@@ -1,0 +1,10 @@
+{
+    Filter = {
+        Executables = (
+            ZYBH
+        );
+        Bundles = (
+            "com.tencent.xin"
+        );
+    };
+} 
