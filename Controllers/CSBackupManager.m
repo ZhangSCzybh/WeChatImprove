@@ -2,6 +2,7 @@
 #import "CSServiceCenter.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
+#import <UIKit/UIKit.h>
 
 #define kUserDefaultsSuiteName @"com.cyansmoke.wechattweak"
 
@@ -32,8 +33,21 @@ static NSString * const kLastAutoBackupDateKey = @"com.wechat.enhance.backup.las
     if (self) {
         [self setupBackupDirectory];
         [self loadBackupList];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationDidBecomeActive:)
+                                                     name:UIApplicationDidBecomeActiveNotification
+                                                   object:nil];
     }
     return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
+    [self performAutoBackupIfNeeded];
 }
 
 #pragma mark - 初始化
@@ -1220,6 +1234,9 @@ static NSString * const kLastAutoBackupDateKey = @"com.wechat.enhance.backup.las
                              error:&error]) {
         [defaults setObject:[NSDate date] forKey:kLastAutoBackupDateKey];
         [defaults synchronize];
+        NSLog(@"[BackupManager] 自动备份成功");
+    } else {
+        NSLog(@"[BackupManager] 自动备份失败: %@", error.localizedDescription);
     }
 }
 

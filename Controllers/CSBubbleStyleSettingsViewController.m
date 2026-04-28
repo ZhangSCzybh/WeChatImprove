@@ -30,7 +30,14 @@ static NSString * const kBubbleReceiverDarkColorGreenKey = @"com.wechat.enhance.
 static NSString * const kBubbleReceiverDarkColorBlueKey = @"com.wechat.enhance.bubble_style.receiver_dark_color.blue";
 static NSString * const kBubbleReceiverDarkColorAlphaKey = @"com.wechat.enhance.bubble_style.receiver_dark_color.alpha";
 
+static NSString * const kMergeMessagesEnabledKey = @"com.wechat.enhance.merge_messages.enabled";
+static NSString * const kMergeMessagesScopeKey = @"com.wechat.enhance.merge_messages.scope";
+static NSString * const kMergeMessagesSpacingKey = @"com.wechat.enhance.merge_messages.spacing";
+static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.merge_messages.avatar_position";
+static NSString * const kConsecutiveMessagesSpacingKey = @"com.wechat.enhance.consecutive_messages.spacing";
+
 static const CGFloat kDefaultCornerRadius = 16.0;
+static const CGFloat kDefaultConsecutiveSpacing = 4.0;
 
 @interface BubbleColorPreviewView : UIView
 @property (nonatomic, strong) UIColor *previewColor;
@@ -280,6 +287,93 @@ static const CGFloat kDefaultCornerRadius = 16.0;
         [weakSelf resetToDefaultColors];
     };
     
+    BOOL mergeEnabled = [defaults boolForKey:kMergeMessagesEnabledKey];
+    NSInteger mergeScope = [defaults integerForKey:kMergeMessagesScopeKey];
+    if (mergeScope == 0) {
+        mergeScope = 2;
+        [defaults setInteger:mergeScope forKey:kMergeMessagesScopeKey];
+        [defaults synchronize];
+    }
+    
+    NSString *scopeText = @"全部生效";
+    switch (mergeScope) {
+        case 1:
+            scopeText = @"群聊生效";
+            break;
+        case 2:
+            scopeText = @"私聊生效";
+            break;
+        case 3:
+            scopeText = @"全部生效";
+            break;
+    }
+    
+    CSSettingItem *mergeEnabledItem = [CSSettingItem switchItemWithTitle:@"合并消息"
+                                                              iconName:@"rectangle.stack"
+                                                             iconColor:[UIColor systemPurpleColor]
+                                                           switchValue:mergeEnabled
+                                                     valueChangedBlock:^(BOOL isOn) {
+        [defaults setBool:isOn forKey:kMergeMessagesEnabledKey];
+        [defaults synchronize];
+        
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            CFSTR("com.wechat.enhance.bubble_style.settings_changed"),
+            NULL,
+            NULL,
+            true
+        );
+    }];
+    
+    CSSettingItem *mergeScopeItem = [CSSettingItem itemWithTitle:@"生效范围"
+                                                       iconName:@"scope"
+                                                      iconColor:[UIColor systemTealColor]
+                                                        detail:scopeText];
+    mergeScopeItem.actionBlock = ^{
+        [weakSelf showMergeScopePicker];
+    };
+    
+    CGFloat consecutiveSpacing = [defaults floatForKey:kConsecutiveMessagesSpacingKey];
+    if (![defaults objectForKey:kConsecutiveMessagesSpacingKey]) {
+        consecutiveSpacing = kDefaultConsecutiveSpacing;
+        [defaults setFloat:consecutiveSpacing forKey:kConsecutiveMessagesSpacingKey];
+        [defaults synchronize];
+    }
+    
+    NSString *consecutiveSpacingText = [NSString stringWithFormat:@"%.1f", consecutiveSpacing];
+    CSSettingItem *consecutiveSpacingItem = [CSSettingItem itemWithTitle:@"连续消息间距"
+                                                               iconName:@"arrow.up.and.down"
+                                                              iconColor:[UIColor systemOrangeColor]
+                                                                detail:consecutiveSpacingText];
+    consecutiveSpacingItem.actionBlock = ^{
+        [weakSelf showConsecutiveSpacingPicker];
+    };
+    
+    NSInteger avatarPosition = [defaults integerForKey:kMergeMessagesAvatarPositionKey];
+    if (avatarPosition == 0) {
+        avatarPosition = 1;
+        [defaults setInteger:avatarPosition forKey:kMergeMessagesAvatarPositionKey];
+        [defaults synchronize];
+    }
+    
+    NSString *avatarPositionText = @"最后一条消息";
+    switch (avatarPosition) {
+        case 1:
+            avatarPositionText = @"最后一条消息";
+            break;
+        case 2:
+            avatarPositionText = @"第一条消息";
+            break;
+    }
+    
+    CSSettingItem *avatarPositionItem = [CSSettingItem itemWithTitle:@"头像显示位置"
+                                                           iconName:@"person.crop.circle"
+                                                          iconColor:[UIColor systemIndigoColor]
+                                                            detail:avatarPositionText];
+    avatarPositionItem.actionBlock = ^{
+        [weakSelf showAvatarPositionPicker];
+    };
+    
     CSSettingSection *mainSection = [CSSettingSection sectionWithHeader:@"功能设置"
                                                                  items:@[bubbleEnabledItem, self.cornerRadiusItem]];
     
@@ -292,10 +386,13 @@ static const CGFloat kDefaultCornerRadius = 16.0;
     CSSettingSection *resetSection = [CSSettingSection sectionWithHeader:@"重置设置"
                                                                   items:@[resetItem]];
     
+    CSSettingSection *mergeSection = [CSSettingSection sectionWithHeader:@"合并消息"
+                                                                  items:@[mergeEnabledItem, mergeScopeItem, consecutiveSpacingItem, avatarPositionItem]];
+    
     CSSettingSection *descSection = [CSSettingSection sectionWithHeader:@"说明"
                                                                  items:@[descItem]];
     
-    self.sections = @[mainSection, lightModeSection, darkModeSection, resetSection, descSection];
+    self.sections = @[mainSection, lightModeSection, darkModeSection, resetSection, mergeSection, descSection];
 }
 
 #pragma mark - Table view data source
@@ -339,6 +436,8 @@ static const CGFloat kDefaultCornerRadius = 16.0;
             return @"点击可选择不同颜色气泡颜色，支持自定义透明度。";
         case 3:
             return @"恢复默认的气泡颜色和圆角设置。";
+        case 4:
+            return @"开启后，同一个人连续发送的消息只保留首条/末条消息的头像。";
         default:
             return nil;
     }
@@ -569,6 +668,218 @@ static const CGFloat kDefaultCornerRadius = 16.0;
             self.receiverDarkColorPreview.previewColor = selectedColor;
             break;
     }
+}
+
+#pragma mark - Merge Scope Picker
+
+- (void)showMergeScopePicker {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSInteger currentScope = [defaults integerForKey:kMergeMessagesScopeKey];
+    if (currentScope == 0) {
+        currentScope = 3;
+    }
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"生效范围"
+                                                                   message:@"选择合并消息功能的生效范围"
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *groupAction = [UIAlertAction actionWithTitle:@"群聊生效"
+                                                          style:UIAlertActionStyleDefault
+                                                        handler:^(UIAlertAction * _Nonnull action) {
+        [defaults setInteger:1 forKey:kMergeMessagesScopeKey];
+        [defaults synchronize];
+        
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            CFSTR("com.wechat.enhance.bubble_style.settings_changed"),
+            NULL,
+            NULL,
+            true
+        );
+        
+        [self setupData];
+        [self.tableView reloadData];
+    }];
+    
+    UIAlertAction *privateAction = [UIAlertAction actionWithTitle:@"私聊生效"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * _Nonnull action) {
+        [defaults setInteger:2 forKey:kMergeMessagesScopeKey];
+        [defaults synchronize];
+        
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            CFSTR("com.wechat.enhance.bubble_style.settings_changed"),
+            NULL,
+            NULL,
+            true
+        );
+        
+        [self setupData];
+        [self.tableView reloadData];
+    }];
+    
+    UIAlertAction *allAction = [UIAlertAction actionWithTitle:@"全部生效"
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * _Nonnull action) {
+        [defaults setInteger:3 forKey:kMergeMessagesScopeKey];
+        [defaults synchronize];
+        
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            CFSTR("com.wechat.enhance.bubble_style.settings_changed"),
+            NULL,
+            NULL,
+            true
+        );
+        
+        [self setupData];
+        [self.tableView reloadData];
+    }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消"
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:nil];
+    
+    if (currentScope == 1) {
+        groupAction.enabled = NO;
+    } else if (currentScope == 2) {
+        privateAction.enabled = NO;
+    } else if (currentScope == 3) {
+        allAction.enabled = NO;
+    }
+    
+    [alert addAction:groupAction];
+    [alert addAction:privateAction];
+    [alert addAction:allAction];
+    [alert addAction:cancelAction];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+#pragma mark - Consecutive Spacing Picker
+
+- (void)showConsecutiveSpacingPicker {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    CGFloat currentSpacing = kDefaultConsecutiveSpacing;
+    
+    if ([defaults objectForKey:kConsecutiveMessagesSpacingKey]) {
+        currentSpacing = [defaults floatForKey:kConsecutiveMessagesSpacingKey];
+    }
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"连续消息间距"
+                                                                   message:@"设置同一发送者连续消息之间的间距（范围: -50-20）\n负值减少间距，正值增加间距  \n（建议设置为-10）"
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+        textField.placeholder = [NSString stringWithFormat:@"当前: %.1f", currentSpacing];
+        textField.text = [NSString stringWithFormat:@"%.1f", currentSpacing];
+    }];
+    
+    UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:@"确定"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * _Nonnull action) {
+        UITextField *textField = alert.textFields.firstObject;
+        NSString *inputText = textField.text;
+        
+        CGFloat spacingValue = [inputText floatValue];
+        
+        if (spacingValue < -50) {
+            spacingValue = -50;
+        } else if (spacingValue > 20) {
+            spacingValue = 20;
+        }
+        
+        [defaults setFloat:spacingValue forKey:kConsecutiveMessagesSpacingKey];
+        [defaults synchronize];
+        
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            CFSTR("com.wechat.enhance.bubble_style.settings_changed"),
+            NULL,
+            NULL,
+            true
+        );
+        
+        [self setupData];
+        [self.tableView reloadData];
+    }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消"
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:nil];
+    
+    [alert addAction:confirmAction];
+    [alert addAction:cancelAction];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+#pragma mark - Avatar Position Picker
+
+- (void)showAvatarPositionPicker {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSInteger currentPosition = [defaults integerForKey:kMergeMessagesAvatarPositionKey];
+    if (currentPosition == 0) {
+        currentPosition = 1;
+    }
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"头像显示位置"
+                                                                   message:@"选择合并消息时头像的显示位置"
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *lastAction = [UIAlertAction actionWithTitle:@"最后一条消息"
+                                                         style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * _Nonnull action) {
+        [defaults setInteger:1 forKey:kMergeMessagesAvatarPositionKey];
+        [defaults synchronize];
+        
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            CFSTR("com.wechat.enhance.bubble_style.settings_changed"),
+            NULL,
+            NULL,
+            true
+        );
+        
+        [self setupData];
+        [self.tableView reloadData];
+    }];
+    
+    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:@"第一条消息"
+                                                          style:UIAlertActionStyleDefault
+                                                        handler:^(UIAlertAction * _Nonnull action) {
+        [defaults setInteger:2 forKey:kMergeMessagesAvatarPositionKey];
+        [defaults synchronize];
+        
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            CFSTR("com.wechat.enhance.bubble_style.settings_changed"),
+            NULL,
+            NULL,
+            true
+        );
+        
+        [self setupData];
+        [self.tableView reloadData];
+    }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消"
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:nil];
+    
+    if (currentPosition == 1) {
+        lastAction.enabled = NO;
+    } else if (currentPosition == 2) {
+        firstAction.enabled = NO;
+    }
+    
+    [alert addAction:lastAction];
+    [alert addAction:firstAction];
+    [alert addAction:cancelAction];
+    
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 @end

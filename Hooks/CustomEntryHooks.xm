@@ -8,6 +8,7 @@
 #import "../Controllers/CSCustomViewController.h" // 自定义设置页面
 #import "../Controllers/CSEntrySettingsViewController.h" // 入口设置控制器
 #import "../Controllers/CSAuthorizationManager.h" // 授权管理器
+#import "../Controllers/CSBackupManager.h" // 备份管理器
 
 // 入口设置相关的键
 static NSString * const kEntryDisplayModeKey = @"com.wechat.tweak.entry.display.mode";
@@ -474,6 +475,11 @@ static int isRegister = 0;
 %ctor {
     // 加载设置
     loadEntrySettings();
+    
+    // 初始化备份管理器，确保自动备份功能可用
+    // 这会在应用启动时触发，确保 CSBackupManager 单例被创建
+    // CSBackupManager 会自动监听应用进入前台的通知
+    [CSBackupManager sharedManager];
     
     // 注册通知观察者，当设置变化时重新加载
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),

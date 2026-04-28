@@ -5,6 +5,8 @@
 #import "../Headers/CSUserInfoHelper.h"
 #import "../Controllers/CSNavigationTitleSettingsViewController.h"
 #import "../Controllers/CSSettingTableViewCell.h"
+#import "../Controllers/CSContactSeparatorManager.h"
+#import "../Controllers/CSContactSeparatorSettingsViewController.h"
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
@@ -43,6 +45,7 @@
 @property (nonatomic, assign) CSNavigationNicknamePosition nicknamePosition; // 网名位置
 @property (nonatomic, assign) CGFloat nicknameSize;              // 网名字体大小
 @property (nonatomic, strong) CContact *otherContact;            // 添加otherContact属性
+@property (nonatomic, copy) NSString *contactId;                 // 联系人ID，用于个性化配置
 - (void)updateOtherAvatarWithUrl:(NSString *)url;
 - (void)updateSelfAvatarWithUrl:(NSString *)url;
 - (void)updateLayoutWithMode:(CSNavigationAvatarMode)mode;
@@ -54,6 +57,7 @@
 - (void)updateVerticalOffset:(CGFloat)offset;
 - (void)updateOtherAvatarWithContact:(CContact *)contact forGroup:(BOOL)isGroup;
 - (void)updateOtherNickname:(NSString *)nickname;               // 添加更新对方网名的方法
+- (void)updateSeparatorForContactId:(NSString *)contactId;      // 根据联系人ID更新分隔符配置
 
 @end
 
@@ -819,6 +823,11 @@
     // 保存联系人信息以便后续使用
     self.otherContact = contact;
     
+    // 更新联系人ID并加载个性化分隔符配置
+    NSString *contactId = contact.m_nsUsrName;
+    self.contactId = contactId;
+    [self updateSeparatorForContactId:contactId];
+    
     if (!isGroup) {
         // 个人或公众号头像
         [self updateOtherAvatarWithUrl:contact.m_nsHeadImgUrl];
@@ -830,6 +839,34 @@
         [self updateOtherAvatarWithUrl:contact.m_nsHeadImgUrl];
         [self updateOtherNickname:contact.m_nsNickName];
     }
+}
+
+- (void)updateSeparatorForContactId:(NSString *)contactId {
+    if (!contactId) return;
+    
+    CSContactSeparatorManager *manager = [CSContactSeparatorManager sharedManager];
+    
+    // 获取联系人个性化配置的分隔符文本
+    NSString *separatorText = [manager separatorTextForContactId:contactId];
+    [self updateSeparatorText:separatorText];
+    
+    // 获取联系人个性化配置的分隔符图片
+    UIImage *separatorImage = [manager separatorImageForContactId:contactId];
+    if (separatorImage) {
+        [self updateSeparatorImage:separatorImage];
+    }
+    
+    // 获取联系人个性化配置的分隔符大小
+    CGFloat separatorSize = [manager separatorSizeForContactId:contactId];
+    [self updateSeparatorSize:separatorSize];
+    
+    // 获取联系人个性化配置的头像间距
+    CGFloat avatarSpacing = [manager avatarSpacingForContactId:contactId];
+    [self updateAvatarSpacing:avatarSpacing];
+    
+    // 获取联系人个性化配置的垂直偏移
+    CGFloat verticalOffset = [manager verticalOffsetForContactId:contactId];
+    [self updateVerticalOffset:verticalOffset];
 }
 
 // 处理设置变更通知
@@ -861,88 +898,36 @@
     CGFloat newRadius = [defaults floatForKey:kNavigationAvatarRadiusKey];
     [self updateSizeAndRadius:newSize radius:newRadius];
     
-    // 更新分隔符大小
-    CGFloat newSeparatorSize = [defaults objectForKey:kNavigationSeparatorSizeKey] ?
-                            [defaults floatForKey:kNavigationSeparatorSizeKey] : kDefaultSeparatorSize;
-    [self updateSeparatorSize:newSeparatorSize];
-    
-    // 更新头像间距
-    CGFloat newAvatarSpacing = [defaults objectForKey:kNavigationAvatarSpacingKey] ?
-                            [defaults floatForKey:kNavigationAvatarSpacingKey] : kDefaultAvatarSpacing;
-    [self updateAvatarSpacing:newAvatarSpacing];
-    
-    // 更新垂直偏移
-    CGFloat newVerticalOffset = [defaults objectForKey:kNavigationVerticalOffsetKey] ?
-                              [defaults floatForKey:kNavigationVerticalOffsetKey] : kDefaultVerticalOffset;
-    [self updateVerticalOffset:newVerticalOffset];
-    
-    // 更新分隔符文本
-    NSString *newSeparator = [defaults objectForKey:kNavigationSeparatorTextKey] ?
-                            [defaults stringForKey:kNavigationSeparatorTextKey] : @"💗";
-    [self updateSeparatorText:newSeparator];
-    
-    // 检查并更新分隔符图片
-    NSString *imagePath = [defaults objectForKey:kNavigationSeparatorImageKey];
-    if (imagePath) {
-        if ([[NSFileManager defaultManager] fileExistsAtPath:imagePath]) {
+    // 如果有联系人ID，优先使用联系人个性化配置
+    if (self.contactId.length > 0) {
+        [self updateSeparatorForContactId:self.contactId];
+    } else {
+        // 使用全局设置
+        CGFloat newSeparatorSize = [defaults objectForKey:kNavigationSeparatorSizeKey] ?
+                                [defaults floatForKey:kNavigationSeparatorSizeKey] : kDefaultSeparatorSize;
+        [self updateSeparatorSize:newSeparatorSize];
+        
+        CGFloat newAvatarSpacing = [defaults objectForKey:kNavigationAvatarSpacingKey] ?
+                                [defaults floatForKey:kNavigationAvatarSpacingKey] : kDefaultAvatarSpacing;
+        [self updateAvatarSpacing:newAvatarSpacing];
+        
+        CGFloat newVerticalOffset = [defaults objectForKey:kNavigationVerticalOffsetKey] ?
+                                  [defaults floatForKey:kNavigationVerticalOffsetKey] : kDefaultVerticalOffset;
+        [self updateVerticalOffset:newVerticalOffset];
+        
+        NSString *newSeparator = [defaults objectForKey:kNavigationSeparatorTextKey] ?
+                                [defaults stringForKey:kNavigationSeparatorTextKey] : @"💗";
+        [self updateSeparatorText:newSeparator];
+        
+        NSString *imagePath = [defaults objectForKey:kNavigationSeparatorImageKey];
+        if (imagePath && [[NSFileManager defaultManager] fileExistsAtPath:imagePath]) {
             NSData *imageData = [NSData dataWithContentsOfFile:imagePath];
             if (imageData) {
                 UIImage *image = [UIImage imageWithData:imageData];
                 [self updateSeparatorImage:image];
-            } else {
-                [self updateSeparatorImage:nil]; // 无法加载图片，使用文本
             }
         } else {
-            // 尝试在固定位置查找
-            // 资源存储路径：Preferences/WeChatImprove/separator_image.png（原WechatEnhance已更名为WeChatImprove）
-            NSString *prefsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
-            prefsPath = [prefsPath stringByAppendingPathComponent:@"Preferences"];
-            NSString *enhanceFolderPath = [prefsPath stringByAppendingPathComponent:@"WeChatImprove"];
-            NSString *fixedPath = [enhanceFolderPath stringByAppendingPathComponent:@"separator_image.png"];
-            
-            if ([[NSFileManager defaultManager] fileExistsAtPath:fixedPath]) {
-                // 找到了固定位置的图片，更新保存的路径
-                [defaults setObject:fixedPath forKey:kNavigationSeparatorImageKey];
-                [defaults synchronize];
-                
-                // 加载图片
-                NSData *imageData = [NSData dataWithContentsOfFile:fixedPath];
-                if (imageData) {
-                    UIImage *image = [UIImage imageWithData:imageData];
-                    [self updateSeparatorImage:image];
-                } else {
-                    [self updateSeparatorImage:nil]; // 无法加载图片，使用文本
-                }
-            } else {
-                // 路径存在但文件不存在，清除设置
-                [defaults removeObjectForKey:kNavigationSeparatorImageKey];
-                [defaults synchronize];
-                [self updateSeparatorImage:nil]; // 文件不存在，使用文本
-            }
-        }
-    } else {
-        // 尝试加载固定位置的图片
-        // 资源存储路径：Preferences/WeChatImprove/separator_image.png（原WechatEnhance已更名为WeChatImprove）
-        NSString *prefsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
-        prefsPath = [prefsPath stringByAppendingPathComponent:@"Preferences"];
-        NSString *enhanceFolderPath = [prefsPath stringByAppendingPathComponent:@"WeChatImprove"];
-        NSString *fixedPath = [enhanceFolderPath stringByAppendingPathComponent:@"separator_image.png"];
-        
-        if ([[NSFileManager defaultManager] fileExistsAtPath:fixedPath]) {
-            // 找到了固定位置的图片，更新保存的路径
-            [defaults setObject:fixedPath forKey:kNavigationSeparatorImageKey];
-            [defaults synchronize];
-            
-            // 加载图片
-            NSData *imageData = [NSData dataWithContentsOfFile:fixedPath];
-            if (imageData) {
-                UIImage *image = [UIImage imageWithData:imageData];
-                [self updateSeparatorImage:image];
-            } else {
-                [self updateSeparatorImage:nil]; // 无法加载图片，使用文本
-            }
-        } else {
-            [self updateSeparatorImage:nil]; // 没有图片路径，使用文本
+            [self updateSeparatorImage:nil];
         }
     }
     
@@ -1333,6 +1318,11 @@
         [self addOfficialAccountInfoSection:contact];
     }
     
+    // 添加个性化分隔符设置入口（仅对私聊和公众号显示）
+    if (![chatID hasSuffix:@"@chatroom"]) {
+        [self addSeparatorConfigSection:contact];
+    }
+    
     // 刷新表格视图
     [_tableView reloadData];
 }
@@ -1460,6 +1450,68 @@
     
     CSSettingSection *section = [CSSettingSection sectionWithHeader:@"公众号信息" items:items];
     [_sections addObject:section];
+}
+
+- (void)addSeparatorConfigSection:(CContact *)contact {
+    NSMutableArray *items = [NSMutableArray array];
+    
+    CSContactSeparatorManager *manager = [CSContactSeparatorManager sharedManager];
+    BOOL hasCustomConfig = [manager hasCustomConfigForContactId:contact.m_nsUsrName];
+    
+    NSString *statusText = hasCustomConfig ? @"已设置个性化" : @"使用全局设置";
+    
+    CSSettingItem *separatorItem = [CSSettingItem itemWithTitle:@"分隔符设置"
+                                                      iconName:@"heart.circle"
+                                                     iconColor:[UIColor systemPinkColor]
+                                                        detail:statusText];
+    separatorItem.actionBlock = ^{
+        [self showSeparatorSettingsForContact:contact];
+    };
+    [items addObject:separatorItem];
+    
+    if (hasCustomConfig) {
+        CSSettingItem *resetItem = [CSSettingItem actionItemWithTitle:@"重置为全局设置"
+                                                            iconName:@"arrow.counterclockwise"
+                                                           iconColor:[UIColor systemRedColor]];
+        resetItem.actionBlock = ^{
+            [[CSContactSeparatorManager sharedManager] removeConfigForContactId:contact.m_nsUsrName];
+            [self updateUIWithContact:contact];
+        };
+        [items addObject:resetItem];
+    }
+    
+    CSSettingSection *section = [CSSettingSection sectionWithHeader:@"个性化设置" items:items];
+    [_sections addObject:section];
+}
+
+- (void)showSeparatorSettingsForContact:(CContact *)contact {
+    NSString *contactName = contact.m_nsNickName;
+    
+    UIImage *contactAvatar = nil;
+    if (contact.m_nsHeadImgUrl.length > 0) {
+        NSURL *url = [NSURL URLWithString:contact.m_nsHeadImgUrl];
+        NSData *data = [NSData dataWithContentsOfURL:url];
+        if (data) {
+            contactAvatar = [UIImage imageWithData:data];
+        }
+    }
+    
+    CSContactSeparatorSettingsViewController *settingsVC = [[CSContactSeparatorSettingsViewController alloc]
+                                                            initWithContactId:contact.m_nsUsrName
+                                                            contactName:contactName
+                                                            contactAvatar:contactAvatar];
+    
+    UINavigationController *navVC = [[UINavigationController alloc] initWithRootViewController:settingsVC];
+    navVC.modalPresentationStyle = UIModalPresentationFormSheet;
+    
+    if (@available(iOS 15.0, *)) {
+        if (navVC.sheetPresentationController) {
+            navVC.sheetPresentationController.detents = @[UISheetPresentationControllerDetent.mediumDetent];
+            navVC.sheetPresentationController.prefersGrabberVisible = YES;
+        }
+    }
+    
+    [self presentViewController:navVC animated:YES completion:nil];
 }
 
 #pragma mark - TableView 数据源方法
@@ -1743,9 +1795,10 @@
     // 添加震动反馈
     [self playHapticFeedback];
     
+    CSSettingItem *item = _sections[indexPath.section].items[indexPath.row];
+    
     // 检查是否点击了个人主页选项
     if (indexPath.section == 1 && indexPath.row == 0) {
-        CSSettingItem *item = _sections[indexPath.section].items[indexPath.row];
         CContact *contact = (CContact *)objc_getAssociatedObject(item, "profileContact");
         
         if (contact) {
@@ -1792,9 +1845,14 @@
         return;
     }
     
+    // 检查是否有 actionBlock（如个性化设置入口）
+    if (item.actionBlock) {
+        item.actionBlock();
+        return;
+    }
+    
     // 其他信息项的复制逻辑
     if (indexPath.section > 0) {
-        CSSettingItem *item = _sections[indexPath.section].items[indexPath.row];
         if (item.detail.length > 0) {
             // 避免复制"未设置"和"未知"
             if (![item.detail isEqualToString:@"未设置"] && ![item.detail isEqualToString:@"未知"]) {

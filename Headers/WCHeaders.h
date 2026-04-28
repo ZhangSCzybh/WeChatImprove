@@ -126,6 +126,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)scrollToMessage:(id)message highlight:(BOOL)highlight marginTop:(double)marginTop animated:(BOOL)animated;
 /// 获取当前聊天会话名称
 - (NSString *)getCurrentChatName;
+/// 获取消息节点数据数组
+- (NSMutableArray *)GetMessageNodeDataArray;
 @end
 
 /// 聊天消息视图模型
@@ -179,6 +181,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *m_nsContent;    // 消息内容
 @property (nonatomic, copy) NSString *m_nsToUsr;      // 接收人
 @property (nonatomic, copy) NSString *m_nsFromUsr;    // 发送人
+@property (nonatomic, copy) NSString *m_nsRealChatUsr; // 群聊中的实际发送者
 @property (nonatomic, assign) unsigned int m_uiStatus; // 消息状态
 @property (nonatomic, assign) unsigned int m_uiCreateTime; // 创建时间
 @property (nonatomic, assign) unsigned int m_uiMessageType; // 消息类型
@@ -219,6 +222,13 @@ NS_ASSUME_NONNULL_BEGIN
 // iPad登录页面控制器
 @interface WCAccountBackDeviceFirstViewController : UIViewController
 @property (nonatomic, strong) UIButton *deviceModeButton;
+@end
+
+#pragma mark - 设置工具类
+
+/// 设置工具类
+@interface SettingUtil : NSObject
++ (NSString *)getCurUsrName;
 @end
 
 NS_ASSUME_NONNULL_END 
