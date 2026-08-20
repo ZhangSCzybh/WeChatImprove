@@ -30,6 +30,10 @@
 #import "CSChatGroupSettingsViewController.h"
 #import "CSTabBarStyleSettingsViewController.h"
 #import "CSAuthorizationManager.h"
+#import <objc/runtime.h>
+
+static UIImage *gCachedQRCodeImage = nil;
+static UIView *gBlurOverlayView = nil;
 
 // UI 常量
 static CGFloat const kHeaderViewHeight = 150.0f;        // 头部视图高度
@@ -928,10 +932,10 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                   iconColor:[UIColor systemBlueColor]
                                                     detail:kPluginVersionString];
     
-    CSSettingItem *authorItem = [CSSettingItem itemWithTitle:@"关注作者"
+    CSSettingItem *authorItem = [CSSettingItem itemWithTitle:@"支持作者"
                                                    iconName:@"person.circle"
                                                   iconColor:[UIColor systemRedColor]
-                                                    detail:@"zaiyebuhui"];
+                                                    detail:@"️赞助咖啡☕️(≧▽≦)"];
     
     CSSettingSection *aboutSection = [CSSettingSection sectionWithHeader:@"关于"
                                                                  items:@[versionItem, authorItem]];
@@ -1138,6 +1142,10 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
             CSBackupSettingsViewController *backupVC = [[CSBackupSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
             [self.navigationController pushViewController:backupVC animated:YES];
         }
+        // 处理支持作者点击
+        else if ([item.title isEqualToString:@"支持作者"]) {
+            [self supportAuthor];
+        }
     }
     // 处理输入类型项的点击
     else if (item.itemType == CSSettingItemTypeInput) {
@@ -1178,6 +1186,217 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
         selectedBackgroundView.backgroundColor = [UIColor systemGray5Color];
     }
     cell.selectedBackgroundView = selectedBackgroundView;
+}
+
+#pragma mark - 支持作者
+
+- (void)supportAuthor {
+    [self showBlurOverlay];
+    
+    if (gCachedQRCodeImage) {
+        NSLog(@"[SupportAuthor] Using cached QR code image");
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"com.wechat.tweak.auto_scan_image"
+                                                          object:nil
+                                                        userInfo:@{@"image": gCachedQRCodeImage, @"blurOverlay": gBlurOverlayView ?: [NSNull null]}];
+        [self openWeChatScanQRCode];
+    } else {
+        [self downloadAndSaveQRCodeImage];
+    }
+}
+
+- (void)downloadAndSaveQRCodeImage {
+    NSString *imageUrlString = @"https://i.postimg.cc/rwSLZ9KP/ZSM.jpg";
+    NSURL *imageUrl = [NSURL URLWithString:imageUrlString];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSData *imageData = [NSData dataWithContentsOfURL:imageUrl];
+        
+        if (imageData) {
+            UIImage *image = [UIImage imageWithData:imageData];
+            gCachedQRCodeImage = image;
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSLog(@"[SupportAuthor] QR code image downloaded and cached");
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"com.wechat.tweak.auto_scan_image"
+                                                                  object:nil
+                                                                userInfo:@{@"image": image, @"blurOverlay": gBlurOverlayView ?: [NSNull null]}];
+                
+                [self openWeChatScanQRCode];
+            });
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self hideBlurOverlay];
+                
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"下载失败"
+                                                                               message:@"无法下载赞赏码图片，请检查网络连接"
+                                                                        preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定"
+                                                                   style:UIAlertActionStyleDefault
+                                                                 handler:nil];
+                [alert addAction:okAction];
+                [self presentViewController:alert animated:YES completion:nil];
+            });
+        }
+    });
+}
+
+- (void)openWeChatScanQRCode {
+    void (^openScanBlock)(void) = ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            Class WCBizUtilClass = NSClassFromString(@"WCBizUtil");
+            if (WCBizUtilClass) {
+                SEL jumpScanQRCodeSelector = NSSelectorFromString(@"jumpScanQRCode");
+                if ([WCBizUtilClass respondsToSelector:jumpScanQRCodeSelector]) {
+                    [WCBizUtilClass performSelector:jumpScanQRCodeSelector];
+                }
+            }
+        });
+    };
+    
+    UIViewController *topVC = [self topViewController];
+    
+    if (topVC.presentingViewController) {
+        [topVC dismissViewControllerAnimated:YES completion:openScanBlock];
+    } else if (topVC.navigationController) {
+        [topVC.navigationController popToRootViewControllerAnimated:YES];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), openScanBlock);
+    } else {
+        openScanBlock();
+    }
+}
+
+- (UIViewController *)topViewController {
+    UIViewController *topVC = self;
+    
+    while (topVC.presentedViewController) {
+        topVC = topVC.presentedViewController;
+    }
+    
+    if ([topVC isKindOfClass:[UINavigationController class]]) {
+        topVC = [(UINavigationController *)topVC topViewController];
+    }
+    
+    if ([topVC isKindOfClass:[UITabBarController class]]) {
+        topVC = [(UITabBarController *)topVC selectedViewController];
+    }
+    
+    return topVC;
+}
+
+- (void)showBlurOverlay {
+    if (gBlurOverlayView) {
+        [gBlurOverlayView removeFromSuperview];
+        gBlurOverlayView = nil;
+    }
+    
+    UIWindow *keyWindow = nil;
+    if (@available(iOS 13.0, *)) {
+        for (UIWindowScene *windowScene in [UIApplication sharedApplication].connectedScenes) {
+            if (windowScene.activationState == UISceneActivationStateForegroundActive) {
+                for (UIWindow *window in windowScene.windows) {
+                    if (window.isKeyWindow) {
+                        keyWindow = window;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    if (!keyWindow) {
+        keyWindow = [UIApplication sharedApplication].keyWindow;
+    }
+    
+    if (!keyWindow) {
+        return;
+    }
+    
+    gBlurOverlayView = [[UIView alloc] initWithFrame:keyWindow.bounds];
+    gBlurOverlayView.backgroundColor = [UIColor clearColor];
+    gBlurOverlayView.userInteractionEnabled = NO;
+    
+    if (@available(iOS 13.0, *)) {
+        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemMaterial];
+        UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+        blurView.frame = gBlurOverlayView.bounds;
+        blurView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [gBlurOverlayView addSubview:blurView];
+    } else {
+        gBlurOverlayView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.95];
+    }
+    
+    UIView *contentView = [[UIView alloc] init];
+    contentView.translatesAutoresizingMaskIntoConstraints = NO;
+    [gBlurOverlayView addSubview:contentView];
+    
+    UIActivityIndicatorView *activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
+    activityIndicator.translatesAutoresizingMaskIntoConstraints = NO;
+    if (@available(iOS 13.0, *)) {
+        activityIndicator.color = [UIColor labelColor];
+    } else {
+        activityIndicator.color = [UIColor darkGrayColor];
+    }
+    [activityIndicator startAnimating];
+    [contentView addSubview:activityIndicator];
+    
+    UILabel *titleLabel = [[UILabel alloc] init];
+    titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    titleLabel.text = @"正在打开赞赏页面";
+    titleLabel.font = [UIFont boldSystemFontOfSize:18];
+    if (@available(iOS 13.0, *)) {
+        titleLabel.textColor = [UIColor labelColor];
+    } else {
+        titleLabel.textColor = [UIColor darkTextColor];
+    }
+    titleLabel.textAlignment = NSTextAlignmentCenter;
+    [contentView addSubview:titleLabel];
+    
+    UILabel *subtitleLabel = [[UILabel alloc] init];
+    subtitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    subtitleLabel.text = @"请稍候...";
+    subtitleLabel.font = [UIFont systemFontOfSize:14];
+    if (@available(iOS 13.0, *)) {
+        subtitleLabel.textColor = [UIColor secondaryLabelColor];
+    } else {
+        subtitleLabel.textColor = [UIColor grayColor];
+    }
+    subtitleLabel.textAlignment = NSTextAlignmentCenter;
+    [contentView addSubview:subtitleLabel];
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [contentView.centerXAnchor constraintEqualToAnchor:gBlurOverlayView.centerXAnchor],
+        [contentView.centerYAnchor constraintEqualToAnchor:gBlurOverlayView.centerYAnchor],
+        
+        [activityIndicator.topAnchor constraintEqualToAnchor:contentView.topAnchor],
+        [activityIndicator.centerXAnchor constraintEqualToAnchor:contentView.centerXAnchor],
+        
+        [titleLabel.topAnchor constraintEqualToAnchor:activityIndicator.bottomAnchor constant:20],
+        [titleLabel.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor],
+        [titleLabel.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor],
+        
+        [subtitleLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:8],
+        [subtitleLabel.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor],
+        [subtitleLabel.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor],
+        [subtitleLabel.bottomAnchor constraintEqualToAnchor:contentView.bottomAnchor]
+    ]];
+    
+    gBlurOverlayView.alpha = 0;
+    [keyWindow addSubview:gBlurOverlayView];
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        gBlurOverlayView.alpha = 1;
+    }];
+}
+
+- (void)hideBlurOverlay {
+    if (gBlurOverlayView) {
+        [UIView animateWithDuration:0.2 animations:^{
+            gBlurOverlayView.alpha = 0;
+        } completion:^(BOOL finished) {
+            [gBlurOverlayView removeFromSuperview];
+            gBlurOverlayView = nil;
+        }];
+    }
 }
 
 @end 

@@ -138,6 +138,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isSender;
 /// 获取消息包装对象
 - (id)messageWrap;
+/// 是否显示群聊昵称
+- (BOOL)isShowChatRoomDisplayName;
+@end
+
+/// 长文本消息子视图模型
+@interface TextMessageSubViewModel : CommonMessageViewModel
+/// 父模型（对于长文本消息，指向父消息模型）
+@property (readonly, nonatomic) id parentModel;
+/// 子视图模型列表
+@property (readonly, nonatomic) NSArray *subViewModels;
 @end
 
 /// 系统消息单元格视图

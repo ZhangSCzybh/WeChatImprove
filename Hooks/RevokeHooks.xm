@@ -522,6 +522,58 @@ static NSString *revokeChatNameFromObject(id obj) {
     return nil;
 }
 
+// 计算消息居中显示所需的 marginTop 值
+static double calculateCenterMarginTop(id viewController, id message) {
+    if (!viewController || !message) return 100.0;
+    
+    double marginTop = 100.0;
+    
+    @try {
+        // 获取屏幕高度
+        CGRect screenBounds = [UIScreen mainScreen].bounds;
+        double screenHeight = screenBounds.size.height;
+        
+        // 获取导航栏高度（通常为44或更大）
+        double navBarHeight = 44.0;
+        if (@available(iOS 11.0, *)) {
+            UIWindow *window = [UIApplication sharedApplication].keyWindow;
+            if (window) {
+                UIEdgeInsets safeArea = window.safeAreaInsets;
+                navBarHeight = 44.0 + safeArea.top;
+            }
+        }
+        
+        // 获取输入框高度（通常为50-100）
+        double inputHeight = 50.0;
+        
+        // 计算可用高度
+        double availableHeight = screenHeight - navBarHeight - inputHeight;
+        
+        // 目标：让消息显示在可用区域的中间
+        // marginTop 应该是可用高度的一半
+        marginTop = availableHeight / 2.0;
+        
+        // 使用 calculateOffsetWithMsg 方法（如果可用）
+        SEL calcOffsetSel = @selector(calculateOffsetWithMsg:marginTop:);
+        if ([viewController respondsToSelector:calcOffsetSel]) {
+            double calculatedOffset = ((double (*)(id, SEL, id, double))objc_msgSend)(viewController, calcOffsetSel, message, marginTop);
+            if (calculatedOffset > 0) {
+                marginTop = calculatedOffset;
+            }
+        }
+        
+        // 确保 marginTop 在合理范围内
+        if (marginTop < 60.0) marginTop = 60.0;
+        if (marginTop > screenHeight - 100.0) marginTop = screenHeight / 2.0;
+        
+    } @catch (NSException *e) {
+        NSLog(@"[防撤回] 计算居中偏移量异常: %@", e);
+        marginTop = 100.0;
+    }
+    
+    return marginTop;
+}
+
 // Hook CMessageMgr处理撤回消息
 %hook CMessageMgr
 
@@ -583,8 +635,11 @@ static NSString *revokeChatNameFromObject(id obj) {
                                 
                                 if (originalMsg) {
                                     
-                                    // 调用scrollToMessage方法跳转到原消息
-                                    [self scrollToMessage:originalMsg highlight:YES marginTop:60.0 animated:YES];
+                                    // 计算居中显示的 marginTop 值
+                                    double centerMarginTop = calculateCenterMarginTop(self, originalMsg);
+                                    
+                                    // 调用scrollToMessage方法跳转到原消息，显示在屏幕中间
+                                    [self scrollToMessage:originalMsg highlight:YES marginTop:centerMarginTop animated:YES];
                                     return;
                                 } else {
                                     NSLog(@"[防撤回] 未找到原消息: session=%@ msgId=%lld", session, revokedMsgId);
@@ -660,7 +715,11 @@ static NSString *revokeChatNameFromObject(id obj) {
                         
                         
                         if (originalMsg) {
-                            [chatVC scrollToMessage:originalMsg highlight:YES marginTop:60.0 animated:YES];
+                            // 计算居中显示的 marginTop 值
+                            double centerMarginTop = calculateCenterMarginTop(chatVC, originalMsg);
+                            
+                            // 调用scrollToMessage方法跳转到原消息，显示在屏幕中间
+                            [chatVC scrollToMessage:originalMsg highlight:YES marginTop:centerMarginTop animated:YES];
                             return;
                         } else {
                             NSLog(@"[防撤回] 未找到原消息: session=%@ msgId=%lld", session, revokedMsgId);

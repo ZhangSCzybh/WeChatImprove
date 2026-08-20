@@ -7,8 +7,6 @@ static NSString * const kMessageTimeFontSizeKey = @"com.wechat.enhance.messageTi
 static NSString * const kMessageTimeTextColorKey = @"com.wechat.enhance.messageTime.textColor";
 static NSString * const kMessageTimeBackgroundColorKey = @"com.wechat.enhance.messageTime.backgroundColor";
 static NSString * const kMessageTimeCornerRadiusKey = @"com.wechat.enhance.messageTime.cornerRadius";
-static NSString * const kMessageTimeTextAlphaKey = @"com.wechat.enhance.messageTime.textAlpha";
-static NSString * const kMessageTimeBackgroundAlphaKey = @"com.wechat.enhance.messageTime.backgroundAlpha";
 // 显示格式控制
 static NSString * const kMessageTimeShowYearKey = @"com.wechat.enhance.messageTime.showYear";
 static NSString * const kMessageTimeShowMonthKey = @"com.wechat.enhance.messageTime.showMonth";
@@ -22,12 +20,12 @@ static NSString * const kMessageTimeShowBelowAvatarKey = @"com.wechat.enhance.me
 static NSString * const kMessageTimeBoldFontKey = @"com.wechat.enhance.messageTime.boldFont";
 // 日期时间换行控制
 static NSString * const kMessageTimeSingleLineKey = @"com.wechat.enhance.messageTime.singleLine";
+// 点击显示控制
+static NSString * const kMessageTimeTapToShowKey = @"com.wechat.enhance.messageTime.tapToShow";
 
 // 默认值
 static CGFloat const kDefaultFontSize = 7.0f;      // 字体大小
 static CGFloat const kDefaultCornerRadius = 8.0f;  // 圆角大小
-static CGFloat const kDefaultTextAlpha = 0.8f;    // 文字透明度
-static CGFloat const kDefaultBackgroundAlpha = 0.8f; // 背景透明度
 static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
 
 @interface CSMessageTimeSettingsViewController () <UIColorPickerViewControllerDelegate>
@@ -70,11 +68,11 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
         self.textColor = [NSKeyedUnarchiver unarchivedObjectOfClass:[UIColor class] fromData:textColorData error:&error];
         if (error) {
             // 如果解档失败，使用默认灰色
-            self.textColor = [UIColor colorWithWhite:0.5 alpha:kDefaultTextAlpha];
+            self.textColor = [UIColor colorWithWhite:0.5 alpha:0.8];
         }
     } else {
         // 默认灰色
-        self.textColor = [UIColor colorWithWhite:0.5 alpha:kDefaultTextAlpha];
+        self.textColor = [UIColor colorWithWhite:0.5 alpha:0.8];
     }
     
     // 加载背景颜色
@@ -161,8 +159,20 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:4] withRowAnimation:UITableViewRowAnimationNone];
     }];
     
+    // 添加点击显示选项
+    CSSettingItem *tapToShowItem = [CSSettingItem switchItemWithTitle:@"点击显示" 
+                                                            iconName:@"hand.tap.fill" 
+                                                           iconColor:[UIColor systemCyanColor] 
+                                                         switchValue:[defaults boolForKey:kMessageTimeTapToShowKey] 
+                                                   valueChangedBlock:^(BOOL isOn) {
+        [defaults setBool:isOn forKey:kMessageTimeTapToShowKey];
+        [defaults synchronize];
+        // 刷新预览区域
+        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:4] withRowAnimation:UITableViewRowAnimationNone];
+    }];
+    
     CSSettingSection *positionSection = [CSSettingSection sectionWithHeader:@"显示位置" 
-                                                                 items:@[belowAvatarItem, boldFontItem, singleLineItem]];
+                                                                 items:@[belowAvatarItem, boldFontItem, singleLineItem, tapToShowItem]];
     
     // 创建时间格式设置项 - 默认值设置，如果没有存储过设置
     if (![defaults objectForKey:kMessageTimeShowHourKey]) {
@@ -283,35 +293,11 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
                                                        iconColor:[UIColor systemPurpleColor] 
                                                          detail:[NSString stringWithFormat:@"%.1f", savedCornerRadius]];
     
-    // 文字透明度
-    CGFloat savedTextAlpha = [defaults floatForKey:kMessageTimeTextAlphaKey];
-    if (savedTextAlpha == 0) { // 如果为0，可能未设置过，使用默认值
-        savedTextAlpha = kDefaultTextAlpha;
-    }
-    
-    CSSettingItem *textAlphaItem = [CSSettingItem itemWithTitle:@"文字透明度" 
-                                                      iconName:@"slider.horizontal.3" 
-                                                     iconColor:[UIColor systemTealColor] 
-                                                       detail:[NSString stringWithFormat:@"%.1f", savedTextAlpha]];
-    
-    // 背景透明度
-    CGFloat savedBgAlpha = [defaults floatForKey:kMessageTimeBackgroundAlphaKey];
-    if (savedBgAlpha == 0 && ![defaults objectForKey:kMessageTimeBackgroundAlphaKey]) { // 如果为0且未设置过，使用默认值
-        savedBgAlpha = kDefaultBackgroundAlpha;
-    }
-    
-    CSSettingItem *bgAlphaItem = [CSSettingItem itemWithTitle:@"背景透明度" 
-                                                    iconName:@"slider.horizontal.below.rectangle" 
-                                                   iconColor:[UIColor systemIndigoColor] 
-                                                     detail:[NSString stringWithFormat:@"%.1f", savedBgAlpha]];
-    
     CSSettingSection *styleSection = [CSSettingSection sectionWithHeader:@"样式设置" 
                                                                  items:@[fontSizeItem,
                                                                         textColorItem,
                                                                         backgroundColorItem,
-                                                                        cornerRadiusItem,
-                                                                        textAlphaItem,
-                                                                        bgAlphaItem]];
+                                                                        cornerRadiusItem]];
     
     // 设置预览组 - 不再使用CSSettingItem，直接在tableView中处理
     CSSettingSection *previewSection = [CSSettingSection sectionWithHeader:@"预览" 
@@ -384,9 +370,9 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
         
         // 为颜色项添加颜色预览指示器
         if (indexPath.row == 1) { // 文字颜色
-            [self addColorIndicator:cell forColor:self.textColor alpha:[self getTextAlpha]];
+            [self addColorIndicator:cell forColor:self.textColor];
         } else if (indexPath.row == 2) { // 背景颜色
-            [self addColorIndicator:cell forColor:self.backgroundColor alpha:[self getBackgroundAlpha]];
+            [self addColorIndicator:cell forColor:self.backgroundColor];
         }
     }
     
@@ -394,22 +380,22 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
 }
 
 // 为颜色项添加颜色预览指示器
-- (void)addColorIndicator:(CSSettingTableViewCell *)cell forColor:(UIColor *)color alpha:(CGFloat)alpha {
+- (void)addColorIndicator:(CSSettingTableViewCell *)cell forColor:(UIColor *)color {
     // 创建颜色指示器
     UIView *colorIndicator = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 22, 22)];
     colorIndicator.layer.cornerRadius = 11;
     colorIndicator.layer.borderWidth = 1;
     colorIndicator.layer.borderColor = [UIColor systemGray4Color].CGColor;
     
-    // 使用实际颜色及透明度
-    if (color && ![color isEqual:[UIColor clearColor]]) {
-        colorIndicator.backgroundColor = [color colorWithAlphaComponent:alpha];
-    } else if (alpha > 0) {
-        colorIndicator.backgroundColor = [UIColor colorWithWhite:0.9 alpha:alpha];
+    // 使用实际颜色
+    if (color) {
+        colorIndicator.backgroundColor = color;
     } else {
-        // 如果是透明色，显示一个标记
         colorIndicator.backgroundColor = [UIColor clearColor];
-        
+    }
+    
+    // 如果是透明色，显示一个标记
+    if ([color isEqual:[UIColor clearColor]]) {
         // 添加一个斜线表示透明
         CAShapeLayer *lineLayer = [CAShapeLayer layer];
         UIBezierPath *linePath = [UIBezierPath bezierPath];
@@ -450,9 +436,6 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
     CGFloat fontSize = [defaults floatForKey:kMessageTimeFontSizeKey];
     if (fontSize == 0) fontSize = kDefaultFontSize;
     
-    CGFloat textAlpha = [self getTextAlpha];
-    CGFloat bgAlpha = [self getBackgroundAlpha];
-    
     CGFloat cornerRadius = [defaults floatForKey:kMessageTimeCornerRadiusKey];
     if (cornerRadius == 0) cornerRadius = kDefaultCornerRadius;
     
@@ -492,8 +475,6 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
     // 接收方消息（左侧），时间标签显示在右侧
     UILabel *receiveTimeLabel = [self createTimeLabel:timeText
                                              fontSize:fontSize
-                                            textAlpha:textAlpha
-                                              bgAlpha:bgAlpha
                                         cornerRadius:cornerRadius];
     
     // 固定时间标签位置
@@ -598,8 +579,6 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
 // 创建时间标签
 - (UILabel *)createTimeLabel:(NSString *)timeText
                     fontSize:(CGFloat)fontSize
-                   textAlpha:(CGFloat)textAlpha
-                     bgAlpha:(CGFloat)bgAlpha
                cornerRadius:(CGFloat)cornerRadius {
     
     // 创建时间标签
@@ -619,16 +598,14 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
     
     // 设置文字颜色
     if (self.textColor) {
-        timeLabel.textColor = [self.textColor colorWithAlphaComponent:textAlpha];
+        timeLabel.textColor = self.textColor;
     } else {
-        timeLabel.textColor = [UIColor colorWithWhite:0.5 alpha:textAlpha];
+        timeLabel.textColor = [UIColor colorWithWhite:0.5 alpha:0.8];
     }
     
     // 设置背景颜色
-    if (self.backgroundColor && ![self.backgroundColor isEqual:[UIColor clearColor]]) {
-        timeLabel.backgroundColor = [self.backgroundColor colorWithAlphaComponent:bgAlpha];
-    } else if (bgAlpha > 0) {
-        timeLabel.backgroundColor = [UIColor colorWithWhite:0.9 alpha:bgAlpha];
+    if (self.backgroundColor) {
+        timeLabel.backgroundColor = self.backgroundColor;
     } else {
         timeLabel.backgroundColor = [UIColor clearColor];
     }
@@ -717,26 +694,6 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
     return bubbleContainer;
 }
 
-// 获取文字透明度
-- (CGFloat)getTextAlpha {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    CGFloat textAlpha = [defaults floatForKey:kMessageTimeTextAlphaKey];
-    if (textAlpha == 0 && ![defaults objectForKey:kMessageTimeTextAlphaKey]) {
-        textAlpha = kDefaultTextAlpha;
-    }
-    return textAlpha;
-}
-
-// 获取背景透明度
-- (CGFloat)getBackgroundAlpha {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    CGFloat bgAlpha = [defaults floatForKey:kMessageTimeBackgroundAlphaKey];
-    if (bgAlpha == 0 && ![defaults objectForKey:kMessageTimeBackgroundAlphaKey]) {
-        bgAlpha = kDefaultBackgroundAlpha;
-    }
-    return bgAlpha;
-}
-
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     return self.sections[section].header;
 }
@@ -775,12 +732,6 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
                 break;
             case 3: // 圆角大小
                 [self showCornerRadiusInputAlert];
-                break;
-            case 4: // 文字透明度
-                [self showAlphaInputAlertForKey:kMessageTimeTextAlphaKey title:@"文字透明度"];
-                break;
-            case 5: // 背景透明度
-                [self showAlphaInputAlertForKey:kMessageTimeBackgroundAlphaKey title:@"背景透明度"];
                 break;
         }
     }
@@ -836,7 +787,7 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
     NSString *currentValue = [NSString stringWithFormat:@"%.1f", currentRadius];
     
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"设置圆角大小"
-                                                                   message:@"请输入圆角大小（建议范围：0.0-5.0）"
+                                                                   message:@"请输入圆角大小（建议范围：0.0-10.0）"
                                                             preferredStyle:UIAlertControllerStyleAlert];
     
     [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
@@ -861,59 +812,6 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
         // 更新UI
         CSSettingItem *cornerRadiusItem = self.sections[3].items[3];
         cornerRadiusItem.detail = [NSString stringWithFormat:@"%.1f", radius];
-        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:3] withRowAnimation:UITableViewRowAnimationNone];
-        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:4] withRowAnimation:UITableViewRowAnimationNone]; // 更新预览
-    }]];
-    
-    [self presentViewController:alert animated:YES completion:nil];
-}
-
-- (void)showAlphaInputAlertForKey:(NSString *)key title:(NSString *)title {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    CGFloat currentAlpha = [defaults floatForKey:key];
-    
-    // 对于背景透明度，如果未设置过且值为0，使用默认值
-    if ([key isEqualToString:kMessageTimeBackgroundAlphaKey] && 
-        currentAlpha == 0 && 
-        ![defaults objectForKey:key]) {
-        currentAlpha = kDefaultBackgroundAlpha;
-    } 
-    // 对于文字透明度，如果未设置，使用默认值
-    else if ([key isEqualToString:kMessageTimeTextAlphaKey] && 
-             currentAlpha == 0 && 
-             ![defaults objectForKey:key]) {
-        currentAlpha = kDefaultTextAlpha;
-    }
-    
-    NSString *currentValue = [NSString stringWithFormat:@"%.1f", currentAlpha];
-    
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"设置%@", title]
-                                                                   message:@"请输入透明度（范围：0.0-1.0）"
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    
-    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-        textField.keyboardType = UIKeyboardTypeDecimalPad;
-        textField.text = currentValue;
-        textField.placeholder = @"请输入0.0-1.0之间的数字";
-    }];
-    
-    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        NSString *inputValue = alert.textFields.firstObject.text;
-        CGFloat alpha = [inputValue floatValue];
-        
-        // 确保透明度在合理范围内
-        if (alpha < 0.0) alpha = 0.0;
-        if (alpha > 1.0) alpha = 1.0;
-        
-        // 保存设置
-        [defaults setFloat:alpha forKey:key];
-        [defaults synchronize];
-        
-        // 确定是更新哪个项
-        NSInteger itemIndex = [key isEqualToString:kMessageTimeTextAlphaKey] ? 4 : 5;
-        CSSettingItem *alphaItem = self.sections[3].items[itemIndex];
-        alphaItem.detail = [NSString stringWithFormat:@"%.1f", alpha];
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:3] withRowAnimation:UITableViewRowAnimationNone];
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:4] withRowAnimation:UITableViewRowAnimationNone]; // 更新预览
     }]];

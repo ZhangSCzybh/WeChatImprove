@@ -27,6 +27,26 @@ static NSString * const kBubbleReceiverDarkColorGreenKey = @"com.wechat.enhance.
 static NSString * const kBubbleReceiverDarkColorBlueKey = @"com.wechat.enhance.bubble_style.receiver_dark_color.blue";
 static NSString * const kBubbleReceiverDarkColorAlphaKey = @"com.wechat.enhance.bubble_style.receiver_dark_color.alpha";
 
+static NSString * const kBubbleRedEnvelopSenderLightColorRedKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_light_color.red";
+static NSString * const kBubbleRedEnvelopSenderLightColorGreenKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_light_color.green";
+static NSString * const kBubbleRedEnvelopSenderLightColorBlueKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_light_color.blue";
+static NSString * const kBubbleRedEnvelopSenderLightColorAlphaKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_light_color.alpha";
+
+static NSString * const kBubbleRedEnvelopSenderDarkColorRedKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_dark_color.red";
+static NSString * const kBubbleRedEnvelopSenderDarkColorGreenKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_dark_color.green";
+static NSString * const kBubbleRedEnvelopSenderDarkColorBlueKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_dark_color.blue";
+static NSString * const kBubbleRedEnvelopSenderDarkColorAlphaKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_dark_color.alpha";
+
+static NSString * const kBubbleRedEnvelopReceiverLightColorRedKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_light_color.red";
+static NSString * const kBubbleRedEnvelopReceiverLightColorGreenKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_light_color.green";
+static NSString * const kBubbleRedEnvelopReceiverLightColorBlueKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_light_color.blue";
+static NSString * const kBubbleRedEnvelopReceiverLightColorAlphaKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_light_color.alpha";
+
+static NSString * const kBubbleRedEnvelopReceiverDarkColorRedKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_dark_color.red";
+static NSString * const kBubbleRedEnvelopReceiverDarkColorGreenKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_dark_color.green";
+static NSString * const kBubbleRedEnvelopReceiverDarkColorBlueKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_dark_color.blue";
+static NSString * const kBubbleRedEnvelopReceiverDarkColorAlphaKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_dark_color.alpha";
+
 static NSString * const kMergeMessagesEnabledKey = @"com.wechat.enhance.merge_messages.enabled";
 static NSString * const kMergeMessagesScopeKey = @"com.wechat.enhance.merge_messages.scope";
 static NSString * const kMergeMessagesSpacingKey = @"com.wechat.enhance.merge_messages.spacing";
@@ -39,6 +59,10 @@ static UIColor *senderLightColor = nil;
 static UIColor *receiverLightColor = nil;
 static UIColor *senderDarkColor = nil;
 static UIColor *receiverDarkColor = nil;
+static UIColor *redEnvelopSenderLightColor = nil;
+static UIColor *redEnvelopReceiverLightColor = nil;
+static UIColor *redEnvelopSenderDarkColor = nil;
+static UIColor *redEnvelopReceiverDarkColor = nil;
 
 static BOOL isMergeMessagesEnabled = NO;
 static NSInteger mergeMessagesScope = 3;
@@ -48,9 +72,20 @@ static CGFloat consecutiveMessagesSpacing = 4.0f;
 
 @interface BubbleInfo : NSObject
 @property(nonatomic, assign) unsigned long long position;
+@property(nonatomic, assign) unsigned long long type;
 @property(retain, nonatomic) NSString *bubbleName;
 - (id)getBubbleImage:(BOOL)arg1 isDarkMode:(BOOL)arg2 useCache:(BOOL)arg3;
 @end
+
+@interface WCPayInfoItem : NSObject
+@property(retain, nonatomic) NSString *m_c2cNativeUrl;
+@end
+
+@interface CMessageWrap (RedEnvelop)
+@property (nonatomic, strong) WCPayInfoItem *m_oWCPayInfoItem;
+@end
+
+static const void *kIsRedEnvelopKey = &kIsRedEnvelopKey;
 
 static UIColor *loadColorWithKeys(NSString *redKey, NSString *greenKey, NSString *blueKey, NSString *alphaKey,
                                   CGFloat defaultRed, CGFloat defaultGreen, CGFloat defaultBlue, CGFloat defaultAlpha) {
@@ -95,6 +130,22 @@ static void loadBubbleStyleSettings() {
                                           kBubbleReceiverDarkColorBlueKey, kBubbleReceiverDarkColorAlphaKey,
                                           0.18, 0.18, 0.18, 1.0);
     
+    redEnvelopSenderLightColor = loadColorWithKeys(kBubbleRedEnvelopSenderLightColorRedKey, kBubbleRedEnvelopSenderLightColorGreenKey,
+                                                   kBubbleRedEnvelopSenderLightColorBlueKey, kBubbleRedEnvelopSenderLightColorAlphaKey,
+                                                   0.91, 0.30, 0.24, 1.0);
+    
+    redEnvelopReceiverLightColor = loadColorWithKeys(kBubbleRedEnvelopReceiverLightColorRedKey, kBubbleRedEnvelopReceiverLightColorGreenKey,
+                                                     kBubbleRedEnvelopReceiverLightColorBlueKey, kBubbleRedEnvelopReceiverLightColorAlphaKey,
+                                                     0.91, 0.30, 0.24, 1.0);
+    
+    redEnvelopSenderDarkColor = loadColorWithKeys(kBubbleRedEnvelopSenderDarkColorRedKey, kBubbleRedEnvelopSenderDarkColorGreenKey,
+                                                  kBubbleRedEnvelopSenderDarkColorBlueKey, kBubbleRedEnvelopSenderDarkColorAlphaKey,
+                                                  0.86, 0.22, 0.10, 1.0);
+    
+    redEnvelopReceiverDarkColor = loadColorWithKeys(kBubbleRedEnvelopReceiverDarkColorRedKey, kBubbleRedEnvelopReceiverDarkColorGreenKey,
+                                                    kBubbleRedEnvelopReceiverDarkColorBlueKey, kBubbleRedEnvelopReceiverDarkColorAlphaKey,
+                                                    0.86, 0.22, 0.10, 1.0);
+    
     isMergeMessagesEnabled = [defaults boolForKey:kMergeMessagesEnabledKey];
     mergeMessagesScope = [defaults integerForKey:kMergeMessagesScopeKey];
     if (mergeMessagesScope == 0) {
@@ -124,7 +175,7 @@ static void loadBubbleStyleSettings() {
 }
 
 // 绘制气泡（根据position绘制不同样式的圆角）
-static UIImage *createBubbleImage(CGSize size, unsigned long long position, BOOL isSender, BOOL isDarkMode) {
+static UIImage *createBubbleImage(CGSize size, unsigned long long position, BOOL isSender, BOOL isDarkMode, BOOL isRedEnvelop) {
     if (size.width <= 0 || size.height <= 0) {
         return nil;
     }
@@ -171,7 +222,13 @@ static UIImage *createBubbleImage(CGSize size, unsigned long long position, BOOL
     
     UIColor *fillColor;
     
-    if (isSender) {
+    if (isRedEnvelop) {
+        if (isSender) {
+            fillColor = isDarkMode ? redEnvelopSenderDarkColor : redEnvelopSenderLightColor;
+        } else {
+            fillColor = isDarkMode ? redEnvelopReceiverDarkColor : redEnvelopReceiverLightColor;
+        }
+    } else if (isSender) {
         fillColor = isDarkMode ? senderDarkColor : senderLightColor;
     } else {
         fillColor = isDarkMode ? receiverDarkColor : receiverLightColor;
@@ -238,13 +295,91 @@ static UIImage *createBubbleImage(CGSize size, unsigned long long position, BOOL
         isSender = [self.bubbleName containsString:@"Sender"];
     }
     
-    UIImage *customBubble = createBubbleImage(originalImage.size, self.position, isSender, arg2);
+    BOOL isRedEnvelop = NO;
+    
+    NSLog(@"[BubbleStyle] bubbleName: %@, type: %llu, position: %llu", 
+          self.bubbleName, self.type, self.position);
+    
+    if (self.bubbleName) {
+        NSString *lowercaseName = [self.bubbleName lowercaseString];
+        isRedEnvelop = [lowercaseName containsString:@"redenvelop"] || 
+                       [lowercaseName containsString:@"redpack"] ||
+                       [lowercaseName containsString:@"hongbao"] ||
+                       [lowercaseName containsString:@"luckymoney"] ||
+                       [lowercaseName containsString:@"wxpay"] ||
+                       [lowercaseName containsString:@"c2c"] ||
+                       [lowercaseName containsString:@"transfer"] ||
+                       [lowercaseName containsString:@"pay"];
+    }
+    
+    NSLog(@"[BubbleStyle] isSender: %d, isRedEnvelop: %d", isSender, isRedEnvelop);
+    
+    NSNumber *isRedEnvelopNumber = objc_getAssociatedObject(self, kIsRedEnvelopKey);
+    if (isRedEnvelopNumber && [isRedEnvelopNumber boolValue]) {
+        isRedEnvelop = YES;
+    }
+    
+    NSLog(@"[BubbleStyle] Final isRedEnvelop: %d", isRedEnvelop);
+    
+    UIImage *customBubble = createBubbleImage(originalImage.size, self.position, isSender, arg2, isRedEnvelop);
     if (customBubble) {
         return customBubble;
     } else {
         return originalImage;
     }
 }
+%end
+
+%hook CommonMessageViewModel
+
+- (id)bgBubbleInfo {
+    BubbleInfo *bubbleInfo = %orig;
+    
+    id messageWrap = [self messageWrap];
+    if (bubbleInfo && messageWrap) {
+        CMessageWrap *wrap = (CMessageWrap *)messageWrap;
+        
+        BOOL isRedEnvelop = NO;
+        
+        if (wrap.m_uiMessageType == 49) {
+            id payInfo = [wrap m_oWCPayInfoItem];
+            if (payInfo) {
+                WCPayInfoItem *payItem = (WCPayInfoItem *)payInfo;
+                NSString *nativeUrl = payItem.m_c2cNativeUrl;
+                
+                NSString *redEnvelopPrefix = @"wxpay://c2cbizmessagehandler/hongbao/receivehongbao?";
+                if (nativeUrl && [nativeUrl hasPrefix:redEnvelopPrefix]) {
+                    isRedEnvelop = YES;
+                }
+                
+                if (!isRedEnvelop && nativeUrl) {
+                    NSString *lowercaseUrl = [nativeUrl lowercaseString];
+                    if ([lowercaseUrl containsString:@"transfer"]) {
+                        isRedEnvelop = YES;
+                    }
+                }
+            }
+            
+            if (!isRedEnvelop) {
+                NSString *content = [wrap m_nsContent];
+                if (content) {
+                    NSString *lowercaseContent = [content lowercaseString];
+                    if ([lowercaseContent containsString:@"transfer"] || [content containsString:@"转账"]) {
+                        isRedEnvelop = YES;
+                    }
+                }
+            }
+        }
+        
+        objc_setAssociatedObject(bubbleInfo, kIsRedEnvelopKey, @(isRedEnvelop), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        
+        NSLog(@"[BubbleStyle] CommonMessageViewModel - m_uiMessageType: %u, isRedEnvelop: %d", 
+              wrap.m_uiMessageType, isRedEnvelop);
+    }
+    
+    return bubbleInfo;
+}
+
 %end
 
 @interface CommonMessageCellView : UIView
@@ -510,6 +645,31 @@ static void initMergeMessagesDicts() {
         
         NSLog(@"[MergeMessages] Saved hide state - headImage: %d, nameLabel: %d", shouldHideHeadImage, shouldHideNameLabel);
         
+        @try {
+            if (shouldHideHeadImage) {
+                UIView *headImageView = [self getHeadImageView];
+                if (headImageView) {
+                    headImageView.hidden = YES;
+                    headImageView.alpha = 0.0;
+                    NSLog(@"[MergeMessages] setViewModel - Head image hidden immediately");
+                }
+            }
+            
+            if (shouldHideNameLabel) {
+                Ivar nameLabelIvar = class_getInstanceVariable([self class], "m_chatRoomNameLabel");
+                if (nameLabelIvar) {
+                    UILabel *nameLabel = object_getIvar(self, nameLabelIvar);
+                    if (nameLabel) {
+                        nameLabel.hidden = YES;
+                        nameLabel.alpha = 0.0;
+                        NSLog(@"[MergeMessages] setViewModel - Name label hidden immediately");
+                    }
+                }
+            }
+        } @catch (NSException *exception) {
+            NSLog(@"[MergeMessages] setViewModel hide exception: %@", exception);
+        }
+        
     } @catch (NSException *exception) {
         NSLog(@"[MergeMessages] 处理合并消息时发生异常: %@", exception);
     }
@@ -530,32 +690,28 @@ static void initMergeMessagesDicts() {
     BOOL shouldHideNameLabel = [g_shouldHideNameLabelDict[cellKey] boolValue];
     
     if (shouldHideHeadImage || shouldHideNameLabel) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            @try {
-                if (shouldHideHeadImage) {
-                    UIView *headImageView = [self getHeadImageView];
-                    if (headImageView) {
-                        headImageView.hidden = YES;
-                        headImageView.alpha = 0.0;
-                        NSLog(@"[MergeMessages] layoutSubviews - Head image hidden");
-                    }
+        @try {
+            if (shouldHideHeadImage) {
+                UIView *headImageView = [self getHeadImageView];
+                if (headImageView) {
+                    headImageView.hidden = YES;
+                    headImageView.alpha = 0.0;
                 }
-                
-                if (shouldHideNameLabel) {
-                    Ivar nameLabelIvar = class_getInstanceVariable([self class], "m_chatRoomNameLabel");
-                    if (nameLabelIvar) {
-                        UILabel *nameLabel = object_getIvar(self, nameLabelIvar);
-                        if (nameLabel) {
-                            nameLabel.hidden = YES;
-                            nameLabel.alpha = 0.0;
-                            NSLog(@"[MergeMessages] layoutSubviews - Name label hidden");
-                        }
-                    }
-                }
-            } @catch (NSException *exception) {
-                NSLog(@"[MergeMessages] layoutSubviews exception: %@", exception);
             }
-        });
+            
+            if (shouldHideNameLabel) {
+                Ivar nameLabelIvar = class_getInstanceVariable([self class], "m_chatRoomNameLabel");
+                if (nameLabelIvar) {
+                    UILabel *nameLabel = object_getIvar(self, nameLabelIvar);
+                    if (nameLabel) {
+                        nameLabel.hidden = YES;
+                        nameLabel.alpha = 0.0;
+                    }
+                }
+            }
+        } @catch (NSException *exception) {
+            NSLog(@"[MergeMessages] layoutSubviews exception: %@", exception);
+        }
     }
 }
 
@@ -631,6 +787,37 @@ static void initMergeMessagesDicts() {
         return originalHeight;
     }
     
+    BOOL isCurrentLongSplit = NO;
+    NSInteger numberOfRows = 1;
+    Class textMessageViewModelClass = NSClassFromString(@"TextMessageViewModel");
+    if (textMessageViewModelClass && [currentNodeData isKindOfClass:textMessageViewModelClass]) {
+        SEL isLongSplitSelector = NSSelectorFromString(@"isLongSplitMessage");
+        if ([currentNodeData respondsToSelector:isLongSplitSelector]) {
+            NSMethodSignature *signature = [currentNodeData methodSignatureForSelector:isLongSplitSelector];
+            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+            [invocation setTarget:currentNodeData];
+            [invocation setSelector:isLongSplitSelector];
+            [invocation invoke];
+            [invocation getReturnValue:&isCurrentLongSplit];
+        }
+        
+        SEL numberOfRowsSelector = NSSelectorFromString(@"numberOfRowsInSection");
+        if ([currentNodeData respondsToSelector:numberOfRowsSelector]) {
+            NSMethodSignature *signature = [currentNodeData methodSignatureForSelector:numberOfRowsSelector];
+            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+            [invocation setTarget:currentNodeData];
+            [invocation setSelector:numberOfRowsSelector];
+            [invocation invoke];
+            long long result = 0;
+            [invocation getReturnValue:&result];
+            numberOfRows = result;
+        }
+    }
+    
+    if (isCurrentLongSplit && indexPath.row < numberOfRows - 1) {
+        return originalHeight;
+    }
+    
     NSString *currentSender = nil;
     BOOL isSelfMessage = NO;
     
@@ -679,12 +866,18 @@ static void initMergeMessagesDicts() {
                     CGFloat spacingMultiplier = 1.0;
                     
                     if (isRoom && !isSelfMessage) {
-                        spacingMultiplier = 2.0;
+                        BOOL isShowChatRoomDisplayName = NO;
+                        Class commonMessageViewModelClass = NSClassFromString(@"CommonMessageViewModel");
+                        if (commonMessageViewModelClass && [currentNodeData isKindOfClass:commonMessageViewModelClass]) {
+                            isShowChatRoomDisplayName = [(CommonMessageViewModel *)currentNodeData isShowChatRoomDisplayName];
+                        }
+                        
+                        if (isShowChatRoomDisplayName) {
+                            spacingMultiplier = 2.0;
+                        }
                     }
                     
                     extraSpacing = consecutiveMessagesSpacing * spacingMultiplier;
-                    NSLog(@"[ConsecutiveSpacing] Section %ld: adding %.1f spacing (%.1fx) at bottom for consecutive message from sender: %@, isSelf: %d, isRoom: %d", 
-                          (long)indexPath.section, extraSpacing, spacingMultiplier, currentSender, isSelfMessage, isRoom);
                 }
             }
         }

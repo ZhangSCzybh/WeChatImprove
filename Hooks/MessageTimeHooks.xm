@@ -10,8 +10,6 @@ static NSString * const kMessageTimeFontSizeKey = @"com.wechat.enhance.messageTi
 static NSString * const kMessageTimeTextColorKey = @"com.wechat.enhance.messageTime.textColor";
 static NSString * const kMessageTimeBackgroundColorKey = @"com.wechat.enhance.messageTime.backgroundColor";
 static NSString * const kMessageTimeCornerRadiusKey = @"com.wechat.enhance.messageTime.cornerRadius";
-static NSString * const kMessageTimeTextAlphaKey = @"com.wechat.enhance.messageTime.textAlpha";
-static NSString * const kMessageTimeBackgroundAlphaKey = @"com.wechat.enhance.messageTime.backgroundAlpha";
 // 显示格式控制
 static NSString * const kMessageTimeShowYearKey = @"com.wechat.enhance.messageTime.showYear";
 static NSString * const kMessageTimeShowMonthKey = @"com.wechat.enhance.messageTime.showMonth";
@@ -25,12 +23,12 @@ static NSString * const kMessageTimeShowBelowAvatarKey = @"com.wechat.enhance.me
 static NSString * const kMessageTimeBoldFontKey = @"com.wechat.enhance.messageTime.boldFont";
 // 日期时间换行控制
 static NSString * const kMessageTimeSingleLineKey = @"com.wechat.enhance.messageTime.singleLine";
+// 点击显示控制
+static NSString * const kMessageTimeTapToShowKey = @"com.wechat.enhance.messageTime.tapToShow";
 
 // 默认值
 static CGFloat const kDefaultFontSize = 9.0f;
 static CGFloat const kDefaultCornerRadius = 2.0f;
-static CGFloat const kDefaultTextAlpha = 0.8f;
-static CGFloat const kDefaultBackgroundAlpha = 0.0f;
 static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
 
 // 类声明
@@ -56,7 +54,7 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
 @property(readonly, nonatomic) NSArray *subViewModels; // 子视图模型列表
 @end
 
-@interface CommonMessageCellView : UIView
+@interface CommonMessageCellView : UIView <UIGestureRecognizerDelegate>
 @property(readonly, nonatomic) CommonMessageViewModel *viewModel; // 消息视图模型
 @property(nonatomic, readonly) UIView *m_contentView; // 内容视图
 - (UIView *)getBgImageView; // 获取背景图片视图
@@ -79,6 +77,10 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
 static char kMessageTimeKey;
 // 存储消息时间视图的关联对象key
 static char kTimeViewKey;
+// 存储时间标签可见状态的关联对象key
+static char kTimeViewVisibleKey;
+// 存储当前显示时间的视图引用key
+static char kCurrentVisibleCellViewKey;
 
 // 辅助函数
 static void setMessageTime(id self, NSString *time) {
@@ -97,6 +99,23 @@ static UIView *getTimeView(id self) {
     return objc_getAssociatedObject(self, &kTimeViewKey);
 }
 
+static void setTimeViewVisible(id self, BOOL visible) {
+    objc_setAssociatedObject(self, &kTimeViewVisibleKey, @(visible), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+static BOOL getTimeViewVisible(id self) {
+    NSNumber *value = objc_getAssociatedObject(self, &kTimeViewVisibleKey);
+    return value ? [value boolValue] : NO;
+}
+
+static void setCurrentVisibleCellView(id view) {
+    objc_setAssociatedObject([UIApplication sharedApplication], &kCurrentVisibleCellViewKey, view, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+static id getCurrentVisibleCellView() {
+    return objc_getAssociatedObject([UIApplication sharedApplication], &kCurrentVisibleCellViewKey);
+}
+
 // 获取颜色设置
 static UIColor *getTextColorFromDefaults() {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -106,23 +125,14 @@ static UIColor *getTextColorFromDefaults() {
         NSError *error = nil;
         UIColor *savedColor = [NSKeyedUnarchiver unarchivedObjectOfClass:[UIColor class] fromData:colorData error:&error];
         if (savedColor && !error) {
-            // 应用保存的文字透明度
-            CGFloat alpha = [defaults floatForKey:kMessageTimeTextAlphaKey];
-            if (alpha == 0 && ![defaults objectForKey:kMessageTimeTextAlphaKey]) {
-                alpha = kDefaultTextAlpha;
-            }
-            return [savedColor colorWithAlphaComponent:alpha];
+            return savedColor;
         }
         if (error) {
             NSLog(@"解档消息时间文字颜色时出错: %@", error);
         }
     }
     // 返回默认颜色
-    CGFloat alpha = [defaults floatForKey:kMessageTimeTextAlphaKey];
-    if (alpha == 0 && ![defaults objectForKey:kMessageTimeTextAlphaKey]) {
-        alpha = kDefaultTextAlpha;
-    }
-    return [UIColor colorWithWhite:0.5 alpha:alpha];
+    return [UIColor colorWithWhite:0.5 alpha:0.8];
 }
 
 static UIColor *getBackgroundColorFromDefaults() {
@@ -132,23 +142,12 @@ static UIColor *getBackgroundColorFromDefaults() {
     if (colorData) {
         NSError *error = nil;
         UIColor *savedColor = [NSKeyedUnarchiver unarchivedObjectOfClass:[UIColor class] fromData:colorData error:&error];
-        if (savedColor && !error && ![savedColor isEqual:[UIColor clearColor]]) {
-            // 应用保存的背景透明度
-            CGFloat alpha = [defaults floatForKey:kMessageTimeBackgroundAlphaKey];
-            if (alpha == 0 && ![defaults objectForKey:kMessageTimeBackgroundAlphaKey]) {
-                alpha = kDefaultBackgroundAlpha;
-            }
-            return [savedColor colorWithAlphaComponent:alpha];
+        if (savedColor && !error) {
+            return savedColor;
         }
         if (error) {
             NSLog(@"解档消息时间背景颜色时出错: %@", error);
         }
-    }
-    
-    // 检查是否有设置背景透明度但没有设置颜色
-    CGFloat alpha = [defaults floatForKey:kMessageTimeBackgroundAlphaKey];
-    if (alpha > 0) {
-        return [UIColor colorWithWhite:0.9 alpha:alpha];
     }
     
     // 默认为透明
@@ -318,8 +317,100 @@ static BOOL isMessageTimeEnabled() {
         
         // 关联时间标签到视图
         setTimeView(self, timeLabel);
+        
+        // 初始化可见状态为NO
+        setTimeViewVisible(self, NO);
+        
+        // 添加点击手势识别器
+        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleMessageTap:)];
+        tapGesture.numberOfTapsRequired = 1;
+        tapGesture.delegate = self;
+        // 设置手势延迟触发，让其他手势优先
+        tapGesture.delaysTouchesBegan = NO;
+        tapGesture.delaysTouchesEnded = NO;
+        tapGesture.cancelsTouchesInView = NO;
+        [self addGestureRecognizer:tapGesture];
+        self.userInteractionEnabled = YES;
     }
     return view;
+}
+
+%new
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    // 允许与其他手势同时识别，不干扰原有手势
+    return YES;
+}
+
+%new
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    // 让我们的手势在其他手势失败后才触发
+    // 如果其他手势是点击手势，我们的手势需要等待它失败
+    if ([otherGestureRecognizer isKindOfClass:[UITapGestureRecognizer class]]) {
+        return YES;
+    }
+    return NO;
+}
+
+%new
+- (void)handleMessageTap:(UITapGestureRecognizer *)gesture {
+    // 检查是否启用了"点击显示"功能
+    BOOL tapToShow = [[NSUserDefaults standardUserDefaults] boolForKey:kMessageTimeTapToShowKey];
+    if (!tapToShow) {
+        return;
+    }
+    
+    // 获取点击位置
+    CGPoint tapLocation = [gesture locationInView:self];
+    
+    // 获取气泡背景视图
+    UIView *bgView = [self getBgImageView];
+    UIView *contentView = [self valueForKey:@"m_contentView"];
+    
+    // 判断点击是否在气泡内
+    BOOL tappedInBubble = NO;
+    if (bgView && CGRectContainsPoint(bgView.frame, tapLocation)) {
+        tappedInBubble = YES;
+    } else if (contentView && CGRectContainsPoint(contentView.frame, tapLocation)) {
+        tappedInBubble = YES;
+    }
+    
+    // 如果点击在气泡内，不处理，让原有事件触发
+    if (tappedInBubble) {
+        return;
+    }
+    
+    // 点击在气泡外，处理时间显示逻辑
+    // 获取当前时间标签
+    UILabel *timeLabel = (UILabel *)getTimeView(self);
+    if (!timeLabel) return;
+    
+    // 获取当前显示时间的视图
+    id currentVisibleCellView = getCurrentVisibleCellView();
+    
+    // 如果当前已经有显示时间的视图，先隐藏它
+    if (currentVisibleCellView && currentVisibleCellView != self) {
+        // 隐藏之前显示的时间标签
+        UILabel *previousTimeLabel = (UILabel *)getTimeView(currentVisibleCellView);
+        if (previousTimeLabel) {
+            previousTimeLabel.hidden = YES;
+        }
+        // 更新之前视图的可见状态
+        setTimeViewVisible(currentVisibleCellView, NO);
+    }
+    
+    // 切换当前时间标签的可见状态
+    BOOL currentVisible = getTimeViewVisible(self);
+    setTimeViewVisible(self, !currentVisible);
+    
+    // 更新显示状态
+    timeLabel.hidden = !getTimeViewVisible(self);
+    
+    // 更新全局引用
+    if (!timeLabel.hidden) {
+        setCurrentVisibleCellView(self);
+    } else {
+        setCurrentVisibleCellView(nil);
+    }
 }
 
 - (void)updateNodeStatus {
@@ -377,7 +468,18 @@ static BOOL isMessageTimeEnabled() {
         if (cornerRadius == 0) cornerRadius = kDefaultCornerRadius;
         timeLabel.layer.cornerRadius = cornerRadius;
         
-        timeLabel.hidden = NO;
+        // 检查是否启用了"点击显示"功能
+        BOOL tapToShow = [defaults boolForKey:kMessageTimeTapToShowKey];
+        
+        // 根据"点击显示"开关决定是否显示时间标签
+        if (tapToShow) {
+            // 点击显示模式：根据点击状态决定是否显示
+            timeLabel.hidden = !getTimeViewVisible(self);
+        } else {
+            // 默认模式：直接显示
+            timeLabel.hidden = NO;
+        }
+        
         timeLabel.text = messageTime;
         
         // 计算标签大小，限制最大宽度
@@ -479,6 +581,19 @@ static BOOL isMessageTimeEnabled() {
 
 - (void)prepareForReuse {
     %orig;
+    
+    // 重置时间标签的可见状态
+    setTimeViewVisible(self, NO);
+    UILabel *timeLabel = (UILabel *)getTimeView(self);
+    if (timeLabel) {
+        timeLabel.hidden = YES;
+    }
+    
+    // 如果当前显示时间的视图是这个视图，清除全局引用
+    id currentVisibleCellView = getCurrentVisibleCellView();
+    if (currentVisibleCellView == self) {
+        setCurrentVisibleCellView(nil);
+    }
 }
 
 %end
