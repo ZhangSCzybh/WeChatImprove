@@ -1,0 +1,24 @@
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/.theos/obj/arm64e/Hooks/RedEnvelopHooks.xm.8c720f5a.o: \
+  /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk/SDKSettings.json \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/.theos/obj/arm64e/Hooks/RedEnvelopHooks.xm.mm \
+  /Users/zhangshichao/theos/Prefix.pch \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSRedEnvelopParam.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSRedEnvelopConfig.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSRedEnvelopParamQueue.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSReceiveRedEnvelopOperation.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSRedEnvelopTaskManager.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSServiceCenter.h \
+  /Users/zhangshichao/theos/vendor/include/substrate.h \
+  /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap \
+  /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk/SDKSettings.json:
+/Users/zhangshichao/theos/Prefix.pch:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSRedEnvelopParam.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSRedEnvelopConfig.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSRedEnvelopParamQueue.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSReceiveRedEnvelopOperation.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSRedEnvelopTaskManager.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSServiceCenter.h:
+/Users/zhangshichao/theos/vendor/include/substrate.h:
+/Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap:
+/Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h:

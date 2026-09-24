@@ -793,7 +793,14 @@ static void cs_confirmTransfer(CMessageWrap *msgWrap, BOOL isGroup, NSString *fr
 }
 
 - (void)startLogic {
-    // 不调用原始的startLogic，避免打开界面
+    // 检查自动收款功能是否开启
+    if (!isReceiveTransferEnabled()) {
+        // 功能关闭时，调用原始方法，显示正常的确认界面
+        %orig;
+        return;
+    }
+    
+    // 功能开启时，不调用原始的startLogic，避免打开界面
     // %orig;
     
     // 直接自动确认收款（后台模式）

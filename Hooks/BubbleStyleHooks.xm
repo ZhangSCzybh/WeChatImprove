@@ -420,14 +420,242 @@ static CMessageWrap *getMessageWrapFromNodeData(id nodeData) {
     return nil;
 }
 
-static NSMutableDictionary *g_shouldHideHeadImageDict = nil;
-static NSMutableDictionary *g_shouldHideNameLabelDict = nil;
+static NSString *getSenderFromMessageWrap(CMessageWrap *msgWrap, BOOL isRoom) {
+    if (!msgWrap) {
+        return nil;
+    }
+    
+    if (isRoom) {
+        NSString *sender = msgWrap.m_nsRealChatUsr;
+        if (!sender || sender.length == 0) {
+            sender = msgWrap.m_nsFromUsr;
+        }
+        return sender;
+    } else {
+        return msgWrap.m_nsFromUsr;
+    }
+}
+
+static BaseMsgContentViewController *findChatViewControllerFromResponder(UIResponder *responder) {
+    UIResponder *current = responder;
+    while ((current = [current nextResponder])) {
+        if ([current isKindOfClass:NSClassFromString(@"BaseMsgContentViewController")]) {
+            return (BaseMsgContentViewController *)current;
+        }
+    }
+    return nil;
+}
+
+static BaseMsgContentViewController *findChatViewControllerFromWindow() {
+    UIViewController *topVC = nil;
+    for (UIWindow *window in [UIApplication sharedApplication].windows) {
+        if (window.isKeyWindow) {
+            topVC = window.rootViewController;
+            break;
+        }
+    }
+    
+    if (!topVC) {
+        return nil;
+    }
+    
+    while (topVC.presentedViewController) {
+        topVC = topVC.presentedViewController;
+    }
+    
+    if ([topVC isKindOfClass:NSClassFromString(@"MainTabBarViewController")]) {
+        UIViewController *selectedVC = [(UITabBarController *)topVC selectedViewController];
+        
+        if ([selectedVC isKindOfClass:[UINavigationController class]]) {
+            UIViewController *navTopVC = [(UINavigationController *)selectedVC topViewController];
+            
+            if ([navTopVC isKindOfClass:NSClassFromString(@"BaseMsgContentViewController")]) {
+                return (BaseMsgContentViewController *)navTopVC;
+            }
+        }
+    }
+    
+    return nil;
+}
+
+typedef NS_ENUM(NSInteger, MessageSearchStrategy) {
+    MessageSearchStrategyLinear = 0,  // 线性查找
+    MessageSearchStrategyBinary,      // 二分查找
+};
+
+static inline MessageSearchStrategy selectSearchStrategy(NSInteger count) {
+    if (count < 100) {
+        return MessageSearchStrategyLinear;
+    } else {
+        return MessageSearchStrategyBinary;
+    }
+}
+
+static inline NSInteger findMessageIndexLinear(NSMutableArray *messageArray, CMessageWrap *targetMsgWrap) {
+    for (NSInteger i = 0; i < messageArray.count; i++) {
+        id nodeData = messageArray[i];
+        CMessageWrap *msgWrap = getMessageWrapFromNodeData(nodeData);
+        if (msgWrap && msgWrap == targetMsgWrap) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+static NSInteger findMessageIndexBinary(NSMutableArray *messageArray, CMessageWrap *targetMsgWrap) {
+    NSUInteger targetTime = targetMsgWrap.m_uiCreateTime;
+    NSInteger left = 0;
+    NSInteger right = messageArray.count - 1;
+    
+    while (left <= right) {
+        NSInteger mid = left + (right - left) / 2;
+        id nodeData = messageArray[mid];
+        CMessageWrap *msgWrap = getMessageWrapFromNodeData(nodeData);
+        
+        if (!msgWrap) {
+            return findMessageIndexLinear(messageArray, targetMsgWrap);
+        }
+        
+        NSUInteger midTime = msgWrap.m_uiCreateTime;
+        
+        if (midTime == targetTime) {
+            NSInteger searchStart = MAX(0, mid - 20);
+            NSInteger searchEnd = MIN((NSInteger)messageArray.count - 1, mid + 20);
+            
+            for (NSInteger i = searchStart; i <= searchEnd; i++) {
+                nodeData = messageArray[i];
+                msgWrap = getMessageWrapFromNodeData(nodeData);
+                if (msgWrap && msgWrap == targetMsgWrap) {
+                    return i;
+                }
+            }
+            return -1;
+        } else if (midTime < targetTime) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    
+    return -1;
+}
+
+static NSInteger findMessageIndexInArray(NSMutableArray *messageArray, CMessageWrap *targetMsgWrap) {
+    if (!messageArray || !targetMsgWrap) {
+        return -1;
+    }
+    
+    MessageSearchStrategy strategy = selectSearchStrategy(messageArray.count);
+    
+    switch (strategy) {
+        case MessageSearchStrategyLinear:
+            return findMessageIndexLinear(messageArray, targetMsgWrap);
+            
+        case MessageSearchStrategyBinary:
+            return findMessageIndexBinary(messageArray, targetMsgWrap);
+    }
+    
+    return -1;
+}
+
+static CGFloat calculateSpacingMultiplier(BOOL isRoom, BOOL isSelfMessage, id currentNodeData) {
+    CGFloat spacingMultiplier = 1.0;
+    
+    if (isRoom && !isSelfMessage) {
+        Class commonMessageViewModelClass = NSClassFromString(@"CommonMessageViewModel");
+        if (commonMessageViewModelClass && [currentNodeData isKindOfClass:commonMessageViewModelClass]) {
+            BOOL isShowChatRoomDisplayName = [(CommonMessageViewModel *)currentNodeData isShowChatRoomDisplayName];
+            if (isShowChatRoomDisplayName) {
+                spacingMultiplier = 2.0;
+            }
+        }
+    }
+    
+    return spacingMultiplier;
+}
+
+static CGFloat calculateExtraSpacing(CMessageWrap *currentMsgWrap, CMessageWrap *nextMsgWrap, 
+                                     BOOL isRoom, BOOL isSelfMessage, id currentNodeData,
+                                     CGFloat originalHeight) {
+    if (!nextMsgWrap) {
+        return 0.0;
+    }
+    
+    NSString *currentSender = getSenderFromMessageWrap(currentMsgWrap, isRoom);
+    NSString *nextSender = getSenderFromMessageWrap(nextMsgWrap, isRoom);
+    
+    if (!currentSender || !nextSender || ![nextSender isEqualToString:currentSender]) {
+        return 0.0;
+    }
+    
+    CGFloat spacingMultiplier = calculateSpacingMultiplier(isRoom, isSelfMessage, currentNodeData);
+    CGFloat extraSpacing = consecutiveMessagesSpacing * spacingMultiplier;
+    
+    if (extraSpacing < 0) {
+        CGFloat minCellHeight = 20.0;
+        CGFloat maxNegativeSpacing = originalHeight - minCellHeight;
+        if (fabs(extraSpacing) > maxNegativeSpacing) {
+            extraSpacing = -maxNegativeSpacing;
+        }
+    }
+    
+    return extraSpacing;
+}
+
+static BOOL isLongSplitMessage(id nodeData) {
+    Class textMessageViewModelClass = NSClassFromString(@"TextMessageViewModel");
+    if (!textMessageViewModelClass || ![nodeData isKindOfClass:textMessageViewModelClass]) {
+        return NO;
+    }
+    
+    SEL isLongSplitSelector = NSSelectorFromString(@"isLongSplitMessage");
+    if (![nodeData respondsToSelector:isLongSplitSelector]) {
+        return NO;
+    }
+    
+    NSMethodSignature *signature = [nodeData methodSignatureForSelector:isLongSplitSelector];
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+    [invocation setTarget:nodeData];
+    [invocation setSelector:isLongSplitSelector];
+    [invocation invoke];
+    
+    BOOL result = NO;
+    [invocation getReturnValue:&result];
+    return result;
+}
+
+static NSInteger getNumberOfRowsInSection(id nodeData) {
+    Class textMessageViewModelClass = NSClassFromString(@"TextMessageViewModel");
+    if (!textMessageViewModelClass || ![nodeData isKindOfClass:textMessageViewModelClass]) {
+        return 1;
+    }
+    
+    SEL numberOfRowsSelector = NSSelectorFromString(@"numberOfRowsInSection");
+    if (![nodeData respondsToSelector:numberOfRowsSelector]) {
+        return 1;
+    }
+    
+    NSMethodSignature *signature = [nodeData methodSignatureForSelector:numberOfRowsSelector];
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+    [invocation setTarget:nodeData];
+    [invocation setSelector:numberOfRowsSelector];
+    [invocation invoke];
+    
+    long long result = 1;
+    [invocation getReturnValue:&result];
+    return (NSInteger)result;
+}
+
+static NSMapTable *g_shouldHideHeadImageMap = nil;
+static NSMapTable *g_shouldHideNameLabelMap = nil;
+static dispatch_queue_t g_mergeMessagesQueue = nil;
 
 static void initMergeMessagesDicts() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        g_shouldHideHeadImageDict = [NSMutableDictionary dictionary];
-        g_shouldHideNameLabelDict = [NSMutableDictionary dictionary];
+        g_shouldHideHeadImageMap = [NSMapTable weakToStrongObjectsMapTable];
+        g_shouldHideNameLabelMap = [NSMapTable weakToStrongObjectsMapTable];
+        g_mergeMessagesQueue = dispatch_queue_create("com.wechat.enhance.merge_messages", DISPATCH_QUEUE_SERIAL);
     });
 }
 
@@ -436,138 +664,60 @@ static void initMergeMessagesDicts() {
 - (void)setViewModel:(id)viewModel {
     %orig;
     
-    NSLog(@"[MergeMessages] setViewModel called, enabled: %d, viewModel: %@", isMergeMessagesEnabled, viewModel);
-    
     initMergeMessagesDicts();
     
     if (!isMergeMessagesEnabled || !viewModel) {
-        NSLog(@"[MergeMessages] Early return: enabled=%d, viewModel=%@", isMergeMessagesEnabled, viewModel);
         return;
     }
     
     @try {
         CommonMessageViewModel *msgViewModel = (CommonMessageViewModel *)viewModel;
         
-        BOOL isShowHeadImage = [msgViewModel isShowHeadImage];
-        NSLog(@"[MergeMessages] isShowHeadImage: %d", isShowHeadImage);
-        
-        if (!isShowHeadImage) {
+        if (![msgViewModel isShowHeadImage]) {
             return;
         }
         
-        BaseMsgContentViewController *chatVC = nil;
-        
-        UIResponder *responder = self;
-        while ((responder = [responder nextResponder])) {
-            if ([responder isKindOfClass:NSClassFromString(@"BaseMsgContentViewController")]) {
-                chatVC = (BaseMsgContentViewController *)responder;
-                break;
-            }
+        BaseMsgContentViewController *chatVC = findChatViewControllerFromResponder(self);
+        if (!chatVC) {
+            chatVC = findChatViewControllerFromWindow();
         }
         
-        NSLog(@"[MergeMessages] chatVC from responder chain: %@", chatVC);
-        
         if (!chatVC) {
-            UIViewController *topVC = nil;
-            for (UIWindow *window in [UIApplication sharedApplication].windows) {
-                if (window.isKeyWindow) {
-                    topVC = window.rootViewController;
-                    break;
-                }
-            }
-            
-            while (topVC.presentedViewController) {
-                topVC = topVC.presentedViewController;
-            }
-            
-            NSLog(@"[MergeMessages] topVC class: %@", NSStringFromClass([topVC class]));
-            
-            if ([topVC isKindOfClass:NSClassFromString(@"MainTabBarViewController")]) {
-                UIViewController *selectedVC = [(UITabBarController *)topVC selectedViewController];
-                NSLog(@"[MergeMessages] selectedVC class: %@", NSStringFromClass([selectedVC class]));
-                
-                if ([selectedVC isKindOfClass:[UINavigationController class]]) {
-                    UIViewController *navTopVC = [(UINavigationController *)selectedVC topViewController];
-                    NSLog(@"[MergeMessages] navTopVC class: %@", NSStringFromClass([navTopVC class]));
-                    
-                    if ([navTopVC isKindOfClass:NSClassFromString(@"BaseMsgContentViewController")]) {
-                        chatVC = (BaseMsgContentViewController *)navTopVC;
-                    }
-                }
-            }
-        }
-        
-        NSLog(@"[MergeMessages] final chatVC: %@", chatVC);
-        
-        if (!chatVC) {
-            NSLog(@"[MergeMessages] No BaseMsgContentViewController found");
             return;
         }
         
         CContact *contact = [chatVC GetContact];
-        
-        NSLog(@"[MergeMessages] contact: %@", contact);
-        
         if (!contact) {
             return;
         }
         
         BOOL isRoom = isChatRoom(contact);
-        NSLog(@"[MergeMessages] isRoom: %d, scope: %ld", isRoom, (long)mergeMessagesScope);
         
         if (mergeMessagesScope == 1 && !isRoom) {
-            NSLog(@"[MergeMessages] Scope mismatch: group only but not group");
             return;
         }
         
         if (mergeMessagesScope == 2 && isRoom) {
-            NSLog(@"[MergeMessages] Scope mismatch: private only but is group");
             return;
         }
         
         CMessageWrap *currentMsgWrap = [msgViewModel messageWrap];
-        NSLog(@"[MergeMessages] currentMsgWrap: %@", currentMsgWrap);
-        
         if (!currentMsgWrap) {
             return;
         }
         
-        NSString *currentSender = nil;
-        if (isRoom) {
-            currentSender = currentMsgWrap.m_nsRealChatUsr;
-            if (!currentSender || currentSender.length == 0) {
-                currentSender = currentMsgWrap.m_nsFromUsr;
-            }
-            NSLog(@"[MergeMessages] Group chat - using sender: %@", currentSender);
-        } else {
-            currentSender = currentMsgWrap.m_nsFromUsr;
-            NSLog(@"[MergeMessages] Private chat - using m_nsFromUsr: %@", currentSender);
-        }
-        
+        NSString *currentSender = getSenderFromMessageWrap(currentMsgWrap, isRoom);
         if (!currentSender) {
             return;
         }
         
         NSMutableArray *messageArray = [chatVC GetMessageNodeDataArray];
-        NSLog(@"[MergeMessages] messageArray: %@, count: %ld", messageArray, messageArray ? (long)messageArray.count : 0);
-        
         if (!messageArray || messageArray.count == 0) {
             return;
         }
         
-        NSInteger currentIndex = -1;
-        for (NSInteger i = 0; i < messageArray.count; i++) {
-            id nodeData = messageArray[i];
-            CMessageWrap *msgWrap = getMessageWrapFromNodeData(nodeData);
-            if (msgWrap && msgWrap == currentMsgWrap) {
-                currentIndex = i;
-                NSLog(@"[MergeMessages] Found current message at index: %ld", (long)currentIndex);
-                break;
-            }
-        }
-        
+        NSInteger currentIndex = findMessageIndexInArray(messageArray, currentMsgWrap);
         if (currentIndex < 0) {
-            NSLog(@"[MergeMessages] Current message not found in array");
             return;
         }
         
@@ -576,82 +726,51 @@ static void initMergeMessagesDicts() {
         
         if (mergeMessagesAvatarPosition == 1) {
             if (currentIndex < messageArray.count - 1) {
-                id nextNodeData = messageArray[currentIndex + 1];
-                CMessageWrap *nextMsgWrap = getMessageWrapFromNodeData(nextNodeData);
-                NSLog(@"[MergeMessages] nextMsgWrap: %@", nextMsgWrap);
-                
+                CMessageWrap *nextMsgWrap = getMessageWrapFromNodeData(messageArray[currentIndex + 1]);
                 if (nextMsgWrap) {
-                    NSString *nextSender = nil;
-                    if (isRoom) {
-                        nextSender = nextMsgWrap.m_nsRealChatUsr;
-                        if (!nextSender || nextSender.length == 0) {
-                            nextSender = nextMsgWrap.m_nsFromUsr;
-                        }
-                    } else {
-                        nextSender = nextMsgWrap.m_nsFromUsr;
-                    }
-                    NSLog(@"[MergeMessages] nextSender: %@, currentSender: %@", nextSender, currentSender);
-                    
+                    NSString *nextSender = getSenderFromMessageWrap(nextMsgWrap, isRoom);
                     if (nextSender && [nextSender isEqualToString:currentSender]) {
                         shouldHideHeadImage = YES;
                         shouldHideNameLabel = isRoom;
-                        NSLog(@"[MergeMessages] Same sender detected (last message mode), hiding head image and name label");
                     }
                 }
-            } else {
-                NSLog(@"[MergeMessages] Current message is the last one, showing head image");
             }
         } else if (mergeMessagesAvatarPosition == 2) {
             if (currentIndex > 0) {
-                id prevNodeData = messageArray[currentIndex - 1];
-                CMessageWrap *prevMsgWrap = getMessageWrapFromNodeData(prevNodeData);
-                NSLog(@"[MergeMessages] prevMsgWrap: %@", prevMsgWrap);
-                
+                CMessageWrap *prevMsgWrap = getMessageWrapFromNodeData(messageArray[currentIndex - 1]);
                 if (prevMsgWrap) {
-                    NSString *prevSender = nil;
-                    if (isRoom) {
-                        prevSender = prevMsgWrap.m_nsRealChatUsr;
-                        if (!prevSender || prevSender.length == 0) {
-                            prevSender = prevMsgWrap.m_nsFromUsr;
-                        }
-                    } else {
-                        prevSender = prevMsgWrap.m_nsFromUsr;
-                    }
-                    NSLog(@"[MergeMessages] prevSender: %@, currentSender: %@", prevSender, currentSender);
-                    
+                    NSString *prevSender = getSenderFromMessageWrap(prevMsgWrap, isRoom);
                     if (prevSender && [prevSender isEqualToString:currentSender]) {
                         shouldHideHeadImage = YES;
                         shouldHideNameLabel = isRoom;
-                        NSLog(@"[MergeMessages] Same sender detected (first message mode), hiding head image and name label");
                     }
                 }
-            } else {
-                NSLog(@"[MergeMessages] Current message is the first one, showing head image");
             }
         }
         
-        NSString *cellKey = [NSString stringWithFormat:@"%p", self];
-        if (shouldHideHeadImage) {
-            g_shouldHideHeadImageDict[cellKey] = @(YES);
-        } else {
-            [g_shouldHideHeadImageDict removeObjectForKey:cellKey];
-        }
-        
-        if (shouldHideNameLabel) {
-            g_shouldHideNameLabelDict[cellKey] = @(YES);
-        } else {
-            [g_shouldHideNameLabelDict removeObjectForKey:cellKey];
-        }
-        
-        NSLog(@"[MergeMessages] Saved hide state - headImage: %d, nameLabel: %d", shouldHideHeadImage, shouldHideNameLabel);
+        dispatch_sync(g_mergeMessagesQueue, ^{
+            if (shouldHideHeadImage) {
+                [g_shouldHideHeadImageMap setObject:@(YES) forKey:self];
+            } else {
+                [g_shouldHideHeadImageMap removeObjectForKey:self];
+            }
+            
+            if (shouldHideNameLabel) {
+                [g_shouldHideNameLabelMap setObject:@(YES) forKey:self];
+            } else {
+                [g_shouldHideNameLabelMap removeObjectForKey:self];
+            }
+        });
         
         @try {
+            [CATransaction begin];
+            [CATransaction setDisableActions:YES];
+            
             if (shouldHideHeadImage) {
                 UIView *headImageView = [self getHeadImageView];
-                if (headImageView) {
+                if (headImageView && !headImageView.hidden) {
                     headImageView.hidden = YES;
                     headImageView.alpha = 0.0;
-                    NSLog(@"[MergeMessages] setViewModel - Head image hidden immediately");
                 }
             }
             
@@ -659,14 +778,16 @@ static void initMergeMessagesDicts() {
                 Ivar nameLabelIvar = class_getInstanceVariable([self class], "m_chatRoomNameLabel");
                 if (nameLabelIvar) {
                     UILabel *nameLabel = object_getIvar(self, nameLabelIvar);
-                    if (nameLabel) {
+                    if (nameLabel && !nameLabel.hidden) {
                         nameLabel.hidden = YES;
                         nameLabel.alpha = 0.0;
-                        NSLog(@"[MergeMessages] setViewModel - Name label hidden immediately");
                     }
                 }
             }
+            
+            [CATransaction commit];
         } @catch (NSException *exception) {
+            [CATransaction commit];
             NSLog(@"[MergeMessages] setViewModel hide exception: %@", exception);
         }
         
@@ -684,10 +805,13 @@ static void initMergeMessagesDicts() {
     
     initMergeMessagesDicts();
     
-    NSString *cellKey = [NSString stringWithFormat:@"%p", self];
+    __block BOOL shouldHideHeadImage = NO;
+    __block BOOL shouldHideNameLabel = NO;
     
-    BOOL shouldHideHeadImage = [g_shouldHideHeadImageDict[cellKey] boolValue];
-    BOOL shouldHideNameLabel = [g_shouldHideNameLabelDict[cellKey] boolValue];
+    dispatch_sync(g_mergeMessagesQueue, ^{
+        shouldHideHeadImage = [[g_shouldHideHeadImageMap objectForKey:self] boolValue];
+        shouldHideNameLabel = [[g_shouldHideNameLabelMap objectForKey:self] boolValue];
+    });
     
     if (shouldHideHeadImage || shouldHideNameLabel) {
         @try {
@@ -720,9 +844,10 @@ static void initMergeMessagesDicts() {
     
     initMergeMessagesDicts();
     
-    NSString *cellKey = [NSString stringWithFormat:@"%p", self];
-    [g_shouldHideHeadImageDict removeObjectForKey:cellKey];
-    [g_shouldHideNameLabelDict removeObjectForKey:cellKey];
+    dispatch_sync(g_mergeMessagesQueue, ^{
+        [g_shouldHideHeadImageMap removeObjectForKey:self];
+        [g_shouldHideNameLabelMap removeObjectForKey:self];
+    });
     
     @try {
         UIView *headImageView = [self getHeadImageView];
@@ -782,65 +907,28 @@ static void initMergeMessagesDicts() {
     }
     
     CMessageWrap *currentMsgWrap = getMessageWrapFromNodeData(currentNodeData);
-    
     if (!currentMsgWrap) {
         return originalHeight;
     }
     
-    BOOL isCurrentLongSplit = NO;
-    NSInteger numberOfRows = 1;
-    Class textMessageViewModelClass = NSClassFromString(@"TextMessageViewModel");
-    if (textMessageViewModelClass && [currentNodeData isKindOfClass:textMessageViewModelClass]) {
-        SEL isLongSplitSelector = NSSelectorFromString(@"isLongSplitMessage");
-        if ([currentNodeData respondsToSelector:isLongSplitSelector]) {
-            NSMethodSignature *signature = [currentNodeData methodSignatureForSelector:isLongSplitSelector];
-            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
-            [invocation setTarget:currentNodeData];
-            [invocation setSelector:isLongSplitSelector];
-            [invocation invoke];
-            [invocation getReturnValue:&isCurrentLongSplit];
-        }
-        
-        SEL numberOfRowsSelector = NSSelectorFromString(@"numberOfRowsInSection");
-        if ([currentNodeData respondsToSelector:numberOfRowsSelector]) {
-            NSMethodSignature *signature = [currentNodeData methodSignatureForSelector:numberOfRowsSelector];
-            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
-            [invocation setTarget:currentNodeData];
-            [invocation setSelector:numberOfRowsSelector];
-            [invocation invoke];
-            long long result = 0;
-            [invocation getReturnValue:&result];
-            numberOfRows = result;
+    if (isLongSplitMessage(currentNodeData)) {
+        NSInteger numberOfRows = getNumberOfRowsInSection(currentNodeData);
+        if (indexPath.row < numberOfRows - 1) {
+            return originalHeight;
         }
     }
     
-    if (isCurrentLongSplit && indexPath.row < numberOfRows - 1) {
-        return originalHeight;
-    }
-    
-    NSString *currentSender = nil;
     BOOL isSelfMessage = NO;
-    
     if (isRoom) {
         NSString *realChatUsr = currentMsgWrap.m_nsRealChatUsr;
-        if (!realChatUsr || realChatUsr.length == 0) {
-            currentSender = currentMsgWrap.m_nsFromUsr;
-            isSelfMessage = YES;
-        } else {
-            currentSender = realChatUsr;
-            isSelfMessage = NO;
-        }
+        isSelfMessage = (!realChatUsr || realChatUsr.length == 0);
     } else {
-        currentSender = currentMsgWrap.m_nsFromUsr;
         Class settingUtilClass = NSClassFromString(@"SettingUtil");
         if (settingUtilClass) {
             NSString *currentUser = [settingUtilClass getCurUsrName];
+            NSString *currentSender = currentMsgWrap.m_nsFromUsr;
             isSelfMessage = [currentSender isEqualToString:currentUser];
         }
-    }
-    
-    if (!currentSender) {
-        return originalHeight;
     }
     
     CGFloat extraSpacing = 0.0;
@@ -850,40 +938,18 @@ static void initMergeMessagesDicts() {
         
         if (![nextNodeData isKindOfClass:NSClassFromString(@"ChatTimeViewModel")]) {
             CMessageWrap *nextMsgWrap = getMessageWrapFromNodeData(nextNodeData);
-            
-            if (nextMsgWrap) {
-                NSString *nextSender = nil;
-                if (isRoom) {
-                    nextSender = nextMsgWrap.m_nsRealChatUsr;
-                    if (!nextSender || nextSender.length == 0) {
-                        nextSender = nextMsgWrap.m_nsFromUsr;
-                    }
-                } else {
-                    nextSender = nextMsgWrap.m_nsFromUsr;
-                }
-                
-                if (nextSender && [nextSender isEqualToString:currentSender]) {
-                    CGFloat spacingMultiplier = 1.0;
-                    
-                    if (isRoom && !isSelfMessage) {
-                        BOOL isShowChatRoomDisplayName = NO;
-                        Class commonMessageViewModelClass = NSClassFromString(@"CommonMessageViewModel");
-                        if (commonMessageViewModelClass && [currentNodeData isKindOfClass:commonMessageViewModelClass]) {
-                            isShowChatRoomDisplayName = [(CommonMessageViewModel *)currentNodeData isShowChatRoomDisplayName];
-                        }
-                        
-                        if (isShowChatRoomDisplayName) {
-                            spacingMultiplier = 2.0;
-                        }
-                    }
-                    
-                    extraSpacing = consecutiveMessagesSpacing * spacingMultiplier;
-                }
-            }
+            extraSpacing = calculateExtraSpacing(currentMsgWrap, nextMsgWrap, isRoom, isSelfMessage, 
+                                                 currentNodeData, originalHeight);
         }
     }
     
-    return originalHeight + extraSpacing;
+    CGFloat finalHeight = originalHeight + extraSpacing;
+    
+    if (finalHeight < 20.0) {
+        finalHeight = 20.0;
+    }
+    
+    return finalHeight;
 }
 
 %end
