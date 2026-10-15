@@ -3,8 +3,11 @@
   Controllers/WEContactSelectViewController.m \
   /Users/zhangshichao/theos/Prefix.pch \
   Controllers/WEContactSelectViewController.h \
-  Controllers/CSServiceCenter.h
+  Controllers/CSServiceCenter.h Controllers/CSGroupNativeBridge.h \
+  Controllers/CSGroupProjection.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk/SDKSettings.json:
 /Users/zhangshichao/theos/Prefix.pch:
 Controllers/WEContactSelectViewController.h:
 Controllers/CSServiceCenter.h:
+Controllers/CSGroupNativeBridge.h:
+Controllers/CSGroupProjection.h:
