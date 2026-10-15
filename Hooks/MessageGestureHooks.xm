@@ -8,6 +8,15 @@
 #import "../HeadersFile/CommonMessageCellView.h"
 #import "../Controllers/WCPLMessagePersistenceAdapter.h"
 
+// These methods are installed by the Logos hook below and called before their definitions.
+@interface CommonMessageCellView (WCMessageGestureActions)
+- (void)wchook_performDeleteMessage;
+- (void)wchook_performForwardMessage;
+- (void)wchook_performFavoriteMessage;
+- (void)wchook_performRevokeMessage;
+- (void)wchook_performRepeatMessage;
+@end
+
 static NSString * const kMessageGestureEnabledKey = @"com.wechat.enhance.message_gesture.enabled";
 static NSString * const kLeftSwipeOtherActionKey = @"com.wechat.enhance.left_swipe_other.action";
 static NSString * const kLeftSwipeSelfActionKey = @"com.wechat.enhance.left_swipe_self.action";

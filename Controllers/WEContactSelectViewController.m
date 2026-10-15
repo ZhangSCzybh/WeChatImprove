@@ -1,5 +1,6 @@
 #import "WEContactSelectViewController.h"
 #import "CSServiceCenter.h"
+#import "CSGroupNativeBridge.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 
@@ -39,27 +40,6 @@
 - (id)getService:(Class)serviceClass;
 @end
 
-static BOOL CSIsChatRoomName(NSString *name) {
-    if (!name || name.length == 0) return NO;
-    return [name hasSuffix:@"@chatroom"];
-}
-
-static BOOL CSIsOfficialAccount(NSString *name) {
-    if (!name || name.length == 0) return NO;
-    return [name hasPrefix:@"gh_"] ||
-           [name hasPrefix:@"newsapp"] ||
-           [name isEqualToString:@"weixin"] ||
-           [name isEqualToString:@"filehelper"] ||
-           [name isEqualToString:@"notification_messages"] ||
-           [name hasSuffix:@"brandsessionholder"] ||
-           [name hasSuffix:@"brandservicesessionholder"];
-}
-
-static BOOL CSIsPrivateChat(NSString *name) {
-    if (!name || name.length == 0) return NO;
-    return !CSIsChatRoomName(name) && !CSIsOfficialAccount(name);
-}
-
 @implementation WEContactSelectViewController
 
 - (instancetype)initWithTitle:(NSString *)title selectedUserNames:(NSArray<NSString *> *)selectedUserNames selectType:(WEContactSelectType)selectType {
@@ -69,7 +49,11 @@ static BOOL CSIsPrivateChat(NSString *name) {
 - (instancetype)initWithTitle:(NSString *)title selectedUserNames:(NSArray<NSString *> *)selectedUserNames selectType:(WEContactSelectType)selectType tagName:(NSString *)tagName {
     if (self = [super initWithStyle:UITableViewStylePlain]) {
         _titleText = [title copy];
-        _selectedUserNames = [NSMutableSet setWithArray:selectedUserNames ?: @[]];
+        _selectedUserNames = [NSMutableSet set];
+        // This is the complete group membership, including names outside this picker category.
+        for (id name in selectedUserNames) {
+            if ([name isKindOfClass:NSString.class] && [name length]) [_selectedUserNames addObject:name];
+        }
         _selectType = selectType;
         _tagName = [tagName copy];
         _isSearching = NO;
@@ -245,6 +229,19 @@ static BOOL CSIsPrivateChat(NSString *name) {
         }
         
         for (NSString *userName in allUserNames) {
+            if (![userName isKindOfClass:NSString.class] || !userName.length) continue;
+            CContact *contact = nil;
+            for (NSString *selectorName in contactSelectors) {
+                SEL selector = NSSelectorFromString(selectorName);
+                if ([contactMgr respondsToSelector:selector]) {
+                    @try {
+                        contact = ((id (*)(id, SEL, id))objc_msgSend)(contactMgr, selector, userName);
+                        if (contact) break;
+                    } @catch (__unused NSException *exception) {}
+                }
+            }
+            if (!contact) continue;
+            CSGroupRowCategory category = CSGroupCategoryForContact(contact);
             BOOL shouldInclude = NO;
             
             switch (self.selectType) {
@@ -252,13 +249,13 @@ static BOOL CSIsPrivateChat(NSString *name) {
                     shouldInclude = YES;
                     break;
                 case WEContactSelectTypeGroup:
-                    shouldInclude = CSIsChatRoomName(userName);
+                    shouldInclude = category == CSGroupRowCategoryGroup;
                     break;
                 case WEContactSelectTypePrivate:
-                    shouldInclude = CSIsPrivateChat(userName);
+                    shouldInclude = category == CSGroupRowCategoryPrivate;
                     break;
                 case WEContactSelectTypeOfficial:
-                    shouldInclude = CSIsOfficialAccount(userName);
+                    shouldInclude = category == CSGroupRowCategoryService;
                     break;
                 case WEContactSelectTypeTag:
                     shouldInclude = NO;
@@ -266,29 +263,7 @@ static BOOL CSIsPrivateChat(NSString *name) {
             }
             
             if (shouldInclude) {
-                CContact *contact = nil;
-                
-                for (NSString *selectorName in contactSelectors) {
-                    SEL selector = NSSelectorFromString(selectorName);
-                    if ([contactMgr respondsToSelector:selector]) {
-                        @try {
-                            contact = ((id (*)(id, SEL, id))objc_msgSend)(contactMgr, selector, userName);
-                            if (contact) break;
-                        } @catch (NSException *e) {
-                        }
-                    }
-                }
-                
-                if (contact) {
-                    if (self.selectType == WEContactSelectTypePrivate) {
-                        if ([contact respondsToSelector:@selector(isMyContact)]) {
-                            if (![contact isMyContact]) {
-                                continue;
-                            }
-                        }
-                    }
-                    [contactList addObject:contact];
-                }
+                [contactList addObject:contact];
             }
         }
         
@@ -296,33 +271,24 @@ static BOOL CSIsPrivateChat(NSString *name) {
     }
 }
 
-- (void)selectAllButtonTapped {
+- (NSSet<NSString *> *)visibleUserNames {
     NSArray *dataSource = self.isSearching ? self.filteredContacts : self.contacts;
-    
-    BOOL allSelected = NO;
-    if (dataSource.count > 0) {
-        allSelected = YES;
-        for (id contact in dataSource) {
-            NSString *userName = [contact m_nsUsrName];
-            if (![self.selectedUserNames containsObject:userName]) {
-                allSelected = NO;
-                break;
-            }
-        }
+    NSMutableSet *names = [NSMutableSet set];
+    for (id contact in dataSource) {
+        id name = CSGroupReadObject(contact, @"m_nsUsrName");
+        if ([name isKindOfClass:NSString.class] && [name length]) [names addObject:name];
     }
-    
+    return [names copy];
+}
+
+- (void)selectAllButtonTapped {
+    NSSet *visible = [self visibleUserNames];
+    BOOL allSelected = visible.count > 0 && [visible isSubsetOfSet:self.selectedUserNames];
+    // Mutate only visible members. Hidden categories, tags and search matches retain membership.
     if (allSelected) {
-        for (id contact in dataSource) {
-            NSString *userName = [contact m_nsUsrName];
-            [self.selectedUserNames removeObject:userName];
-        }
+        [self.selectedUserNames minusSet:visible];
     } else {
-        for (id contact in dataSource) {
-            NSString *userName = [contact m_nsUsrName];
-            if (userName) {
-                [self.selectedUserNames addObject:userName];
-            }
-        }
+        [self.selectedUserNames unionSet:visible];
     }
     
     [self.tableView reloadData];
@@ -333,19 +299,8 @@ static BOOL CSIsPrivateChat(NSString *name) {
 - (void)updateSelectAllButtonTitle {
     if (self.selectType != WEContactSelectTypeTag) return;
     
-    NSArray *dataSource = self.isSearching ? self.filteredContacts : self.contacts;
-    
-    BOOL allSelected = NO;
-    if (dataSource.count > 0) {
-        allSelected = YES;
-        for (id contact in dataSource) {
-            NSString *userName = [contact m_nsUsrName];
-            if (![self.selectedUserNames containsObject:userName]) {
-                allSelected = NO;
-                break;
-            }
-        }
-    }
+    NSSet *visible = [self visibleUserNames];
+    BOOL allSelected = visible.count > 0 && [visible isSubsetOfSet:self.selectedUserNames];
     
     UIBarButtonItem *selectAllItem = nil;
     for (UIBarButtonItem *item in self.navigationItem.rightBarButtonItems) {
@@ -374,7 +329,7 @@ static BOOL CSIsPrivateChat(NSString *name) {
 }
 
 - (void)doneButtonTapped {
-    NSArray *selected = [self.selectedUserNames allObjects];
+    NSArray *selected = [[self.selectedUserNames allObjects] sortedArrayUsingSelector:@selector(compare:)];
     
     if (self.completion) {
         self.completion(selected);
@@ -404,7 +359,7 @@ static BOOL CSIsPrivateChat(NSString *name) {
     
     NSArray *dataSource = self.isSearching ? self.filteredContacts : self.contacts;
     
-    if (indexPath.row < dataSource.count) {
+    if (indexPath.row >= 0 && (NSUInteger)indexPath.row < dataSource.count) {
         CContact *contact = dataSource[indexPath.row];
         NSString *displayName = nil;
         if (contact.m_nsRemark.length > 0) {
@@ -441,9 +396,10 @@ static BOOL CSIsPrivateChat(NSString *name) {
     
     NSArray *dataSource = self.isSearching ? self.filteredContacts : self.contacts;
     
-    if (indexPath.row < dataSource.count) {
+    if (indexPath.row >= 0 && (NSUInteger)indexPath.row < dataSource.count) {
         CContact *contact = dataSource[indexPath.row];
         NSString *userName = contact.m_nsUsrName;
+        if (![userName isKindOfClass:NSString.class] || !userName.length) return;
         
         UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
         

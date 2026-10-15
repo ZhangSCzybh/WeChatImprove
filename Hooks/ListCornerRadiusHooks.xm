@@ -3,6 +3,9 @@
 #import <objc/runtime.h>
 #import "../HeadersFile/NewMainFrameViewController.h"
 
+#import "CSGroupListAdapter.h"
+#import "CSListCornerRenderer.h"
+
 static NSString * const kListCornerRadiusEnabledKey = @"com.wechat.enhance.list_corner_radius.enabled";
 static NSString * const kListCornerRadiusKey = @"com.wechat.enhance.list_corner_radius.radius";
 static NSString * const kListLeftMarginKey = @"com.wechat.enhance.list_corner_radius.left_margin";
@@ -154,29 +157,23 @@ static UIColor *getNormalSessionTopMarginBgColor() {
     return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
 }
 
+static void setBackgroundColorIfNeeded(UIView *view, UIColor *color) {
+    if (![view.backgroundColor isEqual:color]) view.backgroundColor = color;
+}
+
 static void hideCellSeparator(UITableViewCell *cell) {
-    cell.separatorInset = UIEdgeInsetsMake(0, cell.superview.bounds.size.width, 0, 0);
-    cell.layoutMargins = UIEdgeInsetsZero;
-    cell.preservesSuperviewLayoutMargins = NO;
-    
+    UIEdgeInsets inset = UIEdgeInsetsMake(0, cell.superview.bounds.size.width, 0, 0);
+    if (!UIEdgeInsetsEqualToEdgeInsets(cell.separatorInset, inset)) cell.separatorInset = inset;
+    if (!UIEdgeInsetsEqualToEdgeInsets(cell.layoutMargins, UIEdgeInsetsZero)) cell.layoutMargins = UIEdgeInsetsZero;
+    if (cell.preservesSuperviewLayoutMargins) cell.preservesSuperviewLayoutMargins = NO;
+
+    // Still inspect actual subviews: native cell reuse can recreate or reset a separator.
     for (UIView *subview in cell.subviews) {
         if ([subview isKindOfClass:NSClassFromString(@"_UITableViewCellSeparatorView")] ||
             [NSStringFromClass([subview class]) containsString:@"Separator"]) {
-            subview.hidden = YES;
-            subview.alpha = 0;
+            if (!subview.hidden) subview.hidden = YES;
+            if (subview.alpha != 0) subview.alpha = 0;
         }
-    }
-}
-
-static void adjustSubviewFrames(UIView *view, CGFloat offsetX) {
-    if (!view) return;
-    
-    for (UIView *subview in view.subviews) {
-        CGRect frame = subview.frame;
-        frame.origin.x += offsetX;
-        subview.frame = frame;
-        
-        adjustSubviewFrames(subview, offsetX);
     }
 }
 
@@ -251,102 +248,65 @@ static void adjustSubviewFrames(UIView *view, CGFloat offsetX) {
     }
     
     NSInteger section = indexPath.section;
-NSInteger row = indexPath.row;
-NSInteger numberOfRowsInSection = [tableView numberOfRowsInSection:section];
+    NSInteger row = indexPath.row;
+    NSInteger numberOfRowsInSection = [tableView numberOfRowsInSection:section];
 
-for (UIView *subview in cell.contentView.subviews) {
-    NSString *className = NSStringFromClass([subview class]);
-    if (![className containsString:@"UITableViewCellContentView"]) {
-        if ([className isEqualToString:@"UIView"]) {
-            for (UIView *subSubview in subview.subviews) {
-            }
+    BOOL isFirstRow = (row == 0);
+    BOOL isLastRow = (row == numberOfRowsInSection - 1);
+
+    BOOL isTopSection = (section >= 0 && section <= 3);
+
+    if (isTopSection) {
+        NSInteger totalRowsInTopSections = 0;
+        for (NSInteger s = 0; s <= 3; s++) {
+            totalRowsInTopSections += [tableView numberOfRowsInSection:s];
+        }
+
+        NSInteger absoluteRow = 0;
+        for (NSInteger s = 0; s < section; s++) {
+            absoluteRow += [tableView numberOfRowsInSection:s];
+        }
+        absoluteRow += row;
+
+        isFirstRow = (absoluteRow == 0);
+        isLastRow = (absoluteRow == totalRowsInTopSections - 1);
+    }
+
+    setBackgroundColorIfNeeded(cell, [UIColor clearColor]);
+    setBackgroundColorIfNeeded(cell.contentView, [UIColor colorWithRed:0.929 green:0.929 blue:0.929 alpha:1.0]);
+
+    for (UIView *subview in cell.subviews) {
+        NSString *className = NSStringFromClass([subview class]);
+
+        if ([className containsString:@"Separator"] || [className containsString:@"Line"]) {
+            subview.hidden = YES;
+            subview.alpha = 0;
+        }
+
+        if ([className isEqualToString:@"UIView"] && subview.frame.size.height < 1.0) {
+            subview.hidden = YES;
+            subview.alpha = 0;
         }
     }
-}
 
-BOOL isFirstRow = (row == 0);
-BOOL isLastRow = (row == numberOfRowsInSection - 1);
+    hideCellSeparator(cell);
 
-BOOL isTopSection = (section >= 0 && section <= 3);
-
-if (isTopSection) {
-    NSInteger totalRowsInTopSections = 0;
-    for (NSInteger s = 0; s <= 3; s++) {
-        totalRowsInTopSections += [tableView numberOfRowsInSection:s];
+    for (UIView *subview in cell.contentView.subviews) {
+        if ([subview isKindOfClass:[UIView class]] && subview.tag != 9996) {
+            setBackgroundColorIfNeeded(subview, [UIColor clearColor]);
+        }
     }
-    
-    NSInteger absoluteRow = 0;
-    for (NSInteger s = 0; s < section; s++) {
-        absoluteRow += [tableView numberOfRowsInSection:s];
-    }
-    absoluteRow += row;
-    
-    isFirstRow = (absoluteRow == 0);
-    isLastRow = (absoluteRow == totalRowsInTopSections - 1);
-    numberOfRowsInSection = totalRowsInTopSections;
-}
-
-cell.backgroundColor = [UIColor clearColor];
-cell.contentView.backgroundColor = [UIColor colorWithRed:0.929 green:0.929 blue:0.929 alpha:1.0];
-
-for (UIView *subview in cell.subviews) {
-    NSString *className = NSStringFromClass([subview class]);
-    
-    if ([className containsString:@"Separator"] || [className containsString:@"Line"]) {
-        subview.hidden = YES;
-        subview.alpha = 0;
-    }
-    
-    if ([className isEqualToString:@"UIView"] && subview.frame.size.height < 1.0) {
-        subview.hidden = YES;
-        subview.alpha = 0;
-    }
-}
-
-hideCellSeparator(cell);
-
-for (UIView *subview in cell.contentView.subviews) {
-    if ([subview isKindOfClass:[UIView class]] && subview.tag != 9996) {
-        subview.backgroundColor = [UIColor clearColor];
-    }
-}
     
     UIView *bgView = [cell.contentView viewWithTag:9996];
     if (!bgView) {
         bgView = [[UIView alloc] init];
         bgView.tag = 9996;
-        bgView.layer.masksToBounds = YES;
         [cell.contentView insertSubview:bgView atIndex:0];
     }
     
-    bgView.backgroundColor = getBackgroundColor();
-    
     CGFloat bgWidth = tableView.bounds.size.width - leftMargin - rightMargin;
-    CGFloat bgHeight = cell.bounds.size.height;
-    UIBezierPath *path;
-    CGRect bgFrame = CGRectMake(leftMargin, 0, bgWidth, bgHeight);
-    
-    if (numberOfRowsInSection == 1) {
-        bgView.layer.cornerRadius = cornerRadius;
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, bgWidth, bgHeight) cornerRadius:cornerRadius];
-    } else if (isFirstRow) {
-        bgView.layer.cornerRadius = 0;
-        UIRectCorner corners = UIRectCornerTopLeft | UIRectCornerTopRight;
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, bgWidth, bgHeight) byRoundingCorners:corners cornerRadii:CGSizeMake(cornerRadius, cornerRadius)];
-    } else if (isLastRow) {
-        bgView.layer.cornerRadius = 0;
-        UIRectCorner corners = UIRectCornerBottomLeft | UIRectCornerBottomRight;
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, bgWidth, bgHeight) byRoundingCorners:corners cornerRadii:CGSizeMake(cornerRadius, cornerRadius)];
-    } else {
-        bgView.layer.cornerRadius = 0;
-        path = [UIBezierPath bezierPathWithRect:CGRectMake(0, 0, bgWidth, bgHeight)];
-    }
-    
-    CAShapeLayer *maskLayer = [CAShapeLayer layer];
-    maskLayer.path = path.CGPath;
-    bgView.layer.mask = maskLayer;
-    
-    bgView.frame = bgFrame;
+    CGRect bgFrame = CGRectMake(leftMargin, 0, bgWidth, cell.bounds.size.height);
+    CSListApplyCardBackground(bgView, bgFrame, cornerRadius, isFirstRow, isLastRow, getBackgroundColor());
     
     for (UIView *subview in cell.contentView.subviews) {
         if (subview.tag == 9996) continue;
@@ -433,10 +393,6 @@ for (UIView *subview in cell.contentView.subviews) {
             tableView.backgroundColor = [UIColor colorWithRed:0.929 green:0.929 blue:0.929 alpha:1.0];
         }
     }
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    %orig;
 }
 
 - (CGFloat)tableView:(id)arg1 heightForHeaderInSection:(NSInteger)arg2 {
@@ -583,14 +539,14 @@ for (UIView *subview in cell.contentView.subviews) {
     BOOL isFirstRow = (row == 0);
     BOOL isLastRow = (row == numberOfRowsInSection - 1);
     
-    cell.backgroundColor = [UIColor clearColor];
-    cell.contentView.backgroundColor = [UIColor colorWithRed:0.929 green:0.929 blue:0.929 alpha:1.0];
+    setBackgroundColorIfNeeded(cell, [UIColor clearColor]);
+    setBackgroundColorIfNeeded(cell.contentView, [UIColor colorWithRed:0.929 green:0.929 blue:0.929 alpha:1.0]);
     
     hideCellSeparator(cell);
     
     for (UIView *subview in cell.contentView.subviews) {
         if ([subview isKindOfClass:[UIView class]] && subview.tag != 9997) {
-            subview.backgroundColor = [UIColor clearColor];
+            setBackgroundColorIfNeeded(subview, [UIColor clearColor]);
         }
     }
     
@@ -598,50 +554,13 @@ for (UIView *subview in cell.contentView.subviews) {
     if (!bgView) {
         bgView = [[UIView alloc] init];
         bgView.tag = 9997;
-        bgView.layer.masksToBounds = YES;
         [cell.contentView insertSubview:bgView atIndex:0];
     }
     
-    bgView.backgroundColor = getBackgroundColor();
-    
     CGFloat bgWidth = tableView.bounds.size.width - leftMargin - rightMargin;
-    CGFloat bgHeight = cell.bounds.size.height;
-    UIBezierPath *path;
-    CGRect bgFrame = CGRectMake(leftMargin, 0, bgWidth, bgHeight);
-    
-    if (numberOfRowsInSection == 1) {
-        bgView.layer.cornerRadius = cornerRadius;
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, bgWidth, bgHeight) cornerRadius:cornerRadius];
-    } else if (isFirstRow) {
-        bgView.layer.cornerRadius = 0;
-        UIRectCorner corners = UIRectCornerTopLeft | UIRectCornerTopRight;
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, bgWidth, bgHeight) byRoundingCorners:corners cornerRadii:CGSizeMake(cornerRadius, cornerRadius)];
-    } else if (isLastRow) {
-        bgView.layer.cornerRadius = 0;
-        UIRectCorner corners = UIRectCornerBottomLeft | UIRectCornerBottomRight;
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, bgWidth, bgHeight) byRoundingCorners:corners cornerRadii:CGSizeMake(cornerRadius, cornerRadius)];
-    } else {
-        bgView.layer.cornerRadius = 0;
-        path = [UIBezierPath bezierPathWithRect:CGRectMake(0, 0, bgWidth, bgHeight)];
-    }
-    
-    CAShapeLayer *maskLayer = [CAShapeLayer layer];
-    maskLayer.path = path.CGPath;
-    bgView.layer.mask = maskLayer;
-    
-    bgView.frame = bgFrame;
-    
-    NSLog(@"[发现页面] ========== Section: %ld, Row: %ld ==========", (long)section, (long)row);
-    NSLog(@"[发现页面] Cell frame: (%.1f, %.1f, %.1f, %.1f)", 
-          cell.frame.origin.x, cell.frame.origin.y, 
-          cell.frame.size.width, cell.frame.size.height);
-    NSLog(@"[发现页面] ContentView frame: (%.1f, %.1f, %.1f, %.1f)", 
-          cell.contentView.frame.origin.x, cell.contentView.frame.origin.y, 
-          cell.contentView.frame.size.width, cell.contentView.frame.size.height);
-    NSLog(@"[发现页面] 背景视图 frame: (%.1f, %.1f, %.1f, %.1f), bgWidth: %.1f", 
-          bgFrame.origin.x, bgFrame.origin.y, bgFrame.size.width, bgFrame.size.height, bgWidth);
-    
-    CGFloat labelRightEdge = 0;
+    CGRect bgFrame = CGRectMake(leftMargin, 0, bgWidth, cell.bounds.size.height);
+    CSListApplyCardBackground(bgView, bgFrame, cornerRadius, isFirstRow, isLastRow, getBackgroundColor());
+
     CGFloat labelY = 0;
     CGFloat labelHeight = 20.0;
     CGFloat labelOriginalRightEdge = 0;
@@ -652,18 +571,10 @@ for (UIView *subview in cell.contentView.subviews) {
         NSString *className = NSStringFromClass([subview class]);
         CGRect frame = subview.frame;
         
-        NSLog(@"[发现页面] Section: %ld, Row: %ld, 一级子视图: %@, frame: (%.1f, %.1f, %.1f, %.1f), subviews.count: %ld", 
-              (long)section, (long)row, className,
-              frame.origin.x, frame.origin.y, 
-              frame.size.width, frame.size.height,
-              (long)subview.subviews.count);
-        
         if ([className containsString:@"UILabel"]) {
             labelOriginalRightEdge = frame.origin.x + frame.size.width;
             labelY = frame.origin.y;
             labelHeight = frame.size.height;
-            NSLog(@"[发现页面] Section: %ld, Row: %ld, 检测到UILabel，原始右边缘: %.1f, Y: %.1f, 高度: %.1f", 
-                  (long)section, (long)row, labelOriginalRightEdge, labelY, labelHeight);
         }
     }
     
@@ -682,15 +593,11 @@ for (UIView *subview in cell.contentView.subviews) {
                 
                 frame.origin.x = adjustedX;
                 frame.origin.y = labelY + (labelHeight - frame.size.height) / 2.0;
-                
-                NSLog(@"[发现页面] Section: %ld, Row: %ld, MMBadgeView调整位置: (%.1f, %.1f), 原始间距: %.1f, 调整后X: %.1f (leftMargin: %.1f)", 
-                      (long)section, (long)row, frame.origin.x, frame.origin.y, originalBadgeSpacing, adjustedX, leftMargin);
                 subview.frame = frame;
                 continue;
             }
             
             if ([className isEqualToString:@"UIView"]) {
-                NSLog(@"[发现页面] Section: %ld, Row: %ld, >>> 开始分析UIView容器内的子视图 <<<", (long)section, (long)row);
                 
                 CGFloat iconWidth = 24;
                 CGFloat iconSpacing = 12;
@@ -699,25 +606,8 @@ for (UIView *subview in cell.contentView.subviews) {
                     NSString *subClassName = NSStringFromClass([subSubview class]);
                     CGRect subFrame = subSubview.frame;
                     
-                    NSLog(@"[发现页面] Section: %ld, Row: %ld,   二级子视图: %@, frame: (%.1f, %.1f, %.1f, %.1f), tag: %ld", 
-                          (long)section, (long)row, subClassName,
-                          subFrame.origin.x, subFrame.origin.y, 
-                          subFrame.size.width, subFrame.size.height,
-                          (long)subSubview.tag);
-                    
-                    for (UIView *thirdView in subSubview.subviews) {
-                        NSString *thirdClassName = NSStringFromClass([thirdView class]);
-                        CGRect thirdFrame = thirdView.frame;
-                        NSLog(@"[发现页面] Section: %ld, Row: %ld,     三级子视图: %@, frame: (%.1f, %.1f, %.1f, %.1f)", 
-                              (long)section, (long)row, thirdClassName,
-                              thirdFrame.origin.x, thirdFrame.origin.y, 
-                              thirdFrame.size.width, thirdFrame.size.height);
-                    }
-                    
                     if ([subClassName containsString:@"UIImageView"]) {
                         iconWidth = subFrame.size.width;
-                        NSLog(@"[发现页面] Section: %ld, Row: %ld,   检测到图标宽度: %.1f", 
-                              (long)section, (long)row, iconWidth);
                     }
                 }
                 
@@ -728,35 +618,22 @@ for (UIView *subview in cell.contentView.subviews) {
                     CGFloat absoluteCenterX = originalX + subFrame.origin.x + subFrame.size.width / 2;
                     CGFloat bgCenterX = leftMargin + bgWidth / 2;
                     
-                    NSLog(@"[发现页面] Section: %ld, Row: %ld, 处理视图: %@, 绝对中心点: %.1f (原始X: %.1f, 子视图X: %.1f), 背景中心点: %.1f", 
-                          (long)section, (long)row, subClassName, absoluteCenterX, originalX, subFrame.origin.x, bgCenterX);
-                    
                     if ([subClassName containsString:@"UIImageView"]) {
                         if (absoluteCenterX > bgCenterX) {
                             subFrame.origin.x = bgWidth - rightMargin - subFrame.size.width;
-                            NSLog(@"[发现页面] Section: %ld, Row: %ld,   右侧图标，新位置: %.1f (rightMargin: %.1f)", 
-                                  (long)section, (long)row, subFrame.origin.x, rightMargin);
                         } else {
                             subFrame.origin.x = leftMargin;
-                            NSLog(@"[发现页面] Section: %ld, Row: %ld,   左侧图标，新位置: %.1f (leftMargin: %.1f)", 
-                                  (long)section, (long)row, subFrame.origin.x, leftMargin);
                         }
                     } else if ([subClassName containsString:@"UILabel"]) {
                         subFrame.origin.x = leftMargin + iconWidth + iconSpacing;
                         subFrame.size.width = bgWidth - iconWidth - iconSpacing - rightMargin;
-                        NSLog(@"[发现页面] Section: %ld, Row: %ld,   UILabel新位置: %.1f, 宽度: %.1f (图标宽度: %.1f, 间距: %.1f)", 
-                              (long)section, (long)row, subFrame.origin.x, subFrame.size.width, iconWidth, iconSpacing);
                     } else if ([subClassName containsString:@"RichTextView"] || 
                                [subClassName containsString:@"WCFinderRedDotRichTextView"]) {
                         if (absoluteCenterX > bgCenterX) {
                             subFrame.origin.x = bgWidth - rightMargin - subFrame.size.width;
-                            NSLog(@"[发现页面] Section: %ld, Row: %ld,   右侧RichTextView，新位置: %.1f (rightMargin: %.1f)", 
-                                  (long)section, (long)row, subFrame.origin.x, rightMargin);
                         } else {
                             subFrame.origin.x = leftMargin + iconWidth + iconSpacing;
                             subFrame.size.width = bgWidth - iconWidth - iconSpacing - rightMargin;
-                            NSLog(@"[发现页面] Section: %ld, Row: %ld,   左侧RichTextView，新位置: %.1f, 宽度: %.1f (图标宽度: %.1f, 间距: %.1f)", 
-                                  (long)section, (long)row, subFrame.origin.x, subFrame.size.width, iconWidth, iconSpacing);
                         }
                     }
                     
@@ -829,20 +706,6 @@ for (UIView *subview in cell.contentView.subviews) {
             });
         }
     }
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    %orig;
-}
-
-- (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2 {
-    UITableViewCell *cell = %orig;
-    
-    return cell;
-}
-
-- (void)tableView:(id)arg1 willDisplayCell:(id)arg2 forRowAtIndexPath:(id)arg3 {
-    %orig;
 }
 
 - (CGFloat)tableView:(id)arg1 heightForHeaderInSection:(NSInteger)arg2 {
@@ -940,9 +803,13 @@ static void styleCell(UITableViewCell *cell, UITableView *tableView, NSIndexPath
     CGFloat leftMargin = getLeftMargin();
     CGFloat rightMargin = getRightMargin();
     
-    NSInteger section = indexPath.section;
-    NSInteger row = indexPath.row;
-    NSInteger numberOfRowsInSection = [tableView numberOfRowsInSection:section];
+    BOOL isFirstRow = NO;
+    BOOL isLastRow = NO;
+    if (!CSGroupCardPosition(tableView, indexPath, &isFirstRow, &isLastRow)) {
+        NSInteger numberOfRowsInSection = [tableView numberOfRowsInSection:indexPath.section];
+        isFirstRow = indexPath.row == 0;
+        isLastRow = indexPath.row == numberOfRowsInSection - 1;
+    }
     
     for (UIView *subview in cell.contentView.subviews) {
         NSString *className = NSStringFromClass([subview class]);
@@ -955,17 +822,14 @@ static void styleCell(UITableViewCell *cell, UITableView *tableView, NSIndexPath
         }
     }
     
-    BOOL isFirstRow = (row == 0);
-    BOOL isLastRow = (row == numberOfRowsInSection - 1);
-    
-    cell.backgroundColor = [UIColor clearColor];
-    cell.contentView.backgroundColor = [UIColor colorWithRed:0.929 green:0.929 blue:0.929 alpha:1.0];
+    setBackgroundColorIfNeeded(cell, [UIColor clearColor]);
+    setBackgroundColorIfNeeded(cell.contentView, [UIColor colorWithRed:0.929 green:0.929 blue:0.929 alpha:1.0]);
     
     hideCellSeparator(cell);
     
     for (UIView *subview in cell.contentView.subviews) {
         if ([subview isKindOfClass:[UIView class]] && subview.tag != 9999) {
-            subview.backgroundColor = [UIColor clearColor];
+            setBackgroundColorIfNeeded(subview, [UIColor clearColor]);
         }
     }
     
@@ -973,38 +837,12 @@ static void styleCell(UITableViewCell *cell, UITableView *tableView, NSIndexPath
     if (!bgView) {
         bgView = [[UIView alloc] init];
         bgView.tag = 9999;
-        bgView.layer.masksToBounds = YES;
         [cell.contentView insertSubview:bgView atIndex:0];
     }
     
-    bgView.backgroundColor = getBackgroundColor();
-    
     CGFloat bgWidth = tableView.bounds.size.width - leftMargin - rightMargin;
-    CGFloat bgHeight = cell.bounds.size.height;
-    UIBezierPath *path;
-    CGRect bgFrame = CGRectMake(leftMargin, 0, bgWidth, bgHeight);
-    
-    if (numberOfRowsInSection == 1) {
-        bgView.layer.cornerRadius = cornerRadius;
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, bgWidth, bgHeight) cornerRadius:cornerRadius];
-    } else if (isFirstRow) {
-        bgView.layer.cornerRadius = 0;
-        UIRectCorner corners = UIRectCornerTopLeft | UIRectCornerTopRight;
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, bgWidth, bgHeight) byRoundingCorners:corners cornerRadii:CGSizeMake(cornerRadius, cornerRadius)];
-    } else if (isLastRow) {
-        bgView.layer.cornerRadius = 0;
-        UIRectCorner corners = UIRectCornerBottomLeft | UIRectCornerBottomRight;
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, bgWidth, bgHeight) byRoundingCorners:corners cornerRadii:CGSizeMake(cornerRadius, cornerRadius)];
-    } else {
-        bgView.layer.cornerRadius = 0;
-        path = [UIBezierPath bezierPathWithRect:CGRectMake(0, 0, bgWidth, bgHeight)];
-    }
-    
-    CAShapeLayer *maskLayer = [CAShapeLayer layer];
-    maskLayer.path = path.CGPath;
-    bgView.layer.mask = maskLayer;
-    
-    bgView.frame = bgFrame;
+    CGRect bgFrame = CGRectMake(leftMargin, 0, bgWidth, cell.bounds.size.height);
+    CSListApplyCardBackground(bgView, bgFrame, cornerRadius, isFirstRow, isLastRow, getBackgroundColor());
 }
 
 %hook NewMainFrameViewController
@@ -1026,14 +864,6 @@ static void styleCell(UITableViewCell *cell, UITableView *tableView, NSIndexPath
             tableView.showsVerticalScrollIndicator = NO;
         }
     }
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    %orig;
-}
-
-- (void)viewDidLayoutSubviews {
-    %orig;
 }
 
 - (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2 {
@@ -1150,8 +980,8 @@ static void styleMoreViewControllerCell(UITableViewCell *cell, UITableView *tabl
     BOOL isFirstRow = (row == 0);
     BOOL isLastRow = (row == numberOfRowsInSection - 1);
     
-    cell.backgroundColor = [UIColor clearColor];
-    cell.contentView.backgroundColor = [UIColor colorWithRed:0.929 green:0.929 blue:0.929 alpha:1.0];
+    setBackgroundColorIfNeeded(cell, [UIColor clearColor]);
+    setBackgroundColorIfNeeded(cell.contentView, [UIColor colorWithRed:0.929 green:0.929 blue:0.929 alpha:1.0]);
     
     for (UIView *subview in cell.subviews) {
         NSString *className = NSStringFromClass([subview class]);
@@ -1171,7 +1001,7 @@ static void styleMoreViewControllerCell(UITableViewCell *cell, UITableView *tabl
     
     for (UIView *subview in cell.contentView.subviews) {
         if ([subview isKindOfClass:[UIView class]] && subview.tag != 9998) {
-            subview.backgroundColor = [UIColor clearColor];
+            setBackgroundColorIfNeeded(subview, [UIColor clearColor]);
         }
     }
     
@@ -1179,38 +1009,12 @@ static void styleMoreViewControllerCell(UITableViewCell *cell, UITableView *tabl
     if (!bgView) {
         bgView = [[UIView alloc] init];
         bgView.tag = 9998;
-        bgView.layer.masksToBounds = YES;
         [cell.contentView insertSubview:bgView atIndex:0];
     }
     
-    bgView.backgroundColor = getBackgroundColor();
-    
     CGFloat bgWidth = tableView.bounds.size.width - leftMargin - rightMargin;
-    CGFloat bgHeight = cell.bounds.size.height;
-    UIBezierPath *path;
-    CGRect bgFrame = CGRectMake(leftMargin, 0, bgWidth, bgHeight);
-    
-    if (numberOfRowsInSection == 1) {
-        bgView.layer.cornerRadius = cornerRadius;
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, bgWidth, bgHeight) cornerRadius:cornerRadius];
-    } else if (isFirstRow) {
-        bgView.layer.cornerRadius = 0;
-        UIRectCorner corners = UIRectCornerTopLeft | UIRectCornerTopRight;
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, bgWidth, bgHeight) byRoundingCorners:corners cornerRadii:CGSizeMake(cornerRadius, cornerRadius)];
-    } else if (isLastRow) {
-        bgView.layer.cornerRadius = 0;
-        UIRectCorner corners = UIRectCornerBottomLeft | UIRectCornerBottomRight;
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, bgWidth, bgHeight) byRoundingCorners:corners cornerRadii:CGSizeMake(cornerRadius, cornerRadius)];
-    } else {
-        bgView.layer.cornerRadius = 0;
-        path = [UIBezierPath bezierPathWithRect:CGRectMake(0, 0, bgWidth, bgHeight)];
-    }
-    
-    CAShapeLayer *maskLayer = [CAShapeLayer layer];
-    maskLayer.path = path.CGPath;
-    bgView.layer.mask = maskLayer;
-    
-    bgView.frame = bgFrame;
+    CGRect bgFrame = CGRectMake(leftMargin, 0, bgWidth, cell.bounds.size.height);
+    CSListApplyCardBackground(bgView, bgFrame, cornerRadius, isFirstRow, isLastRow, getBackgroundColor());
     
     for (UIView *subview in cell.contentView.subviews) {
         if (subview.tag == 9998) continue;
@@ -1411,14 +1215,6 @@ for (UIView *subview in view.subviews) {
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    %orig;
-}
-
-- (void)viewDidLayoutSubviews {
-    %orig;
-}
-
 - (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2 {
     UITableViewCell *cell = %orig;
     
@@ -1573,6 +1369,3 @@ for (UIView *subview in view.subviews) {
 }
 
 %end
-
-%ctor {
-}

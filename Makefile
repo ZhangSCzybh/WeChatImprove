@@ -13,7 +13,8 @@ ifeq ($(SCHEME),roothide)
 else ifeq ($(SCHEME),rootless)
     export THEOS_PACKAGE_SCHEME = rootless
 else ifeq ($(SCHEME),rootful)
-    export THEOS_PACKAGE_SCHEME = rootful
+    # Rootful is Theos' default scheme (there is no "rootful" module).
+    export THEOS_PACKAGE_SCHEME =
 endif
 
 # 目标设备最低版本
