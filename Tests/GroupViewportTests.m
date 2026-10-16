@@ -98,11 +98,11 @@ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
 @property(nonatomic,strong) id nativeHeader;
 @property(nonatomic) CGFloat baselineDeceleration;
-@property(nonatomic) BOOL dirty,searching,publishedEnabled,scheduled,publishing;
+@property(nonatomic) BOOL dirty,searching,publishedEnabled,scheduled,publishing,groupPanMoving;
 @property(nonatomic) BOOL active,pendingScrollToTop,chromeVisible,swipeActive,nativePresentation,snapshotRetryAttempted;
 @property(nonatomic,strong) NSArray *displayedTabs;
 @property(nonatomic,strong) TestChrome *chrome;
-@property(nonatomic) NSUInteger changeDepth,refreshCount,layoutCount,detachCount;
+@property(nonatomic) NSUInteger changeDepth,refreshCount,layoutCount,detachCount,nativeMenuState;
 @property(nonatomic,copy) NSString *publishedTabID;
 - (BOOL)isActive;
 + (instancetype)adapterForController:(id)controller;
@@ -275,6 +275,15 @@ int main(void) { @autoreleasepool {
     Check(a.pendingScrollToTop && !a.anchors[@"another"],@"switching groups discards the destination's saved position and requests top");
     a.publishedTabID=@"another"; [a restoreAnchor];
     Check(Near(a.table.contentOffset.y,-100),@"selected group starts at top after publication");
+    a=List(&host,1600); a.nativeMenuState=3; [a returnToGroupTop];
+    Check(a.pendingScrollToTop && !a.table.offsetWrites,@"custom menu motion defers return-to-top without UITableView flags");
+    a.nativeMenuState=1; [a applyPendingScrollToTop];
+    Check(a.pendingScrollToTop && !a.table.offsetWrites,@"stationary custom menu preserves viewport while open");
+    a.nativeMenuState=0; [a applyPendingScrollToTop];
+    Check(!a.pendingScrollToTop && Near(a.table.contentOffset.y,-100),@"top request completes after actual custom menu closes");
+    a=List(&host,1600); a.displayedTabs=@[tab]; a.preferences.tabs=@[tab]; a.chrome=[TestChrome new];
+    a.nativeMenuState=1; [a selectIndex:0];
+    Check(!a.pendingScrollToTop && [a.chrome.selectedTabID isEqual:a.publishedTabID],@"custom menu open prevents tab selection and preserves published indicator");
     fprintf(stdout,"Group viewport: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;
 } }

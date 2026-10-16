@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.6-28`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.6-32`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.6-28`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.6-32`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.6-28` 完成 Rootless 测试包构建；Rootful 保留构建入口，本轮未重新验证 |
+| Rootless / Rootful | `1.6-32` 完成 Rootless 测试包构建；Rootful 保留构建入口，本轮未重新验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -109,7 +109,7 @@
 
 顶部主列表标题显示当前分组名称（含自定义名称）。从聊天返回或切换分组后回到列表顶部；普通消息刷新保持当前阅读位置。
 
-手指中途跨越区域不会改变本次手势用途，`85%` 分界线归右侧菜单区域。切组到首尾不循环；搜索、编辑或会话菜单已展开时暂停切组。关闭分组切换手势后，会话滑动范围恢复原生行为。
+手指中途跨越区域不会改变本次手势用途，`85%` 分界线归右侧菜单区域。切组到首尾不循环；搜索时暂停切组。菜单已展开时也严格遵守起手分区：左侧 85% 仍横滑切组，有效切组时先收起旧菜单；右侧 15% 才接收原生菜单滑动。关闭分组切换手势后，会话滑动范围恢复原生行为。
 
 聊天列表切组手势与“消息手势”是两个独立功能：后者作用于进入聊天后的消息气泡。
 
@@ -141,20 +141,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-28
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-32
 ```
 
-默认产物：`packages/com.wechat.improve_1.6-28_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.6-32_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.6-28` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.6-32` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-28
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-32
 ```
 
-默认产物：`packages/com.wechat.improve_1.6-28_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.6-32_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -174,7 +174,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.6-28_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.6-32_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
@@ -218,6 +218,14 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 实现细节见 [会话分组说明](docs/session-groups.md)、[列表圆角优化](docs/list-corners.md)；设计背景见 [分组重构方案](docs/session-groups-refactor-proposal.md)。
 
 ### 验证状态
+
+`1.6-32` 将 85%/15% 起手分区同时应用于切组与原生菜单，修复菜单展开后左侧也被菜单接管的问题；左侧有效横滑先收起菜单再切组。分组回归 308 项通过；详见 [固定手势分区修复](docs/session-groups-zones-1.6-32.md)。
+
+`1.6-31` 补齐微信自定义侧滑菜单的刷新保护：跟手、展开和收起动画均按实际菜单状态避让，关闭后恢复更新；保留 85%/15% 手势分区。分组回归 270 项通过，Rootless 双架构构建完成；实机跟手效果待验证。详见 [原生侧滑菜单修复](docs/session-groups-menu-1.6-31.md)。
+
+`1.6-30` 修复滚回顶部时置顶笔记被“正在更新会话…”占位替换的问题。待刷新期间重新验证无用户名业务行，并同步处理反向路径查询；分组回归 245 项通过。详见 [置顶笔记显示修复](docs/session-groups-business-1.6-30.md)。
+
+`1.6-29` 修复左滑菜单起手期间被分组刷新打断的窗口：触摸期间合并延后刷新，重复关闭编辑状态不再触发无数据变化的重载，关闭菜单直接恢复切组手势。分组回归 218 项通过，详见 [侧滑菜单刷新保护](docs/session-groups-swipe-1.6-29.md)。
 
 `1.6-28` 清理聊天分组未使用的操作令牌、动作索引和投影版本计数，移除旧角标重载接口，收窄内部方法的公开范围。分组相关 205 项回归检查通过。详见 [分组代码清理](docs/session-groups-cleanup-1.6-28.md)。
 

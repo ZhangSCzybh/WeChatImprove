@@ -1,0 +1,30 @@
+{
+  "version": "1.6-29",
+  "scheme": "rootless",
+  "package": "packages/com.wechat.improve_1.6-29_iphoneos-arm64.deb",
+  "sha256": "e7601cb2b171a7e4760ad4a4f370d14aed163ea7c4599eeaf494a338e5baeda3",
+  "bytes": 706862,
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "checks": {
+    "selection": 30,
+    "interactions": 53,
+    "viewport": 66,
+    "header": 46,
+    "indicator": 23
+  },
+  "total_checks": 218,
+  "failures": 0,
+  "baseline_version": "1.6-28",
+  "baseline_interaction_checks": 53,
+  "baseline_interaction_failures": 7,
+  "refresh_test_boundary": "Production admission and scheduler, reload/model build substituted by counter",
+  "payload_matches_build": true,
+  "source_hashes_unchanged_during_build": 205,
+  "previous_packages_preserved": 4,
+  "changed_production_compiler_warnings": [],
+  "on_device_verified": false,
+  "build_log": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-swipe-1.6-29-lfmlpk7u/build.log"
+}

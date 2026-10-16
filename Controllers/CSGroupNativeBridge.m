@@ -98,6 +98,19 @@ static BOOL AnonymousPathWithinBounds(id controller, NSIndexPath *path) {
     long long rows=ControllerCount(controller,table,@selector(tableView:numberOfRowsInSection:),(NSInteger)section,YES);
     return rows>=0 && rows<=100000 && row<(NSUInteger)rows;
 }
+static BOOL AnonymousPathStillBusiness(id logic, NSIndexPath *path) {
+    // Rendering a banner does not require a chat username. During deferred
+    // refresh, prove the slot is still non-session content before reusing it.
+    for (NSString *name in @[@"getSessionInfoAtIndexPath:",@"getCellDataAtIndexPath:"]) {
+        NSMethodSignature *sig=Signature(logic,NSSelectorFromString(name),3);
+        if (!sig || sig.methodReturnType[0]!='@' || [sig getArgumentTypeAtIndex:2][0]!='@') return NO;
+    }
+    if (ObjectAtPath(logic,@"getSessionInfoAtIndexPath:",path)) return NO;
+    id data=ObjectAtPath(logic,@"getCellDataAtIndexPath:",path);
+    if (CSGroupReadObject(data,@"m_sessionInfo")) return NO;
+    id name=CSGroupReadObject(data,@"userName");
+    return !name || ([name isKindOfClass:NSString.class] && ![name length]);
+}
 NSIndexPath *CSGroupResolveNativeRowPath(id controller, CSGroupRow *row, BOOL modelDirty) {
     @try {
         if (![row isKindOfClass:CSGroupRow.class] || !IsNativePath(row.nativePath)) return nil;
@@ -105,7 +118,8 @@ NSIndexPath *CSGroupResolveNativeRowPath(id controller, CSGroupRow *row, BOOL mo
         if (!logic) return nil;
         if (![row.userName isKindOfClass:NSString.class] || !row.userName.length) {
             if (row.kind!=CSGroupRowKindBusiness && row.kind!=CSGroupRowKindAggregate) return nil;
-            return !modelDirty && AnonymousPathWithinBounds(controller,row.nativePath) ? row.nativePath : nil;
+            if (!AnonymousPathWithinBounds(controller,row.nativePath)) return nil;
+            return !modelDirty || AnonymousPathStillBusiness(logic,row.nativePath) ? row.nativePath : nil;
         }
         if (NativeIdentityMatches(logic,row.nativePath,row)) return row.nativePath;
         id path=ResolverObjectAtPath(logic,@"indexPathOfSessionUserName:",row.userName);

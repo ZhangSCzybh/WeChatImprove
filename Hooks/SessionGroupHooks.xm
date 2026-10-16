@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
+#import <substrate.h>
 #import "CSGroupListAdapter.h"
 #import "CSGroupNativeBridge.h"
 
@@ -7,6 +8,7 @@
 @interface MainFrameTableView : UITableView @end
 @interface MainFrameLogicController : NSObject @end
 @interface MainSessionEditingLogic : NSObject @end
+@interface MMBaseMultiMenuTableViewCell : UITableViewCell @end
 
 static char EditingContextKey;
 static CSGroupListAdapter *EditingAdapter(id owner) {
@@ -96,6 +98,44 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 - (id)indexPathOfSessionUserName:(id)name { __block id result=nil; Native(self,NO,^{ result=%orig; }); return result; }
 %end
 
+static CSGroupListAdapter *MenuAdapter(id cell) {
+    if (![cell isKindOfClass:UIView.class]) return nil;
+    for (UIView *view=[cell superview]; view; view=view.superview) {
+        if ([view isKindOfClass:UITableView.class]) return [CSGroupListAdapter adapterForTable:(UITableView *)view];
+    }
+    return nil;
+}
+
+static BOOL (*OriginalMenuReceiveTouch)(id,SEL,UIGestureRecognizer *,UITouch *);
+static BOOL MenuReceiveTouch(id cell, SEL selector, UIGestureRecognizer *gesture, UITouch *touch) {
+    CSGroupListAdapter *adapter=MenuAdapter(cell);
+    if (adapter && ![adapter nativeMenuGesture:gesture inCell:cell shouldReceiveTouch:touch]) return NO;
+    return OriginalMenuReceiveTouch ? OriginalMenuReceiveTouch(cell,selector,gesture,touch) : YES;
+}
+static void InstallMenuTouchGate(void) {
+    Class cell=NSClassFromString(@"MMBaseMultiMenuTableViewCell");
+    if (!cell) return;
+    SEL selector=@selector(gestureRecognizer:shouldReceiveTouch:);
+    // This optional delegate callback may be absent or inherited. Preserve any
+    // existing implementation; a missing callback has UIKit's default YES policy.
+    if (class_getInstanceMethod(cell,selector))
+        MSHookMessageEx(cell,selector,(IMP)MenuReceiveTouch,(IMP *)&OriginalMenuReceiveTouch);
+    else class_addMethod(cell,selector,(IMP)MenuReceiveTouch,"B@:@@");
+}
+
+%hook MMBaseMultiMenuTableViewCell
+- (void)handlePan:(UIGestureRecognizer *)gesture {
+    @try { %orig; }
+    @finally { [MenuAdapter(self) nativeMenuDidChange]; }
+}
+- (void)setMenuOptionsViewHidden:(BOOL)hidden animated:(BOOL)animated completionHandler:(void (^)(void))completion {
+    // Preserve the host's callback and animation. Observe actual menu state;
+    // no native gesture delegate, translation, velocity or threshold is changed.
+    @try { %orig; }
+    @finally { [MenuAdapter(self) nativeMenuDidChange]; }
+}
+%end
+
 %hook MainSessionEditingLogic
 - (void)handleEditing:(NSInteger)style forTableView:(UITableView *)table atIndexPath:(NSIndexPath *)path {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:table];
@@ -135,12 +175,12 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 - (void)setEditing:(BOOL)editing {
     %orig;
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!editing && !a.publishing) { [a endSwipeEditing]; [a requestRefresh]; }
+    if (!editing && !a.publishing) [a endSwipeEditing];
 }
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     %orig;
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!editing && !a.publishing) { [a endSwipeEditing]; [a requestRefresh]; }
+    if (!editing && !a.publishing) [a endSwipeEditing];
 }
 - (UIView *)tableHeaderView {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
@@ -362,6 +402,7 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 %end
 
 %ctor {
+    InstallMenuTouchGate();
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),NULL,SettingsChanged,
         CFSTR("com.wechat.enhance.chat_group.settings_changed"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
 }

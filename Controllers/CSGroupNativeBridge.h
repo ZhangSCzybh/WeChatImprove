@@ -7,6 +7,8 @@ FOUNDATION_EXPORT long long CSGroupReadInteger(id _Nullable object, NSString *na
 FOUNDATION_EXPORT CSGroupRowCategory CSGroupCategoryForContact(id _Nullable contact);
 FOUNDATION_EXPORT NSArray<NSArray<CSGroupRow *> *> * _Nullable CSGroupBuildNativeSections(id controller, id table, id source);
 /// Revalidates a snapshot identity against current host rows. Caller checks account.
-/// Anonymous business rows additionally require verified bounds and a clean model.
+/// Anonymous business rows require verified bounds; a dirty model also requires
+/// proving the slot still has no native session or named fake row. This permits
+/// rendering, not identity-based editing (callers must still require a username).
 FOUNDATION_EXPORT NSIndexPath * _Nullable CSGroupResolveNativeRowPath(id controller, CSGroupRow *row, BOOL modelDirty);
 NS_ASSUME_NONNULL_END

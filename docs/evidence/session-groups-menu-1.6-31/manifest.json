@@ -1,0 +1,38 @@
+{
+  "artifact": "WeChat 8.0.78.34, locally extracted IPA executable",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "cryptid": 0,
+  "class": "MMBaseMultiMenuTableViewCell",
+  "methods": [
+    {
+      "selector": "isMenuHidden",
+      "address": "0x116752c24"
+    },
+    {
+      "selector": "setMenuOptionsViewHidden:animated:completionHandler:",
+      "address": "0x116756b14"
+    },
+    {
+      "selector": "handlePan:",
+      "address": "0x1167576d8"
+    },
+    {
+      "selector": "checkTableViewEditingStyle",
+      "address": "0x116758320"
+    }
+  ],
+  "method_resolution": "Mach-O Objective-C class method metadata; llvm-objdump -d with bounded virtual addresses",
+  "coverage": "Static analysis of local packaged executable only. No device runtime tracing; exact identity with the user installed executable is unverified. Disassembler nearest exported symbol labels are not Objective-C function names.",
+  "observations": [
+    "handlePan uses an independent recognizer and moves the native content container",
+    "checkTableViewEditingStyle is a single ret in this artifact",
+    "isMenuHidden can change before the hide animation completes; _inHideAnimation covers closing motion",
+    "Native close completion may be skipped for stale animation generations; callback identity and lifetime are preserved"
+  ],
+  "files": {
+    "close.asm": "4f9dcc6e8f308a02bb6e3c2af907369de619802413d390dfff2ade98a80768b7",
+    "editing.asm": "544256137b156b0e3114b518db8e78dfedde9c429d3026a6b1d319709f83a768",
+    "hidden.asm": "ccf1656b673ffbb146040c09cb230de6d6a3cafcf856ebf12168ad9e5e1ebcba",
+    "pan.asm": "c3aa9c8a1373b02d6755a312294a2cd128252405061cfb61d55f4c68be345959"
+  }
+}

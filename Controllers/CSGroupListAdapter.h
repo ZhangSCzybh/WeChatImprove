@@ -16,6 +16,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)recordNativeTitle:(nullable NSString *)title status:(unsigned int)status forTitleView:(id)titleView;
 - (void)returnToGroupTop;
 - (void)endSwipeEditing;
+/// Wake pending work after the host custom menu handles a pan or visibility change.
+- (void)nativeMenuDidChange;
+/// Restrict the native row pan using the original touch position in the table.
+- (BOOL)nativeMenuGesture:(UIGestureRecognizer *)gesture inCell:(UIView *)cell shouldReceiveTouch:(UITouch *)touch;
 - (void)layout;
 - (void)refresh;
 - (void)requestRefresh;

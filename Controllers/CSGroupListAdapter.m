@@ -223,13 +223,88 @@ static id ObjectArgument(id target, NSString *name, id value) {
     if (installed!=self.headerContainer || resized) [self publishHeader:self.headerContainer];
     NSInteger sensitivity=[NSUserDefaults.standardUserDefaults integerForKey:@"com.wechat.enhance.scroll_sensitivity"];
     table.decelerationRate=sensitivity==1 ? 0.998 : sensitivity==2 ? 0.9998 : sensitivity==3 ? 0.999 : self.baselineDeceleration;
-    self.pan.enabled=Option(@"swipe_gesture_enabled") && !table.editing && !self.swipeActive;
-    self.listPan.enabled=self.pan.enabled;
+    [self updateGroupGestureAvailability];
     [self applyPendingScrollToTop];
+}
+- (BOOL)groupPanMoving {
+    return self.pan.state==UIGestureRecognizerStateBegan || self.pan.state==UIGestureRecognizerStateChanged ||
+        self.listPan.state==UIGestureRecognizerStateBegan || self.listPan.state==UIGestureRecognizerStateChanged;
+}
+- (NSInteger)listZoneForTouch:(UITouch *)touch {
+    CGPoint point=[touch locationInView:self.table];
+    CGRect viewport=self.table.bounds;
+    if (!CGRectContainsPoint(viewport,point)) return -1;
+    return point.x>=CGRectGetMinX(viewport)+CGRectGetWidth(viewport)*0.85 ? 1 : 0;
+}
+- (BOOL)nativeMenuGesture:(UIGestureRecognizer *)gesture inCell:(UIView *)cell shouldReceiveTouch:(UITouch *)touch {
+    if (![self groupSwipesAvailable] || gesture!=CSGroupReadObject(cell,@"_panGestureRecognizer")) return YES;
+    // UIKit asks once at touch-down. Never reconsider using the translated row
+    // frame or the finger's position after crossing the 85% boundary.
+    return [self listZoneForTouch:touch]==1;
+}
+- (BOOL)closeMenusForGroupSwitch {
+    if (![self nativeMenuState] && !self.swipeActive && !self.table.editing) return YES;
+    [self beginNativeChange];
+    @try {
+        __block NSArray *cells=nil;
+        CSGroupWithDisplayIndices(self.table, ^{ cells=self.table.visibleCells; });
+        Class menuClass=NSClassFromString(@"MMBaseMultiMenuTableViewCell");
+        SEL hide=NSSelectorFromString(@"setMenuOptionsViewHidden:animated:completionHandler:");
+        for (UITableViewCell *cell in cells) {
+            if (menuClass && [cell isKindOfClass:menuClass] && [cell respondsToSelector:hide])
+                ((void(*)(id,SEL,BOOL,BOOL,id))objc_msgSend)(cell,hide,YES,NO,nil);
+        }
+        [self.table setEditing:NO animated:NO];
+        [self endSwipeEditing];
+    } @finally { [self endNativeChange]; }
+    return ![self nativeMenuState] && !self.table.editing && !self.swipeActive;
+}
+- (NSUInteger)nativeMenuState {
+    // WeChat's custom row menu is independent of UITableView.editing/tracking.
+    // Bit 0 blocks publication; bit 1 needs a short wake-up while motion settles.
+    if (!self.table || !self.chromeVisible || !Option(@"enabled") || self.searching) return 0;
+    Class menuClass=NSClassFromString(@"MMBaseMultiMenuTableViewCell");
+    if (!menuClass) return 0;
+    __block NSArray *cells=nil;
+    CSGroupWithDisplayIndices(self.table, ^{ cells=self.table.visibleCells; });
+    NSUInteger state=0;
+    for (UITableViewCell *cell in cells) {
+        if (![cell isKindOfClass:menuClass]) continue;
+        NSDictionary *delivery=objc_getAssociatedObject(cell,&CellRowKey);
+        if (delivery && ![delivery[@"account"] isEqual:CSGroupCurrentAccountID()]) continue;
+        CSGroupRow *row=delivery[@"row"];
+        // A genuinely deleted row must not keep its stale menu alive forever.
+        if (self.dirty && !self.changeDepth && row.userName.length && ![self currentPathForRow:row]) continue;
+        id pan=CSGroupReadObject(cell,@"_panGestureRecognizer");
+        BOOL moving=[pan isKindOfClass:UIGestureRecognizer.class] &&
+            ([(UIGestureRecognizer *)pan state]==UIGestureRecognizerStateBegan || [(UIGestureRecognizer *)pan state]==UIGestureRecognizerStateChanged);
+        Ivar hiding=class_getInstanceVariable(object_getClass(cell),"_inHideAnimation");
+        if (hiding && strchr("Bc",ivar_getTypeEncoding(hiding)[0])) {
+            unsigned char flag=0;
+            memcpy(&flag,(const char *)(__bridge const void *)cell+ivar_getOffset(hiding),sizeof(flag));
+            moving |= flag!=0;
+        }
+        if (moving) state|=3;
+        else if (!CSGroupReadInteger(cell,@"isMenuHidden",1)) state|=1;
+    }
+    return state;
+}
+- (void)nativeMenuDidChange {
+    [self updateGroupGestureAvailability];
+    if (self.dirty || self.pendingScrollToTop) [self requestRefresh];
 }
 - (void)refresh {
     if (!NSThread.isMainThread) { [self requestRefresh]; return; }
     if (self.publishing) return;
+    // A horizontal row swipe starts tracking before UIKit reports editing or
+    // dragging. Reloading in that window replaces the cell under the finger.
+    if (self.table.tracking || [self groupPanMoving]) { [self requestRefresh]; return; }
+    NSUInteger menuState=[self nativeMenuState];
+    if (menuState) {
+        self.dirty=YES;
+        if (menuState&2) [self requestRefresh];
+        return;
+    }
     [self reconcileDeletedSwipeRow];
     if (self.changeDepth || self.table.dragging || self.table.decelerating || self.table.editing || self.swipeActive) { self.dirty=YES; return; }
     self.publishing=YES; self.dirty=NO;
@@ -322,7 +397,12 @@ static id ObjectArgument(id target, NSString *name, id value) {
     if (self.scheduled || self.changeDepth || self.publishing) return;
     self.scheduled=YES;
     __weak typeof(self) weakSelf=self;
-    dispatch_async(dispatch_get_main_queue(), ^{ CSGroupListAdapter *self=weakSelf; self.scheduled=NO; if (self.dirty) [self refresh]; });
+    void (^publish)(void)=^{ CSGroupListAdapter *self=weakSelf; self.scheduled=NO; if (self.dirty) [self refresh]; };
+    // A rejected/cancelled row swipe need not send scrollViewDidEndDragging.
+    // Keep one pending wake-up until tracking ends; editing then owns deferral.
+    if (self.table.tracking || [self groupPanMoving] || ([self nativeMenuState]&2))
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW,(int64_t)(0.05*NSEC_PER_SEC)),dispatch_get_main_queue(),publish);
+    else dispatch_async(dispatch_get_main_queue(),publish);
 }
 - (void)beginNativeChange {
     @synchronized (self) { if (!self.changeDepth && NSThread.isMainThread) [self saveAnchor]; self.changeDepth++; }
@@ -341,7 +421,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     @finally { [self endNativeChange]; }
 }
 - (void)useNativePresentation {
-    if (!self.isActive || self.swipeActive || self.table.editing) return;
+    if (!self.isActive || self.swipeActive || self.table.editing || [self nativeMenuState]) return;
     [self saveAnchor]; self.nativePresentation=YES; [self.table setEditing:NO animated:NO]; [self refresh];
 }
 - (void)performInNativePresentation:(void (^)(void))action {
@@ -349,7 +429,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     void (^guarded)(void)=^{ if ([account isEqualToString:CSGroupCurrentAccountID()]) action(); };
     if (!self.isActive && !self.publishing && !self.changeDepth) { CSGroupWithNativeIndices(self.table,guarded); return; }
     [self.nativeActions addObject:[guarded copy]];
-    if (self.swipeActive || self.table.editing) {
+    if (self.swipeActive || self.table.editing || [self nativeMenuState]) {
         // Native navigation waits for the menu to close; do not discard its queued action.
         self.nativePresentation=YES; [self requestRefresh]; return;
     }
@@ -376,7 +456,11 @@ static id ObjectArgument(id target, NSString *name, id value) {
         // The snapshot stores original positions; resolve current native positions by identity.
         id path=self.identityDisplayPaths[name]; return [path isKindOfClass:NSIndexPath.class] ? path : nil;
     }
-    return self.dirty ? nil : [self.projection displayPathForNativePath:nativePath];
+    NSIndexPath *display=[self.projection displayPathForNativePath:nativePath];
+    CSGroupRow *row=[self.projection rowAtDisplayPath:display];
+    // A deferred refresh alone does not invalidate a banner. Revalidate in both
+    // directions so native rect/cell queries keep addressing the displayed row.
+    return [[self currentPathForRow:row] isEqual:nativePath] ? display : nil;
 }
 - (NSArray *)nativePaths:(NSArray *)displayPaths {
     NSMutableArray *out=[NSMutableArray array];
@@ -415,8 +499,16 @@ static id ObjectArgument(id target, NSString *name, id value) {
     @finally { [self endNativeChange]; }
     return YES;
 }
+- (void)updateGroupGestureAvailability {
+    // Editing/open menus do not transfer left-zone touches to the native menu.
+    BOOL enabled=self.chromeVisible && !self.searching && Option(@"swipe_gesture_enabled");
+    if (self.pan.enabled!=enabled) self.pan.enabled=enabled;
+    if (self.listPan.enabled!=enabled) self.listPan.enabled=enabled;
+}
 - (void)endSwipeEditing {
     self.swipeActive=NO; self.swipeRow=nil; self.swipeAccount=nil; self.swipeDisplayPath=nil;
+    // Closing a clean menu must restore group gestures without rebuilding cells.
+    [self updateGroupGestureAvailability];
     if (self.dirty || self.pendingScrollToTop) [self requestRefresh];
 }
 - (void)reconcileDeletedSwipeRow {
@@ -600,7 +692,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     }
 }
 - (void)selectIndex:(NSInteger)index {
-    if (self.swipeActive || self.table.editing) { self.chrome.selectedTabID=self.publishedTabID; return; }
+    if (self.swipeActive || self.table.editing || [self nativeMenuState]) { self.chrome.selectedTabID=self.publishedTabID; return; }
     NSArray *tabs=self.displayedTabs; if (index<0 || index>=(NSInteger)tabs.count) return;
     if (![self.preferences.accountID isEqualToString:CSGroupCurrentAccountID()]) { [self requestRefresh]; return; }
     NSString *tabID=[tabs[(NSUInteger)index] tabId];
@@ -624,7 +716,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
 - (void)applyPendingScrollToTop {
     UITableView *table=self.table;
     if (!self.pendingScrollToTop || self.publishing || self.dirty || self.changeDepth || !self.chromeVisible ||
-        self.searching || table.tracking || table.dragging || table.decelerating || table.editing || self.swipeActive) return;
+        self.searching || table.tracking || table.dragging || table.decelerating || table.editing || self.swipeActive || [self nativeMenuState]) return;
     CGFloat top=table.adjustedContentInset.top;
     if (CGRectGetHeight(table.bounds)<=0 || !isfinite(top)) return;
     self.pendingScrollToTop=NO;
@@ -663,7 +755,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     }
 }
 - (BOOL)groupSwipesAvailable {
-    return self.table && Option(@"enabled") && Option(@"swipe_gesture_enabled") && self.chromeVisible && !self.searching && !self.table.editing && !self.swipeActive;
+    return self.table && Option(@"enabled") && Option(@"swipe_gesture_enabled") && self.chromeVisible && !self.searching;
 }
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:(UITouch *)touch {
     BOOL allowed=NO;
@@ -671,15 +763,13 @@ static id ObjectArgument(id target, NSString *name, id value) {
     if ((gesture!=self.pan && gesture!=self.listPan) || ![self groupSwipesAvailable]) return NO;
     // Decide using the initial touch, before either recognizer can begin or cancel another.
     for (UIView *view=touch.view; view; view=view.superview) {
-        if ([view isKindOfClass:UIControl.class] && (gesture!=self.pan || ![view isDescendantOfView:self.chrome.scrollView])) return NO;
+        if ([view isKindOfClass:UIControl.class] && gesture==self.pan && ![view isDescendantOfView:self.chrome.scrollView]) return NO;
         if (view==self.table || view==self.chrome) break;
     }
     if (gesture==self.listPan) {
-        CGPoint point=[touch locationInView:self.table];
-        CGRect viewport=self.table.bounds;
-        // The boundary is fixed by the initial touch in the visible list width,
-        // including a nonzero bounds origin. Exactly 85% belongs to native editing.
-        if (!CGRectContainsPoint(viewport,point) || point.x>=CGRectGetMinX(viewport)+CGRectGetWidth(viewport)*0.85) return NO;
+        // Menu state never changes zone ownership; menu buttons still receive taps
+        // unless a left-zone horizontal group pan actually begins.
+        if ([self listZoneForTouch:touch]!=0) return NO;
         if (touch.view==self.chrome || [touch.view isDescendantOfView:self.headerContainer]) return NO;
         allowed=YES;
     } else if (self.chrome.scrollView.contentSize.width>self.chrome.scrollView.bounds.size.width) {
@@ -713,7 +803,9 @@ static id ObjectArgument(id target, NSString *name, id value) {
     CGPoint p=[pan translationInView:self.chrome],v=[pan velocityInView:self.chrome];
     if (fabs(p.x)<44 && fabs(v.x)<350) return;
     NSInteger index=self.chrome.selectedIndex+(p.x<0 || (p.x==0 && v.x<0) ? 1 : -1);
-    if (index>=0 && index<(NSInteger)self.displayedTabs.count) { [self.chrome selectTabAtIndex:index animated:YES]; [self selectIndex:index]; }
+    if (index>=0 && index<(NSInteger)self.displayedTabs.count && [self closeMenusForGroupSwitch]) {
+        [self.chrome selectTabAtIndex:index animated:YES]; [self selectIndex:index];
+    }
 }
 @end
 BOOL CSGroupCardPosition(UITableView *table, NSIndexPath *path, BOOL *first, BOOL *last) {
