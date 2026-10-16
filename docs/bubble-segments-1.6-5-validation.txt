@@ -1,0 +1,47 @@
+WeChatImprove 1.6-5 quoted/split bubble fixes — TEST PACKAGE
+Target: WeChat 8.0.78 / Rootless
+Build: make -j4 package SCHEME=rootless PACKAGE_VERSION=1.6-5
+Build exit: 0
+Build log: /tmp/wechat-bubble-segments-1.6-5-build.log
+
+Package: com.wechat.improve
+Name: WeChatImprove
+Description: 微信插件，支持聊天按钮布局自定义等。
+Maintainer: 再也不会
+Author: 再也不会
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
+Architecture: iphoneos-arm64
+Version: 1.6-5
+Installed-Size: 3164
+
+Dylib path: var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib
+Architectures: arm64 arm64e
+Dylib SHA256: 560f52285592573bc46d9f026ca04730feb6fffc5f2f27d97b5784173aec34f0
+Embedded version/native highlight/reply selectors verified.
+
+Tests (exit 0):
+bash Tests/verify-message-merge.sh
+PASS: 7008 message merge/navigation checks
+PASS: 315 native adapter/navigation lifecycle checks (UIKit double)
+bash Tests/verify-bubble-style.sh
+Bubble policy/renderer/ownership: 9611 checks passed
+Bubble real-adapter lifecycle: 38 checks passed
+
+No device installation/database/settings access. Real WeChat rendering and energy not verified.
+Old 1.6-1/1.6-2/1.6-3/1.6-4 packages unchanged.
+Build warnings: 212
+Changed feature source warnings/errors: 0
+
+Package SHA256: c96b8f9542c77b55c6d3820d92f87e0a0d6d32c009ebaee9a206ac1cd15d5601
+
+Source SHA256:
+598e91c08527ed22ae013bc1da08806d04d8877ec93f77c5245f199304964a0b  Controllers/CSBubbleStyleAdapter.m
+b37070bb81aefda3a4e4cd7c5f486e66de910ad80a67bfb8d0aaa390f52aa340  Controllers/CSBubbleStylePolicy.h
+7905981828b99e97dc6cd54806ecdb23459acd670699f3230e402059a9828df0  Controllers/CSBubbleStylePolicy.m
+68797a83e4dc8d9dc46b03fb6d8658a68895f94916dad552b1d18378e1645f19  Controllers/CSMessageMergeAdapter.m
+0697bcdd6990d028c105e6b6715e2e2dfba684570208a01ec5c7ede047104abf  Tests/BubbleStyleAdapterTests.m
+4bd7eacc8abce9179399223a1e132e6f89b1c34cde47e1c3378273e221d1f2db  Tests/BubbleStyleTests.m
+d12c52500dae45bcd26fdc4179a01b90818731406e819f7b396895f74db6123f  Tests/MessageMergeAdapterTests.m
+30506af7a30af7b013ff9f3418c7523f6c9a745269518f0088a97d3117549f83  Headers/CSUserInfoHelper.h
+52c2f1d8fc3802fe1bc3d6ea00f286c1c75af86f8a8771855b3d009528dc1c80  control

@@ -3,6 +3,8 @@
 
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
+#import "../Controllers/CSMessageMergeAdapter.h"
+#import "../Controllers/CSMessageTimeLayout.h"
 
 // UserDefaults Key常量
 static NSString * const kMessageTimeEnabledKey = @"com.wechat.enhance.messageTime.enabled";
@@ -10,19 +12,10 @@ static NSString * const kMessageTimeFontSizeKey = @"com.wechat.enhance.messageTi
 static NSString * const kMessageTimeTextColorKey = @"com.wechat.enhance.messageTime.textColor";
 static NSString * const kMessageTimeBackgroundColorKey = @"com.wechat.enhance.messageTime.backgroundColor";
 static NSString * const kMessageTimeCornerRadiusKey = @"com.wechat.enhance.messageTime.cornerRadius";
-// 显示格式控制
-static NSString * const kMessageTimeShowYearKey = @"com.wechat.enhance.messageTime.showYear";
-static NSString * const kMessageTimeShowMonthKey = @"com.wechat.enhance.messageTime.showMonth";
-static NSString * const kMessageTimeShowDayKey = @"com.wechat.enhance.messageTime.showDay";
-static NSString * const kMessageTimeShowHourKey = @"com.wechat.enhance.messageTime.showHour";
-static NSString * const kMessageTimeShowMinuteKey = @"com.wechat.enhance.messageTime.showMinute";
-static NSString * const kMessageTimeShowSecondKey = @"com.wechat.enhance.messageTime.showSecond";
 // 位置控制
 static NSString * const kMessageTimeShowBelowAvatarKey = @"com.wechat.enhance.messageTime.showBelowAvatar";
 // 字体加粗控制
 static NSString * const kMessageTimeBoldFontKey = @"com.wechat.enhance.messageTime.boldFont";
-// 日期时间换行控制
-static NSString * const kMessageTimeSingleLineKey = @"com.wechat.enhance.messageTime.singleLine";
 // 点击显示控制
 static NSString * const kMessageTimeTapToShowKey = @"com.wechat.enhance.messageTime.tapToShow";
 
@@ -59,6 +52,7 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
 @property(nonatomic, readonly) UIView *m_contentView; // 内容视图
 - (UIView *)getBgImageView; // 获取背景图片视图
 - (void)updateNodeStatus; // 更新节点状态
+- (void)cs_messageTimeLayout;
 @end
 
 @interface VoiceMessageCellView : CommonMessageCellView
@@ -80,7 +74,19 @@ static char kTimeViewKey;
 // 存储时间标签可见状态的关联对象key
 static char kTimeViewVisibleKey;
 // 存储当前显示时间的视图引用key
-static char kCurrentVisibleCellViewKey;
+static __weak id currentVisibleTimeCell;
+static BOOL timeBelowAvatar;
+static BOOL messageTimeEnabled;
+static NSUInteger timeSettingsVersion;
+static NSDictionary *timeSettingsSnapshot;
+static NSHashTable *timeCells;
+static char kTimeBindingKey;
+@interface CSMessageTimeBinding : NSObject
+@property(nonatomic) unsigned int timestamp;
+@property(nonatomic) NSUInteger version;
+@property(nonatomic) BOOL show;
+@end
+@implementation CSMessageTimeBinding @end
 
 // 辅助函数
 static void setMessageTime(id self, NSString *time) {
@@ -108,13 +114,8 @@ static BOOL getTimeViewVisible(id self) {
     return value ? [value boolValue] : NO;
 }
 
-static void setCurrentVisibleCellView(id view) {
-    objc_setAssociatedObject([UIApplication sharedApplication], &kCurrentVisibleCellViewKey, view, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-static id getCurrentVisibleCellView() {
-    return objc_getAssociatedObject([UIApplication sharedApplication], &kCurrentVisibleCellViewKey);
-}
+static void setCurrentVisibleCellView(id view) { currentVisibleTimeCell = view; }
+static id getCurrentVisibleCellView() { return currentVisibleTimeCell; }
 
 // 获取颜色设置
 static UIColor *getTextColorFromDefaults() {
@@ -154,129 +155,60 @@ static UIColor *getBackgroundColorFromDefaults() {
     return [UIColor clearColor];
 }
 
-// 格式化时间的工具方法
-static NSString* getTimeStringFromTimestamp(unsigned int timestamp) {
-    // 处理时间戳
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp];
-    
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    // 获取显示设置
-    BOOL showYear = [defaults boolForKey:kMessageTimeShowYearKey];
-    BOOL showMonth = [defaults boolForKey:kMessageTimeShowMonthKey];
-    BOOL showDay = [defaults boolForKey:kMessageTimeShowDayKey];
-    BOOL showHour = [defaults boolForKey:kMessageTimeShowHourKey];
-    BOOL showMinute = [defaults boolForKey:kMessageTimeShowMinuteKey];
-    BOOL showSecond = [defaults boolForKey:kMessageTimeShowSecondKey];
-    
-    // 如果没有任何显示选项开启，默认显示时分
-    if (!showYear && !showMonth && !showDay && !showHour && !showMinute && !showSecond) {
-        showHour = YES;
-        showMinute = YES;
+static void assignMessageTime(CommonMessageCellView *view) {
+    if (!NSThread.isMainThread) return;
+    id model = CSMessageNativeObject(view,@"viewModel");
+    if (!model) return;
+    if (!messageTimeEnabled) {
+        setMessageTime(model,nil);
+        objc_setAssociatedObject(model,&kTimeBindingKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        return;
     }
-    
-    NSMutableArray *components = [NSMutableArray array];
-    
-    // 构建日期部分 - 使用短横线分隔
-    NSMutableString *dateComponent = [NSMutableString string];
-    
-    // 添加年份
-    if (showYear) {
-        NSDateFormatter *yearFormatter = [[NSDateFormatter alloc] init];
-        [yearFormatter setDateFormat:@"yyyy"];
-        [dateComponent appendString:[yearFormatter stringFromDate:date]];
+    id parent = CSMessageNativeObject(model,@"parentModel");
+    unsigned int timestamp = 0;
+    if (!CSMessageTimeReadTimestamp(model,&timestamp)) { setMessageTime(model,nil); return; }
+    BOOL show = YES;
+    if (parent) {
+        NSArray *parts = CSMessageNativeObject(parent,@"subViewModels");
+        if ([parts isKindOfClass:NSArray.class] && parts.count)
+            show = (timeBelowAvatar ? parts.firstObject : parts.lastObject) == model;
     }
-    
-    // 添加月份
-    if (showMonth) {
-        // 如果已经有年份，添加分隔符
-        if (showYear && dateComponent.length > 0) {
-            [dateComponent appendString:@"-"];
-        }
-        
-        NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
-        [monthFormatter setDateFormat:@"MM"];
-        [dateComponent appendString:[monthFormatter stringFromDate:date]];
-        
-        // 如果还要显示日，添加分隔符
-        if (showDay) {
-            [dateComponent appendString:@"-"];
-        }
-    }
-    
-    // 添加日
-    if (showDay) {
-        // 如果没有月份但有年份，需要添加分隔符
-        if (!showMonth && showYear && dateComponent.length > 0) {
-            [dateComponent appendString:@"-"];
-        }
-        
-        NSDateFormatter *dayFormatter = [[NSDateFormatter alloc] init];
-        [dayFormatter setDateFormat:@"dd"];
-        [dateComponent appendString:[dayFormatter stringFromDate:date]];
-    }
-    
-    // 构建时间部分 - 使用冒号分隔
-    NSMutableString *timeComponent = [NSMutableString string];
-    
-    // 添加时
-    if (showHour) {
-        NSDateFormatter *hourFormatter = [[NSDateFormatter alloc] init];
-        [hourFormatter setDateFormat:@"HH"];
-        [timeComponent appendString:[hourFormatter stringFromDate:date]];
-    }
-    
-    // 添加分
-    if (showMinute) {
-        if (showHour && timeComponent.length > 0) {
-            [timeComponent appendString:@":"];
-        }
-        
-        NSDateFormatter *minuteFormatter = [[NSDateFormatter alloc] init];
-        [minuteFormatter setDateFormat:@"mm"];
-        [timeComponent appendString:[minuteFormatter stringFromDate:date]];
-    }
-    
-    // 添加秒
-    if (showSecond) {
-        if ((showHour || showMinute) && timeComponent.length > 0) {
-            [timeComponent appendString:@":"];
-        }
-        
-        NSDateFormatter *secondFormatter = [[NSDateFormatter alloc] init];
-        [secondFormatter setDateFormat:@"ss"];
-        [timeComponent appendString:[secondFormatter stringFromDate:date]];
-    }
-    
-    // 添加到组件列表，让日期在上，时间在下
-    if (dateComponent.length > 0) {
-        [components addObject:dateComponent];
-    }
-    
-    if (timeComponent.length > 0) {
-        [components addObject:timeComponent];
-    }
-    
-    // 如果没有任何组件，显示默认时间
-    if (components.count == 0) {
-        NSDateFormatter *defaultFormatter = [[NSDateFormatter alloc] init];
-        [defaultFormatter setDateFormat:@"HH:mm"];
-        [components addObject:[defaultFormatter stringFromDate:date]];
-    }
-    
-    // 根据用户设置决定使用空格还是换行符连接
-    BOOL singleLine = [[NSUserDefaults standardUserDefaults] boolForKey:kMessageTimeSingleLineKey];
-    NSString *separator = singleLine ? @" " : @"\n";
-    return [components componentsJoinedByString:separator];
+    CSMessageTimeBinding *binding = objc_getAssociatedObject(model,&kTimeBindingKey);
+    if (binding && binding.version == timeSettingsVersion && binding.timestamp == timestamp && binding.show == show && getMessageTime(model)) return;
+    setMessageTime(model,show ? CSMessageTimeText(timestamp,NSUserDefaults.standardUserDefaults) : @"-1");
+    binding = [CSMessageTimeBinding new]; binding.version=timeSettingsVersion; binding.timestamp=timestamp; binding.show=show;
+    objc_setAssociatedObject(model,&kTimeBindingKey,binding,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 // 检查是否启用了时间显示功能
 static BOOL isMessageTimeEnabled() {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kMessageTimeEnabledKey];
+    return messageTimeEnabled;
 }
 
 // Hook CommonMessageCellView类，这是消息气泡的基类
 %hook CommonMessageCellView
+- (void)setViewModel:(id)model {
+    if (CSMessageNativeObject(self,@"viewModel") != model) {
+        setTimeViewVisible(self,NO);
+        getTimeView(self).hidden = YES;
+        if (getCurrentVisibleCellView() == self) setCurrentVisibleCellView(nil);
+    }
+    %orig;
+    assignMessageTime(self);
+    if (getTimeView(self)) [self updateNodeStatus];
+}
+
+%new
+- (void)cs_messageTimeLayout {
+    UILabel *label = (UILabel *)getTimeView(self);
+    if (!label) return;
+    UIView *head = CSMessageNativeObject(self,@"getHeadImageView");
+    UIView *content = CSMessageNativeObject(self,@"getContentView") ?: CSMessageNativeObject(self,@"getBgImageView");
+    id model = CSMessageNativeObject(self,@"viewModel");
+    BOOL sender = [model respondsToSelector:@selector(isSender)] && [model isSender];
+    CSMessageTimePositionLabel(label,head,content,sender,timeBelowAvatar);
+}
+
 
 - (id)initWithViewModel:(id)arg1 {
     id view = %orig;
@@ -332,6 +264,9 @@ static BOOL isMessageTimeEnabled() {
         [self addGestureRecognizer:tapGesture];
         self.userInteractionEnabled = YES;
     }
+    if (view) [timeCells addObject:view];
+    assignMessageTime(view);
+    if (view) [view updateNodeStatus];
     return view;
 }
 
@@ -355,7 +290,8 @@ static BOOL isMessageTimeEnabled() {
 - (void)handleMessageTap:(UITapGestureRecognizer *)gesture {
     // 检查是否启用了"点击显示"功能
     BOOL tapToShow = [[NSUserDefaults standardUserDefaults] boolForKey:kMessageTimeTapToShowKey];
-    if (!tapToShow) {
+    id model = CSMessageNativeObject(self,@"viewModel");
+    if (!CSMessageTimeCanToggle(messageTimeEnabled,tapToShow,getMessageTime(model))) {
         return;
     }
     
@@ -364,7 +300,7 @@ static BOOL isMessageTimeEnabled() {
     
     // 获取气泡背景视图
     UIView *bgView = [self getBgImageView];
-    UIView *contentView = [self valueForKey:@"m_contentView"];
+    UIView *contentView = CSMessageNativeObject(self,@"getContentView");
     
     // 判断点击是否在气泡内
     BOOL tappedInBubble = NO;
@@ -404,6 +340,8 @@ static BOOL isMessageTimeEnabled() {
     
     // 更新显示状态
     timeLabel.hidden = !getTimeViewVisible(self);
+    if (!timeLabel.hidden) [self cs_messageTimeLayout];
+    [self setNeedsLayout];
     
     // 更新全局引用
     if (!timeLabel.hidden) {
@@ -415,6 +353,8 @@ static BOOL isMessageTimeEnabled() {
 
 - (void)updateNodeStatus {
     %orig;
+    if (!NSThread.isMainThread) return;
+    assignMessageTime(self);
     
     // 如果功能未启用，直接返回
     if (!isMessageTimeEnabled()) {
@@ -426,7 +366,7 @@ static BOOL isMessageTimeEnabled() {
     }
     
     // 获取视图模型
-    id viewModel = [self valueForKey:@"viewModel"];
+    id viewModel = CSMessageNativeObject(self,@"viewModel");
     if (![viewModel respondsToSelector:@selector(isSender)]) {
         return;
     }
@@ -498,74 +438,7 @@ static BOOL isMessageTimeEnabled() {
         CGFloat labelHeight = textSize.height + 8.0; // 上下各4点的内边距
         timeLabel.frame = CGRectMake(0, 0, labelWidth, labelHeight);
         
-        // 设置时间标签位置
-        CGFloat centerX = 0, centerY = 0;
-        BOOL isSender = [viewModel isSender];
-        
-        // 检查是否应该显示在头像下方
-        BOOL showBelowAvatar = [[NSUserDefaults standardUserDefaults] boolForKey:kMessageTimeShowBelowAvatarKey];
-        
-        // 获取内容视图，在两个分支中都可能用到
-        UIView *contentView = [self valueForKey:@"m_contentView"];
-        // 获取气泡背景视图，可能会用到
-        UIView *bgView = nil;
-        
-        if (showBelowAvatar) {
-            // 尝试找到头像视图
-            UIView *headImageView = nil;
-            
-            // 遍历子视图寻找MMHeadImageView
-            for (UIView *subview in self.subviews) {
-                if ([NSStringFromClass([subview class]) isEqualToString:@"MMHeadImageView"]) {
-                    headImageView = subview;
-                    break;
-                }
-            }
-            
-            if (headImageView) {
-                // 设置位置在头像下方居中
-                centerX = CGRectGetMidX(headImageView.frame);
-                // 计算中心点Y坐标，使标签顶部紧贴头像底部
-                CGFloat topY = CGRectGetMaxY(headImageView.frame);
-                centerY = topY + (timeLabel.bounds.size.height / 2) - 7.0; // 向上移动4像素
-            } else {
-                // 如果找不到头像，使用默认位置
-                if (contentView) {
-                    if (isSender) {
-                        centerX = CGRectGetMinX(contentView.frame) - 1 - timeLabel.bounds.size.width / 2;
-                    } else {
-                        centerX = CGRectGetMaxX(contentView.frame) + 1 + timeLabel.bounds.size.width / 2;
-                    }
-                    centerY = CGRectGetMaxY(contentView.frame) - timeLabel.bounds.size.height / 2; // 向上移动4像素
-                }
-            }
-        } else {
-            // 使用原来的位置逻辑
-            // 统一处理所有消息类型，包括语音消息
-            
-            if (contentView) {
-                if (isSender) {
-                    centerX = CGRectGetMinX(contentView.frame) - 1 - timeLabel.bounds.size.width / 2;
-                } else {
-                    centerX = CGRectGetMaxX(contentView.frame) + 1 + timeLabel.bounds.size.width / 2;
-                }
-                centerY = CGRectGetMaxY(contentView.frame) - timeLabel.bounds.size.height / 2;
-            } else {
-                // 如果无法获取内容视图，则使用气泡背景视图
-                bgView = [self getBgImageView];
-                if (bgView) {
-                    if (isSender) {
-                        centerX = CGRectGetMinX(bgView.frame) - 1 - timeLabel.bounds.size.width / 2;
-                    } else {
-                        centerX = CGRectGetMaxX(bgView.frame) + 1 + timeLabel.bounds.size.width / 2;
-                    }
-                    centerY = CGRectGetMaxY(bgView.frame) - timeLabel.bounds.size.height / 2;
-                }
-            }
-        }
-        
-        // 设置中心位置
-        timeLabel.center = CGPointMake(centerX, centerY);
+        [self cs_messageTimeLayout];
         
         // 添加到视图上
         if (![timeLabel isDescendantOfView:self]) {
@@ -598,100 +471,26 @@ static BOOL isMessageTimeEnabled() {
 
 %end
 
-// Hook BaseMsgContentViewController类，用于设置消息时间
-%hook BaseMsgContentViewController
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = %orig;
-    
-    // 如果功能未启用，直接返回原始结果
-    if (!isMessageTimeEnabled()) {
-        return cell;
+static void refreshTimeSettings(BOOL force) {
+    NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
+    NSMutableDictionary *snapshot = [NSMutableDictionary dictionary];
+    NSDictionary *all = defaults.dictionaryRepresentation;
+    for (NSString *key in all) if ([key hasPrefix:@"com.wechat.enhance.messageTime."]) snapshot[key] = all[key];
+    if (!force && [snapshot isEqual:timeSettingsSnapshot]) return;
+    timeSettingsSnapshot = [snapshot copy]; timeSettingsVersion++;
+    messageTimeEnabled = [defaults boolForKey:kMessageTimeEnabledKey];
+    timeBelowAvatar = [defaults boolForKey:kMessageTimeShowBelowAvatarKey];
+    for (CommonMessageCellView *cell in timeCells) if (cell.window) {
+        [cell updateNodeStatus]; [cell setNeedsLayout];
     }
-    
-    // 仅处理聊天消息单元格
-    if ([cell isKindOfClass:NSClassFromString(@"ChatTableViewCell")]) {
-        // 使用dispatch_async避免阻塞UI
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            ChatTableViewCell *chatCell = (ChatTableViewCell *)cell;
-            CommonMessageCellView *cellView = [chatCell cellView];
-            if (!cellView) return;
-            
-            id viewModel = [cellView valueForKey:@"viewModel"];
-            if (!viewModel) return;
-            
-            // 从视图模型直接获取消息对象
-            if ([viewModel respondsToSelector:@selector(messageWrap)]) {
-                CMessageWrap *messageWrap = [viewModel messageWrap];
-                if (messageWrap && [messageWrap respondsToSelector:@selector(m_uiCreateTime)]) {
-                    // 使用消息对象本身的创建时间，而不是视图模型的时间
-                    unsigned int createTime = messageWrap.m_uiCreateTime;
-                    
-                    // 如果是长文本消息的子视图模型，处理特殊情况
-                    if ([viewModel isKindOfClass:NSClassFromString(@"TextMessageSubViewModel")] && 
-                        getMessageTime(viewModel) == nil) {
-                        
-                        TextMessageSubViewModel *textSubModel = (TextMessageSubViewModel *)viewModel;
-                        id parentModel = [textSubModel valueForKey:@"parentModel"];
-                        
-                        // 获取是否显示在头像下方的设置
-                        BOOL showBelowAvatar = [[NSUserDefaults standardUserDefaults] boolForKey:kMessageTimeShowBelowAvatarKey];
-                        NSArray *subViewModels = [parentModel valueForKey:@"subViewModels"];
-                        
-                        if (subViewModels.count > 0) {
-                            // 根据设置决定在哪个子视图上显示时间
-                            if (showBelowAvatar) {
-                                // 如果设置为显示在头像下方，则在第一个子视图上显示
-                                if ([subViewModels indexOfObject:textSubModel] == 0) {
-                                    NSString *timeStr = getTimeStringFromTimestamp(createTime);
-                                    setMessageTime(viewModel, timeStr);
-                                } else {
-                                    setMessageTime(viewModel, @"-1");
-                                }
-                            } else {
-                                // 如果未设置显示在头像下方，则保持原来的行为，在最后一个子视图上显示
-                                if ([subViewModels indexOfObject:textSubModel] == subViewModels.count - 1) {
-                                    NSString *timeStr = getTimeStringFromTimestamp(createTime);
-                                    setMessageTime(viewModel, timeStr);
-                                } else {
-                                    setMessageTime(viewModel, @"-1");
-                                }
-                            }
-                        }
-                    } 
-                    // 处理其他类型的消息
-                    else if (getMessageTime(viewModel) == nil) {
-                        NSString *timeStr = getTimeStringFromTimestamp(createTime);
-                        setMessageTime(viewModel, timeStr);
-                    }
-                    
-                    // 在主线程更新视图
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if ([cellView respondsToSelector:@selector(updateNodeStatus)]) {
-                            [cellView updateNodeStatus];
-                        }
-                    });
-                }
-            }
-            // 如果没有messageWrap但有createTime属性
-            else if ([viewModel respondsToSelector:@selector(createTime)] && 
-                    getMessageTime(viewModel) == nil) {
-                
-                unsigned int createTime = [viewModel createTime];
-                NSString *timeStr = getTimeStringFromTimestamp(createTime);
-                setMessageTime(viewModel, timeStr);
-                
-                // 在主线程更新视图
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if ([cellView respondsToSelector:@selector(updateNodeStatus)]) {
-                        [cellView updateNodeStatus];
-                    }
-                });
-            }
-        });
-    }
-    
-    return cell;
 }
-
-%end 
+%ctor {
+    timeCells = [NSHashTable weakObjectsHashTable];
+    refreshTimeSettings(NO);
+    [NSNotificationCenter.defaultCenter addObserverForName:NSUserDefaultsDidChangeNotification object:nil
+        queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification *note) { refreshTimeSettings(NO); }];
+    for (NSString *name in @[NSSystemTimeZoneDidChangeNotification,NSCurrentLocaleDidChangeNotification])
+        [NSNotificationCenter.defaultCenter addObserverForName:name object:nil queue:NSOperationQueue.mainQueue
+            usingBlock:^(NSNotification *note) { refreshTimeSettings(YES); }];
+}

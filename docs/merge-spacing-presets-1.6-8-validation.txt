@@ -1,0 +1,52 @@
+WeChatImprove 1.6-8 spacing presets — TEST PACKAGE
+Target: WeChat 8.0.78 / Rootless
+Checkout: /Users/zhangshichao/Documents/Workspace/WeChatImprove
+Build: make -j4 package SCHEME=rootless PACKAGE_VERSION=1.6-8
+Build exit: 0 (initial + final incremental build after invalid-metrics guard)
+Build log: /tmp/wechat-merge-presets-1.6-8-build.log
+
+Package: com.wechat.improve
+Name: WeChatImprove
+Description: 微信插件，支持聊天按钮布局自定义等。
+Maintainer: 再也不会
+Author: 再也不会
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
+Architecture: iphoneos-arm64
+Version: 1.6-8
+Installed-Size: 3164
+
+Dylib path: var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib
+Architectures: arm64 arm64e
+Dylib SHA256: e787a5fcb56638e75c68aa50b540b2bd50fdc1628ffeba9ae3a717edb8bf8f92
+Package SHA256: 93739e87c8dd6b60cf010873ddf9db621744d75822f1e9a5605dc66b301b9c84
+Embedded version and spacing_mode preference verified; host test classes absent.
+Build warnings: 412
+Changed module warnings/errors: 0
+
+Tests: bash Tests/verify-message-merge.sh (exit 0)
+PASS: 53202 policy/math assertions
+PASS: 904 adapter/navigation/time lifecycle assertions (UIKit/display-boundary doubles)
+Tests: bash Tests/verify-bubble-style.sh (exit 0)
+PASS: 9611 bubble policy/pixel/ownership assertions
+PASS: 38 bubble adapter assertions
+
+Read-through numeric preference migration; no device settings were accessed.
+Native content measure hook removed; final table height projection applied once.
+Ordinary single-cell messages support cold first-pass compression from native content metrics.
+Quoted/auxiliary/split text layouts retain protective native-height fallbacks.
+12pt/44pt/24pt space budgets are conservative policy values, not runtime-verified WeChat constants.
+No real-device first-pass visual/scroll/FPS/energy verification or installation.
+Existing packages 1.6-1 through 1.6-7 verified unchanged.
+
+Source SHA256:
+e500b1b0e69c3aac86fdc7e8f0db0fb099252c8870abe861892b52b8fdfa7e9d  Controllers/CSMessageMergePolicy.h
+2798f0efeb9e2ba5ff3ebd3c22c4fb21bc53352f9d3f8e43ea46ca46e98e3a1b  Controllers/CSMessageMergePolicy.m
+cba4a8f65f36f63897f60db5364d4d7ab2cb0aa1b58a209e71748cd25ae5c1ec  Controllers/CSMessageMergeAdapter.h
+55e81cd770bf34f22b1d6ac35012c3d81abc656fcb3418945a7554667bd795ae  Controllers/CSMessageMergeAdapter.m
+620f4e91a64cc027a731b7405c5de1ebc64d0153608e1a022f135f7b9581f192  Controllers/CSBubbleStyleSettingsViewController.m
+07b76020fb91c9ebc4a0d4ad8a232554355536500249e4bd7a055167c0141bd6  Hooks/MessageMergeHooks.xm
+fd79517badb191578cf69c7ec187c42e223256f8fc11f6a469ae14ba9065cfa2  Tests/MessageMergePolicyTests.m
+f3c43a80543d7a0fbf905b5f4a0af9b65540d4a8ca26a9398feec3eaa662a134  Tests/MessageMergeAdapterTests.m
+f0d3a6417319f9f6590bf68184d1a4392b2b9b9d6e28f3b21dbd4a378c9a10f9  Headers/CSUserInfoHelper.h
+0caaa7edc824a52394d97f2bc37c5167494ededbed6ed1ccdaf4311de2dcaa0a  control

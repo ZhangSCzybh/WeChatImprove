@@ -1,0 +1,49 @@
+WeChatImprove 1.6-9 compact 25pt — TEST PACKAGE
+Target: WeChat 8.0.78 / Rootless
+Checkout: /Users/zhangshichao/Documents/Workspace/WeChatImprove
+Build: make -j4 package SCHEME=rootless PACKAGE_VERSION=1.6-9
+Build exit: 0
+Build log: /tmp/wechat-merge-compact-1.6-9-build.log
+
+Package: com.wechat.improve
+Name: WeChatImprove
+Description: 微信插件，支持聊天按钮布局自定义等。
+Maintainer: 再也不会
+Author: 再也不会
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
+Architecture: iphoneos-arm64
+Version: 1.6-9
+Installed-Size: 3164
+
+Dylib path: var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib
+Architectures: arm64 arm64e
+Dylib SHA256: e0f93967263604b9a327ebbc840ac15ba381307a4563f5dd663bc04fa0369b58
+Package SHA256: a813807bb9f3a53cbafdcbb53a4d55a79abf22530de1667ceebffd0c036e42c5
+Embedded version and compact diagnostic verified; host test classes absent.
+Build warnings: 212
+Changed module warnings/errors: 0
+
+Tests: bash Tests/verify-message-merge.sh (exit 0)
+PASS: 53201 policy/math assertions
+PASS: 1314 adapter/navigation/time assertions (UIKit/display-boundary doubles)
+Tests: bash Tests/verify-bubble-style.sh (exit 0)
+PASS: 9611 policy/pixel/ownership assertions
+PASS: 38 adapter assertions
+
+Normal/compact only; retired relaxed maps to normal. Target -25pt with content minimum.
+Single-row TextMessageSubViewModel supported without shared-cache resets.
+Whole cell-view origin translation tested for repeated layout, ownership restoration and reuse.
+Source exclusion defect reproduced in tests; not proven as the only device cause.
+No real-device visual/gesture/highlight/FPS/energy verification or installation.
+Old 1.6-1 through 1.6-8 packages verified unchanged.
+
+Source SHA256:
+0469eeb5e5284fcc351bec3fe72efe96cc17ab786324dee7c9d5ca508b2e4427  Controllers/CSMessageMergePolicy.h
+58386d3fc53619fd348ce320085e1f984d6770c5e559b6b3a525eee7ca33cff9  Controllers/CSMessageMergePolicy.m
+b5f9327fb8d356c501855c28ccb1514f9ae8ac2531798568a13c98549081aa17  Controllers/CSMessageMergeAdapter.m
+801b40b0284a9e84ca2f16e45338ff00b5010012f97d79ed63b92b25c4baafe2  Controllers/CSBubbleStyleSettingsViewController.m
+36a1d8dd2eb6c2f815b7e421c00bd3bb5d606859104d4fffbd1ae6d314481fef  Tests/MessageMergePolicyTests.m
+a1328ffc4999775c620255c0ecf8a366a2bccdac74a4e46f2b09030c51e6010c  Tests/MessageMergeAdapterTests.m
+5f77c22f2da208bc75c78e728ebe9ebb076a90f968371ad29791cb6cdff232f3  Headers/CSUserInfoHelper.h
+aea6124eb84905518042b56bd898cef15c637593f764ee3fcda15ff17557b1e2  control

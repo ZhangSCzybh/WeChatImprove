@@ -6,6 +6,11 @@
 #import <objc/message.h>
 #import <Foundation/Foundation.h>
 #import "../Headers/WCHeaders.h"
+#import "../Controllers/CSMessageNavigation.h"
+#import "../Controllers/CSMessageMergeAdapter.h"
+#import "../Controllers/CSMessageMergePolicy.h"
+#import "../Controllers/CSRevokeReference.h"
+#import "../Controllers/CSChatDiagnostics.h"
 
 // UserDefaults Key常量
 static NSString * const kRevokeEnabledKey = @"com.wechat.enhance.revoke.enabled";
@@ -40,17 +45,6 @@ static NSString *extractXmlTagValue(NSString *xml, NSString *tagName) {
     
     NSRange valueRange = NSMakeRange(searchStart, endRange.location - searchStart);
     return trimString([xml substringWithRange:valueRange]);
-}
-
-// 提取XML中的long long值
-static long long extractLongLongFromXmlTag(NSString *xml, NSString *tagName) {
-    NSString *value = extractXmlTagValue(xml, tagName);
-    if (value.length == 0) return 0;
-    
-    NSScanner *scanner = [NSScanner scannerWithString:value];
-    long long result = 0;
-    if (![scanner scanLongLong:&result]) return 0;
-    return result;
 }
 
 // 去除CDATA包装
@@ -238,22 +232,8 @@ static BOOL isSelfRevokeMessage(id msgWrap) {
     NSString *replaceRaw = extractXmlTagValue(xml, @"replacemsg");
     NSString *replaceText = stripCDATA(replaceRaw);
     
-    if (replaceText) {
-        // 检查是否包含"你撤回"字样
-        NSArray *selfTokens = @[
-            @"你撤回了一条消息",
-            @"你撤回了一则消息",
-            @"You recalled a message",
-            @"You recalled this message"
-        ];
-        for (NSString *token in selfTokens) {
-            if ([replaceText rangeOfString:token options:NSCaseInsensitiveSearch].location != NSNotFound) {
-                return YES;
-            }
-        }
-    }
-    
-    return NO;
+    return CSRevokeIsSelfReplacement(replaceText);
+
 }
 
 // 插入本地提示消息 - 照搬参考项目的实现
@@ -308,8 +288,7 @@ static BOOL insertRevokeTipMessage(id messageMgr, NSString *session, NSString *t
         if (revokedMsgId > 0 && [msgWrap respondsToSelector:@selector(setM_nsPattern:)]) {
             NSString *patternStr = [NSString stringWithFormat:@"revoke_jump_%lld", revokedMsgId];
             ((void (*)(id, SEL, id))objc_msgSend)(msgWrap, @selector(setM_nsPattern:), patternStr);            
-            // 验证是否设置成功
-            NSString *verifyPattern = [msgWrap valueForKey:@"m_nsPattern"];
+
         } else {
             NSLog(@"[防撤回] 跳过设置跳转标识: revokedMsgId=%lld", revokedMsgId);
         }
@@ -367,15 +346,10 @@ static BOOL handleRevokeMessage(id revokeWrap, NSString *chatNameHint) {
     
     if (!xml || xml.length == 0) return NO;
     
-    // 检查是否是撤回消息
-    BOOL looksLikeRevoke = ([xml rangeOfString:@"revokemsg" options:NSCaseInsensitiveSearch].location != NSNotFound ||
-                            [xml rangeOfString:@"replacemsg" options:NSCaseInsensitiveSearch].location != NSNotFound ||
-                            [xml rangeOfString:@"撤回"].location != NSNotFound ||
-                            [xml rangeOfString:@"recalled" options:NSCaseInsensitiveSearch].location != NSNotFound);
-    if (!looksLikeRevoke) return NO;
-    
+    CSRevokeEvent *event=[CSRevokeEvent eventFromXML:xml];
+    if (!event) return NO;
     // 获取会话名称 - 按优先级尝试多种方式
-    NSString *session = extractXmlTagValue(xml, @"session");
+    NSString *session = event.session;
     NSMutableArray *sessionCandidates = [NSMutableArray array];
     
     void (^appendSession)(NSString *) = ^(NSString *value) {
@@ -401,16 +375,8 @@ static BOOL handleRevokeMessage(id revokeWrap, NSString *chatNameHint) {
     session = sessionCandidates.firstObject;
     if (session.length == 0) return NO;
     
-    // 解析撤回消息
-    NSString *replaceRaw = extractXmlTagValue(xml, @"replacemsg");
-    NSString *replaceText = stripCDATA(replaceRaw);
-    
-    // 获取被撤回消息的服务器ID
-    long long revokedMsgId = extractLongLongFromXmlTag(xml, @"newmsgid");
-    if (revokedMsgId <= 0) {
-        revokedMsgId = extractLongLongFromXmlTag(xml, @"msgid");
-    }
-    
+    NSString *replaceText=event.replacement;
+    long long revokedMsgId=event.serverID;
     // 尝试获取被撤回的原消息
     id revokedMsgWrap = nil;
     id messageMgr = getMessageMgr();
@@ -420,8 +386,12 @@ static BOOL handleRevokeMessage(id revokeWrap, NSString *chatNameHint) {
             for (NSString *candidateSession in sessionCandidates) {
                 @try {
                     id msg = ((id (*)(id, SEL, id, long long))objc_msgSend)(messageMgr, getMsgSel, candidateSession, revokedMsgId);
-                    if (msg) {
+                    NSNumber *actualID=[msg valueForKey:@"m_n64MesSvrID"];
+                    if (msg && actualID.longLongValue==revokedMsgId &&
+                        CSRevokeSessionMatches(CSMessageCurrentAccount(),candidateSession,nil,
+                            CSMessageNativeObject(msg,@"m_nsFromUsr"),CSMessageNativeObject(msg,@"m_nsToUsr"))) {
                         revokedMsgWrap = msg;
+                        session = candidateSession;
                         break;
                     }
                 } @catch (NSException *e) {}
@@ -429,6 +399,21 @@ static BOOL handleRevokeMessage(id revokeWrap, NSString *chatNameHint) {
         }
     }
     
+    // Do not suppress unknown events. Once the existing original is validated, protection
+    // does not depend on whether a decorative local tip can be inserted.
+    if (!revokedMsgWrap) return NO;
+    // Original sender is authoritative even when WeChat localizes the self-revoke text.
+    if ([CSMessageNativeObject(revokedMsgWrap,@"m_nsFromUsr") isEqual:CSMessageCurrentAccount()]) return NO;
+    NSString *eventKey=[NSString stringWithFormat:@"%@/%@/%lld",CSMessageCurrentAccount(),session,revokedMsgId];
+    static NSMutableOrderedSet *handled;
+    @synchronized ([CSRevokeEvent class]) {
+        if (!handled) handled=[NSMutableOrderedSet orderedSet];
+        if ([handled containsObject:eventKey]) return YES;
+        if (handled.count>=512) [handled removeObjectAtIndex:0];
+        [handled addObject:eventKey];
+    }
+    CSChatRecordEvent(@"revoke",@"original-preserved");
+    @try {
     // 获取被撤回内容的摘要
     NSString *revokedContent = getMessageDigest(revokedMsgWrap);
     if (revokedContent.length == 0) {
@@ -469,11 +454,17 @@ static BOOL handleRevokeMessage(id revokeWrap, NSString *chatNameHint) {
     NSString *timeText = formatTimestamp(createTime);
     
     // 构建提示文本 - 将被撤回内容设置为可点击的链接
-    NSString *tipText = [NSString stringWithFormat:@"%@\n\"%@\"撤回了一条消息\n<a href=\"revoke_jump_%lld\">%@</a>",
+    unsigned int localID=0;
+    SEL localSelector=NSSelectorFromString(@"m_uiMesLocalID");
+    Method localMethod=class_getInstanceMethod(object_getClass(revokedMsgWrap),localSelector);
+    if (localMethod && method_getNumberOfArguments(localMethod)==2 && method_getTypeEncoding(localMethod)[0]=='I')
+        localID=((unsigned int (*)(id,SEL))objc_msgSend)(revokedMsgWrap,localSelector);
+    NSString *link=[[CSRevokeReference referenceWithServerID:revokedMsgId localID:localID] link];
+    NSString *tipText = [NSString stringWithFormat:@"%@\n\"%@\"撤回了一条消息\n<a href=\"%@\">%@</a>",
                          timeText ?: @"",
-                         actorName,
-                         revokedMsgId,
-                         revokedContent];
+                         CSMessageEscapeMarkup(actorName),
+                         link,
+                         CSMessageEscapeMarkup(revokedContent)];
         
     // 插入提示消息
     if (!messageMgr) {
@@ -482,7 +473,11 @@ static BOOL handleRevokeMessage(id revokeWrap, NSString *chatNameHint) {
     
     BOOL inserted = insertRevokeTipMessage(messageMgr, session, tipText, createTime, revokedMsgId);
     
-    return inserted;
+    CSChatRecordEvent(@"revoke",inserted ? @"tip-inserted" : @"tip-insert-failed-original-preserved");
+    } @catch (__unused NSException *exception) {
+        CSChatRecordEvent(@"revoke",@"tip-exception-original-preserved");
+    }
+    return YES;
 }
 
 // 从对象中获取消息包装对象
@@ -522,58 +517,6 @@ static NSString *revokeChatNameFromObject(id obj) {
     return nil;
 }
 
-// 计算消息居中显示所需的 marginTop 值
-static double calculateCenterMarginTop(id viewController, id message) {
-    if (!viewController || !message) return 100.0;
-    
-    double marginTop = 100.0;
-    
-    @try {
-        // 获取屏幕高度
-        CGRect screenBounds = [UIScreen mainScreen].bounds;
-        double screenHeight = screenBounds.size.height;
-        
-        // 获取导航栏高度（通常为44或更大）
-        double navBarHeight = 44.0;
-        if (@available(iOS 11.0, *)) {
-            UIWindow *window = [UIApplication sharedApplication].keyWindow;
-            if (window) {
-                UIEdgeInsets safeArea = window.safeAreaInsets;
-                navBarHeight = 44.0 + safeArea.top;
-            }
-        }
-        
-        // 获取输入框高度（通常为50-100）
-        double inputHeight = 50.0;
-        
-        // 计算可用高度
-        double availableHeight = screenHeight - navBarHeight - inputHeight;
-        
-        // 目标：让消息显示在可用区域的中间
-        // marginTop 应该是可用高度的一半
-        marginTop = availableHeight / 2.0;
-        
-        // 使用 calculateOffsetWithMsg 方法（如果可用）
-        SEL calcOffsetSel = @selector(calculateOffsetWithMsg:marginTop:);
-        if ([viewController respondsToSelector:calcOffsetSel]) {
-            double calculatedOffset = ((double (*)(id, SEL, id, double))objc_msgSend)(viewController, calcOffsetSel, message, marginTop);
-            if (calculatedOffset > 0) {
-                marginTop = calculatedOffset;
-            }
-        }
-        
-        // 确保 marginTop 在合理范围内
-        if (marginTop < 60.0) marginTop = 60.0;
-        if (marginTop > screenHeight - 100.0) marginTop = screenHeight / 2.0;
-        
-    } @catch (NSException *e) {
-        NSLog(@"[防撤回] 计算居中偏移量异常: %@", e);
-        marginTop = 100.0;
-    }
-    
-    return marginTop;
-}
-
 // Hook CMessageMgr处理撤回消息
 %hook CMessageMgr
 
@@ -600,139 +543,44 @@ static double calculateCenterMarginTop(id viewController, id message) {
 
 %end
 
-// Hook BaseMsgContentViewController 处理消息点击事件
-%hook BaseMsgContentViewController
-
-- (void)onClickMsg:(id)msgWrap {
-    if (!isRevokeEnabled()) {
-        %orig;
-        return;
-    }
-    
-    // 检查是否是防撤回提示消息
-    @try {
-        if ([msgWrap respondsToSelector:@selector(m_nsPattern)]) {
-            NSString *pattern = [msgWrap valueForKey:@"m_nsPattern"];
-            if ([pattern hasPrefix:@"revoke_jump_"]) {
-                // 提取被撤回消息的服务器ID
-                NSString *msgIdStr = [pattern substringFromIndex:@"revoke_jump_".length];
-                long long revokedMsgId = [msgIdStr longLongValue];
-                
-                if (revokedMsgId > 0) {                    
-                    // 获取会话名称
-                    NSString *session = nil;
-                    if ([msgWrap respondsToSelector:@selector(m_nsToUsr)]) {
-                        session = [msgWrap valueForKey:@"m_nsToUsr"];
-                    }
-                    
-                    if (session.length > 0) {
-                        // 从消息管理器获取原消息
-                        id messageMgr = getMessageMgr();
-                        if (messageMgr) {
-                            SEL getMsgSel = @selector(GetMsg:n64SvrID:);
-                            if ([messageMgr respondsToSelector:getMsgSel]) {
-                                id originalMsg = ((id (*)(id, SEL, id, long long))objc_msgSend)(messageMgr, getMsgSel, session, revokedMsgId);
-                                
-                                if (originalMsg) {
-                                    
-                                    // 计算居中显示的 marginTop 值
-                                    double centerMarginTop = calculateCenterMarginTop(self, originalMsg);
-                                    
-                                    // 调用scrollToMessage方法跳转到原消息，显示在屏幕中间
-                                    [self scrollToMessage:originalMsg highlight:YES marginTop:centerMarginTop animated:YES];
-                                    return;
-                                } else {
-                                    NSLog(@"[防撤回] 未找到原消息: session=%@ msgId=%lld", session, revokedMsgId);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    } @catch (NSException *e) {
-        NSLog(@"[防撤回] 处理消息点击异常: %@", e);
-    }
-    
+// All click routes share durable reference resolution and the current page binding.
+%hook BaseMsgContentLogicController
+- (void)onClickMsg:(id)wrap {
+    if (isRevokeEnabled() && CSMessageHandleRevokeLink(self,getMessageMgr(),nil,wrap)) return;
     %orig;
 }
-
 %end
 
-// Hook SystemMessageCellView 处理系统消息点击
 %hook SystemMessageCellView
-
-- (void)onLinkClicked:(id)arg1 withRect:(struct CGRect)arg2 {
-    
-    if (!isRevokeEnabled()) {
-        %orig;
-        return;
-    }
-    
-    // 直接从 arg1 参数中提取消息ID（arg1 就是链接的 href 属性）
-    NSString *linkHref = nil;
-    if ([arg1 isKindOfClass:[NSString class]]) {
-        linkHref = (NSString *)arg1;
-    }
-        
-    // 检查是否是防撤回跳转链接
-    if (linkHref && [linkHref hasPrefix:@"revoke_jump_"]) {
-        // 提取被撤回消息的服务器ID
-        NSString *msgIdStr = [linkHref substringFromIndex:@"revoke_jump_".length];
-        long long revokedMsgId = [msgIdStr longLongValue];
-                
-        if (revokedMsgId > 0) {
-            // 获取BaseMsgContentViewController和当前会话
-            UIResponder *responder = (UIResponder *)self;
-            BaseMsgContentViewController *chatVC = nil;
-            
-            while (responder) {
-                if ([responder isKindOfClass:%c(BaseMsgContentViewController)]) {
-                    chatVC = (BaseMsgContentViewController *)responder;
-                    break;
-                }
-                responder = [responder nextResponder];
-            }
-            
-            if (!chatVC) {
-                %orig;
-                return;
-            }
-            
-            // 从 BaseMsgContentViewController 获取当前会话名称
-            NSString *session = nil;
-            if ([chatVC respondsToSelector:@selector(getCurrentChatName)]) {
-                session = [chatVC getCurrentChatName];
-            }
-                        
-            if (session.length > 0) {
-                // 从消息管理器获取原消息
-                id messageMgr = getMessageMgr();
-                if (messageMgr) {
-                    SEL getMsgSel = @selector(GetMsg:n64SvrID:);
-                    if ([messageMgr respondsToSelector:getMsgSel]) {
-                        id originalMsg = ((id (*)(id, SEL, id, long long))objc_msgSend)(messageMgr, getMsgSel, session, revokedMsgId);
-                        
-                        
-                        if (originalMsg) {
-                            // 计算居中显示的 marginTop 值
-                            double centerMarginTop = calculateCenterMarginTop(chatVC, originalMsg);
-                            
-                            // 调用scrollToMessage方法跳转到原消息，显示在屏幕中间
-                            [chatVC scrollToMessage:originalMsg highlight:YES marginTop:centerMarginTop animated:YES];
-                            return;
-                        } else {
-                            NSLog(@"[防撤回] 未找到原消息: session=%@ msgId=%lld", session, revokedMsgId);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
+- (void)onLinkClicked:(id)link withRect:(CGRect)rect {
+    if (isRevokeEnabled() && CSMessageHandleRevokeLink(self,getMessageMgr(),link,nil)) return;
     %orig;
 }
+%end
 
+%group CSRevokeLinkWithView
+%hook SystemMessageCellView
+- (void)onLinkClicked:(id)link withRect:(CGRect)rect withView:(id)view {
+    if (isRevokeEnabled() && CSMessageHandleRevokeLink(self,getMessageMgr(),link,nil)) return;
+    %orig;
+}
+%end
+%end
+%group CSRevokeLinkWithBackup
+%hook SystemMessageCellView
+- (void)onLinkClicked:(id)link backupUrl:(id)backup withRect:(CGRect)rect {
+    if (isRevokeEnabled() && CSMessageHandleRevokeLink(self,getMessageMgr(),link,nil)) return;
+    %orig;
+}
+%end
+%end
+%group CSRevokeLinkWithExtra
+%hook SystemMessageCellView
+- (void)onLinkClicked:(id)link backupUrl:(id)backup withRect:(CGRect)rect extraInfo:(id)info {
+    if (isRevokeEnabled() && CSMessageHandleRevokeLink(self,getMessageMgr(),link,nil)) return;
+    %orig;
+}
+%end
 %end
 
 // Hook MessageRevokeMgr（备用撤回管理器）
@@ -766,7 +614,7 @@ static double calculateCenterMarginTop(id viewController, id message) {
     
     // 跳过替换被撤回消息的操作
     id revokeWrap = revokeMsgWrapFromObject(arg1);
-    if (revokeWrap && !isSelfRevokeMessage(revokeWrap)) {
+    if (handleRevokeMessage(revokeWrap,revokeChatNameFromObject(arg1))) {
         return;
     }
     
@@ -780,7 +628,7 @@ static double calculateCenterMarginTop(id viewController, id message) {
     }
     
     id revokeWrap = revokeMsgWrapFromObject(arg1);
-    if (revokeWrap && !isSelfRevokeMessage(revokeWrap)) {
+    if (handleRevokeMessage(revokeWrap,revokeChatNameFromObject(arg1))) {
         return;
     }
     
@@ -796,6 +644,11 @@ static void revokeSettingsChangedCallback(CFNotificationCenterRef center, void *
 
 // 监听设置变化
 %ctor {
+    %init;
+    Class cell=NSClassFromString(@"SystemMessageCellView");
+    if (class_getInstanceMethod(cell,NSSelectorFromString(@"onLinkClicked:withRect:withView:"))) { %init(CSRevokeLinkWithView); }
+    if (class_getInstanceMethod(cell,NSSelectorFromString(@"onLinkClicked:backupUrl:withRect:"))) { %init(CSRevokeLinkWithBackup); }
+    if (class_getInstanceMethod(cell,NSSelectorFromString(@"onLinkClicked:backupUrl:withRect:extraInfo:"))) { %init(CSRevokeLinkWithExtra); }
     // 监听设置变化通知
     CFNotificationCenterAddObserver(
         CFNotificationCenterGetDarwinNotifyCenter(),

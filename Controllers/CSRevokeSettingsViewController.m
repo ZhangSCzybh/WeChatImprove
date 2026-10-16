@@ -120,6 +120,8 @@ static NSString * const kWCHideRevokeMessageEnabledKey = @"com.wechat.tweak.hide
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    CSSettingItem *item=self.sections[indexPath.section].items[indexPath.row];
+    if (item.actionBlock) item.actionBlock();
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {

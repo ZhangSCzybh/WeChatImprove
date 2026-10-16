@@ -1,0 +1,37 @@
+WeChatImprove 1.6-11 zero-width content metrics — TEST PACKAGE
+Target: WeChat 8.0.78.34 / Rootless (user report: iOS 27.0.1)
+Checkout: /Users/zhangshichao/Documents/Workspace/WeChatImprove
+Build: make -j4 package SCHEME=rootless PACKAGE_VERSION=1.6-11
+Build exit: 0
+Log: /tmp/wechat-zero-width-1.6-11-build.log
+
+Package: com.wechat.improve
+Name: WeChatImprove
+Description: 微信插件，支持聊天按钮布局自定义等。
+Maintainer: 再也不会
+Author: 再也不会
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
+Architecture: iphoneos-arm64
+Version: 1.6-11
+Installed-Size: 3180
+
+Dylib: var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib
+Architectures: arm64 arm64e
+Dylib SHA256: f9a7bf6b4814704e27ab1f93062a2b61947217011cc507eec8d03df7c1132edb
+Package SHA256: 15b1723b41eeb8ef765d4ad09e66d0cfa22e4c5a5762636b5975795d475a0795
+Embedded version verified; host test classes absent.
+Warnings: 212; changed adapter warnings/errors: 0
+
+Regression first failed on old adapter at the 0x38 content / 42pt target assertion.
+Final: bash Tests/verify-message-merge.sh (exit 0)
+PASS: 53201 policy/math assertions
+PASS: 1535 adapter/navigation/time/diagnostic assertions
+Actual device logs prove rejection by width>0; new-package device rendering not verified.
+No installation/database/settings changes. All 12 existing packages verified unchanged.
+
+Source SHA256:
+9b41a45c89f482f83613bb407e4d6a0c7d35dc3bc517fea2e5802a22280ed54b  Controllers/CSMessageMergeAdapter.m
+0d1b3990b7f353bf18b675e6bbf3836b7a145636f6fdcc4143deb69433240566  Tests/MessageMergeAdapterTests.m
+e096e1cc58712ce1aece32af2bad756de2995e6f2285bae959607d9be1ea9b6c  Headers/CSUserInfoHelper.h
+259e038e4f73514d9bf081533cc2c95854c04b2eadd198eaa1b39d7175f017c9  control

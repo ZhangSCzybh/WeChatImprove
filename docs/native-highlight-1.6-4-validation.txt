@@ -1,0 +1,39 @@
+WeChatImprove 1.6-4 native locate highlight — TEST PACKAGE
+Target: WeChat 8.0.78 / Rootless
+Build: make -j4 package SCHEME=rootless PACKAGE_VERSION=1.6-4
+Build exit: 0
+Build log: /tmp/wechat-native-highlight-1.6-4-build.log
+
+Package: com.wechat.improve
+Name: WeChatImprove
+Description: 微信插件，支持聊天按钮布局自定义等。
+Maintainer: 再也不会
+Author: 再也不会
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
+Architecture: iphoneos-arm64
+Version: 1.6-4
+Installed-Size: 3164
+
+Dylib path: var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib
+Architectures: arm64 arm64e
+Dylib SHA256: 523c2a3a5fced2d444840b48474466f398cb7c750c54485b84a36cca89c7c1d7
+Embedded version/native highlight selector verified; custom marker class absent.
+
+Tests: bash Tests/verify-message-merge.sh (exit 0)
+PASS: 7008 message merge/navigation checks
+PASS: 267 native adapter/navigation lifecycle checks (UIKit double)
+
+No device installation/database/settings access. Real native highlight visuals not verified.
+Old 1.6-1/1.6-2/1.6-3 packages unchanged.
+Build warnings: 212
+
+Package SHA256: 2f9088e76863c38f116c58dd86b7a6303ef83da1c61d9f11a24368af1244c45c
+
+Source SHA256:
+e1c822c64c7c286d1722b8527d451c745366f87270fc4c38eba6e65bcc6be827  Controllers/CSMessageNavigation.m
+3bedb994f40563368fa6f056acbbdf4c34cf9ca5432d132ec2c4f9152548a121  Hooks/MessageMergeHooks.xm
+4db2726d2609943d128a957acb8f690fbb319a45e73a61a6cc031f76c862dc73  Tests/MessageMergeAdapterTests.m
+40a4efbc83209e3d928e14a609c43bcc57c942b9b6eacf04eae850d806287b2b  Tests/verify-message-merge.sh
+788bcc9085bfb62b31e7e931d9d95642f647e2d5dea181b0edc9e21d7d62a600  Headers/CSUserInfoHelper.h
+abe2a24325d3d6ef76e3447f2468ff3cded9e76c01dac013bb8bca020b1aced8  control

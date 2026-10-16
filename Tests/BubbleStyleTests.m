@@ -1,0 +1,141 @@
+#import <Foundation/Foundation.h>
+#import "CSBubbleStylePolicy.h"
+#include <math.h>
+static NSUInteger checks;
+#define CHECK(value) do { checks++; if (!(value)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#value); return 1; } } while (0)
+static NSData *Pixels(CGImageRef image) {
+    size_t width=CGImageGetWidth(image),height=CGImageGetHeight(image);
+    NSMutableData *data=[NSMutableData dataWithLength:width*height*4];
+    CGColorSpaceRef space=CGColorSpaceCreateDeviceRGB();
+    CGContextRef context=CGBitmapContextCreate(data.mutableBytes,width,height,8,width*4,space,kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big);
+    CGColorSpaceRelease(space); CGContextDrawImage(context,CGRectMake(0,0,width,height),image); CGContextRelease(context);
+    return data;
+}
+// A native-style first segment is five points wider to include its arrow. The next
+// segment has no arrow. Their body edges must coincide after nine-slice resizing.
+static CGImageRef NativeSegment(BOOL outgoing, BOOL first, CGFloat scale) {
+    size_t w=(first?35:30)*scale,h=40*scale;
+    CGColorSpaceRef space=CGColorSpaceCreateDeviceRGB();
+    CGContextRef ctx=CGBitmapContextCreate(NULL,w,h,8,w*4,space,kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big);
+    CGColorSpaceRelease(space);CGContextScaleCTM(ctx,scale,scale);
+    CGFloat left=first&&!outgoing?8:3;
+    CGContextSetRGBFillColor(ctx,.4,.5,.6,1);CGContextFillRect(ctx,CGRectMake(left,0,24,40));
+    if (first) CGContextFillRect(ctx,CGRectMake(outgoing?27:3,16,5,8));
+    CGImageRef result=CGBitmapContextCreateImage(ctx);CGContextRelease(ctx);return result;
+}
+static size_t StretchIndex(size_t target, size_t targetSize, size_t sourceSize, size_t leading, size_t trailing) {
+    if (target<leading) return target;
+    if (target>=targetSize-trailing) return sourceSize-(targetSize-target);
+    return leading+(target-leading)*(sourceSize-leading-trailing)/(targetSize-leading-trailing);
+}
+static unsigned char StretchedAlpha(NSData *pixels, CGImageRef image, CSBubbleTemplateMetrics metrics,
+                                   CGFloat scale, CGSize target, size_t x,size_t y) {
+    size_t w=CGImageGetWidth(image),h=CGImageGetHeight(image);
+    size_t sx=StretchIndex(x,target.width*scale,w,metrics.caps.left*scale,metrics.caps.right*scale);
+    size_t sy=StretchIndex(y,target.height*scale,h,metrics.caps.top*scale,metrics.caps.bottom*scale);
+    return ((const unsigned char *)pixels.bytes)[(sy*w+sx)*4+3];
+}
+int main(void) { @autoreleasepool {
+    NSString *suite=[@"CSBubbleTests." stringByAppendingString:NSUUID.UUID.UUIDString];
+    NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite];
+    NSDictionary *before=[defaults persistentDomainForName:suite];
+    CSBubbleStyleConfiguration *config=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:1];
+    CHECK(config.radius==16 && !config.enabled && config.generation==1);
+    CHECK(([defaults persistentDomainForName:suite]?:@{}).count==(before?:@{}).count);
+    for (NSString *component in @[@"red",@"green",@"blue",@"alpha"]) [defaults setDouble:0 forKey:[@"com.wechat.enhance.bubble_style.sender_light_color." stringByAppendingString:component]];
+    config=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:2];
+    CSBubbleRGBA transparent=[config colorForOutgoing:YES dark:NO payment:NO];
+    CHECK(transparent.red==0 && transparent.green==0 && transparent.blue==0 && transparent.alpha==0);
+    [defaults removeObjectForKey:@"com.wechat.enhance.bubble_style.sender_light_color.alpha"];
+    [defaults setDouble:4 forKey:@"com.wechat.enhance.bubble_style.sender_light_color.red"];
+    [defaults setDouble:-4 forKey:@"com.wechat.enhance.bubble_style.sender_light_color.green"];
+    [defaults setObject:@"bad" forKey:@"com.wechat.enhance.bubble_style.sender_light_color.blue"];
+    [defaults setDouble:400 forKey:@"com.wechat.enhance.bubble_style.corner_radius"];
+    config=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:3];
+    CSBubbleRGBA clamped=[config colorForOutgoing:YES dark:NO payment:NO];
+    CHECK(clamped.red==1 && clamped.green==0 && clamped.blue==.49 && clamped.alpha==1 && config.radius==30);
+    [defaults setObject:@"bad" forKey:@"com.wechat.enhance.bubble_style.corner_radius"];
+    config=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:4]; CHECK(config.radius==16);
+    [defaults removePersistentDomainForName:suite];
+    config=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:5];
+    // Real pixels, every theme/direction/payment/segment/highlight combination, three scales.
+    for (NSUInteger position=0;position<4;position++) for (NSUInteger scale=1;scale<=3;scale++)
+    for (NSUInteger bits=0;bits<16;bits++) {
+        BOOL outgoing=bits&1,dark=bits&2,payment=bits&4,highlighted=bits&8;
+        CSBubbleRGBA color=[config colorForOutgoing:outgoing dark:dark payment:payment];
+        CSBubbleInsets padding={2,3,4,5};
+        CSBubbleTemplateMetrics metrics;
+        CHECK(CSBubbleTemplateDescribe(config.radius,position,scale,padding,&metrics));
+        CHECK(fabs(metrics.size.width-metrics.caps.left-metrics.caps.right-1.0/scale)<.0001);
+        CHECK(fabs(metrics.size.height-metrics.caps.top-metrics.caps.bottom-1.0/scale)<.0001);
+        CGImageRef image=CSBubbleCreateTemplate(color,config.radius,position,scale,padding,highlighted); CHECK(image);
+        CHECK(CGImageGetWidth(image)<=512 && CGImageGetHeight(image)<=512);
+        NSData *data=Pixels(image); const unsigned char *bytes=data.bytes;
+        size_t w=CGImageGetWidth(image),h=CGImageGetHeight(image),center=(((size_t)(padding.top*scale)+(h-(size_t)((padding.top+padding.bottom)*scale))/2)*w+w/2)*4;
+        CHECK(bytes[3]==0 && bytes[center+3]==255);
+        CHECK(abs((int)bytes[center]-(int)round(color.red*(highlighted?.84:1)*255))<=1);
+        CHECK(abs((int)bytes[center+1]-(int)round(color.green*(highlighted?.84:1)*255))<=1);
+        CHECK(abs((int)bytes[center+2]-(int)round(color.blue*(highlighted?.84:1)*255))<=1);
+        CSBubbleInsets found; CHECK(CSBubbleNativePadding(image,scale,&found));
+        CHECK(fabs(found.left-padding.left)<.0001 && fabs(found.right-padding.right)<.0001);
+        CHECK(fabs(found.top-padding.top)<.0001 && fabs(found.bottom-padding.bottom)<.0001);
+        // Native segment semantics: top corners round only for 0/1, bottom only for 0/3.
+        size_t x=(size_t)(padding.left*scale),y=(size_t)(padding.top*scale);
+        CHECK((bytes[(y*w+x)*4+3]==0)==(position==0 || position==1));
+        y=h-(size_t)(padding.bottom*scale)-1;
+        CHECK((bytes[(y*w+x)*4+3]==0)==(position==0 || position==3));
+        CGImageRelease(image);
+    }
+    CSBubbleTemplateMetrics metrics;
+    CHECK(!CSBubbleTemplateDescribe(NAN,0,2,(CSBubbleInsets){0},&metrics));
+    CHECK(!CSBubbleTemplateDescribe(16,8,2,(CSBubbleInsets){0},&metrics));
+    CHECK(!CSBubbleTemplateDescribe(16,0,8,(CSBubbleInsets){0},&metrics));
+    CHECK(!CSBubbleTemplateDescribe(16,0,2,(CSBubbleInsets){17,0,0,0},&metrics));
+    CHECK(CSBubbleTemplateDescribe(30,0,4,(CSBubbleInsets){16,16,16,16},&metrics));
+    CGImageRef image=CSBubbleCreateTemplate(transparent,16,0,2,(CSBubbleInsets){0},NO);CHECK(image);
+    NSData *data=Pixels(image); const unsigned char *bytes=data.bytes;
+    for (NSUInteger i=3;i<data.length;i+=4) CHECK(bytes[i]==0);
+    CGImageRelease(image);
+    // Pixel seams for both directions at 1x/2x/3x, including a short bottom row.
+    for (NSUInteger scale=1;scale<=3;scale++) for (NSUInteger outgoing=0;outgoing<2;outgoing++) {
+        CGImageRef firstNative=NativeSegment(outgoing,YES,scale),lastNative=NativeSegment(outgoing,NO,scale);
+        CSBubbleInsets firstPadding,lastPadding;
+        CHECK(CSBubbleNativeBodyPadding(firstNative,scale,&firstPadding));
+        CHECK(CSBubbleNativeBodyPadding(lastNative,scale,&lastPadding));
+        CHECK(firstPadding.left==(outgoing?3:8) && firstPadding.right==(outgoing?8:3));
+        CHECK(lastPadding.left==3 && lastPadding.right==3);
+        CGSize firstSize=CGSizeMake(175,80),lastSize=CGSizeMake(170,24);
+        CGFloat radius=CSBubbleFittedRadius(30,3,scale,lastPadding,lastSize);
+        CSBubbleTemplateMetrics firstMetrics,lastMetrics;
+        CHECK(CSBubbleTemplateDescribe(30,1,scale,firstPadding,&firstMetrics));
+        CHECK(CSBubbleTemplateDescribe(radius,3,scale,lastPadding,&lastMetrics));
+        CHECK(lastMetrics.caps.top+lastMetrics.caps.bottom<lastSize.height);
+        CGImageRef first=CSBubbleCreateTemplate((CSBubbleRGBA){.4,.5,.6,1},30,1,scale,firstPadding,NO);
+        CGImageRef last=CSBubbleCreateTemplate((CSBubbleRGBA){.4,.5,.6,1},radius,3,scale,lastPadding,NO);
+        NSData *firstPixels=Pixels(first),*lastPixels=Pixels(last);
+        size_t offset=outgoing?0:5*scale;
+        for (size_t x=0;x<175*scale;x++) {
+            unsigned char top=StretchedAlpha(firstPixels,first,firstMetrics,scale,firstSize,x,80*scale-1);
+            unsigned char bottom=x>=offset && x<offset+170*scale ?
+                StretchedAlpha(lastPixels,last,lastMetrics,scale,lastSize,x-offset,0):0;
+            CHECK(top==bottom); // No side step or transparent seam at the join.
+        }
+        CGImageRelease(first);CGImageRelease(last);CGImageRelease(firstNative);CGImageRelease(lastNative);
+    }
+    CGFloat fitted=CSBubbleFittedRadius(30,0,3,(CSBubbleInsets){0},CGSizeMake(80,38));
+    CHECK(CSBubbleTemplateDescribe(fitted,0,3,(CSBubbleInsets){0},&metrics));
+    CHECK(metrics.caps.top+metrics.caps.bottom<38);
+    // Own only generated assignments. Native replacement during reuse/disable must survive.
+    CSBubbleImageOwnership *ownership=[CSBubbleImageOwnership new];
+    NSObject *native=[NSObject new],*generated=[NSObject new],*replacement=[NSObject new],*highlight=[NSObject new];
+    [ownership captureImage:native highlighted:NO]; ownership.generatedImage=generated;
+    [ownership captureImage:generated highlighted:NO]; CHECK(ownership.nativeImage==native);
+    CHECK([ownership restoredImageForCurrent:generated highlighted:NO]==native);
+    CHECK([ownership restoredImageForCurrent:replacement highlighted:NO]==replacement);
+    [ownership captureImage:replacement highlighted:NO]; CHECK([ownership restoredImageForCurrent:generated highlighted:NO]==replacement);
+    [ownership captureImage:highlight highlighted:YES]; ownership.generatedHighlightedImage=[NSObject new];
+    CHECK([ownership restoredImageForCurrent:ownership.generatedHighlightedImage highlighted:YES]==highlight);
+    [ownership captureImage:nil highlighted:YES]; CHECK([ownership restoredImageForCurrent:ownership.generatedHighlightedImage highlighted:YES]==nil);
+    CHECK(ownership.nativeImage==replacement);
+    fprintf(stdout,"Bubble policy/renderer/ownership: %lu checks passed\n",(unsigned long)checks);
+} return 0; }

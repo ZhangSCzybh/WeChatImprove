@@ -1,3 +1,4 @@
+#import "CSBubbleStylePolicy.h"
 //
 //  CSBubbleStyleSettingsViewController.m
 //  气泡样式设置界面实现
@@ -5,6 +6,7 @@
 
 #import "CSBubbleStyleSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
+#import "CSMessageMergePolicy.h"
 
 static NSString * const kBubbleStyleEnabledKey = @"com.wechat.enhance.bubble_style.enabled";
 static NSString * const kBubbleCornerRadiusKey = @"com.wechat.enhance.bubble_style.corner_radius";
@@ -52,12 +54,8 @@ static NSString * const kBubbleRedEnvelopReceiverDarkColorAlphaKey = @"com.wecha
 
 static NSString * const kMergeMessagesEnabledKey = @"com.wechat.enhance.merge_messages.enabled";
 static NSString * const kMergeMessagesScopeKey = @"com.wechat.enhance.merge_messages.scope";
-static NSString * const kMergeMessagesSpacingKey = @"com.wechat.enhance.merge_messages.spacing";
 static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.merge_messages.avatar_position";
-static NSString * const kConsecutiveMessagesSpacingKey = @"com.wechat.enhance.consecutive_messages.spacing";
 
-static const CGFloat kDefaultCornerRadius = 16.0;
-static const CGFloat kDefaultConsecutiveSpacing = 4.0;
 
 @interface BubbleColorPreviewView : UIView
 @property (nonatomic, strong) UIColor *previewColor;
@@ -153,13 +151,7 @@ static const CGFloat kDefaultConsecutiveSpacing = 4.0;
 - (void)loadCurrentSettings {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
-    if (![defaults objectForKey:kBubbleCornerRadiusKey]) {
-        self.cornerRadius = kDefaultCornerRadius;
-        [defaults setFloat:self.cornerRadius forKey:kBubbleCornerRadiusKey];
-        [defaults synchronize];
-    } else {
-        self.cornerRadius = [defaults floatForKey:kBubbleCornerRadiusKey];
-    }
+    self.cornerRadius = [[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:0].radius;
     
     self.senderLightColor = [self loadColorWithRedKey:kBubbleSenderLightColorRedKey
                                             greenKey:kBubbleSenderLightColorGreenKey
@@ -254,20 +246,11 @@ static const CGFloat kDefaultConsecutiveSpacing = 4.0;
                   defaultAlpha:(CGFloat)defaultAlpha {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
-    CGFloat red = [defaults floatForKey:redKey];
-    CGFloat green = [defaults floatForKey:greenKey];
-    CGFloat blue = [defaults floatForKey:blueKey];
-    CGFloat alpha = [defaults floatForKey:alphaKey];
-    
-    if (red == 0 && green == 0 && blue == 0 && alpha == 0) {
-        [defaults setFloat:defaultRed forKey:redKey];
-        [defaults setFloat:defaultGreen forKey:greenKey];
-        [defaults setFloat:defaultBlue forKey:blueKey];
-        [defaults setFloat:defaultAlpha forKey:alphaKey];
-        [defaults synchronize];
-        return [UIColor colorWithRed:defaultRed green:defaultGreen blue:defaultBlue alpha:defaultAlpha];
-    }
-    
+    CGFloat red = CSBubbleReadComponent(defaults, redKey, defaultRed);
+    CGFloat green = CSBubbleReadComponent(defaults, greenKey, defaultGreen);
+    CGFloat blue = CSBubbleReadComponent(defaults, blueKey, defaultBlue);
+    CGFloat alpha = CSBubbleReadComponent(defaults, alphaKey, defaultAlpha);
+
     return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
 }
 
@@ -404,14 +387,10 @@ static const CGFloat kDefaultConsecutiveSpacing = 4.0;
         [weakSelf resetToDefaultColors];
     };
     
-    BOOL mergeEnabled = [defaults boolForKey:kMergeMessagesEnabledKey];
-    NSInteger mergeScope = [defaults integerForKey:kMergeMessagesScopeKey];
-    if (mergeScope == 0) {
-        mergeScope = 2;
-        [defaults setInteger:mergeScope forKey:kMergeMessagesScopeKey];
-        [defaults synchronize];
-    }
-    
+    CSMessageMergeConfiguration *mergeConfig = [[CSMessageMergeConfiguration alloc] initWithDefaults:defaults];
+    BOOL mergeEnabled = mergeConfig.enabled;
+    NSInteger mergeScope = mergeConfig.scope;
+
     NSString *scopeText = @"全部生效";
     switch (mergeScope) {
         case 1:
@@ -450,14 +429,7 @@ static const CGFloat kDefaultConsecutiveSpacing = 4.0;
         [weakSelf showMergeScopePicker];
     };
     
-    CGFloat consecutiveSpacing = [defaults floatForKey:kConsecutiveMessagesSpacingKey];
-    if (![defaults objectForKey:kConsecutiveMessagesSpacingKey]) {
-        consecutiveSpacing = kDefaultConsecutiveSpacing;
-        [defaults setFloat:consecutiveSpacing forKey:kConsecutiveMessagesSpacingKey];
-        [defaults synchronize];
-    }
-    
-    NSString *consecutiveSpacingText = [NSString stringWithFormat:@"%.1f", consecutiveSpacing];
+    NSString *consecutiveSpacingText = CSMessageSpacingModeTitle(mergeConfig.spacingMode);
     CSSettingItem *consecutiveSpacingItem = [CSSettingItem itemWithTitle:@"连续消息间距"
                                                                iconName:@"arrow.up.and.down"
                                                               iconColor:[UIColor systemOrangeColor]
@@ -466,13 +438,8 @@ static const CGFloat kDefaultConsecutiveSpacing = 4.0;
         [weakSelf showConsecutiveSpacingPicker];
     };
     
-    NSInteger avatarPosition = [defaults integerForKey:kMergeMessagesAvatarPositionKey];
-    if (avatarPosition == 0) {
-        avatarPosition = 1;
-        [defaults setInteger:avatarPosition forKey:kMergeMessagesAvatarPositionKey];
-        [defaults synchronize];
-    }
-    
+    NSInteger avatarPosition = mergeConfig.avatarPosition;
+
     NSString *avatarPositionText = @"最后一条消息";
     switch (avatarPosition) {
         case 1:
@@ -973,59 +940,24 @@ static const CGFloat kDefaultConsecutiveSpacing = 4.0;
 #pragma mark - Consecutive Spacing Picker
 
 - (void)showConsecutiveSpacingPicker {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    CGFloat currentSpacing = kDefaultConsecutiveSpacing;
-    
-    if ([defaults objectForKey:kConsecutiveMessagesSpacingKey]) {
-        currentSpacing = [defaults floatForKey:kConsecutiveMessagesSpacingKey];
-    }
-    
+    NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
+    CSMessageMergeConfiguration *config = [[CSMessageMergeConfiguration alloc] initWithDefaults:defaults];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"连续消息间距"
-                                                                   message:@"设置同一发送者连续消息之间的间距（范围: -20-10）\n负值减少间距，正值增加间距\n（建议设置为-12）"
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    
-    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-        textField.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
-        textField.placeholder = [NSString stringWithFormat:@"当前: %.1f", currentSpacing];
-        textField.text = [NSString stringWithFormat:@"%.1f", currentSpacing];
-    }];
-    
-    UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:@"确定"
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * _Nonnull action) {
-        UITextField *textField = alert.textFields.firstObject;
-        NSString *inputText = textField.text;
-        
-        CGFloat spacingValue = [inputText floatValue];
-        
-        if (spacingValue < -20) {
-            spacingValue = -20;
-        } else if (spacingValue > 10) {
-            spacingValue = 10;
-        }
-        
-        [defaults setFloat:spacingValue forKey:kConsecutiveMessagesSpacingKey];
-        [defaults synchronize];
-        
-        CFNotificationCenterPostNotification(
-            CFNotificationCenterGetDarwinNotifyCenter(),
-            CFSTR("com.wechat.enhance.bubble_style.settings_changed"),
-            NULL,
-            NULL,
-            true
-        );
-        
-        [self setupData];
-        [self.tableView reloadData];
-    }];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消"
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:nil];
-    
-    [alert addAction:confirmAction];
-    [alert addAction:cancelAction];
-    
+        message:@"正常保留原生间距；紧密在连续消息中目标减少 25pt，空间不足时保留完整内容。分段长文本及特殊内容保持原生布局。"
+        preferredStyle:UIAlertControllerStyleAlert];
+    __weak typeof(self) weakSelf = self;
+    for (NSInteger value=CSMessageSpacingNormal; value<=CSMessageSpacingCompact; value++) {
+        CSMessageSpacingMode mode = (CSMessageSpacingMode)value;
+        NSString *title = CSMessageSpacingModeTitle(mode);
+        if (mode==config.spacingMode) title=[title stringByAppendingString:@" ✓"];
+        [alert addAction:[UIAlertAction actionWithTitle:title style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [defaults setInteger:mode forKey:CSMessageMergeSpacingModeKey];
+            CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
+                (__bridge CFStringRef)CSMessageMergeSettingsNotification,NULL,NULL,true);
+            [weakSelf setupData];[weakSelf.tableView reloadData];
+        }]];
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];
 }
 

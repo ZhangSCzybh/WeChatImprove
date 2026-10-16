@@ -1,0 +1,72 @@
+WeChatImprove 1.6-1 message merge validation
+Date: 2026-10-16
+Target: WeChat 8.0.78 / Rootless (user confirmed)
+Checkout: /Users/zhangshichao/Documents/Workspace/WeChatImprove
+Branch: codex/message-merge-refactor
+Baseline HEAD: c52ccc80a8712b156716a75a70f5533da30f68cd
+Theos: /Users/zhangshichao/theos
+SDK: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk
+
+Tests: bash Tests/verify-message-merge.sh
+PASS: 7008 message merge/navigation checks
+PASS: 35 native adapter/navigation lifecycle checks (UIKit double)
+
+Build: make -j4 package SCHEME=rootless PACKAGE_VERSION=1.6-1
+Exit status: 0
+Package: packages/com.wechat.improve_1.6-1_iphoneos-arm64.deb
+SHA256: bacf9745b84a468af790e656bdbed942ff18e1e89b7d261efd4b39fe33199838
+Version: 1.6-1
+Architecture: iphoneos-arm64
+Packaged dylib architectures: arm64 arm64e
+Packaged dylib SHA256: 5cbd7dea387dc0a7f72c5ffbae680a8f2cbbac00609e9d7be044c7119d7e919b
+Packaged merge/navigation classes and displayed version: verified
+Rootless dylib dependencies:
+WeChatImprove.dylib:
+	@rpath/WeChatImprove.dylib (compatibility version 0.0.0, current version 0.0.0)
+	/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)
+	/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 5027.0.69)
+	/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 5027.0.69)
+	/System/Library/Frameworks/UIKit.framework/UIKit (compatibility version 1.0.0, current version 9127.0.85)
+	/System/Library/Frameworks/LocalAuthentication.framework/LocalAuthentication (compatibility version 1.0.0, current version 2319.12.210)
+	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.27.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)
+	/System/Library/Frameworks/AVFAudio.framework/AVFAudio (compatibility version 1.0.0, current version 1.0.0)
+	/System/Library/Frameworks/AVFoundation.framework/AVFoundation (compatibility version 1.0.0, current version 2.0.0)
+	/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics (compatibility version 64.0.0, current version 2050.0.0)
+	/System/Library/Frameworks/Photos.framework/Photos (compatibility version 1.0.0, current version 912.20.123)
+	/System/Library/Frameworks/QuartzCore.framework/QuartzCore (compatibility version 1.2.0, current version 1223.6.12)
+	/System/Library/Frameworks/UniformTypeIdentifiers.framework/UniformTypeIdentifiers (compatibility version 1.0.0, current version 709.0.0)
+	@rpath/CydiaSubstrate.framework/CydiaSubstrate (compatibility version 0.0.0, current version 0.0.0)
+
+Log /tmp/wechat-message-merge-final-build.log: 204 warnings, no errors; none in modified feature files.
+Log /tmp/wechat-message-merge-package-build.log: 200 warnings, no errors; none in modified feature files.
+
+Old package preservation:
+packages/com.wechat.improve_1.5-7_iphoneos-arm.deb unchanged; SHA256 6f9472a7ad9697add4cd292447ff3ae11557027d371eaefdb6066cc8d4666ef3
+packages/com.wechat.improve_1.6-0_iphoneos-arm64.deb unchanged; SHA256 18082e00400372a33f5e11e6231c4c8e48e01fee2317a11d24b2c61fe366acbb
+
+Source SHA256 (new/modified source and tests):
+17d4702b0dc82ec11325f281a86706676d65e778001fd975d83567e4d5d30b6d  Controllers/CSBubbleStyleSettingsViewController.m
+3c6868950182392f2c7f1eec5053f9a532eb32533ee78678fed7e5f7f2be1588  Controllers/CSMessageMergeAdapter.h
+d9233948d9b2e719646022228158674bbf77c671ebc02631752c8f8d9a14ce4d  Controllers/CSMessageMergeAdapter.m
+4307818be5e5d31b9f95a64b77d3470d4a2774c714eefc9262f8a0c1931b1b80  Controllers/CSMessageMergePolicy.h
+49957d8581e8c90e5fe48555c5d786651379485610473474cb3af52781f86dd4  Controllers/CSMessageMergePolicy.m
+c4e36d346431dc20617dc5fff1b4428360b5aa0069a49b2b3eff8489c532b89b  Controllers/CSMessageNavigation.h
+5ac0bb827a76d9eb3bb4082e8e0ecbce43f0a402fc65b06390f59731878b13ae  Controllers/CSMessageNavigation.m
+1ddffd2ab000ebb3afb88a26e1909b22b49411e6d3eb1536c011ef46486a9c97  Headers/CSUserInfoHelper.h
+05259649eafd42c370cfec8b727fef84c7ac3ce012334bf6a6d70b52b50a467b  Hooks/AvatarHooks.xm
+e1e35e158e5c8800c2d7bb51de859bb1841d0b3cd769d58a59b91029026c23a1  Hooks/BubbleStyleHooks.xm
+81a36ad89d799a90a32ed50d52e81adc0d8e38c4c2563662252e7f45f270e88f  Hooks/MessageMergeHooks.xm
+8342bddf1cf256667948b77671106c098ea159085a8373b1fd71e628cc7e46b5  Hooks/MessageTimeHooks.xm
+4767d488e839c183ced2e7ca7feefb68bf3a50f7fe028bda059caee53e3ad412  Hooks/RevokeHooks.xm
+4d2c5275f1c57180e5b5d2f2625911879d645f9fc381b88217440e9c11800333  Tests/MessageMergeAdapterTests.m
+db89942a79f65af0d6dd7e300754d1a73cb2c27131cfbc371aa721d728d9b946  Tests/MessageMergePolicyTests.m
+6cb69010b7f2c78470e145bda6ec952f3a22e0223a53f85e62699b350d8020cc  Tests/MessageUIKit/MessageUIKit.m
+30016e078b62db1eaabb96b0c3abca3bc1c0ad7ac01d8a839bd5579b56f586f6  Tests/MessageUIKit/UIKit/UIKit.h
+8c77b22220beaa07dfd41ea90cc738097a42624f7013afea6d6be314bc7c171a  Tests/verify-message-merge.sh
+f9f781902f9068a6f6dcc53d1a00e9480354bd02589085a93e233ccaa78a9589  control
+
+NOT verified: installation/injection on device, actual UIKit rendering, frame time, energy, memory trend.
+No device/account/database modified. Test results are local code tests, not real-device acceptance.
+
+Post-build formatting: removed one trailing blank line in BubbleStyleHooks.xm; no semantic changes.

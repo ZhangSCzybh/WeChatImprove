@@ -1,0 +1,35 @@
+WeChatImprove 1.6-2 compatibility follow-up
+Date: 2026-10-16
+Target: WeChat 8.0.78 / Rootless
+Checkout: /Users/zhangshichao/Documents/Workspace/WeChatImprove
+Branch: codex/message-merge-refactor
+
+Fix: hidden tap-to-show time labels receive geometry; click respects master switch and valid display text.
+Helper tests cover hidden/visible labels, hidden avatars, sender direction and click eligibility.
+
+Tests: bash Tests/verify-message-merge.sh
+PASS: 7008 message merge/navigation checks
+PASS: 44 adapter/navigation/time checks (UIKit double)
+Build: make -j4 package SCHEME=rootless PACKAGE_VERSION=1.6-2
+Exit status: 0
+Version: 1.6-2
+Architecture: iphoneos-arm64
+Package SHA256: 1905dd53b3bf0cea8fb199319a0f61d366400df09f01be9f377c80334dd60762
+Packaged dylib: arm64 arm64e; displayed version 1.6-2 verified
+Dylib SHA256: f4c9c96b1bfb8a88b52d532010ceb9a4d3a6a1109b44ea1abab0ea1c8e518dc2
+Build log: /tmp/wechat-message-merge-1.6-2-build.log
+Warnings: 212; none in reviewed feature files.
+
+Previous 1.5-7, 1.6-0 and 1.6-1 packages unchanged.
+Device/database/settings not accessed or changed.
+Not verified: real WeChat injection/callback order, rendering, performance and energy.
+
+Source SHA256:
+d19ddb31335f5a5867a46c1a90da651291265e40668439781964cad6ffa55111  Controllers/CSMessageTimeLayout.h
+e54a12aa444c60587ba2bcd14fb8292dafaffa696e2d7ae696687d95287c6c65  Controllers/CSMessageTimeLayout.m
+111714023d7dd2147ee6c3ce49c371babccec03e3038e4fa91bb9c780bd2ea1d  Hooks/MessageTimeHooks.xm
+28412644b429219cadb237a5de9eef76ca9a2893f2b99d2e3ab3d04c238e20a5  Tests/MessageMergeAdapterTests.m
+428eeeb65b958bc056a4cc5ccf41a14c49fda64ed03490f63da470eb1351e914  Tests/MessageUIKit/UIKit/UIKit.h
+fac67b52650bde7665f7a54a0a4ac1c20170b546a20311f48c160d08d5d7dce0  Tests/verify-message-merge.sh
+5276c8583fe217cc7ff02593944b9dc23e97976ed0d2942a87bcd03d49c22e91  Headers/CSUserInfoHelper.h
+50cf4691fa164d5b23dc6fe03b98ce46fb987768922ad59b766fabc43566dab6  control

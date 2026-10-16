@@ -1,0 +1,44 @@
+WeChatImprove 1.6-6 first-click native highlight — TEST PACKAGE
+Target: WeChat 8.0.78 / Rootless
+Build: make -j4 package SCHEME=rootless PACKAGE_VERSION=1.6-6
+Build exit: 0
+Build log: /tmp/wechat-revoke-first-highlight-1.6-6-build.log
+
+Package: com.wechat.improve
+Name: WeChatImprove
+Description: 微信插件，支持聊天按钮布局自定义等。
+Maintainer: 再也不会
+Author: 再也不会
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
+Architecture: iphoneos-arm64
+Version: 1.6-6
+Installed-Size: 3164
+
+Dylib path: var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib
+Architectures: arm64 arm64e
+Dylib SHA256: 8f27bd936b43ca9cf3c6baaf7a96f51843b8e5fec0f1a2fd9cafbf2b02dea0bd
+Version/display target verified; host display-link double absent.
+
+Tests: bash Tests/verify-message-merge.sh (exit 0)
+PASS: 7008 message merge/navigation checks
+PASS: 396 native adapter/navigation lifecycle checks (UIKit/display-boundary doubles)
+
+User video reviewed; real new-build native highlight visual not verified.
+No device installation/database/settings access.
+Old 1.6-1 through 1.6-5 packages unchanged.
+Build warnings: 212
+Changed navigation source warnings/errors: 0
+Package SHA256: 7ffb5044291908437c5d186cfc01a594e10e5f9d4096740f3d834f9a45053175
+
+Source SHA256:
+f78d3b60a03cec6a7aa1a276d9c9e4bc2f9d207f14a93ff9447a753beda7ecc3  Controllers/CSMessageNavigation.h
+d327e5aa73fb41960f9816341a9eed0f095059985c629dab37351849b8dab49e  Controllers/CSMessageNavigation.m
+c6c7e0d45de2134ee4f760142659bcb888d70c077b73afb81fc6bc8a9a927f07  Hooks/MessageMergeHooks.xm
+ac9c28799cc2abadb1e9d43bbe2b324fb42eaa35725a280b5efd93cdcab80683  Tests/MessageMergeAdapterTests.m
+f439a07558b0624e691a1ffde33023198bd56d0dbcfb68272965055c2cfd732b  Tests/MessageUIKit/DisplayLink.m
+7fbedf48b2a01c48925c68b204a1a7efd10a691fc362f18c1cbf26879ff40822  Tests/MessageUIKit/QuartzCore/CADisplayLink.h
+0176a766195be440b8d4106d5f35c7b7e61e2cda5ba571d6342b6dff1cc34928  Tests/MessageUIKit/UIKit/UIKit.h
+afbc95f6acbccfce96aa838a7ca272371944d635ea38ee79ec5facce4578332a  Tests/verify-message-merge.sh
+47e75cb720f5b91d8d65c29fb58c056b8e21f24e1ee42903cea4d92bdfeaaf89  Headers/CSUserInfoHelper.h
+7064076cafbba108286c8e8678a191d465b541c4c152d4422261a249893c79ee  control
