@@ -15,6 +15,7 @@ for marker in [
     "+ (void)attachToController:", "- (void)requestRefresh",
     "- (BOOL)hasScrollableContent", "- (BOOL)canRestoreAnchor",
     "- (void)saveAnchor", "- (void)restoreAnchor",
+    "- (void)returnToGroupTop", "- (void)applyPendingScrollToTop", "- (void)selectIndex:",
 ]:
     start = text.find(marker)
     if start < 0:

@@ -41,35 +41,19 @@ typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
 @property (nonatomic, readonly) BOOL redDot;
 @end
 
-/// Only named, unambiguous rows can create action tokens. Revalidate before use.
-@interface CSGroupActionToken : NSObject <NSCopying>
-@property (nonatomic, copy, readonly) NSString *accountID;
-@property (nonatomic, copy, readonly) NSString *userName;
-@property (nonatomic, readonly) CSGroupRowKind kind;
-@property (nonatomic, readonly) NSUInteger revision;
-- (instancetype)init NS_UNAVAILABLE;
-@end
-
 @interface CSGroupProjection : NSObject
 @property (nonatomic, copy, readonly) NSArray<NSArray<CSGroupRow *> *> *sections;
 @property (nonatomic, copy, readonly) NSString *accountID;
-@property (nonatomic, readonly) NSUInteger revision;
 @property (nonatomic, readonly, getter=isValid) BOOL valid;
 - (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
                             tabs:(NSArray<WESessionTabItem *> *)tabs
                    selectedTabID:(NSString *)selectedTabID
                 filterDuplicates:(BOOL)filterDuplicates
-                       accountID:(NSString *)accountID
-                        revision:(NSUInteger)revision NS_DESIGNATED_INITIALIZER;
+                       accountID:(NSString *)accountID NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
-- (nullable NSIndexPath *)nativePathForDisplayPath:(NSIndexPath *)displayPath;
 - (nullable NSIndexPath *)displayPathForNativePath:(NSIndexPath *)nativePath;
 - (nullable CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)displayPath;
 /// Snapshot-derived badge. Integration supplies the verified native All total.
 - (CSGroupBadge *)badgeForTabID:(NSString *)tabID;
-- (nullable CSGroupActionToken *)actionTokenForDisplayPath:(NSIndexPath *)displayPath;
-/// Resolves the current native row, including a target outside the selected tab.
-/// Accepts an older revision after identity lookup; rejects future revisions.
-- (nullable CSGroupRow *)rowForActionToken:(CSGroupActionToken *)token;
 @end
 NS_ASSUME_NONNULL_END

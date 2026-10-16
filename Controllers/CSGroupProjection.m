@@ -20,17 +20,6 @@
     return self;
 }
 @end
-@implementation CSGroupActionToken
-- (instancetype)initWithAccountID:(NSString *)accountID userName:(NSString *)userName
-                             kind:(CSGroupRowKind)kind revision:(NSUInteger)revision {
-    if ((self = [super init])) {
-        _accountID = [accountID copy]; _userName = [userName copy]; _kind = kind; _revision = revision;
-    }
-    return self;
-}
-- (id)copyWithZone:(NSZone *)zone { (void)zone; return self; }
-@end
-
 static BOOL CSGroupIsPath(id path) {
     return [path isKindOfClass:[NSIndexPath class]] && [path length] == 2;
 }
@@ -60,25 +49,21 @@ static BOOL CSGroupDotUnread(CSGroupRow *row) {
     return row.redDot || ((row.kind == CSGroupRowKindAggregate || row.kind == CSGroupRowKindBusiness) && row.unreadCount > 0);
 }
 
-static NSArray *CSGroupActionKey(NSString *name, CSGroupRowKind kind) {
-    return @[name, @(kind)];
-}
-
 @interface CSGroupProjection ()
 @property (nonatomic, copy) NSDictionary<NSIndexPath *, NSIndexPath *> *displayToNative;
 @property (nonatomic, copy) NSDictionary<NSIndexPath *, NSIndexPath *> *nativeToDisplay;
 @property (nonatomic, copy) NSDictionary<NSString *, CSGroupBadge *> *badges;
-@property (nonatomic, copy) NSDictionary<NSArray *, id> *actionRows;
+- (nullable NSIndexPath *)nativePathForDisplayPath:(NSIndexPath *)displayPath;
 @end
 
 @implementation CSGroupProjection
 - (instancetype)initWithSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selectedTabID
-                filterDuplicates:(BOOL)filterDuplicates accountID:(NSString *)accountID revision:(NSUInteger)revision {
+                filterDuplicates:(BOOL)filterDuplicates accountID:(NSString *)accountID {
     if ((self = [super init])) {
         // Until every value is validated, no partial map, badge, or row is published.
         _sections = @[]; _accountID = [accountID isKindOfClass:[NSString class]] ? [accountID copy] : @"";
-        _revision = revision; _valid = NO;
-        _displayToNative = @{}; _nativeToDisplay = @{}; _badges = @{}; _actionRows = @{};
+        _valid = NO;
+        _displayToNative = @{}; _nativeToDisplay = @{}; _badges = @{};
         if (!_accountID.length || ![sections isKindOfClass:[NSArray class]] ||
             ![tabs isKindOfClass:[NSArray class]] || ![selectedTabID isKindOfClass:[NSString class]]) return self;
 
@@ -109,7 +94,6 @@ static NSArray *CSGroupActionKey(NSString *name, CSGroupRowKind kind) {
 
         NSMutableSet<NSString *> *ordinaryNames = [NSMutableSet set];
         NSMutableSet<NSIndexPath *> *nativePaths = [NSMutableSet set];
-        NSMutableDictionary<NSArray *, id> *actionRows = [NSMutableDictionary dictionary];
         NSMutableArray<NSArray<CSGroupRow *> *> *copiedSections = [NSMutableArray arrayWithCapacity:sections.count];
         for (NSUInteger sectionIndex = 0; sectionIndex < sections.count; sectionIndex++) {
             id section = sections[sectionIndex];
@@ -132,11 +116,6 @@ static NSArray *CSGroupActionKey(NSString *name, CSGroupRowKind kind) {
                 CSGroupRow *value = [[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName
                     kind:row.kind category:row.category top:row.top unreadCount:row.unreadCount redDot:row.redDot];
                 [copiedRows addObject:value];
-                if (value.userName.length) {
-                    NSArray *key = CSGroupActionKey(value.userName, value.kind);
-                    // Business duplicates may remain visible, but cannot authorize an ambiguous action.
-                    actionRows[key] = actionRows[key] ? (id)[NSNull null] : value;
-                }
             }
             [copiedSections addObject:[copiedRows copy]];
         }
@@ -186,7 +165,7 @@ static NSArray *CSGroupActionKey(NSString *name, CSGroupRowKind kind) {
         }
         _sections = [displaySections copy]; _displayToNative = [displayToNative copy];
         _nativeToDisplay = [nativeToDisplay copy]; _badges = [badges copy];
-        _actionRows = [actionRows copy]; _valid = YES;
+        _valid = YES;
     }
     return self;
 }
@@ -203,17 +182,5 @@ static NSArray *CSGroupActionKey(NSString *name, CSGroupRowKind kind) {
 - (CSGroupBadge *)badgeForTabID:(NSString *)tabID {
     CSGroupBadge *badge = [tabID isKindOfClass:[NSString class]] ? self.badges[tabID] : nil;
     return badge ?: [[CSGroupBadge alloc] initWithCount:0 redDot:NO];
-}
-- (CSGroupActionToken *)actionTokenForDisplayPath:(NSIndexPath *)displayPath {
-    CSGroupRow *row = [self rowAtDisplayPath:displayPath];
-    if (!row.userName.length || self.actionRows[CSGroupActionKey(row.userName,row.kind)] != row) return nil;
-    return [[CSGroupActionToken alloc] initWithAccountID:self.accountID userName:row.userName
-                                                  kind:row.kind revision:self.revision];
-}
-- (CSGroupRow *)rowForActionToken:(CSGroupActionToken *)token {
-    if (!self.valid || ![token isKindOfClass:[CSGroupActionToken class]] ||
-        ![token.accountID isEqualToString:self.accountID] || token.revision > self.revision) return nil;
-    id row = self.actionRows[CSGroupActionKey(token.userName,token.kind)];
-    return [row isKindOfClass:[CSGroupRow class]] ? row : nil;
 }
 @end

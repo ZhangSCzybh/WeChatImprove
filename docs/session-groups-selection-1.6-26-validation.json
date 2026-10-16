@@ -1,0 +1,32 @@
+{
+  "version": "1.6-26",
+  "scheme": "rootless",
+  "package": "packages/com.wechat.improve_1.6-26_iphoneos-arm64.deb",
+  "sha256": "3fd2c34fff4f8ffb7581f1ae049b20f82b5baef294186815492bef0170276ab1",
+  "bytes": 707664,
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "payload_matches_build": true,
+  "obsolete_automatic_native_fallback_methods_absent": true,
+  "explicit_native_navigation_and_previous_fixes_retained": true,
+  "source_hashes_unchanged_during_build": 205,
+  "previous_packages_preserved": 5,
+  "selection_stability_checks": 30,
+  "group_interaction_checks": 40,
+  "viewport_checks": 66,
+  "header_semantics_checks": 46,
+  "indicator_checks": 23,
+  "total_checks": 205,
+  "failures": 0,
+  "old_callback_regression": {
+    "adapter_source_commit": "95fb8fb1ac25046876ede1c98c5f054558cec01b",
+    "checks": 23,
+    "failures": 5,
+    "scope": "Old adapter callback/proxy methods with current UIKit restoration hooks; not an old-package device run."
+  },
+  "changed_production_compiler_warnings": [],
+  "on_device_verified": false,
+  "build_log": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-selection-1.6-26-payoi8bd/build.log"
+}

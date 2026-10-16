@@ -1,0 +1,25 @@
+{
+  "version": "1.6-27",
+  "scheme": "rootless",
+  "package": "packages/com.wechat.improve_1.6-27_iphoneos-arm64.deb",
+  "sha256": "61c50ffba82618f5dfa01150130709adeb761c69620e7a72f2aeabb8aa53ea0e",
+  "bytes": 707948,
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "gesture_split": {
+    "group_switch_left": 0.85,
+    "native_menu_right": 0.15,
+    "boundary_owner": "native_menu"
+  },
+  "interaction_checks": 40,
+  "failures": 0,
+  "payload_matches_build": true,
+  "selection_stability_fix_retained": true,
+  "source_hashes_unchanged_during_build": 205,
+  "previous_packages_preserved": 6,
+  "changed_production_compiler_warnings": [],
+  "on_device_verified": false,
+  "build_log": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-zones-1.6-27-5kpna7j8/build.log"
+}

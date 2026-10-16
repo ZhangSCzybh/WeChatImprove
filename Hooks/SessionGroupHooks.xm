@@ -54,6 +54,7 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 - (void)viewDidAppear:(BOOL)animated {
     Native(self,NO,^{ %orig; });
     [CSGroupListAdapter attachToController:self];
+    [Adapter(self) returnToGroupTop];
 }
 - (void)viewDidLayoutSubviews { Native(self,NO,^{ %orig; }); [CSGroupListAdapter layoutForController:self]; }
 - (void)initTableHeaderView { Native(self,NO,^{ %orig; }); [CSGroupListAdapter layoutForController:self]; }
@@ -64,7 +65,7 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 - (void)cancelSearch { Native(self,NO,^{ %orig; }); [Adapter(self) requestRefresh]; }
 - (id)previewingContext:(id)context viewControllerForLocation:(CGPoint)point {
     CSGroupListAdapter *a=Adapter(self);
-    if (a.isActive) { [a deferNativePresentation]; return nil; }
+    if (a.isActive) return nil; // An incidental preview must not change the selected group.
     __block id result=nil; Native(self,NO,^{ result=%orig; }); return result;
 }
 - (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap { Native(self,YES,^{ %orig; }); }
@@ -134,12 +135,12 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 - (void)setEditing:(BOOL)editing {
     %orig;
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!editing && !a.publishing) [a requestRefresh];
+    if (!editing && !a.publishing) { [a endSwipeEditing]; [a requestRefresh]; }
 }
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     %orig;
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!editing && !a.publishing) [a requestRefresh];
+    if (!editing && !a.publishing) { [a endSwipeEditing]; [a requestRefresh]; }
 }
 - (UIView *)tableHeaderView {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
@@ -194,7 +195,7 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
     if (!a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
     NSIndexPath *display=[a displayPath:path];
-    if (!display && path) { [a revealNativePath:path action:^(NSIndexPath *current) { CSGroupWithDisplayIndices(self, ^{ %orig(current, animated, position); }); }]; return; }
+    if (!display && path) return; // Ignore native restoration outside the selected group.
     CSGroupWithDisplayIndices(self, ^{ %orig(display, animated, position); });
 }
 - (void)deselectRowAtIndexPath:(NSIndexPath *)path animated:(BOOL)animated {
@@ -208,7 +209,7 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
     if (!a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
     NSIndexPath *display=[a displayPath:path];
-    if (!display && path) { [a revealNativePath:path action:^(NSIndexPath *current) { CSGroupWithDisplayIndices(self, ^{ %orig(current, position, animated); }); }]; return; }
+    if (!display && path) return; // Ignore native restoration outside the selected group.
     CSGroupWithDisplayIndices(self, ^{ %orig(display, position, animated); });
 }
 - (NSIndexPath *)indexPathForCell:(UITableViewCell *)cell {
@@ -307,7 +308,7 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
     if (!a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
     NSIndexPath *display=[a displayPath:path];
-    if (!display && path) { [a revealNativePath:path action:^(NSIndexPath *current) { CSGroupWithDisplayIndices(self, ^{ %orig(current, animated, position); }); }]; return; }
+    if (!display && path) return; // Ignore native restoration outside the selected group.
     CSGroupWithDisplayIndices(self, ^{ %orig(display, animated, position); });
 }
 - (void)deselectRowAtIndexPath:(NSIndexPath *)path animated:(BOOL)animated {

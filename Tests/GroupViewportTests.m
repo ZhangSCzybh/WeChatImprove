@@ -16,6 +16,14 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
     return [self indexPathWithIndexes:indexes length:2];
 }
 @end
+@interface WESessionTabItem : NSObject
+@property(nonatomic,copy) NSString *tabId;
+@end
+@implementation WESessionTabItem @end
+@interface TestChrome : NSObject
+@property(nonatomic,copy) NSString *selectedTabID;
+@end
+@implementation TestChrome @end
 @interface UITableView : NSObject
 @property(nonatomic) CGRect bounds;
 @property(nonatomic) CGSize contentSize;
@@ -30,9 +38,11 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @property(nonatomic,strong) NSDictionary<NSIndexPath *,NSNumber *> *rowOrigins;
 @property(nonatomic) NSUInteger offsetWrites;
 - (CGRect)rectForRowAtIndexPath:(NSIndexPath *)path;
+- (void)layoutIfNeeded;
 - (void)setContentOffset:(CGPoint)point animated:(BOOL)animated;
 @end
 @implementation UITableView
+- (void)layoutIfNeeded {}
 - (CGRect)rectForRowAtIndexPath:(NSIndexPath *)path { return CGRectMake(0,[self.rowOrigins[path] doubleValue],320,80); }
 - (void)setContentOffset:(CGPoint)point animated:(BOOL)animated { (void)animated; self.offsetWrites++; self.contentOffset=point; }
 @end
@@ -58,7 +68,8 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 }
 @end
 @interface CSGroupPreferences : NSObject
-@property(nonatomic,copy) NSString *accountID;
+@property(nonatomic,copy) NSString *accountID,*selectedTabID;
+@property(nonatomic,strong) NSArray *tabs;
 @end
 @implementation CSGroupPreferences @end
 static char AdapterKey;
@@ -88,7 +99,9 @@ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table
 @property(nonatomic,strong) id nativeHeader;
 @property(nonatomic) CGFloat baselineDeceleration;
 @property(nonatomic) BOOL dirty,searching,publishedEnabled,scheduled,publishing;
-@property(nonatomic) BOOL active;
+@property(nonatomic) BOOL active,pendingScrollToTop,chromeVisible,swipeActive,nativePresentation,snapshotRetryAttempted;
+@property(nonatomic,strong) NSArray *displayedTabs;
+@property(nonatomic,strong) TestChrome *chrome;
 @property(nonatomic) NSUInteger changeDepth,refreshCount,layoutCount,detachCount;
 @property(nonatomic,copy) NSString *publishedTabID;
 - (BOOL)isActive;
@@ -100,10 +113,14 @@ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table
 - (void)saveAnchor;
 - (void)restoreAnchor;
 - (void)requestRefresh;
+- (void)applyPendingScrollToTop;
+- (void)returnToGroupTop;
+- (void)selectIndex:(NSInteger)index;
 @end
 @implementation CSGroupListAdapter
 #include "GroupViewportBodies.h"
 - (BOOL)isActive { return self.active; }
+- (void)refreshNavigationTitle {}
 - (void)refresh {
     self.refreshCount++; self.dirty=NO;
     self.preferences=[CSGroupPreferences new]; self.preferences.accountID=account;
@@ -123,7 +140,7 @@ static CSGroupListAdapter *List(HostController **owner,CGFloat height) {
     HostController *host=[HostController new]; host.m_tableView=[UITableView new];
     [CSGroupListAdapter attachToController:host];
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForController:host];
-    a.active=YES; a.publishedTabID=@"private";
+    a.active=YES; a.chromeVisible=YES; a.publishedTabID=@"private";
     a.table.bounds=CGRectMake(0,0,320,700);
     a.table.contentSize=CGSizeMake(320,height);
     a.table.adjustedContentInset=(UIEdgeInsets){100,0,30,0};
@@ -219,6 +236,45 @@ int main(void) { @autoreleasepool {
     Check(a.table.offsetWrites==0,@"new group without an anchor leaves layout to the host");
     a=List(&host,1600); [a saveAnchor]; a.table.contentSize=CGSizeMake(320,NAN); [a restoreAnchor];
     Check(a.table.offsetWrites==0,@"nonfinite content geometry does not write an offset");
+    for (NSNumber *height in @[@0,@160,@1600]) {
+        a=List(&host,height.doubleValue); [a saveAnchor];
+        [a returnToGroupTop];
+        Check(Near(a.table.contentOffset.y,-100) && !a.pendingScrollToTop,@"return from chat reaches the full header top for empty, short and long lists");
+        Check(!a.anchors[a.publishedTabID],@"return clears the old per-group anchor");
+        [a saveAnchor]; [a restoreAnchor];
+        Check(Near(a.table.contentOffset.y,-100),@"later data refresh cannot restore the pre-return position");
+    }
+    a=List(&host,1600); [a saveAnchor]; a.pendingScrollToTop=YES;
+    a.table.contentOffset=CGPointMake(7,340); [a saveAnchor]; [a restoreAnchor];
+    Check(Near(a.table.contentOffset.y,-100),@"pending top overrides an old group anchor");
+    a=List(&host,1600); a.dirty=YES; [a returnToGroupTop];
+    Check(a.pendingScrollToTop && a.table.offsetWrites==0,@"top waits until pending data is published");
+    a.dirty=NO; a.publishing=YES; [a applyPendingScrollToTop];
+    Check(a.pendingScrollToTop && a.table.offsetWrites==0,@"top waits for reload/layout completion");
+    a.publishing=NO; a.table.adjustedContentInset=(UIEdgeInsets){147,0,30,0}; [a applyPendingScrollToTop];
+    Check(Near(a.table.contentOffset.y,-147),@"top uses the final adjusted inset without modifying inset");
+    a.table.contentOffset=CGPointMake(7,350); [a applyPendingScrollToTop];
+    Check(Near(a.table.contentOffset.y,350),@"one-time top request does not pin subsequent user scrolling");
+    for (NSString *state in @[@"tracking",@"dragging",@"decelerating",@"editing"]) {
+        a=List(&host,1600); [a.table setValue:@YES forKey:state]; [a returnToGroupTop];
+        Check(a.pendingScrollToTop && a.table.offsetWrites==0,@"return defers while the user is interacting");
+        [a.table setValue:@NO forKey:state]; [a restoreAnchor];
+        Check(Near(a.table.contentOffset.y,-100),@"deferred top completes when interaction ends");
+    }
+    a=List(&host,1600); a.searching=YES; [a returnToGroupTop];
+    Check(!a.pendingScrollToTop && a.table.offsetWrites==0,@"native search appearance does not reset the chat viewport");
+    a=List(&host,1600); enabled=NO; [a returnToGroupTop];
+    Check(!a.pendingScrollToTop && a.table.offsetWrites==0,@"disabled groups do not force native list scrolling"); enabled=YES;
+    a=List(&host,1600);
+    WESessionTabItem *tab=[WESessionTabItem new]; tab.tabId=@"another";
+    a.displayedTabs=@[tab]; a.preferences.tabs=@[tab];
+    a.anchors[@"another"]=@{@"name":@"fixture-row",@"kind":@0,@"offset":@400};
+    [a.nativeActions addObject:^{ }];
+    [a selectIndex:0];
+    Check(a.nativeActions.count==0,@"new group selection supersedes older queued native navigation");
+    Check(a.pendingScrollToTop && !a.anchors[@"another"],@"switching groups discards the destination's saved position and requests top");
+    a.publishedTabID=@"another"; [a restoreAnchor];
+    Check(Near(a.table.contentOffset.y,-100),@"selected group starts at top after publication");
     fprintf(stdout,"Group viewport: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;
 } }

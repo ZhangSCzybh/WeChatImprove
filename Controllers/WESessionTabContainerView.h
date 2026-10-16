@@ -14,7 +14,6 @@
 /// Base font size before Dynamic Type scaling; hiding search releases its full width.
 - (void)applyAppearanceWithFontSize:(CGFloat)fontSize showsSearchButton:(BOOL)showsSearchButton;
 - (void)updateTabs:(NSArray<WESessionTabItem *> * _Nullable)tabs;
-- (void)updateUnreadCount:(NSInteger)count forTabIndex:(NSInteger)index;
 /// A positive number takes precedence over a red dot. Zero/NO hides the badge.
 - (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot forTabIndex:(NSInteger)index;
 - (void)selectTabAtIndex:(NSInteger)index animated:(BOOL)animated;

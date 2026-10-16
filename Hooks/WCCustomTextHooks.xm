@@ -1,5 +1,6 @@
 // 名称自定义
 #import <UIKit/UIKit.h>
+#import "CSGroupListAdapter.h"
 
 // 添加必要的类声明
 @interface TimeoutNumber : UIView
@@ -23,6 +24,7 @@
 @end
 
 // 定义NSUserDefaults的键
+static NSString * const kCSRenderingGroupTitleKey = @"CSGroupRenderingTitle";
 static NSString * const kWCSimpleUIEnabledKey = @"com.wechat.tweak.simple_ui_enabled";
 static NSString * const kWCCustomMenuNamesKey = @"com.wechat.tweak.custom_menu_names";
 // 添加主标题自定义键
@@ -205,7 +207,7 @@ static void loadSettings() {
 
 - (void)setText:(NSString *)text {
     // 如果文本为空或者没有开启自定义功能，直接使用原始设置
-    if (!text || !gSimpleUIEnabled) {
+    if (!text || !gSimpleUIEnabled || [NSThread.currentThread.threadDictionary[kCSRenderingGroupTitleKey] boolValue]) {
         %orig;
         return;
     }
@@ -285,7 +287,7 @@ static void loadSettings() {
 
 // 对attributedText也进行处理，防止通过该方法设置文本
 - (void)setAttributedText:(NSAttributedString *)attributedText {
-    if (!attributedText || !gSimpleUIEnabled) {
+    if (!attributedText || !gSimpleUIEnabled || [NSThread.currentThread.threadDictionary[kCSRenderingGroupTitleKey] boolValue]) {
         %orig;
         return;
     }
@@ -376,6 +378,22 @@ static void loadSettings() {
 %hook MFTitleView
 
 - (void)updateTitleView:(unsigned int)arg1 title:(NSString *)title {
+    // Resolve only the main chat title owner; keep native status/icon flags intact.
+    [CSGroupListAdapter recordNativeTitle:title status:arg1 forTitleView:self];
+    NSString *groupTitle=[CSGroupListAdapter groupTitleForTitleView:self];
+    if (groupTitle.length) {
+        // A custom group named "通讯录"/"微信" must not pass through the global
+        // label-name replacement a second time while this title is rendering.
+        NSMutableDictionary *state=NSThread.currentThread.threadDictionary;
+        id previous=state[kCSRenderingGroupTitleKey];
+        state[kCSRenderingGroupTitleKey]=@YES;
+        @try { %orig(arg1, groupTitle); }
+        @finally {
+            if (previous) state[kCSRenderingGroupTitleKey]=previous;
+            else [state removeObjectForKey:kCSRenderingGroupTitleKey];
+        }
+        return;
+    }
     // 如果标题为空或者没有开启自定义功能，直接使用原始设置
     if (!title || !gSimpleUIEnabled) {
         %orig;

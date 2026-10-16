@@ -339,10 +339,6 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
     [self selectTabAtIndex:selectedIndex animated:NO];
 }
 
-- (void)updateUnreadCount:(NSInteger)count forTabIndex:(NSInteger)index {
-    [self updateUnreadCount:count hasRedDot:NO forTabIndex:index];
-}
-
 - (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot forTabIndex:(NSInteger)index {
     if (index < 0 || index >= (NSInteger)self.tabButtons.count) return;
     [self.tabButtons[index] updateUnreadCount:count hasRedDot:hasRedDot];

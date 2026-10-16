@@ -8,7 +8,7 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 
-static char AdapterKey, CellRowKey;
+static char AdapterKey, CellRowKey, TitleContextKey;
 static NSHashTable<CSGroupListAdapter *> *Adapters(void) {
     static NSHashTable *adapters; static dispatch_once_t once;
     dispatch_once(&once, ^{ adapters=[NSHashTable weakObjectsHashTable]; }); return adapters;
@@ -48,11 +48,13 @@ static id ObjectArgument(id target, NSString *name, id value) {
 @property (nonatomic) BOOL publishedEnabled;
 @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *prefetchedPaths;
 @property (nonatomic, strong) NSMutableArray *nativeActions;
-@property (nonatomic) BOOL nativePresentation, scheduled, dirty, searching;
+@property (nonatomic) BOOL nativePresentation, scheduled, dirty, searching, pendingScrollToTop;
+@property (nonatomic) BOOL snapshotRetryAttempted;
+@property (nonatomic) NSUInteger snapshotRetryGeneration;
 @property (nonatomic, readwrite) BOOL publishing;
 @property (atomic, readwrite) NSUInteger changeDepth;
-@property (nonatomic) NSUInteger revision;
 @property (nonatomic) UIScrollViewDecelerationRate baselineDeceleration;
+- (void)useNativePresentation;
 - (void)forwardInvocation:(NSInvocation *)inv target:(id)target;
 - (UITableViewCell *)cellForDisplayPath:(NSIndexPath *)path target:(id)target;
 @end
@@ -64,7 +66,11 @@ static id ObjectArgument(id target, NSString *name, id value) {
 - (UITableViewCell *)tableView:(UITableView *)table cellForRowAtIndexPath:(NSIndexPath *)path {
     (void)table; return [self.adapter cellForDisplayPath:path target:self.target];
 }
-- (BOOL)respondsToSelector:(SEL)selector { return [super respondsToSelector:selector] || [self.target respondsToSelector:selector]; }
+- (BOOL)respondsToSelector:(SEL)selector {
+    if ([super respondsToSelector:selector]) return YES;
+    if (self.adapter.isActive && !CSGroupUsesNativeIndices(self.adapter.table) && !CSGroupInvocationIsSupported(selector)) return NO;
+    return [self.target respondsToSelector:selector];
+}
 - (BOOL)conformsToProtocol:(Protocol *)protocol { return [self.target conformsToProtocol:protocol] || [super conformsToProtocol:protocol]; }
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)selector { return [self.target methodSignatureForSelector:selector] ?: [super methodSignatureForSelector:selector]; }
 - (void)forwardInvocation:(NSInvocation *)invocation { [self.adapter forwardInvocation:invocation target:self.target]; }
@@ -126,7 +132,8 @@ static id ObjectArgument(id target, NSString *name, id value) {
     proxy.target=target; return proxy;
 }
 - (void)detach {
-    UITableView *table=self.table; self.nativePresentation=YES; self.projecting=NO;
+    UITableView *table=self.table; self.nativePresentation=YES; self.projecting=NO; self.chromeVisible=NO;
+    [self refreshNavigationTitle];
     [self publishHeader:self.nativeHeader]; [self.chrome removeFromSuperview]; [self.chrome removeGestureRecognizer:self.pan]; [table removeGestureRecognizer:self.listPan];
     objc_setAssociatedObject(table,&AdapterKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     if (table.dataSource==self.proxies[@0]) table.dataSource=self.proxies[@0].target;
@@ -173,7 +180,8 @@ static id ObjectArgument(id target, NSString *name, id value) {
 }
 - (void)prepareForNativeSearch {
     if (!self.searching) [self saveAnchor];
-    self.searching=YES;
+    self.searching=YES; self.pendingScrollToTop=NO;
+    [self refreshNavigationTitle];
     [self layout];
 }
 - (void)publishHeader:(UIView *)header {
@@ -217,10 +225,12 @@ static id ObjectArgument(id target, NSString *name, id value) {
     table.decelerationRate=sensitivity==1 ? 0.998 : sensitivity==2 ? 0.9998 : sensitivity==3 ? 0.999 : self.baselineDeceleration;
     self.pan.enabled=Option(@"swipe_gesture_enabled") && !table.editing && !self.swipeActive;
     self.listPan.enabled=self.pan.enabled;
+    [self applyPendingScrollToTop];
 }
 - (void)refresh {
     if (!NSThread.isMainThread) { [self requestRefresh]; return; }
     if (self.publishing) return;
+    [self reconcileDeletedSwipeRow];
     if (self.changeDepth || self.table.dragging || self.table.decelerating || self.table.editing || self.swipeActive) { self.dirty=YES; return; }
     self.publishing=YES; self.dirty=NO;
     BOOL finished=NO;
@@ -229,7 +239,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
         [self installProxies];
         NSString *account=CSGroupCurrentAccountID();
         BOOL changed= ![self.preferences.accountID isEqualToString:account];
-        if (changed) { self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=NO; self.projection=nil; }
+        if (changed) { self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=NO; self.projection=nil; self.snapshotRetryAttempted=NO; }
         self.preferences=[[CSGroupPreferences alloc] initWithDefaults:NSUserDefaults.standardUserDefaults accountID:account];
         self.searching=CSGroupReadInteger(self.controller,@"isSearching",0)!=0;
         [self ensureChrome];
@@ -241,13 +251,8 @@ static id ObjectArgument(id target, NSString *name, id value) {
         }
         __block NSArray *sections=nil;
         CSGroupWithNativeIndices(self.table, ^{ sections=CSGroupBuildNativeSections(self.controller,self.table,[self nativeSource]); });
-        CSGroupProjection *projection=sections && account ? [[CSGroupProjection alloc] initWithSections:sections tabs:tabs selectedTabID:selected filterDuplicates:self.preferences.filterDuplicates accountID:account revision:++self.revision] : nil;
-        self.projection=projection.isValid ? projection : nil;
-        if (!self.projection && account.length) {
-            self.nativePresentation=YES; selected=@"preset_0";
-            if (![tabs filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(WESessionTabItem *tab, NSDictionary *bindings) { (void)bindings; return tab.type==WETabTypeAll; }]].count)
-                tabs=[@[[WESessionTabItem tabWithType:WETabTypeAll]] arrayByAddingObjectsFromArray:tabs];
-        }
+        CSGroupProjection *projection=[self projectionForSections:sections tabs:tabs selectedTabID:selected accountID:account];
+        self.projection=projection;
         NSMutableDictionary *identities=[NSMutableDictionary dictionary];
         [self.projection.sections enumerateObjectsUsingBlock:^(NSArray *rows, NSUInteger s, BOOL *stop) {
             (void)stop; [rows enumerateObjectsUsingBlock:^(CSGroupRow *row, NSUInteger r, BOOL *end) {
@@ -276,9 +281,11 @@ static id ObjectArgument(id target, NSString *name, id value) {
         [self layout];
         CSGroupWithDisplayIndices(self.table, ^{ [self.table reloadData]; [self.table layoutIfNeeded]; });
         [self restoreAnchor];
+        [self refreshNavigationTitle];
         finished=YES;
     } @finally {
         self.publishing=NO;
+        if (finished) [self applyPendingScrollToTop];
         NSArray *callbacks=[self.completions copy]; [self.completions removeAllObjects];
         for (void (^completion)(BOOL) in callbacks) completion(finished);
         if (finished && !self.isActive && !self.changeDepth) {
@@ -287,6 +294,27 @@ static id ObjectArgument(id target, NSString *name, id value) {
         }
         if (self.dirty) [self requestRefresh];
     }
+}
+- (CSGroupProjection *)projectionForSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selected accountID:(NSString *)account {
+    if (!account.length) return nil;
+    CSGroupProjection *projection=sections ? [[CSGroupProjection alloc] initWithSections:sections tabs:tabs selectedTabID:selected
+        filterDuplicates:self.preferences.filterDuplicates accountID:account] : nil;
+    if (projection.isValid) { self.snapshotRetryAttempted=NO; self.snapshotRetryGeneration++; return projection; }
+    // A partially rebuilt native snapshot must not permanently select All.
+    // Publish a safe empty projection for the selected group, then retry once.
+    // Never expose unfiltered rows under a filtered group's label.
+    if (!self.snapshotRetryAttempted) {
+        self.snapshotRetryAttempted=YES;
+        NSUInteger generation=++self.snapshotRetryGeneration;
+        __weak typeof(self) weakSelf=self;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW,(int64_t)(0.05*NSEC_PER_SEC)),dispatch_get_main_queue(), ^{
+            CSGroupListAdapter *self=weakSelf;
+            if (self.snapshotRetryAttempted && self.snapshotRetryGeneration==generation && [account isEqual:CSGroupCurrentAccountID()]) [self requestRefresh];
+        });
+    }
+    projection=[[CSGroupProjection alloc] initWithSections:@[] tabs:tabs selectedTabID:selected
+        filterDuplicates:self.preferences.filterDuplicates accountID:account];
+    return projection.isValid ? projection : nil;
 }
 - (void)requestRefresh {
     if (!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(), ^{ [self requestRefresh]; }); return; }
@@ -316,10 +344,6 @@ static id ObjectArgument(id target, NSString *name, id value) {
     if (!self.isActive || self.swipeActive || self.table.editing) return;
     [self saveAnchor]; self.nativePresentation=YES; [self.table setEditing:NO animated:NO]; [self refresh];
 }
-- (void)deferNativePresentation {
-    __weak typeof(self) weakSelf=self;
-    dispatch_async(dispatch_get_main_queue(), ^{ [weakSelf useNativePresentation]; });
-}
 - (void)performInNativePresentation:(void (^)(void))action {
     NSString *account=CSGroupCurrentAccountID(); if (!account.length) return;
     void (^guarded)(void)=^{ if ([account isEqualToString:CSGroupCurrentAccountID()]) action(); };
@@ -330,17 +354,6 @@ static id ObjectArgument(id target, NSString *name, id value) {
         self.nativePresentation=YES; [self requestRefresh]; return;
     }
     [self useNativePresentation];
-}
-- (void)revealNativePath:(NSIndexPath *)path action:(void (^)(NSIndexPath *))action {
-    id logic=CSGroupReadObject(self.controller,@"m_mainFrameLogicController");
-    NSString *name=CSGroupReadObject(ObjectArgument(logic,@"getSessionInfoAtIndexPath:",path),@"m_nsUserName");
-    if (![name isKindOfClass:NSString.class] || !name.length) return;
-    __weak typeof(self) weakSelf=self;
-    [self performInNativePresentation:^{
-        id logic=CSGroupReadObject(weakSelf.controller,@"m_mainFrameLogicController");
-        NSIndexPath *current=ObjectArgument(logic,@"indexPathOfSessionUserName:",name);
-        if ([current isKindOfClass:NSIndexPath.class] && [CSGroupReadObject(ObjectArgument(logic,@"getSessionInfoAtIndexPath:",current),@"m_nsUserName") isEqual:name]) action(current);
-    }];
 }
 - (BOOL)accountMatches { return [self.projection.accountID isEqualToString:CSGroupCurrentAccountID()]; }
 - (NSIndexPath *)currentPathForRow:(CSGroupRow *)row {
@@ -389,15 +402,44 @@ static id ObjectArgument(id target, NSString *name, id value) {
     if (![row isKindOfClass:CSGroupRow.class] || !row.userName.length) return NO;
     __block NSIndexPath *current=nil;
     CSGroupWithNativeIndices(self.table, ^{ current=CSGroupResolveNativeRowPath(self.controller,row,YES); });
-    if (!current) return NO;
-    CSGroupWithNativeIndices(self.table, ^{ action(current); }); return YES;
+    if (!current) { [self requestRefresh]; return NO; }
+    // Private edit actions can arrive without the projected willBegin callback.
+    // Retain the identity while UIKit still reports editing so a later native
+    // deletion can release that state even if didEnd is never delivered.
+    if (self.table.editing && !self.swipeRow) {
+        self.swipeActive=YES; self.swipeRow=row; self.swipeAccount=context[@"account"];
+        self.swipeDisplayPath=[self displayPath:current];
+    }
+    [self beginNativeChange];
+    @try { CSGroupWithNativeIndices(self.table, ^{ action(current); }); }
+    @finally { [self endNativeChange]; }
+    return YES;
+}
+- (void)endSwipeEditing {
+    self.swipeActive=NO; self.swipeRow=nil; self.swipeAccount=nil; self.swipeDisplayPath=nil;
+    if (self.dirty || self.pendingScrollToTop) [self requestRefresh];
+}
+- (void)reconcileDeletedSwipeRow {
+    // A projected deletion suppresses UIKit's row removal. The native menu may
+    // therefore never emit didEndEditing. Release it only after identity loss,
+    // not merely because another message arrived while the menu was open.
+    if (!self.swipeActive || !self.swipeRow || self.changeDepth) return;
+    if ([self.swipeAccount isEqual:CSGroupCurrentAccountID()] && [self currentPathForRow:self.swipeRow]) return;
+    [self endSwipeEditing];
+    [self.table setEditing:NO animated:NO];
 }
 - (BOOL)forwardSwipeInvocation:(NSInvocation *)inv target:(id)target {
     NSString *name=NSStringFromSelector(inv.selector);
     BOOL begin=[name isEqual:@"tableView:willBeginEditingRowAtIndexPath:"];
     BOOL end=[name isEqual:@"tableView:didEndEditingRowAtIndexPath:"];
     BOOL commit=[name isEqual:@"tableView:commitEditingStyle:forRowAtIndexPath:"];
-    if ((!begin && !end && !commit) || (!self.isActive && !self.swipeRow) || CSGroupUsesNativeIndices(self.table)) return NO;
+    if ((!begin && !end && !commit) || (!self.isActive && !self.swipeRow)) return NO;
+    if (CSGroupUsesNativeIndices(self.table)) {
+        if (!end) return NO;
+        @try { [inv invokeWithTarget:target]; }
+        @finally { [self endSwipeEditing]; }
+        return YES;
+    }
     NSUInteger slot=commit ? 4 : 3;
     __unsafe_unretained NSIndexPath *display=nil; [inv getArgument:&display atIndex:slot];
     CSGroupRow *row=self.swipeRow;
@@ -419,8 +461,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
         }
     } @finally {
         if (end) {
-            self.swipeActive=NO; self.swipeRow=nil; self.swipeAccount=nil; self.swipeDisplayPath=nil;
-            if (self.dirty) [self requestRefresh];
+            [self endSwipeEditing];
         }
     }
     return YES;
@@ -475,7 +516,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     }
     if (!self.isActive || CSGroupUsesNativeIndices(self.table)) {
         CSGroupWithNativeIndices(self.table, ^{ [inv invokeWithTarget:target]; });
-        if (self.dirty && ([name isEqual:@"scrollViewDidEndDecelerating:"] || [name isEqual:@"scrollViewDidEndDragging:willDecelerate:"] || [name isEqual:@"tableView:didEndEditingRowAtIndexPath:"])) [self requestRefresh];
+        if ((self.dirty || self.pendingScrollToTop) && ([name isEqual:@"scrollViewDidEndDecelerating:"] || [name isEqual:@"scrollViewDidEndDragging:willDecelerate:"] || [name isEqual:@"tableView:didEndEditingRowAtIndexPath:"])) [self requestRefresh];
         return;
     }
     if ([name isEqual:@"numberOfSectionsInTableView:"]) { NSInteger count=(NSInteger)self.projection.sections.count; [inv setReturnValue:&count]; return; }
@@ -484,8 +525,9 @@ static id ObjectArgument(id target, NSString *name, id value) {
         NSInteger count=section>=0 && section<(NSInteger)self.projection.sections.count ? (NSInteger)self.projection.sections[(NSUInteger)section].count : 0;
         [inv setReturnValue:&count]; return;
     }
-    // Blocks/points can retain an obsolete path. Retry these interactions after native presentation.
-    if (!CSGroupInvocationIsSupported(inv.selector) || [@[@"tableView:shouldShowMenuForRowAtIndexPath:",@"tableView:moveRowAtIndexPath:toIndexPath:",@"tableView:performAction:forRowAtIndexPath:withSender:"] containsObject:name]) { if (!self.swipeActive) [self deferNativePresentation]; return; }
+    // Optional queries and unsupported coordinate/block callbacks do not express
+    // a request to select All. Keep the initialized neutral return and selection.
+    if (!CSGroupInvocationIsSupported(inv.selector) || [@[@"tableView:shouldShowMenuForRowAtIndexPath:",@"tableView:moveRowAtIndexPath:toIndexPath:",@"tableView:performAction:forRowAtIndexPath:withSender:"] containsObject:name]) return;
     __block CSGroupRow *deliveredRow=nil;
     BOOL mapped=CSGroupMapInvocationPaths(inv, ^NSIndexPath *(NSIndexPath *path) {
         deliveredRow=cellRow ?: [self.projection rowAtDisplayPath:path];
@@ -496,7 +538,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     if (!mapped) {
         if ([name isEqual:@"tableView:heightForRowAtIndexPath:"] || [name isEqual:@"tableView:estimatedHeightForRowAtIndexPath:"]) {
             CGFloat height=44; [inv setReturnValue:&height]; [self requestRefresh];
-        } else if (!cellLifecycle) [self deferNativePresentation];
+        } else if (!cellLifecycle) [self requestRefresh];
         return;
     }
     CSGroupWithNativeIndices(self.table, ^{ [inv invokeWithTarget:target]; });
@@ -505,7 +547,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
         NSIndexPath *display=[self displayPath:native]; [inv setReturnValue:&display]; [inv retainArguments];
     }
     if ([name isEqual:@"scrollViewDidEndDecelerating:"] || [name isEqual:@"scrollViewDidEndDragging:willDecelerate:"] || [name isEqual:@"tableView:didEndEditingRowAtIndexPath:"]) {
-        if (self.dirty) [self requestRefresh];
+        if (self.dirty || self.pendingScrollToTop) [self requestRefresh];
     }
 }
 - (BOOL)hasScrollableContent {
@@ -525,6 +567,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
         table.contentOffset.y>=-table.adjustedContentInset.top-0.5;
 }
 - (void)saveAnchor {
+    if (self.pendingScrollToTop) return;
     if (!self.isActive || !self.publishedTabID) return;
     if (![self hasScrollableContent]) { [self.anchors removeObjectForKey:self.publishedTabID]; return; }
     if (![self canRestoreAnchor]) return;
@@ -534,6 +577,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     if (row.userName.length) self.anchors[self.publishedTabID]=@{@"name":row.userName,@"kind":@(row.kind),@"offset":@(self.table.contentOffset.y+self.table.adjustedContentInset.top-rect.origin.y)};
 }
 - (void)restoreAnchor {
+    if (self.pendingScrollToTop) { [self applyPendingScrollToTop]; return; }
     NSDictionary *anchor=self.anchors[self.publishedTabID];
     if (!self.isActive || !anchor || ![self canRestoreAnchor]) return;
     for (NSUInteger s=0;s<self.projection.sections.count;s++) {
@@ -559,10 +603,64 @@ static id ObjectArgument(id target, NSString *name, id value) {
     if (self.swipeActive || self.table.editing) { self.chrome.selectedTabID=self.publishedTabID; return; }
     NSArray *tabs=self.displayedTabs; if (index<0 || index>=(NSInteger)tabs.count) return;
     if (![self.preferences.accountID isEqualToString:CSGroupCurrentAccountID()]) { [self requestRefresh]; return; }
-    [self saveAnchor]; NSString *tabID=[tabs[(NSUInteger)index] tabId];
+    NSString *tabID=[tabs[(NSUInteger)index] tabId];
     BOOL belongs=[self.preferences.tabs filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(WESessionTabItem *tab, NSDictionary *bindings) { (void)bindings; return [tab.tabId isEqual:tabID]; }]].count>0;
+    // A newer user selection supersedes any queued explicit native navigation.
+    [self.nativeActions removeAllObjects];
+    self.snapshotRetryAttempted=NO;
     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;
+    self.pendingScrollToTop=YES;
+    [self.anchors removeObjectForKey:tabID];
     [self refresh];
+}
+- (void)returnToGroupTop {
+    if (!Option(@"enabled") || !self.chromeVisible || self.searching) return;
+    self.pendingScrollToTop=YES;
+    if (self.publishedTabID) [self.anchors removeObjectForKey:self.publishedTabID];
+    [self.table layoutIfNeeded];
+    [self applyPendingScrollToTop];
+    [self refreshNavigationTitle];
+}
+- (void)applyPendingScrollToTop {
+    UITableView *table=self.table;
+    if (!self.pendingScrollToTop || self.publishing || self.dirty || self.changeDepth || !self.chromeVisible ||
+        self.searching || table.tracking || table.dragging || table.decelerating || table.editing || self.swipeActive) return;
+    CGFloat top=table.adjustedContentInset.top;
+    if (CGRectGetHeight(table.bounds)<=0 || !isfinite(top)) return;
+    self.pendingScrollToTop=NO;
+    // Use UIKit's effective top, never the host's transformed contentInset getter.
+    CSGroupWithDisplayIndices(table, ^{
+        if (fabs(table.contentOffset.y+top)>0.5)
+            [table setContentOffset:CGPointMake(table.contentOffset.x,-top) animated:NO];
+    });
+}
++ (NSString *)groupTitleForTitleView:(id)titleView {
+    if (!titleView || !Option(@"enabled")) return nil;
+    for (CSGroupListAdapter *adapter in Adapters().allObjects) {
+        if (CSGroupReadObject(adapter.controller,@"m_titleView")!=titleView || !adapter.chromeVisible || adapter.searching ||
+            ![adapter.preferences.accountID isEqual:CSGroupCurrentAccountID()]) continue;
+        for (WESessionTabItem *tab in adapter.displayedTabs)
+            if ([tab.tabId isEqual:adapter.publishedTabID]) return tab.displayName;
+    }
+    return nil;
+}
++ (void)recordNativeTitle:(NSString *)title status:(unsigned int)status forTitleView:(id)titleView {
+    objc_setAssociatedObject(titleView,&TitleContextKey,@{@"title":title ?: NSNull.null,@"status":@(status)},OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+- (void)refreshNavigationTitle {
+    id titleView=CSGroupReadObject(self.controller,@"m_titleView");
+    NSDictionary *before=objc_getAssociatedObject(titleView,&TitleContextKey);
+    SEL selector=NSSelectorFromString(@"updateTitleView");
+    if ([self.controller respondsToSelector:selector]) ((void(*)(id,SEL))objc_msgSend)(self.controller,selector);
+    // Native updateTitleView may skip an unchanged "WeChat" title. Replaying its
+    // last input still updates the group name, without changing its cached title
+    // or inventing a status flag. The hook resolves the new group at render time.
+    if (before && before==objc_getAssociatedObject(titleView,&TitleContextKey)) {
+        SEL render=NSSelectorFromString(@"updateTitleView:title:");
+        NSString *title=before[@"title"]==NSNull.null ? nil : before[@"title"];
+        if ([titleView respondsToSelector:render])
+            ((void(*)(id,SEL,unsigned int,id))objc_msgSend)(titleView,render,[before[@"status"] unsignedIntValue],title);
+    }
 }
 - (BOOL)groupSwipesAvailable {
     return self.table && Option(@"enabled") && Option(@"swipe_gesture_enabled") && self.chromeVisible && !self.searching && !self.table.editing && !self.swipeActive;
@@ -580,8 +678,8 @@ static id ObjectArgument(id target, NSString *name, id value) {
         CGPoint point=[touch locationInView:self.table];
         CGRect viewport=self.table.bounds;
         // The boundary is fixed by the initial touch in the visible list width,
-        // including a nonzero bounds origin. Exactly 80% belongs to native editing.
-        if (!CGRectContainsPoint(viewport,point) || point.x>=CGRectGetMinX(viewport)+CGRectGetWidth(viewport)*0.8) return NO;
+        // including a nonzero bounds origin. Exactly 85% belongs to native editing.
+        if (!CGRectContainsPoint(viewport,point) || point.x>=CGRectGetMinX(viewport)+CGRectGetWidth(viewport)*0.85) return NO;
         if (touch.view==self.chrome || [touch.view isDescendantOfView:self.headerContainer]) return NO;
         allowed=YES;
     } else if (self.chrome.scrollView.contentSize.width>self.chrome.scrollView.bounds.size.width) {
@@ -609,7 +707,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     CGPoint v=[pan velocityInView:self.chrome]; return fabs(v.x)>fabs(v.y)*1.5;
 }
 - (void)groupPan:(UIPanGestureRecognizer *)pan {
-    // Admission is latched at touch-down; crossing the 80% boundary cannot change owners.
+    // Admission is latched at touch-down; crossing the 85% boundary cannot change owners.
     if (pan.state!=UIGestureRecognizerStateEnded || ![self groupSwipesAvailable]) return;
     if ((pan!=self.pan && pan!=self.listPan) || !(pan==self.pan ? self.barTouchAllowed : self.listTouchAllowed)) return;
     CGPoint p=[pan translationInView:self.chrome],v=[pan velocityInView:self.chrome];
