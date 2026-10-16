@@ -9,6 +9,7 @@ typedef NS_ENUM(NSInteger, UIImageOrientation) { UIImageOrientationUp, UIImageOr
 typedef NS_ENUM(NSInteger, UIImageResizingMode) { UIImageResizingModeTile, UIImageResizingModeStretch };
 typedef NS_ENUM(NSInteger, UIUserInterfaceStyle) { UIUserInterfaceStyleUnspecified, UIUserInterfaceStyleLight, UIUserInterfaceStyleDark };
 @interface UITraitCollection : NSObject
+@property(class,nonatomic,readonly) UITraitCollection *currentTraitCollection;
 @property(nonatomic) UIUserInterfaceStyle userInterfaceStyle;
 @end
 @interface UIView : NSObject

@@ -1,7 +1,12 @@
 #import <UIKit/UIKit.h>
 #import "CSBubbleStyleAdapter.h"
 NSString *const UIApplicationDidReceiveMemoryWarningNotification=@"BubbleMemoryWarning";
-@implementation UITraitCollection @end
+@implementation UITraitCollection
++ (UITraitCollection *)currentTraitCollection {
+    static UITraitCollection *value;static dispatch_once_t once;
+    dispatch_once(&once,^{value=[UITraitCollection new];});return value;
+}
+@end
 @implementation UIView
 - (instancetype)init { if ((self=[super init])) { _traitCollection=[UITraitCollection new]; _traitCollection.userInterfaceStyle=UIUserInterfaceStyleLight; } return self; }
 + (void)performWithoutAnimation:(void (^)(void))block { block(); }

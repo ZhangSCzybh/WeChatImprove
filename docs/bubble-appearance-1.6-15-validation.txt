@@ -1,0 +1,47 @@
+WeChatImprove 1.6-15 bubble appearance and payment-color removal — TEST PACKAGE
+Target: WeChat 8.0.78.34 / Rootless (user report iOS 27.0.1)
+Checkout: /Users/zhangshichao/Documents/Workspace/WeChatImprove
+Branch: codex/bubble-appearance-fix
+Build: make -j4 package SCHEME=rootless PACKAGE_VERSION=1.6-15
+Build exit: 0
+Log: /tmp/wechat-bubble-theme-1.6-15-build.log
+
+Package: com.wechat.improve
+Name: WeChatImprove
+Description: 微信插件，支持聊天按钮布局自定义等。
+Maintainer: 再也不会
+Author: 再也不会
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
+Architecture: iphoneos-arm64
+Version: 1.6-15
+Installed-Size: 3164
+
+Dylib: var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib
+Architectures: arm64 arm64e
+Dylib SHA256: ab446cbd958e1ffb4f63cf2bcb1882aabea43a1056dc61100a3da772a196b3b2
+Package SHA256: f15eabc74b7bdd17623c90623184aa118c0228f0c14bd0ba346036df3eef7813
+Embedded version verified; host test classes absent.
+Payment color keys, payment color API selector and special background stage absent.
+Build warnings: 212; changed source warnings: 0
+
+Regression before fix (exit 1):
+Bubble policy/renderer/ownership: 9611 checks passed
+FAIL line 87: HasColor(cell.background->m_image,(CSBubbleRGBA){.27,.78,.49,1},NO)
+
+Final bubble regression (exit 0):
+Bubble policy/renderer/ownership: 8269 checks passed
+Bubble real-adapter lifecycle: 111 checks passed
+
+CoreGraphics pixel tests use host UIKit doubles; live WeChat appearance not verified.
+No installation/database/device-settings changes. All 16 previous packages verified unchanged.
+
+Source SHA256:
+84eb984d5a133217ea180c08d787c5f70f69d36262361810e8bdb4cf9a4aefb8  Controllers/CSBubbleStyleAdapter.m
+c805b7b0669dfbb1990dcc6be2a4a455ecec513b7475741913afd118ea8f0cf6  Controllers/CSBubbleStylePolicy.h
+47e961176a5d081479e43dc9c93052539db10bad553f0db92f0f54cb471196c6  Controllers/CSBubbleStylePolicy.m
+daa01ca21558b010ba0d8c3c28f1035e922eb272bc79107f5047e5f70ad6b87a  Controllers/CSBubbleStyleSettingsViewController.m
+b4030722d9fdd2273728be9fd76be285828cd8485e527a2862b4390725c3970f  Tests/BubbleStyleAdapterTests.m
+3bdd1daf8833d7108cc655aedcbc659807f56c4c9cbbd80eec7bc89490fc36ab  Tests/BubbleStyleTests.m
+a9022e3415e8bf946824ab3b4f0d0019e9db3992db3dfb1af393327b5eb7eb0f  Headers/CSUserInfoHelper.h
+755b2a815121baa3dab2aaf82efa2dc784f9873153a9d195b5a1bfba216daf34  control

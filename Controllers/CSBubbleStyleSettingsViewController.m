@@ -32,30 +32,9 @@ static NSString * const kBubbleReceiverDarkColorGreenKey = @"com.wechat.enhance.
 static NSString * const kBubbleReceiverDarkColorBlueKey = @"com.wechat.enhance.bubble_style.receiver_dark_color.blue";
 static NSString * const kBubbleReceiverDarkColorAlphaKey = @"com.wechat.enhance.bubble_style.receiver_dark_color.alpha";
 
-static NSString * const kBubbleRedEnvelopSenderLightColorRedKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_light_color.red";
-static NSString * const kBubbleRedEnvelopSenderLightColorGreenKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_light_color.green";
-static NSString * const kBubbleRedEnvelopSenderLightColorBlueKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_light_color.blue";
-static NSString * const kBubbleRedEnvelopSenderLightColorAlphaKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_light_color.alpha";
-
-static NSString * const kBubbleRedEnvelopSenderDarkColorRedKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_dark_color.red";
-static NSString * const kBubbleRedEnvelopSenderDarkColorGreenKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_dark_color.green";
-static NSString * const kBubbleRedEnvelopSenderDarkColorBlueKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_dark_color.blue";
-static NSString * const kBubbleRedEnvelopSenderDarkColorAlphaKey = @"com.wechat.enhance.bubble_style.redenvelop_sender_dark_color.alpha";
-
-static NSString * const kBubbleRedEnvelopReceiverLightColorRedKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_light_color.red";
-static NSString * const kBubbleRedEnvelopReceiverLightColorGreenKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_light_color.green";
-static NSString * const kBubbleRedEnvelopReceiverLightColorBlueKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_light_color.blue";
-static NSString * const kBubbleRedEnvelopReceiverLightColorAlphaKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_light_color.alpha";
-
-static NSString * const kBubbleRedEnvelopReceiverDarkColorRedKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_dark_color.red";
-static NSString * const kBubbleRedEnvelopReceiverDarkColorGreenKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_dark_color.green";
-static NSString * const kBubbleRedEnvelopReceiverDarkColorBlueKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_dark_color.blue";
-static NSString * const kBubbleRedEnvelopReceiverDarkColorAlphaKey = @"com.wechat.enhance.bubble_style.redenvelop_receiver_dark_color.alpha";
-
 static NSString * const kMergeMessagesEnabledKey = @"com.wechat.enhance.merge_messages.enabled";
 static NSString * const kMergeMessagesScopeKey = @"com.wechat.enhance.merge_messages.scope";
 static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.merge_messages.avatar_position";
-
 
 @interface BubbleColorPreviewView : UIView
 @property (nonatomic, strong) UIColor *previewColor;
@@ -93,30 +72,15 @@ static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.m
 @property (nonatomic, strong) CSSettingItem *senderDarkColorItem;
 @property (nonatomic, strong) CSSettingItem *receiverDarkColorItem;
 
-@property (nonatomic, strong) CSSettingItem *redEnvelopSenderLightColorItem;
-@property (nonatomic, strong) CSSettingItem *redEnvelopReceiverLightColorItem;
-@property (nonatomic, strong) CSSettingItem *redEnvelopSenderDarkColorItem;
-@property (nonatomic, strong) CSSettingItem *redEnvelopReceiverDarkColorItem;
-
 @property (nonatomic, strong) BubbleColorPreviewView *senderLightColorPreview;
 @property (nonatomic, strong) BubbleColorPreviewView *receiverLightColorPreview;
 @property (nonatomic, strong) BubbleColorPreviewView *senderDarkColorPreview;
 @property (nonatomic, strong) BubbleColorPreviewView *receiverDarkColorPreview;
 
-@property (nonatomic, strong) BubbleColorPreviewView *redEnvelopSenderLightColorPreview;
-@property (nonatomic, strong) BubbleColorPreviewView *redEnvelopReceiverLightColorPreview;
-@property (nonatomic, strong) BubbleColorPreviewView *redEnvelopSenderDarkColorPreview;
-@property (nonatomic, strong) BubbleColorPreviewView *redEnvelopReceiverDarkColorPreview;
-
 @property (nonatomic, strong) UIColor *senderLightColor;
 @property (nonatomic, strong) UIColor *receiverLightColor;
 @property (nonatomic, strong) UIColor *senderDarkColor;
 @property (nonatomic, strong) UIColor *receiverDarkColor;
-
-@property (nonatomic, strong) UIColor *redEnvelopSenderLightColor;
-@property (nonatomic, strong) UIColor *redEnvelopReceiverLightColor;
-@property (nonatomic, strong) UIColor *redEnvelopSenderDarkColor;
-@property (nonatomic, strong) UIColor *redEnvelopReceiverDarkColor;
 
 @property (nonatomic, assign) NSInteger currentColorType;
 
@@ -138,12 +102,7 @@ static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.m
     self.receiverLightColorPreview = [[BubbleColorPreviewView alloc] initWithFrame:CGRectMake(0, 0, 28, 28)];
     self.senderDarkColorPreview = [[BubbleColorPreviewView alloc] initWithFrame:CGRectMake(0, 0, 28, 28)];
     self.receiverDarkColorPreview = [[BubbleColorPreviewView alloc] initWithFrame:CGRectMake(0, 0, 28, 28)];
-    
-    self.redEnvelopSenderLightColorPreview = [[BubbleColorPreviewView alloc] initWithFrame:CGRectMake(0, 0, 28, 28)];
-    self.redEnvelopReceiverLightColorPreview = [[BubbleColorPreviewView alloc] initWithFrame:CGRectMake(0, 0, 28, 28)];
-    self.redEnvelopSenderDarkColorPreview = [[BubbleColorPreviewView alloc] initWithFrame:CGRectMake(0, 0, 28, 28)];
-    self.redEnvelopReceiverDarkColorPreview = [[BubbleColorPreviewView alloc] initWithFrame:CGRectMake(0, 0, 28, 28)];
-    
+
     [self loadCurrentSettings];
     [self setupData];
 }
@@ -188,52 +147,12 @@ static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.m
                                          defaultGreen:0.18
                                           defaultBlue:0.18
                                          defaultAlpha:1.0];
-    
-    self.redEnvelopSenderLightColor = [self loadColorWithRedKey:kBubbleRedEnvelopSenderLightColorRedKey
-                                                      greenKey:kBubbleRedEnvelopSenderLightColorGreenKey
-                                                       blueKey:kBubbleRedEnvelopSenderLightColorBlueKey
-                                                      alphaKey:kBubbleRedEnvelopSenderLightColorAlphaKey
-                                                   defaultRed:0.91
-                                                 defaultGreen:0.30
-                                                  defaultBlue:0.24
-                                                 defaultAlpha:1.0];
-    
-    self.redEnvelopReceiverLightColor = [self loadColorWithRedKey:kBubbleRedEnvelopReceiverLightColorRedKey
-                                                        greenKey:kBubbleRedEnvelopReceiverLightColorGreenKey
-                                                         blueKey:kBubbleRedEnvelopReceiverLightColorBlueKey
-                                                        alphaKey:kBubbleRedEnvelopReceiverLightColorAlphaKey
-                                                     defaultRed:0.91
-                                                   defaultGreen:0.30
-                                                    defaultBlue:0.24
-                                                   defaultAlpha:1.0];
-    
-    self.redEnvelopSenderDarkColor = [self loadColorWithRedKey:kBubbleRedEnvelopSenderDarkColorRedKey
-                                                     greenKey:kBubbleRedEnvelopSenderDarkColorGreenKey
-                                                      blueKey:kBubbleRedEnvelopSenderDarkColorBlueKey
-                                                     alphaKey:kBubbleRedEnvelopSenderDarkColorAlphaKey
-                                                  defaultRed:0.86
-                                                defaultGreen:0.22
-                                                 defaultBlue:0.10
-                                                defaultAlpha:1.0];
-    
-    self.redEnvelopReceiverDarkColor = [self loadColorWithRedKey:kBubbleRedEnvelopReceiverDarkColorRedKey
-                                                       greenKey:kBubbleRedEnvelopReceiverDarkColorGreenKey
-                                                        blueKey:kBubbleRedEnvelopReceiverDarkColorBlueKey
-                                                       alphaKey:kBubbleRedEnvelopReceiverDarkColorAlphaKey
-                                                    defaultRed:0.86
-                                                  defaultGreen:0.22
-                                                   defaultBlue:0.10
-                                                  defaultAlpha:1.0];
-    
+
     self.senderLightColorPreview.previewColor = self.senderLightColor;
     self.receiverLightColorPreview.previewColor = self.receiverLightColor;
     self.senderDarkColorPreview.previewColor = self.senderDarkColor;
     self.receiverDarkColorPreview.previewColor = self.receiverDarkColor;
     
-    self.redEnvelopSenderLightColorPreview.previewColor = self.redEnvelopSenderLightColor;
-    self.redEnvelopReceiverLightColorPreview.previewColor = self.redEnvelopReceiverLightColor;
-    self.redEnvelopSenderDarkColorPreview.previewColor = self.redEnvelopSenderDarkColor;
-    self.redEnvelopReceiverDarkColorPreview.previewColor = self.redEnvelopReceiverDarkColor;
 }
 
 - (UIColor *)loadColorWithRedKey:(NSString *)redKey
@@ -338,42 +257,6 @@ static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.m
         [weakSelf showColorPickerWithTitle:@"深色模式 - 接收方颜色" currentColor:weakSelf.receiverDarkColor];
     };
     
-    self.redEnvelopSenderLightColorItem = [CSSettingItem itemWithTitle:@"发送方红包/转账颜色"
-                                                             iconName:@"envelope.fill"
-                                                            iconColor:[UIColor systemRedColor]
-                                                              detail:@""];
-    self.redEnvelopSenderLightColorItem.actionBlock = ^{
-        weakSelf.currentColorType = 4;
-        [weakSelf showColorPickerWithTitle:@"浅色模式 - 发送方红包/转账颜色" currentColor:weakSelf.redEnvelopSenderLightColor];
-    };
-    
-    self.redEnvelopReceiverLightColorItem = [CSSettingItem itemWithTitle:@"接收方红包/转账颜色"
-                                                              iconName:@"envelope.fill"
-                                                             iconColor:[UIColor systemRedColor]
-                                                               detail:@""];
-    self.redEnvelopReceiverLightColorItem.actionBlock = ^{
-        weakSelf.currentColorType = 5;
-        [weakSelf showColorPickerWithTitle:@"浅色模式 - 接收方红包/转账颜色" currentColor:weakSelf.redEnvelopReceiverLightColor];
-    };
-    
-    self.redEnvelopSenderDarkColorItem = [CSSettingItem itemWithTitle:@"发送方红包/转账颜色"
-                                                           iconName:@"envelope.fill"
-                                                          iconColor:[UIColor systemRedColor]
-                                                            detail:@""];
-    self.redEnvelopSenderDarkColorItem.actionBlock = ^{
-        weakSelf.currentColorType = 6;
-        [weakSelf showColorPickerWithTitle:@"深色模式 - 发送方红包/转账颜色" currentColor:weakSelf.redEnvelopSenderDarkColor];
-    };
-    
-    self.redEnvelopReceiverDarkColorItem = [CSSettingItem itemWithTitle:@"接收方红包/转账颜色"
-                                                            iconName:@"envelope.fill"
-                                                           iconColor:[UIColor systemRedColor]
-                                                             detail:@""];
-    self.redEnvelopReceiverDarkColorItem.actionBlock = ^{
-        weakSelf.currentColorType = 7;
-        [weakSelf showColorPickerWithTitle:@"深色模式 - 接收方红包/转账颜色" currentColor:weakSelf.redEnvelopReceiverDarkColor];
-    };
-    
     CSSettingItem *descItem = [CSSettingItem itemWithTitle:@"使用说明"
                                                  iconName:@"info.circle.fill"
                                                 iconColor:[UIColor systemGrayColor]
@@ -462,10 +345,10 @@ static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.m
                                                                  items:@[bubbleEnabledItem, self.cornerRadiusItem]];
     
     CSSettingSection *lightModeSection = [CSSettingSection sectionWithHeader:@"浅色模式"
-                                                                       items:@[self.senderLightColorItem, self.receiverLightColorItem, self.redEnvelopSenderLightColorItem, self.redEnvelopReceiverLightColorItem]];
+                                                                       items:@[self.senderLightColorItem, self.receiverLightColorItem]];
     
     CSSettingSection *darkModeSection = [CSSettingSection sectionWithHeader:@"深色模式"
-                                                                      items:@[self.senderDarkColorItem, self.receiverDarkColorItem, self.redEnvelopSenderDarkColorItem, self.redEnvelopReceiverDarkColorItem]];
+                                                                      items:@[self.senderDarkColorItem, self.receiverDarkColorItem]];
     
     CSSettingSection *resetSection = [CSSettingSection sectionWithHeader:@"重置设置"
                                                                   items:@[resetItem]];
@@ -499,20 +382,12 @@ static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.m
             cell.accessoryView = self.senderLightColorPreview;
         } else if ([item.title isEqualToString:@"接收方颜色"]) {
             cell.accessoryView = self.receiverLightColorPreview;
-        } else if ([item.title isEqualToString:@"发送方红包/转账颜色"]) {
-            cell.accessoryView = self.redEnvelopSenderLightColorPreview;
-        } else if ([item.title isEqualToString:@"接收方红包/转账颜色"]) {
-            cell.accessoryView = self.redEnvelopReceiverLightColorPreview;
         }
     } else if (indexPath.section == 2) {
         if ([item.title isEqualToString:@"发送方颜色"]) {
             cell.accessoryView = self.senderDarkColorPreview;
         } else if ([item.title isEqualToString:@"接收方颜色"]) {
             cell.accessoryView = self.receiverDarkColorPreview;
-        } else if ([item.title isEqualToString:@"发送方红包/转账颜色"]) {
-            cell.accessoryView = self.redEnvelopSenderDarkColorPreview;
-        } else if ([item.title isEqualToString:@"接收方红包/转账颜色"]) {
-            cell.accessoryView = self.redEnvelopReceiverDarkColorPreview;
         }
     }
     
@@ -529,7 +404,7 @@ static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.m
             return @"开启后将使用自定义颜色和样式的聊天气泡，圆角大小可以调整气泡的圆润程度。";
         case 1:
         case 2:
-            return @"点击可选择不同颜色气泡颜色，支持自定义透明度。";
+            return @"颜色随微信聊天页面的浅色/深色外观切换。点击可设置颜色和透明度。";
         case 3:
             return @"恢复默认的气泡颜色和圆角设置。";
         case 4:
@@ -622,10 +497,6 @@ static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.m
         UIColor *defaultReceiverLight = [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1.0];
         UIColor *defaultSenderDark = [UIColor colorWithRed:0.20 green:0.60 blue:0.98 alpha:1.0];
         UIColor *defaultReceiverDark = [UIColor colorWithRed:0.18 green:0.18 blue:0.18 alpha:1.0];
-        UIColor *defaultRedEnvelopSenderLight = [UIColor colorWithRed:0.91 green:0.30 blue:0.24 alpha:1.0];
-        UIColor *defaultRedEnvelopReceiverLight = [UIColor colorWithRed:0.91 green:0.30 blue:0.24 alpha:1.0];
-        UIColor *defaultRedEnvelopSenderDark = [UIColor colorWithRed:0.86 green:0.22 blue:0.10 alpha:1.0];
-        UIColor *defaultRedEnvelopReceiverDark = [UIColor colorWithRed:0.86 green:0.22 blue:0.10 alpha:1.0];
         
         [self saveColor:defaultSenderLight
                 redKey:kBubbleSenderLightColorRedKey
@@ -650,50 +521,18 @@ static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.m
               greenKey:kBubbleReceiverDarkColorGreenKey
                blueKey:kBubbleReceiverDarkColorBlueKey
               alphaKey:kBubbleReceiverDarkColorAlphaKey];
-        
-        [self saveColor:defaultRedEnvelopSenderLight
-                redKey:kBubbleRedEnvelopSenderLightColorRedKey
-              greenKey:kBubbleRedEnvelopSenderLightColorGreenKey
-               blueKey:kBubbleRedEnvelopSenderLightColorBlueKey
-              alphaKey:kBubbleRedEnvelopSenderLightColorAlphaKey];
-        
-        [self saveColor:defaultRedEnvelopReceiverLight
-                redKey:kBubbleRedEnvelopReceiverLightColorRedKey
-              greenKey:kBubbleRedEnvelopReceiverLightColorGreenKey
-               blueKey:kBubbleRedEnvelopReceiverLightColorBlueKey
-              alphaKey:kBubbleRedEnvelopReceiverLightColorAlphaKey];
-        
-        [self saveColor:defaultRedEnvelopSenderDark
-                redKey:kBubbleRedEnvelopSenderDarkColorRedKey
-              greenKey:kBubbleRedEnvelopSenderDarkColorGreenKey
-               blueKey:kBubbleRedEnvelopSenderDarkColorBlueKey
-              alphaKey:kBubbleRedEnvelopSenderDarkColorAlphaKey];
-        
-        [self saveColor:defaultRedEnvelopReceiverDark
-                redKey:kBubbleRedEnvelopReceiverDarkColorRedKey
-              greenKey:kBubbleRedEnvelopReceiverDarkColorGreenKey
-               blueKey:kBubbleRedEnvelopReceiverDarkColorBlueKey
-              alphaKey:kBubbleRedEnvelopReceiverDarkColorAlphaKey];
-        
+
         [defaults synchronize];
         
         self.senderLightColor = defaultSenderLight;
         self.receiverLightColor = defaultReceiverLight;
         self.senderDarkColor = defaultSenderDark;
         self.receiverDarkColor = defaultReceiverDark;
-        self.redEnvelopSenderLightColor = defaultRedEnvelopSenderLight;
-        self.redEnvelopReceiverLightColor = defaultRedEnvelopReceiverLight;
-        self.redEnvelopSenderDarkColor = defaultRedEnvelopSenderDark;
-        self.redEnvelopReceiverDarkColor = defaultRedEnvelopReceiverDark;
         
         self.senderLightColorPreview.previewColor = defaultSenderLight;
         self.receiverLightColorPreview.previewColor = defaultReceiverLight;
         self.senderDarkColorPreview.previewColor = defaultSenderDark;
         self.receiverDarkColorPreview.previewColor = defaultReceiverDark;
-        self.redEnvelopSenderLightColorPreview.previewColor = defaultRedEnvelopSenderLight;
-        self.redEnvelopReceiverLightColorPreview.previewColor = defaultRedEnvelopReceiverLight;
-        self.redEnvelopSenderDarkColorPreview.previewColor = defaultRedEnvelopSenderDark;
-        self.redEnvelopReceiverDarkColorPreview.previewColor = defaultRedEnvelopReceiverDark;
         
         CFNotificationCenterPostNotification(
             CFNotificationCenterGetDarwinNotifyCenter(),
@@ -770,42 +609,6 @@ static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.m
                    blueKey:kBubbleReceiverDarkColorBlueKey
                   alphaKey:kBubbleReceiverDarkColorAlphaKey];
             break;
-        case 4:
-            self.redEnvelopSenderLightColor = selectedColor;
-            self.redEnvelopSenderLightColorPreview.previewColor = selectedColor;
-            [self saveColor:selectedColor
-                    redKey:kBubbleRedEnvelopSenderLightColorRedKey
-                  greenKey:kBubbleRedEnvelopSenderLightColorGreenKey
-                   blueKey:kBubbleRedEnvelopSenderLightColorBlueKey
-                  alphaKey:kBubbleRedEnvelopSenderLightColorAlphaKey];
-            break;
-        case 5:
-            self.redEnvelopReceiverLightColor = selectedColor;
-            self.redEnvelopReceiverLightColorPreview.previewColor = selectedColor;
-            [self saveColor:selectedColor
-                    redKey:kBubbleRedEnvelopReceiverLightColorRedKey
-                  greenKey:kBubbleRedEnvelopReceiverLightColorGreenKey
-                   blueKey:kBubbleRedEnvelopReceiverLightColorBlueKey
-                  alphaKey:kBubbleRedEnvelopReceiverLightColorAlphaKey];
-            break;
-        case 6:
-            self.redEnvelopSenderDarkColor = selectedColor;
-            self.redEnvelopSenderDarkColorPreview.previewColor = selectedColor;
-            [self saveColor:selectedColor
-                    redKey:kBubbleRedEnvelopSenderDarkColorRedKey
-                  greenKey:kBubbleRedEnvelopSenderDarkColorGreenKey
-                   blueKey:kBubbleRedEnvelopSenderDarkColorBlueKey
-                  alphaKey:kBubbleRedEnvelopSenderDarkColorAlphaKey];
-            break;
-        case 7:
-            self.redEnvelopReceiverDarkColor = selectedColor;
-            self.redEnvelopReceiverDarkColorPreview.previewColor = selectedColor;
-            [self saveColor:selectedColor
-                    redKey:kBubbleRedEnvelopReceiverDarkColorRedKey
-                  greenKey:kBubbleRedEnvelopReceiverDarkColorGreenKey
-                   blueKey:kBubbleRedEnvelopReceiverDarkColorBlueKey
-                  alphaKey:kBubbleRedEnvelopReceiverDarkColorAlphaKey];
-            break;
     }
     
     CFNotificationCenterPostNotification(
@@ -834,18 +637,6 @@ static NSString * const kMergeMessagesAvatarPositionKey = @"com.wechat.enhance.m
             break;
         case 3:
             self.receiverDarkColorPreview.previewColor = selectedColor;
-            break;
-        case 4:
-            self.redEnvelopSenderLightColorPreview.previewColor = selectedColor;
-            break;
-        case 5:
-            self.redEnvelopReceiverLightColorPreview.previewColor = selectedColor;
-            break;
-        case 6:
-            self.redEnvelopSenderDarkColorPreview.previewColor = selectedColor;
-            break;
-        case 7:
-            self.redEnvelopReceiverDarkColorPreview.previewColor = selectedColor;
             break;
     }
 }

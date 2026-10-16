@@ -22,7 +22,6 @@ static BOOL CSReloadQueued;
 @property(nonatomic) BOOL applying;
 @property(nonatomic) BOOL applyQueued;
 @property(nonatomic) BOOL outgoing;
-@property(nonatomic) BOOL payment;
 @property(nonatomic) BOOL supported;
 @property(nonatomic) NSUInteger position;
 @property(nonatomic) BOOL descriptorValid;
@@ -105,37 +104,30 @@ static void CSDescribe(CSBubbleBinding *binding, id model) {
         ((CSUnsigned(wrap,@"m_uiAppMsgInnerType",&innerType) && innerType==57) ||
          (CSUnsigned(wrap,@"isReferMsgType",&isRefer) && isRefer));
     BOOL ordinary=(textModel && (type==1 || quotedText)) || (type==34 && [className isEqual:@"VoiceMessageViewModel"]);
-    BOOL payment=NO;
-    if (type==49) {
-        id info=CSMessageNativeObject(wrap,@"m_oWCPayInfoItem");
-        id transfer=CSMessageNativeObject(info,@"m_nsTransferID");
-        id nativeURL=CSMessageNativeObject(info,@"m_c2cNativeUrl");
-        NSURLComponents *url=[nativeURL isKindOfClass:NSString.class] ? [NSURLComponents componentsWithString:nativeURL] : nil;
-        BOOL redPacket=[url.scheme.lowercaseString isEqual:@"wxpay"] && [url.host.lowercaseString isEqual:@"c2cbizmessagehandler"] && [url.path isEqual:@"/hongbao/receivehongbao"];
-        BOOL transferValid=[transfer isKindOfClass:NSString.class] && [transfer length]>0;
-        payment=([className isEqual:@"WCPayC2CMessageViewModel"] && redPacket) || ([className isEqual:@"WCPayTransferMessageViewModel"] && transferValid);
-    }
-    if (!ordinary && !payment) { CSFailure(binding,@"unsupported_message_kind"); return; }
-    binding.outgoing=sender!=0; binding.payment=payment; binding.position=(NSUInteger)position; binding.supported=YES;
+    if (!ordinary) { CSFailure(binding,@"unsupported_message_kind"); return; }
+    binding.outgoing=sender!=0; binding.position=(NSUInteger)position; binding.supported=YES;
 }
 static BOOL CSDark(UIView *cell) {
-    unsigned long long light=0;
-    if (CSUnsigned(cell,@"isUseLightStyle",&light)) return !light;
-    return cell.traitCollection.userInterfaceStyle==UIUserInterfaceStyleDark;
+    // The private isUseLightStyle flag is not UIKit's appearance contract. Inverting
+    // it can select dark colors on a light chat. Honor the effective view appearance,
+    // including WeChat's per-window override, before falling back for unattached cells.
+    UIUserInterfaceStyle style=cell.traitCollection.userInterfaceStyle;
+    if (style==UIUserInterfaceStyleUnspecified) style=cell.window.traitCollection.userInterfaceStyle;
+    if (style==UIUserInterfaceStyleUnspecified) style=UITraitCollection.currentTraitCollection.userInterfaceStyle;
+    return style==UIUserInterfaceStyleDark;
 }
 static UIImage *CSTemplate(CSBubbleBinding *binding, UIImage *native, BOOL dark, BOOL highlighted) {
     if (!native || native.imageOrientation!=UIImageOrientationUp || native.images.count) return nil;
     CGFloat scale=native.scale;
     CSBubbleInsets padding;
-    if (!(binding.payment ? CSBubbleNativePadding(native.CGImage,scale,&padding) :
-          CSBubbleNativeBodyPadding(native.CGImage,scale,&padding))) return nil;
+    if (!CSBubbleNativeBodyPadding(native.CGImage,scale,&padding)) return nil;
     CGFloat radius=CSBubbleFittedRadius(CSStyle.radius,binding.position,scale,padding,binding.background.frame.size);
     if (radius<1) return nil;
-    NSString *key=[NSString stringWithFormat:@"%lu/%d/%d/%d/%lu/%.4f/%.4f/%.4f/%.4f/%.4f/%d/%ld/%.4f",(unsigned long)CSStyle.generation,
-        binding.outgoing,dark,binding.payment,(unsigned long)binding.position,scale,padding.top,padding.left,padding.bottom,padding.right,highlighted,(long)native.resizingMode,radius];
+    NSString *key=[NSString stringWithFormat:@"%lu/%d/%d/%lu/%.4f/%.4f/%.4f/%.4f/%.4f/%d/%ld/%.4f",(unsigned long)CSStyle.generation,
+        binding.outgoing,dark,(unsigned long)binding.position,scale,padding.top,padding.left,padding.bottom,padding.right,highlighted,(long)native.resizingMode,radius];
     UIImage *image=[CSImages objectForKey:key];
     if (image) return image;
-    CGImageRef cg=CSBubbleCreateTemplate([CSStyle colorForOutgoing:binding.outgoing dark:dark payment:binding.payment],radius,binding.position,scale,padding,highlighted);
+    CGImageRef cg=CSBubbleCreateTemplate([CSStyle colorForOutgoing:binding.outgoing dark:dark],radius,binding.position,scale,padding,highlighted);
     if (!cg) return nil;
     CSBubbleTemplateMetrics metrics; CSBubbleTemplateDescribe(radius,binding.position,scale,padding,&metrics);
     image=[UIImage imageWithCGImage:cg scale:scale orientation:UIImageOrientationUp];
@@ -174,8 +166,6 @@ void CSBubbleStyleApply(UIView *cell) {
     }
     if (!binding.descriptorValid) CSDescribe(binding,model);
     if (!binding.supported) { CSRestore(binding); return; }
-    // Branded/animated red-packet resource layers are not a replaceable flat background.
-    if (binding.payment && (CSMessageNativeObject(cell,@"showResourceBgView") || CSMessageNativeObject(cell,@"pagView"))) { CSRestore(binding); CSFailure(binding,@"payment_resource_background"); return; }
     id current=CSCurrentImage(bg,NO),highlighted=CSCurrentImage(bg,YES);
     [binding.images captureImage:current highlighted:NO]; [binding.images captureImage:highlighted highlighted:YES];
     BOOL dark=CSDark(cell);

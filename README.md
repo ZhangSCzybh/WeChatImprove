@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.6-14`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.6-15`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.6-14`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.6-15`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.6-14` 完成 Rootless 测试包构建；Rootful 保留构建入口，本轮未重新验证 |
+| Rootless / Rootful | `1.6-15` 完成 Rootless 测试包构建；Rootful 保留构建入口，本轮未重新验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -39,7 +39,7 @@
 | --- | --- |
 | **聊天分组** | 全部、群聊、私聊、服务及自定义分组；成员管理、排序、重命名、预设隐藏、角标、手势切换、字号和搜索按钮设置 |
 | **列表圆角** | 会话、通讯录、发现和“我”页面的卡片背景；圆角、左右边距、置顶与普通会话顶部距离、浅深色背景 |
-| **气泡样式** | 气泡圆角、发送方与接收方颜色、红包/转账颜色；连续消息合并、间距和头像显示位置 |
+| **气泡样式** | 气泡圆角、浅色/深色模式的发送方与接收方颜色；连续消息合并、间距和头像显示位置 |
 | **底栏样式** | 悬浮底栏、图标与文字、标签隐藏、边框、背景、圆角、大小、位置、触感及描边动画 |
 | **顶栏信息 / 头像设置** | 聊天顶栏头像、网名或备注、分隔符文字/图片、按联系人定制分隔符；聊天头像隐藏、圆角及旋转 |
 | **界面简化 / 界面净化** | 页面标题和菜单文字定制；按项目隐藏“我”、发现、设置页入口及部分聊天提示 |
@@ -139,20 +139,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-14
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-15
 ```
 
-默认产物：`packages/com.wechat.improve_1.6-14_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.6-15_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.6-14` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.6-15` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-14
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-15
 ```
 
-默认产物：`packages/com.wechat.improve_1.6-14_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.6-15_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -172,7 +172,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.6-14_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.6-15_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
@@ -216,6 +216,8 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 实现细节见 [会话分组说明](docs/session-groups.md)、[列表圆角优化](docs/list-corners.md)；设计背景见 [分组重构方案](docs/session-groups-refactor-proposal.md)。
 
 ### 验证状态
+
+`1.6-15` 修正气泡颜色外观判定：依据聊天视图的 UIKit 外观选择浅色/深色配置，不再反转私有 isUseLightStyle 标志。移除红包/转账配色设置及专用渲染链路，卡片保持原生背景。气泡策略/渲染回归 8,269 项、适配器生命周期与主题像素回归 111 项通过，完成 Rootless 构建；设备效果待复核。详见 [气泡外观修复](docs/bubble-appearance-1.6-15.md)。
 
 `1.6-14` 将问题排查分组从“防止撤回”移至“版本控制”页底部，包含兼容性诊断开关、查看记录和复制记录。沿用原有诊断设置与日志实现，补齐版本页的动作分发。1.6-13 的首条间距修复已收到用户设备确认。本轮仅调整设置入口，完成 Rootless 构建及包核对；说明见 [诊断入口迁移](docs/diagnostics-menu-1.6-14.md)。
 

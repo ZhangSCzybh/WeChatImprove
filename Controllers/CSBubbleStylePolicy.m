@@ -9,7 +9,7 @@ CGFloat CSBubbleReadComponent(NSUserDefaults *defaults, NSString *key, CGFloat f
     return isfinite(number) ? MAX(0, MIN(1, number)) : fallback;
 }
 @implementation CSBubbleStyleConfiguration {
-    CSBubbleRGBA _colors[8];
+    CSBubbleRGBA _colors[4];
 }
 - (instancetype)initWithDefaults:(NSUserDefaults *)defaults generation:(NSUInteger)generation {
     if (!(self = [super init])) return nil;
@@ -18,10 +18,8 @@ CGFloat CSBubbleReadComponent(NSUserDefaults *defaults, NSString *key, CGFloat f
     id rawRadius = [defaults objectForKey:[CSPrefix stringByAppendingString:@"corner_radius"]];
     CGFloat radius = [rawRadius isKindOfClass:NSNumber.class] ? [rawRadius doubleValue] : 16;
     _radius = isfinite(radius) ? MAX(1, MIN(30, radius)) : 16;
-    NSArray *names = @[@"sender_light_color", @"receiver_light_color", @"sender_dark_color", @"receiver_dark_color",
-        @"redenvelop_sender_light_color", @"redenvelop_receiver_light_color", @"redenvelop_sender_dark_color", @"redenvelop_receiver_dark_color"];
-    CSBubbleRGBA fallbacks[] = {{.27,.78,.49,1}, {.95,.95,.95,1}, {.20,.60,.98,1}, {.18,.18,.18,1},
-        {.91,.30,.24,1}, {.91,.30,.24,1}, {.86,.22,.10,1}, {.86,.22,.10,1}};
+    NSArray *names = @[@"sender_light_color", @"receiver_light_color", @"sender_dark_color", @"receiver_dark_color"];
+    CSBubbleRGBA fallbacks[] = {{.27,.78,.49,1}, {.95,.95,.95,1}, {.20,.60,.98,1}, {.18,.18,.18,1}};
     NSMutableDictionary *values = [NSMutableDictionary dictionaryWithDictionary:@{@"enabled":@(_enabled), @"radius":@(_radius)}];
     for (NSUInteger i = 0; i < names.count; i++) {
         NSString *prefix = [[CSPrefix stringByAppendingString:names[i]] stringByAppendingString:@"."];
@@ -34,8 +32,8 @@ CGFloat CSBubbleReadComponent(NSUserDefaults *defaults, NSString *key, CGFloat f
     _values = [values copy];
     return self;
 }
-- (CSBubbleRGBA)colorForOutgoing:(BOOL)outgoing dark:(BOOL)dark payment:(BOOL)payment {
-    return _colors[(payment ? 4 : 0) + (dark ? 2 : 0) + (outgoing ? 0 : 1)];
+- (CSBubbleRGBA)colorForOutgoing:(BOOL)outgoing dark:(BOOL)dark {
+    return _colors[(dark ? 2 : 0) + (outgoing ? 0 : 1)];
 }
 @end
 
@@ -101,7 +99,7 @@ CGImageRef CSBubbleCreateTemplate(CSBubbleRGBA color, CGFloat radius, NSUInteger
     CGPathRelease(path); CGContextRelease(context);
     return image;
 }
-static BOOL CSNativePadding(CGImageRef image, CGFloat scale, CSBubbleInsets *padding, BOOL bodyOnly) {
+BOOL CSBubbleNativeBodyPadding(CGImageRef image, CGFloat scale, CSBubbleInsets *padding) {
     if (!image || !isfinite(scale) || scale<1 || scale>4) return NO;
     size_t w=CGImageGetWidth(image),h=CGImageGetHeight(image);
     if (!w || !h || w>512 || h>512) return NO;
@@ -122,29 +120,21 @@ static BOOL CSNativePadding(CGImageRef image, CGFloat scale, CSBubbleInsets *pad
     }
     CGContextRelease(context);
     if (minX==w) return NO;
-    if (bodyOnly) {
-        // The straight body edge repeats across rows; a narrow arrow and rounded corners
-        // do not. Ties keep the outer edge, so uncertain shapes are never cropped inward.
-        size_t left=minX,right=maxX;
-        for (size_t x=minX;x<=maxX;x++) {
-            if (leftCounts[x]>leftCounts[left]) left=x;
-            if (rightCounts[x]>=rightCounts[right]) right=x;
-        }
-        size_t minimum=MAX((size_t)2,opaqueRows/4);
-        if (leftCounts[left]>=minimum && rightCounts[right]>=minimum && left<right &&
-            left/scale<=16 && (w-right-1)/scale<=16) { minX=left;maxX=right; }
+    // The straight body edge repeats across rows; a narrow arrow and rounded corners
+    // do not. Ties keep the outer edge, so uncertain shapes are never cropped inward.
+    size_t left=minX,right=maxX;
+    for (size_t x=minX;x<=maxX;x++) {
+        if (leftCounts[x]>leftCounts[left]) left=x;
+        if (rightCounts[x]>=rightCounts[right]) right=x;
     }
+    size_t minimum=MAX((size_t)2,opaqueRows/4);
+    if (leftCounts[left]>=minimum && rightCounts[right]>=minimum && left<right &&
+        left/scale<=16 && (w-right-1)/scale<=16) { minX=left;maxX=right; }
     CSBubbleInsets result={(CGFloat)minY/scale,(CGFloat)minX/scale,(CGFloat)(h-maxY-1)/scale,(CGFloat)(w-maxX-1)/scale};
     CGFloat sides[]={result.top,result.left,result.bottom,result.right};
     for (NSUInteger i=0;i<4;i++) if (sides[i]>16) return NO;
     if (padding) *padding=result;
     return YES;
-}
-BOOL CSBubbleNativePadding(CGImageRef image, CGFloat scale, CSBubbleInsets *padding) {
-    return CSNativePadding(image,scale,padding,NO);
-}
-BOOL CSBubbleNativeBodyPadding(CGImageRef image, CGFloat scale, CSBubbleInsets *padding) {
-    return CSNativePadding(image,scale,padding,YES);
 }
 @implementation CSBubbleImageOwnership
 - (void)captureImage:(id)image highlighted:(BOOL)highlighted {

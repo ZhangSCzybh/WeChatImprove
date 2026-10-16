@@ -44,7 +44,7 @@ int main(void) { @autoreleasepool {
     CHECK(([defaults persistentDomainForName:suite]?:@{}).count==(before?:@{}).count);
     for (NSString *component in @[@"red",@"green",@"blue",@"alpha"]) [defaults setDouble:0 forKey:[@"com.wechat.enhance.bubble_style.sender_light_color." stringByAppendingString:component]];
     config=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:2];
-    CSBubbleRGBA transparent=[config colorForOutgoing:YES dark:NO payment:NO];
+    CSBubbleRGBA transparent=[config colorForOutgoing:YES dark:NO];
     CHECK(transparent.red==0 && transparent.green==0 && transparent.blue==0 && transparent.alpha==0);
     [defaults removeObjectForKey:@"com.wechat.enhance.bubble_style.sender_light_color.alpha"];
     [defaults setDouble:4 forKey:@"com.wechat.enhance.bubble_style.sender_light_color.red"];
@@ -52,17 +52,23 @@ int main(void) { @autoreleasepool {
     [defaults setObject:@"bad" forKey:@"com.wechat.enhance.bubble_style.sender_light_color.blue"];
     [defaults setDouble:400 forKey:@"com.wechat.enhance.bubble_style.corner_radius"];
     config=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:3];
-    CSBubbleRGBA clamped=[config colorForOutgoing:YES dark:NO payment:NO];
+    CSBubbleRGBA clamped=[config colorForOutgoing:YES dark:NO];
     CHECK(clamped.red==1 && clamped.green==0 && clamped.blue==.49 && clamped.alpha==1 && config.radius==30);
     [defaults setObject:@"bad" forKey:@"com.wechat.enhance.bubble_style.corner_radius"];
     config=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:4]; CHECK(config.radius==16);
     [defaults removePersistentDomainForName:suite];
     config=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:5];
-    // Real pixels, every theme/direction/payment/segment/highlight combination, three scales.
+    // Retired payment-color preferences cannot invalidate or alter the ordinary palette.
+    NSDictionary *ordinaryValues=config.values;
+    [defaults setDouble:.123 forKey:@"com.wechat.enhance.bubble_style.redenvelop_sender_light_color.red"];
+    config=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:6];
+    CHECK([ordinaryValues isEqual:config.values]);
+    CHECK([defaults doubleForKey:@"com.wechat.enhance.bubble_style.redenvelop_sender_light_color.red"]==.123);
+    // Real pixels, every theme/direction/segment/highlight combination, three scales.
     for (NSUInteger position=0;position<4;position++) for (NSUInteger scale=1;scale<=3;scale++)
-    for (NSUInteger bits=0;bits<16;bits++) {
-        BOOL outgoing=bits&1,dark=bits&2,payment=bits&4,highlighted=bits&8;
-        CSBubbleRGBA color=[config colorForOutgoing:outgoing dark:dark payment:payment];
+    for (NSUInteger bits=0;bits<8;bits++) {
+        BOOL outgoing=bits&1,dark=bits&2,highlighted=bits&4;
+        CSBubbleRGBA color=[config colorForOutgoing:outgoing dark:dark];
         CSBubbleInsets padding={2,3,4,5};
         CSBubbleTemplateMetrics metrics;
         CHECK(CSBubbleTemplateDescribe(config.radius,position,scale,padding,&metrics));
@@ -76,7 +82,7 @@ int main(void) { @autoreleasepool {
         CHECK(abs((int)bytes[center]-(int)round(color.red*(highlighted?.84:1)*255))<=1);
         CHECK(abs((int)bytes[center+1]-(int)round(color.green*(highlighted?.84:1)*255))<=1);
         CHECK(abs((int)bytes[center+2]-(int)round(color.blue*(highlighted?.84:1)*255))<=1);
-        CSBubbleInsets found; CHECK(CSBubbleNativePadding(image,scale,&found));
+        CSBubbleInsets found; CHECK(CSBubbleNativeBodyPadding(image,scale,&found));
         CHECK(fabs(found.left-padding.left)<.0001 && fabs(found.right-padding.right)<.0001);
         CHECK(fabs(found.top-padding.top)<.0001 && fabs(found.bottom-padding.bottom)<.0001);
         // Native segment semantics: top corners round only for 0/1, bottom only for 0/3.

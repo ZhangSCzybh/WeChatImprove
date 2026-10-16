@@ -38,13 +38,19 @@ void CSChatRecordEvent(NSString *feature, NSString *stage) { (void)feature; (voi
 @implementation TextMessageSubViewModel @end
 @interface WCPayTransferMessageViewModel : TextMessageViewModel @end
 @implementation WCPayTransferMessageViewModel @end
+@interface WCPayC2CMessageViewModel : TextMessageViewModel @end
+@implementation WCPayC2CMessageViewModel @end
+@interface VoiceMessageViewModel : TextMessageViewModel @end
+@implementation VoiceMessageViewModel @end
 @interface Payment : NSObject
 @property(nonatomic, copy) NSString *m_nsTransferID;
+@property(nonatomic, copy) NSString *m_c2cNativeUrl;
 @end
 @implementation Payment @end
 @interface BubbleCell : UIView
 @property(nonatomic, strong) TextMessageViewModel *viewModel;
 @property(nonatomic, strong) YYAsyncImageView *background;
+@property(nonatomic) BOOL isUseLightStyle; // Deliberately conflicts with UIKit appearance.
 - (id)getBgImageView;
 @end
 @implementation BubbleCell
@@ -53,6 +59,25 @@ void CSChatRecordEvent(NSString *feature, NSString *stage) { (void)feature; (voi
 static UIImage *Native(CGFloat red) {
     CGImageRef cg=CSBubbleCreateTemplate((CSBubbleRGBA){red,.5,.5,1},10,0,2,(CSBubbleInsets){1,2,3,4},NO);
     UIImage *image=[UIImage imageWithCGImage:cg scale:2 orientation:UIImageOrientationUp]; CGImageRelease(cg); return image;
+}
+static BOOL HasColor(id value, CSBubbleRGBA color, BOOL highlighted) {
+    UIImage *image=[value isKindOfClass:YYImage.class] ? ((YYImage *)value).originImage : value;
+    if (![image isKindOfClass:UIImage.class] || !image.CGImage) return NO;
+    CGImageRef cg=image.CGImage;size_t w=CGImageGetWidth(cg),h=CGImageGetHeight(cg);
+    CGColorSpaceRef space=CGColorSpaceCreateDeviceRGB();
+    CGContextRef ctx=CGBitmapContextCreate(NULL,w,h,8,w*4,space,kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big);
+    CGColorSpaceRelease(space);if (!ctx) return NO;
+    CGContextDrawImage(ctx,CGRectMake(0,0,w,h),cg);
+    const unsigned char *pixels=CGBitmapContextGetData(ctx);size_t offset=((h/2)*w+w/2)*4;
+    CGFloat factor=highlighted ? .84 : 1;
+    BOOL matches=abs(pixels[offset]-(int)round(color.red*factor*255))<=1 &&
+        abs(pixels[offset+1]-(int)round(color.green*factor*255))<=1 &&
+        abs(pixels[offset+2]-(int)round(color.blue*factor*255))<=1 && pixels[offset+3]==255;
+    CGContextRelease(ctx);return matches;
+}
+static CSBubbleRGBA SchemeColor(BOOL outgoing, BOOL dark) {
+    if (dark) return outgoing ? (CSBubbleRGBA){0,0,1,1} : (CSBubbleRGBA){1,1,0,1};
+    return outgoing ? (CSBubbleRGBA){1,0,0,1} : (CSBubbleRGBA){0,1,0,1};
 }
 static void Drain(void) { for (int i=0;i<4;i++) CFRunLoopRunInMode(kCFRunLoopDefaultMode,.005,false); }
 static void Settings(BOOL enabled) {
@@ -68,6 +93,7 @@ int main(void) { @autoreleasepool {
     cell.background.image=baseline; cell.background.highlightedImage=nativeHighlight;
     CSBubbleStyleApply(cell); CHECK(cell.background->m_image==baseline);
     Settings(YES); CHECK(cell.background->m_image!=baseline); CHECK([cell.background->m_image isKindOfClass:YYImage.class]);
+    CHECK(HasColor(cell.background->m_image,(CSBubbleRGBA){.27,.78,.49,1},NO));
     CHECK(cell.background.image==nil); // Ensure the adapter used the actual YY storage, not UIKit's getter.
     CHECK(cell.background->m_highlightedImage!=nativeHighlight);
     CHECK(CGRectEqualToRect(cell.frame,CGRectMake(5,7,110,80)));
@@ -116,10 +142,75 @@ int main(void) { @autoreleasepool {
     Settings(YES);CHECK(cell.background->m_image!=baseline);
     CSBubbleStyleDetach(cell);CHECK(cell.background->m_image==baseline);
     cell.background.frame=CGRectZero;
-    // Pay classification uses typed wrap fields, never a matching word in text.
+    // Distinct palettes expose wrong theme/direction selection at the rendered pixel level.
+    NSMutableDictionary *palettes=[NSMutableDictionary dictionaryWithObject:@YES forKey:@"com.wechat.enhance.bubble_style.enabled"];
+    for (NSUInteger i=0;i<4;i++) {
+        CSBubbleRGBA c=SchemeColor(i%2==0,i>=2);
+        NSString *base=[NSString stringWithFormat:@"com.wechat.enhance.bubble_style.%@_%@_color.",i%2==0?@"sender":@"receiver",i>=2?@"dark":@"light"];
+        NSArray *values=@[@(c.red),@(c.green),@(c.blue),@(c.alpha)];
+        NSArray *names=@[@"red",@"green",@"blue",@"alpha"];
+        for (NSUInteger j=0;j<4;j++) palettes[[base stringByAppendingString:names[j]]]=values[j];
+    }
+    [NSUserDefaults.standardUserDefaults setVolatileDomain:palettes forName:NSArgumentDomain];
+    [NSNotificationCenter.defaultCenter postNotificationName:NSUserDefaultsDidChangeNotification object:nil];Drain();
+    UIView *window=[UIView new];cell.window=window;
+    for (NSUInteger kind=0;kind<3;kind++) for (NSUInteger outgoing=0;outgoing<2;outgoing++) for (NSUInteger dark=0;dark<2;dark++) {
+        TextMessageViewModel *themed=kind==2 ? [VoiceMessageViewModel new] : [TextMessageViewModel new];
+        themed.messageWrap=[BubbleWrap new];themed.bgBubbleInfo=[BubbleInfo new];themed.isSender=outgoing;
+        themed.messageWrap.m_uiMessageType=kind==2 ? 34 : (kind==1 ? 49 : 1);themed.messageWrap.m_uiAppMsgInnerType=kind==1 ? 57 : 0;
+        CSBubbleStyleDetach(cell);cell.viewModel=themed;cell.background.image=baseline;cell.background.highlightedImage=nativeHighlight;
+        cell.isUseLightStyle=dark; // Private flag deliberately contradicts UIKit in both themes.
+        cell.traitCollection.userInterfaceStyle=dark ? UIUserInterfaceStyleDark : UIUserInterfaceStyleLight;
+        window.traitCollection.userInterfaceStyle=dark ? UIUserInterfaceStyleLight : UIUserInterfaceStyleDark;
+        CSBubbleStyleApply(cell);
+        CHECK(HasColor(cell.background->m_image,SchemeColor(outgoing,dark),NO));
+        CHECK(HasColor(cell.background->m_highlightedImage,SchemeColor(outgoing,dark),YES));
+        id generated=cell.background->m_image;NSUInteger count=cell.background.assignments;
+        cell.isUseLightStyle=!cell.isUseLightStyle;CSBubbleStyleApply(cell);
+        CHECK(cell.background->m_image==generated && cell.background.assignments==count);
+        cell.background.image=baseline;Drain();CHECK(cell.background->m_image==generated);
+        cell.traitCollection.userInterfaceStyle=dark ? UIUserInterfaceStyleLight : UIUserInterfaceStyleDark;
+        CSBubbleStyleNativeChanged(cell);
+        CHECK(HasColor(cell.background->m_image,SchemeColor(outgoing,!dark),NO));
+    }
+    // Unspecified view appearance falls back to its own window, then the current traits.
+    cell.viewModel.isSender=YES;CSBubbleStyleNativeChanged(cell);
+    cell.traitCollection.userInterfaceStyle=UIUserInterfaceStyleUnspecified;
+    for (NSUInteger dark=0;dark<2;dark++) {
+        window.traitCollection.userInterfaceStyle=dark ? UIUserInterfaceStyleDark : UIUserInterfaceStyleLight;
+        CSBubbleStyleApply(cell);CHECK(HasColor(cell.background->m_image,SchemeColor(YES,dark),NO));
+        window.traitCollection.userInterfaceStyle=UIUserInterfaceStyleUnspecified;
+        UITraitCollection.currentTraitCollection.userInterfaceStyle=dark ? UIUserInterfaceStyleDark : UIUserInterfaceStyleLight;
+        CSBubbleStyleApply(cell);CHECK(HasColor(cell.background->m_image,SchemeColor(YES,dark),NO));
+    }
+    cell.window=nil;UITraitCollection.currentTraitCollection.userInterfaceStyle=UIUserInterfaceStyleUnspecified;
+    CSBubbleStyleApply(cell);CHECK(HasColor(cell.background->m_image,SchemeColor(YES,NO),NO));
+    // Editing dark colors while light must not change the selected palette; light edits take effect.
+    cell.traitCollection.userInterfaceStyle=UIUserInterfaceStyleLight;
+    palettes[@"com.wechat.enhance.bubble_style.sender_dark_color.red"]=@0.7;
+    [NSUserDefaults.standardUserDefaults setVolatileDomain:palettes forName:NSArgumentDomain];
+    [NSNotificationCenter.defaultCenter postNotificationName:NSUserDefaultsDidChangeNotification object:nil];Drain();
+    CHECK(HasColor(cell.background->m_image,SchemeColor(YES,NO),NO));
+    palettes[@"com.wechat.enhance.bubble_style.sender_light_color.red"]=@0.4;
+    [NSUserDefaults.standardUserDefaults setVolatileDomain:palettes forName:NSArgumentDomain];
+    [NSNotificationCenter.defaultCenter postNotificationName:NSUserDefaultsDidChangeNotification object:nil];Drain();
+    CHECK(HasColor(cell.background->m_image,(CSBubbleRGBA){.4,0,0,1},NO));
+    cell.traitCollection.userInterfaceStyle=UIUserInterfaceStyleDark;CSBubbleStyleNativeChanged(cell);
+    CHECK(HasColor(cell.background->m_image,(CSBubbleRGBA){.7,0,1,1},NO));
+    CSBubbleStyleDetach(cell);CHECK(cell.background->m_image==baseline && cell.background->m_highlightedImage==nativeHighlight);
+    // Payment cards stay native even when valid structured payment metadata is present.
     WCPayTransferMessageViewModel *pay=[WCPayTransferMessageViewModel new]; pay.messageWrap=[BubbleWrap new]; pay.messageWrap.m_uiMessageType=49; pay.bgBubbleInfo=[BubbleInfo new];
     cell.viewModel=pay; cell.background.image=baseline; CSBubbleStyleApply(cell); CHECK(cell.background->m_image==baseline);
-    Payment *info=[Payment new]; info.m_nsTransferID=@"verified-structured-field"; pay.messageWrap.m_oWCPayInfoItem=info; CSBubbleStyleNativeChanged(cell); CHECK(cell.background->m_image!=baseline);
+    Payment *info=[Payment new]; info.m_nsTransferID=@"verified-structured-field"; pay.messageWrap.m_oWCPayInfoItem=info; CSBubbleStyleNativeChanged(cell); CHECK(cell.background->m_image==baseline);
+    WCPayC2CMessageViewModel *redPacket=[WCPayC2CMessageViewModel new];redPacket.messageWrap=[BubbleWrap new];
+    redPacket.messageWrap.m_uiMessageType=49;redPacket.bgBubbleInfo=[BubbleInfo new];
+    info.m_c2cNativeUrl=@"wxpay://c2cbizmessagehandler/hongbao/receivehongbao";
+    redPacket.messageWrap.m_oWCPayInfoItem=info;cell.viewModel=redPacket;CSBubbleStyleApply(cell);
+    CHECK(cell.background->m_image==baseline && cell.background->m_highlightedImage==nativeHighlight);
+    for (NSUInteger i=0;i<2;i++) {
+        cell.traitCollection.userInterfaceStyle=i ? UIUserInterfaceStyleDark : UIUserInterfaceStyleLight;
+        CSBubbleStyleNativeChanged(cell);CHECK(cell.background->m_image==baseline);
+    }
     // Unbound image views are untouched by the narrow YY assignment hook.
     YYAsyncImageView *other=[YYAsyncImageView new]; other.image=baseline; Drain(); CHECK(other->m_image==baseline);
     // Native removal clears the owned state instead of reviving a stale image.
