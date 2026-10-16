@@ -72,7 +72,7 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @property(nonatomic,strong) NSArray *tabs;
 @end
 @implementation CSGroupPreferences @end
-static char AdapterKey;
+static char AdapterKey, PresentationSuspendedKey;
 static BOOL enabled=YES;
 static NSString *account=@"test-account";
 static NSHashTable *Adapters(void) {
@@ -89,6 +89,7 @@ static long long CSGroupReadInteger(id object,NSString *name,long long fallback)
 static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table; body(); }
 
 @interface CSGroupListAdapter : NSObject
+@property(nonatomic) BOOL presentationSuspended;
 @property(nonatomic,weak) UITableView *table;
 @property(nonatomic,weak) HostController *controller;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
@@ -118,6 +119,7 @@ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table
 - (void)selectIndex:(NSInteger)index;
 @end
 @implementation CSGroupListAdapter
+- (void)finishSuspendedBatches {}
 #include "GroupViewportBodies.h"
 - (BOOL)isActive { return self.active; }
 - (void)refreshNavigationTitle {}

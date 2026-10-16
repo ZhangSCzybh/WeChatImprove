@@ -162,6 +162,8 @@ static NSHashTable *Adapters(void) {
     static NSHashTable *adapters; if (!adapters) adapters=[NSHashTable weakObjectsHashTable]; return adapters;
 }
 @interface CSGroupListAdapter : NSObject
+@property(nonatomic) BOOL presentationSuspended;
+@property(nonatomic,strong) NSArray *nativeActions;
 @property(nonatomic,strong) UITableView *table;
 @property(nonatomic,strong) Host *controller;
 @property(nonatomic,strong) CSGroupRow *swipeRow;
@@ -201,6 +203,7 @@ static NSHashTable *Adapters(void) {
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:(UITouch *)touch;
 @end
 @implementation CSGroupListAdapter
+- (void)finishSuspendedBatches {}
 #include "GroupInteractionBodies.h"
 - (BOOL)isActive { return self.active; }
 - (NSIndexPath *)currentPathForRow:(CSGroupRow *)row { return CSGroupResolveNativeRowPath(self.controller,row,YES); }

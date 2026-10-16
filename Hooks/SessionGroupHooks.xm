@@ -50,13 +50,23 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 - (void)viewDidLoad { %orig; [CSGroupListAdapter attachToController:self]; }
 - (void)initView { %orig; [CSGroupListAdapter attachToController:self]; }
 - (void)viewWillAppear:(BOOL)animated {
+    [CSGroupListAdapter setPresentationSuspended:NO forController:self];
     Native(self,NO,^{ %orig; });
     [CSGroupListAdapter attachToController:self];
 }
 - (void)viewDidAppear:(BOOL)animated {
+    [CSGroupListAdapter setPresentationSuspended:NO forController:self];
     Native(self,NO,^{ %orig; });
     [CSGroupListAdapter attachToController:self];
     [Adapter(self) returnToGroupTop];
+}
+- (void)viewWillDisappear:(BOOL)animated {
+    [CSGroupListAdapter setPresentationSuspended:YES forController:self];
+    Native(self,NO,^{ %orig; });
+}
+- (void)viewDidDisappear:(BOOL)animated {
+    [CSGroupListAdapter setPresentationSuspended:YES forController:self];
+    Native(self,NO,^{ %orig; });
 }
 - (void)viewDidLayoutSubviews { Native(self,NO,^{ %orig; }); [CSGroupListAdapter layoutForController:self]; }
 - (void)initTableHeaderView { Native(self,NO,^{ %orig; }); [CSGroupListAdapter layoutForController:self]; }
@@ -279,6 +289,7 @@ static void InstallMenuTouchGate(void) {
 }
 - (void)reloadData {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
+    if (!a) { %orig; return; } // Chat and other tables need no grouping index scope.
     if (Projected(a)) { [a requestRefresh]; return; }
     CSGroupWithDisplayIndices(self, ^{ %orig; });
 }

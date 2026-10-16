@@ -10,6 +10,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable instancetype)adapterForTable:(id)table;
 + (nullable instancetype)adapterForController:(id)controller;
 + (void)attachToController:(id)controller;
+/// Suspend derived UI work while the native main-frame owner is offscreen.
++ (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller;
 + (void)layoutForController:(id)controller;
 + (void)settingsChanged;
 + (nullable NSString *)groupTitleForTitleView:(id)titleView;
