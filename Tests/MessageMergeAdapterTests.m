@@ -133,15 +133,17 @@ int main(void) { @autoreleasepool {
     expected.dateFormat=@"yyyy\nss";
     CHECK([CSMessageTimeText(1700000000,timeDefaults) isEqual:[expected stringFromDate:[NSDate dateWithTimeIntervalSince1970:1700000000]]]);
     CHECK(!CSMessageTimeText(0,timeDefaults));
+    UIView *timeContainer=[UIView new];
     UIView *timeLabel=[UIView new], *head=[UIView new], *bubble=[UIView new];
     timeLabel.hidden=YES;timeLabel.bounds=CGRectMake(0,0,40,20);
     head.frame=CGRectMake(10,10,30,30);bubble.frame=CGRectMake(50,15,100,60);
-    CSMessageTimePositionLabel(timeLabel,head,bubble,NO,YES);
+    head.bounds=CGRectMake(0,0,30,30);bubble.bounds=CGRectMake(0,0,100,60);
+    CSMessageTimePositionLabel(timeLabel,timeContainer,head,bubble,NO,YES);
     CHECK(CGPointEqualToPoint(timeLabel.center,CGPointMake(25,43)));
     CHECK(timeLabel.hidden); // Layout must not change tap visibility.
-    head.hidden=YES;CSMessageTimePositionLabel(timeLabel,head,bubble,NO,YES);
+    head.hidden=YES;CSMessageTimePositionLabel(timeLabel,timeContainer,head,bubble,NO,YES);
     CHECK(CGPointEqualToPoint(timeLabel.center,CGPointMake(171,65)));
-    timeLabel.hidden=NO;CSMessageTimePositionLabel(timeLabel,head,bubble,YES,YES);
+    timeLabel.hidden=NO;CSMessageTimePositionLabel(timeLabel,timeContainer,head,bubble,YES,YES);
     CHECK(CGPointEqualToPoint(timeLabel.center,CGPointMake(29,65)));
     CHECK(CSMessageTimeCanToggle(YES,YES,@"12:34"));
     CHECK(!CSMessageTimeCanToggle(NO,YES,@"12:34"));
@@ -675,15 +677,7 @@ int main(void) { @autoreleasepool {
                 a->m_chatRoomNameLabel.bounds=CGRectMake(0,0,150,20);
                 a->m_chatRoomNameLabel.frame=CGRectMake(50,8,150,20);
                 a.content.frame=CGRectMake(50,28,200,38);
-                NSMutableDictionary *prefs=[[NSUserDefaults.standardUserDefaults volatileDomainForName:NSArgumentDomain] mutableCopy];
-                prefs[CSChatDiagnosticsEnabledKey]=@YES;
-                [NSUserDefaults.standardUserDefaults setVolatileDomain:prefs forName:NSArgumentDomain];
                 CSMessageMergeRender(a);
-                NSString *report=CSChatDiagnosticReport();
-                CHECK([report containsString:@"geometry-fallback planned=57.00 top=8.00 bottom=66.00"]);
-                CHECK([report containsString:@"geometry-part role=0x1 top=8.00 bottom=52.00"]);
-                CHECK([report containsString:@"geometry-part role=0x2 top=8.00 bottom=28.00"]);
-                CHECK([report containsString:@"geometry-part role=0x10 top=28.00 bottom=66.00"]);
                 CHECK(CSMessageMergeRowHeight(page,t,paths[0],firstNative)==firstNative);
                 CHECK(CSMessageMergeRowHeight(page,t,paths[0],firstNative)==firstNative);
                 CHECK(CSMessageMergeRowHeight(page,t,paths[1],55)==expectedSecond);
@@ -694,9 +688,9 @@ int main(void) { @autoreleasepool {
             CSMessageMergeDeactivate(page);
         }
     }
-    // Diagnostic capture is opt-in, bounded, and exposes only supplied numeric layout metrics.
+    // Shared revoke diagnostics remain opt-in and bounded.
     [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSChatDiagnosticsEnabledKey:@NO} forName:NSArgumentDomain];
-    NSString *before=CSChatDiagnosticReport();CSChatRecordMergeMeasurement(60,200,30,-25,0);CSChatRecordMergePart(2,0,14);
+    NSString *before=CSChatDiagnosticReport();CSChatRecordEvent(@"test",@"disabled-event");
     CHECK([before isEqual:CSChatDiagnosticReport()]);
     // Clearing removes the shared buffer even when recording is off; it never toggles recording.
     CSChatClearDiagnostics();
@@ -711,14 +705,10 @@ int main(void) { @autoreleasepool {
     CSChatClearDiagnostics(); CSChatClearDiagnostics();
     CHECK([CSChatDiagnosticReport() hasPrefix:@"暂无记录"]);
     [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSChatDiagnosticsEnabledKey:@YES} forName:NSArgumentDomain];
-    CSChatRecordMergeMeasurement(60,200,30,-25,0x800);CSChatRecordMergeGeometry(35,5,37);CSChatRecordMergePart(2,0,14);
-    CHECK([CSChatDiagnosticReport() containsString:@"geometry-part role=0x2 top=0.00 bottom=14.00"]);
-    CHECK([CSChatDiagnosticReport() containsString:@"row=60.00 content=200.00x30.00 delta=-25.00 blockers=0x800"]);
-    CHECK([CSChatDiagnosticReport() containsString:@"geometry-fallback planned=35.00 top=5.00 bottom=37.00"]);
     for (NSUInteger i=0;i<200;i++) CSChatRecordEvent(@"test",@"bounded-event");
     CHECK([CSChatDiagnosticReport() componentsSeparatedByString:@"\n"].count==128);
     [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSChatDiagnosticsEnabledKey:@NO} forName:NSArgumentDomain];
-    before=CSChatDiagnosticReport();CSChatRecordMergeGeometry(35,5,37);
+    before=CSChatDiagnosticReport();CSChatRecordEvent(@"test",@"disabled-event");
     CHECK([before isEqual:CSChatDiagnosticReport()]);
     printf("PASS: %u native adapter/navigation lifecycle checks (UIKit double)\n",checks);
 } return 0; }

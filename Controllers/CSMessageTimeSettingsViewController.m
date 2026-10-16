@@ -850,7 +850,6 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
     NSError *error = nil;
     NSData *colorData = [NSKeyedArchiver archivedDataWithRootObject:selectedColor requiringSecureCoding:NO error:&error];
     if (error) {
-        NSLog(@"颜色归档失败: %@", error);
         return;
     }
     

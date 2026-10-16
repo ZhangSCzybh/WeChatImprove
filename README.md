@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.6-21`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.6-24`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.6-21`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.6-24`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.6-21` 完成 Rootless 测试包构建；Rootful 保留构建入口，本轮未重新验证 |
+| Rootless / Rootful | `1.6-24` 完成 Rootless 测试包构建；Rootful 保留构建入口，本轮未重新验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -139,20 +139,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-21
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-24
 ```
 
-默认产物：`packages/com.wechat.improve_1.6-21_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.6-24_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.6-21` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.6-24` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-21
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-24
 ```
 
-默认产物：`packages/com.wechat.improve_1.6-21_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.6-24_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -172,7 +172,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.6-21_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.6-24_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
@@ -216,6 +216,12 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 实现细节见 [会话分组说明](docs/session-groups.md)、[列表圆角优化](docs/list-corners.md)；设计背景见 [分组重构方案](docs/session-groups-refactor-proposal.md)。
 
 ### 验证状态
+
+`1.6-24` 清理消息合并、气泡样式和消息时间的运行时调试日志、诊断专用状态和几何记录接口，保留布局保护与防撤回通用诊断。详见 [清理记录](docs/chat-debug-cleanup-1.6-24.md)。
+
+`1.6-23` 修复气泡嵌套容器坐标未转换导致时间叠进正文的问题；头像下方模式保留原位置规则，增加嵌套容器与合并整行偏移回归。详见 [消息时间位置修复](docs/message-time-1.6-23.md)。
+
+`1.6-22` 修复消息时间的标签创建/布局刷新、文字子模型收发方向读取及点击区域判断；支持原生 double createTime 回退，样式与尺寸按文本/配置变化缓存。新增直接执行生产时间 Hook 的 125 项主机生命周期断言，消息合并策略 53,201 项及适配/导航/时间 2,892 项断言通过。以 1.6-21 为基础保留分组修复，设备实际显示待复核。详见 [消息时间显示修复](docs/message-time-1.6-22.md)。
 
 `1.6-21` 在聊天分组设置中新增默认开启的“分组指示器切换动画”开关，关闭后直接落位。移除“滑动特效”开关及会话行淡入、位移动画实现。分组切换手势和滑动灵敏度继续独立生效。详见 [分组动画开关与特效清理](docs/session-groups-animation-settings-1.6-21.md)。
 

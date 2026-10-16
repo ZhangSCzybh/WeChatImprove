@@ -25,46 +25,12 @@ static CGFloat const kDefaultCornerRadius = 2.0f;
 static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
 
 // 类声明
-@interface CMessageWrap : NSObject
-@property(nonatomic) unsigned int m_uiCreateTime; // 消息创建时间
-@property(nonatomic) unsigned int m_uiMessageType; // 消息类型
-@property(readonly, nonatomic) BOOL IsImgMsg;      // 是否是图片消息
-@property(readonly, nonatomic) BOOL IsVideoMsg;    // 是否是视频消息
-@property(readonly, nonatomic) BOOL IsVoiceMsg;    // 是否是语音消息
-@property(readonly, nonatomic) BOOL IsTextMsg;     // 是否是文本消息
-@property(readonly, nonatomic) NSString *m_nsContent; // 消息内容
-@property(readonly, nonatomic) unsigned int m_uiMesLocalID; // 消息本地ID，用于唯一标识消息
-@end
-
-@interface CommonMessageViewModel : NSObject
-@property(readonly, nonatomic) BOOL isSender; // 是否是发送者
-@property(retain, nonatomic) CMessageWrap *messageWrap; // 消息包装对象
-@property(nonatomic) unsigned int createTime; // 消息创建时间
-@end
-
-@interface TextMessageSubViewModel : CommonMessageViewModel
-@property(readonly, nonatomic) CommonMessageViewModel *parentModel; // 对于长文本消息，父模型
-@property(readonly, nonatomic) NSArray *subViewModels; // 子视图模型列表
-@end
-
 @interface CommonMessageCellView : UIView <UIGestureRecognizerDelegate>
-@property(readonly, nonatomic) CommonMessageViewModel *viewModel; // 消息视图模型
+@property(readonly, nonatomic) id viewModel; // 消息视图模型
 @property(nonatomic, readonly) UIView *m_contentView; // 内容视图
 - (UIView *)getBgImageView; // 获取背景图片视图
 - (void)updateNodeStatus; // 更新节点状态
 - (void)cs_messageTimeLayout;
-@end
-
-@interface VoiceMessageCellView : CommonMessageCellView
-@property(nonatomic, readonly) UILabel *m_secLabel; // 语音消息秒数标签
-@end
-
-@interface BaseMsgContentViewController : UIViewController
-@property(nonatomic, readonly) UITableView *tableView; // 消息表格视图
-@end
-
-@interface ChatTableViewCell : UITableViewCell
-- (CommonMessageCellView *)cellView; // 获取消息Cell视图
 @end
 
 // 存储消息时间的关联对象key
@@ -80,7 +46,7 @@ static BOOL messageTimeEnabled;
 static NSUInteger timeSettingsVersion;
 static NSDictionary *timeSettingsSnapshot;
 static NSHashTable *timeCells;
-static char kTimeBindingKey;
+static char kTimeBindingKey, kTimeLabelVersionKey;
 @interface CSMessageTimeBinding : NSObject
 @property(nonatomic) unsigned int timestamp;
 @property(nonatomic) NSUInteger version;
@@ -128,9 +94,6 @@ static UIColor *getTextColorFromDefaults() {
         if (savedColor && !error) {
             return savedColor;
         }
-        if (error) {
-            NSLog(@"解档消息时间文字颜色时出错: %@", error);
-        }
     }
     // 返回默认颜色
     return [UIColor colorWithWhite:0.5 alpha:0.8];
@@ -146,11 +109,8 @@ static UIColor *getBackgroundColorFromDefaults() {
         if (savedColor && !error) {
             return savedColor;
         }
-        if (error) {
-            NSLog(@"解档消息时间背景颜色时出错: %@", error);
-        }
     }
-    
+
     // 默认为透明
     return [UIColor clearColor];
 }
@@ -164,15 +124,9 @@ static void assignMessageTime(CommonMessageCellView *view) {
         objc_setAssociatedObject(model,&kTimeBindingKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         return;
     }
-    id parent = CSMessageNativeObject(model,@"parentModel");
     unsigned int timestamp = 0;
     if (!CSMessageTimeReadTimestamp(model,&timestamp)) { setMessageTime(model,nil); return; }
-    BOOL show = YES;
-    if (parent) {
-        NSArray *parts = CSMessageNativeObject(parent,@"subViewModels");
-        if ([parts isKindOfClass:NSArray.class] && parts.count)
-            show = (timeBelowAvatar ? parts.firstObject : parts.lastObject) == model;
-    }
+    BOOL show = CSMessageTimeShowsModel(model,timeBelowAvatar);
     CSMessageTimeBinding *binding = objc_getAssociatedObject(model,&kTimeBindingKey);
     if (binding && binding.version == timeSettingsVersion && binding.timestamp == timestamp && binding.show == show && getMessageTime(model)) return;
     setMessageTime(model,show ? CSMessageTimeText(timestamp,NSUserDefaults.standardUserDefaults) : @"-1");
@@ -185,6 +139,125 @@ static BOOL isMessageTimeEnabled() {
     return messageTimeEnabled;
 }
 
+static UILabel *ensureTimeView(CommonMessageCellView *view) {
+    UILabel *label=(UILabel *)getTimeView(view);
+    if (label) return label;
+    label=[UILabel new];label.numberOfLines=0;label.adjustsFontSizeToFitWidth=NO;
+    label.clipsToBounds=YES;label.textAlignment=NSTextAlignmentCenter;label.hidden=YES;
+    setTimeView(view,label);setTimeViewVisible(view,NO);
+    UITapGestureRecognizer *tap=[[UITapGestureRecognizer alloc] initWithTarget:view action:NSSelectorFromString(@"handleMessageTap:")];
+    tap.numberOfTapsRequired=1;tap.delegate=view;
+    tap.delaysTouchesBegan=NO;tap.delaysTouchesEnded=NO;tap.cancelsTouchesInView=NO;
+    [view addGestureRecognizer:tap];view.userInteractionEnabled=YES;
+    return label;
+}
+static void refreshMessageTimeView(CommonMessageCellView *self) {
+    if (!NSThread.isMainThread) return;
+    [timeCells addObject:self];
+    assignMessageTime(self);
+
+    // 如果功能未启用，直接返回
+    if (!isMessageTimeEnabled()) {
+        UIView *timeView = getTimeView(self);
+        if (timeView) {
+            timeView.hidden = YES;
+        }
+        return;
+    }
+
+    // 获取视图模型
+    id viewModel = CSMessageNativeObject(self,@"viewModel");
+    BOOL sender=NO;
+    if (!CSMessageTimeReadSender(viewModel,&sender)) {
+        getTimeView(self).hidden=YES;
+        return;
+    }
+
+    // 获取时间文本
+    NSString *messageTime = getMessageTime(viewModel);
+    if (messageTime.length > 0) {
+        // 如果标记为不显示，则隐藏
+        if ([messageTime isEqualToString:@"-1"]) {
+            getTimeView(self).hidden = YES;
+            return;
+        }
+
+        // 获取时间标签并更新设置
+        UILabel *timeLabel = ensureTimeView(self);
+        BOOL changed=[objc_getAssociatedObject(self,&kTimeLabelVersionKey) unsignedIntegerValue]!=timeSettingsVersion ||
+            ![timeLabel.text isEqual:messageTime];
+
+        // 更新时间标签的样式，以防设置有变化
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+        if (changed) {
+            // 更新字体大小和加粗
+            CGFloat fontSize = [defaults floatForKey:kMessageTimeFontSizeKey];
+            if (fontSize == 0) fontSize = kDefaultFontSize;
+
+            // 根据设置决定是否使用粗体字
+            BOOL useBoldFont = [defaults boolForKey:kMessageTimeBoldFontKey];
+            if (useBoldFont) {
+                timeLabel.font = [UIFont boldSystemFontOfSize:fontSize];
+            } else {
+                timeLabel.font = [UIFont systemFontOfSize:fontSize];
+            }
+
+            // 更新颜色
+            timeLabel.textColor = getTextColorFromDefaults();
+            timeLabel.backgroundColor = getBackgroundColorFromDefaults();
+
+            // 更新圆角
+            CGFloat cornerRadius = [defaults floatForKey:kMessageTimeCornerRadiusKey];
+            if (cornerRadius == 0) cornerRadius = kDefaultCornerRadius;
+            timeLabel.layer.cornerRadius = cornerRadius;
+
+            timeLabel.text = messageTime;
+
+            // 计算标签大小，限制最大宽度
+            CGFloat padding = 10.0; // 左右各5点的内边距
+            CGSize constraintSize = CGSizeMake(kMaxLabelWidth - padding, CGFLOAT_MAX);
+            CGSize textSize = [messageTime boundingRectWithSize:constraintSize
+                                                   options:NSStringDrawingUsesLineFragmentOrigin
+                                                attributes:@{NSFontAttributeName: timeLabel.font}
+                                                   context:nil].size;
+
+            // 确保有足够的空间包含文本
+            CGFloat labelWidth = textSize.width + padding;
+            if (labelWidth > kMaxLabelWidth) labelWidth = kMaxLabelWidth;
+            if (labelWidth < 30) labelWidth = 30; // 最小宽度
+
+            CGFloat labelHeight = textSize.height + 8.0; // 上下各4点的内边距
+            timeLabel.frame = CGRectMake(0, 0, labelWidth, labelHeight);
+            objc_setAssociatedObject(self,&kTimeLabelVersionKey,@(timeSettingsVersion),OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        // 检查是否启用了"点击显示"功能
+        BOOL tapToShow = [defaults boolForKey:kMessageTimeTapToShowKey];
+
+        // 根据"点击显示"开关决定是否显示时间标签
+        if (tapToShow) {
+            // 点击显示模式：根据点击状态决定是否显示
+            timeLabel.hidden = !getTimeViewVisible(self);
+        } else {
+            // 默认模式：直接显示
+            timeLabel.hidden = NO;
+        }
+
+
+        [self cs_messageTimeLayout];
+
+        // 添加到视图上
+        if (![timeLabel isDescendantOfView:self]) {
+            [self addSubview:timeLabel];
+        }
+
+        [self bringSubviewToFront:timeLabel];
+    } else {
+        // 没有时间信息，隐藏标签
+        getTimeView(self).hidden = YES;
+    }
+}
+
 // Hook CommonMessageCellView类，这是消息气泡的基类
 %hook CommonMessageCellView
 - (void)setViewModel:(id)model {
@@ -194,8 +267,7 @@ static BOOL isMessageTimeEnabled() {
         if (getCurrentVisibleCellView() == self) setCurrentVisibleCellView(nil);
     }
     %orig;
-    assignMessageTime(self);
-    if (getTimeView(self)) [self updateNodeStatus];
+    refreshMessageTimeView(self);
 }
 
 %new
@@ -203,70 +275,16 @@ static BOOL isMessageTimeEnabled() {
     UILabel *label = (UILabel *)getTimeView(self);
     if (!label) return;
     UIView *head = CSMessageNativeObject(self,@"getHeadImageView");
-    UIView *content = CSMessageNativeObject(self,@"getContentView") ?: CSMessageNativeObject(self,@"getBgImageView");
+    UIView *content = CSMessageTimeAnchor(self);
     id model = CSMessageNativeObject(self,@"viewModel");
-    BOOL sender = [model respondsToSelector:@selector(isSender)] && [model isSender];
-    CSMessageTimePositionLabel(label,head,content,sender,timeBelowAvatar);
+    BOOL sender=NO;
+    if (!CSMessageTimeReadSender(model,&sender)) return;
+    CSMessageTimePositionLabel(label,self,head,content,sender,timeBelowAvatar);
 }
 
-
-- (id)initWithViewModel:(id)arg1 {
-    id view = %orig;
-    if (view) {
-        // 从UserDefaults获取字体大小设置
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        CGFloat fontSize = [defaults floatForKey:kMessageTimeFontSizeKey];
-        if (fontSize == 0) fontSize = kDefaultFontSize;
-        
-        // 创建时间标签，但不立即添加到视图
-        UILabel *timeLabel = [[UILabel alloc] init];
-        
-        // 根据设置决定是否使用粗体字
-        BOOL useBoldFont = [defaults boolForKey:kMessageTimeBoldFontKey];
-        if (useBoldFont) {
-            timeLabel.font = [UIFont boldSystemFontOfSize:fontSize];
-        } else {
-            timeLabel.font = [UIFont systemFontOfSize:fontSize];
-        }
-        
-        timeLabel.textColor = getTextColorFromDefaults();
-        timeLabel.backgroundColor = getBackgroundColorFromDefaults();
-        
-        // 设置圆角
-        CGFloat cornerRadius = [defaults floatForKey:kMessageTimeCornerRadiusKey];
-        if (cornerRadius == 0) cornerRadius = kDefaultCornerRadius;
-        timeLabel.layer.cornerRadius = cornerRadius;
-        
-        // 支持换行和文字自动调整大小
-        timeLabel.numberOfLines = 0; // 允许多行
-        timeLabel.adjustsFontSizeToFitWidth = NO; // 不缩小字体，保持清晰度
-        timeLabel.clipsToBounds = YES;
-        timeLabel.textAlignment = NSTextAlignmentCenter; // 居中对齐
-        
-        // 计算标签的初始大小 - 真实大小将在updateNodeStatus中更新
-        CGSize labelSize = CGSizeMake(40, 30); // 一个初始值，实际会在设置文本时调整
-        timeLabel.frame = CGRectMake(0, 0, labelSize.width, labelSize.height);
-        
-        // 关联时间标签到视图
-        setTimeView(self, timeLabel);
-        
-        // 初始化可见状态为NO
-        setTimeViewVisible(self, NO);
-        
-        // 添加点击手势识别器
-        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleMessageTap:)];
-        tapGesture.numberOfTapsRequired = 1;
-        tapGesture.delegate = self;
-        // 设置手势延迟触发，让其他手势优先
-        tapGesture.delaysTouchesBegan = NO;
-        tapGesture.delaysTouchesEnded = NO;
-        tapGesture.cancelsTouchesInView = NO;
-        [self addGestureRecognizer:tapGesture];
-        self.userInteractionEnabled = YES;
-    }
-    if (view) [timeCells addObject:view];
-    assignMessageTime(view);
-    if (view) [view updateNodeStatus];
+- (id)initWithViewModel:(id)model {
+    id view=%orig;
+    if (view) refreshMessageTimeView(view);
     return view;
 }
 
@@ -278,11 +296,8 @@ static BOOL isMessageTimeEnabled() {
 
 %new
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    // 让我们的手势在其他手势失败后才触发
-    // 如果其他手势是点击手势，我们的手势需要等待它失败
-    if ([otherGestureRecognizer isKindOfClass:[UITapGestureRecognizer class]]) {
-        return YES;
-    }
+    // Bubble hit testing below excludes native message actions; do not wait on every
+    // native tap recognizer, which can permanently prevent our outside-bubble tap.
     return NO;
 }
 
@@ -294,35 +309,26 @@ static BOOL isMessageTimeEnabled() {
     if (!CSMessageTimeCanToggle(messageTimeEnabled,tapToShow,getMessageTime(model))) {
         return;
     }
-    
+
     // 获取点击位置
     CGPoint tapLocation = [gesture locationInView:self];
-    
-    // 获取气泡背景视图
-    UIView *bgView = [self getBgImageView];
-    UIView *contentView = CSMessageNativeObject(self,@"getContentView");
-    
-    // 判断点击是否在气泡内
-    BOOL tappedInBubble = NO;
-    if (bgView && CGRectContainsPoint(bgView.frame, tapLocation)) {
-        tappedInBubble = YES;
-    } else if (contentView && CGRectContainsPoint(contentView.frame, tapLocation)) {
-        tappedInBubble = YES;
-    }
-    
+
+    UIView *anchor=CSMessageTimeAnchor(self);
+    BOOL tappedInBubble=anchor && CGRectContainsPoint([self convertRect:anchor.bounds fromView:anchor],tapLocation);
+
     // 如果点击在气泡内，不处理，让原有事件触发
     if (tappedInBubble) {
         return;
     }
-    
+
     // 点击在气泡外，处理时间显示逻辑
     // 获取当前时间标签
     UILabel *timeLabel = (UILabel *)getTimeView(self);
     if (!timeLabel) return;
-    
+
     // 获取当前显示时间的视图
     id currentVisibleCellView = getCurrentVisibleCellView();
-    
+
     // 如果当前已经有显示时间的视图，先隐藏它
     if (currentVisibleCellView && currentVisibleCellView != self) {
         // 隐藏之前显示的时间标签
@@ -333,16 +339,16 @@ static BOOL isMessageTimeEnabled() {
         // 更新之前视图的可见状态
         setTimeViewVisible(currentVisibleCellView, NO);
     }
-    
+
     // 切换当前时间标签的可见状态
     BOOL currentVisible = getTimeViewVisible(self);
     setTimeViewVisible(self, !currentVisible);
-    
+
     // 更新显示状态
     timeLabel.hidden = !getTimeViewVisible(self);
     if (!timeLabel.hidden) [self cs_messageTimeLayout];
     [self setNeedsLayout];
-    
+
     // 更新全局引用
     if (!timeLabel.hidden) {
         setCurrentVisibleCellView(self);
@@ -353,115 +359,29 @@ static BOOL isMessageTimeEnabled() {
 
 - (void)updateNodeStatus {
     %orig;
-    if (!NSThread.isMainThread) return;
-    assignMessageTime(self);
-    
-    // 如果功能未启用，直接返回
-    if (!isMessageTimeEnabled()) {
-        UIView *timeView = getTimeView(self);
-        if (timeView) {
-            timeView.hidden = YES;
-        }
-        return;
-    }
-    
-    // 获取视图模型
-    id viewModel = CSMessageNativeObject(self,@"viewModel");
-    if (![viewModel respondsToSelector:@selector(isSender)]) {
-        return;
-    }
-    
-    // 获取时间文本
-    NSString *messageTime = getMessageTime(viewModel);
-    if (messageTime.length > 0) {
-        // 如果标记为不显示，则隐藏
-        if ([messageTime isEqualToString:@"-1"]) {
-            getTimeView(self).hidden = YES;
-            return;
-        }
-        
-        // 获取时间标签并更新设置
-        UILabel *timeLabel = (UILabel *)getTimeView(self);
-        if (!timeLabel) return;
-        
-        // 更新时间标签的样式，以防设置有变化
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        
-        // 更新字体大小和加粗
-        CGFloat fontSize = [defaults floatForKey:kMessageTimeFontSizeKey];
-        if (fontSize == 0) fontSize = kDefaultFontSize;
-        
-        // 根据设置决定是否使用粗体字
-        BOOL useBoldFont = [defaults boolForKey:kMessageTimeBoldFontKey];
-        if (useBoldFont) {
-            timeLabel.font = [UIFont boldSystemFontOfSize:fontSize];
-        } else {
-            timeLabel.font = [UIFont systemFontOfSize:fontSize];
-        }
-        
-        // 更新颜色
-        timeLabel.textColor = getTextColorFromDefaults();
-        timeLabel.backgroundColor = getBackgroundColorFromDefaults();
-        
-        // 更新圆角
-        CGFloat cornerRadius = [defaults floatForKey:kMessageTimeCornerRadiusKey];
-        if (cornerRadius == 0) cornerRadius = kDefaultCornerRadius;
-        timeLabel.layer.cornerRadius = cornerRadius;
-        
-        // 检查是否启用了"点击显示"功能
-        BOOL tapToShow = [defaults boolForKey:kMessageTimeTapToShowKey];
-        
-        // 根据"点击显示"开关决定是否显示时间标签
-        if (tapToShow) {
-            // 点击显示模式：根据点击状态决定是否显示
-            timeLabel.hidden = !getTimeViewVisible(self);
-        } else {
-            // 默认模式：直接显示
-            timeLabel.hidden = NO;
-        }
-        
-        timeLabel.text = messageTime;
-        
-        // 计算标签大小，限制最大宽度
-        CGFloat padding = 10.0; // 左右各5点的内边距
-        CGSize constraintSize = CGSizeMake(kMaxLabelWidth - padding, CGFLOAT_MAX);
-        CGSize textSize = [messageTime boundingRectWithSize:constraintSize
-                                               options:NSStringDrawingUsesLineFragmentOrigin
-                                            attributes:@{NSFontAttributeName: timeLabel.font}
-                                               context:nil].size;
-                                               
-        // 确保有足够的空间包含文本
-        CGFloat labelWidth = textSize.width + padding;
-        if (labelWidth > kMaxLabelWidth) labelWidth = kMaxLabelWidth;
-        if (labelWidth < 30) labelWidth = 30; // 最小宽度
-        
-        CGFloat labelHeight = textSize.height + 8.0; // 上下各4点的内边距
-        timeLabel.frame = CGRectMake(0, 0, labelWidth, labelHeight);
-        
-        [self cs_messageTimeLayout];
-        
-        // 添加到视图上
-        if (![timeLabel isDescendantOfView:self]) {
-            [self addSubview:timeLabel];
-        }
-        
-        [self bringSubviewToFront:timeLabel];
-    } else {
-        // 没有时间信息，隐藏标签
-        getTimeView(self).hidden = YES;
-    }
+    refreshMessageTimeView(self);
+}
+
+- (void)layoutSubviews {
+    %orig;
+    refreshMessageTimeView(self);
+}
+
+- (void)onAppear {
+    %orig;
+    refreshMessageTimeView(self);
 }
 
 - (void)prepareForReuse {
     %orig;
-    
+
     // 重置时间标签的可见状态
     setTimeViewVisible(self, NO);
     UILabel *timeLabel = (UILabel *)getTimeView(self);
     if (timeLabel) {
         timeLabel.hidden = YES;
     }
-    
+
     // 如果当前显示时间的视图是这个视图，清除全局引用
     id currentVisibleCellView = getCurrentVisibleCellView();
     if (currentVisibleCellView == self) {
@@ -470,7 +390,6 @@ static BOOL isMessageTimeEnabled() {
 }
 
 %end
-
 
 static void refreshTimeSettings(BOOL force) {
     NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
@@ -482,7 +401,7 @@ static void refreshTimeSettings(BOOL force) {
     messageTimeEnabled = [defaults boolForKey:kMessageTimeEnabledKey];
     timeBelowAvatar = [defaults boolForKey:kMessageTimeShowBelowAvatarKey];
     for (CommonMessageCellView *cell in timeCells) if (cell.window) {
-        [cell updateNodeStatus]; [cell setNeedsLayout];
+        refreshMessageTimeView(cell); [cell setNeedsLayout];
     }
 }
 %ctor {

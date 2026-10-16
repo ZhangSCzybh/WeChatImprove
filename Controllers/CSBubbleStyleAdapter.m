@@ -1,7 +1,6 @@
 #import "CSBubbleStyleAdapter.h"
 #import "CSBubbleStylePolicy.h"
 #import "CSChatNativeBridge.h"
-#import "CSChatDiagnostics.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 #include <math.h>
@@ -18,7 +17,6 @@ static BOOL CSReloadQueued;
 @property(nonatomic, weak) UIImageView *background;
 @property(nonatomic, strong) CSBubbleImageOwnership *images;
 @property(nonatomic, copy) NSString *key;
-@property(nonatomic, copy) NSString *lastFailure;
 @property(nonatomic) BOOL applying;
 @property(nonatomic) BOOL applyQueued;
 @property(nonatomic) BOOL outgoing;
@@ -76,9 +74,6 @@ static id CSImageForView(UIImageView *view, UIImage *image) {
     @try { return ((id(*)(id,SEL,id))objc_msgSend)(cls,selector,image); }
     @catch (__unused NSException *exception) { return nil; }
 }
-static void CSFailure(CSBubbleBinding *binding, NSString *reason) {
-    if (![binding.lastFailure isEqual:reason]) { binding.lastFailure=reason; CSChatRecordEvent(@"bubble",reason); }
-}
 static void CSRestore(CSBubbleBinding *binding) {
     UIImageView *view=binding.background; if (!view) return;
     binding.applying=YES;
@@ -94,9 +89,9 @@ static void CSDescribe(CSBubbleBinding *binding, id model) {
     id parent=CSMessageNativeObject(model,@"parentModel"); id logical=parent?:model;
     id wrap=CSMessageNativeObject(logical,@"messageWrap");
     unsigned long long type=0,sender=0,position=0;
-    if (!CSUnsigned(logical,@"isSender",&sender) || !CSUnsigned(wrap,@"m_uiMessageType",&type)) { CSFailure(binding,@"missing_message_descriptor"); return; }
+    if (!CSUnsigned(logical,@"isSender",&sender) || !CSUnsigned(wrap,@"m_uiMessageType",&type)) { return; }
     id bubble=CSMessageNativeObject(model,@"bgBubbleInfo");
-    if (!CSUnsigned(bubble,@"position",&position) || position>3) { CSFailure(binding,@"unsupported_segment_shape"); return; }
+    if (!CSUnsigned(bubble,@"position",&position) || position>3) { return; }
     NSString *className=NSStringFromClass([logical class]);
     unsigned long long innerType=0,isRefer=0;
     BOOL textModel=[className isEqual:@"TextMessageViewModel"];
@@ -104,7 +99,7 @@ static void CSDescribe(CSBubbleBinding *binding, id model) {
         ((CSUnsigned(wrap,@"m_uiAppMsgInnerType",&innerType) && innerType==57) ||
          (CSUnsigned(wrap,@"isReferMsgType",&isRefer) && isRefer));
     BOOL ordinary=(textModel && (type==1 || quotedText)) || (type==34 && [className isEqual:@"VoiceMessageViewModel"]);
-    if (!ordinary) { CSFailure(binding,@"unsupported_message_kind"); return; }
+    if (!ordinary) { return; }
     binding.outgoing=sender!=0; binding.position=(NSUInteger)position; binding.supported=YES;
 }
 static BOOL CSDark(UIView *cell) {
@@ -176,13 +171,13 @@ void CSBubbleStyleApply(UIView *cell) {
     UIImage *source=CSDecodedImage(binding.images.nativeImage,dark);
     UIImage *normal=CSTemplate(binding,source,dark,NO);
     id newImage=normal?CSImageForView(bg,normal):nil;
-    if (!newImage) { CSRestore(binding); binding.key=key; CSFailure(binding,@"native_background_not_decoded_or_supported"); return; }
+    if (!newImage) { CSRestore(binding); binding.key=key; return; }
     id newHighlight=nil;
     if (binding.images.nativeHighlightedImage) {
         UIImage *highlightSource=CSDecodedImage(binding.images.nativeHighlightedImage,dark);
         UIImage *highlightImage=CSTemplate(binding,highlightSource,dark,YES);
         newHighlight=highlightImage?CSImageForView(bg,highlightImage):nil;
-        if (!newHighlight) { CSRestore(binding); binding.key=key; CSFailure(binding,@"native_highlight_not_supported"); return; }
+        if (!newHighlight) { CSRestore(binding); binding.key=key; return; }
     }
     binding.images.generatedImage=newImage; binding.images.generatedHighlightedImage=newHighlight;
     binding.applying=YES;
@@ -192,7 +187,6 @@ void CSBubbleStyleApply(UIView *cell) {
     binding.images.generatedImage=CSCurrentImage(bg,NO);
     if (newHighlight) binding.images.generatedHighlightedImage=CSCurrentImage(bg,YES);
     binding.applying=NO; binding.key=key; binding.appliedGeneration=CSStyle.generation; binding.appliedDark=dark;
-    if (![binding.lastFailure isEqual:@"applied"]) { binding.lastFailure=@"applied"; CSChatRecordEvent(@"bubble",@"applied"); }
 }
 void CSBubbleStyleNativeChanged(UIView *cell) {
     if (!NSThread.isMainThread) return;
@@ -229,7 +223,7 @@ static void CSReload(void) {
         CSReloadQueued=NO;
         CSBubbleStyleConfiguration *next=[[CSBubbleStyleConfiguration alloc] initWithDefaults:NSUserDefaults.standardUserDefaults generation:CSStyle.generation+1];
         if ([next.values isEqual:CSStyle.values]) return;
-        CSStyle=next; [CSImages removeAllObjects]; CSChatRecordEvent(@"bubble",@"configuration_changed");
+        CSStyle=next; [CSImages removeAllObjects];
         for (UIView *cell in CSCells.allObjects) CSBubbleStyleApply(cell);
     });
 }

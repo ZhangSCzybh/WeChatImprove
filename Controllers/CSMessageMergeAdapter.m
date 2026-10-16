@@ -1,7 +1,6 @@
 #import "CSMessageMergeAdapter.h"
 #import "CSMessageMergePolicy.h"
 #import "CSMessageNavigation.h"
-#import "CSChatDiagnostics.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 #include <math.h>
@@ -295,7 +294,6 @@ CGSize CSMessageMergeMeasure(id model, CGSize nativeSize) {
     id logical=CSParent(model);
     BOOL hasContent=CSMeasuredContentSize(logical,&contentSize) && contentSize.width<=nativeSize.width+.5 &&
         contentSize.height<=nativeSize.height;
-    CGSize diagnosticContentSize=contentSize;
     if (!hasContent) contentSize=CGSizeZero;
     if (fabs(s.contentWidth-contentSize.width)>.5 || fabs(s.width-nativeSize.width)>.5 || fabs(s.nativeHeight-nativeSize.height)>.5 ||
         fabs(s.contentHeight-contentSize.height)>.5) {
@@ -322,10 +320,6 @@ CGSize CSMessageMergeMeasure(id model, CGSize nativeSize) {
         s.appliedDelta=CSMessageMergePlannedDelta(config.spacingMode,nativeSize.height,
             canCompact ? contentSize.height : 0,identity ? 44 : 0,nameHeight);
         s.measurementDecided=YES;
-        if (config.spacingMode==CSMessageSpacingCompact) {
-            CSChatRecordEvent(@"merge",s.appliedDelta<0 ? @"compact-height-applied" : @"compact-height-protected");
-            CSChatRecordMergeMeasurement(nativeSize.height,diagnosticContentSize.width,diagnosticContentSize.height,s.appliedDelta,blockers);
-        }
     }
     nativeSize.height+=s.appliedDelta;
     return nativeSize;
@@ -362,27 +356,6 @@ static UIView *CSIvarView(UIView *view, const char *name) {
     if (!ivar || ivar_getTypeEncoding(ivar)[0] != '@') return nil;
     id value = object_getIvar(view,ivar);
     return [value isKindOfClass:UIView.class] ? value : nil;
-}
-static void CSRecordGeometryParts(UIView *view) {
-    if (![NSUserDefaults.standardUserDefaults boolForKey:CSChatDiagnosticsEnabledKey]) return;
-    id head=CSMessageNativeObject(view,@"getHeadImageView");
-    id content=CSMessageNativeObject(view,@"getContentView");
-    id bubble=CSMessageNativeObject(view,@"getBgImageView");
-    UIView *name=CSIvarView(view,"m_chatRoomNameLabel");
-    UIView *desc=CSIvarView(view,"m_chatRoomDescLabel");
-    UIView *state=CSIvarView(view,"m_chatRoomTextStateView");
-    NSUInteger count=0;
-    // Only on a rejected layout; cap diagnostic work, never log text or identities.
-    for (UIView *child in view.subviews) {
-        if (child.hidden || child.alpha<=.01 || CGRectIsEmpty(child.bounds)) continue;
-        if (count++==12) break;
-        NSUInteger role=(child==head ? 1 : 0) | (child==name ? 2 : 0) |
-            (child==desc ? 4 : 0) | (child==state ? 8 : 0) |
-            (child==content ? 16 : 0) | (child==bubble ? 32 : 0);
-        CGRect rect=[view convertRect:child.bounds fromView:child];
-        CSChatRecordMergePart(role,view.frame.origin.y+CGRectGetMinY(rect)-view.bounds.origin.y,
-            view.frame.origin.y+CGRectGetMaxY(rect)-view.bounds.origin.y);
-    }
 }
 static void CSHide(UIView *view, NSMutableArray *records) {
     if (!view || view.hidden) return;
@@ -432,9 +405,6 @@ void CSMessageMergeRender(UIView *view) {
     }
     if (!geometryValid || bottom+2>plannedHeight+.5) {
         s.geometryRejected=YES;s.measurementDecided=NO;s.needsLayout=YES;
-        CSChatRecordEvent(@"merge",@"native-layout-contract-fallback");
-        CSChatRecordMergeGeometry(plannedHeight,top,bottom);
-        CSRecordGeometryParts(view);
         [s.context schedule];
     }
 }

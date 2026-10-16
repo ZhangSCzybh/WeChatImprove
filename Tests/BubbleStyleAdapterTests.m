@@ -2,10 +2,9 @@
 #import "CSBubbleStylePolicy.h"
 #import "CSBubbleStyleAdapter.h"
 #import "CSChatNativeBridge.h"
-#import "CSChatDiagnostics.h"
 #import <objc/message.h>
 #import <objc/runtime.h>
-static NSUInteger checks,events;
+static NSUInteger checks;
 #define CHECK(value) do { checks++; if (!(value)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#value); return 1; } } while (0)
 // The adapter's real selector checks are used for scalars. The shared object bridge is isolated here.
 id CSMessageNativeObject(id object, NSString *selector) {
@@ -14,7 +13,6 @@ id CSMessageNativeObject(id object, NSString *selector) {
     char result[32]={0}; method_getReturnType(method,result,sizeof(result)); if (result[0]!='@') return nil;
     return ((id(*)(id,SEL))objc_msgSend)(object,sel);
 }
-void CSChatRecordEvent(NSString *feature, NSString *stage) { (void)feature; (void)stage; events++; }
 @interface BubbleWrap : NSObject
 @property(nonatomic) unsigned int m_uiMessageType;
 @property(nonatomic) unsigned int m_uiAppMsgInnerType;
@@ -113,7 +111,7 @@ int main(void) { @autoreleasepool {
     // One invalid template is remembered until a native event, rather than reattempted every layout.
     model.messageWrap.m_uiMessageType=1; model.isSender=NO; CSBubbleStyleNativeChanged(cell); CHECK(cell.background->m_image!=baseline);
     YYImage *unready=[YYImage new]; cell.background.image=unready; Drain(); CHECK(cell.background->m_image==unready);
-    NSUInteger priorEvents=events; for (int i=0;i<100;i++) CSBubbleStyleApply(cell); CHECK(events==priorEvents);
+    for (int i=0;i<100;i++) CSBubbleStyleApply(cell); CHECK(cell.background->m_image==unready);
     unready.originImage=Native(.4); CSBubbleStyleImageDecoded(cell.background); CHECK(cell.background->m_image!=unready);
     CSBubbleStyleDetach(cell); CHECK(cell.background->m_image==unready);
     // Quoted replies use TextMessageViewModel with app-message subtype 57.
