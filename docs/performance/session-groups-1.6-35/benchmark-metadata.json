@@ -1,0 +1,18 @@
+{
+  "host": "Apple M4",
+  "scope": "Host Foundation benchmark. Native getters and defaults are synthetic. No UIKit, no disk/IPC sync cost, no device FPS. Data_refresh always reconstructs snapshot and preferences; not the new adapter cache path. Selection-save comparison measures actual changed Preferences implementation.",
+  "hashes": {
+    "1.6-34": {
+      "CSGroupNativeBridge.m": "87896891923cf0964a7c0ea4c9fe0fb4e77b789cfb43c43c8f201be8a3b3e2ad",
+      "CSGroupProjection.m": "01b36ff5594f394c98a193cd3fc137ce20bc41b105c702b4fe94569c7ba6957b",
+      "CSGroupPreferences.m": "5a8baa1ee198d5b01255bb46d9f0a08d462f66da4db195701f3be7c4a1927c94",
+      "WESessionTabItem.m": "dfb12f2a1eb44a0d35a175419bfe914cf7d22ff042e75cbc679ce6959928a6e0"
+    },
+    "1.6-35": {
+      "CSGroupNativeBridge.m": "87896891923cf0964a7c0ea4c9fe0fb4e77b789cfb43c43c8f201be8a3b3e2ad",
+      "CSGroupProjection.m": "01b36ff5594f394c98a193cd3fc137ce20bc41b105c702b4fe94569c7ba6957b",
+      "CSGroupPreferences.m": "1ec46fe99d45a47d56319ec5149d54ddbccb3831dbdd52de6f7f4e590bd58bd4",
+      "WESessionTabItem.m": "dfb12f2a1eb44a0d35a175419bfe914cf7d22ff042e75cbc679ce6959928a6e0"
+    }
+  }
+}

@@ -73,6 +73,8 @@ static id CSLegacyUnarchive(id value) {
 @property (nonatomic, copy, readwrite) NSSet<NSString *> *hiddenPresetTabs;
 @property (nonatomic) BOOL legacyImported;
 @property (nonatomic, copy) id loadedProfile;
+@property (nonatomic) BOOL profileLoaded;
+@property (nonatomic, copy) NSString *profileSelection;
 @end
 
 @implementation CSGroupPreferences
@@ -130,9 +132,20 @@ static id CSLegacyUnarchive(id value) {
     _legacyImported = [p[@"legacyImported"] isKindOfClass:[NSNumber class]] && [p[@"legacyImported"] boolValue];
 }
 
+- (NSString *)selectionKey {
+    return self.accountID.length ? [@"com.wechat.enhance.chat_group.selection." stringByAppendingString:self.accountID] : nil;
+}
 - (void)reload {
-    self.loadedProfile = [[self storedProfile] copy];
-    [self applyProfile:self.loadedProfile priorOrder:nil];
+    id current=[self storedProfile];
+    if (!self.profileLoaded || !(current==self.loadedProfile || [current isEqual:self.loadedProfile])) {
+        self.loadedProfile=[current copy];
+        [self applyProfile:self.loadedProfile priorOrder:nil];
+        self.profileSelection=self.selectedTabID; self.profileLoaded=YES;
+    }
+    _selectedTabID=[self.profileSelection copy];
+    NSDictionary *selection=self.selectionKey ? CSDictionary([self.defaults objectForKey:self.selectionKey]) : @{};
+    if ([selection[@"version"] isEqual:@1] && [CSArray([self.tabs valueForKey:@"tabId"]) containsObject:CSString(selection[@"tabID"]) ?: @""])
+        _selectedTabID=[selection[@"tabID"] copy];
 }
 
 - (NSDictionary *)profileWithCustomTabs:(NSArray *)customTabs names:(NSDictionary *)names order:(NSArray *)order hidden:(NSSet *)hidden selected:(NSString *)selected filter:(BOOL)filter imported:(BOOL)imported {
@@ -142,6 +155,9 @@ static id CSLegacyUnarchive(id value) {
 - (BOOL)writeProfile:(NSDictionary *)profile {
     if (!self.accountID.length) return NO;
     id oldStore = [self.defaults objectForKey:CSProfilesKey];
+    id oldSelection = [self.defaults objectForKey:self.selectionKey];
+    id selectionVersion = CSDictionary(oldSelection)[@"version"];
+    if ([selectionVersion isKindOfClass:NSNumber.class] && [selectionVersion integerValue]>1) return NO;
     id oldProfile = CSDictionary(oldStore)[self.accountID];
     NSDictionary *oldDictionary = CSDictionary(oldProfile);
     if ([oldDictionary[@"version"] isKindOfClass:[NSNumber class]] && [oldDictionary[@"version"] integerValue] > 1) return NO;
@@ -177,11 +193,13 @@ static id CSLegacyUnarchive(id value) {
             if (oldStore) [self.defaults setObject:oldStore forKey:CSProfilesKey]; else [self.defaults removeObjectForKey:CSProfilesKey];
             return NO;
         }
+        [self.defaults removeObjectForKey:self.selectionKey];
         NSArray *priorOrder = self.tabOrder;
         [self applyProfile:profile priorOrder:priorOrder];
-        self.loadedProfile = profile;
+        self.loadedProfile = profile; self.profileLoaded=YES; self.profileSelection=self.selectedTabID;
         return YES;
     } @catch (NSException *exception) {
+        @try { if (oldSelection) [self.defaults setObject:oldSelection forKey:self.selectionKey]; else [self.defaults removeObjectForKey:self.selectionKey]; } @catch (__unused NSException *restoreSelectionException) {}
         @try { if (oldStore) [self.defaults setObject:oldStore forKey:CSProfilesKey]; else [self.defaults removeObjectForKey:CSProfilesKey]; } @catch (NSException *restoreException) {}
         return NO;
     }
@@ -191,11 +209,31 @@ static id CSLegacyUnarchive(id value) {
     // A stale settings form cannot overwrite another editor or revive its deleted groups.
     id current = [self storedProfile];
     if ((current || self.loadedProfile) && ![current isEqual:self.loadedProfile]) return NO;
+    [self reload]; // A selection-only change must not stale a settings editor.
     return [self writeProfile:[self profileWithCustomTabs:customTabs names:presetNames order:tabOrder hidden:hiddenPresetTabs selected:self.selectedTabID filter:self.filterDuplicates imported:self.legacyImported]];
 }
 - (void)setSelectedTabID:(NSString *)selectedTabID {
     [self reload];
-    [self writeProfile:[self profileWithCustomTabs:self.customTabs names:self.presetNames order:self.tabOrder hidden:self.hiddenPresetTabs selected:selectedTabID filter:self.filterDuplicates imported:self.legacyImported]];
+    if (!self.accountID.length || !CSString(selectedTabID).length || [self.selectedTabID isEqual:selectedTabID]) return;
+    NSDictionary *profile=CSDictionary(self.loadedProfile);
+    if (([profile[@"version"] isKindOfClass:NSNumber.class] && [profile[@"version"] integerValue]>1) || ![[self.tabs valueForKey:@"tabId"] containsObject:selectedTabID]) return;
+    NSString *key=self.selectionKey;
+    id previous=[self.defaults objectForKey:key];
+    id selectionVersion=CSDictionary(previous)[@"version"];
+    if ([selectionVersion isKindOfClass:NSNumber.class] && [selectionVersion integerValue]>1) return;
+    NSDictionary *selection=@{@"version":@1,@"tabID":selectedTabID};
+    @try {
+        // NSUserDefaults persists this small value asynchronously. Definition
+        // validation/backups remain in writeProfile; no full-profile rewrite.
+        [self.defaults setObject:selection forKey:key];
+        if (![[self.defaults objectForKey:key] isEqual:selection]) {
+            if (previous) [self.defaults setObject:previous forKey:key]; else [self.defaults removeObjectForKey:key];
+            return;
+        }
+        _selectedTabID=[selectedTabID copy];
+    } @catch (__unused NSException *exception) {
+        @try { if (previous) [self.defaults setObject:previous forKey:key]; else [self.defaults removeObjectForKey:key]; } @catch (__unused NSException *restoreException) {}
+    }
 }
 - (void)setFilterDuplicates:(BOOL)filterDuplicates {
     [self reload];

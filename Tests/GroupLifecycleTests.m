@@ -9,6 +9,8 @@
 @property(nonatomic,strong) id tableHeaderView;
 @property(nonatomic) NSUInteger reloads;
 - (void)setEditing:(BOOL)value animated:(BOOL)animated;
+- (void)layoutIfNeeded;
+- (void)reloadData;
 @end
 @interface Host : NSObject
 @property(nonatomic,strong) UITableView *m_tableView;
@@ -27,7 +29,9 @@
 static char AdapterKey, PresentationSuspendedKey;
 static NSString *account=@"account-A";
 static BOOL enabled=YES;
-static NSUInteger scopes;
+static NSUInteger scopes,snapshotBuilds;
+static BOOL mutateDuringSnapshot;
+static NSArray *CSGroupBuildNativeSections(id controller,id table,id source);
 static NSHashTable *Adapters(void) {
     static NSHashTable *adapters; if (!adapters) adapters=[NSHashTable weakObjectsHashTable]; return adapters;
 }
@@ -38,12 +42,18 @@ static long long CSGroupReadInteger(id owner,NSString *key,long long fallback) {
 static void CSGroupWithNativeIndices(id table,void (^body)(void)) { (void)table; body(); }
 static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table; scopes++; body(); }
 @interface CSGroupListAdapter : NSObject
+@property(nonatomic) NSUInteger modelRevision,snapshotRevision,refreshGeneration;
+@property(nonatomic) BOOL coalescingNotification,scheduledCoalesced;
+@property(nonatomic,copy) NSString *snapshotAccount;
+@property(nonatomic,strong) NSArray *cachedNativeSections;
+@property(nonatomic,copy) NSString *nativeActionsAccount;
 @property(nonatomic,weak) UITableView *table;
 @property(nonatomic,weak) Host *controller;
 @property(nonatomic,strong) NSMutableDictionary *proxies,*anchors;
 @property(nonatomic,strong) NSMutableArray *completions,*nativeActions;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
-@property(nonatomic,strong) id nativeHeader;
+@property(nonatomic,strong) id nativeHeader,projection,identityDisplayPaths;
+@property(nonatomic) BOOL chromeVisible;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
 @property(nonatomic) double baselineDeceleration;
 @property(nonatomic) BOOL active,presentationSuspended,publishedEnabled,searching,dirty,scheduled,publishing,groupPanMoving,swipeActive,nativePresentation,updatingHeader,snapshotRetryAttempted;
@@ -61,8 +71,11 @@ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table
 @implementation CSGroupListAdapter
 #include "GroupLifecycleBodies.h"
 - (BOOL)isActive { return self.active; }
+- (BOOL)projecting { return self.active; }
+- (void)setProjecting:(BOOL)value { self.active=value; }
 - (NSUInteger)nativeMenuState { self.menuReads++; return self.menuState; }
 - (void)reconcileDeletedSwipeRow {}
+- (id)nativeSource { return self; }
 - (void)applyPendingScrollToTop {}
 - (void)detach {
     self.presentationSuspended=YES; self.active=NO;
@@ -71,12 +84,18 @@ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table
 }
 - (void)publishFixture {
     self.refreshCount++;
+    if (!self.nativePresentation) [self nativeSectionsForAccount:account];
     self.preferences=[CSGroupPreferences new]; self.preferences.accountID=account;
     self.publishedEnabled=enabled; self.searching=self.controller.isSearching;
     self.active=enabled && !self.searching && !self.nativePresentation;
     [self layout];
 }
 @end
+static NSArray *CSGroupBuildNativeSections(id controller,id table,id source) {
+    (void)controller; (void)table; snapshotBuilds++;
+    if (mutateDuringSnapshot) [source invalidateNativeSnapshot];
+    return @[@[]];
+}
 static CSGroupListAdapter *Adapter(id owner) { return [CSGroupListAdapter adapterForController:owner]; }
 static void Native(id owner,BOOL change,void (^body)(void)) { (void)owner; (void)change; body(); }
 static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.publishing; }
@@ -89,6 +108,7 @@ static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.publishin
 #include "GroupLifecycleHooks.h"
 @end
 @implementation UITableView
+- (void)layoutIfNeeded {}
 - (void)setEditing:(BOOL)value animated:(BOOL)animated { (void)animated; self.editing=value; }
 #include "GroupLifecycleReload.h"
 @end
@@ -199,6 +219,49 @@ int main(void) { @autoreleasepool {
     UITableView *chat=[UITableView new]; NSUInteger scopesBefore=scopes;
     [chat reloadData];
     Check(chat.reloads==1 && scopes==scopesBefore,@"unrelated chat table reload bypasses grouping scopes");
+    a=List(&host); [host viewWillDisappear:NO]; [a beginNativeChange];
+    [a performInNativePresentation:^{ actions++; }]; before=a.refreshCount;
+    account=@"account-C"; [a endNativeChange]; RunFor(.02);
+    Check(!a.nativeActions.count && a.refreshCount==before,@"account change prunes obsolete hidden navigation before publication");
+    for (NSUInteger i=0;i<3;i++) { [a requestRefresh]; RunFor(.01); }
+    Check(a.refreshCount==before && !a.scheduled,@"pruned navigation cannot reopen hidden refresh admission");
+    a=List(&host); a.publishing=YES; actionBefore=actions;
+    [a performInNativePresentation:^{ actions++; }];
+    Check(a.dirty && a.nativeActions.count==1,@"navigation during publication marks a follow-up dirty");
+    a.publishing=NO; [a requestRefresh]; RunFor(.02);
+    Check(actions==actionBefore+1 && !a.nativeActions.count,@"reentrant navigation drains on the next publication");
+    a=List(&host); [host viewWillDisappear:NO]; account=@"account-D"; actionBefore=actions;
+    [a performInNativePresentation:^{ actions++; }];
+    Check(actions==actionBefore+1 && !a.nativeActions.count,@"valid new-account navigation survives preference account reset");
+    a=List(&host); [host viewWillDisappear:NO];
+    Check(!a.cachedNativeSections,@"leaving chat list releases the retained full snapshot");
+    [host viewWillAppear:NO]; NSUInteger builds=snapshotBuilds;
+    for (NSUInteger i=0;i<10;i++) [a refresh];
+    Check(snapshotBuilds==builds,@"ten selection-only publications reuse immutable native snapshot");
+    [a beginNativeChange]; [a endNativeChange]; RunFor(.02);
+    Check(snapshotBuilds==builds+1,@"native change invalidates snapshot before next publication");
+    builds=snapshotBuilds; enabled=NO; [a refresh]; [a refresh];
+    Check(snapshotBuilds==builds && !a.active,@"disabled grouping never builds a snapshot");
+    enabled=YES; [a refresh]; builds=snapshotBuilds;
+    host.isSearching=YES; [a refresh]; [a refresh];
+    Check(snapshotBuilds==builds && !a.active,@"search uses native mode without snapshot construction");
+    host.isSearching=NO; [a refresh];
+    Check(snapshotBuilds==builds+1,@"search exit rebuilds native data before reactivating projection");
+    [a invalidateNativeSnapshot]; mutateDuringSnapshot=YES;
+    Check(![a nativeSectionsForAccount:account] && !a.cachedNativeSections,@"mutation during snapshot build cannot populate the cache");
+    mutateDuringSnapshot=NO; [a nativeSectionsForAccount:account]; builds=snapshotBuilds;
+    account=@"account-E"; [a nativeSectionsForAccount:account];
+    Check(snapshotBuilds==builds+1,@"snapshot cache never crosses accounts");
+    a=List(&host); before=a.refreshCount;
+    for (NSUInteger i=0;i<10;i++) { [a requestCoalescedRefresh]; RunFor(.001); }
+    Check(a.refreshCount==before && a.scheduled,@"passive notification burst waits for bounded merge window");
+    RunFor(.06);
+    Check(a.refreshCount==before+1 && !a.scheduled,@"burst produces one publication at first-event deadline");
+    before=a.refreshCount; [a requestCoalescedRefresh]; [a requestRefresh]; RunFor(.02);
+    Check(a.refreshCount==before+1,@"direct request promotes a queued passive refresh immediately");
+    RunFor(.06); Check(a.refreshCount==before+1,@"superseded notification timer cannot publish twice");
+    before=a.refreshCount; [a requestCoalescedRefresh]; [a refresh]; RunFor(.06);
+    Check(a.refreshCount==before+1,@"synchronous user publication consumes pending notification work");
     fprintf(stdout,"Group lifecycle: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;
 } }

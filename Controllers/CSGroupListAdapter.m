@@ -49,6 +49,12 @@ static id ObjectArgument(id target, NSString *name, id value) {
 @property (nonatomic) BOOL publishedEnabled;
 @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *prefetchedPaths;
 @property (nonatomic, strong) NSMutableArray *nativeActions;
+@property (nonatomic, copy) NSString *nativeActionsAccount;
+@property (nonatomic, copy) NSArray *cachedNativeSections;
+@property (nonatomic, copy) NSString *snapshotAccount;
+@property (atomic) NSUInteger modelRevision;
+@property (nonatomic) NSUInteger snapshotRevision, refreshGeneration;
+@property (nonatomic) BOOL coalescingNotification, scheduledCoalesced;
 @property (nonatomic) BOOL nativePresentation, scheduled, dirty, searching, pendingScrollToTop;
 @property (nonatomic) BOOL snapshotRetryAttempted;
 @property (nonatomic) NSUInteger snapshotRetryGeneration;
@@ -115,7 +121,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     CSGroupListAdapter *adapter=[self adapterForController:controller];
     adapter.presentationSuspended=suspended;
     if (suspended) {
-        adapter.dirty=YES;
+        adapter.dirty=YES; [adapter invalidateNativeSnapshot]; adapter.cachedNativeSections=nil;
         adapter.snapshotRetryAttempted=NO; adapter.snapshotRetryGeneration++;
         [adapter finishSuspendedBatches];
     }
@@ -135,7 +141,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     [adapter layout];
 }
 + (void)settingsChanged {
-    dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { [adapter refresh]; [adapter layout]; } });
+    dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { [adapter invalidateNativeSnapshot]; [adapter refresh]; [adapter layout]; } });
 }
 - (BOOL)isActive {
     return self.projecting;
@@ -203,6 +209,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     [self layout];
 }
 - (void)prepareForNativeSearch {
+    [self invalidateNativeSnapshot];
     if (!self.searching) [self saveAnchor];
     self.searching=YES; self.pendingScrollToTop=NO;
     [self refreshNavigationTitle];
@@ -318,9 +325,30 @@ static id ObjectArgument(id target, NSString *name, id value) {
     [self updateGroupGestureAvailability];
     if (self.dirty || self.pendingScrollToTop) [self requestRefresh];
 }
+- (void)invalidateNativeSnapshot {
+    @synchronized (self) { self.modelRevision++; }
+}
+- (NSArray *)nativeSectionsForAccount:(NSString *)account {
+    NSUInteger revision=self.modelRevision;
+    if (self.cachedNativeSections && self.snapshotRevision==revision && [self.snapshotAccount isEqual:account]) return self.cachedNativeSections;
+    __block NSArray *sections=nil;
+    CSGroupWithNativeIndices(self.table, ^{ sections=CSGroupBuildNativeSections(self.controller,self.table,[self nativeSource]); });
+    // Only immutable row values are cached; never hold private sessions/contacts.
+    if (revision!=self.modelRevision || ![account isEqual:CSGroupCurrentAccountID()]) { self.cachedNativeSections=nil; return nil; }
+    self.cachedNativeSections=sections; self.snapshotAccount=account; self.snapshotRevision=revision;
+    return sections;
+}
+- (void)pruneNativeActions {
+    if (!self.nativeActions.count) return;
+    if (![self.nativeActionsAccount isEqual:CSGroupCurrentAccountID()]) {
+        [self.nativeActions removeAllObjects]; self.nativeActionsAccount=nil;
+        self.nativePresentation=NO;
+    }
+}
 - (void)refresh {
     if (!NSThread.isMainThread) { [self requestRefresh]; return; }
     if (self.publishing) return;
+    [self pruneNativeActions];
     // Explicit native navigation is the only offscreen publication exception.
     // Ordinary message/unread/draft updates merely invalidate the cached list.
     if (self.presentationSuspended && !self.nativeActions.count) {
@@ -344,9 +372,21 @@ static id ObjectArgument(id target, NSString *name, id value) {
         [self installProxies];
         NSString *account=CSGroupCurrentAccountID();
         BOOL changed= ![self.preferences.accountID isEqualToString:account];
-        if (changed) { self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=NO; self.projection=nil; self.snapshotRetryAttempted=NO; }
-        self.preferences=[[CSGroupPreferences alloc] initWithDefaults:NSUserDefaults.standardUserDefaults accountID:account];
+        if (changed) { self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=self.nativeActions.count>0; self.projection=nil; self.snapshotRetryAttempted=NO; }
         self.searching=CSGroupReadInteger(self.controller,@"isSearching",0)!=0;
+        BOOL enabled=Option(@"enabled");
+        if (!enabled || self.searching || !account.length) {
+            BOOL needsReload=self.projecting || self.nativeActions.count>0;
+            BOOL hadChrome=self.chromeVisible;
+            self.projecting=NO; self.chromeVisible=NO; self.publishedEnabled=enabled;
+            self.projection=nil; self.identityDisplayPaths=nil; self.cachedNativeSections=nil;
+            [self layout];
+            if (needsReload) CSGroupWithDisplayIndices(self.table, ^{ [self.table reloadData]; [self.table layoutIfNeeded]; });
+            if (hadChrome) [self refreshNavigationTitle];
+            finished=YES; return;
+        }
+        if (!self.preferences || changed) self.preferences=[[CSGroupPreferences alloc] initWithDefaults:NSUserDefaults.standardUserDefaults accountID:account];
+        else [self.preferences reload];
         [self ensureChrome];
         NSArray *tabs=self.preferences.tabs; NSString *selected=self.preferences.selectedTabID;
         if (self.nativePresentation) {
@@ -354,9 +394,8 @@ static id ObjectArgument(id target, NSString *name, id value) {
             if (![tabs filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(WESessionTabItem *tab, NSDictionary *bindings) { (void)bindings; return [tab.tabId isEqual:selected]; }]].count)
                 tabs=[@[[WESessionTabItem tabWithType:WETabTypeAll]] arrayByAddingObjectsFromArray:tabs];
         }
-        __block NSArray *sections=nil;
-        CSGroupWithNativeIndices(self.table, ^{ sections=CSGroupBuildNativeSections(self.controller,self.table,[self nativeSource]); });
-        CSGroupProjection *projection=[self projectionForSections:sections tabs:tabs selectedTabID:selected accountID:account];
+        NSArray *sections=self.nativePresentation ? nil : [self nativeSectionsForAccount:account];
+        CSGroupProjection *projection=self.nativePresentation ? nil : [self projectionForSections:sections tabs:tabs selectedTabID:selected accountID:account];
         self.projection=projection;
         NSMutableDictionary *identities=[NSMutableDictionary dictionary];
         [self.projection.sections enumerateObjectsUsingBlock:^(NSArray *rows, NSUInteger s, BOOL *stop) {
@@ -378,7 +417,8 @@ static id ObjectArgument(id target, NSString *name, id value) {
         self.chrome.selectedTabID=selected; [self.chrome updateTabs:tabs]; self.chrome.selectedTabID=selected;
         id logic=CSGroupReadObject(self.controller,@"m_mainFrameLogicController");
         [tabs enumerateObjectsUsingBlock:^(WESessionTabItem *tab, NSUInteger index, BOOL *stop) {
-            (void)stop; CSGroupBadge *badge=[projection badgeForTabID:tab.tabId];
+            (void)stop; if (!projection && tab.type!=WETabTypeAll) return;
+            CSGroupBadge *badge=[projection badgeForTabID:tab.tabId];
             NSInteger count=tab.type==WETabTypeAll ? (NSInteger)MAX(0,CSGroupReadInteger(logic,@"getTotalUnreadCount",(long long)badge.count)) : (NSInteger)MIN(badge.count,(NSUInteger)NSIntegerMax);
             BOOL hidden=Option(tab.type==WETabTypeAll ? @"hide_all_badge" : @"hide_group_badge");
             [self.chrome updateUnreadCount:hidden ? 0 : count hasRedDot:!hidden && badge.redDot forTabIndex:(NSInteger)index];
@@ -423,24 +463,42 @@ static id ObjectArgument(id target, NSString *name, id value) {
 }
 - (void)requestRefresh {
     if (!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(), ^{ [self requestRefresh]; }); return; }
-    self.dirty=YES;
+    self.dirty=YES; [self invalidateNativeSnapshot];
+    [self pruneNativeActions];
     if (self.presentationSuspended && !self.nativeActions.count) { [self finishSuspendedBatches]; return; }
-    if (self.scheduled || self.changeDepth || self.publishing) return;
-    self.scheduled=YES;
+    if (self.changeDepth || self.publishing) return;
+    BOOL coalesced=self.coalescingNotification && !self.nativeActions.count;
+    if (self.scheduled && (!self.scheduledCoalesced || coalesced)) return;
+    self.scheduled=YES; self.scheduledCoalesced=coalesced;
+    NSUInteger generation=++self.refreshGeneration;
     __weak typeof(self) weakSelf=self;
-    void (^publish)(void)=^{ CSGroupListAdapter *self=weakSelf; self.scheduled=NO; if (self.dirty) [self refresh]; };
-    // A rejected/cancelled row swipe need not send scrollViewDidEndDragging.
-    // Keep one pending wake-up until tracking ends; editing then owns deferral.
-    if (!self.presentationSuspended && (self.table.tracking || [self groupPanMoving] || ([self nativeMenuState]&2)))
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW,(int64_t)(0.05*NSEC_PER_SEC)),dispatch_get_main_queue(),publish);
+    void (^publish)(void)=^{
+        CSGroupListAdapter *self=weakSelf;
+        if (!self || generation!=self.refreshGeneration) return;
+        self.scheduled=NO;
+        if (self.dirty) [self refresh];
+    };
+    // Fixed first-event deadline, never a trailing debounce. Direct actions can
+    // supersede a pending notification without waiting for its 40ms window.
+    NSTimeInterval delay=coalesced ? 0.04 : 0;
+    if (!self.presentationSuspended && (self.table.tracking || [self groupPanMoving] || ([self nativeMenuState]&2))) delay=0.05;
+    if (delay>0) dispatch_after(dispatch_time(DISPATCH_TIME_NOW,(int64_t)(delay*NSEC_PER_SEC)),dispatch_get_main_queue(),publish);
     else dispatch_async(dispatch_get_main_queue(),publish);
 }
+- (void)requestCoalescedRefresh {
+    if (!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(), ^{ [self requestCoalescedRefresh]; }); return; }
+    self.coalescingNotification=YES;
+    @try { [self requestRefresh]; } @finally { self.coalescingNotification=NO; }
+}
+
 - (void)beginNativeChange {
+    [self invalidateNativeSnapshot];
     @synchronized (self) { if (!self.changeDepth && NSThread.isMainThread && !self.presentationSuspended) [self saveAnchor]; self.changeDepth++; }
 }
-- (void)endNativeChange {
+- (void)endNativeChange { [self endNativeChangeCoalesced:NO]; }
+- (void)endNativeChangeCoalesced:(BOOL)coalesced {
     BOOL outer=NO; @synchronized (self) { if (self.changeDepth) self.changeDepth--; outer=self.changeDepth==0; }
-    if (outer) [self requestRefresh];
+    if (outer) { if (coalesced) [self requestCoalescedRefresh]; else [self requestRefresh]; }
 }
 - (void)performNativeBatch:(void (^)(void))updates completion:(void (^)(BOOL))completion {
     void (^callback)(BOOL)=[completion copy];
@@ -460,7 +518,12 @@ static id ObjectArgument(id target, NSString *name, id value) {
     NSString *account=CSGroupCurrentAccountID(); if (!account.length) return;
     void (^guarded)(void)=^{ if ([account isEqualToString:CSGroupCurrentAccountID()]) action(); };
     if (!self.isActive && !self.publishing && !self.changeDepth) { CSGroupWithNativeIndices(self.table,guarded); return; }
+    [self pruneNativeActions];
+    self.nativeActionsAccount=account;
     [self.nativeActions addObject:[guarded copy]];
+    if (self.publishing) {
+        self.nativePresentation=YES; [self requestRefresh]; return;
+    }
     if (self.presentationSuspended) {
         // Search/next-chat navigation can target the main list from another page.
         // Publish native coordinates once for that action, then remain suspended.
@@ -756,7 +819,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
 - (void)applyPendingScrollToTop {
     UITableView *table=self.table;
     if (self.presentationSuspended || !self.pendingScrollToTop || self.publishing || self.dirty || self.changeDepth || !self.chromeVisible ||
-        self.searching || table.tracking || table.dragging || table.decelerating || table.editing || self.swipeActive || [self nativeMenuState]) return;
+        self.searching || [self groupPanMoving] || table.tracking || table.dragging || table.decelerating || table.editing || self.swipeActive || [self nativeMenuState]) return;
     CGFloat top=table.adjustedContentInset.top;
     if (CGRectGetHeight(table.bounds)<=0 || !isfinite(top)) return;
     self.pendingScrollToTop=NO;
@@ -838,6 +901,9 @@ static id ObjectArgument(id target, NSString *name, id value) {
     CGPoint v=[pan velocityInView:self.chrome]; return fabs(v.x)>fabs(v.y)*1.5;
 }
 - (void)groupPan:(UIPanGestureRecognizer *)pan {
+    if ((pan==self.pan || pan==self.listPan) &&
+        (pan.state==UIGestureRecognizerStateEnded || pan.state==UIGestureRecognizerStateCancelled || pan.state==UIGestureRecognizerStateFailed) &&
+        (self.dirty || self.pendingScrollToTop)) [self requestRefresh];
     // Admission is latched at touch-down; crossing the 85% boundary cannot change owners.
     if (pan.state!=UIGestureRecognizerStateEnded || ![self groupSwipesAvailable]) return;
     if ((pan!=self.pan && pan!=self.listPan) || !(pan==self.pan ? self.barTouchAllowed : self.listTouchAllowed)) return;

@@ -40,6 +40,13 @@ static void Native(id owner, BOOL change, void (^body)(void)) {
     @try { CSGroupWithNativeIndices(a.table,body); }
     @finally { if (change) [a endNativeChange]; }
 }
+static void NativeNotification(id owner, void (^body)(void)) {
+    CSGroupListAdapter *a=Adapter(owner);
+    if (!a.table) { body(); return; }
+    [a beginNativeChange];
+    @try { CSGroupWithNativeIndices(a.table,body); }
+    @finally { [a endNativeChangeCoalesced:YES]; }
+}
 static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.publishing; }
 static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef info) {
     (void)center; (void)observer; (void)name; (void)object; (void)info;
@@ -80,14 +87,14 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
     if (a.isActive) return nil; // An incidental preview must not change the selected group.
     __block id result=nil; Native(self,NO,^{ result=%orig; }); return result;
 }
-- (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap { Native(self,YES,^{ %orig; }); }
-- (void)updateSession:(id)session { Native(self,YES,^{ %orig; }); }
+- (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap { NativeNotification(self,^{ %orig; }); }
+- (void)updateSession:(id)session { NativeNotification(self,^{ %orig; }); }
 - (void)reloadSessions { Native(self,YES,^{ %orig; }); }
 - (void)updateItem:(id)item { Native(self,YES,^{ %orig; }); }
 - (void)insertSessionCellAtIndexes:(id)paths { Native(self,YES,^{ %orig; }); }
 - (void)deleteSessionCellAtIndexes:(id)paths { Native(self,YES,^{ %orig; }); }
 - (void)onLogicDeleteSessionByUsername:(id)name { Native(self,YES,^{ %orig; }); }
-- (void)logicUpdateSession:(id)session { Native(self,YES,^{ %orig; }); }
+- (void)logicUpdateSession:(id)session { NativeNotification(self,^{ %orig; }); }
 - (void)onAuthOK { Native(self,YES,^{ %orig; }); }
 - (void)onLogicHideSession:(id)session { Native(self,YES,^{ %orig; }); }
 - (void)selectCellForName:(id)name {
@@ -175,8 +182,8 @@ static void InstallMenuTouchGate(void) {
 - (void)onSessionRebuildBegin { [Adapter(self) beginNativeChange]; Native(self,NO,^{ %orig; }); }
 - (void)onSessionRebuildEnd { @try { Native(self,NO,^{ %orig; }); } @finally { [Adapter(self) endNativeChange]; } }
 - (void)onActiveUsrNameChange:(id)oldName curUsrName:(id)newName { Native(self,YES,^{ %orig; }); }
-- (void)onSessionTotalUnreadCountChange:(unsigned int)count { Native(self,YES,^{ %orig; }); }
-- (void)onSessionChanged:(id)session { Native(self,YES,^{ %orig; }); }
+- (void)onSessionTotalUnreadCountChange:(unsigned int)count { NativeNotification(self,^{ %orig; }); }
+- (void)onSessionChanged:(id)session { NativeNotification(self,^{ %orig; }); }
 - (void)onSessionTopStatusChanged:(id)session bTop:(BOOL)top { Native(self,YES,^{ %orig; }); }
 - (void)onMainSessionReload { Native(self,YES,^{ %orig; }); }
 %end

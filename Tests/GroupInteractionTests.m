@@ -30,7 +30,7 @@ static char TitleContextKey,CellRowKey;
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated { (void)animated; self.editing=editing; self.closes++; }
 @end
 @interface HookedTable : UITableView @end
-typedef NS_ENUM(NSInteger,UIGestureRecognizerState) { UIGestureRecognizerStatePossible, UIGestureRecognizerStateBegan, UIGestureRecognizerStateChanged, UIGestureRecognizerStateEnded, UIGestureRecognizerStateCancelled };
+typedef NS_ENUM(NSInteger,UIGestureRecognizerState) { UIGestureRecognizerStatePossible, UIGestureRecognizerStateBegan, UIGestureRecognizerStateChanged, UIGestureRecognizerStateEnded, UIGestureRecognizerStateCancelled, UIGestureRecognizerStateFailed };
 @interface UIGestureRecognizer : NSObject
 @property(nonatomic) UIGestureRecognizerState state;
 @property(nonatomic) BOOL enabled;
@@ -162,6 +162,11 @@ static NSHashTable *Adapters(void) {
     static NSHashTable *adapters; if (!adapters) adapters=[NSHashTable weakObjectsHashTable]; return adapters;
 }
 @interface CSGroupListAdapter : NSObject
+@property(nonatomic) NSUInteger modelRevision,snapshotRevision,refreshGeneration;
+@property(nonatomic) BOOL coalescingNotification,scheduledCoalesced;
+@property(nonatomic,copy) NSString *snapshotAccount;
+@property(nonatomic,strong) NSArray *cachedNativeSections;
+@property(nonatomic,copy) NSString *nativeActionsAccount;
 @property(nonatomic) BOOL presentationSuspended;
 @property(nonatomic,strong) NSArray *nativeActions;
 @property(nonatomic,strong) UITableView *table;
@@ -203,6 +208,8 @@ static NSHashTable *Adapters(void) {
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:(UITouch *)touch;
 @end
 @implementation CSGroupListAdapter
+- (void)invalidateNativeSnapshot { self.modelRevision++; }
+- (void)pruneNativeActions {}
 - (void)finishSuspendedBatches {}
 #include "GroupInteractionBodies.h"
 - (BOOL)isActive { return self.active; }

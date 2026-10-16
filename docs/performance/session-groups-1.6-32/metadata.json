@@ -1,0 +1,28 @@
+{
+  "commit": "e638ba7fac62d6e4229d5cb9b83f53ad3f95a16a",
+  "cpu": "Apple M4",
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0\nBuildVersion:\t\t26A428",
+  "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)",
+  "optimization": "-O2",
+  "warmups_per_stage": 3,
+  "samples_per_stage": 21,
+  "execution": "Single-threaded host Foundation executable. Timings include autorelease pool draining. Fake host getters use arrays; preferences use an in-memory object, not NSUserDefaults. No production defaults or accounts accessed.",
+  "excluded": [
+    "UIKit layout/rendering and reloadData",
+    "real WeChat native getter costs",
+    "preferences IPC and disk synchronization",
+    "iPhone frame rate, energy, thermal or memory measurements"
+  ],
+  "source_sha256": {
+    "Controllers/CSGroupNativeBridge.m": "87896891923cf0964a7c0ea4c9fe0fb4e77b789cfb43c43c8f201be8a3b3e2ad",
+    "Controllers/CSGroupProjection.m": "01b36ff5594f394c98a193cd3fc137ce20bc41b105c702b4fe94569c7ba6957b",
+    "Controllers/CSGroupPreferences.m": "5a8baa1ee198d5b01255bb46d9f0a08d462f66da4db195701f3be7c4a1927c94",
+    "Controllers/WESessionTabItem.m": "dfb12f2a1eb44a0d35a175419bfe914cf7d22ff042e75cbc679ce6959928a6e0",
+    "Controllers/CSGroupListAdapter.m": "4a984294cd1e21519ec31441bc24309c2ea5e0620a6de4c2a3d3c45b18133363",
+    "Controllers/WESessionTabContainerView.m": "842c02a34f412395f60bb0d1b2ef1882c5460acea5d6340440006d58dd60fb48",
+    "Hooks/SessionGroupHooks.xm": "48542b1cab8910d09fad3aa09b9182a3f2b3df637e08fd66829a32e7bca32a7a",
+    "docs/performance/session-groups-1.6-32/benchmark.m": "a885c68eb16b13e490c48c3661d701537bca77204d93fc60bc0ee7182039b0b8",
+    "docs/performance/session-groups-1.6-32/run.sh": "7ec50e9926bcc929be88dd7e584e15bd61193f47c7e9ea2d1fc2e291b2592d95"
+  },
+  "results_sha256": "23d0430f9a016adc37072e367da3c370194cca3119e22fc758f04c8e77c18199"
+}

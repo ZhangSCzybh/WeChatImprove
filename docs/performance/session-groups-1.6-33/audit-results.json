@@ -1,0 +1,21 @@
+{
+  "cross_account": {
+    "still_suspended": true,
+    "extra_hidden_publications_for_3_events": 3,
+    "queued_after_account_change": 1,
+    "executed_old_account_actions": 0
+  },
+  "foreground_publications_for_20_events": 20,
+  "reentrant_navigation": {
+    "dirty": false,
+    "scheduled": false,
+    "queued": 1
+  },
+  "top_offset_writes_during_group_pan": 1,
+  "pending_after": false,
+  "same_selection_syncs": 1,
+  "same_selection_writes": 2,
+  "commit": "217f297b63b1ffd602c38ce4917e1fe017984f51",
+  "adapter_sha256": "0b8cd3888ff67822106da1ffce15effcce08817b88b91d546c01a43acdec231d",
+  "limits": "Host fixtures with production scheduling/guards/account-reset branch. No UIKit, real host event timing, iPhone FPS, real defaults or accounts."
+}

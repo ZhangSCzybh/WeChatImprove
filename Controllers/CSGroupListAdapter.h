@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)requestRefresh;
 - (void)beginNativeChange;
 - (void)endNativeChange;
+/// Only passive message/unread notifications use the bounded merge window.
+- (void)endNativeChangeCoalesced:(BOOL)coalesced;
 - (void)performNativeBatch:(void (^ _Nullable)(void))updates completion:(void (^ _Nullable)(BOOL))completion;
 - (void)performInNativePresentation:(void (^)(void))action;
 - (nullable id)proxyForTarget:(nullable id)target role:(NSUInteger)role;

@@ -89,6 +89,11 @@ static long long CSGroupReadInteger(id object,NSString *name,long long fallback)
 static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table; body(); }
 
 @interface CSGroupListAdapter : NSObject
+@property(nonatomic) NSUInteger modelRevision,snapshotRevision,refreshGeneration;
+@property(nonatomic) BOOL coalescingNotification,scheduledCoalesced;
+@property(nonatomic,copy) NSString *snapshotAccount;
+@property(nonatomic,strong) NSArray *cachedNativeSections;
+@property(nonatomic,copy) NSString *nativeActionsAccount;
 @property(nonatomic) BOOL presentationSuspended;
 @property(nonatomic,weak) UITableView *table;
 @property(nonatomic,weak) HostController *controller;
@@ -119,6 +124,8 @@ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table
 - (void)selectIndex:(NSInteger)index;
 @end
 @implementation CSGroupListAdapter
+- (void)invalidateNativeSnapshot { self.modelRevision++; }
+- (void)pruneNativeActions {}
 - (void)finishSuspendedBatches {}
 #include "GroupViewportBodies.h"
 - (BOOL)isActive { return self.active; }
@@ -286,6 +293,11 @@ int main(void) { @autoreleasepool {
     a=List(&host,1600); a.displayedTabs=@[tab]; a.preferences.tabs=@[tab]; a.chrome=[TestChrome new];
     a.nativeMenuState=1; [a selectIndex:0];
     Check(!a.pendingScrollToTop && [a.chrome.selectedTabID isEqual:a.publishedTabID],@"custom menu open prevents tab selection and preserves published indicator");
+    a=List(&host,1600); a.pendingScrollToTop=YES; a.groupPanMoving=YES;
+    [a applyPendingScrollToTop];
+    Check(a.pendingScrollToTop && !a.table.offsetWrites,@"independent group pan prevents top jump without native tracking flags");
+    a.groupPanMoving=NO; [a applyPendingScrollToTop];
+    Check(!a.pendingScrollToTop && a.table.offsetWrites==1,@"top completes once after group pan ends");
     fprintf(stdout,"Group viewport: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;
 } }

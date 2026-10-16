@@ -1,0 +1,384 @@
+diff --git a/Controllers/CSGroupListAdapter.m b/Controllers/CSGroupListAdapter.m
+index 27ac8a69..ebf79de3 100644
+--- a/Controllers/CSGroupListAdapter.m
++++ b/Controllers/CSGroupListAdapter.m
+@@ -49,6 +49,7 @@ @interface CSGroupListAdapter () <UIGestureRecognizerDelegate>
+ @property (nonatomic) BOOL publishedEnabled;
+ @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *prefetchedPaths;
+ @property (nonatomic, strong) NSMutableArray *nativeActions;
++@property (nonatomic, copy) NSString *nativeActionsAccount;
+ @property (nonatomic) BOOL nativePresentation, scheduled, dirty, searching, pendingScrollToTop;
+ @property (nonatomic) BOOL snapshotRetryAttempted;
+ @property (nonatomic) NSUInteger snapshotRetryGeneration;
+@@ -318,9 +319,17 @@ - (void)nativeMenuDidChange {
+     [self updateGroupGestureAvailability];
+     if (self.dirty || self.pendingScrollToTop) [self requestRefresh];
+ }
++- (void)pruneNativeActions {
++    if (!self.nativeActions.count) return;
++    if (![self.nativeActionsAccount isEqual:CSGroupCurrentAccountID()]) {
++        [self.nativeActions removeAllObjects]; self.nativeActionsAccount=nil;
++        self.nativePresentation=NO;
++    }
++}
+ - (void)refresh {
+     if (!NSThread.isMainThread) { [self requestRefresh]; return; }
+     if (self.publishing) return;
++    [self pruneNativeActions];
+     // Explicit native navigation is the only offscreen publication exception.
+     // Ordinary message/unread/draft updates merely invalidate the cached list.
+     if (self.presentationSuspended && !self.nativeActions.count) {
+@@ -344,7 +353,7 @@ - (void)refresh {
+         [self installProxies];
+         NSString *account=CSGroupCurrentAccountID();
+         BOOL changed= ![self.preferences.accountID isEqualToString:account];
+-        if (changed) { self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=NO; self.projection=nil; self.snapshotRetryAttempted=NO; }
++        if (changed) { self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=self.nativeActions.count>0; self.projection=nil; self.snapshotRetryAttempted=NO; }
+         self.preferences=[[CSGroupPreferences alloc] initWithDefaults:NSUserDefaults.standardUserDefaults accountID:account];
+         self.searching=CSGroupReadInteger(self.controller,@"isSearching",0)!=0;
+         [self ensureChrome];
+@@ -424,6 +433,7 @@ - (CSGroupProjection *)projectionForSections:(NSArray *)sections tabs:(NSArray *
+ - (void)requestRefresh {
+     if (!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(), ^{ [self requestRefresh]; }); return; }
+     self.dirty=YES;
++    [self pruneNativeActions];
+     if (self.presentationSuspended && !self.nativeActions.count) { [self finishSuspendedBatches]; return; }
+     if (self.scheduled || self.changeDepth || self.publishing) return;
+     self.scheduled=YES;
+@@ -460,7 +470,12 @@ - (void)performInNativePresentation:(void (^)(void))action {
+     NSString *account=CSGroupCurrentAccountID(); if (!account.length) return;
+     void (^guarded)(void)=^{ if ([account isEqualToString:CSGroupCurrentAccountID()]) action(); };
+     if (!self.isActive && !self.publishing && !self.changeDepth) { CSGroupWithNativeIndices(self.table,guarded); return; }
++    [self pruneNativeActions];
++    self.nativeActionsAccount=account;
+     [self.nativeActions addObject:[guarded copy]];
++    if (self.publishing) {
++        self.nativePresentation=YES; [self requestRefresh]; return;
++    }
+     if (self.presentationSuspended) {
+         // Search/next-chat navigation can target the main list from another page.
+         // Publish native coordinates once for that action, then remain suspended.
+@@ -756,7 +771,7 @@ - (void)returnToGroupTop {
+ - (void)applyPendingScrollToTop {
+     UITableView *table=self.table;
+     if (self.presentationSuspended || !self.pendingScrollToTop || self.publishing || self.dirty || self.changeDepth || !self.chromeVisible ||
+-        self.searching || table.tracking || table.dragging || table.decelerating || table.editing || self.swipeActive || [self nativeMenuState]) return;
++        self.searching || [self groupPanMoving] || table.tracking || table.dragging || table.decelerating || table.editing || self.swipeActive || [self nativeMenuState]) return;
+     CGFloat top=table.adjustedContentInset.top;
+     if (CGRectGetHeight(table.bounds)<=0 || !isfinite(top)) return;
+     self.pendingScrollToTop=NO;
+@@ -838,6 +853,9 @@ - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gesture {
+     CGPoint v=[pan velocityInView:self.chrome]; return fabs(v.x)>fabs(v.y)*1.5;
+ }
+ - (void)groupPan:(UIPanGestureRecognizer *)pan {
++    if ((pan==self.pan || pan==self.listPan) &&
++        (pan.state==UIGestureRecognizerStateEnded || pan.state==UIGestureRecognizerStateCancelled || pan.state==UIGestureRecognizerStateFailed) &&
++        (self.dirty || self.pendingScrollToTop)) [self requestRefresh];
+     // Admission is latched at touch-down; crossing the 85% boundary cannot change owners.
+     if (pan.state!=UIGestureRecognizerStateEnded || ![self groupSwipesAvailable]) return;
+     if ((pan!=self.pan && pan!=self.listPan) || !(pan==self.pan ? self.barTouchAllowed : self.listTouchAllowed)) return;
+diff --git a/Controllers/WESessionTabContainerView.m b/Controllers/WESessionTabContainerView.m
+index 2bc22a9e..e8a5fc7e 100644
+--- a/Controllers/WESessionTabContainerView.m
++++ b/Controllers/WESessionTabContainerView.m
+@@ -83,7 +83,9 @@ - (void)layoutSubviews {
+ }
+ 
+ - (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot {
+-    self.unreadCount = MAX(0, count);
++    count = MAX(0, count);
++    if (self.unreadCount == count && self.hasRedDot == hasRedDot) return;
++    self.unreadCount = count;
+     self.hasRedDot = hasRedDot;
+     self.unreadBadge.hidden = self.unreadCount == 0 && !hasRedDot;
+     self.unreadBadge.text = self.unreadCount > 99 ? @"99+" :
+@@ -256,12 +258,16 @@ - (CGFloat)widthForTabButton:(WETabButton *)button {
+ 
+ - (void)layoutTabButtons {
+     CGFloat totalWidth = 0;
+-    for (WETabButton *button in self.tabButtons) totalWidth += [self widthForTabButton:button];
++    NSMutableArray<NSNumber *> *widths = [NSMutableArray arrayWithCapacity:self.tabButtons.count];
++    for (WETabButton *button in self.tabButtons) {
++        CGFloat width = [self widthForTabButton:button];
++        [widths addObject:@(width)]; totalWidth += width;
++    }
+     CGFloat viewport = CGRectGetWidth(self.scrollView.bounds);
+     CGFloat spacing = MAX(kTabMinGap, (viewport - totalWidth) / (self.tabButtons.count + 1));
+-    CGFloat x = spacing;
++    CGFloat x = spacing; NSUInteger widthIndex = 0;
+     for (WETabButton *button in self.tabButtons) {
+-        CGFloat width = [self widthForTabButton:button];
++        CGFloat width = widths[widthIndex++].doubleValue;
+         button.frame = CGRectMake(x, 0, width, CGRectGetHeight(self.scrollView.bounds));
+         x += width + spacing;
+     }
+@@ -277,15 +283,15 @@ - (void)updateTabs:(NSArray<WESessionTabItem *> *)tabs {
+     NSString *previousID = [self.selectedTabID copy];
+     NSArray<WETabButton *> *previousButtons = [self.tabButtons copy];
+     NSInteger previousIndex = self.selectedIndex;
++    NSMutableDictionary<NSString *, WETabButton *> *oldButtons = [NSMutableDictionary dictionary];
++    for (WETabButton *button in previousButtons) if (button.tabID.length) oldButtons[button.tabID] = button;
+     NSMutableArray<WETabButton *> *buttons = [NSMutableArray arrayWithCapacity:tabs.count];
+     NSMutableSet<NSString *> *reusedIDs = [NSMutableSet set];
+     NSInteger defaultIndex = NSNotFound;
+     for (WESessionTabItem *item in tabs) {
+         WETabButton *button = nil;
+         if (item.tabId.length && ![reusedIDs containsObject:item.tabId]) {
+-            for (WETabButton *old in previousButtons) {
+-                if ([old.tabID isEqualToString:item.tabId]) { button = old; break; }
+-            }
++            button = oldButtons[item.tabId];
+             [reusedIDs addObject:item.tabId];
+         }
+         if (!button) {
+@@ -294,10 +300,13 @@ - (void)updateTabs:(NSArray<WESessionTabItem *> *)tabs {
+         }
+         button.tabID = item.tabId;
+         button.tabIndex = buttons.count;
+-        button.baseFontSize = self.baseFontSize;
+-        [button setTitle:item.displayName forState:UIControlStateNormal];
+-        button.accessibilityLabel = item.displayName;
+-        [button updateFonts];
++        if (button.baseFontSize != self.baseFontSize) {
++            button.baseFontSize = self.baseFontSize; [button updateFonts];
++        }
++        if (![button.currentTitle isEqual:item.displayName]) {
++            [button setTitle:item.displayName forState:UIControlStateNormal];
++            button.accessibilityLabel = item.displayName;
++        }
+         [self.scrollView addSubview:button];
+         if (item.type == WETabTypeAll && defaultIndex == NSNotFound) defaultIndex = button.tabIndex;
+         [buttons addObject:button];
+@@ -341,7 +350,9 @@ - (void)setSelectedIndex:(NSInteger)selectedIndex {
+ 
+ - (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot forTabIndex:(NSInteger)index {
+     if (index < 0 || index >= (NSInteger)self.tabButtons.count) return;
+-    [self.tabButtons[index] updateUnreadCount:count hasRedDot:hasRedDot];
++    WETabButton *button = self.tabButtons[index];
++    if (button.unreadCount == MAX(0, count) && button.hasRedDot == hasRedDot) return;
++    [button updateUnreadCount:count hasRedDot:hasRedDot];
+     [self setNeedsLayout];
+ }
+ 
+diff --git a/Headers/CSUserInfoHelper.h b/Headers/CSUserInfoHelper.h
+index 778983a3..56bcce27 100644
+--- a/Headers/CSUserInfoHelper.h
++++ b/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@ extern NSString * const kUserAvatarURLKey;    // 用户头像URL缓存键
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"1.6-33"  // 插件版本号
++#define kPluginVersionString @"1.6-34"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+diff --git a/README.md b/README.md
+index a62dfa3f..92f52277 100644
+--- a/README.md
++++ b/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
+ 
+-**当前版本：`1.6-33`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`1.6-34`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
+ 
+@@ -10,11 +10,11 @@
+ 
+ | 项目 | 当前状态 |
+ | --- | --- |
+-| 插件版本 | `1.6-33`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
++| 插件版本 | `1.6-34`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+ | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
+ | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
+ | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
+-| Rootless / Rootful | `1.6-33` 完成 Rootless 测试包构建；Rootful 保留构建入口，本轮未重新验证 |
++| Rootless / Rootful | `1.6-34` 完成 Rootless 测试包构建；Rootful 保留构建入口，本轮未重新验证 |
+ | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
+ | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
+ 
+@@ -141,20 +141,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
+ ### Rootless（无根）
+ 
+ ```bash
+-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-33
++make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-34
+ ```
+ 
+-默认产物：`packages/com.wechat.improve_1.6-33_iphoneos-arm64.deb`。
++默认产物：`packages/com.wechat.improve_1.6-34_iphoneos-arm64.deb`。
+ 
+ ### Rootful（有根）
+ 
+-以下为构建方法；本轮 `1.6-33` 交付仅包含 Rootless 包。
++以下为构建方法；本轮 `1.6-34` 交付仅包含 Rootless 包。
+ 
+ ```bash
+-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-33
++make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-34
+ ```
+ 
+-默认产物：`packages/com.wechat.improve_1.6-33_iphoneos-arm.deb`。
++默认产物：`packages/com.wechat.improve_1.6-34_iphoneos-arm.deb`。
+ 
+ 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
+ 
+@@ -174,7 +174,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
+ 安装了 `dpkg-deb` 的开发环境可检查包内信息：
+ 
+ ```bash
+-dpkg-deb -f packages/com.wechat.improve_1.6-33_iphoneos-arm64.deb Version Architecture
++dpkg-deb -f packages/com.wechat.improve_1.6-34_iphoneos-arm64.deb Version Architecture
+ ```
+ 
+ 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
+@@ -219,6 +219,8 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
+ 
+ ### 验证状态
+ 
++`1.6-34` 完成第一步优化：导航任务账号清理与重入唤醒、回顶部手势保护、角标和标签计算去重。详见 [两步性能优化](docs/session-groups-optimization-1.6-34-35.md)。
++
+ `1.6-33` 修复主列表离屏后仍执行分组全量重建、布局和跟手轮询的问题，返回时合并更新；其他页面的表格刷新直接走原生路径。分组回归 336 项通过，Rootless 双架构构建完成；聊天页实机流畅度待验证。详见 [聊天页性能隔离修复](docs/session-groups-chat-performance-1.6-33.md)。
+ 
+ `1.6-32` 将 85%/15% 起手分区同时应用于切组与原生菜单，修复菜单展开后左侧也被菜单接管的问题；左侧有效横滑先收起菜单再切组。分组回归 308 项通过；详见 [固定手势分区修复](docs/session-groups-zones-1.6-32.md)。
+diff --git a/Tests/GroupInteractionTests.m b/Tests/GroupInteractionTests.m
+index eecd67b3..dccc2995 100644
+--- a/Tests/GroupInteractionTests.m
++++ b/Tests/GroupInteractionTests.m
+@@ -30,7 +30,7 @@ @implementation UITableView
+ - (void)setEditing:(BOOL)editing animated:(BOOL)animated { (void)animated; self.editing=editing; self.closes++; }
+ @end
+ @interface HookedTable : UITableView @end
+-typedef NS_ENUM(NSInteger,UIGestureRecognizerState) { UIGestureRecognizerStatePossible, UIGestureRecognizerStateBegan, UIGestureRecognizerStateChanged, UIGestureRecognizerStateEnded, UIGestureRecognizerStateCancelled };
++typedef NS_ENUM(NSInteger,UIGestureRecognizerState) { UIGestureRecognizerStatePossible, UIGestureRecognizerStateBegan, UIGestureRecognizerStateChanged, UIGestureRecognizerStateEnded, UIGestureRecognizerStateCancelled, UIGestureRecognizerStateFailed };
+ @interface UIGestureRecognizer : NSObject
+ @property(nonatomic) UIGestureRecognizerState state;
+ @property(nonatomic) BOOL enabled;
+@@ -162,6 +162,7 @@ static __attribute__((unused)) void CSGroupWithDisplayIndices(id table,void (^bo
+     static NSHashTable *adapters; if (!adapters) adapters=[NSHashTable weakObjectsHashTable]; return adapters;
+ }
+ @interface CSGroupListAdapter : NSObject
++@property(nonatomic,copy) NSString *nativeActionsAccount;
+ @property(nonatomic) BOOL presentationSuspended;
+ @property(nonatomic,strong) NSArray *nativeActions;
+ @property(nonatomic,strong) UITableView *table;
+@@ -203,6 +204,7 @@ - (void)refreshNavigationTitle;
+ - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:(UITouch *)touch;
+ @end
+ @implementation CSGroupListAdapter
++- (void)pruneNativeActions {}
+ - (void)finishSuspendedBatches {}
+ #include "GroupInteractionBodies.h"
+ - (BOOL)isActive { return self.active; }
+diff --git a/Tests/GroupLifecycleTests.m b/Tests/GroupLifecycleTests.m
+index ba08426f..06b691f9 100644
+--- a/Tests/GroupLifecycleTests.m
++++ b/Tests/GroupLifecycleTests.m
+@@ -38,12 +38,13 @@ @implementation CSGroupPreferences @end
+ static void CSGroupWithNativeIndices(id table,void (^body)(void)) { (void)table; body(); }
+ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table; scopes++; body(); }
+ @interface CSGroupListAdapter : NSObject
++@property(nonatomic,copy) NSString *nativeActionsAccount;
+ @property(nonatomic,weak) UITableView *table;
+ @property(nonatomic,weak) Host *controller;
+ @property(nonatomic,strong) NSMutableDictionary *proxies,*anchors;
+ @property(nonatomic,strong) NSMutableArray *completions,*nativeActions;
+ @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
+-@property(nonatomic,strong) id nativeHeader;
++@property(nonatomic,strong) id nativeHeader,projection;
+ @property(nonatomic,strong) CSGroupPreferences *preferences;
+ @property(nonatomic) double baselineDeceleration;
+ @property(nonatomic) BOOL active,presentationSuspended,publishedEnabled,searching,dirty,scheduled,publishing,groupPanMoving,swipeActive,nativePresentation,updatingHeader,snapshotRetryAttempted;
+@@ -199,6 +200,20 @@ int main(void) { @autoreleasepool {
+     UITableView *chat=[UITableView new]; NSUInteger scopesBefore=scopes;
+     [chat reloadData];
+     Check(chat.reloads==1 && scopes==scopesBefore,@"unrelated chat table reload bypasses grouping scopes");
++    a=List(&host); [host viewWillDisappear:NO]; [a beginNativeChange];
++    [a performInNativePresentation:^{ actions++; }]; before=a.refreshCount;
++    account=@"account-C"; [a endNativeChange]; RunFor(.02);
++    Check(!a.nativeActions.count && a.refreshCount==before,@"account change prunes obsolete hidden navigation before publication");
++    for (NSUInteger i=0;i<3;i++) { [a requestRefresh]; RunFor(.01); }
++    Check(a.refreshCount==before && !a.scheduled,@"pruned navigation cannot reopen hidden refresh admission");
++    a=List(&host); a.publishing=YES; actionBefore=actions;
++    [a performInNativePresentation:^{ actions++; }];
++    Check(a.dirty && a.nativeActions.count==1,@"navigation during publication marks a follow-up dirty");
++    a.publishing=NO; [a requestRefresh]; RunFor(.02);
++    Check(actions==actionBefore+1 && !a.nativeActions.count,@"reentrant navigation drains on the next publication");
++    a=List(&host); [host viewWillDisappear:NO]; account=@"account-D"; actionBefore=actions;
++    [a performInNativePresentation:^{ actions++; }];
++    Check(actions==actionBefore+1 && !a.nativeActions.count,@"valid new-account navigation survives preference account reset");
+     fprintf(stdout,"Group lifecycle: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
+     return failures ? 1 : 0;
+ } }
+diff --git a/Tests/GroupViewportTests.m b/Tests/GroupViewportTests.m
+index f0b7912a..fbb51ffb 100644
+--- a/Tests/GroupViewportTests.m
++++ b/Tests/GroupViewportTests.m
+@@ -89,6 +89,7 @@ static long long CSGroupReadInteger(id object,NSString *name,long long fallback)
+ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table; body(); }
+ 
+ @interface CSGroupListAdapter : NSObject
++@property(nonatomic,copy) NSString *nativeActionsAccount;
+ @property(nonatomic) BOOL presentationSuspended;
+ @property(nonatomic,weak) UITableView *table;
+ @property(nonatomic,weak) HostController *controller;
+@@ -119,6 +120,7 @@ - (void)returnToGroupTop;
+ - (void)selectIndex:(NSInteger)index;
+ @end
+ @implementation CSGroupListAdapter
++- (void)pruneNativeActions {}
+ - (void)finishSuspendedBatches {}
+ #include "GroupViewportBodies.h"
+ - (BOOL)isActive { return self.active; }
+@@ -286,6 +288,11 @@ int main(void) { @autoreleasepool {
+     a=List(&host,1600); a.displayedTabs=@[tab]; a.preferences.tabs=@[tab]; a.chrome=[TestChrome new];
+     a.nativeMenuState=1; [a selectIndex:0];
+     Check(!a.pendingScrollToTop && [a.chrome.selectedTabID isEqual:a.publishedTabID],@"custom menu open prevents tab selection and preserves published indicator");
++    a=List(&host,1600); a.pendingScrollToTop=YES; a.groupPanMoving=YES;
++    [a applyPendingScrollToTop];
++    Check(a.pendingScrollToTop && !a.table.offsetWrites,@"independent group pan prevents top jump without native tracking flags");
++    a.groupPanMoving=NO; [a applyPendingScrollToTop];
++    Check(!a.pendingScrollToTop && a.table.offsetWrites==1,@"top completes once after group pan ends");
+     fprintf(stdout,"Group viewport: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
+     return failures ? 1 : 0;
+ } }
+diff --git a/Tests/extract-group-lifecycle.py b/Tests/extract-group-lifecycle.py
+index ad83e0d5..51814e49 100644
+--- a/Tests/extract-group-lifecycle.py
++++ b/Tests/extract-group-lifecycle.py
+@@ -23,7 +23,7 @@ methods = []
+ for marker in ['+ (instancetype)adapterForTable:', '+ (instancetype)adapterForController:',
+                '+ (void)attachToController:', '+ (void)layoutForController:', '+ (void)settingsChanged',
+                '- (void)requestRefresh', '- (void)beginNativeChange', '- (void)endNativeChange',
+-               '- (void)performNativeBatch:', '- (void)performInNativePresentation:', '- (void)useNativePresentation {']:
++               '- (void)pruneNativeActions', '- (void)performNativeBatch:', '- (void)performInNativePresentation:', '- (void)useNativePresentation {']:
+     methods.append(method(source, marker))
+ for marker, fallback in [('+ (void)setPresentationSuspended:', '+ (void)setPresentationSuspended:(BOOL)value forController:(id)owner { (void)value; (void)owner; }'),
+                          ('- (void)finishSuspendedBatches', '- (void)finishSuspendedBatches {}')]:
+@@ -31,7 +31,10 @@ for marker, fallback in [('+ (void)setPresentationSuspended:', '+ (void)setPrese
+ refresh = method(source, '- (void)refresh {')
+ prefix = refresh[:refresh.index('    self.publishing=YES; self.dirty=NO;')]
+ tail = refresh[refresh.index('    } @finally {'):]
+-methods.append(prefix + '    self.publishing=YES; self.dirty=NO;\n    BOOL finished=NO;\n    @try { [self publishFixture]; finished=YES;\n' + tail)
++account_start=refresh.index('        NSString *account=CSGroupCurrentAccountID();')
++account_end=refresh.index('        self.preferences=',account_start)
++account_reset=refresh[account_start:account_end]
++methods.append(prefix + '    self.publishing=YES; self.dirty=NO;\n    BOOL finished=NO;\n    @try {\n' + account_reset + ' [self publishFixture]; finished=YES;\n' + tail)
+ layout = method(source, '- (void)layout {')
+ methods.append(layout[:layout.index('    __block UIView *installed')] + '    self.layoutCount++;\n}')
+ # Actual save/restore/top method entry guards; the expensive UI work is counted.
+diff --git a/control b/control
+index d05396da..b35ab255 100644
+--- a/control
++++ b/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 1.6-33
++Version: 1.6-34
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会

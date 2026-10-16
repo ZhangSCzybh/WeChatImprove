@@ -83,7 +83,9 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
 }
 
 - (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot {
-    self.unreadCount = MAX(0, count);
+    count = MAX(0, count);
+    if (self.unreadCount == count && self.hasRedDot == hasRedDot) return;
+    self.unreadCount = count;
     self.hasRedDot = hasRedDot;
     self.unreadBadge.hidden = self.unreadCount == 0 && !hasRedDot;
     self.unreadBadge.text = self.unreadCount > 99 ? @"99+" :
@@ -256,12 +258,16 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
 
 - (void)layoutTabButtons {
     CGFloat totalWidth = 0;
-    for (WETabButton *button in self.tabButtons) totalWidth += [self widthForTabButton:button];
-    CGFloat viewport = CGRectGetWidth(self.scrollView.bounds);
-    CGFloat spacing = MAX(kTabMinGap, (viewport - totalWidth) / (self.tabButtons.count + 1));
-    CGFloat x = spacing;
+    NSMutableArray<NSNumber *> *widths = [NSMutableArray arrayWithCapacity:self.tabButtons.count];
     for (WETabButton *button in self.tabButtons) {
         CGFloat width = [self widthForTabButton:button];
+        [widths addObject:@(width)]; totalWidth += width;
+    }
+    CGFloat viewport = CGRectGetWidth(self.scrollView.bounds);
+    CGFloat spacing = MAX(kTabMinGap, (viewport - totalWidth) / (self.tabButtons.count + 1));
+    CGFloat x = spacing; NSUInteger widthIndex = 0;
+    for (WETabButton *button in self.tabButtons) {
+        CGFloat width = widths[widthIndex++].doubleValue;
         button.frame = CGRectMake(x, 0, width, CGRectGetHeight(self.scrollView.bounds));
         x += width + spacing;
     }
@@ -277,15 +283,15 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
     NSString *previousID = [self.selectedTabID copy];
     NSArray<WETabButton *> *previousButtons = [self.tabButtons copy];
     NSInteger previousIndex = self.selectedIndex;
+    NSMutableDictionary<NSString *, WETabButton *> *oldButtons = [NSMutableDictionary dictionary];
+    for (WETabButton *button in previousButtons) if (button.tabID.length) oldButtons[button.tabID] = button;
     NSMutableArray<WETabButton *> *buttons = [NSMutableArray arrayWithCapacity:tabs.count];
     NSMutableSet<NSString *> *reusedIDs = [NSMutableSet set];
     NSInteger defaultIndex = NSNotFound;
     for (WESessionTabItem *item in tabs) {
         WETabButton *button = nil;
         if (item.tabId.length && ![reusedIDs containsObject:item.tabId]) {
-            for (WETabButton *old in previousButtons) {
-                if ([old.tabID isEqualToString:item.tabId]) { button = old; break; }
-            }
+            button = oldButtons[item.tabId];
             [reusedIDs addObject:item.tabId];
         }
         if (!button) {
@@ -294,10 +300,13 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
         }
         button.tabID = item.tabId;
         button.tabIndex = buttons.count;
-        button.baseFontSize = self.baseFontSize;
-        [button setTitle:item.displayName forState:UIControlStateNormal];
-        button.accessibilityLabel = item.displayName;
-        [button updateFonts];
+        if (button.baseFontSize != self.baseFontSize) {
+            button.baseFontSize = self.baseFontSize; [button updateFonts];
+        }
+        if (![button.currentTitle isEqual:item.displayName]) {
+            [button setTitle:item.displayName forState:UIControlStateNormal];
+            button.accessibilityLabel = item.displayName;
+        }
         [self.scrollView addSubview:button];
         if (item.type == WETabTypeAll && defaultIndex == NSNotFound) defaultIndex = button.tabIndex;
         [buttons addObject:button];
@@ -341,7 +350,9 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
 
 - (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot forTabIndex:(NSInteger)index {
     if (index < 0 || index >= (NSInteger)self.tabButtons.count) return;
-    [self.tabButtons[index] updateUnreadCount:count hasRedDot:hasRedDot];
+    WETabButton *button = self.tabButtons[index];
+    if (button.unreadCount == MAX(0, count) && button.hasRedDot == hasRedDot) return;
+    [button updateUnreadCount:count hasRedDot:hasRedDot];
     [self setNeedsLayout];
 }
 
