@@ -1,5 +1,6 @@
 #import "WESessionTabContainerView.h"
 #import "CSGroupAppearance.h"
+#import <QuartzCore/QuartzCore.h>
 
 static CGFloat const kTabContainerHeight = 52.0;
 static CGFloat const kTabMinWidth = 60.0;
@@ -8,6 +9,8 @@ static CGFloat const kTabPadding = 16.0;
 static CGFloat const kTabMinGap = 8.0;
 static CGFloat const kTabBadgeGap = 3.0;
 static CGFloat const kActionButtonWidth = 44.0;
+static NSTimeInterval const kIndicatorDuration = 0.26;
+static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
 
 @interface WETabButton : UIButton
 @property (nonatomic) NSInteger tabIndex;
@@ -99,6 +102,7 @@ static CGFloat const kActionButtonWidth = 44.0;
 @property (nonatomic, strong) UIButton *searchButton;
 @property (nonatomic) CGFloat baseFontSize;
 @property (nonatomic) BOOL revealSelectionAfterLayout;
+@property (nonatomic) CGSize indicatorLayoutSize;
 @end
 
 @implementation WESessionTabContainerView
@@ -134,6 +138,15 @@ static CGFloat const kActionButtonWidth = 44.0;
     _searchButton.hidden = !CSGroupSearchButtonVisible(NSUserDefaults.standardUserDefaults);
     [self addSubview:_searchButton];
     [self refreshAppearance];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(reduceMotionChanged:)
+        name:UIAccessibilityReduceMotionStatusDidChangeNotification object:nil];
+}
+
+- (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
+
+- (void)reduceMotionChanged:(NSNotification *)notification {
+    (void)notification;
+    if (UIAccessibilityIsReduceMotionEnabled()) [self updateIndicatorPositionAnimated:NO];
 }
 
 - (UIButton *)actionButtonWithSymbol:(NSString *)symbol label:(NSString *)label action:(SEL)action {
@@ -196,6 +209,7 @@ static CGFloat const kActionButtonWidth = 44.0;
 
 - (void)didMoveToWindow {
     [super didMoveToWindow];
+    if (!self.window) [self updateIndicatorPositionAnimated:NO];
     [self refreshAppearance];
 }
 
@@ -222,6 +236,10 @@ static CGFloat const kActionButtonWidth = 44.0;
     CGFloat left = self.safeAreaInsets.left;
     self.scrollView.frame = CGRectMake(left, 0, scrollWidth, height);
     self.searchButton.frame = CGRectMake(left + scrollWidth, 0, actionWidth, height);
+    if (!CGSizeEqualToSize(self.indicatorLayoutSize,self.bounds.size)) {
+        [self.indicatorView.layer removeAnimationForKey:kIndicatorAnimationKey];
+        self.indicatorLayoutSize=self.bounds.size;
+    }
     [self layoutTabButtons];
     if (self.revealSelectionAfterLayout) {
         self.revealSelectionAfterLayout = NO;
@@ -340,22 +358,26 @@ static CGFloat const kActionButtonWidth = 44.0;
 
 - (void)selectTabAtIndex:(NSInteger)index animated:(BOOL)animated {
     if (index < 0 || index >= (NSInteger)self.tabButtons.count) return;
-    BOOL changed = index != _selectedIndex;
     [self layoutIfNeeded];
+    // Publishing a projection reassigns the same stable selection several times.
+    // That acknowledgement must not cancel an in-flight user transition.
+    if (index == _selectedIndex) {
+        // A settings refresh must still stop movement when the switch is disabled.
+        if (!CSGroupIndicatorAnimationEnabled(NSUserDefaults.standardUserDefaults))
+            [self updateIndicatorPositionAnimated:NO];
+        return;
+    }
     _selectedIndex = index;
     _selectedTabID = [self.tabButtons[index].tabID copy];
     [self updateSelectedButtons];
-    if (changed) [self triggerHapticFeedback];
-    if (animated && !UIAccessibilityIsReduceMotionEnabled()) {
-        [UIView animateWithDuration:0.18 delay:0 options:UIViewAnimationOptionCurveEaseOut | UIViewAnimationOptionBeginFromCurrentState animations:^{
-            [self updateIndicatorPosition];
-            [self scrollToSelectedTab];
-        } completion:nil];
-    } else {
-        [self.indicatorView.layer removeAllAnimations];
-        [self updateIndicatorPosition];
-        [self scrollToSelectedTab];
-    }
+    [self triggerHapticFeedback];
+    BOOL animate = animated && CSGroupIndicatorAnimationEnabled(NSUserDefaults.standardUserDefaults) && self.window && !UIAccessibilityIsReduceMotionEnabled();
+    [self updateIndicatorPositionAnimated:animate];
+    if (animate) {
+        [UIView animateWithDuration:kIndicatorDuration delay:0
+            options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction
+            animations:^{ [self scrollToSelectedTab]; } completion:nil];
+    } else [self scrollToSelectedTab];
 }
 
 - (void)triggerHapticFeedback {
@@ -372,14 +394,65 @@ static CGFloat const kActionButtonWidth = 44.0;
 }
 
 - (void)updateIndicatorPosition {
+    // An unread badge or data refresh can relayout the same target while moving.
+    // Preserve that animation; retarget only if its final geometry has changed.
+    BOOL moving = [self.indicatorView.layer animationForKey:kIndicatorAnimationKey] != nil;
+    [self updateIndicatorPositionAnimated:moving];
+}
+
+- (void)updateIndicatorPositionAnimated:(BOOL)animated {
     BOOL valid = self.selectedIndex >= 0 && self.selectedIndex < (NSInteger)self.tabButtons.count;
+    BOOL wasHidden = self.indicatorView.hidden;
     self.indicatorView.hidden = !valid;
-    if (!valid) return;
+    if (!valid) {
+        [self.indicatorView.layer removeAnimationForKey:kIndicatorAnimationKey];
+        return;
+    }
     WETabButton *button = self.tabButtons[self.selectedIndex];
     CGRect title = [button tabTitleFrame];
-    CGFloat width = MIN(CGRectGetWidth(button.bounds) - 8, CGRectGetWidth(title) + 12);
-    self.indicatorView.frame = CGRectMake(CGRectGetMinX(button.frame) + CGRectGetMidX(title) - width / 2,
+    CGFloat width = MAX(0, MIN(CGRectGetWidth(button.bounds) - 8, CGRectGetWidth(title) + 12));
+    CGRect target = CGRectMake(CGRectGetMinX(button.frame) + CGRectGetMidX(title) - width / 2,
         MAX(0, CGRectGetHeight(self.scrollView.bounds) - kIndicatorHeight - 5), width, kIndicatorHeight);
+    BOOL animate = animated && CSGroupIndicatorAnimationEnabled(NSUserDefaults.standardUserDefaults) && !wasHidden && self.window && !UIAccessibilityIsReduceMotionEnabled();
+    [self moveIndicatorToFrame:target animated:animate];
+}
+
+- (void)moveIndicatorToFrame:(CGRect)target animated:(BOOL)animated {
+    CALayer *layer = self.indicatorView.layer;
+    if (animated && CGRectEqualToRect(layer.frame,target)) return;
+    // Capture the visible position before replacing the previous animation so
+    // rapid taps reverse smoothly instead of jumping to its previous destination.
+    CALayer *presentation = layer.presentationLayer;
+    CGRect start = presentation ? presentation.frame : layer.frame;
+    [layer removeAnimationForKey:kIndicatorAnimationKey];
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    layer.frame = target;
+    [CATransaction commit];
+    if (!animated || CGRectIsEmpty(start) || CGRectEqualToRect(start,target)) return;
+
+    CGFloat distance = fabs(CGRectGetMidX(target)-CGRectGetMidX(start));
+    CGFloat stretch = MIN(14.0,distance * 0.12);
+    CGPoint from = CGPointMake(CGRectGetMidX(start),CGRectGetMidY(start));
+    CGPoint to = CGPointMake(CGRectGetMidX(target),CGRectGetMidY(target));
+    CAKeyframeAnimation *position = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+    position.values = @[[NSValue valueWithCGPoint:from],[NSValue valueWithCGPoint:to]];
+    position.keyTimes = @[@0,@1];
+    position.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+    CAKeyframeAnimation *size = [CAKeyframeAnimation animationWithKeyPath:@"bounds.size"];
+    size.values = @[[NSValue valueWithCGSize:start.size],
+        [NSValue valueWithCGSize:CGSizeMake(MAX(start.size.width,target.size.width)+stretch,target.size.height)],
+        [NSValue valueWithCGSize:target.size]];
+    size.keyTimes = @[@0,@0.45,@1];
+    size.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut],
+                            [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+    // Position has one continuous easing curve; only width turns at the stretch peak.
+    position.duration = kIndicatorDuration;
+    size.duration = kIndicatorDuration;
+    CAAnimationGroup *group = [CAAnimationGroup animation];
+    group.animations = @[position,size];
+    group.duration = kIndicatorDuration;
+    [layer addAnimation:group forKey:kIndicatorAnimationKey];
 }
 
 - (void)scrollToSelectedTab {
@@ -388,7 +461,8 @@ static CGFloat const kActionButtonWidth = 44.0;
     CGFloat viewport = CGRectGetWidth(self.scrollView.bounds);
     CGFloat maxOffset = MAX(0, self.scrollView.contentSize.width - viewport);
     CGFloat offset = MAX(0, MIN(CGRectGetMidX(frame) - viewport / 2, maxOffset));
-    [self.scrollView setContentOffset:CGPointMake(offset, 0) animated:NO];
+    if (fabs(self.scrollView.contentOffset.x-offset)>0.5)
+        [self.scrollView setContentOffset:CGPointMake(offset, 0) animated:NO];
 }
 
 - (void)tabButtonTapped:(WETabButton *)sender {

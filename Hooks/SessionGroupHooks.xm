@@ -47,8 +47,14 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 %hook NewMainFrameViewController
 - (void)viewDidLoad { %orig; [CSGroupListAdapter attachToController:self]; }
 - (void)initView { %orig; [CSGroupListAdapter attachToController:self]; }
-- (void)viewWillAppear:(BOOL)animated { Native(self,NO,^{ %orig; }); [CSGroupListAdapter attachToController:self]; }
-- (void)viewDidAppear:(BOOL)animated { Native(self,NO,^{ %orig; }); [CSGroupListAdapter attachToController:self]; }
+- (void)viewWillAppear:(BOOL)animated {
+    Native(self,NO,^{ %orig; });
+    [CSGroupListAdapter attachToController:self];
+}
+- (void)viewDidAppear:(BOOL)animated {
+    Native(self,NO,^{ %orig; });
+    [CSGroupListAdapter attachToController:self];
+}
 - (void)viewDidLayoutSubviews { Native(self,NO,^{ %orig; }); [CSGroupListAdapter layoutForController:self]; }
 - (void)initTableHeaderView { Native(self,NO,^{ %orig; }); [CSGroupListAdapter layoutForController:self]; }
 - (void)setSearchBarToTableHeaderView { Native(self,NO,^{ %orig; }); [CSGroupListAdapter layoutForController:self]; }
@@ -137,7 +143,8 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 }
 - (UIView *)tableHeaderView {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (a && !a.updatingHeader && CSGroupUsesNativeIndices(self)) return [a nativeTableHeaderView];
+    if (a && (CSGroupUsesNativeHeader(self) || (!a.updatingHeader && CSGroupUsesNativeIndices(self))))
+        return [a nativeTableHeaderView];
     return %orig;
 }
 - (void)setTableHeaderView:(UIView *)header {
@@ -281,6 +288,16 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 %end
 
 %hook MainFrameTableView
+- (BOOL)hasSearchBarHeader {
+    if (![CSGroupListAdapter adapterForTable:self]) return %orig;
+    // MMTableView switches BOTH contentInset getter and setter semantics based
+    // on this classification. The grouping wrapper must never change it.
+    // A separate read scope also works inside publishHeader (updatingHeader=YES)
+    // without changing which rows or displayed header UIKit is laying out.
+    __block BOOL result=NO;
+    CSGroupWithNativeHeader(self, ^{ result=%orig; });
+    return result;
+}
 - (NSIndexPath *)indexPathForSelectedRow {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
     if (!a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;

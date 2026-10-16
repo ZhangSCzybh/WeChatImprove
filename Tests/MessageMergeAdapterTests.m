@@ -698,6 +698,18 @@ int main(void) { @autoreleasepool {
     [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSChatDiagnosticsEnabledKey:@NO} forName:NSArgumentDomain];
     NSString *before=CSChatDiagnosticReport();CSChatRecordMergeMeasurement(60,200,30,-25,0);CSChatRecordMergePart(2,0,14);
     CHECK([before isEqual:CSChatDiagnosticReport()]);
+    // Clearing removes the shared buffer even when recording is off; it never toggles recording.
+    CSChatClearDiagnostics();
+    CHECK([CSChatDiagnosticReport() hasPrefix:@"暂无记录"]);
+    CHECK(![NSUserDefaults.standardUserDefaults boolForKey:CSChatDiagnosticsEnabledKey]);
+    [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSChatDiagnosticsEnabledKey:@YES} forName:NSArgumentDomain];
+    CSChatRecordEvent(@"test",@"before-clear"); CSChatClearDiagnostics();
+    CHECK([NSUserDefaults.standardUserDefaults boolForKey:CSChatDiagnosticsEnabledKey]);
+    CSChatRecordEvent(@"test",@"after-clear");
+    CHECK([CSChatDiagnosticReport() containsString:@"after-clear"]);
+    CHECK(![CSChatDiagnosticReport() containsString:@"before-clear"]);
+    CSChatClearDiagnostics(); CSChatClearDiagnostics();
+    CHECK([CSChatDiagnosticReport() hasPrefix:@"暂无记录"]);
     [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSChatDiagnosticsEnabledKey:@YES} forName:NSArgumentDomain];
     CSChatRecordMergeMeasurement(60,200,30,-25,0x800);CSChatRecordMergeGeometry(35,5,37);CSChatRecordMergePart(2,0,14);
     CHECK([CSChatDiagnosticReport() containsString:@"geometry-part role=0x2 top=0.00 bottom=14.00"]);

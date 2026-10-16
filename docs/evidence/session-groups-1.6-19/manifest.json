@@ -1,0 +1,36 @@
+{
+  "app_version": "8.0.78",
+  "build": "8.0.78.34",
+  "binary_sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "ipa_sha256": "6a0dc1f9fb3e003c3178b43331d21989dd6ff08f3560e8a1791d4fbdca89eebd",
+  "cryptid": 0,
+  "source_kind": "local third-party packaged IPA, matching version; runtime image identity not verified",
+  "analysis": "REA target identity; bounded Mach-O class/relative-method/chained-pointer decoding and LLVM instruction disassembly. REA inspect_macho timed out; no decompilation or runtime observation claimed.",
+  "methods": {
+    "MMTableView.hasSearchBarHeader": "0x11672b110",
+    "MMTableView.contentInset": "0x116728d34",
+    "MMTableView.setContentInset:": "0x116728b28",
+    "NewMainFrameViewController.setTableViewContentInsetOffsetWithoutScrollWithContentInset:contentOffset:": "0x10510e3b4",
+    "NewMainFrameViewController.setSearchBarToTableHeaderView": "0x105126124"
+  },
+  "selector_refs": {
+    "0x11fe3bb70": "contentInset",
+    "0x1200fef80": "adjustedContentInset",
+    "0x1200ee868": "hasSearchBarHeader",
+    "0x120107728": "setContentInset:",
+    "0x11fe4c788": "setScrollIndicatorInsets:",
+    "0x11fe4cad8": "tableHeaderView",
+    "0x1200fff58": "class",
+    "0x120103858": "isKindOfClass:",
+    "0x11fe3c1b0": "setTableHeaderView:",
+    "0x11fe3bf18": "searchBar"
+  },
+  "search_classes": [
+    "UISearchBar",
+    "WCSearchBar"
+  ],
+  "limitations": [
+    "Nearest exported symbol headings in LLVM output are not Objective-C method names; method starts were resolved from class metadata.",
+    "No connection to the user device; static paths do not prove which flags were set during the supplied trace."
+  ]
+}

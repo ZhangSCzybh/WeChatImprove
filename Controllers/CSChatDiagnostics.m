@@ -13,6 +13,9 @@ void CSChatRecordEvent(NSString *feature, NSString *stage) {
 NSString *CSChatDiagnosticReport(void) {
     @synchronized (CSChatDiagnosticsEnabledKey) { return events.count ? [events componentsJoinedByString:@"\n"] : @"暂无记录。请开启兼容性诊断，返回聊天并复现问题后，再查看或复制。"; }
 }
+void CSChatClearDiagnostics(void) {
+    @synchronized (CSChatDiagnosticsEnabledKey) { [events removeAllObjects]; }
+}
 
 void CSChatRecordMergeMeasurement(double rowHeight, double contentWidth, double contentHeight,
                                   double delta, NSUInteger blockers) {

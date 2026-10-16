@@ -7,7 +7,6 @@
 #import "WESessionTabContainerView.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
-#import <QuartzCore/QuartzCore.h>
 
 static char AdapterKey, CellRowKey;
 static NSHashTable<CSGroupListAdapter *> *Adapters(void) {
@@ -46,9 +45,10 @@ static id ObjectArgument(id target, NSString *name, id value) {
 @property (nonatomic, copy) NSDictionary<NSString *,id> *identityDisplayPaths;
 @property (nonatomic, copy) NSString *publishedTabID;
 @property (nonatomic) BOOL projecting, chromeVisible;
+@property (nonatomic) BOOL publishedEnabled;
 @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *prefetchedPaths;
 @property (nonatomic, strong) NSMutableArray *nativeActions;
-@property (nonatomic) BOOL nativePresentation, scheduled, dirty, searching, scrolling;
+@property (nonatomic) BOOL nativePresentation, scheduled, dirty, searching;
 @property (nonatomic, readwrite) BOOL publishing;
 @property (atomic, readwrite) NSUInteger changeDepth;
 @property (nonatomic) NSUInteger revision;
@@ -89,7 +89,14 @@ static id ObjectArgument(id target, NSString *name, id value) {
         objc_setAssociatedObject(table,&AdapterKey,adapter,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [Adapters() addObject:adapter];
     }
-    [adapter refresh]; [adapter layout];
+    // Appearance is not a data change. Repeated reload/anchor restoration here
+    // competes with WeChat's own search/task-bar inset and offset restoration.
+    NSString *account=CSGroupCurrentAccountID();
+    BOOL sameAccount=adapter.preferences.accountID==account || [adapter.preferences.accountID isEqualToString:account];
+    BOOL searching=CSGroupReadInteger(controller,@"isSearching",0)!=0;
+    if (!adapter.preferences || adapter.dirty || !sameAccount ||
+        adapter.publishedEnabled!=Option(@"enabled") || adapter.searching!=searching) [adapter refresh];
+    [adapter layout];
 }
 + (void)layoutForController:(id)controller {
     if (!NSThread.isMainThread || !controller) return;
@@ -256,6 +263,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
         }
         self.projecting=projecting;
         self.chromeVisible=Option(@"enabled") && !self.searching && account.length>0;
+        self.publishedEnabled=Option(@"enabled");
         self.publishedTabID=selected;
         self.chrome.selectedTabID=selected; [self.chrome updateTabs:tabs]; self.chrome.selectedTabID=selected;
         id logic=CSGroupReadObject(self.controller,@"m_mainFrameLogicController");
@@ -286,7 +294,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     if (self.scheduled || self.changeDepth || self.publishing) return;
     self.scheduled=YES;
     __weak typeof(self) weakSelf=self;
-    dispatch_async(dispatch_get_main_queue(), ^{ CSGroupListAdapter *self=weakSelf; self.scheduled=NO; [self refresh]; });
+    dispatch_async(dispatch_get_main_queue(), ^{ CSGroupListAdapter *self=weakSelf; self.scheduled=NO; if (self.dirty) [self refresh]; });
 }
 - (void)beginNativeChange {
     @synchronized (self) { if (!self.changeDepth && NSThread.isMainThread) [self saveAnchor]; self.changeDepth++; }
@@ -496,43 +504,52 @@ static id ObjectArgument(id target, NSString *name, id value) {
         __unsafe_unretained NSIndexPath *native=nil; [inv getReturnValue:&native];
         NSIndexPath *display=[self displayPath:native]; [inv setReturnValue:&display]; [inv retainArguments];
     }
-    if ([name isEqual:@"tableView:willDisplayCell:forRowAtIndexPath:"]) {
-        __unsafe_unretained UITableViewCell *cell=nil; [inv getArgument:&cell atIndex:3];
-        if (self.scrolling && !self.publishing && !UIAccessibilityIsReduceMotionEnabled() && [NSUserDefaults.standardUserDefaults boolForKey:@"com.wechat.enhance.scroll_animation.enabled"]) {
-            CABasicAnimation *motion=[CABasicAnimation animationWithKeyPath:@"transform.translation.y"];
-            motion.fromValue=@10; motion.toValue=@0; motion.additive=YES; motion.duration=0.18;
-            [cell.layer addAnimation:motion forKey:@"CSGroupScrollMotion"];
-            CABasicAnimation *fade=[CABasicAnimation animationWithKeyPath:@"opacity"];
-            fade.fromValue=@(cell.layer.opacity*0.5); fade.toValue=@(cell.layer.opacity); fade.duration=0.18;
-            [cell.layer addAnimation:fade forKey:@"CSGroupScrollFade"];
-        }
-    }
-    if ([name isEqual:@"scrollViewWillBeginDragging:"]) self.scrolling=YES;
     if ([name isEqual:@"scrollViewDidEndDecelerating:"] || [name isEqual:@"scrollViewDidEndDragging:willDecelerate:"] || [name isEqual:@"tableView:didEndEditingRowAtIndexPath:"]) {
-        if (!self.table.dragging && !self.table.decelerating) self.scrolling=NO;
         if (self.dirty) [self requestRefresh];
     }
 }
+- (BOOL)hasScrollableContent {
+    UITableView *table=self.table;
+    CGFloat viewport=CGRectGetHeight(table.bounds);
+    CGFloat content=table.contentSize.height;
+    UIEdgeInsets inset=table.adjustedContentInset;
+    return viewport>0 && isfinite(viewport) && isfinite(content) &&
+        isfinite(inset.top) && isfinite(inset.bottom) && content+inset.top+inset.bottom>viewport+0.5;
+}
+- (BOOL)canRestoreAnchor {
+    UITableView *table=self.table;
+    // Do not turn a pull-down/bounce or a native top-area transition into a
+    // persistent row anchor. The host owns these positions, including short lists.
+    return [self hasScrollableContent] && !self.searching && !table.tracking &&
+        !table.dragging && !table.decelerating && isfinite(table.contentOffset.y) &&
+        table.contentOffset.y>=-table.adjustedContentInset.top-0.5;
+}
 - (void)saveAnchor {
     if (!self.isActive || !self.publishedTabID) return;
+    if (![self hasScrollableContent]) { [self.anchors removeObjectForKey:self.publishedTabID]; return; }
+    if (![self canRestoreAnchor]) return;
     __block NSIndexPath *first=nil; __block CGRect rect=CGRectZero;
     CSGroupWithDisplayIndices(self.table, ^{ first=[self.table.indexPathsForVisibleRows sortedArrayUsingSelector:@selector(compare:)].firstObject; if (first) rect=[self.table rectForRowAtIndexPath:first]; });
     CSGroupRow *row=[self.projection rowAtDisplayPath:first];
-    if (row.userName.length) self.anchors[self.publishedTabID]=@{@"name":row.userName,@"kind":@(row.kind),@"offset":@(self.table.contentOffset.y-rect.origin.y)};
+    if (row.userName.length) self.anchors[self.publishedTabID]=@{@"name":row.userName,@"kind":@(row.kind),@"offset":@(self.table.contentOffset.y+self.table.adjustedContentInset.top-rect.origin.y)};
 }
 - (void)restoreAnchor {
     NSDictionary *anchor=self.anchors[self.publishedTabID];
-    if (!self.isActive || !anchor) return;
+    if (!self.isActive || !anchor || ![self canRestoreAnchor]) return;
     for (NSUInteger s=0;s<self.projection.sections.count;s++) {
         NSArray *rows=self.projection.sections[s];
         for (NSUInteger r=0;r<rows.count;r++) { CSGroupRow *row=rows[r];
             if ([row.userName isEqual:anchor[@"name"]] && row.kind==[anchor[@"kind"] unsignedIntegerValue]) {
                 NSIndexPath *path=[NSIndexPath indexPathForRow:(NSInteger)r inSection:(NSInteger)s];
                 CSGroupWithDisplayIndices(self.table, ^{
-                    CGFloat y=[self.table rectForRowAtIndexPath:path].origin.y+[anchor[@"offset"] doubleValue];
+                    // Keep the row relative to the unobscured viewport, not an
+                    // absolute offset captured with an earlier navigation inset.
+                    CGFloat y=[self.table rectForRowAtIndexPath:path].origin.y+[anchor[@"offset"] doubleValue]-self.table.adjustedContentInset.top;
                     CGFloat min=-self.table.adjustedContentInset.top;
                     CGFloat max=MAX(min,self.table.contentSize.height-self.table.bounds.size.height+self.table.adjustedContentInset.bottom);
-                    [self.table setContentOffset:CGPointMake(self.table.contentOffset.x,MIN(max,MAX(min,y))) animated:NO];
+                    CGFloat target=MIN(max,MAX(min,y));
+                    if (isfinite(y) && fabs(target-self.table.contentOffset.y)>0.5)
+                        [self.table setContentOffset:CGPointMake(self.table.contentOffset.x,target) animated:NO];
                 }); return;
             }
         }

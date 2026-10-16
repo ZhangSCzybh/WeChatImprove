@@ -1,0 +1,26 @@
+{
+  "version": "1.6-21",
+  "scheme": "rootless",
+  "package": "packages/com.wechat.improve_1.6-21_iphoneos-arm64.deb",
+  "sha256": "81312e195294e799a22f151d4975631accddca83d8765f8abca6ac7353ffaffd",
+  "bytes": 706448,
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "payload_matches_build": true,
+  "removed_scroll_effect_markers_absent_from_source_and_binary": true,
+  "indicator_preference_and_native_header_fix_present": true,
+  "source_hashes_unchanged_during_final_build": 195,
+  "previous_packages_preserved": 22,
+  "header_semantics_checks": 46,
+  "viewport_checks": 39,
+  "indicator_checks": 23,
+  "failures": 0,
+  "changed_production_compiler_warnings": [],
+  "on_device_verified": false,
+  "build_logs": [
+    "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-animation-settings-1.6-21-ksggitft/build.log",
+    "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-animation-settings-1.6-21-ksggitft/final-build.log"
+  ]
+}

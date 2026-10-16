@@ -15,3 +15,18 @@ static void WithDomain(id table, BOOL native, void (^block)(void)) {
 }
 void CSGroupWithNativeIndices(id table, void (^block)(void)) { WithDomain(table,YES,block); }
 void CSGroupWithDisplayIndices(id table, void (^block)(void)) { WithDomain(table,NO,block); }
+
+static NSString *const HeaderScopeKey=@"CSGroupIndexScope.nativeHeaders";
+BOOL CSGroupUsesNativeHeader(id table) {
+    for (id scopedTable in NSThread.currentThread.threadDictionary[HeaderScopeKey])
+        if (scopedTable==table) return YES;
+    return NO;
+}
+void CSGroupWithNativeHeader(id table, void (^block)(void)) {
+    NSMutableDictionary *dictionary=NSThread.currentThread.threadDictionary;
+    NSMutableArray *stack=dictionary[HeaderScopeKey];
+    if (!stack) dictionary[HeaderScopeKey]=stack=[NSMutableArray array];
+    [stack addObject:table];
+    @try { block(); }
+    @finally { [stack removeLastObject]; if (!stack.count) [dictionary removeObjectForKey:HeaderScopeKey]; }
+}

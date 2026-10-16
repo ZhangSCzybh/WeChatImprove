@@ -2,6 +2,7 @@
 FOUNDATION_EXPORT NSString *const CSChatDiagnosticsEnabledKey;
 FOUNDATION_EXPORT void CSChatRecordEvent(NSString *feature, NSString *stage);
 FOUNDATION_EXPORT NSString *CSChatDiagnosticReport(void);
+FOUNDATION_EXPORT void CSChatClearDiagnostics(void);
 
 // Numeric layout metrics only; no messages, account IDs or object descriptions.
 FOUNDATION_EXPORT void CSChatRecordMergeMeasurement(double rowHeight, double contentWidth,

@@ -1,0 +1,31 @@
+{
+  "version": "1.6-18",
+  "scheme": "rootless",
+  "package": "packages/com.wechat.improve_1.6-18_iphoneos-arm64.deb",
+  "sha256": "c8f74b6010157364a66ce1ade59cc15fb217bc60a795b72b89aa107a3ec8a4ea",
+  "bytes": 709356,
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "payload_matches_build": true,
+  "source_hashes_unchanged_during_build": 189,
+  "previous_packages_preserved": 19,
+  "group_checks": 98,
+  "group_failures_on_1_6_17": 10,
+  "group_failures_after_fix": 0,
+  "on_device_verified": false,
+  "build_log": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-inset-1.6-18-usyo24oi/build.log",
+  "observed_1_6_17": {
+    "raw_top": 103,
+    "adjusted_top": 200.67,
+    "automatic_top": 97.67,
+    "offset_y": -200.67,
+    "baseline": 0
+  },
+  "expected_when_normal_103_observed": {
+    "raw_top": 0,
+    "adjusted_top": 97.67,
+    "offset_y": -97.67
+  }
+}

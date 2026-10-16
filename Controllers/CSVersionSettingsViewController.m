@@ -21,11 +21,13 @@ static void CSCopyChatDiagnosticText(UIViewController *controller, NSString *tex
 
 @interface CSChatDiagnosticViewController : UIViewController
 @property(nonatomic,copy) NSString *report;
+@property(nonatomic,strong) UITextView *reportView;
 @end
 @implementation CSChatDiagnosticViewController
 - (void)viewDidLoad {
     [super viewDidLoad];self.title=@"诊断记录";self.view.backgroundColor=UIColor.systemBackgroundColor;
     UITextView *text=[UITextView new];text.translatesAutoresizingMaskIntoConstraints=NO;
+    self.reportView=text;
     text.editable=NO;text.selectable=YES;text.text=self.report;
     text.font=[UIFont monospacedSystemFontOfSize:13 weight:UIFontWeightRegular];
     text.textColor=UIColor.labelColor;text.backgroundColor=UIColor.systemBackgroundColor;
@@ -35,13 +37,22 @@ static void CSCopyChatDiagnosticText(UIViewController *controller, NSString *tex
         [text.bottomAnchor constraintEqualToAnchor:safe.bottomAnchor],
         [text.leadingAnchor constraintEqualToAnchor:safe.leadingAnchor],
         [text.trailingAnchor constraintEqualToAnchor:safe.trailingAnchor]]];
-    self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithTitle:@"复制"
+    UIBarButtonItem *copy=[[UIBarButtonItem alloc] initWithTitle:@"复制"
         style:UIBarButtonItemStylePlain target:self action:@selector(copyReport)];
+    UIBarButtonItem *clear=[[UIBarButtonItem alloc] initWithTitle:@"清空"
+        style:UIBarButtonItemStylePlain target:self action:@selector(clearReport)];
+    self.navigationItem.rightBarButtonItems=@[copy,clear];
     if (self.navigationController.viewControllers.firstObject==self)
         self.navigationItem.leftBarButtonItem=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
             target:self action:@selector(closeReport)];
 }
 - (void)copyReport { CSCopyChatDiagnosticText(self,self.report); }
+- (void)clearReport {
+    CSChatClearDiagnostics();
+    self.report=CSCurrentChatDiagnosticText();
+    self.reportView.text=self.report;
+    [self.reportView setContentOffset:CGPointZero animated:NO];
+}
 - (void)closeReport { [self dismissViewControllerAnimated:YES completion:nil]; }
 @end
 

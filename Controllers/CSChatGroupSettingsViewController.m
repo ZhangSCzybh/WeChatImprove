@@ -20,7 +20,6 @@ static NSString * const kSwipeGestureEnabledKey = @"com.wechat.enhance.chat_grou
 static NSString * const kHideGroupBadgeKey = @"com.wechat.enhance.chat_group.hide_group_badge";
 static NSString * const kHideAllBadgeKey = @"com.wechat.enhance.chat_group.hide_all_badge";
 static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sensitivity";
-static NSString * const kScrollAnimationEnabledKey = @"com.wechat.enhance.scroll_animation.enabled";
 
 @interface WEColorPreviewView : UIView
 @property (nonatomic, strong) UIColor *previewColor;
@@ -310,6 +309,17 @@ static NSString * const kScrollAnimationEnabledKey = @"com.wechat.enhance.scroll
         [weakSelf showColorPicker];
     };
     
+    CSSettingItem *indicatorAnimationItem = [CSSettingItem switchItemWithTitle:@"分组指示器切换动画"
+                                                                  iconName:@"wand.and.stars"
+                                                                 iconColor:[UIColor systemPurpleColor]
+                                                               switchValue:CSGroupIndicatorAnimationEnabled(defaults)
+                                                         valueChangedBlock:^(BOOL isOn) {
+        [defaults setBool:isOn forKey:CSGroupIndicatorAnimationEnabledKey];
+        [defaults synchronize];
+
+        [weakSelf reloadChatGroupSettings];
+    }];
+
     NSString *hapticDetail = [self hapticFeedbackName];
     CSSettingItem *hapticFeedbackItem = [CSSettingItem itemWithTitle:@"切换触感"
                                                            iconName:@"hand.tap"
@@ -374,17 +384,6 @@ static NSString * const kScrollAnimationEnabledKey = @"com.wechat.enhance.scroll
         [weakSelf showScrollSensitivityPicker];
     };
     
-    CSSettingItem *scrollAnimationItem = [CSSettingItem switchItemWithTitle:@"滑动特效"
-                                                                  iconName:@"wand.and.stars"
-                                                                 iconColor:[UIColor systemPurpleColor]
-                                                               switchValue:[defaults boolForKey:kScrollAnimationEnabledKey]
-                                                         valueChangedBlock:^(BOOL isOn) {
-        [defaults setBool:isOn forKey:kScrollAnimationEnabledKey];
-        [defaults synchronize];
-        
-        [weakSelf reloadChatGroupSettings];
-    }];
-    
     CSSettingItem *infoItem = [CSSettingItem itemWithTitle:@"功能说明"
                                                  iconName:@"info.circle"
                                                 iconColor:[UIColor systemBlueColor]
@@ -400,7 +399,7 @@ static NSString * const kScrollAnimationEnabledKey = @"com.wechat.enhance.scroll
                                                                   items:groupItems];
     
     CSSettingSection *otherSection = [CSSettingSection sectionWithHeader:@"其他设置"
-                                                                  items:@[fontSizeItem, searchButtonItem, indicatorColorItem, selectedTextColorItem, hapticFeedbackItem, filterDuplicateItem, swipeGestureItem, hideGroupBadgeItem, hideAllBadgeItem, scrollSensitivityItem, scrollAnimationItem]];
+                                                                  items:@[fontSizeItem, searchButtonItem, indicatorColorItem, selectedTextColorItem, indicatorAnimationItem, hapticFeedbackItem, filterDuplicateItem, swipeGestureItem, hideGroupBadgeItem, hideAllBadgeItem, scrollSensitivityItem]];
     
     CSSettingSection *infoSection = [CSSettingSection sectionWithHeader:@""
                                                                   items:@[infoItem]];
@@ -443,7 +442,7 @@ static NSString * const kScrollAnimationEnabledKey = @"com.wechat.enhance.scroll
         if (!self.groupPreferences.accountID.length) return @"当前账号尚未确认，账号分组暂不可编辑；确认登录账号后将自动载入。";
         return @"点击右上角\"排序\"可拖拽调整分组顺序，左滑可编辑或隐藏或删除";
     } else if (section == 2){
-        return @"分组标签字号：默认 18 pt，可自定义 12–28 pt，并随系统文字大小缩放。\n显示分组栏搜索按钮：开启时使用标签栏右侧搜索入口，收起聊天列表整块原生搜索区域（含背景、留白和占位）；关闭时恢复。\n添加分组：请在本页点击“添加自定义分组”。\n过滤重复联系人：开启后分组内的好友、群聊将不会出现在私信和群列表，在列表安全更新后生效。\n分组切换手势：在会话区域左侧 80% 起手横滑可切换分组；从会话右侧 20% 起手左滑可展开原生菜单。按手指落点区分，滑动中途不改变用途；菜单展开时暂停切组。分组栏也支持横滑，标签过多时优先滚动标签。\n隐藏分组角标：隐藏除\"全部\"外的其他分组角标。\n隐藏全部角标：隐藏\"全部\"分组的角标。\n滑动灵敏度：建议默认，相对流畅。\n滑动特效：开启后，滚动列表显示短暂淡入与位移动画，遵循系统减弱动态效果。";
+        return @"分组标签字号：默认 18 pt，可自定义 12–28 pt，并随系统文字大小缩放。\n显示分组栏搜索按钮：开启时使用标签栏右侧搜索入口，收起聊天列表整块原生搜索区域（含背景、留白和占位）；关闭时恢复。\n添加分组：请在本页点击“添加自定义分组”。\n过滤重复联系人：开启后分组内的好友、群聊将不会出现在私信和群列表，在列表安全更新后生效。\n分组切换手势：在会话区域左侧 80% 起手横滑可切换分组；从会话右侧 20% 起手左滑可展开原生菜单。按手指落点区分，滑动中途不改变用途；菜单展开时暂停切组。分组栏也支持横滑，标签过多时优先滚动标签。\n隐藏分组角标：隐藏除\"全部\"外的其他分组角标。\n隐藏全部角标：隐藏\"全部\"分组的角标。\n滑动灵敏度：建议默认，相对流畅。\n分组指示器切换动画：默认开启，切换分组时指示器平滑移动并轻微伸展收回；关闭后直接落位。遵循系统减弱动态效果。";
     } else {
         return nil;
     }
@@ -1102,7 +1101,7 @@ static NSString * const kScrollAnimationEnabledKey = @"com.wechat.enhance.scroll
 
 - (void)showInfoAlert {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"聊天分组功能说明"
-                                                                            message:@"聊天分组功能在聊天列表顶部显示会话分组标签，方便您快速切换查看不同类型的会话。开启分组栏搜索按钮后，使用该按钮搜索，并收起整块原生搜索区域。\n\n【主要功能】\n• 预设分组：全部、群聊、私聊、服务\n• 自定义分组：在设置页点击“添加自定义分组”创建\n• 分组排序：拖拽调整分组顺序\n• 分组隐藏：可隐藏不需要的分组\n\n【高级设置】\n• 分组标签字号：默认 18 pt，可自定义 12–28 pt\n• 显示分组栏搜索按钮：开启时收起整块原生搜索区域及占位，关闭时恢复\n• 指示器颜色：自定义选中指示器颜色\n• 选中文本颜色：自定义选中文本颜色\n• 切换触感：切换分组时的触感反馈\n• 过滤重复联系人：避免会话重复显示\n• 分组切换手势：会话区域左侧 80% 起手横滑切组，右侧 20% 起手左滑展开菜单，按起点区分；菜单展开时暂停切组。分组栏也可横滑，标签过多时优先滚动标签\n• 隐藏角标：隐藏分组角标\n• 滑动灵敏度：调整列表滑动速度\n• 滑动特效：滚动时的短暂淡入和位移动画\n\n设置将在当前滚动或编辑结束后更新。"
+                                                                            message:@"聊天分组功能在聊天列表顶部显示会话分组标签，方便您快速切换查看不同类型的会话。开启分组栏搜索按钮后，使用该按钮搜索，并收起整块原生搜索区域。\n\n【主要功能】\n• 预设分组：全部、群聊、私聊、服务\n• 自定义分组：在设置页点击“添加自定义分组”创建\n• 分组排序：拖拽调整分组顺序\n• 分组隐藏：可隐藏不需要的分组\n\n【高级设置】\n• 分组标签字号：默认 18 pt，可自定义 12–28 pt\n• 显示分组栏搜索按钮：开启时收起整块原生搜索区域及占位，关闭时恢复\n• 指示器颜色：自定义选中指示器颜色\n• 选中文本颜色：自定义选中文本颜色\n• 切换触感：切换分组时的触感反馈\n• 过滤重复联系人：避免会话重复显示\n• 分组切换手势：会话区域左侧 80% 起手横滑切组，右侧 20% 起手左滑展开菜单，按起点区分；菜单展开时暂停切组。分组栏也可横滑，标签过多时优先滚动标签\n• 隐藏角标：隐藏分组角标\n• 滑动灵敏度：调整列表滑动速度\n• 分组指示器切换动画：默认开启，关闭后指示器直接落位，遵循系统减弱动态效果\n\n设置将在当前滚动或编辑结束后更新。"
                                                                      preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"了解了"

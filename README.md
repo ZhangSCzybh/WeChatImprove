@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.6-15`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.6-21`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.6-15`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.6-21`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.6-15` 完成 Rootless 测试包构建；Rootful 保留构建入口，本轮未重新验证 |
+| Rootless / Rootful | `1.6-21` 完成 Rootless 测试包构建；Rootful 保留构建入口，本轮未重新验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -139,20 +139,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-15
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-21
 ```
 
-默认产物：`packages/com.wechat.improve_1.6-15_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.6-21_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.6-15` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.6-21` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-15
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-21
 ```
 
-默认产物：`packages/com.wechat.improve_1.6-15_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.6-21_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -172,7 +172,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.6-15_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.6-21_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
@@ -216,6 +216,18 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 实现细节见 [会话分组说明](docs/session-groups.md)、[列表圆角优化](docs/list-corners.md)；设计背景见 [分组重构方案](docs/session-groups-refactor-proposal.md)。
 
 ### 验证状态
+
+`1.6-21` 在聊天分组设置中新增默认开启的“分组指示器切换动画”开关，关闭后直接落位。移除“滑动特效”开关及会话行淡入、位移动画实现。分组切换手势和滑动灵敏度继续独立生效。详见 [分组动画开关与特效清理](docs/session-groups-animation-settings-1.6-21.md)。
+
+`1.6-20` 清理顶部空白排查专用日志、底层 inset 读取和顶部状态探测，保留用户实机确认有效的表头识别修复、通用诊断及“清空”按钮。分组指示器新增约 0.26 秒滑动/轻微伸展收回动画，刷新重复设置同一选中项不再取消动画，支持快速连续切换与减少动态效果。详见 [日志清理与指示器动画](docs/session-groups-indicator-1.6-20.md)。
+
+`1.6-19` 修复分组容器导致原生搜索表头识别不一致的问题。微信 `MMTableView` 根据 `hasSearchBarHeader` 切换 inset 读写规则；现在该判断始终读取原生表头，且不改变 UIKit 实际布局的分组容器。移除 1.6-17/18 的数值补偿与重复修正，诊断区分微信 getter 与 UIKit 原始 inset。新增原生语义回放回归。详见 [表头识别根因与修复](docs/session-groups-header-1.6-19.md)。用户已实机确认顶部空白问题解决。
+
+`1.6-18` 继续处理分组短列表返回空白：1.6-17 实机日志中，原始 inset 多出 103，而当前系统贡献为 97.67，旧版相等条件没有命中。本版采样同一主表正常布局时的系统贡献，结合已成功修正的重复量处理后续往返；增加原始 inset 写入诊断和接口未生效诊断。保留诊断“清空”入口。详见 [动态 inset 修复与验证](docs/session-groups-inset-1.6-18.md)。用户随后确认仍有空白：修正重复执行但 inset 读回未改变。该版将微信 getter 当作原始 inset 的假设已被后续二进制分析纠正，见 1.6-19。
+
+`1.6-17` 根据设备诊断处理分组短列表返回时重复计入系统顶部 inset（原始 0→103、调整后 103→206）；按观测基线与系统实际增量修正，不使用固定高度，避开原生顶部展开和交互。诊断记录页增加“清空”，同步清除内存和显示内容并保留诊断开关。详见 [顶部 inset 与诊断清空修复](docs/session-groups-inset-1.6-17.md)。用户随后实机确认仍有空白，相等判据未命中，后续见 1.6-18。
+
+`1.6-16` 修复聊天分组短列表的顶部位置恢复：普通页面往返不再重复重载列表；短列表不再由行锚点恢复强制写入顶部偏移，长列表锚点随顶部 inset 换算，并避开触摸、拖动、减速和下拉回弹。增加分组布局诊断与可执行回归。详见 [分组顶部空白修复](docs/session-groups-viewport-1.6-16.md)。用户随后实机确认仍有顶部空白，后续修复见 1.6-17。
 
 `1.6-15` 修正气泡颜色外观判定：依据聊天视图的 UIKit 外观选择浅色/深色配置，不再反转私有 isUseLightStyle 标志。移除红包/转账配色设置及专用渲染链路，卡片保持原生背景。气泡策略/渲染回归 8,269 项、适配器生命周期与主题像素回归 111 项通过，完成 Rootless 构建；设备效果待复核。详见 [气泡外观修复](docs/bubble-appearance-1.6-15.md)。
 
