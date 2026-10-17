@@ -23,6 +23,7 @@ static NSString * const kWCHideSettingsEnabledKey = @"com.wechat.tweak.hide_sett
 static NSString * const kWCHideServiceEnabledKey = @"com.wechat.tweak.hide_service_enabled";
 // 添加隐藏视频号与公众号选项的键
 static NSString * const kWCHideChannelsEnabledKey = @"com.wechat.tweak.hide_channels_enabled";
+static NSString * const kWCHideWorksEnabledKey = @"com.wechat.tweak.hide_works_enabled";
 
 // 发现页隐藏设置键
 static NSString * const kWCHideDiscoverChannelsKey = @"com.wechat.tweak.hide_discover_channels";
@@ -87,6 +88,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
 @property (nonatomic, strong) CSSettingItem *hideServiceItem;
 // 添加隐藏视频号与公众号选项的控制项
 @property (nonatomic, strong) CSSettingItem *hideChannelsItem;
+@property (nonatomic, strong) CSSettingItem *hideWorksItem;
 
 // 发现页隐藏选项
 @property (nonatomic, strong) CSSettingItem *hideDiscoverChannelsItem;
@@ -212,6 +214,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
     self.hideSettingsItem.switchValue = hideSettingsEnabled;
     self.hideServiceItem.switchValue = hideServiceEnabled;
     self.hideChannelsItem.switchValue = hideChannelsEnabled;
+    self.hideWorksItem.switchValue = [defaults boolForKey:kWCHideWorksEnabledKey];
     
     // 发现页设置
     BOOL hideDiscoverChannels = [defaults objectForKey:kWCHideDiscoverChannelsKey] ? [defaults boolForKey:kWCHideDiscoverChannelsKey] : NO;
@@ -423,6 +426,17 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
+    self.hideWorksItem = [CSSettingItem switchItemWithTitle:@"隐藏作品选项"
+                                                 iconName:@"square.stack"
+                                                iconColor:[UIColor systemBlueColor]
+                                              switchValue:[defaults boolForKey:kWCHideWorksEnabledKey]
+                                         valueChangedBlock:^(BOOL isOn) {
+        [[NSUserDefaults standardUserDefaults] setBool:isOn forKey:kWCHideWorksEnabledKey];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"com.wechat.tweak.local_settings_changed" object:nil];
+        CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
+    }];
+
     // 隐藏视频号
     self.hideDiscoverChannelsItem = [CSSettingItem switchItemWithTitle:@"隐藏视频号" 
                                                              iconName:@"video.circle" 
@@ -751,7 +765,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
                                                                 items:@[self.hideChatTimeItem, self.hidePatMessageItem, self.hideVoiceHintItem]];
     
     CSSettingSection *myPageSection = [CSSettingSection sectionWithHeader:@"我的页面设置" 
-                                                                 items:@[self.hideMomentsItem, self.hideFavoriteItem, self.hideWalletItem, self.hideStickerItem, self.hideSettingsItem, self.hideServiceItem, self.hideChannelsItem]];
+                                                                 items:@[self.hideMomentsItem, self.hideFavoriteItem, self.hideWalletItem, self.hideStickerItem, self.hideSettingsItem, self.hideServiceItem, self.hideChannelsItem, self.hideWorksItem]];
     
     // 创建发现页设置分区
     CSSettingSection *discoverSection = [CSSettingSection sectionWithHeader:@"发现页设置" 

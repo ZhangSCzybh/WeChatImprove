@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.6-40`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.7-0`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.6-40`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.7-0`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.6-40` 完成 Rootless 测试包构建（底栏动画前台恢复与清理）；Rootful 保留构建入口，本轮未重新验证 |
+| Rootless / Rootful | `1.7-0` 完成 Rootless 测试包构建（“我”页面隐藏作品）；Rootful 保留构建入口，本轮未重新验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -56,6 +56,12 @@
 | **备份配置 / 重置设置 / 入口设置** | 配置备份、导入、导出、恢复和自动备份；设置重置及插件入口定制 |
 
 “后台运行”受系统调度和注入环境限制，不能保证微信永不被终止。“版本控制”调整的是微信版本返回值，不会安装或降级微信；“更新控制”针对微信内部热更新，不等同于关闭 App Store 更新。
+
+## 界面净化：隐藏作品
+
+`1.7-0` 在 **界面净化 → 我的页面设置** 新增 **隐藏作品选项**，默认关闭，与“隐藏视频号与公众号选项”独立。开启后返回“我”页面隐藏“作品”；关闭后返回该页重建原生列表以恢复入口。支持读取原始标题来兼容菜单文字定制，不删除作品内容。
+
+已通过主机行为回归并完成 Rootless 双架构编译打包，实机效果待验证。实现与验收说明见 [隐藏作品 1.7-0](docs/my-page-works-1.7-0.md)。
 
 ## 聊天分组
 
@@ -157,20 +163,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-40
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.7-0
 ```
 
-默认产物：`packages/com.wechat.improve_1.6-40_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.7-0_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.6-40` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.7-0` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-40
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.7-0
 ```
 
-默认产物：`packages/com.wechat.improve_1.6-40_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.7-0_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -190,7 +196,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.6-40_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.7-0_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
@@ -234,6 +240,8 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 实现细节见 [会话分组说明](docs/session-groups.md)、[列表圆角优化](docs/list-corners.md)；设计背景见 [分组重构方案](docs/session-groups-refactor-proposal.md)。
 
 ### 验证状态
+
+`1.7-0` 新增独立的“隐藏作品选项”，通过隐藏/恢复、原生重建、开关组合、标题定制和未知行处理的主机回归，完成 Rootless 双架构构建。实机显示效果待验证。详见 [隐藏作品](docs/my-page-works-1.7-0.md)。
 
 `1.6-40` 修复返回微信后动画因缓存跳过而不恢复的问题，清理底栏冗余接口、未使用声明和控制台输出。主机行为回归与 Rootless 双架构构建通过，真实设备后台恢复待验证。详见 [前台恢复与清理](docs/tabbar-animation-resume-1.6-40.md)。
 

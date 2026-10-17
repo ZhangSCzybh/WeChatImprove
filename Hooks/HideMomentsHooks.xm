@@ -9,6 +9,7 @@ static NSString * const kWCHideStickerEnabledKey = @"com.wechat.tweak.hide_stick
 static NSString * const kWCHideSettingsEnabledKey = @"com.wechat.tweak.hide_settings_enabled";
 static NSString * const kWCHideServiceEnabledKey = @"com.wechat.tweak.hide_service_enabled";
 static NSString * const kWCHideChannelsEnabledKey = @"com.wechat.tweak.hide_channels_enabled";
+static NSString * const kWCHideWorksEnabledKey = @"com.wechat.tweak.hide_works_enabled";
 
 static BOOL gHideMomentsEnabled = NO;
 static BOOL gHideFavoriteEnabled = NO;
@@ -17,6 +18,8 @@ static BOOL gHideStickerEnabled = NO;
 static BOOL gHideSettingsEnabled = NO;
 static BOOL gHideServiceEnabled = NO;
 static BOOL gHideChannelsEnabled = NO;
+static BOOL gHideWorksEnabled = NO;
+static char kAppliedHideWorksKey;
 
 static void loadSettings() {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -27,6 +30,7 @@ static void loadSettings() {
     gHideSettingsEnabled = [defaults objectForKey:kWCHideSettingsEnabledKey] ? [defaults boolForKey:kWCHideSettingsEnabledKey] : NO;
     gHideServiceEnabled = [defaults objectForKey:kWCHideServiceEnabledKey] ? [defaults boolForKey:kWCHideServiceEnabledKey] : NO;
     gHideChannelsEnabled = [defaults objectForKey:kWCHideChannelsEnabledKey] ? [defaults boolForKey:kWCHideChannelsEnabledKey] : NO;
+    gHideWorksEnabled = [defaults boolForKey:kWCHideWorksEnabledKey];
 }
 
 static void settingsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
@@ -53,8 +57,8 @@ static NSString *getCellTitle(id cellInfo) {
 }
 
 static BOOL shouldHideCell(NSString *title) {
-    if (!title) return NO;
-    
+    if (![title isKindOfClass:[NSString class]]) return NO;
+
     if (gHideMomentsEnabled && ([title containsString:@"朋友圈"] || [title containsString:@"Moments"])) {
         return YES;
     }
@@ -78,6 +82,20 @@ static BOOL shouldHideCell(NSString *title) {
     }
     
     return NO;
+}
+
+// 文字定制会改写 title getter；只为作品识别读取原始标题，避免误隐藏改名为“作品”的其他入口。
+static BOOL isWorksCell(id cellInfo) {
+    @try {
+        id config = [cellInfo valueForKey:@"cellConfig"];
+        id leftConfig = [config valueForKey:@"leftConfig"];
+        if (!leftConfig) return NO;
+        Ivar titleIvar = class_getInstanceVariable([leftConfig class], "_title");
+        id title = titleIvar ? object_getIvar(leftConfig, titleIvar) : [leftConfig valueForKey:@"title"];
+        return [title isKindOfClass:[NSString class]] && [title isEqualToString:@"作品"];
+    } @catch (NSException *e) {
+        return NO;
+    }
 }
 
 static void removeCellAt(id section, unsigned long long index) {
@@ -116,7 +134,10 @@ static void hideCellsInSection(id tableViewMgr) {
                 if (!cellInfo) continue;
                 
                 NSString *title = getCellTitle(cellInfo);
-                if (shouldHideCell(title)) {
+                // 作品使用原始标题；旧开关继续沿用原有匹配方式。
+                BOOL hideWorks = gHideWorksEnabled && isWorksCell(cellInfo);
+                BOOL hideOther = shouldHideCell(title);
+                if (hideWorks || hideOther) {
                     [cellsToRemove addObject:@{@"section": @(i), @"cell": @(j)}];
                 }
             }
@@ -151,6 +172,7 @@ static void hideCellsInSection(id tableViewMgr) {
 }
 
 @interface MoreViewController : NSObject
+- (void)reloadMoreView;
 @end
 
 %hook MoreViewController
@@ -159,16 +181,26 @@ static void hideCellsInSection(id tableViewMgr) {
     %orig;
     loadSettings();
     hideCellsInSection([self valueForKey:@"m_tableViewMgr"]);
+    objc_setAssociatedObject(self, &kAppliedHideWorksKey, @(gHideWorksEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)viewWillAppear:(_Bool)arg1 {
+    BOOL previouslyHidden = [objc_getAssociatedObject(self, &kAppliedHideWorksKey) boolValue];
+    loadSettings();
     %orig;
+    if (previouslyHidden && !gHideWorksEnabled) {
+        // 删除过的 cell 需要由微信重新创建；仅 reloadData 无法恢复。
+        [self reloadMoreView];
+        return;
+    }
     hideCellsInSection([self valueForKey:@"m_tableViewMgr"]);
+    objc_setAssociatedObject(self, &kAppliedHideWorksKey, @(gHideWorksEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)reloadMoreView {
     %orig;
     hideCellsInSection([self valueForKey:@"m_tableViewMgr"]);
+    objc_setAssociatedObject(self, &kAppliedHideWorksKey, @(gHideWorksEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 %end
