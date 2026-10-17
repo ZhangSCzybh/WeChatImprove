@@ -257,12 +257,55 @@ static void ContactsDiscoverMoreTests(void) {
     more.frame=CGRectMake(0,0,500,700);CSListCornerMoreDecorateHeader(header);Check(header.frame.size.width==462 && detail.frame.size.width==462 && detail.frame.size.height==80,@"profile uses actual container width and preserves status-detail height");
     UIView *ordinary=View(MMUIButton.class,CGRectMake(0,0,120,44));[other addSubview:ordinary];Check(CGRectEqualToRect(CSListCornerMoreHeaderFrame(ordinary,ordinary.frame),ordinary.frame),@"ordinary MMUIButton never becomes a profile card");
 }
+static void ReviewCompatibilityTests(void) {
+    Configure();
+    UITableView *more=Table();Owner(CSListCornerPageMore,more);
+    UIView *header=View(MMUIButton.class,CGRectMake(0,0,390,200));
+    more.tableHeaderView=header;[more addSubview:header];
+    for(Class cls in @[TextStateProfileCardContentView.class,MMUIView.class]) {
+        UIView *detail=View(cls,CGRectMake(0,110,390,0));detail.alpha=.65;detail.hidden=NO;[header addSubview:detail];
+        CSListCornerMoreDecorateHeader(header);
+        Check(!detail.hidden && Near(detail.alpha,.65) && detail.frame.size.height==0,@"zero-height native state content retains its own visibility and height");
+        // Native expansion changes the actual business content, not merely the outer header.
+        detail.frame=CGRectMake(0,110,390,80);
+        CSListCornerMoreDecorateHeader(header);
+        Check(!detail.hidden && Near(detail.alpha,.65) && detail.frame.size.height==80 && detail.frame.size.width==352,@"collapsed state content expands with native visibility, opacity and height preserved");
+        detail.hidden=YES;detail.alpha=.35;detail.frame=CGRectMake(0,110,390,0);
+        CSListCornerMoreDecorateHeader(header);
+        Check(detail.hidden && Near(detail.alpha,.35) && detail.frame.size.height==0,@"native-hidden collapsed status retains its original opacity");
+        detail.hidden=NO;detail.frame=CGRectMake(0,110,390,120);
+        CSListCornerMoreDecorateHeader(header);
+        Check(!detail.hidden && Near(detail.alpha,.35) && detail.frame.size.height==120,@"native unhide after collapse remains visible without plugin alpha suppression");
+        [detail removeFromSuperview];
+    }
+    UIView *line=View(UIView.class,CGRectMake(0,0,390,.5));[header addSubview:line];
+    CSListCornerMoreDecorateHeader(header);
+    Check(line.hidden && line.alpha==0,@"exact UIView separator keeps the established thin-line hiding behavior");
+    [FixtureConfiguration saveEnabled:NO];
+    UITableView *session=Table();id owner=Owner(CSListCornerPageSession,session);session.backgroundView=[UIView new];
+    session.backgroundColor=UIColor.clearColor;session.backgroundView.backgroundColor=UIColor.whiteColor;
+    session.showsVerticalScrollIndicator=YES;session.separatorStyle=(UITableViewCellSeparatorStyle)99;
+    UITableViewCell *cell=Cell(session,0,0);UIView *item=View(MainFrameItemView.class,cell.bounds);[cell.contentView addSubview:item];
+    session.throwsOnQuery=YES;
+    CSListCornerPrepareTable(owner,CSListCornerPageSession,YES);
+    Check([session.backgroundColor isEqual:[FixtureConfiguration.snapshot backgroundForStyle:session.traitCollection.userInterfaceStyle]],@"disabled session appearance still applies configured background");
+    Check([session.backgroundView.backgroundColor isEqual:CSListCornerCanvasColor()] && !session.showsVerticalScrollIndicator,@"disabled session appearance retains canvas and hidden scroll indicator baseline");
+    Check(session.separatorStyle==(UITableViewCellSeparatorStyle)99 && session.queries==0,@"disabled session preparation changes only existing appearance properties without querying table data");
+    CGRect nativeFrame=item.frame;NSUInteger contentSubviews=cell.contentView.subviews.count;
+    CSListCornerSessionDecorate(cell,session,cell.path,owner);
+    HookMMTableViewCellLayout(cell);HookNewContactsItemCellLayout(cell);
+    Check(CGRectEqualToRect(CSListCornerSessionItemFrame(item,nativeFrame),nativeFrame) && cell.contentView.subviews.count==contentSubviews && session.queries==0,@"disabled session cell and global layout decoration remain inactive with zero queries");
+    UITableView *contacts=Table();id contactsOwner=Owner(CSListCornerPageContacts,contacts);contacts.backgroundColor=UIColor.whiteColor;contacts.showsVerticalScrollIndicator=YES;
+    CSListCornerPrepareTable(contactsOwner,CSListCornerPageContacts,YES);
+    Check([contacts.backgroundColor isEqual:UIColor.whiteColor] && contacts.showsVerticalScrollIndicator,@"disabled preparation exception is restricted to session appearance");
+    Configure();
+}
 int main(int argc,const char **argv) { @autoreleasepool {
     if(argc!=2)return 2;
     NSDictionary *baseline=[NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:@(argv[1])] options:0 error:NULL];
     FixtureDefaults=[MemoryDefaults new];FixtureConfiguration=[[CSListCornerConfiguration alloc] initWithDefaults:FixtureDefaults];
     method_setImplementation(class_getClassMethod(CSListCornerConfiguration.class,@selector(sharedConfiguration)),(IMP)SharedConfiguration);
-    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();
+    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();
     fprintf(stdout,"List corners: %lu checks, %lu failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)\n",(unsigned long)checks,(unsigned long)failures);
     return failures?1:0;
 } }

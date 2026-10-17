@@ -73,7 +73,9 @@ void CSListCornerHideSeparator(UITableViewCell *cell) {
 }
 void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial) {
     CSListCornerSnapshot *configuration=[[CSListCornerConfiguration sharedConfiguration] snapshot];
-    if (!configuration.enabled) return;
+    // Session appearance historically applies these three properties even when disabled.
+    // Cell/layout decoration keeps its independent enabled gate.
+    if (!configuration.enabled && page!=CSListCornerPageSession) return;
     UITableView *table=CSListCornerOwnedTable(owner,page); if (!table) return;
     table.backgroundColor=page==CSListCornerPageSession ? [configuration backgroundForStyle:table.traitCollection.userInterfaceStyle] : CSListCornerCanvasColor();
     if (initial || page==CSListCornerPageSession) {

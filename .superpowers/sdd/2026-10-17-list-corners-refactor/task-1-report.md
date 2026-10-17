@@ -23,7 +23,7 @@ Branch: `codex/list-corners-refactor-1.7-17`; starting commit `9c699587` (approv
 `bash Tests/verify-list-corners.sh`
 
 ```text
-List corners: 742 checks, 0 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)
+List corners: 756 checks, 0 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)
 ```
 
 The command compiles the actual production configuration, policy, context, renderer and four adapters with isolated UIKit doubles. It extracts all eight current height Hook bodies, the two global cell layout Hook bodies, the existing production CSGroupCardPosition implementation, production reset mutations and the five picker validation bodies. It links the unchanged production CSGroupIndexScope implementation. Storage is an injected in-memory fixture; shared configuration is overridden in the test process before any production storage access. Tests never write real user defaults.
@@ -65,3 +65,15 @@ Protected source differences against 9c699587: none
 These are host behavioral tests and compiler checks. They do not establish live WeChat UIKit hierarchy, Hook ordering, exact device pixels, frame rate/memory, cold-launch success, long text/dynamic type, or all combinations of hidden/custom entries, favorites verification, status expansion/dragging, QR touch areas, side swipe/search and grouping. Unknown native content roles are preserved rather than recursively rewriting arbitrary labels/images; device acceptance should especially inspect opaque/new private containers and status-card boundaries. The original broad line/subview scanning was narrowed to known owned roles; native separators outside those verified roles need visual acceptance.
 
 The final user package, release metadata, independent review, protected regression evidence and device checklist belong to Task 2. No device installation or acceptance claim is made here.
+
+
+## Independent-review compatibility fixes
+
+Two Important findings were fixed together after commit `52e888b9`:
+
+1. Profile header thin-line hiding is restricted to exact `UIView`, matching the original behavior. `TextStateProfileCardContentView` and `MMUIView` may start at zero height; decoration never modifies their native hidden/alpha values. Their own later nonzero heights and native visibility changes survive subsequent decoration.
+2. Session `viewDidAppear` table preparation again applies configured background, canvas backgroundView color and hidden vertical scroll indicator even when the corner switch is off, preserving the 1.7-17 appearance contract. This exception applies only to session preparation. Disabled cell/item/global layout decoration still exits without table data queries; other disabled page preparation remains inactive.
+
+Fourteen additional checks execute the actual adapters/preparation function. Before the fixes, the expanded suite reported `756 checks, 10 failures`; after the fixes, `bash Tests/verify-list-corners.sh` reports `756 checks, 0 failures`. Fixtures cover both business container classes starting at height 0 and expanding to 80/120, native hidden/alpha preservation during collapse/unhide, unchanged exact-UIView line hiding, disabled session's three appearance properties, unchanged separator behavior, zero-query disabled cell/global layout and unchanged disabled contacts preparation.
+
+The corrected production sources were incrementally compiled in the existing isolated Theos output with `make -j4 SCHEME=rootless _THEOS_LOCAL_DATA_DIR=/tmp/list-corner-ios-fixed.dgIcXX`. Log: `/tmp/list-corner-ios-review-fixes.log`. Both architectures compiled/linked/merged/signed successfully. Existing unrelated hook/linker warnings were left unchanged. No release metadata or parent-owned audit files were changed.

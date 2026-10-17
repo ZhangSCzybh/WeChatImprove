@@ -71,7 +71,9 @@ void CSListCornerMoreDecorateHeader(UIView *view) {
             else if ([name isEqualToString:@"TextStatePublishEntryButton"] || [name isEqualToString:@"TextStateFriendTopicButton"]) { frame.origin.x=buttonX; buttonX+=frame.size.width+8; }
             else if ([name isEqualToString:@"MMUIButton"] && frame.size.width<30 && frame.size.height<30) frame.origin.x=cardWidth-66;
             else if ([name isEqualToString:@"TextStateProfileCardContentView"] || [name isEqualToString:@"MMUIView"] || [name isEqualToString:@"UIView"]) {
-                if (frame.size.height<1) { item.hidden=YES; item.alpha=0; continue; }
+                // Only the established exact-UIView thin-line role is hidden.
+                // Business state containers may begin at zero height and expand later.
+                if ([name isEqualToString:@"UIView"] && frame.size.height<1) { item.hidden=YES; item.alpha=0; continue; }
                 frame.origin.x=0; frame.size.width=cardWidth;
             } else continue;
             CSListCornerSetFrame(item,frame);
