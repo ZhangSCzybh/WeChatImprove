@@ -7,6 +7,7 @@
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupListAdapter.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupIndexScope.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupRefreshState.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupNativeBridge.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
@@ -16,5 +17,6 @@
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupListAdapter.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupIndexScope.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupRefreshState.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupNativeBridge.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h:

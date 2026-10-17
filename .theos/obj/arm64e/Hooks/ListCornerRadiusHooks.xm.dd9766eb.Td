@@ -5,6 +5,7 @@
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../HeadersFile/NewMainFrameViewController.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupListAdapter.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupIndexScope.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupRefreshState.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerRenderer.h \
   /Users/zhangshichao/theos/vendor/include/substrate.h \
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap \
@@ -14,6 +15,7 @@
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../HeadersFile/NewMainFrameViewController.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupListAdapter.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupIndexScope.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupRefreshState.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerRenderer.h:
 /Users/zhangshichao/theos/vendor/include/substrate.h:
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap:

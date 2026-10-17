@@ -5,8 +5,8 @@
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
         @"1.7-12": @[
-            @{@"title": @"修复搜索转场标题闪烁",
-              @"detail": @"使用分组栏搜索进入及返回时，聊天列表保持当前分组标题，避免短暂显示“微信”；搜索页面继续使用自身标题。"}
+            @{@"title": @"参考国民级APP更新",
+              @"detail": @"解决了一些已知问题。"}
         ],
         @"1.7-11": @[
             @{@"title": @"调整指示器拖动收缩效果",

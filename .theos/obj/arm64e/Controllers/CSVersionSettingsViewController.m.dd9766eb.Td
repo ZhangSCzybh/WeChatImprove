@@ -3,11 +3,8 @@
   Controllers/CSVersionSettingsViewController.m \
   /Users/zhangshichao/theos/Prefix.pch \
   Controllers/CSVersionSettingsViewController.h \
-  Controllers/CSSettingTableViewCell.h Controllers/CSChatDiagnostics.h \
-  Controllers/../Headers/CSUserInfoHelper.h
+  Controllers/CSSettingTableViewCell.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
 /Users/zhangshichao/theos/Prefix.pch:
 Controllers/CSVersionSettingsViewController.h:
 Controllers/CSSettingTableViewCell.h:
-Controllers/CSChatDiagnostics.h:
-Controllers/../Headers/CSUserInfoHelper.h:
