@@ -12,7 +12,27 @@ static BOOL CSNativeTypeMatches(const char *actual, NSString *expected) {
     if ([expected isEqualToString:@"@"]) return *actual=='@';
     return strcmp(actual,expected.UTF8String)==0;
 }
+// Only the evidenced CMessageWrap -> type-extension forwarding path is eligible.
+// Never trust a synthetic method signature or follow an arbitrary forwarding chain.
+static id CSNativeReceiver(id receiver, SEL selector) {
+    if (!receiver || class_getInstanceMethod(object_getClass(receiver),selector)) return receiver;
+    Class wrapClass=NSClassFromString(@"CMessageWrap");
+    if (!wrapClass || ![receiver isKindOfClass:wrapClass]) return nil;
+    SEL extensionSelector=NSSelectorFromString(@"m_extendInfoWithMsgType"), forwardingSelector=@selector(forwardingTargetForSelector:);
+    Method getter=class_getInstanceMethod(object_getClass(receiver),extensionSelector), forwarder=class_getInstanceMethod(object_getClass(receiver),forwardingSelector);
+    if (!getter || !forwarder || method_getNumberOfArguments(getter)!=2 || method_getNumberOfArguments(forwarder)!=3) return nil;
+    char type[128]={0}; method_getReturnType(getter,type,sizeof(type)); if (!CSNativeTypeMatches(type,@"@")) return nil;
+    method_getReturnType(forwarder,type,sizeof(type)); if (!CSNativeTypeMatches(type,@"@")) return nil;
+    method_getArgumentType(forwarder,2,type,sizeof(type)); if (!CSNativeTypeMatches(type,@":")) return nil;
+    @try {
+        id extension=((id (*)(id,SEL))method_getImplementation(getter))(receiver,extensionSelector);
+        id target=((id (*)(id,SEL,SEL))method_getImplementation(forwarder))(receiver,forwardingSelector,selector);
+        if (extension && extension!=receiver && target==extension && class_getInstanceMethod(object_getClass(extension),selector)) return extension;
+    } @catch (__unused NSException *exception) {}
+    return nil;
+}
 BOOL CSMessageNativeSupports(id receiver, NSString *selector, NSString *resultType, NSArray<NSString *> *argumentTypes) {
+    receiver=CSNativeReceiver(receiver,NSSelectorFromString(selector));
     if (!receiver) return NO;
     Method method=class_getInstanceMethod(object_getClass(receiver),NSSelectorFromString(selector));
     if (!method || method_getNumberOfArguments(method)!=argumentTypes.count+2) return NO;
@@ -23,6 +43,7 @@ BOOL CSMessageNativeSupports(id receiver, NSString *selector, NSString *resultTy
 }
 id CSMessageNativeInvoke(id receiver, NSString *selector, NSArray *arguments) {
     SEL sel=NSSelectorFromString(selector);
+    receiver=CSNativeReceiver(receiver,sel);
     Method method=class_getInstanceMethod(object_getClass(receiver),sel);
     if (!method || method_getNumberOfArguments(method)!=arguments.count+2) [NSException raise:NSInvalidArgumentException format:@"Unsupported native ABI"];
     NSMethodSignature *signature=[NSMethodSignature signatureWithObjCTypes:method_getTypeEncoding(method)];
@@ -62,10 +83,15 @@ id CSMessageNativeInvoke(id receiver, NSString *selector, NSArray *arguments) {
     return nil;
 }
 unsigned long long CSMessageNativeUnsigned(id receiver, NSString *selector) {
-    @try { Method method=class_getInstanceMethod(object_getClass(receiver),NSSelectorFromString(selector)); char type[32]={0}; if (!method || method_getNumberOfArguments(method)!=2) return 0; method_getReturnType(method,type,sizeof(type)); if (!strchr("BIiQqLl",*CSNativeType(type))) return 0; return [CSMessageNativeInvoke(receiver,selector,@[]) unsignedLongLongValue]; }
+    @try { receiver=CSNativeReceiver(receiver,NSSelectorFromString(selector)); Method method=class_getInstanceMethod(object_getClass(receiver),NSSelectorFromString(selector)); char type[32]={0}; if (!method || method_getNumberOfArguments(method)!=2) return 0; method_getReturnType(method,type,sizeof(type)); if (!strchr("BIiQqLl",*CSNativeType(type))) return 0; return [CSMessageNativeInvoke(receiver,selector,@[]) unsignedLongLongValue]; }
     @catch (__unused NSException *exception) { return 0; }
 }
+id CSMessageNativeObject(id receiver, NSString *selector) {
+    @try { return CSMessageNativeSupports(receiver,selector,@"@",@[]) ? CSMessageNativeInvoke(receiver,selector,@[]) : nil; }
+    @catch (__unused NSException *exception) { return nil; }
+}
 BOOL CSMessageNativeSet(id receiver, NSString *setter, id value, BOOL required) {
+    receiver=CSNativeReceiver(receiver,NSSelectorFromString(setter));
     Method method=class_getInstanceMethod(object_getClass(receiver),NSSelectorFromString(setter));
     if (!method) return !required;
     char result[16]={0}, argument[128]={0}; method_getReturnType(method,result,sizeof(result)); method_getArgumentType(method,2,argument,sizeof(argument));

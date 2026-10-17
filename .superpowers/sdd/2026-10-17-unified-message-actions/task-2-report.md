@@ -106,3 +106,38 @@ Logs are `/tmp/wechat-task2-theos.log` and `/tmp/wechat-task2-theos-final.log` f
 5. No live server acceptance/delivery observer was established. Real native void routes remain Unknown and never auto-retry. Accepted/refused host injection exercises ownership/results without pretending to prove delivery.
 6. Native UI confirmation, picker/comments/cancellation, progress placement, page changes, menu target/icon compatibility, media file/download states, all ordinary subtype repeat equivalence and end-to-end playable/openable recipient payloads require device comparison before release. App nested subtype/delegated location builders have residual native ownership/semantic uncertainty explicitly documented by the evidence; no universal deep-copy or exact-repeat claim is made.
 7. The atomic marker closes queued-callback invalidation before main cleanup. It cannot make an individual opaque native method atomic with WeChat account transitions already concurrent inside that method; post-insertion invalidation yields Unknown and never another sender.
+
+## Review round 1 correction — native payload forwarding and voice XML flags
+
+Addressed both material findings in `task-2-review-findings.md`. The original direct-property host fixture hid a native mismatch: the studied CMessageWrap delegates type-specific payload selectors through `forwardingTargetForSelector:` to `m_extendInfoWithMsgType`. The native adapter now resolves this exact path only for CMessageWrap instances, verifies the concrete getter and forwarder ABIs, requires the forwarder to select that exact type-extension object, then checks/invokes its concrete method ABI. Synthetic signatures, arbitrary forwarding targets, unrelated forwarding objects and recursive forwarding chains are not accepted. Direct native methods retain their previous handling. Task 1 context/service/UI getters remain concrete-only.
+
+The native boundary now includes an object payload getter, used consistently for voice bytes, image-info detachment, emoji MD5 and app attachment ID. Scalar getters/setters and Supports/Invoke share the same checked receiver resolution. Existing production send tests now run against a wrapper whose voice/image/app/emoji properties are `@dynamic` and actually forward to a separate extension, including fresh outgoing voice construction. Image independence and app declared-data/remote-ID guards therefore exercise the real ownership/dispatch shape.
+
+Voice preparation parses presence-aware `endflag` and `cancelflag` attributes from the `voicemsg` tag. Explicit nonterminal state cannot be accepted merely because duration/status/declared byte count match. A correlated terminal native callback can supersede that earlier nonterminal metadata after revalidation. Cancellation is sticky within the preparation and always refuses, including at a terminal callback. Flags are freshly read before background work and again before accepting its result, so cancellation arriving during the file read refuses. Historical messages with absent flags retain the existing length/codec/terminal completeness routes; no new file-size or recipient restriction was added.
+
+Test-first evidence before production changes (line numbers from the red test revision):
+
+```text
+bash Tests/verify-message-actions-execution.sh
+EXPECTED RED: FAIL line 185: CSMessageNativeSupports(forwarded,@"setM_uiVoiceTime:",@"v",(@[@"I"]))
+
+CS_TEST_VOICE_FLAGS_ONLY=1 bash Tests/verify-message-actions-execution.sh
+EXPECTED RED: FAIL line 321: !accepted
+```
+
+The independent flags-only run used status1, a stable five-byte file, declared length5, positive1234ms and format0, so its failure proves the prior provider accepted explicit `endflag=0`. This run intentionally bypassed the earlier forwarding assertion. The final suite also covers immediate cancelled-source refusal, cancellation observed at a correlated terminal callback, cancellation during a real background read, absent-flag historical acceptance, wrong extension target, unrelated forwarder, wrong scalar/object ABI, image nested independence, fresh outgoing voice fields and forwarded app attachment guards.
+
+Final validation:
+
+```text
+bash Tests/verify-message-actions-execution.sh
+PASS: 202 production action/coordinator/native/media checks (host doubles, no native sends)
+
+bash Tests/verify-message-actions-core.sh
+PASS: 1362 message action core checks (isolated defaults suite; no native sends)
+
+Strict iOS syntax: six Task 2 controller implementations passed arm64 and arm64e,
+ARC/blocks, -Wall -Wextra -Werror, iOS SDK27.1 / minimum iOS15.
+```
+
+This correction was tested in the authorized worktree and temporary host test directories. It does not add device acceptance evidence; the previously documented installed-runtime, native UI and recipient-playability limits still apply. No native send, device install, original-checkout edit, service switch, database change, shared `.theos` mutation, package, push or merge was performed.

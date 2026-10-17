@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <objc/runtime.h>
 #import "CSMessageActionCoordinator.h"
 #import "CSMessageSendAdapter.h"
 #import "CSVoiceForwardAdapter.h"
@@ -7,25 +8,55 @@ static NSUInteger checks=0;
 #define CHECK(x) do { checks++; if (!(x)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#x); exit(1); } } while(0)
 static void Drain(void) { NSDate *end=[NSDate dateWithTimeIntervalSinceNow:0.03]; [NSRunLoop.currentRunLoop runUntilDate:end]; }
 static BOOL Wait(BOOL (^predicate)(void)) { NSDate *end=[NSDate dateWithTimeIntervalSinceNow:3]; while (!predicate() && end.timeIntervalSinceNow>0) Drain(); return predicate(); }
-@interface CMessageWrap : NSObject <NSCopying>
-@property(nonatomic, copy) NSString *m_nsFromUsr,*m_nsToUsr,*m_nsContent,*m_nsClientMsgID,*m_nsRealChatUsr,*m_nsEmoticonMD5,*path,*m_nsMsgSource,*m_nsRevokeBatchId;
-@property(nonatomic) unsigned int m_uiMessageType,m_uiMesLocalID,m_uiCreateTime,m_uiStatus,m_uiSendTime,m_uiIsSenderStatus,m_uiVoiceTime,m_uiVoiceFormat,m_uiDownloadStatus,m_uiVoiceForwardFlag;
-@property(nonatomic) long long m_n64MesSvrID;
+// Native payload methods live on the type extension; CMessageWrap forwards them.
+@interface TestPayloadExtension : NSObject
+@property(nonatomic, copy) NSString *m_nsEmoticonMD5,*m_nsAppAttachID;
+@property(nonatomic) unsigned int m_uiVoiceTime,m_uiVoiceFormat,m_uiVoiceForwardFlag,m_uiAppDataSize;
 @property(nonatomic, copy) NSData *m_dtVoice;
-@property(nonatomic, strong) NSMutableDictionary *m_dicForwardParas;
 @property(nonatomic, strong) id m_oImageInfo;
+@property(nonatomic) BOOL m_bAppAttachExistInSvr;
+@end
+@implementation TestPayloadExtension
+@end
+@interface CMessageWrap : NSObject <NSCopying>
+@property(nonatomic, copy) NSString *m_nsFromUsr,*m_nsToUsr,*m_nsContent,*m_nsClientMsgID,*m_nsRealChatUsr,*path,*m_nsMsgSource,*m_nsRevokeBatchId;
+@property(nonatomic) unsigned int m_uiMessageType,m_uiMesLocalID,m_uiCreateTime,m_uiStatus,m_uiSendTime,m_uiIsSenderStatus,m_uiDownloadStatus;
+@property(nonatomic) long long m_n64MesSvrID;
+@property(nonatomic, strong) NSMutableDictionary *m_dicForwardParas;
 @property(nonatomic) BOOL file,record;
-@property(nonatomic) unsigned int m_uiAppDataSize;
+@property(nonatomic, strong) TestPayloadExtension *m_extendInfoWithMsgType;
+@property(nonatomic, copy) NSString *m_nsEmoticonMD5,*m_nsAppAttachID;
+@property(nonatomic) unsigned int m_uiVoiceTime,m_uiVoiceFormat,m_uiVoiceForwardFlag,m_uiAppDataSize;
+@property(nonatomic, copy) NSData *m_dtVoice;
+@property(nonatomic, strong) id m_oImageInfo;
 @property(nonatomic) BOOL m_bAppAttachExistInSvr;
 - (instancetype)initWithMsgType:(unsigned int)type;
 @end
 @implementation CMessageWrap
-- (instancetype)initWithMsgType:(unsigned int)type { if ((self=[super init])) _m_uiMessageType=type; return self; }
-- (id)copyWithZone:(NSZone *)zone { (void)zone; CMessageWrap *copy=[[CMessageWrap alloc] initWithMsgType:_m_uiMessageType]; copy.m_nsFromUsr=_m_nsFromUsr; copy.m_nsToUsr=_m_nsToUsr; copy.m_nsContent=_m_nsContent; copy.m_uiMesLocalID=_m_uiMesLocalID; copy.m_n64MesSvrID=_m_n64MesSvrID; copy.m_uiVoiceTime=_m_uiVoiceTime; copy.m_uiVoiceFormat=_m_uiVoiceFormat; copy.m_uiDownloadStatus=_m_uiDownloadStatus; copy.m_dtVoice=_m_dtVoice; copy.path=_path; copy.m_dicForwardParas=_m_dicForwardParas; copy.m_oImageInfo=_m_oImageInfo; copy.file=_file; copy.record=_record; copy.m_uiAppDataSize=_m_uiAppDataSize; copy.m_bAppAttachExistInSvr=_m_bAppAttachExistInSvr; return copy; }
+@dynamic m_nsEmoticonMD5,m_nsAppAttachID,m_uiVoiceTime,m_uiVoiceFormat,m_uiVoiceForwardFlag,m_uiAppDataSize,m_dtVoice,m_oImageInfo,m_bAppAttachExistInSvr;
+- (instancetype)initWithMsgType:(unsigned int)type { if ((self=[super init])) { _m_uiMessageType=type; _m_extendInfoWithMsgType=[TestPayloadExtension new]; } return self; }
+- (id)forwardingTargetForSelector:(SEL)selector { return [_m_extendInfoWithMsgType respondsToSelector:selector] ? _m_extendInfoWithMsgType : [super forwardingTargetForSelector:selector]; }
+- (id)copyWithZone:(NSZone *)zone { (void)zone; CMessageWrap *copy=[[CMessageWrap alloc] initWithMsgType:_m_uiMessageType]; copy.m_nsFromUsr=_m_nsFromUsr; copy.m_nsToUsr=_m_nsToUsr; copy.m_nsContent=_m_nsContent; copy.m_uiMesLocalID=_m_uiMesLocalID; copy.m_n64MesSvrID=_m_n64MesSvrID; copy.m_uiVoiceTime=self.m_uiVoiceTime; copy.m_uiVoiceFormat=self.m_uiVoiceFormat; copy.m_uiDownloadStatus=self.m_uiDownloadStatus; copy.m_dtVoice=self.m_dtVoice; copy.m_nsEmoticonMD5=self.m_nsEmoticonMD5; copy.m_nsAppAttachID=self.m_nsAppAttachID; copy.path=_path; copy.m_dicForwardParas=_m_dicForwardParas; copy.m_oImageInfo=self.m_oImageInfo; copy.file=_file; copy.record=_record; copy.m_uiAppDataSize=self.m_uiAppDataSize; copy.m_bAppAttachExistInSvr=self.m_bAppAttachExistInSvr; return copy; }
 + (NSString *)getPathOfAudio:(CMessageWrap *)wrap { CHECK(NSThread.isMainThread); return wrap.path; }
 + (void)GetPathOfAppDataByUserName:(NSString *)chat andMessageWrap:(CMessageWrap *)wrap retStrPath:(NSString * __autoreleasing *)path { CHECK([chat isEqualToString:@"chat"]); *path=wrap.path; }
 - (BOOL)IsFileMsg { return _file; }
 + (BOOL)IsRecordOrNoteMsg:(CMessageWrap *)wrap { return wrap.record; }
+@end
+@interface TestWrongPayloadExtension : NSObject
+@property(nonatomic, copy) NSString *m_uiVoiceTime;
+@end
+@implementation TestWrongPayloadExtension
+@end
+@interface TestWrongForwardTarget : CMessageWrap
+@end
+@implementation TestWrongForwardTarget
+- (id)forwardingTargetForSelector:(SEL)selector { (void)selector; return [TestPayloadExtension new]; }
+@end
+@interface TestUnrelatedForwarder : NSObject
+@property(nonatomic, strong) TestPayloadExtension *m_extendInfoWithMsgType;
+@end
+@implementation TestUnrelatedForwarder
+- (id)forwardingTargetForSelector:(SEL)selector { (void)selector; return _m_extendInfoWithMsgType; }
 @end
 @interface TestImageInfo : NSObject <NSCopying>
 @property(nonatomic, copy) NSString *assetId;
@@ -164,6 +195,21 @@ static void TestNativeBoundary(void) {
     CHECK(CSMessageNativeSupports(controller,@"deleteNode:withDB:animated:",@"v",(@[@"@",@"B",@"B"])));
     CHECK(!CSMessageNativeSupports(controller,@"deleteNode:withDB:animated:",@"v",(@[@"@",@"@",@"@"])));
     CSMessageNativeInvoke(controller,@"deleteNode:withDB:animated:",@[cell.wrap,@YES,@YES]); CHECK(controller.calls.count==1);
+    CMessageWrap *forwarded=Cell(34).wrap;
+    CHECK(!class_getInstanceMethod(CMessageWrap.class,@selector(m_uiVoiceTime)));
+    CHECK(!CSMessageActionObjectGetter(forwarded,@selector(m_dtVoice))); // Core context boundary stays concrete-only.
+    CHECK(CSMessageNativeSupports(forwarded,@"setM_uiVoiceTime:",@"v",(@[@"I"])));
+    CHECK(!CSMessageNativeSupports(forwarded,@"setM_uiVoiceTime:",@"v",(@[@"@"])));
+    CHECK(CSMessageNativeSet(forwarded,@"setM_uiVoiceTime:",@1234,YES)); CHECK(forwarded.m_uiVoiceTime==1234);
+    CHECK(CSMessageNativeUnsigned(forwarded,@"m_uiVoiceTime")==1234);
+    NSData *payload=[@"forwarded-audio" dataUsingEncoding:NSUTF8StringEncoding]; forwarded.m_dtVoice=payload;
+    CHECK([CSMessageNativeObject(forwarded,@"m_dtVoice") isEqual:payload]);
+    CHECK(!CSMessageNativeObject(forwarded,@"m_uiVoiceTime"));
+    CHECK(!CSMessageNativeSupports([[TestWrongForwardTarget alloc] initWithMsgType:34],@"m_dtVoice",@"@",@[]));
+    TestUnrelatedForwarder *unrelated=[TestUnrelatedForwarder new]; unrelated.m_extendInfoWithMsgType=[TestPayloadExtension new];
+    CHECK(!CSMessageNativeSupports(unrelated,@"m_dtVoice",@"@",@[]));
+    forwarded.m_extendInfoWithMsgType=(TestPayloadExtension *)[TestWrongPayloadExtension new];
+    CHECK(!CSMessageNativeSupports(forwarded,@"m_uiVoiceTime",@"I",@[])); CHECK(!CSMessageNativeUnsigned(forwarded,@"m_uiVoiceTime"));
     CSMessageNativeActionAdapter *adapter=[CSMessageNativeActionAdapter new]; __block BOOL valid=YES; __block NSInteger state=-99;
     [adapter performAction:CSMessageActionDelete context:context valid:^BOOL{ return valid; } completion:^(CSMessageActionSubmissionState result){ state=result; }];
     CHECK(controller.confirmation); valid=NO; controller.confirmation(); CHECK(state==CSMessageActionSubmissionStateCancelled); CHECK(controller.calls.count==1);
@@ -181,7 +227,7 @@ static void TestSendRoutes(void) {
     manager.insertThrows=YES; CSMessagePreparedSend *c=[sender prepareContext:context targetID:@"C" voice:voice]; CHECK([c submit]==CSMessageActionSubmissionStateUnknown); CHECK(manager.calls.count==3 && uploader.calls.count==2 && !audio.unsafeCalls);
     manager.insertThrows=NO; uploader.throws=YES; CSMessagePreparedSend *d=[sender prepareContext:context targetID:@"D" voice:voice]; CHECK([d submit]==CSMessageActionSubmissionStateUnknown); CHECK(manager.calls.count==4 && uploader.calls.count==3);
     cell=Cell(48); CSMessagePreparedSend *location=[sender prepareContext:Context(cell,controller) targetID:@"chat" voice:nil]; CHECK(location); [location submit]; CHECK([manager.calls.lastObject[0] isEqual:@"add"]); CHECK(cell.wrap.m_uiMesLocalID==42);
-    cell=Cell(47); cell.wrap.m_nsContent=@"<emoji md5=\"0123456789abcdef0123456789abcdef\"/>"; CSMessagePreparedSend *emoji=[sender prepareContext:Context(cell,controller) targetID:@"chat" voice:nil]; CHECK(emoji); [emoji submit]; CHECK([manager.calls.lastObject[0] isEqual:@"emoji"]); CHECK([[CSMessageActionObjectGetter(emoji.outputWrap,NSSelectorFromString(@"m_nsEmoticonMD5")) description] isEqual:@"0123456789abcdef0123456789abcdef"]);
+    cell=Cell(47); cell.wrap.m_nsContent=@"<emoji md5=\"0123456789abcdef0123456789abcdef\"/>"; CSMessagePreparedSend *emoji=[sender prepareContext:Context(cell,controller) targetID:@"chat" voice:nil]; CHECK(emoji); [emoji submit]; CHECK([manager.calls.lastObject[0] isEqual:@"emoji"]); CHECK([[[(CMessageWrap *)emoji.outputWrap m_nsEmoticonMD5] description] isEqual:@"0123456789abcdef0123456789abcdef"]);
 }
 static void TestOrdinaryPayloadRoutes(void) {
     factoryInputs=[NSMutableArray array]; TestEnvironment *env=[TestEnvironment new]; TestManager *manager=[TestManager new]; env.services[@"CMessageMgr"]=manager; TestController *controller=[TestController new]; env.controller=controller;
@@ -201,6 +247,8 @@ static void TestOrdinaryPayloadRoutes(void) {
     cell.wrap.file=NO; cell.wrap.m_uiAppDataSize=(unsigned)data.length; __block NSData *preparedData=nil; __block BOOL dataReady=NO;
     [provider prepareAppDataForContext:fileContext operationID:@"data" completion:^(NSData *bytes,NSString *resolved){ CHECK([resolved isEqual:path]); preparedData=bytes; dataReady=YES; }]; CHECK(Wait(^BOOL{ return dataReady; })); CHECK(reads==1 && [preparedData isEqual:data]);
     CSMessagePreparedSend *app=[sender prepareContext:fileContext targetID:@"chat" voice:nil appData:preparedData appDataPath:path]; CHECK(app); [app submit]; CHECK([manager.calls.lastObject[0] isEqual:@"app-data"] && [manager.calls.lastObject[3] isEqual:data]); CHECK(cell.wrap.m_uiMesLocalID==42);
+    cell.wrap.m_uiAppDataSize=99; CHECK(![sender prepareContext:fileContext targetID:@"chat" voice:nil appData:nil appDataPath:nil]);
+    cell.wrap.m_nsAppAttachID=@"remote-attachment"; CHECK([sender prepareContext:fileContext targetID:@"chat" voice:nil appData:nil appDataPath:nil]);
     cell=Cell(987); CSMessagePreparedSend *generic=[sender prepareContext:Context(cell,controller) targetID:@"chat" voice:nil]; CHECK(generic && generic.outputWrap!=cell.wrap); CHECK([CSMessageActionObjectGetter(generic.outputWrap,NSSelectorFromString(@"m_nsContent")) isEqual:cell.wrap.m_nsContent]); [generic submit]; CHECK([manager.calls.lastObject[0] isEqual:@"add"] && cell.wrap.m_uiMesLocalID==42);
     [NSFileManager.defaultManager removeItemAtPath:path error:nil]; factoryInputs=nil;
 }
@@ -284,4 +332,28 @@ static void TestMedia(void) {
     CHECK([CSMessageNativeAppDataPath(context) isEqual:path]);
     [NSFileManager.defaultManager removeItemAtPath:path error:nil];
 }
-int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestMedia(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }
+static void TestVoiceFlags(void) {
+    TestCell *cell=Cell(34); TestController *controller=[TestController new]; CSMessageActionContext *context=Context(cell,controller);
+    cell.wrap.m_uiDownloadStatus=1; cell.wrap.m_uiVoiceTime=1234; cell.wrap.m_uiVoiceFormat=0; cell.wrap.m_dtVoice=[@"audio" dataUsingEncoding:NSUTF8StringEncoding];
+    NSString *path=[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString]; CHECK([cell.wrap.m_dtVoice writeToFile:path atomically:YES]); cell.wrap.path=path;
+    for (NSUInteger scenario=0;scenario<3;scenario++) {
+        // Otherwise complete bytes must not defeat endflag0 or cancelflag1.
+        cell.wrap.m_nsContent=scenario!=1 ? @"<voicemsg voicelength='1234' voiceformat='0' length='5' endflag='0' cancelflag='0'/>" : @"<voicemsg voicelength='1234' voiceformat='0' length='5' endflag='1' cancelflag='1'/>";
+        CSMessageMediaProvider *provider=[CSMessageMediaProvider new]; __block NSUInteger downloads=0,callbacks=0; __block BOOL accepted=NO;
+        provider.requestDownload=^(__unused CSMessageActionContext *source){ downloads++; };
+        [provider prepareVoiceForContext:context operationID:@"flags" completion:^(CSMessageVoiceResource *resource){ callbacks++; accepted=resource!=nil; }];
+        CHECK(Wait(^BOOL{ return callbacks || downloads; })); CHECK(!accepted);
+        if (scenario==0) { CHECK(downloads==1 && !callbacks); [provider downloadCompletedForAccount:@"me" epoch:1 chat:@"chat" localID:42 serverID:900]; CHECK(Wait(^BOOL{ return callbacks==1; })); CHECK(accepted); }
+        else { if (scenario==2) cell.wrap.m_nsContent=@"<voicemsg voicelength='1234' voiceformat='0' length='5' endflag='0' cancelflag='1'/>"; [provider downloadCompletedForAccount:@"me" epoch:1 chat:@"chat" localID:42 serverID:900]; Drain(); CHECK(callbacks==1 && !accepted); CHECK(downloads==(scenario==2 ? 1 : 0)); }
+    }
+    // Flags can change while bytes are being read; acceptance must use fresh metadata.
+    cell.wrap.m_dtVoice=nil;
+    dispatch_semaphore_t entered=dispatch_semaphore_create(0),release=dispatch_semaphore_create(0);
+    CSMessageMediaProvider *racing=[[CSMessageMediaProvider alloc] initWithReader:^NSData *(NSString *file){ dispatch_semaphore_signal(entered); dispatch_semaphore_wait(release,dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC)); return [NSData dataWithContentsOfFile:file]; }];
+    cell.wrap.m_nsContent=@"<voicemsg voicelength='1234' voiceformat='0' length='5' endflag='1'/>"; __block NSUInteger callbacks=0; __block BOOL accepted=NO;
+    [racing prepareVoiceForContext:context operationID:@"metadata-race" completion:^(CSMessageVoiceResource *resource){ callbacks++; accepted=resource!=nil; }];
+    CHECK(dispatch_semaphore_wait(entered,dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC))==0);
+    cell.wrap.m_nsContent=@"<voicemsg voicelength='1234' voiceformat='0' length='5' endflag='1' cancelflag='1'/>"; dispatch_semaphore_signal(release);
+    CHECK(Wait(^BOOL{ return callbacks==1; })); CHECK(!accepted); [NSFileManager.defaultManager removeItemAtPath:path error:nil];
+}
+int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }

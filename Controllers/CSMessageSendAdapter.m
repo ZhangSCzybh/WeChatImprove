@@ -91,13 +91,13 @@ static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArr
     // Type-specific conversion loads the original media before IDs are reset. It is not a generic forward/send fallback.
     if (selector && CSMessageNativeSupports(factory,selector,@"@",@[@"@"])) {
         id input=CSIndependentCopy(source); if (!input) return nil;
-        if (context.messageType==3) { id imageInfo=CSMessageActionObjectGetter(input,NSSelectorFromString(@"m_oImageInfo")); if (imageInfo) { id detached=CSIndependentCopy(imageInfo); if (!detached || !CSMessageNativeSet(input,@"setM_oImageInfo:",detached,YES)) return nil; } }
+        if (context.messageType==3) { id imageInfo=CSMessageNativeObject(input,@"m_oImageInfo"); if (imageInfo) { id detached=CSIndependentCopy(imageInfo); if (!detached || !CSMessageNativeSet(input,@"setM_oImageInfo:",detached,YES)) return nil; } }
         wrap=CSMessageNativeInvoke(factory,selector,@[input]);
     }
     else wrap=CSIndependentCopy(source);
     if (!wrap || ![wrap isKindOfClass:NSClassFromString(@"CMessageWrap")] || wrap==source || !CSResetSendWrap(wrap,context,target)) return nil;
     if (context.messageType==47) {
-        NSString *md5=CSMessageActionObjectGetter(source,NSSelectorFromString(@"m_nsEmoticonMD5"));
+        NSString *md5=CSMessageNativeObject(source,@"m_nsEmoticonMD5");
         NSString *content=CSMessageActionObjectGetter(source,NSSelectorFromString(@"m_nsContent"));
         if (md5.length!=32 && [content isKindOfClass:NSString.class]) { NSRegularExpression *regex=[NSRegularExpression regularExpressionWithPattern:@"[a-fA-F0-9]{32}" options:0 error:nil]; NSTextCheckingResult *match=[regex firstMatchInString:content options:0 range:NSMakeRange(0,content.length)]; if (match) md5=[content substringWithRange:match.range]; }
         if (md5.length==32) CSMessageNativeSet(wrap,@"setM_nsEmoticonMD5:",md5,NO);
@@ -147,7 +147,7 @@ static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArr
         return nil;
     }
     unsigned long long declared=CSMessageNativeUnsigned(context.sourceWrap,@"m_uiAppDataSize");
-    BOOL remote=CSMessageNativeUnsigned(context.sourceWrap,@"m_bAppAttachExistInSvr") || [CSMessageActionObjectGetter(context.sourceWrap,NSSelectorFromString(@"m_nsAppAttachID")) length];
+    BOOL remote=CSMessageNativeUnsigned(context.sourceWrap,@"m_bAppAttachExistInSvr") || [CSMessageNativeObject(context.sourceWrap,@"m_nsAppAttachID") length];
     if (declared && !data.length && !remote) return nil;
     if (data && declared && declared!=data.length) return nil;
     if (CSMessageNativeSupports(manager,@"AddAppMsg:MsgWrap:Data:Scene:",@"v",@[@"@",@"@",@"@",@"I"])) return CSVoidRoute(manager,@"AddAppMsg:MsgWrap:Data:Scene:",@[target,wrap,data ?: NSNull.null,@1],wrap);

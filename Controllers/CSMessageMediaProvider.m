@@ -13,6 +13,8 @@
 @property(nonatomic) BOOL complete;
 @property(nonatomic) BOOL terminalCompletion;
 @property(nonatomic) BOOL formatKnown;
+@property(nonatomic) BOOL cancelled;
+@property(nonatomic) BOOL explicitNonterminal;
 @property(nonatomic) unsigned int expectedBytes;
 @property(nonatomic) BOOL reading;
 @property(nonatomic) BOOL requestedDownload;
@@ -35,10 +37,31 @@ static unsigned int CSVoiceXMLUInt(NSString *xml, NSString *attribute) {
     if (match.numberOfRanges<2) return 0;
     unsigned long long value=[[xml substringWithRange:[match rangeAtIndex:1]] longLongValue]; return value<=UINT_MAX ? (unsigned int)value : 0;
 }
+// Presence matters: historical XML can omit flags, while explicit zero endflag
+// denies completeness until the correlated terminal native callback arrives.
+static BOOL CSVoiceXMLFlag(NSString *xml, NSString *attribute, unsigned int *value) {
+    if (![xml isKindOfClass:NSString.class]) return NO;
+    NSTextCheckingResult *voice=[[NSRegularExpression regularExpressionWithPattern:@"<voicemsg\\b[^>]*>" options:0 error:nil] firstMatchInString:xml options:0 range:NSMakeRange(0,xml.length)];
+    if (!voice) return NO;
+    xml=[xml substringWithRange:voice.range];
+    NSString *pattern=[NSString stringWithFormat:@"\\s%@\\s*=\\s*[\"']([0-9]+)[\"']",attribute];
+    NSTextCheckingResult *match=[[NSRegularExpression regularExpressionWithPattern:pattern options:0 error:nil] firstMatchInString:xml options:0 range:NSMakeRange(0,xml.length)];
+    if (match.numberOfRanges<2) return NO;
+    NSString *number=[xml substringWithRange:[match rangeAtIndex:1]];
+    *value=number.longLongValue>UINT_MAX ? UINT_MAX : number.intValue; return YES;
+}
+- (void)snapshotFlags:(CSVoicePreparation *)preparation {
+    NSString *xml=CSMessageActionObjectGetter(preparation.context.sourceWrap,NSSelectorFromString(@"m_nsContent"));
+    unsigned int cancel=0,end=0;
+    // Cancellation is sticky for this preparation, including later terminal callbacks.
+    preparation.cancelled=preparation.cancelled || (CSVoiceXMLFlag(xml,@"cancelflag",&cancel) && cancel!=0);
+    preparation.explicitNonterminal=CSVoiceXMLFlag(xml,@"endflag",&end) && end!=1;
+}
 - (NSString *)keyForContext:(CSMessageActionContext *)context { return [NSString stringWithFormat:@"%lu|%@",(unsigned long)context.accountEpoch,context.stableMessageIdentity]; }
 - (void)snapshot:(CSVoicePreparation *)preparation {
+    [self snapshotFlags:preparation];
     id source=preparation.context.sourceWrap;
-    preparation.bytes=CSMessageActionObjectGetter(source,NSSelectorFromString(@"m_dtVoice"));
+    preparation.bytes=CSMessageNativeObject(source,@"m_dtVoice");
     if (![preparation.bytes isKindOfClass:NSData.class]) preparation.bytes=nil;
     NSString *xml=CSMessageActionObjectGetter(source,NSSelectorFromString(@"m_nsContent"));
     preparation.duration=(unsigned int)CSMessageNativeUnsigned(source,@"m_uiVoiceTime");
@@ -61,7 +84,9 @@ static unsigned int CSVoiceXMLUInt(NSString *xml, NSString *attribute) {
 }
 - (void)read:(CSVoicePreparation *)preparation key:(NSString *)key {
     if (preparation.reading || !preparation.subscribers.count) return;
-    if (!preparation.complete) { [self requestMissing:preparation key:key]; return; }
+    [self snapshotFlags:preparation];
+    if (preparation.cancelled) { [self finish:preparation key:key resource:nil]; return; }
+    if (!preparation.complete || (preparation.explicitNonterminal && !preparation.terminalCompletion)) { [self requestMissing:preparation key:key]; return; }
     preparation.reading=YES;
     NSData *snapshot=preparation.bytes; NSString *path=preparation.path; unsigned int duration=preparation.duration, format=preparation.format;
     NSData *(^reader)(NSString *)=_reader;
@@ -77,6 +102,9 @@ static unsigned int CSVoiceXMLUInt(NSString *xml, NSString *attribute) {
             dispatch_async(dispatch_get_main_queue(),^{
                 typeof(self) self=weakSelf; if (!self || self.preparations[key]!=preparation) return;
                 preparation.reading=NO;
+                [self snapshotFlags:preparation];
+                if (preparation.cancelled) { [self finish:preparation key:key resource:nil]; return; }
+                if (preparation.explicitNonterminal && !preparation.terminalCompletion) resource=nil;
                 if (resource && preparation.formatKnown) {
                     BOOL validated=preparation.terminalCompletion || (preparation.expectedBytes && preparation.expectedBytes==resource.data.length);
                     if (!validated) {
