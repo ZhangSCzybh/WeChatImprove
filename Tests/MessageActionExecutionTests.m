@@ -92,6 +92,7 @@ static NSMutableArray *factoryInputs;
 @end
 @interface TestCell : NSObject
 @property(nonatomic, strong) CMessageWrap *wrap;
+@property(nonatomic, weak) id nextResponder;
 @property(nonatomic) BOOL revokeAllowed;
 @property(nonatomic, copy) void (^forwardHandler)(void);
 - (id)getCurrentMessageWrap;
@@ -164,12 +165,60 @@ static NSMutableArray *factoryInputs;
 @implementation TestContact
 @end
 static TestContact *Contact(NSString *name) { TestContact *contact=[TestContact new]; contact.m_nsUsrName=name; return contact; }
+// Native-shaped entry: MMContext returns an NSProxy, not a concrete service.
+@interface CContactMgr : NSObject
+@property(nonatomic, strong) TestContact *contact;
+- (id)getSelfContact;
+@end
+@implementation CContactMgr
+- (id)getSelfContact { return _contact; }
+@end
+@interface MMServiceWrapper : NSProxy
+@property(nonatomic, strong) id service;
+@property(nonatomic) NSUInteger invocations;
+@end
+@implementation MMServiceWrapper
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)selector { return [_service methodSignatureForSelector:selector]; }
+- (void)forwardInvocation:(NSInvocation *)invocation { _invocations++; [invocation invokeWithTarget:_service]; }
+- (BOOL)respondsToSelector:(SEL)selector { return [_service respondsToSelector:selector]; }
+- (id)forwardingTargetForSelector:(SEL)selector { (void)selector; return nil; }
+@end
+static NSMutableDictionary *nativeServices;
+@interface CMessageMgr : TestManager
+@end
+@implementation CMessageMgr
+@end
+@interface AudioSender : TestAudio
+@end
+@implementation AudioSender
+@end
+@interface VoiceMsgDownloader : NSObject
+@property(nonatomic) NSUInteger downloads;
+- (void)downloadMsg:(id)wrap;
+@end
+@implementation VoiceMsgDownloader
+- (void)downloadMsg:(id)wrap { CHECK(wrap); _downloads++; }
+@end
+static MMServiceWrapper *WrappedService(id service) { MMServiceWrapper *wrapper=[MMServiceWrapper alloc]; wrapper.service=service; return wrapper; }
+@interface MMContext : NSObject
++ (id)currentContext;
+- (id)getService:(Class)serviceClass;
+@end
+@implementation MMContext
++ (id)currentContext { static MMContext *context; if (!context) context=[MMContext new]; return context; }
+- (id)getService:(Class)serviceClass { return nativeServices[NSStringFromClass(serviceClass)]; }
+@end
+@interface BaseMsgContentViewController : TestController
+@end
+@implementation BaseMsgContentViewController
+@end
 @interface TestLogic : NSObject
 @property(nonatomic, copy) NSArray *targets;
 @end
 @implementation TestLogic
 - (id)getToContacts { return _targets; }
 @end
+#import "VoiceForwardCleanupHooksUnderTest.h"
 @interface HeldMedia : CSMessageMediaProvider
 @property(nonatomic, strong) NSMutableDictionary *callbacks;
 @end
@@ -190,6 +239,48 @@ static TestContact *Contact(NSString *name) { TestContact *contact=[TestContact 
 static TestCell *Cell(unsigned int type) { TestCell *cell=[TestCell new]; cell.wrap=[[CMessageWrap alloc] initWithMsgType:type]; cell.wrap.m_nsFromUsr=@"chat"; cell.wrap.m_nsToUsr=@"me"; cell.wrap.m_uiMesLocalID=42; cell.wrap.m_n64MesSvrID=900; cell.wrap.m_nsContent=@"Unicode 你好\nline 2"; return cell; }
 static CSMessageActionContext *Context(TestCell *cell,TestController *controller) { return [CSMessageActionContext contextWithCell:cell controller:controller accountID:@"me" accountEpoch:1 conversationID:@"chat" bindingGeneration:1]; }
 static CSMessageActionPreferences *Preferences(NSUserDefaults *defaults) { [defaults setBool:YES forKey:CSMessageActionGestureEnabledKey]; [defaults setBool:YES forKey:CSMessageActionRepeatEnabledKey]; [defaults setBool:YES forKey:CSMessageActionVoiceForwardEnabledKey]; return [[CSMessageActionPreferences alloc] initWithDefaults:defaults]; }
+static void TestProductionAdmission(NSUserDefaults *defaults) {
+    CContactMgr *contacts=[CContactMgr new]; contacts.contact=Contact(@"me");
+    MMServiceWrapper *proxy=WrappedService(contacts); nativeServices=[NSMutableDictionary dictionaryWithObject:proxy forKey:@"CContactMgr"];
+    CHECK(!CSMessageNativeSupports(proxy,@"getSelfContact",@"@",@[]));
+    CSMessageNativeEnvironment *environment=[CSMessageNativeEnvironment new];
+    CHECK([environment serviceNamed:@"CContactMgr"]==proxy);
+    CHECK(!class_getInstanceMethod(object_getClass(proxy),@selector(getSelfContact)));
+    BaseMsgContentViewController *controller=[BaseMsgContentViewController new];
+    TestCell *cell=Cell(34); cell.nextResponder=controller;
+    CHECK([environment controllerForCell:cell]==controller);
+    CSMessageActionPreferences *preferences=Preferences(defaults);
+    CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:environment preferences:preferences mediaProvider:[CSMessageMediaProvider new]];
+    CSMessageActionContext *context=[coordinator captureContextForCell:cell controller:nil bindingGeneration:1];
+    CSMessageActionMenuAdapter *menu=[[CSMessageActionMenuAdapter alloc] initWithCoordinator:coordinator];
+    NSArray *items=[menu itemsByAddingActionsForCell:cell items:@[]];
+    BOOL gesture=[coordinator canExecuteContext:context action:CSMessageActionRepeat entry:CSMessageActionEntryGesture];
+    fprintf(stderr,"production admission: account=%s context=%s menus=%lu gesture=%s\n",environment.currentAccountID.UTF8String ?: "nil",context ? "yes" : "nil",(unsigned long)items.count,gesture ? "yes" : "no");
+    CHECK([environment.currentAccountID isEqual:@"me"]);
+    CHECK(context && [context.accountID isEqual:@"me"]); CHECK(items.count==2); CHECK(gesture);
+    CHECK(proxy.invocations>0); // Dispatch must retain native proxy account-context forwarding.
+    CHECK(!CSMessageNativeSupports(proxy,@"getSelfContact",@"I",@[]));
+    CHECK(!CSMessageActionObjectGetter(proxy,@selector(getSelfContact))); // No arbitrary core getter widening.
+    MMServiceWrapper *unregistered=WrappedService(contacts);
+    CHECK(!CSMessageNativeSupports(unregistered,@"getSelfContact",@"@",@[]));
+    // Exercise production service discovery and sending routes against wrapped services.
+    CMessageMgr *manager=[CMessageMgr new]; MMServiceWrapper *managerProxy=WrappedService(manager); nativeServices[@"CMessageMgr"]=managerProxy;
+    AudioSender *audio=[AudioSender new]; TestUploader *uploader=[TestUploader new]; audio.uploader=uploader; MMServiceWrapper *audioProxy=WrappedService(audio); nativeServices[@"AudioSender"]=audioProxy;
+    CSMessageSendAdapter *sender=[[CSMessageSendAdapter alloc] initWithEnvironment:environment];
+    CSMessageVoiceResource *voice=[[CSMessageVoiceResource alloc] initWithData:[@"audio" dataUsingEncoding:NSUTF8StringEncoding] durationMilliseconds:1234 format:0];
+    CSMessagePreparedSend *route=[sender prepareContext:context targetID:@"chat" voice:voice];
+    CHECK(route); CHECK([route submit]==CSMessageActionSubmissionStateUnknown);
+    CHECK(manager.calls.count==1 && uploader.calls.count==1); CHECK(managerProxy.invocations==1 && audioProxy.invocations==1); CHECK(audio.unsafeCalls==0);
+    CHECK(!CSMessageNativeSupports(managerProxy,@"AddLocalMsg:MsgWrap:",@"v",(@[@"@",@"I"])));
+    VoiceMsgDownloader *downloader=[VoiceMsgDownloader new]; MMServiceWrapper *downloaderProxy=WrappedService(downloader); nativeServices[@"VoiceMsgDownloader"]=downloaderProxy;
+    id service=[environment serviceNamed:@"VoiceMsgDownloader"]; CHECK(CSMessageNativeSupports(service,@"downloadMsg:",@"v",(@[@"@"]))); CSMessageNativeInvoke(service,@"downloadMsg:",@[cell.wrap]); CHECK(downloader.downloads==1 && downloaderProxy.invocations==1);
+    // A changed active service/account invalidates old captured menus and gesture requests.
+    CContactMgr *nextContacts=[CContactMgr new]; nextContacts.contact=Contact(@"other"); nativeServices[@"CContactMgr"]=WrappedService(nextContacts);
+    CHECK(![coordinator validateContext:context]); CHECK([[menu itemsByAddingActionsForCell:cell items:@[]] count]==0);
+    CHECK(![coordinator canExecuteContext:context action:CSMessageActionRepeat entry:CSMessageActionEntryGesture]);
+    nativeServices[@"CContactMgr"]=contacts; CHECK([environment.currentAccountID isEqual:@"me"]); // Native raw-service opt-in remains supported.
+    nativeServices=nil;
+}
 static void TestNativeBoundary(void) {
     TestController *controller=[TestController new]; TestCell *cell=Cell(1); CSMessageActionContext *context=Context(cell,controller); CHECK(context);
     CHECK(CSMessageNativeSupports(controller,@"deleteNode:withDB:animated:",@"v",(@[@"@",@"B",@"B"])));
@@ -305,6 +396,37 @@ static void TestCoordinator(NSUserDefaults *defaults) {
     // A stale cell binding is rejected before native confirmation.
     cell.wrap=Cell(34).wrap; cell.wrap.m_uiMesLocalID=99; cell.wrap.m_n64MesSvrID=999; CHECK(![coordinator validateContext:context]);
 }
+static void TestForwardCleanupWhileWaiting(NSUserDefaults *defaults) {
+    TestEnvironment *env=[TestEnvironment new]; TestController *controller=[TestController new]; env.controller=controller;
+    HeldMedia *media=[HeldMedia new]; RecordingSender *sender=[[RecordingSender alloc] initWithEnvironment:env];
+    CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:env preferences:Preferences(defaults) mediaProvider:media sendAdapter:sender nativeAdapter:[CSMessageNativeActionAdapter new]];
+    coordinator.feedbackHandler=^(__unused NSString *message){};
+    TestCell *cell=Cell(34); CSMessageActionContext *context=[coordinator captureContextForCell:cell controller:nil bindingGeneration:1];
+    TestLogic *logic=[TestLogic new]; logic.targets=@[Contact(@"A")];
+    [coordinator withForwardContext:context entry:CSMessageActionEntryNativeForward perform:^{ [coordinator bindForwardLogic:logic source:cell.wrap]; }];
+    NSString *identifier=[[CSVoiceForwardAdapter new] bindingForLogic:logic].operationID;
+    [coordinator confirmForwardLogic:logic]; CHECK([coordinator handleForwardLogic:logic source:cell.wrap target:logic.targets[0]]);
+    CHECK(!sender.calls.count);
+    forwardHookCoordinator=coordinator; forwardNativeClearCalls=0;
+    TestForwardManager *manager=[TestForwardManager new]; manager.originalCalls=[NSMutableArray array];
+    [manager OnForwardMessageSend:logic]; // Extracted hook %orig synchronously invokes extracted clearData.
+    CHECK(manager.originalCalls.count==1 && forwardNativeClearCalls==1);
+    [media finish:identifier];
+    CHECK(sender.calls.count==1);
+    CHECK([[coordinator resultsForOperationID:identifier][@"A"] integerValue]==CSMessageActionSubmissionStateAccepted);
+    CHECK([coordinator handleForwardLogic:logic source:cell.wrap target:Contact(@"A")]);
+    [media finish:identifier]; CHECK(sender.calls.count==1);
+    // A genuine picker cancellation still wins, even if late completion arrives.
+    TestLogic *cancelled=[TestLogic new]; cancelled.targets=@[Contact(@"A")];
+    [coordinator withForwardContext:context entry:CSMessageActionEntryNativeForward perform:^{ [coordinator bindForwardLogic:cancelled source:cell.wrap]; }];
+    NSString *cancelID=[[CSVoiceForwardAdapter new] bindingForLogic:cancelled].operationID;
+    [coordinator confirmForwardLogic:cancelled]; CHECK([coordinator handleForwardLogic:cancelled source:cell.wrap target:cancelled.targets[0]]);
+    [manager OnForwardMessageCancel:cancelled]; [manager OnForwardMessageSend:cancelled];
+    CHECK(manager.originalCalls.count==3 && forwardNativeClearCalls==3);
+    [media finish:cancelID]; CHECK(sender.calls.count==1);
+    CHECK([[coordinator resultsForOperationID:cancelID][@"A"] integerValue]==CSMessageActionSubmissionStateCancelled);
+    forwardHookCoordinator=nil;
+}
 static void TestMedia(void) {
     TestCell *cell=Cell(34); TestController *controller=[TestController new]; cell.wrap.m_uiVoiceTime=1234; cell.wrap.m_uiVoiceFormat=0; cell.wrap.m_uiDownloadStatus=0;
     NSString *path=[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString]; NSData *audio=[@"audio" dataUsingEncoding:NSUTF8StringEncoding]; CHECK([audio writeToFile:path atomically:YES]); cell.wrap.path=path; cell.wrap.m_nsContent=@"<voicemsg voicelength=\"1234\" voiceformat=\"0\" length=\"5\"/>";
@@ -356,4 +478,4 @@ static void TestVoiceFlags(void) {
     cell.wrap.m_nsContent=@"<voicemsg voicelength='1234' voiceformat='0' length='5' endflag='1' cancelflag='1'/>"; dispatch_semaphore_signal(release);
     CHECK(Wait(^BOOL{ return callbacks==1; })); CHECK(!accepted); [NSFileManager.defaultManager removeItemAtPath:path error:nil];
 }
-int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }
+int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestProductionAdmission(defaults); TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestForwardCleanupWhileWaiting(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }

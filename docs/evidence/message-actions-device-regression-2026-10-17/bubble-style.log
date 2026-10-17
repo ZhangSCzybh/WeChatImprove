@@ -1,0 +1,4 @@
+Command: bash Tests/verify-bubble-style.sh
+Exit status: 0
+Bubble policy/renderer/ownership: 8269 checks passed
+Bubble real-adapter lifecycle: 111 checks passed

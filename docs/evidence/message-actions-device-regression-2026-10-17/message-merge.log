@@ -1,0 +1,4 @@
+Command: bash Tests/verify-message-merge.sh
+Exit status: 0
+PASS: 53200 message merge/navigation checks
+PASS: 2872 native adapter/navigation lifecycle checks (UIKit double)

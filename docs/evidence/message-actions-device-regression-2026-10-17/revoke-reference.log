@@ -1,0 +1,3 @@
+Command: bash Tests/verify-revoke-reference.sh
+Exit status: 0
+PASS: 84 persisted revoke reference/event checks

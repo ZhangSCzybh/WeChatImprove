@@ -284,7 +284,11 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     [op.requestedTargets addObject:identifier]; [self submitTarget:identifier operation:op]; return YES;
 }
 - (void)finishForwardLogic:(id)logic cancelled:(BOOL)cancelled {
-    CSMessageForwardBinding *binding=[_forward bindingForLogic:logic]; CSMessageActionOperation *op=_operations[binding.operationID];
+    CSMessageForwardBinding *binding=[_forward bindingForLogic:logic];
+    // The first native completion/cancel owns the session outcome. Later clearData
+    // is cleanup and must not cancel confirmed targets still waiting for media.
+    if (!binding || binding.closed) return;
+    CSMessageActionOperation *op=_operations[binding.operationID];
     if (op) { op.nativeFinished=YES; if (cancelled) [self cancelOperationID:op.identifier]; if (!op.enhanced || op.cancelled || op.feedbackShown) [self retire:op]; }
     [_forward detachLogic:logic];
 }

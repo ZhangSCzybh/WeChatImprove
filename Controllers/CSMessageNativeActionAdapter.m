@@ -12,10 +12,33 @@ static BOOL CSNativeTypeMatches(const char *actual, NSString *expected) {
     if ([expected isEqualToString:@"@"]) return *actual=='@';
     return strcmp(actual,expected.UTF8String)==0;
 }
+// MMServiceCenter returns MMServiceWrapper:NSProxy unless the service opts into raw
+// access. Its forwardInvocation: installs the service's account context, so do not
+// unwrap it or invoke the service IMP directly. Trust only wrappers obtained from
+// our service lookup, and obtain ABI evidence from the requested concrete class.
+static const void *CSNativeServiceClassKey=&CSNativeServiceClassKey;
+static BOOL CSNativeClassDescendsFrom(Class cls, Class ancestor) {
+    if (!ancestor) return NO;
+    for (; cls; cls=class_getSuperclass(cls)) if (cls==ancestor) return YES;
+    return NO;
+}
+static BOOL CSNativeIsServiceWrapper(id object) {
+    Class cls=object_getClass(object), wrapper=NSClassFromString(@"MMServiceWrapper");
+    return CSNativeClassDescendsFrom(cls,wrapper) && CSNativeClassDescendsFrom(wrapper,NSProxy.class);
+}
+static Method CSNativeMethod(id receiver, SEL selector) {
+    if (!receiver) return NULL;
+    if (CSNativeIsServiceWrapper(receiver)) {
+        Class serviceClass=objc_getAssociatedObject(receiver,CSNativeServiceClassKey);
+        return serviceClass ? class_getInstanceMethod(serviceClass,selector) : NULL;
+    }
+    return class_getInstanceMethod(object_getClass(receiver),selector);
+}
 // Only the evidenced CMessageWrap -> type-extension forwarding path is eligible.
 // Never trust a synthetic method signature or follow an arbitrary forwarding chain.
 static id CSNativeReceiver(id receiver, SEL selector) {
-    if (!receiver || class_getInstanceMethod(object_getClass(receiver),selector)) return receiver;
+    if (!receiver || CSNativeMethod(receiver,selector)) return receiver;
+    if (CSNativeIsServiceWrapper(receiver)) return nil;
     Class wrapClass=NSClassFromString(@"CMessageWrap");
     if (!wrapClass || ![receiver isKindOfClass:wrapClass]) return nil;
     SEL extensionSelector=NSSelectorFromString(@"m_extendInfoWithMsgType"), forwardingSelector=@selector(forwardingTargetForSelector:);
@@ -34,7 +57,7 @@ static id CSNativeReceiver(id receiver, SEL selector) {
 BOOL CSMessageNativeSupports(id receiver, NSString *selector, NSString *resultType, NSArray<NSString *> *argumentTypes) {
     receiver=CSNativeReceiver(receiver,NSSelectorFromString(selector));
     if (!receiver) return NO;
-    Method method=class_getInstanceMethod(object_getClass(receiver),NSSelectorFromString(selector));
+    Method method=CSNativeMethod(receiver,NSSelectorFromString(selector));
     if (!method || method_getNumberOfArguments(method)!=argumentTypes.count+2) return NO;
     char encoding[128]={0}; method_getReturnType(method,encoding,sizeof(encoding));
     if (!CSNativeTypeMatches(encoding,resultType)) return NO;
@@ -44,7 +67,7 @@ BOOL CSMessageNativeSupports(id receiver, NSString *selector, NSString *resultTy
 id CSMessageNativeInvoke(id receiver, NSString *selector, NSArray *arguments) {
     SEL sel=NSSelectorFromString(selector);
     receiver=CSNativeReceiver(receiver,sel);
-    Method method=class_getInstanceMethod(object_getClass(receiver),sel);
+    Method method=CSNativeMethod(receiver,sel);
     if (!method || method_getNumberOfArguments(method)!=arguments.count+2) [NSException raise:NSInvalidArgumentException format:@"Unsupported native ABI"];
     NSMethodSignature *signature=[NSMethodSignature signatureWithObjCTypes:method_getTypeEncoding(method)];
     NSInvocation *invocation=[NSInvocation invocationWithMethodSignature:signature]; invocation.target=receiver; invocation.selector=sel;
@@ -83,7 +106,7 @@ id CSMessageNativeInvoke(id receiver, NSString *selector, NSArray *arguments) {
     return nil;
 }
 unsigned long long CSMessageNativeUnsigned(id receiver, NSString *selector) {
-    @try { receiver=CSNativeReceiver(receiver,NSSelectorFromString(selector)); Method method=class_getInstanceMethod(object_getClass(receiver),NSSelectorFromString(selector)); char type[32]={0}; if (!method || method_getNumberOfArguments(method)!=2) return 0; method_getReturnType(method,type,sizeof(type)); if (!strchr("BIiQqLl",*CSNativeType(type))) return 0; return [CSMessageNativeInvoke(receiver,selector,@[]) unsignedLongLongValue]; }
+    @try { receiver=CSNativeReceiver(receiver,NSSelectorFromString(selector)); Method method=CSNativeMethod(receiver,NSSelectorFromString(selector)); char type[32]={0}; if (!method || method_getNumberOfArguments(method)!=2) return 0; method_getReturnType(method,type,sizeof(type)); if (!strchr("BIiQqLl",*CSNativeType(type))) return 0; return [CSMessageNativeInvoke(receiver,selector,@[]) unsignedLongLongValue]; }
     @catch (__unused NSException *exception) { return 0; }
 }
 id CSMessageActionNativeObject(id receiver, NSString *selector) {
@@ -92,7 +115,7 @@ id CSMessageActionNativeObject(id receiver, NSString *selector) {
 }
 BOOL CSMessageNativeSet(id receiver, NSString *setter, id value, BOOL required) {
     receiver=CSNativeReceiver(receiver,NSSelectorFromString(setter));
-    Method method=class_getInstanceMethod(object_getClass(receiver),NSSelectorFromString(setter));
+    Method method=CSNativeMethod(receiver,NSSelectorFromString(setter));
     if (!method) return !required;
     char result[16]={0}, argument[128]={0}; method_getReturnType(method,result,sizeof(result)); method_getArgumentType(method,2,argument,sizeof(argument));
     if (method_getNumberOfArguments(method)!=3 || *CSNativeType(result)!='v' || !strchr("@BIicqQlL",*CSNativeType(argument))) return NO;
@@ -112,12 +135,21 @@ NSString *CSMessageNativeAppDataPath(CSMessageActionContext *context) {
     Class cls=NSClassFromString(name); if (!cls) return nil;
     id center=CSMessageActionObjectGetter(NSClassFromString(@"MMContext"),NSSelectorFromString(@"currentContext"));
     if (!center) center=CSMessageActionObjectGetter(NSClassFromString(@"MMServiceCenter"),NSSelectorFromString(@"defaultCenter"));
-    @try { if (CSMessageNativeSupports(center,@"getService:",@"@",@[@"#"])) return CSMessageNativeInvoke(center,@"getService:",@[cls]);
+    @try {
+        id service=nil;
         // getService: is declared as Class on some versions and id on others (same object ABI).
-        if (CSMessageNativeSupports(center,@"getService:",@"@",@[@"@"])) return CSMessageNativeInvoke(center,@"getService:",@[cls]); }
+        if (CSMessageNativeSupports(center,@"getService:",@"@",@[@"#"]) || CSMessageNativeSupports(center,@"getService:",@"@",@[@"@"])) service=CSMessageNativeInvoke(center,@"getService:",@[cls]);
+        if (CSNativeIsServiceWrapper(service)) {
+            Class registered=objc_getAssociatedObject(service,CSNativeServiceClassKey);
+            if (registered && registered!=cls) return nil;
+            objc_setAssociatedObject(service,CSNativeServiceClassKey,cls,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            return service;
+        }
+        return CSNativeClassDescendsFrom(object_getClass(service),cls) ? service : nil;
+    }
     @catch (__unused NSException *exception) {} return nil;
 }
-- (NSString *)currentAccountID { id contact=CSMessageActionObjectGetter([self serviceNamed:@"CContactMgr"],NSSelectorFromString(@"getSelfContact")); id name=CSMessageActionObjectGetter(contact,NSSelectorFromString(@"m_nsUsrName")); return [name isKindOfClass:NSString.class] ? name : nil; }
+- (NSString *)currentAccountID { id contact=CSMessageActionNativeObject([self serviceNamed:@"CContactMgr"],@"getSelfContact"); id name=CSMessageActionObjectGetter(contact,NSSelectorFromString(@"m_nsUsrName")); return [name isKindOfClass:NSString.class] ? name : nil; }
 - (id)controllerForCell:(id)cell {
     id cursor=cell; Class controllerClass=NSClassFromString(@"BaseMsgContentViewController");
     for (NSUInteger i=0;cursor && i<32;i++) { if (controllerClass && [cursor isKindOfClass:controllerClass]) return cursor; cursor=CSMessageActionObjectGetter(cursor,NSSelectorFromString(@"nextResponder")); } return nil;
