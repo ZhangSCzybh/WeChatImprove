@@ -1,5 +1,7 @@
 # 消息操作重构 1.8-0
 
+> 已知故障历史版本：用户在微信 `8.0.78` 上确认插件菜单缺失、消息手势无反应。原生服务代理准入与转发清理取消待媒体操作的两处缺陷已在 [1.8-1 修正发布](message-actions-1.8-1.md) 中修复；修复后设备验收尚未执行。本页其余内容为当时的发布记录，1.8-0 安装包和证据字节保留，不应视为设备验收通过。
+
 版本：`1.8-0`；基线：`2aa7bcb8`（1.7-17）；保留分支：`codex/message-actions-refactor-1.7-17`。
 隔离工作树：`/Users/zhangshichao/.codex/worktrees/message-actions-refactor/WeChatImprove`。原工作区和旧安装包保持原状；本轮无服务切换、账号或数据库操作、安装、真实发送、push 或 merge。
 

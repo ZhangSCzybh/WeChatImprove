@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.8-0`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.8-1`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.8-0`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.8-1`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.8-0` 为消息操作重构的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
+| Rootless / Rootful | `1.8-1` 为消息操作回归修复的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -58,11 +58,13 @@
 
 “后台运行”受系统调度和注入环境限制，不能保证微信永不被终止。“版本控制”调整的是微信版本返回值，不会安装或降级微信；“更新控制”针对微信内部热更新，不等同于关闭 App Store 更新。
 
-## 消息操作 1.8-0
+## 消息操作 1.8-1
 
-消息手势、长按复读、语音转发与原生转发入口共用消息上下文、动作权限和提交状态。保留三个设置页、原有默认值和动作编号；手势复读独立于长按复读和语音转发开关。滑动仅在松手确认后提交，取消、消息复用、页面离开或账号切换会停止未提交操作。转发保留微信的收件人选择、确认、留言及取消流程；每个收件人分别记录提交状态，未知结果不自动换路重发。
+`1.8-0` 已收到用户在微信 `8.0.78` 上的菜单缺失与手势无反应反馈，属于已知故障版本，原包保留用于历史核对。`1.8-1` 修复原生服务代理被错误拒绝导致消息上下文无法建立的问题，并修复原生转发清理误取消已确认、正在等待媒体的操作。原生选择、确认、留言和真正取消流程保留；未调整 Hook 执行顺序。
 
-完成了主机行为回归与 Rootless 双架构编译、包内容核对。原生接口证据来自本地提取的微信 `8.0.78.34` arm64 二进制静态分析，未核对当前手机安装映像。本轮未安装、未发送真实消息；UIKit 手势竞争、选择器与留言流程、媒体接收播放及性能仍待实机验收，不承诺所有消息子类型效果一致。详见 [1.8-0 发布与验证说明](docs/message-actions-1.8-0.md) 和 [永久验证证据](docs/evidence/message-actions-1.8-0/)。
+消息手势、长按复读和语音转发继续共用操作管理，三个设置页、默认值和动作编号保持兼容，手势复读独立于其他两个开关。提交结果未知时不会自动换路重发，也不代表消息已送达。
+
+修复后的 8 组主机回归共 66,626 项检查通过，`1.8-1` 完成全新 Rootless 双架构编译和包内容核对。本地微信 `8.0.78.34` arm64 二进制静态证据与用户微信 `8.0.78` 的问题反馈分别记录；修复后尚未安装或完成设备验收。UIKit 手势、原生选择与留言、真实媒体接收播放和性能仍待验证。详见 [1.8-1 修正发布说明](docs/message-actions-1.8-1.md)、[修复回归证据](docs/evidence/message-actions-device-regression-2026-10-17/README.md) 和 [新包证据](docs/evidence/message-actions-1.8-1/)。
 
 ## 后台模糊
 
@@ -190,20 +192,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-0
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-1
 ```
 
-默认产物：`packages/com.wechat.improve_1.8-0_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.8-1_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.8-0` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.8-1` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-0
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-1
 ```
 
-默认产物：`packages/com.wechat.improve_1.8-0_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.8-1_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -223,7 +225,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.8-0_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.8-1_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
@@ -268,7 +270,9 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 
 ### 验证状态
 
-`1.8-0` 统一消息手势、复读与语音转发的操作、媒体和生命周期管理，保留原有设置及原生确认流程。已完成主机回归与 Rootless 双架构包检查；本轮没有实机安装、真实发送或性能测量。详见 [消息操作重构](docs/message-actions-1.8-0.md)。
+`1.8-1` 修复 `1.8-0` 在用户微信 `8.0.78` 上菜单与手势不可用的服务代理准入问题，以及原生清理误取消确认后待媒体操作的问题。修复后 66,626 项主机检查通过，全新 Rootless 双架构包已核对；修复后的手机安装与验收尚未执行。详见 [修正发布说明](docs/message-actions-1.8-1.md)。
+
+`1.8-0` 为已知故障版本，原包与当时的主机/静态包证据保留，不作为设备通过证明。详见 [历史发布说明](docs/message-actions-1.8-0.md)。
 
 `1.7-17` 在用户确认 1.7-16 正常后整理后台模糊代码：统一动画与快照清理，移除调试断言，减少无效处理。221 项行为检查、底栏回归与 Rootless 双架构构建通过。详见 [后台模糊检查与整理](docs/background-blur-cleanup-1.7-17.md)。
 

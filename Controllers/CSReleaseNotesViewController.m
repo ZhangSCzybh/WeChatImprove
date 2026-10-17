@@ -4,6 +4,12 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.8-1": @[
+            @{@"title": @"修复消息菜单和手势不可用",
+              @"detail": @"修复 1.8-0 在微信 8.0.78 中可能不显示复读、语音转发菜单且无法滑动消息的问题，保留原有设置。"},
+            @{@"title": @"修复等待语音时转发被取消",
+              @"detail": @"已确认的转发在等待语音准备时，关闭原生转发页面不会再误取消该操作；主动取消仍会停止发送。"}
+        ],
         @"1.8-0": @[
             @{@"title": @"统一消息操作处理",
               @"detail": @"消息手势、长按复读和语音转发共用操作处理，保留各自设置；滑动复读不再依赖长按复读开关。"},
