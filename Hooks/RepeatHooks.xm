@@ -126,22 +126,8 @@
 
 // The device's alternate sticker menu path reaches uniq even when its builder is bypassed.
 %hook BaseMessageCellView
-- (id)generateOperationMenu {
-    id items=%orig;
-    [CSMessageActionMenuAdapter recordMenuStage:@"menu.generate" cell:self items:items];
-    return items;
-}
 - (id)uniqMenuItems:(id)items {
-    [CSMessageActionMenuAdapter recordMenuStage:@"menu.uniq.in" cell:self items:items];
     id prepared=[CSMessageActionMenuAdapter itemsBeforeNativeDedupForCell:self items:items];
-    id result=%orig(prepared);
-    [CSMessageActionMenuAdapter recordMenuStage:@"menu.uniq.out" cell:self items:result];
-    return result;
-}
-- (id)filteredMenuItems:(id)items {
-    [CSMessageActionMenuAdapter recordMenuStage:@"menu.filter.in" cell:self items:items];
-    id result=%orig;
-    [CSMessageActionMenuAdapter recordMenuStage:@"menu.filter.out" cell:self items:result];
-    return result;
+    return %orig(prepared);
 }
 %end

@@ -1,5 +1,4 @@
 #import "CSMessageActionCoordinator.h"
-#import "CSMessageActionDiagnostics.h"
 #import "CSMessageSendAdapter.h"
 #import "CSVoiceForwardAdapter.h"
 #import <TargetConditionals.h>
@@ -247,7 +246,6 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
         typeof(self) self=weakSelf; CSMessageActionOperation *live=self.operations[identifier];
         if (!live || live.cancelled || ![self validAccount:live.context]) return;
         [self hideWaiting:identifier]; live.voice=resource; live.mediaFailed=!resource;
-        if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"voice.prepared" fields:@{@"accepted":@(resource!=nil)}];
         for (NSString *target in live.requestedTargets.allObjects) [self submitTarget:target operation:live];
     }];
 }
@@ -258,7 +256,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     if (op.context.messageType==34 && !op.voice && !op.mediaFailed) return;
     if (op.mediaFailed) { op.failureDetail=@"语音读取或校验失败"; [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
     CSMessagePreparedSend *route=op.context.messageType==49 ? [_sender prepareContext:op.context targetID:target voice:op.voice appData:op.appData appDataPath:op.appPath] : [_sender prepareContext:op.context targetID:target voice:op.voice];
-    if (!route) { if (op.context.messageType==34) op.failureDetail=@"语音发送准备失败"; if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"send.prepare_failed" fields:@{@"type":@(op.context.messageType)}]; [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
+    if (!route) { if (op.context.messageType==34) op.failureDetail=@"语音发送准备失败"; [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
     [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateReady];
     if (![self validAccount:op.context]) return;
     if (![op.ledger beginSubmissionForOperationID:op.identifier targetID:target currentAccountID:_accountID accountEpoch:_accountEpoch]) return;

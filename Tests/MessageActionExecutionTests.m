@@ -4,7 +4,6 @@
 #import "CSMessageSendAdapter.h"
 #import "CSVoiceForwardAdapter.h"
 #import "CSMessageActionMenuAdapter.h"
-#import "CSMessageActionDiagnostics.h"
 static NSUInteger checks=0;
 #define CHECK(x) do { checks++; if (!(x)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#x); exit(1); } } while(0)
 static void Drain(void) { NSDate *end=[NSDate dateWithTimeIntervalSinceNow:0.03]; [NSRunLoop.currentRunLoop runUntilDate:end]; }
@@ -131,7 +130,7 @@ static NSMutableArray *factoryInputs;
 - (id)getViewController { return _controller; }
 @end
 #import "RepeatMenuHooksUnderTest.h"
-#import "MenuObservationHooksUnderTest.h"
+#import "MenuDedupHookUnderTest.h"
 @interface TestController : NSObject
 @property(nonatomic, strong) NSMutableArray *calls;
 @property(nonatomic, copy) void (^confirmation)(void);
@@ -414,55 +413,6 @@ static NSArray *NativeMenuPipeline(NSArray *items, BOOL onlyDelete) {
     for (MMMenuItem *item in items) { if ([seen containsIndex:item.menuType]) continue; [seen addIndex:item.menuType]; if (!onlyDelete || item.menuType==8 || item.menuType==4 || item.menuType==5) [result addObject:item]; }
     return result;
 }
-static NSArray<NSDictionary *> *DiagnosticEvents(void) {
-    NSData *data=[[CSMessageActionDiagnostics report] dataUsingEncoding:NSUTF8StringEncoding];
-    NSDictionary *report=[NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-    CHECK([report[@"schema"] isEqual:@1]);
-    CHECK([report[@"events"] isKindOfClass:NSArray.class]);
-    return report[@"events"];
-}
-static void TestDiagnostics(void) {
-    CHECK(!CSMessageActionDiagnostics.isEnabled);
-    [CSMessageActionDiagnostics record:@"ignored" fields:@{@"count":@1}]; CHECK(DiagnosticEvents().count==0);
-    [CSMessageActionDiagnostics setEnabled:YES];
-    [CSMessageActionDiagnostics record:@"schema" fields:@{@"cell":@"TestCell",@"count":@2,@"fromSelf":@YES,
-        @"account":@"private-account",@"content":@"private-message",@"path":@"/private/media",@"md5":@"private-md5",@"localID":@42,@"serverID":@900,@"bytes":[NSData data]}];
-    NSDictionary *event=DiagnosticEvents().lastObject;
-    CHECK(event.count==5 && [event[@"cell"] isEqual:@"TestCell"] && [event[@"count"] isEqual:@2] && [event[@"fromSelf"] boolValue]);
-    CHECK(![[CSMessageActionDiagnostics report] containsString:@"private-"]);
-    for (NSUInteger index=0;index<200;index++) [CSMessageActionDiagnostics record:@"bounded" fields:@{@"count":@(index)}];
-    NSArray *events=DiagnosticEvents(); CHECK(events.count==160);
-    CHECK([events.firstObject[@"count"] isEqual:@40] && [events.lastObject[@"count"] isEqual:@199]);
-    [CSMessageActionDiagnostics setEnabled:NO]; NSString *frozen=[CSMessageActionDiagnostics report];
-    [CSMessageActionDiagnostics record:@"ignored" fields:@{@"count":@999}]; CHECK([[CSMessageActionDiagnostics report] isEqual:frozen]);
-    [CSMessageActionDiagnostics setEnabled:YES]; CHECK(DiagnosticEvents().count==0);
-    [CSMessageActionDiagnostics record:@"reset" fields:@{}]; CHECK([DiagnosticEvents().lastObject[@"sequence"] isEqual:@1]);
-    [CSMessageActionDiagnostics setEnabled:NO];
-}
-static void TestMenuObservation(void) {
-    // Execute the actual production hook bodies extracted by the build script.
-    // Native results are controlled inputs here; this does not simulate phone menu rendering.
-    TestMenuObservationCell *cell=[TestMenuObservationCell new]; cell.wrap=Cell(47).wrap;
-    MMMenuItem *native=[[MMMenuItem alloc] initWithTitle:@"原生" target:nil action:NULL];
-    MMMenuItem *repeat=[[MMMenuItem alloc] initWithTitle:@"复读" target:nil action:NSSelectorFromString(@"cs_handleRepeatMenuItem:")];
-    NSArray *withRepeat=@[native,repeat], *restricted=@[native];
-    for (NSNumber *enabled in @[@NO,@YES]) {
-        [CSMessageActionDiagnostics setEnabled:enabled.boolValue];
-        NSString *before=[CSMessageActionDiagnostics report];
-        cell.generatedItems=withRepeat; CHECK([cell generateOperationMenu]==withRepeat);
-        cell.nativeOutput=withRepeat; CHECK([cell uniqMenuItems:withRepeat]==withRepeat && cell.observedInput==withRepeat);
-        cell.nativeOutput=restricted; CHECK([cell filteredMenuItems:withRepeat]==restricted && cell.observedInput==withRepeat);
-        if (enabled.boolValue) {
-            NSArray *events=DiagnosticEvents(); CHECK(events.count==5);
-            CHECK([events[0][@"stage"] isEqual:@"menu.generate"] && [events[0][@"repeat"] isEqual:@1]);
-            CHECK([events[3][@"stage"] isEqual:@"menu.filter.in"] && [events[3][@"repeat"] isEqual:@1]);
-            CHECK([events[4][@"stage"] isEqual:@"menu.filter.out"] && [events[4][@"repeat"] isEqual:@0]);
-        } else CHECK([[CSMessageActionDiagnostics report] isEqual:before]);
-        cell.generatedItems=nil; CHECK([cell generateOperationMenu]==nil);
-        cell.nativeOutput=nil; CHECK([cell uniqMenuItems:nil]==nil && [cell filteredMenuItems:nil]==nil);
-    }
-    [CSMessageActionDiagnostics setEnabled:NO];
-}
 static void TestStickerMenuBypass(NSUserDefaults *defaults) {
     TestEnvironment *env=[TestEnvironment new]; TestController *page=[TestController new]; env.controller=page;
     TestManager *manager=[TestManager new]; env.services[@"CMessageMgr"]=manager;
@@ -470,7 +420,7 @@ static void TestStickerMenuBypass(NSUserDefaults *defaults) {
     CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:env preferences:preferences mediaProvider:[CSMessageMediaProvider new]];
     coordinator.feedbackHandler=^(__unused NSString *message){};
     menuHookAdapter=[[CSMessageActionMenuAdapter alloc] initWithCoordinator:coordinator];
-    TestMenuObservationCell *cell=[TestMenuObservationCell new]; cell.nativePassesThrough=YES;
+    TestMenuDedupCell *cell=[TestMenuDedupCell new];
     TestMessageViewModel *model=[TestMessageViewModel new]; model.messageWrap=Cell(47).wrap; cell.viewModel=model;
     NSMutableArray *native=[NSMutableArray array];
     for (NSInteger i=1;i<=9;i++) { MMMenuItem *item=[[MMMenuItem alloc] initWithTitle:@"原生" target:nil action:NULL]; item.menuType=i; [native addObject:item]; }
@@ -482,7 +432,6 @@ static void TestStickerMenuBypass(NSUserDefaults *defaults) {
     CSMessageNativeInvoke(repeat.target,NSStringFromSelector(repeat.action),@[NSNull.null]);
     CHECK(Wait(^BOOL{ return manager.calls.count==1; })); CHECK([manager.calls[0][0] isEqual:@"emoji"]);
     CHECK(manager.calls[0][2]!=model.messageWrap && model.messageWrap.m_uiMesLocalID==42);
-    cell.nativeOutput=@[native[0]]; CHECK([cell filteredMenuItems:items]==cell.nativeOutput);
     model.isRecordDetail=YES; CHECK([cell uniqMenuItems:native]==native); model.isRecordDetail=NO;
     model.isChatRoomMessageUnsafe=YES; CHECK([cell uniqMenuItems:native]==native); model.isChatRoomMessageUnsafe=NO;
     cell.viewModel=nil; cell.wrap=model.messageWrap; CHECK([cell uniqMenuItems:native]==native);
@@ -969,7 +918,7 @@ static void TestVoiceFlags(void) {
     CHECK(Wait(^BOOL{ return callbacks==1; })); CHECK(!accepted); [NSFileManager.defaultManager removeItemAtPath:path error:nil];
 }
 int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_MESSAGE_CORE")) {
-    TestDiagnostics(); TestMenuObservation(); TestStickerMenuBypass(defaults); TestGameMenu(defaults);
+    TestStickerMenuBypass(defaults); TestGameMenu(defaults);
     TestVoiceNativeConstructorFlows(defaults); TestNativeRecordingGuard(defaults); TestVoiceFailureFeedback(defaults); TestVoiceFlags(); TestForwardCleanupWhileWaiting(defaults);
     [defaults removePersistentDomainForName:suite]; printf("PASS: %lu focused message/menu/voice checks (host doubles, no native sends)\n",(unsigned long)checks); return 0;
 } if (getenv("CS_TEST_FIRST_BATCH_CASE")) {
@@ -980,4 +929,4 @@ int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionT
     else if ([test isEqual:@"games"]) TestGameMenu(defaults);
     else return 2;
     [defaults removePersistentDomainForName:suite]; printf("PASS: %lu focused checks\n",(unsigned long)checks); return 0;
-} if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestDiagnostics(); TestMenuObservation(); TestStickerMenuBypass(defaults); TestNativeRecordingGuard(defaults); TestVoiceNativeConstructorFlows(defaults); TestVoiceFailureFeedback(defaults); TestNativeActionFastPath(defaults); TestMenuNoOp(defaults); TestNativeStickerMenu(defaults); TestGameMenu(defaults); TestVoiceInvalidBytes(); TestVoiceCallbackIntegration(defaults); TestNativeMenuPipeline(defaults); TestNativeVoiceStatuses(); TestNativeTextAndFeedback(defaults); TestProductionAdmission(defaults); TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestForwardCleanupWhileWaiting(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }
+} if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestStickerMenuBypass(defaults); TestNativeRecordingGuard(defaults); TestVoiceNativeConstructorFlows(defaults); TestVoiceFailureFeedback(defaults); TestNativeActionFastPath(defaults); TestMenuNoOp(defaults); TestNativeStickerMenu(defaults); TestGameMenu(defaults); TestVoiceInvalidBytes(); TestVoiceCallbackIntegration(defaults); TestNativeMenuPipeline(defaults); TestNativeVoiceStatuses(); TestNativeTextAndFeedback(defaults); TestProductionAdmission(defaults); TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestForwardCleanupWhileWaiting(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }

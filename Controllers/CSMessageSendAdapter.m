@@ -1,5 +1,4 @@
 #import "CSMessageSendAdapter.h"
-#import "CSMessageActionDiagnostics.h"
 @interface NSObject (CSMessageWrapConstruction)
 - (instancetype)initWithMsgType:(long long)type;
 @end
@@ -23,9 +22,7 @@ static id CSFreshWrap(NSUInteger type) {
     Class cls=NSClassFromString(@"CMessageWrap");
     // Native 8.0.78 uses a signed 64-bit message type for this initializer.
     id allocated=[cls alloc];
-    BOOL supported=CSMessageNativeSupports(allocated,@"initWithMsgType:",@"@",@[@"q"]);
-    if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"voice.constructor" fields:@{@"constructor":@(supported)}];
-    if (!supported) return nil;
+    if (!CSMessageNativeSupports(allocated,@"initWithMsgType:",@"@",@[@"q"])) return nil;
     return [allocated initWithMsgType:(long long)type];
 }
 static id CSIndependentCopy(id source) {
@@ -87,7 +84,6 @@ static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArr
         id audio=[_environment serviceNamed:@"AudioSender"];
         if (!CSMessageNativeSupports(audio,@"uploaderForMsgWrap:",@"@",@[@"@"]) || !CSMessageNativeSupports(manager,@"AddLocalMsg:MsgWrap:",@"v",@[@"@",@"@"])) return nil;
         id uploader=CSMessageNativeInvoke(audio,@"uploaderForMsgWrap:",@[wrap]);
-        if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"voice.uploader" fields:@{@"uploader":@(uploader!=audio && CSMessageNativeSupports(uploader,@"ResendVoiceMsg:MsgWrap:",@"v",@[@"@",@"@"]))}];
         // The AudioSender resend API deletes outgoing originals. Only the selected concrete uploader owns this route.
         if (uploader==audio || !CSMessageNativeSupports(uploader,@"ResendVoiceMsg:MsgWrap:",@"v",@[@"@",@"@"])) return nil;
         __block __weak CSMessagePreparedSend *weakRoute=nil;

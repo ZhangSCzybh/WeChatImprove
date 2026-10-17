@@ -8,7 +8,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray *)itemsByAddingActionsForCell:(id)cell items:(nullable NSArray *)items;
 - (nullable id)itemsBeforeNativeDedupForCell:(id)cell items:(nullable id)items;
 + (nullable id)itemsBeforeNativeDedupForCell:(id)cell items:(nullable id)items;
-+ (void)recordMenuStage:(NSString *)stage cell:(id)cell items:(nullable id)items;
 + (BOOL)isPluginSelector:(SEL)selector;
 + (BOOL)canPerformSelector:(SEL)selector cell:(id)cell;
 + (void)performSelector:(SEL)selector cell:(id)cell;

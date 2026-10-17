@@ -1,7 +1,6 @@
 #import "CSRepeatSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
 #import "CSMessageActionPreferences.h"
-#import "CSMessageActionDiagnostics.h"
 
 @interface CSRepeatSettingsViewController ()
 
@@ -22,11 +21,6 @@
     [CSSettingTableViewCell registerToTableView:self.tableView];
     
     [self setupData];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [self setupData]; [self.tableView reloadData];
 }
 
 - (void)setupData {
@@ -65,7 +59,7 @@
     CSSettingSection *infoSection = [CSSettingSection sectionWithHeader:@"说明"
                                                                  items:@[descriptionItem, supportedTypesItem]];
     
-    self.sections = @[mainSection, infoSection, [CSMessageActionDiagnostics settingsSectionForController:self]];
+    self.sections = @[mainSection, infoSection];
 }
 
 #pragma mark - UITableViewDataSource

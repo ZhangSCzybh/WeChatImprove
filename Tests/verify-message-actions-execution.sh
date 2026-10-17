@@ -31,27 +31,23 @@ for cls in classes:
     native='@property(nonatomic,weak) TestMessageCellDelegate *nativeDelegate;\n' if cls in ('EmoticonMessageCellView','AppEmoticonMessageCellView') else ''
     extracted.append('@interface '+cls+' : TestCell\n'+native+'@property(nonatomic,copy) NSArray *nativeItems;\n- (id)operationMenuItems;\n@end\n@implementation '+cls+'\n'+body+'\n@end')
 (out/'RepeatMenuHooksUnderTest.h').write_text('\n'.join(extracted))
-observer=menu.split('%hook BaseMessageCellView',1)[1].split('%end',1)[0]
-observer=observer.replace('[CSMessageActionMenuAdapter itemsBeforeNativeDedupForCell:self items:items]', '(menuHookAdapter ? [menuHookAdapter itemsBeforeNativeDedupForCell:self items:items] : items)')
-observer=observer.replace('id result=%orig(prepared);', 'self.observedInput=prepared; id result=self.nativePassesThrough ? prepared : self.nativeOutput;')
-observer=observer.replace('id items=%orig;', 'id items=self.generatedItems;').replace('id result=%orig;', 'self.observedInput=items; id result=self.nativeOutput;')
-assert '%orig' not in observer
-(out/'MenuObservationHooksUnderTest.h').write_text('''
-@interface TestMenuObservationCell : TestCell
-@property(nonatomic,strong) id generatedItems, nativeOutput, observedInput;
-@property(nonatomic) BOOL nativePassesThrough;
-- (id)generateOperationMenu;
+dedup=menu.split('%hook BaseMessageCellView',1)[1].split('%end',1)[0]
+dedup=dedup.replace('[CSMessageActionMenuAdapter itemsBeforeNativeDedupForCell:self items:items]', '[menuHookAdapter itemsBeforeNativeDedupForCell:self items:items]')
+dedup=dedup.replace('return %orig(prepared);', 'self.observedInput=prepared; return prepared;')
+assert '%orig' not in dedup
+(out/'MenuDedupHookUnderTest.h').write_text('''
+@interface TestMenuDedupCell : TestCell
+@property(nonatomic,strong) id observedInput;
 - (id)uniqMenuItems:(id)items;
-- (id)filteredMenuItems:(id)items;
 @end
-@implementation TestMenuObservationCell
-'''+observer+'\n@end\n')
+@implementation TestMenuDedupCell
+'''+dedup+'\n@end\n')
 (out/'VoiceForwardCleanupHooksUnderTest.h').write_text('static CSMessageActionCoordinator *forwardHookCoordinator;\nstatic NSUInteger forwardNativeClearCalls;\n@interface TestLogic (CleanupHook)\n- (void)clearData;\n- (BOOL)bShowSendSuccessView;\n- (BOOL)bHiddenSendSuccessToastView;\n@end\n@implementation TestLogic (CleanupHook)\n'+clear+'\n'+'\n'.join(ui)+'\n@end\n@interface TestForwardManager : NSObject\n@property(nonatomic, strong) NSMutableArray *originalCalls;\n@end\n@implementation TestForwardManager\n'+'\n'.join(methods)+'\n@end\n')
 PYEXTRACT
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation \
   -I"$test_dir" -I"$project_dir/Controllers" \
   "$project_dir/Controllers/CSMessageActionPreferences.m" \
-  "$project_dir/Controllers/CSMessageActionDiagnostics.m" "$project_dir/Controllers/CSMessageActionContext.m" \
+  "$project_dir/Controllers/CSMessageActionContext.m" \
   "$project_dir/Controllers/CSMessageActionPolicy.m" \
   "$project_dir/Controllers/CSMessageNativeActionAdapter.m" \
   "$project_dir/Controllers/CSMessageMediaProvider.m" \

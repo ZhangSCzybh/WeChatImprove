@@ -4,6 +4,12 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.8-6": @[
+            @{@"title": @"清理消息操作诊断",
+              @"detail": @"移除复读和语音转发设置中的诊断开关、复制入口及临时记录代码。"},
+            @{@"title": @"精简多余处理",
+              @"detail": @"清理排查期间增加的菜单记录和重复刷新，保留已验证正常的表情复读、骰子猜拳菜单及语音复读转发。"}
+        ],
         @"1.8-5": @[
             @{@"title": @"修正已完成语音判断",
               @"detail": @"修正可播放的已下载语音被误判为正在录音的问题，保留录音中、取消和不完整语音的拦截。"},
