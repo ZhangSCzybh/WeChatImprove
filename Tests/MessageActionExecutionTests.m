@@ -119,6 +119,7 @@ static NSMutableArray *factoryInputs;
 @end
 @interface TestMessageViewModel : NSObject
 @property(nonatomic, strong) CMessageWrap *messageWrap;
+@property(nonatomic) BOOL isRecordDetail,isChatRoomMessageUnsafe;
 @end
 @implementation TestMessageViewModel
 @end
@@ -157,8 +158,10 @@ static NSMutableArray *factoryInputs;
 @interface TestAudio : NSObject
 @property(nonatomic, strong) TestUploader *uploader;
 @property(nonatomic) NSUInteger unsafeCalls;
+@property(nonatomic) BOOL recording;
 @end
 @implementation TestAudio
+- (BOOL)isRecording { return _recording; }
 - (id)uploaderForMsgWrap:(id)wrap { CHECK(CSMessageNativeUnsigned(wrap,@"m_uiMesLocalID")==0); return _uploader; }
 - (void)ResendVoiceMsg:(id)chat MsgWrap:(id)wrap { (void)chat; (void)wrap; _unsafeCalls++; }
 @end
@@ -460,6 +463,35 @@ static void TestMenuObservation(void) {
     }
     [CSMessageActionDiagnostics setEnabled:NO];
 }
+static void TestStickerMenuBypass(NSUserDefaults *defaults) {
+    TestEnvironment *env=[TestEnvironment new]; TestController *page=[TestController new]; env.controller=page;
+    TestManager *manager=[TestManager new]; env.services[@"CMessageMgr"]=manager;
+    CSMessageActionPreferences *preferences=Preferences(defaults);
+    CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:env preferences:preferences mediaProvider:[CSMessageMediaProvider new]];
+    coordinator.feedbackHandler=^(__unused NSString *message){};
+    menuHookAdapter=[[CSMessageActionMenuAdapter alloc] initWithCoordinator:coordinator];
+    TestMenuObservationCell *cell=[TestMenuObservationCell new]; cell.nativePassesThrough=YES;
+    TestMessageViewModel *model=[TestMessageViewModel new]; model.messageWrap=Cell(47).wrap; cell.viewModel=model;
+    NSMutableArray *native=[NSMutableArray array];
+    for (NSInteger i=1;i<=9;i++) { MMMenuItem *item=[[MMMenuItem alloc] initWithTitle:@"原生" target:nil action:NULL]; item.menuType=i; [native addObject:item]; }
+    // Replay the device path: no operationMenuItems call before native dedup.
+    NSArray *items=[cell uniqMenuItems:native]; CHECK(items.count==10 && cell.observedInput==items);
+    for (NSUInteger i=0;i<native.count;i++) CHECK(items[i]==native[i]);
+    CHECK([cell uniqMenuItems:items]==items); // Never add a second repeat item.
+    MMMenuItem *repeat=items.lastObject; CHECK([repeat.title isEqual:@"复读"]);
+    CSMessageNativeInvoke(repeat.target,NSStringFromSelector(repeat.action),@[NSNull.null]);
+    CHECK(Wait(^BOOL{ return manager.calls.count==1; })); CHECK([manager.calls[0][0] isEqual:@"emoji"]);
+    CHECK(manager.calls[0][2]!=model.messageWrap && model.messageWrap.m_uiMesLocalID==42);
+    cell.nativeOutput=@[native[0]]; CHECK([cell filteredMenuItems:items]==cell.nativeOutput);
+    model.isRecordDetail=YES; CHECK([cell uniqMenuItems:native]==native); model.isRecordDetail=NO;
+    model.isChatRoomMessageUnsafe=YES; CHECK([cell uniqMenuItems:native]==native); model.isChatRoomMessageUnsafe=NO;
+    cell.viewModel=nil; cell.wrap=model.messageWrap; CHECK([cell uniqMenuItems:native]==native);
+    cell.wrap=nil; cell.viewModel=model; model.messageWrap.m_uiMessageType=1; CHECK([cell uniqMenuItems:native]==native); model.messageWrap.m_uiMessageType=47;
+    env.account=@"other"; CHECK([cell uniqMenuItems:native]==native); env.account=@"me";
+    [defaults setBool:NO forKey:CSMessageActionRepeatEnabledKey]; [preferences requestRefresh]; CHECK(Wait(^BOOL{ return !coordinator.settings.repeatEnabled; }));
+    CHECK([cell uniqMenuItems:native]==native); CHECK([cell uniqMenuItems:nil]==nil);
+    menuHookAdapter=nil;
+}
 static void TestNativeStickerMenu(NSUserDefaults *defaults) {
     CContactMgr *contacts=[CContactMgr new]; contacts.contact=Contact(@"me");
     CMessageMgr *manager=[CMessageMgr new];
@@ -733,14 +765,22 @@ static NSData *CodecBytes(unsigned int format) {
 static void TestVoiceNativeConstructorFlows(NSUserDefaults *defaults) {
     for (NSNumber *outgoing in @[@NO,@YES]) for (NSNumber *forward in @[@NO,@YES]) for (NSUInteger formatCase=0;formatCase<4;formatCase++) {
         unsigned int codec=formatCase%2==0 ? 4 : 7,declared=formatCase<2 ? codec : UINT_MAX;
-        silkCalculatorCalls=opusCalculatorCalls=lengthCalculatorCalls=0; codecMilliseconds=1000; expectedCodecBytes=CodecBytes(codec);
+        silkCalculatorCalls=opusCalculatorCalls=lengthCalculatorCalls=0; codecMilliseconds=formatCase<2 ? 1000 : 3440; expectedCodecBytes=CodecBytes(codec);
         TestEnvironment *env=[TestEnvironment new]; TestController *page=[TestController new]; env.controller=page;
         TestManager *manager=[TestManager new]; TestAudio *audio=[TestAudio new]; audio.uploader=[TestUploader new];
         env.services[@"CMessageMgr"]=manager; env.services[@"AudioSender"]=audio;
-        TestCell *cell=Cell(34); cell.wrap.m_uiVoiceTime=1000; cell.wrap.m_uiVoiceFormat=declared;
-        cell.wrap.m_dtVoice=expectedCodecBytes; cell.wrap.m_uiDownloadStatus=outgoing.boolValue ? 9 : 1;
+        TestCell *cell=Cell(34); cell.wrap.m_uiVoiceTime=codecMilliseconds; cell.wrap.m_uiVoiceFormat=declared;
+        cell.wrap.m_dtVoice=expectedCodecBytes; cell.wrap.m_uiDownloadStatus=formatCase<2 ? (outgoing.boolValue ? 9 : 1) : 17;
         if (outgoing.boolValue) { cell.wrap.m_nsFromUsr=@"me"; cell.wrap.m_nsToUsr=@"chat"; }
-        NSString *content=[NSString stringWithFormat:@"<voicemsg voicelength='1000' length='%lu' endflag='1'/>",(unsigned long)expectedCodecBytes.length]; cell.wrap.m_nsContent=content;
+        NSString *content=[NSString stringWithFormat:@"<voicemsg voicelength='%u' length='%lu' endflag='1'/>",codecMilliseconds,(unsigned long)expectedCodecBytes.length];
+        NSString *voicePath=nil;
+        if (formatCase>=2) {
+            // Device log: status17, 3440ms, no memory bytes and no XML length.
+            voicePath=[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+            CHECK([expectedCodecBytes writeToFile:voicePath atomically:YES]); cell.wrap.path=voicePath; cell.wrap.m_dtVoice=nil;
+            content=@"<voicemsg voicelength='3440'/>";
+        }
+        cell.wrap.m_nsContent=content;
         CHECK(CSMessageNativeSupports(cell.wrap,@"initWithMsgType:",@"@",@[@"q"]));
         CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:env preferences:Preferences(defaults) mediaProvider:[CSMessageMediaProvider new]];
         coordinator.feedbackHandler=^(__unused NSString *message){};
@@ -758,7 +798,7 @@ static void TestVoiceNativeConstructorFlows(NSUserDefaults *defaults) {
         NSMutableSet *recipients=[NSMutableSet set];
         for (NSUInteger index=0;index<expected;index++) {
             CMessageWrap *sent=manager.calls[index][2]; CHECK(sent!=cell.wrap && sent==audio.uploader.calls[index][1]);
-            CHECK(sent.m_uiVoiceTime==1000 && sent.m_uiVoiceFormat==codec && [sent.m_dtVoice isEqual:expectedCodecBytes]);
+            CHECK(sent.m_uiVoiceTime==codecMilliseconds && sent.m_uiVoiceFormat==codec && [sent.m_dtVoice isEqual:expectedCodecBytes]);
             CHECK(sent.m_uiMesLocalID!=0 && sent.m_n64MesSvrID==0 && [sent.m_nsFromUsr isEqual:@"me"]);
             CHECK([manager.calls[index][1] isEqual:sent.m_nsToUsr]); [recipients addObject:sent.m_nsToUsr];
             CHECK([[coordinator resultsForOperationID:operation][sent.m_nsToUsr] integerValue]==CSMessageActionSubmissionStateUnknown);
@@ -770,10 +810,28 @@ static void TestVoiceNativeConstructorFlows(NSUserDefaults *defaults) {
             [coordinator finishForwardLogic:logic cancelled:NO]; CHECK(audio.uploader.calls.count==2);
         }
         CHECK(cell.wrap.m_uiMesLocalID==42 && cell.wrap.m_n64MesSvrID==900 && [cell.wrap.m_nsContent isEqual:content]);
-        CHECK(cell.wrap.m_uiVoiceFormat==declared && [cell.wrap.m_dtVoice isEqual:expectedCodecBytes]);
+        CHECK(cell.wrap.m_uiVoiceFormat==declared && (formatCase<2 ? [cell.wrap.m_dtVoice isEqual:expectedCodecBytes] : cell.wrap.m_dtVoice==nil));
         CHECK([cell.wrap.m_nsFromUsr isEqual:outgoing.boolValue ? @"me" : @"chat"] && [cell.wrap.m_nsToUsr isEqual:outgoing.boolValue ? @"chat" : @"me"]);
+        if (voicePath) [NSFileManager.defaultManager removeItemAtPath:voicePath error:nil];
     }
     expectedCodecBytes=nil;
+}
+static void TestNativeRecordingGuard(NSUserDefaults *defaults) {
+    for (NSUInteger scenario=0;scenario<5;scenario++) {
+        TestEnvironment *env=[TestEnvironment new]; TestController *page=[TestController new]; env.controller=page;
+        TestManager *manager=[TestManager new]; TestAudio *audio=[TestAudio new]; audio.uploader=[TestUploader new]; audio.recording=scenario==1;
+        env.services[@"CMessageMgr"]=manager; env.services[@"AudioSender"]=scenario==2 ? [NSObject new] : audio;
+        TestCell *cell=Cell(34); cell.wrap.m_nsFromUsr=@"me"; cell.wrap.m_nsToUsr=@"chat";
+        cell.wrap.m_uiDownloadStatus=17; cell.wrap.m_uiVoiceTime=1000; cell.wrap.m_uiVoiceFormat=0;
+        cell.wrap.m_dtVoice=[NSMutableData dataWithLength:scenario==4 ? 14 : 700];
+        cell.wrap.m_nsContent=scenario==3 ? @"<voicemsg endflag='0' cancelflag='1'/>" : @"<voicemsg/>";
+        CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:env preferences:Preferences(defaults) mediaProvider:[CSMessageMediaProvider new]];
+        coordinator.feedbackHandler=^(__unused NSString *message){};
+        NSString *operation=[coordinator executeContext:[coordinator captureContextForCell:cell controller:page bindingGeneration:1] action:CSMessageActionRepeat entry:CSMessageActionEntryMenuRepeat]; CHECK(operation);
+        NSInteger expected=scenario==0 ? CSMessageActionSubmissionStateUnknown : CSMessageActionSubmissionStateFailedBeforeAcceptance;
+        CHECK(Wait(^BOOL{ return [[coordinator resultsForOperationID:operation][@"chat"] integerValue]==expected; }));
+        CHECK(manager.calls.count==(scenario==0 ? 1 : 0) && audio.uploader.calls.count==(scenario==0 ? 1 : 0));
+    }
 }
 static void TestVoiceFailureFeedback(NSUserDefaults *defaults) {
     for (NSUInteger scenario=0;scenario<3;scenario++) {
@@ -910,7 +968,11 @@ static void TestVoiceFlags(void) {
     cell.wrap.m_nsContent=@"<voicemsg voicelength='1000' voiceformat='0' length='700' endflag='1' cancelflag='1'/>"; dispatch_semaphore_signal(release);
     CHECK(Wait(^BOOL{ return callbacks==1; })); CHECK(!accepted); [NSFileManager.defaultManager removeItemAtPath:path error:nil];
 }
-int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_FIRST_BATCH_CASE")) {
+int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_MESSAGE_CORE")) {
+    TestDiagnostics(); TestMenuObservation(); TestStickerMenuBypass(defaults); TestGameMenu(defaults);
+    TestVoiceNativeConstructorFlows(defaults); TestNativeRecordingGuard(defaults); TestVoiceFailureFeedback(defaults); TestVoiceFlags(); TestForwardCleanupWhileWaiting(defaults);
+    [defaults removePersistentDomainForName:suite]; printf("PASS: %lu focused message/menu/voice checks (host doubles, no native sends)\n",(unsigned long)checks); return 0;
+} if (getenv("CS_TEST_FIRST_BATCH_CASE")) {
     NSString *test=[NSString stringWithUTF8String:getenv("CS_TEST_FIRST_BATCH_CASE")];
     if ([test isEqual:@"native-actions"]) TestNativeActionFastPath(defaults);
     else if ([test isEqual:@"menu"]) TestMenuNoOp(defaults);
@@ -918,4 +980,4 @@ int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionT
     else if ([test isEqual:@"games"]) TestGameMenu(defaults);
     else return 2;
     [defaults removePersistentDomainForName:suite]; printf("PASS: %lu focused checks\n",(unsigned long)checks); return 0;
-} if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestDiagnostics(); TestMenuObservation(); TestVoiceNativeConstructorFlows(defaults); TestVoiceFailureFeedback(defaults); TestNativeActionFastPath(defaults); TestMenuNoOp(defaults); TestNativeStickerMenu(defaults); TestGameMenu(defaults); TestVoiceInvalidBytes(); TestVoiceCallbackIntegration(defaults); TestNativeMenuPipeline(defaults); TestNativeVoiceStatuses(); TestNativeTextAndFeedback(defaults); TestProductionAdmission(defaults); TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestForwardCleanupWhileWaiting(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }
+} if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestDiagnostics(); TestMenuObservation(); TestStickerMenuBypass(defaults); TestNativeRecordingGuard(defaults); TestVoiceNativeConstructorFlows(defaults); TestVoiceFailureFeedback(defaults); TestNativeActionFastPath(defaults); TestMenuNoOp(defaults); TestNativeStickerMenu(defaults); TestGameMenu(defaults); TestVoiceInvalidBytes(); TestVoiceCallbackIntegration(defaults); TestNativeMenuPipeline(defaults); TestNativeVoiceStatuses(); TestNativeTextAndFeedback(defaults); TestProductionAdmission(defaults); TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestForwardCleanupWhileWaiting(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }

@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.8-4`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.8-5`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.8-4`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.8-5`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.8-4` 为消息操作回归修复的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
+| Rootless / Rootful | `1.8-5` 为消息操作回归修复的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -58,15 +58,17 @@
 
 “后台运行”受系统调度和注入环境限制，不能保证微信永不被终止。“版本控制”调整的是微信版本返回值，不会安装或降级微信；“更新控制”针对微信内部热更新，不等同于关闭 App Store 更新。
 
-## 消息操作 1.8-4
+## 消息操作 1.8-5
 
-本版修正语音复读、增强语音转发创建新消息时的原生方法签名：本地微信 `8.0.78.34` 的 `CMessageWrap.initWithMsgType:` 使用 64 位整数，而旧版仅接受 32 位签名，会在发送前拒绝创建新语音。测试替身也同步改为真实签名，并验证收到/自己发送的语音、复读/多人转发、SILK/OPUS 与自动格式识别的提交路径。
+根据手机 1.8-4 / 微信 8.0.78.34 诊断修正两条实际失败路径：
 
-用户安装并重启 `1.8-3` 后，普通文字和图片复读正常，但独立表情仍缺少按钮、可播放语音仍提示“1个目标未提交”。**表情菜单的手机故障尚未定位，本版不宣称已修复。** 复读与语音转发设置新增“问题排查”：开启“记录消息操作诊断”，重现问题后返回“复制诊断信息”。它记录菜单构建、生成、去重、过滤及语音准备阶段；默认关闭，仅在内存保留最近 160 条，不记录正文、联系人、消息标识、文件路径或媒体内容。
+- 语音：日志 125、147 显示状态 `17`、时长 `3440ms`、本地已完成，却被误判仍在录音。在这类状态下直接查询微信 `AudioSender.isRecording`；确认没有录音后读取本地文件，保留取消、未结束、文件稳定性和完整性校验。原生录音状态无法确认时不放行。
+- 表情：日志 261–264 中，`EmoticonMessageCellView` 到去重阶段仍无复读项，且未经过已挂接的构建入口。本版在去重前补齐类型 47 的复读项（包括骰子/猜拳），仍经过微信过滤；聊天记录详情、异常群消息和无法确认限制状态的菜单不补项。
+- 诊断：去掉页面刷新产生的大量 `context.source`、`controller.resolve` 重复记录，保留菜单、语音和明确拒绝原因，避免关键记录被挤出 160 条上限。
 
-第一批原生动作精简继续保留：引用、收藏、普通转发直接交给微信，删除/撤回保留轻量确认，复读和增强语音转发保留提交与取消状态。菜单诊断只观察各阶段，不改变微信的过滤结果。
+核心检查命令：`CS_TEST_MESSAGE_CORE=1 bash Tests/verify-message-actions-execution.sh`。本轮 **584 项**通过，覆盖绕过构建入口的表情、去重/限制、状态 17 的本地语音、复读/多人转发、原消息保留、录音/取消/不完整数据拒绝和重复回调。使用主机替身；不运行无关布局、时间、合并全量回归。Rootless 包做版本、双架构和核心类核对，手机按钮显示与语音收件仍需安装验证。
 
-本轮主机回归和全新 Rootless 双架构包核对见 [1.8-4 发布说明](docs/message-actions-1.8-4.md) 与 [发布证据](docs/evidence/message-actions-1.8-4/)。主机测试使用原生结构替身，不能证明手机已收到语音或已显示表情按钮；本版尚未安装到手机。历史依据与设备反馈见 [1.8-3 说明](docs/message-actions-1.8-3.md)。
+后续诊断入口仍为“插件设置 → 功能增强 → 复读功能（或语音转发）→ 记录消息操作诊断”；复现后返回复制。默认关闭，只在内存保留记录，不包含消息正文、联系人或媒体内容。历史分析保留在 [1.8-4 说明](docs/message-actions-1.8-4.md)，本轮不另建报告目录。
 
 ## 后台模糊
 
@@ -194,20 +196,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-4
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-5
 ```
 
-默认产物：`packages/com.wechat.improve_1.8-4_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.8-5_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.8-4` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.8-5` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-4
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-5
 ```
 
-默认产物：`packages/com.wechat.improve_1.8-4_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.8-5_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -227,7 +229,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.8-4_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.8-5_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。

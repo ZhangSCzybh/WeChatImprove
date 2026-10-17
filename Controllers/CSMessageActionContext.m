@@ -96,7 +96,6 @@ static const void *CSActionObjectTokenKey=&CSActionObjectTokenKey;
     BOOL outgoing=NO;
     BOOL known=CSActionNativeOutgoing(wrap,&outgoing);
     BOOL fromSelf=[from isEqualToString:accountID], toSelf=[to isEqualToString:accountID];
-    if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"context.source" fields:@{@"cell":NSStringFromClass([cell class]) ?: @"nil",@"model":NSStringFromClass([CSMessageActionObjectGetter(cell,NSSelectorFromString(@"viewModel")) class]) ?: @"nil",@"wrap":NSStringFromClass([wrap class]),@"controller":NSStringFromClass([controller class]) ?: @"nil",@"type":@(CSActionUnsigned(wrap,NSSelectorFromString(@"m_uiMessageType"))),@"hasFrom":@(from.length>0),@"hasTo":@(to.length>0),@"fromSelf":@(fromSelf),@"toSelf":@(toSelf),@"senderKnown":@(known),@"outgoing":@(outgoing)}];
     if (!known) {
         if (fromSelf) outgoing=YES;
         else if (toSelf) outgoing=NO;

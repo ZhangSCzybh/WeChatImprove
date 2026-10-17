@@ -32,11 +32,14 @@ for cls in classes:
     extracted.append('@interface '+cls+' : TestCell\n'+native+'@property(nonatomic,copy) NSArray *nativeItems;\n- (id)operationMenuItems;\n@end\n@implementation '+cls+'\n'+body+'\n@end')
 (out/'RepeatMenuHooksUnderTest.h').write_text('\n'.join(extracted))
 observer=menu.split('%hook BaseMessageCellView',1)[1].split('%end',1)[0]
+observer=observer.replace('[CSMessageActionMenuAdapter itemsBeforeNativeDedupForCell:self items:items]', '(menuHookAdapter ? [menuHookAdapter itemsBeforeNativeDedupForCell:self items:items] : items)')
+observer=observer.replace('id result=%orig(prepared);', 'self.observedInput=prepared; id result=self.nativePassesThrough ? prepared : self.nativeOutput;')
 observer=observer.replace('id items=%orig;', 'id items=self.generatedItems;').replace('id result=%orig;', 'self.observedInput=items; id result=self.nativeOutput;')
 assert '%orig' not in observer
 (out/'MenuObservationHooksUnderTest.h').write_text('''
 @interface TestMenuObservationCell : TestCell
 @property(nonatomic,strong) id generatedItems, nativeOutput, observedInput;
+@property(nonatomic) BOOL nativePassesThrough;
 - (id)generateOperationMenu;
 - (id)uniqMenuItems:(id)items;
 - (id)filteredMenuItems:(id)items;

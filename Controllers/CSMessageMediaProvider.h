@@ -23,5 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy, nullable) void (^waitingHandler)(NSString *operationID);
 @property(nonatomic, copy, nullable) id _Nullable (^refreshSource)(CSMessageActionContext *context);
 @property(nonatomic, copy, nullable) BOOL (^requestDownload)(CSMessageActionContext *context);
+// nil means the native recorder state could not be verified.
+@property(nonatomic, copy, nullable) NSNumber * _Nullable (^recordingState)(CSMessageActionContext *context);
 @end
 NS_ASSUME_NONNULL_END

@@ -83,6 +83,12 @@ static BOOL CSVoiceXMLFlag(NSString *xml, NSString *attribute, unsigned int *val
     unsigned long long status=CSMessageNativeUnsigned(source,@"m_uiDownloadStatus");
     preparation.localComplete=(status & 1)!=0;
     preparation.recording=preparation.context.outgoing && !(status & 8);
+    // Persisted, playable voices can have status 17 and no recording-end bit.
+    // Query the active native recorder before treating that missing bit as recording.
+    if (preparation.recording && preparation.localComplete && _recordingState) {
+        NSNumber *active=_recordingState(preparation.context);
+        if (active) preparation.recording=active.boolValue;
+    }
     preparation.complete=preparation.terminalCompletion || preparation.localComplete;
     if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"voice.snapshot" fields:@{@"duration":@(preparation.duration),@"format":@(preparation.format),@"formatKnown":@(preparation.formatKnown),@"bytes":@(preparation.bytes.length),@"expectedBytes":@(preparation.expectedBytes),@"status":@(status),@"recording":@(preparation.recording),@"complete":@(preparation.complete),@"terminal":@(preparation.terminalCompletion),@"cancelled":@(preparation.cancelled)}];
     Class cls=NSClassFromString(@"CMessageWrap");

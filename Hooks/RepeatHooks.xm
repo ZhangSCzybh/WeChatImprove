@@ -124,7 +124,7 @@
 - (void)cs_handleVoiceForwardMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
 %end
 
-// Observe only: preserve native output and all restrictions at every stage.
+// The device's alternate sticker menu path reaches uniq even when its builder is bypassed.
 %hook BaseMessageCellView
 - (id)generateOperationMenu {
     id items=%orig;
@@ -133,7 +133,8 @@
 }
 - (id)uniqMenuItems:(id)items {
     [CSMessageActionMenuAdapter recordMenuStage:@"menu.uniq.in" cell:self items:items];
-    id result=%orig;
+    id prepared=[CSMessageActionMenuAdapter itemsBeforeNativeDedupForCell:self items:items];
+    id result=%orig(prepared);
     [CSMessageActionMenuAdapter recordMenuStage:@"menu.uniq.out" cell:self items:result];
     return result;
 }

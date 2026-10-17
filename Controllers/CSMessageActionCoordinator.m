@@ -89,6 +89,13 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
         _operations=[NSMutableDictionary dictionary]; _completed=[NSMutableDictionary dictionary]; _completedOrder=[NSMutableArray array]; _pendingFeedback=[NSMutableArray array]; _accountEpoch=1; _boundaryToken=atomic_load_explicit(&CSActionAccountBoundary,memory_order_acquire); _accountSuspended=(_boundaryToken&1)!=0; _accountID=_accountSuspended ? nil : [environment.currentAccountID copy];
         __weak typeof(self) weakSelf=self;
         provider.waitingHandler=^(NSString *identifier){ [weakSelf showWaiting:identifier]; };
+        provider.recordingState=^NSNumber *(CSMessageActionContext *context){
+            typeof(self) self=weakSelf; if (!self || ![self validAccount:context]) return nil;
+            id audio=[self.environment serviceNamed:@"AudioSender"];
+            @try { if (CSMessageNativeSupports(audio,@"isRecording",@"B",@[])) return CSMessageNativeInvoke(audio,@"isRecording",@[]); }
+            @catch (__unused NSException *exception) {}
+            return nil;
+        };
         provider.requestDownload=^(CSMessageActionContext *context){ typeof(self) self=weakSelf; if (!self || ![self validAccount:context]) return NO;
             id downloader=[self.environment serviceNamed:@"VoiceMsgDownloader"];
             @try { if (CSMessageNativeSupports(downloader,@"downloadMsg:",@"v",@[@"@"])) { CSMessageNativeInvoke(downloader,@"downloadMsg:",@[context.sourceWrap]); return YES; } } @catch (__unused NSException *exception) {}

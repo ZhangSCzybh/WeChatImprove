@@ -32,6 +32,20 @@
 - (instancetype)initWithCoordinator:(CSMessageActionCoordinator *)coordinator { if ((self=[super init])) _coordinator=coordinator; return self; }
 + (instancetype)sharedAdapter { static CSMessageActionMenuAdapter *adapter; static dispatch_once_t once; dispatch_once(&once,^{ adapter=[[self alloc] initWithCoordinator:CSMessageActionCoordinator.sharedCoordinator]; }); return adapter; }
 + (NSArray *)itemsByAddingActionsForCell:(id)cell items:(NSArray *)items { return [[self sharedAdapter] itemsByAddingActionsForCell:cell items:items]; }
++ (id)itemsBeforeNativeDedupForCell:(id)cell items:(id)items { return [[self sharedAdapter] itemsBeforeNativeDedupForCell:cell items:items]; }
+- (id)itemsBeforeNativeDedupForCell:(id)cell items:(id)items {
+    if (!self.coordinator.settings.repeatEnabled || ![items isKindOfClass:NSArray.class] || ![items count] ||
+        CSMessageNativeUnsigned(CSMessageActionResolveSourceWrap(cell),@"m_uiMessageType")!=47) return items;
+    // Device traces reach uniqMenuItems: without the sticker builder hooks.
+    // Retain the two restrictions applied before the normal native builder.
+    id model=CSMessageActionObjectGetter(cell,NSSelectorFromString(@"viewModel"));
+    for (NSString *selector in @[@"isRecordDetail",@"isChatRoomMessageUnsafe"]) {
+        @try {
+            if (!CSMessageNativeSupports(model,selector,@"B",@[]) || [CSMessageNativeInvoke(model,selector,@[]) boolValue]) return items;
+        } @catch (__unused NSException *exception) { return items; }
+    }
+    return [self itemsByAddingActionsForCell:cell items:items];
+}
 + (BOOL)canPerformSelector:(SEL)selector cell:(id)cell { return [[self sharedAdapter] canPerformSelector:selector cell:cell]; }
 + (void)performSelector:(SEL)selector cell:(id)cell { [[self sharedAdapter] performSelector:selector cell:cell]; }
 + (BOOL)isPluginSelector:(SEL)selector { return selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:") || selector==NSSelectorFromString(@"cs_handleVoiceForwardMenuItem:"); }

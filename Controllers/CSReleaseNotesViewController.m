@@ -4,6 +4,14 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.8-5": @[
+            @{@"title": @"修正已完成语音判断",
+              @"detail": @"修正可播放的已下载语音被误判为正在录音的问题，保留录音中、取消和不完整语音的拦截。"},
+            @{@"title": @"补齐表情菜单入口",
+              @"detail": @"针对手机日志中绕过原菜单入口的表情，在微信去重前补齐复读项，继续保留原生菜单限制。"},
+            @{@"title": @"精简诊断记录",
+              @"detail": @"减少页面刷新产生的重复记录，保留菜单和语音操作的关键阶段，便于排查。"}
+        ],
         @"1.8-4": @[
             @{@"title": @"修正语音发送准备",
               @"detail": @"修正语音复读和转发创建新消息时的兼容性判断；发送失败时区分语音读取、校验和发送准备问题。"},
