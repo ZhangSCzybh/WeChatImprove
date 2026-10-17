@@ -1,0 +1,57 @@
+{
+  "fix_commit": "1808c982edd31e54127afba72053216dec98898b",
+  "suite_count": 8,
+  "assertion_count": 66626,
+  "logs": [
+    {
+      "path": "docs/evidence/message-actions-device-regression-2026-10-17/message-actions-core.log",
+      "sha256": "70c58d0282fcb6e62afddc13c592e5093bd4cdb168f3bdc8b59f3ebda464b280",
+      "command": "bash Tests/verify-message-actions-core.sh",
+      "exit_status": 0
+    },
+    {
+      "path": "docs/evidence/message-actions-device-regression-2026-10-17/message-actions-execution.log",
+      "sha256": "bf99b3026da7d256e53547e8bdcf7a29d95f46896b0d76e9168a278e3e2f9cfd",
+      "command": "bash Tests/verify-message-actions-execution.sh",
+      "exit_status": 0
+    },
+    {
+      "path": "docs/evidence/message-actions-device-regression-2026-10-17/message-gesture.log",
+      "sha256": "832ed1fea7dcd638794347782a7b6726a4c4387ad6cd2a4b2d04a9479bfabb23",
+      "command": "bash Tests/verify-message-gesture.sh",
+      "exit_status": 0
+    },
+    {
+      "path": "docs/evidence/message-actions-device-regression-2026-10-17/message-time.log",
+      "sha256": "67ba79a76ab660e9dff7073cade20215d33d67e39757e5d7101bae5f02e819c4",
+      "command": "bash Tests/verify-message-time.sh",
+      "exit_status": 0
+    },
+    {
+      "path": "docs/evidence/message-actions-device-regression-2026-10-17/message-merge.log",
+      "sha256": "597c3cff576267afb2c1402b8ac96780dcb28db7d61055cbe1093f5959ed02b7",
+      "command": "bash Tests/verify-message-merge.sh",
+      "exit_status": 0
+    },
+    {
+      "path": "docs/evidence/message-actions-device-regression-2026-10-17/bubble-style.log",
+      "sha256": "6b7459e4c8fc5508eb89cdb17e2b944a24c723d6f656716d6c0c572b62bff4eb",
+      "command": "bash Tests/verify-bubble-style.sh",
+      "exit_status": 0
+    },
+    {
+      "path": "docs/evidence/message-actions-device-regression-2026-10-17/revoke-interception.log",
+      "sha256": "06d74e2ce96b41eab0efbc1a79fccc4e49f6b9b2cb689360606eb70690eecc87",
+      "command": "bash Tests/verify-revoke-interception.sh",
+      "exit_status": 0
+    },
+    {
+      "path": "docs/evidence/message-actions-device-regression-2026-10-17/revoke-reference.log",
+      "sha256": "246374b19235cf94e6684aaee0656ecb5c52159774178d8d745009280d5bdedb",
+      "command": "bash Tests/verify-revoke-reference.sh",
+      "exit_status": 0
+    }
+  ],
+  "rerun": false,
+  "reason": "Fix owner ran these on exact fixed production/tests; subsequent release edits change only version/release notes/docs and artifact verification, with production/test diff checked before build."
+}

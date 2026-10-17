@@ -1,0 +1,35 @@
+{
+  "source_commit": "b4bb3414e0735260a9c901e28505afab1a2b4d76",
+  "approved_source_commit": "f94d7cb372ce98ed90884733732f66fc20fc8e53",
+  "implementation_commit": "27c4e60307b53d50504cebb49033e8d9834858d4",
+  "source_baseline": "2aa7bcb8",
+  "branch": "codex/message-actions-refactor-1.7-17",
+  "worktree": "/Users/zhangshichao/.codex/worktrees/message-actions-refactor/WeChatImprove",
+  "started_utc": "2026-10-17T16:56:05.786422+00:00",
+  "fresh_build_directory": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-message-actions-1.8-2.ah6943zj",
+  "fresh_build_directory_initial_entries": [],
+  "theos": "/Users/zhangshichao/theos",
+  "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk",
+  "clang": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin",
+  "minimum_ios": "15.0",
+  "production_test_changes_from_approved_source": [
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h"
+  ],
+  "host_evidence": "host-validation-reported.json; implementer-reported executions, raw stdout/stderr not retained",
+  "command": [
+    "make",
+    "package",
+    "SCHEME=rootless",
+    "THEOS=/Users/zhangshichao/theos",
+    "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-message-actions-1.8-2.ah6943zj/build",
+    "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-message-actions-1.8-2.ah6943zj/.theos",
+    "THEOS_PACKAGE_DIR=/Users/zhangshichao/.codex/worktrees/message-actions-refactor/WeChatImprove/packages",
+    "-j4",
+    "COLOR=0"
+  ],
+  "exit_status": 0,
+  "finished_utc": "2026-10-17T16:56:24.113669+00:00",
+  "original_theos_unchanged": true,
+  "original_theos_file_count": 777
+}

@@ -1,0 +1,176 @@
+{
+  "target": {
+    "path": "/private/tmp/wechat-8.0.78-inset-analysis/WeChat",
+    "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+    "architecture": "arm64",
+    "cryptid": 0
+  },
+  "scope": "static read-only, no live target execution",
+  "artifacts": [
+    {
+      "file": "native-voice-AudioHelper-class-isOpusFile_.asm",
+      "sha256": "added3b969042391a40febe1224cd925833018052227807e2a548e4c1d58c254",
+      "bytes": 3050
+    },
+    {
+      "file": "native-voice-AudioHelper-class-isSilkFile_.asm",
+      "sha256": "8d21eec0a2f7cd89c177ccafbdb117eba8e9cb334e6339862b35d46d9461a08f",
+      "bytes": 3049
+    },
+    {
+      "file": "native-voice-AudioReceiver-instance-StartPlay_Path_fromTime_.asm",
+      "sha256": "8b5e18adae511e57a5267f5a1d30d97e24e8f7680ab42efe52957f946282c9e2",
+      "bytes": 16805
+    },
+    {
+      "file": "native-voice-AudioSender-instance-OnRecorderEndRecording_.asm",
+      "sha256": "15010a555d38121589c3c11bae295ac899771ebb59c5a54ad0eabea22ae4cede",
+      "bytes": 8550
+    },
+    {
+      "file": "native-voice-AudioSender-instance-OnRecorderPart_Offset_Len_EndFlag_ForceDelete_Duration_.asm",
+      "sha256": "ce16b7edd2b1308257d29bd772eb18b98509a1600baa82e3050cefaef55a3d77",
+      "bytes": 46507
+    },
+    {
+      "file": "native-voice-AudioSender-instance-updateMessageToDB_.asm",
+      "sha256": "f2e4871beea384275955d6b6ef533005f7945da48b8e3d137e3f2aad0f9be47e",
+      "bytes": 14946
+    },
+    {
+      "file": "native-voice-CDownloadVoiceMgr-instance-OnSyncDownload_LocalID_n64SvrID_CreateTime_Xml_Voice_.asm",
+      "sha256": "2970ee5e5add3d72b0e1acada2b60cc4d1992154e4c7053110b4b0072429c4ba",
+      "bytes": 22900
+    },
+    {
+      "file": "native-voice-CExtendInfoOfVoiceMsg-instance-ChangeForDisplay.asm",
+      "sha256": "c4ac9f4d593be021574c0daa0d77f1e813aca712fc9bd18310a55e32de7b64cc",
+      "bytes": 22573
+    },
+    {
+      "file": "native-voice-CExtendInfoOfVoiceMsg-instance-IsDownloadEnded.asm",
+      "sha256": "ace6c2e676b87e18bce1c49fab40dcefc692b05396f1a50af6ffba9f9d0eee6e",
+      "bytes": 1244
+    },
+    {
+      "file": "native-voice-CExtendInfoOfVoiceMsg-instance-IsRecording.asm",
+      "sha256": "b388ffd3f9458338c5e0787b6cb8cdc2dbaa06b96a481a47bec199343183c131",
+      "bytes": 2508
+    },
+    {
+      "file": "native-voice-CExtendInfoOfVoiceMsg-instance-SaveMesVoice_.asm",
+      "sha256": "02052ab1bf432006e6dc27f1a3866cf71f0ac0adb0ea161e02c57bf3cb1de960",
+      "bytes": 8023
+    },
+    {
+      "file": "native-voice-CExtendInfoOfVoiceMsg-instance-SetPlaySounded_.asm",
+      "sha256": "dbb41203d286929a28366101a9eaf4446f4f7ac06a3b50d973a2f6ee321a02a8",
+      "bytes": 2056
+    },
+    {
+      "file": "native-voice-CExtendInfoOfVoiceMsg-instance-SetPlayed.asm",
+      "sha256": "996820c6285feb6ddf3d14a96f59d68d5ac0831129c508d2801cee5419ff92d7",
+      "bytes": 2055
+    },
+    {
+      "file": "native-voice-CExtendInfoOfVoiceMsg-instance-UpdateContent_.asm",
+      "sha256": "e263b2beca4be915926b8b8edcf50b82d34f3e048c95dacc55258845ce3ebfcb",
+      "bytes": 3303
+    },
+    {
+      "file": "native-voice-CExtendInfoOfVoiceMsg-instance-m_dtVoice.asm",
+      "sha256": "87b68aa9b9304559e2d66b57874a328e258819792fde52d59490d9da2d7b43b7",
+      "bytes": 234
+    },
+    {
+      "file": "native-voice-CExtendInfoOfVoiceMsg-instance-m_uiVoiceCancelFlag.asm",
+      "sha256": "9dd323ddfc90239aa9b5decf4a390fa45ca2f6ef0c67067bd9aefec902707827",
+      "bytes": 234
+    },
+    {
+      "file": "native-voice-CExtendInfoOfVoiceMsg-instance-m_uiVoiceEndFlag.asm",
+      "sha256": "6a6ec74de4c15339a5c69e1b8118b467de1baa2960398354674fd742f73a3fb8",
+      "bytes": 234
+    },
+    {
+      "file": "native-voice-CExtendInfoOfVoiceMsg-instance-m_uiVoiceFormat.asm",
+      "sha256": "3339c6a763a841da004688023c8f4f49edb7f14eef0003a6a27264d8a4264c30",
+      "bytes": 233
+    },
+    {
+      "file": "native-voice-CExtendInfoOfVoiceMsg-instance-m_uiVoiceTime.asm",
+      "sha256": "ce2a9129644ebcf1a08e8ed818e4017f14d787642a6fef8610ee44cdf8f1aaa5",
+      "bytes": 233
+    },
+    {
+      "file": "native-voice-CMessageWrap-class-getPathOfAudio_.asm",
+      "sha256": "662490d9daf6e04ac4d0087ea0dd6df37f58082a0639bf458f93cdf1f10260d1",
+      "bytes": 3254
+    },
+    {
+      "file": "native-voice-CMessageWrap-instance-getVoiceFormat.asm",
+      "sha256": "d10065c5e681c7ed592e4b3a3bdd8fc24cbdbb54a1fa7644467a861e1c4e9b5a",
+      "bytes": 8712
+    },
+    {
+      "file": "native-voice-CMessageWrap-instance-getVoicePath.asm",
+      "sha256": "d6aecf4693746124b82ee2b37d01b4197f63c86f4ac4ad0b6b5b3ec304e222d0",
+      "bytes": 9901
+    },
+    {
+      "file": "native-voice-ForwardMessageLogicController-instance-OnSharePreConfirmSheetViewSend_.asm",
+      "sha256": "39d9b06d07cea30a79a615e5137f2bda0b30475666debfc6d305cd5279b314fa",
+      "bytes": 97491
+    },
+    {
+      "file": "native-voice-ForwardMessageLogicController-instance-bHiddenSendSuccessToastView.asm",
+      "sha256": "09487d7e536bbaf3832ea5b3eef1daa4821b86d5d74d5629dce266653a05ba31",
+      "bytes": 361
+    },
+    {
+      "file": "native-voice-ForwardMessageLogicController-instance-bShowSendSuccessView.asm",
+      "sha256": "0c28d5661730cd2a9bb08543dbecf98c7d581e0c7b8f4cd624a8488ecb0887ee",
+      "bytes": 361
+    },
+    {
+      "file": "native-voice-VoiceMsgDownloader-instance-downloadMsg_.asm",
+      "sha256": "26f6840e601e31d636b8092a881a2e942657ed6a3201cc8a2795145ce293d767",
+      "bytes": 9590
+    },
+    {
+      "file": "native-voice-VoiceMsgDownloader-instance-onServiceInit.asm",
+      "sha256": "b06e1ae808bc9175381a3de224f114dc54b9d2306bb7241cf249c7c52b725f4b",
+      "bytes": 4663
+    },
+    {
+      "file": "native-voice-all-methods.json",
+      "sha256": "833033701a68f07b2172278f890df4c25c9bdc9149f20d65e504613eeebaaf62",
+      "bytes": 211663
+    },
+    {
+      "file": "native-voice-disassemble.py",
+      "sha256": "c844171e0461649cdf6ec644e03a38f5a07c2c1bb72a99fd2f18243e743c2464",
+      "bytes": 2403
+    },
+    {
+      "file": "native-voice-extract.py",
+      "sha256": "be5cf9cefa6481427c4cc9c0fc554041c061baa62faada94f9168913a87f172e",
+      "bytes": 1537
+    },
+    {
+      "file": "native-voice-report.md",
+      "sha256": "b8f86462d5039b2503a815a496a4a04ff01657337e2ab3c8366802fb6396efac",
+      "bytes": 12368
+    },
+    {
+      "file": "native-voice-selected-methods.json",
+      "sha256": "b94bca6a3c6526d1c07d58eff5fc140800cf76fed6b8b8600b4ba8bedacba030",
+      "bytes": 7189
+    },
+    {
+      "file": "native-voice-strings.json",
+      "sha256": "529c0db4031610305c8b095ffc717769a08afcd201cac949437c4b6b5b1ff578",
+      "bytes": 266
+    }
+  ]
+}

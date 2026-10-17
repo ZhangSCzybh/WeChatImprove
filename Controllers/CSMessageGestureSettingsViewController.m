@@ -5,56 +5,41 @@
 
 #import "CSMessageGestureSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
+#import "CSMessageActionPreferences.h"
 
-static NSString * const kMessageGestureEnabledKey = @"com.wechat.enhance.message_gesture.enabled";
-static NSString * const kLeftSwipeOtherActionKey = @"com.wechat.enhance.left_swipe_other.action";
-static NSString * const kLeftSwipeSelfActionKey = @"com.wechat.enhance.left_swipe_self.action";
-static NSString * const kRightSwipeOtherActionKey = @"com.wechat.enhance.right_swipe_other.action";
-static NSString * const kRightSwipeSelfActionKey = @"com.wechat.enhance.right_swipe_self.action";
-
-typedef NS_ENUM(NSInteger, WCSwipeAction) {
-    WCSwipeActionDisabled = 0,
-    WCSwipeActionQuote = 1,
-    WCSwipeActionDelete = 2,
-    WCSwipeActionForward = 3,
-    WCSwipeActionFavorite = 4,
-    WCSwipeActionRevoke = 5,
-    WCSwipeActionRepeat = 6
-};
-
-static NSString *actionToString(WCSwipeAction action) {
+static NSString *actionToString(CSMessageAction action) {
     switch (action) {
-        case WCSwipeActionDisabled:
+        case CSMessageActionDisabled:
             return @"禁用";
-        case WCSwipeActionQuote:
+        case CSMessageActionQuote:
             return @"引用";
-        case WCSwipeActionDelete:
+        case CSMessageActionDelete:
             return @"删除";
-        case WCSwipeActionForward:
+        case CSMessageActionForward:
             return @"转发";
-        case WCSwipeActionFavorite:
+        case CSMessageActionFavorite:
             return @"收藏";
-        case WCSwipeActionRevoke:
+        case CSMessageActionRevoke:
             return @"撤回";
-        case WCSwipeActionRepeat:
+        case CSMessageActionRepeat:
             return @"复读";
         default:
             return @"禁用";
     }
 }
 
-static WCSwipeAction getActionForKey(NSString *key) {
+static CSMessageAction getActionForKey(NSString *key) {
     NSInteger value = [[NSUserDefaults standardUserDefaults] integerForKey:key];
-    return (WCSwipeAction)value;
+    return (CSMessageAction)value;
 }
 
-static void setActionForKey(WCSwipeAction action, NSString *key) {
+static void setActionForKey(CSMessageAction action, NSString *key) {
     [[NSUserDefaults standardUserDefaults] setInteger:action forKey:key];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     CFNotificationCenterPostNotification(
         CFNotificationCenterGetDarwinNotifyCenter(),
-        CFSTR("com.wechat.enhance.message_gesture.settings_changed"),
+        (__bridge CFStringRef)CSMessageActionGestureDarwinNotification,
         NULL,
         NULL,
         true
@@ -88,14 +73,14 @@ static void setActionForKey(WCSwipeAction action, NSString *key) {
     CSSettingItem *gestureEnabledItem = [CSSettingItem switchItemWithTitle:@"消息手势"
                                                                 iconName:@"hand.draw.fill"
                                                                iconColor:[UIColor systemBlueColor]
-                                                             switchValue:[defaults boolForKey:kMessageGestureEnabledKey]
+                                                             switchValue:[defaults boolForKey:CSMessageActionGestureEnabledKey]
                                                        valueChangedBlock:^(BOOL isOn) {
-        [defaults setBool:isOn forKey:kMessageGestureEnabledKey];
+        [defaults setBool:isOn forKey:CSMessageActionGestureEnabledKey];
         [defaults synchronize];
         
         CFNotificationCenterPostNotification(
             CFNotificationCenterGetDarwinNotifyCenter(),
-            CFSTR("com.wechat.enhance.message_gesture.settings_changed"),
+            (__bridge CFStringRef)CSMessageActionGestureDarwinNotification,
             NULL,
             NULL,
             true
@@ -104,40 +89,40 @@ static void setActionForKey(WCSwipeAction action, NSString *key) {
     
     __weak typeof(self) weakSelf = self;
     
-    WCSwipeAction leftSwipeOtherAction = getActionForKey(kLeftSwipeOtherActionKey);
+    CSMessageAction leftSwipeOtherAction = getActionForKey(CSMessageActionLeftOtherKey);
     CSSettingItem *leftSwipeOtherItem = [CSSettingItem itemWithTitle:@"左滑对方消息"
                                                            iconName:@"arrow.left"
                                                           iconColor:[UIColor systemOrangeColor]
                                                             detail:actionToString(leftSwipeOtherAction)];
     leftSwipeOtherItem.actionBlock = ^{
-        [weakSelf showActionPickerForTitle:@"左滑对方消息" currentAction:leftSwipeOtherAction key:kLeftSwipeOtherActionKey];
+        [weakSelf showActionPickerForTitle:@"左滑对方消息" currentAction:leftSwipeOtherAction key:CSMessageActionLeftOtherKey];
     };
     
-    WCSwipeAction leftSwipeSelfAction = getActionForKey(kLeftSwipeSelfActionKey);
+    CSMessageAction leftSwipeSelfAction = getActionForKey(CSMessageActionLeftSelfKey);
     CSSettingItem *leftSwipeSelfItem = [CSSettingItem itemWithTitle:@"左滑己方消息"
                                                           iconName:@"arrow.left"
                                                          iconColor:[UIColor systemPurpleColor]
                                                            detail:actionToString(leftSwipeSelfAction)];
     leftSwipeSelfItem.actionBlock = ^{
-        [weakSelf showActionPickerForTitle:@"左滑己方消息" currentAction:leftSwipeSelfAction key:kLeftSwipeSelfActionKey];
+        [weakSelf showActionPickerForTitle:@"左滑己方消息" currentAction:leftSwipeSelfAction key:CSMessageActionLeftSelfKey];
     };
     
-    WCSwipeAction rightSwipeOtherAction = getActionForKey(kRightSwipeOtherActionKey);
+    CSMessageAction rightSwipeOtherAction = getActionForKey(CSMessageActionRightOtherKey);
     CSSettingItem *rightSwipeOtherItem = [CSSettingItem itemWithTitle:@"右滑对方消息"
                                                             iconName:@"arrow.right"
                                                            iconColor:[UIColor systemCyanColor]
                                                              detail:actionToString(rightSwipeOtherAction)];
     rightSwipeOtherItem.actionBlock = ^{
-        [weakSelf showActionPickerForTitle:@"右滑对方消息" currentAction:rightSwipeOtherAction key:kRightSwipeOtherActionKey];
+        [weakSelf showActionPickerForTitle:@"右滑对方消息" currentAction:rightSwipeOtherAction key:CSMessageActionRightOtherKey];
     };
     
-    WCSwipeAction rightSwipeSelfAction = getActionForKey(kRightSwipeSelfActionKey);
+    CSMessageAction rightSwipeSelfAction = getActionForKey(CSMessageActionRightSelfKey);
     CSSettingItem *rightSwipeSelfItem = [CSSettingItem itemWithTitle:@"右滑己方消息"
                                                            iconName:@"arrow.right"
                                                           iconColor:[UIColor systemPinkColor]
                                                             detail:actionToString(rightSwipeSelfAction)];
     rightSwipeSelfItem.actionBlock = ^{
-        [weakSelf showActionPickerForTitle:@"右滑己方消息" currentAction:rightSwipeSelfAction key:kRightSwipeSelfActionKey];
+        [weakSelf showActionPickerForTitle:@"右滑己方消息" currentAction:rightSwipeSelfAction key:CSMessageActionRightSelfKey];
     };
     
     CSSettingSection *mainSection = [CSSettingSection sectionWithHeader:@"功能设置"
@@ -192,28 +177,28 @@ static void setActionForKey(WCSwipeAction action, NSString *key) {
 
 #pragma mark - Action Picker
 
-- (void)showActionPickerForTitle:(NSString *)title currentAction:(WCSwipeAction)currentAction key:(NSString *)key {
+- (void)showActionPickerForTitle:(NSString *)title currentAction:(CSMessageAction)currentAction key:(NSString *)key {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:title
                                                                    message:@"请选择操作类型"
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     
     NSMutableArray *actions = [NSMutableArray arrayWithArray:@[
-        @{@"title": @"禁用", @"action": @(WCSwipeActionDisabled)},
-        @{@"title": @"引用", @"action": @(WCSwipeActionQuote)},
-        @{@"title": @"删除", @"action": @(WCSwipeActionDelete)},
-        @{@"title": @"转发", @"action": @(WCSwipeActionForward)},
-        @{@"title": @"收藏", @"action": @(WCSwipeActionFavorite)},
-        @{@"title": @"复读", @"action": @(WCSwipeActionRepeat)}
+        @{@"title": @"禁用", @"action": @(CSMessageActionDisabled)},
+        @{@"title": @"引用", @"action": @(CSMessageActionQuote)},
+        @{@"title": @"删除", @"action": @(CSMessageActionDelete)},
+        @{@"title": @"转发", @"action": @(CSMessageActionForward)},
+        @{@"title": @"收藏", @"action": @(CSMessageActionFavorite)},
+        @{@"title": @"复读", @"action": @(CSMessageActionRepeat)}
     ]];
     
     // 如果是己方消息，添加撤回选项
     if ([key containsString:@"self"]) {
-        [actions addObject:@{@"title": @"撤回", @"action": @(WCSwipeActionRevoke)}];
+        [actions addObject:@{@"title": @"撤回", @"action": @(CSMessageActionRevoke)}];
     }
     
     for (NSDictionary *actionDict in actions) {
         NSString *actionTitle = actionDict[@"title"];
-        WCSwipeAction action = [actionDict[@"action"] integerValue];
+        CSMessageAction action = [actionDict[@"action"] integerValue];
         
         UIAlertAction *actionItem = [UIAlertAction actionWithTitle:actionTitle
                                                              style:UIAlertActionStyleDefault

@@ -1,0 +1,404 @@
+{
+  "class": "MMContextManager",
+  "class_address": "0x120649248",
+  "kind": "instance",
+  "methods": [
+    {
+      "selector": "init",
+      "address": "0x1175dfba0",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "initContextEnvironment",
+      "address": "0x1175dfc30",
+      "types": "v16@0:8"
+    },
+    {
+      "selector": "newGuestContext",
+      "address": "0x1175dfd44",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "newContextWithUser:uin:",
+      "address": "0x1175dfd5c",
+      "types": "@32@0:8@16{Uin64Adapter=Q}24"
+    },
+    {
+      "selector": "loginByContext:",
+      "address": "0x1175dff4c",
+      "types": "v24@0:8@16"
+    },
+    {
+      "selector": "logout:",
+      "address": "0x1175e0228",
+      "types": "v24@0:8@16"
+    },
+    {
+      "selector": "allContexts",
+      "address": "0x1175e02d0",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "activeUserContext",
+      "address": "0x1175e0330",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "contextByUin:",
+      "address": "0x1175e0378",
+      "types": "@24@0:8{Uin64Adapter=Q}16"
+    },
+    {
+      "selector": "contextByMarsContext:",
+      "address": "0x1175e04e0",
+      "types": "@24@0:8r^v16"
+    },
+    {
+      "selector": "contextByMarsLongLinkName:",
+      "address": "0x1175e0690",
+      "types": "@24@0:8r*16"
+    },
+    {
+      "selector": "callEnterForeground",
+      "address": "0x1175e084c",
+      "types": "v16@0:8"
+    },
+    {
+      "selector": "callEnterBackground",
+      "address": "0x1175e09d4",
+      "types": "v16@0:8"
+    },
+    {
+      "selector": "callTerminate",
+      "address": "0x1175e0b5c",
+      "types": "v16@0:8"
+    },
+    {
+      "selector": "callMemoryWarning",
+      "address": "0x1175e0ce4",
+      "types": "v16@0:8"
+    },
+    {
+      "selector": "callClearMemoryCache:addedUserType:",
+      "address": "0x1175e0e6c",
+      "types": "v32@0:8Q16Q24"
+    },
+    {
+      "selector": "callClearMemoryCacheInBackground",
+      "address": "0x1175e1004",
+      "types": "v16@0:8"
+    },
+    {
+      "selector": "callPauseBackgroundTask:",
+      "address": "0x1175e118c",
+      "types": "v24@0:8Q16"
+    },
+    {
+      "selector": "callResumeBackgroundTask:",
+      "address": "0x1175e131c",
+      "types": "v24@0:8Q16"
+    },
+    {
+      "selector": "loginContextTimes",
+      "address": "0x1175e14ac",
+      "types": "I16@0:8"
+    },
+    {
+      "selector": "loginNonGuestContextTimes",
+      "address": "0x1175e14b4",
+      "types": "I16@0:8"
+    },
+    {
+      "selector": "documentPath",
+      "address": "0x1175e14bc",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "setDocumentPath:",
+      "address": "0x1175e14c4",
+      "types": "v24@0:8@16"
+    },
+    {
+      "selector": "libraryCachePath",
+      "address": "0x1175e14d0",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "setLibraryCachePath:",
+      "address": "0x1175e14d8",
+      "types": "v24@0:8@16"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "address": "0x1175e14e4",
+      "types": "v16@0:8"
+    }
+  ],
+  "MMContext_methods": [
+    {
+      "selector": "getService:",
+      "address": "0x117609d44",
+      "types": "@24@0:8#16"
+    },
+    {
+      "selector": "isServiceExist:",
+      "address": "0x117609e44",
+      "types": "B24@0:8#16"
+    },
+    {
+      "selector": "removeService:",
+      "address": "0x117609f3c",
+      "types": "v24@0:8#16"
+    },
+    {
+      "selector": "setService:forClass:",
+      "address": "0x11760a078",
+      "types": "v32@0:8@16#24"
+    },
+    {
+      "selector": "unsafeGetServiceWrapper:",
+      "address": "0x11760a100",
+      "types": "@24@0:8#16"
+    },
+    {
+      "selector": "precreateServices:",
+      "address": "0x11760a10c",
+      "types": "v24@0:8@16"
+    },
+    {
+      "selector": "enableTask",
+      "address": "0x1175b53e8",
+      "types": "B16@0:8"
+    },
+    {
+      "selector": "isNetworkingStarted",
+      "address": "0x1175b3ba8",
+      "types": "B16@0:8"
+    },
+    {
+      "selector": "startNetworking",
+      "address": "0x1175b3bc4",
+      "types": "v16@0:8"
+    },
+    {
+      "selector": "stopNetworking",
+      "address": "0x1175b3c08",
+      "types": "v16@0:8"
+    },
+    {
+      "selector": "marsContext",
+      "address": "0x1175b3c24",
+      "types": "^v16@0:8"
+    },
+    {
+      "selector": "marsLongLinkName",
+      "address": "0x1175b3c38",
+      "types": "^v16@0:8"
+    },
+    {
+      "selector": "registerExtension:withTarget:",
+      "address": "0x11758edb4",
+      "types": "v32@0:8@16@24"
+    },
+    {
+      "selector": "unRegisterExtension:withTarget:",
+      "address": "0x11758eea0",
+      "types": "v32@0:8@16@24"
+    },
+    {
+      "selector": "registerExtension:withKey:withTarget:",
+      "address": "0x11758ef8c",
+      "types": "v40@0:8@16@24@32"
+    },
+    {
+      "selector": "unRegisterExtension:withKey:withTarget:",
+      "address": "0x11758f0ac",
+      "types": "v40@0:8@16@24@32"
+    },
+    {
+      "selector": "unRegisterAllKeyExtension:withTarget:",
+      "address": "0x11758f1cc",
+      "types": "v32@0:8@16@24"
+    },
+    {
+      "selector": "callExtension:selector:block:",
+      "address": "0x11758f2b8",
+      "types": "v40@0:8@16:24@?32"
+    },
+    {
+      "selector": "callKeyExtension:key:selector:block:",
+      "address": "0x11758f540",
+      "types": "v48@0:8@16@24:32@?40"
+    },
+    {
+      "selector": "callExtensionOnMainThread:selector:sync:block:",
+      "address": "0x11758f800",
+      "types": "v44@0:8@16:24B32@?36"
+    },
+    {
+      "selector": "callKeyExtensionOnMainThread:key:selector:sync:block:",
+      "address": "0x11758faa8",
+      "types": "v52@0:8@16@24:32B40@?44"
+    },
+    {
+      "selector": "callExtensionContinuously:selector:block:",
+      "address": "0x11758fd88",
+      "types": "v40@0:8@16:24@?32"
+    },
+    {
+      "selector": "callKeyExtensionContinuously:key:selector:block:",
+      "address": "0x117590010",
+      "types": "v48@0:8@16@24:32@?40"
+    },
+    {
+      "selector": "callExtensionOnMainThreadContinuously:selector:sync:block:",
+      "address": "0x1175902d0",
+      "types": "v44@0:8@16:24B32@?36"
+    },
+    {
+      "selector": "callKeyExtensionOnMainThreadContinuously:key:selector:sync:block:",
+      "address": "0x117590578",
+      "types": "v52@0:8@16@24:32B40@?44"
+    },
+    {
+      "selector": "getUin",
+      "address": "0x10007eb48",
+      "types": "I16@0:8"
+    },
+    {
+      "selector": "getUinStr",
+      "address": "0x10007eb54",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "affContext",
+      "address": "0x10007ebf0",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "init",
+      "address": "0x1175e3830",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "initWithContextType:",
+      "address": "0x1175e3848",
+      "types": "@24@0:8Q16"
+    },
+    {
+      "selector": "setUin:userName:",
+      "address": "0x1175e38d4",
+      "types": "v32@0:8{Uin64=Q}16@24"
+    },
+    {
+      "selector": "setLongLink:",
+      "address": "0x1175e3c14",
+      "types": "v24@0:8@16"
+    },
+    {
+      "selector": "longLink",
+      "address": "0x1175e3c8c",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "checkExistExtensionIfNeeded",
+      "address": "0x1175e3c94",
+      "types": "v16@0:8"
+    },
+    {
+      "selector": "mainController",
+      "address": "0x1175e3cb4",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "isRootContext",
+      "address": "0x1175e3dd8",
+      "types": "B16@0:8"
+    },
+    {
+      "selector": "isUserContext",
+      "address": "0x1175e3de8",
+      "types": "B16@0:8"
+    },
+    {
+      "selector": "isInvalidContext",
+      "address": "0x1175e3df8",
+      "types": "B16@0:8"
+    },
+    {
+      "selector": "description",
+      "address": "0x1175e3e08",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "uin",
+      "address": "0x1175e3ed8",
+      "types": "I16@0:8"
+    },
+    {
+      "selector": "uin64",
+      "address": "0x1175e3f58",
+      "types": "Q16@0:8"
+    },
+    {
+      "selector": "uinString",
+      "address": "0x1175e3fd8",
+      "types": "r*16@0:8"
+    },
+    {
+      "selector": "userName",
+      "address": "0x1175e4054",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "userMd5",
+      "address": "0x1175e40e4",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "userDocumentPath",
+      "address": "0x1175e4174",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "userLibraryCachePath",
+      "address": "0x1175e4204",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "setMainController:",
+      "address": "0x1175e4404",
+      "types": "v24@0:8@16"
+    },
+    {
+      "selector": "serviceCenter",
+      "address": "0x1175e4410",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "extensionCenter",
+      "address": "0x1175e4418",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "contextLock",
+      "address": "0x1175e4420",
+      "types": "@16@0:8"
+    },
+    {
+      "selector": "setContextLock:",
+      "address": "0x1175e4428",
+      "types": "v24@0:8@16"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "address": "0x1175e4434",
+      "types": "v16@0:8"
+    },
+    {
+      "selector": ".cxx_construct",
+      "address": "0x1175e44d0",
+      "types": "@16@0:8"
+    }
+  ]
+}

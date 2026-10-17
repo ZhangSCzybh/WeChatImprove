@@ -1,7 +1,6 @@
 #import "CSVoiceForwardSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
-
-static NSString * const kVoiceForwardEnabledKey = @"com.wechat.enhance.voice_forward.enabled";
+#import "CSMessageActionPreferences.h"
 
 @interface CSVoiceForwardSettingsViewController ()
 
@@ -30,14 +29,14 @@ static NSString * const kVoiceForwardEnabledKey = @"com.wechat.enhance.voice_for
     CSSettingItem *voiceForwardEnabledItem = [CSSettingItem switchItemWithTitle:@"语音转发"
                                                                       iconName:@"waveform.circle.fill"
                                                                      iconColor:[UIColor systemGreenColor]
-                                                                   switchValue:[defaults boolForKey:kVoiceForwardEnabledKey]
+                                                                   switchValue:[defaults boolForKey:CSMessageActionVoiceForwardEnabledKey]
                                                              valueChangedBlock:^(BOOL isOn) {
-        [defaults setBool:isOn forKey:kVoiceForwardEnabledKey];
+        [defaults setBool:isOn forKey:CSMessageActionVoiceForwardEnabledKey];
         [defaults synchronize];
         
         CFNotificationCenterPostNotification(
             CFNotificationCenterGetDarwinNotifyCenter(),
-            CFSTR("com.wechat.enhance.voice_forward.settings_changed"),
+            (__bridge CFStringRef)CSMessageActionVoiceForwardDarwinNotification,
             NULL,
             NULL,
             true

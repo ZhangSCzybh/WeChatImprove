@@ -41,6 +41,12 @@ int main(void) { @autoreleasepool {
  [NSUserDefaults.standardUserDefaults setVolatileDomain:@{@"com.wechat.enhance.messageTime.enabled":@YES,@"com.wechat.enhance.messageTime.tapToShow":@YES} forName:NSArgumentDomain];
  refreshTimeSettings(NO);CHECK(label.hidden);
  UITapGestureRecognizer *tap=cell.gestureRecognizers.firstObject;tap.testLocation=CGPointMake(50,20);
+ CHECK(tap.delegate && (id)tap.delegate!=cell);
+ UITouch *timeTouch=[UITouch new];timeTouch.view=cell;timeTouch.testLocation=CGPointMake(50,20);
+ CHECK([tap.delegate gestureRecognizer:tap shouldReceiveTouch:timeTouch]);
+ timeTouch.testLocation=CGPointMake(120,20);CHECK(![tap.delegate gestureRecognizer:tap shouldReceiveTouch:timeTouch]);
+ timeTouch.testLocation=CGPointMake(50,20);UIControl *button=[UIControl new];[cell addSubview:button];timeTouch.view=button;
+ CHECK(![tap.delegate gestureRecognizer:tap shouldReceiveTouch:timeTouch]);
  [cell handleMessageTap:tap];CHECK(!label.hidden);[cell layoutSubviews];CHECK(!label.hidden);
  tap.testLocation=CGPointMake(120,20);[cell handleMessageTap:tap];CHECK(!label.hidden);
  tap.testLocation=CGPointMake(50,20);[cell handleMessageTap:tap];CHECK(label.hidden);

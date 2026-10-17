@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
 #import "../Controllers/CSMessageMergeAdapter.h"
 #import "../Controllers/CSMessageNavigation.h"
+#import "../Controllers/CSMessageGestureAdapter.h"
 
 @interface BaseMsgContentViewController : UIViewController @end
 @interface CommonMessageViewModel : NSObject @end
@@ -10,7 +11,7 @@
 %hook BaseMsgContentViewController
 - (void)viewDidLoad { %orig; CSMessageMergeActivate(self); }
 - (void)viewWillAppear:(BOOL)animated { %orig; CSMessageMergeActivate(self); }
-- (void)viewDidDisappear:(BOOL)animated { CSMessageNavigationCancel(self); CSMessageMergeDeactivate(self); %orig; }
+- (void)viewDidDisappear:(BOOL)animated { CSMessageGestureCancelForController(self); CSMessageNavigationCancel(self); CSMessageMergeDeactivate(self); %orig; }
 - (double)tableView:(UITableView *)table heightForRowAtIndexPath:(NSIndexPath *)path {
     CSMessageMergePrepare(self,table,path);
     double height = %orig;
@@ -93,19 +94,6 @@
     return native && !CSMessageMergeHidesName(self);
 }
 
-%end
-
-%hook CommonMessageCellView
-- (void)setViewModel:(id)model {
-    CSMessageMergeReuse(self);
-    %orig;
-}
-- (void)layoutSubviews {
-    CSMessageMergeRestore(self);
-    %orig;
-    CSMessageMergeRender(self);
-}
-- (void)prepareForReuse { CSMessageMergeReuse(self); %orig; }
 %end
 
 %hook BaseMessageViewModel

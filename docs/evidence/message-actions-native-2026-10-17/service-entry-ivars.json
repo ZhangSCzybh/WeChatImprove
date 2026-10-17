@@ -1,0 +1,360 @@
+{
+  "CContactMgr": [
+    {
+      "offset_address": "0x1201e9d04",
+      "offset": 8,
+      "name": "m_oLock",
+      "type": "@\"NSRecursiveLock\""
+    },
+    {
+      "offset_address": "0x1201e9d08",
+      "offset": 16,
+      "name": "m_uiLoadedType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201e9d24",
+      "offset": 24,
+      "name": "m_oContactDB",
+      "type": "@\"CContactDB\""
+    },
+    {
+      "offset_address": "0x1201e9d54",
+      "offset": 32,
+      "name": "m_oNewContactDB",
+      "type": "@\"NewContactDB\""
+    },
+    {
+      "offset_address": "0x1201e9d28",
+      "offset": 40,
+      "name": "m_oContactOPLog",
+      "type": "@\"CContactOPLog\""
+    },
+    {
+      "offset_address": "0x1201e9d0c",
+      "offset": 48,
+      "name": "m_openImContactMgr",
+      "type": "@\"OpenImContactMgr\""
+    },
+    {
+      "offset_address": "0x1201e9d38",
+      "offset": 56,
+      "name": "m_contactUpdateMgr",
+      "type": "@\"CContactUpdateMgr\""
+    },
+    {
+      "offset_address": "0x1201e9d10",
+      "offset": 64,
+      "name": "m_botContactMgr",
+      "type": "@\"BotContactMgr\""
+    },
+    {
+      "offset_address": "0x1201e9d3c",
+      "offset": 72,
+      "name": "m_contactCacheOptimizeMgr",
+      "type": "@\"CContactCacheOptimizeMgr\""
+    },
+    {
+      "offset_address": "0x1201e9d40",
+      "offset": 80,
+      "name": "m_contactConfigMgr",
+      "type": "@\"CContactConfigMgr\""
+    },
+    {
+      "offset_address": "0x1201e9d14",
+      "offset": 88,
+      "name": "m_dicRemark",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201e9d20",
+      "offset": 96,
+      "name": "m_dicLastAccessTime",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201e9d18",
+      "offset": 104,
+      "name": "m_dicContacts",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201e9d1c",
+      "offset": 112,
+      "name": "m_dicEncodeContacts",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201e9d2c",
+      "offset": 120,
+      "name": "m_mapLastGetTime",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201e9d30",
+      "offset": 128,
+      "name": "m_dicHardCodeUsers",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201e9d34",
+      "offset": 136,
+      "name": "m_uiDBVersion",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201e9d58",
+      "offset": 140,
+      "name": "m_bFirstContactDBMigration",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201e9d4c",
+      "offset": 141,
+      "name": "m_bHadLoadContactDBMigration",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201e9d50",
+      "offset": 142,
+      "name": "m_bContactDBMigrationFinished",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201e9d70",
+      "offset": 144,
+      "name": "m_dicContactSendMsgTickets",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201e9d6c",
+      "offset": 152,
+      "name": "m_dicLastSendMsgTicketAccessTime",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201e9d68",
+      "offset": 160,
+      "name": "m_dicSyncShareCardMessageStatus",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201e9d64",
+      "offset": 168,
+      "name": "m_arrNotExistUserName",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201e9d44",
+      "offset": 176,
+      "name": "m_cacheOptimizeDataLock",
+      "type": "@\"NSRecursiveLock\""
+    },
+    {
+      "offset_address": "0x1201e9d5c",
+      "offset": 184,
+      "name": "m_uiMaxStrangerCache",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201e9d00",
+      "offset": 188,
+      "name": "m_bOpenStrangerCache",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201e9d60",
+      "offset": 189,
+      "name": "m_bFinishDelayLoadAllContact",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201e9d48",
+      "offset": 192,
+      "name": "m_loadAllDataLock",
+      "type": "@\"NSRecursiveLock\""
+    }
+  ],
+  "MMServiceCenter": [
+    {
+      "offset_address": "0x120296464",
+      "offset": 8,
+      "name": "m_lock",
+      "type": "@\"NSRecursiveLock\""
+    },
+    {
+      "offset_address": "0x120296468",
+      "offset": 16,
+      "name": "m_dictService",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x12029646c",
+      "offset": 24,
+      "name": "m_context",
+      "type": "@"
+    },
+    {
+      "offset_address": "0x120296470",
+      "offset": 32,
+      "name": "m_isCallClearData",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120296474",
+      "offset": 33,
+      "name": "m_shouldAssert",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120296478",
+      "offset": 40,
+      "name": "m_userState",
+      "type": "Q"
+    }
+  ],
+  "MMBaseService": [
+    {
+      "offset_address": "0x120296664",
+      "offset": 8,
+      "name": "m_isServiceRemoved",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120296668",
+      "offset": 9,
+      "name": "m_isInitFinished",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12029666c",
+      "offset": 10,
+      "name": "m_isAfterInitFinished",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120296670",
+      "offset": 16,
+      "name": "m_initLock",
+      "type": "@\"NSRecursiveLock\""
+    },
+    {
+      "offset_address": "0x120296674",
+      "offset": 24,
+      "name": "m_context",
+      "type": "@\"MMContext\""
+    }
+  ],
+  "MMContext": [
+    {
+      "offset_address": "0x1202966cc",
+      "offset": 8,
+      "name": "m_contextType",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1202966d0",
+      "offset": 16,
+      "name": "m_uin",
+      "type": "{Uin64=\"value_\"Q}"
+    },
+    {
+      "offset_address": "0x1202966d4",
+      "offset": 24,
+      "name": "m_uinStrForLog",
+      "type": "[32c]"
+    },
+    {
+      "offset_address": "0x1202966d8",
+      "offset": 56,
+      "name": "m_uinString",
+      "type": "[21c]"
+    },
+    {
+      "offset_address": "0x1202966dc",
+      "offset": 80,
+      "name": "m_userName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202966e0",
+      "offset": 88,
+      "name": "m_userState",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1202966e4",
+      "offset": 96,
+      "name": "m_mainController",
+      "type": "@"
+    },
+    {
+      "offset_address": "0x1202966e8",
+      "offset": 104,
+      "name": "m_contextLock",
+      "type": "@\"NSRecursiveLock\""
+    },
+    {
+      "offset_address": "0x1202966ec",
+      "offset": 112,
+      "name": "m_userMd5",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202966f0",
+      "offset": 120,
+      "name": "m_userDocumentPath",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202966f4",
+      "offset": 128,
+      "name": "m_userLibraryCachePath",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202966f8",
+      "offset": 136,
+      "name": "m_marsContext",
+      "type": "{basic_string<char, std::char_traits<char>, std::allocator<char>>=\"__rep_\"(__rep=\"__s\"{__short=\"__data_\"[23c]\"__size_\"b7\"__is_long_\"b1}\"__l\"{__long=\"__data_\"*\"__size_\"Q\"__cap_\"b63\"__is_long_\"b1})}"
+    },
+    {
+      "offset_address": "0x1202966fc",
+      "offset": 160,
+      "name": "m_marsLongLink",
+      "type": "@\"MMLongLink\""
+    },
+    {
+      "offset_address": "0x120296700",
+      "offset": 168,
+      "name": "m_serviceCenter",
+      "type": "@\"MMServiceCenter\""
+    },
+    {
+      "offset_address": "0x120296704",
+      "offset": 176,
+      "name": "m_extensionCenter",
+      "type": "@\"MMExtensionCenter\""
+    }
+  ],
+  "MMServiceWrapper": [
+    {
+      "offset_address": "0x1202967a4",
+      "offset": 8,
+      "name": "m_service",
+      "type": "@\"MMBaseService\""
+    },
+    {
+      "offset_address": "0x1202967a8",
+      "offset": 16,
+      "name": "m_setLock",
+      "type": "{os_unfair_lock_s=\"_os_unfair_lock_opaque\"I}"
+    },
+    {
+      "offset_address": "0x1202967ac",
+      "offset": 24,
+      "name": "m_hookSet",
+      "type": "{unordered_map<SEL *, NSMethodSignature *, std::hash<SEL *>, std::equal_to<SEL *>, std::allocator<std::pair<SEL *const, NSMethodSignature *>>>=\"__table_\"{__hash_table<std::__hash_value_type<SEL *, NSMethodSignature *>, std::__unordered_map_hasher<SEL *, std::__hash_value_type<SEL *, NSMethodSignature *>, std::hash<SEL *>, std::equal_to<SEL *>>, std::__unordered_map_equal<SEL *, std::__hash_value_type<SEL *, NSMethodSignature *>, std::equal_to<SEL *>, std::hash<SEL *>>, std::allocator<std::__hash_value_type<SEL *, NSMethodSignature *>>>=\"__bucket_list_\"{unique_ptr<std::__hash_node_base<std::__hash_node<std::__hash_value_type<SEL *, NSMethodSignature *>, void *> *> *[], std::__bucket_list_deallocator<std::allocator<std::__hash_node_base<std::__hash_node<std::__hash_value_type<SEL *, NSMethodSignature *>, void *> *> *>>>=\"__ptr_\"^^v\"__deleter_\"{__bucket_list_deallocator<std::allocator<std::__hash_node_base<std::__hash_node<std::__hash_value_type<SEL *, NSMethodSignature *>, void *> *> *>>=\"__size_\"Q}}\"__first_node_\"{__hash_node_base<std::__hash_node<std::__hash_value_type<SEL *, NSMethodSignature *>, void *> *>=\"__next_\"^v}\"__size_\"Q\"__max_load_factor_\"f}}"
+    }
+  ]
+}

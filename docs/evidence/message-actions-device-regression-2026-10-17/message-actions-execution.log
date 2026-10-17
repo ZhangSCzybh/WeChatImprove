@@ -1,0 +1,4 @@
+Command: bash Tests/verify-message-actions-execution.sh
+Exit status: 0
+production admission: account=me context=yes menus=2 gesture=yes
+PASS: 241 production action/coordinator/native/media checks (host doubles, no native sends)

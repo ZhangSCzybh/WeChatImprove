@@ -5,15 +5,6 @@
 
 #import <Foundation/Foundation.h>
 
-#ifndef WCHookSwipeDirection_ENUM_DEFINED
-#define WCHookSwipeDirection_ENUM_DEFINED
-typedef NS_ENUM(NSInteger, WCHookSwipeDirection) {
-    WCHookSwipeDirectionLeft,
-    WCHookSwipeDirectionRight,
-    WCHookSwipeDirectionNone
-};
-#endif
-
 @class AppMessageBlockButton, CADisplayLink, CMessageWrap, CTRichTextView, CommonMessageCellViewExtTarget, CommonMessageViewModel, MMCPLabel, MMHeadImageView, MMUIActivityIndicatorView, NSString, TextStateItemView, UIButton, UIImageView, UILabel, UIPanGestureRecognizer, UIImpactFeedbackGenerator, UIView, UIVisualEffectView, YYAsyncImageView;
 
 @interface CommonMessageCellView : UIView
@@ -133,21 +124,4 @@ typedef NS_ENUM(NSInteger, WCHookSwipeDirection) {
 @property(readonly) Class superclass;
 @property(readonly, nonatomic) CommonMessageViewModel *viewModel; // @dynamic viewModel;
 
-@end
-
-@interface CommonMessageCellView (WCHookSwipe)
-@property(retain, nonatomic) UIPanGestureRecognizer *wchook_swipeGesture;
-@property(retain, nonatomic) UIImpactFeedbackGenerator *wchook_feedbackGenerator;
-@property(nonatomic) _Bool wchook_feedbackTriggered;
-@property(nonatomic) NSInteger wchook_swipeTriggerStage;
-- (void)wchook_triggerActionForDirection:(WCHookSwipeDirection)direction;
-- (void)wchook_triggerLightActionForDirection:(WCHookSwipeDirection)direction;
-- (void)wchook_showSwipeActionMenuForDirection:(WCHookSwipeDirection)direction;
-- (void)wchook_performQuoteReply;
-- (void)wchook_performRepeatMessage:(id)arg;
-- (void)wchook_performDeleteMessage:(id)arg;
-- (void)wchook_performRevokeMessage:(id)arg;
-- (id)wchook_findChatViewController;
-- (void)wchook_setupSwipeGestureIfNeeded;
-- (void)wchook_resetSwipeAnimated:(_Bool)animated;
 @end

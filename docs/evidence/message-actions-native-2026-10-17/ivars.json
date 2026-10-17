@@ -1,0 +1,3412 @@
+{
+  "AudioReceiver": [
+    {
+      "offset_address": "0x1201de280",
+      "offset": 8,
+      "name": "m_audioPlayer",
+      "type": "@\"<MsgAudioPlayerProtocol>\""
+    }
+  ],
+  "AudioSender": [
+    {
+      "offset_address": "0x1201de294",
+      "offset": 8,
+      "name": "m_upload",
+      "type": "@\"BaseUploadVoiceMgr\""
+    },
+    {
+      "offset_address": "0x1201de2a4",
+      "offset": 16,
+      "name": "m_cgiUpload",
+      "type": "@\"MMNewUploadVoiceMgr\""
+    },
+    {
+      "offset_address": "0x1201de2b0",
+      "offset": 24,
+      "name": "m_monoServiceId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201de290",
+      "offset": 32,
+      "name": "m_currentRecorder",
+      "type": "@\"BaseAudioRecorder\""
+    },
+    {
+      "offset_address": "0x1201de298",
+      "offset": 40,
+      "name": "m_interruptionDelegates",
+      "type": "@\"NSHashTable\""
+    },
+    {
+      "offset_address": "0x1201de29c",
+      "offset": 48,
+      "name": "useNewInterruptBehaviour",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201de2a0",
+      "offset": 49,
+      "name": "continueRecordingOverTime",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201de2a8",
+      "offset": 56,
+      "name": "_transcacheLogic",
+      "type": "@\"MMNewVoiceInputCacheLogic\""
+    },
+    {
+      "offset_address": "0x1201de2ac",
+      "offset": 64,
+      "name": "_bypUploader",
+      "type": "@\"UploadVoiceCDNMgr\""
+    }
+  ],
+  "BaseMessageCellView": [
+    {
+      "offset_address": "0x1201df2ac",
+      "offset": 16,
+      "name": "m_arrMenuItems",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1201df2a0",
+      "offset": 24,
+      "name": "m_contentView",
+      "type": "@\"UIView\""
+    },
+    {
+      "offset_address": "0x1201df2a4",
+      "offset": 32,
+      "name": "m_touchEnded",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df298",
+      "offset": 33,
+      "name": "m_bDisableAllOperation",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df2b4",
+      "offset": 34,
+      "name": "m_bIsLongPressHandled",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df2a8",
+      "offset": 35,
+      "name": "m_isConverting3dTouchToLongPress",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df2b0",
+      "offset": 36,
+      "name": "m_isTouchUpInsideHandled",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df29c",
+      "offset": 40,
+      "name": "_touches",
+      "type": "@\"NSSet\""
+    },
+    {
+      "offset_address": "0x1201df2b8",
+      "offset": 48,
+      "name": "_templateMsgFolderCellViewDelegate",
+      "type": "@\"<ReaderMessageTemplateMsgFolderCellViewDelegate>\""
+    },
+    {
+      "offset_address": "0x1201df2bc",
+      "offset": 56,
+      "name": "_revokeActionSheetShowTime",
+      "type": "Q"
+    }
+  ],
+  "BaseMsgContentLogicController": [
+    {
+      "offset_address": "0x1201df338",
+      "offset": 8,
+      "name": "m_viewController",
+      "type": "@\"BaseMsgContentViewController\""
+    },
+    {
+      "offset_address": "0x1201df340",
+      "offset": 16,
+      "name": "m_contact",
+      "type": "@\"CBaseContact\""
+    },
+    {
+      "offset_address": "0x1201df2f4",
+      "offset": 24,
+      "name": "m_imageController",
+      "type": "@\"ImageController\""
+    },
+    {
+      "offset_address": "0x1201df2f8",
+      "offset": 32,
+      "name": "m_urlController",
+      "type": "@\"UrlController\""
+    },
+    {
+      "offset_address": "0x1201df2fc",
+      "offset": 40,
+      "name": "m_recordController",
+      "type": "@\"RecordController\""
+    },
+    {
+      "offset_address": "0x1201df3a4",
+      "offset": 48,
+      "name": "m_autoTranslateController",
+      "type": "@\"VoiceAutoTranslateHelper\""
+    },
+    {
+      "offset_address": "0x1201df300",
+      "offset": 56,
+      "name": "m_typingController",
+      "type": "@\"TypingController\""
+    },
+    {
+      "offset_address": "0x1201df304",
+      "offset": 64,
+      "name": "m_shareCardController",
+      "type": "@\"ShareFriendOnChatLogicController\""
+    },
+    {
+      "offset_address": "0x1201df384",
+      "offset": 72,
+      "name": "m_pickLocationController",
+      "type": "@\"MMPickLocationViewController\""
+    },
+    {
+      "offset_address": "0x1201df308",
+      "offset": 80,
+      "name": "m_easterEggController",
+      "type": "@\"MMEasterEggController\""
+    },
+    {
+      "offset_address": "0x1201df36c",
+      "offset": 88,
+      "name": "m_contactVerifyLogic",
+      "type": "@\"CContactVerifyLogic\""
+    },
+    {
+      "offset_address": "0x1201df30c",
+      "offset": 96,
+      "name": "m_multiSelectController",
+      "type": "@\"MultiSelectController\""
+    },
+    {
+      "offset_address": "0x1201df38c",
+      "offset": 104,
+      "name": "m_myFavListController",
+      "type": "@\"MyFavoritesListViewController\""
+    },
+    {
+      "offset_address": "0x1201df388",
+      "offset": 112,
+      "name": "m_cardPkgViewController",
+      "type": "@\"MMUIViewController\""
+    },
+    {
+      "offset_address": "0x1201df310",
+      "offset": 120,
+      "name": "m_shareOpenSDKController",
+      "type": "@\"ShareDataToOpenSDKController\""
+    },
+    {
+      "offset_address": "0x1201df328",
+      "offset": 128,
+      "name": "m_uiSearchedResultNodeLocalID",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df3f0",
+      "offset": 132,
+      "name": "m_bInContacts",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df3f4",
+      "offset": 133,
+      "name": "m_bAddUsr",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df3bc",
+      "offset": 136,
+      "name": "m_navigationController",
+      "type": "@\"UINavigationController\""
+    },
+    {
+      "offset_address": "0x1201df3c0",
+      "offset": 144,
+      "name": "m_pushTime",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x1201df354",
+      "offset": 152,
+      "name": "m_uiSubviewShowStatus",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df348",
+      "offset": 160,
+      "name": "m_eViewDisshowStatus",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201df364",
+      "offset": 168,
+      "name": "m_bIsEditing",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df3c4",
+      "offset": 176,
+      "name": "m_redirectToEmoticonPid",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201df3b0",
+      "offset": 184,
+      "name": "multiMsgCompleteHandler",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x1201df37c",
+      "offset": 192,
+      "name": "m_dicExtraInfo",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201df3ec",
+      "offset": 200,
+      "name": "m_selectContact",
+      "type": "@\"CContact\""
+    },
+    {
+      "offset_address": "0x1201df358",
+      "offset": 208,
+      "name": "m_searchKeywordList",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1201df360",
+      "offset": 216,
+      "name": "m_bFirstWillAppear",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df39c",
+      "offset": 217,
+      "name": "m_bHadShowFirstWillAppear",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df374",
+      "offset": 224,
+      "name": "m_forwardLogic",
+      "type": "@\"ForwardMessageLogicController\""
+    },
+    {
+      "offset_address": "0x1201df394",
+      "offset": 232,
+      "name": "m_poiDetailLogic",
+      "type": "@\"MMLocatingPoiDataLogic\""
+    },
+    {
+      "offset_address": "0x1201df390",
+      "offset": 240,
+      "name": "m_shareMessageHelper",
+      "type": "@\"ShareMessageConfirmLogicHelper\""
+    },
+    {
+      "offset_address": "0x1201df3a0",
+      "offset": 248,
+      "name": "m_bIsInContentView",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df350",
+      "offset": 256,
+      "name": "m_uiFromScene",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201df368",
+      "offset": 264,
+      "name": "m_bHasUnreadMsg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df380",
+      "offset": 272,
+      "name": "_appIdTransfer",
+      "type": "@\"WAAppIdToUsernameTransfer\""
+    },
+    {
+      "offset_address": "0x1201df314",
+      "offset": 280,
+      "name": "m_scheduleLogic",
+      "type": "@\"WCScheduleLogicController\""
+    },
+    {
+      "offset_address": "0x1201df318",
+      "offset": 288,
+      "name": "m_textAutoTranslateController",
+      "type": "@\"AutoTranslateMsgController\""
+    },
+    {
+      "offset_address": "0x1201df31c",
+      "offset": 296,
+      "name": "m_textAutoTranslateControllerV2",
+      "type": "@\"AutoTranslateMsgControllerV2\""
+    },
+    {
+      "offset_address": "0x1201df3b8",
+      "offset": 304,
+      "name": "m_hasRecevieMsgAndScrollToBottom",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df3b4",
+      "offset": 312,
+      "name": "m_sendAppmsgMsgLocalIDSet",
+      "type": "@\"NSMutableSet\""
+    },
+    {
+      "offset_address": "0x1201df370",
+      "offset": 320,
+      "name": "m_sendVerifylogicVC",
+      "type": "@\"SendVerifyMsgLogicController\""
+    },
+    {
+      "offset_address": "0x1201df378",
+      "offset": 328,
+      "name": "m_ilinkMultiSelectLogic",
+      "type": "@\"ilinkMultiSelectLogic\""
+    },
+    {
+      "offset_address": "0x1201df324",
+      "offset": 336,
+      "name": "m_selectedMsgFileExtDictionary",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201df3f8",
+      "offset": 344,
+      "name": "_isStayInPage",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df3fc",
+      "offset": 345,
+      "name": "_hasOpenedWebViewUseFastLoad",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df400",
+      "offset": 346,
+      "name": "_hasInvokeFastLoadPVBiz",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df3e8",
+      "offset": 352,
+      "name": "_setFastLoadTemplateType",
+      "type": "@\"NSMutableSet\""
+    },
+    {
+      "offset_address": "0x1201df32c",
+      "offset": 360,
+      "name": "m_uiLastCreateTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df334",
+      "offset": 364,
+      "name": "m_uiLastSequence",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df398",
+      "offset": 368,
+      "name": "m_uiLeftCount",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df330",
+      "offset": 372,
+      "name": "m_uiDownLastCreateTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df33c",
+      "offset": 376,
+      "name": "m_uiDownLastSequence",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df34c",
+      "offset": 380,
+      "name": "m_uiDownLeftCount",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df320",
+      "offset": 384,
+      "name": "m_msgLoaderLogic",
+      "type": "@\"BaseMsgLoaderLogic\""
+    },
+    {
+      "offset_address": "0x1201df3a8",
+      "offset": 392,
+      "name": "m_bHighlightTargetCell",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df3c8",
+      "offset": 393,
+      "name": "isSharePreview",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df3ac",
+      "offset": 394,
+      "name": "_isPageSheetMode",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df3d4",
+      "offset": 395,
+      "name": "_redEnvelopesClickBlocking",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df3dc",
+      "offset": 396,
+      "name": "_isMovingToMainFrame",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df35c",
+      "offset": 400,
+      "name": "m_searchScene",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201df3cc",
+      "offset": 408,
+      "name": "_pageSheetModeTitle",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201df3d0",
+      "offset": 416,
+      "name": "_toolViewLastText",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201df3d8",
+      "offset": 424,
+      "name": "_currentMusicSearchViewController",
+      "type": "@\"UIViewController\""
+    },
+    {
+      "offset_address": "0x1201df344",
+      "offset": 432,
+      "name": "_firstMsgAfterEnterSession",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x1201df3e0",
+      "offset": 440,
+      "name": "_chatRoomWillEnterReportCtx",
+      "type": "@\"NSDictionary\""
+    },
+    {
+      "offset_address": "0x1201df3e4",
+      "offset": 448,
+      "name": "_textStateItemView",
+      "type": "@\"TextStateItemView\""
+    }
+  ],
+  "BaseMsgContentViewController": [
+    {
+      "offset_address": "0x1201df428",
+      "offset": 112,
+      "name": "m_arrMessageNodeData",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201df440",
+      "offset": 120,
+      "name": "m_uLastTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df4b8",
+      "offset": 124,
+      "name": "m_uLastMoreMsgTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df678",
+      "offset": 128,
+      "name": "m_bKeyboardShow",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df594",
+      "offset": 129,
+      "name": "m_bToolViewHidden",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df4a0",
+      "offset": 136,
+      "name": "m_moreMsgIndex",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201df450",
+      "offset": 144,
+      "name": "m_bReadtToLoadMoreMsg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df424",
+      "offset": 152,
+      "name": "m_delegate",
+      "type": "@\"<BaseMsgContentDelgate>\""
+    },
+    {
+      "offset_address": "0x1201df420",
+      "offset": 160,
+      "name": "m_delegateClass",
+      "type": "#"
+    },
+    {
+      "offset_address": "0x1201df5c0",
+      "offset": 168,
+      "name": "m_LockerTimer",
+      "type": "@\"MMTimer\""
+    },
+    {
+      "offset_address": "0x1201df430",
+      "offset": 176,
+      "name": "m_tableView",
+      "type": "@\"MMTableView\""
+    },
+    {
+      "offset_address": "0x1201df4d0",
+      "offset": 184,
+      "name": "m_activityView",
+      "type": "@\"MMUIActivityIndicatorView\""
+    },
+    {
+      "offset_address": "0x1201df4f0",
+      "offset": 192,
+      "name": "m_headerView",
+      "type": "@\"UIView\""
+    },
+    {
+      "offset_address": "0x1201df43c",
+      "offset": 200,
+      "name": "_inputToolView",
+      "type": "@\"MMInputToolView\""
+    },
+    {
+      "offset_address": "0x1201df474",
+      "offset": 208,
+      "name": "m_backgroundView",
+      "type": "@\"UIImageView\""
+    },
+    {
+      "offset_address": "0x1201df510",
+      "offset": 216,
+      "name": "m_arrDeleteRows",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201df67c",
+      "offset": 224,
+      "name": "m_bViewUnloaded",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df680",
+      "offset": 232,
+      "name": "m_pTableViewOffset",
+      "type": "{CGPoint=\"x\"d\"y\"d}"
+    },
+    {
+      "offset_address": "0x1201df684",
+      "offset": 248,
+      "name": "m_keyboardHeight",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x1201df674",
+      "offset": 256,
+      "name": "m_text",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201df688",
+      "offset": 264,
+      "name": "m_inputMode",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201df68c",
+      "offset": 272,
+      "name": "m_positionMode",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201df690",
+      "offset": 280,
+      "name": "m_contentMode",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201df694",
+      "offset": 288,
+      "name": "m_fKeyboardAnimationDuration",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x1201df460",
+      "offset": 296,
+      "name": "m_oMsgSearchHelper",
+      "type": "@\"MsgSearchHelper\""
+    },
+    {
+      "offset_address": "0x1201df4c8",
+      "offset": 304,
+      "name": "m_iInitTableViewContentOffset",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x1201df468",
+      "offset": 308,
+      "name": "m_bNeedAdjustTableViewContentOffset",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df698",
+      "offset": 312,
+      "name": "m_uiSearchResultNodeViewHeight",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df434",
+      "offset": 320,
+      "name": "m_uiInterfaceOrientation",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x1201df5d8",
+      "offset": 328,
+      "name": "m_loadingView",
+      "type": "@\"MMLoadingView\""
+    },
+    {
+      "offset_address": "0x1201df5c4",
+      "offset": 336,
+      "name": "_shareMessageConfirmLogicHelper",
+      "type": "@\"ShareMessageConfirmLogicHelper\""
+    },
+    {
+      "offset_address": "0x1201df500",
+      "offset": 344,
+      "name": "_multiSelectView",
+      "type": "@\"MMMultiSelectToolView\""
+    },
+    {
+      "offset_address": "0x1201df470",
+      "offset": 352,
+      "name": "m_arrSelectMsgLocalID",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201df57c",
+      "offset": 360,
+      "name": "m_msgReceivingTipsView",
+      "type": "@\"UIView\""
+    },
+    {
+      "offset_address": "0x1201df46c",
+      "offset": 368,
+      "name": "m_uiSelectSearchMsgID",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df4fc",
+      "offset": 372,
+      "name": "m_bShouldShowKeyboardAnimation",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df4ac",
+      "offset": 373,
+      "name": "m_bIsRevokeAdding",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df4a8",
+      "offset": 376,
+      "name": "m_msgCounerDurOneSync",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x1201df5a0",
+      "offset": 380,
+      "name": "m_bHightlightedSearchedMsgNode",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df54c",
+      "offset": 384,
+      "name": "m_decelerateTarget",
+      "type": "{CGPoint=\"x\"d\"y\"d}"
+    },
+    {
+      "offset_address": "0x1201df488",
+      "offset": 400,
+      "name": "m_isTimeShowInDetail",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df4b0",
+      "offset": 408,
+      "name": "m_firstUnReadMsg",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x1201df5b8",
+      "offset": 416,
+      "name": "m_unreadCount",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201df5dc",
+      "offset": 424,
+      "name": "m_scrollActionSheet",
+      "type": "@\"MMScrollActionSheet\""
+    },
+    {
+      "offset_address": "0x1201df48c",
+      "offset": 432,
+      "name": "m_fullScreenWindow",
+      "type": "@\"MMUIWindow\""
+    },
+    {
+      "offset_address": "0x1201df490",
+      "offset": 440,
+      "name": "m_fullScreenNodeData",
+      "type": "@\"BaseChatViewModel\""
+    },
+    {
+      "offset_address": "0x1201df670",
+      "offset": 448,
+      "name": "m_specialMsgSearchHelper",
+      "type": "@\"MMSpecialMsgSearchHelper\""
+    },
+    {
+      "offset_address": "0x1201df5cc",
+      "offset": 456,
+      "name": "m_magicEmojiReportInfo",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201df66c",
+      "offset": 464,
+      "name": "m_multiSelectLogic",
+      "type": "@\"BaseMsgContentViewMultiSelectLogic\""
+    },
+    {
+      "offset_address": "0x1201df5c8",
+      "offset": 472,
+      "name": "m_isMsgReceiveTipsJacking",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df580",
+      "offset": 480,
+      "name": "m_menuHideTime",
+      "type": "{timeval=\"tv_sec\"q\"tv_usec\"i}"
+    },
+    {
+      "offset_address": "0x1201df458",
+      "offset": 496,
+      "name": "m_shouldScrollToBottomAfterRotate",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df598",
+      "offset": 497,
+      "name": "m_resignInputToolViewFirstResponder",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df518",
+      "offset": 498,
+      "name": "m_scrollingTableToBottom",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df524",
+      "offset": 504,
+      "name": "m_scrollingInvisibleRange",
+      "type": "{_NSRange=\"location\"Q\"length\"Q}"
+    },
+    {
+      "offset_address": "0x1201df4bc",
+      "offset": 520,
+      "name": "m_needLayoutOnMenuHide",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df4c0",
+      "offset": 521,
+      "name": "m_needScrollOnMenuHide",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df438",
+      "offset": 522,
+      "name": "m_patToastShowing",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df42c",
+      "offset": 528,
+      "name": "m_lastSectionCount",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201df4cc",
+      "offset": 536,
+      "name": "m_scrollingToTop",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x1201df4b4",
+      "offset": 540,
+      "name": "m_scrollingToFirstUnRead",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df538",
+      "offset": 544,
+      "name": "m_initialOffset",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x1201df568",
+      "offset": 552,
+      "name": "m_lastMsgInNewArray",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x1201df4dc",
+      "offset": 560,
+      "name": "m_footerView",
+      "type": "@\"UIView\""
+    },
+    {
+      "offset_address": "0x1201df4e0",
+      "offset": 568,
+      "name": "m_footerActivityView",
+      "type": "@\"MMUIActivityIndicatorView\""
+    },
+    {
+      "offset_address": "0x1201df56c",
+      "offset": 576,
+      "name": "m_needLoadMoreWhenScrollToFistUnRead",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df570",
+      "offset": 577,
+      "name": "m_needHideFirstUnReadBtn",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df4e4",
+      "offset": 578,
+      "name": "m_bMovingToMainFrameTab",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df498",
+      "offset": 584,
+      "name": "m_bannerHeight",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x1201df454",
+      "offset": 592,
+      "name": "m_isPeekPreview",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df444",
+      "offset": 600,
+      "name": "m_imgFullScreenWnd",
+      "type": "@\"MsgImgFullScreenWindow\""
+    },
+    {
+      "offset_address": "0x1201df5d4",
+      "offset": 608,
+      "name": "m_snapshotView",
+      "type": "@\"UIView\""
+    },
+    {
+      "offset_address": "0x1201df5b0",
+      "offset": 616,
+      "name": "m_uiEnterRoomTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df5b4",
+      "offset": 620,
+      "name": "m_uiEnterRoomUnreadCount",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df494",
+      "offset": 624,
+      "name": "m_bCloseForViewDetail",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df5a8",
+      "offset": 628,
+      "name": "_startTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df5ac",
+      "offset": 632,
+      "name": "_previewingContext",
+      "type": "@\"<UIViewControllerPreviewing>\""
+    },
+    {
+      "offset_address": "0x1201df448",
+      "offset": 640,
+      "name": "m_streamVoiceInputViewController",
+      "type": "@\"StreamVoiceInputViewController\""
+    },
+    {
+      "offset_address": "0x1201df590",
+      "offset": 648,
+      "name": "m_topBarView",
+      "type": "@\"UIView\""
+    },
+    {
+      "offset_address": "0x1201df44c",
+      "offset": 656,
+      "name": "m_voiceStreamTitle",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201df58c",
+      "offset": 664,
+      "name": "m_voiceStreamSavedText",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201df530",
+      "offset": 672,
+      "name": "m_bHasAppear",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df59c",
+      "offset": 680,
+      "name": "m_dropManager",
+      "type": "@\"MMDropManager\""
+    },
+    {
+      "offset_address": "0x1201df484",
+      "offset": 688,
+      "name": "m_readerReporter",
+      "type": "@\"ReaderReporter\""
+    },
+    {
+      "offset_address": "0x1201df588",
+      "offset": 696,
+      "name": "m_voiceRecordPopUpHeight",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x1201df4ec",
+      "offset": 704,
+      "name": "m_menuReporter",
+      "type": "@\"MMMsgMenuReporter\""
+    },
+    {
+      "offset_address": "0x1201df578",
+      "offset": 712,
+      "name": "m_lastScrollingOffsetY",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x1201df528",
+      "offset": 720,
+      "name": "m_multiSelectChecker",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x1201df52c",
+      "offset": 728,
+      "name": "m_multiSelectHandler",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x1201df51c",
+      "offset": 736,
+      "name": "m_bForbidMultiSelect",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df514",
+      "offset": 744,
+      "name": "m_multiManualUnSelectedId",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201df5e8",
+      "offset": 752,
+      "name": "m_lastScrollingHandledMessage",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x1201df4c4",
+      "offset": 760,
+      "name": "m_tipsHelper",
+      "type": "@\"VoiceTransTipsHelper\""
+    },
+    {
+      "offset_address": "0x1201df49c",
+      "offset": 768,
+      "name": "m_dialectFeedbackHelper",
+      "type": "@\"DialectFeedbackHelper\""
+    },
+    {
+      "offset_address": "0x1201df464",
+      "offset": 776,
+      "name": "m_bIsLocating",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df5bc",
+      "offset": 784,
+      "name": "m_referOwnerMsg",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x1201df550",
+      "offset": 792,
+      "name": "m_referKeeperMsg",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x1201df554",
+      "offset": 800,
+      "name": "m_newArrMessageNodeData",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201df560",
+      "offset": 808,
+      "name": "m_canHighLightScrollTargetMsg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df564",
+      "offset": 816,
+      "name": "m_hightTextRange",
+      "type": "{_NSRange=\"location\"Q\"length\"Q}"
+    },
+    {
+      "offset_address": "0x1201df558",
+      "offset": 832,
+      "name": "m_scrollTargetMsg",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x1201df55c",
+      "offset": 840,
+      "name": "m_scrollMarginTop",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x1201df50c",
+      "offset": 848,
+      "name": "m_bMultiSelectMode",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df478",
+      "offset": 856,
+      "name": "m_currentSpeakTextMsg",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x1201df574",
+      "offset": 864,
+      "name": "m_speakTextTipView",
+      "type": "@\"SpeakTextTipsView\""
+    },
+    {
+      "offset_address": "0x1201df5f0",
+      "offset": 872,
+      "name": "m_speakTextHLTimer",
+      "type": "@\"CADisplayLink\""
+    },
+    {
+      "offset_address": "0x1201df5ec",
+      "offset": 880,
+      "name": "m_startSpeakTextTime",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201df47c",
+      "offset": 888,
+      "name": "m_speakTextController",
+      "type": "@\"SpeakTextLogicController\""
+    },
+    {
+      "offset_address": "0x1201df480",
+      "offset": 896,
+      "name": "m_speakTextSource",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201df540",
+      "offset": 904,
+      "name": "m_embedExcerptMsgHasExposedSet",
+      "type": "@\"NSMutableSet\""
+    },
+    {
+      "offset_address": "0x1201df548",
+      "offset": 912,
+      "name": "m_weappTailMsgHasExposedSet",
+      "type": "@\"NSMutableSet\""
+    },
+    {
+      "offset_address": "0x1201df544",
+      "offset": 920,
+      "name": "m_mpScreenshotMsgHasExposedSet",
+      "type": "@\"NSMutableSet\""
+    },
+    {
+      "offset_address": "0x1201df53c",
+      "offset": 928,
+      "name": "m_customerHelperDeeplinkExposedSet",
+      "type": "@\"NSMutableSet\""
+    },
+    {
+      "offset_address": "0x1201df45c",
+      "offset": 936,
+      "name": "m_bHasAddedSplitNode",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df4a4",
+      "offset": 940,
+      "name": "m_localIdToAddSplitNode",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df5fc",
+      "offset": 944,
+      "name": "_m_bIsInMainFrame",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df620",
+      "offset": 945,
+      "name": "_dismissWithoutReset",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df624",
+      "offset": 946,
+      "name": "_isShowMsgSearch",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df628",
+      "offset": 947,
+      "name": "_isPresentingOtherQuickReplaySession",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df62c",
+      "offset": 948,
+      "name": "_bSuppressVoiceTransSendScroll",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df640",
+      "offset": 949,
+      "name": "_didTouchMinimizeCorner",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df644",
+      "offset": 950,
+      "name": "_isAccessbilityBoldTextEnable",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df648",
+      "offset": 951,
+      "name": "_isAppTaskCycleJumpRestoring",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df664",
+      "offset": 952,
+      "name": "_chatBotCardRuntimeActivated",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201df608",
+      "offset": 956,
+      "name": "_uiMultiSelectMaxCount",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df60c",
+      "offset": 960,
+      "name": "_uiMultiSelectMaxMegaBytes",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df614",
+      "offset": 964,
+      "name": "_liteAppMaxSelectCount",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201df520",
+      "offset": 968,
+      "name": "_tableScrollActionType",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x1201df5f8",
+      "offset": 976,
+      "name": "m_shareContacts",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201df4e8",
+      "offset": 984,
+      "name": "m_searchScene",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201df4f4",
+      "offset": 992,
+      "name": "_inputPresenter",
+      "type": "@\"<MMMsgInputPresenter><MMRecordUIManager>\""
+    },
+    {
+      "offset_address": "0x1201df4f8",
+      "offset": 1000,
+      "name": "_inputControlView",
+      "type": "@\"UIView\""
+    },
+    {
+      "offset_address": "0x1201df600",
+      "offset": 1008,
+      "name": "_m_badRoomLogicController",
+      "type": "@\"BadRoomLogicController\""
+    },
+    {
+      "offset_address": "0x1201df5e0",
+      "offset": 1016,
+      "name": "_richTextCoverView",
+      "type": "@\"MMRichTextCoverView\""
+    },
+    {
+      "offset_address": "0x1201df5e4",
+      "offset": 1024,
+      "name": "_richTextView",
+      "type": "@\"RichTextView\""
+    },
+    {
+      "offset_address": "0x1201df604",
+      "offset": 1032,
+      "name": "_msgReferView",
+      "type": "@\"MMInputMsgReferView\""
+    },
+    {
+      "offset_address": "0x1201df610",
+      "offset": 1040,
+      "name": "_messageHistoryTypeFilter",
+      "type": "@\"LiteAppMessageHistoryTypeFilter\""
+    },
+    {
+      "offset_address": "0x1201df618",
+      "offset": 1048,
+      "name": "_oRoomHistoryStat",
+      "type": "@\"ChatRoomHistoryShareStat\""
+    },
+    {
+      "offset_address": "0x1201df504",
+      "offset": 1056,
+      "name": "_tipsNavBar",
+      "type": "@\"MMMsgContentNavBar\""
+    },
+    {
+      "offset_address": "0x1201df508",
+      "offset": 1064,
+      "name": "_tipsNewNavBar",
+      "type": "@\"MMNewMsgContentNavBar\""
+    },
+    {
+      "offset_address": "0x1201df61c",
+      "offset": 1072,
+      "name": "_chatRoomDismissedView",
+      "type": "@\"UIView\""
+    },
+    {
+      "offset_address": "0x1201df630",
+      "offset": 1080,
+      "name": "_pendingTipsView",
+      "type": "@\"MMEdgeTipsView\""
+    },
+    {
+      "offset_address": "0x1201df5d0",
+      "offset": 1088,
+      "name": "_referTipsView",
+      "type": "@\"MMEdgeTipsView\""
+    },
+    {
+      "offset_address": "0x1201df534",
+      "offset": 1096,
+      "name": "_jumpMsgEdgeTipsView",
+      "type": "@\"MMEdgeTipsView\""
+    },
+    {
+      "offset_address": "0x1201df634",
+      "offset": 1104,
+      "name": "_jumpMsgItems",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201df638",
+      "offset": 1112,
+      "name": "_jumpMsgItemKeys",
+      "type": "@\"NSMutableSet\""
+    },
+    {
+      "offset_address": "0x1201df5a4",
+      "offset": 1120,
+      "name": "_chatroomBkgColor",
+      "type": "@\"UIColor\""
+    },
+    {
+      "offset_address": "0x1201df63c",
+      "offset": 1128,
+      "name": "_locateMsg",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x1201df5f4",
+      "offset": 1136,
+      "name": "_minimizationTransitionController",
+      "type": "@\"MiniRecTransitionController\""
+    },
+    {
+      "offset_address": "0x1201df4d4",
+      "offset": 1144,
+      "name": "_autoTranslateAnchorMsg",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x1201df4d8",
+      "offset": 1152,
+      "name": "_autoTranslateAnchorMsgLastContentOffset",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x1201df584",
+      "offset": 1160,
+      "name": "_pasteboardMsgProvider",
+      "type": "@\"PasteboardMsgProvider\""
+    },
+    {
+      "offset_address": "0x1201df64c",
+      "offset": 1168,
+      "name": "_msgMediaGroupAgent",
+      "type": "@\"MsgMediaGroupChatAgent\""
+    },
+    {
+      "offset_address": "0x1201df650",
+      "offset": 1176,
+      "name": "_translateSpeakEndType",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x1201df654",
+      "offset": 1184,
+      "name": "_translateSpeakReporter",
+      "type": "@\"TranslateSpeakReporter\""
+    },
+    {
+      "offset_address": "0x1201df658",
+      "offset": 1192,
+      "name": "_msgDataSaveLogic",
+      "type": "@\"MsgDataSaveLogic\""
+    },
+    {
+      "offset_address": "0x1201df65c",
+      "offset": 1200,
+      "name": "_chatTableViewYOffset",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x1201df660",
+      "offset": 1208,
+      "name": "_chatBotCardRecycleManager",
+      "type": "@\"WAAgentCardRecycleManager\""
+    },
+    {
+      "offset_address": "0x1201df668",
+      "offset": 1216,
+      "name": "_chatBotCardSceneHandle",
+      "type": "@\"WAAgentSceneInstanceHandle\""
+    }
+  ],
+  "DownloadVoiceCDNMgr": [
+    {
+      "offset_address": "0x1201eb2c0",
+      "offset": 8,
+      "name": "_bDownloading",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201eb2c4",
+      "offset": 16,
+      "name": "_delegate",
+      "type": "@\"<DownloadVoiceDelegate>\""
+    },
+    {
+      "offset_address": "0x1201eb2c8",
+      "offset": 24,
+      "name": "_timerCheck",
+      "type": "@\"MMTimer\""
+    },
+    {
+      "offset_address": "0x1201eb2cc",
+      "offset": 32,
+      "name": "_timerCheckTimeout",
+      "type": "@\"MMTimer\""
+    },
+    {
+      "offset_address": "0x1201eb2d0",
+      "offset": 40,
+      "name": "_readyDownloadItems",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201eb2d4",
+      "offset": 48,
+      "name": "_lock",
+      "type": "@\"NSRecursiveLock\""
+    }
+  ],
+  "CDownloadVoiceMgr": [
+    {
+      "offset_address": "0x1201eb2d8",
+      "offset": 8,
+      "name": "m_oLock",
+      "type": "@\"NSRecursiveLock\""
+    },
+    {
+      "offset_address": "0x1201eb2e0",
+      "offset": 16,
+      "name": "m_uiCurDownloadID",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201eb2e4",
+      "offset": 24,
+      "name": "m_delNotifyToReceiver",
+      "type": "@\"<DownloadVoiceDelegate>\""
+    },
+    {
+      "offset_address": "0x1201eb2dc",
+      "offset": 32,
+      "name": "m_uiQueueCount",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201eb2e8",
+      "offset": 40,
+      "name": "_canAutoDownload",
+      "type": "B"
+    }
+  ],
+  "ForwardMessageLogicController": [
+    {
+      "offset_address": "0x1201f4924",
+      "offset": 8,
+      "name": "m_delegate",
+      "type": "@\"<ForwardMessageLogicDelegate>\""
+    },
+    {
+      "offset_address": "0x1201f48f8",
+      "offset": 16,
+      "name": "m_msgList",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201f48fc",
+      "offset": 24,
+      "name": "m_msgListForWXWork",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201f4910",
+      "offset": 32,
+      "name": "m_msgRecordOriginList",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1201f4900",
+      "offset": 40,
+      "name": "m_toContacts",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1201f4914",
+      "offset": 48,
+      "name": "m_sessionSelectController",
+      "type": "@\"SessionSelectController\""
+    },
+    {
+      "offset_address": "0x1201f492c",
+      "offset": 56,
+      "name": "_waitingView",
+      "type": "@\"UIView\""
+    },
+    {
+      "offset_address": "0x1201f4928",
+      "offset": 64,
+      "name": "m_startTime",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201f4944",
+      "offset": 72,
+      "name": "m_toChatRoomContact",
+      "type": "@\"CContact\""
+    },
+    {
+      "offset_address": "0x1201f4948",
+      "offset": 80,
+      "name": "m_atUserList",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201f4908",
+      "offset": 88,
+      "name": "m_msgListBeforeConvertBackup",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201f490c",
+      "offset": 96,
+      "name": "m_msgRecordOriginListBeforeConvertBackup",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1201f4960",
+      "offset": 104,
+      "name": "_bMutliContact",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f496c",
+      "offset": 105,
+      "name": "_bShowSendSuccessView",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f4970",
+      "offset": 106,
+      "name": "_bHiddenSendSuccessToastView",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f4974",
+      "offset": 107,
+      "name": "_bPresent",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f4978",
+      "offset": 108,
+      "name": "_bAnimation",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f4988",
+      "offset": 109,
+      "name": "_m_bFilterMyContact",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f4994",
+      "offset": 110,
+      "name": "_bSpecificContact",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f491c",
+      "offset": 111,
+      "name": "_forbidForwardToEnterpriseChat",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f499c",
+      "offset": 112,
+      "name": "_onlyChatRoom",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f49a0",
+      "offset": 113,
+      "name": "_m_bIgnoreChatRoom",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f4918",
+      "offset": 114,
+      "name": "_hideNewSessionButton",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f4930",
+      "offset": 115,
+      "name": "_sendWaiting",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f4958",
+      "offset": 116,
+      "name": "_hideSelectFromContactList",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f49a8",
+      "offset": 117,
+      "name": "_alignsFilterRulesInSearchResult",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f493c",
+      "offset": 118,
+      "name": "_hasInputSth",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f4954",
+      "offset": 119,
+      "name": "_supportLandscapeShareConfirmView",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f49d4",
+      "offset": 120,
+      "name": "_onlyShareCardForwardToContact",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f49d8",
+      "offset": 121,
+      "name": "_hasAnyMsgDidnotDownload",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1201f4968",
+      "offset": 124,
+      "name": "_m_uiAppMsgScene",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201f4990",
+      "offset": 128,
+      "name": "_m_forwardType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1201f4964",
+      "offset": 136,
+      "name": "_m_commonSearchScene",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201f497c",
+      "offset": 144,
+      "name": "_confirmPlaceholder",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201f4980",
+      "offset": 152,
+      "name": "_title",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201f4984",
+      "offset": 160,
+      "name": "_m_uiIDKeyScene",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201f498c",
+      "offset": 168,
+      "name": "_fromContactUserName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201f494c",
+      "offset": 176,
+      "name": "_fromAppName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201f4950",
+      "offset": 184,
+      "name": "_stayAtString",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201f4920",
+      "offset": 192,
+      "name": "_selectTitle",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201f4998",
+      "offset": 200,
+      "name": "_cancelSendContacts",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1201f4940",
+      "offset": 208,
+      "name": "_shareInfo",
+      "type": "@\"NSDictionary\""
+    },
+    {
+      "offset_address": "0x1201f49a4",
+      "offset": 216,
+      "name": "_todoActivityId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201f49ac",
+      "offset": 224,
+      "name": "_weappChatBotAttach",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201f49b0",
+      "offset": 232,
+      "name": "_searchText",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201f495c",
+      "offset": 240,
+      "name": "_forwardThumbData",
+      "type": "@\"NSData\""
+    },
+    {
+      "offset_address": "0x1201f49b4",
+      "offset": 248,
+      "name": "_eMultiForwardType",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201f49b8",
+      "offset": 256,
+      "name": "_userData",
+      "type": "@"
+    },
+    {
+      "offset_address": "0x1201f49bc",
+      "offset": 264,
+      "name": "_forwardBizScene",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201f4934",
+      "offset": 272,
+      "name": "_loadingType",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1201f49c0",
+      "offset": 280,
+      "name": "_reportUserInfo",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1201f49c4",
+      "offset": 288,
+      "name": "_snackBarTitleProvider",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x1201f49c8",
+      "offset": 296,
+      "name": "_snackBarExposureReporter",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x1201f49cc",
+      "offset": 304,
+      "name": "_snackBarActionReporter",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x1201f49d0",
+      "offset": 312,
+      "name": "_pageSheetHeight",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x1201f49dc",
+      "offset": 320,
+      "name": "_wwkMsgForwarder",
+      "type": "@\"WWKMsgForwarder\""
+    },
+    {
+      "offset_address": "0x1201f4904",
+      "offset": 328,
+      "name": "_confirmSheetView",
+      "type": "@\"SharePreConfirmSheetView\""
+    },
+    {
+      "offset_address": "0x1201f4938",
+      "offset": 336,
+      "name": "_chatbotUploadCDNMgr",
+      "type": "@\"ChatBotUploadCDNMgr\""
+    },
+    {
+      "offset_address": "0x1201f49e0",
+      "offset": 344,
+      "name": "_forwardToThirdAppZipHandler",
+      "type": "@\"ForwardToThirdAppZipHandler\""
+    }
+  ],
+  "ForwardMessageMgr": [
+    {
+      "offset_address": "0x1201f49e4",
+      "offset": 8,
+      "name": "m_forwardLogicController",
+      "type": "@\"ForwardMessageLogicController\""
+    },
+    {
+      "offset_address": "0x1201f49e8",
+      "offset": 16,
+      "name": "m_forwardFromViewController",
+      "type": "@\"UIViewController\""
+    },
+    {
+      "offset_address": "0x1201f49ec",
+      "offset": 24,
+      "name": "_forwardMessageLogics",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1201f49f0",
+      "offset": 32,
+      "name": "_sessionStackPages",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201f49f4",
+      "offset": 40,
+      "name": "_shareSheetStack",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1201f49f8",
+      "offset": 48,
+      "name": "_chatBotAsstForwardSource",
+      "type": "@\"NSString\""
+    }
+  ],
+  "MMNewUploadVoiceMgr": [
+    {
+      "offset_address": "0x12021d784",
+      "offset": 8,
+      "name": "m_oMMDB",
+      "type": "@\"CMMDB\""
+    },
+    {
+      "offset_address": "0x12021d788",
+      "offset": 16,
+      "name": "m_oLock",
+      "type": "@\"NSRecursiveLock\""
+    },
+    {
+      "offset_address": "0x12021d78c",
+      "offset": 24,
+      "name": "m_timerCheck",
+      "type": "@\"MMTimer\""
+    },
+    {
+      "offset_address": "0x12021d790",
+      "offset": 32,
+      "name": "m_uiCurUploadID",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12021d794",
+      "offset": 36,
+      "name": "m_bIsUploading",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12021d798",
+      "offset": 40,
+      "name": "m_delNotifyToSender",
+      "type": "@\"<UploadVoiceDelegate>\""
+    },
+    {
+      "offset_address": "0x12021d79c",
+      "offset": 48,
+      "name": "m_uiQueueCount",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12021d7a4",
+      "offset": 52,
+      "name": "m_bDBError",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12021d7a0",
+      "offset": 56,
+      "name": "m_dicMergeResult",
+      "type": "@\"NSMutableDictionary\""
+    }
+  ],
+  "CMessageMgr": [
+    {
+      "offset_address": "0x120223954",
+      "offset": 8,
+      "name": "m_oMsgDB",
+      "type": "@\"CMessageDB\""
+    },
+    {
+      "offset_address": "0x12022396c",
+      "offset": 16,
+      "name": "m_oDownloadVideoMgr",
+      "type": "@\"CDownloadVideoMgr\""
+    },
+    {
+      "offset_address": "0x120223958",
+      "offset": 24,
+      "name": "m_bypSendMessageMgr",
+      "type": "@\"BypSendMessageMgr\""
+    },
+    {
+      "offset_address": "0x120223970",
+      "offset": 32,
+      "name": "m_oEmoticonUploadMgr",
+      "type": "@\"CEmoticonUploadMgr\""
+    },
+    {
+      "offset_address": "0x120223978",
+      "offset": 40,
+      "name": "m_bypEmoticonUploadMgr",
+      "type": "@\"BypSendEmotionMessageMgr\""
+    },
+    {
+      "offset_address": "0x120223974",
+      "offset": 48,
+      "name": "m_oEmoticonDownloadMgr",
+      "type": "@\"CEmoticonDownloadMgr\""
+    },
+    {
+      "offset_address": "0x1202239cc",
+      "offset": 56,
+      "name": "m_bCheckQueue",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12022397c",
+      "offset": 64,
+      "name": "m_oOpenUploadMgr",
+      "type": "@\"OpenUploadMgr\""
+    },
+    {
+      "offset_address": "0x120223980",
+      "offset": 72,
+      "name": "m_oOpenDownloadMgr",
+      "type": "@\"OpenDownloadMgr\""
+    },
+    {
+      "offset_address": "0x120223984",
+      "offset": 80,
+      "name": "m_oMessagePatternMgr",
+      "type": "@\"MessagePatternCacheMgr\""
+    },
+    {
+      "offset_address": "0x120223988",
+      "offset": 88,
+      "name": "m_oDownloadImageMgr",
+      "type": "@\"DownloadImageMgr\""
+    },
+    {
+      "offset_address": "0x12022395c",
+      "offset": 96,
+      "name": "m_oUploadImageCdnMgr",
+      "type": "@\"ImageUploadUnifyBaseMgr\""
+    },
+    {
+      "offset_address": "0x12022398c",
+      "offset": 104,
+      "name": "m_oDownloadImageCdnMgr",
+      "type": "@\"DownloadImageCDNMgr\""
+    },
+    {
+      "offset_address": "0x120223990",
+      "offset": 112,
+      "name": "m_oSilentDownloadImageCdnMgr",
+      "type": "@\"DownloadImageCDNMgr\""
+    },
+    {
+      "offset_address": "0x120223994",
+      "offset": 120,
+      "name": "m_oQuotaDownloadImageCdnMgr",
+      "type": "@\"DownloadImageCDNMgr\""
+    },
+    {
+      "offset_address": "0x120223998",
+      "offset": 128,
+      "name": "m_oThumbDownloadMgr",
+      "type": "@\"ThumbDownloadMgr\""
+    },
+    {
+      "offset_address": "0x1202239a0",
+      "offset": 136,
+      "name": "m_oDownloadVideoCdnMgr",
+      "type": "@\"DownloadVideoCDNMgr\""
+    },
+    {
+      "offset_address": "0x1202239a4",
+      "offset": 144,
+      "name": "m_oSilentDownloadVideoCdnMgr",
+      "type": "@\"DownloadVideoCDNMgr\""
+    },
+    {
+      "offset_address": "0x1202239e8",
+      "offset": 152,
+      "name": "m_oQuotaDownloadVideoCdnMgr",
+      "type": "@\"DownloadVideoCDNMgr\""
+    },
+    {
+      "offset_address": "0x1202239a8",
+      "offset": 160,
+      "name": "m_oOpenUploadCDNMgr",
+      "type": "@\"OpenUploadCDNMgr\""
+    },
+    {
+      "offset_address": "0x1202239b0",
+      "offset": 168,
+      "name": "m_oOpenUploadVideoCDNMgr",
+      "type": "@\"OpenUploadVideoCDNMgr\""
+    },
+    {
+      "offset_address": "0x1202239b4",
+      "offset": 176,
+      "name": "m_oOpenDownloadCDNMgr",
+      "type": "@\"OpenDownloadCDNMgr\""
+    },
+    {
+      "offset_address": "0x1202239b8",
+      "offset": 184,
+      "name": "m_oSilentOpenDownloadCDNMgr",
+      "type": "@\"OpenDownloadCDNMgr\""
+    },
+    {
+      "offset_address": "0x1202239ac",
+      "offset": 192,
+      "name": "m_oOpenUploadCDNLargeFileMgr",
+      "type": "@\"OpenUploadCDNMgr\""
+    },
+    {
+      "offset_address": "0x1202239bc",
+      "offset": 200,
+      "name": "m_oOpenDownloadCDNLargeFileMgr",
+      "type": "@\"OpenDownloadCDNMgr\""
+    },
+    {
+      "offset_address": "0x120223960",
+      "offset": 208,
+      "name": "m_oRecordUploadCDNMgr",
+      "type": "@\"RecordBaseUploadCDNMgr\""
+    },
+    {
+      "offset_address": "0x1202239c0",
+      "offset": 216,
+      "name": "m_oRecordDownloadCDNMgr",
+      "type": "@\"RecordDownloadCDNMgr\""
+    },
+    {
+      "offset_address": "0x1202239c4",
+      "offset": 224,
+      "name": "m_oRoomHistoryDownloadCDNMgr",
+      "type": "@\"RoomHistoryDownloadCDNMgr\""
+    },
+    {
+      "offset_address": "0x1202239d0",
+      "offset": 232,
+      "name": "_semaphore",
+      "type": "@\"NSObject<OS_dispatch_semaphore>\""
+    },
+    {
+      "offset_address": "0x120223968",
+      "offset": 240,
+      "name": "m_dateLastNotifySentFail",
+      "type": "@\"NSDate\""
+    },
+    {
+      "offset_address": "0x120223964",
+      "offset": 248,
+      "name": "m_dicSentFailMsg",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1202239d4",
+      "offset": 256,
+      "name": "m_willReloadRevokeMsgArr",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1202239e0",
+      "offset": 264,
+      "name": "_hasCheckMsgTime",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202239e4",
+      "offset": 265,
+      "name": "_isUsingNewImageUploadMgr",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202239d8",
+      "offset": 272,
+      "name": "_imageMaxDisplaySize",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x12022399c",
+      "offset": 280,
+      "name": "_uploadVideoUnifyMgr",
+      "type": "@\"VideoUploadUnifyMgr\""
+    },
+    {
+      "offset_address": "0x1202239c8",
+      "offset": 288,
+      "name": "_assetThreshold",
+      "type": "@\"MessageAssetThreshold\""
+    },
+    {
+      "offset_address": "0x1202239dc",
+      "offset": 296,
+      "name": "_waittingSecMsgCount",
+      "type": "@\"NSNumber\""
+    }
+  ],
+  "MessageRevokeMgr": [
+    {
+      "offset_address": "0x120223aa4",
+      "offset": 8,
+      "name": "_arrRevokeInfo",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x120223aa8",
+      "offset": 16,
+      "name": "_serverIdToBatchRevokingWrapMap",
+      "type": "@\"NSMutableDictionary\""
+    }
+  ],
+  "CMessageWrap": [
+    {
+      "offset_address": "0x120224280",
+      "offset": 8,
+      "name": "m_bNew",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224254",
+      "offset": 12,
+      "name": "m_uiMesLocalID",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224258",
+      "offset": 16,
+      "name": "m_n64MesSvrID",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x12022425c",
+      "offset": 24,
+      "name": "m_nsFromUsr",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224260",
+      "offset": 32,
+      "name": "m_nsToUsr",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242a0",
+      "offset": 40,
+      "name": "m_uiMessageType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224264",
+      "offset": 48,
+      "name": "m_nsContent",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224268",
+      "offset": 56,
+      "name": "m_uiStatus",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12022426c",
+      "offset": 60,
+      "name": "m_uiImgStatus",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224398",
+      "offset": 64,
+      "name": "m_uiMsgFlag",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224270",
+      "offset": 68,
+      "name": "m_uiCreateTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202242b0",
+      "offset": 72,
+      "name": "m_nsPushContent",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12022438c",
+      "offset": 80,
+      "name": "m_nsPushTitle",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224390",
+      "offset": 88,
+      "name": "m_nsPushPrefix",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224388",
+      "offset": 96,
+      "name": "m_nsPushBody",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242b4",
+      "offset": 104,
+      "name": "m_nsMsgSource",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224274",
+      "offset": 112,
+      "name": "m_nsRealChatUsr",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224320",
+      "offset": 120,
+      "name": "m_dtThumbnail",
+      "type": "@\"NSData\""
+    },
+    {
+      "offset_address": "0x120224284",
+      "offset": 128,
+      "name": "m_uiSendTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224288",
+      "offset": 132,
+      "name": "m_uiEmojiStatFlag",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224324",
+      "offset": 136,
+      "name": "m_nsPattern",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224278",
+      "offset": 144,
+      "name": "m_bForward",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12022427c",
+      "offset": 145,
+      "name": "m_bCdnForward",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12022428c",
+      "offset": 148,
+      "name": "m_uiPercent",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224250",
+      "offset": 152,
+      "name": "m_uiDownloadStatus",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202242a8",
+      "offset": 160,
+      "name": "m_extendInfoWithMsgTypeForBiz",
+      "type": "@\"<IMsgExtendOperation>\""
+    },
+    {
+      "offset_address": "0x1202242a4",
+      "offset": 168,
+      "name": "m_extendInfoWithMsgType",
+      "type": "@\"<IMsgExtendOperation>\""
+    },
+    {
+      "offset_address": "0x1202242ac",
+      "offset": 176,
+      "name": "m_extendInfoWithFromUsr",
+      "type": "@\"<IMsgExtendOperation>\""
+    },
+    {
+      "offset_address": "0x120224290",
+      "offset": 184,
+      "name": "m_nsLastDisplayContent",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242b8",
+      "offset": 192,
+      "name": "m_isTempSessionMsg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202242c8",
+      "offset": 193,
+      "name": "m_isEnterpriseMsg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202242e0",
+      "offset": 196,
+      "name": "m_sequenceId",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202242f8",
+      "offset": 200,
+      "name": "m_firstSendMsgId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242fc",
+      "offset": 208,
+      "name": "m_firstSendTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12022439c",
+      "offset": 216,
+      "name": "m_forcePushId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242f4",
+      "offset": 224,
+      "name": "m_uiShareCardMessageStatus",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202243a4",
+      "offset": 232,
+      "name": "_groupInfo",
+      "type": "@\"MessageGroupInfo\""
+    },
+    {
+      "offset_address": "0x120224370",
+      "offset": 240,
+      "name": "m_isP8Msg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202243a0",
+      "offset": 241,
+      "name": "m_bIsFromBrandSession",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12022434c",
+      "offset": 242,
+      "name": "m_bIsBrandSendMass",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224374",
+      "offset": 243,
+      "name": "m_bIsBrandServiceMsg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224354",
+      "offset": 244,
+      "name": "m_bIsPhotoMsg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224344",
+      "offset": 245,
+      "name": "m_bForbidden",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224350",
+      "offset": 246,
+      "name": "m_bIsSubscribeMsg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224358",
+      "offset": 247,
+      "name": "m_bIsAffBrandMsg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12022435c",
+      "offset": 248,
+      "name": "m_bIsPreviewMsg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12022433c",
+      "offset": 249,
+      "name": "_m_nsAtAll",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202243d4",
+      "offset": 250,
+      "name": "_m_ignoreSoftBank",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12022431c",
+      "offset": 251,
+      "name": "_forbidDisplayInSession",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224424",
+      "offset": 252,
+      "name": "_m_bIsAffBrandServiceMsg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224428",
+      "offset": 253,
+      "name": "_m_isPrivateNotiNotify",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224440",
+      "offset": 254,
+      "name": "_m_bIsExpand",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12022444c",
+      "offset": 255,
+      "name": "_m_bIsTimelineBanned",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224450",
+      "offset": 256,
+      "name": "_m_bIsNotificationOnlyShowInSession",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224454",
+      "offset": 257,
+      "name": "_m_bIsExposed",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224458",
+      "offset": 258,
+      "name": "_m_brandIsValidExpose",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224310",
+      "offset": 259,
+      "name": "_m_bIsShowBigPic",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224460",
+      "offset": 260,
+      "name": "_m_bBrandMainSessionMsgExposed",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224474",
+      "offset": 261,
+      "name": "_m_hasResorted",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224494",
+      "offset": 262,
+      "name": "_m_bShouldShowPriorityNotification",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224498",
+      "offset": 263,
+      "name": "_m_bIsClickPriorityNotificationInTL",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202244a8",
+      "offset": 264,
+      "name": "_m_bIsShowFinderRedDot",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202244e4",
+      "offset": 265,
+      "name": "_m_isAITalkingMsg",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202244e8",
+      "offset": 266,
+      "name": "_everForceParseGroupInfo",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120224300",
+      "offset": 268,
+      "name": "m_uiSvrCreateTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224308",
+      "offset": 272,
+      "name": "m_easterEggRandomSeed",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224378",
+      "offset": 276,
+      "name": "m_uiKFType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224334",
+      "offset": 280,
+      "name": "m_uiBizChatVer",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202242c4",
+      "offset": 284,
+      "name": "m_bReceiveMessageSwitchStatus",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224340",
+      "offset": 288,
+      "name": "m_bTextFold",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224360",
+      "offset": 292,
+      "name": "m_uiBizSceneType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224298",
+      "offset": 296,
+      "name": "m_nsBizChatUserType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202242ec",
+      "offset": 300,
+      "name": "m_forwardType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12022429c",
+      "offset": 304,
+      "name": "m_uiIsSenderStatus",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202243b8",
+      "offset": 308,
+      "name": "_m_intellCmdType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202243dc",
+      "offset": 312,
+      "name": "_riskFileFlag",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202243e4",
+      "offset": 316,
+      "name": "_unreadMediaExpired",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202243ec",
+      "offset": 320,
+      "name": "_m_secCtrlFlag",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202243f0",
+      "offset": 324,
+      "name": "_m_blockRange",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202243f4",
+      "offset": 328,
+      "name": "_m_mediaToEmoji",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202243f8",
+      "offset": 332,
+      "name": "_m_selectLength",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202243fc",
+      "offset": 336,
+      "name": "_m_forbidLink",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224400",
+      "offset": 340,
+      "name": "_m_previewType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224404",
+      "offset": 344,
+      "name": "_m_bubbleType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224438",
+      "offset": 348,
+      "name": "_m_brandTimelineMsgId",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224444",
+      "offset": 352,
+      "name": "_m_brandTimelineGroupId",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224448",
+      "offset": 356,
+      "name": "_m_msgPredict",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x120224464",
+      "offset": 360,
+      "name": "_m_brandMainSessionExposeCount",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224468",
+      "offset": 364,
+      "name": "_m_brandMainSessionExposeTotalTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12022446c",
+      "offset": 368,
+      "name": "_m_brandMainSessionExposeMinPos",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12022448c",
+      "offset": 372,
+      "name": "_recRecycleCardType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224490",
+      "offset": 376,
+      "name": "_recCardMediaType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12022449c",
+      "offset": 380,
+      "name": "_m_brandCanvasAdExpiredTimeSec",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202244ac",
+      "offset": 384,
+      "name": "_m_brandMassSendType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202244b4",
+      "offset": 388,
+      "name": "_m_uiMergeShowTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202244bc",
+      "offset": 392,
+      "name": "_m_silentFoldMsgReadStatus",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202244d8",
+      "offset": 396,
+      "name": "_m_showAIReply",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202244e0",
+      "offset": 400,
+      "name": "_sendFailRetCode",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120224384",
+      "offset": 408,
+      "name": "m_easterEggBlockType",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x120224304",
+      "offset": 416,
+      "name": "m_easterEggIncludedType",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x12022436c",
+      "offset": 424,
+      "name": "m_nsKFWorkerOpenID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12022437c",
+      "offset": 432,
+      "name": "m_nsBizClientMsgID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224330",
+      "offset": 440,
+      "name": "m_nsBizChatId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242cc",
+      "offset": 448,
+      "name": "m_nsAtUserList",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224380",
+      "offset": 456,
+      "name": "watchMsgSourceType",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1202242e4",
+      "offset": 464,
+      "name": "m_emojiSecurityInfoList",
+      "type": "@\"EmoticonSecurityInfoList\""
+    },
+    {
+      "offset_address": "0x120224338",
+      "offset": 472,
+      "name": "m_nsDisplayName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242bc",
+      "offset": 480,
+      "name": "m_bizMsgMenuID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242c0",
+      "offset": 488,
+      "name": "m_openkfMsgMenuID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224348",
+      "offset": 496,
+      "name": "m_nsTipsUrl",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224364",
+      "offset": 504,
+      "name": "m_bizMsgType",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x120224368",
+      "offset": 512,
+      "name": "m_byteBuffer",
+      "type": "@\"NSData\""
+    },
+    {
+      "offset_address": "0x1202242d0",
+      "offset": 520,
+      "name": "m_weappSourceUsername",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242d4",
+      "offset": 528,
+      "name": "m_weappChatBotAttachFilePath",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242d8",
+      "offset": 536,
+      "name": "m_weappChatBotAttachFileId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242dc",
+      "offset": 544,
+      "name": "m_weappChatBotAttachFileAesKey",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242e8",
+      "offset": 552,
+      "name": "m_uiPastedFromType",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x120224328",
+      "offset": 560,
+      "name": "m_nsSpecifiedChatName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12022432c",
+      "offset": 568,
+      "name": "m_nsBypMsgExtInfo",
+      "type": "@\"NSData\""
+    },
+    {
+      "offset_address": "0x120224394",
+      "offset": 576,
+      "name": "m_nsWatchUser",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202242f0",
+      "offset": 584,
+      "name": "m_inLenList",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202243a8",
+      "offset": 592,
+      "name": "_m_nsBeforeDisplayContent",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202243ac",
+      "offset": 600,
+      "name": "_m_openImStrId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12022430c",
+      "offset": 608,
+      "name": "_m_bEncUserName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202243b0",
+      "offset": 616,
+      "name": "_m_pushStyle",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x1202243b4",
+      "offset": 624,
+      "name": "_m_uiFinishedLength",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1202243bc",
+      "offset": 632,
+      "name": "_m_intellCmdData",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202243c0",
+      "offset": 640,
+      "name": "_m_loginTaskId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202243c4",
+      "offset": 648,
+      "name": "_m_cbtMDContentHeight",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x120224294",
+      "offset": 656,
+      "name": "_m_nsBizCliMsgId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202243c8",
+      "offset": 664,
+      "name": "_mediaExpireAt",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1202243cc",
+      "offset": 672,
+      "name": "_m_forcePushItem",
+      "type": "@\"StrongNotificationItemPB\""
+    },
+    {
+      "offset_address": "0x1202243d0",
+      "offset": 680,
+      "name": "_m_nsProfileRecommendInfo",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202243d8",
+      "offset": 688,
+      "name": "_riskFileMd5List",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202243e0",
+      "offset": 696,
+      "name": "_riskWarningUrl",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202243e8",
+      "offset": 704,
+      "name": "_m_nsShareTipsUrl",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224408",
+      "offset": 712,
+      "name": "_m_uuid",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12022440c",
+      "offset": 720,
+      "name": "_m_groupUUID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224410",
+      "offset": 728,
+      "name": "_m_publisherId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224414",
+      "offset": 736,
+      "name": "_m_initPublisherId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224418",
+      "offset": 744,
+      "name": "_eggMatch",
+      "type": "@\"MMEasterEggMatch\""
+    },
+    {
+      "offset_address": "0x12022441c",
+      "offset": 752,
+      "name": "_cameraEnterSessionID",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x120224420",
+      "offset": 760,
+      "name": "_m_dicForwardParas",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x120224314",
+      "offset": 768,
+      "name": "_bypSessionId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12022442c",
+      "offset": 776,
+      "name": "_m_brandTLAffMsgId",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x120224430",
+      "offset": 784,
+      "name": "_m_brandTLAffMsgExtraData",
+      "type": "@\"BrandAffMsgExtraData\""
+    },
+    {
+      "offset_address": "0x120224434",
+      "offset": 792,
+      "name": "_m_bsTLAffMsgExtraData",
+      "type": "@\"BSAffMsgExtraData\""
+    },
+    {
+      "offset_address": "0x12022443c",
+      "offset": 800,
+      "name": "_m_brandTimelineSequenceId",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x12022445c",
+      "offset": 808,
+      "name": "_m_bizFlag",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x120224470",
+      "offset": 816,
+      "name": "_m_nsBrandRankSessionId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224478",
+      "offset": 824,
+      "name": "_m_nsResortBuffer",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12022447c",
+      "offset": 832,
+      "name": "_m_readerInfo",
+      "type": "@\"MMReaderInfo\""
+    },
+    {
+      "offset_address": "0x120224480",
+      "offset": 840,
+      "name": "_m_nsRecCardId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224484",
+      "offset": 848,
+      "name": "_m_favJsonData",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224488",
+      "offset": 856,
+      "name": "_m_nsRecReason",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202244a0",
+      "offset": 864,
+      "name": "_m_nsBrandCanvasId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202244a4",
+      "offset": 872,
+      "name": "_m_brandDigestInfo",
+      "type": "@\"BrandResortDigestInfo\""
+    },
+    {
+      "offset_address": "0x1202244b0",
+      "offset": 880,
+      "name": "_m_mergeCount",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x1202244b8",
+      "offset": 888,
+      "name": "_m_notifyMsgBlockFlag",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x1202244c0",
+      "offset": 896,
+      "name": "_m_hasSharedServiceType",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x1202244c4",
+      "offset": 904,
+      "name": "_referHostMsg",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x1202244c8",
+      "offset": 912,
+      "name": "_m_nsSignature",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202244cc",
+      "offset": 920,
+      "name": "_m_appMsgSourceType",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1202244d0",
+      "offset": 928,
+      "name": "_fileSource",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1202244d4",
+      "offset": 936,
+      "name": "_shareMsgObj",
+      "type": "@\"ShareMsgObj\""
+    },
+    {
+      "offset_address": "0x1202244dc",
+      "offset": 944,
+      "name": "_m_aiMsgWording",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120224318",
+      "offset": 952,
+      "name": "_m_mpPageIdentityInfo",
+      "type": "@\"MPPageIdentityInfo\""
+    },
+    {
+      "offset_address": "0x1202244ec",
+      "offset": 960,
+      "name": "_systemMessageWording",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202244f0",
+      "offset": 968,
+      "name": "_systemMessageActionWording",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202244f4",
+      "offset": 976,
+      "name": "_referingMessageWrap",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x1202244f8",
+      "offset": 984,
+      "name": "_referPartialInfo",
+      "type": "@\"MMReferPartialInfo\""
+    },
+    {
+      "offset_address": "0x1202244fc",
+      "offset": 992,
+      "name": "_interactionOptionList",
+      "type": "@\"MessageInteractionOptionList\""
+    },
+    {
+      "offset_address": "0x120224500",
+      "offset": 1000,
+      "name": "_commonTail",
+      "type": "@\"MessageCommonTail\""
+    }
+  ],
+  "SendMessageMgr": [
+    {
+      "offset_address": "0x12022ece8",
+      "offset": 8,
+      "name": "m_oLock",
+      "type": "@\"NSRecursiveLock\""
+    },
+    {
+      "offset_address": "0x12022ecfc",
+      "offset": 16,
+      "name": "m_isSending",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12022ed00",
+      "offset": 20,
+      "name": "m_uiSyncSendCount",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12022ecec",
+      "offset": 24,
+      "name": "m_dtLastSyncSend",
+      "type": "@\"NSDate\""
+    },
+    {
+      "offset_address": "0x12022ecf8",
+      "offset": 32,
+      "name": "m_path",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12022ecf4",
+      "offset": 40,
+      "name": "m_messageQueue",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x12022ecf0",
+      "offset": 48,
+      "name": "m_oMMDB",
+      "type": "@\"CMMDB\""
+    }
+  ],
+  "UploadVoiceCDNMgr": [
+    {
+      "offset_address": "0x12023649c",
+      "offset": 8,
+      "name": "_bSending",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120236490",
+      "offset": 16,
+      "name": "_delegate",
+      "type": "@\"<UploadVoiceDelegate>\""
+    },
+    {
+      "offset_address": "0x120236494",
+      "offset": 24,
+      "name": "_tmpUploadItems",
+      "type": "@\"MemoryMappedKV\""
+    },
+    {
+      "offset_address": "0x120236498",
+      "offset": 32,
+      "name": "_readyUploadItems",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x1202364a0",
+      "offset": 40,
+      "name": "_currentUploadItem",
+      "type": "@\"UploadVoiceWrap\""
+    },
+    {
+      "offset_address": "0x1202364a4",
+      "offset": 48,
+      "name": "_lock",
+      "type": "@\"NSRecursiveLock\""
+    },
+    {
+      "offset_address": "0x1202364a8",
+      "offset": 56,
+      "name": "_timerCheck",
+      "type": "@\"MMTimer\""
+    },
+    {
+      "offset_address": "0x1202364ac",
+      "offset": 64,
+      "name": "_bypSendMsgMgr",
+      "type": "@\"BypSendMessageMgr\""
+    }
+  ],
+  "VoiceMsgDownloader": [
+    {
+      "offset_address": "0x120238e1c",
+      "offset": 8,
+      "name": "_cgiDownloader",
+      "type": "@\"CDownloadVoiceMgr\""
+    },
+    {
+      "offset_address": "0x120238e20",
+      "offset": 16,
+      "name": "_cdnDownloader",
+      "type": "@\"DownloadVoiceCDNMgr\""
+    },
+    {
+      "offset_address": "0x120238e24",
+      "offset": 24,
+      "name": "_downloadCdnFailSvrId",
+      "type": "@\"NSMutableSet\""
+    }
+  ]
+}

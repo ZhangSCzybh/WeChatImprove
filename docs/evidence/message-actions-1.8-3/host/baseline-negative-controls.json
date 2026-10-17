@@ -1,0 +1,26 @@
+{
+  "baseline": "2c343db2f21ec04267d7390c578871ff6b080e9b",
+  "method": "Current tests against baseline Controllers and Hooks in temporary copy; no live files reverted",
+  "results": [
+    {
+      "case": "native-actions",
+      "exit_status": 1,
+      "output": "FAIL line 496: controller.calls.count==1 && [controller.calls[0][0] isEqual:@\"quote\"]"
+    },
+    {
+      "case": "menu",
+      "exit_status": 1,
+      "output": "FAIL line 526: [menu itemsByAddingActionsForCell:cell items:withRepeat]==withRepeat"
+    },
+    {
+      "case": "stickers",
+      "exit_status": 1,
+      "output": "FAIL line 431: [environment controllerForCell:cell]==page"
+    },
+    {
+      "case": "games",
+      "exit_status": 1,
+      "output": "FAIL line 467: items.count==3 && items[0]==forward && items[1]==delete"
+    }
+  ]
+}

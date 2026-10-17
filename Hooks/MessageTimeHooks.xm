@@ -5,6 +5,7 @@
 #import <objc/runtime.h>
 #import "../Controllers/CSMessageMergeAdapter.h"
 #import "../Controllers/CSMessageTimeLayout.h"
+#import "../Controllers/CSMessageCellLifecycle.h"
 
 // UserDefaults Key常量
 static NSString * const kMessageTimeEnabledKey = @"com.wechat.enhance.messageTime.enabled";
@@ -25,7 +26,7 @@ static CGFloat const kDefaultCornerRadius = 2.0f;
 static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
 
 // 类声明
-@interface CommonMessageCellView : UIView <UIGestureRecognizerDelegate>
+@interface CommonMessageCellView : UIView
 @property(readonly, nonatomic) id viewModel; // 消息视图模型
 @property(nonatomic, readonly) UIView *m_contentView; // 内容视图
 - (UIView *)getBgImageView; // 获取背景图片视图
@@ -139,6 +140,26 @@ static BOOL isMessageTimeEnabled() {
     return messageTimeEnabled;
 }
 
+@interface CSMessageTimeTapDelegate : NSObject <UIGestureRecognizerDelegate>
+@property(nonatomic, weak) CommonMessageCellView *cell;
+@end
+@implementation CSMessageTimeTapDelegate
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:(UITouch *)touch {
+    CommonMessageCellView *cell=self.cell;
+    if (!cell || !messageTimeEnabled || ![NSUserDefaults.standardUserDefaults boolForKey:kMessageTimeTapToShowKey]) return NO;
+    UIView *anchor=CSMessageTimeAnchor(cell);
+    if (anchor && CGRectContainsPoint([cell convertRect:anchor.bounds fromView:anchor],[touch locationInView:cell])) return NO;
+    for (UIView *view=touch.view; view && view!=cell; view=view.superview)
+        if ([view isKindOfClass:UIControl.class]) return NO;
+    return YES;
+}
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)other {
+    // Outside-bubble only; no native delegate or failure dependency is changed.
+    return YES;
+}
+@end
+static char kTimeTapDelegateKey;
+
 static UILabel *ensureTimeView(CommonMessageCellView *view) {
     UILabel *label=(UILabel *)getTimeView(view);
     if (label) return label;
@@ -146,7 +167,10 @@ static UILabel *ensureTimeView(CommonMessageCellView *view) {
     label.clipsToBounds=YES;label.textAlignment=NSTextAlignmentCenter;label.hidden=YES;
     setTimeView(view,label);setTimeViewVisible(view,NO);
     UITapGestureRecognizer *tap=[[UITapGestureRecognizer alloc] initWithTarget:view action:NSSelectorFromString(@"handleMessageTap:")];
-    tap.numberOfTapsRequired=1;tap.delegate=view;
+    tap.numberOfTapsRequired=1;
+    CSMessageTimeTapDelegate *delegate=[CSMessageTimeTapDelegate new]; delegate.cell=view;
+    objc_setAssociatedObject(view,&kTimeTapDelegateKey,delegate,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    tap.delegate=delegate;
     tap.delaysTouchesBegan=NO;tap.delaysTouchesEnded=NO;tap.cancelsTouchesInView=NO;
     [view addGestureRecognizer:tap];view.userInteractionEnabled=YES;
     return label;
@@ -244,7 +268,7 @@ static void refreshMessageTimeView(CommonMessageCellView *self) {
         }
 
 
-        [self cs_messageTimeLayout];
+        // Final positioning belongs to the shared lifecycle/merge renderer.
 
         // 添加到视图上
         if (![timeLabel isDescendantOfView:self]) {
@@ -258,18 +282,14 @@ static void refreshMessageTimeView(CommonMessageCellView *self) {
     }
 }
 
-// Hook CommonMessageCellView类，这是消息气泡的基类
-%hook CommonMessageCellView
-- (void)setViewModel:(id)model {
-    if (CSMessageNativeObject(self,@"viewModel") != model) {
-        setTimeViewVisible(self,NO);
-        getTimeView(self).hidden = YES;
-        if (getCurrentVisibleCellView() == self) setCurrentVisibleCellView(nil);
-    }
-    %orig;
-    refreshMessageTimeView(self);
+// These bridges retain the time feature's existing state and measurement behavior.
+void CSMessageTimePrepareCell(id cell) { refreshMessageTimeView(cell); }
+void CSMessageTimeResetCell(id cell) {
+    setTimeViewVisible(cell,NO); getTimeView(cell).hidden=YES;
+    if (getCurrentVisibleCellView()==cell) setCurrentVisibleCellView(nil);
 }
 
+%hook CommonMessageCellView
 %new
 - (void)cs_messageTimeLayout {
     UILabel *label = (UILabel *)getTimeView(self);
@@ -280,25 +300,6 @@ static void refreshMessageTimeView(CommonMessageCellView *self) {
     BOOL sender=NO;
     if (!CSMessageTimeReadSender(model,&sender)) return;
     CSMessageTimePositionLabel(label,self,head,content,sender,timeBelowAvatar);
-}
-
-- (id)initWithViewModel:(id)model {
-    id view=%orig;
-    if (view) refreshMessageTimeView(view);
-    return view;
-}
-
-%new
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    // 允许与其他手势同时识别，不干扰原有手势
-    return YES;
-}
-
-%new
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    // Bubble hit testing below excludes native message actions; do not wait on every
-    // native tap recognizer, which can permanently prevent our outside-bubble tap.
-    return NO;
 }
 
 %new
@@ -357,38 +358,6 @@ static void refreshMessageTimeView(CommonMessageCellView *self) {
     }
 }
 
-- (void)updateNodeStatus {
-    %orig;
-    refreshMessageTimeView(self);
-}
-
-- (void)layoutSubviews {
-    %orig;
-    refreshMessageTimeView(self);
-}
-
-- (void)onAppear {
-    %orig;
-    refreshMessageTimeView(self);
-}
-
-- (void)prepareForReuse {
-    %orig;
-
-    // 重置时间标签的可见状态
-    setTimeViewVisible(self, NO);
-    UILabel *timeLabel = (UILabel *)getTimeView(self);
-    if (timeLabel) {
-        timeLabel.hidden = YES;
-    }
-
-    // 如果当前显示时间的视图是这个视图，清除全局引用
-    id currentVisibleCellView = getCurrentVisibleCellView();
-    if (currentVisibleCellView == self) {
-        setCurrentVisibleCellView(nil);
-    }
-}
-
 %end
 
 static void refreshTimeSettings(BOOL force) {
@@ -401,7 +370,7 @@ static void refreshTimeSettings(BOOL force) {
     messageTimeEnabled = [defaults boolForKey:kMessageTimeEnabledKey];
     timeBelowAvatar = [defaults boolForKey:kMessageTimeShowBelowAvatarKey];
     for (CommonMessageCellView *cell in timeCells) if (cell.window) {
-        refreshMessageTimeView(cell); [cell setNeedsLayout];
+        refreshMessageTimeView(cell); [cell cs_messageTimeLayout]; [cell setNeedsLayout];
     }
 }
 %ctor {

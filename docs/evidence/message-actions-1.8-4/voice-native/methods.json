@@ -1,0 +1,103 @@
+[
+  {
+    "cls": "CMessageWrap",
+    "kind": "instance",
+    "selector": "initWithMsgType:",
+    "address": "0x104b9c5ac",
+    "end": "0x104b9c748",
+    "types": "@24@0:8q16",
+    "file": "CMessageWrap--initWithMsgType_.asm"
+  },
+  {
+    "cls": "CMessageWrap",
+    "kind": "instance",
+    "selector": "initWithMsgType:nsFromUsr:",
+    "address": "0x104b9c748",
+    "end": "0x104b9c8c4",
+    "types": "@32@0:8q16@24"
+  },
+  {
+    "cls": "CMessageWrap",
+    "kind": "instance",
+    "selector": "forwardingTargetForSelector:",
+    "address": "0x104b9f110",
+    "end": "0x104b9f1ac",
+    "types": "@24@0:8:16"
+  },
+  {
+    "cls": "CMessageWrap",
+    "kind": "instance",
+    "selector": "m_extendInfoWithMsgType",
+    "address": "0x104bb41a4",
+    "end": "0x104bb41b4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "AudioSender",
+    "kind": "instance",
+    "selector": "uploaderForMsgWrap:",
+    "address": "0x100176448",
+    "end": "0x1001764e0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "AudioSender",
+    "kind": "instance",
+    "selector": "silkAudioDuration",
+    "address": "0x100177be0",
+    "end": "0x100177c38",
+    "types": "I16@0:8",
+    "file": "AudioSender--silkAudioDuration.asm"
+  },
+  {
+    "cls": "AudioSender",
+    "kind": "instance",
+    "selector": "opusAudioDuration",
+    "address": "0x100177c38",
+    "end": "0x100177c90",
+    "types": "I16@0:8",
+    "file": "AudioSender--opusAudioDuration.asm"
+  },
+  {
+    "cls": "SilkAudioRecorder",
+    "kind": "instance",
+    "selector": "audioDuration",
+    "address": "0x1059fb524",
+    "end": "0x1059fb548",
+    "types": "I16@0:8",
+    "file": "SilkAudioRecorder--audioDuration.asm"
+  },
+  {
+    "cls": "OpusAudioRecorder",
+    "kind": "instance",
+    "selector": "audioDuration",
+    "address": "0x1052afe70",
+    "end": "0x1052afe94",
+    "types": "I16@0:8",
+    "file": "OpusAudioRecorder--audioDuration.asm"
+  },
+  {
+    "cls": "CMessageMgr",
+    "kind": "instance",
+    "selector": "AddLocalMsg:MsgWrap:",
+    "address": "0x104b384f4",
+    "end": "0x104b3850c",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MMNewUploadVoiceMgr",
+    "kind": "instance",
+    "selector": "ResendVoiceMsg:MsgWrap:",
+    "address": "0x10453be60",
+    "end": "0x10453c148",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "UploadVoiceCDNMgr",
+    "kind": "instance",
+    "selector": "ResendVoiceMsg:MsgWrap:",
+    "address": "0x105f63024",
+    "end": "0x105f63380",
+    "types": "v32@0:8@16@24"
+  }
+]

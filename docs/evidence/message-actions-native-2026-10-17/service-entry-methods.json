@@ -1,0 +1,3159 @@
+[
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "batchInsertContactTag:",
+    "address": "0x100bc9f50",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "batchUpdateContactTagName:",
+    "address": "0x100bc9f6c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "batchUpdateContactTagOrder:",
+    "address": "0x100bc9f88",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "batchDeleteContactTagWithArrTagId:",
+    "address": "0x100bc9fa4",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "batchInsertContactTagRelationWithUserName:arrContactTagID:",
+    "address": "0x100bca03c",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getArrContactTagIDWithUserName:",
+    "address": "0x100bca058",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "saveArrSelectRecommTagForStrangerContact:arrSelectRecommTagName:",
+    "address": "0x100bca074",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getRecommendTag:arrHadTagID:",
+    "address": "0x100bca460",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getArrContactTagWithUserName:arrIgnoreContactTagID:",
+    "address": "0x100bca570",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "DisabledShareCardMessageMsg:shareCardMessageState:",
+    "address": "0x100bc9794",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "DisabledShareCardMessageMsg:shareCardMessageState:isSyncExtDevice:",
+    "address": "0x100bc97a4",
+    "types": "v32@0:8@16I24B28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "OnModMsg:MsgWrap:",
+    "address": "0x100bc9c98",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getMsgUserNameLocalID:",
+    "address": "0x100bc9ea4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "udpateSendMsgActionFlag:",
+    "address": "0x100bc8d30",
+    "types": "v20@0:8I16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "asynUdpateContactSendMsgTicketList:",
+    "address": "0x100bc8e50",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getSendMsgActionFlag",
+    "address": "0x100bc9094",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getSendMsgTicketWithUserName:",
+    "address": "0x100bc90f8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactSendMsgTicketFromDic:",
+    "address": "0x100bc91b8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "updateContactSendMsgTicketCache",
+    "address": "0x100bc9438",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "updateContactSendMsgTicket:",
+    "address": "0x100bc954c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reportNewSyncCmdContactImportantChangeData:",
+    "address": "0x100bc7990",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reportGetContactFromServiceContactImportantChangeData:",
+    "address": "0x100bc79a0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reportContactImportantChangeData:actionScene:",
+    "address": "0x100bc79b0",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reportContactImportantChangeData:actionCode:actionScene:",
+    "address": "0x100bc7a9c",
+    "types": "v32@0:8@16I24I28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reportContactImportantChangeData:oldContact:actionCode:actionScene:",
+    "address": "0x100bc7b50",
+    "types": "v40@0:8@16@24I32I36"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reportContactImportantChangeData:oldContact:actionCode:actionScene:isPrintContactInfo:",
+    "address": "0x100bc7b60",
+    "types": "v44@0:8@16@24I32I36B40"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "printContactImportantChangeData:oldContact:",
+    "address": "0x100bc87b0",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reportContactImportantChangeData:actionCode:actionScene:oldValue:newValue:",
+    "address": "0x100bc8948",
+    "types": "v48@0:8@16I24I28@32@40"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "makeSendMsgFailedWithSystemMsgWrap:",
+    "address": "0x100bc6d64",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "makeUnavailableAccountTipWithSystemMsgWrap:",
+    "address": "0x100bc7470",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "OnGetNewXmlMsg:Type:MsgWrap:",
+    "address": "0x100bc78d0",
+    "types": "v40@0:8@16@24@32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "modifyContact:Des:WithBlock:WithDoneBlock:",
+    "address": "0x100bc0cd4",
+    "types": "B48@0:8@16@24@?32@?40"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "modifyOrAddContact:Des:WithAddBlock:AddDoneBlock:WithModBlock:ModDoneBlock:",
+    "address": "0x100bc0f04",
+    "types": "B64@0:8@16@24@?32@?40@?48@?56"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "modifyContact:Des:WithBlock:",
+    "address": "0x100bc1194",
+    "types": "B40@0:8@16@24@?32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "modifyContactForInternel:Des:WithBlock:",
+    "address": "0x100bc1218",
+    "types": "B40@0:8@16@24@?32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "internalNewContact:",
+    "address": "0x100bc129c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:remark:",
+    "address": "0x100bc13f8",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:chatState:",
+    "address": "0x100bc1780",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setHDHeadUpdated:Url:",
+    "address": "0x100bc193c",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setChatRoomHeadImageUrlInLocal:Url:",
+    "address": "0x100bc1bb0",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:antispamTicket:",
+    "address": "0x100bc1de8",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:groupMemberTicket:",
+    "address": "0x100bc1fc4",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:remark:isLocal:",
+    "address": "0x100bc21a0",
+    "types": "B36@0:8@16@24B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "startModifyContactUserName:remark:",
+    "address": "0x100bc2554",
+    "types": "I32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "startModifyContactUserName:remark:isChangeRemark:arrPhone:isChangePhone:contactDesc:isChangecontactDesc:callbackBlock:",
+    "address": "0x100bc2690",
+    "types": "v68@0:8@16@24B32@36B44@48B56@?60"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setPhone:Contact:",
+    "address": "0x100bc27ec",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setPhone:Contact:isLocal:",
+    "address": "0x100bc27fc",
+    "types": "B36@0:8@16@24B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:cardDesc:",
+    "address": "0x100bc2ae4",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:cardDesc:isLocal:",
+    "address": "0x100bc2af4",
+    "types": "B36@0:8@16@24B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:cardUrl:",
+    "address": "0x100bc2de0",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:arrCardItem:",
+    "address": "0x100bc2f3c",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:nickName:",
+    "address": "0x100bc3098",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "clearDraftForContact:",
+    "address": "0x100bc31d8",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:mobileIdentify:",
+    "address": "0x100bc336c",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:labelIDList:",
+    "address": "0x100bc354c",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:snsBlack:",
+    "address": "0x100bc3628",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:WeRunBlack:",
+    "address": "0x100bc3854",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:owner:",
+    "address": "0x100bc3a80",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:chatRoomData:",
+    "address": "0x100bc3c74",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:RoomDetail:",
+    "address": "0x100bc3db4",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:chatRoomAccessType:qrCodeAccessType:",
+    "address": "0x100bc3ef4",
+    "types": "B32@0:8@16I24I28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:nsAdminList:nsMemberList:",
+    "address": "0x100bc4068",
+    "types": "B40@0:8@16@24@32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:RoomSpecialAttentionList:isNotify:",
+    "address": "0x100bc4220",
+    "types": "B36@0:8@16@24B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:chatRoomMemList:isNotify:",
+    "address": "0x100bc4418",
+    "types": "B36@0:8@16@24B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:chatRoomBusinessType:",
+    "address": "0x100bc45c8",
+    "types": "B32@0:8@16Q24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:localBitFlag:",
+    "address": "0x100bc46f0",
+    "types": "B32@0:8@16Q24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:localAddContactTime:",
+    "address": "0x100bc4818",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setBlackInLocal:blackFlag:",
+    "address": "0x100bc49b0",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setBlack:blackFlag:sync:",
+    "address": "0x100bc4bdc",
+    "types": "B32@0:8@16B24B28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setBlack:",
+    "address": "0x100bc5044",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setNoBlack:",
+    "address": "0x100bc5058",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setBlack:sync:",
+    "address": "0x100bc506c",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setNoBlack:sync:",
+    "address": "0x100bc5080",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addFromMobileContact:",
+    "address": "0x100bc5094",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addContactInternal:",
+    "address": "0x100bc5334",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addLocalContact:listType:",
+    "address": "0x100bc5510",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addContact:listType:opLog:callExt:",
+    "address": "0x100bc5764",
+    "types": "B36@0:8@16I24B28B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addContact:listType:",
+    "address": "0x100bc5ca8",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "RemoveContactFromChatList:",
+    "address": "0x100bc5cbc",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:socialBlack:",
+    "address": "0x100bc5e64",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContactUserName:chatRoomLocalSendUpgradeType:",
+    "address": "0x100bc60ac",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setLocalPatSuffixWithUserName:patSuffix:",
+    "address": "0x100bc61e0",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getLocalSelfPatSuffixJson",
+    "address": "0x100bc6394",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContactUserName:textStateId:extInfo:",
+    "address": "0x100bc6494",
+    "types": "B40@0:8@16@24@32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setLocalListTypeWithUserName:listType:addFlag:",
+    "address": "0x100bc67a0",
+    "types": "B32@0:8@16I24B28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:isInChatBox:",
+    "address": "0x100bc699c",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:isShowOpenIMStoragePopUp:openIMPrivacyAgreementUrl:",
+    "address": "0x100bc6b40",
+    "types": "B36@0:8@16B24@28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "deleteChatRoomTopMsgWithUserName:insertNewTopMsgList:",
+    "address": "0x100bbe824",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getChatRoomTopMsgInfoListWithUserName:isAllResult:",
+    "address": "0x100bbe904",
+    "types": "@28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "removeChatRoomTopMsgLocalWithUserName:topId:",
+    "address": "0x100bbe9dc",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "removeChatRoomTopMsgLocalWithUserName:msgSvrID:",
+    "address": "0x100bbeaac",
+    "types": "B32@0:8@16Q24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addChatRoomTopMsgLocalWithUserName:topMsgInfo:",
+    "address": "0x100bbeb7c",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setChatRoomTopMsgLocalRevokeWithUserName:msgSvrID:",
+    "address": "0x100bbec5c",
+    "types": "B32@0:8@16Q24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setChatRoomTopMsgExposureTimeWithUserName:msgSvrID:exposureTime:",
+    "address": "0x100bbed2c",
+    "types": "B36@0:8@16Q24I32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "insertOrUpdateNewTopMsgListWithUserName:newTopMsgList:",
+    "address": "0x100bbee04",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "checkIsHadTopMsgWithUserName:msgSvrID:",
+    "address": "0x100bbeee4",
+    "types": "B32@0:8@16Q24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "updateContactInSequence:modContact:",
+    "address": "0x100bbefb4",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "updateContactInSequence:fieldUpdateCtrlInfoList:",
+    "address": "0x100bbf02c",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "rollbackContact:dbContact:svrFieldUpdateCtrlInfo:",
+    "address": "0x100bbf8e4",
+    "types": "v40@0:8@16@24@32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "copyValueToContact:fromContactProperty:",
+    "address": "0x100bbfdf0",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "handleSynStrangerContactProperty:",
+    "address": "0x100bbff8c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "fullUpdateAllContactVerifyRecord:",
+    "address": "0x100bc0654",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "batchInsertOrUpdateContactVerifyRecord:",
+    "address": "0x100bc0670",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "deleteContactVerifyRecordWithUserName:",
+    "address": "0x100bc068c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "deleteStaleContactVerifyRecordWithUserName:currentMsgId:",
+    "address": "0x100bc0700",
+    "types": "B32@0:8@16Q24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactVerifyRecordListWithlastVersion:limit:",
+    "address": "0x100bc0784",
+    "types": "@32@0:8Q16q24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactVerifyRecordWithUserName:",
+    "address": "0x100bc0958",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "hasContactVerifyRecordWithMsgSvrID:",
+    "address": "0x100bc0a20",
+    "types": "B24@0:8Q16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getUnreadContactVerifyRecordCountAfterVersion:",
+    "address": "0x100bc0a3c",
+    "types": "I24@0:8Q16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setVerifyRecordSyncSuccessFlag:",
+    "address": "0x100bc0c1c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getVerifyRecordSyncSuccessFlag",
+    "address": "0x100bc0c74",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactFromDic:",
+    "address": "0x100bbac6c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContactToDic:forKey:",
+    "address": "0x100bbb234",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "removeContactFromDic:",
+    "address": "0x100bbb554",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactFromDB:",
+    "address": "0x100bbb6b0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "removeContactFromDB:",
+    "address": "0x100bbb7c0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addContactToDb:",
+    "address": "0x100bbb8f4",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "updateContactToDb:",
+    "address": "0x100bbbb40",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "loadContactExtInfo:",
+    "address": "0x100bbbe28",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setMigrationFinished",
+    "address": "0x100bbbed0",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "splist_migrationContactList:",
+    "address": "0x100bbbfd4",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reportMigrationStat:status:",
+    "address": "0x100bbc6d8",
+    "types": "v24@0:8I16I20"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "migrationContacts:first:",
+    "address": "0x100bbc818",
+    "types": "B24@0:8I16B20"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllContactList:listType:",
+    "address": "0x100bbcbcc",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllContactNoExtInfoList:listType:",
+    "address": "0x100bbd0b8",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllContactNoExtInfoList:listType:typeExt:",
+    "address": "0x100bbd4ec",
+    "types": "B36@0:8@16I24Q28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllUserName:",
+    "address": "0x100bbd508",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllRemarkList:listType:",
+    "address": "0x100bbd640",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addOrUpdateContactToDB:listType:add:modify:",
+    "address": "0x100bbd790",
+    "types": "@44@0:8@16I24^B28^B36"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "thread_BatchModifyContact:isInit:",
+    "address": "0x100bbdae4",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "thread_BatchModifyContact:",
+    "address": "0x100bbdfa0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "thread_onPushModifyContact:isInit:arrNewContact:",
+    "address": "0x100bbdfb0",
+    "types": "B36@0:8@16B24@28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "ModifyNotifyStatus:withStatus:",
+    "address": "0x100bbe590",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "SetFriendMetaFlag:ForUser:",
+    "address": "0x100bbe614",
+    "types": "B28@0:8I16@20"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "ModifyContactEncryptSecret:withEncryptSecretInfo:",
+    "address": "0x100bbe69c",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "deleteChatRoomToolWeAppInDBWithUserName:insertNewWeAppItemList:",
+    "address": "0x100bbaac4",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getChatRoomToolWeAppListInDBWithUserName:",
+    "address": "0x100bbaba4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getBestCacheOptimizeStrategyFromTime:",
+    "address": "0x100bba8e4",
+    "types": "@24@0:8d16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getMatchStrategyFeatureRecordCountFromTime:strategyFeature:",
+    "address": "0x100bba900",
+    "types": "I32@0:8d16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addContactCacheAccessUserFeatureRecrods:",
+    "address": "0x100bba91c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "removeContactCacheAccessUserFeatureRecrodsToTime:",
+    "address": "0x100bba938",
+    "types": "B20@0:8I16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllChatRoomStrangerCount",
+    "address": "0x100bba954",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getFirstRecordCacheOptimizeInfoTime",
+    "address": "0x100bba970",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addChatRoomStrangerRemark:",
+    "address": "0x100bba98c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onServiceInit",
+    "address": "0x100fc6bac",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "initLock",
+    "address": "0x100fc6ef4",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "initListen",
+    "address": "0x100fc6f50",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "removeListen",
+    "address": "0x100fc709c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "dealloc",
+    "address": "0x100fc71e8",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "isCacheAllLoaded",
+    "address": "0x100fc7294",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addSelfContactToCache",
+    "address": "0x100fc72b0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "autoreloadContacts:",
+    "address": "0x100fc7328",
+    "types": "i20@0:8I16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "autoreloadContacts:needLoadExt:",
+    "address": "0x100fc7338",
+    "types": "i24@0:8I16B20"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addDictoryDataToCache:listType:",
+    "address": "0x100fc737c",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "refreshPluginNickName:",
+    "address": "0x100fc75e0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "refreshContactLocalData",
+    "address": "0x100fc7758",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "internalUpdateContactLocalDataWithUserName:",
+    "address": "0x100fc7914",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "generatePluginContact:uiType:",
+    "address": "0x100fc7a24",
+    "types": "@28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "generatePluginContact:",
+    "address": "0x100fc7ba0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "generatePluginContactNoListContact:",
+    "address": "0x100fc7bb0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "generateOfficialContact:",
+    "address": "0x100fc7bc0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addAddHardcodeContact:selector:",
+    "address": "0x100fc7e24",
+    "types": "v32@0:8@16:24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addHardCodeContacts",
+    "address": "0x100fc81c4",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addHardcodeOfficialContactWithUsrName:",
+    "address": "0x100fc89a0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "isHardCodeContact:",
+    "address": "0x100fc8a7c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "interalReloadContacts:needLoadExt:",
+    "address": "0x100fc8ac4",
+    "types": "i24@0:8I16B20"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "isContactMatch:listType:contactType:",
+    "address": "0x100fc8e40",
+    "types": "B32@0:8@16I24I28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "handleOfficalContactName:",
+    "address": "0x100fc8f38",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "handleWeChatTeamNickName:",
+    "address": "0x100fc91f0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "mergeChatRoomData:oldContact:",
+    "address": "0x100fc9394",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "isChatRoomMember:",
+    "address": "0x100fc9a08",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "internalModifyContact:CallExt:",
+    "address": "0x100fc9c08",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "callOnModifyExt:",
+    "address": "0x100fc9dc4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "callOnDeleteExt:",
+    "address": "0x100fca1c0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "callOnModifyContactHeadImageExt:",
+    "address": "0x100fca51c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "callOnRemoveContactFromAddressBook:",
+    "address": "0x100fca730",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "callOnDeleteContactIsShouldKeep:",
+    "address": "0x100fca8f4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reloadContact:mergeImage:",
+    "address": "0x100fca9e8",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "handleLocalField:oldContact:",
+    "address": "0x100fcab34",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "handleNotChatRoomMemberField:oldContact:",
+    "address": "0x100fcbdd8",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "main_onPushModifyContact:",
+    "address": "0x100fcc1ec",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onPushModifyContact:",
+    "address": "0x100fcc1f8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onPushDeleteContact:",
+    "address": "0x100fcc7b0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "isUserNewDB",
+    "address": "0x100fccfdc",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "checkHadLoadContactDB",
+    "address": "0x100fcd0a8",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "updateNewDB:NewUser:",
+    "address": "0x100fcd0b8",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "initDB:",
+    "address": "0x100fcd4e8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "updateCache:",
+    "address": "0x100fcd578",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactByName:",
+    "address": "0x100fcd954",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactByNameFromDB:",
+    "address": "0x100fcdef4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactByNameFromCache:",
+    "address": "0x100fce098",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getMessageChatContactByMessageWrap:",
+    "address": "0x100fce1c8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "isContactBlack:",
+    "address": "0x100fcef48",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "isContactExistLocal:",
+    "address": "0x100fcefd8",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "isInContactList:",
+    "address": "0x100fcf100",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "isBelongToMMContactInCache:",
+    "address": "0x100fcf1f0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactList:contactType:",
+    "address": "0x100fcf250",
+    "types": "@24@0:8I16I20"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactList:contactType:needLoadExt:",
+    "address": "0x100fcf260",
+    "types": "@28@0:8I16I20B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getCustAsstContactList",
+    "address": "0x100fcf5a0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactListByTypeExt:listType:",
+    "address": "0x100fcf5ec",
+    "types": "@28@0:8Q16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllEnterpriseMainBrandContacts",
+    "address": "0x100fcf69c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllBrandContacts",
+    "address": "0x100fcf9dc",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllSubscriptionBrandContacts",
+    "address": "0x100fcfd1c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllPhotoBrandContacts",
+    "address": "0x100fd005c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllPhotoAndServiceContacts",
+    "address": "0x100fd039c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "deleteContactLocal:listType:",
+    "address": "0x100fd06f0",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "deleteContact:listType:",
+    "address": "0x100fd0708",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "deleteContact:listType:sync:",
+    "address": "0x100fd0720",
+    "types": "B32@0:8@16I24B28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "deleteContact:listType:andScene:sync:",
+    "address": "0x100fd0738",
+    "types": "B36@0:8@16I24I28B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "deleteContact:listType:andScene:sync:local:",
+    "address": "0x100fd0748",
+    "types": "B40@0:8@16I24I28B32B36"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "modifyContactNickName:nickName:callMod:",
+    "address": "0x100fd0f4c",
+    "types": "v36@0:8@16@24B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:typeBit:set:sync:localSet:",
+    "address": "0x100fd118c",
+    "types": "B40@0:8@16I24B28B32B36"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:typeBit:set:sync:",
+    "address": "0x100fd18a0",
+    "types": "B36@0:8@16I24B28B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setLocalContact:notifyOpen:",
+    "address": "0x100fd18b0",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:favour:sync:",
+    "address": "0x100fd1944",
+    "types": "B32@0:8@16B24B28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:watchContact:sync:",
+    "address": "0x100fd19d0",
+    "types": "B32@0:8@16B24B28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:notifyOpen:sync:",
+    "address": "0x100fd1a5c",
+    "types": "B32@0:8@16B24B28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:notifyOpen:sync:localSet:",
+    "address": "0x100fd1a6c",
+    "types": "B36@0:8@16B24B28B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:sessionTop:sync:",
+    "address": "0x100fd1b2c",
+    "types": "B32@0:8@16B24B28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:sessionTop:sync:localSet:",
+    "address": "0x100fd1b3c",
+    "types": "B36@0:8@16B24B28B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setLocalContactToUntopSession:",
+    "address": "0x100fd1c7c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reloadContactImageStatus:Status:Image:",
+    "address": "0x100fd1c98",
+    "types": "v40@0:8@16@24@32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "thread_saveContactImageStatus:Status:Image:Url:",
+    "address": "0x100fd1ef0",
+    "types": "v48@0:8@16@24@32@40"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reportIDKey:stranger:",
+    "address": "0x100fd2404",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "doReportIDKeyWithUiFriendInAddr:andUiFriendNotInAddr:andUiChatRoomInAddr:andUiChatRoomNotInAddr:andUiAll:andCacheCount:",
+    "address": "0x100fd266c",
+    "types": "v44@0:8I16I20I24I28I32Q36"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "optimizeReportIDKey:stranger:",
+    "address": "0x100fd2aa0",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "delayLoadAllContactInBackGround",
+    "address": "0x100fd2d30",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reloadContact:",
+    "address": "0x100fd3878",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "tryLoadExtInfoForContact:",
+    "address": "0x100fd392c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "checkIfForbiddenGetContact:",
+    "address": "0x100fd3a70",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "addToGetContactMap:",
+    "address": "0x100fd3bc4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "internalGetContactsFromSvr:chatContact:withScene:usrData:",
+    "address": "0x100fd3c48",
+    "types": "B44@0:8@16@24i32@36"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactsFromSvrForTempChat:",
+    "address": "0x100fd3c5c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactsFromServer:chatContact:withScene:",
+    "address": "0x100fd3ccc",
+    "types": "B36@0:8@16@24I32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactsFromServer:withScene:",
+    "address": "0x100fd3cdc",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getInviteeContactsFromServer:withTicket:",
+    "address": "0x100fd3cf0",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactsFromServer:chatContact:withScene:withTicket:",
+    "address": "0x100fd3d10",
+    "types": "B44@0:8@16@24I32@36"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactsFromServer:chatContact:withScene:withTicket:usrData:",
+    "address": "0x100fd3d24",
+    "types": "B52@0:8@16@24i32@36@44"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getGroupCardMemberList:",
+    "address": "0x100fd49f0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "fixContactPluginOldData",
+    "address": "0x100fd4d14",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "updateContactLocalData",
+    "address": "0x100fd4f1c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getSocialBlackList",
+    "address": "0x100fd5120",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getLimitedModeGuardianContact",
+    "address": "0x100fd5328",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getFinderBlackList",
+    "address": "0x100fd5558",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactActiveTLastTime:",
+    "address": "0x100fd5760",
+    "types": "I24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:typeExtBit:set:sync:localSet:",
+    "address": "0x100fd5948",
+    "types": "B40@0:8@16I24B28B32B36"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:typeExtBit:set:sync:",
+    "address": "0x100fd5c98",
+    "types": "B36@0:8@16I24B28B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "batchUpdateContactBasicInfo:",
+    "address": "0x100fd5ca8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:foldSingleChat:sync:",
+    "address": "0x100fd61a0",
+    "types": "B32@0:8@16B24B28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setContact:foldSingleChat:sync:localSet:",
+    "address": "0x100fd61b0",
+    "types": "B36@0:8@16B24B28B32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onServiceMemoryWarning",
+    "address": "0x100fd624c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onServiceClearData",
+    "address": "0x100fd6264",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onServiceEnterBackground",
+    "address": "0x100fd62cc",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "updateSelfContactLocalPatSuffix",
+    "address": "0x100fd630c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onLanguageChange",
+    "address": "0x100fd6548",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onRegCountryChange",
+    "address": "0x100fd6588",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "main_onPushBatchModContact:",
+    "address": "0x100fd65c8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onNewSyncDeleteContact:",
+    "address": "0x100fd70a4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onProfilePreChange",
+    "address": "0x100fd71b0",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onProfileChange",
+    "address": "0x100fd720c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onNewSyncBatchModContacts:",
+    "address": "0x100fd7288",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "thread_HandleMemContact:",
+    "address": "0x100fd7294",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "thread_ReloadMemConact:ChatRoom:",
+    "address": "0x100fd7adc",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "MainThread_ReloadMemContact:",
+    "address": "0x100fd7bb0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onGetContact:",
+    "address": "0x100fd7da0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "MessageReturn:Event:",
+    "address": "0x100fd8fa8",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "shouldUpdateContact:",
+    "address": "0x100fd9028",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "updateLimitDuration",
+    "address": "0x100fd91d4",
+    "types": "d16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "updateContactToCache:",
+    "address": "0x100fd91e0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getSelfContact",
+    "address": "0x100fd9274",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setSelfContactUpdated",
+    "address": "0x100fd99f0",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "main_onPushDeleteContact:",
+    "address": "0x100fd9a14",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "main_onPushAddContact:",
+    "address": "0x100fd9dec",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "main_onPushAddBrandContact:",
+    "address": "0x100fd9fb0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "thread_onpushBatchModContact:",
+    "address": "0x100fda174",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "thread_onBatchModifyChatRoomMember:",
+    "address": "0x100fda248",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "ChangeNotifyStatusForChatRoom:withStatus:sync:",
+    "address": "0x100fdb048",
+    "types": "B32@0:8@16B24B28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "ChangeNotifyStatus:withStatus:sync:",
+    "address": "0x100fdb178",
+    "types": "B32@0:8@16B24B28"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "ChangeUnfoldSns:withStatus:",
+    "address": "0x100fdb384",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "setChatRoomDataJoinInfo:andModContact:getContactScene:",
+    "address": "0x100fdb42c",
+    "types": "v36@0:8@16@24I32"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "canDeleteContactInNewSyn:",
+    "address": "0x100fdb9dc",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "onBrandContactModified:withAttrChanged:",
+    "address": "0x100fdba58",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "isHeadImgUpdated:Local:",
+    "address": "0x100fdbef8",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "callModifyContactForCPState:",
+    "address": "0x100fdc0c4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactForSearchByName:",
+    "address": "0x100fdc0d8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllContactUserName",
+    "address": "0x100fdc224",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAllContactUserNameFromCache",
+    "address": "0x100fdc268",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactCount",
+    "address": "0x100fdc2d0",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getContactByAlias:",
+    "address": "0x100fdc35c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getAddsceneChatRoomContactSource:fromMe:",
+    "address": "0x100fdc5dc",
+    "types": "@28@0:8@16B24"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "openIMMgr",
+    "address": "0x100fdc914",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "contactUpdateMgr",
+    "address": "0x100fdc924",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "contactCacheOptimizeMgr",
+    "address": "0x100fdc934",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "contactConfigMgr",
+    "address": "0x100fdc944",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getIndexRecordOfTypeForFTS:",
+    "address": "0x100fdc954",
+    "types": "@20@0:8i16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getUnIndexRecordCountOfType:",
+    "address": "0x100fdc998",
+    "types": "I20@0:8i16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "getUnIndexContactOfType:limit:",
+    "address": "0x100fdc9c4",
+    "types": "@24@0:8i16I20"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "markIndexUpdatedOfType:success:",
+    "address": "0x100fdca08",
+    "types": "B24@0:8i16B20"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "clearFTSIndexRecord",
+    "address": "0x100fdca34",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "reloadSkipContactDictionary",
+    "address": "0x100fdca4c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": "botContactMgr",
+    "address": "0x100fdca58",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x100fdca68",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "class",
+    "selector": "getShareCardMsgFtsTextWithMsgContent:",
+    "address": "0x100bc9b08",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "class",
+    "selector": "reportGroupCreateResultWithSessionId:andChatRoomUserName:andActionCode:andChatRoomCreateResult:",
+    "address": "0x100bc8b08",
+    "types": "v40@0:8@16@24I32i36"
+  },
+  {
+    "class": "CContactMgr",
+    "kind": "class",
+    "selector": "reportGroupCreateResultWithSessionId:andChatRoomUserName:andActionCode:",
+    "address": "0x100bc8d20",
+    "types": "v36@0:8@16@24I32"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "initWithContext:",
+    "address": "0x11759dc3c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "dealloc",
+    "address": "0x11759ddac",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "isServiceExist:",
+    "address": "0x11759dec8",
+    "types": "B24@0:8#16"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "getService:",
+    "address": "0x11759df30",
+    "types": "@24@0:8#16"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "setService:forClass:",
+    "address": "0x11759e888",
+    "types": "v32@0:8@16#24"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "removeService:",
+    "address": "0x11759e9b4",
+    "types": "v24@0:8#16"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "precreateServices:",
+    "address": "0x11759eb04",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "callEnterForeground",
+    "address": "0x11759ed04",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "callEnterBackground",
+    "address": "0x11759ef4c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "callTerminate",
+    "address": "0x11759f194",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "callMemoryWarning",
+    "address": "0x11759f4a0",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "callClearMemoryCache:addedUserType:",
+    "address": "0x11759f7ac",
+    "types": "v32@0:8Q16Q24"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "callClearMemoryCacheInBackground",
+    "address": "0x11759fa08",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "callPauseBackgroundTask:",
+    "address": "0x11759fc50",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "callResumeBackgroundTask:",
+    "address": "0x11759fea4",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "removeAllServices",
+    "address": "0x1175a00f8",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "callClearData",
+    "address": "0x1175a01f0",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "callClearDataAfter",
+    "address": "0x1175a048c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "commonInClearData:",
+    "address": "0x1175a098c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "userWillLogin",
+    "address": "0x1175a0ac4",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": "userDidLogout",
+    "address": "0x1175a0b08",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceCenter",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1175a0b48",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "weakContextObject",
+    "address": "0x11758cf40",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "weakContextObjectWithContext:",
+    "address": "0x11758cf80",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "strongContextObject",
+    "address": "0x11758d110",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "strongContextObjectWithContext:",
+    "address": "0x11758d150",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "dealloc",
+    "address": "0x1175dc7e8",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "context",
+    "address": "0x1175dc8f8",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "initWithContext:",
+    "address": "0x1175dc900",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "unsafeUnwrap",
+    "address": "0x1175dc910",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "onServiceInit",
+    "address": "0x1175dc924",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "onServiceEnterBackground",
+    "address": "0x1175dc928",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "onServiceEnterForeground",
+    "address": "0x1175dc92c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "onServiceTerminate",
+    "address": "0x1175dc930",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "onServiceMemoryWarning",
+    "address": "0x1175dc934",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "onServiceClearMemoryCache:addedUserType:",
+    "address": "0x1175dc938",
+    "types": "v32@0:8Q16Q24"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "onServiceClearMemoryCacheInBackground",
+    "address": "0x1175dc93c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "onServicePauseBackgroundTask:",
+    "address": "0x1175dc940",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "onServiceResumeBackgroundTask:",
+    "address": "0x1175dc944",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "onServiceClearData",
+    "address": "0x1175dc948",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "isServiceRemoved",
+    "address": "0x1175dc94c",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": "setIsServiceRemoved:",
+    "address": "0x1175dc954",
+    "types": "v20@0:8B16"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1175dc95c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "class",
+    "selector": "canUseInSafemode",
+    "address": "0x1175dc914",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "MMBaseService",
+    "kind": "class",
+    "selector": "enableCyclicDependencyCheck",
+    "address": "0x1175dc91c",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "getService:",
+    "address": "0x117609d44",
+    "types": "@24@0:8#16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "isServiceExist:",
+    "address": "0x117609e44",
+    "types": "B24@0:8#16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "removeService:",
+    "address": "0x117609f3c",
+    "types": "v24@0:8#16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "setService:forClass:",
+    "address": "0x11760a078",
+    "types": "v32@0:8@16#24"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "unsafeGetServiceWrapper:",
+    "address": "0x11760a100",
+    "types": "@24@0:8#16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "precreateServices:",
+    "address": "0x11760a10c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "enableTask",
+    "address": "0x1175b53e8",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "isNetworkingStarted",
+    "address": "0x1175b3ba8",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "startNetworking",
+    "address": "0x1175b3bc4",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "stopNetworking",
+    "address": "0x1175b3c08",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "marsContext",
+    "address": "0x1175b3c24",
+    "types": "^v16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "marsLongLinkName",
+    "address": "0x1175b3c38",
+    "types": "^v16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "registerExtension:withTarget:",
+    "address": "0x11758edb4",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "unRegisterExtension:withTarget:",
+    "address": "0x11758eea0",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "registerExtension:withKey:withTarget:",
+    "address": "0x11758ef8c",
+    "types": "v40@0:8@16@24@32"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "unRegisterExtension:withKey:withTarget:",
+    "address": "0x11758f0ac",
+    "types": "v40@0:8@16@24@32"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "unRegisterAllKeyExtension:withTarget:",
+    "address": "0x11758f1cc",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "callExtension:selector:block:",
+    "address": "0x11758f2b8",
+    "types": "v40@0:8@16:24@?32"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "callKeyExtension:key:selector:block:",
+    "address": "0x11758f540",
+    "types": "v48@0:8@16@24:32@?40"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "callExtensionOnMainThread:selector:sync:block:",
+    "address": "0x11758f800",
+    "types": "v44@0:8@16:24B32@?36"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "callKeyExtensionOnMainThread:key:selector:sync:block:",
+    "address": "0x11758faa8",
+    "types": "v52@0:8@16@24:32B40@?44"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "callExtensionContinuously:selector:block:",
+    "address": "0x11758fd88",
+    "types": "v40@0:8@16:24@?32"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "callKeyExtensionContinuously:key:selector:block:",
+    "address": "0x117590010",
+    "types": "v48@0:8@16@24:32@?40"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "callExtensionOnMainThreadContinuously:selector:sync:block:",
+    "address": "0x1175902d0",
+    "types": "v44@0:8@16:24B32@?36"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "callKeyExtensionOnMainThreadContinuously:key:selector:sync:block:",
+    "address": "0x117590578",
+    "types": "v52@0:8@16@24:32B40@?44"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "getUin",
+    "address": "0x10007eb48",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "getUinStr",
+    "address": "0x10007eb54",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "affContext",
+    "address": "0x10007ebf0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x1175e3830",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "initWithContextType:",
+    "address": "0x1175e3848",
+    "types": "@24@0:8Q16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "setUin:userName:",
+    "address": "0x1175e38d4",
+    "types": "v32@0:8{Uin64=Q}16@24"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "setLongLink:",
+    "address": "0x1175e3c14",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "longLink",
+    "address": "0x1175e3c8c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "checkExistExtensionIfNeeded",
+    "address": "0x1175e3c94",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "mainController",
+    "address": "0x1175e3cb4",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "isRootContext",
+    "address": "0x1175e3dd8",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "isUserContext",
+    "address": "0x1175e3de8",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "isInvalidContext",
+    "address": "0x1175e3df8",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "description",
+    "address": "0x1175e3e08",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "uin",
+    "address": "0x1175e3ed8",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "uin64",
+    "address": "0x1175e3f58",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "uinString",
+    "address": "0x1175e3fd8",
+    "types": "r*16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "userName",
+    "address": "0x1175e4054",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "userMd5",
+    "address": "0x1175e40e4",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "userDocumentPath",
+    "address": "0x1175e4174",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "userLibraryCachePath",
+    "address": "0x1175e4204",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "setMainController:",
+    "address": "0x1175e4404",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "serviceCenter",
+    "address": "0x1175e4410",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "extensionCenter",
+    "address": "0x1175e4418",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "contextLock",
+    "address": "0x1175e4420",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": "setContextLock:",
+    "address": "0x1175e4428",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1175e4434",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "instance",
+    "selector": ".cxx_construct",
+    "address": "0x1175e44d0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "CancelAllMMTasksNotification",
+    "address": "0x117641958",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "contextFromTask",
+    "address": "0x1176419f8",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "initialize",
+    "address": "0x1175c4bec",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "initContextEnvironment",
+    "address": "0x1175c4c60",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "currentContext",
+    "address": "0x1175c4c64",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "lastContext",
+    "address": "0x1175c4d20",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "rootContext",
+    "address": "0x1175c4df0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "activeUserContext",
+    "address": "0x1175c4dfc",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "push:",
+    "address": "0x1175c4e28",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "pop:",
+    "address": "0x1175c4f84",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "setContext:atIndex:",
+    "address": "0x1175c5114",
+    "types": "v32@0:8@16Q24"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "currentUin",
+    "address": "0x1175c5244",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "currentUin64",
+    "address": "0x1175c52e8",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "currentUinString",
+    "address": "0x1175c538c",
+    "types": "r*16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "isLoggedIn",
+    "address": "0x1175c542c",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "currentUinStrForLog",
+    "address": "0x1175c5450",
+    "types": "r*16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "currentUserType",
+    "address": "0x1090b6560",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "maxUserType",
+    "address": "0x1090b656c",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "addUserType:",
+    "address": "0x1090b6578",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "removeUserType:",
+    "address": "0x1090b6834",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "currentUserTypeHas:",
+    "address": "0x1090b6ae0",
+    "types": "B24@0:8Q16"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "currentUserName",
+    "address": "0x1175e4294",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "currentUserMd5",
+    "address": "0x1175e42f0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "currentUserDocumentPath",
+    "address": "0x1175e434c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMContext",
+    "kind": "class",
+    "selector": "currentUserLibraryCachePath",
+    "address": "0x1175e43a8",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "weakContextObject",
+    "address": "0x11758d2e0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "weakContextObjectWithContext:",
+    "address": "0x11758d320",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "strongContextObject",
+    "address": "0x11758d43c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "strongContextObjectWithContext:",
+    "address": "0x11758d47c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "initWithServiceObj:",
+    "address": "0x1175fbe48",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "dealloc",
+    "address": "0x1175fbe88",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "forwardingTargetForSelector:",
+    "address": "0x1175fbff8",
+    "types": "@24@0:8:16"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "methodSignatureForSelector:",
+    "address": "0x1175fc03c",
+    "types": "@24@0:8:16"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "forwardInvocation:",
+    "address": "0x1175fc100",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "respondsToSelector:",
+    "address": "0x1175fc188",
+    "types": "B24@0:8:16"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "isEqual:",
+    "address": "0x1175fc1a0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "hash",
+    "address": "0x1175fc1b8",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "superclass",
+    "address": "0x1175fc1d0",
+    "types": "#16@0:8"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "class",
+    "address": "0x1175fc1e8",
+    "types": "#16@0:8"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "isKindOfClass:",
+    "address": "0x1175fc200",
+    "types": "B24@0:8#16"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "isMemberOfClass:",
+    "address": "0x1175fc218",
+    "types": "B24@0:8#16"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "conformsToProtocol:",
+    "address": "0x1175fc230",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "isProxy",
+    "address": "0x1175fc248",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "description",
+    "address": "0x1175fc250",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "debugDescription",
+    "address": "0x1175fc268",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": "unsafeUnwrap",
+    "address": "0x1175fc280",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1175fc290",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "MMServiceWrapper",
+    "kind": "instance",
+    "selector": ".cxx_construct",
+    "address": "0x1175fc2a0",
+    "types": "@16@0:8"
+  }
+]
