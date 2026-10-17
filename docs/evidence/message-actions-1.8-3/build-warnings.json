@@ -1,0 +1,19 @@
+{
+  "occurrences": 26,
+  "unique": [
+    "Controllers/CSAuthorizationManager.m:215:63: warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+    "Controllers/CSAuthorizationManager.m:243:48: warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+    "Controllers/CSAuthorizationManager.m:325:48: warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+    "Controllers/CSContactSeparatorSettingsViewController.m:354:25: warning: unused variable 'weakSelf' [-Wunused-variable]",
+    "Hooks/HideSettingHooks.xm:245:23: warning: unused variable 'title' [-Wunused-variable]",
+    "Hooks/ReceiveTransferHooks.xm:479:15: warning: unused variable 'selfUserName' [-Wunused-variable]",
+    "Hooks/ReceiveTransferHooks.xm:689:64: warning: 'windows' is deprecated: first deprecated in iOS 15.0 - Use UIWindowScene.windows on a relevant window scene instead [-Wdeprecated-declarations]",
+    "Hooks/ReceiveTransferHooks.xm:774:30: warning: unused variable 'replySent' [-Wunused-variable]",
+    "Hooks/ReceiveTransferHooks.xm:730:22: warning: unused variable 'result' [-Wunused-variable]",
+    "Hooks/RedEnvelopHooks.xm:578:22: warning: unused variable 'sent' [-Wunused-variable]",
+    "Hooks/RedEnvelopHooks.xm:1085:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+    "Hooks/RedEnvelopHooks.xm:177:22: warning: unused function 'CSParseURLParams' [-Wunused-function]",
+    "ld: warning: -multiply_defined is obsolete"
+  ],
+  "scope": "Existing unrelated controllers/hooks and obsolete linker flag; no warning names a modified message-action source."
+}
