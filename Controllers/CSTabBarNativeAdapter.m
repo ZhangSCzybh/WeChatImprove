@@ -213,6 +213,8 @@ static void CSStop(CSTabBarState *s) {
     if (!s) return;
     CSRestoreVisuals(s); CSRestoreInset(s);
     [s.halo removeAnimationForKey:@"cs.tabbar.outwardPulse"];
+    [s.surface.layer removeAnimationForKey:@"cs.tabbar.pulse"];
+    s.surface.layer.shadowOpacity=0;
     s.renderedPreferences=nil;
     for (UIControl *button in s.observedButtons) {
         [button removeTarget:s action:@selector(touchBegan:) forControlEvents:UIControlEventTouchDown];
@@ -221,9 +223,8 @@ static void CSStop(CSTabBarState *s) {
     [s.observedButtons removeAllObjects];
     [s.surface removeFromSuperview];
 }
-// Animate only a stroked ring. An inverse rounded-rectangle mask excludes the entire
-// bar interior, including transparent backgrounds, from both the ring and its shadow.
-static void CSRenderHalo(CSTabBarState *s, CGFloat radius, CGFloat line) {
+// Outward modes use a masked ring; classic modes preserve the original full-surface shadow.
+static void CSRenderBorderAnimation(CSTabBarState *s, CGFloat radius, CGFloat line) {
     CSTabBarPreferences *p=CSTabBarPreferences.current;
     if (!s.haloContainer) {
         s.haloContainer=[CALayer layer];
@@ -235,10 +236,26 @@ static void CSRenderHalo(CSTabBarState *s, CGFloat radius, CGFloat line) {
         [s.surface.layer insertSublayer:s.haloContainer below:s.border];
     }
     [s.halo removeAnimationForKey:@"cs.tabbar.outwardPulse"];
+    [s.surface.layer removeAnimationForKey:@"cs.tabbar.pulse"];
+    s.surface.layer.shadowOpacity=0; s.surface.layer.shadowPath=NULL;
+    s.surface.layer.shadowColor=NULL; s.surface.layer.shadowRadius=0;
     NSInteger animation=(p.borderColor && line>0 && !UIAccessibilityIsReduceMotionEnabled()) ? p.animation : 0;
-    s.haloContainer.hidden=animation==0;
+    BOOL classic=animation==CSTabBarBorderAnimationClassicBreathing || animation==CSTabBarBorderAnimationClassicHeartbeat;
+    s.haloContainer.hidden=animation==0 || classic;
     s.halo.opacity=0; // No residual glow when stopped or between pulses.
     if (!animation) return;
+    if (classic) {
+        s.surface.layer.shadowColor=[p.borderColor resolvedColorWithTraitCollection:s.bar.traitCollection].CGColor;
+        s.surface.layer.shadowOffset=CGSizeZero; s.surface.layer.shadowRadius=6;
+        s.surface.layer.shadowPath=[UIBezierPath bezierPathWithRoundedRect:s.surface.bounds cornerRadius:radius].CGPath;
+        BOOL breathing=animation==CSTabBarBorderAnimationClassicBreathing;
+        CAKeyframeAnimation *pulse=[CAKeyframeAnimation animationWithKeyPath:@"shadowOpacity"];
+        pulse.values=breathing ? @[@.15,@.8,@.15] : @[@.15,@.8,@.2,@.55,@.15];
+        pulse.duration=breathing ? 3 : 1.2; pulse.repeatCount=HUGE_VALF;
+        [s.surface.layer addAnimation:pulse forKey:@"cs.tabbar.pulse"];
+        return;
+    }
+    // An inverse rounded-rectangle mask excludes the bar interior from outward glow.
     const CGFloat margin=36, spread=10;
     s.haloContainer.frame=CGRectInset(s.surface.bounds,-margin,-margin);
     s.halo.frame=s.haloContainer.bounds; s.haloMask.frame=s.haloContainer.bounds;
@@ -260,7 +277,7 @@ static void CSRenderHalo(CSTabBarState *s, CGFloat radius, CGFloat line) {
     CAKeyframeAnimation *shape=[CAKeyframeAnimation animationWithKeyPath:@"path"];
     CAKeyframeAnimation *fade=[CAKeyframeAnimation animationWithKeyPath:@"opacity"];
     CAKeyframeAnimation *blur=[CAKeyframeAnimation animationWithKeyPath:@"shadowRadius"];
-    if (animation==1) {
+    if (animation==CSTabBarBorderAnimationOutwardBreathing) {
         shape.values=@[(__bridge id)start.CGPath,(__bridge id)near.CGPath,(__bridge id)end.CGPath];
         fade.values=@[@0,@.7,@0]; blur.values=@[@0,@3,@8];
         shape.keyTimes=fade.keyTimes=blur.keyTimes=@[@0,@.18,@1];
@@ -269,7 +286,7 @@ static void CSRenderHalo(CSTabBarState *s, CGFloat radius, CGFloat line) {
         fade.values=@[@0,@.8,@0,@0,@.6,@0,@0]; blur.values=@[@0,@3,@8,@0,@3,@8,@8];
         shape.keyTimes=fade.keyTimes=blur.keyTimes=@[@0,@.08,@.32,@.36,@.44,@.72,@1];
     }
-    CFTimeInterval duration=animation==1 ? 3 : 1.2;
+    CFTimeInterval duration=animation==CSTabBarBorderAnimationOutwardBreathing ? 3 : 1.2;
     shape.duration=fade.duration=blur.duration=duration;
     CAAnimationGroup *pulse=[CAAnimationGroup animation];
     pulse.animations=@[shape,fade,blur]; pulse.duration=duration; pulse.repeatCount=HUGE_VALF;
@@ -300,7 +317,7 @@ static void CSRenderSurface(CSTabBarState *s, UIView *container) {
     s.border.path=[UIBezierPath bezierPathWithRoundedRect:pathRect cornerRadius:MAX(0,radius-line/2)].CGPath;
     s.border.strokeColor=[p.borderColor resolvedColorWithTraitCollection:bar.traitCollection].CGColor;
     s.border.lineWidth=line;
-    CSRenderHalo(s,radius,line);
+    CSRenderBorderAnimation(s,radius,line);
 }
 
 void CSTabBarUpdate(MMTabBar *bar) {

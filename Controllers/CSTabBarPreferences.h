@@ -1,5 +1,14 @@
 #import <UIKit/UIKit.h>
 
+// Persisted values 1/2 retain the outward effects introduced in 1.6-38.
+typedef NS_ENUM(NSInteger, CSTabBarBorderAnimation) {
+    CSTabBarBorderAnimationNone = 0,
+    CSTabBarBorderAnimationOutwardBreathing = 1,
+    CSTabBarBorderAnimationOutwardHeartbeat = 2,
+    CSTabBarBorderAnimationClassicBreathing = 3,
+    CSTabBarBorderAnimationClassicHeartbeat = 4,
+};
+
 static NSString * const kTabBarStyleEnabledKey = @"com.wechat.enhance.tabbar_style.enabled";
 static NSString * const kTabBarHideTextKey = @"com.wechat.enhance.tabbar_style.hide_text";
 

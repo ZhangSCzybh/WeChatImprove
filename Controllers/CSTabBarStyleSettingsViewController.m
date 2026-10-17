@@ -365,7 +365,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     };
     
     // 底栏边框描边动画
-    NSArray *animationOptions = @[@"无动画", @"呼吸", @"心跳"];
+    NSArray *animationOptions = @[@"无动画", @"扩散呼吸", @"扩散心跳", @"经典呼吸", @"经典心跳"];
     NSString *animationDetail = animationOptions[self.borderAnimation];
     
     self.borderAnimationItem = [CSSettingItem itemWithTitle:@"描边动画"

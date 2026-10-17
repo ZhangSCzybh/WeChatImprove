@@ -63,7 +63,7 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         [isolated setDouble:500 forKey:kTabBarHapticFeedbackKey]; [isolated setDouble:500 forKey:kTabBarBorderAnimationKey];
         [CSTabBarPreferences reload];
         assert(CSTabBarPreferences.current.backgroundColor && CSTabBarPreferences.current.backgroundColor.alpha==0);
-        assert(CSTabBarPreferences.current.haptic<=4 && CSTabBarPreferences.current.animation<=2);
+        assert(CSTabBarPreferences.current.haptic<=4 && CSTabBarPreferences.current.animation==CSTabBarBorderAnimationClassicHeartbeat);
         [isolated removeObjectForKey:kTabBarBgColorAlphaKey];
         [isolated setBool:YES forKey:kTabBarStyleEnabledKey]; [isolated setBool:YES forKey:kTabBarHideTextKey];
         [isolated setObject:@"Renamed" forKey:kTabBarTextChatKey];
@@ -188,7 +188,7 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
             [CSTabBarPreferences reload];CSTabBarUpdate(bar);
             UIView *surface=bar.subviews[0];
             assert(surface.backgroundColor.alpha==0 && surface.layer.shadowOpacity==0 && !surface.layer.shadowPath);
-            assert(surface.layer.animationKeys.count==0);
+            assert(surface.layer.animationKeys.count==0 && !SubmittedAnimation(surface.layer,@"cs.tabbar.pulse"));
             CALayer *glow=nil;
             for (CALayer *layer in surface.layer.sublayers) if (layer.mask) glow=layer;
             assert(glow && !glow.hidden);
@@ -207,6 +207,28 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
             CGRect to=CGPathGetBoundingBox((__bridge CGPathRef)path.values.lastObject);
             assert(equal(to.size.width-from.size.width,20) && equal(to.size.height-from.size.height,20));
             assert([fade.values.firstObject doubleValue]==0 && [fade.values.lastObject doubleValue]==0);
+        }
+        // Classic modes keep their original whole-surface shadow and never run the outward ring.
+        for (NSNumber *mode in @[@3,@4,@1,@3,@0]) {
+            [isolated setInteger:mode.integerValue forKey:kTabBarBorderAnimationKey];
+            [CSTabBarPreferences reload];assert(CSTabBarPreferences.current.animation==mode.integerValue);
+            CSTabBarUpdate(bar);
+            UIView *surface=bar.subviews[0];
+            CALayer *glow=nil;
+            for (CALayer *layer in surface.layer.sublayers) if (layer.mask) glow=layer;
+            CAKeyframeAnimation *classic=(id)SubmittedAnimation(surface.layer,@"cs.tabbar.pulse");
+            CAAnimation *outward=SubmittedAnimation(glow.sublayers[0],@"cs.tabbar.outwardPulse");
+            if (mode.integerValue>=3) {
+                assert(classic && [classic.keyPath isEqual:@"shadowOpacity"] && glow.hidden && !outward);
+                assert(equal(classic.duration,mode.integerValue==3 ? 3 : 1.2));
+                NSArray *expected=mode.integerValue==3 ? @[@.15,@.8,@.15] : @[@.15,@.8,@.2,@.55,@.15];
+                assert([classic.values isEqual:expected] && equal(surface.layer.shadowRadius,6));
+                CGPoint center=CGPointMake(CGRectGetMidX(surface.bounds),CGRectGetMidY(surface.bounds));
+                assert(CGPathContainsPoint(surface.layer.shadowPath,NULL,center,NO));
+            } else {
+                assert(!classic && !surface.layer.shadowPath && surface.layer.shadowOpacity==0);
+                assert(mode.integerValue==1 ? (!glow.hidden && outward!=nil) : (glow.hidden && outward==nil));
+            }
         }
         [isolated setInteger:0 forKey:kTabBarBorderAnimationKey];[CSTabBarPreferences reload];CSTabBarUpdate(bar);
         for (CALayer *layer in [bar.subviews[0] layer].sublayers) if (layer.mask) {

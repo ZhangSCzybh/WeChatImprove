@@ -28,7 +28,7 @@ static CGFloat CSNumber(NSUserDefaults *d, NSString *key, CGFloat fallback, CGFl
     p.borderWidth=CSNumber(d,kTabBarBorderWidthKey,1,0,6);
     p.borderStyle=(NSInteger)CSNumber(d,kTabBarBorderStyleKey,kDefaultBorderStyle,0,1);
     p.haptic=(NSInteger)CSNumber(d,kTabBarHapticFeedbackKey,0,0,4);
-    p.animation=(NSInteger)CSNumber(d,kTabBarBorderAnimationKey,0,0,2);
+    p.animation=(NSInteger)CSNumber(d,kTabBarBorderAnimationKey,0,0,CSTabBarBorderAnimationClassicHeartbeat);
     p.backgroundColor=[self colorInDefaults:d prefix:@"com.wechat.enhance.tabbar_style.bg_color"];
     p.borderColor=[self colorInDefaults:d prefix:@"com.wechat.enhance.tabbar_style.border_color"];
     NSMutableArray *titles=[NSMutableArray array], *icons=[NSMutableArray array], *selected=[NSMutableArray array];
