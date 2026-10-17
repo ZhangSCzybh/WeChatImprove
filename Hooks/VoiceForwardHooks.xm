@@ -6,6 +6,7 @@
 %hook BaseMessageCellView
 - (void)onForward:(id)sender {
     CSMessageActionCoordinator *coordinator=CSMessageActionCoordinator.sharedCoordinator;
+    if (!coordinator.settings.voiceForwardEnabled || CSMessageNativeUnsigned(CSMessageActionResolveSourceWrap(self),@"m_uiMessageType")!=34) { %orig; return; }
     CSMessageActionContext *context=[coordinator captureContextForCell:self controller:nil bindingGeneration:1];
     if (!context || context.messageType!=34 || !coordinator.settings.voiceForwardEnabled) { %orig; return; }
     [coordinator withForwardContext:context entry:CSMessageActionEntryNativeForward perform:^{ %orig; }];

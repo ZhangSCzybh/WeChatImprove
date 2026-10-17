@@ -11,7 +11,7 @@ static BOOL Wait(BOOL (^predicate)(void)) { NSDate *end=[NSDate dateWithTimeInte
 // Native payload methods live on the type extension; CMessageWrap forwards them.
 @interface TestPayloadExtension : NSObject
 @property(nonatomic, copy) NSString *m_nsEmoticonMD5,*m_nsAppAttachID;
-@property(nonatomic) unsigned int m_uiVoiceTime,m_uiVoiceFormat,m_uiVoiceForwardFlag,m_uiVoiceCancelFlag,m_uiAppDataSize;
+@property(nonatomic) unsigned int m_uiVoiceTime,m_uiVoiceFormat,m_uiVoiceForwardFlag,m_uiVoiceCancelFlag,m_uiAppDataSize,m_uiGameType,m_uiGameContent;
 @property(nonatomic, copy) NSData *m_dtVoice;
 @property(nonatomic, strong) id m_oImageInfo;
 @property(nonatomic) BOOL m_bAppAttachExistInSvr;
@@ -26,17 +26,17 @@ static BOOL Wait(BOOL (^predicate)(void)) { NSDate *end=[NSDate dateWithTimeInte
 @property(nonatomic) BOOL file,record;
 @property(nonatomic, strong) TestPayloadExtension *m_extendInfoWithMsgType;
 @property(nonatomic, copy) NSString *m_nsEmoticonMD5,*m_nsAppAttachID;
-@property(nonatomic) unsigned int m_uiVoiceTime,m_uiVoiceFormat,m_uiVoiceForwardFlag,m_uiVoiceCancelFlag,m_uiAppDataSize;
+@property(nonatomic) unsigned int m_uiVoiceTime,m_uiVoiceFormat,m_uiVoiceForwardFlag,m_uiVoiceCancelFlag,m_uiAppDataSize,m_uiGameType,m_uiGameContent;
 @property(nonatomic, copy) NSData *m_dtVoice;
 @property(nonatomic, strong) id m_oImageInfo;
 @property(nonatomic) BOOL m_bAppAttachExistInSvr;
 - (instancetype)initWithMsgType:(unsigned int)type;
 @end
 @implementation CMessageWrap
-@dynamic m_nsEmoticonMD5,m_nsAppAttachID,m_uiVoiceTime,m_uiVoiceFormat,m_uiVoiceForwardFlag,m_uiVoiceCancelFlag,m_uiAppDataSize,m_dtVoice,m_oImageInfo,m_bAppAttachExistInSvr;
+@dynamic m_uiGameType,m_uiGameContent,m_nsEmoticonMD5,m_nsAppAttachID,m_uiVoiceTime,m_uiVoiceFormat,m_uiVoiceForwardFlag,m_uiVoiceCancelFlag,m_uiAppDataSize,m_dtVoice,m_oImageInfo,m_bAppAttachExistInSvr;
 - (instancetype)initWithMsgType:(unsigned int)type { if ((self=[super init])) { _m_uiMessageType=type; _m_extendInfoWithMsgType=[TestPayloadExtension new]; } return self; }
 - (id)forwardingTargetForSelector:(SEL)selector { return [_m_extendInfoWithMsgType respondsToSelector:selector] ? _m_extendInfoWithMsgType : [super forwardingTargetForSelector:selector]; }
-- (id)copyWithZone:(NSZone *)zone { (void)zone; CMessageWrap *copy=[[CMessageWrap alloc] initWithMsgType:_m_uiMessageType]; copy.m_nsFromUsr=_m_nsFromUsr; copy.m_nsToUsr=_m_nsToUsr; copy.m_nsContent=_m_nsContent; copy.m_uiMesLocalID=_m_uiMesLocalID; copy.m_n64MesSvrID=_m_n64MesSvrID; copy.m_uiVoiceTime=self.m_uiVoiceTime; copy.m_uiVoiceFormat=self.m_uiVoiceFormat; copy.m_uiDownloadStatus=self.m_uiDownloadStatus; copy.m_dtVoice=self.m_dtVoice; copy.m_nsEmoticonMD5=self.m_nsEmoticonMD5; copy.m_nsAppAttachID=self.m_nsAppAttachID; copy.path=_path; copy.m_dicForwardParas=_m_dicForwardParas; copy.m_oImageInfo=self.m_oImageInfo; copy.file=_file; copy.record=_record; copy.m_uiAppDataSize=self.m_uiAppDataSize; copy.m_bAppAttachExistInSvr=self.m_bAppAttachExistInSvr; return copy; }
+- (id)copyWithZone:(NSZone *)zone { (void)zone; CMessageWrap *copy=[[CMessageWrap alloc] initWithMsgType:_m_uiMessageType]; copy.m_nsFromUsr=_m_nsFromUsr; copy.m_nsToUsr=_m_nsToUsr; copy.m_nsContent=_m_nsContent; copy.m_uiMesLocalID=_m_uiMesLocalID; copy.m_n64MesSvrID=_m_n64MesSvrID; copy.m_uiVoiceTime=self.m_uiVoiceTime; copy.m_uiVoiceFormat=self.m_uiVoiceFormat; copy.m_uiDownloadStatus=self.m_uiDownloadStatus; copy.m_dtVoice=self.m_dtVoice; copy.m_nsEmoticonMD5=self.m_nsEmoticonMD5; copy.m_uiGameType=self.m_uiGameType; copy.m_uiGameContent=self.m_uiGameContent; copy.m_nsAppAttachID=self.m_nsAppAttachID; copy.path=_path; copy.m_dicForwardParas=_m_dicForwardParas; copy.m_oImageInfo=self.m_oImageInfo; copy.file=_file; copy.record=_record; copy.m_uiAppDataSize=self.m_uiAppDataSize; copy.m_bAppAttachExistInSvr=self.m_bAppAttachExistInSvr; return copy; }
 - (NSString *)getVoicePath { CHECK(NSThread.isMainThread); return self.path; }
 + (NSString *)getPathOfAudio:(CMessageWrap *)wrap { CHECK(NSThread.isMainThread); return wrap.path; }
 + (void)GetPathOfAppDataByUserName:(NSString *)chat andMessageWrap:(CMessageWrap *)wrap retStrPath:(NSString * __autoreleasing *)path { CHECK([chat isEqualToString:@"chat"]); *path=wrap.path; }
@@ -93,6 +93,8 @@ static NSMutableArray *factoryInputs;
 @end
 @interface TestCell : NSObject
 @property(nonatomic, strong) CMessageWrap *wrap;
+@property(nonatomic, strong) id viewModel;
+@property(nonatomic) NSUInteger favoriteCalls;
 @property(nonatomic, weak) id nextResponder;
 @property(nonatomic) BOOL revokeAllowed;
 @property(nonatomic, copy) void (^forwardHandler)(void);
@@ -102,7 +104,29 @@ static NSMutableArray *factoryInputs;
 - (id)getCurrentMessageWrap { return _wrap; }
 - (BOOL)canShowRevokeMsgMenuItemForMessage:(id)wrap { CHECK(wrap==_wrap); return _revokeAllowed; }
 - (void)onForward:(id)sender { (void)sender; if (_forwardHandler) _forwardHandler(); }
-- (void)doFavorite {}
+- (void)doFavorite { _favoriteCalls++; }
+@end
+@interface TestWrongControllerCell : TestCell
+@end
+@implementation TestWrongControllerCell
+- (NSUInteger)getViewController { CHECK(NO); return 1; }
+@end
+@interface TestThrowingControllerCell : TestCell
+@end
+@implementation TestThrowingControllerCell
+- (id)getViewController { [NSException raise:@"controller" format:@"injected"]; return nil; }
+@end
+@interface TestMessageViewModel : NSObject
+@property(nonatomic, strong) CMessageWrap *messageWrap;
+@end
+@implementation TestMessageViewModel
+@end
+@interface TestMessageCellDelegate : NSObject
+@property(nonatomic, weak) id controller;
+- (id)getViewController;
+@end
+@implementation TestMessageCellDelegate
+- (id)getViewController { return _controller; }
 @end
 #import "RepeatMenuHooksUnderTest.h"
 @interface TestController : NSObject
@@ -154,14 +178,15 @@ static NSMutableArray *factoryInputs;
 @end
 @interface TestEnvironment : NSObject <CSMessageActionEnvironment>
 @property(nonatomic, copy) NSString *account;
+@property(nonatomic) NSUInteger accountReads, controllerLookups;
 @property(nonatomic, strong) NSMutableDictionary *services;
 @property(nonatomic, weak) TestController *controller;
 @end
 @implementation TestEnvironment
 - (instancetype)init { if ((self=[super init])) { _account=@"me"; _services=[NSMutableDictionary dictionary]; } return self; }
-- (NSString *)currentAccountID { return _account; }
+- (NSString *)currentAccountID { _accountReads++; return _account; }
 - (id)serviceNamed:(NSString *)name { return _services[name]; }
-- (id)controllerForCell:(id)cell { (void)cell; return _controller; }
+- (id)controllerForCell:(id)cell { (void)cell; _controllerLookups++; return _controller; }
 @end
 @interface TestContact : NSObject
 @property(nonatomic, copy) NSString *m_nsUsrName;
@@ -383,6 +408,144 @@ static NSArray *NativeMenuPipeline(NSArray *items, BOOL onlyDelete) {
     NSMutableIndexSet *seen=[NSMutableIndexSet indexSet]; NSMutableArray *result=[NSMutableArray array];
     for (MMMenuItem *item in items) { if ([seen containsIndex:item.menuType]) continue; [seen addIndex:item.menuType]; if (!onlyDelete || item.menuType==8 || item.menuType==4 || item.menuType==5) [result addObject:item]; }
     return result;
+}
+static void TestNativeStickerMenu(NSUserDefaults *defaults) {
+    CContactMgr *contacts=[CContactMgr new]; contacts.contact=Contact(@"me");
+    CMessageMgr *manager=[CMessageMgr new];
+    nativeServices=[@{@"CContactMgr":WrappedService(contacts),@"CMessageMgr":WrappedService(manager)} mutableCopy];
+    CSMessageNativeEnvironment *environment=[CSMessageNativeEnvironment new];
+    BaseMsgContentViewController *page=[BaseMsgContentViewController new];
+    TestMessageCellDelegate *delegate=[TestMessageCellDelegate new]; delegate.controller=page;
+    CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:environment preferences:Preferences(defaults) mediaProvider:[CSMessageMediaProvider new]];
+    coordinator.feedbackHandler=^(__unused NSString *message){};
+    menuHookAdapter=[[CSMessageActionMenuAdapter alloc] initWithCoordinator:coordinator];
+    for (NSString *name in @[@"EmoticonMessageCellView",@"AppEmoticonMessageCellView"]) {
+        TestCell *cell=[NSClassFromString(name) new];
+        TestMessageViewModel *model=[TestMessageViewModel new]; model.messageWrap=Cell(47).wrap;
+        model.messageWrap.m_nsEmoticonMD5=@"0123456789abcdef0123456789abcdef";
+        cell.viewModel=model; // Native source is viewModel.messageWrap; no synthetic current-wrap getter result.
+        NSObject *responder=[NSObject new]; cell.nextResponder=responder; // Native page is reached through the cell's delegate, not the responder chain.
+        [cell setValue:delegate forKey:@"nativeDelegate"];
+        MMMenuItem *native=[[MMMenuItem alloc] initWithTitle:@"原生表情菜单" target:nil action:NULL]; native.menuType=1;
+        [cell setValue:@[native] forKey:@"nativeItems"];
+        CHECK([environment controllerForCell:cell]==page);
+        NSArray *items=NativeMenuPipeline(CSMessageActionObjectGetter(cell,@selector(operationMenuItems)),NO);
+        CHECK(items.count==2 && items[0]==native);
+        MMMenuItem *repeat=items.lastObject; CHECK([repeat.title isEqual:@"复读"]);
+        NSUInteger calls=manager.calls.count;
+        CSMessageNativeInvoke(repeat.target,NSStringFromSelector(repeat.action),@[NSNull.null]);
+        CHECK(Wait(^BOOL{ return manager.calls.count==calls+1; }));
+        CHECK([manager.calls.lastObject[0] isEqual:@"emoji"]);
+        CHECK(manager.calls.lastObject[2]!=model.messageWrap && model.messageWrap.m_uiMesLocalID==42);
+        NSObject *unrelated=[NSObject new]; delegate.controller=unrelated; CHECK(![environment controllerForCell:cell]);
+        cell.nextResponder=page; CHECK([environment controllerForCell:cell]==page);
+        delegate.controller=nil; CHECK([environment controllerForCell:cell]==page);
+        delegate.controller=page;
+    }
+    for (Class cellClass in @[TestWrongControllerCell.class,TestThrowingControllerCell.class]) {
+        TestCell *cell=[cellClass new]; CHECK(![environment controllerForCell:cell]);
+        cell.nextResponder=page; CHECK([environment controllerForCell:cell]==page);
+    }
+    menuHookAdapter=nil; nativeServices=nil;
+}
+static void TestGameMenu(NSUserDefaults *defaults) {
+    TestEnvironment *environment=[TestEnvironment new]; TestController *page=[TestController new]; environment.controller=page;
+    TestManager *manager=[TestManager new]; environment.services[@"CMessageMgr"]=manager;
+    CSMessageActionPreferences *preferences=Preferences(defaults);
+    CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:environment preferences:preferences mediaProvider:[CSMessageMediaProvider new]];
+    coordinator.feedbackHandler=^(__unused NSString *message){};
+    menuHookAdapter=[[CSMessageActionMenuAdapter alloc] initWithCoordinator:coordinator];
+    for (unsigned int gameType=1;gameType<=2;gameType++) {
+        GameMessageCellView *cell=[GameMessageCellView new];
+        TestMessageViewModel *model=[TestMessageViewModel new]; model.messageWrap=Cell(47).wrap; cell.viewModel=model;
+        CMessageWrap *source=model.messageWrap; source.m_uiGameType=gameType; source.m_uiGameContent=gameType==1 ? 3 : 6;
+        source.m_nsEmoticonMD5=@"0123456789abcdef0123456789abcdef";
+        MMMenuItem *forward=[[MMMenuItem alloc] initWithTitle:@"转发" target:nil action:NULL]; forward.menuType=1;
+        MMMenuItem *delete=[[MMMenuItem alloc] initWithTitle:@"删除" target:nil action:NULL]; delete.menuType=8;
+        cell.nativeItems=@[forward,delete];
+        NSArray *items=NativeMenuPipeline([cell operationMenuItems],NO);
+        CHECK(items.count==3 && items[0]==forward && items[1]==delete);
+        CHECK([menuHookAdapter itemsByAddingActionsForCell:cell items:items]==items);
+        CHECK([NativeMenuPipeline(items,YES) isEqual:@[delete]]);
+        MMMenuItem *repeat=items.lastObject; CHECK([repeat.title isEqual:@"复读"]);
+        NSUInteger count=manager.calls.count;
+        CSMessageNativeInvoke(repeat.target,NSStringFromSelector(repeat.action),@[NSNull.null]);
+        CHECK(Wait(^BOOL{ return manager.calls.count==count+1; }));
+        CMessageWrap *sent=manager.calls.lastObject[2];
+        CHECK([manager.calls.lastObject[0] isEqual:@"emoji"] && sent!=source);
+        CHECK(sent.m_uiGameType==source.m_uiGameType && sent.m_uiGameContent==source.m_uiGameContent);
+        CHECK([sent.m_nsEmoticonMD5 isEqual:source.m_nsEmoticonMD5]);
+        CHECK(source.m_uiMesLocalID==42 && source.m_n64MesSvrID==900 && [source.m_nsFromUsr isEqual:@"chat"]);
+        model.messageWrap=Cell(47).wrap; model.messageWrap.m_uiMesLocalID=123; model.messageWrap.m_n64MesSvrID=901;
+        CSMessageNativeInvoke(repeat.target,NSStringFromSelector(repeat.action),@[NSNull.null]); Drain(); CHECK(manager.calls.count==count+1);
+    }
+    [defaults setBool:NO forKey:CSMessageActionRepeatEnabledKey]; [preferences requestRefresh]; CHECK(Wait(^BOOL{ return !preferences.snapshot.repeatEnabled; }));
+    GameMessageCellView *disabled=[GameMessageCellView new]; disabled.wrap=Cell(47).wrap; disabled.nativeItems=@[];
+    CHECK([disabled operationMenuItems]==disabled.nativeItems);
+    menuHookAdapter=nil;
+}
+static void TestNativeActionFastPath(NSUserDefaults *defaults) {
+    TestEnvironment *environment=[TestEnvironment new]; TestController *controller=[TestController new]; environment.controller=controller;
+    HeldMedia *media=[HeldMedia new]; CSMessageActionPreferences *preferences=Preferences(defaults);
+    CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:environment preferences:preferences mediaProvider:media];
+    NSMutableArray *feedback=[NSMutableArray array]; coordinator.feedbackHandler=^(NSString *message){ [feedback addObject:message]; };
+    TestCell *voice=Cell(34); CSMessageActionContext *voiceContext=Context(voice,controller);
+    for (NSUInteger i=0;i<32;i++) CHECK([coordinator executeContext:voiceContext action:CSMessageActionRepeat entry:CSMessageActionEntryGesture]);
+    TestCell *cell=Cell(1); CSMessageActionContext *context=Context(cell,controller);
+    [coordinator executeContext:context action:CSMessageActionQuote entry:CSMessageActionEntryGesture];
+    CHECK(controller.calls.count==1 && [controller.calls[0][0] isEqual:@"quote"]);
+    [coordinator executeContext:context action:CSMessageActionFavorite entry:CSMessageActionEntryGesture]; CHECK(cell.favoriteCalls==1);
+    __block NSUInteger forwards=0; TestLogic *logic=[TestLogic new];
+    __weak CSMessageActionCoordinator *weakCoordinator=coordinator; __weak TestCell *weakCell=cell;
+    cell.forwardHandler=^{ forwards++; [weakCoordinator bindForwardLogic:logic source:weakCell.wrap]; };
+    [coordinator executeContext:context action:CSMessageActionForward entry:CSMessageActionEntryGesture];
+    CHECK(forwards==1 && ![[CSVoiceForwardAdapter new] bindingForLogic:logic]);
+    CHECK(media.callbacks.count==32 && feedback.count==0);
+    [coordinator withForwardContext:context entry:CSMessageActionEntryNativeForward perform:^{ forwards++; }];
+    CHECK(forwards==2 && feedback.count==0);
+    [defaults setBool:NO forKey:CSMessageActionVoiceForwardEnabledKey]; [preferences requestRefresh]; CHECK(Wait(^BOOL{ return !preferences.snapshot.voiceForwardEnabled; }));
+    voice.forwardHandler=^{ forwards++; };
+    [coordinator executeContext:voiceContext action:CSMessageActionForward entry:CSMessageActionEntryGesture];
+    [coordinator withForwardContext:voiceContext entry:CSMessageActionEntryNativeForward perform:^{ forwards++; }];
+    CHECK(forwards==4 && media.callbacks.count==32 && feedback.count==0);
+    [coordinator executeContext:context action:CSMessageActionDelete entry:CSMessageActionEntryGesture]; CHECK(controller.confirmation);
+    controller.confirmation(); controller.confirmation(); CHECK(controller.calls.count==2);
+    [coordinator executeContext:context action:CSMessageActionDelete entry:CSMessageActionEntryGesture];
+    [coordinator cancelOperationsForCell:cell]; controller.confirmation(); CHECK(controller.calls.count==2);
+    [coordinator executeContext:context action:CSMessageActionDelete entry:CSMessageActionEntryGesture];
+    [defaults setBool:NO forKey:CSMessageActionGestureEnabledKey]; [preferences requestRefresh]; CHECK(Wait(^BOOL{ return !preferences.snapshot.gestureEnabled; }));
+    [defaults setBool:YES forKey:CSMessageActionGestureEnabledKey]; [preferences requestRefresh]; CHECK(Wait(^BOOL{ return preferences.snapshot.gestureEnabled; }));
+    controller.confirmation(); CHECK(controller.calls.count==2); // Disable then re-enable never revives an old confirmation.
+    [coordinator executeContext:context action:CSMessageActionDelete entry:CSMessageActionEntryGesture];
+    CMessageWrap *original=cell.wrap; cell.wrap=Cell(1).wrap; cell.wrap.m_uiMesLocalID=123; cell.wrap.m_n64MesSvrID=456;
+    controller.confirmation(); CHECK(controller.calls.count==2); cell.wrap=original;
+    cell.wrap.m_nsFromUsr=@"me"; cell.wrap.m_nsToUsr=@"chat"; cell.revokeAllowed=YES;
+    CSMessageActionContext *outgoing=Context(cell,controller);
+    [coordinator executeContext:outgoing action:CSMessageActionRevoke entry:CSMessageActionEntryGesture];
+    cell.revokeAllowed=NO; controller.confirmation(); CHECK(controller.calls.count==2);
+    cell.wrap.m_nsFromUsr=@"chat"; cell.wrap.m_nsToUsr=@"me";
+    [coordinator executeContext:context action:CSMessageActionDelete entry:CSMessageActionEntryGesture];
+    [coordinator accountWillChange]; [coordinator accountDidChange]; controller.confirmation(); CHECK(controller.calls.count==2);
+    NSString *noOperation=nil; CHECK(![coordinator resultsForOperationID:noOperation].count); [coordinator cancelOperationID:noOperation];
+    controller.confirmation=nil; [coordinator cancelAllUnsubmittedOperations];
+}
+static void TestMenuNoOp(NSUserDefaults *defaults) {
+    TestEnvironment *environment=[TestEnvironment new]; TestController *controller=[TestController new]; environment.controller=controller;
+    CSMessageActionPreferences *preferences=Preferences(defaults);
+    CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:environment preferences:preferences mediaProvider:[CSMessageMediaProvider new]];
+    CSMessageActionMenuAdapter *menu=[[CSMessageActionMenuAdapter alloc] initWithCoordinator:coordinator];
+    TestCell *cell=Cell(1); MMMenuItem *native=[[MMMenuItem alloc] initWithTitle:@"native" target:nil action:NULL];
+    NSArray *original=@[native], *withRepeat=[menu itemsByAddingActionsForCell:cell items:original]; CHECK(withRepeat.count==2);
+    CHECK([menu itemsByAddingActionsForCell:cell items:withRepeat]==withRepeat);
+    [defaults setBool:NO forKey:CSMessageActionRepeatEnabledKey]; [defaults setBool:NO forKey:CSMessageActionVoiceForwardEnabledKey];
+    [preferences requestRefresh]; CHECK(Wait(^BOOL{ return !preferences.snapshot.repeatEnabled && !preferences.snapshot.voiceForwardEnabled; }));
+    NSUInteger reads=environment.accountReads, lookups=environment.controllerLookups;
+    CHECK([menu itemsByAddingActionsForCell:cell items:original]==original);
+    NSArray *removed=[menu itemsByAddingActionsForCell:cell items:withRepeat]; CHECK(removed.count==1 && removed[0]==native);
+    CHECK(environment.accountReads==reads && environment.controllerLookups==lookups);
+    [defaults setBool:YES forKey:CSMessageActionVoiceForwardEnabledKey]; [preferences requestRefresh]; CHECK(Wait(^BOOL{ return preferences.snapshot.voiceForwardEnabled; }));
+    CHECK([menu itemsByAddingActionsForCell:cell items:original]==original);
+    CHECK(environment.accountReads==reads && environment.controllerLookups==lookups);
 }
 static void TestNativeMenuPipeline(NSUserDefaults *defaults) {
     TestEnvironment *env=[TestEnvironment new]; TestController *controller=[TestController new]; env.controller=controller;
@@ -617,4 +780,12 @@ static void TestVoiceFlags(void) {
     cell.wrap.m_nsContent=@"<voicemsg voicelength='1000' voiceformat='0' length='700' endflag='1' cancelflag='1'/>"; dispatch_semaphore_signal(release);
     CHECK(Wait(^BOOL{ return callbacks==1; })); CHECK(!accepted); [NSFileManager.defaultManager removeItemAtPath:path error:nil];
 }
-int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestVoiceInvalidBytes(); TestVoiceCallbackIntegration(defaults); TestNativeMenuPipeline(defaults); TestNativeVoiceStatuses(); TestNativeTextAndFeedback(defaults); TestProductionAdmission(defaults); TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestForwardCleanupWhileWaiting(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }
+int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_FIRST_BATCH_CASE")) {
+    NSString *test=[NSString stringWithUTF8String:getenv("CS_TEST_FIRST_BATCH_CASE")];
+    if ([test isEqual:@"native-actions"]) TestNativeActionFastPath(defaults);
+    else if ([test isEqual:@"menu"]) TestMenuNoOp(defaults);
+    else if ([test isEqual:@"stickers"]) TestNativeStickerMenu(defaults);
+    else if ([test isEqual:@"games"]) TestGameMenu(defaults);
+    else return 2;
+    [defaults removePersistentDomainForName:suite]; printf("PASS: %lu focused checks\n",(unsigned long)checks); return 0;
+} if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestNativeActionFastPath(defaults); TestMenuNoOp(defaults); TestNativeStickerMenu(defaults); TestGameMenu(defaults); TestVoiceInvalidBytes(); TestVoiceCallbackIntegration(defaults); TestNativeMenuPipeline(defaults); TestNativeVoiceStatuses(); TestNativeTextAndFeedback(defaults); TestProductionAdmission(defaults); TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestForwardCleanupWhileWaiting(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }

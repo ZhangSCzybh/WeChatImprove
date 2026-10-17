@@ -4,6 +4,12 @@
 CSMessageAction CSMessageActionValidated(NSInteger rawAction) {
     return rawAction>=CSMessageActionDisabled && rawAction<=CSMessageActionRepeat ? (CSMessageAction)rawAction : CSMessageActionDisabled;
 }
+BOOL CSMessageActionSupportsRepeatMenuType(NSUInteger messageType) {
+    switch (messageType) {
+        case 1: case 3: case 34: case 42: case 43: case 47: case 48: case 49: return YES;
+        default: return NO;
+    }
+}
 CSMessageAction CSMessageActionForDirection(CSMessageActionSettings *settings, CSMessageActionDirection direction, BOOL outgoing) {
     if (direction==CSMessageActionDirectionLeft) return CSMessageActionValidated(outgoing ? settings.leftSelfAction : settings.leftOtherAction);
     if (direction==CSMessageActionDirectionRight) return CSMessageActionValidated(outgoing ? settings.rightSelfAction : settings.rightOtherAction);

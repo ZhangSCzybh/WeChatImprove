@@ -1,0 +1,2794 @@
+{
+  "binary": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "selection": "Classes containing Cell or ViewModel, and Message or Emoticon; plus named base/menu classes. No runtime class selection is observed.",
+  "classes": {
+    "AppChatBotShareMessageCellView": {
+      "superclass": "AppStandardTextContentMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1000a6690",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowFavoriteMenuItem",
+          "address": "0x1000a6728",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "AppChatBotShareMessageViewModel": {
+      "superclass": "AppStandardTextContentMessageViewModel",
+      "menu_methods": []
+    },
+    "AppDefaultMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1000c4fd8",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppDefaultMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppEmoticonMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1000c6d34",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onLongTouch",
+          "address": "0x1000c7e48",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getViewController",
+          "address": "0x1000c7eec",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppEmoticonMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppFileMessageCellContentView": {
+      "superclass": "AppFileMessageView",
+      "menu_methods": []
+    },
+    "AppFileMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canShowForwardMenu",
+          "address": "0x1000cea28",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowFavoriteMenu",
+          "address": "0x1000cebc8",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1000cee70",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onShowOperationMenu",
+          "address": "0x1000cf06c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "reportXiaoWeiSummaryMenuExposure",
+          "address": "0x1000cf920",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "reportYuanBaoSummaryMenuExposure",
+          "address": "0x1000cfa94",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "canShowXiaoWeiSummaryMenuItem",
+          "address": "0x1000d1108",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowYuanBaoSummaryMenuItem",
+          "address": "0x1000d1cc4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "onMenuControllerDidHide",
+          "address": "0x1000d28e8",
+          "types": "v16@0:8"
+        }
+      ]
+    },
+    "AppFileMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppGameLifeUnsupportedMessageCellView": {
+      "superclass": "TextMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canShowRevokeMsgMenuItem",
+          "address": "0x1000d6dc4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1000d6dcc",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppGameLifeUnsupportedMessageViewModel": {
+      "superclass": "TextMessageViewModel",
+      "menu_methods": []
+    },
+    "AppGameRecordVideoMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": []
+    },
+    "AppGameRecordVideoMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppGameShareMessageCellView": {
+      "superclass": "AppUrlMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1000db928",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppGameShareMessageViewModel": {
+      "superclass": "AppUrlMessageViewModel",
+      "menu_methods": []
+    },
+    "AppGiftCardMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": []
+    },
+    "AppGiftCardMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppHardWareNotifyMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": []
+    },
+    "AppHardWareNotifyMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "AppHardWareRankMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": []
+    },
+    "AppHardWareRankMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "AppImageMessageCellView": {
+      "superclass": "ImageMessageCellView",
+      "menu_methods": []
+    },
+    "AppImageMessageViewModel": {
+      "superclass": "ImageMessageViewModel",
+      "menu_methods": []
+    },
+    "AppLimitedModeAccessMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1000ef0d8",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppLimitedModeAccessMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppLimitedModeGuardianMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1000f1230",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppLimitedModeGuardianMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppLinkTextMessageCellView": {
+      "superclass": "TextMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canShowRevokeMsgMenuItem",
+          "address": "0x1000f1fcc",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1000f1fd4",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppLinkTextMessageViewModel": {
+      "superclass": "TextMessageViewModel",
+      "menu_methods": []
+    },
+    "AppMMScheduleMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": []
+    },
+    "AppMMScheduleMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppNoteMessageCellView": {
+      "superclass": "AppStandardTextContentMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1000ff06c",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppNoteMessageViewModel": {
+      "superclass": "AppStandardTextContentMessageViewModel",
+      "menu_methods": []
+    },
+    "AppOpenSDKAppBrandMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10010383c",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppOpenSDKAppBrandMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppPatMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "showRectForMenuController",
+          "address": "0x100107c28",
+          "types": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "canCellShowOperationMenu",
+          "address": "0x100107d5c",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "generateOperationMenu",
+          "address": "0x100107d78",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppPatMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "AppProductMessageCellView": {
+      "superclass": "AppUrlMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10010d208",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppProductMessageViewModel": {
+      "superclass": "AppUrlMessageViewModel",
+      "menu_methods": []
+    },
+    "AppRecordMessageCellView": {
+      "superclass": "AppStandardTextContentMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10010e958",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppRecordMessageViewModel": {
+      "superclass": "AppStandardTextContentMessageViewModel",
+      "menu_methods": []
+    },
+    "AppRingBackMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": []
+    },
+    "AppRingBackMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppScanCodeRetryMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppStandardAccountContentMessageCellView": {
+      "superclass": "AppStandardContentBaseMessageCellView",
+      "menu_methods": []
+    },
+    "AppStandardAccountContentMessageViewModel": {
+      "superclass": "AppStandardContentBaseMessageViewModel",
+      "menu_methods": []
+    },
+    "AppStandardContentBaseMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": []
+    },
+    "AppStandardContentBaseMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppStandardImageContentMessageCellView": {
+      "superclass": "AppStandardContentBaseMessageCellView",
+      "menu_methods": []
+    },
+    "AppStandardImageContentMessageViewModel": {
+      "superclass": "AppStandardContentBaseMessageViewModel",
+      "menu_methods": []
+    },
+    "AppStandardTextContentMessageCellView": {
+      "superclass": "AppStandardContentBaseMessageCellView",
+      "menu_methods": []
+    },
+    "AppStandardTextContentMessageViewModel": {
+      "superclass": "AppStandardContentBaseMessageViewModel",
+      "menu_methods": []
+    },
+    "AppTingLandingMessageCellView": {
+      "superclass": "AppStandardTextContentMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canShowForwardMenuItem",
+          "address": "0x10011def4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowFavoriteMenuItem",
+          "address": "0x10011df88",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10011e01c",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppTingLandingMessageViewModel": {
+      "superclass": "AppStandardTextContentMessageViewModel",
+      "menu_methods": []
+    },
+    "AppTingMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "addToListenStarMenuItem",
+          "address": "0x10011ff24",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowAddToStarMenuItem",
+          "address": "0x10012063c",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10012076c",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppTingListMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x100121eec",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowForwardMenuItem",
+          "address": "0x100122020",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowFavoriteMenuItem",
+          "address": "0x1001220b4",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "AppTingChatRoomMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10012317c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowForwardMenuItem",
+          "address": "0x10012320c",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowFavoriteMenuItem",
+          "address": "0x1001232a0",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "AppTingMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppTingListMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppTingChatRoomMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppTingMusicSpaceMessageCellView": {
+      "superclass": "AppStandardTextContentMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canShowForwardMenuItem",
+          "address": "0x100127104",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10012710c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowFavoriteMenuItem",
+          "address": "0x100127240",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "AppTingMusicSpaceMessageViewModel": {
+      "superclass": "AppStandardTextContentMessageViewModel",
+      "menu_methods": []
+    },
+    "AppTingStandardListMessageCellView": {
+      "superclass": "AppStandardImageContentMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canShowForwardMenuItem",
+          "address": "0x100128b80",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowFavoriteMenuItem",
+          "address": "0x100128c14",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x100128ca8",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppTingStandardListMessageViewModel": {
+      "superclass": "AppStandardImageContentMessageViewModel",
+      "menu_methods": []
+    },
+    "AppTrackRoomMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": []
+    },
+    "AppTrackRoomMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppUrlImageMessageCellView": {
+      "superclass": "AppUrlMessageCellViewBase",
+      "menu_methods": []
+    },
+    "AppUrlImageMessageViewModel": {
+      "superclass": "AppStandardImageContentMessageViewModel",
+      "menu_methods": []
+    },
+    "AppUrlMessageCellView": {
+      "superclass": "AppStandardTextContentMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10013109c",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppUrlMessageCellViewBase": {
+      "superclass": "AppStandardImageContentMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10013479c",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppUrlMessageViewModel": {
+      "superclass": "AppStandardTextContentMessageViewModel",
+      "menu_methods": []
+    },
+    "AppVideoMessageCellView": {
+      "superclass": "BizAppBaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x100140abc",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppVideoMessageViewModel": {
+      "superclass": "BizAppBaseMessageViewModel",
+      "menu_methods": []
+    },
+    "AppWCCardMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10015222c",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppWCCardMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "AppWeChatIntroductionMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": []
+    },
+    "AppWeChatIntroductionMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "AppWxGameCardMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "onLongTouch",
+          "address": "0x1001547c0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "showMsgPopupMenu",
+          "address": "0x1001547c4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1001548ac",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "AppWxGameCardMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": [
+        {
+          "selector": "showMsgPopupMenu",
+          "address": "0x1001552f4",
+          "types": "v16@0:8"
+        }
+      ]
+    },
+    "AttributedReaderMessageCellView": {
+      "superclass": "ReaderMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "isNeedHeaderMenuButton",
+          "address": "0x100166d34",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "layoutHeaderMenuButtonIfNeedOnCenterY:",
+          "address": "0x100166e10",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x100168eb4",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowMoreMenuItem",
+          "address": "0x100168f48",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "AttributedReaderMessageViewModel": {
+      "superclass": "ReaderMessageViewModel",
+      "menu_methods": []
+    },
+    "BaseChatCellView": {
+      "superclass": "UIView",
+      "menu_methods": []
+    },
+    "BaseChatViewModel": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "BaseMessageCellView": {
+      "superclass": "BaseChatCellView",
+      "menu_methods": [
+        {
+          "selector": "messageSummaryMenuModeWithXiaoWeiExptKey:forXiaoWeiExptKey:",
+          "address": "0x1002a1530",
+          "types": "Q32@0:8@16@24"
+        },
+        {
+          "selector": "messageBizArticleSummaryMenuMode",
+          "address": "0x1002a16f4",
+          "types": "Q16@0:8"
+        },
+        {
+          "selector": "messageFileSummaryMenuMode",
+          "address": "0x1002a17c0",
+          "types": "Q16@0:8"
+        },
+        {
+          "selector": "yuanBaoSummaryMenuItemWithType:target:action:",
+          "address": "0x1002a188c",
+          "types": "@40@0:8q16@24:32"
+        },
+        {
+          "selector": "xiaoWeiSummaryMenuItemWithType:target:action:",
+          "address": "0x1002a18f8",
+          "types": "@40@0:8q16@24:32"
+        },
+        {
+          "selector": "targetRectForMenuController",
+          "address": "0x1002a1964",
+          "types": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "targetRectForMenuControllerForRecordDetail",
+          "address": "0x1002a1e00",
+          "types": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "isOnlyShowDeleteMenu",
+          "address": "0x1002a20c4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "generateOperationMenu",
+          "address": "0x1002a2138",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "generateOperationMenuForRecordDetail",
+          "address": "0x1002a32b8",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "bypassMessageMenuItemsWhitelist:",
+          "address": "0x1002a364c",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "weclawMessageMenuItemsBlacklist:",
+          "address": "0x1002a3eb0",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "uniqMenuItems:",
+          "address": "0x1002a409c",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "filteredMenuItems:",
+          "address": "0x1002a4294",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "showOperationMenu",
+          "address": "0x1002a4bd4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onShowOperationMenu",
+          "address": "0x1002a536c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "handleMenuControllerWillHideMenuNotification:",
+          "address": "0x1002a54fc",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1002a55c0",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canCellShowOperationMenu",
+          "address": "0x1002a565c",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "scheduleMenuItem",
+          "address": "0x1002a57b8",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowScheduleMenuItem",
+          "address": "0x1002a5a80",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "forwardMenuItem",
+          "address": "0x1002a5e64",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowForwardMenuItem",
+          "address": "0x1002a5ff0",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "favoriteMenuItem",
+          "address": "0x1002a6074",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowFavoriteMenuItem",
+          "address": "0x1002a6188",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "copyMenuItem",
+          "address": "0x1002a6494",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "deleteMenuItem",
+          "address": "0x1002a64c8",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowDeleteMenuItem",
+          "address": "0x1002a6c8c",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "revokeMsgMenuItem",
+          "address": "0x1002a6c94",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "addRevokeOrDeleteMenuItem:",
+          "address": "0x1002a752c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "canShowRevokeMsgMenuItemForMessage:",
+          "address": "0x1002a75c8",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "canShowRevokeMsgMenuItem",
+          "address": "0x1002a7828",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "shareMsgToThirdPartyServiceMenuItem",
+          "address": "0x1002a7940",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowShareMsgToThirdPartyServiceMenuItem",
+          "address": "0x1002a7f3c",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "restoreMenuItem",
+          "address": "0x1002a7f7c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "moreMenuItem",
+          "address": "0x1002a8144",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowMoreMenuItem",
+          "address": "0x1002a8274",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "makeAskXiaoWeiMenuItemWithAction:",
+          "address": "0x1002a86d4",
+          "types": "@24@0:8:16"
+        },
+        {
+          "selector": "canShowFTSIndexMenuItem",
+          "address": "0x1002aa2a4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "showFTSIndexMenuItem",
+          "address": "0x1002aa348",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onShowFTSIndexMenuItem:",
+          "address": "0x1002aa388",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "msgReplyMenuItem",
+          "address": "0x1002aa484",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onShowMsgReplyMenuItem:",
+          "address": "0x1002aa4b8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "msgAddNoteMenuItem",
+          "address": "0x1002aa5b4",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onClickMsgAddNoteMenuItem:",
+          "address": "0x1002aa5e8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "canShowTopMsgMenuItem",
+          "address": "0x1002aa6e4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "topMsgMenuItem",
+          "address": "0x1002aaa68",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onTopMsgMenuItem:",
+          "address": "0x1002aaa9c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "canShowCancelTopMenuItem",
+          "address": "0x1002aab98",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "onCancelTopMsgMenuItem:",
+          "address": "0x1002aad54",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "canShowEditMenuItem",
+          "address": "0x1002ab4d0",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowSearchMenuItem",
+          "address": "0x1002ab4d8",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "showRectForMenuController",
+          "address": "0x1002ad6f4",
+          "types": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "onLongTouch",
+          "address": "0x1002ae698",
+          "types": "v16@0:8"
+        }
+      ]
+    },
+    "BaseMessageViewModel": {
+      "superclass": "BaseChatViewModel",
+      "menu_methods": [
+        {
+          "selector": "canShowMsgReplyMenuItem",
+          "address": "0x1002b07c8",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowMsgNoteMenuItem",
+          "address": "0x1002b0a9c",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "BaseMsgContentLogicController": {
+      "superclass": "MMObject",
+      "menu_methods": [
+        {
+          "selector": "getViewController",
+          "address": "0x1002b5e7c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onClickFavMenu:",
+          "address": "0x1002b7e00",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onClickForwardMenu:",
+          "address": "0x1002b7e04",
+          "types": "v24@0:8@16"
+        }
+      ]
+    },
+    "BaseMsgContentViewController": {
+      "superclass": "MMUIViewController",
+      "menu_methods": [
+        {
+          "selector": "onGrowTextViewMenuItemClicked:growTextView:",
+          "address": "0x1002ee6c4",
+          "types": "v32@0:8Q16@24"
+        },
+        {
+          "selector": "onGrowTextViewDidShowMenuControllerWithMenuItemArr:",
+          "address": "0x1002ee784",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "getViewController",
+          "address": "0x1002f53dc",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onClickFavVideoMenu",
+          "address": "0x10030f6b8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onClickFavMenu:",
+          "address": "0x100311b84",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onClickForwardMenu:",
+          "address": "0x100311c3c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onTopMsgMenuItemExposed:",
+          "address": "0x100313cd4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onCancelTopMsgMenuItemExposed:",
+          "address": "0x100313d8c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "willShowMenuController:inMsgWrap:",
+          "address": "0x10032aeb4",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "willShowMenuController:inMsgWrap:menuSourceType:",
+          "address": "0x10032aec4",
+          "types": "v36@0:8@16@24i32"
+        },
+        {
+          "selector": "willShowMenuController:inMsgWrap:menuSourceType:buttonList:",
+          "address": "0x10032aed4",
+          "types": "v44@0:8@16@24i32@36"
+        },
+        {
+          "selector": "canShowOperationMenu",
+          "address": "0x100336b28",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "MenuControllerWillShow:",
+          "address": "0x100340da4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "MenuControllerWillHide:",
+          "address": "0x100340dc0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "getForwardingMenuActionTarget:",
+          "address": "0x100353e54",
+          "types": "@24@0:8:16"
+        },
+        {
+          "selector": "getMenuReporter",
+          "address": "0x100360898",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "BizAppBaseMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x100383d64",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onShowOperationMenu",
+          "address": "0x100384004",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "reportYuanBaoSummaryMenuExposure",
+          "address": "0x1003845c8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "reportXiaoWeiSummaryMenuExposure",
+          "address": "0x100384814",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "canShowYuanBaoSummaryMenuItem",
+          "address": "0x10038520c",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "onMenuControllerDidHide",
+          "address": "0x100387090",
+          "types": "v16@0:8"
+        }
+      ]
+    },
+    "BizAppBaseMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "BizAppImageContentMessageCellView": {
+      "superclass": "AppStandardImageContentMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1003889d4",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onShowOperationMenu",
+          "address": "0x100388a28",
+          "types": "v16@0:8"
+        }
+      ]
+    },
+    "BizAppImageContentMessageCellCoverView": {
+      "superclass": "UIView",
+      "menu_methods": []
+    },
+    "BizAppImageContentMessageViewModel": {
+      "superclass": "AppStandardImageContentMessageViewModel",
+      "menu_methods": []
+    },
+    "BizAppImageContentMessageRecordViewModel": {
+      "superclass": "BizAppImageContentMessageViewModel",
+      "menu_methods": []
+    },
+    "BizAppMessageCellBaseHandler": {
+      "superclass": "NSObject",
+      "menu_methods": [
+        {
+          "selector": "genOperationMenuItems",
+          "address": "0x10038c704",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onShowOperationMenuWithMenuItems:",
+          "address": "0x10038cb24",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "canShowYuanBaoSummaryMenuItem",
+          "address": "0x10038cdb0",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "reportYuanBaoSummaryMenuExposure",
+          "address": "0x10038db8c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "reportXiaoWeiSummaryMenuExposure",
+          "address": "0x10038ddc8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onMenuControllerDidHide",
+          "address": "0x10038edd0",
+          "types": "v16@0:8"
+        }
+      ]
+    },
+    "BizAppReaderMessageBigPicViewModel": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "BizAppTextContentMessageCellView": {
+      "superclass": "AppStandardTextContentMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x100393540",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onShowOperationMenu",
+          "address": "0x100393594",
+          "types": "v16@0:8"
+        }
+      ]
+    },
+    "BizAppTextContentMessageViewModel": {
+      "superclass": "AppStandardTextContentMessageViewModel",
+      "menu_methods": []
+    },
+    "BizAppTextContentMessageRecordViewModel": {
+      "superclass": "BizAppTextContentMessageViewModel",
+      "menu_methods": []
+    },
+    "BrandFinderLiveMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1005a7678",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "BrandFinderLiveMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "CBTCoopV2EmoticonCellView": {
+      "superclass": "CBTCoopV2AsstBoardCellView",
+      "menu_methods": [
+        {
+          "selector": "selectAllForLongPressMenu",
+          "address": "0x100a0fd30",
+          "types": "v16@0:8"
+        }
+      ]
+    },
+    "CBTCoopV2EmoticonViewModel": {
+      "superclass": "CBTCoopV2AsstBoardViewModel",
+      "menu_methods": []
+    },
+    "ChatBotHistoryMessageCell": {
+      "superclass": "UITableViewCell",
+      "menu_methods": []
+    },
+    "ChatBotCardMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "setupMenuCardWithCardWrap:",
+          "address": "0x100d71d50",
+          "types": "v24@0:8@16"
+        }
+      ]
+    },
+    "ChatBotCardMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "CommonMessageCellViewExtTarget": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "CommonMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "showRectForMenuController",
+          "address": "0x100f560c0",
+          "types": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "onShowOperationMenu",
+          "address": "0x100f56664",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onShowMsgReplyMenuItem:",
+          "address": "0x100f5680c",
+          "types": "v24@0:8@16"
+        }
+      ]
+    },
+    "CommonMessageViewModelExtTarget": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "CommonMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "EcsGiftChatroomMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1011eb878",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowRevokeMsgMenuItem",
+          "address": "0x1011ebb0c",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "EcsGiftChatroomMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "EcsGiftMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1011f9e88",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "EcsGiftMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "EcsGiftNewChatroomMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x101215e58",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowRevokeMsgMenuItem",
+          "address": "0x1012160ec",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "EcsGiftNewChatroomMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "EcsKFCardMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x101238e2c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowMoreMenuItem",
+          "address": "0x101238e70",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "EcsKFCardMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": [
+        {
+          "selector": "canShowMsgReplyMenuItem",
+          "address": "0x101239b54",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "EcsKfProductCardMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10124335c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowMoreMenuItem",
+          "address": "0x1012433c4",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "EcsKfProductCardMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": [
+        {
+          "selector": "canShowMsgReplyMenuItem",
+          "address": "0x1012440f0",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "EmoticonBoardCrossCollectionBasePageCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionCameraEmoticonEntryPageCell": {
+      "superclass": "EmoticonBoardCrossCollectionBasePageCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionQQEmojiCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionEmoticonCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionEmoticonButtonCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionAsyncUploadCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionCameraEmoticonEntryCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionRecommendCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionStoreSyncingCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionIPPackMergeTipCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoradCrossCollectionRecommendAndAICell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoradCrossCollectionRecommendAndAIEmptyCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionEmoticonPageCell": {
+      "superclass": "EmoticonBoardCrossCollectionBasePageCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionIPSetPageCell": {
+      "superclass": "EmoticonBoardCrossCollectionBasePageCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionIPTipPageCell": {
+      "superclass": "EmoticonBoardCrossCollectionBasePageCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionQQEmojiPageCell": {
+      "superclass": "EmoticonBoardCrossCollectionBasePageCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionRecommendAndAIPageCell": {
+      "superclass": "EmoticonBoardCrossCollectionBasePageCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionRecommendEmoticonHeaderViewModel": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionRecommendPageCell": {
+      "superclass": "EmoticonBoardCrossCollectionBasePageCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionStoreGridCellModel": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionStoreGridCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardCrossCollectionSystemEmojiPageCell": {
+      "superclass": "EmoticonBoardCrossCollectionBasePageCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardDynamicTabBarCollectionCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonBoardXiaoweiRecentSearchCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonCellLikeButton": {
+      "superclass": "UIButton",
+      "menu_methods": []
+    },
+    "EmoticonCustomManageCellLayoutAttributes": {
+      "superclass": "UICollectionViewLayoutAttributes",
+      "menu_methods": []
+    },
+    "EmoticonCustomManageMultiImagePreviewCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonCustomManageCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonDesignerRichPortfolioCell": {
+      "superclass": "MMStoreEmotionBaseAllCell",
+      "menu_methods": []
+    },
+    "EmoticonFinderDesignerUGCEmojiCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonLensCollectionCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonManageCell": {
+      "superclass": "MMUIView",
+      "menu_methods": []
+    },
+    "EmoticonMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "showRectForMenuController",
+          "address": "0x10152d618",
+          "types": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10152e064",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onLongTouch",
+          "address": "0x10152ee9c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getViewController",
+          "address": "0x10152fa70",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "EmoticonMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "EmoticonMixedPreviewCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonSearchViewModel": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "SearchEmoticonCollectionCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "SearchEmoticonExceptionCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonStoreDesingerIPViewCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "EmoticonWeAppCellView": {
+      "superclass": "EmoticonCellLikeButton",
+      "menu_methods": []
+    },
+    "FavPhotoAccountNameCardMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x101998068",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "FavPhotoAccountNameCardMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "FinderLiveServiceNotifyMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": []
+    },
+    "GCEmoticonCellModel": {
+      "superclass": "GCChatBaseCellModel",
+      "menu_methods": []
+    },
+    "GCEmoticonCell": {
+      "superclass": "GCChatBaseCell",
+      "menu_methods": []
+    },
+    "GCMessageViewModelConfig": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "GCMessageViewModel": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "GCMultiMessageViewModelConfig": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "GCMultiMessageViewModel": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "GameChatMessageCellModel": {
+      "superclass": "GCBaseCellModel",
+      "menu_methods": []
+    },
+    "GameChatMessageCell": {
+      "superclass": "GCBaseCollectionViewCell",
+      "menu_methods": []
+    },
+    "GameMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x101e12948",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "GameMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "GameShareNameCardMessageViewModel": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "GroupNoticeMessageViewModel": {
+      "superclass": "TextMessageViewModel",
+      "menu_methods": [
+        {
+          "selector": "canShowRevokeMsgMenuItem",
+          "address": "0x101ebf5b8",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "ImageMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "showRectForMenuController",
+          "address": "0x101f781a8",
+          "types": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "canShowForwardMenuItem",
+          "address": "0x101f78bcc",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowFavoriteMenuItem",
+          "address": "0x101f78cc4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowEditMenuItem",
+          "address": "0x101f78dbc",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowSearchMenuItem",
+          "address": "0x101f78e34",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x101f78e48",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "ImageMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "ImageReaderMessageCellView": {
+      "superclass": "ReaderMessageCellView",
+      "menu_methods": []
+    },
+    "ImageReaderMessageViewModel": {
+      "superclass": "ReaderMessageViewModel",
+      "menu_methods": []
+    },
+    "ImageTextReaderMessageCellView": {
+      "superclass": "ReaderMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x101f935d0",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "ImageTextReaderMessageViewModel": {
+      "superclass": "ReaderMessageViewModel",
+      "menu_methods": []
+    },
+    "LiveLotteryTextMessageCellView": {
+      "superclass": "TextMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canShowRevokeMsgMenuItem",
+          "address": "0x10221d5d4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10221d5dc",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "LiveLotteryTextMessageViewModel": {
+      "superclass": "TextMessageViewModel",
+      "menu_methods": []
+    },
+    "LiveLuckyBagTextMessageCellView": {
+      "superclass": "TextMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canShowRevokeMsgMenuItem",
+          "address": "0x10221faa4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10221faac",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "LiveLuckyBagTextMessageViewModel": {
+      "superclass": "TextMessageViewModel",
+      "menu_methods": []
+    },
+    "LocationMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x102265284",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "LocationMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "MMFinderLiveTableStyleBigEmoticonCommentPubbleUserCell": {
+      "superclass": "MMFinderLiveTableStyleCommentPubbleCell",
+      "menu_methods": []
+    },
+    "MMQuickSendEmoticonCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "MMQuickSendEmoticonSearchCellView": {
+      "superclass": "UIView",
+      "menu_methods": []
+    },
+    "MMStoreEmoticonPreviewCell": {
+      "superclass": "MMStoreEmotionBaseAllCell",
+      "menu_methods": []
+    },
+    "MailMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": []
+    },
+    "MailMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "MassSendMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "showOperationMenu",
+          "address": "0x104ac7680",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getForwardingMenuActionTarget:",
+          "address": "0x104aca18c",
+          "types": "@24@0:8:16"
+        },
+        {
+          "selector": "getViewController",
+          "address": "0x104aca2f8",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "MassSendMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "MessageTipsCellView": {
+      "superclass": "BaseChatCellView",
+      "menu_methods": []
+    },
+    "MessageTipsViewModel": {
+      "superclass": "BaseChatViewModel",
+      "menu_methods": []
+    },
+    "CMessageWrap": {
+      "superclass": "MMObject",
+      "menu_methods": [
+        {
+          "selector": "setM_bizMsgMenuID:",
+          "address": "0x104b9cf24",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setM_openkfMsgMenuID:",
+          "address": "0x104b9cf74",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "m_bizMsgMenuID",
+          "address": "0x104bb4544",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "m_openkfMsgMenuID",
+          "address": "0x104bb4554",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "MultiColumnReaderMessageCellMainContentView": {
+      "superclass": "UIView",
+      "menu_methods": []
+    },
+    "MultiColumnReaderMessageCellView": {
+      "superclass": "ReaderMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "isNeedHeaderMenuButton",
+          "address": "0x104e4a3b8",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "layoutHeaderMenuButtonIfNeedOnCenterY:parent:",
+          "address": "0x104e4a8c4",
+          "types": "v32@0:8d16@24"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x104e522e8",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowMoreMenuItem",
+          "address": "0x104e523b8",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "MultiColumnReaderMessageViewModel": {
+      "superclass": "ReaderMessageViewModel",
+      "menu_methods": [
+        {
+          "selector": "headerMenuSize",
+          "address": "0x104e5939c",
+          "types": "{CGSize=dd}16@0:8"
+        },
+        {
+          "selector": "headerMenuImage",
+          "address": "0x104e5a0f4",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "MultiImageReaderMessageCellView": {
+      "superclass": "ReaderMessageCellView",
+      "menu_methods": []
+    },
+    "MultiReaderMessageCellView": {
+      "superclass": "ReaderMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "handleMenuControllerWillHideMenuNotification:",
+          "address": "0x104e89078",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "readerItemCanShowLongPressMenu:",
+          "address": "0x104e8a39c",
+          "types": "B20@0:8I16"
+        }
+      ]
+    },
+    "MultiReaderMessageViewModel": {
+      "superclass": "ReaderMessageViewModel",
+      "menu_methods": []
+    },
+    "MultiTalkMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canCellShowOperationMenu",
+          "address": "0x104f2e3b4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "generateOperationMenu",
+          "address": "0x104f2e430",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "MultiTalkMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "FinderLiveMessageCellMainContentView": {
+      "superclass": "UIView",
+      "menu_methods": []
+    },
+    "NotifyLiveImageMessageCellView": {
+      "superclass": "TemplateNotifyMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1051b7ee0",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "NotifyMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "PhotoAccountNameCardMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x105349c90",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "PhotoAccountNameCardMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "PocketMoneyMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1053717c4",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "PocketMoneyMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "ReaderMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1054ed3f0",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "initCustomMenuButtonStyle:position:",
+          "address": "0x1054ee464",
+          "types": "v28@0:8@16i24"
+        },
+        {
+          "selector": "canShowForwardPayReceiptMenuItem",
+          "address": "0x1054f50a0",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "forwardPayReceiptMenuItem",
+          "address": "0x1054f514c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canCellShowOperationMenu",
+          "address": "0x1054f5c18",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "ReaderMessageFolderCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canCellShowOperationMenu",
+          "address": "0x1054f88a8",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "ReaderMessageFolderViewModel": {
+      "superclass": "ReaderMessageViewModel",
+      "menu_methods": []
+    },
+    "ReaderMessageTemplateMsgFolderCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canCellShowOperationMenu",
+          "address": "0x1054fbf10",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "ReaderMessageTemplateMsgFolderViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "ReaderMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "RelatedEmoticonActivityCell": {
+      "superclass": "EmoticonCellLikeButton",
+      "menu_methods": []
+    },
+    "RelatedEmoticonCollectionCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "RelatedEmoticonCollectionExceptionCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "RevokeMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "generateOperationMenu",
+          "address": "0x105582c80",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canCellShowOperationMenu",
+          "address": "0x105582cf8",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "RevokeMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "MessageRingCellHandler": {
+      "superclass": "WCTableViewCellHandler",
+      "menu_methods": []
+    },
+    "ServiceNotifyMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "SessionMenuAdjuester": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "ShareCardMessageCellView": {
+      "superclass": "AppStandardAccountContentMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x1058f85b4",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "ShareCardMessageViewModel": {
+      "superclass": "AppStandardAccountContentMessageViewModel",
+      "menu_methods": []
+    },
+    "StreamMDMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x105af5f8c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowForwardMenuItem",
+          "address": "0x105af7e14",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowFavoriteMenuItem",
+          "address": "0x105af7e98",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "StreamMDMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "SystemMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canCellShowOperationMenu",
+          "address": "0x105b6d854",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "generateOperationMenu",
+          "address": "0x105b6d8d0",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "SystemMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "TemplateNotifyMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "genHeaderMenuButton",
+          "address": "0x105bdb618",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "headerMenuButton",
+          "address": "0x105be09ec",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setHeaderMenuButton:",
+          "address": "0x105be09fc",
+          "types": "v24@0:8@16"
+        }
+      ]
+    },
+    "TemplateReaderMessageFolderCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canCellShowOperationMenu",
+          "address": "0x105be35b8",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "TemplateReaderMessageFolderViewModel": {
+      "superclass": "ReaderMessageViewModel",
+      "menu_methods": []
+    },
+    "TemplateTwoNotifyMessageCellView": {
+      "superclass": "TemplateNotifyMessageCellView",
+      "menu_methods": []
+    },
+    "TextMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "onClickTranslateSearchMenus",
+          "address": "0x105bf7790",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getTranslateMenuItems",
+          "address": "0x105bf7824",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "handleTranslateMenuWillHideMenuNotification:",
+          "address": "0x105bf7dfc",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "canShowRevokeMsgMenuItem",
+          "address": "0x105bfdb34",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x105bfdbb8",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowTranslateMenuItem",
+          "address": "0x105bfefd0",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "onShowMsgReplyMenuItem:",
+          "address": "0x105c019c4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onMenuHide",
+          "address": "0x105c01bfc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getViewController",
+          "address": "0x105c03328",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onFloatPreviewMenuHidden",
+          "address": "0x105c033e0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onFloatPreviewMenuCopy:",
+          "address": "0x105c03440",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onFloatPreviewMenuSelectAll",
+          "address": "0x105c034f8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onFloatPreviewMenuForward",
+          "address": "0x105c0355c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onFloatPreviewMenuSearch:",
+          "address": "0x105c03638",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onFloatPreviewMenuPartRefer:",
+          "address": "0x105c03854",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "getOperateMenuItem",
+          "address": "0x105c08198",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "TextMessageSubViewModel": {
+      "superclass": "TextMessageViewModel",
+      "menu_methods": []
+    },
+    "TextMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": [
+        {
+          "selector": "canShowRevokeMsgMenuItem",
+          "address": "0x105c0ebc4",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "TextReaderMessageCellView": {
+      "superclass": "ReaderMessageCellView",
+      "menu_methods": []
+    },
+    "TextReaderMessageViewModel": {
+      "superclass": "ReaderMessageViewModel",
+      "menu_methods": []
+    },
+    "TextStateMessageBoxCollectionViewCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "VideoMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "showRectForMenuController",
+          "address": "0x10604ca44",
+          "types": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10604e51c",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "VideoMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "VideoReaderMessageCellView": {
+      "superclass": "ReaderMessageCellView",
+      "menu_methods": []
+    },
+    "VideoReaderMessageViewModel": {
+      "superclass": "ReaderMessageViewModel",
+      "menu_methods": []
+    },
+    "VoIPBubbleMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": []
+    },
+    "VoIPBubbleMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "VoIPSignalMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": []
+    },
+    "VoIPSignalMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "VoiceMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "getTextTranslateViewMenus",
+          "address": "0x106272c04",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onClickTextResultTranslateSearchMenus",
+          "address": "0x106274de0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "handleTranslateMenuWillHideMenuNotification:",
+          "address": "0x10627e8b0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "getTranslateMenus",
+          "address": "0x10627ea10",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onLongTouch",
+          "address": "0x10627f1fc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x10627f2a4",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowVoiceTransMenu",
+          "address": "0x10627f864",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "onClickTranslateSearchMenus",
+          "address": "0x106282fa4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getViewController",
+          "address": "0x1062878e0",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "VoiceMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "VoiceNodataMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": []
+    },
+    "VoiceNodataMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "VoiceReaderMessageCellView": {
+      "superclass": "ReaderMessageCellView",
+      "menu_methods": []
+    },
+    "VoiceReaderMessageViewModel": {
+      "superclass": "ReaderMessageViewModel",
+      "menu_methods": []
+    },
+    "VoiceTransTextMessageCellView": {
+      "superclass": "TextMessageCellView",
+      "menu_methods": []
+    },
+    "VoiceTransTextMessageCellViewV2": {
+      "superclass": "TextMessageCellView",
+      "menu_methods": []
+    },
+    "VoiceTransTextMessageViewModel": {
+      "superclass": "TextMessageViewModel",
+      "menu_methods": []
+    },
+    "VoiceTransTextMessageViewModelV2": {
+      "superclass": "TextMessageViewModel",
+      "menu_methods": []
+    },
+    "WAAppMessageBaseCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "operationMenuItems",
+          "address": "0x106456630",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "canShowFavoriteMenuItem",
+          "address": "0x1064567d0",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "WAAppMessageBaseViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "WAAppMessageCellView": {
+      "superclass": "WAAppMessageBaseCellView",
+      "menu_methods": []
+    },
+    "WAAppMessageViewModel": {
+      "superclass": "WAAppMessageBaseViewModel",
+      "menu_methods": []
+    },
+    "WCBizAppReaderMessageBigPicViewModel": {
+      "superclass": "BizAppReaderMessageBigPicViewModel",
+      "menu_methods": []
+    },
+    "WCCommentBigEmoticonViewModel": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "WCFinderMessageCellViewModel": {
+      "superclass": "NSObject",
+      "menu_methods": []
+    },
+    "WCPayBaseMessageCellView": {
+      "superclass": "CommonMessageCellView",
+      "menu_methods": []
+    },
+    "WCPayBaseMessageViewModel": {
+      "superclass": "CommonMessageViewModel",
+      "menu_methods": []
+    },
+    "WCPayC2CMessageCellView": {
+      "superclass": "WCPayBaseMessageCellView",
+      "menu_methods": []
+    },
+    "WCPayC2CMessageViewModel": {
+      "superclass": "WCPayBaseMessageViewModel",
+      "menu_methods": []
+    },
+    "WCPayRecepictReaderMessageCellView": {
+      "superclass": "ReaderMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "isNeedHeaderMenuButton",
+          "address": "0x1099539dc",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "layoutHeaderMenuButtonIfNeedOnCenterY:",
+          "address": "0x109953d2c",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x109957ae4",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "WCPayRecepictReaderMessageViewModel": {
+      "superclass": "ReaderMessageViewModel",
+      "menu_methods": [
+        {
+          "selector": "headerMenuSize",
+          "address": "0x10995c1f0",
+          "types": "{CGSize=dd}16@0:8"
+        },
+        {
+          "selector": "headerMenuImage",
+          "address": "0x10995c24c",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "WCPayThirdC2CMessageCellView": {
+      "superclass": "WCPayBaseMessageCellView",
+      "menu_methods": []
+    },
+    "WCPayThirdC2CMessageCellViewV3": {
+      "superclass": "WCPayBaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canShowForwardMenuItem",
+          "address": "0x109a23e20",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowFavoriteMenuItem",
+          "address": "0x109a23ec4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canShowRevokeMsgMenuItem",
+          "address": "0x109a23f68",
+          "types": "B16@0:8"
+        }
+      ]
+    },
+    "WCPayThirdC2CMessageViewModel": {
+      "superclass": "WCPayBaseMessageViewModel",
+      "menu_methods": []
+    },
+    "WCPayThirdC2CMessageViewModelV3": {
+      "superclass": "WCPayBaseMessageViewModel",
+      "menu_methods": []
+    },
+    "WCPayTransferMessageCellView": {
+      "superclass": "WCPayBaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canShowRevokeMsgMenuItem",
+          "address": "0x109a49098",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "operationMenuItems",
+          "address": "0x109a491b0",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "WCPayTransferMessageViewModel": {
+      "superclass": "WCPayBaseMessageViewModel",
+      "menu_methods": []
+    },
+    "WeClawQuickMessageCell": {
+      "superclass": "UITableViewCell",
+      "menu_methods": []
+    },
+    "WeiShiReaderMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canCellShowOperationMenu",
+          "address": "0x10a939b58",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "getMenuItems",
+          "address": "0x10a93afa8",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onFavoriteMenu:",
+          "address": "0x10a93b084",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onForwardMenu:",
+          "address": "0x10a93b298",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onMoreMenu:",
+          "address": "0x10a93b608",
+          "types": "v24@0:8@16"
+        }
+      ]
+    },
+    "WeiShiReaderMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "ilinkMultiTalkMessageCellView": {
+      "superclass": "BaseMessageCellView",
+      "menu_methods": [
+        {
+          "selector": "canCellShowOperationMenu",
+          "address": "0x10aa1cd80",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "generateOperationMenu",
+          "address": "0x10aa1ce14",
+          "types": "@16@0:8"
+        }
+      ]
+    },
+    "ilinkMultiTalkMessageViewModel": {
+      "superclass": "BaseMessageViewModel",
+      "menu_methods": []
+    },
+    "_TtC6WeChat31EmoticonStoreDesginerIPPackCell": {
+      "superclass": "UICollectionViewCell",
+      "menu_methods": []
+    },
+    "WASubscriptionMessageSettingsViewModel": {
+      "superclass": "MMObject",
+      "menu_methods": []
+    },
+    "WASubscriptionMessagePageSheetViewModel": {
+      "superclass": "WAAuthPageSheetViewModel",
+      "menu_methods": []
+    },
+    "MMMenuController": {
+      "superclass": "MMWindowViewController",
+      "menu_methods": [
+        {
+          "selector": "currentMenuItems",
+          "address": "0x1165e02a0",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setMenuMinWidth:",
+          "address": "0x1165e041c",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "setMenuItemInnerGap:",
+          "address": "0x1165e042c",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "setMenuItemWidth:",
+          "address": "0x1165e043c",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "setPreferredMenuDirection:",
+          "address": "0x1165e044c",
+          "types": "v24@0:8q16"
+        },
+        {
+          "selector": "setMenuExtraInfo:",
+          "address": "0x1165e046c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setMenuVisible:animated:",
+          "address": "0x1165e048c",
+          "types": "v24@0:8B16B20"
+        },
+        {
+          "selector": "setMenuVisible:responder:animated:",
+          "address": "0x1165e04a0",
+          "types": "v32@0:8B16@20B28"
+        },
+        {
+          "selector": "pushSubMenu:style:animated:",
+          "address": "0x1165e0d94",
+          "types": "v36@0:8@16q24B32"
+        },
+        {
+          "selector": "setMenuItems:",
+          "address": "0x1165e0e4c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setMenuItemRows:",
+          "address": "0x1165e0f34",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setMenuControllerStyle:",
+          "address": "0x1165e1658",
+          "types": "v24@0:8q16"
+        },
+        {
+          "selector": "currentMenuFrame",
+          "address": "0x1165e1a8c",
+          "types": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "onTouchAtNoneMenuArea",
+          "address": "0x1165e1b94",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onMenuItemSelected:itemView:",
+          "address": "0x1165e1c24",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "initMenuView",
+          "address": "0x1165e1f14",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "updateMenuView",
+          "address": "0x1165e1fe0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyMenuWillShow:",
+          "address": "0x1165e264c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "notifyMenuDidShow:",
+          "address": "0x1165e2800",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "notifyMenuDidShowFailed:",
+          "address": "0x1165e29f0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "notifyMenuWillHide:",
+          "address": "0x1165e2ba4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "notifyMenuDidHide:",
+          "address": "0x1165e2d58",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "notifyMenuFrameDidChange",
+          "address": "0x1165e2f24",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyMenuItemSelected:",
+          "address": "0x1165e3004",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "indexForMenuItem:",
+          "address": "0x1165e3270",
+          "types": "q24@0:8@16"
+        },
+        {
+          "selector": "isMenuVisible",
+          "address": "0x1165e3534",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setMenuVisible:",
+          "address": "0x1165e3544",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "isCheckMenuWindowValid",
+          "address": "0x1165e3554",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setIsCheckMenuWindowValid:",
+          "address": "0x1165e3564",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "setMenuView:",
+          "address": "0x1165e3594",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setMenuWindow:",
+          "address": "0x1165e35c8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setMenuStyle:",
+          "address": "0x1165e360c",
+          "types": "v24@0:8q16"
+        },
+        {
+          "selector": "subMenuPushedAnimated",
+          "address": "0x1165e365c",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setSubMenuPushedAnimated:",
+          "address": "0x1165e366c",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "setMenuAnimator:",
+          "address": "0x1165e36bc",
+          "types": "v24@0:8@16"
+        }
+      ]
+    },
+    "MMMenuItem": {
+      "superclass": "UIMenuItem",
+      "menu_methods": [
+        {
+          "selector": "setMenuItemAnimator:",
+          "address": "0x1167a6df8",
+          "types": "v24@0:8@?16"
+        },
+        {
+          "selector": "setMenuType:",
+          "address": "0x1167a6f84",
+          "types": "v24@0:8q16"
+        }
+      ]
+    }
+  }
+}

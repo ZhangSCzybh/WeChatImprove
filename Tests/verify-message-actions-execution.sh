@@ -20,13 +20,16 @@ for name,native in (('bShowSendSuccessView','YES'),('bHiddenSendSuccessToastView
     ui.append(re.search(r'- \(BOOL\)'+name+r' \{.*?\n\}',logic,re.S).group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig',native))
 clear=re.search(r'- \(void\)clearData \{.*?\n\}',logic,re.S).group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig;', 'forwardNativeClearCalls++;')
 menu=(root/'Hooks/RepeatHooks.xm').read_text()
-classes=('CommonMessageCellView','TextMessageCellView','ImageMessageCellView','EmoticonMessageCellView','VideoMessageCellView','VoiceMessageCellView','AppEmoticonMessageCellView','AppFileMessageCellView','ShareCardMessageCellView')
+classes=('CommonMessageCellView','TextMessageCellView','ImageMessageCellView','EmoticonMessageCellView','VideoMessageCellView','VoiceMessageCellView','AppEmoticonMessageCellView','AppFileMessageCellView','ShareCardMessageCellView','GameMessageCellView')
 extracted=['static CSMessageActionMenuAdapter *menuHookAdapter;']
 for cls in classes:
     match=re.search(r'%hook '+cls+r'\n(.*?)%end',menu,re.S)
     body=re.search(r'- \(id\)operationMenuItems \{.*?\}',match.group(1),re.S).group() if match else '- (id)operationMenuItems { return %orig; }'
     body=body.replace('CSMessageActionMenuAdapter itemsByAddingActionsForCell','menuHookAdapter itemsByAddingActionsForCell').replace('%orig','self.nativeItems')
-    extracted.append('@interface '+cls+' : TestCell\n@property(nonatomic,copy) NSArray *nativeItems;\n- (id)operationMenuItems;\n@end\n@implementation '+cls+'\n'+body+'\n@end')
+    if cls in ('EmoticonMessageCellView','AppEmoticonMessageCellView'):
+        body+='\n- (id)getViewController { return [self.nativeDelegate getViewController]; }'
+    native='@property(nonatomic,weak) TestMessageCellDelegate *nativeDelegate;\n' if cls in ('EmoticonMessageCellView','AppEmoticonMessageCellView') else ''
+    extracted.append('@interface '+cls+' : TestCell\n'+native+'@property(nonatomic,copy) NSArray *nativeItems;\n- (id)operationMenuItems;\n@end\n@implementation '+cls+'\n'+body+'\n@end')
 (out/'RepeatMenuHooksUnderTest.h').write_text('\n'.join(extracted))
 (out/'VoiceForwardCleanupHooksUnderTest.h').write_text('static CSMessageActionCoordinator *forwardHookCoordinator;\nstatic NSUInteger forwardNativeClearCalls;\n@interface TestLogic (CleanupHook)\n- (void)clearData;\n- (BOOL)bShowSendSuccessView;\n- (BOOL)bHiddenSendSuccessToastView;\n@end\n@implementation TestLogic (CleanupHook)\n'+clear+'\n'+'\n'.join(ui)+'\n@end\n@interface TestForwardManager : NSObject\n@property(nonatomic, strong) NSMutableArray *originalCalls;\n@end\n@implementation TestForwardManager\n'+'\n'.join(methods)+'\n@end\n')
 PYEXTRACT

@@ -19,15 +19,17 @@ FOUNDATION_EXPORT void CSMessageActionAccountDidChangeAtNativeBoundary(void);
 - (nullable CSMessageActionContext *)captureContextForCell:(id)cell controller:(nullable id)controller bindingGeneration:(NSUInteger)generation;
 - (BOOL)validateContext:(CSMessageActionContext *)context;
 - (BOOL)canExecuteContext:(CSMessageActionContext *)context action:(CSMessageAction)action entry:(CSMessageActionEntry)entry;
+// Returns an ID only for plugin-owned repeat/enhanced-voice operations. Native
+// actions return nil; their UI/confirmation lifetime does not occupy the send pool.
 - (nullable NSString *)executeContext:(CSMessageActionContext *)context action:(CSMessageAction)action entry:(CSMessageActionEntry)entry;
-- (void)cancelOperationID:(NSString *)operationID;
+- (void)cancelOperationID:(nullable NSString *)operationID;
 - (void)cancelOperationsForCell:(id)cell;
 - (void)cancelAllUnsubmittedOperations;
 // Invoke at the established account lifecycle boundary, including logout/login to the same account.
 // Logout boundary: invalidates immediately and blocks capture/submission until accountDidChange.
 - (void)accountWillChange;
 - (void)accountDidChange;
-- (NSDictionary<NSString *, NSNumber *> *)resultsForOperationID:(NSString *)operationID;
+- (NSDictionary<NSString *, NSNumber *> *)resultsForOperationID:(nullable NSString *)operationID;
 // Exact native logic bridge; callbacks never discover a different/global pending operation.
 - (void)withForwardContext:(CSMessageActionContext *)context entry:(CSMessageActionEntry)entry perform:(void (^)(void))perform;
 - (void)bindForwardLogic:(id)logic source:(id)source;

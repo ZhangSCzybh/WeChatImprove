@@ -5,6 +5,7 @@
 #import <UIKit/UIKit.h>
 #endif
 @interface NSObject (CSNativeMenuConstruction)
+- (SEL)action;
 - (instancetype)initWithTitle:(NSString *)title icon:(id)icon target:(id)target action:(SEL)action;
 - (instancetype)initWithTitle:(NSString *)title target:(id)target action:(SEL)action;
 @end
@@ -37,9 +38,10 @@ static const void *CSMenuContextKey=&CSMenuContextKey;
 - (BOOL)isPluginSelector:(SEL)selector { return selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:") || selector==NSSelectorFromString(@"cs_handleVoiceForwardMenuItem:"); }
 - (BOOL)canPerformSelector:(SEL)selector cell:(id)cell {
     if (![self isPluginSelector:selector]) return NO;
+    BOOL repeat=selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:");
+    if (!CSMessageActionEntryAllows(self.coordinator.settings,repeat ? CSMessageActionEntryMenuRepeat : CSMessageActionEntryMenuVoiceForward,repeat ? CSMessageActionRepeat : CSMessageActionForward)) return NO;
     CSMessageActionContext *context=objc_getAssociatedObject(cell,CSMenuContextKey);
     if (!context) context=[self.coordinator captureContextForCell:cell controller:nil bindingGeneration:1];
-    BOOL repeat=selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:");
     return context && (repeat || context.messageType==34) && [self.coordinator canExecuteContext:context action:repeat ? CSMessageActionRepeat : CSMessageActionForward entry:repeat ? CSMessageActionEntryMenuRepeat : CSMessageActionEntryMenuVoiceForward];
 }
 - (id)itemForCell:(id)cell repeat:(BOOL)repeat {
@@ -61,28 +63,52 @@ static const void *CSMenuContextKey=&CSMenuContextKey;
     return item;
 }
 - (NSArray *)itemsByAddingActionsForCell:(id)cell items:(NSArray *)items {
-    CSMessageActionContext *context=[self.coordinator captureContextForCell:cell controller:nil bindingGeneration:1];
+    NSArray *original=[items isKindOfClass:NSArray.class] ? items : @[];
+    CSMessageActionSettings *settings=self.coordinator.settings;
+    BOOL repeat=NO,forward=NO;
+    CSMessageActionContext *context=nil;
+    // Decide whether the message can need our menu before resolving account/page
+    // services. Disabled or unrelated menus retain the original array unchanged.
+    if (settings.repeatEnabled || settings.voiceForwardEnabled) {
+        NSUInteger type=(NSUInteger)CSMessageNativeUnsigned(CSMessageActionResolveSourceWrap(cell),@"m_uiMessageType");
+        repeat=settings.repeatEnabled && CSMessageActionSupportsRepeatMenuType(type);
+        forward=settings.voiceForwardEnabled && type==34;
+        if (repeat || forward) {
+            context=[self.coordinator captureContextForCell:cell controller:nil bindingGeneration:1];
+            repeat=repeat && [self.coordinator canExecuteContext:context action:CSMessageActionRepeat entry:CSMessageActionEntryMenuRepeat];
+            forward=forward && [self.coordinator canExecuteContext:context action:CSMessageActionForward entry:CSMessageActionEntryMenuVoiceForward];
+        }
+    }
     objc_setAssociatedObject(cell,CSMenuContextKey,context,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    NSMutableArray *result=[items isKindOfClass:NSArray.class] ? [items mutableCopy] : [NSMutableArray array];
-    // Existing host order is unchanged; voice forwarding precedes repeat as in the baseline.
-    for (NSNumber *repeatValue in @[@NO,@YES]) {
-        BOOL repeat=repeatValue.boolValue; SEL selector=NSSelectorFromString(repeat ? @"cs_handleRepeatMenuItem:" : @"cs_handleVoiceForwardMenuItem:"); BOOL present=NO;
-        for (id item in result) {
-            if (!CSMessageNativeSupports(item,@"action",@":",@[])) continue;
-            SEL itemAction=NULL;
-            NSInvocation *invocation=[NSInvocation invocationWithMethodSignature:[item methodSignatureForSelector:NSSelectorFromString(@"action")]]; invocation.target=item; invocation.selector=NSSelectorFromString(@"action"); [invocation invoke]; [invocation getReturnValue:&itemAction]; if (itemAction==selector) { present=YES; break; }
+    SEL repeatAction=NSSelectorFromString(@"cs_handleRepeatMenuItem:"), forwardAction=NSSelectorFromString(@"cs_handleVoiceForwardMenuItem:");
+    BOOL hasRepeat=NO,hasForward=NO;
+    NSMutableIndexSet *removed=nil;
+    NSMutableSet *used=(repeat || forward) ? [NSMutableSet set] : nil;
+    for (NSUInteger i=0;i<original.count;i++) {
+        id item=original[i]; SEL action=NULL;
+        if (CSMessageNativeSupports(item,@"action",@":",@[])) action=[item action];
+        BOOL isRepeat=action==repeatAction,isForward=action==forwardAction;
+        if (isRepeat || isForward) {
+            id target=CSMessageActionObjectGetter(item,@selector(target));
+            CSMessageActionContext *bound=[target isKindOfClass:CSMessageMenuInvocation.class] ? ((CSMessageMenuInvocation *)target).context : nil;
+            BOOL keep=(isRepeat ? repeat && !hasRepeat : forward && !hasForward) && context && [bound matchesSourceContext:context];
+            if (!keep) { if (!removed) removed=[NSMutableIndexSet indexSet]; [removed addIndex:i]; continue; }
+            if (isRepeat) hasRepeat=YES; else hasForward=YES;
         }
-        if (!present && [self canPerformSelector:selector cell:cell]) {
-            // Native uniqMenuItems: deduplicates by numeric menuType, not action.
-            // This is our positive namespace, not a claimed native enum reservation;
-            // skip collisions with every item already supplied by host/other plugins.
-            unsigned long long menuType=repeat ? 0x43535001ULL : 0x43535002ULL;
-            NSMutableSet *used=[NSMutableSet set];
-            for (id existing in result) if (CSMessageNativeSupports(existing,@"menuType",@"q",@[])) [used addObject:@(CSMessageNativeUnsigned(existing,@"menuType"))];
-            while ([used containsObject:@(menuType)]) menuType++;
-            id item=[self itemForCell:cell repeat:repeat];
-            if (item && CSMessageNativeSet(item,@"setMenuType:",@(menuType),YES)) [result addObject:item];
-        }
+        if (used && CSMessageNativeSupports(item,@"menuType",@"q",@[])) [used addObject:@(CSMessageNativeUnsigned(item,@"menuType"))];
+    }
+    BOOL addForward=forward && !hasForward,addRepeat=repeat && !hasRepeat;
+    if (!removed.count && !addForward && !addRepeat) return original;
+    NSMutableArray *result=[original mutableCopy];
+    if (removed.count) [result removeObjectsAtIndexes:removed];
+    // Add only our items, before native uniq/filter stages, preserving host order.
+    for (NSUInteger i=0;i<2;i++) {
+        BOOL addingRepeat=i==1;
+        if (!(addingRepeat ? addRepeat : addForward)) continue;
+        unsigned long long menuType=addingRepeat ? 0x43535001ULL : 0x43535002ULL;
+        while ([used containsObject:@(menuType)]) menuType++;
+        id item=[self itemForCell:cell repeat:addingRepeat];
+        if (item && CSMessageNativeSet(item,@"setMenuType:",@(menuType),YES)) { [result addObject:item]; [used addObject:@(menuType)]; }
     }
     return result;
 }

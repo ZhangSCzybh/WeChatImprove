@@ -40,6 +40,16 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
 @end
 @implementation CSMessageActionOperation
 @end
+// Only plugin confirmation UI needs a cancellable native-action context. This
+// does not own media, recipients, a submission ledger or an expiry callback.
+@interface CSMessageActionConfirmation : NSObject
+@property(nonatomic, strong) CSMessageActionContext *context;
+@property(nonatomic) CSMessageAction action;
+@property(nonatomic) CSMessageActionEntry entry;
+@property(nonatomic) BOOL finished;
+@end
+@implementation CSMessageActionConfirmation
+@end
 @interface CSMessageActionCoordinator ()
 @property(nonatomic, strong) id<CSMessageActionEnvironment> environment;
 @property(nonatomic, strong) CSMessageActionPreferences *preferences;
@@ -56,6 +66,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
 @property(nonatomic) BOOL accountSuspended;
 @property(nonatomic) uint_fast64_t boundaryToken;
 @property(nonatomic, strong) CSMessageActionOperation *openingForwardOperation;
+@property(nonatomic, strong) NSHashTable<CSMessageActionConfirmation *> *confirmations;
 @property(nonatomic, strong) id settingsObserver;
 #if TARGET_OS_IOS
 @property(nonatomic, strong) NSMutableDictionary<NSString *, UIView *> *waitingViews;
@@ -128,7 +139,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     if (![self validateContext:context] || !CSMessageActionEntryAllows(self.settings,entry,action)) return NO;
     if (action==CSMessageActionRepeat) {
         if (context.messageType==10000 || context.messageType==10002) return NO;
-        if (entry==CSMessageActionEntryMenuRepeat && ![@[@1,@3,@34,@42,@43,@47,@48,@49] containsObject:@(context.messageType)]) return NO;
+        if (entry==CSMessageActionEntryMenuRepeat && !CSMessageActionSupportsRepeatMenuType(context.messageType)) return NO;
         return YES; // Capability preparation is deferred; no media/service lookup in gesture admission.
     }
     return [_native canPerformAction:action context:context];
@@ -182,8 +193,27 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     if (op.ledger) return; op.targets=[targets copy]; op.ledger=[[CSMessageActionSubmissionLedger alloc] initWithAccountID:op.context.accountID accountEpoch:op.context.accountEpoch]; [op.ledger registerOperationID:op.identifier targetIDs:targets];
     for (NSString *target in targets) [op.ledger transitionOperationID:op.identifier targetID:target toState:op.context.messageType==34 ? CSMessageActionSubmissionStateWaitingForMedia : CSMessageActionSubmissionStateReady];
 }
+- (void)performNativeAction:(CSMessageAction)action context:(CSMessageActionContext *)context entry:(CSMessageActionEntry)entry {
+    CSMessageActionConfirmation *confirmation=nil;
+    if (action==CSMessageActionDelete || action==CSMessageActionRevoke) {
+        confirmation=[CSMessageActionConfirmation new]; confirmation.context=context; confirmation.action=action; confirmation.entry=entry;
+        if (!_confirmations) _confirmations=[NSHashTable weakObjectsHashTable];
+        [_confirmations addObject:confirmation];
+    }
+    __weak typeof(self) weakSelf=self;
+    [_native performAction:action context:context valid:^BOOL{
+        return !confirmation.finished && CSMessageActionEntryAllows(weakSelf.settings,entry,action) && [weakSelf validateContext:context];
+    } completion:^(__unused CSMessageActionSubmissionState state){
+        if (confirmation) { confirmation.finished=YES; [weakSelf.confirmations removeObject:confirmation]; }
+    }];
+}
 - (NSString *)executeContext:(CSMessageActionContext *)context action:(CSMessageAction)action entry:(CSMessageActionEntry)entry {
     if (![self canExecuteContext:context action:action entry:entry]) { [self feedback:@"消息或当前操作已失效，未执行。" context:context]; return nil; }
+    BOOL enhancedForward=CSMessageActionUsesVoiceEnhancement(self.settings,entry,action,context.messageType);
+    if (action!=CSMessageActionRepeat && !enhancedForward) {
+        [self performNativeAction:action context:context entry:entry];
+        return nil; // Native owns the action; no plugin send operation was created.
+    }
     CSMessageActionOperation *op=[self createOperation:context action:action entry:entry]; if (!op) return nil;
     if (action==CSMessageActionRepeat) {
         [self registerTargets:@[context.sourceConversationID] operation:op]; [op.requestedTargets addObject:context.sourceConversationID];
@@ -198,9 +228,6 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
         @try { [_native performAction:action context:context valid:^BOOL{ return [weakSelf validateContext:context] && !op.cancelled; } completion:^(__unused CSMessageActionSubmissionState state){}]; }
         @finally { _openingForwardOperation=previous; }
         if (!op.logic) [self retire:op];
-    } else {
-        __weak typeof(self) weakSelf=self; NSString *identifier=op.identifier;
-        [_native performAction:action context:context valid:^BOOL{ CSMessageActionOperation *live=weakSelf.operations[identifier]; return live && !live.cancelled && [weakSelf validateContext:context]; } completion:^(CSMessageActionSubmissionState state){ typeof(self) self=weakSelf; CSMessageActionOperation *live=self.operations[identifier]; if (!live) return; [self rememberResults:@{@"native":@(state)} operationID:identifier]; [self.operations removeObjectForKey:identifier]; }];
     }
     return op.identifier;
 }
@@ -237,6 +264,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     while (_completedOrder.count>32) { [_completed removeObjectForKey:_completedOrder.firstObject]; [_completedOrder removeObjectAtIndex:0]; }
 }
 - (NSDictionary<NSString *,NSNumber *> *)resultsForOperationID:(NSString *)operationID {
+    if (!operationID.length) return @{};
     CSMessageActionOperation *op=_operations[operationID]; if (!op) return _completed[operationID] ?: @{};
     NSMutableDictionary *results=[NSMutableDictionary dictionary]; for (NSString *target in op.targets) results[target]=@([op.ledger stateForOperationID:operationID targetID:target]); return results;
 }
@@ -260,12 +288,22 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     if (!op.logic || op.nativeFinished) [self retire:op];
 }
 - (void)retire:(CSMessageActionOperation *)op { [self hideWaiting:op.identifier]; if (_operations[op.identifier]!=op) return; [self rememberResults:[self resultsForOperationID:op.identifier] operationID:op.identifier]; [_media cancelOperationID:op.identifier]; [_operations removeObjectForKey:op.identifier]; }
-- (void)cancelOperationID:(NSString *)operationID { CSMessageActionOperation *op=_operations[operationID]; if (!op) return; [self hideWaiting:operationID]; op.cancelled=YES; [op.ledger cancelUnsubmittedOperations]; [_media cancelOperationID:operationID]; CSMessageForwardBinding *binding=[_forward bindingForLogic:op.logic]; binding.cancelled=YES; [self reportIfFinished:op]; if (!op.logic) [self retire:op]; }
-- (void)cancelOperationsForCell:(id)cell { for (CSMessageActionOperation *op in _operations.allValues) if (op.context.cell==cell && op.action!=CSMessageActionRepeat && !(op.action==CSMessageActionForward && op.logic)) [self cancelOperationID:op.identifier]; }
-- (void)cancelAllUnsubmittedOperations { for (NSString *identifier in _operations.allKeys) [self cancelOperationID:identifier]; }
-- (void)settingsChanged { for (CSMessageActionOperation *op in _operations.allValues) if (!CSMessageActionEntryAllows(self.settings,op.entry,op.action) || (op.enhanced && !self.settings.voiceForwardEnabled)) [self cancelOperationID:op.identifier]; }
+- (void)cancelOperationID:(NSString *)operationID { if (!operationID.length) return; CSMessageActionOperation *op=_operations[operationID]; if (!op) return; [self hideWaiting:operationID]; op.cancelled=YES; [op.ledger cancelUnsubmittedOperations]; [_media cancelOperationID:operationID]; CSMessageForwardBinding *binding=[_forward bindingForLogic:op.logic]; binding.cancelled=YES; [self reportIfFinished:op]; if (!op.logic) [self retire:op]; }
+- (void)cancelOperationsForCell:(id)cell {
+    for (CSMessageActionConfirmation *confirmation in _confirmations) if (confirmation.context.cell==cell) confirmation.finished=YES;
+    for (CSMessageActionOperation *op in _operations.allValues) if (op.context.cell==cell && op.action!=CSMessageActionRepeat && !(op.action==CSMessageActionForward && op.logic)) [self cancelOperationID:op.identifier];
+}
+- (void)cancelAllUnsubmittedOperations {
+    for (CSMessageActionConfirmation *confirmation in _confirmations) confirmation.finished=YES;
+    for (NSString *identifier in _operations.allKeys) [self cancelOperationID:identifier];
+}
+- (void)settingsChanged {
+    for (CSMessageActionConfirmation *confirmation in _confirmations) if (!CSMessageActionEntryAllows(self.settings,confirmation.entry,confirmation.action)) confirmation.finished=YES;
+    for (CSMessageActionOperation *op in _operations.allValues) if (!CSMessageActionEntryAllows(self.settings,op.entry,op.action) || (op.enhanced && !self.settings.voiceForwardEnabled)) [self cancelOperationID:op.identifier];
+}
 - (void)withForwardContext:(CSMessageActionContext *)context entry:(CSMessageActionEntry)entry perform:(void (^)(void))perform {
     if (_openingForwardOperation) { perform(); return; }
+    if (!CSMessageActionUsesVoiceEnhancement(self.settings,entry,CSMessageActionForward,context.messageType)) { perform(); return; }
     if (![self validateContext:context]) { perform(); return; }
     CSMessageActionOperation *op=[self createOperation:context action:CSMessageActionForward entry:entry]; if (!op) { perform(); return; }
     _openingForwardOperation=op; @try { perform(); } @finally { _openingForwardOperation=nil; if (!op.logic) [self retire:op]; }

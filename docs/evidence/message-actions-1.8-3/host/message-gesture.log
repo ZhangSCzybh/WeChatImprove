@@ -1,0 +1,1 @@
+PASS: 272 production gesture/lifecycle checks (UIKit/facade doubles, no native sends)

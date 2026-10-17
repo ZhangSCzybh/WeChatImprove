@@ -151,7 +151,12 @@ NSString *CSMessageNativeAppDataPath(CSMessageActionContext *context) {
 }
 - (NSString *)currentAccountID { id contact=CSMessageActionNativeObject([self serviceNamed:@"CContactMgr"],@"getSelfContact"); id name=CSMessageActionObjectGetter(contact,NSSelectorFromString(@"m_nsUsrName")); return [name isKindOfClass:NSString.class] ? name : nil; }
 - (id)controllerForCell:(id)cell {
-    id cursor=cell; Class controllerClass=NSClassFromString(@"BaseMsgContentViewController");
+    Class controllerClass=NSClassFromString(@"BaseMsgContentViewController");
+    // Native sticker cells obtain their chat page through BaseChatCellView's weak
+    // delegate. Their responder chain is not required to contain that controller.
+    id controller=CSMessageActionObjectGetter(cell,NSSelectorFromString(@"getViewController"));
+    if (controllerClass && [controller isKindOfClass:controllerClass]) return controller;
+    id cursor=cell;
     for (NSUInteger i=0;cursor && i<32;i++) { if (controllerClass && [cursor isKindOfClass:controllerClass]) return cursor; cursor=CSMessageActionObjectGetter(cursor,NSSelectorFromString(@"nextResponder")); } return nil;
 }
 @end

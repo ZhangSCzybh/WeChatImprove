@@ -3,6 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT CSMessageAction CSMessageActionValidated(NSInteger rawAction);
+FOUNDATION_EXPORT BOOL CSMessageActionSupportsRepeatMenuType(NSUInteger messageType);
 FOUNDATION_EXPORT CSMessageAction CSMessageActionForDirection(CSMessageActionSettings *settings,
     CSMessageActionDirection direction, BOOL outgoing);
 // Settings gate only; caller must separately validate context, message capability and native permissions.
