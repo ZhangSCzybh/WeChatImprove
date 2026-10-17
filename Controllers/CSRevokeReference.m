@@ -23,6 +23,35 @@ static unsigned long long CSDecimal(NSString *text, unsigned long long limit) {
 - (NSString *)link { return [NSString stringWithFormat:@"revoke_jump_v2_%lld_%u",self.serverID,self.localID]; }
 @end
 BOOL CSRevokeOwnsLink(id link) { return [CSLinkString(link) hasPrefix:@"revoke_jump_"]; }
+// The replacement supplies presentation quotes, not part of the actor's name.
+NSString *CSRevokeActorName(NSString *replacement) {
+    if (![replacement isKindOfClass:NSString.class] || !replacement.length) return nil;
+    NSRange action=NSMakeRange(NSNotFound,0);
+    for (NSString *marker in @[@"撤回了一条消息",@"撤回了一则消息",@" recalled a message",@" recalled this message"]) {
+        NSRange found=[replacement rangeOfString:marker options:NSBackwardsSearch];
+        if (found.location!=NSNotFound) { action=found;break; }
+    }
+    if (action.location==NSNotFound) return nil;
+    NSString *name=[[replacement substringToIndex:action.location]
+        stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    for (NSArray<NSString *> *pair in @[@[@"\"",@"\""],@[@"“",@"”"],@[@"「",@"」"],@[@"『",@"』"],
+                                      @[@"&quot;",@"&quot;"],@[@"&#34;",@"&#34;"],@[@"&#x22;",@"&#x22;"]]) {
+        NSUInteger edges=pair[0].length+pair[1].length;
+        if (name.length>=edges && [name hasPrefix:pair[0]] && [name hasSuffix:pair[1]]) {
+            name=[name substringWithRange:NSMakeRange(pair[0].length,name.length-edges)];
+            break; // Preserve quotes which are actually inside the nickname.
+        }
+    }
+    return name.length ? name : nil;
+}
+NSString *CSRevokeEscapeText(NSString *text) {
+    // These values are text nodes, never attributes. Literal quotes are valid here;
+    // escaping them as &quot; is displayed literally by some native tip renderers.
+    if (![text isKindOfClass:NSString.class]) return @"";
+    NSString *result=[text stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"];
+    result=[result stringByReplacingOccurrencesOfString:@"<" withString:@"&lt;"];
+    return [result stringByReplacingOccurrencesOfString:@">" withString:@"&gt;"];
+}
 BOOL CSRevokeIsSelfReplacement(NSString *text) {
     if (![text isKindOfClass:NSString.class]) return NO;
     NSString *trimmed=[text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
@@ -78,6 +107,16 @@ BOOL CSRevokeSessionMatches(NSString *account, NSString *session, NSString *mode
     if (modelChat.length && ![modelChat isEqual:session]) return NO;
     // Current chat binding is authoritative when persisted synthetic tip fields are missing.
     if (!from.length && !to.length) return [modelChat isEqual:session];
+    // Group storage may retain either room -> account or member -> room endpoints.
+    // Require the exact room endpoint; a different room must never match by member name.
+    BOOL group=[session hasSuffix:@"@chatroom"] || [session hasSuffix:@"@im.chatroom"];
+    if (group) {
+        if (![from isEqual:session] && ![to isEqual:session]) return NO;
+        for (NSString *endpoint in @[from ?: @"",to ?: @""])
+            if (([endpoint hasSuffix:@"@chatroom"] || [endpoint hasSuffix:@"@im.chatroom"]) &&
+                ![endpoint isEqual:session]) return NO;
+        return YES;
+    }
     for (NSString *user in @[from ?: @"",to ?: @""])
         if (user.length && ![user isEqual:session] && ![user isEqual:account]) return NO;
     return [from isEqual:session] || [to isEqual:session] || [modelChat isEqual:session];
@@ -120,6 +159,19 @@ BOOL CSRevokeSessionMatches(NSString *account, NSString *session, NSString *mode
 @implementation CSRevokeEvent
 + (instancetype)eventFromXML:(NSString *)xml {
     if (![xml isKindOfClass:NSString.class]||xml.length>128*1024||!xml.length||[xml rangeOfString:@"<!DOCTYPE" options:NSCaseInsensitiveSearch].location!=NSNotFound) return nil;
+    xml=[xml stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    // Some group transports prepend "member:\n". Strip only this bounded envelope,
+    // never search arbitrary text for an embedded revoke XML fragment.
+    if (![xml hasPrefix:@"<"]) {
+        NSRange delimiter=[xml rangeOfString:@":\n"];
+        if (delimiter.location==NSNotFound || !delimiter.location || delimiter.location>256) return nil;
+        NSString *sender=[xml substringToIndex:delimiter.location];
+        NSCharacterSet *allowed=[NSCharacterSet characterSetWithCharactersInString:
+            @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-.@"];
+        if ([sender rangeOfCharacterFromSet:allowed.invertedSet].location!=NSNotFound) return nil;
+        xml=[[xml substringFromIndex:NSMaxRange(delimiter)] stringByTrimmingCharactersInSet:
+            NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    }
     CSRevokeXMLParser *delegate=[CSRevokeXMLParser new];delegate.fields=[NSMutableDictionary dictionary];
     NSXMLParser *parser=[[NSXMLParser alloc] initWithData:[xml dataUsingEncoding:NSUTF8StringEncoding]];
     parser.shouldResolveExternalEntities=NO;parser.delegate=delegate;

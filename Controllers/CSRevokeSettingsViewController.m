@@ -39,14 +39,6 @@ static NSString * const kWCHideRevokeMessageEnabledKey = @"com.wechat.tweak.hide
         [defaults setBool:isOn forKey:kRevokeEnabledKey];
         [defaults synchronize];
         
-        // 发送通知，让Hook文件处理状态改变
-        CFNotificationCenterPostNotification(
-            CFNotificationCenterGetDarwinNotifyCenter(),
-            CFSTR("com.wechat.enhance.revoke.settings_changed"),
-            NULL,
-            NULL,
-            true
-        );
     }];
     
     // 创建隐藏撤回消息提示标签开关

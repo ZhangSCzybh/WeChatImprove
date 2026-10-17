@@ -48,7 +48,6 @@ FOUNDATION_EXPORT double CSMessageMergeSafeDelta(double requested, double native
 FOUNDATION_EXPORT double CSMessageMergePlannedDelta(CSMessageSpacingMode mode, double nativeHeight,
     double contentHeight, double identityHeight, double nameHeight);
 FOUNDATION_EXPORT long long CSMessageRevokeLinkID(NSString * _Nullable link);
-FOUNDATION_EXPORT NSString *CSMessageEscapeMarkup(NSString *text);
 FOUNDATION_EXPORT double CSMessageNavigationMargin(double visibleHeight, double messageHeight);
 FOUNDATION_EXPORT double CSMessageNavigationOffset(double rowY, double rowHeight, double viewportHeight,
     double contentHeight, double topInset, double bottomInset);

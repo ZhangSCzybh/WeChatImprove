@@ -46,5 +46,28 @@ int main(void) { @autoreleasepool {
     CHECK(!CSRevokeIsSelfReplacement(@"\"You recalled a message\" recalled a message"));
     CHECK(![CSRevokeEvent eventFromXML:@"<ordinary><revokemsg><newmsgid>1</newmsgid></revokemsg></ordinary>"]);
     CHECK(![CSRevokeEvent eventFromXML:@"<revokemsg><newmsgid><x>1</x></newmsgid></revokemsg>"]);
+    // Group envelope normalization remains strict: no arbitrary embedded XML search.
+    NSString *payload=@"<sysmsg type='revokemsg'><revokemsg><session>room@chatroom</session><newmsgid>402</newmsgid></revokemsg></sysmsg>";
+    for (NSString *prefix in @[@"member:\n",@"wxid_member-1:\n",@"room@chatroom:\n",@" \nmember:\n \n"])
+        CHECK([CSRevokeEvent eventFromXML:[prefix stringByAppendingString:payload]].serverID==402);
+    for (NSString *prefix in @[@":\n",@"some ordinary text:\n",@"member:",@"text before ",@"<ordinary>",@"member:\nsecond:\n"])
+        CHECK(![CSRevokeEvent eventFromXML:[prefix stringByAppendingString:payload]]);
+    CHECK(![CSRevokeEvent eventFromXML:@"member:\n<revokemsg><newmsgid>402</newmsgid><newmsgid>403</newmsgid></revokemsg>"]);
+    CHECK(![CSRevokeEvent eventFromXML:@"member:\n<!DOCTYPE a><revokemsg><newmsgid>402</newmsgid></revokemsg>"]);
+    CHECK(CSRevokeSessionMatches(@"me",@"room@chatroom",nil,@"member",@"room@chatroom"));
+    CHECK(CSRevokeSessionMatches(@"me",@"room@im.chatroom",nil,@"member",@"room@im.chatroom"));
+    CHECK(!CSRevokeSessionMatches(@"me",@"room@chatroom",nil,@"member",@"other@chatroom"));
+    CHECK(!CSRevokeSessionMatches(@"me",@"room@chatroom",nil,@"room@chatroom",@"other@chatroom"));
+    CHECK(!CSRevokeSessionMatches(@"me",@"room@chatroom",@"other@chatroom",@"member",@"room@chatroom"));
+    CHECK(!CSRevokeSessionMatches(@"me",@"peer",nil,@"member",@"peer"));
+    CHECK([CSRevokeActorName(@"\"喜欢撤回的用户\"撤回了一条消息") isEqual:@"喜欢撤回的用户"]);
+    CHECK([CSRevokeActorName(@"“张三”撤回了一条消息") isEqual:@"张三"]);
+    CHECK([CSRevokeActorName(@"&#x22;张三&#x22;撤回了一条消息") isEqual:@"张三"]);
+    CHECK([CSRevokeActorName(@"\"A \"B\" C\"撤回了一条消息") isEqual:@"A \"B\" C"]);
+    CHECK([CSRevokeActorName(@"\"Alice\" recalled a message") isEqual:@"Alice"]);
+    CHECK([CSRevokeActorName(@"张三撤回了一条消息") isEqual:@"张三"]);
+    CHECK(!CSRevokeActorName(@"普通文本"));CHECK(!CSRevokeActorName(nil));
+    CHECK([CSRevokeEscapeText(@"A \"B\" O'Neil & <a>") isEqual:@"A \"B\" O'Neil &amp; &lt;a&gt;"]);
+    CHECK([CSRevokeEscapeText(nil) isEqual:@""]);
     printf("PASS: %u persisted revoke reference/event checks\n",checks);
 } return 0; }

@@ -2,7 +2,6 @@
 #import "CSMessageMergeAdapter.h"
 #import "CSChatNativeBridge.h"
 #import "CSRevokeReference.h"
-#import "CSChatDiagnostics.h"
 #import "CSMessageMergePolicy.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
@@ -136,7 +135,7 @@ static BOOL CSNavigateToRevoke(id controller,id manager,NSString *session,long l
     if (CSNavigationMatches(controller,existing) && existing.serverID==serverID &&
         NSDate.timeIntervalSinceReferenceDate-existing.created<.1) return YES;
     if (existing) CSMessageNavigationCancel(controller);
-    CSChatRecordEvent(@"revoke",@"query-start");
+
     SEL get = NSSelectorFromString(@"GetMsg:n64SvrID:");
     NSMethodSignature *sig = [manager methodSignatureForSelector:get];
     id message = nil;
@@ -150,7 +149,6 @@ static BOOL CSNavigateToRevoke(id controller,id manager,NSString *session,long l
     if (localMethod && method_getNumberOfArguments(localMethod)==2 && method_getTypeEncoding(localMethod)[0]=='I')
         actualLocalID=((unsigned int (*)(id,SEL))objc_msgSend)(message,localSelector);
     if (!message || (expectedLocalID && actualLocalID!=expectedLocalID) || CSNavigationServerID(message) != serverID || (![from isEqual:session] && ![to isEqual:session])) {
-        CSChatRecordEvent(@"revoke",@"query-identity-rejected");
         CSNavigationFailure(controller,@"原消息可能已删除，或尚未保存在当前账号中。"); return YES;
     }
     UITableView *table = CSMessageNativeTable(controller);
@@ -166,7 +164,7 @@ static BOOL CSNavigateToRevoke(id controller,id manager,NSString *session,long l
         id owner=timeoutOwner;
         CSMessageNavigationRequest *pending=timeoutRequest;
         if (owner && pending && objc_getAssociatedObject(owner,&CSNavigationKey)==pending) {
-            CSChatRecordEvent(@"revoke",@"timeout");CSMessageNavigationFailed(owner);
+            CSMessageNavigationFailed(owner);
         }
     }];
     [NSRunLoop.mainRunLoop addTimer:request.deadline forMode:NSRunLoopCommonModes];
@@ -242,7 +240,7 @@ void CSMessageNavigationCheck(id controller) {
         CSNavigationDisplayTarget *target=[CSNavigationDisplayTarget new];target.request=request;
         request.presentationLink=[CADisplayLink displayLinkWithTarget:target selector:@selector(tick:)];
         [request.presentationLink addToRunLoop:NSRunLoop.mainRunLoop forMode:NSRunLoopCommonModes];
-        CSChatRecordEvent(@"revoke",@"waiting-native-presentation");
+
         return;
     }
     CGFloat margin=CSMessageNavigationMargin(table.bounds.size.height-insets.top-insets.bottom,rect.size.height);
@@ -251,7 +249,7 @@ void CSMessageNavigationCheck(id controller) {
     }
     // Native highlighting may synchronously call back into this page. Do not clear a new request.
     if (objc_getAssociatedObject(controller,&CSNavigationKey)!=request) return;
-    CSChatRecordEvent(@"revoke",@"native-highlight-requested");
+
     [request.deadline invalidate];
     objc_setAssociatedObject(controller,&CSNavigationKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
@@ -310,11 +308,11 @@ BOOL CSMessageHandleRevokeLink(id source,id manager,id clickedLink,id explicitWr
     id model=CSMessageNativeObject(source,@"viewModel");
     id wrap=explicitWrap ?: CSMessageNativeObject(model,@"messageWrap");
     NSString *content=CSMessageNativeObject(wrap,@"m_nsContent"),*pattern=CSMessageNativeObject(wrap,@"m_nsPattern");
-    CSChatRecordEvent(@"revoke",@"link-entry");
+
     CSRevokeReference *reference=CSRevokeResolveReference(clickedLink,content,pattern);
     if (!reference && !CSRevokeOwnsLink(clickedLink) &&
         (clickedLink || !CSRevokeHasOwnedReference(content,pattern))) return NO;
-    CSChatRecordEvent(@"revoke",@"link-received");
+
     CSRevokePageBinding *binding=objc_getAssociatedObject(source,&CSRevokePageKey);
     id owner=nil;
     if (binding.model==model && [binding.account isEqual:CSMessageCurrentAccount()]) owner=binding.owner;
@@ -346,12 +344,10 @@ BOOL CSMessageHandleRevokeLink(id source,id manager,id clickedLink,id explicitWr
     BOOL matches=CSRevokeSessionMatches(CSMessageCurrentAccount(),session,modelChat,
         CSMessageNativeObject(wrap,@"m_nsFromUsr"),CSMessageNativeObject(wrap,@"m_nsToUsr"));
     if (!reference || !matches) {
-        CSChatRecordEvent(@"revoke",reference ? @"session-rejected" : @"invalid-reference");
         CSNavigationFailure(owner,@"无法确认这条提示所属的原消息，请重新打开聊天后重试。");return YES;
     }
     // Every click resolves a fresh target through the current account's manager.
     if (!CSNavigateToRevoke(owner,manager,session,reference.serverID,reference.localID)) {
-        CSChatRecordEvent(@"revoke",@"page-unavailable");
         CSNavigationFailure(owner,@"当前页面暂时无法定位原消息，请稍后重试。");
     }
     return YES;

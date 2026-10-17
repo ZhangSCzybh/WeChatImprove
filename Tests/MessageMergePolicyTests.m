@@ -33,7 +33,6 @@ int main(void) { @autoreleasepool {
     CHECK(CSMessageRevokeLinkID(@"revoke_jump_9223372036854775807") == LLONG_MAX);
     for (NSString *bad in @[@"", @"revoke_jump_", @"revoke_jump_0", @"revoke_jump_-1", @"revoke_jump_1x", @"revoke_jump_ 1", @"revoke_jump_9223372036854775808"]) CHECK(CSMessageRevokeLinkID(bad) == 0);
     CHECK(CSMessageRevokeLinkID(@"revoke_jump_123") == 123);
-    CHECK([CSMessageEscapeMarkup(@"<&\"'>") isEqual:@"&lt;&amp;&quot;&#39;&gt;"]);
     CHECK(CSMessageNavigationMargin(500,100) == 200);
     CHECK(CSMessageNavigationMargin(500,1000) == 0);
     CHECK(CSMessageNavigationOffset(1000,100,600,2000,50,50) == 750);

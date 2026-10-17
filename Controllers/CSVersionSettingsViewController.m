@@ -1,60 +1,5 @@
 #import "CSVersionSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
-#import "CSChatDiagnostics.h"
-#import "../Headers/CSUserInfoHelper.h"
-
-static NSString *CSCurrentChatDiagnosticText(void) {
-    return [NSString stringWithFormat:@"WeChatImprove %@ / iOS %@\nWeChat %@ (%@)\n诊断：%@\n%@",
-        kPluginVersionString,UIDevice.currentDevice.systemVersion,
-        [NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"] ?: @"unknown",
-        [NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleVersion"] ?: @"unknown",
-        [NSUserDefaults.standardUserDefaults boolForKey:CSChatDiagnosticsEnabledKey] ? @"已开启" : @"未开启",
-        CSChatDiagnosticReport()];
-}
-static void CSCopyChatDiagnosticText(UIViewController *controller, NSString *text) {
-    UIPasteboard.generalPasteboard.string=text;
-    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"已复制诊断记录"
-        message:@"可以返回对话粘贴。记录不包含聊天正文、账号或消息 ID。" preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"好" style:UIAlertActionStyleDefault handler:nil]];
-    [controller presentViewController:alert animated:YES completion:nil];
-}
-
-@interface CSChatDiagnosticViewController : UIViewController
-@property(nonatomic,copy) NSString *report;
-@property(nonatomic,strong) UITextView *reportView;
-@end
-@implementation CSChatDiagnosticViewController
-- (void)viewDidLoad {
-    [super viewDidLoad];self.title=@"诊断记录";self.view.backgroundColor=UIColor.systemBackgroundColor;
-    UITextView *text=[UITextView new];text.translatesAutoresizingMaskIntoConstraints=NO;
-    self.reportView=text;
-    text.editable=NO;text.selectable=YES;text.text=self.report;
-    text.font=[UIFont monospacedSystemFontOfSize:13 weight:UIFontWeightRegular];
-    text.textColor=UIColor.labelColor;text.backgroundColor=UIColor.systemBackgroundColor;
-    text.textContainerInset=UIEdgeInsetsMake(12,12,12,12);[self.view addSubview:text];
-    UILayoutGuide *safe=self.view.safeAreaLayoutGuide;
-    [NSLayoutConstraint activateConstraints:@[[text.topAnchor constraintEqualToAnchor:safe.topAnchor],
-        [text.bottomAnchor constraintEqualToAnchor:safe.bottomAnchor],
-        [text.leadingAnchor constraintEqualToAnchor:safe.leadingAnchor],
-        [text.trailingAnchor constraintEqualToAnchor:safe.trailingAnchor]]];
-    UIBarButtonItem *copy=[[UIBarButtonItem alloc] initWithTitle:@"复制"
-        style:UIBarButtonItemStylePlain target:self action:@selector(copyReport)];
-    UIBarButtonItem *clear=[[UIBarButtonItem alloc] initWithTitle:@"清空"
-        style:UIBarButtonItemStylePlain target:self action:@selector(clearReport)];
-    self.navigationItem.rightBarButtonItems=@[copy,clear];
-    if (self.navigationController.viewControllers.firstObject==self)
-        self.navigationItem.leftBarButtonItem=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-            target:self action:@selector(closeReport)];
-}
-- (void)copyReport { CSCopyChatDiagnosticText(self,self.report); }
-- (void)clearReport {
-    CSChatClearDiagnostics();
-    self.report=CSCurrentChatDiagnosticText();
-    self.reportView.text=self.report;
-    [self.reportView setContentOffset:CGPointZero animated:NO];
-}
-- (void)closeReport { [self dismissViewControllerAnimated:YES completion:nil]; }
-@end
 
 // 版本设置的键
 static NSString * const kWeChatVersionKey = @"com.wechat.tweak.version.selected";
@@ -167,32 +112,11 @@ static NSString * const kWeChatCustomVersionKey = @"com.wechat.tweak.version.cus
                                                 iconColor:[UIColor systemBlueColor]
                                                    detail:nil];
     
-    NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
-    CSSettingItem *diagnostic=[CSSettingItem switchItemWithTitle:@"兼容性诊断" iconName:@"stethoscope"
-        iconColor:UIColor.systemGrayColor switchValue:[defaults boolForKey:CSChatDiagnosticsEnabledKey]
-        valueChangedBlock:^(BOOL enabled) { [defaults setBool:enabled forKey:CSChatDiagnosticsEnabledKey]; }];
-    CSSettingItem *copy=[CSSettingItem itemWithTitle:@"复制诊断记录" iconName:@"doc.on.doc" iconColor:UIColor.systemGrayColor detail:nil];
-    __weak typeof(self) weakSelf=self;
-    copy.actionBlock=^{
-        __strong typeof(weakSelf) controller=weakSelf;if (!controller) return;
-        CSCopyChatDiagnosticText(controller,CSCurrentChatDiagnosticText());
-    };
-    CSSettingItem *view=[CSSettingItem itemWithTitle:@"查看诊断记录" iconName:@"doc.text"
-        iconColor:UIColor.systemGrayColor detail:nil];
-    view.actionBlock=^{
-        __strong typeof(weakSelf) controller=weakSelf;if (!controller) return;
-        CSChatDiagnosticViewController *report=[CSChatDiagnosticViewController new];report.report=CSCurrentChatDiagnosticText();
-        if (controller.navigationController) [controller.navigationController pushViewController:report animated:YES];
-        else [controller presentViewController:[[UINavigationController alloc] initWithRootViewController:report] animated:YES completion:nil];
-    };
-    CSSettingSection *diagnosticSection=[CSSettingSection sectionWithHeader:@"问题排查（不记录聊天内容）" items:@[diagnostic,view,copy]];
-
     // 设置sections
     self.sections = @[
         [CSSettingSection sectionWithHeader:@"选择微信版本" items:versionItems],
         [CSSettingSection sectionWithHeader:@"自定义版本" items:customItems],
-        [CSSettingSection sectionWithHeader:@"说明" items:@[infoItem]],
-        diagnosticSection
+        [CSSettingSection sectionWithHeader:@"说明" items:@[infoItem]]
     ];
     
     // 根据展开状态更新

@@ -5,7 +5,6 @@
 #import "CSMessageNavigation.h"
 #import "CSMessageTimeLayout.h"
 #import "CSRevokeReference.h"
-#import "CSChatDiagnostics.h"
 #include <stdlib.h>
 static unsigned checks;
 #define CHECK(x) do { checks++; if (!(x)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#x); exit(1); } } while (0)
@@ -688,27 +687,5 @@ int main(void) { @autoreleasepool {
             CSMessageMergeDeactivate(page);
         }
     }
-    // Shared revoke diagnostics remain opt-in and bounded.
-    [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSChatDiagnosticsEnabledKey:@NO} forName:NSArgumentDomain];
-    NSString *before=CSChatDiagnosticReport();CSChatRecordEvent(@"test",@"disabled-event");
-    CHECK([before isEqual:CSChatDiagnosticReport()]);
-    // Clearing removes the shared buffer even when recording is off; it never toggles recording.
-    CSChatClearDiagnostics();
-    CHECK([CSChatDiagnosticReport() hasPrefix:@"暂无记录"]);
-    CHECK(![NSUserDefaults.standardUserDefaults boolForKey:CSChatDiagnosticsEnabledKey]);
-    [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSChatDiagnosticsEnabledKey:@YES} forName:NSArgumentDomain];
-    CSChatRecordEvent(@"test",@"before-clear"); CSChatClearDiagnostics();
-    CHECK([NSUserDefaults.standardUserDefaults boolForKey:CSChatDiagnosticsEnabledKey]);
-    CSChatRecordEvent(@"test",@"after-clear");
-    CHECK([CSChatDiagnosticReport() containsString:@"after-clear"]);
-    CHECK(![CSChatDiagnosticReport() containsString:@"before-clear"]);
-    CSChatClearDiagnostics(); CSChatClearDiagnostics();
-    CHECK([CSChatDiagnosticReport() hasPrefix:@"暂无记录"]);
-    [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSChatDiagnosticsEnabledKey:@YES} forName:NSArgumentDomain];
-    for (NSUInteger i=0;i<200;i++) CSChatRecordEvent(@"test",@"bounded-event");
-    CHECK([CSChatDiagnosticReport() componentsSeparatedByString:@"\n"].count==128);
-    [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSChatDiagnosticsEnabledKey:@NO} forName:NSArgumentDomain];
-    before=CSChatDiagnosticReport();CSChatRecordEvent(@"test",@"disabled-event");
-    CHECK([before isEqual:CSChatDiagnosticReport()]);
     printf("PASS: %u native adapter/navigation lifecycle checks (UIKit double)\n",checks);
 } return 0; }

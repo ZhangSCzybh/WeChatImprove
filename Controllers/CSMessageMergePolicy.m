@@ -84,13 +84,6 @@ long long CSMessageRevokeLinkID(NSString *link) {
     }
     return (long long)value;
 }
-NSString *CSMessageEscapeMarkup(NSString *text) {
-    NSString *result = [text stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"];
-    result = [result stringByReplacingOccurrencesOfString:@"<" withString:@"&lt;"];
-    result = [result stringByReplacingOccurrencesOfString:@">" withString:@"&gt;"];
-    result = [result stringByReplacingOccurrencesOfString:@"\"" withString:@"&quot;"];
-    return [result stringByReplacingOccurrencesOfString:@"'" withString:@"&#39;"];
-}
 double CSMessageNavigationMargin(double visibleHeight, double messageHeight) {
     if (!isfinite(visibleHeight) || visibleHeight <= 0) return 0;
     if (!isfinite(messageHeight) || messageHeight <= 0 || messageHeight >= visibleHeight) return 0;

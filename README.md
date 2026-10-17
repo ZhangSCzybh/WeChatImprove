@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.7-6`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.7-8`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.7-6`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.7-8`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.7-6` 为修复赞赏宿主兼容性的 Rootless 包（原生流程已在 1.7-3 验证跨账号直达及实际赞赏）；Rootful 保留构建入口，本轮未重新验证 |
+| Rootless / Rootful | `1.7-8` 为撤回提示显示修正及调试清理的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -52,7 +52,7 @@
 | **自动收款** | 私聊/群聊开关、延迟收款、通知、自动回复和收款记录 |
 | **收藏验证** | 进入收藏时使用 Face ID / Touch ID 等系统生物认证 |
 | **后台运行 / 游戏辅助** | 后台运行辅助；发送骰子或猜拳表情时选择结果 |
-| **版本控制 / 更新控制** | 自定义微信版本返回值；问题排查诊断开关、查看与复制记录；控制微信内部热更新的加载、下载后处理等环节 |
+| **版本控制 / 更新控制** | 自定义微信版本返回值；控制微信内部热更新的加载、下载后处理等环节 |
 | **备份配置 / 重置设置 / 入口设置** | 配置备份、导入、导出、恢复和自动备份；设置重置及插件入口定制 |
 
 “后台运行”受系统调度和注入环境限制，不能保证微信永不被终止。“版本控制”调整的是微信版本返回值，不会安装或降级微信；“更新控制”针对微信内部热更新，不等同于关闭 App Store 更新。
@@ -175,20 +175,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.7-6
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.7-8
 ```
 
-默认产物：`packages/com.wechat.improve_1.7-6_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.7-8_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.7-6` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.7-8` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.7-6
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.7-8
 ```
 
-默认产物：`packages/com.wechat.improve_1.7-6_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.7-8_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -208,7 +208,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.7-6_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.7-8_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
@@ -252,6 +252,10 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 实现细节见 [会话分组说明](docs/session-groups.md)、[列表圆角优化](docs/list-corners.md)；设计背景见 [分组重构方案](docs/session-groups-refactor-proposal.md)。
 
 ### 验证状态
+
+`1.7-8` 修复撤回提示用户名引号重复转义，清理防撤回/原文定位调试日志及已无调用方的诊断模块和入口。详见 [撤回提示优化与清理](docs/revoke-cleanup-1.7-8.md)。
+
+`1.7-7` 修复群聊撤回通知前缀解析、群会话归属和本人撤回判断，补充生产拦截代码的主机回归。用户已确认群聊原消息成功保留，后续用户名显示问题在 1.7-8 修正。详见 [群聊防撤回修复](docs/group-revoke-1.7-7.md)。
 
 `1.7-6` 补充真实原生宿主类型、栈顶加载接口、异步停止加载、UIKit 子控制器容纳、无中转页、返回、重复点击、超时和退出回归。测试替身无法替代真实微信运行；本轮尚无手机崩溃栈及安装验证。
 

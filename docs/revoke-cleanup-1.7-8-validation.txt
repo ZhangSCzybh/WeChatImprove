@@ -1,0 +1,56 @@
+WeChatImprove 1.7-8 — revoke tip text and diagnostic cleanup
+Target: WeChat 8.0.78.34 / iOS 27.0.1 / Rootless
+User confirmed 1.7-7 group preservation; quote display supplied in screenshot.
+Checkout: /Users/zhangshichao/Documents/Workspace/WeChatImprove
+Branch: codex/group-revoke-fix
+Build: make -j4 package SCHEME=rootless PACKAGE_VERSION=1.7-8 _THEOS_LOCAL_DATA_DIR=<isolated temporary directory>
+Build directory: /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-revoke-cleanup-build.y8jf9vbc
+Full and final incremental builds exited 0.
+
+Package: com.wechat.improve
+Name: WeChatImprove
+Description: 微信插件，支持聊天按钮布局自定义等。
+Maintainer: 再也不会
+Author: 再也不会
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
+Architecture: iphoneos-arm64
+Version: 1.7-8
+Installed-Size: 3248
+
+Dylib: var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib
+Architectures: arm64 arm64e
+Package SHA256: 7705828420d19a27608cc185e403f12bba0ef8c26fb35fadd6cb9f0b6af178fa
+Dylib SHA256: f01cd90a4c9f632c1dd47bfe1fa8d5c4b591956d4fe02bca4918c39034327f45
+Warnings (total, changed sources): {'build': (202, 0), 'build-final': (194, 0)}
+Removed diagnostic/unused API markers checked absent: 21
+Version and persistent revoke link verified.
+Existing .theos files and all previous package hashes verified unchanged.
+
+Before fix (test executable exit 1):
+FAIL 131: [rendered.m_nsContent containsString:@"\n“再也不会”撤回了一条消息\n"]
+
+After fix:
+PASS: 73 production revoke interception checks (native service doubles)
+PASS: 84 persisted revoke reference/event checks
+PASS: 53200 message merge/navigation checks
+PASS: 2872 native adapter/navigation lifecycle checks (UIKit double)
+
+Tests execute production code with native-service/UIKit doubles.
+No device installation, battery measurement or historic tip/database rewriting.
+The 9 removed diagnostic assertions and 1 old escape-function assertion are obsolete.
+
+Source SHA256:
+4037fbc92bd38b5e0c5ade9f53477caeec5ec9f18b1414742e1b34b19f7a934c  Controllers/CSRevokeReference.h
+ec7fc7246d6315d1045d0933e2a97af99d4bf80af18b8c7679999739f990b0ea  Controllers/CSRevokeReference.m
+7ca2ae51c14a1571c0adc39ae43c3ce0fc9e60264753def76312997477b6db08  Controllers/CSMessageMergePolicy.h
+dcd22db70b65ef934c4fa4831bc859bf524033265456eda42a9020a5e6e5a68f  Controllers/CSMessageMergePolicy.m
+c822176151c6d95fd579c8b2101ed3ff0b1dcccc3da168f1dd0ad84b5f42308d  Controllers/CSMessageNavigation.m
+cc5205fa0129071be7b3071f7eab2b47892259355fd2204211a976c4bcda731a  Controllers/CSVersionSettingsViewController.m
+fdb6baa1b33dc518b26c76a63457464a29c75a5d609a4a11fa8314b8cd4d9eae  Controllers/CSRevokeSettingsViewController.m
+a2c6beca9066525c726ccdffebf9277b781092a3897883041cb9318501015022  Hooks/RevokeHooks.xm
+57a98d540bbd8963d6cb53b9bde67a576d83779382abdc5016de3cb9083f3940  Controllers/CSReleaseNotesViewController.m
+cfb8385c381dc10ebd00b3ebfa66581e63021f3744a51d081adb1e3c0eb207c0  Tests/RevokeInterceptionTests.m
+9e2a51c56a76a0f8d791ea0111a0baf7a793b2817b60b3818f4702b7f411e944  Tests/RevokeReferenceTests.m
+214aa19eb9b5ea9cdcddaaa2f58c104729a3954ff5ad021a634c3c8e97363542  Headers/CSUserInfoHelper.h
+1bcfb3f83d97e1f5a036c2cbe65cd45ffefeea3937144494b57bac3f8a26209a  control

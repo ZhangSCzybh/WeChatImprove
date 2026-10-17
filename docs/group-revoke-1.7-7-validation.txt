@@ -1,0 +1,53 @@
+WeChatImprove 1.7-7 — group revoke interception fix, ROOTLESS TEST PACKAGE
+Known user target: WeChat 8.0.78.34 / iOS 27.0.1 / Rootless
+Current device plugin version not reconfirmed. Source baseline: 2ac42b7e (1.7-6).
+Checkout: /Users/zhangshichao/Documents/Workspace/WeChatImprove
+Branch: codex/group-revoke-fix
+Build: make -j4 package SCHEME=rootless PACKAGE_VERSION=1.7-7 _THEOS_LOCAL_DATA_DIR=<isolated temporary build directory>
+Build directory: /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-revoke-build.tqk13as6
+Build exit: 0
+Build log: /tmp/wechat-group-revoke-1.7-7-build.log
+
+Package: com.wechat.improve
+Name: WeChatImprove
+Description: 微信插件，支持聊天按钮布局自定义等。
+Maintainer: 再也不会
+Author: 再也不会
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
+Architecture: iphoneos-arm64
+Version: 1.7-7
+Installed-Size: 3264
+
+Dylib: var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib
+Architectures: arm64 arm64e
+Package SHA256: 0cd5b0125e380bb830046536895f0dfb71d8ce6d96500ec781f9d542413cbf0c
+Dylib SHA256: 1ffa0bb973cbd773d98d8c82d3b6da8d8b8b46387d0fd652c83a887dd88d1ee7
+Build warnings: 198; warnings from modified source files: 0
+
+Before fix (test executable exit 1):
+FAIL 76: handleRevokeMessage(prefixed,nil)
+
+After fix:
+PASS: 53 production revoke interception checks (native service doubles)
+PASS: 74 persisted revoke reference/event checks
+PASS: 53201 message merge/navigation checks
+PASS: 2881 native adapter/navigation lifecycle checks (UIKit double)
+
+Tests execute production handler and four hook bodies with native service doubles.
+They do not validate native Logos installation or live WeChat database deletion paths.
+Group envelopes and member-to-room endpoint fixtures are compatibility scenarios,
+not captured device evidence from this incident.
+No device installation or user data/settings writes.
+Existing .theos files and previous package hashes verified unchanged.
+Prior merge/bubble/time diagnostic markers remain absent from package.
+
+Source SHA256:
+77a066610316806fcac49d05b86147b395b04c59ae9bbac78a0a290322cf94f7  Controllers/CSRevokeReference.m
+8eab192472298902b8e0bb7a8f51ba4f22fd13475f3bd166fe85cef541636ce7  Hooks/RevokeHooks.xm
+1278a7d6eb9e1d90e9e2626b1f80fe469c9ef46074916dc75b1f472cd0cc5727  Controllers/CSReleaseNotesViewController.m
+6b0207bdc556dd4df27f97eb61b8e062825e7fee96be4d16b0844bf99f845c4c  Tests/RevokeReferenceTests.m
+e09a6bbcb0ad00c1331a1fc9c0b9f6bbd049be8a6e8b09d55e54d9f702c6488d  Tests/RevokeInterceptionTests.m
+9455511c695a711d0e49ca47b5a06a8c3ea1c5e4831c81b13901eff04349faa4  Tests/verify-revoke-interception.sh
+ae09e2044ed3003ee6298c2db1ff80bd46274c4e4d038e6cba307f0fd552949f  Headers/CSUserInfoHelper.h
+4245c9e9925dff6f66a741e2be3d045f91a843adb951cc173318ebd340391af9  control

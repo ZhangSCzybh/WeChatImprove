@@ -12,7 +12,7 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-p
   -I"$project_dir/Tests/MessageUIKit" -I"$project_dir/Controllers" \
   "$project_dir/Tests/MessageUIKit/MessageUIKit.m" "$project_dir/Tests/MessageUIKit/DisplayLink.m" \
   "$project_dir/Controllers/CSMessageMergePolicy.m" "$project_dir/Controllers/CSMessageMergeAdapter.m" \
-  "$project_dir/Controllers/CSChatDiagnostics.m" "$project_dir/Controllers/CSRevokeReference.m" "$project_dir/Controllers/CSChatNativeBridge.m" "$project_dir/Controllers/CSMessageNavigation.m" "$project_dir/Tests/MessageMergeAdapterTests.m" \
+  "$project_dir/Controllers/CSRevokeReference.m" "$project_dir/Controllers/CSChatNativeBridge.m" "$project_dir/Controllers/CSMessageNavigation.m" "$project_dir/Tests/MessageMergeAdapterTests.m" \
   "$project_dir/Controllers/CSMessageTimeLayout.m" \
   -o "$test_dir/adapter-tests"
 "$test_dir/adapter-tests"

@@ -5,6 +5,8 @@
 + (instancetype)referenceWithServerID:(long long)serverID localID:(unsigned int)localID;
 - (NSString *)link;
 @end
+FOUNDATION_EXPORT NSString *CSRevokeActorName(NSString *replacement);
+FOUNDATION_EXPORT NSString *CSRevokeEscapeText(NSString *text);
 FOUNDATION_EXPORT BOOL CSRevokeIsSelfReplacement(NSString *text);
 FOUNDATION_EXPORT BOOL CSRevokeHasOwnedReference(NSString *content, NSString *pattern);
 FOUNDATION_EXPORT BOOL CSRevokeOwnsLink(id link);
