@@ -1,0 +1,22 @@
+{
+  "version": "1.6-38",
+  "package": "packages/com.wechat.improve_1.6-38_iphoneos-arm64.deb",
+  "sha256": "85030d0f44fb24c1afb64ebd73bb15659002173b7cc4c9660afa2f7c5c85d408",
+  "build": {
+    "command": "make package -j4 SCHEME=rootless PACKAGE_VERSION=1.6-38",
+    "exit_code": 0,
+    "architectures": [
+      "arm64",
+      "arm64e"
+    ]
+  },
+  "tests": {
+    "tabbar_geometry": "pass",
+    "tabbar_preferences_native_lifecycle_snapshot_and_border_layers_host_tests": "pass"
+  },
+  "dylib_sha256": "9ceb8847214883d3bd7fa00656089d01e4c3a7c3739f42ae6c8f33f2c4fbb430",
+  "packaged_binary_matches_build": true,
+  "device_verified": false,
+  "deployed": false,
+  "limitations": "Headless CA animations are recorded at submission; tests validate paths, masks and animation configuration, not device rendering. No WeChat configuration or database was accessed."
+}

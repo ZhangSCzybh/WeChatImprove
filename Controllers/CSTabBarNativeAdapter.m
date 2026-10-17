@@ -47,7 +47,8 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 @property(nonatomic, strong) UIView *surface;
 @property(nonatomic, strong) UIVisualEffectView *material;
 @property(nonatomic, strong) CAShapeLayer *border;
-@property(nonatomic) NSInteger animation;
+@property(nonatomic, strong) CALayer *haloContainer;
+@property(nonatomic, strong) CAShapeLayer *halo, *haloMask;
 @property(nonatomic, weak) CSTabBarPreferences *renderedPreferences;
 @property(nonatomic, strong) UIColor *renderedNativeBackground;
 @property(nonatomic) CGSize renderedSize;
@@ -68,7 +69,7 @@ static MMTabBarController *CSOwner(MMTabBar *bar) {
 static CSTabBarState *CSState(MMTabBar *bar, BOOL create) {
     CSTabBarState *s=objc_getAssociatedObject(bar,&CSBarStateKey);
     if (!s && create && CSOwner(bar)) {
-        s=[CSTabBarState new]; s.bar=bar; s.controller=CSOwner(bar); s.animation=-1;
+        s=[CSTabBarState new]; s.bar=bar; s.controller=CSOwner(bar);
         s.backgroundHidden=[NSMapTable weakToStrongObjectsMapTable];
         s.observedButtons=[NSHashTable weakObjectsHashTable];
         objc_setAssociatedObject(bar,&CSBarStateKey,s,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -211,14 +212,68 @@ static void CSRestoreVisuals(CSTabBarState *s) {
 static void CSStop(CSTabBarState *s) {
     if (!s) return;
     CSRestoreVisuals(s); CSRestoreInset(s);
-    [s.surface.layer removeAnimationForKey:@"cs.tabbar.pulse"];
-    s.animation=-1; s.renderedPreferences=nil;
+    [s.halo removeAnimationForKey:@"cs.tabbar.outwardPulse"];
+    s.renderedPreferences=nil;
     for (UIControl *button in s.observedButtons) {
         [button removeTarget:s action:@selector(touchBegan:) forControlEvents:UIControlEventTouchDown];
         [button removeTarget:s action:@selector(touchEnded:) forControlEvents:UIControlEventTouchUpInside];
     }
     [s.observedButtons removeAllObjects];
     [s.surface removeFromSuperview];
+}
+// Animate only a stroked ring. An inverse rounded-rectangle mask excludes the entire
+// bar interior, including transparent backgrounds, from both the ring and its shadow.
+static void CSRenderHalo(CSTabBarState *s, CGFloat radius, CGFloat line) {
+    CSTabBarPreferences *p=CSTabBarPreferences.current;
+    if (!s.haloContainer) {
+        s.haloContainer=[CALayer layer];
+        s.halo=[CAShapeLayer layer]; s.halo.fillColor=UIColor.clearColor.CGColor;
+        s.haloMask=[CAShapeLayer layer]; s.haloMask.fillRule=kCAFillRuleEvenOdd;
+        s.haloMask.fillColor=[UIColor colorWithRed:1 green:1 blue:1 alpha:1].CGColor;
+        s.haloContainer.mask=s.haloMask;
+        [s.haloContainer addSublayer:s.halo];
+        [s.surface.layer insertSublayer:s.haloContainer below:s.border];
+    }
+    [s.halo removeAnimationForKey:@"cs.tabbar.outwardPulse"];
+    NSInteger animation=(p.borderColor && line>0 && !UIAccessibilityIsReduceMotionEnabled()) ? p.animation : 0;
+    s.haloContainer.hidden=animation==0;
+    s.halo.opacity=0; // No residual glow when stopped or between pulses.
+    if (!animation) return;
+    const CGFloat margin=36, spread=10;
+    s.haloContainer.frame=CGRectInset(s.surface.bounds,-margin,-margin);
+    s.halo.frame=s.haloContainer.bounds; s.haloMask.frame=s.haloContainer.bounds;
+    CGRect outline=CGRectInset(s.halo.bounds,margin,margin);
+    CGMutablePathRef mask=CGPathCreateMutable();
+    CGPathAddRect(mask,NULL,s.haloContainer.bounds);
+    CGPathAddPath(mask,NULL,[UIBezierPath bezierPathWithRoundedRect:outline cornerRadius:radius].CGPath);
+    s.haloMask.path=mask; CGPathRelease(mask);
+    CGRect stroke=CGRectInset(outline,line/2,line/2);
+    CGFloat strokeRadius=MAX(.01,radius-line/2); // Keep rounded-path topology stable even for square corners.
+    UIBezierPath *start=[UIBezierPath bezierPathWithRoundedRect:stroke cornerRadius:strokeRadius];
+    UIBezierPath *near=[UIBezierPath bezierPathWithRoundedRect:CGRectInset(stroke,-2,-2) cornerRadius:strokeRadius+2];
+    UIBezierPath *end=[UIBezierPath bezierPathWithRoundedRect:CGRectInset(stroke,-spread,-spread) cornerRadius:strokeRadius+spread];
+    s.halo.path=start.CGPath; s.halo.lineWidth=line;
+    s.halo.strokeColor=[p.borderColor resolvedColorWithTraitCollection:s.bar.traitCollection].CGColor;
+    s.halo.shadowColor=s.halo.strokeColor; s.halo.shadowOffset=CGSizeZero;
+    s.halo.shadowOpacity=1; s.halo.shadowRadius=0;
+    // No filled shadowPath: the stroke itself is the source of the outward glow.
+    CAKeyframeAnimation *shape=[CAKeyframeAnimation animationWithKeyPath:@"path"];
+    CAKeyframeAnimation *fade=[CAKeyframeAnimation animationWithKeyPath:@"opacity"];
+    CAKeyframeAnimation *blur=[CAKeyframeAnimation animationWithKeyPath:@"shadowRadius"];
+    if (animation==1) {
+        shape.values=@[(__bridge id)start.CGPath,(__bridge id)near.CGPath,(__bridge id)end.CGPath];
+        fade.values=@[@0,@.7,@0]; blur.values=@[@0,@3,@8];
+        shape.keyTimes=fade.keyTimes=blur.keyTimes=@[@0,@.18,@1];
+    } else {
+        shape.values=@[(__bridge id)start.CGPath,(__bridge id)near.CGPath,(__bridge id)end.CGPath,(__bridge id)start.CGPath,(__bridge id)near.CGPath,(__bridge id)end.CGPath,(__bridge id)end.CGPath];
+        fade.values=@[@0,@.8,@0,@0,@.6,@0,@0]; blur.values=@[@0,@3,@8,@0,@3,@8,@8];
+        shape.keyTimes=fade.keyTimes=blur.keyTimes=@[@0,@.08,@.32,@.36,@.44,@.72,@1];
+    }
+    CFTimeInterval duration=animation==1 ? 3 : 1.2;
+    shape.duration=fade.duration=blur.duration=duration;
+    CAAnimationGroup *pulse=[CAAnimationGroup animation];
+    pulse.animations=@[shape,fade,blur]; pulse.duration=duration; pulse.repeatCount=HUGE_VALF;
+    [s.halo addAnimation:pulse forKey:@"cs.tabbar.outwardPulse"];
 }
 static void CSRenderSurface(CSTabBarState *s, UIView *container) {
     MMTabBar *bar=s.bar; CSTabBarPreferences *p=CSTabBarPreferences.current;
@@ -245,20 +300,7 @@ static void CSRenderSurface(CSTabBarState *s, UIView *container) {
     s.border.path=[UIBezierPath bezierPathWithRoundedRect:pathRect cornerRadius:MAX(0,radius-line/2)].CGPath;
     s.border.strokeColor=[p.borderColor resolvedColorWithTraitCollection:bar.traitCollection].CGColor;
     s.border.lineWidth=line;
-    NSInteger animation=(p.borderColor && line>0 && !UIAccessibilityIsReduceMotionEnabled()) ? p.animation : 0;
-    s.surface.layer.shadowColor=[p.borderColor resolvedColorWithTraitCollection:bar.traitCollection].CGColor;
-    s.surface.layer.shadowOffset=CGSizeZero; s.surface.layer.shadowRadius=6;
-    s.surface.layer.shadowPath=[UIBezierPath bezierPathWithRoundedRect:s.surface.bounds cornerRadius:radius].CGPath;
-    s.surface.layer.shadowOpacity=0;
-    if (s.animation!=animation) {
-        [s.surface.layer removeAnimationForKey:@"cs.tabbar.pulse"]; s.animation=animation;
-        if (animation) {
-            CAKeyframeAnimation *pulse=[CAKeyframeAnimation animationWithKeyPath:@"shadowOpacity"];
-            pulse.values=animation==1 ? @[@.15,@.8,@.15] : @[@.15,@.8,@.2,@.55,@.15];
-            pulse.duration=animation==1 ? 3 : 1.2; pulse.repeatCount=HUGE_VALF;
-            [s.surface.layer addAnimation:pulse forKey:@"cs.tabbar.pulse"];
-        }
-    }
+    CSRenderHalo(s,radius,line);
 }
 
 void CSTabBarUpdate(MMTabBar *bar) {
@@ -357,7 +399,7 @@ UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot) {
     snapshot.bounds=nativeSnapshot.bounds; snapshot.backgroundColor=UIColor.clearColor;
     snapshot.userInteractionEnabled=NO; snapshot.clipsToBounds=NO;
     CSTabBarState *copy=[CSTabBarState new];
-    copy.bar=bar; copy.floatingRect=s.floatingRect; copy.nativeBackground=s.nativeBackground; copy.animation=-1;
+    copy.bar=bar; copy.floatingRect=s.floatingRect; copy.nativeBackground=s.nativeBackground;
     [CATransaction begin]; [CATransaction setDisableActions:YES]; CSRenderSurface(copy,snapshot); [CATransaction commit];
     for (UIView *image in images) [snapshot addSubview:image];
     return snapshot;

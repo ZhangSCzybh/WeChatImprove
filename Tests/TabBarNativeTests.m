@@ -3,6 +3,26 @@
 #import <objc/runtime.h>
 #import <assert.h>
 
+// Headless macOS discards CA animations at transaction commit. Record the submitted
+// copies while forwarding to QuartzCore; geometry and masks still use real CG/CA objects.
+static char SubmittedAnimationsKey;
+static IMP originalAddAnimation, originalRemoveAnimation;
+static void RecordAnimation(CALayer *layer,SEL selector,CAAnimation *animation,NSString *key) {
+    NSMutableDictionary *submitted=objc_getAssociatedObject(layer,&SubmittedAnimationsKey);
+    if (!submitted) {
+        submitted=[NSMutableDictionary dictionary];
+        objc_setAssociatedObject(layer,&SubmittedAnimationsKey,submitted,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    if (key) submitted[key]=[animation copy];
+    ((void(*)(id,SEL,id,id))originalAddAnimation)(layer,selector,animation,key);
+}
+static void RecordRemoval(CALayer *layer,SEL selector,NSString *key) {
+    [objc_getAssociatedObject(layer,&SubmittedAnimationsKey) removeObjectForKey:key];
+    ((void(*)(id,SEL,id))originalRemoveAnimation)(layer,selector,key);
+}
+static CAAnimation *SubmittedAnimation(CALayer *layer,NSString *key) {
+    return [objc_getAssociatedObject(layer,&SubmittedAnimationsKey) objectForKey:key];
+}
 static NSUserDefaults *isolated;
 static NSUserDefaults *TestDefaults(id self,SEL selector) { return isolated; }
 @implementation MMTabbarItem @end
@@ -31,6 +51,10 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
     isolated=[[NSUserDefaults alloc] initWithSuiteName:suite];
     Method m=class_getClassMethod(NSUserDefaults.class,@selector(standardUserDefaults));
     IMP original=method_setImplementation(m,(IMP)TestDefaults);
+    Method add=class_getInstanceMethod(CALayer.class,@selector(addAnimation:forKey:));
+    Method remove=class_getInstanceMethod(CALayer.class,@selector(removeAnimationForKey:));
+    originalAddAnimation=method_setImplementation(add,(IMP)RecordAnimation);
+    originalRemoveAnimation=method_setImplementation(remove,(IMP)RecordRemoval);
     @try {
         [CSTabBarPreferences reload];
         assert(!CSTabBarPreferences.current.enabled && equal(CSTabBarPreferences.current.contentHeight,52));
@@ -155,6 +179,39 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         [isolated removeObjectForKey:kTabBarIconChatKey];[isolated removeObjectForKey:kTabBarTextChatKey];
         [CSTabBarPreferences reload];CSTabBarUpdate(bar);
         assert(first.imageView.image==nativeImage && !first.textLabel.hidden && [first.textLabel.text isEqual:@"Native"]);
+        // Border pulses must never tint a transparent bar interior or animate its background.
+        [isolated setDouble:0 forKey:kTabBarBgColorAlphaKey];
+        [isolated setDouble:1 forKey:kTabBarBorderColorAlphaKey];
+        [isolated setDouble:1 forKey:kTabBarBorderColorGreenKey];
+        for (NSNumber *mode in @[@1,@2]) {
+            [isolated setInteger:mode.integerValue forKey:kTabBarBorderAnimationKey];
+            [CSTabBarPreferences reload];CSTabBarUpdate(bar);
+            UIView *surface=bar.subviews[0];
+            assert(surface.backgroundColor.alpha==0 && surface.layer.shadowOpacity==0 && !surface.layer.shadowPath);
+            assert(surface.layer.animationKeys.count==0);
+            CALayer *glow=nil;
+            for (CALayer *layer in surface.layer.sublayers) if (layer.mask) glow=layer;
+            assert(glow && !glow.hidden);
+            CAShapeLayer *mask=(CAShapeLayer *)glow.mask;
+            assert([mask.fillRule isEqual:kCAFillRuleEvenOdd]);
+            CGPoint inside=CGPointMake(CGRectGetMidX(glow.bounds),CGRectGetMidY(glow.bounds));
+            CGPoint outside=CGPointMake(CGRectGetMidX(glow.bounds),5);
+            assert(!CGPathContainsPoint(mask.path,NULL,inside,YES));
+            assert(CGPathContainsPoint(mask.path,NULL,outside,YES));
+            CAShapeLayer *ring=(CAShapeLayer *)glow.sublayers[0];
+            assert(CGColorGetAlpha(ring.fillColor)==0 && !ring.shadowPath && ring.opacity==0);
+            CAAnimationGroup *pulse=(CAAnimationGroup *)SubmittedAnimation(ring,@"cs.tabbar.outwardPulse");
+            assert(pulse && equal(pulse.duration,mode.integerValue==1 ? 3 : 1.2));
+            CAKeyframeAnimation *path=pulse.animations[0], *fade=pulse.animations[1];
+            CGRect from=CGPathGetBoundingBox((__bridge CGPathRef)path.values.firstObject);
+            CGRect to=CGPathGetBoundingBox((__bridge CGPathRef)path.values.lastObject);
+            assert(equal(to.size.width-from.size.width,20) && equal(to.size.height-from.size.height,20));
+            assert([fade.values.firstObject doubleValue]==0 && [fade.values.lastObject doubleValue]==0);
+        }
+        [isolated setInteger:0 forKey:kTabBarBorderAnimationKey];[CSTabBarPreferences reload];CSTabBarUpdate(bar);
+        for (CALayer *layer in [bar.subviews[0] layer].sublayers) if (layer.mask) {
+            assert(layer.hidden && !SubmittedAnimation(layer.sublayers[0],@"cs.tabbar.outwardPulse"));
+        }
         // Moving the entire native bar outside a clipping parent during a transition must not flash native UI.
         root.clipsToBounds=YES;bar.frame=CGRectMake(0,850,390,83);CSTabBarUpdate(bar);
         assert(bar.backgroundView.hidden && first.textLabel.hidden==NO);
@@ -171,5 +228,6 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         NSLog(@"tabbar preferences/native lifecycle: PASS");
     } @finally {
         [isolated removePersistentDomainForName:suite];method_setImplementation(m,original);
+        method_setImplementation(add,originalAddAnimation);method_setImplementation(remove,originalRemoveAnimation);
     }
 }return 0;}
