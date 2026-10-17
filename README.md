@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.8-6`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.8-7`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.8-6`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.8-7`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.8-6` 为消息操作诊断清理的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
+| Rootless / Rootful | `1.8-7` 为消息操作诊断清理的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -192,20 +192,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-6
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-7
 ```
 
-默认产物：`packages/com.wechat.improve_1.8-6_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.8-7_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.8-6` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.8-7` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-6
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-7
 ```
 
-默认产物：`packages/com.wechat.improve_1.8-6_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.8-7_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -225,7 +225,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.8-6_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.8-7_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
