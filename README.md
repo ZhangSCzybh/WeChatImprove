@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.7-0`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.7-6`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.7-0`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.7-6`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.7-0` 完成 Rootless 测试包构建（“我”页面隐藏作品）；Rootful 保留构建入口，本轮未重新验证 |
+| Rootless / Rootful | `1.7-6` 为修复赞赏宿主兼容性的 Rootless 包（原生流程已在 1.7-3 验证跨账号直达及实际赞赏）；Rootful 保留构建入口，本轮未重新验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -56,6 +56,18 @@
 | **备份配置 / 重置设置 / 入口设置** | 配置备份、导入、导出、恢复和自动备份；设置重置及插件入口定制 |
 
 “后台运行”受系统调度和注入环境限制，不能保证微信永不被终止。“版本控制”调整的是微信版本返回值，不会安装或降级微信；“更新控制”针对微信内部热更新，不等同于关闭 App Store 更新。
+
+## 支持作者：原生赞赏直达
+
+进入 **关于 → 支持作者**，插件读取作者的固定赞赏码内容并调用微信原生赞赏处理器，直接进入金额选择页。金额与支付确认由微信处理，无需识别图片或打开扫一扫。
+
+2026-10-17，用户在 `1.7-3` 上确认跨账号直达并完成实际赞赏。`1.7-5` 移除中转页时改用了普通 UIViewController，用户反馈点击后闪退。`1.7-6` 改用真正的 MMUIViewController 容器承载原设置内容，恢复原生加载接口兼容性，同时保持无插件中转页。已完成本地主机回归与编译，手机上的最终验证仍待完成。详见 [赞赏宿主兼容修复](docs/native-author-reward-1.7-6.md)。原有安装包保留用于回退。
+
+## 版本更新内容
+
+进入 **插件设置 → 关于 → 版本信息**，可查看当前安装版本的更新说明。入口右侧保留版本号并显示进入箭头，详情页显示插件名称、版本号和本次更新条目，支持滚动阅读、系统字号和深色模式。说明随安装包内置，离线可读。
+
+发布时同步维护 `control`、`Headers/CSUserInfoHelper.h` 中的版本号，以及 `Controllers/CSReleaseNotesViewController.m` 中对应版本的更新说明。未配置说明的版本显示“暂无更新说明”，不会借用其他版本的内容。详见 [版本更新内容 1.7-1](docs/release-notes-1.7-1.md)。
 
 ## 界面净化：隐藏作品
 
@@ -163,20 +175,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.7-0
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.7-6
 ```
 
-默认产物：`packages/com.wechat.improve_1.7-0_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.7-6_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.7-0` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.7-6` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.7-0
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.7-6
 ```
 
-默认产物：`packages/com.wechat.improve_1.7-0_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.7-6_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -196,7 +208,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.7-0_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.7-6_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
@@ -240,6 +252,12 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 实现细节见 [会话分组说明](docs/session-groups.md)、[列表圆角优化](docs/list-corners.md)；设计背景见 [分组重构方案](docs/session-groups-refactor-proposal.md)。
 
 ### 验证状态
+
+`1.7-6` 补充真实原生宿主类型、栈顶加载接口、异步停止加载、UIKit 子控制器容纳、无中转页、返回、重复点击、超时和退出回归。测试替身无法替代真实微信运行；本轮尚无手机崩溃栈及安装验证。
+
+`1.7-4` 完成支持作者调试代码与旧方案清理，原生路由主机回归通过。跨账号直达及实际赞赏已由用户在 `1.7-3` 验证。详见 [支持作者清理](docs/native-author-reward-1.7-4.md)。
+
+`1.7-1` 新增当前版本更新说明页面，已完成入口与显示配置检查、Rootless 双架构构建及安装包内容核对。未进行实机或模拟器视觉验收。详见 [版本更新内容](docs/release-notes-1.7-1.md)。
 
 `1.7-0` 新增独立的“隐藏作品选项”，通过隐藏/恢复、原生重建、开关组合、标题定制和未知行处理的主机回归，完成 Rootless 双架构构建。实机显示效果待验证。详见 [隐藏作品](docs/my-page-works-1.7-0.md)。
 

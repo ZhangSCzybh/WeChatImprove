@@ -6,6 +6,7 @@
 #import "../Headers/CSUserInfoHelper.h" // 用户信息助手和全局常量
 #import "../Headers/WCPluginsHeader.h"  // 其他插件提供的接口声明
 #import "../Controllers/CSCustomViewController.h" // 自定义设置页面
+#import "../Controllers/CSNativeSettingsHost.h"
 #import "../Controllers/CSEntrySettingsViewController.h" // 入口设置控制器
 #import "../Controllers/CSAuthorizationManager.h" // 授权管理器
 #import "../Controllers/CSBackupManager.h" // 备份管理器
@@ -198,7 +199,7 @@ static void entrySettingsChangedCallback(CFNotificationCenterRef center, void *o
 %new
 - (void)openCustomViewController {
     // 创建并配置自定义控制器
-    CSCustomViewController *customVC = [[CSCustomViewController alloc] init];
+    UIViewController *customVC = [[CSNativeSettingsControllerClass() alloc] init];
     customVC.title = getCustomEntryTitle();
     
     // 创建导航控制器（用于模态展示）
@@ -239,7 +240,7 @@ static int isRegister = 0;
         // 获取自定义标题
         NSString *title = getCustomEntryTitle();
         NSString *version = kPluginVersionString;
-        NSString *controller = @"CSCustomViewController";
+        NSString *controller = NSStringFromClass(CSNativeSettingsControllerClass());
         
         NSLog(@"[WeChatTweak] 尝试注册自定义入口: %@, 控制器: %@", title, controller);
         
@@ -449,7 +450,7 @@ static int isRegister = 0;
 %new
 - (void)openCustomViewControllerFromSetting {
     // 创建并配置自定义控制器
-    CSCustomViewController *customVC = [[CSCustomViewController alloc] init];
+    UIViewController *customVC = [[CSNativeSettingsControllerClass() alloc] init];
     customVC.title = getCustomEntryTitle();
     
     // 创建导航控制器（用于模态展示）
@@ -488,4 +489,4 @@ static int isRegister = 0;
                                    CFSTR("com.wechat.tweak.entry.settings.changed"),
                                    NULL,
                                    CFNotificationSuspensionBehaviorDeliverImmediately);
-} 
+}
