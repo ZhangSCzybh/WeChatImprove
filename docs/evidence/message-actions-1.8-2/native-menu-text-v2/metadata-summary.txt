@@ -1,0 +1,255 @@
+encryption (32768, 492666880, 0)
+AppEmoticonMessageCellView -> CommonMessageCellView
+  {'selector': 'operationMenuItems', 'address': '0x1000c6d34', 'types': '@16@0:8'}
+  {'selector': 'onLongTouch', 'address': '0x1000c7e48', 'types': 'v16@0:8'}
+  {'selector': 'getViewController', 'address': '0x1000c7eec', 'types': '@16@0:8'}
+AppFileMessageCellView -> CommonMessageCellView
+  {'selector': 'canShowForwardMenu', 'address': '0x1000cea28', 'types': 'B16@0:8'}
+  {'selector': 'canShowFavoriteMenu', 'address': '0x1000cebc8', 'types': 'B16@0:8'}
+  {'selector': 'operationMenuItems', 'address': '0x1000cee70', 'types': '@16@0:8'}
+  {'selector': 'onShowOperationMenu', 'address': '0x1000cf06c', 'types': 'v16@0:8'}
+  {'selector': 'reportXiaoWeiSummaryMenuExposure', 'address': '0x1000cf920', 'types': 'v16@0:8'}
+  {'selector': 'reportYuanBaoSummaryMenuExposure', 'address': '0x1000cfa94', 'types': 'v16@0:8'}
+  {'selector': 'canShowXiaoWeiSummaryMenuItem', 'address': '0x1000d1108', 'types': 'B16@0:8'}
+  {'selector': 'canShowYuanBaoSummaryMenuItem', 'address': '0x1000d1cc4', 'types': 'B16@0:8'}
+  {'selector': 'onMenuControllerDidHide', 'address': '0x1000d28e8', 'types': 'v16@0:8'}
+AppStandardAccountContentMessageCellView -> AppStandardContentBaseMessageCellView
+AppStandardAccountContentMessageViewModel -> AppStandardContentBaseMessageViewModel
+AppStandardContentBaseMessageCellView -> CommonMessageCellView
+AppStandardContentBaseMessageViewModel -> CommonMessageViewModel
+BaseChatCellView -> UIView
+  {'selector': 'getCurrViewController', 'address': '0x10029cdc4', 'types': '@16@0:8'}
+  {'selector': 'chatViewControllerWidth', 'address': '0x10029ce9c', 'types': 'd16@0:8'}
+  {'selector': 'chatViewControllerShortSideLength', 'address': '0x10029cef0', 'types': 'd16@0:8'}
+  {'selector': 'viewModel', 'address': '0x10029cf78', 'types': '@16@0:8'}
+BaseChatViewModel -> NSObject
+  {'selector': 'chatViewControllerWidth', 'address': '0x10029dd3c', 'types': 'd16@0:8'}
+  {'selector': 'chatViewControllerShortSideLength', 'address': '0x10029df44', 'types': 'd16@0:8'}
+BaseMessageCellView -> BaseChatCellView
+  {'selector': 'messageSummaryMenuModeWithXiaoWeiExptKey:forXiaoWeiExptKey:', 'address': '0x1002a1530', 'types': 'Q32@0:8@16@24'}
+  {'selector': 'messageBizArticleSummaryMenuMode', 'address': '0x1002a16f4', 'types': 'Q16@0:8'}
+  {'selector': 'messageFileSummaryMenuMode', 'address': '0x1002a17c0', 'types': 'Q16@0:8'}
+  {'selector': 'yuanBaoSummaryMenuItemWithType:target:action:', 'address': '0x1002a188c', 'types': '@40@0:8q16@24:32'}
+  {'selector': 'xiaoWeiSummaryMenuItemWithType:target:action:', 'address': '0x1002a18f8', 'types': '@40@0:8q16@24:32'}
+  {'selector': 'targetRectForMenuController', 'address': '0x1002a1964', 'types': '{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8'}
+  {'selector': 'targetRectForMenuControllerForRecordDetail', 'address': '0x1002a1e00', 'types': '{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8'}
+  {'selector': 'isOnlyShowDeleteMenu', 'address': '0x1002a20c4', 'types': 'B16@0:8'}
+  {'selector': 'generateOperationMenu', 'address': '0x1002a2138', 'types': '@16@0:8'}
+  {'selector': 'generateOperationMenuForRecordDetail', 'address': '0x1002a32b8', 'types': '@16@0:8'}
+  {'selector': 'bypassMessageMenuItemsWhitelist:', 'address': '0x1002a364c', 'types': '@24@0:8@16'}
+  {'selector': 'weclawMessageMenuItemsBlacklist:', 'address': '0x1002a3eb0', 'types': '@24@0:8@16'}
+  {'selector': 'uniqMenuItems:', 'address': '0x1002a409c', 'types': '@24@0:8@16'}
+  {'selector': 'filteredMenuItems:', 'address': '0x1002a4294', 'types': '@24@0:8@16'}
+  {'selector': 'showOperationMenu', 'address': '0x1002a4bd4', 'types': 'v16@0:8'}
+  {'selector': 'onShowOperationMenu', 'address': '0x1002a536c', 'types': 'v16@0:8'}
+  {'selector': 'handleMenuControllerWillHideMenuNotification:', 'address': '0x1002a54fc', 'types': 'v24@0:8@16'}
+  {'selector': 'operationMenuItems', 'address': '0x1002a55c0', 'types': '@16@0:8'}
+  {'selector': 'canCellShowOperationMenu', 'address': '0x1002a565c', 'types': 'B16@0:8'}
+  {'selector': 'scheduleMenuItem', 'address': '0x1002a57b8', 'types': '@16@0:8'}
+  {'selector': 'canShowScheduleMenuItem', 'address': '0x1002a5a80', 'types': 'B16@0:8'}
+  {'selector': 'forwardMenuItem', 'address': '0x1002a5e64', 'types': '@16@0:8'}
+  {'selector': 'canShowForwardMenuItem', 'address': '0x1002a5ff0', 'types': 'B16@0:8'}
+  {'selector': 'favoriteMenuItem', 'address': '0x1002a6074', 'types': '@16@0:8'}
+  {'selector': 'canShowFavoriteMenuItem', 'address': '0x1002a6188', 'types': 'B16@0:8'}
+  {'selector': 'copyMenuItem', 'address': '0x1002a6494', 'types': '@16@0:8'}
+  {'selector': 'deleteMenuItem', 'address': '0x1002a64c8', 'types': '@16@0:8'}
+  {'selector': 'canShowDeleteMenuItem', 'address': '0x1002a6c8c', 'types': 'B16@0:8'}
+  {'selector': 'revokeMsgMenuItem', 'address': '0x1002a6c94', 'types': '@16@0:8'}
+  {'selector': 'addRevokeOrDeleteMenuItem:', 'address': '0x1002a752c', 'types': 'v24@0:8@16'}
+  {'selector': 'canShowRevokeMsgMenuItemForMessage:', 'address': '0x1002a75c8', 'types': 'B24@0:8@16'}
+  {'selector': 'canShowRevokeMsgMenuItem', 'address': '0x1002a7828', 'types': 'B16@0:8'}
+  {'selector': 'shareMsgToThirdPartyServiceMenuItem', 'address': '0x1002a7940', 'types': '@16@0:8'}
+  {'selector': 'canShowShareMsgToThirdPartyServiceMenuItem', 'address': '0x1002a7f3c', 'types': 'B16@0:8'}
+  {'selector': 'restoreMenuItem', 'address': '0x1002a7f7c', 'types': '@16@0:8'}
+  {'selector': 'moreMenuItem', 'address': '0x1002a8144', 'types': '@16@0:8'}
+  {'selector': 'canShowMoreMenuItem', 'address': '0x1002a8274', 'types': 'B16@0:8'}
+  {'selector': 'makeAskXiaoWeiMenuItemWithAction:', 'address': '0x1002a86d4', 'types': '@24@0:8:16'}
+  {'selector': 'canShowFTSIndexMenuItem', 'address': '0x1002aa2a4', 'types': 'B16@0:8'}
+  {'selector': 'showFTSIndexMenuItem', 'address': '0x1002aa348', 'types': '@16@0:8'}
+  {'selector': 'onShowFTSIndexMenuItem:', 'address': '0x1002aa388', 'types': 'v24@0:8@16'}
+  {'selector': 'msgReplyMenuItem', 'address': '0x1002aa484', 'types': '@16@0:8'}
+  {'selector': 'onShowMsgReplyMenuItem:', 'address': '0x1002aa4b8', 'types': 'v24@0:8@16'}
+  {'selector': 'msgAddNoteMenuItem', 'address': '0x1002aa5b4', 'types': '@16@0:8'}
+  {'selector': 'onClickMsgAddNoteMenuItem:', 'address': '0x1002aa5e8', 'types': 'v24@0:8@16'}
+  {'selector': 'canShowTopMsgMenuItem', 'address': '0x1002aa6e4', 'types': 'B16@0:8'}
+  {'selector': 'topMsgMenuItem', 'address': '0x1002aaa68', 'types': '@16@0:8'}
+  {'selector': 'onTopMsgMenuItem:', 'address': '0x1002aaa9c', 'types': 'v24@0:8@16'}
+  {'selector': 'canShowCancelTopMenuItem', 'address': '0x1002aab98', 'types': 'B16@0:8'}
+  {'selector': 'onCancelTopMsgMenuItem:', 'address': '0x1002aad54', 'types': 'v24@0:8@16'}
+  {'selector': 'canShowEditMenuItem', 'address': '0x1002ab4d0', 'types': 'B16@0:8'}
+  {'selector': 'canShowSearchMenuItem', 'address': '0x1002ab4d8', 'types': 'B16@0:8'}
+  {'selector': 'showRectForMenuController', 'address': '0x1002ad6f4', 'types': '{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8'}
+  {'selector': 'onLongTouch:', 'address': '0x1002ae68c', 'types': 'v32@0:8{CGPoint=dd}16'}
+  {'selector': 'onLongTouch', 'address': '0x1002ae698', 'types': 'v16@0:8'}
+BaseMessageViewModel -> BaseChatViewModel
+  {'selector': 'viewModelScene', 'address': '0x1002b1ca8', 'types': 'i16@0:8'}
+  {'selector': 'canShowMsgReplyMenuItem', 'address': '0x1002b07c8', 'types': 'B16@0:8'}
+  {'selector': 'canShowMsgNoteMenuItem', 'address': '0x1002b0a9c', 'types': 'B16@0:8'}
+BaseMsgContentLogicController -> MMObject
+  {'selector': 'initViewController', 'address': '0x1002b52e4', 'types': 'v16@0:8'}
+  {'selector': 'genBaseMsgContentViewController', 'address': '0x1002b542c', 'types': '@16@0:8'}
+  {'selector': 'setViewControllerFullScreen', 'address': '0x1002b5448', 'types': 'v16@0:8'}
+  {'selector': 'getMsgContentViewController', 'address': '0x1002b5e6c', 'types': '@16@0:8'}
+  {'selector': 'getViewController', 'address': '0x1002b5e7c', 'types': '@16@0:8'}
+  {'selector': 'onClickFavMenu:', 'address': '0x1002b7e00', 'types': 'v24@0:8@16'}
+  {'selector': 'onClickForwardMenu:', 'address': '0x1002b7e04', 'types': 'v24@0:8@16'}
+  {'selector': 'SendTextMessage:', 'address': '0x1002c38e4', 'types': 'v24@0:8@16'}
+  {'selector': 'SendTextMessage:replyingMessage:isPasted:', 'address': '0x1002c38f8', 'types': 'v36@0:8@16@24B32'}
+  {'selector': 'SendTextMessageWithSolitaire:', 'address': '0x1002c43c0', 'types': 'v24@0:8@16'}
+  {'selector': 'SendTextMessage:externInfo:', 'address': '0x1002c4a28', 'types': 'v32@0:8@16@24'}
+  {'selector': 'onOpenMyCardPkgViewController', 'address': '0x1002ca2d0', 'types': 'v16@0:8'}
+  {'selector': 'onSendLocationToFriendWithViewController:', 'address': '0x1002cd0d0', 'types': 'v24@0:8@16'}
+  {'selector': 'onShareLocationMsgToOpenSDKWithViewController:', 'address': '0x1002cd244', 'types': 'v24@0:8@16'}
+  {'selector': 'getCurrentViewController', 'address': '0x1002d5104', 'types': '@16@0:8'}
+  {'selector': 'getShareMyFriendParentViewController', 'address': '0x1002d69f4', 'types': '@16@0:8'}
+  {'selector': 'getFavForawrdViewController', 'address': '0x1002dab8c', 'types': '@16@0:8'}
+  {'selector': 'getEasterEggContainerViewController', 'address': '0x1002dad70', 'types': '@16@0:8'}
+  {'selector': 'isMusicSearchViewControllerShowing', 'address': '0x1002dd528', 'types': 'B16@0:8'}
+  {'selector': 'currentMusicSearchViewController', 'address': '0x1002ded94', 'types': '@16@0:8'}
+  {'selector': 'setCurrentMusicSearchViewController:', 'address': '0x1002dedb4', 'types': 'v24@0:8@16'}
+BaseMsgContentViewController -> MMUIViewController
+  {'selector': 'MMUIViewControllerDidBeDismissed:', 'address': '0x1002eaa00', 'types': 'v24@0:8@16'}
+  {'selector': 'getPageSheetContainerViewController', 'address': '0x1002eaed8', 'types': '@16@0:8'}
+  {'selector': 'onGrowTextViewMenuItemClicked:growTextView:', 'address': '0x1002ee6c4', 'types': 'v32@0:8Q16@24'}
+  {'selector': 'onGrowTextViewDidShowMenuControllerWithMenuItemArr:', 'address': '0x1002ee784', 'types': 'v24@0:8@16'}
+  {'selector': 'getViewController', 'address': '0x1002f53dc', 'types': '@16@0:8'}
+  {'selector': 'onMediaGroupFoldStep2:viewModel:', 'address': '0x1002f75a0', 'types': 'v32@0:8Q16@24'}
+  {'selector': 'shouldShowRelativeEmoticonViewControllerWithEmoticonWrap:andMessageWrap:', 'address': '0x10030c09c', 'types': 'v32@0:8@16@24'}
+  {'selector': 'showExposeViewController', 'address': '0x10030c280', 'types': 'v16@0:8'}
+  {'selector': 'onClickFavVideoMenu', 'address': '0x10030f6b8', 'types': 'v16@0:8'}
+  {'selector': 'onClickFavMenu:', 'address': '0x100311b84', 'types': 'v24@0:8@16'}
+  {'selector': 'onClickForwardMenu:', 'address': '0x100311c3c', 'types': 'v24@0:8@16'}
+  {'selector': 'onTopMsgMenuItemExposed:', 'address': '0x100313cd4', 'types': 'v24@0:8@16'}
+  {'selector': 'onCancelTopMsgMenuItemExposed:', 'address': '0x100313d8c', 'types': 'v24@0:8@16'}
+  {'selector': 'isViewControllerAnimated', 'address': '0x10031bb60', 'types': 'B16@0:8'}
+  {'selector': 'canSendTextMessage:', 'address': '0x10032788c', 'types': 'B24@0:8@16'}
+  {'selector': 'SendTextMessageToolView:', 'address': '0x100327a64', 'types': 'v24@0:8@16'}
+  {'selector': 'willShowMenuController:inMsgWrap:', 'address': '0x10032aeb4', 'types': 'v32@0:8@16@24'}
+  {'selector': 'willShowMenuController:inMsgWrap:menuSourceType:', 'address': '0x10032aec4', 'types': 'v36@0:8@16@24i32'}
+  {'selector': 'willShowMenuController:inMsgWrap:menuSourceType:buttonList:', 'address': '0x10032aed4', 'types': 'v44@0:8@16@24i32@36'}
+  {'selector': 'onOpenMyCardPkgViewController', 'address': '0x100330d7c', 'types': 'v16@0:8'}
+  {'selector': 'canShowOperationMenu', 'address': '0x100336b28', 'types': 'B16@0:8'}
+  {'selector': 'MenuControllerWillShow:', 'address': '0x100340da4', 'types': 'v24@0:8@16'}
+  {'selector': 'MenuControllerWillHide:', 'address': '0x100340dc0', 'types': 'v24@0:8@16'}
+  {'selector': 'GetCurrentViewController', 'address': '0x1003459b4', 'types': '@16@0:8'}
+  {'selector': 'onMsgImgFullScreenViewController:willBeginDraggingWithMsg:', 'address': '0x10034f070', 'types': 'v32@0:8@16@24'}
+  {'selector': 'onMsgImgFullScreenViewController:draggingCancelWithMsg:', 'address': '0x10034f3a4', 'types': 'v32@0:8@16@24'}
+  {'selector': 'onMsgImgFullScreenViewController:exitAnimateDidEndWithMsg:', 'address': '0x10034f6d8', 'types': 'v32@0:8@16@24'}
+  {'selector': 'previewingContext:commitViewController:', 'address': '0x100352e50', 'types': 'v32@0:8@16@24'}
+  {'selector': 'getCurrentViewController', 'address': '0x1003534c4', 'types': '@16@0:8'}
+  {'selector': 'getForwardingMenuActionTarget:', 'address': '0x100353e54', 'types': '@24@0:8:16'}
+  {'selector': 'getMenuReporter', 'address': '0x100360898', 'types': '@16@0:8'}
+  {'selector': 'canPushMiniTaskViewController', 'address': '0x1003614e4', 'types': 'B16@0:8'}
+  {'selector': 'mmNavigationController:animationControllerForOperation:fromViewController:toViewController:', 'address': '0x100362e54', 'types': '@48@0:8@16q24@32@40'}
+CommonMessageCellView -> BaseMessageCellView
+  {'selector': 'showRectForMenuController', 'address': '0x100f560c0', 'types': '{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8'}
+  {'selector': 'onShowOperationMenu', 'address': '0x100f56664', 'types': 'v16@0:8'}
+  {'selector': 'onShowMsgReplyMenuItem:', 'address': '0x100f5680c', 'types': 'v24@0:8@16'}
+CommonMessageViewModel -> BaseMessageViewModel
+EmoticonMessageCellView -> CommonMessageCellView
+  {'selector': 'showRectForMenuController', 'address': '0x10152d618', 'types': '{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8'}
+  {'selector': 'operationMenuItems', 'address': '0x10152e064', 'types': '@16@0:8'}
+  {'selector': 'onLongTouch', 'address': '0x10152ee9c', 'types': 'v16@0:8'}
+  {'selector': 'getViewController', 'address': '0x10152fa70', 'types': '@16@0:8'}
+ImageMessageCellView -> CommonMessageCellView
+  {'selector': 'showRectForMenuController', 'address': '0x101f781a8', 'types': '{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8'}
+  {'selector': 'canShowForwardMenuItem', 'address': '0x101f78bcc', 'types': 'B16@0:8'}
+  {'selector': 'canShowFavoriteMenuItem', 'address': '0x101f78cc4', 'types': 'B16@0:8'}
+  {'selector': 'canShowEditMenuItem', 'address': '0x101f78dbc', 'types': 'B16@0:8'}
+  {'selector': 'canShowSearchMenuItem', 'address': '0x101f78e34', 'types': 'B16@0:8'}
+  {'selector': 'operationMenuItems', 'address': '0x101f78e48', 'types': '@16@0:8'}
+SessionMenuAdjuester -> NSObject
+ShareCardMessageCellView -> AppStandardAccountContentMessageCellView
+  {'selector': 'operationMenuItems', 'address': '0x1058f85b4', 'types': '@16@0:8'}
+ShareCardMessageViewModel -> AppStandardAccountContentMessageViewModel
+TextMessageCellView -> CommonMessageCellView
+  {'selector': 'onClickTranslateSearchMenus', 'address': '0x105bf7790', 'types': 'v16@0:8'}
+  {'selector': 'getTranslateMenuItems', 'address': '0x105bf7824', 'types': '@16@0:8'}
+  {'selector': 'handleTranslateMenuWillHideMenuNotification:', 'address': '0x105bf7dfc', 'types': 'v24@0:8@16'}
+  {'selector': 'canShowRevokeMsgMenuItem', 'address': '0x105bfdb34', 'types': 'B16@0:8'}
+  {'selector': 'operationMenuItems', 'address': '0x105bfdbb8', 'types': '@16@0:8'}
+  {'selector': 'canShowTranslateMenuItem', 'address': '0x105bfefd0', 'types': 'B16@0:8'}
+  {'selector': 'onShowMsgReplyMenuItem:', 'address': '0x105c019c4', 'types': 'v24@0:8@16'}
+  {'selector': 'onMenuHide', 'address': '0x105c01bfc', 'types': 'v16@0:8'}
+  {'selector': 'onLongTouch:', 'address': '0x105c01fa4', 'types': 'v32@0:8{CGPoint=dd}16'}
+  {'selector': 'getViewController', 'address': '0x105c03328', 'types': '@16@0:8'}
+  {'selector': 'onFloatPreviewMenuHidden', 'address': '0x105c033e0', 'types': 'v16@0:8'}
+  {'selector': 'onFloatPreviewMenuCopy:', 'address': '0x105c03440', 'types': 'v24@0:8@16'}
+  {'selector': 'onFloatPreviewMenuSelectAll', 'address': '0x105c034f8', 'types': 'v16@0:8'}
+  {'selector': 'onFloatPreviewMenuForward', 'address': '0x105c0355c', 'types': 'v16@0:8'}
+  {'selector': 'onFloatPreviewMenuSearch:', 'address': '0x105c03638', 'types': 'v24@0:8@16'}
+  {'selector': 'onFloatPreviewMenuPartRefer:', 'address': '0x105c03854', 'types': 'v24@0:8@16'}
+  {'selector': 'getOperateMenuItem', 'address': '0x105c08198', 'types': '@16@0:8'}
+VideoMessageCellView -> CommonMessageCellView
+  {'selector': 'showRectForMenuController', 'address': '0x10604ca44', 'types': '{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8'}
+  {'selector': 'operationMenuItems', 'address': '0x10604e51c', 'types': '@16@0:8'}
+VoiceMessageCellView -> CommonMessageCellView
+  {'selector': 'getTextTranslateViewMenus', 'address': '0x106272c04', 'types': '@16@0:8'}
+  {'selector': 'onClickTextResultTranslateSearchMenus', 'address': '0x106274de0', 'types': 'v16@0:8'}
+  {'selector': 'handleTranslateMenuWillHideMenuNotification:', 'address': '0x10627e8b0', 'types': 'v24@0:8@16'}
+  {'selector': 'getTranslateMenus', 'address': '0x10627ea10', 'types': '@16@0:8'}
+  {'selector': 'onLongTouch', 'address': '0x10627f1fc', 'types': 'v16@0:8'}
+  {'selector': 'operationMenuItems', 'address': '0x10627f2a4', 'types': '@16@0:8'}
+  {'selector': 'canShowVoiceTransMenu', 'address': '0x10627f864', 'types': 'B16@0:8'}
+  {'selector': 'onClickTranslateSearchMenus', 'address': '0x106282fa4', 'types': 'v16@0:8'}
+  {'selector': 'getViewController', 'address': '0x1062878e0', 'types': '@16@0:8'}
+MMMenuController -> MMWindowViewController
+  {'selector': 'currentMenuItems', 'address': '0x1165e02a0', 'types': '@16@0:8'}
+  {'selector': 'setMenuMinWidth:', 'address': '0x1165e041c', 'types': 'v24@0:8d16'}
+  {'selector': 'setMenuItemInnerGap:', 'address': '0x1165e042c', 'types': 'v24@0:8d16'}
+  {'selector': 'setMenuItemWidth:', 'address': '0x1165e043c', 'types': 'v24@0:8d16'}
+  {'selector': 'setPreferredMenuDirection:', 'address': '0x1165e044c', 'types': 'v24@0:8q16'}
+  {'selector': 'setMenuExtraInfo:', 'address': '0x1165e046c', 'types': 'v24@0:8@16'}
+  {'selector': 'setMenuVisible:animated:', 'address': '0x1165e048c', 'types': 'v24@0:8B16B20'}
+  {'selector': 'setMenuVisible:responder:animated:', 'address': '0x1165e04a0', 'types': 'v32@0:8B16@20B28'}
+  {'selector': 'pushSubMenu:style:animated:', 'address': '0x1165e0d94', 'types': 'v36@0:8@16q24B32'}
+  {'selector': 'setMenuItems:', 'address': '0x1165e0e4c', 'types': 'v24@0:8@16'}
+  {'selector': 'setMenuItemRows:', 'address': '0x1165e0f34', 'types': 'v24@0:8@16'}
+  {'selector': 'setMenuControllerStyle:', 'address': '0x1165e1658', 'types': 'v24@0:8q16'}
+  {'selector': 'currentMenuFrame', 'address': '0x1165e1a8c', 'types': '{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8'}
+  {'selector': 'onTouchAtNoneMenuArea', 'address': '0x1165e1b94', 'types': 'v16@0:8'}
+  {'selector': 'onMenuItemSelected:itemView:', 'address': '0x1165e1c24', 'types': 'v32@0:8@16@24'}
+  {'selector': 'initMenuView', 'address': '0x1165e1f14', 'types': 'v16@0:8'}
+  {'selector': 'updateMenuView', 'address': '0x1165e1fe0', 'types': 'v16@0:8'}
+  {'selector': 'notifyMenuWillShow:', 'address': '0x1165e264c', 'types': 'v24@0:8@16'}
+  {'selector': 'notifyMenuDidShow:', 'address': '0x1165e2800', 'types': 'v24@0:8@16'}
+  {'selector': 'notifyMenuDidShowFailed:', 'address': '0x1165e29f0', 'types': 'v24@0:8@16'}
+  {'selector': 'notifyMenuWillHide:', 'address': '0x1165e2ba4', 'types': 'v24@0:8@16'}
+  {'selector': 'notifyMenuDidHide:', 'address': '0x1165e2d58', 'types': 'v24@0:8@16'}
+  {'selector': 'notifyMenuFrameDidChange', 'address': '0x1165e2f24', 'types': 'v16@0:8'}
+  {'selector': 'notifyMenuItemSelected:', 'address': '0x1165e3004', 'types': 'v24@0:8@16'}
+  {'selector': 'indexForMenuItem:', 'address': '0x1165e3270', 'types': 'q24@0:8@16'}
+  {'selector': 'isMenuVisible', 'address': '0x1165e3534', 'types': 'B16@0:8'}
+  {'selector': 'setMenuVisible:', 'address': '0x1165e3544', 'types': 'v20@0:8B16'}
+  {'selector': 'isCheckMenuWindowValid', 'address': '0x1165e3554', 'types': 'B16@0:8'}
+  {'selector': 'setIsCheckMenuWindowValid:', 'address': '0x1165e3564', 'types': 'v20@0:8B16'}
+  {'selector': 'setMenuView:', 'address': '0x1165e3594', 'types': 'v24@0:8@16'}
+  {'selector': 'setMenuWindow:', 'address': '0x1165e35c8', 'types': 'v24@0:8@16'}
+  {'selector': 'setMenuStyle:', 'address': '0x1165e360c', 'types': 'v24@0:8q16'}
+  {'selector': 'subMenuPushedAnimated', 'address': '0x1165e365c', 'types': 'B16@0:8'}
+  {'selector': 'setSubMenuPushedAnimated:', 'address': '0x1165e366c', 'types': 'v20@0:8B16'}
+  {'selector': 'setMenuAnimator:', 'address': '0x1165e36bc', 'types': 'v24@0:8@16'}
+MMUIViewController -> UIViewController
+  {'selector': 'canPushMiniTaskViewController', 'address': '0x10479bae8', 'types': 'B16@0:8'}
+  {'selector': 'openMiniTaskViewController:', 'address': '0x10479d12c', 'types': 'v24@0:8q16'}
+  {'selector': 'openOriginalMiniTaskViewController:', 'address': '0x10479df08', 'types': 'v24@0:8q16'}
+  {'selector': 'openMiniTaskViewControllerWithGesture:transitionContext:animated:pageActionInfo:', 'address': '0x10479e370', 'types': 'v44@0:8@16@24B32@36'}
+  {'selector': 'openChatBotFlutterViewControllerWithInteractiveController:transitionContext:animated:', 'address': '0x10479e588', 'types': 'v36@0:8@16@24B32'}
+  {'selector': 'openChatBotVoIPViewControllerWithInteractiveController:transitionContext:guideTransitionContext:animated:pageActionInfo:', 'address': '0x10479eb24', 'types': 'v52@0:8@16@24@32B40@44'}
+  {'selector': 'openMiniTaskViewControllerWithInteractiveController:transitionContext:guideTransitionContext:animated:pageActionInfo:', 'address': '0x10479f214', 'types': 'v52@0:8@16@24@32B40@44'}
+  {'selector': 'canPushMiniTaskViewController:', 'address': '0x10479ff38', 'types': 'B20@0:8B16'}
+  {'selector': 'MMUIViewControllerWillDisppear:', 'address': '0x104799dec', 'types': 'v24@0:8@16'}
+  {'selector': 'presentedModalViewController', 'address': '0x11666498c', 'types': '@16@0:8'}
+  {'selector': 'presentingModalViewController', 'address': '0x116664c9c', 'types': '@16@0:8'}
+  {'selector': 'getViewController', 'address': '0x11666e5a0', 'types': '@16@0:8'}
+  {'selector': 'didMoveToParentViewController:', 'address': '0x11666eb1c', 'types': 'v24@0:8@16'}
+  {'selector': 'childViewControllerForStatusBarHidden', 'address': '0x1166731f0', 'types': '@16@0:8'}
+  {'selector': 'childViewControllerForStatusBarStyle', 'address': '0x1166732b0', 'types': '@16@0:8'}
+  {'selector': 'mmUIViewControllerHandleScreenEdgePanGesture:', 'address': '0x116678b60', 'types': 'v24@0:8@16'}
+  {'selector': 'mmNavigationController:animationControllerForOperation:fromViewController:toViewController:', 'address': '0x116679e68', 'types': '@48@0:8@16q24@32@40'}
+  {'selector': 'setPresentingModalViewController:', 'address': '0x11667a868', 'types': 'v24@0:8@16'}
+  {'selector': 'setPresentedModalViewController:', 'address': '0x11667a87c', 'types': 'v24@0:8@16'}
+MMMenuItem -> UIMenuItem
+  {'selector': 'setMenuItemAnimator:', 'address': '0x1167a6df8', 'types': 'v24@0:8@?16'}
+  {'selector': 'setMenuType:', 'address': '0x1167a6f84', 'types': 'v24@0:8q16'}
+MMObject -> NSObject
