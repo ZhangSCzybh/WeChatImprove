@@ -14,7 +14,7 @@ extern NSString * const kUserAvatarURLKey;    // 用户头像URL缓存键
 extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
 
 // 插件信息相关常量
-#define kPluginVersionString @"1.7-12"  // 插件版本号
+#define kPluginVersionString @"1.7-17"  // 插件版本号
 
 #pragma mark - 类定义
 
@@ -47,4 +47,4 @@ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.7-12`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.7-17`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.7-12`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.7-17`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.7-12` 为搜索转场标题闪烁修复的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
+| Rootless / Rootful | `1.7-17` 为后台模糊功能整理的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -51,11 +51,20 @@
 | **红包功能** | 私聊/群聊自动抢红包、群白名单/黑名单、串行与延迟领取、自动回复、通知、汇总和领取记录 |
 | **自动收款** | 私聊/群聊开关、延迟收款、通知、自动回复和收款记录 |
 | **收藏验证** | 进入收藏时使用 Face ID / Touch ID 等系统生物认证 |
+| **后台模糊** | App 切换器与后台页面模糊，回到微信恢复清晰，独立开关默认关闭 |
 | **后台运行 / 游戏辅助** | 后台运行辅助；发送骰子或猜拳表情时选择结果 |
 | **版本控制 / 更新控制** | 自定义微信版本返回值；控制微信内部热更新的加载、下载后处理等环节 |
 | **备份配置 / 重置设置 / 入口设置** | 配置备份、导入、导出、恢复和自动备份；设置重置及插件入口定制 |
 
 “后台运行”受系统调度和注入环境限制，不能保证微信永不被终止。“版本控制”调整的是微信版本返回值，不会安装或降级微信；“更新控制”针对微信内部热更新，不等同于关闭 App Store 更新。
+
+## 后台模糊
+
+进入 **插件设置 → 功能增强 → 后台模糊**，打开“启用后台模糊”。默认关闭，修改后立即生效。微信即将失去活跃状态时用约 0.22 秒渐入系统原生模糊，返回并恢复活跃后用当前模糊画面的内存快照做约 0.22 秒淡出，让清晰页面逐渐显露；覆盖所在窗口的页面内容，包括顶栏和底栏，并跟随系统深浅色与窗口尺寸。
+
+下拉控制中心、通知中心或系统认证也可能导致微信失活，这些场景会暂时模糊。功能只负责页面显示，不依赖“后台运行”，临时快照不写入文件且过渡结束即释放，不增加保活任务或轮询。系统“降低透明度”可能改变模糊材质的观感；开启“减弱动态效果”时即时切换。快速往返会反向衔接当前动画，进入后台时收束到完整模糊。
+
+`1.7-16` 的功能和返回过渡已获用户实机确认正常。`1.7-17` 保留该效果，统一动画／快照释放，移除调试断言，减少无效对象创建与关闭时的处理。221 项主机行为检查及底栏回归通过，Rootless 双架构构建通过。详见 [后台模糊检查与整理](docs/background-blur-cleanup-1.7-17.md)。
 
 ## 支持作者：原生赞赏直达
 
@@ -175,20 +184,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.7-12
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.7-17
 ```
 
-默认产物：`packages/com.wechat.improve_1.7-12_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.7-17_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.7-12` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.7-17` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.7-12
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.7-17
 ```
 
-默认产物：`packages/com.wechat.improve_1.7-12_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.7-17_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -208,7 +217,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.7-12_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.7-17_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
@@ -252,6 +261,16 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 实现细节见 [会话分组说明](docs/session-groups.md)、[列表圆角优化](docs/list-corners.md)；设计背景见 [分组重构方案](docs/session-groups-refactor-proposal.md)。
 
 ### 验证状态
+
+`1.7-17` 在用户确认 1.7-16 正常后整理后台模糊代码：统一动画与快照清理，移除调试断言，减少无效处理。221 项行为检查、底栏回归与 Rootless 双架构构建通过。详见 [后台模糊检查与整理](docs/background-blur-cleanup-1.7-17.md)。
+
+`1.7-16` 根据录屏调整返回渲染：以模糊画面的内存快照做 0.22 秒淡出，正常返回不再将实时模糊材质动画到 nil。221 项主机行为检查与 Rootless 双架构构建通过；用户已确认功能及返回过渡正常。详见 [返回闪烁优化](docs/background-blur-snapshot-1.7-16.md)。
+
+`1.7-15` 统一后台模糊进入与返回动画为 0.22 秒，去掉正常完成回调的重复效果赋值，并避免无关配置通知截断过渡。206 项主机行为检查与 Rootless 双架构构建通过，实机观感待复核。详见 [返回微信的清晰过渡](docs/background-blur-return-1.7-15.md)。
+
+`1.7-14` 为后台模糊增加渐入／渐退、快速往返动画反转、后台完整模糊收束及减弱动态效果适配。195 项主机行为检查与 Rootless 双架构构建通过，新动画观感待手机验证。详见 [后台模糊过渡优化](docs/background-blur-transition-1.7-14.md)。
+
+`1.7-13` 新增独立后台模糊开关，使用应用／场景生命周期通知同步显示与移除原生模糊层。146 项主机行为检查通过，Rootless 双架构构建通过；用户已确认基础功能正常，过渡生硬的问题在 1.7-14 调整。详见 [后台模糊](docs/background-blur-1.7-13.md)。
 
 `1.7-12` 保持快捷搜索转场背后主列表的分组标题，修复短暂显示“微信”的闪烁。详见 [搜索标题修复](docs/session-groups-search-title-1.7-12.md)。
 

@@ -5,6 +5,7 @@
 #import "CSNavigationTitleSettingsViewController.h"
 #import "CSAvatarSettingsViewController.h"
 #import "CSBackgroundRunViewController.h"
+#import "CSBackgroundBlurSettingsViewController.h"
 #import "CSTouchTrailViewController.h"
 #import "CSGameCheatsViewController.h"
 #import "CSFavoriteSettingsViewController.h"
@@ -820,6 +821,11 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                         iconColor:[UIColor systemPurpleColor]
                                                           detail:nil];
     
+    CSSettingItem *backgroundBlurItem = [CSSettingItem itemWithTitle:@"后台模糊"
+                                                          iconName:@"eye.slash"
+                                                         iconColor:[UIColor systemIndigoColor]
+                                                            detail:nil];
+
     CSSettingItem *gameCheatsItem = [CSSettingItem itemWithTitle:@"游戏辅助"
                                                       iconName:@"gamecontroller.fill"
                                                      iconColor:[UIColor systemGreenColor]
@@ -881,6 +887,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 
     CSSettingSection *enhancementSection = [CSSettingSection sectionWithHeader:@"功能增强" 
                                                                       items:@[backgroundRunItem,
+                                                                             backgroundBlurItem,
                                                                              gameCheatsItem,
                                                                              chatAttachmentItem,
                                                                              messageTimeItem,
@@ -1029,6 +1036,10 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
         else if ([item.title isEqualToString:@"后台运行"]) {
             CSBackgroundRunViewController *backgroundVC = [[CSBackgroundRunViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
             [self.navigationController pushViewController:backgroundVC animated:YES];
+        }
+        else if ([item.title isEqualToString:@"后台模糊"]) {
+            CSBackgroundBlurSettingsViewController *blurVC = [[CSBackgroundBlurSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
+            [self.navigationController pushViewController:blurVC animated:YES];
         }
         // 处理触摸轨迹点击
         else if ([item.title isEqualToString:@"触摸轨迹"]) {
