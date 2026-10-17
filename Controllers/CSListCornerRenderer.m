@@ -1,6 +1,7 @@
 #import "CSListCornerRenderer.h"
 #import <QuartzCore/QuartzCore.h>
 #import <objc/runtime.h>
+#import <math.h>
 
 static char CardRenderStateKey;
 
@@ -15,6 +16,10 @@ static char CardRenderStateKey;
 
 void CSListApplyCardBackground(UIView *background, CGRect frame, CGFloat radius,
                                BOOL first, BOOL last, UIColor *color) {
+    if (!background || !isfinite(frame.origin.x) || !isfinite(frame.origin.y) ||
+        !isfinite(frame.size.width) || !isfinite(frame.size.height) || frame.size.width<=0 || frame.size.height<=0 || !isfinite(radius)) return;
+    radius=MAX(0,radius);
+    background.userInteractionEnabled=NO;
     CSListCornerRenderState *state=objc_getAssociatedObject(background,&CardRenderStateKey);
     if (!state) {
         state=[CSListCornerRenderState new];
@@ -40,10 +45,11 @@ void CSListApplyCardBackground(UIView *background, CGRect frame, CGFloat radius,
     CGPathRef path=state.path.CGPath;
     BOOL resetPath=shapeChanged || !state.mask.path ||
         (state.mask.path!=path && !CGPathEqualToPath(state.mask.path,path));
-    if (resetPath || layer.mask!=state.mask || layer.cornerRadius!=layerRadius || !layer.masksToBounds) {
+    if (resetPath || !CGRectEqualToRect(state.mask.frame,CGRectMake(0,0,frame.size.width,frame.size.height)) || layer.mask!=state.mask || layer.cornerRadius!=layerRadius || !layer.masksToBounds) {
         // Reusing a mask must not introduce implicit morph animations when a cell changes groups.
         [CATransaction begin];
         [CATransaction setDisableActions:YES];
+        state.mask.frame=CGRectMake(0,0,frame.size.width,frame.size.height);
         if (resetPath) state.mask.path=path;
         if (layer.mask!=state.mask) layer.mask=state.mask;
         if (layer.cornerRadius!=layerRadius) layer.cornerRadius=layerRadius;
