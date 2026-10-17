@@ -1,7 +1,6 @@
 #import "CSRepeatSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
-
-static NSString * const kRepeatEnabledKey = @"com.wechat.enhance.repeat.enabled";
+#import "CSMessageActionPreferences.h"
 
 @interface CSRepeatSettingsViewController ()
 
@@ -30,14 +29,14 @@ static NSString * const kRepeatEnabledKey = @"com.wechat.enhance.repeat.enabled"
     CSSettingItem *repeatEnabledItem = [CSSettingItem switchItemWithTitle:@"复读功能"
                                                                 iconName:@"repeat.circle.fill"
                                                                iconColor:[UIColor systemPurpleColor]
-                                                             switchValue:[defaults boolForKey:kRepeatEnabledKey]
+                                                             switchValue:[defaults boolForKey:CSMessageActionRepeatEnabledKey]
                                                        valueChangedBlock:^(BOOL isOn) {
-        [defaults setBool:isOn forKey:kRepeatEnabledKey];
+        [defaults setBool:isOn forKey:CSMessageActionRepeatEnabledKey];
         [defaults synchronize];
         
         CFNotificationCenterPostNotification(
             CFNotificationCenterGetDarwinNotifyCenter(),
-            CFSTR("com.wechat.enhance.repeat.settings_changed"),
+            (__bridge CFStringRef)CSMessageActionRepeatDarwinNotification,
             NULL,
             NULL,
             true
