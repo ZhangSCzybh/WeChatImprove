@@ -1,0 +1,233 @@
+{
+  "date": "2026-10-17",
+  "target_sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "read_only_native_analysis": true,
+  "device_sends": false,
+  "files": [
+    {
+      "file": "ordinary--AudioUtil--calcSilkVoiceTime_.asm",
+      "size": 482,
+      "sha256": "9640971c525f686150ed0cb79cc6cfe45cd8c1f53b156ec38d03e49d22c6933d"
+    },
+    {
+      "file": "ordinary--AudioUtil--calcVoiceTime_VoiceFormat_.asm",
+      "size": 5116,
+      "sha256": "afb6bc343117fddfbd65a5f35a34ffc615076c4ec907f73b3e79cd625eb7fcdc"
+    },
+    {
+      "file": "ordinary--CDownloadVoiceMgr--OnSyncDownload_LocalID_n64SvrID_CreateTime_Xml_Voice_.asm",
+      "size": 22899,
+      "sha256": "e93067e244bc299cafda799377f8d173b0b14b01fff53722084124378cce2e3a"
+    },
+    {
+      "file": "ordinary--CExtendInfoOfVoiceMsg--ChangeForDisplay.asm",
+      "size": 22572,
+      "sha256": "a936238fc048eedc8c2e00ec4a9dea12c1c2ddca08928e3a4a9242aa78a9c7b0"
+    },
+    {
+      "file": "ordinary--CExtendInfoOfVoiceMsg--IsDownloadEnded.asm",
+      "size": 1243,
+      "sha256": "c315c00f5fde2fbfc0b23d848ab989d013ec13275b057faf8f4d3bb8fe7e52bc"
+    },
+    {
+      "file": "ordinary--CMessageMgr--AddAppMsg_MsgWrap_DataPath_Scene_.asm",
+      "size": 32705,
+      "sha256": "0f7c22d74b1683985c1efe29c74d5aaf048ebc30c1df0a4c8053ce121a2784b7"
+    },
+    {
+      "file": "ordinary--CMessageMgr--AddAppMsg_MsgWrap_Data_Scene_.asm",
+      "size": 37219,
+      "sha256": "19644d9634868102078a7948b458d29e2b7972d59801c60ee8f68f71ce773cf2"
+    },
+    {
+      "file": "ordinary--CMessageMgr--AddEmoticonMsg_MsgWrap_.asm",
+      "size": 15493,
+      "sha256": "0a4f6245b6c5ccb1a3c831782603d11f8734e6e2a09dabad0d1851e80ed424ca"
+    },
+    {
+      "file": "ordinary--CMessageMgr--AddMsg_MsgWrap_.asm",
+      "size": 27615,
+      "sha256": "195758bf6221782c27bb2b55a03c16d741a5415b82caa5e9495b582d7bfc2427"
+    },
+    {
+      "file": "ordinary--CMessageMgr--AddRecordMsg_MsgWrap_.asm",
+      "size": 22184,
+      "sha256": "0277077501b12d9df927b949200b1186b3dc8bfb0b42aa17c8f04f165e3e90ec"
+    },
+    {
+      "file": "ordinary--CMessageMgr--AddShortVideoMsg_ToUsr_VideoInfo_.asm",
+      "size": 6056,
+      "sha256": "4b8c4b78804aa6881fdd371617acd0d70cc813746a89509f7660f371402f5aaf"
+    },
+    {
+      "file": "ordinary--CMessageMgr--AddVideoMsg_ToUsr_VideoInfo_.asm",
+      "size": 463,
+      "sha256": "02910247dc9353b1b1a336ad4f2fc4e27cc36e521eee4a1375167977719dd1c6"
+    },
+    {
+      "file": "ordinary--CMessageMgr--AddVideoMsg_ToUsr_VideoInfo_MsgType_.asm",
+      "size": 66141,
+      "sha256": "a98f56541b470b2391635dfe3f0423abb55592561968c6d13667378d7b099b9a"
+    },
+    {
+      "file": "ordinary--CMessageMgr--ResendMsg_MsgWrap_.asm",
+      "size": 55676,
+      "sha256": "efba1ed9833c02ad3b3d2ea0a89382b9e81561476b1887ea0305ae18fa8b6b0a"
+    },
+    {
+      "file": "ordinary--CMessageMgr--ResendVideoMsg_MsgWrap_.asm",
+      "size": 42841,
+      "sha256": "f8622ed5be1af31d59c54b7e242786241356bd22a1f428e78e8029fb93cdd304"
+    },
+    {
+      "file": "ordinary--CMessageWrap--GetPathOfAppDataByUserName_andMessageWrap_retStrPath_.asm",
+      "size": 2853,
+      "sha256": "018ff45192a5720260fc61564db6d36f5b55a39a05f3783321d27e2646416c81"
+    },
+    {
+      "file": "ordinary--CMessageWrap--copyToMsg_.asm",
+      "size": 43775,
+      "sha256": "94436b4a659393493011aa6855a98fcb8d9131f4d98f8aba5e07cf3cc80cd3b6"
+    },
+    {
+      "file": "ordinary--CMessageWrap--copyWithZone_.asm",
+      "size": 1731,
+      "sha256": "997e9d534bddc110d4817a1403f3dc24b9a6cfbbc6a25b17f777100a5a85cb9e"
+    },
+    {
+      "file": "ordinary--CMessageWrap--forwardingTargetForSelector_.asm",
+      "size": 2394,
+      "sha256": "ac3a12c77ce3c17b2ca3c896b0822f8047676b3f5be9a8fba62ec0d869af2c87"
+    },
+    {
+      "file": "ordinary--DownloadVoiceCDNMgr--OnSyncDownload_LocalID_n64SvrID_CreateTime_Xml_Voice_.asm",
+      "size": 35004,
+      "sha256": "faef2ce5c7b6d8e662e7406780e05f3397d0294b7604e28e24d79cfd77369e08"
+    },
+    {
+      "file": "ordinary--DownloadVoiceCommon--parseVoiceXml_.asm",
+      "size": 16591,
+      "sha256": "5dab9abb2c8c59f8534f45e17cfc857aa9190894036206cd406b7d79d19c83fa"
+    },
+    {
+      "file": "ordinary--DownloadVoiceWrap--m_uiEndFlag.asm",
+      "size": 239,
+      "sha256": "b4689e3402b5991c5154bab5eed56f9a0fb170e5b7ba7362436165f47fd94e6e"
+    },
+    {
+      "file": "ordinary--DownloadVoiceWrap--m_uiVoiceLen.asm",
+      "size": 239,
+      "sha256": "d20880f0fcca96e4fd2f6fb92bf8b320a46a4d03e4d545069ba996b2f89a6097"
+    },
+    {
+      "file": "ordinary--DownloadVoiceWrap--m_uiVoiceTime.asm",
+      "size": 239,
+      "sha256": "937525aa8696a990c416e4fa08ad9ca13d9a356b96e07c1de329f94be4151824"
+    },
+    {
+      "file": "ordinary--ForwardMsgUtil--GenForwardVideoFromMsgWrap_.asm",
+      "size": 35823,
+      "sha256": "0a0194ee2084ee6b84d3aebd687d58f804b922b6a10373fd387786ef29502f50"
+    },
+    {
+      "file": "ordinary--ForwardMsgUtil--appMsgFromMsgWrap_.asm",
+      "size": 123269,
+      "sha256": "5ae67bc6765919e79a50622fe9a7ab525f625c4c1f51717a4aedbd095bf709f0"
+    },
+    {
+      "file": "ordinary--ForwardMsgUtil--cardMsgFromMsgWrap_.asm",
+      "size": 6132,
+      "sha256": "4cbbe58bd698fc2cda16b2bdbc87ea52d9f5ea85cba4090dd39de73359223444"
+    },
+    {
+      "file": "ordinary--ForwardMsgUtil--emojiMsgFromMsgWrap_.asm",
+      "size": 18908,
+      "sha256": "7c3e395577160ef51f3cefbfba6558123236191ba7d1669509ade9b805a2c92a"
+    },
+    {
+      "file": "ordinary--ForwardMsgUtil--imgMsgFromMsgWrap_.asm",
+      "size": 83820,
+      "sha256": "29d2e59392b422fad47b63f8457378c84e1d924d84599daa31945c6e57a6fbaa"
+    },
+    {
+      "file": "ordinary--ForwardMsgUtil--locMsgFromMsgWrap_.asm",
+      "size": 5303,
+      "sha256": "ce6e8816877627ca460fa27ffe7fb5daac9fe0275d0297e0e147c6cf68173994"
+    },
+    {
+      "file": "ordinary--ForwardMsgUtil--textMsgFromMsgWrap_.asm",
+      "size": 3655,
+      "sha256": "82d5794c5c443db65c220e75e5f1c4522d9b5f338f51b2aa42f4ddbf8ac43851"
+    },
+    {
+      "file": "ordinary--MMContextManager--activeUserContext.asm",
+      "size": 1050,
+      "sha256": "1d161e9c5ed27f4f57f25d5ee46ced6c50eda7423fa59dfef330ed5a61d358db"
+    },
+    {
+      "file": "ordinary--MMContextManager--loginByContext_.asm",
+      "size": 8359,
+      "sha256": "5065827cb4b85332d46efd33d0c7ae40332a7df54bc546b0ff1c82a16bfe0dcd"
+    },
+    {
+      "file": "ordinary--MMContextManager--loginContextTimes.asm",
+      "size": 228,
+      "sha256": "0d1c42c0cc9365e034b3b00bc25de09a5ee0f893abf7988b1503f92248f80243"
+    },
+    {
+      "file": "ordinary--MMContextManager--loginNonGuestContextTimes.asm",
+      "size": 228,
+      "sha256": "5800c9eae0828b5a9048e6e9e89f46f18d72ce30c12dd2f99df9aa487fbcad5f"
+    },
+    {
+      "file": "ordinary--MMContextManager--logout_.asm",
+      "size": 2404,
+      "sha256": "0b9ebcd1ea4e826c1b8344467f2a22beb9a7455ec7a4bf8843ff7c16909643d5"
+    },
+    {
+      "file": "ordinary--OpusAudioPlayer--calculateVoiceTime_.asm",
+      "size": 11189,
+      "sha256": "0efff0cc4059b037f133e6ba6275eaf87e2c1092a97a88edfd913c10397f02b3"
+    },
+    {
+      "file": "ordinary--SilkAudioPlayer--calculateVoiceTime_.asm",
+      "size": 5694,
+      "sha256": "f0e563af425e08d22fe892708376acf98dad32d036ebc347532842e1921df5ff"
+    },
+    {
+      "file": "ordinary-context-methods.json",
+      "size": 9227,
+      "sha256": "d77f600967fc87c853aa8f096eacf40591a90941a31a840865011ef180d30243"
+    },
+    {
+      "file": "ordinary-disassemble.py",
+      "size": 4772,
+      "sha256": "347c9fe2ba772df6361571cb46ac0c5a918c80bb66d10961ba8aea5b67ce768c"
+    },
+    {
+      "file": "ordinary-lookup-methods.json",
+      "size": 5535,
+      "sha256": "5470cb41113f3dea776c6ec727f636b2a1da0d47538ed083b295de41607d140f"
+    },
+    {
+      "file": "ordinary-methods.json",
+      "size": 8931,
+      "sha256": "1ab32313d17b97489e01a2f702f4853a2d0c9bfcafa6c47d84a81c9f60a1c4c0"
+    },
+    {
+      "file": "ordinary-repeat-contracts.md",
+      "size": 24603,
+      "sha256": "7d316f796e8af4a0c6f52c6014c479ad99f5b583a615116fb15ee15295fa08c8"
+    },
+    {
+      "file": "ordinary-voice-time-methods.json",
+      "size": 885,
+      "sha256": "2792d25ae905ee0aedffe8bc9937084c16e109a41631776ef5feeff33b59e6cc"
+    },
+    {
+      "file": "ordinary-voice-xml-methods.json",
+      "size": 6522,
+      "sha256": "62babd86dc3f533d0ea3727ee30d7efdeadc20c2d85a26208eb8c3b493b2aa25"
+    }
+  ]
+}
