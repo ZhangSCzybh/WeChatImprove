@@ -1,0 +1,26 @@
+{
+  "baseline": "2aa7bcb8 / 1.7-17",
+  "binary_path": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "binary_sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "binary_uuid": "9cd58b8e-b7ab-3487-adbd-2ac0aa16a5de",
+  "cryptid": 0,
+  "identity": "REA open_binary verified SHA-256; local Mach-O LC_UUID equals supplied crash app slice UUID. No live-device file hash verified.",
+  "method": "Bounded local Mach-O Objective-C relative method/ivar/chained-pointer decoding reused from prior analysis; six function ranges from LC_FUNCTION_STARTS disassembled with Capstone. Selector annotations mark direct reference loads, not resolved receivers or runtime execution. External-bound parent classes are intentionally unresolved.",
+  "limitations": [
+    "Static binary and source analysis only; no phone UI hierarchy or live feature-state observations.",
+    "ClassDump headers differ from the inspected binary; no assertion of exact pixel layout from headers.",
+    "No production code changed and no build, install, or live database operations performed.",
+    "No tests run this round; historical documentation test counts are not current validation."
+  ],
+  "source_sha256": {
+    "Hooks/ListCornerRadiusHooks.xm": "a4c9ea50718f03b1d9a9bc6739bcec85c745da151227084b09f983cd39200e4e",
+    "Controllers/CSListCornerRenderer.m": "b0e8d7d309d50745be4d8e6838f8f2c599c8e13e358463901984471ace6032bb",
+    "Controllers/CSListCornerRadiusSettingsViewController.m": "a15eef87616840aa6ad435987bcc3d96976410cdf2330063535c56904a73d793",
+    "Hooks/SessionGroupHooks.xm": "222be335e54953d1d9c7135472a70cd2e7f144fc4019fa27992a3c7adadb5d6b",
+    "Controllers/CSGroupListAdapter.m": "8e824895eb03e52f3d5306c1934cd6a2faa2b66ace91553171b9410064eff2a1",
+    "Controllers/CSGroupIndexScope.m": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780",
+    "Hooks/HideDiscoverHooks.xm": "01a8e7762f025058418e70528ddfbdd990080111af187879a455a7cd3b543f79",
+    "Hooks/HideMomentsHooks.xm": "5fb57c30af53f4f865e8565d43e76b0e30b7f8f3c16a372a250bbf5876c48056",
+    "Hooks/CustomEntryHooks.xm": "483c04416638a29ed6fd5ae9114800f1b0986036d094c9873630bdeae3aa3001"
+  }
+}
