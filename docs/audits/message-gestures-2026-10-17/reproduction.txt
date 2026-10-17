@@ -1,0 +1,9 @@
+vertical_should_begin=1 (expected 0)
+disabled_right_should_begin=1 (expected 0)
+cancelled_dispatches=1 (expected 0)
+failed_transform_tx=-30.0 (expected 0)
+subthreshold_haptics=1,dispatches=0 (threshold=60,displacement=45)
+reverse_velocity_dispatches=1,direction=0 (left=0,right=1)
+1000_changed_configuration_reads=2000 (first action enabled; last-action-only would read more)
+duplicate_delegate_registration_first=1,second=0 (second implementation is not installed)
+source_sha256=ceff2bd4f24c4d2124bb5a6b14d0c0d580d26fe1e99055a03e1ffd94876ff522
