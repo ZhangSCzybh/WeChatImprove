@@ -24,7 +24,6 @@
 - (void)setPreviewColor:(UIColor *)previewColor {
     _previewColor = previewColor;
     self.backgroundColor = previewColor;
-    [self setNeedsDisplay];
 }
 
 @end

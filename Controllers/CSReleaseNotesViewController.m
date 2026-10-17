@@ -4,6 +4,10 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.7-23": @[
+            @{@"title": @"整理列表圆角实现",
+              @"detail": @"清理无效参数、重复代码及多余重绘请求，保留四页圆角、未读提示、好友数量背景和已有设置。"}
+        ],
         @"1.7-22": @[
             @{@"title": @"补齐通讯录底部背景",
               @"detail": @"好友数量区域与通讯录背景保持一致，保留原生人数文字和布局，并包含此前发现页未读提示、分割线及资料卡片圆角修复。"}

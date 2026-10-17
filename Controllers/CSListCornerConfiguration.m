@@ -46,7 +46,7 @@ const CGFloat kDefaultNormalSessionTopMargin = 10.0;
 - (UIColor *)pinnedColorForStyle:(UIUserInterfaceStyle)style { return self.colors[style == UIUserInterfaceStyleDark ? 3 : 2]; }
 - (UIColor *)normalColorForStyle:(UIUserInterfaceStyle)style { return self.colors[style == UIUserInterfaceStyleDark ? 5 : 4]; }
 @end
-UIColor *CSListCornerLoadColor(id<CSListCornerDefaults> defaults, NSString *redKey, NSString *greenKey, NSString *blueKey, NSString *alphaKey, UIColor *fallback) {
+static UIColor *CSListCornerLoadColor(id<CSListCornerDefaults> defaults, NSString *redKey, NSString *greenKey, NSString *blueKey, NSString *alphaKey, UIColor *fallback) {
     CGFloat red=[defaults floatForKey:redKey], green=[defaults floatForKey:greenKey];
     CGFloat blue=[defaults floatForKey:blueKey], alpha=[defaults floatForKey:alphaKey];
     // Preserve 1.7-17's all-zero sentinel, including opaque background fallback.

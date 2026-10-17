@@ -1,0 +1,15 @@
+{
+  "list_corners": {
+    "command": "bash Tests/verify-list-corners.sh",
+    "checks": 797,
+    "failures": 0
+  },
+  "group_regressions": {
+    "suites": 11,
+    "checks": 647,
+    "failures": 0
+  },
+  "my_page_clean": "PASS",
+  "tests_modified": false,
+  "scope": "Host production modules/extracted Hooks with UIKit doubles and in-memory defaults; no device UI, startup, FPS, memory or battery measurement."
+}

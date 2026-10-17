@@ -106,7 +106,7 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 - (CGFloat)tableView:(id)arg1 heightForFooterInSection:(NSInteger)arg2 {
     CGFloat originalHeight=%orig;
     CSListCornerSnapshot *configuration=[[CSListCornerConfiguration sharedConfiguration] snapshot];
-    return CSListCornerFooterHeight(CSListCornerPageContacts,configuration.enabled && CSListCornerOwnsTable(self,(UITableView *)arg1,CSListCornerPageContacts),originalHeight,arg2,configuration.pinnedGap,configuration.normalGap);
+    return CSListCornerFooterHeight(CSListCornerPageContacts,configuration.enabled && CSListCornerOwnsTable(self,(UITableView *)arg1,CSListCornerPageContacts),originalHeight);
 }
 - (UIView *)tableView:(id)arg1 viewForFooterInSection:(NSInteger)arg2 {
     UIView *originalView=%orig;
@@ -140,7 +140,7 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 - (CGFloat)tableView:(id)arg1 heightForFooterInSection:(NSInteger)arg2 {
     CGFloat originalHeight=%orig;
     CSListCornerSnapshot *configuration=[[CSListCornerConfiguration sharedConfiguration] snapshot];
-    return CSListCornerFooterHeight(CSListCornerPageDiscover,configuration.enabled && CSListCornerOwnsTable(self,(UITableView *)arg1,CSListCornerPageDiscover),originalHeight,arg2,configuration.pinnedGap,configuration.normalGap);
+    return CSListCornerFooterHeight(CSListCornerPageDiscover,configuration.enabled && CSListCornerOwnsTable(self,(UITableView *)arg1,CSListCornerPageDiscover),originalHeight);
 }
 - (UIView *)tableView:(id)arg1 viewForFooterInSection:(NSInteger)arg2 {
     UIView *originalView=%orig;
@@ -174,7 +174,7 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 - (CGFloat)tableView:(id)arg1 heightForFooterInSection:(NSInteger)arg2 {
     CGFloat originalHeight=%orig;
     CSListCornerSnapshot *configuration=[[CSListCornerConfiguration sharedConfiguration] snapshot];
-    return CSListCornerFooterHeight(CSListCornerPageSession,configuration.enabled && CSListCornerOwnsTable(self,(UITableView *)arg1,CSListCornerPageSession),originalHeight,arg2,configuration.pinnedGap,configuration.normalGap);
+    return CSListCornerFooterHeight(CSListCornerPageSession,configuration.enabled && CSListCornerOwnsTable(self,(UITableView *)arg1,CSListCornerPageSession),originalHeight);
 }
 - (UIView *)tableView:(id)arg1 viewForFooterInSection:(NSInteger)arg2 {
     UIView *originalView=%orig;
@@ -212,7 +212,7 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 - (CGFloat)tableView:(id)arg1 heightForFooterInSection:(NSInteger)arg2 {
     CGFloat originalHeight=%orig;
     CSListCornerSnapshot *configuration=[[CSListCornerConfiguration sharedConfiguration] snapshot];
-    return CSListCornerFooterHeight(CSListCornerPageMore,configuration.enabled && CSListCornerOwnsTable(self,(UITableView *)arg1,CSListCornerPageMore),originalHeight,arg2,configuration.pinnedGap,configuration.normalGap);
+    return CSListCornerFooterHeight(CSListCornerPageMore,configuration.enabled && CSListCornerOwnsTable(self,(UITableView *)arg1,CSListCornerPageMore),originalHeight);
 }
 - (UIView *)tableView:(id)arg1 viewForFooterInSection:(NSInteger)arg2 {
     UIView *originalView=%orig;

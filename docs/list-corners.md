@@ -54,3 +54,9 @@
 ## 1.7-22 通讯录底部统计区
 
 好友数量属于 tableFooterView，独立于 section footer。补充原生 initCountLabel: 和页面布局之后的背景修复，只识别实际通讯录主表及当前 footer 内的 m_countLabel，保留人数、样式与高度。原生创建、页面返回及布局后与通讯录 canvas 底色一致；没有行数查询、列表刷新或 footer 替换。主机回归 797 项/0 失败。详情见 [1.7-22 修复记录](audits/list-corners-fixes-1.7-22/README.md)。
+
+## 1.7-23 无行为变更清理
+
+删除 footer 纯值函数的三个未使用参数，收回两个文件内部函数和四个上下文属性的公共声明，合并重复 object ivar 读取并保持短路访问顺序，删除设置颜色预览的多余 setNeedsDisplay。未发现生产调试日志/探针；四页适配与渲染器、测试用例和基线保持 1.7-22 原样。
+
+当前验证：圆角 797 项、分组 647 项均零失败，my-page-clean PASS。与 1.7-17 的逐项收益及性能限制见 [清理与对比记录](audits/list-corners-cleanup-1.7-23/README.md)。路径缓存原本已存在，不列为新增优化；未进行真机帧率、内存、启动耗时或耗电对比。

@@ -23,13 +23,16 @@ static NSString *CSListCornerOwnerName(CSListCornerPage page) {
         case CSListCornerPageMore:return @"MoreViewController";
     } return @"";
 }
+static id CSListCornerObjectIvar(id object, const char *name) {
+    Ivar ivar=class_getInstanceVariable([object class],name);
+    // Reject non-object ivars before using ARC's object_getIvar.
+    const char *type=ivar ? ivar_getTypeEncoding(ivar) : NULL;
+    return type && type[0]=='@' ? object_getIvar(object,ivar) : nil;
+}
 UITableView *CSListCornerOwnedTable(id owner, CSListCornerPage page) {
     Class cls=NSClassFromString(CSListCornerOwnerName(page));
     if (!cls || ![owner isKindOfClass:cls]) return nil;
-    Ivar ivar=class_getInstanceVariable([owner class],page==CSListCornerPageMore ? "_frontTableView" : "m_tableView");
-    // Reject non-object ivars before using ARC's object_getIvar.
-    const char *type=ivar ? ivar_getTypeEncoding(ivar) : NULL;
-    id table=type && type[0]=='@' ? object_getIvar(owner,ivar) : nil;
+    id table=CSListCornerObjectIvar(owner,page==CSListCornerPageMore ? "_frontTableView" : "m_tableView");
     return [table isKindOfClass:UITableView.class] ? table : nil;
 }
 BOOL CSListCornerOwnsTable(id owner, UITableView *table, CSListCornerPage page) { return table && CSListCornerOwnedTable(owner,page)==table; }
@@ -59,15 +62,12 @@ UIView *CSListCornerOwnedBackground(UIView *container) {
     return background;
 }
 UIView *CSListCornerNativeContent(UITableViewCell *cell) {
-    Ivar ivar=class_getInstanceVariable(cell.class,"m_subContentView");
-    const char *type=ivar ? ivar_getTypeEncoding(ivar) : NULL;
-    id native=type && type[0]=='@' ? object_getIvar(cell,ivar) : nil;
+    id native=CSListCornerObjectIvar(cell,"m_subContentView");
+    // Preserve short-circuiting: contentView may itself enter native layout.
     return [native isKindOfClass:UIView.class] && [native isDescendantOfView:cell.contentView] ? native : nil;
 }
 UIView *CSListCornerViewIvar(id object, const char *name, UIView *container) {
-    Ivar ivar=class_getInstanceVariable([object class],name);
-    const char *type=ivar ? ivar_getTypeEncoding(ivar) : NULL;
-    id view=type && type[0]=='@' ? object_getIvar(object,ivar) : nil;
+    id view=CSListCornerObjectIvar(object,name);
     return [view isKindOfClass:UIView.class] && [view isDescendantOfView:container] ? view : nil;
 }
 static void CSListCornerHideEdgeLines(UIView *container, CGFloat cellWidth, NSUInteger depth) {
@@ -84,7 +84,7 @@ static void CSListCornerHideEdgeLines(UIView *container, CGFloat cellWidth, NSUI
         if (structural && depth<3) CSListCornerHideEdgeLines(view,cellWidth,depth+1);
     }
 }
-void CSListCornerHideSeparator(UITableViewCell *cell) {
+static void CSListCornerHideSeparator(UITableViewCell *cell) {
     UIEdgeInsets inset=UIEdgeInsetsMake(0,cell.bounds.size.width,0,0);
     if (!UIEdgeInsetsEqualToEdgeInsets(cell.separatorInset,inset)) cell.separatorInset=inset;
     if (!UIEdgeInsetsEqualToEdgeInsets(cell.layoutMargins,UIEdgeInsetsZero)) cell.layoutMargins=UIEdgeInsetsZero;

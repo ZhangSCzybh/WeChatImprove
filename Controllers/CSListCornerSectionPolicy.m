@@ -11,7 +11,6 @@ double CSListCornerHeaderHeight(CSListCornerPage page, BOOL enabled, double orig
     if (CSListCornerHidesSection(page,section)) return 0;
     return originalHeight+CSListCornerSectionGap(page,section,pinnedGap,normalGap);
 }
-double CSListCornerFooterHeight(CSListCornerPage page, BOOL enabled, double originalHeight, NSInteger section, double pinnedGap, double normalGap) {
-    (void)section; (void)pinnedGap; (void)normalGap;
+double CSListCornerFooterHeight(CSListCornerPage page, BOOL enabled, double originalHeight) {
     return enabled ? (page==CSListCornerPageContacts ? 0 : 0.01) : originalHeight;
 }

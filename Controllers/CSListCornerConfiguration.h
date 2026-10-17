@@ -60,5 +60,4 @@ FOUNDATION_EXPORT const CGFloat kDefaultNormalSessionTopMargin;
 - (void)saveEnabled:(BOOL)enabled;
 - (void)saveColor:(UIColor *)color redKey:(NSString *)red greenKey:(NSString *)green blueKey:(NSString *)blue alphaKey:(NSString *)alpha;
 @end
-FOUNDATION_EXPORT UIColor *CSListCornerLoadColor(id<CSListCornerDefaults> defaults, NSString *red, NSString *green, NSString *blue, NSString *alpha, UIColor *fallback);
 NS_ASSUME_NONNULL_END
