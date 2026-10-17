@@ -18,6 +18,14 @@
     %orig;
 }
 - (void)OnSharePreConfirmSheetViewSend:(id)sender { %orig; }
+- (BOOL)bShowSendSuccessView {
+    if ([CSMessageActionCoordinator.sharedCoordinator shouldSuppressNativeSuccessForLogic:self]) return NO;
+    return %orig;
+}
+- (BOOL)bHiddenSendSuccessToastView {
+    if ([CSMessageActionCoordinator.sharedCoordinator shouldSuppressNativeSuccessForLogic:self]) return YES;
+    return %orig;
+}
 - (void)ForwardMsgList:(id)messages ToContact:(id)target WithRevokeBatchId:(id)batchID {
     // Reaching native dispatch (after waiting/refusal checks) authorizes the final target snapshot.
     [CSMessageActionCoordinator.sharedCoordinator confirmForwardLogic:self];

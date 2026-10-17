@@ -25,6 +25,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
 @property(nonatomic, strong) CSMessageActionSubmissionLedger *ledger;
 @property(nonatomic, copy) NSArray<NSString *> *targets;
 @property(nonatomic, strong) NSMutableSet<NSString *> *requestedTargets;
+@property(nonatomic, strong) NSMutableSet<NSString *> *normalNativeHandoffs;
 @property(nonatomic, strong) NSMutableArray<CSMessagePreparedSend *> *leases;
 @property(nonatomic, strong) CSMessageVoiceResource *voice;
 @property(nonatomic, weak) id logic;
@@ -75,9 +76,16 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
         _operations=[NSMutableDictionary dictionary]; _completed=[NSMutableDictionary dictionary]; _completedOrder=[NSMutableArray array]; _pendingFeedback=[NSMutableArray array]; _accountEpoch=1; _boundaryToken=atomic_load_explicit(&CSActionAccountBoundary,memory_order_acquire); _accountSuspended=(_boundaryToken&1)!=0; _accountID=_accountSuspended ? nil : [environment.currentAccountID copy];
         __weak typeof(self) weakSelf=self;
         provider.waitingHandler=^(NSString *identifier){ [weakSelf showWaiting:identifier]; };
-        provider.requestDownload=^(CSMessageActionContext *context){ typeof(self) self=weakSelf; if (!self || ![self validAccount:context]) return;
+        provider.requestDownload=^(CSMessageActionContext *context){ typeof(self) self=weakSelf; if (!self || ![self validAccount:context]) return NO;
             id downloader=[self.environment serviceNamed:@"VoiceMsgDownloader"];
-            @try { if (CSMessageNativeSupports(downloader,@"downloadMsg:",@"v",@[@"@"])) CSMessageNativeInvoke(downloader,@"downloadMsg:",@[context.sourceWrap]); } @catch (__unused NSException *exception) {}
+            @try { if (CSMessageNativeSupports(downloader,@"downloadMsg:",@"v",@[@"@"])) { CSMessageNativeInvoke(downloader,@"downloadMsg:",@[context.sourceWrap]); return YES; } } @catch (__unused NSException *exception) {}
+            return NO;
+        };
+        provider.refreshSource=^id(CSMessageActionContext *context){
+            typeof(self) self=weakSelf; if (!self || ![self validAccount:context]) return nil;
+            id manager=[self.environment serviceNamed:@"CMessageMgr"];
+            @try { if (CSMessageNativeSupports(manager,@"GetMsg:LocalID:",@"@",@[@"@",@"I"])) return CSMessageNativeInvoke(manager,@"GetMsg:LocalID:",@[context.sourceConversationID,@(context.localID)]); } @catch (__unused NSException *exception) {}
+            return nil;
         };
         _settingsObserver=[NSNotificationCenter.defaultCenter addObserverForName:CSMessageActionSettingsDidChangeNotification object:preferences queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note){ [weakSelf settingsChanged]; }];
     } return self;
@@ -120,7 +128,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     if (![self validateContext:context] || !CSMessageActionEntryAllows(self.settings,entry,action)) return NO;
     if (action==CSMessageActionRepeat) {
         if (context.messageType==10000 || context.messageType==10002) return NO;
-        if (entry==CSMessageActionEntryMenuRepeat && ![@[@1,@3,@34,@43,@47,@48,@49] containsObject:@(context.messageType)]) return NO;
+        if (entry==CSMessageActionEntryMenuRepeat && ![@[@1,@3,@34,@42,@43,@47,@48,@49] containsObject:@(context.messageType)]) return NO;
         return YES; // Capability preparation is deferred; no media/service lookup in gesture admission.
     }
     return [_native canPerformAction:action context:context];
@@ -165,7 +173,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
 }
 - (CSMessageActionOperation *)createOperation:(CSMessageActionContext *)context action:(CSMessageAction)action entry:(CSMessageActionEntry)entry {
     if (_operations.count>=32) { [self feedback:@"待处理操作较多，请稍后再试。" context:context]; return nil; }
-    CSMessageActionOperation *op=[CSMessageActionOperation new]; op.identifier=NSUUID.UUID.UUIDString; op.context=context; op.action=action; op.entry=entry; op.requestedTargets=[NSMutableSet set]; op.leases=[NSMutableArray array]; _operations[op.identifier]=op;
+    CSMessageActionOperation *op=[CSMessageActionOperation new]; op.identifier=NSUUID.UUID.UUIDString; op.context=context; op.action=action; op.entry=entry; op.requestedTargets=[NSMutableSet set]; op.normalNativeHandoffs=[NSMutableSet set]; op.leases=[NSMutableArray array]; _operations[op.identifier]=op;
     __weak typeof(self) weakSelf=self; NSString *identifier=op.identifier;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW,180*NSEC_PER_SEC),dispatch_get_main_queue(),^{ typeof(self) self=weakSelf; CSMessageActionOperation *live=self.operations[identifier]; if (live) { [self cancelOperationID:identifier]; [self.forward detachLogic:live.logic]; [self retire:live]; } });
     return op;
@@ -220,6 +228,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     __weak typeof(self) weakSelf=self; __weak CSMessageActionOperation *weakOperation=op; CSMessageActionContext *captured=op.context;
     route.submissionStillAuthorized=^BOOL{ CSMessageActionOperation *live=weakOperation; return live && [weakSelf validAccount:captured] && !live.cancelled; };
     [op.leases addObject:route]; CSMessageActionSubmissionState result=[route submit];
+    if (route.nativeHandoffReturned) [op.normalNativeHandoffs addObject:target];
     if (result!=CSMessageActionSubmissionStateAccepted && result!=CSMessageActionSubmissionStateFailedBeforeAcceptance && result!=CSMessageActionSubmissionStateUnknown) result=CSMessageActionSubmissionStateUnknown;
     [op.ledger transitionOperationID:op.identifier targetID:target toState:result]; [self reportIfFinished:op];
 }
@@ -233,10 +242,12 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
 }
 - (void)reportIfFinished:(CSMessageActionOperation *)op {
     NSUInteger accepted=0,unknown=0,failed=0,cancelled=0;
-    for (NSNumber *state in [self resultsForOperationID:op.identifier].allValues) {
+    NSDictionary *results=[self resultsForOperationID:op.identifier];
+    for (NSString *target in results) {
+        NSNumber *state=results[target];
         switch (state.integerValue) {
             case CSMessageActionSubmissionStateAccepted: case CSMessageActionSubmissionStateSucceeded: accepted++; break;
-            case CSMessageActionSubmissionStateUnknown: unknown++; break;
+            case CSMessageActionSubmissionStateUnknown: if (![op.normalNativeHandoffs containsObject:target]) unknown++; break;
             case CSMessageActionSubmissionStateCancelled: cancelled++; break;
             case CSMessageActionSubmissionStateFailedBeforeAcceptance: case CSMessageActionSubmissionStateFailedAfterAcceptance: failed++; break;
             default: return;
@@ -244,7 +255,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     }
     if (!op.targets.count || op.feedbackShown) return; op.feedbackShown=YES;
     NSMutableArray *parts=[NSMutableArray array]; if (accepted) [parts addObject:[NSString stringWithFormat:@"%lu个目标已受理",(unsigned long)accepted]]; if (unknown) [parts addObject:[NSString stringWithFormat:@"%lu个目标暂未确认发送结果，请查看微信消息状态",(unsigned long)unknown]]; if (failed) [parts addObject:[NSString stringWithFormat:@"%lu个目标未提交",(unsigned long)failed]]; if (cancelled) [parts addObject:[NSString stringWithFormat:@"%lu个目标已取消",(unsigned long)cancelled]];
-    [self feedback:[parts componentsJoinedByString:@"；"] context:op.context];
+    if (parts.count) [self feedback:[parts componentsJoinedByString:@"；"] context:op.context];
     // Preserve a live native binding until cleanup. Its ledger is the duplicate callback tombstone.
     if (!op.logic || op.nativeFinished) [self retire:op];
 }
@@ -261,10 +272,16 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
 }
 - (void)bindForwardLogic:(id)logic source:(id)source {
     CSMessageActionOperation *op=_openingForwardOperation;
-    if (!op || ![_forward source:source matchesContext:op.context] || ![self validAccount:op.context] || ![_forward bindLogic:logic operationID:op.identifier context:op.context]) return;
+    if (!op) { [_forward resetClosedBindingForLogic:logic]; return; }
+    if (![_forward source:source matchesContext:op.context] || ![self validAccount:op.context] || ![_forward bindLogic:logic operationID:op.identifier context:op.context]) return;
     op.logic=logic; op.enhanced=CSMessageActionUsesVoiceEnhancement(self.settings,op.entry,op.action,op.context.messageType);
     [_forward bindingForLogic:logic].enhanced=op.enhanced;
     if (op.enhanced) [self prepareVoice:op];
+}
+- (BOOL)shouldSuppressNativeSuccessForLogic:(id)logic {
+    // The compact binding survives native clearData until the next forwardMessage:
+    // invocation, including the two success-UI getters that follow native cleanup.
+    return [_forward bindingForLogic:logic].enhanced;
 }
 - (void)confirmForwardLogic:(id)logic {
     CSMessageForwardBinding *binding=[_forward bindingForLogic:logic]; CSMessageActionOperation *op=_operations[binding.operationID];
@@ -293,6 +310,8 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     [_forward detachLogic:logic];
 }
 - (void)voiceDownloadCompletedForChat:(NSString *)chat localID:(unsigned int)localID serverID:(long long)serverID endFlag:(unsigned int)endFlag error:(unsigned int)error {
-    [self refreshAccount]; if (endFlag==1 && error==3 && _accountID.length) [_media downloadCompletedForAccount:_accountID epoch:_accountEpoch chat:chat localID:localID serverID:serverID];
+    [self refreshAccount]; if (endFlag!=1 || !_accountID.length) return;
+    if (error==3) [_media downloadCompletedForAccount:_accountID epoch:_accountEpoch chat:chat localID:localID serverID:serverID];
+    else [_media downloadFailedForAccount:_accountID epoch:_accountEpoch chat:chat localID:localID serverID:serverID];
 }
 @end

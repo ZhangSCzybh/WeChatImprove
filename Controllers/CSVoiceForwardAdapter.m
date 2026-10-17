@@ -50,6 +50,9 @@ static const void *CSForwardBindingKey=&CSForwardBindingKey;
     NSString *from=CSMessageActionObjectGetter(source,NSSelectorFromString(@"m_nsFromUsr")), *to=CSMessageActionObjectGetter(source,NSSelectorFromString(@"m_nsToUsr"));
     return [from isEqualToString:context.outgoing ? context.accountID : context.sourceConversationID] && [to isEqualToString:context.outgoing ? context.sourceConversationID : context.accountID];
 }
+- (void)resetClosedBindingForLogic:(id)logic {
+    if ([self bindingForLogic:logic].closed) objc_setAssociatedObject(logic,CSForwardBindingKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
 - (void)detachLogic:(id)logic {
     CSMessageForwardBinding *binding=[self bindingForLogic:logic]; if (!binding) return;
     // One compact tombstone per native logic suppresses late duplicate voice callbacks. It owns

@@ -56,7 +56,7 @@ static const void *CSMenuContextKey=&CSMenuContextKey;
     @try {
         if (CSMessageNativeSupports(allocated,@"initWithTitle:icon:target:action:",@"@",@[@"@",@"@",@"@",@":"])) item=[allocated initWithTitle:title icon:icon target:invocation action:selector];
         else if (CSMessageNativeSupports(allocated,@"initWithTitle:target:action:",@"@",@[@"@",@"@",@":"])) item=[allocated initWithTitle:title target:invocation action:selector];
-        if (item) { objc_setAssociatedObject(item,@selector(itemForCell:repeat:),invocation,OBJC_ASSOCIATION_RETAIN_NONATOMIC); CSMessageNativeSet(item,@"setIconImage:",icon,NO); CSMessageNativeSet(item,@"setLinePosition:",@0,NO); CSMessageNativeSet(item,@"setMenuType:",@0,NO); }
+        if (item) { objc_setAssociatedObject(item,@selector(itemForCell:repeat:),invocation,OBJC_ASSOCIATION_RETAIN_NONATOMIC); CSMessageNativeSet(item,@"setIconImage:",icon,NO); CSMessageNativeSet(item,@"setLinePosition:",@0,NO); }
     } @catch (__unused NSException *exception) { return nil; }
     return item;
 }
@@ -72,7 +72,17 @@ static const void *CSMenuContextKey=&CSMenuContextKey;
             SEL itemAction=NULL;
             NSInvocation *invocation=[NSInvocation invocationWithMethodSignature:[item methodSignatureForSelector:NSSelectorFromString(@"action")]]; invocation.target=item; invocation.selector=NSSelectorFromString(@"action"); [invocation invoke]; [invocation getReturnValue:&itemAction]; if (itemAction==selector) { present=YES; break; }
         }
-        if (!present && [self canPerformSelector:selector cell:cell]) { id item=[self itemForCell:cell repeat:repeat]; if (item) [result addObject:item]; }
+        if (!present && [self canPerformSelector:selector cell:cell]) {
+            // Native uniqMenuItems: deduplicates by numeric menuType, not action.
+            // This is our positive namespace, not a claimed native enum reservation;
+            // skip collisions with every item already supplied by host/other plugins.
+            unsigned long long menuType=repeat ? 0x43535001ULL : 0x43535002ULL;
+            NSMutableSet *used=[NSMutableSet set];
+            for (id existing in result) if (CSMessageNativeSupports(existing,@"menuType",@"q",@[])) [used addObject:@(CSMessageNativeUnsigned(existing,@"menuType"))];
+            while ([used containsObject:@(menuType)]) menuType++;
+            id item=[self itemForCell:cell repeat:repeat];
+            if (item && CSMessageNativeSet(item,@"setMenuType:",@(menuType),YES)) [result addObject:item];
+        }
     }
     return result;
 }

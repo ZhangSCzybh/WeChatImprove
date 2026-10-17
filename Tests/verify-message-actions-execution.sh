@@ -15,8 +15,20 @@ for name in ('OnForwardMessageSend','OnForwardMessageCancel'):
     assert match, name
     methods.append(match.group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig;', '[self.originalCalls addObject:@"'+name+'"]; [logic clearData];'))
 logic=source.split('%hook ForwardMessageLogicController',1)[1].split('%end',1)[0]
+ui=[]
+for name,native in (('bShowSendSuccessView','YES'),('bHiddenSendSuccessToastView','NO')):
+    ui.append(re.search(r'- \(BOOL\)'+name+r' \{.*?\n\}',logic,re.S).group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig',native))
 clear=re.search(r'- \(void\)clearData \{.*?\n\}',logic,re.S).group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig;', 'forwardNativeClearCalls++;')
-(out/'VoiceForwardCleanupHooksUnderTest.h').write_text('static CSMessageActionCoordinator *forwardHookCoordinator;\nstatic NSUInteger forwardNativeClearCalls;\n@interface TestLogic (CleanupHook)\n- (void)clearData;\n@end\n@implementation TestLogic (CleanupHook)\n'+clear+'\n@end\n@interface TestForwardManager : NSObject\n@property(nonatomic, strong) NSMutableArray *originalCalls;\n@end\n@implementation TestForwardManager\n'+'\n'.join(methods)+'\n@end\n')
+menu=(root/'Hooks/RepeatHooks.xm').read_text()
+classes=('CommonMessageCellView','TextMessageCellView','ImageMessageCellView','EmoticonMessageCellView','VideoMessageCellView','VoiceMessageCellView','AppEmoticonMessageCellView','AppFileMessageCellView','ShareCardMessageCellView')
+extracted=['static CSMessageActionMenuAdapter *menuHookAdapter;']
+for cls in classes:
+    match=re.search(r'%hook '+cls+r'\n(.*?)%end',menu,re.S)
+    body=re.search(r'- \(id\)operationMenuItems \{.*?\}',match.group(1),re.S).group() if match else '- (id)operationMenuItems { return %orig; }'
+    body=body.replace('CSMessageActionMenuAdapter itemsByAddingActionsForCell','menuHookAdapter itemsByAddingActionsForCell').replace('%orig','self.nativeItems')
+    extracted.append('@interface '+cls+' : TestCell\n@property(nonatomic,copy) NSArray *nativeItems;\n- (id)operationMenuItems;\n@end\n@implementation '+cls+'\n'+body+'\n@end')
+(out/'RepeatMenuHooksUnderTest.h').write_text('\n'.join(extracted))
+(out/'VoiceForwardCleanupHooksUnderTest.h').write_text('static CSMessageActionCoordinator *forwardHookCoordinator;\nstatic NSUInteger forwardNativeClearCalls;\n@interface TestLogic (CleanupHook)\n- (void)clearData;\n- (BOOL)bShowSendSuccessView;\n- (BOOL)bHiddenSendSuccessToastView;\n@end\n@implementation TestLogic (CleanupHook)\n'+clear+'\n'+'\n'.join(ui)+'\n@end\n@interface TestForwardManager : NSObject\n@property(nonatomic, strong) NSMutableArray *originalCalls;\n@end\n@implementation TestForwardManager\n'+'\n'.join(methods)+'\n@end\n')
 PYEXTRACT
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation \
   -I"$test_dir" -I"$project_dir/Controllers" \

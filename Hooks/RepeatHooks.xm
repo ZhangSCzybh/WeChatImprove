@@ -74,3 +74,39 @@
 %new
 - (void)cs_handleVoiceForwardMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
 %end
+
+%hook AppEmoticonMessageCellView
+- (id)operationMenuItems { return [CSMessageActionMenuAdapter itemsByAddingActionsForCell:self items:%orig]; }
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+    if ([CSMessageActionMenuAdapter isPluginSelector:action]) return [CSMessageActionMenuAdapter canPerformSelector:action cell:self];
+    return %orig;
+}
+%new
+- (void)cs_handleRepeatMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
+%new
+- (void)cs_handleVoiceForwardMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
+%end
+
+%hook AppFileMessageCellView
+- (id)operationMenuItems { return [CSMessageActionMenuAdapter itemsByAddingActionsForCell:self items:%orig]; }
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+    if ([CSMessageActionMenuAdapter isPluginSelector:action]) return [CSMessageActionMenuAdapter canPerformSelector:action cell:self];
+    return %orig;
+}
+%new
+- (void)cs_handleRepeatMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
+%new
+- (void)cs_handleVoiceForwardMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
+%end
+
+%hook ShareCardMessageCellView
+- (id)operationMenuItems { return [CSMessageActionMenuAdapter itemsByAddingActionsForCell:self items:%orig]; }
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+    if ([CSMessageActionMenuAdapter isPluginSelector:action]) return [CSMessageActionMenuAdapter canPerformSelector:action cell:self];
+    return %orig;
+}
+%new
+- (void)cs_handleRepeatMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
+%new
+- (void)cs_handleVoiceForwardMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
+%end

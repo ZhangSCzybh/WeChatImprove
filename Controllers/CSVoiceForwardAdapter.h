@@ -16,6 +16,7 @@ FOUNDATION_EXPORT NSString * _Nullable CSMessageForwardTargetID(id _Nullable con
 - (nullable CSMessageForwardBinding *)bindingForLogic:(id)logic;
 - (BOOL)confirmLogic:(id)logic;
 - (void)detachLogic:(id)logic;
+- (void)resetClosedBindingForLogic:(id)logic;
 - (BOOL)source:(id)source matchesBinding:(CSMessageForwardBinding *)binding;
 - (BOOL)source:(id)source matchesContext:(CSMessageActionContext *)context;
 @end

@@ -32,6 +32,7 @@ FOUNDATION_EXPORT void CSMessageActionAccountDidChangeAtNativeBoundary(void);
 - (void)withForwardContext:(CSMessageActionContext *)context entry:(CSMessageActionEntry)entry perform:(void (^)(void))perform;
 - (void)bindForwardLogic:(id)logic source:(id)source;
 - (void)confirmForwardLogic:(id)logic;
+- (BOOL)shouldSuppressNativeSuccessForLogic:(id)logic;
 - (BOOL)handleForwardLogic:(id)logic source:(id)source target:(id)target;
 - (void)finishForwardLogic:(id)logic cancelled:(BOOL)cancelled;
 - (void)voiceDownloadCompletedForChat:(NSString *)chat localID:(unsigned int)localID serverID:(long long)serverID endFlag:(unsigned int)endFlag error:(unsigned int)error;

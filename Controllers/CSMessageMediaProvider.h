@@ -18,7 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cancelOperationID:(NSString *)operationID;
 - (void)downloadCompletedForAccount:(NSString *)account epoch:(NSUInteger)epoch chat:(NSString *)chat
     localID:(unsigned int)localID serverID:(long long)serverID;
+- (void)downloadFailedForAccount:(NSString *)account epoch:(NSUInteger)epoch chat:(NSString *)chat
+    localID:(unsigned int)localID serverID:(long long)serverID;
 @property(nonatomic, copy, nullable) void (^waitingHandler)(NSString *operationID);
-@property(nonatomic, copy, nullable) void (^requestDownload)(CSMessageActionContext *context);
+@property(nonatomic, copy, nullable) id _Nullable (^refreshSource)(CSMessageActionContext *context);
+@property(nonatomic, copy, nullable) BOOL (^requestDownload)(CSMessageActionContext *context);
 @end
 NS_ASSUME_NONNULL_END

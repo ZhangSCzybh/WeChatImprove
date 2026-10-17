@@ -6,6 +6,7 @@
 @property(nonatomic, strong, readwrite) id outputWrap;
 @property(nonatomic, copy) CSMessageActionSubmissionState (^submission)(void);
 @property(nonatomic) BOOL submitted;
+@property(nonatomic, readwrite) BOOL nativeHandoffReturned;
 @end
 @implementation CSMessagePreparedSend
 - (instancetype)initWithWrap:(id)wrap routeName:(NSString *)routeName submission:(CSMessageActionSubmissionState (^)(void))submission { if ((self=[super init])) { _outputWrap=wrap; _routeName=[routeName copy]; _submission=[submission copy]; } return self; }
@@ -41,6 +42,7 @@ static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArr
     CSMessagePreparedSend *route=[[CSMessagePreparedSend alloc] initWithWrap:wrap routeName:selector submission:^{
         id output=CSMessageNativeInvoke(receiver,selector,arguments);
         if (output && [output isKindOfClass:NSClassFromString(@"CMessageWrap")]) weakRoute.outputWrap=output;
+        weakRoute.nativeHandoffReturned=YES;
         return CSMessageActionSubmissionStateUnknown;
     }]; weakRoute=route; return route;
 }
@@ -56,6 +58,13 @@ static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArr
 - (CSMessagePreparedSend *)prepareChecked:(CSMessageActionContext *)context target:(NSString *)target voice:(CSMessageVoiceResource *)voice appData:(NSData *)appData appPath:(NSString *)path {
     id source=context.sourceWrap, manager=[_environment serviceNamed:@"CMessageMgr"];
     id logic=CSMessageActionObjectGetter(context.controller,NSSelectorFromString(@"m_logicController")) ?: CSMessageActionObjectGetter(context.controller,NSSelectorFromString(@"logicController"));
+    // WeChat 8.0.78 stores BaseMsgContentLogicController in the page's weak m_delegate.
+    // Do not follow unrelated delegates or broaden service/proxy resolution.
+    Class pageClass=NSClassFromString(@"BaseMsgContentViewController"), logicClass=NSClassFromString(@"BaseMsgContentLogicController");
+    if (pageClass && [context.controller isKindOfClass:pageClass]) {
+        id delegate=CSMessageActionObjectGetter(context.controller,NSSelectorFromString(@"m_delegate"));
+        logic=logicClass && [delegate isKindOfClass:logicClass] ? delegate : nil;
+    }
     if (context.messageType==1) {
         NSString *text=CSMessageActionObjectGetter(source,NSSelectorFromString(@"m_nsContent")); if (![text isKindOfClass:NSString.class] || !text.length || ![target isEqualToString:context.sourceConversationID]) return nil;
         for (id receiver in @[logic ?: NSNull.null,context.controller ?: NSNull.null]) {
@@ -80,7 +89,7 @@ static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArr
             CSMessageNativeInvoke(manager,@"AddLocalMsg:MsgWrap:",@[target,wrap]);
             if (!CSMessageNativeUnsigned(wrap,@"m_uiMesLocalID")) return CSMessageActionSubmissionStateUnknown;
             if (weakRoute.submissionStillAuthorized && !weakRoute.submissionStillAuthorized()) return CSMessageActionSubmissionStateUnknown;
-            CSMessageNativeInvoke(uploader,@"ResendVoiceMsg:MsgWrap:",@[target,wrap]); return CSMessageActionSubmissionStateUnknown;
+            CSMessageNativeInvoke(uploader,@"ResendVoiceMsg:MsgWrap:",@[target,wrap]); weakRoute.nativeHandoffReturned=YES; return CSMessageActionSubmissionStateUnknown;
         }]; weakRoute=route; return route;
     }
     Class factory=NSClassFromString(@"ForwardMsgUtil");
