@@ -1,0 +1,17 @@
+{
+  "static_only": true,
+  "checks": [
+    {
+      "manifest": "docs/evidence/message-actions-1.8-2/native-voice-manifest.json",
+      "manifest_sha256": "6972bd41949443e560ffe46b5be0132c6cabdc7133449463a8c18f5eb39c3d13",
+      "entries": 33,
+      "all_match": true
+    },
+    {
+      "manifest": "docs/evidence/message-actions-1.8-2/native-menu-text-v2/manifest.json",
+      "manifest_sha256": "48e5649ffb5cac83896ea6c6a35dc5e2fc6c7f65f49683d1255fbd3cc502e2f2",
+      "entries": 47,
+      "all_match": true
+    }
+  ]
+}
