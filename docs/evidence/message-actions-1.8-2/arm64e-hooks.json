@@ -1,0 +1,296 @@
+[
+  {
+    "class": "CommonMessageCellView",
+    "selector": "initWithViewModel:",
+    "registration_address": "0x0000000000005710",
+    "replacement_imp": "0x58c8"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "setViewModel:",
+    "registration_address": "0x0000000000005738",
+    "replacement_imp": "0x5910"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "prepareForReuse",
+    "registration_address": "0x0000000000005760",
+    "replacement_imp": "0x5998"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "layoutSubviews",
+    "registration_address": "0x0000000000005788",
+    "replacement_imp": "0x59e0"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "onAppear",
+    "registration_address": "0x0000000000005828",
+    "replacement_imp": "0x5b60"
+  },
+  {
+    "class": "VoiceMessageCellView",
+    "selector": "layoutSubviews",
+    "registration_address": "0x000000000000b800",
+    "replacement_imp": "0xc178"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "initWithViewModel:",
+    "registration_address": "0x0000000000019958",
+    "replacement_imp": "0x19b70"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "setViewModel:",
+    "registration_address": "0x0000000000019984",
+    "replacement_imp": "0x19bc0"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "prepareForReuse",
+    "registration_address": "0x00000000000199b0",
+    "replacement_imp": "0x19c84"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "layoutSubviews",
+    "registration_address": "0x00000000000199dc",
+    "replacement_imp": "0x19cf0"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "updateNodeStatus",
+    "registration_address": "0x0000000000019a04",
+    "replacement_imp": "0x19d5c"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "onAppear",
+    "registration_address": "0x0000000000019a2c",
+    "replacement_imp": "0x19d9c"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "onDisappear",
+    "registration_address": "0x0000000000019a54",
+    "replacement_imp": "0x19ddc"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "didMoveToWindow",
+    "registration_address": "0x0000000000019a7c",
+    "replacement_imp": "0x19e5c"
+  },
+  {
+    "class": "VoiceMessageCellView",
+    "selector": "setViewModel:",
+    "registration_address": "0x0000000000019aac",
+    "replacement_imp": "0x19e9c"
+  },
+  {
+    "class": "VoiceMessageCellView",
+    "selector": "prepareForReuse",
+    "registration_address": "0x0000000000019ad0",
+    "replacement_imp": "0x19f60"
+  },
+  {
+    "class": "VoiceMessageCellView",
+    "selector": "layoutSubviews",
+    "registration_address": "0x0000000000019af4",
+    "replacement_imp": "0x19fcc"
+  },
+  {
+    "class": "MMContextManager",
+    "selector": "logout:",
+    "registration_address": "0x0000000000019b28",
+    "replacement_imp": "0x1a038"
+  },
+  {
+    "class": "MMContextManager",
+    "selector": "loginByContext:",
+    "registration_address": "0x0000000000019b6c",
+    "replacement_imp": "0x1a0b8"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "operationMenuItems",
+    "registration_address": "0x00000000000306c0",
+    "replacement_imp": "0x30cf4"
+  },
+  {
+    "class": "CommonMessageCellView",
+    "selector": "canPerformAction:withSender:",
+    "registration_address": "0x00000000000306ec",
+    "replacement_imp": "0x30d88"
+  },
+  {
+    "class": "TextMessageCellView",
+    "selector": "operationMenuItems",
+    "registration_address": "0x000000000003078c",
+    "replacement_imp": "0x30e5c"
+  },
+  {
+    "class": "TextMessageCellView",
+    "selector": "canPerformAction:withSender:",
+    "registration_address": "0x00000000000307b0",
+    "replacement_imp": "0x30ef0"
+  },
+  {
+    "class": "ImageMessageCellView",
+    "selector": "operationMenuItems",
+    "registration_address": "0x0000000000030838",
+    "replacement_imp": "0x30fc4"
+  },
+  {
+    "class": "ImageMessageCellView",
+    "selector": "canPerformAction:withSender:",
+    "registration_address": "0x000000000003085c",
+    "replacement_imp": "0x31058"
+  },
+  {
+    "class": "EmoticonMessageCellView",
+    "selector": "operationMenuItems",
+    "registration_address": "0x00000000000308e4",
+    "replacement_imp": "0x3112c"
+  },
+  {
+    "class": "EmoticonMessageCellView",
+    "selector": "canPerformAction:withSender:",
+    "registration_address": "0x0000000000030908",
+    "replacement_imp": "0x311c0"
+  },
+  {
+    "class": "VideoMessageCellView",
+    "selector": "operationMenuItems",
+    "registration_address": "0x0000000000030990",
+    "replacement_imp": "0x31294"
+  },
+  {
+    "class": "VideoMessageCellView",
+    "selector": "canPerformAction:withSender:",
+    "registration_address": "0x00000000000309b4",
+    "replacement_imp": "0x31328"
+  },
+  {
+    "class": "VoiceMessageCellView",
+    "selector": "operationMenuItems",
+    "registration_address": "0x0000000000030a3c",
+    "replacement_imp": "0x313fc"
+  },
+  {
+    "class": "VoiceMessageCellView",
+    "selector": "canPerformAction:withSender:",
+    "registration_address": "0x0000000000030a60",
+    "replacement_imp": "0x31490"
+  },
+  {
+    "class": "AppEmoticonMessageCellView",
+    "selector": "operationMenuItems",
+    "registration_address": "0x0000000000030ae8",
+    "replacement_imp": "0x31564"
+  },
+  {
+    "class": "AppEmoticonMessageCellView",
+    "selector": "canPerformAction:withSender:",
+    "registration_address": "0x0000000000030b0c",
+    "replacement_imp": "0x315f8"
+  },
+  {
+    "class": "AppFileMessageCellView",
+    "selector": "operationMenuItems",
+    "registration_address": "0x0000000000030b94",
+    "replacement_imp": "0x316cc"
+  },
+  {
+    "class": "AppFileMessageCellView",
+    "selector": "canPerformAction:withSender:",
+    "registration_address": "0x0000000000030bb8",
+    "replacement_imp": "0x31760"
+  },
+  {
+    "class": "ShareCardMessageCellView",
+    "selector": "operationMenuItems",
+    "registration_address": "0x0000000000030c40",
+    "replacement_imp": "0x31834"
+  },
+  {
+    "class": "ShareCardMessageCellView",
+    "selector": "canPerformAction:withSender:",
+    "registration_address": "0x0000000000030c64",
+    "replacement_imp": "0x318c8"
+  },
+  {
+    "class": "BaseMessageCellView",
+    "selector": "onForward:",
+    "registration_address": "0x00000000000402f8",
+    "replacement_imp": "0x404ec"
+  },
+  {
+    "class": "ForwardMessageLogicController",
+    "selector": "forwardMessage:",
+    "registration_address": "0x000000000004032c",
+    "replacement_imp": "0x406a0"
+  },
+  {
+    "class": "ForwardMessageLogicController",
+    "selector": "OnSharePreConfirmSheetViewSend:",
+    "registration_address": "0x0000000000040354",
+    "replacement_imp": "0x40754"
+  },
+  {
+    "class": "ForwardMessageLogicController",
+    "selector": "bShowSendSuccessView",
+    "registration_address": "0x000000000004037c",
+    "replacement_imp": "0x40760"
+  },
+  {
+    "class": "ForwardMessageLogicController",
+    "selector": "bHiddenSendSuccessToastView",
+    "registration_address": "0x00000000000403a4",
+    "replacement_imp": "0x40804"
+  },
+  {
+    "class": "ForwardMessageLogicController",
+    "selector": "ForwardMsgList:ToContact:WithRevokeBatchId:",
+    "registration_address": "0x00000000000403cc",
+    "replacement_imp": "0x408a8"
+  },
+  {
+    "class": "ForwardMessageLogicController",
+    "selector": "ForwardMsg:ToContact:",
+    "registration_address": "0x00000000000403f4",
+    "replacement_imp": "0x409a8"
+  },
+  {
+    "class": "ForwardMessageLogicController",
+    "selector": "clearData",
+    "registration_address": "0x000000000004041c",
+    "replacement_imp": "0x40a94"
+  },
+  {
+    "class": "ForwardMessageMgr",
+    "selector": "OnForwardMessageSend:",
+    "registration_address": "0x0000000000040450",
+    "replacement_imp": "0x40b20"
+  },
+  {
+    "class": "ForwardMessageMgr",
+    "selector": "OnForwardMessageCancel:",
+    "registration_address": "0x0000000000040478",
+    "replacement_imp": "0x40bd4"
+  },
+  {
+    "class": "ForwardMessageMgr",
+    "selector": "OnForwardMessageConfirmCanceled:",
+    "registration_address": "0x00000000000404a0",
+    "replacement_imp": "0x40c88"
+  },
+  {
+    "class": "VoiceMsgDownloader",
+    "selector": "OnRecvData:MesLocalID:n64MesSvrID:CreateTime:VoiceTime:Offset:Len:Data:EndFlag:ErrNo:",
+    "registration_address": "0x00000000000404e8",
+    "replacement_imp": "0x40c94"
+  }
+]
