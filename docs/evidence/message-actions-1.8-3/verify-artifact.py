@@ -88,7 +88,7 @@ for arch in ['arm64','arm64e']:
  excerpts=[]
  for i,line in enumerate(disassembly):
   if line.split('\t')[0] in selected_addresses: excerpts.extend(disassembly[max(0,i-12):i+2]+[''])
- (ev/(arch+'-hook-instructions.txt')).write_text('\n'.join(excerpts)+'\n')
+ (ev/(arch+'-hook-instructions.txt')).write_text('\n'.join(excerpts).rstrip()+'\n')
  manifest['slices'][arch]={'required_classes':required_classes,'required_exports':required_exports,'required_hook_pairs':len(required_hooks),'matching_registration_sites':len(selected),'selector_reference_count':len(sels)}
 (ev/'artifact-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 print('PASS: metadata, payload/filter/version, arm64+arm64e classes/exports and '+str(len(required_hooks))+' required hook pairs per slice; '+str(len(prior))+' prior packages and 777 tracked .theos files unchanged')
