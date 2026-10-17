@@ -123,3 +123,24 @@
 %new
 - (void)cs_handleVoiceForwardMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
 %end
+
+// Observe only: preserve native output and all restrictions at every stage.
+%hook BaseMessageCellView
+- (id)generateOperationMenu {
+    id items=%orig;
+    [CSMessageActionMenuAdapter recordMenuStage:@"menu.generate" cell:self items:items];
+    return items;
+}
+- (id)uniqMenuItems:(id)items {
+    [CSMessageActionMenuAdapter recordMenuStage:@"menu.uniq.in" cell:self items:items];
+    id result=%orig;
+    [CSMessageActionMenuAdapter recordMenuStage:@"menu.uniq.out" cell:self items:result];
+    return result;
+}
+- (id)filteredMenuItems:(id)items {
+    [CSMessageActionMenuAdapter recordMenuStage:@"menu.filter.in" cell:self items:items];
+    id result=%orig;
+    [CSMessageActionMenuAdapter recordMenuStage:@"menu.filter.out" cell:self items:result];
+    return result;
+}
+%end

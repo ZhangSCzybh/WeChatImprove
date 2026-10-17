@@ -1,4 +1,5 @@
 #import "CSMessageNativeActionAdapter.h"
+#import "CSMessageActionDiagnostics.h"
 #import <objc/runtime.h>
 #import <TargetConditionals.h>
 #if TARGET_OS_IOS
@@ -155,6 +156,7 @@ NSString *CSMessageNativeAppDataPath(CSMessageActionContext *context) {
     // Native sticker cells obtain their chat page through BaseChatCellView's weak
     // delegate. Their responder chain is not required to contain that controller.
     id controller=CSMessageActionObjectGetter(cell,NSSelectorFromString(@"getViewController"));
+    if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"controller.resolve" fields:@{@"cell":NSStringFromClass([cell class]) ?: @"nil",@"nativeController":NSStringFromClass([controller class]) ?: @"nil"}];
     if (controllerClass && [controller isKindOfClass:controllerClass]) return controller;
     id cursor=cell;
     for (NSUInteger i=0;cursor && i<32;i++) { if (controllerClass && [cursor isKindOfClass:controllerClass]) return cursor; cursor=CSMessageActionObjectGetter(cursor,NSSelectorFromString(@"nextResponder")); } return nil;

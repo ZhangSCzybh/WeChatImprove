@@ -4,6 +4,14 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.8-4": @[
+            @{@"title": @"修正语音发送准备",
+              @"detail": @"修正语音复读和转发创建新消息时的兼容性判断；发送失败时区分语音读取、校验和发送准备问题。"},
+            @{@"title": @"新增消息操作诊断",
+              @"detail": @"复读和语音转发设置新增问题排查入口，按需开启，复现后复制诊断；不记录消息内容或联系人。"},
+            @{@"title": @"表情菜单仍在排查",
+              @"detail": @"部分独立表情仍缺少复读按钮，本版新增菜单阶段记录以定位原因，尚未确认解决。"}
+        ],
         @"1.8-3": @[
             @{@"title": @"精简消息操作处理",
               @"detail": @"引用、收藏、普通转发直接交给微信处理，减少额外等待任务；删除、撤回保留确认和取消校验。"},

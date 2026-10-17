@@ -1,4 +1,5 @@
 #import "CSMessageActionContext.h"
+#import "CSMessageActionDiagnostics.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 #include <string.h>
@@ -87,24 +88,25 @@ static const void *CSActionObjectTokenKey=&CSActionObjectTokenKey;
 @implementation CSMessageActionContext
 + (instancetype)contextWithCell:(id)cell controller:(id)controller accountID:(NSString *)accountID
     accountEpoch:(NSUInteger)accountEpoch conversationID:(NSString *)conversationID bindingGeneration:(NSUInteger)bindingGeneration {
-    if (!NSThread.isMainThread || ![accountID isKindOfClass:NSString.class] || !accountID.length || !accountEpoch) return nil;
+    if (!NSThread.isMainThread || ![accountID isKindOfClass:NSString.class] || !accountID.length || !accountEpoch) { if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"context.reject" fields:@{@"reason":@"thread_or_account"}]; return nil; }
     id wrap=CSMessageActionResolveSourceWrap(cell);
-    if (!wrap) return nil;
+    if (!wrap) { if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"context.reject" fields:@{@"reason":@"source_missing",@"cell":NSStringFromClass([cell class]) ?: @"nil",@"model":NSStringFromClass([CSMessageActionObjectGetter(cell,NSSelectorFromString(@"viewModel")) class]) ?: @"nil"}]; return nil; }
     NSString *from=CSActionString(wrap,NSSelectorFromString(@"m_nsFromUsr"));
     NSString *to=CSActionString(wrap,NSSelectorFromString(@"m_nsToUsr"));
     BOOL outgoing=NO;
     BOOL known=CSActionNativeOutgoing(wrap,&outgoing);
     BOOL fromSelf=[from isEqualToString:accountID], toSelf=[to isEqualToString:accountID];
+    if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"context.source" fields:@{@"cell":NSStringFromClass([cell class]) ?: @"nil",@"model":NSStringFromClass([CSMessageActionObjectGetter(cell,NSSelectorFromString(@"viewModel")) class]) ?: @"nil",@"wrap":NSStringFromClass([wrap class]),@"controller":NSStringFromClass([controller class]) ?: @"nil",@"type":@(CSActionUnsigned(wrap,NSSelectorFromString(@"m_uiMessageType"))),@"hasFrom":@(from.length>0),@"hasTo":@(to.length>0),@"fromSelf":@(fromSelf),@"toSelf":@(toSelf),@"senderKnown":@(known),@"outgoing":@(outgoing)}];
     if (!known) {
         if (fromSelf) outgoing=YES;
         else if (toSelf) outgoing=NO;
-        else return nil;
-    } else if ((outgoing && !fromSelf) || (!outgoing && !toSelf)) return nil;
+        else { [CSMessageActionDiagnostics record:@"context.reject" fields:@{@"reason":@"endpoints_unmatched"}]; return nil; }
+    } else if ((outgoing && !fromSelf) || (!outgoing && !toSelf)) { [CSMessageActionDiagnostics record:@"context.reject" fields:@{@"reason":@"direction_unmatched"}]; return nil; }
     NSString *chat=outgoing ? to : from;
-    if (!chat.length || (conversationID && (![conversationID isKindOfClass:NSString.class] || ![conversationID isEqualToString:chat]))) return nil;
+    if (!chat.length || (conversationID && (![conversationID isKindOfClass:NSString.class] || ![conversationID isEqualToString:chat]))) { [CSMessageActionDiagnostics record:@"context.reject" fields:@{@"reason":@"conversation_unmatched"}]; return nil; }
     unsigned long long local=CSActionUnsigned(wrap,NSSelectorFromString(@"m_uiMesLocalID"));
     unsigned long long server=CSActionUnsigned(wrap,NSSelectorFromString(@"m_n64MesSvrID"));
-    if (!local && !server && !bindingGeneration) return nil;
+    if (!local && !server && !bindingGeneration) { [CSMessageActionDiagnostics record:@"context.reject" fields:@{@"reason":@"identity_missing"}]; return nil; }
     CSMessageActionContext *context=[self new];
     context->_accountID=[accountID copy]; context->_accountEpoch=accountEpoch;
     context->_sourceConversationID=[chat copy]; context->_sourceWrap=wrap;

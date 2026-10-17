@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.8-3`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.8-4`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.8-3`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.8-4`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.8-3` 为消息操作回归修复的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
+| Rootless / Rootful | `1.8-4` 为消息操作回归修复的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -58,13 +58,15 @@
 
 “后台运行”受系统调度和注入环境限制，不能保证微信永不被终止。“版本控制”调整的是微信版本返回值，不会安装或降级微信；“更新控制”针对微信内部热更新，不等同于关闭 App Store 更新。
 
-## 消息操作 1.8-3
+## 消息操作 1.8-4
 
-第一批优化让引用、收藏、普通转发直接进入原生动作，不再创建通用发送任务；删除、撤回使用随确认界面释放的轻量状态，保留取消、消息复用和账号校验。仅复读和增强语音转发继续持有媒体准备、收件人及提交状态。菜单无变化时返回原数组，关闭功能或消息类型无关时跳过账号与聊天页面查询。
+本版修正语音复读、增强语音转发创建新消息时的原生方法签名：本地微信 `8.0.78.34` 的 `CMessageWrap.initWithMsgType:` 使用 64 位整数，而旧版仅接受 32 位签名，会在发送前拒绝创建新语音。测试替身也同步改为真实签名，并验证收到/自己发送的语音、复读/多人转发、SILK/OPUS 与自动格式识别的提交路径。
 
-针对独立大表情、表情包、自定义动图缺少“复读”的问题，优先通过微信原生 `getViewController` 取得聊天页面，保留响应链回退。骰子、猜拳新增 `GameMessageCellView` 独立菜单入口。继续使用现有原生表情发送路径，保留原消息；启用游戏辅助时沿用原有结果选择流程。所有菜单仍经过微信原生去重和限制过滤。
+用户安装并重启 `1.8-3` 后，普通文字和图片复读正常，但独立表情仍缺少按钮、可播放语音仍提示“1个目标未提交”。**表情菜单的手机故障尚未定位，本版不宣称已修复。** 复读与语音转发设置新增“问题排查”：开启“记录消息操作诊断”，重现问题后返回“复制诊断信息”。它记录菜单构建、生成、去重、过滤及语音准备阶段；默认关闭，仅在内存保留最近 160 条，不记录正文、联系人、消息标识、文件路径或媒体内容。
 
-本轮主机行为回归、旧版负对照和全新 Rootless 双架构构建记录在 [1.8-3 发布说明](docs/message-actions-1.8-3.md) 与 [发布证据](docs/evidence/message-actions-1.8-3/)。静态原生依据来自本地微信 `8.0.78.34` arm64；本版尚未安装到手机，实际菜单显示及收件效果仍需设备验收。此前 `1.8-0` 至 `1.8-2` 的故障、修复和旧包保持原样，参见 [1.8-2 历史说明](docs/message-actions-1.8-2.md)。
+第一批原生动作精简继续保留：引用、收藏、普通转发直接交给微信，删除/撤回保留轻量确认，复读和增强语音转发保留提交与取消状态。菜单诊断只观察各阶段，不改变微信的过滤结果。
+
+本轮主机回归和全新 Rootless 双架构包核对见 [1.8-4 发布说明](docs/message-actions-1.8-4.md) 与 [发布证据](docs/evidence/message-actions-1.8-4/)。主机测试使用原生结构替身，不能证明手机已收到语音或已显示表情按钮；本版尚未安装到手机。历史依据与设备反馈见 [1.8-3 说明](docs/message-actions-1.8-3.md)。
 
 ## 后台模糊
 
@@ -192,20 +194,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-3
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-4
 ```
 
-默认产物：`packages/com.wechat.improve_1.8-3_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.8-4_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.8-3` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.8-4` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-3
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-4
 ```
 
-默认产物：`packages/com.wechat.improve_1.8-3_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.8-4_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -225,7 +227,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.8-3_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.8-4_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
@@ -270,7 +272,9 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 
 ### 验证状态
 
-`1.8-3` 完成第一批原生动作与菜单精简，并补齐大表情、骰子和猜拳的复读菜单；主机回归与双架构包核对记录随包保留，手机验收尚未完成。详见 [1.8-3 发布说明](docs/message-actions-1.8-3.md)。
+`1.8-4` 修正新建语音消息的原生签名错误，并提供按需开启的菜单和语音诊断；独立表情缺少按钮仍待手机诊断。详见 [1.8-4 发布说明](docs/message-actions-1.8-4.md)。
+
+`1.8-3` 完成第一批原生动作与菜单精简，并加入大表情控制器查找和骰子/猜拳独立菜单 Hook；用户手机反馈表情菜单与语音问题仍存在，不能视为设备验收通过。详见 [1.8-3 历史说明](docs/message-actions-1.8-3.md)。
 
 `1.8-1` 修复 `1.8-0` 在用户微信 `8.0.78` 上菜单与手势不可用的服务代理准入问题，以及原生清理误取消确认后待媒体操作的问题。修复后 66,626 项主机检查通过，全新 Rootless 双架构包已核对；修复后的手机安装与验收尚未执行。详见 [修正发布说明](docs/message-actions-1.8-1.md)。
 

@@ -1,4 +1,5 @@
 #import "CSMessageActionMenuAdapter.h"
+#import "CSMessageActionDiagnostics.h"
 #import <objc/runtime.h>
 #import <TargetConditionals.h>
 #if TARGET_OS_IOS
@@ -34,6 +35,21 @@
 + (BOOL)canPerformSelector:(SEL)selector cell:(id)cell { return [[self sharedAdapter] canPerformSelector:selector cell:cell]; }
 + (void)performSelector:(SEL)selector cell:(id)cell { [[self sharedAdapter] performSelector:selector cell:cell]; }
 + (BOOL)isPluginSelector:(SEL)selector { return selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:") || selector==NSSelectorFromString(@"cs_handleVoiceForwardMenuItem:"); }
++ (void)recordMenuStage:(NSString *)stage cell:(id)cell items:(id)items {
+    if (!CSMessageActionDiagnostics.isEnabled) return;
+    NSUInteger repeats=0,forwards=0;
+    NSArray *array=[items isKindOfClass:NSArray.class] ? items : @[];
+    for (id item in array) {
+        @try {
+            if (!CSMessageNativeSupports(item,@"action",@":",@[])) continue;
+            SEL action=[item action];
+            if (action==NSSelectorFromString(@"cs_handleRepeatMenuItem:")) repeats++;
+            if (action==NSSelectorFromString(@"cs_handleVoiceForwardMenuItem:")) forwards++;
+        } @catch (__unused NSException *exception) {}
+    }
+    id wrap=CSMessageActionResolveSourceWrap(cell);
+    [CSMessageActionDiagnostics record:stage fields:@{@"cell":NSStringFromClass([cell class]) ?: @"nil",@"wrap":NSStringFromClass([wrap class]) ?: @"nil",@"type":@(CSMessageNativeUnsigned(wrap,@"m_uiMessageType")),@"count":@(array.count),@"repeat":@(repeats),@"forward":@(forwards)}];
+}
 static const void *CSMenuContextKey=&CSMenuContextKey;
 - (BOOL)isPluginSelector:(SEL)selector { return selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:") || selector==NSSelectorFromString(@"cs_handleVoiceForwardMenuItem:"); }
 - (BOOL)canPerformSelector:(SEL)selector cell:(id)cell {
@@ -59,11 +75,16 @@ static const void *CSMenuContextKey=&CSMenuContextKey;
         if (CSMessageNativeSupports(allocated,@"initWithTitle:icon:target:action:",@"@",@[@"@",@"@",@"@",@":"])) item=[allocated initWithTitle:title icon:icon target:invocation action:selector];
         else if (CSMessageNativeSupports(allocated,@"initWithTitle:target:action:",@"@",@[@"@",@"@",@":"])) item=[allocated initWithTitle:title target:invocation action:selector];
         if (item) { objc_setAssociatedObject(item,@selector(itemForCell:repeat:),invocation,OBJC_ASSOCIATION_RETAIN_NONATOMIC); CSMessageNativeSet(item,@"setIconImage:",icon,NO); CSMessageNativeSet(item,@"setLinePosition:",@0,NO); }
-    } @catch (__unused NSException *exception) { return nil; }
+    } @catch (__unused NSException *exception) { [CSMessageActionDiagnostics record:@"menu.construct" fields:@{@"reason":@"exception"}]; return nil; }
+    if (CSMessageActionDiagnostics.isEnabled) {
+        @try { [CSMessageActionDiagnostics record:@"menu.construct" fields:@{@"item":NSStringFromClass([item class]) ?: @"nil",@"accepted":@(item!=nil),@"actionMatches":@(CSMessageNativeSupports(item,@"action",@":",@[]) && [item action]==selector),@"targetPresent":@(CSMessageActionObjectGetter(item,NSSelectorFromString(@"target"))!=nil)}]; }
+        @catch (__unused NSException *exception) { [CSMessageActionDiagnostics record:@"menu.construct" fields:@{@"reason":@"observation_exception"}]; }
+    }
     return item;
 }
 - (NSArray *)itemsByAddingActionsForCell:(id)cell items:(NSArray *)items {
     NSArray *original=[items isKindOfClass:NSArray.class] ? items : @[];
+    [CSMessageActionMenuAdapter recordMenuStage:@"menu.builder.in" cell:cell items:original];
     CSMessageActionSettings *settings=self.coordinator.settings;
     BOOL repeat=NO,forward=NO;
     CSMessageActionContext *context=nil;
@@ -80,6 +101,7 @@ static const void *CSMenuContextKey=&CSMenuContextKey;
         }
     }
     objc_setAssociatedObject(cell,CSMenuContextKey,context,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"menu.admission" fields:@{@"cell":NSStringFromClass([cell class]) ?: @"nil",@"repeatEnabled":@(settings.repeatEnabled),@"voiceEnabled":@(settings.voiceForwardEnabled),@"context":@(context!=nil),@"controller":NSStringFromClass([context.controller class]) ?: @"nil",@"repeat":@(repeat),@"forward":@(forward)}];
     SEL repeatAction=NSSelectorFromString(@"cs_handleRepeatMenuItem:"), forwardAction=NSSelectorFromString(@"cs_handleVoiceForwardMenuItem:");
     BOOL hasRepeat=NO,hasForward=NO;
     NSMutableIndexSet *removed=nil;
@@ -98,7 +120,7 @@ static const void *CSMenuContextKey=&CSMenuContextKey;
         if (used && CSMessageNativeSupports(item,@"menuType",@"q",@[])) [used addObject:@(CSMessageNativeUnsigned(item,@"menuType"))];
     }
     BOOL addForward=forward && !hasForward,addRepeat=repeat && !hasRepeat;
-    if (!removed.count && !addForward && !addRepeat) return original;
+    if (!removed.count && !addForward && !addRepeat) { [CSMessageActionMenuAdapter recordMenuStage:@"menu.builder.out" cell:cell items:original]; return original; }
     NSMutableArray *result=[original mutableCopy];
     if (removed.count) [result removeObjectsAtIndexes:removed];
     // Add only our items, before native uniq/filter stages, preserving host order.
@@ -108,8 +130,11 @@ static const void *CSMenuContextKey=&CSMenuContextKey;
         unsigned long long menuType=addingRepeat ? 0x43535001ULL : 0x43535002ULL;
         while ([used containsObject:@(menuType)]) menuType++;
         id item=[self itemForCell:cell repeat:addingRepeat];
-        if (item && CSMessageNativeSet(item,@"setMenuType:",@(menuType),YES)) { [result addObject:item]; [used addObject:@(menuType)]; }
+        BOOL typeSet=item && CSMessageNativeSet(item,@"setMenuType:",@(menuType),YES);
+        if (typeSet) { [result addObject:item]; [used addObject:@(menuType)]; }
+        if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"menu.insert" fields:@{@"repeat":@(addingRepeat),@"typeSet":@(typeSet),@"menuType":@(CSMessageNativeUnsigned(item,@"menuType"))}];
     }
+    [CSMessageActionMenuAdapter recordMenuStage:@"menu.builder.out" cell:cell items:result];
     return result;
 }
 - (void)performSelector:(SEL)selector cell:(id)cell {

@@ -1,4 +1,5 @@
 #import "CSMessageMediaProvider.h"
+#import "CSMessageActionDiagnostics.h"
 #import "CSMessageNativeActionAdapter.h"
 #include <string.h>
 @implementation CSMessageVoiceResource
@@ -83,6 +84,7 @@ static BOOL CSVoiceXMLFlag(NSString *xml, NSString *attribute, unsigned int *val
     preparation.localComplete=(status & 1)!=0;
     preparation.recording=preparation.context.outgoing && !(status & 8);
     preparation.complete=preparation.terminalCompletion || preparation.localComplete;
+    if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"voice.snapshot" fields:@{@"duration":@(preparation.duration),@"format":@(preparation.format),@"formatKnown":@(preparation.formatKnown),@"bytes":@(preparation.bytes.length),@"expectedBytes":@(preparation.expectedBytes),@"status":@(status),@"recording":@(preparation.recording),@"complete":@(preparation.complete),@"terminal":@(preparation.terminalCompletion),@"cancelled":@(preparation.cancelled)}];
     Class cls=NSClassFromString(@"CMessageWrap");
     if (CSMessageNativeSupports(source,@"getVoicePath",@"@",@[])) {
         id path=CSMessageActionNativeObject(source,@"getVoicePath"); if ([path isKindOfClass:NSString.class]) preparation.path=[path copy];
@@ -98,6 +100,7 @@ static BOOL CSVoiceXMLFlag(NSString *xml, NSString *attribute, unsigned int *val
 // Immutable-byte validation stays on the serial media queue. Header recognition follows
 // native getVoiceFormat; a header alone is never evidence of a complete recording.
 static CSMessageVoiceResource *CSValidatedVoice(NSData *data, unsigned int duration, unsigned int format, BOOL formatKnown, unsigned int expected) {
+    if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"voice.bytes" fields:@{@"bytes":@(data.length),@"duration":@(duration),@"format":@(format),@"formatKnown":@(formatKnown),@"expectedBytes":@(expected)}];
     if (!data.length || !duration || !formatKnown || (expected && expected!=data.length)) return nil;
     const unsigned char *bytes=data.bytes;
     if (format==UINT_MAX || format==4 || format==7) {
@@ -112,6 +115,7 @@ static CSMessageVoiceResource *CSValidatedVoice(NSData *data, unsigned int durat
             else if (format==7 && CSMessageNativeSupports(NSClassFromString(@"OpusAudioPlayer"),@"calculateVoiceTime:",@"I",@[@"@"])) measured=[CSMessageNativeInvoke(NSClassFromString(@"OpusAudioPlayer"),@"calculateVoiceTime:",@[data]) unsignedLongLongValue];
             else if (CSMessageNativeSupports(utility,@"calcVoiceTime:VoiceFormat:",@"I",@[@"I",@"I"]) && data.length<=UINT_MAX) measured=[CSMessageNativeInvoke(utility,@"calcVoiceTime:VoiceFormat:",@[@(data.length),@(format)]) unsignedLongLongValue];
         } @catch (__unused NSException *exception) {}
+        if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"voice.duration" fields:@{@"duration":@(duration),@"measured":@(measured),@"format":@(format)}];
         if (!measured || llabs((long long)measured-duration)>20) return nil;
     }
     return [[CSMessageVoiceResource alloc] initWithData:data durationMilliseconds:duration format:format];
@@ -131,6 +135,7 @@ static CSMessageVoiceResource *CSValidatedVoice(NSData *data, unsigned int durat
             NSData *data=snapshot.length ? snapshot : (path.length ? reader(path) : nil);
             NSDictionary *after=path.length ? [NSFileManager.defaultManager attributesOfItemAtPath:path error:nil] : nil;
             BOOL stable=snapshot.length || (before && after && [before[NSFileSize] isEqual:after[NSFileSize]] && [before[NSFileModificationDate] isEqual:after[NSFileModificationDate]] && [after[NSFileSize] unsignedLongLongValue]==data.length);
+            if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"voice.read" fields:@{@"stable":@(stable),@"bytes":@(data.length)}];
             CSMessageVoiceResource *resource=stable ? CSValidatedVoice(data,duration,format,known,expected) : nil;
             dispatch_async(dispatch_get_main_queue(),^{
                 typeof(self) self=weakSelf; if (!self || self.preparations[key]!=preparation) return;

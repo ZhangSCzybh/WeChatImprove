@@ -1,4 +1,5 @@
 #import "CSMessageActionCoordinator.h"
+#import "CSMessageActionDiagnostics.h"
 #import "CSMessageSendAdapter.h"
 #import "CSVoiceForwardAdapter.h"
 #import <TargetConditionals.h>
@@ -31,6 +32,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
 @property(nonatomic, weak) id logic;
 @property(nonatomic) BOOL cancelled;
 @property(nonatomic) BOOL mediaFailed;
+@property(nonatomic, copy) NSString *failureDetail;
 @property(nonatomic) BOOL appReady;
 @property(nonatomic, copy) NSData *appData;
 @property(nonatomic, copy) NSString *appPath;
@@ -238,6 +240,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
         typeof(self) self=weakSelf; CSMessageActionOperation *live=self.operations[identifier];
         if (!live || live.cancelled || ![self validAccount:live.context]) return;
         [self hideWaiting:identifier]; live.voice=resource; live.mediaFailed=!resource;
+        if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"voice.prepared" fields:@{@"accepted":@(resource!=nil)}];
         for (NSString *target in live.requestedTargets.allObjects) [self submitTarget:target operation:live];
     }];
 }
@@ -246,9 +249,9 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     CSMessageActionSubmissionState state=[op.ledger stateForOperationID:op.identifier targetID:target];
     if (state!=CSMessageActionSubmissionStateWaitingForMedia && state!=CSMessageActionSubmissionStateReady && state!=CSMessageActionSubmissionStatePreparing) return;
     if (op.context.messageType==34 && !op.voice && !op.mediaFailed) return;
-    if (op.mediaFailed) { [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
+    if (op.mediaFailed) { op.failureDetail=@"语音读取或校验失败"; [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
     CSMessagePreparedSend *route=op.context.messageType==49 ? [_sender prepareContext:op.context targetID:target voice:op.voice appData:op.appData appDataPath:op.appPath] : [_sender prepareContext:op.context targetID:target voice:op.voice];
-    if (!route) { [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
+    if (!route) { if (op.context.messageType==34) op.failureDetail=@"语音发送准备失败"; if (CSMessageActionDiagnostics.isEnabled) [CSMessageActionDiagnostics record:@"send.prepare_failed" fields:@{@"type":@(op.context.messageType)}]; [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
     [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateReady];
     if (![self validAccount:op.context]) return;
     if (![op.ledger beginSubmissionForOperationID:op.identifier targetID:target currentAccountID:_accountID accountEpoch:_accountEpoch]) return;
@@ -282,7 +285,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
         }
     }
     if (!op.targets.count || op.feedbackShown) return; op.feedbackShown=YES;
-    NSMutableArray *parts=[NSMutableArray array]; if (accepted) [parts addObject:[NSString stringWithFormat:@"%lu个目标已受理",(unsigned long)accepted]]; if (unknown) [parts addObject:[NSString stringWithFormat:@"%lu个目标暂未确认发送结果，请查看微信消息状态",(unsigned long)unknown]]; if (failed) [parts addObject:[NSString stringWithFormat:@"%lu个目标未提交",(unsigned long)failed]]; if (cancelled) [parts addObject:[NSString stringWithFormat:@"%lu个目标已取消",(unsigned long)cancelled]];
+    NSMutableArray *parts=[NSMutableArray array]; if (accepted) [parts addObject:[NSString stringWithFormat:@"%lu个目标已受理",(unsigned long)accepted]]; if (unknown) [parts addObject:[NSString stringWithFormat:@"%lu个目标暂未确认发送结果，请查看微信消息状态",(unsigned long)unknown]]; if (failed) [parts addObject:[NSString stringWithFormat:@"%lu个目标未提交%@",(unsigned long)failed,op.failureDetail.length ? [NSString stringWithFormat:@"（%@）",op.failureDetail] : @""]]; if (cancelled) [parts addObject:[NSString stringWithFormat:@"%lu个目标已取消",(unsigned long)cancelled]];
     if (parts.count) [self feedback:[parts componentsJoinedByString:@"；"] context:op.context];
     // Preserve a live native binding until cleanup. Its ledger is the duplicate callback tombstone.
     if (!op.logic || op.nativeFinished) [self retire:op];
