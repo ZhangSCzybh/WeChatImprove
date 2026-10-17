@@ -37,16 +37,16 @@
 - Per-page cell adapters consume cell, table and current indexPath/context, and only decorate verified owned lists. Explicit immutable configuration snapshot passed through one operation avoids repeated defaults reads.
 - A failed group role lookup while grouping is active must not fall through to native row-count guessing. No group refresh requests from decoration.
 
-- [ ] Write meaningful regression fixtures before switching production callers: freeze 1.7-17 legal-value configuration/heights and four-page special layout requirements. Use injected in-memory defaults; never write user defaults.
-- [ ] Centralize keys/defaults and RGBA loading. Cache immutable numeric/color inputs, invalidate on explicit settings saves and appropriate defaults changes; select view trait style per operation. Keep save/restart behavior and numeric validation. Replace localized-title identity with item identity. Remove orphan notification sends only once local invalidation is connected. Reset must retain existing switch and gap-color behavior.
-- [ ] Extract all eight height callbacks into pure policy. Header examples: session 0 adds pinnedGap, 1/2 adds normalGap, others unchanged; contacts 0...3 zero, others original+10; discover/me original+10. Footer enabled: contacts zero, others 0.01. Disabled always original.
-- [ ] Move repeated background and ownership mechanics into context. Use associated-object ownership rather than adopting unrelated tag matches. Only plugin background is masked and non-interactive. Verify actual contentView each operation; no strong global cell/table cache. Guard invalid/zero geometry and per-object reentry; do not suppress native `%orig`.
-- [ ] Migrate session adapter retaining group query and native index scope. Preserve MainFrame/Fake widths, banner geometry and callbacks. Restrict to actual owner table so search results using the same class are unaffected. Do not alter group files.
-- [ ] Migrate contacts/discover/me preserving their distinct layout formulas and special subview roles. Prefer identified native containers/known classes to arbitrary recursive rewrites. Keep contacts first-four-section grouping but bound queries by actual sections. Use actual container width; verify idempotence for nested content and discovery badges. Retain any compatibility refresh whose replacement is unproven, clearly document it rather than deleting functionality.
-- [ ] Refactor profile header separately: restrict MMUIButton hooks to the actual More header, retain original callbacks, replace direct layoutSubviews/global dispatch_once with bounded normal layout invalidation, ensure frame/radius repair when native has reset them. Preserve status card and touch targets.
-- [ ] Test production policy + extracted Hook with a table that throws on row queries/reloads during height evaluation; run under real group index scopes. Test first/middle/last/single roles, renderer reuse and native resets, content replacement, width changes, active-invalid group paths, non-target tables and recursion. Tests must execute production logic, not merely look for strings.
-- [ ] Run `bash Tests/verify-list-corners.sh`. Compile changed Objective-C/Logos for both iOS architectures using isolated Theos output. Fix discovered issues. Review own diff for accidental feature loss and unchanged protected files.
-- [ ] Commit only Task 1 source/tests and report test output and remaining device-only verification in task report.
+- [x] Write meaningful regression fixtures before switching production callers: freeze 1.7-17 legal-value configuration/heights and four-page special layout requirements. Use injected in-memory defaults; never write user defaults.
+- [x] Centralize keys/defaults and RGBA loading. Cache immutable numeric/color inputs, invalidate on explicit settings saves and appropriate defaults changes; select view trait style per operation. Keep save/restart behavior and numeric validation. Replace localized-title identity with item identity. Remove orphan notification sends only once local invalidation is connected. Reset must retain existing switch and gap-color behavior.
+- [x] Extract all eight height callbacks into pure policy. Header examples: session 0 adds pinnedGap, 1/2 adds normalGap, others unchanged; contacts 0...3 zero, others original+10; discover/me original+10. Footer enabled: contacts zero, others 0.01. Disabled always original.
+- [x] Move repeated background and ownership mechanics into context. Use associated-object ownership rather than adopting unrelated tag matches. Only plugin background is masked and non-interactive. Verify actual contentView each operation; no strong global cell/table cache. Guard invalid/zero geometry and per-object reentry; do not suppress native `%orig`.
+- [x] Migrate session adapter retaining group query and native index scope. Preserve MainFrame/Fake widths, banner geometry and callbacks. Restrict to actual owner table so search results using the same class are unaffected. Do not alter group files.
+- [x] Migrate contacts/discover/me preserving their distinct layout formulas and special subview roles. Prefer identified native containers/known classes to arbitrary recursive rewrites. Keep contacts first-four-section grouping but bound queries by actual sections. Use actual container width; verify idempotence for nested content and discovery badges. Retain any compatibility refresh whose replacement is unproven, clearly document it rather than deleting functionality.
+- [x] Refactor profile header separately: restrict MMUIButton hooks to the actual More header, retain original callbacks, replace direct layoutSubviews/global dispatch_once with bounded normal layout invalidation, ensure frame/radius repair when native has reset them. Preserve status card and touch targets.
+- [x] Test production policy + extracted Hook with a table that throws on row queries/reloads during height evaluation; run under real group index scopes. Test first/middle/last/single roles, renderer reuse and native resets, content replacement, width changes, active-invalid group paths, non-target tables and recursion. Tests must execute production logic, not merely look for strings.
+- [x] Run `bash Tests/verify-list-corners.sh`. Compile changed Objective-C/Logos for both iOS architectures using isolated Theos output. Fix discovered issues. Review own diff for accidental feature loss and unchanged protected files.
+- [x] Commit only Task 1 source/tests and report test output and remaining device-only verification in task report.
 
 ## Task 2: 全分支审查、版本与安装包
 
@@ -54,13 +54,13 @@
 
 **Interfaces:** Task 1 verification command `bash Tests/verify-list-corners.sh`; unchanged group and other-feature code is the integration baseline.
 
-- [ ] Review Task 1 diff against native audit and original Hook method inventory. Resolve important findings and re-run covering regressions.
-- [ ] Run existing group header, search, interactions, business, selection, viewport, lifecycle, incremental, preferences, appearance and indicator tests plus my-page-clean. Record commands, counts and failures accurately; do not quote historical counts.
-- [ ] Update version to `1.7-19` and add truthful release notes including device acceptance boundary. No other feature code changes.
-- [ ] Build complete Release Rootless arm64/arm64e package from this worktree with a fresh temporary `_THEOS_LOCAL_DATA_DIR`. Preserve existing package and .theos artifacts. Use unique build output paths and do not run install.
-- [ ] Extract new deb into temporary inspection directory; verify control version/architecture, install location, fat library slices, dependencies, new module symbols and absence of retired `CSListHeaderHeight`.
-- [ ] Record package SHA-256, commit/base, protected-file hash comparison, build result and device checklist. Copy only the new `1.7-19` package to original workspace packages for convenient delivery without overwriting any existing file.
-- [ ] Commit scoped release/docs changes, deliver branch, worktree, package path, hash, actual tests and pending device scenarios. Leave branch unmerged for user acceptance.
+- [x] Review Task 1 diff against native audit and original Hook method inventory. Resolve important findings and re-run covering regressions.
+- [x] Run existing group header, search, interactions, business, selection, viewport, lifecycle, incremental, preferences, appearance and indicator tests plus my-page-clean. Record commands, counts and failures accurately; do not quote historical counts.
+- [x] Update version to `1.7-19` and add truthful release notes including device acceptance boundary. No other feature code changes.
+- [x] Build complete Release Rootless arm64/arm64e package from this worktree with a fresh temporary `_THEOS_LOCAL_DATA_DIR`. Preserve existing package and .theos artifacts. Use unique build output paths and do not run install.
+- [x] Extract new deb into temporary inspection directory; verify control version/architecture, install location, fat library slices, dependencies, new module symbols and absence of retired `CSListHeaderHeight`.
+- [x] Record package SHA-256, commit/base, protected-file hash comparison, build result and device checklist. Copy only the new `1.7-19` package to original workspace packages for convenient delivery without overwriting any existing file.
+- [x] Commit scoped release/docs changes, deliver branch, worktree, package path, hash, actual tests and pending device scenarios. Leave branch unmerged for user acceptance.
 
 ## Review checklist
 
