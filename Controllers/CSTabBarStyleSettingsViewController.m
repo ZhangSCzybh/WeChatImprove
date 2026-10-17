@@ -4,68 +4,8 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <AVFoundation/AVFoundation.h>
 
-static NSString * const kTabBarStyleEnabledKey = @"com.wechat.enhance.tabbar_style.enabled";
-static NSString * const kTabBarHideTextKey = @"com.wechat.enhance.tabbar_style.hide_text";
-
-static NSString * const kTabBarIconChatKey = @"com.wechat.enhance.tabbar_style.icon.chat";
-static NSString * const kTabBarIconContactsKey = @"com.wechat.enhance.tabbar_style.icon.contacts";
-static NSString * const kTabBarIconDiscoverKey = @"com.wechat.enhance.tabbar_style.icon.discover";
-static NSString * const kTabBarIconMeKey = @"com.wechat.enhance.tabbar_style.icon.me";
-
-static NSString * const kTabBarIconSelectedChatKey = @"com.wechat.enhance.tabbar_style.icon.selected.chat";
-static NSString * const kTabBarIconSelectedContactsKey = @"com.wechat.enhance.tabbar_style.icon.selected.contacts";
-static NSString * const kTabBarIconSelectedDiscoverKey = @"com.wechat.enhance.tabbar_style.icon.selected.discover";
-static NSString * const kTabBarIconSelectedMeKey = @"com.wechat.enhance.tabbar_style.icon.selected.me";
-
-// 新增样式设置键
-static NSString * const kTabBarCornerRadiusKey = @"com.wechat.enhance.tabbar_style.corner_radius";
-static NSString * const kTabBarPositionOffsetKey = @"com.wechat.enhance.tabbar_style.position_offset";
-static NSString * const kTabBarScaleKey = @"com.wechat.enhance.tabbar_style.scale";
-static NSString * const kTabBarBorderStyleKey = @"com.wechat.enhance.tabbar_style.border_style";
-static NSString * const kTabBarHapticFeedbackKey = @"com.wechat.enhance.tabbar_style.haptic_feedback";
-static NSString * const kTabBarBorderAnimationKey = @"com.wechat.enhance.tabbar_style.border_animation";
-static NSString * const kTabBarBorderColorRedKey = @"com.wechat.enhance.tabbar_style.border_color.red";
-static NSString * const kTabBarBorderColorGreenKey = @"com.wechat.enhance.tabbar_style.border_color.green";
-static NSString * const kTabBarBorderColorBlueKey = @"com.wechat.enhance.tabbar_style.border_color.blue";
-static NSString * const kTabBarBorderColorAlphaKey = @"com.wechat.enhance.tabbar_style.border_color.alpha";
-
-static NSString * const kTabBarBgColorRedKey = @"com.wechat.enhance.tabbar_style.bg_color.red";
-static NSString * const kTabBarBgColorGreenKey = @"com.wechat.enhance.tabbar_style.bg_color.green";
-static NSString * const kTabBarBgColorBlueKey = @"com.wechat.enhance.tabbar_style.bg_color.blue";
-static NSString * const kTabBarBgColorAlphaKey = @"com.wechat.enhance.tabbar_style.bg_color.alpha";
-
-// 文本自定义键
-static NSString * const kTabBarTextChatKey = @"com.wechat.enhance.tabbar_style.text.chat";
-static NSString * const kTabBarTextContactsKey = @"com.wechat.enhance.tabbar_style.text.contacts";
-static NSString * const kTabBarTextDiscoverKey = @"com.wechat.enhance.tabbar_style.text.discover";
-static NSString * const kTabBarTextMeKey = @"com.wechat.enhance.tabbar_style.text.me";
-
-// 默认值
-static const CGFloat kDefaultCornerRadius = 0.0;
-static const CGFloat kDefaultPositionOffset = 0.0;
-static const CGFloat kDefaultScale = 0.9;
-static const NSInteger kDefaultBorderStyle = 1; // 默认圆角
-static const NSInteger kDefaultHapticFeedback = 0; // 默认无
-static const NSInteger kDefaultBorderAnimation = 0; // 默认无动画
-
-typedef NS_ENUM(NSInteger, TabBarBorderStyle) {
-    TabBarBorderStyleCapsule = 0,  // 半圆（胶囊）
-    TabBarBorderStyleRounded = 1   // 圆角
-};
-
-typedef NS_ENUM(NSInteger, TabBarHapticFeedback) {
-    TabBarHapticFeedbackNone = 0,      // 无
-    TabBarHapticFeedbackSoft = 1,      // 舒适
-    TabBarHapticFeedbackLight = 2,     // 轻柔
-    TabBarHapticFeedbackMedium = 3,    // 中度
-    TabBarHapticFeedbackHeavy = 4      // 强烈
-};
-
-typedef NS_ENUM(NSInteger, TabBarBorderAnimation) {
-    TabBarBorderAnimationNone = 0,     // 无动画
-    TabBarBorderAnimationBreath = 1,   // 呼吸
-    TabBarBorderAnimationHeartbeat = 2 // 心跳
-};
+#import "CSTabBarPreferences.h"
+#import "CSTabBarGeometry.h"
 
 typedef NS_ENUM(NSInteger, TabBarIconType) {
     TabBarIconTypeChat = 0,
@@ -91,6 +31,8 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, strong) CSSettingItem *bgColorItem;
 @property (nonatomic, strong) CSSettingItem *positionOffsetItem;
 @property (nonatomic, strong) CSSettingItem *scaleItem;
+@property (nonatomic, strong) CSSettingItem *contentHeightItem;
+@property (nonatomic, strong) CSSettingItem *borderWidthItem;
 @property (nonatomic, strong) CSSettingItem *hapticFeedbackItem;
 @property (nonatomic, strong) CSSettingItem *borderAnimationItem;
 @property (nonatomic, strong) CSSettingItem *borderColorItem;
@@ -113,6 +55,8 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, strong) UIColor *borderColor;
 @property (nonatomic, assign) CGFloat positionOffset;
 @property (nonatomic, assign) CGFloat scale;
+@property (nonatomic, assign) CGFloat contentHeight;
+@property (nonatomic, assign) CGFloat borderWidth;
 
 // 文本自定义属性
 @property (nonatomic, strong) NSString *chatText;
@@ -142,89 +86,15 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 }
 
 - (void)loadCurrentSettings {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    self.tabBarStyleEnabled = [defaults boolForKey:kTabBarStyleEnabledKey];
-    self.hideText = [defaults boolForKey:kTabBarHideTextKey];
-    
-    // 加载新的样式设置
-    self.cornerRadius = [defaults floatForKey:kTabBarCornerRadiusKey];
-    if (self.cornerRadius == 0) {
-        self.cornerRadius = kDefaultCornerRadius;
-    }
-    
-    self.positionOffset = [defaults floatForKey:kTabBarPositionOffsetKey];
-    if (self.positionOffset == 0) {
-        self.positionOffset = kDefaultPositionOffset;
-    }
-    
-    self.scale = [defaults floatForKey:kTabBarScaleKey];
-    if (self.scale == 0) {
-        self.scale = kDefaultScale;
-    }
-    
-    self.borderStyle = [defaults integerForKey:kTabBarBorderStyleKey];
-    if (self.borderStyle == 0 && ![defaults objectForKey:kTabBarBorderStyleKey]) {
-        self.borderStyle = kDefaultBorderStyle;
-    }
-    
-    self.hapticFeedback = [defaults integerForKey:kTabBarHapticFeedbackKey];
-    if (self.hapticFeedback == 0 && ![defaults objectForKey:kTabBarHapticFeedbackKey]) {
-        self.hapticFeedback = kDefaultHapticFeedback;
-    }
-    
-    self.borderAnimation = [defaults integerForKey:kTabBarBorderAnimationKey];
-    if (self.borderAnimation == 0 && ![defaults objectForKey:kTabBarBorderAnimationKey]) {
-        self.borderAnimation = kDefaultBorderAnimation;
-    }
-    
-    // 加载背景颜色
-    self.bgColor = [self loadColorWithKeys:kTabBarBgColorRedKey
-                                 greenKey:kTabBarBgColorGreenKey
-                                  blueKey:kTabBarBgColorBlueKey
-                                 alphaKey:kTabBarBgColorAlphaKey
-                              defaultRed:0.0
-                             defaultGreen:0.0
-                              defaultBlue:0.0
-                             defaultAlpha:0.0];
-    
-    // 加载描边颜色
-    self.borderColor = [self loadColorWithKeys:kTabBarBorderColorRedKey
-                                     greenKey:kTabBarBorderColorGreenKey
-                                      blueKey:kTabBarBorderColorBlueKey
-                                     alphaKey:kTabBarBorderColorAlphaKey
-                                  defaultRed:1.0
-                                 defaultGreen:0.0
-                                  defaultBlue:0.0
-                                 defaultAlpha:1.0];
-    
-    // 加载自定义文本
-    self.chatText = [defaults stringForKey:kTabBarTextChatKey];
-    self.contactsText = [defaults stringForKey:kTabBarTextContactsKey];
-    self.discoverText = [defaults stringForKey:kTabBarTextDiscoverKey];
-    self.meText = [defaults stringForKey:kTabBarTextMeKey];
-}
-
-- (UIColor *)loadColorWithKeys:(NSString *)redKey
-                     greenKey:(NSString *)greenKey
-                      blueKey:(NSString *)blueKey
-                     alphaKey:(NSString *)alphaKey
-                  defaultRed:(CGFloat)defaultRed
-                 defaultGreen:(CGFloat)defaultGreen
-                  defaultBlue:(CGFloat)defaultBlue
-                 defaultAlpha:(CGFloat)defaultAlpha {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    CGFloat red = [defaults floatForKey:redKey];
-    CGFloat green = [defaults floatForKey:greenKey];
-    CGFloat blue = [defaults floatForKey:blueKey];
-    CGFloat alpha = [defaults floatForKey:alphaKey];
-    
-    if (red == 0 && green == 0 && blue == 0 && alpha == 0) {
-        return [UIColor colorWithRed:defaultRed green:defaultGreen blue:defaultBlue alpha:defaultAlpha];
-    }
-    
-    return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
+    [CSTabBarPreferences reload];
+    CSTabBarPreferences *p=CSTabBarPreferences.current;
+    self.tabBarStyleEnabled=p.enabled; self.hideText=p.hideText;
+    self.cornerRadius=p.cornerRadius; self.positionOffset=p.lift; self.scale=p.scale;
+    self.contentHeight=p.contentHeight; self.borderWidth=p.borderWidth;
+    self.borderStyle=p.borderStyle; self.hapticFeedback=p.haptic; self.borderAnimation=p.animation;
+    self.bgColor=p.backgroundColor; self.borderColor=p.borderColor;
+    self.chatText=[p titleAtIndex:0]; self.contactsText=[p titleAtIndex:1];
+    self.discoverText=[p titleAtIndex:2]; self.meText=[p titleAtIndex:3];
 }
 
 - (void)saveSettings {
@@ -236,6 +106,8 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     [defaults setFloat:self.cornerRadius forKey:kTabBarCornerRadiusKey];
     [defaults setFloat:self.positionOffset forKey:kTabBarPositionOffsetKey];
     [defaults setFloat:self.scale forKey:kTabBarScaleKey];
+    [defaults setFloat:self.contentHeight forKey:kTabBarContentHeightKey];
+    [defaults setFloat:self.borderWidth forKey:kTabBarBorderWidthKey];
     [defaults setInteger:self.borderStyle forKey:kTabBarBorderStyleKey];
     [defaults setInteger:self.hapticFeedback forKey:kTabBarHapticFeedbackKey];
     [defaults setInteger:self.borderAnimation forKey:kTabBarBorderAnimationKey];
@@ -272,8 +144,12 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
          alphaKey:(NSString *)alphaKey {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
-    CGFloat red, green, blue, alpha;
-    [color getRed:&red green:&green blue:&blue alpha:&alpha];
+    if (!color) {
+        for (NSString *key in @[redKey,greenKey,blueKey,alphaKey]) [defaults removeObjectForKey:key];
+        return;
+    }
+    CGFloat red=0, green=0, blue=0, alpha=0;
+    if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) return;
     
     [defaults setFloat:red forKey:redKey];
     [defaults setFloat:green forKey:greenKey];
@@ -282,14 +158,15 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 }
 
 - (void)setupData {
+    __weak typeof(self) weakSelf = self;
     self.enableItem = [CSSettingItem switchItemWithTitle:@"启用悬浮导航栏"
                                               iconName:@"rectangle.bottomthird.inset.filled"
                                              iconColor:[UIColor systemBlueColor]
                                             switchValue:self.tabBarStyleEnabled
                                        valueChangedBlock:^(BOOL isOn) {
-        self.tabBarStyleEnabled = isOn;
-        [self saveSettings];
-        [self updateIconItemsState];
+        weakSelf.tabBarStyleEnabled = isOn;
+        [weakSelf saveSettings];
+        [weakSelf updateIconItemsState];
     }];
     
     self.hideTextItem = [CSSettingItem switchItemWithTitle:@"隐藏标签文本"
@@ -297,11 +174,9 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
                                                iconColor:[UIColor systemOrangeColor]
                                               switchValue:self.hideText
                                          valueChangedBlock:^(BOOL isOn) {
-        self.hideText = isOn;
-        [self saveSettings];
+        weakSelf.hideText = isOn;
+        [weakSelf saveSettings];
     }];
-    
-    __weak typeof(self) weakSelf = self;
     
     // 加载已上传的图标
     UIImage *chatIcon = [self loadIconForType:TabBarIconTypeChat isSelected:NO];
@@ -422,20 +297,20 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf presentViewController:alert animated:YES completion:nil];
     };
     
-    self.cornerRadiusItem = [CSSettingItem inputItemWithTitle:@"圆角比例"
+    self.cornerRadiusItem = [CSSettingItem inputItemWithTitle:@"圆角半径"
                                                    iconName:@"rectangle.roundedtop"
                                                   iconColor:[UIColor systemPurpleColor]
                                                   inputValue:[NSString stringWithFormat:@"%.1f", self.cornerRadius]
-                                              inputPlaceholder:@"输入圆角（0-30）"
+                                              inputPlaceholder:@"输入圆角（0–40 pt）"
                                              valueChangedBlock:^(NSString *value) {
         CGFloat radius = [value floatValue];
-        radius = MAX(0, MIN(30, radius));
+        radius = CSTabBarClamp(radius,0,40,kDefaultCornerRadius);
         weakSelf.cornerRadius = radius;
         [weakSelf saveSettings];
     }];
     self.cornerRadiusItem.inputKeyboardType = UIKeyboardTypeDecimalPad; // 数字键盘
     
-    NSString *bgColorDetail = @"点击选择";
+    NSString *bgColorDetail = @"跟随原生";
     if (self.bgColor) {
         CGFloat red, green, blue, alpha;
         [self.bgColor getRed:&red green:&green blue:&blue alpha:&alpha];
@@ -447,7 +322,13 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
                                         iconColor:[UIColor systemPinkColor]
                                            detail:bgColorDetail];
     self.bgColorItem.actionBlock = ^{
-        [weakSelf showColorPicker];
+        UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"背景颜色" message:nil preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"自定义颜色" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) { [weakSelf showColorPicker]; }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"跟随原生" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            weakSelf.bgColor=nil; [weakSelf saveSettings]; [weakSelf setupData]; [weakSelf.tableView reloadData];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+        [weakSelf presentViewController:alert animated:YES completion:nil];
     };
     
     // 底栏切换触感
@@ -532,14 +413,14 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf showBorderColorPicker];
     };
     
-    self.positionOffsetItem = [CSSettingItem inputItemWithTitle:@"位置偏移"
+    self.positionOffsetItem = [CSSettingItem inputItemWithTitle:@"向上偏移"
                                                      iconName:@"arrow.up.and.down"
                                                     iconColor:[UIColor systemOrangeColor]
                                                     inputValue:[NSString stringWithFormat:@"%.1f", self.positionOffset]
-                                                inputPlaceholder:@"输入偏移量（-50~50）"
+                                                inputPlaceholder:@"输入上移距离（0–100 pt）"
                                                valueChangedBlock:^(NSString *value) {
         CGFloat offset = [value floatValue];
-        offset = MAX(-50, MIN(50, offset));
+        offset = CSTabBarClamp(offset,0,100,0);
         weakSelf.positionOffset = offset;
         [weakSelf saveSettings];
     }];
@@ -556,7 +437,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         }
     }
     
-    self.scaleItem = [CSSettingItem itemWithTitle:@"底栏大小"
+    self.scaleItem = [CSSettingItem itemWithTitle:@"底栏宽度"
                                         iconName:@"slider.horizontal.3"
                                        iconColor:[UIColor systemTealColor]
                                           detail:scaleOptions[scaleIndex]];
@@ -585,6 +466,23 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf presentViewController:alert animated:YES completion:nil];
     };
     
+    self.contentHeightItem=[CSSettingItem inputItemWithTitle:@"底栏高度"
+        iconName:@"arrow.up.and.down" iconColor:UIColor.systemTealColor
+        inputValue:[NSString stringWithFormat:@"%.0f",self.contentHeight]
+        inputPlaceholder:@"内容高度（44–80 pt）" valueChangedBlock:^(NSString *value) {
+            weakSelf.contentHeight=CSTabBarClamp(value.doubleValue,44,80,52);
+            [weakSelf saveSettings];
+        }];
+    self.contentHeightItem.inputKeyboardType=UIKeyboardTypeDecimalPad;
+    self.borderWidthItem=[CSSettingItem inputItemWithTitle:@"描边宽度"
+        iconName:@"pencil.tip" iconColor:UIColor.systemIndigoColor
+        inputValue:[NSString stringWithFormat:@"%.1f",self.borderWidth]
+        inputPlaceholder:@"描边宽度（0–6 pt，0 为关闭）" valueChangedBlock:^(NSString *value) {
+            weakSelf.borderWidth=CSTabBarClamp(value.doubleValue,0,6,1);
+            [weakSelf saveSettings];
+        }];
+    self.borderWidthItem.inputKeyboardType=UIKeyboardTypeDecimalPad;
+
     CSSettingSection *mainSection = [CSSettingSection sectionWithHeader:@"主设置"
                                                                 items:@[self.enableItem, self.hideTextItem]];
     
@@ -602,13 +500,15 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     
     CSSettingSection *styleSection = [CSSettingSection sectionWithHeader:@"样式设置"
                                                                 items:@[self.scaleItem,
+                                                                       self.contentHeightItem,
                                                                        self.borderStyleItem,
                                                                        self.cornerRadiusItem,
                                                                        self.positionOffsetItem,
                                                                        self.bgColorItem,
                                                                        self.hapticFeedbackItem,
                                                                        self.borderAnimationItem,
-                                                                       self.borderColorItem]];
+                                                                       self.borderColorItem,
+                                                                       self.borderWidthItem]];
     
     CSSettingItem *resetItem = [CSSettingItem actionItemWithTitle:@"恢复默认设置"
                                                        iconName:@"arrow.counterclockwise"
@@ -623,7 +523,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     CSSettingItem *descriptionItem = [CSSettingItem itemWithTitle:@"说明"
                                                        iconName:@"info.circle"
                                                       iconColor:[UIColor systemGrayColor]
-                                                        detail:@"修改后需要重启微信才能生效。"];
+                                                        detail:@"设置即时生效；红点与未读数字沿用微信原生显示。"];
     
     CSSettingSection *descriptionSection = [CSSettingSection sectionWithHeader:@""
                                                                        items:@[descriptionItem]];
@@ -636,10 +536,9 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     
     self.hideTextItem.switchValue = self.hideText;
     
-    self.chatIconItem.detail = enabled ? @"点击设置" : @"未启用";
-    self.contactsIconItem.detail = enabled ? @"点击设置" : @"未启用";
-    self.discoverIconItem.detail = enabled ? @"点击设置" : @"未启用";
-    self.meIconItem.detail = enabled ? @"点击设置" : @"未启用";
+    for (CSSettingItem *item in @[self.chatIconItem,self.contactsIconItem,self.discoverIconItem,self.meIconItem]) {
+        item.detail=enabled ? (item.customImage ? @"已设置" : @"点击设置") : @"未启用";
+    }
     
     [self.tableView reloadData];
 }
@@ -732,13 +631,13 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     
     if (status == PHAuthorizationStatusNotDetermined) {
         [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-            if (status == PHAuthorizationStatusAuthorized) {
+            if (status == PHAuthorizationStatusAuthorized || status == PHAuthorizationStatusLimited) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self presentImagePickerWithSource:UIImagePickerControllerSourceTypePhotoLibrary];
                 });
             }
         }];
-    } else if (status == PHAuthorizationStatusAuthorized) {
+    } else if (status == PHAuthorizationStatusAuthorized || status == PHAuthorizationStatusLimited) {
         [self presentImagePickerWithSource:UIImagePickerControllerSourceTypePhotoLibrary];
     } else {
         [self showPermissionDeniedAlert];
@@ -776,7 +675,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.sourceType = sourceType;
     picker.delegate = self;
-    picker.allowsEditing = YES;
+    picker.allowsEditing = NO;
     picker.mediaTypes = @[@"public.image"];
     [self presentViewController:picker animated:YES completion:nil];
 }
@@ -984,6 +883,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     } else {
         self.bgColor = viewController.selectedColor;
     }
+    [self saveSettings];
 }
 
 - (void)resetToDefault {
@@ -1030,6 +930,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [defaults setFloat:kDefaultPositionOffset forKey:kTabBarPositionOffsetKey];
         [defaults setFloat:kDefaultScale forKey:kTabBarScaleKey];
         [defaults setInteger:kDefaultBorderStyle forKey:kTabBarBorderStyleKey];
+        for (NSString *key in @[kTabBarContentHeightKey,kTabBarBorderWidthKey,kTabBarHapticFeedbackKey,kTabBarBorderAnimationKey,kTabBarBorderColorRedKey,kTabBarBorderColorGreenKey,kTabBarBorderColorBlueKey,kTabBarBorderColorAlphaKey]) [defaults removeObjectForKey:key];
         
         [defaults removeObjectForKey:kTabBarBgColorRedKey];
         [defaults removeObjectForKey:kTabBarBgColorGreenKey];
@@ -1063,7 +964,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"com.wechat.enhance.tabbar_style.changed" object:nil];
         
         UIAlertController *successAlert = [UIAlertController alertControllerWithTitle:@"成功"
-                                                                              message:@"已恢复默认设置，重启微信后生效"
+                                                                              message:@"已恢复默认设置"
                                                                        preferredStyle:UIAlertControllerStyleAlert];
         [successAlert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
         [self presentViewController:successAlert animated:YES completion:nil];
@@ -1083,10 +984,8 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     }
     
     if (image) {
-        // 处理图像，去除白色背景
-        UIImage *processedImage = [self removeWhiteBackgroundFromImage:image];
-        
-        NSData *imageData = UIImagePNGRepresentation(processedImage);
+        // Preserve uploaded colors and alpha; white pixels may be intentional artwork.
+        NSData *imageData = UIImagePNGRepresentation(image);
         if (imageData) {
             // 获取保存路径
             NSString *folderPath = [self getWeChatImproveFolderPath];
@@ -1101,12 +1000,6 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
             
             NSString *fileName = [self getIconFileNameForType:self.currentIconType isSelected:self.isSelectingIcon];
             NSString *filePath = [folderPath stringByAppendingPathComponent:fileName];
-            
-            // 删除旧文件
-            NSFileManager *fileManager = [NSFileManager defaultManager];
-            if ([fileManager fileExistsAtPath:filePath]) {
-                [fileManager removeItemAtPath:filePath error:nil];
-            }
             
             // 保存图片到文件
             NSError *error = nil;
@@ -1192,12 +1085,6 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         return;
     }
     
-    // 处理背景颜色选择
-    if (item == self.bgColorItem) {
-        [self showColorPicker];
-        return;
-    }
-    
     if (item.actionBlock) {
         item.actionBlock();
     }
@@ -1230,7 +1117,9 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
             item.inputValueChanged(value);
         }
         
-        // 刷新对应的cell
+        // Display the validated value rather than the unbounded input.
+        [weakSelf loadCurrentSettings];
+        [weakSelf setupData];
         [weakSelf.tableView reloadData];
     }]];
     
@@ -1252,63 +1141,6 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         return @"开启隐藏标签文本后，自定义文本不会显示。";
     }
     return nil;
-}
-
-#pragma mark - Image Processing
-
-- (UIImage *)removeWhiteBackgroundFromImage:(UIImage *)image {
-    CGImageRef rawImageRef = image.CGImage;
-    
-    if (!rawImageRef) {
-        return image;
-    }
-    
-    CGFloat width = CGImageGetWidth(rawImageRef);
-    CGFloat height = CGImageGetHeight(rawImageRef);
-    
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    NSUInteger bytesPerPixel = 4;
-    NSUInteger bytesPerRow = bytesPerPixel * width;
-    NSUInteger bitsPerComponent = 8;
-    
-    NSUInteger rawDataSize = bytesPerRow * height;
-    void *rawData = malloc(rawDataSize);
-    
-    CGContextRef context = CGBitmapContextCreate(rawData, width, height,
-                                                  bitsPerComponent, bytesPerRow, colorSpace,
-                                                  kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-    
-    CGColorSpaceRelease(colorSpace);
-    
-    CGContextDrawImage(context, CGRectMake(0, 0, width, height), rawImageRef);
-    
-    // 遍历所有像素，将白色或接近白色的像素设为透明
-    NSUInteger byteIndex = 0;
-    for (NSUInteger y = 0; y < height; y++) {
-        for (NSUInteger x = 0; x < width; x++) {
-            CGFloat red = ((CGFloat) ((unsigned char *)rawData)[byteIndex]) / 255.0;
-            CGFloat green = ((CGFloat) ((unsigned char *)rawData)[byteIndex + 1]) / 255.0;
-            CGFloat blue = ((CGFloat) ((unsigned char *)rawData)[byteIndex + 2]) / 255.0;
-            CGFloat alpha = ((CGFloat) ((unsigned char *)rawData)[byteIndex + 3]) / 255.0;
-            
-            // 判断是否为白色或接近白色（阈值：0.9）
-            if (red > 0.9 && green > 0.9 && blue > 0.9 && alpha > 0.9) {
-                // 设置为完全透明
-                ((unsigned char *)rawData)[byteIndex + 3] = 0;
-            }
-            
-            byteIndex += bytesPerPixel;
-        }
-    }
-    
-    CGImageRef resultImageRef = CGBitmapContextCreateImage(context);
-    UIImage *resultImage = [UIImage imageWithCGImage:resultImageRef];
-    
-    CGImageRelease(resultImageRef);
-    CGContextRelease(context);
-    free(rawData);
-    
-    return resultImage;
 }
 
 @end

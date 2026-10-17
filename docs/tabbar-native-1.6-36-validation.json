@@ -1,0 +1,48 @@
+{
+  "version": "1.6-36",
+  "package": "packages/com.wechat.improve_1.6-36_iphoneos-arm64.deb",
+  "sha256": "edb736829752a377eb7d1e1a674585b9910c2b3840d5de3660550a4ff3c7bd14",
+  "build": {
+    "command": "make package -j4 SCHEME=rootless PACKAGE_VERSION=1.6-36",
+    "exit_code": 0,
+    "architectures": [
+      "arm64",
+      "arm64e"
+    ],
+    "minimum_target": "iOS 15.0"
+  },
+  "tests": {
+    "tabbar_geometry": "pass",
+    "tabbar_preferences_and_native_adapter_host_doubles": "pass",
+    "group_lifecycle": {
+      "checks": 46,
+      "failures": 0
+    },
+    "group_viewport": {
+      "checks": 72,
+      "failures": 0
+    },
+    "group_header": {
+      "checks": 46,
+      "failures": 0
+    },
+    "group_interactions": {
+      "checks": 112,
+      "failures": 0
+    },
+    "group_preferences": {
+      "checks": 23,
+      "failures": 0
+    },
+    "group_appearance": {
+      "checks": 8,
+      "failures": 0
+    }
+  },
+  "device_verified": false,
+  "deployed": false,
+  "data_access": "No WeChat configuration or database was opened or changed. Host preference tests use an isolated temporary suite.",
+  "dylib_sha256": "340835666f145883443defba59722eb3a42561cb5735d5c22f3a85589a768946",
+  "packaged_binary_matches_build": true,
+  "legacy_custom_tabbar_class_absent": true
+}
