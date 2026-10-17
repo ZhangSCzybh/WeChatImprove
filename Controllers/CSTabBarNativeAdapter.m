@@ -6,6 +6,8 @@
 
 static char CSBarStateKey, CSItemStateKey;
 static NSHashTable<MMTabBar *> *CSBars;
+static NSString * const CSOutwardAnimationKey=@"cs.tabbar.outwardPulse";
+static NSString * const CSClassicAnimationKey=@"cs.tabbar.pulse";
 static CGRect CSRect(CSTabBarRect r) { return CGRectMake(r.x,r.y,r.width,r.height); }
 static void CSSetFrame(UIView *view, CGRect frame) {
     if (view && !CGRectEqualToRect(view.frame,frame)) {
@@ -212,8 +214,8 @@ static void CSRestoreVisuals(CSTabBarState *s) {
 static void CSStop(CSTabBarState *s) {
     if (!s) return;
     CSRestoreVisuals(s); CSRestoreInset(s);
-    [s.halo removeAnimationForKey:@"cs.tabbar.outwardPulse"];
-    [s.surface.layer removeAnimationForKey:@"cs.tabbar.pulse"];
+    [s.halo removeAnimationForKey:CSOutwardAnimationKey];
+    [s.surface.layer removeAnimationForKey:CSClassicAnimationKey];
     s.surface.layer.shadowOpacity=0;
     s.renderedPreferences=nil;
     for (UIControl *button in s.observedButtons) {
@@ -222,6 +224,10 @@ static void CSStop(CSTabBarState *s) {
     }
     [s.observedButtons removeAllObjects];
     [s.surface removeFromSuperview];
+}
+static NSInteger CSDesiredAnimation(void) {
+    CSTabBarPreferences *p=CSTabBarPreferences.current;
+    return p.enabled && p.borderColor && p.borderWidth>0 && !UIAccessibilityIsReduceMotionEnabled() ? p.animation : CSTabBarBorderAnimationNone;
 }
 // Outward modes use a masked ring; classic modes preserve the original full-surface shadow.
 static void CSRenderBorderAnimation(CSTabBarState *s, CGFloat radius, CGFloat line) {
@@ -235,11 +241,11 @@ static void CSRenderBorderAnimation(CSTabBarState *s, CGFloat radius, CGFloat li
         [s.haloContainer addSublayer:s.halo];
         [s.surface.layer insertSublayer:s.haloContainer below:s.border];
     }
-    [s.halo removeAnimationForKey:@"cs.tabbar.outwardPulse"];
-    [s.surface.layer removeAnimationForKey:@"cs.tabbar.pulse"];
+    [s.halo removeAnimationForKey:CSOutwardAnimationKey];
+    [s.surface.layer removeAnimationForKey:CSClassicAnimationKey];
     s.surface.layer.shadowOpacity=0; s.surface.layer.shadowPath=NULL;
     s.surface.layer.shadowColor=NULL; s.surface.layer.shadowRadius=0;
-    NSInteger animation=(p.borderColor && line>0 && !UIAccessibilityIsReduceMotionEnabled()) ? p.animation : 0;
+    NSInteger animation=CSDesiredAnimation();
     BOOL classic=animation==CSTabBarBorderAnimationClassicBreathing || animation==CSTabBarBorderAnimationClassicHeartbeat;
     s.haloContainer.hidden=animation==0 || classic;
     s.halo.opacity=0; // No residual glow when stopped or between pulses.
@@ -252,7 +258,7 @@ static void CSRenderBorderAnimation(CSTabBarState *s, CGFloat radius, CGFloat li
         CAKeyframeAnimation *pulse=[CAKeyframeAnimation animationWithKeyPath:@"shadowOpacity"];
         pulse.values=breathing ? @[@.15,@.8,@.15] : @[@.15,@.8,@.2,@.55,@.15];
         pulse.duration=breathing ? 3 : 1.2; pulse.repeatCount=HUGE_VALF;
-        [s.surface.layer addAnimation:pulse forKey:@"cs.tabbar.pulse"];
+        [s.surface.layer addAnimation:pulse forKey:CSClassicAnimationKey];
         return;
     }
     // An inverse rounded-rectangle mask excludes the bar interior from outward glow.
@@ -290,7 +296,20 @@ static void CSRenderBorderAnimation(CSTabBarState *s, CGFloat radius, CGFloat li
     shape.duration=fade.duration=blur.duration=duration;
     CAAnimationGroup *pulse=[CAAnimationGroup animation];
     pulse.animations=@[shape,fade,blur]; pulse.duration=duration; pulse.repeatCount=HUGE_VALF;
-    [s.halo addAnimation:pulse forKey:@"cs.tabbar.outwardPulse"];
+    [s.halo addAnimation:pulse forKey:CSOutwardAnimationKey];
+}
+// Appearance caching cannot prove that CA animations survived suspension/detachment.
+// Inspect the layer itself and leave an existing animation's phase untouched.
+static void CSEnsureBorderAnimation(CSTabBarState *s) {
+    NSInteger animation=CSDesiredAnimation();
+    if (animation==CSTabBarBorderAnimationNone) {
+        if (![s.halo animationForKey:CSOutwardAnimationKey] && ![s.surface.layer animationForKey:CSClassicAnimationKey]) return;
+    } else {
+        BOOL classic=animation==CSTabBarBorderAnimationClassicBreathing || animation==CSTabBarBorderAnimationClassicHeartbeat;
+        if ([(classic ? s.surface.layer : s.halo) animationForKey:(classic ? CSClassicAnimationKey : CSOutwardAnimationKey)]) return;
+    }
+    CSTabBarPreferences *p=CSTabBarPreferences.current;
+    CSRenderBorderAnimation(s,s.surface.layer.cornerRadius,p.borderColor ? p.borderWidth : 0);
 }
 static void CSRenderSurface(CSTabBarState *s, UIView *container) {
     MMTabBar *bar=s.bar; CSTabBarPreferences *p=CSTabBarPreferences.current;
@@ -304,7 +323,10 @@ static void CSRenderSurface(CSTabBarState *s, UIView *container) {
     if (s.surface.superview!=container) [container insertSubview:s.surface atIndex:0];
     s.surface.hidden=NO;
     CSSetFrame(s.surface,s.floatingRect); CSSetFrame(s.material,s.surface.bounds);
-    if (s.renderedPreferences==p && CGSizeEqualToSize(s.renderedSize,s.surface.bounds.size) && s.renderedStyle==bar.traitCollection.userInterfaceStyle && s.renderedNativeBackground==s.nativeBackground) return;
+    if (s.renderedPreferences==p && CGSizeEqualToSize(s.renderedSize,s.surface.bounds.size) && s.renderedStyle==bar.traitCollection.userInterfaceStyle && s.renderedNativeBackground==s.nativeBackground) {
+        CSEnsureBorderAnimation(s);
+        return;
+    }
     s.renderedPreferences=p; s.renderedNativeBackground=s.nativeBackground; s.renderedSize=s.surface.bounds.size; s.renderedStyle=bar.traitCollection.userInterfaceStyle;
     CGFloat radius=p.borderStyle==0 ? CGRectGetHeight(s.floatingRect)/2 : MIN(p.cornerRadius,CGRectGetHeight(s.floatingRect)/2);
     s.material.layer.cornerRadius=radius; s.material.clipsToBounds=YES;
@@ -430,7 +452,6 @@ void CSTabBarEndLayout(MMTabBar *bar) {
     if (s.depth) s.depth--;
     if (!s.depth) CSTabBarUpdate(bar);
 }
-void CSTabBarVisibilityChanged(MMTabBar *bar) { CSTabBarUpdate(bar); }
 void CSTabBarBeginItemUpdate(MMTabBarItemView *item) {
     CSTabBarItemState *s=objc_getAssociatedObject(item,&CSItemStateKey);
     if (!s) return; // Ordinary native item updates do no work until this instance is styled.
@@ -491,9 +512,25 @@ static void CSRefreshPreferences(void) {
 static void CSDarwinPreferencesChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef info) {
     CSRefreshPreferences();
 }
-void CSTabBarInstallPreferencesObserver(void) {
-    [CSTabBarPreferences reload];
-    [[NSNotificationCenter defaultCenter] addObserverForName:CSTabBarPreferencesDidChange object:nil queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification *note) { CSRefreshPreferences(); }];
-    [[NSNotificationCenter defaultCenter] addObserverForName:UIAccessibilityReduceMotionStatusDidChangeNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification *note) { CSRefreshPreferences(); }];
-    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),NULL,CSDarwinPreferencesChanged,CFSTR("com.wechat.enhance.tabbar_style.changed"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
+static void CSResumeVisibleAnimations(void) {
+    [CATransaction begin]; [CATransaction setDisableActions:YES];
+    for (MMTabBar *bar in CSBars.allObjects) {
+        CSTabBarState *s=CSState(bar,NO);
+        if (s.applied && s.geometryApplied && bar.window && !bar.hidden && bar.alpha>=.01) CSEnsureBorderAnimation(s);
+    }
+    [CATransaction commit];
+}
+void CSTabBarInstallObservers(void) {
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        [CSTabBarPreferences reload];
+        NSNotificationCenter *center=NSNotificationCenter.defaultCenter;
+        for (NSString *name in @[CSTabBarPreferencesDidChange,UIAccessibilityReduceMotionStatusDidChangeNotification]) {
+            [center addObserverForName:name object:nil queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification *note) { CSRefreshPreferences(); }];
+        }
+        for (NSString *name in @[UIApplicationDidBecomeActiveNotification,UISceneDidActivateNotification]) {
+            [center addObserverForName:name object:nil queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification *note) { CSResumeVisibleAnimations(); }];
+        }
+        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),NULL,CSDarwinPreferencesChanged,CFSTR("com.wechat.enhance.tabbar_style.changed"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
+    });
 }

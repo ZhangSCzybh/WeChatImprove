@@ -15,12 +15,12 @@
 - (void)setHidden:(BOOL)hidden {
     CSTabBarUpdate(self);
     %orig(hidden);
-    CSTabBarVisibilityChanged(self);
+    CSTabBarUpdate(self);
 }
 - (void)setAlpha:(CGFloat)alpha {
     CSTabBarUpdate(self);
     %orig(alpha);
-    CSTabBarVisibilityChanged(self);
+    CSTabBarUpdate(self);
 }
 - (UIView *)snapshotViewAfterScreenUpdates:(BOOL)afterUpdates {
     CSTabBarUpdate(self);
@@ -29,7 +29,7 @@
 }
 - (void)didMoveToWindow {
     %orig;
-    CSTabBarVisibilityChanged(self);
+    CSTabBarUpdate(self);
 }
 - (void)traitCollectionDidChange:(UITraitCollection *)previous {
     %orig(previous);
@@ -83,4 +83,4 @@
 }
 %end
 
-%ctor { CSTabBarInstallPreferencesObserver(); }
+%ctor { CSTabBarInstallObservers(); }

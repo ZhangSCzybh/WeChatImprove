@@ -22,7 +22,7 @@ static NSString * const kTabBarIconSelectedContactsKey = @"com.wechat.enhance.ta
 static NSString * const kTabBarIconSelectedDiscoverKey = @"com.wechat.enhance.tabbar_style.icon.selected.discover";
 static NSString * const kTabBarIconSelectedMeKey = @"com.wechat.enhance.tabbar_style.icon.selected.me";
 
-// 新增样式设置键
+// 样式设置键
 static NSString * const kTabBarCornerRadiusKey = @"com.wechat.enhance.tabbar_style.corner_radius";
 static NSString * const kTabBarPositionOffsetKey = @"com.wechat.enhance.tabbar_style.position_offset";
 static NSString * const kTabBarScaleKey = @"com.wechat.enhance.tabbar_style.scale";
@@ -50,8 +50,6 @@ static const CGFloat kDefaultCornerRadius = 20.0;
 static const CGFloat kDefaultPositionOffset = 0.0;
 static const CGFloat kDefaultScale = 0.9;
 static const NSInteger kDefaultBorderStyle = 1; // 默认圆角
-static const NSInteger kDefaultHapticFeedback = 0; // 默认无
-static const NSInteger kDefaultBorderAnimation = 0; // 默认无动画
 
 
 static NSString * const kTabBarContentHeightKey = @"com.wechat.enhance.tabbar_style.content_height";

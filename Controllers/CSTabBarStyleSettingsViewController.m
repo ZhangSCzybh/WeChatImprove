@@ -1,7 +1,6 @@
 #import "CSTabBarStyleSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
 #import <Photos/Photos.h>
-#import <MobileCoreServices/MobileCoreServices.h>
 #import <AVFoundation/AVFoundation.h>
 
 #import "CSTabBarPreferences.h"
@@ -25,7 +24,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, strong) CSSettingItem *discoverIconItem;
 @property (nonatomic, strong) CSSettingItem *meIconItem;
 
-// 新增样式设置项
+// 样式设置项
 @property (nonatomic, strong) CSSettingItem *borderStyleItem;
 @property (nonatomic, strong) CSSettingItem *cornerRadiusItem;
 @property (nonatomic, strong) CSSettingItem *bgColorItem;
@@ -49,7 +48,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, assign) NSInteger hapticFeedback;
 @property (nonatomic, assign) NSInteger borderAnimation;
 
-// 新增样式属性
+// 样式属性
 @property (nonatomic, assign) CGFloat cornerRadius;
 @property (nonatomic, strong) UIColor *bgColor;
 @property (nonatomic, strong) UIColor *borderColor;
@@ -453,7 +452,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
                 weakSelf.scale = [scaleValues[i] floatValue];
                 weakSelf.scaleItem.detail = scaleOptions[i];
                 [weakSelf saveSettings];
-                [weakSelf.tableView reloadData]; // 添加这行来刷新表格
+                [weakSelf.tableView reloadData];
             }];
             [alert addAction:action];
         }
@@ -757,13 +756,8 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager fileExistsAtPath:enhanceFolderPath]) {
-        NSError *error = nil;
-        [fileManager createDirectoryAtPath:enhanceFolderPath 
-               withIntermediateDirectories:YES 
-                                attributes:nil 
-                                     error:&error];
-        if (error) {
-            NSLog(@"创建WeChatImprove目录失败: %@", error.localizedDescription);
+        if (![fileManager createDirectoryAtPath:enhanceFolderPath
+                    withIntermediateDirectories:YES attributes:nil error:nil]) {
             return nil;
         }
     }
@@ -925,7 +919,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [defaults removeObjectForKey:kTabBarIconSelectedDiscoverKey];
         [defaults removeObjectForKey:kTabBarIconSelectedMeKey];
         
-        // 重置新的样式设置
+        // 重置样式设置
         [defaults setFloat:kDefaultCornerRadius forKey:kTabBarCornerRadiusKey];
         [defaults setFloat:kDefaultPositionOffset forKey:kTabBarPositionOffsetKey];
         [defaults setFloat:kDefaultScale forKey:kTabBarScaleKey];
@@ -944,18 +938,6 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [defaults removeObjectForKey:kTabBarTextMeKey];
         
         [defaults synchronize];
-        
-        self.tabBarStyleEnabled = NO;
-        self.hideText = NO;
-        self.cornerRadius = kDefaultCornerRadius;
-        self.positionOffset = kDefaultPositionOffset;
-        self.scale = kDefaultScale;
-        self.borderStyle = kDefaultBorderStyle;
-        self.bgColor = [UIColor clearColor];
-        self.chatText = nil;
-        self.contactsText = nil;
-        self.discoverText = nil;
-        self.meText = nil;
         
         [self loadCurrentSettings];
         [self setupData];

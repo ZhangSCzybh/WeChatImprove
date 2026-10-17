@@ -1,6 +1,9 @@
 #import <UIKit/UIKit.h>
 NSString *const UIAccessibilityReduceMotionStatusDidChangeNotification=@"reduceMotion";
-BOOL UIAccessibilityIsReduceMotionEnabled(void) { return NO; }
+NSString *const UIApplicationDidBecomeActiveNotification=@"applicationActive";
+NSString *const UISceneDidActivateNotification=@"sceneActive";
+BOOL CSTestReduceMotionEnabled=NO;
+BOOL UIAccessibilityIsReduceMotionEnabled(void) { return CSTestReduceMotionEnabled; }
 @implementation UITraitCollection @end
 @implementation UIColor { CGColorRef _color; }
 + (instancetype)clearColor { static UIColor *c; if (!c) c=[self colorWithRed:0 green:0 blue:0 alpha:0]; return c; }

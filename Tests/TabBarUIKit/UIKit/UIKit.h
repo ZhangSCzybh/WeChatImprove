@@ -11,6 +11,9 @@ typedef NS_ENUM(NSInteger, UIImpactFeedbackStyle) { UIImpactFeedbackStyleLight,U
 typedef NS_OPTIONS(NSUInteger, UIControlEvents) { UIControlEventTouchDown=1,UIControlEventTouchUpInside=2 };
 typedef NS_ENUM(NSInteger, UIBlurEffectStyle) { UIBlurEffectStyleSystemMaterial };
 extern NSString *const UIAccessibilityReduceMotionStatusDidChangeNotification;
+extern NSString *const UIApplicationDidBecomeActiveNotification;
+extern NSString *const UISceneDidActivateNotification;
+extern BOOL CSTestReduceMotionEnabled;
 BOOL UIAccessibilityIsReduceMotionEnabled(void);
 @class UIWindow, UIColor, UIViewController;
 @interface UITraitCollection : NSObject

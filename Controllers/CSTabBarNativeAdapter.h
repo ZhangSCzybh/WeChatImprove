@@ -32,13 +32,12 @@ extern "C" {
 void CSTabBarBeginLayout(MMTabBar *bar);
 void CSTabBarEndLayout(MMTabBar *bar);
 void CSTabBarUpdate(MMTabBar *bar);
-void CSTabBarVisibilityChanged(MMTabBar *bar);
 UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot);
 void CSTabBarBeginItemUpdate(MMTabBarItemView *item);
 void CSTabBarEndItemUpdate(MMTabBarItemView *item);
 BOOL CSTabBarContainsPoint(MMTabBar *bar, CGPoint point, BOOL *handled);
 UIView *CSTabBarHitTest(MMTabBar *bar, CGPoint point, UIEvent *event, BOOL *handled);
-void CSTabBarInstallPreferencesObserver(void);
+void CSTabBarInstallObservers(void);
 
 #ifdef __cplusplus
 }

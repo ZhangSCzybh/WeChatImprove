@@ -6,14 +6,15 @@
 // Headless macOS discards CA animations at transaction commit. Record the submitted
 // copies while forwarding to QuartzCore; geometry and masks still use real CG/CA objects.
 static char SubmittedAnimationsKey;
-static IMP originalAddAnimation, originalRemoveAnimation;
+static IMP originalAddAnimation, originalRemoveAnimation, originalLookupAnimation, originalRemoveAllAnimations;
+static NSUInteger submittedAnimationCount;
 static void RecordAnimation(CALayer *layer,SEL selector,CAAnimation *animation,NSString *key) {
     NSMutableDictionary *submitted=objc_getAssociatedObject(layer,&SubmittedAnimationsKey);
     if (!submitted) {
         submitted=[NSMutableDictionary dictionary];
         objc_setAssociatedObject(layer,&SubmittedAnimationsKey,submitted,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
-    if (key) submitted[key]=[animation copy];
+    if (key) { submitted[key]=[animation copy]; if ([key hasPrefix:@"cs.tabbar."]) submittedAnimationCount++; }
     ((void(*)(id,SEL,id,id))originalAddAnimation)(layer,selector,animation,key);
 }
 static void RecordRemoval(CALayer *layer,SEL selector,NSString *key) {
@@ -22,6 +23,14 @@ static void RecordRemoval(CALayer *layer,SEL selector,NSString *key) {
 }
 static CAAnimation *SubmittedAnimation(CALayer *layer,NSString *key) {
     return [objc_getAssociatedObject(layer,&SubmittedAnimationsKey) objectForKey:key];
+}
+static CAAnimation *LookupAnimation(CALayer *layer,SEL selector,NSString *key) {
+    if ([key hasPrefix:@"cs.tabbar."]) return SubmittedAnimation(layer,key);
+    return ((id(*)(id,SEL,id))originalLookupAnimation)(layer,selector,key);
+}
+static void RemoveAllAnimations(CALayer *layer,SEL selector) {
+    [objc_getAssociatedObject(layer,&SubmittedAnimationsKey) removeAllObjects];
+    ((void(*)(id,SEL))originalRemoveAllAnimations)(layer,selector);
 }
 static NSUserDefaults *isolated;
 static NSUserDefaults *TestDefaults(id self,SEL selector) { return isolated; }
@@ -55,7 +64,13 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
     Method remove=class_getInstanceMethod(CALayer.class,@selector(removeAnimationForKey:));
     originalAddAnimation=method_setImplementation(add,(IMP)RecordAnimation);
     originalRemoveAnimation=method_setImplementation(remove,(IMP)RecordRemoval);
+    Method lookup=class_getInstanceMethod(CALayer.class,@selector(animationForKey:));
+    Method removeAll=class_getInstanceMethod(CALayer.class,@selector(removeAllAnimations));
+    originalLookupAnimation=method_setImplementation(lookup,(IMP)LookupAnimation);
+    originalRemoveAllAnimations=method_setImplementation(removeAll,(IMP)RemoveAllAnimations);
     @try {
+        CSTabBarInstallObservers();
+        CSTabBarInstallObservers(); // Registration is idempotent.
         [CSTabBarPreferences reload];
         assert(!CSTabBarPreferences.current.enabled && equal(CSTabBarPreferences.current.contentHeight,52));
         assert(CSTabBarPreferences.current.backgroundColor==nil && CSTabBarPreferences.current.borderColor==nil);
@@ -127,7 +142,7 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         assert(equal(badge.frame.size.width,30) && first.badgeView==badge);
         // A host change to bottom inset is retained when ownership is released.
         UIEdgeInsets external=table.contentInset;external.bottom=41;table.contentInset=external;
-        bar.hidden=YES;CSTabBarVisibilityChanged(bar);
+        bar.hidden=YES;CSTabBarUpdate(bar);
         assert(equal(table.contentInset.bottom,41) && equal(table.verticalScrollIndicatorInsets.bottom,5));
         assert(CGRectEqualToRect(first.frame,floating) && first.textLabel.hidden && first.imageView.image==loaded);
         assert(bar.hidden && !bar.clipsToBounds && bar.backgroundView.hidden);
@@ -154,21 +169,21 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         assert(first.badgeView==badge && bar.hidden && bar.backgroundView.hidden);
         UIView *unknown=[UIView new];assert(CSTabBarStyleSnapshot(bar,unknown)==unknown);
         // Alpha-based fades, detachment and cancelled returns retain the same styled geometry.
-        bar.hidden=NO;bar.alpha=0;CSTabBarVisibilityChanged(bar);
+        bar.hidden=NO;bar.alpha=0;CSTabBarUpdate(bar);
         assert(bar.backgroundView.hidden && first.textLabel.hidden && bar.alpha==0);
         assert(!CSTabBarContainsPoint(bar,center,&handled));
-        [bar removeFromSuperview];CSTabBarVisibilityChanged(bar);
+        [bar removeFromSuperview];CSTabBarUpdate(bar);
         assert(bar.backgroundView.hidden && CGRectEqualToRect(first.frame,floating));
-        [root addSubview:bar];bar.alpha=1;CSTabBarVisibilityChanged(bar);
+        [root addSubview:bar];bar.alpha=1;CSTabBarUpdate(bar);
         assert(bar.backgroundView.hidden && CGRectEqualToRect(first.frame,floating));
-        bar.hidden=YES;CSTabBarVisibilityChanged(bar);
+        bar.hidden=YES;CSTabBarUpdate(bar);
         [isolated setBool:NO forKey:kTabBarStyleEnabledKey];[CSTabBarPreferences reload];CSTabBarUpdate(bar);
         assert(CGRectEqualToRect(first.frame,originalItem) && CGRectEqualToRect(first.imageView.frame,originalImage));
         assert(!first.textLabel.hidden && [first.textLabel.text isEqual:@"Native"] && first.imageView.image==nativeImage);
         assert(bar.hidden && bar.clipsToBounds && !bar.backgroundView.hidden && bar.backgroundColor==nativeColor);
         assert([buttons[0] actions].count==1);
         assert(CSTabBarStyleSnapshot(bar,raw)==raw);
-        bar.hidden=NO;CSTabBarVisibilityChanged(bar);
+        bar.hidden=NO;CSTabBarUpdate(bar);
         [isolated setBool:NO forKey:kTabBarStyleEnabledKey];[CSTabBarPreferences reload];CSTabBarUpdate(bar);
         assert(!bar.hidden && !first.textLabel.hidden && first.imageView.image==nativeImage);
         assert(CGRectEqualToRect(first.frame,originalItem) && equal(table.contentInset.bottom,41));
@@ -234,6 +249,54 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         for (CALayer *layer in [bar.subviews[0] layer].sublayers) if (layer.mask) {
             assert(layer.hidden && !SubmittedAnimation(layer.sublayers[0],@"cs.tabbar.outwardPulse"));
         }
+        // Simulate iOS discarding animations while the app is away, without changing
+        // preferences or bounds. Activation must recover all four modes without a layout.
+        for (NSNumber *mode in @[@1,@2,@3,@4]) {
+            [isolated setInteger:mode.integerValue forKey:kTabBarBorderAnimationKey];
+            [CSTabBarPreferences reload];CSTabBarUpdate(bar);
+            UIView *surface=bar.subviews[0];
+            CALayer *ring=nil;
+            for (CALayer *layer in surface.layer.sublayers) if (layer.mask) ring=layer.sublayers[0];
+            CALayer *animated=mode.integerValue>=3 ? surface.layer : ring;
+            NSString *key=mode.integerValue>=3 ? @"cs.tabbar.pulse" : @"cs.tabbar.outwardPulse";
+            assert(SubmittedAnimation(animated,key));
+            CGRect itemBefore=first.frame; UIView *badgeBefore=first.badgeView;
+            for (NSString *notification in @[UIApplicationDidBecomeActiveNotification,UISceneDidActivateNotification]) {
+                [animated removeAllAnimations]; assert(!SubmittedAnimation(animated,key));
+                [NSNotificationCenter.defaultCenter postNotificationName:notification object:nil];
+                CAAnimation *resumed=SubmittedAnimation(animated,key);assert(resumed);
+                NSUInteger submissions=submittedAnimationCount;
+                [NSNotificationCenter.defaultCenter postNotificationName:notification object:nil];
+                for (int n=0;n<20;n++) CSTabBarUpdate(bar);
+                assert(SubmittedAnimation(animated,key)==resumed && submittedAnimationCount==submissions);
+                assert(CGRectEqualToRect(first.frame,itemBefore) && first.badgeView==badgeBefore);
+            }
+            // Ordinary cached layout is a fallback if removal happens after activation.
+            [animated removeAllAnimations];CSTabBarUpdate(bar);assert(SubmittedAnimation(animated,key));
+            // A return into a chat must not unhide/rebuild the root bar; showing it later repairs it.
+            bar.hidden=YES;[animated removeAllAnimations];
+            [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
+            assert(bar.hidden && !SubmittedAnimation(animated,key));
+            bar.hidden=NO;CSTabBarUpdate(bar);assert(SubmittedAnimation(animated,key));
+            CSTestReduceMotionEnabled=YES;
+            [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
+            assert(!SubmittedAnimation(animated,key));
+            CSTestReduceMotionEnabled=NO;
+            [NSNotificationCenter.defaultCenter postNotificationName:UISceneDidActivateNotification object:nil];
+            assert(SubmittedAnimation(animated,key));
+            [isolated setDouble:0 forKey:kTabBarBorderWidthKey];[CSTabBarPreferences reload];CSTabBarUpdate(bar);
+            [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
+            assert(!SubmittedAnimation(animated,key));
+            [isolated removeObjectForKey:kTabBarBorderWidthKey];
+        }
+        [isolated setInteger:0 forKey:kTabBarBorderAnimationKey];[CSTabBarPreferences reload];CSTabBarUpdate(bar);
+        NSUInteger noAnimationCount=submittedAnimationCount;
+        [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
+        assert(submittedAnimationCount==noAnimationCount);
+        [isolated setBool:NO forKey:kTabBarStyleEnabledKey];[CSTabBarPreferences reload];CSTabBarUpdate(bar);
+        [NSNotificationCenter.defaultCenter postNotificationName:UISceneDidActivateNotification object:nil];
+        assert(!bar.backgroundView.hidden && submittedAnimationCount==noAnimationCount);
+        [isolated setBool:YES forKey:kTabBarStyleEnabledKey];[CSTabBarPreferences reload];CSTabBarUpdate(bar);
         // Moving the entire native bar outside a clipping parent during a transition must not flash native UI.
         root.clipsToBounds=YES;bar.frame=CGRectMake(0,850,390,83);CSTabBarUpdate(bar);
         assert(bar.backgroundView.hidden && first.textLabel.hidden==NO);
@@ -251,5 +314,6 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
     } @finally {
         [isolated removePersistentDomainForName:suite];method_setImplementation(m,original);
         method_setImplementation(add,originalAddAnimation);method_setImplementation(remove,originalRemoveAnimation);
+        method_setImplementation(lookup,originalLookupAnimation);method_setImplementation(removeAll,originalRemoveAllAnimations);
     }
 }return 0;}
