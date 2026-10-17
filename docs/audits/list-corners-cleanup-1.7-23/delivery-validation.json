@@ -1,0 +1,17 @@
+{
+  "version": "1.7-23",
+  "source_commit": "c939411de9f7b3dc999abe648e22f654d375a0f8",
+  "package": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/com.wechat.improve_1.7-23_iphoneos-arm64.deb",
+  "sha256": "e90fc0855e39cc4392507a6dad7d3d9a9e570474326a61dcf53bce6d1c905fe7",
+  "bytes": 749812,
+  "payload_matches_fresh_build": true,
+  "protected_sources_count": 174,
+  "protected_sources_unchanged": true,
+  "adapters_renderer_and_tests_unchanged": true,
+  "old_packages_count": 12,
+  "old_packages_unchanged": true,
+  "source_hashes_still_match": true,
+  "tests_and_audit_not_in_package": true,
+  "device_installed": false,
+  "device_verified": false
+}
