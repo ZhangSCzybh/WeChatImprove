@@ -76,13 +76,23 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 %end
 
 %hook ContactsViewController
+- (void)initCountLabel:(id)arg1 {
+    %orig;
+    if (CSListCornerOwnsTable(self,(UITableView *)arg1,CSListCornerPageContacts)) CSListCornerContactsDecorateCountFooter(self);
+}
+- (void)viewDidLayoutSubviews {
+    %orig;
+    CSListCornerContactsDecorateCountFooter(self);
+}
 - (void)viewDidLoad {
     %orig;
     CSListCornerPrepareTable(self,CSListCornerPageContacts,YES);
+    CSListCornerContactsDecorateCountFooter(self);
 }
 - (void)viewWillAppear:(BOOL)animated {
     %orig;
     CSListCornerPrepareTable(self,CSListCornerPageContacts,NO);
+    CSListCornerContactsDecorateCountFooter(self);
 }
 - (CGFloat)tableView:(id)arg1 heightForHeaderInSection:(NSInteger)arg2 {
     CGFloat originalHeight=%orig;

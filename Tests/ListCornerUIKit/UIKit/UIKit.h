@@ -51,7 +51,7 @@ typedef NS_ENUM(NSInteger, UITableViewCellSeparatorStyle) { UITableViewCellSepar
 @property(nonatomic,strong) NSIndexPath *path;
 @end
 @interface UITableView : UIView
-@property(nonatomic,strong) UIView *backgroundView,*tableHeaderView;
+@property(nonatomic,strong) UIView *backgroundView,*tableHeaderView,*tableFooterView;
 @property(nonatomic,strong) UIColor *sectionIndexBackgroundColor,*sectionIndexTrackingBackgroundColor;
 @property(nonatomic) BOOL showsVerticalScrollIndicator;
 @property(nonatomic) BOOL footerLineVisible;
@@ -80,7 +80,9 @@ typedef NS_ENUM(NSInteger, UITableViewCellSeparatorStyle) { UITableViewCellSepar
 @interface UITableViewHeaderFooterView : UIView
 @property(nonatomic,strong) UIView *contentView,*backgroundView;
 @end
-@interface UILabel : UIView @end
+@interface UILabel : UIView
+@property(nonatomic,copy) NSString *text;
+@end
 @interface UIBezierPath : NSObject
 @property(nonatomic,readonly) CGPathRef CGPath;
 + (instancetype)bezierPathWithRoundedRect:(CGRect)rect cornerRadius:(CGFloat)radius;

@@ -1,4 +1,19 @@
 #import "CSListCornerContactsAdapter.h"
+void CSListCornerContactsDecorateCountFooter(id owner) {
+    if (![[CSListCornerConfiguration sharedConfiguration] snapshot].enabled) return;
+    UITableView *table=CSListCornerOwnedTable(owner,CSListCornerPageContacts);
+    UIView *footer=table.tableFooterView;
+    if (!footer) return;
+    UIView *label=CSListCornerViewIvar(owner,"m_countLabel",footer);
+    // Native initCountLabel: installs this label inside a dedicated table footer.
+    // A different footer or a stale label must not become a guessed paint target.
+    if (![label isKindOfClass:UILabel.class] || !CSListCornerBeginOperation(footer)) return;
+    @try {
+        UIColor *canvas=CSListCornerCanvasColor();
+        if (![footer.backgroundColor isEqual:canvas]) footer.backgroundColor=canvas;
+        if (![label.backgroundColor isEqual:UIColor.clearColor]) label.backgroundColor=UIColor.clearColor;
+    } @finally { CSListCornerEndOperation(footer); }
+}
 static void CSListCornerContactsSectionSurface(UIView *surface, UIView *selection, NSUInteger depth) {
     for (UIView *child in surface.subviews) {
         if (child==selection) continue;

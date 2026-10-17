@@ -27,7 +27,8 @@
 @interface name : UIViewController { @public UITableView *ivarName; } @end \
 @implementation name @end
 OWNER_CLASS(NewMainFrameViewController,m_tableView)
-OWNER_CLASS(ContactsViewController,m_tableView)
+@interface ContactsViewController : UIViewController { @public UITableView *m_tableView; UILabel *m_countLabel; } @end
+@implementation ContactsViewController @end
 OWNER_CLASS(FindFriendEntryViewController,m_tableView)
 OWNER_CLASS(MoreViewController,_frontTableView)
 #define VIEW_CLASS(name,base) @interface name : base @end @implementation name @end
@@ -354,6 +355,41 @@ static void ReviewCompatibilityTests(void) {
     Check([contacts.backgroundColor isEqual:UIColor.whiteColor] && contacts.showsVerticalScrollIndicator,@"disabled preparation exception is restricted to session appearance");
     Configure();
 }
+static void ContactsCountFooterTests(void) {
+    Configure();UITableView *table=Table();ContactsViewController *owner=Owner(CSListCornerPageContacts,table);
+    UIView *footer=View(UIView.class,CGRectMake(0,900,390,50));footer.backgroundColor=UIColor.whiteColor;
+    UILabel *label=(id)View(UILabel.class,CGRectMake(0,15,390,20));label.text=@"2 个朋友";label.backgroundColor=UIColor.whiteColor;
+    __block NSUInteger originals=0;
+    table.throwsOnQuery=YES;
+    // Run the extracted creation hook: decoration must follow native installation.
+    HookContactsInitCount(owner,table,^{ originals++;table.tableFooterView=footer;[footer addSubview:label];owner->m_countLabel=label; });
+    Check(originals==1 && [footer.backgroundColor isEqual:CSListCornerCanvasColor()] && label.backgroundColor.alpha==0,@"count footer creation preserves original callback and replaces the native white paint");
+    Check(table.tableFooterView==footer && CGRectEqualToRect(footer.frame,CGRectMake(0,900,390,50)) && CGRectEqualToRect(label.frame,CGRectMake(0,15,390,20)) && [label.text isEqual:@"2 个朋友"],@"count footer identity, height, label geometry and displayed count remain native");
+    UIView *sibling=View(UIView.class,CGRectMake(0,0,20,20));sibling.backgroundColor=UIColor.whiteColor;[footer addSubview:sibling];
+    HookContactsCountLayout(owner,^{ originals++;footer.backgroundColor=UIColor.whiteColor;label.text=@"3 个朋友"; });
+    Check(originals==2 && [footer.backgroundColor isEqual:CSListCornerCanvasColor()] && [label.text isEqual:@"3 个朋友"] && [sibling.backgroundColor isEqual:UIColor.whiteColor],@"native refresh/layout repaints footer without touching count or unrelated subviews");
+    for(NSUInteger n=0;n<20;n++)HookContactsCountLayout(owner,^{ originals++; });
+    Check(table.queries==0 && table.reloads==0 && footer.layoutInvalidations==0,@"footer repair performs no row query, reload or layout request");
+    footer.hidden=YES;label.alpha=.4;CSListCornerContactsDecorateCountFooter(owner);
+    Check(footer.hidden && Near(label.alpha,.4) && footer.userInteractionEnabled,@"count footer visibility, alpha and hit testing remain native");
+    UIView *replacement=View(UIView.class,CGRectMake(0,900,450,70));replacement.backgroundColor=UIColor.whiteColor;table.tableFooterView=replacement;
+    HookContactsCountLayout(owner,^{ originals++; });
+    Check([replacement.backgroundColor isEqual:UIColor.whiteColor],@"replacement footer with stale count label is not modified");
+    UILabel *newLabel=(id)View(UILabel.class,CGRectMake(0,20,450,30));newLabel.text=@"0 个朋友";[replacement addSubview:newLabel];owner->m_countLabel=newLabel;
+    HookContactsCountLayout(owner,^{ originals++; });
+    Check([replacement.backgroundColor isEqual:CSListCornerCanvasColor()] && replacement.frame.size.height==70 && [newLabel.text isEqual:@"0 个朋友"],@"replacement count footer supports empty count and wider/taller native layout");
+    [FixtureConfiguration saveEnabled:NO];replacement.backgroundColor=UIColor.whiteColor;newLabel.backgroundColor=UIColor.whiteColor;
+    HookContactsCountLayout(owner,^{ originals++; });
+    Check([replacement.backgroundColor isEqual:UIColor.whiteColor] && [newLabel.backgroundColor isEqual:UIColor.whiteColor],@"disabled rounding leaves count footer paint untouched");
+    Configure();UITableView *other=Table();id otherOwner=Owner(CSListCornerPageDiscover,other);other.tableFooterView=replacement;
+    CSListCornerContactsDecorateCountFooter(otherOwner);
+    Check([replacement.backgroundColor isEqual:UIColor.whiteColor],@"other page footer is excluded");
+    HookContactsInitCount(owner,other,^{ originals++; });
+    Check([replacement.backgroundColor isEqual:UIColor.whiteColor],@"count creation hook excludes a non-owned table argument");
+    owner->m_countLabel=nil;CSListCornerContactsDecorateCountFooter(owner);
+    Check([replacement.backgroundColor isEqual:UIColor.whiteColor],@"missing private label safely preserves the native footer");
+    table.tableFooterView=nil;CSListCornerContactsDecorateCountFooter(owner);
+}
 static void ScreenshotRegressionTests(void) {
     Configure();
     UITableView *contacts=Table();id owner=Owner(CSListCornerPageContacts,contacts);
@@ -425,7 +461,7 @@ int main(int argc,const char **argv) { @autoreleasepool {
     NSDictionary *baseline=[NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:@(argv[1])] options:0 error:NULL];
     FixtureDefaults=[MemoryDefaults new];FixtureConfiguration=[[CSListCornerConfiguration alloc] initWithDefaults:FixtureDefaults];
     method_setImplementation(class_getClassMethod(CSListCornerConfiguration.class,@selector(sharedConfiguration)),(IMP)SharedConfiguration);
-    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();ScreenshotRegressionTests();
+    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();ScreenshotRegressionTests();ContactsCountFooterTests();
     fprintf(stdout,"List corners: %lu checks, %lu failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)\n",(unsigned long)checks,(unsigned long)failures);
     return failures?1:0;
 } }

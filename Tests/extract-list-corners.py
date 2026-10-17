@@ -26,6 +26,10 @@ for cls in ['MMTableViewCell','NewContactsItemCell','MMTableSectionHeaderView']:
     chunk=source[source.index('%hook '+cls+'\n'):];chunk=chunk[:chunk.index('%end')]
     code=body(chunk,chunk.index('- (void)layoutSubviews')).replace('%orig;','(void)self; /* original layout stub */')
     output.append(f'static void Hook{cls}Layout(id self) {{'+code+'}')
+chunk=source[source.index('%hook ContactsViewController\n'):];chunk=chunk[:chunk.index('%end')]
+for method,signature in [('- (void)initCountLabel:', 'HookContactsInitCount(id self,id arg1,void (^original)(void))'), ('- (void)viewDidLayoutSubviews', 'HookContactsCountLayout(id self,void (^original)(void))')]:
+    code=body(chunk,chunk.index(method));assert code.count('%orig')==1
+    output.append('static void '+signature+' {'+code.replace('%orig;', 'original();')+'}')
 group=(root/'Controllers/CSGroupListAdapter.m').read_text();start=group.index('BOOL CSGroupCardPosition(')
 output.append(group[start:group.index('{',start)+1]+body(group,start)+'}')
 settings=(root/'Controllers/CSListCornerRadiusSettingsViewController.m').read_text()
