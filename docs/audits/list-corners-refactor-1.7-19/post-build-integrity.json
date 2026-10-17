@@ -1,0 +1,18 @@
+{
+  "protected-feature-sources.json": {
+    "count": 174,
+    "all_equal": true
+  },
+  "existing-feature-regressions.json": {
+    "count": 48,
+    "all_equal": true
+  },
+  "existing_artifacts": {
+    "count": 782,
+    "all_equal": true
+  },
+  "build_sources": {
+    "count": 197,
+    "all_equal": true
+  }
+}

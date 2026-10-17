@@ -1,0 +1,289 @@
+{
+  "base": "2aa7bcb8",
+  "baseline": [
+    {
+      "class": "MainFrameItemView",
+      "signature": "- (void)setFrame:(CGRect)frame {"
+    },
+    {
+      "class": "NewContactsItemCell",
+      "signature": "- (void)layoutSubviews {"
+    },
+    {
+      "class": "ContactsViewController",
+      "signature": "- (void)viewDidLoad {"
+    },
+    {
+      "class": "ContactsViewController",
+      "signature": "- (void)viewWillAppear:(BOOL)animated {"
+    },
+    {
+      "class": "ContactsViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "ContactsViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "ContactsViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "ContactsViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "MMTableViewCell",
+      "signature": "- (void)layoutSubviews {"
+    },
+    {
+      "class": "FindFriendEntryViewController",
+      "signature": "- (void)viewDidLoad {"
+    },
+    {
+      "class": "FindFriendEntryViewController",
+      "signature": "- (void)viewWillAppear:(BOOL)animated {"
+    },
+    {
+      "class": "FindFriendEntryViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "FindFriendEntryViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "FindFriendEntryViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "FindFriendEntryViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "FakeMainFrameItemView",
+      "signature": "- (void)setFrame:(CGRect)frame {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (void)viewDidAppear:(BOOL)animated {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2 {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (void)tableView:(id)arg1 willDisplayCell:(id)arg2 forRowAtIndexPath:(id)arg3 {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "MMUIButton",
+      "signature": "- (void)setFrame:(CGRect)frame {"
+    },
+    {
+      "class": "MMUIButton",
+      "signature": "- (void)layoutSubviews {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (void)viewDidLoad {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (void)viewWillAppear:(BOOL)animated {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2 {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (void)tableView:(id)arg1 willDisplayCell:(id)arg2 forRowAtIndexPath:(id)arg3 {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "WCTableViewManager",
+      "signature": "- (void)tableView:(id)arg1 willDisplayCell:(id)arg2 forRowAtIndexPath:(id)arg3 {"
+    },
+    {
+      "class": "WCTableViewManager",
+      "signature": "- (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2 {"
+    }
+  ],
+  "current": [
+    {
+      "class": "MainFrameItemView",
+      "signature": "- (void)setFrame:(CGRect)frame {"
+    },
+    {
+      "class": "FakeMainFrameItemView",
+      "signature": "- (void)setFrame:(CGRect)frame {"
+    },
+    {
+      "class": "NewContactsItemCell",
+      "signature": "- (void)layoutSubviews {"
+    },
+    {
+      "class": "MMTableViewCell",
+      "signature": "- (void)layoutSubviews {"
+    },
+    {
+      "class": "MMUIButton",
+      "signature": "- (void)setFrame:(CGRect)frame {"
+    },
+    {
+      "class": "MMUIButton",
+      "signature": "- (void)layoutSubviews {"
+    },
+    {
+      "class": "ContactsViewController",
+      "signature": "- (void)viewDidLoad {"
+    },
+    {
+      "class": "ContactsViewController",
+      "signature": "- (void)viewWillAppear:(BOOL)animated {"
+    },
+    {
+      "class": "ContactsViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "ContactsViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "ContactsViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "ContactsViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "FindFriendEntryViewController",
+      "signature": "- (void)viewDidLoad {"
+    },
+    {
+      "class": "FindFriendEntryViewController",
+      "signature": "- (void)viewWillAppear:(BOOL)animated {"
+    },
+    {
+      "class": "FindFriendEntryViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "FindFriendEntryViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "FindFriendEntryViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "FindFriendEntryViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (void)viewDidAppear:(BOOL)animated {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2 {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (void)tableView:(id)arg1 willDisplayCell:(id)arg2 forRowAtIndexPath:(id)arg3 {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "NewMainFrameViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (void)viewDidLoad {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (void)viewWillAppear:(BOOL)animated {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2 {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (void)tableView:(id)arg1 willDisplayCell:(id)arg2 forRowAtIndexPath:(id)arg3 {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForHeaderInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (CGFloat)tableView:(id)arg1 heightForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "MoreViewController",
+      "signature": "- (UIView *)tableView:(id)arg1 viewForFooterInSection:(NSInteger)arg2 {"
+    },
+    {
+      "class": "WCTableViewManager",
+      "signature": "- (void)tableView:(id)arg1 willDisplayCell:(id)arg2 forRowAtIndexPath:(id)arg3 {"
+    },
+    {
+      "class": "WCTableViewManager",
+      "signature": "- (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2 {"
+    }
+  ],
+  "missing": [],
+  "added": []
+}
