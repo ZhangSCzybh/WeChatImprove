@@ -37,7 +37,7 @@ VIEW_CLASS(MFBannerBtn,UIView)
 VIEW_CLASS(MFWebMMBtn,UIView)
 VIEW_CLASS(ContactsItemView,UIView)
 VIEW_CLASS(MMUIView,UIView)
-VIEW_CLASS(MMBadgeView,UIView)
+VIEW_CLASS(MMBadgeView,UIImageView)
 VIEW_CLASS(RichTextView,UIView)
 VIEW_CLASS(MMHeadImageView,UIImageView)
 VIEW_CLASS(MMCPLabel,UILabel)
@@ -233,17 +233,64 @@ static void ContactsDiscoverMoreTests(void) {
     UITableView *discover=Table();id discoverOwner=Owner(CSListCornerPageDiscover,discover);UITableViewCell *d=Cell(discover,1,0);
     UILabel *label=(id)View(UILabel.class,CGRectMake(68,20,100,20));UIView *badge=View(MMBadgeView.class,CGRectMake(180,22,9,9));MMUIView *native=(id)View(MMUIView.class,d.bounds);native.backgroundColor=UIColor.whiteColor;d->m_subContentView=native;
     [d.contentView addSubview:native];[d.contentView addSubview:label];[d.contentView addSubview:badge];
-    HookMMTableViewCellLayout(d);Check(badge.frame.origin.x==179 && label.frame.origin.x==67 && native.backgroundColor.alpha==0,@"discover direct badge native spacing and owned opaque content role");
+    HookMMTableViewCellLayout(d);Check(badge.frame.origin.x==195 && label.frame.origin.x==83 && native.backgroundColor.alpha==0,@"discover direct badge native spacing and owned opaque content role");
     CGRect badgeFrame=badge.frame;for(NSUInteger n=0;n<20;n++)HookMMTableViewCellLayout(d);Check(CGRectEqualToRect(badge.frame,badgeFrame),@"discovery badge never drifts across repeated decoration");
-    d.contentView.frame=CGRectMake(0,0,450,60);CSListCornerDiscoverDecorate(d,discover,d.path,discoverOwner);Check(label.frame.size.width==344 && badge.frame.origin.x==179,@"discover width change resizes text without shifting badge repeatedly");
+    d.contentView.frame=CGRectMake(0,0,450,60);CSListCornerDiscoverDecorate(d,discover,d.path,discoverOwner);Check(label.frame.size.width==100 && badge.frame.origin.x==195,@"discover width change preserves native title size and attached badge spacing");
     UITableViewCell *nestedCell=Cell(discover,0,1);
     MMUIView *nested=(id)View(MMUIView.class,nestedCell.bounds);nestedCell->m_subContentView=nested;
     UIView *nestedIcon=View(UIImageView.class,CGRectMake(16,10,24,24)),*nestedTitle=View(UILabel.class,CGRectMake(52,10,150,20)),*rich=View(RichTextView.class,CGRectMake(300,10,40,20));
     for(UIView *v in @[nestedIcon,nestedTitle,rich])[nested addSubview:v];[nestedCell.contentView addSubview:nested];
     HookMMTableViewCellLayout(nestedCell);CGRect nestedFrame=nested.frame,richFrame=rich.frame;
     HookMMTableViewCellLayout(nestedCell);
-    Check(nested.frame.origin.x==15 && nested.frame.size.width==352 && nestedIcon.frame.origin.x==15 && nestedTitle.frame.origin.x==51 && rich.frame.origin.x==289,@"discover verified MMUIView retains distinct nested icon/title/rich-text formulas");
+    Check(nested.frame.origin.x==0 && nested.frame.size.width==390 && nestedIcon.frame.origin.x==31 && nestedTitle.frame.origin.x==67 && rich.frame.origin.x==277,@"discover wrapper keeps its coordinate system while content respects both card edges");
     Check(CGRectEqualToRect(nested.frame,nestedFrame) && CGRectEqualToRect(rich.frame,richFrame),@"nested discovery content remains idempotent");
+    // Screenshot regression: a left title plus long unread text, avatar and its dot.
+    UITableViewCell *unread=Cell(discover,0,1);
+    UIView *leftIcon=View(UIImageView.class,CGRectMake(16,18,24,24));
+    UILabel *leftTitle=(id)View(UILabel.class,CGRectMake(56,20,54,20));leftTitle.tag=1011;
+    UIView *hint=View(UIView.class,CGRectMake(130,14,220,32));hint.autoresizesSubviews=YES;
+    UIView *hintText=View(UILabel.class,CGRectMake(0,6,178,20));
+    UIView *avatarHint=View(UIImageView.class,CGRectMake(188,0,32,32));
+    UIView *avatarDot=View(MMBadgeView.class,CGRectMake(214,-3,8,8));avatarDot.tag=4011;
+    for(UIView *v in @[hintText,avatarHint,avatarDot])[hint addSubview:v];
+    UIView *arrow=View(UIImageView.class,CGRectMake(366,24,8,12));
+    for(UIView *v in @[hint,leftTitle,arrow,leftIcon])[unread.contentView addSubview:v];
+    HookMMTableViewCellLayout(unread);
+    Check(CGRectGetMinX(hint.frame)>=CGRectGetMaxX(leftTitle.frame)+8,@"long unread composite stays outside title even when its native origin is in left half");
+    Check(Near(hint.frame.origin.x+CGRectGetMaxX(avatarHint.frame),327) && Near(arrow.frame.origin.x,343),@"unread avatar and accessory preserve native right spacing with asymmetric insets");
+    Check(Near(avatarDot.frame.origin.x-avatarHint.frame.origin.x,26) && avatarDot.frame.origin.y==-3 && avatarDot.backgroundColor==nil,@"avatar dot preserves its native attachment, vertical position and paint");
+    Check(hintText.frame.size.width<178 && hintText.frame.origin.x==0 && leftTitle.frame.size.width==54,@"only colliding unread text yields space; title and images retain native size");
+    CGRect hf=hint.frame,tf=hintText.frame,af=avatarHint.frame,df=avatarDot.frame;
+    NSUInteger hintInvalidations=hint.layoutInvalidations;
+    for(NSUInteger n=0;n<20;n++)HookMMTableViewCellLayout(unread);
+    Check(CGRectEqualToRect(hint.frame,hf) && CGRectEqualToRect(hintText.frame,tf) && CGRectEqualToRect(avatarHint.frame,af) && CGRectEqualToRect(avatarDot.frame,df) && hint.layoutInvalidations==hintInvalidations && hint.autoresizesSubviews,@"composite unread layout is idempotent without repeated layout invalidation");
+    // Native relayout/reuse replaces a long hint with a shorter, wider-screen result.
+    unread.contentView.frame=CGRectMake(0,0,450,60);hint.frame=CGRectMake(260,14,150,32);
+    hintText.frame=CGRectMake(0,6,108,20);avatarHint.frame=CGRectMake(118,0,32,32);avatarDot.frame=CGRectMake(144,-3,8,8);arrow.frame=CGRectMake(426,24,8,12);
+    HookMMTableViewCellLayout(unread);
+    Check(hint.frame.origin.x==237 && hint.frame.size.width==150 && hintText.frame.size.width==108 && avatarHint.frame.origin.x==118 && arrow.frame.origin.x==403,@"native width and content updates replace the old unread baseline");
+    UITableViewCell *flat=Cell(discover,0,1);
+    UILabel *flatTitle=(id)View(UILabel.class,CGRectMake(56,20,54,20));flatTitle.tag=1012;
+    UIView *flatText=View(RichTextView.class,CGRectMake(130,20,160,20));
+    UIView *flatAvatar=View(UIImageView.class,CGRectMake(300,14,32,32));
+    UIView *flatDot=View(MMBadgeView.class,CGRectMake(328,11,8,8));flatDot.tag=4012;
+    for(UIView *v in @[flatText,flatAvatar,flatDot,flatTitle])[flat.contentView addSubview:v];
+    HookMMTableViewCellLayout(flat);
+    Check(CGRectGetMinX(flatText.frame)>=CGRectGetMaxX(flatTitle.frame)+8 && CGRectGetMaxX(flatText.frame)==267 && flatAvatar.frame.origin.x==277 && flatDot.frame.origin.x==305,@"flat rich unread text, avatar and image-subclass badge keep distinct roles");
+    UIView *leftOverhang=View(MMBadgeView.class,CGRectMake(-3,-2,8,8));[hint addSubview:leftOverhang];
+    HookMMTableViewCellLayout(unread);
+    Check(leftOverhang.frame.origin.x==-3 && leftOverhang.frame.origin.y==-2,@"noncolliding composite preserves native overhanging badge coordinates");
+    UITableViewCell *unknown=Cell(discover,0,1);
+    UIView *unknownContent=View(TextStateProfileCardContentView.class,CGRectMake(120,10,230,40));
+    UILabel *unknownTitle=(id)View(UILabel.class,CGRectMake(56,20,54,20));unknownTitle.tag=1010;
+    [unknown.contentView addSubview:unknownTitle];[unknown.contentView addSubview:unknownContent];
+    CGRect originalTitle=unknownTitle.frame,originalUnknown=unknownContent.frame;
+    HookMMTableViewCellLayout(unknown);
+    Check(CGRectEqualToRect(unknownTitle.frame,originalTitle) && CGRectEqualToRect(unknownContent.frame,originalUnknown) && Background(unknown),@"unknown overflowing custom composite keeps native geometry atomically while background remains rounded");
+    UITableViewCell *noTitle=Cell(discover,0,1);UIView *orphan=View(UIImageView.class,CGRectMake(250,10,32,32));[noTitle.contentView addSubview:orphan];
+    HookMMTableViewCellLayout(noTitle);Check(orphan.frame.origin.x==250,@"unrecognized discovery row has no guessed image role");
+    flatDot.hidden=YES;flatDot.alpha=.4;HookMMTableViewCellLayout(flat);
+    Check(flatDot.hidden && Near(flatDot.alpha,.4) && flatDot.frame.origin.y==11,@"native unread visibility and alpha remain authoritative");
     UITableView *more=Table();id moreOwner=Owner(CSListCornerPageMore,more);UITableViewCell *m=Cell(more,0,1);
     UIImageView *icon=(id)View(UIImageView.class,CGRectMake(16,10,24,24));UILabel *title=(id)View(UILabel.class,CGRectMake(52,10,150,20));[m.contentView addSubview:icon];[m.contentView addSubview:title];
     CSListCornerMoreDecorate(m,more,m.path,moreOwner);Check(icon.frame.origin.x==31 && title.frame.origin.x==67 && Background(m).frame.size.width==352,@"More keeps its direct icon/title formula");

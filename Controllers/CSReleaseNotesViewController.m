@@ -4,6 +4,12 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.7-21": @[
+            @{@"title": @"修复发现页未读提示错位",
+              @"detail": @"保留视频号、直播等入口的标题、未读文字、头像和红点布局，处理长提示与标题重叠。"},
+            @{@"title": @"包含通讯录与资料卡修复",
+              @"detail": @"保留星标朋友、字母导航背景、列表分割线及个人资料卡片圆角修复。"}
+        ],
         @"1.7-20": @[
             @{@"title": @"修复通讯录圆角显示",
               @"detail": @"统一星标朋友与字母分组标题的背景，清理卡片边缘和行间残留分割线。"},

@@ -24,7 +24,8 @@ typedef NS_ENUM(NSInteger, UITableViewCellSeparatorStyle) { UITableViewCellSepar
 @interface UIView : NSObject
 @property(nonatomic) CGRect frame,bounds;
 @property(nonatomic) CGFloat alpha;
-@property(nonatomic) BOOL hidden,userInteractionEnabled;
+@property(nonatomic) NSInteger tag;
+@property(nonatomic) BOOL hidden,userInteractionEnabled,autoresizesSubviews;
 @property(nonatomic,strong) CALayer *layer;
 @property(nonatomic,strong) UIColor *backgroundColor;
 @property(nonatomic,strong) UITraitCollection *traitCollection;

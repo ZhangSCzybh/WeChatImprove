@@ -1,0 +1,25 @@
+{
+  "list_corners": {
+    "checks": 786,
+    "failures": 0,
+    "command": "bash Tests/verify-list-corners.sh"
+  },
+  "group_header": {
+    "checks": 46,
+    "failures": 0
+  },
+  "group_search": {
+    "checks": 36,
+    "failures": 0
+  },
+  "group_interactions": {
+    "checks": 124,
+    "failures": 0
+  },
+  "my_page_clean": "PASS",
+  "initial_red": {
+    "checks": 782,
+    "failures": 9
+  },
+  "scope": "Production source compiled with host UIKit doubles and memory defaults; no phone rendering or cold-start measurement."
+}
