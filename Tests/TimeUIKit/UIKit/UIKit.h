@@ -1,5 +1,13 @@
 #import "../../MessageUIKit/UIKit/UIKit.h"
-@protocol UIGestureRecognizerDelegate @end
+@class UIGestureRecognizer, UITouch;
+@protocol UIGestureRecognizerDelegate <NSObject>
+@optional
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gesture;
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:(UITouch *)touch;
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)other;
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)other;
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)other;
+@end
 @interface CSTestLayer : NSObject
 @property(nonatomic) CGFloat cornerRadius;
 @end
@@ -33,11 +41,23 @@ typedef NS_ENUM(NSInteger,NSTextAlignment) { NSTextAlignmentCenter };
 @property(nonatomic) BOOL clipsToBounds;
 @property(nonatomic) NSTextAlignment textAlignment;
 @end
-@interface UIGestureRecognizer : NSObject @end
+@interface UIControl : UIView @end
+@interface UITouch : NSObject
+@property(nonatomic,weak) UIView *view;
+@property(nonatomic) CGPoint testLocation;
+- (CGPoint)locationInView:(UIView *)view;
+@end
+@class UIPanGestureRecognizer;
+@interface UIGestureRecognizer : NSObject
+@property(nonatomic,weak) id<UIGestureRecognizerDelegate> delegate;
+@property(nonatomic,weak) UIView *view;
+@property(nonatomic) NSInteger state;
+@property(nonatomic) BOOL enabled,delaysTouchesBegan,delaysTouchesEnded,cancelsTouchesInView;
+- (CGPoint)locationInView:(UIView *)view;
+- (instancetype)initWithTarget:(id)target action:(SEL)action;
+@end
 @interface UITapGestureRecognizer : UIGestureRecognizer
-@property(nonatomic,weak) id delegate;
 @property(nonatomic) NSUInteger numberOfTapsRequired;
-@property(nonatomic) BOOL delaysTouchesBegan,delaysTouchesEnded,cancelsTouchesInView;
 @property(nonatomic) CGPoint testLocation;
 - (instancetype)initWithTarget:(id)target action:(SEL)action;
 - (CGPoint)locationInView:(UIView *)view;

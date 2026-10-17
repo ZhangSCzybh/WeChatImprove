@@ -4,7 +4,7 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT BOOL CSMessageNativeSupports(id _Nullable receiver, NSString *selector, NSString *resultType, NSArray<NSString *> *argumentTypes);
 FOUNDATION_EXPORT id _Nullable CSMessageNativeInvoke(id receiver, NSString *selector, NSArray *arguments);
 FOUNDATION_EXPORT NSString * _Nullable CSMessageNativeAppDataPath(CSMessageActionContext *context);
-FOUNDATION_EXPORT id _Nullable CSMessageNativeObject(id _Nullable receiver, NSString *selector);
+FOUNDATION_EXPORT id _Nullable CSMessageActionNativeObject(id _Nullable receiver, NSString *selector);
 FOUNDATION_EXPORT unsigned long long CSMessageNativeUnsigned(id _Nullable receiver, NSString *selector);
 FOUNDATION_EXPORT BOOL CSMessageNativeSet(id receiver, NSString *setter, id _Nullable value, BOOL required);
 @protocol CSMessageActionEnvironment <NSObject>

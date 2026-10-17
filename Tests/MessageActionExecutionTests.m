@@ -203,8 +203,8 @@ static void TestNativeBoundary(void) {
     CHECK(CSMessageNativeSet(forwarded,@"setM_uiVoiceTime:",@1234,YES)); CHECK(forwarded.m_uiVoiceTime==1234);
     CHECK(CSMessageNativeUnsigned(forwarded,@"m_uiVoiceTime")==1234);
     NSData *payload=[@"forwarded-audio" dataUsingEncoding:NSUTF8StringEncoding]; forwarded.m_dtVoice=payload;
-    CHECK([CSMessageNativeObject(forwarded,@"m_dtVoice") isEqual:payload]);
-    CHECK(!CSMessageNativeObject(forwarded,@"m_uiVoiceTime"));
+    CHECK([CSMessageActionNativeObject(forwarded,@"m_dtVoice") isEqual:payload]);
+    CHECK(!CSMessageActionNativeObject(forwarded,@"m_uiVoiceTime"));
     CHECK(!CSMessageNativeSupports([[TestWrongForwardTarget alloc] initWithMsgType:34],@"m_dtVoice",@"@",@[]));
     TestUnrelatedForwarder *unrelated=[TestUnrelatedForwarder new]; unrelated.m_extendInfoWithMsgType=[TestPayloadExtension new];
     CHECK(!CSMessageNativeSupports(unrelated,@"m_dtVoice",@"@",@[]));

@@ -61,7 +61,7 @@ static BOOL CSVoiceXMLFlag(NSString *xml, NSString *attribute, unsigned int *val
 - (void)snapshot:(CSVoicePreparation *)preparation {
     [self snapshotFlags:preparation];
     id source=preparation.context.sourceWrap;
-    preparation.bytes=CSMessageNativeObject(source,@"m_dtVoice");
+    preparation.bytes=CSMessageActionNativeObject(source,@"m_dtVoice");
     if (![preparation.bytes isKindOfClass:NSData.class]) preparation.bytes=nil;
     NSString *xml=CSMessageActionObjectGetter(source,NSSelectorFromString(@"m_nsContent"));
     preparation.duration=(unsigned int)CSMessageNativeUnsigned(source,@"m_uiVoiceTime");

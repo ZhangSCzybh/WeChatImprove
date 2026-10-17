@@ -25,14 +25,21 @@ static char layerKey,parentKey,gesturesKey,interactionKey;
     objc_setAssociatedObject(view,&parentKey,self,OBJC_ASSOCIATION_ASSIGN);
 }
 - (void)bringSubviewToFront:(UIView *)view {}
-- (BOOL)isDescendantOfView:(UIView *)view { return self.superview==view; }
+- (BOOL)isDescendantOfView:(UIView *)view { for (UIView *v=self;v;v=v.superview) if (v==view) return YES; return NO; }
 - (NSArray *)gestureRecognizers { return objc_getAssociatedObject(self,&gesturesKey) ?: @[]; }
-- (void)addGestureRecognizer:(id)gesture { objc_setAssociatedObject(self,&gesturesKey,[self.gestureRecognizers arrayByAddingObject:gesture],OBJC_ASSOCIATION_RETAIN_NONATOMIC); }
+- (void)addGestureRecognizer:(UIGestureRecognizer *)gesture { gesture.view=self; objc_setAssociatedObject(self,&gesturesKey,[self.gestureRecognizers arrayByAddingObject:gesture],OBJC_ASSOCIATION_RETAIN_NONATOMIC); }
 @end
 @implementation UILabel
 - (void)setFrame:(CGRect)frame { [super setFrame:frame];self.bounds=CGRectMake(0,0,frame.size.width,frame.size.height); }
 @end
-@implementation UIGestureRecognizer @end
+@implementation UIControl @end
+@implementation UITouch
+- (CGPoint)locationInView:(UIView *)view { return self.testLocation; }
+@end
+@implementation UIGestureRecognizer
+- (CGPoint)locationInView:(UIView *)view { return CGPointZero; }
+- (instancetype)initWithTarget:(id)target action:(SEL)action { if ((self=[super init])) _enabled=YES; return self; }
+@end
 @implementation UITapGestureRecognizer
 - (instancetype)initWithTarget:(id)target action:(SEL)action { return [super init]; }
 - (CGPoint)locationInView:(UIView *)view { return self.testLocation; }

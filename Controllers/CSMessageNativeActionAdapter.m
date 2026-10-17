@@ -86,7 +86,7 @@ unsigned long long CSMessageNativeUnsigned(id receiver, NSString *selector) {
     @try { receiver=CSNativeReceiver(receiver,NSSelectorFromString(selector)); Method method=class_getInstanceMethod(object_getClass(receiver),NSSelectorFromString(selector)); char type[32]={0}; if (!method || method_getNumberOfArguments(method)!=2) return 0; method_getReturnType(method,type,sizeof(type)); if (!strchr("BIiQqLl",*CSNativeType(type))) return 0; return [CSMessageNativeInvoke(receiver,selector,@[]) unsignedLongLongValue]; }
     @catch (__unused NSException *exception) { return 0; }
 }
-id CSMessageNativeObject(id receiver, NSString *selector) {
+id CSMessageActionNativeObject(id receiver, NSString *selector) {
     @try { return CSMessageNativeSupports(receiver,selector,@"@",@[]) ? CSMessageNativeInvoke(receiver,selector,@[]) : nil; }
     @catch (__unused NSException *exception) { return nil; }
 }
