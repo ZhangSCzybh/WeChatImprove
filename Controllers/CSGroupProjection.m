@@ -49,16 +49,39 @@ static BOOL CSGroupDotUnread(CSGroupRow *row) {
     return row.redDot || ((row.kind == CSGroupRowKindAggregate || row.kind == CSGroupRowKindBusiness) && row.unreadCount > 0);
 }
 
+static BOOL CSGroupRowsMatch(CSGroupRow *a, CSGroupRow *b, BOOL unread) {
+    return a && b && [a.nativePath isEqual:b.nativePath] &&
+        (a.userName==b.userName || [a.userName isEqual:b.userName]) &&
+        a.kind==b.kind && a.category==b.category && a.top==b.top &&
+        (!unread || (a.unreadCount==b.unreadCount && a.redDot==b.redDot));
+}
+static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
+    if (!a || !b || a.count!=b.count) return NO;
+    for (NSUInteger s=0;s<a.count;s++) {
+        NSArray *left=a[s], *right=b[s]; if (left.count!=right.count) return NO;
+        for (NSUInteger r=0;r<left.count;r++) if (!CSGroupRowsMatch(left[r],right[r],unread)) return NO;
+    }
+    return YES;
+}
+
 @interface CSGroupProjection ()
 @property (nonatomic, copy) NSDictionary<NSIndexPath *, NSIndexPath *> *displayToNative;
 @property (nonatomic, copy) NSDictionary<NSIndexPath *, NSIndexPath *> *nativeToDisplay;
 @property (nonatomic, copy) NSDictionary<NSString *, CSGroupBadge *> *badges;
+@property (nonatomic, copy) NSArray *definitionRecords, *inputSections;
+@property (nonatomic, copy) NSDictionary *memberTabIDs, *presetIDs, *destinationsByPath;
+@property (nonatomic, copy) NSString *selectedTabID;
+@property (nonatomic) BOOL filterDuplicates;
 - (nullable NSIndexPath *)nativePathForDisplayPath:(NSIndexPath *)displayPath;
 @end
 
 @implementation CSGroupProjection
 - (instancetype)initWithSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selectedTabID
                 filterDuplicates:(BOOL)filterDuplicates accountID:(NSString *)accountID {
+    return [self initWithSections:sections tabs:tabs selectedTabID:selectedTabID filterDuplicates:filterDuplicates accountID:accountID previousProjection:nil];
+}
+- (instancetype)initWithSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates accountID:(NSString *)accountID previousProjection:(CSGroupProjection *)previous {
     if ((self = [super init])) {
         // Until every value is validated, no partial map, badge, or row is published.
         _sections = @[]; _accountID = [accountID isKindOfClass:[NSString class]] ? [accountID copy] : @"";
@@ -68,29 +91,44 @@ static BOOL CSGroupDotUnread(CSGroupRow *row) {
             ![tabs isKindOfClass:[NSArray class]] || ![selectedTabID isKindOfClass:[NSString class]]) return self;
 
         NSMutableDictionary<NSString *, NSNumber *> *types = [NSMutableDictionary dictionary];
-        NSMutableDictionary<NSNumber *, NSMutableArray<NSString *> *> *presetIDs = [NSMutableDictionary dictionary];
-        NSMutableDictionary<NSString *, NSMutableSet<NSString *> *> *memberTabIDs = [NSMutableDictionary dictionary];
+        NSMutableArray *records=[NSMutableArray array];
         for (id candidate in tabs) {
-            if (![candidate isKindOfClass:[WESessionTabItem class]]) return self;
-            WESessionTabItem *tab = candidate;
-            if (![tab.tabId isKindOfClass:[NSString class]] || !tab.tabId.length || types[tab.tabId] ||
-                tab.type < WETabTypeAll || tab.type > WETabTypeCustom) return self;
-            NSString *tabID = [tab.tabId copy];
-            types[tabID] = @(tab.type);
-            if (tab.type == WETabTypeCustom) {
-                if (tab.sessionUserNames && ![tab.sessionUserNames isKindOfClass:[NSArray class]]) return self;
+            if (![candidate isKindOfClass:WESessionTabItem.class]) return self;
+            WESessionTabItem *tab=candidate;
+            if (![tab.tabId isKindOfClass:NSString.class] || !tab.tabId.length || types[tab.tabId] ||
+                tab.type<WETabTypeAll || tab.type>WETabTypeCustom) return self;
+            NSString *tabID=[tab.tabId copy]; types[tabID]=@(tab.type);
+            NSMutableArray *members=[NSMutableArray array];
+            if (tab.type==WETabTypeCustom) {
+                if (tab.sessionUserNames && ![tab.sessionUserNames isKindOfClass:NSArray.class]) return self;
                 for (id member in tab.sessionUserNames) {
-                    if (![member isKindOfClass:[NSString class]] || ![member length]) return self;
-                    NSString *name = [member copy];
-                    if (!memberTabIDs[name]) memberTabIDs[name] = [NSMutableSet set];
-                    [memberTabIDs[name] addObject:tabID];
+                    if (![member isKindOfClass:NSString.class] || ![member length]) return self;
+                    [members addObject:[member copy]];
                 }
-            } else {
-                if (!presetIDs[@(tab.type)]) presetIDs[@(tab.type)] = [NSMutableArray array];
-                [presetIDs[@(tab.type)] addObject:tabID];
             }
+            [records addObject:@[tabID,@(tab.type),[members copy]]];
         }
         if (!types[selectedTabID]) return self;
+        BOOL sameDefinitions=previous.isValid && [previous.accountID isEqual:accountID] && [previous.definitionRecords isEqual:records];
+        NSDictionary *presetIDs=previous.presetIDs, *memberTabIDs=previous.memberTabIDs;
+        if (!sameDefinitions) {
+            NSMutableDictionary *presets=[NSMutableDictionary dictionary], *members=[NSMutableDictionary dictionary];
+            for (NSArray *record in records) {
+                NSString *tabID=record[0]; NSNumber *type=record[1];
+                if (type.unsignedIntegerValue==WETabTypeCustom) {
+                    for (NSString *name in record[2]) {
+                        if (!members[name]) members[name]=[NSMutableSet set];
+                        [members[name] addObject:tabID];
+                    }
+                } else {
+                    if (!presets[type]) presets[type]=[NSMutableArray array];
+                    [presets[type] addObject:tabID];
+                }
+            }
+            presetIDs=[presets copy]; memberTabIDs=[members copy];
+        }
+        _definitionRecords=[records copy]; _presetIDs=presetIDs; _memberTabIDs=memberTabIDs;
+        _selectedTabID=[selectedTabID copy]; _filterDuplicates=filterDuplicates;
 
         NSMutableSet<NSString *> *ordinaryNames = [NSMutableSet set];
         NSMutableSet<NSIndexPath *> *nativePaths = [NSMutableSet set];
@@ -112,13 +150,19 @@ static BOOL CSGroupDotUnread(CSGroupRow *row) {
                     if (!row.userName.length || [ordinaryNames containsObject:row.userName]) return self;
                     [ordinaryNames addObject:row.userName];
                 }
-                // Materialize a fresh value, so subclasses cannot leak a mutable host object.
-                CSGroupRow *value = [[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName
+                // Base rows are immutable; materialize subclasses so mutable host values cannot leak.
+                CSGroupRow *value = [row isMemberOfClass:CSGroupRow.class] ? row : [[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName
                     kind:row.kind category:row.category top:row.top unreadCount:row.unreadCount redDot:row.redDot];
                 [copiedRows addObject:value];
             }
             [copiedSections addObject:[copiedRows copy]];
         }
+
+        BOOL sameStructure=sameDefinitions && previous.filterDuplicates==filterDuplicates && CSGroupSectionsMatch(copiedSections,previous.inputSections,NO);
+        BOOL sameValues=sameStructure && CSGroupSectionsMatch(copiedSections,previous.inputSections,YES);
+        if (sameValues && [previous.selectedTabID isEqual:selectedTabID]) return previous;
+        _inputSections=sameValues ? previous.inputSections : [copiedSections copy];
+        NSMutableDictionary *destinationsByPath=sameStructure ? nil : [NSMutableDictionary dictionary];
 
         NSMutableDictionary<NSString *, NSNumber *> *counts = [NSMutableDictionary dictionary];
         NSMutableSet<NSString *> *dotTabs = [NSMutableSet set];
@@ -130,22 +174,25 @@ static BOOL CSGroupDotUnread(CSGroupRow *row) {
             NSMutableArray<CSGroupRow *> *visible = [NSMutableArray array];
             for (CSGroupRow *row in copiedSections[sectionIndex]) {
                 BOOL retained = CSGroupRetainsEveryTab(row);
-                NSMutableSet<NSString *> *destinations = [NSMutableSet set];
+                NSMutableSet<NSString *> *destinations = sameStructure ? previous.destinationsByPath[row.nativePath] : [NSMutableSet set];
                 if (retained) {
                     retainedCount = CSGroupSaturatedAdd(retainedCount, CSGroupNumericUnread(row));
                     retainedDot |= CSGroupDotUnread(row);
                 } else {
-                    [destinations addObjectsFromArray:presetIDs[@(WETabTypeAll)] ?: @[]];
-                    NSSet<NSString *> *customIDs = row.userName.length ? memberTabIDs[row.userName] : nil;
-                    if (customIDs) [destinations unionSet:customIDs];
-                    WETabType categoryType = WETabTypeOfficial;
-                    if (row.category == CSGroupRowCategoryGroup) categoryType = WETabTypeGroup;
-                    else if (row.category == CSGroupRowCategoryPrivate) categoryType = WETabTypePrivate;
-                    if (!(filterDuplicates && customIDs.count &&
-                          (categoryType == WETabTypeGroup || categoryType == WETabTypePrivate))) {
-                        [destinations addObjectsFromArray:presetIDs[@(categoryType)] ?: @[]];
+                    if (!sameStructure) {
+                        [destinations addObjectsFromArray:presetIDs[@(WETabTypeAll)] ?: @[]];
+                        NSSet<NSString *> *customIDs = row.userName.length ? memberTabIDs[row.userName] : nil;
+                        if (customIDs) [destinations unionSet:customIDs];
+                        WETabType categoryType = WETabTypeOfficial;
+                        if (row.category == CSGroupRowCategoryGroup) categoryType = WETabTypeGroup;
+                        else if (row.category == CSGroupRowCategoryPrivate) categoryType = WETabTypePrivate;
+                        if (!(filterDuplicates && customIDs.count &&
+                              (categoryType == WETabTypeGroup || categoryType == WETabTypePrivate))) {
+                            [destinations addObjectsFromArray:presetIDs[@(categoryType)] ?: @[]];
+                        }
+                        destinationsByPath[row.nativePath]=[destinations copy];
                     }
-                    for (NSString *tabID in destinations) {
+                    if (!sameValues) for (NSString *tabID in destinations) {
                         counts[tabID] = @(CSGroupSaturatedAdd([counts[tabID] unsignedIntegerValue], CSGroupNumericUnread(row)));
                         if (CSGroupDotUnread(row)) [dotTabs addObject:tabID];
                     }
@@ -163,11 +210,27 @@ static BOOL CSGroupDotUnread(CSGroupRow *row) {
             NSUInteger count = CSGroupSaturatedAdd([counts[tabID] unsignedIntegerValue], retainedCount);
             badges[tabID] = [[CSGroupBadge alloc] initWithCount:count redDot:retainedDot || [dotTabs containsObject:tabID]];
         }
+        _destinationsByPath=sameStructure ? previous.destinationsByPath : [destinationsByPath copy];
         _sections = [displaySections copy]; _displayToNative = [displayToNative copy];
-        _nativeToDisplay = [nativeToDisplay copy]; _badges = [badges copy];
+        _nativeToDisplay = [nativeToDisplay copy]; _badges = sameValues ? previous.badges : [badges copy];
         _valid = YES;
     }
     return self;
+}
+- (BOOL)hasSameDisplayStructureAs:(CSGroupProjection *)other {
+    return self.valid && other.valid && [self.accountID isEqual:other.accountID] &&
+        [self.selectedTabID isEqual:other.selectedTabID] && CSGroupSectionsMatch(self.sections,other.sections,NO);
+}
+- (NSArray<NSIndexPath *> *)changedUnreadPathsFrom:(CSGroupProjection *)other {
+    if (![self hasSameDisplayStructureAs:other]) return @[];
+    NSMutableArray *paths=[NSMutableArray array];
+    for (NSUInteger s=0;s<self.sections.count;s++)
+        for (NSUInteger r=0;r<self.sections[s].count;r++)
+            if (!CSGroupRowsMatch(self.sections[s][r],other.sections[s][r],YES)) [paths addObject:CSGroupPath(s,r)];
+    return paths;
+}
+- (void)discardComputationCache {
+    self.inputSections=nil; self.destinationsByPath=nil;
 }
 - (NSIndexPath *)nativePathForDisplayPath:(NSIndexPath *)displayPath {
     return self.valid && CSGroupIsPath(displayPath) ? self.displayToNative[displayPath] : nil;

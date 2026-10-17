@@ -1,0 +1,7 @@
+Hidden native event publications: 0 / 20 events
+AUDIT idle publications: 0
+AUDIT spaced passive events: 10 publications / 10 events
+AUDIT direct events: 10 publications / 10 events
+AUDIT moving menu: 11 state reads, 0 publications, pending=1 after 270ms
+AUDIT injected publication invalidation: 12 chained publications (fixture stops at 12)
+Group lifecycle: 52 checks, 0 failures

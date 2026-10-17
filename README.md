@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.7-8`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.7-12`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.7-8`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.7-12`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.7-8` 为撤回提示显示修正及调试清理的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
+| Rootless / Rootful | `1.7-12` 为搜索转场标题闪烁修复的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -111,9 +111,9 @@
 | 隐藏分组角标 / 隐藏全部角标 | 分别控制分组及“全部”的未读提示显示 |
 | 指示器颜色 / 选中文本颜色 / 切换触感 | 调整选中效果和切换反馈 |
 
-分组栏属于聊天列表头部，会随列表滚动。搜索按钮开启时，如果原生头部同时包含横幅等内容，也会一起收起；进入原生搜索或关闭分组后恢复原生头部。
+分组栏属于聊天列表头部，会随列表滚动。搜索按钮开启时，如果原生头部同时包含横幅等内容，也会一起收起；使用快捷按钮进入原生搜索时，保留转场背后的分组栏，原生搜索页面继续由微信负责；关闭分组或快捷按钮后恢复原生头部。搜索按钮使用细线轮廓放大镜。
 
-**当前版本切换分组时只更新分组选择和会话列表，不会把页面顶部“微信”标题同步替换成分组名称。**
+**页面顶部标题跟随当前选中的分组名称，搜索页面保留原生标题。**
 
 ### 手势与原生会话菜单
 
@@ -175,20 +175,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.7-8
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.7-12
 ```
 
-默认产物：`packages/com.wechat.improve_1.7-8_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.7-12_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.7-8` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.7-12` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.7-8
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.7-12
 ```
 
-默认产物：`packages/com.wechat.improve_1.7-8_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.7-12_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -208,7 +208,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.7-8_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.7-12_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
@@ -252,6 +252,14 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 实现细节见 [会话分组说明](docs/session-groups.md)、[列表圆角优化](docs/list-corners.md)；设计背景见 [分组重构方案](docs/session-groups-refactor-proposal.md)。
 
 ### 验证状态
+
+`1.7-12` 保持快捷搜索转场背后主列表的分组标题，修复短暂显示“微信”的闪烁。详见 [搜索标题修复](docs/session-groups-search-title-1.7-12.md)。
+
+`1.7-11` 将拖动中段指示器改为缩短至正常宽度的 30%，松手或取消时直接恢复宽度，避免额外拉长。详见 [指示器收缩调整](docs/session-groups-indicator-1.7-11.md)。
+
+`1.7-10` 保留快捷搜索转场背后的当前分组列表，修复全部会话闪现；指示器从拖动开始实时跟随，增强伸缩并缩短落位动画。详见 [搜索列表与指示器优化](docs/session-groups-search-indicator-1.7-10.md)。
+
+`1.7-9` 修复分组搜索进入/返回时原生搜索框闪现，调整搜索图标，加入有界重试、非活跃刷新准入、局部行刷新及成员索引缓存。详见 [搜索转场修复与打包验证](docs/session-groups-search-1.7-9.md) 和 [分组性能优化](docs/session-groups-energy-optimization.md)。
 
 `1.7-8` 修复撤回提示用户名引号重复转义，清理防撤回/原文定位调试日志及已无调用方的诊断模块和入口。详见 [撤回提示优化与清理](docs/revoke-cleanup-1.7-8.md)。
 
@@ -366,7 +374,7 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 | 开启分组后没有标签 | 核对“启用聊天分组”、账号登录状态及微信实际版本；退出搜索/编辑后返回聊天列表，必要时重新打开微信 |
 | 原生搜索框消失 | “显示分组栏搜索按钮”默认开启，此时通过分组栏右侧按钮搜索；关闭该选项可恢复原生搜索区域 |
 | 列表横滑切组，无法打开会话菜单 | 从列表最右侧 `15%` 区域起手左滑；关闭“分组切换手势”可恢复原生范围 |
-| 切到群聊后顶部仍显示“微信” | 属于当前版本行为；分组名称显示在分组栏，顶部标题不随分组同步 |
+| 切到群聊后顶部仍显示“微信” | 主列表标题应跟随分组名称；搜索页保留原生标题，可检查其他标题类插件是否覆盖 |
 | 切换账号后看不到原来的自定义组 | 分组配置按账号隔离；旧版无账号归属的配置需通过设置页手动导入 |
 | 安装包版本与插件显示版本不同 | 检查 `control`、`kPluginVersionString` 和打包时的 `PACKAGE_VERSION` 是否一致 |
 | 编译找不到 Theos 或微信头文件 | 显式传入正确的 `THEOS` 路径，确认 `Headers/`、`HeadersFile/` 完整，并检查 `xcrun` 使用的 SDK |

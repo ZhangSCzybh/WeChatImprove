@@ -55,12 +55,16 @@ typedef NSInteger UITableViewScrollPosition;
 - (NSIndexPath *)currentPathForRow:(CSGroupRow *)row;
 - (NSIndexPath *)displayPath:(NSIndexPath *)path;
 - (void)requestRefresh;
+- (void)requestRecovery;
+- (void)scheduleRefresh;
 - (void)deferNativePresentation; // Baseline-only spy: production must never call it.
 #if HAS_STABLE_SNAPSHOT
 - (CSGroupProjection *)projectionForSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selected accountID:(NSString *)account;
 #endif
 @end
 @implementation CSGroupListAdapter
+- (void)requestRecovery { [self requestRefresh]; }
+- (void)scheduleRefresh { [self requestRefresh]; }
 #include "GroupSelectionBodies.h"
 - (BOOL)isActive { return self.active; }
 + (instancetype)adapterForTable:(UITableView *)table { return table.adapter; }

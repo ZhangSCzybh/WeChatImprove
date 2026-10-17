@@ -1,0 +1,17 @@
+#import "../Controllers/CSGroupRefreshState.h"
+static BOOL CSGroupAppInactive;
+static BOOL CSGroupApplicationActive(void) { return !CSGroupAppInactive; }
+#define UIApplicationDidBecomeActiveNotification @"UIApplicationDidBecomeActiveNotification"
+@interface NSObject (GroupCacheFixture)
+- (void)discardComputationCache;
+- (void)refreshAppearance;
+@end
+#define CS_GROUP_REFRESH_TEST_PROPERTIES \
+@property(nonatomic) CSGroupChangeKind pendingChanges; \
+@property(nonatomic) BOOL recoveryPending,scheduledInteraction,scheduledRecovery,appearanceDirty; \
+@property(nonatomic) NSUInteger recoveryAttempts,recoveryRevision,interactionAttempts; \
+@property(nonatomic,copy) NSString *recoveryAccount; \
+@property(nonatomic) NSTimeInterval interactionDeadline; \
+- (void)scheduleRefresh; \
+- (void)requestRecovery; \
+- (void)cancelScheduledRefresh;

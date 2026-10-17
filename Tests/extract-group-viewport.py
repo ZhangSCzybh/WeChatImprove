@@ -12,7 +12,7 @@ text = source.read_text()
 methods = []
 for marker in [
     "+ (instancetype)adapterForTable:", "+ (instancetype)adapterForController:",
-    "+ (void)attachToController:", "- (void)requestRefresh",
+    "+ (void)attachToController:", "- (void)cancelScheduledRefresh {", "- (void)requestRefresh {", "- (void)scheduleRefresh {", "- (void)requestRecovery {",
     "- (BOOL)hasScrollableContent", "- (BOOL)canRestoreAnchor",
     "- (void)saveAnchor", "- (void)restoreAnchor",
     "- (void)returnToGroupTop", "- (void)applyPendingScrollToTop", "- (void)selectIndex:",

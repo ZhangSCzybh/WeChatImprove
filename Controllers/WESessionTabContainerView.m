@@ -9,8 +9,29 @@ static CGFloat const kTabPadding = 16.0;
 static CGFloat const kTabMinGap = 8.0;
 static CGFloat const kTabBadgeGap = 3.0;
 static CGFloat const kActionButtonWidth = 44.0;
-static NSTimeInterval const kIndicatorDuration = 0.26;
+static NSTimeInterval const kIndicatorDuration = 0.20;
 static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
+
+// Match the native outlined magnifier proportions without relying on private
+// asset names that change across WeChat versions. Render once at screen scale;
+// template tint keeps the existing light/dark and custom colour behaviour.
+static UIImage *CSGroupSearchIcon(void) {
+    static UIImage *image; static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        UIGraphicsImageRenderer *renderer=[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(24,24)];
+        image=[[renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+            CGContextRef c=context.CGContext;
+            CGContextSetStrokeColorWithColor(c,UIColor.blackColor.CGColor);
+            CGContextSetLineWidth(c,1.5);
+            CGContextSetLineCap(c,kCGLineCapButt);
+            CGContextStrokeEllipseInRect(c,CGRectMake(1.75,1.75,17,17));
+            CGContextMoveToPoint(c,16.26,16.26);
+            CGContextAddLineToPoint(c,23,23);
+            CGContextStrokePath(c);
+        }] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    });
+    return image;
+}
 
 @interface WETabButton : UIButton
 @property (nonatomic) NSInteger tabIndex;
@@ -98,6 +119,7 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
 @end
 
 @interface WESessionTabContainerView ()
+@property (nonatomic, copy) NSArray *renderedTabRecords;
 @property (nonatomic, strong, readwrite) UIScrollView *scrollView;
 @property (nonatomic, strong) NSMutableArray<WETabButton *> *tabButtons;
 @property (nonatomic, strong) UIView *indicatorView;
@@ -105,6 +127,9 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
 @property (nonatomic) CGFloat baseFontSize;
 @property (nonatomic) BOOL revealSelectionAfterLayout;
 @property (nonatomic) CGSize indicatorLayoutSize;
+@property (nonatomic) BOOL interactiveTransition, settlingInteractiveTransition;
+@property (nonatomic) NSInteger interactiveTarget;
+@property (nonatomic) CGFloat interactiveProgress;
 @end
 
 @implementation WESessionTabContainerView
@@ -136,7 +161,7 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
     _indicatorView.isAccessibilityElement = NO;
     _indicatorView.hidden = YES;
     [_scrollView addSubview:_indicatorView];
-    _searchButton = [self actionButtonWithSymbol:@"magnifyingglass" label:@"搜索聊天" action:@selector(searchButtonTapped)];
+    _searchButton = [self searchActionButton];
     _searchButton.hidden = !CSGroupSearchButtonVisible(NSUserDefaults.standardUserDefaults);
     [self addSubview:_searchButton];
     [self refreshAppearance];
@@ -151,12 +176,11 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
     if (UIAccessibilityIsReduceMotionEnabled()) [self updateIndicatorPositionAnimated:NO];
 }
 
-- (UIButton *)actionButtonWithSymbol:(NSString *)symbol label:(NSString *)label action:(SEL)action {
+- (UIButton *)searchActionButton {
     UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
-    UIImageSymbolConfiguration *configuration = [UIImageSymbolConfiguration configurationWithPointSize:17 weight:UIImageSymbolWeightRegular];
-    [button setImage:[UIImage systemImageNamed:symbol withConfiguration:configuration] forState:UIControlStateNormal];
-    button.accessibilityLabel = label;
-    [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+    [button setImage:CSGroupSearchIcon() forState:UIControlStateNormal];
+    button.accessibilityLabel = @"搜索聊天";
+    [button addTarget:self action:@selector(searchButtonTapped) forControlEvents:UIControlEventTouchUpInside];
     return button;
 }
 
@@ -280,6 +304,11 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
 }
 
 - (void)updateTabs:(NSArray<WESessionTabItem *> *)tabs {
+    NSMutableArray *records=[NSMutableArray arrayWithCapacity:tabs.count];
+    for (WESessionTabItem *tab in tabs) [records addObject:@[tab.tabId ?: @"",tab.displayName ?: @"",@(tab.type)]];
+    if ([self.renderedTabRecords isEqual:records]) return;
+    self.interactiveTransition=NO;
+    self.renderedTabRecords=[records copy];
     NSString *previousID = [self.selectedTabID copy];
     NSArray<WETabButton *> *previousButtons = [self.tabButtons copy];
     NSInteger previousIndex = self.selectedIndex;
@@ -365,7 +394,11 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
 
 - (void)selectTabAtIndex:(NSInteger)index animated:(BOOL)animated {
     if (index < 0 || index >= (NSInteger)self.tabButtons.count) return;
-    [self layoutIfNeeded];
+    // Keep the finger's current geometry when committing; a layout must not
+    // snap the indicator back to its old selection before the settle animation.
+    BOOL interactive=self.interactiveTransition;
+    if (!interactive) [self layoutIfNeeded];
+    if (index!=_selectedIndex) self.interactiveTransition=NO;
     // Publishing a projection reassigns the same stable selection several times.
     // That acknowledgement must not cancel an in-flight user transition.
     if (index == _selectedIndex) {
@@ -379,7 +412,9 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
     [self updateSelectedButtons];
     [self triggerHapticFeedback];
     BOOL animate = animated && CSGroupIndicatorAnimationEnabled(NSUserDefaults.standardUserDefaults) && self.window && !UIAccessibilityIsReduceMotionEnabled();
+    self.settlingInteractiveTransition=interactive;
     [self updateIndicatorPositionAnimated:animate];
+    self.settlingInteractiveTransition=NO;
     if (animate) {
         [UIView animateWithDuration:kIndicatorDuration delay:0
             options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction
@@ -403,11 +438,16 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
 - (void)updateIndicatorPosition {
     // An unread badge or data refresh can relayout the same target while moving.
     // Preserve that animation; retarget only if its final geometry has changed.
+    if (self.interactiveTransition) {
+        [self updateInteractiveTransitionToIndex:self.interactiveTarget progress:self.interactiveProgress];
+        return;
+    }
     BOOL moving = [self.indicatorView.layer animationForKey:kIndicatorAnimationKey] != nil;
     [self updateIndicatorPositionAnimated:moving];
 }
 
 - (void)updateIndicatorPositionAnimated:(BOOL)animated {
+    self.interactiveTransition=NO;
     BOOL valid = self.selectedIndex >= 0 && self.selectedIndex < (NSInteger)self.tabButtons.count;
     BOOL wasHidden = self.indicatorView.hidden;
     self.indicatorView.hidden = !valid;
@@ -415,13 +455,46 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
         [self.indicatorView.layer removeAnimationForKey:kIndicatorAnimationKey];
         return;
     }
-    WETabButton *button = self.tabButtons[self.selectedIndex];
-    CGRect title = [button tabTitleFrame];
-    CGFloat width = MAX(0, MIN(CGRectGetWidth(button.bounds) - 8, CGRectGetWidth(title) + 12));
-    CGRect target = CGRectMake(CGRectGetMinX(button.frame) + CGRectGetMidX(title) - width / 2,
-        MAX(0, CGRectGetHeight(self.scrollView.bounds) - kIndicatorHeight - 5), width, kIndicatorHeight);
+    CGRect target=[self indicatorFrameForIndex:self.selectedIndex];
     BOOL animate = animated && CSGroupIndicatorAnimationEnabled(NSUserDefaults.standardUserDefaults) && !wasHidden && self.window && !UIAccessibilityIsReduceMotionEnabled();
     [self moveIndicatorToFrame:target animated:animate];
+}
+
+- (CGRect)indicatorFrameForIndex:(NSInteger)index {
+    WETabButton *button = self.tabButtons[index];
+    CGRect title = [button tabTitleFrame];
+    CGFloat width = MAX(0, MIN(CGRectGetWidth(button.bounds) - 8, CGRectGetWidth(title) + 12));
+    return CGRectMake(CGRectGetMinX(button.frame) + CGRectGetMidX(title) - width / 2,
+        MAX(0, CGRectGetHeight(self.scrollView.bounds) - kIndicatorHeight - 5), width, kIndicatorHeight);
+}
+
+- (void)updateInteractiveTransitionToIndex:(NSInteger)index progress:(CGFloat)progress {
+    if (!CSGroupIndicatorAnimationEnabled(NSUserDefaults.standardUserDefaults) || !self.window || UIAccessibilityIsReduceMotionEnabled() ||
+        self.selectedIndex<0 || self.selectedIndex>=(NSInteger)self.tabButtons.count || index<0 || index>=(NSInteger)self.tabButtons.count || !isfinite(progress)) {
+        if (self.interactiveTransition) { self.interactiveTransition=NO; [self updateIndicatorPositionAnimated:NO]; }
+        return;
+    }
+    self.interactiveTransition=YES; self.interactiveTarget=index;
+    CGFloat t=MAX(0,MIN(1,progress)); self.interactiveProgress=t;
+    CGRect from=[self indicatorFrameForIndex:self.selectedIndex], to=[self indicatorFrameForIndex:index];
+    CGFloat center=CGRectGetMidX(from)+(CGRectGetMidX(to)-CGRectGetMidX(from))*t;
+    CGFloat width=(from.size.width+(to.size.width-from.size.width)*t)*(1-0.70*sin(M_PI*t));
+    CGRect frame=CGRectMake(center-width/2,to.origin.y,width,to.size.height);
+    self.indicatorView.hidden=NO;
+    [self moveIndicatorToFrame:frame animated:NO];
+    CGFloat viewport=CGRectGetWidth(self.scrollView.bounds);
+    CGFloat maxOffset=MAX(0,self.scrollView.contentSize.width-viewport);
+    CGFloat offset=MAX(0,MIN(center-viewport/2,maxOffset));
+    if (fabs(self.scrollView.contentOffset.x-offset)>0.5) [self.scrollView setContentOffset:CGPointMake(offset,0) animated:NO];
+}
+
+- (void)cancelInteractiveTransition {
+    if (!self.interactiveTransition) return;
+    self.interactiveTransition=NO;
+    self.settlingInteractiveTransition=YES;
+    [self updateIndicatorPositionAnimated:YES];
+    self.settlingInteractiveTransition=NO;
+    [self scrollToSelectedTab];
 }
 
 - (void)moveIndicatorToFrame:(CGRect)target animated:(BOOL)animated {
@@ -439,13 +512,13 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
     if (!animated || CGRectIsEmpty(start) || CGRectEqualToRect(start,target)) return;
 
     CGFloat distance = fabs(CGRectGetMidX(target)-CGRectGetMidX(start));
-    CGFloat stretch = MIN(14.0,distance * 0.12);
+    CGFloat stretch = MIN(48.0,distance * 0.45);
     CGPoint from = CGPointMake(CGRectGetMidX(start),CGRectGetMidY(start));
     CGPoint to = CGPointMake(CGRectGetMidX(target),CGRectGetMidY(target));
     CAKeyframeAnimation *position = [CAKeyframeAnimation animationWithKeyPath:@"position"];
     position.values = @[[NSValue valueWithCGPoint:from],[NSValue valueWithCGPoint:to]];
     position.keyTimes = @[@0,@1];
-    position.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+    position.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
     CAKeyframeAnimation *size = [CAKeyframeAnimation animationWithKeyPath:@"bounds.size"];
     size.values = @[[NSValue valueWithCGSize:start.size],
         [NSValue valueWithCGSize:CGSizeMake(MAX(start.size.width,target.size.width)+stretch,target.size.height)],
@@ -453,7 +526,14 @@ static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
     size.keyTimes = @[@0,@0.45,@1];
     size.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut],
                             [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
-    // Position has one continuous easing curve; only width turns at the stretch peak.
+    // A drag has already contracted the indicator. Settle directly to its final
+    // width instead of replaying the tap animation's additional stretch peak.
+    if (self.settlingInteractiveTransition) {
+        size.values=@[[NSValue valueWithCGSize:start.size],[NSValue valueWithCGSize:target.size]];
+        size.keyTimes=@[@0,@1];
+        size.timingFunctions=@[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
+    }
+    // Position has one continuous easing curve.
     position.duration = kIndicatorDuration;
     size.duration = kIndicatorDuration;
     CAAnimationGroup *group = [CAAnimationGroup animation];

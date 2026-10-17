@@ -1,3 +1,4 @@
+#import "GroupRefreshFixture.h"
 // Production method bodies + small host doubles. No real defaults, accounts or UI.
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
@@ -89,6 +90,7 @@ static long long CSGroupReadInteger(id object,NSString *name,long long fallback)
 static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table; body(); }
 
 @interface CSGroupListAdapter : NSObject
+CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic) NSUInteger modelRevision,snapshotRevision,refreshGeneration;
 @property(nonatomic) BOOL coalescingNotification,scheduledCoalesced;
 @property(nonatomic,copy) NSString *snapshotAccount;

@@ -22,7 +22,7 @@ def method(text, marker):
 methods = []
 for marker in ['+ (instancetype)adapterForTable:', '+ (instancetype)adapterForController:',
                '+ (void)attachToController:', '+ (void)layoutForController:', '+ (void)settingsChanged',
-               '- (void)requestRefresh', '- (void)requestCoalescedRefresh', '- (void)invalidateNativeSnapshot', '- (NSArray *)nativeSectionsForAccount:', '- (void)beginNativeChange', '- (void)endNativeChange {', '- (void)endNativeChangeCoalesced:',
+               '- (void)requestRefresh {', '- (void)requestRecovery {', '- (void)scheduleRefresh {', '- (void)cancelScheduledRefresh {', '+ (void)applicationActivityChanged:', '- (void)beginNativeChangeOfKind:', '- (void)requestCoalescedRefresh', '- (void)invalidateNativeSnapshot', '- (NSArray *)nativeSectionsForAccount:', '- (void)beginNativeChange', '- (void)endNativeChange {', '- (void)endNativeChangeCoalesced:',
                '- (void)pruneNativeActions', '- (void)performNativeBatch:', '- (void)performInNativePresentation:', '- (void)useNativePresentation {']:
     methods.append(method(source, marker))
 for marker, fallback in [('+ (void)setPresentationSuspended:', '+ (void)setPresentationSuspended:(BOOL)value forController:(id)owner { (void)value; (void)owner; }'),
@@ -36,7 +36,10 @@ account_end=refresh.index('        self.searching=CSGroupReadInteger',account_st
 account_reset=refresh[account_start:account_end]
 mode_end=refresh.index('        if (!self.preferences || changed)',account_end)
 account_reset+=refresh[account_end:mode_end]
-methods.append(prefix + '    self.publishing=YES; self.dirty=NO;\n    BOOL finished=NO;\n    @try {\n' + account_reset + ' [self publishFixture]; finished=YES;\n' + tail)
+publication_start=refresh.index('    self.publishing=YES; self.dirty=NO;')
+publication_end=refresh.index('    @try {',publication_start)
+publication_state=refresh[publication_start:publication_end]
+methods.append(prefix + publication_state + '    @try {\n' + account_reset + ' self.lastPublishedChanges=changes; [self publishFixture]; finished=YES;\n' + tail)
 layout = method(source, '- (void)layout {')
 methods.append(layout[:layout.index('    __block UIView *installed')] + '    self.layoutCount++;\n}')
 # Actual save/restore/top method entry guards; the expensive UI work is counted.

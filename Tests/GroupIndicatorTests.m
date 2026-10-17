@@ -15,16 +15,18 @@ static NSUInteger viewportAnimations;
 + (instancetype)valueWithCGPoint:(CGPoint)value;
 + (instancetype)valueWithCGSize:(CGSize)value;
 - (CGPoint)CGPointValue;
+- (CGSize)CGSizeValue;
 @end
 @implementation NSValue (UIKitGeometry)
 + (instancetype)valueWithCGPoint:(CGPoint)value { return [self valueWithBytes:&value objCType:@encode(CGPoint)]; }
 + (instancetype)valueWithCGSize:(CGSize)value { return [self valueWithBytes:&value objCType:@encode(CGSize)]; }
+- (CGSize)CGSizeValue { CGSize size; [self getValue:&size size:sizeof(size)]; return size; }
 - (CGPoint)CGPointValue { CGPoint point; [self getValue:&point size:sizeof(point)]; return point; }
 @end
 static BOOL reducedMotion;
 static BOOL UIAccessibilityIsReduceMotionEnabled(void) { return reducedMotion; }
 static CGFloat const kIndicatorHeight=2;
-static NSTimeInterval const kIndicatorDuration=0.26;
+static NSTimeInterval const kIndicatorDuration=0.20;
 static NSString *const kIndicatorAnimationKey=@"CSGroupIndicator.selection";
 enum { UIViewAnimationOptionCurveEaseInOut=1, UIViewAnimationOptionBeginFromCurrentState=2, UIViewAnimationOptionAllowUserInteraction=4 };
 @interface TestLayer : CALayer
@@ -75,6 +77,12 @@ enum { UIViewAnimationOptionCurveEaseInOut=1, UIViewAnimationOptionBeginFromCurr
 @property(nonatomic,strong) NSArray<WETabButton *> *tabButtons;
 @property(nonatomic,strong) UIView *indicatorView,*scrollView;
 @property(nonatomic) NSUInteger haptics;
+@property(nonatomic) BOOL interactiveTransition,settlingInteractiveTransition;
+@property(nonatomic) NSInteger interactiveTarget;
+@property(nonatomic) CGFloat interactiveProgress;
+- (CGRect)indicatorFrameForIndex:(NSInteger)index;
+- (void)updateInteractiveTransitionToIndex:(NSInteger)index progress:(CGFloat)progress;
+- (void)cancelInteractiveTransition;
 - (void)selectTabAtIndex:(NSInteger)index animated:(BOOL)animated;
 - (void)updateIndicatorPosition;
 - (void)updateIndicatorPositionAnimated:(BOOL)animated;
@@ -113,7 +121,7 @@ int main(void) { @autoreleasepool {
     WESessionTabContainerView *v=Fixture();
     [v selectTabAtIndex:1 animated:YES];
     CAAnimationGroup *first=(id)[v.indicatorView.layer animationForKey:kIndicatorAnimationKey];
-    Check(first!=nil && fabs(first.duration-0.26)<0.001,@"user selection starts the intended transition");
+    Check(first!=nil && fabs(first.duration-0.20)<0.001,@"user selection starts the intended transition");
     Check(v.selectedIndex==1 && [v.selectedTabID isEqual:@"tab1"],@"selection commits immediately without waiting for animation");
     NSUInteger adds=v.indicatorView.layer.animationAdds,haptics=v.haptics,scrolls=v.scrollView.scrollWrites;
     for (NSUInteger i=0;i<4;i++) { v.selectedTabID=@"tab1"; [v updateIndicatorPosition]; [v scrollToSelectedTab]; }
@@ -163,6 +171,48 @@ int main(void) { @autoreleasepool {
     [testDefaults setBool:YES forKey:CSGroupIndicatorAnimationEnabledKey];
     reducedMotion=YES; [v selectTabAtIndex:1 animated:YES];
     Check(![v.indicatorView.layer animationForKey:kIndicatorAnimationKey],@"system reduce motion overrides the enabled switch");
+    reducedMotion=NO; v=Fixture();
+    CGRect origin=v.indicatorView.frame;
+    [v updateInteractiveTransitionToIndex:1 progress:0.25];
+    Check(v.interactiveTransition && v.selectedIndex==0 && v.haptics==0,@"drag preview never commits selection or sends haptics");
+    Check(fabs(CGRectGetMidX(v.indicatorView.frame)-65)<0.001 && ![v.indicatorView.layer animationForKey:kIndicatorAnimationKey],@"quarter drag moves immediately with no queued animation");
+    [v updateInteractiveTransitionToIndex:1 progress:0.5];
+    Check(fabs(v.indicatorView.frame.size.width-origin.size.width*0.30)<0.001,@"mid-drag contracts to 30 percent of normal width");
+    CGRect mid=v.indicatorView.frame; [v updateIndicatorPosition];
+    Check(CGRectEqualToRect(mid,v.indicatorView.frame),@"ordinary layout keeps interactive progress");
+    [v updateInteractiveTransitionToIndex:1 progress:0.1];
+    Check(CGRectGetMidX(v.indicatorView.frame)<CGRectGetMidX(mid),@"reversing the finger reverses the indicator immediately");
+    [v cancelInteractiveTransition];
+    Check(!v.interactiveTransition && v.selectedIndex==0 && CGRectEqualToRect(v.indicatorView.frame,origin),@"cancel restores original group without committing a switch");
+    v=Fixture(); [v updateInteractiveTransitionToIndex:1 progress:0.5];
+    mid=v.indicatorView.frame; [v selectTabAtIndex:1 animated:YES];
+    next=(id)[v.indicatorView.layer animationForKey:kIndicatorAnimationKey]; position=(id)next.animations[0];
+    Check(!v.interactiveTransition && v.selectedIndex==1 && fabs([position.values[0] CGPointValue].x-CGRectGetMidX(mid))<0.001,@"commit settles from finger position without snapping back");
+    CAKeyframeAnimation *settleSize=(id)next.animations[1];
+    Check(settleSize.values.count==2 && fabs([settleSize.values.firstObject CGSizeValue].width-mid.size.width)<0.001 &&
+        fabs([settleSize.values.lastObject CGSizeValue].width-origin.size.width)<0.001,@"release restores normal width without a second expansion peak");
+    v=Fixture();
+    BOOL bounded=YES;
+    for (NSUInteger step=0;step<=20;step++) {
+        [v updateInteractiveTransitionToIndex:1 progress:step/20.0];
+        CGFloat ratio=v.indicatorView.frame.size.width/origin.size.width;
+        bounded &= ratio>=0.30-0.001 && ratio<=1.001;
+    }
+    Check(bounded,@"entire drag stays between 30 and 100 percent of normal width");
+    [v updateInteractiveTransitionToIndex:1 progress:0.5]; [v cancelInteractiveTransition];
+    CAAnimationGroup *cancel=(id)[v.indicatorView.layer animationForKey:kIndicatorAnimationKey];
+    Check([(CAKeyframeAnimation *)cancel.animations[1] values].count==2 && v.selectedIndex==0,@"cancel returns to the original group without extra stretch");
+    v=Fixture(); [v updateInteractiveTransitionToIndex:1 progress:2];
+    Check(fabs(CGRectGetMidX(v.indicatorView.frame)-140)<0.001 && fabs(v.indicatorView.frame.size.width-origin.size.width)<0.001,@"full drag clamps at target and contracts to final width");
+    [testDefaults setBool:NO forKey:CSGroupIndicatorAnimationEnabledKey]; [v updateIndicatorPosition];
+    Check(!v.interactiveTransition && CGRectEqualToRect(v.indicatorView.frame,origin),@"disabling animation during drag clears preview");
+    [v updateInteractiveTransitionToIndex:1 progress:0.5];
+    Check(!v.interactiveTransition && v.selectedIndex==0,@"disabled animation never previews a drag");
+    [testDefaults setBool:YES forKey:CSGroupIndicatorAnimationEnabledKey]; reducedMotion=YES;
+    [v updateInteractiveTransitionToIndex:1 progress:0.5];
+    Check(!v.interactiveTransition,@"reduce motion also suppresses interactive stretch");
+    reducedMotion=NO; [v updateInteractiveTransitionToIndex:99 progress:0.5];
+    Check(!v.interactiveTransition,@"invalid adjacent target is ignored");
     [testDefaults removePersistentDomainForName:suite];
     printf("Group indicator: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;

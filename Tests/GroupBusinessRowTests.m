@@ -88,8 +88,10 @@ static NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionStyleNone
 @property(nonatomic) NSUInteger refreshRequests;
 - (BOOL)isActive;
 - (void)requestRefresh;
+- (void)requestRecovery;
 @end
 @implementation CSGroupListAdapter
+- (void)requestRecovery { [self requestRefresh]; }
 #include "GroupBusinessBodies.h"
 - (BOOL)isActive { return YES; }
 - (void)requestRefresh { self.dirty=YES;self.refreshRequests++; }

@@ -1,3 +1,4 @@
+#import "GroupRefreshFixture.h"
 #import <Foundation/Foundation.h>
 #import <dispatch/dispatch.h>
 #import <objc/runtime.h>
@@ -30,7 +31,7 @@ static char AdapterKey, PresentationSuspendedKey;
 static NSString *account=@"account-A";
 static BOOL enabled=YES;
 static NSUInteger scopes,snapshotBuilds;
-static BOOL mutateDuringSnapshot;
+static BOOL mutateDuringSnapshot,failPublication,rawPublicationFailure;
 static NSArray *CSGroupBuildNativeSections(id controller,id table,id source);
 static NSHashTable *Adapters(void) {
     static NSHashTable *adapters; if (!adapters) adapters=[NSHashTable weakObjectsHashTable]; return adapters;
@@ -42,6 +43,7 @@ static long long CSGroupReadInteger(id owner,NSString *key,long long fallback) {
 static void CSGroupWithNativeIndices(id table,void (^body)(void)) { (void)table; body(); }
 static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table; scopes++; body(); }
 @interface CSGroupListAdapter : NSObject
+CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic) NSUInteger modelRevision,snapshotRevision,refreshGeneration;
 @property(nonatomic) BOOL coalescingNotification,scheduledCoalesced;
 @property(nonatomic,copy) NSString *snapshotAccount;
@@ -53,7 +55,9 @@ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table
 @property(nonatomic,strong) NSMutableArray *completions,*nativeActions;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
 @property(nonatomic,strong) id nativeHeader,projection,identityDisplayPaths;
-@property(nonatomic) BOOL chromeVisible;
+@property(nonatomic) BOOL chromeVisible,searchChromeVisible;
+@property(nonatomic) CSGroupChangeKind lastPublishedChanges;
+@property(nonatomic,strong) id chrome;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
 @property(nonatomic) double baselineDeceleration;
 @property(nonatomic) BOOL active,presentationSuspended,publishedEnabled,searching,dirty,scheduled,publishing,groupPanMoving,swipeActive,nativePresentation,updatingHeader,snapshotRetryAttempted;
@@ -89,6 +93,7 @@ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table
     self.publishedEnabled=enabled; self.searching=self.controller.isSearching;
     self.active=enabled && !self.searching && !self.nativePresentation;
     [self layout];
+    if (failPublication) { if (rawPublicationFailure) [self requestRefresh]; else [self requestRecovery]; }
 }
 @end
 static NSArray *CSGroupBuildNativeSections(id controller,id table,id source) {
@@ -209,6 +214,23 @@ int main(void) { @autoreleasepool {
     Check(!a.publishedEnabled && a.searching && [a.preferences.accountID isEqual:account],@"return applies latest account, settings and search state");
     enabled=YES;
 
+    a=List(&host); a.searchChromeVisible=YES; host.isSearching=YES;
+    NSUInteger searchReloads=a.table.reloads,searchBuilds=snapshotBuilds;
+    a.pendingChanges=CSGroupChangeContent; [a refresh];
+    Check(a.searching && a.searchChromeVisible && a.active,@"search retains selected projection rather than publishing unfiltered rows");
+    Check(a.table.reloads==searchReloads && snapshotBuilds==searchBuilds && (a.pendingChanges&CSGroupChangeUnknown),@"entering search neither reloads all rows nor loses deferred content changes");
+    for (NSUInteger i=0;i<12;i++) { [a beginNativeChange]; [a endNativeChange]; }
+    RunFor(.08);
+    Check(a.active && a.table.reloads==searchReloads && snapshotBuilds==searchBuilds,@"messages during search retain the selected list without rebuilding snapshots");
+    host.isSearching=NO; [a refresh];
+    Check(a.lastPublishedChanges&CSGroupChangeUnknown,@"return reconciles accumulated search-time changes with a full publication");
+    Check(!a.searching && !a.searchChromeVisible && a.active,@"completed search clears transition ownership during normal publication");
+
+    a=List(&host); a.searchChromeVisible=YES; host.isSearching=YES; [a refresh];
+    NSUInteger beforeSearchAction=actions;
+    [a performInNativePresentation:^{ actions++; }];
+    Check(actions==beforeSearchAction+1 && !a.active && !a.nativeActions.count,@"explicit search result navigation can still request native presentation");
+
     a=List(&host); [host viewWillDisappear:NO];
     CSGroupListAdapter *old=a; host.m_tableView=[UITableView new];
     [CSGroupListAdapter attachToController:host]; a=Adapter(host);
@@ -243,8 +265,8 @@ int main(void) { @autoreleasepool {
     builds=snapshotBuilds; enabled=NO; [a refresh]; [a refresh];
     Check(snapshotBuilds==builds && !a.active,@"disabled grouping never builds a snapshot");
     enabled=YES; [a refresh]; builds=snapshotBuilds;
-    host.isSearching=YES; [a refresh]; [a refresh];
-    Check(snapshotBuilds==builds && !a.active,@"search uses native mode without snapshot construction");
+    a.searchChromeVisible=YES; host.isSearching=YES; [a refresh]; [a refresh];
+    Check(snapshotBuilds==builds && a.active,@"search retains selected rows without rebuilding or exposing native rows");
     host.isSearching=NO; [a refresh];
     Check(snapshotBuilds==builds+1,@"search exit rebuilds native data before reactivating projection");
     [a invalidateNativeSnapshot]; mutateDuringSnapshot=YES;
@@ -262,6 +284,44 @@ int main(void) { @autoreleasepool {
     RunFor(.06); Check(a.refreshCount==before+1,@"superseded notification timer cannot publish twice");
     before=a.refreshCount; [a requestCoalescedRefresh]; [a refresh]; RunFor(.06);
     Check(a.refreshCount==before+1,@"synchronous user publication consumes pending notification work");
+    a=List(&host); before=a.refreshCount;
+    [a requestRefresh];
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:@"willResign" object:nil]];
+    for (NSUInteger i=0;i<30;i++) { [a beginNativeChange]; [a endNativeChange]; }
+    [a refresh]; [a layout]; RunFor(.08);
+    Check(a.refreshCount==before && !a.scheduled && a.dirty,@"inactive app cancels queued refresh and defers every publication");
+    actionBefore=actions; [a performInNativePresentation:^{ actions++; }]; RunFor(.03);
+    Check(actions==actionBefore && a.nativeActions.count==1,@"inactive state defers even explicit navigation");
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:UIApplicationDidBecomeActiveNotification object:nil]];
+    RunFor(.03);
+    Check(actions==actionBefore+1 && !a.nativeActions.count,@"active notification resumes valid navigation once");
+    a=List(&host); before=a.refreshCount; failPublication=YES; [a requestRefresh]; RunFor(1.1);
+    Check(a.refreshCount==before+4 && a.recoveryAttempts==3 && a.dirty && !a.scheduled,@"persistent render failure stops after three bounded delayed retries");
+    before=a.refreshCount; [a requestRecovery]; [a requestRecovery]; RunFor(.12);
+    Check(a.refreshCount==before && !a.scheduled,@"duplicate failures of the exhausted revision cannot restart a loop");
+    failPublication=NO; [a beginNativeChange]; [a endNativeChange]; RunFor(.03);
+    Check(a.refreshCount==before+1 && !a.dirty,@"new model event wakes an exhausted recovery without waiting");
+    a=List(&host); before=a.refreshCount; a.menuState=3; [a requestRefresh]; RunFor(2.5);
+    Check(a.refreshCount==before && !a.scheduled && a.dirty,@"stuck menu animation exhausts interaction polling without forcing a reload");
+    a.menuState=0; [a scheduleRefresh]; RunFor(.03);
+    Check(a.refreshCount==before+1 && !a.dirty,@"real interaction end wakes work after polling budget exhaustion");
+    a=List(&host); [host viewWillDisappear:NO]; before=a.refreshCount;
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:@"willResign" object:nil]];
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:UIApplicationDidBecomeActiveNotification object:nil]]; RunFor(.03);
+    Check(a.refreshCount==before && a.presentationSuspended,@"app foreground does not unhide a covered chat list");
+    a=List(&host);
+    [a beginNativeChangeOfKind:CSGroupChangeUnread]; [a endNativeChangeCoalesced:YES]; RunFor(.06);
+    Check(a.lastPublishedChanges==CSGroupChangeUnread && !a.pendingChanges,@"unread notification kind is consumed exactly once");
+    [a beginNativeChangeOfKind:CSGroupChangeUnread]; [a beginNativeChangeOfKind:CSGroupChangeContent];
+    [a endNativeChange]; [a endNativeChangeCoalesced:YES]; RunFor(.06);
+    Check(a.lastPublishedChanges==(CSGroupChangeUnread|CSGroupChangeContent),@"nested content change cannot be downgraded to unread-only");
+    a.table.tracking=YES; [a requestRefresh]; NSUInteger revision=a.modelRevision; RunFor(.2);
+    Check(a.modelRevision==revision && a.dirty,@"interaction retries do not invalidate a valid snapshot repeatedly");
+    a.table.tracking=NO; [a scheduleRefresh]; RunFor(.03);
+    a=List(&host); before=a.refreshCount; failPublication=YES; rawPublicationFailure=YES;
+    [a requestRefresh]; RunFor(1.1);
+    Check(a.refreshCount==before+4 && !a.scheduled,@"generic refresh requests during publication also share the bounded recovery budget");
+    failPublication=NO; rawPublicationFailure=NO;
     fprintf(stdout,"Group lifecycle: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;
 } }

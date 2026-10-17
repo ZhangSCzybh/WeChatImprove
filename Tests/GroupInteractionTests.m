@@ -1,3 +1,4 @@
+#import "GroupRefreshFixture.h"
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <objc/runtime.h>
@@ -87,10 +88,15 @@ typedef NS_ENUM(NSInteger,UIGestureRecognizerState) { UIGestureRecognizerStatePo
 @interface Chrome : UIView
 @property(nonatomic,strong) UIView *scrollView;
 @property(nonatomic) NSInteger selectedIndex;
-@property(nonatomic) NSUInteger selections;
+@property(nonatomic) NSUInteger selections,previews,cancellations;
+@property(nonatomic) CGFloat progress;
+- (void)updateInteractiveTransitionToIndex:(NSInteger)index progress:(CGFloat)progress;
+- (void)cancelInteractiveTransition;
 - (void)selectTabAtIndex:(NSInteger)index animated:(BOOL)animated;
 @end
 @implementation Chrome
+- (void)updateInteractiveTransitionToIndex:(NSInteger)index progress:(CGFloat)progress { (void)index; self.previews++; self.progress=progress; }
+- (void)cancelInteractiveTransition { self.cancellations++; }
 - (void)selectTabAtIndex:(NSInteger)index animated:(BOOL)animated { (void)animated; self.selectedIndex=index; self.selections++; }
 @end
 @interface CSGroupRow : NSObject
@@ -140,7 +146,8 @@ typedef NS_ENUM(NSInteger,UIGestureRecognizerState) { UIGestureRecognizerStatePo
 - (void)tableView:(UITableView *)table willBeginEditingRowAtIndexPath:(NSIndexPath *)path { (void)table; self.calls++; self.receivedPath=path; }
 - (void)tableView:(UITableView *)table commitEditingStyle:(NSInteger)style forRowAtIndexPath:(NSIndexPath *)path { (void)table; (void)style; self.calls++; self.receivedPath=path; }
 @end
-static BOOL enabled=YES,gestureEnabled=YES,nativeScope;
+static BOOL enabled=YES,gestureEnabled=YES,nativeScope,searchButtonVisible=YES;
+static BOOL CSGroupSearchButtonVisible(NSUserDefaults *defaults) { (void)defaults; return searchButtonVisible; }
 static NSString *account=@"account-A";
 static NSString *CSGroupCurrentAccountID(void) { return account; }
 static BOOL Option(NSString *suffix) { return [suffix isEqual:@"enabled"] ? enabled : gestureEnabled; }
@@ -162,6 +169,7 @@ static NSHashTable *Adapters(void) {
     static NSHashTable *adapters; if (!adapters) adapters=[NSHashTable weakObjectsHashTable]; return adapters;
 }
 @interface CSGroupListAdapter : NSObject
+CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic) NSUInteger modelRevision,snapshotRevision,refreshGeneration;
 @property(nonatomic) BOOL coalescingNotification,scheduledCoalesced;
 @property(nonatomic,copy) NSString *snapshotAccount;
@@ -174,7 +182,7 @@ static NSHashTable *Adapters(void) {
 @property(nonatomic,strong) CSGroupRow *swipeRow;
 @property(nonatomic,copy) NSString *swipeAccount,*publishedTabID;
 @property(nonatomic,strong) NSIndexPath *swipeDisplayPath;
-@property(nonatomic) BOOL active,swipeActive,dirty,scheduled,publishing,pendingScrollToTop,chromeVisible,searching,barTouchAllowed,listTouchAllowed;
+@property(nonatomic) BOOL active,swipeActive,dirty,scheduled,publishing,pendingScrollToTop,chromeVisible,searching,searchChromeVisible,barTouchAllowed,listTouchAllowed;
 @property(nonatomic) NSUInteger changeDepth,refreshRequests,refreshCount;
 @property(nonatomic,strong) CSGroupProjection *projection;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
@@ -288,7 +296,7 @@ int main(void) { @autoreleasepool {
     Check(a.swipeActive,@"identity loss during an unfinished native batch does not prematurely close editing");
     a.changeDepth=0; [a reconcileDeletedSwipeRow];
     Check(!a.swipeActive && !a.swipeRow && !a.table.editing && a.table.closes==1,@"deletion with no UIKit end callback releases both refresh blockers");
-    Check(a.refreshRequests>0 && a.controller.paths[@"survivor"]!=nil,@"deleted identity schedules refresh without deleting another session");
+    Check(a.scheduled && a.controller.paths[@"survivor"]!=nil,@"deleted identity schedules refresh without deleting another session");
     a=Fixture(); a.dirty=YES; nativeScope=YES;
     [a forwardSwipeInvocation:Swipe(a.controller,YES,NO,a.table,Path(8)) target:a.controller];
     Check(!a.swipeActive && [a.controller.receivedPath isEqual:Path(8)],@"native-scope end callback clears the latch without double mapping its path"); nativeScope=NO;
@@ -325,6 +333,27 @@ int main(void) { @autoreleasepool {
     Check([[CSGroupListAdapter groupTitleForTitleView:a.controller.m_titleView] isEqual:@"Team"],@"renamed group title follows the published tab model");
     Check(![CSGroupListAdapter groupTitleForTitleView:[NSObject new]],@"unrelated title views are never replaced");
     a.searching=YES; Check(![CSGroupListAdapter groupTitleForTitleView:a.controller.m_titleView],@"search retains native title"); a.searching=NO;
+    a.searching=YES; a.searchChromeVisible=YES;
+    Check([[CSGroupListAdapter groupTitleForTitleView:a.controller.m_titleView] isEqual:@"Team"],@"shortcut search preserves the backing main-list group title");
+    Check(![CSGroupListAdapter groupTitleForTitleView:[NativeTitle new]],@"search page title view is never replaced by the retained group name");
+    [a.controller.m_titleView updateTitleView:7 title:@"微信(3)"];
+    Check([a.controller.m_titleView.renderedTitle isEqual:@"Team"] && a.controller.m_titleView.renderedStatus==7,@"native title updates during entry retain group text and native status");
+    for (NSUInteger i=0;i<4;i++) [a refreshNavigationTitle];
+    Check([a.controller.m_titleView.renderedTitle isEqual:@"Team"],@"repeated transition layout title refreshes do not reveal WeChat");
+    a.presentationSuspended=YES;
+    [a.controller.m_titleView updateTitleView:8 title:@"微信"];
+    Check([a.controller.m_titleView.renderedTitle isEqual:@"Team"],@"native title updates while search covers the list preserve the backing title");
+    a.presentationSuspended=NO;
+    searchButtonVisible=NO;
+    Check(![CSGroupListAdapter groupTitleForTitleView:a.controller.m_titleView],@"disabling the shortcut preserves ordinary native search title policy"); searchButtonVisible=YES;
+    a.chromeVisible=NO;
+    Check(![CSGroupListAdapter groupTitleForTitleView:a.controller.m_titleView],@"explicit native presentation does not retain an unrelated group title"); a.chromeVisible=YES;
+    enabled=NO;
+    Check(![CSGroupListAdapter groupTitleForTitleView:a.controller.m_titleView],@"disabling grouping during search restores native title"); enabled=YES;
+    account=@"account-B";
+    Check(![CSGroupListAdapter groupTitleForTitleView:a.controller.m_titleView],@"search title retention cannot cross accounts"); account=@"account-A";
+    a.searching=NO; a.searchChromeVisible=NO; [a refreshNavigationTitle];
+    Check([a.controller.m_titleView.renderedTitle isEqual:@"Team"],@"search return keeps group title when transition ownership clears");
     enabled=NO; Check(![CSGroupListAdapter groupTitleForTitleView:a.controller.m_titleView],@"disabling groups restores native/customized title"); enabled=YES;
     account=@"account-B"; Check(![CSGroupListAdapter groupTitleForTitleView:a.controller.m_titleView],@"stale-account group name is not displayed"); account=@"account-A";
 
@@ -404,7 +433,7 @@ int main(void) { @autoreleasepool {
     __block NSUInteger completions=0; void (^completion)(void)=^{ completions++; };
     [menu setMenuOptionsViewHidden:YES animated:YES completionHandler:completion]; RunFor(0.08);
     Check(!a.refreshCount && a.scheduled,@"hidden flag changing at close start does not permit reload during animation");
-    Check(menu.hideCalls==1 && menu.receivedAnimated && menu.receivedCompletion==completion && !completions,@"visibility hook preserves native arguments and completion identity/timing");
+    Check(menu.hideCalls==1 && menu.receivedAnimated && menu.receivedCompletion!=nil && !completions,@"visibility hook preserves native arguments and completion timing");
     menu->_inHideAnimation=NO; menu.receivedCompletion(); RunFor(0.08);
     Check(a.refreshCount==1 && !a.dirty && !a.scheduled && completions==1,@"close settles and publishes once without any standard scroll/edit callbacks");
     Check([a groupSwipesAvailable] && a.pan.enabled && a.listPan.enabled,@"group gestures recover after custom close without disabling recognizers mid-pan");
@@ -485,6 +514,10 @@ int main(void) { @autoreleasepool {
     Check([a gestureRecognizerShouldBegin:a.listPan],@"left horizontal pan starts while the old menu is open");
     a.listPan.state=UIGestureRecognizerStateBegan; [a requestRefresh]; RunFor(0.08);
     Check(!a.refreshCount && a.dirty && a.scheduled,@"group movement also defers refresh without native table tracking flags");
+    [a groupPan:a.listPan];
+    Check(a.chrome.previews==1 && a.chrome.progress>0 && !a.groupSelections,@"began previews movement before release without changing groups");
+    a.listPan.state=UIGestureRecognizerStateChanged; [a groupPan:a.listPan];
+    Check(a.chrome.previews==2 && !a.groupSelections,@"changed continuously updates indicator preview");
     touch.point=CGPointMake(390,300); a.listPan.state=UIGestureRecognizerStateEnded;
     [a groupPan:a.listPan];
     Check(a.groupSelections==1 && a.chrome.selectedIndex==1 && !a.selectionWithOpenMenu,@"left-owned completion closes the old menu before selecting another group");

@@ -6,7 +6,7 @@ methods = []
 for marker in ['- (NSInteger)indexForTabID:', '- (void)setSelectedTabID:',
                '- (void)selectTabAtIndex:', '- (void)updateIndicatorPosition {',
                '- (void)updateIndicatorPositionAnimated:', '- (void)moveIndicatorToFrame:',
-               '- (void)scrollToSelectedTab']:
+               '- (void)scrollToSelectedTab', '- (CGRect)indicatorFrameForIndex:', '- (void)updateInteractiveTransitionToIndex:', '- (void)cancelInteractiveTransition']:
     start = source.index(marker)
     brace = source.index('{', start)
     depth = 0

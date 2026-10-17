@@ -1,0 +1,27 @@
+{
+  "version": "1.7-8",
+  "commit": "45e3ff8521f20821af276cede1da00e878120350",
+  "date": "2026-10-17",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cpu": "Apple M4",
+  "scope": "Host Foundation benchmark with synthetic getters and in-memory defaults; lifecycle replay replaces native UI publication. No device, FPS, GPU, energy, thermal or heap measurement.",
+  "benchmark_command": "bash docs/performance/session-groups-1.6-32/run.sh",
+  "audit_command": "python3 docs/performance/session-groups-1.7-8/audit.py",
+  "source_sha256": {
+    "Controllers/CSGroupListAdapter.m": "5a2c43bda7b808316f8c9a7484e4ee5532cdaa61eca4df48e228a91fafe525ce",
+    "Controllers/CSGroupNativeBridge.m": "87896891923cf0964a7c0ea4c9fe0fb4e77b789cfb43c43c8f201be8a3b3e2ad",
+    "Controllers/CSGroupProjection.m": "01b36ff5594f394c98a193cd3fc137ce20bc41b105c702b4fe94569c7ba6957b",
+    "Controllers/CSGroupPreferences.m": "1ec46fe99d45a47d56319ec5149d54ddbccb3831dbdd52de6f7f4e590bd58bd4",
+    "Controllers/CSGroupInvocationMapper.m": "a8149e2d01d10d4e65574edc9547ce6ee431cd523e6d6d85e505f9c9ce42c68f",
+    "Controllers/CSGroupIndexScope.m": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780",
+    "Controllers/WESessionTabContainerView.m": "fde55bf94e295d280b34a8ade14d2a9639d8fb3aa74746eb787deb5a4355d3e0",
+    "Controllers/CSChatGroupSettingsViewController.m": "42baa66ffe46e814782cf6a7d4786b82741b51bc9a22e1e229c59e653487683f",
+    "Controllers/WEContactSelectViewController.m": "e6288a0dc10ce097bc9649ed759205b03141031ad28dc56d22635e215215a0a9",
+    "Hooks/SessionGroupHooks.xm": "b84fee736ceb0bb3aeae2f29b3592116925f73749d3ab9fc494dd25eae5f5413",
+    "Hooks/WCCustomTextHooks.xm": "b2cfbb251cc8949534838970fc4a7ff59ffa20272ec9f94bd9c00d3bca36aabb",
+    "Tests/extract-group-lifecycle.py": "9e40e9ce3790b676d5d2970e798f648e46522f65341b04a71c393c562df20d62",
+    "Tests/GroupLifecycleTests.m": "8ee2c1140e3174f83bd243644385050b236901b6df1bc76ad3fcd1c7b1601585",
+    "docs/performance/session-groups-1.6-32/benchmark.m": "a885c68eb16b13e490c48c3661d701537bca77204d93fc60bc0ee7182039b0b8",
+    "docs/performance/session-groups-1.6-32/run.sh": "7ec50e9926bcc929be88dd7e584e15bd61193f47c7e9ea2d1fc2e291b2592d95"
+  }
+}

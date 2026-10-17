@@ -40,10 +40,10 @@ static void Native(id owner, BOOL change, void (^body)(void)) {
     @try { CSGroupWithNativeIndices(a.table,body); }
     @finally { if (change) [a endNativeChange]; }
 }
-static void NativeNotification(id owner, void (^body)(void)) {
+static void NativeNotification(id owner, CSGroupChangeKind kind, void (^body)(void)) {
     CSGroupListAdapter *a=Adapter(owner);
     if (!a.table) { body(); return; }
-    [a beginNativeChange];
+    [a beginNativeChangeOfKind:kind];
     @try { CSGroupWithNativeIndices(a.table,body); }
     @finally { [a endNativeChangeCoalesced:YES]; }
 }
@@ -80,21 +80,21 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 - (void)setSearchBarToTableHeaderView { Native(self,NO,^{ %orig; }); [CSGroupListAdapter layoutForController:self]; }
 - (void)onSearch { [Adapter(self) prepareForNativeSearch]; Native(self,NO,^{ %orig; }); [Adapter(self) requestRefresh]; }
 - (void)setSearchBarActive:(BOOL)active { if (active) [Adapter(self) prepareForNativeSearch]; Native(self,NO,^{ %orig; }); [Adapter(self) refresh]; }
-- (void)onFTSSearchEnd { Native(self,NO,^{ %orig; }); [Adapter(self) requestRefresh]; }
-- (void)cancelSearch { Native(self,NO,^{ %orig; }); [Adapter(self) requestRefresh]; }
+- (void)onFTSSearchEnd { Native(self,NO,^{ %orig; }); [Adapter(self) refresh]; }
+- (void)cancelSearch { Native(self,NO,^{ %orig; }); [Adapter(self) refresh]; }
 - (id)previewingContext:(id)context viewControllerForLocation:(CGPoint)point {
     CSGroupListAdapter *a=Adapter(self);
     if (a.isActive) return nil; // An incidental preview must not change the selected group.
     __block id result=nil; Native(self,NO,^{ result=%orig; }); return result;
 }
-- (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap { NativeNotification(self,^{ %orig; }); }
-- (void)updateSession:(id)session { NativeNotification(self,^{ %orig; }); }
+- (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,^{ %orig; }); }
+- (void)updateSession:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,^{ %orig; }); }
 - (void)reloadSessions { Native(self,YES,^{ %orig; }); }
 - (void)updateItem:(id)item { Native(self,YES,^{ %orig; }); }
 - (void)insertSessionCellAtIndexes:(id)paths { Native(self,YES,^{ %orig; }); }
 - (void)deleteSessionCellAtIndexes:(id)paths { Native(self,YES,^{ %orig; }); }
 - (void)onLogicDeleteSessionByUsername:(id)name { Native(self,YES,^{ %orig; }); }
-- (void)logicUpdateSession:(id)session { NativeNotification(self,^{ %orig; }); }
+- (void)logicUpdateSession:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,^{ %orig; }); }
 - (void)onAuthOK { Native(self,YES,^{ %orig; }); }
 - (void)onLogicHideSession:(id)session { Native(self,YES,^{ %orig; }); }
 - (void)selectCellForName:(id)name {
@@ -148,7 +148,13 @@ static void InstallMenuTouchGate(void) {
 - (void)setMenuOptionsViewHidden:(BOOL)hidden animated:(BOOL)animated completionHandler:(void (^)(void))completion {
     // Preserve the host's callback and animation. Observe actual menu state;
     // no native gesture delegate, translation, velocity or threshold is changed.
-    @try { %orig; }
+    if (!MenuAdapter(self).isActive) { %orig; return; }
+    __weak id weakCell=self;
+    void (^observedCompletion)(void)=^{
+        @try { if (completion) completion(); }
+        @finally { [MenuAdapter(weakCell) nativeMenuDidChange]; }
+    };
+    @try { %orig(hidden,animated,observedCompletion); }
     @finally { [MenuAdapter(self) nativeMenuDidChange]; }
 }
 %end
@@ -182,8 +188,8 @@ static void InstallMenuTouchGate(void) {
 - (void)onSessionRebuildBegin { [Adapter(self) beginNativeChange]; Native(self,NO,^{ %orig; }); }
 - (void)onSessionRebuildEnd { @try { Native(self,NO,^{ %orig; }); } @finally { [Adapter(self) endNativeChange]; } }
 - (void)onActiveUsrNameChange:(id)oldName curUsrName:(id)newName { Native(self,YES,^{ %orig; }); }
-- (void)onSessionTotalUnreadCountChange:(unsigned int)count { NativeNotification(self,^{ %orig; }); }
-- (void)onSessionChanged:(id)session { NativeNotification(self,^{ %orig; }); }
+- (void)onSessionTotalUnreadCountChange:(unsigned int)count { NativeNotification(self,CSGroupChangeUnread,^{ %orig; }); }
+- (void)onSessionChanged:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,^{ %orig; }); }
 - (void)onSessionTopStatusChanged:(id)session bTop:(BOOL)top { Native(self,YES,^{ %orig; }); }
 - (void)onMainSessionReload { Native(self,YES,^{ %orig; }); }
 %end
@@ -421,6 +427,8 @@ static void InstallMenuTouchGate(void) {
 
 %ctor {
     InstallMenuTouchGate();
+    for (NSString *name in @[UIApplicationWillResignActiveNotification,UIApplicationDidEnterBackgroundNotification,UIApplicationDidBecomeActiveNotification])
+        [NSNotificationCenter.defaultCenter addObserver:CSGroupListAdapter.class selector:@selector(applicationActivityChanged:) name:name object:nil];
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),NULL,SettingsChanged,
         CFSTR("com.wechat.enhance.chat_group.settings_changed"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
 }

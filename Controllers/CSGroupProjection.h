@@ -49,7 +49,18 @@ typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
                             tabs:(NSArray<WESessionTabItem *> *)tabs
                    selectedTabID:(NSString *)selectedTabID
                 filterDuplicates:(BOOL)filterDuplicates
-                       accountID:(NSString *)accountID NS_DESIGNATED_INITIALIZER;
+                       accountID:(NSString *)accountID;
+/// Reuse only verified immutable values from the same account and definitions.
+- (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+                            tabs:(NSArray<WESessionTabItem *> *)tabs
+                   selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates
+                       accountID:(NSString *)accountID
+              previousProjection:(nullable CSGroupProjection *)previous NS_DESIGNATED_INITIALIZER;
+- (BOOL)hasSameDisplayStructureAs:(nullable CSGroupProjection *)other;
+- (NSArray<NSIndexPath *> *)changedUnreadPathsFrom:(CSGroupProjection *)other;
+/// Release full-list computation caches when the list is not being presented.
+- (void)discardComputationCache;
 - (instancetype)init NS_UNAVAILABLE;
 - (nullable NSIndexPath *)displayPathForNativePath:(NSIndexPath *)nativePath;
 - (nullable CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)displayPath;

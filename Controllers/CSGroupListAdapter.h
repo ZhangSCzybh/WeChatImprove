@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import "CSGroupIndexScope.h"
+#import "CSGroupRefreshState.h"
 NS_ASSUME_NONNULL_BEGIN
 @interface CSGroupListAdapter : NSObject
 @property (nonatomic, weak, readonly) UITableView *table;
@@ -14,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller;
 + (void)layoutForController:(id)controller;
 + (void)settingsChanged;
++ (void)applicationActivityChanged:(NSNotification *)notification;
 + (nullable NSString *)groupTitleForTitleView:(id)titleView;
 + (void)recordNativeTitle:(nullable NSString *)title status:(unsigned int)status forTitleView:(id)titleView;
 - (void)returnToGroupTop;
@@ -26,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)refresh;
 - (void)requestRefresh;
 - (void)beginNativeChange;
+- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind;
 - (void)endNativeChange;
 /// Only passive message/unread notifications use the bounded merge window.
 - (void)endNativeChangeCoalesced:(BOOL)coalesced;
@@ -39,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSInteger)nativeSectionCount;
 - (nullable UIView *)nativeTableHeaderView;
 - (void)setNativeTableHeaderView:(nullable UIView *)header;
-/// Restore the native search/header before WeChat activates its search interface.
+/// Prepare native search while preserving the shortcut header during its transition.
 - (void)prepareForNativeSearch;
 - (nullable NSDictionary *)captureNativeEditingContextAtPath:(NSIndexPath *)path;
 - (BOOL)performNativeEditingContext:(NSDictionary *)context action:(void (^)(NSIndexPath *currentPath))action;

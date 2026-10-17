@@ -4,9 +4,9 @@ import sys
 root = Path(__file__).resolve().parent.parent
 source = (Path(sys.argv[2]) if len(sys.argv) > 2 else root / 'Controllers/CSGroupListAdapter.m').read_text()
 methods = []
-for marker in ['- (BOOL)groupPanMoving', '- (NSInteger)listZoneForTouch:', '- (BOOL)nativeMenuGesture:', '- (BOOL)closeMenusForGroupSwitch', '- (BOOL)gestureRecognizerShouldBegin:', '- (void)groupPan:', '- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldBeRequiredToFailByGestureRecognizer:', '- (NSUInteger)nativeMenuState', '- (void)nativeMenuDidChange', '- (void)updateGroupGestureAvailability', '- (void)endSwipeEditing', '- (void)reconcileDeletedSwipeRow',
+for marker in ['- (void)cancelScheduledRefresh {', '- (void)requestRecovery {', '- (BOOL)groupPanMoving', '- (NSInteger)listZoneForTouch:', '- (BOOL)nativeMenuGesture:', '- (BOOL)closeMenusForGroupSwitch', '- (BOOL)gestureRecognizerShouldBegin:', '- (void)groupPan:', '- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldBeRequiredToFailByGestureRecognizer:', '- (NSUInteger)nativeMenuState', '- (void)nativeMenuDidChange', '- (void)updateGroupGestureAvailability', '- (void)endSwipeEditing', '- (void)reconcileDeletedSwipeRow',
                '- (BOOL)performNativeEditingContext:', '- (BOOL)forwardSwipeInvocation:',
-               '+ (NSString *)groupTitleForTitleView:', '+ (void)recordNativeTitle:', '- (void)refreshNavigationTitle', '- (BOOL)groupSwipesAvailable',
+               '- (BOOL)keepsGroupHeaderDuringSearch', '+ (NSString *)groupTitleForTitleView:', '+ (void)recordNativeTitle:', '- (void)refreshNavigationTitle', '- (BOOL)groupSwipesAvailable',
                '- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:']:
     if marker in ['- (BOOL)groupPanMoving', '- (NSInteger)listZoneForTouch:', '- (BOOL)nativeMenuGesture:', '- (BOOL)closeMenusForGroupSwitch'] and marker not in source:
         if marker == '- (BOOL)nativeMenuGesture:':
@@ -51,6 +51,7 @@ if 'static CSGroupListAdapter *MenuAdapter(' in hooks:
     menu = hooks[start:end].replace('%hook MMBaseMultiMenuTableViewCell', '@implementation HookedMenuCell').replace('%end', '@end')
     menu = menu.replace('%orig;', '[super handlePan:gesture];', 1)
     menu = menu.replace('%orig;', '[super setMenuOptionsViewHidden:hidden animated:animated completionHandler:completion];', 1)
+    menu = menu.replace('%orig(hidden,animated,observedCompletion);', '[super setMenuOptionsViewHidden:hidden animated:animated completionHandler:observedCompletion];')
 else:
     menu = '@implementation HookedMenuCell @end'
 Path(sys.argv[1]).with_name('GroupMenuHookBodies.h').write_text(menu)
