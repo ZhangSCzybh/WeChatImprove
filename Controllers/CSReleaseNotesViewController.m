@@ -4,6 +4,10 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.7-24": @[
+            @{@"title": @"修复首次进入时会话卡片缺失",
+              @"detail": @"会话原生布局完成后同步卡片背景与圆角遮罩尺寸，处理首次加载、行高变化和占位会话切换时背景覆盖不完整的问题。"}
+        ],
         @"1.7-23": @[
             @{@"title": @"整理列表圆角实现",
               @"detail": @"清理无效参数、重复代码及多余重绘请求，保留四页圆角、未读提示、好友数量背景和已有设置。"}

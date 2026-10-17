@@ -26,6 +26,10 @@ for cls in ['MMTableViewCell','NewContactsItemCell','MMTableSectionHeaderView']:
     chunk=source[source.index('%hook '+cls+'\n'):];chunk=chunk[:chunk.index('%end')]
     code=body(chunk,chunk.index('- (void)layoutSubviews')).replace('%orig;','(void)self; /* original layout stub */')
     output.append(f'static void Hook{cls}Layout(id self) {{'+code+'}')
+for cls in ['NewMainFrameCell','FakeMainFrameCell']:
+    chunk=source[source.index('%hook '+cls+'\n'):];chunk=chunk[:chunk.index('%end')]
+    code=body(chunk,chunk.index('- (void)layoutSubviews'));assert code.count('%orig')==1
+    output.append('static void Hook'+cls+'Layout(id self,void (^original)(void)) {'+code.replace('%orig;', 'original();')+'}')
 chunk=source[source.index('%hook ContactsViewController\n'):];chunk=chunk[:chunk.index('%end')]
 for method,signature in [('- (void)initCountLabel:', 'HookContactsInitCount(id self,id arg1,void (^original)(void))'), ('- (void)viewDidLayoutSubviews', 'HookContactsCountLayout(id self,void (^original)(void))')]:
     code=body(chunk,chunk.index(method));assert code.count('%orig')==1

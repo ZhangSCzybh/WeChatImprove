@@ -38,6 +38,18 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
     %orig(frame);
 }
 %end
+%hook NewMainFrameCell
+- (void)layoutSubviews {
+    %orig;
+    CSListCornerRefreshSessionGeometry((UITableViewCell *)self);
+}
+%end
+%hook FakeMainFrameCell
+- (void)layoutSubviews {
+    %orig;
+    CSListCornerRefreshSessionGeometry((UITableViewCell *)self);
+}
+%end
 %hook NewContactsItemCell
 - (void)layoutSubviews {
     %orig;

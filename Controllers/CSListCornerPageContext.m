@@ -118,6 +118,17 @@ void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial) {
         if (page==CSListCornerPageContacts) { table.sectionHeaderHeight=0; table.sectionFooterHeight=0; }
     }
 }
+static void CSListCornerPrepareCellPaint(UITableViewCell *cell, UIView *content) {
+    cell.backgroundColor=[UIColor clearColor]; content.backgroundColor=CSListCornerCanvasColor();
+    CSListCornerHideSeparator(cell);
+    // Native MMTableViewCell's dedicated content container may have an opaque fill.
+    UIView *native=CSListCornerNativeContent(cell);
+    native.backgroundColor=[UIColor clearColor];
+    for (UIView *view in content.subviews) {
+        NSString *name=NSStringFromClass(view.class);
+        if ([name isEqualToString:@"MainFrameItemView"] || [name isEqualToString:@"FakeMainFrameItemView"] || [name isEqualToString:@"MMUIView"]) view.backgroundColor=[UIColor clearColor];
+    }
+}
 @interface CSListCornerPageContext ()
 @property(nonatomic, strong) UITableViewCell *cell;
 @property(nonatomic, strong) UITableView *table;
@@ -148,15 +159,7 @@ void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial) {
     *first=self.indexPath.row==0; *last=self.indexPath.row==rows-1; return YES;
 }
 - (void)renderFirst:(BOOL)first last:(BOOL)last {
-    self.cell.backgroundColor=[UIColor clearColor]; self.content.backgroundColor=CSListCornerCanvasColor();
-    CSListCornerHideSeparator(self.cell);
-    // Native MMTableViewCell's dedicated content container may have an opaque fill.
-    UIView *native=CSListCornerNativeContent(self.cell);
-    native.backgroundColor=[UIColor clearColor];
-    for (UIView *view in self.content.subviews) {
-        NSString *name=NSStringFromClass(view.class);
-        if ([name isEqualToString:@"MainFrameItemView"] || [name isEqualToString:@"FakeMainFrameItemView"] || [name isEqualToString:@"MMUIView"]) view.backgroundColor=[UIColor clearColor];
-    }
+    CSListCornerPrepareCellPaint(self.cell,self.content);
     UIView *previous=objc_getAssociatedObject(self.cell,&PreviousBackgroundKey);
     if (previous && previous.superview!=self.content) [previous removeFromSuperview];
     UIView *background=CSListCornerOwnedBackground(self.content);
@@ -164,6 +167,32 @@ void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial) {
     CSListApplyCardBackground(background,self.cardFrame,self.configuration.radius,first,last,[self.configuration backgroundForStyle:self.style]);
 }
 @end
+void CSListCornerRefreshSessionGeometry(UITableViewCell *cell) {
+    CSListCornerSnapshot *configuration=[[CSListCornerConfiguration sharedConfiguration] snapshot];
+    if (!configuration.enabled) return;
+    UITableView *table=CSListCornerTableForView(cell);
+    if (!CSListCornerOwnerForTable(table,CSListCornerPageSession) || !CSListCornerBeginOperation(cell)) return;
+    @try {
+        UIView *background=objc_getAssociatedObject(cell,&PreviousBackgroundKey);
+        if (!background) return; // Row roles are established only by normal display callbacks.
+        UIView *content=cell.contentView;
+        CGRect bounds=content.bounds;
+        CGRect frame=CGRectMake(configuration.leftMargin,0,bounds.size.width-configuration.leftMargin-configuration.rightMargin,bounds.size.height);
+        if (!CSListCornerValidRect(bounds) || !CSListCornerValidRect(frame)) return;
+        if (!CSListRefreshCardBackground(background,frame,configuration.radius,[configuration backgroundForStyle:content.traitCollection.userInterfaceStyle])) return;
+        if (background.superview!=content) {
+            // MMBaseMultiMenuTableViewCell may switch its actual content container.
+            UIView *oldParent=background.superview;
+            if (oldParent && objc_getAssociatedObject(oldParent,&BackgroundKey)==background) objc_setAssociatedObject(oldParent,&BackgroundKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            UIView *other=objc_getAssociatedObject(content,&BackgroundKey);
+            if (other && other!=background) [other removeFromSuperview];
+            objc_setAssociatedObject(content,&BackgroundKey,background,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        if (content.subviews.firstObject!=background) [content insertSubview:background atIndex:0];
+        background.hidden=NO;
+        CSListCornerPrepareCellPaint(cell,content);
+    } @finally { CSListCornerEndOperation(cell); }
+}
 @interface CSListCornerFrameState : NSObject
 @property(nonatomic) CGRect nativeFrame, appliedFrame;
 @end

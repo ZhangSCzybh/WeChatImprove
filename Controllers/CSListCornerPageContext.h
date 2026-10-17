@@ -14,6 +14,8 @@ FOUNDATION_EXPORT BOOL CSListCornerBeginOperation(id _Nullable object);
 FOUNDATION_EXPORT void CSListCornerEndOperation(id object);
 FOUNDATION_EXPORT UIView *CSListCornerOwnedBackground(UIView *container);
 FOUNDATION_EXPORT BOOL CSListCornerValidRect(CGRect rect);
+// Layout-only repair using an existing card role; never queries table rows or paths.
+FOUNDATION_EXPORT void CSListCornerRefreshSessionGeometry(UITableViewCell *cell);
 @interface CSListCornerPageContext : NSObject
 @property(nonatomic, readonly) UIView *content;
 @property(nonatomic, readonly) CSListCornerSnapshot *configuration;

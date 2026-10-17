@@ -60,3 +60,12 @@ void CSListApplyCardBackground(UIView *background, CGRect frame, CGFloat radius,
     if (![background.backgroundColor isEqual:color]) background.backgroundColor=color;
     if (!CGRectEqualToRect(background.frame,frame)) background.frame=frame;
 }
+
+BOOL CSListRefreshCardBackground(UIView *background, CGRect frame, CGFloat radius, UIColor *color) {
+    CSListCornerRenderState *state=objc_getAssociatedObject(background,&CardRenderStateKey);
+    if (!state.path) return NO;
+    BOOL first=(state.corners & UIRectCornerTopLeft)!=0;
+    BOOL last=(state.corners & UIRectCornerBottomLeft)!=0;
+    CSListApplyCardBackground(background,frame,radius,first,last,color);
+    return YES;
+}

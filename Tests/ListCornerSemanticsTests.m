@@ -355,6 +355,59 @@ static void ReviewCompatibilityTests(void) {
     Check([contacts.backgroundColor isEqual:UIColor.whiteColor] && contacts.showsVerticalScrollIndicator,@"disabled preparation exception is restricted to session appearance");
     Configure();
 }
+static void SessionFirstLayoutTests(void) {
+    Configure();
+    for(NSUInteger fake=0;fake<2;fake++) {
+        void (*layout)(id,void (^)(void))=fake ? HookFakeMainFrameCellLayout : HookNewMainFrameCellLayout;
+        UITableView *table=Table();id owner=Owner(CSListCornerPageSession,table);
+        for(NSUInteger role=0;role<4;role++) {
+            table.rows=role==3 ? @[@1] : @[@3];
+            NSInteger row=role==0 || role==3 ? 0 : (role==1 ? 1 : 2);
+            UITableViewCell *cell=Cell(table,row,0);cell.contentView.frame=CGRectMake(0,0,390,44);
+            CSListCornerSessionDecorate(cell,table,cell.path,owner);
+            UIView *background=Background(cell);Check(background.frame.size.height==44,@"fixture reproduces a card drawn before native final row height");
+            table.throwsOnQuery=YES;NSUInteger queries=table.queries;
+            __block NSUInteger originalCalls=0;
+            layout(cell,^{originalCalls++;cell.frame=CGRectMake(0,0,390,64);cell.contentView.frame=cell.bounds;});
+            Check(originalCalls==1 && background.frame.size.height==64 && ((CAShapeLayer *)background.layer.mask).frame.size.height==64,@"real/fake cell final layout repairs card and mask to complete row height");
+            Check(Rounded(background,CGPointMake(1,1))==!(role==0 || role==3) && Rounded(background,CGPointMake(1,63))==!(role==2 || role==3),@"layout keeps existing first/middle/last/single card corners");
+            CAShapeLayer *mask=(id)background.layer.mask;CGPathRef path=mask.path;
+            for(NSUInteger n=0;n<20;n++)layout(cell,^{});
+            Check(Background(cell)==background && background.layer.mask==mask && mask.path==path && table.queries==queries && table.reloads==0 && cell.layoutInvalidations==0,@"layout repair reuses rendering state without row/path queries, refreshes or scheduled layouts");
+            background.layer.mask=nil;layout(cell,^{});
+            Check(background.layer.mask==mask,@"native mask reset is repaired without recomputing group roles");
+            layout(cell,^{cell.contentView.frame=CGRectMake(-80,0,450,76);});
+            Check(background.frame.origin.x==15 && background.frame.size.width==412 && background.frame.size.height==76 && cell.contentView.frame.origin.x==-80,@"width/height changes follow actual content coordinates and preserve swipe translation");
+            UIView *oldContent=cell.contentView,*replacement=View(UIView.class,CGRectMake(0,0,450,76));
+            layout(cell,^{cell.contentView=replacement;[cell addSubview:replacement];});
+            Check(Background(cell)==background && background.superview==replacement && ![oldContent.subviews containsObject:background],@"first-layout actual content replacement retains only one correctly sized card");
+            [FixtureConfiguration saveEnabled:NO];CGRect previous=background.frame;
+            layout(cell,^{cell.contentView.frame=CGRectMake(0,0,450,90);});
+            Check(CGRectEqualToRect(previous,background.frame),@"disabled rounding performs no geometry repair");
+            Configure();table.throwsOnQuery=NO;
+        }
+        UITableViewCell *fresh=Cell(table,0,0);table.throwsOnQuery=YES;
+        layout(fresh,^{});Check(fresh.contentView.subviews.count==0,@"layout with no established card does not invent a grouping role");
+        UITableView *search=Table();search.responder=owner;search.throwsOnQuery=YES;
+        UITableViewCell *searchCell=Cell(search,0,0);layout(searchCell,^{});
+        Check(search.queries==0 && searchCell.contentView.subviews.count==0,@"session-class cells in search tables are excluded");
+    }
+    UITableView *grouped=Table();id groupOwner=Owner(CSListCornerPageSession,grouped);
+    CSGroupListAdapter *adapter=[CSGroupListAdapter new];adapter.active=YES;adapter.projection=[ProjectionFixture new];adapter.projection.sections=@[@[@"B",@"D"]];adapter.nativeToDisplay=@{Path(3,0):Path(1,0)};grouped.groupAdapter=adapter;
+    UITableViewCell *groupCell=Cell(grouped,3,0);groupCell.contentView.frame=CGRectMake(0,0,390,44);grouped.throwsOnQuery=YES;
+    CSGroupWithNativeIndices(grouped,^{CSListCornerSessionDecorate(groupCell,grouped,Path(3,0),groupOwner);});
+    CSGroupWithDisplayIndices(grouped,^{HookNewMainFrameCellLayout(groupCell,^{groupCell.contentView.frame=CGRectMake(0,0,390,70);});});
+    Check(grouped.queries==0 && Rounded(Background(groupCell),CGPointMake(1,1)) && !Rounded(Background(groupCell),CGPointMake(1,69)),@"layout outside native index scope preserves the established filtered-group last-row role");
+    CGRect stable=Background(groupCell).frame;
+    HookNewMainFrameCellLayout(groupCell,^{groupCell.contentView.frame=CGRectZero;});
+    Check(CGRectEqualToRect(Background(groupCell).frame,stable),@"transient zero layout does not erase an existing card");
+    ReentrantContentCell *reentrant=[[ReentrantContentCell alloc] initWithFrame:CGRectMake(0,0,390,60)];reentrant.contentView.frame=reentrant.bounds;[grouped addSubview:reentrant];
+    CSGroupWithNativeIndices(grouped,^{CSListCornerSessionDecorate(reentrant,grouped,Path(3,0),groupOwner);});
+    __weak ReentrantContentCell *weakCell=reentrant;__block NSUInteger visits=0;
+    reentrant.onContent=^{visits++;CSListCornerRefreshSessionGeometry(weakCell);};
+    CSListCornerRefreshSessionGeometry(reentrant);reentrant.onContent=nil;
+    Check(visits==1,@"geometry repair guard blocks contentView-triggered recursive layout");
+}
 static void ContactsCountFooterTests(void) {
     Configure();UITableView *table=Table();ContactsViewController *owner=Owner(CSListCornerPageContacts,table);
     UIView *footer=View(UIView.class,CGRectMake(0,900,390,50));footer.backgroundColor=UIColor.whiteColor;
@@ -461,7 +514,7 @@ int main(int argc,const char **argv) { @autoreleasepool {
     NSDictionary *baseline=[NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:@(argv[1])] options:0 error:NULL];
     FixtureDefaults=[MemoryDefaults new];FixtureConfiguration=[[CSListCornerConfiguration alloc] initWithDefaults:FixtureDefaults];
     method_setImplementation(class_getClassMethod(CSListCornerConfiguration.class,@selector(sharedConfiguration)),(IMP)SharedConfiguration);
-    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();ScreenshotRegressionTests();ContactsCountFooterTests();
+    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();ScreenshotRegressionTests();ContactsCountFooterTests();SessionFirstLayoutTests();
     fprintf(stdout,"List corners: %lu checks, %lu failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)\n",(unsigned long)checks,(unsigned long)failures);
     return failures?1:0;
 } }
