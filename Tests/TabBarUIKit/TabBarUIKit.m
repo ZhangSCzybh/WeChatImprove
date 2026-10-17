@@ -13,6 +13,7 @@ BOOL UIAccessibilityIsReduceMotionEnabled(void) { return NO; }
 - (void)dealloc { if (_color) CGColorRelease(_color); }
 @end
 @implementation UIView
++ (void)performWithoutAnimation:(void (^)(void))actions { actions(); }
 - (instancetype)init { if ((self=[super init])) { _alpha=1;_userInteractionEnabled=YES;_layer=[CALayer layer];_subviews=[NSMutableArray array];_traitCollection=[UITraitCollection new]; } return self; }
 - (instancetype)initWithFrame:(CGRect)frame { if ((self=[self init])) self.frame=frame; return self; }
 - (void)setFrame:(CGRect)frame { _frame=frame; _bounds.size=frame.size; }

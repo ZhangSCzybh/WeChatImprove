@@ -13,8 +13,19 @@
     CSTabBarEndLayout(self);
 }
 - (void)setHidden:(BOOL)hidden {
+    CSTabBarUpdate(self);
     %orig(hidden);
     CSTabBarVisibilityChanged(self);
+}
+- (void)setAlpha:(CGFloat)alpha {
+    CSTabBarUpdate(self);
+    %orig(alpha);
+    CSTabBarVisibilityChanged(self);
+}
+- (UIView *)snapshotViewAfterScreenUpdates:(BOOL)afterUpdates {
+    CSTabBarUpdate(self);
+    UIView *snapshot=%orig(afterUpdates);
+    return CSTabBarStyleSnapshot(self,snapshot);
 }
 - (void)didMoveToWindow {
     %orig;

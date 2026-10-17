@@ -8,7 +8,9 @@ static char CSBarStateKey, CSItemStateKey;
 static NSHashTable<MMTabBar *> *CSBars;
 static CGRect CSRect(CSTabBarRect r) { return CGRectMake(r.x,r.y,r.width,r.height); }
 static void CSSetFrame(UIView *view, CGRect frame) {
-    if (view && !CGRectEqualToRect(view.frame,frame)) view.frame=frame;
+    if (view && !CGRectEqualToRect(view.frame,frame)) {
+        [UIView performWithoutAnimation:^{ view.frame=frame; }];
+    }
 }
 
 @interface CSTabBarItemState : NSObject
@@ -218,7 +220,7 @@ static void CSStop(CSTabBarState *s) {
     [s.observedButtons removeAllObjects];
     [s.surface removeFromSuperview];
 }
-static void CSRenderSurface(CSTabBarState *s) {
+static void CSRenderSurface(CSTabBarState *s, UIView *container) {
     MMTabBar *bar=s.bar; CSTabBarPreferences *p=CSTabBarPreferences.current;
     if (!s.surface) {
         s.surface=[UIView new]; s.surface.userInteractionEnabled=NO;
@@ -227,7 +229,7 @@ static void CSRenderSurface(CSTabBarState *s) {
         s.border=[CAShapeLayer layer]; s.border.fillColor=UIColor.clearColor.CGColor;
         [s.surface.layer addSublayer:s.border];
     }
-    if (s.surface.superview!=bar) [bar insertSubview:s.surface atIndex:0];
+    if (s.surface.superview!=container) [container insertSubview:s.surface atIndex:0];
     s.surface.hidden=NO;
     CSSetFrame(s.surface,s.floatingRect); CSSetFrame(s.material,s.surface.bounds);
     if (s.renderedPreferences==p && CGSizeEqualToSize(s.renderedSize,s.surface.bounds.size) && s.renderedStyle==bar.traitCollection.userInterfaceStyle && s.renderedNativeBackground==s.nativeBackground) return;
@@ -265,7 +267,7 @@ void CSTabBarUpdate(MMTabBar *bar) {
     s.applying=YES;
     s.controller=CSOwner(bar);
     NSArray *items=CSItems(bar);
-    if (!CSTabBarPreferences.current.enabled || ![s.controller respondsToSelector:@selector(getTabBarBtnForIndex:)] || !CSOwner(bar) || !bar.window || bar.hidden || bar.alpha<.01 || items.count!=4 || bar.items.count!=4) {
+    if (!CSTabBarPreferences.current.enabled || ![s.controller respondsToSelector:@selector(getTabBarBtnForIndex:)] || !CSOwner(bar) || items.count!=4 || bar.items.count!=4) {
         CSStop(s); s.applying=NO; return;
     }
     // Fail closed if the native controls are unavailable; never replace navigation.
@@ -277,12 +279,13 @@ void CSTabBarUpdate(MMTabBar *bar) {
         }
         [buttons addObject:button];
     }
-    CGFloat safe=bar.window.safeAreaInsets.bottom;
     CSTabBarPreferences *p=CSTabBarPreferences.current;
-    CSTabBarRect rect=CSTabBarFloatingRect(CGRectGetWidth(bar.bounds),CGRectGetHeight(bar.bounds),safe,p.scale,p.contentHeight,p.lift);
+    CSTabBarRect rect=CSTabBarFloatingRect(CGRectGetWidth(bar.bounds),CGRectGetHeight(bar.bounds),p.scale,p.contentHeight,p.lift);
     if (rect.width<=0 || bar.layer.mask) { CSStop(s); s.applying=NO; return; }
     for (UIView *ancestor=bar.superview;ancestor;ancestor=ancestor.superview) {
-        if (ancestor.clipsToBounds && !CGRectContainsRect(ancestor.bounds,[bar convertRect:CSRect(rect) toView:ancestor])) {
+        // A navigation transition can move the whole bar beyond a clipping ancestor.
+        // Only reject floating overflow when the native bar itself is fully inside it.
+        if (ancestor.clipsToBounds && CGRectContainsRect(ancestor.bounds,[bar convertRect:bar.bounds toView:ancestor]) && !CGRectContainsRect(ancestor.bounds,[bar convertRect:CSRect(rect) toView:ancestor])) {
             CSStop(s); s.applying=NO; return;
         }
     }
@@ -322,9 +325,42 @@ void CSTabBarUpdate(MMTabBar *bar) {
         }
     }
     s.buttons=buttonStates;
-    [CATransaction begin]; [CATransaction setDisableActions:YES]; CSRenderSurface(s); [CATransaction commit];
-    CSUpdateInset(s);
+    [CATransaction begin]; [CATransaction setDisableActions:YES]; CSRenderSurface(s,bar); [CATransaction commit];
+    // Hidden/detached bars retain their styled appearance for native transition snapshots.
+    // They must not retain ownership of a page's scroll inset or receive touches.
+    if (!bar.window || bar.hidden || bar.alpha<.01) CSRestoreInset(s);
+    else CSUpdateInset(s);
     s.applying=NO;
+}
+UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot) {
+    CSTabBarState *s=CSState(bar,NO);
+    if (!s.applied || !s.geometryApplied || !CSTabBarPreferences.current.enabled || !nativeSnapshot) return nativeSnapshot;
+    // WeChat 8.0.78 snapshots each item into a direct UIImageView and independently adds
+    // a full-width blur and hairline. Reuse those native pixels (including badges), but
+    // compose them with our surface. Never move live items or touch native navigation.
+    NSMutableArray<UIView *> *images=[NSMutableArray array];
+    for (MMTabBarItemView *item in CSItems(bar)) {
+        if (item.superview!=bar) return nativeSnapshot;
+        CGRect frame=item.frame;
+        UIView *match=nil;
+        for (UIView *candidate in nativeSnapshot.subviews) {
+            if ([candidate isKindOfClass:UIImageView.class] && CGRectEqualToRect(candidate.frame,frame) && ![images containsObject:candidate]) {
+                if (match) return nativeSnapshot;
+                match=candidate;
+            }
+        }
+        if (!match) return nativeSnapshot; // Preserve unknown snapshot compositions.
+        [images addObject:match];
+    }
+    if (images.count!=4) return nativeSnapshot;
+    UIView *snapshot=[[UIView alloc] initWithFrame:nativeSnapshot.frame];
+    snapshot.bounds=nativeSnapshot.bounds; snapshot.backgroundColor=UIColor.clearColor;
+    snapshot.userInteractionEnabled=NO; snapshot.clipsToBounds=NO;
+    CSTabBarState *copy=[CSTabBarState new];
+    copy.bar=bar; copy.floatingRect=s.floatingRect; copy.nativeBackground=s.nativeBackground; copy.animation=-1;
+    [CATransaction begin]; [CATransaction setDisableActions:YES]; CSRenderSurface(copy,snapshot); [CATransaction commit];
+    for (UIView *image in images) [snapshot addSubview:image];
+    return snapshot;
 }
 void CSTabBarBeginLayout(MMTabBar *bar) {
     CSTabBarState *s=CSState(bar,CSTabBarPreferences.current.enabled);

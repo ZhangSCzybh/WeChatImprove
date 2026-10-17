@@ -6,12 +6,13 @@ static inline double CSTabBarClamp(double value, double low, double high, double
     return fmin(high, fmax(low, isfinite(value) ? value : fallback));
 }
 // Coordinates are local to the untouched native tab bar. Negative y is intentional.
-static inline CSTabBarRect CSTabBarFloatingRect(double width, double height, double safeBottom,
+static inline CSTabBarRect CSTabBarFloatingRect(double width, double height,
                                                 double scale, double contentHeight, double lift) {
     if (!isfinite(width) || !isfinite(height) || width<=0 || height<=0) return (CSTabBarRect){0};
     double w=fmin(width, fmax(176, width*CSTabBarClamp(scale,.6,1,.9)));
     double h=CSTabBarClamp(contentHeight,44,80,52);
-    double bottom=height-CSTabBarClamp(safeBottom,0,height,0)-8-CSTabBarClamp(lift,0,100,0);
+    // Lift is measured from the native host's bottom edge, without an implicit safe-area gap.
+    double bottom=height-CSTabBarClamp(lift,0,100,0);
     return (CSTabBarRect){(width-w)/2,bottom-h,w,h};
 }
 static inline CSTabBarRect CSTabBarItemRect(CSTabBarRect rect, unsigned index, unsigned count, int rtl) {

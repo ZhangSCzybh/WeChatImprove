@@ -1,0 +1,31 @@
+{
+  "version": "1.6-37",
+  "package": "packages/com.wechat.improve_1.6-37_iphoneos-arm64.deb",
+  "sha256": "b4e922e1f70c112a92da3a39518b7bb721c2034915191ae70e977f78826e20dc",
+  "build": {
+    "command": "make package -j4 SCHEME=rootless PACKAGE_VERSION=1.6-37",
+    "exit_code": 0,
+    "architectures": [
+      "arm64",
+      "arm64e"
+    ],
+    "minimum_target": "iOS 15.0"
+  },
+  "tests": {
+    "tabbar_geometry": "pass",
+    "tabbar_preferences_native_lifecycle_and_snapshot_host_doubles": "pass",
+    "group_lifecycle": {
+      "checks": 46,
+      "failures": 0
+    },
+    "group_viewport": {
+      "checks": 72,
+      "failures": 0
+    }
+  },
+  "dylib_sha256": "9ad13a9562f6c8ecef0e09ab5725d23c703f12cdb9fcb78b3264aff80f922d62",
+  "packaged_binary_matches_build": true,
+  "device_verified": false,
+  "deployed": false,
+  "data_access": "Host tests use an isolated temporary preferences suite. No phone configuration, accounts or database were accessed."
+}

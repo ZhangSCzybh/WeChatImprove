@@ -417,7 +417,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
                                                      iconName:@"arrow.up.and.down"
                                                     iconColor:[UIColor systemOrangeColor]
                                                     inputValue:[NSString stringWithFormat:@"%.1f", self.positionOffset]
-                                                inputPlaceholder:@"输入上移距离（0–100 pt）"
+                                                inputPlaceholder:@"距底边距离（0–100 pt，0 为贴底）"
                                                valueChangedBlock:^(NSString *value) {
         CGFloat offset = [value floatValue];
         offset = CSTabBarClamp(offset,0,100,0);

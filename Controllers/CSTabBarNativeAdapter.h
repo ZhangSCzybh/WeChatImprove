@@ -33,6 +33,7 @@ void CSTabBarBeginLayout(MMTabBar *bar);
 void CSTabBarEndLayout(MMTabBar *bar);
 void CSTabBarUpdate(MMTabBar *bar);
 void CSTabBarVisibilityChanged(MMTabBar *bar);
+UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot);
 void CSTabBarBeginItemUpdate(MMTabBarItemView *item);
 void CSTabBarEndItemUpdate(MMTabBarItemView *item);
 BOOL CSTabBarContainsPoint(MMTabBar *bar, CGPoint point, BOOL *handled);

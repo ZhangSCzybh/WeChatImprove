@@ -24,6 +24,7 @@ BOOL UIAccessibilityIsReduceMotionEnabled(void);
 - (UIColor *)resolvedColorWithTraitCollection:(UITraitCollection *)trait;
 @end
 @interface UIView : NSObject
++ (void)performWithoutAnimation:(void (^)(void))actions;
 @property(nonatomic) CGRect frame,bounds;
 @property(nonatomic) CGFloat alpha;
 @property(nonatomic) BOOL hidden,clipsToBounds,userInteractionEnabled;

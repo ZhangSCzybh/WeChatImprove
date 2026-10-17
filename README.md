@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.6-36`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.6-37`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,11 +10,11 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.6-36`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.6-37`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.6-36` 完成 Rootless 测试包构建（原生悬浮底栏重构）；Rootful 保留构建入口，本轮未重新验证 |
+| Rootless / Rootful | `1.6-37` 完成 Rootless 测试包构建（底栏转场与贴底修复）；Rootful 保留构建入口，本轮未重新验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
@@ -119,9 +119,9 @@
 
 在 **底栏样式** 中配置：普通/选中图标、宽度档位、内容高度（44–80 pt）、向上偏移（0–100 pt）、圆角或胶囊、背景颜色/透明度、描边颜色/宽度、切换触感、隐藏文字。现有自定义文本与呼吸/心跳动画继续保留；系统开启减少动态效果时停止描边动画。
 
-沿用旧配置键和图标路径。旧负偏移按 0 处理；旧大小档位现在控制宽度，内容高度独立。修改后返回主页查看，关闭功能恢复原生外观。导入图标保留颜色、比例和透明通道，不再自动抠除白色像素。
+沿用旧配置键和图标路径。旧负偏移按 0 处理；旧大小档位现在控制宽度，内容高度独立。`1.6-37` 将上移距离改为从原生底栏宿主底边计算：0 为贴底，不再额外叠加安全区和 8 pt 间隔；保留 44–80 pt 高度范围及原有宽度逻辑。隐藏期间保留悬浮外观，微信的转场图标快照与悬浮背景组合，避免返回列表时显示原生整条底栏。修改后返回主页查看，关闭功能恢复原生外观。导入图标保留颜色、比例和透明通道，不再自动抠除白色像素。
 
-**验证范围：** 主机上的几何/偏好/生命周期行为测试、聊天分组 307 项回归和 arm64 / arm64e 构建；未连接目标手机，不能将这些结果视为实机渲染、原生双击/长按或转场已通过。具体设计、兼容边界与验收步骤见 [底栏重构说明](docs/tabbar-native-1.6-36.md)。
+**验证范围：** 本轮通过底栏几何/偏好/生命周期/快照组合主机测试、聊天分组生命周期和视口 118 项回归，并完成 arm64 / arm64e 构建。未连接目标手机，实机转场、贴底触控和渲染仍待验证。见 [本轮修复说明](docs/tabbar-transition-1.6-37.md)；原生架构及上一版验证见 [底栏重构说明](docs/tabbar-native-1.6-36.md)。
 
 ## 列表圆角
 
@@ -151,20 +151,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-36
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.6-37
 ```
 
-默认产物：`packages/com.wechat.improve_1.6-36_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.6-37_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.6-36` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.6-37` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-36
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.6-37
 ```
 
-默认产物：`packages/com.wechat.improve_1.6-36_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.6-37_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -184,7 +184,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.6-36_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.6-37_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
@@ -228,6 +228,8 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m`。新增实现文件放
 实现细节见 [会话分组说明](docs/session-groups.md)、[列表圆角优化](docs/list-corners.md)；设计背景见 [分组重构方案](docs/session-groups-refactor-proposal.md)。
 
 ### 验证状态
+
+`1.6-37` 修复底栏隐藏/转场快照中的原生样式回退，并使向上偏移 0 对齐底边。底栏主机行为测试、聊天分组生命周期 46 项及视口 72 项回归通过，Rootless 双架构包已构建。实机侧滑返回、取消返回及贴底触控待验证。详见 [底栏转场与贴底修复](docs/tabbar-transition-1.6-37.md)。
 
 `1.6-36` 完成原生悬浮底栏重构。底栏几何/偏好/生命周期行为测试和聊天分组 307 项回归通过，Rootless 双架构包已构建；实机布局与交互待验证。详见 [底栏重构说明](docs/tabbar-native-1.6-36.md)。
 

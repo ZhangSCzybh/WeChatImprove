@@ -78,12 +78,12 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         assert(first.textLabel.hidden && first.imageView.image==loaded && first.item.index==100);
         assert(first.badgeView==badge && !badge.hidden);
         assert(CGRectEqualToRect(first.frame,[buttons[0] frame]));
-        assert(first.frame.origin.y<0 && first.frame.size.height==52);
-        assert(equal(table.contentInset.bottom,19) && equal(table.contentInset.top,7));
+        assert(equal(first.frame.origin.y,31) && first.frame.size.height==52);
+        assert(equal(table.contentInset.bottom,2) && equal(table.contentInset.top,7));
         CGRect floating=first.frame, badgeFrame=badge.frame;
         for(int i=0;i<100;i++) CSTabBarUpdate(bar);
         assert(CGRectEqualToRect(first.frame,floating) && CGRectEqualToRect(badge.frame,badgeFrame));
-        assert(equal(table.contentInset.bottom,19));
+        assert(equal(table.contentInset.bottom,2));
         assert([buttons[0] actions].count==3); // native target plus the two feedback observers
         BOOL handled=NO;
         CGPoint center=CGPointMake(CGRectGetMidX(first.frame),CGRectGetMidY(first.frame));
@@ -105,10 +105,45 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         UIEdgeInsets external=table.contentInset;external.bottom=41;table.contentInset=external;
         bar.hidden=YES;CSTabBarVisibilityChanged(bar);
         assert(equal(table.contentInset.bottom,41) && equal(table.verticalScrollIndicatorInsets.bottom,5));
+        assert(CGRectEqualToRect(first.frame,floating) && first.textLabel.hidden && first.imageView.image==loaded);
+        assert(bar.hidden && !bar.clipsToBounds && bar.backgroundView.hidden);
+        assert([buttons[0] actions].count==3);
+        assert(!CSTabBarContainsPoint(bar,center,&handled) && handled);
+        // Native navigation snapshots must include the capsule even while the real bar is hidden.
+        UIView *raw=[[UIView alloc] initWithFrame:bar.frame];
+        UIView *blur=[[UIView alloc] initWithFrame:bar.bounds];[raw addSubview:blur];
+        NSMutableArray *nativeImages=[NSMutableArray array];
+        for (MMTabBarItemView *item in items) {
+            UIImageView *image=[[UIImageView alloc] initWithFrame:item.frame];image.image=[UIImage new];
+            [nativeImages addObject:image];[raw addSubview:image];
+        }
+        UIView *hairline=[[UIView alloc] initWithFrame:CGRectMake(0,0,390,.5)];[raw addSubview:hairline];
+        UIView *snapshot=CSTabBarStyleSnapshot(bar,raw);
+        assert(snapshot!=raw && CGRectEqualToRect(snapshot.frame,raw.frame));
+        assert(snapshot.subviews.count==5 && !snapshot.userInteractionEnabled && !snapshot.clipsToBounds);
+        assert(CGRectEqualToRect(snapshot.subviews[0].frame,CGRectMake(19.5,31,351,52)));
+        assert(blur.superview==raw && hairline.superview==raw);
+        for (NSUInteger i=0;i<4;i++) {
+            assert(snapshot.subviews[i+1]==nativeImages[i]);
+            assert([items[i] superview]==bar && [buttons[i] superview]==bar);
+        }
+        assert(first.badgeView==badge && bar.hidden && bar.backgroundView.hidden);
+        UIView *unknown=[UIView new];assert(CSTabBarStyleSnapshot(bar,unknown)==unknown);
+        // Alpha-based fades, detachment and cancelled returns retain the same styled geometry.
+        bar.hidden=NO;bar.alpha=0;CSTabBarVisibilityChanged(bar);
+        assert(bar.backgroundView.hidden && first.textLabel.hidden && bar.alpha==0);
+        assert(!CSTabBarContainsPoint(bar,center,&handled));
+        [bar removeFromSuperview];CSTabBarVisibilityChanged(bar);
+        assert(bar.backgroundView.hidden && CGRectEqualToRect(first.frame,floating));
+        [root addSubview:bar];bar.alpha=1;CSTabBarVisibilityChanged(bar);
+        assert(bar.backgroundView.hidden && CGRectEqualToRect(first.frame,floating));
+        bar.hidden=YES;CSTabBarVisibilityChanged(bar);
+        [isolated setBool:NO forKey:kTabBarStyleEnabledKey];[CSTabBarPreferences reload];CSTabBarUpdate(bar);
         assert(CGRectEqualToRect(first.frame,originalItem) && CGRectEqualToRect(first.imageView.frame,originalImage));
         assert(!first.textLabel.hidden && [first.textLabel.text isEqual:@"Native"] && first.imageView.image==nativeImage);
         assert(bar.hidden && bar.clipsToBounds && !bar.backgroundView.hidden && bar.backgroundColor==nativeColor);
         assert([buttons[0] actions].count==1);
+        assert(CSTabBarStyleSnapshot(bar,raw)==raw);
         bar.hidden=NO;CSTabBarVisibilityChanged(bar);
         [isolated setBool:NO forKey:kTabBarStyleEnabledKey];[CSTabBarPreferences reload];CSTabBarUpdate(bar);
         assert(!bar.hidden && !first.textLabel.hidden && first.imageView.image==nativeImage);
@@ -120,7 +155,12 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         [isolated removeObjectForKey:kTabBarIconChatKey];[isolated removeObjectForKey:kTabBarTextChatKey];
         [CSTabBarPreferences reload];CSTabBarUpdate(bar);
         assert(first.imageView.image==nativeImage && !first.textLabel.hidden && [first.textLabel.text isEqual:@"Native"]);
-        // A clipping ancestor must fall back to the native presentation, not leave unreachable controls.
+        // Moving the entire native bar outside a clipping parent during a transition must not flash native UI.
+        root.clipsToBounds=YES;bar.frame=CGRectMake(0,850,390,83);CSTabBarUpdate(bar);
+        assert(bar.backgroundView.hidden && first.textLabel.hidden==NO);
+        bar.frame=originalBar;root.clipsToBounds=NO;CSTabBarUpdate(bar);
+        // A stationary clipping ancestor still rejects an unreachable raised capsule.
+        [isolated setDouble:80 forKey:kTabBarPositionOffsetKey];[CSTabBarPreferences reload];
         root.clipsToBounds=YES;root.bounds=CGRectMake(0,761,390,83);
         CSTabBarUpdate(bar);
         assert(!bar.backgroundView.hidden && CGRectEqualToRect(first.frame,originalItem));
