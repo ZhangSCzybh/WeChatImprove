@@ -46,6 +46,13 @@ VIEW_CLASS(MMUIButton,UIView)
 VIEW_CLASS(TextStatePublishEntryButton,UIView)
 VIEW_CLASS(TextStateFriendTopicButton,UIView)
 VIEW_CLASS(TextStateProfileCardContentView,UIView)
+@interface MMTableSectionHeaderView : UITableViewHeaderFooterView
+@property(nonatomic,strong) UIImageView *backgroundImageView,*starImageView;
+@property(nonatomic,strong) UIView *topLineView,*bottomLineView;
+@property(nonatomic,strong) UILabel *titleLabel;
+@end
+@implementation MMTableSectionHeaderView @end
+VIEW_CLASS(_UITableViewCellSeparatorView,UIView)
 @interface ReentrantContentCell : UITableViewCell
 @property(nonatomic,copy) void (^onContent)(void);
 @end
@@ -300,12 +307,78 @@ static void ReviewCompatibilityTests(void) {
     Check([contacts.backgroundColor isEqual:UIColor.whiteColor] && contacts.showsVerticalScrollIndicator,@"disabled preparation exception is restricted to session appearance");
     Configure();
 }
+static void ScreenshotRegressionTests(void) {
+    Configure();
+    UITableView *contacts=Table();id owner=Owner(CSListCornerPageContacts,contacts);
+    MMTableSectionHeaderView *section=(id)View(MMTableSectionHeaderView.class,CGRectMake(0,0,390,44));
+    section.contentView.frame=section.bounds;section.contentView.backgroundColor=UIColor.whiteColor;
+    section.backgroundView=View(UIView.class,section.bounds);section.backgroundView.backgroundColor=UIColor.whiteColor;[section addSubview:section.backgroundView];
+    section.backgroundImageView=(id)View(UIImageView.class,section.bounds);section.backgroundImageView.image=[NSObject new];
+    section.starImageView=(id)View(UIImageView.class,CGRectMake(16,14,16,16));id starImage=[NSObject new];section.starImageView.image=starImage;
+    section.titleLabel=(id)View(UILabel.class,CGRectMake(40,10,200,24));
+    section.topLineView=View(UIView.class,CGRectMake(0,0,390,.5));section.bottomLineView=View(UIView.class,CGRectMake(0,43.5,390,.5));
+    for(UIView *view in @[section.backgroundImageView,section.starImageView,section.titleLabel,section.topLineView,section.bottomLineView])[section.contentView addSubview:view];
+    contacts.throwsOnQuery=YES;
+    Check(CSListCornerSectionView(owner,contacts,section,4,CSListCornerPageContacts,NO)==section,@"contacts keeps original star/letter header and native identity");
+    Check([section.contentView.backgroundColor isEqual:CSListCornerCanvasColor()] && [section.backgroundView.backgroundColor isEqual:CSListCornerCanvasColor()],@"star and alphabet header content/background surfaces match canvas");
+    Check(!section.backgroundImageView.image && [section.backgroundImageView.backgroundColor isEqual:CSListCornerCanvasColor()],@"opaque header background image no longer covers canvas");
+    Check(section.starImageView.image==starImage && !section.starImageView.hidden && !section.titleLabel.hidden,@"header star and title remain native visible content");
+    Check(section.topLineView.hidden && section.bottomLineView.hidden && contacts.queries==0,@"header known line roles hidden without table data queries");
+    [contacts addSubview:section];section.backgroundImageView.image=[NSObject new];section.topLineView.hidden=NO;
+    HookMMTableSectionHeaderViewLayout(section);
+    Check(!section.backgroundImageView.image && section.topLineView.hidden && contacts.queries==0,@"native header relayout/reuse repairs paint and lines without querying data");
+    [FixtureConfiguration saveEnabled:NO];id resetImage=[NSObject new];section.backgroundImageView.image=resetImage;section.topLineView.hidden=NO;
+    HookMMTableSectionHeaderViewLayout(section);
+    Check(section.backgroundImageView.image==resetImage && !section.topLineView.hidden,@"disabled section layout preserves native paint and line state");
+    Configure();UITableView *unrelatedTable=Table();Owner(CSListCornerPageSession,unrelatedTable);[unrelatedTable addSubview:section];unrelatedTable.throwsOnQuery=YES;
+    HookMMTableSectionHeaderViewLayout(section);
+    Check(section.backgroundImageView.image==resetImage && !section.topLineView.hidden && unrelatedTable.queries==0,@"shared section class outside Contacts is untouched");
+    contacts.footerLineVisible=YES;contacts.separatorStyle=(UITableViewCellSeparatorStyle)99;
+    CSListCornerPrepareTable(owner,CSListCornerPageContacts,NO);
+    Check(!contacts.footerLineVisible && contacts.separatorStyle==UITableViewCellSeparatorStyleNone,@"appearance repairs table separators and native extra footer line");
+    Check(contacts.sectionIndexBackgroundColor && contacts.sectionIndexBackgroundColor.alpha==0 && contacts.sectionIndexTrackingBackgroundColor.alpha==0,@"alphabet index backgrounds are transparent on appearance");
+    UIView *plainHeader=View(UIView.class,CGRectMake(0,0,390,44));
+    UIView *plainPaint=View(UIView.class,plainHeader.bounds);plainPaint.backgroundColor=UIColor.whiteColor;
+    UILabel *plainTitle=(id)View(UILabel.class,CGRectMake(16,10,200,24));plainTitle.backgroundColor=UIColor.whiteColor;
+    UIView *plainLine=View(UIView.class,CGRectMake(0,43.5,390,.5));
+    [plainHeader addSubview:plainPaint];[plainPaint addSubview:plainTitle];[plainPaint addSubview:plainLine];
+    CSListCornerSectionView(owner,contacts,plainHeader,5,CSListCornerPageContacts,NO);
+    Check([plainPaint.backgroundColor isEqual:CSListCornerCanvasColor()] && plainTitle.backgroundColor.alpha==0 && !plainTitle.hidden && plainLine.hidden,@"plain generated alphabet header surfaces and line are handled without removing title");
+    contacts.throwsOnQuery=NO;
+    UITableViewCell *cell=Cell(contacts,0,4);
+    UIView *wrapper=View(MMUIView.class,cell.bounds);cell->m_subContentView=wrapper;[cell.contentView addSubview:wrapper];
+    UIView *line=View(UIView.class,CGRectMake(52,59.5,338,.5));[wrapper addSubview:line];
+    UIView *namedLine=View(_UITableViewCellSeparatorView.class,CGRectMake(52,59.5,338,.5));[cell.contentView addSubview:namedLine];
+    UIView *zeroBusiness=View(TextStateProfileCardContentView.class,CGRectMake(0,60,390,0));[wrapper addSubview:zeroBusiness];
+    UIView *progress=View(UIView.class,CGRectMake(52,25,300,.5));[wrapper addSubview:progress];
+    CSListCornerContactsDecorate(cell,contacts,cell.path,owner);
+    Check(line.hidden && namedLine.hidden,@"native thin edge line and nested UIKit separator are removed");
+    Check(!zeroBusiness.hidden && !progress.hidden,@"zero-height business views and interior progress lines are preserved");
+    UITableView *more=Table();Owner(CSListCornerPageMore,more);UITableViewCell *moreCell=Cell(more,0,1);
+    UIView *lateLine=View(UIView.class,CGRectMake(52,59.5,338,.5));[moreCell.contentView addSubview:lateLine];
+    more.throwsOnQuery=YES;HookMMTableViewCellLayout(moreCell);
+    Check(lateLine.hidden && more.queries==0,@"More late native layout repairs separators without querying row data");
+    UIView *header=View(MMUIButton.class,CGRectMake(0,0,390,200));header.backgroundColor=UIColor.clearColor;more.tableHeaderView=header;[more addSubview:header];
+    UIView *nativePaint=View(UIView.class,header.bounds);nativePaint.userInteractionEnabled=NO;nativePaint.backgroundColor=UIColor.whiteColor;[header addSubview:nativePaint];
+    UIView *detail=View(TextStateProfileCardContentView.class,CGRectMake(0,120,390,80));detail.backgroundColor=UIColor.whiteColor;[header addSubview:detail];
+    CSListCornerMoreDecorateHeader(header);UIView *card=CSListCornerOwnedBackground(header);
+    Check(nativePaint.backgroundColor.alpha==0 && [card.backgroundColor isEqual:UIColor.whiteColor],@"opaque noninteractive profile backing paint moves into rounded plugin background");
+    Check(!Rounded(card,CGPointMake(1,199)) && !header.layer.mask && !detail.layer.mask && !detail.hidden && detail.backgroundColor.alpha==1,@"profile bottom corner is cut while native status content retains its surface and visibility");
+    for(NSUInteger n=0;n<10;n++)CSListCornerMoreDecorateHeader(header);
+    Check([card.backgroundColor isEqual:UIColor.whiteColor] && nativePaint.backgroundColor.alpha==0 && header.subviews.count==3,@"profile backing remains stable without overlay accumulation");
+    nativePaint.backgroundColor=[UIColor colorWithRed:.1 green:.1 blue:.1 alpha:1];
+    CSListCornerMoreDecorateHeader(header);
+    Check(nativePaint.backgroundColor.alpha==0 && Near(card.backgroundColor.red,.1),@"native profile backing color reset updates owned background and is cleared again");
+    [FixtureConfiguration saveEnabled:NO];lateLine.hidden=NO;lateLine.alpha=1;HookMMTableViewCellLayout(moreCell);
+    Check(!lateLine.hidden && more.queries==0,@"disabled More separator repair remains inactive");
+    Configure();
+}
 int main(int argc,const char **argv) { @autoreleasepool {
     if(argc!=2)return 2;
     NSDictionary *baseline=[NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:@(argv[1])] options:0 error:NULL];
     FixtureDefaults=[MemoryDefaults new];FixtureConfiguration=[[CSListCornerConfiguration alloc] initWithDefaults:FixtureDefaults];
     method_setImplementation(class_getClassMethod(CSListCornerConfiguration.class,@selector(sharedConfiguration)),(IMP)SharedConfiguration);
-    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();
+    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();ScreenshotRegressionTests();
     fprintf(stdout,"List corners: %lu checks, %lu failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)\n",(unsigned long)checks,(unsigned long)failures);
     return failures?1:0;
 } }

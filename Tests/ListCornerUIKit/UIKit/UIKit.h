@@ -51,7 +51,9 @@ typedef NS_ENUM(NSInteger, UITableViewCellSeparatorStyle) { UITableViewCellSepar
 @end
 @interface UITableView : UIView
 @property(nonatomic,strong) UIView *backgroundView,*tableHeaderView;
+@property(nonatomic,strong) UIColor *sectionIndexBackgroundColor,*sectionIndexTrackingBackgroundColor;
 @property(nonatomic) BOOL showsVerticalScrollIndicator;
+@property(nonatomic) BOOL footerLineVisible;
 @property(nonatomic) UITableViewCellSeparatorStyle separatorStyle;
 @property(nonatomic) CGFloat sectionHeaderHeight,sectionFooterHeight;
 @property(nonatomic,copy) NSArray<NSNumber *> *rows;
@@ -63,6 +65,7 @@ typedef NS_ENUM(NSInteger, UITableViewCellSeparatorStyle) { UITableViewCellSepar
 - (NSInteger)numberOfRowsInSection:(NSInteger)section;
 - (NSIndexPath *)indexPathForCell:(UITableViewCell *)cell;
 - (void)reloadData;
+- (void)drawFooterLine:(BOOL)draw;
 - (CGFloat)originalHeight;
 @end
 @interface NSIndexPath (ListCornerUIKit)
@@ -70,7 +73,12 @@ typedef NS_ENUM(NSInteger, UITableViewCellSeparatorStyle) { UITableViewCellSepar
 + (instancetype)indexPathForRow:(NSInteger)row inSection:(NSInteger)section;
 @end
 @interface UIViewController : NSObject @end
-@interface UIImageView : UIView @end
+@interface UIImageView : UIView
+@property(nonatomic,strong) id image;
+@end
+@interface UITableViewHeaderFooterView : UIView
+@property(nonatomic,strong) UIView *contentView,*backgroundView;
+@end
 @interface UILabel : UIView @end
 @interface UIBezierPath : NSObject
 @property(nonatomic,readonly) CGPathRef CGPath;

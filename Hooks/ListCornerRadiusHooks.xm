@@ -12,11 +12,7 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
     if (!configuration.enabled || !CSListCornerOwnsTable(owner,table,page)) return original;
     if (CSListCornerHidesSection(page,section)) return nil;
     if (page==CSListCornerPageContacts) {
-        original.backgroundColor=CSListCornerCanvasColor();
-        for (UIView *view in original.subviews) {
-            NSString *name=NSStringFromClass(view.class);
-            if ([name isEqualToString:@"_UITableViewCellSeparatorView"] || [name isEqualToString:@"MMTableViewCellSeparatorView"]) { view.hidden=YES; view.alpha=0; }
-        }
+        CSListCornerContactsDecorateSection(original,table,owner);
         return original;
     }
     CGFloat height=footer ? 0 : CSListCornerSectionGap(page,section,configuration.pinnedGap,configuration.normalGap);
@@ -56,6 +52,14 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
     UITableViewCell *cell=(UITableViewCell *)self;
     UITableView *table=CSListCornerTableForView(cell);
     CSListCornerDiscoverDecorate(cell,table,nil,nil);
+    CSListCornerRepairCellSeparators(cell,table);
+}
+%end
+%hook MMTableSectionHeaderView
+- (void)layoutSubviews {
+    %orig;
+    UIView *view=(UIView *)self;
+    CSListCornerContactsDecorateSection(view,CSListCornerTableForView(view),nil);
 }
 %end
 %hook MMUIButton

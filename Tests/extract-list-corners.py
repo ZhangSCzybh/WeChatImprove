@@ -12,6 +12,8 @@ def body(text,start):
         end+=1
     return text[begin+1:end-1]
 output=[]
+start=source.index('static UIView *CSListCornerSectionView(')
+output.append(source[start:source.index('{',start)+1]+body(source,start)+'}')
 for page,cls in [('Contacts','ContactsViewController'),('Discover','FindFriendEntryViewController'),('Session','NewMainFrameViewController'),('More','MoreViewController')]:
     start=source.index('%hook '+cls+'\n');end=source.index('%end',start);chunk=source[start:end]
     for role in ['Header','Footer']:
@@ -20,7 +22,7 @@ for page,cls in [('Contacts','ContactsViewController'),('Discover','FindFriendEn
         assert code.count('%orig')==1
         code=code.replace('%orig','[(UITableView *)arg1 originalHeight]')
         output.append(f'static CGFloat Hook{page}{role}(id self,id arg1,NSInteger arg2) {{'+code+'}')
-for cls in ['MMTableViewCell','NewContactsItemCell']:
+for cls in ['MMTableViewCell','NewContactsItemCell','MMTableSectionHeaderView']:
     chunk=source[source.index('%hook '+cls+'\n'):];chunk=chunk[:chunk.index('%end')]
     code=body(chunk,chunk.index('- (void)layoutSubviews')).replace('%orig;','(void)self; /* original layout stub */')
     output.append(f'static void Hook{cls}Layout(id self) {{'+code+'}')

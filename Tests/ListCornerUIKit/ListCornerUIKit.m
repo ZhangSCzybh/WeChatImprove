@@ -24,6 +24,7 @@
 - (instancetype)init { if ((self=[super init])) { _contentView=[UIView new];[self addSubview:_contentView]; }return self; }
 @end
 @implementation UITableView
+- (void)drawFooterLine:(BOOL)draw { self.footerLineVisible=draw; }
 - (void)query { self.queries++;if(self.onQuery)self.onQuery();if(self.throwsOnQuery)[NSException raise:@"query" format:@"height callback queried/refreshed table"]; }
 - (NSInteger)numberOfSections { [self query];return self.rows.count; }
 - (NSInteger)numberOfRowsInSection:(NSInteger)section { [self query];if(section<0 || section>=(NSInteger)self.rows.count)[NSException raise:@"bounds" format:@"section out of bounds"];return self.rows[section].integerValue; }
@@ -38,6 +39,9 @@
 @end
 @implementation UIViewController @end
 @implementation UIImageView @end
+@implementation UITableViewHeaderFooterView
+- (instancetype)init { if ((self=[super init])) { _contentView=[UIView new];[self addSubview:_contentView]; } return self; }
+@end
 @implementation UILabel @end
 @implementation UIBezierPath { CGPathRef _path; }
 + (instancetype)bezierPathWithRoundedRect:(CGRect)rect cornerRadius:(CGFloat)radius { UIBezierPath *p=[self new];p->_path=CGPathCreateWithRoundedRect(rect,radius,radius,NULL);return p; }

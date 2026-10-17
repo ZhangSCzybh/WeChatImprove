@@ -1,0 +1,14 @@
+{
+  "base": "c1f8501f",
+  "protected_sources_count": 174,
+  "protected_sources_unchanged": true,
+  "old_original_packages_sha256": {
+    "packages/com.wechat.improve_1.7-12_iphoneos-arm64.deb": "658149d3090667335131a8daeb16b9bead00a2db2c32a354a1147e91069548cb",
+    "packages/com.wechat.improve_1.7-17_iphoneos-arm64.deb": "af1fa08d48f9cba4548125318a301debca2835322ba2cf938d1dd7ad2739bb93",
+    "packages/com.wechat.improve_1.7-14_iphoneos-arm64.deb": "bdeaa77fcbafa1352ea62325e6f3587b25095072a0a40747c984dbf77523c9ab",
+    "packages/com.wechat.improve_1.7-19_iphoneos-arm64.deb": "ce9a6d8ff8feed4e01f64c87bc1505d2745c006d3bb419816343edc61585e03b",
+    "packages/com.wechat.improve_1.7-15_iphoneos-arm64.deb": "cbd94b193486c0cc30aa773a7ded5fc35c05ed7e0ec780da5bcae4c6cec33048",
+    "packages/com.wechat.improve_1.7-16_iphoneos-arm64.deb": "cf0c8f64f3e99fb66831f00f23b9666c6a02fe8b95e871fa702d006e2ce3594f",
+    "packages/com.wechat.improve_1.7-13_iphoneos-arm64.deb": "39339f59d41544399585be0c5f2db11d9a9a1c74381b0e30047b493674f91193"
+  }
+}

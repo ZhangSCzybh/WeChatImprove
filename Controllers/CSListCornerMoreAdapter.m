@@ -57,8 +57,21 @@ void CSListCornerMoreDecorateHeader(UIView *view) {
         UIColor *nativeColor=objc_getAssociatedObject(view,&HeaderNativeColorKey);
         if (view.backgroundColor && ![view.backgroundColor isEqual:[UIColor clearColor]]) {
             nativeColor=view.backgroundColor;
-            objc_setAssociatedObject(view,&HeaderNativeColorKey,nativeColor,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
+        // makeHeaderView adds a noninteractive, empty native backing view (BG_2)
+        // above the button's own background. Moving that paint into our rounded
+        // background avoids clipping the entire interactive/status header.
+        for (UIView *item in view.subviews) {
+            if (item==background || item.userInteractionEnabled || item.subviews.count) continue;
+            NSString *name=NSStringFromClass(item.class);
+            CGRect frame=item.frame;
+            BOOL plain=[name isEqualToString:@"UIView"] || [name isEqualToString:@"MMUIView"];
+            BOOL coversBottom=CSListCornerValidRect(frame) && frame.size.height>1 && CGRectGetMinX(frame)<=1 && CGRectGetMaxX(frame)>=cardWidth-1 && CGRectGetMaxY(frame)>=CGRectGetMaxY(view.bounds)-1;
+            if (!plain || !coversBottom) continue;
+            if (item.backgroundColor && ![item.backgroundColor isEqual:[UIColor clearColor]]) nativeColor=item.backgroundColor;
+            item.backgroundColor=[UIColor clearColor];
+        }
+        if (nativeColor) objc_setAssociatedObject(view,&HeaderNativeColorKey,nativeColor,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         view.backgroundColor=[UIColor clearColor];
         CSListApplyCardBackground(background,view.bounds,configuration.radius,YES,YES,nativeColor ?: [UIColor clearColor]);
         for (UIView *item in view.subviews) {

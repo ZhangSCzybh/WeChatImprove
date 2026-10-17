@@ -4,6 +4,12 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.7-20": @[
+            @{@"title": @"修复通讯录圆角显示",
+              @"detail": @"统一星标朋友与字母分组标题的背景，清理卡片边缘和行间残留分割线。"},
+            @{@"title": @"修复个人资料卡片圆角",
+              @"detail": @"处理资料卡片的原生背景遮挡，并清理“我”页面原生布局后重现的分割线。"}
+        ],
         @"1.7-19": @[
             @{@"title": @"整理四页列表圆角",
               @"detail": @"统一会话、通讯录、发现和我的列表圆角处理，保留各页布局、独立左右边距、会话间距和颜色设置。"},

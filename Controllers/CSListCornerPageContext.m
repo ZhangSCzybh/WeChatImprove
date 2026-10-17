@@ -2,6 +2,9 @@
 #import "CSListCornerRenderer.h"
 #import <objc/runtime.h>
 #import <math.h>
+@interface UITableView (CSListCornerNativeFooter)
+- (void)drawFooterLine:(BOOL)draw;
+@end
 static char OperationKey, BackgroundKey, PreviousBackgroundKey;
 BOOL CSListCornerBeginOperation(id object) {
     if (!object || [objc_getAssociatedObject(object,&OperationKey) boolValue]) return NO;
@@ -61,15 +64,39 @@ UIView *CSListCornerNativeContent(UITableViewCell *cell) {
     id native=type && type[0]=='@' ? object_getIvar(cell,ivar) : nil;
     return [native isKindOfClass:UIView.class] && [native isDescendantOfView:cell.contentView] ? native : nil;
 }
+UIView *CSListCornerViewIvar(id object, const char *name, UIView *container) {
+    Ivar ivar=class_getInstanceVariable([object class],name);
+    const char *type=ivar ? ivar_getTypeEncoding(ivar) : NULL;
+    id view=type && type[0]=='@' ? object_getIvar(object,ivar) : nil;
+    return [view isKindOfClass:UIView.class] && [view isDescendantOfView:container] ? view : nil;
+}
+static void CSListCornerHideEdgeLines(UIView *container, CGFloat cellWidth, NSUInteger depth) {
+    // Only inspect the cell's structural containers, never arbitrary business content.
+    for (UIView *view in container.subviews) {
+        NSString *name=NSStringFromClass(view.class);
+        CGRect frame=view.frame;
+        BOOL plain=[name isEqualToString:@"UIView"] || [name isEqualToString:@"MMUIView"];
+        BOOL named=[name isEqualToString:@"_UITableViewCellSeparatorView"] || [name isEqualToString:@"MMTableViewCellSeparatorView"];
+        BOOL edge=CGRectGetMinY(frame)<=CGRectGetMinY(container.bounds)+1 || CGRectGetMaxY(frame)>=CGRectGetMaxY(container.bounds)-1;
+        BOOL thin=plain && view.subviews.count==0 && CSListCornerValidRect(frame) && frame.size.height<=1 && frame.size.width>=MAX(20,cellWidth/2) && edge;
+        if (named || thin) { view.hidden=YES; view.alpha=0; continue; }
+        BOOL structural=plain || [name isEqualToString:@"UITableViewCellContentView"] || [name isEqualToString:@"ContactsItemView"];
+        if (structural && depth<3) CSListCornerHideEdgeLines(view,cellWidth,depth+1);
+    }
+}
 void CSListCornerHideSeparator(UITableViewCell *cell) {
     UIEdgeInsets inset=UIEdgeInsetsMake(0,cell.bounds.size.width,0,0);
     if (!UIEdgeInsetsEqualToEdgeInsets(cell.separatorInset,inset)) cell.separatorInset=inset;
     if (!UIEdgeInsetsEqualToEdgeInsets(cell.layoutMargins,UIEdgeInsetsZero)) cell.layoutMargins=UIEdgeInsetsZero;
     cell.preservesSuperviewLayoutMargins=NO;
-    for (UIView *subview in cell.subviews) {
-        NSString *name=NSStringFromClass(subview.class);
-        if ([name isEqualToString:@"_UITableViewCellSeparatorView"] || [name isEqualToString:@"MMTableViewCellSeparatorView"]) { subview.hidden=YES; subview.alpha=0; }
-    }
+    CSListCornerHideEdgeLines(cell,cell.bounds.size.width,0);
+}
+void CSListCornerRepairCellSeparators(UITableViewCell *cell, UITableView *table) {
+    if (![[CSListCornerConfiguration sharedConfiguration] snapshot].enabled) return;
+    if (!CSListCornerOwnerForTable(table,CSListCornerPageContacts) && !CSListCornerOwnerForTable(table,CSListCornerPageMore)) return;
+    if (!CSListCornerBeginOperation(cell)) return;
+    @try { CSListCornerHideSeparator(cell); }
+    @finally { CSListCornerEndOperation(cell); }
 }
 void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial) {
     CSListCornerSnapshot *configuration=[[CSListCornerConfiguration sharedConfiguration] snapshot];
@@ -78,9 +105,16 @@ void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial) {
     if (!configuration.enabled && page!=CSListCornerPageSession) return;
     UITableView *table=CSListCornerOwnedTable(owner,page); if (!table) return;
     table.backgroundColor=page==CSListCornerPageSession ? [configuration backgroundForStyle:table.traitCollection.userInterfaceStyle] : CSListCornerCanvasColor();
+    if (page==CSListCornerPageContacts) {
+        table.sectionIndexBackgroundColor=[UIColor clearColor];
+        table.sectionIndexTrackingBackgroundColor=[UIColor clearColor];
+    }
+    if (page==CSListCornerPageContacts || page==CSListCornerPageMore) {
+        table.separatorStyle=UITableViewCellSeparatorStyleNone;
+        if ([table respondsToSelector:@selector(drawFooterLine:)]) [table drawFooterLine:NO];
+    }
     if (initial || page==CSListCornerPageSession) {
         table.backgroundView.backgroundColor=CSListCornerCanvasColor(); table.showsVerticalScrollIndicator=NO;
-        if (page==CSListCornerPageContacts || page==CSListCornerPageMore) table.separatorStyle=UITableViewCellSeparatorStyleNone;
         if (page==CSListCornerPageContacts) { table.sectionHeaderHeight=0; table.sectionFooterHeight=0; }
     }
 }
