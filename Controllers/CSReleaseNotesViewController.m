@@ -4,6 +4,12 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.7-19": @[
+            @{@"title": @"整理四页列表圆角",
+              @"detail": @"统一会话、通讯录、发现和我的列表圆角处理，保留各页布局、独立左右边距、会话间距和颜色设置。"},
+            @{@"title": @"完善列表复用与资料卡显示",
+              @"detail": @"列表复用、宽度变化或原生布局刷新后恢复卡片样式，保留角标、二维码和状态卡片展开收起。"}
+        ],
         @"1.7-17": @[
             @{@"title": @"后台模糊功能整理",
               @"detail": @"保留已验证的 0.22 秒模糊与快照淡出过渡，统一动画和快照清理，减少重复处理。"}
