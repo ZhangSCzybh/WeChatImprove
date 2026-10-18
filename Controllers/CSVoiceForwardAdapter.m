@@ -19,7 +19,7 @@ static const void *CSForwardBindingKey=&CSForwardBindingKey;
 - (BOOL)bindLogic:(id)logic operationID:(NSString *)operationID context:(CSMessageActionContext *)context {
     CSMessageForwardBinding *old=[self bindingForLogic:logic];
     if (!logic || (old && !old.closed)) return old && [old.operationID isEqualToString:operationID];
-    CSMessageForwardBinding *binding=[CSMessageForwardBinding new]; binding.operationID=operationID; binding.logic=logic; binding.context=context; binding.sourceWrap=context.sourceWrap; binding.messageType=context.messageType; binding.localID=context.localID; binding.serverID=context.serverID; binding.fromUser=context.outgoing ? context.accountID : context.sourceConversationID; binding.toUser=context.outgoing ? context.sourceConversationID : context.accountID;
+    CSMessageForwardBinding *binding=[CSMessageForwardBinding new]; binding.operationID=operationID; binding.context=context; binding.sourceWrap=context.sourceWrap; binding.messageType=context.messageType; binding.localID=context.localID; binding.serverID=context.serverID; binding.fromUser=context.outgoing ? context.accountID : context.sourceConversationID; binding.toUser=context.outgoing ? context.sourceConversationID : context.accountID;
     objc_setAssociatedObject(logic,CSForwardBindingKey,binding,OBJC_ASSOCIATION_RETAIN_NONATOMIC); return YES;
 }
 - (BOOL)confirmLogic:(id)logic {

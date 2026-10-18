@@ -45,10 +45,6 @@ static NSTimeInterval const kCSLogicMgrRetrySleepInterval = 0.08;
     
     self.executing = YES;
     
-    NSLog(@"[抢红包] 任务开始: delay=%u session=%@ sendId=%@",
-          self.delaySeconds,
-          self.redEnvelopParam.sessionUserName ?: @"",
-          self.redEnvelopParam.sendId ?: @"");
     
     __weak typeof(self) weakSelf = self;
     
@@ -85,10 +81,6 @@ static NSTimeInterval const kCSLogicMgrRetrySleepInterval = 0.08;
 - (void)main {
     NSDictionary *params = [self.redEnvelopParam toParams];
     
-    NSLog(@"[抢红包] 任务执行: mainThread=%d session=%@ sendId=%@",
-          [NSThread isMainThread],
-          self.redEnvelopParam.sessionUserName ?: @"",
-          self.redEnvelopParam.sendId ?: @"");
     
     NSInteger maxRetry = self.maxRetryCount > 0 ? self.maxRetryCount : 1;
     BOOL didSchedule = NO;
@@ -130,8 +122,6 @@ static NSTimeInterval const kCSLogicMgrRetrySleepInterval = 0.08;
             if (self.isCancelled) return;
             @try {
                 ((void (*)(id, SEL, id))objc_msgSend)(logicMgr, @selector(OpenRedEnvelopesRequest:), params);
-                NSLog(@"[抢红包] 调用完成: sendId=%@ attempt=%ld",
-                      self.redEnvelopParam.sendId ?: @"", (long)attempt);
             } @catch (NSException *exception) {
                 NSLog(@"[抢红包] 调用异常: %@", exception);
             }

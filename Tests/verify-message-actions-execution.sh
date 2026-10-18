@@ -19,6 +19,9 @@ ui=[]
 for name,native in (('bShowSendSuccessView','YES'),('bHiddenSendSuccessToastView','NO')):
     ui.append(re.search(r'- \(BOOL\)'+name+r' \{.*?\n\}',logic,re.S).group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig',native))
 clear=re.search(r'- \(void\)clearData \{.*?\n\}',logic,re.S).group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig;', 'forwardNativeClearCalls++;')
+download=source.split('%hook VoiceMsgDownloader',1)[1].split('%end',1)[0]
+body=download[download.index('{'):download.rindex('}')+1].replace('%orig;', 'voiceHookNativeCalls++;').replace('CSMessageActionCoordinator.sharedCoordinator','TestVoiceCoordinator()')
+(out/'VoiceDownloadHookUnderTest.h').write_text('static NSUInteger voiceHookNativeCalls, voiceHookCoordinatorReads;\nstatic CSMessageActionCoordinator *voiceHookCoordinator;\nstatic CSMessageActionCoordinator *TestVoiceCoordinator(void) { voiceHookCoordinatorReads++; return voiceHookCoordinator; }\nstatic void TestNativeVoiceCallback(NSString *chat, unsigned int localID, long long serverID, unsigned int endFlag, unsigned int error) '+body+'\n')
 menu=(root/'Hooks/RepeatHooks.xm').read_text()
 classes=('CommonMessageCellView','TextMessageCellView','ImageMessageCellView','EmoticonMessageCellView','VideoMessageCellView','VoiceMessageCellView','AppEmoticonMessageCellView','AppFileMessageCellView','ShareCardMessageCellView','GameMessageCellView')
 extracted=['static CSMessageActionMenuAdapter *menuHookAdapter;']

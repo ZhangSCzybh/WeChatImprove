@@ -1,3 +1,4 @@
+#import "CSPreferenceRefresh.h"
 #import "CSTabBarNativeAdapter.h"
 #import "CSTabBarPreferences.h"
 #import "CSTabBarGeometry.h"
@@ -225,7 +226,13 @@ static void CSStop(CSTabBarState *s) {
     [s.observedButtons removeAllObjects];
     [s.surface removeFromSuperview];
 }
-static NSInteger CSDesiredAnimation(void) {
+static BOOL CSAnimationInactive;
+static NSHashTable *CSInactiveAnimationScenes;
+static NSInteger CSDesiredAnimation(CSTabBarState *s) {
+    if (CSAnimationInactive || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive ||
+        NSProcessInfo.processInfo.thermalState>=NSProcessInfoThermalStateSerious || !s.bar.window) return CSTabBarBorderAnimationNone;
+    if (s.bar.window.windowScene && ([CSInactiveAnimationScenes containsObject:s.bar.window.windowScene] || s.bar.window.windowScene.activationState!=UISceneActivationStateForegroundActive)) return CSTabBarBorderAnimationNone;
+    for (UIView *view=s.bar;view;view=view.superview) if (view.hidden || view.alpha<.01) return CSTabBarBorderAnimationNone;
     CSTabBarPreferences *p=CSTabBarPreferences.current;
     return p.enabled && p.borderColor && p.borderWidth>0 && !UIAccessibilityIsReduceMotionEnabled() ? p.animation : CSTabBarBorderAnimationNone;
 }
@@ -245,7 +252,7 @@ static void CSRenderBorderAnimation(CSTabBarState *s, CGFloat radius, CGFloat li
     [s.surface.layer removeAnimationForKey:CSClassicAnimationKey];
     s.surface.layer.shadowOpacity=0; s.surface.layer.shadowPath=NULL;
     s.surface.layer.shadowColor=NULL; s.surface.layer.shadowRadius=0;
-    NSInteger animation=CSDesiredAnimation();
+    NSInteger animation=CSDesiredAnimation(s);
     BOOL classic=animation==CSTabBarBorderAnimationClassicBreathing || animation==CSTabBarBorderAnimationClassicHeartbeat;
     s.haloContainer.hidden=animation==0 || classic;
     s.halo.opacity=0; // No residual glow when stopped or between pulses.
@@ -301,7 +308,7 @@ static void CSRenderBorderAnimation(CSTabBarState *s, CGFloat radius, CGFloat li
 // Appearance caching cannot prove that CA animations survived suspension/detachment.
 // Inspect the layer itself and leave an existing animation's phase untouched.
 static void CSEnsureBorderAnimation(CSTabBarState *s) {
-    NSInteger animation=CSDesiredAnimation();
+    NSInteger animation=CSDesiredAnimation(s);
     if (animation==CSTabBarBorderAnimationNone) {
         if (![s.halo animationForKey:CSOutwardAnimationKey] && ![s.surface.layer animationForKey:CSClassicAnimationKey]) return;
     } else {
@@ -495,18 +502,14 @@ UIView *CSTabBarHitTest(MMTabBar *bar, CGPoint point, UIEvent *event, BOOL *hand
     });
 }
 @end
+static atomic_bool CSPreferencesPending;
 static void CSRefreshPreferences(void) {
-    static BOOL pending=NO;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (pending) return;
-        pending=YES;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            pending=NO; [CSTabBarPreferences reload];
-            for (MMTabBar *bar in CSBars.allObjects) {
-                CSTabBarState *s=CSState(bar,NO); CSStop(s);
-                [bar setNeedsLayout]; [bar layoutIfNeeded]; CSTabBarUpdate(bar);
-            }
-        });
+    CSRequestMainRefresh(&CSPreferencesPending, ^{
+        [CSTabBarPreferences reload];
+        for (MMTabBar *bar in CSBars.allObjects) {
+            CSTabBarState *s=CSState(bar,NO); CSStop(s);
+            [bar setNeedsLayout]; [bar layoutIfNeeded]; CSTabBarUpdate(bar);
+        }
     });
 }
 static void CSDarwinPreferencesChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef info) {
@@ -516,7 +519,7 @@ static void CSResumeVisibleAnimations(void) {
     [CATransaction begin]; [CATransaction setDisableActions:YES];
     for (MMTabBar *bar in CSBars.allObjects) {
         CSTabBarState *s=CSState(bar,NO);
-        if (s.applied && s.geometryApplied && bar.window && !bar.hidden && bar.alpha>=.01) CSEnsureBorderAnimation(s);
+        if (s.applied && s.geometryApplied) CSEnsureBorderAnimation(s);
     }
     [CATransaction commit];
 }
@@ -524,12 +527,24 @@ void CSTabBarInstallObservers(void) {
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         [CSTabBarPreferences reload];
+        CSAnimationInactive=UIApplication.sharedApplication.applicationState!=UIApplicationStateActive;
+        CSInactiveAnimationScenes=[NSHashTable weakObjectsHashTable];
         NSNotificationCenter *center=NSNotificationCenter.defaultCenter;
         for (NSString *name in @[CSTabBarPreferencesDidChange,UIAccessibilityReduceMotionStatusDidChangeNotification]) {
-            [center addObserverForName:name object:nil queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification *note) { CSRefreshPreferences(); }];
+            [center addObserverForName:name object:nil queue:nil usingBlock:^(NSNotification *note) { CSRefreshPreferences(); }];
         }
-        for (NSString *name in @[UIApplicationDidBecomeActiveNotification,UISceneDidActivateNotification]) {
-            [center addObserverForName:name object:nil queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification *note) { CSResumeVisibleAnimations(); }];
+        for (NSString *name in @[UIApplicationDidBecomeActiveNotification, UIApplicationWillResignActiveNotification,
+            UISceneDidActivateNotification, UISceneWillDeactivateNotification, NSProcessInfoThermalStateDidChangeNotification]) {
+            [center addObserverForName:name object:nil queue:nil usingBlock:^(NSNotification *note) {
+                void (^update)(void)=^{
+                    if ([note.name isEqual:UIApplicationWillResignActiveNotification]) CSAnimationInactive=YES;
+                    if ([note.name isEqual:UIApplicationDidBecomeActiveNotification]) CSAnimationInactive=NO;
+                    if (note.object && [note.name isEqual:UISceneWillDeactivateNotification]) [CSInactiveAnimationScenes addObject:note.object];
+                    if (note.object && [note.name isEqual:UISceneDidActivateNotification]) [CSInactiveAnimationScenes removeObject:note.object];
+                    CSResumeVisibleAnimations();
+                };
+                if (NSThread.isMainThread) update(); else dispatch_async(dispatch_get_main_queue(),update);
+            }];
         }
         CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),NULL,CSDarwinPreferencesChanged,CFSTR("com.wechat.enhance.tabbar_style.changed"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
     });

@@ -273,27 +273,5 @@ static void applyGlobalScale(SessionCellLayoutParam *layoutParam, CGFloat scale)
 
 %end
 
-static void reloadSettings() {
-    CFNotificationCenterPostNotification(
-        CFNotificationCenterGetDarwinNotifyCenter(),
-        CFSTR("com.wechat.enhance.settings_changed"),
-        NULL,
-        NULL,
-        true
-    );
-}
-
-%ctor {
-    CFNotificationCenterAddObserver(
-        CFNotificationCenterGetDarwinNotifyCenter(),
-        NULL,
-        (CFNotificationCallback)reloadSettings,
-        CFSTR("com.wechat.enhance.settings_changed"),
-        NULL,
-        CFNotificationSuspensionBehaviorDeliverImmediately
-    );
-    
-    NSLog(@"[LayoutHooks] 布局和字体设置Hook已加载");
-    NSLog(@"[LayoutHooks] 聊天界面字体大小: %.1fpt (默认17pt)", getChatFontSize());
-    NSLog(@"[LayoutHooks] 全局缩放比例: %.2f (默认1.0)", getGlobalScale());
-}
+// Layout getters read the current shared preferences directly. There is no
+// cache to invalidate and no observer that republishes its own notification.

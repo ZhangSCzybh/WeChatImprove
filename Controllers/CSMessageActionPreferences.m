@@ -95,9 +95,12 @@ static NSArray<NSString *> *CSActionDarwinNames(void) {
 - (void)refreshOnMain {
     NSAssert(NSThread.isMainThread,@"Settings updates must run on main");
     BOOL changed=NO;
+    NSUInteger version;
+    @synchronized(self) { _refreshPending=NO; version=_snapshot.version+1; }
+    // Defaults may synchronously notify a worker that needs requestRefresh's
+    // lock. Never read preferences while holding that lock.
+    CSMessageActionSettings *candidate=[[CSMessageActionSettings alloc] initWithDefaults:_defaults version:version];
     @synchronized(self) {
-        _refreshPending=NO;
-        CSMessageActionSettings *candidate=[[CSMessageActionSettings alloc] initWithDefaults:_defaults version:_snapshot.version+1];
         if (![_snapshot hasSameValuesAs:candidate]) { _snapshot=candidate; changed=YES; }
     }
     if (changed) [NSNotificationCenter.defaultCenter postNotificationName:CSMessageActionSettingsDidChangeNotification object:self];

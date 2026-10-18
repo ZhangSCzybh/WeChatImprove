@@ -32,7 +32,6 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
 @property(nonatomic) BOOL cancelled;
 @property(nonatomic) BOOL mediaFailed;
 @property(nonatomic, copy) NSString *failureDetail;
-@property(nonatomic) BOOL appReady;
 @property(nonatomic, copy) NSData *appData;
 @property(nonatomic, copy) NSString *appPath;
 @property(nonatomic) BOOL nativeFinished;
@@ -88,6 +87,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
         _operations=[NSMutableDictionary dictionary]; _completed=[NSMutableDictionary dictionary]; _completedOrder=[NSMutableArray array]; _pendingFeedback=[NSMutableArray array]; _accountEpoch=1; _boundaryToken=atomic_load_explicit(&CSActionAccountBoundary,memory_order_acquire); _accountSuspended=(_boundaryToken&1)!=0; _accountID=_accountSuspended ? nil : [environment.currentAccountID copy];
         __weak typeof(self) weakSelf=self;
         provider.waitingHandler=^(NSString *identifier){ [weakSelf showWaiting:identifier]; };
+        provider.failureHandler=^(NSString *identifier, NSString *reason){ weakSelf.operations[identifier].failureDetail=[@"语音读取或校验失败：" stringByAppendingString:reason]; };
         provider.recordingState=^NSNumber *(CSMessageActionContext *context){
             typeof(self) self=weakSelf; if (!self || ![self validAccount:context]) return nil;
             id audio=[self.environment serviceNamed:@"AudioSender"];
@@ -228,7 +228,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
         if (context.messageType==34) [self prepareVoice:op];
         else if (context.messageType==49) {
             __weak typeof(self) weakSelf=self; NSString *identifier=op.identifier;
-            [_media prepareAppDataForContext:context operationID:identifier completion:^(NSData *data, NSString *path){ typeof(self) self=weakSelf; CSMessageActionOperation *live=self.operations[identifier]; if (!live || live.cancelled || ![self validAccount:live.context]) return; live.appReady=YES; live.appData=data; live.appPath=path; [self submitTarget:context.sourceConversationID operation:live]; }];
+            [_media prepareAppDataForContext:context operationID:identifier completion:^(NSData *data, NSString *path){ typeof(self) self=weakSelf; CSMessageActionOperation *live=self.operations[identifier]; if (!live || live.cancelled || ![self validAccount:live.context]) return; live.appData=data; live.appPath=path; [self submitTarget:context.sourceConversationID operation:live]; }];
         } else dispatch_async(dispatch_get_main_queue(),^{ [self submitTarget:context.sourceConversationID operation:op]; });
     } else if (action==CSMessageActionForward) {
         CSMessageActionOperation *previous=_openingForwardOperation; _openingForwardOperation=op;
@@ -254,7 +254,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     CSMessageActionSubmissionState state=[op.ledger stateForOperationID:op.identifier targetID:target];
     if (state!=CSMessageActionSubmissionStateWaitingForMedia && state!=CSMessageActionSubmissionStateReady && state!=CSMessageActionSubmissionStatePreparing) return;
     if (op.context.messageType==34 && !op.voice && !op.mediaFailed) return;
-    if (op.mediaFailed) { op.failureDetail=@"语音读取或校验失败"; [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
+    if (op.mediaFailed) { if (!op.failureDetail.length) op.failureDetail=@"语音读取或校验失败"; [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
     CSMessagePreparedSend *route=op.context.messageType==49 ? [_sender prepareContext:op.context targetID:target voice:op.voice appData:op.appData appDataPath:op.appPath] : [_sender prepareContext:op.context targetID:target voice:op.voice];
     if (!route) { if (op.context.messageType==34) op.failureDetail=@"语音发送准备失败"; [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
     [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateReady];
@@ -356,7 +356,8 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     [_forward detachLogic:logic];
 }
 - (void)voiceDownloadCompletedForChat:(NSString *)chat localID:(unsigned int)localID serverID:(long long)serverID endFlag:(unsigned int)endFlag error:(unsigned int)error {
-    [self refreshAccount]; if (endFlag!=1 || !_accountID.length) return;
+    if (endFlag!=1 || ![_media hasPendingVoiceForChat:chat localID:localID serverID:serverID]) return;
+    [self refreshAccount]; if (!_accountID.length) return;
     if (error==3) [_media downloadCompletedForAccount:_accountID epoch:_accountEpoch chat:chat localID:localID serverID:serverID];
     else [_media downloadFailedForAccount:_accountID epoch:_accountEpoch chat:chat localID:localID serverID:serverID];
 }

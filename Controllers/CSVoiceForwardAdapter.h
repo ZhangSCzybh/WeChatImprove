@@ -3,7 +3,6 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSString * _Nullable CSMessageForwardTargetID(id _Nullable contact);
 @interface CSMessageForwardBinding : NSObject
 @property(nonatomic, copy) NSString *operationID;
-@property(nonatomic, weak) id logic;
 @property(nonatomic, strong, nullable) CSMessageActionContext *context;
 @property(nonatomic, copy, nullable) NSDictionary<NSString *, id> *targets;
 @property(nonatomic) BOOL confirmed;

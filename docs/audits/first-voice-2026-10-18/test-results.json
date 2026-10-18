@@ -1,0 +1,14 @@
+{
+  "command": "CS_TEST_VOICE_CORE=1 bash Tests/verify-message-actions-execution.sh",
+  "exit_code": 0,
+  "summary": [
+    "PASS: 2261 core voice/media/forward/ownership checks (host doubles, no native sends)"
+  ],
+  "scope": "voice core only; no unrelated module reruns",
+  "source_files": {
+    "Controllers/CSMessageMediaProvider.m": "a95315da37c5e5e19ba26df597a55330e1804f7d585b99dcad211389552b7df7",
+    "Controllers/CSMessageMediaProvider.h": "d1e082451806c0f36102b33ae7651d67a6577c45d61d452c91c7c0063228b872",
+    "Controllers/CSMessageActionCoordinator.m": "918c02f121c40de9c8dbe9fc8c0b602a7fba8531ebdad1295cbe5a072e9c5d8c",
+    "Tests/MessageActionExecutionTests.m": "a981f5172c30e74737fbdf162615d5201f26f3bd06f5fe9cb99e2f17ca3d419d"
+  }
+}

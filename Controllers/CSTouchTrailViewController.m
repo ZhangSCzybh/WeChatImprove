@@ -1007,6 +1007,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
         }
     }
     
+    if (success) [NSNotificationCenter.defaultCenter postNotificationName:@"CSTouchTrailImageDidChange" object:nil];
     return success ? filePath : nil;
 }
 

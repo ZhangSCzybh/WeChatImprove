@@ -66,10 +66,11 @@ enum { UIViewAnimationOptionCurveEaseInOut=1, UIViewAnimationOptionBeginFromCurr
 @interface WETabButton : UIView
 @property(nonatomic) NSInteger tabIndex;
 @property(nonatomic,copy) NSString *tabID;
+@property(nonatomic) CGRect titleFrame;
 - (CGRect)tabTitleFrame;
 @end
 @implementation WETabButton
-- (CGRect)tabTitleFrame { return CGRectMake(20,12,40,20); }
+- (CGRect)tabTitleFrame { return CGRectIsEmpty(self.titleFrame) ? CGRectMake(20,12,40,20) : self.titleFrame; }
 @end
 @interface WESessionTabContainerView : UIView
 @property(nonatomic) NSInteger selectedIndex;
@@ -110,6 +111,50 @@ static WESessionTabContainerView *Fixture(void) {
     }
     view.tabButtons=buttons; view.selectedIndex=0; view.selectedTabID=@"tab0";
     [view updateIndicatorPositionAnimated:NO]; return view;
+}
+static void TestSwipeGeometry(void) {
+    // Different title widths must reach their minimum at the destination too.
+    for (NSArray<NSNumber *> *widths in @[@[@40,@40],@[@40,@140],@[@140,@40]]) {
+        for (NSInteger direction=0;direction<2;direction++) {
+            WESessionTabContainerView *view=Fixture();
+            for (NSUInteger index=0;index<2;index++) {
+                WETabButton *button=view.tabButtons[index];
+                CGFloat width=widths[index].doubleValue;
+                button.frame=CGRectMake(index*200,0,width+40,52);
+                button.bounds=CGRectMake(0,0,width+40,52);
+                button.titleFrame=CGRectMake(20,12,width,20);
+            }
+            [view selectTabAtIndex:direction animated:NO];
+            CGRect origin=[view indicatorFrameForIndex:direction], target=[view indicatorFrameForIndex:1-direction];
+            CGFloat previousWidth=origin.size.width, minimumWidth=CGFLOAT_MAX, minimumCenter=0;
+            BOOL contracts=YES,expands=YES,staysAtTarget=YES,bounded=YES,reversible=YES;
+            NSMutableArray<NSValue *> *frames=[NSMutableArray array];
+            for (NSUInteger step=0;step<=100;step++) {
+                [view updateInteractiveTransitionToIndex:1-direction progress:step/100.0];
+                CGRect frame=view.indicatorView.frame;
+                [frames addObject:[NSValue valueWithBytes:&frame objCType:@encode(CGRect)]];
+                if (step<=50) contracts &= frame.size.width<=previousWidth+0.001;
+                else expands &= frame.size.width>=previousWidth-0.001;
+                if (step>=50) staysAtTarget &= fabs(CGRectGetMidX(frame)-CGRectGetMidX(target))<0.001;
+                bounded &= frame.size.width>=MIN(origin.size.width,target.size.width)*0.30-0.001 &&
+                    frame.size.width<=MAX(origin.size.width,target.size.width)+0.001;
+                if (frame.size.width<minimumWidth) { minimumWidth=frame.size.width; minimumCenter=CGRectGetMidX(frame); }
+                previousWidth=frame.size.width;
+            }
+            Check(contracts && expands,@"both swipe directions contract then expand even with unequal title widths");
+            Check(staysAtTarget && fabs(minimumCenter-CGRectGetMidX(target))<0.001,@"minimum width is under the target title and expansion stays there");
+            Check(bounded && CGRectEqualToRect(view.indicatorView.frame,target),@"swipe preserves width bounds and ends at the normal target frame");
+            for (NSInteger step=100;step>=0;step--) {
+                [view updateInteractiveTransitionToIndex:1-direction progress:step/100.0];
+                CGRect expected; [frames[step] getValue:&expected size:sizeof(expected)];
+                reversible &= CGRectEqualToRect(view.indicatorView.frame,expected);
+            }
+            Check(reversible && CGRectEqualToRect(view.indicatorView.frame,origin),@"finger reversal retraces the same geometry back to the source");
+            [view updateInteractiveTransitionToIndex:1-direction progress:0.75];
+            [view cancelInteractiveTransition];
+            Check(view.selectedIndex==direction && CGRectEqualToRect(view.indicatorView.frame,origin),@"cancel after arriving under the target still restores the original group");
+        }
+    }
 }
 int main(void) { @autoreleasepool {
     NSString *suite=[@"com.wechat.improve.tests.indicator." stringByAppendingString:NSUUID.UUID.UUIDString];
@@ -175,9 +220,10 @@ int main(void) { @autoreleasepool {
     CGRect origin=v.indicatorView.frame;
     [v updateInteractiveTransitionToIndex:1 progress:0.25];
     Check(v.interactiveTransition && v.selectedIndex==0 && v.haptics==0,@"drag preview never commits selection or sends haptics");
-    Check(fabs(CGRectGetMidX(v.indicatorView.frame)-65)<0.001 && ![v.indicatorView.layer animationForKey:kIndicatorAnimationKey],@"quarter drag moves immediately with no queued animation");
+    Check(fabs(CGRectGetMidX(v.indicatorView.frame)-90)<0.001 && ![v.indicatorView.layer animationForKey:kIndicatorAnimationKey],@"contraction moves toward the target immediately with no queued animation");
     [v updateInteractiveTransitionToIndex:1 progress:0.5];
     Check(fabs(v.indicatorView.frame.size.width-origin.size.width*0.30)<0.001,@"mid-drag contracts to 30 percent of normal width");
+    Check(fabs(CGRectGetMidX(v.indicatorView.frame)-140)<0.001,@"shortest indicator is directly under the target title");
     CGRect mid=v.indicatorView.frame; [v updateIndicatorPosition];
     Check(CGRectEqualToRect(mid,v.indicatorView.frame),@"ordinary layout keeps interactive progress");
     [v updateInteractiveTransitionToIndex:1 progress:0.1];
@@ -213,6 +259,7 @@ int main(void) { @autoreleasepool {
     Check(!v.interactiveTransition,@"reduce motion also suppresses interactive stretch");
     reducedMotion=NO; [v updateInteractiveTransitionToIndex:99 progress:0.5];
     Check(!v.interactiveTransition,@"invalid adjacent target is ignored");
+    TestSwipeGeometry();
     [testDefaults removePersistentDomainForName:suite];
     printf("Group indicator: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;

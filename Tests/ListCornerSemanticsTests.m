@@ -13,10 +13,11 @@
 @interface MemoryDefaults : NSObject <CSListCornerDefaults>
 @property(nonatomic,strong) NSMutableDictionary *values;
 @property(nonatomic) NSUInteger reads,writes,syncs;
+@property(nonatomic,copy) void (^readProbe)(void);
 @end
 @implementation MemoryDefaults
 - (instancetype)init { if((self=[super init]))_values=[NSMutableDictionary dictionary];return self; }
-- (id)objectForKey:(NSString *)key { self.reads++;return self.values[key]; }
+- (id)objectForKey:(NSString *)key { if (self.readProbe) self.readProbe(); self.reads++;return self.values[key]; }
 - (float)floatForKey:(NSString *)key { return [[self objectForKey:key] floatValue]; }
 - (BOOL)boolForKey:(NSString *)key { return [[self objectForKey:key] boolValue]; }
 - (void)setFloat:(float)value forKey:(NSString *)key { self.writes++;self.values[key]=@(value); }
@@ -109,6 +110,15 @@ static void Configure(void) {
 static UIView *Background(UITableViewCell *cell) { return CSListCornerOwnedBackground(cell.contentView); }
 static BOOL Rounded(UIView *background,CGPoint point) { return CGPathContainsPoint(((CAShapeLayer *)background.layer.mask).path,NULL,point,NO); }
 static void ConfigurationTests(NSDictionary *baseline) {
+    __block BOOL invalidationReturned=NO;
+    FixtureDefaults.readProbe=^{
+        FixtureDefaults.readProbe=nil;
+        dispatch_semaphore_t completed=dispatch_semaphore_create(0);
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT,0), ^{ [FixtureConfiguration invalidate]; dispatch_semaphore_signal(completed); });
+        invalidationReturned=dispatch_semaphore_wait(completed,dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC))==0;
+    };
+    (void)FixtureConfiguration.snapshot;
+    Check(invalidationReturned,@"background Defaults invalidation never waits for a lock held across a settings read");
     CSListCornerSnapshot *defaults=FixtureConfiguration.snapshot;
     Check(!defaults.enabled && Near(defaults.radius,10) && Near(defaults.leftMargin,15) && Near(defaults.rightMargin,15) && Near(defaults.pinnedGap,10) && Near(defaults.normalGap,10),@"frozen numeric defaults and disabled switch");
     for(NSArray *entry in ProductionKeys()) Check([baseline[@"keys"][entry[0]] isEqual:entry[1]],@"all 30 persisted keys match 1.7-17");

@@ -1,3 +1,4 @@
+#import "CSInputTextStyle.h"
 #import "CSInputTextSettingsViewController.h"
 #import <UIKit/UIKit.h>
 
@@ -96,6 +97,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
                                                 valueChangedBlock:^(BOOL isOn) {
         [defaults setBool:isOn forKey:kInputTextEnabledKey];
         [defaults synchronize];
+        CSInputTextStylePreferencesChanged();
         
         // 重新构建菜单并刷新整个表格
         [weakSelf setupData];
@@ -110,6 +112,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
                                                  valueChangedBlock:^(BOOL isOn) {
         [defaults setBool:isOn forKey:kInputTextRoundedCornersKey];
         [defaults synchronize];
+        CSInputTextStylePreferencesChanged();
         
         // 重新构建菜单并刷新整个表格
         [weakSelf setupData];
@@ -124,6 +127,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
                                                  valueChangedBlock:^(BOOL isOn) {
         [defaults setBool:isOn forKey:kInputTextBorderEnabledKey];
         [defaults synchronize];
+        CSInputTextStylePreferencesChanged();
         
         // 重新构建菜单并刷新整个表格
         [weakSelf setupData];
@@ -216,6 +220,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
                                                    valueChangedBlock:^(BOOL isOn) {
             [defaults setBool:isOn forKey:kInputTextBoldKey];
             [defaults synchronize];
+            CSInputTextStylePreferencesChanged();
         }];
         
         CSSettingSection *styleSection = [CSSettingSection sectionWithHeader:@"样式设置" 
@@ -429,6 +434,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
             // 保存设置
             [defaults setObject:inputValue forKey:kInputTextContentKey];
             [defaults synchronize];
+            CSInputTextStylePreferencesChanged();
             
             // 更新UI
             // 找到内容设置组的索引
@@ -476,6 +482,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         // 保存设置
         [defaults setFloat:fontSize forKey:kInputTextFontSizeKey];
         [defaults synchronize];
+        CSInputTextStylePreferencesChanged();
         
         // 更新UI
         // 找到高级样式组的索引
@@ -524,6 +531,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         // 保存设置
         [defaults setFloat:alpha forKey:kInputTextAlphaKey];
         [defaults synchronize];
+        CSInputTextStylePreferencesChanged();
         
         // 更新UI
         // 找到高级样式组的索引
@@ -589,6 +597,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     }
     
     [defaults synchronize];
+    CSInputTextStylePreferencesChanged();
     
     // 重新加载颜色指示器显示 - 根据section标题来刷新
     for (NSInteger i = 0; i < self.sections.count; i++) {
@@ -661,6 +670,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         // 保存设置
         [defaults setFloat:radius forKey:kInputTextCornerRadiusKey];
         [defaults synchronize];
+        CSInputTextStylePreferencesChanged();
         
         // 更新UI
         // 找到圆角设置组的索引
@@ -708,6 +718,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         // 保存设置
         [defaults setFloat:width forKey:kInputTextBorderWidthKey];
         [defaults synchronize];
+        CSInputTextStylePreferencesChanged();
         
         // 更新UI
         // 找到边框设置组的索引

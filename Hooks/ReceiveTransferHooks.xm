@@ -6,6 +6,8 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
+#import "../Controllers/CSPreferenceRefresh.h"
+static atomic_bool transferAdmissionEnabled, transferSettingsPending;
 
 #import "CSServiceCenter.h"
 
@@ -210,6 +212,19 @@ static BOOL isGroupReceiveEnabled() {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     id value = [defaults objectForKey:kReceiveTransferGroupEnableKey];
     return value ? [value boolValue] : YES;
+}
+
+static void CSReloadTransferAdmission(void) {
+    atomic_store(&transferAdmissionEnabled,isReceiveTransferEnabled() && (isPrivateReceiveEnabled() || isGroupReceiveEnabled()));
+}
+
+static BOOL CSIsTransferCandidate(CMessageWrap *wrap) {
+    if (!atomic_load(&transferAdmissionEnabled) || !wrap || wrap.m_uiMessageType!=49) return NO;
+    id payInfo=wrap.m_oWCPayInfoItem;
+    NSString *nativeURL=[payInfo respondsToSelector:@selector(m_c2cNativeUrl)] ? [payInfo m_c2cNativeUrl] : nil;
+    if ([nativeURL isKindOfClass:NSString.class] && ([nativeURL containsString:@"transfer"] || [nativeURL containsString:@"Transfer"])) return YES;
+    NSString *content=wrap.m_nsContent;
+    return [content isKindOfClass:NSString.class] && ([content containsString:@"transfer"] || [content containsString:@"Transfer"] || [content containsString:@"转账"]);
 }
 
 static NSInteger getDelaySeconds() {
@@ -476,8 +491,6 @@ static void cs_handleTransferMessage(CMessageWrap *msgWrap) {
         return;
     }
     
-    NSString *selfUserName = CSGetCurrentUserName();
-    
     // 判断是否群聊：检查fromUsr或toUsr是否为群聊ID
     BOOL isGroup = CSIsChatRoomName(fromUsr) || CSIsChatRoomName(toUsr);
     
@@ -727,7 +740,7 @@ static void cs_confirmTransfer(CMessageWrap *msgWrap, BOOL isGroup, NSString *fr
     // 调用收款接口（参考手动收款日志）
     @try {
         
-        unsigned int result = ((unsigned int (*)(id, SEL, id, id))objc_msgSend)(controlMgr, startLogicSelector, currentVC, controlData);
+        ((unsigned int (*)(id, SEL, id, id))objc_msgSend)(controlMgr, startLogicSelector, currentVC, controlData);
         
         // 更新收款统计
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -771,13 +784,10 @@ static void cs_confirmTransfer(CMessageWrap *msgWrap, BOOL isGroup, NSString *fr
                 
                 if (replyTarget && replyTarget.length > 0) {
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                        BOOL replySent = CSSendTextMessage(replyContent, replyTarget);
+                        CSSendTextMessage(replyContent, replyTarget);
                     });
-                } else {
                 }
-            } else {
             }
-        } else {
         }
     } @catch (NSException *e) {
     }
@@ -786,11 +796,6 @@ static void cs_confirmTransfer(CMessageWrap *msgWrap, BOOL isGroup, NSString *fr
 #pragma mark - Hook手动收款流程
 
 %hook WCPayReveiverControlTransferControlLogic
-
-- (id)initWithData:(id)arg1 {
-    id result = %orig;
-    return result;
-}
 
 - (void)startLogic {
     // 检查自动收款功能是否开启
@@ -816,43 +821,28 @@ static void cs_confirmTransfer(CMessageWrap *msgWrap, BOOL isGroup, NSString *fr
 
 
 %hook CMessageMgr
-
 - (void)AsyncOnAddMsg:(NSString *)msg MsgWrap:(CMessageWrap *)wrap {
     %orig;
-    
-    if (wrap) {
-        unsigned int msgType = [wrap m_uiMessageType];
-        
-        // 转账消息是type=49的AppNode消息
-        if (msgType == 49) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                cs_handleTransferMessage(wrap);
-            });
-        }
-    }
+    if (!CSIsTransferCandidate(wrap)) return;
+    dispatch_async(dispatch_get_main_queue(), ^{ cs_handleTransferMessage(wrap); });
 }
-
 - (void)AddMsg:(id)arg1 MsgWrap:(CMessageWrap *)arg2 {
     %orig;
-    
-    if (arg2) {
-        unsigned int msgType = [arg2 m_uiMessageType];
-        
-        // 转账消息是type=49的AppNode消息
-        if (msgType == 49) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                cs_handleTransferMessage(arg2);
-            });
-        }
-    }
+    if (!CSIsTransferCandidate(arg2)) return;
+    dispatch_async(dispatch_get_main_queue(), ^{ cs_handleTransferMessage(arg2); });
 }
 
 %end
 
 static void cs_receiveTransferSettingsChanged(CFNotificationCenterRef center, void *observer, CFNotificationName name, const void *object, CFDictionaryRef userInfo) {
+    CSRequestMainRefresh(&transferSettingsPending, ^{ CSReloadTransferAdmission(); });
 }
 
 %ctor {
+    CSReloadTransferAdmission();
+    [NSNotificationCenter.defaultCenter addObserverForName:NSUserDefaultsDidChangeNotification object:nil queue:nil usingBlock:^(__unused NSNotification *note) {
+        CSRequestMainRefresh(&transferSettingsPending, ^{ CSReloadTransferAdmission(); });
+    }];
     
     CFNotificationCenterAddObserver(
         CFNotificationCenterGetDarwinNotifyCenter(),

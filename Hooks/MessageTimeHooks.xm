@@ -3,6 +3,8 @@
 
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
+#import "../Controllers/CSPreferenceRefresh.h"
+static atomic_bool timeRefreshPending, timeRefreshForced;
 #import "../Controllers/CSMessageMergeAdapter.h"
 #import "../Controllers/CSMessageTimeLayout.h"
 #import "../Controllers/CSMessageCellLifecycle.h"
@@ -363,8 +365,12 @@ void CSMessageTimeResetCell(id cell) {
 static void refreshTimeSettings(BOOL force) {
     NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
     NSMutableDictionary *snapshot = [NSMutableDictionary dictionary];
-    NSDictionary *all = defaults.dictionaryRepresentation;
-    for (NSString *key in all) if ([key hasPrefix:@"com.wechat.enhance.messageTime."]) snapshot[key] = all[key];
+    for (NSString *key in @[kMessageTimeEnabledKey, kMessageTimeFontSizeKey, kMessageTimeTextColorKey,
+        kMessageTimeBackgroundColorKey, kMessageTimeCornerRadiusKey, kMessageTimeShowBelowAvatarKey,
+        kMessageTimeBoldFontKey, kMessageTimeTapToShowKey]) {
+        id value = [defaults objectForKey:key];
+        if (value) snapshot[key] = value;
+    }
     if (!force && [snapshot isEqual:timeSettingsSnapshot]) return;
     timeSettingsSnapshot = [snapshot copy]; timeSettingsVersion++;
     messageTimeEnabled = [defaults boolForKey:kMessageTimeEnabledKey];
@@ -373,12 +379,16 @@ static void refreshTimeSettings(BOOL force) {
         refreshMessageTimeView(cell); [cell cs_messageTimeLayout]; [cell setNeedsLayout];
     }
 }
+static void requestTimeRefresh(BOOL force) {
+    if (force) atomic_store(&timeRefreshForced, true);
+    CSRequestMainRefresh(&timeRefreshPending, ^{ refreshTimeSettings(atomic_exchange(&timeRefreshForced, false)); });
+}
 %ctor {
     timeCells = [NSHashTable weakObjectsHashTable];
     refreshTimeSettings(NO);
     [NSNotificationCenter.defaultCenter addObserverForName:NSUserDefaultsDidChangeNotification object:nil
-        queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification *note) { refreshTimeSettings(NO); }];
+        queue:nil usingBlock:^(NSNotification *note) { requestTimeRefresh(NO); }];
     for (NSString *name in @[NSSystemTimeZoneDidChangeNotification,NSCurrentLocaleDidChangeNotification])
-        [NSNotificationCenter.defaultCenter addObserverForName:name object:nil queue:NSOperationQueue.mainQueue
-            usingBlock:^(NSNotification *note) { refreshTimeSettings(YES); }];
+        [NSNotificationCenter.defaultCenter addObserverForName:name object:nil queue:nil
+            usingBlock:^(NSNotification *note) { requestTimeRefresh(YES); }];
 }

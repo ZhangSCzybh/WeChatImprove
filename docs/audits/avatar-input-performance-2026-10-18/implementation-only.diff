@@ -1,0 +1,1875 @@
+--- before/Controllers/CSAvatarRotation.h
++++ after/Controllers/CSAvatarRotation.h
+@@ -0,0 +1,8 @@
++#import <UIKit/UIKit.h>
++
++// Called from the two existing avatar hooks. Only tag=101 participates.
++FOUNDATION_EXPORT void CSAvatarRotationUpdate(UIView *view);
++FOUNDATION_EXPORT void CSAvatarRotationPageVisibility(UIViewController *controller, BOOL visible);
++FOUNDATION_EXPORT void CSAvatarRotationRefreshViews(void);
++FOUNDATION_EXPORT void CSAvatarRotationPreferencesChanged(void);
++FOUNDATION_EXPORT void CSAvatarRotationInstall(NSUserDefaults *defaults);
+--- before/Controllers/CSAvatarRotation.m
++++ after/Controllers/CSAvatarRotation.m
+@@ -0,0 +1,130 @@
++#import "CSAvatarRotation.h"
++#import "CSPreferenceRefresh.h"
++#import <QuartzCore/QuartzCore.h>
++#import <objc/runtime.h>
++#import <math.h>
++
++static NSString *const CSRotationKey = @"cs.avatar.rotation";
++static char CSRotationTrackedKey, CSRotationPageHiddenKey;
++static NSHashTable<UIView *> *CSRotationViews;
++static NSHashTable *CSRotationInactiveScenes;
++static NSUserDefaults *CSRotationDefaults;
++static BOOL CSRotationEnabled, CSRotationInactive;
++static NSTimeInterval CSRotationDuration = 7;
++static atomic_bool CSRotationRefreshPending;
++
++static BOOL CSRotationCanRun(UIView *view) {
++    UIWindow *window = view.window;
++    if (!CSRotationEnabled || view.tag != 101 || CSRotationInactive || !window ||
++        UIApplication.sharedApplication.applicationState != UIApplicationStateActive ||
++        UIAccessibilityIsReduceMotionEnabled() ||
++        NSProcessInfo.processInfo.thermalState >= NSProcessInfoThermalStateSerious) return NO;
++    if (window.windowScene && ([CSRotationInactiveScenes containsObject:window.windowScene] ||
++        window.windowScene.activationState != UISceneActivationStateForegroundActive)) return NO;
++    CGRect visible = [view convertRect:view.bounds toView:window];
++    if (CGRectIsEmpty(visible) || CGRectIsNull(visible)) return NO;
++    for (UIView *ancestor = view; ancestor; ancestor = ancestor.superview) {
++        if (ancestor.hidden || ancestor.alpha < .01 ||
++            [objc_getAssociatedObject(ancestor, &CSRotationPageHiddenKey) boolValue]) return NO;
++        if (ancestor.clipsToBounds || ancestor == window) {
++            visible = CGRectIntersection(visible, [ancestor convertRect:ancestor.bounds toView:window]);
++            if (CGRectIsEmpty(visible) || CGRectIsNull(visible)) return NO;
++        }
++    }
++    return YES;
++}
++
++void CSAvatarRotationUpdate(UIView *view) {
++    if (!view || !NSThread.isMainThread) return;
++    BOOL tracked = [objc_getAssociatedObject(view, &CSRotationTrackedKey) boolValue];
++    if (view.tag != 101 && !tracked) return;
++    if (!tracked) {
++        if (!CSRotationViews) CSRotationViews = [NSHashTable weakObjectsHashTable];
++        [CSRotationViews addObject:view];
++        objc_setAssociatedObject(view, &CSRotationTrackedKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
++    }
++    CAAnimation *existing = [view.layer animationForKey:CSRotationKey];
++    if (!CSRotationCanRun(view)) {
++        if (existing) [view.layer removeAnimationForKey:CSRotationKey];
++        return;
++    }
++    // Inspect CA itself: suspension can remove an animation while a cached flag stays set.
++    if (existing && fabs(existing.duration - CSRotationDuration) < .0001) return;
++    CABasicAnimation *rotation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
++    rotation.toValue = @(M_PI * 2);
++    rotation.duration = CSRotationDuration;
++    rotation.cumulative = YES;
++    rotation.repeatCount = HUGE_VALF;
++    rotation.removedOnCompletion = NO;
++    rotation.fillMode = kCAFillModeForwards;
++    [view.layer addAnimation:rotation forKey:CSRotationKey];
++}
++
++void CSAvatarRotationRefreshViews(void) {
++    if (!NSThread.isMainThread) return;
++    for (UIView *view in CSRotationViews.allObjects) CSAvatarRotationUpdate(view);
++}
++
++void CSAvatarRotationPageVisibility(UIViewController *controller, BOOL visible) {
++    if (!NSThread.isMainThread) return;
++    UIView *root = controller.viewIfLoaded;
++    if (!root) return;
++    objc_setAssociatedObject(root, &CSRotationPageHiddenKey, @(!visible), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
++    CSAvatarRotationRefreshViews();
++}
++
++static BOOL CSRotationLoadPreferences(void) {
++    BOOL enabled = [CSRotationDefaults boolForKey:@"rotateAvatar"];
++    double speed = [CSRotationDefaults doubleForKey:@"rotateSpeed"];
++    if (!isfinite(speed) || speed == 0) speed = 5;
++    NSTimeInterval duration = 12 - MIN(10, MAX(1, speed));
++    BOOL changed = enabled != CSRotationEnabled || duration != CSRotationDuration;
++    CSRotationEnabled = enabled;
++    CSRotationDuration = duration;
++    return changed;
++}
++
++void CSAvatarRotationPreferencesChanged(void) {
++    CSRequestMainRefresh(&CSRotationRefreshPending, ^{
++        if (CSRotationLoadPreferences()) CSAvatarRotationRefreshViews();
++    });
++}
++
++static void CSRotationDarwinChanged(CFNotificationCenterRef center, void *observer, CFStringRef name,
++                                    const void *object, CFDictionaryRef info) {
++    CSAvatarRotationPreferencesChanged();
++}
++
++void CSAvatarRotationInstall(NSUserDefaults *defaults) {
++    static dispatch_once_t once;
++    dispatch_once(&once, ^{
++        CSRotationDefaults = defaults;
++        CSRotationInactiveScenes = [NSHashTable weakObjectsHashTable];
++        CSRotationLoadPreferences();
++        NSNotificationCenter *center = NSNotificationCenter.defaultCenter;
++        for (NSString *name in @[NSUserDefaultsDidChangeNotification, @"com.wechat.tweak.local_settings_changed"]) {
++            [center addObserverForName:name object:nil queue:nil usingBlock:^(NSNotification *note) {
++                CSAvatarRotationPreferencesChanged();
++            }];
++        }
++        for (NSString *name in @[UIApplicationWillResignActiveNotification, UIApplicationDidBecomeActiveNotification,
++             UISceneWillDeactivateNotification, UISceneDidActivateNotification,
++             NSProcessInfoThermalStateDidChangeNotification, UIAccessibilityReduceMotionStatusDidChangeNotification]) {
++            [center addObserverForName:name object:nil queue:nil usingBlock:^(NSNotification *note) {
++                void (^update)(void) = ^{
++                    if ([note.name isEqual:UIApplicationWillResignActiveNotification]) CSRotationInactive = YES;
++                    if ([note.name isEqual:UIApplicationDidBecomeActiveNotification]) {
++                        CSRotationInactive = NO;
++                        CSAvatarRotationPreferencesChanged();
++                    }
++                    if (note.object && [note.name isEqual:UISceneWillDeactivateNotification]) [CSRotationInactiveScenes addObject:note.object];
++                    if (note.object && [note.name isEqual:UISceneDidActivateNotification]) [CSRotationInactiveScenes removeObject:note.object];
++                    CSAvatarRotationRefreshViews();
++                };
++                if (NSThread.isMainThread) update(); else dispatch_async(dispatch_get_main_queue(), update);
++            }];
++        }
++        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, CSRotationDarwinChanged,
++            CFSTR("com.wechat.enhance.settings_changed"), NULL, CFNotificationSuspensionBehaviorCoalesce);
++    });
++}
+--- before/Controllers/CSAvatarSettingsViewController.m
++++ after/Controllers/CSAvatarSettingsViewController.m
+@@ -1,3 +1,4 @@
++#import "CSAvatarRotation.h"
+ #import "CSAvatarSettingsViewController.h"
+ #import "CSSettingTableViewCell.h"
+ 
+@@ -335,28 +336,7 @@
+         // 更新旋转速度分区的显示状态
+         [weakSelf updateRotateSpeedSection];
+         
+-        // 显示提示对话框
+-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"提示"
+-                                                                                message:@"头像旋转设置已保存，需要重启刷新缓存才能生效。"
+-                                                                         preferredStyle:UIAlertControllerStyleAlert];
+-        
+-        // 稍后重启选项
+-        UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"稍后重启" 
+-                                                             style:UIAlertActionStyleDefault 
+-                                                           handler:nil];
+-        [alertController addAction:laterAction];
+-        
+-        // 立即重启选项
+-        UIAlertAction *restartAction = [UIAlertAction actionWithTitle:@"立即重启" 
+-                                                              style:UIAlertActionStyleDestructive 
+-                                                            handler:^(UIAlertAction * _Nonnull action) {
+-            // 使用exit(0)立即重启
+-            exit(0);
+-        }];
+-        [alertController addAction:restartAction];
+-        
+-        // 显示对话框
+-        [weakSelf presentViewController:alertController animated:YES completion:nil];
++        CSAvatarRotationPreferencesChanged();
+     }];
+     
+     CSSettingSection *rotateAvatarSection = [CSSettingSection sectionWithHeader:@"旋转功能" 
+@@ -379,28 +359,7 @@
+         [defaults setFloat:speed forKey:kRotateSpeedKey];
+         [defaults synchronize];
+         
+-        // 显示提示对话框，提供立即重启和稍后重启选项
+-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"提示"
+-                                                                                message:@"旋转速度设置已保存，需要重启微信才能生效。"
+-                                                                         preferredStyle:UIAlertControllerStyleAlert];
+-        
+-        // 稍后重启选项
+-        UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"稍后重启" 
+-                                                           style:UIAlertActionStyleDefault 
+-                                                         handler:nil];
+-        [alertController addAction:laterAction];
+-        
+-        // 立即重启选项
+-        UIAlertAction *restartAction = [UIAlertAction actionWithTitle:@"立即重启" 
+-                                                             style:UIAlertActionStyleDestructive 
+-                                                           handler:^(UIAlertAction * _Nonnull action) {
+-            // 使用exit(0)立即重启
+-            exit(0);
+-        }];
+-        [alertController addAction:restartAction];
+-        
+-        // 显示对话框
+-        [weakSelf presentViewController:alertController animated:YES completion:nil];
++        CSAvatarRotationPreferencesChanged();
+     }];
+     
+     // 添加旋转速度分区（仅在旋转功能开启时显示）
+--- before/Controllers/CSInputTextSettingsViewController.m
++++ after/Controllers/CSInputTextSettingsViewController.m
+@@ -1,3 +1,4 @@
++#import "CSInputTextStyle.h"
+ #import "CSInputTextSettingsViewController.h"
+ #import <UIKit/UIKit.h>
+ 
+@@ -96,6 +97,7 @@
+                                                 valueChangedBlock:^(BOOL isOn) {
+         [defaults setBool:isOn forKey:kInputTextEnabledKey];
+         [defaults synchronize];
++        CSInputTextStylePreferencesChanged();
+         
+         // 重新构建菜单并刷新整个表格
+         [weakSelf setupData];
+@@ -110,6 +112,7 @@
+                                                  valueChangedBlock:^(BOOL isOn) {
+         [defaults setBool:isOn forKey:kInputTextRoundedCornersKey];
+         [defaults synchronize];
++        CSInputTextStylePreferencesChanged();
+         
+         // 重新构建菜单并刷新整个表格
+         [weakSelf setupData];
+@@ -124,6 +127,7 @@
+                                                  valueChangedBlock:^(BOOL isOn) {
+         [defaults setBool:isOn forKey:kInputTextBorderEnabledKey];
+         [defaults synchronize];
++        CSInputTextStylePreferencesChanged();
+         
+         // 重新构建菜单并刷新整个表格
+         [weakSelf setupData];
+@@ -216,6 +220,7 @@
+                                                    valueChangedBlock:^(BOOL isOn) {
+             [defaults setBool:isOn forKey:kInputTextBoldKey];
+             [defaults synchronize];
++            CSInputTextStylePreferencesChanged();
+         }];
+         
+         CSSettingSection *styleSection = [CSSettingSection sectionWithHeader:@"样式设置" 
+@@ -429,6 +434,7 @@
+             // 保存设置
+             [defaults setObject:inputValue forKey:kInputTextContentKey];
+             [defaults synchronize];
++            CSInputTextStylePreferencesChanged();
+             
+             // 更新UI
+             // 找到内容设置组的索引
+@@ -476,6 +482,7 @@
+         // 保存设置
+         [defaults setFloat:fontSize forKey:kInputTextFontSizeKey];
+         [defaults synchronize];
++        CSInputTextStylePreferencesChanged();
+         
+         // 更新UI
+         // 找到高级样式组的索引
+@@ -524,6 +531,7 @@
+         // 保存设置
+         [defaults setFloat:alpha forKey:kInputTextAlphaKey];
+         [defaults synchronize];
++        CSInputTextStylePreferencesChanged();
+         
+         // 更新UI
+         // 找到高级样式组的索引
+@@ -589,6 +597,7 @@
+     }
+     
+     [defaults synchronize];
++    CSInputTextStylePreferencesChanged();
+     
+     // 重新加载颜色指示器显示 - 根据section标题来刷新
+     for (NSInteger i = 0; i < self.sections.count; i++) {
+@@ -661,6 +670,7 @@
+         // 保存设置
+         [defaults setFloat:radius forKey:kInputTextCornerRadiusKey];
+         [defaults synchronize];
++        CSInputTextStylePreferencesChanged();
+         
+         // 更新UI
+         // 找到圆角设置组的索引
+@@ -708,6 +718,7 @@
+         // 保存设置
+         [defaults setFloat:width forKey:kInputTextBorderWidthKey];
+         [defaults synchronize];
++        CSInputTextStylePreferencesChanged();
+         
+         // 更新UI
+         // 找到边框设置组的索引
+--- before/Controllers/CSInputTextStyle.h
++++ after/Controllers/CSInputTextStyle.h
+@@ -0,0 +1,13 @@
++#import <UIKit/UIKit.h>
++
++typedef NS_ENUM(NSUInteger, CSInputTextNativeField) {
++    CSInputTextNativePlain, CSInputTextNativeAttributed,
++    CSInputTextNativeColor, CSInputTextNativeMultiline
++};
++
++FOUNDATION_EXPORT void CSInputTextStyleInstall(NSUserDefaults *defaults);
++FOUNDATION_EXPORT void CSInputTextStylePreferencesChanged(void);
++FOUNDATION_EXPORT void CSInputTextStyleApply(UIView *view);
++FOUNDATION_EXPORT void CSInputTextStyleChatVisibility(UIViewController *controller, BOOL visible);
++FOUNDATION_EXPORT void CSInputTextStyleNativeBegin(UIView *view, CSInputTextNativeField field, id value);
++FOUNDATION_EXPORT void CSInputTextStyleNativeEnd(UIView *view);
+--- before/Controllers/CSInputTextStyle.m
++++ after/Controllers/CSInputTextStyle.m
+@@ -0,0 +1,269 @@
++#import "CSInputTextStyle.h"
++#import "CSPreferenceRefresh.h"
++#import <QuartzCore/QuartzCore.h>
++#import <objc/runtime.h>
++#import <math.h>
++
++@protocol CSInputPlaceholder <NSObject>
++@property(nonatomic, copy) NSString *placeHolder;
++@property(nonatomic, copy) NSAttributedString *attributePlaceholder;
++- (id)textView;
++- (void)setPlaceHolderColor:(UIColor *)color;
++- (void)setPlaceHolderMultiLine:(BOOL)multiline;
++@end
++@protocol CSInnerPlaceholder <NSObject>
++- (UIColor *)placeHolderColor;
++- (BOOL)placeholderMultiLine;
++@end
++
++@interface CSInputStyleSnapshot : NSObject
++@property(nonatomic) BOOL enabled, rounded, bordered;
++@property(nonatomic) CGFloat radius, borderWidth;
++@property(nonatomic, strong) UIColor *textColor, *borderColor;
++@property(nonatomic, copy) NSString *text;
++@property(nonatomic, copy) NSAttributedString *attributed;
++@end
++@implementation CSInputStyleSnapshot @end
++
++@interface CSInputStyleState : NSObject
++@property(nonatomic) BOOL applying, placeholderOwned, cornerOwned, borderOwned;
++@property(nonatomic) NSUInteger nativeDepth;
++@property(nonatomic, copy) NSString *nativeText;
++@property(nonatomic, copy) NSAttributedString *nativeAttributed;
++@property(nonatomic, strong) UIColor *nativeColor, *renderedColor;
++@property(nonatomic, weak) id nativeInner;
++@property(nonatomic) BOOL hasNativeColor, hasNativeMultiline, nativeMultiline, multilineApplied;
++@property(nonatomic) UIUserInterfaceStyle renderedTrait;
++@property(nonatomic) CGFloat nativeRadius, renderedRadius, nativeWidth, renderedWidth;
++@property(nonatomic) BOOL nativeClips, renderedClips;
++@property(nonatomic, strong) UIColor *nativeBorder, *renderedBorder;
++@property(nonatomic, strong) UIColor *borderSource;
++@property(nonatomic, strong) UITraitCollection *borderTraits;
++@end
++@implementation CSInputStyleState @end
++
++static char CSInputStyleStateKey, CSInputChatVisibleKey;
++static NSUserDefaults *CSInputDefaults;
++static NSDictionary *CSInputRaw;
++static CSInputStyleSnapshot *CSInputStyle;
++static NSHashTable<UIView *> *CSInputViews;
++static atomic_bool CSInputRefreshPending;
++
++static BOOL CSEqual(id a, id b) { return a == b || [a isEqual:b]; }
++static BOOL CSColorsEqual(CGColorRef a, CGColorRef b) { return a == b || (a && b && CGColorEqualToColor(a, b)); }
++static BOOL CSInputBool(id value) { return [value respondsToSelector:@selector(boolValue)] && [value boolValue]; }
++static double CSInputNumber(id value, double fallback) {
++    double number = [value respondsToSelector:@selector(doubleValue)] ? [value doubleValue] : fallback;
++    return isfinite(number) ? number : fallback;
++}
++static UIColor *CSInputDecodeColor(id data, UIColor *fallback) {
++    if (![data isKindOfClass:NSData.class]) return fallback;
++    @try {
++        UIColor *color = [NSKeyedUnarchiver unarchivedObjectOfClass:UIColor.class fromData:data error:NULL];
++        return color ?: fallback;
++    } @catch (__unused NSException *exception) { return fallback; }
++}
++static BOOL CSInputLoadPreferences(void) {
++    NSMutableDictionary *raw = [NSMutableDictionary dictionary];
++    for (NSString *suffix in @[@"enabled", @"content", @"color", @"alpha", @"fontSize", @"bold",
++                              @"roundedCorners", @"cornerRadius", @"border.enabled", @"border.width", @"border.color"]) {
++        id value = [CSInputDefaults objectForKey:[@"com.wechat.enhance.inputText." stringByAppendingString:suffix]];
++        if (value) raw[suffix] = value;
++    }
++    if (CSEqual(raw, CSInputRaw)) return NO;
++    CSInputRaw = [raw copy];
++    CSInputStyleSnapshot *p = [CSInputStyleSnapshot new];
++    p.enabled = CSInputBool(raw[@"enabled"]);
++    p.rounded = CSInputBool(raw[@"roundedCorners"]);
++    p.bordered = CSInputBool(raw[@"border.enabled"]);
++    p.radius = CSInputNumber(raw[@"cornerRadius"], 18);
++    if (p.radius <= 0) p.radius = 18;
++    p.borderWidth = CSInputNumber(raw[@"border.width"], 1);
++    if (p.borderWidth <= 0) p.borderWidth = 1;
++    if (p.bordered) p.borderColor = CSInputDecodeColor(raw[@"border.color"], UIColor.systemGrayColor);
++    if (p.enabled) {
++        p.text = [raw[@"content"] isKindOfClass:NSString.class] && [raw[@"content"] length] ? raw[@"content"] : @"我爱你呀";
++        CGFloat alpha = MIN(1, MAX(0, CSInputNumber(raw[@"alpha"], .5)));
++        p.textColor = [CSInputDecodeColor(raw[@"color"], [UIColor colorWithWhite:.5 alpha:1]) colorWithAlphaComponent:alpha];
++        CGFloat size = CSInputNumber(raw[@"fontSize"], 15);
++        if (size <= 0) size = 15;
++        UIFont *font = CSInputBool(raw[@"bold"]) ? [UIFont boldSystemFontOfSize:size] : [UIFont systemFontOfSize:size];
++        NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
++        paragraph.alignment = NSTextAlignmentLeft;
++        p.attributed = [[NSAttributedString alloc] initWithString:p.text attributes:@{
++            NSFontAttributeName:font, NSForegroundColorAttributeName:p.textColor, NSParagraphStyleAttributeName:paragraph}];
++    }
++    CSInputStyle = p;
++    return YES;
++}
++
++static UIViewController *CSInputChatOwner(UIView *view) {
++    Class chat = NSClassFromString(@"BaseMsgContentViewController");
++    if (!chat) return nil;
++    for (UIResponder *responder = view.nextResponder; responder; responder = responder.nextResponder) {
++        if ([responder isKindOfClass:chat]) return (UIViewController *)responder;
++        // A separate presented/embedded controller owns its own input fields.
++        if ([responder isKindOfClass:UIViewController.class]) return nil;
++    }
++    return nil;
++}
++
++static void CSInputCaptureInner(UIView<CSInputPlaceholder> *view, CSInputStyleState *s) {
++    id<CSInnerPlaceholder> inner = [view respondsToSelector:@selector(textView)] ? [view textView] : nil;
++    s.nativeInner = inner;
++    s.hasNativeColor = [inner respondsToSelector:@selector(placeHolderColor)];
++    s.hasNativeMultiline = [inner respondsToSelector:@selector(placeholderMultiLine)];
++    if (s.hasNativeColor) s.nativeColor = [inner placeHolderColor];
++    if (s.hasNativeMultiline) s.nativeMultiline = [inner placeholderMultiLine];
++    s.renderedColor = nil;
++    s.multilineApplied = NO;
++}
++static void CSInputCapturePlaceholder(UIView<CSInputPlaceholder> *view, CSInputStyleState *s) {
++    s.nativeText = view.placeHolder;
++    s.nativeAttributed = view.attributePlaceholder;
++    CSInputCaptureInner(view, s);
++    s.placeholderOwned = YES;
++}
++
++void CSInputTextStyleApply(UIView *candidate) {
++    if (!candidate || !NSThread.isMainThread) return;
++    UIView<CSInputPlaceholder> *view = (id)candidate;
++    CSInputStyleState *s = objc_getAssociatedObject(view, &CSInputStyleStateKey);
++    if (s.applying || s.nativeDepth) return;
++    CSInputStyleSnapshot *p = CSInputStyle;
++    if (s && !p.enabled && !p.rounded && !p.bordered &&
++        !s.placeholderOwned && !s.cornerOwned && !s.borderOwned) return;
++    UIViewController *owner = CSInputChatOwner(view);
++    if (!s && !owner) return;
++    if (!s) {
++        s = [CSInputStyleState new];
++        objc_setAssociatedObject(view, &CSInputStyleStateKey, s, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
++        if (!CSInputViews) CSInputViews = [NSHashTable weakObjectsHashTable];
++        [CSInputViews addObject:view];
++    }
++    BOOL active = owner && [objc_getAssociatedObject(owner, &CSInputChatVisibleKey) boolValue];
++    s.applying = YES;
++    @try {
++        // WeChat can rebuild the inner text view when switching input modes.
++        if (s.placeholderOwned && [view respondsToSelector:@selector(textView)] && [view textView] != s.nativeInner)
++            CSInputCaptureInner(view, s);
++        if (active && p.enabled) {
++            if (!s.placeholderOwned) CSInputCapturePlaceholder(view, s);
++            UIUserInterfaceStyle trait = view.traitCollection.userInterfaceStyle;
++            if (!CSEqual(s.renderedColor, p.textColor) || s.renderedTrait != trait) {
++                // Only override auxiliary native properties when they can be restored.
++                if (s.hasNativeColor) [view setPlaceHolderColor:p.textColor];
++                s.renderedColor = p.textColor;
++                s.renderedTrait = trait;
++            }
++            if (!s.multilineApplied) {
++                if (s.hasNativeMultiline) [view setPlaceHolderMultiLine:YES];
++                s.multilineApplied = YES;
++            }
++            if (!CSEqual(view.placeHolder, p.text)) view.placeHolder = p.text;
++            if (!CSEqual(view.attributePlaceholder, p.attributed)) view.attributePlaceholder = p.attributed;
++        } else if (s.placeholderOwned) {
++            if (s.hasNativeColor) [view setPlaceHolderColor:s.nativeColor];
++            if (s.hasNativeMultiline) [view setPlaceHolderMultiLine:s.nativeMultiline];
++            view.placeHolder = s.nativeText;
++            view.attributePlaceholder = s.nativeAttributed;
++            s.placeholderOwned = NO;
++            s.renderedColor = nil;
++            s.nativeAttributed = nil;
++            s.nativeText = nil;
++            s.nativeColor = nil;
++        }
++
++        // Native layout/theme changes can replace layer values. Preserve its latest values
++        // instead of restoring an obsolete snapshot when this feature is disabled.
++        if (s.cornerOwned) {
++            if (view.layer.cornerRadius != s.renderedRadius) s.nativeRadius = view.layer.cornerRadius;
++            if (view.clipsToBounds != s.renderedClips) s.nativeClips = view.clipsToBounds;
++        }
++        if (active && p.rounded) {
++            if (!s.cornerOwned) { s.nativeRadius = view.layer.cornerRadius; s.nativeClips = view.clipsToBounds; }
++            s.cornerOwned = YES;
++            if (view.layer.cornerRadius != p.radius) view.layer.cornerRadius = p.radius;
++            if (!view.clipsToBounds) view.clipsToBounds = YES;
++            s.renderedRadius = p.radius; s.renderedClips = YES;
++        } else if (s.cornerOwned) {
++            view.layer.cornerRadius = s.nativeRadius; view.clipsToBounds = s.nativeClips;
++            s.cornerOwned = NO;
++        }
++        if (s.borderOwned) {
++            if (view.layer.borderWidth != s.renderedWidth) s.nativeWidth = view.layer.borderWidth;
++            if (!CSColorsEqual(view.layer.borderColor, s.renderedBorder.CGColor))
++                s.nativeBorder = view.layer.borderColor ? [UIColor colorWithCGColor:view.layer.borderColor] : nil;
++        }
++        if (active && p.bordered) {
++            if (!s.borderOwned) {
++                s.nativeWidth = view.layer.borderWidth;
++                s.nativeBorder = view.layer.borderColor ? [UIColor colorWithCGColor:view.layer.borderColor] : nil;
++            }
++            s.borderOwned = YES;
++            if (s.borderSource != p.borderColor || !s.borderTraits ||
++                [view.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:s.borderTraits]) {
++                s.renderedBorder = [p.borderColor resolvedColorWithTraitCollection:view.traitCollection];
++                s.borderSource = p.borderColor;
++                s.borderTraits = view.traitCollection;
++            }
++            UIColor *color = s.renderedBorder;
++            if (view.layer.borderWidth != p.borderWidth) view.layer.borderWidth = p.borderWidth;
++            if (!CSColorsEqual(view.layer.borderColor, color.CGColor)) view.layer.borderColor = color.CGColor;
++            s.renderedWidth = p.borderWidth;
++        } else if (s.borderOwned) {
++            view.layer.borderWidth = s.nativeWidth; view.layer.borderColor = s.nativeBorder.CGColor;
++            s.borderOwned = NO; s.nativeBorder = nil; s.renderedBorder = nil;
++            s.borderSource = nil; s.borderTraits = nil;
++        }
++    } @finally { s.applying = NO; }
++}
++
++void CSInputTextStyleNativeBegin(UIView *view, CSInputTextNativeField field, id value) {
++    if (!NSThread.isMainThread) return;
++    CSInputStyleState *s = objc_getAssociatedObject(view, &CSInputStyleStateKey);
++    if (!s || s.applying) return;
++    s.nativeDepth++;
++    if (!s.placeholderOwned) return;
++    switch (field) {
++        case CSInputTextNativePlain: s.nativeText = value; break;
++        case CSInputTextNativeAttributed: s.nativeAttributed = value; break;
++        case CSInputTextNativeColor: s.nativeColor = value; s.hasNativeColor = YES; s.renderedColor = nil; break;
++        case CSInputTextNativeMultiline: s.nativeMultiline = [value boolValue]; s.hasNativeMultiline = YES; s.multilineApplied = NO; break;
++    }
++}
++void CSInputTextStyleNativeEnd(UIView *view) {
++    if (!NSThread.isMainThread) return;
++    CSInputStyleState *s = objc_getAssociatedObject(view, &CSInputStyleStateKey);
++    if (!s || s.applying || !s.nativeDepth) return;
++    if (--s.nativeDepth == 0) CSInputTextStyleApply(view);
++}
++void CSInputTextStyleChatVisibility(UIViewController *controller, BOOL visible) {
++    if (!controller || !NSThread.isMainThread) return;
++    objc_setAssociatedObject(controller, &CSInputChatVisibleKey, @(visible), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
++    for (UIView *view in CSInputViews.allObjects) CSInputTextStyleApply(view);
++}
++void CSInputTextStylePreferencesChanged(void) {
++    CSRequestMainRefresh(&CSInputRefreshPending, ^{
++        if (CSInputLoadPreferences()) for (UIView *view in CSInputViews.allObjects) CSInputTextStyleApply(view);
++    });
++}
++static void CSInputDarwinChanged(CFNotificationCenterRef center, void *observer, CFStringRef name,
++                                 const void *object, CFDictionaryRef info) {
++    CSInputTextStylePreferencesChanged();
++}
++void CSInputTextStyleInstall(NSUserDefaults *defaults) {
++    static dispatch_once_t once;
++    dispatch_once(&once, ^{
++        CSInputDefaults = defaults;
++        CSInputLoadPreferences();
++        for (NSString *name in @[NSUserDefaultsDidChangeNotification, @"com.wechat.tweak.local_settings_changed",
++                                UIApplicationDidBecomeActiveNotification]) {
++            [NSNotificationCenter.defaultCenter addObserverForName:name object:nil queue:nil usingBlock:^(NSNotification *note) {
++                CSInputTextStylePreferencesChanged();
++            }];
++        }
++        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, CSInputDarwinChanged,
++            CFSTR("com.wechat.enhance.settings_changed"), NULL, CFNotificationSuspensionBehaviorCoalesce);
++    });
++}
+--- before/Controllers/CSMessageMediaProvider.m
++++ after/Controllers/CSMessageMediaProvider.m
+@@ -38,13 +38,6 @@
+ @implementation CSMessageMediaProvider
+ - (instancetype)init { return [self initWithReader:^NSData *(NSString *path){ return [NSData dataWithContentsOfFile:path options:NSDataReadingMappedIfSafe error:nil]; }]; }
+ - (instancetype)initWithReader:(NSData *(^)(NSString *))reader { if ((self=[super init])) { _reader=[reader copy]; _preparations=[NSMutableDictionary dictionary]; _appSubscribers=[NSMutableSet set]; _queue=dispatch_queue_create("com.wechat.enhance.message-media",DISPATCH_QUEUE_SERIAL); } return self; }
+-static unsigned int CSVoiceXMLUInt(NSString *xml, NSString *attribute) {
+-    if (![xml isKindOfClass:NSString.class]) return 0;
+-    NSRegularExpression *expression=[NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"\\b%@=[\"']([0-9]+)[\"']",attribute] options:0 error:nil];
+-    NSTextCheckingResult *match=[expression firstMatchInString:xml options:0 range:NSMakeRange(0,xml.length)];
+-    if (match.numberOfRanges<2) return 0;
+-    unsigned long long value=[[xml substringWithRange:[match rangeAtIndex:1]] longLongValue]; return value<=UINT_MAX ? (unsigned int)value : 0;
+-}
+ // Presence matters: historical XML can omit flags, while explicit zero endflag
+ // denies completeness until the correlated terminal native callback arrives.
+ static BOOL CSVoiceXMLFlag(NSString *xml, NSString *attribute, unsigned int *value) {
+@@ -52,11 +45,15 @@
+     NSTextCheckingResult *voice=[[NSRegularExpression regularExpressionWithPattern:@"<voicemsg\\b[^>]*>" options:0 error:nil] firstMatchInString:xml options:0 range:NSMakeRange(0,xml.length)];
+     if (!voice) return NO;
+     xml=[xml substringWithRange:voice.range];
+-    NSString *pattern=[NSString stringWithFormat:@"\\s%@\\s*=\\s*[\"']([0-9]+)[\"']",attribute];
++    NSString *pattern=[NSString stringWithFormat:@"\\s%@\\s*=\\s*([\"'])([0-9]+)\\1",attribute];
+     NSTextCheckingResult *match=[[NSRegularExpression regularExpressionWithPattern:pattern options:0 error:nil] firstMatchInString:xml options:0 range:NSMakeRange(0,xml.length)];
+-    if (match.numberOfRanges<2) return NO;
+-    NSString *number=[xml substringWithRange:[match rangeAtIndex:1]];
++    if (match.numberOfRanges<3) return NO;
++    NSString *number=[xml substringWithRange:[match rangeAtIndex:2]];
+     *value=number.longLongValue>UINT_MAX ? UINT_MAX : number.intValue; return YES;
++}
++static unsigned int CSVoiceXMLUInt(NSString *xml, NSString *attribute) {
++    // Group sender prefixes and unrelated XML nodes are not voice metadata.
++    unsigned int value=0; CSVoiceXMLFlag(xml,attribute,&value); return value;
+ }
+ - (void)snapshotFlags:(CSVoicePreparation *)preparation {
+     NSString *xml=CSMessageActionObjectGetter(preparation.refreshedSource ?: preparation.context.sourceWrap,NSSelectorFromString(@"m_nsContent"));
+@@ -81,7 +78,7 @@
+     if (!preparation.duration) preparation.duration=CSVoiceXMLUInt(xml,@"voicelength");
+     preparation.formatKnown=CSMessageNativeSupports(source,@"m_uiVoiceFormat",@"I",@[]) || CSMessageNativeSupports(source,@"m_uiVoiceFormat",@"i",@[]);
+     preparation.format=(unsigned int)CSMessageNativeUnsigned(source,@"m_uiVoiceFormat");
+-    if (!preparation.formatKnown && [xml isKindOfClass:NSString.class] && [xml rangeOfString:@"voiceformat="].location!=NSNotFound) { preparation.format=CSVoiceXMLUInt(xml,@"voiceformat"); preparation.formatKnown=YES; }
++    if (!preparation.formatKnown) { unsigned int format=0; preparation.formatKnown=CSVoiceXMLFlag(xml,@"voiceformat",&format); preparation.format=format; }
+     preparation.expectedBytes=CSVoiceXMLUInt(xml,@"length");
+     unsigned long long status=CSMessageNativeUnsigned(source,@"m_uiDownloadStatus");
+     preparation.localComplete=(status & 1)!=0;
+@@ -117,13 +114,21 @@
+         else return nil;
+     }
+     {
+-        unsigned long long measured=0; Class utility=NSClassFromString(@"AudioUtil");
++        unsigned long long measured=0; BOOL decodedBytes=NO; Class utility=NSClassFromString(@"AudioUtil");
+         @try {
+-            if (format==4 && CSMessageNativeSupports(utility,@"calcSilkVoiceTime:",@"I",@[@"@"])) measured=[CSMessageNativeInvoke(utility,@"calcSilkVoiceTime:",@[data]) unsignedLongLongValue];
+-            else if (format==7 && CSMessageNativeSupports(NSClassFromString(@"OpusAudioPlayer"),@"calculateVoiceTime:",@"I",@[@"@"])) measured=[CSMessageNativeInvoke(NSClassFromString(@"OpusAudioPlayer"),@"calculateVoiceTime:",@[data]) unsignedLongLongValue];
++            if (format==4 && CSMessageNativeSupports(utility,@"calcSilkVoiceTime:",@"I",@[@"@"])) { decodedBytes=YES; measured=[CSMessageNativeInvoke(utility,@"calcSilkVoiceTime:",@[data]) unsignedLongLongValue]; }
++            else if (format==7 && CSMessageNativeSupports(NSClassFromString(@"OpusAudioPlayer"),@"calculateVoiceTime:",@"I",@[@"@"])) { decodedBytes=YES; measured=[CSMessageNativeInvoke(NSClassFromString(@"OpusAudioPlayer"),@"calculateVoiceTime:",@[data]) unsignedLongLongValue]; }
+             else if (CSMessageNativeSupports(utility,@"calcVoiceTime:VoiceFormat:",@"I",@[@"I",@"I"]) && data.length<=UINT_MAX) measured=[CSMessageNativeInvoke(utility,@"calcVoiceTime:VoiceFormat:",@[@(data.length),@(format)]) unsignedLongLongValue];
+         } @catch (__unused NSException *exception) {}
+-        if (!measured || llabs((long long)measured-duration)>20) return nil;
++        if (!measured || measured>UINT_MAX) return nil;
++        if (llabs((long long)measured-duration)>20) {
++            // Network XML byte count + completed/nonrecording state + native byte
++            // decoding establish this complete resource independently of display
++            // duration. Normalize only the fresh send; never mutate source metadata.
++            // Without declared bytes, retain duration agreement as the truncation guard.
++            if (!expected || !decodedBytes) return nil;
++            duration=(unsigned int)measured;
++        }
+     }
+     return [[CSMessageVoiceResource alloc] initWithData:data durationMilliseconds:duration format:format];
+ }
+@@ -138,11 +143,16 @@
+     NSData *(^reader)(NSString *)=_reader; __weak typeof(self) weakSelf=self;
+     dispatch_async(_queue,^{
+         @autoreleasepool {
+-            NSDictionary *before=path.length ? [NSFileManager.defaultManager attributesOfItemAtPath:path error:nil] : nil;
+-            NSData *data=snapshot.length ? snapshot : (path.length ? reader(path) : nil);
+-            NSDictionary *after=path.length ? [NSFileManager.defaultManager attributesOfItemAtPath:path error:nil] : nil;
+-            BOOL stable=snapshot.length || (before && after && [before[NSFileSize] isEqual:after[NSFileSize]] && [before[NSFileModificationDate] isEqual:after[NSFileModificationDate]] && [after[NSFileSize] unsignedLongLongValue]==data.length);
+-            CSMessageVoiceResource *resource=stable ? CSValidatedVoice(data,duration,format,known,expected) : nil;
++            CSMessageVoiceResource *resource=snapshot.length ? CSValidatedVoice(snapshot,duration,format,known,expected) : nil;
++            if (!resource && path.length) {
++                // A UI wrapper can retain only a cached chunk. Try its native file
++                // once, on this queue, with the same completeness/codec checks.
++                NSDictionary *before=[NSFileManager.defaultManager attributesOfItemAtPath:path error:nil];
++                NSData *data=reader(path);
++                NSDictionary *after=[NSFileManager.defaultManager attributesOfItemAtPath:path error:nil];
++                BOOL stable=before && after && [before[NSFileSize] isEqual:after[NSFileSize]] && [before[NSFileModificationDate] isEqual:after[NSFileModificationDate]] && [after[NSFileSize] unsignedLongLongValue]==data.length;
++                if (stable) resource=CSValidatedVoice(data,duration,format,known,expected);
++            }
+             dispatch_async(dispatch_get_main_queue(),^{
+                 typeof(self) self=weakSelf; if (!self || self.preparations[key]!=preparation) return;
+                 preparation.reading=NO; [self snapshotFlags:preparation];
+--- before/Controllers/CSReleaseNotesViewController.m
++++ after/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,14 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"1.8-10": @[
++            @{@"title": @"改善语音转发与复读兼容",
++              @"detail": @"修正完整语音因时长标注差异被误判的问题；语音缓存不完整时尝试读取本地文件，并加强群聊与私聊之间的转发校验。"},
++            @{@"title": @"优化头像旋转耗电",
++              @"detail": @"头像离开可见页面、微信退到后台或设备过热时暂停旋转；旋转开关和速度修改即时生效。"},
++            @{@"title": @"减少输入框重复处理",
++              @"detail": @"缓存输入框文字、颜色和边框样式，减少输入与键盘切换时的重复工作；关闭自定义样式后恢复原生显示。"}
++        ],
+         @"1.8-9": @[
+             @{@"title": @"减少日常处理开销",
+               @"detail": @"精简页面刷新、入口加载和消息处理中的重复记录与无用操作，延续首屏恢复和界面能耗优化。"}
+--- before/Headers/CSUserInfoHelper.h
++++ after/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"1.8-9"  // 插件版本号
++#define kPluginVersionString @"1.8-10"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- before/Hooks/CSAvatarShape.xm
++++ after/Hooks/CSAvatarShape.xm
+@@ -3,6 +3,7 @@
+ #import <UIKit/UIKit.h>
+ #import "../Controllers/CSAvatarSettingsViewController.h"
+ #import <objc/runtime.h>
++#import "CSAvatarRotation.h"
+ // 添加 substrate 头文件导入，用于 MSHookIvar
+ #import <substrate.h>
+ 
+@@ -44,17 +45,10 @@
+ static NSString * const kUserDefaultsSuiteNameConst = @"com.cyansmoke.wechattweak";
+ static NSString * const kRoundAvatarKeyConst = @"roundAvatar";
+ static NSString * const kAvatarCornerRadiusKeyConst = @"avatarCornerRadius";
+-static NSString * const kRotateAvatarKeyConst = @"rotateAvatar";
+-static NSString * const kRotateSpeedKeyConst = @"rotateSpeed";
+ 
+ // 全局变量
+ static BOOL isRoundAvatarEnabled = NO;
+ static float customCornerRadius = 1.0f; // 默认值改为1.0 (全圆)
+-static BOOL isRotateAvatarEnabled = NO;
+-static float rotateSpeed = 5.0f;
+-
+-// 添加一个关联对象key，用于存储是否已经添加了旋转动画
+-static char kHasRotationAnimationKey;
+ 
+ // 在主函数之前执行，读取用户设置
+ %ctor {
+@@ -66,13 +60,8 @@
+         customCornerRadius = 1.0f; // 默认值改为1.0 (全圆)
+     }
+     
+-    // 读取旋转设置
+-    isRotateAvatarEnabled = [defaults boolForKey:kRotateAvatarKeyConst];
+-    rotateSpeed = [defaults floatForKey:kRotateSpeedKeyConst];
+-    if (rotateSpeed == 0) {
+-        rotateSpeed = 5.0f; // 默认值
+-    }
+-    
++    CSAvatarRotationInstall(defaults);
++
+ }
+ 
+ // Hook MMHeadImageView的初始化方法
+@@ -135,43 +124,14 @@
+         }
+     }
+     
+-    // 应用旋转动画
+-    // 获取是否已经添加了旋转动画
+-    NSNumber *hasAnimation = objc_getAssociatedObject(self, &kHasRotationAnimationKey);
+-    
+-    // 使用tag值识别"我的"页面头像视图
+-    BOOL isProfileAvatar = self.tag == 101;
+-    
+-    if (isRotateAvatarEnabled && isProfileAvatar) {
+-        // 只有在没有添加过动画的情况下才添加
+-        if (!hasAnimation || ![hasAnimation boolValue]) {
+-            // 创建旋转动画
+-            CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+-            rotationAnimation.toValue = @(M_PI * 2.0);
+-            rotationAnimation.duration = 12.0 - rotateSpeed; // 速度范围是1-10，所以11-1=10秒到2秒不等
+-            rotationAnimation.cumulative = YES;
+-            rotationAnimation.repeatCount = HUGE_VALF;
+-            
+-            // 重要：设置removedOnCompletion为NO，这样动画不会在完成后被移除
+-            rotationAnimation.removedOnCompletion = NO;
+-            
+-            // 设置fillMode为forwards，这样动画会保持在最后一帧
+-            rotationAnimation.fillMode = kCAFillModeForwards;
+-            
+-            // 添加动画
+-            [self.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+-            
+-            // 标记已经添加了动画
+-            objc_setAssociatedObject(self, &kHasRotationAnimationKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+-        }
+-    } else {
+-        // 如果不需要旋转，移除动画
+-        if ([self.layer animationForKey:@"rotationAnimation"]) {
+-            [self.layer removeAnimationForKey:@"rotationAnimation"];
+-            objc_setAssociatedObject(self, &kHasRotationAnimationKey, @NO, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+-        }
+-    }
+-}
++    CSAvatarRotationUpdate(self);
++}
++
++- (void)didMoveToWindow { %orig; CSAvatarRotationUpdate(self); }
++- (void)didMoveToSuperview { %orig; CSAvatarRotationUpdate(self); }
++- (void)setHidden:(BOOL)hidden { %orig; CSAvatarRotationUpdate(self); }
++- (void)setAlpha:(CGFloat)alpha { %orig; CSAvatarRotationUpdate(self); }
++- (void)setTag:(NSInteger)tag { %orig; CSAvatarRotationUpdate(self); }
+ 
+ // Hook conerSize属性的setter方法 - 保留这个hook以防万一
+ -(void)setConerSize:(unsigned int)size {
+@@ -268,42 +228,14 @@
+         }
+     }
+     
+-    // 应用旋转动画
+-    NSNumber *hasAnimation = objc_getAssociatedObject(self, &kHasRotationAnimationKey);
+-    
+-    // 使用tag值识别"我的"页面头像视图
+-    BOOL isProfileAvatar = self.tag == 101;
+-    
+-    if (isRotateAvatarEnabled && isProfileAvatar) {
+-        // 只有在没有添加过动画的情况下才添加
+-        if (!hasAnimation || ![hasAnimation boolValue]) {
+-            // 创建旋转动画
+-            CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+-            rotationAnimation.toValue = @(M_PI * 2.0);
+-            rotationAnimation.duration = 12.0 - rotateSpeed; // 速度范围是1-10，所以11-1=10秒到2秒不等
+-            rotationAnimation.cumulative = YES;
+-            rotationAnimation.repeatCount = HUGE_VALF;
+-            
+-            // 重要：设置removedOnCompletion为NO，这样动画不会在完成后被移除
+-            rotationAnimation.removedOnCompletion = NO;
+-            
+-            // 设置fillMode为forwards，这样动画会保持在最后一帧
+-            rotationAnimation.fillMode = kCAFillModeForwards;
+-            
+-            // 添加动画
+-            [self.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+-            
+-            // 标记已经添加了动画
+-            objc_setAssociatedObject(self, &kHasRotationAnimationKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+-        }
+-    } else {
+-        // 如果不需要旋转，移除动画
+-        if ([self.layer animationForKey:@"rotationAnimation"]) {
+-            [self.layer removeAnimationForKey:@"rotationAnimation"];
+-            objc_setAssociatedObject(self, &kHasRotationAnimationKey, @NO, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+-        }
+-    }
+-}
++    CSAvatarRotationUpdate(self);
++}
++
++- (void)didMoveToWindow { %orig; CSAvatarRotationUpdate(self); }
++- (void)didMoveToSuperview { %orig; CSAvatarRotationUpdate(self); }
++- (void)setHidden:(BOOL)hidden { %orig; CSAvatarRotationUpdate(self); }
++- (void)setAlpha:(CGFloat)alpha { %orig; CSAvatarRotationUpdate(self); }
++- (void)setTag:(NSInteger)tag { %orig; CSAvatarRotationUpdate(self); }
+ 
+ // Hook conerSize属性的setter方法
+ - (void)setConerSize:(unsigned int)size {
+@@ -316,4 +248,11 @@
+     }
+ }
+ 
+-%end +%end
++
++@interface MoreViewController : UIViewController @end
++%hook MoreViewController
++- (void)viewDidAppear:(BOOL)animated { %orig; CSAvatarRotationPageVisibility(self, YES); }
++- (void)viewWillDisappear:(BOOL)animated { CSAvatarRotationPageVisibility(self, NO); %orig; }
++- (void)viewDidLayoutSubviews { %orig; CSAvatarRotationRefreshViews(); }
++%end
+--- before/Hooks/InputTextHooks.xm
++++ after/Hooks/InputTextHooks.xm
+@@ -1,384 +1,57 @@
+-// 聊天输入框占位文本Hook
+-// 在输入框显示自定义的灰色文本
++#import <UIKit/UIKit.h>
++#import "CSInputTextStyle.h"
+ 
+-#import <UIKit/UIKit.h>
+-#import <objc/runtime.h>
+-#import <Foundation/Foundation.h>
+-
+-// UserDefaults Key常量
+-static NSString * const kInputTextEnabledKey = @"com.wechat.enhance.inputText.enabled";
+-static NSString * const kInputTextContentKey = @"com.wechat.enhance.inputText.content";
+-static NSString * const kInputTextColorKey = @"com.wechat.enhance.inputText.color";
+-static NSString * const kInputTextAlphaKey = @"com.wechat.enhance.inputText.alpha";
+-static NSString * const kInputTextFontSizeKey = @"com.wechat.enhance.inputText.fontSize";
+-static NSString * const kInputTextBoldKey = @"com.wechat.enhance.inputText.bold";
+-// 添加输入框圆角设置键
+-static NSString * const kInputTextRoundedCornersKey = @"com.wechat.enhance.inputText.roundedCorners";
+-// 添加圆角大小设置键
+-static NSString * const kInputTextCornerRadiusKey = @"com.wechat.enhance.inputText.cornerRadius";
+-// 添加边框相关设置键
+-static NSString * const kInputTextBorderEnabledKey = @"com.wechat.enhance.inputText.border.enabled";
+-static NSString * const kInputTextBorderWidthKey = @"com.wechat.enhance.inputText.border.width";
+-static NSString * const kInputTextBorderColorKey = @"com.wechat.enhance.inputText.border.color";
+-
+-// 默认值
+-static NSString * const kDefaultInputText = @"我爱你呀";
+-static CGFloat const kDefaultFontSize = 15.0f;
+-static CGFloat const kDefaultTextAlpha = 0.5f;
+-// 输入框圆角大小
+-static CGFloat const kDefaultCornerRadius = 18.0f;
+-// 输入框边框默认值
+-static CGFloat const kDefaultBorderWidth = 1.0f;
+-
+-// 存储当前是否在聊天界面
+-static BOOL isInChatView = NO;
+-
+-// 聊天界面声明
+-@interface BaseMsgContentViewController : UIViewController
+-- (id)GetContact;
++@interface BaseMsgContentViewController : UIViewController @end
++@interface MMGrowTextView : UIView @end
++@interface MMInputToolView : UIView
++@property(nonatomic, strong) MMGrowTextView *textView;
+ @end
+ 
+-// 类声明
+-@interface MMGrowTextView : UIView
+-@property(nonatomic) __weak NSString *placeHolder;
+-@property(nonatomic) __weak NSAttributedString *attributePlaceholder;
+-- (void)setPlaceHolderColor:(UIColor *)color;
+-- (void)setPlaceHolderMultiLine:(BOOL)multiLine;
+-@end
+-
+-@interface MMInputToolView : UIView
+-@property(retain, nonatomic) MMGrowTextView *textView;
+-@end
+-
+-// 检查功能是否启用
+-static BOOL isInputTextEnabled() {
+-    return [[NSUserDefaults standardUserDefaults] boolForKey:kInputTextEnabledKey];
+-}
+-
+-// 检查输入框圆角是否启用
+-static BOOL isInputTextRoundedCornersEnabled() {
+-    return [[NSUserDefaults standardUserDefaults] boolForKey:kInputTextRoundedCornersKey];
+-}
+-
+-// 检查输入框边框是否启用
+-static BOOL isInputTextBorderEnabled() {
+-    return [[NSUserDefaults standardUserDefaults] boolForKey:kInputTextBorderEnabledKey];
+-}
+-
+-// 检查是否应该应用输入框样式(必须在聊天界面且功能启用)
+-static BOOL shouldApplyInputTextStyle() {
+-    return isInChatView && isInputTextEnabled();
+-}
+-
+-// 检查是否应该应用圆角样式(必须在聊天界面且功能启用)
+-static BOOL shouldApplyRoundedCorners() {
+-    return isInChatView && isInputTextRoundedCornersEnabled();
+-}
+-
+-// 检查是否应该应用边框样式(必须在聊天界面且功能启用)
+-static BOOL shouldApplyBorder() {
+-    return isInChatView && isInputTextBorderEnabled();
+-}
+-
+-// 获取圆角大小设置
+-static CGFloat getCornerRadius() {
+-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+-    CGFloat cornerRadius = [defaults floatForKey:kInputTextCornerRadiusKey];
+-    // 如果没有设置过或者值为0，返回默认值
+-    if (cornerRadius <= 0) {
+-        cornerRadius = kDefaultCornerRadius;
+-    }
+-    return cornerRadius;
+-}
+-
+-// 获取边框宽度设置
+-static CGFloat getBorderWidth() {
+-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+-    CGFloat borderWidth = [defaults floatForKey:kInputTextBorderWidthKey];
+-    // 如果没有设置过或者值为0，返回默认值
+-    if (borderWidth <= 0) {
+-        borderWidth = kDefaultBorderWidth;
+-    }
+-    return borderWidth;
+-}
+-
+-// 获取边框颜色设置
+-static UIColor *getBorderColorFromDefaults() {
+-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+-    // 获取保存的颜色
+-    NSData *colorData = [defaults objectForKey:kInputTextBorderColorKey];
+-    if (colorData) {
+-        NSError *error = nil;
+-        UIColor *savedColor = [NSKeyedUnarchiver unarchivedObjectOfClass:[UIColor class] fromData:colorData error:&error];
+-        if (savedColor && !error) {
+-            return savedColor;
+-        }
+-        if (error) {
+-            NSLog(@"解档边框颜色时出错: %@", error);
+-        }
+-    }
+-    // 返回默认颜色
+-    return [UIColor systemGrayColor];
+-}
+-
+-// 获取保存的设置内容
+-static NSString *getInputTextContent() {
+-    NSString *savedText = [[NSUserDefaults standardUserDefaults] objectForKey:kInputTextContentKey];
+-    return savedText.length > 0 ? savedText : kDefaultInputText;
+-}
+-
+-// 获取文字颜色设置
+-static UIColor *getTextColorFromDefaults() {
+-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+-    // 获取保存的颜色
+-    NSData *colorData = [defaults objectForKey:kInputTextColorKey];
+-    if (colorData) {
+-        NSError *error = nil;
+-        UIColor *savedColor = [NSKeyedUnarchiver unarchivedObjectOfClass:[UIColor class] fromData:colorData error:&error];
+-        if (savedColor && !error) {
+-            // 应用保存的文字透明度
+-            CGFloat alpha = [defaults floatForKey:kInputTextAlphaKey];
+-            if (alpha == 0 && ![defaults objectForKey:kInputTextAlphaKey]) {
+-                alpha = kDefaultTextAlpha;
+-            }
+-            return [savedColor colorWithAlphaComponent:alpha];
+-        }
+-        if (error) {
+-            NSLog(@"解档文字颜色时出错: %@", error);
+-        }
+-    }
+-    // 返回默认颜色
+-    CGFloat alpha = [defaults floatForKey:kInputTextAlphaKey];
+-    if (alpha == 0 && ![defaults objectForKey:kInputTextAlphaKey]) {
+-        alpha = kDefaultTextAlpha;
+-    }
+-    return [UIColor colorWithWhite:0.5 alpha:alpha];
+-}
+-
+-// 应用圆角和边框设置
+-static void applyRoundedCornersIfNeeded(MMGrowTextView *textView) {
+-    BOOL shouldApplyCorners = shouldApplyRoundedCorners();
+-    BOOL shouldApplyBorderStyle = shouldApplyBorder();
+-    
+-    if (!shouldApplyCorners && !shouldApplyBorderStyle) {
+-        // 如果圆角和边框功能都未启用或不在聊天界面，将圆角和边框重置为0
+-        textView.layer.cornerRadius = 0;
+-        textView.layer.borderWidth = 0;
+-        textView.clipsToBounds = NO;
+-        return;
+-    }
+-    
+-    // 获取用户设置
+-    CGFloat cornerRadius = shouldApplyCorners ? getCornerRadius() : 0;
+-    CGFloat borderWidth = shouldApplyBorderStyle ? getBorderWidth() : 0;
+-    UIColor *borderColor = shouldApplyBorderStyle ? getBorderColorFromDefaults() : [UIColor clearColor];
+-    
+-    // 只在最外层容器应用圆角和边框
+-    textView.layer.cornerRadius = cornerRadius;
+-    textView.layer.borderWidth = borderWidth;
+-    textView.layer.borderColor = borderColor.CGColor;
+-    textView.clipsToBounds = (cornerRadius > 0);
+-}
+-
+-// 应用占位文本设置的辅助函数
+-static void applyPlaceHolderSettings(MMGrowTextView *textView) {
+-    if (!shouldApplyInputTextStyle()) {
+-        // 即使不应用占位文本，也尝试应用圆角和边框设置
+-        if (shouldApplyRoundedCorners() || shouldApplyBorder()) {
+-            applyRoundedCornersIfNeeded(textView);
+-        }
+-        return;
+-    }
+-    
+-    // 获取自定义设置
+-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+-    NSString *customText = getInputTextContent();
+-    CGFloat fontSize = [defaults floatForKey:kInputTextFontSizeKey];
+-    if (fontSize <= 0) fontSize = kDefaultFontSize;
+-    BOOL isBold = [defaults boolForKey:kInputTextBoldKey];
+-    
+-    // 设置颜色
+-    UIColor *textColor = getTextColorFromDefaults();
+-    [textView setPlaceHolderColor:textColor];
+-    
+-    // 支持多行
+-    [textView setPlaceHolderMultiLine:YES];
+-    
+-    // 创建字体
+-    UIFont *font = isBold ? 
+-        [UIFont boldSystemFontOfSize:fontSize] : 
+-        [UIFont systemFontOfSize:fontSize];
+-    
+-    // 设置富文本样式的占位文本
+-    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+-    paragraphStyle.alignment = NSTextAlignmentLeft;
+-    
+-    NSDictionary *attributes = @{
+-        NSFontAttributeName: font,
+-        NSForegroundColorAttributeName: textColor,
+-        NSParagraphStyleAttributeName: paragraphStyle
+-    };
+-    
+-    NSAttributedString *attributedPlaceholder = [[NSAttributedString alloc] 
+-                                               initWithString:customText 
+-                                               attributes:attributes];
+-    
+-    textView.attributePlaceholder = attributedPlaceholder;
+-    
+-    // 同时设置普通占位文本，以防富文本设置无效
+-    textView.placeHolder = customText;
+-    
+-    // 应用圆角和边框设置
+-    applyRoundedCornersIfNeeded(textView);
+-}
+-
+-// Hook BaseMsgContentViewController来识别聊天界面
++// Scope styles to the owning chat instead of a process-wide "in chat" flag.
+ %hook BaseMsgContentViewController
+-
+-- (void)viewDidLoad {
+-    %orig;
+-    isInChatView = YES;
+-}
+-
+-- (void)viewWillAppear:(BOOL)animated {
+-    %orig;
+-    isInChatView = YES;
+-}
+-
+-- (void)viewWillDisappear:(BOOL)animated {
+-    %orig;
+-    isInChatView = NO;
+-}
+-
++- (void)viewWillAppear:(BOOL)animated { %orig; CSInputTextStyleChatVisibility(self, YES); }
++- (void)viewWillDisappear:(BOOL)animated { CSInputTextStyleChatVisibility(self, NO); %orig; }
+ %end
+ 
+-// Hook MMGrowTextView类，这是微信的输入框类
+ %hook MMGrowTextView
++- (void)layoutSubviews { %orig; CSInputTextStyleApply(self); }
++- (void)didMoveToWindow { %orig; CSInputTextStyleApply(self); }
++- (void)didMoveToSuperview { %orig; CSInputTextStyleApply(self); }
++- (void)traitCollectionDidChange:(UITraitCollection *)previous { %orig; CSInputTextStyleApply(self); }
+ 
+-- (id)init {
+-    id view = %orig;
+-    if (view) {
+-        applyPlaceHolderSettings(self);
+-    }
+-    return view;
++// Keep the latest native placeholder for disable/leave-chat restoration. A depth
++// guard in the adapter prevents recursive application through native setters.
++- (void)setPlaceHolder:(NSString *)text {
++    CSInputTextStyleNativeBegin(self, CSInputTextNativePlain, text);
++    @try { %orig; } @finally { CSInputTextStyleNativeEnd(self); }
+ }
+-
+-- (id)initWithExtConfig:(id)arg1 {
+-    id view = %orig;
+-    if (view) {
+-        applyPlaceHolderSettings(self);
+-    }
+-    return view;
++- (void)setAttributePlaceholder:(NSAttributedString *)text {
++    CSInputTextStyleNativeBegin(self, CSInputTextNativeAttributed, text);
++    @try { %orig; } @finally { CSInputTextStyleNativeEnd(self); }
+ }
+-
+-- (id)initWithOriginHeight:(double)arg1 {
+-    id view = %orig;
+-    if (view) {
+-        applyPlaceHolderSettings(self);
+-    }
+-    return view;
++- (void)setPlaceHolderColor:(UIColor *)color {
++    CSInputTextStyleNativeBegin(self, CSInputTextNativeColor, color);
++    @try { %orig; } @finally { CSInputTextStyleNativeEnd(self); }
+ }
+-
+-- (id)initWithOriginHeight:(double)arg1 extConfig:(id)arg2 {
+-    id view = %orig;
+-    if (view) {
+-        applyPlaceHolderSettings(self);
+-    }
+-    return view;
++- (void)setPlaceHolderMultiLine:(BOOL)multiline {
++    CSInputTextStyleNativeBegin(self, CSInputTextNativeMultiline, @(multiline));
++    @try { %orig; } @finally { CSInputTextStyleNativeEnd(self); }
+ }
+-
+-- (id)initWithDonotNeedTextViewContentTopBottomInset:(_Bool)arg1 {
+-    id view = %orig;
+-    if (view) {
+-        applyPlaceHolderSettings(self);
+-    }
+-    return view;
++- (void)setPlaceholder:(NSString *)text animated:(BOOL)animated {
++    CSInputTextStyleNativeBegin(self, CSInputTextNativePlain, text);
++    @try { %orig; } @finally { CSInputTextStyleNativeEnd(self); }
+ }
+-
+-- (id)initWithDonotNeedTextViewContentTopBottomInset:(_Bool)arg1 matchInnerViewHeightWithFrame:(_Bool)arg2 {
+-    id view = %orig;
+-    if (view) {
+-        applyPlaceHolderSettings(self);
+-    }
+-    return view;
++- (void)setAttributedPlaceholder:(NSAttributedString *)text animated:(BOOL)animated {
++    CSInputTextStyleNativeBegin(self, CSInputTextNativeAttributed, text);
++    @try { %orig; } @finally { CSInputTextStyleNativeEnd(self); }
+ }
+-
+-- (id)initWithOriginHeight:(double)arg1 WithDonotNeedTextViewContentTopBottomInset:(_Bool)arg2 extConfig:(id)arg3 matchInnerViewHeightWithFrame:(_Bool)arg4 {
+-    id view = %orig;
+-    if (view) {
+-        applyPlaceHolderSettings(self);
+-    }
+-    return view;
+-}
+-
+-// 添加布局后的处理，确保圆角设置正确应用
+-- (void)layoutSubviews {
+-    %orig;
+-    // 应用圆角设置，即使placeholder功能未启用
+-    if (shouldApplyRoundedCorners()) {
+-        applyRoundedCornersIfNeeded(self);
+-    }
+-}
+-
+ %end
+ 
+-// Hook MMInputToolView，确保在视图更新时总是设置占位文本和圆角
+ %hook MMInputToolView
++- (void)layoutSubviews { %orig; CSInputTextStyleApply(self.textView); }
++- (void)updateToolViewHeight:(BOOL)animated { %orig; CSInputTextStyleApply(self.textView); }
++- (void)onWillAppear { %orig; CSInputTextStyleApply(self.textView); }
++- (void)onViewDidInit { %orig; CSInputTextStyleApply(self.textView); }
++%end
+ 
+-- (void)layoutSubviews {
+-    %orig;
+-    
+-    if (self.textView) {
+-        // 应用占位文本设置（如果启用）
+-        if (shouldApplyInputTextStyle()) {
+-            applyPlaceHolderSettings(self.textView);
+-        } else if (shouldApplyRoundedCorners() || shouldApplyBorder()) {
+-            // 如果只启用了圆角或边框设置，只应用这些设置
+-            applyRoundedCornersIfNeeded(self.textView);
+-        }
+-    }
+-}
+-
+-- (void)updateToolViewHeight:(_Bool)arg1 {
+-    %orig;
+-    
+-    if (self.textView) {
+-        // 应用占位文本设置（如果启用）
+-        if (shouldApplyInputTextStyle()) {
+-            applyPlaceHolderSettings(self.textView);
+-        } else if (shouldApplyRoundedCorners() || shouldApplyBorder()) {
+-            // 如果只启用了圆角或边框设置，只应用这些设置
+-            applyRoundedCornersIfNeeded(self.textView);
+-        }
+-    }
+-}
+-
+-- (void)onWillAppear {
+-    %orig;
+-    
+-    if (self.textView) {
+-        // 应用占位文本设置（如果启用）
+-        if (shouldApplyInputTextStyle()) {
+-            applyPlaceHolderSettings(self.textView);
+-        } else if (shouldApplyRoundedCorners() || shouldApplyBorder()) {
+-            // 如果只启用了圆角或边框设置，只应用这些设置
+-            applyRoundedCornersIfNeeded(self.textView);
+-        }
+-    }
+-}
+-
+-- (void)onViewDidInit {
+-    %orig;
+-    
+-    if (self.textView) {
+-        // 应用占位文本设置（如果启用）
+-        if (shouldApplyInputTextStyle()) {
+-            applyPlaceHolderSettings(self.textView);
+-        } else if (shouldApplyRoundedCorners() || shouldApplyBorder()) {
+-            // 如果只启用了圆角或边框设置，只应用这些设置
+-            applyRoundedCornersIfNeeded(self.textView);
+-        }
+-    }
+-}
+-
+-%end
++%ctor { CSInputTextStyleInstall(NSUserDefaults.standardUserDefaults); }
+--- before/README.md
++++ after/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
+ 
+-**当前版本：`1.8-9`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`1.8-10`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
+ 
+@@ -10,17 +10,17 @@
+ 
+ | 项目 | 当前状态 |
+ | --- | --- |
+-| 插件版本 | `1.8-9`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
++| 插件版本 | `1.8-10`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+ | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
+ | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
+ | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
+-| Rootless / Rootful | `1.8-9` 为性能优化后的代码清理 Rootless 包；Rootful 保留构建入口，本轮未验证 |
++| Rootless / Rootful | `1.8-10` 为语音兼容修正、头像旋转与输入框优化的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
+ | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
+ | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
+ 
+ 微信私有类、方法和界面结构会随版本变化。当前已有编译与逻辑回归结果，真实设备上的界面渲染、原生菜单和不同插件组合仍需按实际环境验证。
+ 
+-本轮记录见 [1.8-9 代码清理与剩余性能风险](docs/audits/performance-cleanup-2026-10-18/README.md)，此前改进见 [1.8-8 首屏恢复与性能优化](docs/audits/performance-resume-2026-10-18/implementation.md)。用户已安装 1.8-8 并确认语音转发正常；1.8-9 待安装，真机温升、CPU 与长时间后台恢复仍待实测。
++本轮记录见 [1.8-10 语音兼容修正、头像旋转与输入框优化](docs/audits/avatar-input-performance-2026-10-18/README.md)。此前记录：[1.8-9 代码清理](docs/audits/performance-cleanup-2026-10-18/README.md)、[1.8-8 首屏恢复与性能优化](docs/audits/performance-resume-2026-10-18/implementation.md)。用户最新反馈为 1.8-8、1.8-9 私聊语音正常，涉及群聊时转发／复读出现读取校验失败。1.8-10 修正已复现的媒体误拒绝，并完成群聊双向核心回归；本任务未将新包安装到手机，实际发送、接收播放、CPU、温升与长时间后台恢复仍需真机实测。
+ 
+ ## 安装与入口
+ 
+@@ -194,20 +194,20 @@
+ ### Rootless（无根）
+ 
+ ```bash
+-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-9
++make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-10
+ ```
+ 
+-默认产物：`packages/com.wechat.improve_1.8-9_iphoneos-arm64.deb`。
++默认产物：`packages/com.wechat.improve_1.8-10_iphoneos-arm64.deb`。
+ 
+ ### Rootful（有根）
+ 
+-以下为构建方法；本轮 `1.8-9` 交付仅包含 Rootless 包。
++以下为构建方法；本轮 `1.8-10` 交付仅包含 Rootless 包。
+ 
+ ```bash
+-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-9
++make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-10
+ ```
+ 
+-默认产物：`packages/com.wechat.improve_1.8-9_iphoneos-arm.deb`。
++默认产物：`packages/com.wechat.improve_1.8-10_iphoneos-arm.deb`。
+ 
+ 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
+ 
+@@ -227,7 +227,7 @@
+ 安装了 `dpkg-deb` 的开发环境可检查包内信息：
+ 
+ ```bash
+-dpkg-deb -f packages/com.wechat.improve_1.8-9_iphoneos-arm64.deb Version Architecture
++dpkg-deb -f packages/com.wechat.improve_1.8-10_iphoneos-arm64.deb Version Architecture
+ ```
+ 
+ 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
+--- before/Tests/AvatarInputStyleTests.m
++++ after/Tests/AvatarInputStyleTests.m
+@@ -0,0 +1,182 @@
++#import <UIKit/UIKit.h>
++#import "CSAvatarRotation.h"
++#import "CSInputTextStyle.h"
++#import <objc/runtime.h>
++#import <assert.h>
++
++static NSUInteger checks;
++#define Check(condition) do { checks++; if (!(condition)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#condition); abort(); } } while(0)
++static void Pump(void) { [NSRunLoop.mainRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.03]]; }
++@interface CountingDefaults : NSUserDefaults
++@property(nonatomic,strong) NSMutableDictionary *values;
++@property(nonatomic) NSUInteger reads;
++@end
++@implementation CountingDefaults
++- (instancetype)init { if ((self=[super init])) _values=[NSMutableDictionary dictionary]; return self; }
++- (id)objectForKey:(NSString *)key { self.reads++;return self.values[key]; }
++- (BOOL)boolForKey:(NSString *)key { return [[self objectForKey:key] boolValue]; }
++- (double)doubleForKey:(NSString *)key { return [[self objectForKey:key] doubleValue]; }
++- (void)setObject:(id)value forKey:(NSString *)key { self.values[key]=value; }
++- (void)removeObjectForKey:(NSString *)key { [self.values removeObjectForKey:key]; }
++@end
++@interface CountingLayer : CALayer
++@property(nonatomic,strong) NSMutableDictionary *submitted;
++@property(nonatomic) NSUInteger adds, styleWrites;
++@end
++@implementation CountingLayer
++- (instancetype)init { if ((self=[super init])) _submitted=[NSMutableDictionary dictionary];return self; }
++- (void)addAnimation:(CAAnimation *)animation forKey:(NSString *)key { self.adds++;self.submitted[key]=[animation copy]; }
++- (CAAnimation *)animationForKey:(NSString *)key { return self.submitted[key]; }
++- (void)removeAnimationForKey:(NSString *)key { [self.submitted removeObjectForKey:key]; }
++- (void)removeAllAnimations { [self.submitted removeAllObjects]; }
++- (void)setCornerRadius:(CGFloat)value { self.styleWrites++;[super setCornerRadius:value]; }
++- (void)setBorderWidth:(CGFloat)value { self.styleWrites++;[super setBorderWidth:value]; }
++- (void)setBorderColor:(CGColorRef)value { self.styleWrites++;[super setBorderColor:value]; }
++@end
++@interface TestNativeInner : NSObject
++@property(nonatomic,strong) UIColor *placeHolderColor;
++@property(nonatomic) BOOL placeholderMultiLine;
++@end
++@implementation TestNativeInner @end
++@interface TestNativeInput : UIView
++@property(nonatomic,copy) NSString *placeHolder;
++@property(nonatomic,copy) NSAttributedString *attributePlaceholder;
++@property(nonatomic,strong) TestNativeInner *textView;
++@property(nonatomic) NSUInteger writes,nativeLayouts,nativeMoves;
++@property(nonatomic,copy) NSString *typedText;
++@property(nonatomic) NSRange selectedRange;
++- (void)setPlaceHolderColor:(UIColor *)color;
++- (void)setPlaceHolderMultiLine:(BOOL)value;
++- (void)setPlaceholder:(NSString *)text animated:(BOOL)animated;
++- (void)setAttributedPlaceholder:(NSAttributedString *)text animated:(BOOL)animated;
++@end
++@implementation TestNativeInput
++- (instancetype)init { if ((self=[super init])) { self.layer=[CountingLayer layer];_textView=[TestNativeInner new];_textView.placeHolderColor=[UIColor colorWithWhite:.3 alpha:1];_placeHolder=@"Native"; }return self; }
++- (void)setPlaceHolder:(NSString *)text { self.writes++;BOOL changed=![_placeHolder isEqual:text];_placeHolder=[text copy];if(changed) self.attributePlaceholder=nil; }
++- (void)setAttributePlaceholder:(NSAttributedString *)text { self.writes++;_attributePlaceholder=[text copy]; }
++- (void)setPlaceHolderColor:(UIColor *)color { self.writes++;self.textView.placeHolderColor=color; }
++- (void)setPlaceHolderMultiLine:(BOOL)value { self.writes++;self.textView.placeholderMultiLine=value; }
++- (void)setPlaceholder:(NSString *)text animated:(BOOL)animated { self.placeHolder=text; }
++- (void)setAttributedPlaceholder:(NSAttributedString *)text animated:(BOOL)animated { self.attributePlaceholder=text; }
++- (void)layoutSubviews { self.nativeLayouts++; }
++- (void)didMoveToWindow { self.nativeMoves++; }
++@end
++@interface TestNativeTool : UIView
++@property(nonatomic,strong) TestNativeInput *textView;
++@property(nonatomic) NSUInteger nativeUpdates;
++- (void)updateToolViewHeight:(BOOL)animated;
++- (void)onWillAppear;
++- (void)onViewDidInit;
++@end
++@implementation TestNativeTool
++- (void)layoutSubviews { self.nativeUpdates++; }
++- (void)updateToolViewHeight:(BOOL)animated { self.nativeUpdates++; }
++- (void)onWillAppear { self.nativeUpdates++; }
++- (void)onViewDidInit { self.nativeUpdates++; }
++@end
++#import "StyleHooksUnderTest.h"
++
++static NSProcessInfoThermalState thermal=NSProcessInfoThermalStateNominal;
++static NSProcessInfoThermalState TestThermal(id object,SEL selector) { return thermal; }
++static IMP decodeOriginal;
++static NSUInteger decodes;
++static id CountDecode(id cls,SEL selector,Class expected,NSData *data,NSError **error) {
++    decodes++;
++    return ((id(*)(id,SEL,Class,id,NSError **))decodeOriginal)(cls,selector,expected,data,error);
++}
++static NSString *Key(NSString *suffix) { return [@"com.wechat.enhance.inputText." stringByAppendingString:suffix]; }
++static void InputSet(CountingDefaults *defaults,NSString *key,id value) { [defaults setObject:value forKey:Key(key)]; }
++static void Post(NSString *name,id object) { [NSNotificationCenter.defaultCenter postNotificationName:name object:object]; }
++static BOOL Rotating(UIView *view) { return [view.layer animationForKey:@"cs.avatar.rotation"]!=nil; }
++
++static void TestAvatars(CountingDefaults *defaults,UIWindow *window) {
++    CSAvatarRotationInstall(defaults);CSAvatarRotationInstall(defaults);
++    MoreViewController *page=[MoreViewController new];page.view=[[UIView alloc] initWithFrame:window.bounds];[window addSubview:page.view];
++    [page viewDidAppear:NO];
++    for (Class cls in @[MMHeadImageView.class,FakeHeadImageView.class]) {
++        UIView *avatar=[[cls alloc] initWithFrame:CGRectMake(20,20,60,60)];avatar.layer=[CountingLayer layer];avatar.tag=101;[page.view addSubview:avatar];[avatar didMoveToWindow];
++        Check(!Rotating(avatar));
++        [defaults setObject:@YES forKey:@"rotateAvatar"];CSAvatarRotationPreferencesChanged();Pump();Check(Rotating(avatar));
++        CountingLayer *layer=(id)avatar.layer;NSUInteger reads=defaults.reads,adds=layer.adds;
++        for(NSUInteger i=0;i<10000;i++)CSAvatarRotationUpdate(avatar);
++        Check(defaults.reads==reads);Check(layer.adds==adds);
++        CABasicAnimation *unrelated=[CABasicAnimation animationWithKeyPath:@"opacity"];[layer addAnimation:unrelated forKey:@"native"];
++        avatar.hidden=YES;Check(!Rotating(avatar));Check([layer animationForKey:@"native"]!=nil);
++        avatar.hidden=NO;Check(Rotating(avatar));avatar.alpha=0;Check(!Rotating(avatar));avatar.alpha=1;Check(Rotating(avatar));
++        avatar.tag=99;Check(!Rotating(avatar));avatar.tag=101;Check(Rotating(avatar));
++        page.view.hidden=YES;[page viewDidLayoutSubviews];Check(!Rotating(avatar));page.view.hidden=NO;[page viewDidLayoutSubviews];Check(Rotating(avatar));
++        page.view.clipsToBounds=YES;avatar.frame=CGRectMake(20,1000,60,60);[page viewDidLayoutSubviews];Check(!Rotating(avatar));avatar.frame=CGRectMake(20,20,60,60);[page viewDidLayoutSubviews];Check(Rotating(avatar));
++        [page viewWillDisappear:NO];Check(!Rotating(avatar));Post(UIApplicationDidBecomeActiveNotification,nil);Check(!Rotating(avatar));[page viewDidAppear:NO];Check(Rotating(avatar));
++        Post(UIApplicationWillResignActiveNotification,nil);Check(!Rotating(avatar));Post(UIApplicationDidBecomeActiveNotification,nil);Check(Rotating(avatar));
++        UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;CSAvatarRotationUpdate(avatar);Check(!Rotating(avatar));UIApplication.sharedApplication.applicationState=UIApplicationStateActive;CSAvatarRotationUpdate(avatar);Check(Rotating(avatar));
++        Post(UISceneWillDeactivateNotification,window.windowScene);Check(!Rotating(avatar));Post(UISceneDidActivateNotification,window.windowScene);Check(Rotating(avatar));
++        UIWindowScene *other=[UIWindowScene new];Post(UISceneWillDeactivateNotification,other);Check(Rotating(avatar));
++        window.windowScene.activationState=UISceneActivationStateBackground;CSAvatarRotationUpdate(avatar);Check(!Rotating(avatar));window.windowScene.activationState=UISceneActivationStateForegroundActive;CSAvatarRotationUpdate(avatar);Check(Rotating(avatar));
++        for (NSNumber *state in @[@(NSProcessInfoThermalStateSerious),@(NSProcessInfoThermalStateCritical)]) { thermal=state.integerValue;Post(NSProcessInfoThermalStateDidChangeNotification,nil);Check(!Rotating(avatar)); }
++        thermal=NSProcessInfoThermalStateFair;Post(NSProcessInfoThermalStateDidChangeNotification,nil);Check(Rotating(avatar));
++        CSTestReduceMotionEnabled=YES;Post(UIAccessibilityReduceMotionStatusDidChangeNotification,nil);Check(!Rotating(avatar));CSTestReduceMotionEnabled=NO;Post(UIAccessibilityReduceMotionStatusDidChangeNotification,nil);Check(Rotating(avatar));
++        [layer removeAllAnimations];CSAvatarRotationUpdate(avatar);Check(Rotating(avatar));
++        [defaults setObject:@10 forKey:@"rotateSpeed"];CSAvatarRotationPreferencesChanged();Pump();Check([layer animationForKey:@"cs.avatar.rotation"].duration==2);
++        [defaults setObject:@0 forKey:@"rotateSpeed"];CSAvatarRotationPreferencesChanged();Pump();Check([layer animationForKey:@"cs.avatar.rotation"].duration==7);
++        [defaults setObject:@100 forKey:@"rotateSpeed"];CSAvatarRotationPreferencesChanged();Pump();Check([layer animationForKey:@"cs.avatar.rotation"].duration==2);
++        [avatar removeFromSuperview];[avatar didMoveToWindow];Check(!Rotating(avatar));[page.view addSubview:avatar];[avatar didMoveToWindow];Check(Rotating(avatar));
++        [defaults setObject:@NO forKey:@"rotateAvatar"];CSAvatarRotationPreferencesChanged();Pump();Check(!Rotating(avatar));
++        [avatar removeFromSuperview];
++    }
++    __weak UIView *released;
++    @autoreleasepool { UIView *view=[MMHeadImageView new];view.tag=101;released=view;CSAvatarRotationUpdate(view); }
++    Check(released==nil);[page.view removeFromSuperview];
++}
++
++static void TestInputs(CountingDefaults *defaults,UIWindow *window) {
++    CSInputTextStyleInstall(defaults);CSInputTextStyleInstall(defaults);
++    BaseMsgContentViewController *chat=[BaseMsgContentViewController new];chat.view=[[UIView alloc] initWithFrame:window.bounds];chat.view.testOwner=chat;[window addSubview:chat.view];
++    MMInputToolView *tool=[MMInputToolView new];[chat.view addSubview:tool];
++    MMGrowTextView *view=[MMGrowTextView new];[tool addSubview:view];tool.textView=view;
++    view.layer.cornerRadius=4;view.layer.borderWidth=2;UIColor *nativeBorder=[UIColor colorWithWhite:.2 alpha:1];view.layer.borderColor=nativeBorder.CGColor;
++    UIColor *nativeColor=view.textView.placeHolderColor;view.typedText=@"未发送内容";view.selectedRange=NSMakeRange(2,1);
++    [chat viewWillAppear:NO];[view layoutSubviews];Check([view.placeHolder isEqual:@"Native"]);Check(view.writes==0);
++    InputSet(defaults,@"enabled",@YES);InputSet(defaults,@"roundedCorners",@YES);InputSet(defaults,@"border.enabled",@YES);InputSet(defaults,@"content",@"Custom");
++    NSData *color=[NSKeyedArchiver archivedDataWithRootObject:[UIColor colorWithWhite:.8 alpha:1] requiringSecureCoding:YES error:NULL];Check(color!=nil);InputSet(defaults,@"color",color);InputSet(defaults,@"alpha",@0);
++    CSInputTextStylePreferencesChanged();Pump();Check([view.placeHolder isEqual:@"Custom"]);Check(view.textView.placeHolderColor.alpha==0);Check(view.textView.placeholderMultiLine);Check(view.layer.cornerRadius==18);Check(view.layer.borderWidth==1);
++    NSAttributedString *cached=view.attributePlaceholder;NSUInteger reads=defaults.reads,decodeCount=decodes,fonts=CSStyleTestFonts,writes=view.writes,layerWrites=((CountingLayer*)view.layer).styleWrites,resolutions=CSStyleTestColorResolutions;
++    for(NSUInteger i=0;i<10000;i++) { [view layoutSubviews];[tool layoutSubviews];[tool updateToolViewHeight:NO]; }
++    Check(defaults.reads==reads);Check(decodes==decodeCount);Check(CSStyleTestFonts==fonts);Check(view.writes==writes);Check(((CountingLayer*)view.layer).styleWrites==layerWrites);Check(view.attributePlaceholder==cached);Check(view.nativeLayouts==10001);Check(tool.nativeUpdates==20000);
++    Check(CSStyleTestColorResolutions==resolutions);
++    Check([view.typedText isEqual:@"未发送内容"]);Check(NSEqualRanges(view.selectedRange,NSMakeRange(2,1)));
++    for(NSUInteger i=0;i<1000;i++)Post(NSUserDefaultsDidChangeNotification,defaults);Pump();Check(defaults.reads-reads==11);Check(decodes==decodeCount);Check(view.writes==writes);
++    [view setPlaceholder:@"新原生占位" animated:YES];Check([view.placeHolder isEqual:@"Custom"]);Check([view.attributePlaceholder.string isEqual:@"Custom"]);
++    NSAttributedString *nativeAttributed=[[NSAttributedString alloc] initWithString:@"原生富文本"];
++    [view setAttributedPlaceholder:nativeAttributed animated:YES];Check([view.attributePlaceholder.string isEqual:@"Custom"]);
++    TestNativeInner *newInner=[TestNativeInner new];newInner.placeHolderColor=nativeColor;view.textView=newInner;[view layoutSubviews];Check(view.textView.placeholderMultiLine);Check(view.textView.placeHolderColor.alpha==0);
++    UIColor *laterNativeColor=[UIColor colorWithWhite:.1 alpha:1];[view setPlaceHolderColor:laterNativeColor];[view setPlaceHolderMultiLine:NO];Check(view.textView.placeholderMultiLine);
++    UITraitCollection *dark=[UITraitCollection new];dark.userInterfaceStyle=UIUserInterfaceStyleDark;view.traitCollection=dark;[view traitCollectionDidChange:nil];Check(CGColorGetComponents(view.layer.borderColor)[0]>.6);Check(CSStyleTestColorResolutions==resolutions+1);
++    view.layer.cornerRadius=6;view.layer.borderWidth=3;[view layoutSubviews];Check(view.layer.cornerRadius==18);Check(view.layer.borderWidth==1);
++    InputSet(defaults,@"enabled",@NO);InputSet(defaults,@"roundedCorners",@NO);InputSet(defaults,@"border.enabled",@NO);CSInputTextStylePreferencesChanged();Pump();
++    Check([view.placeHolder isEqual:@"新原生占位"]);Check([view.attributePlaceholder isEqual:nativeAttributed]);Check(view.textView.placeHolderColor==laterNativeColor);Check(!view.textView.placeholderMultiLine);Check(view.layer.cornerRadius==6);Check(!view.clipsToBounds);Check(view.layer.borderWidth==3);Check(CGColorEqualToColor(view.layer.borderColor,nativeBorder.CGColor));
++    writes=view.writes;[view layoutSubviews];Check(view.writes==writes);
++    InputSet(defaults,@"border.enabled",@YES);CSInputTextStylePreferencesChanged();Pump();Check(view.layer.borderWidth==1);Check(view.layer.cornerRadius==6);Check([view.placeHolder isEqual:@"新原生占位"]);
++    InputSet(defaults,@"enabled",@YES);InputSet(defaults,@"color",[@"bad archive" dataUsingEncoding:NSUTF8StringEncoding]);InputSet(defaults,@"content",@"Updated");CSInputTextStylePreferencesChanged();Pump();Check([view.placeHolder isEqual:@"Updated"]);decodeCount=decodes;[view layoutSubviews];Check(decodes==decodeCount);
++    MMGrowTextView *unrelated=[MMGrowTextView new];[window addSubview:unrelated];[unrelated layoutSubviews];Check([unrelated.placeHolder isEqual:@"Native"]);Check(unrelated.writes==0);
++    [chat viewWillDisappear:NO];Check([view.placeHolder isEqual:@"新原生占位"]);Check(view.layer.borderWidth==3);[chat viewWillAppear:NO];Check([view.placeHolder isEqual:@"Updated"]);
++    BaseMsgContentViewController *second=[BaseMsgContentViewController new];second.view=[UIView new];second.view.testOwner=second;[second viewWillAppear:NO];[second viewWillDisappear:NO];Check([view.placeHolder isEqual:@"Updated"]);
++    [view removeFromSuperview];[window addSubview:view];[view didMoveToSuperview];Check([view.placeHolder isEqual:@"新原生占位"]);[tool addSubview:view];[view didMoveToSuperview];Check([view.placeHolder isEqual:@"Updated"]);
++    MMGrowTextView *fresh=[MMGrowTextView new];[tool addSubview:fresh];[fresh didMoveToWindow];Check([fresh.placeHolder isEqual:@"Updated"]);Check(fresh.nativeMoves==1);
++    __weak UIView *released;
++    @autoreleasepool { MMGrowTextView *temporary=[MMGrowTextView new];[tool addSubview:temporary];[temporary layoutSubviews];[temporary removeFromSuperview];released=temporary; }
++    Check(released==nil);
++    // Notification delivery must return while the main thread is occupied.
++    reads=defaults.reads;dispatch_semaphore_t finished=dispatch_semaphore_create(0);
++    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT,0),^{ for(NSUInteger i=0;i<1000;i++)Post(NSUserDefaultsDidChangeNotification,nil);dispatch_semaphore_signal(finished); });
++    Check(dispatch_semaphore_wait(finished,dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC))==0);Check(defaults.reads==reads);Pump();Check(defaults.reads-reads==11);
++    [chat.view removeFromSuperview];[unrelated removeFromSuperview];
++}
++int main(void) { @autoreleasepool {
++    Method thermalMethod=class_getInstanceMethod(NSProcessInfo.processInfo.class,@selector(thermalState));IMP thermalOriginal=method_setImplementation(thermalMethod,(IMP)TestThermal);
++    Method decode=class_getClassMethod(NSKeyedUnarchiver.class,@selector(unarchivedObjectOfClass:fromData:error:));decodeOriginal=method_setImplementation(decode,(IMP)CountDecode);
++    CountingDefaults *avatarDefaults=[CountingDefaults new],*inputDefaults=[CountingDefaults new];
++    UIWindow *window=[[UIWindow alloc] initWithFrame:CGRectMake(0,0,390,844)];window.windowScene=[UIWindowScene new];
++    TestAvatars(avatarDefaults,window);TestInputs(inputDefaults,window);
++    method_setImplementation(thermalMethod,thermalOriginal);method_setImplementation(decode,decodeOriginal);
++    printf("PASS: %lu avatar/input production runtime + extracted hook checks; 20,000 avatar updates and 30,000 input callbacks without repeated hot-path reads/rebuilds/writes; host doubles only\n",(unsigned long)checks);
++} return 0; }
+--- before/Tests/MessageActionExecutionTests.m
++++ after/Tests/MessageActionExecutionTests.m
+@@ -171,7 +171,7 @@
+ @end
+ @implementation TestManager
+ - (instancetype)init { if ((self=[super init])) _calls=[NSMutableArray array]; return self; }
+-- (id)GetMsg:(NSString *)chat LocalID:(unsigned int)localID { CHECK([chat isEqual:@"chat"] && localID==42); return _storedWrap; }
++- (id)GetMsg:(NSString *)chat LocalID:(unsigned int)localID { CHECK([chat isEqual:_storedWrap.m_nsFromUsr ?: @"chat"] && localID==42); return _storedWrap; }
+ - (void)AddLocalMsg:(NSString *)chat MsgWrap:(CMessageWrap *)wrap { CHECK(wrap.m_uiMesLocalID==0); [_calls addObject:@[@"insert",chat,wrap]]; wrap.m_uiMesLocalID=(unsigned)_calls.count+100; if (_insertThrows) [NSException raise:@"after-insert" format:@"injected"]; }
+ - (void)AddMsg:(NSString *)chat MsgWrap:(CMessageWrap *)wrap { [_calls addObject:@[@"add",chat,wrap]]; wrap.m_uiMesLocalID=(unsigned)_calls.count+200; }
+ - (void)AddEmoticonMsg:(NSString *)chat MsgWrap:(CMessageWrap *)wrap { [_calls addObject:@[@"emoji",chat,wrap]]; wrap.m_uiMesLocalID=(unsigned)_calls.count+300; }
+@@ -711,6 +711,69 @@
+     if (format==4) { unsigned char prefix=2; [data appendBytes:&prefix length:1]; [data appendData:[@"#!SILK_V3" dataUsingEncoding:NSUTF8StringEncoding]]; }
+     else [data appendData:[@"#!OPUS_RAW_V1" dataUsingEncoding:NSUTF8StringEncoding]];
+     [data increaseLengthBy:32]; return data;
++}
++static void TestGroupVoiceFlows(NSUserDefaults *defaults) {
++    // Synthetic codec bytes: exercise the production media/coordinator/send path,
++    // with both source conversations and both recipient kinds. No native sends.
++    for (NSNumber *group in @[@YES,@NO]) for (NSNumber *outgoing in @[@NO,@YES])
++    for (NSNumber *forward in @[@NO,@YES]) for (NSUInteger scenario=0;scenario<4;scenario++) {
++        if (getenv("CS_TEST_GROUP_VOICE_CASE") && scenario!=(NSUInteger)atoi(getenv("CS_TEST_GROUP_VOICE_CASE"))) continue;
++        NSString *chat=group.boolValue ? @"source@chatroom" : @"chat";
++        unsigned int codec=scenario%2 ? 7 : 4;
++        expectedCodecBytes=CodecBytes(codec); codecMilliseconds=1000;
++        TestEnvironment *env=[TestEnvironment new]; TestController *page=[TestController new]; env.controller=page;
++        TestManager *manager=[TestManager new]; TestAudio *audio=[TestAudio new]; audio.uploader=[TestUploader new];
++        env.services[@"CMessageMgr"]=manager; env.services[@"AudioSender"]=audio;
++        TestCell *cell=Cell(34); cell.wrap.m_nsFromUsr=outgoing.boolValue ? @"me" : chat; cell.wrap.m_nsToUsr=outgoing.boolValue ? chat : @"me";
++        cell.wrap.m_nsRealChatUsr=group.boolValue ? (outgoing.boolValue ? @"me" : @"member") : @"";
++        cell.wrap.m_uiDownloadStatus=outgoing.boolValue ? 29 : 21; cell.wrap.m_uiVoiceFormat=codec;
++        cell.wrap.m_uiVoiceTime=scenario==1 ? 1120 : 1000; cell.wrap.m_dtVoice=expectedCodecBytes;
++        NSString *attributes=[NSString stringWithFormat:@"voicelength='%u' voiceformat='%u' length='%lu' endflag='1'",cell.wrap.m_uiVoiceTime,codec,(unsigned long)expectedCodecBytes.length];
++        NSString *xml=[NSString stringWithFormat:@"<msg><voicemsg %@/></msg>",attributes];
++        if (scenario==2) xml=[NSString stringWithFormat:@"<msg><metadata length='999' voicelength='9999'/><voicemsg voicelength = '1000' voiceformat = '%u' length = '%lu' endflag = '1'/></msg>",codec,(unsigned long)expectedCodecBytes.length];
++        if (group.boolValue && !outgoing.boolValue) xml=[@"member:\n" stringByAppendingString:xml];
++        cell.wrap.m_nsContent=xml;
++        NSString *path=nil;
++        if (scenario==3) {
++            path=[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
++            CHECK([expectedCodecBytes writeToFile:path atomically:YES]); cell.wrap.path=path;
++            cell.wrap.m_dtVoice=[expectedCodecBytes subdataWithRange:NSMakeRange(0,5)];
++        }
++        NSData *originalBytes=cell.wrap.m_dtVoice; __block NSUInteger reads=0;
++        CSMessageMediaProvider *provider=[[CSMessageMediaProvider alloc] initWithReader:^NSData *(NSString *file){ CHECK(!NSThread.isMainThread && [file isEqual:path]); reads++; return [NSData dataWithContentsOfFile:file]; }];
++        CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:env preferences:Preferences(defaults) mediaProvider:provider];
++        __block NSString *feedback=nil; coordinator.feedbackHandler=^(NSString *message){ feedback=message; };
++        CSMessageActionContext *context=[coordinator captureContextForCell:cell controller:page bindingGeneration:1]; CHECK(context && [context.sourceConversationID isEqual:chat]);
++        TestLogic *logic=[TestLogic new]; logic.targets=@[Contact(@"destination@chatroom"),Contact(@"friend"),Contact(@"destination@chatroom")];
++        NSString *operation;
++        if (forward.boolValue) {
++            [coordinator withForwardContext:context entry:CSMessageActionEntryMenuVoiceForward perform:^{ [coordinator bindForwardLogic:logic source:cell.wrap]; }];
++            operation=[[CSVoiceForwardAdapter new] bindingForLogic:logic].operationID;
++            [coordinator confirmForwardLogic:logic];
++            for (id target in logic.targets) CHECK([coordinator handleForwardLogic:logic source:cell.wrap target:target]);
++        } else operation=[coordinator executeContext:context action:CSMessageActionRepeat entry:CSMessageActionEntryMenuRepeat];
++        NSUInteger expected=forward.boolValue ? 2 : 1; CHECK(operation.length);
++        CHECK(Wait(^BOOL{ return audio.uploader.calls.count==expected || feedback!=nil; }));
++        CHECK(audio.uploader.calls.count==expected && manager.calls.count==expected && !audio.unsafeCalls);
++        CHECK(reads==(scenario==3 ? 1 : 0));
++        for (NSArray *call in manager.calls) {
++            CMessageWrap *sent=call[2]; NSString *target=call[1];
++            CHECK(sent!=cell.wrap && [sent.m_nsToUsr isEqual:target] && [sent.m_nsFromUsr isEqual:@"me"]);
++            CHECK([sent.m_nsRealChatUsr isEqual:[target hasSuffix:@"@chatroom"] ? @"me" : @""]);
++            CHECK([sent.m_dtVoice isEqual:expectedCodecBytes] && sent.m_uiVoiceFormat==codec && sent.m_uiVoiceTime==1000);
++            CHECK(sent.m_uiMesLocalID!=42 && sent.m_n64MesSvrID==0);
++            CHECK([[coordinator resultsForOperationID:operation][target] integerValue]==CSMessageActionSubmissionStateUnknown);
++        }
++        if (forward.boolValue) {
++            CHECK(manager.calls[0][2]!=manager.calls[1][2]);
++            CHECK([coordinator handleForwardLogic:logic source:cell.wrap target:Contact(@"destination@chatroom")]);
++            [coordinator finishForwardLogic:logic cancelled:NO]; CHECK(manager.calls.count==expected);
++        }
++        CHECK([cell.wrap.m_dtVoice isEqual:originalBytes] && [cell.wrap.m_nsContent isEqual:xml]);
++        CHECK(cell.wrap.m_uiVoiceTime==(scenario==1 ? 1120 : 1000) && cell.wrap.m_uiMesLocalID==42 && cell.wrap.m_n64MesSvrID==900);
++        if (path) { CHECK([[NSData dataWithContentsOfFile:path] isEqual:expectedCodecBytes]); [NSFileManager.defaultManager removeItemAtPath:path error:nil]; }
++    }
++    expectedCodecBytes=nil;
+ }
+ static void TestVoiceNativeConstructorFlows(NSUserDefaults *defaults) {
+     for (NSNumber *outgoing in @[@NO,@YES]) for (NSNumber *forward in @[@NO,@YES]) for (NSUInteger formatCase=0;formatCase<4;formatCase++) {
+@@ -766,6 +829,32 @@
+     }
+     expectedCodecBytes=nil;
+ }
++static void TestGroupVoiceInvalidResources(void) {
++    for (NSUInteger scenario=0;scenario<8;scenario++) {
++        TestController *page=[TestController new]; TestCell *cell=Cell(34);
++        cell.wrap.m_nsFromUsr=@"source@chatroom"; cell.wrap.m_nsRealChatUsr=@"member";
++        cell.wrap.m_uiDownloadStatus=21; cell.wrap.m_uiVoiceTime=1120; cell.wrap.m_uiVoiceFormat=scenario==6 ? 999 : 4;
++        expectedCodecBytes=CodecBytes(4); codecMilliseconds=(scenario==2 || scenario==7) ? 0 : 1000;
++        cell.wrap.m_dtVoice=expectedCodecBytes;
++        NSString *length=scenario==1 ? @"" : [NSString stringWithFormat:@"length='%lu'",(unsigned long)expectedCodecBytes.length+(scenario==0 ? 1 : 0)];
++        cell.wrap.m_nsContent=[NSString stringWithFormat:@"member:\n<msg><voicemsg %@ voicelength='1120' endflag='%u' cancelflag='%u'/></msg>",length,scenario==4 ? 0 : 1,scenario==3 ? 1 : 0];
++        NSString *path=nil;
++        if (scenario==5 || scenario==7) {
++            path=[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
++            NSData *file=scenario==5 ? [expectedCodecBytes subdataWithRange:NSMakeRange(0,10)] : expectedCodecBytes;
++            CHECK([file writeToFile:path atomically:YES]); cell.wrap.path=path;
++            cell.wrap.m_dtVoice=[expectedCodecBytes subdataWithRange:NSMakeRange(0,5)];
++        }
++        CSMessageMediaProvider *provider=[CSMessageMediaProvider new];
++        __block NSUInteger downloads=0; __block BOOL finished=NO;
++        provider.requestDownload=^(__unused CSMessageActionContext *context){ downloads++; return YES; };
++        CSMessageActionContext *context=[CSMessageActionContext contextWithCell:cell controller:page accountID:@"me" accountEpoch:1 conversationID:@"source@chatroom" bindingGeneration:1]; CHECK(context);
++        [provider prepareVoiceForContext:context operationID:@"group-invalid" completion:^(CSMessageVoiceResource *resource){ CHECK(!resource); finished=YES; }];
++        CHECK(Wait(^BOOL{ return finished; })); CHECK(!downloads);
++        if (path) [NSFileManager.defaultManager removeItemAtPath:path error:nil];
++    }
++    expectedCodecBytes=nil; codecMilliseconds=1000;
++}
+ static void TestNativeRecordingGuard(NSUserDefaults *defaults) {
+     for (NSUInteger scenario=0;scenario<5;scenario++) {
+         TestEnvironment *env=[TestEnvironment new]; TestController *page=[TestController new]; env.controller=page;
+@@ -848,12 +937,12 @@
+     for (NSUInteger n=0;n<1000;n++) TestNativeVoiceCallback(@"chat",42,900,0,0);
+     TestNativeVoiceCallback(@"chat",42,900,1,3);
+     CHECK(voiceHookNativeCalls==1001 && voiceHookCoordinatorReads==0);
+-    for (NSUInteger scenario=0;scenario<4;scenario++) {
++    for (NSString *chat in @[@"chat",@"source@chatroom"]) for (NSUInteger scenario=0;scenario<4;scenario++) {
+         TestEnvironment *env=[TestEnvironment new]; TestController *controller=[TestController new]; env.controller=controller;
+         TestManager *manager=[TestManager new]; TestAudio *audio=[TestAudio new]; audio.uploader=[TestUploader new];
+         VoiceMsgDownloader *downloader=[VoiceMsgDownloader new]; env.services[@"CMessageMgr"]=manager; env.services[@"AudioSender"]=audio;
+         if (scenario!=3) env.services[@"VoiceMsgDownloader"]=downloader;
+-        TestCell *cell=Cell(34); cell.wrap.m_uiVoiceTime=1000; cell.wrap.m_uiVoiceFormat=0;
++        TestCell *cell=Cell(34); cell.wrap.m_nsFromUsr=chat; cell.wrap.m_uiVoiceTime=1000; cell.wrap.m_uiVoiceFormat=0;
+         cell.wrap.m_nsContent=@"<voicemsg voicelength='1000' voiceformat='0' length='700' endflag='0'/>";
+         manager.storedWrap=[cell.wrap copy]; manager.storedWrap.m_dtVoice=[NSMutableData dataWithLength:700]; manager.storedWrap.m_uiDownloadStatus=5;
+         manager.storedWrap.m_nsContent=@"<voicemsg voicelength='1000' voiceformat='0' length='700' endflag='1'/>";
+@@ -864,16 +953,16 @@
+         NSString *operation=[coordinator executeContext:context action:CSMessageActionRepeat entry:CSMessageActionEntryMenuRepeat]; CHECK(operation);
+         voiceHookCoordinator=coordinator;
+         NSUInteger reads=env.accountReads;
+-        [coordinator voiceDownloadCompletedForChat:@"chat" localID:42 serverID:900 endFlag:0 error:0];
++        [coordinator voiceDownloadCompletedForChat:chat localID:42 serverID:900 endFlag:0 error:0];
+         [coordinator voiceDownloadCompletedForChat:@"unrelated" localID:42 serverID:900 endFlag:1 error:3];
+         CHECK(env.accountReads==reads && !manager.calls.count);
+         if (scenario!=3) CHECK(downloader.downloads==1);
+-        TestNativeVoiceCallback(@"chat",42,900,1,scenario==2 ? 0 : 3);
+-        CHECK(Wait(^BOOL{ NSInteger state=[[coordinator resultsForOperationID:operation][@"chat"] integerValue]; return state==CSMessageActionSubmissionStateUnknown || state==CSMessageActionSubmissionStateFailedBeforeAcceptance; }));
++        TestNativeVoiceCallback(chat,42,900,1,scenario==2 ? 0 : 3);
++        CHECK(Wait(^BOOL{ NSInteger state=[[coordinator resultsForOperationID:operation][chat] integerValue]; return state==CSMessageActionSubmissionStateUnknown || state==CSMessageActionSubmissionStateFailedBeforeAcceptance; }));
+         CHECK(manager.calls.count==(scenario==0 ? 1 : 0)); CHECK(audio.uploader.calls.count==(scenario==0 ? 1 : 0));
+         CHECK(!CSMessageHasPendingVoiceDownloads());
+         CHECK(cell.wrap.m_dtVoice==nil && cell.wrap.m_uiDownloadStatus==0 && [cell.wrap.m_nsContent containsString:@"endflag='0'"]);
+-        [coordinator voiceDownloadCompletedForChat:@"chat" localID:42 serverID:900 endFlag:1 error:3]; Drain(); CHECK(audio.uploader.calls.count==(scenario==0 ? 1 : 0));
++        [coordinator voiceDownloadCompletedForChat:chat localID:42 serverID:900 endFlag:1 error:3]; Drain(); CHECK(audio.uploader.calls.count==(scenario==0 ? 1 : 0));
+     }
+ }
+ static void TestMedia(void) {
+@@ -928,7 +1017,14 @@
+     cell.wrap.m_nsContent=@"<voicemsg voicelength='1000' voiceformat='0' length='700' endflag='1' cancelflag='1'/>"; dispatch_semaphore_signal(release);
+     CHECK(Wait(^BOOL{ return callbacks==1; })); CHECK(!accepted); [NSFileManager.defaultManager removeItemAtPath:path error:nil];
+ }
+-int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_MESSAGE_CORE")) {
++int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_GROUP_VOICE_CASE")) {
++    TestGroupVoiceFlows(defaults); [defaults removePersistentDomainForName:suite]; return 0;
++} if (getenv("CS_TEST_VOICE_CORE")) {
++    TestGroupVoiceFlows(defaults); TestGroupVoiceInvalidResources(); TestVoiceNativeConstructorFlows(defaults); TestNativeRecordingGuard(defaults);
++    TestVoiceFailureFeedback(defaults); TestVoiceInvalidBytes(); TestVoiceCallbackIntegration(defaults);
++    TestNativeVoiceStatuses(); TestVoiceFlags(); TestMedia(); TestForwardCleanupWhileWaiting(defaults); TestCoordinator(defaults);
++    [defaults removePersistentDomainForName:suite]; printf("PASS: %lu core voice/media/forward/ownership checks (host doubles, no native sends)\n",(unsigned long)checks); return 0;
++} if (getenv("CS_TEST_MESSAGE_CORE")) {
+     TestStickerMenuBypass(defaults); TestGameMenu(defaults);
+     TestVoiceNativeConstructorFlows(defaults); TestNativeRecordingGuard(defaults); TestVoiceFailureFeedback(defaults); TestVoiceFlags(); TestForwardCleanupWhileWaiting(defaults);
+     [defaults removePersistentDomainForName:suite]; printf("PASS: %lu focused message/menu/voice checks (host doubles, no native sends)\n",(unsigned long)checks); return 0;
+@@ -940,4 +1036,4 @@
+     else if ([test isEqual:@"games"]) TestGameMenu(defaults);
+     else return 2;
+     [defaults removePersistentDomainForName:suite]; printf("PASS: %lu focused checks\n",(unsigned long)checks); return 0;
+-} if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestStickerMenuBypass(defaults); TestNativeRecordingGuard(defaults); TestVoiceNativeConstructorFlows(defaults); TestVoiceFailureFeedback(defaults); TestNativeActionFastPath(defaults); TestMenuNoOp(defaults); TestNativeStickerMenu(defaults); TestGameMenu(defaults); TestVoiceInvalidBytes(); TestVoiceCallbackIntegration(defaults); TestNativeMenuPipeline(defaults); TestNativeVoiceStatuses(); TestNativeTextAndFeedback(defaults); TestProductionAdmission(defaults); TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestForwardCleanupWhileWaiting(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }
++} if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestGroupVoiceFlows(defaults); TestGroupVoiceInvalidResources(); TestStickerMenuBypass(defaults); TestNativeRecordingGuard(defaults); TestVoiceNativeConstructorFlows(defaults); TestVoiceFailureFeedback(defaults); TestNativeActionFastPath(defaults); TestMenuNoOp(defaults); TestNativeStickerMenu(defaults); TestGameMenu(defaults); TestVoiceInvalidBytes(); TestVoiceCallbackIntegration(defaults); TestNativeMenuPipeline(defaults); TestNativeVoiceStatuses(); TestNativeTextAndFeedback(defaults); TestProductionAdmission(defaults); TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestForwardCleanupWhileWaiting(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }
+--- before/Tests/StyleUIKit/StyleUIKit.m
++++ after/Tests/StyleUIKit/StyleUIKit.m
+@@ -0,0 +1,56 @@
++#import <UIKit/UIKit.h>
++#import <objc/runtime.h>
++static char tagKey, ownerKey;
++@interface CSWeakOwner : NSObject
++@property(nonatomic,weak) id value;
++@end
++@implementation CSWeakOwner @end
++@implementation NSObject (StyleResponder)
++- (id)nextResponder { return nil; }
++@end
++@implementation UIView (StyleTest)
++- (NSInteger)tag { return [objc_getAssociatedObject(self,&tagKey) integerValue]; }
++- (void)setTag:(NSInteger)tag { objc_setAssociatedObject(self,&tagKey,@(tag),OBJC_ASSOCIATION_RETAIN_NONATOMIC); }
++- (id)testOwner { return [objc_getAssociatedObject(self,&ownerKey) value]; }
++- (void)setTestOwner:(id)owner { CSWeakOwner *weak=[CSWeakOwner new];weak.value=owner;objc_setAssociatedObject(self,&ownerKey,weak,OBJC_ASSOCIATION_RETAIN_NONATOMIC); }
++- (id)nextResponder { return self.testOwner ?: self.superview; }
++- (void)layoutSubviews {} - (void)didMoveToWindow {} - (void)didMoveToSuperview {}
++- (void)traitCollectionDidChange:(UITraitCollection *)previous {}
++@end
++@implementation UIViewController (StyleTest)
++- (void)viewWillAppear:(BOOL)animated {} - (void)viewWillDisappear:(BOOL)animated {}
++- (void)viewDidAppear:(BOOL)animated {} - (void)viewDidLayoutSubviews {}
++@end
++@interface CSStyleDynamicGray : UIColor @end
++NSUInteger CSStyleTestColorResolutions;
++@implementation CSStyleDynamicGray
++- (UIColor *)resolvedColorWithTraitCollection:(UITraitCollection *)trait {
++    CSStyleTestColorResolutions++;
++    return [UIColor colorWithWhite:trait.userInterfaceStyle==UIUserInterfaceStyleDark?.7:.5 alpha:1];
++}
++@end
++@implementation UITraitCollection (StyleTest)
++- (BOOL)hasDifferentColorAppearanceComparedToTraitCollection:(UITraitCollection *)other {
++    return self.userInterfaceStyle != other.userInterfaceStyle;
++}
++@end
++@implementation UIColor (StyleTest)
+++ (BOOL)supportsSecureCoding { return YES; }
++- (void)encodeWithCoder:(NSCoder *)c { [c encodeDouble:self.red forKey:@"r"];[c encodeDouble:self.green forKey:@"g"];[c encodeDouble:self.blue forKey:@"b"];[c encodeDouble:self.alpha forKey:@"a"]; }
++- (instancetype)initWithCoder:(NSCoder *)c { return [UIColor colorWithRed:[c decodeDoubleForKey:@"r"] green:[c decodeDoubleForKey:@"g"] blue:[c decodeDoubleForKey:@"b"] alpha:[c decodeDoubleForKey:@"a"]]; }
+++ (instancetype)systemGrayColor { return [CSStyleDynamicGray new]; }
+++ (instancetype)colorWithWhite:(CGFloat)white alpha:(CGFloat)alpha { return [self colorWithRed:white green:white blue:white alpha:alpha]; }
+++ (instancetype)colorWithCGColor:(CGColorRef)c { const CGFloat *v=CGColorGetComponents(c);return CGColorGetNumberOfComponents(c)==4?[self colorWithRed:v[0] green:v[1] blue:v[2] alpha:v[3]]:[self colorWithWhite:v[0] alpha:v[1]]; }
++- (instancetype)colorWithAlphaComponent:(CGFloat)alpha { return [UIColor colorWithRed:self.red green:self.green blue:self.blue alpha:alpha]; }
++@end
++NSUInteger CSStyleTestFonts;
++@implementation UIFont (StyleTest)
+++ (instancetype)systemFontOfSize:(CGFloat)size { CSStyleTestFonts++;UIFont *f=[self new];f.lineHeight=size;return f; }
+++ (instancetype)boldSystemFontOfSize:(CGFloat)size { return [self systemFontOfSize:size]; }
++@end
++@implementation NSMutableParagraphStyle
++- (id)copyWithZone:(NSZone *)zone { NSMutableParagraphStyle *p=[NSMutableParagraphStyle new];p.alignment=self.alignment;return p; }
++@end
++NSString *const NSFontAttributeName=@"font";
++NSString *const NSForegroundColorAttributeName=@"foreground";
++NSString *const NSParagraphStyleAttributeName=@"paragraph";
+--- before/Tests/StyleUIKit/UIKit/UIKit.h
++++ after/Tests/StyleUIKit/UIKit/UIKit.h
+@@ -0,0 +1,41 @@
++#import "../../TabBarUIKit/UIKit/UIKit.h"
++@compatibility_alias UIResponder NSObject;
++@interface NSObject (StyleResponder)
++- (id)nextResponder;
++@end
++@interface UIView (StyleTest)
++@property(nonatomic) NSInteger tag;
++@property(nonatomic, weak) id testOwner;
++- (void)layoutSubviews;
++- (void)didMoveToWindow;
++- (void)didMoveToSuperview;
++- (void)traitCollectionDidChange:(UITraitCollection *)previous;
++@end
++@interface UIViewController (StyleTest)
++- (void)viewWillAppear:(BOOL)animated;
++- (void)viewWillDisappear:(BOOL)animated;
++- (void)viewDidAppear:(BOOL)animated;
++- (void)viewDidLayoutSubviews;
++@end
++@interface UIColor (StyleTest) <NSSecureCoding>
+++ (instancetype)systemGrayColor;
+++ (instancetype)colorWithWhite:(CGFloat)white alpha:(CGFloat)alpha;
+++ (instancetype)colorWithCGColor:(CGColorRef)color;
++- (instancetype)colorWithAlphaComponent:(CGFloat)alpha;
++@end
++@interface UIFont (StyleTest)
+++ (instancetype)systemFontOfSize:(CGFloat)size;
+++ (instancetype)boldSystemFontOfSize:(CGFloat)size;
++@end
++@interface UITraitCollection (StyleTest)
++- (BOOL)hasDifferentColorAppearanceComparedToTraitCollection:(UITraitCollection *)other;
++@end
++typedef NS_ENUM(NSInteger, NSTextAlignment) { NSTextAlignmentLeft };
++@interface NSMutableParagraphStyle : NSObject <NSCopying>
++@property(nonatomic) NSTextAlignment alignment;
++@end
++extern NSString *const NSFontAttributeName;
++extern NSString *const NSForegroundColorAttributeName;
++extern NSString *const NSParagraphStyleAttributeName;
++extern NSUInteger CSStyleTestFonts;
++extern NSUInteger CSStyleTestColorResolutions;
+--- before/Tests/verify-avatar-input-style.sh
++++ after/Tests/verify-avatar-input-style.sh
+@@ -0,0 +1,44 @@
++#!/bin/bash
++set -euo pipefail
++project_dir="$(cd "$(dirname "$0")/.." && pwd)"
++test_dir="$(mktemp -d "${TMPDIR:-/tmp}/wechat-avatar-input.XXXXXX")"
++trap 'rm -rf "$test_dir"' EXIT
++python3 - "$project_dir" "$test_dir" <<'PY'
++from pathlib import Path
++import sys,re
++root,out=map(Path,sys.argv[1:])
++s=(root/'Hooks/InputTextHooks.xm').read_text()
++result=[]
++for name,parent in [('BaseMsgContentViewController','UIViewController'),('MMGrowTextView','TestNativeInput'),('MMInputToolView','TestNativeTool')]:
++    body=s.split('%hook '+name+'\n')[1].split('%end')[0]
++    if name=='BaseMsgContentViewController':
++        for sel in ['viewWillAppear','viewWillDisappear']:
++            body=re.sub(r'(- \(void\)'+sel+r':[^\n]+)',lambda m:m.group().replace('%orig;',f'[super {sel}:animated];'),body)
++    elif name=='MMGrowTextView':
++        replacements=['[super layoutSubviews];','[super didMoveToWindow];','[super didMoveToSuperview];','[super traitCollectionDidChange:previous];',
++          '[super setPlaceHolder:text];','[super setAttributePlaceholder:text];','[super setPlaceHolderColor:color];','[super setPlaceHolderMultiLine:multiline];',
++          '[super setPlaceholder:text animated:animated];','[super setAttributedPlaceholder:text animated:animated];']
++        for r in replacements: body=body.replace('%orig;',r,1)
++    else:
++        for r in ['[super layoutSubviews];','[super updateToolViewHeight:animated];','[super onWillAppear];','[super onViewDidInit];']:body=body.replace('%orig;',r,1)
++    assert '%' not in body
++    result.append('@interface '+name+' : '+parent+' @end\n@implementation '+name+'\n'+body+'\n@end\n')
++s=(root/'Hooks/CSAvatarShape.xm').read_text()
++for name in ['MMHeadImageView','FakeHeadImageView']:
++    body=s.split('%hook '+name+'\n')[1].split('%end')[0]
++    body=body[body.index('- (void)didMoveToWindow'):body.index('// Hook conerSize')]
++    for r in ['[super didMoveToWindow];','[super didMoveToSuperview];','[super setHidden:hidden];','[super setAlpha:alpha];','[super setTag:tag];']:body=body.replace('%orig;',r,1)
++    assert '%' not in body
++    result.append('@interface '+name+' : UIView @end\n@implementation '+name+'\n'+body+'\n@end\n')
++body=s.split('%hook MoreViewController\n')[1].split('%end')[0]
++for r in ['[super viewDidAppear:animated];','[super viewWillDisappear:animated];','[super viewDidLayoutSubviews];']:body=body.replace('%orig;',r,1)
++result.append('@interface MoreViewController : UIViewController @end\n@implementation MoreViewController\n'+body+'\n@end\n')
++(out/'StyleHooksUnderTest.h').write_text('\n'.join(result))
++PY
++xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \
++  -Wno-unused-parameter -framework Foundation -framework CoreGraphics -framework QuartzCore \
++  -I"$project_dir/Tests/StyleUIKit" -I"$project_dir/Controllers" -I"$test_dir" \
++  "$project_dir/Tests/TabBarUIKit/TabBarUIKit.m" "$project_dir/Tests/StyleUIKit/StyleUIKit.m" \
++  "$project_dir/Controllers/CSAvatarRotation.m" "$project_dir/Controllers/CSInputTextStyle.m" \
++  "$project_dir/Tests/AvatarInputStyleTests.m" -o "$test_dir/tests"
++"$test_dir/tests"
+--- before/control
++++ after/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 1.8-9
++Version: 1.8-10
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会

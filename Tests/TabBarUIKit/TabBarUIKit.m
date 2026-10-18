@@ -2,6 +2,12 @@
 NSString *const UIAccessibilityReduceMotionStatusDidChangeNotification=@"reduceMotion";
 NSString *const UIApplicationDidBecomeActiveNotification=@"applicationActive";
 NSString *const UISceneDidActivateNotification=@"sceneActive";
+NSString *const UIApplicationWillResignActiveNotification=@"applicationInactive";
+NSString *const UISceneWillDeactivateNotification=@"sceneInactive";
+@implementation UIApplication
++ (instancetype)sharedApplication { static UIApplication *app; if (!app) app=[self new]; return app; }
+@end
+@implementation UIWindowScene @end
 BOOL CSTestReduceMotionEnabled=NO;
 BOOL UIAccessibilityIsReduceMotionEnabled(void) { return CSTestReduceMotionEnabled; }
 @implementation UITraitCollection @end

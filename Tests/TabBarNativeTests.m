@@ -55,6 +55,13 @@ static NSUserDefaults *TestDefaults(id self,SEL selector) { return isolated; }
 - (void)nativeClick:(UIControl *)button { self.nativeClicks++;self.selectedIndex=[self.buttons indexOfObjectIdenticalTo:button]; }
 @end
 static BOOL equal(CGFloat a,CGFloat b) { return fabs(a-b)<.001; }
+static NSProcessInfoThermalState testThermalState=NSProcessInfoThermalStateNominal;
+@interface NSProcessInfo (CSThermalTest)
+- (NSProcessInfoThermalState)cs_testThermalState;
+@end
+@implementation NSProcessInfo (CSThermalTest)
+- (NSProcessInfoThermalState)cs_testThermalState { return testThermalState; }
+@end
 int main(int argc,const char *argv[]) { @autoreleasepool {
     NSString *suite=[@"com.wechatimprove.test.tabbar." stringByAppendingString:NSUUID.UUID.UUIDString];
     isolated=[[NSUserDefaults alloc] initWithSuiteName:suite];
@@ -89,6 +96,7 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         assert(loaded && loaded==[CSTabBarPreferences.current iconAtIndex:0 selected:YES]);
         assert(loaded==[CSTabBarPreferences.current iconAtIndex:0 selected:NO]);
 
+        class_replaceMethod(NSProcessInfo.processInfo.class,@selector(thermalState),method_getImplementation(class_getInstanceMethod(NSProcessInfo.class,@selector(cs_testThermalState))),method_getTypeEncoding(class_getInstanceMethod(NSProcessInfo.class,@selector(cs_testThermalState))));
         UIWindow *window=[[UIWindow alloc] initWithFrame:CGRectMake(0,0,390,844)];window.safeAreaInsets=(UIEdgeInsets){0,0,34,0};
         UIView *root=[[UIView alloc] initWithFrame:window.bounds];[window addSubview:root];
         MMTabBar *bar=[[MMTabBar alloc] initWithFrame:CGRectMake(0,761,390,83)];[root addSubview:bar];
@@ -271,6 +279,27 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
                 assert(SubmittedAnimation(animated,key)==resumed && submittedAnimationCount==submissions);
                 assert(CGRectEqualToRect(first.frame,itemBefore) && first.badgeView==badgeBefore);
             }
+            // Inactive, hot, hidden-parent and detached scenes stop existing animations,
+            // then recover once without changing native geometry or preference values.
+            [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationWillResignActiveNotification object:nil];
+            assert(!SubmittedAnimation(animated,key));
+            CSTabBarUpdate(bar); assert(!SubmittedAnimation(animated,key));
+            [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
+            assert(SubmittedAnimation(animated,key));
+            testThermalState=NSProcessInfoThermalStateSerious;
+            [NSNotificationCenter.defaultCenter postNotificationName:NSProcessInfoThermalStateDidChangeNotification object:nil];
+            assert(!SubmittedAnimation(animated,key));
+            testThermalState=NSProcessInfoThermalStateNominal;
+            [NSNotificationCenter.defaultCenter postNotificationName:NSProcessInfoThermalStateDidChangeNotification object:nil];
+            assert(SubmittedAnimation(animated,key));
+            root.hidden=YES; CSTabBarUpdate(bar); assert(!SubmittedAnimation(animated,key));
+            root.hidden=NO; CSTabBarUpdate(bar); assert(SubmittedAnimation(animated,key));
+            window.windowScene=[UIWindowScene new]; window.windowScene.activationState=UISceneActivationStateForegroundActive; // Will-deactivate can precede the state change.
+            [NSNotificationCenter.defaultCenter postNotificationName:UISceneWillDeactivateNotification object:window.windowScene];
+            assert(!SubmittedAnimation(animated,key));
+            window.windowScene.activationState=UISceneActivationStateForegroundActive;
+            [NSNotificationCenter.defaultCenter postNotificationName:UISceneDidActivateNotification object:window.windowScene];
+            assert(SubmittedAnimation(animated,key));
             // Ordinary cached layout is a fallback if removal happens after activation.
             [animated removeAllAnimations];CSTabBarUpdate(bar);assert(SubmittedAnimation(animated,key));
             // A return into a chat must not unhide/rebuild the root bar; showing it later repairs it.

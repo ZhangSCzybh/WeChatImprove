@@ -40,15 +40,10 @@ static void loadDiscoverSettings() {
     gHideDiscoverGame = [defaults objectForKey:kWCHideDiscoverGameKey] ? [defaults boolForKey:kWCHideDiscoverGameKey] : NO;
     gHideDiscoverMiniProgram = [defaults objectForKey:kWCHideDiscoverMiniProgramKey] ? [defaults boolForKey:kWCHideDiscoverMiniProgramKey] : NO;
     
-    NSLog(@"[HideDiscover] Settings loaded - Channels:%d Live:%d Scan:%d Listen:%d Look:%d Search:%d Nearby:%d Game:%d MiniProgram:%d",
-          gHideDiscoverChannels, gHideDiscoverLive, gHideDiscoverScan,
-          gHideDiscoverListen, gHideDiscoverLook, gHideDiscoverSearch, gHideDiscoverNearby,
-          gHideDiscoverGame, gHideDiscoverMiniProgram);
 }
 
 // 设置变化回调
 static void discoverSettingsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
-    NSLog(@"[HideDiscover] Settings changed notification received");
     loadDiscoverSettings();
 }
 
@@ -64,7 +59,6 @@ static void discoverSettingsChanged(CFNotificationCenterRef center, void *observ
 // 返回NO时隐藏看一看入口
 - (_Bool)shouldShowBrowseEntry {
     if (gHideDiscoverLook) {
-        NSLog(@"[HideDiscover] Hiding Browse (看一看) entry");
         return NO;
     }
     return %orig;
@@ -74,7 +68,6 @@ static void discoverSettingsChanged(CFNotificationCenterRef center, void *observ
 // 返回NO时隐藏听一听入口
 - (_Bool)shouldShowTingEntry {
     if (gHideDiscoverListen) {
-        NSLog(@"[HideDiscover] Hiding Ting (听一听) entry");
         return NO;
     }
     return %orig;
@@ -84,7 +77,6 @@ static void discoverSettingsChanged(CFNotificationCenterRef center, void *observ
 // 返回NO时隐藏搜一搜入口
 - (_Bool)shouldShowSearchEntry {
     if (gHideDiscoverSearch) {
-        NSLog(@"[HideDiscover] Hiding Search (搜一搜) entry");
         return NO;
     }
     return %orig;
@@ -94,7 +86,6 @@ static void discoverSettingsChanged(CFNotificationCenterRef center, void *observ
 // 返回NO时隐藏扫一扫入口
 - (_Bool)shouldShowScanQRCodeEntry {
     if (gHideDiscoverScan) {
-        NSLog(@"[HideDiscover] Hiding ScanQRCode (扫一扫) entry");
         return NO;
     }
     return %orig;
@@ -104,7 +95,6 @@ static void discoverSettingsChanged(CFNotificationCenterRef center, void *observ
 // 返回NO时隐藏游戏入口
 - (_Bool)shouldShowGameEntry {
     if (gHideDiscoverGame) {
-        NSLog(@"[HideDiscover] Hiding Game (游戏) entry");
         return NO;
     }
     return %orig;
@@ -114,7 +104,6 @@ static void discoverSettingsChanged(CFNotificationCenterRef center, void *observ
 // 返回NO时隐藏小程序入口
 - (_Bool)shouldShowAppBrandEntry {
     if (gHideDiscoverMiniProgram) {
-        NSLog(@"[HideDiscover] Hiding AppBrand (小程序) entry");
         return NO;
     }
     return %orig;
@@ -124,7 +113,6 @@ static void discoverSettingsChanged(CFNotificationCenterRef center, void *observ
 // 返回NO时隐藏附近的人入口
 - (_Bool)shouldShowNearbyLiveEntry {
     if (gHideDiscoverNearby) {
-        NSLog(@"[HideDiscover] Hiding Nearby (附近的人) entry");
         return NO;
     }
     return %orig;
@@ -144,7 +132,6 @@ static void discoverSettingsChanged(CFNotificationCenterRef center, void *observ
 // 返回NO时隐藏视频号入口
 + (_Bool)shouldShowFinderEntry {
     if (gHideDiscoverChannels) {
-        NSLog(@"[HideDiscover] Hiding Finder (视频号) entry");
         return NO;
     }
     return %orig;
@@ -154,7 +141,6 @@ static void discoverSettingsChanged(CFNotificationCenterRef center, void *observ
 // 返回NO时隐藏直播入口
 - (_Bool)shouldShowDiscoveryFinderLiveEntry {
     if (gHideDiscoverLive) {
-        NSLog(@"[HideDiscover] Hiding DiscoveryFinderLive (直播) entry");
         return NO;
     }
     return %orig;
@@ -164,7 +150,6 @@ static void discoverSettingsChanged(CFNotificationCenterRef center, void *observ
 // 返回NO时隐藏直播入口
 - (_Bool)shouldShowFinderLiveEntry {
     if (gHideDiscoverLive) {
-        NSLog(@"[HideDiscover] Hiding FinderLive (直播) entry");
         return NO;
     }
     return %orig;
@@ -176,7 +161,6 @@ static void discoverSettingsChanged(CFNotificationCenterRef center, void *observ
 
 // 构造函数，插件加载时执行
 %ctor {
-    NSLog(@"[HideDiscover] Tweak loaded");
     loadDiscoverSettings();
     
     // 注册Darwin通知，监听设置变化

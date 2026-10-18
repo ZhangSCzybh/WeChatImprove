@@ -1,0 +1,485 @@
+{
+  "binary": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "uuid": "9cd58b8e-b7ab-3487-adbd-2ac0aa16a5de",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "crash_sha256": "75e797f7f8416557e184951ef4247736ac084d6bc297077a3657428df2f2de77",
+  "frames": [
+    {
+      "thread": 0,
+      "frame": 4,
+      "offset": "0x1759e10c",
+      "address": "0x11759e10c",
+      "start": "0x11759df30",
+      "end": "0x11759e888",
+      "methods": [
+        "-[MMServiceCenter getService:]"
+      ]
+    },
+    {
+      "thread": 0,
+      "frame": 5,
+      "offset": "0x1759ec80",
+      "address": "0x11759ec80",
+      "start": "0x11759eb04",
+      "end": "0x11759ed04",
+      "methods": [
+        "-[MMServiceCenter precreateServices:]"
+      ]
+    },
+    {
+      "thread": 0,
+      "frame": 6,
+      "offset": "0x175b8594",
+      "address": "0x1175b8594",
+      "start": "0x1175b83c8",
+      "end": "0x1175b85d4",
+      "methods": [
+        "-[LazyExtensionAgent ensureLazyListenerInitedForExtension:withSelector:inContext:]"
+      ]
+    },
+    {
+      "thread": 0,
+      "frame": 7,
+      "offset": "0x175f90d4",
+      "address": "0x1175f90d4",
+      "start": "0x1175f9074",
+      "end": "0x1175f91dc",
+      "methods": [
+        "-[MMExtensionCenter callExtension:selector:block:]"
+      ]
+    },
+    {
+      "thread": 0,
+      "frame": 8,
+      "offset": "0x1758f35c",
+      "address": "0x11758f35c",
+      "start": "0x11758f2b8",
+      "end": "0x11758f540",
+      "methods": [
+        "-[MMContext callExtension:selector:block:]"
+      ]
+    },
+    {
+      "thread": 0,
+      "frame": 9,
+      "offset": "0x6776358",
+      "address": "0x106776358",
+      "start": "0x1067761a0",
+      "end": "0x106776420",
+      "methods": [
+        "-[WCAccountControlMgr onWCAccountAutoLoginControlLogicStop:]"
+      ]
+    },
+    {
+      "thread": 0,
+      "frame": 10,
+      "offset": "0x6762184",
+      "address": "0x106762184",
+      "start": "0x106761f34",
+      "end": "0x1067621ac",
+      "methods": [
+        "-[WCAccountAutoLoginControlLogic stopLogic:]"
+      ]
+    },
+    {
+      "thread": 0,
+      "frame": 11,
+      "offset": "0x67658c4",
+      "address": "0x1067658c4",
+      "start": "0x10676492c",
+      "end": "0x106766bb0",
+      "methods": [
+        "-[WCAccountAutoLoginControlLogic handleAuthResponse:]"
+      ]
+    },
+    {
+      "thread": 0,
+      "frame": 12,
+      "offset": "0x67670cc",
+      "address": "0x1067670cc",
+      "start": "0x106766edc",
+      "end": "0x1067671bc",
+      "methods": [
+        "-[WCAccountAutoLoginControlLogic HandleMessageReturn:]"
+      ]
+    },
+    {
+      "thread": 0,
+      "frame": 13,
+      "offset": "0x676721c",
+      "address": "0x10676721c",
+      "start": "0x1067671bc",
+      "end": "0x106767234",
+      "methods": [
+        "-[WCAccountAutoLoginControlLogic MessageReturn:Event:]"
+      ]
+    },
+    {
+      "thread": 0,
+      "frame": 14,
+      "offset": "0x101aa8",
+      "address": "0x100101aa8",
+      "start": "0x100101974",
+      "end": "0x100101e10",
+      "methods": [
+        "-[CAppObserverCenter NotifyFromMainCtrl:Event:]"
+      ]
+    },
+    {
+      "thread": 0,
+      "frame": 15,
+      "offset": "0x4a6996c",
+      "address": "0x104a6996c",
+      "start": "0x104a698b8",
+      "end": "0x104a699f0",
+      "methods": [
+        "-[CMainControll speedyDispacthMessage:]"
+      ]
+    },
+    {
+      "thread": 0,
+      "frame": 16,
+      "offset": "0x175ae34c",
+      "address": "0x1175ae34c",
+      "start": "0x1175ae2fc",
+      "end": "0x1175ae394",
+      "methods": []
+    },
+    {
+      "thread": 0,
+      "frame": 25,
+      "offset": "0xaa2a980",
+      "address": "0x10aa2a980",
+      "start": "0x10aa2a44c",
+      "end": "0x10aa2aa58",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 7,
+      "offset": "0x85208",
+      "address": "0x100085208",
+      "start": "0x10008517c",
+      "end": "0x100085278",
+      "methods": [
+        "+[CommonAffDataUtilsObjcStatic getWxUsername:]"
+      ]
+    },
+    {
+      "thread": 27,
+      "frame": 8,
+      "offset": "0x123efbac",
+      "address": "0x1123efbac",
+      "start": "0x1123efa20",
+      "end": "0x1123efca4",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 9,
+      "offset": "0x11707548",
+      "address": "0x111707548",
+      "start": "0x1117071a4",
+      "end": "0x111707690",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 10,
+      "offset": "0x116e5de0",
+      "address": "0x1116e5de0",
+      "start": "0x1116e5c48",
+      "end": "0x1116e5f34",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 11,
+      "offset": "0x116f01f4",
+      "address": "0x1116f01f4",
+      "start": "0x1116f018c",
+      "end": "0x1116f02b0",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 12,
+      "offset": "0x116f1658",
+      "address": "0x1116f1658",
+      "start": "0x1116f161c",
+      "end": "0x1116f16b4",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 13,
+      "offset": "0x102cc228",
+      "address": "0x1102cc228",
+      "start": "0x1102cc0ec",
+      "end": "0x1102cc488",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 14,
+      "offset": "0x102cc058",
+      "address": "0x1102cc058",
+      "start": "0x1102cbf98",
+      "end": "0x1102cc0ec",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 15,
+      "offset": "0x102c8ff4",
+      "address": "0x1102c8ff4",
+      "start": "0x1102c8f50",
+      "end": "0x1102c90e4",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 16,
+      "offset": "0x102c8ea0",
+      "address": "0x1102c8ea0",
+      "start": "0x1102c8e10",
+      "end": "0x1102c8f50",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 17,
+      "offset": "0x11e4aa98",
+      "address": "0x111e4aa98",
+      "start": "0x111e4a82c",
+      "end": "0x111e4acd8",
+      "methods": [
+        "-[FinderDataService configService:dbPath:prefetchDbDir:]"
+      ]
+    },
+    {
+      "thread": 27,
+      "frame": 18,
+      "offset": "0x7227358",
+      "address": "0x107227358",
+      "start": "0x1072272ac",
+      "end": "0x107227388",
+      "methods": [
+        "-[WCFinderDataService configAffService]"
+      ]
+    },
+    {
+      "thread": 27,
+      "frame": 19,
+      "offset": "0x7227284",
+      "address": "0x107227284",
+      "start": "0x107226e0c",
+      "end": "0x1072272ac",
+      "methods": [
+        "-[WCFinderDataService resetFinder]"
+      ]
+    },
+    {
+      "thread": 27,
+      "frame": 20,
+      "offset": "0x7228698",
+      "address": "0x107228698",
+      "start": "0x107228334",
+      "end": "0x107228790",
+      "methods": [
+        "-[WCFinderDataService dataServiceInit]"
+      ]
+    },
+    {
+      "thread": 27,
+      "frame": 21,
+      "offset": "0x7224c64",
+      "address": "0x107224c64",
+      "start": "0x1072246b4",
+      "end": "0x107224c90",
+      "methods": [
+        "-[WCFinderDataService onServiceInit]"
+      ]
+    },
+    {
+      "thread": 27,
+      "frame": 22,
+      "offset": "0x1759e5b8",
+      "address": "0x11759e5b8",
+      "start": "0x11759df30",
+      "end": "0x11759e888",
+      "methods": [
+        "-[MMServiceCenter getService:]"
+      ]
+    },
+    {
+      "thread": 27,
+      "frame": 23,
+      "offset": "0x17609de0",
+      "address": "0x117609de0",
+      "start": "0x117609d44",
+      "end": "0x117609e44",
+      "methods": [
+        "-[MMContext getService:]"
+      ]
+    },
+    {
+      "thread": 27,
+      "frame": 24,
+      "offset": "0xaa2c308",
+      "address": "0x10aa2c308",
+      "start": "0x10aa2bdf4",
+      "end": "0x10aa2c950",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 25,
+      "offset": "0x1444bc38",
+      "address": "0x11444bc38",
+      "start": "0x11444bb6c",
+      "end": "0x11444bc54",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 26,
+      "offset": "0x1444e9a0",
+      "address": "0x11444e9a0",
+      "start": "0x11444e92c",
+      "end": "0x11444eae8",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 27,
+      "offset": "0x1444d84c",
+      "address": "0x11444d84c",
+      "start": "0x11444d358",
+      "end": "0x11444dc98",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 28,
+      "offset": "0x1443f210",
+      "address": "0x11443f210",
+      "start": "0x11443f19c",
+      "end": "0x11443f2bc",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 29,
+      "offset": "0x147fdc34",
+      "address": "0x1147fdc34",
+      "start": "0x1147fdbb0",
+      "end": "0x1147fdce4",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 30,
+      "offset": "0x147b545c",
+      "address": "0x1147b545c",
+      "start": "0x1147b5304",
+      "end": "0x1147b5494",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 31,
+      "offset": "0xb81830c",
+      "address": "0x10b81830c",
+      "start": "0x10b81827c",
+      "end": "0x10b818324",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 32,
+      "offset": "0x147a8308",
+      "address": "0x1147a8308",
+      "start": "0x1147a7d54",
+      "end": "0x1147a90e8",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 33,
+      "offset": "0x147adfbc",
+      "address": "0x1147adfbc",
+      "start": "0x1147adf74",
+      "end": "0x1147adfc8",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 34,
+      "offset": "0x147ada74",
+      "address": "0x1147ada74",
+      "start": "0x1147ada50",
+      "end": "0x1147ada80",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 35,
+      "offset": "0xb7db5b0",
+      "address": "0x10b7db5b0",
+      "start": "0x10b7db550",
+      "end": "0x10b7db5c0",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 36,
+      "offset": "0x14865180",
+      "address": "0x114865180",
+      "start": "0x114865084",
+      "end": "0x1148651e8",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 37,
+      "offset": "0xb7c9fe4",
+      "address": "0x10b7c9fe4",
+      "start": "0x10b7c9f70",
+      "end": "0x10b7c9ff8",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 38,
+      "offset": "0x1486480c",
+      "address": "0x11486480c",
+      "start": "0x114864324",
+      "end": "0x114864920",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 39,
+      "offset": "0x1486558c",
+      "address": "0x11486558c",
+      "start": "0x114865544",
+      "end": "0x114865600",
+      "methods": []
+    },
+    {
+      "thread": 27,
+      "frame": 40,
+      "offset": "0xb7cba8c",
+      "address": "0x10b7cba8c",
+      "start": "0x10b7cba40",
+      "end": "0x10b7cbab0",
+      "methods": []
+    }
+  ],
+  "skipped_class_metadata": 0,
+  "limitations": [
+    "Static method boundaries; does not identify a runtime lock owner.",
+    "Class and metaclass method lists only; category-only methods and C/C++ frames may remain unnamed."
+  ]
+}

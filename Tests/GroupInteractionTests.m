@@ -171,7 +171,7 @@ static NSHashTable *Adapters(void) {
 @interface CSGroupListAdapter : NSObject
 CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic) NSUInteger modelRevision,snapshotRevision,refreshGeneration;
-@property(nonatomic) BOOL coalescingNotification,scheduledCoalesced;
+@property(nonatomic) BOOL coalescingNotification,scheduledCoalesced,coalescedDispatchPending;
 @property(nonatomic,copy) NSString *snapshotAccount;
 @property(nonatomic,strong) NSArray *cachedNativeSections;
 @property(nonatomic,copy) NSString *nativeActionsAccount;

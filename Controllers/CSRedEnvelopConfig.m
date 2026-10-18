@@ -86,7 +86,6 @@ static NSString * const kRedEnvelopTotalAmountKey = @"com.wechat.enhance.redenve
     [self.defaults setObject:@(_totalReceiveAmount) forKey:kRedEnvelopTotalAmountKey];
     [self.defaults synchronize];
     
-    NSLog(@"[红包] 记录统计: 已领%ld次, 累计%.2f元", (long)_totalReceiveCount, (double)_totalReceiveAmount / 100.0);
 }
 
 - (void)resetReceiveRecords {
@@ -97,7 +96,6 @@ static NSString * const kRedEnvelopTotalAmountKey = @"com.wechat.enhance.redenve
     [self.defaults setObject:@0 forKey:kRedEnvelopTotalAmountKey];
     [self.defaults synchronize];
     
-    NSLog(@"[红包] 记录统计已重置");
 }
 
 @end

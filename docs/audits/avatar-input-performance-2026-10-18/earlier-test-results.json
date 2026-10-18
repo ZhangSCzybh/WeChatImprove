@@ -1,0 +1,60 @@
+[
+  {
+    "test": "avatar-input-style",
+    "exit_code": 0,
+    "summary": [
+      "PASS: 139 avatar/input production runtime + extracted hook checks; 20,000 avatar updates and 30,000 input callbacks without repeated hot-path reads/rebuilds/writes; host doubles only"
+    ]
+  },
+  {
+    "test": "preference-concurrency",
+    "exit_code": 0,
+    "summary": [
+      "Preference concurrency: 12 checks passed"
+    ]
+  },
+  {
+    "test": "tabbar",
+    "exit_code": 0,
+    "summary": [
+      "tabbar geometry: PASS",
+      "2026-10-18 09:56:12.862 native[30228:17922281] tabbar preferences/native lifecycle: PASS"
+    ]
+  },
+  {
+    "test": "my-page-clean",
+    "exit_code": 0,
+    "summary": [
+      "PASS: defaults, hide/restore, reload idempotency, independent switches, renamed titles, unknown cells"
+    ]
+  },
+  {
+    "test": "message-actions-execution",
+    "exit_code": 0,
+    "summary": [
+      "PASS: 1013 production action/coordinator/native/media checks (host doubles, no native sends)"
+    ]
+  },
+  {
+    "test": "message-gesture",
+    "exit_code": 0,
+    "summary": [
+      "PASS: 272 production gesture/lifecycle checks (UIKit/facade doubles, no native sends)"
+    ]
+  },
+  {
+    "test": "message-time",
+    "exit_code": 0,
+    "summary": [
+      "PASS: 142 message-time production hook lifecycle checks (UIKit double)"
+    ]
+  },
+  {
+    "test": "bubble-style",
+    "exit_code": 0,
+    "summary": [
+      "Bubble policy/renderer/ownership: 8269 checks passed",
+      "Bubble real-adapter lifecycle: 111 checks passed"
+    ]
+  }
+]

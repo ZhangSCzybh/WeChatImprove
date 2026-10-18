@@ -9,6 +9,7 @@
   Controllers/CSNavigationTitleSettingsViewController.h \
   Controllers/CSAvatarSettingsViewController.h \
   Controllers/CSBackgroundRunViewController.h \
+  Controllers/CSBackgroundBlurSettingsViewController.h \
   Controllers/CSTouchTrailViewController.h \
   Controllers/CSGameCheatsViewController.h \
   Controllers/CSFavoriteSettingsViewController.h \
@@ -46,6 +47,7 @@ Controllers/CSAccountDetailViewController.h:
 Controllers/CSNavigationTitleSettingsViewController.h:
 Controllers/CSAvatarSettingsViewController.h:
 Controllers/CSBackgroundRunViewController.h:
+Controllers/CSBackgroundBlurSettingsViewController.h:
 Controllers/CSTouchTrailViewController.h:
 Controllers/CSGameCheatsViewController.h:
 Controllers/CSFavoriteSettingsViewController.h:

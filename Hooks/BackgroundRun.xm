@@ -10,7 +10,6 @@ static UIBackgroundTaskIdentifier bgTaskIdentifier;
 static NSTimer *bgTaskTimer;
 static AVAudioPlayer *silentAudioPlayer;
 static BOOL isInBackground = NO;  // 添加应用状态跟踪
-static NSInteger timerFireCount = 0;  // 记录定时器触发次数
 static NSTimeInterval timerInterval = 10.0; // 默认10秒触发一次
 
 // 检查后台运行功能是否启用
@@ -104,8 +103,6 @@ static void requestMoreBackgroundTime() {
 
 @implementation NSTimerCallbackClass
 + (void)requestMoreBackgroundTimeCallback:(NSTimer *)timer {
-    // 增加触发计数
-    timerFireCount++;
     requestMoreBackgroundTime();
 }
 @end
@@ -123,7 +120,6 @@ static void handleEnterBackground() {
     }
     
     isInBackground = YES;
-    timerFireCount = 0;  // 重置触发计数
     
     // 确保使用最新的间隔设置
     timerInterval = getBackgroundInterval();
@@ -261,23 +257,12 @@ static void handleEnterForeground() {
     handleEnterForeground();
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    %orig;
-}
-
-- (void)applicationWillResignActive:(UIApplication *)application {
-    %orig;
-}
 %end
 
 // 添加UIApplicationDelegate的分类，以捕获可能的应用状态变化
 %hook UIApplication
 
 // 前台切换到后台
-- (void)_applicationWillResignActive {
-    %orig;
-}
-
 - (void)_applicationDidEnterBackground {
     %orig;
     // 延迟执行，确保系统已完成状态切换
@@ -313,18 +298,9 @@ static void handleEnterForeground() {
         // 初始化变量
         bgTaskIdentifier = UIBackgroundTaskInvalid;
         isInBackground = NO;
-        timerFireCount = 0;
         
         // 注册通知观察者
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-        
-        // 观察应用退到后台的通知
-        [center addObserverForName:UIApplicationDidEnterBackgroundNotification 
-                            object:nil 
-                             queue:[NSOperationQueue mainQueue] 
-                        usingBlock:^(NSNotification *notification) {
-            // 应用进入后台
-        }];
         
         // 观察应用回到前台的通知
         [center addObserverForName:UIApplicationWillEnterForegroundNotification 
@@ -350,4 +326,4 @@ static void handleEnterForeground() {
             }
         }];
     }
-} 
+}

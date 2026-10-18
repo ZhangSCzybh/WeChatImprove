@@ -89,7 +89,6 @@ static BOOL CSIsChatRoomName(NSString *name) {
     self.chatRooms = [rooms sortedArrayUsingDescriptors:@[sortDescriptor]];
     self.filteredChatRooms = self.chatRooms;
     
-    NSLog(@"[红包] 加载群聊列表完成: %lu个群", (unsigned long)self.chatRooms.count);
 }
 
 - (void)loadChatRoomsInternal:(NSMutableArray *)rooms {
@@ -115,7 +114,6 @@ static BOOL CSIsChatRoomName(NSString *name) {
             if ([contactMgr respondsToSelector:selector]) {
                 allUserNames = ((id (*)(id, SEL))objc_msgSend)(contactMgr, selector);
                 if (allUserNames.count > 0) {
-                    NSLog(@"[红包] 使用%@获取到%lu个联系人", selectorName, (unsigned long)allUserNames.count);
                     break;
                 }
             }
@@ -150,7 +148,6 @@ static BOOL CSIsChatRoomName(NSString *name) {
             }
         }
         
-        NSLog(@"[红包] 筛选群聊完成: %lu个群", (unsigned long)rooms.count);
         
     } @catch (NSException *exception) {
         NSLog(@"[红包] 加载群聊列表异常: %@", exception);

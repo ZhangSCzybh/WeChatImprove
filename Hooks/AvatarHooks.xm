@@ -2,7 +2,8 @@
 #import "../Controllers/CSAvatarSettingsViewController.h"
 #import "../Controllers/CSMessageMergeAdapter.h"
 #import "../Headers/WCHeaders.h"
-#import <stdatomic.h>
+#import "../Controllers/CSPreferenceRefresh.h"
+static atomic_bool avatarRefreshPending;
 
 static atomic_uint avatarHiddenMask;
 static NSUserDefaults *avatarDefaults;
@@ -34,5 +35,7 @@ static void reloadAvatarVisibility(void) {
     avatarDefaults = [[NSUserDefaults alloc] initWithSuiteName:kUserDefaultsSuiteName];
     reloadAvatarVisibility();
     [NSNotificationCenter.defaultCenter addObserverForName:NSUserDefaultsDidChangeNotification object:nil
-        queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification *note) { reloadAvatarVisibility(); }];
+        queue:nil usingBlock:^(NSNotification *note) {
+            CSRequestMainRefresh(&avatarRefreshPending, ^{ reloadAvatarVisibility(); });
+        }];
 }

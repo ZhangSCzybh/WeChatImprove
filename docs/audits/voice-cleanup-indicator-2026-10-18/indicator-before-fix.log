@@ -1,0 +1,19 @@
+FAIL: contraction moves toward the target immediately with no queued animation
+FAIL: shortest indicator is directly under the target title
+FAIL: minimum width is under the target title and expansion stays there
+FAIL: swipe preserves width bounds and ends at the normal target frame
+FAIL: minimum width is under the target title and expansion stays there
+FAIL: swipe preserves width bounds and ends at the normal target frame
+FAIL: both swipe directions contract then expand even with unequal title widths
+FAIL: minimum width is under the target title and expansion stays there
+FAIL: swipe preserves width bounds and ends at the normal target frame
+FAIL: both swipe directions contract then expand even with unequal title widths
+FAIL: minimum width is under the target title and expansion stays there
+FAIL: swipe preserves width bounds and ends at the normal target frame
+FAIL: both swipe directions contract then expand even with unequal title widths
+FAIL: minimum width is under the target title and expansion stays there
+FAIL: swipe preserves width bounds and ends at the normal target frame
+FAIL: both swipe directions contract then expand even with unequal title widths
+FAIL: minimum width is under the target title and expansion stays there
+FAIL: swipe preserves width bounds and ends at the normal target frame
+Group indicator: 69 checks, 18 failures

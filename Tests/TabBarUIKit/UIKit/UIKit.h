@@ -14,6 +14,17 @@ extern NSString *const UIAccessibilityReduceMotionStatusDidChangeNotification;
 extern NSString *const UIApplicationDidBecomeActiveNotification;
 extern NSString *const UISceneDidActivateNotification;
 extern BOOL CSTestReduceMotionEnabled;
+extern NSString *const UIApplicationWillResignActiveNotification;
+extern NSString *const UISceneWillDeactivateNotification;
+typedef NS_ENUM(NSInteger, UIApplicationState) { UIApplicationStateActive, UIApplicationStateInactive, UIApplicationStateBackground };
+typedef NS_ENUM(NSInteger, UISceneActivationState) { UISceneActivationStateForegroundActive, UISceneActivationStateForegroundInactive, UISceneActivationStateBackground };
+@interface UIApplication : NSObject
+@property(nonatomic) UIApplicationState applicationState;
++ (instancetype)sharedApplication;
+@end
+@interface UIWindowScene : NSObject
+@property(nonatomic) UISceneActivationState activationState;
+@end
 BOOL UIAccessibilityIsReduceMotionEnabled(void);
 @class UIWindow, UIColor, UIViewController;
 @interface UITraitCollection : NSObject
@@ -51,6 +62,7 @@ BOOL UIAccessibilityIsReduceMotionEnabled(void);
 - (void)layoutIfNeeded;
 @end
 @interface UIWindow : UIView
+@property(nonatomic,strong) UIWindowScene *windowScene;
 @property(nonatomic) UIEdgeInsets safeAreaInsets;
 @end
 @interface UIEvent : NSObject @end

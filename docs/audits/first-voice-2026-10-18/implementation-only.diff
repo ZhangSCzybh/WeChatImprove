@@ -1,0 +1,458 @@
+--- before/Controllers/CSMessageMediaProvider.m
++++ after/Controllers/CSMessageMediaProvider.m
+@@ -25,6 +25,11 @@
+ @property(nonatomic) BOOL localComplete;
+ @property(nonatomic) BOOL recording;
+ @property(nonatomic) BOOL requestedDownload;
++@property(nonatomic) BOOL sourceReloaded;
++@property(nonatomic) BOOL localReadAttempted;
++@property(nonatomic) BOOL readRetryUsed;
++@property(nonatomic) BOOL retryScheduled;
++@property(nonatomic, copy) NSString *failureHint;
+ @end
+ @implementation CSVoicePreparation
+ - (void)dealloc { if (_requestedDownload) atomic_fetch_sub(&CSPendingVoiceDownloads,1); }
+@@ -90,6 +95,7 @@
+         if (active) preparation.recording=active.boolValue;
+     }
+     preparation.complete=preparation.terminalCompletion || preparation.localComplete;
++    preparation.path=nil;
+     Class cls=NSClassFromString(@"CMessageWrap");
+     if (CSMessageNativeSupports(source,@"getVoicePath",@"@",@[])) {
+         id path=CSMessageActionNativeObject(source,@"getVoicePath"); if ([path isKindOfClass:NSString.class]) preparation.path=[path copy];
+@@ -101,17 +107,55 @@
+     if (_preparations[key]!=preparation) return;
+     if (preparation.requestedDownload) { preparation.requestedDownload=NO; atomic_fetch_sub(&CSPendingVoiceDownloads,1); }
+     NSDictionary *subscribers=[preparation.subscribers copy]; [preparation.subscribers removeAllObjects]; preparation.bytes=nil; preparation.context=nil; [_preparations removeObjectForKey:key];
+-    for (void (^completion)(CSMessageVoiceResource *) in subscribers.allValues) completion(resource);
++    for (NSString *identifier in subscribers) {
++        if (!resource && preparation.failureHint.length && _failureHandler) _failureHandler(identifier,preparation.failureHint);
++        void (^completion)(CSMessageVoiceResource *)=subscribers[identifier]; completion(resource);
++    }
++}
++static BOOL CSVoiceSourceMatches(id source, CSMessageActionContext *context) {
++    return [source isKindOfClass:NSClassFromString(@"CMessageWrap")] && CSMessageNativeUnsigned(source,@"m_uiMessageType")==34 &&
++        CSMessageNativeUnsigned(source,@"m_uiMesLocalID")==context.localID &&
++        (!context.serverID || CSMessageNativeUnsigned(source,@"m_n64MesSvrID")==context.serverID) &&
++        [CSMessageActionObjectGetter(source,NSSelectorFromString(@"m_nsFromUsr")) isEqual:context.outgoing ? context.accountID : context.sourceConversationID] &&
++        [CSMessageActionObjectGetter(source,NSSelectorFromString(@"m_nsToUsr")) isEqual:context.outgoing ? context.sourceConversationID : context.accountID];
++}
++- (BOOL)reloadSource:(CSVoicePreparation *)preparation key:(NSString *)key {
++    preparation.sourceReloaded=YES;
++    CSMessageActionContext *context=preparation.context;
++    id refreshed=_refreshSource && context.localID ? _refreshSource(context) : nil;
++    // Service lookup can cross an account boundary and synchronously cancel us.
++    if (_preparations[key]!=preparation) return NO;
++    if (refreshed && !CSVoiceSourceMatches(refreshed,context)) { preparation.failureHint=@"原语音记录已变化，请重新打开会话"; [self finish:preparation key:key resource:nil]; return NO; }
++    if (refreshed) preparation.refreshedSource=refreshed;
++    [self snapshot:preparation];
++    return YES;
++}
++- (BOOL)retryLocalRead:(CSVoicePreparation *)preparation key:(NSString *)key {
++    if (preparation.readRetryUsed) return NO;
++    preparation.readRetryUsed=YES; preparation.retryScheduled=YES;
++    __weak typeof(self) weakSelf=self; __weak CSVoicePreparation *weakPreparation=preparation;
++    // One bounded preparation retry, never an upload retry or a polling timer.
++    dispatch_after(dispatch_time(DISPATCH_TIME_NOW,200*NSEC_PER_MSEC),dispatch_get_main_queue(),^{
++        typeof(self) self=weakSelf; CSVoicePreparation *live=weakPreparation;
++        if (!self || !live || self.preparations[key]!=live) return;
++        live.retryScheduled=NO;
++        if (!live.sourceReloaded) { if (![self reloadSource:live key:key]) return; }
++        else [self snapshot:live];
++        [self read:live key:key];
++    });
++    return YES;
+ }
+ // Immutable-byte validation stays on the serial media queue. Header recognition follows
+ // native getVoiceFormat; a header alone is never evidence of a complete recording.
+-static CSMessageVoiceResource *CSValidatedVoice(NSData *data, unsigned int duration, unsigned int format, BOOL formatKnown, unsigned int expected) {
+-    if (!data.length || !duration || !formatKnown || (expected && expected!=data.length)) return nil;
++static CSMessageVoiceResource *CSValidatedVoice(NSData *data, unsigned int duration, unsigned int format, BOOL formatKnown, unsigned int expected, NSString **failureHint) {
++    if (!data.length) { *failureHint=@"原语音文件未就绪，请先播放后重试"; return nil; }
++    if (!duration || !formatKnown) { *failureHint=@"原语音信息不完整"; return nil; }
++    if (expected && expected!=data.length) { *failureHint=@"原语音数据不完整"; return nil; }
+     const unsigned char *bytes=data.bytes;
+     if (format==UINT_MAX || format==4 || format==7) {
+         if (data.length>=7 && memcmp(bytes+1,"#!SILK",6)==0) format=4;
+         else if (data.length>=12 && memcmp(bytes,"#!OPUS_RAW_V1",12)==0) format=7;
+-        else return nil;
++        else { *failureHint=@"无法识别原语音格式"; return nil; }
+     }
+     {
+         unsigned long long measured=0; BOOL decodedBytes=NO; Class utility=NSClassFromString(@"AudioUtil");
+@@ -120,30 +164,38 @@
+             else if (format==7 && CSMessageNativeSupports(NSClassFromString(@"OpusAudioPlayer"),@"calculateVoiceTime:",@"I",@[@"@"])) { decodedBytes=YES; measured=[CSMessageNativeInvoke(NSClassFromString(@"OpusAudioPlayer"),@"calculateVoiceTime:",@[data]) unsignedLongLongValue]; }
+             else if (CSMessageNativeSupports(utility,@"calcVoiceTime:VoiceFormat:",@"I",@[@"I",@"I"]) && data.length<=UINT_MAX) measured=[CSMessageNativeInvoke(utility,@"calcVoiceTime:VoiceFormat:",@[@(data.length),@(format)]) unsignedLongLongValue];
+         } @catch (__unused NSException *exception) {}
+-        if (!measured || measured>UINT_MAX) return nil;
++        if (!measured || measured>UINT_MAX) { *failureHint=@"无法读取原语音时长"; return nil; }
+         if (llabs((long long)measured-duration)>20) {
+             // Network XML byte count + completed/nonrecording state + native byte
+             // decoding establish this complete resource independently of display
+             // duration. Normalize only the fresh send; never mutate source metadata.
+             // Without declared bytes, retain duration agreement as the truncation guard.
+-            if (!expected || !decodedBytes) return nil;
++            if (!expected || !decodedBytes) { *failureHint=@"原语音标注时长与音频不一致"; return nil; }
+             duration=(unsigned int)measured;
+         }
+     }
+     return [[CSMessageVoiceResource alloc] initWithData:data durationMilliseconds:duration format:format];
+ }
+ - (void)read:(CSVoicePreparation *)preparation key:(NSString *)key {
+-    if (preparation.reading || !preparation.subscribers.count) return;
++    if (preparation.reading || preparation.retryScheduled || !preparation.subscribers.count) return;
+     [self snapshotFlags:preparation];
++    if (preparation.cancelled) { [self finish:preparation key:key resource:nil]; return; }
++    // A first cell may keep stale status/extension fields across every user retry.
++    // Re-fetch the exact persisted message before refusing it or starting download.
++    if (!preparation.sourceReloaded && (preparation.recording || !preparation.complete ||
++        (preparation.explicitNonterminal && !preparation.terminalCompletion))) {
++        if (![self reloadSource:preparation key:key]) return;
++    }
+     if (preparation.cancelled || preparation.recording) { [self finish:preparation key:key resource:nil]; return; }
+     if (!preparation.complete || (preparation.explicitNonterminal && !preparation.terminalCompletion)) { [self requestMissing:preparation key:key]; return; }
+-    preparation.reading=YES;
++    preparation.reading=YES; preparation.localReadAttempted=YES;
+     NSData *snapshot=preparation.bytes; NSString *path=preparation.path;
+     unsigned int duration=preparation.duration, format=preparation.format, expected=preparation.expectedBytes; BOOL known=preparation.formatKnown;
+     NSData *(^reader)(NSString *)=_reader; __weak typeof(self) weakSelf=self;
+     dispatch_async(_queue,^{
+         @autoreleasepool {
+-            CSMessageVoiceResource *resource=snapshot.length ? CSValidatedVoice(snapshot,duration,format,known,expected) : nil;
++            NSString *failureHint=nil;
++            CSMessageVoiceResource *resource=CSValidatedVoice(snapshot,duration,format,known,expected,&failureHint);
+             if (!resource && path.length) {
+                 // A UI wrapper can retain only a cached chunk. Try its native file
+                 // once, on this queue, with the same completeness/codec checks.
+@@ -151,12 +203,15 @@
+                 NSData *data=reader(path);
+                 NSDictionary *after=[NSFileManager.defaultManager attributesOfItemAtPath:path error:nil];
+                 BOOL stable=before && after && [before[NSFileSize] isEqual:after[NSFileSize]] && [before[NSFileModificationDate] isEqual:after[NSFileModificationDate]] && [after[NSFileSize] unsignedLongLongValue]==data.length;
+-                if (stable) resource=CSValidatedVoice(data,duration,format,known,expected);
++                if (stable) resource=CSValidatedVoice(data,duration,format,known,expected,&failureHint);
++                else if (data.length) failureHint=@"原语音文件仍在更新，请稍后重试";
+             }
+             dispatch_async(dispatch_get_main_queue(),^{
+                 typeof(self) self=weakSelf; if (!self || self.preparations[key]!=preparation) return;
+                 preparation.reading=NO; [self snapshotFlags:preparation];
+                 if (preparation.cancelled || (preparation.explicitNonterminal && !preparation.terminalCompletion)) { [self finish:preparation key:key resource:nil]; return; }
++                preparation.failureHint=failureHint;
++                if (!resource && [self retryLocalRead:preparation key:key]) return;
+                 // A completed local source cannot be repaired through downloadMsg:, whose
+                 // CGI path can remove an existing source file. Invalid bytes fail closed.
+                 [self finish:preparation key:key resource:resource];
+@@ -165,7 +220,7 @@
+     });
+ }
+ - (void)requestMissing:(CSVoicePreparation *)preparation key:(NSString *)key {
+-    if (preparation.localComplete || preparation.recording || preparation.context.outgoing || !preparation.context.serverID || !preparation.expectedBytes) { [self finish:preparation key:key resource:nil]; return; }
++    if (preparation.localComplete || preparation.localReadAttempted || preparation.recording || preparation.context.outgoing || !preparation.context.serverID || !preparation.expectedBytes) { preparation.failureHint=@"原语音尚未准备完整，请先播放后重试"; [self finish:preparation key:key resource:nil]; return; }
+     if (preparation.requestedDownload) return;
+     preparation.requestedDownload=YES; atomic_fetch_add(&CSPendingVoiceDownloads,1);
+     if (_waitingHandler) for (NSString *operationID in preparation.subscribers.allKeys) _waitingHandler(operationID);
+@@ -216,17 +271,8 @@
+     for (NSString *key in _preparations.allKeys) {
+         CSVoicePreparation *preparation=_preparations[key]; CSMessageActionContext *context=preparation.context;
+         if (![context isValidForAccountID:account epoch:epoch] || ![context.sourceConversationID isEqualToString:chat] || !localID || context.localID!=localID || (context.serverID && serverID && context.serverID!=(unsigned long long)serverID)) continue;
+-        id refreshed=_refreshSource ? _refreshSource(context) : nil;
+-        if (refreshed) {
+-            BOOL matches=[refreshed isKindOfClass:NSClassFromString(@"CMessageWrap")] && CSMessageNativeUnsigned(refreshed,@"m_uiMessageType")==34 &&
+-                CSMessageNativeUnsigned(refreshed,@"m_uiMesLocalID")==context.localID &&
+-                (!context.serverID || CSMessageNativeUnsigned(refreshed,@"m_n64MesSvrID")==context.serverID) &&
+-                [CSMessageActionObjectGetter(refreshed,NSSelectorFromString(@"m_nsFromUsr")) isEqual:CSMessageActionObjectGetter(context.sourceWrap,NSSelectorFromString(@"m_nsFromUsr"))] &&
+-                [CSMessageActionObjectGetter(refreshed,NSSelectorFromString(@"m_nsToUsr")) isEqual:CSMessageActionObjectGetter(context.sourceWrap,NSSelectorFromString(@"m_nsToUsr"))];
+-            if (!matches) { [self finish:preparation key:key resource:nil]; continue; }
+-            preparation.refreshedSource=refreshed;
+-        }
+-        preparation.complete=YES; preparation.terminalCompletion=YES; [self snapshot:preparation]; [self read:preparation key:key];
++        preparation.terminalCompletion=YES;
++        if ([self reloadSource:preparation key:key]) [self read:preparation key:key];
+     }
+ }
+ - (void)downloadFailedForAccount:(NSString *)account epoch:(NSUInteger)epoch chat:(NSString *)chat localID:(unsigned int)localID serverID:(long long)serverID {
+--- before/Controllers/CSMessageMediaProvider.h
++++ after/Controllers/CSMessageMediaProvider.h
+@@ -24,6 +24,8 @@
+ - (void)downloadFailedForAccount:(NSString *)account epoch:(NSUInteger)epoch chat:(NSString *)chat
+     localID:(unsigned int)localID serverID:(long long)serverID;
+ @property(nonatomic, copy, nullable) void (^waitingHandler)(NSString *operationID);
++// Final, user-visible preparation failure only; no persistent diagnostic logging.
++@property(nonatomic, copy, nullable) void (^failureHandler)(NSString *operationID, NSString *reason);
+ @property(nonatomic, copy, nullable) id _Nullable (^refreshSource)(CSMessageActionContext *context);
+ @property(nonatomic, copy, nullable) BOOL (^requestDownload)(CSMessageActionContext *context);
+ // nil means the native recorder state could not be verified.
+--- before/Controllers/CSMessageActionCoordinator.m
++++ after/Controllers/CSMessageActionCoordinator.m
+@@ -87,6 +87,7 @@
+         _operations=[NSMutableDictionary dictionary]; _completed=[NSMutableDictionary dictionary]; _completedOrder=[NSMutableArray array]; _pendingFeedback=[NSMutableArray array]; _accountEpoch=1; _boundaryToken=atomic_load_explicit(&CSActionAccountBoundary,memory_order_acquire); _accountSuspended=(_boundaryToken&1)!=0; _accountID=_accountSuspended ? nil : [environment.currentAccountID copy];
+         __weak typeof(self) weakSelf=self;
+         provider.waitingHandler=^(NSString *identifier){ [weakSelf showWaiting:identifier]; };
++        provider.failureHandler=^(NSString *identifier, NSString *reason){ weakSelf.operations[identifier].failureDetail=[@"语音读取或校验失败：" stringByAppendingString:reason]; };
+         provider.recordingState=^NSNumber *(CSMessageActionContext *context){
+             typeof(self) self=weakSelf; if (!self || ![self validAccount:context]) return nil;
+             id audio=[self.environment serviceNamed:@"AudioSender"];
+@@ -253,7 +254,7 @@
+     CSMessageActionSubmissionState state=[op.ledger stateForOperationID:op.identifier targetID:target];
+     if (state!=CSMessageActionSubmissionStateWaitingForMedia && state!=CSMessageActionSubmissionStateReady && state!=CSMessageActionSubmissionStatePreparing) return;
+     if (op.context.messageType==34 && !op.voice && !op.mediaFailed) return;
+-    if (op.mediaFailed) { op.failureDetail=@"语音读取或校验失败"; [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
++    if (op.mediaFailed) { if (!op.failureDetail.length) op.failureDetail=@"语音读取或校验失败"; [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
+     CSMessagePreparedSend *route=op.context.messageType==49 ? [_sender prepareContext:op.context targetID:target voice:op.voice appData:op.appData appDataPath:op.appPath] : [_sender prepareContext:op.context targetID:target voice:op.voice];
+     if (!route) { if (op.context.messageType==34) op.failureDetail=@"语音发送准备失败"; [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateFailedBeforeAcceptance]; [self reportIfFinished:op]; return; }
+     [op.ledger transitionOperationID:op.identifier targetID:target toState:CSMessageActionSubmissionStateReady];
+--- before/Tests/MessageActionExecutionTests.m
++++ after/Tests/MessageActionExecutionTests.m
+@@ -168,10 +168,11 @@
+ @property(nonatomic, strong) NSMutableArray *calls;
+ @property(nonatomic) BOOL insertThrows;
+ @property(nonatomic,strong) CMessageWrap *storedWrap;
++@property(nonatomic) NSUInteger lookups;
+ @end
+ @implementation TestManager
+ - (instancetype)init { if ((self=[super init])) _calls=[NSMutableArray array]; return self; }
+-- (id)GetMsg:(NSString *)chat LocalID:(unsigned int)localID { CHECK([chat isEqual:_storedWrap.m_nsFromUsr ?: @"chat"] && localID==42); return _storedWrap; }
++- (id)GetMsg:(NSString *)chat LocalID:(unsigned int)localID { CHECK(NSThread.isMainThread && localID==42); if (_storedWrap) CHECK([chat isEqual:[_storedWrap.m_nsFromUsr isEqual:@"me"] ? _storedWrap.m_nsToUsr : _storedWrap.m_nsFromUsr]); _lookups++; return _storedWrap; }
+ - (void)AddLocalMsg:(NSString *)chat MsgWrap:(CMessageWrap *)wrap { CHECK(wrap.m_uiMesLocalID==0); [_calls addObject:@[@"insert",chat,wrap]]; wrap.m_uiMesLocalID=(unsigned)_calls.count+100; if (_insertThrows) [NSException raise:@"after-insert" format:@"injected"]; }
+ - (void)AddMsg:(NSString *)chat MsgWrap:(CMessageWrap *)wrap { [_calls addObject:@[@"add",chat,wrap]]; wrap.m_uiMesLocalID=(unsigned)_calls.count+200; }
+ - (void)AddEmoticonMsg:(NSString *)chat MsgWrap:(CMessageWrap *)wrap { [_calls addObject:@[@"emoji",chat,wrap]]; wrap.m_uiMesLocalID=(unsigned)_calls.count+300; }
+@@ -775,6 +776,96 @@
+     }
+     expectedCodecBytes=nil;
+ }
++static void TestFirstVoiceRefresh(NSUserDefaults *defaults) {
++    // The first cell keeps the same stale wrap across user retries. Persisted
++    // metadata belongs to the same message; the second message is never used.
++    for (NSString *chat in @[@"chat",@"source@chatroom"]) for (NSNumber *outgoing in @[@NO,@YES])
++    for (NSNumber *forward in @[@NO,@YES]) for (NSUInteger scenario=0;scenario<4;scenario++) {
++        TestEnvironment *env=[TestEnvironment new]; TestController *page=[TestController new]; env.controller=page;
++        TestManager *manager=[TestManager new]; TestAudio *audio=[TestAudio new]; audio.uploader=[TestUploader new];
++        env.services[@"CMessageMgr"]=manager; env.services[@"AudioSender"]=audio;
++        TestCell *cell=Cell(34); cell.wrap.m_nsFromUsr=outgoing.boolValue ? @"me" : chat; cell.wrap.m_nsToUsr=outgoing.boolValue ? chat : @"me";
++        cell.wrap.m_uiVoiceTime=1000; cell.wrap.m_uiVoiceFormat=0; cell.wrap.m_uiDownloadStatus=outgoing.boolValue ? 9 : 5;
++        cell.wrap.m_dtVoice=[NSMutableData dataWithLength:700]; cell.wrap.m_nsContent=@"<voicemsg voicelength='1000' voiceformat='0'/>";
++        manager.storedWrap=[cell.wrap copy];
++        if (scenario==0) { cell.wrap.m_uiVoiceTime=0; cell.wrap.m_nsContent=@"<voicemsg/>"; }
++        if (scenario==1) cell.wrap.m_uiDownloadStatus=0;
++        if (scenario==2) cell.wrap.m_dtVoice=nil;
++        if (scenario==3) cell.wrap.m_nsContent=@"<voicemsg voicelength='1000' voiceformat='0' endflag='0'/>";
++        NSString *originalXML=cell.wrap.m_nsContent; NSData *originalBytes=cell.wrap.m_dtVoice; unsigned int originalStatus=cell.wrap.m_uiDownloadStatus;
++        CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:env preferences:Preferences(defaults) mediaProvider:[CSMessageMediaProvider new]];
++        __block NSString *feedback=nil; coordinator.feedbackHandler=^(NSString *message){ feedback=message; };
++        CSMessageActionContext *context=[coordinator captureContextForCell:cell controller:page bindingGeneration:1]; CHECK(context);
++        TestLogic *logic=[TestLogic new]; logic.targets=@[Contact(@"destination@chatroom"),Contact(@"friend")]; NSString *operation;
++        if (forward.boolValue) {
++            [coordinator withForwardContext:context entry:CSMessageActionEntryMenuVoiceForward perform:^{ [coordinator bindForwardLogic:logic source:cell.wrap]; }];
++            operation=[[CSVoiceForwardAdapter new] bindingForLogic:logic].operationID; [coordinator confirmForwardLogic:logic];
++            for (id target in logic.targets) CHECK([coordinator handleForwardLogic:logic source:cell.wrap target:target]);
++        } else operation=[coordinator executeContext:context action:CSMessageActionRepeat entry:CSMessageActionEntryMenuRepeat];
++        NSUInteger expected=forward.boolValue ? 2 : 1;
++        CHECK(operation && Wait(^BOOL{ return manager.calls.count==expected || feedback!=nil; }));
++        CHECK(manager.calls.count==expected && audio.uploader.calls.count==expected && !audio.unsafeCalls);
++        CHECK(manager.lookups==1);
++        for (NSArray *call in manager.calls) {
++            CMessageWrap *sent=call[2]; CHECK(sent!=cell.wrap && sent!=manager.storedWrap && sent.m_uiVoiceTime==1000 && sent.m_dtVoice.length==700);
++            CHECK([[coordinator resultsForOperationID:operation][call[1]] integerValue]==CSMessageActionSubmissionStateUnknown);
++        }
++        if (forward.boolValue) { [coordinator handleForwardLogic:logic source:cell.wrap target:logic.targets[0]]; [coordinator finishForwardLogic:logic cancelled:NO]; CHECK(manager.calls.count==expected); }
++        CHECK(cell.wrap.m_uiDownloadStatus==originalStatus && cell.wrap.m_dtVoice==originalBytes && [cell.wrap.m_nsContent isEqual:originalXML]);
++        CHECK(cell.wrap.m_uiMesLocalID==42 && cell.wrap.m_n64MesSvrID==900 && manager.storedWrap.m_uiMesLocalID==42);
++    }
++}
++static void TestFirstVoiceRetryBoundaries(void) {
++    TestController *page=[TestController new];
++    for (NSUInteger scenario=0;scenario<10;scenario++) {
++        TestCell *cell=Cell(34); cell.wrap.m_uiDownloadStatus=1; cell.wrap.m_uiVoiceTime=1000; cell.wrap.m_uiVoiceFormat=0;
++        CMessageWrap *fresh=[cell.wrap copy]; fresh.m_dtVoice=[NSMutableData dataWithLength:700];
++        if (scenario==0) fresh.m_uiMesLocalID=43;
++        if (scenario==1) fresh.m_n64MesSvrID=901;
++        if (scenario==2) fresh.m_nsFromUsr=@"other-chat";
++        if (scenario==3) fresh.m_uiMessageType=1;
++        if (scenario==4) fresh.m_uiVoiceCancelFlag=1;
++        if (scenario==7) { fresh.m_uiDownloadStatus=0; fresh.m_nsContent=@"<voicemsg length='700'/>"; }
++        CSMessageMediaProvider *provider=[CSMessageMediaProvider new]; __weak CSMessageMediaProvider *weakProvider=provider;
++        __block NSUInteger refreshes=0,downloads=0,callbacks=0;
++        provider.refreshSource=^id(__unused CSMessageActionContext *context){
++            refreshes++;
++            if (scenario==5) cell.wrap.m_uiVoiceCancelFlag=1;
++            if (scenario==6) [weakProvider cancelOperationID:@"first"];
++            if (scenario==9) { cell.wrap.m_nsFromUsr=@"other-chat"; fresh.m_nsFromUsr=@"other-chat"; }
++            return fresh;
++        };
++        provider.requestDownload=^BOOL(__unused CSMessageActionContext *context){ downloads++; return YES; };
++        [provider prepareVoiceForContext:Context(cell,page) operationID:@"first" completion:^(CSMessageVoiceResource *resource){ CHECK(!resource); callbacks++; }];
++        if (scenario==8) dispatch_after(dispatch_time(DISPATCH_TIME_NOW,50*NSEC_PER_MSEC),dispatch_get_main_queue(),^{ [provider cancelOperationID:@"first"]; });
++        __block BOOL settled=NO; dispatch_after(dispatch_time(DISPATCH_TIME_NOW,350*NSEC_PER_MSEC),dispatch_get_main_queue(),^{ settled=YES; });
++        CHECK(Wait(^BOOL{ return settled; }));
++        CHECK(callbacks==((scenario==6 || scenario==8) ? 0 : 1));
++        CHECK(refreshes==(scenario==8 ? 0 : 1) && downloads==0 && !CSMessageHasPendingVoiceDownloads());
++    }
++    // A file that becomes readable during the single preparation retry is read
++    // only twice even when a second operation subscribes while recovery is pending.
++    TestCell *cell=Cell(34); cell.wrap.m_uiDownloadStatus=1; cell.wrap.m_uiVoiceTime=1000; cell.wrap.m_uiVoiceFormat=0;
++    NSData *bytes=[NSMutableData dataWithLength:700]; NSString *path=[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
++    CHECK([bytes writeToFile:path atomically:YES]); cell.wrap.path=path;
++    __block NSUInteger reads=0,refreshes=0,callbacks=0,failures=0;
++    CSMessageMediaProvider *provider=[[CSMessageMediaProvider alloc] initWithReader:^NSData *(__unused NSString *file){ reads++; return reads==1 ? nil : bytes; }];
++    provider.refreshSource=^id(__unused CSMessageActionContext *context){ refreshes++; return nil; };
++    provider.failureHandler=^(__unused NSString *identifier,__unused NSString *reason){ failures++; };
++    CSMessageActionContext *context=Context(cell,page);
++    void (^completion)(CSMessageVoiceResource *)=^(CSMessageVoiceResource *resource){ CHECK([resource.data isEqual:bytes]); callbacks++; };
++    [provider prepareVoiceForContext:context operationID:@"first" completion:completion];
++    dispatch_after(dispatch_time(DISPATCH_TIME_NOW,50*NSEC_PER_MSEC),dispatch_get_main_queue(),^{ [provider prepareVoiceForContext:context operationID:@"second" completion:completion]; });
++    CHECK(Wait(^BOOL{ return callbacks==2; })); CHECK(reads==2 && refreshes==1 && !failures);
++    [NSFileManager.defaultManager removeItemAtPath:path error:nil];
++    // Permanently invalid media fails once with a specific reason after its bounded retry.
++    cell.wrap.path=nil; cell.wrap.m_dtVoice=[NSMutableData dataWithLength:14]; callbacks=refreshes=failures=0;
++    provider=[CSMessageMediaProvider new];
++    provider.refreshSource=^id(__unused CSMessageActionContext *source){ refreshes++; return nil; };
++    provider.failureHandler=^(NSString *identifier,NSString *reason){ CHECK([identifier isEqual:@"invalid"] && [reason containsString:@"时长"]); failures++; };
++    [provider prepareVoiceForContext:context operationID:@"invalid" completion:^(CSMessageVoiceResource *resource){ CHECK(!resource); callbacks++; }];
++    CHECK(Wait(^BOOL{ return callbacks==1; })); CHECK(refreshes==1 && failures==1);
++}
+ static void TestVoiceNativeConstructorFlows(NSUserDefaults *defaults) {
+     for (NSNumber *outgoing in @[@NO,@YES]) for (NSNumber *forward in @[@NO,@YES]) for (NSUInteger formatCase=0;formatCase<4;formatCase++) {
+         unsigned int codec=formatCase%2==0 ? 4 : 7,declared=formatCase<2 ? codec : UINT_MAX;
+@@ -944,9 +1035,7 @@
+         if (scenario!=3) env.services[@"VoiceMsgDownloader"]=downloader;
+         TestCell *cell=Cell(34); cell.wrap.m_nsFromUsr=chat; cell.wrap.m_uiVoiceTime=1000; cell.wrap.m_uiVoiceFormat=0;
+         cell.wrap.m_nsContent=@"<voicemsg voicelength='1000' voiceformat='0' length='700' endflag='0'/>";
+-        manager.storedWrap=[cell.wrap copy]; manager.storedWrap.m_dtVoice=[NSMutableData dataWithLength:700]; manager.storedWrap.m_uiDownloadStatus=5;
+-        manager.storedWrap.m_nsContent=@"<voicemsg voicelength='1000' voiceformat='0' length='700' endflag='1'/>";
+-        if (scenario==1) manager.storedWrap.m_n64MesSvrID=901;
++        manager.storedWrap=[cell.wrap copy];
+         CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:env preferences:Preferences(defaults) mediaProvider:[CSMessageMediaProvider new]];
+         coordinator.feedbackHandler=^(__unused NSString *message){};
+         CSMessageActionContext *context=[coordinator captureContextForCell:cell controller:controller bindingGeneration:1];
+@@ -957,6 +1046,10 @@
+         [coordinator voiceDownloadCompletedForChat:@"unrelated" localID:42 serverID:900 endFlag:1 error:3];
+         CHECK(env.accountReads==reads && !manager.calls.count);
+         if (scenario!=3) CHECK(downloader.downloads==1);
++        // Persisted metadata becomes complete in native download processing.
++        manager.storedWrap.m_dtVoice=[NSMutableData dataWithLength:700]; manager.storedWrap.m_uiDownloadStatus=5;
++        manager.storedWrap.m_nsContent=@"<voicemsg voicelength='1000' voiceformat='0' length='700' endflag='1'/>";
++        if (scenario==1) manager.storedWrap.m_n64MesSvrID=901;
+         TestNativeVoiceCallback(chat,42,900,1,scenario==2 ? 0 : 3);
+         CHECK(Wait(^BOOL{ NSInteger state=[[coordinator resultsForOperationID:operation][chat] integerValue]; return state==CSMessageActionSubmissionStateUnknown || state==CSMessageActionSubmissionStateFailedBeforeAcceptance; }));
+         CHECK(manager.calls.count==(scenario==0 ? 1 : 0)); CHECK(audio.uploader.calls.count==(scenario==0 ? 1 : 0));
+@@ -1017,10 +1110,12 @@
+     cell.wrap.m_nsContent=@"<voicemsg voicelength='1000' voiceformat='0' length='700' endflag='1' cancelflag='1'/>"; dispatch_semaphore_signal(release);
+     CHECK(Wait(^BOOL{ return callbacks==1; })); CHECK(!accepted); [NSFileManager.defaultManager removeItemAtPath:path error:nil];
+ }
+-int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_GROUP_VOICE_CASE")) {
++int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_FIRST_VOICE")) {
++    TestFirstVoiceRefresh(defaults); [defaults removePersistentDomainForName:suite]; return 0;
++} if (getenv("CS_TEST_GROUP_VOICE_CASE")) {
+     TestGroupVoiceFlows(defaults); [defaults removePersistentDomainForName:suite]; return 0;
+ } if (getenv("CS_TEST_VOICE_CORE")) {
+-    TestGroupVoiceFlows(defaults); TestGroupVoiceInvalidResources(); TestVoiceNativeConstructorFlows(defaults); TestNativeRecordingGuard(defaults);
++    TestFirstVoiceRefresh(defaults); TestFirstVoiceRetryBoundaries(); TestGroupVoiceFlows(defaults); TestGroupVoiceInvalidResources(); TestVoiceNativeConstructorFlows(defaults); TestNativeRecordingGuard(defaults);
+     TestVoiceFailureFeedback(defaults); TestVoiceInvalidBytes(); TestVoiceCallbackIntegration(defaults);
+     TestNativeVoiceStatuses(); TestVoiceFlags(); TestMedia(); TestForwardCleanupWhileWaiting(defaults); TestCoordinator(defaults);
+     [defaults removePersistentDomainForName:suite]; printf("PASS: %lu core voice/media/forward/ownership checks (host doubles, no native sends)\n",(unsigned long)checks); return 0;
+@@ -1036,4 +1131,4 @@
+     else if ([test isEqual:@"games"]) TestGameMenu(defaults);
+     else return 2;
+     [defaults removePersistentDomainForName:suite]; printf("PASS: %lu focused checks\n",(unsigned long)checks); return 0;
+-} if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestGroupVoiceFlows(defaults); TestGroupVoiceInvalidResources(); TestStickerMenuBypass(defaults); TestNativeRecordingGuard(defaults); TestVoiceNativeConstructorFlows(defaults); TestVoiceFailureFeedback(defaults); TestNativeActionFastPath(defaults); TestMenuNoOp(defaults); TestNativeStickerMenu(defaults); TestGameMenu(defaults); TestVoiceInvalidBytes(); TestVoiceCallbackIntegration(defaults); TestNativeMenuPipeline(defaults); TestNativeVoiceStatuses(); TestNativeTextAndFeedback(defaults); TestProductionAdmission(defaults); TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestForwardCleanupWhileWaiting(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }
++} if (getenv("CS_TEST_VOICE_FLAGS_ONLY")) { TestVoiceFlags(); return 0; } TestFirstVoiceRefresh(defaults); TestFirstVoiceRetryBoundaries(); TestGroupVoiceFlows(defaults); TestGroupVoiceInvalidResources(); TestStickerMenuBypass(defaults); TestNativeRecordingGuard(defaults); TestVoiceNativeConstructorFlows(defaults); TestVoiceFailureFeedback(defaults); TestNativeActionFastPath(defaults); TestMenuNoOp(defaults); TestNativeStickerMenu(defaults); TestGameMenu(defaults); TestVoiceInvalidBytes(); TestVoiceCallbackIntegration(defaults); TestNativeMenuPipeline(defaults); TestNativeVoiceStatuses(); TestNativeTextAndFeedback(defaults); TestProductionAdmission(defaults); TestNativeBoundary(); TestSendRoutes(); TestOrdinaryPayloadRoutes(); TestMenuSnapshots(defaults); TestCoordinator(defaults); TestForwardCleanupWhileWaiting(defaults); TestMedia(); TestVoiceFlags(); [defaults removePersistentDomainForName:suite]; printf("PASS: %lu production action/coordinator/native/media checks (host doubles, no native sends)\n",(unsigned long)checks); } return 0; }
+--- before/Controllers/CSReleaseNotesViewController.m
++++ after/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,10 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"1.8-11": @[
++            @{@"title": @"改善首条语音处理",
++              @"detail": @"语音信息未更新时重新获取原消息记录，读取未就绪时进行一次准备重试；转发和复读仍只提交一次，失败提示更具体。"}
++        ],
+         @"1.8-10": @[
+             @{@"title": @"改善语音转发与复读兼容",
+               @"detail": @"修正完整语音因时长标注差异被误判的问题；语音缓存不完整时尝试读取本地文件，并加强群聊与私聊之间的转发校验。"},
+--- before/Headers/CSUserInfoHelper.h
++++ after/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"1.8-10"  // 插件版本号
++#define kPluginVersionString @"1.8-11"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- before/README.md
++++ after/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
+ 
+-**当前版本：`1.8-10`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`1.8-11`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
+ 
+@@ -10,17 +10,17 @@
+ 
+ | 项目 | 当前状态 |
+ | --- | --- |
+-| 插件版本 | `1.8-10`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
++| 插件版本 | `1.8-11`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+ | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
+ | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
+ | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
+-| Rootless / Rootful | `1.8-10` 为语音兼容修正、头像旋转与输入框优化的 Rootless 包；Rootful 保留构建入口，本轮未验证 |
++| Rootless / Rootful | `1.8-11` 为首条语音准备修正的 Rootless 包，包含此前头像旋转与输入框优化；Rootful 保留构建入口，本轮未验证 |
+ | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
+ | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
+ 
+ 微信私有类、方法和界面结构会随版本变化。当前已有编译与逻辑回归结果，真实设备上的界面渲染、原生菜单和不同插件组合仍需按实际环境验证。
+ 
+-本轮记录见 [1.8-10 语音兼容修正、头像旋转与输入框优化](docs/audits/avatar-input-performance-2026-10-18/README.md)。此前记录：[1.8-9 代码清理](docs/audits/performance-cleanup-2026-10-18/README.md)、[1.8-8 首屏恢复与性能优化](docs/audits/performance-resume-2026-10-18/implementation.md)。用户最新反馈为 1.8-8、1.8-9 私聊语音正常，涉及群聊时转发／复读出现读取校验失败。1.8-10 修正已复现的媒体误拒绝，并完成群聊双向核心回归；本任务未将新包安装到手机，实际发送、接收播放、CPU、温升与长时间后台恢复仍需真机实测。
++本轮记录见 [1.8-11 首条语音准备修正](docs/audits/first-voice-2026-10-18/README.md)。此前记录：[1.8-10 语音兼容与界面优化](docs/audits/avatar-input-performance-2026-10-18/README.md)、[1.8-9 代码清理](docs/audits/performance-cleanup-2026-10-18/README.md)、[1.8-8 首屏恢复与性能优化](docs/audits/performance-resume-2026-10-18/implementation.md)。用户确认上一轮功能恢复，仍反馈私聊／群聊第一条语音持续失败、第二条正常，自己发送和收到的语音均受影响。本轮对过期消息快照增加严格身份核对后的刷新和一次受限准备重试，完成语音核心回归；没有安装到手机或替代真实收发、播放验证。
+ 
+ ## 安装与入口
+ 
+@@ -194,20 +194,20 @@
+ ### Rootless（无根）
+ 
+ ```bash
+-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-10
++make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-11
+ ```
+ 
+-默认产物：`packages/com.wechat.improve_1.8-10_iphoneos-arm64.deb`。
++默认产物：`packages/com.wechat.improve_1.8-11_iphoneos-arm64.deb`。
+ 
+ ### Rootful（有根）
+ 
+-以下为构建方法；本轮 `1.8-10` 交付仅包含 Rootless 包。
++以下为构建方法；本轮 `1.8-11` 交付仅包含 Rootless 包。
+ 
+ ```bash
+-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-10
++make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-11
+ ```
+ 
+-默认产物：`packages/com.wechat.improve_1.8-10_iphoneos-arm.deb`。
++默认产物：`packages/com.wechat.improve_1.8-11_iphoneos-arm.deb`。
+ 
+ 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
+ 
+@@ -227,7 +227,7 @@
+ 安装了 `dpkg-deb` 的开发环境可检查包内信息：
+ 
+ ```bash
+-dpkg-deb -f packages/com.wechat.improve_1.8-10_iphoneos-arm64.deb Version Architecture
++dpkg-deb -f packages/com.wechat.improve_1.8-11_iphoneos-arm64.deb Version Architecture
+ ```
+ 
+ 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。
+--- before/control
++++ after/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 1.8-10
++Version: 1.8-11
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会

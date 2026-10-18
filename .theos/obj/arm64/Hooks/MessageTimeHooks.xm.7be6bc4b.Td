@@ -5,6 +5,7 @@
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageMergeAdapter.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSChatNativeBridge.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageTimeLayout.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageCellLifecycle.h \
   /Users/zhangshichao/theos/vendor/include/substrate.h \
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap \
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h
@@ -13,6 +14,7 @@
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageMergeAdapter.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSChatNativeBridge.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageTimeLayout.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageCellLifecycle.h:
 /Users/zhangshichao/theos/vendor/include/substrate.h:
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap:
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h:

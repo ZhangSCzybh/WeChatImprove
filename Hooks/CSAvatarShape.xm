@@ -3,6 +3,7 @@
 #import <UIKit/UIKit.h>
 #import "../Controllers/CSAvatarSettingsViewController.h"
 #import <objc/runtime.h>
+#import "CSAvatarRotation.h"
 // 添加 substrate 头文件导入，用于 MSHookIvar
 #import <substrate.h>
 
@@ -44,17 +45,10 @@ UIViewController *findParentViewController(UIView *view) {
 static NSString * const kUserDefaultsSuiteNameConst = @"com.cyansmoke.wechattweak";
 static NSString * const kRoundAvatarKeyConst = @"roundAvatar";
 static NSString * const kAvatarCornerRadiusKeyConst = @"avatarCornerRadius";
-static NSString * const kRotateAvatarKeyConst = @"rotateAvatar";
-static NSString * const kRotateSpeedKeyConst = @"rotateSpeed";
 
 // 全局变量
 static BOOL isRoundAvatarEnabled = NO;
 static float customCornerRadius = 1.0f; // 默认值改为1.0 (全圆)
-static BOOL isRotateAvatarEnabled = NO;
-static float rotateSpeed = 5.0f;
-
-// 添加一个关联对象key，用于存储是否已经添加了旋转动画
-static char kHasRotationAnimationKey;
 
 // 在主函数之前执行，读取用户设置
 %ctor {
@@ -66,19 +60,8 @@ static char kHasRotationAnimationKey;
         customCornerRadius = 1.0f; // 默认值改为1.0 (全圆)
     }
     
-    // 读取旋转设置
-    isRotateAvatarEnabled = [defaults boolForKey:kRotateAvatarKeyConst];
-    rotateSpeed = [defaults floatForKey:kRotateSpeedKeyConst];
-    if (rotateSpeed == 0) {
-        rotateSpeed = 5.0f; // 默认值
-    }
-    
-    // 调试日志
-    NSLog(@"[CSAvatarShape] 已加载，圆形头像设置：%@，圆角比例：%.1f，旋转设置：%@，旋转速度：%.1f", 
-          isRoundAvatarEnabled ? @"开启" : @"关闭", 
-          customCornerRadius,
-          isRotateAvatarEnabled ? @"开启" : @"关闭",
-          rotateSpeed);
+    CSAvatarRotationInstall(defaults);
+
 }
 
 // Hook MMHeadImageView的初始化方法
@@ -141,43 +124,14 @@ static char kHasRotationAnimationKey;
         }
     }
     
-    // 应用旋转动画
-    // 获取是否已经添加了旋转动画
-    NSNumber *hasAnimation = objc_getAssociatedObject(self, &kHasRotationAnimationKey);
-    
-    // 使用tag值识别"我的"页面头像视图
-    BOOL isProfileAvatar = self.tag == 101;
-    
-    if (isRotateAvatarEnabled && isProfileAvatar) {
-        // 只有在没有添加过动画的情况下才添加
-        if (!hasAnimation || ![hasAnimation boolValue]) {
-            // 创建旋转动画
-            CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-            rotationAnimation.toValue = @(M_PI * 2.0);
-            rotationAnimation.duration = 12.0 - rotateSpeed; // 速度范围是1-10，所以11-1=10秒到2秒不等
-            rotationAnimation.cumulative = YES;
-            rotationAnimation.repeatCount = HUGE_VALF;
-            
-            // 重要：设置removedOnCompletion为NO，这样动画不会在完成后被移除
-            rotationAnimation.removedOnCompletion = NO;
-            
-            // 设置fillMode为forwards，这样动画会保持在最后一帧
-            rotationAnimation.fillMode = kCAFillModeForwards;
-            
-            // 添加动画
-            [self.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
-            
-            // 标记已经添加了动画
-            objc_setAssociatedObject(self, &kHasRotationAnimationKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        }
-    } else {
-        // 如果不需要旋转，移除动画
-        if ([self.layer animationForKey:@"rotationAnimation"]) {
-            [self.layer removeAnimationForKey:@"rotationAnimation"];
-            objc_setAssociatedObject(self, &kHasRotationAnimationKey, @NO, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        }
-    }
+    CSAvatarRotationUpdate(self);
 }
+
+- (void)didMoveToWindow { %orig; CSAvatarRotationUpdate(self); }
+- (void)didMoveToSuperview { %orig; CSAvatarRotationUpdate(self); }
+- (void)setHidden:(BOOL)hidden { %orig; CSAvatarRotationUpdate(self); }
+- (void)setAlpha:(CGFloat)alpha { %orig; CSAvatarRotationUpdate(self); }
+- (void)setTag:(NSInteger)tag { %orig; CSAvatarRotationUpdate(self); }
 
 // Hook conerSize属性的setter方法 - 保留这个hook以防万一
 -(void)setConerSize:(unsigned int)size {
@@ -274,42 +228,14 @@ static char kHasRotationAnimationKey;
         }
     }
     
-    // 应用旋转动画
-    NSNumber *hasAnimation = objc_getAssociatedObject(self, &kHasRotationAnimationKey);
-    
-    // 使用tag值识别"我的"页面头像视图
-    BOOL isProfileAvatar = self.tag == 101;
-    
-    if (isRotateAvatarEnabled && isProfileAvatar) {
-        // 只有在没有添加过动画的情况下才添加
-        if (!hasAnimation || ![hasAnimation boolValue]) {
-            // 创建旋转动画
-            CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-            rotationAnimation.toValue = @(M_PI * 2.0);
-            rotationAnimation.duration = 12.0 - rotateSpeed; // 速度范围是1-10，所以11-1=10秒到2秒不等
-            rotationAnimation.cumulative = YES;
-            rotationAnimation.repeatCount = HUGE_VALF;
-            
-            // 重要：设置removedOnCompletion为NO，这样动画不会在完成后被移除
-            rotationAnimation.removedOnCompletion = NO;
-            
-            // 设置fillMode为forwards，这样动画会保持在最后一帧
-            rotationAnimation.fillMode = kCAFillModeForwards;
-            
-            // 添加动画
-            [self.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
-            
-            // 标记已经添加了动画
-            objc_setAssociatedObject(self, &kHasRotationAnimationKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        }
-    } else {
-        // 如果不需要旋转，移除动画
-        if ([self.layer animationForKey:@"rotationAnimation"]) {
-            [self.layer removeAnimationForKey:@"rotationAnimation"];
-            objc_setAssociatedObject(self, &kHasRotationAnimationKey, @NO, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        }
-    }
+    CSAvatarRotationUpdate(self);
 }
+
+- (void)didMoveToWindow { %orig; CSAvatarRotationUpdate(self); }
+- (void)didMoveToSuperview { %orig; CSAvatarRotationUpdate(self); }
+- (void)setHidden:(BOOL)hidden { %orig; CSAvatarRotationUpdate(self); }
+- (void)setAlpha:(CGFloat)alpha { %orig; CSAvatarRotationUpdate(self); }
+- (void)setTag:(NSInteger)tag { %orig; CSAvatarRotationUpdate(self); }
 
 // Hook conerSize属性的setter方法
 - (void)setConerSize:(unsigned int)size {
@@ -322,4 +248,11 @@ static char kHasRotationAnimationKey;
     }
 }
 
-%end 
+%end
+
+@interface MoreViewController : UIViewController @end
+%hook MoreViewController
+- (void)viewDidAppear:(BOOL)animated { %orig; CSAvatarRotationPageVisibility(self, YES); }
+- (void)viewWillDisappear:(BOOL)animated { CSAvatarRotationPageVisibility(self, NO); %orig; }
+- (void)viewDidLayoutSubviews { %orig; CSAvatarRotationRefreshViews(); }
+%end

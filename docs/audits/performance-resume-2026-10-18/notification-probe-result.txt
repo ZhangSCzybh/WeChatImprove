@@ -1,0 +1,8 @@
+Host-only isolated Foundation experiment, 2026-10-18.
+Compile: clang -fobjc-arc -fblocks -framework Foundation -framework CoreFoundation notification-probe.m -o /tmp/wechat-notification-probe-20261018
+No WeChat process, account, defaults domain, or database was used.
+
+mainQueue: producer_started=1 producer_blocked_during_200ms_main_wait=1 observer_before_main_runloop=0 observer_after_runloop=1 producer_finished_after_runloop=1
+darwinEcho: callbacks=100 hard_limit=100 max_stack_depth=1 elapsed_ms=2.899
+
+Interpretation: notification posting waited for the main queue observer. A callback reposting its own Darwin notification reached the artificial cap of 100 callbacks after one external post. Stack depth stayed at 1: this was queued feedback, not synchronous recursion. These values establish host mechanism only; they do not measure iPhone CPU, temperature, or actual callback frequency.

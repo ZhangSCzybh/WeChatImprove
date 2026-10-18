@@ -5,6 +5,13 @@
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageMergeAdapter.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSChatNativeBridge.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageNavigation.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageGestureAdapter.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageActionCoordinator.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageNativeActionAdapter.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageActionPolicy.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageActionPreferences.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageActionContext.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageMediaProvider.h \
   /Users/zhangshichao/theos/vendor/include/substrate.h \
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap \
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h
@@ -13,6 +20,13 @@
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageMergeAdapter.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSChatNativeBridge.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageNavigation.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageGestureAdapter.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageActionCoordinator.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageNativeActionAdapter.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageActionPolicy.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageActionPreferences.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageActionContext.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSMessageMediaProvider.h:
 /Users/zhangshichao/theos/vendor/include/substrate.h:
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap:
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h:

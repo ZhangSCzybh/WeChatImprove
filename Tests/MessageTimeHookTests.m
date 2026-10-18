@@ -18,6 +18,7 @@ static NSUInteger checks;
 @implementation TimePart @end
 int main(void) { @autoreleasepool {
  timeCells=[NSHashTable weakObjectsHashTable];
+ requestTimeRefresh(NO);
  [NSUserDefaults.standardUserDefaults setVolatileDomain:@{@"com.wechat.enhance.messageTime.enabled":@YES} forName:NSArgumentDomain];
  refreshTimeSettings(NO);
  TimeModel *parent=[TimeModel new];parent.isSender=YES;parent.messageWrap=[TimeWrap new];parent.messageWrap.m_uiCreateTime=1700000000;

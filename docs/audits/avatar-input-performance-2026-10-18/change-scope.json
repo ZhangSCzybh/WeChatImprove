@@ -1,0 +1,77 @@
+{
+  "baseline": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-avatar-input-before-h3osa5qs",
+  "changes": {
+    "Controllers/CSAvatarRotation.h": {
+      "before_sha256": null,
+      "after_sha256": "2be3b75fb159a5c29534146aaf808cac5f19cfc42595f2199a8305fc95f5aaf8"
+    },
+    "Controllers/CSAvatarRotation.m": {
+      "before_sha256": null,
+      "after_sha256": "58b8af3fcae29e4ea6462a589c21db89d7acf831c06319ac5826bf93f8831862"
+    },
+    "Controllers/CSAvatarSettingsViewController.m": {
+      "before_sha256": "f1b22ea0d9c5823341d251ef2fdf95d0602e3d5a3bd69deca9612e66166d2e54",
+      "after_sha256": "3fdfd4a43a814130c9b648916073c9691b5b6fb822d013d29d550c94b38cf6f4"
+    },
+    "Controllers/CSInputTextSettingsViewController.m": {
+      "before_sha256": "1287c9f09ead73d0b114c2d49b5a43ac7bf7454f5a1084971ea1a8a425508502",
+      "after_sha256": "a8a7db39242f8aeae1fa2678d0473655a4d932c8976db6a46d48135c1fe65cd3"
+    },
+    "Controllers/CSInputTextStyle.h": {
+      "before_sha256": null,
+      "after_sha256": "a38c97e8e597182af8ea27aee5e88e34dc6e1493cb6bd4433fd410947447b688"
+    },
+    "Controllers/CSInputTextStyle.m": {
+      "before_sha256": null,
+      "after_sha256": "2946595d79f08ed5d488685fd8c802f700c2e713fd708a6b93cb219bd68a1a87"
+    },
+    "Controllers/CSMessageMediaProvider.m": {
+      "before_sha256": "3a090e17d85cb5d65f025af9af23dc8b741d9dd672cc5f12476dfaa51474524d",
+      "after_sha256": "a8c4456a474b5bccb55e832b09cbf127f71876bbc1fac4a2943edc397cfe96a6"
+    },
+    "Controllers/CSReleaseNotesViewController.m": {
+      "before_sha256": "bb408d0d38a31dab0f4b7732f468c4c0617064489ad15665e05c4e0919aece6f",
+      "after_sha256": "ade6ce8ec6133b0954afe865714c85151923f80cff52341375d73a31972924a0"
+    },
+    "Headers/CSUserInfoHelper.h": {
+      "before_sha256": "1eff7871c5398e46f27ae46e49e6986b966cdf4eb62ed8ea60e2c37ad77e5506",
+      "after_sha256": "479f9f371653415f7ddd31f79ab6a9056c58f5db2f5d6b7e5b087855b985d98c"
+    },
+    "Hooks/CSAvatarShape.xm": {
+      "before_sha256": "fd92dfb34595054fe40fcb1a13118c4cb6785130bfc644260f60927ec5611f5f",
+      "after_sha256": "9050b2ba38cd9c00259a264faddcf5e6326449f16fa32284adfac13c8dcc345f"
+    },
+    "Hooks/InputTextHooks.xm": {
+      "before_sha256": "6c4c81867d23699c6bbd3f19a3f2534f51504702aa7f4cecc6d5fd27e2147169",
+      "after_sha256": "9ce01dd782fb628622db4a233e4a5395999b26ff4d10bc185b354469657c9d2b"
+    },
+    "README.md": {
+      "before_sha256": "b161a59d3b5b6644e8f6b870876ec2f3f8c380ebf0d78538fc88591f7194f7e2",
+      "after_sha256": "ad1dafb0f058f8a996c92e804c592c413baf30673b4545fd3965749cf71d829e"
+    },
+    "Tests/AvatarInputStyleTests.m": {
+      "before_sha256": null,
+      "after_sha256": "dc5f6d70cd84d94417fddb140dc4517fac82041610217481f331b79aa65395df"
+    },
+    "Tests/MessageActionExecutionTests.m": {
+      "before_sha256": "0a21917696502fd4ef30c491329130765cb8b9a16012bae50e6c94609a9f06b4",
+      "after_sha256": "0025aa992222148f065fda11a00bd44de10da4a8e53ed55e6c26d5b06894f309"
+    },
+    "Tests/StyleUIKit/StyleUIKit.m": {
+      "before_sha256": null,
+      "after_sha256": "d7a8314f1e39ab67d7d013b9d99574720690445cc961362e297fb042c4289b8d"
+    },
+    "Tests/StyleUIKit/UIKit/UIKit.h": {
+      "before_sha256": null,
+      "after_sha256": "fa2fb430c9ba03a67130956899cdc604bb5d6d9290827fa3cf2e52fdca19b022"
+    },
+    "Tests/verify-avatar-input-style.sh": {
+      "before_sha256": null,
+      "after_sha256": "aca3721de56234bbf9beb354661612e732899eb26741f786c72befb0db8d1077"
+    },
+    "control": {
+      "before_sha256": "a35ed0366846f60e7bedc2865ac214299ff9722826a854582fab08cba78b8fa6",
+      "after_sha256": "83a2b6797e5928b891288522db62146e39b5ca0e450c69e0416ba87418854899"
+    }
+  }
+}

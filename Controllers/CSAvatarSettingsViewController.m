@@ -1,3 +1,4 @@
+#import "CSAvatarRotation.h"
 #import "CSAvatarSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
 
@@ -335,28 +336,7 @@
         // 更新旋转速度分区的显示状态
         [weakSelf updateRotateSpeedSection];
         
-        // 显示提示对话框
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"提示"
-                                                                                message:@"头像旋转设置已保存，需要重启刷新缓存才能生效。"
-                                                                         preferredStyle:UIAlertControllerStyleAlert];
-        
-        // 稍后重启选项
-        UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"稍后重启" 
-                                                             style:UIAlertActionStyleDefault 
-                                                           handler:nil];
-        [alertController addAction:laterAction];
-        
-        // 立即重启选项
-        UIAlertAction *restartAction = [UIAlertAction actionWithTitle:@"立即重启" 
-                                                              style:UIAlertActionStyleDestructive 
-                                                            handler:^(UIAlertAction * _Nonnull action) {
-            // 使用exit(0)立即重启
-            exit(0);
-        }];
-        [alertController addAction:restartAction];
-        
-        // 显示对话框
-        [weakSelf presentViewController:alertController animated:YES completion:nil];
+        CSAvatarRotationPreferencesChanged();
     }];
     
     CSSettingSection *rotateAvatarSection = [CSSettingSection sectionWithHeader:@"旋转功能" 
@@ -379,28 +359,7 @@
         [defaults setFloat:speed forKey:kRotateSpeedKey];
         [defaults synchronize];
         
-        // 显示提示对话框，提供立即重启和稍后重启选项
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"提示"
-                                                                                message:@"旋转速度设置已保存，需要重启微信才能生效。"
-                                                                         preferredStyle:UIAlertControllerStyleAlert];
-        
-        // 稍后重启选项
-        UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"稍后重启" 
-                                                           style:UIAlertActionStyleDefault 
-                                                         handler:nil];
-        [alertController addAction:laterAction];
-        
-        // 立即重启选项
-        UIAlertAction *restartAction = [UIAlertAction actionWithTitle:@"立即重启" 
-                                                             style:UIAlertActionStyleDestructive 
-                                                           handler:^(UIAlertAction * _Nonnull action) {
-            // 使用exit(0)立即重启
-            exit(0);
-        }];
-        [alertController addAction:restartAction];
-        
-        // 显示对话框
-        [weakSelf presentViewController:alertController animated:YES completion:nil];
+        CSAvatarRotationPreferencesChanged();
     }];
     
     // 添加旋转速度分区（仅在旋转功能开启时显示）

@@ -173,30 +173,6 @@ static NSString *CSGetSessionDisplayName(NSString *sessionUserName) {
     }
 }
 
-// 辅助函数：从URL中解析参数
-static NSDictionary *CSParseURLParams(NSString *urlString) {
-    if (!urlString || urlString.length == 0) return @{};
-    
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    NSRange queryRange = [urlString rangeOfString:@"?"];
-    NSString *query = queryRange.location != NSNotFound ? 
-        [urlString substringFromIndex:queryRange.location + 1] : urlString;
-    
-    NSArray *pairs = [query componentsSeparatedByString:@"&"];
-    for (NSString *pair in pairs) {
-        NSArray *kv = [pair componentsSeparatedByString:@"="];
-        if (kv.count == 2) {
-            NSString *key = [kv[0] stringByRemovingPercentEncoding];
-            NSString *value = [kv[1] stringByRemovingPercentEncoding];
-            if (key.length > 0) {
-                params[key] = value ?: @"";
-            }
-        }
-    }
-    
-    return [params copy];
-}
-
 // 辅助函数：从URL中获取指定key的值
 static NSString *CSQueryValueForKeyInURL(NSString *key, NSString *urlString) {
     if (!key || !urlString) return nil;
@@ -492,14 +468,12 @@ static unsigned int CSGetRedEnvelopCommandId(id res, id req) {
         // 白名单模式（scope=1）
         if (config.groupRedEnvelopScope == 1) {
             if (!CSRedEnvelopUserNameInList(param.sessionUserName, config.allowedGroupList)) {
-                NSLog(@"[红包] 不在白名单: session=%@", param.sessionUserName);
                 return NO;
             }
         }
         // 黑名单模式（scope=2）
         else if (config.groupRedEnvelopScope == 2) {
             if (CSRedEnvelopUserNameInList(param.sessionUserName, config.blockedGroupList)) {
-                NSLog(@"[红包] 在黑名单: session=%@", param.sessionUserName);
                 return NO;
             }
         }
@@ -575,7 +549,7 @@ static unsigned int CSGetRedEnvelopCommandId(id res, id req) {
             NSString *sessionCopy = [sessionUserName copy];
             NSString *replyCopy = [trimmedReply copy];
             dispatch_async(dispatch_get_main_queue(), ^{
-                BOOL sent = [self cs_sendTextMessage:replyCopy toSession:sessionCopy];
+                [self cs_sendTextMessage:replyCopy toSession:sessionCopy];
             });
         }
     }
@@ -785,7 +759,6 @@ static unsigned int CSGetRedEnvelopCommandId(id res, id req) {
     if ([msgMgr respondsToSelector:@selector(AddMsg:MsgWrap:)]) {
         @try {
             [msgMgr AddMsg:session MsgWrap:msgWrap];
-            NSLog(@"[红包] 发送消息成功(AddMsg): session=%@ text=%@", session, text);
             return YES;
         } @catch (NSException *exception) {
             NSLog(@"[红包] AddMsg异常: %@", exception);
@@ -796,7 +769,6 @@ static unsigned int CSGetRedEnvelopCommandId(id res, id req) {
     if ([msgMgr respondsToSelector:@selector(AddLocalMsg:)]) {
         @try {
             ((void (*)(id, SEL, id))objc_msgSend)(msgMgr, @selector(AddLocalMsg:), msgWrap);
-            NSLog(@"[红包] 发送消息成功(AddLocalMsg): session=%@ text=%@", session, text);
             return YES;
         } @catch (NSException *exception) {
             NSLog(@"[红包] AddLocalMsg异常: %@", exception);
@@ -878,11 +850,9 @@ static unsigned int CSGetRedEnvelopCommandId(id res, id req) {
     // 群聊红包检查
     if (isGroup) {
         if (!config.groupRedEnvelopEnable) {
-            NSLog(@"[红包] 群聊红包未开启");
             return;
         }
         if (isGroupSender && !config.receiveSelfRedEnvelop) {
-            NSLog(@"[红包] 不抢自己发的群红包");
             return;
         }
 
@@ -895,21 +865,18 @@ static unsigned int CSGetRedEnvelopCommandId(id res, id req) {
         // 白名单模式（scope=1）
         if (config.groupRedEnvelopScope == 1) {
             if (!CSRedEnvelopUserNameInList(groupUserName, config.allowedGroupList)) {
-                NSLog(@"[红包] 不在白名单: session=%@", groupUserName);
                 return;
             }
         }
         // 黑名单模式（scope=2）
         else if (config.groupRedEnvelopScope == 2) {
             if (CSRedEnvelopUserNameInList(groupUserName, config.blockedGroupList)) {
-                NSLog(@"[红包] 在黑名单: session=%@", groupUserName);
                 return;
             }
         }
     } else {
         // 私聊红包检查
         if (!config.privateRedEnvelopEnable) {
-            NSLog(@"[红包] 私聊红包未开启");
             return;
         }
     }
@@ -968,7 +935,6 @@ static unsigned int CSGetRedEnvelopCommandId(id res, id req) {
         WCRedEnvelopesLogicMgr *logicMgr = CSGetService(logicMgrClass);
         if (logicMgr && [logicMgr respondsToSelector:@selector(ReceiverQueryRedEnvelopesRequest:)]) {
             [logicMgr ReceiverQueryRedEnvelopesRequest:[queryParams mutableCopy]];
-            NSLog(@"[红包] 发送查询请求: sendId=%@", sendId);
         } else {
             NSLog(@"[红包] 无法获取WCRedEnvelopesLogicMgr");
         }
@@ -983,7 +949,6 @@ static void CSRedEnvelopSettingsChanged(CFNotificationCenterRef center,
                                         CFNotificationName name,
                                         const void *object,
                                         CFDictionaryRef userInfo) {
-    NSLog(@"[红包] 设置已更新");
     [[CSRedEnvelopConfig sharedConfig] reload];
 }
 
@@ -1179,7 +1144,6 @@ static void CSInstallRedEnvelopSummaryHook(void) {
     cs_orig_StoryViewController_viewDidLoad = (void (*)(id, SEL))oldImp;
     method_setImplementation(method, newImp);
     
-    NSLog(@"[红包] 详情页汇总Hook已安装");
 }
 
 %ctor {
@@ -1201,5 +1165,4 @@ static void CSInstallRedEnvelopSummaryHook(void) {
         });
     });
     
-    NSLog(@"[红包] Hook 已加载");
 }

@@ -56,6 +56,7 @@ static UIColor *CSListCornerLoadColor(id<CSListCornerDefaults> defaults, NSStrin
 @interface CSListCornerConfiguration ()
 @property(nonatomic, strong) id<CSListCornerDefaults> defaults;
 @property(nonatomic, strong) CSListCornerSnapshot *cached;
+@property(nonatomic) NSUInteger revision;
 @end
 @implementation CSListCornerConfiguration
 + (instancetype)sharedConfiguration {
@@ -71,7 +72,7 @@ static UIColor *CSListCornerLoadColor(id<CSListCornerDefaults> defaults, NSStrin
 }
 - (void)dealloc { [[NSNotificationCenter defaultCenter] removeObserver:self]; }
 - (void)defaultsChanged:(NSNotification *)notification { [self invalidate]; }
-- (void)invalidate { @synchronized(self) { self.cached=nil; } }
+- (void)invalidate { @synchronized(self) { self.revision++; self.cached=nil; } }
 - (void)saveNumber:(CGFloat)value forKey:(NSString *)key { [self.defaults setFloat:value forKey:key]; [self.defaults synchronize]; [self invalidate]; }
 - (void)saveEnabled:(BOOL)value { [self.defaults setBool:value forKey:kListCornerRadiusEnabledKey]; [self.defaults synchronize]; [self invalidate]; }
 - (void)saveColor:(UIColor *)color redKey:(NSString *)redKey greenKey:(NSString *)greenKey blueKey:(NSString *)blueKey alphaKey:(NSString *)alphaKey {
@@ -80,8 +81,10 @@ static UIColor *CSListCornerLoadColor(id<CSListCornerDefaults> defaults, NSStrin
     [self.defaults setFloat:blue forKey:blueKey]; [self.defaults setFloat:alpha forKey:alphaKey]; [self.defaults synchronize]; [self invalidate];
 }
 - (CSListCornerSnapshot *)snapshot {
-    @synchronized(self) {
-        if (self.cached) return self.cached;
+    NSUInteger revision;
+    @synchronized(self) { if (self.cached) return self.cached; revision=self.revision; }
+    // A Defaults notification must be able to invalidate while this read runs.
+    {
         id<CSListCornerDefaults> defaults=self.defaults;
         CSListCornerSnapshot *s=[CSListCornerSnapshot new];
         s.enabled=[defaults boolForKey:kListCornerRadiusEnabledKey];
@@ -103,7 +106,8 @@ static UIColor *CSListCornerLoadColor(id<CSListCornerDefaults> defaults, NSStrin
             CSListCornerLoadColor(defaults, kNormalSessionTopMarginLightBgColorRedKey, kNormalSessionTopMarginLightBgColorGreenKey, kNormalSessionTopMarginLightBgColorBlueKey, kNormalSessionTopMarginLightBgColorAlphaKey, [UIColor clearColor]),
             CSListCornerLoadColor(defaults, kNormalSessionTopMarginDarkBgColorRedKey, kNormalSessionTopMarginDarkBgColorGreenKey, kNormalSessionTopMarginDarkBgColorBlueKey, kNormalSessionTopMarginDarkBgColorAlphaKey, [UIColor clearColor]),
         ];
-        self.cached=s; return s;
+        @synchronized(self) { if (revision==self.revision) self.cached=s; }
+        return s;
     }
 }
 @end

@@ -1,0 +1,73 @@
+[
+  {
+    "test": "preference-concurrency",
+    "exit_code": 0,
+    "summary": [
+      "Preference concurrency: 12 checks passed"
+    ]
+  },
+  {
+    "test": "message-actions-core",
+    "exit_code": 0,
+    "summary": [
+      "PASS: 1362 message action core checks (isolated defaults suite; no native sends)"
+    ]
+  },
+  {
+    "test": "message-actions-execution",
+    "exit_code": 0,
+    "summary": [
+      "PASS: 1013 production action/coordinator/native/media checks (host doubles, no native sends)"
+    ]
+  },
+  {
+    "test": "message-gesture",
+    "exit_code": 0,
+    "summary": [
+      "PASS: 272 production gesture/lifecycle checks (UIKit/facade doubles, no native sends)"
+    ]
+  },
+  {
+    "test": "transfer-admission",
+    "exit_code": 0,
+    "summary": [
+      "Transfer admission: 7 checks passed; native callbacks preserved, no payment services invoked"
+    ]
+  },
+  {
+    "test": "touch-trail",
+    "exit_code": 0,
+    "summary": [
+      "Touch runtime: 10015 checks passed; 10000 moves, zero preference/image reads, <=48 live dots"
+    ]
+  },
+  {
+    "test": "tabbar",
+    "exit_code": 0,
+    "summary": [
+      "tabbar geometry: PASS",
+      "2026-10-18 09:29:33.392 native[8862:17861690] tabbar preferences/native lifecycle: PASS"
+    ]
+  },
+  {
+    "test": "message-time",
+    "exit_code": 0,
+    "summary": [
+      "PASS: 142 message-time production hook lifecycle checks (UIKit double)"
+    ]
+  },
+  {
+    "test": "group-lifecycle",
+    "exit_code": 0,
+    "summary": [
+      "Group lifecycle: 67 checks, 0 failures"
+    ]
+  },
+  {
+    "test": "list-corners",
+    "exit_code": 0,
+    "summary": [
+      "List corners: 869 checks, 0 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)"
+    ]
+  }
+]

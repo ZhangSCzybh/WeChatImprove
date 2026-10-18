@@ -181,7 +181,6 @@ static void removeSettingCellAt(id section, unsigned long long index) {
         [invocation setSelector:selector];
         [invocation setArgument:&index atIndex:2];
         [invocation invoke];
-        NSLog(@"[HideSetting] Removed cell at index %llu", index);
     } @catch (NSException *e) {
         NSLog(@"[HideSetting] Exception in removeSettingCellAt: %@", e);
     }
@@ -190,18 +189,15 @@ static void removeSettingCellAt(id section, unsigned long long index) {
 // 隐藏设置页面中的Cell
 static void hideSettingCells(id tableViewMgr) {    
     if (!tableViewMgr) {
-        NSLog(@"[HideSetting] tableViewMgr is nil");
         return;
     }
     
     @try {
         NSMutableArray *sections = [tableViewMgr valueForKey:@"sections"];
         if (!sections) {
-            NSLog(@"[HideSetting] sections is nil");
             return;
         }
         if (sections.count == 0) {
-            NSLog(@"[HideSetting] sections is empty");
             return;
         }
                 
@@ -210,13 +206,11 @@ static void hideSettingCells(id tableViewMgr) {
         for (NSUInteger i = 0; i < sections.count; i++) {
             id section = sections[i];
             if (!section) {
-                NSLog(@"[HideSetting] Section %lu is nil", (unsigned long)i);
                 continue;
             }
             
             NSMutableArray *cells = [section valueForKey:@"cells"];
             if (!cells) {
-                NSLog(@"[HideSetting] Section %lu cells is nil", (unsigned long)i);
                 continue;
             }
                         
@@ -225,16 +219,14 @@ static void hideSettingCells(id tableViewMgr) {
                 if (!cellInfo) continue;
                 
                 NSString *title = getSettingCellTitle(cellInfo);
-                NSLog(@"[HideSetting] Section %lu Cell %lu: %@", (unsigned long)i, (unsigned long)j, title ?: @"(no title)");
                 
                 if (shouldHideSettingCell(title)) {
-                    [cellsToRemove addObject:@{@"section": @(i), @"cell": @(j), @"title": title ?: @"(unknown)"}];
+                    [cellsToRemove addObject:@{@"section": @(i), @"cell": @(j)}];
                 }
             }
         }
                 
         if (cellsToRemove.count == 0) {
-            NSLog(@"[HideSetting] No cells to remove");
             return;
         }
         
@@ -242,23 +234,19 @@ static void hideSettingCells(id tableViewMgr) {
         for (NSDictionary *info in [cellsToRemove reverseObjectEnumerator]) {
             NSUInteger sectionIdx = [info[@"section"] unsignedLongLongValue];
             NSUInteger cellIdx = [info[@"cell"] unsignedLongLongValue];
-            NSString *title = info[@"title"];
                         
             sections = [tableViewMgr valueForKey:@"sections"];
             if (!sections || sectionIdx >= sections.count) {
-                NSLog(@"[HideSetting] Skip - sections changed or index out of bounds");
                 continue;
             }
             
             id section = sections[sectionIdx];
             if (!section) {
-                NSLog(@"[HideSetting] Skip - section is nil");
                 continue;
             }
             
             NSMutableArray *cells = [section valueForKey:@"cells"];
             if (!cells || cellIdx >= cells.count) {
-                NSLog(@"[HideSetting] Skip - cells changed or index out of bounds");
                 continue;
             }
             
@@ -270,7 +258,6 @@ static void hideSettingCells(id tableViewMgr) {
         
         sections = [tableViewMgr valueForKey:@"sections"];
         if (!sections) {
-            NSLog(@"[HideSetting] sections is nil after cell removal");
             return;
         }
         
@@ -344,24 +331,18 @@ static void hideSettingCells(id tableViewMgr) {
             
             // 如果是目标分区且没有剩余 Cell，则标记为需要移除
             if (isTargetSection && (!cells || cells.count == 0)) {
-                NSLog(@"[HideSetting] Marking empty section %lu for removal: %@", (unsigned long)i, headerTitle);
                 [sectionsToRemove addObject:@(i)];
             }
         }
         
         // 逆序移除空分区
         if (sectionsToRemove.count > 0) {
-            NSLog(@"[HideSetting] Removing %lu empty sections", (unsigned long)sectionsToRemove.count);
             for (NSNumber *sectionIdx in [sectionsToRemove reverseObjectEnumerator]) {
                 NSUInteger idx = [sectionIdx unsignedLongLongValue];
                 sections = [tableViewMgr valueForKey:@"sections"];
                 if (!sections || idx >= sections.count) {
-                    NSLog(@"[HideSetting] Skip section removal - index out of bounds");
                     continue;
                 }
-                
-                id section = sections[idx];
-                NSString *headerTitle = [section valueForKey:@"headerTitle"];
                 
                 @try {
                     SEL selector = @selector(removeSection:);
@@ -372,11 +353,9 @@ static void hideSettingCells(id tableViewMgr) {
                         [invocation setSelector:selector];
                         [invocation setArgument:&idx atIndex:2];
                         [invocation invoke];
-                        NSLog(@"[HideSetting] Removed empty section: %@", headerTitle ?: @"(unknown)");
                     } else {
                         // 尝试直接从数组中移除
                         [sections removeObjectAtIndex:idx];
-                        NSLog(@"[HideSetting] Removed empty section from array: %@", headerTitle ?: @"(unknown)");
                     }
                 } @catch (NSException *e) {
                     NSLog(@"[HideSetting] Exception removing section: %@", e);
@@ -419,7 +398,6 @@ static void hideSettingCells(id tableViewMgr) {
 
 - (void)reloadTableData {
     %orig;
-    NSLog(@"[HideSetting] NewSettingViewController reloadTableData");
     dispatch_async(dispatch_get_main_queue(), ^{
         @try {
             id tableViewMgr = [self valueForKey:@"m_tableViewMgr"];
@@ -436,7 +414,6 @@ static void hideSettingCells(id tableViewMgr) {
 
 // 构造函数，插件加载时执行
 %ctor {
-    NSLog(@"[HideSetting] Tweak loaded");
     loadSettingPageSettings();
     
     // 注册Darwin通知，监听设置变化

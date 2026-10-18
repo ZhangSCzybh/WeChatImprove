@@ -51,7 +51,6 @@ static NSString *getCustomEntryTitle() {
 static void loadEntrySettings() {
     // 加载自定义标题
     gCustomEntryTitle = getCustomEntryTitle();
-    NSLog(@"[WeChatTweak] 入口设置已加载: 显示模式=%ld, 标题=%@", (long)getEntryDisplayMode(), gCustomEntryTitle);
 }
 
 // 监听设置变更的回调
@@ -103,7 +102,6 @@ static void entrySettingsChangedCallback(CFNotificationCenterRef center, void *o
     
     // 使用位掩码判断是否显示在我页面
     if ((displayMode & CSEntryDisplayModeMore) == 0) {
-        NSLog(@"[WeChatTweak] 根据设置跳过在我页面添加入口");
         return;
     }
     
@@ -141,7 +139,6 @@ static void entrySettingsChangedCallback(CFNotificationCenterRef center, void *o
                 } @catch (NSException *e) {}
                 
                 if (title && [title isEqualToString:entryTitle]) {
-                    NSLog(@"[WeChatTweak] 入口已存在，跳过添加");
                     return;
                 }
             }
@@ -160,7 +157,6 @@ static void entrySettingsChangedCallback(CFNotificationCenterRef center, void *o
         
         // 添加cell到section
         [section addCell:customEntryCell];
-        NSLog(@"[WeChatTweak] 已在我页面添加入口: %@", entryTitle);
         
         // 刷新tableView
         UITableView *tableView = [tableViewMgr valueForKey:@"tableView"];
@@ -230,7 +226,6 @@ static int isRegister = 0;
     
     // 使用位掩码判断是否显示在插件入口
     if ((displayMode & CSEntryDisplayModePlugin) == 0) {
-        NSLog(@"[WeChatTweak] 根据设置跳过在插件入口添加入口");
         return;
     }
     
@@ -242,7 +237,6 @@ static int isRegister = 0;
         NSString *version = kPluginVersionString;
         NSString *controller = NSStringFromClass(CSNativeSettingsControllerClass());
         
-        NSLog(@"[WeChatTweak] 尝试注册自定义入口: %@, 控制器: %@", title, controller);
         
         @try {
             Class wcPluginsMgr = objc_getClass("WCPluginsMgr");
@@ -252,7 +246,6 @@ static int isRegister = 0;
                     SEL registerSel = @selector(registerControllerWithTitle:version:controller:);
                     if ([instance respondsToSelector:registerSel]) {
                         [instance registerControllerWithTitle:title version:version controller:controller];
-                        NSLog(@"[WeChatTweak] 成功注册自定义入口: %@", title);
                     } else {
                         NSLog(@"[WeChatTweak] 注册失败: registerControllerWithTitle方法不存在");
                     }
@@ -304,7 +297,6 @@ static int isRegister = 0;
     
     // 使用位掩码判断是否显示在设置页面
     if ((displayMode & CSEntryDisplayModeSetting) == 0) {
-        NSLog(@"[WeChatTweak] 根据设置跳过在设置页面添加入口");
         return;
     }
     
@@ -367,7 +359,6 @@ static int isRegister = 0;
                 } @catch (NSException *e) {}
                 
                 if (title && [title isEqualToString:entryTitle]) {
-                    NSLog(@"[WeChatTweak] 入口已存在，跳过添加");
                     return;
                 }
             }
@@ -405,7 +396,6 @@ static int isRegister = 0;
         SEL addCellSel = @selector(addCell:);
         if ([targetSection respondsToSelector:addCellSel]) {
             [targetSection addCell:customEntryCell];
-            NSLog(@"[WeChatTweak] 已在设置页面添加入口: %@", entryTitle);
             
             // 刷新tableView
             UITableView *tableView = [tableViewMgr valueForKey:@"tableView"];

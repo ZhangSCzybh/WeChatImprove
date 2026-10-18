@@ -18,7 +18,6 @@
     [CSMessageActionCoordinator.sharedCoordinator bindForwardLogic:self source:source];
     %orig;
 }
-- (void)OnSharePreConfirmSheetViewSend:(id)sender { %orig; }
 - (BOOL)bShowSendSuccessView {
     if ([CSMessageActionCoordinator.sharedCoordinator shouldSuppressNativeSuccessForLogic:self]) return NO;
     return %orig;
@@ -52,13 +51,13 @@
     [CSMessageActionCoordinator.sharedCoordinator finishForwardLogic:logic cancelled:YES];
     %orig;
 }
-// Confirmation cancellation returns to the picker in this artifact. Preserve its binding.
-- (void)OnForwardMessageConfirmCanceled:(id)logic { %orig; }
+// Confirmation cancellation returns to the picker; no hook is needed to preserve its binding.
 %end
 
 %hook VoiceMsgDownloader
 - (void)OnRecvData:(id)chat MesLocalID:(unsigned int)localID n64MesSvrID:(long long)serverID CreateTime:(unsigned int)createTime VoiceTime:(unsigned int)voiceTime Offset:(unsigned int)offset Len:(unsigned int)length Data:(id)data EndFlag:(unsigned int)endFlag ErrNo:(unsigned int)error {
     %orig;
+    if (endFlag!=1 || !CSMessageHasPendingVoiceDownloads()) return;
     // Native completion first persists the full audio and updates its message state.
     void (^continuation)(void)=^{ [CSMessageActionCoordinator.sharedCoordinator voiceDownloadCompletedForChat:chat localID:localID serverID:serverID endFlag:endFlag error:error]; };
     if (NSThread.isMainThread) continuation(); else dispatch_async(dispatch_get_main_queue(),continuation);

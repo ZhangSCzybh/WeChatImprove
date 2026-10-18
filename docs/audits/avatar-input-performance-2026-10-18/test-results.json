@@ -1,0 +1,20 @@
+[
+  {
+    "test": "voice-core",
+    "command": "CS_TEST_VOICE_CORE=1 bash Tests/verify-message-actions-execution.sh",
+    "exit_code": 0,
+    "summary": [
+      "PASS: 1534 core voice/media/forward/ownership checks (host doubles, no native sends)"
+    ],
+    "log": "test-voice-core.log"
+  },
+  {
+    "test": "avatar-input-style",
+    "command": "bash Tests/verify-avatar-input-style.sh",
+    "exit_code": 0,
+    "summary": [
+      "PASS: 139 avatar/input production runtime + extracted hook checks; 20,000 avatar updates and 30,000 input callbacks without repeated hot-path reads/rebuilds/writes; host doubles only"
+    ],
+    "log": "test-avatar-input-style.log"
+  }
+]

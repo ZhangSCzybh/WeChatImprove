@@ -1,5 +1,7 @@
 #import "CSMessageActionContext.h"
 NS_ASSUME_NONNULL_BEGIN
+// Lock-free admission for native downloader callbacks; never creates services.
+FOUNDATION_EXPORT BOOL CSMessageHasPendingVoiceDownloads(void);
 @interface CSMessageVoiceResource : NSObject
 @property(nonatomic, copy, readonly) NSData *data;
 // Native m_uiVoiceTime and XML voicelength are milliseconds. Never infer units by magnitude.
@@ -15,12 +17,15 @@ NS_ASSUME_NONNULL_BEGIN
     completion:(void (^)(CSMessageVoiceResource * _Nullable resource))completion;
 - (void)prepareAppDataForContext:(CSMessageActionContext *)context operationID:(NSString *)operationID
     completion:(void (^)(NSData * _Nullable data, NSString * _Nullable path))completion;
+- (BOOL)hasPendingVoiceForChat:(NSString *)chat localID:(unsigned int)localID serverID:(long long)serverID;
 - (void)cancelOperationID:(NSString *)operationID;
 - (void)downloadCompletedForAccount:(NSString *)account epoch:(NSUInteger)epoch chat:(NSString *)chat
     localID:(unsigned int)localID serverID:(long long)serverID;
 - (void)downloadFailedForAccount:(NSString *)account epoch:(NSUInteger)epoch chat:(NSString *)chat
     localID:(unsigned int)localID serverID:(long long)serverID;
 @property(nonatomic, copy, nullable) void (^waitingHandler)(NSString *operationID);
+// Final, user-visible preparation failure only; no persistent diagnostic logging.
+@property(nonatomic, copy, nullable) void (^failureHandler)(NSString *operationID, NSString *reason);
 @property(nonatomic, copy, nullable) id _Nullable (^refreshSource)(CSMessageActionContext *context);
 @property(nonatomic, copy, nullable) BOOL (^requestDownload)(CSMessageActionContext *context);
 // nil means the native recorder state could not be verified.

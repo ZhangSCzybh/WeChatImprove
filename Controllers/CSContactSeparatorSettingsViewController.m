@@ -351,7 +351,6 @@
 }
 
 - (void)showInputAlertForItem:(CSSettingItem *)item {
-    __weak typeof(self) weakSelf = self;
     [CSUIHelper showInputAlertWithTitle:item.title
                                 message:nil
                             initialValue:item.inputValue

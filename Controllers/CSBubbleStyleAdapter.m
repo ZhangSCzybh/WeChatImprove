@@ -1,3 +1,4 @@
+#import "CSPreferenceRefresh.h"
 #import "CSBubbleStyleAdapter.h"
 #import "CSBubbleStylePolicy.h"
 #import "CSChatNativeBridge.h"
@@ -9,7 +10,7 @@ static char CSBubbleCellKey, CSBubbleImageKey;
 static CSBubbleStyleConfiguration *CSStyle;
 static NSCache *CSImages;
 static NSHashTable<UIView *> *CSCells;
-static BOOL CSReloadQueued;
+static atomic_bool CSReloadQueued;
 
 @interface CSBubbleBinding : NSObject
 @property(nonatomic, weak) UIView *cell;
@@ -218,9 +219,7 @@ id CSBubbleStyleImageAssignment(UIImageView *view, id nativeImage, BOOL highligh
     return nativeImage;
 }
 static void CSReload(void) {
-    if (CSReloadQueued) return; CSReloadQueued=YES;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        CSReloadQueued=NO;
+    CSRequestMainRefresh(&CSReloadQueued, ^{
         CSBubbleStyleConfiguration *next=[[CSBubbleStyleConfiguration alloc] initWithDefaults:NSUserDefaults.standardUserDefaults generation:CSStyle.generation+1];
         if ([next.values isEqual:CSStyle.values]) return;
         CSStyle=next; [CSImages removeAllObjects];
@@ -228,7 +227,7 @@ static void CSReload(void) {
     });
 }
 static void CSSettingsNotification(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef info) {
-    dispatch_async(dispatch_get_main_queue(), ^{ CSReload(); });
+    CSReload();
 }
 void CSBubbleStyleStart(void) {
     static dispatch_once_t once;
@@ -236,7 +235,7 @@ void CSBubbleStyleStart(void) {
         CSStyle=[[CSBubbleStyleConfiguration alloc] initWithDefaults:NSUserDefaults.standardUserDefaults generation:1];
         CSImages=[NSCache new]; CSImages.countLimit=128; CSImages.totalCostLimit=8*1024*1024;
         CSCells=[NSHashTable weakObjectsHashTable];
-        [NSNotificationCenter.defaultCenter addObserverForName:NSUserDefaultsDidChangeNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) { CSReload(); }];
+        [NSNotificationCenter.defaultCenter addObserverForName:NSUserDefaultsDidChangeNotification object:nil queue:nil usingBlock:^(__unused NSNotification *note) { CSReload(); }];
         [NSNotificationCenter.defaultCenter addObserverForName:UIApplicationDidReceiveMemoryWarningNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) { [CSImages removeAllObjects]; }];
         CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),NULL,CSSettingsNotification,CFSTR("com.wechat.enhance.bubble_style.settings_changed"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
     });

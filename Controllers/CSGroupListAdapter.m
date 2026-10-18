@@ -59,6 +59,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
 @property (atomic) NSUInteger modelRevision;
 @property (nonatomic) NSUInteger snapshotRevision, refreshGeneration;
 @property (nonatomic) BOOL coalescingNotification, scheduledCoalesced;
+@property (nonatomic) BOOL coalescedDispatchPending;
 @property (atomic) CSGroupChangeKind pendingChanges;
 @property (atomic) BOOL recoveryPending;
 @property (nonatomic) BOOL scheduledInteraction, scheduledRecovery, appearanceDirty;
@@ -585,7 +586,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     BOOL releasedWait=self.scheduledInteraction && !waiting;
     BOOL freshEvent=self.scheduledRecovery && !self.recoveryPending;
     if (self.scheduled && !releasedWait && !freshEvent && (!self.scheduledCoalesced || coalesced)) return;
-    NSTimeInterval delay=coalesced ? 0.04 : 0;
+    NSTimeInterval delay=coalesced ? 0.08 : 0;
     if (waiting) {
         NSTimeInterval now=NSProcessInfo.processInfo.systemUptime;
         if (!self.interactionDeadline) self.interactionDeadline=now+2.0;
@@ -615,7 +616,14 @@ static id ObjectArgument(id target, NSString *name, id value) {
     else dispatch_async(dispatch_get_main_queue(),publish);
 }
 - (void)requestCoalescedRefresh {
-    if (!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(), ^{ [self requestCoalescedRefresh]; }); return; }
+    if (!NSThread.isMainThread) {
+        @synchronized (self) { if (self.coalescedDispatchPending) return; self.coalescedDispatchPending=YES; }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            @synchronized (self) { self.coalescedDispatchPending=NO; }
+            [self requestCoalescedRefresh];
+        });
+        return;
+    }
     self.dirty=YES;
     self.coalescingNotification=YES;
     @try { [self scheduleRefresh]; } @finally { self.coalescingNotification=NO; }
@@ -624,7 +632,14 @@ static id ObjectArgument(id target, NSString *name, id value) {
 - (void)beginNativeChange { [self beginNativeChangeOfKind:CSGroupChangeStructure|CSGroupChangeContent]; }
 - (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind {
     [self invalidateNativeSnapshot];
-    @synchronized (self) { self.recoveryPending=NO; self.pendingChanges|=kind; if (!self.changeDepth && NSThread.isMainThread && !self.presentationSuspended) [self saveAnchor]; self.changeDepth++; }
+    BOOL captureAnchor=NO;
+    @synchronized (self) {
+        self.recoveryPending=NO; self.pendingChanges|=kind;
+        captureAnchor=!self.changeDepth && NSThread.isMainThread && !self.presentationSuspended && !(self.dirty && self.scheduledCoalesced);
+        self.changeDepth++;
+    }
+    // Native/UI reads must not hold the lock used by background notifications.
+    if (captureAnchor) [self saveAnchor];
 }
 - (void)endNativeChange { [self endNativeChangeCoalesced:NO]; }
 - (void)endNativeChangeCoalesced:(BOOL)coalesced {

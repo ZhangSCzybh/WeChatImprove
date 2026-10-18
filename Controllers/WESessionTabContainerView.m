@@ -477,8 +477,14 @@ static UIImage *CSGroupSearchIcon(void) {
     self.interactiveTransition=YES; self.interactiveTarget=index;
     CGFloat t=MAX(0,MIN(1,progress)); self.interactiveProgress=t;
     CGRect from=[self indicatorFrameForIndex:self.selectedIndex], to=[self indicatorFrameForIndex:index];
-    CGFloat center=CGRectGetMidX(from)+(CGRectGetMidX(to)-CGRectGetMidX(from))*t;
-    CGFloat width=(from.size.width+(to.size.width-from.size.width)*t)*(1-0.70*sin(M_PI*t));
+    // Arrive beneath the target as contraction finishes, then expand in place.
+    // Separate width phases keep the minimum there even for unequal titles.
+    CGFloat travel=MIN(1,t*2);
+    CGFloat center=CGRectGetMidX(from)+(CGRectGetMidX(to)-CGRectGetMidX(from))*travel;
+    CGFloat minimumWidth=MIN(from.size.width,to.size.width)*0.30;
+    CGFloat endpointWidth=t<0.5 ? from.size.width : to.size.width;
+    CGFloat contraction=(t==0 || t==1) ? 0 : sin(M_PI*t);
+    CGFloat width=endpointWidth+(minimumWidth-endpointWidth)*contraction;
     CGRect frame=CGRectMake(center-width/2,to.origin.y,width,to.size.height);
     self.indicatorView.hidden=NO;
     [self moveIndicatorToFrame:frame animated:NO];

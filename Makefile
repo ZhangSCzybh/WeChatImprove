@@ -44,5 +44,5 @@ clean::
 	@rm -rf .theos packages
 
 after-package::
-	@echo -e "\033[32m==>\033[0m 编译完成！生成deb包：$$(ls -t packages/*.deb | head -1)"
-	@echo -e "\033[32m==>\033[0m 请运行 ./install.sh 将插件安装到设备"
+	@echo -e "\033[32m==>\033[0m 编译完成！安装包目录：$(THEOS_PACKAGE_DIR)"
+	@echo -e "\033[32m==>\033[0m 请使用设备当前注入环境对应的包管理器安装"

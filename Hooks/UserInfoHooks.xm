@@ -4,6 +4,9 @@
 #import "../Headers/WCHeaders.h"      // 微信相关的所有类和框架
 #import "../Headers/CSUserInfoHelper.h" // 用户信息助手和全局常量
 #import <UIKit/UIKit.h>
+#import "../Controllers/CSAvatarURLCache.h"
+static CSAvatarURLCache *userAvatarCache;
+@interface MMContextManager : NSObject @end
 
 #pragma mark - 全局常量定义
 
@@ -36,22 +39,10 @@ NSString * const kChatAvatarURLKey = @"com.wechat.tweak.chat.avatar.url";  // �
 }
 
 + (NSString *)getUserAvatarURL {
-    // 先从UserDefaults获取，避免重复获取
-    NSString *cachedURL = [[NSUserDefaults standardUserDefaults] objectForKey:kUserAvatarURLKey];
-    if (cachedURL.length > 0) {
-        return cachedURL;
-    }
-    
-    // 如果没有缓存，则获取并保存
+    // Resolve the current account instead of returning a previous account's cache.
     CContact *selfContact = [[%c(CContactMgr) alloc] getSelfContact];
     NSString *avatarURL = selfContact.m_nsHeadImgUrl;
-    
-    // 保存到UserDefaults
-    if (avatarURL.length > 0) {
-        [[NSUserDefaults standardUserDefaults] setObject:avatarURL forKey:kUserAvatarURLKey];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    
+
     return avatarURL;
 }
 
@@ -70,24 +61,11 @@ NSString * const kChatAvatarURLKey = @"com.wechat.tweak.chat.avatar.url";  // �
 %hook CContactMgr
 
 - (CContact *)getSelfContact {
+    NSUInteger generation = [userAvatarCache generation];
     CContact *contact = %orig;
-    
-    // 如果获取到了头像URL，缓存到UserDefaults
-    if (contact && contact.m_nsHeadImgUrl.length > 0) {
-        [[NSUserDefaults standardUserDefaults] setObject:contact.m_nsHeadImgUrl forKey:kUserAvatarURLKey];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    
+    [userAvatarCache captureURL:contact.m_nsHeadImgUrl account:contact.m_nsUsrName generation:generation];
+
     return contact;
-}
-
-%end
-
-// 额外的Hook，确保在不同场景下都能获取WXID
-%hook MMContext
-
-+ (id)currentUserName {
-    return %orig;
 }
 
 %end
@@ -118,15 +96,28 @@ NSString * const kChatAvatarURLKey = @"com.wechat.tweak.chat.avatar.url";  // �
     if (contact) {
         // 缓存聊天对象头像URL
         if (contact.m_nsHeadImgUrl.length > 0) {
-            [[NSUserDefaults standardUserDefaults] setObject:contact.m_nsHeadImgUrl forKey:kChatAvatarURLKey];
-            [[NSUserDefaults standardUserDefaults] synchronize];
+            NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
+            if (![[defaults stringForKey:kChatAvatarURLKey] isEqual:contact.m_nsHeadImgUrl])
+                [defaults setObject:contact.m_nsHeadImgUrl forKey:kChatAvatarURLKey];
         }
     }
 }
 
 %end
 
+%hook MMContextManager
+- (void)logout:(id)context {
+    [userAvatarCache accountBoundaryAcceptingContacts:NO];
+    %orig;
+}
+- (void)loginByContext:(id)context {
+    // Accept new-account contacts during native service initialization.
+    [userAvatarCache accountBoundaryAcceptingContacts:YES];
+    %orig;
+}
+%end
+
 // 主入口函数
 %ctor {
-    // 初始化，不输出日志
-} 
+    userAvatarCache = [[CSAvatarURLCache alloc] initWithDefaults:NSUserDefaults.standardUserDefaults key:kUserAvatarURLKey];
+}

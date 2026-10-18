@@ -45,7 +45,7 @@ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table
 @interface CSGroupListAdapter : NSObject
 CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic) NSUInteger modelRevision,snapshotRevision,refreshGeneration;
-@property(nonatomic) BOOL coalescingNotification,scheduledCoalesced;
+@property(nonatomic) BOOL coalescingNotification,scheduledCoalesced,coalescedDispatchPending;
 @property(nonatomic,copy) NSString *snapshotAccount;
 @property(nonatomic,strong) NSArray *cachedNativeSections;
 @property(nonatomic,copy) NSString *nativeActionsAccount;
@@ -158,6 +158,13 @@ int main(void) { @autoreleasepool {
     // A cancelled push gives appearance callbacks back to the list.
     [host viewWillAppear:YES]; [host viewDidAppear:YES]; RunFor(.02);
     Check(!a.presentationSuspended && !a.dirty,@"cancelled departure resumes on appearance callbacks");
+
+    // A visible sync burst retains the first viewport anchor, then publishes
+    // one final snapshot. Native model mutation still runs for every event.
+    a=List(&host); before=a.refreshCount; a.anchorOrTitleCount=0;
+    for (NSUInteger i=0;i<200;i++) { [a beginNativeChange]; [a endNativeChangeCoalesced:YES]; }
+    Check(a.anchorOrTitleCount==1,@"one viewport anchor is captured for 200 pending notifications");
+    RunFor(.12); Check(a.refreshCount==before+1,@"200 visible notifications publish once");
 
     // Separate run-loop turns reproduce normal event delivery, not just one burst.
     a=List(&host); [host viewWillDisappear:NO]; RunFor(.02); before=a.refreshCount;
@@ -277,12 +284,12 @@ int main(void) { @autoreleasepool {
     a=List(&host); before=a.refreshCount;
     for (NSUInteger i=0;i<10;i++) { [a requestCoalescedRefresh]; RunFor(.001); }
     Check(a.refreshCount==before && a.scheduled,@"passive notification burst waits for bounded merge window");
-    RunFor(.06);
+    RunFor(.12);
     Check(a.refreshCount==before+1 && !a.scheduled,@"burst produces one publication at first-event deadline");
     before=a.refreshCount; [a requestCoalescedRefresh]; [a requestRefresh]; RunFor(.02);
     Check(a.refreshCount==before+1,@"direct request promotes a queued passive refresh immediately");
-    RunFor(.06); Check(a.refreshCount==before+1,@"superseded notification timer cannot publish twice");
-    before=a.refreshCount; [a requestCoalescedRefresh]; [a refresh]; RunFor(.06);
+    RunFor(.12); Check(a.refreshCount==before+1,@"superseded notification timer cannot publish twice");
+    before=a.refreshCount; [a requestCoalescedRefresh]; [a refresh]; RunFor(.12);
     Check(a.refreshCount==before+1,@"synchronous user publication consumes pending notification work");
     a=List(&host); before=a.refreshCount;
     [a requestRefresh];
@@ -310,10 +317,10 @@ int main(void) { @autoreleasepool {
     [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:UIApplicationDidBecomeActiveNotification object:nil]]; RunFor(.03);
     Check(a.refreshCount==before && a.presentationSuspended,@"app foreground does not unhide a covered chat list");
     a=List(&host);
-    [a beginNativeChangeOfKind:CSGroupChangeUnread]; [a endNativeChangeCoalesced:YES]; RunFor(.06);
+    [a beginNativeChangeOfKind:CSGroupChangeUnread]; [a endNativeChangeCoalesced:YES]; RunFor(.12);
     Check(a.lastPublishedChanges==CSGroupChangeUnread && !a.pendingChanges,@"unread notification kind is consumed exactly once");
     [a beginNativeChangeOfKind:CSGroupChangeUnread]; [a beginNativeChangeOfKind:CSGroupChangeContent];
-    [a endNativeChange]; [a endNativeChangeCoalesced:YES]; RunFor(.06);
+    [a endNativeChange]; [a endNativeChangeCoalesced:YES]; RunFor(.12);
     Check(a.lastPublishedChanges==(CSGroupChangeUnread|CSGroupChangeContent),@"nested content change cannot be downgraded to unread-only");
     a.table.tracking=YES; [a requestRefresh]; NSUInteger revision=a.modelRevision; RunFor(.2);
     Check(a.modelRevision==revision && a.dirty,@"interaction retries do not invalidate a valid snapshot repeatedly");

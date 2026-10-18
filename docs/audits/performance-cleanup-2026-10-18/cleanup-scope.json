@@ -1,0 +1,99 @@
+{
+  "baseline_directory": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-cleanup-before-20261018-vis3oy8p",
+  "removed_NSLog_sites": 64,
+  "removed_passthrough_hooks": 7,
+  "removed_empty_observers": 1,
+  "changed_files": {
+    "Controllers/CSChatRoomSelectViewController.m": {
+      "before_sha256": "2b295c56a5a18465eddb2d0da2a75d42de68b8161b2aa1ecaa705c56ec3409f4",
+      "after_sha256": "03055f9e695f9375e0a2190db3e1ef2cfd6ba303b199cecd208a281fb8b832f4",
+      "removed_NSLog_sites": 3
+    },
+    "Controllers/CSContactSeparatorSettingsViewController.m": {
+      "before_sha256": "e8132980c17921485fee2c3a10dfb87e8165eb85b7bfd3228d57fd28e55fa618",
+      "after_sha256": "f4c93a35bb1e71d26caf1f3f1a6b6616cd7d52ffd913a030b107f2e62b3374a4",
+      "removed_NSLog_sites": 0
+    },
+    "Controllers/CSMessageActionCoordinator.m": {
+      "before_sha256": "0283973721456c12f7eeb8fb6b5249dd97bf4c6366773446e5f633cdddd872ba",
+      "after_sha256": "07978c1eef21896ebcc98b3023eeb29089efd90c8740d332bfc56425a12d8aed",
+      "removed_NSLog_sites": 0
+    },
+    "Controllers/CSReceiveRedEnvelopOperation.m": {
+      "before_sha256": "bb559e6c304215c9d51c5297f0d7dc4e82e8f9fd48df884e70951e389d9286f9",
+      "after_sha256": "e3782de974d8c23bfe2ff1c67921f80b82b16d6c32c2baa96efa0c24ae91c2cd",
+      "removed_NSLog_sites": 3
+    },
+    "Controllers/CSRedEnvelopConfig.m": {
+      "before_sha256": "ac10965ef8b980aa80a533fb35f36fc98b2996950f1ddd5d587ef41600e59a24",
+      "after_sha256": "610acef948632da024d68a1da58216c7307c8635ada12c59163ddce48ea9f619",
+      "removed_NSLog_sites": 2
+    },
+    "Controllers/CSReleaseNotesViewController.m": {
+      "before_sha256": "aa25bd27b28f24616358c501f183c177a1bed84ab505f30a11e4a151a4dfaa94",
+      "after_sha256": "bb408d0d38a31dab0f4b7732f468c4c0617064489ad15665e05c4e0919aece6f",
+      "removed_NSLog_sites": 0
+    },
+    "Headers/CSUserInfoHelper.h": {
+      "before_sha256": "45a8cc67b636ce2721135d67ca263f31bcc0896c3456010cfc52ce7d4f919136",
+      "after_sha256": "1eff7871c5398e46f27ae46e49e6986b966cdf4eb62ed8ea60e2c37ad77e5506",
+      "removed_NSLog_sites": 0
+    },
+    "Hooks/BackgroundRun.xm": {
+      "before_sha256": "9904c14158d0f0054568b0005a4a8f7e0fc55453542c92141a15a6b8da9e9c29",
+      "after_sha256": "be69adcccf6f81159dc4c3d1c1b53cf4fb728b07d958e74d09074f576bfaf389",
+      "removed_NSLog_sites": 0
+    },
+    "Hooks/CSAvatarShape.xm": {
+      "before_sha256": "4b9b7178b76014e1e4c2122dd925dcc6dc310d0f0234e8b4f27ea71dd62ab10d",
+      "after_sha256": "fd92dfb34595054fe40fcb1a13118c4cb6785130bfc644260f60927ec5611f5f",
+      "removed_NSLog_sites": 1
+    },
+    "Hooks/CustomEntryHooks.xm": {
+      "before_sha256": "483c04416638a29ed6fd5ae9114800f1b0986036d094c9873630bdeae3aa3001",
+      "after_sha256": "ad5d686c43b7468756d7a6f6d21c41033533fec3160ac6c980f515ee286638eb",
+      "removed_NSLog_sites": 10
+    },
+    "Hooks/HideDiscoverHooks.xm": {
+      "before_sha256": "01a8e7762f025058418e70528ddfbdd990080111af187879a455a7cd3b543f79",
+      "after_sha256": "9440d8740624524caa05f81e5101fa773ac45a5f3c8aaa9f741edae5eee03589",
+      "removed_NSLog_sites": 13
+    },
+    "Hooks/HideSettingHooks.xm": {
+      "before_sha256": "f24efc92d485f3255129da3a82f52b5c48d8e0178b8c231fef3b69c52e120ddc",
+      "after_sha256": "af0dc498b769c4953cd5d21c617c1cf393d3b4e5eb26f2b79b8e765bf60e3a7d",
+      "removed_NSLog_sites": 19
+    },
+    "Hooks/ReceiveTransferHooks.xm": {
+      "before_sha256": "2328357c0a47353dd72914435bf24e337622026f67259c5ce0b0155d307c7226",
+      "after_sha256": "70b0f5a6e0c586b71f6a0d788fceb85ea1f78ff9233f8361ab6d251c1d9e9603",
+      "removed_NSLog_sites": 0
+    },
+    "Hooks/RedEnvelopHooks.xm": {
+      "before_sha256": "aab7dd9545e1208d50b3a560536cb66f4d690d5c958df2827070b2019821e179",
+      "after_sha256": "50d8a16ececcd948bcb0b8c0d0eae1eda746cab126d04fdb0ebfda07804e913b",
+      "removed_NSLog_sites": 13
+    },
+    "Hooks/UserInfoHooks.xm": {
+      "before_sha256": "8f61a57e7cffc0b0a76ef799c01e967529be7974a01f40c54be5711cb3700515",
+      "after_sha256": "933e9b5d9bc45f725429b21e861fad98f6d8021327e772461bc781ff66ae3b55",
+      "removed_NSLog_sites": 0
+    },
+    "Hooks/VoiceForwardHooks.xm": {
+      "before_sha256": "0e20f679e7890e7043e85ed4b556a0340f4ac04947e0d5d94723d7c7b2092d4e",
+      "after_sha256": "89a335d1a0a738b0bc73ff109fcdcc89b1eea8313216dbf0979fc6e9b653471d",
+      "removed_NSLog_sites": 0
+    },
+    "README.md": {
+      "before_sha256": "103f47f8e48acbf206db4e53bfdd26b1aa758c414de12422ab048d2d88fb6a85",
+      "after_sha256": "b161a59d3b5b6644e8f6b870876ec2f3f8c380ebf0d78538fc88591f7194f7e2",
+      "removed_NSLog_sites": 0
+    },
+    "control": {
+      "before_sha256": "aa99d5de6385034dbc9627bdd859468922f9c2760849cff212aaec5b3eac90ef",
+      "after_sha256": "a35ed0366846f60e7bedc2865ac214299ff9722826a854582fab08cba78b8fa6",
+      "removed_NSLog_sites": 0
+    }
+  },
+  "tests_unchanged": true
+}
