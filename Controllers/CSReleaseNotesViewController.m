@@ -5,8 +5,8 @@
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
         @"1.8-20": @[
-            @{@"title": @"胶囊直接使用指示器颜色",
-              @"detail": @"胶囊背景直接使用当前深浅色模式下设置的指示器颜色，保留颜色本身的透明度，移除额外的浅色处理。标题继续使用选中文本颜色。"}
+            @{@"title": @"参考国民级APP更新",
+              @"detail": @"解决了一些已知问题。"}
         ],
         @"1.8-19": @[
             @{@"title": @"聊天分组新增胶囊包裹",
