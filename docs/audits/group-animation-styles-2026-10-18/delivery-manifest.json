@@ -1,0 +1,43 @@
+{
+  "version": "1.8-13",
+  "workspace": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "base_head": "bcb5ff0fd2d8c918291b142f82aa03a07e6b4dc7",
+  "artifacts": {
+    "packages/com.wechat.improve_1.8-13_iphoneos-arm64.deb": {
+      "sha256": "8093a3df5fa6e2a76f0334fcf1e221d8ee3bcb6d85de10c591112159f000c3de",
+      "bytes": 785846
+    },
+    "packages/WeChatImprove-1.8-13-dSYMs.zip": {
+      "sha256": "d7cffa63442a2b2ebd54ff38492c988c930babf624612ffc88045fba6af9d5c1",
+      "bytes": 3377180
+    }
+  },
+  "changed_source_hashes": {
+    "Controllers/CSChatGroupSettingsViewController.m": "0c4ff60d8bdb4e8d5d3f1fb945ad12d8183e2418bd235387a72ffd2e149c11f2",
+    "Controllers/CSGroupAppearance.h": "6fa9a142cade420d3457bb08f77a9dbdf47cc3782bc1d20424dae8adb1bb888e",
+    "Controllers/CSGroupIndicatorMotion.h": "98fdf0616db11e5a12958b4c0cf103b34697be81ccb4f250e6bebb9d3eef46ca",
+    "Controllers/CSReleaseNotesViewController.m": "48b51ac0da18e44052aadfdadec8c6d35628c44304460f0584de23afcf89bb66",
+    "Controllers/WESessionTabContainerView.m": "96eab2b5718c7e0a8097ab070eec1bebc009a1a9e1ebbd2fbce0a83077956ff0",
+    "Headers/CSUserInfoHelper.h": "269007d0521c4937db6c4980d3ff8af3a97e304e2660a2431166a4ccf4f967a5",
+    "README.md": "9d07aa59559dc6e43543fcdb02ae6e5de7f7ad9a04b88b0443ec50d52af74ab0",
+    "Tests/GroupIndicatorSettingsTests.m": "c109fd5322dd458845992dd4bc5ff826274efa42c6f462b7690e5fda953c67c4",
+    "Tests/GroupIndicatorTests.m": "c2f94a1097901589e89aad91c863f236939dd37e37deadb9366412b814323330",
+    "Tests/verify-group-indicator-settings.sh": "e3667406a100e3505342a34bde7f3e514cbb77ae7874fc073481a26661d2905c",
+    "control": "8bd64871cd3d55254f537ba5a1ecd5428017e9029c10637d54e28c274fe1a685"
+  },
+  "tests": {
+    "group_indicator": {
+      "checks": 150,
+      "failures": 0
+    },
+    "group_indicator_settings": {
+      "checks": 62,
+      "failures": 0
+    },
+    "group_interactions": {
+      "checks": 124,
+      "failures": 0
+    }
+  },
+  "device_installed": false
+}

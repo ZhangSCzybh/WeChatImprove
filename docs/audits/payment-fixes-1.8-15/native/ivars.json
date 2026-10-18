@@ -1,0 +1,2786 @@
+{
+  "WCBaseControlMgr": [
+    {
+      "offset_address": "0x120242398",
+      "offset": 8,
+      "name": "m_arrLogicStack",
+      "type": "@\"NSMutableArray\""
+    }
+  ],
+  "WCBizControlLogic": [
+    {
+      "offset_address": "0x1202425f0",
+      "offset": 32,
+      "name": "m_loadView",
+      "type": "@\"WCBizLoadingView\""
+    },
+    {
+      "offset_address": "0x1202425ec",
+      "offset": 40,
+      "name": "m_isLoading",
+      "type": "B"
+    }
+  ],
+  "WCPayControlData": [
+    {
+      "offset_address": "0x12026848c",
+      "offset": 8,
+      "name": "nsCardHodlerName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268490",
+      "offset": 16,
+      "name": "nsCardHodlerCredit",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268494",
+      "offset": 24,
+      "name": "nsCardHodlerIdentifyCard",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268498",
+      "offset": 32,
+      "name": "nsCardNumber",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026849c",
+      "offset": 40,
+      "name": "nsPhoneNumber",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684a0",
+      "offset": 48,
+      "name": "nsResetPhoneNumber",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684a4",
+      "offset": 56,
+      "name": "nsResetCVVCode",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684a8",
+      "offset": 64,
+      "name": "nsCVVCode",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684ac",
+      "offset": 72,
+      "name": "nsResetValidDate",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684b0",
+      "offset": 80,
+      "name": "nsValidDate",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684b4",
+      "offset": 88,
+      "name": "nsPhoneVerifyCode",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684b8",
+      "offset": 96,
+      "name": "nsPayPasswd",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684bc",
+      "offset": 104,
+      "name": "nsRepeatPayPasswd",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684c0",
+      "offset": 112,
+      "name": "nsVerifiedPasswd",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684c4",
+      "offset": 120,
+      "name": "nsSaveBalanceMoney",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684c8",
+      "offset": 128,
+      "name": "nsFetchBalanceMoney",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684cc",
+      "offset": 136,
+      "name": "nsTransferMoney",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684d0",
+      "offset": 144,
+      "name": "nsTransferExtMoney",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684d4",
+      "offset": 152,
+      "name": "nsFetchArriveTime",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684d8",
+      "offset": 160,
+      "name": "m_bAutoFilledCardInfo",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202684dc",
+      "offset": 168,
+      "name": "nsTransferRemark",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684e0",
+      "offset": 176,
+      "name": "nsWCLanguage",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684e4",
+      "offset": 184,
+      "name": "nsFirstName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684e8",
+      "offset": 192,
+      "name": "nsLastName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684ec",
+      "offset": 200,
+      "name": "nsCountry",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684f0",
+      "offset": 208,
+      "name": "nsArea",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684f4",
+      "offset": 216,
+      "name": "nsCity",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684f8",
+      "offset": 224,
+      "name": "nsAddress",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202684fc",
+      "offset": 232,
+      "name": "nsPhoneNumber_Overseas",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268500",
+      "offset": 240,
+      "name": "nsZipCode",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268504",
+      "offset": 248,
+      "name": "nsEmail",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268508",
+      "offset": 256,
+      "name": "nsCreditPayFirstName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026850c",
+      "offset": 264,
+      "name": "nsCreditPayLast4IDNumber",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268510",
+      "offset": 272,
+      "name": "nsCreditPayName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268514",
+      "offset": 280,
+      "name": "nsCreditPayIDNumber",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268518",
+      "offset": 288,
+      "name": "uiFlag",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026851c",
+      "offset": 292,
+      "name": "uiPayScene",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268520",
+      "offset": 296,
+      "name": "uiBindScene",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268524",
+      "offset": 300,
+      "name": "uiJSApiPayScene",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268528",
+      "offset": 304,
+      "name": "nsOrderID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026852c",
+      "offset": 312,
+      "name": "nsUUID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268530",
+      "offset": 320,
+      "name": "nsImportCode",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268534",
+      "offset": 328,
+      "name": "nsProductsID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268538",
+      "offset": 336,
+      "name": "nsBindSerial",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026853c",
+      "offset": 344,
+      "name": "m_nsToken",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268540",
+      "offset": 352,
+      "name": "nsServiceAppID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268544",
+      "offset": 360,
+      "name": "nsServiceAppUserName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268548",
+      "offset": 368,
+      "name": "nsServiceAppName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026854c",
+      "offset": 376,
+      "name": "nsServiceAppLogoUrl",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268550",
+      "offset": 384,
+      "name": "nsServiceDetail",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268554",
+      "offset": 392,
+      "name": "nsServiceSubscribeUrl",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268558",
+      "offset": 400,
+      "name": "nsWapPayUrl",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026855c",
+      "offset": 408,
+      "name": "nsShareToFriendURL",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268560",
+      "offset": 416,
+      "name": "nsPaidSuccessDetail",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268564",
+      "offset": 424,
+      "name": "uiServiceSubscribeStrategy",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x120268568",
+      "offset": 432,
+      "name": "nsAppName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026856c",
+      "offset": 440,
+      "name": "nsAppID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268570",
+      "offset": 448,
+      "name": "nsAppSource",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268574",
+      "offset": 456,
+      "name": "structAppAuthRequest",
+      "type": "@\"WCPayAppAuthRequestStruct\""
+    },
+    {
+      "offset_address": "0x120268578",
+      "offset": 464,
+      "name": "bindUserInfo",
+      "type": "@\"WCPayBindUserInfo\""
+    },
+    {
+      "offset_address": "0x12026857c",
+      "offset": 472,
+      "name": "uiCardBankTag",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268580",
+      "offset": 480,
+      "name": "m_oPaidError",
+      "type": "@\"NSError\""
+    },
+    {
+      "offset_address": "0x120268584",
+      "offset": 488,
+      "name": "m_structAuthenticationPay",
+      "type": "@\"WCPayAuthenticationPay\""
+    },
+    {
+      "offset_address": "0x120268588",
+      "offset": 496,
+      "name": "m_structAuthenticationPayVerifySMS",
+      "type": "@\"WCPayAuthenticationPayVerifySMSStruct\""
+    },
+    {
+      "offset_address": "0x12026858c",
+      "offset": 504,
+      "name": "m_structResetPayPasswordInfo",
+      "type": "@\"WCPayResetPasswordInfo\""
+    },
+    {
+      "offset_address": "0x120268590",
+      "offset": 512,
+      "name": "m_arrTenpayImportBindCard",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x120268594",
+      "offset": 520,
+      "name": "m_structSelectedTenpayBindCardInfo",
+      "type": "@\"TenpayBindCardInfo\""
+    },
+    {
+      "offset_address": "0x120268598",
+      "offset": 528,
+      "name": "m_structSelectedTenpayBindCardSubscribeAppInfo",
+      "type": "@\"TenpayBindCardSubscribeAppInfo\""
+    },
+    {
+      "offset_address": "0x12026859c",
+      "offset": 536,
+      "name": "m_structBindInfo",
+      "type": "@\"WCPayBindInfo\""
+    },
+    {
+      "offset_address": "0x1202685a0",
+      "offset": 544,
+      "name": "m_arrBindedCard",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1202685a4",
+      "offset": 552,
+      "name": "m_arrHistoryCard",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1202685a8",
+      "offset": 560,
+      "name": "m_arrVirtualNoBindCard",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1202685ac",
+      "offset": 568,
+      "name": "m_arrWXBorrowMoneyItemList",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1202685b0",
+      "offset": 576,
+      "name": "m_structSelectedCardInfo",
+      "type": "@\"WCPayBindCardInfo\""
+    },
+    {
+      "offset_address": "0x1202685b4",
+      "offset": 584,
+      "name": "m_structSelectedResetBalanceTelCardInfo",
+      "type": "@\"WCPayBindCardInfo\""
+    },
+    {
+      "offset_address": "0x1202685b8",
+      "offset": 592,
+      "name": "m_structUserInfo",
+      "type": "@\"WCPayUserInfo\""
+    },
+    {
+      "offset_address": "0x1202685bc",
+      "offset": 600,
+      "name": "m_structSwitchInfo",
+      "type": "@\"WCPaySwitchInfo\""
+    },
+    {
+      "offset_address": "0x1202685c0",
+      "offset": 608,
+      "name": "m_structBalanceInfo",
+      "type": "@\"WCPayBalanceInfo\""
+    },
+    {
+      "offset_address": "0x1202685c4",
+      "offset": 616,
+      "name": "m_structNoticeInfo",
+      "type": "@\"WCPayNoticeInfo\""
+    },
+    {
+      "offset_address": "0x1202685c8",
+      "offset": 624,
+      "name": "m_structSelectedCardType",
+      "type": "@\"WCPayCardBinInfo\""
+    },
+    {
+      "offset_address": "0x1202685cc",
+      "offset": 632,
+      "name": "m_arrAvailableBank",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1202685d0",
+      "offset": 640,
+      "name": "m_structIAPOrderDetail",
+      "type": "@\"WCPayIAPOrderDetail\""
+    },
+    {
+      "offset_address": "0x1202685d4",
+      "offset": 648,
+      "name": "m_structOrderDetail",
+      "type": "@\"WCPayMultiOrderDetail\""
+    },
+    {
+      "offset_address": "0x1202685d8",
+      "offset": 656,
+      "name": "m_arrStatusChangeOrderArray",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1202685dc",
+      "offset": 664,
+      "name": "m_arrOrderArray",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1202685e0",
+      "offset": 672,
+      "name": "m_arrNotifyMsgArray",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1202685e4",
+      "offset": 680,
+      "name": "m_structAuthenticationPayStatus",
+      "type": "@\"WCPayAuthenticationPayStatusStruct\""
+    },
+    {
+      "offset_address": "0x1202685e8",
+      "offset": 688,
+      "name": "m_structVirtualCardInfo",
+      "type": "@\"WCPayVirtualNoBindCard\""
+    },
+    {
+      "offset_address": "0x1202685ec",
+      "offset": 696,
+      "name": "startPayDate",
+      "type": "@\"NSDate\""
+    },
+    {
+      "offset_address": "0x1202685f0",
+      "offset": 704,
+      "name": "startVerifySMSDate",
+      "type": "@\"NSDate\""
+    },
+    {
+      "offset_address": "0x1202685f4",
+      "offset": 712,
+      "name": "bNeedGetSMSAgain",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202685f8",
+      "offset": 720,
+      "name": "nsOfflinePayQRCode",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202685fc",
+      "offset": 728,
+      "name": "nsOfflinepayBarCode",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268600",
+      "offset": 736,
+      "name": "m_bNeedOfflinePayLoading",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268604",
+      "offset": 744,
+      "name": "uiOfflinePayLimit",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x120268608",
+      "offset": 752,
+      "name": "offlinePayAmount",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x12026860c",
+      "offset": 760,
+      "name": "offlinePayNumber",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x120268610",
+      "offset": 768,
+      "name": "uiOfflinePayChangedLimit",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x120268614",
+      "offset": 776,
+      "name": "m_structWCPayOfflinePayChangeLimitFeeRequestStruct",
+      "type": "@\"WCPayOfflinePayChangeLimitFeeRequestStruct\""
+    },
+    {
+      "offset_address": "0x120268618",
+      "offset": 784,
+      "name": "nsOfflinePayConfirmViewTips",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026861c",
+      "offset": 792,
+      "name": "uiInitalMoney",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268620",
+      "offset": 796,
+      "name": "m_enWCPayOfflinePayCodeDisplayScene",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x120268624",
+      "offset": 800,
+      "name": "m_bBankUser",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268628",
+      "offset": 808,
+      "name": "m_nsSessionKey",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026862c",
+      "offset": 816,
+      "name": "m_bNeedBind",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268630",
+      "offset": 824,
+      "name": "m_nsIDNumberMask",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268634",
+      "offset": 832,
+      "name": "m_nsNameMask",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268638",
+      "offset": 840,
+      "name": "m_arrIncreaseLimitQuestionArray",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x12026863c",
+      "offset": 848,
+      "name": "m_sturctWCPayCreditCardInfo",
+      "type": "@\"WCPayCreditCardInfo\""
+    },
+    {
+      "offset_address": "0x120268640",
+      "offset": 856,
+      "name": "m_uiQueryQuestionCnt",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268644",
+      "offset": 864,
+      "name": "m_oSelectedContact",
+      "type": "@\"CContact\""
+    },
+    {
+      "offset_address": "0x120268648",
+      "offset": 872,
+      "name": "m_nsSelectedUserNameFromQRCode",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026864c",
+      "offset": 880,
+      "name": "m_nsSelectedTruthNameFromQRCode",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268650",
+      "offset": 888,
+      "name": "m_nsControlTransationID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268654",
+      "offset": 896,
+      "name": "m_nsTransferID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268658",
+      "offset": 904,
+      "name": "m_nsCurrentUserName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026865c",
+      "offset": 912,
+      "name": "m_nsTranferMoneyString",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268660",
+      "offset": 920,
+      "name": "m_uiTransferInvalidTime",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x120268664",
+      "offset": 928,
+      "name": "m_uiEffectiveDate",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268668",
+      "offset": 936,
+      "name": "m_oWCPayTransferPrepayRequestStruct",
+      "type": "@\"WCPayTransferPrepayRequestStruct\""
+    },
+    {
+      "offset_address": "0x12026866c",
+      "offset": 944,
+      "name": "m_arrFacingReceiveMoneyPayer",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x120268670",
+      "offset": 952,
+      "name": "m_uiStepInFacingReceiveViewTimestamp",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268674",
+      "offset": 960,
+      "name": "m_nsFixedAmountReceiveMoneyDesc",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268678",
+      "offset": 968,
+      "name": "m_llFixedAmountReceiveMoneyTotalMoney",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x12026867c",
+      "offset": 976,
+      "name": "m_enWCPayFacingReceiveMoneyScene",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x120268680",
+      "offset": 984,
+      "name": "m_nsFacingPaidID",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268684",
+      "offset": 992,
+      "name": "m_nsInterruptDesc",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268688",
+      "offset": 1000,
+      "name": "m_uiHasUnarriveMoney",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026868c",
+      "offset": 1004,
+      "name": "m_uiChargeFee",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268690",
+      "offset": 1008,
+      "name": "m_uiAccFee",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268694",
+      "offset": 1012,
+      "name": "m_uiFeeLimit",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268698",
+      "offset": 1016,
+      "name": "m_uiRemainFee",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026869c",
+      "offset": 1020,
+      "name": "m_uiExceedFee",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202686a0",
+      "offset": 1024,
+      "name": "m_nsChargeRate",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202686a4",
+      "offset": 1032,
+      "name": "m_nsTransferInterruptChargeDesc",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202686a8",
+      "offset": 1040,
+      "name": "m_uiUsedFee",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202686ac",
+      "offset": 1044,
+      "name": "m_isShowCharge",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202686b0",
+      "offset": 1048,
+      "name": "m_nsChargeDesc",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202686b4",
+      "offset": 1056,
+      "name": "m_nsChargeShortDesc",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202686b8",
+      "offset": 1064,
+      "name": "m_uiShortRemainFee",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202686bc",
+      "offset": 1068,
+      "name": "m_isSender",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202686c0",
+      "offset": 1069,
+      "name": "m_isOpenIM",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202686c4",
+      "offset": 1072,
+      "name": "m_subChannelId",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1202686c8",
+      "offset": 1080,
+      "name": "m_c2c_sender_title",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202686cc",
+      "offset": 1088,
+      "name": "m_c2c_receiver_title",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202686d0",
+      "offset": 1096,
+      "name": "m_c2c_des",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202686d4",
+      "offset": 1104,
+      "name": "m_c2c_sender_des",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202686d8",
+      "offset": 1112,
+      "name": "m_c2c_receiver_des",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202686dc",
+      "offset": 1120,
+      "name": "m_c2c_url",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202686e0",
+      "offset": 1128,
+      "name": "m_c2c_templateId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202686e4",
+      "offset": 1136,
+      "name": "m_c2c_sceneId",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202686e8",
+      "offset": 1144,
+      "name": "m_loanEntryInfo",
+      "type": "@\"WCPayLoanEntryInfo\""
+    },
+    {
+      "offset_address": "0x1202686ec",
+      "offset": 1152,
+      "name": "m_loanJsApiToken",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202686f0",
+      "offset": 1160,
+      "name": "m_uiPayChannel",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202686f4",
+      "offset": 1168,
+      "name": "m_uiPayEntry",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x1202686f8",
+      "offset": 1176,
+      "name": "m_uiRealnameActionFlag",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202686fc",
+      "offset": 1184,
+      "name": "m_nsRealnameToken",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268700",
+      "offset": 1192,
+      "name": "m_walletInfo",
+      "type": "@\"WCPayWalletInfo\""
+    },
+    {
+      "offset_address": "0x120268704",
+      "offset": 1200,
+      "name": "m_arrAvailableWalletInfo",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x120268708",
+      "offset": 1208,
+      "name": "m_dicBanners",
+      "type": "@\"NSDictionary\""
+    },
+    {
+      "offset_address": "0x12026870c",
+      "offset": 1216,
+      "name": "m_nsTransferReceiverTrueName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268710",
+      "offset": 1224,
+      "name": "isAutoDeduct",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268714",
+      "offset": 1232,
+      "name": "realnameInfo",
+      "type": "@\"WCPayRealnameGuideInfo\""
+    },
+    {
+      "offset_address": "0x120268718",
+      "offset": 1240,
+      "name": "realnameScene",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x12026871c",
+      "offset": 1248,
+      "name": "bNeedInputNewTelToResetBalanceTel",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268720",
+      "offset": 1249,
+      "name": "_bIsSmsVerifyAddCard",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268724",
+      "offset": 1250,
+      "name": "_fromPinnedShortcut",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268728",
+      "offset": 1251,
+      "name": "_m_bTouchIDAuthOrder",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026872c",
+      "offset": 1252,
+      "name": "_m_realnameIsMinorBindcard",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268730",
+      "offset": 1253,
+      "name": "_m_blockUseCaseStopWhenAddCardSuccess",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268734",
+      "offset": 1254,
+      "name": "_openChangeRealName",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268738",
+      "offset": 1255,
+      "name": "_bIsBindNewCardToPay",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026873c",
+      "offset": 1256,
+      "name": "_m_isShowArrow",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268740",
+      "offset": 1257,
+      "name": "_bIsFreePayment",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268744",
+      "offset": 1258,
+      "name": "_bIsResetPwdFromPayManage",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268748",
+      "offset": 1259,
+      "name": "_bIsChargedLQTInBalance",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026874c",
+      "offset": 1260,
+      "name": "_fromTransCollection",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120268750",
+      "offset": 1264,
+      "name": "m_pay_msg_type",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268754",
+      "offset": 1268,
+      "name": "_m_enWCPayFacingReceiveMoneyRegion",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x120268758",
+      "offset": 1272,
+      "name": "_m_uiWeAppEnterScene",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026875c",
+      "offset": 1276,
+      "name": "_m_uiFetchChargeFee",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268760",
+      "offset": 1280,
+      "name": "_scanScene",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268764",
+      "offset": 1284,
+      "name": "_f2fAmount",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268768",
+      "offset": 1288,
+      "name": "_m_walletType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026876c",
+      "offset": 1292,
+      "name": "_m_currency",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x120268770",
+      "offset": 1296,
+      "name": "_transferReSendMsgFromScene",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268774",
+      "offset": 1300,
+      "name": "_tpaCountry",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268778",
+      "offset": 1304,
+      "name": "_funclistType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026877c",
+      "offset": 1308,
+      "name": "_qrcode_level",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x120268780",
+      "offset": 1312,
+      "name": "_fixed_qrcode_level",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x120268784",
+      "offset": 1316,
+      "name": "_pwdEncryptMode",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268788",
+      "offset": 1320,
+      "name": "_sessionChatType",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x12026878c",
+      "offset": 1324,
+      "name": "_sessionSendType",
+      "type": "i"
+    },
+    {
+      "offset_address": "0x120268790",
+      "offset": 1328,
+      "name": "_recvChannelType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268794",
+      "offset": 1332,
+      "name": "_palmSideLimit",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x120268798",
+      "offset": 1336,
+      "name": "_needUploadPalmCgi",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026879c",
+      "offset": 1340,
+      "name": "_needPalmInfo",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202687a0",
+      "offset": 1344,
+      "name": "_palmCaptureMode",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202687a4",
+      "offset": 1348,
+      "name": "_guidePopUpMode",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202687a8",
+      "offset": 1352,
+      "name": "m_placeHolderMoney",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x1202687ac",
+      "offset": 1360,
+      "name": "m_nsTransferMoneySuccessMsgContent",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202687b0",
+      "offset": 1368,
+      "name": "m_structSelectedResetBalanceTelCardType",
+      "type": "@\"WCPayCardBinInfo\""
+    },
+    {
+      "offset_address": "0x1202687b4",
+      "offset": 1376,
+      "name": "m_arrBalanceNotice",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1202687b8",
+      "offset": 1384,
+      "name": "m_arrFetchNotice",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1202687bc",
+      "offset": 1392,
+      "name": "m_payMenuArrayInfo",
+      "type": "@\"WCPayPayMenuArrayInfo\""
+    },
+    {
+      "offset_address": "0x1202687c0",
+      "offset": 1400,
+      "name": "_nsCardHolderCreValidTime",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202687c4",
+      "offset": 1408,
+      "name": "_nsCardHolderCreEffectTime",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202687c8",
+      "offset": 1416,
+      "name": "_nsCardHolderRenewalTime",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202687cc",
+      "offset": 1424,
+      "name": "_nsCardHolderBirthDay",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202687d0",
+      "offset": 1432,
+      "name": "_gender",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202687d4",
+      "offset": 1440,
+      "name": "_nsAdministrationAddress",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202687d8",
+      "offset": 1448,
+      "name": "_m_structLqtInfo",
+      "type": "@\"WCPayLQTInfo\""
+    },
+    {
+      "offset_address": "0x1202687dc",
+      "offset": 1456,
+      "name": "_m_billEntryInfo",
+      "type": "@\"WCPayBillEntryInfo\""
+    },
+    {
+      "offset_address": "0x1202687e0",
+      "offset": 1464,
+      "name": "_m_structFetchInfo",
+      "type": "@\"WCPayFetchInfo\""
+    },
+    {
+      "offset_address": "0x1202687e4",
+      "offset": 1472,
+      "name": "_offlinePayCardIcons",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x1202687e8",
+      "offset": 1480,
+      "name": "_m_nsTransferAttach",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202687ec",
+      "offset": 1488,
+      "name": "_fixedAmountCollectionData",
+      "type": "@\"WCPayQRCodeCollectionFixedAmountData\""
+    },
+    {
+      "offset_address": "0x1202687f0",
+      "offset": 1496,
+      "name": "_m_nsFacingReceivePayerDesc",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202687f4",
+      "offset": 1504,
+      "name": "_m_nsWeAppCookie",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202687f8",
+      "offset": 1512,
+      "name": "_m_mktBizInfo",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202687fc",
+      "offset": 1520,
+      "name": "_expiredTimeToPopOfflinePayForCard",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x120268800",
+      "offset": 1528,
+      "name": "_offlinePayReturnBlock",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x120268804",
+      "offset": 1536,
+      "name": "_shareCardStatDic",
+      "type": "@\"NSDictionary\""
+    },
+    {
+      "offset_address": "0x120268808",
+      "offset": 1544,
+      "name": "_m_nsFetchChargeWording",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026880c",
+      "offset": 1552,
+      "name": "_realnameGuideType",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x120268810",
+      "offset": 1560,
+      "name": "_fetchCasher",
+      "type": "@\"WCPayFetchCashierWithField\""
+    },
+    {
+      "offset_address": "0x120268814",
+      "offset": 1568,
+      "name": "_placeorderSucSign",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268818",
+      "offset": 1576,
+      "name": "_paySucExtend",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026881c",
+      "offset": 1584,
+      "name": "_f2fId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268820",
+      "offset": 1592,
+      "name": "_transId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268824",
+      "offset": 1600,
+      "name": "_exposureInfo",
+      "type": "@\"ExposureInfo\""
+    },
+    {
+      "offset_address": "0x120268828",
+      "offset": 1608,
+      "name": "_securityData",
+      "type": "@\"WCPaySecurityControlData\""
+    },
+    {
+      "offset_address": "0x12026882c",
+      "offset": 1616,
+      "name": "_m_uifaceTofaceName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268830",
+      "offset": 1624,
+      "name": "_m_uifaceTofaceDescTitle",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268834",
+      "offset": 1632,
+      "name": "_m_uifaceTofacePayerDescTitle",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268838",
+      "offset": 1640,
+      "name": "_groupPayData",
+      "type": "@\"WCPayControlDataGroupPayData\""
+    },
+    {
+      "offset_address": "0x12026883c",
+      "offset": 1648,
+      "name": "_m_uiBalanceMobile",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268840",
+      "offset": 1656,
+      "name": "_balanceMobileInfos",
+      "type": "@\"NSArray\""
+    },
+    {
+      "offset_address": "0x120268844",
+      "offset": 1664,
+      "name": "_selectedBalanceMobileInfo",
+      "type": "@\"BalanceMobileInfo\""
+    },
+    {
+      "offset_address": "0x120268848",
+      "offset": 1672,
+      "name": "_banPayMobileInfoResponse",
+      "type": "@\"GetBanPayMobileInfoResponse\""
+    },
+    {
+      "offset_address": "0x12026884c",
+      "offset": 1680,
+      "name": "_cre_tail",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268850",
+      "offset": 1688,
+      "name": "_messageVerifyType",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x120268854",
+      "offset": 1696,
+      "name": "_autoDeductSelectedCardInfo",
+      "type": "@\"WCPayBindCardInfo\""
+    },
+    {
+      "offset_address": "0x120268858",
+      "offset": 1704,
+      "name": "_startTrackTimeInMs",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x12026885c",
+      "offset": 1712,
+      "name": "_payOrReceiveFromScene",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x120268860",
+      "offset": 1720,
+      "name": "_getUserExInfoCgiResponse",
+      "type": "@\"WCPayGetUserExInfoCgiResponse\""
+    },
+    {
+      "offset_address": "0x120268864",
+      "offset": 1728,
+      "name": "_setUserExInfoRequest",
+      "type": "@\"WCPaySetUserExInfoCgiRequest\""
+    },
+    {
+      "offset_address": "0x120268868",
+      "offset": 1736,
+      "name": "_m_payApplyNewCardInfo",
+      "type": "@\"WCPayBindCardListApplyNewCardInfo\""
+    },
+    {
+      "offset_address": "0x12026886c",
+      "offset": 1744,
+      "name": "_m_oSelectedMessageWrap",
+      "type": "@\"CMessageWrap\""
+    },
+    {
+      "offset_address": "0x120268870",
+      "offset": 1752,
+      "name": "_m_feeType",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268874",
+      "offset": 1760,
+      "name": "_m_transferTotalAmount",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x120268878",
+      "offset": 1768,
+      "name": "_m_receiverNickName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026887c",
+      "offset": 1776,
+      "name": "_m_receiverUserName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268880",
+      "offset": 1784,
+      "name": "_m_payerNickname",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268884",
+      "offset": 1792,
+      "name": "_m_f2fRecevieMultipleWalletTitle",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268888",
+      "offset": 1800,
+      "name": "_m_f2fReceiveBottomDetailTitle",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026888c",
+      "offset": 1808,
+      "name": "_m_bannerNotice",
+      "type": "@\"WCPayBannerNotice\""
+    },
+    {
+      "offset_address": "0x120268890",
+      "offset": 1816,
+      "name": "_m_tarnsferPayerUserName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268894",
+      "offset": 1824,
+      "name": "_lqtControlData",
+      "type": "@\"WCPayLQTControlData\""
+    },
+    {
+      "offset_address": "0x120268898",
+      "offset": 1832,
+      "name": "_bank_priority",
+      "type": "@\"WCPayBankPriority\""
+    },
+    {
+      "offset_address": "0x12026889c",
+      "offset": 1840,
+      "name": "_delayTransferWordingResponse",
+      "type": "@\"GetTransferWordingResponse\""
+    },
+    {
+      "offset_address": "0x1202688a0",
+      "offset": 1848,
+      "name": "_delayTransferViewEntryScene",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x1202688a4",
+      "offset": 1856,
+      "name": "_m_nsF2FMaskTrueName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202688a8",
+      "offset": 1864,
+      "name": "_m_nsF2FReciverQRCode",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202688ac",
+      "offset": 1872,
+      "name": "_m_f2fRightBarItems",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x1202688b0",
+      "offset": 1880,
+      "name": "_m_f2fBottomDetailItem",
+      "type": "@\"MenuItem\""
+    },
+    {
+      "offset_address": "0x1202688b4",
+      "offset": 1888,
+      "name": "_m_nsBottomIconUrl",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202688b8",
+      "offset": 1896,
+      "name": "_m_f2fSaveQRCodeResp",
+      "type": "@\"CgiSaveQrcodeResp\""
+    },
+    {
+      "offset_address": "0x1202688bc",
+      "offset": 1904,
+      "name": "_m_nsMsgSvrId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202688c0",
+      "offset": 1912,
+      "name": "_mchQRCodeData",
+      "type": "@\"WCPayMchQRCodeControlData\""
+    },
+    {
+      "offset_address": "0x1202688c4",
+      "offset": 1920,
+      "name": "_bizF2FControlData",
+      "type": "@\"WCPayBizF2FControlData\""
+    },
+    {
+      "offset_address": "0x1202688c8",
+      "offset": 1928,
+      "name": "_m_f2fControlData",
+      "type": "@\"WCPayF2FControlData\""
+    },
+    {
+      "offset_address": "0x1202688cc",
+      "offset": 1936,
+      "name": "_eCardControlData",
+      "type": "@\"WCPayECardControlData\""
+    },
+    {
+      "offset_address": "0x1202688d0",
+      "offset": 1944,
+      "name": "_qrcodeRewardData",
+      "type": "@\"WCPayQRCodeRewardControlData\""
+    },
+    {
+      "offset_address": "0x1202688d4",
+      "offset": 1952,
+      "name": "_transferMoneyData",
+      "type": "@\"WCPayTransferMoneyData\""
+    },
+    {
+      "offset_address": "0x1202688d8",
+      "offset": 1960,
+      "name": "_honeyPayData",
+      "type": "@\"WCPayHoneyPayControlData\""
+    },
+    {
+      "offset_address": "0x1202688dc",
+      "offset": 1968,
+      "name": "_m_transToBankCardData",
+      "type": "@\"WCPayTransToBankCardData\""
+    },
+    {
+      "offset_address": "0x1202688e0",
+      "offset": 1976,
+      "name": "_m_nsTransToBankBillId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202688e4",
+      "offset": 1984,
+      "name": "_m_nsT2BCOperationResp",
+      "type": "@\"OperationResp\""
+    },
+    {
+      "offset_address": "0x1202688e8",
+      "offset": 1992,
+      "name": "_m_t2bcQueryDetailResp",
+      "type": "@\"QueryDetailResp\""
+    },
+    {
+      "offset_address": "0x1202688ec",
+      "offset": 2000,
+      "name": "_retry_pay_info",
+      "type": "@\"WCPayPayResponseRetryInfo\""
+    },
+    {
+      "offset_address": "0x1202688f0",
+      "offset": 2008,
+      "name": "_m_f2fQrcodeResp",
+      "type": "@\"CgiGetQrcodeUrlV2Resp\""
+    },
+    {
+      "offset_address": "0x1202688f4",
+      "offset": 2016,
+      "name": "_mobile_area",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202688f8",
+      "offset": 2024,
+      "name": "_forget_pwd_url",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202688fc",
+      "offset": 2032,
+      "name": "_checkNameTitle",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268900",
+      "offset": 2040,
+      "name": "_checkNameWording",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268904",
+      "offset": 2048,
+      "name": "_checkNameDisplayName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268908",
+      "offset": 2056,
+      "name": "_checkNameErrorTitle",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026890c",
+      "offset": 2064,
+      "name": "_checkNameErrorContent",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268910",
+      "offset": 2072,
+      "name": "_checkNameSign",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268914",
+      "offset": 2080,
+      "name": "_checkNameMessageType",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x120268918",
+      "offset": 2088,
+      "name": "_jumpRemindInfo",
+      "type": "@\"WCPayJumpRemindInfo\""
+    },
+    {
+      "offset_address": "0x12026891c",
+      "offset": 2096,
+      "name": "_planIndexResp",
+      "type": "@\"PlanIndexResp\""
+    },
+    {
+      "offset_address": "0x120268920",
+      "offset": 2104,
+      "name": "_preAddPlanResp",
+      "type": "@\"PreAddPlanResp\""
+    },
+    {
+      "offset_address": "0x120268924",
+      "offset": 2112,
+      "name": "_addPlanData",
+      "type": "@\"AddPlanReq\""
+    },
+    {
+      "offset_address": "0x120268928",
+      "offset": 2120,
+      "name": "_selectedPlanItem",
+      "type": "@\"PlanIndexResp_PlanItem\""
+    },
+    {
+      "offset_address": "0x12026892c",
+      "offset": 2128,
+      "name": "_managePlanData",
+      "type": "@\"ManagePlanReq\""
+    },
+    {
+      "offset_address": "0x120268930",
+      "offset": 2136,
+      "name": "_modifyPlanData",
+      "type": "@\"ModifyPlanReq\""
+    },
+    {
+      "offset_address": "0x120268934",
+      "offset": 2144,
+      "name": "_lqtFetchActionEntry",
+      "type": "@\"WCPayDynamicActionEntry\""
+    },
+    {
+      "offset_address": "0x120268938",
+      "offset": 2152,
+      "name": "_currentWeAppAppId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026893c",
+      "offset": 2160,
+      "name": "_funcSwitchListResponse",
+      "type": "@\"GetPayFunctionSwitchListResponse\""
+    },
+    {
+      "offset_address": "0x120268940",
+      "offset": 2168,
+      "name": "_balanceChargeLQTInfo",
+      "type": "@\"WCPayBalanceChargeLQTInfo\""
+    },
+    {
+      "offset_address": "0x120268944",
+      "offset": 2176,
+      "name": "_patternLockScene",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x120268948",
+      "offset": 2184,
+      "name": "_f2fExtendInfo",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026894c",
+      "offset": 2192,
+      "name": "_selectedTransferChatroomUsername",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268950",
+      "offset": 2200,
+      "name": "_merchantPayQRCodeInfoResp",
+      "type": "@\"MerchantPayGetQRCodeInfoResp\""
+    },
+    {
+      "offset_address": "0x120268954",
+      "offset": 2208,
+      "name": "_merchantPayPlaceOrderResp",
+      "type": "@\"MerchantPayPlaceOrderResp\""
+    },
+    {
+      "offset_address": "0x120268958",
+      "offset": 2216,
+      "name": "_merchantPayTotalAmount",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x12026895c",
+      "offset": 2224,
+      "name": "_merchantPayPayerRemark",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268960",
+      "offset": 2232,
+      "name": "_sessionPaySenderUserName",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268964",
+      "offset": 2240,
+      "name": "_sessionPaySenderMsgId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268968",
+      "offset": 2248,
+      "name": "_payInitRawUrl",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026896c",
+      "offset": 2256,
+      "name": "_payInitTimestamp",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x120268970",
+      "offset": 2264,
+      "name": "_nfcCardType",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268974",
+      "offset": 2272,
+      "name": "_nfcCardId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268978",
+      "offset": 2280,
+      "name": "_pkPass",
+      "type": "@\"SimplePKPass\""
+    },
+    {
+      "offset_address": "0x12026897c",
+      "offset": 2288,
+      "name": "_nfcCardInfoResponse",
+      "type": "@\"NFCCardsQueryNFCCardInfoResponse\""
+    },
+    {
+      "offset_address": "0x120268980",
+      "offset": 2296,
+      "name": "_recvBindSerial",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268984",
+      "offset": 2304,
+      "name": "_collectPalmSessionId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x120268988",
+      "offset": 2312,
+      "name": "_palmSdkConfig",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026898c",
+      "offset": 2320,
+      "name": "_palmGuidePopupConfig",
+      "type": "@\"NSString\""
+    }
+  ],
+  "WCPayControlLogic": [
+    {
+      "offset_address": "0x120268990",
+      "offset": 48,
+      "name": "m_data",
+      "type": "@\"WCPayControlData\""
+    },
+    {
+      "offset_address": "0x120268994",
+      "offset": 56,
+      "name": "m_nsErrorDetailUrl",
+      "type": "@\"NSString\""
+    }
+  ],
+  "WCPayControlMgr": [
+    {
+      "offset_address": "0x120268998",
+      "offset": 16,
+      "name": "_offlineLogicDelegate",
+      "type": "@\"<WCPayOfflineLogicDelegate>\""
+    }
+  ],
+  "WCPayLogicMgr": [
+    {
+      "offset_address": "0x12026beb8",
+      "offset": 8,
+      "name": "m_oWCPayLocalCachedData",
+      "type": "@\"WCPayLocalCachedData\""
+    },
+    {
+      "offset_address": "0x12026be8c",
+      "offset": 16,
+      "name": "m_oWCPayNetworkHelper",
+      "type": "@\"WCPayNetworkHelper\""
+    },
+    {
+      "offset_address": "0x12026be94",
+      "offset": 24,
+      "name": "m_uWCPayLogicQuitCount",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026bec0",
+      "offset": 32,
+      "name": "m_oWCPayAuthenticationPay",
+      "type": "@\"WCPayAuthenticationPay\""
+    },
+    {
+      "offset_address": "0x12026bec4",
+      "offset": 40,
+      "name": "m_oWCPayAuthenticationPayVerifySMSStruct",
+      "type": "@\"WCPayAuthenticationPayVerifySMSStruct\""
+    },
+    {
+      "offset_address": "0x12026bec8",
+      "offset": 48,
+      "name": "m_oWCPayBindInfo",
+      "type": "@\"WCPayBindInfo\""
+    },
+    {
+      "offset_address": "0x12026becc",
+      "offset": 56,
+      "name": "m_oWCPayBindInfoSMS",
+      "type": "@\"WCPayBindInfoSMS\""
+    },
+    {
+      "offset_address": "0x12026bed0",
+      "offset": 64,
+      "name": "m_owcPayUnbindCardInfo",
+      "type": "@\"WCPayBindCardInfo\""
+    },
+    {
+      "offset_address": "0x12026bed4",
+      "offset": 72,
+      "name": "m_oWCPayResetPasswordInfo",
+      "type": "@\"WCPayResetPasswordInfo\""
+    },
+    {
+      "offset_address": "0x12026bef8",
+      "offset": 80,
+      "name": "m_oWCPayAvalibleBankCardBinInfo",
+      "type": "@\"WCPayAvalibleBankCardBinInfo\""
+    },
+    {
+      "offset_address": "0x12026bed8",
+      "offset": 88,
+      "name": "m_orderListExtBuffer",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026bedc",
+      "offset": 96,
+      "name": "m_bizOrderListExtBuffer",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026bee8",
+      "offset": 104,
+      "name": "m_dicCFTNeedPayRequestInfo",
+      "type": "@\"NSDictionary\""
+    },
+    {
+      "offset_address": "0x12026bee0",
+      "offset": 112,
+      "name": "m_oOldPassword",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026bee4",
+      "offset": 120,
+      "name": "m_oNewPassword",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026beec",
+      "offset": 128,
+      "name": "m_bufferAvailableCard",
+      "type": "@\"NSDictionary\""
+    },
+    {
+      "offset_address": "0x12026bef0",
+      "offset": 136,
+      "name": "m_oGetDate",
+      "type": "@\"NSDate\""
+    },
+    {
+      "offset_address": "0x12026bef4",
+      "offset": 144,
+      "name": "m_oGetBankLogoDate",
+      "type": "@\"NSDate\""
+    },
+    {
+      "offset_address": "0x12026be98",
+      "offset": 152,
+      "name": "m_aReceivedStatusChangedOrderList",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x12026befc",
+      "offset": 160,
+      "name": "m_aOrderList",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x12026bf08",
+      "offset": 168,
+      "name": "m_uiOrderListSum",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026bf0c",
+      "offset": 172,
+      "name": "m_uiLimit",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026be90",
+      "offset": 176,
+      "name": "m_bGetTenpaySecureCtrlSalt",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026bf2c",
+      "offset": 177,
+      "name": "m_needRetryDownloadPackageList",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026be9c",
+      "offset": 184,
+      "name": "m_oTenpayCertificate",
+      "type": "@\"TenpayCertificate\""
+    },
+    {
+      "offset_address": "0x12026beac",
+      "offset": 192,
+      "name": "m_lastTimestampWhenCodeIsNil",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x12026bfc4",
+      "offset": 200,
+      "name": "m_oTenpayCertificateToken",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026bfc0",
+      "offset": 208,
+      "name": "m_ndOfflinePayTokenValidDate",
+      "type": "@\"NSDate\""
+    },
+    {
+      "offset_address": "0x12026bea0",
+      "offset": 216,
+      "name": "m_bIsOfflinePayInPos",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026bea4",
+      "offset": 224,
+      "name": "m_nsOfflinePayOrderIdInPos",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026bea8",
+      "offset": 232,
+      "name": "m_bIsCurrentOfflinePayMsgFromPull",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026bebc",
+      "offset": 240,
+      "name": "getTokenScene",
+      "type": "Q"
+    },
+    {
+      "offset_address": "0x12026bf04",
+      "offset": 248,
+      "name": "m_hasLoadCreditCardViewDic",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026bf00",
+      "offset": 256,
+      "name": "m_dicCreditCardHadView",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x12026bfc8",
+      "offset": 264,
+      "name": "m_lastQueryCreditPayTime",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026bf24",
+      "offset": 272,
+      "name": "m_nsCurrentScene",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026bf10",
+      "offset": 280,
+      "name": "m_handledMsgSvrIds",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x12026bfbc",
+      "offset": 288,
+      "name": "m_sceneBuffer",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x12026bf28",
+      "offset": 296,
+      "name": "isGetBankResourcesPending",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026bfcc",
+      "offset": 300,
+      "name": "m_uiRealnameReportScene",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026beb4",
+      "offset": 304,
+      "name": "m_redEnvelopesPromotionCacheDict",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x12026bf20",
+      "offset": 312,
+      "name": "m_currentSessionContact",
+      "type": "@\"CContact\""
+    },
+    {
+      "offset_address": "0x12026bfb8",
+      "offset": 320,
+      "name": "startResTime",
+      "type": "@\"NSDate\""
+    },
+    {
+      "offset_address": "0x12026bf58",
+      "offset": 328,
+      "name": "_isFromViewLicense",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026bf80",
+      "offset": 329,
+      "name": "_isOfflineViewAppear",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026bf84",
+      "offset": 330,
+      "name": "_isBackground",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026bf88",
+      "offset": 331,
+      "name": "_isClickOfflinePayRefreshBtn",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026bf98",
+      "offset": 332,
+      "name": "_bIsUserCreateOfflinePay",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026bf18",
+      "offset": 333,
+      "name": "_bIsSettingV2AuthCodePayment",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026bf54",
+      "offset": 336,
+      "name": "_acceptLicenseScene",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026bf5c",
+      "offset": 340,
+      "name": "_alertViewScene",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026bf14",
+      "offset": 344,
+      "name": "_authCodeType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x12026bf30",
+      "offset": 352,
+      "name": "_m_nsJsApiReqKey",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026bf34",
+      "offset": 360,
+      "name": "_m_nsLogString_14954",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026bf38",
+      "offset": 368,
+      "name": "_m_lastBankOrPhoneAlreadyShow",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026bf3c",
+      "offset": 376,
+      "name": "_licenseAcceptCallback",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x12026bf40",
+      "offset": 384,
+      "name": "_licenseDenyCallback",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x12026bf44",
+      "offset": 392,
+      "name": "_licenseStartLoadingCallback",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x12026bf48",
+      "offset": 400,
+      "name": "_licenseStopLoadingCallback",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x12026bf4c",
+      "offset": 408,
+      "name": "_payLicenseAlertView",
+      "type": "@\"MMTipsViewController\""
+    },
+    {
+      "offset_address": "0x12026bf50",
+      "offset": 416,
+      "name": "_licenseData",
+      "type": "@\"NSDictionary\""
+    },
+    {
+      "offset_address": "0x12026bf60",
+      "offset": 424,
+      "name": "_realnameGuideAcceptCallback",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x12026bf64",
+      "offset": 432,
+      "name": "_realnameGuideDenyCallback",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x12026bf68",
+      "offset": 440,
+      "name": "_realnameGuideAlertView",
+      "type": "@\"MMTipsViewController\""
+    },
+    {
+      "offset_address": "0x12026bf6c",
+      "offset": 448,
+      "name": "_downloadPagLogic",
+      "type": "@\"WCRedEnvelopesSendControlLogic\""
+    },
+    {
+      "offset_address": "0x12026bf1c",
+      "offset": 456,
+      "name": "_c2cMessagePlayPagSet",
+      "type": "@\"NSMutableSet\""
+    },
+    {
+      "offset_address": "0x12026bf70",
+      "offset": 464,
+      "name": "_m_walletRequestInfo",
+      "type": "@\"WalletRequestInfo\""
+    },
+    {
+      "offset_address": "0x12026bf74",
+      "offset": 472,
+      "name": "_mobileInfoCompletion",
+      "type": "@?"
+    },
+    {
+      "offset_address": "0x12026bf78",
+      "offset": 480,
+      "name": "_m_digitalCertControl",
+      "type": "@\"TenpayCertificate\""
+    },
+    {
+      "offset_address": "0x12026bf7c",
+      "offset": 488,
+      "name": "_smDigitalCertControl",
+      "type": "@\"WxSmCertUtil\""
+    },
+    {
+      "offset_address": "0x12026bf8c",
+      "offset": 496,
+      "name": "_targetBrightness",
+      "type": "d"
+    },
+    {
+      "offset_address": "0x12026bf90",
+      "offset": 504,
+      "name": "_realnameTipsVC",
+      "type": "@\"WCPayRealNameTipsViewController\""
+    },
+    {
+      "offset_address": "0x12026bf94",
+      "offset": 512,
+      "name": "_transferMsgCheckTaskQueue",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x12026bf9c",
+      "offset": 520,
+      "name": "_offlinePayCertNo",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026bfa0",
+      "offset": 528,
+      "name": "_groupPaySessionId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026bfa4",
+      "offset": 536,
+      "name": "_weakGroupPayControlLogic",
+      "type": "@\"WCPayGPLaunchControlLogic\""
+    },
+    {
+      "offset_address": "0x12026bfa8",
+      "offset": 544,
+      "name": "_deepLinkForPay",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x12026bfac",
+      "offset": 552,
+      "name": "_showResourceDownloadDict",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x12026bfb0",
+      "offset": 560,
+      "name": "_miscellaneousCache",
+      "type": "@\"NSCache\""
+    },
+    {
+      "offset_address": "0x12026bfb4",
+      "offset": 568,
+      "name": "_applePayAuthorizationLogic",
+      "type": "@\"WCPayApplePayAuthorizationLogic\""
+    },
+    {
+      "offset_address": "0x12026beb0",
+      "offset": 576,
+      "name": "_passkitFacade",
+      "type": "@\"WCPayPassKitFacade\""
+    }
+  ],
+  "WCPayNetworkHelper": [
+    {
+      "offset_address": "0x12026c490",
+      "offset": 8,
+      "name": "m_delegate",
+      "type": "@\"<WCPayNetworkHelperDelegate>\""
+    },
+    {
+      "offset_address": "0x12026c48c",
+      "offset": 16,
+      "name": "m_dicCGIStartedTime",
+      "type": "@\"NSMutableDictionary\""
+    },
+    {
+      "offset_address": "0x12026c494",
+      "offset": 24,
+      "name": "m_nsCurrentControlLogicName",
+      "type": "@\"NSString\""
+    }
+  ],
+  "WCPayReveiverControlTransferControlLogic": [
+    {
+      "offset_address": "0x12026df10",
+      "offset": 56,
+      "name": "_bIsOpenIM",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12026defc",
+      "offset": 64,
+      "name": "_m_jumpRemindControlLogic",
+      "type": "@\"WCPayJumpRemindControlLogic\""
+    },
+    {
+      "offset_address": "0x12026df04",
+      "offset": 72,
+      "name": "_interceptWinLogic",
+      "type": "@\"WCPayInterceptWinLogic\""
+    },
+    {
+      "offset_address": "0x12026df08",
+      "offset": 80,
+      "name": "_intercept_win_after",
+      "type": "@\"InterceptWin\""
+    },
+    {
+      "offset_address": "0x12026df0c",
+      "offset": 88,
+      "name": "_complianceHalfPage",
+      "type": "@\"WCPayComplianceHalfPage\""
+    },
+    {
+      "offset_address": "0x12026df14",
+      "offset": 96,
+      "name": "_unionQueryCgi",
+      "type": "@\"WCPayUnionTransferQueryCgi\""
+    },
+    {
+      "offset_address": "0x12026df18",
+      "offset": 104,
+      "name": "_unionConfirmCgi",
+      "type": "@\"WCPayUnionTransferConfirmCgi\""
+    },
+    {
+      "offset_address": "0x12026df00",
+      "offset": 112,
+      "name": "_recvChannelSubTitleClickInfo",
+      "type": "@\"NSDictionary\""
+    },
+    {
+      "offset_address": "0x12026df1c",
+      "offset": 120,
+      "name": "_senderNickNameHelper",
+      "type": "@\"ContactUpdateHelper\""
+    }
+  ],
+  "WCPayUnionTransferConfirmCgi": [
+    {
+      "offset_address": "0x12026f27c",
+      "offset": 8,
+      "name": "m_delegate",
+      "type": "@\"<WCPayUnionTransferConfirmCgiDelegate>\""
+    }
+  ],
+  "WCRedEnvelopesLogicMgr": [
+    {
+      "offset_address": "0x1202707e0",
+      "offset": 8,
+      "name": "m_networkHelper",
+      "type": "@\"WCRedEnvelopesNetworkHelper\""
+    },
+    {
+      "offset_address": "0x1202707ec",
+      "offset": 16,
+      "name": "_m_isDownloadingNewYearRes",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202707e4",
+      "offset": 24,
+      "name": "_m_senderNickNameHelper",
+      "type": "@\"ContactUpdateHelper\""
+    },
+    {
+      "offset_address": "0x1202707e8",
+      "offset": 32,
+      "name": "_getShowResourcesCgi",
+      "type": "@\"WCRedEnvelopesGetShowResourcesCgi\""
+    }
+  ],
+  "WCRedEnvelopesNetworkHelper": [
+    {
+      "offset_address": "0x120270a20",
+      "offset": 8,
+      "name": "m_delegate",
+      "type": "@\"<WCRedEnvelopesNetworkHelperDelegate>\""
+    },
+    {
+      "offset_address": "0x120270a1c",
+      "offset": 16,
+      "name": "m_dicCGIStartedTime",
+      "type": "@\"NSMutableDictionary\""
+    }
+  ],
+  "WCRedEnvelopesStoryViewController": [
+    {
+      "offset_address": "0x1202710cc",
+      "offset": 112,
+      "name": "m_data",
+      "type": "@\"WCRedEnvelopesControlData\""
+    },
+    {
+      "offset_address": "0x1202710e4",
+      "offset": 120,
+      "name": "m_closeBtn",
+      "type": "@\"MMUIButton\""
+    },
+    {
+      "offset_address": "0x120271130",
+      "offset": 128,
+      "name": "_canSwipeUp",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120271134",
+      "offset": 129,
+      "name": "_isPreviewMode",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120271138",
+      "offset": 130,
+      "name": "_isNeedDelayPlayVideo",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12027113c",
+      "offset": 131,
+      "name": "_isAutoPlayNow",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120271140",
+      "offset": 132,
+      "name": "_isMaskViewShouldStop",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120271144",
+      "offset": 133,
+      "name": "_bHasAutoMove",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202710d4",
+      "offset": 134,
+      "name": "_bHasAutoPlay",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x120271148",
+      "offset": 135,
+      "name": "_isSecondTimeAutoShowStory",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x1202710e0",
+      "offset": 136,
+      "name": "_bHasManulTapMute",
+      "type": "B"
+    },
+    {
+      "offset_address": "0x12027114c",
+      "offset": 140,
+      "name": "_exposeType",
+      "type": "I"
+    },
+    {
+      "offset_address": "0x1202710f4",
+      "offset": 144,
+      "name": "_m_redSkinStoryPage",
+      "type": "@\"WCRedEnvelopesStoryPageView\""
+    },
+    {
+      "offset_address": "0x1202710f8",
+      "offset": 152,
+      "name": "_m_scrollView",
+      "type": "@\"UIScrollView\""
+    },
+    {
+      "offset_address": "0x1202710fc",
+      "offset": 160,
+      "name": "_m_scrollViewContentView",
+      "type": "@\"UIView\""
+    },
+    {
+      "offset_address": "0x120271100",
+      "offset": 168,
+      "name": "_m_storysArr",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x120271104",
+      "offset": 176,
+      "name": "_m_pageControl",
+      "type": "@\"UIPageControl\""
+    },
+    {
+      "offset_address": "0x120271108",
+      "offset": 184,
+      "name": "_m_redSkinCorpLogo",
+      "type": "@\"WCPayWebImageView\""
+    },
+    {
+      "offset_address": "0x12027110c",
+      "offset": 192,
+      "name": "_m_redSkinTitleInfoView",
+      "type": "@\"UIView\""
+    },
+    {
+      "offset_address": "0x1202710e8",
+      "offset": 200,
+      "name": "_m_redSkinDescLabel",
+      "type": "@\"UILabel\""
+    },
+    {
+      "offset_address": "0x120271110",
+      "offset": 208,
+      "name": "_m_bottomMaskView",
+      "type": "@\"UIImageView\""
+    },
+    {
+      "offset_address": "0x120271114",
+      "offset": 216,
+      "name": "_m_storyDragAnimationUtil",
+      "type": "@\"WCRedEnvelopesStoryDargUtil\""
+    },
+    {
+      "offset_address": "0x120271118",
+      "offset": 224,
+      "name": "_delegate",
+      "type": "@\"<WCRedEnvelopesStoryViewControllerDelegate>\""
+    },
+    {
+      "offset_address": "0x12027111c",
+      "offset": 232,
+      "name": "_m_storyPageArr",
+      "type": "@\"NSMutableArray\""
+    },
+    {
+      "offset_address": "0x120271120",
+      "offset": 240,
+      "name": "_m_storyViewMaskView",
+      "type": "@\"WCPayWebImageView\""
+    },
+    {
+      "offset_address": "0x120271124",
+      "offset": 248,
+      "name": "_m_storyPagView",
+      "type": "@\"WCPayWebPagView\""
+    },
+    {
+      "offset_address": "0x120271128",
+      "offset": 256,
+      "name": "_m_enterMPBtn",
+      "type": "@\"UIButton\""
+    },
+    {
+      "offset_address": "0x1202710ec",
+      "offset": 264,
+      "name": "_enterMPBkgView",
+      "type": "@\"UIImageView\""
+    },
+    {
+      "offset_address": "0x12027112c",
+      "offset": 272,
+      "name": "_panGesture",
+      "type": "@\"UIPanGestureRecognizer\""
+    },
+    {
+      "offset_address": "0x1202710d0",
+      "offset": 280,
+      "name": "_sessionId",
+      "type": "@\"NSString\""
+    },
+    {
+      "offset_address": "0x1202710d8",
+      "offset": 288,
+      "name": "_autoPlayInterval",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x1202710dc",
+      "offset": 296,
+      "name": "_firstFramePlayInterval",
+      "type": "q"
+    },
+    {
+      "offset_address": "0x1202710f0",
+      "offset": 304,
+      "name": "_storyPicTimer",
+      "type": "@\"MMTimer\""
+    }
+  ]
+}

@@ -11,6 +11,48 @@ static CGFloat const kTabBadgeGap = 3.0;
 static CGFloat const kActionButtonWidth = 44.0;
 static NSTimeInterval const kIndicatorDuration = 0.20;
 static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
+static NSTimeInterval const kCapsuleDuration = 0.28;
+static NSString *const kCapsuleAnimationKey = @"CSGroupIndicator.capsule";
+
+static CGRect CSGroupCapsuleFrame(CGRect title, CGRect bounds) {
+    if (CGRectIsEmpty(title) || CGRectIsEmpty(bounds)) return CGRectZero;
+    CGRect frame = CGRectInset(title, -10, -7);
+    CGRect clipped = CGRectIntersection(frame, CGRectInset(bounds, 3, 3));
+    return CGRectIsNull(clipped) || CGRectIsEmpty(clipped) ? CGRectZero : clipped;
+}
+
+// Explicit, finite Core Animation transitions. Unchanged targets preserve their
+// in-flight animation; interactive updates only write model layers, with no timer.
+static void CSGroupSetCapsuleLayer(CALayer *layer, CGFloat opacity, BOOL scales, BOOL animated) {
+    if (!layer) return;
+    CATransform3D transform = scales ? CATransform3DMakeScale(0.42 + 0.58 * opacity, 0.84 + 0.16 * opacity, 1) : CATransform3DIdentity;
+    BOOL unchanged = fabs(layer.opacity - opacity) < 0.0001 && (!scales || CATransform3DEqualToTransform(layer.transform, transform));
+    if (unchanged && (animated || ![layer animationForKey:kCapsuleAnimationKey])) return;
+    CALayer *visible = layer.presentationLayer ?: layer;
+    CGFloat startOpacity = visible.opacity;
+    CATransform3D startTransform = visible.transform;
+    [layer removeAnimationForKey:kCapsuleAnimationKey];
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    layer.opacity = opacity;
+    if (scales) layer.transform = transform;
+    [CATransaction commit];
+    if (!animated || (fabs(startOpacity - opacity) < 0.0001 && (!scales || CATransform3DEqualToTransform(startTransform, transform)))) return;
+    CABasicAnimation *fade = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    fade.fromValue = @(startOpacity); fade.toValue = @(opacity);
+    fade.duration = kCapsuleDuration;
+    CAAnimationGroup *group = [CAAnimationGroup animation];
+    if (scales) {
+        CABasicAnimation *scale = [CABasicAnimation animationWithKeyPath:@"transform"];
+        scale.fromValue = [NSValue valueWithCATransform3D:startTransform];
+        scale.toValue = [NSValue valueWithCATransform3D:transform];
+        scale.duration = kCapsuleDuration;
+        group.animations = @[fade, scale];
+    } else group.animations = @[fade];
+    group.duration = kCapsuleDuration;
+    group.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+    [layer addAnimation:group forKey:kCapsuleAnimationKey];
+}
 
 // Match the native outlined magnifier proportions without relying on private
 // asset names that change across WeChat versions. Render once at screen scale;
@@ -40,10 +82,16 @@ static UIImage *CSGroupSearchIcon(void) {
 @property (nonatomic) BOOL hasRedDot;
 @property (nonatomic) CGFloat baseFontSize;
 @property (nonatomic, strong) UILabel *unreadBadge;
+@property (nonatomic, strong) CALayer *capsuleLayer;
+@property (nonatomic, strong) UILabel *capsuleTitleLabel;
+@property (nonatomic) BOOL capsuleEnabled;
+@property (nonatomic) CGFloat capsuleProgress;
 - (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot;
 - (void)updateFonts;
 - (CGFloat)badgeWidth;
 - (CGRect)tabTitleFrame;
+- (void)configureCapsuleEnabled:(BOOL)enabled color:(UIColor *)color textColor:(UIColor *)textColor;
+- (void)setCapsuleProgress:(CGFloat)progress animated:(BOOL)animated;
 @end
 
 @implementation WETabButton
@@ -101,6 +149,56 @@ static UIImage *CSGroupSearchIcon(void) {
     CGFloat y = MAX(2, CGRectGetMinY(titleFrame) - height * 0.35);
     self.unreadBadge.frame = CGRectMake(MAX(0, x), y, width, height);
     self.unreadBadge.layer.cornerRadius = height / 2;
+    if (self.capsuleEnabled) {
+        CGRect capsuleFrame = CSGroupCapsuleFrame(titleFrame, self.bounds);
+        [CATransaction begin];
+        [CATransaction setDisableActions:YES];
+        // Set bounds/position separately: frame is undefined while scaled.
+        self.capsuleLayer.bounds = (CGRect){CGPointZero, capsuleFrame.size};
+        self.capsuleLayer.position = CGPointMake(CGRectGetMidX(capsuleFrame), CGRectGetMidY(capsuleFrame));
+        self.capsuleLayer.cornerRadius = capsuleFrame.size.height / 2;
+        self.capsuleTitleLabel.frame = titleFrame;
+        self.capsuleTitleLabel.text = self.currentTitle;
+        self.capsuleTitleLabel.font = self.titleLabel.font;
+        [CATransaction commit];
+    }
+}
+
+- (void)configureCapsuleEnabled:(BOOL)enabled color:(UIColor *)color textColor:(UIColor *)textColor {
+    BOOL changed = self.capsuleEnabled != enabled;
+    self.capsuleEnabled = enabled;
+    if (!enabled) {
+        if (!changed) return;
+        [self setCapsuleProgress:0 animated:NO];
+        [self.capsuleLayer removeFromSuperlayer]; self.capsuleLayer = nil;
+        [self.capsuleTitleLabel removeFromSuperview]; self.capsuleTitleLabel = nil;
+        return;
+    }
+    if (!self.capsuleLayer) {
+        self.capsuleLayer = [CALayer layer];
+        self.capsuleLayer.opacity = 0;
+        [self.layer insertSublayer:self.capsuleLayer atIndex:0];
+        self.capsuleTitleLabel = [[UILabel alloc] init];
+        self.capsuleTitleLabel.isAccessibilityElement = NO;
+        self.capsuleTitleLabel.userInteractionEnabled = NO;
+        self.capsuleTitleLabel.textAlignment = NSTextAlignmentCenter;
+        self.capsuleTitleLabel.layer.opacity = 0;
+        [self insertSubview:self.capsuleTitleLabel belowSubview:self.unreadBadge];
+    }
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    self.capsuleLayer.backgroundColor = color.CGColor;
+    self.capsuleTitleLabel.textColor = textColor;
+    [CATransaction commit];
+    [self setNeedsLayout];
+}
+
+- (void)setCapsuleProgress:(CGFloat)progress animated:(BOOL)animated {
+    if (!self.capsuleLayer) return;
+    self.capsuleProgress = MAX(0, MIN(1, progress));
+    CSGroupSetCapsuleLayer(self.capsuleLayer, self.capsuleProgress, YES, animated);
+    CSGroupSetCapsuleLayer(self.capsuleTitleLabel.layer, self.capsuleProgress, NO, animated);
+    CSGroupSetCapsuleLayer(self.titleLabel.layer, 1 - self.capsuleProgress, NO, animated);
 }
 
 - (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot {
@@ -130,6 +228,7 @@ static UIImage *CSGroupSearchIcon(void) {
 @property (nonatomic) BOOL interactiveTransition, settlingInteractiveTransition;
 @property (nonatomic) NSInteger interactiveTarget;
 @property (nonatomic) CGFloat interactiveProgress;
+@property (nonatomic) CSGroupIndicatorStyle indicatorStyle;
 @end
 
 @implementation WESessionTabContainerView
@@ -203,15 +302,22 @@ static UIImage *CSGroupSearchIcon(void) {
     NSString *suffix = dark ? @"_dark" : @"";
     UIColor *green = [UIColor colorWithRed:0.102 green:0.678 blue:0.098 alpha:1];
     UIColor *selected = [self storedColorForKey:[@"com.wechat.enhance.chat_group.selected_text_color" stringByAppendingString:suffix] fallback:green];
-    self.indicatorView.backgroundColor = [self storedColorForKey:[@"com.wechat.enhance.chat_group.indicator_color" stringByAppendingString:suffix] fallback:green];
+    UIColor *indicator = [self storedColorForKey:[@"com.wechat.enhance.chat_group.indicator_color" stringByAppendingString:suffix] fallback:green];
+    self.indicatorView.backgroundColor = indicator;
+    CSGroupIndicatorStyle style = CSGroupCurrentIndicatorStyle(NSUserDefaults.standardUserDefaults);
+    BOOL styleChanged = self.indicatorStyle != style;
+    self.indicatorStyle = style;
+    BOOL capsule = style == CSGroupIndicatorStyleCapsule;
     self.backgroundColor = dark ? [UIColor.secondarySystemBackgroundColor resolvedColorWithTraitCollection:self.traitCollection] :
         [UIColor colorWithRed:0.929 green:0.929 blue:0.929 alpha:1];
     UIColor *normal = [UIColor.secondaryLabelColor resolvedColorWithTraitCollection:self.traitCollection];
     for (WETabButton *button in self.tabButtons) {
         [button setTitleColor:normal forState:UIControlStateNormal];
-        [button setTitleColor:selected forState:UIControlStateSelected];
+        [button setTitleColor:capsule ? normal : selected forState:UIControlStateSelected];
+        [button configureCapsuleEnabled:capsule color:indicator textColor:selected];
     }
     self.searchButton.tintColor = [UIColor.labelColor resolvedColorWithTraitCollection:self.traitCollection];
+    if (styleChanged) [self updateIndicatorPositionAnimated:NO];
 }
 
 - (void)applyAppearanceWithFontSize:(CGFloat)fontSize showsSearchButton:(BOOL)showsSearchButton {
@@ -308,6 +414,7 @@ static UIImage *CSGroupSearchIcon(void) {
     for (WESessionTabItem *tab in tabs) [records addObject:@[tab.tabId ?: @"",tab.displayName ?: @"",@(tab.type)]];
     if ([self.renderedTabRecords isEqual:records]) return;
     self.interactiveTransition=NO;
+    for (WETabButton *button in self.tabButtons) [button setCapsuleProgress:0 animated:NO];
     self.renderedTabRecords=[records copy];
     NSString *previousID = [self.selectedTabID copy];
     NSArray<WETabButton *> *previousButtons = [self.tabButtons copy];
@@ -356,6 +463,7 @@ static UIImage *CSGroupSearchIcon(void) {
     _selectedIndex = nextIndex;
     _selectedTabID = nextIndex == NSNotFound ? nil : [buttons[nextIndex].tabID copy];
     [self updateSelectedButtons];
+    if (self.indicatorStyle == CSGroupIndicatorStyleCapsule) [self updateIndicatorPositionAnimated:NO];
     [self setNeedsLayout];
     [self layoutIfNeeded];
     [self scrollToSelectedTab];
@@ -442,12 +550,21 @@ static UIImage *CSGroupSearchIcon(void) {
         [self updateInteractiveTransitionToIndex:self.interactiveTarget progress:self.interactiveProgress];
         return;
     }
+    if (self.indicatorStyle == CSGroupIndicatorStyleCapsule) {
+        BOOL animate = CSGroupIndicatorAnimationEnabled(NSUserDefaults.standardUserDefaults) && self.window && !UIAccessibilityIsReduceMotionEnabled();
+        [self updateCapsuleSelectionAnimated:animate];
+        return;
+    }
     BOOL moving = [self.indicatorView.layer animationForKey:kIndicatorAnimationKey] != nil;
     [self updateIndicatorPositionAnimated:moving];
 }
 
 - (void)updateIndicatorPositionAnimated:(BOOL)animated {
     self.interactiveTransition=NO;
+    if (self.indicatorStyle == CSGroupIndicatorStyleCapsule) {
+        [self updateCapsuleSelectionAnimated:animated && CSGroupIndicatorAnimationEnabled(NSUserDefaults.standardUserDefaults) && self.window && !UIAccessibilityIsReduceMotionEnabled()];
+        return;
+    }
     BOOL valid = self.selectedIndex >= 0 && self.selectedIndex < (NSInteger)self.tabButtons.count;
     BOOL wasHidden = self.indicatorView.hidden;
     self.indicatorView.hidden = !valid;
@@ -460,6 +577,13 @@ static UIImage *CSGroupSearchIcon(void) {
     [self moveIndicatorToFrame:target animated:animate];
 }
 
+- (void)updateCapsuleSelectionAnimated:(BOOL)animated {
+    self.indicatorView.hidden = YES;
+    [self.indicatorView.layer removeAnimationForKey:kIndicatorAnimationKey];
+    for (WETabButton *button in self.tabButtons)
+        [button setCapsuleProgress:button.tabIndex == self.selectedIndex ? 1 : 0 animated:animated];
+}
+
 - (CGRect)indicatorFrameForIndex:(NSInteger)index {
     WETabButton *button = self.tabButtons[index];
     CGRect title = [button tabTitleFrame];
@@ -470,24 +594,26 @@ static UIImage *CSGroupSearchIcon(void) {
 
 - (void)updateInteractiveTransitionToIndex:(NSInteger)index progress:(CGFloat)progress {
     if (!CSGroupIndicatorAnimationEnabled(NSUserDefaults.standardUserDefaults) || !self.window || UIAccessibilityIsReduceMotionEnabled() ||
-        self.selectedIndex<0 || self.selectedIndex>=(NSInteger)self.tabButtons.count || index<0 || index>=(NSInteger)self.tabButtons.count || !isfinite(progress)) {
+        self.selectedIndex<0 || self.selectedIndex>=(NSInteger)self.tabButtons.count || index<0 || index>=(NSInteger)self.tabButtons.count || index==self.selectedIndex || !isfinite(progress)) {
         if (self.interactiveTransition) { self.interactiveTransition=NO; [self updateIndicatorPositionAnimated:NO]; }
         return;
     }
     self.interactiveTransition=YES; self.interactiveTarget=index;
     CGFloat t=MAX(0,MIN(1,progress)); self.interactiveProgress=t;
     CGRect from=[self indicatorFrameForIndex:self.selectedIndex], to=[self indicatorFrameForIndex:index];
-    // Arrive beneath the target as contraction finishes, then expand in place.
-    // Separate width phases keep the minimum there even for unequal titles.
-    CGFloat travel=MIN(1,t*2);
-    CGFloat center=CGRectGetMidX(from)+(CGRectGetMidX(to)-CGRectGetMidX(from))*travel;
-    CGFloat minimumWidth=MIN(from.size.width,to.size.width)*0.30;
-    CGFloat endpointWidth=t<0.5 ? from.size.width : to.size.width;
-    CGFloat contraction=(t==0 || t==1) ? 0 : sin(M_PI*t);
-    CGFloat width=endpointWidth+(minimumWidth-endpointWidth)*contraction;
-    CGRect frame=CGRectMake(center-width/2,to.origin.y,width,to.size.height);
-    self.indicatorView.hidden=NO;
-    [self moveIndicatorToFrame:frame animated:NO];
+    CGFloat center=CGRectGetMidX(from)+(CGRectGetMidX(to)-CGRectGetMidX(from))*t;
+    if (self.indicatorStyle == CSGroupIndicatorStyleCapsule) {
+        self.indicatorView.hidden = YES;
+        for (WETabButton *button in self.tabButtons) {
+            CGFloat progress = button.tabIndex == self.selectedIndex ? 1 - t : (button.tabIndex == index ? t : 0);
+            [button setCapsuleProgress:progress animated:NO];
+        }
+    } else {
+        CGFloat width=(from.size.width+(to.size.width-from.size.width)*t)*(1-0.70*sin(M_PI*t));
+        CGRect frame=CGRectMake(center-width/2,to.origin.y,width,to.size.height);
+        self.indicatorView.hidden=NO;
+        [self moveIndicatorToFrame:frame animated:NO];
+    }
     CGFloat viewport=CGRectGetWidth(self.scrollView.bounds);
     CGFloat maxOffset=MAX(0,self.scrollView.contentSize.width-viewport);
     CGFloat offset=MAX(0,MIN(center-viewport/2,maxOffset));

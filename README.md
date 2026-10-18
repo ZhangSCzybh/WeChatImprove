@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
 
-**当前版本：`1.8-12`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.8-20`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
 
@@ -10,19 +10,17 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 插件版本 | `1.8-12`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+| 插件版本 | `1.8-20`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
 | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
 | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
 | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
-| Rootless / Rootful | `1.8-12` 为语音代码清理与分组指示器调整的 Rootless 包，包含此前首条语音与界面性能修正；Rootful 保留构建入口，本轮未验证 |
+| Rootless / Rootful | `1.8-20` 为胶囊直接使用指示器颜色的 Rootless 包，保留原下划线效果与此前功能；Rootful 保留构建入口，本轮未验证 |
 | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
 | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
 
 微信私有类、方法和界面结构会随版本变化。当前已有编译与逻辑回归结果，真实设备上的界面渲染、原生菜单和不同插件组合仍需按实际环境验证。
 
-本轮记录见 [1.8-12 语音清理与分组指示器调整](docs/audits/voice-cleanup-indicator-2026-10-18/README.md)。用户已确认语音功能正常；本轮精简调试断言、重复状态与未使用引用，保留首条语音修复。分组指示器在收缩阶段到达目标标题下方，再原地展开，兼顾左右滑动与不同标题宽度。按用户要求只运行语音、指示器和分组手势核心回归；没有安装到手机或替代真实收发、播放与动画验证。
-
-此前记录：[1.8-11 首条语音准备修正](docs/audits/first-voice-2026-10-18/README.md)、[1.8-10 语音兼容与界面优化](docs/audits/avatar-input-performance-2026-10-18/README.md)、[1.8-9 代码清理](docs/audits/performance-cleanup-2026-10-18/README.md)、[1.8-8 首屏恢复与性能优化](docs/audits/performance-resume-2026-10-18/implementation.md)。
+本轮记录见 [1.8-20 胶囊背景颜色调整](docs/group-capsule-1.8-20.md)。胶囊背景直接使用所设置的指示器颜色，保留颜色自身透明度，去掉额外的浅色处理；标题继续使用选中文本颜色，深浅色分别配置。沿用 [1.8-19 分组胶囊包裹](docs/group-capsule-1.8-19.md) 的动画、设置选项与六项入口图标调整，保留此前配置、历史记录与旧安装包。
 
 ## 安装与入口
 
@@ -131,6 +129,7 @@
 | 显示分组栏搜索按钮：关闭 | 隐藏分组栏搜索按钮，恢复原生搜索区域，分组栏显示在其下方 |
 | 隐藏分组角标 / 隐藏全部角标 | 分别控制分组及“全部”的未读提示显示 |
 | 指示器颜色 / 选中文本颜色 / 切换触感 | 调整选中效果和切换反馈 |
+| 分组指示器切换动画 | 下划线：原平移伸展效果；胶囊包裹：标题背后的圆角色块原地收拢、展开；关闭：静态下划线直接落位 |
 
 分组栏属于聊天列表头部，会随列表滚动。搜索按钮开启时，如果原生头部同时包含横幅等内容，也会一起收起；使用快捷按钮进入原生搜索时，保留转场背后的分组栏，原生搜索页面继续由微信负责；关闭分组或快捷按钮后恢复原生头部。搜索按钮使用细线轮廓放大镜。
 
@@ -196,20 +195,20 @@ Makefile 当前包含开发机的固定 Theos 路径。下面通过命令行 `TH
 ### Rootless（无根）
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-12
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless PACKAGE_VERSION=1.8-11
 ```
 
-默认产物：`packages/com.wechat.improve_1.8-12_iphoneos-arm64.deb`。
+默认产物：`packages/com.wechat.improve_1.8-11_iphoneos-arm64.deb`。
 
 ### Rootful（有根）
 
-以下为构建方法；本轮 `1.8-12` 交付仅包含 Rootless 包。
+以下为构建方法；本轮 `1.8-11` 交付仅包含 Rootless 包。
 
 ```bash
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-12
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful PACKAGE_VERSION=1.8-11
 ```
 
-默认产物：`packages/com.wechat.improve_1.8-12_iphoneos-arm.deb`。
+默认产物：`packages/com.wechat.improve_1.8-11_iphoneos-arm.deb`。
 
 两种方案均配置编译 `arm64` 和 `arm64e`。包名里的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择安装包，不能仅凭手机处理器名称选择。
 
@@ -229,7 +228,7 @@ Roothide 需要匹配的 Theos 方案支持，可通过 `SCHEME=roothide` 选择
 安装了 `dpkg-deb` 的开发环境可检查包内信息：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.8-12_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.8-11_iphoneos-arm64.deb Version Architecture
 ```
 
 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`。普通打包直接运行 `make package`；如确需清理，先将要保留的安装包移到其他目录。

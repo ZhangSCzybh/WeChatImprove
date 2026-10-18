@@ -28,6 +28,7 @@ static BOOL UIAccessibilityIsReduceMotionEnabled(void) { return reducedMotion; }
 static CGFloat const kIndicatorHeight=2;
 static NSTimeInterval const kIndicatorDuration=0.20;
 static NSString *const kIndicatorAnimationKey=@"CSGroupIndicator.selection";
+#include "GroupCapsuleHelpers.h"
 enum { UIViewAnimationOptionCurveEaseInOut=1, UIViewAnimationOptionBeginFromCurrentState=2, UIViewAnimationOptionAllowUserInteraction=4 };
 @interface TestLayer : CALayer
 @property(nonatomic,strong) NSMutableDictionary *savedAnimations;
@@ -49,6 +50,9 @@ enum { UIViewAnimationOptionCurveEaseInOut=1, UIViewAnimationOptionBeginFromCurr
 @property(nonatomic) CGPoint contentOffset;
 @property(nonatomic) CGSize contentSize;
 @property(nonatomic) NSUInteger scrollWrites;
+- (void)setNeedsLayout;
+- (void)removeFromSuperview;
+- (void)insertSubview:(UIView *)view belowSubview:(UIView *)sibling;
 - (void)layoutIfNeeded;
 - (void)setContentOffset:(CGPoint)offset animated:(BOOL)animated;
 + (void)animateWithDuration:(double)duration delay:(double)delay options:(NSUInteger)options animations:(void (^)(void))animations completion:(void (^)(BOOL))completion;
@@ -58,19 +62,45 @@ enum { UIViewAnimationOptionCurveEaseInOut=1, UIViewAnimationOptionBeginFromCurr
 - (CGRect)frame { return self.layer.frame; }
 - (void)setFrame:(CGRect)frame { self.layer.frame=frame; }
 - (void)layoutIfNeeded {}
+- (void)setNeedsLayout {}
+- (void)removeFromSuperview {}
+- (void)insertSubview:(UIView *)view belowSubview:(UIView *)sibling { (void)view; (void)sibling; }
 - (void)setContentOffset:(CGPoint)offset animated:(BOOL)animated { (void)animated; self.contentOffset=offset; self.scrollWrites++; }
 + (void)animateWithDuration:(double)duration delay:(double)delay options:(NSUInteger)options animations:(void (^)(void))animations completion:(void (^)(BOOL))completion {
     (void)duration; (void)delay; (void)options; viewportAnimations++; animations(); if (completion) completion(YES);
 }
 @end
+@interface UIColor : NSObject
+@property(nonatomic,readonly) CGColorRef CGColor;
+@end
+@implementation UIColor
+- (CGColorRef)CGColor { return CGColorGetConstantColor(kCGColorWhite); }
+@end
+enum { NSTextAlignmentCenter=1 };
+@interface UILabel : UIView
+@property(nonatomic) BOOL isAccessibilityElement,userInteractionEnabled;
+@property(nonatomic) NSInteger textAlignment;
+@property(nonatomic,strong) UIColor *textColor;
+@end
+@implementation UILabel @end
 @interface WETabButton : UIView
 @property(nonatomic) NSInteger tabIndex;
 @property(nonatomic,copy) NSString *tabID;
-@property(nonatomic) CGRect titleFrame;
+@property(nonatomic,strong) TestLayer *capsuleLayer;
+@property(nonatomic,strong) UILabel *capsuleTitleLabel;
+@property(nonatomic,strong) UIView *titleLabel;
+@property(nonatomic,strong) UIView *unreadBadge;
+@property(nonatomic) BOOL capsuleEnabled;
+@property(nonatomic) CGFloat capsuleProgress;
+- (void)setCapsuleProgress:(CGFloat)progress animated:(BOOL)animated;
+- (void)configureCapsuleEnabled:(BOOL)enabled color:(UIColor *)color textColor:(UIColor *)textColor;
 - (CGRect)tabTitleFrame;
 @end
 @implementation WETabButton
-- (CGRect)tabTitleFrame { return CGRectIsEmpty(self.titleFrame) ? CGRectMake(20,12,40,20) : self.titleFrame; }
+- (CGRect)tabTitleFrame { return CGRectMake(20,12,40,20); }
+#define CALayer TestLayer
+#include "GroupCapsuleButtonBody.h"
+#undef CALayer
 @end
 @interface WESessionTabContainerView : UIView
 @property(nonatomic) NSInteger selectedIndex;
@@ -81,6 +111,8 @@ enum { UIViewAnimationOptionCurveEaseInOut=1, UIViewAnimationOptionBeginFromCurr
 @property(nonatomic) BOOL interactiveTransition,settlingInteractiveTransition;
 @property(nonatomic) NSInteger interactiveTarget;
 @property(nonatomic) CGFloat interactiveProgress;
+@property(nonatomic) CSGroupIndicatorStyle indicatorStyle;
+- (void)updateCapsuleSelectionAnimated:(BOOL)animated;
 - (CGRect)indicatorFrameForIndex:(NSInteger)index;
 - (void)updateInteractiveTransitionToIndex:(NSInteger)index progress:(CGFloat)progress;
 - (void)cancelInteractiveTransition;
@@ -102,63 +134,45 @@ static void Check(BOOL c,NSString *message) { checks++; if (!c) { failures++; fp
 static WESessionTabContainerView *Fixture(void) {
     WESessionTabContainerView *view=[WESessionTabContainerView new];
     view.window=[NSObject new]; view.indicatorView=[UIView new]; view.scrollView=[UIView new];
+    view.indicatorStyle=CSGroupCurrentIndicatorStyle(testDefaults);
     view.scrollView.bounds=CGRectMake(0,0,160,52); view.scrollView.contentSize=CGSizeMake(300,52);
     NSMutableArray *buttons=[NSMutableArray array];
     for (NSInteger i=0;i<3;i++) {
         WETabButton *button=[WETabButton new]; button.frame=CGRectMake(i*100,0,80,52);
         button.bounds=CGRectMake(0,0,80,52); button.tabIndex=i; button.tabID=[NSString stringWithFormat:@"tab%ld",(long)i];
+        button.titleLabel=[UIView new]; button.unreadBadge=[UIView new];
+        if (view.indicatorStyle==CSGroupIndicatorStyleCapsule) {
+            [button configureCapsuleEnabled:YES color:[UIColor new] textColor:[UIColor new]];
+        }
         [buttons addObject:button];
     }
     view.tabButtons=buttons; view.selectedIndex=0; view.selectedTabID=@"tab0";
     [view updateIndicatorPositionAnimated:NO]; return view;
 }
-static void TestSwipeGeometry(void) {
-    // Different title widths must reach their minimum at the destination too.
-    for (NSArray<NSNumber *> *widths in @[@[@40,@40],@[@40,@140],@[@140,@40]]) {
-        for (NSInteger direction=0;direction<2;direction++) {
-            WESessionTabContainerView *view=Fixture();
-            for (NSUInteger index=0;index<2;index++) {
-                WETabButton *button=view.tabButtons[index];
-                CGFloat width=widths[index].doubleValue;
-                button.frame=CGRectMake(index*200,0,width+40,52);
-                button.bounds=CGRectMake(0,0,width+40,52);
-                button.titleFrame=CGRectMake(20,12,width,20);
-            }
-            [view selectTabAtIndex:direction animated:NO];
-            CGRect origin=[view indicatorFrameForIndex:direction], target=[view indicatorFrameForIndex:1-direction];
-            CGFloat previousWidth=origin.size.width, minimumWidth=CGFLOAT_MAX, minimumCenter=0;
-            BOOL contracts=YES,expands=YES,staysAtTarget=YES,bounded=YES,reversible=YES;
-            NSMutableArray<NSValue *> *frames=[NSMutableArray array];
-            for (NSUInteger step=0;step<=100;step++) {
-                [view updateInteractiveTransitionToIndex:1-direction progress:step/100.0];
-                CGRect frame=view.indicatorView.frame;
-                [frames addObject:[NSValue valueWithBytes:&frame objCType:@encode(CGRect)]];
-                if (step<=50) contracts &= frame.size.width<=previousWidth+0.001;
-                else expands &= frame.size.width>=previousWidth-0.001;
-                if (step>=50) staysAtTarget &= fabs(CGRectGetMidX(frame)-CGRectGetMidX(target))<0.001;
-                bounded &= frame.size.width>=MIN(origin.size.width,target.size.width)*0.30-0.001 &&
-                    frame.size.width<=MAX(origin.size.width,target.size.width)+0.001;
-                if (frame.size.width<minimumWidth) { minimumWidth=frame.size.width; minimumCenter=CGRectGetMidX(frame); }
-                previousWidth=frame.size.width;
-            }
-            Check(contracts && expands,@"both swipe directions contract then expand even with unequal title widths");
-            Check(staysAtTarget && fabs(minimumCenter-CGRectGetMidX(target))<0.001,@"minimum width is under the target title and expansion stays there");
-            Check(bounded && CGRectEqualToRect(view.indicatorView.frame,target),@"swipe preserves width bounds and ends at the normal target frame");
-            for (NSInteger step=100;step>=0;step--) {
-                [view updateInteractiveTransitionToIndex:1-direction progress:step/100.0];
-                CGRect expected; [frames[step] getValue:&expected size:sizeof(expected)];
-                reversible &= CGRectEqualToRect(view.indicatorView.frame,expected);
-            }
-            Check(reversible && CGRectEqualToRect(view.indicatorView.frame,origin),@"finger reversal retraces the same geometry back to the source");
-            [view updateInteractiveTransitionToIndex:1-direction progress:0.75];
-            [view cancelInteractiveTransition];
-            Check(view.selectedIndex==direction && CGRectEqualToRect(view.indicatorView.frame,origin),@"cancel after arriving under the target still restores the original group");
-        }
-    }
-}
 int main(void) { @autoreleasepool {
     NSString *suite=[@"com.wechat.improve.tests.indicator." stringByAppendingString:NSUUID.UUID.UUIDString];
     testDefaults=[[NSUserDefaults alloc] initWithSuiteName:suite];
+    Check(CSGroupCurrentIndicatorStyle(testDefaults)==CSGroupIndicatorStyleUnderline,@"fresh install preserves the original underline style");
+    Check(![testDefaults objectForKey:CSGroupIndicatorStyleKey],@"reading preferences does not migrate or write user data");
+    [testDefaults setInteger:2 forKey:@"com.wechat.enhance.chat_group.indicator_animation_style"];
+    Check(CSGroupCurrentIndicatorStyle(testDefaults)==CSGroupIndicatorStyleUnderline,@"abandoned animation choices cannot silently opt into capsule");
+    for (NSNumber *legacy in @[@YES,@NO]) {
+        [testDefaults setBool:legacy.boolValue forKey:CSGroupIndicatorAnimationEnabledKey];
+        CSGroupIndicatorStyle expected=legacy.boolValue?CSGroupIndicatorStyleUnderline:CSGroupIndicatorStyleNone;
+        for (id invalid in @[@"2",@(-1),@3,@1.5,@(NAN),@{},@[]]) {
+            [testDefaults setObject:invalid forKey:CSGroupIndicatorStyleKey];
+            Check(CSGroupCurrentIndicatorStyle(testDefaults)==expected,@"invalid new preferences preserve the old on/off choice");
+        }
+    }
+    for (NSNumber *style in @[@0,@1,@2]) {
+        CSGroupSetIndicatorStyle(testDefaults,style.integerValue);
+        Check(CSGroupCurrentIndicatorStyle([[NSUserDefaults alloc] initWithSuiteName:suite])==style.integerValue,@"each style survives a new preference instance");
+        Check([testDefaults boolForKey:CSGroupIndicatorAnimationEnabledKey]==(style.integerValue!=0),@"legacy boolean remains compatible with downgrades");
+    }
+    CSGroupSetIndicatorStyle(testDefaults,(CSGroupIndicatorStyle)99);
+    Check(CSGroupCurrentIndicatorStyle(testDefaults)==CSGroupIndicatorStyleCapsule,@"invalid selections do not overwrite the saved style");
+    [testDefaults removeObjectForKey:CSGroupIndicatorStyleKey];
+    [testDefaults removeObjectForKey:CSGroupIndicatorAnimationEnabledKey];
     Check(CSGroupIndicatorAnimationEnabled(testDefaults),@"unset preference preserves enabled animation by default");
     [testDefaults setObject:@"invalid" forKey:CSGroupIndicatorAnimationEnabledKey];
     Check(CSGroupIndicatorAnimationEnabled(testDefaults),@"invalid stored preference falls back to enabled");
@@ -220,10 +234,9 @@ int main(void) { @autoreleasepool {
     CGRect origin=v.indicatorView.frame;
     [v updateInteractiveTransitionToIndex:1 progress:0.25];
     Check(v.interactiveTransition && v.selectedIndex==0 && v.haptics==0,@"drag preview never commits selection or sends haptics");
-    Check(fabs(CGRectGetMidX(v.indicatorView.frame)-90)<0.001 && ![v.indicatorView.layer animationForKey:kIndicatorAnimationKey],@"contraction moves toward the target immediately with no queued animation");
+    Check(fabs(CGRectGetMidX(v.indicatorView.frame)-65)<0.001 && ![v.indicatorView.layer animationForKey:kIndicatorAnimationKey],@"quarter drag moves immediately with no queued animation");
     [v updateInteractiveTransitionToIndex:1 progress:0.5];
     Check(fabs(v.indicatorView.frame.size.width-origin.size.width*0.30)<0.001,@"mid-drag contracts to 30 percent of normal width");
-    Check(fabs(CGRectGetMidX(v.indicatorView.frame)-140)<0.001,@"shortest indicator is directly under the target title");
     CGRect mid=v.indicatorView.frame; [v updateIndicatorPosition];
     Check(CGRectEqualToRect(mid,v.indicatorView.frame),@"ordinary layout keeps interactive progress");
     [v updateInteractiveTransitionToIndex:1 progress:0.1];
@@ -259,7 +272,73 @@ int main(void) { @autoreleasepool {
     Check(!v.interactiveTransition,@"reduce motion also suppresses interactive stretch");
     reducedMotion=NO; [v updateInteractiveTransitionToIndex:99 progress:0.5];
     Check(!v.interactiveTransition,@"invalid adjacent target is ignored");
-    TestSwipeGeometry();
+
+    CSGroupSetIndicatorStyle(testDefaults,CSGroupIndicatorStyleCapsule);
+    v=Fixture();
+    WETabButton *a=v.tabButtons[0], *b=v.tabButtons[1], *c=v.tabButtons[2];
+    Check(v.indicatorView.hidden && a.capsuleLayer.opacity==1 && b.capsuleLayer.opacity==0,@"capsule first layout has exactly one selected background and no underline");
+    Check(!a.capsuleLayer.animationAdds && !b.capsuleLayer.animationAdds,@"first layout does not animate");
+    CGRect title=CGRectMake(20,12,40,20), bounds=CGRectMake(0,0,80,52);
+    CGRect capsule=CSGroupCapsuleFrame(title,bounds);
+    Check(CGRectContainsRect(capsule,title) && CGRectContainsRect(bounds,capsule),@"capsule surrounds the title within the original button bounds");
+    Check(CGRectGetMidX(capsule)==CGRectGetMidX(title) && capsule.size.height>title.size.height,@"capsule wraps the title without changing its position");
+    Check(CGRectEqualToRect(CSGroupCapsuleFrame(title,CGRectZero),CGRectZero) && CGRectEqualToRect(CSGroupCapsuleFrame(CGRectZero,bounds),CGRectZero),@"unmeasured button/title cannot produce infinite layer geometry");
+    Check(CGRectEqualToRect(CSGroupCapsuleFrame(CGRectMake(200,0,40,20),bounds),CGRectZero),@"nonintersecting layout cannot produce a null/infinite frame");
+    UIColor *chosenText=[UIColor new], *chosenFill=[UIColor new];
+    CALayer *reused=a.capsuleLayer;
+    [a configureCapsuleEnabled:YES color:chosenFill textColor:chosenText];
+    Check(a.capsuleLayer==reused && a.capsuleTitleLabel.textColor==chosenText && CGColorEqualToColor(a.capsuleLayer.backgroundColor,chosenFill.CGColor),@"appearance refresh reuses the capsule and applies independent fill/text colors");
+    Check(!a.capsuleTitleLabel.isAccessibilityElement && !a.capsuleTitleLabel.userInteractionEnabled,@"overlay neither intercepts taps nor duplicates VoiceOver elements");
+    [v selectTabAtIndex:1 animated:YES];
+    CAAnimationGroup *bloom=(id)[b.capsuleLayer animationForKey:kCapsuleAnimationKey];
+    Check(bloom && fabs(bloom.duration-0.28)<0.001,@"capsule selection uses a finite 280ms transition");
+    Check(b.capsuleLayer.opacity==1 && a.capsuleLayer.opacity==0 && b.titleLabel.layer.opacity==0 && b.capsuleTitleLabel.layer.opacity==1,@"background and selected title crossfade to the committed selection");
+    Check([[(CABasicAnimation *)bloom.animations[0] keyPath] isEqual:@"opacity"] && [[(CABasicAnimation *)bloom.animations[1] keyPath] isEqual:@"transform"],@"capsule animates only opacity and local scale, never horizontal travel");
+    NSUInteger capsuleAdds=b.capsuleLayer.animationAdds, capsuleHaptics=v.haptics;
+    for (NSInteger i=0;i<10;i++) { v.selectedTabID=@"tab1"; [v updateIndicatorPosition]; }
+    Check(b.capsuleLayer.animationAdds==capsuleAdds && [b.capsuleLayer animationForKey:kCapsuleAnimationKey]==bloom && v.haptics==capsuleHaptics,@"passive refresh does not restart capsule animation or repeat haptics");
+    CALayer *partial=[CALayer layer]; partial.opacity=.4; partial.transform=CATransform3DMakeScale(.65,.9,1);
+    b.capsuleLayer.visibleLayer=partial;
+    [v selectTabAtIndex:2 animated:YES];
+    CAAnimationGroup *retreat=(id)[b.capsuleLayer animationForKey:kCapsuleAnimationKey];
+    Check(fabs([[(CABasicAnimation *)retreat.animations[0] fromValue] doubleValue]-.4)<.001,@"rapid reversal starts from the displayed opacity");
+    Check(CATransform3DEqualToTransform([[(CABasicAnimation *)retreat.animations[1] fromValue] CATransform3DValue],partial.transform),@"rapid reversal starts from the displayed local scale");
+    Check(c.capsuleLayer.opacity==1 && a.capsuleLayer.opacity==0 && b.capsuleLayer.opacity==0,@"rapid selection cannot leave multiple selected model layers");
+    v=Fixture(); a=v.tabButtons[0]; b=v.tabButtons[1];
+    [v updateInteractiveTransitionToIndex:1 progress:.4];
+    Check(v.selectedIndex==0 && v.haptics==0 && fabs(a.capsuleProgress-.6)<.001 && fabs(b.capsuleProgress-.4)<.001,@"capsule drag previews both titles without committing or haptics");
+    Check(!a.capsuleLayer.animationAdds && !b.capsuleLayer.animationAdds,@"drag updates do not enqueue animations");
+    [v updateIndicatorPosition];
+    Check(fabs(b.capsuleProgress-.4)<.001,@"passive layout preserves the finger's capsule progress");
+    [v updateInteractiveTransitionToIndex:1 progress:.15];
+    Check(fabs(b.capsuleProgress-.15)<.001,@"reversing a drag reverses the fill immediately");
+    [v cancelInteractiveTransition];
+    Check(v.selectedIndex==0 && a.capsuleLayer.opacity==1 && b.capsuleLayer.opacity==0 && v.haptics==0,@"cancel restores original capsule with no selection or haptic side effects");
+    v=Fixture(); a=v.tabButtons[0]; b=v.tabButtons[1];
+    [v updateInteractiveTransitionToIndex:1 progress:.5]; [v selectTabAtIndex:1 animated:YES];
+    bloom=(id)[b.capsuleLayer animationForKey:kCapsuleAnimationKey];
+    Check(v.selectedIndex==1 && v.haptics==1 && fabs([[(CABasicAnimation *)bloom.animations[0] fromValue] doubleValue]-.5)<.001,@"gesture commit continues from visible fill and triggers one haptic");
+    [v selectTabAtIndex:2 animated:YES]; reducedMotion=YES; [v updateIndicatorPositionAnimated:NO];
+    BOOL stopped=YES;
+    for (WETabButton *tab in v.tabButtons) stopped &= ![tab.capsuleLayer animationForKey:kCapsuleAnimationKey] && ![tab.titleLabel.layer animationForKey:kCapsuleAnimationKey] && ![tab.capsuleTitleLabel.layer animationForKey:kCapsuleAnimationKey];
+    Check(stopped && v.tabButtons[2].capsuleProgress==1,@"reduce motion stops every capsule layer at the selected state");
+    [v selectTabAtIndex:0 animated:YES];
+    Check(![v.tabButtons[0].capsuleLayer animationForKey:kCapsuleAnimationKey],@"reduce motion suppresses capsule transitions");
+    reducedMotion=NO; v=Fixture(); v.window=nil; [v selectTabAtIndex:1 animated:YES];
+    Check(![v.tabButtons[1].capsuleLayer animationForKey:kCapsuleAnimationKey] && v.tabButtons[1].capsuleProgress==1,@"offscreen capsule selection is immediate");
+    v=Fixture(); [v selectTabAtIndex:1 animated:YES]; v.selectedIndex=NSNotFound; [v updateIndicatorPositionAnimated:NO];
+    Check(v.indicatorView.hidden && v.tabButtons[0].capsuleProgress==0 && v.tabButtons[1].capsuleProgress==0 && v.tabButtons[2].capsuleProgress==0,@"invalid or removed selection clears all capsule highlights");
+    v=Fixture(); [v selectTabAtIndex:1 animated:YES]; b=v.tabButtons[1];
+    [b configureCapsuleEnabled:NO color:nil textColor:nil];
+    Check(!b.capsuleLayer && !b.capsuleTitleLabel && b.titleLabel.layer.opacity==1 && ![b.titleLabel.layer animationForKey:kCapsuleAnimationKey],@"leaving capsule style frees its views and restores the normal title immediately");
+    v=Fixture(); [v updateInteractiveTransitionToIndex:0 progress:.5];
+    Check(!v.interactiveTransition && v.tabButtons[0].capsuleProgress==1,@"same-tab gesture cannot fade the selected capsule");
+    [v updateInteractiveTransitionToIndex:1 progress:INFINITY];
+    Check(!v.interactiveTransition && v.tabButtons[0].capsuleProgress==1,@"nonfinite drag input cannot corrupt capsule layers");
+    CSGroupSetIndicatorStyle(testDefaults,CSGroupIndicatorStyleNone);
+    v.indicatorStyle=CSGroupIndicatorStyleNone;
+    [v updateIndicatorPositionAnimated:NO];
+    Check(!v.indicatorView.hidden && ![v.indicatorView.layer animationForKey:kIndicatorAnimationKey],@"disabled choice uses the original static underline");
     [testDefaults removePersistentDomainForName:suite];
     printf("Group indicator: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;

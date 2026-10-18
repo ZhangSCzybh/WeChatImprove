@@ -1,0 +1,124 @@
+ M .DS_Store
+ M .theos/_/DEBIAN/control
+ M .theos/_/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib
+ M .theos/last_package
+ M .theos/obj/WeChatImprove.dylib
+ M .theos/obj/arm64/Controllers/CSAvatarSettingsViewController.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSAvatarSettingsViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSBubbleStyleAdapter.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSBubbleStyleAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSChatRoomSelectViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSContactSeparatorSettingsViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSGroupListAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSInputTextSettingsViewController.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSInputTextSettingsViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSListCornerConfiguration.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSMessageActionCoordinator.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSMessageActionPreferences.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSMessageMediaProvider.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSMessageSendAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSReceiveRedEnvelopOperation.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSRedEnvelopConfig.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSReleaseNotesViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSTabBarNativeAdapter.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSTabBarNativeAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSTouchTrailViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSVoiceForwardAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/WESessionTabContainerView.m.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/AvatarHooks.xm.7be6bc4b.Td
+ M .theos/obj/arm64/Hooks/AvatarHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/BackgroundRun.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/CSAvatarShape.xm.7be6bc4b.Td
+ M .theos/obj/arm64/Hooks/CSAvatarShape.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/CustomEntryHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/HideDiscoverHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/HideSettingHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/InputTextHooks.xm.7be6bc4b.Td
+ M .theos/obj/arm64/Hooks/InputTextHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/LayoutHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/MessageTimeHooks.xm.7be6bc4b.Td
+ M .theos/obj/arm64/Hooks/MessageTimeHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/NavigationTitleHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/ReceiveTransferHooks.xm.7be6bc4b.Td
+ M .theos/obj/arm64/Hooks/ReceiveTransferHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/RedEnvelopHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/TouchTrailHooks.xm.7be6bc4b.Td
+ M .theos/obj/arm64/Hooks/TouchTrailHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/UserInfoHooks.xm.7be6bc4b.Td
+ M .theos/obj/arm64/Hooks/UserInfoHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/VoiceForwardHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/WeChatImprove.dylib
+ M .theos/obj/arm64/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib
+ M .theos/obj/arm64/WeChatImprove.dylib.dSYM/Contents/Resources/Relocations/aarch64/WeChatImprove.dylib.yml
+ M .theos/obj/arm64e/Controllers/CSAvatarSettingsViewController.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSAvatarSettingsViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSBubbleStyleAdapter.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSBubbleStyleAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSChatRoomSelectViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSContactSeparatorSettingsViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSGroupListAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSInputTextSettingsViewController.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSInputTextSettingsViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSListCornerConfiguration.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSMessageActionCoordinator.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSMessageActionPreferences.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSMessageMediaProvider.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSMessageSendAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSReceiveRedEnvelopOperation.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSRedEnvelopConfig.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSReleaseNotesViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSTabBarNativeAdapter.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSTabBarNativeAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSTouchTrailViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSVoiceForwardAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/WESessionTabContainerView.m.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/AvatarHooks.xm.dd9766eb.Td
+ M .theos/obj/arm64e/Hooks/AvatarHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/BackgroundRun.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/CSAvatarShape.xm.dd9766eb.Td
+ M .theos/obj/arm64e/Hooks/CSAvatarShape.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/CustomEntryHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/HideDiscoverHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/HideSettingHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/InputTextHooks.xm.dd9766eb.Td
+ M .theos/obj/arm64e/Hooks/InputTextHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/LayoutHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/MessageTimeHooks.xm.dd9766eb.Td
+ M .theos/obj/arm64e/Hooks/MessageTimeHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/NavigationTitleHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/ReceiveTransferHooks.xm.dd9766eb.Td
+ M .theos/obj/arm64e/Hooks/ReceiveTransferHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/RedEnvelopHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/TouchTrailHooks.xm.dd9766eb.Td
+ M .theos/obj/arm64e/Hooks/TouchTrailHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/UserInfoHooks.xm.dd9766eb.Td
+ M .theos/obj/arm64e/Hooks/UserInfoHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/VoiceForwardHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/WeChatImprove.dylib
+ M .theos/obj/arm64e/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib
+ M .theos/obj/arm64e/WeChatImprove.dylib.dSYM/Contents/Resources/Relocations/arm64e/WeChatImprove.dylib.yml
+ M Controllers/CSMessageMediaProvider.m
+ M Controllers/CSReleaseNotesViewController.m
+ M Controllers/WESessionTabContainerView.m
+ M Headers/CSUserInfoHelper.h
+ M README.md
+ M Tests/GroupIndicatorTests.m
+ M control
+?? .theos/obj/arm64/Controllers/CSAvatarRotation.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSAvatarRotation.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSAvatarURLCache.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSAvatarURLCache.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSInputTextStyle.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSInputTextStyle.m.7be6bc4b.o
+?? .theos/obj/arm64e/Controllers/CSAvatarRotation.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSAvatarRotation.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSAvatarURLCache.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSAvatarURLCache.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSInputTextStyle.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSInputTextStyle.m.dd9766eb.o
+?? docs/audits/group-animation-styles-2026-10-18/
+?? docs/audits/payment-optimization-1.8-14/
+?? docs/audits/rollback-1.8-11-2026-10-18/
+?? docs/audits/voice-cleanup-payment-review-2026-10-18/
+?? packages/WeChatImprove-1.8-13-dSYMs.zip
+?? packages/com.wechat.improve_1.8-13_iphoneos-arm64.deb

@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "Package": "com.wechat.improve",
+    "Version": "1.8-13",
+    "Architecture": "iphoneos-arm64",
+    "Depends": "mobilesubstrate (>= 0.9.5000)"
+  },
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "dylib_sha256": "c6856b831d76682842d5eb46fb736d5322e0723c43459278bc542c77ff250767",
+  "package_matches_built_and_staged_dylib": true,
+  "injection_filter_unchanged": true,
+  "symbols": {
+    "arm64": "4217C9C8-B4F9-33A8-A032-E952267F785C",
+    "arm64e": "A17FB8DD-201D-3F62-A578-8F06444FF28C"
+  },
+  "preserved_prior_artifacts": 3,
+  "unchanged_baseline_source_files": 319,
+  "changed_existing_files": [
+    "Controllers/CSChatGroupSettingsViewController.m",
+    "Controllers/CSGroupAppearance.h",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Controllers/WESessionTabContainerView.m",
+    "Headers/CSUserInfoHelper.h",
+    "README.md",
+    "Tests/GroupIndicatorTests.m",
+    "control"
+  ],
+  "added_files": [
+    "Controllers/CSGroupIndicatorMotion.h",
+    "Tests/GroupIndicatorSettingsTests.m",
+    "Tests/verify-group-indicator-settings.sh"
+  ],
+  "diff_check": "passed",
+  "device_installed": false
+}

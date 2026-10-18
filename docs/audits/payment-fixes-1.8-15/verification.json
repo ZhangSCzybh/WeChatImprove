@@ -1,0 +1,53 @@
+{
+  "version": "1.8-15",
+  "metadata": {
+    "Package": "com.wechat.improve",
+    "Version": "1.8-15",
+    "Architecture": "iphoneos-arm64",
+    "Depends": "mobilesubstrate (>= 0.9.5000)"
+  },
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "dylib_sha256": "261606d8560af1a6310f21149d5aa956ee01fbff26cacf113e1e8d5913812338",
+  "package_matches_built_and_staged": true,
+  "dSYM_UUIDs": {
+    "arm64": "972D6F3B-AE89-389C-B794-B35502180757",
+    "arm64e": "334F8BEE-3B5E-3A2D-B5C5-378F1FAB31FF"
+  },
+  "artifacts": {
+    "packages/com.wechat.improve_1.8-15_iphoneos-arm64.deb": "fc20d6044e6173c7b02a482eec9624536efa1c17bcb1084c475ca2a424b8558a",
+    "packages/WeChatImprove-1.8-15-dSYMs.zip": "e0a0f3e1347c06d12318ead6794943b45dc5ba6a4e507092750e4e309c865b6c"
+  },
+  "preserved_prior_artifacts": 8,
+  "unchanged_baseline_files": 309,
+  "changed_existing_files": [
+    "Controllers/CSRedEnvelopSettingsViewController.m",
+    "Controllers/CSPaymentLedger.m",
+    "Controllers/CSPaymentAutomation.m",
+    "Controllers/CSReceiveTransferSettingsViewController.m",
+    "Controllers/CSPaymentCore.m",
+    "Controllers/CSPaymentLedger.h",
+    "Controllers/CSRedEnvelopSettingsViewController.h",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Controllers/CSPaymentCore.h",
+    "Hooks/ReceiveTransferHooks.xm",
+    "Hooks/RedEnvelopHooks.xm",
+    "Headers/CSUserInfoHelper.h",
+    "Tests/verify-payment-core.sh",
+    "Tests/PaymentAutomationTests.m",
+    "Tests/PaymentCoreTests.m",
+    "control",
+    "README.md"
+  ],
+  "deleted_obsolete_files": [],
+  "added_files": [],
+  "voice_and_grouping_baseline_preserved": true,
+  "core_tests": {
+    "foundation_assertions": 2213,
+    "production_bridge_and_hook_assertions": 95
+  },
+  "device_installed": false,
+  "real_payment_or_messages_sent": false
+}

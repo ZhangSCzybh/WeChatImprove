@@ -180,12 +180,12 @@ static CSMessageVoiceResource *CSValidatedVoice(NSData *data, unsigned int durat
     if (preparation.cancelled) { [self finish:preparation key:key resource:nil]; return; }
     // A first cell may keep stale status/extension fields across every user retry.
     // Re-fetch the exact persisted message before refusing it or starting download.
-    if (!preparation.sourceReloaded && (preparation.recording || (!preparation.terminalCompletion && !preparation.localComplete) ||
+    if (!preparation.sourceReloaded && (preparation.recording || !(preparation.terminalCompletion || preparation.localComplete) ||
         (preparation.explicitNonterminal && !preparation.terminalCompletion))) {
         if (![self reloadSource:preparation key:key]) return;
     }
     if (preparation.cancelled || preparation.recording) { [self finish:preparation key:key resource:nil]; return; }
-    if (!preparation.terminalCompletion && (!preparation.localComplete || preparation.explicitNonterminal)) { [self requestMissing:preparation key:key]; return; }
+    if (!(preparation.terminalCompletion || preparation.localComplete) || (preparation.explicitNonterminal && !preparation.terminalCompletion)) { [self requestMissing:preparation key:key]; return; }
     preparation.reading=YES; preparation.localReadAttempted=YES;
     NSData *snapshot=preparation.bytes; NSString *path=preparation.path;
     unsigned int duration=preparation.duration, format=preparation.format, expected=preparation.expectedBytes; BOOL known=preparation.formatKnown;

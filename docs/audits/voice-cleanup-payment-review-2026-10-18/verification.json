@@ -1,0 +1,23 @@
+{
+  "version_base": "1.8-11",
+  "changed_production_files": [
+    "Controllers/CSMessageMediaProvider.m",
+    "Controllers/CSVoiceForwardAdapter.h",
+    "Controllers/CSVoiceForwardAdapter.m"
+  ],
+  "production_hashes": {
+    "Controllers/CSMessageMediaProvider.m": "8fc3eb120a7923a75ca364e132e2e5aff5cf164027ef5c0d29ae3d38be96095f",
+    "Controllers/CSVoiceForwardAdapter.h": "9df3c53d10239211a9df8ac14938ac76546814ab1076371df77bd0e8b1f84038",
+    "Controllers/CSVoiceForwardAdapter.m": "0bcffb447e961c388abe35262f372394858b3f4eb725c76f7d3ae48358e1b734"
+  },
+  "other_baseline_files_unchanged": 324,
+  "prior_artifacts_unchanged": 5,
+  "voice_core_checks": 2261,
+  "voice_core_failures": 0,
+  "payment_audit_assertions": 29,
+  "existing_behavior_reproductions": 12,
+  "payment_production_logic_modified": false,
+  "new_package_built": false,
+  "device_installed": false,
+  "real_payment_or_message_calls": false
+}

@@ -1,0 +1,390 @@
+[0;36m==> [1;36mNotice:[m Build may be slow as Theos isn’t using all available CPU cores on this computer. Consider upgrading GNU Make: https://theos.dev/docs/parallel-building
+[1;31m> [1;3;39mMaking all for tweak WeChatImprove…[m
+[0;31m==> [1;39mPreprocessing Hooks/AvatarHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/AvatarHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BackgroundBlurHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BackgroundBlurHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BackgroundRun.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BackgroundRun.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BubbleStyleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BubbleStyleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CSAvatarShape.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CSAvatarShape.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CSChatAttachmentLayout.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CSChatAttachmentLayout.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CUtility.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CUtility.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CustomEntryHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CustomEntryHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/DisableUpdateHook.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/DisableUpdateHook.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/FavoriteHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/FavoriteHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/GameCheatsHook.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/GameCheatsHook.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideChatTimeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideChatTimeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideDiscoverHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideDiscoverHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideMomentsHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideQRCodeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideMomentsHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideSettingHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideQRCodeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/InputTextHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/LayoutHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideSettingHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/ListCornerRadiusHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/MessageGestureHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/InputTextHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/MessageMergeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/LayoutHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/ListCornerRadiusHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/MessageTimeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/MessageGestureHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/NavigationTitleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/ReceiveTransferHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/MessageMergeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/RedEnvelopHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/MessageTimeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/NavigationTitleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/ReceiveTransferHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/RedEnvelopHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/RepeatHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/RevokeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/SessionGroupHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/RepeatHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/TabBarStyleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/RevokeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/TouchTrailHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/UserInfoHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/SessionGroupHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/VoiceForwardHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/WCCustomTextHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/WCUploadTaskHook.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/TabBarStyleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/TouchTrailHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/UserInfoHooks.xm…[m
+[0;32m==> [1;39mCompiling Controllers/CSAccountDetailViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSAuthorizationManager.m (arm64e)…[m
+[0;31m==> [1;39mPreprocessing Hooks/VoiceForwardHooks.xm…[m
+[0;32m==> [1;39mCompiling Controllers/CSAvatarRotation.m (arm64e)…[m
+[0;31m==> [1;39mPreprocessing Hooks/WCCustomTextHooks.xm…[m
+[1mControllers/CSAuthorizationManager.m:215:63: [0m[0;1;35mwarning: [0m[1m'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations][0m
+  215 |             BOOL success = [[UIApplication sharedApplication] openURL:url];[0m
+      | [0;1;32m                                                              ^~~~~~~
+[0m      | [0;32m                                                              openURL:options:completionHandler:
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:97:1: [0m[0;1;36mnote: [0m'openURL:' has been explicitly marked deprecated here[0m
+   97 | - (BOOL)openURL:(NSURL*)url API_DEPRECATED_WITH_REPLACEMENT("openURL:options:completionHandler:", ios(2.0, 10.0)) API_UNAVAILABLE(visionos, watchos);[0m
+      | [0;1;32m^
+[0m[1mControllers/CSAuthorizationManager.m:243:48: [0m[0;1;35mwarning: [0m[1m'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations][0m
+  243 |             [[UIApplication sharedApplication] openURL:url];[0m
+      | [0;1;32m                                               ^~~~~~~
+[0m      | [0;32m                                               openURL:options:completionHandler:
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:97:1: [0m[0;1;36mnote: [0m'openURL:' has been explicitly marked deprecated here[0m
+   97 | - (BOOL)openURL:(NSURL*)url API_DEPRECATED_WITH_REPLACEMENT("openURL:options:completionHandler:", ios(2.0, 10.0)) API_UNAVAILABLE(visionos, watchos);[0m
+      | [0;1;32m^
+[0m[1mControllers/CSAuthorizationManager.m:325:48: [0m[0;1;35mwarning: [0m[1m'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations][0m
+  325 |             [[UIApplication sharedApplication] openURL:nsurl];[0m
+      | [0;1;32m                                               ^~~~~~~
+[0m      | [0;32m                                               openURL:options:completionHandler:
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:97:1: [0m[0;1;36mnote: [0m'openURL:' has been explicitly marked deprecated here[0m
+   97 | - (BOOL)openURL:(NSURL*)url API_DEPRECATED_WITH_REPLACEMENT("openURL:options:completionHandler:", ios(2.0, 10.0)) API_UNAVAILABLE(visionos, watchos);[0m
+      | [0;1;32m^
+[0m[0;31m==> [1;39mPreprocessing Hooks/WCUploadTaskHook.xm…[m
+[0;32m==> [1;39mCompiling Controllers/CSAccountDetailViewController.m (arm64)…[m
+3 warnings generated.
+[0;32m==> [1;39mCompiling Controllers/CSAuthorizationManager.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSAvatarRotation.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSAvatarSettingsViewController.m (arm64e)…[m
+[1mControllers/CSAuthorizationManager.m:215:63: [0m[0;1;35mwarning: [0m[1m'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations][0m
+  215 |             BOOL success = [[UIApplication sharedApplication] openURL:url];[0m
+      | [0;1;32m                                                              ^~~~~~~
+[0m      | [0;32m                                                              openURL:options:completionHandler:
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:97:1: [0m[0;1;36mnote: [0m'openURL:' has been explicitly marked deprecated here[0m
+   97 | - (BOOL)openURL:(NSURL*)url API_DEPRECATED_WITH_REPLACEMENT("openURL:options:completionHandler:", ios(2.0, 10.0)) API_UNAVAILABLE(visionos, watchos);[0m
+      | [0;1;32m^
+[0m[1mControllers/CSAuthorizationManager.m:243:48: [0m[0;1;35mwarning: [0m[1m'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations][0m
+  243 |             [[UIApplication sharedApplication] openURL:url];[0m
+      | [0;1;32m                                               ^~~~~~~
+[0m      | [0;32m                                               openURL:options:completionHandler:
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:97:1: [0m[0;1;36mnote: [0m'openURL:' has been explicitly marked deprecated here[0m
+   97 | - (BOOL)openURL:(NSURL*)url API_DEPRECATED_WITH_REPLACEMENT("openURL:options:completionHandler:", ios(2.0, 10.0)) API_UNAVAILABLE(visionos, watchos);[0m
+      | [0;1;32m^
+[0m[1mControllers/CSAuthorizationManager.m:325:48: [0m[0;1;35mwarning: [0m[1m'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations][0m
+  325 |             [[UIApplication sharedApplication] openURL:nsurl];[0m
+      | [0;1;32m                                               ^~~~~~~
+[0m      | [0;32m                                               openURL:options:completionHandler:
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:97:1: [0m[0;1;36mnote: [0m'openURL:' has been explicitly marked deprecated here[0m
+   97 | - (BOOL)openURL:(NSURL*)url API_DEPRECATED_WITH_REPLACEMENT("openURL:options:completionHandler:", ios(2.0, 10.0)) API_UNAVAILABLE(visionos, watchos);[0m
+      | [0;1;32m^
+[0m[0;32m==> [1;39mCompiling Controllers/CSAvatarURLCache.m (arm64e)…[m
+3 warnings generated.
+[0;32m==> [1;39mCompiling Controllers/CSBackgroundBlurManager.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackgroundBlurSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSAvatarSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackgroundRunViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupInfo.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupManager.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSAvatarURLCache.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStyleAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackgroundBlurManager.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStylePolicy.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackgroundBlurSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStyleSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatAttachmentSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatGroupSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackgroundRunViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupInfo.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatNativeBridge.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupManager.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatRoomSelectViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSContactSeparatorManager.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStyleAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSContactSeparatorSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSCustomViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStylePolicy.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStyleSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSEntrySettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSFavoriteSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGameCheatsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatAttachmentSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatGroupSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatNativeBridge.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupIndexScope.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupInvocationMapper.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatRoomSelectViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupListAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSContactSeparatorManager.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupNativeBridge.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupPreferences.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSContactSeparatorSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSCustomViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupProjection.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSEntrySettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSInputTextSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSFavoriteSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGameCheatsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSInputTextStyle.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSLayoutSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupIndexScope.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupInvocationMapper.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerConfiguration.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerContactsAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupListAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerDiscoverAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupNativeBridge.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerMoreAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerPageContext.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerRadiusSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupPreferences.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerRenderer.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupProjection.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerSectionPolicy.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerSessionAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSInputTextSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSInputTextStyle.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionContext.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionCoordinator.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionMenuAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionPolicy.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSLayoutSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionPreferences.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageCellLifecycle.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerConfiguration.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageGestureAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerContactsAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerDiscoverAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerMoreAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerPageContext.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageGestureSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerRadiusSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageMediaProvider.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerRenderer.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageMergeAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageMergePolicy.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerSectionPolicy.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerSessionAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageNativeActionAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionContext.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageNavigation.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionCoordinator.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageSendAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageTimeLayout.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionMenuAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionPolicy.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageTimeSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionPreferences.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageCellLifecycle.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageGestureAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNativeRewardPresenter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageGestureSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNativeRewardRoute.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageMediaProvider.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNativeSettingsHost.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageMergeAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNavigationTitleSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageMergePolicy.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageNativeActionAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSPaymentAutomation.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSPaymentCore.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageNavigation.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSPaymentLedger.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageSendAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSReceiveTransferSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRedEnvelopConfig.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageTimeLayout.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageTimeSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRedEnvelopSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNativeRewardPresenter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSReleaseNotesViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNativeRewardRoute.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRepeatSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNativeSettingsHost.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSResetSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRevokeReference.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNavigationTitleSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSPaymentAutomation.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSPaymentCore.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRevokeSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSServiceCenter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSSettingTableViewCell.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSPaymentLedger.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTabBarNativeAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTabBarPreferences.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSReceiveTransferSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTabBarStyleSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTimeLineTailSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRedEnvelopConfig.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRedEnvelopSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTouchTrailViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSUICleanViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSReleaseNotesViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRepeatSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSResetSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRevokeReference.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRevokeSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSUpdateControlViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSVersionSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSVoiceForwardAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSServiceCenter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSSettingTableViewCell.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTabBarNativeAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSVoiceForwardSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTabBarPreferences.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSWCEnhanceViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTabBarStyleSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/WCPLMessagePersistenceAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/WEContactSelectViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/WESessionTabContainerView.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/WESessionTabItem.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTimeLineTailSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTouchTrailViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSUICleanViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSUpdateControlViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/AvatarHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/BackgroundBlurHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/BackgroundRun.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSVersionSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSVoiceForwardAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSVoiceForwardSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSWCEnhanceViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/BubbleStyleHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/CSAvatarShape.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/WCPLMessagePersistenceAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/WEContactSelectViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/CSChatAttachmentLayout.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/WESessionTabContainerView.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/WESessionTabItem.m (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/CUtility.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/AvatarHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/CustomEntryHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/BackgroundBlurHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/DisableUpdateHook.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/FavoriteHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/BackgroundRun.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/BubbleStyleHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/CSAvatarShape.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/GameCheatsHook.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/HideChatTimeHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/HideDiscoverHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/CSChatAttachmentLayout.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/HideMomentsHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/CUtility.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/HideQRCodeHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/CustomEntryHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/HideSettingHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/DisableUpdateHook.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/InputTextHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/LayoutHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/FavoriteHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/GameCheatsHook.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/ListCornerRadiusHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/HideChatTimeHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/MessageGestureHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/MessageMergeHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/HideDiscoverHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/MessageTimeHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/HideMomentsHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/HideQRCodeHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/NavigationTitleHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/ReceiveTransferHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/HideSettingHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/InputTextHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/LayoutHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/RedEnvelopHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/RepeatHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/ListCornerRadiusHooks.xm (arm64)…[m
+[1mHooks/RedEnvelopHooks.xm:31:170: [0m[0;1;31merror: [0m[1munknown type name 'HongBaoReq'[0m
+   31 | static void (*_logos_orig$_ungrouped$WCRedEnvelopesNetworkHelper$WCToHongbaoCommonRequest$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesNetworkHelper* _LOGOS_SELF_CONST, SEL, HongBaoReq *); static void _logos_method$_ungrouped$WCRedEnvelopesNetworkHelper$WCToHongbaoCommonRequest$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesNetworkHelper* _LOGOS_SELF_CONST, SEL, HongBaoReq *); static void (*_logos_orig$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonResponse$Request$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void _logos_method$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonResponse$Request$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonErrorResponse$Request$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void _logos_method$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonErrorResponse$Request$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonSystemErrorResponse$Request$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void _logos_method$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonSystemErrorResponse$Request$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLoad)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLoad(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$_ungrouped$WCRedEnvelopesStoryViewController$refreshViewWithData$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$_ungrouped$WCRedEnvelopesStoryViewController$refreshViewWithData$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLayoutSubviews)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLayoutSubviews(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); [0m
+      | [0;1;32m                                                                                                                                                                         ^
+[0m[1mHooks/RedEnvelopHooks.xm:31:353: [0m[0;1;31merror: [0m[1munknown type name 'HongBaoReq'[0m
+   31 | static void (*_logos_orig$_ungrouped$WCRedEnvelopesNetworkHelper$WCToHongbaoCommonRequest$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesNetworkHelper* _LOGOS_SELF_CONST, SEL, HongBaoReq *); static void _logos_method$_ungrouped$WCRedEnvelopesNetworkHelper$WCToHongbaoCommonRequest$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesNetworkHelper* _LOGOS_SELF_CONST, SEL, HongBaoReq *); static void (*_logos_orig$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonResponse$Request$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void _logos_method$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonResponse$Request$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonErrorResponse$Request$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void _logos_method$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonErrorResponse$Request$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonSystemErrorResponse$Request$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void _logos_method$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonSystemErrorResponse$Request$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLoad)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLoad(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$_ungrouped$WCRedEnvelopesStoryViewController$refreshViewWithData$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$_ungrouped$WCRedEnvelopesStoryViewController$refreshViewWithData$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLayoutSubviews)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLayoutSubviews(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); [0m
+      | [0;1;32m                                                                                                                                                                                                                                                                                                                                                                ^
+[0m[1mHooks/RedEnvelopHooks.xm:15:94: [0m[0;1;31merror: [0m[1mcannot initialize a parameter of type 'int *' with an lvalue of type 'HongBaoReq *__strong'[0m
+   15 |     _logos_orig$_ungrouped$WCRedEnvelopesNetworkHelper$WCToHongbaoCommonRequest$(self, _cmd, request);[0m
+      | [0;1;32m                                                                                             ^~~~~~~
+[0m[1mHooks/RedEnvelopHooks.xm:131:61: [0m[0;1;35mwarning: [0m[1m'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations][0m
+  131 |         statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;[0m
+      | [0;1;32m                                                            ^
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:131:38: [0m[0;1;36mnote: [0m'statusBarFrame' has been explicitly marked deprecated here[0m
+  131 | @property(nonatomic,readonly) CGRect statusBarFrame API_DEPRECATED("Use the statusBarManager property of the window scene instead.", ios(2.0, 13.0)) API_UNAVAILABLE(tvos) API_UNAVAILABLE(visionos, watchos); // returns CGRectZero if the status bar is hidden[0m
+      | [0;1;32m                                     ^
+[0m1 warning and 3 errors generated.
+make[3]: *** [/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64e/Hooks/RedEnvelopHooks.xm.5060adbe.o] Error 1
+make[3]: *** Waiting for unfinished jobs....
+[0;32m==> [1;39mCompiling Hooks/MessageGestureHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/MessageMergeHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/MessageTimeHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/NavigationTitleHooks.xm (arm64)…[m
+rm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64e/Hooks/WCCustomTextHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64e/Hooks/TouchTrailHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64e/Hooks/RevokeHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64e/Hooks/VoiceForwardHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64e/Hooks/UserInfoHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64e/Hooks/WCUploadTaskHook.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64e/Hooks/TabBarStyleHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64e/Hooks/RedEnvelopHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64e/Hooks/SessionGroupHooks.xm.mm
+make[2]: *** [/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64e/WeChatImprove.dylib] Error 2
+make[2]: *** Waiting for unfinished jobs....
+[0;32m==> [1;39mCompiling Hooks/ReceiveTransferHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/RedEnvelopHooks.xm (arm64)…[m
+[1mHooks/RedEnvelopHooks.xm:31:170: [0m[0;1;31merror: [0m[1munknown type name 'HongBaoReq'[0m
+   31 | static void (*_logos_orig$_ungrouped$WCRedEnvelopesNetworkHelper$WCToHongbaoCommonRequest$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesNetworkHelper* _LOGOS_SELF_CONST, SEL, HongBaoReq *); static void _logos_method$_ungrouped$WCRedEnvelopesNetworkHelper$WCToHongbaoCommonRequest$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesNetworkHelper* _LOGOS_SELF_CONST, SEL, HongBaoReq *); static void (*_logos_orig$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonResponse$Request$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void _logos_method$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonResponse$Request$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonErrorResponse$Request$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void _logos_method$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonErrorResponse$Request$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonSystemErrorResponse$Request$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void _logos_method$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonSystemErrorResponse$Request$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLoad)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLoad(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$_ungrouped$WCRedEnvelopesStoryViewController$refreshViewWithData$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$_ungrouped$WCRedEnvelopesStoryViewController$refreshViewWithData$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLayoutSubviews)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLayoutSubviews(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); [0m
+      | [0;1;32m                                                                                                                                                                         ^
+[0m[0;32m==> [1;39mCompiling Hooks/RepeatHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/RevokeHooks.xm (arm64)…[m
+[1mHooks/RedEnvelopHooks.xm:31:353: [0m[0;1;31merror: [0m[1munknown type name 'HongBaoReq'[0m
+   31 | static void (*_logos_orig$_ungrouped$WCRedEnvelopesNetworkHelper$WCToHongbaoCommonRequest$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesNetworkHelper* _LOGOS_SELF_CONST, SEL, HongBaoReq *); static void _logos_method$_ungrouped$WCRedEnvelopesNetworkHelper$WCToHongbaoCommonRequest$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesNetworkHelper* _LOGOS_SELF_CONST, SEL, HongBaoReq *); static void (*_logos_orig$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonResponse$Request$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void _logos_method$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonResponse$Request$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonErrorResponse$Request$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void _logos_method$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonErrorResponse$Request$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonSystemErrorResponse$Request$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void _logos_method$_ungrouped$WCRedEnvelopesLogicMgr$OnWCToHongbaoCommonSystemErrorResponse$Request$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesLogicMgr* _LOGOS_SELF_CONST, SEL, id, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLoad)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLoad(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$_ungrouped$WCRedEnvelopesStoryViewController$refreshViewWithData$)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$_ungrouped$WCRedEnvelopesStoryViewController$refreshViewWithData$(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL, id); static void (*_logos_orig$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLayoutSubviews)(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$WCRedEnvelopesStoryViewController$viewDidLayoutSubviews(_LOGOS_SELF_TYPE_NORMAL WCRedEnvelopesStoryViewController* _LOGOS_SELF_CONST, SEL); [0m
+      | [0;1;32m                                                                                                                                                                                                                                                                                                                                                                ^
+[0m[1mHooks/RedEnvelopHooks.xm:15:94: [0m[0;1;31merror: [0m[1mcannot initialize a parameter of type 'int *' with an lvalue of type 'HongBaoReq *__strong'[0m
+   15 |     _logos_orig$_ungrouped$WCRedEnvelopesNetworkHelper$WCToHongbaoCommonRequest$(self, _cmd, request);[0m
+      | [0;1;32m                                                                                             ^~~~~~~
+[0m[1mHooks/RedEnvelopHooks.xm:131:61: [0m[0;1;35mwarning: [0m[1m'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations][0m
+  131 |         statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;[0m
+      | [0;1;32m                                                            ^
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:131:38: [0m[0;1;36mnote: [0m'statusBarFrame' has been explicitly marked deprecated here[0m
+  131 | @property(nonatomic,readonly) CGRect statusBarFrame API_DEPRECATED("Use the statusBarManager property of the window scene instead.", ios(2.0, 13.0)) API_UNAVAILABLE(tvos) API_UNAVAILABLE(visionos, watchos); // returns CGRectZero if the status bar is hidden[0m
+      | [0;1;32m                                     ^
+[0m1 warning and 3 errors generated.
+make[3]: *** [/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64/Hooks/RedEnvelopHooks.xm.53f5dea9.o] Error 1
+make[3]: *** Waiting for unfinished jobs....
+rm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64/Hooks/TabBarStyleHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64/Hooks/RedEnvelopHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64/Hooks/WCCustomTextHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64/Hooks/TouchTrailHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64/Hooks/VoiceForwardHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64/Hooks/UserInfoHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64/Hooks/SessionGroupHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64/Hooks/WCUploadTaskHook.xm.mm
+make[2]: *** [/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-1.8-15-cxhx54il/theos/obj/arm64/WeChatImprove.dylib] Error 2
+make[1]: *** [internal-library-all_] Error 2
+make: *** [WeChatImprove.all.tweak.variables] Error 2

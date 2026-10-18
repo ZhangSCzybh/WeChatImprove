@@ -4,6 +4,7 @@
 //
 
 #import "CSReceiveTransferSettingsViewController.h"
+#import "CSPaymentLedger.h"
 #import "CSSettingTableViewCell.h"
 
 static NSString * const kReceiveTransferAutoEnableKey = @"kReceiveTransferAutoEnableKey";
@@ -27,6 +28,7 @@ static NSString * const kReceiveTransferTotalAmountKey = @"kReceiveTransferTotal
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(cs_paymentStatisticsChanged:) name:CSPaymentStatisticsDidChangeNotification object:nil];
     
     self.title = @"自动收款";
     self.tableView.backgroundColor = [UIColor systemGroupedBackgroundColor];
@@ -36,6 +38,21 @@ static NSString * const kReceiveTransferTotalAmountKey = @"kReceiveTransferTotal
     [CSSettingTableViewCell registerToTableView:self.tableView];
     
     [self setupData];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self setupData];
+    [self.tableView reloadData];
+}
+- (void)cs_paymentStatisticsChanged:(NSNotification *)notification {
+    if (self.isViewLoaded && self.view.window) {
+        [self setupData];
+        [self.tableView reloadData];
+    }
+}
+- (void)dealloc {
+    [NSNotificationCenter.defaultCenter removeObserver:self name:CSPaymentStatisticsDidChangeNotification object:nil];
 }
 
 - (void)setupData {

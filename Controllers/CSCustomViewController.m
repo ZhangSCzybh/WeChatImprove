@@ -747,7 +747,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     
     // 界面定制组
     CSSettingItem *navigationTitleItem = [CSSettingItem itemWithTitle:@"顶栏信息" 
-                                                           iconName:@"text.aligncenter" 
+                                                           iconName:@"person.text.rectangle.fill"
                                                           iconColor:[UIColor systemGreenColor]
                                                             detail:nil];
     
@@ -775,31 +775,31 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     
     // 添加气泡样式项
     CSSettingItem *bubbleStyleItem = [CSSettingItem itemWithTitle:@"气泡样式"
-                                                        iconName:@"rectangle.roundedtop"
+                                                        iconName:@"bubble.left.and.bubble.right.fill"
                                                        iconColor:[UIColor systemBlueColor]
                                                          detail:nil];
     
     // 添加列表圆角项
     CSSettingItem *listCornerRadiusItem = [CSSettingItem itemWithTitle:@"列表圆角"
-                                                             iconName:@"rectangle.on.rectangle"
+                                                             iconName:@"list.bullet.rectangle.fill"
                                                             iconColor:[UIColor systemIndigoColor]
                                                               detail:nil];
     
     // 添加底栏样式项
     CSSettingItem *tabBarStyleItem = [CSSettingItem itemWithTitle:@"底栏样式"
-                                                       iconName:@"rectangle.bottomthird.inset.filled"
+                                                       iconName:@"ellipsis.rectangle.fill"
                                                       iconColor:[UIColor systemBlueColor]
                                                         detail:nil];
     
     // 添加布局设置项
     CSSettingItem *layoutSettingsItem = [CSSettingItem itemWithTitle:@"布局设置"
-                                                          iconName:@"rectangle.3.group"
+                                                          iconName:@"slider.horizontal.3"
                                                          iconColor:[UIColor systemOrangeColor]
                                                            detail:nil];
     
     // 添加聊天分组设置项
     CSSettingItem *chatGroupItem = [CSSettingItem itemWithTitle:@"聊天分组"
-                                                     iconName:@"rectangle.split.3x3"
+                                                     iconName:@"square.stack.3d.up.fill"
                                                     iconColor:[UIColor systemCyanColor]
                                                       detail:nil];
     

@@ -4,6 +4,7 @@
   /Users/zhangshichao/theos/Prefix.pch \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Headers/WCHeaders.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Headers/CSUserInfoHelper.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSAvatarURLCache.h \
   /Users/zhangshichao/theos/vendor/include/substrate.h \
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap \
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h
@@ -11,6 +12,7 @@
 /Users/zhangshichao/theos/Prefix.pch:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Headers/WCHeaders.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Headers/CSUserInfoHelper.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSAvatarURLCache.h:
 /Users/zhangshichao/theos/vendor/include/substrate.h:
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap:
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h:

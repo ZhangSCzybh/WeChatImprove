@@ -4,9 +4,26 @@
 //
 
 #import "CSRedEnvelopSettingsViewController.h"
+#import "CSPaymentLedger.h"
 #import "CSSettingTableViewCell.h"
 #import "CSChatRoomSelectViewController.h"
 #import "CSRedEnvelopConfig.h"
+
+// Settings keys are private to this page; NSUserDefaults persists writes automatically.
+static NSString * const kRedEnvelopAutoReceiveKey = @"com.wechat.enhance.redenvelop.autoReceive";
+static NSString * const kRedEnvelopPrivateEnableKey = @"com.wechat.enhance.redenvelop.privateEnable";
+static NSString * const kRedEnvelopGroupEnableKey = @"com.wechat.enhance.redenvelop.groupEnable";
+static NSString * const kRedEnvelopDelayKey = @"com.wechat.enhance.redenvelop.delay";
+static NSString * const kRedEnvelopReceiveSelfKey = @"com.wechat.enhance.redenvelop.receiveSelf";
+static NSString * const kRedEnvelopSerialReceiveKey = @"com.wechat.enhance.redenvelop.serialReceive";
+static NSString * const kRedEnvelopGroupScopeKey = @"com.wechat.enhance.redenvelop.groupScope";
+static NSString * const kRedEnvelopAllowedGroupsKey = @"com.wechat.enhance.redenvelop.allowedGroups";
+static NSString * const kRedEnvelopBlockedGroupsKey = @"com.wechat.enhance.redenvelop.blockedGroups";
+static NSString * const kRedEnvelopAutoReplyEnableKey = @"com.wechat.enhance.redenvelop.autoReplyEnable";
+static NSString * const kRedEnvelopPrivateReplyKey = @"com.wechat.enhance.redenvelop.privateReply";
+static NSString * const kRedEnvelopGroupReplyKey = @"com.wechat.enhance.redenvelop.groupReply";
+static NSString * const kRedEnvelopNotifyTargetKey = @"com.wechat.enhance.redenvelop.notifyTarget";
+static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenvelop.pageSummary";
 
 @interface CSRedEnvelopSettingsViewController ()
 
@@ -18,6 +35,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(cs_paymentStatisticsChanged:) name:CSPaymentStatisticsDidChangeNotification object:nil];
     
     self.title = @"红包功能";
     self.tableView.backgroundColor = [UIColor systemGroupedBackgroundColor];
@@ -27,6 +45,21 @@
     [CSSettingTableViewCell registerToTableView:self.tableView];
     
     [self setupData];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self setupData];
+    [self.tableView reloadData];
+}
+- (void)cs_paymentStatisticsChanged:(NSNotification *)notification {
+    if (self.isViewLoaded && self.view.window) {
+        [self setupData];
+        [self.tableView reloadData];
+    }
+}
+- (void)dealloc {
+    [NSNotificationCenter.defaultCenter removeObserver:self name:CSPaymentStatisticsDidChangeNotification object:nil];
 }
 
 - (void)setupData {
@@ -39,7 +72,6 @@
                                                            switchValue:[defaults boolForKey:kRedEnvelopAutoReceiveKey]
                                                      valueChangedBlock:^(BOOL isOn) {
         [defaults setBool:isOn forKey:kRedEnvelopAutoReceiveKey];
-        [defaults synchronize];
         
         // 发送通知，让Hook文件处理状态改变
         CFNotificationCenterPostNotification(
@@ -58,7 +90,6 @@
                                                             switchValue:[defaults boolForKey:kRedEnvelopPrivateEnableKey]
                                                       valueChangedBlock:^(BOOL isOn) {
         [defaults setBool:isOn forKey:kRedEnvelopPrivateEnableKey];
-        [defaults synchronize];
     }];
     
     // 创建群聊红包开关
@@ -70,7 +101,6 @@
                                                           switchValue:groupEnable
                                                     valueChangedBlock:^(BOOL isOn) {
         [defaults setBool:isOn forKey:kRedEnvelopGroupEnableKey];
-        [defaults synchronize];
     }];
     
     // 创建抢自己发的红包开关
@@ -80,7 +110,6 @@
                                                           switchValue:[defaults boolForKey:kRedEnvelopReceiveSelfKey]
                                                     valueChangedBlock:^(BOOL isOn) {
         [defaults setBool:isOn forKey:kRedEnvelopReceiveSelfKey];
-        [defaults synchronize];
     }];
     
     // 创建串行抢红包开关
@@ -90,7 +119,6 @@
                                                             switchValue:[defaults boolForKey:kRedEnvelopSerialReceiveKey]
                                                       valueChangedBlock:^(BOOL isOn) {
         [defaults setBool:isOn forKey:kRedEnvelopSerialReceiveKey];
-        [defaults synchronize];
     }];
     
     // 创建延迟时间设置
@@ -133,6 +161,16 @@
                                                      iconColor:[UIColor systemRedColor]
                                                        detail:blacklistDetail];
     
+    id savedReplyEnabled=[defaults objectForKey:kRedEnvelopAutoReplyEnableKey];
+    BOOL replyEnabled=savedReplyEnabled ? [savedReplyEnabled boolValue] :
+        ([defaults stringForKey:kRedEnvelopPrivateReplyKey].length || [defaults stringForKey:kRedEnvelopGroupReplyKey].length);
+    CSSettingItem *replyEnableItem=[CSSettingItem switchItemWithTitle:@"红包自动回复"
+        iconName:@"bubble.left.and.bubble.right.fill" iconColor:UIColor.systemGreenColor
+        switchValue:replyEnabled valueChangedBlock:^(BOOL isOn) {
+            [defaults setBool:isOn forKey:kRedEnvelopAutoReplyEnableKey];
+            [[CSRedEnvelopConfig sharedConfig] reload];
+        }];
+
     // 创建私聊自动回复设置
     NSString *privateReply = [defaults stringForKey:kRedEnvelopPrivateReplyKey] ?: @"";
     CSSettingItem *privateReplyItem = [CSSettingItem itemWithTitle:@"私聊自动回复"
@@ -162,7 +200,6 @@
                                                           switchValue:[defaults boolForKey:kRedEnvelopPageSummaryKey]
                                                     valueChangedBlock:^(BOOL isOn) {
         [defaults setBool:isOn forKey:kRedEnvelopPageSummaryKey];
-        [defaults synchronize];
     }];
     
     // 创建领取记录项
@@ -179,7 +216,7 @@
     CSSettingItem *infoItem = [CSSettingItem itemWithTitle:@"功能说明"
                                                  iconName:@"info.circle"
                                                 iconColor:[UIColor systemGrayColor]
-                                                  detail:@"自动抢红包功能,修改后需要重启微信。"];
+                                                  detail:@"修改立即生效；关闭后撤销待领取任务。"];
     
     // 创建分组
     CSSettingSection *switchSection = [CSSettingSection sectionWithHeader:@"开关设置"
@@ -189,7 +226,7 @@
                                                                      items:@[receiveSelfItem, serialReceiveItem, delayItem, groupScopeItem, whitelistItem, blacklistItem]];
     
     CSSettingSection *replySection = [CSSettingSection sectionWithHeader:@"自动回复"
-                                                                  items:@[privateReplyItem, groupReplyItem]];
+                                                                  items:@[replyEnableItem, privateReplyItem, groupReplyItem]];
     
     CSSettingSection *notifySection = [CSSettingSection sectionWithHeader:@"通知设置"
                                                                    items:@[notifyItem, pageSummaryItem, receiveRecordItem]];
@@ -293,7 +330,6 @@
                                                          style:UIAlertActionStyleDefault
                                                        handler:^(UIAlertAction * _Nonnull action) {
             [defaults setInteger:i forKey:kRedEnvelopDelayKey];
-            [defaults synchronize];
             [self setupData];
             [self.tableView reloadData];
         }];
@@ -323,7 +359,6 @@
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * _Nonnull action) {
         [defaults setInteger:0 forKey:kRedEnvelopGroupScopeKey];
-        [defaults synchronize];
         [self setupData];
         [self.tableView reloadData];
     }];
@@ -336,7 +371,6 @@
                                                               style:UIAlertActionStyleDefault
                                                             handler:^(UIAlertAction * _Nonnull action) {
         [defaults setInteger:1 forKey:kRedEnvelopGroupScopeKey];
-        [defaults synchronize];
         [self setupData];
         [self.tableView reloadData];
         [self showWhitelistSelector];
@@ -350,7 +384,6 @@
                                                               style:UIAlertActionStyleDefault
                                                             handler:^(UIAlertAction * _Nonnull action) {
         [defaults setInteger:2 forKey:kRedEnvelopGroupScopeKey];
-        [defaults synchronize];
         [self setupData];
         [self.tableView reloadData];
         [self showBlacklistSelector];
@@ -378,7 +411,6 @@
     
     selectVC.completion = ^(NSArray<NSString *> *userNames) {
         [defaults setObject:userNames forKey:kRedEnvelopAllowedGroupsKey];
-        [defaults synchronize];
         [self setupData];
         [self.tableView reloadData];
     };
@@ -398,7 +430,6 @@
     
     selectVC.completion = ^(NSArray<NSString *> *userNames) {
         [defaults setObject:userNames forKey:kRedEnvelopBlockedGroupsKey];
-        [defaults synchronize];
         [self setupData];
         [self.tableView reloadData];
     };
@@ -427,7 +458,6 @@
         UITextField *textField = alert.textFields.firstObject;
         NSString *text = textField.text ?: @"";
         [defaults setObject:text forKey:kRedEnvelopPrivateReplyKey];
-        [defaults synchronize];
         [self setupData];
         [self.tableView reloadData];
     }];
@@ -460,7 +490,6 @@
         UITextField *textField = alert.textFields.firstObject;
         NSString *text = textField.text ?: @"";
         [defaults setObject:text forKey:kRedEnvelopGroupReplyKey];
-        [defaults synchronize];
         [self setupData];
         [self.tableView reloadData];
     }];
@@ -488,9 +517,10 @@
     UIAlertAction *resetAction = [UIAlertAction actionWithTitle:@"重置记录"
                                                           style:UIAlertActionStyleDestructive
                                                         handler:^(UIAlertAction * _Nonnull action) {
-        [[CSRedEnvelopConfig sharedConfig] resetReceiveRecords];
-        [self setupData];
-        [self.tableView reloadData];
+        [[CSRedEnvelopConfig sharedConfig] resetReceiveRecordsWithCompletion:^{
+            [self setupData];
+            [self.tableView reloadData];
+        }];
     }];
     [alert addAction:resetAction];
     
@@ -516,7 +546,6 @@
                                                          style:UIAlertActionStyleDefault
                                                        handler:^(UIAlertAction * _Nonnull action) {
             [defaults setInteger:i forKey:kRedEnvelopNotifyTargetKey];
-            [defaults synchronize];
             [self setupData];
             [self.tableView reloadData];
         }];

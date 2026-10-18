@@ -1,0 +1,70 @@
+--- a/Controllers/CSMessageMediaProvider.m
++++ b/Controllers/CSMessageMediaProvider.m
+@@ -15,7 +15,6 @@
+ @property(nonatomic, strong) id refreshedSource;
+ @property(nonatomic) unsigned int duration;
+ @property(nonatomic) unsigned int format;
+-@property(nonatomic) BOOL complete;
+ @property(nonatomic) BOOL terminalCompletion;
+ @property(nonatomic) BOOL formatKnown;
+ @property(nonatomic) BOOL cancelled;
+@@ -94,7 +93,6 @@
+         NSNumber *active=_recordingState(preparation.context);
+         if (active) preparation.recording=active.boolValue;
+     }
+-    preparation.complete=preparation.terminalCompletion || preparation.localComplete;
+     preparation.path=nil;
+     Class cls=NSClassFromString(@"CMessageWrap");
+     if (CSMessageNativeSupports(source,@"getVoicePath",@"@",@[])) {
+@@ -182,12 +180,12 @@
+     if (preparation.cancelled) { [self finish:preparation key:key resource:nil]; return; }
+     // A first cell may keep stale status/extension fields across every user retry.
+     // Re-fetch the exact persisted message before refusing it or starting download.
+-    if (!preparation.sourceReloaded && (preparation.recording || !preparation.complete ||
++    if (!preparation.sourceReloaded && (preparation.recording || !(preparation.terminalCompletion || preparation.localComplete) ||
+         (preparation.explicitNonterminal && !preparation.terminalCompletion))) {
+         if (![self reloadSource:preparation key:key]) return;
+     }
+     if (preparation.cancelled || preparation.recording) { [self finish:preparation key:key resource:nil]; return; }
+-    if (!preparation.complete || (preparation.explicitNonterminal && !preparation.terminalCompletion)) { [self requestMissing:preparation key:key]; return; }
++    if (!(preparation.terminalCompletion || preparation.localComplete) || (preparation.explicitNonterminal && !preparation.terminalCompletion)) { [self requestMissing:preparation key:key]; return; }
+     preparation.reading=YES; preparation.localReadAttempted=YES;
+     NSData *snapshot=preparation.bytes; NSString *path=preparation.path;
+     unsigned int duration=preparation.duration, format=preparation.format, expected=preparation.expectedBytes; BOOL known=preparation.formatKnown;
+@@ -227,7 +225,6 @@
+     if (!_requestDownload || !_requestDownload(preparation.context)) [self finish:preparation key:key resource:nil];
+ }
+ - (void)prepareVoiceForContext:(CSMessageActionContext *)context operationID:(NSString *)operationID completion:(void (^)(CSMessageVoiceResource *))completion {
+-    NSAssert(NSThread.isMainThread,@"Media metadata is main-thread owned");
+     NSString *key=[self keyForContext:context]; CSVoicePreparation *preparation=_preparations[key];
+     if (!preparation) {
+         // Bound source metadata, not bytes. Refuse new operations visibly through completion.
+@@ -242,7 +239,6 @@
+     preparation.subscribers[operationID]=[completion copy]; if (preparation.requestedDownload && _waitingHandler) _waitingHandler(operationID); [self read:preparation key:key];
+ }
+ - (void)prepareAppDataForContext:(CSMessageActionContext *)context operationID:(NSString *)operationID completion:(void (^)(NSData *, NSString *))completion {
+-    NSAssert(NSThread.isMainThread,@"App metadata is main-thread owned");
+     if (_appSubscribers.count>=32) { completion(nil,nil); return; }
+     NSString *path=CSMessageNativeAppDataPath(context);
+     BOOL file=NO;
+--- a/Controllers/CSVoiceForwardAdapter.h
++++ b/Controllers/CSVoiceForwardAdapter.h
+@@ -3,7 +3,6 @@
+ FOUNDATION_EXPORT NSString * _Nullable CSMessageForwardTargetID(id _Nullable contact);
+ @interface CSMessageForwardBinding : NSObject
+ @property(nonatomic, copy) NSString *operationID;
+-@property(nonatomic, weak) id logic;
+ @property(nonatomic, strong, nullable) CSMessageActionContext *context;
+ @property(nonatomic, copy, nullable) NSDictionary<NSString *, id> *targets;
+ @property(nonatomic) BOOL confirmed;
+--- a/Controllers/CSVoiceForwardAdapter.m
++++ b/Controllers/CSVoiceForwardAdapter.m
+@@ -19,7 +19,7 @@
+ - (BOOL)bindLogic:(id)logic operationID:(NSString *)operationID context:(CSMessageActionContext *)context {
+     CSMessageForwardBinding *old=[self bindingForLogic:logic];
+     if (!logic || (old && !old.closed)) return old && [old.operationID isEqualToString:operationID];
+-    CSMessageForwardBinding *binding=[CSMessageForwardBinding new]; binding.operationID=operationID; binding.logic=logic; binding.context=context; binding.sourceWrap=context.sourceWrap; binding.messageType=context.messageType; binding.localID=context.localID; binding.serverID=context.serverID; binding.fromUser=context.outgoing ? context.accountID : context.sourceConversationID; binding.toUser=context.outgoing ? context.sourceConversationID : context.accountID;
++    CSMessageForwardBinding *binding=[CSMessageForwardBinding new]; binding.operationID=operationID; binding.context=context; binding.sourceWrap=context.sourceWrap; binding.messageType=context.messageType; binding.localID=context.localID; binding.serverID=context.serverID; binding.fromUser=context.outgoing ? context.accountID : context.sourceConversationID; binding.toUser=context.outgoing ? context.sourceConversationID : context.accountID;
+     objc_setAssociatedObject(logic,CSForwardBindingKey,binding,OBJC_ASSOCIATION_RETAIN_NONATOMIC); return YES;
+ }
+ - (BOOL)confirmLogic:(id)logic {
