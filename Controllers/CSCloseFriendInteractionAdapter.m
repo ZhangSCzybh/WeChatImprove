@@ -21,9 +21,19 @@ static CSCloseFriendSocialProjection *Messages(id page) {
 static NSIndexPath *MessagePath(id page,NSIndexPath *path) {
     CSCloseFriendSocialProjection *projection=objc_getAssociatedObject(page,&MessagesKey) ?: Messages(page);
     if(!CSCFPageIsCurrent(page) || ![path isKindOfClass:NSIndexPath.class]) return nil;
+    NSArray *live=CSCloseFriendRead(page,@"_arrCommentList");
+    if(![live isKindOfClass:NSArray.class] || path.row<0) return nil;
     NSUInteger index=[projection sourceIndex:(NSUInteger)path.row];
-    // Preserve native trailing load-more/empty rows without treating them as message objects.
-    if(index==NSNotFound && (NSUInteger)path.row>=projection.visible.count) index=projection.source.count+((NSUInteger)path.row-projection.visible.count);
+    if(index!=NSNotFound) {
+        // Native cell/height callbacks dereference the current page array, not our immutable
+        // snapshot. Never forward a coordinate whose live object was replaced/reordered.
+        id visible=projection.visible[(NSUInteger)path.row];
+        if(index>=live.count || live[index]!=visible || CSCFSocialHidden(visible,CSCloseFriendSurfaceInteraction)) return nil;
+    } else {
+        // A trailing native load-more row is safe only while the source boundary is unchanged.
+        if(live.count!=projection.source.count || (NSUInteger)path.row<projection.visible.count) return nil;
+        index=live.count+((NSUInteger)path.row-projection.visible.count);
+    }
     return [NSIndexPath indexPathForRow:(NSInteger)index inSection:path.section];
 }
 static BOOL MessageActionCurrent(id page,NSIndexPath *path) {

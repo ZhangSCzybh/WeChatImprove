@@ -17,7 +17,8 @@ static id CSCloseFriendRead(id object,NSString *key) {
     Ivar ivar=class_getInstanceVariable([object class],key.UTF8String); return ivar && ivar_getTypeEncoding(ivar)[0]=='@' ? object_getIvar(object,ivar) : nil;
 }
 static BOOL CSCFPageIsCurrent(id page) {NSNumber *old=objc_getAssociatedObject(page,&EpochKey); if(!old) {old=@(Epoch); objc_setAssociatedObject(page,&EpochKey,old,OBJC_ASSOCIATION_RETAIN_NONATOMIC);} return old.unsignedIntegerValue==Epoch;}
-static void CSCFSocialTrack(__unused id owner,__unused void(^refresh)(id)) {}
+static NSMapTable *Refreshes;
+static void CSCFSocialTrack(id owner,void(^refresh)(id)) {if(!Refreshes) Refreshes=[NSMapTable weakToStrongObjectsMapTable]; [Refreshes setObject:[refresh copy] forKey:owner];}
 static void CSCFSocialClearCaches(__unused id owner,__unused NSArray *names) {}
 static BOOL CSCFCallVoid(__unused id page,__unused NSString *selector) {return NO;}
 static void CSCFReloadTables(__unused id page) {}
@@ -84,6 +85,17 @@ static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(
 @property(nonatomic,strong) NSMutableArray *_arrCommentList;
 @end
 @implementation InteractionPage @end
+@interface UITableViewCell : NSObject @end
+@implementation UITableViewCell @end
+@interface WCCommentListViewController : InteractionPage
+@property(nonatomic) NSUInteger nativeRenderCalls;
+- (id)tableView:(id)table cellForRowAtIndexPath:(NSIndexPath *)path;
+- (double)tableView:(id)table heightForRowAtIndexPath:(NSIndexPath *)path;
+@end
+@implementation WCCommentListViewController
+- (id)tableView:(__unused id)table cellForRowAtIndexPath:(NSIndexPath *)path {self.nativeRenderCalls++; return self._arrCommentList[(NSUInteger)path.row];}
+- (double)tableView:(__unused id)table heightForRowAtIndexPath:(__unused NSIndexPath *)path {self.nativeRenderCalls++; return 44;}
+@end
 @interface StatusPage : NSObject
 @property(nonatomic,strong) NSMutableArray *usernameList;
 @end
@@ -96,15 +108,37 @@ static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(
 - (BOOL)badgeAtMomentCell {return YES;}
 - (NSInteger)numberOfUnreadAtMomentCell {return 7;}
 @end
+@interface WCMomentsPrivacyViewController : NSObject
+@property(nonatomic,strong) NSSet *selectContacts;
+@end
+@implementation WCMomentsPrivacyViewController @end
+@interface ContactSelectView : NSObject
+@property(nonatomic,weak) id m_delegate;
+@property(nonatomic,strong) NSSet *pending;
+@end
+@implementation ContactSelectView @end
+@interface AudienceLogic : NSObject
+@property(nonatomic,weak) id m_delegate;
+@property(nonatomic,strong) NSArray *contacts;
+@end
+@implementation AudienceLogic @end
+static NSArray *FixtureKeys(__unused id logic,__unused SEL cmd) {return @[@"A"];}
+static NSArray *FixtureRows(AudienceLogic *logic,__unused SEL cmd,__unused id key) {return logic.contacts;}
+static char ShieldKey;
+static void ShieldPicker(id picker) {objc_setAssociatedObject(picker,&ShieldKey,@YES,OBJC_ASSOCIATION_RETAIN_NONATOMIC);}
+static NSString *CSCloseFriendUserName(id object) {return [object isKindOfClass:NSString.class] ? object : CSCloseFriendRead(object,@"username");}
+static BOOL CSCFSocialRequireAuthentication(id owner,CSCloseFriendSurface surface) {return !CSCFPageIsCurrent(owner) || CSCloseFriendSurfaceConcealed(Snapshot,surface);}
 #include "TimelineBodies.h"
 #include "InteractionBodies.h"
 #include "StatusBodies.h"
+#include "AudienceBodies.h"
 #define Check(x) do { if(!(x)) {fprintf(stderr,"FAIL %s:%d: %s\n",__FILE__,__LINE__,#x); return 1;} } while(0)
 static void Policy(BOOL revealed,NSUInteger revision) {
     Snapshot=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"fixture" profile:@{@"enabled":@YES,@"friends":@[@"secret"],@"groups":@[],@"options":CSCloseFriendDefaultOptions()} revealed:revealed revision:revision blocked:NO];
 }
 int main(void) { @autoreleasepool {
     Policy(NO,1); InstallModel(); DiscoveryCounters();
+    TableMethod(@"tableView:cellForRowAtIndexPath:","@@:@@"); TableMethod(@"tableView:heightForRowAtIndexPath:","d@:@@");
     FindFriendEntryViewController *discovery=[FindFriendEntryViewController new];
     Check(!discovery.badgeAtMomentCell && discovery.numberOfUnreadAtMomentCell==0);
     NSDictionary *ordinary=@{@"username":@"alice"}, *hidden=@{@"username":@"secret"}, *reply=@{@"username":@"alice",@"refUserName":@"secret"};
@@ -132,19 +166,41 @@ int main(void) { @autoreleasepool {
     NSDictionary *m2=@{@"comment":hidden}, *m3=@{@"comment":ordinary,@"refComment":reply};
     NSDictionary *m4=@{@"comment":@{@"username":@"alice",@"dataItemUsrName":@"secret"}};
     NSDictionary *m5=@{@"comment":@{@"username":@"carol"}};
-    InteractionPage *messages=[InteractionPage new]; messages._arrCommentList=[@[m1,m2,m3,m4,m5] mutableCopy];
+    WCCommentListViewController *messages=[WCCommentListViewController new]; messages._arrCommentList=[@[m1,m2,m3,m4,m5] mutableCopy];
     NSMutableArray *nativeMessages=messages._arrCommentList;
     Check(Messages(messages).visible.count==2);
     NSIndexPath *second=[NSIndexPath indexPathForRow:1 inSection:0];
     Check(MessagePath(messages,second).row==4 && MessageActionCurrent(messages,second));
     Check(MessagePath(messages,[NSIndexPath indexPathForRow:2 inSection:0]).row==5);
     Check(messages._arrCommentList==nativeMessages && nativeMessages.count==5);
+    Check([messages tableView:nil cellForRowAtIndexPath:second]==m5);
+    NSUInteger renders=messages.nativeRenderCalls; nativeMessages[4]=m2;
+    Check(MessagePath(messages,second)==nil && !MessageActionCurrent(messages,second));
+    Check([[messages tableView:nil cellForRowAtIndexPath:second] isKindOfClass:UITableViewCell.class]);
+    Check([messages tableView:nil heightForRowAtIndexPath:second]==0 && messages.nativeRenderCalls==renders);
+    Check(nativeMessages[4]==m2); // Validation never rewrites the native update.
     [nativeMessages removeLastObject]; Check(!MessageActionCurrent(messages,second));
     Policy(YES,4); Check(Messages(messages).visible.count==4); Check(nativeMessages.count==4);
     StatusPage *status=[StatusPage new]; status.usernameList=[@[@"secret",@"alice",@"carol"] mutableCopy];
     Policy(NO,5); Check(Cards(status).visible.count==2 && [Cards(status) sourceIndex:0]==1 && [Cards(status) sourceIndex:1]==2); Check(status.usernameList.count==3);
     Policy(YES,6); Check(Cards(status).visible.count==3 && [Cards(status) sourceIndex:0]==0);
-    Epoch++; Policy(NO,7); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==0); Leave(previous); Check([facade countOfTimelineDataItem]==3);
+    // Revealed publishing picker retains complete native candidates and real pending ACL.
+    WCMomentsPrivacyViewController *privacy=[WCMomentsPrivacyViewController new]; privacy.selectContacts=acl;
+    ContactSelectView *picker=[ContactSelectView new]; picker.m_delegate=privacy; picker.pending=acl;
+    AudienceLogic *logic=[AudienceLogic new]; logic.m_delegate=picker; logic.contacts=@[@"alice",@"secret"];
+    AudienceKeys=(void *)FixtureKeys; AudienceRows=(void *)FixtureRows;
+    Check([Keys(logic,NULL) count]==1 && [Rows(logic,NULL,@"A") count]==2 && PickerAllowsAction(picker));
+    void(^refreshPicker)(id)=[Refreshes objectForKey:picker]; Check(refreshPicker!=nil);
+    Policy(NO,7); refreshPicker(picker);
+    Check([objc_getAssociatedObject(picker,&ShieldKey) boolValue]);
+    Check([Rows(logic,NULL,@"A") count]==0 && !PickerAllowsAction(picker) && NeedsUnlock(privacy));
+    Check(logic.contacts.count==2 && picker.pending==acl && privacy.selectContacts==acl);
+    Policy(YES,8); Check([Rows(logic,NULL,@"A") count]==0 && !PickerAllowsAction(picker) && NeedsUnlock(privacy));
+    WCMomentsPrivacyViewController *freshPrivacy=[WCMomentsPrivacyViewController new]; freshPrivacy.selectContacts=acl;
+    ContactSelectView *freshPicker=[ContactSelectView new]; freshPicker.m_delegate=freshPrivacy;
+    AudienceLogic *freshLogic=[AudienceLogic new]; freshLogic.m_delegate=freshPicker; freshLogic.contacts=logic.contacts;
+    Check([Keys(freshLogic,NULL) count]==1 && [Rows(freshLogic,NULL,@"A") count]==2 && PickerAllowsAction(freshPicker) && !NeedsUnlock(freshPrivacy) && NeedsUnlock(privacy));
+    Epoch++; Policy(NO,9); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==0); Leave(previous); Check([facade countOfTimelineDataItem]==3);
     Check(Cards(status).visible.count==0 && !MessageActionCurrent(messages,second));
-    puts("Close-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, discovery cues and reveal/relock/account transitions passed");
+    puts("Close-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, discovery cues, publishing-picker revocation, stale native render rejection and reveal/relock/account transitions passed");
 } return 0; }
