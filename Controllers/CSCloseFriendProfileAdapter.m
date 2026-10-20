@@ -2,7 +2,8 @@
 @interface CSCFProfileState : NSObject
 @property(nonatomic,weak) UIViewController *owner;
 @property(nonatomic,copy) NSString *userName, *coverUserName;
-@property(nonatomic) NSUInteger epoch;
+@property(nonatomic) NSUInteger epoch, generation;
+@property(nonatomic,weak) id activeAssist;
 @property(nonatomic,strong) UIView *cover;
 @property(nonatomic,strong) NSMapTable<UIView *,NSNumber *> *hidden;
 @property(nonatomic,copy) NSArray *rightItems;
@@ -12,7 +13,18 @@
 @property(nonatomic) BOOL accessibilityElement, refreshing;
 - (void)localAdd;
 @end
-static char ProfileKey;
+@interface CSCFProfileAssistBinding : NSObject
+@property(nonatomic,weak,readonly) UIViewController *owner;
+@property(nonatomic,copy,readonly) NSString *userName;
+@property(nonatomic,readonly) NSUInteger epoch, generation;
+- (instancetype)initWithOwner:(UIViewController *)owner userName:(NSString *)userName epoch:(NSUInteger)epoch generation:(NSUInteger)generation;
+@end
+@implementation CSCFProfileAssistBinding
+- (instancetype)initWithOwner:(UIViewController *)owner userName:(NSString *)userName epoch:(NSUInteger)epoch generation:(NSUInteger)generation {
+    if((self=[super init])) { _owner=owner; _userName=[userName copy]; _epoch=epoch; _generation=generation; } return self;
+}
+@end
+static char ProfileKey, AssistBindingKey;
 static BOOL Masked(CSCFProfileState *state) {
     if(!state) return NO;
     if(state.epoch!=CSCloseFriendAccountEpoch() || CSCloseFriendCurrentSnapshot().blocked) return YES;
@@ -34,9 +46,18 @@ void CSCFProfileBind(id controller) {
         state=[CSCFProfileState new]; state.owner=controller; state.epoch=CSCloseFriendAccountEpoch();
         objc_setAssociatedObject(controller,&ProfileKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
-    state.userName=CSCloseFriendUserName(CSCloseFriendRead(controller,@"m_contact"));
+    NSString *userName=CSCloseFriendUserName(CSCloseFriendRead(controller,@"m_contact"));
     id assist=CSCloseFriendRead(controller,@"m_oContactInfoAssist") ?: CSCloseFriendRead(controller,@"getContactInfoAssist");
-    if(assist) objc_setAssociatedObject(assist,&ProfileKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if(![state.userName isEqual:userName] || state.activeAssist!=assist) state.generation++;
+    state.userName=userName; state.activeAssist=assist;
+    NSString *assistUserName=CSCloseFriendUserName(CSCloseFriendRead(assist,@"m_contact"));
+    if(assist && userName.length && [assistUserName isEqual:userName]) {
+        CSCFProfileAssistBinding *binding=objc_getAssociatedObject(assist,&AssistBindingKey);
+        if(binding.owner!=controller || binding.generation!=state.generation || binding.epoch!=state.epoch || ![binding.userName isEqual:userName]) {
+            binding=[[CSCFProfileAssistBinding alloc] initWithOwner:controller userName:userName epoch:state.epoch generation:state.generation];
+            objc_setAssociatedObject(assist,&AssistBindingKey,binding,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+    }
     static NSHashTable *pages; static dispatch_once_t once;
     dispatch_once(&once,^{
         pages=[NSHashTable weakObjectsHashTable];
@@ -45,12 +66,23 @@ void CSCFProfileBind(id controller) {
     [pages addObject:controller];
 }
 BOOL CSCFProfileBlocksAction(id object) {
-    CSCFProfileState *state=objc_getAssociatedObject(object,&ProfileKey);
-    {
-        id owner=state.owner ?: (CSCFIsClass(object,@"ContactInfoViewController") ? object : CSCloseFriendRead(object,@"getViewController"));
-        CSCFProfileBind(owner); state=objc_getAssociatedObject(object,&ProfileKey);
+    if(CSCFIsClass(object,@"ContactInfoViewController")) {
+        CSCFProfileBind(object); return Masked(objc_getAssociatedObject(object,&ProfileKey));
     }
-    return Masked(state);
+    CSCFProfileAssistBinding *binding=objc_getAssociatedObject(object,&AssistBindingKey);
+    id owner=binding.owner ?: CSCloseFriendRead(object,@"getViewController");
+    CSCFProfileBind(owner);
+    binding=objc_getAssociatedObject(object,&AssistBindingKey);
+    CSCFProfileState *state=objc_getAssociatedObject(owner,&ProfileKey);
+    NSString *actualUserName=CSCloseFriendUserName(CSCloseFriendRead(object,@"m_contact"));
+    if(state || binding) {
+        // A retired assist never borrows the replacement contact's authorization.
+        if(!binding || !state || state.activeAssist!=object || binding.owner!=owner ||
+           binding.epoch!=CSCloseFriendAccountEpoch() || binding.generation!=state.generation ||
+           ![binding.userName isEqual:state.userName] || ![binding.userName isEqual:actualUserName]) return YES;
+    }
+    if(CSCloseFriendCurrentSnapshot().blocked) return YES;
+    return ![actualUserName hasSuffix:@"@chatroom"] && CSCloseFriendShouldHideUserName(actualUserName,CSCloseFriendSurfaceProfile);
 }
 static NSString *PublicNickname(id contact,NSString *fallback) {
     id name=CSCloseFriendRead(contact,@"m_nsNickName");

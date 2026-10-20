@@ -1,6 +1,6 @@
 #import "CSCloseFriendContactAdapter.h"
 #import <objc/message.h>
-static char SelectionKey, PageEpochKey, ForwardSourcesKey, ForwardInstalledKey;
+static char SelectionKey, PageEpochKey, ForwardSourcesKey, ForwardUpdateDepthKey;
 BOOL CSCFPageIsCurrent(id owner) {
     NSNumber *epoch=objc_getAssociatedObject(owner,&PageEpochKey);
     if(!epoch) { epoch=@(CSCloseFriendAccountEpoch()); objc_setAssociatedObject(owner,&PageEpochKey,epoch,OBJC_ASSOCIATION_RETAIN_NONATOMIC); }
@@ -115,34 +115,55 @@ static BOOL SetPresentationBuffer(id owner,NSString *key,id value) {
     object_setIvar(owner,ivar,value); return YES;
 }
 void CSCFRefreshForwardSearch(id owner) {
+    if([objc_getAssociatedObject(owner,&ForwardUpdateDepthKey) unsignedIntegerValue]) return;
     NSDictionary *sources=objc_getAssociatedObject(owner,&ForwardSourcesKey);
     if(!sources) return;
-    NSMutableDictionary *installed=[NSMutableDictionary dictionary];
     BOOL current=CSCFPageIsCurrent(owner);
     for(NSString *key in @[@"arrSearchResultOfContacts",@"arrSearchResultOfGroup",@"arrSearchResultOfTopHit"]) {
         NSArray *rows=current ? CSCFVisible(sources[key],CSCloseFriendSurfaceForward) : @[];
         NSMutableArray *buffer=[rows mutableCopy];
-        if(SetPresentationBuffer(owner,key,buffer)) installed[key]=buffer;
+        SetPresentationBuffer(owner,key,buffer);
     }
     NSArray *keys=sources[@"arrSectionKey"]; NSDictionary *sections=sources[@"dicSearchResult"];
     if([keys isKindOfClass:NSArray.class] && [sections isKindOfClass:NSDictionary.class]) {
         CSCloseFriendContactProjection *p=[[CSCloseFriendContactProjection alloc] initWithKeys:current?keys:@[] sections:sections snapshot:CSCloseFriendCurrentSnapshot() surface:CSCloseFriendSurfaceForward identity:^NSString *(id item){return CSCloseFriendUserName(item);}];
         NSMutableArray *keyBuffer=[p.keys mutableCopy]; NSMutableDictionary *sectionBuffer=[NSMutableDictionary dictionary];
         for(id key in p.keys) sectionBuffer[key]=[p.sections[key] mutableCopy];
-        if(SetPresentationBuffer(owner,@"arrSectionKey",keyBuffer)) installed[@"arrSectionKey"]=keyBuffer;
-        if(SetPresentationBuffer(owner,@"dicSearchResult",sectionBuffer)) installed[@"dicSearchResult"]=sectionBuffer;
+        SetPresentationBuffer(owner,@"arrSectionKey",keyBuffer);
+        SetPresentationBuffer(owner,@"dicSearchResult",sectionBuffer);
     }
-    objc_setAssociatedObject(owner,&ForwardInstalledKey,installed,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+void CSCFForwardSearchWillUpdate(id owner) {
+    NSUInteger depth=[objc_getAssociatedObject(owner,&ForwardUpdateDepthKey) unsignedIntegerValue];
+    objc_setAssociatedObject(owner,&ForwardUpdateDepthKey,@(depth+1),OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if(depth) return;
+    // A partial native merge must start with the complete last source, not our filtered buffers.
+    // A full rebuild will clear/replace these containers itself. Neither is a policy-only refresh.
+    NSDictionary *sources=objc_getAssociatedObject(owner,&ForwardSourcesKey);
+    for(NSString *key in sources) {
+        id value=sources[key];
+        if([value isKindOfClass:NSDictionary.class]) {
+            NSMutableDictionary *sections=[NSMutableDictionary dictionary];
+            for(id section in value) sections[section]=[value[section] isKindOfClass:NSArray.class] ? [value[section] mutableCopy] : value[section];
+            SetPresentationBuffer(owner,key,sections);
+        } else if([value isKindOfClass:NSArray.class]) SetPresentationBuffer(owner,key,[value mutableCopy]);
+    }
 }
 void CSCFForwardSearchDidUpdate(id owner) {
-    NSMutableDictionary *sources=[objc_getAssociatedObject(owner,&ForwardSourcesKey) mutableCopy] ?: [NSMutableDictionary dictionary];
-    NSDictionary *installed=objc_getAssociatedObject(owner,&ForwardInstalledKey);
+    NSUInteger depth=[objc_getAssociatedObject(owner,&ForwardUpdateDepthKey) unsignedIntegerValue];
+    objc_setAssociatedObject(owner,&ForwardUpdateDepthKey,@(depth ? depth-1 : 0),OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if(depth>1) return; // Nested merge inside the full contact callback: publish only once.
+    NSMutableDictionary *sources=[NSMutableDictionary dictionary];
     for(NSString *key in @[@"arrSearchResultOfContacts",@"arrSearchResultOfGroup",@"arrSearchResultOfTopHit",@"arrSectionKey",@"dicSearchResult"]) {
         id value=CSCloseFriendRead(owner,key);
-        // If native code left this branch untouched, retain its full original copy for reveal.
-        if(value==installed[key]) continue;
-        if([value isKindOfClass:NSArray.class] || [value isKindOfClass:NSDictionary.class]) sources[key]=[value copy];
+        if([value isKindOfClass:NSDictionary.class]) {
+            NSMutableDictionary *sections=[NSMutableDictionary dictionary];
+            for(id section in value) sections[section]=[value[section] isKindOfClass:NSArray.class] ? [value[section] copy] : value[section];
+            sources[key]=[sections copy];
+        } else if([value isKindOfClass:NSArray.class]) sources[key]=[value copy];
     }
-    objc_setAssociatedObject(owner,&ForwardSourcesKey,sources,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    // Native full callbacks clear and repopulate existing containers. Always capture their contents.
+    objc_setAssociatedObject(owner,&ForwardSourcesKey,[sources copy],OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     CSCFRefreshForwardSearch(owner);
+    CSCFReloadTables(owner);
 }

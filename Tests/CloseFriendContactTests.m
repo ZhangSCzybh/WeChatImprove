@@ -21,14 +21,39 @@ NSString *CSCloseFriendUserName(id object) {return [object isKindOfClass:Contact
 BOOL CSCFIsClass(id object,NSString *name) {return [object isKindOfClass:NSClassFromString(name)];}
 #import "GroupTitle.h"
 // The production profile state predicate, compiled verbatim by the focused runner.
+@interface UIViewController : NSObject @end
+@implementation UIViewController @end
+@interface ContactInfoViewController : UIViewController
+@property(nonatomic,strong) Contact *m_contact;
+@property(nonatomic,strong) id m_oContactInfoAssist;
+@end
+@implementation ContactInfoViewController @end
 @interface CSCFProfileState : NSObject
-@property(nonatomic) NSUInteger epoch;
+@property(nonatomic,weak) UIViewController *owner;
+@property(nonatomic,weak) id activeAssist;
+@property(nonatomic) NSUInteger epoch, generation;
 @property(nonatomic,copy) NSString *userName;
 @end
 @implementation CSCFProfileState @end
 #import "ProfilePredicate.h"
-static CSCFProfileState *ProfileState;
-BOOL CSCFProfileBlocksAction(id object) { (void)object; return Masked(ProfileState); }
+#import "ProfileBindingClass.h"
+static char ProfileKey, AssistBindingKey;
+NSString *const CSCloseFriendPolicyDidChangeNotification=@"TestPolicyChanged";
+void CSCFProfileRefresh(id object) {(void)object;}
+#import "ProfileBindings.h"
+static char PageEpochKey, ForwardSourcesKey, ForwardUpdateDepthKey;
+NSArray *CSCFVisible(NSArray *source,CSCloseFriendSurface surface) {
+    return CSCloseFriendVisibleContacts(source,Current,surface,^NSString *(id item){return CSCloseFriendUserName(item);});
+}
+void CSCFReloadTables(id owner) {(void)owner;}
+#import "ForwardBodies.h"
+@interface NativeForward : NSObject {
+@public
+    NSMutableArray *arrSearchResultOfContacts, *arrSearchResultOfGroup, *arrSearchResultOfTopHit, *arrSectionKey;
+    NSMutableDictionary *dicSearchResult;
+}
+@end
+@implementation NativeForward @end
 BOOL CSCloseFriendInstallHook(NSString *className,NSString *name,IMP replacement,IMP *original,const char *encoding) {
     (void)encoding; Class cls=NSClassFromString(className); SEL selector=NSSelectorFromString(name); Method method=class_getInstanceMethod(cls,selector);
     if(!method) return NO; *original=method_getImplementation(method); method_setImplementation(method,replacement); return YES;
@@ -37,10 +62,14 @@ BOOL CSCloseFriendInstallHook(NSString *className,NSString *name,IMP replacement
 #import "ProfileGuards.h"
 @interface NativeAssist : NSObject
 @property(nonatomic) NSUInteger sent;
+@property(nonatomic,strong) Contact *m_contact;
+@property(nonatomic,weak) id owner;
+- (id)getViewController;
 - (void)doAddContact;
 - (void)onNewMessage:(id)sender;
 @end
 @implementation NativeAssist
+- (id)getViewController {return self.owner;}
 - (void)doAddContact {self.sent++;}
 - (void)onNewMessage:(id)sender {(void)sender; self.sent++;}
 @end
@@ -68,11 +97,32 @@ int main(void) {@autoreleasepool {
     Check([GroupDisplayTitle(group) isEqual:@"公开群名"],@"group row cover exposes public group title, never member-match summary");
     hidden.m_nsNickName=@"公开昵称"; hidden.remark=@"私密备注";
     Check([PublicNickname(hidden,hidden.username) isEqual:@"公开昵称"],@"stranger presentation uses public nickname, never saved remark");
-    ProfileState=[CSCFProfileState new]; ProfileState.userName=@"secret"; ProfileState.epoch=Epoch;
+    NativeForward *forward=[NativeForward new];
+    CSCFForwardSearchWillUpdate(forward);
+    forward->arrSearchResultOfContacts=[@[hidden,visible] mutableCopy]; forward->arrSearchResultOfGroup=[NSMutableArray array]; forward->arrSearchResultOfTopHit=[NSMutableArray array];
+    forward->arrSectionKey=[@[@"first"] mutableCopy]; forward->dicSearchResult=[@{@"first":[@[hidden,visible] mutableCopy]} mutableCopy];
+    Current=Policy(NO,3); CSCFForwardSearchDidUpdate(forward);
+    CSCFForwardSearchWillUpdate(forward);
+    NSMutableArray *reusedKeys=forward->arrSectionKey; NSMutableDictionary *reusedSections=forward->dicSearchResult;
+    [reusedKeys removeAllObjects]; [reusedKeys addObject:@"second"];
+    [reusedSections removeAllObjects]; reusedSections[@"second"]=[@[hidden,group] mutableCopy];
+    forward->arrSearchResultOfContacts=[@[hidden] mutableCopy]; forward->arrSearchResultOfGroup=[@[group] mutableCopy];
+    CSCFForwardSearchWillUpdate(forward); CSCFRefreshForwardSearch(forward); CSCFForwardSearchDidUpdate(forward); // Nested native merge must not publish filtered source early.
+    Check(forward->arrSectionKey==reusedKeys && forward->dicSearchResult==reusedSections,@"native second-query buffers mutate in place through nested merge");
+    CSCFForwardSearchDidUpdate(forward);
+    Current=Policy(YES,4); CSCFRefreshForwardSearch(forward);
+    Check([forward->arrSectionKey isEqual:@[@"second"]] && [forward->dicSearchResult[@"second"] isEqual:@[hidden,group]] && !forward->dicSearchResult[@"first"],@"consecutive in-place queries publish current complete sections and reveal current hidden members");
     Guard0(@"NativeAssist",@"doAddContact"); Guard1(@"NativeAssist",@"onNewMessage:"); NativeAssist *assist=[NativeAssist new];
+    ContactInfoViewController *page=[ContactInfoViewController new]; page.m_contact=hidden; page.m_oContactInfoAssist=assist; assist.m_contact=hidden; assist.owner=page;
+    CSCFProfileBind(page);
     Current=Policy(NO,3); [assist doAddContact]; [assist onNewMessage:nil];
     Check(assist.sent==0 && hidden.isFriend,@"masked profile guards never invoke native add/message or change friendship");
     Current=Policy(YES,4); [assist onNewMessage:nil]; Check(assist.sent==1,@"reveal permits native action again");
-    Epoch++; [assist doAddContact]; Check(assist.sent==1,@"stale assist stays blocked across accounts");
-    printf("Close-friend contacts: projection/source/tag preservation, stale forwarding, profile action guards passed\n");
+    NativeAssist *replacement=[NativeAssist new]; replacement.m_contact=visible; replacement.owner=page;
+    page.m_contact=visible; page.m_oContactInfoAssist=replacement; CSCFProfileBind(page);
+    Current=Policy(NO,5); [assist doAddContact]; [assist onNewMessage:nil]; [replacement onNewMessage:nil];
+    Check(assist.sent==1 && replacement.sent==1,@"retired assist cannot inherit ordinary replacement authorization while the current ordinary assist works");
+    Current=Policy(YES,6); [assist onNewMessage:nil]; Check(assist.sent==1,@"retired assist remains rejected even during reveal");
+    Epoch++; [replacement doAddContact]; Check(replacement.sent==1,@"stale assist stays blocked across accounts");
+    printf("Close-friend contacts: projection/source/tag preservation, stale forwarding, profile action guards and native-reuse regressions passed\n");
 } return 0;}

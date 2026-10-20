@@ -95,10 +95,12 @@ static void InstallContacts(void) {
     Predicate(@"SessionSelectController",@"onShouldSelectContact:",CSCloseFriendSurfaceForward);
     Hook0(@"SessionSelectView",@"initData",^(id object,void(^orig)(void)){orig(); CSCFTrackSurface(object,@"initData");});
     Hook1(@"SessionSelectView",@"onFTSContactSearchFinish:",^(id object,id result,void(^orig)(id)){
-        if(!CSCFPageIsCurrent(object)) return; orig(result); CSCFForwardSearchDidUpdate(object);
+        if(!CSCFPageIsCurrent(object)) return; CSCFForwardSearchWillUpdate(object);
+        @try { orig(result); } @finally { CSCFForwardSearchDidUpdate(object); }
     });
     Hook0(@"SessionSelectView",@"mergeMessageSearchResultsAndNotify",^(id object,void(^orig)(void)){
-        if(!CSCFPageIsCurrent(object)) return; orig(); CSCFForwardSearchDidUpdate(object);
+        if(!CSCFPageIsCurrent(object)) return; CSCFForwardSearchWillUpdate(object);
+        @try { orig(); } @finally { CSCFForwardSearchDidUpdate(object); }
     });
     __block IMP include=NULL;
     IMP includeReplacement=imp_implementationWithBlock(^BOOL(id object,id logic,id contact){

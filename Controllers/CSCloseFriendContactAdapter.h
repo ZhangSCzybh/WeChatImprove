@@ -11,6 +11,7 @@ FOUNDATION_EXPORT void CSCFTrackSurface(id owner, NSString *refreshSelector);
 FOUNDATION_EXPORT void CSCFReloadTables(id owner);
 FOUNDATION_EXPORT BOOL CSCFContactLogicSurface(id logic, CSCloseFriendSurface *surface);
 FOUNDATION_EXPORT BOOL CSCFPageIsCurrent(id owner);
+FOUNDATION_EXPORT void CSCFForwardSearchWillUpdate(id owner);
 FOUNDATION_EXPORT void CSCFForwardSearchDidUpdate(id owner);
 FOUNDATION_EXPORT void CSCFRefreshForwardSearch(id owner);
 FOUNDATION_EXPORT void CSCFBeginSelection(id owner);
