@@ -1,0 +1,842 @@
+[
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "audioMgr",
+    "address": "0x102923d5c",
+    "end": "0x102923d6c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x102923d6c",
+    "end": "0x1029243c0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "setMultitalkSelf:useruin:multitalkApiDelegate:",
+    "address": "0x1029243c0",
+    "end": "0x10292449c",
+    "types": "v40@0:8@16Q24@32"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "ensureMemberMgrAllocated",
+    "address": "0x10292449c",
+    "end": "0x102924544",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "initEngine:",
+    "address": "0x102924544",
+    "end": "0x102924834",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "dealloc",
+    "address": "0x1029249dc",
+    "end": "0x102924a60",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "BeginSysCallInterruption",
+    "address": "0x102924a60",
+    "end": "0x102924abc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "EndSysCallInterruption",
+    "address": "0x102924abc",
+    "end": "0x102924c6c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "HeadSetPlugin:",
+    "address": "0x102924d04",
+    "end": "0x102924d1c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "notifyAudioDeviceChange:isWirelessDevice:isWiredDevice:",
+    "address": "0x102924d1c",
+    "end": "0x102924d34",
+    "types": "v28@0:8B16B20B24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "onServiceTerminate",
+    "address": "0x102924d34",
+    "end": "0x102924df4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "onServiceInit",
+    "address": "0x102924e08",
+    "end": "0x102924f1c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "onServiceEnterBackground",
+    "address": "0x1029250e8",
+    "end": "0x102925144",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "onServiceEnterForeground",
+    "address": "0x102925144",
+    "end": "0x1029251a0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "onServiceClearData",
+    "address": "0x1029251a0",
+    "end": "0x102925260",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "readyToTalk",
+    "address": "0x102925274",
+    "end": "0x102925494",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "notifyVideoMemberChange:",
+    "address": "0x10292565c",
+    "end": "0x102925838",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "HandleMemberchangeEvent:users:",
+    "address": "0x102925838",
+    "end": "0x102925dac",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "setUpLongTermCallbackAfterJoin",
+    "address": "0x10292626c",
+    "end": "0x102926598",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "tryTriggerJoinSucc:",
+    "address": "0x1029282fc",
+    "end": "0x102928458",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "tryTriggerInviteSucc:",
+    "address": "0x102928720",
+    "end": "0x1029289e0",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "startAudioDeviceOnCall",
+    "address": "0x102928ca8",
+    "end": "0x102928de8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "tryTriggerAcceptSucc:",
+    "address": "0x1029290b0",
+    "end": "0x10292920c",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "callbackDeviceStartFailed:errCode:",
+    "address": "0x1029294d4",
+    "end": "0x102929540",
+    "types": "v28@0:8@?16i24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "cleanUpJoinStatus",
+    "address": "0x102929540",
+    "end": "0x102929568",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "startListenNetworkChange",
+    "address": "0x102929568",
+    "end": "0x102929588",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "stopListenNetworkChange",
+    "address": "0x102929604",
+    "end": "0x10292961c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "createLinkEngineParams",
+    "address": "0x10292961c",
+    "end": "0x1029298f8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "initWithSession:",
+    "address": "0x1029298f8",
+    "end": "0x102929978",
+    "types": "i20@0:8B16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "callbackJoin:errType:errCode:errMsg:",
+    "address": "0x102929978",
+    "end": "0x102929ac4",
+    "types": "v40@0:8@?16i24i28@32"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "callbackInvite:errType:errCode:errMsg:",
+    "address": "0x102929ac4",
+    "end": "0x102929bdc",
+    "types": "v40@0:8@?16i24i28@32"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "callbackAccept:errType:errCode:errMsg:",
+    "address": "0x102929bdc",
+    "end": "0x102929cb4",
+    "types": "v40@0:8@?16i24i28@32"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "convertReason:",
+    "address": "0x102929cb4",
+    "end": "0x102929cd8",
+    "types": "i20@0:8i16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "exitConferenceSyncWithReason:",
+    "address": "0x102929cd8",
+    "end": "0x102929de4",
+    "types": "i20@0:8i16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "cleanUpLongTermCallbacks",
+    "address": "0x102929de4",
+    "end": "0x102929e84",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "setSpeakerPhone:",
+    "address": "0x102929e84",
+    "end": "0x102929ee0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "setMicroPhoneMute:",
+    "address": "0x102929ee0",
+    "end": "0x10292a01c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "updateConfig:callback:",
+    "address": "0x10292a01c",
+    "end": "0x10292a110",
+    "types": "v32@0:8@16@?24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "mayRelease:",
+    "address": "0x10292a28c",
+    "end": "0x10292a50c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "addCrossPlatformCameraSubscriptionIfNeededForMember:videoLength:videoMembers:",
+    "address": "0x10292a50c",
+    "end": "0x10292a6e8",
+    "types": "v36@0:8@16i24@28"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "subscribeAll",
+    "address": "0x10292a6e8",
+    "end": "0x10292ac48",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "subscribeByUsernameList:LargeUsers:",
+    "address": "0x10292ac48",
+    "end": "0x10292ad3c",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "subscribeByUsername:NeedBigVideo:",
+    "address": "0x10292b4dc",
+    "end": "0x10292b5b4",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "GetScreenHWEncWidth:",
+    "address": "0x10292bca4",
+    "end": "0x10292bcf8",
+    "types": "i20@0:8i16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "GetScreenHWEncHeight:",
+    "address": "0x10292bcf8",
+    "end": "0x10292bd4c",
+    "types": "i20@0:8i16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "CloseCodec:codecFlag:",
+    "address": "0x10292bd4c",
+    "end": "0x10292bd90",
+    "types": "v24@0:8i16i20"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "doQosCtrl:",
+    "address": "0x10292bd90",
+    "end": "0x10292c4e4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "sendVideoData:",
+    "address": "0x10292c4e4",
+    "end": "0x10292c99c",
+    "types": "i24@0:8^v16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "sendVideoData:dataLen:imgBuf:width:height:format:",
+    "address": "0x10292c99c",
+    "end": "0x10292cc88",
+    "types": "i48@0:8*16i24^{__CVBuffer=}28i36i40i44"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "sendVideoData:dataLen:imgBuf:width:height:",
+    "address": "0x10292cc88",
+    "end": "0x10292cc98",
+    "types": "i44@0:8*16i24^{__CVBuffer=}28i36i40"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "sendScreenData:",
+    "address": "0x10292cc98",
+    "end": "0x10292cca4",
+    "types": "i24@0:8^v16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "checkIfMemberVideoOn:",
+    "address": "0x10292cca4",
+    "end": "0x10292cea8",
+    "types": "B20@0:8i16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "onVideoFrame:data:dataLen:width:height:format:",
+    "address": "0x10292cea8",
+    "end": "0x10292d2ec",
+    "types": "v44@0:8i16r*20i28i32i36i40"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "switchVideoWithCameraEnabled:screenStatus:subVideoType:",
+    "address": "0x10292d2ec",
+    "end": "0x10292d354",
+    "types": "v28@0:8B16i20i24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "switchVideoToCamera",
+    "address": "0x10292d504",
+    "end": "0x10292d51c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "switchVideoToScreen",
+    "address": "0x10292d51c",
+    "end": "0x10292d530",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "switchScreenEnabled:keepCameraEnabled:",
+    "address": "0x10292d530",
+    "end": "0x10292d540",
+    "types": "v24@0:8B16B20"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "switchScreenEnabled:keepCameraEnabled:subVideoType:",
+    "address": "0x10292d540",
+    "end": "0x10292d7dc",
+    "types": "v28@0:8B16B20i24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "switchCameraEnabledPreservingScreenStatus:",
+    "address": "0x10292d7e0",
+    "end": "0x10292d8b8",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "doVideoScreenSharingSecurityCheck:fileId:",
+    "address": "0x10292d8b8",
+    "end": "0x10292dab4",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "switchVideoToScreenPaused",
+    "address": "0x10292db48",
+    "end": "0x10292db68",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "stopVideo",
+    "address": "0x10292db68",
+    "end": "0x10292db80",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "gotDecVideoFrame:Frame:Width:Height:format:",
+    "address": "0x10292db80",
+    "end": "0x10292dd9c",
+    "types": "v40@0:8i16*20I28I32i36"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "CloseHWDecoder:codecType:",
+    "address": "0x10292dd9c",
+    "end": "0x10292dde4",
+    "types": "i24@0:8i16i20"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "gotEncodedData:isKeyFrame:codecType:encIdx:isScreen:",
+    "address": "0x10292dde4",
+    "end": "0x10292df48",
+    "types": "i40@0:8@16B24i28i32B36"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "gotXpsData:codecType:encIdx:isScreen:",
+    "address": "0x10292df48",
+    "end": "0x10292e0a8",
+    "types": "i36@0:8@16i24i28B32"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "gotEncodeErrCode:encIdx:",
+    "address": "0x10292e0a8",
+    "end": "0x10292e0b0",
+    "types": "i24@0:8i16i20"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "forceExitRoom:",
+    "address": "0x10292e0b0",
+    "end": "0x10292e114",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "currentMembers",
+    "address": "0x10292e12c",
+    "end": "0x10292e1ac",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "getTalkingMember",
+    "address": "0x10292e1ac",
+    "end": "0x10292e478",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "sortedTalkingMembers",
+    "address": "0x10292e478",
+    "end": "0x10292e694",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "getMemberQualityInfoList",
+    "address": "0x10292e700",
+    "end": "0x10292eb74",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "checkUsingMultiPathCellularConn",
+    "address": "0x10292eb74",
+    "end": "0x10292ebb4",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "getMemberByOpenid:",
+    "address": "0x10292ebb4",
+    "end": "0x10292ebcc",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "getMemberByUsername:",
+    "address": "0x10292ebcc",
+    "end": "0x10292ebe4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "getMemberByMemberid:",
+    "address": "0x10292ebe4",
+    "end": "0x10292ebfc",
+    "types": "@20@0:8i16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "engineDoMemberSelectForView:",
+    "address": "0x10292ebfc",
+    "end": "0x10292f008",
+    "types": "i24@0:8@16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "hangup:isSubCall:",
+    "address": "0x10292f008",
+    "end": "0x10292f134",
+    "types": "v24@0:8i16B20"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "hangup:",
+    "address": "0x10292f154",
+    "end": "0x10292f208",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "hangup:roomID:",
+    "address": "0x10292f248",
+    "end": "0x10292f3a4",
+    "types": "v28@0:8i16Q20"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "addMembers:inviteId:",
+    "address": "0x10292f3f8",
+    "end": "0x10292f7b0",
+    "types": "v32@0:8@16Q24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "accept",
+    "address": "0x10292fe44",
+    "end": "0x1029300f0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "invite:groupId:inviteId:",
+    "address": "0x102930820",
+    "end": "0x102930980",
+    "types": "i40@0:8@16@24Q32"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "inviteSync:inviteId:",
+    "address": "0x1029309d8",
+    "end": "0x102930d50",
+    "types": "v32@0:8@16Q24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "inviteImp:inviteCallback:inviteId:",
+    "address": "0x102931130",
+    "end": "0x1029316d4",
+    "types": "v40@0:8@16@?24Q32"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "joinroom:wxGroupId:joinSuccessHandler:",
+    "address": "0x1029326c4",
+    "end": "0x1029328cc",
+    "types": "i40@0:8@16@24@?32"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "joinSync:wxGroupId:joinSuccessHandler:",
+    "address": "0x1029328cc",
+    "end": "0x1029329f0",
+    "types": "v40@0:8@16@24@?32"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "joinimp:wxGroupId:joinSuccessHandler:",
+    "address": "0x102932d98",
+    "end": "0x102933238",
+    "types": "v40@0:8@16@24@?32"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "recvNotify:datalen:groupId:sdkGroupId:displayUserList:muteNotification:notifyFrom:",
+    "address": "0x102934050",
+    "end": "0x10293420c",
+    "types": "v60@0:8@16i24@28@36@44B52i56"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "recvSubcallInviteData:groupId:sdkGroupId:displayUserList:",
+    "address": "0x1029344d0",
+    "end": "0x102934634",
+    "types": "v48@0:8@16@24@32@40"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "RecvNotifyImp:datalen:groupId:sdkGroupId:displayUserList:muteNotification:notifyFrom:",
+    "address": "0x10293555c",
+    "end": "0x102935ab8",
+    "types": "v60@0:8@16i24@28@36@44B52i56"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "cacheBannerCreateUserName:wxGroupId:",
+    "address": "0x10293734c",
+    "end": "0x1029373dc",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "svrReport",
+    "address": "0x1029373dc",
+    "end": "0x102937710",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "releaseAudioDeviceStartedEarlierIfNeeded",
+    "address": "0x102937710",
+    "end": "0x102937754",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "releaseDevice",
+    "address": "0x102937754",
+    "end": "0x1029377e4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "uninitEngine",
+    "address": "0x1029377e4",
+    "end": "0x102937a8c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "callIfNotNil:errCode:data:callbackData:",
+    "address": "0x102937a8c",
+    "end": "0x102937ba0",
+    "types": "v44@0:8@16i24@28@36"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "OnConfEvent:errCode:data:callbackData:",
+    "address": "0x102937ba0",
+    "end": "0x102937e84",
+    "types": "v40@0:8i16i20@24@32"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "IsInWxGroup:userName:",
+    "address": "0x102938000",
+    "end": "0x102938164",
+    "types": "B32@0:8r*16r*24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "queryEnhanceVoiceAmbientStatus:",
+    "address": "0x102938164",
+    "end": "0x1029381f4",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "setEnhanceVoiceEnabled:deviceType:completion:",
+    "address": "0x1029382a4",
+    "end": "0x10293834c",
+    "types": "v32@0:8B16i20@?24"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "startedAudioDeviceEarlier",
+    "address": "0x1029383f0",
+    "end": "0x102938404",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": "setStartedAudioDeviceEarlier:",
+    "address": "0x102938404",
+    "end": "0x102938414",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x102938414",
+    "end": "0x10293888c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKService",
+    "kind": "class",
+    "selector": "isVoipMtInviteData:",
+    "address": "0x102933f20",
+    "end": "0x102934050",
+    "types": "B24@0:8@16"
+  }
+]

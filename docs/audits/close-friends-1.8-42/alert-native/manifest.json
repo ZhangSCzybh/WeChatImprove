@@ -1,0 +1,666 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "selected_classes": [
+    "VoIPInvitationInfo",
+    "VoIPInvitationService",
+    "VoIPInvitationViewController",
+    "VoipMonoMsg",
+    "MultiTalkMgr",
+    "VoipUIManager",
+    "VOIPMgr",
+    "VoIPilinkMgr",
+    "VoipCXMgr",
+    "VoIPPushKitNotifyService",
+    "MonoServiceMgr",
+    "MonoServiceLogic",
+    "MultiTalkSessionMgr",
+    "MultiTalkTerminationService",
+    "VoIPConfSDKService",
+    "VoIPConfigUtils"
+  ],
+  "method_count": 2328,
+  "callback_count": 4,
+  "class_count": 46098,
+  "errors": [],
+  "parser_inputs": [
+    {
+      "file": "docs/evidence/close-friends-native-2026-10-20/extract.py",
+      "sha256": "9eb0a12b61b5c9e38538c509831a82e87aacce79d9691c0b6881cbd4e9d0daf3"
+    },
+    {
+      "file": "docs/evidence/message-actions-native-2026-10-17/classes.json",
+      "sha256": "04f4578ba39d08f5e7115b532ef86197243eb56391d805631a14ad92b43834a1"
+    },
+    {
+      "file": "docs/evidence/close-friends-native-2026-10-20/VoIPInvitationService--rejectInvitationWithInfo_.asm",
+      "sha256": "d34f7e53124db54037e578c518fe52d22436bf21b4a911ccb429983ee67c91c9"
+    }
+  ],
+  "evidence_files": [
+    {
+      "file": "CAppUtil--class--voIPRequestAnswerAboutRejectWithDelegate_roomID_roomKey_contact_forceToVoice_.asm",
+      "bytes": 848,
+      "sha256": "78cf25a3b4fc5df45cad2333b4cd994b25c4802679d5cf63f1162a9f47830c08"
+    },
+    {
+      "file": "CAppUtil--class--voIPRequestAnswerWithDelegate_roomID_roomKey_contact_forceToVoice_type_nicInfos_peerId_capInfo_.asm",
+      "bytes": 62987,
+      "sha256": "79a412c88d622af769e2a9367f1cd378d020b83c0391fd96b04e93d659b7bf08"
+    },
+    {
+      "file": "CAppUtil-methods.json",
+      "bytes": 27722,
+      "sha256": "72886734415e080eb4f5697699a76fef6d4ba9844c364a55f8b3cab245e4b0af"
+    },
+    {
+      "file": "ConfRecvInviteInfo-methods.json",
+      "bytes": 744,
+      "sha256": "171797386f4507c0eac2c380562db79725f28067fd4b9c3b83a50833c935950c"
+    },
+    {
+      "file": "MMConfSDKMemberMgr-methods.json",
+      "bytes": 9783,
+      "sha256": "67293e1567f55b45524016672467a905c2f5a3d1590e77fa234226dd5cf49318"
+    },
+    {
+      "file": "MMConfSDKNativeEngine--class--getConfInst.asm",
+      "bytes": 361,
+      "sha256": "2783ef04c6388e0f72d6bc7fcb3dadaaf47aef8fd8f5b13130eb79d578be8c21"
+    },
+    {
+      "file": "MMConfSDKNativeEngine--class--hangup_isSubCall_.asm",
+      "bytes": 4362,
+      "sha256": "6033cc0deaf32ad0ea02ca62a9d086050f8dc3182b9dd94faec065cd949f17a8"
+    },
+    {
+      "file": "MMConfSDKNativeEngine--class--hangup_roomID_.asm",
+      "bytes": 4365,
+      "sha256": "2d87f5e3bbbfacee43e69adb58144946933b642a43b8e7af2b4e0bd3ca6fa7ba"
+    },
+    {
+      "file": "MMConfSDKNativeEngine-methods.json",
+      "bytes": 9739,
+      "sha256": "70fa0d6ffc77bc31b86661871c79bcf56fd5e630f8ca60aa73312626592308e8"
+    },
+    {
+      "file": "MMConfSDKService--instance--hangup_isSubCall_.asm",
+      "bytes": 4592,
+      "sha256": "41e0fa494652c85a20f61821c9f6d3fa488f02a61203e7939b64a67f894e95a5"
+    },
+    {
+      "file": "MMConfSDKService--instance--hangup_roomID_.asm",
+      "bytes": 5271,
+      "sha256": "100f9ad580e5d31702a68ae7c8e43a84e2faa30d68741ddafa55d1a7c33be18b"
+    },
+    {
+      "file": "MMConfSDKService-methods.json",
+      "bytes": 20469,
+      "sha256": "b2bea02415d062af6d8efb3ee220d34ddd2f8c7e4676ae1200dcb0721133f28f"
+    },
+    {
+      "file": "MultiTalkMgr--instance--MultiTalkReject_.asm",
+      "bytes": 5623,
+      "sha256": "e2b983eea4afc54003819084519b60f1add6f0847c6e507eb7763878846159cf"
+    },
+    {
+      "file": "MultiTalkMgr--instance--_onMonoServiceMsgStartWithMsg_.asm",
+      "bytes": 55871,
+      "sha256": "590b0a4a071b771e47831f6fa88bf0c5cccf025e67743d562b9989ab92134e64"
+    },
+    {
+      "file": "MultiTalkMgr--instance--onInviteMultiTalk_.asm",
+      "bytes": 27734,
+      "sha256": "7a73322d6ab98807b892943e3a9277800a8d96ff332fcd84a380acdefb6b280e"
+    },
+    {
+      "file": "MultiTalkMgr--instance--onMonoServiceMsgRejectWithMsg_.asm",
+      "bytes": 22222,
+      "sha256": "af8299f31227d9fd88d78a690fcca018b047ae62055946fc162fffe1f7b0bea3"
+    },
+    {
+      "file": "MultiTalkMgr--instance--voIPInvitationServiceDidRejectWithInfo_.asm",
+      "bytes": 190,
+      "sha256": "f8988737da38105ef87214c685d71637e45a974d466d8703d18b40fa1d42837b"
+    },
+    {
+      "file": "MultiTalkMgr-methods.json",
+      "bytes": 79011,
+      "sha256": "5589af7876afd8349afc9ccd10834da7bad09ec1693404bbda7826ac1586a927"
+    },
+    {
+      "file": "MultiTalkMonoMsg-methods.json",
+      "bytes": 5543,
+      "sha256": "64489e405a27ffad919aa8bdffbca8f8660101ae36e17546132fe3cd6e6f4a84"
+    },
+    {
+      "file": "VOIPMessageMgr--instance--init.asm",
+      "bytes": 4779,
+      "sha256": "7bb258a119ec1a2d5d2257a7a66d1bc672af3390335b3c1949cf00c9cb4695ad"
+    },
+    {
+      "file": "VOIPMessageMgr--instance--onServiceInit.asm",
+      "bytes": 3066,
+      "sha256": "eb70b17b5147cc6d5b579d7de82afb23a1e3a906c7f6b0714866a978c024a36a"
+    },
+    {
+      "file": "VOIPMessageMgr--instance--voIPInvitationServiceDidRejectWithInfo_.asm",
+      "bytes": 9861,
+      "sha256": "998e3b2e7c767a68181a676137179bb83a517e141e1efa0b38d460383cc7f006"
+    },
+    {
+      "file": "VOIPMessageMgr-methods.json",
+      "bytes": 7980,
+      "sha256": "d477c52af9da872888d4f94eeb0d50813ec07ec0c8c340e9c923c27de1cd6773"
+    },
+    {
+      "file": "VOIPMgr--instance--Reject_withRoomId_andKey_.asm",
+      "bytes": 2351,
+      "sha256": "781be83111cf10c49d81b00ffbc9b110fd0fa04b731c09e56a24b1786bb9f713"
+    },
+    {
+      "file": "VoIPConfSDKService--instance--hangup_isSubCall_.asm",
+      "bytes": 7067,
+      "sha256": "cae1580b9b825a6548dbd94c0ed5e41bf8518fbbe7cef49ad3e55698561626cd"
+    },
+    {
+      "file": "VoIPConfSDKService--instance--hangup_roomID_.asm",
+      "bytes": 7079,
+      "sha256": "9c7f18c0be73ab5b1099e3ce9d60a91ecf014fd4e43c3277f8f94f7205ee9360"
+    },
+    {
+      "file": "VoIPInvitationInfo--class--infoWithVoipMonoMsg_scene_.asm",
+      "bytes": 22661,
+      "sha256": "ea330cf3b5ae7610cb04ce0a9ef21654942c317bd9c2c9acc09023044dee19c7"
+    },
+    {
+      "file": "VoIPInvitationService--instance--handleInvitationInfo_withTalkingRoomID_talkingRoomKey_.asm",
+      "bytes": 36264,
+      "sha256": "190c76a5b22a93b042de436deeb9540abb6e8a4361da623bb40c5c6eb55caa09"
+    },
+    {
+      "file": "VoIPInvitationService--instance--rejectWithRoomID_.asm",
+      "bytes": 6616,
+      "sha256": "5d9a27423673361f53293e560abda0d564f933f474e3917c02f9a1d1650959f0"
+    },
+    {
+      "file": "VoIPMPSubCallCache-methods.json",
+      "bytes": 4003,
+      "sha256": "f0131bfbd12d32a6914691d8348ee5779cd3bff0000299f08350f8ef7cd21f52"
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--clear.asm",
+      "bytes": 4200,
+      "sha256": "6c38eb8b94056a9233c1d246b26fff7426ecc6b37bb72e1316cdad20a236f7b0"
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--genVoIPInvitationInfoWithMsg_Scene_NeedReport_.asm",
+      "bytes": 45807,
+      "sha256": "9b48e2440ec4c20e9fa54dde244a78c707922ff2d363d2d4bb2e915ad867017e"
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--init.asm",
+      "bytes": 5402,
+      "sha256": "02f0c130eb1c53178e1b790a1fe97143fd2d4b290072e5a9afc10ea3c347b25c"
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--onMonoServiceMsgHandleWithMsg_.asm",
+      "bytes": 19530,
+      "sha256": "ab13870fac3f7693d42157c0862ed76c56d18a4fed7a46f3d372d036ae879a3c"
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--receiveInviteData_.asm",
+      "bytes": 49758,
+      "sha256": "af18ee161e10f26dfc476c236d3f11a8b32326ae4adc06b8a80ef00c68f67d2d"
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--reject.asm",
+      "bytes": 19460,
+      "sha256": "9146a7ca06bd6e6a1042cbe9f77fcc9660a60ca07ee3bb168eb23afb2732662b"
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--voIPInvitationServiceDidRejectWithInfo_.asm",
+      "bytes": 12939,
+      "sha256": "2b5706612213c94dbbae74799dd2293c79e37e42b669b9ae6e400f58a5706181"
+    },
+    {
+      "file": "VoIPMPSubCallService-methods.json",
+      "bytes": 7701,
+      "sha256": "e01889d7fd0198ef5ba3f6ee36b394696b11df7a9fa137d8106a41cc746ecb18"
+    },
+    {
+      "file": "VoIPMtInviteMsg-methods.json",
+      "bytes": 172,
+      "sha256": "8b3e2f1678d82aa11603bcf537f97f047c954c3ab0c1195589419ad946efe343"
+    },
+    {
+      "file": "VoIPilinkMgr--instance--hangupWithRoomID_.asm",
+      "bytes": 6738,
+      "sha256": "80102c85cff2fdeebf98147cb7687bced704d008b9d8766a8bc64ee0edb7bd9d"
+    },
+    {
+      "file": "VoIPilinkMgr--instance--rejectWithRoomID_.asm",
+      "bytes": 5706,
+      "sha256": "4c27118ad3c9f079551856d7fbdc5804e4af6adcd3d82d222e5916a947610252"
+    },
+    {
+      "file": "VoipMonoMsg--instance--isVideo.asm",
+      "bytes": 625,
+      "sha256": "254ff90f78c266dce19f44d82ba6a9c4339b5938880ec71396d259e792c7605d"
+    },
+    {
+      "file": "VoipUIManager--instance--HangupWithRoomID_reason_.asm",
+      "bytes": 17887,
+      "sha256": "dd436448b2806ff26f4357620a4641276579f9eea1ef202ab2ea59f5f0a5a38f"
+    },
+    {
+      "file": "VoipUIManager--instance--OnHangup_.asm",
+      "bytes": 2537,
+      "sha256": "b165b855d364d0392651917e9a55ce03c910022ef393249f14657f0c6b6c46c5"
+    },
+    {
+      "file": "VoipUIManager--instance--Reject_withRoomId_andKey_isilink_.asm",
+      "bytes": 4062,
+      "sha256": "bf570f8520e647457401e51eb4e8b0a8c04e4a2c0b625efe233f8b009166c2f7"
+    },
+    {
+      "file": "VoipUIManager-methods.json",
+      "bytes": 66782,
+      "sha256": "ca44882bed7443447cbe921444b594dd086ce96e0619e6b8aa5791437b8975be"
+    },
+    {
+      "file": "analyze.py",
+      "bytes": 6790,
+      "sha256": "d8a517a96c647733552cb9136e04b1765bf27eed2ea0ba4a836089bae0895b17"
+    },
+    {
+      "file": "callback-methods.json",
+      "bytes": 847,
+      "sha256": "1adf555fc592a167afb2e56728e2d3f43e5464e6df7070d7f5cf9700407a3254"
+    },
+    {
+      "file": "finalize-manifest.py",
+      "bytes": 2731,
+      "sha256": "91a8422178a68b1ee505f2d452de2e4e3ca778c14e6992f098a1da43ac828347"
+    },
+    {
+      "file": "function-0x10292f134.asm",
+      "bytes": 677,
+      "sha256": "1366cb820bfef7fbc02ffd15602d6286ca1029fe2fc4572d13c1e13bae21811b"
+    },
+    {
+      "file": "function-0x10292f3a4.asm",
+      "bytes": 1429,
+      "sha256": "c838e007b627b1a3513cc6d13205e7411abafcb9f10278491968653739bccfa6"
+    },
+    {
+      "file": "function-0x1060f64bc.asm",
+      "bytes": 1750,
+      "sha256": "d5f46bf15370416a67115b6dc7ea890766273f5e5742e0f2f86b6f516df5fb82"
+    },
+    {
+      "file": "function-0x1060f6710.asm",
+      "bytes": 1746,
+      "sha256": "e4e6e5160c8d68a5849d445a441a91fe38bca508853117ecd182f3e37c0d3c06"
+    },
+    {
+      "file": "function-0x106121a8c.asm",
+      "bytes": 532,
+      "sha256": "46844c6e30996ca072590cb3820a98f93dadb3912e2568275eb032b6fb7fbf7c"
+    },
+    {
+      "file": "function-0x107c0cfc8.asm",
+      "bytes": 226,
+      "sha256": "01f224d89851f5a5cd7d70d09e36a18a16c85be1d1b8c63a8c8edd765be980fb"
+    },
+    {
+      "file": "function-0x107c0d220.asm",
+      "bytes": 226,
+      "sha256": "69e2a9d19c6b1fdfcf8e0465a978afe51d568dac03365ef4aaf6b88a76290dbe"
+    },
+    {
+      "file": "function-0x107c2718c.asm",
+      "bytes": 226,
+      "sha256": "ca0d9f8292637410e3b8f02e82a766681e013f9a0fae46dc92fdc7ed9ca83821"
+    },
+    {
+      "file": "group-identity-methods.json",
+      "bytes": 532,
+      "sha256": "c090d413ddbb702fd90e22056f30162892c77a50f4189e0a27722b21c64e9480"
+    },
+    {
+      "file": "identity-metadata.py",
+      "bytes": 1654,
+      "sha256": "8fe96e8986fdacb675f0f3e2324c946e8c7916990ab527a771c08bfec920b113"
+    },
+    {
+      "file": "identity-properties.json",
+      "bytes": 4250,
+      "sha256": "00e9f37b161a437427a219f8d0de795a15726bc1886761b1e11acb884dc632b3"
+    },
+    {
+      "file": "ilink-service-fields.json",
+      "bytes": 709,
+      "sha256": "cff93ce0abf92c3fe8149461af90a761a9b8eae8a3109918a02582172945edf0"
+    },
+    {
+      "file": "ilink-service-fields.py",
+      "bytes": 1258,
+      "sha256": "13f73a394ee0b3be6f8def43720061fed52f469f7270ed4ffdaaea43478b76ee"
+    },
+    {
+      "file": "methods.json",
+      "bytes": 434279,
+      "sha256": "b07ead08492019d1abf6252c951c14af5328753d2394777db37880fb46fc1284"
+    }
+  ],
+  "disassembly": [
+    {
+      "file": "CAppUtil--class--voIPRequestAnswerAboutRejectWithDelegate_roomID_roomKey_contact_forceToVoice_.asm",
+      "start": "0x100139a10",
+      "stop": "0x100139a40",
+      "function_end": "0x100139a40",
+      "truncated": false
+    },
+    {
+      "file": "CAppUtil--class--voIPRequestAnswerWithDelegate_roomID_roomKey_contact_forceToVoice_type_nicInfos_peerId_capInfo_.asm",
+      "start": "0x100138a24",
+      "stop": "0x100139a10",
+      "function_end": "0x100139a10",
+      "truncated": false
+    },
+    {
+      "file": "MMConfSDKNativeEngine--class--getConfInst.asm",
+      "start": "0x10291f0a4",
+      "stop": "0x10291f0b0",
+      "function_end": "0x10291f0b0",
+      "truncated": false
+    },
+    {
+      "file": "MMConfSDKNativeEngine--class--hangup_isSubCall_.asm",
+      "start": "0x1029201f4",
+      "stop": "0x1029202fc",
+      "function_end": "0x1029202fc",
+      "truncated": false
+    },
+    {
+      "file": "MMConfSDKNativeEngine--class--hangup_roomID_.asm",
+      "start": "0x10292030c",
+      "stop": "0x102920414",
+      "function_end": "0x102920414",
+      "truncated": false
+    },
+    {
+      "file": "MMConfSDKService--instance--hangup_isSubCall_.asm",
+      "start": "0x10292f008",
+      "stop": "0x10292f134",
+      "function_end": "0x10292f134",
+      "truncated": false
+    },
+    {
+      "file": "MMConfSDKService--instance--hangup_roomID_.asm",
+      "start": "0x10292f248",
+      "stop": "0x10292f3a4",
+      "function_end": "0x10292f3a4",
+      "truncated": false
+    },
+    {
+      "file": "MultiTalkMgr--instance--MultiTalkReject_.asm",
+      "start": "0x104f38dc4",
+      "stop": "0x104f38f24",
+      "function_end": "0x104f38f24",
+      "truncated": false
+    },
+    {
+      "file": "MultiTalkMgr--instance--_onMonoServiceMsgStartWithMsg_.asm",
+      "start": "0x104f52754",
+      "stop": "0x104f534d4",
+      "function_end": "0x104f534d4",
+      "truncated": false
+    },
+    {
+      "file": "MultiTalkMgr--instance--onInviteMultiTalk_.asm",
+      "start": "0x104f3a030",
+      "stop": "0x104f3a700",
+      "function_end": "0x104f3a700",
+      "truncated": false
+    },
+    {
+      "file": "MultiTalkMgr--instance--onMonoServiceMsgRejectWithMsg_.asm",
+      "start": "0x104f5350c",
+      "stop": "0x104f53a5c",
+      "function_end": "0x104f53a5c",
+      "truncated": false
+    },
+    {
+      "file": "MultiTalkMgr--instance--voIPInvitationServiceDidRejectWithInfo_.asm",
+      "start": "0x104f5fcec",
+      "stop": "0x104f5fcf0",
+      "function_end": "0x104f5fcf0",
+      "truncated": false
+    },
+    {
+      "file": "VOIPMessageMgr--instance--init.asm",
+      "start": "0x105f7dea8",
+      "stop": "0x105f7dfdc",
+      "function_end": "0x105f7dfdc",
+      "truncated": false
+    },
+    {
+      "file": "VOIPMessageMgr--instance--onServiceInit.asm",
+      "start": "0x105f7dfdc",
+      "stop": "0x105f7e098",
+      "function_end": "0x105f7e098",
+      "truncated": false
+    },
+    {
+      "file": "VOIPMessageMgr--instance--voIPInvitationServiceDidRejectWithInfo_.asm",
+      "start": "0x105f8bc0c",
+      "stop": "0x105f8be98",
+      "function_end": "0x105f8be98",
+      "truncated": false
+    },
+    {
+      "file": "VOIPMgr--instance--Reject_withRoomId_andKey_.asm",
+      "start": "0x105fe30b8",
+      "stop": "0x105fe3158",
+      "function_end": "0x105fe3158",
+      "truncated": false
+    },
+    {
+      "file": "VoIPConfSDKService--instance--hangup_isSubCall_.asm",
+      "start": "0x1060f62e4",
+      "stop": "0x1060f64bc",
+      "function_end": "0x1060f64bc",
+      "truncated": false
+    },
+    {
+      "file": "VoIPConfSDKService--instance--hangup_roomID_.asm",
+      "start": "0x1060f6538",
+      "stop": "0x1060f6710",
+      "function_end": "0x1060f6710",
+      "truncated": false
+    },
+    {
+      "file": "VoIPInvitationInfo--class--infoWithVoipMonoMsg_scene_.asm",
+      "start": "0x10611f8cc",
+      "stop": "0x10611fe5c",
+      "function_end": "0x10611fe5c",
+      "truncated": false
+    },
+    {
+      "file": "VoIPInvitationService--instance--handleInvitationInfo_withTalkingRoomID_talkingRoomKey_.asm",
+      "start": "0x106120688",
+      "stop": "0x106120fd4",
+      "function_end": "0x106120fd4",
+      "truncated": false
+    },
+    {
+      "file": "VoIPInvitationService--instance--rejectWithRoomID_.asm",
+      "start": "0x106122dc0",
+      "stop": "0x106122f6c",
+      "function_end": "0x106122f6c",
+      "truncated": false
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--clear.asm",
+      "start": "0x106168488",
+      "stop": "0x10616858c",
+      "function_end": "0x10616858c",
+      "truncated": false
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--genVoIPInvitationInfoWithMsg_Scene_NeedReport_.asm",
+      "start": "0x10616c37c",
+      "stop": "0x10616cef4",
+      "function_end": "0x10616cef4",
+      "truncated": false
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--init.asm",
+      "start": "0x10616e748",
+      "stop": "0x10616e8a8",
+      "function_end": "0x10616e8a8",
+      "truncated": false
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--onMonoServiceMsgHandleWithMsg_.asm",
+      "start": "0x10616e9a0",
+      "stop": "0x10616ee50",
+      "function_end": "0x10616ee50",
+      "truncated": false
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--receiveInviteData_.asm",
+      "start": "0x106169af4",
+      "stop": "0x10616a730",
+      "function_end": "0x10616a730",
+      "truncated": false
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--reject.asm",
+      "start": "0x10616a730",
+      "stop": "0x10616ac14",
+      "function_end": "0x10616ac14",
+      "truncated": false
+    },
+    {
+      "file": "VoIPMPSubCallService--instance--voIPInvitationServiceDidRejectWithInfo_.asm",
+      "start": "0x106171484",
+      "stop": "0x1061717d0",
+      "function_end": "0x1061717d0",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--instance--hangupWithRoomID_.asm",
+      "start": "0x1062552a0",
+      "stop": "0x106255454",
+      "function_end": "0x106255454",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--instance--rejectWithRoomID_.asm",
+      "start": "0x106255454",
+      "stop": "0x1062555b0",
+      "function_end": "0x1062555b0",
+      "truncated": false
+    },
+    {
+      "file": "VoipMonoMsg--instance--isVideo.asm",
+      "start": "0x106375308",
+      "stop": "0x10637532c",
+      "function_end": "0x10637532c",
+      "truncated": false
+    },
+    {
+      "file": "VoipUIManager--instance--HangupWithRoomID_reason_.asm",
+      "start": "0x10639dfcc",
+      "stop": "0x10639e47c",
+      "function_end": "0x10639e47c",
+      "truncated": false
+    },
+    {
+      "file": "VoipUIManager--instance--OnHangup_.asm",
+      "start": "0x1063a3e30",
+      "stop": "0x1063a3ec8",
+      "function_end": "0x1063a3ec8",
+      "truncated": false
+    },
+    {
+      "file": "VoipUIManager--instance--Reject_withRoomId_andKey_isilink_.asm",
+      "start": "0x10639dc0c",
+      "stop": "0x10639dd10",
+      "function_end": "0x10639dd10",
+      "truncated": false
+    },
+    {
+      "file": "function-0x10292f134.asm",
+      "start": "0x10292f134",
+      "stop": "0x10292f154",
+      "function_end": "0x10292f154",
+      "truncated": false
+    },
+    {
+      "file": "function-0x10292f3a4.asm",
+      "start": "0x10292f3a4",
+      "stop": "0x10292f3f8",
+      "function_end": "0x10292f3f8",
+      "truncated": false
+    },
+    {
+      "file": "function-0x1060f64bc.asm",
+      "start": "0x1060f64bc",
+      "stop": "0x1060f6528",
+      "function_end": "0x1060f6528",
+      "truncated": false
+    },
+    {
+      "file": "function-0x1060f6710.asm",
+      "start": "0x1060f6710",
+      "stop": "0x1060f677c",
+      "function_end": "0x1060f677c",
+      "truncated": false
+    },
+    {
+      "file": "function-0x106121a8c.asm",
+      "start": "0x106121a8c",
+      "stop": "0x106121aa4",
+      "function_end": "0x106121aa4",
+      "truncated": false
+    },
+    {
+      "file": "function-0x107c0cfc8.asm",
+      "start": "0x107c0cfc8",
+      "stop": "0x107c0cfcc",
+      "function_end": "0x107c0cfcc",
+      "truncated": false
+    },
+    {
+      "file": "function-0x107c0d220.asm",
+      "start": "0x107c0d220",
+      "stop": "0x107c0d224",
+      "function_end": "0x107c0d224",
+      "truncated": false
+    },
+    {
+      "file": "function-0x107c2718c.asm",
+      "start": "0x107c2718c",
+      "stop": "0x107c27190",
+      "function_end": "0x107c27190",
+      "truncated": false
+    }
+  ],
+  "disassembly_count": 42,
+  "truncated_disassembly_count": 0,
+  "coverage_limits": [
+    "Objective-C class and metaclass base method tables; no complete category inventory.",
+    "Property metadata for selected identities; dynamic accessors were not run.",
+    "Reference annotations are hints, not complete register data-flow analysis.",
+    "No target execution, device access, account access, service requests, or runtime success validation."
+  ],
+  "report": {
+    "file": "../alert-native-report.md",
+    "sha256": "795570305de75df09dd732e42ec43adcac5f289541c6481a025cb8a0b77d6974"
+  }
+}

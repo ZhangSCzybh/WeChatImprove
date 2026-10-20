@@ -1,0 +1,13 @@
+{
+  "artifact": {
+    "path": "packages/com.wechat.improve_1.8-42_iphoneos-arm64.deb",
+    "sha256": "146e7a37e6482106c81b991836bd7e6ba2c48207402ff91d7eef0659a7135932",
+    "bytes": 1074430
+  },
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "minimum_ios": "15.0"
+}
+455 source inputs, 22 exports per architecture, 5 prior artifacts verified; exit 0.

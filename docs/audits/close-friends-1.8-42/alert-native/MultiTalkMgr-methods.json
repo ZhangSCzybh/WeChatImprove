@@ -1,0 +1,3338 @@
+[
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "cancelQueryingTalkingMembers",
+    "address": "0x104f2e89c",
+    "end": "0x104f2eabc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "queryTalkingMembersContinually",
+    "address": "0x104f2eabc",
+    "end": "0x104f2f4f8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "close",
+    "address": "0x104f2f508",
+    "end": "0x104f2f588",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "minimize",
+    "address": "0x104f2f588",
+    "end": "0x104f2fd2c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "showCalleeRiskAlertWithUserNames:isAll:isCreating:",
+    "address": "0x104f2fd3c",
+    "end": "0x104f305d8",
+    "types": "v32@0:8@16B24B28"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "clearResumeAfterInterruptionBlock",
+    "address": "0x104f305d8",
+    "end": "0x104f30664",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "broadcastCmdMsgData:toSpecifyMemberIDs:",
+    "address": "0x104f30664",
+    "end": "0x104f30954",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "broadcastInfoToSpecifyMemberIDs:",
+    "address": "0x104f30954",
+    "end": "0x104f30ccc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "updateMemberInfosByGroupInfo:",
+    "address": "0x104f30ccc",
+    "end": "0x104f30ea4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "initVoIPToastAdapter",
+    "address": "0x104f30f80",
+    "end": "0x104f3107c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "defaultVoIPToastAdapterParam",
+    "address": "0x104f310cc",
+    "end": "0x104f3116c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "showVoIPToastWithFineTuneBlock:",
+    "address": "0x104f3116c",
+    "end": "0x104f3120c",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "showVoIPToastWithText:",
+    "address": "0x104f3120c",
+    "end": "0x104f312a4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "showConflictWording",
+    "address": "0x104f312bc",
+    "end": "0x104f31444",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x104f31444",
+    "end": "0x104f31b9c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "dealloc",
+    "address": "0x104f31b9c",
+    "end": "0x104f31c38",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onServiceInit",
+    "address": "0x104f31c38",
+    "end": "0x104f31dd4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "genMultiTalkClientGroupId",
+    "address": "0x104f31dd4",
+    "end": "0x104f31f20",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getNextEnableTimeForCreateRoom",
+    "address": "0x104f31f20",
+    "end": "0x104f31f2c",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "clearVideoDevice",
+    "address": "0x104f32388",
+    "end": "0x104f324d0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "resetVideoDevice",
+    "address": "0x104f324d0",
+    "end": "0x104f3299c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "startVideoDevice",
+    "address": "0x104f3299c",
+    "end": "0x104f32d10",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "stopVideoDevice",
+    "address": "0x104f32d10",
+    "end": "0x104f32f14",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "uploadFpsCountCheck",
+    "address": "0x104f32f14",
+    "end": "0x104f33018",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "canStartANewCall",
+    "address": "0x104f33018",
+    "end": "0x104f3330c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isMultiTalkActive",
+    "address": "0x104f3330c",
+    "end": "0x104f334bc",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "checkIfDuplicateGroup:",
+    "address": "0x104f334bc",
+    "end": "0x104f33680",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isMultiTalkLocalCameraActive",
+    "address": "0x104f33680",
+    "end": "0x104f336d8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isMultiTalkCalling",
+    "address": "0x104f336d8",
+    "end": "0x104f336e4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isMultiTalkConnected",
+    "address": "0x104f336e4",
+    "end": "0x104f336f0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "canAutoEnterCrossPlatformRemoteViewing",
+    "address": "0x104f336f0",
+    "end": "0x104f337ec",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "currentScreenProjectingMemberId",
+    "address": "0x104f337ec",
+    "end": "0x104f33c24",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isOutOfDate:",
+    "address": "0x104f33c24",
+    "end": "0x104f33c60",
+    "types": "B20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isMultiTalkValidWithWxGroupId:",
+    "address": "0x104f33c60",
+    "end": "0x104f33eec",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isPhoneCalling",
+    "address": "0x104f33eec",
+    "end": "0x104f34074",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getRenderForMemberId:",
+    "address": "0x104f34074",
+    "end": "0x104f341b8",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isSpeakerSupported",
+    "address": "0x104f341b8",
+    "end": "0x104f34204",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isCaller",
+    "address": "0x104f34204",
+    "end": "0x104f34250",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isUsingEarDevice",
+    "address": "0x104f34250",
+    "end": "0x104f34258",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getRenderForUsername:",
+    "address": "0x104f34258",
+    "end": "0x104f3475c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getTalkIngMember:",
+    "address": "0x104f3475c",
+    "end": "0x104f347fc",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getRemoteCameraOnUserNames",
+    "address": "0x104f347fc",
+    "end": "0x104f34b54",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getMemberQualityInfoList:",
+    "address": "0x104f34b54",
+    "end": "0x104f34bf4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "engineDoMemberSelectForView:",
+    "address": "0x104f34bf4",
+    "end": "0x104f34cac",
+    "types": "i24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "subscribeLargeVideoForUser:isSharedScreenData:isCancel:",
+    "address": "0x104f34cac",
+    "end": "0x104f34d68",
+    "types": "v32@0:8@16B24B28"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "checkAndResubscribeLargeSharedScreenDataWithUserName:",
+    "address": "0x104f34d68",
+    "end": "0x104f34e50",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "checkAndCancelSubscribeLargeSharedScreenDataWithGroupInfo:",
+    "address": "0x104f34e50",
+    "end": "0x104f35184",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getMemberIdByUserName:",
+    "address": "0x104f35184",
+    "end": "0x104f3526c",
+    "types": "i24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isUserSharingScreenWithUserMemberID:",
+    "address": "0x104f3526c",
+    "end": "0x104f35408",
+    "types": "B20@0:8i16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "resubscribeLargeVideo",
+    "address": "0x104f35408",
+    "end": "0x104f356e4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "joinMultiTalkWithGroup:roomId:roomKey:joinSuccessHandler:",
+    "address": "0x104f356e4",
+    "end": "0x104f35864",
+    "types": "v48@0:8@16Q24Q32@?40"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "_joinMultiTalkWithGroup:roomId:roomKey:joinSuccessHandler:",
+    "address": "0x104f358e0",
+    "end": "0x104f35fe4",
+    "types": "v48@0:8@16Q24Q32@?40"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "createMultiTalkSubCallWithGroup:",
+    "address": "0x104f35ff4",
+    "end": "0x104f360b0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "initVoipCheckAudioDeviceObj",
+    "address": "0x104f36114",
+    "end": "0x104f36124",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "initVoipCheckAudioDeviceObjWithIsSpeaker:",
+    "address": "0x104f36124",
+    "end": "0x104f36240",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "doCreateMultiTalkWithContacts:withChatroomUsername:inviteId:",
+    "address": "0x104f36240",
+    "end": "0x104f37550",
+    "types": "v40@0:8@16@24Q32"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getMultiTalkWindow",
+    "address": "0x104f37560",
+    "end": "0x104f3756c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "hideMultiTalkWindowForScreenProject",
+    "address": "0x104f3756c",
+    "end": "0x104f37730",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "restoreMultiTalkWindowForScreenProject",
+    "address": "0x104f37730",
+    "end": "0x104f3790c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "createMultiTalkWithContacts:withChatroomUsername:inviteId:",
+    "address": "0x104f3790c",
+    "end": "0x104f379f8",
+    "types": "v40@0:8@16@24Q32"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "maxMultiTalkMemberCount",
+    "address": "0x104f37a00",
+    "end": "0x104f37a14",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setMicrophoneState:",
+    "address": "0x104f37a14",
+    "end": "0x104f37c0c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setSpeakerState:",
+    "address": "0x104f37c0c",
+    "end": "0x104f37d68",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "showlocalNetworkBadTips",
+    "address": "0x104f37d68",
+    "end": "0x104f37e9c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "validateScreenSharingFileWithPath:",
+    "address": "0x104f37e9c",
+    "end": "0x104f38094",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "_validateScreenSharingFileWithPath:MD5:",
+    "address": "0x104f38264",
+    "end": "0x104f38498",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "_handleValidateScreenSharingFileWithMD5:ret:fileStatus:",
+    "address": "0x104f38498",
+    "end": "0x104f38780",
+    "types": "v32@0:8@16i24i28"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onAuthOK",
+    "address": "0x104f3879c",
+    "end": "0x104f38878",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onPreQuit",
+    "address": "0x104f38878",
+    "end": "0x104f38884",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "writeLog:tag:content:",
+    "address": "0x104f38884",
+    "end": "0x104f38c58",
+    "types": "v36@0:8i16@20@28"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "rejectCall:",
+    "address": "0x104f38c58",
+    "end": "0x104f38dc4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "MultiTalkReject:",
+    "address": "0x104f38dc4",
+    "end": "0x104f38f24",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "playWhenEnterForeground",
+    "address": "0x104f38f24",
+    "end": "0x104f38ff4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "playRingSoundWithVibration:isCaller:",
+    "address": "0x104f38ff4",
+    "end": "0x104f39c10",
+    "types": "v24@0:8B16B20"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "stopRingSound",
+    "address": "0x104f39f34",
+    "end": "0x104f3a030",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onInviteMultiTalk:",
+    "address": "0x104f3a030",
+    "end": "0x104f3a700",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onAcceptSubCallMultiTalk:",
+    "address": "0x104f3a700",
+    "end": "0x104f3adf8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onCancelCreateMultiTalk:",
+    "address": "0x104f3ae30",
+    "end": "0x104f3b05c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onCreateMultiTalk:",
+    "address": "0x104f3b05c",
+    "end": "0x104f3b1a8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onEnterMultiTalk:",
+    "address": "0x104f3b280",
+    "end": "0x104f3b3d8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onInviteOrAcceptTimeout:",
+    "address": "0x104f3b59c",
+    "end": "0x104f3b6e8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "confSDKOnRecvCmdMsg:",
+    "address": "0x104f3b7c0",
+    "end": "0x104f3bda8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMemberChange:",
+    "address": "0x104f3bda8",
+    "end": "0x104f3bf28",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMemberChange:withNewJoinedMembers:",
+    "address": "0x104f3c010",
+    "end": "0x104f3c48c",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkReady",
+    "address": "0x104f3c574",
+    "end": "0x104f3ca6c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMuteStateChange:",
+    "address": "0x104f3cbd8",
+    "end": "0x104f3cd24",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onSpeakerStateChange:",
+    "address": "0x104f3cddc",
+    "end": "0x104f3cf28",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onErr:groupUserName:",
+    "address": "0x104f3cfe0",
+    "end": "0x104f3d1ac",
+    "types": "v28@0:8i16@20"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onCreateFailedDueToCallerRisk",
+    "address": "0x104f3d438",
+    "end": "0x104f3d44c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onCreateFailedDueToRequireVerification:",
+    "address": "0x104f3d6e0",
+    "end": "0x104f3da30",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onJoinFailedDueToCallerRisk",
+    "address": "0x104f3db10",
+    "end": "0x104f3db24",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onCreateUnsafelyDueToCalleeRiskWithUserNames:isAll:",
+    "address": "0x104f3ddb8",
+    "end": "0x104f3de50",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onReceiveConfCallWordingInfo:",
+    "address": "0x104f3e004",
+    "end": "0x104f3e0b8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onRejectToCreateRoomForServerOverloadWithTimeInterval:",
+    "address": "0x104f3e134",
+    "end": "0x104f3e250",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onRejectToOpenCameraForServerOverloadWithTimeInterval:",
+    "address": "0x104f3e268",
+    "end": "0x104f3e38c",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onAddMultiTalkMemberResult:errorType:groupInfo:",
+    "address": "0x104f3e38c",
+    "end": "0x104f3e518",
+    "types": "v32@0:8B16i20@24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onAddMultiTalkMemberFailedDueToCallerRisk",
+    "address": "0x104f3e608",
+    "end": "0x104f3e61c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onAddMultiTalkMemberFailedDueToRiskWithUserNames:groupInfo:isAll:",
+    "address": "0x104f3e854",
+    "end": "0x104f3e91c",
+    "types": "v36@0:8@16@24B32"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onReceiveMutilTalkPokerMsg",
+    "address": "0x104f3eb80",
+    "end": "0x104f3ec6c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkDeviceLauchSuccess",
+    "address": "0x104f3ec70",
+    "end": "0x104f3f0e8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onReceiveSubscribeMemberChangeMsg:",
+    "address": "0x104f3f158",
+    "end": "0x104f3f1d4",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onReceiveVideoMemberChangeMsg:extArray:",
+    "address": "0x104f3f1d4",
+    "end": "0x104f3f354",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "OnVideoStateChange:VideoOn:",
+    "address": "0x104f3f7cc",
+    "end": "0x104f3fdd0",
+    "types": "v24@0:8B16B20"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getRemoteVideoOrientation:",
+    "address": "0x104f40700",
+    "end": "0x104f40720",
+    "types": "q20@0:8i16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onVideoData:Bgra:Width:Height:frontCamera:screenData:format:",
+    "address": "0x104f40720",
+    "end": "0x104f410dc",
+    "types": "v48@0:8I16*20I28I32B36B40i44"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkRedirectOk",
+    "address": "0x104f41120",
+    "end": "0x104f41244",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkJoinLimit:",
+    "address": "0x104f41254",
+    "end": "0x104f41364",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkCreateLimit:",
+    "address": "0x104f41364",
+    "end": "0x104f41474",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkNotAllowCameraLimit:",
+    "address": "0x104f41474",
+    "end": "0x104f4160c",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onSetMultiTalkScreenSharingStatus:ScreenSharingStatus:",
+    "address": "0x104f41690",
+    "end": "0x104f416fc",
+    "types": "v24@0:8i16i20"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onDoScreenSharingSecurityCheck:checkStatus:fileMd5:",
+    "address": "0x104f41700",
+    "end": "0x104f417e0",
+    "types": "v32@0:8i16i20@24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onOtherDeviceHandleTalk:",
+    "address": "0x104f417f8",
+    "end": "0x104f41944",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "handleMultiTalkBannerMsg:messageCreateTime:",
+    "address": "0x104f41a1c",
+    "end": "0x104f437bc",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getMultiTalkUserNameListWithPrivacy:",
+    "address": "0x104f4389c",
+    "end": "0x104f43a04",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "OnGetNewXmlMsg:Type:MsgWrap:",
+    "address": "0x104f43a04",
+    "end": "0x104f462a8",
+    "types": "v40@0:8@16@24@32"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "notifyInviteString",
+    "address": "0x104f462a8",
+    "end": "0x104f462b4",
+    "types": "r*16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "notifyDataString",
+    "address": "0x104f462b4",
+    "end": "0x104f462c0",
+    "types": "r*16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "notifyBannerString",
+    "address": "0x104f462c0",
+    "end": "0x104f462cc",
+    "types": "r*16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "notFriendNotify",
+    "address": "0x104f462cc",
+    "end": "0x104f462d8",
+    "types": "r*16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "notifyCancelInviteString",
+    "address": "0x104f462d8",
+    "end": "0x104f462e4",
+    "types": "r*16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerRequestMinimizeFrame",
+    "address": "0x104f462e4",
+    "end": "0x104f465bc",
+    "types": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerQuitAnimationWillStart",
+    "address": "0x104f465bc",
+    "end": "0x104f4679c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerQuitAnimationDidEnd",
+    "address": "0x104f4679c",
+    "end": "0x104f46ba0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerCloseCameraByInterrupt",
+    "address": "0x104f46c84",
+    "end": "0x104f46cec",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerOpenCameraByInterrupt",
+    "address": "0x104f46cec",
+    "end": "0x104f46d54",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "clearMultiTalkStatus",
+    "address": "0x104f46d54",
+    "end": "0x104f47798",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerCollapseAnimationDidEnd",
+    "address": "0x104f477a8",
+    "end": "0x104f47b24",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerExtendFromCollapseAnimationWillStart",
+    "address": "0x104f47b34",
+    "end": "0x104f48084",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerViewDidAppear:",
+    "address": "0x104f48084",
+    "end": "0x104f48840",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerCollapseAnimationWillStart",
+    "address": "0x104f48850",
+    "end": "0x104f48d44",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerExtendFromCollapseAnimationDidEnd",
+    "address": "0x104f48d44",
+    "end": "0x104f49368",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkTipsViewResumeMainWindowFromBanner",
+    "address": "0x104f49368",
+    "end": "0x104f49474",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerReceiveCancelCall:",
+    "address": "0x104f49474",
+    "end": "0x104f49630",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerHangupWithGroup:isClickHangup:isNewIlink:isVoipRoomWithOutsideContacts:contactInviteMe:isSelfOutsideChatRoom:",
+    "address": "0x104f49630",
+    "end": "0x104f49920",
+    "types": "v48@0:8@16B24B28B32@36B44"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "checkIfMeExitLatestWithGroup:",
+    "address": "0x104f49920",
+    "end": "0x104f49c10",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "genLocalMessageOnMultiTalkEndWithGroup:isClickHangup:contactInviteMe:isMeExitLatest:isVoipRoomWithOutsideContacts:isSelfOutsideChatRoom:",
+    "address": "0x104f49c10",
+    "end": "0x104f4a048",
+    "types": "v48@0:8@16B24@28B36B40B44"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getCurrentRoomRealMember:",
+    "address": "0x104f4a048",
+    "end": "0x104f4a1c4",
+    "types": "q24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getCurrentRoomRealMembers",
+    "address": "0x104f4a1c4",
+    "end": "0x104f4a4dc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerAcceptWithGroup:",
+    "address": "0x104f4a4dc",
+    "end": "0x104f4a7e4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "acceptWithRoomID:",
+    "address": "0x104f4a7e4",
+    "end": "0x104f4aa18",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerRejectWithGroup:",
+    "address": "0x104f4aa18",
+    "end": "0x104f4abe4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerReceiveTimeOutWithGroup:",
+    "address": "0x104f4abe4",
+    "end": "0x104f4adb0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerCancelJoinWithGroup:",
+    "address": "0x104f4adb0",
+    "end": "0x104f4aed8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerSpeakerButtonSeclect:",
+    "address": "0x104f4aed8",
+    "end": "0x104f4b0a0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerMicButtonSeclect:",
+    "address": "0x104f4b0a0",
+    "end": "0x104f4b19c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerClickedCollapseButton",
+    "address": "0x104f4b19c",
+    "end": "0x104f4b288",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerSlipToCollapse:",
+    "address": "0x104f4b288",
+    "end": "0x104f4ba50",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerClickedCollapseButtonWithNotAnimation",
+    "address": "0x104f4ba70",
+    "end": "0x104f4c214",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "closeLocalCameraForServerEnableWithInterval:",
+    "address": "0x104f4c224",
+    "end": "0x104f4c300",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerVideoSelected:",
+    "address": "0x104f4c318",
+    "end": "0x104f4c328",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerVideoSelected:forceBackCamera:",
+    "address": "0x104f4c328",
+    "end": "0x104f4d1a4",
+    "types": "v24@0:8B16B20"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerScreenSharingDidStartWithView:",
+    "address": "0x104f4d1c4",
+    "end": "0x104f4d38c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerScreenSharingDidStop",
+    "address": "0x104f4d38c",
+    "end": "0x104f4d4ec",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerScreenSharingDidPause",
+    "address": "0x104f4d4ec",
+    "end": "0x104f4d664",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerScreenSharingDidResume",
+    "address": "0x104f4d664",
+    "end": "0x104f4d7dc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getShareScreenStatus",
+    "address": "0x104f4d7dc",
+    "end": "0x104f4d824",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerScreenSharingPresentationWillTransition",
+    "address": "0x104f4d824",
+    "end": "0x104f4d914",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerScreenSharingPresentationDidTransition",
+    "address": "0x104f4d914",
+    "end": "0x104f4da04",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerAddNewMemberArray:inviteId:",
+    "address": "0x104f4da04",
+    "end": "0x104f4dbf8",
+    "types": "v32@0:8@16Q24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerRequestLocalVideoDeviceStatus",
+    "address": "0x104f4dbf8",
+    "end": "0x104f4dc04",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerFlipCamera",
+    "address": "0x104f4dc04",
+    "end": "0x104f4dd38",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerResubscribe",
+    "address": "0x104f4dd38",
+    "end": "0x104f4de24",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerRecoverVideoOn:screenStatus:",
+    "address": "0x104f4de24",
+    "end": "0x104f4dfb8",
+    "types": "v24@0:8B16I20"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerResumeMultiTalkAudio",
+    "address": "0x104f4dfb8",
+    "end": "0x104f4e1a4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMultiTalkMainViewControllerHoldMultiTalkAudio",
+    "address": "0x104f4e1a4",
+    "end": "0x104f4e2f8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getLowVersionMembers",
+    "address": "0x104f4e2f8",
+    "end": "0x104f4e398",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getStartTalkingTime",
+    "address": "0x104f4e398",
+    "end": "0x104f4e430",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onDidSelectNormalContact:",
+    "address": "0x104f4e430",
+    "end": "0x104f4e4dc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getIfCallKitStatus",
+    "address": "0x104f4e4dc",
+    "end": "0x104f4e4f0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getIfCallkitWithRoom:",
+    "address": "0x104f4e4f0",
+    "end": "0x104f4e53c",
+    "types": "B24@0:8Q16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onVideoSessionStartComplete",
+    "address": "0x104f4e53c",
+    "end": "0x104f4e6f0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onVideoSessionRecvFirstFrame",
+    "address": "0x104f4e700",
+    "end": "0x104f4e854",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onVideoSessionStopComplete",
+    "address": "0x104f4e854",
+    "end": "0x104f4ea08",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "videoDeviceCameraFront:",
+    "address": "0x104f4ea18",
+    "end": "0x104f4ea98",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "videoDeviceCameraBack:",
+    "address": "0x104f4ed30",
+    "end": "0x104f4edb0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "videoDevice:didChangeRotation:",
+    "address": "0x104f4f048",
+    "end": "0x104f4f058",
+    "types": "v28@0:8@16i24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "videoDevice:didOutputPixelBuffer:",
+    "address": "0x104f4f058",
+    "end": "0x104f4f2f4",
+    "types": "v32@0:8@16^{__CVBuffer=}24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "VideoDevPutData:frmData:frmIndex:imageWidth:imageHeight:rgbaTexture:auxiliaryInfo:",
+    "address": "0x104f4f2f4",
+    "end": "0x104f504f8",
+    "types": "i60@0:8i16*20Q28I36I40@44@52"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "GetFrmType",
+    "address": "0x104f5053c",
+    "end": "0x104f50544",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "checkUnReachableWithNotify:",
+    "address": "0x104f50544",
+    "end": "0x104f50708",
+    "types": "B20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "checkWiFiWithNotify:",
+    "address": "0x104f50718",
+    "end": "0x104f508f4",
+    "types": "B20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "checkHighWWanWithNotify:",
+    "address": "0x104f50904",
+    "end": "0x104f50ae0",
+    "types": "B20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "updateNetworkTacticsWithNotify:",
+    "address": "0x104f50af0",
+    "end": "0x104f50b54",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "ReachabilityChange:",
+    "address": "0x104f50b54",
+    "end": "0x104f50c90",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onSimCardNetTypeChange",
+    "address": "0x104f50ca0",
+    "end": "0x104f50ddc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "audioModuleInterruptionBegin:param:",
+    "address": "0x104f50dec",
+    "end": "0x104f511c8",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "audioModuleInterruptionEnd:param:",
+    "address": "0x104f515d8",
+    "end": "0x104f51890",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "audioModuleDidRemoveFromInterruptList:",
+    "address": "0x104f51fb0",
+    "end": "0x104f522a8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isMonoServiceUIExist",
+    "address": "0x104f522a8",
+    "end": "0x104f52358",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isMonoServiceUIWorking",
+    "address": "0x104f52358",
+    "end": "0x104f524a4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isMonoServiceCheckingServer",
+    "address": "0x104f524a4",
+    "end": "0x104f524ac",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgStartWithMsg:",
+    "address": "0x104f524ac",
+    "end": "0x104f52608",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "_onMonoServiceMsgStartWithMsg:",
+    "address": "0x104f52754",
+    "end": "0x104f534d4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgRejectWithMsg:",
+    "address": "0x104f5350c",
+    "end": "0x104f53a5c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgCancelWithMsg:",
+    "address": "0x104f53a5c",
+    "end": "0x104f53f40",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgHoldWithMsg:",
+    "address": "0x104f53fb0",
+    "end": "0x104f53fb8",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgHandleWithMsg:",
+    "address": "0x104f53fb8",
+    "end": "0x104f53fc0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onReceiveVoIPPushInfo:",
+    "address": "0x104f53fc0",
+    "end": "0x104f54090",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "handleNotificationContentInfo:pushType:",
+    "address": "0x104f54090",
+    "end": "0x104f54c24",
+    "types": "B28@0:8@16i24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "hideMultiTalkBannerWithGroupId:",
+    "address": "0x104f54c24",
+    "end": "0x104f54c90",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "insertMultiTalkBannerItem:",
+    "address": "0x104f54ca0",
+    "end": "0x104f54e9c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "deleteMultiTalkBannerItemWithGroupId:",
+    "address": "0x104f54eb4",
+    "end": "0x104f54fac",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getMultiTalkBannerItemWithGroupId:",
+    "address": "0x104f54fac",
+    "end": "0x104f55054",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getCurViewController",
+    "address": "0x104f55054",
+    "end": "0x104f55060",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "loadMultiTalkBannerInfoList",
+    "address": "0x104f55060",
+    "end": "0x104f550dc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getCurrentTalkingGroupId",
+    "address": "0x104f556c0",
+    "end": "0x104f556cc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isMultiTalkMinimized",
+    "address": "0x104f556cc",
+    "end": "0x104f55748",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "quitMultiTalkAndClearBannerInfoWithGroupName:",
+    "address": "0x104f55748",
+    "end": "0x104f559e8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "OnQuitGroup:",
+    "address": "0x104f559e8",
+    "end": "0x104f559f4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onModifyContact:",
+    "address": "0x104f559f4",
+    "end": "0x104f55b44",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getCurrentRoomBanner",
+    "address": "0x104f55b44",
+    "end": "0x104f55ea8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getCurrentRoomKey",
+    "address": "0x104f55ea8",
+    "end": "0x104f56008",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getCurrentRoomID",
+    "address": "0x104f56008",
+    "end": "0x104f561e0",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getMinimizeTaskData",
+    "address": "0x104f561e0",
+    "end": "0x104f566d0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getMinimizeTaskKey",
+    "address": "0x104f566d0",
+    "end": "0x104f566dc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "createMinimizeView",
+    "address": "0x104f566dc",
+    "end": "0x104f5683c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getMultiTalkMinimizeView",
+    "address": "0x104f56950",
+    "end": "0x104f5695c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "updateMinimizeViewFromSize:toSize:",
+    "address": "0x104f5695c",
+    "end": "0x104f569c0",
+    "types": "v48@0:8{CGSize=dd}16{CGSize=dd}32"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onEnterMinimizedTask:openContext:taskEnterScene:",
+    "address": "0x104f569c0",
+    "end": "0x104f56a1c",
+    "types": "B36@0:8@16@24I32"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onContainerSizeDidChange:fromSize:toSize:",
+    "address": "0x104f56a1c",
+    "end": "0x104f56b04",
+    "types": "v56@0:8@16{CGSize=dd}24{CGSize=dd}40"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "renewViewCapture",
+    "address": "0x104f56b04",
+    "end": "0x104f56ba0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "clearViewCapture",
+    "address": "0x104f56ba0",
+    "end": "0x104f56cc4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "startViewCaptureWithView:",
+    "address": "0x104f56cc4",
+    "end": "0x104f56ddc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "stopViewCapture",
+    "address": "0x104f56ddc",
+    "end": "0x104f56f14",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "pauseViewCapture",
+    "address": "0x104f56f14",
+    "end": "0x104f56fa4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "resumeViewCapture",
+    "address": "0x104f56fa4",
+    "end": "0x104f57034",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "viewCapture:didCaptureImageContext:orientation:",
+    "address": "0x104f57034",
+    "end": "0x104f570e8",
+    "types": "v40@0:8@16^{CGContext=}24q32"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "didCaptureViewWithVideoBuffer:orientation:",
+    "address": "0x104f570e8",
+    "end": "0x104f5735c",
+    "types": "v32@0:8^{CGContext=}16q24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "valueFromScreenSharingOrientation:",
+    "address": "0x104f5735c",
+    "end": "0x104f57380",
+    "types": "i24@0:8q16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "reportMultiTalkVoipIncomingCallLogWithActionCode:",
+    "address": "0x104f57380",
+    "end": "0x104f57440",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "notifyWithData:",
+    "address": "0x104f57440",
+    "end": "0x104f57960",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getTalkViewStartTime",
+    "address": "0x104f57960",
+    "end": "0x104f57970",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "videoDevice:updateFilterSetting:fromABTest:",
+    "address": "0x104f57970",
+    "end": "0x104f57a28",
+    "types": "v36@0:8@16@24B32"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "reportVirtualBackgroundWithtimeStamp:endCall:",
+    "address": "0x104f57a28",
+    "end": "0x104f57c4c",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setVirtualBackground:isFront:",
+    "address": "0x104f57c4c",
+    "end": "0x104f57e9c",
+    "types": "v24@0:8B16B20"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "addReportVirtualBackgroundData:",
+    "address": "0x104f57e9c",
+    "end": "0x104f58000",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "ilinkDoCreateMultiTalk:isAudio:",
+    "address": "0x104f58000",
+    "end": "0x104f587b4",
+    "types": "i28@0:8@16B24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getIfThisTalkIlink",
+    "address": "0x104f587b4",
+    "end": "0x104f5884c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "receiverOpenUIAfterAckSuccess:",
+    "address": "0x104f5884c",
+    "end": "0x104f58a6c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "receiverCanStartCamera",
+    "address": "0x104f58a8c",
+    "end": "0x104f58b98",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "ilinkDidEnd",
+    "address": "0x104f58b98",
+    "end": "0x104f58db8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isCameraFront",
+    "address": "0x104f58de0",
+    "end": "0x104f58e64",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onIlinkInviteMultiTalk:",
+    "address": "0x104f58e64",
+    "end": "0x104f590c4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "onIlinkChangeToMultiTalk:",
+    "address": "0x104f590c4",
+    "end": "0x104f59f38",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "showToastOnMultiTalkVC:",
+    "address": "0x104f59fb4",
+    "end": "0x104f5a008",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "hangupMultiTalkByCallEnd:",
+    "address": "0x104f5a008",
+    "end": "0x104f5a114",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "_hangupMultiTalkByCallEnd",
+    "address": "0x104f5a170",
+    "end": "0x104f5a47c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "settingPortType",
+    "address": "0x104f5a47c",
+    "end": "0x104f5a4d0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "hasExtenalOutput",
+    "address": "0x104f5a4d0",
+    "end": "0x104f5a51c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "curOutputPort",
+    "address": "0x104f5a51c",
+    "end": "0x104f5a570",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getIfCurrentSpeaker",
+    "address": "0x104f5a570",
+    "end": "0x104f5a5d8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "getSpeakerBtnText:",
+    "address": "0x104f5a5d8",
+    "end": "0x104f5a864",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "changeAudioToPort:hasChanged:",
+    "address": "0x104f5a864",
+    "end": "0x104f5aad0",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "multiTalkRestartDeviceForFail",
+    "address": "0x104f5aad0",
+    "end": "0x104f5ab48",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "multiTalkAudioDeviceStartedSuccess",
+    "address": "0x104f5ab48",
+    "end": "0x104f5ae78",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "updatePortWithReasonValue:prevPort:",
+    "address": "0x104f5ae78",
+    "end": "0x104f5b54c",
+    "types": "v32@0:8Q16@24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "updateSpeakerButtonStatus:hasExtenalOutput:",
+    "address": "0x104f5b808",
+    "end": "0x104f5b87c",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "notifyAudioDeviceChange",
+    "address": "0x104f5b87c",
+    "end": "0x104f5bc28",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "audioDeviceStartedFail:",
+    "address": "0x104f5bc2c",
+    "end": "0x104f5bcd0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "audioDeviceDidReceiveCallbackFirstEachStartup",
+    "address": "0x104f5c120",
+    "end": "0x104f5c1c4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "audioDeviceDidReceivePlaybackCallbackFirstEachStartup:",
+    "address": "0x104f5c724",
+    "end": "0x104f5c730",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "audioDeviceDidReceiveRecordingCallbackFirstEachStartup:",
+    "address": "0x104f5c730",
+    "end": "0x104f5c73c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "audioDeviceHumanVoiceDetectCallback",
+    "address": "0x104f5c73c",
+    "end": "0x104f5c8c0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "BeginInterruption",
+    "address": "0x104f5c954",
+    "end": "0x104f5c9d4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "EndInterruption",
+    "address": "0x104f5cf9c",
+    "end": "0x104f5d0b0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "OnVoipCXHungUp:",
+    "address": "0x104f5d530",
+    "end": "0x104f5d734",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "OnSysCallState:andCallId:",
+    "address": "0x104f5d734",
+    "end": "0x104f5ddb8",
+    "types": "v28@0:8i16@20"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "OnVoipCXReject",
+    "address": "0x104f5ddb8",
+    "end": "0x104f5df58",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "OnVoipCXSetMuted2:",
+    "address": "0x104f5df58",
+    "end": "0x104f5e100",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceWillScrollIn",
+    "address": "0x104f5e100",
+    "end": "0x104f5e180",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceDidScrollIn",
+    "address": "0x104f5e7fc",
+    "end": "0x104f5e80c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceWillScrollOut",
+    "address": "0x104f5e80c",
+    "end": "0x104f5e88c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceDidScrollOut",
+    "address": "0x104f5f4c0",
+    "end": "0x104f5f4c4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceWillClear",
+    "address": "0x104f5f4c4",
+    "end": "0x104f5f544",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceDidClear",
+    "address": "0x104f5fca0",
+    "end": "0x104f5fce8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceWillAcceptWithInfo:",
+    "address": "0x104f5fce8",
+    "end": "0x104f5fcec",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceDidRejectWithInfo:",
+    "address": "0x104f5fcec",
+    "end": "0x104f5fcf0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_mainWindow",
+    "address": "0x104f5fcf0",
+    "end": "0x104f5fd00",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_mainWindow:",
+    "address": "0x104f5fd00",
+    "end": "0x104f5fd14",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_mTalkViewStartTime",
+    "address": "0x104f5fd14",
+    "end": "0x104f5fd24",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_mTalkViewStartTime:",
+    "address": "0x104f5fd24",
+    "end": "0x104f5fd34",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isMicrophoneOn",
+    "address": "0x104f5fd34",
+    "end": "0x104f5fd44",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsMicrophoneOn:",
+    "address": "0x104f5fd44",
+    "end": "0x104f5fd54",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isSpeakerEnabled",
+    "address": "0x104f5fd54",
+    "end": "0x104f5fd64",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsSpeakerEnabled:",
+    "address": "0x104f5fd64",
+    "end": "0x104f5fd74",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isSpeakerOn",
+    "address": "0x104f5fd74",
+    "end": "0x104f5fd84",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsSpeakerOn:",
+    "address": "0x104f5fd84",
+    "end": "0x104f5fd94",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isCameraEnabled",
+    "address": "0x104f5fd94",
+    "end": "0x104f5fda4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsCameraEnabled:",
+    "address": "0x104f5fda4",
+    "end": "0x104f5fdb4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isCameraOn",
+    "address": "0x104f5fdb4",
+    "end": "0x104f5fdc4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsCameraOn:",
+    "address": "0x104f5fdc4",
+    "end": "0x104f5fdd4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isScreenManagedByCrossPlatform",
+    "address": "0x104f5fdd4",
+    "end": "0x104f5fde4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsScreenManagedByCrossPlatform:",
+    "address": "0x104f5fde4",
+    "end": "0x104f5fdf4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_videoDevice",
+    "address": "0x104f5fdf4",
+    "end": "0x104f5fe04",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_videoDevice:",
+    "address": "0x104f5fe04",
+    "end": "0x104f5fe18",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "ilinkTalkReady",
+    "address": "0x104f5fe18",
+    "end": "0x104f5fe28",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIlinkTalkReady:",
+    "address": "0x104f5fe28",
+    "end": "0x104f5fe38",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "voipToastAdapter",
+    "address": "0x104f5fe38",
+    "end": "0x104f5fe48",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setVoipToastAdapter:",
+    "address": "0x104f5fe48",
+    "end": "0x104f5fe5c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_renderDic",
+    "address": "0x104f5fe5c",
+    "end": "0x104f5fe6c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_renderDic:",
+    "address": "0x104f5fe6c",
+    "end": "0x104f5fe80",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_videoInfoDic",
+    "address": "0x104f5fe80",
+    "end": "0x104f5fe90",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_videoInfoDic:",
+    "address": "0x104f5fe90",
+    "end": "0x104f5fea4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_videoDeviceRunning",
+    "address": "0x104f5fea4",
+    "end": "0x104f5feb4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_videoDeviceRunning:",
+    "address": "0x104f5feb4",
+    "end": "0x104f5fec4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_audioPlayer",
+    "address": "0x104f5fec4",
+    "end": "0x104f5fed4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_audioPlayer:",
+    "address": "0x104f5fed4",
+    "end": "0x104f5fee8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "ringCoordinator",
+    "address": "0x104f5fee8",
+    "end": "0x104f5fef8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setRingCoordinator:",
+    "address": "0x104f5fef8",
+    "end": "0x104f5ff0c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "memberInfoMutableDictionrary",
+    "address": "0x104f5ff0c",
+    "end": "0x104f5ff1c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setMemberInfoMutableDictionrary:",
+    "address": "0x104f5ff1c",
+    "end": "0x104f5ff30",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "viewCapture",
+    "address": "0x104f5ff30",
+    "end": "0x104f5ff40",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setViewCapture:",
+    "address": "0x104f5ff40",
+    "end": "0x104f5ff54",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "lastOrientationFromViewCapture",
+    "address": "0x104f5ff54",
+    "end": "0x104f5ff64",
+    "types": "q16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setLastOrientationFromViewCapture:",
+    "address": "0x104f5ff64",
+    "end": "0x104f5ff74",
+    "types": "v24@0:8q16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_multiTalkReady",
+    "address": "0x104f5ff74",
+    "end": "0x104f5ff84",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_multiTalkReady:",
+    "address": "0x104f5ff84",
+    "end": "0x104f5ff94",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_isCalling",
+    "address": "0x104f5ff94",
+    "end": "0x104f5ffa4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_isCalling:",
+    "address": "0x104f5ffa4",
+    "end": "0x104f5ffb4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_deviceLaunchSuccess",
+    "address": "0x104f5ffb4",
+    "end": "0x104f5ffc4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_deviceLaunchSuccess:",
+    "address": "0x104f5ffc4",
+    "end": "0x104f5ffd4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_sdkCallEnded",
+    "address": "0x104f5ffd4",
+    "end": "0x104f5ffe4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_sdkCallEnded:",
+    "address": "0x104f5ffe4",
+    "end": "0x104f5fff4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isCameraSwitchingOn",
+    "address": "0x104f5fff4",
+    "end": "0x104f60004",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsCameraSwitchingOn:",
+    "address": "0x104f60004",
+    "end": "0x104f60014",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isScreenOn",
+    "address": "0x104f60014",
+    "end": "0x104f60024",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsScreenOn:",
+    "address": "0x104f60024",
+    "end": "0x104f60034",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isScreenSwitchingOn",
+    "address": "0x104f60034",
+    "end": "0x104f60044",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsScreenSwitchingOn:",
+    "address": "0x104f60044",
+    "end": "0x104f60054",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isScreenSharingTransition",
+    "address": "0x104f60054",
+    "end": "0x104f60064",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsScreenSharingTransition:",
+    "address": "0x104f60064",
+    "end": "0x104f60074",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isScreenPause",
+    "address": "0x104f60074",
+    "end": "0x104f60084",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsScreenPause:",
+    "address": "0x104f60084",
+    "end": "0x104f60094",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "validatingScreenSharingMapping",
+    "address": "0x104f60094",
+    "end": "0x104f600a4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setValidatingScreenSharingMapping:",
+    "address": "0x104f600a4",
+    "end": "0x104f600b8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_uploadFpsCount",
+    "address": "0x104f600b8",
+    "end": "0x104f600c8",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_uploadFpsCount:",
+    "address": "0x104f600c8",
+    "end": "0x104f600d8",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_uploadFpsTimer",
+    "address": "0x104f600d8",
+    "end": "0x104f600e8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_uploadFpsTimer:",
+    "address": "0x104f600e8",
+    "end": "0x104f600fc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_useLowQualityVideo",
+    "address": "0x104f600fc",
+    "end": "0x104f6010c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_useLowQualityVideo:",
+    "address": "0x104f6010c",
+    "end": "0x104f6011c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_bannerInfoList",
+    "address": "0x104f6011c",
+    "end": "0x104f6012c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_bannerInfoList:",
+    "address": "0x104f6012c",
+    "end": "0x104f60140",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_talkingGroupId",
+    "address": "0x104f60140",
+    "end": "0x104f60150",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_talkingGroupId:",
+    "address": "0x104f60150",
+    "end": "0x104f60164",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_endedRoomIds",
+    "address": "0x104f60164",
+    "end": "0x104f60174",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_endedRoomIds:",
+    "address": "0x104f60174",
+    "end": "0x104f60188",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_invitedFlagList",
+    "address": "0x104f60188",
+    "end": "0x104f60198",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_invitedFlagList:",
+    "address": "0x104f60198",
+    "end": "0x104f601ac",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_nextCanJoinTalkTime",
+    "address": "0x104f601ac",
+    "end": "0x104f601bc",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_nextCanJoinTalkTime:",
+    "address": "0x104f601bc",
+    "end": "0x104f601cc",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_nextCanCreateTalkTime",
+    "address": "0x104f601cc",
+    "end": "0x104f601dc",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_nextCanCreateTalkTime:",
+    "address": "0x104f601dc",
+    "end": "0x104f601ec",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_haveBigVideoSubscriber",
+    "address": "0x104f601ec",
+    "end": "0x104f601fc",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_haveBigVideoSubscriber:",
+    "address": "0x104f601fc",
+    "end": "0x104f6020c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_lastSubscribeName",
+    "address": "0x104f6020c",
+    "end": "0x104f6021c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_lastSubscribeName:",
+    "address": "0x104f6021c",
+    "end": "0x104f60230",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "lastSubscribeScreenUserName",
+    "address": "0x104f60230",
+    "end": "0x104f60240",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setLastSubscribeScreenUserName:",
+    "address": "0x104f60240",
+    "end": "0x104f6024c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "lastSubscribeScreenMemberID",
+    "address": "0x104f6024c",
+    "end": "0x104f6025c",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setLastSubscribeScreenMemberID:",
+    "address": "0x104f6025c",
+    "end": "0x104f6026c",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_nextCanOpenCameraTime",
+    "address": "0x104f6026c",
+    "end": "0x104f6027c",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_nextCanOpenCameraTime:",
+    "address": "0x104f6027c",
+    "end": "0x104f6028c",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "minimizeTaskData",
+    "address": "0x104f6028c",
+    "end": "0x104f6029c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setMinimizeTaskData:",
+    "address": "0x104f6029c",
+    "end": "0x104f602b0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "minimizeView",
+    "address": "0x104f602b0",
+    "end": "0x104f602c0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setMinimizeView:",
+    "address": "0x104f602c0",
+    "end": "0x104f602d4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isMinimizeMode",
+    "address": "0x104f602d4",
+    "end": "0x104f602e4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsMinimizeMode:",
+    "address": "0x104f602e4",
+    "end": "0x104f602f4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "checkAudioDeviceObj",
+    "address": "0x104f602f4",
+    "end": "0x104f60304",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setCheckAudioDeviceObj:",
+    "address": "0x104f60304",
+    "end": "0x104f60318",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "mainViewController",
+    "address": "0x104f60318",
+    "end": "0x104f60328",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setMainViewController:",
+    "address": "0x104f60328",
+    "end": "0x104f6033c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "m_videoEncLock",
+    "address": "0x104f6033c",
+    "end": "0x104f6034c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setM_videoEncLock:",
+    "address": "0x104f6034c",
+    "end": "0x104f60360",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "nextEnableTimeForCreateRoom",
+    "address": "0x104f60360",
+    "end": "0x104f60370",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setNextEnableTimeForCreateRoom:",
+    "address": "0x104f60370",
+    "end": "0x104f60380",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "nextEnableTimeForOpenCamera",
+    "address": "0x104f60380",
+    "end": "0x104f60390",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setNextEnableTimeForOpenCamera:",
+    "address": "0x104f60390",
+    "end": "0x104f603a0",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "reportVirtualBackgroundData",
+    "address": "0x104f603a0",
+    "end": "0x104f603b0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setReportVirtualBackgroundData:",
+    "address": "0x104f603b0",
+    "end": "0x104f603c4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "hasSetVirtualBackground",
+    "address": "0x104f603c4",
+    "end": "0x104f603d4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setHasSetVirtualBackground:",
+    "address": "0x104f603d4",
+    "end": "0x104f603e4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "reportVirtualBackgroundHeader",
+    "address": "0x104f603e4",
+    "end": "0x104f603f4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setReportVirtualBackgroundHeader:",
+    "address": "0x104f603f4",
+    "end": "0x104f60408",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "resumeAfterInterruptionBlock",
+    "address": "0x104f60408",
+    "end": "0x104f60418",
+    "types": "@?16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setResumeAfterInterruptionBlock:",
+    "address": "0x104f60418",
+    "end": "0x104f60424",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "audioRouteMgr",
+    "address": "0x104f60424",
+    "end": "0x104f60434",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setAudioRouteMgr:",
+    "address": "0x104f60434",
+    "end": "0x104f60448",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "queryTalkingMembersBlock",
+    "address": "0x104f60448",
+    "end": "0x104f60458",
+    "types": "@?16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setQueryTalkingMembersBlock:",
+    "address": "0x104f60458",
+    "end": "0x104f60464",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "currentTalkingInfos",
+    "address": "0x104f60464",
+    "end": "0x104f60474",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setCurrentTalkingInfos:",
+    "address": "0x104f60474",
+    "end": "0x104f60488",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "audioUnitReceivedCallbackCount",
+    "address": "0x104f60488",
+    "end": "0x104f60498",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setAudioUnitReceivedCallbackCount:",
+    "address": "0x104f60498",
+    "end": "0x104f604a8",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isInAudioInterruption",
+    "address": "0x104f604a8",
+    "end": "0x104f604b8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsInAudioInterruption:",
+    "address": "0x104f604b8",
+    "end": "0x104f604c8",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isSpeakerOnBeforeAudioInterruption",
+    "address": "0x104f604c8",
+    "end": "0x104f604d8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsSpeakerOnBeforeAudioInterruption:",
+    "address": "0x104f604d8",
+    "end": "0x104f604e8",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "waitForAcceptedRoomID",
+    "address": "0x104f604e8",
+    "end": "0x104f604f8",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setWaitForAcceptedRoomID:",
+    "address": "0x104f604f8",
+    "end": "0x104f60508",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "multitalkRoomID",
+    "address": "0x104f60508",
+    "end": "0x104f60518",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setMultitalkRoomID:",
+    "address": "0x104f60518",
+    "end": "0x104f60528",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "isSysCallingBeforeAcception",
+    "address": "0x104f60528",
+    "end": "0x104f60538",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setIsSysCallingBeforeAcception:",
+    "address": "0x104f60538",
+    "end": "0x104f60548",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "shouldHandleWindowInMgr",
+    "address": "0x104f60548",
+    "end": "0x104f60558",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setShouldHandleWindowInMgr:",
+    "address": "0x104f60558",
+    "end": "0x104f60568",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "multiTalkLocalMsg",
+    "address": "0x104f60568",
+    "end": "0x104f60578",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setMultiTalkLocalMsg:",
+    "address": "0x104f60578",
+    "end": "0x104f6058c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "sendLocalMsgRemoteName",
+    "address": "0x104f6058c",
+    "end": "0x104f6059c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setSendLocalMsgRemoteName:",
+    "address": "0x104f6059c",
+    "end": "0x104f605a8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "mAcceptCallTime",
+    "address": "0x104f605a8",
+    "end": "0x104f605b8",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "setMAcceptCallTime:",
+    "address": "0x104f605b8",
+    "end": "0x104f605c8",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x104f605c8",
+    "end": "0x104f60838",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "class",
+    "selector": "shouldPlayPromptSound",
+    "address": "0x104f30ea4",
+    "end": "0x104f30f80",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "class",
+    "selector": "queryGroupNickNameIfInGroupWithGrounId:",
+    "address": "0x104f31f2c",
+    "end": "0x104f32388",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "class",
+    "selector": "DefMaxMultiTalkMemberCount",
+    "address": "0x104f379f8",
+    "end": "0x104f37a00",
+    "types": "Q16@0:8"
+  }
+]

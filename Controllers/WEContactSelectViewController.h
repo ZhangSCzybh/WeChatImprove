@@ -15,6 +15,8 @@ typedef void (^WEContactSelectCompletion)(NSArray<NSString *> *selectedUserNames
 @interface WEContactSelectViewController : UITableViewController
 
 @property (nonatomic, copy, nullable) WEContactSelectCompletion completion;
+// Opt in when the caller may present a save error after selection.
+@property (nonatomic) BOOL completesAfterDismissal;
 
 - (instancetype)initWithTitle:(NSString *)title
                 selectedUserNames:(NSArray<NSString *> *)selectedUserNames

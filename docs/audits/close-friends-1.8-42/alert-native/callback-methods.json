@@ -1,0 +1,34 @@
+[
+  {
+    "cls": "MultiTalkMgr",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceDidRejectWithInfo:",
+    "address": "0x104f5fcec",
+    "end": "0x104f5fcf0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceDidRejectWithInfo:",
+    "address": "0x105f8bc0c",
+    "end": "0x105f8be98",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPInvitationService",
+    "kind": "instance",
+    "selector": "handleInvitationInfo:withTalkingRoomID:talkingRoomKey:",
+    "address": "0x106120688",
+    "end": "0x106120fd4",
+    "types": "B40@0:8@16Q24Q32"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceDidRejectWithInfo:",
+    "address": "0x106171484",
+    "end": "0x1061717d0",
+    "types": "v24@0:8@16"
+  }
+]

@@ -156,3 +156,7 @@ Options use these exact keys: `hideSessions`, `hideContacts`, `hideForwarding`, 
 - [ ] Build using `make package -j4 SCHEME=rootless PACKAGE_VERSION=1.8-42`; no clean. Verify package metadata, dylib architectures, exports and package/source version agreement. Address concrete compiler/test failures and repeat only affected checks.
 - [ ] Document actual covered adapters and unavailable routes honestly; record target version requirements and device acceptance matrix including shared-group profile buttons, unlock restore, tags/ACL and process-killed notifications.
 - [ ] Finish on current checkout with reviewable commits, exact package path and no automatic device installation. Do not claim real-device acceptance without actual evidence.
+
+### Execution update: focused validation
+
+The user subsequently requested higher efficiency and fewer redundant tests/regressions. This takes precedence over the earlier broad per-task verification instructions: during implementation, run meaningful checks for changed core behavior and compile affected sources only. Reuse successful evidence for unchanged code; reviewers do not rerun suites to confirm reports. At integration, run the close-friend suites once and only directly affected existing regressions. The final package build supplies integration compilation, so a duplicate full isolated-object compile is unnecessary. New failures or code changes justify focused reruns; speculative coverage expansion does not.

@@ -1,0 +1,338 @@
+[
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x105f7dea8",
+    "end": "0x105f7dfdc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onServiceInit",
+    "address": "0x105f7dfdc",
+    "end": "0x105f7e098",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onServiceClearData",
+    "address": "0x105f7e098",
+    "end": "0x105f7e0a8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgStartWithMsg:",
+    "address": "0x105f7e988",
+    "end": "0x105f7f37c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgHandleWithMsg:",
+    "address": "0x105f7f37c",
+    "end": "0x105f7f650",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgRejectWithMsg:",
+    "address": "0x105f7f650",
+    "end": "0x105f7ff64",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgCancelWithMsg:",
+    "address": "0x105f7ff64",
+    "end": "0x105f80a98",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgHoldWithMsg:",
+    "address": "0x105f80a98",
+    "end": "0x105f819fc",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "isMonoServiceUIExist",
+    "address": "0x105f82428",
+    "end": "0x105f8264c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "isMonoServiceUIWorking",
+    "address": "0x105f8264c",
+    "end": "0x105f82858",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "isMonoServiceCheckingServer",
+    "address": "0x105f82858",
+    "end": "0x105f82980",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "didMonoServiceRejectMsg",
+    "address": "0x105f82980",
+    "end": "0x105f82a6c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onVoipGetRoomInfoCgiParaError:",
+    "address": "0x105f82a6c",
+    "end": "0x105f82cb8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onVoipGetRoomInfoCgiCreateFailed:",
+    "address": "0x105f82cb8",
+    "end": "0x105f82f04",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onVoipGetRoomInfoCgiConnectFailed:",
+    "address": "0x105f82f04",
+    "end": "0x105f831f8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onVoipGetRoomInfoCgiRespNull:",
+    "address": "0x105f831f8",
+    "end": "0x105f834ec",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onVoipGetRoomInfoCgiRespFailed:",
+    "address": "0x105f834ec",
+    "end": "0x105f837e0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onVoipGetRoomInfoCgiOk:",
+    "address": "0x105f837e0",
+    "end": "0x105f83dbc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "OnMsgNotAddDBNotify:MsgWrap:",
+    "address": "0x105f83dbc",
+    "end": "0x105f83e8c",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "OnAddMsg:MsgWrap:",
+    "address": "0x105f83e8c",
+    "end": "0x105f84550",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "receiveInviteFromNotify:",
+    "address": "0x105f84550",
+    "end": "0x105f84aac",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "receiveCancelFromNotify:",
+    "address": "0x105f84aac",
+    "end": "0x105f84f60",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "receiveOtherDeviceHandleSignalFromSecurityNotify:",
+    "address": "0x105f84f60",
+    "end": "0x105f856a0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "receiveAnsweredFromNotify:",
+    "address": "0x105f856a0",
+    "end": "0x105f85b54",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "receiveCancelMsgFromSync:MsgWrap:",
+    "address": "0x105f85b54",
+    "end": "0x105f85f34",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "receiveInviteFromSync:MsgWrap:",
+    "address": "0x105f85f34",
+    "end": "0x105f86378",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "handleVoipBusy:MsgWrap:",
+    "address": "0x105f86378",
+    "end": "0x105f8642c",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "handleAPNSPushSyncNotificationContentInfo:",
+    "address": "0x105f8a7c4",
+    "end": "0x105f8adf4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "handleAPNSPushUserInfos:",
+    "address": "0x105f8adf4",
+    "end": "0x105f8b4c0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "handlePushKitUserInfos:",
+    "address": "0x105f8b4c0",
+    "end": "0x105f8bc00",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "onReceiveVoIPPushInfo:",
+    "address": "0x105f8bc00",
+    "end": "0x105f8bc0c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceDidRejectWithInfo:",
+    "address": "0x105f8bc0c",
+    "end": "0x105f8be98",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "MessageReturn:Event:",
+    "address": "0x105f8be98",
+    "end": "0x105f8c4c0",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "m_getRoomInfoCgi",
+    "address": "0x105f8c4c0",
+    "end": "0x105f8c4d0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": "setM_getRoomInfoCgi:",
+    "address": "0x105f8c4d0",
+    "end": "0x105f8c4e4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x105f8c4e4",
+    "end": "0x105f8c4f8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "class",
+    "selector": "reportAckWithCallResult:ByVoipMsg:",
+    "address": "0x105f7e0a8",
+    "end": "0x105f7e988",
+    "types": "v28@0:8i16@20"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "class",
+    "selector": "genInviteMessageFromVoipMonoMsg:",
+    "address": "0x105f86668",
+    "end": "0x105f86910",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "class",
+    "selector": "handleVoipLocalBusy:",
+    "address": "0x105f86910",
+    "end": "0x105f86b94",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "class",
+    "selector": "handleInviteMonoMsg:",
+    "address": "0x105f86b94",
+    "end": "0x105f88288",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "class",
+    "selector": "startVoipViewByVoipMonoMsg:",
+    "address": "0x105f88288",
+    "end": "0x105f8a498",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VOIPMessageMgr",
+    "kind": "class",
+    "selector": "openVoipViewByVoipMonoMsg:haveAnswered:isilink:",
+    "address": "0x105f8a588",
+    "end": "0x105f8a7c4",
+    "types": "B32@0:8@16B24B28"
+  }
+]

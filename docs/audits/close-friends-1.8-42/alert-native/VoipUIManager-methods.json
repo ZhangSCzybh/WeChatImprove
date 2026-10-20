@@ -1,0 +1,2866 @@
+[
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isInAudioInterruption",
+    "address": "0x1063916b0",
+    "end": "0x1063917ec",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isCaller",
+    "address": "0x1063917ec",
+    "end": "0x106391828",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isSplit",
+    "address": "0x106391828",
+    "end": "0x10639189c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isSplitLocalOnTop",
+    "address": "0x10639189c",
+    "end": "0x106391910",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isMainLocal",
+    "address": "0x106391910",
+    "end": "0x106391984",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isSubWindowFolded",
+    "address": "0x106391984",
+    "end": "0x1063919f8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isIlinkTalking",
+    "address": "0x1063919f8",
+    "end": "0x106391aa0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "window",
+    "address": "0x106391aa0",
+    "end": "0x106391aac",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "didCloseCompeletly",
+    "address": "0x106391aac",
+    "end": "0x106391da4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "dealloc",
+    "address": "0x106391dc4",
+    "end": "0x106391ed0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x106391ed0",
+    "end": "0x106391fc4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onServiceInit",
+    "address": "0x106391fc4",
+    "end": "0x106392240",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onServiceClearData",
+    "address": "0x106392240",
+    "end": "0x106392660",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onServiceEnterBackground",
+    "address": "0x106392664",
+    "end": "0x1063926e4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onServiceEnterForeground",
+    "address": "0x1063926e4",
+    "end": "0x106392878",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "clearData",
+    "address": "0x106392878",
+    "end": "0x106392b1c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "canStartVoipWithOpenFrom:isVideoMode:",
+    "address": "0x106392b1c",
+    "end": "0x106393374",
+    "types": "B28@0:8Q16B24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "prepareForIncomingInvitationFromPushKit",
+    "address": "0x1063933f8",
+    "end": "0x10639352c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "initVoipCheckAudioDeviceObj",
+    "address": "0x10639352c",
+    "end": "0x1063935f4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isTheSameContactWithCurrentVoip:",
+    "address": "0x106393648",
+    "end": "0x1063937a4",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isMinCardMode",
+    "address": "0x1063937a4",
+    "end": "0x10639382c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isLocalLandscapeMode",
+    "address": "0x10639382c",
+    "end": "0x1063938d8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "appDidFirstBecomeActive",
+    "address": "0x1063938d8",
+    "end": "0x106393980",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "checkAndOpenVoipCallerViewByCallKit",
+    "address": "0x106393980",
+    "end": "0x10639428c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "closeWithCompletion:",
+    "address": "0x10639428c",
+    "end": "0x1063942f8",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "closeByCancellationWithMonoMsg:",
+    "address": "0x1063942f8",
+    "end": "0x106394e84",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "closeForcibly",
+    "address": "0x106394e84",
+    "end": "0x106395050",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "hideVoipCard",
+    "address": "0x106395054",
+    "end": "0x106395160",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "displayViopCard",
+    "address": "0x106395160",
+    "end": "0x10639526c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "showVideoEntranceInMainFrame",
+    "address": "0x10639526c",
+    "end": "0x106395310",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isViewEnding",
+    "address": "0x106395310",
+    "end": "0x106395374",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isVoipWorking",
+    "address": "0x106395374",
+    "end": "0x1063953a4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isVideoVoipWorking",
+    "address": "0x1063953a4",
+    "end": "0x1063953e4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isVoipCalling",
+    "address": "0x1063953e4",
+    "end": "0x1063954e4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isVoipTalking",
+    "address": "0x1063954e4",
+    "end": "0x106395504",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isTalking",
+    "address": "0x106395504",
+    "end": "0x106395608",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isVoipSpeakerMode:",
+    "address": "0x106395608",
+    "end": "0x10639585c",
+    "types": "B20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "showVoIPToastWithFineTuneBlock:",
+    "address": "0x10639585c",
+    "end": "0x1063958c8",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "showVoIPToastWithText:",
+    "address": "0x1063958c8",
+    "end": "0x106395934",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "showConflictWording",
+    "address": "0x106395934",
+    "end": "0x106395980",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getConflictWording",
+    "address": "0x106395980",
+    "end": "0x106395a48",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "showCannotStartVoipTwice",
+    "address": "0x106395a48",
+    "end": "0x106395bf0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "addScrollingString:withDisplayTime:withKeyboardHeight:",
+    "address": "0x106395bf0",
+    "end": "0x106396128",
+    "types": "v40@0:8@16d24d32"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "changeVoIPToastWindowOriginY:height:",
+    "address": "0x106396128",
+    "end": "0x106396180",
+    "types": "v32@0:8d16d24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setToastAlpha:",
+    "address": "0x106396180",
+    "end": "0x1063961d0",
+    "types": "v24@0:8d16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onTapNetStatusTipView",
+    "address": "0x1063961d0",
+    "end": "0x106396278",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "clearCurrentString",
+    "address": "0x106396278",
+    "end": "0x1063962b8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "clearAllString",
+    "address": "0x1063962b8",
+    "end": "0x1063962f8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "cleanIfNeedWithTargetString:",
+    "address": "0x1063962f8",
+    "end": "0x106396364",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "switchToSpeakPhoneMode:",
+    "address": "0x106396364",
+    "end": "0x106396460",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "updateWarningTipsWithRoomid:roomkey:type:tips:",
+    "address": "0x106396460",
+    "end": "0x106396668",
+    "types": "v44@0:8Q16Q24I32@36"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setReceiverViewMonoMsgForCloseNotification:",
+    "address": "0x106396ac8",
+    "end": "0x106396b54",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isValidVoipViewController:",
+    "address": "0x106396b54",
+    "end": "0x106396e90",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getVoIPCallOutUserName",
+    "address": "0x106396e90",
+    "end": "0x106396fc8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "currentVoipViewController",
+    "address": "0x106396fc8",
+    "end": "0x106397054",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "currentViewController",
+    "address": "0x106397054",
+    "end": "0x106397060",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "canBluetoothStartEarlier",
+    "address": "0x106397828",
+    "end": "0x1063978d8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "checkIfCanAcceptAndStartAudio",
+    "address": "0x1063978d8",
+    "end": "0x1063979fc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "didFailedToAcceptBecauseOfSystemCall",
+    "address": "0x1063979fc",
+    "end": "0x106397af0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "didReceiveAudioUnitCallbackFirstEachStartup:",
+    "address": "0x106397bdc",
+    "end": "0x106397e44",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "activeMixWithOtherAudio",
+    "address": "0x106397f14",
+    "end": "0x106398048",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setCallkitCategory",
+    "address": "0x106398048",
+    "end": "0x1063981c4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "normalVoipDescriptButtonBackImage",
+    "address": "0x1063982a0",
+    "end": "0x106398358",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "selectedVoipDescriptButtonBackImage",
+    "address": "0x106398358",
+    "end": "0x1063983d8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "disabledVoipDescriptButtonBackImage",
+    "address": "0x1063983d8",
+    "end": "0x106398490",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voipAcceptButtonBackImage",
+    "address": "0x106398490",
+    "end": "0x106398510",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voipHangupButtonBackImage",
+    "address": "0x106398510",
+    "end": "0x106398590",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voipSelectHangupAndAcceptButtonBackImage",
+    "address": "0x106398590",
+    "end": "0x106398648",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRemoteVideoRatio",
+    "address": "0x106398648",
+    "end": "0x1063987ac",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRemoteUserIlinkSupportStatus:",
+    "address": "0x1063987ac",
+    "end": "0x106398864",
+    "types": "I24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVideoVoipViewCloseWithCompletion:delay:",
+    "address": "0x106398864",
+    "end": "0x106398a54",
+    "types": "v28@0:8@?16f24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVideoVoipViewCloseWithCompletionNoAnimation:delay:",
+    "address": "0x106398aa8",
+    "end": "0x106398be4",
+    "types": "v28@0:8@?16f24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setupBeforeCollapsingWindow",
+    "address": "0x106398be4",
+    "end": "0x106398dfc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVideoVoipViewChangeToMinimizeMode",
+    "address": "0x106398e0c",
+    "end": "0x1063990cc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVideoVoipViewSlipToMinimizeMode:",
+    "address": "0x1063990cc",
+    "end": "0x10639928c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVideoVoipViewMinCardModeChangeToMinimizeMode",
+    "address": "0x10639928c",
+    "end": "0x1063992e0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVideoVoipViewRequestMinimizeStatus",
+    "address": "0x1063992e0",
+    "end": "0x106399330",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "videoVoipViewDidLoadView:",
+    "address": "0x106399330",
+    "end": "0x106399334",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "videoVoipViewDidSwitchToTalk",
+    "address": "0x106399334",
+    "end": "0x106399398",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "videoVoipViewDidClose:",
+    "address": "0x1063993a8",
+    "end": "0x1063993e8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPMainWindowExtendAnimationWillStart",
+    "address": "0x1063993e8",
+    "end": "0x106399558",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "ReportVoIPButtonStatus:dialStatus:audioData:actionResult:",
+    "address": "0x106399558",
+    "end": "0x106399668",
+    "types": "v44@0:8@16i24@28@36"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "ReportVoIPButtonAction:dialStatus:audioData:",
+    "address": "0x106399668",
+    "end": "0x106399748",
+    "types": "v32@0:8i16i20@24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "StopTalk",
+    "address": "0x106399748",
+    "end": "0x1063998cc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "StartNetDetect",
+    "address": "0x1063998cc",
+    "end": "0x1063999f8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getVoIPType",
+    "address": "0x106399b54",
+    "end": "0x106399b78",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setVideoDelegate:",
+    "address": "0x106399b78",
+    "end": "0x106399cac",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "SetMicroPhoneMute:",
+    "address": "0x106399cac",
+    "end": "0x106399e74",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getDangerUserTips",
+    "address": "0x106399e74",
+    "end": "0x106399ff0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getIsDangerTalk",
+    "address": "0x106399ff0",
+    "end": "0x10639a114",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRoomId",
+    "address": "0x10639a114",
+    "end": "0x10639a258",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRoomKey",
+    "address": "0x10639a258",
+    "end": "0x10639a39c",
+    "types": "q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRoomType",
+    "address": "0x10639a39c",
+    "end": "0x10639a4f8",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getDangerRoomId",
+    "address": "0x10639a4f8",
+    "end": "0x10639a61c",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getDangerRoomKey",
+    "address": "0x10639a61c",
+    "end": "0x10639a740",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getInviteId",
+    "address": "0x10639a740",
+    "end": "0x10639a868",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getIsTalked",
+    "address": "0x10639a868",
+    "end": "0x10639a9ac",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setIsUserAbort:",
+    "address": "0x10639a9ac",
+    "end": "0x10639aadc",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "FlipCamera",
+    "address": "0x10639aadc",
+    "end": "0x10639abf8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setVirtualBackground:isFront:",
+    "address": "0x10639abf8",
+    "end": "0x10639ad2c",
+    "types": "v24@0:8B16B20"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isRemoteUsePhone",
+    "address": "0x10639ad2c",
+    "end": "0x10639ae50",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getIsCameraFront",
+    "address": "0x10639ae50",
+    "end": "0x10639af78",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getIsMinimizeView",
+    "address": "0x10639af78",
+    "end": "0x10639b0a0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setIsMinimizeView:",
+    "address": "0x10639b0a0",
+    "end": "0x10639b1cc",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voipAppBecomeActive",
+    "address": "0x10639b1cc",
+    "end": "0x10639b2f4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voipAppGotoBackground",
+    "address": "0x10639b2f4",
+    "end": "0x10639b41c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setVideoDeviceDelegate:",
+    "address": "0x10639b41c",
+    "end": "0x10639b568",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "reportVoipIncomingCallLogWithActionCode:",
+    "address": "0x10639b568",
+    "end": "0x10639b6a4",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "StopSession",
+    "address": "0x10639b6b4",
+    "end": "0x10639b7d0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "BeCanceled",
+    "address": "0x10639b7d0",
+    "end": "0x10639b968",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRemoteUserName",
+    "address": "0x10639b968",
+    "end": "0x10639baa4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "StartLocalVideo",
+    "address": "0x10639baa4",
+    "end": "0x10639bbc0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "startVideoDeviceSession",
+    "address": "0x10639bbc0",
+    "end": "0x10639bd34",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "videoDevice",
+    "address": "0x10639bd34",
+    "end": "0x10639be80",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "resetCameraDevice",
+    "address": "0x10639be80",
+    "end": "0x10639c0b0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "changeRenderFrame:",
+    "address": "0x10639c0b0",
+    "end": "0x10639c228",
+    "types": "v48@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "VideoStatusChange:update:notify:",
+    "address": "0x10639c228",
+    "end": "0x10639c36c",
+    "types": "v28@0:8B16B20B24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setOutputVideoRender:",
+    "address": "0x10639c36c",
+    "end": "0x10639c578",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setInputVideoRender:",
+    "address": "0x10639c578",
+    "end": "0x10639c6c4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setSmallInputVideoRender:",
+    "address": "0x10639c6c4",
+    "end": "0x10639c810",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setSmallOutputVideoRender:",
+    "address": "0x10639c810",
+    "end": "0x10639c95c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getOutputVideoRenderView",
+    "address": "0x10639c95c",
+    "end": "0x10639cab8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getInputVideoRenderLock",
+    "address": "0x10639cab8",
+    "end": "0x10639cbf4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getOutputVideoRenderLock",
+    "address": "0x10639cbf4",
+    "end": "0x10639cd30",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "changeInputRenderFrame:",
+    "address": "0x10639cd30",
+    "end": "0x10639cea8",
+    "types": "v48@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getInputVideoRenderView",
+    "address": "0x10639cea8",
+    "end": "0x10639d004",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isCameraFront",
+    "address": "0x10639d004",
+    "end": "0x10639d12c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isLocalCaptureSuspended",
+    "address": "0x10639d12c",
+    "end": "0x10639d254",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "remoteCaptureStatus",
+    "address": "0x10639d254",
+    "end": "0x10639d37c",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "reinitCameraForVoIPLCK",
+    "address": "0x10639d37c",
+    "end": "0x10639d3bc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "extendInviteToFullScreen",
+    "address": "0x10639d3bc",
+    "end": "0x10639d400",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "AudioCall:withCallType:",
+    "address": "0x10639d400",
+    "end": "0x10639d58c",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "VideoCall:withCallType:",
+    "address": "0x10639d58c",
+    "end": "0x10639d718",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "CancelCall:",
+    "address": "0x10639d718",
+    "end": "0x10639d860",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "AcceptAudio:withRoomId:andKey:",
+    "address": "0x10639d860",
+    "end": "0x10639da2c",
+    "types": "v40@0:8@16Q24q32"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "AcceptVideo:withRoomId:andKey:forceToVoice:",
+    "address": "0x10639da2c",
+    "end": "0x10639dc0c",
+    "types": "v44@0:8@16Q24q32B40"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "Reject:withRoomId:andKey:isilink:",
+    "address": "0x10639dc0c",
+    "end": "0x10639dd10",
+    "types": "v44@0:8@16Q24q32B40"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "HangupWithReason:",
+    "address": "0x10639dd10",
+    "end": "0x10639de7c",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "HangupWithReason:ifIsConnect:",
+    "address": "0x10639de7c",
+    "end": "0x10639dfcc",
+    "types": "v24@0:8i16B20"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "HangupWithRoomID:reason:",
+    "address": "0x10639dfcc",
+    "end": "0x10639e47c",
+    "types": "v32@0:8Q16q24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getVideoOrientation",
+    "address": "0x10639e47c",
+    "end": "0x10639e5a4",
+    "types": "q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRemoteWxVer",
+    "address": "0x10639e5a4",
+    "end": "0x10639e6cc",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRemoteSourceDevice",
+    "address": "0x10639e6cc",
+    "end": "0x10639e808",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRemoteSupportAdaptiveRotate",
+    "address": "0x10639e808",
+    "end": "0x10639e928",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getUseSharpenFilterConfig",
+    "address": "0x10639e928",
+    "end": "0x10639e9e0",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getUse1080pSharpen",
+    "address": "0x10639e9e0",
+    "end": "0x10639ea78",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRaisrCapacity",
+    "address": "0x10639ea78",
+    "end": "0x10639eb98",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRaisrStrength",
+    "address": "0x10639eb98",
+    "end": "0x10639ecb8",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRaisrIPhoneVersion",
+    "address": "0x10639ecb8",
+    "end": "0x10639edd8",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRaisrIPadVersion",
+    "address": "0x10639edd8",
+    "end": "0x10639eef8",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "tryAddMembersForIlink:inviteId:",
+    "address": "0x10639eef8",
+    "end": "0x10639efac",
+    "types": "v32@0:8@16Q24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onIlinkChangeToMultiTalk",
+    "address": "0x10639efac",
+    "end": "0x10639f010",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getMemberCountLimitForSelectContacts",
+    "address": "0x10639f010",
+    "end": "0x10639f024",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getLowVersionMembers",
+    "address": "0x10639f024",
+    "end": "0x10639f0c4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onDetermineIfNeedReset",
+    "address": "0x10639f0c4",
+    "end": "0x10639f23c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setupLocalRenderAtFirst",
+    "address": "0x10639f23c",
+    "end": "0x10639f740",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onLocalRenderAtFirst",
+    "address": "0x10639f740",
+    "end": "0x10639f74c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onRemoteRenderAtFirst",
+    "address": "0x10639f74c",
+    "end": "0x10639fb9c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVideoSessionStartCompleteAtFirst",
+    "address": "0x10639fb9c",
+    "end": "0x10639fc34",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVideoSessionRecvFrameAtFirst",
+    "address": "0x10639fc44",
+    "end": "0x10639fcdc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onDidSelectNormalContact:",
+    "address": "0x10639fcec",
+    "end": "0x10639fd98",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isInCallkit",
+    "address": "0x10639fd98",
+    "end": "0x10639fdac",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setLocalViewRenderer:",
+    "address": "0x10639fdac",
+    "end": "0x10639fefc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getLocalViewRenderer",
+    "address": "0x10639fefc",
+    "end": "0x1063a0050",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setRemoteViewRenderer:",
+    "address": "0x1063a0050",
+    "end": "0x1063a01a0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRemoteVideoClosed",
+    "address": "0x1063a01a0",
+    "end": "0x1063a02e4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getLocalVideoClosed",
+    "address": "0x1063a02e4",
+    "end": "0x1063a0428",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getModeActionStatus",
+    "address": "0x1063a0428",
+    "end": "0x1063a056c",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getIsVoiceMode",
+    "address": "0x1063a056c",
+    "end": "0x1063a06b0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "VideoSwitchToVoiceModeNotPushStatus",
+    "address": "0x1063a06b0",
+    "end": "0x1063a07d8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "checkHasChangedToCelluar",
+    "address": "0x1063a07d8",
+    "end": "0x1063a0900",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getChangeToCelluarCount",
+    "address": "0x1063a0900",
+    "end": "0x1063a0a28",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "SetSpeakerPhone:",
+    "address": "0x1063a0b4c",
+    "end": "0x1063a0c94",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setIsDangerTalk:",
+    "address": "0x1063a0c94",
+    "end": "0x1063a0d28",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setWarningString:",
+    "address": "0x1063a0d28",
+    "end": "0x1063a0dd4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setDangerRoomId:",
+    "address": "0x1063a0dd4",
+    "end": "0x1063a0e68",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setDangerRoomKey:",
+    "address": "0x1063a0e68",
+    "end": "0x1063a0efc",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setRemoteUserName:",
+    "address": "0x1063a0efc",
+    "end": "0x1063a10a4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "resetVoipRender",
+    "address": "0x1063a10a4",
+    "end": "0x1063a11c0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getIfThisTalkIlink",
+    "address": "0x1063a11c0",
+    "end": "0x1063a1258",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isHavingIlinkCall",
+    "address": "0x1063a1258",
+    "end": "0x1063a126c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getStartTalkingTime",
+    "address": "0x1063a126c",
+    "end": "0x1063a1394",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "showUIAtApplcationStateActive:",
+    "address": "0x1063a1394",
+    "end": "0x1063a17b4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onMultiTalkMainWindowExtendAnimationDidEnd",
+    "address": "0x1063a17cc",
+    "end": "0x1063a18b8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPMainWindowExtendAnimationDidEnd",
+    "address": "0x1063a18b8",
+    "end": "0x1063a1b48",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPMainWindowQuitAnimationWillStart",
+    "address": "0x1063a1b58",
+    "end": "0x1063a1c80",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPMainWindowQuitAnimationDidEnd",
+    "address": "0x1063a1c90",
+    "end": "0x1063a253c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPMainWindowCollapseAnimationDidEnd",
+    "address": "0x1063a257c",
+    "end": "0x1063a28e0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPMainWindowCollapseAnimationWillStart",
+    "address": "0x1063a28f0",
+    "end": "0x1063a2a18",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPMainWindowExtendFromCollapseAnimationWillStart",
+    "address": "0x1063a2a28",
+    "end": "0x1063a2da0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPMainWindowExtendFromCollapseAnimationDidEnd",
+    "address": "0x1063a2db0",
+    "end": "0x1063a2f70",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPMainWindowRequestMinimizeFrame",
+    "address": "0x1063a2f90",
+    "end": "0x1063a3178",
+    "types": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPMainWindowRequestPreviousOrientation",
+    "address": "0x1063a3178",
+    "end": "0x1063a3180",
+    "types": "q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isCurrentPageEnding",
+    "address": "0x1063a3180",
+    "end": "0x1063a31dc",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPMainWindowGetMinimizeImage",
+    "address": "0x1063a31dc",
+    "end": "0x1063a3294",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPMainWindowGetCustomSnapshot",
+    "address": "0x1063a3294",
+    "end": "0x1063a3324",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnCall:ErrNo:",
+    "address": "0x1063a3324",
+    "end": "0x1063a3590",
+    "types": "v28@0:8@16i24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "VoIPExt_onCallFailedWithRiskControlReasonType:",
+    "address": "0x1063a37ec",
+    "end": "0x1063a3ab4",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "VoIPExt_onCallFailedWithRiskControlReasonType:verificationUrlBase64:",
+    "address": "0x1063a3ab4",
+    "end": "0x1063a3e28",
+    "types": "v32@0:8Q16@24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnAccept:ErrNo:",
+    "address": "0x1063a3e28",
+    "end": "0x1063a3e2c",
+    "types": "v28@0:8@16i24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnNoAnswer:",
+    "address": "0x1063a3e2c",
+    "end": "0x1063a3e30",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnHangup:",
+    "address": "0x1063a3e30",
+    "end": "0x1063a3ec8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnCacnel:withType:",
+    "address": "0x1063a3ec8",
+    "end": "0x1063a3f7c",
+    "types": "v28@0:8@16i24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnTimeOut:",
+    "address": "0x1063a3f7c",
+    "end": "0x1063a3f80",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnError:ErrNo:",
+    "address": "0x1063a3f80",
+    "end": "0x1063a3f84",
+    "types": "v28@0:8@16i24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnSyncError:ErrNo:",
+    "address": "0x1063a3f84",
+    "end": "0x1063a3f88",
+    "types": "v28@0:8@16i24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnTalkBrokenError:ErrNo:",
+    "address": "0x1063a3f88",
+    "end": "0x1063a3f8c",
+    "types": "v28@0:8@16i24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnCallInterrupt:",
+    "address": "0x1063a3f8c",
+    "end": "0x1063a3f90",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnAutoHangUp:",
+    "address": "0x1063a3f90",
+    "end": "0x1063a3f94",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onOtherDeviceHandleTalk:WithStatus:",
+    "address": "0x1063a3f94",
+    "end": "0x1063a3f98",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnTellMeViewIsExist:",
+    "address": "0x1063a3f98",
+    "end": "0x1063a4158",
+    "types": "v24@0:8^B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnTellMeIsAuthing:",
+    "address": "0x1063a4158",
+    "end": "0x1063a4184",
+    "types": "v24@0:8^B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnBeginTalk:",
+    "address": "0x1063a4184",
+    "end": "0x1063a445c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVideoOrientationChangeTo:",
+    "address": "0x1063a445c",
+    "end": "0x1063a4460",
+    "types": "v24@0:8q16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnMicStartFailed",
+    "address": "0x1063a4460",
+    "end": "0x1063a4708",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnMicRMSCheckBad",
+    "address": "0x1063a478c",
+    "end": "0x1063a49c8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onVoIPExtLocalCaptureToggleWithIsBack:",
+    "address": "0x1063a49c8",
+    "end": "0x1063a49d4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "willVoIPExtRestartAudioDevice",
+    "address": "0x1063a49d4",
+    "end": "0x1063a4b14",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onAudioStartComplete",
+    "address": "0x1063a4b14",
+    "end": "0x1063a4c44",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onMMDynamicConfigUpdated",
+    "address": "0x1063a4c44",
+    "end": "0x1063a4d00",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onPreQuit",
+    "address": "0x1063a4d00",
+    "end": "0x1063a4d7c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "acceptCallUseCallkit:roomKey:isVideo:userName:isilink:",
+    "address": "0x1063a4d7c",
+    "end": "0x1063a5378",
+    "types": "v48@0:8Q16q24B32@36B44"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onClickTipsBtn:Index:tipTag:withTipsVC:",
+    "address": "0x1063a5378",
+    "end": "0x1063a5608",
+    "types": "v48@0:8@16q24q32@40"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "audioDevicePlugin",
+    "address": "0x1063a5608",
+    "end": "0x1063a566c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "audioDeviceUnPlugin",
+    "address": "0x1063a567c",
+    "end": "0x1063a5a5c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "OnVideoModeChangeToVoiceMode",
+    "address": "0x1063a5a6c",
+    "end": "0x1063a5b5c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "extendWindowToFullScreen",
+    "address": "0x1063a5b5c",
+    "end": "0x1063a5ed8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "extendWindowToFullScreenImmediately",
+    "address": "0x1063a5ee8",
+    "end": "0x1063a6168",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "checkAndUpdateNetStatus",
+    "address": "0x1063a6178",
+    "end": "0x1063a6728",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "showBadNetwork:",
+    "address": "0x1063a6728",
+    "end": "0x1063a6cbc",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "canPlayOtherAudio",
+    "address": "0x1063a6ccc",
+    "end": "0x1063a6d88",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setRoomInfoToCurrentVoipViewWith:And:",
+    "address": "0x1063a6d88",
+    "end": "0x1063a6f18",
+    "types": "v32@0:8Q16q24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRoomIDForCurrentVoipView",
+    "address": "0x1063a6f18",
+    "end": "0x1063a6f64",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getRoomKeyForCurrentVoipView",
+    "address": "0x1063a6f64",
+    "end": "0x1063a6fb0",
+    "types": "q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "messageWrapForCurrentVoipView",
+    "address": "0x1063a6fb0",
+    "end": "0x1063a7004",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "checkIfCouldChangeDevice:from:",
+    "address": "0x1063a7004",
+    "end": "0x1063a70e4",
+    "types": "B32@0:8@16Q24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "checkIfDuplicateContact:",
+    "address": "0x1063a70e4",
+    "end": "0x1063a7498",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "openWindowWithContext:",
+    "address": "0x1063a7498",
+    "end": "0x1063aa22c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getVoIPWindow",
+    "address": "0x1063aa808",
+    "end": "0x1063aa814",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "openAudioWindowWithContext:",
+    "address": "0x1063aa814",
+    "end": "0x1063aadd4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "openVideoWindowWithContext:",
+    "address": "0x1063abe30",
+    "end": "0x1063ac404",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "openVoipCallerViewByCallKitWithContact:",
+    "address": "0x1063ad8b0",
+    "end": "0x1063adbd0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "acceptInvitaionInfo:needCloseCamera:",
+    "address": "0x1063adbd0",
+    "end": "0x1063adee0",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "view",
+    "address": "0x1063ae068",
+    "end": "0x1063ae128",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "updateAfterRestoringUserInterfacePictureInPictureStop",
+    "address": "0x1063ae128",
+    "end": "0x1063ae368",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "updateAfterStartingPictureInPicture",
+    "address": "0x1063ae368",
+    "end": "0x1063ae698",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "updateAfterStoppingPictureInPicture",
+    "address": "0x1063ae698",
+    "end": "0x1063ae9cc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "updateAfterEnteringForegroundFromPictureInPicture:",
+    "address": "0x1063ae9cc",
+    "end": "0x1063aede0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setupPictureInPictureEnable:",
+    "address": "0x1063aede0",
+    "end": "0x1063aefa8",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setupPictureInPictureDisplayed:",
+    "address": "0x1063aefa8",
+    "end": "0x1063af0d8",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "viewForPictureInPicture",
+    "address": "0x1063af0d8",
+    "end": "0x1063af284",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setAudioSessionStatus:",
+    "address": "0x1063af284",
+    "end": "0x1063af48c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "resetAudioSessionStatus",
+    "address": "0x1063af924",
+    "end": "0x1063afacc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getIfCameraInterrupt",
+    "address": "0x1063afd28",
+    "end": "0x1063afd74",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getIfCurrentSpeaker",
+    "address": "0x1063afd74",
+    "end": "0x1063afddc",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "settingPortType",
+    "address": "0x1063afddc",
+    "end": "0x1063afe30",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "hasExtenalOutput",
+    "address": "0x1063afe30",
+    "end": "0x1063afe7c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "curOutputPort",
+    "address": "0x1063afe7c",
+    "end": "0x1063afed0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "showAirplayOrJustChange",
+    "address": "0x1063afed0",
+    "end": "0x1063aff5c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "changeAudioToPort:hasChanged:",
+    "address": "0x1063aff5c",
+    "end": "0x1063aff6c",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "changeAudioToPort:hasChanged:shouldIgnoreToast:",
+    "address": "0x1063aff6c",
+    "end": "0x1063b0094",
+    "types": "v32@0:8@16B24B28"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "__changeAudioToPort:hasChanged:shouldIgnoreToast:",
+    "address": "0x1063b0094",
+    "end": "0x1063b0494",
+    "types": "v32@0:8@16B24B28"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "getSpeakerBtnText:",
+    "address": "0x1063b0590",
+    "end": "0x1063b0898",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "updatePortWithReasonValue:prevPort:",
+    "address": "0x1063b0898",
+    "end": "0x1063b0e1c",
+    "types": "v32@0:8Q16@24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "updateSpeakerButtonStatus:hasExtenalOutput:",
+    "address": "0x1063b0f7c",
+    "end": "0x1063b101c",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "notifyAudioDeviceChange",
+    "address": "0x1063b10e8",
+    "end": "0x1063b12e0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "audioDeviceStartedSuccess:",
+    "address": "0x1063b12e0",
+    "end": "0x1063b196c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "audioDeviceHumanVoiceDetectCallback",
+    "address": "0x1063b197c",
+    "end": "0x1063b1b1c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voIPOrientationServiceDidChangeDeviceOrientation",
+    "address": "0x1063b1bc0",
+    "end": "0x1063b2808",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voIPOrientationServiceDidChangeDeviceAngleDegree",
+    "address": "0x1063b29d4",
+    "end": "0x1063b29d8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voIPOrientationServiceDidChangeMotionOrientation",
+    "address": "0x1063b29d8",
+    "end": "0x1063b29dc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceWillScrollIn",
+    "address": "0x1063b29dc",
+    "end": "0x1063b29e0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceDidScrollIn",
+    "address": "0x1063b29e0",
+    "end": "0x1063b29f0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceWillScrollOut",
+    "address": "0x1063b29f0",
+    "end": "0x1063b29f4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceDidScrollOut",
+    "address": "0x1063b29f4",
+    "end": "0x1063b2ad0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceWillClear",
+    "address": "0x1063b2ad0",
+    "end": "0x1063b2ad4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceDidClear",
+    "address": "0x1063b2ad4",
+    "end": "0x1063b2ae4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onSetRoomID:",
+    "address": "0x1063b2ae4",
+    "end": "0x1063b2af4",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "ilinkReceiverOpenWindowWithContact:msgWrap:monoMsg:from:isAudioMode:completion:",
+    "address": "0x1063b2af4",
+    "end": "0x1063b2dc4",
+    "types": "v60@0:8@16@24@32Q40B48@?52"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onCancelCreateMultiTalk",
+    "address": "0x1063b2dc4",
+    "end": "0x1063b2ed0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "ilinkInviteFailedToVoIPMgr:withCallType:isAudio:status:",
+    "address": "0x1063b2ed0",
+    "end": "0x1063b374c",
+    "types": "v40@0:8@16I24B28@32"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "fakeEndVoIPByChangingToMultiTalk",
+    "address": "0x1063b374c",
+    "end": "0x1063b378c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isCarPlayConnected",
+    "address": "0x1063b378c",
+    "end": "0x1063b37e0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "applicationWillSuspend",
+    "address": "0x1063b37e0",
+    "end": "0x1063b383c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "applicationWillEnterForeground",
+    "address": "0x1063b383c",
+    "end": "0x1063b3f48",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "onAbsorbFloatingViewEndResultMoveTo:",
+    "address": "0x1063b4258",
+    "end": "0x1063b4348",
+    "types": "v32@0:8{CGPoint=dd}16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "voIPAudioServiceWillStartAudioUnit",
+    "address": "0x1063b4348",
+    "end": "0x1063b489c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "m_videoVoipCallerViewController",
+    "address": "0x1063b489c",
+    "end": "0x1063b48ac",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setM_videoVoipCallerViewController:",
+    "address": "0x1063b48ac",
+    "end": "0x1063b48c0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "m_videoVoipReceiverViewController",
+    "address": "0x1063b48c0",
+    "end": "0x1063b48d0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setM_videoVoipReceiverViewController:",
+    "address": "0x1063b48d0",
+    "end": "0x1063b48e4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "m_voipToastWindow",
+    "address": "0x1063b48e4",
+    "end": "0x1063b48f4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setM_voipToastWindow:",
+    "address": "0x1063b48f4",
+    "end": "0x1063b4908",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "m_mainWindow",
+    "address": "0x1063b4908",
+    "end": "0x1063b4918",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setM_mainWindow:",
+    "address": "0x1063b4918",
+    "end": "0x1063b492c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "m_tipsViewController",
+    "address": "0x1063b492c",
+    "end": "0x1063b493c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setM_tipsViewController:",
+    "address": "0x1063b493c",
+    "end": "0x1063b4950",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isAudioMode",
+    "address": "0x1063b4950",
+    "end": "0x1063b4960",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setIsAudioMode:",
+    "address": "0x1063b4960",
+    "end": "0x1063b4970",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "mainRender",
+    "address": "0x1063b4970",
+    "end": "0x1063b4980",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "smallRender",
+    "address": "0x1063b4980",
+    "end": "0x1063b4990",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "speakerStatusOnTalking",
+    "address": "0x1063b4990",
+    "end": "0x1063b49a0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setSpeakerStatusOnTalking:",
+    "address": "0x1063b49a0",
+    "end": "0x1063b49b0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "currentRemoteContact",
+    "address": "0x1063b49b0",
+    "end": "0x1063b49c0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setCurrentRemoteContact:",
+    "address": "0x1063b49c0",
+    "end": "0x1063b49d4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "audioRouteMgr",
+    "address": "0x1063b49d4",
+    "end": "0x1063b49e4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setAudioRouteMgr:",
+    "address": "0x1063b49e4",
+    "end": "0x1063b49f8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isVoIPViewControllerExtendAtFirst",
+    "address": "0x1063b49f8",
+    "end": "0x1063b4a08",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setIsVoIPViewControllerExtendAtFirst:",
+    "address": "0x1063b4a08",
+    "end": "0x1063b4a18",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isVoIPReceiverCardExtendAtFirst",
+    "address": "0x1063b4a18",
+    "end": "0x1063b4a28",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setIsVoIPReceiverCardExtendAtFirst:",
+    "address": "0x1063b4a28",
+    "end": "0x1063b4a38",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "netStatusUpdateTimer",
+    "address": "0x1063b4a38",
+    "end": "0x1063b4a48",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setNetStatusUpdateTimer:",
+    "address": "0x1063b4a48",
+    "end": "0x1063b4a5c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "wavAudioPlayer",
+    "address": "0x1063b4a5c",
+    "end": "0x1063b4a6c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setWavAudioPlayer:",
+    "address": "0x1063b4a6c",
+    "end": "0x1063b4a80",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "lastAudioNotifyTimeForNetStatus",
+    "address": "0x1063b4a80",
+    "end": "0x1063b4a90",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setLastAudioNotifyTimeForNetStatus:",
+    "address": "0x1063b4a90",
+    "end": "0x1063b4aa0",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "hasShownChangeToCelluarTip",
+    "address": "0x1063b4aa0",
+    "end": "0x1063b4ab0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setHasShownChangeToCelluarTip:",
+    "address": "0x1063b4ab0",
+    "end": "0x1063b4ac0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "hasShownLongUseCellularTips",
+    "address": "0x1063b4ac0",
+    "end": "0x1063b4ad0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setHasShownLongUseCellularTips:",
+    "address": "0x1063b4ad0",
+    "end": "0x1063b4ae0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "m_hasBeganTalk",
+    "address": "0x1063b4ae0",
+    "end": "0x1063b4af0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setM_hasBeganTalk:",
+    "address": "0x1063b4af0",
+    "end": "0x1063b4b00",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "checkAudioDeviceObj",
+    "address": "0x1063b4b00",
+    "end": "0x1063b4b10",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setCheckAudioDeviceObj:",
+    "address": "0x1063b4b10",
+    "end": "0x1063b4b24",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "startCallContactFromCallKit",
+    "address": "0x1063b4b24",
+    "end": "0x1063b4b34",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setStartCallContactFromCallKit:",
+    "address": "0x1063b4b34",
+    "end": "0x1063b4b48",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "dateOfIncomingInvitationFromPushKit",
+    "address": "0x1063b4b48",
+    "end": "0x1063b4b58",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setDateOfIncomingInvitationFromPushKit:",
+    "address": "0x1063b4b58",
+    "end": "0x1063b4b6c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isAuthing",
+    "address": "0x1063b4b6c",
+    "end": "0x1063b4b7c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setIsAuthing:",
+    "address": "0x1063b4b7c",
+    "end": "0x1063b4b8c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isMainCameraMyselfBeforePIP",
+    "address": "0x1063b4b8c",
+    "end": "0x1063b4b9c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setIsMainCameraMyselfBeforePIP:",
+    "address": "0x1063b4b9c",
+    "end": "0x1063b4bac",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "openFrom",
+    "address": "0x1063b4bac",
+    "end": "0x1063b4bbc",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setOpenFrom:",
+    "address": "0x1063b4bbc",
+    "end": "0x1063b4bcc",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isLocalCaptureBack",
+    "address": "0x1063b4bcc",
+    "end": "0x1063b4bdc",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setIsLocalCaptureBack:",
+    "address": "0x1063b4bdc",
+    "end": "0x1063b4bec",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "audioDeviceStartedSucessAfterBeganTalkCount",
+    "address": "0x1063b4bec",
+    "end": "0x1063b4bfc",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setAudioDeviceStartedSucessAfterBeganTalkCount:",
+    "address": "0x1063b4bfc",
+    "end": "0x1063b4c0c",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "shouldHandleWindowInMgr",
+    "address": "0x1063b4c0c",
+    "end": "0x1063b4c1c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setShouldHandleWindowInMgr:",
+    "address": "0x1063b4c1c",
+    "end": "0x1063b4c2c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "startTalkTimestamp",
+    "address": "0x1063b4c2c",
+    "end": "0x1063b4c3c",
+    "types": "d16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setStartTalkTimestamp:",
+    "address": "0x1063b4c3c",
+    "end": "0x1063b4c4c",
+    "types": "v24@0:8d16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "hasSetActived",
+    "address": "0x1063b4c4c",
+    "end": "0x1063b4c5c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setHasSetActived:",
+    "address": "0x1063b4c5c",
+    "end": "0x1063b4c6c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "suspendTimestamp",
+    "address": "0x1063b4c6c",
+    "end": "0x1063b4c7c",
+    "types": "d16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setSuspendTimestamp:",
+    "address": "0x1063b4c7c",
+    "end": "0x1063b4c8c",
+    "types": "v24@0:8d16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isUIShowedAtApplcationStateActive",
+    "address": "0x1063b4c8c",
+    "end": "0x1063b4c9c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setIsUIShowedAtApplcationStateActive:",
+    "address": "0x1063b4c9c",
+    "end": "0x1063b4cac",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "isOrientationChangeTipsScrolled",
+    "address": "0x1063b4cac",
+    "end": "0x1063b4cbc",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": "setIsOrientationChangeTipsScrolled:",
+    "address": "0x1063b4cbc",
+    "end": "0x1063b4ccc",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1063b4ccc",
+    "end": "0x1063b4dfc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "class",
+    "selector": "canStartVideoWithContact:",
+    "address": "0x106396678",
+    "end": "0x1063968a0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "class",
+    "selector": "canForceStartVoiceWithContact:",
+    "address": "0x1063968a0",
+    "end": "0x106396ac8",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "class",
+    "selector": "tryGetRemoteUserIlinkStatus:",
+    "address": "0x106397060",
+    "end": "0x1063973a0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "class",
+    "selector": "shouldPlayPromptSound",
+    "address": "0x1063981c4",
+    "end": "0x1063982a0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "class",
+    "selector": "getVoIPType",
+    "address": "0x1063999f8",
+    "end": "0x106399b54",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "VoipUIManager",
+    "kind": "class",
+    "selector": "getNextInviteAvailable",
+    "address": "0x1063a0a28",
+    "end": "0x1063a0b4c",
+    "types": "I16@0:8"
+  }
+]

@@ -1,0 +1,540 @@
+{
+  "target_sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "metadata": {
+    "FindFriendEntryViewController": {
+      "address": "0x1202e4fa8",
+      "ivars": [
+        {
+          "offset_address": "0x1201f4040",
+          "offset": 112,
+          "name": "m_bNeedToDestroySelf",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f4070",
+          "offset": 113,
+          "name": "m_bBeingAppear",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f4078",
+          "offset": 114,
+          "name": "m_findTabHasShow",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f4030",
+          "offset": 115,
+          "name": "m_isOnAppearState",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f4060",
+          "offset": 120,
+          "name": "m_gameCenterNoticeID",
+          "type": "@\"NSString\""
+        },
+        {
+          "offset_address": "0x1201f4064",
+          "offset": 128,
+          "name": "m_gameCenterAppIDForStat",
+          "type": "@\"NSString\""
+        },
+        {
+          "offset_address": "0x1201f407c",
+          "offset": 136,
+          "name": "_startTime",
+          "type": "I"
+        },
+        {
+          "offset_address": "0x1201f408c",
+          "offset": 144,
+          "name": "m_gameEntrySetting",
+          "type": "@\"GameIndexSettingControl\""
+        },
+        {
+          "offset_address": "0x1201f4088",
+          "offset": 152,
+          "name": "m_ffBrowseReddotMsgIdDuringSelect",
+          "type": "@\"NSString\""
+        },
+        {
+          "offset_address": "0x1201f402c",
+          "offset": 160,
+          "name": "finderPrefetchTimingSeconds",
+          "type": "q"
+        },
+        {
+          "offset_address": "0x1201f4048",
+          "offset": 168,
+          "name": "m_hadRptRedSnsId",
+          "type": "@\"NSString\""
+        },
+        {
+          "offset_address": "0x1201f4074",
+          "offset": 176,
+          "name": "m_lastExposeSnsId",
+          "type": "@\"NSString\""
+        },
+        {
+          "offset_address": "0x1201f4084",
+          "offset": 184,
+          "name": "m_reportJdExposeAtAppear",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f405c",
+          "offset": 185,
+          "name": "m_hasGameLifeReddot",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f4024",
+          "offset": 186,
+          "name": "m_hasInitData",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f4020",
+          "offset": 192,
+          "name": "m_tableView",
+          "type": "@\"MMMainTableView\""
+        },
+        {
+          "offset_address": "0x1201f3ff4",
+          "offset": 200,
+          "name": "m_aryEntryRow",
+          "type": "^{stEntryRow=i#@@@@@@@@@@@QQB@B@}"
+        },
+        {
+          "offset_address": "0x1201f401c",
+          "offset": 208,
+          "name": "m_mapSectionType",
+          "type": "{map<unsigned long, unsigned int, std::less<unsigned long>, std::allocator<std::pair<const unsigned long, unsigned int>>>=\"__tree_\"{__tree<std::__value_type<unsigned long, unsigned int>, std::__map_value_compare<unsigned long, std::__value_type<unsigned long, unsigned int>, std::less<unsigned long>>, std::allocator<std::__value_type<unsigned long, unsigned int>>>=\"__begin_node_\"^v\"__end_node_\"{__tree_end_node<std::__tree_node_base<void *> *>=\"__left_\"^v}\"__size_\"Q}}"
+        },
+        {
+          "offset_address": "0x1201f4014",
+          "offset": 232,
+          "name": "m_mapRowToRowTypeAlbum",
+          "type": "{map<unsigned long, unsigned int, std::less<unsigned long>, std::allocator<std::pair<const unsigned long, unsigned int>>>=\"__tree_\"{__tree<std::__value_type<unsigned long, unsigned int>, std::__map_value_compare<unsigned long, std::__value_type<unsigned long, unsigned int>, std::less<unsigned long>>, std::allocator<std::__value_type<unsigned long, unsigned int>>>=\"__begin_node_\"^v\"__end_node_\"{__tree_end_node<std::__tree_node_base<void *> *>=\"__left_\"^v}\"__size_\"Q}}"
+        },
+        {
+          "offset_address": "0x1201f3ff8",
+          "offset": 256,
+          "name": "m_mapRowToRowTypeSocial",
+          "type": "{map<unsigned long, unsigned int, std::less<unsigned long>, std::allocator<std::pair<const unsigned long, unsigned int>>>=\"__tree_\"{__tree<std::__value_type<unsigned long, unsigned int>, std::__map_value_compare<unsigned long, std::__value_type<unsigned long, unsigned int>, std::less<unsigned long>>, std::allocator<std::__value_type<unsigned long, unsigned int>>>=\"__begin_node_\"^v\"__end_node_\"{__tree_end_node<std::__tree_node_base<void *> *>=\"__left_\"^v}\"__size_\"Q}}"
+        },
+        {
+          "offset_address": "0x1201f4000",
+          "offset": 280,
+          "name": "m_mapRowToRowTypeMotion",
+          "type": "{map<unsigned long, unsigned int, std::less<unsigned long>, std::allocator<std::pair<const unsigned long, unsigned int>>>=\"__tree_\"{__tree<std::__value_type<unsigned long, unsigned int>, std::__map_value_compare<unsigned long, std::__value_type<unsigned long, unsigned int>, std::less<unsigned long>>, std::allocator<std::__value_type<unsigned long, unsigned int>>>=\"__begin_node_\"^v\"__end_node_\"{__tree_end_node<std::__tree_node_base<void *> *>=\"__left_\"^v}\"__size_\"Q}}"
+        },
+        {
+          "offset_address": "0x1201f4004",
+          "offset": 304,
+          "name": "m_mapRowToRowTypeSearch",
+          "type": "{map<unsigned long, unsigned int, std::less<unsigned long>, std::allocator<std::pair<const unsigned long, unsigned int>>>=\"__tree_\"{__tree<std::__value_type<unsigned long, unsigned int>, std::__map_value_compare<unsigned long, std::__value_type<unsigned long, unsigned int>, std::less<unsigned long>>, std::allocator<std::__value_type<unsigned long, unsigned int>>>=\"__begin_node_\"^v\"__end_node_\"{__tree_end_node<std::__tree_node_base<void *> *>=\"__left_\"^v}\"__size_\"Q}}"
+        },
+        {
+          "offset_address": "0x1201f4008",
+          "offset": 328,
+          "name": "m_mapRowToRowTypeOpen",
+          "type": "{map<unsigned long, unsigned int, std::less<unsigned long>, std::allocator<std::pair<const unsigned long, unsigned int>>>=\"__tree_\"{__tree<std::__value_type<unsigned long, unsigned int>, std::__map_value_compare<unsigned long, std::__value_type<unsigned long, unsigned int>, std::less<unsigned long>>, std::allocator<std::__value_type<unsigned long, unsigned int>>>=\"__begin_node_\"^v\"__end_node_\"{__tree_end_node<std::__tree_node_base<void *> *>=\"__left_\"^v}\"__size_\"Q}}"
+        },
+        {
+          "offset_address": "0x1201f4010",
+          "offset": 352,
+          "name": "m_mapRowToRowTypeWCO",
+          "type": "{map<unsigned long, unsigned int, std::less<unsigned long>, std::allocator<std::pair<const unsigned long, unsigned int>>>=\"__tree_\"{__tree<std::__value_type<unsigned long, unsigned int>, std::__map_value_compare<unsigned long, std::__value_type<unsigned long, unsigned int>, std::less<unsigned long>>, std::allocator<std::__value_type<unsigned long, unsigned int>>>=\"__begin_node_\"^v\"__end_node_\"{__tree_end_node<std::__tree_node_base<void *> *>=\"__left_\"^v}\"__size_\"Q}}"
+        },
+        {
+          "offset_address": "0x1201f400c",
+          "offset": 376,
+          "name": "m_mapRowToRowTypeAppBrand",
+          "type": "{map<unsigned long, unsigned int, std::less<unsigned long>, std::allocator<std::pair<const unsigned long, unsigned int>>>=\"__tree_\"{__tree<std::__value_type<unsigned long, unsigned int>, std::__map_value_compare<unsigned long, std::__value_type<unsigned long, unsigned int>, std::less<unsigned long>>, std::allocator<std::__value_type<unsigned long, unsigned int>>>=\"__begin_node_\"^v\"__end_node_\"{__tree_end_node<std::__tree_node_base<void *> *>=\"__left_\"^v}\"__size_\"Q}}"
+        },
+        {
+          "offset_address": "0x1201f4018",
+          "offset": 400,
+          "name": "m_mapRowToRowTypeFinder",
+          "type": "{map<unsigned long, unsigned int, std::less<unsigned long>, std::allocator<std::pair<const unsigned long, unsigned int>>>=\"__tree_\"{__tree<std::__value_type<unsigned long, unsigned int>, std::__map_value_compare<unsigned long, std::__value_type<unsigned long, unsigned int>, std::less<unsigned long>>, std::allocator<std::__value_type<unsigned long, unsigned int>>>=\"__begin_node_\"^v\"__end_node_\"{__tree_end_node<std::__tree_node_base<void *> *>=\"__left_\"^v}\"__size_\"Q}}"
+        },
+        {
+          "offset_address": "0x1201f4068",
+          "offset": 424,
+          "name": "m_WCTimeLineIndexPath",
+          "type": "@\"NSIndexPath\""
+        },
+        {
+          "offset_address": "0x1201f4028",
+          "offset": 432,
+          "name": "m_latestSeenDataItem",
+          "type": "@\"WCDataItem\""
+        },
+        {
+          "offset_address": "0x1201f4058",
+          "offset": 440,
+          "name": "m_latesetDataItem",
+          "type": "@\"WCDataItem\""
+        },
+        {
+          "offset_address": "0x1201f3ffc",
+          "offset": 448,
+          "name": "m_lbsIndexPath",
+          "type": "@\"NSIndexPath\""
+        },
+        {
+          "offset_address": "0x1201f4090",
+          "offset": 456,
+          "name": "m_shakeIndexPath",
+          "type": "@\"NSIndexPath\""
+        },
+        {
+          "offset_address": "0x1201f4094",
+          "offset": 464,
+          "name": "m_gameIndexPath",
+          "type": "@\"NSIndexPath\""
+        },
+        {
+          "offset_address": "0x1201f4080",
+          "offset": 472,
+          "name": "m_needDoGameSync",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f406c",
+          "offset": 480,
+          "name": "m_WCFinderIndexPath",
+          "type": "@\"NSIndexPath\""
+        },
+        {
+          "offset_address": "0x1201f4034",
+          "offset": 488,
+          "name": "m_timelineViewController",
+          "type": "@\"WCTimeLineViewController\""
+        },
+        {
+          "offset_address": "0x1201f4050",
+          "offset": 496,
+          "name": "m_timelineCacheTimer",
+          "type": "@\"MMTimer\""
+        },
+        {
+          "offset_address": "0x1201f4038",
+          "offset": 504,
+          "name": "m_timelineHeadView",
+          "type": "@\"MMHeadImageView\""
+        },
+        {
+          "offset_address": "0x1201f403c",
+          "offset": 512,
+          "name": "m_timelineRedDotView",
+          "type": "@\"UIImageView\""
+        },
+        {
+          "offset_address": "0x1201f40d8",
+          "offset": 520,
+          "name": "m_inTimeline",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f404c",
+          "offset": 521,
+          "name": "m_hasWeAppReportedCellExposal",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f4044",
+          "offset": 528,
+          "name": "m_gameNotifyType",
+          "type": "q"
+        },
+        {
+          "offset_address": "0x1201f40a0",
+          "offset": 536,
+          "name": "_hasFinderEntranceRedDotBefore",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f40a4",
+          "offset": 537,
+          "name": "_lastLiveEntranceSwitch",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f40b4",
+          "offset": 538,
+          "name": "_isShowingMomentsRedDot",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f40c4",
+          "offset": 539,
+          "name": "_lastClickWithRedDot",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f40d4",
+          "offset": 540,
+          "name": "_preserveEnteringFindPageReportCache",
+          "type": "B"
+        },
+        {
+          "offset_address": "0x1201f4098",
+          "offset": 544,
+          "name": "_finderCacheTimer",
+          "type": "@\"MMTimer\""
+        },
+        {
+          "offset_address": "0x1201f4054",
+          "offset": 552,
+          "name": "_finderTimelineTabVC",
+          "type": "@\"WCFinderTimelineTabViewController\""
+        },
+        {
+          "offset_address": "0x1201f409c",
+          "offset": 560,
+          "name": "_allEntriesClosedHintView",
+          "type": "@\"UIView\""
+        },
+        {
+          "offset_address": "0x1201f40a8",
+          "offset": 568,
+          "name": "_finderContextIdArray",
+          "type": "@\"NSMutableArray\""
+        },
+        {
+          "offset_address": "0x1201f40ac",
+          "offset": 576,
+          "name": "_finderLiveCacheTimer",
+          "type": "@\"MMTimer\""
+        },
+        {
+          "offset_address": "0x1201f40b0",
+          "offset": 584,
+          "name": "_liveHomePageVC",
+          "type": "@\"WCFinderLiveHomePageViewController\""
+        },
+        {
+          "offset_address": "0x1201f40b8",
+          "offset": 592,
+          "name": "_redDotEventSender",
+          "type": "@\"FindFriendRedDotEventSender\""
+        },
+        {
+          "offset_address": "0x1201f40bc",
+          "offset": 600,
+          "name": "_redDotReporter",
+          "type": "@\"FindFriendRedDotReporter\""
+        },
+        {
+          "offset_address": "0x1201f40c0",
+          "offset": 608,
+          "name": "_lastClickIdx",
+          "type": "q"
+        },
+        {
+          "offset_address": "0x1201f40c8",
+          "offset": 616,
+          "name": "_lastBusinessEnterTimeMs",
+          "type": "Q"
+        },
+        {
+          "offset_address": "0x1201f40cc",
+          "offset": 624,
+          "name": "_curTabPageSource",
+          "type": "q"
+        },
+        {
+          "offset_address": "0x1201f40d0",
+          "offset": 632,
+          "name": "_findPageReportExtraParams",
+          "type": "@\"NSDictionary\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "fakeTitleView",
+          "attributes": "T@\"MMTitleView\",&,D,N"
+        },
+        {
+          "name": "fakeNavBarView",
+          "attributes": "T@\"FindPageCustomBarView\",&,D,N"
+        },
+        {
+          "name": "finderTimelineTabVC",
+          "attributes": "T@\"WCFinderTimelineTabViewController\",&,N,V_finderTimelineTabVC"
+        },
+        {
+          "name": "allEntriesClosedHintView",
+          "attributes": "T@\"UIView\",&,N,V_allEntriesClosedHintView"
+        },
+        {
+          "name": "hasFinderEntranceRedDotBefore",
+          "attributes": "TB,N,V_hasFinderEntranceRedDotBefore"
+        },
+        {
+          "name": "lastLiveEntranceSwitch",
+          "attributes": "TB,N,V_lastLiveEntranceSwitch"
+        },
+        {
+          "name": "finderContextIdArray",
+          "attributes": "T@\"NSMutableArray\",&,N,V_finderContextIdArray"
+        },
+        {
+          "name": "finderCacheTimer",
+          "attributes": "T@\"MMTimer\",&,N,V_finderCacheTimer"
+        },
+        {
+          "name": "finderLiveCacheTimer",
+          "attributes": "T@\"MMTimer\",&,N,V_finderLiveCacheTimer"
+        },
+        {
+          "name": "liveHomePageVC",
+          "attributes": "T@\"WCFinderLiveHomePageViewController\",&,N,V_liveHomePageVC"
+        },
+        {
+          "name": "isShowingMomentsRedDot",
+          "attributes": "TB,N,V_isShowingMomentsRedDot"
+        },
+        {
+          "name": "redDotEventSender",
+          "attributes": "T@\"FindFriendRedDotEventSender\",&,N,V_redDotEventSender"
+        },
+        {
+          "name": "redDotReporter",
+          "attributes": "T@\"FindFriendRedDotReporter\",&,N,V_redDotReporter"
+        },
+        {
+          "name": "lastClickIdx",
+          "attributes": "Tq,N,V_lastClickIdx"
+        },
+        {
+          "name": "lastClickWithRedDot",
+          "attributes": "TB,N,V_lastClickWithRedDot"
+        },
+        {
+          "name": "lastBusinessEnterTimeMs",
+          "attributes": "TQ,N,V_lastBusinessEnterTimeMs"
+        },
+        {
+          "name": "curTabPageSource",
+          "attributes": "Tq,N,V_curTabPageSource"
+        },
+        {
+          "name": "findPageReportExtraParams",
+          "attributes": "T@\"NSDictionary\",&,N,V_findPageReportExtraParams"
+        },
+        {
+          "name": "preserveEnteringFindPageReportCache",
+          "attributes": "TB,N,V_preserveEnteringFindPageReportCache"
+        },
+        {
+          "name": "m_shakeIndexPath",
+          "attributes": "T@\"NSIndexPath\",&,N,Vm_shakeIndexPath"
+        },
+        {
+          "name": "m_gameIndexPath",
+          "attributes": "T@\"NSIndexPath\",&,N,Vm_gameIndexPath"
+        },
+        {
+          "name": "m_lbsIndexPath",
+          "attributes": "T@\"NSIndexPath\",&,N,Vm_lbsIndexPath"
+        },
+        {
+          "name": "hash",
+          "attributes": "TQ,R"
+        },
+        {
+          "name": "superclass",
+          "attributes": "T#,R"
+        },
+        {
+          "name": "description",
+          "attributes": "T@\"NSString\",R,C"
+        },
+        {
+          "name": "debugDescription",
+          "attributes": "T@\"NSString\",?,R,C"
+        }
+      ],
+      "superclass": "MMTabBarBaseViewController"
+    }
+  },
+  "methods": [
+    {
+      "cls": "FindFriendEntryViewController",
+      "kind": "instance",
+      "selector": "reloadData",
+      "address": "0x101b33144",
+      "end": "0x101b331a0",
+      "types": "v16@0:8"
+    },
+    {
+      "cls": "FindFriendEntryViewController",
+      "kind": "instance",
+      "selector": "tableView:cellForRowAtIndexPath:",
+      "address": "0x101b48560",
+      "end": "0x101b496f0",
+      "types": "@32@0:8@16@24"
+    },
+    {
+      "cls": "FindFriendEntryViewController",
+      "kind": "instance",
+      "selector": "numberOfUnreadAtTab",
+      "address": "0x101b4ea38",
+      "end": "0x101b4ee1c",
+      "types": "q16@0:8"
+    },
+    {
+      "cls": "FindFriendEntryViewController",
+      "kind": "instance",
+      "selector": "numberOfUnreadAtMomentCell",
+      "address": "0x101b4f1d8",
+      "end": "0x101b4f2c0",
+      "types": "q16@0:8"
+    },
+    {
+      "cls": "FindFriendEntryViewController",
+      "kind": "instance",
+      "selector": "badgeAtMomentCell",
+      "address": "0x101b50da0",
+      "end": "0x101b50dc0",
+      "types": "B16@0:8"
+    },
+    {
+      "cls": "FindFriendEntryViewController",
+      "kind": "instance",
+      "selector": "viewWillAppear:",
+      "address": "0x101b53124",
+      "end": "0x101b53ef0",
+      "types": "v20@0:8B16"
+    },
+    {
+      "cls": "FindFriendEntryViewController",
+      "kind": "instance",
+      "selector": "updateWCTimeLineView:",
+      "address": "0x101b5e490",
+      "end": "0x101b5f3cc",
+      "types": "v24@0:8@16"
+    },
+    {
+      "cls": "FindFriendEntryViewController",
+      "kind": "instance",
+      "selector": "onReveiceWCMessage:",
+      "address": "0x101b5f8a4",
+      "end": "0x101b5f9a8",
+      "types": "v24@0:8@16"
+    },
+    {
+      "cls": "FindFriendEntryViewController",
+      "kind": "instance",
+      "selector": "onMessageUnReadCountChanged",
+      "address": "0x101b5f9a8",
+      "end": "0x101b5fa6c",
+      "types": "v16@0:8"
+    }
+  ]
+}

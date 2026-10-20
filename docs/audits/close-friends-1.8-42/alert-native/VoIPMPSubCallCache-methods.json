@@ -1,0 +1,178 @@
+[
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "initWithInviteMsg:messageWrap:",
+    "address": "0x10616771c",
+    "end": "0x1061677c0",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "description",
+    "address": "0x1061677c0",
+    "end": "0x1061678d4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "voIPMonoMsgWithType:",
+    "address": "0x1061678d4",
+    "end": "0x106167b6c",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "inviteMultiTalkMonoMsg",
+    "address": "0x106167b6c",
+    "end": "0x106167d98",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "cancelMultiTalkMonoMsg",
+    "address": "0x106167d98",
+    "end": "0x106167fc4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "inviteMonoMsg",
+    "address": "0x106167fc4",
+    "end": "0x10616802c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "cancelMonoMsg",
+    "address": "0x10616802c",
+    "end": "0x106168094",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "inviteMsg",
+    "address": "0x106168094",
+    "end": "0x10616809c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "setInviteMsg:",
+    "address": "0x10616809c",
+    "end": "0x1061680a8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "inviteMessageWrap",
+    "address": "0x1061680a8",
+    "end": "0x1061680b0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "setInviteMessageWrap:",
+    "address": "0x1061680b0",
+    "end": "0x1061680bc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "inviteInfo",
+    "address": "0x1061680bc",
+    "end": "0x1061680c4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "setInviteInfo:",
+    "address": "0x1061680c4",
+    "end": "0x1061680d0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "inviteType",
+    "address": "0x1061680d0",
+    "end": "0x1061680d8",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "setInviteType:",
+    "address": "0x1061680d8",
+    "end": "0x1061680e0",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "data",
+    "address": "0x1061680e0",
+    "end": "0x1061680e8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "setData:",
+    "address": "0x1061680e8",
+    "end": "0x1061680f4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "isChangeToMultitalk",
+    "address": "0x1061680f4",
+    "end": "0x1061680fc",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "setIsChangeToMultitalk:",
+    "address": "0x1061680fc",
+    "end": "0x106168104",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "memberStatusMap",
+    "address": "0x106168104",
+    "end": "0x10616810c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": "setMemberStatusMap:",
+    "address": "0x10616810c",
+    "end": "0x106168114",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallCache",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x106168114",
+    "end": "0x106168168",
+    "types": "v16@0:8"
+  }
+]

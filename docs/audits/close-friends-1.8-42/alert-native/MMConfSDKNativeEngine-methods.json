@@ -1,0 +1,402 @@
+[
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "updateFrameOrientation:isFrontCamera:",
+    "address": "0x1060e5650",
+    "end": "0x1060e5740",
+    "types": "v28@0:8q16B24"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "getConfInst",
+    "address": "0x10291f0a4",
+    "end": "0x10291f0b0",
+    "types": "^{IWXConfService=^^?}16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "GetCPUCapacity",
+    "address": "0x10291f0b0",
+    "end": "0x10291f110",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "updateSessionKey:",
+    "address": "0x10291f110",
+    "end": "0x10291f2b0",
+    "types": "i24@0:8@16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "joinRoom:",
+    "address": "0x10291f2b0",
+    "end": "0x10291f444",
+    "types": "i24@0:8@16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "sendAudioData:delay:",
+    "address": "0x10291f444",
+    "end": "0x10291f594",
+    "types": "i28@0:8@16i24"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "sendProcessedAudioData:",
+    "address": "0x10291f594",
+    "end": "0x10291f6e4",
+    "types": "i24@0:8@16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "getAudioData:dataLength:",
+    "address": "0x10291f6e4",
+    "end": "0x10291f7a8",
+    "types": "i28@0:8*16i24"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "sendVideoData:dataLen:width:height:format:",
+    "address": "0x10291f7a8",
+    "end": "0x10291f89c",
+    "types": "i40@0:8*16i24i28i32i36"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "sendVideoData:",
+    "address": "0x10291f89c",
+    "end": "0x10291f958",
+    "types": "i24@0:8^{ImagePlane=iii^v[4^v][4q]}16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "getVoiceActivity:",
+    "address": "0x10291f958",
+    "end": "0x10291fa14",
+    "types": "i20@0:8i16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "SwitchAV:bOpenVideo:bScreenStatus:",
+    "address": "0x10291fa14",
+    "end": "0x10291fa30",
+    "types": "i28@0:8B16B20i24"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "SwitchAV:bOpenVideo:bScreenStatus:mainVideoType:subVideoType:",
+    "address": "0x10291fa30",
+    "end": "0x10291fb24",
+    "types": "i36@0:8B16B20i24i28i32"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "SwitchAudio:",
+    "address": "0x10291fb24",
+    "end": "0x10291fbe0",
+    "types": "i20@0:8B16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "setCmdData:data:",
+    "address": "0x10291fbe0",
+    "end": "0x10291fd10",
+    "types": "i28@0:8i16@20"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "setCmdData:dataPtr:dataLen:",
+    "address": "0x10291fd10",
+    "end": "0x10291fdf8",
+    "types": "i32@0:8i16*20i28"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "getAudDevFmtParam:rec_channels:play_sample_rate:play_channels:framelen_ms:pcmfmt:",
+    "address": "0x10291fdf8",
+    "end": "0x10291fef4",
+    "types": "i64@0:8^i16^i24^i32^i40^i48^i56"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "onNetworkChanged:",
+    "address": "0x10291fef4",
+    "end": "0x1029200f8",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "exitRoom:",
+    "address": "0x1029200f8",
+    "end": "0x1029201f4",
+    "types": "i20@0:8i16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "hangup:isSubCall:",
+    "address": "0x1029201f4",
+    "end": "0x1029202fc",
+    "types": "i24@0:8i16B20"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "hangup:",
+    "address": "0x1029202fc",
+    "end": "0x10292030c",
+    "types": "i20@0:8i16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "hangup:roomID:",
+    "address": "0x10292030c",
+    "end": "0x102920414",
+    "types": "i28@0:8i16Q20"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "uninit",
+    "address": "0x102920414",
+    "end": "0x102920508",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "subScribeVideoAndResList:screenMembers:",
+    "address": "0x102920508",
+    "end": "0x1029206dc",
+    "types": "i32@0:8@16@24"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "invite:roomType:wxGroupId:token:netType:muteVideo:appId:subAppId:inviteId:",
+    "address": "0x1029206dc",
+    "end": "0x102920900",
+    "types": "i76@0:8@16i24@28@36i44B48@52@60Q68"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "addmember:roomType:wxGroupId:token:netType:inviteId:",
+    "address": "0x102920900",
+    "end": "0x102920ab8",
+    "types": "i56@0:8@16i24@28@36i44Q48"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "ack",
+    "address": "0x102920ab8",
+    "end": "0x102920ae4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "recvNotify:datalen:netType:notifyFrom:",
+    "address": "0x102920ae4",
+    "end": "0x102920c34",
+    "types": "i36@0:8r*16i24i28i32"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "accept:",
+    "address": "0x102920c34",
+    "end": "0x102920c74",
+    "types": "i20@0:8B16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "imageConvert:dstImg:",
+    "address": "0x102920c74",
+    "end": "0x102920cb8",
+    "types": "i32@0:8^v16^v24"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "reportInfo:len:",
+    "address": "0x102920cb8",
+    "end": "0x102920cfc",
+    "types": "i28@0:8r*16i24"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "getProxyInfo",
+    "address": "0x102920cfc",
+    "end": "0x102921158",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "generateGlobalConfig",
+    "address": "0x102921158",
+    "end": "0x1029216a4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "buildDefaultVideoConfig",
+    "address": "0x1029216a4",
+    "end": "0x102921708",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "useDoubleLink",
+    "address": "0x102921708",
+    "end": "0x1029217f0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "setAppInfo:",
+    "address": "0x1029217f0",
+    "end": "0x102921a20",
+    "types": "i24@0:8@16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "setProxyInfo",
+    "address": "0x102921a20",
+    "end": "0x102921b84",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "initEngine:nCallback:",
+    "address": "0x102921b84",
+    "end": "0x102921cf8",
+    "types": "i32@0:8@16^{IWXConfCallback=^^?}24"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "startPulish:",
+    "address": "0x102921cf8",
+    "end": "0x102921dd8",
+    "types": "i24@0:8@16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "stopPulish",
+    "address": "0x102921dd8",
+    "end": "0x102921e04",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "sendCmdMsg:data:",
+    "address": "0x102921e04",
+    "end": "0x102921efc",
+    "types": "v28@0:8i16@20"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "sendCmdMsgData:",
+    "address": "0x102921efc",
+    "end": "0x102921ff0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "sendResponse:errCode:taskid:",
+    "address": "0x102921ff0",
+    "end": "0x102922098",
+    "types": "i32@0:8@16i24I28"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "stat:withUserInfo:",
+    "address": "0x102922098",
+    "end": "0x102922828",
+    "types": "v32@0:8Q16@24"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "hasCall",
+    "address": "0x102922828",
+    "end": "0x102922854",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "initConfServiceShared",
+    "address": "0x102922854",
+    "end": "0x102922b30",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "setCallback:subAppId:callback:",
+    "address": "0x102922b30",
+    "end": "0x102922c54",
+    "types": "i40@0:8@16@24^{IWXConfCallback=^^?}32"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "configureEngineFeatureSwitch:",
+    "address": "0x102922c54",
+    "end": "0x102922cb0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "setupVoIPModelDirectory",
+    "address": "0x102922cb0",
+    "end": "0x102922d80",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMConfSDKNativeEngine",
+    "kind": "class",
+    "selector": "configureJBM3ParamsForBusiness:",
+    "address": "0x102922d80",
+    "end": "0x102922fac",
+    "types": "v24@0:8@16"
+  }
+]

@@ -1,0 +1,75 @@
+[
+  {
+    "command": [
+      "bash",
+      "Tests/verify-close-friend-core.sh"
+    ],
+    "exit_code": 0,
+    "seconds": 1.2,
+    "log": "logs/verify-close-friend-core.log"
+  },
+  {
+    "command": [
+      "bash",
+      "Tests/verify-close-friend-runtime.sh"
+    ],
+    "exit_code": 0,
+    "seconds": 3.73,
+    "log": "logs/verify-close-friend-runtime.log"
+  },
+  {
+    "command": [
+      "bash",
+      "Tests/verify-close-friend-session.sh"
+    ],
+    "exit_code": 0,
+    "seconds": 2.5,
+    "log": "logs/verify-close-friend-session.log"
+  },
+  {
+    "command": [
+      "bash",
+      "Tests/verify-close-friend-contacts.sh"
+    ],
+    "exit_code": 0,
+    "seconds": 0.78,
+    "log": "logs/verify-close-friend-contacts.log"
+  },
+  {
+    "command": [
+      "bash",
+      "Tests/verify-close-friend-social.sh"
+    ],
+    "exit_code": 0,
+    "seconds": 1.08,
+    "log": "logs/verify-close-friend-social.log"
+  },
+  {
+    "command": [
+      "bash",
+      "Tests/verify-close-friend-alerts.sh"
+    ],
+    "exit_code": 0,
+    "seconds": 1.46,
+    "log": "logs/verify-close-friend-alerts.log"
+  },
+  {
+    "command": [
+      "bash",
+      "Tests/verify-plugin-framework.sh"
+    ],
+    "exit_code": 0,
+    "seconds": 1.02,
+    "log": "logs/verify-plugin-framework.log"
+  },
+  {
+    "command": [
+      "bash",
+      "Tests/verify-payment-core.sh",
+      "--privacy"
+    ],
+    "exit_code": 0,
+    "seconds": 1.28,
+    "log": "logs/verify-payment-core.log"
+  }
+]

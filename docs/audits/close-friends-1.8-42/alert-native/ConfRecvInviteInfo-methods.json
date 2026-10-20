@@ -1,0 +1,34 @@
+[
+  {
+    "cls": "ConfRecvInviteInfo",
+    "kind": "instance",
+    "selector": "voIPMonoMsgWithType:scene:",
+    "address": "0x100bdb980",
+    "end": "0x100bdbb18",
+    "types": "@24@0:8I16I20"
+  },
+  {
+    "cls": "ConfRecvInviteInfo",
+    "kind": "instance",
+    "selector": "inviteVoIPMonoMsg:",
+    "address": "0x100bdbb18",
+    "end": "0x100bdbb2c",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "ConfRecvInviteInfo",
+    "kind": "instance",
+    "selector": "cancelVoIPMonoMsg:",
+    "address": "0x100bdbb2c",
+    "end": "0x100bdbb40",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "ConfRecvInviteInfo",
+    "kind": "class",
+    "selector": "initialize",
+    "address": "0x10aa69858",
+    "end": "0x10aa69878",
+    "types": "v16@0:8"
+  }
+]

@@ -1,0 +1,2312 @@
+[
+  {
+    "class": "WCCommentListViewController",
+    "name": "_tableView",
+    "type": "@\"MMTableView\"",
+    "offset": 112,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_footerView",
+    "type": "@\"WCTimeLineFooterView\"",
+    "offset": 120,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_arrCommentList",
+    "type": "@\"NSMutableArray\"",
+    "offset": 128,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_dicDataItems",
+    "type": "@\"NSMutableDictionary\"",
+    "offset": 136,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_arrCommentListFromDB",
+    "type": "@\"NSMutableArray\"",
+    "offset": 144,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_autoGetMoreCount",
+    "type": "I",
+    "offset": 152,
+    "size": 4
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_bUnreadOnly",
+    "type": "B",
+    "offset": 156,
+    "size": 1
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_bHasNullIDs",
+    "type": "B",
+    "offset": 157,
+    "size": 1
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_bHasMoreItems",
+    "type": "B",
+    "offset": 158,
+    "size": 1
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_dicCells",
+    "type": "@\"NSMutableDictionary\"",
+    "offset": 160,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_dicCellHeights",
+    "type": "@\"NSMutableDictionary\"",
+    "offset": 168,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_fromScene",
+    "type": "I",
+    "offset": 176,
+    "size": 4
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_totalUnreadCount",
+    "type": "I",
+    "offset": 180,
+    "size": 4
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_clickLikeCount",
+    "type": "I",
+    "offset": 184,
+    "size": 4
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_clickCommentCount",
+    "type": "I",
+    "offset": 188,
+    "size": 4
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_totalBrowseTime",
+    "type": "Q",
+    "offset": 192,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_statTimeHelper",
+    "type": "@\"WCStatTimerHelper\"",
+    "offset": 200,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "updatingItemIDs",
+    "type": "@\"NSMutableSet\"",
+    "offset": 208,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_enterStartTime",
+    "type": "Q",
+    "offset": 216,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_clickArray",
+    "type": "@\"NSMutableDictionary\"",
+    "offset": 224,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_shouldShowMessagesByRelevance",
+    "type": "B",
+    "offset": 232,
+    "size": 1
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_isMutualFriendsInteractionReminderEnabled",
+    "type": "B",
+    "offset": 233,
+    "size": 1
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_isClickClearMsg",
+    "type": "B",
+    "offset": 234,
+    "size": 1
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_isNewMessageMuteTipsEnabled",
+    "type": "B",
+    "offset": 235,
+    "size": 1
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_shouldShowMuteTips",
+    "type": "B",
+    "offset": 236,
+    "size": 1
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_pageContext",
+    "type": "@\"WCMomentsPageContext\"",
+    "offset": 240,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_delegate",
+    "type": "@\"<WCCommentListManageDelegate>\"",
+    "offset": 248,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_commentEmotionView",
+    "type": "@\"WCCommentEmotionFloatView\"",
+    "offset": 256,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_commentEmotionBgView",
+    "type": "@\"UIView\"",
+    "offset": 264,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_selectedMessage",
+    "type": "@\"WCSNSMessage\"",
+    "offset": 272,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_selectedImageView",
+    "type": "@\"WCImageView\"",
+    "offset": 280,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_updatedItemIds",
+    "type": "@\"NSMutableSet\"",
+    "offset": 288,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_deletedItemIds",
+    "type": "@\"NSMutableSet\"",
+    "offset": 296,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_triggleMuteTipsItemId",
+    "type": "@\"NSString\"",
+    "offset": 304,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_commentListTipsView",
+    "type": "@\"WCCommentListTipsView\"",
+    "offset": 312,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_clickEmoCmtCount",
+    "type": "q",
+    "offset": 320,
+    "size": 8
+  },
+  {
+    "class": "WCCommentListViewController",
+    "name": "_clickPicCmtCount",
+    "type": "q",
+    "offset": 328,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_isReflashingHead",
+    "type": "B",
+    "offset": 112,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_isDelayStopFooterLoading",
+    "type": "B",
+    "offset": 113,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_bTapHeaderView",
+    "type": "B",
+    "offset": 114,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_bLongPressRightButton",
+    "type": "B",
+    "offset": 115,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_hasSpeedyLoadView",
+    "type": "B",
+    "offset": 116,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_shouldReloadData",
+    "type": "B",
+    "offset": 117,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_shouldForbidRealodData",
+    "type": "B",
+    "offset": 118,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_arrUploadFailItems",
+    "type": "@\"NSArray\"",
+    "offset": 120,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_arrCommentFailItems",
+    "type": "@\"NSArray\"",
+    "offset": 128,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_arrLikeFailItems",
+    "type": "@\"NSArray\"",
+    "offset": 136,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_arrFailureCancelLikeItems",
+    "type": "@\"NSArray\"",
+    "offset": 144,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_SightFoldItem",
+    "type": "@\"WCDataItem\"",
+    "offset": 152,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_ImageFoldItem",
+    "type": "@\"WCDataItem\"",
+    "offset": 160,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_userName",
+    "type": "@\"NSString\"",
+    "offset": 168,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_hasBeginTimeline",
+    "type": "B",
+    "offset": 176,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_lastWCCanvasContentHeight",
+    "type": "d",
+    "offset": 184,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_hasDataSourceChanged",
+    "type": "B",
+    "offset": 192,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_oldBlackList",
+    "type": "B",
+    "offset": 193,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "m_sectionIndexToType",
+    "type": "{map<long, mmsns::TimeLineSectionType, std::less<long>, std::allocator<std::pair<const long, mmsns::TimeLineSectionType>>>=\"__tree_\"{__tree<std::__value_type<long, mmsns::TimeLineSectionType>, std::__map_value_compare<long, std::__value_type<long, mmsns::TimeLineSectionType>, std::less<long>>, std::allocator<std::__value_type<long, mmsns::TimeLineSectionType>>>=\"__begin_node_\"^v\"__end_node_\"{__tree_end_node<std::__tree_node_base<void *> *>=\"__left_\"^v}\"__size_\"Q}}",
+    "offset": 200,
+    "size": 24
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_isStayInPage",
+    "type": "B",
+    "offset": 224,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_hasOpenedWebViewUseFastLoad",
+    "type": "B",
+    "offset": 225,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_hasInvokeFastLoadPVBiz",
+    "type": "B",
+    "offset": 226,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_setFastLoadTemplateType",
+    "type": "@\"NSMutableSet\"",
+    "offset": 232,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_isFirstEntering",
+    "type": "B",
+    "offset": 240,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_hasNewPhotoWhenEnter",
+    "type": "B",
+    "offset": 241,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_hasRefrashHead",
+    "type": "B",
+    "offset": 242,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_openPostActionDirectly",
+    "type": "B",
+    "offset": 243,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_postTextDirectly",
+    "type": "B",
+    "offset": 244,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_isEnhanceInteractionEnabled",
+    "type": "B",
+    "offset": 245,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_canReload",
+    "type": "B",
+    "offset": 246,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_startReload",
+    "type": "B",
+    "offset": 247,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_isScrolling",
+    "type": "B",
+    "offset": 248,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_isScrollBouncingOnBottom",
+    "type": "B",
+    "offset": 249,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_isActionAtAd",
+    "type": "B",
+    "offset": 250,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_canShowFinderShareButton",
+    "type": "B",
+    "offset": 251,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_canShowNewLifeShareButton",
+    "type": "B",
+    "offset": 252,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_isViewDidAppear",
+    "type": "B",
+    "offset": 253,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_canLogDataList",
+    "type": "B",
+    "offset": 254,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_isReloadingData",
+    "type": "B",
+    "offset": 255,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_bInvalidateCacheAsLimitModeChanged",
+    "type": "B",
+    "offset": 256,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_isCoverNewVersion",
+    "type": "B",
+    "offset": 257,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_isModeTall",
+    "type": "B",
+    "offset": 258,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_hasChangedFoldedState",
+    "type": "B",
+    "offset": 259,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_isModifyingStarStatus",
+    "type": "B",
+    "offset": 260,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_isStaysAtFirstPageWhenLeaving",
+    "type": "B",
+    "offset": 261,
+    "size": 1
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_togetherTailReporter",
+    "type": "@\"WCTogetherTailReporter\"",
+    "offset": 264,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_tigerReporter",
+    "type": "@\"WCMomentsTigerReporter\"",
+    "offset": 272,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_delegate",
+    "type": "@\"<WCTimeLineViewControllerDelegate>\"",
+    "offset": 280,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_redDotInfoStr",
+    "type": "@\"NSString\"",
+    "offset": 288,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_postingViewModel",
+    "type": "@\"WCMomentsPostShareBaseViewModel\"",
+    "offset": 296,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_headRefreshView",
+    "type": "@\"WCTimeLineHeaderView\"",
+    "offset": 304,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_footerView",
+    "type": "@\"WCTimeLineFooterView\"",
+    "offset": 312,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_headerView",
+    "type": "@\"WCListHeaderView\"",
+    "offset": 320,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_introView",
+    "type": "@\"MMTipsViewController\"",
+    "offset": 328,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_messageTipView",
+    "type": "@\"UIButton\"",
+    "offset": 336,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_messageHeaderView",
+    "type": "@\"MMHeadImageView\"",
+    "offset": 344,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_floatOperateView",
+    "type": "@\"WCOperateFloatView\"",
+    "offset": 352,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_plainTextFullScreenView",
+    "type": "@\"WCPlainTextTipFullScreenView\"",
+    "offset": 360,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_messageTipCount",
+    "type": "q",
+    "offset": 368,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_messageTipUserName",
+    "type": "@\"NSString\"",
+    "offset": 376,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_cacheDateItem",
+    "type": "@\"WCDataItem\"",
+    "offset": 384,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_animationView",
+    "type": "@\"UIView\"",
+    "offset": 392,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_atContact",
+    "type": "@\"CContact\"",
+    "offset": 400,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_pastelogic",
+    "type": "@\"WCPasteTextLengthLogic\"",
+    "offset": 408,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_postReportSession",
+    "type": "@\"WCMomentsPostReportSession\"",
+    "offset": 416,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_minimumVideoDurationForFinderShare",
+    "type": "d",
+    "offset": 424,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_minimumImageCountForFinderShare",
+    "type": "q",
+    "offset": 432,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_alwaysAllowsImagesWithPOIForFinderShare",
+    "type": "q",
+    "offset": 440,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_finderShareTips",
+    "type": "@\"NSString\"",
+    "offset": 448,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_reEditButton",
+    "type": "@\"UIButton\"",
+    "offset": 456,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_reEditTipButton",
+    "type": "@\"UIButton\"",
+    "offset": 464,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_redditItemPlaceHolder",
+    "type": "@\"WCDataItem\"",
+    "offset": 472,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_commentEmotionBgView",
+    "type": "@\"UIView\"",
+    "offset": 480,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_commentEmotionView",
+    "type": "@\"WCCommentEmotionFloatView\"",
+    "offset": 488,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_commentEmotionReportDict",
+    "type": "@\"NSMutableDictionary\"",
+    "offset": 496,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_sharePreConfirmSheetView",
+    "type": "@\"SharePreConfirmSheetView\"",
+    "offset": 504,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_latestAutoplayVideoTid",
+    "type": "@\"NSString\"",
+    "offset": 512,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_videoPreloadMgr",
+    "type": "@\"WCTimeLineVideoPreloadMgr\"",
+    "offset": 520,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_jumpItem",
+    "type": "@\"WCDataItem\"",
+    "offset": 528,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_headViewForJumpState",
+    "type": "@\"WCTimeLineFooterView\"",
+    "offset": 536,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_missReadItemIdToJump",
+    "type": "@\"NSString\"",
+    "offset": 544,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_missReadItem",
+    "type": "@\"WCDataItem\"",
+    "offset": 552,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_adFeedbackView",
+    "type": "@\"WCAdvertiseFeedbackBaseView\"",
+    "offset": 560,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_floatViewPageWrap",
+    "type": "@\"WCADPageWrap\"",
+    "offset": 568,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_adReloadIndexPaths",
+    "type": "@\"NSMutableArray\"",
+    "offset": 576,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_adInitIndexPaths",
+    "type": "@\"NSMutableArray\"",
+    "offset": 584,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_advertiseActionFloatView",
+    "type": "@\"WCAdvertiseActionFloatView\"",
+    "offset": 592,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_fpsLabel",
+    "type": "@\"WCTimelineFPSLabel\"",
+    "offset": 600,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_fpsMonitor",
+    "type": "@\"WCTimelineFPSMonitor\"",
+    "offset": 608,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_scrollViewMonitor",
+    "type": "@\"WCScrollViewMonitor\"",
+    "offset": 616,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_listFrontView",
+    "type": "@\"MMUIButton\"",
+    "offset": 624,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_headerPanGestureRecognizer",
+    "type": "@\"UIPanGestureRecognizer\"",
+    "offset": 632,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_animateHelper",
+    "type": "@\"TLProfileDragAnimateHelper\"",
+    "offset": 640,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_expandableHeader",
+    "type": "@\"TLProfileExpandableHeaderView\"",
+    "offset": 648,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_profileContact",
+    "type": "@\"CContact\"",
+    "offset": 656,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_profileModel",
+    "type": "@\"TLProfileModel\"",
+    "offset": 664,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_coverActionReporter",
+    "type": "@\"WCCoverActionReporter\"",
+    "offset": 672,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_usingTemplateShareInfo",
+    "type": "@\"WCMomentsTemplateShareInfo\"",
+    "offset": 680,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_finderSnSShareLiveLogicController",
+    "type": "@\"WCFinderSnSShareLiveLogicController\"",
+    "offset": 688,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_dataControllers",
+    "type": "@\"NSMutableDictionary\"",
+    "offset": 696,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_shareScopeMgr",
+    "type": "@\"WCMomentsShareScopeMgr\"",
+    "offset": 704,
+    "size": 8
+  },
+  {
+    "class": "WCTimeLineViewController",
+    "name": "_deleteDataItemWrap",
+    "type": "@\"WCTimelineDeleteDataItemWrap\"",
+    "offset": 712,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_actionAreaWrapEnabled",
+    "type": "B",
+    "offset": 112,
+    "size": 1
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_dynamicTagEnabled",
+    "type": "B",
+    "offset": 113,
+    "size": 1
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_isStarBrowsingEnabled",
+    "type": "B",
+    "offset": 114,
+    "size": 1
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_shouldResumeInputState",
+    "type": "B",
+    "offset": 115,
+    "size": 1
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_isShowEmoticonSearchViewVC",
+    "type": "B",
+    "offset": 116,
+    "size": 1
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_isShowingCommentImageFullViewVC",
+    "type": "B",
+    "offset": 117,
+    "size": 1
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_hasAtFriendForAd",
+    "type": "B",
+    "offset": 118,
+    "size": 1
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_commentWordLimit",
+    "type": "I",
+    "offset": 120,
+    "size": 4
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_clickHandler",
+    "type": "@\"WCMomentsClickHandler\"",
+    "offset": 128,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_urlHandler",
+    "type": "@\"MMURLHandler\"",
+    "offset": 136,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_tableView",
+    "type": "@\"MMTableView\"",
+    "offset": 144,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_inputDataItem",
+    "type": "@\"WCDataItem\"",
+    "offset": 152,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_inputRefComment",
+    "type": "@\"WCUserComment\"",
+    "offset": 160,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_inputController",
+    "type": "@\"WCInputController\"",
+    "offset": 168,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_expressionButton",
+    "type": "@\"UIButton\"",
+    "offset": 176,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_remainWordCountLabel",
+    "type": "@\"MMUILabel\"",
+    "offset": 184,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_lastRemainWordCount",
+    "type": "q",
+    "offset": 192,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_backgroundView",
+    "type": "@\"UIView\"",
+    "offset": 200,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_inputToolView",
+    "type": "@\"UIImageView\"",
+    "offset": 208,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_emoticonBoardView",
+    "type": "@\"EmoticonBoardView\"",
+    "offset": 216,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_atButton",
+    "type": "@\"UIButton\"",
+    "offset": 224,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_growTextView",
+    "type": "@\"MMGrowTextView\"",
+    "offset": 232,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_growTextViewBackGroundView",
+    "type": "@\"UIView\"",
+    "offset": 240,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_previewingContext",
+    "type": "@\"<UIViewControllerPreviewing>\"",
+    "offset": 248,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_pageContext",
+    "type": "@\"WCMomentsPageContext\"",
+    "offset": 256,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_inputAreaReportInfo",
+    "type": "@\"WCMomentsInputAreaReportInfo\"",
+    "offset": 264,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_selectableRichTextCoverView",
+    "type": "@\"MMSnsRichTextCoverView\"",
+    "offset": 272,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_selectableRichTextView",
+    "type": "@\"RichTextView\"",
+    "offset": 280,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_selectableDataItem",
+    "type": "@\"WCDataItem\"",
+    "offset": 288,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_selectableCellView",
+    "type": "@\"WCTimeLineCellView\"",
+    "offset": 296,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_selectableMenuResponder",
+    "type": "@\"MMRTCSnsMenuResponder\"",
+    "offset": 304,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_cellHeightCache",
+    "type": "@\"NSMutableDictionary\"",
+    "offset": 312,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_cellShowItemCache",
+    "type": "@\"NSMutableDictionary\"",
+    "offset": 320,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_hasPredownload",
+    "type": "@\"NSMutableDictionary\"",
+    "offset": 328,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_focusedCellMatchingMode",
+    "type": "q",
+    "offset": 336,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_videoAutoPlayType",
+    "type": "q",
+    "offset": 344,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_pictureButton",
+    "type": "@\"UIButton\"",
+    "offset": 352,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_commentImageView",
+    "type": "@\"MMWebImageView\"",
+    "offset": 360,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_commentImageDeleteButton",
+    "type": "@\"MMUIButton\"",
+    "offset": 368,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_emoticonWrap",
+    "type": "@\"CEmoticonWrap\"",
+    "offset": 376,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_selectedImage",
+    "type": "@\"MMImage\"",
+    "offset": 384,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_commentImageHelper",
+    "type": "@\"WCCommentImageHelper\"",
+    "offset": 392,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_bubSelectionType",
+    "type": "q",
+    "offset": 400,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_bigEmoticonAddHelper",
+    "type": "@\"WCCommentBigEmoticonAddHelper\"",
+    "offset": 408,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_emoticonBoardPid",
+    "type": "@\"NSString\"",
+    "offset": 416,
+    "size": 8
+  },
+  {
+    "class": "WCBaseTimelineViewController",
+    "name": "_userScrollingVelocity",
+    "type": "{CGPoint=\"x\"d\"y\"d}",
+    "offset": 424,
+    "size": 16
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_hasRedDot",
+    "type": "B",
+    "offset": 112,
+    "size": 1
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_enableCustomTransition",
+    "type": "B",
+    "offset": 113,
+    "size": 1
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_needUpdateHistoryInfo",
+    "type": "B",
+    "offset": 114,
+    "size": 1
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_scene",
+    "type": "q",
+    "offset": 120,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_sessionId",
+    "type": "@\"NSString\"",
+    "offset": 128,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_sceneSessionId",
+    "type": "@\"NSString\"",
+    "offset": 136,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_collectionView",
+    "type": "@\"UICollectionView\"",
+    "offset": 144,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_collectionViewLayout",
+    "type": "@\"UICollectionViewFlowLayout\"",
+    "offset": 152,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_noFriendView",
+    "type": "@\"UIView\"",
+    "offset": 160,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_loadingIndicatorView",
+    "type": "@\"MMUIActivityIndicatorView\"",
+    "offset": 168,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_cacheCheckTimer",
+    "type": "@\"MMTimer\"",
+    "offset": 176,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_friendTopicList",
+    "type": "@\"NSMutableArray\"",
+    "offset": 184,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_usernameList",
+    "type": "@\"NSMutableArray\"",
+    "offset": 192,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_usernameToTextStateListDict",
+    "type": "@\"NSMutableDictionary\"",
+    "offset": 200,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_enterTime",
+    "type": "Q",
+    "offset": 208,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_beginIndex",
+    "type": "Q",
+    "offset": 216,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_clusterPresentType",
+    "type": "@\"NSString\"",
+    "offset": 224,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_ownTopicId",
+    "type": "@\"NSString\"",
+    "offset": 232,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_unfoldTopicSet",
+    "type": "@\"NSMutableSet\"",
+    "offset": 240,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_itemNumberPerRow",
+    "type": "Q",
+    "offset": 248,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_tapGesture",
+    "type": "@\"UITapGestureRecognizer\"",
+    "offset": 256,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_transition",
+    "type": "@\"_TtC6WeChat31TextStateFriendSquareTransition\"",
+    "offset": 264,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_messageBoxInfo",
+    "type": "@\"TextStateMessageBoxInfo\"",
+    "offset": 272,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_cardListViewController",
+    "type": "@\"TextStateCardListViewController\"",
+    "offset": 280,
+    "size": 8
+  },
+  {
+    "class": "TextStateFriendSquareViewController",
+    "name": "_mixHeaderCell",
+    "type": "@\"_TtC6WeChat42TextStateSquareMixHeaderCollectionViewCell\"",
+    "offset": 288,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "m_cpKeyForContent",
+    "type": "@\"NSString\"",
+    "offset": 8,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "m_cpKeyForLikeUsers",
+    "type": "@\"NSString\"",
+    "offset": 16,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "m_isContentUnsafe",
+    "type": "B",
+    "offset": 24,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "m_isLikeUsersUnsafe",
+    "type": "B",
+    "offset": 25,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "hash",
+    "type": "I",
+    "offset": 28,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_extBean",
+    "type": "@\"WCTimelineExtBean\"",
+    "offset": 32,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "noChange",
+    "type": "B",
+    "offset": 40,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_isBidirectionalFan",
+    "type": "B",
+    "offset": 41,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_likeFlag",
+    "type": "B",
+    "offset": 42,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_isRichText",
+    "type": "B",
+    "offset": 43,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_isSecurityVerified",
+    "type": "B",
+    "offset": 44,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_shouldErrorIgnoreForSpam",
+    "type": "B",
+    "offset": 45,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_isHiddenAdvertiseActionFloatTipView",
+    "type": "B",
+    "offset": 46,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_isNewDataSeparator",
+    "type": "B",
+    "offset": 47,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_isEarlierContentTipsItem",
+    "type": "B",
+    "offset": 48,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_canEditAfterDeleted",
+    "type": "B",
+    "offset": 49,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_reEditPlaceOnFirst",
+    "type": "B",
+    "offset": 50,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_isWeiShang",
+    "type": "B",
+    "offset": 51,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_isWsPlaceHolder",
+    "type": "B",
+    "offset": 52,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_isFromFav",
+    "type": "B",
+    "offset": 53,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_isStarred",
+    "type": "B",
+    "offset": 54,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_hasUpdateCommentUsers",
+    "type": "B",
+    "offset": 55,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_isPrivate",
+    "type": "B",
+    "offset": 56,
+    "size": 1
+  },
+  {
+    "class": "WCDataItem",
+    "name": "contentAttributeBitSetFlag",
+    "type": "I",
+    "offset": 60,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_cid",
+    "type": "i",
+    "offset": 64,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_type",
+    "type": "i",
+    "offset": 68,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_flag",
+    "type": "i",
+    "offset": 72,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_createtime",
+    "type": "I",
+    "offset": 76,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_contentDescShowType",
+    "type": "i",
+    "offset": 80,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_contentDescScene",
+    "type": "i",
+    "offset": 84,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_likeCount",
+    "type": "i",
+    "offset": 88,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_commentCount",
+    "type": "i",
+    "offset": 92,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_withCount",
+    "type": "i",
+    "offset": 96,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_togetherCount",
+    "type": "i",
+    "offset": 100,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_uploadErrType",
+    "type": "i",
+    "offset": 104,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_visibiltyType",
+    "type": "I",
+    "offset": 108,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_extFlag",
+    "type": "I",
+    "offset": 112,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_realLikeCount",
+    "type": "i",
+    "offset": 116,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_realCommentCount",
+    "type": "i",
+    "offset": 120,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_selfLikeCount",
+    "type": "i",
+    "offset": 124,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_selfCommentCount",
+    "type": "i",
+    "offset": 128,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_sightFolded",
+    "type": "i",
+    "offset": 132,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_showFlag",
+    "type": "i",
+    "offset": 136,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_sessionActionType",
+    "type": "i",
+    "offset": 140,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_favLocalId",
+    "type": "I",
+    "offset": 144,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_starGuidingFlags",
+    "type": "I",
+    "offset": 148,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_finderSharingFlags",
+    "type": "I",
+    "offset": 152,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_newlifeSharingFlags",
+    "type": "I",
+    "offset": 156,
+    "size": 4
+  },
+  {
+    "class": "WCDataItem",
+    "name": "blackUsers",
+    "type": "@\"NSArray\"",
+    "offset": 160,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "contentDescPattern",
+    "type": "@\"NSString\"",
+    "offset": 168,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "snsWeAppInfo",
+    "type": "@\"SnsWeAppInfo\"",
+    "offset": 176,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "visibleUsers",
+    "type": "@\"NSArray\"",
+    "offset": 184,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_tid",
+    "type": "@\"NSString\"",
+    "offset": 192,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_username",
+    "type": "@\"NSString\"",
+    "offset": 200,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_nickname",
+    "type": "@\"NSString\"",
+    "offset": 208,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_sourceUrl",
+    "type": "@\"NSString\"",
+    "offset": 216,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_sourceUrl2",
+    "type": "@\"NSString\"",
+    "offset": 224,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_extData",
+    "type": "@\"NSMutableDictionary\"",
+    "offset": 232,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_contentObj",
+    "type": "@\"WCContentItem\"",
+    "offset": 240,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_appInfo",
+    "type": "@\"WCAppInfo\"",
+    "offset": 248,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_publicUserName",
+    "type": "@\"NSString\"",
+    "offset": 256,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_publicPhotoAccountUserName",
+    "type": "@\"NSString\"",
+    "offset": 264,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_publicPhotoAccountNickName",
+    "type": "@\"NSString\"",
+    "offset": 272,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_sourceUserName",
+    "type": "@\"NSString\"",
+    "offset": 280,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_publicFinderUserName",
+    "type": "@\"NSString\"",
+    "offset": 288,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_publicBrandContactType",
+    "type": "q",
+    "offset": 296,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_snsCoverOffset",
+    "type": "q",
+    "offset": 304,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_bgmInfo",
+    "type": "@\"WCBgmInfo\"",
+    "offset": 312,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_sourceNickName",
+    "type": "@\"NSString\"",
+    "offset": 320,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_contentDesc",
+    "type": "@\"NSString\"",
+    "offset": 328,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_actionInfo",
+    "type": "@\"WCActionInfo\"",
+    "offset": 336,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_musicInfo",
+    "type": "@\"WCMusicInfo\"",
+    "offset": 344,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_streamVideoInfo",
+    "type": "@\"WCStreamVideoInfo\"",
+    "offset": 352,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_redEnvelopesInfo",
+    "type": "@\"WCRedEnvelopesInfo\"",
+    "offset": 360,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_redEnvelopesRewardInfo",
+    "type": "@\"WCRedEnvelopesRewardInfo\"",
+    "offset": 368,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_weappInfo",
+    "type": "@\"WCWeAppInfo\"",
+    "offset": 376,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_liteappInfo",
+    "type": "@\"WCLiteAppInfo\"",
+    "offset": 384,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_gameShareCardInfo",
+    "type": "@\"WCGameShareCardInfo\"",
+    "offset": 392,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_likeUsers",
+    "type": "@\"NSMutableArray\"",
+    "offset": 400,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_commentUsers",
+    "type": "@\"NSMutableArray\"",
+    "offset": 408,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_withUsers",
+    "type": "@\"NSMutableArray\"",
+    "offset": 416,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_togetherUsers",
+    "type": "@\"NSMutableArray\"",
+    "offset": 424,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_uploadErrSnsTipsCode",
+    "type": "q",
+    "offset": 432,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_uploadErrMsg",
+    "type": "@\"NSString\"",
+    "offset": 440,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_uploadErrBtnUrl",
+    "type": "@\"NSString\"",
+    "offset": 448,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_uploadErrBtnTitle",
+    "type": "@\"NSString\"",
+    "offset": 456,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_uploadErrTogetherUsernames",
+    "type": "@\"NSArray\"",
+    "offset": 464,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_statisticsData",
+    "type": "@\"NSString\"",
+    "offset": 472,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_locationInfo",
+    "type": "@\"WCLocationInfo\"",
+    "offset": 480,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_groupContactTags",
+    "type": "@\"NSMutableArray\"",
+    "offset": 488,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_blackContactTags",
+    "type": "@\"NSMutableArray\"",
+    "offset": 496,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_interactUsers",
+    "type": "@\"NSArray\"",
+    "offset": 504,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_objOperation",
+    "type": "@\"WCObjectOperation\"",
+    "offset": 512,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_shareOriginUrl",
+    "type": "@\"NSString\"",
+    "offset": 520,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_shareOpenUrl",
+    "type": "@\"NSString\"",
+    "offset": 528,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_jsAppId",
+    "type": "@\"NSString\"",
+    "offset": 536,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_statParasDic",
+    "type": "@\"NSMutableDictionary\"",
+    "offset": 544,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_templateInfo",
+    "type": "@\"WCMomentsTemplateInfo\"",
+    "offset": 552,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_advertiseInfo",
+    "type": "@\"WCAdvertiseInfo\"",
+    "offset": 560,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_atFriendAdvertiseInfo",
+    "type": "@\"WCAdvertiseInfo\"",
+    "offset": 568,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_advertiseInfoNSCodingData",
+    "type": "@\"NSData\"",
+    "offset": 576,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_atFriendAdvertiseInfoNSCodingData",
+    "type": "@\"NSData\"",
+    "offset": 584,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_foldAdvertiseInfo",
+    "type": "@\"WCFoldSnsAdvertiseInfo\"",
+    "offset": 592,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_recommendInfo",
+    "type": "@\"WCRecommendInfo\"",
+    "offset": 600,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_statExtStr",
+    "type": "@\"NSString\"",
+    "offset": 608,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_canvasInfoXml",
+    "type": "@\"NSString\"",
+    "offset": 616,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_videoFlowInfo",
+    "type": "@\"WCVideoFlowInfo\"",
+    "offset": 624,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_draftID",
+    "type": "@\"NSString\"",
+    "offset": 632,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_sessionID",
+    "type": "@\"NSString\"",
+    "offset": 640,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_wsGroup",
+    "type": "@\"WCMicroMerchantFeedsGroup\"",
+    "offset": 648,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_wsSellerType",
+    "type": "q",
+    "offset": 656,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_wsFeedType",
+    "type": "q",
+    "offset": 664,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_wsVideoSourceType",
+    "type": "q",
+    "offset": 672,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_postTipsViewType",
+    "type": "q",
+    "offset": 680,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_picCmtCnt",
+    "type": "q",
+    "offset": 688,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_emoCmtCnt",
+    "type": "q",
+    "offset": 696,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_ybRetouch",
+    "type": "@\"NSString\"",
+    "offset": 704,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_placeholderType",
+    "type": "q",
+    "offset": 712,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_sharedGroupIDs",
+    "type": "@\"NSMutableArray\"",
+    "offset": 720,
+    "size": 8
+  },
+  {
+    "class": "WCDataItem",
+    "name": "_discoveryContentDesc",
+    "type": "@\"NSString\"",
+    "offset": 728,
+    "size": 8
+  }
+]

@@ -331,6 +331,13 @@
 - (void)doneButtonTapped {
     NSArray *selected = [[self.selectedUserNames allObjects] sortedArrayUsingSelector:@selector(compare:)];
     
+    if (self.completesAfterDismissal) {
+        WEContactSelectCompletion completion = self.completion;
+        [self dismissViewControllerAnimated:YES completion:^{
+            if (completion) completion(selected);
+        }];
+        return;
+    }
     if (self.completion) {
         self.completion(selected);
     }

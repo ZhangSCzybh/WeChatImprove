@@ -1,0 +1,314 @@
+[
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "isActive",
+    "address": "0x1061681e0",
+    "end": "0x10616821c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "isChangeToMultiTalkWithRoomID:",
+    "address": "0x10616821c",
+    "end": "0x106168488",
+    "types": "B24@0:8Q16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "clear",
+    "address": "0x106168488",
+    "end": "0x10616858c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "receiveInviteMsg:fromUsername:withMsgWrap:isMultiTalk:notifyFrom:",
+    "address": "0x10616858c",
+    "end": "0x1061693ac",
+    "types": "B48@0:8@16@24@32B40i44"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "receiveCancelInviteMsg:withMsgWrap:isMultiTalk:notifyFrom:",
+    "address": "0x1061693ac",
+    "end": "0x106169af4",
+    "types": "B40@0:8@16@24B32i36"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "receiveInviteData:",
+    "address": "0x106169af4",
+    "end": "0x10616a730",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "reject",
+    "address": "0x10616a730",
+    "end": "0x10616ac14",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "cancel",
+    "address": "0x10616ac14",
+    "end": "0x10616b148",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "tryToAccept",
+    "address": "0x10616b148",
+    "end": "0x10616b9b8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "fetchAndFillCurrentRoomInfoWithRoomIdPtr:RoomKeyPtr:ScenePtr:",
+    "address": "0x10616b9b8",
+    "end": "0x10616c37c",
+    "types": "v40@0:8^Q16^q24^Q32"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "genVoIPInvitationInfoWithMsg:Scene:NeedReport:",
+    "address": "0x10616c37c",
+    "end": "0x10616cef4",
+    "types": "@36@0:8@16Q24B32"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "acceptWithRoomID:",
+    "address": "0x10616cef4",
+    "end": "0x10616d31c",
+    "types": "B24@0:8Q16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "handleTalkSuccWithRoomID:",
+    "address": "0x10616d31c",
+    "end": "0x10616d850",
+    "types": "B24@0:8Q16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "handleMemberChangeWithRoomID:confMemberList:",
+    "address": "0x10616d850",
+    "end": "0x10616e268",
+    "types": "B32@0:8Q16@24"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "updateDisplayUserListWithConfMemberList:",
+    "address": "0x10616e2b8",
+    "end": "0x10616e748",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x10616e748",
+    "end": "0x10616e8a8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "onServiceClearData",
+    "address": "0x10616e8a8",
+    "end": "0x10616e8b4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgStartWithMsg:",
+    "address": "0x10616e8b4",
+    "end": "0x10616e9a0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgHandleWithMsg:",
+    "address": "0x10616e9a0",
+    "end": "0x10616ee50",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgRejectWithMsg:",
+    "address": "0x10616ee50",
+    "end": "0x10616f63c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgCancelWithMsg:",
+    "address": "0x10616f63c",
+    "end": "0x10616ff4c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "onMonoServiceMsgHoldWithMsg:",
+    "address": "0x10616ff4c",
+    "end": "0x106170040",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "mmConfSDKServiceOnReceiveEvent:errCode:data:ret:",
+    "address": "0x106170040",
+    "end": "0x10617057c",
+    "types": "v40@0:8i16i20@24@32"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "mmConfSDKServiceOnReceiveMainCallEndEvent",
+    "address": "0x10617057c",
+    "end": "0x1061706a8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "voIPConfSDKServiceOnReceiveEvent:errCode:data:ret:",
+    "address": "0x1061707fc",
+    "end": "0x106170d08",
+    "types": "v40@0:8i16i20@24@32"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "voIPConfSDKServiceOnReceiveMainCallEndEvent",
+    "address": "0x106170d08",
+    "end": "0x106170e34",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "voIPConfSDKServiceWillInterrputVoIPByCall:",
+    "address": "0x106170f88",
+    "end": "0x106170fd4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceWillAcceptWithInfo:",
+    "address": "0x106170fd4",
+    "end": "0x106171484",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "voIPInvitationServiceDidRejectWithInfo:",
+    "address": "0x106171484",
+    "end": "0x1061717d0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "cache",
+    "address": "0x1061717d0",
+    "end": "0x1061717e0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "setCache:",
+    "address": "0x1061717e0",
+    "end": "0x1061717f4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "isWaitingForAccept",
+    "address": "0x1061717f4",
+    "end": "0x106171804",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "setIsWaitingForAccept:",
+    "address": "0x106171804",
+    "end": "0x106171814",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "endingRoomID",
+    "address": "0x106171814",
+    "end": "0x106171824",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "setEndingRoomID:",
+    "address": "0x106171824",
+    "end": "0x106171834",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "handledInviteMsgs",
+    "address": "0x106171834",
+    "end": "0x106171844",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": "setHandledInviteMsgs:",
+    "address": "0x106171844",
+    "end": "0x106171858",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x106171858",
+    "end": "0x106171898",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "VoIPMPSubCallService",
+    "kind": "class",
+    "selector": "sharedInstance",
+    "address": "0x106168168",
+    "end": "0x1061681e0",
+    "types": "@16@0:8"
+  }
+]

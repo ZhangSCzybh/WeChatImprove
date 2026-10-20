@@ -1,0 +1,1218 @@
+[
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getGenearlPasteboard",
+    "address": "0x100139dec",
+    "end": "0x10013a1b0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getGenearlPasteboardString",
+    "address": "0x10013a270",
+    "end": "0x10013a38c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "setGenearlPasteboardMD5:",
+    "address": "0x10013a38c",
+    "end": "0x10013a39c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "setGenearlPasteboardString:",
+    "address": "0x10013a39c",
+    "end": "0x10013a6c4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "hasGeneralPasteboardString",
+    "address": "0x10013a6c4",
+    "end": "0x10013a734",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "hasGeneralPasteboardImage",
+    "address": "0x10013a734",
+    "end": "0x10013a780",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "hasGeneralPasteboardMultiMedia",
+    "address": "0x10013a780",
+    "end": "0x10013ae34",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isEqualToLastPasteboardString:",
+    "address": "0x10013ae34",
+    "end": "0x10013aee0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getMainController",
+    "address": "0x10013aee0",
+    "end": "0x10013af3c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "addEventObserverListItem:andValue:",
+    "address": "0x10013af3c",
+    "end": "0x10013afb4",
+    "types": "v28@0:8I16@20"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "removeEventObserverListItem:andValue:",
+    "address": "0x10013afb4",
+    "end": "0x10013b02c",
+    "types": "v28@0:8I16@20"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "removeEventObserverListItemByObject:",
+    "address": "0x10013b02c",
+    "end": "0x10013b09c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "addMessageObserverListItem:andValue:",
+    "address": "0x10013b09c",
+    "end": "0x10013b114",
+    "types": "v28@0:8I16@20"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "removeMessageObserverListItem:andValue:",
+    "address": "0x10013b114",
+    "end": "0x10013b18c",
+    "types": "v28@0:8I16@20"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "removeMessageObserverListItemByObject:",
+    "address": "0x10013b18c",
+    "end": "0x10013b1fc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "addMessageObserverListItemByList:andValue:",
+    "address": "0x10013b1fc",
+    "end": "0x10013b35c",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "removeMessageObserverListItemByList:andValue:",
+    "address": "0x10013b35c",
+    "end": "0x10013b4bc",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "addPBEventObserverListItem:andValue:",
+    "address": "0x10013b4bc",
+    "end": "0x10013b534",
+    "types": "v28@0:8I16@20"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "removePBEventObserverListItem:andValue:",
+    "address": "0x10013b534",
+    "end": "0x10013b5ac",
+    "types": "v28@0:8I16@20"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "removePBEventObserverListItemByObject:",
+    "address": "0x10013b5ac",
+    "end": "0x10013b61c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isLogin",
+    "address": "0x10013b61c",
+    "end": "0x10013b6b4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateFormatMonth:",
+    "address": "0x10013b6b4",
+    "end": "0x10013b6c4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateFormatMonth:dateStyle:",
+    "address": "0x10013b6c4",
+    "end": "0x10013ba6c",
+    "types": "@32@0:8@16Q24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genWCTimelineVideoTimeFormatByUInt:",
+    "address": "0x10013ba6c",
+    "end": "0x10013beec",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genWCTimeStringByUInt:atScene:",
+    "address": "0x10013beec",
+    "end": "0x10013c4b0",
+    "types": "@28@0:8I16Q20"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genWCTimeShortStringByUInt:",
+    "address": "0x10013c4b0",
+    "end": "0x10013c90c",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "updateLanguageForFormat:",
+    "address": "0x10013c90c",
+    "end": "0x10013ca78",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genWCLocalizeDayStringByDate:",
+    "address": "0x10013ca78",
+    "end": "0x10013cb28",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genWCLocalizeMonthStringByDate:",
+    "address": "0x10013cb28",
+    "end": "0x10013cbd8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genSimpleVideoTimeFormatByDuration:",
+    "address": "0x10013cbd8",
+    "end": "0x10013ccb8",
+    "types": "@24@0:8Q16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getAppNameByMsg:",
+    "address": "0x10013ccb8",
+    "end": "0x10013ce5c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getAppNameById:",
+    "address": "0x10013ce5c",
+    "end": "0x10013cf68",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "GetAppVerCompareWithLastRun",
+    "address": "0x10013cf68",
+    "end": "0x10013cfbc",
+    "types": "q16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getServiceAppItemCurrentLanguageAppName:",
+    "address": "0x10013cfbc",
+    "end": "0x10013d2d8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getServiceAppItemCurrentLanguageAppName:localStringKey:",
+    "address": "0x10013d2d8",
+    "end": "0x10013d760",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getCurrentLanguageAppName:",
+    "address": "0x10013d760",
+    "end": "0x10013da5c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isTwTraditionalChinaLanguageUser",
+    "address": "0x10013da5c",
+    "end": "0x10013db1c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isHkTraditionalChinaLanguageUser",
+    "address": "0x10013db1c",
+    "end": "0x10013dbdc",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isChinaLanguageUser",
+    "address": "0x10013dbdc",
+    "end": "0x10013dd2c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "uploadUpdateStatOpLog:",
+    "address": "0x10013dd2c",
+    "end": "0x10013de2c",
+    "types": "B20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getSecureUrl:from:isAppInstalled:",
+    "address": "0x10013de2c",
+    "end": "0x10013e690",
+    "types": "@36@0:8@16Q24B32"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "checkSavePhoto:",
+    "address": "0x10013e690",
+    "end": "0x10013e7b8",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getAppInstallUrl:from:",
+    "address": "0x10013e7b8",
+    "end": "0x10013e97c",
+    "types": "@32@0:8@16Q24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "addHtmlHrefForText:",
+    "address": "0x10013e97c",
+    "end": "0x10013ecf8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "GetEnabledNotificationSettingWithCompletionHandler:",
+    "address": "0x10013ecf8",
+    "end": "0x10013edfc",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getAppFromUrl:from:",
+    "address": "0x10013f11c",
+    "end": "0x10013f2e0",
+    "types": "@32@0:8@16Q24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getFeedbackUrl",
+    "address": "0x10013f2e0",
+    "end": "0x10013f530",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getPrivacyAgreementUrl",
+    "address": "0x10013f530",
+    "end": "0x10013f598",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getPrivacyAgreementUrlWithCountryCode:",
+    "address": "0x10013f598",
+    "end": "0x10013f6e4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getTermsAgreementUrl",
+    "address": "0x10013f6e4",
+    "end": "0x10013f74c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getTermsAgreementUrlWithCountryCode:",
+    "address": "0x10013f74c",
+    "end": "0x10013f898",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "saveLastPhoneNumber:",
+    "address": "0x10013f898",
+    "end": "0x10013f8a8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "saveLastPhoneNumber:autoSave:",
+    "address": "0x10013f8a8",
+    "end": "0x10013fbd0",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "voIPRequestAnswerWithDelegate:roomID:roomKey:contact:forceToVoice:type:nicInfos:peerId:capInfo:",
+    "address": "0x100138a24",
+    "end": "0x100139a10",
+    "types": "I80@0:8@16Q24q32@40B48i52@56@64@72"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "voIPRequestAnswerAboutRejectWithDelegate:roomID:roomKey:contact:forceToVoice:",
+    "address": "0x100139a10",
+    "end": "0x100139a40",
+    "types": "I52@0:8@16Q24q32@40B48"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isShakeScene:",
+    "address": "0x116571ca0",
+    "end": "0x116571cb8",
+    "types": "B20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isLBSScene:",
+    "address": "0x116571cb8",
+    "end": "0x116571ccc",
+    "types": "B20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isGoogleScene:",
+    "address": "0x116571ccc",
+    "end": "0x116571ce4",
+    "types": "B20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getDeviceScale",
+    "address": "0x116571ce4",
+    "end": "0x116571d54",
+    "types": "d16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isSupportHQImage",
+    "address": "0x116571d54",
+    "end": "0x116571dc8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isSupportVideoRecord",
+    "address": "0x116571dc8",
+    "end": "0x116571dd0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getMainWindowWidth",
+    "address": "0x116571dd0",
+    "end": "0x116571eb0",
+    "types": "d16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getMainWindowHeight",
+    "address": "0x116571eb0",
+    "end": "0x116571f90",
+    "types": "d16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateYearFormatLong:",
+    "address": "0x116571f90",
+    "end": "0x116572184",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateMonthFormatLong:",
+    "address": "0x116572184",
+    "end": "0x116572378",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateYearFormatSimpleLong:",
+    "address": "0x116572378",
+    "end": "0x1165725f4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateMonthFormatSimpleLong:",
+    "address": "0x1165725f4",
+    "end": "0x116572870",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateFormatForVoiceOver:",
+    "address": "0x116572870",
+    "end": "0x1165728a0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateFormatForVoiceOver:withTime:",
+    "address": "0x1165728a0",
+    "end": "0x1165729ac",
+    "types": "@28@0:8@16B24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "timeAjustFormat:timeHour:",
+    "address": "0x1165729ac",
+    "end": "0x116572e8c",
+    "types": "@32@0:8@16q24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genVoiceReminderDataTimeStringByUInt:",
+    "address": "0x116572e8c",
+    "end": "0x116573690",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genVoiceReminderDataTimeString:",
+    "address": "0x116573690",
+    "end": "0x11657370c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genDateTimeString:",
+    "address": "0x11657370c",
+    "end": "0x116573784",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genHourAndMinStringFromInt:",
+    "address": "0x116573784",
+    "end": "0x1165737d8",
+    "types": "@24@0:8q16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "timeFormat:",
+    "address": "0x1165737d8",
+    "end": "0x1165738ac",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "timeAdjustDateString:timeHour:",
+    "address": "0x1165738ac",
+    "end": "0x116573acc",
+    "types": "@32@0:8@16q24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateFormat:",
+    "address": "0x116573acc",
+    "end": "0x116573af4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateFormatWithoutYear2rd:",
+    "address": "0x116573af4",
+    "end": "0x116573b98",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "setCurrentLanguageForFormatter:",
+    "address": "0x116573b98",
+    "end": "0x116573b9c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateFormatLong:",
+    "address": "0x116573b9c",
+    "end": "0x116573bc4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateFormatLongLong:",
+    "address": "0x116573bc4",
+    "end": "0x116573bec",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "dateFormat:dateStyle:",
+    "address": "0x116573bec",
+    "end": "0x116573cc4",
+    "types": "@32@0:8@16Q24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "absoluteDayIntervalSince:currDate:todaySeconds:",
+    "address": "0x116573cc4",
+    "end": "0x116573d38",
+    "types": "q40@0:8@16@24q32"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genWeekDayString:",
+    "address": "0x116573d38",
+    "end": "0x116573da0",
+    "types": "@24@0:8q16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genDateTimeStringByUInt:",
+    "address": "0x116573da0",
+    "end": "0x1165742bc",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genDetailDateTimeStringByUInt:",
+    "address": "0x1165742bc",
+    "end": "0x1165746d0",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genMessageListTimeString:",
+    "address": "0x1165746d0",
+    "end": "0x116574720",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genSpaceMessageMgrSessionStringByUInt:",
+    "address": "0x116574720",
+    "end": "0x116574924",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genRoamAutoBackupPauseStartTimeByUInt:",
+    "address": "0x116574924",
+    "end": "0x116574c6c",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genMessageListTimeStringByUInt:retIsMoreThanAWeek:",
+    "address": "0x116574c6c",
+    "end": "0x116575154",
+    "types": "@28@0:8I16^B20"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genMessageListTimeStringOfFullYearByUInt:retIsMoreThanAWeek:",
+    "address": "0x116575154",
+    "end": "0x116575544",
+    "types": "@28@0:8I16^B20"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genYoTitleShortStringByUInt:",
+    "address": "0x116575544",
+    "end": "0x116575708",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genYoTimeShortStringByUInt:",
+    "address": "0x116575708",
+    "end": "0x1165759ec",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genFavCellTimeStringByUInt:",
+    "address": "0x1165759ec",
+    "end": "0x116575e4c",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genFavRecordSubTimeStringByUInt:",
+    "address": "0x116575e4c",
+    "end": "0x116576094",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genNasLastBackupTimeByUInt:",
+    "address": "0x116576094",
+    "end": "0x1165761a4",
+    "types": "@24@0:8d16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genScanHistoryCellTimeStringByUInt:",
+    "address": "0x1165761a4",
+    "end": "0x116576624",
+    "types": "@24@0:8d16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genImgMsgCreatTimeStringByUInt:",
+    "address": "0x116576624",
+    "end": "0x1165767fc",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genStoryHistoryTimeStringByDateStr:",
+    "address": "0x1165767fc",
+    "end": "0x116576ad0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genCurrentTime",
+    "address": "0x116576ad0",
+    "end": "0x116576b40",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genWCPayT2BCHistoryTime:",
+    "address": "0x116576b40",
+    "end": "0x116576cd8",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genImgMsgTimeForFastBrowse:",
+    "address": "0x116576cd8",
+    "end": "0x116576fa4",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genAssetTimeForPickerController:",
+    "address": "0x116576fa4",
+    "end": "0x116577460",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getDateWithYear:month:day:",
+    "address": "0x116577460",
+    "end": "0x116577554",
+    "types": "@40@0:8q16q24q32"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genFTSSearchShowTime:",
+    "address": "0x116577554",
+    "end": "0x116577b10",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genFTSSearchFullShowTime:",
+    "address": "0x116577b10",
+    "end": "0x11657803c",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genReceivedRedEnvelopesShowTime:",
+    "address": "0x11657803c",
+    "end": "0x116578378",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genScheduleShowTime:",
+    "address": "0x116578378",
+    "end": "0x1165789cc",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genFileBrowseShowTime:",
+    "address": "0x1165789cc",
+    "end": "0x116578d3c",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genShakeTvHistoryShowTime:",
+    "address": "0x116578d3c",
+    "end": "0x116579018",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genStrongNotificatonShowTime:",
+    "address": "0x116579018",
+    "end": "0x1165792f4",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genTimelineVideoTimeFormatByUInt:",
+    "address": "0x1165792f4",
+    "end": "0x116579474",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genTansferLeftTimeByUInt:",
+    "address": "0x116579474",
+    "end": "0x1165795e8",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "genTansferCostTimeByUInt:",
+    "address": "0x1165795e8",
+    "end": "0x1165797b4",
+    "types": "@20@0:8I16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "daysBetweenFrom:To:",
+    "address": "0x1165797b4",
+    "end": "0x116579948",
+    "types": "q32@0:8@16@24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "calStringLen:",
+    "address": "0x116579948",
+    "end": "0x116579a14",
+    "types": "I24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "cutTextView:orTextField:withLimitLen:andEmoOneCharPolicy:",
+    "address": "0x116579a14",
+    "end": "0x116579f4c",
+    "types": "v40@0:8@16@24I32B36"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "cutTextField:withLimitLen:",
+    "address": "0x116579f4c",
+    "end": "0x116579f70",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "cutTextView:withLimitLen:",
+    "address": "0x116579f70",
+    "end": "0x116579f90",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "cutTextField:withLimitLen:andEmoOneCharPolicy:",
+    "address": "0x116579f90",
+    "end": "0x116579fb4",
+    "types": "v32@0:8@16I24B28"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "cutTextView:withLimitLen:andEmoOneCharPolicy:",
+    "address": "0x116579fb4",
+    "end": "0x116579fd4",
+    "types": "v32@0:8@16I24B28"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "calStringLen:maxLen:",
+    "address": "0x116579fd4",
+    "end": "0x11657a0bc",
+    "types": "I28@0:8@16I24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "calAttributeString:",
+    "address": "0x11657a0bc",
+    "end": "0x11657a214",
+    "types": "I24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "calAttributeString:maxLen:",
+    "address": "0x11657a214",
+    "end": "0x11657a384",
+    "types": "I28@0:8@16I24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getLastLoginName",
+    "address": "0x11657a384",
+    "end": "0x11657a53c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "saveLastLoginName:",
+    "address": "0x11657a53c",
+    "end": "0x11657a650",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getLastPhoneNumber",
+    "address": "0x11657a650",
+    "end": "0x11657a7d4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getLastUserName",
+    "address": "0x11657a7d4",
+    "end": "0x11657a98c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isChinaPhoneUser",
+    "address": "0x11657a98c",
+    "end": "0x11657aa40",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isChinaPhoneAndMainLandTimeZone",
+    "address": "0x11657aa40",
+    "end": "0x11657aa88",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isUTC8",
+    "address": "0x11657aa88",
+    "end": "0x11657ab08",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "canUseSignInWithApple",
+    "address": "0x11657ab08",
+    "end": "0x11657ab14",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "canShowFaceBookPlugin",
+    "address": "0x11657ab14",
+    "end": "0x11657ab5c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isSimpleChinaLanguageUser",
+    "address": "0x11657ab5c",
+    "end": "0x11657ac54",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isChinaPhoneAndSimpleCHSUser",
+    "address": "0x11657ac54",
+    "end": "0x11657ac9c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isChinaPhoneOrSimpleCHSUser",
+    "address": "0x11657ac9c",
+    "end": "0x11657ace8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "canShowShareToFaceBookEntrance",
+    "address": "0x11657ace8",
+    "end": "0x11657acf0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isChinaMainlandTimeZone",
+    "address": "0x11657acf0",
+    "end": "0x11657ae08",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "UrlFromTypeToString:",
+    "address": "0x11657ae08",
+    "end": "0x11657ae30",
+    "types": "@24@0:8Q16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "openURL:",
+    "address": "0x11657ae30",
+    "end": "0x11657aecc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "canOpenURL:",
+    "address": "0x11657aecc",
+    "end": "0x11657b150",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getOriginUrlFromSecureUrl:",
+    "address": "0x11657b150",
+    "end": "0x11657b268",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getDeviceType",
+    "address": "0x11657b268",
+    "end": "0x11657b2e0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "VersionCompare:vs:",
+    "address": "0x11657b2e0",
+    "end": "0x11657b534",
+    "types": "q32@0:8@16@24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "currentInterfaceOrientation",
+    "address": "0x11657b534",
+    "end": "0x11657b638",
+    "types": "q16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isOrientationLandscape",
+    "address": "0x11657b638",
+    "end": "0x11657b660",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isOrientationPortrait",
+    "address": "0x11657b660",
+    "end": "0x11657b688",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "addLocalMemoryWarningObserver:selector:",
+    "address": "0x11657b688",
+    "end": "0x11657b728",
+    "types": "v32@0:8@16:24"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "removeLocalMemoryWarningObserver:",
+    "address": "0x11657b728",
+    "end": "0x11657b7c0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "fireLocalMemoryWarningNotify",
+    "address": "0x11657b7c0",
+    "end": "0x11657b87c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "getCurrentDeviceName",
+    "address": "0x11657b87c",
+    "end": "0x11657b8ec",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CAppUtil",
+    "kind": "class",
+    "selector": "isProductionSignature",
+    "address": "0x11657b8ec",
+    "end": "0x11657b91c",
+    "types": "B16@0:8"
+  }
+]

@@ -1,0 +1,187 @@
+[
+  {
+    "class": "VoIPMtInviteMsg",
+    "property": "wxGroupid",
+    "attributes": "T@\"NSString\",&,D,N"
+  },
+  {
+    "class": "VoIPMtInviteMsg",
+    "property": "roomid",
+    "attributes": "TQ,D,N"
+  },
+  {
+    "class": "VoIPMtInviteMsg",
+    "property": "sdkGroupid",
+    "attributes": "T@\"NSString\",&,D,N"
+  },
+  {
+    "class": "VoIPMtInviteMsg",
+    "property": "fromOpenid",
+    "attributes": "T@\"NSString\",&,D,N"
+  },
+  {
+    "class": "VoIPMtInviteMsg",
+    "property": "toOpenid",
+    "attributes": "T@\"NSString\",&,D,N"
+  },
+  {
+    "class": "VoIPMtInviteMsg",
+    "property": "confInviteItem",
+    "attributes": "T@\"NSData\",&,D,N"
+  },
+  {
+    "class": "VoIPMtInviteMsg",
+    "property": "displayUserList",
+    "attributes": "T@\"NSMutableArray\",&,D,N"
+  },
+  {
+    "class": "VoIPMtInviteMsg",
+    "property": "fromUsername",
+    "attributes": "T@\"NSString\",&,D,N"
+  },
+  {
+    "class": "VoIPMtInviteMsg",
+    "property": "createtime",
+    "attributes": "TQ,D,N"
+  },
+  {
+    "class": "VoIPMtInviteMsg",
+    "property": "mutenotification",
+    "attributes": "TB,D,N"
+  },
+  {
+    "class": "ConfRecvInviteInfo",
+    "property": "roomid",
+    "attributes": "TQ,D,N"
+  },
+  {
+    "class": "ConfRecvInviteInfo",
+    "property": "roomType",
+    "attributes": "TI,D,N"
+  },
+  {
+    "class": "ConfRecvInviteInfo",
+    "property": "memberid",
+    "attributes": "TI,D,N"
+  },
+  {
+    "class": "ConfRecvInviteInfo",
+    "property": "callerOpenid",
+    "attributes": "T@\"NSString\",&,D,N"
+  },
+  {
+    "class": "ConfRecvInviteInfo",
+    "property": "callerUsername",
+    "attributes": "T@\"NSString\",&,D,N"
+  },
+  {
+    "class": "ConfRecvInviteInfo",
+    "property": "usernameList",
+    "attributes": "T@\"NSMutableArray\",&,D,N"
+  },
+  {
+    "class": "ConfRecvInviteInfo",
+    "property": "subAppid",
+    "attributes": "T@\"NSString\",&,D,N"
+  },
+  {
+    "class": "ConfRecvInviteInfo",
+    "property": "subCall",
+    "attributes": "TB,D,N"
+  },
+  {
+    "class": "ConfRecvInviteInfo",
+    "property": "ownerGroupid",
+    "attributes": "T@\"NSString\",&,D,N"
+  },
+  {
+    "class": "VoIPInvitationInfo",
+    "property": "roomType",
+    "attributes": "TQ,N,V_roomType"
+  },
+  {
+    "class": "VoIPInvitationInfo",
+    "property": "isFromIlink",
+    "attributes": "TB,N,V_isFromIlink"
+  },
+  {
+    "class": "VoIPInvitationInfo",
+    "property": "roomID",
+    "attributes": "TQ,N,V_roomID"
+  },
+  {
+    "class": "VoIPInvitationInfo",
+    "property": "roomKey",
+    "attributes": "Tq,N,V_roomKey"
+  },
+  {
+    "class": "VoIPInvitationInfo",
+    "property": "contact",
+    "attributes": "T@\"CContact\",&,N,V_contact"
+  },
+  {
+    "class": "VoIPInvitationInfo",
+    "property": "receiveTime",
+    "attributes": "TI,N,V_receiveTime"
+  },
+  {
+    "class": "VoIPInvitationInfo",
+    "property": "monoMsg",
+    "attributes": "T@\"MonoServiceMsg\",&,N,V_monoMsg"
+  },
+  {
+    "class": "VoIPInvitationInfo",
+    "property": "inviteMsg",
+    "attributes": "T@\"VoIPMtInviteMsg\",&,N,V_inviteMsg"
+  },
+  {
+    "class": "VoIPInvitationInfo",
+    "property": "inviteInfo",
+    "attributes": "T@\"ConfRecvInviteInfo\",&,N,V_inviteInfo"
+  },
+  {
+    "class": "VoIPInvitationInfo",
+    "property": "scene",
+    "attributes": "TQ,N,V_scene"
+  },
+  {
+    "class": "VoIPInvitationInfo",
+    "property": "memberStatusMap",
+    "attributes": "T@\"NSDictionary\",C,N,V_memberStatusMap"
+  },
+  {
+    "class": "MultiTalkMonoMsg",
+    "property": "m_notificationInfo",
+    "attributes": "T@\"WXLocalNotificationInfo\",&,N,V_m_notificationInfo"
+  },
+  {
+    "class": "MultiTalkMonoMsg",
+    "property": "m_msgReceiveTime",
+    "attributes": "TQ,N,V_m_msgReceiveTime"
+  },
+  {
+    "class": "MultiTalkMonoMsg",
+    "property": "m_group",
+    "attributes": "T@\"MMConfSDKMemberMgr\",&,N,V_m_group"
+  },
+  {
+    "class": "MultiTalkMonoMsg",
+    "property": "m_fromUser",
+    "attributes": "T@\"NSString\",&,N,V_m_fromUser"
+  },
+  {
+    "class": "MultiTalkMonoMsg",
+    "property": "m_isCancelMsg",
+    "attributes": "TB,N,Vm_isCancelMsg"
+  },
+  {
+    "class": "MultiTalkMonoMsg",
+    "property": "roomID",
+    "attributes": "TQ,N,V_roomID"
+  },
+  {
+    "class": "MultiTalkMonoMsg",
+    "property": "m_muteNotification",
+    "attributes": "TB,N,V_m_muteNotification"
+  }
+]

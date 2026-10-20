@@ -9,8 +9,8 @@
 @implementation CSCloseFriendSettingsViewController
 - (void)viewDidLoad {
     [super viewDidLoad]; self.title=@"密友";
-    self.keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"autoMute",@"rejectVoice",@"rejectVideo",@"hidePrivacyIcons",@"showBadges",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"unlockSeconds"];
-    self.labels=@[@"隐藏会话",@"隐藏联系人",@"隐藏转发候选",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏朋友圈内容",@"隐藏互动痕迹",@"隐藏状态",@"遮蔽个人资料",@"静默消息通知",@"自动免打扰",@"拒接语音来电",@"拒接视频来电",@"隐藏全部朋友圈可见范围图标",@"显示密友标记",@"隐藏密友设置入口",@"隐藏插件入口",@"允许生物识别解锁",@"摇动立即锁定",@"临时解锁时长"];
+    self.keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"autoMute",@"rejectVoice",@"rejectVideo",@"hidePrivacyIcons",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"unlockSeconds"];
+    self.labels=@[@"隐藏会话",@"隐藏联系人",@"隐藏转发候选",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏朋友圈内容",@"隐藏互动痕迹",@"隐藏状态",@"遮蔽个人资料",@"静默消息通知",@"自动免打扰",@"拒接语音来电",@"拒接视频来电",@"隐藏全部朋友圈可见范围图标",@"隐藏密友设置入口",@"隐藏插件入口",@"允许生物识别解锁",@"摇动立即锁定",@"临时解锁时长"];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(policyChanged:) name:CSCloseFriendPolicyDidChangeNotification object:nil];
 }
 - (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
@@ -32,7 +32,7 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return @[@"账号保护",@"保护选项",@"兼容性状态"][section]; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if(section==0)return @"密码仅保存在本机钥匙串。临时解锁仍会静默通知、独立拒接来电。后台或账号切换会立即锁定。";
-    if(section==1)return @"隐藏入口后，长按微信首页顶部导航栏 1.2 秒验证恢复。默认解锁 300 秒。免打扰恢复保留用户或远端后续修改。";
+    if(section==1)return @"隐藏入口后，长按微信首页顶部导航栏 1.2 秒验证恢复。默认解锁 300 秒。免打扰恢复保留用户或远端后续修改。微信重启后，移出密友或停用功能可能仍保留免打扰，需在微信里手动关闭。";
     return @"接口检查只说明方法签名是否匹配；实际设备验证仍待完成，不代表全部界面或通知已受保护。";
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -74,6 +74,7 @@
     if(indexPath.section==0 && (indexPath.row==1 || indexPath.row==2)) {
         NSString *key=indexPath.row==1?@"friends":@"groups";
         WEContactSelectViewController *picker=[[WEContactSelectViewController alloc] initWithTitle:indexPath.row==1?@"选择密友":@"选择密友群聊" selectedUserNames:CSCloseFriendCurrentProfile()[key] selectType:indexPath.row==1?WEContactSelectTypePrivate:WEContactSelectTypeGroup];
+        picker.completesAfterDismissal=YES;
         picker.completion=^(NSArray<NSString *> *names){
             [CSCloseFriendManager.sharedManager refreshAccount];
             if(![self authorized] || ![CSCloseFriendManager.sharedManager.runtime isTokenCurrent:token])return;
