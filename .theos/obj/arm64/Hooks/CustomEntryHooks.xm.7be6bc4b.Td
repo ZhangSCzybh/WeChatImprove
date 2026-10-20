@@ -11,7 +11,6 @@
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSSettingTableViewCell.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSAuthorizationManager.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSBackupManager.h \
-  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSBackupInfo.h \
   /Users/zhangshichao/theos/vendor/include/substrate.h \
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap \
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h
@@ -26,7 +25,6 @@
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSSettingTableViewCell.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSAuthorizationManager.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSBackupManager.h:
-/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSBackupInfo.h:
 /Users/zhangshichao/theos/vendor/include/substrate.h:
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap:
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h:

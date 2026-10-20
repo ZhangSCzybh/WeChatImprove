@@ -2,6 +2,7 @@
   /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/.theos/obj/arm64/Hooks/RedEnvelopHooks.xm.mm \
   /Users/zhangshichao/theos/Prefix.pch \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSBackupBootstrap.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSPaymentAutomation.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSPaymentCore.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSRedEnvelopConfig.h \
@@ -10,6 +11,7 @@
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
 /Users/zhangshichao/theos/Prefix.pch:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSBackupBootstrap.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSPaymentAutomation.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSPaymentCore.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSRedEnvelopConfig.h:

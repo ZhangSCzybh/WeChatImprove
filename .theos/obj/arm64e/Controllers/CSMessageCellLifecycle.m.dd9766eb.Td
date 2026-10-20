@@ -10,7 +10,8 @@
   Controllers/CSMessageActionPreferences.h \
   Controllers/CSMessageActionContext.h \
   Controllers/CSMessageMediaProvider.h \
-  Controllers/CSMessageMergeAdapter.h Controllers/CSChatNativeBridge.h
+  Controllers/CSMessageMergeAdapter.h Controllers/CSChatNativeBridge.h \
+  Controllers/CSMessageMergePolicy.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
 /Users/zhangshichao/theos/Prefix.pch:
 Controllers/CSMessageCellLifecycle.h:
@@ -23,3 +24,4 @@ Controllers/CSMessageActionContext.h:
 Controllers/CSMessageMediaProvider.h:
 Controllers/CSMessageMergeAdapter.h:
 Controllers/CSChatNativeBridge.h:
+Controllers/CSMessageMergePolicy.h:
