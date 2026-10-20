@@ -7,6 +7,6 @@
     "PACKAGE_VERSION=1.8-42"
   ],
   "exit_code": 0,
-  "seconds": 8.37,
-  "log": "logs/package.log"
+  "seconds": 6.34,
+  "log": "logs/package-final-fix.log"
 }

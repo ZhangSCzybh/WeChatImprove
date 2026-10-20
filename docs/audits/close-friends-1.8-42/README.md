@@ -34,11 +34,13 @@
 
 ## 验证与依据
 
-核心验证只运行一次：策略/存储、运行时与到期调度、会话/展示、联系人/转发/资料、社交/ACL、通知/免打扰/来电六组脚本全部通过。另运行直接涉及的插件入口/启动及付款隐私输出验证，均通过。未修改的分组映射沿用 Task3 的已审结果；没有重跑全部历史套件，也没有在 package 前重复全量独立对象编译。
+首次集成的核心验证运行一次：策略/存储、运行时与到期调度、会话/展示、联系人/转发/资料、社交/ACL、通知/免打扰/来电六组脚本全部通过。另运行直接涉及的插件入口/启动及付款隐私输出验证，均通过。未修改的分组映射沿用 Task3 的已审结果；没有重跑全部历史套件，也没有在 package 前重复全量独立对象编译。
+
+全分支审查随后发现 I1：已绑定旧账号的通知在账号/epoch 切换后可能落入原生输出。现已独立区分过期绑定与未知身份：过期输出丢弃，未知请求保留原生处理；已知通知清理仍同时匹配标识和内容。修复只重跑受影响的通知 fixture（先复现失败，后 71 项通过），随后重建同版本包并核验产物。其他原集成结果继续复用，未声称所有套件在修复后重跑。参见 [最终修复报告](task-reports/final-fix-report.md) 与 [定向验证](final-fix-results.json)。
 
 - [精确命令、结果与产物元数据](validation.json)；[各核心验证日志](host-results.json)。
-- [构建命令及耗时](build-result.json)；[完整构建日志](logs/package.log)。构建成功但并非无警告：保留的旧通知 API、原有红包 statusBarFrame API 产生弃用警告，链接器提示旧 multiply_defined 标志过时；均已记录。
-- [源文件摘要](source-manifest.json) 在测试/构建前采集，交付校验确认 455 份生产/测试与构建输入未变。[验证脚本](verify-delivery.py) 只校验已有包，不执行构建或安装。
+- [构建命令及耗时](build-result.json)；[最终构建日志](logs/package-final-fix.log)（[原集成构建日志](logs/package.log)保留）。构建成功但并非无警告：保留的旧通知 API、原有红包 statusBarFrame API 产生弃用警告，链接器提示旧 multiply_defined 标志过时；均已记录。
+- [最终源文件摘要](source-manifest.json) 在修复后、最终构建前采集，交付校验确认 455 份生产/测试与构建输入未变，对应源码提交 `06aeaa37`。首次集成的 [原始摘要](source-manifest-integration.json) 和 [原始产物校验](validation-integration.json) 独立保留。[验证脚本](verify-delivery.py) 只校验已有包，不执行构建或安装。
 - 包中的 dylib 与 `.theos` 已构建和暂存 dylib 一致；确认 arm64/arm64e、两架构 iOS 15.0、22 个各架构必需导出、dSYM UUID、注入过滤和版本一致。过滤器仍只针对微信主进程。
 - [真机验收表](device-acceptance.md) 全部标记待验证，明确区分过滤、门控、中性提示、未适配拒接及系统路径。主机 fixture 和编译不能证明手机上的 UIKit 动画、真实通知或拒接结果。
 
@@ -48,11 +50,11 @@
 
 构建命令：`make package -j4 SCHEME=rootless PACKAGE_VERSION=1.8-42`。
 
-- [1.8-42 Rootless 安装包](../../../packages/com.wechat.improve_1.8-42_iphoneos-arm64.deb)，1,074,430 字节。
-- SHA-256：`146e7a37e6482106c81b991836bd7e6ba2c48207402ff91d7eef0659a7135932`。
+- [1.8-42 Rootless 安装包](../../../packages/com.wechat.improve_1.8-42_iphoneos-arm64.deb)，1,077,776 字节。
+- SHA-256：`f9ed41cfbcb43332a09205f56be7639b3cbcc9fe1645cfc0f71af820436e72cc`。
 - Debian 架构为 `iphoneos-arm64`，dylib 同时包含 `arm64` / `arm64e`，最低编译目标 iOS 15.0。
 - 既有 4 个安装包和 packages/.DS_Store 均与开始前摘要一致。`.theos` 在原位置保留本次构建结果；其中已跟踪及未跟踪的生成变更不回滚，也不纳入源码提交。包与源码的一致性以摘要/实际产物校验为准，不把构建缓存的工作区变更视为额外源码修改。
 
-[实施决定](delivery-decisions.md)、[历史进度](implementation-progress.md)、[各任务报告](task-reports/) 和 [已完成的阶段审查](reviews/) 已持久归档；早期“待修复”条目由后续修复/批准记录取代。最终 Task7 与全分支审查由同一审查者一次完成。
+[实施决定](delivery-decisions.md)、[历史进度](implementation-progress.md)、[各任务报告](task-reports/) 和 [已完成的阶段审查](reviews/) 已持久归档；早期“待修复”条目由后续修复/批准记录取代。[合并 Task7 与全分支审查](reviews/final-review.md) 已完成；其中唯一 Important 项 I1 已修复，等待一次定向复审。M1 可读性和 M2 构建警告为非阻断项，本轮不扩大清理。
 
 原生接口与调用约束见 [native-evidence.md](native-evidence.md)。原有安装包基线见 [prior-packages.json](prior-packages.json)。没有执行 `make clean`，既有包与构建目录保留。

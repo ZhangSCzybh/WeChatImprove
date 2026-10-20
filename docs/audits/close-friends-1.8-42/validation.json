@@ -4,7 +4,8 @@
   "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
   "branch": "codex/close-friends",
   "integration_base": "b0a811357c8af96b7c599c570d99f41011040f31",
-  "source_identity": "source-manifest.json captures integrated production/test bytes before tests and build; integration commit records these same bytes",
+  "production_source_commit": "06aeaa37a1ac9064a483922f5b84278245606ab9",
+  "source_identity": "source-manifest.json captures final production/test bytes before the final build; targeted post-review fixture ran on these same bytes. Original integration source/results are retained separately.",
   "metadata": {
     "Package": "com.wechat.improve",
     "Version": "1.8-42",
@@ -16,15 +17,15 @@
     "arm64e"
   ],
   "minimum_ios": "15.0",
-  "dylib_sha256": "29203da954a9fb99a0e34e18187428fa1b90739ad68b73a4094597a44c6c4c71",
+  "dylib_sha256": "11a005901f8d4b1242455de50aefb217cbaccc3bcb0d55ba017f07f7012a7197",
   "dSYM_UUIDs": {
-    "arm64": "FFA6966F-4C9D-344A-A77B-560A5C2676DC",
-    "arm64e": "B4504D04-0E10-3E00-B70E-4B8552617F1B"
+    "arm64": "54921B28-8184-3D93-B42E-95E266DE2EC1",
+    "arm64e": "67B84C34-A719-3BB7-9FFC-48CEDF4EC8E7"
   },
   "artifact": {
     "path": "packages/com.wechat.improve_1.8-42_iphoneos-arm64.deb",
-    "sha256": "146e7a37e6482106c81b991836bd7e6ba2c48207402ff91d7eef0659a7135932",
-    "bytes": 1074430
+    "sha256": "f9ed41cfbcb43332a09205f56be7639b3cbcc9fe1645cfc0f71af820436e72cc",
+    "bytes": 1077776
   },
   "checks": {
     "source_matches_pretest_build_manifest": true,
@@ -147,6 +148,17 @@
       "log": "logs/verify-payment-core.log"
     }
   ],
+  "post_review_results": [
+    {
+      "command": [
+        "bash",
+        "Tests/verify-close-friend-alerts.sh"
+      ],
+      "exit_code": 0,
+      "seconds": 1.51,
+      "log": "logs/final-fix-alerts.log"
+    }
+  ],
   "build": {
     "command": [
       "make",
@@ -156,8 +168,13 @@
       "PACKAGE_VERSION=1.8-42"
     ],
     "exit_code": 0,
-    "seconds": 8.37,
-    "log": "logs/package.log"
+    "seconds": 6.34,
+    "log": "logs/package-final-fix.log"
+  },
+  "integration_evidence": {
+    "validation": "validation-integration.json",
+    "source_manifest": "source-manifest-integration.json",
+    "scope": "Original integrated runs retained. Only the affected alerts fixture and final package were rerun after I1; unchanged suite results reused."
   },
   "build_warnings": [
     "UILocalNotification deprecation (legacy adapter, both architectures)",
@@ -217,19 +234,19 @@
       "xcrun",
       "lipo",
       "-archs",
-      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friends-package-9vo2e8nl/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib"
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friends-package-h43tduqv/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib"
     ],
     [
       "xcrun",
       "vtool",
       "-show-build",
-      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friends-package-9vo2e8nl/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib"
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friends-package-h43tduqv/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib"
     ],
     [
       "xcrun",
       "dwarfdump",
       "--uuid",
-      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friends-package-9vo2e8nl/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib"
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friends-package-h43tduqv/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib"
     ],
     [
       "xcrun",
@@ -243,7 +260,7 @@
       "-arch",
       "arm64",
       "-gU",
-      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friends-package-9vo2e8nl/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib"
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friends-package-h43tduqv/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib"
     ],
     [
       "xcrun",
@@ -257,7 +274,7 @@
       "-arch",
       "arm64e",
       "-gU",
-      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friends-package-9vo2e8nl/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib"
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friends-package-h43tduqv/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib"
     ],
     [
       "/usr/bin/plutil",
@@ -265,7 +282,7 @@
       "json",
       "-o",
       "-",
-      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friends-package-9vo2e8nl/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.plist"
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friends-package-h43tduqv/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.plist"
     ],
     [
       "/usr/bin/plutil",
@@ -281,8 +298,13 @@
       "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
       "branch",
       "--show-current"
+    ],
+    [
+      "git",
+      "-C",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "rev-parse",
+      "HEAD"
     ]
-  ],
-  "integration_source_commit": "6987c113",
-  "index_source_manifest_verified": true
+  ]
 }

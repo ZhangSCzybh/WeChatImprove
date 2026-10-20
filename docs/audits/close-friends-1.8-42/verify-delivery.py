@@ -21,7 +21,7 @@ def run(*args):
 
 manifest = json.loads((out / 'source-manifest.json').read_text())
 for name, digest in manifest.items():
-    assert sha(root / name) == digest, ('source changed since integrated tests/build', name)
+    assert sha(root / name) == digest, ('source changed since captured final build manifest', name)
 prior = json.loads((out / 'prior-packages.json').read_text())['files']
 for name, expected in prior.items():
     p = root / name
@@ -74,17 +74,20 @@ with tempfile.TemporaryDirectory(prefix='wechat-close-friends-package-') as temp
 
 host = json.loads((out / 'host-results.json').read_text())
 packaging = json.loads((out / 'build-result.json').read_text())
-assert all(result['exit_code'] == 0 for result in host) and packaging['exit_code'] == 0
+post_review = json.loads((out / 'final-fix-results.json').read_text()) if (out / 'final-fix-results.json').exists() else []
+assert all(result['exit_code'] == 0 for result in host + post_review) and packaging['exit_code'] == 0
 report = {
     'version': version, 'scheme': 'rootless', 'checkout': str(root), 'branch': run('git', '-C', str(root), 'branch', '--show-current'),
     'integration_base': 'b0a811357c8af96b7c599c570d99f41011040f31',
-    'source_identity': 'source-manifest.json captures integrated production/test bytes before tests and build; integration commit records these same bytes',
+    'production_source_commit': run('git', '-C', str(root), 'rev-parse', 'HEAD'),
+    'source_identity': 'source-manifest.json captures final production/test bytes before the final build; targeted post-review fixture ran on these same bytes. Original integration source/results are retained separately.',
     'metadata': metadata, 'architectures': archs, 'minimum_ios': '15.0', 'dylib_sha256': digest, 'dSYM_UUIDs': uuids,
     'artifact': {'path': str(package.relative_to(root)), 'sha256': sha(package), 'bytes': package.stat().st_size},
     'checks': {'source_matches_pretest_build_manifest': True, 'package_matches_built_and_staged_dylib': True,
                'version_agreement': True, 'required_exports_in_both_architectures': exports,
                'injection_filter_unchanged': filter_value, 'prior_artifacts_unchanged': list(prior)},
-    'host_results': host, 'build': packaging,
+    'host_results': host, 'post_review_results': post_review, 'build': packaging,
+    'integration_evidence': {'validation': 'validation-integration.json', 'source_manifest': 'source-manifest-integration.json', 'scope': 'Original integrated runs retained. Only the affected alerts fixture and final package were rerun after I1; unchanged suite results reused.'},
     'build_warnings': ['UILocalNotification deprecation (legacy adapter, both architectures)', 'statusBarFrame deprecation (existing RedEnvelopHooks, both architectures)', 'obsolete -multiply_defined linker flag (both architectures)'],
     'reused_validation': {'group_mapping': 'Task3 reviewed results, task-reports/task-3-report.md; projection/index/mapping algorithms unchanged since 3cf088f2. Task6 added source epoch checks and badge accessor covered by integrated alerts/session fixtures.'},
     'build_cache': 'Existing .theos preserved and updated by make; tracked/untracked build outputs deliberately not committed or reverted. No clean.',

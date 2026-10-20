@@ -1,6 +1,6 @@
 # Historical implementation and review ledger
 
-This is the complete captured working history; later entries supersede earlier pending/fix statements. Final delivery state is in README.md and validation.json.
+Later entries supersede earlier pending/fix statements. Current delivery state is in README.md and validation.json.
 
 # SDD ledger — plan: docs/superpowers/plans/2026-10-20-close-friends.md
 Baseline: 929d265b; design/plan: 54762b7f; original checkout retained; branch codex/close-friends.
@@ -132,3 +132,13 @@ Task7 integrated core scripts + directly affected entry/payment privacy passed o
 Ruling: .theos is tracked by this repository; preserve current generated build outputs on disk and exclude cache churn from the integration commit. Commit source/docs/audit and new package. Record generated working-tree changes explicitly rather than resetting the user's build directory or mixing build cache into review.
 
 Task7 integration complete: picker deferred save, inert showBadges row omitted, process-bound DND UI/docs explicit; all six close-friend core scripts + entry/startup + payment privacy passed once. Package 1.8-42 rootless dual-arch built and metadata/hash/source/prior-artifact checks passed. Device acceptance pending; combined final review follows. .theos retained, excluded from commit.
+
+Task7 implementation complete6987c113 + documentation e98c5ace. Integrated core/entry/payment checks once and package passed. Verified arm64/arm64e, minOS15.0,22exports perarch, UUID, source/staged/package bytes and455source inputs; prior5artifacts preserved. Package1,074,430bytes SHA256146e7a37e6482106c81b991836bd7e6ba2c48207402ff91d7eef0659a7135932. Build warnings are documented deprecated APIs/old linker flag, not errors.
+Combined Task7 task gate and final branch review dispatched to /root/cf_final_review with929d265b..e98c5ace package. No deployment or device acceptance claimed.
+
+Final review early Important candidate: positively bound stale notification subjects return shouldSilence=NO and output hooks can pass old-account/epoch UN/QuickReply/localInfo to native display. Must distinguish unknown subject from known stale output, drop stale presentation while honoring completions and without applying old policy to new account. Await full findings before one consolidated final fix wave.
+
+Combined final review complete: Task7 spec/quality Approved; whole branch Needs fixes for one Important I1 (bound stale notification output); no Critical. M1 preexisting carried compact security control-flow readability and M2 documented build warnings nonblocking.
+Final consolidated fix wave dispatched to /root/cf_integration_impl from e98c5ace for I1 only; focused actual notification output regression plus required package/manifest refresh. Unknown/unbound output stays native, positively stale output discarded, exact request matching/mandatory completions retained. No unrelated test or formatting expansion.
+
+Final fix wave: I1 stale bound notifications addressed in 06aeaa37; real UN output reproduced failure then 71 focused alert checks passed. Only affected alerts and final package rerun, unchanged suites reused. New 1.8-42 package/hash and explicit historical-vs-final evidence recorded; one scoped rereview pending.
