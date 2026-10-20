@@ -52,7 +52,7 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
             struct stat st; if(lstat(existing.path.fileSystemRepresentation,&st)==0 || errno!=ENOENT) { CSKeychainError(error,errSecItemNotFound); return nil; }
             key=CSCloseFriendRandomBytes(64,error); if(!key || !CSKeychainWrite(account,@"policy",key,NO,error))return nil; return key;
         }];
-        _runtime=[[CSCloseFriendRuntime alloc] initWithStore:store clock:^NSTimeInterval{ return NSDate.date.timeIntervalSince1970; } credentialReader:^NSDictionary *(NSString *account,NSError **error){
+        _runtime=[[CSCloseFriendRuntime alloc] initWithStore:store wallClock:^NSTimeInterval{ return NSDate.date.timeIntervalSince1970; } elapsedClock:^NSTimeInterval{ return NSProcessInfo.processInfo.systemUptime; } credentialReader:^NSDictionary *(NSString *account,NSError **error){
             NSData *data=CSKeychainRead(account,@"auth",error); if(!data)return nil;
             id value=[NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:error];
             if(![value isKindOfClass:NSDictionary.class]) { CSKeychainError(error,errSecDecode); return nil; } return value;

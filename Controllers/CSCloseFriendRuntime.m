@@ -10,7 +10,8 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
 @interface CSCloseFriendRuntime ()
 @property(nonatomic,strong) CSCloseFriendStore *store;
 @property(nonatomic,strong) CSCloseFriendSnapshot *publishedSnapshot, *boundarySnapshot;
-@property(nonatomic,copy) NSTimeInterval (^clock)(void);
+@property(nonatomic,copy) NSTimeInterval (^wallClock)(void);
+@property(nonatomic,copy) NSTimeInterval (^elapsedClock)(void);
 @property(nonatomic,copy) CSCloseFriendCredentialReader reader;
 @property(nonatomic,copy) CSCloseFriendCredentialWriter writer;
 @property(nonatomic,copy) NSString *account;
@@ -21,7 +22,10 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
 @end
 @implementation CSCloseFriendRuntime
 - (instancetype)initWithStore:(CSCloseFriendStore *)store clock:(NSTimeInterval (^)(void))clock credentialReader:(CSCloseFriendCredentialReader)reader credentialWriter:(CSCloseFriendCredentialWriter)writer {
-    if((self=[super init])) { _store=store; _clock=[clock copy]; _reader=[reader copy]; _writer=[writer copy]; _account=@""; _blocked=YES; _active=YES; }
+    return [self initWithStore:store wallClock:clock elapsedClock:^NSTimeInterval{ return NSProcessInfo.processInfo.systemUptime; } credentialReader:reader credentialWriter:writer];
+}
+- (instancetype)initWithStore:(CSCloseFriendStore *)store wallClock:(NSTimeInterval (^)(void))wallClock elapsedClock:(NSTimeInterval (^)(void))elapsedClock credentialReader:(CSCloseFriendCredentialReader)reader credentialWriter:(CSCloseFriendCredentialWriter)writer {
+    if((self=[super init])) { _store=store; _wallClock=[wallClock copy]; _elapsedClock=[elapsedClock copy]; _reader=[reader copy]; _writer=[writer copy]; _account=@""; _blocked=YES; _active=YES; }
     return self;
 }
 - (void)changed { self.revision++; self.publishedSnapshot=nil; self.boundarySnapshot=nil; if(self.didChange)self.didChange(); }
@@ -65,7 +69,7 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
             if(!self.boundarySnapshot)self.boundarySnapshot=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"" profile:CSEmptyProfile() revealed:NO revision:self.revision blocked:YES];
             return self.boundarySnapshot;
         }
-        BOOL revealed=!self.blocked && self.active && self.revealUntil>self.clock();
+        BOOL revealed=!self.blocked && self.active && self.revealUntil>self.elapsedClock();
         if(self.publishedSnapshot && self.publishedSnapshot.revealed!=revealed)[self changed];
         if(!self.publishedSnapshot) {
             self.publishedSnapshot=[[CSCloseFriendSnapshot alloc] initWithAccountID:self.account profile:self.state[@"profile"]?:CSEmptyProfile() revealed:revealed revision:self.revision blocked:self.blocked];
@@ -78,7 +82,7 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
 - (NSDictionary *)authenticationToken { @synchronized(self) { if(self.blocked || self.suspended || !self.active || !self.account.length)return nil; return @{@"account":self.account,@"epoch":@(self.epoch),@"generation":@(self.generation)}; } }
 - (BOOL)isTokenCurrent:(NSDictionary *)token { @synchronized(self) { return token && [[self authenticationToken] isEqual:token]; } }
 - (BOOL)hasCredential { @synchronized(self) { return self.credential!=nil; } }
-- (BOOL)isAuthorized { @synchronized(self) { return !self.blocked && !self.suspended && self.active && self.revealUntil>self.clock(); } }
+- (BOOL)isAuthorized { @synchronized(self) { return !self.blocked && !self.suspended && self.active && self.revealUntil>self.elapsedClock(); } }
 - (BOOL)setPassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error {
     NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
     @synchronized(self) {
@@ -89,7 +93,7 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
         if(!verifier)return NO;
         NSDictionary *credential=@{@"salt":salt,@"verifier":verifier,@"iterations":@210000,@"failures":@0,@"cooldown":@0};
         if(!self.writer(self.account,credential,error))return NO;
-        self.credential=credential; self.generation++; self.revealUntil=self.clock()+[self.state[@"profile"][@"options"][@"unlockSeconds"] doubleValue]; [self changed]; return YES;
+        self.credential=credential; self.generation++; self.revealUntil=self.elapsedClock()+[self.state[@"profile"][@"options"][@"unlockSeconds"] doubleValue]; [self changed]; return YES;
     }
 }
 - (BOOL)persistCredential:(NSDictionary *)credential error:(NSError **)error {
@@ -100,22 +104,22 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
     NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
     @synchronized(self) {
         if(![self isTokenCurrent:token] || !self.credential)return CSRuntimeFail(error,@"验证已失效，请重试。");
-        if([self.credential[@"cooldown"] doubleValue]>self.clock())return CSRuntimeFail(error,@"错误次数过多，请稍后重试。");
+        if([self.credential[@"cooldown"] doubleValue]>self.wallClock())return CSRuntimeFail(error,@"错误次数过多，请稍后重试。");
         NSData *derived=CSCloseFriendPasswordVerifier(password,self.credential[@"salt"],[self.credential[@"iterations"] unsignedIntegerValue],NULL);
         BOOL success=derived && CSCloseFriendConstantTimeEqual(derived,self.credential[@"verifier"]);
         NSMutableDictionary *next=[self.credential mutableCopy];
         NSUInteger failures=success?0:MIN([next[@"failures"] unsignedIntegerValue]+1,10u);
-        next[@"failures"]=@(failures); next[@"cooldown"]=@(!success && failures>=5 ? self.clock()+MIN(300.0,30.0*(failures-4)):0);
+        next[@"failures"]=@(failures); next[@"cooldown"]=@(!success && failures>=5 ? self.wallClock()+MIN(300.0,30.0*(failures-4)):0);
         if(![self persistCredential:next error:error])return NO;
         if(!success)return CSRuntimeFail(error,@"密码错误。");
-        self.revealUntil=self.clock()+[self.state[@"profile"][@"options"][@"unlockSeconds"] doubleValue]; self.generation++; [self changed]; return YES;
+        self.revealUntil=self.elapsedClock()+[self.state[@"profile"][@"options"][@"unlockSeconds"] doubleValue]; self.generation++; [self changed]; return YES;
     }
 }
 - (BOOL)completeBiometricWithToken:(NSDictionary *)token {
     NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
     @synchronized(self) {
-        if(![self isTokenCurrent:token] || !self.credential || ![self.state[@"profile"][@"options"][@"biometric"] boolValue] || [self.credential[@"cooldown"] doubleValue]>self.clock())return NO;
-        self.revealUntil=self.clock()+[self.state[@"profile"][@"options"][@"unlockSeconds"] doubleValue]; self.generation++; [self changed]; return YES;
+        if(![self isTokenCurrent:token] || !self.credential || ![self.state[@"profile"][@"options"][@"biometric"] boolValue] || [self.credential[@"cooldown"] doubleValue]>self.wallClock())return NO;
+        self.revealUntil=self.elapsedClock()+[self.state[@"profile"][@"options"][@"unlockSeconds"] doubleValue]; self.generation++; [self changed]; return YES;
     }
 }
 - (NSDictionary *)currentProfile { @synchronized(self) { return self.blocked?nil:self.state[@"profile"]; } }

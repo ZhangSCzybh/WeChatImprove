@@ -6,7 +6,10 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NSDictionary * _Nullable (^CSCloseFriendCredentialReader)(NSString *, NSError **);
 typedef BOOL (^CSCloseFriendCredentialWriter)(NSString *, NSDictionary *, NSError **);
 @interface CSCloseFriendRuntime : NSObject
+/// Compatibility initializer: injected clock is wall time; reveal uses system uptime.
 - (instancetype)initWithStore:(CSCloseFriendStore *)store clock:(NSTimeInterval (^)(void))clock credentialReader:(CSCloseFriendCredentialReader)reader credentialWriter:(CSCloseFriendCredentialWriter)writer;
+/// Wall time persists cooldown timestamps; elapsedClock must be monotonic and owns reveal deadlines.
+- (instancetype)initWithStore:(CSCloseFriendStore *)store wallClock:(NSTimeInterval (^)(void))wallClock elapsedClock:(NSTimeInterval (^)(void))elapsedClock credentialReader:(CSCloseFriendCredentialReader)reader credentialWriter:(CSCloseFriendCredentialWriter)writer;
 /// Mutations are main-thread-owned. Every async continuation must retain and validate its token.
 - (void)synchronizeAccount:(NSString *)account epoch:(NSUInteger)epoch suspended:(BOOL)suspended;
 - (CSCloseFriendSnapshot *)snapshotForEpoch:(NSUInteger)epoch suspended:(BOOL)suspended;

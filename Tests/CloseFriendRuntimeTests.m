@@ -67,7 +67,7 @@ int main(void) { @autoreleasepool {
     authority=Nil;
     Check([CSCloseFriendResolveAccount(lookup) isEqual:@"cached-account"] && fallbackReads==1,"legacy fallback only when authoritative accessors absent");
     NSURL *root=[NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString] isDirectory:YES];
-    __block NSTimeInterval now=10000; __block BOOL unavailable=NO, failWrite=NO;
+    __block NSTimeInterval now=10000, elapsed=5000; __block BOOL unavailable=NO, failWrite=NO;
     NSMutableDictionary *credentials=[NSMutableDictionary new]; NSData *key=CSCloseFriendRandomBytes(64,NULL);
     CSCloseFriendStore *store=[[CSCloseFriendStore alloc] initWithRoot:root keyProvider:^NSData *(__unused NSString *account,NSError **error){
         if(unavailable) { if(error)*error=[NSError errorWithDomain:@"FakeKeychain" code:1 userInfo:nil]; return nil; } return key;
@@ -78,7 +78,7 @@ int main(void) { @autoreleasepool {
     CSCloseFriendCredentialWriter writer=^BOOL(NSString *account,NSDictionary *credential,NSError **error){
         if(failWrite) { if(error)*error=[NSError errorWithDomain:@"FakeKeychain" code:2 userInfo:nil];return NO; } credentials[account]=[credential copy];return YES;
     };
-    CSCloseFriendRuntime *(^makeRuntime)(void)=^{ return [[CSCloseFriendRuntime alloc] initWithStore:store clock:^NSTimeInterval{return now;} credentialReader:reader credentialWriter:writer]; };
+    CSCloseFriendRuntime *(^makeRuntime)(void)=^{ return [[CSCloseFriendRuntime alloc] initWithStore:store wallClock:^NSTimeInterval{return now;} elapsedClock:^NSTimeInterval{return elapsed;} credentialReader:reader credentialWriter:writer]; };
     CSCloseFriendRuntime *runtime=makeRuntime();
     Check([runtime snapshotForEpoch:0 suspended:NO].blocked,"uninitialized runtime protects surfaces");
     [runtime synchronizeAccount:@"alice" epoch:1 suspended:NO];
@@ -110,8 +110,18 @@ int main(void) { @autoreleasepool {
     now+=31; Check([runtime authenticatePassword:@"correct-password" token:token error:NULL],"password succeeds after cooldown");
     Check(![runtime isTokenCurrent:token],"successful authentication consumes token");
     NSUInteger revealedRevision=[runtime snapshotForEpoch:1 suspended:NO].revision;
-    now+=301; Check(!runtime.isAuthorized && ![runtime snapshotForEpoch:1 suspended:NO].revealed,"clock expiry removes authorization immediately");
+    now-=3600; elapsed+=299;
+    Check(runtime.isAuthorized,"wall-clock rollback does not change the elapsed reveal deadline");
+    elapsed+=2;
+    Check(!runtime.isAuthorized && ![runtime snapshotForEpoch:1 suspended:NO].revealed,"reveal expires after elapsed time despite backward wall-clock adjustment");
     Check([runtime snapshotForEpoch:1 suspended:NO].revision>revealedRevision,"expiry publishes a new policy revision");
+    now+=7200;
+    Check(!runtime.isAuthorized,"forward wall-clock correction cannot resurrect expired reveal");
+    Check([runtime authenticatePassword:@"correct-password" token:runtime.authenticationToken error:NULL],"new authorization uses independent clocks");
+    now+=86400; elapsed+=299;
+    Check(runtime.isAuthorized,"wall-clock jump forward leaves the original monotonic interval intact");
+    elapsed+=2;
+    Check(!runtime.isAuthorized && ![runtime snapshotForEpoch:1 suspended:NO].revealed,"forward wall-clock movement cannot extend authorization beyond elapsed deadline");
     token=runtime.authenticationToken; [runtime setActive:NO]; [runtime setActive:YES];
     Check(![runtime completeBiometricWithToken:token],"late biometric reply after background fails");
     Check(![runtime authenticatePassword:@"correct-password" token:token error:NULL],"late password reply after background fails");
