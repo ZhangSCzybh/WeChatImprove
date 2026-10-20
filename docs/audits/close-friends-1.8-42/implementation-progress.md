@@ -128,4 +128,7 @@ Task6 fix round1/5 (durable revocation finding addressed, 0 open; f747a6a4..b0a8
 Task 6: complete (3e757d92..b0a81135; review approved; documented restart and native route limits remain).
 Task 7: in progress; base b0a81135; final integration/version/package/docs. Combined Task7 task gate + final whole-branch review will follow once, as ledgered.
 
-Task7 integration complete: deferred picker save and inert-marker row resolved. Process-bound DND limitation explicit in UI/delivery; focused host tests and final package pass. Device acceptance pending. Combined final review follows.
+Task7 integrated core scripts + directly affected entry/payment privacy passed once; package build succeeded, metadata checks ongoing. Picker error delivery uses explicit opt-in completesAfterDismissal on existing picker with default behavior preserved. Inert showBadges row omitted, schema retained. DND restart limitation added to settings/docs.
+Ruling: .theos is tracked by this repository; preserve current generated build outputs on disk and exclude cache churn from the integration commit. Commit source/docs/audit and new package. Record generated working-tree changes explicitly rather than resetting the user's build directory or mixing build cache into review.
+
+Task7 integration complete: picker deferred save, inert showBadges row omitted, process-bound DND UI/docs explicit; all six close-friend core scripts + entry/startup + payment privacy passed once. Package 1.8-42 rootless dual-arch built and metadata/hash/source/prior-artifact checks passed. Device acceptance pending; combined final review follows. .theos retained, excluded from commit.

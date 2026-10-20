@@ -2,6 +2,8 @@
 
 Status: DONE_WITH_CONCERNS — authorized integration complete; device acceptance and documented native limits remain. Integration base: b0a811357c8af96b7c599c570d99f41011040f31, original checkout /Users/zhangshichao/Documents/Workspace/WeChatImprove, branch codex/close-friends.
 
+Integration/source/package commit: `6987c113` — `feat: integrate close-friend privacy and package 1.8-42`. All 455 source manifest entries also matched the staged Git index before commit; no `.theos` path staged. A documentation-only follow-up captures this commit identity and the controller’s latest ledger.
+
 ## Changes
 
 - Unified control, displayed version, current release notes, README download/output/build guidance at 1.8-42. Preserved historical release entries.

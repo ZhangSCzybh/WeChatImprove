@@ -282,5 +282,7 @@
       "branch",
       "--show-current"
     ]
-  ]
+  ],
+  "integration_source_commit": "6987c113",
+  "index_source_manifest_verified": true
 }
