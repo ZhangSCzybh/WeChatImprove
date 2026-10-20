@@ -200,7 +200,9 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
                 if (row.userName.length && [hiddenUserNames containsObject:row.userName]) continue;
                 // Aggregate preview/dot attribution is not a sum of visible sessions.
                 // Keep its navigation entry but publish no unverified unread contribution.
-                if (hiddenUserNames.count && row.kind==CSGroupRowKindAggregate && ![unmaskedAggregateUserNames containsObject:row.userName ?: @""]) {
+                // Only folded chats can summarize protected friends/groups. Service-account
+                // containers keep their native title, layout and unread semantics.
+                if (hiddenUserNames.count && row.kind==CSGroupRowKindAggregate && [row.userName isEqual:@"chatroom_session_box"] && ![unmaskedAggregateUserNames containsObject:row.userName]) {
                     row=[[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName kind:row.kind category:row.category top:row.top unreadCount:0 redDot:NO];
                     row.privacyMasked=YES;
                 }

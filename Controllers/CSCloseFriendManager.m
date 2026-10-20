@@ -37,6 +37,7 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 @property(nonatomic,strong) NSMutableArray<UIView *> *covers;
 @property(nonatomic,strong) LAContext *authenticationContext;
 @property(nonatomic,strong) NSTimer *timer;
+@property(nonatomic,weak) UIViewController *recoveryPage;
 @property(nonatomic) BOOL started, lastRevealed, authenticating, backgroundCoverRequired;
 @end
 @implementation CSCloseFriendManager
@@ -209,18 +210,34 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 }
 - (NSDictionary *)capabilities { @synchronized(self.capabilityMap) { return [self.capabilityMap copy]; } }
 - (void)recordCapability:(NSString *)name available:(BOOL)available { if(!name.length)return; @synchronized(self.capabilityMap) { self.capabilityMap[name]=@(available); } }
+- (BOOL)consumeHomepageSearchPassword:(NSString *)query {
+    if(!NSThread.isMainThread || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return NO;
+    [self refreshAccount];
+    BOOL consumed=[self.runtime consumeSearchPassword:query token:self.runtime.authenticationToken];
+    if(consumed) self.lastRevealed=self.runtime.isAuthorized;
+    return consumed;
+}
 - (void)recovery:(UILongPressGestureRecognizer *)gesture {
-    if(gesture.state!=UIGestureRecognizerStateBegan)return;
-    UIResponder *responder=gesture.view; while(responder && ![responder isKindOfClass:UIViewController.class])responder=responder.nextResponder;
-    UIViewController *controller=(UIViewController *)responder;
-    if([controller isKindOfClass:UINavigationController.class])controller=((UINavigationController *)controller).topViewController;
-    if(controller)[self presentSettingsFrom:controller];
+    if(gesture.state!=UIGestureRecognizerStateBegan || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return;
+    UIViewController *page=self.recoveryPage;
+    if(!page || page.navigationController.topViewController!=page || page.presentedViewController || gesture.view!=page.navigationController.navigationBar) return;
+    [self refreshAccount];
+    if([self.runtime revealWithShortcutToken:self.runtime.authenticationToken]) {
+        self.lastRevealed=YES;
+        [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
+    }
 }
 - (void)attachRecoveryGestureTo:(UIViewController *)controller {
-    UINavigationBar *bar=controller.navigationController.navigationBar; if(!bar)return;
+    // Some WeChat builds expose an NSObject main-frame owner with curViewController.
+    id page=[controller isKindOfClass:UIViewController.class] ? controller : CSCloseFriendRead(controller,@"curViewController");
+    if(![page isKindOfClass:UIViewController.class]) return;
+    self.recoveryPage=page;
+    UINavigationBar *bar=self.recoveryPage.navigationController.navigationBar; if(!bar)return;
     static char recoveryKey;
     if(objc_getAssociatedObject(bar,&recoveryKey))return;
     UILongPressGestureRecognizer *gesture=[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(recovery:)]; gesture.minimumPressDuration=1.2;
+    gesture.cancelsTouchesInView=NO;
     [bar addGestureRecognizer:gesture]; objc_setAssociatedObject(bar,&recoveryKey,gesture,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
+
 @end

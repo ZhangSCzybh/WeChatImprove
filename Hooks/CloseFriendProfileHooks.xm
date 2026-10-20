@@ -8,13 +8,29 @@ static void Refresh0(NSString *cls,NSString *name) {
 }
 static void Guard0(NSString *cls,NSString *name) {
     __block IMP original=NULL; SEL selector=NSSelectorFromString(name);
-    IMP replacement=imp_implementationWithBlock(^(id object){if(!CSCFProfileBlocksAction(object)) ((void(*)(id,SEL))original)(object,selector);});
+    IMP replacement=imp_implementationWithBlock(^(id object){if(!CSCFProfileBlocksAction(object)) ((void(*)(id,SEL))original)(object,selector);
+        else if([name isEqual:@"onAddToContacts"] || [name isEqual:@"onAddToContact"]) CSCFProfileLocalAdd(object);});
     if(!CSCloseFriendInstallHook(cls,name,replacement,&original,"v@:")) imp_removeBlock(replacement);
 }
 static void Guard1(NSString *cls,NSString *name) {
     __block IMP original=NULL; SEL selector=NSSelectorFromString(name);
     IMP replacement=imp_implementationWithBlock(^(id object,id argument){if(!CSCFProfileBlocksAction(object)) ((void(*)(id,SEL,id))original)(object,selector,argument);});
     if(!CSCloseFriendInstallHook(cls,name,replacement,&original,"v@:@")) imp_removeBlock(replacement);
+}
+static void Render0(NSString *cls,NSString *name) {
+    __block IMP original=NULL; SEL selector=NSSelectorFromString(name);
+    IMP replacement=imp_implementationWithBlock(^(id object){
+        CSCFProfileWithNativePresentation(object,^{((void(*)(id,SEL))original)(object,selector);});
+    });
+    if(!CSCloseFriendInstallHook(cls,name,replacement,&original,"v@:")) imp_removeBlock(replacement);
+}
+static void DisplayFlag(NSString *cls,NSString *name) {
+    __block IMP original=NULL; SEL selector=NSSelectorFromString(name);
+    IMP replacement=imp_implementationWithBlock(^BOOL(id object){
+        if(CSCFProfileUsesNativeStranger(object)) return NO;
+        return ((BOOL(*)(id,SEL))original)(object,selector);
+    });
+    if(!CSCloseFriendInstallHook(cls,name,replacement,&original,"B@:")) imp_removeBlock(replacement);
 }
 %ctor { dispatch_async(dispatch_get_main_queue(),^{
     for(NSString *name in @[@"viewDidLoad",@"viewDidLayoutSubviews",@"reloadView",@"reloadContactAssist",@"onTableViewReload"]) Refresh0(@"ContactInfoViewController",name);
@@ -32,5 +48,9 @@ static void Guard1(NSString *cls,NSString *name) {
     __block IMP message=NULL;
     IMP replacement=imp_implementationWithBlock(^(id object,id argument,id info){if(!CSCFProfileBlocksAction(object)) ((void(*)(id,SEL,id,id))message)(object,NSSelectorFromString(@"onNewMessage:requestInfo:"),argument,info);});
     if(!CSCloseFriendInstallHook(@"ContactInfoViewController",@"onNewMessage:requestInfo:",replacement,&message,"v@:@@")) imp_removeBlock(replacement);
-    // No isMyContact / isMMContact hook. Native relationship flags remain true and intact.
+    for(NSString *name in @[@"addMsgActionView",@"initFooterView",@"initFooterBtnArea"]) Render0(@"WeixinContactInfoAssist",name);
+    DisplayFlag(@"CBaseContactInfoAssist",@"isInMyContactList");
+    for(NSString *name in @[@"isNeedVerify",@"isFromStrangeScene",@"canShowVOIPBtn"]) DisplayFlag(@"WeixinContactInfoAssist",name);
+    // All relationship getters outside native button construction keep their real value.
+    // No CContact / CContactMgr friendship hook or persistent flag modification.
 }); }

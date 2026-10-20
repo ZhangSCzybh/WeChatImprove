@@ -115,6 +115,28 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
         self.revealUntil=self.elapsedClock()+[self.state[@"profile"][@"options"][@"unlockSeconds"] doubleValue]; self.generation++; [self changed]; return YES;
     }
 }
+- (BOOL)revealWithShortcutToken:(NSDictionary *)token {
+    NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
+    @synchronized(self) {
+        if(![self isTokenCurrent:token] || !self.credential || ![self.state[@"profile"][@"enabled"] boolValue]) return NO;
+        self.revealUntil=self.elapsedClock()+[self.state[@"profile"][@"options"][@"unlockSeconds"] doubleValue];
+        self.generation++; [self changed]; return YES;
+    }
+}
+- (BOOL)consumeSearchPassword:(NSString *)query token:(NSDictionary *)token {
+    NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
+    @synchronized(self) {
+        if(![query isKindOfClass:NSString.class] || query.length<6 || query.length>128 ||
+           ![self isTokenCurrent:token] || !self.credential || ![self.state[@"profile"][@"enabled"] boolValue]) return NO;
+        NSData *derived=CSCloseFriendPasswordVerifier(query,self.credential[@"salt"],[self.credential[@"iterations"] unsignedIntegerValue],NULL);
+        if(!derived || !CSCloseFriendConstantTimeEqual(derived,self.credential[@"verifier"])) return NO;
+        // Never forward a recognized credential to native search/history, including cooldown.
+        if([self.credential[@"cooldown"] doubleValue]>self.wallClock()) return YES;
+        NSMutableDictionary *next=[self.credential mutableCopy]; next[@"failures"]=@0; next[@"cooldown"]=@0;
+        if([self persistCredential:next error:NULL]) [self revealWithShortcutToken:token];
+        return YES;
+    }
+}
 - (BOOL)completeBiometricWithToken:(NSDictionary *)token {
     NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
     @synchronized(self) {

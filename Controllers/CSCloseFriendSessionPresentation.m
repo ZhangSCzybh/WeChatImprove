@@ -14,7 +14,7 @@
 static char CoverKey;
 void CSCloseFriendUpdateSessionCover(UITableViewCell *cell, CSGroupRow *row) {
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
-    BOOL cover=row.privacyMasked && row.kind==CSGroupRowKindAggregate && (policy.blocked ||
+    BOOL cover=row.privacyMasked && row.kind==CSGroupRowKindAggregate && [row.userName isEqual:@"chatroom_session_box"] && (policy.blocked ||
         (policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue] && policy.protectedUserNames.count));
     CSCloseFriendSessionCover *view=objc_getAssociatedObject(cell,&CoverKey);
     if (!cover) {
@@ -36,7 +36,7 @@ void CSCloseFriendUpdateSessionCover(UITableViewCell *cell, CSGroupRow *row) {
         view.originalAccessibilityLabel=cell.accessibilityLabel;
         UILabel *title=[[UILabel alloc] initWithFrame:CGRectInset(view.bounds,18,0)];
         title.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-        title.text=[row.userName isEqual:@"chatroom_session_box"] ? @"折叠的群聊" : @"会话合集";
+        title.text=@"折叠的群聊";
         title.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody]; title.textColor=UIColor.labelColor;
         [view addSubview:title]; view.isAccessibilityElement=YES; view.accessibilityLabel=title.text;
         objc_setAssociatedObject(cell,&CoverKey,view,OBJC_ASSOCIATION_RETAIN_NONATOMIC);

@@ -10,7 +10,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad]; self.title=@"密友";
     self.keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"autoMute",@"rejectVoice",@"rejectVideo",@"hidePrivacyIcons",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"unlockSeconds"];
-    self.labels=@[@"隐藏会话",@"隐藏联系人",@"隐藏转发候选",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏朋友圈内容",@"隐藏互动痕迹",@"隐藏状态",@"遮蔽个人资料",@"静默消息通知",@"自动免打扰",@"拒接语音来电",@"拒接视频来电",@"隐藏全部朋友圈可见范围图标",@"隐藏密友设置入口",@"隐藏插件入口",@"允许生物识别解锁",@"摇动立即锁定",@"临时解锁时长"];
+    self.labels=@[@"隐藏会话",@"隐藏联系人",@"隐藏转发候选",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏朋友圈内容",@"隐藏互动痕迹",@"隐藏状态",@"资料页显示添加到通讯录",@"静默消息通知",@"自动免打扰",@"拒接语音来电",@"拒接视频来电",@"隐藏全部朋友圈可见范围图标",@"隐藏密友设置入口",@"隐藏插件入口",@"允许生物识别解锁",@"摇动立即锁定",@"临时解锁时长"];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(policyChanged:) name:CSCloseFriendPolicyDidChangeNotification object:nil];
 }
 - (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
@@ -27,13 +27,13 @@
     }
 }
 - (void)policyChanged:(NSNotification *)note { [self.tableView reloadData]; }
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return [self authorized]?3:0; }
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { return section==0?6:(section==1?self.keys.count:MAX((NSUInteger)1,CSCloseFriendManager.sharedManager.capabilities.count)); }
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return @[@"账号保护",@"保护选项",@"兼容性状态"][section]; }
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return [self authorized]?2:0; }
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { return section==0?6:self.keys.count; }
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return @[@"账号保护",@"保护选项"][section]; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if(section==0)return @"密码仅保存在本机钥匙串。临时解锁仍会静默通知、独立拒接来电。后台或账号切换会立即锁定。";
-    if(section==1)return @"隐藏入口后，长按微信首页顶部导航栏 1.2 秒验证恢复。默认解锁 300 秒。免打扰恢复保留用户或远端后续修改。微信重启后，移出密友或停用功能可能仍保留免打扰，需在微信里手动关闭。";
-    return @"接口检查只说明方法签名是否匹配；实际设备验证仍待完成，不代表全部界面或通知已受保护。";
+    if(section==1)return @"长按微信首页顶部导航栏 1.2 秒直接临时解锁，或在首页搜索框输入完整密码解锁；解锁期间显示隐藏的密友设置入口。默认解锁 300 秒。免打扰恢复保留用户或远端后续修改。微信重启后，移出密友或停用功能可能仍保留免打扰，需在微信里手动关闭。";
+    return nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell=[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
@@ -48,11 +48,6 @@
         NSString *key=self.keys[indexPath.row]; cell.textLabel.text=self.labels[indexPath.row];
         if([key isEqual:@"unlockSeconds"]) { cell.detailTextLabel.text=[NSString stringWithFormat:@"%@ 秒",profile[@"options"][key]]; cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator; }
         else { UISwitch *toggle=[UISwitch new]; toggle.tag=indexPath.row; toggle.on=[profile[@"options"][key] boolValue]; [toggle addTarget:self action:@selector(toggle:) forControlEvents:UIControlEventValueChanged]; cell.accessoryView=toggle; }
-    } else {
-        NSDictionary *capabilities=CSCloseFriendManager.sharedManager.capabilities; NSArray *names=[capabilities.allKeys sortedArrayUsingSelector:@selector(compare:)];
-        cell.textLabel.numberOfLines=0; cell.detailTextLabel.numberOfLines=0;
-        cell.textLabel.text=names.count?names[indexPath.row]:@"尚无接口检查结果";
-        cell.detailTextLabel.text=names.count?([capabilities[names[indexPath.row]] boolValue]?@"接口可用\n设备验证待完成":@"接口不可用\n设备验证待完成"):@"设备验证待完成";
     }
     return cell;
 }

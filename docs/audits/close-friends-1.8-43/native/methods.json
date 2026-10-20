@@ -1,0 +1,210 @@
+[
+  {
+    "cls": "FTSHomeViewController",
+    "kind": "instance",
+    "selector": "mmInputBoxTextChanged:text:",
+    "address": "0x101763fa8",
+    "end": "0x101764268",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "FTSHomeViewController",
+    "kind": "instance",
+    "selector": "onTextFieldChanged:",
+    "address": "0x1017643c8",
+    "end": "0x101764460",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "FTSHomeViewController",
+    "kind": "instance",
+    "selector": "reloadList",
+    "address": "0x101767434",
+    "end": "0x1017674a8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "FTSHomeViewController",
+    "kind": "instance",
+    "selector": "searchBarText",
+    "address": "0x1017674a8",
+    "end": "0x1017674fc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "FTSHomeViewController",
+    "kind": "instance",
+    "selector": "searchTextField",
+    "address": "0x1017675a4",
+    "end": "0x1017675f8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "FTSHomeViewController",
+    "kind": "instance",
+    "selector": "resignSearchFirstResponder",
+    "address": "0x101767910",
+    "end": "0x101767950",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "FTSHomeViewController",
+    "kind": "instance",
+    "selector": "onGetTextInput:isFromVoice:",
+    "address": "0x101767980",
+    "end": "0x101767a9c",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "FTSHomeViewController",
+    "kind": "instance",
+    "selector": "presenter",
+    "address": "0x10176b614",
+    "end": "0x10176b624",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "FTSVoiceSearchBarController",
+    "kind": "instance",
+    "selector": "doFTSSearch:",
+    "address": "0x101829d74",
+    "end": "0x101829e20",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "FTSVoiceSearchBarController",
+    "kind": "instance",
+    "selector": "cancelFTSSearch",
+    "address": "0x101829e20",
+    "end": "0x10182a008",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "FTSVoiceSearchBarController",
+    "kind": "instance",
+    "selector": "delaySearch:slowMode:",
+    "address": "0x10182a308",
+    "end": "0x10182a3b0",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "FTSVoiceSearchBarController",
+    "kind": "instance",
+    "selector": "doSearch:",
+    "address": "0x10182a3b0",
+    "end": "0x10182a418",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "FTSVoiceSearchBarController",
+    "kind": "instance",
+    "selector": "handleTextDidChange:",
+    "address": "0x10182a428",
+    "end": "0x10182a438",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "FTSVoiceSearchBarController",
+    "kind": "instance",
+    "selector": "handleTextDidChange:fromNewVoice:",
+    "address": "0x10182a438",
+    "end": "0x10182a6d0",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "FTSVoiceSearchBarController",
+    "kind": "instance",
+    "selector": "resetDataSource",
+    "address": "0x10182a6d0",
+    "end": "0x10182a8d0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "FTSVoiceSearchBarController",
+    "kind": "instance",
+    "selector": "recordLocalSearchHistory:",
+    "address": "0x10182b7a0",
+    "end": "0x10182b80c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "FTSVoiceSearchBarController",
+    "kind": "instance",
+    "selector": "page",
+    "address": "0x10182e12c",
+    "end": "0x10182e144",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCMomentsPrivacyViewController",
+    "kind": "instance",
+    "selector": "handleMultiSelectContactReturn:",
+    "address": "0x1091f7260",
+    "end": "0x1091f75c4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCMomentsPrivacyViewController",
+    "kind": "instance",
+    "selector": "currentItem",
+    "address": "0x1091f96a4",
+    "end": "0x1091f96f8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCMomentsPrivacyViewController",
+    "kind": "instance",
+    "selector": "updateWithSelectedContactSet:",
+    "address": "0x1091f973c",
+    "end": "0x1091f986c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCMomentsPrivacyViewController",
+    "kind": "instance",
+    "selector": "openAddFromTag",
+    "address": "0x1091fc5ec",
+    "end": "0x1091fc8d0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCMomentsPrivacyViewController",
+    "kind": "instance",
+    "selector": "openAddFromFriend",
+    "address": "0x1091fc8d0",
+    "end": "0x1091fce6c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "ContactSelectView",
+    "kind": "instance",
+    "selector": "reloadContacts",
+    "address": "0x10101a3ec",
+    "end": "0x10101a404",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "ContactSelectView",
+    "kind": "instance",
+    "selector": "onFilterContactCandidate:",
+    "address": "0x10101a550",
+    "end": "0x10101a618",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "ContactSelectView",
+    "kind": "instance",
+    "selector": "m_delegate",
+    "address": "0x10101c38c",
+    "end": "0x10101c3ac",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "ContactSelectView",
+    "kind": "instance",
+    "selector": "m_contactsDataLogic",
+    "address": "0x10101c408",
+    "end": "0x10101c418",
+    "types": "@16@0:8"
+  }
+]

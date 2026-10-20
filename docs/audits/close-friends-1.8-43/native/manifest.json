@@ -1,0 +1,95 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "classes": [
+    "FTSHomeViewController",
+    "FTSVoiceSearchBarController",
+    "WCMomentsPrivacyViewController",
+    "ContactSelectView"
+  ],
+  "missing": [],
+  "encryption": [
+    32768,
+    492666880,
+    0
+  ],
+  "method_count": 26,
+  "files": {
+    "ContactSelectView--onFilterContactCandidate_.asm": "baca7813dfc66c46bce9a7b851757499a0815d8b78e9124ba5bb97d723ac395b",
+    "FTSHomeViewController--onTextFieldChanged_.asm": "73cfb1de4dea8bc8649cddd299d4b7a202cb6180fa258e5cd365fb012ffcbbf8",
+    "WCMomentsPrivacyViewController--handleMultiSelectContactReturn_.asm": "2c99a0b3ca8fd1eea1d285969d778da0de1fb61b96e239ece4b888c8149d6e5f",
+    "WCMomentsPrivacyViewController--updateWithSelectedContactSet_.asm": "ff54fd3688c430e5614d11f318d2ab6acc12aaceda7ecffcfc408ed88a549b06",
+    "FTSHomeViewController--onGetTextInput_isFromVoice_.asm": "3aaeddf1283c90aa91d5a9d79cabb3b4794f93f2795902bf2b3455ad23a76399",
+    "methods.json": "38fee689a8f366c159288499db69d5b5e20708a5e8acf762ffc509109cb77885",
+    "disassemble.py": "0f814eef35f8d33e48d37a90a3128c70de1cbdfc506de16da711189479d3307d",
+    "FTSVoiceSearchBarController--delaySearch_slowMode_.asm": "35b13fbbd65931d443f05c825e031daae834b011048431d13021165601415e60",
+    "FTSVoiceSearchBarController--doSearch_.asm": "25feb59aad15040f2119f6c3d032dbc1f48611c863a728217726b69c74c4443d",
+    "FTSVoiceSearchBarController--handleTextDidChange_.asm": "198e7198c39822ab3d242fb3a15d77e74dfd9438d5d7fe5c1df27b009c599fe8",
+    "WeixinContactInfoAssist--reloadTableView.asm": "efb62ca1e879461bc3b4c21fce752a65057745e86256fd58a59a9f6e14b05265",
+    "WCMomentsPrivacyViewController--openAddFromFriend.asm": "67c13d9b2e23a68112d03d35247775d4a01fb68906ae863b796ea7fd02afa8c1",
+    "extract.py": "a584adb3fad61b9f990464061eff76cb0185d27ed289e0e79bfbac50e03b0c06"
+  },
+  "disassembly": [
+    {
+      "file": "FTSHomeViewController--onTextFieldChanged_.asm",
+      "start": "0x1017643c8",
+      "stop": "0x101764460",
+      "truncated": false
+    },
+    {
+      "file": "FTSHomeViewController--onGetTextInput_isFromVoice_.asm",
+      "start": "0x101767980",
+      "stop": "0x101767a9c",
+      "truncated": false
+    },
+    {
+      "file": "FTSVoiceSearchBarController--delaySearch_slowMode_.asm",
+      "start": "0x10182a308",
+      "stop": "0x10182a3b0",
+      "truncated": false
+    },
+    {
+      "file": "FTSVoiceSearchBarController--doSearch_.asm",
+      "start": "0x10182a3b0",
+      "stop": "0x10182a418",
+      "truncated": false
+    },
+    {
+      "file": "FTSVoiceSearchBarController--handleTextDidChange_.asm",
+      "start": "0x10182a428",
+      "stop": "0x10182a438",
+      "truncated": false
+    },
+    {
+      "file": "WCMomentsPrivacyViewController--handleMultiSelectContactReturn_.asm",
+      "start": "0x1091f7260",
+      "stop": "0x1091f75c4",
+      "truncated": false
+    },
+    {
+      "file": "WCMomentsPrivacyViewController--updateWithSelectedContactSet_.asm",
+      "start": "0x1091f973c",
+      "stop": "0x1091f986c",
+      "truncated": false
+    },
+    {
+      "file": "WCMomentsPrivacyViewController--openAddFromFriend.asm",
+      "start": "0x1091fc8d0",
+      "stop": "0x1091fce6c",
+      "truncated": false
+    },
+    {
+      "file": "ContactSelectView--onFilterContactCandidate_.asm",
+      "start": "0x10101a550",
+      "stop": "0x10101a618",
+      "truncated": false
+    }
+  ],
+  "supplemental_disassembly": {
+    "WeixinContactInfoAssist--reloadTableView.asm": [
+      "0x10a94cd4c",
+      "0x10a94d2b4"
+    ]
+  }
+}

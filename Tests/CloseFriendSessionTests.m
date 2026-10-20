@@ -175,6 +175,9 @@ int main(void) { @autoreleasepool {
  NSArray *retained=@[Row(0,@"A",CSGroupRowKindBusiness,CSGroupRowCategoryUnknown,9),Row(1,nil,CSGroupRowKindBusiness,CSGroupRowCategoryUnknown,0),Row(2,@"chatroom_session_box",CSGroupRowKindAggregate,CSGroupRowCategoryGroup,12)];
  CSGroupProjection *r=Project(retained,tabs,custom.tabId,hidden,1,nil);
  Check(r.sections[0].count==2 && ![r rowAtDisplayPath:Path(0)].userName,@"privacy precedes retained rules; unknown anonymous business row survives");
+ NSArray *services=@[Row(0,@"brandsessionholder",CSGroupRowKindAggregate,CSGroupRowCategoryService,7),Row(1,@"brandservicesessionholder",CSGroupRowKindAggregate,CSGroupRowCategoryService,4)];
+ CSGroupProjection *serviceProjection=Project(services,tabs,all.tabId,[NSSet setWithObject:@"A"],1,nil);
+ Check(serviceProjection.sections[0][0]==services[0] && serviceProjection.sections[0][1]==services[1] && !serviceProjection.sections[0][0].privacyMasked && serviceProjection.sections[0][1].unreadCount==4,@"locked friend never replaces native service-account containers or unread values");
  Check(![r badgeForTabID:all.tabId].redDot && ![r badgeForTabID:custom.tabId].redDot,@"unattributed aggregate unread does not leak into badges");
  Check(![r rowAtDisplayPath:Path(1)].unreadCount && [retained[2] unreadCount]==12,@"aggregate presentation neutralizes unread without changing input value");
  Check([Project(retained,tabs,custom.tabId,[NSSet set],2,r) badgeForTabID:custom.tabId].redDot,@"reveal restores aggregate native dot");

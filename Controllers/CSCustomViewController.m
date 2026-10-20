@@ -764,7 +764,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     
     NSMutableArray *accountItems=[NSMutableArray arrayWithArray:@[accountItem,favoriteAuthItem]];
     CSCloseFriendSnapshot *closeFriendSnapshot=CSCloseFriendCurrentSnapshot();
-    if(!(closeFriendSnapshot.enabled && [closeFriendSnapshot.options[@"hideSettingsEntry"] boolValue])) {
+    if(!(closeFriendSnapshot.enabled && !closeFriendSnapshot.revealed && [closeFriendSnapshot.options[@"hideSettingsEntry"] boolValue])) {
         [accountItems addObject:[CSSettingItem itemWithTitle:@"密友" iconName:@"lock.shield" iconColor:UIColor.systemBlueColor detail:nil]];
     }
     CSSettingSection *accountSection = [CSSettingSection sectionWithHeader:@"账号与安全" items:accountItems];

@@ -20,6 +20,11 @@ typedef BOOL (^CSCloseFriendCredentialWriter)(NSString *, NSDictionary *, NSErro
 - (BOOL)hasCredential;
 - (BOOL)setPassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error;
 - (BOOL)authenticatePassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error;
+/// Explicit homepage shortcut. Validates foreground account/config; no password prompt.
+- (BOOL)revealWithShortcutToken:(NSDictionary *)token;
+/// YES means consume locally, even if cooldown/storage prevents reveal. Unrelated queries
+/// never count as failed password attempts and never write the credential.
+- (BOOL)consumeSearchPassword:(NSString *)query token:(NSDictionary *)token;
 /// Only call after successful LAContext biometric evaluation. Still validates token/current policy/cooldown.
 - (BOOL)completeBiometricWithToken:(NSDictionary *)token;
 - (BOOL)isAuthorized;

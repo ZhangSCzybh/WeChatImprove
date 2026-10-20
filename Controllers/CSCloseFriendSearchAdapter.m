@@ -1,4 +1,23 @@
 #import "CSCloseFriendSearchAdapter.h"
+#import "CSCloseFriendManager.h"
+
+BOOL CSCFSearchConsumePassword(id page,id input) {
+    if(!NSThread.isMainThread || !CSCFIsClass(page,@"FTSHomeViewController")) return NO;
+    id field=CSCloseFriendRead(page,@"searchTextField");
+    if([field isKindOfClass:UITextField.class] && [(UITextField *)field markedTextRange]) return NO;
+    id query=[input isKindOfClass:NSString.class] ? input : CSCloseFriendRead(input,@"text");
+    if(![query isKindOfClass:NSString.class]) query=CSCloseFriendRead(page,@"searchBarText");
+    if(![query isKindOfClass:NSString.class] || ![CSCloseFriendManager.sharedManager consumeHomepageSearchPassword:query]) return NO;
+    // Consume before the original text-change/search/history methods run.
+    CSCFSetObject(field,@"setText:",@"");
+    id presenter=CSCloseFriendRead(page,@"presenter");
+    [NSObject cancelPreviousPerformRequestsWithTarget:presenter];
+    CSCFCallVoid(presenter,@"cancelFTSSearch");
+    CSCFCallVoid(presenter,@"resetDataSource");
+    CSCFCallVoid(page,@"reloadList");
+    CSCFCallVoid(page,@"resignSearchFirstResponder");
+    return YES;
+}
 @interface CSCFSearchState : NSObject
 @property(nonatomic) NSUInteger epoch, revision, displayedRevision, generation, displayedGeneration;
 @property(nonatomic,copy) NSArray *source;
@@ -8,6 +27,16 @@
 @implementation CSCFSearchState @end
 static char SearchKey;
 static NSHashTable *Sections;
+id CSCFSearchModel(id row) {
+    // FTSNormalSectionData.rows contains row wrappers. Native single/group/top-hit
+    // cell builders read row.model before reading CContact.m_nsUsrName.
+    return CSCloseFriendRead(row,@"model") ?: row;
+}
+NSArray *CSCFSearchVisibleRows(NSArray *rows) {
+    return CSCloseFriendVisibleContacts(rows,CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceSearch,^NSString *(id row){
+        return CSCloseFriendUserName(CSCFSearchModel(row));
+    });
+}
 static UIViewController *Presenter(id section) {
     id page=CSCloseFriendRead(section,@"getViewController");
     if(![page isKindOfClass:UIViewController.class]) page=CSCloseFriendRead(CSCloseFriendRead(section,@"resultPage"),@"getViewController");
@@ -26,7 +55,13 @@ static CSCFSearchState *State(id section) {
     [Sections addObject:section]; return state;
 }
 void CSCFSearchBegin(id section) {
-    CSCFSearchState *state=State(section); state.epoch=CSCloseFriendAccountEpoch(); state.source=nil; state.revision=0;
+    CSCFSearchState *state=State(section); state.source=nil; state.revision=0; state.generation++;
+}
+void CSCFSearchWillUpdate(id section) {
+    CSCFSearchState *state=State(section);
+    if(state.key.length && state.epoch==CSCloseFriendAccountEpoch() && state.source) {
+        CSCFSetObject(section,[state.key isEqual:@"contacts"] ? @"setContacts:" : @"setTopHitItems:",[state.source mutableCopy]);
+    }
 }
 void CSCFSearchDidUpdate(id section,NSString *key) {
     CSCFSearchState *state=State(section); state.key=key;
@@ -40,7 +75,7 @@ BOOL CSCFSearchPrepare(id section) {
     CSCFSearchState *state=State(section); CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
     BOOL current=state.epoch==CSCloseFriendAccountEpoch();
     if(state.key.length) {
-        NSArray *rows=current ? CSCFVisible(state.source,CSCloseFriendSurfaceSearch) : @[];
+        NSArray *rows=current ? CSCFSearchVisibleRows(state.source) : @[];
         NSString *setter=[state.key isEqual:@"contacts"] ? @"setContacts:" : @"setTopHitItems:";
         if(!CSCFSetObject(section,setter,rows)) return NO;
     }
@@ -85,6 +120,7 @@ void CSCFSearchUnlock(id section) {
 @implementation CSCFGroupResultCover @end
 static char GroupCoverKey;
 static NSString *GroupDisplayTitle(id item) {
+    item=CSCFSearchModel(item);
     NSString *username=CSCloseFriendUserName(item);
     if([username hasSuffix:@"@chatroom"]) {
         id title=CSCloseFriendRead(item,@"m_nsNickName");

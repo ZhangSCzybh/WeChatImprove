@@ -12,4 +12,5 @@
 - (NSDictionary *)capabilities;
 - (void)recordCapability:(NSString *)name available:(BOOL)available;
 - (void)attachRecoveryGestureTo:(UIViewController *)controller;
+- (BOOL)consumeHomepageSearchPassword:(NSString *)query;
 @end

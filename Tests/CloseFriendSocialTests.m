@@ -110,6 +110,7 @@ static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(
 @end
 @interface WCMomentsPrivacyViewController : NSObject
 @property(nonatomic,strong) NSSet *selectContacts;
+@property(nonatomic,strong) id currentItem;
 @end
 @implementation WCMomentsPrivacyViewController @end
 @interface ContactSelectView : NSObject
@@ -131,6 +132,7 @@ static BOOL CSCFSocialRequireAuthentication(id owner,CSCloseFriendSurface surfac
 #include "TimelineBodies.h"
 #include "InteractionBodies.h"
 #include "StatusBodies.h"
+static BOOL CSCloseFriendShouldHideUserName(NSString *name,CSCloseFriendSurface surface) {return [Snapshot hidesUserName:name surface:surface];}
 #include "AudienceBodies.h"
 #define Check(x) do { if(!(x)) {fprintf(stderr,"FAIL %s:%d: %s\n",__FILE__,__LINE__,#x); return 1;} } while(0)
 static void Policy(BOOL revealed,NSUInteger revision) {
@@ -192,14 +194,24 @@ int main(void) { @autoreleasepool {
     Check([Keys(logic,NULL) count]==1 && [Rows(logic,NULL,@"A") count]==2 && PickerAllowsAction(picker));
     void(^refreshPicker)(id)=[Refreshes objectForKey:picker]; Check(refreshPicker!=nil);
     Policy(NO,7); refreshPicker(picker);
-    Check([objc_getAssociatedObject(picker,&ShieldKey) boolValue]);
-    Check([Rows(logic,NULL,@"A") count]==0 && !PickerAllowsAction(picker) && NeedsUnlock(privacy));
+    Check(PickerAllowsContact([ContactSelectView new],@"secret"));
+    Check(!PickerAllowsContact(picker,@"secret") && PickerAllowsContact(picker,@"alice"));
+    Check(![objc_getAssociatedObject(picker,&ShieldKey) boolValue]);
+    Check([Rows(logic,NULL,@"A") count]==1 && PickerAllowsAction(picker) && !NeedsUnlock(privacy));
     Check(logic.contacts.count==2 && picker.pending==acl && privacy.selectContacts==acl);
-    Policy(YES,8); Check([Rows(logic,NULL,@"A") count]==0 && !PickerAllowsAction(picker) && NeedsUnlock(privacy));
+    Policy(YES,8); Check([Rows(logic,NULL,@"A") count]==2 && PickerAllowsAction(picker) && !NeedsUnlock(privacy));
     WCMomentsPrivacyViewController *freshPrivacy=[WCMomentsPrivacyViewController new]; freshPrivacy.selectContacts=acl;
     ContactSelectView *freshPicker=[ContactSelectView new]; freshPicker.m_delegate=freshPrivacy;
     AudienceLogic *freshLogic=[AudienceLogic new]; freshLogic.m_delegate=freshPicker; freshLogic.contacts=logic.contacts;
-    Check([Keys(freshLogic,NULL) count]==1 && [Rows(freshLogic,NULL,@"A") count]==2 && PickerAllowsAction(freshPicker) && !NeedsUnlock(freshPrivacy) && NeedsUnlock(privacy));
+    Check([Keys(freshLogic,NULL) count]==1 && [Rows(freshLogic,NULL,@"A") count]==2 && PickerAllowsAction(freshPicker) && !NeedsUnlock(freshPrivacy) && !NeedsUnlock(privacy));
+    Policy(NO,9);
+    privacy.currentItem=[NSObject new];
+    objc_setAssociatedObject(privacy,&AudienceItemKey,privacy.currentItem,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(privacy,&AudienceSelectionKey,[NSSet setWithArray:@[@"secret",@"alice"]],OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    NSSet *visibleChange=[NSSet setWithObject:@"carol"];
+    Check(([MergeSelection(privacy,visibleChange) isEqual:[NSSet setWithArray:@[@"secret",@"carol"]]]));
+    Check(visibleChange.count==1 && privacy.selectContacts==acl);
+    Policy(YES,10); Check([MergeSelection(privacy,visibleChange) isEqual:visibleChange]);
     // Successful native return may release both presentation objects before editor onDone.
     // Exercise the production onDone authorization predicate after those weak refs disappear.
     __weak id dismissedPicker=freshPicker, dismissedLogic=freshLogic;
@@ -207,8 +219,8 @@ int main(void) { @autoreleasepool {
     Check(dismissedPicker==nil && dismissedLogic==nil);
     Check(!NeedsUnlock(freshPrivacy));
     __block NSUInteger doneCalls=0; FinishEdit(freshPrivacy,^{doneCalls++;});
-    Check(doneCalls==1 && freshPrivacy.selectContacts==acl && NeedsUnlock(privacy));
+    Check(doneCalls==1 && freshPrivacy.selectContacts==acl && !NeedsUnlock(privacy));
     Epoch++; Policy(NO,9); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==0); Leave(previous); Check([facade countOfTimelineDataItem]==3);
     Check(Cards(status).visible.count==0 && !MessageActionCurrent(messages,second) && NeedsUnlock(freshPrivacy));
-    puts("Close-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, discovery cues, publishing-picker revocation, stale native render rejection, completed-picker authorization and reveal/relock/account transitions passed");
+    puts("Close-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, discovery cues, locked publishing candidates and hidden-selection preservation, stale native render rejection, completed-picker authorization and reveal/relock/account transitions passed");
 } return 0; }

@@ -16,7 +16,7 @@ static NSUInteger Epoch=1;
 NSUInteger CSCloseFriendAccountEpoch(void) { return Epoch; }
 CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) {return Current;}
 BOOL CSCloseFriendShouldHideUserName(NSString *name,CSCloseFriendSurface surface) {return [Current hidesUserName:name surface:surface];}
-id CSCloseFriendRead(id object,NSString *key) {return [object valueForKey:key];}
+id CSCloseFriendRead(id object,NSString *key) {@try {return [object valueForKey:key];} @catch(__unused NSException *e) {return nil;}}
 NSString *CSCloseFriendUserName(id object) {return [object isKindOfClass:Contact.class] ? [object username] : nil;}
 BOOL CSCFIsClass(id object,NSString *name) {return [object isKindOfClass:NSClassFromString(name)];}
 #import "GroupTitle.h"
@@ -37,7 +37,8 @@ BOOL CSCFIsClass(id object,NSString *name) {return [object isKindOfClass:NSClass
 @implementation CSCFProfileState @end
 #import "ProfilePredicate.h"
 #import "ProfileBindingClass.h"
-static char ProfileKey, AssistBindingKey;
+static char ProfileKey, AssistBindingKey, PresentationDepthKey;
+void CSCFProfileLocalAdd(id object) {(void)object;}
 NSString *const CSCloseFriendPolicyDidChangeNotification=@"TestPolicyChanged";
 void CSCFProfileRefresh(id object) {(void)object;}
 #import "ProfileBindings.h"
@@ -62,6 +63,9 @@ BOOL CSCloseFriendInstallHook(NSString *className,NSString *name,IMP replacement
 #import "ProfileGuards.h"
 @interface NativeAssist : NSObject
 @property(nonatomic) NSUInteger sent;
+@property(nonatomic,copy) NSString *nativeButton;
+- (BOOL)isInMyContactList;
+- (void)renderButtons;
 @property(nonatomic,strong) Contact *m_contact;
 @property(nonatomic,weak) id owner;
 - (id)getViewController;
@@ -70,10 +74,14 @@ BOOL CSCloseFriendInstallHook(NSString *className,NSString *name,IMP replacement
 @end
 @implementation NativeAssist
 - (id)getViewController {return self.owner;}
+- (BOOL)isInMyContactList {return self.m_contact.isFriend;}
+- (void)renderButtons {self.nativeButton=[self isInMyContactList] ? @"发消息" : @"添加到通讯录";}
 - (void)doAddContact {self.sent++;}
 - (void)onNewMessage:(id)sender {(void)sender; self.sent++;}
 @end
+#include "CloseFriendSearchInputFixture.h"
 int main(void) {@autoreleasepool {
+    SearchInputChecks();
     CSCloseFriendIdentity identity=^NSString *(id item){return [item isKindOfClass:NSString.class] ? item : [item username];};
     Contact *visible=Person(@"ordinary"), *hidden=Person(@"secret"), *group=Person(@"private@chatroom");
     NSMutableArray *a=[NSMutableArray arrayWithArray:@[hidden,visible]], *b=[NSMutableArray arrayWithObject:group];
@@ -96,7 +104,13 @@ int main(void) {@autoreleasepool {
     group.m_nsNickName=@"公开群名"; group.remark=@"密友匹配摘要";
     Check([GroupDisplayTitle(group) isEqual:@"公开群名"],@"group row cover exposes public group title, never member-match summary");
     hidden.m_nsNickName=@"公开昵称"; hidden.remark=@"私密备注";
-    Check([PublicNickname(hidden,hidden.username) isEqual:@"公开昵称"],@"stranger presentation uses public nickname, never saved remark");
+    Current=Policy(NO,3);
+    NSArray *nativeRows=@[@{@"model":hidden},@{@"model":visible},@{@"model":group},@{@"model":@{@"feature":@1}}];
+    NSArray *filtered=CSCFSearchVisibleRows(nativeRows);
+    Check(filtered.count==2 && filtered[0]==nativeRows[1] && filtered[1]==nativeRows[3],@"native FTS row.model filters nickname/remark contact and group hits, preserves feature rows");
+    Check(nativeRows.count==4 && hidden.isFriend,@"search projection preserves native results and real friendship");
+    Current=Policy(YES,4); Check(CSCFSearchVisibleRows(nativeRows).count==4,@"search reveal restores original row wrappers");
+    Check([GroupDisplayTitle(@{@"model":group}) isEqual:@"公开群名"],@"group summary unwraps the same native row model");
     NativeForward *forward=[NativeForward new];
     CSCFForwardSearchWillUpdate(forward);
     forward->arrSearchResultOfContacts=[@[hidden,visible] mutableCopy]; forward->arrSearchResultOfGroup=[NSMutableArray array]; forward->arrSearchResultOfTopHit=[NSMutableArray array];
@@ -115,6 +129,12 @@ int main(void) {@autoreleasepool {
     Guard0(@"NativeAssist",@"doAddContact"); Guard1(@"NativeAssist",@"onNewMessage:"); NativeAssist *assist=[NativeAssist new];
     ContactInfoViewController *page=[ContactInfoViewController new]; page.m_contact=hidden; page.m_oContactInfoAssist=assist; assist.m_contact=hidden; assist.owner=page;
     CSCFProfileBind(page);
+    DisplayFlag(@"NativeAssist",@"isInMyContactList"); Render0(@"NativeAssist",@"renderButtons");
+    Current=Policy(NO,5); [assist renderButtons];
+    Check([assist.nativeButton isEqual:@"添加到通讯录"] && [assist isInMyContactList] && hidden.isFriend,@"native button construction sees stranger only inside the bound scope");
+    @try {CSCFProfileWithNativePresentation(assist,^{@throw [NSException exceptionWithName:@"Fixture" reason:nil userInfo:nil];});} @catch(__unused NSException *e) {}
+    Check([assist isInMyContactList],@"native presentation scope restores real relationship after an exception");
+    Current=Policy(YES,6); [assist renderButtons]; Check([assist.nativeButton isEqual:@"发消息"],@"reveal rebuilds original native friend button");
     Current=Policy(NO,3); [assist doAddContact]; [assist onNewMessage:nil];
     Check(assist.sent==0 && hidden.isFriend,@"masked profile guards never invoke native add/message or change friendship");
     Current=Policy(YES,4); [assist onNewMessage:nil]; Check(assist.sent==1,@"reveal permits native action again");
