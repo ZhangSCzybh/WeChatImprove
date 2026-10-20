@@ -1,7 +1,3 @@
-# Historical implementation and review ledger
-
-Later entries supersede earlier pending/fix statements. Current delivery state is in README.md and validation.json.
-
 # SDD ledger — plan: docs/superpowers/plans/2026-10-20-close-friends.md
 Baseline: 929d265b; design/plan: 54762b7f; original checkout retained; branch codex/close-friends.
 Ruling: User has approved the complete design and requested implementation including shared-group profile masking; no repeated approval gate.
@@ -142,3 +138,9 @@ Combined final review complete: Task7 spec/quality Approved; whole branch Needs 
 Final consolidated fix wave dispatched to /root/cf_integration_impl from e98c5ace for I1 only; focused actual notification output regression plus required package/manifest refresh. Unknown/unbound output stays native, positively stale output discarded, exact request matching/mandatory completions retained. No unrelated test or formatting expansion.
 
 Final fix wave: I1 stale bound notifications addressed in 06aeaa37; real UN output reproduced failure then 71 focused alert checks passed. Only affected alerts and final package rerun, unchanged suites reused. New 1.8-42 package/hash and explicit historical-vs-final evidence recorded; one scoped rereview pending.
+
+Final fix wave implemented06aeaa37 (source/tests) +16ffb180 (package/audit). Added stale-output discard distinct from current membership silence; real output and cleanup fixtures RED→71checks GREEN. Rebuilt package and verified delivery, reusing unaffected initial checks. Current package1,077,776bytes SHA256f9ed41cfbcb43332a09205f56be7639b3cbcc9fe1645cfc0f71af820436e72cc; prior5artifacts unchanged. Single scoped final rereview dispatched to original /root/cf_final_review on e98c5ace..16ffb180.
+
+Final scoped rereview complete: I1 ADDRESSED, no new breakage. Whole branch Approved for code/package delivery with explicit device-pending/coverage limits; zero unresolved Critical/Important findings. M1 readability/M2 documented warnings remain nonblocking.
+Task 7: complete (b0a81135..16ffb180; combined task gate + whole-branch review + one consolidated fix wave/scoped rereview approved).
+Delivery: final package1.8-42,1,077,776bytes,SHA256f9ed41cfbcb43332a09205f56be7639b3cbcc9fe1645cfc0f71af820436e72cc; original checkout/data/prior artifacts preserved, .theos generated changes retained. No install/push/merge or device acceptance claimed. Final reports/decisions archived before retiring this plan's scratch workspace.

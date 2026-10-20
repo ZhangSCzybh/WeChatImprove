@@ -1,6 +1,6 @@
 # 密友设置 1.8-42 交付记录
 
-状态：1.8-42 核心主机集成验证、Rootless 双架构打包及产物校验已完成。尚未安装设备，真机验收待执行；本文不是设备验收通过记录。
+状态：1.8-42 源码实现、核心主机集成验证、Rootless 双架构打包及产物校验已完成，最终代码审查已通过。尚未安装设备，真机验收待执行；本文不是设备验收通过记录。
 
 本次功能在原项目 `/Users/zhangshichao/Documents/Workspace/WeChatImprove` 的 `codex/close-friends` 分支开发，基线为 `929d265b`。没有切换项目、修改真实微信数据库、安装到手机或操作真实账号。
 
@@ -55,6 +55,6 @@
 - Debian 架构为 `iphoneos-arm64`，dylib 同时包含 `arm64` / `arm64e`，最低编译目标 iOS 15.0。
 - 既有 4 个安装包和 packages/.DS_Store 均与开始前摘要一致。`.theos` 在原位置保留本次构建结果；其中已跟踪及未跟踪的生成变更不回滚，也不纳入源码提交。包与源码的一致性以摘要/实际产物校验为准，不把构建缓存的工作区变更视为额外源码修改。
 
-[实施决定](delivery-decisions.md)、[历史进度](implementation-progress.md)、[各任务报告](task-reports/) 和 [已完成的阶段审查](reviews/) 已持久归档；早期“待修复”条目由后续修复/批准记录取代。[合并 Task7 与全分支审查](reviews/final-review.md) 已完成；其中唯一 Important 项 I1 已修复，等待一次定向复审。M1 可读性和 M2 构建警告为非阻断项，本轮不扩大清理。
+[实施决定](delivery-decisions.md)、[历史进度](implementation-progress.md)、[各任务报告](task-reports/) 和 [已完成的阶段审查](reviews/) 已持久归档；早期“待修复”条目由后续修复/批准记录取代。[合并 Task7 与全分支审查](reviews/final-review.md) 已完成；其中唯一 Important 项 I1 已修复，[定向复审](reviews/final-fix-review.md) 已通过，当前没有未解决的 Critical/Important finding。M1 可读性和 M2 构建警告为非阻断项，本轮不扩大清理。
 
 原生接口与调用约束见 [native-evidence.md](native-evidence.md)。原有安装包基线见 [prior-packages.json](prior-packages.json)。没有执行 `make clean`，既有包与构建目录保留。
