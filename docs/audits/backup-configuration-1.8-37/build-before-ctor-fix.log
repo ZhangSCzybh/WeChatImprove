@@ -1,0 +1,455 @@
+[0;36m==> [1;36mNotice:[m Build may be slow as Theos isn’t using all available CPU cores on this computer. Consider upgrading GNU Make: https://theos.dev/docs/parallel-building
+[1;31m> [1;3;39mMaking all for tweak WeChatImprove…[m
+[0;31m==> [1;39mPreprocessing Hooks/AvatarHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BackgroundBlurHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BackgroundBlurHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/AvatarHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BackgroundRun.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BackgroundRun.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BackupLifecycleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BackupLifecycleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BubbleStyleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/BubbleStyleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CSAvatarShape.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CSChatAttachmentLayout.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CSAvatarShape.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CUtility.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CustomEntryHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/DisableUpdateHook.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/FavoriteHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CSChatAttachmentLayout.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CUtility.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/CustomEntryHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/GameCheatsHook.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideChatTimeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/DisableUpdateHook.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideDiscoverHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideMomentsHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideQRCodeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/FavoriteHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/GameCheatsHook.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideChatTimeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideSettingHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/InputTextHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideDiscoverHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/LayoutHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideMomentsHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/ListCornerRadiusHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideQRCodeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/HideSettingHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/MessageGestureHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/InputTextHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/MessageMergeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/MessageTimeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/LayoutHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/ListCornerRadiusHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/MessageGestureHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/NavigationTitleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/MessageMergeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/MessageTimeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/ReceiveTransferHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/NavigationTitleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/ReceiveTransferHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/RedEnvelopHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/RedEnvelopHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/RepeatHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/RevokeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/SessionGroupHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/RepeatHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/TabBarStyleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/RevokeHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/SessionGroupHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/TabBarStyleHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/TouchTrailHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/TouchTrailHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/UserInfoHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/UserInfoHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/VoiceForwardHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/WCCustomTextHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/WCUploadTaskHook.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/VoiceForwardHooks.xm…[m
+[0;31m==> [1;39mPreprocessing Hooks/WCCustomTextHooks.xm…[m
+[0;32m==> [1;39mCompiling Controllers/CSAccountDetailViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSAuthorizationManager.m (arm64)…[m
+[0;31m==> [1;39mPreprocessing Hooks/WCUploadTaskHook.xm…[m
+[0;32m==> [1;39mCompiling Controllers/CSAccountDetailViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSAvatarRotation.m (arm64)…[m
+[1mControllers/CSAuthorizationManager.m:215:63: [0m[0;1;35mwarning: [0m[1m'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations][0m
+  215 |             BOOL success = [[UIApplication sharedApplication] openURL:url];[0m
+      | [0;1;32m                                                              ^~~~~~~
+[0m      | [0;32m                                                              openURL:options:completionHandler:
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:97:1: [0m[0;1;36mnote: [0m'openURL:' has been explicitly marked deprecated here[0m
+   97 | - (BOOL)openURL:(NSURL*)url API_DEPRECATED_WITH_REPLACEMENT("openURL:options:completionHandler:", ios(2.0, 10.0)) API_UNAVAILABLE(visionos, watchos);[0m
+      | [0;1;32m^
+[0m[1mControllers/CSAuthorizationManager.m:243:48: [0m[0;1;35mwarning: [0m[1m'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations][0m
+  243 |             [[UIApplication sharedApplication] openURL:url];[0m
+      | [0;1;32m                                               ^~~~~~~
+[0m      | [0;32m                                               openURL:options:completionHandler:
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:97:1: [0m[0;1;36mnote: [0m'openURL:' has been explicitly marked deprecated here[0m
+   97 | - (BOOL)openURL:(NSURL*)url API_DEPRECATED_WITH_REPLACEMENT("openURL:options:completionHandler:", ios(2.0, 10.0)) API_UNAVAILABLE(visionos, watchos);[0m
+      | [0;1;32m^
+[0m[1mControllers/CSAuthorizationManager.m:325:48: [0m[0;1;35mwarning: [0m[1m'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations][0m
+  325 |             [[UIApplication sharedApplication] openURL:nsurl];[0m
+      | [0;1;32m                                               ^~~~~~~
+[0m      | [0;32m                                               openURL:options:completionHandler:
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:97:1: [0m[0;1;36mnote: [0m'openURL:' has been explicitly marked deprecated here[0m
+   97 | - (BOOL)openURL:(NSURL*)url API_DEPRECATED_WITH_REPLACEMENT("openURL:options:completionHandler:", ios(2.0, 10.0)) API_UNAVAILABLE(visionos, watchos);[0m
+      | [0;1;32m^
+[0m3 warnings generated.
+[0;32m==> [1;39mCompiling Controllers/CSAvatarSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSAuthorizationManager.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSAvatarURLCache.m (arm64)…[m
+[1mControllers/CSAuthorizationManager.m:215:63: [0m[0;1;35mwarning: [0m[1m'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations][0m
+  215 |             BOOL success = [[UIApplication sharedApplication] openURL:url];[0m
+      | [0;1;32m                                                              ^~~~~~~
+[0m      | [0;32m                                                              openURL:options:completionHandler:
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:97:1: [0m[0;1;36mnote: [0m'openURL:' has been explicitly marked deprecated here[0m
+   97 | - (BOOL)openURL:(NSURL*)url API_DEPRECATED_WITH_REPLACEMENT("openURL:options:completionHandler:", ios(2.0, 10.0)) API_UNAVAILABLE(visionos, watchos);[0m
+      | [0;1;32m^
+[0m[1mControllers/CSAuthorizationManager.m:243:48: [0m[0;1;35mwarning: [0m[1m'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations][0m
+  243 |             [[UIApplication sharedApplication] openURL:url];[0m
+      | [0;1;32m                                               ^~~~~~~
+[0m      | [0;32m                                               openURL:options:completionHandler:
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:97:1: [0m[0;1;36mnote: [0m'openURL:' has been explicitly marked deprecated here[0m
+   97 | - (BOOL)openURL:(NSURL*)url API_DEPRECATED_WITH_REPLACEMENT("openURL:options:completionHandler:", ios(2.0, 10.0)) API_UNAVAILABLE(visionos, watchos);[0m
+      | [0;1;32m^
+[0m[1mControllers/CSAuthorizationManager.m:325:48: [0m[0;1;35mwarning: [0m[1m'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations][0m
+  325 |             [[UIApplication sharedApplication] openURL:nsurl];[0m
+      | [0;1;32m                                               ^~~~~~~
+[0m      | [0;32m                                               openURL:options:completionHandler:
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:97:1: [0m[0;1;36mnote: [0m'openURL:' has been explicitly marked deprecated here[0m
+   97 | - (BOOL)openURL:(NSURL*)url API_DEPRECATED_WITH_REPLACEMENT("openURL:options:completionHandler:", ios(2.0, 10.0)) API_UNAVAILABLE(visionos, watchos);[0m
+      | [0;1;32m^
+[0m[0;32m==> [1;39mCompiling Controllers/CSAvatarRotation.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSAvatarSettingsViewController.m (arm64e)…[m
+3 warnings generated.
+[0;32m==> [1;39mCompiling Controllers/CSAvatarURLCache.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackgroundBlurManager.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackgroundBlurManager.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackgroundBlurSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackgroundRunViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackgroundBlurSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackgroundRunViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupAssets.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupAssets.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupBootstrap.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupBootstrap.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupCodec.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupCodec.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupEngine.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupInfo.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupLegacyReader.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupEngine.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupInfo.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupLegacyReader.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupManager.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupMutation.m (arm64)…[m
+[1mControllers/CSBackupManager.m:23:44: [0m[0;1;35mwarning: [0m[1m'atomic' attribute on property 'status' does not match the property inherited from 'CSBackupManager' [-Wproperty-attribute-mismatch][0m
+   23 | @property(atomic,copy,readwrite) NSString *status;[0m
+      | [0;1;32m                                           ^
+[0m[1mControllers/CSBackupManager.h:7:46: [0m[0;1;36mnote: [0mproperty declared here[0m
+    7 | @property(nonatomic,copy,readonly) NSString *status;[0m
+      | [0;1;32m                                             ^
+[0m[0;32m==> [1;39mCompiling Controllers/CSBackupManager.m (arm64e)…[m
+[1mControllers/CSBackupManager.m:122:6: [0m[0;1;35mwarning: [0m[1mmisleading indentation; statement is not part of the previous 'for' [-Wmisleading-indentation][0m
+  122 |     }return YES;[0m
+      | [0;1;32m     ^
+[0m[1mControllers/CSBackupManager.m:119:5: [0m[0;1;36mnote: [0mprevious statement is here[0m
+  119 |     for(NSDictionary *f in snapshot[@"fields"])if([f[@"present"] boolValue]&&[[CSBackupRegistry entryForDomain:f[@"domain"] key:f[@"key"]][@"type"] isEqual:@"data"]){[0m
+      | [0;1;32m    ^
+[0m[0;32m==> [1;39mCompiling Controllers/CSBackupPreviewViewController.m (arm64)…[m
+[1mControllers/CSBackupManager.m:23:44: [0m[0;1;35mwarning: [0m[1m'atomic' attribute on property 'status' does not match the property inherited from 'CSBackupManager' [-Wproperty-attribute-mismatch][0m
+   23 | @property(atomic,copy,readwrite) NSString *status;[0m
+      | [0;1;32m                                           ^
+[0m[1mControllers/CSBackupManager.h:7:46: [0m[0;1;36mnote: [0mproperty declared here[0m
+    7 | @property(nonatomic,copy,readonly) NSString *status;[0m
+      | [0;1;32m                                             ^
+[0m[0;32m==> [1;39mCompiling Controllers/CSBackupMutation.m (arm64e)…[m
+[1mControllers/CSBackupManager.m:122:6: [0m[0;1;35mwarning: [0m[1mmisleading indentation; statement is not part of the previous 'for' [-Wmisleading-indentation][0m
+  122 |     }return YES;[0m
+      | [0;1;32m     ^
+[0m[1mControllers/CSBackupManager.m:119:5: [0m[0;1;36mnote: [0mprevious statement is here[0m
+  119 |     for(NSDictionary *f in snapshot[@"fields"])if([f[@"present"] boolValue]&&[[CSBackupRegistry entryForDomain:f[@"domain"] key:f[@"key"]][@"type"] isEqual:@"data"]){[0m
+      | [0;1;32m    ^
+[0m[0;32m==> [1;39mCompiling Controllers/CSBackupRegistry.m (arm64)…[m
+2 warnings generated.
+[0;32m==> [1;39mCompiling Controllers/CSBackupScheduler.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupPreviewViewController.m (arm64e)…[m
+2 warnings generated.
+[0;32m==> [1;39mCompiling Controllers/CSBackupSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupRegistry.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupScheduler.m (arm64e)…[m
+[1mControllers/CSBackupSettingsViewController.m:53:145: [0m[0;1;35mwarning: [0m[1m'rename:' is only available on iOS 16.0 or newer [-Wunguarded-availability-new][0m
+   53 |         [alert addAction:[UIAlertAction actionWithTitle:@"重命名" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *a){[self rename:record];}]];[0m
+      | [0;1;32m                                                                                                                                             ^~~~~~~~~~~~~~
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIResponder.h:67:1: [0m[0;1;36mnote: [0m'rename:' has been marked as being introduced in iOS 16.0 here, but the deployment target is iOS 15.0.0[0m
+   67 | - (void)rename:(nullable id)sender API_AVAILABLE(ios(16.0)) API_UNAVAILABLE(watchos);[0m
+      | [0;1;32m^
+[0m[1mControllers/CSBackupSettingsViewController.m:53:145: [0m[0;1;36mnote: [0menclose 'rename:' in an @available check to silence this warning[0m
+   53 |         [alert addAction:[UIAlertAction actionWithTitle:@"重命名" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *a){[self rename:record];}]];[0m
+      | [0;1;32m                                                                                                                                             ^~~~~~~~~~~~~~ 
+[0m[0;32m==> [1;39mCompiling Controllers/CSBackupStore.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStyleAdapter.m (arm64)…[m
+1 warning generated.
+[0;32m==> [1;39mCompiling Controllers/CSBackupSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBackupStore.m (arm64e)…[m
+[1mControllers/CSBackupSettingsViewController.m:53:145: [0m[0;1;35mwarning: [0m[1m'rename:' is only available on iOS 16.0 or newer [-Wunguarded-availability-new][0m
+   53 |         [alert addAction:[UIAlertAction actionWithTitle:@"重命名" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *a){[self rename:record];}]];[0m
+      | [0;1;32m                                                                                                                                             ^~~~~~~~~~~~~~
+[0m[1m/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIResponder.h:67:1: [0m[0;1;36mnote: [0m'rename:' has been marked as being introduced in iOS 16.0 here, but the deployment target is iOS 15.0.0[0m
+   67 | - (void)rename:(nullable id)sender API_AVAILABLE(ios(16.0)) API_UNAVAILABLE(watchos);[0m
+      | [0;1;32m^
+[0m[1mControllers/CSBackupSettingsViewController.m:53:145: [0m[0;1;36mnote: [0menclose 'rename:' in an @available check to silence this warning[0m
+   53 |         [alert addAction:[UIAlertAction actionWithTitle:@"重命名" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *a){[self rename:record];}]];[0m
+      | [0;1;32m                                                                                                                                             ^~~~~~~~~~~~~~ 
+[0m[0;32m==> [1;39mCompiling Controllers/CSBubbleStylePolicy.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStylePreview.m (arm64)…[m
+1 warning generated.
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStyleAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStylePolicy.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStylePreview.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStyleSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleTextColors.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatAttachmentSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleStyleSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSBubbleTextColors.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatGroupSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatNativeBridge.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatAttachmentSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatRoomSelectViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSContactSeparatorManager.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatGroupSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatNativeBridge.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSContactSeparatorSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSCustomTextMatch.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSChatRoomSelectViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSContactSeparatorManager.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSCustomViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSEntrySettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSContactSeparatorSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSCustomTextMatch.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSCustomViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSFavoriteSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSEntrySettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGameCheatsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSFavoriteSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGameCheatsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupIndexScope.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupIndexScope.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupInvocationMapper.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupInvocationMapper.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupListAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupNativeBridge.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupListAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupNativeBridge.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupPreferences.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupProjection.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupPreferences.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSInputTextSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSInputTextStyle.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSGroupProjection.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSLayoutSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerConfiguration.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSInputTextSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSInputTextStyle.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSLayoutSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerContactsAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerConfiguration.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerDiscoverAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerMoreAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerContactsAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerDiscoverAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerPageContext.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerMoreAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerRadiusSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerPageContext.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerRadiusSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerRenderer.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerSectionPolicy.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerSessionAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionContext.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerRenderer.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerSectionPolicy.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionMenuAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionCoordinator.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionPolicy.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSListCornerSessionAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionPreferences.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionContext.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionCoordinator.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageCellLifecycle.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionMenuAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageGestureAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionPolicy.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageActionPreferences.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageCellLifecycle.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageGestureSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageGestureAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageMediaProvider.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageMergeAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageGestureSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageMediaProvider.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageMergePolicy.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageMergeAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageNativeActionAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageNavigation.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageSendAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageTimeLayout.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageTimeSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageMergePolicy.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNativeRewardPresenter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageNativeActionAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageNavigation.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageSendAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNativeRewardRoute.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageTimeLayout.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSMessageTimeSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNativeSettingsHost.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNavigationImageLoader.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNativeRewardPresenter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNavigationTitleSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSPaymentAutomation.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNativeRewardRoute.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSPaymentCore.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNativeSettingsHost.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNavigationImageLoader.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSPaymentLedger.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSReceiveTransferSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSNavigationTitleSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSPaymentAutomation.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRedEnvelopConfig.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSPaymentCore.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRedEnvelopSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSPaymentLedger.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSReleaseNotesViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRepeatSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSReceiveTransferSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSResetSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRedEnvelopConfig.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRedEnvelopSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRevokeReference.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRevokeSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSServiceCenter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSSettingTableViewCell.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTabBarNativeAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTabBarPreferences.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSReleaseNotesViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRepeatSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTabBarStyleSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSResetSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRevokeReference.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSRevokeSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSServiceCenter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTimeLineTailSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTouchTrailViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSSettingTableViewCell.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSUICleanViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSUpdateControlViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTabBarNativeAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTabBarPreferences.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTabBarStyleSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSVersionSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTimeLineTailSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSTouchTrailViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSVoiceForwardAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSUICleanViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSVoiceForwardSettingsViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSWCEnhanceViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSUpdateControlViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSVersionSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/CSVoiceForwardAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/WCPLMessagePersistenceAdapter.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSVoiceForwardSettingsViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/WEContactSelectViewController.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/CSWCEnhanceViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/WESessionTabContainerView.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/WCPLMessagePersistenceAdapter.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/WESessionTabItem.m (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/WEContactSelectViewController.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Controllers/WESessionTabContainerView.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/AvatarHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/BackgroundBlurHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Controllers/WESessionTabItem.m (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/BackgroundRun.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/AvatarHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/BackgroundBlurHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/BackupLifecycleHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/BubbleStyleHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/BackgroundRun.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/BackupLifecycleHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/BubbleStyleHooks.xm (arm64e)…[m
+[0;32m==> [1;39mCompiling Hooks/CSAvatarShape.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/CSAvatarShape.xm (arm64e)…[m
+[1mHooks/CSAvatarShape.xm:66:222: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$initWithUsrName$headImgUrl$bAutoUpdate$bRoundCorner$'[0m
+[0;32m==> [1;39mCompiling Hooks/CSChatAttachmentLayout.xm (arm64)…[m
+[1mHooks/CSAvatarShape.xm:66:324: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$initWithUsrName$headImgUrl$bAutoUpdate$bRoundCorner$'[0m
+[1mHooks/CSAvatarShape.xm:66:222: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$initWithUsrName$headImgUrl$bAutoUpdate$bRoundCorner$'[0m
+[1mHooks/CSAvatarShape.xm:66:324: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$initWithUsrName$headImgUrl$bAutoUpdate$bRoundCorner$'[0m
+[0;32m==> [1;39mCompiling Hooks/CUtility.xm (arm64)…[m
+[1mHooks/CSAvatarShape.xm:66:510: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$layoutSubviews'[0m
+[1mHooks/CSAvatarShape.xm:66:510: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$layoutSubviews'[0m
+[0;32m==> [1;39mCompiling Hooks/CustomEntryHooks.xm (arm64)…[m
+[1mHooks/CSAvatarShape.xm:66:574: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$layoutSubviews'[0m
+[1mHooks/CSAvatarShape.xm:66:574: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$layoutSubviews'[0m
+[0;32m==> [1;39mCompiling Hooks/DisableUpdateHook.xm (arm64)…[m
+[1mHooks/CSAvatarShape.xm:66:723: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$didMoveToWindow'[0m
+[1mHooks/CSAvatarShape.xm:66:723: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$didMoveToWindow'[0m
+[1mHooks/CSAvatarShape.xm:66:788: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$didMoveToWindow'[0m
+[1mHooks/CSAvatarShape.xm:66:788: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$didMoveToWindow'[0m
+[1mHooks/CSAvatarShape.xm:66:941: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$didMoveToSuperview'[0m
+[0;32m==> [1;39mCompiling Hooks/CSChatAttachmentLayout.xm (arm64e)…[m
+[1mHooks/CSAvatarShape.xm:66:941: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$didMoveToSuperview'[0m
+[0;32m==> [1;39mCompiling Hooks/CUtility.xm (arm64e)…[m
+[1mHooks/CSAvatarShape.xm:66:1009: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$didMoveToSuperview'[0m
+[1mHooks/CSAvatarShape.xm:66:1009: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$didMoveToSuperview'[0m
+[1mHooks/CSAvatarShape.xm:66:1157: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$setHidden$'; did you mean '_logos_class$_ungrouped$MMHeadImageView'?[0m
+[1mHooks/CSAvatarShape.xm:66:16: [0m[0;1;36mnote: [0m'_logos_class$_ungrouped$MMHeadImageView' declared here[0m
+[1mHooks/CSAvatarShape.xm:66:1151: [0m[0;1;31merror: [0m[1mcast of an indirect pointer to an Objective-C pointer to 'IMP' (aka 'void (*)()') is disallowed with ARC[0m
+[0;32m==> [1;39mCompiling Hooks/CustomEntryHooks.xm (arm64e)…[m
+[1mHooks/CSAvatarShape.xm:66:1157: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$setHidden$'; did you mean '_logos_class$_ungrouped$MMHeadImageView'?[0m
+[1mHooks/CSAvatarShape.xm:66:16: [0m[0;1;36mnote: [0m'_logos_class$_ungrouped$MMHeadImageView' declared here[0m
+[1mHooks/CSAvatarShape.xm:66:1151: [0m[0;1;31merror: [0m[1mcast of an indirect pointer to an Objective-C pointer to 'IMP' (aka 'void (*)()') is disallowed with ARC[0m
+[0;32m==> [1;39mCompiling Hooks/FavoriteHooks.xm (arm64)…[m
+[1mHooks/CSAvatarShape.xm:66:1217: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$setHidden$'; did you mean '_logos_class$_ungrouped$MMHeadImageView'?[0m
+[1mHooks/CSAvatarShape.xm:66:16: [0m[0;1;36mnote: [0m'_logos_class$_ungrouped$MMHeadImageView' declared here[0m
+[1mHooks/CSAvatarShape.xm:66:1210: [0m[0;1;31merror: [0m[1mcast of an indirect pointer to an Objective-C pointer to 'IMP *' (aka 'void (**)()') is disallowed with ARC[0m
+[1mHooks/CSAvatarShape.xm:66:1217: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$setHidden$'; did you mean '_logos_class$_ungrouped$MMHeadImageView'?[0m
+[1mHooks/CSAvatarShape.xm:66:16: [0m[0;1;36mnote: [0m'_logos_class$_ungrouped$MMHeadImageView' declared here[0m
+[1mHooks/CSAvatarShape.xm:66:1210: [0m[0;1;31merror: [0m[1mcast of an indirect pointer to an Objective-C pointer to 'IMP *' (aka 'void (**)()') is disallowed with ARC[0m
+[1mHooks/CSAvatarShape.xm:66:1356: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$setAlpha$'[0m
+[1mHooks/CSAvatarShape.xm:66:1356: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$setAlpha$'[0m
+[0;32m==> [1;39mCompiling Hooks/GameCheatsHook.xm (arm64)…[m
+[1mHooks/CSAvatarShape.xm:66:1415: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$setAlpha$'[0m
+[0;32m==> [1;39mCompiling Hooks/DisableUpdateHook.xm (arm64e)…[m
+[1mHooks/CSAvatarShape.xm:66:1415: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$setAlpha$'[0m
+[1mHooks/CSAvatarShape.xm:66:1551: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$setTag$'[0m
+[1mHooks/CSAvatarShape.xm:66:1551: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$setTag$'[0m
+[0;32m==> [1;39mCompiling Hooks/HideChatTimeHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/HideDiscoverHooks.xm (arm64)…[m
+[1mHooks/CSAvatarShape.xm:66:1608: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$setTag$'[0m
+[1mHooks/CSAvatarShape.xm:66:1608: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$setTag$'[0m
+[1mHooks/CSAvatarShape.xm:66:1748: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$setConerSize$'[0m
+[0;32m==> [1;39mCompiling Hooks/FavoriteHooks.xm (arm64e)…[m
+[1mHooks/CSAvatarShape.xm:66:1748: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$MMHeadImageView$setConerSize$'[0m
+[1mHooks/CSAvatarShape.xm:66:1811: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$setConerSize$'[0m
+[1mHooks/CSAvatarShape.xm:66:2052: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$FakeHeadImageView$initWithRoundCorner$'[0m
+[1mHooks/CSAvatarShape.xm:66:1811: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_orig$_ungrouped$MMHeadImageView$setConerSize$'[0m
+[0;32m==> [1;39mCompiling Hooks/GameCheatsHook.xm (arm64e)…[m
+[0;1;31mfatal error: [0m[1mtoo many errors emitted, stopping now [-ferror-limit=][0m
+20 errors generated.
+[1mHooks/CSAvatarShape.xm:66:2052: [0m[0;1;31merror: [0m[1muse of undeclared identifier '_logos_method$_ungrouped$FakeHeadImageView$initWithRoundCorner$'[0m
+make[3]: *** [/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/CSAvatarShape.xm.542351d6.o] Error 1
+make[3]: *** Waiting for unfinished jobs....
+[0;32m==> [1;39mCompiling Hooks/HideMomentsHooks.xm (arm64)…[m
+[0;32m==> [1;39mCompiling Hooks/HideChatTimeHooks.xm (arm64e)…[m
+[0;1;31mfatal error: [0m[1mtoo many errors emitted, stopping now [-ferror-limit=][0m
+20 errors generated.
+make[3]: *** [/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/CSAvatarShape.xm.4588ebaa.o] Error 1
+make[3]: *** Waiting for unfinished jobs....
+rm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/WCCustomTextHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/SessionGroupHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/RevokeHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/TouchTrailHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/VoiceForwardHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/InputTextHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/MessageTimeHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/ListCornerRadiusHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/WCUploadTaskHook.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/RedEnvelopHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/HideSettingHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/LayoutHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/TabBarStyleHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/MessageGestureHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/MessageMergeHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/NavigationTitleHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/RepeatHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/CSAvatarShape.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/UserInfoHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/ReceiveTransferHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/Hooks/HideQRCodeHooks.xm.mm
+make[2]: *** [/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64/WeChatImprove.dylib] Error 2
+make[2]: *** Waiting for unfinished jobs....
+rm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/InputTextHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/ReceiveTransferHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/RevokeHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/RepeatHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/VoiceForwardHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/UserInfoHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/HideQRCodeHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/HideSettingHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/MessageGestureHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/ListCornerRadiusHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/WCUploadTaskHook.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/LayoutHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/TabBarStyleHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/SessionGroupHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/NavigationTitleHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/CSAvatarShape.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/WCCustomTextHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/RedEnvelopHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/HideDiscoverHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/MessageMergeHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/HideMomentsHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/MessageTimeHooks.xm.mm /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/Hooks/TouchTrailHooks.xm.mm
+make[2]: *** [/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-1.8-37-build-cuve8pi2/theos/obj/arm64e/WeChatImprove.dylib] Error 2
+make[1]: *** [internal-library-all_] Error 2
+make: *** [WeChatImprove.all.tweak.variables] Error 2

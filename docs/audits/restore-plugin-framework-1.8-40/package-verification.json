@@ -1,0 +1,17 @@
+{
+  "version": "1.8-40",
+  "architecture": "arm64 arm64e",
+  "metadata": "Version: 1.8-40\nArchitecture: iphoneos-arm64",
+  "filter_matches_source": true,
+  "packaged_dylib_matches_build_and_stage": true,
+  "dylib_sha256": "42a817518cd367111eb667f8cbcea20e97302c6dcf3ab1daeed3ce61754d1e11",
+  "uuids": {
+    "arm64": "EF988D56-52B0-354D-8F5A-09E167E0192E",
+    "arm64e": "FCF77817-C53C-38C1-B12E-CCFC8A069E68"
+  },
+  "package": "packages/com.wechat.improve_1.8-40_iphoneos-arm64.deb",
+  "package_sha256": "a2d5803001fd6d2b19fbaff37e6f788e8c1acb9fdcc6476a51abf242aab24d1f",
+  "symbols": "packages/WeChatImprove-1.8-40-dSYMs.zip",
+  "symbols_sha256": "c022aa5e58c6e8c7aa7519d385b929fdd0e63e470df1c0959ca894112e710f63",
+  "device_installed": false
+}

@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import "../Controllers/CSMessageCellLifecycle.h"
 #import "../Controllers/CSMessageGestureAdapter.h"
@@ -37,3 +38,7 @@
     CSMessageGestureAccountBoundary();
 }
 %end
+
+%ctor {
+    CSBackupWhenReady(^{ %init; });
+}

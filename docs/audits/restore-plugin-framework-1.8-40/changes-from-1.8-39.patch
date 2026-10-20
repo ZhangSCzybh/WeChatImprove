@@ -1,0 +1,593 @@
+--- 1.8-39/Controllers/CSBackupBootstrap.m
++++ 1.8-40/Controllers/CSBackupBootstrap.m
+@@ -10,7 +10,8 @@
+ }
+ 
+ BOOL CSBackupStartupNeedsResolution(NSURL *journalURL, NSString *protectedVersion, NSString *currentVersion) {
+-    if (![protectedVersion isEqualToString:currentVersion]) return YES;
++    // A version backup is optional work, never a prerequisite for the plugin framework.
++    (void)protectedVersion;(void)currentVersion;
+     // lstat detects dangling symlinks too; never interpret an unreadable journal as absent.
+     struct stat metadata;
+     if (lstat(journalURL.fileSystemRepresentation, &metadata) == 0) return YES;
+--- 1.8-39/Controllers/CSBackupManager.m
++++ 1.8-40/Controllers/CSBackupManager.m
+@@ -10,6 +10,7 @@
+ #import "CSUserInfoHelper.h"
+ #import <UIKit/UIKit.h>
+ #import <objc/message.h>
++static NSString *const UpgradeErrorKey=@"com.wechat.enhance.backup.upgrade_error";
+ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
+ @interface CSBackupManager ()
+ @property(nonatomic) CSBackupEngine *engine;
+@@ -45,6 +46,7 @@
+         for(NSString *name in @[@"CSBackupAccountChanged",@"CSBackupResourcesChanged",@"CSNavigationTitleSettingsChanged",@"CSTouchTrailImageDidChange",@"com.wechat.enhance.tabbar_style.changed",@"CSContactSeparatorSettingsChanged"])[center addObserver:self selector:@selector(resourceChanged:) name:name object:nil];
+         _timer=dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,0,0,_queue);dispatch_source_set_timer(_timer,dispatch_time(DISPATCH_TIME_NOW,10*NSEC_PER_SEC),10*NSEC_PER_SEC,NSEC_PER_SEC);
+         dispatch_source_set_event_handler(_timer,^{[weakSelf tick];});dispatch_resume(_timer);
++        dispatch_async(_queue,^{[weakSelf attemptUpgradeBackup:NULL];});
+     }return self;
+ }
+ - (NSDictionary *)currentContext {
+@@ -86,6 +88,8 @@
+         if([last isKindOfClass:NSDate.class]){NSDateFormatter *date=[NSDateFormatter new];date.dateStyle=NSDateFormatterShortStyle;date.timeStyle=NSDateFormatterShortStyle;self.status=[self.status stringByAppendingFormat:@"\n最近自动备份：%@",[date stringFromDate:last]];}
+         NSString *failure=[NSUserDefaults.standardUserDefaults stringForKey:@"com.wechat.enhance.backup.last_error"];
+         if(failure.length)self.status=[self.status stringByAppendingFormat:@"\n最近自动备份未完成：%@",failure];
++        NSString *upgradeFailure=[NSUserDefaults.standardUserDefaults stringForKey:UpgradeErrorKey];
++        if(upgradeFailure.length)self.status=[self.status stringByAppendingFormat:@"\n版本更新备份未完成：%@",upgradeFailure];
+         return records;
+     } completion:completion];
+ }
+@@ -135,7 +139,7 @@
+ - (void)cancelPending:(CSBackupCompletion)completion {[self perform:^id(NSError **error){return [self.engine cancelPending:error]?@YES:nil;} completion:^(id result,NSError *error){if(!error)CSBackupResumeAfterRecovery();completion(result,error);}];}
+ - (BOOL)isAutoBackupEnabled {return [NSUserDefaults.standardUserDefaults boolForKey:AutoKey];}
+ - (void)enableAutoBackup:(BOOL)enabled {[NSUserDefaults.standardUserDefaults setBool:enabled forKey:AutoKey];[NSUserDefaults.standardUserDefaults synchronize];if(enabled)[self resourceChanged:nil];}
+-- (void)foreground:(NSNotification *)notification {(void)notification;dispatch_async(self.queue,^{self.active=YES;[self.scheduler changedAt:NSProcessInfo.processInfo.systemUptime-30];[self tick];});}
++- (void)foreground:(NSNotification *)notification {(void)notification;dispatch_async(self.queue,^{self.active=YES;[self.scheduler changedAt:NSProcessInfo.processInfo.systemUptime-30];[self attemptUpgradeBackup:NULL];[self tick];});}
+ - (void)background:(NSNotification *)notification {(void)notification;dispatch_async(self.queue,^{self.active=NO;});}
+ - (NSString *)preferenceSignature {
+     NSMutableDictionary *values=[NSMutableDictionary dictionary];NSMutableDictionary *domains=[NSMutableDictionary dictionary];
+@@ -153,16 +157,52 @@
+     NSDictionary *saved=[self.engine save:@"自动备份" kind:@"automatic" error:&error];[self.scheduler completed:saved!=nil at:NSProcessInfo.processInfo.systemUptime];
+     if(saved){[NSUserDefaults.standardUserDefaults removeObjectForKey:@"com.wechat.enhance.backup.last_error"];[NSUserDefaults.standardUserDefaults setObject:saved[@"createdAt"] forKey:@"com.wechat.enhance.backup.last_date"];self.status=@"自动备份已保存，未变化的内容会自动去重";}else {self.status=error.localizedDescription?:@"自动备份等待重试";[NSUserDefaults.standardUserDefaults setObject:self.status forKey:@"com.wechat.enhance.backup.last_error"];}
+ }
++- (BOOL)attemptUpgradeBackup:(NSError **)error {
++    // This method runs only on the serial I/O queue, after normal feature initialization.
++    // Failure is local to backup settings and never participates in the startup gate.
++    if(!CSBackupIsReady())return YES;
++    NSUserDefaults *defaults=NSUserDefaults.standardUserDefaults;
++    if([[defaults stringForKey:@"com.wechat.enhance.backup.protectedVersion"] isEqual:kPluginVersionString])return YES;
++    NSError *failure=nil;NSDictionary *journal=[self.engine.store journal:&failure];
++    if(journal){
++        BOOL settled=[journal[@"state"] isEqual:@"rolledBack"]||([journal[@"state"] isEqual:@"committed"]&&[self.engine.store activationConfirmed:journal]);
++        if(!settled)return YES; // Never compete with a prepared or unfinished transaction.
++        if(![self.engine.store archiveJournal:&failure])failure=failure?:CSBackupFailure(@"恢复记录归档未完成");
++    }
++    NSDictionary *saved=failure?nil:[self.engine save:[@"版本更新备份 · " stringByAppendingString:kPluginVersionString] kind:@"upgrade" error:&failure];
++    if(saved){
++        [defaults setObject:kPluginVersionString forKey:@"com.wechat.enhance.backup.protectedVersion"];
++        [defaults removeObjectForKey:UpgradeErrorKey];
++        if(![defaults synchronize]){
++            [defaults removeObjectForKey:@"com.wechat.enhance.backup.protectedVersion"];
++            failure=CSBackupFailure(@"版本更新备份标记未保存");
++        }
++    }
++    if(!saved||failure){
++        NSString *message=failure.localizedDescription?:@"版本更新备份未完成";
++        [defaults setObject:message forKey:UpgradeErrorKey];self.status=message;
++        if(error)*error=failure?:CSBackupFailure(message);return NO;
++    }
++    return YES;
++}
++- (void)retryPendingWork:(CSBackupCompletion)completion {
++    if(!CSBackupIsReady()){
++        CSBackupRetryStartup(^(NSError *error){completion(error?nil:@YES,error);});return;
++    }
++    [self perform:^id(NSError **error){
++        NSDictionary *journal=[self.engine.store journal:error];if(error&&*error)return nil;
++        if(journal){
++            BOOL settled=[journal[@"state"] isEqual:@"rolledBack"]||([journal[@"state"] isEqual:@"committed"]&&[self.engine.store activationConfirmed:journal]);
++            if(!settled){if(error)*error=CSBackupFailure(@"已有待执行计划，请重新打开微信后应用，或先取消计划。");return nil;}
++            if(![self.engine.store archiveJournal:error])return nil;
++        }
++        return [self attemptUpgradeBackup:error]?@YES:nil;
++    } completion:completion];
++}
+ - (void)resolveStartup:(CSBackupCompletion)completion {
+     [self perform:^id(NSError **error){
+         if(CSBackupIsReady()){if(error)*error=CSBackupFailure(@"插件已初始化，请重新打开微信后应用待恢复配置");return nil;}
+         if(![self.engine applyPending:error])return nil;
+-        NSString *version=[NSUserDefaults.standardUserDefaults stringForKey:@"com.wechat.enhance.backup.protectedVersion"];
+-        if(![version isEqual:kPluginVersionString]){
+-            if(![self.engine save:[@"升级初始化前 · " stringByAppendingString:kPluginVersionString] kind:@"upgrade" error:error])return nil;
+-            [NSUserDefaults.standardUserDefaults setObject:kPluginVersionString forKey:@"com.wechat.enhance.backup.protectedVersion"];
+-            if(![NSUserDefaults.standardUserDefaults synchronize]){if(error)*error=CSBackupFailure(@"升级保护标记未保存");return nil;}
+-        }
+         NSDictionary *handoffContext=self.engine.appliedContext?:[self currentContext];
+         if(![self.engine finishStartup:error])return nil;
+         self.status=@"启动配置已就绪";return handoffContext;
+@@ -170,7 +210,7 @@
+         if(error||!context){completion(nil,error);return;}
+         __block BOOL delivered=NO;__block NSError *handoffError=nil;
+         CSBackupPerformAtAccountEpoch([context[@"epoch"] unsignedIntegerValue],^{
+-            if([context isEqual:[self currentContext]]&&[self.engine confirmStartup:&handoffError]){delivered=YES;completion(@YES,nil);}
++            if([context isEqual:[self currentContext]]&&[self.engine confirmStartup:&handoffError]){delivered=YES;completion(@YES,nil);dispatch_async(self.queue,^{[self attemptUpgradeBackup:NULL];});}
+         });
+         if(!delivered)[self perform:^id(NSError **rollbackError){return [self.engine rollbackBeforeActivation:rollbackError]?@YES:nil;} completion:^(__unused id result,NSError *rollbackError){completion(nil,rollbackError?:handoffError?:CSBackupFailure(@"启动交接前账号发生变化，恢复已回滚，请重试"));}];
+     } synchronousHandoff:YES];
+--- 1.8-39/Controllers/CSBackupBootstrap.h
++++ 1.8-40/Controllers/CSBackupBootstrap.h
+@@ -22,7 +22,8 @@
+ void CSBackupAccountWillChangeAtNativeBoundary(void);
+ void CSBackupAccountDidChangeAtNativeBoundary(void);
+ 
+-/// Metadata-only startup probe. A journal, inaccessible path, or version mismatch holds startup.
++/// Metadata-only startup probe. Only a journal or inaccessible journal path holds startup.
++/// Version changes never block the original plugin framework.
+ BOOL CSBackupStartupNeedsResolution(NSURL *journalURL, NSString * _Nullable protectedVersion, NSString *currentVersion);
+ #ifdef __cplusplus
+ }
+--- 1.8-39/Controllers/CSReleaseNotesViewController.m
++++ 1.8-40/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,10 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"1.8-40": @[
++            @{@"title": @"恢复原有插件入口与框架", @"detail": @"“再也不会”及自定义入口始终打开完整设置页，保留原有名称、显示位置和授权流程，备份状态不再替换插件主页。"},
++            @{@"title": @"版本备份不再阻断插件", @"detail": @"版本更新备份在正常启动后检查；缺失图片等错误仅在备份设置中提示，不影响其他功能初始化。实际恢复事务仍保留启动校验与回滚。"}
++        ],
+         @"1.8-39": @[
+             @{@"title": @"修复图片缺失时无法重置", @"detail": @"已丢失的自定义图片不再阻断重置预览和准备；明确提示缺失项，保护其余可读配置，并保留中断回滚和账号校验。"},
+             @{@"title": @"统一备份与重置页面", @"detail": @"沿用其他设置页的图标、分组和单元格布局，整理备份操作、恢复管理和说明；预览明确区分重置与恢复。"}
+--- 1.8-39/Controllers/CSBackupSettingsViewController.m
++++ 1.8-40/Controllers/CSBackupSettingsViewController.m
+@@ -1,6 +1,5 @@
+ #import "CSBackupSettingsViewController.h"
+ #import "CSBackupManager.h"
+-#import "CSBackupBootstrap.h"
+ #import "CSBackupPreviewViewController.h"
+ #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
+ #import "CSNavigationTitleSettingsViewController.h"
+@@ -14,7 +13,7 @@
+ @implementation CSBackupRepairViewController
+ - (void)viewDidLoad {[super viewDidLoad];self.title=@"修复当前配置";id contacts=[NSUserDefaults.standardUserDefaults objectForKey:@"com.wechat.tweak.navigation.contact.overrides"];self.contacts=[contacts isKindOfClass:NSDictionary.class]?[[contacts allKeys] sortedArrayUsingSelector:@selector(compare:)]:@[];}
+ - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {(void)tableView;(void)section;return 4+self.contacts.count;}
+-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {(void)tableView;(void)section;return @"升级保护未能完成时，可在原有设置页面重新选择缺失图片或修正无效配置，然后返回备份页重试。插件功能在校验完成前保持等待；本页不会自动清除配置。其他设置仍使用原有授权检查。";}
++- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {(void)tableView;(void)section;return @"升级保护未能完成时，可在原有设置页面重新选择缺失图片或修正无效配置，然后返回备份页重试。版本更新备份失败不影响其他插件功能；本页不会自动清除配置。其他设置仍使用原有授权检查。";}
+ - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {(void)tableView;UITableViewCell *cell=[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];cell.textLabel.text=path.row<4?@[@"导航栏分隔图片",@"底栏普通及选中图标",@"触摸轨迹图片",@"其他插件设置"][path.row]:[@"联系人分隔图片 · " stringByAppendingString:self.contacts[path.row-4]];cell.textLabel.numberOfLines=0;cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;return cell;}
+ - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)path {[tableView deselectRowAtIndexPath:path animated:YES];UIViewController *controller=nil;switch(path.row){case 0:controller=[CSNavigationTitleSettingsViewController new];break;case 1:controller=[CSTabBarStyleSettingsViewController new];break;case 2:controller=[CSTouchTrailViewController new];break;case 3:controller=[[CSNativeSettingsControllerClass() alloc]init];break;default:controller=[[CSContactSeparatorSettingsViewController alloc]initWithContactId:self.contacts[path.row-4] contactName:nil contactAvatar:nil];break;}[self.navigationController pushViewController:controller animated:YES];}
+ @end
+@@ -51,7 +50,7 @@
+     if(!backups.count)[backups addObject:[CSSettingItem itemWithTitle:@"暂无本机备份" iconName:@"archivebox" iconColor:UIColor.systemGrayColor detail:nil]];
+     CSSettingItem *status=[self action:@"备份与恢复状态" icon:@"info.circle" color:UIColor.systemBlueColor block:^{[weakSelf message:@"备份与恢复状态" detail:CSBackupManager.sharedManager.status];}];
+     status.detail=@"查看";
+-    CSSettingItem *retry=[self action:@"重试未完成的恢复" icon:@"arrow.clockwise" color:UIColor.systemOrangeColor block:^{[weakSelf retryStartup];}];
++    CSSettingItem *retry=[self action:@"重试备份与恢复" icon:@"arrow.clockwise" color:UIColor.systemOrangeColor block:^{[weakSelf retryStartup];}];
+     CSSettingItem *repair=[self action:@"修复当前配置" icon:@"wrench.and.screwdriver" color:UIColor.systemOrangeColor block:^{[weakSelf repair];}];
+     CSSettingItem *cancel=[self action:@"取消待执行计划" icon:@"xmark.circle" color:UIColor.systemRedColor block:^{[weakSelf confirmCancel];}];
+     CSSettingItem *info=[self action:@"功能说明" icon:@"questionmark.circle" color:UIColor.systemGrayColor block:^{[weakSelf message:@"备份配置说明" detail:@"备份包含插件配置、自定义图片和已存档账号分组。点击备份可预览恢复、导出、重命名、收藏或删除。旧版原件只读保留。\n\n自动备份在配置停止变化约 30 秒后尝试保存，持续编辑时约 5 分钟检查一次，相同内容不重复保存。默认保留 20 份自动备份与 5 份操作保护备份；手动、收藏及待执行计划使用的备份会保留。\n\n导出文件未加密，可能包含成员、联系人标识和自定义文字；不包含微信消息、登录凭据或支付账本。"]; }];
+@@ -94,7 +93,7 @@
+     [self setWorking:YES];[CSBackupManager.sharedManager checkRepairAccess:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"暂时不能修复" detail:error.localizedDescription];else [self.navigationController pushViewController:[[CSBackupRepairViewController alloc]initWithStyle:UITableViewStyleInsetGrouped] animated:YES];}];
+ }
+ - (void)retryStartup {
+-    [self setWorking:YES];CSBackupRetryStartup(^(NSError *error){[self setWorking:NO];if(error)[self message:@"恢复仍待处理" detail:error.localizedDescription];else [self message:@"校验已完成" detail:@"请重新打开微信，以完整初始化所有插件功能。"];[self.tableView reloadData];});
++    [self setWorking:YES];[CSBackupManager.sharedManager retryPendingWork:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"恢复仍待处理" detail:error.localizedDescription];else [self message:@"校验已完成" detail:@"备份检查已完成；若刚完成恢复处理，请重新打开微信。"];[self.tableView reloadData];}];
+ }
+ - (void)create {
+     UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"创建完整备份" message:@"保存当前插件配置、图片和账号分组。" preferredStyle:UIAlertControllerStyleAlert];
+--- 1.8-39/Controllers/CSBackupManager.h
++++ 1.8-40/Controllers/CSBackupManager.h
+@@ -16,6 +16,8 @@
+ - (void)prepare:(NSDictionary *)preview completion:(CSBackupCompletion)completion;
+ - (void)resetSnapshot:(CSBackupCompletion)completion;
+ - (void)checkRepairAccess:(CSBackupCompletion)completion;
++/// Retry pending recovery before activation, or optional version backup after activation.
++- (void)retryPendingWork:(CSBackupCompletion)completion;
+ - (void)cancelPending:(CSBackupCompletion)completion;
+ - (BOOL)isAutoBackupEnabled;
+ - (void)enableAutoBackup:(BOOL)enabled;
+--- 1.8-39/Headers/CSUserInfoHelper.h
++++ 1.8-40/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"1.8-39"  // 插件版本号
++#define kPluginVersionString @"1.8-40"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- 1.8-39/Hooks/CustomEntryHooks.xm
++++ 1.8-40/Hooks/CustomEntryHooks.xm
+@@ -10,8 +10,6 @@
+ #import "../Controllers/CSEntrySettingsViewController.h" // 入口设置控制器
+ #import "../Controllers/CSAuthorizationManager.h" // 授权管理器
+ #import "../Controllers/CSBackupManager.h" // 备份管理器
+-#import "../Controllers/CSBackupBootstrap.h"
+-#import "../Controllers/CSBackupSettingsViewController.h"
+ 
+ // 入口设置相关的键
+ static NSString * const kEntryDisplayModeKey = @"com.wechat.tweak.entry.display.mode";
+@@ -30,8 +28,6 @@
+ 
+ // 获取显示模式设置
+ static CSEntryDisplayMode getEntryDisplayMode() {
+-    // Recovery must stay reachable even when the user's normal plugin entry is hidden.
+-    if (!CSBackupIsReady()) return (CSEntryDisplayMode)(CSEntryDisplayModeMore | CSEntryDisplayModeSetting);
+     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+     
+     // 首次安装时，默认显示在设置页面
+@@ -44,7 +40,6 @@
+ 
+ // 获取自定义标题
+ static NSString *getCustomEntryTitle() {
+-    if (!CSBackupIsReady()) return @"备份与恢复";
+     if (!gCustomEntryTitle) {
+         NSString *savedTitle = [[NSUserDefaults standardUserDefaults] objectForKey:kEntryCustomTitleKey];
+         gCustomEntryTitle = savedTitle ?: @"再也不会";
+@@ -54,9 +49,8 @@
+ 
+ // 加载设置
+ static void loadEntrySettings() {
+-    // Do not keep entry values captured before a pending transaction commits.
++    // Reload the user's entry title when preferences change.
+     gCustomEntryTitle = nil;
+-    if (!CSBackupIsReady()) return;
+     // 加载自定义标题
+     gCustomEntryTitle = getCustomEntryTitle();
+ }
+@@ -126,10 +120,6 @@
+         
+         // 获取第三个section（通常是功能区域）
+         WCTableViewSectionManager *section = [tableViewMgr getSectionAt:2];
+-        if (!section && !CSBackupIsReady()) {
+-            NSArray *sections = [tableViewMgr valueForKey:@"sections"];
+-            section = sections.lastObject;
+-        }
+         if (!section) { 
+             NSLog(@"[WeChatTweak] section is nil");
+             return; 
+@@ -183,7 +173,6 @@
+ // 处理入口点击事件
+ %new
+ - (void)onCustomEntryClick {
+-    if (!CSBackupIsReady()) { [self openCustomViewController]; return; }
+     // 检查授权状态
+     CSAuthorizationManager *authManager = [CSAuthorizationManager sharedManager];
+     
+@@ -208,8 +197,7 @@
+ %new
+ - (void)openCustomViewController {
+     // 创建并配置自定义控制器
+-    Class controllerClass = CSBackupIsReady() ? CSNativeSettingsControllerClass() : CSBackupSettingsViewController.class;
+-    UIViewController *customVC = [[controllerClass alloc] init];
++    UIViewController *customVC = [[CSNativeSettingsControllerClass() alloc] init];
+     customVC.title = getCustomEntryTitle();
+     
+     // 创建导航控制器（用于模态展示）
+@@ -427,7 +415,6 @@
+ // 处理入口点击事件
+ %new
+ - (void)onCustomEntryClickInSetting:(id)sender {
+-    if (!CSBackupIsReady()) { [self openCustomViewControllerFromSetting]; return; }
+     // 检查授权状态
+     CSAuthorizationManager *authManager = [CSAuthorizationManager sharedManager];
+     
+@@ -455,8 +442,7 @@
+ %new
+ - (void)openCustomViewControllerFromSetting {
+     // 创建并配置自定义控制器
+-    Class controllerClass = CSBackupIsReady() ? CSNativeSettingsControllerClass() : CSBackupSettingsViewController.class;
+-    UIViewController *customVC = [[controllerClass alloc] init];
++    UIViewController *customVC = [[CSNativeSettingsControllerClass() alloc] init];
+     customVC.title = getCustomEntryTitle();
+     
+     // 创建导航控制器（用于模态展示）
+@@ -497,6 +483,6 @@
+                                    CFSTR("com.wechat.tweak.entry.settings.changed"),
+                                    NULL,
+                                    CFNotificationSuspensionBehaviorDeliverImmediately);
+-    // This entry is deliberately always installed; held startup routes directly to recovery.
++    // The original plugin framework remains available independently of backup status.
+     %init;
+ }
+--- 1.8-39/Tests/BackupBootstrapTests.m
++++ 1.8-40/Tests/BackupBootstrapTests.m
+@@ -30,8 +30,12 @@
+     Check([NSFileManager.defaultManager createDirectoryAtURL:root withIntermediateDirectories:YES attributes:nil error:NULL], @"Create isolated test root");
+     NSURL *journal = [root URLByAppendingPathComponent:@"transaction.plist"];
+     Check(!CSBackupStartupNeedsResolution(journal, @"v1", @"v1"), @"Ordinary launch requires no resolution");
+-    Check(CSBackupStartupNeedsResolution(journal, nil, @"v1"), @"First startup holds migrations for protection");
+-    Check(CSBackupStartupNeedsResolution(journal, @"v0", @"v1"), @"Upgrade holds migrations for protection");
++    Check(!CSBackupStartupNeedsResolution(journal, nil, @"v1"), @"First startup keeps the original plugin available");
++    Check(!CSBackupStartupNeedsResolution(journal, @"v0", @"v1"), @"Version backup cannot block plugin initialization");
++    __block NSUInteger initialized=0,resolutions=0;
++    CSBackupStartupGate *upgraded=[[CSBackupStartupGate alloc]initWithNeedsResolution:CSBackupStartupNeedsResolution(journal,@"v0",@"v1") resolver:^(CSBackupStartupCompletion done){resolutions++;done(Failure());}];
++    for(NSUInteger i=0;i<33;i++)[upgraded whenReady:^{initialized++;}];
++    Check(upgraded.isReady&&initialized==33&&resolutions==0,@"All original feature consumers initialize even when a version backup would fail");
+     Check([[@"not a valid journal" dataUsingEncoding:NSUTF8StringEncoding] writeToURL:journal atomically:YES], @"Create corrupt journal");
+     Check(CSBackupStartupNeedsResolution(journal, @"v1", @"v1"), @"Any journal is held without parsing on main");
+     Check(CSBackupStartupNeedsResolution([journal URLByAppendingPathComponent:@"child"], @"v1", @"v1"), @"Invalid parent path fails closed");
+--- 1.8-39/README.md
++++ 1.8-40/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
+ 
+-**当前版本：`1.8-39`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`1.8-40`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
+ 
+@@ -38,7 +38,7 @@
+ 
+ ### 安装步骤
+ 
+-1. 获取与设备注入环境匹配的 `.deb`。当前仓库提供 [1.8-39 Rootless 安装包](packages/com.wechat.improve_1.8-39_iphoneos-arm64.deb)，其他方案可参照下文编译。
++1. 获取与设备注入环境匹配的 `.deb`。当前仓库提供 [1.8-40 Rootless 安装包](packages/com.wechat.improve_1.8-40_iphoneos-arm64.deb)，其他方案可参照下文编译。
+ 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
+ 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
+ 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
+@@ -118,9 +118,9 @@
+ - **自动备份**：沿用原开关；配置静默约 30 秒后尝试，持续编辑约 5 分钟检查一次，前台补偿并按内容去重。默认保留 20 份自动快照、5 份操作保护快照；手动、收藏和当前事务依赖的快照不自动删除。
+ - **导入与分享**：导入不会自动应用。支持旧 `.wechatbackup` / `.wcbak` JSON 和旧本机目录转换；旧格式已丢失的字段会明确报告，缺失字段不会删除当前值。导出使用系统文件分享，不再通过私有微信接口推测发送成功。
+ - **重置设置**：先选择模块和原所属账号、查看变化，再准备重置并手动重新打开微信。仅删除已登记且被选择的插件配置项。已丢失的图片会在预览中提示，不再阻断重置；保护备份保留其余可读配置和图片，无法找回已丢失文件。事务日志保留原始配置引用，供执行中断时回滚。现存但损坏、过大或不可访问的图片仍需先修复，普通备份继续要求资源完整。
+-- **故障修复**：升级保护因旧图片缺失而暂停时，可从备份页进入“修复当前配置”，在原设置页重新选图或移除无效引用，再重试；活动恢复事务需先取消或完成回滚。
+-
+-备份不包含微信聊天记录、登录凭据、授权缓存、支付去重账本或支付累计统计。文件可能包含联系人标识、分组成员和自定义文字，当前格式未加密。升级保护发生在新版本首次启动、插件功能初始化之前；不是安装包替换之前的设备备份。
++- **故障修复**：版本更新备份因旧图片缺失等原因失败时，原插件入口、完整设置页及其他功能仍正常加载。可在原有“备份配置”页面查看错误，通过“修复当前配置”重新选图或移除无效引用，再点“重试备份与恢复”；活动恢复事务需先取消或完成回滚。
++
++备份不包含微信聊天记录、登录凭据、授权缓存、支付去重账本或支付累计统计。文件可能包含联系人标识、分组成员和自定义文字，当前格式未加密。版本更新备份在插件正常初始化后检查，不作为插件启动条件，也不保证保存迁移前的状态；需要升级前配置时，应先手动创建完整备份。真正待执行或中断的恢复事务仍在功能初始化前校验。
+ 
+ 实现边界及真机验收要求见 [备份重构验证记录](docs/audits/backup-configuration-1.8-37/README.md)，精确配置范围见 [配置登记表](docs/backup-configuration-registry.md)。
+ 
+@@ -148,7 +148,7 @@
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_1.8-39_iphoneos-arm64.deb`。
++当前版本默认输出：`packages/com.wechat.improve_1.8-40_iphoneos-arm64.deb`。
+ 
+ ### Rootful
+ 
+@@ -157,7 +157,7 @@
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_1.8-39_iphoneos-arm.deb`。此命令说明构建入口，当前交付记录仅验证了 Rootless 方案。
++当前版本默认输出：`packages/com.wechat.improve_1.8-40_iphoneos-arm.deb`。此命令说明构建入口，当前交付记录仅验证了 Rootless 方案。
+ 
+ | 方案 | 动态库安装目录 |
+ | --- | --- |
+@@ -181,7 +181,7 @@
+ `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
+ 
+ ```bash
+-dpkg-deb -f packages/com.wechat.improve_1.8-39_iphoneos-arm64.deb Version Architecture
++dpkg-deb -f packages/com.wechat.improve_1.8-40_iphoneos-arm64.deb Version Architecture
+ ```
+ 
+ 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
+@@ -235,6 +235,8 @@
+ 
+ 仓库另有搜索、手势、底栏、消息时间、防撤回、后台模糊等专项脚本。测试通过主机替身验证策略、接口调用和生命周期，不替代设备验收。
+ 
++`1.8-40` 修正了版本备份失败替换插件入口并阻止功能加载的问题，恢复原有“再也不会”框架和入口路由，记录见[插件框架恢复验证](docs/audits/restore-plugin-framework-1.8-40/README.md)。
++
+ `1.8-39` 聚焦验证重置、图片读取、备份编解码、恢复事务和启动边界，记录见[重置修复与设置页验证](docs/audits/reset-settings-1.8-39/README.md)。页面复用项目原有设置单元格；当前环境无 iOS 模拟器运行时，真机显示与操作仍需安装验收。
+ 
+ `1.8-37` 的[备份重构交付记录](docs/audits/backup-configuration-1.8-37/README.md)记录了本轮 41/41 项回归脚本通过、Rootless 双架构构建、包与调试符号核对。测试覆盖备份事务、异常退出、账号范围和原有功能回归；尚未安装到手机或验证真机启动、性能及全部插件组合。历史记录仅对应各自版本与测试环境。
+@@ -257,7 +259,7 @@
+ | 问题 | 处理方式 |
+ | --- | --- |
+ | 准备恢复后设置尚未变化 | 手动退出并重新打开微信后应用；准备完成只表示计划已保存 |
+-| 升级后显示恢复等待或图片缺失 | 从原生设置中的备份入口查看错误，修复当前配置后重试；不要删除恢复日志或清空偏好域 |
++| 升级后版本备份提示图片缺失 | 在原插件的“备份配置”中查看和修复，其他功能继续正常加载；不要删除恢复日志或清空偏好域 |
+ | 找不到插件入口 | 默认在微信“我 → 设置 → 再也不会”；修改过名称或位置时按实际设置查找，并确认安装方案与注入是否生效 |
+ | 开启聊天分组后没有标签 | 检查开关、登录状态与微信版本，退出搜索/编辑状态后返回聊天列表，必要时重新打开微信 |
+ | 原生搜索框不见了 | 默认改用分组栏右侧搜索按钮；关闭“显示分组栏搜索按钮”可恢复原生搜索区域 |
+--- 1.8-39/control
++++ 1.8-40/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 1.8-39
++Version: 1.8-40
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会
+--- /dev/null
++++ 1.8-40/Tests/PluginEntryTests.m
+@@ -0,0 +1,71 @@
++#import <Foundation/Foundation.h>
++static NSUInteger checks;
++static void Check(BOOL ok,NSString *message){checks++;if(!ok){fprintf(stderr,"FAIL: %s\n",message.UTF8String);exit(1);}}
++static NSUserDefaults *testDefaults;
++static NSString *gCustomEntryTitle;
++static NSString *const kEntryDisplayModeKey=@"com.wechat.tweak.entry.display.mode";
++static NSString *const kEntryCustomTitleKey=@"com.wechat.tweak.entry.custom.title";
++typedef NS_ENUM(NSInteger,CSEntryDisplayMode){CSEntryDisplayModeMore=1,CSEntryDisplayModePlugin=2,CSEntryDisplayModeSetting=4};
++static BOOL ready;
++static BOOL CSBackupIsReady(void){return ready;}
++enum {UIModalPresentationFormSheet,UIModalPresentationPageSheet};
++@interface UIViewController : NSObject
++@property(nonatomic) NSString *title;
++@property(nonatomic) UIViewController *presented;
++@property(nonatomic) UIViewController *navigationController;
++@property(nonatomic) NSInteger modalPresentationStyle;
++- (void)presentViewController:(UIViewController *)vc animated:(BOOL)animated completion:(void (^)(void))completion;
++@end
++@implementation UIViewController
++- (void)presentViewController:(UIViewController *)vc animated:(BOOL)animated completion:(void (^)(void))completion{self.presented=vc;}
++@end
++@interface UINavigationController : UIViewController
++@property(nonatomic) UIViewController *root;
++- (instancetype)initWithRootViewController:(UIViewController *)controller;
++@end
++@implementation UINavigationController
++- (instancetype)initWithRootViewController:(UIViewController *)controller{if((self=[super init]))_root=controller;return self;}
++@end
++@interface OriginalSettingsController : UIViewController @end
++@implementation OriginalSettingsController @end
++@interface CSBackupSettingsViewController : UIViewController @end
++@implementation CSBackupSettingsViewController @end
++static Class CSNativeSettingsControllerClass(void){return OriginalSettingsController.class;}
++@interface CSAuthorizationManager : NSObject
++@property(nonatomic) BOOL authorized;
++@property(nonatomic) NSUInteger requests;
+++ (instancetype)sharedManager;
++- (BOOL)isAuthorized;
++- (void)requestAuthorizationWithPresentingViewController:(UIViewController *)vc completion:(void (^)(BOOL,NSString *))completion;
++@end
++@implementation CSAuthorizationManager
+++ (instancetype)sharedManager{static CSAuthorizationManager *v;if(!v)v=[self new];return v;}
++- (BOOL)isAuthorized{return self.authorized;}
++- (void)requestAuthorizationWithPresentingViewController:(UIViewController *)vc completion:(void (^)(BOOL,NSString *))completion{self.requests++;completion(NO,@"test");}
++@end
++@interface TestEntry : UIViewController
++- (void)onCustomEntryClick;
++- (void)onCustomEntryClickInSetting:(id)sender;
++- (void)openCustomViewController;
++- (void)openCustomViewControllerFromSetting;
++@end
++#import "EntryUnderTest.h"
++int main(void){@autoreleasepool{
++    NSString *suite=[@"framework.entry.test." stringByAppendingString:NSUUID.UUID.UUIDString];testDefaults=[[NSUserDefaults alloc]initWithSuiteName:suite];
++    for(NSNumber *state in @[@NO,@YES]){
++        ready=state.boolValue;gCustomEntryTitle=nil;[testDefaults removeObjectForKey:kEntryCustomTitleKey];[testDefaults removeObjectForKey:kEntryDisplayModeKey];
++        Check([getCustomEntryTitle() isEqual:@"再也不会"],@"backup readiness cannot rename the plugin");
++        Check(getEntryDisplayMode()==CSEntryDisplayModeSetting,@"backup readiness cannot override original default location");
++        [testDefaults setObject:@"我的插件" forKey:kEntryCustomTitleKey];[testDefaults setInteger:CSEntryDisplayModePlugin forKey:kEntryDisplayModeKey];loadEntrySettings();
++        Check([getCustomEntryTitle() isEqual:@"我的插件"]&&getEntryDisplayMode()==CSEntryDisplayModePlugin,@"custom entry name and placement survive backup failure");
++        TestEntry *more=[TestEntry new];CSAuthorizationManager.sharedManager.authorized=YES;[more onCustomEntryClick];
++        Check([[(UINavigationController *)more.presented root] isKindOfClass:OriginalSettingsController.class],@"More entry always opens the complete original settings framework");
++        Check([[[(UINavigationController *)more.presented root] title] isEqual:@"我的插件"],@"original settings receives saved plugin title");
++        TestEntry *settings=[TestEntry new];settings.navigationController=[UINavigationController new];[settings onCustomEntryClickInSetting:nil];
++        Check([[(UINavigationController *)settings.navigationController.presented root] isKindOfClass:OriginalSettingsController.class],@"Settings entry always opens the complete original framework");
++        TestEntry *denied=[TestEntry new];CSAuthorizationManager.sharedManager.authorized=NO;NSUInteger before=CSAuthorizationManager.sharedManager.requests;
++        [denied onCustomEntryClick];[denied onCustomEntryClickInSetting:nil];
++        Check(!denied.presented&&CSAuthorizationManager.sharedManager.requests==before+2,@"backup failure does not bypass original authorization");
++    }
++    [testDefaults removePersistentDomainForName:suite];printf("Plugin entry: %lu checks passed\n",(unsigned long)checks);
++}return 0;}
+--- /dev/null
++++ 1.8-40/Tests/BackupStartupIntegrationTests.m
+@@ -0,0 +1,87 @@
++#import <Foundation/Foundation.h>
++#import "CSUserInfoHelper.h"
++static NSUInteger checks;
++static void Check(BOOL ok,NSString *message){checks++;if(!ok){fprintf(stderr,"FAIL: %s\n",message.UTF8String);exit(1);}}
++typedef void (^CSBackupCompletion)(id,NSError *);
++static BOOL ready;
++static BOOL CSBackupIsReady(void){return ready;}
++static NSError *CSBackupFailure(NSString *message){return [NSError errorWithDomain:@"test.backup" code:1 userInfo:@{NSLocalizedDescriptionKey:message}];}
++static BOOL CSBackupPerformAtAccountEpoch(NSUInteger epoch,void (^block)(void)){block();return YES;}
++static void CSBackupRetryStartup(void (^completion)(NSError *)){completion(CSBackupFailure(@"test pending recovery"));}
++static NSString *const UpgradeErrorKey=@"com.wechat.enhance.backup.upgrade_error";
++@interface TestStore : NSObject
++@property(nonatomic) NSDictionary *record;
++@property(nonatomic) BOOL activated;
++- (NSDictionary *)journal:(NSError **)error;
++- (BOOL)activationConfirmed:(NSDictionary *)journal;
++- (BOOL)archiveJournal:(NSError **)error;
++@end
++@implementation TestStore
++- (NSDictionary *)journal:(NSError **)error{return self.record;}
++- (BOOL)activationConfirmed:(NSDictionary *)journal{return self.activated;}
++- (BOOL)archiveJournal:(NSError **)error{self.record=nil;return YES;}
++@end
++@interface TestEngine : NSObject
++@property(nonatomic) TestStore *store;
++@property(nonatomic) NSDictionary *appliedContext;
++@property(nonatomic) NSUInteger saves;
++@property(nonatomic) NSUInteger applies;
++@property(nonatomic) BOOL failBackup;
++- (NSDictionary *)save:(NSString *)name kind:(NSString *)kind error:(NSError **)error;
++- (BOOL)applyPending:(NSError **)error;
++- (BOOL)finishStartup:(NSError **)error;
++- (BOOL)confirmStartup:(NSError **)error;
++- (BOOL)rollbackBeforeActivation:(NSError **)error;
++@end
++@implementation TestEngine
++- (NSDictionary *)save:(NSString *)name kind:(NSString *)kind error:(NSError **)error{self.saves++;if(self.failBackup){if(error)*error=CSBackupFailure(@"底栏样式：图片 missing.png 无法完整读取");return nil;}return @{@"kind":kind};}
++- (BOOL)applyPending:(NSError **)error{self.applies++;return YES;}
++- (BOOL)finishStartup:(NSError **)error{return YES;}
++- (BOOL)confirmStartup:(NSError **)error{return YES;}
++- (BOOL)rollbackBeforeActivation:(NSError **)error{return YES;}
++@end
++@interface TestManager : NSObject
++@property(nonatomic) TestEngine *engine;
++@property(nonatomic) NSUserDefaults *testDefaults;
++@property(nonatomic) dispatch_queue_t queue;
++@property(nonatomic) NSString *status;
++- (NSDictionary *)currentContext;
++- (void)perform:(id (^)(NSError **))work completion:(CSBackupCompletion)completion;
++- (void)perform:(id (^)(NSError **))work completion:(CSBackupCompletion)completion synchronousHandoff:(BOOL)handoff;
++- (BOOL)attemptUpgradeBackup:(NSError **)error;
++- (void)retryPendingWork:(CSBackupCompletion)completion;
++- (void)resolveStartup:(CSBackupCompletion)completion;
++@end
++@implementation TestManager
++- (NSDictionary *)currentContext{return @{@"epoch":@1,@"account":@"test"};}
++- (void)perform:(id (^)(NSError **))work completion:(CSBackupCompletion)completion{[self perform:work completion:completion synchronousHandoff:NO];}
++- (void)perform:(id (^)(NSError **))work completion:(CSBackupCompletion)completion synchronousHandoff:(BOOL)handoff{NSError *error=nil;id value=work(&error);completion(value,error);}
++#import "ManagerUnderTest.h"
++@end
++int main(void){@autoreleasepool{
++    NSString *suite=[@"framework.startup.test." stringByAppendingString:NSUUID.UUID.UUIDString];
++    TestManager *manager=[TestManager new];manager.testDefaults=[[NSUserDefaults alloc]initWithSuiteName:suite];manager.queue=dispatch_queue_create("test.optional-backup",DISPATCH_QUEUE_SERIAL);manager.engine=[TestEngine new];manager.engine.store=[TestStore new];manager.engine.failBackup=YES;
++    NSString *versionKey=@"com.wechat.enhance.backup.protectedVersion";[manager.testDefaults setObject:@"previous" forKey:versionKey];
++    [manager.testDefaults setObject:@"keep my setting" forKey:@"existing.plugin.setting"];
++    ready=NO;__block BOOL released=NO;
++    [manager resolveStartup:^(id result,NSError *error){released=result!=nil&&error==nil;ready=released;}];
++    Check(released&&ready,@"successful recovery releases plugin even when version backup fails");
++    dispatch_sync(manager.queue,^{});
++    Check(manager.engine.applies==1&&manager.engine.saves==1,@"optional backup runs after recovery handoff");
++    Check([[manager.testDefaults stringForKey:versionKey] isEqual:@"previous"],@"failed version backup is not marked complete");
++    Check([manager.testDefaults stringForKey:UpgradeErrorKey].length>0,@"failure is retained for backup settings");
++    Check([[manager.testDefaults stringForKey:@"existing.plugin.setting"] isEqual:@"keep my setting"],@"backup failure does not reset live preferences");
++    __block NSError *retryError=nil;[manager retryPendingWork:^(id result,NSError *error){retryError=error;}];
++    Check(retryError!=nil&&ready&&manager.engine.applies==1,@"failed backup retry leaves feature initialization and recovery untouched");
++    manager.engine.failBackup=NO;[manager retryPendingWork:^(id result,NSError *error){Check(result!=nil&&error==nil,@"repair permits optional backup retry");}];
++    Check([[manager.testDefaults stringForKey:versionKey] isEqual:kPluginVersionString]&&![manager.testDefaults objectForKey:UpgradeErrorKey],@"successful retry clears the failure and records current version");
++    NSUInteger saved=manager.engine.saves;[manager retryPendingWork:^(id result,NSError *error){Check(error==nil,@"completed version backup retry succeeds");}];
++    Check(manager.engine.saves==saved,@"one version is not backed up repeatedly");
++    manager.engine.store.record=@{@"state":@"prepared"};[manager retryPendingWork:^(id result,NSError *error){Check(!result&&error!=nil,@"prepared restore requires restart once features are active");}];
++    Check(manager.engine.applies==1,@"retry cannot apply settings to live hooks");
++    [manager.testDefaults removeObjectForKey:versionKey];[manager attemptUpgradeBackup:NULL];
++    Check(manager.engine.saves==saved,@"optional version backup never competes with pending restoration");
++    manager.engine.store.record=@{@"state":@"committed"};manager.engine.store.activated=YES;
++    Check([manager attemptUpgradeBackup:NULL]&&manager.engine.saves==saved+1&&!manager.engine.store.record,@"settled recovery can archive before optional backup");
++    [manager.testDefaults removePersistentDomainForName:suite];printf("Backup startup integration: %lu checks passed\n",(unsigned long)checks);
++}return 0;}
+--- /dev/null
++++ 1.8-40/Tests/verify-plugin-framework.sh
+@@ -0,0 +1,28 @@
++#!/bin/bash
++set -euo pipefail
++cd "$(dirname "$0")/.."
++work=$(mktemp -d)
++trap 'rm -rf "$work"' EXIT
++python3 - "$work" <<'PY'
++from pathlib import Path
++import sys
++out=Path(sys.argv[1])
++def extract(source, signature):
++    start=source.index(signature); opening=source.index('{',start); depth=1; pos=opening+1
++    while depth:
++        depth += (source[pos]=='{')-(source[pos]=='}');pos+=1
++    return source[start:pos]
++entry=Path('Hooks/CustomEntryHooks.xm').read_text()
++functions=[extract(entry,s) for s in ('static CSEntryDisplayMode getEntryDisplayMode()', 'static NSString *getCustomEntryTitle()', 'static void loadEntrySettings()')]
++methods=[extract(entry,s) for s in ('- (void)onCustomEntryClick {','- (void)openCustomViewController {','- (void)onCustomEntryClickInSetting:', '- (void)openCustomViewControllerFromSetting {')]
++(out/'EntryUnderTest.h').write_text(('\n'.join(functions)+'\n@implementation TestEntry\n'+'\n'.join(methods)+'\n@end\n').replace('[NSUserDefaults standardUserDefaults]','testDefaults'))
++manager=Path('Controllers/CSBackupManager.m').read_text()
++methods=[extract(manager,s) for s in ('- (BOOL)attemptUpgradeBackup:', '- (void)retryPendingWork:', '- (void)resolveStartup:')]
++(out/'ManagerUnderTest.h').write_text('\n'.join(methods).replace('NSUserDefaults.standardUserDefaults','self.testDefaults'))
++PY
++xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-function \
++ -framework Foundation -I"$work" Tests/PluginEntryTests.m -o "$work/entry"
++"$work/entry"
++xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \
++ -framework Foundation -I"$work" -IHeaders Tests/BackupStartupIntegrationTests.m -o "$work/startup"
++"$work/startup"

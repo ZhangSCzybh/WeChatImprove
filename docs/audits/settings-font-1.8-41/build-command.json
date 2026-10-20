@@ -1,0 +1,9 @@
+[
+  "make",
+  "-j4",
+  "package",
+  "SCHEME=rootless",
+  "PACKAGE_VERSION=1.8-41",
+  "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-settings-font-1.8-41-vcjua15t/theos",
+  "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-settings-font-1.8-41-vcjua15t/packages"
+]

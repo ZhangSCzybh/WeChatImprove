@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // A single owner applies custom backgrounds to actual message cells. BubbleInfo getters stay native.
 #import <UIKit/UIKit.h>
 #import "../Controllers/CSBubbleStyleAdapter.h"
@@ -91,4 +92,9 @@
 }
 %end
 
-%ctor { CSBubbleStyleStart(); }
+%ctor {
+    CSBackupWhenReady(^{
+        CSBubbleStyleStart();
+        %init;
+    });
+}

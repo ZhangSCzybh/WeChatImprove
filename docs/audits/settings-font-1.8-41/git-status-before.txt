@@ -1,0 +1,148 @@
+ M .DS_Store
+ M Controllers/CSBackupManager.h
+ M Controllers/CSBackupManager.m
+ M Controllers/CSBackupSettingsViewController.m
+ M Controllers/CSContactSeparatorSettingsViewController.m
+ M Controllers/CSNavigationTitleSettingsViewController.m
+ M Controllers/CSReleaseNotesViewController.m
+ M Controllers/CSResetSettingsViewController.m
+ M Controllers/CSTabBarStyleSettingsViewController.m
+ M Controllers/CSTouchTrailViewController.m
+ M Headers/CSUserInfoHelper.h
+ M Hooks/AvatarHooks.xm
+ M Hooks/BackgroundBlurHooks.xm
+ M Hooks/BackgroundRun.xm
+ M Hooks/BubbleStyleHooks.xm
+ M Hooks/CSAvatarShape.xm
+ M Hooks/CSChatAttachmentLayout.xm
+ M Hooks/CUtility.xm
+ M Hooks/CustomEntryHooks.xm
+ M Hooks/DisableUpdateHook.xm
+ M Hooks/FavoriteHooks.xm
+ M Hooks/GameCheatsHook.xm
+ M Hooks/HideChatTimeHooks.xm
+ M Hooks/HideDiscoverHooks.xm
+ M Hooks/HideMomentsHooks.xm
+ M Hooks/HideQRCodeHooks.xm
+ M Hooks/HideSettingHooks.xm
+ M Hooks/InputTextHooks.xm
+ M Hooks/LayoutHooks.xm
+ M Hooks/ListCornerRadiusHooks.xm
+ M Hooks/MessageGestureHooks.xm
+ M Hooks/MessageMergeHooks.xm
+ M Hooks/MessageTimeHooks.xm
+ M Hooks/NavigationTitleHooks.xm
+ M Hooks/ReceiveTransferHooks.xm
+ M Hooks/RedEnvelopHooks.xm
+ M Hooks/RepeatHooks.xm
+ M Hooks/RevokeHooks.xm
+ M Hooks/SessionGroupHooks.xm
+ M Hooks/TabBarStyleHooks.xm
+ M Hooks/TouchTrailHooks.xm
+ M Hooks/UserInfoHooks.xm
+ M Hooks/VoiceForwardHooks.xm
+ M Hooks/WCCustomTextHooks.xm
+ M Hooks/WCUploadTaskHook.xm
+ M Makefile
+ M README.md
+ M Tests/verify-my-page-clean.sh
+ M Tests/verify-touch-trail.sh
+ M control
+?? Controllers/CSBackupAssets.h
+?? Controllers/CSBackupAssets.m
+?? Controllers/CSBackupBootstrap.h
+?? Controllers/CSBackupBootstrap.m
+?? Controllers/CSBackupCodec.h
+?? Controllers/CSBackupCodec.m
+?? Controllers/CSBackupEngine.h
+?? Controllers/CSBackupEngine.m
+?? Controllers/CSBackupLegacyReader.h
+?? Controllers/CSBackupLegacyReader.m
+?? Controllers/CSBackupMutation.h
+?? Controllers/CSBackupMutation.m
+?? Controllers/CSBackupPreviewViewController.h
+?? Controllers/CSBackupPreviewViewController.m
+?? Controllers/CSBackupRegistry.h
+?? Controllers/CSBackupRegistry.m
+?? Controllers/CSBackupScheduler.h
+?? Controllers/CSBackupScheduler.m
+?? Controllers/CSBackupStore.h
+?? Controllers/CSBackupStore.m
+?? Hooks/BackupLifecycleHooks.xm
+?? Tests/BackupAssetsTests.m
+?? Tests/BackupBootstrapTests.m
+?? Tests/BackupCodecTests.m
+?? Tests/BackupEngineTests.m
+?? Tests/BackupLegacyTests.m
+?? Tests/BackupRegistryTests.m
+?? Tests/BackupResetTests.m
+?? Tests/BackupSchedulerTests.m
+?? Tests/BackupStartupIntegrationTests.m
+?? Tests/BackupStoreTests.m
+?? Tests/BackupTransactionTests.m
+?? Tests/PluginEntryTests.m
+?? Tests/verify-backup-assets.sh
+?? Tests/verify-backup-bootstrap.sh
+?? Tests/verify-backup-codec.sh
+?? Tests/verify-backup-engine.sh
+?? Tests/verify-backup-legacy.sh
+?? Tests/verify-backup-registry.sh
+?? Tests/verify-backup-reset.sh
+?? Tests/verify-backup-scheduler.sh
+?? Tests/verify-backup-store.sh
+?? Tests/verify-backup-transactions.sh
+?? Tests/verify-plugin-framework.sh
+?? docs/audits/.DS_Store
+?? docs/audits/backup-configuration-1.8-37/
+?? docs/audits/inbound/
+?? docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips
+?? docs/audits/merge-voice-translation-1.8-36/IMG_7445.jpg
+?? docs/audits/payment-notifications-1.8-21/before-source.zip
+?? docs/audits/reset-settings-1.8-39/
+?? docs/audits/restore-plugin-framework-1.8-40/
+?? docs/audits/rollback-to-1.8-27-2026-10-20/source-before-rollback-1.8-28.zip
+?? docs/audits/rollback-to-1.8-37-2026-10-20/
+?? docs/audits/scroll-jitter-analysis-2026-10-20/gap-before-after.png
+?? docs/audits/settings-font-1.8-41/
+?? docs/audits/settings-layout-1.8-38/
+?? docs/backup-configuration-registry.md
+?? docs/superpowers/plans/2026-10-20-backup-configuration.md
+?? docs/superpowers/specs/2026-10-20-backup-configuration-design.md
+?? packages/WeChatImprove-1.8-21-dSYMs.zip
+?? packages/WeChatImprove-1.8-22-dSYMs.zip
+?? packages/WeChatImprove-1.8-23-dSYMs.zip
+?? packages/WeChatImprove-1.8-24-dSYMs.zip
+?? packages/WeChatImprove-1.8-25-dSYMs.zip
+?? packages/WeChatImprove-1.8-26-dSYMs.zip
+?? packages/WeChatImprove-1.8-27-dSYMs.zip
+?? packages/WeChatImprove-1.8-28-dSYMs.zip
+?? packages/WeChatImprove-1.8-29-dSYMs.zip
+?? packages/WeChatImprove-1.8-30-dSYMs.zip
+?? packages/WeChatImprove-1.8-31-dSYMs.zip
+?? packages/WeChatImprove-1.8-32-dSYMs.zip
+?? packages/WeChatImprove-1.8-33-dSYMs.zip
+?? packages/WeChatImprove-1.8-34-dSYMs.zip
+?? packages/WeChatImprove-1.8-35-dSYMs.zip
+?? packages/WeChatImprove-1.8-37-dSYMs.zip
+?? packages/WeChatImprove-1.8-38-dSYMs.zip
+?? packages/WeChatImprove-1.8-39-dSYMs.zip
+?? packages/WeChatImprove-1.8-40-dSYMs.zip
+?? packages/com.wechat.improve_1.8-21_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-22_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-23_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-24_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-25_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-26_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-27_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-28_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-29_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-30_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-31_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-32_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-33_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-34_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-35_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-37_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-38_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-39_iphoneos-arm64.deb
+?? packages/com.wechat.improve_1.8-40_iphoneos-arm64.deb

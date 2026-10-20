@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import "CSTabBarNativeAdapter.h"
 
 // Keep native navigation, badge content, keyboard handling and visibility decisions intact.
@@ -83,4 +84,9 @@
 }
 %end
 
-%ctor { CSTabBarInstallObservers(); }
+%ctor {
+    CSBackupWhenReady(^{
+        CSTabBarInstallObservers();
+        %init;
+    });
+}

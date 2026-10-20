@@ -10,6 +10,8 @@ import sys
 root, output = map(Path, sys.argv[1:])
 source = (root / 'Hooks/HideMomentsHooks.xm').read_text()
 source = source.split('%ctor {')[0]
+# The lifecycle gate is independently exercised by verify-backup-bootstrap.sh.
+source = source.replace('#import "../Controllers/CSBackupBootstrap.h"', '')
 source = source.replace('#import <UIKit/UIKit.h>', '#import <Foundation/Foundation.h>')
 source = source.replace('@interface MoreViewController : NSObject', '@interface MoreViewController : NativeMoreViewController')
 source = source.replace('%hook MoreViewController', '@implementation MoreViewController').replace('%end', '@end')

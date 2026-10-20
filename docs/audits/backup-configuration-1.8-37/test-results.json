@@ -1,0 +1,248 @@
+[
+  {
+    "script": "Tests/verify-avatar-input-style.sh",
+    "exit_code": 0,
+    "seconds": 2.23,
+    "log": "verify-avatar-input-style.log"
+  },
+  {
+    "script": "Tests/verify-background-blur.sh",
+    "exit_code": 0,
+    "seconds": 1.17,
+    "log": "verify-background-blur.log"
+  },
+  {
+    "script": "Tests/verify-backup-assets.sh",
+    "exit_code": 0,
+    "seconds": 0.99,
+    "log": "verify-backup-assets.log"
+  },
+  {
+    "script": "Tests/verify-backup-bootstrap.sh",
+    "exit_code": 0,
+    "seconds": 10.32,
+    "log": "verify-backup-bootstrap.log"
+  },
+  {
+    "script": "Tests/verify-backup-codec.sh",
+    "exit_code": 0,
+    "seconds": 0.97,
+    "log": "verify-backup-codec.log"
+  },
+  {
+    "script": "Tests/verify-backup-engine.sh",
+    "exit_code": 0,
+    "seconds": 1.94,
+    "log": "verify-backup-engine.log"
+  },
+  {
+    "script": "Tests/verify-backup-legacy.sh",
+    "exit_code": 0,
+    "seconds": 1.19,
+    "log": "verify-backup-legacy.log"
+  },
+  {
+    "script": "Tests/verify-backup-registry.sh",
+    "exit_code": 0,
+    "seconds": 0.74,
+    "log": "verify-backup-registry.log"
+  },
+  {
+    "script": "Tests/verify-backup-scheduler.sh",
+    "exit_code": 0,
+    "seconds": 0.66,
+    "log": "verify-backup-scheduler.log"
+  },
+  {
+    "script": "Tests/verify-backup-store.sh",
+    "exit_code": 0,
+    "seconds": 1.32,
+    "log": "verify-backup-store.log"
+  },
+  {
+    "script": "Tests/verify-backup-transactions.sh",
+    "exit_code": 0,
+    "seconds": 5.18,
+    "log": "verify-backup-transactions.log"
+  },
+  {
+    "script": "Tests/verify-bubble-style.sh",
+    "exit_code": 0,
+    "seconds": 10.77,
+    "log": "verify-bubble-style.log"
+  },
+  {
+    "script": "Tests/verify-custom-text.sh",
+    "exit_code": 0,
+    "seconds": 1.08,
+    "log": "verify-custom-text.log"
+  },
+  {
+    "script": "Tests/verify-group-appearance.sh",
+    "exit_code": 0,
+    "seconds": 0.82,
+    "log": "verify-group-appearance.log"
+  },
+  {
+    "script": "Tests/verify-group-business.sh",
+    "exit_code": 0,
+    "seconds": 1.23,
+    "log": "verify-group-business.log"
+  },
+  {
+    "script": "Tests/verify-group-header.sh",
+    "exit_code": 0,
+    "seconds": 0.74,
+    "log": "verify-group-header.log"
+  },
+  {
+    "script": "Tests/verify-group-incremental.sh",
+    "exit_code": 0,
+    "seconds": 1.01,
+    "log": "verify-group-incremental.log"
+  },
+  {
+    "script": "Tests/verify-group-indicator.sh",
+    "exit_code": 0,
+    "seconds": 0.66,
+    "log": "verify-group-indicator.log"
+  },
+  {
+    "script": "Tests/verify-group-interactions.sh",
+    "exit_code": 0,
+    "seconds": 1.9,
+    "log": "verify-group-interactions.log"
+  },
+  {
+    "script": "Tests/verify-group-lifecycle.sh",
+    "exit_code": 0,
+    "seconds": 7.97,
+    "log": "verify-group-lifecycle.log"
+  },
+  {
+    "script": "Tests/verify-group-preferences.sh",
+    "exit_code": 0,
+    "seconds": 1.01,
+    "log": "verify-group-preferences.log"
+  },
+  {
+    "script": "Tests/verify-group-search.sh",
+    "exit_code": 0,
+    "seconds": 0.59,
+    "log": "verify-group-search.log"
+  },
+  {
+    "script": "Tests/verify-group-selection.sh",
+    "exit_code": 0,
+    "seconds": 1.77,
+    "log": "verify-group-selection.log"
+  },
+  {
+    "script": "Tests/verify-group-viewport.sh",
+    "exit_code": 0,
+    "seconds": 0.62,
+    "log": "verify-group-viewport.log"
+  },
+  {
+    "script": "Tests/verify-list-corners.sh",
+    "exit_code": 0,
+    "seconds": 2.56,
+    "log": "verify-list-corners.log"
+  },
+  {
+    "script": "Tests/verify-merge-bubble-integration.sh",
+    "exit_code": 0,
+    "seconds": 43.6,
+    "log": "verify-merge-bubble-integration.log"
+  },
+  {
+    "script": "Tests/verify-message-actions-core.sh",
+    "exit_code": 0,
+    "seconds": 1.93,
+    "log": "verify-message-actions-core.log"
+  },
+  {
+    "script": "Tests/verify-message-actions-execution.sh",
+    "exit_code": 0,
+    "seconds": 17.68,
+    "log": "verify-message-actions-execution.log"
+  },
+  {
+    "script": "Tests/verify-message-gesture.sh",
+    "exit_code": 0,
+    "seconds": 1.89,
+    "log": "verify-message-gesture.log"
+  },
+  {
+    "script": "Tests/verify-message-merge.sh",
+    "exit_code": 0,
+    "seconds": 2.71,
+    "log": "verify-message-merge.log"
+  },
+  {
+    "script": "Tests/verify-message-time.sh",
+    "exit_code": 0,
+    "seconds": 1.61,
+    "log": "verify-message-time.log"
+  },
+  {
+    "script": "Tests/verify-my-page-clean.sh",
+    "exit_code": 0,
+    "seconds": 0.55,
+    "log": "verify-my-page-clean.log"
+  },
+  {
+    "script": "Tests/verify-native-reward.sh",
+    "exit_code": 0,
+    "seconds": 3.46,
+    "log": "verify-native-reward.log"
+  },
+  {
+    "script": "Tests/verify-navigation-images.sh",
+    "exit_code": 0,
+    "seconds": 1.57,
+    "log": "verify-navigation-images.log"
+  },
+  {
+    "script": "Tests/verify-payment-core.sh",
+    "exit_code": 0,
+    "seconds": 19.2,
+    "log": "verify-payment-core.log"
+  },
+  {
+    "script": "Tests/verify-preference-concurrency.sh",
+    "exit_code": 0,
+    "seconds": 1.24,
+    "log": "verify-preference-concurrency.log"
+  },
+  {
+    "script": "Tests/verify-revoke-interception.sh",
+    "exit_code": 0,
+    "seconds": 0.75,
+    "log": "verify-revoke-interception.log"
+  },
+  {
+    "script": "Tests/verify-revoke-reference.sh",
+    "exit_code": 0,
+    "seconds": 0.75,
+    "log": "verify-revoke-reference.log"
+  },
+  {
+    "script": "Tests/verify-tabbar.sh",
+    "exit_code": 0,
+    "seconds": 1.74,
+    "log": "verify-tabbar.log"
+  },
+  {
+    "script": "Tests/verify-touch-trail.sh",
+    "exit_code": 0,
+    "seconds": 1.14,
+    "log": "verify-touch-trail.log"
+  },
+  {
+    "script": "Tests/verify-transfer-admission.sh",
+    "exit_code": 0,
+    "seconds": 18.79,
+    "log": "verify-transfer-admission.log"
+  }
+]

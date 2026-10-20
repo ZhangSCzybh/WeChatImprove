@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import "CSListCornerConfiguration.h"
 #import "CSListCornerSectionPolicy.h"
@@ -243,3 +244,7 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
     return cell;
 }
 %end
+
+%ctor {
+    CSBackupWhenReady(^{ %init; });
+}

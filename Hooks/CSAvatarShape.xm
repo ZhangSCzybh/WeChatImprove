@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // 圆形头像，头像旋转相关hook
 
 #import <UIKit/UIKit.h>
@@ -50,19 +51,6 @@ static NSString * const kAvatarCornerRadiusKeyConst = @"avatarCornerRadius";
 static BOOL isRoundAvatarEnabled = NO;
 static float customCornerRadius = 1.0f; // 默认值改为1.0 (全圆)
 
-// 在主函数之前执行，读取用户设置
-%ctor {
-    // 读取用户设置
-    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kUserDefaultsSuiteNameConst];
-    isRoundAvatarEnabled = [defaults boolForKey:kRoundAvatarKeyConst];
-    customCornerRadius = [defaults floatForKey:kAvatarCornerRadiusKeyConst];
-    if (customCornerRadius == 0) {
-        customCornerRadius = 1.0f; // 默认值改为1.0 (全圆)
-    }
-    
-    CSAvatarRotationInstall(defaults);
-
-}
 
 // Hook MMHeadImageView的初始化方法
 %hook MMHeadImageView
@@ -256,3 +244,19 @@ static float customCornerRadius = 1.0f; // 默认值改为1.0 (全圆)
 - (void)viewWillDisappear:(BOOL)animated { CSAvatarRotationPageVisibility(self, NO); %orig; }
 - (void)viewDidLayoutSubviews { %orig; CSAvatarRotationRefreshViews(); }
 %end
+
+// 在主函数之前执行，读取用户设置
+%ctor {
+    CSBackupWhenReady(^{
+        // 读取用户设置
+        NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kUserDefaultsSuiteNameConst];
+        isRoundAvatarEnabled = [defaults boolForKey:kRoundAvatarKeyConst];
+        customCornerRadius = [defaults floatForKey:kAvatarCornerRadiusKeyConst];
+        if (customCornerRadius == 0) {
+            customCornerRadius = 1.0f; // 默认值改为1.0 (全圆)
+        }
+
+        CSAvatarRotationInstall(defaults);
+        %init;
+    });
+}

@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 #import "../Headers/WCHeaders.h"
@@ -69,4 +70,8 @@ static BOOL isGameCheatEnabled() {
 
     %orig(msg, msgWrap);
 }
-%end 
+%end
+
+%ctor {
+    CSBackupWhenReady(^{ %init; });
+}

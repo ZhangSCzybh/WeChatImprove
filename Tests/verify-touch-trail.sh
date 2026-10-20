@@ -8,6 +8,8 @@ from pathlib import Path
 import sys
 root,out=map(Path,sys.argv[1:])
 s=(root/'Hooks/TouchTrailHooks.xm').read_text().replace('../Controllers/','')
+# Execute the existing runtime after readiness; the real gate has its own suite.
+s=s.replace('#import "CSBackupBootstrap.h"', 'static void CSBackupWhenReady(void (^callback)(void)) { callback(); }').replace('%init;', '')
 a=s.index('@implementation WBTouchTrailDotView');b=s.index('// 获取当前设置的触摸轨迹颜色',a)
 # Only drawing/CA interpolation are doubles; execute the production settings,
 # image cache, event admission, sampling, ownership and lifecycle code.

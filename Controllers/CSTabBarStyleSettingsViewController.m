@@ -1,3 +1,4 @@
+#import "CSBackupMutation.h"
 #import "CSTabBarStyleSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
 #import <Photos/Photos.h>
@@ -899,6 +900,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         NSArray *iconKeys = @[kTabBarIconChatKey, kTabBarIconContactsKey, kTabBarIconDiscoverKey, kTabBarIconMeKey,
                              kTabBarIconSelectedChatKey, kTabBarIconSelectedContactsKey, kTabBarIconSelectedDiscoverKey, kTabBarIconSelectedMeKey];
         
+        CSBackupResourceMutationScope();
         for (NSString *key in iconKeys) {
             NSString *filePath = [defaults stringForKey:key];
             if (filePath && [fileManager fileExistsAtPath:filePath]) {
@@ -958,6 +960,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 #pragma mark - UIImagePickerControllerDelegate
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
+    CSBackupResourceMutationScope();
     [picker dismissViewControllerAnimated:YES completion:nil];
     
     UIImage *image = info[UIImagePickerControllerEditedImage];

@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
@@ -153,4 +154,8 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
     %orig;
 }
 
-%end 
+%end
+
+%ctor {
+    CSBackupWhenReady(^{ %init; });
+}

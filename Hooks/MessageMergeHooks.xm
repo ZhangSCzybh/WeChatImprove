@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import "../Controllers/CSMessageMergeAdapter.h"
 #import "../Controllers/CSMessageNavigation.h"
@@ -99,3 +100,7 @@
 %hook BaseMessageViewModel
 - (void)resetLayoutCache { CSMessageMergeResetGeometry(self); %orig; }
 %end
+
+%ctor {
+    CSBackupWhenReady(^{ %init; });
+}

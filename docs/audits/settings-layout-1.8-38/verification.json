@@ -1,0 +1,47 @@
+{
+  "version": "1.8-38",
+  "metadata": "Package: com.wechat.improve\nVersion: 1.8-38\nArchitecture: iphoneos-arm64",
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "uuids": {
+    "arm64": "05917416-1E75-31E9-BD41-36901420DFB5",
+    "arm64e": "8835FA64-4555-3F30-8A11-1359207B3F62"
+  },
+  "filter": {
+    "Filter": {
+      "Bundles": [
+        "com.tencent.xin"
+      ],
+      "Executables": [
+        "ZYBH"
+      ]
+    }
+  },
+  "changed_existing_files": [
+    "Controllers/CSBackupPreviewViewController.m",
+    "Controllers/CSBackupSettingsViewController.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "README.md",
+    "control"
+  ],
+  "unchanged_baseline_files": 287,
+  "backup_core_unchanged": true,
+  "settings_home_unchanged": true,
+  "reset_page_unchanged": true,
+  "all_existing_packages_preserved": true,
+  "device_installed": false,
+  "simulator_runtime_available": false,
+  "artifacts": {
+    "packages/com.wechat.improve_1.8-38_iphoneos-arm64.deb": {
+      "sha256": "0f08e9a863e835ace7227ce27cff647648859dc8728d1d9d58bced97f68eeed5",
+      "bytes": 903480
+    },
+    "packages/WeChatImprove-1.8-38-dSYMs.zip": {
+      "sha256": "b97029d1eb070c86b05f04fd7a55e6ccc22ddc485ccedbe1230770841c68ce91",
+      "bytes": 3718563
+    }
+  }
+}

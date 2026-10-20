@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // 防止撤回功能Hook
 // 拦截微信撤回消息，保留被撤回的消息并显示提示
 
@@ -543,9 +544,11 @@ static NSString *revokeChatNameFromObject(id obj) {
 %end
 
 %ctor {
-    %init;
-    Class cell=NSClassFromString(@"SystemMessageCellView");
-    if (class_getInstanceMethod(cell,NSSelectorFromString(@"onLinkClicked:withRect:withView:"))) { %init(CSRevokeLinkWithView); }
-    if (class_getInstanceMethod(cell,NSSelectorFromString(@"onLinkClicked:backupUrl:withRect:"))) { %init(CSRevokeLinkWithBackup); }
-    if (class_getInstanceMethod(cell,NSSelectorFromString(@"onLinkClicked:backupUrl:withRect:extraInfo:"))) { %init(CSRevokeLinkWithExtra); }
+    CSBackupWhenReady(^{
+        %init;
+        Class cell=NSClassFromString(@"SystemMessageCellView");
+        if (class_getInstanceMethod(cell,NSSelectorFromString(@"onLinkClicked:withRect:withView:"))) { %init(CSRevokeLinkWithView); }
+        if (class_getInstanceMethod(cell,NSSelectorFromString(@"onLinkClicked:backupUrl:withRect:"))) { %init(CSRevokeLinkWithBackup); }
+        if (class_getInstanceMethod(cell,NSSelectorFromString(@"onLinkClicked:backupUrl:withRect:extraInfo:"))) { %init(CSRevokeLinkWithExtra); }
+    });
 }

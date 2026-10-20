@@ -1,0 +1,8 @@
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/TouchTrailRuntimeTests.m:39:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-touch-trail.MIKG3U/TouchHookUnderTest.h:470:9: error: expected expression
+  470 |         %init;
+      |         ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-touch-trail.MIKG3U/TouchHookUnderTest.h:470:10: error: use of undeclared identifier 'init'
+  470 |         %init;
+      |          ^~~~
+2 errors generated.

@@ -1,0 +1,21 @@
+{
+  "tests": [
+    {
+      "script": "Tests/verify-backup-reset.sh",
+      "checks": 30,
+      "exit_code": 0
+    },
+    {
+      "script": "Tests/verify-backup-transactions.sh",
+      "checks": 89,
+      "exit_code": 0
+    },
+    {
+      "script": "Tests/verify-plugin-framework.sh",
+      "checks": 28,
+      "exit_code": 0
+    }
+  ],
+  "total_checks": 147,
+  "environment": "macOS host; isolated UUID preferences domains and temporary files; no device data"
+}

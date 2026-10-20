@@ -1,3 +1,4 @@
+#import "CSBackupMutation.h"
 #import "CSNavigationTitleSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
 #import <objc/runtime.h>
@@ -1016,6 +1017,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                                placeholder:item.inputPlaceholder
                           inViewController:self
                                 completion:^(NSString *value) {
+    CSBackupResourceMutationScope();
             // 更新item的值
             item.inputValue = value;
             
@@ -1061,6 +1063,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                                placeholder:@"输入表情或符号"
                           inViewController:self
                                 completion:^(NSString *value) {
+    CSBackupResourceMutationScope();
             // 处理输入值
             NSString *finalValue = value;
             
@@ -1083,7 +1086,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
             }
             
             // 清除图片分隔符
-            if (self.separatorImage) {
+            if (self.separatorImage || [defaults stringForKey:kNavigationSeparatorImageKey].length) {
                 self.separatorImage = nil;
                 NSString *imagePath = [defaults objectForKey:kNavigationSeparatorImageKey];
                 if (imagePath) {
@@ -1110,8 +1113,8 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
         [self openImagePicker];
     }]];
     
-    // 如果已有图片，添加删除选项
-    if (self.separatorImage) {
+    // Missing historical paths must remain removable from the recovery editor.
+    if (self.separatorImage || [[NSUserDefaults standardUserDefaults] stringForKey:kNavigationSeparatorImageKey].length) {
         [actionSheet addAction:[UIAlertAction actionWithTitle:@"删除图片" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
             [self deleteSeparatorImage];
         }]];
@@ -1222,6 +1225,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
 
 // 删除分隔符图片
 - (void)deleteSeparatorImage {
+    CSBackupResourceMutationScope();
     // 清除图片数据
     self.separatorImage = nil;
     
@@ -1389,6 +1393,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
 
 // 保存分隔符图片
 - (void)saveSeparatorImage:(UIImage *)image {
+    CSBackupResourceMutationScope();
     if (!image) return;
     
     // 保存图片到文件

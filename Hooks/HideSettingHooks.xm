@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // HOOK 隐藏设置页面选项
 // 控制器类: NewSettingViewController
 // 通过Hook设置页控制器的viewWillAppear和reloadTableData方法，在页面显示时移除不需要的Cell
@@ -414,15 +415,18 @@ static void hideSettingCells(id tableViewMgr) {
 
 // 构造函数，插件加载时执行
 %ctor {
-    loadSettingPageSettings();
-    
-    // 注册Darwin通知，监听设置变化
-    CFNotificationCenterAddObserver(
-        CFNotificationCenterGetDarwinNotifyCenter(),
-        NULL,
-        settingPageSettingsChanged,
-        CFSTR("com.wechat.tweak.settings_changed"),
-        NULL,
-        CFNotificationSuspensionBehaviorCoalesce
-    );
+    CSBackupWhenReady(^{
+        loadSettingPageSettings();
+
+        // 注册Darwin通知，监听设置变化
+        CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            NULL,
+            settingPageSettingsChanged,
+            CFSTR("com.wechat.tweak.settings_changed"),
+            NULL,
+            CFNotificationSuspensionBehaviorCoalesce
+        );
+        %init;
+    });
 }

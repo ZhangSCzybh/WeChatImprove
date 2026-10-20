@@ -49,6 +49,8 @@ static NSString *getCustomEntryTitle() {
 
 // 加载设置
 static void loadEntrySettings() {
+    // Reload the user's entry title when preferences change.
+    gCustomEntryTitle = nil;
     // 加载自定义标题
     gCustomEntryTitle = getCustomEntryTitle();
 }
@@ -334,8 +336,8 @@ static int isRegister = 0;
         }
         
         // 如果没找到通用section，使用第二个section
-        if (!targetSection && sections.count > 1) {
-            targetSection = sections[1];
+        if (!targetSection && sections.count > 0) {
+            targetSection = sections[MIN((NSUInteger)1, sections.count - 1)];
         }
         
         if (!targetSection) {
@@ -457,6 +459,8 @@ static int isRegister = 0;
     UINavigationController *navigationController = [self valueForKey:@"navigationController"];
     if (navigationController) {
         [navigationController presentViewController:navVC animated:YES completion:nil];
+    } else if ([(id)self isKindOfClass:UIViewController.class]) {
+        [(UIViewController *)(id)self presentViewController:navVC animated:YES completion:nil];
     }
 }
 
@@ -470,7 +474,7 @@ static int isRegister = 0;
     // 初始化备份管理器，确保自动备份功能可用
     // 这会在应用启动时触发，确保 CSBackupManager 单例被创建
     // CSBackupManager 会自动监听应用进入前台的通知
-    [CSBackupManager sharedManager];
+    dispatch_async(dispatch_get_main_queue(), ^{ [CSBackupManager sharedManager]; });
     
     // 注册通知观察者，当设置变化时重新加载
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
@@ -479,4 +483,6 @@ static int isRegister = 0;
                                    CFSTR("com.wechat.tweak.entry.settings.changed"),
                                    NULL,
                                    CFNotificationSuspensionBehaviorDeliverImmediately);
+    // The original plugin framework remains available independently of backup status.
+    %init;
 }

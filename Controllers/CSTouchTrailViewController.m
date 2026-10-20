@@ -1,3 +1,4 @@
+#import "CSBackupMutation.h"
 #import "CSTouchTrailViewController.h"
 #import "CSSettingTableViewCell.h"
 #import <UIKit/UIKit.h>
@@ -935,6 +936,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
 }
 
 - (void)processAndSaveImage:(UIImage *)image {
+    CSBackupResourceMutationScope();
     if (!image) return;
     
     // 更新图片预览
@@ -961,6 +963,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
 
 // 保存图片到应用沙盒
 - (NSString *)saveImageToDocuments:(UIImage *)image {
+    CSBackupResourceMutationScope();
     // 获取Preferences目录下的WeChatImprove文件夹路径（原WechatEnhance已更名为WeChatImprove）
     NSString *prefsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
     prefsPath = [prefsPath stringByAppendingPathComponent:@"Preferences"];
@@ -983,15 +986,6 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     // 使用固定的文件名
     NSString *fileName = @"touch_trail.png";
     NSString *filePath = [enhanceFolderPath stringByAppendingPathComponent:fileName];
-    
-    // 如果旧文件存在，先删除
-    if ([fileManager fileExistsAtPath:filePath]) {
-        NSError *error = nil;
-        [fileManager removeItemAtPath:filePath error:&error];
-        if (error) {
-            NSLog(@"删除旧图片失败: %@", error.localizedDescription);
-        }
-    }
     
     // 将图片转换为PNG数据并保存
     NSData *imageData = UIImagePNGRepresentation(image);

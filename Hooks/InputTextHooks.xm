@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import "CSInputTextStyle.h"
 
@@ -54,4 +55,9 @@
 - (void)onViewDidInit { %orig; CSInputTextStyleApply(self.textView); }
 %end
 
-%ctor { CSInputTextStyleInstall(NSUserDefaults.standardUserDefaults); }
+%ctor {
+    CSBackupWhenReady(^{
+        CSInputTextStyleInstall(NSUserDefaults.standardUserDefaults);
+        %init;
+    });
+}

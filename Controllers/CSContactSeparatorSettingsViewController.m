@@ -1,3 +1,4 @@
+#import "CSBackupMutation.h"
 #import "CSContactSeparatorSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
 #import "CSContactSeparatorManager.h"
@@ -145,7 +146,7 @@
     };
     [separatorItems addObject:imageItem];
     
-    if (self.separatorImage) {
+    if (self.separatorImage || self.separatorImagePath.length) {
         CSSettingItem *clearImageItem = [CSSettingItem actionItemWithTitle:@"清除分隔符图片"
                                                                  iconName:@"xmark.circle"
                                                                 iconColor:[UIColor systemRedColor]];
@@ -285,6 +286,7 @@
 }
 
 - (void)saveSeparatorImage:(UIImage *)image {
+    CSBackupResourceMutationScope();
     NSString *prefsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
     prefsPath = [prefsPath stringByAppendingPathComponent:@"Preferences"];
     NSString *enhanceFolderPath = [prefsPath stringByAppendingPathComponent:@"WeChatImprove"];

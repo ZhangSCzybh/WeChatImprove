@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // 禁用微信界面原生标签显示-界面净化
 
 #import <UIKit/UIKit.h>
@@ -275,16 +276,19 @@ static void settingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 
 // 初始化函数
 %ctor {
-    // 读取初始设置
-    loadSettings();
-    
-    // 注册设置变更通知
-    CFNotificationCenterAddObserver(
-        CFNotificationCenterGetDarwinNotifyCenter(),
-        NULL,
-        settingsChanged,
-        CFSTR("com.wechat.tweak.settings_changed"),
-        NULL,
-        CFNotificationSuspensionBehaviorCoalesce
-    );
+    CSBackupWhenReady(^{
+        // 读取初始设置
+        loadSettings();
+
+        // 注册设置变更通知
+        CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            NULL,
+            settingsChanged,
+            CFSTR("com.wechat.tweak.settings_changed"),
+            NULL,
+            CFNotificationSuspensionBehaviorCoalesce
+        );
+        %init;
+    });
 } 

@@ -1,0 +1,22 @@
+[
+  {
+    "file": "Controllers/CSBackupSettingsCell.m",
+    "exit_code": 0
+  },
+  {
+    "file": "Controllers/CSBackupSettingsViewController.m",
+    "exit_code": 0
+  },
+  {
+    "file": "Controllers/CSResetSettingsViewController.m",
+    "exit_code": 0
+  },
+  {
+    "file": "Controllers/CSBackupPreviewViewController.m",
+    "exit_code": 0
+  },
+  {
+    "file": "Controllers/CSReleaseNotesViewController.m",
+    "exit_code": 0
+  }
+]

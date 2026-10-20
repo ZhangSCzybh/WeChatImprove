@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // HOOK 隐藏二维码按钮
 #import <UIKit/UIKit.h>
 
@@ -36,14 +37,17 @@ static void loadSettings() {
 
 // 构造函数，在加载时执行
 %ctor {
-    // 加载设置
-    loadSettings();
-    
-    // 添加通知观察者，当设置变化时重新加载
-    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
-                                    NULL,
-                                    (CFNotificationCallback)loadSettings,
-                                    CFSTR("com.wechat.tweak.settings_changed"),
-                                    NULL,
-                                    CFNotificationSuspensionBehaviorDeliverImmediately);
+    CSBackupWhenReady(^{
+        // 加载设置
+        loadSettings();
+
+        // 添加通知观察者，当设置变化时重新加载
+        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
+                                        NULL,
+                                        (CFNotificationCallback)loadSettings,
+                                        CFSTR("com.wechat.tweak.settings_changed"),
+                                        NULL,
+                                        CFNotificationSuspensionBehaviorDeliverImmediately);
+        %init;
+    });
 } 

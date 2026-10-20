@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // Avatar preferences compose with native visibility and belong to each model's chat.
 #import "../Controllers/CSAvatarSettingsViewController.h"
 #import "../Controllers/CSMessageMergeAdapter.h"
@@ -32,10 +33,13 @@ static void reloadAvatarVisibility(void) {
 }
 %end
 %ctor {
-    avatarDefaults = [[NSUserDefaults alloc] initWithSuiteName:kUserDefaultsSuiteName];
-    reloadAvatarVisibility();
-    [NSNotificationCenter.defaultCenter addObserverForName:NSUserDefaultsDidChangeNotification object:nil
-        queue:nil usingBlock:^(NSNotification *note) {
-            CSRequestMainRefresh(&avatarRefreshPending, ^{ reloadAvatarVisibility(); });
-        }];
+    CSBackupWhenReady(^{
+        avatarDefaults = [[NSUserDefaults alloc] initWithSuiteName:kUserDefaultsSuiteName];
+        reloadAvatarVisibility();
+        [NSNotificationCenter.defaultCenter addObserverForName:NSUserDefaultsDidChangeNotification object:nil
+            queue:nil usingBlock:^(NSNotification *note) {
+                CSRequestMainRefresh(&avatarRefreshPending, ^{ reloadAvatarVisibility(); });
+            }];
+        %init;
+    });
 }

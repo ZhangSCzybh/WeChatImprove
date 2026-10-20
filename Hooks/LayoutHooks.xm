@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // 布局和字体设置Hook
 // 实现聊天界面字体大小和全局缩放控制
 
@@ -275,3 +276,7 @@ static void applyGlobalScale(SessionCellLayoutParam *layoutParam, CGFloat scale)
 
 // Layout getters read the current shared preferences directly. There is no
 // cache to invalidate and no observer that republishes its own notification.
+
+%ctor {
+    CSBackupWhenReady(^{ %init; });
+}

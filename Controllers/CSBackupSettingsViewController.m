@@ -1,524 +1,182 @@
 #import "CSBackupSettingsViewController.h"
-#import "CSSettingTableViewCell.h"
 #import "CSBackupManager.h"
-#import "CSBackupInfo.h"
-#import <Photos/Photos.h>
-#import <MobileCoreServices/MobileCoreServices.h>
-
-static NSString * const kBackupCellIdentifier = @"CSBackupCell";
-
-@interface CSBackupSettingsViewController () <UITableViewDelegate, UITableViewDataSource, UIDocumentPickerDelegate>
-
-@property (nonatomic, strong) NSMutableArray<CSBackupInfo *> *backupList;
-
+#import "CSBackupPreviewViewController.h"
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
+#import "CSNavigationTitleSettingsViewController.h"
+#import "CSTabBarStyleSettingsViewController.h"
+#import "CSTouchTrailViewController.h"
+#import "CSContactSeparatorSettingsViewController.h"
+#import "CSNativeSettingsHost.h"
+#import "CSBackupSettingsCell.h"
+@interface CSBackupRepairViewController : UITableViewController
+@property(nonatomic) NSArray<NSString *> *contacts;
 @end
-
-@implementation CSBackupSettingsViewController
-
+@implementation CSBackupRepairViewController
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    self.title = @"备份配置";
-    self.tableView.backgroundColor = [UIColor systemGroupedBackgroundColor];
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-    self.tableView.separatorInset = UIEdgeInsetsMake(0, 54, 0, 0);
-    
-    [CSSettingTableViewCell registerToTableView:self.tableView];
-    
-    [self loadBackupList];
-    [self setupData];
+    self.title=@"修复当前配置";
+    self.tableView.backgroundColor=UIColor.systemGroupedBackgroundColor;
+    self.tableView.separatorInset=UIEdgeInsetsMake(0,54,0,0);
+    [CSBackupSettingsCell registerToTableView:self.tableView];
+    id contacts=[NSUserDefaults.standardUserDefaults objectForKey:@"com.wechat.tweak.navigation.contact.overrides"];
+    self.contacts=[contacts isKindOfClass:NSDictionary.class]?[[contacts allKeys] sortedArrayUsingSelector:@selector(compare:)]:@[];
 }
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [self loadBackupList];
-    [self setupData];
-    [self.tableView reloadData];
-}
-
-- (void)loadBackupList {
-    self.backupList = [[CSBackupManager sharedManager].getAllBackups mutableCopy];
-}
-
-- (void)setupData {
-    self.sections = [NSMutableArray array];
-    
-    CSSettingItem *createBackupItem = [CSSettingItem actionItemWithTitle:@"创建备份"
-                                                              iconName:@"plus.circle.fill"
-                                                             iconColor:[UIColor systemBlueColor]];
-    createBackupItem.actionBlock = ^{
-        [self showCreateBackupDialog];
-    };
-    
-    CSSettingItem *importBackupItem = [CSSettingItem actionItemWithTitle:@"导入备份"
-                                                              iconName:@"square.and.arrow.down"
-                                                             iconColor:[UIColor systemGreenColor]];
-    importBackupItem.actionBlock = ^{
-        [self showImportBackupPicker];
-    };
-    
-    CSSettingItem *autoBackupItem = [CSSettingItem switchItemWithTitle:@"自动备份"
-                                                            iconName:@"clock.arrow.circlepath"
-                                                           iconColor:[UIColor systemOrangeColor]
-                                                          switchValue:[CSBackupManager sharedManager].isAutoBackupEnabled
-                                                     valueChangedBlock:^(BOOL isOn) {
-        [[CSBackupManager sharedManager] enableAutoBackup:isOn];
-    }];
-    
-    CSSettingSection *actionSection = [CSSettingSection sectionWithHeader:@"操作"
-                                                                   items:@[createBackupItem, importBackupItem, autoBackupItem]];
-    [self.sections addObject:actionSection];
-    
-    if (self.backupList.count > 0) {
-        NSMutableArray *backupItems = [NSMutableArray array];
-        
-        for (CSBackupInfo *backupInfo in self.backupList) {
-            NSString *detailText = [NSString stringWithFormat:@"%@ | %ld项配置",
-                                    [self formatDate:backupInfo.createTime],
-                                    (long)backupInfo.configCount];
-            
-            CSSettingItem *backupItem = [CSSettingItem itemWithTitle:backupInfo.backupName
-                                                           iconName:@"doc.fill"
-                                                          iconColor:backupInfo.isAutoBackup ? [UIColor systemOrangeColor] : [UIColor systemBlueColor]
-                                                             detail:detailText];
-            backupItem.actionBlock = ^{
-                [self showBackupActionsForBackup:backupInfo];
-            };
-            [backupItems addObject:backupItem];
-        }
-        
-        CSSettingSection *backupSection = [CSSettingSection sectionWithHeader:@"备份列表"
-                                                                       items:backupItems];
-        [self.sections addObject:backupSection];
-    }
-    
-    CSSettingItem *infoItem = [CSSettingItem itemWithTitle:@"备份说明"
-                                                iconName:@"info.circle"
-                                               iconColor:[UIColor systemGrayColor]
-                                                 detail:@"备份包含所有插件配置，可随时恢复"];
-    
-    CSSettingSection *infoSection = [CSSettingSection sectionWithHeader:@"说明"
-                                                                 items:@[infoItem]];
-    [self.sections addObject:infoSection];
-}
-
-#pragma mark - Table view data source
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return self.sections.count;
-}
-
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { (void)tableView;return self.contacts.count?3:2; }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.sections[section].items.count;
+    (void)tableView;return section==0?3:(section==1&&self.contacts.count?self.contacts.count:1);
 }
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    CSSettingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[CSSettingTableViewCell reuseIdentifier]];
-    
-    CSSettingItem *item = self.sections[indexPath.section].items[indexPath.row];
-    [cell configureWithItem:item];
-    
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    (void)tableView;return section==0?@"自定义图片":(section==1&&self.contacts.count?@"联系人分隔图片":@"其他设置");
+}
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+    (void)tableView;
+    if(section==0)return @"在对应设置页重新选择图片，或移除无效引用，然后返回备份页重试。";
+    if(section==1&&self.contacts.count)return @"按联系人分别检查分隔图片和专属设置。";
+    return @"版本更新备份失败不影响其他插件功能。本页不会自动清除配置；其他设置仍使用原有授权检查。";
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {
+    CSSettingItem *item=nil;
+    BOOL contactRow=path.section==1&&self.contacts.count;
+    if(path.section==0){
+        NSArray *titles=@[@"导航栏分隔图片",@"底栏图标",@"触摸轨迹图片"];
+        NSArray *icons=@[@"photo",@"square.grid.2x2",@"hand.draw"];
+        item=[CSSettingItem itemWithTitle:titles[path.row] iconName:icons[path.row] iconColor:UIColor.systemBlueColor detail:nil];
+    }else if(contactRow){
+        item=[CSSettingItem itemWithTitle:self.contacts[path.row] iconName:@"person.crop.circle" iconColor:UIColor.systemGreenColor detail:@"编辑"];
+    }else{
+        item=[CSSettingItem itemWithTitle:@"其他插件设置" iconName:@"gearshape" iconColor:UIColor.systemGrayColor detail:nil];
+    }
+    CSBackupSettingsCell *cell=[tableView dequeueReusableCellWithIdentifier:CSBackupSettingsCell.reuseIdentifier];
+    [cell configureWithItem:item];cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+    cell.accessibilityTraits=UIAccessibilityTraitButton;
+    if(contactRow)cell.textLabel.lineBreakMode=NSLineBreakByTruncatingMiddle;
     return cell;
 }
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return self.sections[section].header;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if (section == 0) {
-        return @"自动备份每天执行一次";
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)path {
+    [tableView deselectRowAtIndexPath:path animated:YES];
+    UIViewController *controller=nil;
+    if(path.section==0){
+        switch(path.row){
+            case 0:controller=[CSNavigationTitleSettingsViewController new];break;
+            case 1:controller=[CSTabBarStyleSettingsViewController new];break;
+            default:controller=[CSTouchTrailViewController new];break;
+        }
+    }else if(path.section==1&&self.contacts.count){
+        controller=[[CSContactSeparatorSettingsViewController alloc]initWithContactId:self.contacts[path.row] contactName:nil contactAvatar:nil];
+    }else{
+        controller=[[CSNativeSettingsControllerClass() alloc]init];
     }
+    [self.navigationController pushViewController:controller animated:YES];
+}
+@end
+
+@interface CSBackupSettingsViewController () <UIDocumentPickerDelegate>
+@property(nonatomic) NSArray *records;
+@property(nonatomic) BOOL busy;
+@end
+@implementation CSBackupSettingsViewController
+- (void)viewDidLoad {
+    [super viewDidLoad];self.title=@"备份配置";self.records=@[];
+    self.tableView.backgroundColor=UIColor.systemGroupedBackgroundColor;
+    self.tableView.separatorInset=UIEdgeInsetsMake(0,54,0,0);
+    [CSBackupSettingsCell registerToTableView:self.tableView];[self rebuildSections];
+}
+- (void)viewWillAppear:(BOOL)animated {[super viewWillAppear:animated];[self reload];}
+- (void)setWorking:(BOOL)working {self.busy=working;self.tableView.userInteractionEnabled=!working;self.navigationItem.prompt=working?@"正在处理，请稍候…":nil;}
+- (void)reload {[self setWorking:YES];[CSBackupManager.sharedManager list:^(NSArray *records,NSError *error){self.records=records?:@[];[self setWorking:NO];[self rebuildSections];[self.tableView reloadData];if(error)[self message:@"备份检查" detail:error.localizedDescription];}];}
+- (void)message:(NSString *)title detail:(NSString *)message {UIAlertController *alert=[UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];[alert addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleDefault handler:nil]];[self presentViewController:alert animated:YES completion:nil];}
+- (CSSettingItem *)action:(NSString *)title icon:(NSString *)icon color:(UIColor *)color block:(void (^)(void))block {
+    // Match ordinary settings rows; Action items override the inherited title font with 17pt.
+    CSSettingItem *item=[CSSettingItem itemWithTitle:title iconName:icon iconColor:color detail:nil];item.actionBlock=block;return item;
+}
+- (void)rebuildSections {
+    __weak typeof(self) weakSelf=self;
+    CSSettingItem *create=[self action:@"创建备份" icon:@"plus.circle.fill" color:UIColor.systemGreenColor block:^{[weakSelf create];}];
+    CSSettingItem *import=[self action:@"从文件导入" icon:@"square.and.arrow.down" color:UIColor.systemBlueColor block:^{[weakSelf importFile];}];
+    CSSettingItem *automatic=[CSSettingItem switchItemWithTitle:@"自动备份" iconName:@"arrow.triangle.2.circlepath" iconColor:UIColor.systemOrangeColor switchValue:CSBackupManager.sharedManager.isAutoBackupEnabled valueChangedBlock:^(BOOL on){[CSBackupManager.sharedManager enableAutoBackup:on];}];
+    NSMutableArray *backups=[NSMutableArray array];NSDateFormatter *date=[NSDateFormatter new];date.dateFormat=@"MM-dd HH:mm";
+    for(NSDictionary *record in self.records){
+        BOOL favorite=[record[@"metadata"][@"favorite"] boolValue];
+        CSSettingItem *item=[self action:record[@"metadata"][@"name"]?:record[@"name"] icon:favorite?@"star.fill":@"archivebox.fill" color:favorite?UIColor.systemOrangeColor:UIColor.systemBlueColor block:^{[weakSelf openRecord:record];}];
+        item.detail=record[@"createdAt"]?[date stringFromDate:record[@"createdAt"]]:@"旧版";[backups addObject:item];
+    }
+    if(!backups.count)[backups addObject:[CSSettingItem itemWithTitle:@"暂无本机备份" iconName:@"archivebox" iconColor:UIColor.systemGrayColor detail:nil]];
+    CSSettingItem *status=[self action:@"备份与恢复状态" icon:@"info.circle" color:UIColor.systemBlueColor block:^{[weakSelf message:@"备份与恢复状态" detail:CSBackupManager.sharedManager.status];}];
+    status.detail=@"查看";
+    CSSettingItem *retry=[self action:@"重试备份与恢复" icon:@"arrow.clockwise" color:UIColor.systemOrangeColor block:^{[weakSelf retryStartup];}];
+    CSSettingItem *repair=[self action:@"修复当前配置" icon:@"wrench.and.screwdriver" color:UIColor.systemOrangeColor block:^{[weakSelf repair];}];
+    CSSettingItem *cancel=[self action:@"取消待执行计划" icon:@"xmark.circle" color:UIColor.systemRedColor block:^{[weakSelf confirmCancel];}];
+    CSSettingItem *info=[self action:@"功能说明" icon:@"questionmark.circle" color:UIColor.systemGrayColor block:^{[weakSelf message:@"备份配置说明" detail:@"备份包含插件配置、自定义图片和已存档账号分组。点击备份可预览恢复、导出、重命名、收藏或删除。旧版原件只读保留。\n\n自动备份在配置停止变化约 30 秒后尝试保存，持续编辑时约 5 分钟检查一次，相同内容不重复保存。默认保留 20 份自动备份与 5 份操作保护备份；手动、收藏及待执行计划使用的备份会保留。\n\n导出文件未加密，可能包含成员、联系人标识和自定义文字；不包含微信消息、登录凭据或支付账本。"]; }];
+    self.sections=[@[[CSSettingSection sectionWithHeader:@"备份设置" items:@[create,import,automatic]],
+                     [CSSettingSection sectionWithHeader:[NSString stringWithFormat:@"本机备份 · %lu 份",(unsigned long)self.records.count] items:backups],
+                     [CSSettingSection sectionWithHeader:@"恢复管理" items:@[status,retry,repair,cancel]],
+                     [CSSettingSection sectionWithHeader:@"说明" items:@[info]]] mutableCopy];
+}
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {(void)tableView;return self.sections.count;}
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {(void)tableView;return self.sections[section].items.count;}
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {(void)tableView;return self.sections[section].header;}
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+    (void)tableView;
+    if(section==0)return @"保存当前插件配置和自定义图片。自动备份会在停止编辑后检查，内容相同时不重复保存。";
+    if(section==1)return self.records.count?@"点击备份可预览恢复、分享及管理。":@"创建第一份备份，或从文件导入已有备份。";
+    if(section==2)return @"恢复和重置均在重新打开微信时应用。执行前可取消待处理计划。";
     return nil;
 }
-
-#pragma mark - UITableViewDelegate
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
-    CSSettingItem *item = self.sections[indexPath.section].items[indexPath.row];
-    if (item.actionBlock) {
-        item.actionBlock();
-    }
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {
+    CSBackupSettingsCell *cell=[tableView dequeueReusableCellWithIdentifier:CSBackupSettingsCell.reuseIdentifier];
+    CSSettingItem *item=self.sections[path.section].items[path.row];[cell configureWithItem:item];
+    if(item.actionBlock)cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+    if(!item.actionBlock&&item.itemType!=CSSettingItemTypeSwitch)cell.selectionStyle=UITableViewCellSelectionStyleNone;
+    return cell;
 }
-
-#pragma mark - 创建备份
-
-- (void)showCreateBackupDialog {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"创建备份"
-                                                                   message:@"请输入备份名称和描述（可选）"
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    
-    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.placeholder = @"备份名称";
-        textField.text = [NSString stringWithFormat:@"备份 %@", [self formatDate:[NSDate date]]];
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)path {
+    [tableView deselectRowAtIndexPath:path animated:YES];if(self.busy)return;
+    [self.sections[path.section].items[path.row] performAction];
+}
+- (void)openRecord:(NSDictionary *)record {
+    [self setWorking:YES];[CSBackupManager.sharedManager load:record completion:^(NSDictionary *snapshot,NSError *error){
+        [self setWorking:NO];if(error){[self message:@"无法读取备份" detail:error.localizedDescription];return;}
+        NSUInteger row=[self.records indexOfObject:record];UIView *anchor=row!=NSNotFound?[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:1]]:self.view;
+        [self showRecord:record snapshot:snapshot anchor:anchor];
     }];
-    
-    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.placeholder = @"备份描述（可选）";
-    }];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消"
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:nil];
-    
-    UIAlertAction *createAction = [UIAlertAction actionWithTitle:@"创建"
-                                                           style:UIAlertActionStyleDefault
-                                                         handler:^(UIAlertAction *action) {
-        UITextField *nameField = alert.textFields.firstObject;
-        UITextField *descField = alert.textFields.lastObject;
-        
-        NSString *backupName = nameField.text.length > 0 ? nameField.text : @"未命名备份";
-        NSString *description = descField.text.length > 0 ? descField.text : nil;
-        
-        [self createBackupWithName:backupName description:description];
-    }];
-    
-    [alert addAction:cancelAction];
-    [alert addAction:createAction];
-    
-    [self presentViewController:alert animated:YES completion:nil];
 }
-
-- (void)createBackupWithName:(NSString *)backupName description:(NSString *)description {
-    NSError *error = nil;
-    BOOL success = [[CSBackupManager sharedManager] createBackupWithName:backupName
-                                                              description:description
-                                                             isAutoBackup:NO
-                                                                    error:&error];
-    
-    if (success) {
-        [self loadBackupList];
-        [self setupData];
-        
-        [self showSuccessAlert:@"备份创建成功" message:@"请选择发送方式" completion:^(NSInteger actionType) {
-            if (actionType == 1) {
-                [self sendLatestBackupToFileHelper];
-            } else if (actionType == 2) {
-                [self sendLatestBackupToSelf];
-            }
-            [self.tableView reloadData];
-        }];
-    } else {
-        NSString *errorMsg = error ? error.localizedDescription : @"未知错误";
-        [self showErrorAlert:@"创建失败" message:errorMsg];
+- (void)importFile {
+    UIDocumentPickerViewController *picker=[[UIDocumentPickerViewController alloc]initForOpeningContentTypes:@[UTTypeData] asCopy:YES];picker.delegate=self;picker.allowsMultipleSelection=NO;[self presentViewController:picker animated:YES completion:nil];
+}
+- (void)repair {
+    [self setWorking:YES];[CSBackupManager.sharedManager checkRepairAccess:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"暂时不能修复" detail:error.localizedDescription];else [self.navigationController pushViewController:[[CSBackupRepairViewController alloc]initWithStyle:UITableViewStyleInsetGrouped] animated:YES];}];
+}
+- (void)retryStartup {
+    [self setWorking:YES];[CSBackupManager.sharedManager retryPendingWork:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"恢复仍待处理" detail:error.localizedDescription];else [self message:@"校验已完成" detail:@"备份检查已完成；若刚完成恢复处理，请重新打开微信。"];[self.tableView reloadData];}];
+}
+- (void)create {
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"创建完整备份" message:@"保存当前插件配置、图片和账号分组。" preferredStyle:UIAlertControllerStyleAlert];
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *field){field.placeholder=@"名称（可留空）";}];
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"保存" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){NSString *name=[alert.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];if(!name.length){NSDateFormatter *date=[NSDateFormatter new];date.dateFormat=@"yyyy-MM-dd HH:mm";name=[@"手动备份 " stringByAppendingString:[date stringFromDate:NSDate.date]];}[self setWorking:YES];[CSBackupManager.sharedManager create:name completion:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"保存失败" detail:error.localizedDescription];else [self reload];}];}]];[self presentViewController:alert animated:YES completion:nil];
+}
+- (void)confirmCancel {
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"取消待执行计划" message:@"保留当前配置、原备份和保护备份。已开始但未完成的事务必须先回滚。" preferredStyle:UIAlertControllerStyleAlert];[alert addAction:[UIAlertAction actionWithTitle:@"返回" style:UIAlertActionStyleCancel handler:nil]];[alert addAction:[UIAlertAction actionWithTitle:@"取消计划" style:UIAlertActionStyleDestructive handler:^(__unused UIAlertAction *a){[self setWorking:YES];[CSBackupManager.sharedManager cancelPending:^(__unused id result,NSError *error){[self setWorking:NO];if(error)[self message:@"无法取消" detail:error.localizedDescription];else [self reload];}];}]];[self presentViewController:alert animated:YES completion:nil];
+}
+- (void)showRecord:(NSDictionary *)record snapshot:(NSDictionary *)snapshot anchor:(UIView *)anchor {
+    NSDateFormatter *date=[NSDateFormatter new];date.dateStyle=NSDateFormatterMediumStyle;date.timeStyle=NSDateFormatterShortStyle;
+    NSString *kind=@{@"manual":@"手动备份",@"automatic":@"自动备份",@"protection":@"操作前保护",@"upgrade":@"升级保护",@"imported":@"导入备份"}[snapshot[@"kind"]]?:@"备份";
+    NSString *message=[NSString stringWithFormat:@"%@ · %@\n来源版本 %@ · %lu 项配置 · %lu 张图片%@",kind,[date stringFromDate:snapshot[@"createdAt"]],snapshot[@"source"][@"pluginVersion"],(unsigned long)[snapshot[@"fields"] count],(unsigned long)[snapshot[@"assets"] count],[snapshot[@"warnings"] count]?[@"\n" stringByAppendingString:[snapshot[@"warnings"] componentsJoinedByString:@"\n"]]:@""];
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:record[@"metadata"][@"name"]?:snapshot[@"name"] message:message preferredStyle:UIAlertControllerStyleActionSheet];
+    [alert addAction:[UIAlertAction actionWithTitle:@"预览恢复" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *a){[self.navigationController pushViewController:[[CSBackupPreviewViewController alloc]initWithSnapshot:snapshot] animated:YES];}]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"导出到文件 / 分享" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *a){[self setWorking:YES];[CSBackupManager.sharedManager exportSnapshot:snapshot completion:^(NSURL *url,NSError *error){[self setWorking:NO];if(error){[self message:@"导出失败" detail:error.localizedDescription];return;}UIActivityViewController *share=[[UIActivityViewController alloc]initWithActivityItems:@[url] applicationActivities:nil];share.popoverPresentationController.sourceView=anchor?:self.view;share.popoverPresentationController.sourceRect=(anchor?:self.view).bounds;share.completionWithItemsHandler=^(__unused UIActivityType type,__unused BOOL complete,__unused NSArray *items,__unused NSError *shareError){[NSFileManager.defaultManager removeItemAtURL:url error:NULL];};[self presentViewController:share animated:YES completion:nil];}];}]];
+    if(![record[@"legacy"] boolValue]){
+        [alert addAction:[UIAlertAction actionWithTitle:@"重命名" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *a){[self renameRecord:record];}]];
+        BOOL favorite=[record[@"metadata"][@"favorite"] boolValue];[alert addAction:[UIAlertAction actionWithTitle:favorite?@"取消收藏":@"收藏（保留不自动清理）" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *a){NSMutableDictionary *metadata=[record[@"metadata"] mutableCopy];metadata[@"favorite"]=favorite?@NO:@YES;[self setWorking:YES];[CSBackupManager.sharedManager updateMetadata:metadata record:record completion:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"修改失败" detail:error.localizedDescription];else [self reload];}];}]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"删除备份" style:UIAlertActionStyleDestructive handler:^(__unused UIAlertAction *a){[self deleteRecord:record];}]];
     }
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];alert.popoverPresentationController.sourceView=anchor?:self.view;alert.popoverPresentationController.sourceRect=(anchor?:self.view).bounds;[self presentViewController:alert animated:YES completion:nil];
 }
-
-- (void)sendLatestBackupToFileHelper {
-    if (self.backupList.count == 0) {
-        [self showErrorAlert:@"发送失败" message:@"没有可用的备份"];
-        return;
-    }
-    
-    CSBackupInfo *latestBackup = self.backupList.firstObject;
-    NSError *error = nil;
-    BOOL success = [[CSBackupManager sharedManager] sendBackupToFileHelper:latestBackup error:&error];
-    
-    if (success) {
-        [self showSuccessAlert:@"发送成功" message:@"备份已发送到文件传输助手" completion:nil];
-    } else {
-        NSString *errorMsg = error ? error.localizedDescription : @"未知错误";
-        [self showErrorAlert:@"发送失败" message:errorMsg];
-    }
+- (void)renameRecord:(NSDictionary *)record {
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"重命名本机备份" message:@"仅修改本机显示名称，原始快照信息保留。" preferredStyle:UIAlertControllerStyleAlert];[alert addTextFieldWithConfigurationHandler:^(UITextField *field){field.text=record[@"metadata"][@"name"]?:record[@"name"];}];[alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];[alert addAction:[UIAlertAction actionWithTitle:@"保存" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *a){NSString *name=[alert.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];if(!name.length||name.length>128){[self message:@"名称无效" detail:@"请输入 1–128 个字符。"] ;return;}NSMutableDictionary *metadata=[record[@"metadata"] mutableCopy];metadata[@"name"]=name;[self setWorking:YES];[CSBackupManager.sharedManager updateMetadata:metadata record:record completion:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"修改失败" detail:error.localizedDescription];else [self reload];}];}]];[self presentViewController:alert animated:YES completion:nil];
 }
-
-- (void)sendLatestBackupToSelf {
-    if (self.backupList.count == 0) {
-        [self showErrorAlert:@"发送失败" message:@"没有可用的备份"];
-        return;
-    }
-    
-    CSBackupInfo *latestBackup = self.backupList.firstObject;
-    NSError *error = nil;
-    BOOL success = [[CSBackupManager sharedManager] sendBackupToSelf:latestBackup error:&error];
-    
-    if (success) {
-        [self showSuccessAlert:@"发送成功" message:@"备份已发送给自己" completion:nil];
-    } else {
-        NSString *errorMsg = error ? error.localizedDescription : @"未知错误";
-        [self showErrorAlert:@"发送失败" message:errorMsg];
-    }
+- (void)deleteRecord:(NSDictionary *)record {
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"删除这份备份？" message:@"只删除所选备份，不改变当前配置。" preferredStyle:UIAlertControllerStyleAlert];[alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];[alert addAction:[UIAlertAction actionWithTitle:@"删除" style:UIAlertActionStyleDestructive handler:^(__unused UIAlertAction *a){[self setWorking:YES];[CSBackupManager.sharedManager remove:record completion:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"删除失败" detail:error.localizedDescription];else [self reload];}];}]];[self presentViewController:alert animated:YES completion:nil];
 }
-
-#pragma mark - 备份操作
-
-- (void)showBackupActionsForBackup:(CSBackupInfo *)backupInfo {
-    UIAlertController *actionSheet = [UIAlertController alertControllerWithTitle:backupInfo.backupName
-                                                                         message:nil
-                                                                  preferredStyle:UIAlertControllerStyleActionSheet];
-    
-    UIAlertAction *restoreAction = [UIAlertAction actionWithTitle:@"恢复此备份"
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *action) {
-        [self restoreBackup:backupInfo];
-    }];
-    
-    UIAlertAction *exportAction = [UIAlertAction actionWithTitle:@"导出备份"
-                                                           style:UIAlertActionStyleDefault
-                                                         handler:^(UIAlertAction *action) {
-        [self exportBackup:backupInfo];
-    }];
-    
-    UIAlertAction *sendAction = [UIAlertAction actionWithTitle:@"发送到文件传输助手"
-                                                         style:UIAlertActionStyleDefault
-                                                       handler:^(UIAlertAction *action) {
-        [self sendBackupToFileHelper:backupInfo];
-    }];
-    
-    UIAlertAction *sendToSelfAction = [UIAlertAction actionWithTitle:@"发送给自己"
-                                                              style:UIAlertActionStyleDefault
-                                                            handler:^(UIAlertAction *action) {
-        [self sendBackupToSelf:backupInfo];
-    }];
-    
-    UIAlertAction *deleteAction = [UIAlertAction actionWithTitle:@"删除备份"
-                                                           style:UIAlertActionStyleDestructive
-                                                         handler:^(UIAlertAction *action) {
-        [self deleteBackup:backupInfo];
-    }];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消"
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:nil];
-    
-    [actionSheet addAction:restoreAction];
-    [actionSheet addAction:exportAction];
-    [actionSheet addAction:sendAction];
-    [actionSheet addAction:sendToSelfAction];
-    [actionSheet addAction:deleteAction];
-    [actionSheet addAction:cancelAction];
-    
-    if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-        actionSheet.popoverPresentationController.sourceView = self.tableView;
-        actionSheet.popoverPresentationController.sourceRect = self.tableView.bounds;
-    }
-    
-    [self presentViewController:actionSheet animated:YES completion:nil];
-}
-
-- (void)restoreBackup:(CSBackupInfo *)backupInfo {
-    UIAlertController *confirmAlert = [UIAlertController alertControllerWithTitle:@"确认恢复"
-                                                                         message:@"恢复备份将覆盖当前所有配置，恢复后需要重启微信才能完全生效。是否继续？"
-                                                                  preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消"
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:nil];
-    
-    UIAlertAction *restoreAction = [UIAlertAction actionWithTitle:@"恢复并重启"
-                                                            style:UIAlertActionStyleDestructive
-                                                          handler:^(UIAlertAction *action) {
-        NSError *error = nil;
-        BOOL success = [[CSBackupManager sharedManager] restoreBackup:backupInfo error:&error];
-        
-        if (success) {
-            [self showRestartAlert];
-        } else {
-            NSString *errorMsg = error ? error.localizedDescription : @"未知错误";
-            [self showErrorAlert:@"恢复失败" message:errorMsg];
-        }
-    }];
-    
-    [confirmAlert addAction:cancelAction];
-    [confirmAlert addAction:restoreAction];
-    
-    [self presentViewController:confirmAlert animated:YES completion:nil];
-}
-
-- (void)exportBackup:(CSBackupInfo *)backupInfo {
-    NSError *error = nil;
-    NSURL *exportURL = [[CSBackupManager sharedManager] exportBackupToTempFile:backupInfo error:&error];
-    
-    if (!exportURL) {
-        NSString *errorMsg = error ? error.localizedDescription : @"未知错误";
-        [self showErrorAlert:@"导出失败" message:errorMsg];
-        return;
-    }
-    
-    UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:@[exportURL]
-                                                                             applicationActivities:nil];
-    
-    if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-        activityVC.popoverPresentationController.sourceView = self.tableView;
-        activityVC.popoverPresentationController.sourceRect = self.tableView.bounds;
-    }
-    
-    [self presentViewController:activityVC animated:YES completion:nil];
-}
-
-- (void)sendBackupToFileHelper:(CSBackupInfo *)backupInfo {
-    NSError *error = nil;
-    BOOL success = [[CSBackupManager sharedManager] sendBackupToFileHelper:backupInfo error:&error];
-    
-    if (success) {
-        [self showSuccessAlert:@"发送成功" message:@"备份已发送到文件传输助手" completion:nil];
-    } else {
-        NSString *errorMsg = error ? error.localizedDescription : @"未知错误";
-        [self showErrorAlert:@"发送失败" message:errorMsg];
-    }
-}
-
-- (void)sendBackupToSelf:(CSBackupInfo *)backupInfo {
-    NSError *error = nil;
-    BOOL success = [[CSBackupManager sharedManager] sendBackupToSelf:backupInfo error:&error];
-    
-    if (success) {
-        [self showSuccessAlert:@"发送成功" message:@"备份已发送给自己" completion:nil];
-    } else {
-        NSString *errorMsg = error ? error.localizedDescription : @"未知错误";
-        [self showErrorAlert:@"发送失败" message:errorMsg];
-    }
-}
-
-- (void)deleteBackup:(CSBackupInfo *)backupInfo {
-    UIAlertController *confirmAlert = [UIAlertController alertControllerWithTitle:@"确认删除"
-                                                                         message:@"删除后无法恢复，是否继续？"
-                                                                  preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消"
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:nil];
-    
-    UIAlertAction *deleteAction = [UIAlertAction actionWithTitle:@"删除"
-                                                           style:UIAlertActionStyleDestructive
-                                                         handler:^(UIAlertAction *action) {
-        NSError *error = nil;
-        BOOL success = [[CSBackupManager sharedManager] deleteBackup:backupInfo error:&error];
-        
-        if (success) {
-            [self loadBackupList];
-            [self setupData];
-            [self.tableView reloadData];
-        } else {
-            NSString *errorMsg = error ? error.localizedDescription : @"未知错误";
-            [self showErrorAlert:@"删除失败" message:errorMsg];
-        }
-    }];
-    
-    [confirmAlert addAction:cancelAction];
-    [confirmAlert addAction:deleteAction];
-    
-    [self presentViewController:confirmAlert animated:YES completion:nil];
-}
-
-#pragma mark - 导入备份
-
-- (void)showImportBackupPicker {
-    UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc]
-                                                      initForOpeningContentTypes:@[UTTypeData]
-                                                                      asCopy:YES];
-    documentPicker.delegate = self;
-    documentPicker.allowsMultipleSelection = NO;
-    
-    [self presentViewController:documentPicker animated:YES completion:nil];
-}
-
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    if (urls.count == 0) {
-        return;
-    }
-    
-    NSURL *fileURL = urls.firstObject;
-    
-    NSError *error = nil;
-    BOOL success = [[CSBackupManager sharedManager] importBackupFromFile:fileURL error:&error];
-    
-    if (success) {
-        [self showSuccessAlert:@"导入成功" message:@"备份已导入，可在备份列表中查看" completion:nil];
-        [self loadBackupList];
-        [self setupData];
-        [self.tableView reloadData];
-    } else {
-        NSString *errorMsg = error ? error.localizedDescription : @"未知错误";
-        [self showErrorAlert:@"导入失败" message:errorMsg];
-    }
-}
-
-- (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
-    
-}
-
-#pragma mark - 辅助方法
-
-- (void)showSuccessAlert:(NSString *)title message:(NSString *)message completion:(void(^)(NSInteger actionType))completion {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title
-                                                                   message:message
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    
-    if (completion) {
-        UIAlertAction *sendToFileHelperAction = [UIAlertAction actionWithTitle:@"发送到文件传输助手"
-                                                                        style:UIAlertActionStyleDefault
-                                                                      handler:^(UIAlertAction *action) {
-            completion(1);
-        }];
-        
-        UIAlertAction *sendToSelfAction = [UIAlertAction actionWithTitle:@"发送给自己"
-                                                                  style:UIAlertActionStyleDefault
-                                                                handler:^(UIAlertAction *action) {
-            completion(2);
-        }];
-        
-        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定"
-                                                           style:UIAlertActionStyleDefault
-                                                         handler:^(UIAlertAction *action) {
-            completion(0);
-        }];
-        
-        [alert addAction:sendToFileHelperAction];
-        [alert addAction:sendToSelfAction];
-        [alert addAction:okAction];
-    } else {
-        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定"
-                                                           style:UIAlertActionStyleDefault
-                                                         handler:nil];
-        [alert addAction:okAction];
-    }
-    
-    [self presentViewController:alert animated:YES completion:nil];
-}
-
-- (void)showErrorAlert:(NSString *)title message:(NSString *)message {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title
-                                                                   message:message
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定"
-                                                       style:UIAlertActionStyleDefault
-                                                     handler:nil];
-    [alert addAction:okAction];
-    
-    [self presentViewController:alert animated:YES completion:nil];
-}
-
-- (void)showRestartAlert {
-    [self.tableView reloadData];
-    
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"恢复成功"
-                                                                   message:@"配置已恢复，需要重启微信才能完全应用更改。\n\n如果重启后设置仍未生效，请尝试关闭并重新打开设置界面。"
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *restartAction = [UIAlertAction actionWithTitle:@"立即重启"
-                                                            style:UIAlertActionStyleDestructive
-                                                          handler:^(UIAlertAction *action) {
-        exit(0);
-    }];
-    
-    UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"稍后重启"
-                                                          style:UIAlertActionStyleDefault
-                                                        handler:nil];
-    
-    [alert addAction:laterAction];
-    [alert addAction:restartAction];
-    
-    [self presentViewController:alert animated:YES completion:nil];
-}
-
-- (NSString *)formatDate:(NSDate *)date {
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    formatter.dateFormat = @"yyyy-MM-dd HH:mm:ss";
-    return [formatter stringFromDate:date];
-}
-
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {(void)controller;if(!urls.count)return;[self setWorking:YES];[CSBackupManager.sharedManager importURL:urls.firstObject completion:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"导入失败" detail:error.localizedDescription];else [self reload];}];}
 @end

@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import "CSMessageActionCoordinator.h"
 
@@ -63,3 +64,7 @@
     if (NSThread.isMainThread) continuation(); else dispatch_async(dispatch_get_main_queue(),continuation);
 }
 %end
+
+%ctor {
+    CSBackupWhenReady(^{ %init; });
+}

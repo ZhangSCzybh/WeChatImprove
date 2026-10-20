@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import "CSMessageActionMenuAdapter.h"
 
@@ -131,3 +132,7 @@
     return %orig(prepared);
 }
 %end
+
+%ctor {
+    CSBackupWhenReady(^{ %init; });
+}

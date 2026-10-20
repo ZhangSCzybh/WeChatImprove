@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // UserInfoHooks.xm
 // 用于获取微信用户信息和头像URL的整合钩子
 
@@ -119,5 +120,8 @@ NSString * const kChatAvatarURLKey = @"com.wechat.tweak.chat.avatar.url";  // �
 
 // 主入口函数
 %ctor {
-    userAvatarCache = [[CSAvatarURLCache alloc] initWithDefaults:NSUserDefaults.standardUserDefaults key:kUserAvatarURLKey];
+    CSBackupWhenReady(^{
+        userAvatarCache = [[CSAvatarURLCache alloc] initWithDefaults:NSUserDefaults.standardUserDefaults key:kUserAvatarURLKey];
+        %init;
+    });
 }

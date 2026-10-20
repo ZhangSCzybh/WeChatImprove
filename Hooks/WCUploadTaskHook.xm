@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // WCUploadTaskHook.xm
 // 朋友圈后缀功能
 
@@ -41,4 +42,8 @@ static NSString * const kWCTimeLineMessageTailEnabled = @"WCTimeLineMessageTailE
     return appInfo;
 }
 
-%end 
+%end
+
+%ctor {
+    CSBackupWhenReady(^{ %init; });
+}

@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
@@ -209,3 +210,7 @@ static void CSRedEnvelopSummaryApplyToTarget(id target) {
     @try { CSRedEnvelopSummaryApplyToTarget(self); } @catch (__unused NSException *e) {}
 }
 %end
+
+%ctor {
+    CSBackupWhenReady(^{ %init; });
+}

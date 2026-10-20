@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // 后台运行hook
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
@@ -294,36 +295,39 @@ static void handleEnterForeground() {
 
 // 添加通知观察者，而不是Hook通知中心
 %ctor {
-    @autoreleasepool {
-        // 初始化变量
-        bgTaskIdentifier = UIBackgroundTaskInvalid;
-        isInBackground = NO;
-        
-        // 注册通知观察者
-        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-        
-        // 观察应用回到前台的通知
-        [center addObserverForName:UIApplicationWillEnterForegroundNotification 
-                            object:nil 
-                             queue:[NSOperationQueue mainQueue] 
-                        usingBlock:^(NSNotification *notification) {
-            // 通过通知直接触发前台处理
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                handleEnterForeground();
-            });
-        }];
-        
-        // 增加活跃状态通知监听
-        [center addObserverForName:UIApplicationDidBecomeActiveNotification
-                            object:nil
-                             queue:[NSOperationQueue mainQueue]
-                        usingBlock:^(NSNotification *notification) {
-            // 最后的保障，确保一定会执行前台处理
-            if (isInBackground) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    CSBackupWhenReady(^{
+        @autoreleasepool {
+            // 初始化变量
+            bgTaskIdentifier = UIBackgroundTaskInvalid;
+            isInBackground = NO;
+
+            // 注册通知观察者
+            NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+
+            // 观察应用回到前台的通知
+            [center addObserverForName:UIApplicationWillEnterForegroundNotification
+                                object:nil
+                                 queue:[NSOperationQueue mainQueue]
+                            usingBlock:^(NSNotification *notification) {
+                // 通过通知直接触发前台处理
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     handleEnterForeground();
                 });
-            }
-        }];
-    }
+            }];
+
+            // 增加活跃状态通知监听
+            [center addObserverForName:UIApplicationDidBecomeActiveNotification
+                                object:nil
+                                 queue:[NSOperationQueue mainQueue]
+                            usingBlock:^(NSNotification *notification) {
+                // 最后的保障，确保一定会执行前台处理
+                if (isInBackground) {
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                        handleEnterForeground();
+                    });
+                }
+            }];
+        }
+        %init;
+    });
 }

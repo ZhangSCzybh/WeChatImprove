@@ -1,64 +1,28 @@
 #import <Foundation/Foundation.h>
-#import "CSBackupInfo.h"
-
 NS_ASSUME_NONNULL_BEGIN
-
-typedef NS_ENUM(NSInteger, CSBackupError) {
-    CSBackupErrorNone = 0,
-    CSBackupErrorCreateFailed,
-    CSBackupErrorRestoreFailed,
-    CSBackupErrorDeleteFailed,
-    CSBackupErrorExportFailed,
-    CSBackupErrorImportFailed,
-    CSBackupErrorInvalidBackup,
-    CSBackupErrorFileNotFound,
-};
-
+typedef void (^CSBackupCompletion)(id _Nullable result,NSError * _Nullable error);
+/// UIKit-facing asynchronous facade. Completions always run on the main thread.
 @interface CSBackupManager : NSObject
-
 + (instancetype)sharedManager;
-
-#pragma mark - 备份管理
-
-- (BOOL)createBackupWithName:(NSString *)backupName
-                  description:(nullable NSString *)description
-                   isAutoBackup:(BOOL)isAutoBackup
-                       error:(NSError **)error;
-
-- (BOOL)restoreBackup:(CSBackupInfo *)backupInfo error:(NSError **)error;
-
-- (BOOL)deleteBackup:(CSBackupInfo *)backupInfo error:(NSError **)error;
-
-- (NSArray<CSBackupInfo *> *)getAllBackups;
-
-- (nullable CSBackupInfo *)getBackupById:(NSString *)backupId;
-
-#pragma mark - 导出导入
-
-- (nullable NSURL *)exportBackupToTempFile:(CSBackupInfo *)backupInfo error:(NSError **)error;
-
-- (BOOL)importBackupFromFile:(NSURL *)fileURL error:(NSError **)error;
-
-#pragma mark - 发送到聊天窗口
-
-- (BOOL)sendBackupToFileHelper:(CSBackupInfo *)backupInfo error:(NSError **)error;
-
-- (BOOL)sendBackupToSelf:(CSBackupInfo *)backupInfo error:(NSError **)error;
-
-#pragma mark - 自动备份
-
-- (void)enableAutoBackup:(BOOL)enable;
-
+@property(atomic,copy,readonly) NSString *status;
+- (void)list:(CSBackupCompletion)completion;
+- (void)load:(NSDictionary *)record completion:(CSBackupCompletion)completion;
+- (void)create:(NSString *)name completion:(CSBackupCompletion)completion;
+- (void)importURL:(NSURL *)url completion:(CSBackupCompletion)completion;
+- (void)exportSnapshot:(NSDictionary *)snapshot completion:(CSBackupCompletion)completion;
+- (void)remove:(NSDictionary *)record completion:(CSBackupCompletion)completion;
+- (void)updateMetadata:(NSDictionary *)metadata record:(NSDictionary *)record completion:(CSBackupCompletion)completion;
+- (void)preview:(NSDictionary *)snapshot modules:(NSSet<NSString *> *)modules accounts:(NSSet<NSString *> *)accounts completion:(CSBackupCompletion)completion;
+- (void)prepare:(NSDictionary *)preview completion:(CSBackupCompletion)completion;
+- (void)resetSnapshot:(CSBackupCompletion)completion;
+- (void)checkRepairAccess:(CSBackupCompletion)completion;
+/// Retry pending recovery before activation, or optional version backup after activation.
+- (void)retryPendingWork:(CSBackupCompletion)completion;
+- (void)cancelPending:(CSBackupCompletion)completion;
 - (BOOL)isAutoBackupEnabled;
-
-- (void)performAutoBackupIfNeeded;
-
-#pragma mark - 辅助方法
-
-- (NSInteger)getConfigCount;
-
-- (NSString *)getBackupDirectory;
-
+- (void)enableAutoBackup:(BOOL)enabled;
+- (NSDictionary *)currentContext;
+/// Called only by the startup barrier before feature hooks are installed.
+- (void)resolveStartup:(CSBackupCompletion)completion;
 @end
-
 NS_ASSUME_NONNULL_END

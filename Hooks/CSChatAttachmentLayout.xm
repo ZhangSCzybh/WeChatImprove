@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
@@ -686,45 +687,48 @@ static BOOL shouldEnableLayout() {
 
 // 添加Notification监听，当设置改变时更新状态
 %ctor {
-    // 默认值初始化 - 如果键不存在，设置默认值
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    // 检查场景控制设置是否存在，如不存在则设置默认值(全部开启)
-    if (![defaults objectForKey:kChatAttachmentShowInPrivateKey]) {
-        [defaults setBool:YES forKey:kChatAttachmentShowInPrivateKey];
-    }
-    
-    if (![defaults objectForKey:kChatAttachmentShowInGroupKey]) {
-        [defaults setBool:YES forKey:kChatAttachmentShowInGroupKey];
-    }
-    
-    if (![defaults objectForKey:kChatAttachmentShowInOfficialKey]) {
-        [defaults setBool:YES forKey:kChatAttachmentShowInOfficialKey];
-    }
-    
-    // 初始化公众号排序设置
-    if (![defaults objectForKey:kChatAttachmentOfficialSortEnabledKey]) {
-        [defaults setBool:YES forKey:kChatAttachmentOfficialSortEnabledKey];
-    }
-    
-    // 初始化私聊排序设置
-    if (![defaults objectForKey:kChatAttachmentPrivateSortEnabledKey]) {
-        [defaults setBool:YES forKey:kChatAttachmentPrivateSortEnabledKey];
-    }
-    
-    // 初始化群聊排序设置
-    if (![defaults objectForKey:kChatAttachmentGroupSortEnabledKey]) {
-        [defaults setBool:YES forKey:kChatAttachmentGroupSortEnabledKey];
-    }
-    
-    // 同步设置
-    [defaults synchronize];
-    
-    // 注册通知监听
-    [[NSNotificationCenter defaultCenter] addObserverForName:@"CSChatAttachmentLayoutSettingsChanged" 
-                                                     object:nil 
-                                                      queue:[NSOperationQueue mainQueue] 
-                                                 usingBlock:^(NSNotification *notification) {
-        // 设置已更新
-    }];
+    CSBackupWhenReady(^{
+        // 默认值初始化 - 如果键不存在，设置默认值
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+        // 检查场景控制设置是否存在，如不存在则设置默认值(全部开启)
+        if (![defaults objectForKey:kChatAttachmentShowInPrivateKey]) {
+            [defaults setBool:YES forKey:kChatAttachmentShowInPrivateKey];
+        }
+
+        if (![defaults objectForKey:kChatAttachmentShowInGroupKey]) {
+            [defaults setBool:YES forKey:kChatAttachmentShowInGroupKey];
+        }
+
+        if (![defaults objectForKey:kChatAttachmentShowInOfficialKey]) {
+            [defaults setBool:YES forKey:kChatAttachmentShowInOfficialKey];
+        }
+
+        // 初始化公众号排序设置
+        if (![defaults objectForKey:kChatAttachmentOfficialSortEnabledKey]) {
+            [defaults setBool:YES forKey:kChatAttachmentOfficialSortEnabledKey];
+        }
+
+        // 初始化私聊排序设置
+        if (![defaults objectForKey:kChatAttachmentPrivateSortEnabledKey]) {
+            [defaults setBool:YES forKey:kChatAttachmentPrivateSortEnabledKey];
+        }
+
+        // 初始化群聊排序设置
+        if (![defaults objectForKey:kChatAttachmentGroupSortEnabledKey]) {
+            [defaults setBool:YES forKey:kChatAttachmentGroupSortEnabledKey];
+        }
+
+        // 同步设置
+        [defaults synchronize];
+
+        // 注册通知监听
+        [[NSNotificationCenter defaultCenter] addObserverForName:@"CSChatAttachmentLayoutSettingsChanged"
+                                                         object:nil
+                                                          queue:[NSOperationQueue mainQueue]
+                                                     usingBlock:^(NSNotification *notification) {
+            // 设置已更新
+        }];
+        %init;
+    });
 }

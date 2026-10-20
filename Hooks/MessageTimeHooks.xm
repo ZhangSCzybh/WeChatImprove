@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // 消息时间显示Hook
 // 显示每条消息的发送时间
 
@@ -384,11 +385,14 @@ static void requestTimeRefresh(BOOL force) {
     CSRequestMainRefresh(&timeRefreshPending, ^{ refreshTimeSettings(atomic_exchange(&timeRefreshForced, false)); });
 }
 %ctor {
-    timeCells = [NSHashTable weakObjectsHashTable];
-    refreshTimeSettings(NO);
-    [NSNotificationCenter.defaultCenter addObserverForName:NSUserDefaultsDidChangeNotification object:nil
-        queue:nil usingBlock:^(NSNotification *note) { requestTimeRefresh(NO); }];
-    for (NSString *name in @[NSSystemTimeZoneDidChangeNotification,NSCurrentLocaleDidChangeNotification])
-        [NSNotificationCenter.defaultCenter addObserverForName:name object:nil queue:nil
-            usingBlock:^(NSNotification *note) { requestTimeRefresh(YES); }];
+    CSBackupWhenReady(^{
+        timeCells = [NSHashTable weakObjectsHashTable];
+        refreshTimeSettings(NO);
+        [NSNotificationCenter.defaultCenter addObserverForName:NSUserDefaultsDidChangeNotification object:nil
+            queue:nil usingBlock:^(NSNotification *note) { requestTimeRefresh(NO); }];
+        for (NSString *name in @[NSSystemTimeZoneDidChangeNotification,NSCurrentLocaleDidChangeNotification])
+            [NSNotificationCenter.defaultCenter addObserverForName:name object:nil queue:nil
+                usingBlock:^(NSNotification *note) { requestTimeRefresh(YES); }];
+        %init;
+    });
 }

@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // NavigationTitleHooks.xm
 // 用于修改导航栏标题为头像的Hook实现
 
@@ -1120,6 +1121,9 @@
 
 // 主入口函数
 %ctor {
+    CSBackupWhenReady(^{
+        %init;
+    });
 } 
 
 // 重新实现用户信息弹窗控制器类

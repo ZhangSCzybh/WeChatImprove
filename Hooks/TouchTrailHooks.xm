@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import "../Controllers/CSPreferenceRefresh.h"
 #import "../Controllers/CSTouchTrailPolicy.h"
@@ -667,22 +668,25 @@ static void CSRequestTouchTrailRefresh(void) {
 
 %end
 %ctor {
-    touchViews=[NSMutableDictionary dictionary]; touchTailViews=[NSMutableDictionary dictionary];
-    touchLastPointTimes=[NSMutableDictionary dictionary]; allTrailViews=[NSHashTable weakObjectsHashTable];
-    trailInactive=UIApplication.sharedApplication.applicationState!=UIApplicationStateActive;
-    CSRequestTouchTrailRefresh();
-    NSNotificationCenter *center=NSNotificationCenter.defaultCenter;
-    [center addObserverForName:NSUserDefaultsDidChangeNotification object:nil queue:nil usingBlock:^(__unused NSNotification *note) { CSRequestTouchTrailRefresh(); }];
-    for (NSString *name in @[@"CSTouchTrailImageDidChange", @"com.wechat.tweak.settings_changed"]) {
-        [center addObserverForName:name object:nil queue:nil usingBlock:^(__unused NSNotification *note) {
-            atomic_store(&trailImageInvalidated,true); CSRequestTouchTrailRefresh();
+    CSBackupWhenReady(^{
+        touchViews=[NSMutableDictionary dictionary]; touchTailViews=[NSMutableDictionary dictionary];
+        touchLastPointTimes=[NSMutableDictionary dictionary]; allTrailViews=[NSHashTable weakObjectsHashTable];
+        trailInactive=UIApplication.sharedApplication.applicationState!=UIApplicationStateActive;
+        CSRequestTouchTrailRefresh();
+        NSNotificationCenter *center=NSNotificationCenter.defaultCenter;
+        [center addObserverForName:NSUserDefaultsDidChangeNotification object:nil queue:nil usingBlock:^(__unused NSNotification *note) { CSRequestTouchTrailRefresh(); }];
+        for (NSString *name in @[@"CSTouchTrailImageDidChange", @"com.wechat.tweak.settings_changed"]) {
+            [center addObserverForName:name object:nil queue:nil usingBlock:^(__unused NSNotification *note) {
+                atomic_store(&trailImageInvalidated,true); CSRequestTouchTrailRefresh();
+            }];
+        }
+        [center addObserverForName:UIScreenCapturedDidChangeNotification object:nil queue:nil usingBlock:^(__unused NSNotification *note) { CSRequestTouchTrailRefresh(); }];
+        [center addObserverForName:UIApplicationWillResignActiveNotification object:nil queue:nil usingBlock:^(__unused NSNotification *note) {
+            dispatch_async(dispatch_get_main_queue(), ^{ trailInactive=YES; isTrailEnabled=NO; CSClearTouchTrails(); });
         }];
-    }
-    [center addObserverForName:UIScreenCapturedDidChangeNotification object:nil queue:nil usingBlock:^(__unused NSNotification *note) { CSRequestTouchTrailRefresh(); }];
-    [center addObserverForName:UIApplicationWillResignActiveNotification object:nil queue:nil usingBlock:^(__unused NSNotification *note) {
-        dispatch_async(dispatch_get_main_queue(), ^{ trailInactive=YES; isTrailEnabled=NO; CSClearTouchTrails(); });
-    }];
-    [center addObserverForName:UIApplicationDidBecomeActiveNotification object:nil queue:nil usingBlock:^(__unused NSNotification *note) {
-        dispatch_async(dispatch_get_main_queue(), ^{ trailInactive=NO; CSReloadTouchTrails(); });
-    }];
+        [center addObserverForName:UIApplicationDidBecomeActiveNotification object:nil queue:nil usingBlock:^(__unused NSNotification *note) {
+            dispatch_async(dispatch_get_main_queue(), ^{ trailInactive=NO; CSReloadTouchTrails(); });
+        }];
+        %init;
+    });
 }

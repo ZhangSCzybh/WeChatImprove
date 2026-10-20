@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 #import <Foundation/Foundation.h>
 #import "CSPaymentAutomation.h"
 
@@ -104,4 +105,9 @@
 - (void)loginByContext:(id)context { %orig; CSPaymentAccountDidChange(); }
 %end
 
-%ctor { CSPaymentStart(); }
+%ctor {
+    CSBackupWhenReady(^{
+        CSPaymentStart();
+        %init;
+    });
+}

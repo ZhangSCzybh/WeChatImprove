@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // HOOK 隐藏我的页面选项
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
@@ -206,14 +207,17 @@ static void hideCellsInSection(id tableViewMgr) {
 %end
 
 %ctor {
-    loadSettings();
-    
-    CFNotificationCenterAddObserver(
-        CFNotificationCenterGetDarwinNotifyCenter(),
-        NULL,
-        settingsChanged,
-        CFSTR("com.wechat.tweak.settings_changed"),
-        NULL,
-        CFNotificationSuspensionBehaviorCoalesce
-    );
+    CSBackupWhenReady(^{
+        loadSettings();
+
+        CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            NULL,
+            settingsChanged,
+            CFSTR("com.wechat.tweak.settings_changed"),
+            NULL,
+            CFNotificationSuspensionBehaviorCoalesce
+        );
+        %init;
+    });
 }

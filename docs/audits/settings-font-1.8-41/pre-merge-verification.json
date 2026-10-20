@@ -1,0 +1,12 @@
+{
+  "previous_main": "a758a5f7b02597b05618db74414f90bcc7f6f810",
+  "branch": "codex/backup-configuration",
+  "version": "1.8-41",
+  "bootstrap_script": "Tests/verify-backup-bootstrap.sh",
+  "bootstrap_checks": 36,
+  "gated_feature_hooks": 33,
+  "always_available_hooks": 2,
+  "ios_generated_hook_syntax": "passed",
+  "objective_cxx_linkage": "passed",
+  "source_matches_verified_build": true
+}

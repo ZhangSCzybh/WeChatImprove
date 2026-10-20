@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // HOOK 收藏验证
 #import "../Headers/WCHeaders.h"
 #import <LocalAuthentication/LocalAuthentication.h>
@@ -29,4 +30,8 @@ static NSString * const kBiometricAuthFavReason = @"请验证您的身份以查�
     }];
 }
 
-%end 
+%end
+
+%ctor {
+    CSBackupWhenReady(^{ %init; });
+}

@@ -1,3 +1,4 @@
+#import "../Controllers/CSBackupBootstrap.h"
 // HOOK 隐藏发现页选项
 // 控制器类: FindFriendEntryViewController, WCFinderDataService
 // 通过Hook发现页控制器的shouldShow*Entry方法，控制各入口是否显示
@@ -161,15 +162,18 @@ static void discoverSettingsChanged(CFNotificationCenterRef center, void *observ
 
 // 构造函数，插件加载时执行
 %ctor {
-    loadDiscoverSettings();
-    
-    // 注册Darwin通知，监听设置变化
-    CFNotificationCenterAddObserver(
-        CFNotificationCenterGetDarwinNotifyCenter(),
-        NULL,
-        discoverSettingsChanged,
-        CFSTR("com.wechat.tweak.settings_changed"),
-        NULL,
-        CFNotificationSuspensionBehaviorCoalesce
-    );
+    CSBackupWhenReady(^{
+        loadDiscoverSettings();
+
+        // 注册Darwin通知，监听设置变化
+        CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            NULL,
+            discoverSettingsChanged,
+            CFSTR("com.wechat.tweak.settings_changed"),
+            NULL,
+            CFNotificationSuspensionBehaviorCoalesce
+        );
+        %init;
+    });
 }
