@@ -15,6 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller;
 + (void)layoutForController:(id)controller;
 + (void)settingsChanged;
+/// Display-only total for identity-silent subjects; nil means native policy, zero means
+/// privacy owns the badge but no current validated main-list source is available.
++ (nullable NSNumber *)closeFriendAlertBadgeCount;
 + (void)closeFriendPolicyChanged:(NSNotification *)notification;
 /// Returns YES when privacy owns navigation, including no eligible destination.
 - (BOOL)navigatePrivateSessionsForward:(BOOL)forward unreadOnly:(BOOL)unreadOnly;

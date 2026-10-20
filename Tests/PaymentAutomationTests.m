@@ -8,7 +8,8 @@ static NSMutableArray *deliveries;
 static NSUInteger checks, originalCallbacks, nativeStarts, sentMessages, submittedTransfers, submittedQueries, submittedOpens;
 static NSMutableArray *requests;
 static NSString *testAccount=@"self";
-static BOOL nativePaymentBusy;
+static BOOL nativePaymentBusy, privacyAllowsOutput=YES;
+BOOL CSCFPaymentOutputAllowed(__unused NSString *account,__unused NSString *session,__unused NSString *sender) { return privacyAllowsOutput; }
 static NSMutableDictionary *notificationContacts;
 static NSUInteger notificationLookups;
 static BOOL notificationLookupThrows;
@@ -211,12 +212,27 @@ static void CompleteTransfer(id req, NSDictionary *confirmation) {
     Respond(req,confirmation,NO);
     if (t.phase==CSPaymentVerifying && t.queryRequest) Respond(t.queryRequest,Receipt(4250),NO);
 }
-int main(void) { @autoreleasepool {
+int main(int argc, const char **argv) { @autoreleasepool {
     NSString *suite=[@"payment-automation-tests-" stringByAppendingString:NSUUID.UUID.UUIDString]; paymentDefaults=[[NSUserDefaults alloc] initWithSuiteName:suite];
     NSURL *dir=[NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:suite]];
     ledger=[[CSPaymentLedger alloc] initWithURL:[dir URLByAppendingPathComponent:@"ledger.plist"] defaults:paymentDefaults];
     __block BOOL loaded=NO; [ledger load:^{loaded=YES;}]; Until(^BOOL{ return loaded; }); CHECK(ledger.ready);
     Setup();
+    if(argc>1 && strcmp(argv[1],"--privacy")==0) {
+        [paymentDefaults setInteger:2 forKey:@"kReceiveTransferNotifyTargetKey"]; transferSettings=CSSettings(NO);
+        privacyAllowsOutput=NO;
+        NSInteger before=[paymentDefaults integerForKey:@"kReceiveTransferTotalCountKey"];
+        CSPaymentAdmitMessage(Message(@"privacy-protected",@"self",NO),NO); Drain();
+        CompleteTransfer(requests.lastObject,@{@"retcode":@0});
+        Until(^BOOL{return [paymentDefaults integerForKey:@"kReceiveTransferTotalCountKey"]==before+1;});
+        CHECK(submittedTransfers==1 && submittedStatusQueries==1 && sentMessages==0 && !store.tasks.count);
+        privacyAllowsOutput=YES;
+        CSPaymentAdmitMessage(Message(@"privacy-ordinary",@"self",NO),NO); Drain();
+        CompleteTransfer(requests.lastObject,@{@"retcode":@0}); Until(^BOOL{return sentMessages==2;});
+        CHECK(submittedTransfers==2 && submittedStatusQueries==2);
+        [paymentDefaults removePersistentDomainForName:suite]; [NSFileManager.defaultManager removeItemAtURL:dir error:NULL];
+        printf("Payment privacy: ledger/execution preserved, summary + reply gated, ordinary outputs restored (%lu checks)\n",(unsigned long)checks);return 0;
+    }
     // Confirmation is not the final receipt. Native 8.0.78 performs command 84 next.
     CSPaymentAdmitMessage(Message(@"confirm-without-receipt-fields",@"self",NO),NO); Drain();
     Respond(requests.lastObject,@{@"retcode":@0},NO);

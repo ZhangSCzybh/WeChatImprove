@@ -58,7 +58,7 @@ static BOOL Option(NSString *suffix) {
 @property (nonatomic, copy) NSArray *cachedNativeSections;
 @property (nonatomic, copy) NSString *snapshotAccount;
 @property (atomic) NSUInteger modelRevision;
-@property (nonatomic) NSUInteger snapshotRevision, refreshGeneration;
+@property (nonatomic) NSUInteger snapshotRevision, snapshotEpoch, refreshGeneration;
 @property (nonatomic) BOOL coalescingNotification, scheduledCoalesced;
 @property (nonatomic) BOOL coalescedDispatchPending;
 @property (atomic) CSGroupChangeKind pendingChanges;
@@ -155,6 +155,31 @@ static BOOL Option(NSString *suffix) {
     id table=CSGroupReadObject(controller,CSGroupIsFoldedController(controller) ? @"tableView" : @"m_tableView");
     if (!adapter || adapter.table!=table) { [self attachToController:controller]; return; }
     [adapter layout];
+}
++ (NSNumber *)closeFriendAlertBadgeCount {
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    NSMutableSet *hidden=[NSMutableSet set];
+    for(NSString *name in policy.protectedUserNames)
+        if([policy silencesSession:name sender:nil] || [policy hidesUserName:name surface:CSCloseFriendSurfaceSession]) [hidden addObject:name];
+    if(!policy.blocked && !hidden.count)return nil;
+    if(!NSThread.isMainThread || policy.blocked)return @0;
+    NSUInteger epoch=CSCloseFriendAccountEpoch();
+    for(CSGroupListAdapter *adapter in Adapters().allObjects) {
+        if(CSGroupIsFoldedController(adapter.controller) || !adapter.cachedNativeSections || adapter.changeDepth || adapter.dirty ||
+           adapter.snapshotRevision!=adapter.modelRevision || adapter.snapshotEpoch!=epoch || ![adapter.snapshotAccount isEqual:policy.accountID] ||
+           ![policy.accountID isEqual:CSGroupCurrentAccountID()])continue;
+        NSUInteger revision=adapter.modelRevision;
+        NSMutableSet *unmasked=[NSMutableSet set];
+        CSGroupFoldedPrivacyState folded=CSGroupAssessFoldedUserNames(CSGroupCopyFoldedUserNames(),hidden);
+        if(folded==CSGroupFoldedPrivacyAllHidden)[hidden addObject:@"chatroom_session_box"];
+        else if(folded==CSGroupFoldedPrivacyNoHidden)[unmasked addObject:@"chatroom_session_box"];
+        WESessionTabItem *all=[WESessionTabItem tabWithType:WETabTypeAll];
+        CSGroupProjection *projection=[[CSGroupProjection alloc] initWithSections:adapter.cachedNativeSections tabs:@[all] selectedTabID:all.tabId
+            filterDuplicates:NO accountID:policy.accountID hiddenUserNames:hidden unmaskedAggregateUserNames:unmasked privacyRevision:policy.revision previousProjection:nil];
+        if(!projection.isValid || revision!=adapter.modelRevision || epoch!=CSCloseFriendAccountEpoch() || policy.revision!=CSCloseFriendCurrentSnapshot().revision)return @0;
+        return @([projection badgeForTabID:all.tabId].count);
+    }
+    return @0;
 }
 + (void)settingsChanged {
     dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } [adapter invalidateNativeSnapshot]; adapter.appearanceDirty=YES; [adapter refresh]; [adapter layout]; } });
@@ -399,14 +424,14 @@ static BOOL Option(NSString *suffix) {
     @synchronized (self) { self.modelRevision++; }
 }
 - (NSArray *)nativeSectionsForAccount:(NSString *)account {
-    NSUInteger revision=self.modelRevision;
-    if (self.cachedNativeSections && self.snapshotRevision==revision && [self.snapshotAccount isEqual:account]) return self.cachedNativeSections;
+    NSUInteger revision=self.modelRevision, epoch=CSCloseFriendAccountEpoch();
+    if (self.cachedNativeSections && self.snapshotRevision==revision && self.snapshotEpoch==epoch && [self.snapshotAccount isEqual:account]) return self.cachedNativeSections;
     __block NSArray *sections=nil;
-    NSArray *previous=[self.snapshotAccount isEqual:account] ? self.cachedNativeSections : nil;
+    NSArray *previous=self.snapshotEpoch==epoch && [self.snapshotAccount isEqual:account] ? self.cachedNativeSections : nil;
     CSGroupWithNativeIndices(self.table, ^{ sections=CSGroupBuildNativeSectionsReusing(self.controller,self.table,[self nativeSource],previous); });
     // Only immutable row values are cached; never hold private sessions/contacts.
-    if (revision!=self.modelRevision || ![account isEqual:CSGroupCurrentAccountID()]) { self.cachedNativeSections=nil; return nil; }
-    self.cachedNativeSections=sections; self.snapshotAccount=account; self.snapshotRevision=revision;
+    if (revision!=self.modelRevision || epoch!=CSCloseFriendAccountEpoch() || ![account isEqual:CSGroupCurrentAccountID()]) { self.cachedNativeSections=nil; return nil; }
+    self.cachedNativeSections=sections; self.snapshotAccount=account; self.snapshotRevision=revision; self.snapshotEpoch=epoch;
     return sections;
 }
 - (void)pruneNativeActions {

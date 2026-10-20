@@ -3,8 +3,10 @@ set -euo pipefail
 project_dir="$(cd "$(dirname "$0")/.." && pwd)"
 test_dir="$(mktemp -d "${TMPDIR:-/tmp}/wechat-payment-core.XXXXXX")"
 trap 'rm -rf "$test_dir"' EXIT
+if [[ "${1:-}" != "--privacy" ]]; then
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -framework Foundation -I"$project_dir/Controllers" "$project_dir/Tests/PaymentCoreTests.m" "$project_dir/Controllers/CSPaymentCore.m" "$project_dir/Controllers/CSPaymentLedger.m" -o "$test_dir/core"
 "$test_dir/core"
+fi
 
 python3 - "$project_dir" "$test_dir" <<'PYTEST'
 from pathlib import Path
@@ -32,4 +34,4 @@ response=hooks.split('%hook WCRedEnvelopesLogicMgr',1)[1].split('%end',1)[0].rep
 (out/'EnvelopeResponseHooksUnderTest.h').write_text(response)
 PYTEST
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -Wno-nullability-completeness -framework Foundation -I"$project_dir/Controllers" -I"$test_dir" "$project_dir/Tests/PaymentAutomationTests.m" "$project_dir/Controllers/CSPaymentCore.m" "$project_dir/Controllers/CSPaymentLedger.m" -o "$test_dir/automation"
-"$test_dir/automation"
+"$test_dir/automation" "$@"

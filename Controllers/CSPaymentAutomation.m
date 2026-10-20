@@ -1,3 +1,4 @@
+#import "CSCloseFriendNotificationAdapter.h"
 #import "CSPaymentAutomation.h"
 #import "CSPaymentLedger.h"
 #import "CSServiceCenter.h"
@@ -208,7 +209,8 @@ NSDictionary *CSPaymentResponseSnapshot(id res, id req, BOOL envelope, BOOL fail
     } @catch (__unused NSException *e) { return @{@"task":t,@"requestObject":req,@"valid":@NO,@"bodyData":NSData.data,@"requestData":NSData.data,@"cmd":@0}; }
 }
 static void CSSend(NSString *content, NSString *session, CSPaymentTask *t) {
-    if (!content.length || !session.length || !CSEligible(t)) return;
+    if (!content.length || !session.length || !CSEligible(t) ||
+        !CSCFPaymentOutputAllowed(t.account,t.session,CSPaymentString(t.payload[t.envelope?@"sender":@"payer"]))) return;
     id mgr=CSGetService(NSClassFromString(@"CMessageMgr")); Class cls=NSClassFromString(@"CMessageWrap");
     SEL init=NSSelectorFromString(@"initWithMsgType:"), add=NSSelectorFromString(@"AddMsg:MsgWrap:");
     if (![cls instancesRespondToSelector:init] || ![mgr respondsToSelector:add]) return;
