@@ -43,6 +43,12 @@ static Class CSNativeSettingsControllerClass(void){return OriginalSettingsContro
 - (BOOL)isAuthorized{return self.authorized;}
 - (void)requestAuthorizationWithPresentingViewController:(UIViewController *)vc completion:(void (^)(BOOL,NSString *))completion{self.requests++;completion(NO,@"test");}
 @end
+static BOOL closeFriendHidden, closeFriendAllow;
+static NSUInteger closeFriendRequests;
+static BOOL CSCloseFriendPluginEntryHidden(void){return closeFriendHidden;}
+static void CSCloseFriendAuthenticate(UIViewController *presenter,void (^completion)(BOOL)) {
+    closeFriendRequests++; if(closeFriendAllow)closeFriendHidden=NO; completion(closeFriendAllow);
+}
 @interface TestEntry : UIViewController
 - (void)onCustomEntryClick;
 - (void)onCustomEntryClickInSetting:(id)sender;
@@ -67,5 +73,16 @@ int main(void){@autoreleasepool{
         [denied onCustomEntryClick];[denied onCustomEntryClickInSetting:nil];
         Check(!denied.presented&&CSAuthorizationManager.sharedManager.requests==before+2,@"backup failure does not bypass original authorization");
     }
+    CSAuthorizationManager.sharedManager.authorized=YES;
+    closeFriendHidden=YES; closeFriendAllow=NO;
+    TestEntry *hidden=[TestEntry new]; [hidden onCustomEntryClick];
+    Check(!hidden.presented&&closeFriendRequests==1,@"hidden More route requires close-friend authentication");
+    hidden.navigationController=[UINavigationController new]; [hidden openCustomViewControllerFromSetting];
+    Check(!hidden.navigationController.presented&&closeFriendRequests==2,@"direct hidden Settings route cannot bypass close-friend authentication");
+    closeFriendAllow=YES; [hidden openCustomViewControllerFromSetting];
+    Check([[(UINavigationController *)hidden.navigationController.presented root] isKindOfClass:OriginalSettingsController.class],@"authenticated hidden route restores original complete settings");
+    closeFriendHidden=YES; closeFriendAllow=NO; CSAuthorizationManager.sharedManager.authorized=NO;
+    NSUInteger prior=closeFriendRequests; [hidden onCustomEntryClick];
+    Check(closeFriendRequests==prior,@"close-friend gate does not bypass original plugin authorization");
     [testDefaults removePersistentDomainForName:suite];printf("Plugin entry: %lu checks passed\n",(unsigned long)checks);
 }return 0;}

@@ -9,6 +9,7 @@
 #import "../Controllers/CSNativeSettingsHost.h"
 #import "../Controllers/CSEntrySettingsViewController.h" // 入口设置控制器
 #import "../Controllers/CSAuthorizationManager.h" // 授权管理器
+#import "../Controllers/CSCloseFriendBridge.h"
 #import "../Controllers/CSBackupManager.h" // 备份管理器
 
 // 入口设置相关的键
@@ -99,6 +100,22 @@ static void entrySettingsChangedCallback(CFNotificationCenterRef center, void *o
 // 添加自定义入口到我页面
 %new
 - (void)addCustomEntryToMorePage {
+    if(CSCloseFriendPluginEntryHidden()) {
+        @try {
+            id manager=CSCloseFriendRead(self,@"m_tableViewMgr");
+            id sections=CSCloseFriendRead(manager,@"sections");
+            if(![sections isKindOfClass:NSArray.class])return;
+            for(id section in sections) {
+                NSMutableArray *cells=CSCloseFriendRead(section,@"cells");
+                if(![cells isKindOfClass:NSMutableArray.class])continue;
+                for(id cell in [cells copy]) {
+                    id title=CSCloseFriendRead(CSCloseFriendRead(CSCloseFriendRead(cell,@"cellConfig"),@"leftConfig"),@"title");
+                    if([title isEqual:getCustomEntryTitle()])[cells removeObjectIdenticalTo:cell];
+                }
+            }
+        } @catch(__unused NSException *exception) {}
+        return;
+    }
     // 获取显示模式
     CSEntryDisplayMode displayMode = getEntryDisplayMode();
     
@@ -196,6 +213,12 @@ static void entrySettingsChangedCallback(CFNotificationCenterRef center, void *o
 // 打开自定义控制器
 %new
 - (void)openCustomViewController {
+    if(CSCloseFriendPluginEntryHidden()) {
+        CSCloseFriendAuthenticate((UIViewController *)(id)self,^(BOOL success){
+            if(success && !CSCloseFriendPluginEntryHidden())[self openCustomViewController];
+        });
+        return;
+    }
     // 创建并配置自定义控制器
     UIViewController *customVC = [[CSNativeSettingsControllerClass() alloc] init];
     customVC.title = getCustomEntryTitle();
@@ -222,6 +245,7 @@ static int isRegister = 0;
 
 -(void)viewDidLoad{
     %orig;
+    if(CSCloseFriendPluginEntryHidden())return;
     
     // 获取显示模式
     CSEntryDisplayMode displayMode = getEntryDisplayMode();
@@ -294,6 +318,22 @@ static int isRegister = 0;
 // 添加自定义入口到设置页面
 %new
 - (void)addCustomEntryToSettingPage {
+    if(CSCloseFriendPluginEntryHidden()) {
+        @try {
+            id manager=CSCloseFriendRead(self,@"m_tableViewMgr");
+            id sections=CSCloseFriendRead(manager,@"sections");
+            if(![sections isKindOfClass:NSArray.class])return;
+            for(id section in sections) {
+                NSMutableArray *cells=CSCloseFriendRead(section,@"cells");
+                if(![cells isKindOfClass:NSMutableArray.class])continue;
+                for(id cell in [cells copy]) {
+                    id title=CSCloseFriendRead(CSCloseFriendRead(CSCloseFriendRead(cell,@"cellConfig"),@"leftConfig"),@"title");
+                    if([title isEqual:getCustomEntryTitle()])[cells removeObjectIdenticalTo:cell];
+                }
+            }
+        } @catch(__unused NSException *exception) {}
+        return;
+    }
     // 获取显示模式
     CSEntryDisplayMode displayMode = getEntryDisplayMode();
     
@@ -441,6 +481,12 @@ static int isRegister = 0;
 // 打开自定义控制器
 %new
 - (void)openCustomViewControllerFromSetting {
+    if(CSCloseFriendPluginEntryHidden()) {
+        CSCloseFriendAuthenticate((UIViewController *)(id)self,^(BOOL success){
+            if(success && !CSCloseFriendPluginEntryHidden())[self openCustomViewControllerFromSetting];
+        });
+        return;
+    }
     // 创建并配置自定义控制器
     UIViewController *customVC = [[CSNativeSettingsControllerClass() alloc] init];
     customVC.title = getCustomEntryTitle();

@@ -1,5 +1,8 @@
 #import <Foundation/Foundation.h>
 NS_ASSUME_NONNULL_BEGIN
+#ifdef __cplusplus
+extern "C" {
+#endif
 typedef NSData * _Nullable (^CSCloseFriendKeyProvider)(NSString *accountID, NSError **error);
 FOUNDATION_EXPORT NSString *const CSCloseFriendStoreErrorDomain;
 typedef NS_ENUM(NSInteger, CSCloseFriendStoreErrorCode) {
@@ -16,4 +19,7 @@ typedef NS_ENUM(NSInteger, CSCloseFriendStoreErrorCode) {
 /// Refuses to overwrite existing corrupt, incompatible or wrongly keyed bytes. Atomic, protected, readback-verified replacement.
 - (BOOL)saveState:(NSDictionary *)state forAccountID:(NSString *)accountID error:(NSError **)error;
 @end
+#ifdef __cplusplus
+}
+#endif
 NS_ASSUME_NONNULL_END

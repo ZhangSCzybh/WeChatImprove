@@ -1,5 +1,8 @@
 #import <Foundation/Foundation.h>
 NS_ASSUME_NONNULL_BEGIN
+#ifdef __cplusplus
+extern "C" {
+#endif
 typedef NS_ENUM(NSUInteger, CSCloseFriendSurface) {
     CSCloseFriendSurfaceSession, CSCloseFriendSurfaceContact, CSCloseFriendSurfaceForward,
     CSCloseFriendSurfaceTag, CSCloseFriendSurfaceSearch, CSCloseFriendSurfaceTimeline,
@@ -20,4 +23,7 @@ FOUNDATION_EXPORT NSDictionary * _Nullable CSCloseFriendNormalizeProfile(id prof
 - (BOOL)silencesSession:(nullable NSString *)session sender:(nullable NSString *)sender;
 - (BOOL)rejectsCaller:(nullable NSString *)caller chatRoom:(nullable NSString *)room video:(BOOL)video;
 @end
+#ifdef __cplusplus
+}
+#endif
 NS_ASSUME_NONNULL_END

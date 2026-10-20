@@ -1,4 +1,6 @@
 #import "CSCustomViewController.h"
+#import "CSCloseFriendBridge.h"
+#import "CSCloseFriendManager.h"
 #import "CSSettingTableViewCell.h"
 #import "CSUserInfoHelper.h"
 #import "CSAccountDetailViewController.h"
@@ -125,9 +127,28 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     });
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    // Covers direct third-party plugin registration routes before any settings content appears.
+    UIView *cover=[self.view viewWithTag:871042];
+    if(CSCloseFriendPluginEntryHidden() && !cover) {
+        cover=[[UIView alloc] initWithFrame:self.view.bounds]; cover.tag=871042;
+        cover.backgroundColor=UIColor.systemBackgroundColor; cover.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+        [self.view addSubview:cover];
+    } else if(!CSCloseFriendPluginEntryHidden())[cover removeFromSuperview];
+}
+
 // 添加viewDidAppear方法，在视图显示后检查用户协议
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    if(CSCloseFriendPluginEntryHidden()) {
+        CSCloseFriendAuthenticate(self,^(BOOL success){
+            if(success && !CSCloseFriendPluginEntryHidden()) { [[self.view viewWithTag:871042] removeFromSuperview]; [self viewDidAppear:NO]; }
+            else [self dismissViewControllerAnimated:YES completion:nil];
+        });
+        return;
+    }
+    [[self.view viewWithTag:871042] removeFromSuperview];
     
     // 刷新设置项
     [self setupData];
@@ -741,9 +762,12 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                        iconColor:[UIColor systemYellowColor]
                                                          detail:nil];
     
-    CSSettingSection *accountSection = [CSSettingSection sectionWithHeader:@"账号与安全" 
-                                                                   items:@[accountItem, 
-                                                                          favoriteAuthItem]];
+    NSMutableArray *accountItems=[NSMutableArray arrayWithArray:@[accountItem,favoriteAuthItem]];
+    CSCloseFriendSnapshot *closeFriendSnapshot=CSCloseFriendCurrentSnapshot();
+    if(!(closeFriendSnapshot.enabled && [closeFriendSnapshot.options[@"hideSettingsEntry"] boolValue])) {
+        [accountItems addObject:[CSSettingItem itemWithTitle:@"密友" iconName:@"lock.shield" iconColor:UIColor.systemBlueColor detail:nil]];
+    }
+    CSSettingSection *accountSection = [CSSettingSection sectionWithHeader:@"账号与安全" items:accountItems];
     
     // 界面定制组
     CSSettingItem *navigationTitleItem = [CSSettingItem itemWithTitle:@"顶栏信息" 
@@ -1017,8 +1041,11 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     
     // 根据item类型和标题处理不同的点击事件
     if (item.itemType == CSSettingItemTypeNormal) {
+        if ([item.title isEqualToString:@"密友"]) {
+            [CSCloseFriendManager.sharedManager presentSettingsFrom:self];
+        }
         // 处理账号信息点击
-        if ([item.title isEqualToString:@"账号信息"]) {
+        else if ([item.title isEqualToString:@"账号信息"]) {
             CSAccountDetailViewController *detailVC = [[CSAccountDetailViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
             [self.navigationController pushViewController:detailVC animated:YES];
         }
