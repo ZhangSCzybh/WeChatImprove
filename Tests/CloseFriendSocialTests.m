@@ -200,7 +200,15 @@ int main(void) { @autoreleasepool {
     ContactSelectView *freshPicker=[ContactSelectView new]; freshPicker.m_delegate=freshPrivacy;
     AudienceLogic *freshLogic=[AudienceLogic new]; freshLogic.m_delegate=freshPicker; freshLogic.contacts=logic.contacts;
     Check([Keys(freshLogic,NULL) count]==1 && [Rows(freshLogic,NULL,@"A") count]==2 && PickerAllowsAction(freshPicker) && !NeedsUnlock(freshPrivacy) && NeedsUnlock(privacy));
+    // Successful native return may release both presentation objects before editor onDone.
+    // Exercise the production onDone authorization predicate after those weak refs disappear.
+    __weak id dismissedPicker=freshPicker, dismissedLogic=freshLogic;
+    freshPicker=nil; freshLogic=nil;
+    Check(dismissedPicker==nil && dismissedLogic==nil);
+    Check(!NeedsUnlock(freshPrivacy));
+    __block NSUInteger doneCalls=0; FinishEdit(freshPrivacy,^{doneCalls++;});
+    Check(doneCalls==1 && freshPrivacy.selectContacts==acl && NeedsUnlock(privacy));
     Epoch++; Policy(NO,9); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==0); Leave(previous); Check([facade countOfTimelineDataItem]==3);
-    Check(Cards(status).visible.count==0 && !MessageActionCurrent(messages,second));
-    puts("Close-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, discovery cues, publishing-picker revocation, stale native render rejection and reveal/relock/account transitions passed");
+    Check(Cards(status).visible.count==0 && !MessageActionCurrent(messages,second) && NeedsUnlock(freshPrivacy));
+    puts("Close-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, discovery cues, publishing-picker revocation, stale native render rejection, completed-picker authorization and reveal/relock/account transitions passed");
 } return 0; }

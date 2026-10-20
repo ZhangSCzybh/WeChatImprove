@@ -7,8 +7,13 @@ static char AudienceBindingKey, AudiencePendingKey, AudienceOwnerRevokedKey;
 @property(nonatomic,strong) CSCloseFriendContactProjection *projection;
 @end
 @implementation CSCFAudienceBinding @end
+static BOOL AuthorizationCurrent(CSCFAudienceBinding *binding) {
+    // Operation authorization survives ordinary native picker dismissal. It remains bound to
+    // the editor/account/policy, independently of the weak presentation objects' lifetime.
+    return binding && !binding.revoked && binding.owner && ![objc_getAssociatedObject(binding.owner,&AudienceOwnerRevokedKey) boolValue] && binding.epoch==CSCloseFriendAccountEpoch() && binding.revision==CSCloseFriendCurrentSnapshot().revision && CSCFPageIsCurrent(binding.owner);
+}
 static BOOL BindingCurrent(CSCFAudienceBinding *binding) {
-    return binding && !binding.revoked && ![objc_getAssociatedObject(binding.owner,&AudienceOwnerRevokedKey) boolValue] && binding.owner && binding.logic && binding.picker && binding.epoch==CSCloseFriendAccountEpoch() && binding.revision==CSCloseFriendCurrentSnapshot().revision && CSCFPageIsCurrent(binding.owner);
+    return AuthorizationCurrent(binding) && binding.logic && binding.picker;
 }
 static void ShieldPicker(id picker) {
     // A revoked operation never revives on a later reveal. Native pending selections/ACL are
@@ -25,7 +30,8 @@ static void RevokeBinding(CSCFAudienceBinding *binding) {
 }
 static void RefreshPicker(id picker) {
     CSCFAudienceBinding *binding=objc_getAssociatedObject(picker,&AudienceBindingKey);
-    if(!BindingCurrent(binding)) {RevokeBinding(binding);}
+    if(!AuthorizationCurrent(binding)) RevokeBinding(binding);
+    else if(!BindingCurrent(binding)) ShieldPicker(picker);
     CSCFReloadTables(picker);
 }
 static CSCFAudienceBinding *BindPicker(id logic,id owner) {
@@ -44,7 +50,8 @@ static CSCFAudienceBinding *BindPicker(id logic,id owner) {
 static BOOL PickerAllowsAction(id picker) {
     CSCFAudienceBinding *binding=objc_getAssociatedObject(picker,&AudienceBindingKey);
     if(!binding) return YES; // Not one of our positively identified publishing pickers.
-    if(!BindingCurrent(binding)) {RevokeBinding(binding); return NO;}
+    if(!AuthorizationCurrent(binding)) {RevokeBinding(binding); return NO;}
+    if(!BindingCurrent(binding)) {ShieldPicker(picker); return NO;}
     return !CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceContact) && !CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceTag);
 }
 static id (*AudienceKeys)(id,SEL);
@@ -93,8 +100,11 @@ static BOOL NeedsUnlock(id owner) {
     // selectContacts/selectTags and pending native sets are never overwritten by projections.
     if([objc_getAssociatedObject(owner,&AudienceOwnerRevokedKey) boolValue]) return YES;
     CSCFAudienceBinding *pending=objc_getAssociatedObject(owner,&AudiencePendingKey);
-    if(pending && !BindingCurrent(pending)) return YES;
+    if(pending && !AuthorizationCurrent(pending)) return YES;
     return CSCFSocialRequireAuthentication(owner,CSCloseFriendSurfaceContact) || CSCFSocialRequireAuthentication(owner,CSCloseFriendSurfaceTag);
+}
+static void FinishEdit(id owner,void(^native)(void)) {
+    if(!NeedsUnlock(owner)) native();
 }
 static void Cover(id page) {
     BOOL concealed=CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceContact) || CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceTag);
@@ -107,7 +117,7 @@ void CSCFAudienceInstall(void) {
         if([objc_getAssociatedObject(owner,&AudienceOwnerRevokedKey) boolValue] || CSCFSocialRequireAuthentication(owner,CSCloseFriendSurfaceContact) || CSCFSocialRequireAuthentication(owner,CSCloseFriendSurfaceTag)) return;
         objc_setAssociatedObject(owner,&AudiencePendingKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC); orig();
     });
-    for(NSString *name in @[@"onDone",@"onSaveAsNewTag"]) CSCFSocialHook0(@"WCMomentsPrivacyViewController",name,^(id owner,void(^orig)(void)){if(!NeedsUnlock(owner)) orig();});
+    for(NSString *name in @[@"onDone",@"onSaveAsNewTag"]) CSCFSocialHook0(@"WCMomentsPrivacyViewController",name,^(id owner,void(^orig)(void)){FinishEdit(owner,orig);});
     for(NSString *name in @[@"onMultiSelectContactReturn:",@"onMultiSelectContactReturnForSns:",@"handleMultiSelectContactReturn:",@"handleMultiSelectContactReturnForSns:",@"updateWithSelectedContactSet:"]) CSCFSocialHook1(@"WCMomentsPrivacyViewController",name,^(id owner,id argument,void(^orig)(id)){if(!NeedsUnlock(owner)) orig(argument);});
     for(NSString *name in @[@"onMultiSelectContactReturn:selectContactFromGroup:",@"handleMultiSelectContactReturn:selectContactFromGroup:",@"contactTagListViewController:didSelectContactTag:",@"tableView:didSelectRowAtIndexPath:"]) {
         __block IMP raw=NULL; SEL selector=NSSelectorFromString(name);
@@ -125,7 +135,8 @@ void CSCFAudienceInstall(void) {
     if(!CSCloseFriendInstallHook(@"WCMomentsPrivacyViewController",@"contactNamesComponentsJoinedByComma:",replacement,&summary,"@@:@")) imp_removeBlock(replacement);
     CSCFSocialHook0(@"ContactSelectView",@"layoutSubviews",^(id picker,void(^orig)(void)){
         orig(); CSCFAudienceBinding *binding=objc_getAssociatedObject(picker,&AudienceBindingKey);
-        if(binding && !BindingCurrent(binding)) RevokeBinding(binding);
+        if(binding && !AuthorizationCurrent(binding)) RevokeBinding(binding);
+        else if(binding && !BindingCurrent(binding)) ShieldPicker(picker);
     });
     for(NSString *name in @[@"didSearchViewTableSelect:",@"addSelect:",@"multiSelectWithSearchResult:"]) CSCFSocialHook1(@"ContactSelectView",name,^(id picker,id value,void(^orig)(id)){if(PickerAllowsAction(picker)) orig(value);});
     __block IMP select=NULL;
