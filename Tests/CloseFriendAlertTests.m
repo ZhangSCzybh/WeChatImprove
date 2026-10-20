@@ -137,11 +137,11 @@ int main(void){@autoreleasepool{
     CSCFWithAlert([CSCloseFriendAlertSubject subjectForSession:@"ordinary" sender:nil],^{[center addNotificationRequest:request withCompletionHandler:^(NSError *error){CHECK(!error);completions++;}];});
     CHECK(completions==2 && center.submissions==1);
     // Durable write ownership survives a new engine; native pre-muted contacts are never restored.
-    __block NSDictionary *journal=@{};__block NSMutableDictionary *native=[@{@"friend":@YES,@"secret@chatroom":@NO} mutableCopy];__block NSUInteger writes=0;__block BOOL failCommit=NO;
+    __block NSDictionary *journal=@{};__block NSMutableDictionary *native=[@{@"friend":@YES,@"secret@chatroom":@NO} mutableCopy];__block NSUInteger writes=0;__block BOOL failCommit=NO,failRevoke=NO;
     CSCloseFriendMuteAdapter *(^engine)(void)=^CSCloseFriendMuteAdapter *{
         CSCloseFriendMuteAdapter *a=[CSCloseFriendMuteAdapter new];a.load=^NSDictionary *{return journal;};
         a.current=^BOOL(NSString *account,NSUInteger epoch){return [account isEqual:Policy.accountID] && epoch==Epoch;};
-        a.save=^BOOL(NSDictionary *r,NSString *account,NSUInteger epoch){if(failCommit && [r[@"friend"][@"phase"] isEqual:@"applied"])return NO;NSData *d=[NSPropertyListSerialization dataWithPropertyList:r format:NSPropertyListBinaryFormat_v1_0 options:0 error:NULL];journal=[NSPropertyListSerialization propertyListWithData:d options:0 format:NULL error:NULL];return YES;};
+        a.save=^BOOL(NSDictionary *r,NSString *account,NSUInteger epoch){if((failCommit && [r[@"friend"][@"phase"] isEqual:@"applied"]) || (failRevoke && [r[@"friend"][@"phase"] isEqual:@"revoked"]))return NO;NSData *d=[NSPropertyListSerialization dataWithPropertyList:r format:NSPropertyListBinaryFormat_v1_0 options:0 error:NULL];journal=[NSPropertyListSerialization propertyListWithData:d options:0 format:NULL error:NULL];return YES;};
         a.readOpen=^NSNumber *(NSString *name){return native[name];};a.writeOpen=^BOOL(NSString *name,BOOL open){writes++;native[name]=@(open);return YES;};return a;
     };
     CSCloseFriendMuteAdapter *mute=engine();[mute reconcile:Policy epoch:Epoch];CHECK(writes==1 && ![native[@"friend"] boolValue]);CHECK([journal[@"friend"][@"owned"] boolValue]);
@@ -150,6 +150,12 @@ int main(void){@autoreleasepool{
     Policy=Snapshot(NO,NO,nil);NSUInteger before=writes;[mute reconcile:Policy epoch:Epoch];CHECK(writes==before && ![native[@"friend"] boolValue]);
     journal=@{};native[@"friend"]=@YES;failCommit=YES;Policy=Snapshot(YES,NO,nil);[mute reconcile:Policy epoch:Epoch];CHECK([journal[@"friend"][@"phase"] isEqual:@"prepared"]);failCommit=NO;
     [engine() reconcile:Policy epoch:Epoch];CHECK([journal[@"friend"][@"phase"] isEqual:@"revoked"]);Policy=Snapshot(NO,NO,nil);before=writes;[mute reconcile:Policy epoch:Epoch];CHECK(writes==before);
+    // A failed revocation must not revive old restoration authority on runtime reload.
+    journal=@{};native[@"friend"]=@YES;Policy=Snapshot(YES,NO,nil);[mute reconcile:Policy epoch:Epoch];
+    failRevoke=YES;[mute externalMutation:@"friend" account:@"self" epoch:Epoch];native[@"friend"]=@NO;
+    CHECK([journal[@"friend"][@"owned"] boolValue]);failRevoke=NO;before=writes;
+    Epoch++;Policy=Snapshot(NO,NO,nil);[engine() reconcile:Policy epoch:Epoch];
+    CHECK(writes==before && ![native[@"friend"] boolValue]);
     // Unified invitation: duplicate protection, current ordinary room preserved, ilink unsupported.
     Policy=Snapshot(YES,YES,nil);Mono *mono=[Mono new];mono.msgKey=@"invite-1";Info *info=[Info new];info.roomID=100;info.roomKey=7;info.roomType=1;info.contact=@"friend";info.monoMsg=mono;Invites *service=[Invites new];
     CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);

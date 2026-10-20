@@ -2,6 +2,26 @@
 #import "CSCloseFriendBridge.h"
 #import "CSServiceCenter.h"
 #import <objc/message.h>
+// Restoration authority is deliberately process-local. If persisting a revocation
+// fails, a subsequent process cannot distinguish the old disk record from an
+// untouched transaction. Never reacquire that ambiguous authority after restart.
+static NSString *RestorationSession(void) {
+    static NSString *session; static dispatch_once_t once;
+    dispatch_once(&once,^{session=NSUUID.UUID.UUIDString;});return session;
+}
+static NSMutableSet *RevokedTransactions(void) {
+    static NSMutableSet *revoked; static dispatch_once_t once;
+    dispatch_once(&once,^{revoked=[NSMutableSet set];});return revoked;
+}
+static NSArray *RestorationKey(NSString *account,NSString *name,NSDictionary *record) {
+    id transaction=record[@"transactionID"];
+    return [transaction isKindOfClass:NSString.class] && [transaction length] ? @[account,name,transaction] : nil;
+}
+static BOOL HasRestorationAuthority(NSString *account,NSString *name,NSDictionary *record) {
+    if(![record[@"restorationSession"] isEqual:RestorationSession()])return NO;
+    NSArray *key=RestorationKey(account,name,record);if(!key)return NO;
+    @synchronized(RevokedTransactions()){return ![RevokedTransactions() containsObject:key];}
+}
 @interface CSCloseFriendMuteAdapter ()
 @property(nonatomic) BOOL running;
 @end
@@ -13,6 +33,10 @@
     if(!name.length || !self.current(account,epoch))return;
     NSMutableDictionary *records=[self.load() mutableCopy]; NSMutableDictionary *r=[records[name] mutableCopy];
     if(!r || [r[@"phase"] isEqual:@"revoked"])return;
+    // Register before disk I/O and before forwarding the native external edit.
+    // This survives adapter recreation, runtime recovery and account epoch changes.
+    NSArray *key=RestorationKey(account,name,r);
+    if(key)@synchronized(RevokedTransactions()){[RevokedTransactions() addObject:key];}
     r[@"phase"]=@"revoked"; r[@"owned"]=@NO; records[name]=r; [self persist:records account:account epoch:epoch];
 }
 - (void)reconcile:(CSCloseFriendSnapshot *)p epoch:(NSUInteger)epoch {
@@ -26,13 +50,20 @@
             if(!self.current(p.accountID,epoch))break;
             NSNumber *open=self.readOpen(name); if(!open)continue;
             NSMutableDictionary *r=[records[name] mutableCopy]; BOOL wants=[wanted containsObject:name];
+            BOOL authority=r && HasRestorationAuthority(p.accountID,name,r);
+            if(r && !authority && ![r[@"phase"] isEqual:@"revoked"]) {
+                // Never turn a previous process's prepared/applied record into a
+                // new owned transaction, even if autoMute is still enabled.
+                r[@"phase"]=@"revoked";r[@"owned"]=@NO;records[name]=r;
+                if(![self persist:records account:p.accountID epoch:epoch])break;
+            }
             if(!wants) {
                 // Only a completed, read-back-confirmed write owns restoration. A crash
                 // between native write and commit deliberately forfeits ownership.
-                if([r[@"phase"] isEqual:@"applied"] && [r[@"owned"] boolValue] && [r[@"original"] boolValue] && !open.boolValue) {
+                if(authority && [r[@"phase"] isEqual:@"applied"] && [r[@"owned"] boolValue] && [r[@"original"] boolValue] && !open.boolValue) {
                     r[@"phase"]=@"restoring"; r[@"owned"]=@NO; records[name]=r;
                     if(![self persist:records account:p.accountID epoch:epoch])break;
-                    if(!self.current(p.accountID,epoch))break;
+                    if(!self.current(p.accountID,epoch) || !HasRestorationAuthority(p.accountID,name,r))break;
                     self.writeOpen(name,YES);
                     open=self.readOpen(name);
                     if(!self.current(p.accountID,epoch))break;
@@ -49,7 +80,7 @@
                 r[@"phase"]=@"revoked"; r[@"owned"]=@NO; records[name]=r; if(![self persist:records account:p.accountID epoch:epoch])break; continue;
             }
             if(!r) {
-                r=[@{@"original":open,@"owned":@NO,@"phase":open.boolValue?@"prepared":@"preserved",@"attempts":@0} mutableCopy];
+                r=[@{@"original":open,@"owned":@NO,@"phase":open.boolValue?@"prepared":@"preserved",@"attempts":@0,@"restorationSession":RestorationSession(),@"transactionID":NSUUID.UUID.UUIDString} mutableCopy];
                 records[name]=r;
                 if(![self persist:records account:p.accountID epoch:epoch])break;
                 if(!open.boolValue)continue;
@@ -60,7 +91,7 @@
             if(![self.readOpen(name) isEqual:@YES] || !self.current(p.accountID,epoch))continue;
             BOOL wrote=self.writeOpen(name,NO); NSNumber *after=self.readOpen(name);
             if(!self.current(p.accountID,epoch))break;
-            if(wrote && after && !after.boolValue) { r[@"phase"]=@"applied"; r[@"owned"]=@YES; }
+            if(wrote && after && !after.boolValue && HasRestorationAuthority(p.accountID,name,r)) { r[@"phase"]=@"applied"; r[@"owned"]=@YES; }
             else if(after && !after.boolValue) { r[@"phase"]=@"revoked"; r[@"owned"]=@NO; }
             records[name]=r; if(![self persist:records account:p.accountID epoch:epoch])break;
         }
