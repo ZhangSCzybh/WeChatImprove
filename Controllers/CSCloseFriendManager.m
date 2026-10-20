@@ -107,13 +107,20 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     [center addObserver:self selector:@selector(resign:) name:UIApplicationProtectedDataWillBecomeUnavailable object:nil];
     [self.runtime setActive:UIApplication.sharedApplication.applicationState==UIApplicationStateActive];
     [self refreshAccount];
+    [self startExpiryTimer];
+}
+- (void)startExpiryTimer {
+    NSAssert(NSThread.isMainThread,@"Expiry scheduling on main");
+    [self.timer invalidate];
     __weak typeof(self) weakSelf=self;
-    self.timer=[NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(__unused NSTimer *timer){
+    self.timer=[NSTimer timerWithTimeInterval:1 repeats:YES block:^(__unused NSTimer *timer){
         typeof(self) self=weakSelf; if(!self)return;
         CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
         if(self.lastRevealed && !snapshot.revealed)[self lockAndReturnToSafePage];
         self.lastRevealed=snapshot.revealed;
     }];
+    // Keep expiry-driven covering/navigation active while a scroll view tracks a finger.
+    [NSRunLoop.mainRunLoop addTimer:self.timer forMode:NSRunLoopCommonModes];
 }
 - (void)resign:(NSNotification *)note { self.backgroundCoverRequired=YES; [self lockAndReturnToSafePage]; [self.runtime setActive:NO]; }
 - (void)active:(NSNotification *)note { [self.runtime setActive:YES]; [self refreshAccount]; self.backgroundCoverRequired=NO; [self uncover]; }

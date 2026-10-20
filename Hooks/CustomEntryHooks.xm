@@ -56,6 +56,22 @@ static void loadEntrySettings() {
     gCustomEntryTitle = getCustomEntryTitle();
 }
 
+static void CSRemoveHiddenPluginEntryFromHost(id host) {
+    @try {
+        id manager=CSCloseFriendRead(host,@"m_tableViewMgr");
+        id sections=CSCloseFriendRead(manager,@"sections");
+        if(![sections isKindOfClass:NSArray.class])return;
+        for(id section in sections) {
+            NSMutableArray *cells=CSCloseFriendRead(section,@"cells");
+            if(![cells isKindOfClass:NSMutableArray.class])continue;
+            for(id cell in [cells copy]) {
+                id title=CSCloseFriendRead(CSCloseFriendRead(CSCloseFriendRead(cell,@"cellConfig"),@"leftConfig"),@"title");
+                if([title isEqual:getCustomEntryTitle()])[cells removeObjectIdenticalTo:cell];
+            }
+        }
+    } @catch(__unused NSException *exception) {}
+}
+
 // 监听设置变更的回调
 static void entrySettingsChangedCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
     // 重新加载设置
@@ -101,19 +117,7 @@ static void entrySettingsChangedCallback(CFNotificationCenterRef center, void *o
 %new
 - (void)addCustomEntryToMorePage {
     if(CSCloseFriendPluginEntryHidden()) {
-        @try {
-            id manager=CSCloseFriendRead(self,@"m_tableViewMgr");
-            id sections=CSCloseFriendRead(manager,@"sections");
-            if(![sections isKindOfClass:NSArray.class])return;
-            for(id section in sections) {
-                NSMutableArray *cells=CSCloseFriendRead(section,@"cells");
-                if(![cells isKindOfClass:NSMutableArray.class])continue;
-                for(id cell in [cells copy]) {
-                    id title=CSCloseFriendRead(CSCloseFriendRead(CSCloseFriendRead(cell,@"cellConfig"),@"leftConfig"),@"title");
-                    if([title isEqual:getCustomEntryTitle()])[cells removeObjectIdenticalTo:cell];
-                }
-            }
-        } @catch(__unused NSException *exception) {}
+        CSRemoveHiddenPluginEntryFromHost(self);
         return;
     }
     // 获取显示模式
@@ -319,19 +323,7 @@ static int isRegister = 0;
 %new
 - (void)addCustomEntryToSettingPage {
     if(CSCloseFriendPluginEntryHidden()) {
-        @try {
-            id manager=CSCloseFriendRead(self,@"m_tableViewMgr");
-            id sections=CSCloseFriendRead(manager,@"sections");
-            if(![sections isKindOfClass:NSArray.class])return;
-            for(id section in sections) {
-                NSMutableArray *cells=CSCloseFriendRead(section,@"cells");
-                if(![cells isKindOfClass:NSMutableArray.class])continue;
-                for(id cell in [cells copy]) {
-                    id title=CSCloseFriendRead(CSCloseFriendRead(CSCloseFriendRead(cell,@"cellConfig"),@"leftConfig"),@"title");
-                    if([title isEqual:getCustomEntryTitle()])[cells removeObjectIdenticalTo:cell];
-                }
-            }
-        } @catch(__unused NSException *exception) {}
+        CSRemoveHiddenPluginEntryFromHost(self);
         return;
     }
     // 获取显示模式

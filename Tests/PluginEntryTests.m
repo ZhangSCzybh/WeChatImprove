@@ -43,6 +43,7 @@ static Class CSNativeSettingsControllerClass(void){return OriginalSettingsContro
 - (BOOL)isAuthorized{return self.authorized;}
 - (void)requestAuthorizationWithPresentingViewController:(UIViewController *)vc completion:(void (^)(BOOL,NSString *))completion{self.requests++;completion(NO,@"test");}
 @end
+static id CSCloseFriendRead(id object,NSString *key) { return [object isKindOfClass:NSDictionary.class]?object[key]:nil; }
 static BOOL closeFriendHidden, closeFriendAllow;
 static NSUInteger closeFriendRequests;
 static BOOL CSCloseFriendPluginEntryHidden(void){return closeFriendHidden;}
@@ -84,5 +85,14 @@ int main(void){@autoreleasepool{
     closeFriendHidden=YES; closeFriendAllow=NO; CSAuthorizationManager.sharedManager.authorized=NO;
     NSUInteger prior=closeFriendRequests; [hidden onCustomEntryClick];
     Check(closeFriendRequests==prior,@"close-friend gate does not bypass original plugin authorization");
+    NSDictionary *(^cell)(NSString *)=^NSDictionary *(NSString *title){return @{@"cellConfig":@{@"leftConfig":@{@"title":title}}};};
+    NSMutableArray *ownedCells=[NSMutableArray arrayWithArray:@[cell(getCustomEntryTitle()),cell(@"原生功能"),cell(getCustomEntryTitle())]];
+    NSArray *immutableCells=@[cell(getCustomEntryTitle())];
+    NSDictionary *host=@{@"m_tableViewMgr":@{@"sections":@[@{@"cells":ownedCells},@{@"cells":immutableCells}]}};
+    CSRemoveHiddenPluginEntryFromHost(host);
+    Check(ownedCells.count==1&&[ownedCells.firstObject isEqual:cell(@"原生功能")],@"shared hidden-entry remover removes matching cached rows while preserving native rows");
+    Check(immutableCells.count==1,@"shared hidden-entry remover leaves unsupported immutable cell collections intact");
+    CSRemoveHiddenPluginEntryFromHost(@{@"m_tableViewMgr":@{@"sections":@"unsupported"}});
+    Check(ownedCells.count==1,@"shared hidden-entry remover tolerates unavailable section shape");
     [testDefaults removePersistentDomainForName:suite];printf("Plugin entry: %lu checks passed\n",(unsigned long)checks);
 }return 0;}

@@ -79,7 +79,10 @@
             if(![self authorized] || ![CSCloseFriendManager.sharedManager.runtime isTokenCurrent:token])return;
             NSMutableDictionary *profile=[CSCloseFriendCurrentProfile() mutableCopy]; profile[key]=names; [self save:profile];
         };
-        [self.navigationController pushViewController:picker animated:YES];
+        // The existing picker's Done/Cancel handlers dismiss a modal presentation.
+        UINavigationController *pickerNavigation=[[UINavigationController alloc] initWithRootViewController:picker];
+        pickerNavigation.modalPresentationStyle=UIModalPresentationPageSheet;
+        [self presentViewController:pickerNavigation animated:YES completion:nil];
     } else if(indexPath.section==0 && indexPath.row==3)[CSCloseFriendManager.sharedManager changePasswordFrom:self];
     else if(indexPath.section==0 && indexPath.row==4)CSCloseFriendLock();
     else if(indexPath.section==1 && [self.keys[indexPath.row] isEqual:@"unlockSeconds"]) {

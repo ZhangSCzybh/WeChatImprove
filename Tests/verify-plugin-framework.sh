@@ -13,7 +13,7 @@ def extract(source, signature):
         depth += (source[pos]=='{')-(source[pos]=='}');pos+=1
     return source[start:pos]
 entry=Path('Hooks/CustomEntryHooks.xm').read_text()
-functions=[extract(entry,s) for s in ('static CSEntryDisplayMode getEntryDisplayMode()', 'static NSString *getCustomEntryTitle()', 'static void loadEntrySettings()')]
+functions=[extract(entry,s) for s in ('static CSEntryDisplayMode getEntryDisplayMode()', 'static NSString *getCustomEntryTitle()', 'static void loadEntrySettings()', 'static void CSRemoveHiddenPluginEntryFromHost(id host)')]
 methods=[extract(entry,s) for s in ('- (void)onCustomEntryClick {','- (void)openCustomViewController {','- (void)onCustomEntryClickInSetting:', '- (void)openCustomViewControllerFromSetting {')]
 (out/'EntryUnderTest.h').write_text(('\n'.join(functions)+'\n@implementation TestEntry\n'+'\n'.join(methods)+'\n@end\n').replace('[NSUserDefaults standardUserDefaults]','testDefaults'))
 manager=Path('Controllers/CSBackupManager.m').read_text()
