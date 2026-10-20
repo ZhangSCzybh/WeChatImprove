@@ -1,0 +1,16 @@
+{
+  "message_merge": {
+    "command": "bash Tests/verify-message-merge.sh",
+    "exit_code": 0,
+    "policy_checks": 145544,
+    "adapter_checks": 6515
+  },
+  "bubble_style": {
+    "command": "bash Tests/verify-bubble-style.sh",
+    "exit_code": 0,
+    "policy_renderer_checks": 27664,
+    "adapter_checks": 475
+  },
+  "observation": "Counts and exits recorded from the completed tool runs in this task; no unrelated suites rerun.",
+  "ui_runtime": "No available iOS Simulator runtime; settings compiled for both iOS architectures, not interactively tested."
+}

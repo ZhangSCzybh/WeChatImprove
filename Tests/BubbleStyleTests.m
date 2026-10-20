@@ -64,6 +64,103 @@ int main(void) { @autoreleasepool {
     config=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:6];
     CHECK([ordinaryValues isEqual:config.values]);
     CHECK([defaults doubleForKey:@"com.wechat.enhance.bubble_style.redenvelop_sender_light_color.red"]==.123);
+    CHECK(config.kind==CSBubbleStyleRounded);
+    [defaults setInteger:CSBubbleStyleStacked forKey:CSBubbleStyleKindKey];
+    CSBubbleStyleConfiguration *stacked=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:7];
+    CHECK(stacked.kind==CSBubbleStyleStacked && stacked.radius==config.radius);
+    CHECK(![stacked.values isEqual:config.values]);
+    CHECK([stacked.values[@"sender_light_color"] isEqual:config.values[@"sender_light_color"]]);
+    [defaults setObject:@"1" forKey:CSBubbleStyleKindKey];
+    CHECK([[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:8].kind==CSBubbleStyleRounded);
+    CHECK(CSBubbleGroupPositionForJoins(NO,NO)==CSBubbleGroupSingle);
+    CHECK(CSBubbleGroupPositionForJoins(NO,YES)==CSBubbleGroupFirst);
+    CHECK(CSBubbleGroupPositionForJoins(YES,YES)==CSBubbleGroupMiddle);
+    CHECK(CSBubbleGroupPositionForJoins(YES,NO)==CSBubbleGroupLast);
+    CHECK([CSBubbleStyleKindTitle(stacked.kind) isEqualToString:@"连续圆角"]);
+    // Text defaults preserve native colors. All four direction/theme palettes
+    // are independent, and font-only edits cannot invalidate background templates.
+    NSDictionary *backgroundValues=stacked.backgroundValues;
+    [defaults setInteger:CSBubbleStyleStacked forKey:CSBubbleStyleKindKey];
+    for (NSUInteger palette=0;palette<4;palette++) {
+        CSBubbleStyleConfiguration *native=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:8];
+        CHECK(![native textColorForOutgoing:palette%2==0 dark:palette>=2 color:NULL]);
+        for (NSString *component in @[@"red",@"green",@"blue"])
+            [defaults setDouble:palette*.2 forKey:CSBubbleTextColorPreferenceKey(palette,component)];
+        CSBubbleStyleConfiguration *custom=[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:9];
+        CSBubbleRGBA font;CHECK([custom textColorForOutgoing:palette%2==0 dark:palette>=2 color:&font]);
+        CHECK(font.red==palette*.2 && font.green==palette*.2 && font.blue==palette*.2 && font.alpha==1);
+        CHECK([custom.backgroundValues isEqual:backgroundValues]);CHECK(![custom.values isEqual:native.values]);
+        [defaults setObject:@"bad" forKey:CSBubbleTextColorPreferenceKey(palette,@"red")];
+        CHECK(![[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:10] textColorForOutgoing:palette%2==0 dark:palette>=2 color:NULL]);
+        [defaults setDouble:2 forKey:CSBubbleTextColorPreferenceKey(palette,@"red")];
+        CHECK([[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:11] textColorForOutgoing:palette%2==0 dark:palette>=2 color:&font] && font.red==1);
+        [defaults removeObjectForKey:CSBubbleTextColorPreferenceKey(palette,@"blue")];
+        CHECK(![[[CSBubbleStyleConfiguration alloc] initWithDefaults:defaults generation:12] textColorForOutgoing:palette%2==0 dark:palette>=2 color:NULL]);
+    }
+    [defaults removePersistentDomainForName:suite];
+    // Expected corner masks in TL/TR/BL/BR order. These enumerate the requested
+    // incoming/outgoing single, first, middle and last silhouettes explicitly.
+    const NSUInteger squareCorners[2][4]={{0,4,5,1},{0,8,10,2}};
+    for (NSNumber *radiusValue in @[@1,@2,@4,@16,@30])
+    for (NSUInteger scale=1;scale<=3;scale++) for (NSUInteger outgoing=0;outgoing<2;outgoing++)
+    for (NSUInteger group=0;group<=3;group++) for (NSUInteger palette=0;palette<2;palette++)
+    for (NSUInteger highlighted=0;highlighted<2;highlighted++) {
+        CGFloat radius=radiusValue.doubleValue;
+        CSBubbleRGBA c=palette ? (CSBubbleRGBA){.1,.6,.8,.5} : (CSBubbleRGBA){.9,.7,.2,1};
+        CSBubbleInsets padding={2,3,4,5};CSBubbleTemplateMetrics metrics,baseMetrics;
+        CHECK(CSBubbleStyledTemplateDescribe(radius,0,scale,padding,CSBubbleStyleStacked,&metrics));
+        CHECK(CSBubbleTemplateDescribe(radius,0,scale,padding,&baseMetrics));
+        CHECK(CGSizeEqualToSize(metrics.size,baseMetrics.size));
+        CHECK(metrics.caps.left==baseMetrics.caps.left && metrics.caps.right==baseMetrics.caps.right);
+        CGImageRef cg=CSBubbleCreateStyledTemplate(c,radius,0,scale,padding,highlighted,CSBubbleStyleStacked,group,outgoing);
+        CGImageRef base=CSBubbleCreateTemplate(c,radius,0,scale,padding,highlighted);
+        CHECK(cg && base);
+        NSData *data=Pixels(cg),*original=Pixels(base);
+        const unsigned char *bytes=data.bytes,*rounded=original.bytes;
+        size_t w=CGImageGetWidth(cg),h=CGImageGetHeight(cg);
+        CGFloat factor=highlighted?.84:1;
+        BOOL uniform=YES;
+        for (NSUInteger i=0;i<data.length;i+=4) {
+            CGFloat alpha=bytes[i+3];
+            if (alpha>ceil(c.alpha*255) || fabs(bytes[i]-c.red*factor*alpha)>2 ||
+                fabs(bytes[i+1]-c.green*factor*alpha)>2 || fabs(bytes[i+2]-c.blue*factor*alpha)>2) uniform=NO;
+        }
+        CHECK(uniform); // No backing/stripe colors and no doubled opacity anywhere.
+        CHECK(bytes[3]==0); // Native transparent padding is preserved.
+        CHECK(abs(bytes[((h/2)*w+w/2)*4+3]-(int)round(c.alpha*255))<=1);
+        CGSize target=CGSizeMake(220,100);
+        for (NSUInteger corner=0;corner<4;corner++) {
+            BOOL right=corner&1,bottom=corner&2;
+            size_t x=right ? w-(size_t)(padding.right*scale)-1 : padding.left*scale;
+            size_t y=bottom ? h-(size_t)(padding.bottom*scale)-1 : padding.top*scale;
+            NSUInteger at=(y*w+x)*4+3;
+            BOOL square=squareCorners[outgoing][group]&(1<<corner);
+            if (square && abs(bytes[at]-(int)round(c.alpha*255))>1)
+                fprintf(stderr,"Corner mismatch: radius=%g scale=%lu outgoing=%lu group=%lu corner=%lu alpha=%u expected=%g\n",
+                    radius,(unsigned long)scale,(unsigned long)outgoing,(unsigned long)group,(unsigned long)corner,bytes[at],round(c.alpha*255));
+            if (square) CHECK(abs(bytes[at]-(int)round(c.alpha*255))<=1);
+            else { CHECK(abs(bytes[at]-rounded[at])<=1);CHECK(bytes[at]<c.alpha*255-1); }
+            size_t tx=right ? (target.width-padding.right)*scale-1 : padding.left*scale;
+            size_t ty=bottom ? (target.height-padding.bottom)*scale-1 : padding.top*scale;
+            CHECK(StretchedAlpha(data,cg,metrics,scale,target,tx,ty)==bytes[at]);
+        }
+        if (group==CSBubbleGroupSingle) CHECK([data isEqual:original]);
+        else CHECK(![data isEqual:original]);
+        CGImageRelease(cg);CGImageRelease(base);
+    }
+    // Native split rows retain their existing seams for every group and direction.
+    for (NSUInteger segment=1;segment<=3;segment++) for (NSUInteger group=0;group<=3;group++)
+    for (NSUInteger outgoing=0;outgoing<2;outgoing++) {
+        CGImageRef cg=CSBubbleCreateStyledTemplate((CSBubbleRGBA){.4,.6,.2,1},16,segment,2,(CSBubbleInsets){0},NO,CSBubbleStyleStacked,group,outgoing);
+        CGImageRef base=CSBubbleCreateTemplate((CSBubbleRGBA){.4,.6,.2,1},16,segment,2,(CSBubbleInsets){0},NO);
+        CHECK([Pixels(cg) isEqual:Pixels(base)]);CGImageRelease(cg);CGImageRelease(base);
+    }
+    for (NSUInteger group=0;group<=3;group++) {
+        CGImageRef cg=CSBubbleCreateStyledTemplate((CSBubbleRGBA){0,0,0,0},16,0,2,(CSBubbleInsets){0},YES,CSBubbleStyleStacked,group,YES);
+        NSData *data=Pixels(cg);const unsigned char *bytes=data.bytes;
+        for (NSUInteger i=3;i<data.length;i+=4) CHECK(bytes[i]==0);
+        CGImageRelease(cg);
+    }
     // Real pixels, every theme/direction/segment/highlight combination, three scales.
     for (NSUInteger position=0;position<4;position++) for (NSUInteger scale=1;scale<=3;scale++)
     for (NSUInteger bits=0;bits<8;bits++) {

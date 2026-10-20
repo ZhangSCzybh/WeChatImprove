@@ -7,7 +7,7 @@ xcrun --sdk macosx clang -fobjc-arc -Wall -Wextra -Werror -framework Foundation 
   -I"$project_dir/Controllers" "$project_dir/Controllers/CSMessageMergePolicy.m" \
   "$project_dir/Tests/MessageMergePolicyTests.m" -o "$test_dir/policy-tests"
 "$test_dir/policy-tests"
-xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \
+xcrun --sdk macosx clang -DCS_MERGE_TESTING=1 -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \
   -framework Foundation -framework CoreGraphics -framework CoreFoundation \
   -I"$project_dir/Tests/MessageUIKit" -I"$project_dir/Controllers" \
   "$project_dir/Tests/MessageUIKit/MessageUIKit.m" "$project_dir/Tests/MessageUIKit/DisplayLink.m" \

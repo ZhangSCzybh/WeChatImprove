@@ -7,6 +7,8 @@
 #import "../Controllers/CSSettingTableViewCell.h"
 #import "../Controllers/CSContactSeparatorManager.h"
 #import "../Controllers/CSContactSeparatorSettingsViewController.h"
+#import "../Controllers/CSNavigationImageLoader.h"
+#import "../Controllers/CSChatNativeBridge.h"
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
@@ -46,8 +48,15 @@
 @property (nonatomic, assign) CGFloat nicknameSize;              // 网名字体大小
 @property (nonatomic, strong) CContact *otherContact;            // 添加otherContact属性
 @property (nonatomic, copy) NSString *contactId;                 // 联系人ID，用于个性化配置
+@property (nonatomic, strong) CSNavigationImageRequest *otherAvatarRequest, *selfAvatarRequest, *separatorRequest;
+@property (nonatomic, copy) NSArray *otherAvatarRequestKey, *selfAvatarRequestKey;
+@property (nonatomic, copy) NSArray *separatorRequestKey;
+@property (nonatomic) BOOL otherAvatarLoaded, selfAvatarLoaded;
+@property (nonatomic) NSUInteger separatorGeneration;
 - (void)updateOtherAvatarWithUrl:(NSString *)url;
 - (void)updateSelfAvatarWithUrl:(NSString *)url;
+- (void)updateAvatarWithURL:(NSString *)url other:(BOOL)other;
+- (void)reloadSeparatorImage;
 - (void)updateLayoutWithMode:(CSNavigationAvatarMode)mode;
 - (void)updateSizeAndRadius:(CGFloat)size radius:(CGFloat)radius;
 - (void)updateSeparatorText:(NSString *)text;
@@ -159,79 +168,8 @@
         _separatorImageView.hidden = YES; // 默认隐藏图片
         [_separatorContainer addSubview:_separatorImageView];
         
-        // 加载分隔符图片
-        NSString *imagePath = [defaults objectForKey:kNavigationSeparatorImageKey];
-        if (imagePath) {
-            // 检查保存的路径是否存在
-            if ([[NSFileManager defaultManager] fileExistsAtPath:imagePath]) {
-                NSData *imageData = [NSData dataWithContentsOfFile:imagePath];
-                if (imageData) {
-                    _separatorImage = [UIImage imageWithData:imageData];
-                    _separatorImageView.image = _separatorImage;
-                    
-                    // 如果有图片，则显示图片而不是文本
-                    if (_separatorImage) {
-                        _separatorImageView.hidden = NO;
-                        _separatorLabel.hidden = YES;
-                    }
-                }
-            } else {
-                // 尝试在固定位置查找
-                // 资源存储路径：Preferences/WeChatImprove/separator_image.png（原WechatEnhance已更名为WeChatImprove）
-                NSString *prefsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
-                prefsPath = [prefsPath stringByAppendingPathComponent:@"Preferences"];
-                NSString *enhanceFolderPath = [prefsPath stringByAppendingPathComponent:@"WeChatImprove"];
-                NSString *fixedPath = [enhanceFolderPath stringByAppendingPathComponent:@"separator_image.png"];
-                
-                if ([[NSFileManager defaultManager] fileExistsAtPath:fixedPath]) {
-                    // 找到了固定位置的图片，更新保存的路径
-                    [defaults setObject:fixedPath forKey:kNavigationSeparatorImageKey];
-                    [defaults synchronize];
-                    
-                    // 加载图片
-                    NSData *imageData = [NSData dataWithContentsOfFile:fixedPath];
-                    if (imageData) {
-                        _separatorImage = [UIImage imageWithData:imageData];
-                        _separatorImageView.image = _separatorImage;
-                        
-                        if (_separatorImage) {
-                            _separatorImageView.hidden = NO;
-                            _separatorLabel.hidden = YES;
-                        }
-                    }
-                } else {
-                    // 没有找到图片，清除设置
-                    [defaults removeObjectForKey:kNavigationSeparatorImageKey];
-                    [defaults synchronize];
-                }
-            }
-        } else {
-            // 尝试加载固定位置的图片
-            // 资源存储路径：Preferences/WeChatImprove/separator_image.png（原WechatEnhance已更名为WeChatImprove）
-            NSString *prefsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
-            prefsPath = [prefsPath stringByAppendingPathComponent:@"Preferences"];
-            NSString *enhanceFolderPath = [prefsPath stringByAppendingPathComponent:@"WeChatImprove"];
-            NSString *fixedPath = [enhanceFolderPath stringByAppendingPathComponent:@"separator_image.png"];
-            
-            if ([[NSFileManager defaultManager] fileExistsAtPath:fixedPath]) {
-                // 找到了固定位置的图片，更新保存的路径
-                [defaults setObject:fixedPath forKey:kNavigationSeparatorImageKey];
-                [defaults synchronize];
-                
-                // 加载图片
-                NSData *imageData = [NSData dataWithContentsOfFile:fixedPath];
-                if (imageData) {
-                    _separatorImage = [UIImage imageWithData:imageData];
-                    _separatorImageView.image = _separatorImage;
-                    
-                    if (_separatorImage) {
-                        _separatorImageView.hidden = NO;
-                        _separatorLabel.hidden = YES;
-                    }
-                }
-            }
-        }
-        
+        [self reloadSeparatorImage];
+
         // 创建对方网名标签
         _nicknameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 150, 20)];
         _nicknameLabel.textAlignment = NSTextAlignmentLeft;
@@ -270,76 +208,56 @@
     return self;
 }
 
-- (void)updateOtherAvatarWithUrl:(NSString *)url {
-    if (!url || [url isEqualToString:self.otherAvatarUrl]) {
-        return;
-    }
-    
-    self.otherAvatarUrl = url;
-    
-    // 加载对方头像
-    if (url.length > 0) {
-        // 设置默认头像作为占位图
-        self.otherAvatarImageView.image = [UIImage imageNamed:@"DefaultProfileHead_phone"];
-        
-        NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
-        config.timeoutIntervalForRequest = 10; // 设置10秒超时
-        NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
-        
-        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
-        NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-            if (data && !error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    // 确保URL没有改变
-                    if ([url isEqualToString:self.otherAvatarUrl]) {
-                        UIImage *image = [UIImage imageWithData:data];
-                        if (image) {
-                            self.otherAvatarImageView.image = image;
-                        }
-                    }
-                });
-            }
-        }];
-        [task resume];
-    } else {
-        self.otherAvatarImageView.image = [UIImage imageNamed:@"DefaultProfileHead_phone"];
-    }
+- (void)updateOtherAvatarWithUrl:(NSString *)url { [self updateAvatarWithURL:url other:YES]; }
+- (void)updateSelfAvatarWithUrl:(NSString *)url { [self updateAvatarWithURL:url other:NO]; }
+
+- (void)updateAvatarWithURL:(NSString *)url other:(BOOL)other {
+    url=[url isKindOfClass:NSString.class] ? url : @"";
+    NSString *account=CSMessageCurrentAccount();
+    NSUInteger pixels=(NSUInteger)ceil(MAX(44,MIN(170,self.avatarSize))*UIScreen.mainScreen.scale);
+    NSArray *key=@[account,url,@(pixels)];
+    NSArray *oldKey=other ? self.otherAvatarRequestKey : self.selfAvatarRequestKey;
+    CSNavigationImageRequest *oldRequest=other ? self.otherAvatarRequest : self.selfAvatarRequest;
+    BOOL loaded=other ? self.otherAvatarLoaded : self.selfAvatarLoaded;
+    if ([key isEqual:oldKey] && (oldRequest || loaded)) return;
+    [oldRequest cancel];
+    if (other) { self.otherAvatarUrl=url;self.otherAvatarRequestKey=key;self.otherAvatarLoaded=NO;self.otherAvatarRequest=nil; }
+    else { self.selfAvatarUrl=url;self.selfAvatarRequestKey=key;self.selfAvatarLoaded=NO;self.selfAvatarRequest=nil; }
+    UIImageView *imageView=other ? self.otherAvatarImageView : self.selfAvatarImageView;
+    imageView.image=[UIImage imageNamed:@"DefaultProfileHead_phone"];
+    if (!url.length) return;
+    __weak typeof(self) weakSelf=self;
+    CSNavigationImageRequest *request=[CSNavigationImageLoader.sharedLoader loadURL:[NSURL URLWithString:url] fallbackFileURL:nil scope:account maxPixelSize:pixels completion:^(UIImage *image, __unused NSURL *resolved) {
+        CSAvatarTitleView *live=weakSelf;
+        if (!live || ![key isEqual:other ? live.otherAvatarRequestKey : live.selfAvatarRequestKey]) return;
+        BOOL sameAccount=[account isEqual:CSMessageCurrentAccount()];
+        if (other) { live.otherAvatarRequest=nil;live.otherAvatarLoaded=image!=nil && sameAccount; }
+        else { live.selfAvatarRequest=nil;live.selfAvatarLoaded=image!=nil && sameAccount; }
+        if (image && sameAccount) (other ? live.otherAvatarImageView : live.selfAvatarImageView).image=image;
+    }];
+    if (other) self.otherAvatarRequest=request; else self.selfAvatarRequest=request;
 }
 
-- (void)updateSelfAvatarWithUrl:(NSString *)url {
-    if (!url || [url isEqualToString:self.selfAvatarUrl]) {
-        return;
-    }
-    
-    self.selfAvatarUrl = url;
-    
-    // 加载自己头像
-    if (url.length > 0) {
-        // 设置默认头像作为占位图
-        self.selfAvatarImageView.image = [UIImage imageNamed:@"DefaultProfileHead_phone"];
-        
-        NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
-        config.timeoutIntervalForRequest = 10; // 设置10秒超时
-        NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
-        
-        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
-        NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-            if (data && !error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    // 确保URL没有改变
-                    if ([url isEqualToString:self.selfAvatarUrl]) {
-                        UIImage *image = [UIImage imageWithData:data];
-                        if (image) {
-                            self.selfAvatarImageView.image = image;
-                        }
-                    }
-                });
-            }
-        }];
-        [task resume];
-    } else {
-        self.selfAvatarImageView.image = [UIImage imageNamed:@"DefaultProfileHead_phone"];
-    }
+- (void)reloadSeparatorImage {
+    [self.separatorRequest cancel];self.separatorRequest=nil;
+    NSUInteger generation=++self.separatorGeneration;
+    NSString *account=CSMessageCurrentAccount();
+    CSContactSeparatorManager *manager=CSContactSeparatorManager.sharedManager;
+    CSContactSeparatorConfig *config=self.contactId.length ? [manager configForContactId:self.contactId] : nil;
+    BOOL custom=config.enabled && config.separatorImagePath.length>0;
+    NSString *path=self.contactId.length ? [manager separatorImagePathForContactId:self.contactId] : [NSUserDefaults.standardUserDefaults stringForKey:kNavigationSeparatorImageKey];
+    NSString *library=NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,NSUserDomainMask,YES).firstObject;
+    NSURL *fallback=custom ? nil : [NSURL fileURLWithPath:[library stringByAppendingPathComponent:@"Preferences/WeChatImprove/separator_image.png"]];
+    NSArray *key=@[account,self.contactId ?: @"",path ?: @"",fallback.absoluteString ?: @""];
+    if (![key isEqual:self.separatorRequestKey]) [self updateSeparatorImage:nil];
+    self.separatorRequestKey=key;
+    __weak typeof(self) weakSelf=self;
+    self.separatorRequest=[CSNavigationImageLoader.sharedLoader loadURL:path.length ? [NSURL fileURLWithPath:path] : nil fallbackFileURL:fallback scope:account maxPixelSize:512 completion:^(UIImage *image,__unused NSURL *resolved) {
+        CSAvatarTitleView *live=weakSelf;
+        if (!live || live.separatorGeneration!=generation) return;
+        live.separatorRequest=nil;
+        if ([account isEqual:CSMessageCurrentAccount()]) [live updateSeparatorImage:image];
+    }];
 }
 
 - (void)updateLayoutWithMode:(CSNavigationAvatarMode)mode {
@@ -517,6 +435,7 @@
 }
 
 - (void)updateSizeAndRadius:(CGFloat)size radius:(CGFloat)radius {
+    BOOL sizeChanged=self.avatarSize!=size;
     self.avatarSize = size;
     self.avatarRadius = radius;
     
@@ -538,6 +457,10 @@
     
     // 更新整体布局
     [self updateLayoutWithMode:self.avatarMode];
+    if (sizeChanged) {
+        if (self.otherAvatarUrl.length) [self updateOtherAvatarWithUrl:self.otherAvatarUrl];
+        if (self.selfAvatarUrl.length) [self updateSelfAvatarWithUrl:self.selfAvatarUrl];
+    }
 }
 
 - (void)updateSeparatorText:(NSString *)text {
@@ -850,12 +773,8 @@
     NSString *separatorText = [manager separatorTextForContactId:contactId];
     [self updateSeparatorText:separatorText];
     
-    // 获取联系人个性化配置的分隔符图片
-    UIImage *separatorImage = [manager separatorImageForContactId:contactId];
-    if (separatorImage) {
-        [self updateSeparatorImage:separatorImage];
-    }
-    
+    [self reloadSeparatorImage];
+
     // 获取联系人个性化配置的分隔符大小
     CGFloat separatorSize = [manager separatorSizeForContactId:contactId];
     [self updateSeparatorSize:separatorSize];
@@ -919,18 +838,9 @@
                                 [defaults stringForKey:kNavigationSeparatorTextKey] : @"💗";
         [self updateSeparatorText:newSeparator];
         
-        NSString *imagePath = [defaults objectForKey:kNavigationSeparatorImageKey];
-        if (imagePath && [[NSFileManager defaultManager] fileExistsAtPath:imagePath]) {
-            NSData *imageData = [NSData dataWithContentsOfFile:imagePath];
-            if (imageData) {
-                UIImage *image = [UIImage imageWithData:imageData];
-                [self updateSeparatorImage:image];
-            }
-        } else {
-            [self updateSeparatorImage:nil];
-        }
+        [self reloadSeparatorImage];
     }
-    
+
     // 根据开关组合设置模式
     CSNavigationAvatarMode newMode;
     if (showSelfAvatar && showOtherAvatar && !showOtherNickname) {
@@ -949,6 +859,7 @@
 
 // 在dealloc中移除通知观察者
 - (void)dealloc {
+    [_otherAvatarRequest cancel];[_selfAvatarRequest cancel];[_separatorRequest cancel];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 

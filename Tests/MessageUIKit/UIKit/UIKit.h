@@ -17,6 +17,7 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @property(nonatomic) CGFloat alpha;
 @property(nonatomic) CGAffineTransform transform;
 @property(nonatomic, weak) UIWindow *window;
+@property(nonatomic, weak) UIView *superview;
 @property(nonatomic, strong) NSArray<UIView *> *subviews;
 @property(nonatomic) NSUInteger layoutRequests;
 - (CGRect)convertRect:(CGRect)rect fromView:(UIView *)view;
@@ -24,7 +25,20 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 - (void)layoutIfNeeded;
 + (void)performWithoutAnimation:(void (^)(void))block;
 @end
-@interface UIWindow : UIView @end
+typedef NS_ENUM(NSInteger, UIApplicationState) { UIApplicationStateActive, UIApplicationStateInactive, UIApplicationStateBackground };
+typedef NS_ENUM(NSInteger, UISceneActivationState) { UISceneActivationStateUnattached=-1, UISceneActivationStateForegroundActive, UISceneActivationStateForegroundInactive, UISceneActivationStateBackground };
+@interface UIApplication : NSObject
+@property(class,nonatomic,readonly) UIApplication *sharedApplication;
+@property(nonatomic) UIApplicationState applicationState;
+@end
+@interface UIScene : NSObject
+@property(nonatomic) UISceneActivationState activationState;
+@end
+@interface UIWindow : UIView
+@property(nonatomic,strong) UIScene *windowScene;
+@end
+extern NSString *const UIApplicationWillResignActiveNotification, *const UIApplicationDidEnterBackgroundNotification, *const UIApplicationDidBecomeActiveNotification;
+extern NSString *const UISceneWillDeactivateNotification, *const UISceneDidActivateNotification;
 @interface UITableView : UIView
 @property(nonatomic) BOOL dragging;
 @property(nonatomic) BOOL decelerating;

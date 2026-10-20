@@ -61,18 +61,35 @@ int main(void) { @autoreleasepool {
     CHECK([[CSMessageMergeConfiguration alloc] initWithDefaults:d].spacingMode==CSMessageSpacingNormal);
     [d setInteger:99 forKey:CSMessageMergeSpacingModeKey];
     CHECK([[CSMessageMergeConfiguration alloc] initWithDefaults:d].spacingMode==CSMessageSpacingNormal);
-    CHECK(CSMessageMergePlannedDelta(CSMessageSpacingCompact,60,30,0,0)==-25);
-    CHECK(CSMessageMergePlannedDelta(CSMessageSpacingCompact,60,30,44,0)==-12);
-    CHECK(CSMessageMergePlannedDelta(CSMessageSpacingCompact,60,30,44,24)==-2);
-    CHECK(CSMessageMergePlannedDelta(CSMessageSpacingCompact,60,0,0,0)==0);
-    CHECK(CSMessageMergePlannedDelta(CSMessageSpacingCompact,60,NAN,0,0)==0);
-    CHECK(CSMessageMergePlannedDelta(CSMessageSpacingNormal,60,30,0,0)==0);
-    CHECK(CSMessageMergePlannedDelta((CSMessageSpacingMode)2,60,30,0,0)==0);
+    CSMessageMergeLayoutPlan first=CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,46,NO,YES);
+    CSMessageMergeLayoutPlan middle=CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,46,YES,YES);
+    CSMessageMergeLayoutPlan last=CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,46,YES,NO);
+    CHECK(first.valid && first.height==47 && first.originDelta==0);
+    CHECK(middle.valid && middle.height==40 && middle.originDelta==-7);
+    CHECK(last.valid && last.height==48 && last.originDelta==-7);
+    CHECK(fabs(first.height+8+middle.originDelta-46-2)<.00001);
+    CHECK(fabs(middle.height+8+last.originDelta-(46+middle.originDelta)-2)<.00001);
+    CHECK(fabs(last.height-(46+last.originDelta)-(55-46))<.00001); // Outer bottom remains native.
+    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingCompact,55,NAN,46,YES,YES).valid);
+    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,56,YES,YES).valid);
+    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingCompact,55,-1,46,YES,YES).valid);
+    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingNormal,55,8,46,YES,YES).valid);
+    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,46,NO,NO).valid);
     for (int height=20;height<400;height++) for (int content=10;content<=height;content+=5) {
-        double delta=CSMessageMergePlannedDelta(CSMessageSpacingCompact,height,content,0,0);
-        CHECK(delta>=-25 && delta<=0);
-        CHECK(height+delta>=content);
-        CHECK(delta==0 || height+delta>=content+4);
+        // Non-pixel-aligned native coordinates must retain a 2pt seam too.
+        for (int fraction=1;fraction<=3;fraction++) {
+            double top=(height-content)*(.17*fraction),bottom=top+content;
+            CSMessageMergeLayoutPlan plan=CSMessageMergePlanLayout(CSMessageSpacingCompact,height,top,bottom,YES,YES);
+            CHECK(plan.valid && plan.height<=height && plan.height>=content-.00001);
+            CHECK(top+plan.originDelta>=-.00001 && bottom+plan.originDelta<=plan.height+.00001);
+            if (top>=1 && height-bottom>=1) {
+                CSMessageMergeLayoutPlan head=CSMessageMergePlanLayout(CSMessageSpacingCompact,height,top,bottom,NO,YES);
+                CSMessageMergeLayoutPlan tail=CSMessageMergePlanLayout(CSMessageSpacingCompact,height,top,bottom,YES,NO);
+                CHECK(fabs(head.height+top+plan.originDelta-(bottom+head.originDelta)-2)<.00001);
+                CHECK(fabs(plan.height+top+tail.originDelta-(bottom+plan.originDelta)-2)<.00001);
+                CHECK(fabs(tail.height-(bottom+tail.originDelta)-(height-bottom))<.00001);
+            }
+        }
     }
     [d removePersistentDomainForName:suite];
     printf("PASS: %u message merge/navigation checks\n", checks);

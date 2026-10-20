@@ -1,0 +1,189 @@
+--- 1.8-32/Controllers/CSBubbleStyleAdapter.m
++++ 1.8-33/Controllers/CSBubbleStyleAdapter.m
+@@ -159,10 +159,13 @@
+         UIImage *image=CSDecodedImage(source,CSBubbleStyleIsDark(background));
+         // Only upright stretchable templates preserve transparent margins in points.
+         // Protect the union of normal/highlighted pixels, including native highlights.
++        // The destination may collapse the stretchable center to zero while the
++        // fixed caps stay intact (8.0.78: top 30 + bottom 8 == a 38pt short bubble).
++        // A center pixel is required in the source template, not in the destination.
+         if (!image || image.images.count || image.imageOrientation!=UIImageOrientationUp ||
+             (image.capInsets.top<=0 && image.capInsets.bottom<=0) ||
+-            background.frame.size.height<image.capInsets.top+image.capInsets.bottom+1/image.scale ||
+-            background.frame.size.width<image.capInsets.left+image.capInsets.right+1/image.scale) return NO;
++            background.frame.size.height<image.capInsets.top+image.capInsets.bottom ||
++            background.frame.size.width<image.capInsets.left+image.capInsets.right) return NO;
+         CSBubbleInsets padding;
+         if (!CSBodyPadding(image,&padding)) return NO;
+         if (!slot) result=UIEdgeInsetsMake(padding.top,padding.left,padding.bottom,padding.right);
+@@ -249,10 +252,12 @@
+             id source=((id(*)(id,SEL,BOOL,BOOL,BOOL))objc_msgSend)(info,sel,slot!=0,dark,YES);
+             UIImage *image=CSReadyUIImage(source,NSClassFromString(@"YYImage"));
+             if (slot && !source) continue;
++            // Match visible-inset qualification: equal fixed-cap extents are
++            // valid before display, so short rows do not freeze at native spacing.
+             if (!image || image.images.count || image.imageOrientation!=UIImageOrientationUp ||
+                 (image.capInsets.top<=0 && image.capInsets.bottom<=0) ||
+-                size.height<image.capInsets.top+image.capInsets.bottom+1/image.scale ||
+-                (size.width>0 && size.width<image.capInsets.left+image.capInsets.right+1/image.scale)) return NO;
++                size.height<image.capInsets.top+image.capInsets.bottom ||
++                (size.width>0 && size.width<image.capInsets.left+image.capInsets.right)) return NO;
+             CSBubbleInsets padding;
+             if (!CSBodyPadding(image,&padding)) return NO;
+             if (!slot) result=UIEdgeInsetsMake(padding.top,padding.left,padding.bottom,padding.right);
+--- 1.8-32/Controllers/CSReleaseNotesViewController.m
++++ 1.8-33/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,12 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"1.8-33": @[
++            @{@"title": @"修复紧密间距偏大",
++              @"detail": @"修复单行文本和短语音被误判为不支持紧密布局的问题，恢复标准合并消息及引用消息前后的 2pt 逻辑间距。"},
++            @{@"title": @"保持滚动布局稳定",
++              @"detail": @"沿用首次确定行高与位移的处理，保留气泡样式、颜色和快速滑动保护；昵称、时间等附加内容继续保留必要空间。"}
++        ],
+         @"1.8-32": @[
+             @{@"title": @"稳定合并消息间距",
+               @"detail": @"紧密模式在首次显示前统一确定 2pt 接缝、行高与内容位置，停止滚动、图片就绪和重复缓存通知不再二次收紧。"},
+--- 1.8-32/Headers/CSUserInfoHelper.h
++++ 1.8-33/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"1.8-32"  // 插件版本号
++#define kPluginVersionString @"1.8-33"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- 1.8-32/README.md
++++ 1.8-33/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
+ 
+-**当前版本：`1.8-32`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`1.8-33`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
+ 
+@@ -10,17 +10,17 @@
+ 
+ | 项目 | 当前状态 |
+ | --- | --- |
+-| 插件版本 | `1.8-32`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
++| 插件版本 | `1.8-33`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+ | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
+ | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
+ | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
+-| Rootless / Rootful | `1.8-32` 为稳定紧密合并布局的 Rootless 包，保留字体颜色、连续圆角、通话背景与预览；Rootful 保留构建入口，本轮未验证 |
++| Rootless / Rootful | `1.8-33` 为修复紧密间距偏大的 Rootless 包，保留字体颜色、连续圆角、通话背景与预览；Rootful 保留构建入口，本轮未验证 |
+ | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
+ | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
+ 
+ 微信私有类、方法和界面结构会随版本变化。当前已有编译与逻辑回归结果，真实设备上的界面渲染、原生菜单和不同插件组合仍需按实际环境验证。
+ 
+-本轮记录见 [1.8-32 稳定合并布局](docs/audits/merge-layout-1.8-32/README.md)。在已适配的微信 8.0.78 上，首次确定行高时读取原生缓存模板的透明边距，统一保存行高与位移；后续布局只验证安全空间，图片就绪、按压态和无变化的历史缓存通知不再收紧已显示消息。标准头像与气泡分开占位，引用框计入完整高度，保留连续圆角、自定义底色与字体颜色、通话背景和原有合并范围。间距按 2pt 逻辑点计算，不随屏幕倍率折算；群昵称、头像下时间等额外内容继续保护，未知版本或无法确认的布局保持稳定的安全回退。真机帧率、发热和实际微信视图仍需设备验收。
++本轮记录见 [1.8-33 紧密间距边界修复](docs/audits/merge-native-caps-1.8-33/README.md)。修正 1.8-32 对原生模板的尺寸判断：38pt 的单行文本和短语音恰好容纳上下固定区域，不应再额外要求一个物理像素而退回大间距。保留 [1.8-32 的统一布局机制](docs/audits/merge-layout-1.8-32/README.md)：首次确定行高和内容位移，图片就绪、按压态和无变化的历史缓存通知不再收紧已显示消息。标准合并接缝按 2pt 逻辑点计算，不随屏幕倍率折算，引用框计入完整高度；群昵称、头像下时间等额外内容继续保护，未知版本或无法确认的布局保持稳定安全回退。沿用连续圆角、自定义底色与字体颜色、通话背景及原有合并范围。真机帧率、发热和实际微信视图仍需设备验收。
+ 
+ ## 安装与入口
+ 
+--- 1.8-32/Tests/MergeBubbleIntegrationTests.m
++++ 1.8-33/Tests/MergeBubbleIntegrationTests.m
+@@ -42,6 +42,21 @@
+     UIImage *image=[UIImage imageWithCGImage:cg scale:scale orientation:UIImageOrientationUp];CGImageRelease(cg);
+     return [image resizableImageWithCapInsets:UIEdgeInsetsMake(top+10,12,bottom+10,14) resizingMode:UIImageResizingModeStretch];
+ }
++static UIImage *NativeCapsTemplate(CGFloat scale, CGFloat top, CGFloat bottom) {
++    // 8.0.78 BubbleManager sets {30,25,8,20}; keep a real stretchable center
++    // in the SOURCE image. The 38pt destination may collapse that center to zero.
++    // Pixels are synthetic; cap dimensions are from the audited native method.
++    size_t pixels=(size_t)(49*scale);
++    CGColorSpaceRef space=CGColorSpaceCreateDeviceRGB();
++    CGContextRef context=CGBitmapContextCreate(NULL,pixels,pixels,8,pixels*4,space,kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big);
++    CGColorSpaceRelease(space);CHECK(context!=NULL);
++    CGContextScaleCTM(context,scale,scale);CGContextTranslateCTM(context,0,49);CGContextScaleCTM(context,1,-1);
++    CGPathRef path=CGPathCreateWithRoundedRect(CGRectMake(2,top,43,49-top-bottom),8,8,NULL);
++    CGContextSetRGBFillColor(context,.5,.5,.5,1);CGContextAddPath(context,path);CGContextFillPath(context);
++    CGImageRef cg=CGBitmapContextCreateImage(context);CGPathRelease(path);CGContextRelease(context);
++    UIImage *image=[UIImage imageWithCGImage:cg scale:scale orientation:UIImageOrientationUp];CGImageRelease(cg);
++    return [image resizableImageWithCapInsets:UIEdgeInsetsMake(30,25,8,20) resizingMode:UIImageResizingModeStretch];
++}
+ static void DrainIntegration(void) { [NSRunLoop.currentRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.001]]; }
+ static void ConfigureIntegration(BOOL style, NSInteger avatar) {
+     [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSMessageMergeEnabledKey:@YES,
+@@ -55,14 +70,40 @@
+ }
+ 
+ int main(void) { @autoreleasepool {
++    // Regression: a 38pt body exactly fits the native fixed caps. Requiring an
++    // extra 1/scale here incorrectly freezes text/voice rows at native spacing.
++    for (NSUInteger scale=1;scale<=3;scale++) {
++        BubbleInfo *info=[BubbleInfo new];info.normal=NativeCapsTemplate(scale,1,3);info.pressed=NativeCapsTemplate(scale,0,2);
++        info.darkNormal=NativeCapsTemplate(scale,2,4);info.darkPressed=NativeCapsTemplate(scale,1,3);
++        TextMessageViewModel *m=model(19000+(unsigned)scale);m.bgBubbleInfo=info;
++        UIImageView *bg=[UIImageView new];UIEdgeInsets modelInsets,visibleInsets;
++        for (NSUInteger dark=0;dark<2;dark++) {
++            bg.traitCollection.userInterfaceStyle=dark ? UIUserInterfaceStyleDark : UIUserInterfaceStyleLight;
++            bg.image=dark ? info.darkNormal : info.normal;bg.highlightedImage=dark ? info.darkPressed : info.pressed;
++            bg.frame=CGRectMake(0,0,45,38);
++            CHECK(CSBubbleStyleModelInsets(m,bg,bg.frame.size,&modelInsets));
++            CHECK(CSBubbleStyleVisibleInsets(bg,&visibleInsets));
++            CHECK(modelInsets.top==(dark ? 1 : 0) && modelInsets.bottom==(dark ? 3 : 2));
++            CHECK(visibleInsets.top==modelInsets.top && visibleInsets.bottom==modelInsets.bottom);
++            CHECK(CSBubbleStyleModelInsets(m,bg,CGSizeMake(0,38),&modelInsets)); // Width measured separately by native text layout.
++            bg.frame=CGRectMake(0,0,45,37.99);
++            CHECK(!CSBubbleStyleModelInsets(m,bg,bg.frame.size,&modelInsets));CHECK(!CSBubbleStyleVisibleInsets(bg,&visibleInsets));
++            bg.frame=CGRectMake(0,0,44.99,38);
++            CHECK(!CSBubbleStyleModelInsets(m,bg,bg.frame.size,&modelInsets));CHECK(!CSBubbleStyleVisibleInsets(bg,&visibleInsets));
++            bg.frame=CGRectMake(0,0,45.01,38.01);
++            CHECK(CSBubbleStyleModelInsets(m,bg,bg.frame.size,&modelInsets));CHECK(CSBubbleStyleVisibleInsets(bg,&visibleInsets));
++        }
++    }
+     NSUInteger scenarios=0;
++    for (NSUInteger templateKind=0;templateKind<3;templateKind++)
+     for (NSUInteger style=0;style<2;style++) for (NSUInteger dark=0;dark<2;dark++)
+     for (NSUInteger scale=1;scale<=3;scale++) for (NSUInteger outgoing=0;outgoing<2;outgoing++)
+     for (NSString *session in @[@"alice",@"group@chatroom"]) for (NSUInteger avatar=1;avatar<=2;avatar++)
+     for (NSUInteger quote=0;quote<2;quote++) {
+         ConfigureIntegration(style,avatar);scenarios++;
+-        BubbleInfo *info=[BubbleInfo new];info.normal=Template(scale,1,3);info.pressed=Template(scale,1,3);
+-        info.darkNormal=Template(scale,2,4);info.darkPressed=Template(scale,2,4);
++        UIImage *(*makeTemplate)(CGFloat,CGFloat,CGFloat)=templateKind ? NativeCapsTemplate : Template;
++        BubbleInfo *info=[BubbleInfo new];info.normal=makeTemplate(scale,1,3);info.pressed=makeTemplate(scale,1,3);
++        info.darkNormal=makeTemplate(scale,2,4);info.darkPressed=makeTemplate(scale,2,4);
+         CGFloat top=dark ? 2 : 1,bottom=dark ? 4 : 3;
+         TestController *page=[TestController new];page.session=session;page.nodes=[NSMutableArray array];
+         UIWindow *window=[UIWindow new];UITableView *table=[UITableView new];page.table=table;page.view=table;table.window=window;
+@@ -70,8 +111,10 @@
+         NSMutableArray *views=[NSMutableArray array],*paths=[NSMutableArray array],*heights=[NSMutableArray array],*nativeHeights=[NSMutableArray array];
+         NSMutableDictionary *cells=[NSMutableDictionary dictionary];
+         for (NSUInteger i=0;i<3;i++) {
+-            TextMessageViewModel *m=model(20000+(unsigned)i);m.contentViewSize=CGSizeMake(0,38);m.isSender=outgoing;
+-            m.messageWrap.m_nsFromUsr=session;m.bgBubbleInfo=info;m.messageWrap.m_uiMessageType=1;
++            BOOL voice=templateKind==2 && i==(quote ? 0 : 1);
++            TextMessageViewModel *m=voice ? [VoiceMessageViewModel new] : [TextMessageViewModel new];
++            m.messageWrap=model(20000+(unsigned)i).messageWrap;m.contentViewSize=CGSizeMake(0,38);m.isSender=outgoing;
++            m.messageWrap.m_nsFromUsr=session;m.bgBubbleInfo=info;m.messageWrap.m_uiMessageType=voice ? 34 : 1;
+             if (quote && i==1) { m.messageWrap.m_uiMessageType=49;m.messageWrap.m_uiAppMsgInnerType=57;
+                 m.canShowReplyMessage=YES;m.replyTextSize=CGSizeMake(160,24);m.replyTextInset=UIEdgeInsetsMake(2,0,3,0); }
+             [page.nodes addObject:m];
+@@ -83,6 +126,7 @@
+             CGFloat y=named ? 17 : 8,extra=quote && i==1 ? 33 : 0,native=(named ? 67 : 55)+extra;
+             NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];[paths addObject:path];
+             CSMessageMergePrepare(page,table,path);CGFloat height=CSMessageMergeRowHeight(page,table,path,native);
++            CHECK(height<native || (named && i==2)); // Compact before display; keep the last-row nickname footprint.
+             [heights addObject:@(height)];[nativeHeights addObject:@(native)];
+             IntegrationCellView *v=[IntegrationCellView new];v.viewModel=m;v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
+             v.container=[UIView new];v.container.frame=CGRectMake(0,0,320,native);v.container.bounds=v.container.frame;[v addSubview:v.container];
+--- 1.8-32/control
++++ 1.8-33/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 1.8-32
++Version: 1.8-33
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会

@@ -16,7 +16,7 @@ FOUNDATION_EXPORT NSString *const CSMessageMergeSettingsNotification;
 @property(nonatomic, readonly) BOOL enabled;
 @property(nonatomic, readonly) NSInteger scope; // 1 group, 2 private, 3 both
 @property(nonatomic, readonly) NSInteger avatarPosition; // 1 last, 2 first
-@property(nonatomic, readonly) double spacing;
+@property(nonatomic, readonly) double spacing; // Legacy signed value; not a row-height delta.
 @property(nonatomic, readonly) CSMessageSpacingMode spacingMode;
 @property(nonatomic, readonly) BOOL reservesAvatarTime;
 @property(nonatomic, readonly) BOOL hasLargeTimeLabel;
@@ -44,9 +44,17 @@ FOUNDATION_EXPORT BOOL CSMessageMergeCanJoin(CSMessageMergeItem * _Nullable a, C
 FOUNDATION_EXPORT CSMessageMergeDecision CSMessageMergeDecide(CSMessageMergeItem * _Nullable previous,
     CSMessageMergeItem *current, CSMessageMergeItem * _Nullable next, NSInteger avatarPosition);
 FOUNDATION_EXPORT double CSMessageMergeSafeDelta(double requested, double nativeHeight, double verifiedSlack);
-// First-pass external spacing budget. Content and identity sizes are never scaled.
-FOUNDATION_EXPORT double CSMessageMergePlannedDelta(CSMessageSpacingMode mode, double nativeHeight,
-    double contentHeight, double identityHeight, double nameHeight);
+typedef struct {
+    double height;
+    double originDelta;
+    BOOL valid;
+} CSMessageMergeLayoutPlan;
+// Bounds describe native occupied content, in row coordinates. Trim only group-facing
+// edges toward a 2pt seam; preserve the group's outer padding. All geometry is in
+// logical points, independent of display scale. Content sizes and hit regions stay native.
+FOUNDATION_EXPORT CSMessageMergeLayoutPlan CSMessageMergePlanLayout(CSMessageSpacingMode mode,
+    double nativeHeight, double occupiedTop, double occupiedBottom,
+    BOOL joinsPrevious, BOOL joinsNext);
 FOUNDATION_EXPORT long long CSMessageRevokeLinkID(NSString * _Nullable link);
 FOUNDATION_EXPORT double CSMessageNavigationMargin(double visibleHeight, double messageHeight);
 FOUNDATION_EXPORT double CSMessageNavigationOffset(double rowY, double rowHeight, double viewportHeight,

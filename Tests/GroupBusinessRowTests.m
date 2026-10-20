@@ -33,6 +33,8 @@ static NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionStyleNone
 @end
 @interface Session : NSObject
 @property(nonatomic,copy) NSString *m_nsUserName;
+@property(nonatomic) unsigned int m_uUnReadCount;
+@property(nonatomic) BOOL m_bIsTop,m_bShowUnReadAsRedDot,isInBrandServiceBox;
 - (BOOL)isSingleChatSession;
 @end
 @implementation Session
@@ -144,5 +146,34 @@ int main(void) { @autoreleasepool {
         Check(!CSGroupResolveNativeRowPath(host,Row(path,nil,CSGroupRowKindBusiness),YES),@"out-of-bounds and malformed paths stay invalid");
     Check(!CSGroupResolveNativeRowPath(host,Row(Path(0,0),nil,CSGroupRowKindSession),YES),@"a session cannot bypass identity checks using a missing username");
     Check(!CSGroupResolveNativeRowPath(host,Row(Path(0,0),nil,CSGroupRowKindFake),YES),@"an unnamed fake row cannot use business rendering fallback");
+    // Full native validation is retained; immutable allocation is proportional to changed rows.
+    host.counts=@[@200,@200,@200];[logic.sessions removeAllObjects];[logic.data removeAllObjects];
+    for (NSUInteger s=0;s<3;s++) for (NSUInteger r=0;r<200;r++) {
+        Session *session=[Session new];session.m_nsUserName=[NSString stringWithFormat:@"s%lu-r%lu",(unsigned long)s,(unsigned long)r];
+        logic.sessions[Path(s,r)]=session;
+    }
+    NSArray *base=CSGroupBuildNativeSections(host,host.m_tableView,host);
+    NSArray *unchanged=CSGroupBuildNativeSectionsReusing(host,host.m_tableView,host,base);
+    Check(base==unchanged,@"600 unchanged rows reuse the entire immutable snapshot");
+    ((Session *)logic.sessions[Path(1,50)]).m_uUnReadCount=7;
+    NSArray *updated=CSGroupBuildNativeSectionsReusing(host,host.m_tableView,host,base);
+    NSUInteger replaced=0;
+    for (NSUInteger s=0;s<3;s++) for (NSUInteger r=0;r<200;r++) if (updated[s][r]!=base[s][r]) replaced++;
+    Check(replaced==1 && updated[0]==base[0] && updated[2]==base[2],@"one unread change replaces one row and shares unaffected sections");
+    Check([updated[1][50] unreadCount]==7 && [base[1][50] unreadCount]==0,@"old snapshot remains immutable");
+    id moved=logic.sessions[Path(1,50)];logic.sessions[Path(1,50)]=logic.sessions[Path(1,51)];logic.sessions[Path(1,51)]=moved;
+    NSArray *reordered=CSGroupBuildNativeSectionsReusing(host,host.m_tableView,host,updated);
+    Check([reordered[1][51] unreadCount]==7 && [[reordered[1][51] nativePath] isEqual:Path(1,51)],@"equal-count reordering revalidates identities and coordinates");
+    Session *changedSession=logic.sessions[Path(1,51)];changedSession.m_bIsTop=YES;changedSession.isInBrandServiceBox=YES;changedSession.m_bShowUnReadAsRedDot=YES;
+    NSArray *reclassified=CSGroupBuildNativeSectionsReusing(host,host.m_tableView,host,reordered);
+    Check([reclassified[1][51] top] && [reclassified[1][51] redDot] && [reclassified[1][51] category]==CSGroupRowCategoryService,@"in-place top/category/red-dot changes cannot hide behind cached identity");
+    NSArray *cold=CSGroupBuildNativeSections(host,host.m_tableView,host);
+    for (NSUInteger s=0;s<3;s++) for (NSUInteger r=0;r<200;r++) {
+        CSGroupRow *a=reclassified[s][r],*b=cold[s][r];
+        Check([a.userName isEqual:b.userName] && [a.nativePath isEqual:b.nativePath] && a.kind==b.kind && a.category==b.category && a.top==b.top && a.unreadCount==b.unreadCount && a.redDot==b.redDot,@"shared snapshot agrees with cold reconstruction");
+    }
+    host.counts=@[@200,@199];
+    NSArray *removed=CSGroupBuildNativeSectionsReusing(host,host.m_tableView,host,reclassified);
+    Check(removed.count==2 && [removed[1] count]==199,@"row and section removals do not retain stale cached records");
     printf("Group business rows: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);return failures?1:0;
 } }

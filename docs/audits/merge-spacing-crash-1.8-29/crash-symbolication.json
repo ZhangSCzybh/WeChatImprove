@@ -1,0 +1,73 @@
+{
+  "ips": "docs/audits/inbound/WeChat-2026-10-20-090621.ips",
+  "ips_sha256": "6ce9e474d7d81d8905e9c98c08d2d8b4d1bce19d5206f84f2ff5a64d34bd426b",
+  "faulting_thread": 0,
+  "exception": {
+    "codes": "0x0000000000000001, 0x0000000000000010",
+    "rawCodes": [
+      1,
+      16
+    ],
+    "type": "EXC_BAD_ACCESS",
+    "signal": "SIGSEGV",
+    "subtype": "KERN_INVALID_ADDRESS at 0x0000000000000010"
+  },
+  "native_uuid": "UUID: 9CD58B8E-B7AB-3487-ADBD-2AC0AA16A5DE (arm64) /private/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "plugin_1_8_27_uuid": "UUID: 5521B98A-DD8E-3488-8121-CAF4A9B06BEE (arm64e) /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-bubble-font-colors-xacikk4h/theos/obj/arm64e/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib",
+  "both_uuids_match_crash": true,
+  "plugin_frames": [
+    {
+      "offset": "0x667d8",
+      "symbol": "CSMessageNativeObject (in WeChatImprove.dylib) (CSChatNativeBridge.m:15)"
+    },
+    {
+      "offset": "0x4daf4",
+      "symbol": "CSDecodedImage (in WeChatImprove.dylib) (CSBubbleStyleAdapter.m:107)"
+    },
+    {
+      "offset": "0x4e61c",
+      "symbol": "CSBubbleStyleApply (in WeChatImprove.dylib) (CSBubbleStyleAdapter.m:266)"
+    },
+    {
+      "offset": "0x5b18",
+      "symbol": "_logos_method$_ungrouped$CommonMessageCellView$layoutSubviews(CommonMessageCellView*, objc_selector*) (in WeChatImprove.dylib) (BubbleStyleHooks.xm:23)"
+    },
+    {
+      "offset": "0xa6ec8",
+      "symbol": "CSMessageCellPerformLayout (in WeChatImprove.dylib) (CSMessageCellLifecycle.m:0)"
+    },
+    {
+      "offset": "0x14874",
+      "symbol": "_logos_method$_ungrouped$CommonMessageCellView$layoutSubviews(CommonMessageCellView*, objc_selector*) (in WeChatImprove.dylib) (MessageGestureHooks.xm:14)"
+    }
+  ],
+  "native_pc": "0x10a9bdb88",
+  "native_method": "-[YYImage originImage]",
+  "instruction": "ldr x8, [x0, #0x10]",
+  "registers": {
+    "pc": {
+      "value": 4513733512,
+      "matchesCrashFrame": 1
+    },
+    "far": {
+      "value": 16
+    },
+    "esr": {
+      "value": 2449473542,
+      "description": "(Data Abort) byte read Translation fault"
+    }
+  },
+  "x0": {
+    "value": 0
+  },
+  "x19": {
+    "value": 18722158848
+  },
+  "x21_origin_image_runtime_offset": {
+    "value": 184
+  },
+  "x22_get_block_runtime_offset": {
+    "value": 144
+  },
+  "static_analysis_only": true
+}

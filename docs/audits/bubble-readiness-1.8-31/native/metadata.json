@@ -1,0 +1,377 @@
+{
+  "binary": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "classes": {
+    "YYAsyncImageView": {
+      "address": "0x1204815a0",
+      "super_raw": "0x801000000000222d",
+      "super_addr": null,
+      "methods": [
+        {
+          "selector": "setImage:",
+          "address": "0x10a9bb698",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setHighlightedImage:",
+          "address": "0x10a9bb7e4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setHighlighted:",
+          "address": "0x10a9bb8b4",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "setDefaultImage:",
+          "address": "0x10a9bb934",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "resetAllImage",
+          "address": "0x10a9bba04",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "newAsyncDisplayTask",
+          "address": "0x10a9bba50",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "willMoveToWindow:",
+          "address": "0x10a9bbd1c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "overrideStyle",
+          "address": "0x10a9bbdec",
+          "types": "q16@0:8"
+        },
+        {
+          "selector": "didSetDynamicYYImage",
+          "address": "0x10a9bbdf8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "didSetDarkModeObserver",
+          "address": "0x10a9bbf08",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setDidSetDarkModeObserver:",
+          "address": "0x10a9bbf18",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "address": "0x10a9bbf28",
+          "types": "v16@0:8"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_image",
+          "offset": 8,
+          "type": "@\"YYImage\""
+        },
+        {
+          "name": "m_highlightedImage",
+          "offset": 16,
+          "type": "@\"YYImage\""
+        },
+        {
+          "name": "m_defaultImage",
+          "offset": 24,
+          "type": "@\"YYImage\""
+        },
+        {
+          "name": "m_highlighted",
+          "offset": 32,
+          "type": "B"
+        },
+        {
+          "name": "_didSetDarkModeObserver",
+          "offset": 33,
+          "type": "B"
+        }
+      ],
+      "class_methods": [
+        {
+          "selector": "layerClass",
+          "address": "0x10a9bb684",
+          "types": "#16@0:8"
+        }
+      ],
+      "superclass": "UIImageView"
+    },
+    "YYAsyncLayerDisplayTask": {
+      "address": "0x1204815f0",
+      "super_raw": "0x80100000000021ec",
+      "super_addr": null,
+      "methods": [
+        {
+          "selector": "willDisplay",
+          "address": "0x10a9bbf7c",
+          "types": "@?16@0:8"
+        },
+        {
+          "selector": "setWillDisplay:",
+          "address": "0x10a9bbf84",
+          "types": "v24@0:8@?16"
+        },
+        {
+          "selector": "display",
+          "address": "0x10a9bbf8c",
+          "types": "@?16@0:8"
+        },
+        {
+          "selector": "setDisplay:",
+          "address": "0x10a9bbf94",
+          "types": "v24@0:8@?16"
+        },
+        {
+          "selector": "displayContentsForLayer",
+          "address": "0x10a9bbf9c",
+          "types": "@?16@0:8"
+        },
+        {
+          "selector": "setDisplayContentsForLayer:",
+          "address": "0x10a9bbfa4",
+          "types": "v24@0:8@?16"
+        },
+        {
+          "selector": "didDisplay",
+          "address": "0x10a9bbfac",
+          "types": "@?16@0:8"
+        },
+        {
+          "selector": "setDidDisplay:",
+          "address": "0x10a9bbfb4",
+          "types": "v24@0:8@?16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "address": "0x10a9bbfbc",
+          "types": "v16@0:8"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "_willDisplay",
+          "offset": 8,
+          "type": "@?"
+        },
+        {
+          "name": "_display",
+          "offset": 16,
+          "type": "@?"
+        },
+        {
+          "name": "_displayContentsForLayer",
+          "offset": 24,
+          "type": "@?"
+        },
+        {
+          "name": "_didDisplay",
+          "offset": 32,
+          "type": "@?"
+        }
+      ],
+      "class_methods": [],
+      "superclass": "NSObject"
+    },
+    "YYImage": {
+      "address": "0x120481668",
+      "super_raw": "0x80100000000021f4",
+      "super_addr": null,
+      "methods": [
+        {
+          "selector": "initWithBlock:prefertSize:",
+          "address": "0x10a9bd6ac",
+          "types": "@40@0:8@?16{CGSize=dd}24"
+        },
+        {
+          "selector": "dealloc",
+          "address": "0x10a9bd7a4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setIsDynamicImg:",
+          "address": "0x10a9bd7fc",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "isDarkMode",
+          "address": "0x10a9bd8d8",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "image",
+          "address": "0x10a9bda00",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "originImage",
+          "address": "0x10a9bdb14",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "decodeImage",
+          "address": "0x10a9bdc18",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "asyncLoad",
+          "address": "0x10a9bde68",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "_cancelAsyncLoad",
+          "address": "0x10a9bde74",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "_loadInBackground",
+          "address": "0x10a9bde8c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "_fourceDecodeImage:prefertSize:isCancelled:",
+          "address": "0x10a9be3f8",
+          "types": "@48@0:8@16{CGSize=dd}24@?40"
+        },
+        {
+          "selector": "setOriginImage:",
+          "address": "0x10a9be5c0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "prefertSize",
+          "address": "0x10a9be5d4",
+          "types": "{CGSize=dd}16@0:8"
+        },
+        {
+          "selector": "setPrefertSize:",
+          "address": "0x10a9be5e8",
+          "types": "v32@0:8{CGSize=dd}16"
+        },
+        {
+          "selector": "delegate",
+          "address": "0x10a9be5fc",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setDelegate:",
+          "address": "0x10a9be61c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "decodeImageLM",
+          "address": "0x10a9be630",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setDecodeImageLM:",
+          "address": "0x10a9be640",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "decodeImageDM",
+          "address": "0x10a9be654",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setDecodeImageDM:",
+          "address": "0x10a9be664",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "isDynamicImg",
+          "address": "0x10a9be678",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "address": "0x10a9be688",
+          "types": "v16@0:8"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_getBlock",
+          "offset": 8,
+          "type": "@?"
+        },
+        {
+          "name": "m_isDecodingInBackground",
+          "offset": 16,
+          "type": "B"
+        },
+        {
+          "name": "m_lock",
+          "offset": 24,
+          "type": "@\"NSObject<OS_dispatch_semaphore>\""
+        },
+        {
+          "name": "m_sentinel",
+          "offset": 32,
+          "type": "@\"YYSentinel\""
+        },
+        {
+          "name": "_isDynamicImg",
+          "offset": 40,
+          "type": "B"
+        },
+        {
+          "name": "m_originImage",
+          "offset": 48,
+          "type": "@\"UIImage\""
+        },
+        {
+          "name": "_delegate",
+          "offset": 56,
+          "type": "@\"<YYImageDelegate>\""
+        },
+        {
+          "name": "_decodeImageLM",
+          "offset": 64,
+          "type": "@\"UIImage\""
+        },
+        {
+          "name": "_decodeImageDM",
+          "offset": 72,
+          "type": "@\"UIImage\""
+        },
+        {
+          "name": "_prefertSize",
+          "offset": 80,
+          "type": "{CGSize=\"width\"d\"height\"d}"
+        }
+      ],
+      "class_methods": [
+        {
+          "selector": "imageWithBlock:",
+          "address": "0x10a9bd444",
+          "types": "@24@0:8@?16"
+        },
+        {
+          "selector": "imageWithUIImage:",
+          "address": "0x10a9bd4a4",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "imageWithBlock:prefertSize:",
+          "address": "0x10a9bd574",
+          "types": "@40@0:8@?16{CGSize=dd}24"
+        },
+        {
+          "selector": "imageWithUIImage:prefertSize:",
+          "address": "0x10a9bd5e0",
+          "types": "@40@0:8@16{CGSize=dd}24"
+        }
+      ],
+      "superclass": "UIImage"
+    }
+  },
+  "categories": []
+}

@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import "CSChatNativeBridge.h"
+#import "CSMessageMergePolicy.h"
 
 // Main-thread entry points. No ownership of native messages or database records.
 FOUNDATION_EXPORT void CSMessageMergeActivate(id controller);
@@ -24,3 +25,6 @@ FOUNDATION_EXPORT NSString *CSMessageCurrentAccount(void);
 FOUNDATION_EXPORT NSString *CSMessageNativeIdentity(id model);
 
 FOUNDATION_EXPORT BOOL CSMessageMergeLayoutSettled(id controller);
+
+// Read-only appearance snapshot. Never measures a row or changes native caches.
+FOUNDATION_EXPORT BOOL CSMessageMergeReadAppearance(id model, CSMessageMergeDecision *decision);

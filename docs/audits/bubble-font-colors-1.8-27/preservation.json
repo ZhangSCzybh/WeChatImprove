@@ -1,0 +1,14 @@
+{
+  "merge_files_unchanged": [
+    "Controllers/CSMessageMergeAdapter.h",
+    "Controllers/CSMessageMergeAdapter.m",
+    "Controllers/CSMessageMergePolicy.h",
+    "Controllers/CSMessageMergePolicy.m"
+  ],
+  "bubble_geometry_and_renderer_unchanged": true,
+  "prior_artifacts_unchanged": true,
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "database_access": false,
+  "service_restart": false,
+  "device_installed": false
+}

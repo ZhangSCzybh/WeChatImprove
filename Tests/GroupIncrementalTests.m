@@ -57,6 +57,8 @@ int main(void) { @autoreleasepool {
     Check(unread!=old && [unread hasSameDisplayStructureAs:old],@"unread change preserves verified structure but updates row values");
     Check([unread valueForKey:@"memberTabIDs"]==[old valueForKey:@"memberTabIDs"],@"unread updates reuse validated member index");
     Check([unread valueForKey:@"destinationsByPath"]==[old valueForKey:@"destinationsByPath"],@"unread updates reuse validated group destinations");
+    Check([unread valueForKey:@"displayToNative"]==[old valueForKey:@"displayToNative"],@"unread-only changes reuse verified display indices");
+    Check([unread valueForKey:@"nativeToDisplay"]==[old valueForKey:@"nativeToDisplay"],@"unread-only changes reuse verified native indices");
     Check([[unread changedUnreadPathsFrom:old] isEqual:@[Path(0,0)]],@"only the changed displayed unread row is invalidated");
     CSGroupProjection *selected=Build(changed,tabs,@"custom",NO,@"A",unread);
     Check([selected badgeForTabID:@"custom"]==[unread badgeForTabID:@"custom"],@"selection-only publication reuses computed badges");

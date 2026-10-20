@@ -1,0 +1,3 @@
+dark_insets: valid=1 top=1.00 bottom=3.00 expected_dark_top=4 expected_dark_bottom=6
+late_bubble_metadata: ordinary_apply_still_native=1 explicit_invalidation_recovers=1
+pressed_state_insets: normal_styled=1 measurable_before_press=0 measurable_after_press=1 top=1.00 bottom=3.00

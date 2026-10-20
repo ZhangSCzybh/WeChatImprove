@@ -1,0 +1,726 @@
+--- a/Controllers/CSBubbleStyleAdapter.h
++++ b/Controllers/CSBubbleStyleAdapter.h
+@@ -1,5 +1,5 @@
+ #import <UIKit/UIKit.h>
+-@class UIImageView;
++@class UIImage, UIImageView;
+ FOUNDATION_EXPORT void CSBubbleStyleStart(void);
+ FOUNDATION_EXPORT void CSBubbleStyleApply(UIView *cell);
+ FOUNDATION_EXPORT void CSBubbleStyleDetach(UIView *cell);
+@@ -8,9 +8,17 @@
+ FOUNDATION_EXPORT id CSBubbleStyleImageAssignment(UIImageView *view, id nativeImage, BOOL highlighted);
+ // Observe native decoding only for a bound message background; never start decoding.
+ FOUNDATION_EXPORT void CSBubbleStyleObserveDisplayTask(UIImageView *view, id task);
++// Observes an already-returned native decoder result only inside a bound display task.
++// This callback never invokes decoding or reads YYImage's mutable cache slots.
++FOUNDATION_EXPORT void CSBubbleStyleObserveDecodedImage(id source, UIImage *decoded);
++#ifdef CS_BUBBLE_TESTING
++// Fixtures for pixels whose native display observation has already completed.
++FOUNDATION_EXPORT void CSBubbleStyleTestPublishDecodedImage(id source, UIImage *decoded, BOOL dark);
++#endif
+ // Uses already-decoded immutable images and the shared padding cache; never forces decoding.
+ FOUNDATION_EXPORT BOOL CSBubbleStyleVisibleInsets(UIView *background, UIEdgeInsets *insets);
+ // 8.0.78 BubbleInfo's cached UIImage templates, before a cell/YYImage exists.
+-// Normal and pressed states share one conservative footprint. No lazy YY getter.
++// Uses the fitted custom template when enabled; normal/pressed share one safe
++// footprint. Native opaque short bodies need no cap-size minimum. No lazy YY getter.
+ FOUNDATION_EXPORT BOOL CSBubbleStyleModelInsets(id model, UIView *appearance, CGSize size, UIEdgeInsets *insets);
+ FOUNDATION_EXPORT BOOL CSBubbleStyleIsDark(UIView *view);
+--- a/Controllers/CSBubbleStyleAdapter.m
++++ b/Controllers/CSBubbleStyleAdapter.m
+@@ -8,7 +8,7 @@
+ #import <objc/message.h>
+ #include <math.h>
+ 
+-static char CSBubbleCellKey, CSBubbleImageKey, CSBubbleReadyImageKey;
++static char CSBubbleCellKey, CSBubbleImageKey, CSBubbleReadyImageKey, CSBubbleObservedImageKey;
+ static CSBubbleStyleConfiguration *CSStyle;
+ static NSCache *CSImages;
+ static NSCache *CSBodyMetrics;
+@@ -30,6 +30,8 @@
+ @property(nonatomic, strong) CSBubbleImageOwnership *images;
+ @property(nonatomic, strong) UIImage *source, *highlightSource;
+ @property(nonatomic, copy) NSString *key;
++@property(nonatomic, copy) NSString *modelSourceKey;
++@property(nonatomic, strong) UIImage *modelSource, *modelHighlightSource;
+ @property(nonatomic) BOOL applying;
+ @property(nonatomic) BOOL applyQueued;
+ @property(nonatomic) BOOL outgoing;
+@@ -45,6 +47,19 @@
+ @end
+ @implementation CSBubbleBinding @end
+ 
++@interface CSBubbleDecodedImages : NSObject
++@property(nonatomic,strong) UIImage *light, *dark;
++@end
++@implementation CSBubbleDecodedImages @end
++@interface CSBubbleDecodeCapture : NSObject
++@property(nonatomic,strong) id normal, highlighted;
++@property(nonatomic,strong) UIImage *normalPixels, *highlightedPixels;
++@end
++@implementation CSBubbleDecodeCapture @end
++// A synchronous native decoder call belongs to exactly the enclosing display task.
++// No global image registry or cross-thread access to a mutable native image cache.
++static _Thread_local void *CSActiveDecodeCapture;
++
+ @interface CSBubbleBodyMetrics : NSObject
+ @property(nonatomic) CSBubbleInsets padding;
+ @property(nonatomic) BOOL valid;
+@@ -112,6 +127,27 @@
+     if (![image isKindOfClass:UIImage.class] || (wrapperClass && [image isKindOfClass:wrapperClass])) return nil;
+     return [image CGImage] ? image : nil;
+ }
++static void CSPublishDecodedImage(id source, UIImage *decoded, BOOL dark) {
++    if (!NSThread.isMainThread || !source) return;
++    UIImage *ready=CSReadyUIImage(decoded,NSClassFromString(@"YYImage"));
++    CSBubbleDecodedImages *pixels=objc_getAssociatedObject(source,&CSBubbleObservedImageKey);
++    if (!pixels && ready) {
++        pixels=[CSBubbleDecodedImages new];
++        objc_setAssociatedObject(source,&CSBubbleObservedImageKey,pixels,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
++    }
++    if (dark) pixels.dark=ready; else pixels.light=ready;
++}
++#ifdef CS_BUBBLE_TESTING
++void CSBubbleStyleTestPublishDecodedImage(id source, UIImage *decoded, BOOL dark) { CSPublishDecodedImage(source,decoded,dark); }
++#endif
++void CSBubbleStyleObserveDecodedImage(id source, UIImage *decoded) {
++    if (!CSActiveDecodeCapture) return;
++    CSBubbleDecodeCapture *capture=(__bridge id)CSActiveDecodeCapture;
++    if (source!=capture.normal && source!=capture.highlighted) return;
++    UIImage *ready=CSReadyUIImage(decoded,NSClassFromString(@"YYImage"));
++    if (source==capture.normal) capture.normalPixels=ready;
++    if (source==capture.highlighted) capture.highlightedPixels=ready;
++}
+ static UIImage *CSDecodedImage(id image, BOOL dark) {
+     Class wrapperClass=NSClassFromString(@"YYImage");
+     if (!wrapperClass || ![image isKindOfClass:wrapperClass]) return CSReadyUIImage(image,wrapperClass);
+@@ -119,19 +155,12 @@
+     // lazy factory. Keep their known pixels available to layout immediately.
+     UIImage *owned=objc_getAssociatedObject(image,&CSBubbleReadyImageKey);
+     if (owned) return owned;
+-    // 8.0.78 originImage checks m_getBlock, then calls setIsDynamicImg:, then
+-    // invokes that block without rechecking. The supplied crash has a nil block
+-    // at that invocation (ldr [x0,#0x10]). Do not call this getter from layout.
+-    // Resolve object ivars by name/type, never private offsets or lazy accessors.
+-    const char *slots[]={dark?"_decodeImageDM":"_decodeImageLM","m_originImage",dark?"_decodeImageLM":"_decodeImageDM"};
+-    for (NSUInteger i=0;i<3;i++) {
+-        Ivar slot=class_getInstanceVariable(object_getClass(image),slots[i]);
+-        const char *type=slot ? ivar_getTypeEncoding(slot) : NULL;
+-        if (!type || type[0]!='@') continue;
+-        UIImage *ready=CSReadyUIImage(object_getIvar(image,slot),wrapperClass);
+-        if (ready) return ready;
+-    }
+-    return nil;
++    // Native decode slots are nonatomic and can change on a worker thread.
++    // Reading an object ivar and retaining it are not one atomic operation:
++    // the 1.8-33 crash occurred in that retain. Keep only owned snapshots of
++    // results returned by native display, published and consumed on the main thread.
++    CSBubbleDecodedImages *pixels=objc_getAssociatedObject(image,&CSBubbleObservedImageKey);
++    return dark ? pixels.dark : pixels.light;
+ }
+ static id CSImageForView(UIImageView *view, UIImage *image) {
+     if (!CSIsAsync(view)) return image;
+@@ -225,8 +254,9 @@
+     if (style==UIUserInterfaceStyleUnspecified) style=UITraitCollection.currentTraitCollection.userInterfaceStyle;
+     return style==UIUserInterfaceStyleDark;
+ }
+-BOOL CSBubbleStyleModelInsets(id model, UIView *appearance, CGSize size, UIEdgeInsets *insets) {
+-    if (!NSThread.isMainThread || !insets || !isfinite(size.height) || size.height<=0) return NO;
++static BOOL CSModelTemplates(id model, BOOL dark, UIImage **normal, UIImage **pressed) {
++    if (!NSThread.isMainThread) return NO;
++    *normal=nil;*pressed=nil;
+ #ifndef CS_BUBBLE_TESTING
+     NSString *version=NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"];
+     if (![version isEqual:@"8.0.78"] && ![version hasPrefix:@"8.0.78."]) return NO;
+@@ -242,9 +272,6 @@
+         method_getArgumentType(method,i,type,sizeof(type));
+         if (strcmp(type,@encode(BOOL))) return NO;
+     }
+-    CSBubbleStyleStart();
+-    BOOL dark=CSBubbleStyleIsDark(appearance);
+-    UIEdgeInsets result={0,0,0,0};
+     @try {
+         for (NSUInteger slot=0;slot<2;slot++) {
+             // Verified 8.0.78 contract: returns a cached, stretchable UIImage;
+@@ -252,19 +279,47 @@
+             id source=((id(*)(id,SEL,BOOL,BOOL,BOOL))objc_msgSend)(info,sel,slot!=0,dark,YES);
+             UIImage *image=CSReadyUIImage(source,NSClassFromString(@"YYImage"));
+             if (slot && !source) continue;
+-            // Match visible-inset qualification: equal fixed-cap extents are
+-            // valid before display, so short rows do not freeze at native spacing.
+-            if (!image || image.images.count || image.imageOrientation!=UIImageOrientationUp ||
+-                (image.capInsets.top<=0 && image.capInsets.bottom<=0) ||
+-                size.height<image.capInsets.top+image.capInsets.bottom ||
+-                (size.width>0 && size.width<image.capInsets.left+image.capInsets.right)) return NO;
+-            CSBubbleInsets padding;
+-            if (!CSBodyPadding(image,&padding)) return NO;
+-            if (!slot) result=UIEdgeInsetsMake(padding.top,padding.left,padding.bottom,padding.right);
+-            else result=UIEdgeInsetsMake(MIN(result.top,padding.top),MIN(result.left,padding.left),
+-                                        MIN(result.bottom,padding.bottom),MIN(result.right,padding.right));
++            if (!image) return NO;
++            if (slot) *pressed=image; else *normal=image;
+         }
+     } @catch (__unused NSException *exception) { return NO; }
++    return *normal!=nil;
++}
++BOOL CSBubbleStyleModelInsets(id model, UIView *appearance, CGSize size, UIEdgeInsets *insets) {
++    if (!NSThread.isMainThread || !insets || !isfinite(size.height) || size.height<=0) return NO;
++    CSBubbleStyleStart();
++    UIImage *normal=nil,*pressed=nil;
++    if (!CSModelTemplates(model,CSBubbleStyleIsDark(appearance),&normal,&pressed)) return NO;
++    unsigned long long position=0;
++    BOOL custom=CSStyle.enabled && CSUnsigned(CSMessageNativeObject(model,@"bgBubbleInfo"),@"position",&position) && position<=3;
++    UIEdgeInsets result={0,0,0,0};
++    for (NSUInteger slot=0;slot<2;slot++) {
++        UIImage *image=slot ? pressed : normal;if (!image) continue;
++        if (image.images.count || image.imageOrientation!=UIImageOrientationUp) return NO;
++        CSBubbleInsets padding;
++        if (!CSBodyPadding(image,&padding)) return NO;
++        if (custom) {
++            // Native short-message height follows the chosen font (the report is
++            // 37pt). Our renderer fits NEW caps to that height; the source's 30+8
++            // caps do not define the minimum size of the generated background.
++            CGSize fitted=size;
++            if (fitted.width<=0) fitted.width=2*(CSStyle.radius+2)+padding.left+padding.right+1;
++            CGFloat radius=CSBubbleFittedRadius(CSStyle.radius,(NSUInteger)position,image.scale,padding,fitted);
++            CSBubbleTemplateMetrics metrics;
++            if (!CSBubbleStyledTemplateDescribe(radius,(NSUInteger)position,image.scale,padding,CSStyle.kind,&metrics) ||
++                metrics.caps.top+metrics.caps.bottom>=size.height ||
++                (size.width>0 && metrics.caps.left+metrics.caps.right>=size.width)) return NO;
++        } else {
++            // With native styling, undersized caps may rescale transparent margins.
++            // An opaque perimeter needs no adjustment; otherwise keep the safe fallback.
++            if ((image.capInsets.top<=0 && image.capInsets.bottom<=0) ||
++                (size.height<image.capInsets.top+image.capInsets.bottom && (padding.top>0 || padding.bottom>0)) ||
++                (size.width>0 && size.width<image.capInsets.left+image.capInsets.right && (padding.left>0 || padding.right>0))) return NO;
++        }
++        if (!slot) result=UIEdgeInsetsMake(padding.top,padding.left,padding.bottom,padding.right);
++        else result=UIEdgeInsetsMake(MIN(result.top,padding.top),MIN(result.left,padding.left),
++                                    MIN(result.bottom,padding.bottom),MIN(result.right,padding.right));
++    }
+     *insets=result;return YES;
+ }
+ static CSBubbleGroupPosition CSGroupPosition(id model, NSUInteger nativePosition) {
+@@ -330,7 +385,7 @@
+     if (binding.descriptorValid && ((!positioned && !binding.callRecord) || !typed || !directed ||
+         currentPosition!=binding.position || wrap!=binding.describedWrap || type!=binding.describedType ||
+         inner!=binding.describedInnerType || refer!=binding.describedRefer || (sender!=0)!=binding.outgoing)) {
+-        binding.descriptorValid=NO;binding.key=nil;
++        binding.descriptorValid=NO;binding.key=nil;binding.modelSourceKey=nil;
+     }
+     if (!binding.descriptorValid) CSDescribe(binding,model);
+     if (!binding.supported) { CSRestore(binding); return; }
+@@ -342,8 +397,15 @@
+         (__bridge void *)binding.images.nativeImage,(__bridge void *)binding.images.nativeHighlightedImage,(unsigned long)binding.position,(unsigned long)binding.group,
+         ((UIImageView *)bg).frame.size.width,((UIImageView *)bg).frame.size.height];
+     UIColor *textColor=CSTextColors[(dark ? 2 : 0)+(binding.outgoing ? 0 : 1)];
+-    UIImage *source=CSDecodedImage(binding.images.nativeImage,dark);
+-    UIImage *highlightSource=CSDecodedImage(binding.images.nativeHighlightedImage,dark);
++    if (![binding.modelSourceKey isEqual:key]) {
++        UIImage *normal=nil,*pressed=nil;
++        CSModelTemplates(model,dark,&normal,&pressed);
++        binding.modelSource=normal;binding.modelHighlightSource=pressed;binding.modelSourceKey=key;
++    }
++    // Use the same cached templates as first-pass geometry, before YY decoding.
++    // The observed return-value path handles native layouts without this contract.
++    UIImage *source=binding.modelSource ?: CSDecodedImage(binding.images.nativeImage,dark);
++    UIImage *highlightSource=binding.modelHighlightSource ?: CSDecodedImage(binding.images.nativeHighlightedImage,dark);
+     BOOL samePixels=binding.source==source && binding.highlightSource==highlightSource;
+     // A YYImage is populated in place. Wrapper identity alone cannot cache a
+     // pending/failed attempt. Retain the compared images to prevent pointer reuse.
+@@ -354,7 +416,13 @@
+     }
+     UIImage *normal=CSTemplate(binding,source,dark,NO);
+     id newImage=normal?CSImageForView(bg,normal):nil;
+-    if (!newImage) { CSRestore(binding); binding.key=key; return; }
++    if (!newImage) {
++        CSRestore(binding); binding.key=key;
++        // A style enabled after native display may have no observation yet.
++        // Request one native display; the cached key prevents per-layout polling.
++        if (!source && binding.images.nativeImage) [bg setNeedsDisplay];
++        return;
++    }
+     id newHighlight=nil;
+     if (binding.images.nativeHighlightedImage) {
+         UIImage *highlightImage=CSTemplate(binding,highlightSource,dark,YES);
+@@ -379,7 +447,7 @@
+ void CSBubbleStyleNativeChanged(UIView *cell) {
+     if (!NSThread.isMainThread) return;
+     CSBubbleBinding *binding=objc_getAssociatedObject(cell,&CSBubbleCellKey);
+-    binding.descriptorValid=NO; binding.key=nil;
++    binding.descriptorValid=NO; binding.key=nil;binding.modelSourceKey=nil;
+     CSBubbleStyleApply(cell);
+ }
+ id CSBubbleStyleImageAssignment(UIImageView *view, id nativeImage, BOOL highlighted) {
+@@ -459,17 +527,27 @@
+     __weak UIImageView *background=view;
+     __weak id model=binding.model;
+     id normal=binding.images.nativeImage,highlight=binding.images.nativeHighlightedImage;
++    BOOL dark=CSBubbleStyleIsDark(binding.cell);
++    NSUInteger generation=CSStyle.generation;
+     CSBubbleDisplayContents observed=^UIImage *(CGSize size, BOOL (^cancelled)(void)) {
+-        UIImage *image=original(size,cancelled);
++        CSBubbleDecodeCapture *capture=[CSBubbleDecodeCapture new];capture.normal=normal;capture.highlighted=highlight;
++        void *previous=CSActiveDecodeCapture;CSActiveDecodeCapture=(__bridge void *)capture;
++        UIImage *image;
++        @try { image=original(size,cancelled); }
++        @finally { CSActiveDecodeCapture=previous; }
+         if (!image || (cancelled && cancelled())) return image;
++        if (!capture.normalPixels && !capture.highlightedPixels) return image;
+         // No UIKit access or binding mutation on the native decoding thread.
+         dispatch_async(dispatch_get_main_queue(), ^{
+             CSBubbleBinding *live=expected;UIView *liveCell=cell;UIImageView *liveView=background;
+-            if (!live || !liveCell || !liveView || !model ||
++            if (!live || !liveCell || !liveView || !model || !CSStyle.enabled ||
++                CSStyle.generation!=generation || CSBubbleStyleIsDark(liveCell)!=dark ||
+                 objc_getAssociatedObject(liveCell,&CSBubbleCellKey)!=live ||
+                 objc_getAssociatedObject(liveView,&CSBubbleImageKey)!=live ||
+                 live.model!=model || CSMessageNativeObject(liveCell,@"viewModel")!=model ||
+                 live.images.nativeImage!=normal || live.images.nativeHighlightedImage!=highlight) return;
++            if (capture.normalPixels) CSPublishDecodedImage(normal,capture.normalPixels,dark);
++            if (capture.highlightedPixels) CSPublishDecodedImage(highlight,capture.highlightedPixels,dark);
+             CSBubbleStyleApply(liveCell);
+         });
+         return image;
+--- a/Controllers/CSMessageMergeAdapter.m
++++ b/Controllers/CSMessageMergeAdapter.m
+@@ -548,19 +548,33 @@
+     UIView *bubble=CSMessageNativeObject(view,@"getBgImageView");
+     UIView *head=CSMessageNativeObject(view,@"getHeadImageView");
+     UIView *container=CSMessageNativeObject(view,@"getContentView");
+-    // BaseMessageCellView owns m_contentView; backgrounds, avatars and reply
+-    // views are children of that container in 8.0.78. Its full row-sized bounds
++    // BaseMessageCellView owns m_contentView; backgrounds and reply views live
++    // in that container, while the avatar is on the cell in 8.0.78. Its full bounds
+     // are not visible content. Inspect this known level, never a recursive tree.
+     BOOL hasContainer=[container isKindOfClass:UIView.class] && container!=bubble &&
+         container!=view && container.superview==view && !container.hidden && container.alpha>.01;
+     if (hasContainer && !CGAffineTransformIsIdentity(container.transform)) geometryValid=NO;
+     // The standard avatar occupies a different horizontal lane. Keep it wholly
+     // inside the row without charging its transparent-free height to the bubble seam.
+-    BOOL canPlaceHead=[head isKindOfClass:UIView.class] && !head.hidden &&
+-        [bubble isKindOfClass:UIView.class] && head.superview==bubble.superview &&
+-        CGAffineTransformIsIdentity(head.transform) && head.bounds.size.height<=38.01 &&
+-        head.bounds.size.height<=plannedHeight &&
+-        (CGRectGetMaxX(head.frame)<=CGRectGetMinX(bubble.frame) || CGRectGetMaxX(bubble.frame)<=CGRectGetMinX(head.frame));
++    // In 8.0.78 the avatar is a direct child of the cell, while the text/voice
++    // background lives in m_contentView. Their local frames are incomparable.
++    // Only accept the two known parents, then compare the separate lanes in
++    // cell coordinates; unrelated or transformed hierarchies keep the safety path.
++    BOOL headKnown=[head isKindOfClass:UIView.class] &&
++        (head.superview==view || (hasContainer && head.superview==container));
++    BOOL bubbleKnown=[bubble isKindOfClass:UIView.class] &&
++        (bubble.superview==view || (hasContainer && bubble.superview==container));
++    BOOL canPlaceHead=headKnown && bubbleKnown && !head.hidden &&
++        CGAffineTransformIsIdentity(head.transform) && CGAffineTransformIsIdentity(bubble.transform) &&
++        !CGRectIsEmpty(head.bounds) && !CGRectIsEmpty(bubble.bounds) &&
++        head.bounds.size.height<=38.01 && head.bounds.size.height<=plannedHeight;
++    if (canPlaceHead) {
++        CGRect headRect=[view convertRect:head.bounds fromView:head];
++        CGRect bubbleRect=[view convertRect:bubble.bounds fromView:bubble];
++        canPlaceHead=isfinite(CGRectGetMinX(headRect)) && isfinite(CGRectGetMaxX(headRect)) &&
++            isfinite(CGRectGetMinX(bubbleRect)) && isfinite(CGRectGetMaxX(bubbleRect)) &&
++            (CGRectGetMaxX(headRect)<=CGRectGetMinX(bubbleRect) || CGRectGetMaxX(bubbleRect)<=CGRectGetMinX(headRect));
++    }
+     UIEdgeInsets insets={0,0,0,0};
+     BOOL visibleInsets=s.hasBubbleInsets;
+     if (visibleInsets) insets=s.bubbleInsets;
+--- a/Controllers/CSReleaseNotesViewController.m
++++ b/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,14 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"1.8-34": @[
++            @{@"title": @"修复快速滑动闪退",
++              @"detail": @"移除对微信异步图片内部缓存的直接读取，使用原生模板与安全的显示结果，过滤已取消、已复用和主题变更后的旧任务。"},
++            @{@"title": @"修正短消息紧密间距",
++              @"detail": @"自定义气泡按实际字号和消息高度拟合，修复短文本、短语音仍保留大间距的问题；修正头像与气泡跨容器时的占位，保持标准组内 2pt 间距。"},
++            @{@"title": @"保持首次布局稳定",
++              @"detail": @"首次布局使用同一份模板确定外观与间距，保留引用内容、昵称和时间空间，继续避免停止滚动后再次收紧。"}
++        ],
+         @"1.8-33": @[
+             @{@"title": @"修复紧密间距偏大",
+               @"detail": @"修复单行文本和短语音被误判为不支持紧密布局的问题，恢复标准合并消息及引用消息前后的 2pt 逻辑间距。"},
+--- a/Headers/CSUserInfoHelper.h
++++ b/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"1.8-33"  // 插件版本号
++#define kPluginVersionString @"1.8-34"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- a/Hooks/BubbleStyleHooks.xm
++++ b/Hooks/BubbleStyleHooks.xm
+@@ -83,4 +83,12 @@
+ }
+ %end
+ 
++%hook YYImage
++- (id)decodeImage {
++    id decoded=%orig;
++    CSBubbleStyleObserveDecodedImage(self,decoded);
++    return decoded;
++}
++%end
++
+ %ctor { CSBubbleStyleStart(); }
+--- a/README.md
++++ b/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
+ 
+-**当前版本：`1.8-33`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`1.8-34`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
+ 
+@@ -10,17 +10,17 @@
+ 
+ | 项目 | 当前状态 |
+ | --- | --- |
+-| 插件版本 | `1.8-33`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
++| 插件版本 | `1.8-34`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+ | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
+ | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
+ | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
+-| Rootless / Rootful | `1.8-33` 为修复紧密间距偏大的 Rootless 包，保留字体颜色、连续圆角、通话背景与预览；Rootful 保留构建入口，本轮未验证 |
++| Rootless / Rootful | `1.8-34` 为修复快速滑动崩溃与短消息间距的 Rootless 包，保留字体颜色、连续圆角、通话背景与预览；Rootful 保留构建入口，本轮未验证 |
+ | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
+ | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
+ 
+ 微信私有类、方法和界面结构会随版本变化。当前已有编译与逻辑回归结果，真实设备上的界面渲染、原生菜单和不同插件组合仍需按实际环境验证。
+ 
+-本轮记录见 [1.8-33 紧密间距边界修复](docs/audits/merge-native-caps-1.8-33/README.md)。修正 1.8-32 对原生模板的尺寸判断：38pt 的单行文本和短语音恰好容纳上下固定区域，不应再额外要求一个物理像素而退回大间距。保留 [1.8-32 的统一布局机制](docs/audits/merge-layout-1.8-32/README.md)：首次确定行高和内容位移，图片就绪、按压态和无变化的历史缓存通知不再收紧已显示消息。标准合并接缝按 2pt 逻辑点计算，不随屏幕倍率折算，引用框计入完整高度；群昵称、头像下时间等额外内容继续保护，未知版本或无法确认的布局保持稳定安全回退。沿用连续圆角、自定义底色与字体颜色、通话背景及原有合并范围。真机帧率、发热和实际微信视图仍需设备验收。
++本轮记录见 [1.8-34 原生布局与图片生命周期修复](docs/audits/merge-runtime-1.8-34/README.md)。针对实际 1.8-33 崩溃符号移除 YYImage 解码缓存的直接读取；标准气泡首次使用原生缓存模板，其余情况仅保留原生显示过程已经返回的图片结果。自定义背景按实际高度拟合，不再把原生 38pt 固定区域当作短消息最低高度；头像与气泡按真实跨容器层级统一坐标计算。保留首次确定行高和位移、停止滚动后不二次收紧的机制，标准组内接缝为 2pt 逻辑点。引用、昵称、头像下时间等内容继续保留，沿用样式、颜色、通话背景和合并范围。主机回归与打包结果不代表真机帧率、温升和所有插件组合已经验证。
+ 
+ ## 安装与入口
+ 
+--- a/Tests/BubbleStyleAdapterTests.m
++++ b/Tests/BubbleStyleAdapterTests.m
+@@ -243,9 +243,13 @@
+     YYImage *pressed=[YYImage deferredImageWithUIImage:pressedPixels];
+     cell.background.image=normal;cell.background.highlightedImage=pressed;
+     CSBubbleStyleApply(cell);CHECK(cell.background->m_image==normal);
++    NSUInteger displays=cell.background.displayRequests;
++    for (NSUInteger i=0;i<100;i++) CSBubbleStyleApply(cell);
++    CHECK(cell.background.displayRequests==displays); // At most one request for the unchanged missing snapshot.
+     YYAsyncLayerDisplayTask *task=[cell.background newAsyncDisplayTask];
+     CHECK(RunDisplay(task,YES,NO)==pixels);
+     CHECK(cell.background->m_image==normal); // No UIKit write on the decoding thread.
++    UIEdgeInsets unpublished;CHECK(!CSBubbleStyleVisibleInsets(cell.background,&unpublished));
+     CHECK(pressed.decodeImageLM==nil); // The inactive state remains lazy indefinitely.
+     Drain();CHECK(cell.background->m_image!=normal);
+     CHECK(HasColor(cell.background->m_image,(CSBubbleRGBA){.95,.95,.95,1},NO));
+@@ -266,11 +270,12 @@
+ 
+     // Canceled/stale work, feature disable, unsupported reuse, and normal completion.
+     // No test calls a pretend "decoded" callback or a second layout to recover.
+-    for (NSUInteger pass=0;pass<72;pass++) {
++    for (NSUInteger pass=0;pass<98;pass++) {
++        cell.traitCollection.userInterfaceStyle=UIUserInterfaceStyleLight;
+         model.messageWrap.m_uiMessageType=1;cell.viewModel=model;Settings(YES);
+         normal=[YYImage deferredImageWithUIImage:pixels];cell.background.image=normal;
+         CSBubbleStyleNativeChanged(cell);Drain();task=[cell.background newAsyncDisplayTask];
+-        NSUInteger mode=pass%6;
++        NSUInteger mode=pass%7;
+         if (mode==1) CSBubbleStyleDetach(cell);
+         if (mode==2) Settings(NO);
+         if (mode==3) {
+@@ -282,6 +287,7 @@
+             YYImage *replacement=[YYImage deferredImageWithUIImage:pressedPixels];
+             cell.background.image=replacement;Drain();
+         }
++        if (mode==6) cell.traitCollection.userInterfaceStyle=UIUserInterfaceStyleDark;
+         writes=cell.background.assignments;
+         CHECK(RunDisplay(task,pass%2,mode==0)==pixels);Drain();
+         if (mode==5) CHECK(cell.background->m_image!=normal);
+@@ -300,7 +306,22 @@
+     CSBubbleStyleDetach(cell);Settings(NO);CSBubbleTestDeferredFactory=NO;
+     return 0;
+ }
++static int VerifyUnownedNativeCache(void) {
++    // Match the crash's invalid decoder slot without dereferencing it in the test.
++    // The plugin must not read/retain cache storage owned by native worker threads.
++    YYImage *image=[YYImage new];UIImageView *view=[UIImageView new];view.image=image;
++    view.frame=CGRectMake(0,0,100,100);UIEdgeInsets insets;
++    Ivar slot=class_getInstanceVariable(YYImage.class,"_decodeImageLM");CHECK(slot!=NULL);
++    unsigned char *storage=(__bridge void *)image;
++    uintptr_t poison=0xbad0,empty=0;
++    memcpy(storage+ivar_getOffset(slot),&poison,sizeof(poison));
++    BOOL ready=CSBubbleStyleVisibleInsets(view,&insets);
++    memcpy(storage+ivar_getOffset(slot),&empty,sizeof(empty));
++    CHECK(!ready);
++    return 0;
++}
+ int main(void) { @autoreleasepool {
++    if (VerifyUnownedNativeCache()) return 1;
+     NSDictionary *saved=[NSUserDefaults.standardUserDefaults volatileDomainForName:NSArgumentDomain];
+     Settings(NO); CSBubbleStyleStart();
+     TextMessageViewModel *model=[TextMessageViewModel new]; model.messageWrap=[BubbleWrap new]; model.messageWrap.m_uiMessageType=1; model.isSender=YES; model.bgBubbleInfo=[BubbleInfo new];
+@@ -386,7 +407,8 @@
+     LazyYYImage *pendingHighlight=[LazyYYImage new];metricView.highlightedImage=pendingHighlight;
+     CHECK(!CSBubbleStyleVisibleInsets(metricView,&measured));
+     pendingHighlight.originImage=loaded;CHECK(CSBubbleStyleVisibleInsets(metricView,&measured));metricView.highlightedImage=nil;
+-    lazy.decodeImageLM=nil;lazy.decodeImageDM=loaded;CHECK(CSBubbleStyleVisibleInsets(metricView,&measured));
++    lazy.decodeImageLM=nil;lazy.decodeImageDM=loaded;CHECK(!CSBubbleStyleVisibleInsets(metricView,&measured));
++    metricView.traitCollection.userInterfaceStyle=UIUserInterfaceStyleDark;CHECK(CSBubbleStyleVisibleInsets(metricView,&measured));
+     lazy.decodeImageDM=nil;lazy.originImage=lazy; // A nested wrapper must not invoke CGImage recursively.
+     CHECK(!CSBubbleStyleVisibleInsets(metricView,&measured));lazy.originImage=nil;
+     for (NSUInteger reuse=0;reuse<600;reuse++) {
+--- a/Tests/BubbleUIKit/BubbleUIKit.m
++++ b/Tests/BubbleUIKit/BubbleUIKit.m
+@@ -55,12 +55,26 @@
+ BOOL CSBubbleTestDeferredFactory;
+ @implementation YYImage
+ @synthesize originImage=m_originImage;
++// Isolated ready-image fixtures represent an earlier completed observation.
++// Deferred fixtures below bypass these setters: the real display observer must
++// publish their results, including worker/cancellation/reuse/theme validation.
++- (void)setOriginImage:(UIImage *)image {
++    m_originImage=image;
++    CSBubbleStyleTestPublishDecodedImage(self,image,NO);CSBubbleStyleTestPublishDecodedImage(self,image,YES);
++}
++- (void)setDecodeImageLM:(UIImage *)image { _decodeImageLM=image;CSBubbleStyleTestPublishDecodedImage(self,image,NO); }
++- (void)setDecodeImageDM:(UIImage *)image { _decodeImageDM=image;CSBubbleStyleTestPublishDecodedImage(self,image,YES); }
+ + (instancetype)imageWithUIImage:(UIImage *)image {
+     if (CSBubbleTestDeferredFactory) return [self deferredImageWithUIImage:image];
+     YYImage *value=[self new]; value.originImage=image; return value;
+ }
+ + (instancetype)deferredImageWithUIImage:(UIImage *)image { YYImage *value=[self new]; value.pendingImage=image; return value; }
+-- (UIImage *)decodeImage { if (!_decodeImageLM) _decodeImageLM=m_originImage?:_pendingImage; return _decodeImageLM; }
++- (UIImage *)decodeImage {
++    if (!_decodeImageLM) _decodeImageLM=m_originImage?:_pendingImage;
++    UIImage *decoded=_decodeImageLM;
++    CSBubbleStyleObserveDecodedImage(self,decoded); // Mirrors the native return-value hook.
++    return decoded;
++}
+ @end
+ @implementation YYAsyncLayerDisplayTask @end
+ @implementation YYAsyncImageView
+--- a/Tests/MergeBubbleIntegrationTests.m
++++ b/Tests/MergeBubbleIntegrationTests.m
+@@ -70,6 +70,7 @@
+ }
+ 
+ int main(void) { @autoreleasepool {
++    ConfigureIntegration(NO,2);
+     // Regression: a 38pt body exactly fits the native fixed caps. Requiring an
+     // extra 1/scale here incorrectly freezes text/voice rows at native spacing.
+     for (NSUInteger scale=1;scale<=3;scale++) {
+@@ -94,17 +95,33 @@
+             CHECK(CSBubbleStyleModelInsets(m,bg,bg.frame.size,&modelInsets));CHECK(CSBubbleStyleVisibleInsets(bg,&visibleInsets));
+         }
+     }
++    // A custom template fits actual font-derived short bodies, including alpha
++    // padding; native 30+8 caps must not veto the replacement renderer's fit.
++    ConfigureIntegration(YES,2);
++    for (NSUInteger scale=1;scale<=3;scale++) {
++        BubbleInfo *info=[BubbleInfo new];info.normal=NativeCapsTemplate(scale,1,3);info.pressed=info.normal;
++        TextMessageViewModel *m=model(19500+(unsigned)scale);m.bgBubbleInfo=info;
++        UIView *appearance=[UIView new];UIEdgeInsets padding;
++        CHECK(CSBubbleStyleModelInsets(m,appearance,CGSizeMake(60,37),&padding));
++        CHECK(padding.top==1 && padding.bottom==3);
++        CHECK(!CSBubbleStyleModelInsets(m,appearance,CGSizeMake(60,5),&padding));
++    }
+     NSUInteger scenarios=0;
++    for (NSUInteger heightCase=0;heightCase<2;heightCase++)
+     for (NSUInteger templateKind=0;templateKind<3;templateKind++)
+     for (NSUInteger style=0;style<2;style++) for (NSUInteger dark=0;dark<2;dark++)
+     for (NSUInteger scale=1;scale<=3;scale++) for (NSUInteger outgoing=0;outgoing<2;outgoing++)
+     for (NSString *session in @[@"alice",@"group@chatroom"]) for (NSUInteger avatar=1;avatar<=2;avatar++)
+     for (NSUInteger quote=0;quote<2;quote++) {
+         ConfigureIntegration(style,avatar);scenarios++;
++        // Each independent scenario starts with an empty bounded image cache.
++        // Check steady scrolling without eviction from hundreds of earlier fixtures.
++        [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidReceiveMemoryWarningNotification object:nil];
+         UIImage *(*makeTemplate)(CGFloat,CGFloat,CGFloat)=templateKind ? NativeCapsTemplate : Template;
+-        BubbleInfo *info=[BubbleInfo new];info.normal=makeTemplate(scale,1,3);info.pressed=makeTemplate(scale,1,3);
+-        info.darkNormal=makeTemplate(scale,2,4);info.darkPressed=makeTemplate(scale,2,4);
+-        CGFloat top=dark ? 2 : 1,bottom=dark ? 4 : 3;
++        CGFloat bodyHeight=heightCase ? 37 : 38;
++        BubbleInfo *info=[BubbleInfo new];info.normal=makeTemplate(scale,heightCase ? 0 : 1,heightCase ? 0 : 3);info.pressed=info.normal;
++        info.darkNormal=makeTemplate(scale,heightCase ? 0 : 2,heightCase ? 0 : 4);info.darkPressed=info.darkNormal;
++        CGFloat top=heightCase ? 0 : (dark ? 2 : 1),bottom=heightCase ? 0 : (dark ? 4 : 3);
+         TestController *page=[TestController new];page.session=session;page.nodes=[NSMutableArray array];
+         UIWindow *window=[UIWindow new];UITableView *table=[UITableView new];page.table=table;page.view=table;table.window=window;
+         table.bounds=CGRectMake(0,0,320,600);table.traitCollection.userInterfaceStyle=dark ? UIUserInterfaceStyleDark : UIUserInterfaceStyleLight;
+@@ -113,7 +130,7 @@
+         for (NSUInteger i=0;i<3;i++) {
+             BOOL voice=templateKind==2 && i==(quote ? 0 : 1);
+             TextMessageViewModel *m=voice ? [VoiceMessageViewModel new] : [TextMessageViewModel new];
+-            m.messageWrap=model(20000+(unsigned)i).messageWrap;m.contentViewSize=CGSizeMake(0,38);m.isSender=outgoing;
++            m.messageWrap=model(20000+(unsigned)i).messageWrap;m.contentViewSize=CGSizeMake(0,bodyHeight);m.isSender=outgoing;
+             m.messageWrap.m_nsFromUsr=session;m.bgBubbleInfo=info;m.messageWrap.m_uiMessageType=voice ? 34 : 1;
+             if (quote && i==1) { m.messageWrap.m_uiMessageType=49;m.messageWrap.m_uiAppMsgInnerType=57;
+                 m.canShowReplyMessage=YES;m.replyTextSize=CGSizeMake(160,24);m.replyTextInset=UIEdgeInsetsMake(2,0,3,0); }
+@@ -123,29 +140,29 @@
+         for (NSUInteger i=0;i<3;i++) {
+             TextMessageViewModel *m=page.nodes[i];BOOL identity=avatar==2 ? i==0 : i==2;
+             BOOL named=identity && !outgoing && [session hasSuffix:@"@chatroom"];
+-            CGFloat y=named ? 17 : 8,extra=quote && i==1 ? 33 : 0,native=(named ? 67 : 55)+extra;
++            CGFloat y=named ? 17 : 8,extra=quote && i==1 ? 33 : 0,native=(named ? 29 : 17)+bodyHeight+extra;
+             NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];[paths addObject:path];
+             CSMessageMergePrepare(page,table,path);CGFloat height=CSMessageMergeRowHeight(page,table,path,native);
+             CHECK(height<native || (named && i==2)); // Compact before display; keep the last-row nickname footprint.
+             [heights addObject:@(height)];[nativeHeights addObject:@(native)];
+             IntegrationCellView *v=[IntegrationCellView new];v.viewModel=m;v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
+-            v.container=[UIView new];v.container.frame=CGRectMake(0,0,320,native);v.container.bounds=v.container.frame;[v addSubview:v.container];
++            v.container=[UIView new];v.container.frame=CGRectMake(40,y,240,native-y);v.container.bounds=CGRectMake(0,0,240,native-y);[v addSubview:v.container];
+             v.traitCollection.userInterfaceStyle=table.traitCollection.userInterfaceStyle;
+-            v.head=[UIView new];v.head.frame=CGRectMake(0,named ? 3 : 8,38,38);v.head.bounds=CGRectMake(0,0,38,38);[v.container addSubview:v.head];
+-            YYAsyncImageView *bg=[YYAsyncImageView new];bg.frame=CGRectMake(50,y,180,38);bg.bounds=CGRectMake(0,0,180,38);
++            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 282 : 0,named ? 3 : 8,38,38);v.head.bounds=CGRectMake(0,0,38,38);[v addSubview:v.head];
++            YYAsyncImageView *bg=[YYAsyncImageView new];bg.frame=CGRectMake(10,0,180,bodyHeight);bg.bounds=CGRectMake(0,0,180,bodyHeight);
+             bg.traitCollection.userInterfaceStyle=v.traitCollection.userInterfaceStyle;
+             bg.image=[ForbiddenYYImage deferredImageWithUIImage:dark ? info.darkNormal : info.normal];
+             bg.highlightedImage=[ForbiddenYYImage deferredImageWithUIImage:dark ? info.darkPressed : info.pressed];
+             v.content=bg;[v.container addSubview:bg];
+             if (named) { v->m_chatRoomNameLabel=[UIView new];v->m_chatRoomNameLabel.frame=CGRectMake(50,0,160,14);
+-                v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,160,14);[v.container addSubview:v->m_chatRoomNameLabel]; }
+-            if (extra) { UIView *reply=[UIView new];reply.frame=CGRectMake(50,y+42,160,29);reply.bounds=CGRectMake(0,0,160,29);[v.container addSubview:reply]; }
++                v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,160,14);[v addSubview:v->m_chatRoomNameLabel]; }
++            if (extra) { UIView *reply=[UIView new];reply.frame=CGRectMake(10,bodyHeight+4,160,29);reply.bounds=CGRectMake(0,0,160,29);[v.container addSubview:reply]; }
+             TestTableCell *cell=[TestTableCell new];cell.cellView=v;cells[path]=cell;[views addObject:v];
+             CSMessageMergeBind(page,table,path,cell);
+         }
+         table.testCells=cells;table.testHeights=heights;table.indexPathsForVisibleRows=paths;
+         NSUInteger requests=info.requests,scans=0,resets=((TextMessageViewModel *)page.nodes[1]).resetCount;
+-        CHECK(requests==6); // Two cached native templates per initial plan, never per frame.
++        CHECK(requests==(style ? 12 : 6)); // Two per plan and per initial styled binding, never per frame.
+         for (NSUInteger pass=0;pass<16;pass++) {
+             table.dragging=pass<5;table.decelerating=pass>=5 && pass<10;
+             if (pass==1 || pass==3) for (TestCellView *v in views) {
+@@ -169,8 +186,8 @@
+                 }
+                 if (i) {
+                     TestCellView *previous=views[i-1];BOOL previousQuoted=quote && i==2;
+-                    CGFloat previousBottom=previous.frame.origin.y+previous.content.frame.origin.y+38+(previousQuoted ? 33 : -bottom);
+-                    CGFloat currentTop=v.frame.origin.y+v.content.frame.origin.y+top;
++                    CGFloat previousBottom=previous.frame.origin.y+CGRectGetMinY([previous convertRect:previous.content.bounds fromView:previous.content])+bodyHeight+(previousQuoted ? 33 : -bottom);
++                    CGFloat currentTop=v.frame.origin.y+CGRectGetMinY([v convertRect:v.content.bounds fromView:v.content])+top;
+                     BOOL named=!outgoing && [session hasSuffix:@"@chatroom"] && avatar==1 && i==2;
+                     CGFloat gap=[heights[i-1] doubleValue]+currentTop-previousBottom;
+                     CHECK(fabs(gap-(named ? 18+top : 2))<.01);
+@@ -178,6 +195,8 @@
+             }
+             CSMessageMergeFlush(page);CHECK(table.updateCount==0);CHECK(info.requests==requests);
+             if (pass==4) scans=CSBubbleNativePaddingScanCount;
++            if (pass>4 && scans!=CSBubbleNativePaddingScanCount)
++                fprintf(stderr,"Unexpected scan: fixture=%lu style=%lu dark=%lu scale=%lu outgoing=%lu session=%s avatar=%lu quote=%lu pass=%lu before=%lu after=%lu\n",(unsigned long)templateKind,(unsigned long)style,(unsigned long)dark,(unsigned long)scale,(unsigned long)outgoing,session.UTF8String,(unsigned long)avatar,(unsigned long)quote,(unsigned long)pass,(unsigned long)scans,(unsigned long)CSBubbleNativePaddingScanCount);
+             if (pass>4) CHECK(scans==CSBubbleNativePaddingScanCount);
+         }
+         CHECK(((TextMessageViewModel *)page.nodes[1]).resetCount==resets+16); // Only simulated native resets.
+--- a/Tests/MessageMergeAdapterTests.m
++++ b/Tests/MessageMergeAdapterTests.m
+@@ -94,9 +94,19 @@
+ - (id)getContentView;
+ @end
+ @implementation TestCellView
++- (void)setSubviews:(NSArray *)children {
++    [super setSubviews:children];
++    for (UIView *child in children) child.superview=self;
++}
+ - (id)getHeadImageView { return self.head; }
+ - (id)getContentView { return self.content; }
+ - (id)getBgImageView { return self.content; }
++@end
++@interface NativeHierarchyCellView : TestCellView
++@property(nonatomic,strong) UIView *container;
++@end
++@implementation NativeHierarchyCellView
++- (id)getContentView { return self.container; }
+ @end
+ @interface TestTableCell : NSObject
+ @property(nonatomic,strong) TestCellView *cellView;
+@@ -250,7 +260,76 @@
+         }
+     }
+ }
++static void VerifyNativeAvatarHierarchy(void) {
++    // 8.0.78 adds the avatar directly to the cell, while the bubble belongs to
++    // m_contentView. Compare both in cell coordinates, including a shifted container.
++    UIWindow *window=[UIWindow new];
++    insetBackground=[UIView new];visibleInsets=(UIEdgeInsets){1,0,3,0};
++    for (NSUInteger outgoing=0;outgoing<2;outgoing++) for (NSUInteger avatar=1;avatar<=2;avatar++) {
++        [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSMessageMergeEnabledKey:@YES,
++            CSMessageMergeScopeKey:@3,CSMessageMergeSpacingModeKey:@1,CSMessageMergeAvatarKey:@(avatar)} forName:NSArgumentDomain];
++        TestController *page=[TestController new];page.session=@"alice";page.nodes=[NSMutableArray array];
++        UITableView *table=[UITableView new];page.table=table;page.view=table;table.window=window;
++        table.bounds=CGRectMake(0,0,320,600);
++        for (NSUInteger i=0;i<3;i++) {
++            TextMessageViewModel *m=model(18000+(unsigned)i);m.isSender=outgoing;
++            m.messageWrap.m_nsFromUsr=page.session;m.messageWrap.m_uiMessageType=1;m.contentViewSize=CGSizeMake(0,38);
++            [page.nodes addObject:m];
++        }
++        CSMessageMergeActivate(page);
++        NSMutableArray *paths=[NSMutableArray array],*views=[NSMutableArray array],*heights=[NSMutableArray array];
++        NSMutableDictionary *cells=[NSMutableDictionary dictionary];
++        for (NSUInteger i=0;i<3;i++) {
++            NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];[paths addObject:path];
++            CSMessageMergePrepare(page,table,path);CGFloat height=CSMessageMergeRowHeight(page,table,path,55);[heights addObject:@(height)];
++            NativeHierarchyCellView *v=[NativeHierarchyCellView new];v.viewModel=page.nodes[i];v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
++            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 280 : 2,8,38,38);v.head.bounds=CGRectMake(0,0,38,38);
++            v.container=[UIView new];v.container.frame=CGRectMake(50,8,220,38);v.container.bounds=CGRectMake(0,0,220,38);
++            v.content=[UIView new];v.content.frame=CGRectMake(0,0,220,38);v.content.bounds=v.content.frame;
++            v.container.subviews=@[v.content];v.content.superview=v.container;v.subviews=@[v.head,v.container];
++            TestTableCell *cell=[TestTableCell new];cell.cellView=v;cells[path]=cell;[views addObject:v];
++            CSMessageMergeBind(page,table,path,cell);
++        }
++        table.testCells=cells;table.testHeights=heights;table.indexPathsForVisibleRows=paths;
++        for (NSUInteger pass=0;pass<8;pass++) {
++            table.dragging=pass<2;table.decelerating=pass>=2 && pass<5;
++            for (NSUInteger i=0;i<3;i++) {
++                NativeHierarchyCellView *v=views[i];CSMessageMergeRender(v);
++                CHECK(CSMessageMergeRowHeight(page,table,paths[i],55)==[heights[i] doubleValue]);
++                if (!v.head.hidden) {
++                    CGRect rect=[v convertRect:v.head.bounds fromView:v.head];
++                    CHECK(v.frame.origin.y+CGRectGetMinY(rect)>=0);
++                    CHECK(v.frame.origin.y+CGRectGetMaxY(rect)<=[heights[i] doubleValue]+.01);
++                }
++                if (i) {
++                    NativeHierarchyCellView *previous=views[i-1];
++                    CGFloat end=previous.frame.origin.y+CGRectGetMaxY([previous convertRect:previous.content.bounds fromView:previous.content])-3;
++                    CGFloat start=v.frame.origin.y+CGRectGetMinY([v convertRect:v.content.bounds fromView:v.content])+1;
++                    CHECK(fabs([heights[i-1] doubleValue]+start-end-2)<.01);
++                }
++            }
++            CSMessageMergeFlush(page);CHECK(table.updateCount==0);
++        }
++        if (outgoing) {
++            NSUInteger identity=avatar==2 ? 0 : 2;NativeHierarchyCellView *v=views[identity];
++            // Local frames appear separate, but the container now moves the bubble
++            // into the avatar's lane. This must retain the normal safety expansion.
++            CGRect shifted=v.container.frame;shifted.origin.x=270;v.container.frame=shifted;
++            CSMessageMergeRender(v);
++            CGFloat safeHeight=CSMessageMergeRowHeight(page,table,paths[identity],55);
++            CHECK(safeHeight>[heights[identity] doubleValue]);CHECK(v.head.frame.origin.y==8);
++            for (NSUInteger pass=0;pass<4;pass++) {
++                CSMessageMergeRender(v);CHECK(CSMessageMergeRowHeight(page,table,paths[identity],55)==safeHeight);
++                CHECK(v.head.frame.origin.y==8);
++            }
++        }
++        for (NativeHierarchyCellView *v in views) CSMessageMergeReuse(v);
++        CSMessageMergeDeactivate(page);
++    }
++    insetBackground=nil;visibleInsets=(UIEdgeInsets){0,0,0,0};
++}
+ int main(void) { @autoreleasepool {
++    VerifyNativeAvatarHierarchy();
+     VerifyShortAndQuotedSeams();
+     TestWrap *timeWrap=[TestWrap new];timeWrap.m_uiCreateTime=1700000000;
+     TextMessageViewModel *timeModel=[TextMessageViewModel new];timeModel.messageWrap=timeWrap;
+--- a/control
++++ b/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 1.8-33
++Version: 1.8-34
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会

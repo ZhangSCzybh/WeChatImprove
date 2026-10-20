@@ -1,0 +1,2 @@
+Payment core: 2215 checks passed
+FAIL 498: [notice hasSuffix:@"时间：10-19 06:32:08"]

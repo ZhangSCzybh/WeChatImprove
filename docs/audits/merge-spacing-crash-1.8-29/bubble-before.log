@@ -1,0 +1,26 @@
+Bubble policy/renderer/ownership: 36979 checks passed
+*** Terminating app due to uncaught exception 'UnsafeLazyDecode', reason: 'originImage invoked during layout'
+*** First throw call stack:
+(
+	0   CoreFoundation                      0x0000000185a3a8c0 __exceptionPreprocess + 176
+	1   libobjc.A.dylib                     0x000000018549860c objc_exception_throw + 88
+	2   CoreFoundation                      0x0000000185a3a7b0 +[NSException exceptionWithName:reason:userInfo:] + 0
+	3   bubble-adapter-tests                0x00000001025c68c4 -[LazyYYImage originImage] + 52
+	4   bubble-adapter-tests                0x00000001025c5c78 CSMessageNativeObject + 224
+	5   bubble-adapter-tests                0x00000001025befd8 CSDecodedImage + 64
+	6   bubble-adapter-tests                0x00000001025c0354 CSBubbleStyleApply + 2240
+	7   bubble-adapter-tests                0x00000001025c2ad4 __CSBubbleStyleImageAssignment_block_invoke + 260
+	8   libdispatch.dylib                   0x0000000185748a34 _dispatch_call_block_and_release + 32
+	9   libdispatch.dylib                   0x00000001857625a0 _dispatch_client_callout + 16
+	10  libdispatch.dylib                   0x0000000185780998 _dispatch_main_queue_drain.cold.6 + 832
+	11  libdispatch.dylib                   0x0000000185757b0c _dispatch_main_queue_drain + 176
+	12  libdispatch.dylib                   0x0000000185757a4c _dispatch_main_queue_callback_4CF + 44
+	13  CoreFoundation                      0x0000000185a079cc __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__ + 16
+	14  CoreFoundation                      0x00000001859c965c __CFRunLoopRun + 1980
+	15  CoreFoundation                      0x0000000185aa382c _CFRunLoopRunSpecificWithOptions + 536
+	16  bubble-adapter-tests                0x00000001025cdc04 Drain + 76
+	17  bubble-adapter-tests                0x00000001025c8a64 main + 8388
+	18  dyld                                0x0000000185533e80 start + 6688
+)
+libc++abi: terminating due to uncaught exception of type NSException
+Tests/verify-bubble-style.sh: line 17: 75612 Abort trap: 6           "$test_dir/bubble-adapter-tests"

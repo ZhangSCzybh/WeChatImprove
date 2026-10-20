@@ -6,6 +6,8 @@ FOUNDATION_EXPORT id _Nullable CSGroupReadObject(id _Nullable object, NSString *
 FOUNDATION_EXPORT long long CSGroupReadInteger(id _Nullable object, NSString *name, long long fallback);
 FOUNDATION_EXPORT CSGroupRowCategory CSGroupCategoryForContact(id _Nullable contact);
 FOUNDATION_EXPORT NSArray<NSArray<CSGroupRow *> *> * _Nullable CSGroupBuildNativeSections(id controller, id table, id source);
+/// Re-read native values, then share unchanged immutable rows/sections. Caller enforces the account boundary.
+FOUNDATION_EXPORT NSArray<NSArray<CSGroupRow *> *> * _Nullable CSGroupBuildNativeSectionsReusing(id controller, id table, id source, NSArray<NSArray<CSGroupRow *> *> * _Nullable previous);
 /// Revalidates a snapshot identity against current host rows. Caller checks account.
 /// Anonymous business rows require verified bounds; a dirty model also requires
 /// proving the slot still has no native session or named fake row. This permits

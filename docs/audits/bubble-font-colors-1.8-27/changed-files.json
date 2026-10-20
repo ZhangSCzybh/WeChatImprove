@@ -1,0 +1,18 @@
+[
+  "Controllers/CSBubbleStylePreview.m",
+  "Controllers/CSBubbleStylePolicy.h",
+  "Controllers/CSBubbleStylePolicy.m",
+  "Controllers/CSBubbleStylePreview.h",
+  "Controllers/CSBubbleStyleSettingsViewController.m",
+  "Controllers/CSBubbleStyleAdapter.m",
+  "Controllers/CSReleaseNotesViewController.m",
+  "Hooks/BubbleStyleHooks.xm",
+  "Headers/CSUserInfoHelper.h",
+  "Tests/BubbleStyleAdapterTests.m",
+  "Tests/verify-bubble-style.sh",
+  "Tests/BubbleStyleTests.m",
+  "Tests/BubbleUIKit/BubbleUIKit.m",
+  "Tests/BubbleUIKit/UIKit/UIKit.h",
+  "README.md",
+  "control"
+]

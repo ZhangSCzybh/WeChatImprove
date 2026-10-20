@@ -1,0 +1,28 @@
+{
+  "initial_files_verified": 44335,
+  "changed_files": [
+    "Controllers/CSBubbleStylePolicy.h",
+    "Controllers/CSBubbleStylePolicy.m",
+    "Controllers/CSBubbleStylePreview.m",
+    "Controllers/CSBubbleStyleSettingsViewController.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "README.md",
+    "Tests/BubbleStyleAdapterTests.m",
+    "Tests/BubbleStyleTests.m",
+    "control"
+  ],
+  "merge_and_bubble_adapter_unchanged": [
+    "Controllers/CSMessageMergeAdapter.h",
+    "Controllers/CSMessageMergeAdapter.m",
+    "Controllers/CSMessageMergePolicy.h",
+    "Controllers/CSMessageMergePolicy.m",
+    "Controllers/CSBubbleStyleAdapter.m",
+    "Hooks/BubbleStyleHooks.xm"
+  ],
+  "prior_artifacts_unchanged": true,
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "device_installed": false,
+  "database_access": false,
+  "service_restart": false
+}

@@ -1,0 +1,8 @@
+[
+  "make",
+  "-j4",
+  "package",
+  "SCHEME=rootless",
+  "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-merge-voice-translation-1.8-36-s3vx3bg7/theos",
+  "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-merge-voice-translation-1.8-36-s3vx3bg7/packages"
+]

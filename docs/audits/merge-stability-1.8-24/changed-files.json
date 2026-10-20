@@ -1,0 +1,8 @@
+[
+  "README.md",
+  "control",
+  "Tests/MessageMergeAdapterTests.m",
+  "Headers/CSUserInfoHelper.h",
+  "Controllers/CSMessageMergeAdapter.m",
+  "Controllers/CSReleaseNotesViewController.m"
+]

@@ -1,0 +1,253 @@
+--- 1.8-29/Controllers/CSMessageMergeAdapter.m
++++ 1.8-30/Controllers/CSMessageMergeAdapter.m
+@@ -84,7 +84,6 @@
+ @property(nonatomic) BOOL hasNativeGeometry;
+ @property(nonatomic) CGFloat occupiedTop;
+ @property(nonatomic) CGFloat occupiedBottom;
+-@property(nonatomic) CGFloat displayScale;
+ @property(nonatomic) NSUInteger auxiliaryFlags;
+ @property(nonatomic) BOOL showsName;
+ @end
+@@ -393,14 +392,6 @@
+     if (identity) *bottom=MAX(*bottom,(named ? 3 : 8)+38);
+     return *bottom<=s.nativeHeight;
+ }
+-static CGFloat CSDisplayScale(CSMessageMergeContext *ctx) {
+-    id traits=CSMessageNativeObject(ctx.table,@"traitCollection");
+-    SEL sel=NSSelectorFromString(@"displayScale");
+-    NSMethodSignature *signature=[traits methodSignatureForSelector:sel];
+-    if (signature.numberOfArguments!=2 || strcmp(signature.methodReturnType,@encode(CGFloat))) return 1;
+-    CGFloat scale=((CGFloat(*)(id,SEL))objc_msgSend)(traits,sel);
+-    return isfinite(scale) && scale>=1 && scale<=4 ? scale : 1;
+-}
+ static BOOL CSCanCompact(CSMessageMergeState *s, id logical) {
+     CSMessageMergeConfiguration *config=s.context.config;
+     return config.spacingMode==CSMessageSpacingCompact && !s.geometryRejected && s.contentHeight>0 &&
+@@ -418,22 +409,20 @@
+     BOOL hasContent=CSMeasuredContentSize(logical,&contentSize) && contentSize.width<=nativeSize.width+.5 &&
+         contentSize.height<=nativeSize.height;
+     if (!hasContent) contentSize=CGSizeZero;
+-    CGFloat scale=CSDisplayScale(s.context);
+     NSUInteger flags=CSAuxiliaryContentFlags(logical);
+     BOOL showsName=s.group && !CSBool(logical,@"isSender",NO) && !s.decision.hidesIdentity && CSBool(logical,@"isShowChatRoomDisplayName",YES);
+     if (fabs(s.contentWidth-contentSize.width)>.5 || fabs(s.width-nativeSize.width)>.5 || fabs(s.nativeHeight-nativeSize.height)>.5 ||
+-        fabs(s.contentHeight-contentSize.height)>.5 || s.displayScale!=scale || s.auxiliaryFlags!=flags || s.showsName!=showsName) {
++        fabs(s.contentHeight-contentSize.height)>.5 || s.auxiliaryFlags!=flags || s.showsName!=showsName) {
+         s.geometryRejected=NO;s.measurementDecided=NO;s.hasNativeGeometry=NO;
+     }
+     s.width=nativeSize.width;s.nativeHeight=nativeSize.height;s.contentHeight=contentSize.height;s.contentWidth=contentSize.width;
+-    s.displayScale=scale;
+     s.auxiliaryFlags=flags;s.showsName=showsName;
+     if (!s.measurementDecided) {
+         s.appliedDelta=0;
+         CGFloat top=s.occupiedTop,bottom=s.occupiedBottom;
+         if (CSCanCompact(s,logical) && (s.hasNativeGeometry || CSNativeProfile(s,logical,&top,&bottom))) {
+             CSMessageMergeLayoutPlan plan=CSMessageMergePlanLayout(s.context.config.spacingMode,s.nativeHeight,
+-                top,bottom,s.decision.joinsPrevious,s.decision.joinsNext,scale);
++                top,bottom,s.decision.joinsPrevious,s.decision.joinsNext);
+             if (plan.valid) s.appliedDelta=plan.height-s.nativeHeight;
+         }
+         s.measurementDecided=YES;
+@@ -522,7 +511,7 @@
+         bottom=MAX(bottom,view.frame.origin.y+CGRectGetMaxY(rect)-view.bounds.origin.y);
+     }
+     CSMessageMergeLayoutPlan actual=CSMessageMergePlanLayout(s.context.config.spacingMode,s.nativeHeight,
+-        top,bottom,s.decision.joinsPrevious,s.decision.joinsNext,s.displayScale);
++        top,bottom,s.decision.joinsPrevious,s.decision.joinsNext);
+     if (!geometryValid || !actual.valid) {
+         // An unknown/overflowing native child is never clipped to a guessed footprint.
+         if (s.appliedDelta<0) {
+--- 1.8-29/Controllers/CSMessageMergePolicy.h
++++ 1.8-30/Controllers/CSMessageMergePolicy.h
+@@ -50,10 +50,11 @@
+     BOOL valid;
+ } CSMessageMergeLayoutPlan;
+ // Bounds describe native occupied content, in row coordinates. Trim only group-facing
+-// edges; preserve the group's outer padding. Content sizes and hit regions stay native.
++// edges toward a 2pt seam; preserve the group's outer padding. All geometry is in
++// logical points, independent of display scale. Content sizes and hit regions stay native.
+ FOUNDATION_EXPORT CSMessageMergeLayoutPlan CSMessageMergePlanLayout(CSMessageSpacingMode mode,
+     double nativeHeight, double occupiedTop, double occupiedBottom,
+-    BOOL joinsPrevious, BOOL joinsNext, double scale);
++    BOOL joinsPrevious, BOOL joinsNext);
+ FOUNDATION_EXPORT long long CSMessageRevokeLinkID(NSString * _Nullable link);
+ FOUNDATION_EXPORT double CSMessageNavigationMargin(double visibleHeight, double messageHeight);
+ FOUNDATION_EXPORT double CSMessageNavigationOffset(double rowY, double rowHeight, double viewportHeight,
+--- 1.8-29/Controllers/CSBubbleStyleSettingsViewController.m
++++ 1.8-30/Controllers/CSBubbleStyleSettingsViewController.m
+@@ -100,7 +100,7 @@
+         CSSettingItem *scope=[CSSettingItem itemWithTitle:@"生效范围" iconName:@"scope" iconColor:UIColor.systemTealColor detail:scopes[merge.scope-1]];
+         scope.actionBlock=^{ [weakSelf showChoice:@"合并生效范围" message:nil titles:scopes values:@[@1,@2,@3] key:CSMessageMergeScopeKey selected:merge.scope]; };
+         CSSettingItem *spacing=[CSSettingItem itemWithTitle:@"组内间距" iconName:@"arrow.up.and.down" iconColor:UIColor.systemOrangeColor detail:CSMessageSpacingModeTitle(merge.spacingMode)];
+-        spacing.actionBlock=^{ [weakSelf showChoice:@"组内间距" message:@"正常保留原生间距；紧密以组内 2 个屏幕像素为目标，头像、昵称及附加内容仍保留必要空间。连续圆角在两种间距下均可使用。" titles:@[@"正常",@"紧密"] values:@[@0,@1] key:CSMessageMergeSpacingModeKey selected:merge.spacingMode]; };
++        spacing.actionBlock=^{ [weakSelf showChoice:@"组内间距" message:@"正常保留原生间距；紧密以组内 2pt（逻辑点）为目标，头像、昵称及附加内容仍保留必要空间。连续圆角在两种间距下均可使用。" titles:@[@"正常",@"紧密"] values:@[@0,@1] key:CSMessageMergeSpacingModeKey selected:merge.spacingMode]; };
+         CSSettingItem *avatar=[CSSettingItem itemWithTitle:@"头像保留位置" iconName:@"person.crop.circle" iconColor:UIColor.systemIndigoColor detail:merge.avatarPosition==2 ? @"首条消息" : @"末条消息"];
+         avatar.actionBlock=^{ [weakSelf showChoice:@"头像保留位置" message:@"选择一组连续消息保留哪一条的头像。连续圆角的首条和末条按消息顺序确定。" titles:@[@"首条消息",@"末条消息"] values:@[@2,@1] key:CSMessageMergeAvatarKey selected:merge.avatarPosition]; };
+         [mergeItems addObjectsFromArray:@[scope,spacing,avatar]];
+--- 1.8-29/Controllers/CSReleaseNotesViewController.m
++++ 1.8-30/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,12 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"1.8-30": @[
++            @{@"title": @"统一合并间距为 2pt",
++              @"detail": @"紧密模式下，合并消息首条与中间条、以及引用消息前后的组内间距统一以 2pt（逻辑点）为目标，间距计算不随屏幕倍率变化。"},
++            @{@"title": @"保留布局与滚动修复",
++              @"detail": @"沿用首条头像占位、群聊发送方昵称判断、引用框完整占用和快速滑动闪退修复，附加内容继续保留必要空间。"}
++        ],
+         @"1.8-29": @[
+             @{@"title": @"修复快速滑动闪退",
+               @"detail": @"修复气泡布局读取微信延迟解码图片时的空指针访问，未解码完成时保留原图，完成后自动应用样式。"},
+--- 1.8-29/Controllers/CSMessageMergePolicy.m
++++ 1.8-30/Controllers/CSMessageMergePolicy.m
+@@ -43,18 +43,18 @@
+     return mode == CSMessageSpacingCompact ? @"紧密" : @"正常";
+ }
+ CSMessageMergeLayoutPlan CSMessageMergePlanLayout(CSMessageSpacingMode mode,
+-    double nativeHeight, double top, double bottom, BOOL before, BOOL after, double scale) {
++    double nativeHeight, double top, double bottom, BOOL before, BOOL after) {
+     CSMessageMergeLayoutPlan plan={nativeHeight,0,NO};
+     if (mode!=CSMessageSpacingCompact || (!before && !after) || !isfinite(nativeHeight) || nativeHeight<=0 ||
+-        !isfinite(top) || !isfinite(bottom) || top<0 || bottom<=top || bottom>nativeHeight ||
+-        !isfinite(scale) || scale<1 || scale>4) return plan;
+-    // One physical pixel on each side of an internal seam (two pixels total).
++        !isfinite(top) || !isfinite(bottom) || top<0 || bottom<=top || bottom>nativeHeight) return plan;
++    // One logical point on each side of an internal seam (2pt total).
++    // Keep fractional native coordinates; spacing never depends on display scale.
+     // Never add padding to a native edge which is already tighter.
+-    double edge=1/scale;
++    double edge=1;
+     double leading=before ? fmin(top,edge) : top;
+     double trailing=after ? fmin(nativeHeight-bottom,edge) : nativeHeight-bottom;
+-    plan.originDelta=-floor((top-leading)*scale+1e-7)/scale;
+-    plan.height=ceil((bottom+plan.originDelta+trailing)*scale-1e-7)/scale;
++    plan.originDelta=leading-top;
++    plan.height=bottom+plan.originDelta+trailing;
+     plan.height=fmin(nativeHeight,plan.height);
+     plan.valid=YES;
+     return plan;
+--- 1.8-29/Headers/CSUserInfoHelper.h
++++ 1.8-30/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"1.8-29"  // 插件版本号
++#define kPluginVersionString @"1.8-30"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- 1.8-29/Tests/MessageMergePolicyTests.m
++++ 1.8-30/Tests/MessageMergePolicyTests.m
+@@ -61,27 +61,34 @@
+     CHECK([[CSMessageMergeConfiguration alloc] initWithDefaults:d].spacingMode==CSMessageSpacingNormal);
+     [d setInteger:99 forKey:CSMessageMergeSpacingModeKey];
+     CHECK([[CSMessageMergeConfiguration alloc] initWithDefaults:d].spacingMode==CSMessageSpacingNormal);
+-    CSMessageMergeLayoutPlan first=CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,46,NO,YES,3);
+-    CSMessageMergeLayoutPlan middle=CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,46,YES,YES,3);
+-    CSMessageMergeLayoutPlan last=CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,46,YES,NO,3);
+-    CHECK(first.valid && fabs(first.height-(46+1.0/3))<.00001 && first.originDelta==0);
+-    CHECK(middle.valid && fabs(middle.height-(38+2.0/3))<.00001 && fabs(middle.originDelta+23.0/3)<.00001);
+-    CHECK(last.valid && fabs(last.height-(47+1.0/3))<.00001 && fabs(last.originDelta+23.0/3)<.00001);
+-    CHECK(fabs((first.height+8+middle.originDelta-46)*3-2)<.00001);
+-    CHECK(fabs((middle.height+8+last.originDelta-(46+middle.originDelta))*3-2)<.00001);
++    CSMessageMergeLayoutPlan first=CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,46,NO,YES);
++    CSMessageMergeLayoutPlan middle=CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,46,YES,YES);
++    CSMessageMergeLayoutPlan last=CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,46,YES,NO);
++    CHECK(first.valid && first.height==47 && first.originDelta==0);
++    CHECK(middle.valid && middle.height==40 && middle.originDelta==-7);
++    CHECK(last.valid && last.height==48 && last.originDelta==-7);
++    CHECK(fabs(first.height+8+middle.originDelta-46-2)<.00001);
++    CHECK(fabs(middle.height+8+last.originDelta-(46+middle.originDelta)-2)<.00001);
+     CHECK(fabs(last.height-(46+last.originDelta)-(55-46))<.00001); // Outer bottom remains native.
+-    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingCompact,55,NAN,46,YES,YES,3).valid);
+-    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,56,YES,YES,3).valid);
+-    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingCompact,55,-1,46,YES,YES,3).valid);
+-    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingNormal,55,8,46,YES,YES,3).valid);
+-    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,46,NO,NO,3).valid);
++    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingCompact,55,NAN,46,YES,YES).valid);
++    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,56,YES,YES).valid);
++    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingCompact,55,-1,46,YES,YES).valid);
++    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingNormal,55,8,46,YES,YES).valid);
++    CHECK(!CSMessageMergePlanLayout(CSMessageSpacingCompact,55,8,46,NO,NO).valid);
+     for (int height=20;height<400;height++) for (int content=10;content<=height;content+=5) {
+-        double top=(height-content)*.37,bottom=top+content;
+-        for (int scale=1;scale<=3;scale++) {
+-            CSMessageMergeLayoutPlan plan=CSMessageMergePlanLayout(CSMessageSpacingCompact,height,top,bottom,YES,YES,scale);
+-            CHECK(plan.valid && plan.height<=height && plan.height>=content);
+-            CHECK(top+plan.originDelta>=0 && bottom+plan.originDelta<=plan.height+.00001);
+-            CHECK(fabs(plan.originDelta*scale-round(plan.originDelta*scale))<.00001);
++        // Non-pixel-aligned native coordinates must retain a 2pt seam too.
++        for (int fraction=1;fraction<=3;fraction++) {
++            double top=(height-content)*(.17*fraction),bottom=top+content;
++            CSMessageMergeLayoutPlan plan=CSMessageMergePlanLayout(CSMessageSpacingCompact,height,top,bottom,YES,YES);
++            CHECK(plan.valid && plan.height<=height && plan.height>=content-.00001);
++            CHECK(top+plan.originDelta>=-.00001 && bottom+plan.originDelta<=plan.height+.00001);
++            if (top>=1 && height-bottom>=1) {
++                CSMessageMergeLayoutPlan head=CSMessageMergePlanLayout(CSMessageSpacingCompact,height,top,bottom,NO,YES);
++                CSMessageMergeLayoutPlan tail=CSMessageMergePlanLayout(CSMessageSpacingCompact,height,top,bottom,YES,NO);
++                CHECK(fabs(head.height+top+plan.originDelta-(bottom+head.originDelta)-2)<.00001);
++                CHECK(fabs(plan.height+top+tail.originDelta-(bottom+plan.originDelta)-2)<.00001);
++                CHECK(fabs(tail.height-(bottom+tail.originDelta)-(height-bottom))<.00001);
++            }
+         }
+     }
+     [d removePersistentDomainForName:suite];
+--- 1.8-29/Tests/MessageMergeAdapterTests.m
++++ 1.8-30/Tests/MessageMergeAdapterTests.m
+@@ -202,9 +202,9 @@
+                         TestCellView *previous=views[i-1];
+                         CGFloat gap=[heights[i-1] doubleValue]+v.frame.origin.y+[starts[i] doubleValue]-previous.frame.origin.y-[ends[i-1] doubleValue];
+                         // A last-row group nickname already starts at y=0; retain its native edge.
+-                        CGFloat pixels=[starts[i] doubleValue]==0 ? 1 : 2;
+-                        if (fabs(gap*scale-pixels)>=.00001) fprintf(stderr,"seam scale=%lu group=%lu outgoing=%lu avatar=%lu quote=%ld pass=%lu row=%lu gap=%g height=%g prevY=%g y=%g\n",scale,group,outgoing,avatar,quote,pass,i,gap,[heights[i-1] doubleValue],previous.frame.origin.y,v.frame.origin.y);
+-                        CHECK(fabs(gap*scale-pixels)<.00001);
++                        CGFloat points=[starts[i] doubleValue]==0 ? 1 : 2;
++                        if (fabs(gap-points)>=.00001) fprintf(stderr,"seam scale=%lu group=%lu outgoing=%lu avatar=%lu quote=%ld pass=%lu row=%lu gap=%g height=%g prevY=%g y=%g\n",scale,group,outgoing,avatar,quote,pass,i,gap,[heights[i-1] doubleValue],previous.frame.origin.y,v.frame.origin.y);
++                        CHECK(fabs(gap-points)<.00001);
+                     }
+                     CHECK(v.frame.origin.y+[starts[i] doubleValue]>=-.00001);
+                     CHECK(v.frame.origin.y+[ends[i] doubleValue]<=[heights[i] doubleValue]+.00001);
+--- 1.8-29/README.md
++++ 1.8-30/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
+ 
+-**当前版本：`1.8-29`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`1.8-30`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
+ 
+@@ -10,17 +10,17 @@
+ 
+ | 项目 | 当前状态 |
+ | --- | --- |
+-| 插件版本 | `1.8-29`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
++| 插件版本 | `1.8-30`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+ | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
+ | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
+ | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
+-| Rootless / Rootful | `1.8-29` 为修复合并间距与滚动闪退的 Rootless 包，保留字体颜色、连续圆角、通话背景与预览；Rootful 保留构建入口，本轮未验证 |
++| Rootless / Rootful | `1.8-30` 为统一合并间距为 2pt 的 Rootless 包，保留字体颜色、连续圆角、通话背景与预览；Rootful 保留构建入口，本轮未验证 |
+ | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
+ | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
+ 
+ 微信私有类、方法和界面结构会随版本变化。当前已有编译与逻辑回归结果，真实设备上的界面渲染、原生菜单和不同插件组合仍需按实际环境验证。
+ 
+-本轮记录见 [1.8-29 合并间距与滚动闪退](docs/audits/merge-spacing-crash-1.8-29/README.md)。基于已回退的 1.8-27，修正微信 8.0.78 标准短文本的头像占位与群聊发送方昵称判断，紧密模式组内接缝目标为 2 个屏幕物理像素。引用消息按正文、引用框及原生内边距计算完整占用后收紧前后间距；分段长文本、翻译和其他未知附加内容继续保留必要空间。根据所附闪退日志及匹配 UUID 的二进制，移除布局路径对 `YYImage.originImage` 延迟解码 getter 的调用，未就绪图片等待原生解码回调。保留 [1.8-27 字体颜色](docs/audits/bubble-font-colors-1.8-27/README.md)、[1.8-26 连续圆角](docs/audits/bubble-connected-1.8-26/README.md) 和 [1.8-25 通话背景与设置页](docs/audits/bubble-stacked-1.8-25/README.md)。本轮为主机回归与构建验证，真机滚动与渲染仍需验收。
++本轮记录见 [1.8-30 合并间距统一为 2pt](docs/audits/merge-spacing-points-1.8-30/README.md)。紧密模式下，标准合并消息首条与中间条、以及引用消息前后的组内间距统一以 **2pt（逻辑点）** 为目标；直接按逻辑坐标计算行高与位移，移除屏幕倍率换算和物理像素取整。沿用 [1.8-29 的首条占位、引用框完整布局与滚动闪退修复](docs/audits/merge-spacing-crash-1.8-29/README.md)，保留字体颜色、连续圆角、通话背景及附加内容保护。不同屏幕倍率与分数坐标的主机回归、全部回归入口和构建验证见本轮记录；真机滚动与渲染仍需验收。
+ 
+ ## 安装与入口
+ 
+--- 1.8-29/control
++++ 1.8-30/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 1.8-29
++Version: 1.8-30
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会

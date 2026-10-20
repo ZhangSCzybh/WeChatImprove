@@ -1,0 +1,143 @@
+--- before/Controllers/CSBubbleStyleAdapter.m
++++ after/Controllers/CSBubbleStyleAdapter.m
+@@ -38,6 +38,8 @@
+ @property(nonatomic) NSUInteger position;
+ @property(nonatomic) CSBubbleGroupPosition group;
+ @property(nonatomic) BOOL descriptorValid;
++@property(nonatomic, weak) id describedWrap;
++@property(nonatomic) unsigned long long describedType, describedInnerType, describedRefer;
+ @property(nonatomic) NSUInteger appliedGeneration;
+ @property(nonatomic) BOOL appliedDark;
+ @end
+@@ -121,7 +123,7 @@
+     // invokes that block without rechecking. The supplied crash has a nil block
+     // at that invocation (ldr [x0,#0x10]). Do not call this getter from layout.
+     // Resolve object ivars by name/type, never private offsets or lazy accessors.
+-    const char *slots[]={"m_originImage",dark?"_decodeImageDM":"_decodeImageLM",dark?"_decodeImageLM":"_decodeImageDM"};
++    const char *slots[]={dark?"_decodeImageDM":"_decodeImageLM","m_originImage",dark?"_decodeImageLM":"_decodeImageDM"};
+     for (NSUInteger i=0;i<3;i++) {
+         Ivar slot=class_getInstanceVariable(object_getClass(image),slots[i]);
+         const char *type=slot ? ivar_getTypeEncoding(slot) : NULL;
+@@ -154,7 +156,7 @@
+     for (NSUInteger slot=0;slot<2;slot++) {
+         id source=CSCurrentImage((UIImageView *)background,slot!=0);
+         if (slot && !source) continue;
+-        UIImage *image=CSDecodedImage(source,NO);
++        UIImage *image=CSDecodedImage(source,CSBubbleStyleIsDark(background));
+         // Only upright stretchable templates preserve transparent margins in points.
+         // Protect the union of normal/highlighted pixels, including native highlights.
+         if (!image || image.images.count || image.imageOrientation!=UIImageOrientationUp ||
+@@ -182,7 +184,8 @@
+     binding.images.generatedImage=nil; binding.images.generatedHighlightedImage=nil;
+ }
+ static void CSDescribe(CSBubbleBinding *binding, id model) {
+-    binding.descriptorValid=YES; binding.supported=NO;
++    // Missing metadata is transient, not a permanently unsupported message.
++    binding.descriptorValid=NO; binding.supported=NO;
+     id parent=CSMessageNativeObject(model,@"parentModel"); id logical=parent?:model;
+     id wrap=CSMessageNativeObject(logical,@"messageWrap");
+     unsigned long long type=0,sender=0,position=0;
+@@ -193,7 +196,12 @@
+     // Independent call records need no text-segment metadata. If present, still
+     // validate it; never treat an unknown text segment as a complete message.
+     if ((!CSUnsigned(bubble,@"position",&position) && !callRecord) || position>3) return;
++    binding.descriptorValid=YES;
+     unsigned long long innerType=0,isRefer=0;
++    CSUnsigned(wrap,@"m_uiAppMsgInnerType",&innerType);CSUnsigned(wrap,@"isReferMsgType",&isRefer);
++    binding.describedWrap=wrap;binding.describedType=type;
++    binding.describedInnerType=innerType;binding.describedRefer=isRefer;
++    binding.outgoing=sender!=0;binding.position=(NSUInteger)position;
+     BOOL textModel=[className isEqual:@"TextMessageViewModel"];
+     BOOL quotedText=textModel && type==49 &&
+         ((CSUnsigned(wrap,@"m_uiAppMsgInnerType",&innerType) && innerType==57) ||
+@@ -205,7 +213,7 @@
+     if (!ordinary && !callRecord) { return; }
+     binding.outgoing=sender!=0; binding.position=(NSUInteger)position; binding.supported=YES;binding.callRecord=callRecord;
+ }
+-static BOOL CSDark(UIView *cell) {
++BOOL CSBubbleStyleIsDark(UIView *cell) {
+     // The private isUseLightStyle flag is not UIKit's appearance contract. Inverting
+     // it can select dark colors on a light chat. Honor the effective view appearance,
+     // including WeChat's per-window override, before falling back for unattached cells.
+@@ -213,6 +221,46 @@
+     if (style==UIUserInterfaceStyleUnspecified) style=cell.window.traitCollection.userInterfaceStyle;
+     if (style==UIUserInterfaceStyleUnspecified) style=UITraitCollection.currentTraitCollection.userInterfaceStyle;
+     return style==UIUserInterfaceStyleDark;
++}
++BOOL CSBubbleStyleModelInsets(id model, UIView *appearance, CGSize size, UIEdgeInsets *insets) {
++    if (!NSThread.isMainThread || !insets || !isfinite(size.height) || size.height<=0) return NO;
++#ifndef CS_BUBBLE_TESTING
++    NSString *version=NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"];
++    if (![version isEqual:@"8.0.78"] && ![version hasPrefix:@"8.0.78."]) return NO;
++#endif
++    id info=CSMessageNativeObject(model,@"bgBubbleInfo");
++    if (![NSStringFromClass([info class]) isEqual:@"BubbleInfo"]) return NO;
++    SEL sel=NSSelectorFromString(@"getBubbleImage:isDarkMode:useCache:");
++    Method method=class_getInstanceMethod([info class],sel);
++    if (!method || method_getNumberOfArguments(method)!=5) return NO;
++    char type[32]={0};method_getReturnType(method,type,sizeof(type));
++    if (type[0]!='@') return NO;
++    for (unsigned int i=2;i<5;i++) {
++        method_getArgumentType(method,i,type,sizeof(type));
++        if (strcmp(type,@encode(BOOL))) return NO;
++    }
++    CSBubbleStyleStart();
++    BOOL dark=CSBubbleStyleIsDark(appearance);
++    UIEdgeInsets result={0,0,0,0};
++    @try {
++        for (NSUInteger slot=0;slot<2;slot++) {
++            // Verified 8.0.78 contract: returns a cached, stretchable UIImage;
++            // useCache:YES avoids resolving/rasterizing a template for every row.
++            id source=((id(*)(id,SEL,BOOL,BOOL,BOOL))objc_msgSend)(info,sel,slot!=0,dark,YES);
++            UIImage *image=CSReadyUIImage(source,NSClassFromString(@"YYImage"));
++            if (slot && !source) continue;
++            if (!image || image.images.count || image.imageOrientation!=UIImageOrientationUp ||
++                (image.capInsets.top<=0 && image.capInsets.bottom<=0) ||
++                size.height<image.capInsets.top+image.capInsets.bottom+1/image.scale ||
++                (size.width>0 && size.width<image.capInsets.left+image.capInsets.right+1/image.scale)) return NO;
++            CSBubbleInsets padding;
++            if (!CSBodyPadding(image,&padding)) return NO;
++            if (!slot) result=UIEdgeInsetsMake(padding.top,padding.left,padding.bottom,padding.right);
++            else result=UIEdgeInsetsMake(MIN(result.top,padding.top),MIN(result.left,padding.left),
++                                        MIN(result.bottom,padding.bottom),MIN(result.right,padding.right));
++        }
++    } @catch (__unused NSException *exception) { return NO; }
++    *insets=result;return YES;
+ }
+ static CSBubbleGroupPosition CSGroupPosition(id model, NSUInteger nativePosition) {
+     if (CSStyle.kind!=CSBubbleStyleStacked || nativePosition!=0) return CSBubbleGroupSingle;
+@@ -268,15 +316,22 @@
+         [CSCells addObject:cell];
+     }
+     if (binding.applying) return;
+-    unsigned long long currentPosition=0;
+-    if (binding.descriptorValid && CSUnsigned(CSMessageNativeObject(model,@"bgBubbleInfo"),@"position",&currentPosition) && currentPosition!=binding.position) {
++    unsigned long long currentPosition=0,type=0,inner=0,refer=0,sender=0;
++    id logical=CSMessageNativeObject(model,@"parentModel")?:model;
++    id wrap=CSMessageNativeObject(logical,@"messageWrap");
++    BOOL positioned=CSUnsigned(CSMessageNativeObject(model,@"bgBubbleInfo"),@"position",&currentPosition);
++    BOOL typed=CSUnsigned(wrap,@"m_uiMessageType",&type),directed=CSUnsigned(logical,@"isSender",&sender);
++    CSUnsigned(wrap,@"m_uiAppMsgInnerType",&inner);CSUnsigned(wrap,@"isReferMsgType",&refer);
++    if (binding.descriptorValid && ((!positioned && !binding.callRecord) || !typed || !directed ||
++        currentPosition!=binding.position || wrap!=binding.describedWrap || type!=binding.describedType ||
++        inner!=binding.describedInnerType || refer!=binding.describedRefer || (sender!=0)!=binding.outgoing)) {
+         binding.descriptorValid=NO;binding.key=nil;
+     }
+     if (!binding.descriptorValid) CSDescribe(binding,model);
+     if (!binding.supported) { CSRestore(binding); return; }
+     id current=CSCurrentImage(bg,NO),highlighted=CSCurrentImage(bg,YES);
+     [binding.images captureImage:current highlighted:NO]; [binding.images captureImage:highlighted highlighted:YES];
+-    BOOL dark=CSDark(cell);
++    BOOL dark=CSBubbleStyleIsDark(cell);
+     binding.group=CSGroupPosition(model,binding.position);
+     NSString *key=[NSString stringWithFormat:@"%lu/%d/%p/%p/%lu/%lu/%.4f/%.4f",(unsigned long)CSStyle.generation,dark,
+         (__bridge void *)binding.images.nativeImage,(__bridge void *)binding.images.nativeHighlightedImage,(unsigned long)binding.position,(unsigned long)binding.group,
+@@ -331,7 +386,7 @@
+     // Native layout often reassigns the same cached object. Keep the owned template without
+     // decoding pixels or scheduling another turn when its descriptor is still current.
+     if (CSStyle.enabled && binding.key && generated && nativeImage==baseline &&
+-        binding.appliedGeneration==CSStyle.generation && binding.appliedDark==CSDark(binding.cell) &&
++        binding.appliedGeneration==CSStyle.generation && binding.appliedDark==CSBubbleStyleIsDark(binding.cell) &&
+         binding.group==CSGroupPosition(binding.model,binding.position)) return generated;
+     [binding.images captureImage:nativeImage highlighted:highlighted]; binding.key=nil;
+     if (binding.applyQueued) return nativeImage;

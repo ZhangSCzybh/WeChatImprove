@@ -220,7 +220,76 @@ static void CSSend(NSString *content, NSString *session, CSPaymentTask *t) {
         ((void(*)(id,SEL,id,id))objc_msgSend)(mgr,add,session,wrap);
     } @catch (__unused NSException *e) {}
 }
-static void CSSuccess(CSPaymentTask *t, long long cents, NSString *currency) {
+static NSString *CSNotificationName(id value) {
+    NSString *name=CSPaymentString(value);
+    if (!name) return nil;
+    BOOL truncated=name.length>80;
+    if (truncated) name=[name substringWithRange:[name rangeOfComposedCharacterSequencesForRange:NSMakeRange(0,80)]];
+    NSMutableCharacterSet *separators=[NSCharacterSet.whitespaceAndNewlineCharacterSet mutableCopy];
+    [separators formUnionWithCharacterSet:NSCharacterSet.controlCharacterSet];
+    NSMutableArray *parts=[NSMutableArray array];
+    for (NSString *part in [name componentsSeparatedByCharactersInSet:separators]) if (part.length) [parts addObject:part];
+    name=[parts componentsJoinedByString:@" "];
+    return name.length ? (truncated ? [name stringByAppendingString:@"…"] : name) : nil;
+}
+static NSString *CSNotificationContactName(NSString *username, NSString *fallback) {
+    if (CSPaymentString(username)) {
+        @try {
+            id manager=CSGetService(NSClassFromString(@"CContactMgr"));
+            // Two bounded local lookups, only when a successful receipt needs a notification.
+            for (NSString *method in @[@"getContactByNameFromCache:",@"getContactByName:"]) {
+                SEL sel=NSSelectorFromString(method);
+                if (![manager respondsToSelector:sel]) continue;
+                @try {
+                    id contact=((id(*)(id,SEL,id))objc_msgSend)(manager,sel,username);
+                    NSString *name=CSNotificationName(CSValue(contact,@"m_nsRemark"))?:CSNotificationName(CSValue(contact,@"m_nsNickName"));
+                    if (name) return name;
+                } @catch (__unused NSException *e) {}
+            }
+        } @catch (__unused NSException *e) {}
+    }
+    return CSNotificationName(fallback);
+}
+static NSString *CSNotificationMoney(long long cents, NSString *currency) {
+    NSString *number=[NSString stringWithFormat:@"%lld.%02lld",cents/100,cents%100];
+    return [currency isEqual:@"CNY"] ? [@"¥" stringByAppendingString:number] : [NSString stringWithFormat:@"%@ %@",currency,number];
+}
+// Called on the payment main queue. Display-only metadata never decides receipt success.
+static NSString *CSNotificationText(CSPaymentTask *t, long long cents, NSString *currency, NSDictionary *receipt, NSDate *receivedAt) {
+    NSMutableArray *lines=[NSMutableArray arrayWithObjects:t.envelope?@"🧧 红包已领取":@"💰 转账已收款",
+        [@"到账金额：" stringByAppendingString:CSNotificationMoney(cents,currency)],nil];
+    if (t.envelope) {
+        // Native OnContinueOpenRedEnvelopesRequest: maps totalAmount to m_lTotalAmount.
+        NSNumber *total=CSPaymentInteger(receipt[@"totalAmount"]);
+        NSString *text=total.longLongValue>=cents && total.longLongValue>0 ? CSNotificationMoney(total.longLongValue,@"CNY") : @"未提供";
+        [lines addObject:[@"红包总额：" stringByAppendingString:text]];
+    }
+    [lines addObject:@""];
+    NSString *sender=CSPaymentString(t.payload[t.envelope?@"sender":@"payer"]), *nick=nil;
+    if (t.envelope) {
+        NSString *reported=CSPaymentString(receipt[@"sendUserName"]);
+        if (reported && !CSGroup(reported) && (!sender || [reported isEqual:sender])) {
+            sender=reported; nick=CSPaymentString(receipt[@"sendNick"]);
+        }
+    }
+    if (sender && !CSGroup(sender)) {
+        NSString *name=CSNotificationContactName(sender,nick?:@"未获取昵称");
+        [lines addObject:[@"来自：" stringByAppendingString:name?:@"未获取昵称"]];
+    }
+    if (CSGroup(t.session)) [lines addObject:[@"群聊：" stringByAppendingString:CSNotificationContactName(t.session,@"未获取群名")]];
+    else [lines addObject:@"会话：私聊"];
+    static NSDateFormatter *formatter; static dispatch_once_t once;
+    dispatch_once(&once,^{
+        formatter=[NSDateFormatter new]; formatter.locale=[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+        formatter.calendar=[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+        formatter.dateFormat=@"MM-dd HH:mm:ss";
+    });
+    formatter.timeZone=NSTimeZone.defaultTimeZone;
+    [lines addObject:[@"时间：" stringByAppendingString:[formatter stringFromDate:receivedAt]]];
+    return [lines componentsJoinedByString:@"\n"];
+}
+static void CSSuccess(CSPaymentTask *t, long long cents, NSString *currency, NSDictionary *receipt) {
+    NSDate *receivedAt=NSDate.date;
     for (CSPaymentTask *other in store.tasks) if ([other.key isEqual:t.key]) CSFinish(other);
     [receiptSources removeObjectForKey:t.key];
     NSTimeInterval effectDeadline=CSNow()+15;
@@ -232,8 +301,7 @@ static void CSSuccess(CSPaymentTask *t, long long cents, NSString *currency) {
         if ([c[@"reply"] boolValue] && reply.length) CSSend(reply,t.session,t);
         NSInteger target=[c[@"notify"] integerValue];
         if (target) {
-            NSString *amount=[NSString stringWithFormat:@"%lld.%02lld",cents/100,cents%100];
-            NSString *message=[NSString stringWithFormat:@"%@\n会话：%@\n金额：%@ %@\n状态：已领取",t.envelope?@"🎉 抢到红包提醒":@"💰 收到转账提醒",t.session,currency,amount];
+            NSString *message=CSNotificationText(t,cents,currency,receipt,receivedAt);
             CSSend(message,target==1?t.account:@"filehelper",t);
         }
     }];
@@ -292,7 +360,7 @@ void CSPaymentHandleResponse(NSDictionary *snapshot) {
                 amount=v;
             }
             if (!amount || amount.longLongValue<=0) CSFinish(t);
-            else CSSuccess(t,amount.longLongValue,@"CNY");
+            else CSSuccess(t,amount.longLongValue,@"CNY",body);
         } else {
             if (verifying) {
                 // These are the status response's username fields, not the
@@ -305,7 +373,7 @@ void CSPaymentHandleResponse(NSDictionary *snapshot) {
                 // 8.0.78 maps 2001 to Succeed_Receiver; 2000 is still waiting.
                 BOOL received=status.integerValue==2001 && (!body[@"is_payer"] || (payer && !payer.boolValue));
                 if (!received || !amount || amount.longLongValue<=0 || currency.length!=3 || ![body[@"receiver_name"] isEqual:t.account] || ![body[@"payer_name"] isEqual:t.payload[@"payer"]]) CSFinish(t);
-                else CSSuccess(t,amount.longLongValue,currency);
+                else CSSuccess(t,amount.longLongValue,currency,body);
             } else {
                 // Confirmation fields and guides cannot prove settlement. A read
                 // cannot accept a license or bypass an intercept; only the final
@@ -408,7 +476,8 @@ static void CSAdmit(NSDictionary *s, BOOL envelope, uint64_t epoch) {
         NSString *sign=CSPaymentString(q[@"sign"]); if (sign) params[@"sign"]=sign;
         NSString *nick=CSPaymentString(CSValue(contact,@"m_nsNickName")), *head=CSPaymentString(CSValue(contact,@"m_nsHeadImgUrl"));
         if (nick) params[@"nickName"]=nick; if (head) params[@"headImg"]=head;
-        payload=@{@"params":[params copy],@"self":@(selfSent)}; identifier=send;
+        NSString *sender=selfSent?account:(CSGroup(from)?CSPaymentString(s[@"sender"]):from);
+        payload=@{@"params":[params copy],@"self":@(selfSent),@"sender":(sender && !CSGroup(sender))?sender:@""}; identifier=send;
     }
     CSPaymentTask *t=[CSPaymentTask new]; t.account=account; t.session=session; t.payload=payload; t.envelope=envelope; t.epoch=epoch;
     t.key=CSPaymentBusinessKey(account,envelope?@"envelope":@"transfer",session,identifier);

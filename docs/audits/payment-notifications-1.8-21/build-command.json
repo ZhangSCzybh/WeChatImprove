@@ -1,0 +1,7 @@
+[
+  "make",
+  "package",
+  "SCHEME=rootless",
+  "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-notifications-1.8-21-_vqyw4q2/theos",
+  "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-payment-notifications-1.8-21-_vqyw4q2/packages"
+]

@@ -1,0 +1,2 @@
+PASS: 235148 message merge/navigation checks
+FAIL line 298: CSMessageMergeRowHeight(page,table,paths[i],55)==[heights[i] doubleValue]

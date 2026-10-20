@@ -147,7 +147,7 @@ NSString * const kContactSeparatorOverridesKey = @"com.wechat.tweak.navigation.c
            [defaults stringForKey:kNavigationSeparatorTextKey] : @"💗";
 }
 
-- (UIImage *)separatorImageForContactId:(NSString *)contactId {
+- (NSString *)separatorImagePathForContactId:(NSString *)contactId {
     CSContactSeparatorConfig *config = [self configForContactId:contactId];
     NSString *imagePath = nil;
     
@@ -158,6 +158,11 @@ NSString * const kContactSeparatorOverridesKey = @"com.wechat.tweak.navigation.c
         imagePath = [defaults objectForKey:kNavigationSeparatorImageKey];
     }
     
+    return [imagePath isKindOfClass:NSString.class] ? imagePath : nil;
+}
+
+- (UIImage *)separatorImageForContactId:(NSString *)contactId {
+    NSString *imagePath=[self separatorImagePathForContactId:contactId];
     if (imagePath && [[NSFileManager defaultManager] fileExistsAtPath:imagePath]) {
         NSData *imageData = [NSData dataWithContentsOfFile:imagePath];
         return [UIImage imageWithData:imageData];

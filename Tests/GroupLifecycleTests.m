@@ -33,6 +33,7 @@ static BOOL enabled=YES;
 static NSUInteger scopes,snapshotBuilds;
 static BOOL mutateDuringSnapshot,failPublication,rawPublicationFailure;
 static NSArray *CSGroupBuildNativeSections(id controller,id table,id source);
+static NSArray *CSGroupBuildNativeSectionsReusing(id controller,id table,id source,NSArray *previous);
 static NSHashTable *Adapters(void) {
     static NSHashTable *adapters; if (!adapters) adapters=[NSHashTable weakObjectsHashTable]; return adapters;
 }
@@ -100,6 +101,9 @@ static NSArray *CSGroupBuildNativeSections(id controller,id table,id source) {
     (void)controller; (void)table; snapshotBuilds++;
     if (mutateDuringSnapshot) [source invalidateNativeSnapshot];
     return @[@[]];
+}
+static NSArray *CSGroupBuildNativeSectionsReusing(id controller,id table,id source,NSArray *previous) {
+    (void)previous;return CSGroupBuildNativeSections(controller,table,source);
 }
 static CSGroupListAdapter *Adapter(id owner) { return [CSGroupListAdapter adapterForController:owner]; }
 static void Native(id owner,BOOL change,void (^body)(void)) { (void)owner; (void)change; body(); }

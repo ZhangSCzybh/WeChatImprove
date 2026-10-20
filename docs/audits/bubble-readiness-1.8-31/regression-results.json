@@ -1,0 +1,188 @@
+[
+  {
+    "script": "Tests/verify-avatar-input-style.sh",
+    "exit_code": 0,
+    "seconds": 2.68,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-avatar-input-style.log"
+  },
+  {
+    "script": "Tests/verify-background-blur.sh",
+    "exit_code": 0,
+    "seconds": 1.47,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-background-blur.log"
+  },
+  {
+    "script": "Tests/verify-bubble-style.sh",
+    "exit_code": 0,
+    "seconds": 9.44,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-bubble-style.log"
+  },
+  {
+    "script": "Tests/verify-custom-text.sh",
+    "exit_code": 0,
+    "seconds": 1.47,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-custom-text.log"
+  },
+  {
+    "script": "Tests/verify-group-appearance.sh",
+    "exit_code": 0,
+    "seconds": 0.64,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-group-appearance.log"
+  },
+  {
+    "script": "Tests/verify-group-business.sh",
+    "exit_code": 0,
+    "seconds": 1.3,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-group-business.log"
+  },
+  {
+    "script": "Tests/verify-group-header.sh",
+    "exit_code": 0,
+    "seconds": 0.8,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-group-header.log"
+  },
+  {
+    "script": "Tests/verify-group-incremental.sh",
+    "exit_code": 0,
+    "seconds": 0.88,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-group-incremental.log"
+  },
+  {
+    "script": "Tests/verify-group-indicator.sh",
+    "exit_code": 0,
+    "seconds": 0.67,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-group-indicator.log"
+  },
+  {
+    "script": "Tests/verify-group-interactions.sh",
+    "exit_code": 0,
+    "seconds": 1.92,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-group-interactions.log"
+  },
+  {
+    "script": "Tests/verify-group-lifecycle.sh",
+    "exit_code": 0,
+    "seconds": 7.93,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-group-lifecycle.log"
+  },
+  {
+    "script": "Tests/verify-group-preferences.sh",
+    "exit_code": 0,
+    "seconds": 0.92,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-group-preferences.log"
+  },
+  {
+    "script": "Tests/verify-group-search.sh",
+    "exit_code": 0,
+    "seconds": 0.63,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-group-search.log"
+  },
+  {
+    "script": "Tests/verify-group-selection.sh",
+    "exit_code": 0,
+    "seconds": 1.67,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-group-selection.log"
+  },
+  {
+    "script": "Tests/verify-group-viewport.sh",
+    "exit_code": 0,
+    "seconds": 0.67,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-group-viewport.log"
+  },
+  {
+    "script": "Tests/verify-list-corners.sh",
+    "exit_code": 0,
+    "seconds": 2.48,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-list-corners.log"
+  },
+  {
+    "script": "Tests/verify-message-actions-core.sh",
+    "exit_code": 0,
+    "seconds": 1.48,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-message-actions-core.log"
+  },
+  {
+    "script": "Tests/verify-message-actions-execution.sh",
+    "exit_code": 0,
+    "seconds": 17.75,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-message-actions-execution.log"
+  },
+  {
+    "script": "Tests/verify-message-gesture.sh",
+    "exit_code": 0,
+    "seconds": 1.84,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-message-gesture.log"
+  },
+  {
+    "script": "Tests/verify-message-merge.sh",
+    "exit_code": 0,
+    "seconds": 2.87,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-message-merge.log"
+  },
+  {
+    "script": "Tests/verify-message-time.sh",
+    "exit_code": 0,
+    "seconds": 1.48,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-message-time.log"
+  },
+  {
+    "script": "Tests/verify-my-page-clean.sh",
+    "exit_code": 0,
+    "seconds": 0.72,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-my-page-clean.log"
+  },
+  {
+    "script": "Tests/verify-native-reward.sh",
+    "exit_code": 0,
+    "seconds": 3.42,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-native-reward.log"
+  },
+  {
+    "script": "Tests/verify-navigation-images.sh",
+    "exit_code": 0,
+    "seconds": 1.57,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-navigation-images.log"
+  },
+  {
+    "script": "Tests/verify-payment-core.sh",
+    "exit_code": 0,
+    "seconds": 19.78,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-payment-core.log"
+  },
+  {
+    "script": "Tests/verify-preference-concurrency.sh",
+    "exit_code": 0,
+    "seconds": 1.1,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-preference-concurrency.log"
+  },
+  {
+    "script": "Tests/verify-revoke-interception.sh",
+    "exit_code": 0,
+    "seconds": 0.7,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-revoke-interception.log"
+  },
+  {
+    "script": "Tests/verify-revoke-reference.sh",
+    "exit_code": 0,
+    "seconds": 0.75,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-revoke-reference.log"
+  },
+  {
+    "script": "Tests/verify-tabbar.sh",
+    "exit_code": 0,
+    "seconds": 1.63,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-tabbar.log"
+  },
+  {
+    "script": "Tests/verify-touch-trail.sh",
+    "exit_code": 0,
+    "seconds": 1.02,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-touch-trail.log"
+  },
+  {
+    "script": "Tests/verify-transfer-admission.sh",
+    "exit_code": 0,
+    "seconds": 19.33,
+    "log": "docs/audits/bubble-readiness-1.8-31/regression/verify-transfer-admission.log"
+  }
+]

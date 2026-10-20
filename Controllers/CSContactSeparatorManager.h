@@ -30,6 +30,7 @@ extern NSString * const kContactSeparatorOverridesKey;
 
 - (NSString *)separatorTextForContactId:(NSString *)contactId;
 - (UIImage * _Nullable)separatorImageForContactId:(NSString *)contactId;
+- (NSString * _Nullable)separatorImagePathForContactId:(NSString *)contactId;
 - (CGFloat)separatorSizeForContactId:(NSString *)contactId;
 - (CGFloat)avatarSpacingForContactId:(NSString *)contactId;
 - (CGFloat)verticalOffsetForContactId:(NSString *)contactId;

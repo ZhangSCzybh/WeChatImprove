@@ -1,6 +1,7 @@
 // 名称自定义
 #import <UIKit/UIKit.h>
 #import "CSGroupListAdapter.h"
+#import "CSCustomTextMatch.h"
 
 // 添加必要的类声明
 @interface TimeoutNumber : UIView
@@ -37,10 +38,7 @@ static NSString * const kWCFriendsCountReplacementKey = @"com.wechat.tweak.frien
 // 添加钱包余额自定义键
 static NSString * const kWCWalletBalanceReplacementKey = @"com.wechat.tweak.wallet_balance_replacement";
 
-// 定义替换"微信"标题的常量
-static NSString * const kWCOriginalTitle = @"微信";
-// 定义"通讯录"和"发现"的常量
-static NSString * const kWCOriginalContacts = @"通讯录";
+// 发现标题使用精确匹配；带数字的标题使用共享匹配器。
 static NSString * const kWCOriginalDiscover = @"发现";
 
 // 缓存设置状态的静态变量
@@ -207,7 +205,7 @@ static void loadSettings() {
 
 - (void)setText:(NSString *)text {
     // 如果文本为空或者没有开启自定义功能，直接使用原始设置
-    if (!text || !gSimpleUIEnabled || [NSThread.currentThread.threadDictionary[kCSRenderingGroupTitleKey] boolValue]) {
+    if (!text || !gSimpleUIEnabled || !(gMainTitleReplacement.length || gContactsReplacement.length || gDiscoverReplacement.length || gFriendsCountReplacement.length) || [NSThread.currentThread.threadDictionary[kCSRenderingGroupTitleKey] boolValue]) {
         %orig;
         return;
     }
@@ -218,24 +216,9 @@ static void loadSettings() {
         return;
     }
     
-    // 检查是否为"微信"或"微信(数字)"格式
-    BOOL isWeChatTitle = [text isEqualToString:kWCOriginalTitle];
-    if (!isWeChatTitle) {
-        // 检查是否匹配"微信(数字)"格式
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^微信\\(\\d+\\)$" options:0 error:nil];
-        NSTextCheckingResult *match = [regex firstMatchInString:text options:0 range:NSMakeRange(0, text.length)];
-        isWeChatTitle = (match != nil);
-    }
-    
-    // 检查是否为"通讯录"或"通讯录(数字)"格式
-    BOOL isContactsTitle = [text isEqualToString:kWCOriginalContacts];
-    if (!isContactsTitle) {
-        // 检查是否匹配"通讯录(数字)"格式
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^通讯录\\(\\d+\\)$" options:0 error:nil];
-        NSTextCheckingResult *match = [regex firstMatchInString:text options:0 range:NSMakeRange(0, text.length)];
-        isContactsTitle = (match != nil);
-    }
-    
+    BOOL isWeChatTitle = gMainTitleReplacement.length && CSCustomTextMatchesTitle(text,NO);
+    BOOL isContactsTitle = gContactsReplacement.length && CSCustomTextMatchesTitle(text,YES);
+
     // 检查是否在导航栏中（只对微信标题进行检查）
     BOOL isInNavBar = NO;
     if (isWeChatTitle) {
@@ -270,11 +253,7 @@ static void loadSettings() {
     
     // 处理好友数量显示（如"697个朋友"）
     if (gFriendsCountReplacement && [gFriendsCountReplacement length] > 0) {
-        // 使用正则表达式匹配"数字+个朋友"模式
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^\\d+个朋友$" options:0 error:nil];
-        NSTextCheckingResult *match = [regex firstMatchInString:text options:0 range:NSMakeRange(0, text.length)];
-        
-        if (match) {
+        if (CSCustomTextMatchesFriendsCount(text)) {
             // 替换为自定义好友数量文本 + "个朋友"
             NSString *customText = [NSString stringWithFormat:@"%@个朋友", gFriendsCountReplacement];
             %orig(customText);
@@ -287,7 +266,7 @@ static void loadSettings() {
 
 // 对attributedText也进行处理，防止通过该方法设置文本
 - (void)setAttributedText:(NSAttributedString *)attributedText {
-    if (!attributedText || !gSimpleUIEnabled || [NSThread.currentThread.threadDictionary[kCSRenderingGroupTitleKey] boolValue]) {
+    if (!attributedText || !gSimpleUIEnabled || !(gMainTitleReplacement.length || gContactsReplacement.length || gDiscoverReplacement.length || gFriendsCountReplacement.length) || [NSThread.currentThread.threadDictionary[kCSRenderingGroupTitleKey] boolValue]) {
         %orig;
         return;
     }
@@ -300,24 +279,9 @@ static void loadSettings() {
         return;
     }
     
-    // 检查是否为"微信"或"微信(数字)"格式
-    BOOL isWeChatTitle = [originalString isEqualToString:kWCOriginalTitle];
-    if (!isWeChatTitle) {
-        // 检查是否匹配"微信(数字)"格式
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^微信\\(\\d+\\)$" options:0 error:nil];
-        NSTextCheckingResult *match = [regex firstMatchInString:originalString options:0 range:NSMakeRange(0, originalString.length)];
-        isWeChatTitle = (match != nil);
-    }
-    
-    // 检查是否为"通讯录"或"通讯录(数字)"格式
-    BOOL isContactsTitle = [originalString isEqualToString:kWCOriginalContacts];
-    if (!isContactsTitle) {
-        // 检查是否匹配"通讯录(数字)"格式
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^通讯录\\(\\d+\\)$" options:0 error:nil];
-        NSTextCheckingResult *match = [regex firstMatchInString:originalString options:0 range:NSMakeRange(0, originalString.length)];
-        isContactsTitle = (match != nil);
-    }
-    
+    BOOL isWeChatTitle = gMainTitleReplacement.length && CSCustomTextMatchesTitle(originalString,NO);
+    BOOL isContactsTitle = gContactsReplacement.length && CSCustomTextMatchesTitle(originalString,YES);
+
     // 检查是否在导航栏中（只对微信标题进行检查）
     BOOL isInNavBar = NO;
     if (isWeChatTitle) {
@@ -355,11 +319,7 @@ static void loadSettings() {
     
     // 处理好友数量显示（如"697个朋友"）
     if (gFriendsCountReplacement && [gFriendsCountReplacement length] > 0) {
-        // 使用正则表达式匹配"数字+个朋友"模式
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^\\d+个朋友$" options:0 error:nil];
-        NSTextCheckingResult *match = [regex firstMatchInString:originalString options:0 range:NSMakeRange(0, originalString.length)];
-        
-        if (match) {
+        if (CSCustomTextMatchesFriendsCount(originalString)) {
             // 创建新的属性字符串，使用自定义好友数量
             NSString *customText = [NSString stringWithFormat:@"%@个朋友", gFriendsCountReplacement];
             NSMutableAttributedString *newAttributedText = [[NSMutableAttributedString alloc] initWithString:customText attributes:[attributedText attributesAtIndex:0 effectiveRange:NULL]];
@@ -406,24 +366,9 @@ static void loadSettings() {
         return;
     }
     
-    // 检查是否为"微信"或"微信(数字)"格式
-    BOOL isWeChatTitle = [title isEqualToString:kWCOriginalTitle];
-    if (!isWeChatTitle) {
-        // 检查是否匹配"微信(数字)"格式
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^微信\\(\\d+\\)$" options:0 error:nil];
-        NSTextCheckingResult *match = [regex firstMatchInString:title options:0 range:NSMakeRange(0, title.length)];
-        isWeChatTitle = (match != nil);
-    }
-    
-    // 检查是否为"通讯录"或"通讯录(数字)"格式
-    BOOL isContactsTitle = [title isEqualToString:kWCOriginalContacts];
-    if (!isContactsTitle) {
-        // 检查是否匹配"通讯录(数字)"格式
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^通讯录\\(\\d+\\)$" options:0 error:nil];
-        NSTextCheckingResult *match = [regex firstMatchInString:title options:0 range:NSMakeRange(0, title.length)];
-        isContactsTitle = (match != nil);
-    }
-    
+    BOOL isWeChatTitle = gMainTitleReplacement.length && CSCustomTextMatchesTitle(title,NO);
+    BOOL isContactsTitle = gContactsReplacement.length && CSCustomTextMatchesTitle(title,YES);
+
     // 处理"微信"标题替换 - 保留导航栏检查（MFTitleView已经在导航栏中）
     if (isWeChatTitle && gMainTitleReplacement && [gMainTitleReplacement length] > 0) {
         // 完全替换为自定义文本，不保留数字
@@ -705,4 +650,4 @@ static void loadSettings() {
     }
 }
 
-%end 
+%end

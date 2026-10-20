@@ -385,7 +385,8 @@ static id ObjectArgument(id target, NSString *name, id value) {
     NSUInteger revision=self.modelRevision;
     if (self.cachedNativeSections && self.snapshotRevision==revision && [self.snapshotAccount isEqual:account]) return self.cachedNativeSections;
     __block NSArray *sections=nil;
-    CSGroupWithNativeIndices(self.table, ^{ sections=CSGroupBuildNativeSections(self.controller,self.table,[self nativeSource]); });
+    NSArray *previous=[self.snapshotAccount isEqual:account] ? self.cachedNativeSections : nil;
+    CSGroupWithNativeIndices(self.table, ^{ sections=CSGroupBuildNativeSectionsReusing(self.controller,self.table,[self nativeSource],previous); });
     // Only immutable row values are cached; never hold private sessions/contacts.
     if (revision!=self.modelRevision || ![account isEqual:CSGroupCurrentAccountID()]) { self.cachedNativeSections=nil; return nil; }
     self.cachedNativeSections=sections; self.snapshotAccount=account; self.snapshotRevision=revision;

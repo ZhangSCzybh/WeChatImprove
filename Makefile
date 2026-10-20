@@ -33,7 +33,7 @@ WeChatImprove_CFLAGS = -fobjc-arc \
                        -Wno-error \
 
 # 框架依赖
-WeChatImprove_FRAMEWORKS = UIKit Foundation QuartzCore LocalAuthentication
+WeChatImprove_FRAMEWORKS = UIKit Foundation QuartzCore LocalAuthentication ImageIO
 
 # 包含 Theos make 系统
 include $(THEOS)/makefiles/common.mk

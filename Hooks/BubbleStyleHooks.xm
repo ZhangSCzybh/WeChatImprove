@@ -1,6 +1,7 @@
 // A single owner applies custom backgrounds to actual message cells. BubbleInfo getters stay native.
 #import <UIKit/UIKit.h>
 #import "../Controllers/CSBubbleStyleAdapter.h"
+#import "../Controllers/CSBubbleTextColors.h"
 
 %hook CommonMessageCellView
 - (id)initWithViewModel:(id)model {
@@ -39,6 +40,32 @@
 }
 %end
 
+// Call records can replace their background while their status/content changes.
+// Their own boundaries also cover runtimes whose layout bypasses the common hook.
+%hook VoIPBubbleMessageCellView
+- (void)layoutContentView { %orig; CSBubbleStyleApply((UIView *)self); }
+- (void)updateStatus { %orig; CSBubbleStyleNativeChanged((UIView *)self); }
+%end
+
+%hook TextMessageCellView
+- (void)layoutContentView { %orig; CSBubbleStyleApply((UIView *)self); }
+- (void)updateStatus { %orig; CSBubbleStyleApply((UIView *)self); }
+%end
+
+%hook VoiceMessageCellView
+- (void)layoutContentView { %orig; CSBubbleStyleApply((UIView *)self); }
+- (void)updateSecLabelColor { %orig; CSBubbleStyleApply((UIView *)self); }
+%end
+
+%hook RichTextView
+- (void)setOTextColor:(id)color { %orig(CSBubbleTextColorAssignment(self,color)); }
+%end
+
+%hook VoIPSignalMessageCellView
+- (void)layoutContentView { %orig; CSBubbleStyleApply((UIView *)self); }
+- (void)updateStatus { %orig; CSBubbleStyleNativeChanged((UIView *)self); }
+%end
+
 // YYAsyncImageView may assign decoded/dynamic native images after the cell's layout.
 // Only associated message background instances are observed; all other images pass through.
 %hook YYAsyncImageView
@@ -48,10 +75,19 @@
 - (void)setHighlightedImage:(id)image {
     %orig(CSBubbleStyleImageAssignment((UIImageView *)self,image,YES));
 }
-- (void)didSetDynamicYYImage {
-    %orig;
-    // The current object may have decoded in place, without another setImage: call.
-    CSBubbleStyleImageDecoded((UIImageView *)self);
+- (id)newAsyncDisplayTask {
+    id task=%orig;
+    // didSetDynamicYYImage only registers dark-mode observation, before decoding.
+    CSBubbleStyleObserveDisplayTask((UIImageView *)self,task);
+    return task;
+}
+%end
+
+%hook YYImage
+- (id)decodeImage {
+    id decoded=%orig;
+    CSBubbleStyleObserveDecodedImage(self,decoded);
+    return decoded;
 }
 %end
 

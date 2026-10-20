@@ -1,0 +1,57 @@
+{
+  "version": "1.8-25",
+  "scheme": "rootless",
+  "metadata": {
+    "Package": "com.wechat.improve",
+    "Version": "1.8-25",
+    "Architecture": "iphoneos-arm64",
+    "Depends": "mobilesubstrate (>= 0.9.5000)"
+  },
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "dylib_sha256": "4588aac295323c059a40b31adb2377e5bde1003ba4d5a09e795f00c6baa0a1a4",
+  "package_matches_built_and_staged": true,
+  "dSYM_UUIDs": {
+    "arm64": "27D14E76-69F0-32E8-95C7-511A64E2F92C",
+    "arm64e": "64C463AE-AD13-3585-8129-453624DA4D05"
+  },
+  "artifacts": {
+    "packages/com.wechat.improve_1.8-25_iphoneos-arm64.deb": {
+      "sha256": "22b2e1cb63ae110ec9fd54770fde277fafb0f1a65616dcc0dd2586b84c1b7388",
+      "bytes": 817394
+    },
+    "packages/WeChatImprove-1.8-25-dSYMs.zip": {
+      "sha256": "3fd1002335f43786d0e667d99352e12733c8dd255b66e05f6f21c7c04460c56a",
+      "bytes": 3455027
+    }
+  },
+  "prior_artifacts_unchanged": true,
+  "source_matches_build_manifest": true,
+  "changes_limited_to_allowed_files": true,
+  "changed_files": [
+    "README.md",
+    "control",
+    "Tests/BubbleStyleAdapterTests.m",
+    "Tests/MessageMergeAdapterTests.m",
+    "Tests/BubbleStyleTests.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/BubbleStyleHooks.xm",
+    "Controllers/CSBubbleStylePolicy.h",
+    "Controllers/CSMessageMergeAdapter.m",
+    "Controllers/CSBubbleStylePolicy.m",
+    "Controllers/CSBubbleStyleSettingsViewController.m",
+    "Controllers/CSBubbleStyleAdapter.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Controllers/CSMessageMergeAdapter.h"
+  ],
+  "added_files": [
+    "Controllers/CSBubbleStylePreview.h",
+    "Controllers/CSBubbleStylePreview.m"
+  ],
+  "compact_geometry_and_visible_insets_present_in_both_architectures": true,
+  "test_counter_exports_absent": true,
+  "injection_filter_preserved": true,
+  "device_installed": false
+}

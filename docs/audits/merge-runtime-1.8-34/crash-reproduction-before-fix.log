@@ -1,0 +1,2 @@
+Bubble policy/renderer/ownership: 36979 checks passed
+Tests/verify-bubble-style.sh: line 17: 77926 Segmentation fault: 11  "$test_dir/bubble-adapter-tests"

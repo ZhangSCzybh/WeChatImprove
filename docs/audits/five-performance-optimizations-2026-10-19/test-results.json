@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-19",
+  "environment": "macOS host tests; UIKit fixtures and offline NSURLProtocol where required",
+  "source_manifest": "changed-files.json",
+  "device_tests_run": false,
+  "note": "Summarized results of completed verification runs; counts are assertions, not performance samples.",
+  "suites": [
+    {
+      "command": "bash Tests/verify-custom-text.sh",
+      "status": "passed",
+      "checks": 37502
+    },
+    {
+      "command": "bash Tests/verify-bubble-style.sh",
+      "status": "passed",
+      "policy_renderer_ownership_checks": 8269,
+      "adapter_checks": 315
+    },
+    {
+      "command": "bash Tests/verify-message-merge.sh",
+      "status": "passed",
+      "policy_navigation_checks": 53200,
+      "adapter_lifecycle_checks": 2885
+    },
+    {
+      "command": "bash Tests/verify-group-business.sh",
+      "status": "passed",
+      "checks": 633
+    },
+    {
+      "command": "bash Tests/verify-group-incremental.sh",
+      "status": "passed",
+      "checks": 180
+    },
+    {
+      "command": "bash Tests/verify-group-lifecycle.sh",
+      "status": "passed",
+      "checks": 67
+    },
+    {
+      "command": "bash Tests/verify-group-selection.sh",
+      "status": "passed",
+      "checks": 30
+    },
+    {
+      "command": "bash Tests/verify-group-search.sh",
+      "status": "passed",
+      "checks": 36
+    },
+    {
+      "command": "bash Tests/verify-message-time.sh",
+      "status": "passed",
+      "checks": 142
+    },
+    {
+      "command": "bash Tests/verify-message-gesture.sh",
+      "status": "passed",
+      "checks": 272
+    },
+    {
+      "command": "bash Tests/verify-navigation-images.sh",
+      "status": "passed",
+      "checks": 131
+    }
+  ]
+}

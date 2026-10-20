@@ -42,15 +42,22 @@ NSString *const CSMessageMergeSettingsNotification = @"com.wechat.enhance.bubble
 NSString *CSMessageSpacingModeTitle(CSMessageSpacingMode mode) {
     return mode == CSMessageSpacingCompact ? @"紧密" : @"正常";
 }
-double CSMessageMergePlannedDelta(CSMessageSpacingMode mode, double nativeHeight,
-                                  double contentHeight, double identityHeight, double nameHeight) {
-    if (!isfinite(nativeHeight) || nativeHeight<=0) return 0;
-    if (mode!=CSMessageSpacingCompact || !isfinite(contentHeight) || contentHeight<=0 ||
-        !isfinite(identityHeight) || identityHeight<0 || !isfinite(nameHeight) || nameHeight<0) return 0;
-    // Target a 25pt reduction. Preserve the occupied footprint plus 2pt per edge.
-    // Rendering may translate external padding, but never resize message content.
-    double occupied = fmax(contentHeight + nameHeight, identityHeight);
-    return -fmin(25, fmax(0, nativeHeight - occupied - 4));
+CSMessageMergeLayoutPlan CSMessageMergePlanLayout(CSMessageSpacingMode mode,
+    double nativeHeight, double top, double bottom, BOOL before, BOOL after) {
+    CSMessageMergeLayoutPlan plan={nativeHeight,0,NO};
+    if (mode!=CSMessageSpacingCompact || (!before && !after) || !isfinite(nativeHeight) || nativeHeight<=0 ||
+        !isfinite(top) || !isfinite(bottom) || top<0 || bottom<=top || bottom>nativeHeight) return plan;
+    // One logical point on each side of an internal seam (2pt total).
+    // Keep fractional native coordinates; spacing never depends on display scale.
+    // Never add padding to a native edge which is already tighter.
+    double edge=1;
+    double leading=before ? fmin(top,edge) : top;
+    double trailing=after ? fmin(nativeHeight-bottom,edge) : nativeHeight-bottom;
+    plan.originDelta=leading-top;
+    plan.height=bottom+plan.originDelta+trailing;
+    plan.height=fmin(nativeHeight,plan.height);
+    plan.valid=YES;
+    return plan;
 }
 
 @implementation CSMessageMergeItem

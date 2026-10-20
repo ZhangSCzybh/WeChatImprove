@@ -1,0 +1,16 @@
+[
+  "README.md",
+  "control",
+  "Tests/BubbleStyleAdapterTests.m",
+  "Tests/MessageMergeAdapterTests.m",
+  "Tests/BubbleStyleTests.m",
+  "Headers/CSUserInfoHelper.h",
+  "Hooks/BubbleStyleHooks.xm",
+  "Controllers/CSBubbleStylePolicy.h",
+  "Controllers/CSMessageMergeAdapter.m",
+  "Controllers/CSBubbleStylePolicy.m",
+  "Controllers/CSBubbleStyleSettingsViewController.m",
+  "Controllers/CSBubbleStyleAdapter.m",
+  "Controllers/CSReleaseNotesViewController.m",
+  "Controllers/CSMessageMergeAdapter.h"
+]

@@ -1,0 +1,438 @@
+--- 1.8-30/Controllers/CSBubbleStyleAdapter.h
++++ 1.8-31/Controllers/CSBubbleStyleAdapter.h
+@@ -6,6 +6,7 @@
+ FOUNDATION_EXPORT void CSBubbleStyleNativeChanged(UIView *cell);
+ // Called only by YYAsyncImageView setters. Unassociated image views pass through unchanged.
+ FOUNDATION_EXPORT id CSBubbleStyleImageAssignment(UIImageView *view, id nativeImage, BOOL highlighted);
+-FOUNDATION_EXPORT void CSBubbleStyleImageDecoded(UIImageView *view);
++// Observe native decoding only for a bound message background; never start decoding.
++FOUNDATION_EXPORT void CSBubbleStyleObserveDisplayTask(UIImageView *view, id task);
+ // Uses already-decoded immutable images and the shared padding cache; never forces decoding.
+ FOUNDATION_EXPORT BOOL CSBubbleStyleVisibleInsets(UIView *background, UIEdgeInsets *insets);
+--- 1.8-30/Controllers/CSBubbleStyleAdapter.m
++++ 1.8-31/Controllers/CSBubbleStyleAdapter.m
+@@ -8,7 +8,7 @@
+ #import <objc/message.h>
+ #include <math.h>
+ 
+-static char CSBubbleCellKey, CSBubbleImageKey;
++static char CSBubbleCellKey, CSBubbleImageKey, CSBubbleReadyImageKey;
+ static CSBubbleStyleConfiguration *CSStyle;
+ static NSCache *CSImages;
+ static NSCache *CSBodyMetrics;
+@@ -28,6 +28,7 @@
+ @property(nonatomic, weak) id model;
+ @property(nonatomic, weak) UIImageView *background;
+ @property(nonatomic, strong) CSBubbleImageOwnership *images;
++@property(nonatomic, strong) UIImage *source, *highlightSource;
+ @property(nonatomic, copy) NSString *key;
+ @property(nonatomic) BOOL applying;
+ @property(nonatomic) BOOL applyQueued;
+@@ -105,13 +106,17 @@
+ }
+ static UIImage *CSReadyUIImage(id image, Class wrapperClass) {
+     // YYImage's getters can enter the lazy decoder. Even a nested YYImage must
+-    // never reach CGImage here; wait for the existing native decode callback.
++    // never reach CGImage here; wait for native display to publish decoded pixels.
+     if (![image isKindOfClass:UIImage.class] || (wrapperClass && [image isKindOfClass:wrapperClass])) return nil;
+     return [image CGImage] ? image : nil;
+ }
+ static UIImage *CSDecodedImage(id image, BOOL dark) {
+     Class wrapperClass=NSClassFromString(@"YYImage");
+     if (!wrapperClass || ![image isKindOfClass:wrapperClass]) return CSReadyUIImage(image,wrapperClass);
++    // Our own templates are already decoded before being wrapped by YYImage's
++    // lazy factory. Keep their known pixels available to layout immediately.
++    UIImage *owned=objc_getAssociatedObject(image,&CSBubbleReadyImageKey);
++    if (owned) return owned;
+     // 8.0.78 originImage checks m_getBlock, then calls setIsDynamicImg:, then
+     // invokes that block without rechecking. The supplied crash has a nil block
+     // at that invocation (ldr [x0,#0x10]). Do not call this getter from layout.
+@@ -133,7 +138,12 @@
+     if (!method || method_getNumberOfArguments(method)!=3) return nil;
+     method_getReturnType(method,result,sizeof(result)); method_getArgumentType(method,2,arg,sizeof(arg));
+     if (result[0]!='@' || arg[0]!='@') return nil;
+-    @try { return ((id(*)(id,SEL,id))objc_msgSend)(cls,selector,image); }
++    @try {
++        id wrapped=((id(*)(id,SEL,id))objc_msgSend)(cls,selector,image);
++        if (wrapped && [wrapped isKindOfClass:cls])
++            objc_setAssociatedObject(wrapped,&CSBubbleReadyImageKey,image,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
++        return wrapped;
++    }
+     @catch (__unused NSException *exception) { return nil; }
+ }
+ BOOL CSBubbleStyleVisibleInsets(UIView *background, UIEdgeInsets *insets) {
+@@ -272,24 +282,33 @@
+         (__bridge void *)binding.images.nativeImage,(__bridge void *)binding.images.nativeHighlightedImage,(unsigned long)binding.position,(unsigned long)binding.group,
+         ((UIImageView *)bg).frame.size.width,((UIImageView *)bg).frame.size.height];
+     UIColor *textColor=CSTextColors[(dark ? 2 : 0)+(binding.outgoing ? 0 : 1)];
+-    if ([binding.key isEqual:key]) {
++    UIImage *source=CSDecodedImage(binding.images.nativeImage,dark);
++    UIImage *highlightSource=CSDecodedImage(binding.images.nativeHighlightedImage,dark);
++    BOOL samePixels=binding.source==source && binding.highlightSource==highlightSource;
++    // A YYImage is populated in place. Wrapper identity alone cannot cache a
++    // pending/failed attempt. Retain the compared images to prevent pointer reuse.
++    binding.source=source;binding.highlightSource=highlightSource;
++    if ([binding.key isEqual:key] && samePixels) {
+         CSBubbleTextColorsApply(cell,binding.images.generatedImage ? textColor : nil,binding.callRecord);
+         return;
+     }
+-    UIImage *source=CSDecodedImage(binding.images.nativeImage,dark);
+     UIImage *normal=CSTemplate(binding,source,dark,NO);
+     id newImage=normal?CSImageForView(bg,normal):nil;
+     if (!newImage) { CSRestore(binding); binding.key=key; return; }
+     id newHighlight=nil;
+     if (binding.images.nativeHighlightedImage) {
+-        UIImage *highlightSource=CSDecodedImage(binding.images.nativeHighlightedImage,dark);
+         UIImage *highlightImage=CSTemplate(binding,highlightSource,dark,YES);
+         newHighlight=highlightImage?CSImageForView(bg,highlightImage):nil;
+-        if (!newHighlight) { CSRestore(binding); binding.key=key; return; }
++        // Native display normally decodes only the active state. A dormant or
++        // unsupported pressed image must not block the ready normal background.
+     }
+     binding.images.generatedImage=newImage; binding.images.generatedHighlightedImage=newHighlight;
+     binding.applying=YES;
+-    [UIView performWithoutAnimation:^{ ((UIImageView *)bg).image=newImage; if (newHighlight) ((UIImageView *)bg).highlightedImage=newHighlight; }];
++    [UIView performWithoutAnimation:^{
++        ((UIImageView *)bg).image=newImage;
++        id targetHighlight=newHighlight?:binding.images.nativeHighlightedImage;
++        if (CSCurrentImage(bg,YES)!=targetHighlight) ((UIImageView *)bg).highlightedImage=targetHighlight;
++    }];
+     // Some YY implementations wrap/copy assigned UIImage objects. Own the stored results,
+     // not just the arguments, so disable/reuse still restores the correct native baseline.
+     binding.images.generatedImage=CSCurrentImage(bg,NO);
+@@ -355,8 +374,45 @@
+     });
+ }
+ 
+-void CSBubbleStyleImageDecoded(UIImageView *view) {
+-    if (!NSThread.isMainThread) return;
++// Verified 8.0.78 display-task ABI: UIImage *(CGSize, BOOL (^)(void)). The native
++// block does the decoding. We only observe its completion, outside the decoder,
++// and retry on main after validating the cell, model, background and image pair.
++typedef UIImage *(^CSBubbleDisplayContents)(CGSize, BOOL (^)(void));
++void CSBubbleStyleObserveDisplayTask(UIImageView *view, id task) {
++    if (!NSThread.isMainThread || !CSStyle.enabled) return;
+     CSBubbleBinding *binding=objc_getAssociatedObject(view,&CSBubbleImageKey);
+-    if (binding && !binding.applying) { binding.key=nil; CSBubbleStyleApply(binding.cell); }
+-}
++    if (!binding || !binding.supported || binding.applying || !binding.cell ||
++        (binding.images.generatedImage && (!binding.images.nativeHighlightedImage || binding.images.generatedHighlightedImage))) return;
++    Class taskClass=NSClassFromString(@"YYAsyncLayerDisplayTask");
++    if (!taskClass || ![task isKindOfClass:taskClass]) return;
++    SEL getter=NSSelectorFromString(@"displayContentsForLayer"),setter=NSSelectorFromString(@"setDisplayContentsForLayer:");
++    Method get=class_getInstanceMethod(object_getClass(task),getter),set=class_getInstanceMethod(object_getClass(task),setter);
++    if (!get || !set || method_getNumberOfArguments(get)!=2 || method_getNumberOfArguments(set)!=3) return;
++    char result[32]={0},argument[32]={0},setterResult[32]={0};
++    method_getReturnType(get,result,sizeof(result));method_getArgumentType(set,2,argument,sizeof(argument));
++    method_getReturnType(set,setterResult,sizeof(setterResult));
++    if (strcmp(result,"@?") || strcmp(argument,"@?") || setterResult[0]!='v') return;
++    CSBubbleDisplayContents original=((id(*)(id,SEL))objc_msgSend)(task,getter);
++    if (!original) return;
++    __weak CSBubbleBinding *expected=binding;
++    __weak UIView *cell=binding.cell;
++    __weak UIImageView *background=view;
++    __weak id model=binding.model;
++    id normal=binding.images.nativeImage,highlight=binding.images.nativeHighlightedImage;
++    CSBubbleDisplayContents observed=^UIImage *(CGSize size, BOOL (^cancelled)(void)) {
++        UIImage *image=original(size,cancelled);
++        if (!image || (cancelled && cancelled())) return image;
++        // No UIKit access or binding mutation on the native decoding thread.
++        dispatch_async(dispatch_get_main_queue(), ^{
++            CSBubbleBinding *live=expected;UIView *liveCell=cell;UIImageView *liveView=background;
++            if (!live || !liveCell || !liveView || !model ||
++                objc_getAssociatedObject(liveCell,&CSBubbleCellKey)!=live ||
++                objc_getAssociatedObject(liveView,&CSBubbleImageKey)!=live ||
++                live.model!=model || CSMessageNativeObject(liveCell,@"viewModel")!=model ||
++                live.images.nativeImage!=normal || live.images.nativeHighlightedImage!=highlight) return;
++            CSBubbleStyleApply(liveCell);
++        });
++        return image;
++    };
++    ((void(*)(id,SEL,id))objc_msgSend)(task,setter,observed);
++}
+--- 1.8-30/Controllers/CSReleaseNotesViewController.m
++++ 1.8-31/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,12 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"1.8-31": @[
++            @{@"title": @"修复自定义气泡不显示",
++              @"detail": @"修复微信背景延迟解码后未恢复自定义样式的问题，普通背景不再等待按压背景就绪，图片显示完成后自动更新。"},
++            @{@"title": @"保护历史消息复用",
++              @"detail": @"过滤取消任务和已复用消息的过期回调，保留快速滑动防闪退保护，以及合并消息 2pt 逻辑间距。"}
++        ],
+         @"1.8-30": @[
+             @{@"title": @"统一合并间距为 2pt",
+               @"detail": @"紧密模式下，合并消息首条与中间条、以及引用消息前后的组内间距统一以 2pt（逻辑点）为目标，间距计算不随屏幕倍率变化。"},
+--- 1.8-30/Hooks/BubbleStyleHooks.xm
++++ 1.8-31/Hooks/BubbleStyleHooks.xm
+@@ -75,10 +75,11 @@
+ - (void)setHighlightedImage:(id)image {
+     %orig(CSBubbleStyleImageAssignment((UIImageView *)self,image,YES));
+ }
+-- (void)didSetDynamicYYImage {
+-    %orig;
+-    // The current object may have decoded in place, without another setImage: call.
+-    CSBubbleStyleImageDecoded((UIImageView *)self);
++- (id)newAsyncDisplayTask {
++    id task=%orig;
++    // didSetDynamicYYImage only registers dark-mode observation, before decoding.
++    CSBubbleStyleObserveDisplayTask((UIImageView *)self,task);
++    return task;
+ }
+ %end
+ 
+--- 1.8-30/Headers/CSUserInfoHelper.h
++++ 1.8-31/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"1.8-30"  // 插件版本号
++#define kPluginVersionString @"1.8-31"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- 1.8-30/Tests/BubbleStyleAdapterTests.m
++++ 1.8-31/Tests/BubbleStyleAdapterTests.m
+@@ -106,7 +106,8 @@
+     UIImage *image=[UIImage imageWithCGImage:cg scale:2 orientation:UIImageOrientationUp]; CGImageRelease(cg); return image;
+ }
+ static BOOL HasColor(id value, CSBubbleRGBA color, BOOL highlighted) {
+-    UIImage *image=[value isKindOfClass:YYImage.class] ? ((YYImage *)value).originImage : value;
++    UIImage *image=[value isKindOfClass:YYImage.class] ?
++        (((YYImage *)value)->m_originImage ?: ((YYImage *)value).decodeImageLM ?: ((YYImage *)value).pendingImage) : value;
+     if (![image isKindOfClass:UIImage.class] || !image.CGImage) return NO;
+     CGImageRef cg=image.CGImage;size_t w=CGImageGetWidth(cg),h=CGImageGetHeight(cg);
+     CGColorSpaceRef space=CGColorSpaceCreateDeviceRGB();
+@@ -222,6 +223,83 @@
+     [NSNotificationCenter.defaultCenter postNotificationName:NSUserDefaultsDidChangeNotification object:nil];Drain();
+     return 0;
+ }
++// Execute the same display-task boundary used by the Logos hook, including a
++// worker completion. The original result and cancellation block are preserved.
++static UIImage *RunDisplay(YYAsyncLayerDisplayTask *task, BOOL worker, BOOL cancelled) {
++    __block UIImage *result=nil;
++    void (^run)(void)=^{ result=task.displayContentsForLayer(CGSizeMake(180,38), ^BOOL { return cancelled; }); };
++    if (worker) dispatch_sync(dispatch_get_global_queue(QOS_CLASS_DEFAULT,0),run); else run();
++    return result;
++}
++static int VerifyNativeDisplayReadiness(void) {
++    Settings(YES);
++    CSBubbleTestDeferredFactory=YES;
++    BubbleCell *cell=[BubbleCell new];cell.background=[YYAsyncImageView new];
++    cell.background.frame=CGRectMake(0,0,180,38);
++    TextMessageViewModel *model=[TextMessageViewModel new];model.messageWrap=[BubbleWrap new];
++    model.messageWrap.m_uiMessageType=1;model.bgBubbleInfo=[BubbleInfo new];cell.viewModel=model;
++    UIImage *pixels=Native(.2),*pressedPixels=Native(.3);
++    YYImage *normal=[YYImage deferredImageWithUIImage:pixels];
++    YYImage *pressed=[YYImage deferredImageWithUIImage:pressedPixels];
++    cell.background.image=normal;cell.background.highlightedImage=pressed;
++    CSBubbleStyleApply(cell);CHECK(cell.background->m_image==normal);
++    YYAsyncLayerDisplayTask *task=[cell.background newAsyncDisplayTask];
++    CHECK(RunDisplay(task,YES,NO)==pixels);
++    CHECK(cell.background->m_image==normal); // No UIKit write on the decoding thread.
++    CHECK(pressed.decodeImageLM==nil); // The inactive state remains lazy indefinitely.
++    Drain();CHECK(cell.background->m_image!=normal);
++    CHECK(HasColor(cell.background->m_image,(CSBubbleRGBA){.95,.95,.95,1},NO));
++    CHECK(cell.background->m_highlightedImage==pressed);
++    NSUInteger writes=cell.background.assignments,scans=CSBubbleNativePaddingScanCount;
++    task=[cell.background newAsyncDisplayTask];RunDisplay(task,NO,NO);Drain();
++    CHECK(cell.background.assignments==writes && CSBubbleNativePaddingScanCount==scans);
++    cell.background.highlighted=YES;task=[cell.background newAsyncDisplayTask];
++    CHECK(RunDisplay(task,YES,NO)==pressedPixels);Drain();
++    CHECK(cell.background->m_highlightedImage!=pressed);
++    CHECK(HasColor(cell.background->m_highlightedImage,(CSBubbleRGBA){.95,.95,.95,1},YES));
++    UIEdgeInsets insets;
++    CHECK(((YYImage *)cell.background->m_highlightedImage).decodeImageLM==nil);
++    CHECK(CSBubbleStyleVisibleInsets(cell.background,&insets));
++    CHECK(insets.top==1 && insets.bottom==3); // Owned pixels are known before YY decodes our wrapper.
++    CSBubbleStyleDetach(cell);CHECK(cell.background->m_image==normal && cell.background->m_highlightedImage==pressed);
++    cell.background.highlighted=NO;cell.background.highlightedImage=nil;Drain();
++
++    // Canceled/stale work, feature disable, unsupported reuse, and normal completion.
++    // No test calls a pretend "decoded" callback or a second layout to recover.
++    for (NSUInteger pass=0;pass<72;pass++) {
++        model.messageWrap.m_uiMessageType=1;cell.viewModel=model;Settings(YES);
++        normal=[YYImage deferredImageWithUIImage:pixels];cell.background.image=normal;
++        CSBubbleStyleNativeChanged(cell);Drain();task=[cell.background newAsyncDisplayTask];
++        NSUInteger mode=pass%6;
++        if (mode==1) CSBubbleStyleDetach(cell);
++        if (mode==2) Settings(NO);
++        if (mode==3) {
++            TextMessageViewModel *replacement=[TextMessageViewModel new];replacement.messageWrap=[BubbleWrap new];
++            replacement.messageWrap.m_uiMessageType=3;replacement.bgBubbleInfo=[BubbleInfo new];
++            cell.viewModel=replacement; // Even without a detach, stale model identity must reject completion.
++        }
++        if (mode==4) {
++            YYImage *replacement=[YYImage deferredImageWithUIImage:pressedPixels];
++            cell.background.image=replacement;Drain();
++        }
++        writes=cell.background.assignments;
++        CHECK(RunDisplay(task,pass%2,mode==0)==pixels);Drain();
++        if (mode==5) CHECK(cell.background->m_image!=normal);
++        else CHECK(cell.background.assignments==writes);
++        CSBubbleStyleDetach(cell);
++    }
++    Settings(YES);
++    YYAsyncImageView *unbound=[YYAsyncImageView new];unbound.image=[YYImage deferredImageWithUIImage:pixels];
++    task=[YYAsyncLayerDisplayTask new];task.displayContentsForLayer=^UIImage *(CGSize size, BOOL (^cancelled)(void)) { return pixels; };
++    id original=task.displayContentsForLayer;CSBubbleStyleObserveDisplayTask(unbound,task);
++    CHECK(task.displayContentsForLayer==original);CHECK(RunDisplay(task,YES,NO)==pixels);Drain();
++    CHECK(unbound.assignments==1);
++    CSBubbleStyleApply(cell);task=[YYAsyncLayerDisplayTask new];
++    CSBubbleStyleObserveDisplayTask(cell.background,task);CHECK(task.displayContentsForLayer==nil);
++    CSBubbleStyleObserveDisplayTask(cell.background,[NSObject new]);
++    CSBubbleStyleDetach(cell);Settings(NO);CSBubbleTestDeferredFactory=NO;
++    return 0;
++}
+ int main(void) { @autoreleasepool {
+     NSDictionary *saved=[NSUserDefaults.standardUserDefaults volatileDomainForName:NSArgumentDomain];
+     Settings(NO); CSBubbleStyleStart();
+@@ -279,17 +357,27 @@
+     cell.background.image=baseline;
+     model=[TextMessageViewModel new]; model.messageWrap=[BubbleWrap new]; model.messageWrap.m_uiMessageType=3; model.bgBubbleInfo=[BubbleInfo new]; cell.viewModel=model;
+     CSBubbleStyleApply(cell); Drain(); CHECK(cell.background->m_image==baseline);
+-    // One invalid template is remembered until a native event, rather than reattempted every layout.
++    // A pending wrapper can become ready in place without a setter or dynamic-image callback.
+     model.messageWrap.m_uiMessageType=1; model.isSender=NO; CSBubbleStyleNativeChanged(cell); CHECK(cell.background->m_image!=baseline);
+     YYImage *unready=[LazyYYImage new]; cell.background.image=unready; Drain(); CHECK(cell.background->m_image==unready);
+     for (int i=0;i<100;i++) CSBubbleStyleApply(cell); CHECK(cell.background->m_image==unready);
+     scans=CSBubbleNativePaddingScanCount;
+-    unready.originImage=Native(.4); CSBubbleStyleImageDecoded(cell.background); CHECK(cell.background->m_image!=unready);
++    unready.originImage=Native(.4); CSBubbleStyleApply(cell); CHECK(cell.background->m_image!=unready);
+     CHECK(CSBubbleNativePaddingScanCount==scans+1);
+     scans=CSBubbleNativePaddingScanCount;
+-    unready.originImage=Native(.6); CSBubbleStyleImageDecoded(cell.background);
++    unready.originImage=Native(.6); CSBubbleStyleApply(cell);
+     CHECK(CSBubbleNativePaddingScanCount==scans+1); // Same YY wrapper, new immutable decoded pixels.
+     CSBubbleStyleDetach(cell); CHECK(cell.background->m_image==unready);
++    // WeChat leaves the pressed background lazy until it is actually displayed.
++    LazyYYImage *dormantHighlight=[LazyYYImage new];
++    cell.background.image=baseline;cell.background.highlightedImage=dormantHighlight;
++    CSBubbleStyleApply(cell);CHECK(cell.background->m_image!=baseline);
++    CHECK(cell.background->m_highlightedImage==dormantHighlight);
++    dormantHighlight.originImage=Native(.3);CSBubbleStyleApply(cell);
++    CHECK(cell.background->m_highlightedImage!=dormantHighlight);
++    CSBubbleStyleDetach(cell);CHECK(cell.background->m_image==baseline);
++    CHECK(cell.background->m_highlightedImage==dormantHighlight);
++    cell.background.highlightedImage=nativeHighlight;
+     // Visible-inset inspection shares the same safe decoder, even with styling off.
+     UIImage *loaded=[Native(.4) resizableImageWithCapInsets:UIEdgeInsetsMake(12,12,12,12) resizingMode:UIImageResizingModeStretch];
+     LazyYYImage *lazy=[LazyYYImage new];metricView.image=lazy;
+@@ -304,7 +392,7 @@
+     for (NSUInteger reuse=0;reuse<600;reuse++) {
+         LazyYYImage *pending=[LazyYYImage new];cell.background.image=pending;
+         CSBubbleStyleNativeChanged(cell);CHECK(cell.background->m_image==pending);
+-        pending.originImage=loaded;CSBubbleStyleImageDecoded(cell.background);
++        pending.originImage=loaded;CSBubbleStyleApply(cell);
+         CHECK(cell.background->m_image!=pending);
+         CSBubbleStyleDetach(cell);CHECK(cell.background->m_image==pending);
+     }
+@@ -438,6 +526,7 @@
+     cell.background.image=nil; Drain(); CHECK(cell.background->m_image==nil);
+     Settings(NO); CHECK(cell.background->m_image==nil);
+     CHECK(VerifyTextColors()==0);
++    CHECK(VerifyNativeDisplayReadiness()==0);
+     [NSUserDefaults.standardUserDefaults setVolatileDomain:saved forName:NSArgumentDomain];
+     fprintf(stdout,"Bubble real-adapter lifecycle: %lu checks passed\n",(unsigned long)checks);
+ } return 0; }
+--- 1.8-30/Tests/BubbleUIKit/BubbleUIKit.m
++++ 1.8-31/Tests/BubbleUIKit/BubbleUIKit.m
+@@ -48,11 +48,29 @@
+ - (void)dealloc { if (_image) CGImageRelease(_image); }
+ @end
+ @implementation UIImageView @end
++BOOL CSBubbleTestDeferredFactory;
+ @implementation YYImage
+ @synthesize originImage=m_originImage;
+-+ (instancetype)imageWithUIImage:(UIImage *)image { YYImage *value=[self new]; value.originImage=image; return value; }
+++ (instancetype)imageWithUIImage:(UIImage *)image {
++    if (CSBubbleTestDeferredFactory) return [self deferredImageWithUIImage:image];
++    YYImage *value=[self new]; value.originImage=image; return value;
++}
+++ (instancetype)deferredImageWithUIImage:(UIImage *)image { YYImage *value=[self new]; value.pendingImage=image; return value; }
++- (UIImage *)decodeImage { if (!_decodeImageLM) _decodeImageLM=m_originImage?:_pendingImage; return _decodeImageLM; }
+ @end
++@implementation YYAsyncLayerDisplayTask @end
+ @implementation YYAsyncImageView
+ - (void)setImage:(UIImage *)image { self.assignments++; m_image=CSBubbleStyleImageAssignment(self,image,NO); }
+ - (void)setHighlightedImage:(UIImage *)image { self.assignments++; m_highlightedImage=CSBubbleStyleImageAssignment(self,image,YES); }
++- (YYAsyncLayerDisplayTask *)newAsyncDisplayTask {
++    YYAsyncLayerDisplayTask *task=[YYAsyncLayerDisplayTask new];
++    __weak YYImage *normal=m_image,*pressed=m_highlightedImage;
++    BOOL highlighted=self.highlighted;
++    // Match 8.0.78's block ABI and active-state-only native decoding. No setter,
++    // dynamic-image notification, or extra layout is emitted on completion.
++    task.displayContentsForLayer=^UIImage *(CGSize size, BOOL (^cancelled)(void)) {
++        return (highlighted ? [pressed decodeImage] : nil) ?: [normal decodeImage];
++    };
++    CSBubbleStyleObserveDisplayTask(self,task);return task;
++}
+ @end
+--- 1.8-30/Tests/BubbleUIKit/UIKit/UIKit.h
++++ 1.8-31/Tests/BubbleUIKit/UIKit/UIKit.h
+@@ -59,11 +59,20 @@
+ }
+ @property(nonatomic, strong) UIImage *originImage;
+ @property(nonatomic, strong) UIImage *decodeImageLM, *decodeImageDM;
++@property(nonatomic, strong) UIImage *pendingImage;
+ + (instancetype)imageWithUIImage:(UIImage *)image;
+++ (instancetype)deferredImageWithUIImage:(UIImage *)image;
++- (UIImage *)decodeImage;
++@end
++extern BOOL CSBubbleTestDeferredFactory;
++@interface YYAsyncLayerDisplayTask : NSObject
++@property(nonatomic, copy) UIImage *(^displayContentsForLayer)(CGSize, BOOL (^)(void));
+ @end
+ @interface YYAsyncImageView : UIImageView {
+ @public id m_image; id m_highlightedImage;
+ }
+ @property(nonatomic) NSUInteger assignments;
++@property(nonatomic) BOOL highlighted;
++- (YYAsyncLayerDisplayTask *)newAsyncDisplayTask;
+ @end
+ extern NSString *const UIApplicationDidReceiveMemoryWarningNotification;
+--- 1.8-30/README.md
++++ 1.8-31/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，提供聊天分组、列表圆角、界面定制和消息操作增强。通过 Objective-C / Logos 接入微信原生界面，各项功能在插件设置中分别配置。
+ 
+-**当前版本：`1.8-30`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`1.8-31`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [安装与入口](#安装与入口) · [功能概览](#功能概览) · [聊天分组](#聊天分组) · [源码编译](#源码编译) · [开发说明](#开发说明) · [常见问题](#常见问题)
+ 
+@@ -10,17 +10,17 @@
+ 
+ | 项目 | 当前状态 |
+ | --- | --- |
+-| 插件版本 | `1.8-30`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
++| 插件版本 | `1.8-31`，由 `control` 和 `Headers/CSUserInfoHelper.h` 记录 |
+ | 分组实现 | 沿用 `1.5-15` 的功能状态，包含服务号归属修复和圆角复用优化 |
+ | 最近适配目标 | 微信 `8.0.78`、iOS `27.0` |
+ | 最低编译目标 | iOS `15.0`；不代表所有系统和微信组合都已验证 |
+-| Rootless / Rootful | `1.8-30` 为统一合并间距为 2pt 的 Rootless 包，保留字体颜色、连续圆角、通话背景与预览；Rootful 保留构建入口，本轮未验证 |
++| Rootless / Rootful | `1.8-31` 为修复自定义气泡显示的 Rootless 包，保留字体颜色、连续圆角、通话背景与预览；Rootful 保留构建入口，本轮未验证 |
+ | Roothide | Makefile 保留方案入口，当前版本尚未验证打包与运行 |
+ | 注入依赖 | 包元数据声明 `mobilesubstrate >= 0.9.5000`，实际加载还取决于设备的注入环境 |
+ 
+ 微信私有类、方法和界面结构会随版本变化。当前已有编译与逻辑回归结果，真实设备上的界面渲染、原生菜单和不同插件组合仍需按实际环境验证。
+ 
+-本轮记录见 [1.8-30 合并间距统一为 2pt](docs/audits/merge-spacing-points-1.8-30/README.md)。紧密模式下，标准合并消息首条与中间条、以及引用消息前后的组内间距统一以 **2pt（逻辑点）** 为目标；直接按逻辑坐标计算行高与位移，移除屏幕倍率换算和物理像素取整。沿用 [1.8-29 的首条占位、引用框完整布局与滚动闪退修复](docs/audits/merge-spacing-crash-1.8-29/README.md)，保留字体颜色、连续圆角、通话背景及附加内容保护。不同屏幕倍率与分数坐标的主机回归、全部回归入口和构建验证见本轮记录；真机滚动与渲染仍需验收。
++本轮记录见 [1.8-31 自定义气泡延迟解码修复](docs/audits/bubble-readiness-1.8-31/README.md)。修复背景图片延迟解码后失败缓存未更新、普通背景被未解码按压背景阻塞的问题；在微信实际显示任务完成后校验消息身份并重试，防止过期任务影响复用消息。插件自身生成的背景保留已知像素，供透明边距测量直接复用。沿用 [1.8-30 的 2pt 逻辑间距](docs/audits/merge-spacing-points-1.8-30/README.md)，保留不主动调用微信延迟解码 getter 的防闪退保护。已完成主机核心时序回归、全部回归入口及编译打包；真实设备的最终渲染与滚动仍需验收。
+ 
+ ## 安装与入口
+ 
+--- 1.8-30/control
++++ 1.8-31/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 1.8-30
++Version: 1.8-31
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会

@@ -9,19 +9,30 @@ static NSUInteger checks, originalCallbacks, nativeStarts, sentMessages, submitt
 static NSMutableArray *requests;
 static NSString *testAccount=@"self";
 static BOOL nativePaymentBusy;
+static NSMutableDictionary *notificationContacts;
+static NSUInteger notificationLookups;
+static BOOL notificationLookupThrows;
 #define CHECK(c) do { checks++; if (!(c)) { fprintf(stderr,"FAIL %d: %s\n",__LINE__,#c); exit(1); } } while(0)
 NSString *const UIApplicationDidBecomeActiveNotification=@"TestActive", *const UIApplicationDidEnterBackgroundNotification=@"TestBackground";
 id CSGetService(Class cls) { static NSMutableDictionary *services; if (!services) services=[NSMutableDictionary dictionary]; NSString *key=NSStringFromClass(cls); if (!key) return nil; if (!services[key]) services[key]=[cls new]; return services[key]; }
 #import "PaymentAutomationUnderTest.h"
 @interface TestContact : NSObject
-@property NSString *m_nsUsrName;
+@property NSString *m_nsUsrName, *m_nsRemark, *m_nsNickName;
 @end
 @implementation TestContact @end
 @interface CContactMgr : NSObject
 - (id)getSelfContact;
+- (id)getContactByNameFromCache:(NSString *)username;
+- (id)getContactByName:(NSString *)username;
 @end
 @implementation CContactMgr
 - (id)getSelfContact { TestContact *c=[TestContact new]; c.m_nsUsrName=testAccount; return c; }
+- (id)getContactByNameFromCache:(NSString *)username { return [self getContactByName:username]; }
+- (id)getContactByName:(NSString *)username {
+    notificationLookups++;
+    if (notificationLookupThrows) @throw [NSException exceptionWithName:@"ContactUnavailable" reason:nil userInfo:nil];
+    return notificationContacts[username];
+}
 @end
 @interface TestBuffer : NSObject
 @property NSData *buffer;
@@ -155,7 +166,12 @@ static void Setup(void) {
     for (CSPaymentTask *t in store.tasks) CSFinish(t);
     store=[CSPaymentTaskStore new]; receiptSources=[NSMutableDictionary dictionary]; requests=[NSMutableArray array]; submittedTransfers=submittedQueries=submittedOpens=sentMessages=0;
     testAccount=@"self"; nativePaymentBusy=NO; submittedStatusQueries=0; deliveries=[NSMutableArray array];
+    TestContact *payer=[TestContact new]; payer.m_nsRemark=@"付款人备注"; payer.m_nsNickName=@"付款人昵称";
+    TestContact *room=[TestContact new]; room.m_nsNickName=@"测试群";
+    notificationContacts=[@{@"payer":payer,@"room@chatroom":room} mutableCopy];
+    notificationLookups=0; notificationLookupThrows=NO;
     [paymentDefaults setInteger:0 forKey:@"kReceiveTransferNotifyTargetKey"];
+    [paymentDefaults setInteger:0 forKey:@"com.wechat.enhance.redenvelop.notifyTarget"];
     [paymentDefaults removeObjectForKey:@"com.wechat.enhance.redenvelop.autoReplyEnable"];
     [paymentDefaults setInteger:0 forKey:@"com.wechat.enhance.redenvelop.groupScope"];
     [paymentDefaults setBool:YES forKey:@"kReceiveTransferAutoEnableKey"];
@@ -389,9 +405,11 @@ int main(void) { @autoreleasepool {
         if (notify.integerValue) {
             NSDictionary *notification=deliveries.lastObject;
             CHECK([notification[@"session"] isEqual:notify.integerValue==1?@"self":@"filehelper"]);
-            CHECK([notification[@"text"] containsString:@"收到转账提醒"] && [notification[@"text"] containsString:@"CNY 1.23"]);
-            CHECK([notification[@"text"] containsString:card.m_nsFromUsr]);
+            CHECK([notification[@"text"] hasPrefix:@"💰 转账已收款\n到账金额：¥1.23\n\n来自：付款人备注\n"]);
+            CHECK([notification[@"text"] containsString:group.boolValue?@"群聊：测试群":@"会话：私聊"]);
+            CHECK(![notification[@"text"] containsString:@"红包总额"] && ![notification[@"text"] containsString:@"@chatroom"]);
         }
+        CHECK(notificationLookups==(notify.integerValue ? (group.boolValue?2u:1u) : 0u));
         NSUInteger effects=sentMessages;
         Respond(statusRequest,Receipt(123),NO); Respond(confirm,@{@"retcode":@0},NO); CSPaymentAdmitMessage(card,NO); Drain();
         CHECK(sentMessages==effects && submittedStatusQueries==1 && submittedTransfers==1);
@@ -399,6 +417,94 @@ int main(void) { @autoreleasepool {
         CHECK(!store.tasks.count && !timer);
         [NSNotificationCenter.defaultCenter removeObserver:observer];
     }
+    // Envelope notifications share the layout, but preserve the whole packet's total separately.
+    for (NSNumber *group in @[@NO,@YES]) for (NSNumber *notify in @[@0,@1,@2]) for (NSNumber *reply in @[@NO,@YES]) {
+        Setup();
+        [paymentDefaults setInteger:notify.integerValue forKey:@"com.wechat.enhance.redenvelop.notifyTarget"];
+        [paymentDefaults setBool:reply.boolValue forKey:@"com.wechat.enhance.redenvelop.autoReplyEnable"]; CSPaymentReload(); Drain();
+        CMessageWrap *card=Message(NSUUID.UUID.UUIDString,@"self",YES); card.m_nsRealChatUsr=@"payer";
+        if (!group.boolValue) card.m_nsFromUsr=@"payer";
+        NSInteger priorCount=[paymentDefaults integerForKey:@"com.wechat.enhance.redenvelop.totalCount"];
+        long long priorAmount=[[paymentDefaults objectForKey:@"com.wechat.enhance.redenvelop.totalAmount"] longLongValue];
+        CSPaymentAdmitMessage(card,YES); Drain(); Respond(requests.lastObject,nativeQuery,YES);
+        id opened=requests.lastObject;
+        NSDictionary *body=@{@"amount":@888,@"totalAmount":@"10000",@"sendUserName":@"payer",@"sendNick":@"服务器昵称"};
+        Respond(opened,body,YES);
+        Until(^BOOL{ return [paymentDefaults integerForKey:@"com.wechat.enhance.redenvelop.totalCount"]==priorCount+1; });
+        CHECK([[paymentDefaults objectForKey:@"com.wechat.enhance.redenvelop.totalAmount"] longLongValue]==priorAmount+888);
+        CHECK(sentMessages==(NSUInteger)(reply.boolValue+(notify.integerValue!=0)));
+        if (reply.boolValue) CHECK(([deliveries.firstObject isEqual:@{@"session":card.m_nsFromUsr,@"text":@"thanks"}]));
+        if (notify.integerValue) {
+            NSDictionary *notice=deliveries.lastObject;
+            CHECK([notice[@"session"] isEqual:notify.integerValue==1?@"self":@"filehelper"]);
+            CHECK([notice[@"text"] hasPrefix:@"🧧 红包已领取\n到账金额：¥8.88\n红包总额：¥100.00\n\n来自：付款人备注\n"]);
+            CHECK([notice[@"text"] containsString:group.boolValue?@"群聊：测试群":@"会话：私聊"]);
+            CHECK(![notice[@"text"] containsString:@"@chatroom"]);
+        }
+        CHECK(notificationLookups==(notify.integerValue ? (group.boolValue?2u:1u) : 0u));
+        NSUInteger effects=sentMessages, lookups=notificationLookups;
+        Respond(opened,body,YES); CSPaymentAdmitMessage(card,YES); Drain();
+        CHECK(sentMessages==effects && notificationLookups==lookups && submittedQueries==1 && submittedOpens==1);
+        CHECK(!store.tasks.count && !timer);
+    }
+    // Optional display fields cannot invalidate an otherwise successful receipt.
+    for (NSDictionary *body in @[
+        @{@"amount":@88}, @{@"amount":@88,@"totalAmount":NSNull.null},
+        @{@"amount":@88,@"totalAmount":@0}, @{@"amount":@88,@"totalAmount":@-1},
+        @{@"amount":@88,@"totalAmount":@87}, @{@"amount":@88,@"totalAmount":@"8.88"},
+        @{@"amount":@88,@"totalAmount":@"9223372036854775808"}
+    ]) {
+        Setup(); [paymentDefaults setInteger:2 forKey:@"com.wechat.enhance.redenvelop.notifyTarget"]; CSPaymentReload(); Drain();
+        CSPaymentAdmitMessage(Message(NSUUID.UUID.UUIDString,@"self",YES),YES); Drain(); Respond(requests.lastObject,nativeQuery,YES);
+        Respond(requests.lastObject,body,YES); Until(^BOOL{ return sentMessages==2; });
+        CHECK([deliveries.lastObject[@"text"] containsString:@"到账金额：¥0.88\n红包总额：未提供"]);
+        CHECK(![deliveries.lastObject[@"text"] containsString:@"来自："]);
+        CHECK(!store.tasks.count);
+    }
+    // A manual receipt still uses the same correlated response and notifies only once.
+    Setup(); [paymentDefaults setInteger:10 forKey:@"com.wechat.enhance.redenvelop.delay"];
+    [paymentDefaults setInteger:2 forKey:@"com.wechat.enhance.redenvelop.notifyTarget"]; CSPaymentReload(); Drain();
+    CSPaymentAdmitMessage(Message(@"manual-notice",@"self",YES),YES); Drain(); Respond(requests.lastObject,nativeQuery,YES);
+    pending=store.tasks.firstObject; manualParams=[pending.payload[@"params"] mutableCopy]; manualParams[@"timingIdentifier"]=@"manual-token";
+    manualOpen=[HongBaoReq new]; manualOpen.cgiCmd=4; manualOpen.reqText=Form(manualParams,2);
+    [(id)CSGetService(WCRedEnvelopesNetworkHelper.class) WCToHongbaoCommonRequest:manualOpen];
+    Respond(manualOpen,@{@"amount":@77,@"totalAmount":@100,@"sendUserName":@"payer"},YES);
+    Until(^BOOL{ return sentMessages==2; });
+    CHECK([deliveries.lastObject[@"text"] containsString:@"红包总额：¥1.00\n\n来自：付款人备注"]);
+    Respond(manualOpen,@{@"amount":@77,@"totalAmount":@100},YES); CHECK(sentMessages==2 && !submittedOpens);
+
+    // Name precedence/fallback, layout safety, exact decimal amounts, and local-time changes.
+    Setup(); CSPaymentTask *noticeTask=[CSPaymentTask new]; noticeTask.envelope=YES;
+    noticeTask.session=@"room@chatroom"; noticeTask.payload=@{@"sender":@"payer"};
+    NSTimeZone *originalZone=NSTimeZone.defaultTimeZone;
+    [NSTimeZone setDefaultTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:8*3600]];
+    NSDate *fixedDate=[NSDate dateWithTimeIntervalSince1970:1792391528]; // 2026-10-19 14:32:08 UTC+8.
+    NSString *notice=CSNotificationText(noticeTask,888,@"CNY",@{@"totalAmount":@10000},fixedDate);
+    CHECK([notice hasSuffix:@"时间：10-19 14:32:08"]);
+    TestContact *nameContact=notificationContacts[@"payer"]; nameContact.m_nsRemark=@"  \r\n "; nameContact.m_nsNickName=@"昵称\n第二行\t尾部";
+    notice=CSNotificationText(noticeTask,1,@"CNY",@{@"totalAmount":@1},fixedDate);
+    CHECK([notice containsString:@"来自：昵称 第二行 尾部\n"] && [notice containsString:@"红包总额：¥0.01"]);
+    notificationLookupThrows=YES;
+    notice=CSNotificationText(noticeTask,1,@"CNY",@{@"sendUserName":@"payer",@"sendNick":@"发送者\n昵称"},fixedDate);
+    CHECK([notice containsString:@"来自：发送者 昵称"] && [notice containsString:@"群聊：未获取群名"]);
+    notice=CSNotificationText(noticeTask,1,@"CNY",@{@"sendUserName":@"other",@"sendNick":@"错误昵称"},fixedDate);
+    CHECK(![notice containsString:@"错误昵称"]);
+    CHECK([notice containsString:@"来自：未获取昵称"]);
+    noticeTask.envelope=NO; noticeTask.session=@"payer"; noticeTask.payload=@{@"payer":@"payer"};
+    notice=CSNotificationText(noticeTask,LLONG_MAX,@"USD",@{},fixedDate);
+    CHECK([notice containsString:@"到账金额：USD 92233720368547758.07"] && ![notice containsString:@"红包总额"]);
+    [NSTimeZone setDefaultTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+    notice=CSNotificationText(noticeTask,100,@"CNY",@{},fixedDate);
+    CHECK([notice hasSuffix:@"时间：10-19 06:32:08"]);
+    [NSTimeZone setDefaultTimeZone:originalZone];
+    CHECK(!CSNotificationName(NSNull.null) && !CSNotificationName(@" \t\n"));
+    NSString *longName=[@"🧧" stringByPaddingToLength:200 withString:@"🧧" startingAtIndex:0];
+    CHECK([CSNotificationName(longName) hasSuffix:@"…"] && CSNotificationName(longName).length<=83);
+    // Notification preference and new display fields cannot bypass exclusive-recipient protection.
+    Setup(); [paymentDefaults setInteger:2 forKey:@"com.wechat.enhance.redenvelop.notifyTarget"]; CSPaymentReload(); Drain();
+    exclusive=Message(@"notice-exclusive",@"self",YES); exclusive.m_oWCPayInfoItem.exclusive_recv_username=@"other";
+    CSPaymentAdmitMessage(exclusive,YES); Drain(); CHECK(!submittedQueries && !sentMessages && !notificationLookups);
+
     // Never record pending, rejected, refunded, mismatched, malformed or failed status responses.
     for (NSDictionary *delta in @[
         @{@"trans_status":@2000},@{@"trans_status":@2002},@{@"trans_status":@2003},@{@"trans_status":@2004},@{@"trans_status":@2005},@{@"trans_status":NSNull.null},

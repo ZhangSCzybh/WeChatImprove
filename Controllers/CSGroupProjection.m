@@ -50,6 +50,7 @@ static BOOL CSGroupDotUnread(CSGroupRow *row) {
 }
 
 static BOOL CSGroupRowsMatch(CSGroupRow *a, CSGroupRow *b, BOOL unread) {
+    if (a && a==b) return YES; // Published base rows are immutable.
     return a && b && [a.nativePath isEqual:b.nativePath] &&
         (a.userName==b.userName || [a.userName isEqual:b.userName]) &&
         a.kind==b.kind && a.category==b.category && a.top==b.top &&
@@ -59,6 +60,7 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
     if (!a || !b || a.count!=b.count) return NO;
     for (NSUInteger s=0;s<a.count;s++) {
         NSArray *left=a[s], *right=b[s]; if (left.count!=right.count) return NO;
+        if (left==right) continue;
         for (NSUInteger r=0;r<left.count;r++) if (!CSGroupRowsMatch(left[r],right[r],unread)) return NO;
     }
     return YES;
@@ -161,13 +163,14 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
         BOOL sameStructure=sameDefinitions && previous.filterDuplicates==filterDuplicates && CSGroupSectionsMatch(copiedSections,previous.inputSections,NO);
         BOOL sameValues=sameStructure && CSGroupSectionsMatch(copiedSections,previous.inputSections,YES);
         if (sameValues && [previous.selectedTabID isEqual:selectedTabID]) return previous;
+        BOOL sameDisplay=sameStructure && [previous.selectedTabID isEqual:selectedTabID];
         _inputSections=sameValues ? previous.inputSections : [copiedSections copy];
         NSMutableDictionary *destinationsByPath=sameStructure ? nil : [NSMutableDictionary dictionary];
 
         NSMutableDictionary<NSString *, NSNumber *> *counts = [NSMutableDictionary dictionary];
         NSMutableSet<NSString *> *dotTabs = [NSMutableSet set];
-        NSMutableDictionary<NSIndexPath *, NSIndexPath *> *displayToNative = [NSMutableDictionary dictionary];
-        NSMutableDictionary<NSIndexPath *, NSIndexPath *> *nativeToDisplay = [NSMutableDictionary dictionary];
+        NSMutableDictionary<NSIndexPath *, NSIndexPath *> *displayToNative = sameDisplay ? nil : [NSMutableDictionary dictionary];
+        NSMutableDictionary<NSIndexPath *, NSIndexPath *> *nativeToDisplay = sameDisplay ? nil : [NSMutableDictionary dictionary];
         NSMutableArray<NSArray<CSGroupRow *> *> *displaySections = [NSMutableArray arrayWithCapacity:sections.count];
         NSUInteger retainedCount = 0; BOOL retainedDot = NO;
         for (NSUInteger sectionIndex = 0; sectionIndex < copiedSections.count; sectionIndex++) {
@@ -198,12 +201,16 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
                     }
                 }
                 if (retained || [destinations containsObject:selectedTabID]) {
-                    NSIndexPath *displayPath = CSGroupPath(sectionIndex, visible.count);
-                    [visible addObject:row]; displayToNative[displayPath] = row.nativePath;
-                    nativeToDisplay[row.nativePath] = displayPath;
+                    if (!sameDisplay) {
+                        NSIndexPath *displayPath = CSGroupPath(sectionIndex, visible.count);
+                        displayToNative[displayPath] = row.nativePath;
+                        nativeToDisplay[row.nativePath] = displayPath;
+                    }
+                    [visible addObject:row];
                 }
             }
-            [displaySections addObject:[visible copy]];
+            NSArray *oldDisplay=sameDisplay ? previous.sections[sectionIndex] : nil;
+            [displaySections addObject:[visible isEqualToArray:oldDisplay] ? oldDisplay : [visible copy]];
         }
         NSMutableDictionary<NSString *, CSGroupBadge *> *badges = [NSMutableDictionary dictionary];
         for (NSString *tabID in types) {
@@ -211,8 +218,8 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
             badges[tabID] = [[CSGroupBadge alloc] initWithCount:count redDot:retainedDot || [dotTabs containsObject:tabID]];
         }
         _destinationsByPath=sameStructure ? previous.destinationsByPath : [destinationsByPath copy];
-        _sections = [displaySections copy]; _displayToNative = [displayToNative copy];
-        _nativeToDisplay = [nativeToDisplay copy]; _badges = sameValues ? previous.badges : [badges copy];
+        _sections = [displaySections copy]; _displayToNative = sameDisplay ? previous.displayToNative : [displayToNative copy];
+        _nativeToDisplay = sameDisplay ? previous.nativeToDisplay : [nativeToDisplay copy]; _badges = sameValues ? previous.badges : [badges copy];
         _valid = YES;
     }
     return self;

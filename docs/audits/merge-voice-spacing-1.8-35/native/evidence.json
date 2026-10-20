@@ -1,0 +1,12 @@
+{
+  "binary": "/private/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "uuid": "9CD58B8E-B7AB-3487-ADBD-2AC0AA16A5DE",
+  "version": "8.0.78.34",
+  "evidence": "static native metadata and bounded disassembly; no device execution",
+  "mirror_call": "0x106277ed0..0x106277ed8: CGAffineTransformMakeScale(-1,1)",
+  "mirror_store": "0x106277fdc..0x106277fec: m_playingImageView setTransform:",
+  "ordinary_glyph_center": "0x106286b00..0x106286b18 outgoing; 0x106286fa8..0x106286fc0 incoming",
+  "ordinary_glyph_size": "0x106277f0c..0x106277f4c: dynamicLength(24), dynamicLength(24)",
+  "class_layout": "m_playingImageView is an object ivar at offset208, queried by name in production"
+}

@@ -1,0 +1,12 @@
+[
+  "Controllers/CSBubbleStylePreview.m",
+  "Controllers/CSBubbleStylePolicy.h",
+  "Controllers/CSBubbleStylePolicy.m",
+  "Controllers/CSBubbleStyleSettingsViewController.m",
+  "Controllers/CSReleaseNotesViewController.m",
+  "Headers/CSUserInfoHelper.h",
+  "Tests/BubbleStyleAdapterTests.m",
+  "Tests/BubbleStyleTests.m",
+  "README.md",
+  "control"
+]

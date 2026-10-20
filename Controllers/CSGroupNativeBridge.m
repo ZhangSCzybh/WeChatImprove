@@ -155,6 +155,9 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact) {
     return CSGroupRowCategoryUnknown;
 }
 NSArray *CSGroupBuildNativeSections(id controller,id table,id source) {
+    return CSGroupBuildNativeSectionsReusing(controller,table,source,nil);
+}
+NSArray *CSGroupBuildNativeSectionsReusing(id controller,id table,id source,NSArray *previous) {
     @try {
         SEL rowsSEL=@selector(tableView:numberOfRowsInSection:);
         NSMethodSignature *rowSig=Signature(source,rowsSEL,4);
@@ -173,9 +176,16 @@ NSArray *CSGroupBuildNativeSections(id controller,id table,id source) {
         for (NSInteger section=0;section<count;section++) {
             NSInteger rows=((NSInteger(*)(id,SEL,id,NSInteger))objc_msgSend)(source,rowsSEL,table,section);
             if (rows<0 || rows>100000 || total+(NSUInteger)rows>100000) return nil;
-            total+=rows; NSMutableArray *values=[NSMutableArray arrayWithCapacity:rows];
+            total+=rows;
+            NSArray *oldSection=(NSUInteger)section<previous.count ? previous[section] : nil;
+            BOOL sameCount=oldSection && oldSection.count==(NSUInteger)rows;
+            NSMutableArray *values=sameCount ? nil : [NSMutableArray arrayWithCapacity:rows];
             for (NSInteger row=0;row<rows;row++) {
-                NSUInteger indices[]={(NSUInteger)section,(NSUInteger)row}; NSIndexPath *path=[NSIndexPath indexPathWithIndexes:indices length:2];
+                CSGroupRow *old=(NSUInteger)row<oldSection.count ? oldSection[row] : nil;
+                if (![old isMemberOfClass:CSGroupRow.class] || old.nativePath.length!=2 ||
+                    [old.nativePath indexAtPosition:0]!=(NSUInteger)section || [old.nativePath indexAtPosition:1]!=(NSUInteger)row) old=nil;
+                NSUInteger indices[]={(NSUInteger)section,(NSUInteger)row};
+                NSIndexPath *path=old.nativePath ?: [NSIndexPath indexPathWithIndexes:indices length:2];
                 id session=ObjectAtPath(logic,@"getSessionInfoAtIndexPath:",path);
                 id cellData=nil;
                 if (!session) { cellData=ObjectAtPath(logic,@"getCellDataAtIndexPath:",path); session=CSGroupReadObject(cellData,@"m_sessionInfo"); }
@@ -196,11 +206,19 @@ NSArray *CSGroupBuildNativeSections(id controller,id table,id source) {
                 BOOL top=CSGroupReadInteger(session,@"m_bIsTop",CSGroupReadInteger(cellData,@"bTopCell",0))!=0;
                 NSUInteger unread=(NSUInteger)MAX(0,CSGroupReadInteger(session,@"m_uUnReadCount",0));
                 BOOL dot=CSGroupReadInteger(session,@"m_bShowUnReadAsRedDot",0)!=0;
-                [values addObject:[[CSGroupRow alloc] initWithNativePath:path userName:name kind:kind category:category top:top unreadCount:unread redDot:dot]];
+                BOOL same=old && old.kind==kind && old.category==category && old.top==top && old.unreadCount==unread && old.redDot==dot &&
+                    (old.userName==name || [old.userName isEqual:name]);
+                if (!same || values) {
+                    CSGroupRow *value=same ? old : [[CSGroupRow alloc] initWithNativePath:path userName:name kind:kind category:category top:top unreadCount:unread redDot:dot];
+                    if (sameCount) { if (!values) values=[oldSection mutableCopy];values[row]=value; }
+                    else [values addObject:value];
+                }
             }
             if (((NSInteger(*)(id,SEL,id,NSInteger))objc_msgSend)(source,rowsSEL,table,section)!=rows) return nil;
-            [sections addObject:[values copy]];
+            [sections addObject:values ? [values copy] : oldSection];
         }
+        if (sectionSig && ((NSInteger(*)(id,SEL,id))objc_msgSend)(source,sectionsSEL,table)!=count) return nil;
+        if ([sections isEqualToArray:previous]) return previous;
         return [sections copy];
     } @catch (__unused NSException *e) { return nil; }
 }

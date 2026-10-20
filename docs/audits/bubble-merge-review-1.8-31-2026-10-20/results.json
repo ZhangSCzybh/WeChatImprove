@@ -1,0 +1,26 @@
+[
+  {
+    "name": "baseline-bubble",
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-merge",
+    "exit_code": 0
+  },
+  {
+    "name": "bubble-probes-build",
+    "exit_code": 0
+  },
+  {
+    "name": "bubble-probes",
+    "exit_code": 0
+  },
+  {
+    "name": "merge-probes-build",
+    "exit_code": 0
+  },
+  {
+    "name": "merge-probes",
+    "exit_code": 0
+  }
+]
