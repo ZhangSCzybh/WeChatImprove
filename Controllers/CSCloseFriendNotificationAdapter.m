@@ -17,6 +17,7 @@ static NSString *Name(id value) { return [value isKindOfClass:NSString.class] &&
 }
 - (BOOL)isCurrent { CSCloseFriendSnapshot *p=CSCloseFriendCurrentSnapshot(); return !p.blocked && self.epoch==CSCloseFriendAccountEpoch() && [self.account isEqual:p.accountID]; }
 - (BOOL)shouldSilence { return [self isCurrent] && [CSCloseFriendCurrentSnapshot() silencesSession:self.session sender:self.sender]; }
+- (BOOL)shouldDiscardOutput { return ![self isCurrent] || [self shouldSilence]; }
 @end
 void CSCFBindAlert(id object, CSCloseFriendAlertSubject *subject) { if(object && subject)objc_setAssociatedObject(object,&SubjectKey,subject,OBJC_ASSOCIATION_RETAIN_NONATOMIC); }
 CSCloseFriendAlertSubject *CSCFBoundAlert(id object) { return object?objc_getAssociatedObject(object,&SubjectKey):nil; }

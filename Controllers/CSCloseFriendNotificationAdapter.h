@@ -8,6 +8,8 @@ extern "C" {
 + (instancetype)subjectForSession:(NSString *)session sender:(NSString *)sender;
 - (BOOL)isCurrent;
 - (BOOL)shouldSilence;
+// A known stale subject must be discarded without evaluating another account's membership.
+- (BOOL)shouldDiscardOutput;
 @end
 FOUNDATION_EXPORT CSCloseFriendAlertSubject *CSCFMessageSubject(id message, id contact);
 FOUNDATION_EXPORT void CSCFBindAlert(id object, CSCloseFriendAlertSubject *subject);

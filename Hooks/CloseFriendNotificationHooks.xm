@@ -8,7 +8,7 @@
 #import <objc/message.h>
 static NSMutableDictionary<NSString *,NSDictionary *> *Requests;
 static NSHashTable *TabOwners;
-static BOOL Silent(CSCloseFriendAlertSubject *subject) { return [subject shouldSilence] || CSCFCallOutputSuppressed(); }
+static BOOL Silent(CSCloseFriendAlertSubject *subject) { return [subject shouldDiscardOutput] || CSCFCallOutputSuppressed(); }
 static CSCloseFriendAlertSubject *ItemSubject(id item) {
     return CSCFBoundAlert(item) ?: CSCFMessageSubject(CSCloseFriendRead(item,@"message"),CSCloseFriendRead(item,@"contact") ?: CSCloseFriendRead(item,@"username"));
 }
@@ -18,7 +18,7 @@ static void RemoveKnown(NSArray<UNNotificationRequest *> *requests,BOOL delivere
         for(UNNotificationRequest *request in requests) {
             NSDictionary *entry=Requests[request.identifier];
             CSCloseFriendAlertSubject *subject=entry[@"subject"];
-            if([subject shouldSilence] && [entry[@"content"] isEqual:request.content])[ids addObject:request.identifier];
+            if([subject shouldDiscardOutput] && [entry[@"content"] isEqual:request.content])[ids addObject:request.identifier];
         }
         if(!ids.count)return;
         if(delivered)[UNUserNotificationCenter.currentNotificationCenter removeDeliveredNotificationsWithIdentifiers:ids];
@@ -42,13 +42,14 @@ static BOOL ChatTab(id controller,NSUInteger index) {
     IMP imp=imp_implementationWithBlock(^(id owner,id contact,id message,double timeout){CSCloseFriendAlertSubject *s=CSCFMessageSubject(message,contact);if(Silent(s))return;CSCFWithAlert(s,^{((void(*)(id,SEL,id,id,double))quick)(owner,NSSelectorFromString(@"showQuickReplyMsg:message:timeout:"),contact,message,timeout);});});
     if(!CSCloseFriendInstallHook(@"QuickReplyMsgMgr",@"showQuickReplyMsg:message:timeout:",imp,&quick,"v@:@@d"))imp_removeBlock(imp);
     __block IMP canShow=NULL;
-    imp=imp_implementationWithBlock(^BOOL(id owner,id contact,id message){if([CSCFMessageSubject(message,contact) shouldSilence])return NO;return ((BOOL(*)(id,SEL,id,id))canShow)(owner,NSSelectorFromString(@"canShowPushForContact:msgWrap:"),contact,message);});
+    imp=imp_implementationWithBlock(^BOOL(id owner,id contact,id message){if([CSCFMessageSubject(message,contact) shouldDiscardOutput])return NO;return ((BOOL(*)(id,SEL,id,id))canShow)(owner,NSSelectorFromString(@"canShowPushForContact:msgWrap:"),contact,message);});
     if(!CSCloseFriendInstallHook(@"QuickReplyMsgMgr",@"canShowPushForContact:msgWrap:",imp,&canShow,"B@:@@"))imp_removeBlock(imp);
     __block IMP arriving=NULL;
     imp=imp_implementationWithBlock(^(id owner,id message,long long flags){CSCFWithAlert(CSCFMessageSubject(message,nil),^{((void(*)(id,SEL,id,long long))arriving)(owner,NSSelectorFromString(@"onNewMsgArriving:NotifyFlag:"),message,flags);});});
     if(!CSCloseFriendInstallHook(@"QuickReplyMsgMgr",@"onNewMsgArriving:NotifyFlag:",imp,&arriving,"v@:@q"))imp_removeBlock(imp);
     // Never globally disable audio/haptics. These native output functions are
-    // gated only while an identity-bearing incoming alert scope is current.
+    // gated only within an identity-bearing incoming alert scope, including stale
+    // scopes whose old-account output must be discarded.
     Class audio=NSClassFromString(@"AudioHelper");SEL vibration=NSSelectorFromString(@"playVibration");
     if(CSCloseFriendMethodMatches(class_getClassMethod(audio,vibration),"v@:")) {
         __block IMP original=NULL;

@@ -110,13 +110,20 @@ static CSGroupFoldedPrivacyState CSGroupAssessFoldedUserNames(id names,id hidden
 @end
 @interface UNUserNotificationCenter : NSObject
 @property NSUInteger submissions;
+@property NSArray *removedPending,*removedDelivered;
++ (instancetype)currentNotificationCenter;
+- (void)removePendingNotificationRequestsWithIdentifiers:(NSArray *)identifiers;
+- (void)removeDeliveredNotificationsWithIdentifiers:(NSArray *)identifiers;
 - (void)addNotificationRequest:(UNNotificationRequest *)r withCompletionHandler:(void(^)(NSError *))completion;
 @end
 @implementation UNUserNotificationCenter
++ (instancetype)currentNotificationCenter{static UNUserNotificationCenter *center;static dispatch_once_t once;dispatch_once(&once,^{center=[self new];});return center;}
+- (void)removePendingNotificationRequestsWithIdentifiers:(NSArray *)identifiers{self.removedPending=identifiers;}
+- (void)removeDeliveredNotificationsWithIdentifiers:(NSArray *)identifiers{self.removedDelivered=identifiers;}
 - (void)addNotificationRequest:(UNNotificationRequest *)r withCompletionHandler:(void(^)(NSError *))completion{self.submissions++;if(completion)completion(nil);}
 @end
 static NSMutableDictionary *Requests;
-static BOOL Silent(CSCloseFriendAlertSubject *subject){return [subject shouldSilence] || CSCFCallOutputSuppressed();}
+#import "AlertOutputDecisions.h"
 #import "AlertNotificationBody.h"
 static CSGroupRow *Row(NSUInteger index,NSString *name,NSUInteger count,CSGroupRowKind kind){NSUInteger path[]={0,index};return [[CSGroupRow alloc] initWithNativePath:[NSIndexPath indexPathWithIndexes:path length:2] userName:name kind:kind category:CSGroupRowCategoryPrivate top:NO unreadCount:count redDot:NO];}
 int main(void){@autoreleasepool{
@@ -136,6 +143,31 @@ int main(void){@autoreleasepool{
     CHECK(completions==1 && center.submissions==0);
     CSCFWithAlert([CSCloseFriendAlertSubject subjectForSession:@"ordinary" sender:nil],^{[center addNotificationRequest:request withCompletionHandler:^(NSError *error){CHECK(!error);completions++;}];});
     CHECK(completions==2 && center.submissions==1);
+    // A positively bound old-account request is not an unknown request. Exercise
+    // the real UN submission hook after the switch, including its completion.
+    CSCloseFriendAlertSubject *oldSubject=[CSCloseFriendAlertSubject subjectForSession:@"ordinary" sender:nil];
+    UNNotificationRequest *stale=[UNNotificationRequest requestWithIdentifier:@"stale" content:[UNMutableNotificationContent new] trigger:nil];
+    CSCFBindAlert(stale,oldSubject);
+    [center addNotificationRequest:stale withCompletionHandler:^(NSError *error){CHECK(!error);completions++;}];
+    CHECK(completions==3 && center.submissions==2);
+    Epoch++;Policy=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"new-account" profile:@{@"enabled":@NO} revealed:NO revision:Epoch blocked:NO];
+    CHECK(!oldSubject.shouldSilence && !oldSubject.isCurrent);
+    [center addNotificationRequest:stale withCompletionHandler:^(NSError *error){CHECK(!error);completions++;}];
+    CHECK(completions==4 && center.submissions==2);
+    UNNotificationRequest *unknown=[UNNotificationRequest requestWithIdentifier:@"unknown" content:[UNMutableNotificationContent new] trigger:nil];
+    CSCFWithAlert(oldSubject,^{[center addNotificationRequest:unknown withCompletionHandler:^(NSError *error){CHECK(!error);completions++;}];});
+    CHECK(completions==5 && center.submissions==2);
+    [center addNotificationRequest:unknown withCompletionHandler:^(NSError *error){CHECK(!error);completions++;}];
+    CHECK(completions==6 && center.submissions==3);
+    CHECK(Silent(oldSubject) && !Silent(nil));
+    // Cleanup matches both the tracked identifier and captured content. A native
+    // replacement reusing the identifier, or an untracked request, is untouched.
+    UNNotificationRequest *replacement=[UNNotificationRequest requestWithIdentifier:@"bound" content:[UNMutableNotificationContent new] trigger:nil];
+    RemoveKnown(@[stale,replacement,unknown],NO);RemoveKnown(@[stale,replacement,unknown],YES);
+    CHECK([UNUserNotificationCenter.currentNotificationCenter.removedPending isEqual:@[@"stale"]]);
+    CHECK([UNUserNotificationCenter.currentNotificationCenter.removedDelivered isEqual:@[@"stale"]]);
+    Policy=Snapshot(YES,YES,nil);
+
     // Durable write ownership survives a new engine; native pre-muted contacts are never restored.
     __block NSDictionary *journal=@{};__block NSMutableDictionary *native=[@{@"friend":@YES,@"secret@chatroom":@NO} mutableCopy];__block NSUInteger writes=0;__block BOOL failCommit=NO,failRevoke=NO;
     CSCloseFriendMuteAdapter *(^engine)(void)=^CSCloseFriendMuteAdapter *{
