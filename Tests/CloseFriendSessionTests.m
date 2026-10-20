@@ -77,7 +77,7 @@ static const NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionSty
 @property(nonatomic,strong) TestTable *m_tableView;
 @property(nonatomic,strong) NSMutableArray<NativeSession *> *sessions;
 @property(nonatomic,strong) NSIndexPath *opened;
-@property(nonatomic) NSUInteger calls;
+@property(nonatomic) NSUInteger calls,nativeTraversalCalls;
 @property(nonatomic,strong) NSIndexPath *rendered;
 @property(nonatomic,strong) UITableViewCell *nativeCell;
 - (id)tableView:(id)table cellForRowAtIndexPath:(NSIndexPath *)path;
@@ -112,11 +112,13 @@ static const NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionSty
 @property(nonatomic,strong) NSDictionary *identityDisplayPaths;
 @property(nonatomic) BOOL snapshotRetryAttempted,dirty,publishing,nativePresentation,pendingScrollToTop;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
+@property(nonatomic,strong) NSMutableArray *queuedNavigation;
 @property(nonatomic) NSUInteger snapshotRetryGeneration,changeDepth,recoveries;
 - (BOOL)isActive;
 - (void)refresh;
 - (void)requestRecovery;
 - (void)scheduleRefresh;
+- (void)performInNativePresentation:(void (^)(void))action;
 - (BOOL)forwardSwipeInvocation:(NSInvocation *)inv target:(id)target;
 @end
 @implementation CSGroupListAdapter
@@ -124,6 +126,7 @@ static const NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionSty
 - (BOOL)isActive { return self.projection.isValid; }
 - (void)requestRecovery { self.recoveries++; }
 - (void)scheduleRefresh {}
+- (void)performInNativePresentation:(void (^)(void))action { if (!self.queuedNavigation) self.queuedNavigation=[NSMutableArray array]; [self.queuedNavigation addObject:[action copy]]; }
 - (BOOL)forwardSwipeInvocation:(NSInvocation *)inv target:(id)target { (void)inv; (void)target; return NO; }
 - (void)refresh {
  NSArray *sections=CSGroupBuildNativeSections(self.controller,self.table,self.controller);
@@ -132,6 +135,19 @@ static const NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionSty
  for (NSUInteger i=0;i<self.projection.sections.firstObject.count;i++) paths[self.projection.sections[0][i].userName]=Path(i);
  self.identityDisplayPaths=paths;
 }
+@end
+static CSGroupListAdapter *navigationAdapter;
+static CSGroupListAdapter *Adapter(id owner) { return navigationAdapter.controller==owner ? navigationAdapter : nil; }
+static void Native(id owner,BOOL mutation,void (^action)(void)) { (void)owner;(void)mutation;action(); }
+@interface NativeHost (NavigationFixture)
+- (void)onNextChat;
+- (void)onNextUnreadChat;
+- (void)onLastChat;
+- (void)originalNativeTraversal;
+@end
+@implementation NativeHost (NavigationFixture)
+#include "SessionNavigationHooks.h"
+- (void)originalNativeTraversal { self.nativeTraversalCalls++;self.opened=Path(1); }
 @end
 static NSUInteger checks,failures;
 static void Check(BOOL pass,NSString *name) { checks++; if(!pass) {failures++; fprintf(stderr,"FAIL: %s\n",name.UTF8String);} }
@@ -216,6 +232,15 @@ int main(void) { @autoreleasepool {
  Check(aggregate.m_uUnReadCount==12 && main.sessions.count==1 && manager.sourceSessions[0]==sourceA,@"folded assessment never mutates native aggregate, source children, or unread");
  WrongFoldedGetter *wrong=[WrongFoldedGetter new];foldedService=wrong;
  Check(CSGroupCopyFoldedUserNames()==nil && wrong.calls==0,@"unsupported scalar child getter is rejected before invocation");
+ // Exercise the production hook's deferred callback across a policy transition.
+ NativeHost *queuedHost=[NativeHost new];queuedHost.m_tableView=[TestTable new];queuedHost.sessions=[NSMutableArray array];
+ for (NSString *name in @[@"B",@"A",@"C"]) { NativeSession *session=[NativeSession new];session.m_nsUserName=name;session.m_uUnReadCount=1;[queuedHost.sessions addObject:session]; }
+ navigationAdapter=[CSGroupListAdapter new];navigationAdapter.controller=queuedHost;navigationAdapter.table=queuedHost.m_tableView;navigationAdapter.preferences=[Preferences new];
+ policy=Policy(@[@"A"],YES,7);[navigationAdapter refresh];queuedHost.m_tableView.indexPathForSelectedRow=Path(0);
+ [queuedHost onNextChat];BOOL queuedWhileRevealed=navigationAdapter.queuedNavigation.count==1 && queuedHost.calls==0 && queuedHost.nativeTraversalCalls==0;
+ policy=Policy(@[@"A"],NO,8);
+ NSArray *pending=[navigationAdapter.queuedNavigation copy];[navigationAdapter.queuedNavigation removeAllObjects];for (void (^action)(void) in pending) action();
+ Check(queuedWhileRevealed && queuedHost.nativeTraversalCalls==0 && [queuedHost.opened isEqual:Path(2)],@"revealed queued next-chat rechecks lock and advances past hidden A to visible C at drain time");
  fprintf(stdout,"Close-friend sessions: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
  return failures?1:0;
 } }

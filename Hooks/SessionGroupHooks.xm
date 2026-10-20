@@ -114,9 +114,9 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
     Native(self,NO,^{ %orig; });
 }
 - (void)previewingContext:(id)context commitViewController:(id)vc { Native(self,NO,^{ %orig; }); }
-- (void)onNextUnreadChat { CSGroupListAdapter *a=Adapter(self); if ([a navigatePrivateSessionsForward:YES unreadOnly:YES]) return; if (a.isActive) { [a performInNativePresentation:^{ Native(self,NO,^{ %orig; }); }]; return; } Native(self,NO,^{ %orig; }); }
-- (void)onNextChat { CSGroupListAdapter *a=Adapter(self); if ([a navigatePrivateSessionsForward:YES unreadOnly:NO]) return; if (a.isActive) { [a performInNativePresentation:^{ Native(self,NO,^{ %orig; }); }]; return; } Native(self,NO,^{ %orig; }); }
-- (void)onLastChat { CSGroupListAdapter *a=Adapter(self); if ([a navigatePrivateSessionsForward:NO unreadOnly:NO]) return; if (a.isActive) { [a performInNativePresentation:^{ Native(self,NO,^{ %orig; }); }]; return; } Native(self,NO,^{ %orig; }); }
+- (void)onNextUnreadChat { CSGroupListAdapter *a=Adapter(self); if ([a navigatePrivateSessionsForward:YES unreadOnly:YES]) return; if (a.isActive) { [a performInNativePresentation:^{ if ([a navigatePrivateSessionsForward:YES unreadOnly:YES]) return; Native(self,NO,^{ %orig; }); }]; return; } Native(self,NO,^{ %orig; }); }
+- (void)onNextChat { CSGroupListAdapter *a=Adapter(self); if ([a navigatePrivateSessionsForward:YES unreadOnly:NO]) return; if (a.isActive) { [a performInNativePresentation:^{ if ([a navigatePrivateSessionsForward:YES unreadOnly:NO]) return; Native(self,NO,^{ %orig; }); }]; return; } Native(self,NO,^{ %orig; }); }
+- (void)onLastChat { CSGroupListAdapter *a=Adapter(self); if ([a navigatePrivateSessionsForward:NO unreadOnly:NO]) return; if (a.isActive) { [a performInNativePresentation:^{ if ([a navigatePrivateSessionsForward:NO unreadOnly:NO]) return; Native(self,NO,^{ %orig; }); }]; return; } Native(self,NO,^{ %orig; }); }
 
 - (id)logicGetCellDataAtIndexPath:(id)path { __block id result=nil; Native(self,NO,^{ result=%orig; }); return result; }
 - (id)logicGetSessionAtIndexPath:(id)path { __block id result=nil; Native(self,NO,^{ result=%orig; }); return result; }
