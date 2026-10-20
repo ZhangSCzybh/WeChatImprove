@@ -1,5 +1,7 @@
 #import "CSGroupListAdapter.h"
 #import "CSGroupProjection.h"
+#import "CSCloseFriendBridge.h"
+#import "CSCloseFriendSessionPresentation.h"
 #import "CSGroupPreferences.h"
 #import "CSGroupAppearance.h"
 #import "CSGroupInvocationMapper.h"
@@ -11,6 +13,10 @@
 static BOOL CSGroupAppInactive;
 static BOOL CSGroupApplicationActive(void) { return !CSGroupAppInactive && UIApplication.sharedApplication.applicationState==UIApplicationStateActive; }
 
+static BOOL CSGroupPrivacyActive(void) {
+    CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
+    return snapshot.blocked || (snapshot.enabled && !snapshot.revealed && [snapshot.options[@"hideSessions"] boolValue]);
+}
 static char AdapterKey, CellRowKey, TitleContextKey, PresentationSuspendedKey;
 static NSHashTable<CSGroupListAdapter *> *Adapters(void) {
     static NSHashTable *adapters; static dispatch_once_t once;
@@ -18,12 +24,6 @@ static NSHashTable<CSGroupListAdapter *> *Adapters(void) {
 }
 static BOOL Option(NSString *suffix) {
     return [NSUserDefaults.standardUserDefaults boolForKey:[@"com.wechat.enhance.chat_group." stringByAppendingString:suffix]];
-}
-static id ObjectArgument(id target, NSString *name, id value) {
-    SEL selector=NSSelectorFromString(name);
-    NSMethodSignature *signature=[target methodSignatureForSelector:selector];
-    if (signature.numberOfArguments!=3 || signature.methodReturnType[0]!='@' || [signature getArgumentTypeAtIndex:2][0]!='@') return nil;
-    return ((id(*)(id,SEL,id))objc_msgSend)(target,selector,value);
 }
 @class CSGroupTableProxy;
 @interface CSGroupListAdapter () <UIGestureRecognizerDelegate>
@@ -48,6 +48,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
 @property (nonatomic, copy) NSDictionary<NSString *,id> *identityDisplayPaths;
 @property (nonatomic, copy) NSString *publishedTabID;
 @property (nonatomic) BOOL projecting, chromeVisible;
+@property (nonatomic) BOOL privacyRefreshPending, privacyShielded, privacyTableWasHidden;
 @property (nonatomic) BOOL searchChromeVisible;
 @property (nonatomic) BOOL presentationSuspended;
 @property (nonatomic) BOOL publishedEnabled;
@@ -104,7 +105,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     // The native main-frame owner can expose curViewController instead of inheriting UIKit.
     // Attachment is authorized by its actual chat table, not an assumed superclass.
     if (!NSThread.isMainThread || !controller) return;
-    id table=CSGroupReadObject(controller,@"m_tableView");
+    id table=CSGroupReadObject(controller,CSGroupIsFoldedController(controller) ? @"tableView" : @"m_tableView");
     if (![table isKindOfClass:UITableView.class]) return;
     CSGroupListAdapter *adapter=[self adapterForController:controller];
     if (adapter.table!=table) {
@@ -151,12 +152,28 @@ static id ObjectArgument(id target, NSString *name, id value) {
 + (void)layoutForController:(id)controller {
     if (!NSThread.isMainThread || !controller) return;
     CSGroupListAdapter *adapter=[self adapterForController:controller];
-    id table=CSGroupReadObject(controller,@"m_tableView");
+    id table=CSGroupReadObject(controller,CSGroupIsFoldedController(controller) ? @"tableView" : @"m_tableView");
     if (!adapter || adapter.table!=table) { [self attachToController:controller]; return; }
     [adapter layout];
 }
 + (void)settingsChanged {
     dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } [adapter invalidateNativeSnapshot]; adapter.appearanceDirty=YES; [adapter refresh]; [adapter layout]; } });
+}
++ (void)closeFriendPolicyChanged:(NSNotification *)notification {
+    (void)notification;
+    if (!NSThread.isMainThread) {
+        dispatch_async(dispatch_get_main_queue(), ^{ [self closeFriendPolicyChanged:notification]; }); return;
+    }
+    for (CSGroupListAdapter *adapter in Adapters().allObjects) {
+        // Keep the existing coordinate snapshot while hiding its rendered cells immediately.
+        // A model transaction may finish later; no protected content remains on screen meanwhile.
+        adapter.privacyRefreshPending=YES; adapter.dirty=YES;
+        if (!adapter.privacyShielded) adapter.privacyTableWasHidden=adapter.table.hidden;
+        adapter.privacyShielded=YES; adapter.table.hidden=YES;
+        [adapter cancelScheduledRefresh]; [adapter invalidateNativeSnapshot];
+        @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; }
+        [adapter refresh];
+    }
 }
 // UIApplication notifications are delivered on the main thread. Inactive apps
 // keep native model updates, but never publish even for explicit navigation.
@@ -410,15 +427,15 @@ static id ObjectArgument(id target, NSString *name, id value) {
     }
     // A horizontal row swipe starts tracking before UIKit reports editing or
     // dragging. Reloading in that window replaces the cell under the finger.
-    if (!self.presentationSuspended && (self.table.tracking || [self groupPanMoving])) { self.dirty=YES; [self scheduleRefresh]; return; }
-    NSUInteger menuState=self.presentationSuspended ? 0 : [self nativeMenuState];
+    if (!self.privacyRefreshPending && !self.presentationSuspended && (self.table.tracking || [self groupPanMoving])) { self.dirty=YES; [self scheduleRefresh]; return; }
+    NSUInteger menuState=(self.privacyRefreshPending || self.presentationSuspended) ? 0 : [self nativeMenuState];
     if (menuState) {
         self.dirty=YES;
         if (menuState&2) [self scheduleRefresh];
         return;
     }
     if (!self.presentationSuspended) [self reconcileDeletedSwipeRow];
-    if (self.changeDepth || (!self.presentationSuspended && (self.table.dragging || self.table.decelerating || self.table.editing || self.swipeActive))) { self.dirty=YES; return; }
+    if (self.changeDepth || (!self.privacyRefreshPending && !self.presentationSuspended && (self.table.dragging || self.table.decelerating || self.table.editing || self.swipeActive))) { self.dirty=YES; return; }
     self.interactionDeadline=0; self.interactionAttempts=0;
     self.publishing=YES; self.dirty=NO;
     CSGroupChangeKind changes;
@@ -433,17 +450,18 @@ static id ObjectArgument(id target, NSString *name, id value) {
         if (changed) { self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=self.nativeActions.count>0; self.projection=nil; self.snapshotRetryAttempted=NO; }
         self.searching=CSGroupReadInteger(self.controller,@"isSearching",0)!=0;
         if (!self.searching) self.searchChromeVisible=NO;
-        BOOL enabled=Option(@"enabled");
+        BOOL enabled=Option(@"enabled") && !CSGroupIsFoldedController(self.controller);
+        BOOL privacy=CSGroupPrivacyActive();
         // Search owns a separate page. Preserve the selected list behind its
         // transition instead of publishing unfiltered rows underneath group tabs.
         // Explicit result navigation may still require native coordinates.
-        if (enabled && self.searching && self.searchChromeVisible && account.length && !changed && self.projecting &&
+        if (!privacy && !self.privacyRefreshPending && enabled && self.searching && self.searchChromeVisible && account.length && !changed && self.projecting &&
             !self.nativePresentation && !self.nativeActions.count) {
             @synchronized (self) { self.pendingChanges|=changes|CSGroupChangeUnknown; }
             self.cachedNativeSections=nil; [self.projection discardComputationCache];
             [self layout]; finished=YES; return;
         }
-        if (!enabled || self.searching || !account.length) {
+        if ((!privacy && (!enabled || self.searching)) || !account.length) {
             BOOL needsReload=self.projecting || self.nativeActions.count>0;
             BOOL hadChrome=self.chromeVisible;
             self.projecting=NO; self.chromeVisible=NO; self.publishedEnabled=enabled;
@@ -457,15 +475,15 @@ static id ObjectArgument(id target, NSString *name, id value) {
         else [self.preferences reload];
         [self ensureChrome];
         NSArray *tabs=self.preferences.tabs; NSString *selected=self.preferences.selectedTabID;
-        if (self.nativePresentation) {
+        if (self.nativePresentation || !enabled || self.searching) {
             selected=@"preset_0";
             if (![tabs filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(WESessionTabItem *tab, NSDictionary *bindings) { (void)bindings; return [tab.tabId isEqual:selected]; }]].count)
                 tabs=[@[[WESessionTabItem tabWithType:WETabTypeAll]] arrayByAddingObjectsFromArray:tabs];
         }
         CSGroupProjection *previous=self.projection;
         BOOL previouslyProjecting=self.projecting;
-        NSArray *sections=self.nativePresentation ? nil : [self nativeSectionsForAccount:account];
-        CSGroupProjection *projection=self.nativePresentation ? nil : [self projectionForSections:sections tabs:tabs selectedTabID:selected accountID:account];
+        NSArray *sections=(self.nativePresentation && !privacy) ? nil : [self nativeSectionsForAccount:account];
+        CSGroupProjection *projection=(self.nativePresentation && !privacy) ? nil : [self projectionForSections:sections tabs:tabs selectedTabID:selected accountID:account];
         self.projection=projection;
         if (![projection hasSameDisplayStructureAs:previous]) {
             NSMutableDictionary *identities=[NSMutableDictionary dictionary];
@@ -476,7 +494,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
             }]; self.identityDisplayPaths=identities;
         }
         self.displayedTabs=tabs;
-        BOOL projecting=Option(@"enabled") && !self.searching && !self.nativePresentation && self.projection.isValid && account.length>0;
+        BOOL projecting=(privacy || (enabled && !self.searching && !self.nativePresentation)) && self.projection.isValid && account.length>0;
         if (projecting && self.prefetchedPaths.count) {
             id prefetch=self.proxies[@2].target;
             NSArray *paths=self.prefetchedPaths.allObjects;
@@ -484,7 +502,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
             [self.prefetchedPaths removeAllObjects];
         }
         self.projecting=projecting;
-        self.chromeVisible=Option(@"enabled") && !self.searching && account.length>0;
+        self.chromeVisible=enabled && !self.searching && account.length>0;
         self.publishedEnabled=Option(@"enabled");
         self.publishedTabID=selected;
         if (self.appearanceDirty) { [self.chrome refreshAppearance]; self.appearanceDirty=NO; }
@@ -493,7 +511,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
         [tabs enumerateObjectsUsingBlock:^(WESessionTabItem *tab, NSUInteger index, BOOL *stop) {
             (void)stop; if (!projection && tab.type!=WETabTypeAll) return;
             CSGroupBadge *badge=[projection badgeForTabID:tab.tabId];
-            NSInteger count=tab.type==WETabTypeAll ? (NSInteger)MAX(0,CSGroupReadInteger(logic,@"getTotalUnreadCount",(long long)badge.count)) : (NSInteger)MIN(badge.count,(NSUInteger)NSIntegerMax);
+            NSInteger count=tab.type==WETabTypeAll && !privacy ? (NSInteger)MAX(0,CSGroupReadInteger(logic,@"getTotalUnreadCount",(long long)badge.count)) : (NSInteger)MIN(badge.count,(NSUInteger)NSIntegerMax);
             BOOL hidden=Option(tab.type==WETabTypeAll ? @"hide_all_badge" : @"hide_group_badge");
             [self.chrome updateUnreadCount:hidden ? 0 : count hasRedDot:!hidden && badge.redDot forTabIndex:(NSInteger)index];
         }];
@@ -504,10 +522,16 @@ static id ObjectArgument(id target, NSString *name, id value) {
         finished=YES;
     } @finally {
         self.publishing=NO;
+        if (finished) {
+            self.privacyRefreshPending=NO;
+            if (self.privacyShielded && !(CSCloseFriendCurrentSnapshot().blocked && !CSGroupCurrentAccountID().length)) {
+                self.table.hidden=self.privacyTableWasHidden; self.privacyShielded=NO;
+            }
+        }
         if (finished) [self applyPendingScrollToTop];
         NSArray *callbacks=[self.completions copy]; [self.completions removeAllObjects];
         for (void (^completion)(BOOL) in callbacks) completion(finished);
-        if (finished && !self.isActive && !self.changeDepth) {
+        if (finished && (!self.isActive || CSGroupPrivacyActive()) && !self.changeDepth) {
             NSArray *actions=[self.nativeActions copy]; [self.nativeActions removeAllObjects];
             for (void (^action)(void) in actions) CSGroupWithNativeIndices(self.table,action);
         }
@@ -538,8 +562,22 @@ static id ObjectArgument(id target, NSString *name, id value) {
 }
 - (CSGroupProjection *)projectionForSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selected accountID:(NSString *)account {
     if (!account.length) return nil;
+    NSUInteger epoch=CSCloseFriendAccountEpoch();
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    NSMutableSet *hidden=[NSMutableSet set];
+    for (NSString *name in policy.protectedUserNames)
+        if ([policy hidesUserName:name surface:CSCloseFriendSurfaceSession]) [hidden addObject:name];
+    NSMutableSet *unmasked=[NSMutableSet set];
+    if (hidden.count && !CSGroupIsFoldedController(self.controller)) {
+        CSGroupFoldedPrivacyState folded=CSGroupAssessFoldedUserNames(CSGroupCopyFoldedUserNames(),hidden);
+        if (folded==CSGroupFoldedPrivacyAllHidden) [hidden addObject:@"chatroom_session_box"];
+        else if (folded==CSGroupFoldedPrivacyNoHidden) [unmasked addObject:@"chatroom_session_box"];
+    }
+    // Account transitions and unreadable policy never expose a partially classified list.
+    if (policy.blocked || ![policy.accountID isEqual:account] || ![account isEqual:CSGroupCurrentAccountID()] || epoch!=CSCloseFriendAccountEpoch() ||
+        CSCloseFriendCurrentSnapshot().revision!=policy.revision) sections=@[];
     CSGroupProjection *projection=sections ? [[CSGroupProjection alloc] initWithSections:sections tabs:tabs selectedTabID:selected
-        filterDuplicates:self.preferences.filterDuplicates accountID:account previousProjection:self.projection] : nil;
+        filterDuplicates:self.preferences.filterDuplicates accountID:account hiddenUserNames:hidden unmaskedAggregateUserNames:unmasked privacyRevision:policy.revision previousProjection:self.projection] : nil;
     if (projection.isValid) { self.snapshotRetryAttempted=NO; self.snapshotRetryGeneration++; return projection; }
     // A partially rebuilt native snapshot must not permanently select All.
     // Publish a safe empty projection for the selected group, then retry once.
@@ -550,7 +588,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
         __weak typeof(self) weakSelf=self;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW,(int64_t)(0.05*NSEC_PER_SEC)),dispatch_get_main_queue(), ^{
             CSGroupListAdapter *self=weakSelf;
-            if (self.snapshotRetryAttempted && self.snapshotRetryGeneration==generation && [account isEqual:CSGroupCurrentAccountID()]) [self requestRecovery];
+            if (self.snapshotRetryAttempted && self.snapshotRetryGeneration==generation && epoch==CSCloseFriendAccountEpoch() && [account isEqual:CSGroupCurrentAccountID()]) [self requestRecovery];
         });
     }
     projection=[[CSGroupProjection alloc] initWithSections:@[] tabs:tabs selectedTabID:selected
@@ -582,8 +620,8 @@ static id ObjectArgument(id target, NSString *name, id value) {
     [self pruneNativeActions];
     if (!CSGroupApplicationActive() || (self.presentationSuspended && !self.nativeActions.count)) { [self finishSuspendedBatches]; return; }
     if (self.changeDepth || self.publishing) return;
-    BOOL coalesced=self.coalescingNotification && !self.nativeActions.count;
-    BOOL waiting=!self.presentationSuspended && (self.table.tracking || [self groupPanMoving] || ([self nativeMenuState]&2));
+    BOOL coalesced=!self.privacyRefreshPending && self.coalescingNotification && !self.nativeActions.count;
+    BOOL waiting=!self.privacyRefreshPending && !self.presentationSuspended && (self.table.tracking || [self groupPanMoving] || ([self nativeMenuState]&2));
     BOOL releasedWait=self.scheduledInteraction && !waiting;
     BOOL freshEvent=self.scheduledRecovery && !self.recoveryPending;
     if (self.scheduled && !releasedWait && !freshEvent && (!self.scheduledCoalesced || coalesced)) return;
@@ -663,7 +701,8 @@ static id ObjectArgument(id target, NSString *name, id value) {
 }
 - (void)performInNativePresentation:(void (^)(void))action {
     NSString *account=CSGroupCurrentAccountID(); if (!account.length) return;
-    void (^guarded)(void)=^{ if ([account isEqualToString:CSGroupCurrentAccountID()]) action(); };
+    NSUInteger epoch=CSCloseFriendAccountEpoch();
+    void (^guarded)(void)=^{ if (epoch==CSCloseFriendAccountEpoch() && CSGroupApplicationActive() && [account isEqualToString:CSGroupCurrentAccountID()]) action(); };
     if (CSGroupApplicationActive() && !self.isActive && !self.publishing && !self.changeDepth) { CSGroupWithNativeIndices(self.table,guarded); return; }
     [self pruneNativeActions];
     self.nativeActionsAccount=account;
@@ -683,9 +722,45 @@ static id ObjectArgument(id target, NSString *name, id value) {
     }
     [self useNativePresentation];
 }
+- (BOOL)navigatePrivateSessionsForward:(BOOL)forward unreadOnly:(BOOL)unreadOnly {
+    if (!CSGroupPrivacyActive()) return NO;
+    if (!NSThread.isMainThread || !CSGroupApplicationActive() || self.changeDepth || self.publishing) return YES;
+    NSUInteger epoch=CSCloseFriendAccountEpoch();
+    NSString *account=CSGroupCurrentAccountID();
+    __block NSIndexPath *oldSelected=nil;
+    CSGroupWithDisplayIndices(self.table, ^{ oldSelected=self.table.indexPathForSelectedRow; });
+    NSString *selectedName=[self.projection rowAtDisplayPath:oldSelected].userName;
+    self.nativePresentation=YES;
+    // Build All without disabling privacy; next/previous must not escape via native services.
+    [self refresh];
+    if (!self.isActive || ![self.projection.accountID isEqual:account]) return YES;
+    CSGroupRow *selectedRow=nil;
+    NSMutableArray<CSGroupRow *> *rows=[NSMutableArray array];
+    for (NSArray *section in self.projection.sections) for (CSGroupRow *row in section)
+        if (row.userName.length && row.kind!=CSGroupRowKindAggregate && row.kind!=CSGroupRowKindBusiness) {
+            [rows addObject:row]; if ([row.userName isEqual:selectedName]) selectedRow=row;
+        }
+    if (!rows.count) return YES;
+    NSUInteger current=selectedRow ? [rows indexOfObject:selectedRow] : NSNotFound;
+    for (NSUInteger step=1;step<=rows.count;step++) {
+        NSUInteger index=current==NSNotFound ? (forward ? step-1 : rows.count-step) :
+            (forward ? (current+step)%rows.count : (current+rows.count-step)%rows.count);
+        CSGroupRow *row=rows[index];
+        if (unreadOnly && !row.unreadCount && !row.redDot) continue;
+        NSIndexPath *path=[self currentPathForRow:row];
+        if (!path || CSCloseFriendShouldHideUserName(row.userName,CSCloseFriendSurfaceSession)) continue;
+        SEL selector=NSSelectorFromString(@"handleSelectIndexPath:tableView:");
+        Method method=class_getInstanceMethod(object_getClass(self.controller),selector);
+        if (epoch!=CSCloseFriendAccountEpoch() || ![account isEqual:CSGroupCurrentAccountID()] ||
+            !CSCloseFriendMethodMatches(method,"v@:@@")) return YES;
+        CSGroupWithNativeIndices(self.table, ^{ ((void(*)(id,SEL,id,id))objc_msgSend)(self.controller,selector,path,self.table); });
+        return YES;
+    }
+    return YES;
+}
 - (BOOL)accountMatches { return [self.projection.accountID isEqualToString:CSGroupCurrentAccountID()]; }
 - (NSIndexPath *)currentPathForRow:(CSGroupRow *)row {
-    if (!row || ![self accountMatches]) return nil;
+    if (!row || ![self accountMatches] || CSCloseFriendShouldHideUserName(row.userName,CSCloseFriendSurfaceSession)) return nil;
     __block NSIndexPath *path=nil;
     CSGroupWithNativeIndices(self.table, ^{ path=CSGroupResolveNativeRowPath(self.controller,row,self.dirty); });
     return path;
@@ -697,9 +772,8 @@ static id ObjectArgument(id target, NSString *name, id value) {
 }
 - (NSIndexPath *)displayPath:(NSIndexPath *)nativePath {
     if (![nativePath isKindOfClass:NSIndexPath.class] || nativePath.length!=2 || ![self accountMatches]) return nil;
-    id logic=CSGroupReadObject(self.controller,@"m_mainFrameLogicController");
-    id session=ObjectArgument(logic,@"getSessionInfoAtIndexPath:",nativePath);
-    NSString *name=CSGroupReadObject(session,@"m_nsUserName");
+    NSString *name=CSGroupNativeUserNameAtPath(self.controller,nativePath);
+    if (CSCloseFriendShouldHideUserName(name,CSCloseFriendSurfaceSession)) return nil;
     if (name.length) {
         // The snapshot stores original positions; resolve current native positions by identity.
         id path=self.identityDisplayPaths[name]; return [path isKindOfClass:NSIndexPath.class] ? path : nil;
@@ -726,12 +800,12 @@ static id ObjectArgument(id target, NSString *name, id value) {
     if (!self.table || !self.isActive || ![self accountMatches]) return nil;
     CSGroupRow *row=[self.projection rowAtDisplayPath:[self displayPath:path]];
     if (!row.userName.length) return nil;
-    return @{@"row":row,@"account":self.projection.accountID};
+    return @{@"row":row,@"account":self.projection.accountID,@"epoch":@(CSCloseFriendAccountEpoch())};
 }
 - (BOOL)performNativeEditingContext:(NSDictionary *)context action:(void (^)(NSIndexPath *))action {
-    if (!self.table || !NSThread.isMainThread || ![context[@"account"] isEqual:CSGroupCurrentAccountID()]) return NO;
+    if (!self.table || !NSThread.isMainThread || [context[@"epoch"] unsignedIntegerValue]!=CSCloseFriendAccountEpoch() || ![context[@"account"] isEqual:CSGroupCurrentAccountID()]) return NO;
     CSGroupRow *row=context[@"row"];
-    if (![row isKindOfClass:CSGroupRow.class] || !row.userName.length) return NO;
+    if (![row isKindOfClass:CSGroupRow.class] || !row.userName.length || CSCloseFriendShouldHideUserName(row.userName,CSCloseFriendSurfaceSession)) return NO;
     __block NSIndexPath *current=nil;
     CSGroupWithNativeIndices(self.table, ^{ current=CSGroupResolveNativeRowPath(self.controller,row,YES); });
     if (!current) { [self requestRefresh]; return NO; }
@@ -821,6 +895,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     }
     id delivery=row ? @{@"row":row,@"account":self.projection.accountID} : nil;
     objc_setAssociatedObject(cell,&CellRowKey,delivery,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    CSCloseFriendUpdateSessionCover(cell,row);
     return cell;
 }
 - (void)forwardInvocation:(NSInvocation *)inv target:(id)target {
@@ -831,19 +906,20 @@ static id ObjectArgument(id target, NSString *name, id value) {
     if ([self forwardSwipeInvocation:inv target:target]) return;
     BOOL cellLifecycle=[name isEqual:@"tableView:willDisplayCell:forRowAtIndexPath:"] || [name isEqual:@"tableView:didEndDisplayingCell:forRowAtIndexPath:"];
     CSGroupRow *cellRow=nil;
+    __unsafe_unretained UITableViewCell *cell=nil;
     if (cellLifecycle) {
-        __unsafe_unretained UITableViewCell *cell=nil; [inv getArgument:&cell atIndex:3];
+        [inv getArgument:&cell atIndex:3];
         NSDictionary *delivery=objc_getAssociatedObject(cell,&CellRowKey);
         if (delivery) {
             if (![delivery[@"account"] isEqual:CSGroupCurrentAccountID()]) return;
             cellRow=delivery[@"row"];
             if (!self.isActive || CSGroupUsesNativeIndices(self.table)) {
                 if (!CSGroupMapInvocationPaths(inv, ^NSIndexPath *(NSIndexPath *path) { (void)path; return [self currentPathForRow:cellRow]; })) return;
-                CSGroupWithNativeIndices(self.table, ^{ [inv invokeWithTarget:target]; }); return;
+                CSGroupWithNativeIndices(self.table, ^{ [inv invokeWithTarget:target]; }); CSCloseFriendRefreshSessionCover(cell); return;
             }
         } else if (self.publishing && [name isEqual:@"tableView:didEndDisplayingCell:forRowAtIndexPath:"]) {
             // Cells delivered before activation were native and never carried projected coordinates.
-            CSGroupWithNativeIndices(self.table, ^{ [inv invokeWithTarget:target]; }); return;
+            CSGroupWithNativeIndices(self.table, ^{ [inv invokeWithTarget:target]; }); CSCloseFriendRefreshSessionCover(cell); return;
         }
     }
     BOOL prefetch=[name isEqual:@"tableView:prefetchRowsAtIndexPaths:"];
@@ -856,6 +932,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
     }
     if (!self.isActive || CSGroupUsesNativeIndices(self.table)) {
         CSGroupWithNativeIndices(self.table, ^{ [inv invokeWithTarget:target]; });
+        if (cellLifecycle) CSCloseFriendRefreshSessionCover(cell);
         if ((self.dirty || self.pendingScrollToTop) && ([name isEqual:@"scrollViewDidEndDecelerating:"] || [name isEqual:@"scrollViewDidEndDragging:willDecelerate:"] || [name isEqual:@"tableView:didEndEditingRowAtIndexPath:"])) [self scheduleRefresh];
         return;
     }
@@ -882,6 +959,7 @@ static id ObjectArgument(id target, NSString *name, id value) {
         return;
     }
     CSGroupWithNativeIndices(self.table, ^{ [inv invokeWithTarget:target]; });
+    if (cellLifecycle) CSCloseFriendRefreshSessionCover(cell);
     if (CSGroupInvocationReturnsPath(inv.selector)) {
         __unsafe_unretained NSIndexPath *native=nil; [inv getReturnValue:&native];
         NSIndexPath *display=[self displayPath:native]; [inv setReturnValue:&display]; [inv retainArguments];

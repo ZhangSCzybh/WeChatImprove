@@ -2,14 +2,24 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <objc/runtime.h>
 #import "CSGroupProjection.h"
+#import "CSCloseFriendPolicy.h"
 #import "CSGroupPreferences.h"
 #import "CSGroupInvocationMapper.h"
 #import "CSGroupIndexScope.h"
 #import "WESessionTabItem.h"
 #import "GroupSelectionFlags.h"
+static void CSCloseFriendRefreshSessionCover(id cell) { (void)cell; }
 static char CellRowKey;
 static NSString *currentAccount=@"selection-account";
 static NSString *CSGroupCurrentAccountID(void) { return currentAccount; }
+static NSUInteger CSCloseFriendAccountEpoch(void) { return 1; }
+typedef NS_ENUM(NSUInteger,CSGroupFoldedPrivacyState) { CSGroupFoldedPrivacyUnknown,CSGroupFoldedPrivacyNoHidden,CSGroupFoldedPrivacyMixed,CSGroupFoldedPrivacyAllHidden };
+static BOOL CSGroupIsFoldedController(id owner) { (void)owner; return NO; }
+static NSArray *CSGroupCopyFoldedUserNames(void) { return nil; }
+static CSGroupFoldedPrivacyState CSGroupAssessFoldedUserNames(NSArray *names,NSSet *hidden) { (void)names;(void)hidden;return CSGroupFoldedPrivacyUnknown; }
+static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) {
+    return [[CSCloseFriendSnapshot alloc] initWithAccountID:currentAccount profile:@{@"enabled":@NO,@"friends":@[],@"groups":@[],@"options":@{}} revealed:NO revision:0 blocked:NO];
+}
 typedef NSInteger UITableViewScrollPosition;
 @class CSGroupListAdapter;
 @interface UITableView : NSObject
@@ -41,6 +51,7 @@ typedef NSInteger UITableViewScrollPosition;
 @end
 @interface CSGroupListAdapter : NSObject
 @property(nonatomic,strong) UITableView *table;
+@property(nonatomic,strong) id controller;
 @property(nonatomic,strong) CSGroupProjection *projection;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;

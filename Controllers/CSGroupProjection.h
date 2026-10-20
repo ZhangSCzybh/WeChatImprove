@@ -26,6 +26,7 @@ typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
 @property (nonatomic, readonly) BOOL top;
 @property (nonatomic, readonly) NSUInteger unreadCount;
 @property (nonatomic, readonly) BOOL redDot;
+@property (nonatomic, readonly) BOOL privacyMasked;
 - (instancetype)initWithNativePath:(NSIndexPath *)nativePath
                          userName:(nullable NSString *)userName
                              kind:(CSGroupRowKind)kind
@@ -56,6 +57,26 @@ typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
                    selectedTabID:(NSString *)selectedTabID
                 filterDuplicates:(BOOL)filterDuplicates
                        accountID:(NSString *)accountID
+              previousProjection:(nullable CSGroupProjection *)previous;
+/// Privacy runs after complete native validation, before any grouping or badge work.
+/// A revision change invalidates reuse even when the hidden names are unchanged.
+- (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+                            tabs:(NSArray<WESessionTabItem *> *)tabs
+                   selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates
+                       accountID:(NSString *)accountID
+                 hiddenUserNames:(NSSet<NSString *> *)hiddenUserNames
+                 privacyRevision:(NSUInteger)privacyRevision
+              previousProjection:(nullable CSGroupProjection *)previous;
+/// Verified aggregates containing no hidden child may retain their native presentation.
+- (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+                            tabs:(NSArray<WESessionTabItem *> *)tabs
+                   selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates
+                       accountID:(NSString *)accountID
+                 hiddenUserNames:(NSSet<NSString *> *)hiddenUserNames
+       unmaskedAggregateUserNames:(NSSet<NSString *> *)unmaskedAggregateUserNames
+                 privacyRevision:(NSUInteger)privacyRevision
               previousProjection:(nullable CSGroupProjection *)previous NS_DESIGNATED_INITIALIZER;
 - (BOOL)hasSameDisplayStructureAs:(nullable CSGroupProjection *)other;
 - (NSArray<NSIndexPath *> *)changedUnreadPathsFrom:(CSGroupProjection *)other;

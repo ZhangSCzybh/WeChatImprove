@@ -15,6 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller;
 + (void)layoutForController:(id)controller;
 + (void)settingsChanged;
++ (void)closeFriendPolicyChanged:(NSNotification *)notification;
+/// Returns YES when privacy owns navigation, including no eligible destination.
+- (BOOL)navigatePrivateSessionsForward:(BOOL)forward unreadOnly:(BOOL)unreadOnly;
 + (void)applicationActivityChanged:(NSNotification *)notification;
 + (nullable NSString *)groupTitleForTitleView:(id)titleView;
 + (void)recordNativeTitle:(nullable NSString *)title status:(unsigned int)status forTitleView:(id)titleView;

@@ -1,6 +1,15 @@
 #import <Foundation/Foundation.h>
 #import "CSGroupProjection.h"
 NS_ASSUME_NONNULL_BEGIN
+typedef NS_ENUM(NSUInteger, CSGroupFoldedPrivacyState) {
+    CSGroupFoldedPrivacyUnknown, CSGroupFoldedPrivacyNoHidden,
+    CSGroupFoldedPrivacyMixed, CSGroupFoldedPrivacyAllHidden
+};
+FOUNDATION_EXPORT NSArray<NSString *> * _Nullable CSGroupCopyFoldedUserNames(void);
+FOUNDATION_EXPORT CSGroupFoldedPrivacyState CSGroupAssessFoldedUserNames(NSArray<NSString *> * _Nullable names, NSSet<NSString *> *hiddenNames);
+FOUNDATION_EXPORT BOOL CSGroupIsFoldedController(id _Nullable controller);
+FOUNDATION_EXPORT id _Nullable CSGroupNativeLogic(id controller);
+FOUNDATION_EXPORT NSString * _Nullable CSGroupNativeUserNameAtPath(id controller, NSIndexPath *path);
 FOUNDATION_EXPORT NSString * _Nullable CSGroupCurrentAccountID(void);
 FOUNDATION_EXPORT id _Nullable CSGroupReadObject(id _Nullable object, NSString *name);
 FOUNDATION_EXPORT long long CSGroupReadInteger(id _Nullable object, NSString *name, long long fallback);

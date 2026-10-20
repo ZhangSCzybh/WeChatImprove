@@ -5,7 +5,7 @@
 #import <objc/message.h>
 @class CSGroupListAdapter;
 @interface UITableView : NSObject
-@property(nonatomic) BOOL tracking,dragging,decelerating,editing;
+@property(nonatomic) BOOL tracking,dragging,decelerating,editing,hidden;
 @property(nonatomic) double decelerationRate;
 @property(nonatomic,strong) id tableHeaderView;
 @property(nonatomic) NSUInteger reloads;
@@ -30,6 +30,16 @@
 static char AdapterKey, PresentationSuspendedKey;
 static NSString *account=@"account-A";
 static BOOL enabled=YES;
+static BOOL privacyEnabled;
+static BOOL CSGroupPrivacyActive(void) { return privacyEnabled; }
+static NSUInteger accountEpoch=1;
+static NSUInteger CSCloseFriendAccountEpoch(void) { return accountEpoch; }
+static BOOL CSGroupIsFoldedController(id owner) { (void)owner; return NO; }
+@interface PolicyFixture : NSObject
+@property(nonatomic) BOOL blocked;
+@end
+@implementation PolicyFixture @end
+static PolicyFixture *CSCloseFriendCurrentSnapshot(void) { return [PolicyFixture new]; }
 static NSUInteger scopes,snapshotBuilds;
 static BOOL mutateDuringSnapshot,failPublication,rawPublicationFailure;
 static NSArray *CSGroupBuildNativeSections(id controller,id table,id source);
@@ -56,7 +66,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic,strong) NSMutableArray *completions,*nativeActions;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
 @property(nonatomic,strong) id nativeHeader,projection,identityDisplayPaths;
-@property(nonatomic) BOOL chromeVisible,searchChromeVisible;
+@property(nonatomic) BOOL chromeVisible,searchChromeVisible,privacyRefreshPending,privacyShielded,privacyTableWasHidden;
 @property(nonatomic) CSGroupChangeKind lastPublishedChanges;
 @property(nonatomic,strong) id chrome;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
@@ -92,7 +102,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
     if (!self.nativePresentation) [self nativeSectionsForAccount:account];
     self.preferences=[CSGroupPreferences new]; self.preferences.accountID=account;
     self.publishedEnabled=enabled; self.searching=self.controller.isSearching;
-    self.active=enabled && !self.searching && !self.nativePresentation;
+    self.active=privacyEnabled || (enabled && !self.searching && !self.nativePresentation);
     [self layout];
     if (failPublication) { if (rawPublicationFailure) [self requestRefresh]; else [self requestRecovery]; }
 }
@@ -333,6 +343,25 @@ int main(void) { @autoreleasepool {
     [a requestRefresh]; RunFor(1.1);
     Check(a.refreshCount==before+4 && !a.scheduled,@"generic refresh requests during publication also share the bounded recovery budget");
     failPublication=NO; rawPublicationFailure=NO;
+    a=List(&host); privacyEnabled=YES; enabled=NO; before=a.refreshCount;
+    [a refresh];
+    Check(a.refreshCount==before+1 && a.active,@"privacy reaches publication with grouping disabled");
+    host.isSearching=YES; a.searchChromeVisible=YES; before=a.refreshCount; [a refresh];
+    Check(a.refreshCount==before+1 && a.active,@"search cannot bypass privacy projection or preserve stale rows");
+    a.table.tracking=YES; a.table.editing=YES; a.menuState=3; before=a.refreshCount;
+    [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(a.refreshCount==before+1 && !a.table.hidden && !a.privacyRefreshPending,@"privacy refresh bypasses tracking/edit/menu deferral and republishes immediately");
+    [a beginNativeChange]; before=a.refreshCount; [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(a.table.hidden && a.privacyRefreshPending && a.refreshCount==before,@"policy change immediately hides old cells while native transaction is open");
+    [a endNativeChange]; RunFor(.03);
+    Check(!a.table.hidden && a.refreshCount==before+1,@"transaction completion publishes current privacy and releases temporary shield");
+    a.table.tracking=NO; a.table.editing=NO; a.menuState=0;
+    a.publishing=YES; actionBefore=actions; [a performInNativePresentation:^{actions++;}]; a.publishing=NO;
+    [a refresh]; Check(actions==actionBefore+1 && a.active && !a.nativeActions.count,@"native action drains through privacy projection without disabling it");
+    a.publishing=YES; actionBefore=actions; [a performInNativePresentation:^{actions++;}]; a.publishing=NO;
+    accountEpoch++; [a refresh];
+    Check(actions==actionBefore && !a.nativeActions.count,@"same-account epoch replacement discards queued native action");
+    privacyEnabled=NO; enabled=YES;
     fprintf(stdout,"Group lifecycle: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;
 } }

@@ -4,6 +4,8 @@
 #import <substrate.h>
 #import "CSGroupListAdapter.h"
 #import "CSGroupNativeBridge.h"
+#import "CSCloseFriendBridge.h"
+#import "CSCloseFriendSessionPresentation.h"
 
 @interface NewMainFrameViewController : NSObject @end
 @interface MainFrameTableView : UITableView @end
@@ -99,16 +101,22 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 - (void)onAuthOK { Native(self,YES,^{ %orig; }); }
 - (void)onLogicHideSession:(id)session { Native(self,YES,^{ %orig; }); }
 - (void)selectCellForName:(id)name {
+    if (CSCloseFriendShouldHideUserName(name,CSCloseFriendSurfaceSession)) return;
     CSGroupListAdapter *a=Adapter(self);
-    if (a.isActive) { [a performInNativePresentation:^{ Native(self,NO,^{ %orig; }); }]; return; }
+    if (a.isActive) { [a performInNativePresentation:^{ if (!CSCloseFriendShouldHideUserName(name,CSCloseFriendSurfaceSession)) Native(self,NO,^{ %orig; }); }]; return; }
     Native(self,NO,^{ %orig; });
 }
 - (void)cancelSelectedCell { Native(self,NO,^{ %orig; }); }
-- (void)handleSelectIndexPath:(id)path tableView:(id)table { Native(self,NO,^{ %orig; }); }
+- (void)handleSelectIndexPath:(id)path tableView:(id)table {
+    CSGroupListAdapter *a=Adapter(self);
+    if (CSCloseFriendShouldHideUserName(CSGroupNativeUserNameAtPath(self,path),CSCloseFriendSurfaceSession)) return;
+    if (a.isActive && ![a displayPath:path]) return;
+    Native(self,NO,^{ %orig; });
+}
 - (void)previewingContext:(id)context commitViewController:(id)vc { Native(self,NO,^{ %orig; }); }
-- (void)onNextUnreadChat { CSGroupListAdapter *a=Adapter(self); if (a.isActive) { [a performInNativePresentation:^{ Native(self,NO,^{ %orig; }); }]; return; } Native(self,NO,^{ %orig; }); }
-- (void)onNextChat { CSGroupListAdapter *a=Adapter(self); if (a.isActive) { [a performInNativePresentation:^{ Native(self,NO,^{ %orig; }); }]; return; } Native(self,NO,^{ %orig; }); }
-- (void)onLastChat { CSGroupListAdapter *a=Adapter(self); if (a.isActive) { [a performInNativePresentation:^{ Native(self,NO,^{ %orig; }); }]; return; } Native(self,NO,^{ %orig; }); }
+- (void)onNextUnreadChat { CSGroupListAdapter *a=Adapter(self); if ([a navigatePrivateSessionsForward:YES unreadOnly:YES]) return; if (a.isActive) { [a performInNativePresentation:^{ Native(self,NO,^{ %orig; }); }]; return; } Native(self,NO,^{ %orig; }); }
+- (void)onNextChat { CSGroupListAdapter *a=Adapter(self); if ([a navigatePrivateSessionsForward:YES unreadOnly:NO]) return; if (a.isActive) { [a performInNativePresentation:^{ Native(self,NO,^{ %orig; }); }]; return; } Native(self,NO,^{ %orig; }); }
+- (void)onLastChat { CSGroupListAdapter *a=Adapter(self); if ([a navigatePrivateSessionsForward:NO unreadOnly:NO]) return; if (a.isActive) { [a performInNativePresentation:^{ Native(self,NO,^{ %orig; }); }]; return; } Native(self,NO,^{ %orig; }); }
 
 - (id)logicGetCellDataAtIndexPath:(id)path { __block id result=nil; Native(self,NO,^{ result=%orig; }); return result; }
 - (id)logicGetSessionAtIndexPath:(id)path { __block id result=nil; Native(self,NO,^{ result=%orig; }); return result; }
@@ -426,9 +434,60 @@ static void InstallMenuTouchGate(void) {
 }
 %end
 
+%hook UITableViewCell
+- (void)prepareForReuse { CSCloseFriendUpdateSessionCover(self,nil); %orig; }
+- (void)layoutSubviews { %orig; CSCloseFriendRefreshSessionCover(self); }
+%end
+
+// Folded lists share the projection/proxy owner, but never group chrome. Native
+// data-source methods still read ChatBoxMgr with original coordinates.
+static void (*FoldedLoadOriginal)(id,SEL);
+static void FoldedLoad(id owner,SEL selector) {
+    FoldedLoadOriginal(owner,selector); [CSGroupListAdapter attachToController:owner];
+}
+static void (*FoldedAppearOriginal)(id,SEL,BOOL);
+static void FoldedAppear(id owner,SEL selector,BOOL animated) {
+    [CSGroupListAdapter setPresentationSuspended:NO forController:owner];
+    Native(owner,NO,^{ FoldedAppearOriginal(owner,selector,animated); });
+    [CSGroupListAdapter attachToController:owner];
+}
+static void (*FoldedDisappearOriginal)(id,SEL,BOOL);
+static void FoldedDisappear(id owner,SEL selector,BOOL animated) {
+    [CSGroupListAdapter setPresentationSuspended:YES forController:owner];
+    Native(owner,NO,^{ FoldedDisappearOriginal(owner,selector,animated); });
+}
+static void (*FoldedChangedOriginal)(id,SEL);
+static void FoldedChanged(id owner,SEL selector) {
+    Native(owner,YES,^{ FoldedChangedOriginal(owner,selector); });
+    // The main aggregate assessment depends on these children as well.
+    [CSGroupListAdapter settingsChanged];
+}
+static void (*FoldedSessionOriginal)(id,SEL,id);
+static void FoldedSession(id owner,SEL selector,id session) {
+    NativeNotification(owner,CSGroupChangeContent|CSGroupChangeStructure,^{ FoldedSessionOriginal(owner,selector,session); });
+}
+static void (*FoldedOpenOriginal)(id,SEL,id,id);
+static void FoldedOpen(id owner,SEL selector,id session,id path) {
+    if (CSCloseFriendShouldHideUserName(CSCloseFriendUserName(session),CSCloseFriendSurfaceSession)) return;
+    CSGroupListAdapter *adapter=Adapter(owner);
+    if (adapter.isActive && ![adapter displayPath:path]) return;
+    Native(owner,NO,^{ FoldedOpenOriginal(owner,selector,session,path); });
+}
+static void InstallFoldedSessionHooks(void) {
+    NSString *cls=@"ChatBoxSessionListViewController";
+    CSCloseFriendInstallHook(cls,@"viewDidLoad",(IMP)FoldedLoad,(IMP *)&FoldedLoadOriginal,"v@:");
+    CSCloseFriendInstallHook(cls,@"viewDidAppear:",(IMP)FoldedAppear,(IMP *)&FoldedAppearOriginal,"v@:B");
+    CSCloseFriendInstallHook(cls,@"viewWillDisappear:",(IMP)FoldedDisappear,(IMP *)&FoldedDisappearOriginal,"v@:B");
+    CSCloseFriendInstallHook(cls,@"onChatBoxSessionListChanged",(IMP)FoldedChanged,(IMP *)&FoldedChangedOriginal,"v@:");
+    CSCloseFriendInstallHook(cls,@"onSessionChanged:",(IMP)FoldedSession,(IMP *)&FoldedSessionOriginal,"v@:@");
+    CSCloseFriendInstallHook(cls,@"openSession:atIndexPath:",(IMP)FoldedOpen,(IMP *)&FoldedOpenOriginal,"v@:@@");
+}
+
 %ctor {
     CSBackupWhenReady(^{
         InstallMenuTouchGate();
+        InstallFoldedSessionHooks();
+        [NSNotificationCenter.defaultCenter addObserver:CSGroupListAdapter.class selector:@selector(closeFriendPolicyChanged:) name:CSCloseFriendPolicyDidChangeNotification object:nil];
         for (NSString *name in @[UIApplicationWillResignActiveNotification,UIApplicationDidEnterBackgroundNotification,UIApplicationDidBecomeActiveNotification])
             [NSNotificationCenter.defaultCenter addObserver:CSGroupListAdapter.class selector:@selector(applicationActivityChanged:) name:name object:nil];
         CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),NULL,SettingsChanged,

@@ -4,6 +4,9 @@
 #import "CSGroupNativeBridge.h"
 #import "CSGroupIndexScope.h"
 #import "WESessionTabItem.h"
+static BOOL CSCloseFriendShouldHideUserName(id name, NSUInteger surface) { (void)name; (void)surface; return NO; }
+static const NSUInteger CSCloseFriendSurfaceSession=0;
+static void CSCloseFriendUpdateSessionCover(id cell, id row) { (void)cell; (void)row; }
 static char CellRowKey;
 static NSString *account=@"test-account";
 id CSGetService(Class cls) { (void)cls; return nil; }

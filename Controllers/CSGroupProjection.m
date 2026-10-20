@@ -1,6 +1,9 @@
 #import "CSGroupProjection.h"
 #import "WESessionTabItem.h"
 
+@interface CSGroupRow ()
+@property (nonatomic, readwrite) BOOL privacyMasked;
+@end
 @implementation CSGroupRow
 - (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(NSString *)userName
                              kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
@@ -53,7 +56,7 @@ static BOOL CSGroupRowsMatch(CSGroupRow *a, CSGroupRow *b, BOOL unread) {
     if (a && a==b) return YES; // Published base rows are immutable.
     return a && b && [a.nativePath isEqual:b.nativePath] &&
         (a.userName==b.userName || [a.userName isEqual:b.userName]) &&
-        a.kind==b.kind && a.category==b.category && a.top==b.top &&
+        a.kind==b.kind && a.category==b.category && a.top==b.top && a.privacyMasked==b.privacyMasked &&
         (!unread || (a.unreadCount==b.unreadCount && a.redDot==b.redDot));
 }
 static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
@@ -74,6 +77,8 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
 @property (nonatomic, copy) NSDictionary *memberTabIDs, *presetIDs, *destinationsByPath;
 @property (nonatomic, copy) NSString *selectedTabID;
 @property (nonatomic) BOOL filterDuplicates;
+@property (nonatomic, copy) NSSet<NSString *> *hiddenUserNames, *unmaskedAggregateUserNames;
+@property (nonatomic) NSUInteger privacyRevision;
 - (nullable NSIndexPath *)nativePathForDisplayPath:(NSIndexPath *)displayPath;
 @end
 
@@ -84,6 +89,16 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
 }
 - (instancetype)initWithSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selectedTabID
                 filterDuplicates:(BOOL)filterDuplicates accountID:(NSString *)accountID previousProjection:(CSGroupProjection *)previous {
+    return [self initWithSections:sections tabs:tabs selectedTabID:selectedTabID filterDuplicates:filterDuplicates accountID:accountID hiddenUserNames:[NSSet set] privacyRevision:0 previousProjection:previous];
+}
+- (instancetype)initWithSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates accountID:(NSString *)accountID hiddenUserNames:(NSSet *)hiddenUserNames
+                 privacyRevision:(NSUInteger)privacyRevision previousProjection:(CSGroupProjection *)previous {
+    return [self initWithSections:sections tabs:tabs selectedTabID:selectedTabID filterDuplicates:filterDuplicates accountID:accountID hiddenUserNames:hiddenUserNames unmaskedAggregateUserNames:[NSSet set] privacyRevision:privacyRevision previousProjection:previous];
+}
+- (instancetype)initWithSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates accountID:(NSString *)accountID hiddenUserNames:(NSSet *)hiddenUserNames
+      unmaskedAggregateUserNames:(NSSet *)unmaskedAggregateUserNames privacyRevision:(NSUInteger)privacyRevision previousProjection:(CSGroupProjection *)previous {
     if ((self = [super init])) {
         // Until every value is validated, no partial map, badge, or row is published.
         _sections = @[]; _accountID = [accountID isKindOfClass:[NSString class]] ? [accountID copy] : @"";
@@ -92,6 +107,11 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
         if (!_accountID.length || ![sections isKindOfClass:[NSArray class]] ||
             ![tabs isKindOfClass:[NSArray class]] || ![selectedTabID isKindOfClass:[NSString class]]) return self;
 
+        if (![hiddenUserNames isKindOfClass:NSSet.class]) return self;
+        for (id name in hiddenUserNames) if (![name isKindOfClass:NSString.class] || ![name length]) return self;
+        if (![unmaskedAggregateUserNames isKindOfClass:NSSet.class]) return self;
+        for (id name in unmaskedAggregateUserNames) if (![name isKindOfClass:NSString.class] || ![name length]) return self;
+        _hiddenUserNames=[hiddenUserNames copy]; _unmaskedAggregateUserNames=[unmaskedAggregateUserNames copy]; _privacyRevision=privacyRevision;
         NSMutableDictionary<NSString *, NSNumber *> *types = [NSMutableDictionary dictionary];
         NSMutableArray *records=[NSMutableArray array];
         for (id candidate in tabs) {
@@ -160,7 +180,8 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
             [copiedSections addObject:[copiedRows copy]];
         }
 
-        BOOL sameStructure=sameDefinitions && previous.filterDuplicates==filterDuplicates && CSGroupSectionsMatch(copiedSections,previous.inputSections,NO);
+        BOOL samePrivacy=previous.privacyRevision==privacyRevision && [previous.hiddenUserNames isEqual:hiddenUserNames] && [previous.unmaskedAggregateUserNames isEqual:unmaskedAggregateUserNames];
+        BOOL sameStructure=sameDefinitions && samePrivacy && previous.filterDuplicates==filterDuplicates && CSGroupSectionsMatch(copiedSections,previous.inputSections,NO);
         BOOL sameValues=sameStructure && CSGroupSectionsMatch(copiedSections,previous.inputSections,YES);
         if (sameValues && [previous.selectedTabID isEqual:selectedTabID]) return previous;
         BOOL sameDisplay=sameStructure && [previous.selectedTabID isEqual:selectedTabID];
@@ -175,7 +196,14 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
         NSUInteger retainedCount = 0; BOOL retainedDot = NO;
         for (NSUInteger sectionIndex = 0; sectionIndex < copiedSections.count; sectionIndex++) {
             NSMutableArray<CSGroupRow *> *visible = [NSMutableArray array];
-            for (CSGroupRow *row in copiedSections[sectionIndex]) {
+            for (CSGroupRow * __strong row in copiedSections[sectionIndex]) {
+                if (row.userName.length && [hiddenUserNames containsObject:row.userName]) continue;
+                // Aggregate preview/dot attribution is not a sum of visible sessions.
+                // Keep its navigation entry but publish no unverified unread contribution.
+                if (hiddenUserNames.count && row.kind==CSGroupRowKindAggregate && ![unmaskedAggregateUserNames containsObject:row.userName ?: @""]) {
+                    row=[[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName kind:row.kind category:row.category top:row.top unreadCount:0 redDot:NO];
+                    row.privacyMasked=YES;
+                }
                 BOOL retained = CSGroupRetainsEveryTab(row);
                 NSMutableSet<NSString *> *destinations = sameStructure ? previous.destinationsByPath[row.nativePath] : [NSMutableSet set];
                 if (retained) {
