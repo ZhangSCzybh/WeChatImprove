@@ -130,50 +130,114 @@ static void TypeSearch(FTSHomeViewController *page,NSString *query) {
     if(page.searchBar) {page.searchBar.textView.text=query;[page mmInputBoxTextChanged:nil text:query];}
     else {page.searchTextField.text=query;[page onTextFieldChanged:page.searchTextField];}
 }
+// Keep native section behavior behind the actual production guards. A hidden
+// aggregate has zero items; no substitute row or unlock action is manufactured.
+@interface UITableViewCell : NSObject @end
+@implementation UITableViewCell @end
+static void CSCFSearchUpdateGroupCell(id cell,id item) {(void)cell;(void)item;}
+#include "SearchSectionBodies.h"
+@interface NativeSearchSection : NSObject
+@property(nonatomic) NSUInteger cellCalls,selections,loads;
+- (NSInteger)numberOfItems;
+- (id)cellForItemAtIndex:(NSInteger)index section:(NSInteger)section;
+- (void)didSelectRowAtIndex:(NSInteger)index;
+- (void)didSelectDataRowAtIndex:(NSInteger)index indexPath:(id)path;
+- (void)onLoadMore;
+@end
+@implementation NativeSearchSection
+- (NSInteger)numberOfItems {return 3;}
+- (id)cellForItemAtIndex:(NSInteger)index section:(NSInteger)section {(void)index;(void)section;self.cellCalls++;return @"native row";}
+- (void)didSelectRowAtIndex:(NSInteger)index {(void)index;self.selections++;}
+- (void)didSelectDataRowAtIndex:(NSInteger)index indexPath:(id)path {(void)index;(void)path;self.selections++;}
+- (void)onLoadMore {self.loads++;}
+@end
+// Own methods on each class, matching MSHookMessageEx's per-class isolation.
+#define NATIVE_SECTION_METHODS \
+- (NSInteger)numberOfItems {return [super numberOfItems];} \
+- (id)cellForItemAtIndex:(NSInteger)index section:(NSInteger)section {return [super cellForItemAtIndex:index section:section];} \
+- (void)didSelectRowAtIndex:(NSInteger)index {[super didSelectRowAtIndex:index];} \
+- (void)didSelectDataRowAtIndex:(NSInteger)index indexPath:(id)path {[super didSelectDataRowAtIndex:index indexPath:path];} \
+- (void)onLoadMore {[super onLoadMore];}
+@interface FTSMessageSectionController : NativeSearchSection @end
+@implementation FTSMessageSectionController
+NATIVE_SECTION_METHODS
+@end
+@interface FTSSearchContactSectionController : NativeSearchSection @end
+@implementation FTSSearchContactSectionController
+NATIVE_SECTION_METHODS
+@end
+#undef NATIVE_SECTION_METHODS
+#include "SearchSectionHooks.h"
+static void SearchSectionChecks(void) {
+    NSUInteger epoch=Epoch;Current=Policy(NO,10);
+    InstallSection(@"FTSMessageSectionController",nil);InstallSection(@"FTSSearchContactSectionController",nil);
+    NSArray *sections=@[[FTSMessageSectionController new],[FTSSearchContactSectionController new]];
+    for(NativeSearchSection *section in sections) {
+        Check([section numberOfItems]==0,@"concealed search aggregates have zero rows, no unlock placeholder");
+        Check([[section cellForItemAtIndex:0 section:0] isKindOfClass:UITableViewCell.class] && !section.cellCalls,@"stale cell requests cannot render native concealed content");
+        [section didSelectRowAtIndex:0];[section didSelectDataRowAtIndex:0 indexPath:nil];[section onLoadMore];
+        Check(!section.selections && !section.loads,@"removed placeholder has no leftover selection or load action");
+    }
+    Current=Policy(YES,11);
+    for(NativeSearchSection *section in sections) {
+        Check([section numberOfItems]==3 && [[section cellForItemAtIndex:0 section:0] isEqual:@"native row"],@"unlock restores original aggregate rows");
+        [section didSelectRowAtIndex:0];[section onLoadMore];
+        Check(section.selections==1 && section.loads==1,@"revealed native selection and pagination remain available");
+    }
+    Epoch++;
+    for(NativeSearchSection *section in sections)Check([section numberOfItems]==0,@"stale account cannot regain hidden search rows");
+    Epoch=epoch;
+}
 static void SearchInputChecks(void) {
-    NSUInteger initialEpoch=Epoch;
     Current=Policy(NO,1);InstallSearchInputHooks();
     FTSHomeViewController *page=SearchPage(YES);FTSVoiceSearchBarController *presenter=page.presenter;
-    [presenter performSelector:@selector(delaySearchImp:) withObject:@"previous query" afterDelay:0.01];
-    for(NSString *prefix in @[@"6",@"65",@"654",@"6543",@"65432"]) {
-        TypeSearch(page,prefix);[presenter handleTextDidChange:prefix fromNewVoice:YES];[presenter delayPardusSearchImp:prefix];
-        [presenter recordLocalSearchHistory:prefix];[page updateFooterView];[page setLoadingStatus];
-        Check([[page searchBarText] isEqual:prefix] && page.emptyPresentation && ![page objectsForListAdapter:nil].count && !page.tableView.tableFooterView,@"prefix stays in editor with no suggestions, result rows or loading footer");
+    NSArray *nativeRows=@[@"搜索网络结果",@"61",@"619电竞",@"61路公交"];
+    presenter.results=nativeRows;
+    for(NSString *prefix in @[@"6",@"61",@"65",@"654",@"6543",@"65432"]) {
+        TypeSearch(page,prefix);
+        Check([[page searchBarText] isEqual:prefix] && [presenter.queries.lastObject isEqual:prefix] && !CSCFSearchSuppressLoading(page),@"prefix flows immediately to native live search, without requiring Return");
+        Check([page objectsForListAdapter:nil]==nativeRows && page.tableView.tableFooterView && !page.emptyPresentation,@"native web entry, suggestions and loading remain unchanged while typing");
     }
-    Check(!presenter.queries.count && !presenter.history.count && !page.footerReads && !page.loadingStarts,@"typing never reaches original suggestion, history, footer logging or loading methods");
-    [NSRunLoop.currentRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.02]];
-    Check(!presenter.delayedSearches && !page.searchBar.textOnlyWrites,@"pending previous searches are cancelled without rewriting the editor");
+    [presenter delayPardusSearchImp:@"65432"];[presenter recordLocalSearchHistory:@"65432"];
+    Check([[page objectsForListAdapter:nil] isEqual:@[@"65432"]] && [presenter.history.lastObject isEqual:@"65432"],@"native delayed suggestion and ordinary history paths stay enabled");
+    NSUInteger queries=presenter.queries.count,history=presenter.history.count,probes=CSCloseFriendManager.sharedManager.probes;
+    [presenter performSelector:@selector(delaySearchImp:) withObject:@"65432" afterDelay:0.01];
     TypeSearch(page,@"654321");
-    Check(page.searchBar.clears==1 && ![page searchBarText].length && page.resigns==1 && [page.searchTextField.text isEqual:@"unused"],@"exact password clears the actual large editor and dismisses keyboard");
-    Check(!presenter.searching && !presenter.queries.count && !presenter.history.count && CSCFSearchSuppressLoading(page),@"unlock consumes password before query/history and cannot leave a loading task");
-    TypeSearch(page,@"ordinary");Check(!presenter.queries.count,@"ordinary typing is retained until explicit Search");
-    [page shouldReturnStartSearch];[presenter delaySearchImp:@"ordinary"];[presenter delayPardusSearchImp:@"ordinary"];
-    Check(page.submits==1 && presenter.searches==1 && [presenter.queries isEqual:@[@"ordinary"]] && [presenter.history isEqual:@[@"ordinary"]] && [page objectsForListAdapter:nil].count==1 && !page.emptyPresentation,@"explicit submission starts native query once and allows delayed results/history");
-    TypeSearch(page,@"6");[presenter delaySearchImp:@"ordinary"];[presenter recordLocalSearchHistory:@"ordinary"];
-    Check(presenter.delayedSearches==1 && presenter.history.count==1 && ![page objectsForListAdapter:nil].count,@"next edit revokes old asynchronous query and clears prior visible results");
-    NSUInteger probes=CSCloseFriendManager.sharedManager.probes;
-    page.searchBar.textView.textView.markedTextRange=[NSObject new];TypeSearch(page,@"654321");[page shouldReturnStartSearch];
-    Check(page.searchBar.clears==1 && page.searchBar.textView.textView.markedTextRange && CSCloseFriendManager.sharedManager.probes==probes && !presenter.searching,@"nested large-editor IME neither unlocks nor leaks suggestions, and is not unmarked");
-    page.searchBar.textView.textView.markedTextRange=nil;TypeSearch(page,@"654321");
-    Check(page.searchBar.clears==2,@"committed/pasted complete password unlocks");
+    Check(page.searchBar.clears==1 && ![page searchBarText].length && page.resigns==1 && [page.searchTextField.text isEqual:@"unused"],@"exact password clears actual large editor and dismisses keyboard");
+    Check(CSCloseFriendManager.sharedManager.probes==probes+1 && presenter.queries.count==queries && presenter.history.count==history && !presenter.searching && CSCFSearchSuppressLoading(page),@"only complete password is consumed before native query/history, without recursive verification");
+    [NSRunLoop.currentRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.02]];
+    Check(!presenter.delayedSearches,@"password unlock cancels already scheduled prefix search");
+    presenter.results=nativeRows;page.tableView.tableFooterView=@"late loading";
+    [presenter delaySearchImp:@"65432"];[presenter recordLocalSearchHistory:@"654321"];[page updateFooterView];[page setLoadingStatus];
+    Check(![page objectsForListAdapter:nil].count && !page.tableView.tableFooterView && presenter.history.count==history && !presenter.delayedSearches,@"late callbacks cannot revive cleared password search or history");
+    TypeSearch(page,@"ordinary");presenter.results=nativeRows;
+    Check(presenter.queries.count==queries+1 && presenter.searching && !CSCFSearchSuppressLoading(page) && [page objectsForListAdapter:nil]==nativeRows,@"next ordinary edit immediately restores native live results and loading");
+    NSUInteger searches=presenter.searches;[page shouldReturnStartSearch];
+    Check(page.submits==1 && presenter.searches==searches && [presenter.history.lastObject isEqual:@"ordinary"],@"Return keeps native submit behavior without injecting another search");
+    probes=CSCloseFriendManager.sharedManager.probes;NSUInteger clears=page.searchBar.clears;
+    page.searchBar.textView.textView.markedTextRange=[NSObject new];TypeSearch(page,@"654321");
+    Check(page.searchBar.clears==clears && page.searchBar.textView.textView.markedTextRange && CSCloseFriendManager.sharedManager.probes==probes && [presenter.queries.lastObject isEqual:@"654321"],@"IME composition follows native behavior without early password consumption or unmarking");
+    page.searchBar.textView.textView.markedTextRange=nil;TypeSearch(page,@"654321");Check(page.searchBar.clears==clears+1,@"confirmed complete password unlocks");
     [page onGetTextInputFromNewVoice:@"voice query" voiceId:@"voice-1"];
-    Check([[page searchBarText] isEqual:@"voice query"] && presenter.queries.count==1,@"voice input remains visible without native prefix dispatch");
-    [page shouldReturnStartSearch];Check(presenter.searches==2,@"retained voice query can be submitted normally");
-    Epoch++;[presenter delaySearchImp:@"voice query"];[page shouldReturnStartSearch];
-    Check(presenter.delayedSearches==1 && page.submits==2 && CSCFSearchSuppressLoading(page),@"old page submission and callbacks cannot cross accounts");
-    TypeSearch(page,@"new account");[page shouldReturnStartSearch];Check(page.submits==3,@"fresh edit binds a new ordinary search to the current account");
-    FTSHomeViewController *legacy=SearchPage(NO);TypeSearch(legacy,@"65");Check(!legacy.presenter.queries.count,@"legacy editor also holds prefixes");
-    TypeSearch(legacy,@"654321");Check(!legacy.searchTextField.text.length && legacy.resigns==1,@"legacy clear fallback preserves full-password unlock");
-    TypeSearch(legacy,@"ordinary legacy");[legacy shouldReturnStartSearch];Check(legacy.presenter.searches==1,@"legacy explicit submission starts local search even without incremental results");
+    Check([[page searchBarText] isEqual:@"voice query"] && [presenter.queries.lastObject isEqual:@"voice query"],@"voice input retains native editor and live search behavior");
+    queries=presenter.queries.count;[page onGetTextInput:@"654321" isFromVoice:YES];
+    Check(![page searchBarText].length && presenter.queries.count==queries,@"full voice password is consumed before original voice dispatch");
+    FTSHomeViewController *legacy=SearchPage(NO);TypeSearch(legacy,@"65");
+    Check([legacy.presenter.queries isEqual:@[@"65"]],@"legacy partial input searches immediately");
+    TypeSearch(legacy,@"654321");Check(!legacy.searchTextField.text.length && legacy.resigns==1,@"legacy clear fallback retains full-password unlock");
+    TypeSearch(legacy,@"ordinary legacy");[legacy shouldReturnStartSearch];
+    Check(legacy.submits==1 && legacy.presenter.searches==0 && [legacy.presenter.queries.lastObject isEqual:@"ordinary legacy"],@"legacy return uses existing native search without replay");
+    page.searchBar.textView.text=@"654321";queries=presenter.queries.count;[page shouldReturnStartSearch];
+    Check(page.submits==1 && presenter.queries.count==queries && ![page searchBarText].length,@"Return also consumes complete password if an edit callback was bypassed");
     presenter.throwOnEmpty=YES;
-    @try {TypeSearch(page,@"throw");} @catch(__unused NSException *e) {}
-    Check(!InputState(page).resetting,@"native reset exception cannot leave a broad reentrancy bypass");
-    presenter.throwOnEmpty=NO;TypeSearch(page,@"65");Check(presenter.queries.count==3,@"after reset failure prefixes are still withheld");
-    __block NSUInteger external=0;CSCFSearchDispatchInput([NSObject new],@"654321",NO,NO,^{external++;});
+    @try {TypeSearch(page,@"654321");} @catch(__unused NSException *e) {}
+    Check(!InputState(page).resetting && !InputState(page).dispatchDepth,@"native reset exception restores dispatch guards");
+    presenter.throwOnEmpty=NO;TypeSearch(page,@"recovered");Check([presenter.queries.lastObject isEqual:@"recovered"],@"next ordinary input remains usable after a reset exception");
+    __block NSUInteger external=0;CSCFSearchDispatchInput([NSObject new],@"654321",NO,^{external++;});
     Check(external==1,@"non-homepage searches remain native");
     Current=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"account-A" profile:@{@"enabled":@NO,@"friends":@[],@"groups":@[],@"options":CSCloseFriendDefaultOptions()} revealed:NO revision:99 blocked:NO];
     NSUInteger unlocks=CSCloseFriendManager.sharedManager.unlocks;TypeSearch(page,@"654321");
-    Check(!CSCFSearchSuppressLoading(page) && presenter.queries.count==4 && CSCloseFriendManager.sharedManager.unlocks==unlocks,@"feature disabled restores native live search without password interception");
-    Epoch=initialEpoch;
-    printf("Search input: prefix isolation, full unlock, installed submit/delay/footer hooks, IME, voice and account boundaries passed\n");
+    Check(!CSCFSearchSuppressLoading(page) && [presenter.queries.lastObject isEqual:@"654321"] && CSCloseFriendManager.sharedManager.unlocks==unlocks,@"disabled feature leaves native live search intact");
+    SearchSectionChecks();
+    printf("Search: zero unlock placeholders, native live suggestions/web/history/submit, full unlock, late callbacks and IME passed\n");
 }

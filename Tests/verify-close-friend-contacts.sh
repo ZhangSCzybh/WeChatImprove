@@ -28,6 +28,11 @@ start=source.index('@interface CSCFSearchInputState')
 end=source.index('@interface CSCFSearchState',start)
 (out/'SearchInputBodies.h').write_text(source[start:end])
 (out/'SearchInputHooks.h').write_text(body(Path('Hooks/CloseFriendSearchHooks.xm').read_text(),'static void InstallSearchInputHooks('))
+start=source.index('@interface CSCFSearchState')
+declarations=source[start:source.index('id CSCFSearchModel(',start)]
+sectionBodies=source[source.index('static UIViewController *Presenter('):source.index('@interface CSCFGroupResultCover')]
+(out/'SearchSectionBodies.h').write_text('BOOL CSCFSearchPrepare(id section);\n'+declarations+sectionBodies)
+(out/'SearchSectionHooks.h').write_text(body(Path('Hooks/CloseFriendSearchHooks.xm').read_text(),'static void InstallSection('))
 source=Path('Hooks/CloseFriendProfileHooks.xm').read_text()
 (out/'ProfileGuards.h').write_text(body(source,'static void Guard0(')+'\n'+body(source,'static void Guard1(')+'\n'+body(source,'static void Render0(')+'\n'+body(source,'static void DisplayFlag('))
 PY

@@ -1,0 +1,36 @@
+{
+  "files": {
+    "packages/com.wechat.improve_1.8-43_iphoneos-arm64.deb": {
+      "sha256": "7d41004421c57b2b48eb725d06f35196a1953e99af64b406afc12550cde6495d",
+      "bytes": 1075590
+    },
+    "packages/com.wechat.improve_1.8-45_iphoneos-arm64.deb": {
+      "sha256": "ef40c8be07eb219218c716e20ef1772fa489f723cf1a9f85a8853e9cf1580a19",
+      "bytes": 1099148
+    },
+    "packages/com.wechat.improve_1.5-7_iphoneos-arm.deb": {
+      "sha256": "6f9472a7ad9697add4cd292447ff3ae11557027d371eaefdb6066cc8d4666ef3",
+      "bytes": 601160
+    },
+    "packages/com.wechat.improve_1.8-44_iphoneos-arm64.deb": {
+      "sha256": "574fdd0d6a13aeb70f17bc291408af39d3a6cfb1c7a888df11c35c608b07f0e7",
+      "bytes": 1085992
+    },
+    "packages/com.wechat.improve_1.8-41-b2_iphoneos-arm64.deb": {
+      "sha256": "038108f50dfe4b8d41eb97d83e6c1a6db673b2a07ca8a52b997f2aa8dac3a5ac",
+      "bytes": 912728
+    },
+    "packages/com.wechat.improve_1.6-0_iphoneos-arm64.deb": {
+      "sha256": "18082e00400372a33f5e11e6231c4c8e48e01fee2317a11d24b2c61fe366acbb",
+      "bytes": 655288
+    },
+    "packages/com.wechat.improve_1.8-42_iphoneos-arm64.deb": {
+      "sha256": "f9ed41cfbcb43332a09205f56be7639b3cbcc9fe1645cfc0f71af820436e72cc",
+      "bytes": 1077776
+    },
+    "packages/com.wechat.improve_1.8-41_iphoneos-arm64.deb": {
+      "sha256": "3616641f1ab3432dca19aeabcefd33ac82c28370e3b739e06524387b0ca4b016",
+      "bytes": 911626
+    }
+  }
+}

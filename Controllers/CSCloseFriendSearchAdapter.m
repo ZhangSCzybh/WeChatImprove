@@ -1,11 +1,11 @@
 #import "CSCloseFriendSearchAdapter.h"
 #import "CSCloseFriendManager.h"
 
-// The stored credential is a one-way verifier: no password-prefix oracle is kept.
-// Hold all homepage typing until a deliberate ordinary search or exact unlock.
+// Ordinary edits stay in WeChat's live-search pipeline. Only an exact password
+// match consumes input and keeps late callbacks from reviving that cleared query.
 @interface CSCFSearchInputState : NSObject
-@property(nonatomic) NSUInteger epoch, generation, submittedGeneration;
-@property(nonatomic) BOOL held, consumed, resetting;
+@property(nonatomic) NSUInteger dispatchDepth;
+@property(nonatomic) BOOL consumed, resetting;
 @end
 @implementation CSCFSearchInputState @end
 static char SearchInputKey;
@@ -16,7 +16,7 @@ static BOOL SearchProtected(id page) {
 static CSCFSearchInputState *InputState(id page) {
     CSCFSearchInputState *state=objc_getAssociatedObject(page,&SearchInputKey);
     if(!state) {
-        state=[CSCFSearchInputState new]; state.epoch=CSCloseFriendAccountEpoch();
+        state=[CSCFSearchInputState new];
         objc_setAssociatedObject(page,&SearchInputKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     return state;
@@ -40,28 +40,24 @@ static void SearchSetEmptyPresentation(id page,BOOL empty) {
 BOOL CSCFSearchSuppressLoading(id page) {
     if(!SearchProtected(page)) return NO;
     CSCFSearchInputState *state=objc_getAssociatedObject(page,&SearchInputKey);
-    return state && (state.held || state.consumed || state.epoch!=CSCloseFriendAccountEpoch());
+    return state.consumed;
 }
 void CSCFSearchClearResults(id page) {
     CSCFSetObject(page,@"setSectionData:",@[]);
     CSCFSetObject(CSCloseFriendRead(page,@"tableView"),@"setTableFooterView:",nil);
     CSCFSetObject(CSCloseFriendRead(CSCloseFriendRead(page,@"listAdapter"),@"tableView"),@"setTableFooterView:",nil);
 }
-static void SearchReset(id page,BOOL clearInput) {
+static void SearchReset(id page) {
     CSCFSearchInputState *state=InputState(page); id presenter=CSCloseFriendRead(page,@"presenter");
     [NSObject cancelPreviousPerformRequestsWithTarget:presenter];
     state.resetting=YES;
     @try {
-        if(clearInput) {
-            id bar=CSCloseFriendRead(page,@"searchBar");
-            // This clears the actual large editor and its native empty-input state.
-            if(!CSCFCallVoid(bar,@"inputBoxClear")) {
-                CSCFSetObject(CSCloseFriendRead(page,@"searchTextField"),@"setText:",@"");
-                CSCFSetObject(CSCloseFriendRead(bar,@"textView"),@"setText:",@"");
-            }
+        id bar=CSCloseFriendRead(page,@"searchBar");
+        // Clear the actual large editor, or the legacy field on older layouts.
+        if(!CSCFCallVoid(bar,@"inputBoxClear")) {
+            CSCFSetObject(CSCloseFriendRead(page,@"searchTextField"),@"setText:",@"");
+            CSCFSetObject(CSCloseFriendRead(bar,@"textView"),@"setText:",@"");
         }
-        // Only an empty query may pass this reentrancy guard. Never clear/restore
-        // a partially typed editor: that would end Chinese IME composition.
         CSCFSetObject(presenter,@"handleTextDidChange:",@"");
     } @finally {
         state.resetting=NO;
@@ -78,58 +74,38 @@ BOOL CSCFSearchConsumePassword(id page,id input) {
     NSString *query=SearchInput(page,input);
     if(!query.length || ![CSCloseFriendManager.sharedManager consumeHomepageSearchPassword:query]) return NO;
     CSCFSearchInputState *state=InputState(page);
-    state.held=YES; state.consumed=YES; state.submittedGeneration=0;
-    SearchReset(page,YES);
+    state.consumed=YES;
+    SearchReset(page);
     CSCFCallVoid(page,@"resignSearchFirstResponder");
     return YES;
 }
-void CSCFSearchDispatchInput(id page,id input,BOOL composing,BOOL voice,void (^native)(void)) {
-    if(!SearchProtected(page)) {
+static void DispatchPassword(id page,id input,BOOL composing,void (^native)(void)) {
+    CSCFSearchInputState *state=InputState(page);
+    if(state.resetting) { if(!SearchInput(page,input).length) native(); return; }
+    if(state.consumed) return;
+    if(state.dispatchDepth || composing || SearchComposing(page)) { native(); return; }
+    state.dispatchDepth++;
+    @try { if(!CSCFSearchConsumePassword(page,input)) native(); }
+    @finally { state.dispatchDepth--; }
+}
+void CSCFSearchDispatchInput(id page,id input,BOOL composing,void (^native)(void)) {
+    if(!NSThread.isMainThread || !SearchProtected(page)) {
         if(page) objc_setAssociatedObject(page,&SearchInputKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         native(); return;
     }
-    if(!NSThread.isMainThread) return;
-    CSCFSearchInputState *state=InputState(page); NSString *query=SearchInput(page,input);
-    if(state.resetting) { if(!query.length) native(); return; }
-    state.epoch=CSCloseFriendAccountEpoch(); state.generation++;
-    state.submittedGeneration=0; state.held=YES; state.consumed=NO;
-    if(!composing && CSCFSearchConsumePassword(page,query)) return;
-    // Voice delivery writes the editor in its original handler. Keep the text
-    // without invoking that handler's query logging / suggestion dispatch.
-    if(voice) {
-        id bar=CSCloseFriendRead(page,@"searchBar");
-        if(!CSCFSetObject(bar,@"inputBoxSetTextOnly:",query))
-            CSCFSetObject(CSCloseFriendRead(page,@"searchTextField"),@"setText:",query);
-    }
-    SearchReset(page,NO);
+    CSCFSearchInputState *state=InputState(page);
+    if(!state.resetting) state.consumed=NO;
+    DispatchPassword(page,input,composing,native);
 }
 void CSCFSearchDispatchQuery(id page,id input,void (^native)(void)) {
-    if(!SearchProtected(page)) { native(); return; }
-    if(!NSThread.isMainThread) return;
-    CSCFSearchInputState *state=InputState(page); NSString *query=SearchInput(page,input);
-    if(state.resetting) { if(!query.length) native(); return; }
-    if(state.epoch!=CSCloseFriendAccountEpoch() || state.held || state.consumed ||
-        !state.submittedGeneration || state.submittedGeneration!=state.generation || SearchComposing(page)) return;
-    NSCharacterSet *spaces=NSCharacterSet.whitespaceAndNewlineCharacterSet;
-    if(![[query stringByTrimmingCharactersInSet:spaces] isEqual:[SearchInput(page,nil) stringByTrimmingCharactersInSet:spaces]]) return;
-    native();
+    if(!NSThread.isMainThread || !SearchProtected(page)) { native(); return; }
+    DispatchPassword(page,input,NO,native);
 }
 void CSCFSearchSubmit(id page,void (^native)(void)) {
-    if(!SearchProtected(page)) { native(); return; }
-    if(!NSThread.isMainThread) return;
-    CSCFSearchInputState *state=InputState(page);
-    if(state.resetting || state.epoch!=CSCloseFriendAccountEpoch() || SearchComposing(page)) return;
+    // Native typing already scheduled searches. Do not replay a query on Return.
     NSString *query=SearchInput(page,nil);
-    if(CSCFSearchConsumePassword(page,query)) return;
-    query=[query stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-    if(!query.length) { state.held=YES; SearchReset(page,NO); return; }
-    state.generation++; state.submittedGeneration=state.generation;
-    state.held=NO; state.consumed=NO;
-    SearchSetEmptyPresentation(page,NO);
-    // Incremental queries were withheld. Start native local FTS once explicitly,
-    // then retain native Return navigation (large editor opens the full results).
-    CSCFSetObject(CSCloseFriendRead(page,@"presenter"),@"doSearch:",query);
-    native();
+    if(query.length) CSCFSearchDispatchInput(page,query,NO,native);
+    else CSCFSearchDispatchQuery(page,query,native);
 }
 @interface CSCFSearchState : NSObject
 @property(nonatomic) NSUInteger epoch, revision, displayedRevision, generation, displayedGeneration;
@@ -208,21 +184,6 @@ BOOL CSCFSearchGated(id section) {
     // These contracts cannot distinguish protected group authors and aggregate payloads safely.
     return CSCFIsClass(section,@"FTSMessageSectionController") || CSCFIsClass(section,@"FTSSearchContactSectionController");
 }
-UITableViewCell *CSCFSearchUnlockCell(void) {
-    UITableViewCell *cell=[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
-    cell.textLabel.text=@"解锁后查看"; cell.textLabel.textColor=UIColor.secondaryLabelColor;
-    cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator; return cell;
-}
-void CSCFSearchUnlock(id section) {
-    UIViewController *page=Presenter(section); if(!page) return;
-    NSUInteger epoch=CSCloseFriendAccountEpoch(); __weak id weakSection=section;
-    CSCloseFriendAuthenticate(page,^(BOOL ok){
-        if(ok && epoch==CSCloseFriendAccountEpoch() && weakSection && !CSCFSearchGated(weakSection)) {
-            CSCFSearchPrepare(weakSection); CSCFReloadTables(Presenter(weakSection));
-        }
-    });
-}
-
 @interface CSCFGroupResultCover : UIView
 @property(nonatomic,strong) NSMapTable<UIView *,NSNumber *> *hiddenStates;
 @property(nonatomic,strong) id originalElements;

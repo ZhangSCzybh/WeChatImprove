@@ -1,0 +1,7 @@
+[
+  {
+    "command": "bash Tests/verify-close-friend-contacts.sh",
+    "exit_code": 0,
+    "output": "Search: zero unlock placeholders, native live suggestions/web/history/submit, full unlock, late callbacks and IME passed\nClose-friend contacts: projection/source/tag preservation, stale forwarding, profile action guards and native-reuse regressions passed\n"
+  }
+]
