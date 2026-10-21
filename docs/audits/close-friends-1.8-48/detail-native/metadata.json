@@ -1,0 +1,1975 @@
+{
+  "WCCommentDetailViewControllerFB": {
+    "superclass": "MMUIViewController",
+    "ivars": [
+      {
+        "offset_address": "0x1202454dc",
+        "offset": 112,
+        "name": "_tableView",
+        "type": "@\"MMTableView\""
+      },
+      {
+        "offset_address": "0x1202456e8",
+        "offset": 120,
+        "name": "_contentViews",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x1202456e4",
+        "offset": 128,
+        "name": "_likeListView",
+        "type": "@\"UIView\""
+      },
+      {
+        "offset_address": "0x1202455bc",
+        "offset": 136,
+        "name": "_headerGridView",
+        "type": "@\"WCHeaderGridView\""
+      },
+      {
+        "offset_address": "0x1202455a4",
+        "offset": 144,
+        "name": "_inputView",
+        "type": "@\"UIView\""
+      },
+      {
+        "offset_address": "0x1202454e4",
+        "offset": 152,
+        "name": "_emoticonBoardView",
+        "type": "@\"EmoticonBoardView\""
+      },
+      {
+        "offset_address": "0x1202456e0",
+        "offset": 160,
+        "name": "_expressionButton",
+        "type": "@\"UIButton\""
+      },
+      {
+        "offset_address": "0x1202456dc",
+        "offset": 168,
+        "name": "_pictureButton",
+        "type": "@\"UIButton\""
+      },
+      {
+        "offset_address": "0x1202456d8",
+        "offset": 176,
+        "name": "_remainWordCountLabel",
+        "type": "@\"MMUILabel\""
+      },
+      {
+        "offset_address": "0x1202455b0",
+        "offset": 184,
+        "name": "_growTextView",
+        "type": "@\"MMGrowTextView\""
+      },
+      {
+        "offset_address": "0x1202454b0",
+        "offset": 192,
+        "name": "_floatOperateView",
+        "type": "@\"WCOperateFloatView\""
+      },
+      {
+        "offset_address": "0x120245590",
+        "offset": 200,
+        "name": "_advertiseActionFloatView",
+        "type": "@\"WCAdvertiseActionFloatView\""
+      },
+      {
+        "offset_address": "0x1202454e8",
+        "offset": 208,
+        "name": "_inputController",
+        "type": "@\"WCInputController\""
+      },
+      {
+        "offset_address": "0x120245454",
+        "offset": 216,
+        "name": "_bStranger",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202454f4",
+        "offset": 224,
+        "name": "_nsStrangerUsrName",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120245458",
+        "offset": 232,
+        "name": "_bForbideComment",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202454ec",
+        "offset": 240,
+        "name": "_urlHandler",
+        "type": "@\"MMURLHandler\""
+      },
+      {
+        "offset_address": "0x1202454f0",
+        "offset": 248,
+        "name": "_clickHandler",
+        "type": "@\"WCMomentsClickHandler\""
+      },
+      {
+        "offset_address": "0x1202455c0",
+        "offset": 256,
+        "name": "_bIsShow",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202455c4",
+        "offset": 264,
+        "name": "_refComment",
+        "type": "@\"WCUserComment\""
+      },
+      {
+        "offset_address": "0x1202454fc",
+        "offset": 272,
+        "name": "_defaultRefComment",
+        "type": "@\"WCUserComment\""
+      },
+      {
+        "offset_address": "0x120245460",
+        "offset": 280,
+        "name": "_defaultRefCommentContentOffset",
+        "type": "d"
+      },
+      {
+        "offset_address": "0x120245464",
+        "offset": 288,
+        "name": "_hasFoundDefaultRefComment",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120245468",
+        "offset": 289,
+        "name": "_hasJumpDefaultRefCommentOnce",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202454e0",
+        "offset": 296,
+        "name": "m_delegate",
+        "type": "@\"NSObject<WCCommentDetailViewControllerFBDelegate>\""
+      },
+      {
+        "offset_address": "0x12024550c",
+        "offset": 304,
+        "name": "_copyedText",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120245508",
+        "offset": 312,
+        "name": "_contentDescView",
+        "type": "@\"WCRichTextView\""
+      },
+      {
+        "offset_address": "0x120245500",
+        "offset": 320,
+        "name": "_springTextContainerView",
+        "type": "@\"WCMomentsSpringTextContainerView\""
+      },
+      {
+        "offset_address": "0x120245504",
+        "offset": 328,
+        "name": "m_translateView",
+        "type": "@\"WCRichTextView\""
+      },
+      {
+        "offset_address": "0x120245558",
+        "offset": 336,
+        "name": "m_translateStatusView",
+        "type": "@\"UIButton\""
+      },
+      {
+        "offset_address": "0x120245554",
+        "offset": 344,
+        "name": "m_translateLineView",
+        "type": "@\"UIView\""
+      },
+      {
+        "offset_address": "0x1202455ac",
+        "offset": 352,
+        "name": "eTranslateStatus",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x120245560",
+        "offset": 360,
+        "name": "fTranslateViewHeight",
+        "type": "d"
+      },
+      {
+        "offset_address": "0x1202455c8",
+        "offset": 368,
+        "name": "curLongPressedComment",
+        "type": "@\"WCUserComment\""
+      },
+      {
+        "offset_address": "0x120245478",
+        "offset": 376,
+        "name": "curTranslateComment",
+        "type": "@\"WCUserComment\""
+      },
+      {
+        "offset_address": "0x12024553c",
+        "offset": 384,
+        "name": "_errTipsView",
+        "type": "@\"UIView\""
+      },
+      {
+        "offset_address": "0x120245540",
+        "offset": 392,
+        "name": "_headImageView",
+        "type": "@\"MMHeadImageView\""
+      },
+      {
+        "offset_address": "0x120245544",
+        "offset": 400,
+        "name": "_nickLabel",
+        "type": "@\"UrlLabel\""
+      },
+      {
+        "offset_address": "0x1202454b4",
+        "offset": 408,
+        "name": "_mediaCellView",
+        "type": "@\"WCContentItemBaseView\""
+      },
+      {
+        "offset_address": "0x120245564",
+        "offset": 416,
+        "name": "_togetherTextView",
+        "type": "@\"RichTextView\""
+      },
+      {
+        "offset_address": "0x120245570",
+        "offset": 424,
+        "name": "_privacyBtn",
+        "type": "@\"MMUIButton\""
+      },
+      {
+        "offset_address": "0x120245510",
+        "offset": 432,
+        "name": "_timeLabel",
+        "type": "@\"UILabel\""
+      },
+      {
+        "offset_address": "0x120245580",
+        "offset": 440,
+        "name": "_operateBtn",
+        "type": "@\"MMUIButton\""
+      },
+      {
+        "offset_address": "0x120245524",
+        "offset": 448,
+        "name": "_deleteBtn",
+        "type": "@\"MMUIButton\""
+      },
+      {
+        "offset_address": "0x12024554c",
+        "offset": 456,
+        "name": "_advertiseLogo",
+        "type": "@\"UIButton\""
+      },
+      {
+        "offset_address": "0x12024555c",
+        "offset": 464,
+        "name": "_adTagButton",
+        "type": "@\"WCAdTagButton\""
+      },
+      {
+        "offset_address": "0x12024546c",
+        "offset": 472,
+        "name": "_commentViewForDelete",
+        "type": "@\"WCCommentView\""
+      },
+      {
+        "offset_address": "0x1202455cc",
+        "offset": 480,
+        "name": "_floatViewPageWrap",
+        "type": "@\"WCADPageWrap\""
+      },
+      {
+        "offset_address": "0x120245470",
+        "offset": 488,
+        "name": "m_commentWordLimit",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x120245474",
+        "offset": 492,
+        "name": "m_bHasClickFloat",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12024547c",
+        "offset": 493,
+        "name": "m_bHaveActionSheet",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120245574",
+        "offset": 496,
+        "name": "_rewardTipLabel",
+        "type": "@\"UILabel\""
+      },
+      {
+        "offset_address": "0x120245578",
+        "offset": 504,
+        "name": "_rewardDetailView",
+        "type": "@\"WCSnsCommentDetailRewardView\""
+      },
+      {
+        "offset_address": "0x12024557c",
+        "offset": 512,
+        "name": "_headImageRewardView",
+        "type": "@\"WCHeaderGridView\""
+      },
+      {
+        "offset_address": "0x12024556c",
+        "offset": 520,
+        "name": "_adPOILabel",
+        "type": "@\"UILabel\""
+      },
+      {
+        "offset_address": "0x120245520",
+        "offset": 528,
+        "name": "_adChainStrengthenLabel",
+        "type": "@\"UILabel\""
+      },
+      {
+        "offset_address": "0x1202456ec",
+        "offset": 536,
+        "name": "_isActionAtAd",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202454f8",
+        "offset": 544,
+        "name": "_inputSessionId",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120245450",
+        "offset": 552,
+        "name": "m_dicUserCommentsUICache",
+        "type": "@\"NSMutableDictionary\""
+      },
+      {
+        "offset_address": "0x1202456d4",
+        "offset": 560,
+        "name": "_adCardTopMaskView",
+        "type": "@\"UIView\""
+      },
+      {
+        "offset_address": "0x1202456d0",
+        "offset": 568,
+        "name": "_atContact",
+        "type": "@\"CContact\""
+      },
+      {
+        "offset_address": "0x1202456cc",
+        "offset": 576,
+        "name": "_atButton",
+        "type": "@\"UIButton\""
+      },
+      {
+        "offset_address": "0x120245484",
+        "offset": 584,
+        "name": "pastelogic",
+        "type": "@\"WCPasteTextLengthLogic\""
+      },
+      {
+        "offset_address": "0x120245550",
+        "offset": 592,
+        "name": "m_openIMDescLabel",
+        "type": "@\"MMCPLabel\""
+      },
+      {
+        "offset_address": "0x1202455d8",
+        "offset": 600,
+        "name": "_extBean",
+        "type": "@\"WCTimelineExtBean\""
+      },
+      {
+        "offset_address": "0x1202455b8",
+        "offset": 608,
+        "name": "m_forbidsReloadTableView",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202455b4",
+        "offset": 609,
+        "name": "_hasViewsCntExp",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12024545c",
+        "offset": 610,
+        "name": "_bJustShowContent",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12024551c",
+        "offset": 611,
+        "name": "_bMusicSearchScene",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202455e4",
+        "offset": 612,
+        "name": "_bFromAtFriend",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120245600",
+        "offset": 613,
+        "name": "_canShowInvisibleTipsView",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202455a0",
+        "offset": 614,
+        "name": "_isInvisible",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12024559c",
+        "offset": 615,
+        "name": "_bShowSpringBubble",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120245498",
+        "offset": 616,
+        "name": "_isStarModificationEnabled",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12024549c",
+        "offset": 617,
+        "name": "_isStarBrowsingEnabled",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120245494",
+        "offset": 618,
+        "name": "_dynamicTagEnabled",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120245634",
+        "offset": 619,
+        "name": "_isViewAppear",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120245490",
+        "offset": 620,
+        "name": "_isEnhanceInteractionEnabled",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202454cc",
+        "offset": 621,
+        "name": "_hasActionRecordForShowingStarGuideButton",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12024568c",
+        "offset": 622,
+        "name": "_isModifyingStarStatus",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120245598",
+        "offset": 623,
+        "name": "_hasModifiedStarStatus",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202454d4",
+        "offset": 624,
+        "name": "_hasActionRecordForShowingFinderShareButton",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202454a0",
+        "offset": 625,
+        "name": "_actionAreaWrapEnabled",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202456a0",
+        "offset": 626,
+        "name": "_isShowEmoticonSearchViewVC",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202456a4",
+        "offset": 627,
+        "name": "_isShowingCommentImageFullViewVC",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120245480",
+        "offset": 628,
+        "name": "_shouldResumeInputState",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202456b4",
+        "offset": 629,
+        "name": "_isShowingCommentPickerVC",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202456b8",
+        "offset": 630,
+        "name": "_hasAtFriendForAd",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202456c8",
+        "offset": 631,
+        "name": "_didShowModifyShareScopeInActionSheet",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202455dc",
+        "offset": 632,
+        "name": "_nsUsrName",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202455e0",
+        "offset": 640,
+        "name": "_uiSource",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x1202455d0",
+        "offset": 648,
+        "name": "_togetherTailReporter",
+        "type": "@\"WCTogetherTailReporter\""
+      },
+      {
+        "offset_address": "0x1202455d4",
+        "offset": 656,
+        "name": "_tigerReporter",
+        "type": "@\"WCMomentsTigerReporter\""
+      },
+      {
+        "offset_address": "0x12024544c",
+        "offset": 664,
+        "name": "_dataItem",
+        "type": "@\"WCDataItem\""
+      },
+      {
+        "offset_address": "0x1202454b8",
+        "offset": 672,
+        "name": "_contentItem",
+        "type": "@\"WCContentItem\""
+      },
+      {
+        "offset_address": "0x1202454bc",
+        "offset": 680,
+        "name": "_arrMediaList",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x1202454c0",
+        "offset": 688,
+        "name": "_arrCommentList",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x1202454c4",
+        "offset": 696,
+        "name": "_arrLikeList",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x120245518",
+        "offset": 704,
+        "name": "_failedComment",
+        "type": "@\"WCCommentItem\""
+      },
+      {
+        "offset_address": "0x120245514",
+        "offset": 712,
+        "name": "_tipType",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x120245488",
+        "offset": 720,
+        "name": "_commentReport",
+        "type": "@\"WCCommentReport\""
+      },
+      {
+        "offset_address": "0x1202455e8",
+        "offset": 728,
+        "name": "_albumForwardFlow",
+        "type": "@\"WCAlbumForwardFinderUtil\""
+      },
+      {
+        "offset_address": "0x1202455ec",
+        "offset": 736,
+        "name": "_enterScene",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x1202455f0",
+        "offset": 744,
+        "name": "_fromPageScene",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x12024548c",
+        "offset": 752,
+        "name": "_homepageType",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x1202455f4",
+        "offset": 760,
+        "name": "_snsPageSessionId",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202455f8",
+        "offset": 768,
+        "name": "_pageEnterTime",
+        "type": "d"
+      },
+      {
+        "offset_address": "0x1202454a8",
+        "offset": 776,
+        "name": "_pageContext",
+        "type": "@\"WCMomentsPageContext\""
+      },
+      {
+        "offset_address": "0x1202455fc",
+        "offset": 784,
+        "name": "_flutterAlbumSessionId",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120245604",
+        "offset": 792,
+        "name": "_togetherHistoryReportSession",
+        "type": "@\"WCTogetherHistoryReportSession\""
+      },
+      {
+        "offset_address": "0x120245608",
+        "offset": 800,
+        "name": "_lastRemainWordCount",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x12024560c",
+        "offset": 808,
+        "name": "_selectableRichTextCoverView",
+        "type": "@\"MMSnsRichTextCoverView\""
+      },
+      {
+        "offset_address": "0x120245610",
+        "offset": 816,
+        "name": "_selectableRichTextView",
+        "type": "@\"RichTextView\""
+      },
+      {
+        "offset_address": "0x120245614",
+        "offset": 824,
+        "name": "_selectableMenuResponder",
+        "type": "@\"MMRTCSnsMenuResponder\""
+      },
+      {
+        "offset_address": "0x120245618",
+        "offset": 832,
+        "name": "_commentImageHelper",
+        "type": "@\"WCCommentImageHelper\""
+      },
+      {
+        "offset_address": "0x12024561c",
+        "offset": 840,
+        "name": "_emoticonWrap",
+        "type": "@\"CEmoticonWrap\""
+      },
+      {
+        "offset_address": "0x120245620",
+        "offset": 848,
+        "name": "_selectedImage",
+        "type": "@\"MMImage\""
+      },
+      {
+        "offset_address": "0x120245624",
+        "offset": 856,
+        "name": "_commentImageView",
+        "type": "@\"MMWebImageView\""
+      },
+      {
+        "offset_address": "0x120245628",
+        "offset": 864,
+        "name": "_commentImageDeleteButton",
+        "type": "@\"MMUIButton\""
+      },
+      {
+        "offset_address": "0x12024562c",
+        "offset": 872,
+        "name": "_sharePreConfirmSheetView",
+        "type": "@\"SharePreConfirmSheetView\""
+      },
+      {
+        "offset_address": "0x120245630",
+        "offset": 880,
+        "name": "_emotionReporter",
+        "type": "@\"WCTimelineCommentEmotionReport\""
+      },
+      {
+        "offset_address": "0x120245528",
+        "offset": 888,
+        "name": "_sourceLabel",
+        "type": "@\"UrlLabel\""
+      },
+      {
+        "offset_address": "0x12024552c",
+        "offset": 896,
+        "name": "_individualSourceLabel",
+        "type": "@\"UrlLabel\""
+      },
+      {
+        "offset_address": "0x120245538",
+        "offset": 904,
+        "name": "_locationLabel",
+        "type": "@\"UILabel\""
+      },
+      {
+        "offset_address": "0x120245568",
+        "offset": 912,
+        "name": "_individualLocationLabel",
+        "type": "@\"UILabel\""
+      },
+      {
+        "offset_address": "0x120245638",
+        "offset": 920,
+        "name": "_adFeedbackView",
+        "type": "@\"WCAdvertiseFeedbackBaseView\""
+      },
+      {
+        "offset_address": "0x120245530",
+        "offset": 928,
+        "name": "_weAppView",
+        "type": "@\"WCMomentsWeAppLogoNameView\""
+      },
+      {
+        "offset_address": "0x120245534",
+        "offset": 936,
+        "name": "_individualWeAppView",
+        "type": "@\"WCMomentsWeAppLogoNameView\""
+      },
+      {
+        "offset_address": "0x12024563c",
+        "offset": 944,
+        "name": "_ecsView",
+        "type": "@\"WCEcsLogoNameView\""
+      },
+      {
+        "offset_address": "0x120245640",
+        "offset": 952,
+        "name": "_adDetailView",
+        "type": "@\"WCAdActionLinkDetailView\""
+      },
+      {
+        "offset_address": "0x120245644",
+        "offset": 960,
+        "name": "_adBreakFrameView",
+        "type": "@\"WCAdBreakFrameView\""
+      },
+      {
+        "offset_address": "0x120245648",
+        "offset": 968,
+        "name": "_adBreakFrameTagView",
+        "type": "@\"WCAdBreakFrameTagView\""
+      },
+      {
+        "offset_address": "0x12024564c",
+        "offset": 976,
+        "name": "_adInteractionLabelView",
+        "type": "@\"WCAdInteractionLabelView\""
+      },
+      {
+        "offset_address": "0x120245650",
+        "offset": 984,
+        "name": "_adSocialLikeView",
+        "type": "@\"WCAdSocialLikeView\""
+      },
+      {
+        "offset_address": "0x120245654",
+        "offset": 992,
+        "name": "_adSocialLikeCheerPlayerView",
+        "type": "@\"WCAdSocialLikeCheerPlayerView\""
+      },
+      {
+        "offset_address": "0x120245658",
+        "offset": 1000,
+        "name": "_adContinuousLikeBannerAnimationView",
+        "type": "@\"WCAdContinuousLikeBannerAnimationView\""
+      },
+      {
+        "offset_address": "0x12024565c",
+        "offset": 1008,
+        "name": "_adWeGameGiftTagView",
+        "type": "@\"WCAdWeGameGiftTagView\""
+      },
+      {
+        "offset_address": "0x120245660",
+        "offset": 1016,
+        "name": "_adContinuousLikeTagView",
+        "type": "@\"WCAdContinuousLikeTagView\""
+      },
+      {
+        "offset_address": "0x120245664",
+        "offset": 1024,
+        "name": "_adStateSettingBarView",
+        "type": "@\"WCAdStateSettingBarView\""
+      },
+      {
+        "offset_address": "0x120245668",
+        "offset": 1032,
+        "name": "_adRandomPickCardView",
+        "type": "@\"WCAdRandomPickCardView\""
+      },
+      {
+        "offset_address": "0x12024566c",
+        "offset": 1040,
+        "name": "_adPreviewMaskView",
+        "type": "@\"WCAdPreviewMaskView\""
+      },
+      {
+        "offset_address": "0x120245670",
+        "offset": 1048,
+        "name": "_adInteractionTagView",
+        "type": "@\"WCAdInteractionTagView\""
+      },
+      {
+        "offset_address": "0x120245674",
+        "offset": 1056,
+        "name": "_adHeadStateView",
+        "type": "@\"WCAdHeadStateView\""
+      },
+      {
+        "offset_address": "0x120245678",
+        "offset": 1064,
+        "name": "_adHeadLivingView",
+        "type": "@\"WCAdHeadLivingView\""
+      },
+      {
+        "offset_address": "0x12024567c",
+        "offset": 1072,
+        "name": "_adHighlightTagView",
+        "type": "@\"WCAdHighlightTagView\""
+      },
+      {
+        "offset_address": "0x120245680",
+        "offset": 1080,
+        "name": "_adMediaBottomBarContainerView",
+        "type": "@\"WCAdCommonBarContainerView\""
+      },
+      {
+        "offset_address": "0x120245684",
+        "offset": 1088,
+        "name": "_adBarContainerView",
+        "type": "@\"WCAdCommonBarContainerView\""
+      },
+      {
+        "offset_address": "0x120245688",
+        "offset": 1096,
+        "name": "_postSessionController",
+        "type": "@\"WCMomentsPostSessionController\""
+      },
+      {
+        "offset_address": "0x1202454d8",
+        "offset": 1104,
+        "name": "_shareScopeMgr",
+        "type": "@\"WCMomentsShareScopeMgr\""
+      },
+      {
+        "offset_address": "0x1202455a8",
+        "offset": 1112,
+        "name": "_invisibleTipsView",
+        "type": "@\"WCMomentsInvisibleTipsView\""
+      },
+      {
+        "offset_address": "0x120245548",
+        "offset": 1120,
+        "name": "_textStateView",
+        "type": "@\"TextStateItemView\""
+      },
+      {
+        "offset_address": "0x12024558c",
+        "offset": 1128,
+        "name": "_starIconButton",
+        "type": "@\"MMUIButton\""
+      },
+      {
+        "offset_address": "0x1202454c8",
+        "offset": 1136,
+        "name": "_starGuideViewModel",
+        "type": "@\"WCMomentsStarGuideViewModel\""
+      },
+      {
+        "offset_address": "0x120245584",
+        "offset": 1144,
+        "name": "_starGuideButton",
+        "type": "@\"WCMomentsStarGuideButton\""
+      },
+      {
+        "offset_address": "0x1202454d0",
+        "offset": 1152,
+        "name": "_finderShareViewModel",
+        "type": "@\"WCMomentsFinderShareViewModel\""
+      },
+      {
+        "offset_address": "0x120245588",
+        "offset": 1160,
+        "name": "_postShareButton",
+        "type": "@\"WCMomentsPostShareButton\""
+      },
+      {
+        "offset_address": "0x120245690",
+        "offset": 1168,
+        "name": "_inputAreaReportInfo",
+        "type": "@\"WCMomentsInputAreaReportInfo\""
+      },
+      {
+        "offset_address": "0x1202454a4",
+        "offset": 1176,
+        "name": "_actionAreaRowCount",
+        "type": "Q"
+      },
+      {
+        "offset_address": "0x120245694",
+        "offset": 1184,
+        "name": "_animatedFireworksView",
+        "type": "@\"WCMomentsAnimatedFireworksView\""
+      },
+      {
+        "offset_address": "0x120245594",
+        "offset": 1192,
+        "name": "_springBubbleView",
+        "type": "@\"WCSpringWishBubbleView\""
+      },
+      {
+        "offset_address": "0x120245698",
+        "offset": 1200,
+        "name": "_feedTailText",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x12024569c",
+        "offset": 1208,
+        "name": "_addEmoticonLogic",
+        "type": "@\"EmoticonCustomManageAddLogic\""
+      },
+      {
+        "offset_address": "0x1202456a8",
+        "offset": 1216,
+        "name": "_bubSelectionType",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x1202454ac",
+        "offset": 1224,
+        "name": "_commentBrowseAggreReporter",
+        "type": "@\"WCMomentsCommentBrowseAggreReport\""
+      },
+      {
+        "offset_address": "0x1202456ac",
+        "offset": 1232,
+        "name": "_growTextViewBackGroundView",
+        "type": "@\"UIView\""
+      },
+      {
+        "offset_address": "0x1202456b0",
+        "offset": 1240,
+        "name": "_bigEmoticonAddHelper",
+        "type": "@\"WCCommentBigEmoticonAddHelper\""
+      },
+      {
+        "offset_address": "0x1202456bc",
+        "offset": 1248,
+        "name": "_emoticonBoardPid",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202456c0",
+        "offset": 1256,
+        "name": "_totalCommentPicCount",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x1202456c4",
+        "offset": 1264,
+        "name": "_actionItems",
+        "type": "@\"NSArray\""
+      }
+    ]
+  },
+  "WCHeaderGridView": {
+    "superclass": "<bound external>",
+    "ivars": [
+      {
+        "offset_address": "0x1202639d8",
+        "offset": 8,
+        "name": "m_arrContacts",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x1202639bc",
+        "offset": 16,
+        "name": "imageHeight",
+        "type": "d"
+      },
+      {
+        "offset_address": "0x1202639c0",
+        "offset": 24,
+        "name": "rowSpace",
+        "type": "d"
+      },
+      {
+        "offset_address": "0x1202639c4",
+        "offset": 32,
+        "name": "sectionSpace",
+        "type": "d"
+      },
+      {
+        "offset_address": "0x1202639c8",
+        "offset": 40,
+        "name": "countPerLine",
+        "type": "I"
+      },
+      {
+        "offset_address": "0x1202639cc",
+        "offset": 44,
+        "name": "likeCount",
+        "type": "I"
+      },
+      {
+        "offset_address": "0x1202639e8",
+        "offset": 48,
+        "name": "m_iconImageView",
+        "type": "@\"UIImageView\""
+      },
+      {
+        "offset_address": "0x1202639ec",
+        "offset": 56,
+        "name": "m_richText",
+        "type": "@\"RichTextView\""
+      },
+      {
+        "offset_address": "0x1202639dc",
+        "offset": 64,
+        "name": "m_arrHeaderViews",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x1202639e0",
+        "offset": 72,
+        "name": "m_arrHeaderMatteViews",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x1202639d0",
+        "offset": 80,
+        "name": "isHBComment",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202639e4",
+        "offset": 81,
+        "name": "isRewardGrid",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x1202639f0",
+        "offset": 88,
+        "name": "_m_titleLabel",
+        "type": "@\"UILabel\""
+      },
+      {
+        "offset_address": "0x1202639f4",
+        "offset": 96,
+        "name": "_onHedaImageClick",
+        "type": "@?"
+      },
+      {
+        "offset_address": "0x1202639f8",
+        "offset": 104,
+        "name": "_customTextContent",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202639fc",
+        "offset": 112,
+        "name": "_customHeadImgUrlDic",
+        "type": "@\"NSDictionary\""
+      },
+      {
+        "offset_address": "0x1202639d4",
+        "offset": 120,
+        "name": "_customIconImageColor",
+        "type": "@\"UIColor\""
+      },
+      {
+        "offset_address": "0x120263a00",
+        "offset": 128,
+        "name": "_customIconSVGImageName",
+        "type": "@\"NSString\""
+      }
+    ]
+  },
+  "WCTimelineFlutterDetailViewController": {
+    "superclass": "MMFlutterViewController",
+    "ivars": [
+      {
+        "offset_address": "0x120274638",
+        "offset": 112,
+        "name": "_forbidComment",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120274644",
+        "offset": 113,
+        "name": "_canShowInvisibleTipsView",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120274630",
+        "offset": 120,
+        "name": "_instance",
+        "type": "@\"MMFlutterInstance\""
+      },
+      {
+        "offset_address": "0x120274634",
+        "offset": 128,
+        "name": "_dataItem",
+        "type": "@\"WCDataItem\""
+      },
+      {
+        "offset_address": "0x12027463c",
+        "offset": 136,
+        "name": "_tipType",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x120274640",
+        "offset": 144,
+        "name": "_failedComment",
+        "type": "@\"WCCommentItem\""
+      }
+    ]
+  },
+  "WCDataItem": {
+    "superclass": "<bound external>",
+    "ivars": [
+      {
+        "offset_address": "0x120246624",
+        "offset": 8,
+        "name": "m_cpKeyForContent",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120246628",
+        "offset": 16,
+        "name": "m_cpKeyForLikeUsers",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x12024662c",
+        "offset": 24,
+        "name": "m_isContentUnsafe",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246630",
+        "offset": 25,
+        "name": "m_isLikeUsersUnsafe",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246634",
+        "offset": 28,
+        "name": "hash",
+        "type": "I"
+      },
+      {
+        "offset_address": "0x120246638",
+        "offset": 32,
+        "name": "_extBean",
+        "type": "@\"WCTimelineExtBean\""
+      },
+      {
+        "offset_address": "0x12024663c",
+        "offset": 40,
+        "name": "noChange",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246640",
+        "offset": 41,
+        "name": "_isBidirectionalFan",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246644",
+        "offset": 42,
+        "name": "_likeFlag",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246648",
+        "offset": 43,
+        "name": "_isRichText",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12024664c",
+        "offset": 44,
+        "name": "_isSecurityVerified",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246650",
+        "offset": 45,
+        "name": "_shouldErrorIgnoreForSpam",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246654",
+        "offset": 46,
+        "name": "_isHiddenAdvertiseActionFloatTipView",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246658",
+        "offset": 47,
+        "name": "_isNewDataSeparator",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12024665c",
+        "offset": 48,
+        "name": "_isEarlierContentTipsItem",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246660",
+        "offset": 49,
+        "name": "_canEditAfterDeleted",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246664",
+        "offset": 50,
+        "name": "_reEditPlaceOnFirst",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246668",
+        "offset": 51,
+        "name": "_isWeiShang",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12024666c",
+        "offset": 52,
+        "name": "_isWsPlaceHolder",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246670",
+        "offset": 53,
+        "name": "_isFromFav",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246674",
+        "offset": 54,
+        "name": "_isStarred",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246678",
+        "offset": 55,
+        "name": "_hasUpdateCommentUsers",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12024667c",
+        "offset": 56,
+        "name": "_isPrivate",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x120246680",
+        "offset": 60,
+        "name": "contentAttributeBitSetFlag",
+        "type": "I"
+      },
+      {
+        "offset_address": "0x120246684",
+        "offset": 64,
+        "name": "_cid",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x120246688",
+        "offset": 68,
+        "name": "_type",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x12024668c",
+        "offset": 72,
+        "name": "_flag",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x120246690",
+        "offset": 76,
+        "name": "_createtime",
+        "type": "I"
+      },
+      {
+        "offset_address": "0x120246694",
+        "offset": 80,
+        "name": "_contentDescShowType",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x120246698",
+        "offset": 84,
+        "name": "_contentDescScene",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x12024669c",
+        "offset": 88,
+        "name": "_likeCount",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x1202466a0",
+        "offset": 92,
+        "name": "_commentCount",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x1202466a4",
+        "offset": 96,
+        "name": "_withCount",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x1202466a8",
+        "offset": 100,
+        "name": "_togetherCount",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x1202466ac",
+        "offset": 104,
+        "name": "_uploadErrType",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x1202466b0",
+        "offset": 108,
+        "name": "_visibiltyType",
+        "type": "I"
+      },
+      {
+        "offset_address": "0x1202466b4",
+        "offset": 112,
+        "name": "_extFlag",
+        "type": "I"
+      },
+      {
+        "offset_address": "0x1202466b8",
+        "offset": 116,
+        "name": "_realLikeCount",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x1202466bc",
+        "offset": 120,
+        "name": "_realCommentCount",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x1202466c0",
+        "offset": 124,
+        "name": "_selfLikeCount",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x1202466c4",
+        "offset": 128,
+        "name": "_selfCommentCount",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x1202466c8",
+        "offset": 132,
+        "name": "_sightFolded",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x1202466cc",
+        "offset": 136,
+        "name": "_showFlag",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x1202466d0",
+        "offset": 140,
+        "name": "_sessionActionType",
+        "type": "i"
+      },
+      {
+        "offset_address": "0x1202466d4",
+        "offset": 144,
+        "name": "_favLocalId",
+        "type": "I"
+      },
+      {
+        "offset_address": "0x1202466d8",
+        "offset": 148,
+        "name": "_starGuidingFlags",
+        "type": "I"
+      },
+      {
+        "offset_address": "0x1202466dc",
+        "offset": 152,
+        "name": "_finderSharingFlags",
+        "type": "I"
+      },
+      {
+        "offset_address": "0x1202466e0",
+        "offset": 156,
+        "name": "_newlifeSharingFlags",
+        "type": "I"
+      },
+      {
+        "offset_address": "0x1202466e4",
+        "offset": 160,
+        "name": "blackUsers",
+        "type": "@\"NSArray\""
+      },
+      {
+        "offset_address": "0x1202466e8",
+        "offset": 168,
+        "name": "contentDescPattern",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202466ec",
+        "offset": 176,
+        "name": "snsWeAppInfo",
+        "type": "@\"SnsWeAppInfo\""
+      },
+      {
+        "offset_address": "0x1202466f0",
+        "offset": 184,
+        "name": "visibleUsers",
+        "type": "@\"NSArray\""
+      },
+      {
+        "offset_address": "0x1202466f4",
+        "offset": 192,
+        "name": "_tid",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202466f8",
+        "offset": 200,
+        "name": "_username",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202466fc",
+        "offset": 208,
+        "name": "_nickname",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120246700",
+        "offset": 216,
+        "name": "_sourceUrl",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120246704",
+        "offset": 224,
+        "name": "_sourceUrl2",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120246708",
+        "offset": 232,
+        "name": "_extData",
+        "type": "@\"NSMutableDictionary\""
+      },
+      {
+        "offset_address": "0x12024670c",
+        "offset": 240,
+        "name": "_contentObj",
+        "type": "@\"WCContentItem\""
+      },
+      {
+        "offset_address": "0x120246710",
+        "offset": 248,
+        "name": "_appInfo",
+        "type": "@\"WCAppInfo\""
+      },
+      {
+        "offset_address": "0x120246714",
+        "offset": 256,
+        "name": "_publicUserName",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120246718",
+        "offset": 264,
+        "name": "_publicPhotoAccountUserName",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x12024671c",
+        "offset": 272,
+        "name": "_publicPhotoAccountNickName",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120246720",
+        "offset": 280,
+        "name": "_sourceUserName",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120246724",
+        "offset": 288,
+        "name": "_publicFinderUserName",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120246728",
+        "offset": 296,
+        "name": "_publicBrandContactType",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x12024672c",
+        "offset": 304,
+        "name": "_snsCoverOffset",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x120246730",
+        "offset": 312,
+        "name": "_bgmInfo",
+        "type": "@\"WCBgmInfo\""
+      },
+      {
+        "offset_address": "0x120246734",
+        "offset": 320,
+        "name": "_sourceNickName",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120246738",
+        "offset": 328,
+        "name": "_contentDesc",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x12024673c",
+        "offset": 336,
+        "name": "_actionInfo",
+        "type": "@\"WCActionInfo\""
+      },
+      {
+        "offset_address": "0x120246740",
+        "offset": 344,
+        "name": "_musicInfo",
+        "type": "@\"WCMusicInfo\""
+      },
+      {
+        "offset_address": "0x120246744",
+        "offset": 352,
+        "name": "_streamVideoInfo",
+        "type": "@\"WCStreamVideoInfo\""
+      },
+      {
+        "offset_address": "0x120246748",
+        "offset": 360,
+        "name": "_redEnvelopesInfo",
+        "type": "@\"WCRedEnvelopesInfo\""
+      },
+      {
+        "offset_address": "0x12024674c",
+        "offset": 368,
+        "name": "_redEnvelopesRewardInfo",
+        "type": "@\"WCRedEnvelopesRewardInfo\""
+      },
+      {
+        "offset_address": "0x120246750",
+        "offset": 376,
+        "name": "_weappInfo",
+        "type": "@\"WCWeAppInfo\""
+      },
+      {
+        "offset_address": "0x120246754",
+        "offset": 384,
+        "name": "_liteappInfo",
+        "type": "@\"WCLiteAppInfo\""
+      },
+      {
+        "offset_address": "0x120246758",
+        "offset": 392,
+        "name": "_gameShareCardInfo",
+        "type": "@\"WCGameShareCardInfo\""
+      },
+      {
+        "offset_address": "0x12024675c",
+        "offset": 400,
+        "name": "_likeUsers",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x120246760",
+        "offset": 408,
+        "name": "_commentUsers",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x120246764",
+        "offset": 416,
+        "name": "_withUsers",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x120246768",
+        "offset": 424,
+        "name": "_togetherUsers",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x12024676c",
+        "offset": 432,
+        "name": "_uploadErrSnsTipsCode",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x120246770",
+        "offset": 440,
+        "name": "_uploadErrMsg",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120246774",
+        "offset": 448,
+        "name": "_uploadErrBtnUrl",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120246778",
+        "offset": 456,
+        "name": "_uploadErrBtnTitle",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x12024677c",
+        "offset": 464,
+        "name": "_uploadErrTogetherUsernames",
+        "type": "@\"NSArray\""
+      },
+      {
+        "offset_address": "0x120246780",
+        "offset": 472,
+        "name": "_statisticsData",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x120246784",
+        "offset": 480,
+        "name": "_locationInfo",
+        "type": "@\"WCLocationInfo\""
+      },
+      {
+        "offset_address": "0x120246788",
+        "offset": 488,
+        "name": "_groupContactTags",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x12024678c",
+        "offset": 496,
+        "name": "_blackContactTags",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x120246790",
+        "offset": 504,
+        "name": "_interactUsers",
+        "type": "@\"NSArray\""
+      },
+      {
+        "offset_address": "0x120246794",
+        "offset": 512,
+        "name": "_objOperation",
+        "type": "@\"WCObjectOperation\""
+      },
+      {
+        "offset_address": "0x120246798",
+        "offset": 520,
+        "name": "_shareOriginUrl",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x12024679c",
+        "offset": 528,
+        "name": "_shareOpenUrl",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202467a0",
+        "offset": 536,
+        "name": "_jsAppId",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202467a4",
+        "offset": 544,
+        "name": "_statParasDic",
+        "type": "@\"NSMutableDictionary\""
+      },
+      {
+        "offset_address": "0x1202467a8",
+        "offset": 552,
+        "name": "_templateInfo",
+        "type": "@\"WCMomentsTemplateInfo\""
+      },
+      {
+        "offset_address": "0x1202467ac",
+        "offset": 560,
+        "name": "_advertiseInfo",
+        "type": "@\"WCAdvertiseInfo\""
+      },
+      {
+        "offset_address": "0x1202467b0",
+        "offset": 568,
+        "name": "_atFriendAdvertiseInfo",
+        "type": "@\"WCAdvertiseInfo\""
+      },
+      {
+        "offset_address": "0x1202467b4",
+        "offset": 576,
+        "name": "_advertiseInfoNSCodingData",
+        "type": "@\"NSData\""
+      },
+      {
+        "offset_address": "0x1202467b8",
+        "offset": 584,
+        "name": "_atFriendAdvertiseInfoNSCodingData",
+        "type": "@\"NSData\""
+      },
+      {
+        "offset_address": "0x1202467bc",
+        "offset": 592,
+        "name": "_foldAdvertiseInfo",
+        "type": "@\"WCFoldSnsAdvertiseInfo\""
+      },
+      {
+        "offset_address": "0x1202467c0",
+        "offset": 600,
+        "name": "_recommendInfo",
+        "type": "@\"WCRecommendInfo\""
+      },
+      {
+        "offset_address": "0x1202467c4",
+        "offset": 608,
+        "name": "_statExtStr",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202467c8",
+        "offset": 616,
+        "name": "_canvasInfoXml",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202467cc",
+        "offset": 624,
+        "name": "_videoFlowInfo",
+        "type": "@\"WCVideoFlowInfo\""
+      },
+      {
+        "offset_address": "0x1202467d0",
+        "offset": 632,
+        "name": "_draftID",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202467d4",
+        "offset": 640,
+        "name": "_sessionID",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202467d8",
+        "offset": 648,
+        "name": "_wsGroup",
+        "type": "@\"WCMicroMerchantFeedsGroup\""
+      },
+      {
+        "offset_address": "0x1202467dc",
+        "offset": 656,
+        "name": "_wsSellerType",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x1202467e0",
+        "offset": 664,
+        "name": "_wsFeedType",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x1202467e4",
+        "offset": 672,
+        "name": "_wsVideoSourceType",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x1202467e8",
+        "offset": 680,
+        "name": "_postTipsViewType",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x1202467ec",
+        "offset": 688,
+        "name": "_picCmtCnt",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x1202467f0",
+        "offset": 696,
+        "name": "_emoCmtCnt",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x1202467f4",
+        "offset": 704,
+        "name": "_ybRetouch",
+        "type": "@\"NSString\""
+      },
+      {
+        "offset_address": "0x1202467f8",
+        "offset": 712,
+        "name": "_placeholderType",
+        "type": "q"
+      },
+      {
+        "offset_address": "0x1202467fc",
+        "offset": 720,
+        "name": "_sharedGroupIDs",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x120246800",
+        "offset": 728,
+        "name": "_discoveryContentDesc",
+        "type": "@\"NSString\""
+      }
+    ]
+  },
+  "WCTimelineRouterHelper": {
+    "superclass": "<bound external>",
+    "ivars": []
+  },
+  "WCMomentsUIUtil": {
+    "superclass": "<bound external>",
+    "ivars": []
+  },
+  "WCMomentsDataConvertUtilities": {
+    "superclass": "MMObject",
+    "ivars": []
+  },
+  "FlutterSnsNativeRouterPlugin": {
+    "superclass": "<bound external>",
+    "ivars": [
+      {
+        "offset_address": "0x1201f47f0",
+        "offset": 8,
+        "name": "_lastPublishCreateTime",
+        "type": "I"
+      },
+      {
+        "offset_address": "0x1201f47f4",
+        "offset": 16,
+        "name": "_delegate",
+        "type": "@\"<SNSPluginDelegate>\""
+      },
+      {
+        "offset_address": "0x1201f47f8",
+        "offset": 24,
+        "name": "_poster",
+        "type": "@\"WCTimelinePoster\""
+      },
+      {
+        "offset_address": "0x1201f47fc",
+        "offset": 32,
+        "name": "_snsPublishEventChannel",
+        "type": "@\"FlutterEventChannel\""
+      },
+      {
+        "offset_address": "0x1201f4800",
+        "offset": 40,
+        "name": "_snsPublishEventSink",
+        "type": "@?"
+      },
+      {
+        "offset_address": "0x1201f4804",
+        "offset": 48,
+        "name": "_pendingFinderShareParams",
+        "type": "@\"NSDictionary\""
+      },
+      {
+        "offset_address": "0x1201f4808",
+        "offset": 56,
+        "name": "_shareScopeMgr",
+        "type": "@\"WCMomentsShareScopeMgr\""
+      },
+      {
+        "offset_address": "0x1201f480c",
+        "offset": 64,
+        "name": "_detailCaller",
+        "type": "@\"FlutterDetailApi\""
+      },
+      {
+        "offset_address": "0x1201f4810",
+        "offset": 72,
+        "name": "_pendingStarGuideActionCompletions",
+        "type": "@\"NSMutableDictionary\""
+      }
+    ]
+  },
+  "FlutterSnsUtil": {
+    "superclass": "<bound external>",
+    "ivars": []
+  }
+}

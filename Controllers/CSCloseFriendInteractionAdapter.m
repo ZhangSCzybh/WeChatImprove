@@ -1,7 +1,9 @@
 #import "CSCloseFriendSocialAdapter.h"
+#import <objc/message.h>
 static char MessagesKey;
 static BOOL UnreadDisplay;
 static id MessageCountingOwner;
+static id DiscoveryCountingOwner;
 static id (*NativeUnread)(id,SEL);
 BOOL CSCFUnreadBegin(void) { BOOL previous=UnreadDisplay; if(NSThread.isMainThread) UnreadDisplay=YES; return previous; }
 void CSCFUnreadEnd(BOOL previous) { if(NSThread.isMainThread) UnreadDisplay=previous; }
@@ -50,6 +52,42 @@ static void TableMethod(NSString *name,const char *type) {
     else if(!strcmp(type,"v@:@@")) replacement=imp_implementationWithBlock(^(id page,id table,NSIndexPath *path){if(!MessageActionCurrent(page,path)) return; NSIndexPath *native=MessagePath(page,path); if(native) ((void(*)(id,SEL,id,id))raw)(page,selector,table,native);});
     if(replacement && !CSCloseFriendInstallHook(@"WCCommentListViewController",name,replacement,&raw,type)) imp_removeBlock(replacement);
 }
+// The discovery row reads getSnsMessageCount, while the tab aggregate reads
+// numberOfUnreadAtMomentCell. Preserve their native reminder-partition choice.
+static BOOL DiscoveryCommentInteger(id comment,NSString *name,int *value) {
+    SEL selector=NSSelectorFromString(name);
+    if(!CSCloseFriendMethodMatches(class_getInstanceMethod([comment class],selector),"i@:")) return NO;
+    *value=((int(*)(id,SEL))objc_msgSend)(comment,selector); return YES;
+}
+static BOOL DiscoveryRelatedMessage(id message,BOOL *known) {
+    id comment=CSCloseFriendRead(message,@"comment"); int type=0,flags=0;
+    *known=DiscoveryCommentInteger(comment,@"type",&type) && DiscoveryCommentInteger(comment,@"commentFlag",&flags);
+    if(!*known) return NO;
+    // MyWCDB isMessageRelatedToMe: uses the server action's type/flag/referrer;
+    // WCMessageFromDBMessage: preserves these in WCUserComment and refComment.
+    NSString *referrer=CSCloseFriendRead(CSCloseFriendRead(message,@"refComment"),@"username");
+    return type==4 || (flags & (1<<17))!=0 || ([referrer isKindOfClass:NSString.class] && [referrer isEqual:CSCloseFriendCurrentSnapshot().accountID]);
+}
+static unsigned int DiscoveryUnreadCount(id facade,NSString *name,unsigned int nativeCount) {
+    if(!CSCFPageIsCurrent(DiscoveryCountingOwner) || CSCloseFriendCurrentSnapshot().blocked || !NativeUnread) return 0;
+    NSArray *source=NativeUnread(facade,NSSelectorFromString(@"getUnReadMessages"));
+    if(![source isKindOfClass:NSArray.class]) return 0;
+    BOOL total=[name isEqual:@"getUnReadMessageCount"];
+    BOOL related=[name isEqual:@"getUnReadMessageCountReleatedToMe"];
+    NSUInteger removed=0;
+    for(id message in source) {
+        if(!CSCFSocialHidden(message,CSCloseFriendSurfaceInteraction)) continue;
+        if(!total) {
+            BOOL known=NO,isRelated=DiscoveryRelatedMessage(message,&known);
+            if(!known) return 0;
+            if(isRelated!=related) continue;
+        }
+        removed++;
+    }
+    // Only the display count changes. Native arrays, hasRead flags and cached
+    // notification-manager counts never receive the filtered list or count.
+    return nativeCount-(unsigned int)MIN((NSUInteger)nativeCount,removed);
+}
 static void InstallUnread(void) {
     __block IMP unread=NULL;
     IMP replacement=imp_implementationWithBlock(^id(id facade){id rows=((id(*)(id,SEL))unread)(facade,NSSelectorFromString(@"getUnReadMessages")); return UnreadDisplay && NSThread.isMainThread ? CSCFSocialProject(rows,CSCloseFriendSurfaceInteraction).visible : rows;});
@@ -58,7 +96,8 @@ static void InstallUnread(void) {
         __block IMP raw=NULL; SEL selector=NSSelectorFromString(name);
         replacement=imp_implementationWithBlock(^unsigned int(id facade){
             if(UnreadDisplay && NSThread.isMainThread && CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceInteraction)) {
-                // Relevance-specific partitions have no verified independent source contract.
+                if(DiscoveryCountingOwner) return DiscoveryUnreadCount(facade,name,((unsigned int(*)(id,SEL))raw)(facade,selector));
+                // Other surfaces retain their existing partition fallback.
                 if(![name isEqual:@"getUnReadMessageCount"] || !NativeUnread) return 0;
                 return (unsigned int)MIN(CSCFSocialProject(NativeUnread(facade,NSSelectorFromString(@"getUnReadMessages")),CSCloseFriendSurfaceInteraction).visible.count,UINT_MAX);
             }
@@ -93,9 +132,18 @@ static void DiscoveryCounters(void) {
     __block IMP badge=NULL;
     IMP replacement=imp_implementationWithBlock(^BOOL(id page){return !DiscoveryConcealed(page) && ((BOOL(*)(id,SEL))badge)(page,NSSelectorFromString(@"badgeAtMomentCell"));});
     if(!CSCloseFriendInstallHook(@"FindFriendEntryViewController",@"badgeAtMomentCell",replacement,&badge,"B@:")) imp_removeBlock(replacement);
-    __block IMP count=NULL;
-    replacement=imp_implementationWithBlock(^NSInteger(id page){return DiscoveryConcealed(page) ? 0 : ((NSInteger(*)(id,SEL))count)(page,NSSelectorFromString(@"numberOfUnreadAtMomentCell"));});
-    if(!CSCloseFriendInstallHook(@"FindFriendEntryViewController",@"numberOfUnreadAtMomentCell",replacement,&count,"q@:")) imp_removeBlock(replacement);
+    for(NSString *name in @[@"getSnsMessageCount",@"numberOfUnreadAtMomentCell"]) {
+        __block IMP count=NULL; SEL selector=NSSelectorFromString(name);
+        replacement=imp_implementationWithBlock(^NSInteger(id page){
+            if(!NSThread.isMainThread) return ((NSInteger(*)(id,SEL))count)(page,selector);
+            if(!CSCFPageIsCurrent(page)) return 0;
+            BOOL saved=UnreadDisplay; id previous=DiscoveryCountingOwner;
+            UnreadDisplay=YES; DiscoveryCountingOwner=page;
+            @try { return ((NSInteger(*)(id,SEL))count)(page,selector); }
+            @finally { UnreadDisplay=saved; DiscoveryCountingOwner=previous; }
+        });
+        if(!CSCloseFriendInstallHook(@"FindFriendEntryViewController",name,replacement,&count,"q@:")) imp_removeBlock(replacement);
+    }
 }
 static char DiscoveryViewKey;
 static void DiscoveryViews(id page) {
@@ -111,13 +159,25 @@ static void DiscoveryViews(id page) {
             objc_setAssociatedObject(view,&DiscoveryViewKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
     }
-    CSCFSocialTrack(page,^(id owner){DiscoveryViews(owner); if(CSCFPageIsCurrent(owner)) CSCFCallVoid(owner,@"reloadData");});
+    CSCFSocialTrack(page,^(id owner){
+        DiscoveryViews(owner);
+        // Native refresh rebuilds the existing Moments row and the tab aggregate;
+        // it does not mark interaction messages read or change source records.
+        if(CSCFPageIsCurrent(owner)) CSCFCallVoid(owner,@"onMessageUnReadCountChanged");
+    });
 }
 static void InstallDiscovery(void) {
     DiscoveryCounters();
     CSCFSocialHook1(@"FindFriendEntryViewController",@"updateWCTimeLineView:",^(id page,id cell,void(^orig)(id)){orig(cell); DiscoveryViews(page);});
     CSCFSocialHook0(@"FindFriendEntryViewController",@"reloadData",^(id page,void(^orig)(void)){orig(); DiscoveryViews(page);});
     CSCFSocialHook0(@"FindFriendEntryViewController",@"onMessageUnReadCountChanged",^(id page,void(^orig)(void)){orig(); DiscoveryViews(page);});
+    __block IMP appear=NULL;
+    IMP replacement=imp_implementationWithBlock(^(id page,BOOL animated){
+        ((void(*)(id,SEL,BOOL))appear)(page,NSSelectorFromString(@"viewWillAppear:"),animated);
+        if(CSCFPageIsCurrent(page)) CSCFCallVoid(page,@"onMessageUnReadCountChanged");
+        DiscoveryViews(page);
+    });
+    if(!CSCloseFriendInstallHook(@"FindFriendEntryViewController",@"viewWillAppear:",replacement,&appear,"v@:B")) imp_removeBlock(replacement);
 }
 void CSCFInteractionInstall(void) {
     InstallUnread(); InstallDiscovery();

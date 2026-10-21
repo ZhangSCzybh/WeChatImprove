@@ -1,0 +1,125 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "disassembly": [
+    {
+      "file": "WCListViewController--viewDidLoad.asm",
+      "start": "0x109015df4",
+      "stop": "0x109016318",
+      "truncated": false
+    },
+    {
+      "file": "WCListViewController--reloadStyle.asm",
+      "start": "0x109018c48",
+      "stop": "0x1090190cc",
+      "truncated": false
+    },
+    {
+      "file": "WCListViewController--initData_.asm",
+      "start": "0x10901a1c0",
+      "stop": "0x10901a618",
+      "truncated": false
+    },
+    {
+      "file": "WCListViewController--reloadDataWithPrePageUpdate_.asm",
+      "start": "0x10901a628",
+      "stop": "0x10901a940",
+      "truncated": false
+    },
+    {
+      "file": "WCListViewController--refreshFooter.asm",
+      "start": "0x10901acb0",
+      "stop": "0x10901ae30",
+      "truncated": false
+    },
+    {
+      "file": "WCListView--initFooterView.asm",
+      "start": "0x108ffbda4",
+      "stop": "0x108ffbf60",
+      "truncated": false
+    },
+    {
+      "file": "WCListView--initWithData_starredDataItems_frame_contact_viewController_params_.asm",
+      "start": "0x108ffc7bc",
+      "stop": "0x108ffcde0",
+      "truncated": false
+    },
+    {
+      "file": "WCListView--onDataChanged_.asm",
+      "start": "0x108ffd430",
+      "stop": "0x108ffd6c8",
+      "truncated": false
+    },
+    {
+      "file": "WCListView--shouldReloadData_starredDataItems_jumpState_prePage_.asm",
+      "start": "0x108ffd6e4",
+      "stop": "0x108ffd92c",
+      "truncated": false
+    },
+    {
+      "file": "WCListView--updateJumpState_.asm",
+      "start": "0x108ffd92c",
+      "stop": "0x108ffdd5c",
+      "truncated": false
+    },
+    {
+      "file": "WCListView--updateRowsData.asm",
+      "start": "0x108ffdd5c",
+      "stop": "0x108fff744",
+      "truncated": false
+    },
+    {
+      "file": "WCListView--onNoMoreDataWithRet_andTip_.asm",
+      "start": "0x10900e128",
+      "stop": "0x10900e20c",
+      "truncated": false
+    },
+    {
+      "file": "WCListView--refreshFooter.asm",
+      "start": "0x10900e324",
+      "stop": "0x10900e360",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineFooterView--onStateOfNoMoreData_.asm",
+      "start": "0x10a0aae6c",
+      "stop": "0x10a0aafdc",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineFooterView--genStandardTerminatorViewWithTip_.asm",
+      "start": "0x10a0aafdc",
+      "stop": "0x10a0ab1a0",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineFooterView--onStateOfNoData_.asm",
+      "start": "0x10a0ab21c",
+      "stop": "0x10a0ab530",
+      "truncated": false
+    }
+  ],
+  "files": {
+    "WCListView--initWithData_starredDataItems_frame_contact_viewController_params_.asm": "7e432c4019946837e2975ac8509fb08921042833a43e4123fe125e81a01c46fc",
+    "WCListView--updateRowsData.asm": "0c36efdd89e387185b672c5d9b118761b5270894f70160dd82ef6a9039ec246b",
+    "WCListView--updateJumpState_.asm": "a54e1cbb14a28262acbd4e7d908dd1b6b4b7f3d9ab8a3ff56776970994c40be6",
+    "WCListViewController--viewDidLoad.asm": "bab78c434346f491df0a144a203d79237bf4f0a8266187a85ba034694ceab99f",
+    "WCListView--onDataChanged_.asm": "b6eeb7c906bb072751eb4a06b7ee6d6edead4a8120e262d2eff5c93fe742593c",
+    "metadata.json": "b2a84caf0b648f29e8b733e694c819b743b027a6effb55acd158289009470206",
+    "WCListView--initFooterView.asm": "a8c26052996f4554ed0d3dc2be47a4e442f31f13117bc5606751bfc0fa89ec08",
+    "WCListViewController--refreshFooter.asm": "0624576e4c186016f62f4ddcd702801081d475b77604dd4d7225e83102175e2c",
+    "methods.json": "92e63c5dbfbe08e5503f368c10e86b3766b9c65146752f600c04ec96b77d1705",
+    "WCTimeLineFooterView--onStateOfNoData_.asm": "8689e9181bebbf5aec2162f7e6f74abdb068585f80ad5315ce51b0c56d3f3c89",
+    "disassemble.py": "3d8b748cdecbfc561ae2d6992052822b68f163dcbd05ce8c4e843ee323ac6e4e",
+    "WCListView--shouldReloadData_starredDataItems_jumpState_prePage_.asm": "91a8073bc929a7722402d2a72d611c4afef642e0a46489a445927ef7c7d2dc67",
+    "WCListViewController--reloadStyle.asm": "aa2e9ebaac6621d88cb0a69aa05aabf9efb1a014fa20ddbe94f0551d44316b2e",
+    "WCListViewController--reloadDataWithPrePageUpdate_.asm": "1f10f88f55750395e58ff6c0f11d9d45328cf48a022c9b9f4c2b76dd4e39dbb8",
+    "WCTimeLineFooterView--genStandardTerminatorViewWithTip_.asm": "84d95f799067e0246e79101766adc5a91a15167e1a5464a017f23f612691d6f6",
+    "WCListView--onNoMoreDataWithRet_andTip_.asm": "d71acde64e18fab52527922d379898a95c3056b725364707af09edf52b57e5d1",
+    "extract.py": "a05c6859376627bf8381c781d1ef10b0dbc70a8642c5469bea66f288f061dd17",
+    "WCTimeLineFooterView--onStateOfNoMoreData_.asm": "041624598c8dc500a361164facd7ee37f01964387afc4233eb83ed3cd9c02196",
+    "WCListViewController--initData_.asm": "a4a0e4bf426f8fbfe7e55b0c1414057521e95a78311c8fdc2328c4646a54e62a",
+    "WCListView--refreshFooter.asm": "d2c8983f8c33b9ddf6e8e7be2e0494770aae52f1c2a00f3f9ecc01c5db692e32"
+  }
+}

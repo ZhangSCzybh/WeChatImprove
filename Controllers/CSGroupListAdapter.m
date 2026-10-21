@@ -472,7 +472,7 @@ static BOOL Option(NSString *suffix) {
         [self installProxies];
         NSString *account=CSGroupCurrentAccountID();
         BOOL changed= ![self.preferences.accountID isEqualToString:account];
-        if (changed) { self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=self.nativeActions.count>0; self.projection=nil; self.snapshotRetryAttempted=NO; }
+        if (changed) { self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=self.nativeActions.count>0; self.projection=nil; self.snapshotRetryAttempted=NO; self.searchChromeVisible=NO; }
         self.searching=CSGroupReadInteger(self.controller,@"isSearching",0)!=0;
         if (!self.searching) self.searchChromeVisible=NO;
         BOOL enabled=Option(@"enabled") && !CSGroupIsFoldedController(self.controller);
@@ -480,13 +480,14 @@ static BOOL Option(NSString *suffix) {
         // Search owns a separate page. Preserve the selected list behind its
         // transition instead of publishing unfiltered rows underneath group tabs.
         // Explicit result navigation may still require native coordinates.
-        if (!privacy && !self.privacyRefreshPending && enabled && self.searching && self.searchChromeVisible && account.length && !changed && self.projecting &&
-            !self.nativePresentation && !self.nativeActions.count) {
+        BOOL keepsSearchGroup=enabled && self.searching && self.searchChromeVisible && account.length && !changed &&
+            !self.nativePresentation && !self.nativeActions.count;
+        if (keepsSearchGroup && !self.privacyRefreshPending && self.projecting) {
             @synchronized (self) { self.pendingChanges|=changes|CSGroupChangeUnknown; }
             self.cachedNativeSections=nil; [self.projection discardComputationCache];
             [self layout]; finished=YES; return;
         }
-        if ((!privacy && (!enabled || self.searching)) || !account.length) {
+        if ((!privacy && (!enabled || (self.searching && !keepsSearchGroup))) || !account.length) {
             BOOL needsReload=self.projecting || self.nativeActions.count>0;
             BOOL hadChrome=self.chromeVisible;
             self.projecting=NO; self.chromeVisible=NO; self.publishedEnabled=enabled;
@@ -500,7 +501,9 @@ static BOOL Option(NSString *suffix) {
         else [self.preferences reload];
         [self ensureChrome];
         NSArray *tabs=self.preferences.tabs; NSString *selected=self.preferences.selectedTabID;
-        if (self.nativePresentation || !enabled || self.searching) {
+        // A privacy change during search must rebuild this same group. It must
+        // neither retain newly hidden rows nor replace the transition with All.
+        if (self.nativePresentation || !enabled || (self.searching && !keepsSearchGroup)) {
             selected=@"preset_0";
             if (![tabs filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(WESessionTabItem *tab, NSDictionary *bindings) { (void)bindings; return [tab.tabId isEqual:selected]; }]].count)
                 tabs=[@[[WESessionTabItem tabWithType:WETabTypeAll]] arrayByAddingObjectsFromArray:tabs];
@@ -519,7 +522,7 @@ static BOOL Option(NSString *suffix) {
             }]; self.identityDisplayPaths=identities;
         }
         self.displayedTabs=tabs;
-        BOOL projecting=(privacy || (enabled && !self.searching && !self.nativePresentation)) && self.projection.isValid && account.length>0;
+        BOOL projecting=(privacy || (enabled && (!self.searching || keepsSearchGroup) && !self.nativePresentation)) && self.projection.isValid && account.length>0;
         if (projecting && self.prefetchedPaths.count) {
             id prefetch=self.proxies[@2].target;
             NSArray *paths=self.prefetchedPaths.allObjects;
@@ -527,7 +530,7 @@ static BOOL Option(NSString *suffix) {
             [self.prefetchedPaths removeAllObjects];
         }
         self.projecting=projecting;
-        self.chromeVisible=enabled && !self.searching && account.length>0;
+        self.chromeVisible=enabled && (!self.searching || keepsSearchGroup) && account.length>0;
         self.publishedEnabled=Option(@"enabled");
         self.publishedTabID=selected;
         if (self.appearanceDirty) { [self.chrome refreshAppearance]; self.appearanceDirty=NO; }

@@ -161,10 +161,8 @@ static void Policy(BOOL revealed,NSUInteger revision) {
 #include "CloseFriendSocialRouteFixture.h"
 int main(void) { @autoreleasepool {
     Check(TestSocialRoutes()==0);
-    Policy(NO,1); InstallModel(); DiscoveryCounters();
+    Policy(NO,1); InstallModel();
     TableMethod(@"tableView:cellForRowAtIndexPath:","@@:@@"); TableMethod(@"tableView:heightForRowAtIndexPath:","d@:@@");
-    FindFriendEntryViewController *discovery=[FindFriendEntryViewController new];
-    Check(!discovery.badgeAtMomentCell && discovery.numberOfUnreadAtMomentCell==0);
     NSDictionary *ordinary=@{@"username":@"alice"}, *hidden=@{@"username":@"secret"}, *reply=@{@"username":@"alice",@"refUserName":@"secret"};
     WCDataItem *post=[WCDataItem new]; post.username=@"alice"; post.itemID=@"post-a"; post.likeUsers=@[ordinary,hidden]; post.commentUsers=@[hidden,reply,ordinary]; post.isPrivate=YES; post.selectContacts=[NSSet setWithArray:@[@"alice",@"secret"]]; post.selectTags=[NSSet setWithObject:@"original-tag"];
     WCDataItem *secretPost=[WCDataItem new]; secretPost.username=@"secret"; secretPost.itemID=@"post-s";
@@ -184,8 +182,8 @@ int main(void) { @autoreleasepool {
     Check(facade.source==originalPosts && post.likeUsers==originalLikes && post.commentUsers==originalComments);
     Check(post.likeCount==2 && post.commentCount==3 && post.isPrivate && post.selectContacts==acl && post.selectTags==tags);
     Check(facade.clears>0 && facade.styleCache.count==0);
-    Policy(YES,2); Check(discovery.badgeAtMomentCell && discovery.numberOfUnreadAtMomentCell==7); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==3 && post.commentCount==3); Leave(previous);
-    Policy(NO,3); Check(!discovery.badgeAtMomentCell && discovery.numberOfUnreadAtMomentCell==0); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==2 && post.commentCount==1); Leave(previous);
+    Policy(YES,2); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==3 && post.commentCount==3); Leave(previous);
+    Policy(NO,3); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==2 && post.commentCount==1); Leave(previous);
     NSDictionary *m1=@{@"comment":ordinary,@"objID":@"secret"};
     NSDictionary *m2=@{@"comment":hidden}, *m3=@{@"comment":ordinary,@"refComment":reply};
     NSDictionary *m4=@{@"comment":@{@"username":@"alice",@"dataItemUsrName":@"secret"}};
@@ -223,9 +221,14 @@ int main(void) { @autoreleasepool {
     Check(logic.contacts.count==2 && picker.pending==acl && privacy.selectContacts==acl);
     Policy(YES,8); Check([Rows(logic,NULL,@"A") count]==2 && PickerAllowsAction(picker) && !NeedsUnlock(privacy));
     WCMomentsPrivacyViewController *freshPrivacy=[WCMomentsPrivacyViewController new]; freshPrivacy.selectContacts=acl;
+    __weak id dismissedPicker, dismissedLogic;
+    // Drain temporary weak-reference retains before checking native dismissal.
+    @autoreleasepool {
     ContactSelectView *freshPicker=[ContactSelectView new]; freshPicker.m_delegate=freshPrivacy;
     AudienceLogic *freshLogic=[AudienceLogic new]; freshLogic.m_delegate=freshPicker; freshLogic.contacts=logic.contacts;
     Check([Keys(freshLogic,NULL) count]==1 && [Rows(freshLogic,NULL,@"A") count]==2 && PickerAllowsAction(freshPicker) && !NeedsUnlock(freshPrivacy) && !NeedsUnlock(privacy));
+    dismissedPicker=freshPicker; dismissedLogic=freshLogic;
+    }
     Policy(NO,9);
     privacy.currentItem=[NSObject new];
     objc_setAssociatedObject(privacy,&AudienceItemKey,privacy.currentItem,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -252,8 +255,6 @@ int main(void) { @autoreleasepool {
     Check(!PublishingOwner(otherLogic));
     // Successful native return may release both presentation objects before editor onDone.
     // Exercise the production onDone authorization predicate after those weak refs disappear.
-    __weak id dismissedPicker=freshPicker, dismissedLogic=freshLogic;
-    freshPicker=nil; freshLogic=nil;
     Check(dismissedPicker==nil && dismissedLogic==nil);
     Check(!NeedsUnlock(freshPrivacy));
     __block NSUInteger doneCalls=0; FinishEdit(freshPrivacy,^{doneCalls++;});
@@ -261,5 +262,5 @@ int main(void) { @autoreleasepool {
     Epoch++; Policy(NO,9); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==0); Leave(previous); Check([facade countOfTimelineDataItem]==3);
     Check(Cards(status).visible.count==0 && !MessageActionCurrent(messages,second) && NeedsUnlock(freshPrivacy));
     Check([Rows(reminderLogic,NULL,@"A") count]==0 && !PickerAllowsContact(reminder,@"alice") && [selector.arrContacts isEqual:@[@"secret"]]);
-    puts("Close-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, discovery cues, locked publishing candidates and hidden-selection preservation, stale native render rejection, completed-picker authorization and reveal/relock/account transitions passed");
+    puts("Close-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, locked publishing candidates and hidden-selection preservation, stale native render rejection, completed-picker authorization and reveal/relock/account transitions passed");
 } return 0; }

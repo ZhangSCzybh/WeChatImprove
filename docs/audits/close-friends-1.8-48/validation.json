@@ -1,0 +1,122 @@
+{
+  "version": "1.8-48",
+  "scheme": "rootless",
+  "checkout": "/Users/zhangshichao/.codex/worktrees/close-friends-148/WeChatImprove",
+  "branch": "codex/close-friends-148",
+  "base_commit": "2953a2ad4eb2f7193dfca48d7c87c454d242b6d8",
+  "source_identity": "source-manifest.json",
+  "metadata": {
+    "Package": "com.wechat.improve",
+    "Version": "1.8-48",
+    "Architecture": "iphoneos-arm64",
+    "Depends": "mobilesubstrate (>= 0.9.5000)"
+  },
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "minimum_ios": "15.0",
+  "artifact": {
+    "path": "packages/com.wechat.improve_1.8-48_iphoneos-arm64.deb",
+    "sha256": "0114f0ed42294c8aeb27af4b6b57a7006c5c7bd4cd66197a52dd44d2e3432eb6",
+    "bytes": 1112328
+  },
+  "dylib_sha256": "cad616a163608980c1faf27991f62384054dd696e9e0cfc7406406cbbc84db1c",
+  "dSYM_UUIDs": {
+    "arm64": "9B652843-3284-3712-994D-F8CF8BA63053",
+    "arm64e": "59A2A1D5-6C6E-3E9D-B47B-6EAE5006D09C"
+  },
+  "source_matches_manifest": true,
+  "package_matches_build_and_stage": true,
+  "version_agreement": true,
+  "injection_filter_unchanged": true,
+  "prior_artifacts_unchanged": {
+    "/Users/zhangshichao/.codex/worktrees/close-friends-148/WeChatImprove": [
+      "packages/com.wechat.improve_1.5-7_iphoneos-arm.deb",
+      "packages/com.wechat.improve_1.6-0_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-41-b2_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-41_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-42_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-43_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-44_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-45_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-46_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-47_iphoneos-arm64.deb"
+    ],
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove": [
+      "packages/com.wechat.improve_1.5-7_iphoneos-arm.deb",
+      "packages/com.wechat.improve_1.6-0_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-41-b2_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-41_iphoneos-arm64.deb"
+    ]
+  },
+  "exports_in_both_architectures": [
+    "_CSCFAlbumInstall",
+    "_CSCFDetailInstall",
+    "_CSCFInteractionInstall",
+    "_CSCFSocialProtectRoute",
+    "_CSCFSocialGate",
+    "_CSCFTimelineInstall",
+    "_CSCFIncomingCallToken",
+    "_CSCFHandleIncomingCall",
+    "_CSCFCallDidReject",
+    "_CSCFCallReplyMessageDidChange",
+    "_CSCFSearchSubmit",
+    "_CSCFSearchDispatchInput",
+    "_CSCFSearchDispatchQuery",
+    "_CSCFSearchSuppressLoading",
+    "_CSCFSearchModel",
+    "_CSCFSearchVisibleRows",
+    "_CSCFSearchConsumePassword",
+    "_CSCFProfileWithNativePresentation",
+    "_CSCFProfileUsesNativeStranger",
+    "_CSCFAudienceInstall"
+  ],
+  "host_results": [
+    {
+      "command": "bash Tests/verify-group-search.sh",
+      "exit_code": 0,
+      "checks": 50,
+      "output": "Group search: 50 checks, 0 failures",
+      "runner": "cf_group148",
+      "evidence": "group-search/results.json"
+    },
+    {
+      "command": "bash Tests/verify-close-friend-album.sh",
+      "exit_code": 0,
+      "checks": 19,
+      "output": "Album: 19 checks, native headers/terminator, updates, ordinary pages, reveal/relock, source restoration and routing passed",
+      "runner": "root"
+    },
+    {
+      "command": "bash Tests/verify-close-friend-detail.sh",
+      "exit_code": 0,
+      "checks": 35,
+      "output": "Close-friend detail: 35 checks passed (native ivar rendering, likes/comments, source preservation, action identity, reveal/relock, routes).",
+      "scope": "Foundation fixtures run the complete production DetailAdapter body; no device or backend writes",
+      "source_sha256": {
+        "Controllers/CSCloseFriendDetailAdapter.m": "efa12127fad0855cdf8a793aed67533db6ccd3e26c0f9ccf3ef914943df7353c",
+        "Tests/CloseFriendDetailFixture.h": "7ea56b264064a7819f3bd1f097f61f280a5305877efaad139f3d3218ba301253",
+        "Tests/verify-close-friend-detail.sh": "86d8350ba692d43fe6f9d069e7a85bf12a359de5f7b6b9dfd6ca61f3e081d607"
+      }
+    },
+    {
+      "command": "bash Tests/verify-close-friend-discovery.sh",
+      "exit_code": 0,
+      "output": "Discovery: native row accessor, related/mutual partitions, ordinary reminders, policy/appearance refresh, unchanged unread records and stale owner guards passed",
+      "runner": "cf_discovery148"
+    },
+    {
+      "command": "bash Tests/verify-close-friend-social.sh",
+      "exit_code": 0,
+      "output": "Social routes: all native Moments lifecycle calls preserved without page unlock covers\nClose-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, locked publishing candidates and hidden-selection preservation, stale native render rejection, completed-picker authorization and reveal/relock/account transitions passed",
+      "runner": "root"
+    }
+  ],
+  "build_exit_code": 0,
+  "build_command": "make package -j4 SCHEME=rootless PACKAGE_VERSION=1.8-48",
+  "device_validation": "Pending physical-device validation of the four reported group search/Moments workflows; host fixtures and native static evidence passed.",
+  "delivery_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/com.wechat.improve_1.8-48_iphoneos-arm64.deb",
+  "delivery_matches_build": true,
+  "original_checkout_branch_at_verification": "main"
+}

@@ -18,6 +18,8 @@ FOUNDATION_EXPORT id CSCFTimelineFacade(id owner);
 FOUNDATION_EXPORT BOOL CSCFUnreadBegin(void);
 FOUNDATION_EXPORT void CSCFUnreadEnd(BOOL previous);
 FOUNDATION_EXPORT void CSCFTimelineInstall(void);
+FOUNDATION_EXPORT void CSCFAlbumInstall(void);
+FOUNDATION_EXPORT void CSCFDetailInstall(void);
 FOUNDATION_EXPORT void CSCFInteractionInstall(void);
 FOUNDATION_EXPORT void CSCFStatusInstall(void);
 FOUNDATION_EXPORT void CSCFAudienceInstall(void);

@@ -40,8 +40,8 @@ static CSCFTimelineScope *Enter(id owner,id item) {
         CSCFSocialTrack(owner,^(id page){
             CSCFTimelineState *state=State(page); ClearLikes(state.facade,state.posts.source); state.posts=nil;
             CSCFSocialClearCaches(page,@[@"cellHeightCache",@"cellShowItemCache"]);
-            if(!CSCFPageIsCurrent(page)) CSCFSocialGate(page,CSCloseFriendSurfaceTimeline,YES);
-            else {CSCFCallVoid(page,@"onMessageUnReadCountChanged"); CSCFReloadTables(page);}
+            if(CSCFPageIsCurrent(page)) CSCFCallVoid(page,@"onMessageUnReadCountChanged");
+            CSCFReloadTables(page);
         });
     }
     next.unreadPrevious=CSCFUnreadBegin(); Scope=next; return previous;
@@ -185,20 +185,14 @@ static void InstallComments(void) {
     replacement=imp_implementationWithBlock(^(id owner,id comment,id item,id view){if(!CSCFPageIsCurrent(owner) || CSCFSocialHidden(comment,CSCloseFriendSurfaceInteraction) || CSCFSocialHidden(item,CSCloseFriendSurfaceTimeline)) return; ((void(*)(id,SEL,id,id,id))reply)(owner,NSSelectorFromString(@"onReplyComment:ofDataItem:ofTouchedView:"),comment,item,view);});
     if(!CSCloseFriendInstallHook(@"WCTimeLineViewController",@"onReplyComment:ofDataItem:ofTouchedView:",replacement,&reply,"v@:@@@")) imp_removeBlock(replacement);
 }
-static void InstallTimelineRoutes(void) {
-    // WCCommentDetailViewController is Finder's comment UI. Moments uses the FB
-    // controller and its WCDataItem, or the Flutter detail/profile controllers.
-    for(NSString *cls in @[@"WCListViewController",@"WCCommentDetailViewControllerFB",@"WCTimelineFlutterAlbumV2ViewController",@"WCTimelineFlutterDetailViewController",@"WCTimelineFlutterProfileViewController",@"WCTimelineFlutterViewController"]) CSCFSocialProtectRoute(cls,CSCloseFriendSurfaceTimeline);
-}
 void CSCFTimelineInstall(void) {
-    InstallTimelineRoutes();
     BOOL ready=YES;
     NSDictionary *contracts=@{@"WCFacade":@{@"getTimelineDataItem":@"@@:",@"countOfTimelineDataItem":@"q@:",@"getTimelineDataItemOfIndex:":@"@@:q",@"removeCachesOfLikeUserWithDataItemId:":@"v@:@"},@"WCDataItem":@{@"likeUsers":@"@@:",@"commentUsers":@"@@:",@"likeCount":@"i@:",@"commentCount":@"i@:"},@"WCTimeLineViewController":@{@"numberOfSectionsInTableView:":@"q@:@",@"tableView:numberOfRowsInSection:":@"q@:@q",@"tableView:cellForRowAtIndexPath:":@"@@:@@",@"tableView:heightForRowAtIndexPath:":@"d@:@@",@"tableView:didSelectRowAtIndexPath:":@"v@:@@"}};
     for(NSString *cls in contracts) for(NSString *selector in contracts[cls]) ready &= CSCloseFriendMethodMatches(class_getInstanceMethod(NSClassFromString(cls),NSSelectorFromString(selector)),[contracts[cls][selector] UTF8String]);
     NSDictionary *commentContracts=@{@"getCommentViewCountForDataItem:":@"Q@:@",@"getCommentIndexForDataItem:RowIndex:":@"q@:@q",@"getCellHeightForDataItem:RowIndex:pageContext:":@"d@:@q@",@"getNickNameForDataItem:":@"@@:@"};
     for(NSString *selector in commentContracts) ready &= CSCloseFriendMethodMatches(class_getClassMethod(NSClassFromString(@"WCTimeLineCommentCellView"),NSSelectorFromString(selector)),[commentContracts[selector] UTF8String]);
     CSCloseFriendRecordCapability(@"social.timeline.coupled",ready);
-    if(!ready) {CSCFSocialProtectRoute(@"WCTimeLineViewController",CSCloseFriendSurfaceTimeline); return;}
+    if(!ready) return;
     InstallModel(); InstallComments();
     TimelineMethod(@"numberOfSectionsInTableView:","q@:@");
     TimelineMethod(@"tableView:numberOfRowsInSection:","q@:@q");
@@ -210,5 +204,4 @@ void CSCFTimelineInstall(void) {
     for(NSString *name in @[@"scrollViewDidScroll:",@"scrollTableViewToShowDataItem:",@"refreshWholeViewWithFixedDataItem:"]) CSCFSocialHook1(@"WCTimeLineViewController",name,^(id owner,id arg,void(^orig)(id)){
         if(!CSCFPageIsCurrent(owner)) return; CSCFTimelineScope *old=Enter(owner,nil); @try {orig(arg);} @finally {Leave(old);}
     });
-    CSCloseFriendRecordCapability(@"social.personal-detail.filtered",NO); CSCloseFriendRecordCapability(@"social.flutter.filtered",NO);
 }

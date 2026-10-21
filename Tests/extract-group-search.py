@@ -14,6 +14,7 @@ def method(text,marker):
    if not depth: return text[start:end+1]
  raise AssertionError(marker)
 markers=['- (UIView *)nativeTableHeaderView','- (void)setNativeTableHeaderView:', '- (void)prepareForNativeSearch', '- (BOOL)keepsGroupHeaderDuringSearch', '- (void)publishHeader:', '- (void)layout {']
-out.write_text('\n'.join(method(source,m) for m in markers))
+out.write_text('\n'.join(method(source,m) for m in markers) + '\n' +
+               method(source, '- (void)refresh {').replace('- (void)refresh {', '- (void)refreshProjection {', 1))
 markers=['- (void)onSearch {','- (void)setSearchBarActive:', '- (void)onFTSSearchEnd {','- (void)cancelSearch {']
 out.with_name('SearchHooks.h').write_text('\n'.join(method(hooks,m).replace('%orig','[self originalSearchCall]') for m in markers))

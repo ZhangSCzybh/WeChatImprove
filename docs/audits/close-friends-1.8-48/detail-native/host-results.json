@@ -1,0 +1,12 @@
+{
+  "command": "bash Tests/verify-close-friend-detail.sh",
+  "exit_code": 0,
+  "checks": 35,
+  "output": "Close-friend detail: 35 checks passed (native ivar rendering, likes/comments, source preservation, action identity, reveal/relock, routes).",
+  "scope": "Foundation fixtures run the complete production DetailAdapter body; no device or backend writes",
+  "source_sha256": {
+    "Controllers/CSCloseFriendDetailAdapter.m": "efa12127fad0855cdf8a793aed67533db6ccd3e26c0f9ccf3ef914943df7353c",
+    "Tests/CloseFriendDetailFixture.h": "7ea56b264064a7819f3bd1f097f61f280a5305877efaad139f3d3218ba301253",
+    "Tests/verify-close-friend-detail.sh": "86d8350ba692d43fe6f9d069e7a85bf12a359de5f7b6b9dfd6ca61f3e081d607"
+  }
+}

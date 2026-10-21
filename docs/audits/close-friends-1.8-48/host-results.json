@@ -1,0 +1,41 @@
+[
+  {
+    "command": "bash Tests/verify-group-search.sh",
+    "exit_code": 0,
+    "checks": 50,
+    "output": "Group search: 50 checks, 0 failures",
+    "runner": "cf_group148",
+    "evidence": "group-search/results.json"
+  },
+  {
+    "command": "bash Tests/verify-close-friend-album.sh",
+    "exit_code": 0,
+    "checks": 19,
+    "output": "Album: 19 checks, native headers/terminator, updates, ordinary pages, reveal/relock, source restoration and routing passed",
+    "runner": "root"
+  },
+  {
+    "command": "bash Tests/verify-close-friend-detail.sh",
+    "exit_code": 0,
+    "checks": 35,
+    "output": "Close-friend detail: 35 checks passed (native ivar rendering, likes/comments, source preservation, action identity, reveal/relock, routes).",
+    "scope": "Foundation fixtures run the complete production DetailAdapter body; no device or backend writes",
+    "source_sha256": {
+      "Controllers/CSCloseFriendDetailAdapter.m": "efa12127fad0855cdf8a793aed67533db6ccd3e26c0f9ccf3ef914943df7353c",
+      "Tests/CloseFriendDetailFixture.h": "7ea56b264064a7819f3bd1f097f61f280a5305877efaad139f3d3218ba301253",
+      "Tests/verify-close-friend-detail.sh": "86d8350ba692d43fe6f9d069e7a85bf12a359de5f7b6b9dfd6ca61f3e081d607"
+    }
+  },
+  {
+    "command": "bash Tests/verify-close-friend-discovery.sh",
+    "exit_code": 0,
+    "output": "Discovery: native row accessor, related/mutual partitions, ordinary reminders, policy/appearance refresh, unchanged unread records and stale owner guards passed",
+    "runner": "cf_discovery148"
+  },
+  {
+    "command": "bash Tests/verify-close-friend-social.sh",
+    "exit_code": 0,
+    "output": "Social routes: all native Moments lifecycle calls preserved without page unlock covers\nClose-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, locked publishing candidates and hidden-selection preservation, stale native render rejection, completed-picker authorization and reveal/relock/account transitions passed",
+    "runner": "root"
+  }
+]
