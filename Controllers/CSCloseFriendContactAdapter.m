@@ -68,9 +68,11 @@ void CSCFBeginSelection(id owner) {
 }
 void CSCFCancelSelection(id owner) {
     if(!objc_getAssociatedObject(owner,&SelectionKey)) return;
-    // Native cancellation clears all selected state and closes the operation; never trim its recipient set.
-    CSCFCallVoid(owner,@"onSelectCancel");
-    // Keep the invalid ticket so a late callback cannot resurrect the cancelled operation.
+    // End the visible multi-select mode in place. onSelectCancel dismisses this
+    // page, which must not happen when the user relocks from an unrelated page.
+    CSCFCallVoid(owner,@"cancelMultiSelect");
+    // Keep the invalid ticket so a late callback cannot resurrect this operation.
+    // The native Back/Cancel button remains available to start a fresh operation.
 }
 BOOL CSCFAllowSelection(id owner,NSArray *recipients) {
     CSCFBeginSelection(owner);

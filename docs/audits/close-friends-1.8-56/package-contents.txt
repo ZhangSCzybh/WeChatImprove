@@ -1,0 +1,8 @@
+drwxr-xr-x root/wheel        0 2026-10-21 13:59 .
+drwxr-xr-x root/wheel        0 2026-10-21 13:59 var
+drwxr-xr-x root/wheel        0 2026-10-21 13:59 var/jb
+drwxr-xr-x root/wheel        0 2026-10-21 13:59 var/jb/Library
+drwxr-xr-x root/wheel        0 2026-10-21 13:59 var/jb/Library/MobileSubstrate
+drwxr-xr-x root/wheel        0 2026-10-21 13:59 var/jb/Library/MobileSubstrate/DynamicLibraries
+-rwxr-xr-x root/wheel  5064304 2026-10-21 13:59 var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib
+-rw-r--r-- root/wheel      111 2026-10-21 13:59 var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.plist

@@ -38,17 +38,6 @@ static void InstallSection(NSString *cls,NSString *key) {
         ((void(*)(id,SEL,NSInteger))select)(object,NSSelectorFromString(@"didSelectRowAtIndex:"),index);
     });
     if(!CSCloseFriendInstallHook(cls,@"didSelectRowAtIndex:",replacement,&select,"v@:q")) imp_removeBlock(replacement);
-    if([key isEqual:@"contacts"] || [key isEqual:@"topHitItems"]) {
-        __block IMP dataCell=NULL;
-        IMP replacement=imp_implementationWithBlock(^id(id object,NSInteger index,id path){
-            if(CSCFSearchGated(object)) return [UITableViewCell new];
-            id cell=((id(*)(id,SEL,NSInteger,id))dataCell)(object,NSSelectorFromString(@"dataCellForItemAtIndex:indexPath:"),index,path);
-            NSArray *rows=CSCloseFriendRead(object,key);
-            id item=[rows isKindOfClass:NSArray.class] && index>=0 && (NSUInteger)index<rows.count ? rows[(NSUInteger)index] : nil;
-            CSCFSearchUpdateGroupCell(cell,item); return cell;
-        });
-        if(!CSCloseFriendInstallHook(cls,@"dataCellForItemAtIndex:indexPath:",replacement,&dataCell,"@@:q@")) imp_removeBlock(replacement);
-    }
     __block IMP selectData=NULL;
     replacement=imp_implementationWithBlock(^(id object,NSInteger index,id path){
         if(CSCFSearchGated(object)) return;
@@ -64,6 +53,18 @@ static void InstallSection(NSString *cls,NSString *key) {
     __block IMP load=NULL;
     replacement=imp_implementationWithBlock(^(id object){if(CSCFSearchGated(object)) return; ((void(*)(id,SEL))load)(object,NSSelectorFromString(@"onLoadMore"));});
     if(!CSCloseFriendInstallHook(cls,@"onLoadMore",replacement,&load,"v@:")) imp_removeBlock(replacement);
+}
+static void InstallNativeSearchCell(void) {
+    __block IMP update=NULL;
+    SEL selector=NSSelectorFromString(@"updateContact:matchTip:asTopHit:");
+    IMP replacement=imp_implementationWithBlock(^(id cell,id contact,id tip,BOOL topHit){
+        // Contact, group and followed-Finder sections reuse FTSContactCell.
+        // Redact the match payload before native rendering; never hide its views.
+        if(CSCFSearchRedactsGroupMatch(contact)) tip=nil;
+        ((void(*)(id,SEL,id,id,BOOL))update)(cell,selector,contact,tip,topHit);
+        CSCFSearchUpdateGroupCell(cell,contact);
+    });
+    if(!CSCloseFriendInstallHook(@"FTSContactCell",NSStringFromSelector(selector),replacement,&update,"v@:@@B")) imp_removeBlock(replacement);
 }
 static void InstallSearchInputHooks(void) {
     for(NSString *name in @[@"setLoadingStatus",@"updateFooterView"]) {
@@ -122,6 +123,7 @@ static void InstallSearchInputHooks(void) {
 }
 %ctor { dispatch_async(dispatch_get_main_queue(),^{
     InstallSearchInputHooks();
+    InstallNativeSearchCell();
     InstallSection(@"FTSSingleContactSectionController",@"contacts");
     InstallSection(@"FTSGroupContactSectionController",@"contacts");
     InstallSection(@"FTSTopHitsSectionController",@"topHitItems");

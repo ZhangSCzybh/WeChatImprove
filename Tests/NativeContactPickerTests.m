@@ -8,10 +8,11 @@ static BOOL wrapPickerBeforeLoad;
 static NSString *account=@"me";
 static void (^duringDismissal)(void);
 static void Check(BOOL ok,NSString *message){checks++;if(!ok){fprintf(stderr,"FAIL: %s\n",message.UTF8String);exit(1);}}
+@implementation UIView @end
 @implementation UIBarButtonItem @end
 @implementation UINavigationItem @end
 @implementation UIViewController
-- (instancetype)init {if((self=[super init])){_navigationItem=[UINavigationItem new];_navigationItem.rightBarButtonItem=[UIBarButtonItem new];}return self;}
+- (instancetype)init {if((self=[super init])){_view=[UIView new];_navigationItem=[UINavigationItem new];_navigationItem.rightBarButtonItem=[UIBarButtonItem new];}return self;}
 - (void)viewDidLoad {}
 - (void)presentViewController:(UIViewController *)controller animated:(BOOL)animated completion:(void(^)(void))completion {
     self.presentedViewController=controller;controller.presentingViewController=self;
@@ -160,7 +161,11 @@ int main(void){@autoreleasepool{
     groups=(id)Picker(presenter);[groups.m_dicMultiSelect removeAllObjects];[groups onCancelBack:nil];[groups onDone];
     Check(saves==3&&!presenter.presentedViewController,@"cancel dismisses without writing or accepting a late Done");
     CSNativeContactPickerPresent(presenter,@"密友",NO,@[@"alice"],^BOOL{return valid;},save,&error);
-    friends=(id)Picker(presenter);valid=NO;CSNativeContactPickerRevalidate(presenter);[friends actionDone];
+    friends=(id)Picker(presenter);valid=NO;CSNativeContactPickerRevalidate(presenter);
+    Check(Picker(presenter)==friends && friends.view.hidden && !friends.navigationItem.rightBarButtonItem.enabled,@"relock conceals invalid picker in place, retaining native cancel");
+    valid=YES;[friends updateRightBarItemEnabled:YES];
+    Check(!friends.navigationItem.rightBarButtonItem.enabled,@"retired picker cannot re-enable Done after later unlock");
+    [friends actionDone];
     Check(saves==3&&!presenter.presentedViewController,@"expired unlock cancels and cannot save late");valid=YES;
     CSNativeContactPickerPresent(presenter,@"群",YES,@[],nil,save,&error);groups=(id)Picker(presenter);
     account=@"another";[groups onDone];Check(saves==3,@"account switch rejects save");account=@"me";

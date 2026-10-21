@@ -13,7 +13,7 @@ static char PickerStateKey;
 @property(nonatomic,copy) NSString *account;
 @property(nonatomic,copy) BOOL (^isValid)(void);
 @property(nonatomic,copy) void (^completion)(NSArray<NSString *> *);
-@property(nonatomic) BOOL groups, seeded, finished;
+@property(nonatomic) BOOL groups, seeded, finished, revoked;
 - (BOOL)valid;
 - (void)finish:(BOOL)save;
 @end
@@ -40,7 +40,7 @@ static id CurrentSelection(id picker) {
 
 @implementation CSNativePickerState
 - (BOOL)valid {
-    return !self.finished && [self.account isEqual:CSGroupCurrentAccountID()] && (!self.isValid || self.isValid());
+    return !self.finished && !self.revoked && [self.account isEqual:CSGroupCurrentAccountID()] && (!self.isValid || self.isValid());
 }
 - (BOOL)onShouldSelectContact:(id)contact {
     NSString *name=Get(contact,@"m_nsUsrName");
@@ -90,10 +90,10 @@ static void PickerInitData(id picker, SEL command) {
 }
 static void PickerUpdateGroupButton(UIViewController *picker, SEL command) {
     ((void(*)(id,SEL))NativeGroupUpdateButton)(picker,command);
-    picker.navigationItem.rightBarButtonItem.enabled=YES; // Saving an empty settings list is valid.
+    picker.navigationItem.rightBarButtonItem.enabled=[State(picker) valid]; // An authorized empty list can be saved.
 }
 static void PickerUpdateFriendButton(id picker, SEL command, BOOL enabled) {
-    ((void(*)(id,SEL,BOOL))NativeFriendUpdateButton)(picker,command,YES);
+    ((void(*)(id,SEL,BOOL))NativeFriendUpdateButton)(picker,command,[State(picker) valid]);
 }
 static BOOL Override(Class cls, Class base, NSString *name, IMP implementation, const char *type) {
     Method method=class_getInstanceMethod(base,NSSelectorFromString(name));
@@ -175,5 +175,11 @@ BOOL CSNativeContactPickerPresent(UIViewController *presenter, NSString *title, 
 }
 void CSNativeContactPickerRevalidate(UIViewController *presenter) {
     CSNativePickerState *state=State(presenter.presentedViewController);
-    if(state && ![state valid])[state finish:NO];
+    if(state && ![state valid]) {
+        // Keep the page and native Cancel button. Expired selections cannot be
+        // viewed or saved; finish: still checks authorization before any write.
+        state.revoked=YES;
+        state.picker.view.hidden=YES;
+        state.picker.navigationItem.rightBarButtonItem.enabled=NO;
+    }
 }

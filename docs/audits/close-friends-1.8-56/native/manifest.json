@@ -1,0 +1,285 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "disassembly": [
+    {
+      "file": "MemberListViewController--updateCount.asm",
+      "start": "0x104adb570",
+      "stop": "0x104adbba8",
+      "truncated": false
+    },
+    {
+      "file": "MemberListViewController--reloadTable.asm",
+      "start": "0x104adc2b0",
+      "stop": "0x104adc2ec",
+      "truncated": false
+    },
+    {
+      "file": "MemberListViewController--setMemberLogic_.asm",
+      "start": "0x104adc2ec",
+      "stop": "0x104adc34c",
+      "truncated": false
+    },
+    {
+      "file": "MemberListViewController--numberOfSectionsInTableView_.asm",
+      "start": "0x104adc438",
+      "stop": "0x104adc450",
+      "truncated": false
+    },
+    {
+      "file": "MemberListViewController--tableView_numberOfRowsInSection_.asm",
+      "start": "0x104adc684",
+      "stop": "0x104adc6a0",
+      "truncated": false
+    },
+    {
+      "file": "MemberListViewController--tableView_cellForRowAtIndexPath_.asm",
+      "start": "0x104adc6a0",
+      "stop": "0x104adc928",
+      "truncated": false
+    },
+    {
+      "file": "MemberListViewController--cellForSearchViewTable_index_.asm",
+      "start": "0x104adcb58",
+      "stop": "0x104adcc30",
+      "truncated": false
+    },
+    {
+      "file": "MemberListViewController--heightForSearchViewTable_.asm",
+      "start": "0x104adcc30",
+      "stop": "0x104adcc4c",
+      "truncated": false
+    },
+    {
+      "file": "MemberListViewController--didSearchViewTableSelect_.asm",
+      "start": "0x104adcc4c",
+      "stop": "0x104adcf40",
+      "truncated": false
+    },
+    {
+      "file": "MemberListViewController--hasNoSearchResult.asm",
+      "start": "0x104add2a4",
+      "stop": "0x104add300",
+      "truncated": false
+    },
+    {
+      "file": "MemberListViewController--doSearch_Pre_.asm",
+      "start": "0x104add300",
+      "stop": "0x104add370",
+      "truncated": false
+    },
+    {
+      "file": "MemberListViewController--usrNameConvertToOContacts_.asm",
+      "start": "0x104add3c4",
+      "stop": "0x104add400",
+      "truncated": false
+    },
+    {
+      "file": "ChatRoomListViewController--init.asm",
+      "start": "0x100ed76fc",
+      "stop": "0x100ed7730",
+      "truncated": false
+    },
+    {
+      "file": "ChatRoomListViewController--viewDidLoad.asm",
+      "start": "0x100ed7730",
+      "stop": "0x100ed78dc",
+      "truncated": false
+    },
+    {
+      "file": "ChatRoomListViewController--showContactInfoView_.asm",
+      "start": "0x100ed7a94",
+      "stop": "0x100ed7aa0",
+      "truncated": false
+    },
+    {
+      "file": "ChatRoomListViewController--onContactListUpdate_.asm",
+      "start": "0x100ed7f6c",
+      "stop": "0x100ed7fb4",
+      "truncated": false
+    },
+    {
+      "file": "ChatRoomListViewController--tableView_didSelectRowAtIndexPath_.asm",
+      "start": "0x100ed8110",
+      "stop": "0x100ed81f4",
+      "truncated": false
+    },
+    {
+      "file": "MemberDataLogic--getTotalCount.asm",
+      "start": "0x104ad9f98",
+      "stop": "0x104ad9fa8",
+      "truncated": false
+    },
+    {
+      "file": "MemberDataLogic--getAllContacts.asm",
+      "start": "0x104ad9fa8",
+      "stop": "0x104ad9fb0",
+      "truncated": false
+    },
+    {
+      "file": "MemberDataLogic--getKeyArray.asm",
+      "start": "0x104adad5c",
+      "stop": "0x104adad64",
+      "truncated": false
+    },
+    {
+      "file": "MemberDataLogic--getKeyAtSection_.asm",
+      "start": "0x104adad64",
+      "stop": "0x104adad74",
+      "truncated": false
+    },
+    {
+      "file": "MemberDataLogic--getSectionCount.asm",
+      "start": "0x104adad74",
+      "stop": "0x104adad84",
+      "truncated": false
+    },
+    {
+      "file": "MemberDataLogic--getSectionItemCount_.asm",
+      "start": "0x104adad84",
+      "stop": "0x104adae04",
+      "truncated": false
+    },
+    {
+      "file": "MemberDataLogic--getItemInSection_atRow_.asm",
+      "start": "0x104adae04",
+      "stop": "0x104adae94",
+      "truncated": false
+    },
+    {
+      "file": "MemberDataLogic--getFilteredContacts.asm",
+      "start": "0x104adb100",
+      "stop": "0x104adb108",
+      "truncated": false
+    },
+    {
+      "file": "MemberDataLogic--filtContactsByName_.asm",
+      "start": "0x104adb108",
+      "stop": "0x104adb430",
+      "truncated": false
+    },
+    {
+      "file": "FTSTopHitsSectionController--dataCellForItemAtIndex_indexPath_.asm",
+      "start": "0x1017fa9ac",
+      "stop": "0x1017fb478",
+      "truncated": false
+    },
+    {
+      "file": "FTSSingleContactSectionController--dataCellForItemAtIndex_indexPath_.asm",
+      "start": "0x1017e0260",
+      "stop": "0x1017e04fc",
+      "truncated": false
+    },
+    {
+      "file": "FTSGroupContactSectionController--dataCellForItemAtIndex_indexPath_.asm",
+      "start": "0x101759e3c",
+      "stop": "0x10175a1c8",
+      "truncated": false
+    },
+    {
+      "file": "FTSContactCell--prepareForReuse.asm",
+      "start": "0x1016a444c",
+      "stop": "0x1016a44a8",
+      "truncated": false
+    },
+    {
+      "file": "FTSContactCell--getTopHitDescrpition.asm",
+      "start": "0x1016a45b8",
+      "stop": "0x1016a47c8",
+      "truncated": false
+    },
+    {
+      "file": "FTSContactCell--updateStatus_.asm",
+      "start": "0x1016a47c8",
+      "stop": "0x1016a6424",
+      "truncated": false
+    },
+    {
+      "file": "FTSContactCell--updateContact_matchTip_.asm",
+      "start": "0x1016a6634",
+      "stop": "0x1016a6644",
+      "truncated": false
+    },
+    {
+      "file": "FTSContactCell--updateContact_matchTip_asTopHit_.asm",
+      "start": "0x1016a6644",
+      "stop": "0x1016a66dc",
+      "truncated": false
+    },
+    {
+      "file": "FTSContactCell--layoutSubviews.asm",
+      "start": "0x1016a66dc",
+      "stop": "0x1016a73a4",
+      "truncated": false
+    },
+    {
+      "file": "FTSFinderSectionController--dataCellForItemAtIndex_indexPath_.asm",
+      "start": "0x101730c9c",
+      "stop": "0x101730ef4",
+      "truncated": false
+    },
+    {
+      "file": "BaseMsgContentViewController--GetContact.asm",
+      "start": "0x1003356b4",
+      "stop": "0x100335768",
+      "truncated": false
+    },
+    {
+      "file": "BaseMsgContentViewController--GetCContact.asm",
+      "start": "0x100335768",
+      "stop": "0x1003357e4",
+      "truncated": false
+    },
+    {
+      "file": "SessionSelectController--cancelMultiSelect.asm",
+      "start": "0x1057d7234",
+      "stop": "0x1057d724c",
+      "truncated": false
+    }
+  ],
+  "files": {
+    "FTSContactCell--getTopHitDescrpition.asm": "cef9d3f899091332f4b5482af7667163882affdf4537d49191885b088a1caf53",
+    "MemberListViewController--cellForSearchViewTable_index_.asm": "d5314d2d4765fd85489a063a057380a6da9743bf22f5d2c5f6844cfd11ebb843",
+    "ChatRoomListViewController--onContactListUpdate_.asm": "d045873d8969b89fd8da9f0c30eafcc1beecf52f31679896fd4403006a0c5947",
+    "ChatRoomListViewController--tableView_didSelectRowAtIndexPath_.asm": "dc3635a3a9b422a5bfd16da08315f9a987970bfd66c5ba809b2a03a3ae10ddcb",
+    "MemberListViewController--doSearch_Pre_.asm": "9c74f813eee5838b1dbc833646f6c88b7fb0c1def88305e30e620f82f1bf8c10",
+    "ChatRoomListViewController--viewDidLoad.asm": "d633c439eebe9ac44dcb829664d5431912d9c19fd462fd76fbc7976cca0f8608",
+    "MemberListViewController--hasNoSearchResult.asm": "3665388e5245c8c4378558fbd4febf391eea7fb9caa52955b0f6f9cc29fe6353",
+    "MemberListViewController--setMemberLogic_.asm": "a2ee6efc89411c9178d927118bbe42f0fc209c6b6d30be56e2ffa800895beab9",
+    "MemberDataLogic--getAllContacts.asm": "acc1eff9f2d11b2de7fee12937e13c609018f2ab6d3a3a13dae6906c529f9647",
+    "MemberDataLogic--getTotalCount.asm": "b2ad9ee0f33ffa9e35103288c96aac39050addfd952d77aa563fc51a32a7d39a",
+    "FTSContactCell--prepareForReuse.asm": "8992e047f02ee6a4f203c38f9995ff78eba467da7d9688c132bfb59a7754d864",
+    "MemberDataLogic--getItemInSection_atRow_.asm": "491e6abd9ef502d89b8493f28b1c780a98b0aa984573826bf1529101d805b977",
+    "MemberListViewController--usrNameConvertToOContacts_.asm": "c62c6106dfc1eafeec0df151e0066a7985b0e7fb260aa54e9e398a1f4921f1a4",
+    "MemberListViewController--numberOfSectionsInTableView_.asm": "bd41b91f3681aaf719c26fe24afaef3e2a815632708bbe5785bb05870dbcec3d",
+    "MemberDataLogic--getSectionItemCount_.asm": "77fa2a070e7dd8263ca00217c19e694d65ce7356df8dc7f5cfb60af82a929ec7",
+    "FTSFinderSectionController--dataCellForItemAtIndex_indexPath_.asm": "9636cf748b66b37b8946c4ce5130e7f4274598e06c91069bc9e3e13e6386f8e3",
+    "MemberDataLogic--getFilteredContacts.asm": "e75ba49af21e6adfcb7ba1846b34042bc429817705f8afae8cd299e70fbf2bd6",
+    "FTSGroupContactSectionController--dataCellForItemAtIndex_indexPath_.asm": "ea92fc25f6202c9c02f4de50a6442e071b7224456a1fa2e0a3907a35749bc0da",
+    "MemberDataLogic--filtContactsByName_.asm": "2a25bea910935d787b36b450d7835329114e999288396e357a12be814feb4439",
+    "methods.json": "8c6612cf446e675d84c9fc59008d5e87d129ce416c1c30095359562c446a26e6",
+    "FTSContactCell--layoutSubviews.asm": "b9dce20941652cc1e723df16dbcac140848bd05dea4ccc422a7c80a55dcd7ccb",
+    "MemberListViewController--didSearchViewTableSelect_.asm": "9ef62c98ed8690d82acb84a489a1a3fc3705749bff852662043ac263c4f2afb9",
+    "FTSContactCell--updateStatus_.asm": "08d5520c92896e6f8b88b459059f3209bc04818a4b56124dc7b42728da86b76d",
+    "MemberListViewController--tableView_numberOfRowsInSection_.asm": "531863ab204cfdfd2ab3e0df17cfdd391985005717bcea6bef0b11287ff69cc2",
+    "ChatRoomListViewController--showContactInfoView_.asm": "362b1fec8d681a64ec7f74783ac692c5b5338fedaf398cbed2aab0f82790967e",
+    "MemberDataLogic--getSectionCount.asm": "75b1529257312700cd4b577cfbd96dd553b93359c593bc8705a250d35d0ca97c",
+    "MemberListViewController--tableView_cellForRowAtIndexPath_.asm": "48c10136b86fbfec09af8de98e5792954ce014ef03e873c968032fde2ee5d0d0",
+    "disassemble.py": "e68c338ed132423543c483c1a3f938224bd46229ae0aecd632a663b0aa34733a",
+    "SessionSelectController--cancelMultiSelect.asm": "1ab0830c1c0b3e61d44ae41d78b320214dbc62a6a817300baf00b8327e8168f7",
+    "MemberListViewController--updateCount.asm": "1303ee71a74ffe2aeba3d0e98adfbea7897d469367340502bbceae926a2f611d",
+    "ChatRoomListViewController--init.asm": "bde5f9ba23fa1f3ab259e304df3d008f7a9a28127edf9312710e91dececfe40b",
+    "FTSContactCell--updateContact_matchTip_asTopHit_.asm": "affd6ee14cafd7f953226c3df7d8505ee552cec8360b30dbfaf252046230b3a3",
+    "FTSContactCell--updateContact_matchTip_.asm": "081dd4efa12bc58b18f53f12e2c56b607fe09bcb4843ef8d2acfaae9d6380961",
+    "FTSTopHitsSectionController--dataCellForItemAtIndex_indexPath_.asm": "6de8183107957c42f44849e0e98dbaf29e55652b9594890adbd75fcd597cabc1",
+    "MemberListViewController--heightForSearchViewTable_.asm": "e297ca1cf05dd35ae63b8594f1fad3dc1a61c928c180cd361858887f5f4a55d5",
+    "BaseMsgContentViewController--GetContact.asm": "49a0fdebdf64d8f5d15c9788459a5b364e21bbc815d51a1ad8aaab6f66bd6a34",
+    "extract.py": "28dabbc8aaa039e5e693aa34429960b5de20a431705ecc0a17010eb33f1279a0",
+    "BaseMsgContentViewController--GetCContact.asm": "c8fc0ea81ff953fb25f0c1e0bae33efe37fc80b07bf0ab77f8da450032abd987",
+    "FTSSingleContactSectionController--dataCellForItemAtIndex_indexPath_.asm": "e120f46b8343dc6ce1e6dfde947339e871d809f60a429d78ec4e2fbf4ef30c10",
+    "MemberDataLogic--getKeyAtSection_.asm": "39554b3bd4fbabd0268e3b87a03d8d03782421a98306e3594b4469a5cf045913",
+    "MemberListViewController--reloadTable.asm": "b75e3423b66d94ca369c7b7631eaf09e93922808dba15757e58a9980e9260b28",
+    "MemberDataLogic--getKeyArray.asm": "1fc85942e293215c709475773f420bdc6216e1ab70ae98cd8f44ccda358b7fdb"
+  }
+}

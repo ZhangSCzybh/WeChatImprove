@@ -4,6 +4,7 @@
 #import "CSCloseFriendCrypto.h"
 #import "CSCloseFriendAccount.h"
 #import "CSCloseFriendShakeMonitor.h"
+#import "CSCloseFriendNavigation.h"
 #import "CSBackupBootstrap.h"
 #import <Security/Security.h>
 #import <LocalAuthentication/LocalAuthentication.h>
@@ -40,7 +41,7 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 @property(nonatomic,strong) NSTimer *timer;
 @property(nonatomic,strong) CSCloseFriendShakeMonitor *shakeMonitor;
 @property(nonatomic,weak) UIViewController *recoveryPage;
-@property(nonatomic) BOOL started, lastRevealed, authenticating, backgroundCoverRequired;
+@property(nonatomic) BOOL started, lastRevealed, authenticating, backgroundCoverRequired, routingProtectedChat;
 @end
 @implementation CSCloseFriendManager
 + (instancetype)sharedManager { static CSCloseFriendManager *instance; static dispatch_once_t once; dispatch_once(&once,^{ instance=[self new]; }); return instance; }
@@ -86,11 +87,13 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     }
 }
 - (void)uncover { for(UIView *view in self.covers)[view removeFromSuperview]; [self.covers removeAllObjects]; }
-- (void)returnSafe:(UIViewController *)controller {
-    if(controller.presentedViewController)[controller dismissViewControllerAnimated:NO completion:nil];
-    if([controller isKindOfClass:UINavigationController.class])[(UINavigationController *)controller popToRootViewControllerAnimated:NO];
-    if([controller isKindOfClass:UITabBarController.class])[(UITabBarController *)controller setSelectedIndex:0];
-    for(UIViewController *child in controller.childViewControllers)[self returnSafe:child];
+- (void)returnToChatListIfNeeded {
+    if(self.routingProtectedChat) return;
+    self.routingProtectedChat=YES;
+    @try {
+        for(UIWindow *window in [self windows])
+            if(!window.hidden) CSCFReturnProtectedChatToList(window.rootViewController,self.recoveryPage);
+    } @finally { self.routingProtectedChat=NO; }
 }
 - (void)lockAndReturnToSafePage {
     NSAssert(NSThread.isMainThread,@"UI on main");
@@ -100,8 +103,12 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     if(sensitive)[self cover];
     [self.authenticationContext invalidate]; self.authenticationContext=nil; self.authenticating=NO;
     [self.runtime lock]; self.lastRevealed=NO;
-    if(sensitive)for(UIWindow *window in [self windows])[self returnSafe:window.rootViewController];
-    if(!self.backgroundCoverRequired && UIApplication.sharedApplication.applicationState==UIApplicationStateActive)[self uncover];
+    if(sensitive) [self returnToChatListIfNeeded];
+    // Let the queued policy observers refresh the current page before lifting the
+    // privacy cover. Relocking must not reset an unrelated navigation stack.
+    dispatch_async(dispatch_get_main_queue(),^{
+        if(!self.backgroundCoverRequired && UIApplication.sharedApplication.applicationState==UIApplicationStateActive) [self uncover];
+    });
 }
 - (void)start {
     NSAssert(NSThread.isMainThread,@"UI on main"); if(self.started)return; self.started=YES;

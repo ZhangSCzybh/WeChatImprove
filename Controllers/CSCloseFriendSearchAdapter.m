@@ -184,15 +184,6 @@ BOOL CSCFSearchGated(id section) {
     // These contracts cannot distinguish protected group authors and aggregate payloads safely.
     return CSCFIsClass(section,@"FTSMessageSectionController") || CSCFIsClass(section,@"FTSSearchContactSectionController");
 }
-@interface CSCFGroupResultCover : UIView
-@property(nonatomic,strong) NSMapTable<UIView *,NSNumber *> *hiddenStates;
-@property(nonatomic,strong) id originalElements;
-@property(nonatomic,copy) NSString *originalLabel;
-@property(nonatomic) BOOL originalElement;
-@property(nonatomic,strong) UILabel *titleLabel;
-@end
-@implementation CSCFGroupResultCover @end
-static char GroupCoverKey;
 static NSString *GroupDisplayTitle(id item) {
     item=CSCFSearchModel(item);
     NSString *username=CSCloseFriendUserName(item);
@@ -211,35 +202,13 @@ static NSString *GroupDisplayTitle(id item) {
     }
     return nil;
 }
-static UIView *FindGroupAvatar(UIView *view) {
-    if(CSCFIsClass(view,@"MMHeadImageView")) return view;
-    for(UIView *child in view.subviews) {UIView *found=FindGroupAvatar(child); if(found) return found;}
-    return nil;
+BOOL CSCFSearchRedactsGroupMatch(id contact) {
+    return [CSCloseFriendUserName(contact) hasSuffix:@"@chatroom"] &&
+        CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceSearch);
 }
-void CSCFSearchUpdateGroupCell(id object,id item) {
-    if(![object isKindOfClass:UITableViewCell.class]) return;
-    UITableViewCell *cell=object; CSCFGroupResultCover *cover=objc_getAssociatedObject(cell,&GroupCoverKey);
-    NSString *title=GroupDisplayTitle(item);
-    BOOL masked=title && CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceSearch);
-    {
-        if(cover) {
-            for(UIView *child in cover.hiddenStates) child.hidden=[[cover.hiddenStates objectForKey:child] boolValue];
-            cell.isAccessibilityElement=cover.originalElement; cell.accessibilityElements=cover.originalElements; cell.accessibilityLabel=cover.originalLabel;
-            [cover removeFromSuperview]; objc_setAssociatedObject(cell,&GroupCoverKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC); cover=nil;
-        }
-        if(!masked) return;
-    }
-    if(!cover) {
-        cover=[[CSCFGroupResultCover alloc] initWithFrame:cell.contentView.bounds]; cover.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight; cover.userInteractionEnabled=NO;
-        cover.hiddenStates=[NSMapTable weakToStrongObjectsMapTable]; cover.originalElement=cell.isAccessibilityElement; cover.originalElements=cell.accessibilityElements; cover.originalLabel=cell.accessibilityLabel;
-        UIView *head=FindGroupAvatar(cell.contentView); UIView *avatar=[head snapshotViewAfterScreenUpdates:NO];
-        if(!avatar) {UIImageView *fallback=[[UIImageView alloc] initWithImage:[UIImage systemImageNamed:@"person.2.fill"]]; fallback.tintColor=UIColor.secondaryLabelColor; fallback.contentMode=UIViewContentModeScaleAspectFit; avatar=fallback;}
-        avatar.frame=CGRectMake(16,10,40,40); avatar.autoresizingMask=UIViewAutoresizingFlexibleBottomMargin; [cover addSubview:avatar];
-        UILabel *label=[[UILabel alloc] initWithFrame:CGRectMake(72,0,MAX(0,cover.bounds.size.width-88),cover.bounds.size.height)]; label.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight; label.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody]; label.textColor=UIColor.labelColor; label.numberOfLines=2; cover.titleLabel=label; [cover addSubview:label];
-        cover.isAccessibilityElement=YES; objc_setAssociatedObject(cell,&GroupCoverKey,cover,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    cover.titleLabel.text=title; cover.accessibilityLabel=title; cover.backgroundColor=cell.contentView.backgroundColor ?: cell.backgroundColor ?: UIColor.systemBackgroundColor;
-    for(UIView *child in cell.contentView.subviews) if(child!=cover) {if(![cover.hiddenStates objectForKey:child]) [cover.hiddenStates setObject:@(child.hidden) forKey:child]; child.hidden=YES;}
-    if(cover.superview!=cell.contentView) [cell.contentView addSubview:cover]; [cell.contentView bringSubviewToFront:cover];
-    cell.isAccessibilityElement=NO; cell.accessibilityLabel=nil; cell.accessibilityElements=@[cover];
+void CSCFSearchUpdateGroupCell(id cell,id contact) {
+    if(!CSCFSearchRedactsGroupMatch(contact)) return;
+    // Keep WeChat's live avatar, hierarchy and layout. Only substitute the public
+    // group title, avoiding fallback names generated from protected group members.
+    CSCFSetObject(CSCloseFriendRead(cell,@"_displayNameLabel"),@"setText:",GroupDisplayTitle(contact));
 }

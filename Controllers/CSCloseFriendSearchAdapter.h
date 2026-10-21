@@ -11,6 +11,7 @@ FOUNDATION_EXPORT BOOL CSCFSearchPrepare(id section);
 FOUNDATION_EXPORT void CSCFSearchDidRender(id section);
 FOUNDATION_EXPORT BOOL CSCFSearchAllowsSelection(id section);
 FOUNDATION_EXPORT BOOL CSCFSearchGated(id section);
+FOUNDATION_EXPORT BOOL CSCFSearchRedactsGroupMatch(id contact);
 FOUNDATION_EXPORT void CSCFSearchUpdateGroupCell(id cell,id item);
 FOUNDATION_EXPORT BOOL CSCFSearchConsumePassword(id page,id input);
 FOUNDATION_EXPORT BOOL CSCFSearchSuppressLoading(id page);

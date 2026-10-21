@@ -22,7 +22,8 @@
         self.requestingAuthentication=YES;
         [CSCloseFriendManager.sharedManager authenticateFrom:self completion:^(BOOL success){
             self.requestingAuthentication=NO; [self.tableView reloadData];
-            if(!success) { if(self.navigationController.viewControllers.firstObject==self)[self dismissViewControllerAnimated:YES completion:nil];else [self.navigationController popViewControllerAnimated:YES]; }
+            // A relock or cancelled authentication clears sensitive rows in place.
+            (void)success;
         }];
     }
 }

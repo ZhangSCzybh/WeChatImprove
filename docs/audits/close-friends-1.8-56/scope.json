@@ -1,0 +1,34 @@
+{
+  "code_baseline": "26a91d89",
+  "original_checkout_head": "929d265b715f4a15b514bd0621c8eb01f0861483",
+  "allowed_production_changes": [
+    "Controllers/CSCloseFriendContactAdapter.m",
+    "Controllers/CSCloseFriendGroupListAdapter.h",
+    "Controllers/CSCloseFriendGroupListAdapter.m",
+    "Controllers/CSCloseFriendManager.h",
+    "Controllers/CSCloseFriendManager.m",
+    "Controllers/CSCloseFriendNavigation.h",
+    "Controllers/CSCloseFriendNavigation.m",
+    "Controllers/CSCloseFriendSearchAdapter.h",
+    "Controllers/CSCloseFriendSearchAdapter.m",
+    "Controllers/CSCloseFriendSettingsViewController.m",
+    "Controllers/CSCloseFriendStatusAdapter.m",
+    "Controllers/CSNativeContactPicker.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/CloseFriendContactHooks.xm",
+    "Hooks/CloseFriendLifecycleHooks.xm",
+    "Hooks/CloseFriendSearchHooks.xm",
+    "control"
+  ],
+  "preserved_adapters": {
+    "Controllers/CSCloseFriendAlbumAdapter.m": "4862a8bc1dc9f6f8354910996ad2290fcfe7769c0b00cc1eefc5a7fddbc20fd2",
+    "Controllers/CSCloseFriendTimelineAdapter.m": "fb4c5f70e201b7bc46b769a87b5194754c9f3c7702970ba1eb3417c582652988",
+    "Controllers/CSCloseFriendDetailAdapter.m": "efa12127fad0855cdf8a793aed67533db6ccd3e26c0f9ccf3ef914943df7353c",
+    "Controllers/CSCloseFriendCallAdapter.m": "dba7a6ab8d6f13c1cf94748d8c6d35413d9b8cde2e54926db8201a135d466262",
+    "Controllers/CSCloseFriendCallReply.m": "fe32ccdefd9e0eff5dd9626e8505a7754f94f9262bf5e79fd5cd638a19fe0d6a",
+    "Controllers/CSBackupAssets.m": "44127c4c90801893f572480edc89403a72f1c519b623a1cc2b3c9ec78c9a5b5e",
+    "Controllers/CSGroupListAdapter.m": "dce56e358fbfeb2e40a03cae517725c79bed3d8c131b2197d8629bd37c3852d1",
+    "Hooks/SessionGroupHooks.xm": "a70c542721185d3c00723df8188713fbbc57e099f88ae45b9d7d575a821c0c5d"
+  }
+}

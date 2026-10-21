@@ -14,9 +14,6 @@ static void Track(id owner) {
             // Revealed card state must never survive a relock, even if the native sliding window caches it.
             if(CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceStatus)) {
                 CSCFSocialGate(cards,CSCloseFriendSurfaceStatus,YES);
-                UIViewController *vc=cards;
-                if(vc.presentingViewController) [vc dismissViewControllerAnimated:NO completion:nil];
-                else if(vc.navigationController.topViewController==vc) [vc.navigationController popViewControllerAnimated:NO];
             } else CSCFCallVoid(cards,@"reloadData");
         }
     });
@@ -101,9 +98,6 @@ static void InstallCards(void) {
         CSCFSocialTrack(page,^(id owner){
             if(CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceStatus)) {
                 CSCFSocialGate(owner,CSCloseFriendSurfaceStatus,YES);
-                UIViewController *vc=owner;
-                if(vc.presentingViewController) [vc dismissViewControllerAnimated:NO completion:nil];
-                else if(vc.navigationController.topViewController==vc) [vc.navigationController popViewControllerAnimated:NO];
             } else {CSCFSocialGate(owner,CSCloseFriendSurfaceStatus,NO); CSCFCallVoid(owner,@"reloadData");}
         });
     });

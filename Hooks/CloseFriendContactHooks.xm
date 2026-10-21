@@ -1,5 +1,6 @@
 #import "../Controllers/CSCloseFriendContactAdapter.h"
 #import <objc/message.h>
+#import "../Controllers/CSCloseFriendGroupListAdapter.h"
 static char ProjectionKey;
 static id (*OriginalKeys)(id,SEL);
 static id (*OriginalRows)(id,SEL,id);
@@ -146,4 +147,4 @@ static void InstallContacts(void) {
     CSCloseFriendRecordCapability(@"tags.search.filtered",NO);
     CSCloseFriendRecordCapability(@"forward.message-search.filtered",NO);
 }
-%ctor { dispatch_async(dispatch_get_main_queue(),^{ InstallContacts(); }); }
+%ctor { dispatch_async(dispatch_get_main_queue(),^{ InstallContacts(); CSCFGroupListInstall(); }); }

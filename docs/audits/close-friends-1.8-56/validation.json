@@ -1,0 +1,93 @@
+{
+  "version": "1.8-56",
+  "scheme": "rootless",
+  "checkout": "/Users/zhangshichao/.codex/worktrees/close-friends-148/WeChatImprove",
+  "branch": "codex/close-friends-148",
+  "base_commit": "26a91d89",
+  "source_identity": "source-manifest.json",
+  "metadata": {
+    "Package": "com.wechat.improve",
+    "Version": "1.8-56",
+    "Architecture": "iphoneos-arm64",
+    "Depends": "mobilesubstrate (>= 0.9.5000)"
+  },
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "minimum_ios": "15.0",
+  "artifact": {
+    "path": "packages/com.wechat.improve_1.8-56_iphoneos-arm64.deb",
+    "sha256": "acdb1a8dda6457e1da9a84d64486fc14bc34e29693a9a5cb2084228f1b001fd4",
+    "bytes": 1128434
+  },
+  "dylib_sha256": "be876646512bffcc0a43d7fae784231b4a8a94bab02d3752062d69beeb3ce83e",
+  "dSYM_UUIDs": {
+    "arm64": "6CE85273-1AF8-373B-A8C0-F0FA405471F6",
+    "arm64e": "9575233D-FE67-35B8-83D5-996AE56EBE1D"
+  },
+  "source_matches_manifest": true,
+  "production_scope_verified": true,
+  "forced_footer_layout_selector_absent": true,
+  "core_motion_linked_both_architectures": true,
+  "package_matches_build_and_stage": true,
+  "version_agreement": true,
+  "injection_filter_unchanged": true,
+  "prior_artifacts_unchanged": true,
+  "host_results": [
+    {
+      "command": [
+        "bash",
+        "Tests/verify-close-friend-contacts.sh"
+      ],
+      "exit_code": 0,
+      "result": "Search zero unlock placeholders; native live suggestions/web/history/submit; exact password, late callbacks, IME; contact/profile/forwarding regressions passed."
+    },
+    {
+      "command": [
+        "bash",
+        "Tests/verify-native-contact-picker.sh"
+      ],
+      "exit_code": 0,
+      "result": "72 checks passed: multiselection/save/cancel/clearing, recursion guard, relock stays on picker with hidden contents and invalidated Done."
+    },
+    {
+      "command": [
+        "bash",
+        "Tests/verify-close-friend-social.sh"
+      ],
+      "exit_code": 0,
+      "result": "Social routes, native timeline presentation, interactions, ACL/reminder selections, status mapping and reveal/relock/account transitions passed."
+    },
+    {
+      "command": [
+        "bash",
+        "Tests/verify-close-friend-shake.sh"
+      ],
+      "exit_code": 0,
+      "result": "18 checks passed: recognition, lifecycle, stale callbacks and native fallback."
+    },
+    {
+      "command": [
+        "bash",
+        "Tests/verify-close-friend-ios.sh",
+        "--surfaces"
+      ],
+      "exit_code": 0,
+      "result": "arm64 and arm64e strict object compilation passed before final visible-chat container adjustment; final dual-architecture package recompiles it."
+    },
+    {
+      "command": [
+        "bash",
+        "Tests/verify-close-friend-pages.sh"
+      ],
+      "exit_code": 0,
+      "result": "Close-friend pages: 38 checks passed\n"
+    }
+  ],
+  "build_exit_code": 0,
+  "delivery_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/com.wechat.improve_1.8-56_iphoneos-arm64.deb",
+  "delivery_matches_build": true,
+  "original_checkout_head": "929d265b715f4a15b514bd0621c8eb01f0861483",
+  "device_validation": "Pending real-device appearance acceptance. Isolated host fixtures passed 38 group-list/navigation/search-cell checks, 72 native-picker checks, 18 shake checks, and existing contact/search/social regressions. Strict surface compilation and the final package passed for arm64 and arm64e. No device installation or live account writes performed."
+}

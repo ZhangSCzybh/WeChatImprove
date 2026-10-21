@@ -134,7 +134,6 @@ static void TypeSearch(FTSHomeViewController *page,NSString *query) {
 // aggregate has zero items; no substitute row or unlock action is manufactured.
 @interface UITableViewCell : NSObject @end
 @implementation UITableViewCell @end
-static void CSCFSearchUpdateGroupCell(id cell,id item) {(void)cell;(void)item;}
 #include "SearchSectionBodies.h"
 @interface NativeSearchSection : NSObject
 @property(nonatomic) NSUInteger cellCalls,selections,loads;

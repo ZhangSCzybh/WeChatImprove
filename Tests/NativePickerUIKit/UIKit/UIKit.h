@@ -1,5 +1,8 @@
 #import <Foundation/Foundation.h>
 typedef NS_ENUM(NSInteger,UIModalPresentationStyle){UIModalPresentationFullScreen};
+@interface UIView : NSObject
+@property(nonatomic) BOOL hidden;
+@end
 @class UINavigationController;
 @interface UIBarButtonItem : NSObject
 @property(nonatomic) BOOL enabled;
@@ -11,6 +14,7 @@ typedef NS_ENUM(NSInteger,UIModalPresentationStyle){UIModalPresentationFullScree
 @property(nonatomic,strong) UIBarButtonItem *rightBarButtonItem;
 @end
 @interface UIViewController : NSObject
+@property(nonatomic,strong) UIView *view;
 @property(nonatomic,copy) NSString *title;
 @property(nonatomic,strong) UINavigationItem *navigationItem;
 @property(nonatomic,weak) UINavigationController *navigationController;

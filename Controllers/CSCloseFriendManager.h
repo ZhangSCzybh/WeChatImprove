@@ -7,6 +7,7 @@
 - (void)refreshAccount;
 - (void)lockAndReturnToSafePage;
 - (void)handleShake;
+- (void)returnToChatListIfNeeded;
 - (void)authenticateFrom:(UIViewController *)presenter completion:(void (^)(BOOL))completion;
 - (void)presentSettingsFrom:(UIViewController *)presenter;
 - (void)changePasswordFrom:(UIViewController *)presenter;
