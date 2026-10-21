@@ -1,7 +1,10 @@
 #import "CSNativeContactPicker.h"
 #import "CSGroupNativeBridge.h"
 #import <objc/message.h>
+#import <objc/runtime.h>
 static NSUInteger checks, nativeDoneCalls;
+static NSUInteger groupInitCalls, groupButtonCalls, friendButtonCalls;
+static BOOL wrapPickerBeforeLoad;
 static NSString *account=@"me";
 static void (^duringDismissal)(void);
 static void Check(BOOL ok,NSString *message){checks++;if(!ok){fprintf(stderr,"FAIL: %s\n",message.UTF8String);exit(1);}}
@@ -12,7 +15,19 @@ static void Check(BOOL ok,NSString *message){checks++;if(!ok){fprintf(stderr,"FA
 - (void)viewDidLoad {}
 - (void)presentViewController:(UIViewController *)controller animated:(BOOL)animated completion:(void(^)(void))completion {
     self.presentedViewController=controller;controller.presentingViewController=self;
-    [[(UINavigationController *)controller topViewController] viewDidLoad];if(completion)completion();
+    if([controller isKindOfClass:UINavigationController.class]) [[(UINavigationController *)controller topViewController] loadViewIfNeeded];
+    if(completion)completion();
+}
+- (void)loadViewIfNeeded {
+    if(self.isViewLoaded)return;
+    // UIKit appearance tagging can insert a runtime subclass just before viewDidLoad.
+    if(wrapPickerBeforeLoad && [NSStringFromClass(object_getClass(self)) hasPrefix:@"CSNativeSettings"]) {
+        Class base=object_getClass(self);NSString *name=[@"Appearance_" stringByAppendingString:NSStringFromClass(base)];
+        Class wrapper=NSClassFromString(name);
+        if(!wrapper){wrapper=objc_allocateClassPair(base,name.UTF8String,0);objc_registerClassPair(wrapper);}
+        object_setClass(self,wrapper);
+    }
+    self.isViewLoaded=YES;[self viewDidLoad];
 }
 - (void)dismissViewControllerAnimated:(BOOL)animated completion:(void(^)(void))completion {
     self.presentingViewController.presentedViewController=nil;
@@ -64,7 +79,7 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 - (void)onDone:(id)sender {[self actionDone];}
 - (void)actionCancel {nativeDoneCalls++;}
 - (void)onCancel:(id)sender {[self actionCancel];}
-- (void)updateRightBarItemEnabled:(BOOL)enabled {self.navigationItem.rightBarButtonItem.enabled=enabled;}
+- (void)updateRightBarItemEnabled:(BOOL)enabled {friendButtonCalls++;self.navigationItem.rightBarButtonItem.enabled=enabled;}
 @end
 @interface GroupSelectContactsViewController : UIViewController
 @property(nonatomic,weak) id m_delegate;
@@ -79,12 +94,12 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 - (void)updateRightBarBtn;
 @end
 @implementation GroupSelectContactsViewController
-- (void)initData {self.m_dicMultiSelect=[NSMutableDictionary dictionary];}
+- (void)initData {groupInitCalls++;self.m_dicMultiSelect=[NSMutableDictionary dictionary];}
 - (void)viewDidLoad {[self initData];[self updateRightBarBtn];}
 - (void)actionDone {nativeDoneCalls++;}
 - (void)onDone {[self actionDone];}
 - (void)onCancelBack:(id)sender {nativeDoneCalls++;}
-- (void)updateRightBarBtn {self.navigationItem.rightBarButtonItem.enabled=self.m_dicMultiSelect.count>0;}
+- (void)updateRightBarBtn {groupButtonCalls++;self.navigationItem.rightBarButtonItem.enabled=self.m_dicMultiSelect.count>0;}
 @end
 static UIViewController *Picker(UIViewController *presenter){return [(UINavigationController *)presenter.presentedViewController topViewController];}
 int main(void){@autoreleasepool{
@@ -127,5 +142,30 @@ int main(void){@autoreleasepool{
     NSUInteger previous=saves;CSNativeContactPickerPresent(presenter,@"密友",NO,@[],nil,save,&error);friends=(id)Picker(presenter);friends.m_selectView.m_dicMultiSelect=nil;[friends onDone:nil];
     Check(saves==previous,@"missing native result never clears stored names");
     Check(nativeDoneCalls==0,@"settings Done/Cancel never invokes native send/create-group actions");
+    wrapPickerBeforeLoad=YES;
+    NSUInteger initializations=groupInitCalls,updates=groupButtonCalls;
+    Check(CSNativeContactPickerPresent(presenter,@"密友群聊",YES,@[@"room@chatroom"],nil,save,&error),@"group picker opens with appearance runtime subclass");
+    groups=(id)Picker(presenter);
+    Check(groupInitCalls==initializations+1&&groupButtonCalls==updates+1,@"runtime wrapper forwards each native group method exactly once");
+    [groups.m_dicMultiSelect removeAllObjects];groups.m_dicMultiSelect[@"changed@chatroom"]=Contact(@"changed@chatroom");
+    [groups initData];[groups updateRightBarBtn];
+    Check(groupInitCalls==initializations+2&&groupButtonCalls==updates+2&&groups.m_dicMultiSelect[@"changed@chatroom"],@"wrapped reinitialization preserves live selection without recursion");
+    [groups onDone];Check([saved isEqual:@[@"changed@chatroom"]],@"wrapped group picker completes normally");
+    updates=friendButtonCalls;
+    Check(CSNativeContactPickerPresent(presenter,@"密友名单",NO,@[],nil,save,&error),@"friend picker opens with appearance runtime subclass");
+    friends=(id)Picker(presenter);[friends updateRightBarItemEnabled:NO];
+    Check(friendButtonCalls==updates+2&&friends.navigationItem.rightBarButtonItem.enabled,@"wrapped friend button forwards once and allows empty list");
+    [friends actionCancel];
+    for(NSString *title in @[@"白名单群",@"黑名单群"]) {
+        previous=saves;initializations=groupInitCalls;updates=groupButtonCalls;
+        Check(CSNativeContactPickerPresent(presenter,title,YES,@[@"room@chatroom"],nil,save,&error),[title stringByAppendingString:@" opens the shared native group picker"]);
+        groups=(id)Picker(presenter);
+        Check([groups.title isEqual:title]&&groupInitCalls==initializations+1&&groupButtonCalls==updates+1&&groups.m_dicMultiSelect[@"room@chatroom"],@"red envelope group picker loads once with its existing selection");
+        [groups.m_dicMultiSelect removeAllObjects];[groups updateRightBarBtn];[groups onDone];
+        Check(saves==previous+1&&saved.count==0&&!presenter.presentedViewController,@"red envelope group picker saves and dismisses");
+        CSNativeContactPickerPresent(presenter,title,YES,@[@"room@chatroom"],nil,save,&error);
+        groups=(id)Picker(presenter);[groups.m_dicMultiSelect removeAllObjects];[groups onCancelBack:nil];
+        Check(saves==previous+1&&!presenter.presentedViewController,@"red envelope group picker cancel preserves the stored list");
+    }
     printf("Native contact picker: %lu checks passed\n",(unsigned long)checks);
 }return 0;}

@@ -74,29 +74,35 @@ static void PickerDoneWithSender(id picker, SEL command, id sender) { PickerDone
 static void PickerCancel(id picker, SEL command) { [State(picker) finish:NO]; }
 static void PickerCancelWithSender(id picker, SEL command, id sender) { PickerCancel(picker,command); }
 
-static Class NativeBase(id picker) {
-    return class_getSuperclass(object_getClass(picker));
-}
+// Capture the native implementations at registration. UIKit appearance tagging
+// can subclass the instance again during view loading; its runtime superclass
+// then points to our override, not to the native implementation.
+static IMP NativeGroupInitData, NativeGroupUpdateButton, NativeFriendUpdateButton;
 static void PickerInitData(id picker, SEL command) {
     CSNativePickerState *state=State(picker);
     NSDictionary *selection=state.seeded ? Get(picker,@"m_dicMultiSelect") : state.preselected;
     // GroupSelectContactsViewController.initData creates a new selection dictionary.
     // Seed after that reset, before the native table/search UI is initialized.
-    ((void(*)(id,SEL))class_getMethodImplementation(NativeBase(picker),command))(picker,command);
+    ((void(*)(id,SEL))NativeGroupInitData)(picker,command);
     if(!state)return;
     Set(picker,@"setM_dicMultiSelect:",[selection mutableCopy] ?: [NSMutableDictionary dictionary]);
     state.seeded=YES;
 }
 static void PickerUpdateGroupButton(UIViewController *picker, SEL command) {
-    ((void(*)(id,SEL))class_getMethodImplementation(NativeBase(picker),command))(picker,command);
+    ((void(*)(id,SEL))NativeGroupUpdateButton)(picker,command);
     picker.navigationItem.rightBarButtonItem.enabled=YES; // Saving an empty settings list is valid.
 }
 static void PickerUpdateFriendButton(id picker, SEL command, BOOL enabled) {
-    ((void(*)(id,SEL,BOOL))class_getMethodImplementation(NativeBase(picker),command))(picker,command,YES);
+    ((void(*)(id,SEL,BOOL))NativeFriendUpdateButton)(picker,command,YES);
 }
 static BOOL Override(Class cls, Class base, NSString *name, IMP implementation, const char *type) {
     Method method=class_getInstanceMethod(base,NSSelectorFromString(name));
     return CSCloseFriendMethodMatches(method,type) && class_addMethod(cls,NSSelectorFromString(name),implementation,method_getTypeEncoding(method));
+}
+static BOOL OverrideForwarding(Class cls, Class base, NSString *name, IMP implementation, const char *type, IMP *original) {
+    if(!Override(cls,base,name,implementation,type))return NO;
+    *original=method_getImplementation(class_getInstanceMethod(base,NSSelectorFromString(name)));
+    return YES;
 }
 static Class PickerClass(BOOL groups) {
     NSString *name=groups?@"CSNativeSettingsGroupPicker":@"CSNativeSettingsFriendPicker";
@@ -110,14 +116,14 @@ static Class PickerClass(BOOL groups) {
     if(!Matches(base,@"m_dicMultiSelect","@@:"))return Nil;
     Class cls=objc_allocateClassPair(base,name.UTF8String,0);if(!cls)return Nil;
     BOOL ok=Override(cls,base,@"actionDone",(IMP)PickerDone,"v@:");
-    if(groups)ok=ok && Override(cls,base,@"initData",(IMP)PickerInitData,"v@:") &&
+    if(groups)ok=ok && OverrideForwarding(cls,base,@"initData",(IMP)PickerInitData,"v@:",&NativeGroupInitData) &&
         Override(cls,base,@"onDone",(IMP)PickerDone,"v@:") &&
         Override(cls,base,@"onCancelBack:",(IMP)PickerCancelWithSender,"v@:@") &&
-        Override(cls,base,@"updateRightBarBtn",(IMP)PickerUpdateGroupButton,"v@:");
+        OverrideForwarding(cls,base,@"updateRightBarBtn",(IMP)PickerUpdateGroupButton,"v@:",&NativeGroupUpdateButton);
     else ok=ok && Override(cls,base,@"onDone:",(IMP)PickerDoneWithSender,"v@:@") &&
         Override(cls,base,@"actionCancel",(IMP)PickerCancel,"v@:") &&
         Override(cls,base,@"onCancel:",(IMP)PickerCancelWithSender,"v@:@") &&
-        Override(cls,base,@"updateRightBarItemEnabled:",(IMP)PickerUpdateFriendButton,"v@:B");
+        OverrideForwarding(cls,base,@"updateRightBarItemEnabled:",(IMP)PickerUpdateFriendButton,"v@:B",&NativeFriendUpdateButton);
     if(!ok){objc_disposeClassPair(cls);return Nil;}
     objc_registerClassPair(cls);return cls;
 }

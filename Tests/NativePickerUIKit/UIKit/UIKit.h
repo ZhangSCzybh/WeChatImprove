@@ -14,7 +14,9 @@ typedef NS_ENUM(NSInteger,UIModalPresentationStyle){UIModalPresentationFullScree
 @property(nonatomic,weak) UIViewController *presentingViewController;
 @property(nonatomic,strong) UIViewController *presentedViewController;
 @property(nonatomic) UIModalPresentationStyle modalPresentationStyle;
+@property(nonatomic) BOOL isViewLoaded;
 - (void)viewDidLoad;
+- (void)loadViewIfNeeded;
 - (void)presentViewController:(UIViewController *)controller animated:(BOOL)animated completion:(void(^)(void))completion;
 - (void)dismissViewControllerAnimated:(BOOL)animated completion:(void(^)(void))completion;
 @end
