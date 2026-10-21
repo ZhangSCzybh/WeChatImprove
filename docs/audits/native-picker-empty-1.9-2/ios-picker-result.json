@@ -1,0 +1,56 @@
+[
+  {
+    "architecture": "arm64",
+    "command": [
+      "xcrun",
+      "--sdk",
+      "iphoneos",
+      "clang",
+      "-target",
+      "arm64-apple-ios15.0",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk",
+      "-fobjc-arc",
+      "-fblocks",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-unused-parameter",
+      "-IControllers",
+      "-IHeaders",
+      "-c",
+      "Controllers/CSNativeContactPicker.m",
+      "-o",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-picker-empty-1.9-2-qpo4ut_0/CSNativeContactPicker.arm64.o"
+    ],
+    "exit_code": 0,
+    "diagnostics": ""
+  },
+  {
+    "architecture": "arm64e",
+    "command": [
+      "xcrun",
+      "--sdk",
+      "iphoneos",
+      "clang",
+      "-target",
+      "arm64e-apple-ios15.0",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk",
+      "-fobjc-arc",
+      "-fblocks",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-unused-parameter",
+      "-IControllers",
+      "-IHeaders",
+      "-c",
+      "Controllers/CSNativeContactPicker.m",
+      "-o",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-picker-empty-1.9-2-qpo4ut_0/CSNativeContactPicker.arm64e.o"
+    ],
+    "exit_code": 0,
+    "diagnostics": ""
+  }
+]

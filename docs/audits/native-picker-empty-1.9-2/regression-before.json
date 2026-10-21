@@ -1,0 +1,10 @@
+{
+  "command": [
+    "bash",
+    "Tests/verify-native-contact-picker.sh"
+  ],
+  "exit_code": 1,
+  "elapsed_seconds": 2.38,
+  "expected_failure": "friend Done permits clearing the last entry",
+  "failed_as_expected": true
+}

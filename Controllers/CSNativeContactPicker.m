@@ -77,7 +77,7 @@ static void PickerCancelWithSender(id picker, SEL command, id sender) { PickerCa
 // Capture the native implementations at registration. UIKit appearance tagging
 // can subclass the instance again during view loading; its runtime superclass
 // then points to our override, not to the native implementation.
-static IMP NativeGroupInitData, NativeGroupUpdateButton, NativeFriendUpdateButton;
+static IMP NativeGroupInitData, NativeGroupUpdateButton, NativeFriendUpdateButton, NativeFriendUpdatePanel;
 static void PickerInitData(id picker, SEL command) {
     CSNativePickerState *state=State(picker);
     NSDictionary *selection=state.seeded ? Get(picker,@"m_dicMultiSelect") : state.preselected;
@@ -93,7 +93,24 @@ static void PickerUpdateGroupButton(UIViewController *picker, SEL command) {
     picker.navigationItem.rightBarButtonItem.enabled=[State(picker) valid]; // An authorized empty list can be saved.
 }
 static void PickerUpdateFriendButton(id picker, SEL command, BOOL enabled) {
-    ((void(*)(id,SEL,BOOL))NativeFriendUpdateButton)(picker,command,[State(picker) valid]);
+    BOOL allowed=[State(picker) valid];
+    ((void(*)(id,SEL,BOOL))NativeFriendUpdateButton)(picker,command,allowed);
+    // Bottom-toolbar layouts have no navigation right item. WeChat moves the
+    // internal item's custom UIButton into ContactSelectToolView and keeps its
+    // own completeHandler. Update that actual control as well as the source item.
+    id item=Get(picker,@"m_panelBtnItem");
+    if([item isKindOfClass:UIBarButtonItem.class])[(UIBarButtonItem *)item setEnabled:allowed];
+    id panelButton=Get(picker,@"m_panelBtn");
+    if([panelButton isKindOfClass:UIControl.class])[(UIControl *)panelButton setEnabled:allowed];
+    id completeButton=Get(CSGroupReadObject(picker,@"m_toolView"),@"completeButton");
+    if([completeButton isKindOfClass:UIControl.class])[(UIControl *)completeButton setEnabled:allowed];
+}
+static void PickerUpdateFriendPanel(id picker, SEL command) {
+    ((void(*)(id,SEL))NativeFriendUpdatePanel)(picker,command);
+    // Native updatePanelBtn replaces the item and disables empty selections
+    // without calling updateRightBarItemEnabled:. Reapply settings authorization
+    // after that replacement, preserving the native item, title and action.
+    PickerUpdateFriendButton(picker,NSSelectorFromString(@"updateRightBarItemEnabled:"),YES);
 }
 static BOOL Override(Class cls, Class base, NSString *name, IMP implementation, const char *type) {
     Method method=class_getInstanceMethod(base,NSSelectorFromString(name));
@@ -123,7 +140,8 @@ static Class PickerClass(BOOL groups) {
     else ok=ok && Override(cls,base,@"onDone:",(IMP)PickerDoneWithSender,"v@:@") &&
         Override(cls,base,@"actionCancel",(IMP)PickerCancel,"v@:") &&
         Override(cls,base,@"onCancel:",(IMP)PickerCancelWithSender,"v@:@") &&
-        OverrideForwarding(cls,base,@"updateRightBarItemEnabled:",(IMP)PickerUpdateFriendButton,"v@:B",&NativeFriendUpdateButton);
+        OverrideForwarding(cls,base,@"updateRightBarItemEnabled:",(IMP)PickerUpdateFriendButton,"v@:B",&NativeFriendUpdateButton) &&
+        OverrideForwarding(cls,base,@"updatePanelBtn",(IMP)PickerUpdateFriendPanel,"v@:",&NativeFriendUpdatePanel);
     if(!ok){objc_disposeClassPair(cls);return Nil;}
     objc_registerClassPair(cls);return cls;
 }
@@ -181,5 +199,6 @@ void CSNativeContactPickerRevalidate(UIViewController *presenter) {
         state.revoked=YES;
         state.picker.view.hidden=YES;
         state.picker.navigationItem.rightBarButtonItem.enabled=NO;
+        if(!state.groups)PickerUpdateFriendButton(state.picker,NSSelectorFromString(@"updateRightBarItemEnabled:"),NO);
     }
 }

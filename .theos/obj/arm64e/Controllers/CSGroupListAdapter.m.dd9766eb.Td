@@ -3,6 +3,8 @@
   Controllers/CSGroupListAdapter.m /Users/zhangshichao/theos/Prefix.pch \
   Controllers/CSGroupListAdapter.h Controllers/CSGroupIndexScope.h \
   Controllers/CSGroupRefreshState.h Controllers/CSGroupProjection.h \
+  Controllers/CSCloseFriendBridge.h Controllers/CSCloseFriendPolicy.h \
+  Controllers/CSCloseFriendSessionPresentation.h \
   Controllers/CSGroupPreferences.h Controllers/WESessionTabItem.h \
   Controllers/CSGroupAppearance.h Controllers/CSGroupInvocationMapper.h \
   Controllers/CSGroupNativeBridge.h \
@@ -13,6 +15,9 @@ Controllers/CSGroupListAdapter.h:
 Controllers/CSGroupIndexScope.h:
 Controllers/CSGroupRefreshState.h:
 Controllers/CSGroupProjection.h:
+Controllers/CSCloseFriendBridge.h:
+Controllers/CSCloseFriendPolicy.h:
+Controllers/CSCloseFriendSessionPresentation.h:
 Controllers/CSGroupPreferences.h:
 Controllers/WESessionTabItem.h:
 Controllers/CSGroupAppearance.h:

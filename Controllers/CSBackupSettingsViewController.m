@@ -73,16 +73,29 @@
 @interface CSBackupSettingsViewController () <UIDocumentPickerDelegate>
 @property(nonatomic) NSArray *records;
 @property(nonatomic) BOOL busy;
+@property(nonatomic,strong) UIActivityIndicatorView *activityIndicator;
 @end
 @implementation CSBackupSettingsViewController
 - (void)viewDidLoad {
     [super viewDidLoad];self.title=@"备份配置";self.records=@[];
     self.tableView.backgroundColor=UIColor.systemGroupedBackgroundColor;
     self.tableView.separatorInset=UIEdgeInsetsMake(0,54,0,0);
+    // Keep the navigation bar's geometry stable while asynchronous work starts/finishes.
+    UIView *activityContainer=[[UIView alloc]initWithFrame:CGRectMake(0,0,32,32)];
+    self.activityIndicator=[[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
+    self.activityIndicator.frame=CGRectMake(6,6,20,20);
+    self.activityIndicator.hidesWhenStopped=YES;
+    self.activityIndicator.isAccessibilityElement=YES;
+    self.activityIndicator.accessibilityLabel=@"正在处理，请稍候…";
+    [activityContainer addSubview:self.activityIndicator];
+    self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc]initWithCustomView:activityContainer];
     [CSBackupSettingsCell registerToTableView:self.tableView];[self rebuildSections];
 }
 - (void)viewWillAppear:(BOOL)animated {[super viewWillAppear:animated];[self reload];}
-- (void)setWorking:(BOOL)working {self.busy=working;self.tableView.userInteractionEnabled=!working;self.navigationItem.prompt=working?@"正在处理，请稍候…":nil;}
+- (void)setWorking:(BOOL)working {
+    self.busy=working;self.tableView.userInteractionEnabled=!working;
+    if(working)[self.activityIndicator startAnimating];else [self.activityIndicator stopAnimating];
+}
 - (void)reload {[self setWorking:YES];[CSBackupManager.sharedManager list:^(NSArray *records,NSError *error){self.records=records?:@[];[self setWorking:NO];[self rebuildSections];[self.tableView reloadData];if(error)[self message:@"备份检查" detail:error.localizedDescription];}];}
 - (void)message:(NSString *)title detail:(NSString *)message {UIAlertController *alert=[UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];[alert addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleDefault handler:nil]];[self presentViewController:alert animated:YES completion:nil];}
 - (CSSettingItem *)action:(NSString *)title icon:(NSString *)icon color:(UIColor *)color block:(void (^)(void))block {

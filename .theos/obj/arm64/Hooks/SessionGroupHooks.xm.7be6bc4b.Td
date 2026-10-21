@@ -10,7 +10,10 @@
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupIndexScope.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupRefreshState.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupNativeBridge.h \
-  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendBridge.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendPolicy.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendSessionPresentation.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
 /Users/zhangshichao/theos/Prefix.pch:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSBackupBootstrap.h:
@@ -22,3 +25,6 @@
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupRefreshState.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupNativeBridge.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendBridge.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendPolicy.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendSessionPresentation.h:

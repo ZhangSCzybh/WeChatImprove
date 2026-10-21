@@ -1,0 +1,53 @@
+{
+  "version": "1.9-3",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "branch": "main",
+  "native_evidence": {
+    "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+    "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+    "complete_handler_block": "0x104ea48b8",
+    "forwards_to": "onDone:",
+    "static_only": true
+  },
+  "screenshot": {
+    "path": "/Users/zhangshichao/Downloads/IMG_7477.PNG",
+    "sha256": "1fb7444e1a60a830963aa3359684ecef21836964dd9ddf2256b137ebe68e1339"
+  },
+  "regression_before_failed": true,
+  "picker_checks": 130,
+  "picker_passed": true,
+  "strict_ios_architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "build_passed": true,
+  "package": {
+    "Package": "com.wechat.improve",
+    "Version": "1.9-3",
+    "Architecture": "iphoneos-arm64"
+  },
+  "minimum_ios": "15.0",
+  "binary_uuids": {
+    "arm64": "C2EF978E-C38E-35AF-8AF5-604AD03AA635",
+    "arm64e": "AEFC6CFE-51A1-398C-B051-103DE4D6075C"
+  },
+  "package_build_stage_binary_identical": true,
+  "symbol_uuids_match": true,
+  "preserved_existing_changes": [
+    "Controllers/CSCloseFriendSettingsViewController.m",
+    "Controllers/CSBackupSettingsViewController.m"
+  ],
+  "historical_packages_preserved": 29,
+  "outputs": {
+    "packages/com.wechat.improve_1.9-3_iphoneos-arm64.deb": {
+      "sha256": "646ccb3345baeef6c5553f9c36619a4c12d1d67916a95bd226a0607869d3c434",
+      "bytes": 1137938
+    },
+    "packages/WeChatImprove-1.9-3-dSYMs.zip": {
+      "sha256": "fb81795eb5902e8a2bb44b6a0634fd6fe23ed8cc13272898c11dc94850477b83",
+      "bytes": 4503574
+    }
+  },
+  "device_installed": false,
+  "device_validation": false
+}

@@ -4,12 +4,11 @@
   /Users/zhangshichao/theos/Prefix.pch \
   Controllers/CSRedEnvelopSettingsViewController.h \
   Controllers/CSPaymentLedger.h Controllers/CSSettingTableViewCell.h \
-  Controllers/CSChatRoomSelectViewController.h \
-  Controllers/CSRedEnvelopConfig.h
+  Controllers/CSNativeContactPicker.h Controllers/CSRedEnvelopConfig.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
 /Users/zhangshichao/theos/Prefix.pch:
 Controllers/CSRedEnvelopSettingsViewController.h:
 Controllers/CSPaymentLedger.h:
 Controllers/CSSettingTableViewCell.h:
-Controllers/CSChatRoomSelectViewController.h:
+Controllers/CSNativeContactPicker.h:
 Controllers/CSRedEnvelopConfig.h:

@@ -3,12 +3,21 @@ typedef NS_ENUM(NSInteger,UIModalPresentationStyle){UIModalPresentationFullScree
 @interface UIView : NSObject
 @property(nonatomic) BOOL hidden;
 @end
+@interface UIControl : UIView
+@property(nonatomic) BOOL enabled;
+@end
+@interface UIButton : UIControl
+@property(nonatomic,copy) NSString *title;
+@property(nonatomic,weak) id target;
+@property(nonatomic) SEL action;
+@end
 @class UINavigationController;
 @interface UIBarButtonItem : NSObject
 @property(nonatomic) BOOL enabled;
 @property(nonatomic,weak) id target;
 @property(nonatomic) SEL action;
 @property(nonatomic,copy) NSString *title;
+@property(nonatomic,strong) UIView *customView;
 @end
 @interface UINavigationItem : NSObject
 @property(nonatomic,strong) UIBarButtonItem *rightBarButtonItem;

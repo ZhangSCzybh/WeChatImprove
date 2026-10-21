@@ -1,0 +1,11 @@
+{
+  "Controllers/CSNativeContactPicker.m": "f7cc2404d285a93dadd7478dbb9660b4ae11c40a615777cd5a10d3ad686d0ff5",
+  "Tests/NativeContactPickerTests.m": "445e18c2574f9d2b148fa4086217d336ec4b89c59a2040c13d749c6e5c45966d",
+  "Tests/verify-native-contact-picker.sh": "cc2a914480feb239b6329f2ae5ecac19a5eb36a997c370113d76fa12cdb0a2b0",
+  "Controllers/CSReleaseNotesViewController.m": "5b8511833aa1411f13c250029db5fc9a5bf2267fbf4213ac2ca14acba4cfe5e8",
+  "Headers/CSUserInfoHelper.h": "8547afb260b7ed89bacbffb78bf494123aa3e506de0f41564ca31faf646106fd",
+  "README.md": "383ca02170377de0caa3b2ea3c007398b06577d659fb9ff2f8e991a305c8c478",
+  "control": "59170cd31bd125d386161c968c79ed5f5caa21fda1a1b8de409f12ddd3099b50",
+  "Controllers/CSCloseFriendSettingsViewController.m": "26ceedd77a2968bbc2d0df41d75581520a05aadd219bd95d2be297d75c4d44a3",
+  "Controllers/CSBackupSettingsViewController.m": "e56bb03f95349ca330bf9607a16232e03f52c6f112450423b84657ecf849ab74"
+}

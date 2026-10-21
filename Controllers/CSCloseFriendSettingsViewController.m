@@ -2,15 +2,103 @@
 #import "CSCloseFriendBridge.h"
 #import "CSCloseFriendManager.h"
 #import "CSNativeContactPicker.h"
+#import "CSSettingTableViewCell.h"
+
+// Keep long values within the common settings layout without changing other pages.
+@interface CSCloseFriendSettingsCell : CSSettingTableViewCell
+@property(nonatomic,weak) UISwitch *closeFriendSwitch;
+- (void)configureCloseFriendSwitch:(UISwitch *)toggle;
+@end
+
+@implementation CSCloseFriendSettingsCell
++ (NSString *)reuseIdentifier { return @"CSCloseFriendSettingsCell"; }
+
+- (void)prepareForReuse {
+    [super prepareForReuse];
+    self.closeFriendSwitch = nil;
+}
+
+- (void)configureWithItem:(CSSettingItem *)item {
+    [super configureWithItem:item];
+    self.textLabel.numberOfLines = 1;
+    self.detailTextLabel.numberOfLines = 1;
+    self.textLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+    self.detailTextLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+}
+
+- (void)configureCloseFriendSwitch:(UISwitch *)toggle {
+    // Match the shared cell's switch placement, retaining the original target and tag.
+    self.closeFriendSwitch = toggle;
+    self.selectionStyle = UITableViewCellSelectionStyleNone;
+    [self.contentView addSubview:toggle];
+    toggle.translatesAutoresizingMaskIntoConstraints = NO;
+    [NSLayoutConstraint activateConstraints:@[
+        [toggle.centerYAnchor constraintEqualToAnchor:self.contentView.centerYAnchor],
+        [toggle.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor constant:-15.0]
+    ]];
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    CGFloat leading = 54.0, trailing = 15.0, gap = 8.0;
+    CGFloat available = MAX(0, CGRectGetWidth(self.contentView.bounds) - leading - trailing);
+    CGFloat titleWidth = available;
+    if (self.closeFriendSwitch) {
+        titleWidth = MAX(0, available - self.closeFriendSwitch.intrinsicContentSize.width - gap);
+    } else if (self.detailTextLabel.text.length) {
+        CGFloat titleDesired = [self.textLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)].width;
+        CGFloat detailDesired = [self.detailTextLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)].width;
+        CGFloat reservedTitle = MIN(titleDesired, MAX(0, (available - gap) * 0.5));
+        CGFloat detailWidth = MIN(detailDesired, MAX(0, available - reservedTitle - gap));
+        CGRect detailFrame = self.detailTextLabel.frame;
+        detailFrame.origin.x = leading + available - detailWidth;
+        detailFrame.size.width = detailWidth;
+        self.detailTextLabel.frame = detailFrame;
+        titleWidth = MAX(0, available - detailWidth - gap);
+    }
+    CGRect titleFrame = self.textLabel.frame;
+    titleFrame.origin.x = leading;
+    titleFrame.size.width = titleWidth;
+    self.textLabel.frame = titleFrame;
+}
+@end
+
 @interface CSCloseFriendSettingsViewController ()
 @property(nonatomic) BOOL requestingAuthentication;
 @property(nonatomic,copy) NSArray<NSString *> *keys, *labels;
+@property(nonatomic,copy) NSDictionary<NSString *, NSString *> *optionIcons;
 @end
 @implementation CSCloseFriendSettingsViewController
 - (void)viewDidLoad {
     [super viewDidLoad]; self.title=@"密友";
+    self.tableView.backgroundColor = [UIColor systemGroupedBackgroundColor];
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    self.tableView.separatorInset = UIEdgeInsetsMake(0, 54, 0, 0);
+    [CSCloseFriendSettingsCell registerToTableView:self.tableView];
     self.keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"rejectVoice",@"rejectVideo",@"callReplyEnabled",@"callReplyText",@"hidePrivacyIcons",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"unlockSeconds"];
     self.labels=@[@"隐藏会话",@"隐藏联系人",@"隐藏转发候选",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏朋友圈内容",@"隐藏互动痕迹",@"隐藏状态",@"资料页显示添加到通讯录",@"静默消息通知",@"拒接语音来电",@"拒接视频来电",@"挂断回复",@"挂断回复内容",@"隐藏全部朋友圈可见范围图标",@"隐藏密友设置入口",@"隐藏插件入口",@"允许生物识别解锁",@"摇动立即锁定",@"临时解锁时长"];
+    self.optionIcons = @{
+        @"hideSessions": @"bubble.left.and.bubble.right.fill",
+        @"hideContacts": @"person.crop.circle.fill",
+        @"hideForwarding": @"arrowshape.turn.up.right.fill",
+        @"hideTags": @"tag.fill",
+        @"hideSearch": @"magnifyingglass",
+        @"hideTimeline": @"photo.on.rectangle",
+        @"hideInteractions": @"hand.thumbsup.fill",
+        @"hideStatus": @"quote.bubble.fill",
+        @"maskProfiles": @"person.crop.rectangle.fill",
+        @"silenceMessages": @"bell.slash.fill",
+        @"rejectVoice": @"phone.down.fill",
+        @"rejectVideo": @"video.slash.fill",
+        @"callReplyEnabled": @"text.bubble.fill",
+        @"callReplyText": @"square.and.pencil",
+        @"hidePrivacyIcons": @"eye.slash.fill",
+        @"hideSettingsEntry": @"gearshape.fill",
+        @"hidePluginEntry": @"square.grid.2x2.fill",
+        @"biometric": @"faceid",
+        @"shakeToLock": @"iphone.radiowaves.left.and.right",
+        @"unlockSeconds": @"clock.fill"
+    };
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(policyChanged:) name:CSCloseFriendPolicyDidChangeNotification object:nil];
 }
 - (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
@@ -37,19 +125,29 @@
     return nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell=[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+    CSCloseFriendSettingsCell *cell=[tableView dequeueReusableCellWithIdentifier:[CSCloseFriendSettingsCell reuseIdentifier]];
+    NSString *title, *iconName;
+    UIColor *iconColor = [UIColor systemBlueColor];
+    if(indexPath.section==0) {
+        title=@[@"启用密友",@"密友名单",@"密友群聊",@"修改密码",@"立即锁定",@"当前状态"][indexPath.row];
+        iconName=@[@"lock.shield.fill",@"person.fill",@"person.3.fill",@"key.fill",@"lock.fill",@"info.circle.fill"][indexPath.row];
+        iconColor=@[[UIColor systemGreenColor],[UIColor systemBlueColor],[UIColor systemGreenColor],[UIColor systemOrangeColor],[UIColor systemRedColor],[UIColor systemGrayColor]][indexPath.row];
+    } else {
+        title=self.labels[indexPath.row];
+        iconName=self.optionIcons[self.keys[indexPath.row]];
+    }
+    [cell configureWithItem:[CSSettingItem itemWithTitle:title iconName:iconName iconColor:iconColor detail:nil]];
     NSDictionary *profile=CSCloseFriendCurrentProfile();
     if(indexPath.section==0) {
-        cell.textLabel.text=@[@"启用密友",@"密友名单",@"密友群聊",@"修改密码",@"立即锁定",@"当前状态"][indexPath.row];
-        if(indexPath.row==0) { UISwitch *toggle=[UISwitch new]; toggle.on=[profile[@"enabled"] boolValue]; toggle.tag=100; [toggle addTarget:self action:@selector(toggle:) forControlEvents:UIControlEventValueChanged]; cell.accessoryView=toggle; }
+        if(indexPath.row==0) { UISwitch *toggle=[UISwitch new]; toggle.on=[profile[@"enabled"] boolValue]; toggle.tag=100; [toggle addTarget:self action:@selector(toggle:) forControlEvents:UIControlEventValueChanged]; [cell configureCloseFriendSwitch:toggle]; }
         else if(indexPath.row==1 || indexPath.row==2) { cell.detailTextLabel.text=[NSString stringWithFormat:@"%lu",(unsigned long)[profile[indexPath.row==1?@"friends":@"groups"] count]]; cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator; }
-        else if(indexPath.row==5)cell.detailTextLabel.text=@"临时显示中";
+        else if(indexPath.row==5) { cell.detailTextLabel.text=@"临时显示中"; cell.selectionStyle=UITableViewCellSelectionStyleNone; }
         else cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
     } else if(indexPath.section==1) {
-        NSString *key=self.keys[indexPath.row]; cell.textLabel.text=self.labels[indexPath.row];
+        NSString *key=self.keys[indexPath.row];
         if([key isEqual:@"unlockSeconds"]) { cell.detailTextLabel.text=[NSString stringWithFormat:@"%@ 秒",profile[@"options"][key]]; cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator; }
         else if([key isEqual:@"callReplyText"]) {cell.detailTextLabel.text=profile[@"options"][key]; cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;}
-        else { UISwitch *toggle=[UISwitch new]; toggle.tag=indexPath.row; toggle.on=[profile[@"options"][key] boolValue]; [toggle addTarget:self action:@selector(toggle:) forControlEvents:UIControlEventValueChanged]; cell.accessoryView=toggle; }
+        else { UISwitch *toggle=[UISwitch new]; toggle.tag=indexPath.row; toggle.on=[profile[@"options"][key] boolValue]; [toggle addTarget:self action:@selector(toggle:) forControlEvents:UIControlEventValueChanged]; [cell configureCloseFriendSwitch:toggle]; }
     }
     return cell;
 }

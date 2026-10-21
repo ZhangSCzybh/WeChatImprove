@@ -1,0 +1,12 @@
+{
+  "Controllers/CSNativeContactPicker.m": "2c8043cd8cfc6ceafa2dd06157979d30512a8d608b65da7583420f8231220dd1",
+  "Tests/NativeContactPickerTests.m": "ce648314e45b534de0527ecde152d8fe59ac566cf2d7c6051b942b5066a1d1ea",
+  "Tests/NativePickerUIKit/UIKit/UIKit.h": "bf119aff24ab042f1e111e5bcade5ba70b0972417001508af8e9021e1962ac54",
+  "Tests/verify-native-contact-picker.sh": "cc2a914480feb239b6329f2ae5ecac19a5eb36a997c370113d76fa12cdb0a2b0",
+  "Controllers/CSReleaseNotesViewController.m": "172d889dde9a34d433917f1900f9e633b40d67fd81d6b612ea64aa2b04a175e5",
+  "Headers/CSUserInfoHelper.h": "92067e0e850ffe96bd905244fe681c77f7d21339616d6e98d2c06c73f5f980fe",
+  "README.md": "570f5149346156e8b6009a07edc9158c6bccc606e08445809881d67f7126b20d",
+  "control": "6d10eafaa2b04e5fc61a49b2c60e7ccf650f9bc797b992713d6ce502ee4e31da",
+  "Controllers/CSCloseFriendSettingsViewController.m": "26ceedd77a2968bbc2d0df41d75581520a05aadd219bd95d2be297d75c4d44a3",
+  "Controllers/CSBackupSettingsViewController.m": "e56bb03f95349ca330bf9607a16232e03f52c6f112450423b84657ecf849ab74"
+}

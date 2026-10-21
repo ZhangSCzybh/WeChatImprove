@@ -10,6 +10,8 @@
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSEntrySettingsViewController.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSSettingTableViewCell.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSAuthorizationManager.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSCloseFriendBridge.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSCloseFriendPolicy.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSBackupManager.h \
   /Users/zhangshichao/theos/vendor/include/substrate.h \
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap \
@@ -24,6 +26,8 @@
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSEntrySettingsViewController.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSSettingTableViewCell.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSAuthorizationManager.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSCloseFriendBridge.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSCloseFriendPolicy.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSBackupManager.h:
 /Users/zhangshichao/theos/vendor/include/substrate.h:
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap:

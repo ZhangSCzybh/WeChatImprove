@@ -1,0 +1,55 @@
+[
+  {
+    "cls": "MultiSelectContactsViewController",
+    "kind": "instance",
+    "selector": "updatePanelBtnAndToolViewSelectedContacts",
+    "address": "0x104ea093c",
+    "end": "0x104ea0970",
+    "types": "v16@0:8",
+    "file": "MultiSelectContactsViewController--updatePanelBtnAndToolViewSelectedContacts.asm"
+  },
+  {
+    "cls": "MultiSelectContactsViewController",
+    "kind": "instance",
+    "selector": "updateToolViewSelectedContacts",
+    "address": "0x104ea0f9c",
+    "end": "0x104ea1070",
+    "types": "v16@0:8",
+    "file": "MultiSelectContactsViewController--updateToolViewSelectedContacts.asm"
+  },
+  {
+    "cls": "ContactSelectToolView",
+    "kind": "instance",
+    "selector": "updateWithCompleteBarButtonItem:",
+    "address": "0x1010078b4",
+    "end": "0x1010079c8",
+    "types": "v24@0:8@16",
+    "file": "ContactSelectToolView--updateWithCompleteBarButtonItem_.asm"
+  },
+  {
+    "cls": "ContactSelectToolView",
+    "kind": "instance",
+    "selector": "updateSelectedContacts:",
+    "address": "0x1010079c8",
+    "end": "0x101007ca0",
+    "types": "v24@0:8@16",
+    "file": "ContactSelectToolView--updateSelectedContacts_.asm"
+  },
+  {
+    "cls": "ContactSelectToolView",
+    "kind": "instance",
+    "selector": "onDone:",
+    "address": "0x101008dbc",
+    "end": "0x101008e44",
+    "types": "v24@0:8@16",
+    "file": "ContactSelectToolView--onDone_.asm"
+  },
+  {
+    "cls": "MultiSelectContactsViewController",
+    "kind": "instance",
+    "selector": "initBottomArea",
+    "address": "0x104ea43a4",
+    "end": "0x104ea48b8",
+    "types": "v16@0:8"
+  }
+]

@@ -3,12 +3,15 @@
 #import <objc/message.h>
 #import <objc/runtime.h>
 static NSUInteger checks, nativeDoneCalls;
-static NSUInteger groupInitCalls, groupButtonCalls, friendButtonCalls;
-static BOOL wrapPickerBeforeLoad;
+static NSUInteger groupInitCalls, groupButtonCalls, friendButtonCalls, friendPanelCalls;
+static BOOL wrapPickerBeforeLoad, useBottomToolView;
+static NSUInteger toolDoneCalls;
 static NSString *account=@"me";
 static void (^duringDismissal)(void);
 static void Check(BOOL ok,NSString *message){checks++;if(!ok){fprintf(stderr,"FAIL: %s\n",message.UTF8String);exit(1);}}
 @implementation UIView @end
+@implementation UIControl @end
+@implementation UIButton @end
 @implementation UIBarButtonItem @end
 @implementation UINavigationItem @end
 @implementation UIViewController
@@ -60,10 +63,28 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 @property(nonatomic,strong) NSMutableDictionary *m_dicMultiSelect;
 @end
 @implementation ContactSelectView @end
+@interface ContactSelectToolView : UIView
+@property(nonatomic,strong) UIButton *completeButton;
+@property(nonatomic,copy) void (^completeHandler)(id);
+- (void)updateWithCompleteBarButtonItem:(UIBarButtonItem *)item;
+- (void)onDone:(id)sender;
+@end
+@implementation ContactSelectToolView
+- (void)updateWithCompleteBarButtonItem:(UIBarButtonItem *)item {
+    // Native tool view takes the button from the item's custom view and
+    // redirects touch-up to its completeHandler; it has no navigation item.
+    self.completeButton=(UIButton *)item.customView;
+    self.completeButton.target=self;self.completeButton.action=@selector(onDone:);
+}
+- (void)onDone:(id)sender {toolDoneCalls++;if(self.completeHandler)self.completeHandler(sender);}
+@end
 @interface MultiSelectContactsViewController : UIViewController
 @property(nonatomic,weak) id m_delegate;
 @property(nonatomic,strong) NSMutableDictionary *m_dicMultiSelect;
 @property(nonatomic,strong) ContactSelectView *m_selectView;
+@property(nonatomic,strong) ContactSelectToolView *m_toolView;
+@property(nonatomic,strong) UIBarButtonItem *m_panelBtnItem;
+@property(nonatomic,strong) UIButton *m_panelBtn;
 @property(nonatomic,copy) NSString *m_viewcontrllerTitle,*m_rightBarButtonTitle;
 @property(nonatomic) BOOL m_bShowHistoryGroup,m_bShowRadarCreateRoom,hideSelfContact;
 - (void)initData;
@@ -72,15 +93,39 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 - (void)actionCancel;
 - (void)onCancel:(id)sender;
 - (void)updateRightBarItemEnabled:(BOOL)enabled;
+- (void)updatePanelBtn;
 @end
 @implementation MultiSelectContactsViewController
 - (void)initData {}
-- (void)viewDidLoad {[self initData];self.m_selectView=[ContactSelectView new];self.m_selectView.m_dicMultiSelect=[self.m_dicMultiSelect mutableCopy];[self updateRightBarItemEnabled:NO];}
+- (void)viewDidLoad {
+    [self initData];self.m_selectView=[ContactSelectView new];self.m_selectView.m_dicMultiSelect=[self.m_dicMultiSelect mutableCopy];
+    if(useBottomToolView) {
+        self.m_toolView=[ContactSelectToolView new];
+        __weak typeof(self) weakSelf=self;
+        self.m_toolView.completeHandler=^(id sender){[weakSelf onDone:sender];};
+    }
+    [self updatePanelBtn];
+}
 - (void)actionDone {nativeDoneCalls++;}
 - (void)onDone:(id)sender {[self actionDone];}
 - (void)actionCancel {nativeDoneCalls++;}
 - (void)onCancel:(id)sender {[self actionCancel];}
 - (void)updateRightBarItemEnabled:(BOOL)enabled {friendButtonCalls++;self.navigationItem.rightBarButtonItem.enabled=enabled;}
+- (void)updatePanelBtn {
+    friendPanelCalls++;
+    // Native updatePanelBtn rebuilds the item and sets enabled directly,
+    // bypassing updateRightBarItemEnabled: in the default picker scene.
+    NSUInteger count=self.m_selectView.m_dicMultiSelect.count;
+    UIBarButtonItem *button=[UIBarButtonItem new];button.target=self;button.action=@selector(onDone:);
+    button.title=count ? [NSString stringWithFormat:@"%@(%lu)",self.m_rightBarButtonTitle,(unsigned long)count] : self.m_rightBarButtonTitle;
+    button.enabled=count>0;
+    UIButton *control=[UIButton new];control.enabled=button.enabled;control.title=button.title;
+    button.customView=control;self.m_panelBtnItem=button;self.m_panelBtn=control;
+    if(self.m_toolView) {
+        self.navigationItem.rightBarButtonItem=nil;
+        [self.m_toolView updateWithCompleteBarButtonItem:button];
+    } else self.navigationItem.rightBarButtonItem=button;
+}
 @end
 @protocol TestGroupPickerDelegate <NSObject>
 @optional
@@ -129,6 +174,17 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 }
 @end
 static UIViewController *Picker(UIViewController *presenter){return [(UINavigationController *)presenter.presentedViewController topViewController];}
+static void TapFriendDone(MultiSelectContactsViewController *picker) {
+    if(picker.m_toolView) {
+        UIButton *button=picker.m_toolView.completeButton;
+        Check(button.enabled&&button.target==picker.m_toolView&&[button.target respondsToSelector:button.action],@"bottom Done keeps its enabled native tool-view action");
+        ((void(*)(id,SEL,id))objc_msgSend)(button.target,button.action,button);
+        return;
+    }
+    UIBarButtonItem *button=picker.navigationItem.rightBarButtonItem;
+    Check(button.enabled&&button.target==picker&&[button.target respondsToSelector:button.action],@"friend native Done has an enabled action and target");
+    ((void(*)(id,SEL,id))objc_msgSend)(button.target,button.action,button);
+}
 static void TapGroupDone(GroupSelectContactsViewController *picker) {
     UIBarButtonItem *button=picker.navigationItem.rightBarButtonItem;
     Check(button.enabled&&button.target==picker&&[button.target respondsToSelector:button.action],@"native Done button has an enabled action and target");
@@ -144,12 +200,14 @@ int main(void){@autoreleasepool{
     Check(friends.m_dicMultiSelect.count==2&&friends.m_dicMultiSelect[@"alice"],@"preselection survives native initialization");
     [friends.m_selectView.m_dicMultiSelect removeObjectForKey:@"bob"];friends.m_selectView.m_dicMultiSelect[@"carol"]=Contact(@"carol");
     [friends initData];Check(friends.m_selectView.m_dicMultiSelect.count==2&&friends.m_selectView.m_dicMultiSelect[@"carol"],@"native reinitialization preserves current edits");
-    [friends onDone:nil];[friends actionDone];
+    [friends updatePanelBtn];
+    Check([friends.navigationItem.rightBarButtonItem.title isEqual:@"完成(2)"],@"friend native count title is preserved after live edits");
+    TapFriendDone(friends);[friends actionDone];
     Check(saves==1&&[saved isEqual:@[@"alice",@"carol"]],@"live search/tag selection wins over initial seed and commits exactly once");
     Check(CSNativeContactPickerPresent(presenter,@"密友",NO,@[@"alice"],nil,save,&error),@"reopen friends");
-    friends=(id)Picker(presenter);[friends.m_selectView.m_dicMultiSelect removeAllObjects];[friends updateRightBarItemEnabled:NO];
+    friends=(id)Picker(presenter);[friends.m_selectView.m_dicMultiSelect removeAllObjects];[friends updatePanelBtn];
     Check(friends.navigationItem.rightBarButtonItem.enabled,@"friend Done permits clearing the last entry");
-    [friends onDone:nil];Check(saved.count==0&&saves==2,@"empty friend list is saved");
+    TapFriendDone(friends);Check(saved.count==0&&saves==2,@"empty friend list is saved");
     Check(CSNativeContactPickerPresent(presenter,@"群",YES,@[@"room@chatroom"],nil,save,&error),@"group picker opens");
     GroupSelectContactsViewController *groups=(id)Picker(presenter);
     Check([groups isKindOfClass:GroupSelectContactsViewController.class]&&groups.m_bShowSearchBar,@"native group search/list is configured");
@@ -165,6 +223,8 @@ int main(void){@autoreleasepool{
     Check(Picker(presenter)==friends && friends.view.hidden && !friends.navigationItem.rightBarButtonItem.enabled,@"relock conceals invalid picker in place, retaining native cancel");
     valid=YES;[friends updateRightBarItemEnabled:YES];
     Check(!friends.navigationItem.rightBarButtonItem.enabled,@"retired picker cannot re-enable Done after later unlock");
+    [friends updatePanelBtn];
+    Check(!friends.navigationItem.rightBarButtonItem.enabled,@"native item replacement cannot re-enable a revoked picker");
     [friends actionDone];
     Check(saves==3&&!presenter.presentedViewController,@"expired unlock cancels and cannot save late");valid=YES;
     CSNativeContactPickerPresent(presenter,@"群",YES,@[],nil,save,&error);groups=(id)Picker(presenter);
@@ -214,5 +274,46 @@ int main(void){@autoreleasepool{
         groups=(id)Picker(presenter);[groups selectContact:Contact(@"cancelled@chatroom")];[groups onCancelBack:nil];
         Check(saves==previous+2&&saved.count==0&&!presenter.presentedViewController,@"cancel after native selection preserves the stored list");
     }
+    for(NSNumber *wrapped in @[@NO,@YES]) {
+        wrapPickerBeforeLoad=wrapped.boolValue;previous=saves;updates=friendPanelCalls;
+        Check(CSNativeContactPickerPresent(presenter,@"密友名单",NO,@[],nil,save,&error),@"initially empty friend picker opens");
+        friends=(id)Picker(presenter);
+        Check(friendPanelCalls==updates+1&&friends.navigationItem.rightBarButtonItem.enabled,@"initial empty Done is enabled and native initialization runs once");
+        [friends updatePanelBtn];
+        Check(friendPanelCalls==updates+2&&[friends.navigationItem.rightBarButtonItem.title isEqual:@"完成"],@"repeated native updates and runtime subclassing retain the empty Done title without recursion");
+        TapFriendDone(friends);
+        Check(saves==previous+1&&saved.count==0&&!presenter.presentedViewController,@"untouched empty friend selection saves through the native button");
+    }
+    useBottomToolView=YES;
+    for(NSNumber *wrapped in @[@NO,@YES]) {
+        wrapPickerBeforeLoad=wrapped.boolValue;
+        for(NSArray *initial in @[@[],@[@"alice"]]) {
+            previous=saves;NSUInteger calls=toolDoneCalls;
+            CSNativeContactPickerPresent(presenter,@"密友名单",NO,initial,nil,save,&error);friends=(id)Picker(presenter);
+            Check(!friends.navigationItem.rightBarButtonItem&&friends.m_toolView.completeButton,@"screenshot layout has only a bottom Done button");
+            Check(friends.m_panelBtnItem.enabled&&friends.m_toolView.completeButton.enabled,@"bottom Done permits an initially empty list");
+            Check(friends.m_panelBtnItem.customView==friends.m_toolView.completeButton,@"native toolbar reuses the original custom button");
+            UIButton *old=friends.m_toolView.completeButton;
+            [friends.m_selectView.m_dicMultiSelect removeAllObjects];[friends updatePanelBtn];
+            Check(friends.m_toolView.completeButton!=old&&friends.m_toolView.completeButton.enabled&&[friends.m_toolView.completeButton.title isEqual:@"完成"],@"clearing and rebuilding the native bottom button keeps it enabled");
+            TapFriendDone(friends);
+            Check(saves==previous+1&&saved.count==0&&toolDoneCalls==calls+1,@"bottom control routes through native completeHandler and saves an empty list once");
+            CSNativeContactPickerPresent(presenter,@"密友名单",NO,saved,nil,save,&error);friends=(id)Picker(presenter);
+            Check(friends.m_selectView.m_dicMultiSelect.count==0&&friends.m_toolView.completeButton.enabled,@"reopening the saved empty list still enables bottom Done");
+            [friends actionCancel];Check(saves==previous+1,@"bottom picker cancel does not save");
+        }
+    }
+    previous=saves;valid=YES;
+    CSNativeContactPickerPresent(presenter,@"密友名单",NO,@[@"alice"],^BOOL{return valid;},save,&error);friends=(id)Picker(presenter);
+    valid=NO;CSNativeContactPickerRevalidate(presenter);
+    Check(!friends.m_panelBtnItem.enabled&&!friends.m_toolView.completeButton.enabled,@"relock immediately disables the internal item and actual bottom control");
+    valid=YES;[friends updatePanelBtn];
+    Check(!friends.m_toolView.completeButton.enabled,@"native bottom button replacement cannot restore revoked authorization");
+    [friends.m_toolView onDone:friends.m_toolView.completeButton];Check(saves==previous,@"late bottom completion cannot write after revocation");
+    CSNativeContactPickerPresent(presenter,@"密友名单",NO,@[],nil,save,&error);friends=(id)Picker(presenter);
+    account=@"another";[friends updatePanelBtn];
+    Check(!friends.m_toolView.completeButton.enabled,@"account change disables bottom Done even without a navigation button");
+    [friends.m_toolView onDone:nil];Check(saves==previous,@"bottom completion rejects a changed account");account=@"me";
+    Check(nativeDoneCalls==0,@"bottom Done never enters native send or create-group business actions");
     printf("Native contact picker: %lu checks passed\n",(unsigned long)checks);
 }return 0;}

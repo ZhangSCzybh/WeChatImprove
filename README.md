@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`1.8-59`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.9-3`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -39,7 +39,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`。当前仓库提供 [1.8-59 Rootless 安装包](packages/com.wechat.improve_1.8-59_iphoneos-arm64.deb)，其他方案可参照下文编译。
+1. 获取与设备注入环境匹配的 `.deb`。当前仓库提供 [1.9-3 Rootless 安装包](packages/com.wechat.improve_1.9-3_iphoneos-arm64.deb)，其他方案可参照下文编译。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
@@ -155,7 +155,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_1.8-59_iphoneos-arm64.deb`。
+当前版本默认输出：`packages/com.wechat.improve_1.9-3_iphoneos-arm64.deb`。
 
 ### Rootful
 
@@ -164,7 +164,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_1.8-59_iphoneos-arm.deb`。此命令说明构建入口，当前交付记录仅验证了 Rootless 方案。
+当前版本默认输出：`packages/com.wechat.improve_1.9-3_iphoneos-arm.deb`。此命令说明构建入口，当前交付记录仅验证了 Rootless 方案。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -241,6 +241,14 @@ bash Tests/verify-payment-core.sh
 ```
 
 仓库另有搜索、手势、底栏、消息时间、防撤回、后台模糊等专项脚本。测试通过主机替身验证策略、接口调用和生命周期，不替代设备验收。
+
+`1.9-3` 补齐密友选择器底部工具栏布局的空名单保存，实际底部完成按钮与内部按钮项同步更新授权状态。原生回调、空名单重开和动态子类回归见 [1.9-3 底部完成按钮修复](docs/audits/native-picker-bottom-1.9-3/README.md)。
+
+`1.9-2` 修复密友选择器空名单时“完成”置灰的问题，支持未选择联系人或取消最后一个联系人后保存。保留微信原生选择界面、已选人数及授权校验；验证记录见 [1.9-2 空名单保存修复](docs/audits/native-picker-empty-1.9-2/README.md)。
+
+`1.9-1` 修复进入备份配置时标题和列表上移的问题。加载提示改用右上角固定尺寸的活动指示器，避免异步读取前后改变导航栏高度；沿用原有忙碌期间交互限制和全部备份操作。验证范围见 [1.9-1 备份页标题修复记录](docs/audits/backup-title-1.9-1/README.md)。
+
+`1.8-60` 统一密友设置页的图标、文字起点、分隔线和开关间距，并限制长回复的预览宽度。保留原两组 26 个条目、配置键、认证流程和所有操作回调。验证与交付范围见 [1.8-60 密友设置布局记录](docs/audits/close-friends-settings-1.8-60/README.md)。
 
 `1.8-59` 修复 1.8-58 朋友圈进入与滚动时的缓存递归加锁闪退。基于两份真机日志和匹配 UUID 的符号定位，改用对象身份缓存键并避免原生模型内容比较；离开朋友圈、切换账号及密友策略变化时主动清理缓存。新增旧代码失败、修复后通过的专项回归，以及动态对象和缓存数据释放验证。详见 [1.8-59 崩溃修复与验收记录](docs/audits/close-friends-crash-1.8-59/README.md)。
 
