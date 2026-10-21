@@ -3,6 +3,9 @@ typedef NS_ENUM(NSInteger,UIModalPresentationStyle){UIModalPresentationFullScree
 @class UINavigationController;
 @interface UIBarButtonItem : NSObject
 @property(nonatomic) BOOL enabled;
+@property(nonatomic,weak) id target;
+@property(nonatomic) SEL action;
+@property(nonatomic,copy) NSString *title;
 @end
 @interface UINavigationItem : NSObject
 @property(nonatomic,strong) UIBarButtonItem *rightBarButtonItem;

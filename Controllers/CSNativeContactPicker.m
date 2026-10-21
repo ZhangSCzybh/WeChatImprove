@@ -158,7 +158,9 @@ BOOL CSNativeContactPickerPresent(UIViewController *presenter, NSString *title, 
         Set(picker,groups?@"setM_viewControllerTitle:":@"setM_viewcontrllerTitle:",title);
         picker.title=title;
         if(groups) {
-            ((void(*)(id,SEL,unsigned int))objc_msgSend)(picker,NSSelectorFromString(@"setM_uiDataScene:"),5);
+            // Scene 4 enables native checkmarks, selection toggling and Done.
+            // Scene 5 is a single-contact history picker and never toggles this dictionary.
+            ((void(*)(id,SEL,unsigned int))objc_msgSend)(picker,NSSelectorFromString(@"setM_uiDataScene:"),4);
             ((void(*)(id,SEL,BOOL))objc_msgSend)(picker,NSSelectorFromString(@"setM_bShowSearchBar:"),YES);
         } else {
             for(NSString *selector in @[@"setM_bShowHistoryGroup:",@"setM_bShowRadarCreateRoom:",@"setHideSelfContact:"])

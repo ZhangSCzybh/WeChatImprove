@@ -1,0 +1,92 @@
+[
+  {
+    "cls": "GroupSelectContactsViewController",
+    "kind": "instance",
+    "selector": "onDone",
+    "address": "0x101ecca30",
+    "end": "0x101ecca3c",
+    "types": "v16@0:8",
+    "file": "GroupSelectContactsViewController--onDone.asm"
+  },
+  {
+    "cls": "GroupSelectContactsViewController",
+    "kind": "instance",
+    "selector": "initTitleArea",
+    "address": "0x101eccb1c",
+    "end": "0x101eccd78",
+    "types": "v16@0:8",
+    "file": "GroupSelectContactsViewController--initTitleArea.asm"
+  },
+  {
+    "cls": "GroupSelectContactsViewController",
+    "kind": "instance",
+    "selector": "createInitRightBarItem",
+    "address": "0x101ecceec",
+    "end": "0x101ecd008",
+    "types": "@16@0:8",
+    "file": "GroupSelectContactsViewController--createInitRightBarItem.asm"
+  },
+  {
+    "cls": "GroupSelectContactsViewController",
+    "kind": "instance",
+    "selector": "viewDidLoad",
+    "address": "0x101ecd588",
+    "end": "0x101ecd60c",
+    "types": "v16@0:8",
+    "file": "GroupSelectContactsViewController--viewDidLoad.asm"
+  },
+  {
+    "cls": "GroupSelectContactsViewController",
+    "kind": "instance",
+    "selector": "isSelected:",
+    "address": "0x101ecd9b0",
+    "end": "0x101ecda24",
+    "types": "B24@0:8@16",
+    "file": "GroupSelectContactsViewController--isSelected_.asm"
+  },
+  {
+    "cls": "GroupSelectContactsViewController",
+    "kind": "instance",
+    "selector": "isExisted:",
+    "address": "0x101ecda24",
+    "end": "0x101ecda98",
+    "types": "B24@0:8@16",
+    "file": "GroupSelectContactsViewController--isExisted_.asm"
+  },
+  {
+    "cls": "GroupSelectContactsViewController",
+    "kind": "instance",
+    "selector": "selectContact:",
+    "address": "0x101ecda98",
+    "end": "0x101ecdce0",
+    "types": "v24@0:8@16",
+    "file": "GroupSelectContactsViewController--selectContact_.asm"
+  },
+  {
+    "cls": "GroupSelectContactsViewController",
+    "kind": "instance",
+    "selector": "makeCell:contact:",
+    "address": "0x101ecde00",
+    "end": "0x101ece330",
+    "types": "v32@0:8@16@24",
+    "file": "GroupSelectContactsViewController--makeCell_contact_.asm"
+  },
+  {
+    "cls": "GroupSelectContactsViewController",
+    "kind": "instance",
+    "selector": "tableView:didSelectRowAtIndexPath:",
+    "address": "0x101ece704",
+    "end": "0x101ece870",
+    "types": "v32@0:8@16@24",
+    "file": "GroupSelectContactsViewController--tableView_didSelectRowAtIndexPath_.asm"
+  },
+  {
+    "cls": "GroupSelectContactsViewController",
+    "kind": "instance",
+    "selector": "didSearchViewTableSelect:",
+    "address": "0x101ecea8c",
+    "end": "0x101eceb9c",
+    "types": "v24@0:8@16",
+    "file": "GroupSelectContactsViewController--didSearchViewTableSelect_.asm"
+  }
+]

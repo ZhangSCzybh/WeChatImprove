@@ -4,6 +4,9 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.8-55": @[
+            @{@"title": @"修复群聊勾选与保存", @"detail": @"密友群聊、红包白名单群和黑名单群启用微信原生多选，恢复勾选、取消勾选与完成保存，并支持清空名单。"}
+        ],
         @"1.8-54": @[
             @{@"title": @"修复原生选择器闪退", @"detail": @"修复打开密友群聊、红包白名单群和黑名单群时的递归闪退，并同步修正密友名单完成按钮的同类问题。"}
         ],

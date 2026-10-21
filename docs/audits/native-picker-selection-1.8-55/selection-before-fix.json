@@ -1,0 +1,10 @@
+{
+  "command": [
+    "bash",
+    "Tests/verify-native-contact-picker.sh"
+  ],
+  "source_version": "1.8-54",
+  "expected_failure": "Native scene 5 does not toggle a tapped group; native scene 4 is required",
+  "exit_code": 1,
+  "output": "FAIL: tapping a group checks it and updates the native Done count\n"
+}

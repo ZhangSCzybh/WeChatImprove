@@ -81,8 +81,13 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 - (void)onCancel:(id)sender {[self actionCancel];}
 - (void)updateRightBarItemEnabled:(BOOL)enabled {friendButtonCalls++;self.navigationItem.rightBarButtonItem.enabled=enabled;}
 @end
+@protocol TestGroupPickerDelegate <NSObject>
+@optional
+- (BOOL)onShouldSelectContact:(CContact *)contact;
+- (void)onGroupSelectContactReturn:(CContact *)contact;
+@end
 @interface GroupSelectContactsViewController : UIViewController
-@property(nonatomic,weak) id m_delegate;
+@property(nonatomic,weak) id<TestGroupPickerDelegate> m_delegate;
 @property(nonatomic,strong) NSMutableDictionary *m_dicMultiSelect;
 @property(nonatomic,copy) NSString *m_viewControllerTitle,*m_rightBarButtonTitle;
 @property(nonatomic) BOOL m_bShowSearchBar;
@@ -92,6 +97,8 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 - (void)onDone;
 - (void)onCancelBack:(id)sender;
 - (void)updateRightBarBtn;
+- (BOOL)isSelected:(CContact *)contact;
+- (void)selectContact:(CContact *)contact;
 @end
 @implementation GroupSelectContactsViewController
 - (void)initData {groupInitCalls++;self.m_dicMultiSelect=[NSMutableDictionary dictionary];}
@@ -99,9 +106,33 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 - (void)actionDone {nativeDoneCalls++;}
 - (void)onDone {[self actionDone];}
 - (void)onCancelBack:(id)sender {nativeDoneCalls++;}
-- (void)updateRightBarBtn {groupButtonCalls++;self.navigationItem.rightBarButtonItem.enabled=self.m_dicMultiSelect.count>0;}
+- (void)updateRightBarBtn {
+    groupButtonCalls++;
+    if(!self.m_rightBarButtonTitle.length)return;
+    UIBarButtonItem *button=[UIBarButtonItem new];button.target=self;button.action=@selector(onDone);
+    button.title=self.m_dicMultiSelect.count ? [NSString stringWithFormat:@"%@(%lu)",self.m_rightBarButtonTitle,(unsigned long)self.m_dicMultiSelect.count] : self.m_rightBarButtonTitle;
+    button.enabled=self.m_dicMultiSelect.count>0;self.navigationItem.rightBarButtonItem=button;
+}
+- (BOOL)isSelected:(CContact *)contact {return self.m_dicMultiSelect[contact.m_nsUsrName]!=nil;}
+- (void)selectContact:(CContact *)contact {
+    // WeChat 8.0.78 selectContact: at 0x101ecda98: only scene 4 toggles
+    // the dictionary. Other scenes dispatch a single-contact delegate callback.
+    if(self.m_uiDataScene!=4) {
+        if([self.m_delegate respondsToSelector:@selector(onGroupSelectContactReturn:)])[self.m_delegate onGroupSelectContactReturn:contact];
+        return;
+    }
+    if([self isSelected:contact])[self.m_dicMultiSelect removeObjectForKey:contact.m_nsUsrName];
+    else if(![self.m_delegate respondsToSelector:@selector(onShouldSelectContact:)] || [self.m_delegate onShouldSelectContact:contact])
+        self.m_dicMultiSelect[contact.m_nsUsrName]=contact;
+    [self updateRightBarBtn];
+}
 @end
 static UIViewController *Picker(UIViewController *presenter){return [(UINavigationController *)presenter.presentedViewController topViewController];}
+static void TapGroupDone(GroupSelectContactsViewController *picker) {
+    UIBarButtonItem *button=picker.navigationItem.rightBarButtonItem;
+    Check(button.enabled&&button.target==picker&&[button.target respondsToSelector:button.action],@"native Done button has an enabled action and target");
+    ((void(*)(id,SEL))objc_msgSend)(button.target,button.action);
+}
 int main(void){@autoreleasepool{
     UIViewController *presenter=[UIViewController new];NSError *error=nil;
     __block NSUInteger saves=0;__block NSArray *saved=nil;__block BOOL valid=YES;
@@ -120,7 +151,7 @@ int main(void){@autoreleasepool{
     [friends onDone:nil];Check(saved.count==0&&saves==2,@"empty friend list is saved");
     Check(CSNativeContactPickerPresent(presenter,@"群",YES,@[@"room@chatroom"],nil,save,&error),@"group picker opens");
     GroupSelectContactsViewController *groups=(id)Picker(presenter);
-    Check([groups isKindOfClass:GroupSelectContactsViewController.class]&&groups.m_bShowSearchBar&&groups.m_uiDataScene==5,@"native group search/list is configured");
+    Check([groups isKindOfClass:GroupSelectContactsViewController.class]&&groups.m_bShowSearchBar,@"native group search/list is configured");
     Check(groups.m_dicMultiSelect[@"room@chatroom"]!=nil,@"group preselection survives native reset");
     [groups.m_dicMultiSelect removeAllObjects];[groups updateRightBarBtn];
     Check(groups.navigationItem.rightBarButtonItem.enabled,@"group Done permits an empty list");[groups onDone];
@@ -156,16 +187,27 @@ int main(void){@autoreleasepool{
     friends=(id)Picker(presenter);[friends updateRightBarItemEnabled:NO];
     Check(friendButtonCalls==updates+2&&friends.navigationItem.rightBarButtonItem.enabled,@"wrapped friend button forwards once and allows empty list");
     [friends actionCancel];
-    for(NSString *title in @[@"白名单群",@"黑名单群"]) {
+    for(NSString *title in @[@"密友群聊",@"白名单群",@"黑名单群"]) {
         previous=saves;initializations=groupInitCalls;updates=groupButtonCalls;
         Check(CSNativeContactPickerPresent(presenter,title,YES,@[@"room@chatroom"],nil,save,&error),[title stringByAppendingString:@" opens the shared native group picker"]);
         groups=(id)Picker(presenter);
-        Check([groups.title isEqual:title]&&groupInitCalls==initializations+1&&groupButtonCalls==updates+1&&groups.m_dicMultiSelect[@"room@chatroom"],@"red envelope group picker loads once with its existing selection");
-        [groups.m_dicMultiSelect removeAllObjects];[groups updateRightBarBtn];[groups onDone];
-        Check(saves==previous+1&&saved.count==0&&!presenter.presentedViewController,@"red envelope group picker saves and dismisses");
-        CSNativeContactPickerPresent(presenter,title,YES,@[@"room@chatroom"],nil,save,&error);
-        groups=(id)Picker(presenter);[groups.m_dicMultiSelect removeAllObjects];[groups onCancelBack:nil];
-        Check(saves==previous+1&&!presenter.presentedViewController,@"red envelope group picker cancel preserves the stored list");
+        Check([groups.title isEqual:title]&&groupInitCalls==initializations+1&&groupButtonCalls==updates+1&&[groups isSelected:Contact(@"room@chatroom")],@"group picker loads once with its existing selection");
+        [groups selectContact:Contact(@"second@chatroom")];
+        Check([groups isSelected:Contact(@"second@chatroom")]&&[groups.navigationItem.rightBarButtonItem.title isEqual:@"完成(2)"],@"tapping a group checks it and updates the native Done count");
+        [groups selectContact:Contact(@"room@chatroom")];
+        Check(![groups isSelected:Contact(@"room@chatroom")]&&[groups.navigationItem.rightBarButtonItem.title isEqual:@"完成(1)"],@"tapping a preselected group unchecks it");
+        [groups selectContact:Contact(@"ordinary-friend")];
+        Check(groups.m_dicMultiSelect.count==1,@"native selection delegate rejects a non-group candidate");
+        TapGroupDone(groups);
+        Check(saves==previous+1&&[saved isEqual:@[@"second@chatroom"]]&&!presenter.presentedViewController,@"native Done saves the tapped group and dismisses");
+        CSNativeContactPickerPresent(presenter,title,YES,saved,nil,save,&error);
+        groups=(id)Picker(presenter);[groups selectContact:Contact(@"second@chatroom")];
+        Check(groups.m_dicMultiSelect.count==0&&groups.navigationItem.rightBarButtonItem.enabled,@"last group can be unchecked while Done stays enabled");
+        TapGroupDone(groups);
+        Check(saves==previous+2&&saved.count==0,@"empty group selection saves through the native button");
+        CSNativeContactPickerPresent(presenter,title,YES,saved,nil,save,&error);
+        groups=(id)Picker(presenter);[groups selectContact:Contact(@"cancelled@chatroom")];[groups onCancelBack:nil];
+        Check(saves==previous+2&&saved.count==0&&!presenter.presentedViewController,@"cancel after native selection preserves the stored list");
     }
     printf("Native contact picker: %lu checks passed\n",(unsigned long)checks);
 }return 0;}

@@ -1,0 +1,110 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "metadata_parser": "docs/audits/native-pickers-backup-1.8-53/native/extract.py",
+  "methods": [
+    {
+      "cls": "GroupSelectContactsViewController",
+      "kind": "instance",
+      "selector": "onDone",
+      "address": "0x101ecca30",
+      "end": "0x101ecca3c",
+      "types": "v16@0:8",
+      "file": "GroupSelectContactsViewController--onDone.asm"
+    },
+    {
+      "cls": "GroupSelectContactsViewController",
+      "kind": "instance",
+      "selector": "initTitleArea",
+      "address": "0x101eccb1c",
+      "end": "0x101eccd78",
+      "types": "v16@0:8",
+      "file": "GroupSelectContactsViewController--initTitleArea.asm"
+    },
+    {
+      "cls": "GroupSelectContactsViewController",
+      "kind": "instance",
+      "selector": "createInitRightBarItem",
+      "address": "0x101ecceec",
+      "end": "0x101ecd008",
+      "types": "@16@0:8",
+      "file": "GroupSelectContactsViewController--createInitRightBarItem.asm"
+    },
+    {
+      "cls": "GroupSelectContactsViewController",
+      "kind": "instance",
+      "selector": "viewDidLoad",
+      "address": "0x101ecd588",
+      "end": "0x101ecd60c",
+      "types": "v16@0:8",
+      "file": "GroupSelectContactsViewController--viewDidLoad.asm"
+    },
+    {
+      "cls": "GroupSelectContactsViewController",
+      "kind": "instance",
+      "selector": "isSelected:",
+      "address": "0x101ecd9b0",
+      "end": "0x101ecda24",
+      "types": "B24@0:8@16",
+      "file": "GroupSelectContactsViewController--isSelected_.asm"
+    },
+    {
+      "cls": "GroupSelectContactsViewController",
+      "kind": "instance",
+      "selector": "isExisted:",
+      "address": "0x101ecda24",
+      "end": "0x101ecda98",
+      "types": "B24@0:8@16",
+      "file": "GroupSelectContactsViewController--isExisted_.asm"
+    },
+    {
+      "cls": "GroupSelectContactsViewController",
+      "kind": "instance",
+      "selector": "selectContact:",
+      "address": "0x101ecda98",
+      "end": "0x101ecdce0",
+      "types": "v24@0:8@16",
+      "file": "GroupSelectContactsViewController--selectContact_.asm"
+    },
+    {
+      "cls": "GroupSelectContactsViewController",
+      "kind": "instance",
+      "selector": "makeCell:contact:",
+      "address": "0x101ecde00",
+      "end": "0x101ece330",
+      "types": "v32@0:8@16@24",
+      "file": "GroupSelectContactsViewController--makeCell_contact_.asm"
+    },
+    {
+      "cls": "GroupSelectContactsViewController",
+      "kind": "instance",
+      "selector": "tableView:didSelectRowAtIndexPath:",
+      "address": "0x101ece704",
+      "end": "0x101ece870",
+      "types": "v32@0:8@16@24",
+      "file": "GroupSelectContactsViewController--tableView_didSelectRowAtIndexPath_.asm"
+    },
+    {
+      "cls": "GroupSelectContactsViewController",
+      "kind": "instance",
+      "selector": "didSearchViewTableSelect:",
+      "address": "0x101ecea8c",
+      "end": "0x101eceb9c",
+      "types": "v24@0:8@16",
+      "file": "GroupSelectContactsViewController--didSearchViewTableSelect_.asm"
+    }
+  ],
+  "files": {
+    "GroupSelectContactsViewController--createInitRightBarItem.asm": "10bed76c14f4129dc16ffc03194376368ff0943bd25d109ca012736baf507046",
+    "GroupSelectContactsViewController--selectContact_.asm": "7a0594d098b731551708b626b26abb035cb08bdf7b568d2cf0b748ff05138a34",
+    "GroupSelectContactsViewController--makeCell_contact_.asm": "606b21b68738b7923750a5339e5dfbb5041a9b16ccff30339df9561b565d1f04",
+    "GroupSelectContactsViewController--isExisted_.asm": "df6098e49845ff43ab53f3b7175a503613496ffeee67e9c2773638a49c3252bc",
+    "GroupSelectContactsViewController--tableView_didSelectRowAtIndexPath_.asm": "91f6b169bc2a1b51f2a148b53c3f7fc60b63ee5ac4b9869e345ab31faadcdeed",
+    "GroupSelectContactsViewController--viewDidLoad.asm": "52a6c27300db9129e60e5fb220303e12aec3f0a35a8ec239a359a1eb0a765ded",
+    "GroupSelectContactsViewController--isSelected_.asm": "c5b6de10941b5cec39ea0b6628ba6e646480f3887bbfefb6d7b250f3c2fe939e",
+    "GroupSelectContactsViewController--onDone.asm": "cf7bd263e49d27af46bb754151a670fb75e2bdc41f9d5963a17ca042f961f7b9",
+    "GroupSelectContactsViewController--initTitleArea.asm": "7a687cf68658b2738edc94625d56d1bc617665167d1f9a3b7c63d55cb8c0c0e2",
+    "GroupSelectContactsViewController--didSearchViewTableSelect_.asm": "b678f03b793c4e2cb42ac6292999be52b48281e75c44187770588c6be687e271"
+  }
+}
