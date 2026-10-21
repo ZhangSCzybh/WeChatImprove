@@ -1,0 +1,24 @@
+#import <Foundation/Foundation.h>
+typedef NS_ENUM(NSInteger,UIModalPresentationStyle){UIModalPresentationFullScreen};
+@class UINavigationController;
+@interface UIBarButtonItem : NSObject
+@property(nonatomic) BOOL enabled;
+@end
+@interface UINavigationItem : NSObject
+@property(nonatomic,strong) UIBarButtonItem *rightBarButtonItem;
+@end
+@interface UIViewController : NSObject
+@property(nonatomic,copy) NSString *title;
+@property(nonatomic,strong) UINavigationItem *navigationItem;
+@property(nonatomic,weak) UINavigationController *navigationController;
+@property(nonatomic,weak) UIViewController *presentingViewController;
+@property(nonatomic,strong) UIViewController *presentedViewController;
+@property(nonatomic) UIModalPresentationStyle modalPresentationStyle;
+- (void)viewDidLoad;
+- (void)presentViewController:(UIViewController *)controller animated:(BOOL)animated completion:(void(^)(void))completion;
+- (void)dismissViewControllerAnimated:(BOOL)animated completion:(void(^)(void))completion;
+@end
+@interface UINavigationController : UIViewController
+@property(nonatomic,strong) UIViewController *topViewController;
+- (instancetype)initWithRootViewController:(UIViewController *)root;
+@end

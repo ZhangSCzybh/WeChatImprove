@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`1.8-52`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.8-53`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -39,7 +39,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`。当前仓库提供 [1.8-52 Rootless 安装包](packages/com.wechat.improve_1.8-52_iphoneos-arm64.deb)，其他方案可参照下文编译。
+1. 获取与设备注入环境匹配的 `.deb`。当前仓库提供 [1.8-53 Rootless 安装包](packages/com.wechat.improve_1.8-53_iphoneos-arm64.deb)，其他方案可参照下文编译。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
@@ -155,7 +155,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_1.8-52_iphoneos-arm64.deb`。
+当前版本默认输出：`packages/com.wechat.improve_1.8-53_iphoneos-arm64.deb`。
 
 ### Rootful
 
@@ -164,7 +164,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_1.8-52_iphoneos-arm.deb`。此命令说明构建入口，当前交付记录仅验证了 Rootless 方案。
+当前版本默认输出：`packages/com.wechat.improve_1.8-53_iphoneos-arm.deb`。此命令说明构建入口，当前交付记录仅验证了 Rootless 方案。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -188,7 +188,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_1.8-52_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_1.8-53_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
@@ -241,6 +241,8 @@ bash Tests/verify-payment-core.sh
 ```
 
 仓库另有搜索、手势、底栏、消息时间、防撤回、后台模糊等专项脚本。测试通过主机替身验证策略、接口调用和生命周期，不替代设备验收。
+
+`1.8-53` 将密友与红包名单选择入口接入微信原生选择器，并修复底栏未配置图片或残留失效图片路径时无法备份的问题。验证记录见 [1.8-53 修复与验收记录](docs/audits/native-pickers-backup-1.8-53/README.md)。
 
 `1.8-52` 修复密友解锁后朋友圈首屏缺失、滑动后才恢复的问题：按当前状态完成一次原生刷新，并统一单元格显示与列表投影。验证记录见 [1.8-52 修复与验收记录](docs/audits/close-friends-1.8-52/README.md)。
 

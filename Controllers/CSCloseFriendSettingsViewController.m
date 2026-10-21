@@ -1,7 +1,7 @@
 #import "CSCloseFriendSettingsViewController.h"
 #import "CSCloseFriendBridge.h"
 #import "CSCloseFriendManager.h"
-#import "WEContactSelectViewController.h"
+#import "CSNativeContactPicker.h"
 @interface CSCloseFriendSettingsViewController ()
 @property(nonatomic) BOOL requestingAuthentication;
 @property(nonatomic,copy) NSArray<NSString *> *keys, *labels;
@@ -26,7 +26,7 @@
         }];
     }
 }
-- (void)policyChanged:(NSNotification *)note { [self.tableView reloadData]; }
+- (void)policyChanged:(NSNotification *)note { CSNativeContactPickerRevalidate(self); [self.tableView reloadData]; }
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return [self authorized]?2:0; }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { return section==0?6:self.keys.count; }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return @[@"账号保护",@"保护选项"][section]; }
@@ -69,17 +69,17 @@
     NSDictionary *token=CSCloseFriendManager.sharedManager.runtime.authenticationToken;
     if(indexPath.section==0 && (indexPath.row==1 || indexPath.row==2)) {
         NSString *key=indexPath.row==1?@"friends":@"groups";
-        WEContactSelectViewController *picker=[[WEContactSelectViewController alloc] initWithTitle:indexPath.row==1?@"选择密友":@"选择密友群聊" selectedUserNames:CSCloseFriendCurrentProfile()[key] selectType:indexPath.row==1?WEContactSelectTypePrivate:WEContactSelectTypeGroup];
-        picker.completesAfterDismissal=YES;
-        picker.completion=^(NSArray<NSString *> *names){
+        __weak typeof(self) weakSelf=self;
+        NSError *error=nil;
+        BOOL shown=CSNativeContactPickerPresent(self,indexPath.row==1?@"选择密友":@"选择密友群聊",indexPath.row==2,
+          CSCloseFriendCurrentProfile()[key],^BOOL{
+            return weakSelf && [weakSelf authorized] && [CSCloseFriendManager.sharedManager.runtime isTokenCurrent:token];
+          },^(NSArray<NSString *> *names){
             [CSCloseFriendManager.sharedManager refreshAccount];
-            if(![self authorized] || ![CSCloseFriendManager.sharedManager.runtime isTokenCurrent:token])return;
-            NSMutableDictionary *profile=[CSCloseFriendCurrentProfile() mutableCopy]; profile[key]=names; [self save:profile];
-        };
-        // The existing picker's Done/Cancel handlers dismiss a modal presentation.
-        UINavigationController *pickerNavigation=[[UINavigationController alloc] initWithRootViewController:picker];
-        pickerNavigation.modalPresentationStyle=UIModalPresentationPageSheet;
-        [self presentViewController:pickerNavigation animated:YES completion:nil];
+            if(![weakSelf authorized] || ![CSCloseFriendManager.sharedManager.runtime isTokenCurrent:token])return;
+            NSMutableDictionary *profile=[CSCloseFriendCurrentProfile() mutableCopy]; profile[key]=names; [weakSelf save:profile];
+          },&error);
+        if(!shown)[self showError:error];
     } else if(indexPath.section==0 && indexPath.row==3)[CSCloseFriendManager.sharedManager changePasswordFrom:self];
     else if(indexPath.section==0 && indexPath.row==4)CSCloseFriendLock();
     else if(indexPath.section==1 && [self.keys[indexPath.row] isEqual:@"callReplyText"]) {

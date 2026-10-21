@@ -68,6 +68,13 @@ static NSString *Materialize(NSString *reference,NSString *name,NSDictionary *as
         NSMutableDictionary *f=[field mutableCopy];NSDictionary *entry=[CSBackupRegistry entryForDomain:f[@"domain"] key:f[@"key"]];NSString *resource=entry[@"resource"];
         if([resource isEqual:@"file"]) {
             NSString *path=[f[@"present"] boolValue]?f[@"value"]:nil;
+            // The tab bar falls back to its native icon when an old image no longer
+            // exists. Export that effective unset state without changing live defaults.
+            BOOL optionalIcon=[entry[@"module"] isEqual:@"tabbar"];
+            if(optionalIcon && (!path.length || RecordMissing(path,field,nil,missing ?: [NSMutableArray array]))) {
+                f[@"present"]=@NO; [f removeObjectForKey:@"value"];
+                [result addObject:f]; continue;
+            }
             NSString *fixed=FixedName(f[@"key"]);NSString *fallback=fixed?[root URLByAppendingPathComponent:fixed].path:nil;
             if(path.length) {
                 // Existing readers use the fixed file when the saved sandbox path has moved.

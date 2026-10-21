@@ -1,0 +1,30 @@
+[
+  {
+    "scene": 3,
+    "table_address": "0x118d84933",
+    "file_offset": "0x18d84933",
+    "byte": 15,
+    "destination": "0x1010a40cc"
+  },
+  {
+    "scene": 4,
+    "table_address": "0x118d84934",
+    "file_offset": "0x18d84934",
+    "byte": 15,
+    "destination": "0x1010a40cc"
+  },
+  {
+    "scene": 5,
+    "table_address": "0x118d84935",
+    "file_offset": "0x18d84935",
+    "byte": 6,
+    "destination": "0x1010a40a8"
+  },
+  {
+    "scene": 28,
+    "table_address": "0x118d8494c",
+    "file_offset": "0x18d8494c",
+    "byte": 56,
+    "destination": "0x1010a4170"
+  }
+]

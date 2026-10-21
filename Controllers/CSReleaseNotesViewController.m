@@ -4,6 +4,10 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.8-53": @[
+            @{@"title": @"使用微信原生选择器", @"detail": @"密友名单、密友群聊及红包白名单群、黑名单群使用微信原生选择界面，支持已有选择回填、搜索选择和清空名单。"},
+            @{@"title": @"修复无底栏图片时的备份", @"detail": @"未设置底栏图片或旧图片已不存在时，按原生图标状态完成备份；仍完整保存有效图片并校验损坏资源。"}
+        ],
         @"1.8-52": @[
             @{@"title": @"修复解锁后的朋友圈首屏", @"detail": @"密友解锁后，朋友圈在显示前按当前状态完成原生刷新；单元格显示与列表数据保持一致，避免需要滑动后才恢复内容。"}
         ],

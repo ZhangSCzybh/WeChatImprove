@@ -6,7 +6,7 @@
 #import "CSRedEnvelopSettingsViewController.h"
 #import "CSPaymentLedger.h"
 #import "CSSettingTableViewCell.h"
-#import "CSChatRoomSelectViewController.h"
+#import "CSNativeContactPicker.h"
 #import "CSRedEnvelopConfig.h"
 
 // Settings keys are private to this page; NSUserDefaults persists writes automatically.
@@ -402,41 +402,25 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
 }
 
 - (void)showWhitelistSelector {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *selectedUserNames = [defaults arrayForKey:kRedEnvelopAllowedGroupsKey] ?: @[];
-    
-    CSChatRoomSelectViewController *selectVC = [[CSChatRoomSelectViewController alloc] 
-        initWithTitle:@"白名单群" 
-        selectedUserNames:selectedUserNames];
-    
-    selectVC.completion = ^(NSArray<NSString *> *userNames) {
-        [defaults setObject:userNames forKey:kRedEnvelopAllowedGroupsKey];
-        [self setupData];
-        [self.tableView reloadData];
-    };
-    
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:selectVC];
-    nav.modalPresentationStyle = UIModalPresentationFullScreen;
-    [self presentViewController:nav animated:YES completion:nil];
+    [self showGroupSelectorWithTitle:@"白名单群" key:kRedEnvelopAllowedGroupsKey];
 }
 
 - (void)showBlacklistSelector {
+    [self showGroupSelectorWithTitle:@"黑名单群" key:kRedEnvelopBlockedGroupsKey];
+}
+
+- (void)showGroupSelectorWithTitle:(NSString *)title key:(NSString *)key {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *selectedUserNames = [defaults arrayForKey:kRedEnvelopBlockedGroupsKey] ?: @[];
-    
-    CSChatRoomSelectViewController *selectVC = [[CSChatRoomSelectViewController alloc] 
-        initWithTitle:@"黑名单群" 
-        selectedUserNames:selectedUserNames];
-    
-    selectVC.completion = ^(NSArray<NSString *> *userNames) {
-        [defaults setObject:userNames forKey:kRedEnvelopBlockedGroupsKey];
-        [self setupData];
-        [self.tableView reloadData];
-    };
-    
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:selectVC];
-    nav.modalPresentationStyle = UIModalPresentationFullScreen;
-    [self presentViewController:nav animated:YES completion:nil];
+    __weak typeof(self) weakSelf=self;
+    NSError *error=nil;
+    if(!CSNativeContactPickerPresent(self,title,YES,[defaults arrayForKey:key]?:@[],nil,^(NSArray<NSString *> *names){
+        [defaults setObject:names forKey:key];
+        [weakSelf setupData]; [weakSelf.tableView reloadData];
+    },&error)) {
+        UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"无法选择群聊" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"好" style:UIAlertActionStyleDefault handler:nil]];
+        [self presentViewController:alert animated:YES completion:nil];
+    }
 }
 
 - (void)showPrivateReplyInput {

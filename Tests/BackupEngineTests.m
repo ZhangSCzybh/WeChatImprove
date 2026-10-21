@@ -17,6 +17,13 @@ int main(void){@autoreleasepool{
  [standard setObject:@"original" forKey:key];[legacy setBool:YES forKey:@"BackgroundRunEnabled"];[layout setDouble:1.2 forKey:@"global.scale"];
  NSError *error=nil;NSDictionary *snapshot=[engine save:@"original" kind:@"manual" error:&error];Check(snapshot!=nil,error.description?:@"capture");
  Check([store snapshots:NULL].count==1,@"snapshot listed without an index");
+ NSString *icon=@"com.wechat.enhance.tabbar_style.icon.chat",*stale=[engine.resourceRoot URLByAppendingPathComponent:@"old-icon.png"].path;
+ [standard setObject:stale forKey:icon];error=nil;
+ NSDictionary *withoutIcon=[engine save:@"native tab icons" kind:@"manual" error:&error];
+ Check(withoutIcon!=nil&&error==nil&&[withoutIcon[@"assets"] count]==0,@"complete backup succeeds with a stale optional tab icon path");
+ Check([[standard objectForKey:icon] isEqual:stale],@"successful backup leaves current preferences unchanged");
+ NSData *exported=[CSBackupCodec encode:withoutIcon error:&error];
+ Check(exported.length>0,@"backup without custom tab images remains exportable");
  [legacy setBool:NO forKey:@"BackgroundRunEnabled"];[standard setObject:@"changed" forKey:key];[layout setDouble:1.5 forKey:@"global.scale"];
  NSSet *modules=[NSSet setWithArray:[CSBackupRegistry moduleTitles].allKeys];
  NSDictionary *preview=[engine preview:snapshot modules:modules accounts:[NSSet setWithObject:account] error:&error];Check(preview!=nil,error.description?:@"preview");
