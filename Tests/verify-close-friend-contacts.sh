@@ -24,11 +24,14 @@ source=Path('Controllers/CSCloseFriendContactAdapter.m').read_text()
 (out/'ForwardBodies.h').write_text('\n'.join(body(source,marker) for marker in ['BOOL CSCFPageIsCurrent(', 'static BOOL SetPresentationBuffer(', 'void CSCFRefreshForwardSearch(', 'void CSCFForwardSearchWillUpdate(', 'void CSCFForwardSearchDidUpdate(']))
 source=Path('Controllers/CSCloseFriendSearchAdapter.m').read_text()
 (out/'GroupTitle.h').write_text('\n'.join(body(source,m) for m in ['id CSCFSearchModel(', 'NSArray *CSCFSearchVisibleRows(', 'static NSString *GroupDisplayTitle(']))
-(out/'SearchInputBodies.h').write_text('static char SearchPasswordConsumedKey;\n'+body(source,'BOOL CSCFSearchSuppressLoading(')+'\n'+body(source,'BOOL CSCFSearchConsumePassword(')+'\n'+body(Path('Hooks/CloseFriendSearchHooks.xm').read_text(),'static void DispatchSearchInput('))
+start=source.index('@interface CSCFSearchInputState')
+end=source.index('@interface CSCFSearchState',start)
+(out/'SearchInputBodies.h').write_text(source[start:end])
+(out/'SearchInputHooks.h').write_text(body(Path('Hooks/CloseFriendSearchHooks.xm').read_text(),'static void InstallSearchInputHooks('))
 source=Path('Hooks/CloseFriendProfileHooks.xm').read_text()
 (out/'ProfileGuards.h').write_text(body(source,'static void Guard0(')+'\n'+body(source,'static void Guard1(')+'\n'+body(source,'static void Render0(')+'\n'+body(source,'static void DisplayFlag('))
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation \
- -IControllers -I"$work" Controllers/CSCloseFriendPolicy.m Controllers/CSCloseFriendContactProjection.m \
+ -IControllers -I"$work" Controllers/CSCloseFriendPolicy.m Controllers/CSCloseFriendSignatures.m Controllers/CSCloseFriendContactProjection.m \
  Tests/CloseFriendContactTests.m -o "$work/tests"
 "$work/tests"

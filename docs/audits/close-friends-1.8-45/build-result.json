@@ -1,0 +1,10 @@
+{
+  "command": [
+    "make",
+    "package",
+    "-j4",
+    "SCHEME=rootless",
+    "PACKAGE_VERSION=1.8-45"
+  ],
+  "exit_code": 0
+}

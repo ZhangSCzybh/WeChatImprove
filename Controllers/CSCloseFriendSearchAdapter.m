@@ -1,43 +1,135 @@
 #import "CSCloseFriendSearchAdapter.h"
 #import "CSCloseFriendManager.h"
 
-static char SearchPasswordConsumedKey;
-BOOL CSCFSearchSuppressLoading(id page) {
-    return [objc_getAssociatedObject(page,&SearchPasswordConsumedKey) boolValue];
+// The stored credential is a one-way verifier: no password-prefix oracle is kept.
+// Hold all homepage typing until a deliberate ordinary search or exact unlock.
+@interface CSCFSearchInputState : NSObject
+@property(nonatomic) NSUInteger epoch, generation, submittedGeneration;
+@property(nonatomic) BOOL held, consumed, resetting;
+@end
+@implementation CSCFSearchInputState @end
+static char SearchInputKey;
+static BOOL SearchProtected(id page) {
+    CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
+    return CSCFIsClass(page,@"FTSHomeViewController") && (snapshot.enabled || snapshot.blocked);
 }
-BOOL CSCFSearchConsumePassword(id page,id input) {
-    if(!NSThread.isMainThread || !CSCFIsClass(page,@"FTSHomeViewController")) return NO;
-    id bar=CSCloseFriendRead(page,@"searchBar");
-    id field=CSCloseFriendRead(page,@"searchTextField");
-    id textView=CSCloseFriendRead(bar,@"textView");
-    if(CSCloseFriendRead(field,@"markedTextRange") || CSCloseFriendRead(textView,@"markedTextRange")) return NO;
+static CSCFSearchInputState *InputState(id page) {
+    CSCFSearchInputState *state=objc_getAssociatedObject(page,&SearchInputKey);
+    if(!state) {
+        state=[CSCFSearchInputState new]; state.epoch=CSCloseFriendAccountEpoch();
+        objc_setAssociatedObject(page,&SearchInputKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return state;
+}
+static NSString *SearchInput(id page,id input) {
     id query=[input isKindOfClass:NSString.class] ? input : CSCloseFriendRead(input,@"text");
     if(![query isKindOfClass:NSString.class]) query=CSCloseFriendRead(page,@"searchBarText");
-    if(![query isKindOfClass:NSString.class]) return NO;
-    if(![CSCloseFriendManager.sharedManager consumeHomepageSearchPassword:query]) {
-        if([query length]) objc_setAssociatedObject(page,&SearchPasswordConsumedKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        return NO;
-    }
-    objc_setAssociatedObject(page,&SearchPasswordConsumedKey,@YES,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    id presenter=CSCloseFriendRead(page,@"presenter");
-    [NSObject cancelPreviousPerformRequestsWithTarget:presenter];
-    // 8.0.78 uses WCSearchBar's large-input UITextView. Its native clear operation
-    // resets the visible editor AND runs the empty-input delegate path. Clearing
-    // searchTextField alone leaves that editor, query state and loading footer live.
-    if(!CSCFCallVoid(bar,@"inputBoxClear")) {
-        CSCFSetObject(field,@"setText:",@"");
-        CSCFSetObject(textView,@"setText:",@"");
-        CSCFSetObject(presenter,@"handleTextDidChange:",@"");
-    }
-    // Cancel after native empty-input reset; resetDataSource after cancellation
-    // would create a fresh unfinished search and revive the loading indicator.
-    [NSObject cancelPreviousPerformRequestsWithTarget:presenter];
-    CSCFCallVoid(presenter,@"cancelFTSSearch");
-    CSCFSetObject(presenter,@"setLatestCompeleteWebSearchQuery:",@"");
+    return [query isKindOfClass:NSString.class] ? query : @"";
+}
+static BOOL SearchComposing(id page) {
+    id textView=CSCloseFriendRead(CSCloseFriendRead(page,@"searchBar"),@"textView");
+    return CSCloseFriendRead(CSCloseFriendRead(page,@"searchTextField"),@"markedTextRange") ||
+        CSCloseFriendRead(textView,@"markedTextRange") ||
+        CSCloseFriendRead(CSCloseFriendRead(textView,@"textView"),@"markedTextRange");
+}
+static void SearchSetEmptyPresentation(id page,BOOL empty) {
+    SEL selector=NSSelectorFromString(@"updateViewHideStates:");
+    if(CSCloseFriendMethodMatches(class_getInstanceMethod([page class],selector),"v@:B"))
+        ((void(*)(id,SEL,BOOL))[page methodForSelector:selector])(page,selector,empty);
+}
+BOOL CSCFSearchSuppressLoading(id page) {
+    if(!SearchProtected(page)) return NO;
+    CSCFSearchInputState *state=objc_getAssociatedObject(page,&SearchInputKey);
+    return state && (state.held || state.consumed || state.epoch!=CSCloseFriendAccountEpoch());
+}
+void CSCFSearchClearResults(id page) {
+    CSCFSetObject(page,@"setSectionData:",@[]);
     CSCFSetObject(CSCloseFriendRead(page,@"tableView"),@"setTableFooterView:",nil);
-    CSCFCallVoid(page,@"reloadList");
+    CSCFSetObject(CSCloseFriendRead(CSCloseFriendRead(page,@"listAdapter"),@"tableView"),@"setTableFooterView:",nil);
+}
+static void SearchReset(id page,BOOL clearInput) {
+    CSCFSearchInputState *state=InputState(page); id presenter=CSCloseFriendRead(page,@"presenter");
+    [NSObject cancelPreviousPerformRequestsWithTarget:presenter];
+    state.resetting=YES;
+    @try {
+        if(clearInput) {
+            id bar=CSCloseFriendRead(page,@"searchBar");
+            // This clears the actual large editor and its native empty-input state.
+            if(!CSCFCallVoid(bar,@"inputBoxClear")) {
+                CSCFSetObject(CSCloseFriendRead(page,@"searchTextField"),@"setText:",@"");
+                CSCFSetObject(CSCloseFriendRead(bar,@"textView"),@"setText:",@"");
+            }
+        }
+        // Only an empty query may pass this reentrancy guard. Never clear/restore
+        // a partially typed editor: that would end Chinese IME composition.
+        CSCFSetObject(presenter,@"handleTextDidChange:",@"");
+    } @finally {
+        state.resetting=NO;
+        [NSObject cancelPreviousPerformRequestsWithTarget:presenter];
+        CSCFCallVoid(presenter,@"cancelFTSSearch");
+        CSCFSetObject(presenter,@"setLatestCompeleteWebSearchQuery:",@"");
+        CSCFSearchClearResults(page);
+        SearchSetEmptyPresentation(page,YES);
+        CSCFCallVoid(page,@"reloadList");
+    }
+}
+BOOL CSCFSearchConsumePassword(id page,id input) {
+    if(!NSThread.isMainThread || !SearchProtected(page) || SearchComposing(page)) return NO;
+    NSString *query=SearchInput(page,input);
+    if(!query.length || ![CSCloseFriendManager.sharedManager consumeHomepageSearchPassword:query]) return NO;
+    CSCFSearchInputState *state=InputState(page);
+    state.held=YES; state.consumed=YES; state.submittedGeneration=0;
+    SearchReset(page,YES);
     CSCFCallVoid(page,@"resignSearchFirstResponder");
     return YES;
+}
+void CSCFSearchDispatchInput(id page,id input,BOOL composing,BOOL voice,void (^native)(void)) {
+    if(!SearchProtected(page)) {
+        if(page) objc_setAssociatedObject(page,&SearchInputKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        native(); return;
+    }
+    if(!NSThread.isMainThread) return;
+    CSCFSearchInputState *state=InputState(page); NSString *query=SearchInput(page,input);
+    if(state.resetting) { if(!query.length) native(); return; }
+    state.epoch=CSCloseFriendAccountEpoch(); state.generation++;
+    state.submittedGeneration=0; state.held=YES; state.consumed=NO;
+    if(!composing && CSCFSearchConsumePassword(page,query)) return;
+    // Voice delivery writes the editor in its original handler. Keep the text
+    // without invoking that handler's query logging / suggestion dispatch.
+    if(voice) {
+        id bar=CSCloseFriendRead(page,@"searchBar");
+        if(!CSCFSetObject(bar,@"inputBoxSetTextOnly:",query))
+            CSCFSetObject(CSCloseFriendRead(page,@"searchTextField"),@"setText:",query);
+    }
+    SearchReset(page,NO);
+}
+void CSCFSearchDispatchQuery(id page,id input,void (^native)(void)) {
+    if(!SearchProtected(page)) { native(); return; }
+    if(!NSThread.isMainThread) return;
+    CSCFSearchInputState *state=InputState(page); NSString *query=SearchInput(page,input);
+    if(state.resetting) { if(!query.length) native(); return; }
+    if(state.epoch!=CSCloseFriendAccountEpoch() || state.held || state.consumed ||
+        !state.submittedGeneration || state.submittedGeneration!=state.generation || SearchComposing(page)) return;
+    NSCharacterSet *spaces=NSCharacterSet.whitespaceAndNewlineCharacterSet;
+    if(![[query stringByTrimmingCharactersInSet:spaces] isEqual:[SearchInput(page,nil) stringByTrimmingCharactersInSet:spaces]]) return;
+    native();
+}
+void CSCFSearchSubmit(id page,void (^native)(void)) {
+    if(!SearchProtected(page)) { native(); return; }
+    if(!NSThread.isMainThread) return;
+    CSCFSearchInputState *state=InputState(page);
+    if(state.resetting || state.epoch!=CSCloseFriendAccountEpoch() || SearchComposing(page)) return;
+    NSString *query=SearchInput(page,nil);
+    if(CSCFSearchConsumePassword(page,query)) return;
+    query=[query stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    if(!query.length) { state.held=YES; SearchReset(page,NO); return; }
+    state.generation++; state.submittedGeneration=state.generation;
+    state.held=NO; state.consumed=NO;
+    SearchSetEmptyPresentation(page,NO);
+    // Incremental queries were withheld. Start native local FTS once explicitly,
+    // then retain native Return navigation (large editor opens the full results).
+    CSCFSetObject(CSCloseFriendRead(page,@"presenter"),@"doSearch:",query);
+    native();
 }
 @interface CSCFSearchState : NSObject
 @property(nonatomic) NSUInteger epoch, revision, displayedRevision, generation, displayedGeneration;

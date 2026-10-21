@@ -8,7 +8,7 @@ theos_dir=${THEOS:-/Users/zhangshichao/theos}
 sdk_dir=$(xcrun --sdk iphoneos --show-sdk-path)
 surface_hooks=(CloseFriendContactHooks CloseFriendSearchHooks CloseFriendProfileHooks)
 social_hooks=(CloseFriendSocialHooks)
-alert_hooks=(CloseFriendNotificationHooks CloseFriendCallHooks)
+alert_hooks=(CloseFriendNotificationHooks CloseFriendCallHooks CloseFriendCallReplyHooks)
 hooks=("${alert_hooks[@]}" "${social_hooks[@]}" CloseFriendLifecycleHooks CustomEntryHooks "${surface_hooks[@]}")
 if [[ "${1:-}" == "--surfaces" ]]; then hooks=("${surface_hooks[@]}"); fi
 if [[ "${1:-}" == "--alerts" ]]; then hooks=("${alert_hooks[@]}"); fi
@@ -18,10 +18,10 @@ for hook in "${hooks[@]}"; do
 done
 for arch in arm64 arm64e; do
  flags=(-target "$arch-apple-ios15.0" -isysroot "$sdk_dir" -fobjc-arc -fblocks -Wno-deprecated-declarations -Wno-unused-parameter -IControllers -IHeaders -IHooks -I"$theos_dir/vendor/include" -F"$theos_dir/vendor/lib")
- sources=(Controllers/CSCloseFriend{Policy,Crypto,Store,Account,Runtime,Signatures,Bridge,Manager,SettingsViewController,ContactProjection,ContactAdapter,SearchAdapter,ProfileAdapter,SocialProjection,SocialAdapter,TimelineAdapter,InteractionAdapter,StatusAdapter,AudienceAdapter,NotificationAdapter,MuteAdapter,CallAdapter}.m)
+ sources=(Controllers/CSCloseFriend{Policy,Crypto,Store,Account,Runtime,Signatures,Bridge,Manager,SettingsViewController,ContactProjection,ContactAdapter,SearchAdapter,ProfileAdapter,SocialProjection,SocialAdapter,TimelineAdapter,InteractionAdapter,StatusAdapter,AudienceAdapter,NotificationAdapter,MuteAdapter,CallAdapter,CallReply}.m)
  if [[ "${1:-}" == "--surfaces" ]]; then sources=(Controllers/CSCloseFriend{ContactProjection,ContactAdapter,SearchAdapter,ProfileAdapter}.m); fi
  if [[ "${1:-}" == "--social" ]]; then sources=(Controllers/CSCloseFriend{SocialProjection,SocialAdapter,TimelineAdapter,InteractionAdapter,StatusAdapter,AudienceAdapter}.m); fi
- if [[ "${1:-}" == "--alerts" ]]; then sources=(Controllers/CSCloseFriend{NotificationAdapter,MuteAdapter,CallAdapter}.m Controllers/CSGroupListAdapter.m Controllers/CSPaymentAutomation.m); fi
+ if [[ "${1:-}" == "--alerts" ]]; then sources=(Controllers/CSCloseFriend{NotificationAdapter,MuteAdapter,CallAdapter,CallReply}.m Controllers/CSGroupListAdapter.m Controllers/CSPaymentAutomation.m); fi
  for source in "${sources[@]}"; do
   xcrun --sdk iphoneos clang "${flags[@]}" -Wall -Wextra -Werror -Wno-unused-parameter -c "$source" -o "$work/$(basename "$source").$arch.o"
  done

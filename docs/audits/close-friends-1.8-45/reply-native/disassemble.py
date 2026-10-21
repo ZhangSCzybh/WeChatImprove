@@ -1,0 +1,29 @@
+"""Bounded read-only disassembly for selected close-friend integration decisions."""
+import json,subprocess,re,runpy,hashlib
+from pathlib import Path
+out=Path(__file__).parent
+# Reuse only the parser prefix without running the inventory writer.
+ctx={};exec((out/'extract.py').read_text().split('\nimport re,subprocess,hashlib,bisect')[0],ctx)
+selected={'CMessageWrap': ['initWithMsgType:', 'setM_uiStatus:', 'setM_uiCreateTime:', 'm_uiStatus', 'm_uiMesLocalID', 'm_n64MesSvrID', 'IsSendBySendMsg'], 'CMessageMgr': ['AddMsg:MsgWrap:', 'ResendMsg:MsgWrap:', 'ReSendMessage:MsgWrap:', 'OnSendMessageFail:', 'OnSendMessageSuccess:', 'OnMessageSentBySender:', 'OnErrorBySender:ErrNo:', 'ModMsg:MsgWrap:', 'ModMsgByBitSet:MsgWrap:BitSet:', 'GetMsg:LocalID:'], 'SendMessageMgr': ['AddMsgToSendTable:MsgWrap:', 'CheckResend', 'SendMsg', 'MessageReturn:Event:', 'getSendMessages'], 'SendMessageEventHandler': ['OnProtocolStart:shouldContinue:', 'OnProtocolResponse:shouldContinue:', 'OnProtocolConnectFail:', 'HandleSendFail', 'handleSendSuccessMsg:', 'LoadMsgFromDB']}
+rows=json.loads((out/'methods.json').read_text());reports=[]
+for row in rows:
+ if row['selector'] not in selected.get(row['cls'],[]):continue
+ start=int(row['address'],16);stop=min(int(row['end'],16),start+16000)
+ raw=subprocess.check_output(['xcrun','llvm-objdump','-d','--start-address='+hex(start),'--stop-address='+hex(stop),'/tmp/wechat-8.0.78-inset-analysis/WeChat'],text=True)
+ regs={};lines=[]
+ for line in raw.splitlines():
+  m=re.search(r'adrp\s+(x\d+), (0x[0-9a-f]+)',line)
+  if m:regs[m[1]]=int(m[2],16)
+  m=re.search(r'ldr\s+x\d+, \[(x\d+), #(0x[0-9a-f]+)\]',line)
+  if m and m[1] in regs:
+   try:
+    value=ctx['string'](ctx['ptr'](ctx['pos'](regs[m[1]]+int(m[2],16))))
+    if value and len(value)<180 and all(c.isprintable() and c!='�' for c in value):line+=' ; '+value
+   except Exception:pass
+  lines.append(line.rstrip())
+ name=row['cls']+'--'+row['selector'].replace(':','_')+'.asm'
+ (out/name).write_text('\n'.join(lines)+'\n');reports.append(dict(file=name,start=hex(start),stop=hex(stop),truncated=stop<int(row['end'],16)))
+manifest=json.loads((out/'manifest.json').read_text());manifest['disassembly']=reports
+manifest['files']={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in out.iterdir() if p.suffix in ['.py','.asm','.json'] and p.name!='manifest.json'}
+(out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+print(json.dumps(reports,indent=2))

@@ -27,7 +27,7 @@ def body(marker):
 start=s.index('    __block IMP add=NULL;');end=s.index('    for(NSString *name in @[@"presentLocalNotificationNow:',start)
 (Path(sys.argv[1])/'AlertNotificationBody.h').write_text('static void InstallNotificationOutput(void) { IMP imp;\n'+s[start:end]+'\n}')
 PY
-xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \
+xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -DCSCF_CALL_REPLY_TESTING=1 \
  -framework Foundation -I"$work" -IControllers \
  Controllers/CSCloseFriend{Policy,Signatures,NotificationAdapter,MuteAdapter,CallAdapter,CallReply}.m \
  Controllers/CSGroupProjection.m Controllers/WESessionTabItem.m Tests/CloseFriendAlertTests.m -o "$work/alerts"

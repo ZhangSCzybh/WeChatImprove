@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
 #import "CSCloseFriendContactProjection.h"
+#import "CSCloseFriendSignatures.h"
 static void Check(BOOL condition,NSString *message) { if(!condition) {fprintf(stderr,"FAIL: %s\n",message.UTF8String); exit(1);} }
 @interface Contact : NSObject
 @property(nonatomic,copy) NSString *username, *m_nsNickName, *remark;
@@ -56,8 +57,8 @@ void CSCFReloadTables(id owner) {(void)owner;}
 @end
 @implementation NativeForward @end
 BOOL CSCloseFriendInstallHook(NSString *className,NSString *name,IMP replacement,IMP *original,const char *encoding) {
-    (void)encoding; Class cls=NSClassFromString(className); SEL selector=NSSelectorFromString(name); Method method=class_getInstanceMethod(cls,selector);
-    if(!method) return NO; *original=method_getImplementation(method); method_setImplementation(method,replacement); return YES;
+    Class cls=NSClassFromString(className); SEL selector=NSSelectorFromString(name); Method method=class_getInstanceMethod(cls,selector);
+    if(!CSCloseFriendMethodMatches(method,encoding)) return NO; *original=method_getImplementation(method); method_setImplementation(method,replacement); return YES;
 }
 // Compile the production action wrappers, rather than a test-only imitation of their control flow.
 #import "ProfileGuards.h"

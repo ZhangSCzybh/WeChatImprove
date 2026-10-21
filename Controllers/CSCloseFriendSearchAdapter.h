@@ -16,6 +16,10 @@ FOUNDATION_EXPORT UITableViewCell *CSCFSearchUnlockCell(void);
 FOUNDATION_EXPORT void CSCFSearchUnlock(id section);
 FOUNDATION_EXPORT BOOL CSCFSearchConsumePassword(id page,id input);
 FOUNDATION_EXPORT BOOL CSCFSearchSuppressLoading(id page);
+FOUNDATION_EXPORT void CSCFSearchClearResults(id page);
+FOUNDATION_EXPORT void CSCFSearchDispatchInput(id page,id input,BOOL composing,BOOL voice,void (^native)(void));
+FOUNDATION_EXPORT void CSCFSearchDispatchQuery(id page,id input,void (^native)(void));
+FOUNDATION_EXPORT void CSCFSearchSubmit(id page,void (^native)(void));
 #ifdef __cplusplus
 }
 #endif
