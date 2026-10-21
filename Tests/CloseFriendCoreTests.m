@@ -39,6 +39,10 @@ int main(void) { @autoreleasepool {
     CHECK([locked rejectsCaller:@"bob" chatRoom:@"room@chatroom" video:YES]);
     CHECK(![locked rejectsCaller:@"bob" chatRoom:@"other@chatroom" video:YES]);
     CHECK([locked rejectsCaller:@"alice" chatRoom:@"other@chatroom" video:YES]);
+    for(NSNumber *video in @[@NO,@YES]) {
+        CHECK(![open rejectsCaller:@"alice" chatRoom:nil video:video.boolValue]);
+        CHECK(![open rejectsCaller:@"bob" chatRoom:@"room@chatroom" video:video.boolValue]);
+    }
     CHECK(CSCloseFriendNormalizeProfile(@{@"enabled":@"yes"}, &error)==nil);
     NSData *key=CSCloseFriendRandomBytes(64,&error);
     CHECK(key.length==64);
@@ -66,7 +70,7 @@ int main(void) { @autoreleasepool {
     CHECK(![store saveState:@{@"profile":badProfile} forAccountID:@"one" error:&error]);
     CHECK([[NSData dataWithContentsOfURL:files[0]] isEqual:cipher]);
     for(id invalid in @[@{}, @{@"enabled":@1,@"friends":@[],@"groups":@[],@"options":@{}}, @{@"enabled":@YES,@"friends":@[@1],@"groups":@[],@"options":@{}}, @{@"enabled":@YES,@"friends":@[],@"groups":@[],@"options":@{@"unlockSeconds":@0}}, @{@"enabled":@YES,@"friends":@[],@"groups":@[],@"options":@{@"hideSessions":@1}}]) CHECK(!CSCloseFriendNormalizeProfile(invalid,&error));
-    // Every policy switch controls exactly one surface; revealed affects presentation only.
+    // Every hiding switch controls exactly one surface.
     NSArray *surfaceKeys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles"];
     for(NSUInteger i=0;i<surfaceKeys.count;i++) {
         NSMutableDictionary *p=[Profile() mutableCopy]; p[@"options"]=@{surfaceKeys[i]:@NO};
@@ -91,7 +95,7 @@ int main(void) { @autoreleasepool {
     [mutableName setString:@"mallory"]; [mutableNames removeAllObjects];
     CHECK([frozen containsUserName:@"alice"] && ![frozen containsUserName:@"mallory"]);
     NSMutableDictionary *callProfile=[Profile() mutableCopy]; callProfile[@"options"]=@{@"rejectVoice":@NO,@"silenceMessages":@NO};
-    CSCloseFriendSnapshot *calls=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"one" profile:callProfile revealed:YES revision:6 blocked:NO];
+    CSCloseFriendSnapshot *calls=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"one" profile:callProfile revealed:NO revision:6 blocked:NO];
     CHECK(![calls rejectsCaller:@"alice" chatRoom:nil video:NO]); CHECK([calls rejectsCaller:@"alice" chatRoom:nil video:YES]); CHECK(![calls silencesSession:@"alice" sender:nil]);
     // Version header, IV, ciphertext, MAC and truncation are independently rejected.
     for(NSNumber *offset in @[@0,@7,@8,@24,@(cipher.length-1)]) {

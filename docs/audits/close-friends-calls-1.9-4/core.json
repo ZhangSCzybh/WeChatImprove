@@ -1,0 +1,9 @@
+{
+  "command": [
+    "bash",
+    "Tests/verify-close-friend-core.sh"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 1.35,
+  "output": "CloseFriendCoreTests: 215 checks passed\n"
+}

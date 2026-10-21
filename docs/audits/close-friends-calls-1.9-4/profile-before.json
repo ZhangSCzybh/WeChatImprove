@@ -1,0 +1,9 @@
+{
+  "command": [
+    "bash",
+    "Tests/verify-close-friend-profile.sh"
+  ],
+  "exit_code": 1,
+  "elapsed_seconds": 0.87,
+  "output": "In file included from Tests/CloseFriendProfileTests.m:106:\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.E9etBiNGxU/ProfileAdapterBodies.h:57:226: error: call to undeclared function 'CSCFRefreshSurface'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]\n   57 |         [NSNotificationCenter.defaultCenter addObserverForName:CSCloseFriendPolicyDidChangeNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note){for(id page in pages.allObjects) CSCFRefreshSurface(page,^(id owner){CSCFProfileRefresh(owner);});}];\n      |                                                                                                                                                                                                                                  ^\n1 error generated.\n"
+}

@@ -1,0 +1,9 @@
+{
+  "command": [
+    "bash",
+    "Tests/verify-close-friend-alerts.sh"
+  ],
+  "exit_code": 1,
+  "elapsed_seconds": 2.01,
+  "output": "FAIL 191: !CSCFCallOutputSuppressed()\n"
+}

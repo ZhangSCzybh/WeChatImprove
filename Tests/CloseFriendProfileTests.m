@@ -12,6 +12,8 @@ static BOOL CSCloseFriendShouldHideUserName(NSString *name,CSCloseFriendSurface 
 static id CSCloseFriendRead(id object,NSString *key) {@try {return [object valueForKey:key];} @catch(__unused NSException *e) {return nil;}}
 static NSString *CSCloseFriendUserName(id object) {return CSCloseFriendRead(object,@"username");}
 static BOOL CSCFIsClass(id object,NSString *name) {return [object isKindOfClass:NSClassFromString(name)];}
+// Page visibility scheduling is covered by the contact fixture; run its callback inline here.
+static void CSCFRefreshSurface(id owner,void (^refresh)(id)) {refresh(owner);}
 static BOOL CSCFCallVoid(id object,NSString *name) {
     SEL selector=NSSelectorFromString(name); Method method=class_getInstanceMethod([object class],selector);
     if(!CSCloseFriendMethodMatches(method,"v@:")) return NO;
@@ -76,12 +78,16 @@ static BOOL CSCloseFriendInstallHook(NSString *cls,NSString *name,IMP replacemen
 - (BOOL)isInMyContactList {return self.m_contact.isFriend;}
 @end
 @interface WeixinContactInfoAssist : CBaseContactInfoAssist
-@property(nonatomic) NSUInteger albums,socials,messages,calls,adds,reloads;
+@property(nonatomic) NSUInteger albums,socials,messages,calls,voiceCalls,callMenus,adds,reloads;
 @property(nonatomic,copy) NSString *nativeButton;
+@property(nonatomic) BOOL nativeCallButtonVisible;
 - (void)showAlbumList;
 - (void)onSocialInfoHandle;
 - (void)onNewMessage:(id)sender;
 - (void)onOpenVoipView;
+- (void)onOpenVoiceVoipView;
+- (void)onOpenVoipActionSheet:(id)sender;
+- (BOOL)canShowVOIPBtn;
 - (void)onAddToContacts;
 - (void)addMsgActionView;
 - (void)reloadTableView;
@@ -91,8 +97,11 @@ static BOOL CSCloseFriendInstallHook(NSString *cls,NSString *name,IMP replacemen
 - (void)onSocialInfoHandle {self.socials++;}
 - (void)onNewMessage:(__unused id)sender {self.messages++;}
 - (void)onOpenVoipView {self.calls++;}
+- (void)onOpenVoiceVoipView {self.voiceCalls++;}
+- (void)onOpenVoipActionSheet:(__unused id)sender {self.callMenus++;}
+- (BOOL)canShowVOIPBtn {return self.m_contact.isFriend;}
 - (void)onAddToContacts {self.adds++;}
-- (void)addMsgActionView {self.nativeButton=[self isInMyContactList] ? @"发消息" : @"添加到通讯录";}
+- (void)addMsgActionView {self.nativeButton=[self isInMyContactList] ? @"发消息" : @"添加到通讯录";self.nativeCallButtonVisible=[self canShowVOIPBtn];}
 - (void)reloadTableView {self.reloads++; [self addMsgActionView];}
 @end
 void CSCFProfileRefresh(id controller);
@@ -115,23 +124,34 @@ int main(void) { @autoreleasepool {
     [assist showAlbumList]; [assist onSocialInfoHandle];
     Check(assist.albums==1 && assist.socials==1);
     [assist onNewMessage:nil]; [assist onOpenVoipView]; [page jumpToContentViewController:secret];
+    [assist onOpenVoiceVoipView]; [assist onOpenVoipActionSheet:nil];
     Check(assist.messages==0 && assist.calls==0 && page.chats==0);
+    Check(assist.voiceCalls==0 && assist.callMenus==0);
     [assist addMsgActionView]; [assist onAddToContacts];
     Check([assist.nativeButton isEqual:@"添加到通讯录"] && assist.adds==0 && page.alerts==1);
+    Check(!assist.nativeCallButtonVisible);
     Check(secret.isFriend && [assist isInMyContactList]);
     Policy(YES,NO); CSCFProfileRefresh(page);
     [assist showAlbumList]; [assist onSocialInfoHandle]; [assist onNewMessage:nil]; [assist onOpenVoipView]; [page jumpToContentViewController:secret];
+    [assist onOpenVoiceVoipView]; [assist onOpenVoipActionSheet:nil];
     Check(assist.albums==2 && assist.socials==2 && assist.messages==1 && assist.calls==1 && page.chats==1);
+    Check(assist.voiceCalls==1 && assist.callMenus==1 && assist.nativeCallButtonVisible);
     Check([assist.nativeButton isEqual:@"发消息"]);
     Policy(NO,NO); CSCFProfileRefresh(page); [assist showAlbumList]; [assist onSocialInfoHandle];
     Check(assist.albums==3 && assist.socials==3 && [assist.nativeButton isEqual:@"添加到通讯录"]);
+    [assist onOpenVoipView]; [assist onOpenVoiceVoipView]; [assist onOpenVoipActionSheet:nil];
+    Check(assist.calls==1 && assist.voiceCalls==1 && assist.callMenus==1 && !assist.nativeCallButtonVisible);
     WeixinContactInfoAssist *replacement=Bind(page,ordinary);
     [replacement showAlbumList]; [replacement onSocialInfoHandle]; [replacement onNewMessage:nil]; [page jumpToContentViewController:ordinary];
     Check(replacement.albums==1 && replacement.socials==1 && replacement.messages==1 && page.chats==2);
+    [replacement onOpenVoipView]; [replacement onOpenVoiceVoipView]; [replacement onOpenVoipActionSheet:nil];
+    Check(replacement.calls==1 && replacement.voiceCalls==1 && replacement.callMenus==1);
     [assist showAlbumList]; [assist onSocialInfoHandle]; [assist onNewMessage:nil];
     Check(assist.albums==3 && assist.socials==3 && assist.messages==1);
     Policy(YES,NO); [assist showAlbumList]; [assist onSocialInfoHandle];
     Check(assist.albums==3 && assist.socials==3);
+    [assist onOpenVoipView]; [assist onOpenVoiceVoipView]; [assist onOpenVoipActionSheet:nil];
+    Check(assist.calls==1 && assist.voiceCalls==1 && assist.callMenus==1);
     // An assist whose contact was changed before the owner catches up has no valid binding.
     replacement.m_contact=secret; [replacement showAlbumList]; [replacement onSocialInfoHandle];
     Check(replacement.albums==1 && replacement.socials==1);

@@ -14,7 +14,11 @@ static NSString *String(id v){return [v isKindOfClass:NSString.class] && [v leng
     if(self.roomType==1 || self.roomType==2)return [p rejectsCaller:self.subject.sender chatRoom:self.subject.session video:self.roomType==2];
     return [p rejectsCaller:self.subject.sender chatRoom:self.subject.session video:NO] && [p rejectsCaller:self.subject.sender chatRoom:self.subject.session video:YES];
 }
-- (BOOL)suppressesPresentation {return [self.subject shouldSilence] || [self requiresRejection];}
+- (BOOL)suppressesPresentation {
+    // Revealing restores native call handling while chat notifications stay silent.
+    if(CSCloseFriendCurrentSnapshot().revealed)return NO;
+    return [self.subject shouldSilence] || [self requiresRejection];
+}
 @end
 @interface CSCloseFriendCallAdapter ()
 @property(nonatomic,strong) NSMutableDictionary *claims;

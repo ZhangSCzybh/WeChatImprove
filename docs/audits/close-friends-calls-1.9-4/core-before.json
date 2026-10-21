@@ -1,0 +1,9 @@
+{
+  "command": [
+    "bash",
+    "Tests/verify-close-friend-core.sh"
+  ],
+  "exit_code": 1,
+  "elapsed_seconds": 1.95,
+  "output": "FAIL line 43: ![open rejectsCaller:@\"alice\" chatRoom:nil video:video.boolValue]\n"
+}

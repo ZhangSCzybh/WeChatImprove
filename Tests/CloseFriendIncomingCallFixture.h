@@ -112,13 +112,36 @@ static void IncomingCallChecks(void) {
     ilink.isConnected=NO;ilink.mRoomId=0;VoIPMPSubCallService.sharedInstance.cache=nil;
     Policy=Snapshot(YES,NO,@{@"rejectVoice":@NO});m=IncomingMessage(@"friend",8112,YES,NO);CHECK(CSCFHandleIncomingCall(ilink,m,YES) && ilink.rejects==2);
     m=IncomingMessage(@"friend",8113,YES,YES);CHECK(CSCFHandleIncomingCall(ilink,m,YES) && ilink.rejects==3);
-    Policy=Snapshot(YES,YES,nil);m=IncomingMessage(@"friend",8114,YES,NO);CHECK(CSCFHandleIncomingCall(ilink,m,YES) && ilink.rejects==4);
+    // Revealed friends reach the native incoming UI on both transports and media.
+    // Message silence remains enabled, so it cannot substitute for call rejection.
+    Policy=Snapshot(YES,YES,nil);
+    unsigned long long openRoom=8300;
+    Invites *openInvites=[Invites new];
+    for(NSNumber *transport in @[@YES,@NO])for(NSNumber *video in @[@NO,@YES]) {
+        id manager=transport.boolValue?(id)ilink:(id)legacy;
+        m=IncomingMessage(@"friend",openRoom++,transport.boolValue,video.boolValue);
+        CSCloseFriendCallToken *token=CSCFIncomingCallToken(m);
+        CHECK(token.subject.shouldSilence && !token.requiresRejection && !token.suppressesPresentation);
+        NSUInteger starts=[manager starts];
+        BOOL intercepted=CSCFHandleIncomingCall(manager,m,transport.boolValue);
+        CHECK(!intercepted);
+        if(!intercepted)[manager onMonoServiceMsgStartWithMsg:m];
+        CHECK([manager starts]==starts+1);
+        Info *invitation=[VoIPInvitationInfo infoWithVoipMonoMsg:m scene:0];
+        CHECK(!CSCFHandleInvitation(openInvites,invitation,999));
+        CHECK(!CSCFInvitationOutputSuppressed(@{@"info":invitation}));
+    }
+    CHECK(ilink.rejects==3 && legacy.rejects==0 && openInvites.rejects==0);
+    // Existing tokens consult the current lock state, without waiting for a new invite.
+    CSCloseFriendCallToken *openToken=CSCFIncomingCallToken(m);
+    Policy=Snapshot(YES,NO,nil);CHECK(openToken.requiresRejection && openToken.suppressesPresentation);
+    Policy=Snapshot(YES,YES,nil);CHECK(!openToken.requiresRejection && !openToken.suppressesPresentation);
     m=IncomingMessage(@"friend",8115,YES,NO);CHECK(CSCFIncomingCallToken(m).subject.isCurrent);Epoch++;Policy=Snapshot(YES,NO,nil);
-    CHECK(CSCFHandleIncomingCall(ilink,m,YES) && ilink.rejects==4);
+    CHECK(CSCFHandleIncomingCall(ilink,m,YES) && ilink.rejects==3);
     // Native reset does not reset isCaller; a previous outgoing call must not
     // disable a later incoming rejection once the owning UI/SDK are idle.
     ilink.isCaller=YES;m=IncomingMessage(@"friend",8116,YES,NO);
-    CHECK(CSCFHandleIncomingCall(ilink,m,YES) && ilink.rejects==5);ilink.isCaller=NO;
+    CHECK(CSCFHandleIncomingCall(ilink,m,YES) && ilink.rejects==4);ilink.isCaller=NO;
     m=IncomingMessage(@"friend",8201,NO,NO);CHECK(CSCFHandleIncomingCall(legacy,m,NO));CHECK(legacy.rejects==1 && legacy.lastRoom==8201);CHECK(CSCFHandleIncomingCall(legacy,m,NO) && legacy.rejects==1);
     ui.talking=YES;ui.room=8202;m=IncomingMessage(@"friend",8202,NO,YES);CHECK(CSCFHandleIncomingCall(legacy,m,NO) && legacy.rejects==1);
     ui.room=999;m=IncomingMessage(@"friend",8203,NO,YES);CHECK(CSCFHandleIncomingCall(legacy,m,NO) && legacy.rejects==2 && legacy.lastRoom==8203 && ui.room==999);ui.talking=NO;

@@ -64,5 +64,5 @@ NSDictionary *CSCloseFriendNormalizeProfile(id profile, NSError **error) {
     return self.blocked || [self.protectedUserNames containsObject:name];
 }
 - (BOOL)silencesSession:(NSString *)session sender:(NSString *)sender { return self.enabled && [self.options[@"silenceMessages"] boolValue] && ([self containsUserName:session] || [self containsUserName:sender]); }
-- (BOOL)rejectsCaller:(NSString *)caller chatRoom:(NSString *)room video:(BOOL)video { return self.enabled && [self.options[video?@"rejectVideo":@"rejectVoice"] boolValue] && ([self containsUserName:caller] || [self containsUserName:room]); }
+- (BOOL)rejectsCaller:(NSString *)caller chatRoom:(NSString *)room video:(BOOL)video { return self.enabled && !self.revealed && [self.options[video?@"rejectVideo":@"rejectVoice"] boolValue] && ([self containsUserName:caller] || [self containsUserName:room]); }
 @end

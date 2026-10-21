@@ -91,14 +91,14 @@ static void CallReplyChecks(void) {
     CMessageMgr *messages=ResetReplies();Policy=Snapshot(YES,NO,nil);
     CHECK(![Policy.options[@"callReplyEnabled"] boolValue] && [Policy.options[@"callReplyText"] length]>0);
     CSCFCallDidReject(ReplyToken(300));PumpReplies();CHECK(messages.sent==0);
-    Policy=Snapshot(YES,YES,@{@"callReplyEnabled":@YES,@"callReplyText":@"稍后联系"});
+    Policy=Snapshot(YES,NO,@{@"callReplyEnabled":@YES,@"callReplyText":@"稍后联系"});
     __weak CSCloseFriendCallToken *weak;
     @autoreleasepool {
         CSCloseFriendCallToken *first=ReplyToken(301);weak=first;
         CSCFCallDidReject(first);CSCFCallDidReject(first);CSCFCallDidReject(ReplyToken(302));
         first.state=@"native-ended";first.subject=nil;first=nil;
     }
-    Policy=Snapshot(YES,YES,@{@"callReplyEnabled":@YES,@"callReplyText":@"新的设置内容"});PumpReplies();
+    Policy=Snapshot(YES,NO,@{@"callReplyEnabled":@YES,@"callReplyText":@"新的设置内容"});PumpReplies();
     CHECK(!weak && messages.sent==1 && [messages.lastReceiver isEqual:@"friend"] && [messages.lastWrap.m_nsContent isEqual:@"稍后联系"]);
     CHECK(messages.lastWrap.m_uiMessageType==1 && messages.lastWrap.m_uiStatus==1 && [messages.lastWrap.m_nsFromUsr isEqual:@"self"] && [messages.lastWrap.m_nsToUsr isEqual:@"friend"]);
     CHECK(CSCloseFriendMethodMatches(class_getInstanceMethod(CMessageWrap.class,@selector(initWithMsgType:)),"@@:q"));
@@ -119,6 +119,10 @@ static void CallReplyChecks(void) {
     messages=ResetReplies();CSCFCallDidReject(ReplyToken(320));Epoch++;Policy=Snapshot(YES,NO,@{@"callReplyEnabled":@YES});PumpReplies();CHECK(messages.sent==0);
     messages=ResetReplies();CSCFCallDidReject(ReplyToken(321));Policy=Snapshot(YES,NO,nil);PumpReplies();CHECK(messages.sent==0);
     messages=ResetReplies();CSCFCallDidReject(ReplyToken(322));Policy=Snapshot(YES,NO,@{@"callReplyEnabled":@YES,@"rejectVoice":@NO});PumpReplies();CHECK(messages.sent==0);
+    messages=ResetReplies();Policy=Snapshot(YES,YES,@{@"callReplyEnabled":@YES});
+    CSCFCallDidReject(ReplyToken(327));CSCloseFriendCallToken *openVideo=ReplyToken(328);openVideo.roomType=2;CSCFCallDidReject(openVideo);
+    PumpReplies();CHECK(messages.sent==0);
+    messages=ResetReplies();CSCFCallDidReject(ReplyToken(329));Policy=Snapshot(YES,YES,@{@"callReplyEnabled":@YES});PumpReplies();CHECK(messages.sent==0);
     messages=ResetReplies();CSCloseFriendCallToken *suppressed=ReplyToken(323);suppressed.state=@"presentationSuppressed";CSCFCallDidReject(suppressed);
     CSCloseFriendCallToken *group=ReplyToken(324);group.subject=[CSCloseFriendAlertSubject subjectForSession:@"secret@chatroom" sender:@"friend"];CSCFCallDidReject(group);
     CSCloseFriendCallToken *ordinary=ReplyToken(325);ordinary.subject=[CSCloseFriendAlertSubject subjectForSession:@"ordinary" sender:@"ordinary"];CSCFCallDidReject(ordinary);
@@ -152,6 +156,9 @@ static void CallReplyChecks(void) {
     CHECK(sender.queued==0 && messages.modified==0 && messages.sent==1);
     messages=ResetReplies();sender=FixtureServices[@"SendMessageMgr"];CSCFCallDidReject(ReplyToken(351));PumpReplies();
     ReplyStatus(messages,5,0,NO);AdvanceReplies(2);Policy=Snapshot(YES,NO,nil);AdvanceReplies(2);CHECK(sender.queued==0);
+    messages=ResetReplies();sender=FixtureServices[@"SendMessageMgr"];CSCFCallDidReject(ReplyToken(352));PumpReplies();
+    ReplyStatus(messages,5,0,NO);AdvanceReplies(2);Policy=Snapshot(YES,YES,@{@"callReplyEnabled":@YES});AdvanceReplies(2);
+    CHECK(sender.queued==0 && messages.modified==0 && messages.sent==1);
 
     // Missing native queue is retried without a new local message.
     messages=ResetReplies();sender=FixtureServices[@"SendMessageMgr"];[FixtureServices removeObjectForKey:@"SendMessageMgr"];

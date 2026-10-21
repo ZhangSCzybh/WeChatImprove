@@ -173,7 +173,7 @@ int main(void){@autoreleasepool{
     Policy=Snapshot(YES,YES,nil);
 
     // Unified invitation: duplicate protection, current ordinary room preserved, ilink unsupported.
-    Policy=Snapshot(YES,YES,nil);Mono *mono=[Mono new];mono.msgKey=@"invite-1";Info *info=[Info new];info.roomID=100;info.roomKey=7;info.roomType=1;info.contact=@"friend";info.monoMsg=mono;Invites *service=[Invites new];
+    Policy=Snapshot(YES,NO,nil);Mono *mono=[Mono new];mono.msgKey=@"invite-1";Info *info=[Info new];info.roomID=100;info.roomKey=7;info.roomType=1;info.contact=@"friend";info.monoMsg=mono;Invites *service=[Invites new];
     CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);
     info.roomID=101;mono.msgKey=@"invite-2";info.isFromIlink=YES;CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);
     info.contact=@"ordinary";CHECK(!CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);
@@ -187,8 +187,11 @@ int main(void){@autoreleasepool{
     CSCFHandleMultiTalk(multi,gm,^{lifecycle++;CHECK(CSCFCallOutputSuppressed());CHECK(CSCFCallBannerSuppressed(group,200));CHECK(!CSCFCallBannerSuppressed(group,999));});CHECK(lifecycle==1 && multi.rejects==1 && multi.lastRejected==200 && multi.active==999);CHECK(!CSCFCallOutputSuppressed());CHECK(!CSCFCallBannerSuppressed(group,200));
     CSCFHandleMultiTalk(multi,gm,^{lifecycle++;});CHECK(multi.rejects==1 && lifecycle==2);
     multi.active=200;CSCFHandleMultiTalk(multi,gm,^{CHECK(!CSCFCallOutputSuppressed());});CHECK(multi.rejects==1);multi.active=999;
+    Policy=Snapshot(YES,YES,nil);
+    CSCFHandleMultiTalk(multi,gm,^{lifecycle++;CHECK(!CSCFCallOutputSuppressed());CHECK(!CSCFCallBannerSuppressed(group,200));CHECK(!CSCFCurrentAlert());});
+    CHECK(lifecycle==3 && multi.rejects==1 && multi.active==999);
     Policy=Snapshot(YES,NO,@{@"rejectVoice":@NO});CHECK(![CSCFMultiTalkToken(gm) requiresRejection]);
-    group.mWxGroupId=@"ordinary@chatroom";CHECK(![CSCFMultiTalkToken(gm) suppressesPresentation]);CSCFHandleMultiTalk(multi,gm,^{CHECK(!CSCFCallOutputSuppressed());lifecycle++;});CHECK(lifecycle==3 && multi.rejects==1);
+    group.mWxGroupId=@"ordinary@chatroom";CHECK(![CSCFMultiTalkToken(gm) suppressesPresentation]);CSCFHandleMultiTalk(multi,gm,^{CHECK(!CSCFCallOutputSuppressed());lifecycle++;});CHECK(lifecycle==4 && multi.rejects==1);
     // The validated owner excludes protected counts while revealed; folded owner never doubles totals.
     Policy=Snapshot(YES,YES,@{@"showBadges":@YES});Owners=[NSHashTable hashTableWithOptions:NSPointerFunctionsStrongMemory];CSGroupListAdapter *owner=[CSGroupListAdapter new];owner.controller=@"main";owner.snapshotAccount=@"self";owner.modelRevision=owner.snapshotRevision=1;owner.snapshotEpoch=Epoch;
     owner.cachedNativeSections=@[@[Row(0,@"friend",8,CSGroupRowKindSession),Row(1,@"ordinary",3,CSGroupRowKindSession),Row(2,@"chatroom_session_box",10,CSGroupRowKindAggregate)]];[Owners addObject:owner];

@@ -4,6 +4,12 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.9-5": @[
+            @{@"title": @"参考国民级APP更新内容", @"detail": @"解决了一些已知问题。"}
+        ],
+        @"1.9-4": @[
+            @{@"title": @"参考国民级APP更新内容", @"detail": @"解决了一些已知问题。"}
+        ],
         @"1.9-3": @[
             @{@"title": @"参考国民级APP更新内容", @"detail": @"解决了一些已知问题。"}
         ],
