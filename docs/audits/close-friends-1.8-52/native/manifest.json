@@ -1,0 +1,32 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "disassembly": [
+    {
+      "file": "WCTimeLineViewController--tableView_heightForRowAtIndexPath_.asm",
+      "start": "0x10a0bfc38",
+      "stop": "0x10a0c060c",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--genNormalCell_indexPath_.asm",
+      "start": "0x10a0c0b48",
+      "stop": "0x10a0c153c",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--tableView_willDisplayCell_forRowAtIndexPath_.asm",
+      "start": "0x10a0c4378",
+      "stop": "0x10a0c52dc",
+      "truncated": false
+    }
+  ],
+  "files": {
+    "WCTimeLineViewController--tableView_heightForRowAtIndexPath_.asm": "519048d11fc11d2d73b500b98dc27906abc93d3244f46b21efd2619a2d60cc3b",
+    "methods.json": "e18cb340860e26c68a30f2001440ba1af8d12a63f6a7dfdaad85887baf8c0fed",
+    "WCTimeLineViewController--tableView_willDisplayCell_forRowAtIndexPath_.asm": "3cc6f14fc971e032298780b27a6da4a41fcc845998606cb2a66a659b13163fbf",
+    "disassemble.py": "e0e8a157b39fa7f3f2d3acfdd5115d7c1c0e3b507d2c95b00a9e4f357c081dd4",
+    "WCTimeLineViewController--genNormalCell_indexPath_.asm": "7b1702377934b8f46c703e2df20ad1790867682f7e1ae03a0908e87b8a22955f"
+  }
+}

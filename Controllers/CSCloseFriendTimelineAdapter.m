@@ -5,6 +5,8 @@
 @property(nonatomic,strong) CSCloseFriendSocialProjection *posts;
 @property(nonatomic,weak) id facade;
 @property(nonatomic) NSUInteger revision, epoch;
+@property(nonatomic) NSUInteger presentationRevision;
+@property(nonatomic) BOOL prepared, refreshing;
 @end
 @implementation CSCFTimelineState @end
 @interface CSCFTimelineScope : NSObject
@@ -19,6 +21,8 @@ static char TimelineKey, CommentRevisionKey;
 static id (*RawPosts)(id,SEL);
 static id (*RawLikes)(id,SEL);
 static id (*RawComments)(id,SEL);
+static void InvalidateTimeline(id owner);
+static void PrepareTimeline(id owner);
 static void ClearLikes(id facade,NSArray *posts) {
     SEL selector=NSSelectorFromString(@"removeCachesOfLikeUserWithDataItemId:");
     if(!CSCloseFriendMethodMatches(class_getInstanceMethod([facade class],selector),"v@:@")) return;
@@ -38,10 +42,10 @@ static CSCFTimelineScope *Enter(id owner,id item) {
     if(CSCFIsClass(owner,@"WCTimeLineViewController")) {
         next.state=State(owner);
         CSCFSocialTrack(owner,^(id page){
-            CSCFTimelineState *state=State(page); ClearLikes(state.facade,state.posts.source); state.posts=nil;
-            CSCFSocialClearCaches(page,@[@"cellHeightCache",@"cellShowItemCache"]);
-            if(CSCFPageIsCurrent(page)) CSCFCallVoid(page,@"onMessageUnReadCountChanged");
-            CSCFReloadTables(page);
+            InvalidateTimeline(page);
+            // Offscreen tables retain native geometry until they next appear.
+            // Reload only the owned timeline, never nested media collections.
+            if([page isKindOfClass:UIViewController.class] && [page isViewLoaded] && [[page view] window]) PrepareTimeline(page);
         });
     }
     next.unreadPrevious=CSCFUnreadBegin(); Scope=next; return previous;
@@ -50,6 +54,49 @@ static void Leave(CSCFTimelineScope *previous) {
     if(!NSThread.isMainThread) return;
     if(!previous) ClearLikes(Scope.state.facade,Scope.state.posts.source);
     CSCFUnreadEnd(Scope.unreadPrevious); Scope=previous;
+}
+static void InvalidateTimeline(id owner) {
+    CSCFTimelineState *state=State(owner);
+    if(state.epoch!=CSCloseFriendAccountEpoch()) {state.posts=nil; return;}
+    ClearLikes(state.facade,state.posts.source); state.posts=nil;
+    CSCFSocialClearCaches(owner,@[@"cellHeightCache",@"cellShowItemCache"]);
+}
+static void PrepareTimeline(id owner) {
+    if(!NSThread.isMainThread || !CSCFPageIsCurrent(owner) || ![owner isKindOfClass:UIViewController.class] || ![owner isViewLoaded]) return;
+    CSCFTimelineState *state=State(owner);
+    CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
+    if(state.epoch!=CSCloseFriendAccountEpoch() || state.refreshing || (state.prepared && state.presentationRevision==snapshot.revision)) return;
+    BOOL affected=snapshot.blocked || (snapshot.enabled && snapshot.protectedUserNames.count &&
+        ([snapshot.options[@"hideTimeline"] boolValue] || [snapshot.options[@"hideInteractions"] boolValue]));
+    if(!affected && !state.prepared) return;
+    id table=CSCloseFriendRead(owner,@"tableView");
+    if(![table isKindOfClass:UITableView.class]) return;
+    state.refreshing=YES;
+    InvalidateTimeline(owner);
+    CSCFTimelineScope *previous=Enter(owner,nil);
+    BOOL refreshed=NO;
+    @try {
+        CSCFCallVoid(owner,@"onMessageUnReadCountChanged");
+        // Native reload resets _isReloadingData and the deferred row cache.
+        // UIKit completes the resulting render in its normal layout pass.
+        refreshed=CSCFCallVoid(owner,@"reloadDataWrap") || CSCFCallVoid(table,@"reloadData");
+    } @finally {
+        Leave(previous); state.refreshing=NO;
+        state.prepared=refreshed; state.presentationRevision=snapshot.revision;
+    }
+}
+static void InstallTimelinePresentation(void) {
+    // No viewDidLayoutSubviews/reloadDataWrap hook and no layoutIfNeeded:
+    // native viewDidLayoutSubviews itself reloads, so forcing another layout
+    // from that cycle can continually schedule a new reload (the 1.8-49 freeze).
+    for(NSString *name in @[@"viewWillAppear:",@"viewDidAppear:"]) {
+        __block IMP original=NULL; SEL selector=NSSelectorFromString(name);
+        IMP replacement=imp_implementationWithBlock(^(id owner,BOOL animated){
+            ((void(*)(id,SEL,BOOL))original)(owner,selector,animated);
+            PrepareTimeline(owner);
+        });
+        if(!CSCloseFriendInstallHook(@"WCTimeLineViewController",name,replacement,&original,"v@:B")) imp_removeBlock(replacement);
+    }
 }
 static NSArray *ProjectedPosts(id facade) {
     if(!NSThread.isMainThread || !Scope.state || !RawPosts) return nil;
@@ -108,6 +155,7 @@ static void TimelineMethod(NSString *name,const char *types) {
     else if(!strcmp(types,"@@:@@")) replacement=imp_implementationWithBlock(^id(id object,id a,id b){BEGIN; @try {return ((id(*)(id,SEL,id,id))raw)(object,sel,a,b);} END });
     else if(!strcmp(types,"d@:@@")) replacement=imp_implementationWithBlock(^double(id object,id a,id b){BEGIN; @try {return ((double(*)(id,SEL,id,id))raw)(object,sel,a,b);} END });
     else if(!strcmp(types,"v@:@@")) replacement=imp_implementationWithBlock(^(id object,id a,id b){if(!CSCFPageIsCurrent(object)) return; BEGIN; @try {((void(*)(id,SEL,id,id))raw)(object,sel,a,b);} END });
+    else if(!strcmp(types,"v@:@@@")) replacement=imp_implementationWithBlock(^(id object,id a,id b,id c){if(!CSCFPageIsCurrent(object)) return; BEGIN; @try {((void(*)(id,SEL,id,id,id))raw)(object,sel,a,b,c);} END });
     else if(!strcmp(types,"@@:q")) replacement=imp_implementationWithBlock(^id(id object,NSInteger a){BEGIN; @try {return ((id(*)(id,SEL,NSInteger))raw)(object,sel,a);} END });
     else if(!strcmp(types,"@@:")) replacement=imp_implementationWithBlock(^id(id object){BEGIN; @try {return ((id(*)(id,SEL))raw)(object,sel);} END });
     else if(!strcmp(types,"@@:@")) replacement=imp_implementationWithBlock(^id(id object,id a){BEGIN; @try {return ((id(*)(id,SEL,id))raw)(object,sel,a);} END });
@@ -193,12 +241,13 @@ void CSCFTimelineInstall(void) {
     for(NSString *selector in commentContracts) ready &= CSCloseFriendMethodMatches(class_getClassMethod(NSClassFromString(@"WCTimeLineCommentCellView"),NSSelectorFromString(selector)),[commentContracts[selector] UTF8String]);
     CSCloseFriendRecordCapability(@"social.timeline.coupled",ready);
     if(!ready) return;
-    InstallModel(); InstallComments();
+    InstallModel(); InstallComments(); InstallTimelinePresentation();
     TimelineMethod(@"numberOfSectionsInTableView:","q@:@");
     TimelineMethod(@"tableView:numberOfRowsInSection:","q@:@q");
     TimelineMethod(@"tableView:cellForRowAtIndexPath:","@@:@@");
     TimelineMethod(@"tableView:heightForRowAtIndexPath:","d@:@@");
     TimelineMethod(@"tableView:didSelectRowAtIndexPath:","v@:@@");
+    TimelineMethod(@"tableView:willDisplayCell:forRowAtIndexPath:","v@:@@@");
     TimelineMethod(@"getNextDataItem:","@@:q"); TimelineMethod(@"visibleDataItemList","@@:");
     TimelineMethod(@"indexPathOfDataItem:","@@:@"); TimelineMethod(@"sectionIndexForDataItemWithTid:","Q@:@");
     for(NSString *name in @[@"scrollViewDidScroll:",@"scrollTableViewToShowDataItem:",@"refreshWholeViewWithFixedDataItem:"]) CSCFSocialHook1(@"WCTimeLineViewController",name,^(id owner,id arg,void(^orig)(id)){

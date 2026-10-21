@@ -19,8 +19,8 @@ static id CSCloseFriendRead(id object,NSString *key) {
 static BOOL CSCFPageIsCurrent(id page) {NSNumber *old=objc_getAssociatedObject(page,&EpochKey); if(!old) {old=@(Epoch); objc_setAssociatedObject(page,&EpochKey,old,OBJC_ASSOCIATION_RETAIN_NONATOMIC);} return old.unsignedIntegerValue==Epoch;}
 static NSMapTable *Refreshes;
 static void CSCFSocialTrack(id owner,void(^refresh)(id)) {if(!Refreshes) Refreshes=[NSMapTable weakToStrongObjectsMapTable]; [Refreshes setObject:[refresh copy] forKey:owner];}
-static void CSCFSocialClearCaches(__unused id owner,__unused NSArray *names) {}
-static BOOL CSCFCallVoid(__unused id page,__unused NSString *selector) {return NO;}
+static void CSCFSocialClearCaches(id owner,NSArray *names) {for(NSString *name in names) {id cache=CSCloseFriendRead(owner,name); if([cache isKindOfClass:NSMutableDictionary.class]) [cache removeAllObjects];}}
+static BOOL CSCFCallVoid(id page,NSString *name) {SEL selector=NSSelectorFromString(name); if(!CSCloseFriendMethodMatches(class_getInstanceMethod([page class],selector),"v@:"))return NO; ((void(*)(id,SEL))objc_msgSend)(page,selector); return YES;}
 static void CSCFReloadTables(__unused id page) {}
 static NSMapTable *RouteGates;
 static BOOL CSCFSocialGate(id owner,CSCloseFriendSurface surface,BOOL force) {
@@ -32,10 +32,12 @@ static BOOL CSCFUnreadBegin(void) {return NO;}
 static void CSCFUnreadEnd(__unused BOOL previous) {}
 static CSCloseFriendSocialProjection *CSCFSocialProject(NSArray *source,CSCloseFriendSurface surface) {return [[CSCloseFriendSocialProjection alloc] initWithSource:source snapshot:Snapshot surface:surface read:^id(id item,NSString *key){return CSCloseFriendRead(item,key);}];}
 static BOOL CSCFSocialHidden(id object,CSCloseFriendSurface surface) {return CSCloseFriendSocialObjectHidden(object,Snapshot,surface,^id(id item,NSString *key){return CSCloseFriendRead(item,key);});}
+static NSMutableSet *InstalledHooks;
 static BOOL CSCloseFriendInstallHook(NSString *cls,NSString *name,IMP replacement,IMP *original,const char *type) {
     Method m=class_getInstanceMethod(NSClassFromString(cls),NSSelectorFromString(name));
     if(!CSCloseFriendMethodMatches(m,type)) return NO;
     *original=method_getImplementation(m);
+    if(!InstalledHooks)InstalledHooks=[NSMutableSet new]; [InstalledHooks addObject:[cls stringByAppendingFormat:@".%@",name]];
     // MSHookMessageEx creates a class-local override for inherited lifecycle methods.
     class_replaceMethod(NSClassFromString(cls),NSSelectorFromString(name),replacement,method_getTypeEncoding(m)); return YES;
 }
@@ -86,8 +88,53 @@ static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(
 - (id)layoutStylesOfLikeUserWithDataItem:(WCDataItem *)item width:(__unused double)width isSpringStyle:(__unused BOOL)spring {NSArray *names=self.styleCache[item.itemID]; if(!names) self.styleCache[item.itemID]=names=item.likeUsers; return names;}
 - (double)likeUserHeightForWidth:(__unused double)width withDataItem:(WCDataItem *)item isSpringStyle:(__unused BOOL)spring {return item.likeCount*20;}
 @end
-@interface WCTimeLineViewController : NSObject @end
-@implementation WCTimeLineViewController @end
+@interface UIView : NSObject
+@property(nonatomic,strong) id window;
+@end
+@implementation UIView @end
+@interface UITableView : UIView
+@property(nonatomic) NSUInteger reloads;
+@property(nonatomic) BOOL renderPending;
+- (void)reloadData;
+@end
+@implementation UITableView
+- (void)reloadData {self.reloads++; self.renderPending=YES;}
+@end
+@interface UIViewController : NSObject
+@property(nonatomic,strong) UIView *view;
+@property(nonatomic,getter=isViewLoaded) BOOL viewLoaded;
+@end
+@implementation UIViewController @end
+@interface WCTimeLineViewController : UIViewController
+@property(nonatomic,strong) UITableView *tableView,*nestedMedia;
+@property(nonatomic,strong) WCFacade *facade;
+@property(nonatomic,strong) NSMutableDictionary *cellHeightCache,*cellShowItemCache;
+@property(nonatomic,strong) NSMutableArray *deferredRows;
+@property(nonatomic,strong) id displayedItem;
+@property(nonatomic) NSUInteger nativeReloads,nativeLayouts,appearances,displayCalls;
+@property(nonatomic) BOOL refreshInsideReload;
+- (void)viewWillAppear:(BOOL)animated;
+- (void)viewDidAppear:(BOOL)animated;
+- (void)viewDidLayoutSubviews;
+- (void)reloadDataWrap;
+- (NSInteger)numberOfSectionsInTableView:(id)table;
+- (void)tableView:(id)table willDisplayCell:(id)cell forRowAtIndexPath:(NSIndexPath *)path;
+@end
+@implementation WCTimeLineViewController
+- (void)viewWillAppear:(__unused BOOL)animated {self.appearances++;}
+- (void)viewDidAppear:(__unused BOOL)animated {self.appearances++;}
+// Native layout can reload. A plugin that forces layout from a reload hook
+// would re-enter this cycle; production must not install either hook.
+- (void)viewDidLayoutSubviews {self.nativeLayouts++; [self reloadDataWrap];}
+- (void)reloadDataWrap {
+    self.nativeReloads++; [self.deferredRows removeAllObjects]; [self.tableView reloadData];
+    if(self.refreshInsideReload) {void(^update)(id)=[Refreshes objectForKey:self]; if(update)update(self);}
+}
+- (NSInteger)numberOfSectionsInTableView:(__unused id)table {return [self.facade countOfTimelineDataItem];}
+- (void)tableView:(__unused id)table willDisplayCell:(__unused id)cell forRowAtIndexPath:(NSIndexPath *)path {
+    self.displayCalls++; self.displayedItem=[self.facade getTimelineDataItemOfIndex:path.section];
+}
+@end
 @interface InteractionPage : NSObject
 @property(nonatomic,strong) NSMutableArray *_arrCommentList;
 @end
@@ -159,6 +206,7 @@ static void Policy(BOOL revealed,NSUInteger revision) {
     Snapshot=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"fixture" profile:@{@"enabled":@YES,@"friends":@[@"secret"],@"groups":@[],@"options":CSCloseFriendDefaultOptions()} revealed:revealed revision:revision blocked:NO];
 }
 #include "CloseFriendSocialRouteFixture.h"
+#include "CloseFriendTimelinePresentationTests.h"
 int main(void) { @autoreleasepool {
     Check(TestSocialRoutes()==0);
     Policy(NO,1); InstallModel();
@@ -259,6 +307,7 @@ int main(void) { @autoreleasepool {
     Check(!NeedsUnlock(freshPrivacy));
     __block NSUInteger doneCalls=0; FinishEdit(freshPrivacy,^{doneCalls++;});
     Check(doneCalls==1 && freshPrivacy.selectContacts==acl && !NeedsUnlock(privacy));
+    Check(TestTimelinePresentation()==0);
     Epoch++; Policy(NO,9); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==0); Leave(previous); Check([facade countOfTimelineDataItem]==3);
     Check(Cards(status).visible.count==0 && !MessageActionCurrent(messages,second) && NeedsUnlock(freshPrivacy));
     Check([Rows(reminderLogic,NULL,@"A") count]==0 && !PickerAllowsContact(reminder,@"alice") && [selector.arrContacts isEqual:@[@"secret"]]);

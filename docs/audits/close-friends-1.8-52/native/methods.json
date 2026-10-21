@@ -1,0 +1,26 @@
+[
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "tableView:heightForRowAtIndexPath:",
+    "address": "0x10a0bfc38",
+    "end": "0x10a0c060c",
+    "types": "d32@0:8@16@24"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "genNormalCell:indexPath:",
+    "address": "0x10a0c0b48",
+    "end": "0x10a0c153c",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "tableView:willDisplayCell:forRowAtIndexPath:",
+    "address": "0x10a0c4378",
+    "end": "0x10a0c52dc",
+    "types": "v40@0:8@16@24@32"
+  }
+]

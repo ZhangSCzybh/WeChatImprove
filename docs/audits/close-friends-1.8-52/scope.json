@@ -1,0 +1,21 @@
+{
+  "code_baseline": "28a458ec3091bb0823a00c72f238acc5d2722e39",
+  "allowed_production_changes": [
+    "Controllers/CSCloseFriendTimelineAdapter.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "control"
+  ],
+  "preserved_adapters": {
+    "Controllers/CSCloseFriendAlbumAdapter.m": "4862a8bc1dc9f6f8354910996ad2290fcfe7769c0b00cc1eefc5a7fddbc20fd2",
+    "Controllers/CSCloseFriendDetailAdapter.m": "efa12127fad0855cdf8a793aed67533db6ccd3e26c0f9ccf3ef914943df7353c",
+    "Controllers/CSCloseFriendInteractionAdapter.m": "07ae220f3dd69ad9587fe830c290051aa50c07c53289105201773acd56af364b",
+    "Controllers/CSCloseFriendSocialAdapter.m": "a6e90d0b9cea90c6cfa581e3fe9308b4ccdf191c467f465311bf6fb8729cef1e",
+    "Controllers/CSCloseFriendProfileAdapter.m": "d7ec2176b3b9bb7218644eb3e51bd1b15345b72d331254bfe95f1caffa90eab0",
+    "Controllers/CSCloseFriendManager.m": "c7854971e857e5c064fb97211185d437ab95acccaa962631f111561b17a346dc",
+    "Controllers/CSCloseFriendShakeMonitor.m": "6179ba4188bfc7991028e5c9578d50a7bd8bfca358c5d2ac8bb5eba3c6009fbc",
+    "Hooks/CloseFriendLifecycleHooks.xm": "92a322335bb79b8295e1cfb45629d5bf7ac648bc0afa8dc5943b0a730f76170b",
+    "Hooks/CloseFriendProfileHooks.xm": "7a24fee3c7eef39c4da5144d57de8475afd2b8358c00655fb04c1774d030e954"
+  },
+  "original_checkout_head": "929d265b715f4a15b514bd0621c8eb01f0861483"
+}
