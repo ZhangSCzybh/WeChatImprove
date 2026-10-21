@@ -1,0 +1,171 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "classes": [
+    "FTSHomeViewController",
+    "FTSVoiceSearchBarController",
+    "WCSearchBar"
+  ],
+  "missing": [],
+  "encryption": [
+    32768,
+    492666880,
+    0
+  ],
+  "method_count": 21,
+  "files": {
+    "FTSHomeViewController--searchBarText.asm": "2f609c214095d675c5e278e522700b4638d45e8d241bc56eb93604178425f324",
+    "FTSHomeViewController--setLoadingStatus.asm": "9871f20635270e46efb49b384930d7fb707a8139351ace1013dd3f411a168f05",
+    "FTSHomeViewController--mmInputBoxTextChanged_text_.asm": "96e22547ed9edce16186f42441eebd143abd7ef7e6ad67b1f7a63e92bfd70dfc",
+    "WCSearchBar--inputBoxClear.asm": "dba6ac6f7e34aea25f4fa6b4a4829355f9a38a708601e9a9d00051d6b87a6d58",
+    "FTSVoiceSearchBarController--cancelFTSSearch.asm": "895b84f4be368daa956c7dcbe3239c3edfebd2ac0dd983f0989aef2c28a6cfb7",
+    "FTSVoiceSearchBarController--handleTextDidChange_fromNewVoice_.asm": "e7f239575e1e7e89334c17b69f6330400d91b1aaa9635e3aff7e83d67766c92a",
+    "WCSearchBar--inputBoxSetText_.asm": "afcaca0b5e948a41840aba7998187eb04b832091b48a93cc9aaba7d695f9a719",
+    "FTSVoiceSearchBarController--resetDataSource.asm": "b6bd0c9260fc90a2bb2dd24bbd6722988c064c812bdd6b4791f529d6808f5e3e",
+    "FTSVoiceSearchBarController--delaySearchImp_.asm": "0861dd635d9293b2e54fa014fd7fbd10c56bd61c4aed1518a1a5e75abbacc300",
+    "WCSearchBar--inputBoxSetTextOnly_.asm": "596c47b7659fcbf0f9f3a203bed0c2f67eb7136e99601efd51da41ac724364d4",
+    "methods.json": "7709ae6cdbcfa9c55f6bfbbb879dda4993afa6b1f5439003cf5768dec56b6543",
+    "FTSVoiceSearchBarController--onDataChanged.asm": "ece2cf0e5adc2c03bb3409781ba3785984a8087760e25502b318f861a163cf3c",
+    "disassemble.py": "b218e34d5fb88c9a80ea616d98ef9d1f9102a15afd01a5a99aade5c1b6f909b2",
+    "FTSVoiceSearchBarController--clearAllResource.asm": "b08033b912c9c97e3c3744bea41fa8737054ec77a9753806bf08927ac0b62bb6",
+    "WCSearchBar--inputBoxGetText.asm": "efb1249074063aeaa209d766471f4c663ecb84735ed73b7c4f9a5c720f736730",
+    "FTSHomeViewController--reloadList.asm": "752289f4704a8d80825e024c42be4410b29dbf4babb8186478878e264f1b612a",
+    "FTSHomeViewController--customSearchBar.asm": "8747674cf27199ea85029c013a499dcf2d4aeea8412a1d8e290975f86b66c266",
+    "WCSearchBar--clearInputBox.asm": "6acc21880c5757c45ca02ab1426fb0fd070b9c9fec72c09bba0c9bf5094565ab",
+    "WCSearchBar--textField.asm": "75de1d0ab3d1a3bd5ab4ad92311090131e3ffcf09f1bc303e33f2b5877236edd",
+    "extract.py": "d27b8da7141af287144d6365c37aadd616a0bc020ebe58c1f703274db53ffae0",
+    "FTSHomeViewController--searchTextField.asm": "3809e954f912c1719b743390ab83bc0dea0b0117d0eb942b20146fccb304626c",
+    "FTSHomeViewController--updateFooterView.asm": "639a163ca5eaaceaae2f88bb52c610b6baa522f36ed8c1313934983f1591bf42",
+    "FTSHomeViewController--onNavigationCancelItemClick.asm": "4a7de4618e487a8054f6c2ae8addb70487e00525c2e32471599affe0b3119507",
+    "WCSearchBar--onTextFieldChanged_.asm": "c8da85dade81734c48c11913b54207b4564f4fd17c97aaf19cc90b67a85e2890"
+  },
+  "disassembly": [
+    {
+      "file": "FTSHomeViewController--onNavigationCancelItemClick.asm",
+      "start": "0x1017629e8",
+      "stop": "0x101762a1c",
+      "truncated": false
+    },
+    {
+      "file": "FTSHomeViewController--customSearchBar.asm",
+      "start": "0x101762aec",
+      "stop": "0x1017630c4",
+      "truncated": false
+    },
+    {
+      "file": "FTSHomeViewController--mmInputBoxTextChanged_text_.asm",
+      "start": "0x101763fa8",
+      "stop": "0x101764268",
+      "truncated": false
+    },
+    {
+      "file": "FTSHomeViewController--updateFooterView.asm",
+      "start": "0x101766628",
+      "stop": "0x101766bd4",
+      "truncated": false
+    },
+    {
+      "file": "FTSHomeViewController--setLoadingStatus.asm",
+      "start": "0x101766e4c",
+      "stop": "0x101766f28",
+      "truncated": false
+    },
+    {
+      "file": "FTSHomeViewController--reloadList.asm",
+      "start": "0x101767434",
+      "stop": "0x1017674a8",
+      "truncated": false
+    },
+    {
+      "file": "FTSHomeViewController--searchBarText.asm",
+      "start": "0x1017674a8",
+      "stop": "0x1017674fc",
+      "truncated": false
+    },
+    {
+      "file": "FTSHomeViewController--searchTextField.asm",
+      "start": "0x1017675a4",
+      "stop": "0x1017675f8",
+      "truncated": false
+    },
+    {
+      "file": "FTSVoiceSearchBarController--clearAllResource.asm",
+      "start": "0x10181a980",
+      "stop": "0x10181a988",
+      "truncated": false
+    },
+    {
+      "file": "FTSVoiceSearchBarController--cancelFTSSearch.asm",
+      "start": "0x101829e20",
+      "stop": "0x10182a008",
+      "truncated": false
+    },
+    {
+      "file": "FTSVoiceSearchBarController--delaySearchImp_.asm",
+      "start": "0x10182a008",
+      "stop": "0x10182a308",
+      "truncated": false
+    },
+    {
+      "file": "FTSVoiceSearchBarController--handleTextDidChange_fromNewVoice_.asm",
+      "start": "0x10182a438",
+      "stop": "0x10182a6d0",
+      "truncated": false
+    },
+    {
+      "file": "FTSVoiceSearchBarController--resetDataSource.asm",
+      "start": "0x10182a6d0",
+      "stop": "0x10182a8d0",
+      "truncated": false
+    },
+    {
+      "file": "FTSVoiceSearchBarController--onDataChanged.asm",
+      "start": "0x10182dfb0",
+      "stop": "0x10182e024",
+      "truncated": false
+    },
+    {
+      "file": "WCSearchBar--textField.asm",
+      "start": "0x109dd32b8",
+      "stop": "0x109dd35b0",
+      "truncated": false
+    },
+    {
+      "file": "WCSearchBar--onTextFieldChanged_.asm",
+      "start": "0x109dd4e90",
+      "stop": "0x109dd4f18",
+      "truncated": false
+    },
+    {
+      "file": "WCSearchBar--inputBoxClear.asm",
+      "start": "0x109dd9bb0",
+      "stop": "0x109dd9fbc",
+      "truncated": false
+    },
+    {
+      "file": "WCSearchBar--clearInputBox.asm",
+      "start": "0x109dd9fbc",
+      "stop": "0x109dda31c",
+      "truncated": false
+    },
+    {
+      "file": "WCSearchBar--inputBoxSetText_.asm",
+      "start": "0x109ddac3c",
+      "stop": "0x109ddae9c",
+      "truncated": false
+    },
+    {
+      "file": "WCSearchBar--inputBoxSetTextOnly_.asm",
+      "start": "0x109ddae9c",
+      "stop": "0x109ddaf7c",
+      "truncated": false
+    },
+    {
+      "file": "WCSearchBar--inputBoxGetText.asm",
+      "start": "0x109ddaf7c",
+      "stop": "0x109ddb258",
+      "truncated": false
+    }
+  ]
+}

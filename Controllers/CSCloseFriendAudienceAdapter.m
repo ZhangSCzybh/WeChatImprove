@@ -1,5 +1,5 @@
 #import "CSCloseFriendSocialAdapter.h"
-static char AudienceBindingKey, AudiencePendingKey, AudienceOwnerRevokedKey, AudienceSelectionKey, AudienceItemKey;
+static char AudienceBindingKey, AudiencePendingKey, AudienceOwnerRevokedKey, AudienceSelectionKey, AudienceItemKey, AudienceReminderKey;
 @interface CSCFAudienceBinding : NSObject
 @property(nonatomic,weak) id owner,logic,picker;
 @property(nonatomic) NSUInteger epoch,revision,projectionEpoch,projectionRevision;
@@ -61,6 +61,18 @@ static BOOL PickerAllowsContact(id picker,id contact) {
 }
 static id (*AudienceKeys)(id,SEL);
 static id (*AudienceRows)(id,SEL,id);
+static id ReminderOwner(id selector) {
+    if(!CSCFIsClass(selector,@"ContactsSelectorController")) return nil;
+    id editor=CSCloseFriendRead(selector,@"delegate");
+    return CSCFIsClass(editor,@"WCNewCommitViewController") && CSCloseFriendRead(editor,@"contactsSelectorController")==selector ? editor : nil;
+}
+static void BindReminderPicker(id selector,id picker) {
+    id editor=ReminderOwner(selector);
+    if(!editor || !CSCFIsClass(picker,@"MultiSelectContactsViewController")) return;
+    CSCFPageIsCurrent(editor);
+    CSCFAudienceBinding *origin=[CSCFAudienceBinding new]; origin.owner=editor;
+    objc_setAssociatedObject(picker,&AudienceReminderKey,origin,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
 static id PublishingOwner(id logic) {
     id select=CSCloseFriendRead(logic,@"m_delegate");
     if(!CSCFIsClass(select,@"ContactSelectView")) return nil;
@@ -68,7 +80,14 @@ static id PublishingOwner(id logic) {
     // This is a positively identified publishing page, never a global candidate filter.
     if(CSCFIsClass(owner,@"WCMomentsPrivacyViewController")) return owner;
     id delegate=CSCloseFriendRead(owner,@"m_delegate") ?: CSCloseFriendRead(owner,@"delegate");
-    return CSCFIsClass(delegate,@"WCMomentsPrivacyViewController") ? delegate : nil;
+    if(CSCFIsClass(delegate,@"WCMomentsPrivacyViewController")) return delegate;
+    if(!CSCFIsClass(owner,@"MultiSelectContactsViewController")) return nil;
+    // The reminder selector also has a session-hosted variant. Both pass through
+    // commonSetup; retain only a weak editor identity, never its real selection.
+    CSCFAudienceBinding *origin=objc_getAssociatedObject(owner,&AudienceReminderKey);
+    id editor=origin.owner;
+    if(editor && ReminderOwner(CSCloseFriendRead(editor,@"contactsSelectorController"))==editor) return editor;
+    return ReminderOwner(delegate);
 }
 static CSCloseFriendContactProjection *Candidates(id logic) {
     id owner=PublishingOwner(logic);
@@ -119,6 +138,9 @@ static void FinishEdit(id owner,void(^native)(void)) {
     if(!NeedsUnlock(owner)) native();
 }
 void CSCFAudienceInstall(void) {
+    CSCFSocialHook1(@"ContactsSelectorController",@"commonSetupMutiSelectContactViewController:",^(id selector,id picker,void(^orig)(id)){
+        BindReminderPicker(selector,picker); orig(picker);
+    });
     for(NSString *name in @[@"viewDidLoad",@"viewDidLayoutSubviews"]) CSCFSocialHook0(@"WCMomentsPrivacyViewController",name,^(id page,void(^orig)(void)){orig(); CSCFPageIsCurrent(page); CSCFSocialTrack(page,^(id owner){CSCFReloadTables(owner);});});
     for(NSString *name in @[@"openAddFromTag",@"openAddFromFriend"]) CSCFSocialHook0(@"WCMomentsPrivacyViewController",name,^(id owner,void(^orig)(void)){
         if(NeedsUnlock(owner)) return;

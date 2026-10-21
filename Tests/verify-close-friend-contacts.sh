@@ -24,7 +24,7 @@ source=Path('Controllers/CSCloseFriendContactAdapter.m').read_text()
 (out/'ForwardBodies.h').write_text('\n'.join(body(source,marker) for marker in ['BOOL CSCFPageIsCurrent(', 'static BOOL SetPresentationBuffer(', 'void CSCFRefreshForwardSearch(', 'void CSCFForwardSearchWillUpdate(', 'void CSCFForwardSearchDidUpdate(']))
 source=Path('Controllers/CSCloseFriendSearchAdapter.m').read_text()
 (out/'GroupTitle.h').write_text('\n'.join(body(source,m) for m in ['id CSCFSearchModel(', 'NSArray *CSCFSearchVisibleRows(', 'static NSString *GroupDisplayTitle(']))
-(out/'SearchInputBodies.h').write_text(body(source,'BOOL CSCFSearchConsumePassword(')+'\n'+body(Path('Hooks/CloseFriendSearchHooks.xm').read_text(),'static void DispatchSearchInput('))
+(out/'SearchInputBodies.h').write_text('static char SearchPasswordConsumedKey;\n'+body(source,'BOOL CSCFSearchSuppressLoading(')+'\n'+body(source,'BOOL CSCFSearchConsumePassword(')+'\n'+body(Path('Hooks/CloseFriendSearchHooks.xm').read_text(),'static void DispatchSearchInput('))
 source=Path('Hooks/CloseFriendProfileHooks.xm').read_text()
 (out/'ProfileGuards.h').write_text(body(source,'static void Guard0(')+'\n'+body(source,'static void Guard1(')+'\n'+body(source,'static void Render0(')+'\n'+body(source,'static void DisplayFlag('))
 PY

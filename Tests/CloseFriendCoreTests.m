@@ -73,9 +73,9 @@ int main(void) { @autoreleasepool {
         CSCloseFriendSnapshot *snap=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"one" profile:p revealed:NO revision:3 blocked:NO];
         for(NSUInteger j=0;j<surfaceKeys.count;j++)CHECK([snap hidesUserName:@"alice" surface:j]==(i!=j));
     }
-    NSDictionary *defaults=CSCloseFriendDefaultOptions(); CHECK(defaults.count==20);
+    NSDictionary *defaults=CSCloseFriendDefaultOptions(); CHECK([CSCloseFriendNormalizeProfile(Profile(),NULL)[@"options"] isEqual:defaults]);
     for(NSString *name in @[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"autoMute",@"rejectVoice",@"rejectVideo",@"hidePrivacyIcons"])CHECK([defaults[name] boolValue]);
-    for(NSString *name in @[@"showBadges",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock"])CHECK(![defaults[name] boolValue]);
+    for(NSString *name in @[@"showBadges",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"callReplyEnabled"])CHECK(![defaults[name] boolValue]);
     CHECK([defaults[@"unlockSeconds"] isEqual:@300]);
     CSCloseFriendSnapshot *blocked=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"one" profile:@{} revealed:YES revision:4 blocked:NO];
     CHECK(blocked.blocked && !blocked.revealed);

@@ -113,6 +113,19 @@ static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(
 @property(nonatomic,strong) id currentItem;
 @end
 @implementation WCMomentsPrivacyViewController @end
+@interface WCNewCommitViewController : NSObject
+@property(nonatomic,strong) id contactsSelectorController;
+@end
+@implementation WCNewCommitViewController @end
+@interface ContactsSelectorController : NSObject
+@property(nonatomic,weak) id delegate;
+@property(nonatomic,strong) NSArray *arrContacts;
+@end
+@implementation ContactsSelectorController @end
+@interface MultiSelectContactsViewController : NSObject
+@property(nonatomic,weak) id m_delegate;
+@end
+@implementation MultiSelectContactsViewController @end
 @interface ContactSelectView : NSObject
 @property(nonatomic,weak) id m_delegate;
 @property(nonatomic,strong) NSSet *pending;
@@ -212,6 +225,22 @@ int main(void) { @autoreleasepool {
     Check(([MergeSelection(privacy,visibleChange) isEqual:[NSSet setWithArray:@[@"secret",@"carol"]]]));
     Check(visibleChange.count==1 && privacy.selectContacts==acl);
     Policy(YES,10); Check([MergeSelection(privacy,visibleChange) isEqual:visibleChange]);
+    WCNewCommitViewController *editor=[WCNewCommitViewController new];
+    ContactsSelectorController *selector=[ContactsSelectorController new];selector.delegate=editor;editor.contactsSelectorController=selector;selector.arrContacts=@[@"secret"];
+    MultiSelectContactsViewController *multiPicker=[MultiSelectContactsViewController new];multiPicker.m_delegate=selector;
+    ContactSelectView *reminder=[ContactSelectView new];reminder.m_delegate=multiPicker;reminder.pending=acl;
+    AudienceLogic *reminderLogic=[AudienceLogic new];reminderLogic.m_delegate=reminder;reminderLogic.contacts=logic.contacts;
+    Policy(NO,11); Check(PublishingOwner(reminderLogic)==editor);
+    Check([Keys(reminderLogic,NULL) count]==1 && [Rows(reminderLogic,NULL,@"A") isEqual:@[@"alice"]] && !PickerAllowsContact(reminder,@"secret"));
+    Check(PickerAllowsContact(reminder,@"alice") && reminder.pending==acl && [selector.arrContacts isEqual:@[@"secret"]] && reminderLogic.contacts.count==2);
+    BindReminderPicker(selector,multiPicker);multiPicker.m_delegate=nil;
+    Check(PublishingOwner(reminderLogic)==editor); // Session-hosted branch uses commonSetup identity.
+    Policy(YES,12);Check([Rows(reminderLogic,NULL,@"A") count]==2);
+    MultiSelectContactsViewController *unrelated=[MultiSelectContactsViewController new];
+    ContactsSelectorController *otherSelector=[ContactsSelectorController new];otherSelector.delegate=editor;unrelated.m_delegate=otherSelector;
+    ContactSelectView *otherPicker=[ContactSelectView new];otherPicker.m_delegate=unrelated;
+    AudienceLogic *otherLogic=[AudienceLogic new];otherLogic.m_delegate=otherPicker;
+    Check(!PublishingOwner(otherLogic));
     // Successful native return may release both presentation objects before editor onDone.
     // Exercise the production onDone authorization predicate after those weak refs disappear.
     __weak id dismissedPicker=freshPicker, dismissedLogic=freshLogic;
@@ -222,5 +251,6 @@ int main(void) { @autoreleasepool {
     Check(doneCalls==1 && freshPrivacy.selectContacts==acl && !NeedsUnlock(privacy));
     Epoch++; Policy(NO,9); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==0); Leave(previous); Check([facade countOfTimelineDataItem]==3);
     Check(Cards(status).visible.count==0 && !MessageActionCurrent(messages,second) && NeedsUnlock(freshPrivacy));
+    Check([Rows(reminderLogic,NULL,@"A") count]==0 && !PickerAllowsContact(reminder,@"alice") && [selector.arrContacts isEqual:@[@"secret"]]);
     puts("Close-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, discovery cues, locked publishing candidates and hidden-selection preservation, stale native render rejection, completed-picker authorization and reveal/relock/account transitions passed");
 } return 0; }

@@ -1,0 +1,219 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "classes": [
+    "VoIPilinkMgr",
+    "VOIPMessageMgr",
+    "VoipUIManager",
+    "VoIPConfSDKService",
+    "VoipMonoMsg",
+    "ConfRecvInviteInfo",
+    "MonoServiceMsgMgr"
+  ],
+  "missing": [],
+  "encryption": [
+    32768,
+    492666880,
+    0
+  ],
+  "method_count": 162,
+  "files": {
+    "function--0x1060f8180.asm": "b04efbf9e43eb2a9d7e24133c8d511ccda7277f742641561d4e326abb9d44f2e",
+    "MonoServiceMsgMgr--checkMsgQueue.asm": "a0aa4cfa23de1a8a756c2d3da89d9960f2d318fac66b24c8acb55ec4b0312ba2",
+    "VoIPilinkMgr--onStartRecvInvite_inviteMsg_.asm": "c86011cf0843e6a87055430ca05d84b846284cc41ce253834e0609dd431c0ec0",
+    "function--0x1060fd810.asm": "a27fcb2cac2a1ba15da522569bd6a14a9931ff187293b9c22419b0caee05ddda",
+    "MonoServiceMsgMgr--processInviteMsg_.asm": "5111a6ce4440f914ff81acdd9a9199bad812732e116af90e27730f2b72df98be",
+    "VoIPilinkMgr--voIPConfSDKServiceOnReceiveEvent_errCode_data_ret_.asm": "aad3345b6383847d0c066b2c9fa057620baaf550ab1e82534356ee08134c1e06",
+    "VoIPilinkMgr--reset.asm": "3b3ab944c7c6ccfd2bfc7ddffce2b80ad16f50f3dbe533751b0b898cbfed61f4",
+    "VoIPilinkMgr--hangupWithRoomID_.asm": "54bc52f2a03168b14ba3a25ff51018323895b3a7bed62b2a9dbf8e7d38fa9a5f",
+    "MonoServiceMsgMgr--processMsg_.asm": "6b26cc852b4f8c4d4accd9df491336cb65d843b987215f3d49b892963abbe3ac",
+    "VoIPilinkMgr--readyJoinRoomForIlink_roomID_.asm": "e3ef95b56fbd1c66f550899b2b6992f551b35f408e87288987f9e2ed063f9eb9",
+    "VoipUIManager--isVoipWorking.asm": "18a971096da431802720ee41528afc31d43b46e58ee4df6f692cfc82ef98718e",
+    "ConfRecvInviteInfo--inviteVoIPMonoMsg_.asm": "5a3aa8d91d9db09e8e05babf246ec670aedc05489a006efac94d88476f4a6495",
+    "VoIPilinkMgr--rejectWithRoomID_.asm": "fdc868188ce2e55dd6f40227bd607503a20c7c8f9d9c7c0dbc2f9d4fff7c9c7f",
+    "README.md": "aa926a8ad1877e5a26d24d0f3e709c33dff0ccb90215a8bf494921505cdf6cd8",
+    "VOIPMessageMgr--startVoipViewByVoipMonoMsg_.asm": "d997cabd34ccf149660e51f9f0fe5e676a3e957c751439cdbc74fdd136b39916",
+    "MonoServiceMsgMgr--didMonoServiceMsgReject.asm": "7a0616126f9cda19812562a5e6479e04e2c055d8777c81081d16dd6b22a8bdc7",
+    "methods.json": "e245997b7267bb98fbacacafb3dc778dad82ded03a88f65c1cdf5985fa0fcc7c",
+    "MonoServiceMsgMgr--inQueueMsg_.asm": "cd9b2ecf034e727079f4529c8eb456ccf2a2ebf331926b280196e9710df685d2",
+    "ConfRecvInviteInfo--voIPMonoMsgWithType_scene_.asm": "560fd41736eae3a6fbfc305b1096e9a3268b36a19aea276310b4d557392942b7",
+    "function--0x1060fd470.asm": "02ba3418d0c49d95d40e8f247fab370573391ce4f117a9c470ce4542b25aa8e9",
+    "disassemble.py": "3d56ad303ee505c78dc2425b717e03b25cff2f2e70f3f6aa72cdec70c7c5b59c",
+    "function--0x1060fbf54.asm": "75ab0f76247aba4d370916e6d142b17c97db362e121b6fb86a583792455e289d",
+    "VOIPMessageMgr--openVoipViewByVoipMonoMsg_haveAnswered_isilink_.asm": "7e8ff8181df2093c84773a84b495c1728c030034108de14db1900b6ec59b35d1",
+    "VoIPilinkMgr--receiverOpenUIForRoomInfo_username_receiveMsgTime_.asm": "2a62d960fd277b7d46f19cc6f2e4c74edbdd1292c86e121b611da494dbfd7e24",
+    "VoIPilinkMgr--onMonoServiceMsgRejectWithMsg_.asm": "9974a0bf90c20adb5b4314e2ae5f8af5ce501e06fcfdb2e86ec6fe97c25ff0dc",
+    "early-selector-xrefs.json": "992857e5a63f29223499b972fb7feed1bf0b982fafef05040cea562a34b37ff3",
+    "VoIPilinkMgr--startVoipViewByVoipMonoMsg_.asm": "00b3b01607a9d89c859a05c8b444020c045360dabde65ed8565728ed3918a028",
+    "extract.py": "069b73baa7be63abaa49e08878723386c2c9c99cb727f1db1e3e98ad48edb467",
+    "VOIPMessageMgr--onMonoServiceMsgStartWithMsg_.asm": "8f4c523ebecfd1636d27f95727702f649422d6eb6fa444d5001a060dcf76d27c",
+    "VoIPilinkMgr--onStartRecvInvite_muteNotification_.asm": "84801ac903a621ee8570b74d8a2ceec56397c7fb0c45e4e400fc613e9fc273db",
+    "VoIPilinkMgr--onMonoServiceMsgHandleWithMsg_.asm": "b4ed92af4dcbf3959717dec186b1b43c0b39320785f95306dcc858b2e92c6ad5",
+    "VoIPilinkMgr--onMonoServiceMsgStartWithMsg_.asm": "c063b93a874d6d1a2df637e5e49d9d92be629fd2c71e8c9d30ee280877086b7c"
+  },
+  "disassembly": [
+    {
+      "file": "VoIPilinkMgr--reset.asm",
+      "start": "0x10624f0f8",
+      "stop": "0x10624f440",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--hangupWithRoomID_.asm",
+      "start": "0x1062552a0",
+      "stop": "0x106255454",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--rejectWithRoomID_.asm",
+      "start": "0x106255454",
+      "stop": "0x1062555b0",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--receiverOpenUIForRoomInfo_username_receiveMsgTime_.asm",
+      "start": "0x10625ec38",
+      "stop": "0x10625ee60",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--onStartRecvInvite_muteNotification_.asm",
+      "start": "0x106262774",
+      "stop": "0x106262994",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--onStartRecvInvite_inviteMsg_.asm",
+      "start": "0x106262994",
+      "stop": "0x106262da8",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--readyJoinRoomForIlink_roomID_.asm",
+      "start": "0x106262e84",
+      "stop": "0x106262ffc",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--onMonoServiceMsgStartWithMsg_.asm",
+      "start": "0x106265788",
+      "stop": "0x106265ed4",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--onMonoServiceMsgHandleWithMsg_.asm",
+      "start": "0x106267638",
+      "stop": "0x106267788",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--onMonoServiceMsgRejectWithMsg_.asm",
+      "start": "0x106267788",
+      "stop": "0x106267e98",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--voIPConfSDKServiceOnReceiveEvent_errCode_data_ret_.asm",
+      "start": "0x106269920",
+      "stop": "0x106269c44",
+      "truncated": false
+    },
+    {
+      "file": "VoIPilinkMgr--startVoipViewByVoipMonoMsg_.asm",
+      "start": "0x106265ed4",
+      "stop": "0x10626751c",
+      "truncated": false
+    },
+    {
+      "file": "VOIPMessageMgr--onMonoServiceMsgStartWithMsg_.asm",
+      "start": "0x105f7e988",
+      "stop": "0x105f7f37c",
+      "truncated": false
+    },
+    {
+      "file": "VOIPMessageMgr--startVoipViewByVoipMonoMsg_.asm",
+      "start": "0x105f88288",
+      "stop": "0x105f8a498",
+      "truncated": false
+    },
+    {
+      "file": "VOIPMessageMgr--openVoipViewByVoipMonoMsg_haveAnswered_isilink_.asm",
+      "start": "0x105f8a588",
+      "stop": "0x105f8a7c4",
+      "truncated": false
+    },
+    {
+      "file": "VoipUIManager--isVoipWorking.asm",
+      "start": "0x106395374",
+      "stop": "0x1063953a4",
+      "truncated": false
+    },
+    {
+      "file": "ConfRecvInviteInfo--voIPMonoMsgWithType_scene_.asm",
+      "start": "0x100bdb980",
+      "stop": "0x100bdbb18",
+      "truncated": false
+    },
+    {
+      "file": "ConfRecvInviteInfo--inviteVoIPMonoMsg_.asm",
+      "start": "0x100bdbb18",
+      "stop": "0x100bdbb2c",
+      "truncated": false
+    },
+    {
+      "file": "MonoServiceMsgMgr--inQueueMsg_.asm",
+      "start": "0x104cc859c",
+      "stop": "0x104cc867c",
+      "truncated": false
+    },
+    {
+      "file": "MonoServiceMsgMgr--checkMsgQueue.asm",
+      "start": "0x104cc8794",
+      "stop": "0x104cc8870",
+      "truncated": false
+    },
+    {
+      "file": "MonoServiceMsgMgr--processMsg_.asm",
+      "start": "0x104cc98d0",
+      "stop": "0x104cc9990",
+      "truncated": false
+    },
+    {
+      "file": "MonoServiceMsgMgr--processInviteMsg_.asm",
+      "start": "0x104cc9f2c",
+      "stop": "0x104cca9f0",
+      "truncated": false
+    },
+    {
+      "file": "MonoServiceMsgMgr--didMonoServiceMsgReject.asm",
+      "start": "0x104ccaf30",
+      "stop": "0x104ccb0c4",
+      "truncated": false
+    },
+    {
+      "file": "function--0x1060f8180.asm",
+      "start": "0x1060f8180",
+      "stop": "0x1060f8d3c",
+      "truncated": false
+    },
+    {
+      "file": "function--0x1060fbf54.asm",
+      "start": "0x1060fbf54",
+      "stop": "0x1060fd12c",
+      "truncated": false
+    },
+    {
+      "file": "function--0x1060fd470.asm",
+      "start": "0x1060fd470",
+      "stop": "0x1060fd5a8",
+      "truncated": false
+    },
+    {
+      "file": "function--0x1060fd810.asm",
+      "start": "0x1060fd810",
+      "stop": "0x1060fd8c4",
+      "truncated": false
+    }
+  ]
+}

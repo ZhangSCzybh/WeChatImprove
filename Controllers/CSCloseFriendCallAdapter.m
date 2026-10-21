@@ -76,6 +76,102 @@ static BOOL Pending(CSCloseFriendCallToken *t) {
     BOOL cancel=YES,expired=YES;
     return t.key.length && [t.subject isCurrent] && Bool(t.mono,@"isCancelMsg",&cancel) && !cancel && Bool(t.mono,@"isOutOfDate",&expired) && !expired;
 }
+CSCloseFriendCallToken *CSCFIncomingCallToken(id message) {
+    Class cls=NSClassFromString(@"VoipMonoMsg");
+    BOOL invite=NO,valid=NO,video=NO,ilink=NO;
+    unsigned long long room=0;long long key=0;
+    if(!cls || ![message isKindOfClass:cls] ||
+       !Bool(message,@"isInvite",&invite) || !invite ||
+       !Bool(message,@"isParaVaild",&valid) || !valid ||
+       !Bool(message,@"isVideo",&video) || !Bool(message,@"isFromIlink",&ilink) ||
+       !Unsigned(message,@"m_roomId",&room) || !room || !Signed(message,@"m_roomKey",&key))return nil;
+    CSCloseFriendCallToken *t=[CSCloseFriendCallToken new];
+    t.mono=message;t.roomID=room;t.roomKey=key;t.roomType=video?2:1;t.ilink=ilink;
+    Identify(t,String(CSCloseFriendRead(message,@"m_fromUser")),nil,String(CSCloseFriendRead(message,@"msgKey")));
+    return t;
+}
+static BOOL MainIlinkPending(id manager,CSCloseFriendCallToken *t) {
+    BOOL connected=YES,changing=YES,working=YES,multiActive=YES;
+    unsigned long long room=0,status=1;
+    if(!Bool(manager,@"isConnected",&connected) || connected ||
+       !Bool(manager,@"changeToMultiTalk",&changing) || changing ||
+       !Unsigned(manager,@"mRoomId",&room) || (room && room!=t.roomID))return NO;
+    id ui=CSGetService(NSClassFromString(@"VoipUIManager"));
+    id multi=CSGetService(NSClassFromString(@"MultiTalkMgr"));
+    id sdk=CSGetService(NSClassFromString(@"VoIPConfSDKService"));
+    // isCaller survives reset in 8.0.78, so it is not an active-call predicate.
+    // These native services share audio/camera state. A new protected invitation
+    // must never use the main-call hangup path while an ordinary call owns it.
+    if(!Bool(ui,@"isVoipWorking",&working) || working ||
+       !Bool(multi,@"isMultiTalkActive",&multiActive) || multiActive ||
+       !Unsigned(sdk,@"currentStatus",&status) || status==1 ||
+       !Matches(sdk,@"hangup:roomID:","v@:iQ"))return NO;
+    Class sub=NSClassFromString(@"VoIPMPSubCallService");SEL shared=NSSelectorFromString(@"sharedInstance");
+    if(!CSCloseFriendMethodMatches(class_getClassMethod(sub,shared),"@@:"))return NO;
+    id subcall=((id(*)(id,SEL))objc_msgSend)(sub,shared);BOOL subActive=YES;
+    return Bool(subcall,@"isActive",&subActive) && !subActive &&
+        Matches(manager,@"rejectWithRoomID:","v@:Q");
+}
+static void RejectionSubmitted(CSCloseFriendCallToken *t) {
+    t.state=@"rejectionSubmitted";CSCFCallDidReject(t);
+}
+static id IncomingInfo(CSCloseFriendCallToken *t) {
+    Class cls=NSClassFromString(@"VoIPInvitationInfo");SEL make=NSSelectorFromString(@"infoWithVoipMonoMsg:scene:");
+    if(!CSCloseFriendMethodMatches(class_getClassMethod(cls,make),"@@:@Q"))return nil;
+    id info=((id(*)(id,SEL,id,unsigned long long))objc_msgSend)(cls,make,t.mono,0);
+    CSCloseFriendCallToken *made=CSCFInvitationToken(info);
+    return made && made.ilink==t.ilink && [made.key isEqual:t.key]?info:nil;
+}
+static id IncomingSubcall(id manager,CSCloseFriendCallToken *t,id expectedInfo) {
+    BOOL connected=YES;unsigned long long activeRoom=0;
+    if(!Bool(manager,@"isConnected",&connected) || !Unsigned(manager,@"mRoomId",&activeRoom) ||
+       (connected && activeRoom==t.roomID))return nil;
+    Class cls=NSClassFromString(@"VoIPMPSubCallService");SEL shared=NSSelectorFromString(@"sharedInstance");
+    if(!CSCloseFriendMethodMatches(class_getClassMethod(cls,shared),"@@:"))return nil;
+    id service=((id(*)(id,SEL))objc_msgSend)(cls,shared);
+    id info=CSCloseFriendRead(CSCloseFriendRead(service,@"cache"),@"inviteInfo");
+    BOOL active=NO;unsigned long long room=0;
+    if(!Bool(service,@"isActive",&active) || !active || !Unsigned(info,@"roomid",&room) || room!=t.roomID ||
+       (expectedInfo && info!=expectedInfo) ||
+       ![String(CSCloseFriendRead(info,@"callerUsername")) isEqual:t.subject.sender] ||
+       !Matches(service,@"voIPInvitationServiceDidRejectWithInfo:","v@:@"))return nil;
+    return service;
+}
+BOOL CSCFHandleIncomingCall(id manager,id message,BOOL ilink) {
+    CSCloseFriendCallToken *t=CSCFIncomingCallToken(message);
+    if(!t || t.ilink!=ilink)return NO;
+    // Known callbacks from an old account cannot display or obtain new authority.
+    if(t.subject && ![t.subject isCurrent])return YES;
+    if(!Pending(t) || ![t suppressesPresentation])return NO;
+    if(![t requiresRejection]) {t.state=@"presentationSuppressed";return YES;}
+    id info=nil,subcall=nil,subInfo=nil;
+    BOOL route=NO;
+    if(ilink) {
+        route=MainIlinkPending(manager,t);
+        if(!route && (subcall=IncomingSubcall(manager,t,nil))) {
+            subInfo=CSCloseFriendRead(CSCloseFriendRead(subcall,@"cache"),@"inviteInfo");
+            info=IncomingInfo(t);route=info!=nil;
+        }
+    }
+    else {
+        id ui=CSGetService(NSClassFromString(@"VoipUIManager"));BOOL talking=YES;unsigned long long active=0;
+        BOOL safe=Bool(ui,@"isVoipTalking",&talking) &&
+            (!talking || (Unsigned(ui,@"getRoomIDForCurrentVoipView",&active) && active!=t.roomID));
+        if(t.roomKey && Matches(manager,@"voIPInvitationServiceDidRejectWithInfo:","v@:@") &&
+           safe) {info=IncomingInfo(t);route=info!=nil;}
+    }
+    if(!route) {t.state=@"rejectionUnsupported";CSCloseFriendRecordCapability(ilink?@"calls.ilinkMain.rejection":@"calls.single.rejection",NO);return YES;}
+    if([Registry() claim:t now:NSProcessInfo.processInfo.systemUptime]) {
+        if(!Pending(t) || ![CSCFIncomingCallToken(message).key isEqual:t.key] || ![t requiresRejection] ||
+           (ilink && (subcall ? IncomingSubcall(manager,t,subInfo)!=subcall : !MainIlinkPending(manager,t))))return [t suppressesPresentation];
+        t.state=@"rejectionRequested";
+        if(subcall)((void(*)(id,SEL,id))objc_msgSend)(subcall,NSSelectorFromString(@"voIPInvitationServiceDidRejectWithInfo:"),info);
+        else if(ilink)((void(*)(id,SEL,unsigned long long))objc_msgSend)(manager,NSSelectorFromString(@"rejectWithRoomID:"),t.roomID);
+        else ((void(*)(id,SEL,id))objc_msgSend)(manager,NSSelectorFromString(@"voIPInvitationServiceDidRejectWithInfo:"),info);
+        RejectionSubmitted(t);
+    }
+    return YES;
+}
 static BOOL MatchedSubcall(CSCloseFriendCallToken *t) {
     Class cls=NSClassFromString(@"VoIPMPSubCallService"); SEL sel=NSSelectorFromString(@"sharedInstance");
     if(!CSCloseFriendMethodMatches(class_getClassMethod(cls,sel),"@@:"))return NO;
@@ -99,6 +195,7 @@ BOOL CSCFHandleInvitation(id service,id info,unsigned long long talkingRoom) {
         if(!Pending(t) || ![CSCFInvitationToken(info).key isEqual:t.key] || ![t requiresRejection] || (t.ilink && !MatchedSubcall(t)))return [t suppressesPresentation];
         t.state=@"rejectionRequested";
         ((void(*)(id,SEL,id))objc_msgSend)(service,NSSelectorFromString(@"rejectInvitationWithInfo:"),info);
+        RejectionSubmitted(t);
     }
     return YES;
 }
@@ -126,5 +223,6 @@ void CSCFHandleMultiTalk(id manager,id message,void (^native)(void)) {
     if(!state || (connected && active==t.roomID) || !Pending(t) || !Matches(manager,@"MultiTalkReject:","v@:Q")) {t.state=@"rejectionUnsupported";CSCloseFriendRecordCapability(@"calls.multitalk.rejection",NO);return;}
     if([Registry() claim:t now:NSProcessInfo.processInfo.systemUptime] && Pending(t) && [CSCFMultiTalkToken(message).key isEqual:t.key] && [t requiresRejection]) {
         t.state=@"rejectionRequested";((void(*)(id,SEL,unsigned long long))objc_msgSend)(manager,NSSelectorFromString(@"MultiTalkReject:"),t.roomID);
+        RejectionSubmitted(t);
     }
 }

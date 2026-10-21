@@ -5,9 +5,26 @@ static void Guard0(NSString *cls,NSString *name,BOOL invitation) {
     IMP imp=imp_implementationWithBlock(^(id object){if(!(invitation?CSCFInvitationOutputSuppressed(object):CSCFCallOutputSuppressed()))((void(*)(id,SEL))orig)(object,sel);});
     if(!CSCloseFriendInstallHook(cls,name,imp,&orig,"v@:"))imp_removeBlock(imp);
 }
+static void InstallSingleCall(NSString *cls,BOOL ilink) {
+    // MonoServiceMsgMgr records history and removes a handled invite itself.
+    // The Start guard also covers versions/routes that enter the UI directly.
+    __block IMP handle=NULL;SEL handleSEL=NSSelectorFromString(@"onMonoServiceMsgHandleWithMsg:");
+    IMP imp=imp_implementationWithBlock(^BOOL(id manager,id message){
+        if(CSCFHandleIncomingCall(manager,message,ilink))return YES;
+        return ((BOOL(*)(id,SEL,id))handle)(manager,handleSEL,message);
+    });
+    if(!CSCloseFriendInstallHook(cls,NSStringFromSelector(handleSEL),imp,&handle,"B@:@"))imp_removeBlock(imp);
+    __block IMP start=NULL;SEL startSEL=NSSelectorFromString(@"onMonoServiceMsgStartWithMsg:");
+    imp=imp_implementationWithBlock(^(id manager,id message){
+        if(!CSCFHandleIncomingCall(manager,message,ilink))((void(*)(id,SEL,id))start)(manager,startSEL,message);
+    });
+    if(!CSCloseFriendInstallHook(cls,NSStringFromSelector(startSEL),imp,&start,"v@:@"))imp_removeBlock(imp);
+}
 %ctor {dispatch_async(dispatch_get_main_queue(),^{
     CSCloseFriendRecordCapability(@"calls.systemFirstFrame.verified",NO);
     CSCloseFriendRecordCapability(@"calls.ilinkMain.rejection",NO);
+    InstallSingleCall(@"VoIPilinkMgr",YES);
+    InstallSingleCall(@"VOIPMessageMgr",NO);
     __block IMP invite=NULL;
     IMP imp=imp_implementationWithBlock(^BOOL(id service,id info,unsigned long long talking,unsigned long long key){
         if(CSCFHandleInvitation(service,info,talking))return YES;

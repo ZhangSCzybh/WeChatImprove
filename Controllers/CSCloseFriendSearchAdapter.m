@@ -1,19 +1,40 @@
 #import "CSCloseFriendSearchAdapter.h"
 #import "CSCloseFriendManager.h"
 
+static char SearchPasswordConsumedKey;
+BOOL CSCFSearchSuppressLoading(id page) {
+    return [objc_getAssociatedObject(page,&SearchPasswordConsumedKey) boolValue];
+}
 BOOL CSCFSearchConsumePassword(id page,id input) {
     if(!NSThread.isMainThread || !CSCFIsClass(page,@"FTSHomeViewController")) return NO;
+    id bar=CSCloseFriendRead(page,@"searchBar");
     id field=CSCloseFriendRead(page,@"searchTextField");
-    if([field isKindOfClass:UITextField.class] && [(UITextField *)field markedTextRange]) return NO;
+    id textView=CSCloseFriendRead(bar,@"textView");
+    if(CSCloseFriendRead(field,@"markedTextRange") || CSCloseFriendRead(textView,@"markedTextRange")) return NO;
     id query=[input isKindOfClass:NSString.class] ? input : CSCloseFriendRead(input,@"text");
     if(![query isKindOfClass:NSString.class]) query=CSCloseFriendRead(page,@"searchBarText");
-    if(![query isKindOfClass:NSString.class] || ![CSCloseFriendManager.sharedManager consumeHomepageSearchPassword:query]) return NO;
-    // Consume before the original text-change/search/history methods run.
-    CSCFSetObject(field,@"setText:",@"");
+    if(![query isKindOfClass:NSString.class]) return NO;
+    if(![CSCloseFriendManager.sharedManager consumeHomepageSearchPassword:query]) {
+        if([query length]) objc_setAssociatedObject(page,&SearchPasswordConsumedKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        return NO;
+    }
+    objc_setAssociatedObject(page,&SearchPasswordConsumedKey,@YES,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     id presenter=CSCloseFriendRead(page,@"presenter");
     [NSObject cancelPreviousPerformRequestsWithTarget:presenter];
+    // 8.0.78 uses WCSearchBar's large-input UITextView. Its native clear operation
+    // resets the visible editor AND runs the empty-input delegate path. Clearing
+    // searchTextField alone leaves that editor, query state and loading footer live.
+    if(!CSCFCallVoid(bar,@"inputBoxClear")) {
+        CSCFSetObject(field,@"setText:",@"");
+        CSCFSetObject(textView,@"setText:",@"");
+        CSCFSetObject(presenter,@"handleTextDidChange:",@"");
+    }
+    // Cancel after native empty-input reset; resetDataSource after cancellation
+    // would create a fresh unfinished search and revive the loading indicator.
+    [NSObject cancelPreviousPerformRequestsWithTarget:presenter];
     CSCFCallVoid(presenter,@"cancelFTSSearch");
-    CSCFCallVoid(presenter,@"resetDataSource");
+    CSCFSetObject(presenter,@"setLatestCompeleteWebSearchQuery:",@"");
+    CSCFSetObject(CSCloseFriendRead(page,@"tableView"),@"setTableFooterView:",nil);
     CSCFCallVoid(page,@"reloadList");
     CSCFCallVoid(page,@"resignSearchFirstResponder");
     return YES;

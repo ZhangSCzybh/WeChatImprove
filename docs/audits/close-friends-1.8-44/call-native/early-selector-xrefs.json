@@ -1,0 +1,22 @@
+[
+  {
+    "selector": "onStartRecvInvite:inviteMsg:",
+    "reference": "0x1060f84bc",
+    "adrp": "0x1060f84b8"
+  },
+  {
+    "selector": "onStartRecvInvite:muteNotification:",
+    "reference": "0x1060fc9c0",
+    "adrp": "0x1060fc9bc"
+  },
+  {
+    "selector": "receiverOpenUIForRoomInfo:username:receiveMsgTime:",
+    "reference": "0x1060fd570",
+    "adrp": "0x1060fd56c"
+  },
+  {
+    "selector": "receiverOpenUIForRoomInfo:username:receiveMsgTime:",
+    "reference": "0x1060fd89c",
+    "adrp": "0x1060fd898"
+  }
+]

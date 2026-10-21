@@ -12,13 +12,15 @@ static CSCloseFriendSnapshot *Policy;
 NSString *const CSCloseFriendPolicyDidChangeNotification=@"test-policy";
 CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void){return Policy;}
 NSUInteger CSCloseFriendAccountEpoch(void){return Epoch;}
+BOOL CSBackupPerformAtAccountEpoch(NSUInteger epoch,void (^handoff)(void)){if(epoch!=Epoch)return NO;handoff();return YES;}
 void CSCloseFriendRecordCapability(NSString *n,BOOL available){}
 id CSCloseFriendRead(id o,NSString *key) {if([o isKindOfClass:NSDictionary.class])return o[key];SEL s=NSSelectorFromString(key);return CSCloseFriendMethodMatches(class_getInstanceMethod([o class],s),"@@:")?((id(*)(id,SEL))objc_msgSend)(o,s):nil;}
 NSString *CSCloseFriendUserName(id o){return [o isKindOfClass:NSString.class]?o:CSCloseFriendRead(o,@"m_nsUsrName");}
 BOOL CSCloseFriendInstallHook(NSString *c,NSString *s,IMP r,IMP *o,const char *e){Method m=class_getInstanceMethod(NSClassFromString(c),NSSelectorFromString(s));if(!CSCloseFriendMethodMatches(m,e))return NO;*o=method_setImplementation(m,r);return YES;}
 NSDictionary *CSCloseFriendMuteRecords(void){return @{};}
 BOOL CSCloseFriendSaveMuteRecords(NSDictionary *r,NSString *a,NSUInteger e,NSError **error){return NO;}
-id CSGetService(Class c){return nil;}
+static NSMutableDictionary *FixtureServices;
+id CSGetService(Class c){return c ? FixtureServices[NSStringFromClass(c)] : nil;}
 static CSCloseFriendSnapshot *Snapshot(BOOL enabled,BOOL revealed,NSDictionary *options) {
     return [[CSCloseFriendSnapshot alloc] initWithAccountID:@"self" profile:@{@"enabled":@(enabled),@"friends":@[@"friend"],@"groups":@[@"secret@chatroom"],@"options":options?:@{}} revealed:revealed revision:Epoch blocked:NO];
 }
@@ -73,6 +75,8 @@ static CSCloseFriendSnapshot *Snapshot(BOOL enabled,BOOL revealed,NSDictionary *
 - (unsigned long long)getCurrentRoomID{return self.active;}
 - (void)MultiTalkReject:(unsigned long long)room{self.rejects++;self.lastRejected=room;}
 @end
+#include "CloseFriendCallReplyFixture.h"
+#include "CloseFriendIncomingCallFixture.h"
 // Only the new public badge accessor is extracted. Its actual projection runs below.
 @interface CSGroupListAdapter : NSObject
 @property id controller;
@@ -212,5 +216,7 @@ int main(void){@autoreleasepool{
     CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@3]);CHECK(((CSGroupRow *)owner.cachedNativeSections[0][0]).unreadCount==8);
     owner.snapshotEpoch--;CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@0]);owner.snapshotEpoch=Epoch;
     owner.modelRevision++;CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@0]);Policy=Snapshot(NO,NO,nil);CHECK(![CSGroupListAdapter closeFriendAlertBadgeCount]);
-    printf("Close-friend alerts: %lu focused checks passed (identity, durable mute, calls, badge, payment policy)\n",(unsigned long)Checks);
+    IncomingCallChecks();
+    CallReplyChecks();
+    printf("Close-friend alerts: %lu focused checks passed (identity, durable mute, calls, reply, badge, payment policy)\n",(unsigned long)Checks);
 }return 0;}

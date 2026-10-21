@@ -71,6 +71,12 @@ static void InstallSection(NSString *cls,NSString *key) {
     if(!CSCloseFriendInstallHook(cls,@"onLoadMore",replacement,&load,"v@:")) imp_removeBlock(replacement);
 }
 %ctor { dispatch_async(dispatch_get_main_queue(),^{
+    __block IMP loading=NULL;
+    IMP loadingReplacement=imp_implementationWithBlock(^(id page){
+        if(CSCFSearchSuppressLoading(page)) return;
+        ((void(*)(id,SEL))loading)(page,NSSelectorFromString(@"setLoadingStatus"));
+    });
+    if(!CSCloseFriendInstallHook(@"FTSHomeViewController",@"setLoadingStatus",loadingReplacement,&loading,"v@:")) imp_removeBlock(loadingReplacement);
     __block IMP inputChanged=NULL;
     IMP inputReplacement=imp_implementationWithBlock(^(id page,id marked,id query){
         DispatchSearchInput(page,query,marked!=nil,^{((void(*)(id,SEL,id,id))inputChanged)(page,NSSelectorFromString(@"mmInputBoxTextChanged:text:"),marked,query);});

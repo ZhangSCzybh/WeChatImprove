@@ -20,11 +20,16 @@ extern "C" {
 @end
 FOUNDATION_EXPORT CSCloseFriendCallToken *CSCFInvitationToken(id info);
 FOUNDATION_EXPORT CSCloseFriendCallToken *CSCFMultiTalkToken(id message);
+FOUNDATION_EXPORT CSCloseFriendCallToken *CSCFIncomingCallToken(id message);
+/// Consumes a pending single-party invitation before the native UI/ring boundary.
+FOUNDATION_EXPORT BOOL CSCFHandleIncomingCall(id manager,id message,BOOL ilink);
 FOUNDATION_EXPORT BOOL CSCFHandleInvitation(id service,id info,unsigned long long talkingRoom);
 FOUNDATION_EXPORT void CSCFHandleMultiTalk(id manager,id message,void (^native)(void));
 FOUNDATION_EXPORT BOOL CSCFCallOutputSuppressed(void);
 FOUNDATION_EXPORT BOOL CSCFCallBannerSuppressed(id group,unsigned long long room);
 FOUNDATION_EXPORT BOOL CSCFInvitationOutputSuppressed(id controller);
+/// Called only after a supported native rejection request was submitted, not on suppression alone.
+FOUNDATION_EXPORT void CSCFCallDidReject(CSCloseFriendCallToken *token);
 #ifdef __cplusplus
 }
 #endif

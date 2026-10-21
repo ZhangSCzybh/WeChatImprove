@@ -1,0 +1,210 @@
+[
+  {
+    "cls": "WCNewCommitViewController",
+    "kind": "instance",
+    "selector": "commonInit",
+    "address": "0x1092865f8",
+    "end": "0x109286e68",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCNewCommitViewController",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x109286e68",
+    "end": "0x109286f20",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCNewCommitViewController",
+    "kind": "instance",
+    "selector": "onWithContactCellClicked",
+    "address": "0x109299dd8",
+    "end": "0x10929a028",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCNewCommitViewController",
+    "kind": "instance",
+    "selector": "onRemindContactSelected:",
+    "address": "0x1092a7420",
+    "end": "0x1092a749c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCNewCommitViewController",
+    "kind": "instance",
+    "selector": "contactsSelectorController",
+    "address": "0x1092aa578",
+    "end": "0x1092aa588",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "ContactsSelectorController",
+    "kind": "instance",
+    "selector": "addContact",
+    "address": "0x106f43944",
+    "end": "0x106f4398c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "ContactsSelectorController",
+    "kind": "instance",
+    "selector": "showMutiSelectContactViewController",
+    "address": "0x106f4398c",
+    "end": "0x106f43e90",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "ContactsSelectorController",
+    "kind": "instance",
+    "selector": "commonSetupMutiSelectContactViewController:",
+    "address": "0x106f43e90",
+    "end": "0x106f43f6c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "ContactsSelectorController",
+    "kind": "instance",
+    "selector": "setupMutiSelectContactViewControllerInSessionSelectController:",
+    "address": "0x106f43f6c",
+    "end": "0x106f43f78",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "ContactsSelectorController",
+    "kind": "instance",
+    "selector": "showSessionSelectController",
+    "address": "0x106f43f78",
+    "end": "0x106f444e8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "ContactsSelectorController",
+    "kind": "instance",
+    "selector": "didSelectContacts:",
+    "address": "0x106f4474c",
+    "end": "0x106f44a50",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "ContactsSelectorController",
+    "kind": "instance",
+    "selector": "onMultiSelectContactReturn:",
+    "address": "0x106f44ca8",
+    "end": "0x106f44cac",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "ContactsSelectorController",
+    "kind": "instance",
+    "selector": "onMultiSelectContactReturnForSns:",
+    "address": "0x106f44cac",
+    "end": "0x106f44d2c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "ContactsSelectorController",
+    "kind": "instance",
+    "selector": "delegate",
+    "address": "0x106f451d4",
+    "end": "0x106f451f4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "ContactsSelectorController",
+    "kind": "instance",
+    "selector": "selectDelegate",
+    "address": "0x106f45208",
+    "end": "0x106f45228",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "ContactsSelectorController",
+    "kind": "instance",
+    "selector": "contactsSelectorType",
+    "address": "0x106f45338",
+    "end": "0x106f45348",
+    "types": "q16@0:8"
+  },
+  {
+    "cls": "MultiSelectContactsViewController",
+    "kind": "instance",
+    "selector": "actionDone",
+    "address": "0x104ea1644",
+    "end": "0x104ea1c28",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiSelectContactsViewController",
+    "kind": "instance",
+    "selector": "initView",
+    "address": "0x104ea50c4",
+    "end": "0x104ea6b2c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MultiSelectContactsViewController",
+    "kind": "instance",
+    "selector": "getContactSelectViewClass",
+    "address": "0x104ea8df0",
+    "end": "0x104ea8e04",
+    "types": "#16@0:8"
+  },
+  {
+    "cls": "MultiSelectContactsViewController",
+    "kind": "instance",
+    "selector": "m_delegate",
+    "address": "0x104eb8cc4",
+    "end": "0x104eb8ce4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "ContactSelectView",
+    "kind": "instance",
+    "selector": "initData:",
+    "address": "0x10100fb80",
+    "end": "0x101010020",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "ContactSelectView",
+    "kind": "instance",
+    "selector": "onFilterContactCandidate:",
+    "address": "0x10101a550",
+    "end": "0x10101a618",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "ContactSelectView",
+    "kind": "instance",
+    "selector": "m_delegate",
+    "address": "0x10101c38c",
+    "end": "0x10101c3ac",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "ContactsDataLogic",
+    "kind": "instance",
+    "selector": "getKeysArray",
+    "address": "0x1010a64c4",
+    "end": "0x1010a6604",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "ContactsDataLogic",
+    "kind": "instance",
+    "selector": "getContactsArrayWith:",
+    "address": "0x1010a6618",
+    "end": "0x1010a6708",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "ContactsDataLogic",
+    "kind": "instance",
+    "selector": "m_delegate",
+    "address": "0x1010ab580",
+    "end": "0x1010ab5a0",
+    "types": "@16@0:8"
+  }
+]

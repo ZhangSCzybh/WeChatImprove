@@ -1,0 +1,22 @@
+[
+  {
+    "command": "bash Tests/verify-close-friend-contacts.sh",
+    "exit_code": 0,
+    "result": "Native large-input clearing, cancellation/loading and normal next search; existing contacts/profile/forwarding passed."
+  },
+  {
+    "command": "bash Tests/verify-close-friend-social.sh",
+    "exit_code": 0,
+    "result": "Reminder picker list and selector binding; hidden selections and native draft/ACL retained; reveal/account transitions passed."
+  },
+  {
+    "command": "bash Tests/verify-close-friend-core.sh",
+    "exit_code": 0,
+    "result": "210 checks passed; older profiles gain the new defaults through normalization."
+  },
+  {
+    "command": "bash Tests/verify-close-friend-alerts.sh",
+    "exit_code": 0,
+    "result": "132 focused checks passed: main ilink/legacy/subcall rejection, ordinary call preservation, account changes, optional replies and deduplication."
+  }
+]
