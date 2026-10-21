@@ -4,6 +4,9 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.8-47": @[
+            @{@"title": @"修复普通好友朋友圈误锁", @"detail": @"个人朋友圈与动态详情按当前好友或动态作者判断隐藏状态，普通好友可正常查看；切换好友、临时解锁及重新锁定时同步更新。"}
+        ],
         @"1.8-46": @[
             @{@"title": @"移除搜索解锁占位", @"detail": @"密友隐藏时，搜索结果不再显示“解锁后查看”占位行。原生实时联想、搜索网络结果和普通搜索保持正常。"},
             @{@"title": @"保留完整密码解锁", @"detail": @"输入完整密友密码后仍自动解锁、清空输入并停止本次加载；后续输入继续实时搜索，无需额外点击搜索。"}

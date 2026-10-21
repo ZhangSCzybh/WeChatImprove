@@ -102,12 +102,37 @@ static void Privacy(id cell) {
         }
     }
 }
+static BOOL RouteRequiresGate(id owner,CSCloseFriendSurface surface) {
+    if(surface!=CSCloseFriendSurfaceTimeline) return YES;
+    id subject=nil;
+    // A personal album/detail is not the mixed timeline. Only its owner/author
+    // determines page access; a hidden commenter must not lock an ordinary post.
+    if(CSCFIsClass(owner,@"WCListViewController")) subject=CSCloseFriendRead(owner,@"m_contact");
+    else if(CSCFIsClass(owner,@"WCTimelineFlutterProfileViewController")) subject=CSCloseFriendRead(owner,@"contact");
+    else if(CSCFIsClass(owner,@"WCCommentDetailViewControllerFB") || CSCFIsClass(owner,@"WCTimelineFlutterDetailViewController")) subject=CSCloseFriendRead(owner,@"dataItem");
+    // 8.0.78 initWithSource: explicitly builds this album for getCurUsrName.
+    else if(CSCFIsClass(owner,@"WCTimelineFlutterAlbumV2ViewController")) return CSCloseFriendCurrentSnapshot().blocked;
+    else return YES; // Unsupported mixed feeds retain their existing fallback.
+    NSString *name=CSCloseFriendUserName(subject);
+    // Missing identity is not proof of an ordinary friend. Setters/layout retry
+    // against the actual subject, without caching a previous owner's permission.
+    return !name.length || CSCloseFriendShouldHideUserName(name,CSCloseFriendSurfaceTimeline);
+}
+static void RefreshRoute(id owner,CSCloseFriendSurface surface) {
+    CSCloseFriendSurface effective=surface==CSCloseFriendSurfaceTimeline && CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceInteraction) ? CSCloseFriendSurfaceInteraction : surface;
+    CSCFSocialGate(owner,effective,RouteRequiresGate(owner,surface));
+    CSCFSocialTrack(owner,^(id page){RefreshRoute(page,surface);});
+}
 void CSCFSocialProtectRoute(NSString *cls,CSCloseFriendSurface surface) {
     for(NSString *name in @[@"viewDidLoad",@"viewDidLayoutSubviews"]) CSCFSocialHook0(cls,name,^(id owner,void(^orig)(void)){
-        orig(); CSCloseFriendSurface effective=surface==CSCloseFriendSurfaceTimeline && CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceInteraction) ? CSCloseFriendSurfaceInteraction : surface;
-        CSCFSocialGate(owner,effective,YES);
-        CSCFSocialTrack(owner,^(id page){CSCloseFriendSurface current=surface==CSCloseFriendSurfaceTimeline && CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceInteraction) ? CSCloseFriendSurfaceInteraction : surface; CSCFSocialGate(page,current,YES);});
+        orig(); RefreshRoute(owner,surface);
     });
+    if(surface==CSCloseFriendSurfaceTimeline) {
+        NSString *setter=@{@"WCListViewController":@"setM_contact:",@"WCTimelineFlutterProfileViewController":@"setContact:",@"WCCommentDetailViewControllerFB":@"setDataItem:",@"WCTimelineFlutterDetailViewController":@"setDataItem:"}[cls];
+        if(setter) CSCFSocialHook1(cls,setter,^(id owner,id subject,void(^orig)(id)){
+            orig(subject); RefreshRoute(owner,surface);
+        });
+    }
 }
 void CSCFSocialInstall(void) {
     CSCFSocialHook1(@"WCTimeLineCellView",@"initPrivacyButton:",^(id cell,id item,void(^orig)(id)){ orig(item); Privacy(cell); CSCFSocialTrack(cell,^(id c){Privacy(c); [c setNeedsLayout];}); });

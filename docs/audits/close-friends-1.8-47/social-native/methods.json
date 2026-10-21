@@ -1,0 +1,394 @@
+[
+  {
+    "cls": "WCListViewController",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x109015afc",
+    "end": "0x109015b0c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCListViewController",
+    "kind": "instance",
+    "selector": "initWithHomepageType:",
+    "address": "0x109015b0c",
+    "end": "0x109015df4",
+    "types": "@24@0:8q16"
+  },
+  {
+    "cls": "WCListViewController",
+    "kind": "instance",
+    "selector": "viewDidLoad",
+    "address": "0x109015df4",
+    "end": "0x109016318",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCListViewController",
+    "kind": "instance",
+    "selector": "viewDidLayoutSubviews",
+    "address": "0x1090169f0",
+    "end": "0x109016a40",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCListViewController",
+    "kind": "instance",
+    "selector": "initBarItem",
+    "address": "0x109017710",
+    "end": "0x109018134",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCListViewController",
+    "kind": "instance",
+    "selector": "setM_contact:",
+    "address": "0x1090190cc",
+    "end": "0x109019268",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCListViewController",
+    "kind": "instance",
+    "selector": "initData:",
+    "address": "0x10901a1c0",
+    "end": "0x10901a618",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "WCListViewController",
+    "kind": "instance",
+    "selector": "m_contact",
+    "address": "0x10901e790",
+    "end": "0x10901e7a0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewController",
+    "kind": "instance",
+    "selector": "initWithViewModel:showTitle:",
+    "address": "0x106e55f24",
+    "end": "0x106e5609c",
+    "types": "@28@0:8@16B24"
+  },
+  {
+    "cls": "WCCommentDetailViewController",
+    "kind": "instance",
+    "selector": "viewDidLoad",
+    "address": "0x106e5718c",
+    "end": "0x106e57e70",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewController",
+    "kind": "instance",
+    "selector": "initEducateDoubleIdentityLabel",
+    "address": "0x106e57ee8",
+    "end": "0x106e58fb4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewController",
+    "kind": "instance",
+    "selector": "initEmoticonView",
+    "address": "0x106e5a08c",
+    "end": "0x106e5a734",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initInputToolView",
+    "address": "0x106e9eb00",
+    "end": "0x106ea0d14",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initEmoticonView",
+    "address": "0x106ea1484",
+    "end": "0x106ea1790",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initInputController",
+    "address": "0x106ea1790",
+    "end": "0x106ea1a14",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x106e711ac",
+    "end": "0x106e7189c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initCommentBrowseAggreReporter",
+    "address": "0x106e718f8",
+    "end": "0x106e71a94",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "setDataItem:",
+    "address": "0x106e71ad4",
+    "end": "0x106e727b8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initData",
+    "address": "0x106e73a48",
+    "end": "0x106e740ac",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initIndividualSourceLabel",
+    "address": "0x106e7b480",
+    "end": "0x106e7bca4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initEcsView",
+    "address": "0x106e7c68c",
+    "end": "0x106e7c870",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initTableHeaderView",
+    "address": "0x106e7cc04",
+    "end": "0x106e7ccdc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initExtensionViewsInTableHeader",
+    "address": "0x106e7ccdc",
+    "end": "0x106e7cd78",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initRewardDetailView:",
+    "address": "0x106e82464",
+    "end": "0x106e8317c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initTableFooterView",
+    "address": "0x106e89a10",
+    "end": "0x106e8a248",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initTableView",
+    "address": "0x106e8b158",
+    "end": "0x106e8b4f8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "viewDidLoad",
+    "address": "0x106e8cc60",
+    "end": "0x106e8d3ac",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "viewDidLayoutSubviews",
+    "address": "0x106e8e15c",
+    "end": "0x106e8e32c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initContentTranslateView:andSuperView:",
+    "address": "0x106e9635c",
+    "end": "0x106e96f00",
+    "types": "d32@0:8@16@24"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initTranslateStatusButton:withTitle:andReferView:",
+    "address": "0x106e97044",
+    "end": "0x106e9741c",
+    "types": "d36@0:8B16@20@28"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initAdBreakFrameView",
+    "address": "0x106e99970",
+    "end": "0x106e9a118",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initAdPreviewMaskView",
+    "address": "0x106e9a2c0",
+    "end": "0x106e9a5a4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initAdSocialLikeView",
+    "address": "0x106e9a798",
+    "end": "0x106e9a9a4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initAdSocialLikeCheerPlayerView",
+    "address": "0x106e9a9a4",
+    "end": "0x106e9ad38",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "initAdContinuousLikeBannerAnimationView",
+    "address": "0x106e9af40",
+    "end": "0x106e9b1c4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCCommentDetailViewControllerFB",
+    "kind": "instance",
+    "selector": "dataItem",
+    "address": "0x106e9c9b8",
+    "end": "0x106e9c9c8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCTimelineFlutterAlbumV2ViewController",
+    "kind": "instance",
+    "selector": "initWithSource:",
+    "address": "0x10a1207d0",
+    "end": "0x10a120ce4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "WCTimelineFlutterDetailViewController",
+    "kind": "instance",
+    "selector": "initWithDataItem:",
+    "address": "0x10a120d20",
+    "end": "0x10a120d30",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "WCTimelineFlutterDetailViewController",
+    "kind": "instance",
+    "selector": "initWithDataItem:forbidComment:",
+    "address": "0x10a120d30",
+    "end": "0x10a120d48",
+    "types": "@28@0:8@16B24"
+  },
+  {
+    "cls": "WCTimelineFlutterDetailViewController",
+    "kind": "instance",
+    "selector": "initWithDataItem:forbidComment:tipType:failedComment:canShowInvisibleTipsView:",
+    "address": "0x10a120d48",
+    "end": "0x10a120d58",
+    "types": "@48@0:8@16B24q28@36B44"
+  },
+  {
+    "cls": "WCTimelineFlutterDetailViewController",
+    "kind": "instance",
+    "selector": "initWithDataItem:forbidComment:tipType:failedComment:canShowInvisibleTipsView:targetComment:",
+    "address": "0x10a120d58",
+    "end": "0x10a1214e8",
+    "types": "@56@0:8@16B24q28@36B44@48"
+  },
+  {
+    "cls": "WCTimelineFlutterDetailViewController",
+    "kind": "instance",
+    "selector": "dataItem",
+    "address": "0x10a121fd0",
+    "end": "0x10a121fe0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCTimelineFlutterDetailViewController",
+    "kind": "instance",
+    "selector": "setDataItem:",
+    "address": "0x10a121fe0",
+    "end": "0x10a121ff4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCTimelineFlutterProfileViewController",
+    "kind": "instance",
+    "selector": "initWithContact:source:",
+    "address": "0x10a124450",
+    "end": "0x10a124b40",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "cls": "WCTimelineFlutterProfileViewController",
+    "kind": "instance",
+    "selector": "initWithSearchSource:",
+    "address": "0x10a124b40",
+    "end": "0x10a125130",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "WCTimelineFlutterProfileViewController",
+    "kind": "instance",
+    "selector": "viewDidLoad",
+    "address": "0x10a125164",
+    "end": "0x10a1251e4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCTimelineFlutterProfileViewController",
+    "kind": "instance",
+    "selector": "contact",
+    "address": "0x10a1262dc",
+    "end": "0x10a1262ec",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCTimelineFlutterProfileViewController",
+    "kind": "instance",
+    "selector": "setContact:",
+    "address": "0x10a1262ec",
+    "end": "0x10a126300",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCTimelineFlutterViewController",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x10a12646c",
+    "end": "0x10a1267e4",
+    "types": "@16@0:8"
+  }
+]

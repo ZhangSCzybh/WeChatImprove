@@ -185,9 +185,13 @@ static void InstallComments(void) {
     replacement=imp_implementationWithBlock(^(id owner,id comment,id item,id view){if(!CSCFPageIsCurrent(owner) || CSCFSocialHidden(comment,CSCloseFriendSurfaceInteraction) || CSCFSocialHidden(item,CSCloseFriendSurfaceTimeline)) return; ((void(*)(id,SEL,id,id,id))reply)(owner,NSSelectorFromString(@"onReplyComment:ofDataItem:ofTouchedView:"),comment,item,view);});
     if(!CSCloseFriendInstallHook(@"WCTimeLineViewController",@"onReplyComment:ofDataItem:ofTouchedView:",replacement,&reply,"v@:@@@")) imp_removeBlock(replacement);
 }
+static void InstallTimelineRoutes(void) {
+    // WCCommentDetailViewController is Finder's comment UI. Moments uses the FB
+    // controller and its WCDataItem, or the Flutter detail/profile controllers.
+    for(NSString *cls in @[@"WCListViewController",@"WCCommentDetailViewControllerFB",@"WCTimelineFlutterAlbumV2ViewController",@"WCTimelineFlutterDetailViewController",@"WCTimelineFlutterProfileViewController",@"WCTimelineFlutterViewController"]) CSCFSocialProtectRoute(cls,CSCloseFriendSurfaceTimeline);
+}
 void CSCFTimelineInstall(void) {
-    for(NSString *cls in @[@"WCListViewController",@"WCCommentDetailViewController",@"WCTimelineFlutterAlbumV2ViewController",@"WCTimelineFlutterDetailViewController",@"WCTimelineFlutterProfileViewController",@"WCTimelineFlutterViewController"]) CSCFSocialProtectRoute(cls,CSCloseFriendSurfaceTimeline);
-
+    InstallTimelineRoutes();
     BOOL ready=YES;
     NSDictionary *contracts=@{@"WCFacade":@{@"getTimelineDataItem":@"@@:",@"countOfTimelineDataItem":@"q@:",@"getTimelineDataItemOfIndex:":@"@@:q",@"removeCachesOfLikeUserWithDataItemId:":@"v@:@"},@"WCDataItem":@{@"likeUsers":@"@@:",@"commentUsers":@"@@:",@"likeCount":@"i@:",@"commentCount":@"i@:"},@"WCTimeLineViewController":@{@"numberOfSectionsInTableView:":@"q@:@",@"tableView:numberOfRowsInSection:":@"q@:@q",@"tableView:cellForRowAtIndexPath:":@"@@:@@",@"tableView:heightForRowAtIndexPath:":@"d@:@@",@"tableView:didSelectRowAtIndexPath:":@"v@:@@"}};
     for(NSString *cls in contracts) for(NSString *selector in contracts[cls]) ready &= CSCloseFriendMethodMatches(class_getInstanceMethod(NSClassFromString(cls),NSSelectorFromString(selector)),[contracts[cls][selector] UTF8String]);

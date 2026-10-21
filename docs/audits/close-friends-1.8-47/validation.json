@@ -1,0 +1,73 @@
+{
+  "version": "1.8-47",
+  "scheme": "rootless",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "branch": "codex/close-friends",
+  "base_commit": "f240a3fa",
+  "source_identity": "source-manifest.json",
+  "metadata": {
+    "Package": "com.wechat.improve",
+    "Version": "1.8-47",
+    "Architecture": "iphoneos-arm64",
+    "Depends": "mobilesubstrate (>= 0.9.5000)"
+  },
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "minimum_ios": "15.0",
+  "artifact": {
+    "path": "packages/com.wechat.improve_1.8-47_iphoneos-arm64.deb",
+    "sha256": "89181f15be2721ad20de3a0263520a836bab84819b70b9e7399440ec617d6eab",
+    "bytes": 1099080
+  },
+  "dylib_sha256": "1012132ac7a230311bade53a53b4b04a6765cdc7b638fe43eb0058bdb175ef16",
+  "dSYM_UUIDs": {
+    "arm64": "E8E90D2B-18FB-31A5-8D9D-26CB5AFF2995",
+    "arm64e": "249F33A6-6C0F-3D80-BB98-124F9200189E"
+  },
+  "source_matches_manifest": true,
+  "package_matches_build_and_stage": true,
+  "version_agreement": true,
+  "injection_filter_unchanged": true,
+  "prior_artifacts_unchanged": [
+    "packages/com.wechat.improve_1.8-43_iphoneos-arm64.deb",
+    "packages/com.wechat.improve_1.8-45_iphoneos-arm64.deb",
+    "packages/com.wechat.improve_1.5-7_iphoneos-arm.deb",
+    "packages/com.wechat.improve_1.8-46_iphoneos-arm64.deb",
+    "packages/com.wechat.improve_1.8-44_iphoneos-arm64.deb",
+    "packages/com.wechat.improve_1.8-41-b2_iphoneos-arm64.deb",
+    "packages/com.wechat.improve_1.6-0_iphoneos-arm64.deb",
+    "packages/com.wechat.improve_1.8-42_iphoneos-arm64.deb",
+    "packages/com.wechat.improve_1.8-41_iphoneos-arm64.deb"
+  ],
+  "exports_in_both_architectures": [
+    "_CSCFSocialProtectRoute",
+    "_CSCFSocialGate",
+    "_CSCFTimelineInstall",
+    "_CSCFIncomingCallToken",
+    "_CSCFHandleIncomingCall",
+    "_CSCFCallDidReject",
+    "_CSCFCallReplyMessageDidChange",
+    "_CSCFSearchSubmit",
+    "_CSCFSearchDispatchInput",
+    "_CSCFSearchDispatchQuery",
+    "_CSCFSearchSuppressLoading",
+    "_CSCFSearchModel",
+    "_CSCFSearchVisibleRows",
+    "_CSCFSearchConsumePassword",
+    "_CSCFProfileWithNativePresentation",
+    "_CSCFProfileUsesNativeStranger",
+    "_CSCFAudienceInstall"
+  ],
+  "host_results": [
+    {
+      "command": "bash Tests/verify-close-friend-social.sh",
+      "exit_code": 0,
+      "output": "Social routes: ordinary albums/details open, hidden authors protected, identity/reveal/relock/account transitions and native lifecycle preserved\nClose-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, discovery cues, locked publishing candidates and hidden-selection preservation, stale native render rejection, completed-picker authorization and reveal/relock/account transitions passed\n"
+    }
+  ],
+  "build_exit_code": 0,
+  "build_command": "make package -j4 SCHEME=rootless PACKAGE_VERSION=1.8-47",
+  "device_validation": "Pending real-device check: ordinary personal Moments albums and post details open without an unlock cover; hidden authors remain protected across reveal/relock and page reuse."
+}

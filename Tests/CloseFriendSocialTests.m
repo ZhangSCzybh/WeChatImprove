@@ -22,7 +22,12 @@ static void CSCFSocialTrack(id owner,void(^refresh)(id)) {if(!Refreshes) Refresh
 static void CSCFSocialClearCaches(__unused id owner,__unused NSArray *names) {}
 static BOOL CSCFCallVoid(__unused id page,__unused NSString *selector) {return NO;}
 static void CSCFReloadTables(__unused id page) {}
-static BOOL CSCFSocialGate(__unused id owner,__unused CSCloseFriendSurface surface,__unused BOOL force) {return YES;}
+static NSMapTable *RouteGates;
+static BOOL CSCFSocialGate(id owner,CSCloseFriendSurface surface,BOOL force) {
+    if(!RouteGates) RouteGates=[NSMapTable weakToStrongObjectsMapTable];
+    BOOL blocked=!CSCFPageIsCurrent(owner) || (force && CSCloseFriendSurfaceConcealed(Snapshot,surface));
+    [RouteGates setObject:@(blocked) forKey:owner]; return blocked;
+}
 static BOOL CSCFUnreadBegin(void) {return NO;}
 static void CSCFUnreadEnd(__unused BOOL previous) {}
 static CSCloseFriendSocialProjection *CSCFSocialProject(NSArray *source,CSCloseFriendSurface surface) {return [[CSCloseFriendSocialProjection alloc] initWithSource:source snapshot:Snapshot surface:surface read:^id(id item,NSString *key){return CSCloseFriendRead(item,key);}];}
@@ -30,7 +35,9 @@ static BOOL CSCFSocialHidden(id object,CSCloseFriendSurface surface) {return CSC
 static BOOL CSCloseFriendInstallHook(NSString *cls,NSString *name,IMP replacement,IMP *original,const char *type) {
     Method m=class_getInstanceMethod(NSClassFromString(cls),NSSelectorFromString(name));
     if(!CSCloseFriendMethodMatches(m,type)) return NO;
-    *original=method_setImplementation(m,replacement); return YES;
+    *original=method_getImplementation(m);
+    // MSHookMessageEx creates a class-local override for inherited lifecycle methods.
+    class_replaceMethod(NSClassFromString(cls),NSSelectorFromString(name),replacement,method_getTypeEncoding(m)); return YES;
 }
 static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(void))) {
     __block IMP original=NULL; SEL selector=NSSelectorFromString(name);
@@ -140,18 +147,20 @@ static NSArray *FixtureKeys(__unused id logic,__unused SEL cmd) {return @[@"A"];
 static NSArray *FixtureRows(AudienceLogic *logic,__unused SEL cmd,__unused id key) {return logic.contacts;}
 static char ShieldKey;
 static void ShieldPicker(id picker) {objc_setAssociatedObject(picker,&ShieldKey,@YES,OBJC_ASSOCIATION_RETAIN_NONATOMIC);}
-static NSString *CSCloseFriendUserName(id object) {return [object isKindOfClass:NSString.class] ? object : CSCloseFriendRead(object,@"username");}
+static BOOL CSCloseFriendShouldHideUserName(NSString *name,CSCloseFriendSurface surface) {return [Snapshot hidesUserName:name surface:surface];}
+#include "SocialRouteBodies.h"
 static BOOL CSCFSocialRequireAuthentication(id owner,CSCloseFriendSurface surface) {return !CSCFPageIsCurrent(owner) || CSCloseFriendSurfaceConcealed(Snapshot,surface);}
 #include "TimelineBodies.h"
 #include "InteractionBodies.h"
 #include "StatusBodies.h"
-static BOOL CSCloseFriendShouldHideUserName(NSString *name,CSCloseFriendSurface surface) {return [Snapshot hidesUserName:name surface:surface];}
 #include "AudienceBodies.h"
 #define Check(x) do { if(!(x)) {fprintf(stderr,"FAIL %s:%d: %s\n",__FILE__,__LINE__,#x); return 1;} } while(0)
 static void Policy(BOOL revealed,NSUInteger revision) {
     Snapshot=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"fixture" profile:@{@"enabled":@YES,@"friends":@[@"secret"],@"groups":@[],@"options":CSCloseFriendDefaultOptions()} revealed:revealed revision:revision blocked:NO];
 }
+#include "CloseFriendSocialRouteFixture.h"
 int main(void) { @autoreleasepool {
+    Check(TestSocialRoutes()==0);
     Policy(NO,1); InstallModel(); DiscoveryCounters();
     TableMethod(@"tableView:cellForRowAtIndexPath:","@@:@@"); TableMethod(@"tableView:heightForRowAtIndexPath:","d@:@@");
     FindFriendEntryViewController *discovery=[FindFriendEntryViewController new];
