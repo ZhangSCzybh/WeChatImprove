@@ -1,0 +1,43 @@
+{
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "branch": "main",
+  "head": "b56895f2833005ebd4f3e01f34968a77a67c787a",
+  "initial_status": " M .theos/_/DEBIAN/control\n M .theos/_/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib\n M .theos/last_package\n M .theos/obj/WeChatImprove.dylib\n M .theos/obj/arm64/Controllers/CSCustomViewController.m.7be6bc4b.o\n M .theos/obj/arm64/Hooks/NavigationTitleHooks.xm.7be6bc4b.o\n M .theos/obj/arm64/WeChatImprove.dylib\n M .theos/obj/arm64/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib\n M .theos/obj/arm64e/Controllers/CSCustomViewController.m.dd9766eb.o\n M .theos/obj/arm64e/WeChatImprove.dylib\n M .theos/obj/arm64e/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib\n M Controllers/CSCloseFriendCallAdapter.m\n M Controllers/CSCloseFriendPolicy.m\n M Controllers/CSCloseFriendSettingsViewController.m\n M Controllers/CSReleaseNotesViewController.m\n M Headers/CSUserInfoHelper.h\n M README.md\n M Tests/CloseFriendAlertTests.m\n M Tests/CloseFriendCallReplyFixture.h\n M Tests/CloseFriendCoreTests.m\n M Tests/CloseFriendIncomingCallFixture.h\n M Tests/CloseFriendProfileTests.m\n M control\n?? docs/audits/close-friends-calls-1.9-4/\n?? packages/WeChatImprove-1.9-4-dSYMs.zip\n?? packages/com.wechat.improve_1.9-3-b2_iphoneos-arm64.deb\n?? packages/com.wechat.improve_1.9-4_iphoneos-arm64.deb\n",
+  "preserved_files": {
+    "packages/WeChatImprove-1.9-4-dSYMs.zip": "9fd5b3e5628d130ca87edcb3bbbe485d14dbb2b7383a7a46db1a7dc546d7a97e",
+    "packages/.DS_Store": "63ef0b78df05db4d0498390d966856ebc381e09df252b088c304bb59ddc2d007",
+    "packages/com.wechat.improve_1.5-7_iphoneos-arm.deb": "6f9472a7ad9697add4cd292447ff3ae11557027d371eaefdb6066cc8d4666ef3",
+    "packages/com.wechat.improve_1.9-4_iphoneos-arm64.deb": "605a2c09fd883ea6a478d3ad1941e0b3366f61e4b0489a20f1c6351eb3507ff9",
+    "packages/com.wechat.improve_1.9-3-b2_iphoneos-arm64.deb": "7e1f4f1ac2e30fd68dbc3923cf39e49b0349e8f7d45975c08913a7a2796316a8",
+    "packages/com.wechat.improve_1.9-3-b1_iphoneos-arm64.deb": "d0a410a2c83cd16e4fabdb60a427243ced77deaff1a0fec8940278c74dd6aacb",
+    "packages/com.wechat.improve_1.6-0_iphoneos-arm64.deb": "18082e00400372a33f5e11e6231c4c8e48e01fee2317a11d24b2c61fe366acbb",
+    ".theos/_/DEBIAN/control": "78d46021c53d55f3e2e67a05db427d1e34e13a04bb2493a839913a08981f73bc",
+    ".theos/_/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib": "a5d92c9cfc418d5bf52cf1f673a2fad4cb29e3a3b42bc10c9570f1697f5acef8",
+    ".theos/last_package": "df7873aa97b730b192809fc5e9968adfb526b3d051e89a0f405c7a8f2a3fa9f0",
+    ".theos/obj/WeChatImprove.dylib": "a5d92c9cfc418d5bf52cf1f673a2fad4cb29e3a3b42bc10c9570f1697f5acef8",
+    ".theos/obj/arm64/Controllers/CSCustomViewController.m.7be6bc4b.o": "2fc49959d7f192fe19164c9bec20591b5e13d4af459f7d5934eaf93de94d626f",
+    ".theos/obj/arm64/Hooks/NavigationTitleHooks.xm.7be6bc4b.o": "980f0f60a49a76ccb1b436bb6a01bd7d9471a8a62439fb60ffbee7977970a063",
+    ".theos/obj/arm64/WeChatImprove.dylib": "e59fb97260bb8e5bbcc95eeed9af292d2e42ba07b773b9bde92edd0c9e13d712",
+    ".theos/obj/arm64/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib": "9365f7578e8adc7e328e00b961d7c066255b87fbc291e7e98e2e7b1e6edafe61",
+    ".theos/obj/arm64e/Controllers/CSCustomViewController.m.dd9766eb.o": "775ddf22b6feb5f5230a07a559f7291e0643a2eec4ec817ca10aa39393251981",
+    ".theos/obj/arm64e/WeChatImprove.dylib": "f4126683101b8a16518628ff26984c351a8f87ddb751cbd55a6d14a0cf0a95b0",
+    ".theos/obj/arm64e/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib": "1cef2fc9c949b1e017d5431109d242831e02030431ee3c638bcb179e34d3757f"
+  },
+  "source_before": {
+    "Controllers/CSCloseFriendRuntime.h": "22d7d6dd82c999cb50319538d188f8a3a4b3ee4a92ea6ff10c45de05372a70d7",
+    "Controllers/CSCloseFriendRuntime.m": "e16fb2db0ad7f24313b756a25a5513101ac87237a2faa926d783e11e9b1166a7",
+    "Controllers/CSCloseFriendManager.m": "b85c388fd0178efba03247f89c5b216cab75f793912907a77de371bed5957de7",
+    "Controllers/CSCloseFriendPolicy.m": "bc9995af24fd74b45b7496cbbdd6630bb97e13a87e9282af24605441c36de9f9",
+    "Controllers/CSCloseFriendSettingsViewController.m": "bf799e2e7679a19118aab7e23b7163101de67b962333ffe1928defb81f542312",
+    "Tests/CloseFriendRuntimeTests.m": "b02ba0149b3c7f8b9bcea8eb011e4408290665b3a02fc2241af0261cbb5c3099",
+    "Tests/CloseFriendCoreTests.m": "494d553fd9ca1abbc21269f6185aae1d6a88d40282c0afa1c89717bd09a8ebdc",
+    "Tests/CloseFriendSchedulingTests.m": "09fd30880ce9e0f7eb480c0eabae84da39f94b3767d405f9d11d56197c387467",
+    "Tests/verify-close-friend-runtime.sh": "bef791fadedf1a32970c5f0efb9f9ea02fa1307ee3a10f1aa89c5ce1b531f11f",
+    "Tests/verify-close-friend-shake.sh": "88da6050b4f88757ecb58e9a25240a3302525d5b26b03212b0476d6952f16af5",
+    "Controllers/CSReleaseNotesViewController.m": "3786fe297c42d1ddec44edf2844a0adbb77165c165c009f6f7dbe9f408b43cdf",
+    "Headers/CSUserInfoHelper.h": "9deb7b8f376fb2b455bcde5c42a4e9421a752f42d77434105e6a6618de697052",
+    "README.md": "324372c7b1e88b9ae3062c3c267902ad88929735a7a5bb9db3baecbd08d24c31",
+    "control": "fb225419e65e22e81a72e48caa8eb422d42e75bb2d37fee20d92e11824e2e0a2"
+  },
+  "build_directory": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-no-expiry-1.9-5-nf4idi39/build"
+}

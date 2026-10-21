@@ -1,0 +1,9 @@
+{
+  "command": [
+    "bash",
+    "Tests/verify-close-friend-core.sh"
+  ],
+  "exit_code": 1,
+  "elapsed_seconds": 2.28,
+  "output": "FAIL line 88: defaults[@\"unlockSeconds\"]==nil\n"
+}

@@ -765,7 +765,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     NSMutableArray *accountItems=[NSMutableArray arrayWithArray:@[accountItem,favoriteAuthItem]];
     CSCloseFriendSnapshot *closeFriendSnapshot=CSCloseFriendCurrentSnapshot();
     if(!(closeFriendSnapshot.enabled && !closeFriendSnapshot.revealed && [closeFriendSnapshot.options[@"hideSettingsEntry"] boolValue])) {
-        [accountItems addObject:[CSSettingItem itemWithTitle:@"密友" iconName:@"lock.shield" iconColor:UIColor.systemBlueColor detail:nil]];
+        [accountItems addObject:[CSSettingItem itemWithTitle:@"捉迷藏呀" iconName:@"lock.shield" iconColor:UIColor.systemBlueColor detail:nil]];
     }
     CSSettingSection *accountSection = [CSSettingSection sectionWithHeader:@"账号与安全" items:accountItems];
     
@@ -1041,7 +1041,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     
     // 根据item类型和标题处理不同的点击事件
     if (item.itemType == CSSettingItemTypeNormal) {
-        if ([item.title isEqualToString:@"密友"]) {
+        if ([item.title isEqualToString:@"捉迷藏呀"]) {
             [CSCloseFriendManager.sharedManager presentSettingsFrom:self];
         }
         // 处理账号信息点击

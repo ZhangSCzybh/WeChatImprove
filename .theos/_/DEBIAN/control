@@ -6,5 +6,5 @@ Author: 再也不会
 Section: Tweaks
 Depends: mobilesubstrate (>= 0.9.5000)
 Architecture: iphoneos-arm64
-Version: 1.9-3-b1
+Version: 1.9-5
 Installed-Size: 4984
