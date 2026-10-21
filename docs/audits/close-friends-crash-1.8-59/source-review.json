@@ -1,0 +1,13 @@
+{
+  "baseline": "d35c3e00",
+  "changed_product_files": [
+    "Controllers/CSCloseFriendTimelineAdapter.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "README.md",
+    "control"
+  ],
+  "functional_change": "Controllers/CSCloseFriendTimelineAdapter.m",
+  "other_changes": "release metadata and focused regression",
+  "no_unrelated_hooks_changed": true
+}

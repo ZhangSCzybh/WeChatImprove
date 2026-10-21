@@ -1,0 +1,7 @@
+{
+  "baseline": "d35c3e00 / 1.8-58 production code",
+  "exit_code": 1,
+  "elapsed_seconds": 2.34,
+  "expected_failure": "native model hash callback in cache lookup",
+  "failed_as_expected": true
+}

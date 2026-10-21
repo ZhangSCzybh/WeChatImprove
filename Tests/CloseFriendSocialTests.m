@@ -6,6 +6,7 @@
 #import "CSCloseFriendContactProjection.h"
 static CSCloseFriendSnapshot *Snapshot;
 static NSUInteger Epoch=1;
+NSString *const CSCloseFriendPolicyDidChangeNotification=@"CSCloseFriendPolicyDidChange";
 static char EpochKey;
 static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) {return Snapshot;}
 static NSUInteger CSCloseFriendAccountEpoch(void) {return Epoch;}
@@ -111,10 +112,11 @@ static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(
 @property(nonatomic,strong) NSMutableDictionary *cellHeightCache,*cellShowItemCache;
 @property(nonatomic,strong) NSMutableArray *deferredRows;
 @property(nonatomic,strong) id displayedItem;
-@property(nonatomic) NSUInteger nativeReloads,nativeLayouts,appearances,displayCalls;
+@property(nonatomic) NSUInteger nativeReloads,nativeLayouts,appearances,displayCalls,disappearances;
 @property(nonatomic) BOOL refreshInsideReload;
 - (void)viewWillAppear:(BOOL)animated;
 - (void)viewDidAppear:(BOOL)animated;
+- (void)viewDidDisappear:(BOOL)animated;
 - (void)viewDidLayoutSubviews;
 - (void)reloadDataWrap;
 - (NSInteger)numberOfSectionsInTableView:(id)table;
@@ -123,6 +125,7 @@ static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(
 @implementation WCTimeLineViewController
 - (void)viewWillAppear:(__unused BOOL)animated {self.appearances++;}
 - (void)viewDidAppear:(__unused BOOL)animated {self.appearances++;}
+- (void)viewDidDisappear:(__unused BOOL)animated {self.disappearances++;}
 // Native layout can reload. A plugin that forces layout from a reload hook
 // would re-enter this cycle; production must not install either hook.
 - (void)viewDidLayoutSubviews {self.nativeLayouts++; [self reloadDataWrap];}
@@ -207,9 +210,12 @@ static void Policy(BOOL revealed,NSUInteger revision) {
 }
 #include "CloseFriendSocialRouteFixture.h"
 #include "CloseFriendTimelinePresentationTests.h"
+#include "CloseFriendTimelineCacheTests.h"
 int main(void) { @autoreleasepool {
     Check(TestSocialRoutes()==0);
     Policy(NO,1); InstallModel();
+    Check(TestTimelineCacheNativeCallbacks()==0);
+    Policy(NO,1);
     TableMethod(@"tableView:cellForRowAtIndexPath:","@@:@@"); TableMethod(@"tableView:heightForRowAtIndexPath:","d@:@@");
     NSDictionary *ordinary=@{@"username":@"alice"}, *hidden=@{@"username":@"secret"}, *reply=@{@"username":@"alice",@"refUserName":@"secret"};
     WCDataItem *post=[WCDataItem new]; post.username=@"alice"; post.itemID=@"post-a"; post.likeUsers=@[ordinary,hidden]; post.commentUsers=@[hidden,reply,ordinary]; post.isPrivate=YES; post.selectContacts=[NSSet setWithArray:@[@"alice",@"secret"]]; post.selectTags=[NSSet setWithObject:@"original-tag"];

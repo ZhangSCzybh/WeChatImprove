@@ -1,0 +1,8 @@
+{
+  "command": [
+    "bash",
+    "Tests/verify-close-friend-social.sh"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 2.02
+}

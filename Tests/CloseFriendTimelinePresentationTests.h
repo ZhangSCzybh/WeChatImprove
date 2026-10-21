@@ -41,6 +41,17 @@ static int TestTimelinePresentation(void) {
     update(page); [page viewDidAppear:NO];
     Check(page.nativeReloads==4); // Repeated notifications/appearance do not reload again.
     [page tableView:page.tableView willDisplayCell:nil forRowAtIndexPath:first]; Check(page.displayedItem==ordinary);
+    __weak id releasedInteraction=nil;
+    @autoreleasepool {
+        NSMutableDictionary *interaction=[NSMutableDictionary dictionaryWithObject:@"alice" forKey:@"username"];
+        releasedInteraction=interaction;ordinary.likeUsers=@[interaction];
+        CSCFTimelineScope *previous=Enter(page,nil);Check(ordinary.likeCount==1);Leave(previous);ordinary.likeUsers=@[];
+    }
+    Check(releasedInteraction!=nil);
+    [page viewDidDisappear:YES];
+    Check(!releasedInteraction && !State(page).posts && page.disappearances==1 && page.nativeReloads==4);
+    [page viewWillAppear:YES];
+    Check(page.nativeReloads==4 && [page numberOfSectionsInTableView:nil]==1);
 
     page.viewLoaded=NO; Policy(YES,203); update(page); [page viewWillAppear:NO];
     Check(page.nativeReloads==4); page.viewLoaded=YES; [page viewWillAppear:NO];
@@ -53,6 +64,6 @@ static int TestTimelinePresentation(void) {
     Epoch++; Policy(NO,205); update(page); [page viewWillAppear:NO];
     [page tableView:page.tableView willDisplayCell:nil forRowAtIndexPath:first];
     Check(page.nativeReloads==6 && page.displayCalls==displayed); Epoch--;
-    puts("Timeline presentation: core cases passed (native refresh, display mapping, offscreen reveal, lifecycle deduplication, no layout/reload hooks, stale accounts)");
+    puts("Timeline presentation: core cases passed (native refresh, display mapping, offscreen reveal, lifecycle deduplication, no layout/reload hooks, stale accounts, disappearance releases cache without reload)");
     return 0;
 }

@@ -1,0 +1,9 @@
+{
+  "command": [
+    "bash",
+    "Tests/verify-close-friend-ios.sh",
+    "--social"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 3.54
+}

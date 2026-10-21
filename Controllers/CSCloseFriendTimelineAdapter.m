@@ -19,11 +19,13 @@
 @implementation CSCFTimelineScope @end
 static CSCFTimelineScope *Scope; // main-thread only, synchronous UI calls
 @interface CSCFTimelineUsers : NSObject
+@property(nonatomic,weak) id owner;
 @property(nonatomic,copy) NSArray *source, *visible;
 @property(nonatomic) NSUInteger revision,epoch;
 @end
 @implementation CSCFTimelineUsers @end
 static NSCache *LikeProjections, *CommentProjections;
+static NSHashTable *TimelineStates;
 static NSUInteger UsersCacheEpoch;
 static char TimelineKey, CommentRevisionKey;
 static id (*RawPosts)(id,SEL);
@@ -31,6 +33,31 @@ static id (*RawLikes)(id,SEL);
 static id (*RawComments)(id,SEL);
 static void InvalidateTimeline(id owner);
 static void PrepareTimeline(id owner);
+static BOOL SameObjects(NSArray *left,NSArray *right) {
+    if(left==right)return YES;
+    if(left.count!=right.count)return NO;
+    // Native model equality/hash can archive the model and reenter our getters.
+    for(NSUInteger i=0;i<left.count;i++)if(left[i]!=right[i])return NO;
+    return YES;
+}
+static void ClearInteractionProjections(void) {
+    [LikeProjections removeAllObjects]; [CommentProjections removeAllObjects];
+    UsersCacheEpoch=CSCloseFriendAccountEpoch();
+}
+static void InstallCacheLifecycle(void) {
+    static dispatch_once_t once;
+    dispatch_once(&once,^{
+        TimelineStates=[NSHashTable weakObjectsHashTable];
+        for(NSString *name in @[CSCloseFriendPolicyDidChangeNotification,@"CSBackupAccountChanged"]) {
+            [NSNotificationCenter.defaultCenter addObserverForName:name object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note){
+                ClearInteractionProjections();
+                // Release plugin snapshots immediately, including offscreen pages.
+                // Native UI refresh remains with the existing surface lifecycle.
+                for(CSCFTimelineState *state in TimelineStates.allObjects) {state.posts=nil; state.postIdentities=nil;}
+            }];
+        }
+    });
+}
 static void ClearLikes(id facade,NSArray *posts) {
     SEL selector=NSSelectorFromString(@"removeCachesOfLikeUserWithDataItemId:");
     if(!CSCloseFriendMethodMatches(class_getInstanceMethod([facade class],selector),"v@:@")) return;
@@ -41,6 +68,7 @@ static CSCFTimelineState *State(id owner) {
     if(!state) {
         state=[CSCFTimelineState new]; state.epoch=CSCloseFriendAccountEpoch();
         objc_setAssociatedObject(owner,&TimelineKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [TimelineStates addObject:state];
         CSCFSocialTrack(owner,^(id page){
             InvalidateTimeline(page);
             if([page isKindOfClass:UIViewController.class] && [page isViewLoaded] && [[page view] window])PrepareTimeline(page);
@@ -109,6 +137,16 @@ static void InstallTimelinePresentation(void) {
         });
         if(!CSCloseFriendInstallHook(@"WCTimeLineViewController",name,replacement,&original,"v@:B")) imp_removeBlock(replacement);
     }
+    __block IMP disappear=NULL;
+    IMP replacement=imp_implementationWithBlock(^(id owner,BOOL animated){
+        @try {((void(*)(id,SEL,BOOL))disappear)(owner,@selector(viewDidDisappear:),animated);}
+        @finally {
+            ClearInteractionProjections();
+            CSCFTimelineState *state=objc_getAssociatedObject(owner,&TimelineKey);
+            state.posts=nil; state.postIdentities=nil;
+        }
+    });
+    if(!CSCloseFriendInstallHook(@"WCTimeLineViewController",@"viewDidDisappear:",replacement,&disappear,"v@:B"))imp_removeBlock(replacement);
 }
 static NSArray *ProjectedPosts(id facade) {
     if(!NSThread.isMainThread || !Scope.state || !RawPosts)return nil;
@@ -118,7 +156,7 @@ static NSArray *ProjectedPosts(id facade) {
         CSCFTimelineScope *saved=Scope; id source=nil; Scope=nil;
         @try {source=RawPosts(facade,NSSelectorFromString(@"getTimelineDataItem"));} @finally {Scope=saved;}
         if(![source isKindOfClass:NSArray.class])return @[];
-        if(!state.posts || state.facade!=facade || state.revision!=Scope.snapshot.revision || ![state.posts.source isEqualToArray:source]) {
+        if(!state.posts || state.facade!=facade || state.revision!=Scope.snapshot.revision || !SameObjects(state.posts.source,source)) {
             state.facade=facade;
             state.posts=[[CSCloseFriendSocialProjection alloc] initWithSource:source snapshot:Scope.snapshot surface:CSCloseFriendSurfaceTimeline read:^id(id object,NSString *key){return CSCloseFriendRead(object,key);}];
             state.postIdentities=[NSHashTable hashTableWithOptions:NSPointerFunctionsObjectPointerPersonality|NSPointerFunctionsWeakMemory];
@@ -138,13 +176,17 @@ static NSArray *ProjectedUsers(id item,BOOL likes) {
     if(![source isKindOfClass:NSArray.class])source=@[];
     if(!LikeProjections) {LikeProjections=[NSCache new]; CommentProjections=[NSCache new]; LikeProjections.countLimit=128; CommentProjections.countLimit=128;}
     NSUInteger epoch=CSCloseFriendAccountEpoch();
-    if(UsersCacheEpoch!=epoch) {[LikeProjections removeAllObjects];[CommentProjections removeAllObjects];UsersCacheEpoch=epoch;}
+    if(UsersCacheEpoch!=epoch)ClearInteractionProjections();
     NSCache *cache=likes ? LikeProjections : CommentProjections;
-    CSCFTimelineUsers *users=[cache objectForKey:item];
-    if(!users || users.revision!=Scope.snapshot.revision || users.epoch!=epoch || ![users.source isEqualToArray:source]) {
-        users=[CSCFTimelineUsers new]; users.source=[source copy]; users.revision=Scope.snapshot.revision; users.epoch=epoch;
+    // NSCache holds a nonrecursive lock while hashing its key. WCDataItem.hash
+    // archives interaction getters, so only a pointer value may be used here.
+    NSValue *key=[NSValue valueWithPointer:(__bridge const void *)item];
+    CSCFTimelineUsers *users=[cache objectForKey:key];
+    if(!users || users.owner!=item || users.revision!=Scope.snapshot.revision || users.epoch!=epoch || !SameObjects(users.source,source)) {
+        // A weak owner also rejects a cached entry after its address is reused.
+        users=[CSCFTimelineUsers new]; users.owner=item; users.source=[source copy]; users.revision=Scope.snapshot.revision; users.epoch=epoch;
         users.visible=[[CSCloseFriendSocialProjection alloc] initWithSource:source snapshot:Scope.snapshot surface:CSCloseFriendSurfaceInteraction read:^id(id object,NSString *key){return CSCloseFriendRead(object,key);}].visible;
-        [cache setObject:users forKey:item];
+        [cache setObject:users forKey:key];
     }
     return users.visible;
 }
@@ -152,6 +194,7 @@ static BOOL LikesFiltered(id item) {
     return RawLikes && ModelScoped(item) && ProjectedUsers(item,YES).count<[RawLikes(item,NSSelectorFromString(@"likeUsers")) count];
 }
 static void InstallModel(void) {
+    InstallCacheLifecycle();
     __block IMP original=NULL;
     IMP replacement=imp_implementationWithBlock(^id(id object){NSArray *p=ProjectedPosts(object); return p ?: ((id(*)(id,SEL))original)(object,NSSelectorFromString(@"getTimelineDataItem"));});
     if(CSCloseFriendInstallHook(@"WCFacade",@"getTimelineDataItem",replacement,&original,"@@:")) RawPosts=(void *)original; else imp_removeBlock(replacement);

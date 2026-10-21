@@ -4,6 +4,10 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.8-59": @[
+            @{@"title": @"修复朋友圈进入与滚动闪退", @"detail": @"修复密友互动缓存触发微信动态对象递归读取的问题，恢复朋友圈进入、刷新与滚动。"},
+            @{@"title": @"及时释放朋友圈缓存", @"detail": @"离开朋友圈或切换账号时清理插件缓存，减少动态和互动数据的额外内存占用。"}
+        ],
         @"1.8-58": @[
             @{@"title": @"优化密友搜索与朋友圈", @"detail": @"减少连续搜索、朋友圈滚动与点赞评论显示的重复处理，保留原生搜索联想和完整密码解锁。"},
             @{@"title": @"减少重复刷新与后台检查", @"detail": @"优化列表和角标刷新，离屏页面在再次显示时更新；临时解锁按到期时间自动锁定。"},
