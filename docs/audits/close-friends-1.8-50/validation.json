@@ -1,0 +1,108 @@
+{
+  "version": "1.8-50",
+  "scheme": "rootless",
+  "checkout": "/Users/zhangshichao/.codex/worktrees/close-friends-148/WeChatImprove",
+  "branch": "codex/close-friends-148",
+  "base_commit": "01aaef8cee2e8f920eddf715a279df55247d76f9",
+  "source_identity": "source-manifest.json",
+  "metadata": {
+    "Package": "com.wechat.improve",
+    "Version": "1.8-50",
+    "Architecture": "iphoneos-arm64",
+    "Depends": "mobilesubstrate (>= 0.9.5000)"
+  },
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "minimum_ios": "15.0",
+  "artifact": {
+    "path": "packages/com.wechat.improve_1.8-50_iphoneos-arm64.deb",
+    "sha256": "b3ff869cb3f978111344c66f1a0cfc14581b8a50b8af0e230df9d3cdaa8cbeaf",
+    "bytes": 1112926
+  },
+  "dylib_sha256": "6c2636b1239691a9854d299f2caa7840dc96a1546edd8e2f12dc414424ebdac1",
+  "dSYM_UUIDs": {
+    "arm64": "228A20D4-387E-382D-B454-2E131D1FE70A",
+    "arm64e": "6CB68246-AD04-317A-A207-380F4088B288"
+  },
+  "source_matches_manifest": true,
+  "production_scope_matches_148_plus_profile_fix": true,
+  "timeline_149_forced_layout_selectors_absent": true,
+  "package_matches_build_and_stage": true,
+  "version_agreement": true,
+  "injection_filter_unchanged": true,
+  "prior_artifacts_unchanged": {
+    "/Users/zhangshichao/.codex/worktrees/close-friends-148/WeChatImprove": [
+      "packages/com.wechat.improve_1.5-7_iphoneos-arm.deb",
+      "packages/com.wechat.improve_1.6-0_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-41-b2_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-41_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-42_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-43_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-44_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-45_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-46_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-47_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-48_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-49_iphoneos-arm64.deb"
+    ],
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove": [
+      "packages/com.wechat.improve_1.5-7_iphoneos-arm.deb",
+      "packages/com.wechat.improve_1.6-0_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-41-b2_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-41_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-48_iphoneos-arm64.deb",
+      "packages/com.wechat.improve_1.8-49_iphoneos-arm64.deb"
+    ]
+  },
+  "exports_in_both_architectures": [
+    "_CSCFAlbumInstall",
+    "_CSCFDetailInstall",
+    "_CSCFInteractionInstall",
+    "_CSCFSocialProtectRoute",
+    "_CSCFSocialGate",
+    "_CSCFTimelineInstall",
+    "_CSCFIncomingCallToken",
+    "_CSCFHandleIncomingCall",
+    "_CSCFCallDidReject",
+    "_CSCFCallReplyMessageDidChange",
+    "_CSCFSearchSubmit",
+    "_CSCFSearchDispatchInput",
+    "_CSCFSearchDispatchQuery",
+    "_CSCFSearchSuppressLoading",
+    "_CSCFSearchModel",
+    "_CSCFSearchVisibleRows",
+    "_CSCFSearchConsumePassword",
+    "_CSCFProfileBlocksNavigation",
+    "_CSCFProfileWithNativePresentation",
+    "_CSCFProfileUsesNativeStranger",
+    "_CSCFAudienceInstall"
+  ],
+  "host_results": [
+    {
+      "command": [
+        "bash",
+        "Tests/verify-close-friend-profile.sh"
+      ],
+      "exit_code": 0,
+      "checks": 16,
+      "output": "Close-friend profile: 16 checks passed (native routes, sensitive actions, reveal/relock and stale bindings)\n"
+    },
+    {
+      "command": [
+        "bash",
+        "Tests/verify-close-friend-album.sh"
+      ],
+      "exit_code": 0,
+      "checks": 19,
+      "output": "Album: 19 checks, native headers/terminator, updates, ordinary pages, reveal/relock, source restoration and routing passed\n"
+    }
+  ],
+  "build_exit_code": 0,
+  "build_command": "make package -j4 SCHEME=rootless PACKAGE_VERSION=1.8-50",
+  "device_validation": "Pending physical-device validation of the two profile navigation entrances; profile and album host regressions passed. Timeline rendering remains identical to 1.8-48.",
+  "delivery_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/com.wechat.improve_1.8-50_iphoneos-arm64.deb",
+  "delivery_matches_build": true,
+  "original_checkout_branch_at_verification": "main"
+}

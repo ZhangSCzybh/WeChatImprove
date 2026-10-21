@@ -4,6 +4,9 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.8-50": @[
+            @{@"title": @"恢复资料页原生入口", @"detail": @"从群聊头像打开个人资料后，可正常进入微信原生朋友圈和朋友资料。密友隐藏期间，个人朋友圈继续保留原生封面和空内容横杠。"}
+        ],
         @"1.8-48": @[
             @{@"title": @"修复分组搜索闪跳", @"detail": @"在当前聊天分组进入和退出搜索时保留原分组；搜索期间解锁或重新锁定密友，也同步按原分组刷新。"},
             @{@"title": @"保留原生朋友圈页面", @"detail": @"朋友圈入口保持微信原生页面，密友个人朋友圈保留封面、头像、昵称与签名，动态区域显示原生空内容横杠。"},
