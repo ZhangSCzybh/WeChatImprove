@@ -6,6 +6,7 @@
 - (void)start;
 - (void)refreshAccount;
 - (void)lockAndReturnToSafePage;
+- (void)handleShake;
 - (void)authenticateFrom:(UIViewController *)presenter completion:(void (^)(BOOL))completion;
 - (void)presentSettingsFrom:(UIViewController *)presenter;
 - (void)changePasswordFrom:(UIViewController *)presenter;

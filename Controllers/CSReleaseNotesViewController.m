@@ -4,6 +4,10 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.8-51": @[
+            @{@"title": @"缩短长按解锁时间", @"detail": @"首页顶部导航栏长按 1 秒即可临时解锁密友，并恢复隐藏的密友设置入口。"},
+            @{@"title": @"提高摇动锁定灵敏度", @"detail": @"开启“摇动立即锁定”后，临时解锁期间轻摇手机即可重新隐藏密友；仅在微信前台检测，锁定或进入后台即停止。"}
+        ],
         @"1.8-50": @[
             @{@"title": @"恢复资料页原生入口", @"detail": @"从群聊头像打开个人资料后，可正常进入微信原生朋友圈和朋友资料。密友隐藏期间，个人朋友圈继续保留原生封面和空内容横杠。"}
         ],

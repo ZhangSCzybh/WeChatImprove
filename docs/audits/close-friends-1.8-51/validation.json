@@ -1,0 +1,60 @@
+{
+  "version": "1.8-51",
+  "scheme": "rootless",
+  "checkout": "/Users/zhangshichao/.codex/worktrees/close-friends-148/WeChatImprove",
+  "branch": "codex/close-friends-148",
+  "base_commit": "73deb4cd445ee0fc627b2014ab9b0317c3f800ea",
+  "source_identity": "source-manifest.json",
+  "metadata": {
+    "Package": "com.wechat.improve",
+    "Version": "1.8-51",
+    "Architecture": "iphoneos-arm64",
+    "Depends": "mobilesubstrate (>= 0.9.5000)"
+  },
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "minimum_ios": "15.0",
+  "artifact": {
+    "path": "packages/com.wechat.improve_1.8-51_iphoneos-arm64.deb",
+    "sha256": "02f3d3dd3c91fd2a4e0586b9ab5b9b807910a5c97edc4c1e0399457a54f50a89",
+    "bytes": 1114790
+  },
+  "dylib_sha256": "963b4833cfa77edc894a43518ca668dc64e59f925beb8f0000eb79904da64690",
+  "dSYM_UUIDs": {
+    "arm64": "F0377020-BA74-34B0-9F13-BEDD40B0A36F",
+    "arm64e": "03DEF3C3-338E-3A6C-9F04-2AC5CADE25EA"
+  },
+  "source_matches_manifest": true,
+  "production_scope_verified": true,
+  "timeline_149_forced_layout_selectors_absent": true,
+  "core_motion_linked_both_architectures": true,
+  "package_matches_build_and_stage": true,
+  "version_agreement": true,
+  "injection_filter_unchanged": true,
+  "prior_artifacts_unchanged": true,
+  "host_results": [
+    {
+      "command": [
+        "bash",
+        "Tests/verify-close-friend-shake.sh"
+      ],
+      "exit_code": 0,
+      "output": "CloseFriendShakeTests: 18 checks passed (recognition, lifecycle, stale callbacks, native fallback)\n"
+    },
+    {
+      "command": [
+        "bash",
+        "Tests/verify-close-friend-runtime.sh"
+      ],
+      "exit_code": 0,
+      "output": "CloseFriendRuntimeTests: 89 checks passed\nCloseFriendSchedulingTests: 5 checks passed\n"
+    }
+  ],
+  "build_exit_code": 0,
+  "delivery_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/com.wechat.improve_1.8-51_iphoneos-arm64.deb",
+  "delivery_matches_build": true,
+  "original_checkout_head": "929d265b715f4a15b514bd0621c8eb01f0861483",
+  "device_validation": "Pending real-device gesture timing and shake sensitivity/false-positive validation; host tests use synthetic motion samples."
+}

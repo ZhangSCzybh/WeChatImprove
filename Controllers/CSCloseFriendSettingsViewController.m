@@ -32,7 +32,7 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return @[@"账号保护",@"保护选项"][section]; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if(section==0)return @"密码仅保存在本机钥匙串。临时解锁仍会静默通知、独立拒接来电。后台或账号切换会立即锁定。挂断回复默认关闭；开启后，仅对自动拒接的单人语音／视频来电发送私聊回复，同一人 5 分钟内最多一次。";
-    if(section==1)return @"长按微信首页顶部导航栏 1.2 秒直接临时解锁，或在首页搜索框输入完整密码解锁。密友隐藏时，搜索不显示“解锁后查看”占位，原生实时联想与网络搜索保持正常；解锁期间显示隐藏的密友设置入口。默认解锁 300 秒。免打扰恢复保留用户或远端后续修改。微信重启后，移出密友或停用功能可能仍保留免打扰，需在微信里手动关闭。";
+    if(section==1)return @"长按微信首页顶部导航栏 1 秒直接临时解锁，或在首页搜索框输入完整密码解锁。开启“摇动立即锁定”后，临时解锁期间轻摇手机即可重新隐藏密友。密友隐藏时，搜索不显示“解锁后查看”占位，原生实时联想与网络搜索保持正常；解锁期间显示隐藏的密友设置入口。默认解锁 300 秒。免打扰恢复保留用户或远端后续修改。微信重启后，移出密友或停用功能可能仍保留免打扰，需在微信里手动关闭。";
     return nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

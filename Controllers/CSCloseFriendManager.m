@@ -3,6 +3,7 @@
 #import "CSCloseFriendSettingsViewController.h"
 #import "CSCloseFriendCrypto.h"
 #import "CSCloseFriendAccount.h"
+#import "CSCloseFriendShakeMonitor.h"
 #import "CSBackupBootstrap.h"
 #import <Security/Security.h>
 #import <LocalAuthentication/LocalAuthentication.h>
@@ -37,6 +38,7 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 @property(nonatomic,strong) NSMutableArray<UIView *> *covers;
 @property(nonatomic,strong) LAContext *authenticationContext;
 @property(nonatomic,strong) NSTimer *timer;
+@property(nonatomic,strong) CSCloseFriendShakeMonitor *shakeMonitor;
 @property(nonatomic,weak) UIViewController *recoveryPage;
 @property(nonatomic) BOOL started, lastRevealed, authenticating, backgroundCoverRequired;
 @end
@@ -66,6 +68,7 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
             // Defer observers outside the runtime lock; no username or profile in notification payload.
             dispatch_async(dispatch_get_main_queue(),^{
                 typeof(self) self=weakSelf; if(!self)return;
+                [self refreshShakeMonitoring];
                 [NSNotificationCenter.defaultCenter postNotificationName:CSCloseFriendPolicyDidChangeNotification object:nil];
             });
         };
@@ -91,6 +94,7 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 }
 - (void)lockAndReturnToSafePage {
     NSAssert(NSThread.isMainThread,@"UI on main");
+    [self.shakeMonitor stop];
     CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
     BOOL sensitive=snapshot.enabled || self.runtime.isAuthorized || self.lastRevealed || self.authenticating;
     if(sensitive)[self cover];
@@ -108,7 +112,27 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     [center addObserver:self selector:@selector(resign:) name:UIApplicationProtectedDataWillBecomeUnavailable object:nil];
     [self.runtime setActive:UIApplication.sharedApplication.applicationState==UIApplicationStateActive];
     [self refreshAccount];
+    [self refreshShakeMonitoring];
     [self startExpiryTimer];
+}
+- (BOOL)canLockForShake {
+    CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
+    return self.started && !self.backgroundCoverRequired && UIApplication.sharedApplication.applicationState==UIApplicationStateActive &&
+        !snapshot.blocked && snapshot.enabled && snapshot.revealed && [snapshot.options[@"shakeToLock"] boolValue];
+}
+- (void)refreshShakeMonitoring {
+    NSAssert(NSThread.isMainThread,@"Shake lifecycle on main");
+    if(![self canLockForShake]) { [self.shakeMonitor stop]; return; }
+    if(!self.shakeMonitor) self.shakeMonitor=[CSCloseFriendShakeMonitor new];
+    __weak typeof(self) weakSelf=self;
+    [self.shakeMonitor startForAccountEpoch:CSCloseFriendAccountEpoch() onShake:^(NSUInteger epoch){
+        // The motion callback may have been queued just before logout/relock.
+        if(epoch==CSCloseFriendAccountEpoch()) [weakSelf handleShake];
+    }];
+}
+- (void)handleShake {
+    NSAssert(NSThread.isMainThread,@"Shake action on main");
+    if([self canLockForShake]) [self lockAndReturnToSafePage];
 }
 - (void)startExpiryTimer {
     NSAssert(NSThread.isMainThread,@"Expiry scheduling on main");
@@ -235,7 +259,7 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     UINavigationBar *bar=self.recoveryPage.navigationController.navigationBar; if(!bar)return;
     static char recoveryKey;
     if(objc_getAssociatedObject(bar,&recoveryKey))return;
-    UILongPressGestureRecognizer *gesture=[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(recovery:)]; gesture.minimumPressDuration=1.2;
+    UILongPressGestureRecognizer *gesture=[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(recovery:)]; gesture.minimumPressDuration=1.0;
     gesture.cancelsTouchesInView=NO;
     [bar addGestureRecognizer:gesture]; objc_setAssociatedObject(bar,&recoveryKey,gesture,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
