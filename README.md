@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`1.8-56`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.8-57`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -39,7 +39,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`。当前仓库提供 [1.8-56 Rootless 安装包](packages/com.wechat.improve_1.8-56_iphoneos-arm64.deb)，其他方案可参照下文编译。
+1. 获取与设备注入环境匹配的 `.deb`。当前仓库提供 [1.8-57 Rootless 安装包](packages/com.wechat.improve_1.8-57_iphoneos-arm64.deb)，其他方案可参照下文编译。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
@@ -155,7 +155,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_1.8-56_iphoneos-arm64.deb`。
+当前版本默认输出：`packages/com.wechat.improve_1.8-57_iphoneos-arm64.deb`。
 
 ### Rootful
 
@@ -164,7 +164,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_1.8-56_iphoneos-arm.deb`。此命令说明构建入口，当前交付记录仅验证了 Rootless 方案。
+当前版本默认输出：`packages/com.wechat.improve_1.8-57_iphoneos-arm.deb`。此命令说明构建入口，当前交付记录仅验证了 Rootless 方案。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -241,6 +241,8 @@ bash Tests/verify-payment-core.sh
 ```
 
 仓库另有搜索、手势、底栏、消息时间、防撤回、后台模糊等专项脚本。测试通过主机替身验证策略、接口调用和生命周期，不替代设备验收。
+
+`1.8-57` 去除公共操作项的固定字号，使气泡样式、底栏样式和布局设置的恢复操作与其他设置行字号一致。验证记录见 [1.8-57 修复与验收记录](docs/audits/settings-action-font-1.8-57/README.md)。
 
 `1.8-56` 补齐通讯录群聊列表的密群过滤；隐藏密友时保留当前页面，仅退出密友聊天；修复搜索群聊及关注的视频号头像缺失。验证记录见 [1.8-56 修复与验收记录](docs/audits/close-friends-1.8-56/README.md)。
 

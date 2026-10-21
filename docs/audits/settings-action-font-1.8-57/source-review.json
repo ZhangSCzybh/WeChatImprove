@@ -1,0 +1,21 @@
+{
+  "changed_existing_sources": [
+    "Controllers/CSReleaseNotesViewController.m",
+    "Controllers/CSSettingTableViewCell.m",
+    "Headers/CSUserInfoHelper.h"
+  ],
+  "all_hooks_and_reset_handlers_preserved": true,
+  "targets": {
+    "Controllers/CSBubbleStyleSettingsViewController.m": [
+      "恢复默认背景色",
+      "字体恢复跟随微信"
+    ],
+    "Controllers/CSTabBarStyleSettingsViewController.m": [
+      "恢复默认设置"
+    ],
+    "Controllers/CSLayoutSettingsViewController.m": [
+      "恢复默认设置"
+    ]
+  },
+  "font_policy": "Action rows use the same inherited UIKit title font as other shared setting rows; no point size is hardcoded."
+}

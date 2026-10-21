@@ -1,0 +1,24 @@
+{
+  "version": "1.8-57",
+  "sha256": "4c01c23160029e435653ba02cc0f0d91c8547a95a0662661bb76982c3e1808a0",
+  "bytes": 1129626,
+  "delivery": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/com.wechat.improve_1.8-57_iphoneos-arm64.deb",
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "minimum_ios": "15.0",
+  "production_changes": [
+    "Controllers/CSReleaseNotesViewController.m",
+    "Controllers/CSSettingTableViewCell.m",
+    "Headers/CSUserInfoHelper.h"
+  ],
+  "reset_handlers_and_hooks_preserved": true,
+  "source_versions_build_stage_and_delivery_verified": true,
+  "historical_packages_preserved": true,
+  "dSYM_UUIDs": {
+    "arm64": "F0F73110-2F1C-3BA0-98AC-4294F5B29FCA",
+    "arm64e": "0DF25809-BE1E-3D41-91D4-A1B8FDE326D9"
+  },
+  "validation": "Targeted source review, strict shared-cell syntax compilation for both architectures, Rootless build and package verification. No new behavior tests for this font-only change. Real-device visual acceptance pending."
+}

@@ -333,7 +333,7 @@
     // 移除蓝色加粗的文字样式，使用普通文字样式
     self.textLabel.textAlignment = NSTextAlignmentLeft; // 改为左对齐
     self.textLabel.textColor = [UIColor labelColor]; // 使用默认文字颜色
-    self.textLabel.font = [UIFont systemFontOfSize:17]; // 使用常规文字粗细
+    // 与普通设置行共用原生默认字体，不为操作行单独覆盖字号。
     self.detailTextLabel.text = item.detail; // 显示详情文本
     self.accessoryType = UITableViewCellAccessoryDisclosureIndicator; // 添加指示箭头
     self.selectionStyle = UITableViewCellSelectionStyleDefault;

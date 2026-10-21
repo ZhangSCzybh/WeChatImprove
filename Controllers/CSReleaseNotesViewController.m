@@ -4,6 +4,9 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.8-57": @[
+            @{@"title": @"统一恢复操作字号", @"detail": @"气泡样式的恢复默认背景色、字体恢复跟随微信，以及底栏和布局设置的恢复默认设置，统一沿用普通设置行的原生字号。"}
+        ],
         @"1.8-56": @[
             @{@"title": @"补齐群聊列表隐藏", @"detail": @"通讯录群聊列表及页内搜索同步隐藏密群，解锁后恢复，列表数量与点击映射保持一致。"},
             @{@"title": @"锁定保留当前页面", @"detail": @"隐藏密友时停留当前页面；仅正在查看密友聊天时返回聊天列表。授权失效的选择器留在原页，阻止继续保存。"},
