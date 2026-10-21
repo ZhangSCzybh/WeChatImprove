@@ -74,7 +74,12 @@ int main(void) { @autoreleasepool {
         for(NSUInteger j=0;j<surfaceKeys.count;j++)CHECK([snap hidesUserName:@"alice" surface:j]==(i!=j));
     }
     NSDictionary *defaults=CSCloseFriendDefaultOptions(); CHECK([CSCloseFriendNormalizeProfile(Profile(),NULL)[@"options"] isEqual:defaults]);
-    for(NSString *name in @[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"autoMute",@"rejectVoice",@"rejectVideo",@"hidePrivacyIcons"])CHECK([defaults[name] boolValue]);
+    for(NSString *name in @[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"rejectVoice",@"rejectVideo",@"hidePrivacyIcons"])CHECK([defaults[name] boolValue]);
+    CHECK(defaults[@"autoMute"]==nil);
+    NSMutableDictionary *legacyOptions=[defaults mutableCopy];legacyOptions[@"autoMute"]=@YES;
+    NSDictionary *legacy=CSCloseFriendNormalizeProfile(@{@"enabled":@YES,@"friends":@[],@"groups":@[],@"options":legacyOptions},NULL);
+    CHECK(legacy && !legacy[@"options"][@"autoMute"]);
+
     for(NSString *name in @[@"showBadges",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"callReplyEnabled"])CHECK(![defaults[name] boolValue]);
     CHECK([defaults[@"unlockSeconds"] isEqual:@300]);
     CSCloseFriendSnapshot *blocked=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"one" profile:@{} revealed:YES revision:4 blocked:NO];

@@ -3,6 +3,7 @@
 #import <substrate.h>
 @interface CSCFTimelineState : NSObject
 @property(nonatomic,strong) CSCloseFriendSocialProjection *posts;
+@property(nonatomic,strong) NSHashTable *postIdentities;
 @property(nonatomic,weak) id facade;
 @property(nonatomic) NSUInteger revision, epoch;
 @property(nonatomic) NSUInteger presentationRevision;
@@ -13,10 +14,17 @@
 @property(nonatomic,strong) CSCloseFriendSnapshot *snapshot;
 @property(nonatomic,strong) CSCFTimelineState *state;
 @property(nonatomic,strong) id item;
-@property(nonatomic) BOOL unreadPrevious;
+@property(nonatomic) BOOL unreadPrevious, validatedPosts;
 @end
 @implementation CSCFTimelineScope @end
 static CSCFTimelineScope *Scope; // main-thread only, synchronous UI calls
+@interface CSCFTimelineUsers : NSObject
+@property(nonatomic,copy) NSArray *source, *visible;
+@property(nonatomic) NSUInteger revision,epoch;
+@end
+@implementation CSCFTimelineUsers @end
+static NSCache *LikeProjections, *CommentProjections;
+static NSUInteger UsersCacheEpoch;
 static char TimelineKey, CommentRevisionKey;
 static id (*RawPosts)(id,SEL);
 static id (*RawLikes)(id,SEL);
@@ -30,35 +38,39 @@ static void ClearLikes(id facade,NSArray *posts) {
 }
 static CSCFTimelineState *State(id owner) {
     CSCFTimelineState *state=objc_getAssociatedObject(owner,&TimelineKey);
-    if(!state) { state=[CSCFTimelineState new]; state.epoch=CSCloseFriendAccountEpoch(); objc_setAssociatedObject(owner,&TimelineKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC); }
+    if(!state) {
+        state=[CSCFTimelineState new]; state.epoch=CSCloseFriendAccountEpoch();
+        objc_setAssociatedObject(owner,&TimelineKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        CSCFSocialTrack(owner,^(id page){
+            InvalidateTimeline(page);
+            if([page isKindOfClass:UIViewController.class] && [page isViewLoaded] && [[page view] window])PrepareTimeline(page);
+        });
+    }
     return state;
 }
 id CSCFTimelineFacade(id owner) { CSCFTimelineState *state=objc_getAssociatedObject(owner,&TimelineKey); return state.epoch==CSCloseFriendAccountEpoch() ? state.facade : nil; }
 static CSCFTimelineScope *Enter(id owner,id item) {
-    if(!NSThread.isMainThread) return nil;
+    if(!NSThread.isMainThread)return nil;
     CSCFTimelineScope *previous=Scope;
-    CSCFTimelineScope *next=[CSCFTimelineScope new]; next.snapshot=previous.snapshot ?: CSCloseFriendCurrentSnapshot();
-    next.item=item ?: previous.item; next.state=previous.state;
-    if(CSCFIsClass(owner,@"WCTimeLineViewController")) {
-        next.state=State(owner);
-        CSCFSocialTrack(owner,^(id page){
-            InvalidateTimeline(page);
-            // Offscreen tables retain native geometry until they next appear.
-            // Reload only the owned timeline, never nested media collections.
-            if([page isKindOfClass:UIViewController.class] && [page isViewLoaded] && [[page view] window]) PrepareTimeline(page);
-        });
-    }
+    CSCloseFriendSnapshot *snapshot=previous.snapshot ?: CSCloseFriendCurrentSnapshot();
+    CSCFTimelineState *state=CSCFIsClass(owner,@"WCTimeLineViewController") ? State(owner) : previous.state;
+    if((!state || state.epoch==CSCloseFriendAccountEpoch()) &&
+       ![snapshot concealsSurface:CSCloseFriendSurfaceTimeline] && ![snapshot concealsSurface:CSCloseFriendSurfaceInteraction])return previous;
+    CSCFTimelineScope *next=[CSCFTimelineScope new]; next.snapshot=snapshot;
+    next.item=item ?: previous.item; next.state=state;
+    next.validatedPosts=previous && previous.state==state && previous.validatedPosts;
     next.unreadPrevious=CSCFUnreadBegin(); Scope=next; return previous;
 }
 static void Leave(CSCFTimelineScope *previous) {
-    if(!NSThread.isMainThread) return;
-    if(!previous) ClearLikes(Scope.state.facade,Scope.state.posts.source);
+    if(!NSThread.isMainThread || Scope==previous)return;
+    // Filtered native like layouts are cleaned at their own call boundary only.
+    // A scroll callback does not invalidate every loaded post's layout cache.
     CSCFUnreadEnd(Scope.unreadPrevious); Scope=previous;
 }
 static void InvalidateTimeline(id owner) {
     CSCFTimelineState *state=State(owner);
-    if(state.epoch!=CSCloseFriendAccountEpoch()) {state.posts=nil; return;}
-    ClearLikes(state.facade,state.posts.source); state.posts=nil;
+    state.posts=nil; state.postIdentities=nil;
+    if(state.epoch!=CSCloseFriendAccountEpoch())return;
     CSCFSocialClearCaches(owner,@[@"cellHeightCache",@"cellShowItemCache"]);
 }
 static void PrepareTimeline(id owner) {
@@ -99,21 +111,45 @@ static void InstallTimelinePresentation(void) {
     }
 }
 static NSArray *ProjectedPosts(id facade) {
-    if(!NSThread.isMainThread || !Scope.state || !RawPosts) return nil;
+    if(!NSThread.isMainThread || !Scope.state || !RawPosts)return nil;
     CSCFTimelineState *state=Scope.state;
-    if(state.epoch!=CSCloseFriendAccountEpoch()) return @[];
-    if(!state.posts || state.revision!=Scope.snapshot.revision) {
-        CSCFTimelineScope *saved=Scope; Scope=nil; id source=RawPosts(facade,NSSelectorFromString(@"getTimelineDataItem")); Scope=saved;
-        if(![source isKindOfClass:NSArray.class]) return @[];
-        state.facade=facade; ClearLikes(facade,source);
-        state.posts=[[CSCloseFriendSocialProjection alloc] initWithSource:source snapshot:Scope.snapshot surface:CSCloseFriendSurfaceTimeline read:^id(id object,NSString *key){return CSCloseFriendRead(object,key);}];
-        state.revision=Scope.snapshot.revision;
-    } return state.posts.visible;
+    if(state.epoch!=CSCloseFriendAccountEpoch())return @[];
+    if(!Scope.validatedPosts || !state.posts || state.revision!=Scope.snapshot.revision) {
+        CSCFTimelineScope *saved=Scope; id source=nil; Scope=nil;
+        @try {source=RawPosts(facade,NSSelectorFromString(@"getTimelineDataItem"));} @finally {Scope=saved;}
+        if(![source isKindOfClass:NSArray.class])return @[];
+        if(!state.posts || state.facade!=facade || state.revision!=Scope.snapshot.revision || ![state.posts.source isEqualToArray:source]) {
+            state.facade=facade;
+            state.posts=[[CSCloseFriendSocialProjection alloc] initWithSource:source snapshot:Scope.snapshot surface:CSCloseFriendSurfaceTimeline read:^id(id object,NSString *key){return CSCloseFriendRead(object,key);}];
+            state.postIdentities=[NSHashTable hashTableWithOptions:NSPointerFunctionsObjectPointerPersonality|NSPointerFunctionsWeakMemory];
+            for(id item in state.posts.visible)[state.postIdentities addObject:item];
+            state.revision=Scope.snapshot.revision;
+        }
+        Scope.validatedPosts=YES;
+    }
+    return state.posts.visible;
 }
-static BOOL ModelScoped(id item) { return NSThread.isMainThread && Scope && (item==Scope.item || [Scope.state.posts.visible containsObject:item]); }
+static BOOL ModelScoped(id item) {
+    return NSThread.isMainThread && Scope && [Scope.snapshot concealsSurface:CSCloseFriendSurfaceInteraction] &&
+        (item==Scope.item || [Scope.state.postIdentities containsObject:item]);
+}
 static NSArray *ProjectedUsers(id item,BOOL likes) {
     NSArray *source=likes ? RawLikes(item,NSSelectorFromString(@"likeUsers")) : RawComments(item,NSSelectorFromString(@"commentUsers"));
-    return [[CSCloseFriendSocialProjection alloc] initWithSource:source snapshot:Scope.snapshot surface:CSCloseFriendSurfaceInteraction read:^id(id object,NSString *key){return CSCloseFriendRead(object,key);}].visible;
+    if(![source isKindOfClass:NSArray.class])source=@[];
+    if(!LikeProjections) {LikeProjections=[NSCache new]; CommentProjections=[NSCache new]; LikeProjections.countLimit=128; CommentProjections.countLimit=128;}
+    NSUInteger epoch=CSCloseFriendAccountEpoch();
+    if(UsersCacheEpoch!=epoch) {[LikeProjections removeAllObjects];[CommentProjections removeAllObjects];UsersCacheEpoch=epoch;}
+    NSCache *cache=likes ? LikeProjections : CommentProjections;
+    CSCFTimelineUsers *users=[cache objectForKey:item];
+    if(!users || users.revision!=Scope.snapshot.revision || users.epoch!=epoch || ![users.source isEqualToArray:source]) {
+        users=[CSCFTimelineUsers new]; users.source=[source copy]; users.revision=Scope.snapshot.revision; users.epoch=epoch;
+        users.visible=[[CSCloseFriendSocialProjection alloc] initWithSource:source snapshot:Scope.snapshot surface:CSCloseFriendSurfaceInteraction read:^id(id object,NSString *key){return CSCloseFriendRead(object,key);}].visible;
+        [cache setObject:users forKey:item];
+    }
+    return users.visible;
+}
+static BOOL LikesFiltered(id item) {
+    return RawLikes && ModelScoped(item) && ProjectedUsers(item,YES).count<[RawLikes(item,NSSelectorFromString(@"likeUsers")) count];
 }
 static void InstallModel(void) {
     __block IMP original=NULL;
@@ -137,12 +173,12 @@ static void InstallModel(void) {
         if(!CSCloseFriendInstallHook(@"WCDataItem",name,replacement,&raw,"i@:")) imp_removeBlock(replacement);
     }
     // Native itemID/width caches have no policy revision. Clear before scoped layout reads and
-    // at outer scope exit, so filtered styles cannot contaminate an unscoped service consumer.
+    // after each affected layout read, so filtered styles cannot contaminate an unscoped consumer.
     __block IMP styles=NULL;
-    replacement=imp_implementationWithBlock(^id(id facade,id item,double width,BOOL spring){if(ModelScoped(item)) ClearLikes(facade,@[item]); id result=((id(*)(id,SEL,id,double,BOOL))styles)(facade,NSSelectorFromString(@"layoutStylesOfLikeUserWithDataItem:width:isSpringStyle:"),item,width,spring); if(ModelScoped(item)) ClearLikes(facade,@[item]); return result;});
+    replacement=imp_implementationWithBlock(^id(id facade,id item,double width,BOOL spring){BOOL filtered=LikesFiltered(item); if(filtered)ClearLikes(facade,@[item]); @try {return ((id(*)(id,SEL,id,double,BOOL))styles)(facade,NSSelectorFromString(@"layoutStylesOfLikeUserWithDataItem:width:isSpringStyle:"),item,width,spring);} @finally {if(filtered)ClearLikes(facade,@[item]);}});
     if(!CSCloseFriendInstallHook(@"WCFacade",@"layoutStylesOfLikeUserWithDataItem:width:isSpringStyle:",replacement,&styles,"@@:@dB")) imp_removeBlock(replacement);
     __block IMP height=NULL;
-    replacement=imp_implementationWithBlock(^double(id facade,double width,id item,BOOL spring){if(ModelScoped(item)) ClearLikes(facade,@[item]); double result=((double(*)(id,SEL,double,id,BOOL))height)(facade,NSSelectorFromString(@"likeUserHeightForWidth:withDataItem:isSpringStyle:"),width,item,spring); if(ModelScoped(item)) ClearLikes(facade,@[item]); return result;});
+    replacement=imp_implementationWithBlock(^double(id facade,double width,id item,BOOL spring){BOOL filtered=LikesFiltered(item); if(filtered)ClearLikes(facade,@[item]); @try {return ((double(*)(id,SEL,double,id,BOOL))height)(facade,NSSelectorFromString(@"likeUserHeightForWidth:withDataItem:isSpringStyle:"),width,item,spring);} @finally {if(filtered)ClearLikes(facade,@[item]);}});
     if(!CSCloseFriendInstallHook(@"WCFacade",@"likeUserHeightForWidth:withDataItem:isSpringStyle:",replacement,&height,"d@:d@B")) imp_removeBlock(replacement);
 }
 // Only known method signatures are wrapped. Native section/body/footer/ad semantics stay native.
@@ -150,7 +186,7 @@ static void TimelineMethod(NSString *name,const char *types) {
     __block IMP raw=NULL; SEL sel=NSSelectorFromString(name); IMP replacement=NULL;
 #define BEGIN CSCFTimelineScope *old=Enter(object,nil)
 #define END @finally {Leave(old);}
-    if(!strcmp(types,"q@:@")) replacement=imp_implementationWithBlock(^NSInteger(id object,id a){State(object).posts=nil; BEGIN; @try {return ((NSInteger(*)(id,SEL,id))raw)(object,sel,a);} END });
+    if(!strcmp(types,"q@:@")) replacement=imp_implementationWithBlock(^NSInteger(id object,id a){BEGIN; @try {return ((NSInteger(*)(id,SEL,id))raw)(object,sel,a);} END });
     else if(!strcmp(types,"q@:@q")) replacement=imp_implementationWithBlock(^NSInteger(id object,id a,NSInteger b){BEGIN; @try {return ((NSInteger(*)(id,SEL,id,NSInteger))raw)(object,sel,a,b);} END });
     else if(!strcmp(types,"@@:@@")) replacement=imp_implementationWithBlock(^id(id object,id a,id b){BEGIN; @try {return ((id(*)(id,SEL,id,id))raw)(object,sel,a,b);} END });
     else if(!strcmp(types,"d@:@@")) replacement=imp_implementationWithBlock(^double(id object,id a,id b){BEGIN; @try {return ((double(*)(id,SEL,id,id))raw)(object,sel,a,b);} END });

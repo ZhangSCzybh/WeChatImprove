@@ -6,6 +6,9 @@
 @interface CSCFSearchInputState : NSObject
 @property(nonatomic) NSUInteger dispatchDepth;
 @property(nonatomic) BOOL consumed, resetting;
+@property(nonatomic) NSUInteger generation, epoch;
+@property(nonatomic,copy) NSString *inputQuery, *pendingQuery;
+@property(nonatomic,strong) NSMutableArray *pendingCallbacks;
 @end
 @implementation CSCFSearchInputState @end
 static char SearchInputKey;
@@ -16,7 +19,7 @@ static BOOL SearchProtected(id page) {
 static CSCFSearchInputState *InputState(id page) {
     CSCFSearchInputState *state=objc_getAssociatedObject(page,&SearchInputKey);
     if(!state) {
-        state=[CSCFSearchInputState new];
+        state=[CSCFSearchInputState new]; state.epoch=CSCloseFriendAccountEpoch();
         objc_setAssociatedObject(page,&SearchInputKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     return state;
@@ -69,36 +72,60 @@ static void SearchReset(id page) {
         CSCFCallVoid(page,@"reloadList");
     }
 }
-BOOL CSCFSearchConsumePassword(id page,id input) {
-    if(!NSThread.isMainThread || !SearchProtected(page) || SearchComposing(page)) return NO;
-    NSString *query=SearchInput(page,input);
-    if(!query.length || ![CSCloseFriendManager.sharedManager consumeHomepageSearchPassword:query]) return NO;
-    CSCFSearchInputState *state=InputState(page);
-    state.consumed=YES;
-    SearchReset(page);
-    CSCFCallVoid(page,@"resignSearchFirstResponder");
-    return YES;
-}
 static void DispatchPassword(id page,id input,BOOL composing,void (^native)(void)) {
     CSCFSearchInputState *state=InputState(page);
-    if(state.resetting) { if(!SearchInput(page,input).length) native(); return; }
-    if(state.consumed) return;
-    if(state.dispatchDepth || composing || SearchComposing(page)) { native(); return; }
-    state.dispatchDepth++;
-    @try { if(!CSCFSearchConsumePassword(page,input)) native(); }
-    @finally { state.dispatchDepth--; }
+    NSString *query=SearchInput(page,input);
+    if(state.resetting) { if(!query.length)native(); return; }
+    if(state.consumed || state.epoch!=CSCloseFriendAccountEpoch())return;
+    if(state.dispatchDepth || composing || SearchComposing(page)) {native();return;}
+    if(query.length<6 || query.length>128) {native();return;}
+    if([state.pendingQuery isEqual:query]) { [state.pendingCallbacks addObject:[native copy]]; return; }
+    state.pendingQuery=query; state.pendingCallbacks=[NSMutableArray arrayWithObject:[native copy]];
+    NSUInteger generation=state.generation, epoch=state.epoch;
+    [CSCloseFriendManager.sharedManager checkHomepageSearchPassword:query isCurrent:^BOOL{
+        return objc_getAssociatedObject(page,&SearchInputKey)==state && state.generation==generation &&
+            epoch==CSCloseFriendAccountEpoch() && !SearchComposing(page) && [state.pendingQuery isEqual:query];
+    } completion:^(BOOL consumed){
+        if(objc_getAssociatedObject(page,&SearchInputKey)!=state || state.generation!=generation ||
+           ![state.pendingQuery isEqual:query])return;
+        NSArray *callbacks=[state.pendingCallbacks copy]; state.pendingCallbacks=nil; state.pendingQuery=nil;
+        // Release native closures on account changes as well; they retain the page.
+        if(epoch!=CSCloseFriendAccountEpoch() || SearchComposing(page))return;
+        if(consumed) {
+            state.consumed=YES; state.inputQuery=@"";
+            @try {SearchReset(page);} @catch(__unused NSException *exception) {CSCFSearchClearResults(page);}
+            CSCFCallVoid(page,@"resignSearchFirstResponder");
+            return;
+        }
+        state.dispatchDepth++;
+        @try {
+            for(void (^callback)(void) in callbacks) {
+                if(state.generation!=generation || epoch!=CSCloseFriendAccountEpoch())break;
+                callback();
+            }
+        } @finally {state.dispatchDepth--;}
+    }];
 }
 void CSCFSearchDispatchInput(id page,id input,BOOL composing,void (^native)(void)) {
     if(!NSThread.isMainThread || !SearchProtected(page)) {
-        if(page) objc_setAssociatedObject(page,&SearchInputKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        if(page)objc_setAssociatedObject(page,&SearchInputKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         native(); return;
     }
     CSCFSearchInputState *state=InputState(page);
-    if(!state.resetting) state.consumed=NO;
+    if(state.dispatchDepth || state.resetting) {DispatchPassword(page,input,composing,native);return;}
+    NSString *query=SearchInput(page,input);
+    if(state.epoch!=CSCloseFriendAccountEpoch())return;
+    if(![state.inputQuery isEqual:query] || state.consumed || composing || SearchComposing(page)) {
+        state.generation++; state.pendingQuery=nil; state.pendingCallbacks=nil;
+    }
+    state.inputQuery=query; state.consumed=NO;
     DispatchPassword(page,input,composing,native);
 }
 void CSCFSearchDispatchQuery(id page,id input,void (^native)(void)) {
-    if(!NSThread.isMainThread || !SearchProtected(page)) { native(); return; }
+    if(!NSThread.isMainThread || !SearchProtected(page)) {native();return;}
+    CSCFSearchInputState *state=InputState(page);
+    // Delayed work for an older edit cannot revive it after a new input/clear.
+    if(!state.resetting && !state.dispatchDepth && state.inputQuery && ![state.inputQuery isEqual:SearchInput(page,input)])return;
     DispatchPassword(page,input,NO,native);
 }
 void CSCFSearchSubmit(id page,void (^native)(void)) {
@@ -108,7 +135,8 @@ void CSCFSearchSubmit(id page,void (^native)(void)) {
     else CSCFSearchDispatchQuery(page,query,native);
 }
 @interface CSCFSearchState : NSObject
-@property(nonatomic) NSUInteger epoch, revision, displayedRevision, generation, displayedGeneration;
+@property(nonatomic) NSUInteger epoch, revision, displayedRevision, generation, displayedGeneration, preparedGeneration;
+@property(nonatomic) BOOL prepared;
 @property(nonatomic,copy) NSArray *source;
 @property(nonatomic,copy) NSString *key;
 @property(nonatomic,copy) id taskKey;
@@ -138,13 +166,18 @@ static CSCFSearchState *State(id section) {
     dispatch_once(&once,^{
         Sections=[NSHashTable weakObjectsHashTable];
         [NSNotificationCenter.defaultCenter addObserverForName:CSCloseFriendPolicyDidChangeNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note){
-            for(id item in Sections.allObjects) { CSCFSearchPrepare(item); CSCFReloadTables(Presenter(item)); }
+            NSHashTable *pages=[NSHashTable weakObjectsHashTable];
+            for(id item in Sections.allObjects) {
+                State(item).prepared=NO;
+                UIViewController *page=Presenter(item); if(page)[pages addObject:page];
+            }
+            for(id page in pages.allObjects)CSCFRefreshSurface(page,^(id owner){CSCFReloadTables(owner);});
         }];
     });
     [Sections addObject:section]; return state;
 }
 void CSCFSearchBegin(id section) {
-    CSCFSearchState *state=State(section); state.source=nil; state.revision=0; state.generation++;
+    CSCFSearchState *state=State(section); state.source=nil; state.revision=0; state.prepared=NO; state.generation++;
 }
 void CSCFSearchWillUpdate(id section) {
     CSCFSearchState *state=State(section);
@@ -157,18 +190,19 @@ void CSCFSearchDidUpdate(id section,NSString *key) {
     id source=CSCloseFriendRead(section,key);
     state.generation++;
     state.source=[source isKindOfClass:NSArray.class] ? [source copy] : @[];
-    state.taskKey=[CSCloseFriendRead(section,@"ftsTaskKey") copy]; state.revision=0;
+    state.taskKey=[CSCloseFriendRead(section,@"ftsTaskKey") copy]; state.revision=0; state.prepared=NO;
     CSCFSearchPrepare(section);
 }
 BOOL CSCFSearchPrepare(id section) {
     CSCFSearchState *state=State(section); CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
     BOOL current=state.epoch==CSCloseFriendAccountEpoch();
+    if(state.prepared && current && state.revision==policy.revision && state.preparedGeneration==state.generation)return YES;
     if(state.key.length) {
         NSArray *rows=current ? CSCFSearchVisibleRows(state.source) : @[];
         NSString *setter=[state.key isEqual:@"contacts"] ? @"setContacts:" : @"setTopHitItems:";
         if(!CSCFSetObject(section,setter,rows)) return NO;
     }
-    state.revision=policy.revision; return current;
+    state.revision=policy.revision; state.preparedGeneration=state.generation; state.prepared=YES; return current;
 }
 void CSCFSearchDidRender(id section) {
     CSCFSearchState *state=State(section); state.displayedRevision=CSCloseFriendCurrentSnapshot().revision; state.displayedGeneration=state.generation;

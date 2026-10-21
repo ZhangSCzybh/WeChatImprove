@@ -22,16 +22,16 @@ typedef BOOL (^CSCloseFriendCredentialWriter)(NSString *, NSDictionary *, NSErro
 - (BOOL)authenticatePassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error;
 /// Explicit homepage shortcut. Validates foreground account/config; no password prompt.
 - (BOOL)revealWithShortcutToken:(NSDictionary *)token;
-/// YES means consume locally, even if cooldown/storage prevents reveal. Unrelated queries
-/// never count as failed password attempts and never write the credential.
-- (BOOL)consumeSearchPassword:(NSString *)query token:(NSDictionary *)token;
+/// Checks off the main thread, then completes on main. YES consumes locally, including
+/// cancelled checks/cooldown. Ordinary queries never count as password failures or write credentials.
+- (void)checkSearchPassword:(NSString *)query token:(NSDictionary *)token isCurrent:(BOOL (^)(void))isCurrent completion:(void (^)(BOOL consumed))completion;
+/// Monotonic remaining authorization time; zero while locked/inactive.
+- (NSTimeInterval)revealTimeRemaining;
 /// Only call after successful LAContext biometric evaluation. Still validates token/current policy/cooldown.
 - (BOOL)completeBiometricWithToken:(NSDictionary *)token;
 - (BOOL)isAuthorized;
 - (nullable NSDictionary *)currentProfile;
-- (NSDictionary *)muteRecords;
 - (BOOL)updateProfile:(NSDictionary *)profile error:(NSError **)error;
-- (BOOL)saveMuteRecords:(NSDictionary *)records account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error;
 @property(nonatomic, copy, nullable) void (^didChange)(void);
 @end
 NS_ASSUME_NONNULL_END

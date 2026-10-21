@@ -49,6 +49,14 @@ static NSUInteger fallbackReads;
 @implementation CSFakeEmptyContext
 + (id)currentContext { return nil; }
 @end
+static BOOL SearchPassword(CSCloseFriendRuntime *runtime,NSString *query,NSDictionary *token) {
+    __block BOOL done=NO,consumed=NO;
+    [runtime checkSearchPassword:query token:token isCurrent:^BOOL{return YES;} completion:^(BOOL result){consumed=result;done=YES;}];
+    NSDate *limit=[NSDate dateWithTimeIntervalSinceNow:3];
+    while(!done && limit.timeIntervalSinceNow>0)[NSRunLoop.mainRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.005]];
+    Check(done,"asynchronous password verification completes on main run loop");
+    return consumed;
+}
 int main(void) { @autoreleasepool {
     __block Class authority=CSFakeAuthority.class;
     Class (^lookup)(NSString *)=^Class(NSString *name){
@@ -84,7 +92,6 @@ int main(void) { @autoreleasepool {
     [runtime synchronizeAccount:@"alice" epoch:1 suspended:NO];
     Check(![runtime snapshotForEpoch:1 suspended:NO].blocked,"missing data is a new disabled account");
     Check(!runtime.hasCredential && !runtime.isAuthorized,"new account has no implicit authorization");
-    Check(![runtime saveMuteRecords:@{} account:@"alice" epoch:1 error:NULL],"journal cannot create persisted account state before credential setup");
     NSMutableDictionary *profile=[runtime.currentProfile mutableCopy]; profile[@"enabled"]=@YES; profile[@"friends"]=@[@"protected"];
     Check(![runtime updateProfile:profile error:NULL],"enable requires password and authorization");
     NSDictionary *token=runtime.authenticationToken;
@@ -99,13 +106,21 @@ int main(void) { @autoreleasepool {
     Check([runtime snapshotForEpoch:1 suspended:NO].revealed,"snapshot publishes reveal");
     Check([runtime snapshotForEpoch:1 suspended:NO]==[runtime snapshotForEpoch:1 suspended:NO],"stable reads reuse published immutable snapshot");
     Check([[runtime snapshotForEpoch:1 suspended:NO] silencesSession:@"protected" sender:nil],"reveal preserves silence");
-    Check([runtime saveMuteRecords:@{@"protected":@{@"original":@NO}} account:@"alice" epoch:1 error:NULL],"journal writes independently");
-    Check([runtime.currentProfile[@"friends"] isEqual:@[@"protected"]],"journal preserves profile");
     [runtime lock]; token=runtime.authenticationToken;
+    NSUInteger lockedRevision=[runtime snapshotForEpoch:1 suspended:NO].revision;
+    [runtime lock];
+    Check([runtime snapshotForEpoch:1 suspended:NO].revision==lockedRevision && ![runtime isTokenCurrent:token],"repeated lock invalidates auth without invalidating display caches");
+    token=runtime.authenticationToken;
+    __block BOOL currentQuery=YES,finished=NO;
+    [runtime checkSearchPassword:@"correct-password" token:token isCurrent:^BOOL{return currentQuery;} completion:^(__unused BOOL consumed){finished=YES;}];
+    currentQuery=NO;
+    NSDate *searchLimit=[NSDate dateWithTimeIntervalSinceNow:3];
+    while(!finished && searchLimit.timeIntervalSinceNow>0)[NSRunLoop.mainRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.005]];
+    Check(finished && !runtime.isAuthorized,"superseded search password cannot unlock after a newer short input");
     NSDictionary *beforeQuery=credentials[@"alice"];
-    for(int i=0;i<6;i++) Check(![runtime consumeSearchPassword:@"ordinary-search" token:token],"ordinary searches are not password failures");
+    for(int i=0;i<6;i++) Check(!SearchPassword(runtime,@"ordinary-search",token),"ordinary searches are not password failures");
     Check(credentials[@"alice"]==beforeQuery && !runtime.isAuthorized,"non-password queries do not write credentials or reveal");
-    Check([runtime consumeSearchPassword:@"correct-password" token:token] && runtime.isAuthorized,"full search password reveals before native dispatch");
+    Check(SearchPassword(runtime,@"correct-password",token) && runtime.isAuthorized,"full search password reveals before native dispatch");
     Check([[runtime snapshotForEpoch:1 suspended:NO] silencesSession:@"protected" sender:nil],"search unlock retains silence");
     [runtime lock]; token=runtime.authenticationToken;
     Check([runtime revealWithShortcutToken:token] && runtime.isAuthorized,"homepage gesture grants immediate temporary reveal");
@@ -115,7 +130,7 @@ int main(void) { @autoreleasepool {
     for(int i=0;i<5;i++)Check(![runtime authenticatePassword:@"wrong-password" token:token error:NULL],"wrong password fails");
     Check(![runtime authenticatePassword:@"correct-password" token:token error:NULL],"cooldown rejects correct password");
     Check(![runtime completeBiometricWithToken:token],"cooldown cannot be bypassed by biometric");
-    Check([runtime consumeSearchPassword:@"correct-password" token:token] && !runtime.isAuthorized,"cooldown still consumes the password without native search/history leakage");
+    Check(SearchPassword(runtime,@"correct-password",token) && !runtime.isAuthorized,"cooldown still consumes the password without native search/history leakage");
     CSCloseFriendRuntime *reloaded=makeRuntime(); [reloaded synchronizeAccount:@"alice" epoch:1 suspended:NO];
     Check(![reloaded authenticatePassword:@"correct-password" token:reloaded.authenticationToken error:NULL],"cooldown survives runtime recreation");
     now+=31; Check([runtime authenticatePassword:@"correct-password" token:token error:NULL],"password succeeds after cooldown");
@@ -138,9 +153,6 @@ int main(void) { @autoreleasepool {
     Check(![runtime authenticatePassword:@"correct-password" token:token error:NULL],"late password reply after background fails");
     token=runtime.authenticationToken; Check([runtime completeBiometricWithToken:token],"current biometric authorization succeeds");
     [runtime lock]; Check(![runtime updateProfile:profile error:NULL],"locked settings cannot mutate profile");
-    Check([runtime saveMuteRecords:@{@"protected":@{@"original":@YES}} account:@"alice" epoch:1 error:NULL],"trusted journal write remains possible while locked");
-    Check(![runtime saveMuteRecords:@{} account:@"bob" epoch:1 error:NULL],"cross-account journal write rejected");
-    Check(![runtime saveMuteRecords:@{} account:@"alice" epoch:0 error:NULL],"stale journal epoch rejected");
     Check([runtime snapshotForEpoch:2 suspended:NO].blocked,"immediate external epoch mismatch blocks snapshot");
     Check(![[runtime snapshotForEpoch:2 suspended:NO] silencesSession:@"protected" sender:nil],"epoch boundary cannot silence using prior account membership");
     Check(![[runtime snapshotForEpoch:2 suspended:NO] rejectsCaller:@"protected" chatRoom:nil video:NO],"epoch boundary cannot reject calls using prior account membership");
@@ -154,11 +166,9 @@ int main(void) { @autoreleasepool {
     Check([runtime setPassword:@"123456" token:runtime.authenticationToken error:NULL],"six ASCII digit PIN is permitted");
     [runtime synchronizeAccount:@"alice" epoch:3 suspended:NO];
     Check([runtime.currentProfile[@"friends"] isEqual:@[@"protected"]],"account return loads original membership");
-    Check([runtime.muteRecords[@"protected"][@"original"] boolValue],"account return loads independent durable journal");
     token=runtime.authenticationToken; Check([runtime authenticatePassword:@"correct-password" token:token error:NULL],"account credential reloads");
     profile=[runtime.currentProfile mutableCopy]; profile[@"groups"]=@[@"room@chatroom"];
     Check([runtime updateProfile:profile error:NULL],"profile edit succeeds after reload");
-    Check([runtime.muteRecords[@"protected"][@"original"] boolValue],"profile edit preserves journal");
     unavailable=YES; [runtime synchronizeAccount:@"alice" epoch:4 suspended:NO];
     Check([runtime snapshotForEpoch:4 suspended:NO].blocked && !runtime.authenticationToken,"unavailable key blocks auth and policy");
     unavailable=NO; [runtime synchronizeAccount:@"alice" epoch:4 suspended:NO];
@@ -177,7 +187,6 @@ int main(void) { @autoreleasepool {
     [runtime synchronizeAccount:@"alice" epoch:6 suspended:NO];
     Check([runtime snapshotForEpoch:6 suspended:NO].blocked,"corrupt persisted state holds protection");
     Check([[runtime snapshotForEpoch:6 suspended:NO] hidesUserName:@"any-contact" surface:CSCloseFriendSurfaceContact],"blocked state protects even unknown membership");
-    Check(![runtime saveMuteRecords:@{} account:@"alice" epoch:6 error:NULL],"corrupt state not overwritten by journal");
     Check([[NSData dataWithContentsOfURL:stateURL] isEqual:corrupt],"corrupt bytes preserved");
     Method object=class_getInstanceMethod(CSSignatureFixture.class,@selector(object:));
     Check(CSCloseFriendMethodMatches(object,"@@:@"),"normalized signature ignores encoded offsets");

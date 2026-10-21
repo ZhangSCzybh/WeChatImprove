@@ -22,8 +22,37 @@ NSString *CSCloseFriendUserName(id object) {return [object isKindOfClass:Contact
 BOOL CSCFIsClass(id object,NSString *name) {return [object isKindOfClass:NSClassFromString(name)];}
 #import "GroupTitle.h"
 // The production profile state predicate, compiled verbatim by the focused runner.
-@interface UIViewController : NSObject @end
-@implementation UIViewController @end
+@interface UIView : NSObject
+@property(nonatomic,strong) id window;
+@property(nonatomic,copy) NSArray *subviews;
+@property(nonatomic) NSUInteger moves;
+- (void)didMoveToWindow;
+@end
+@implementation UIView
+- (void)didMoveToWindow {self.moves++;}
+@end
+@interface UITableView : UIView
+@property(nonatomic) NSUInteger reloads;
+- (void)reloadData;
+@end
+@implementation UITableView
+- (void)reloadData {self.reloads++;}
+@end
+@interface UICollectionView : UITableView @end
+@implementation UICollectionView @end
+@interface UIViewController : NSObject
+@property(nonatomic,strong) UIView *view;
+@property(nonatomic,getter=isViewLoaded) BOOL viewLoaded;
+@property(nonatomic) NSUInteger appearances;
+- (void)viewWillAppear:(BOOL)animated;
+@end
+@implementation UIViewController
+- (void)viewWillAppear:(__unused BOOL)animated {self.appearances++;}
+@end
+@interface DeferredPage : UIViewController @end
+@implementation DeferredPage @end
+BOOL CSCloseFriendInstallHook(NSString *,NSString *,IMP,IMP *,const char *);
+#import "SurfaceRefreshBodies.h"
 @interface ContactInfoViewController : UIViewController
 @property(nonatomic,strong) Contact *m_contact;
 @property(nonatomic,strong) id m_oContactInfoAssist;
@@ -47,7 +76,6 @@ static char PageEpochKey, ForwardSourcesKey, ForwardUpdateDepthKey;
 NSArray *CSCFVisible(NSArray *source,CSCloseFriendSurface surface) {
     return CSCloseFriendVisibleContacts(source,Current,surface,^NSString *(id item){return CSCloseFriendUserName(item);});
 }
-void CSCFReloadTables(id owner) {(void)owner;}
 #import "ForwardBodies.h"
 @interface NativeForward : NSObject {
 @public
@@ -58,7 +86,7 @@ void CSCFReloadTables(id owner) {(void)owner;}
 @implementation NativeForward @end
 BOOL CSCloseFriendInstallHook(NSString *className,NSString *name,IMP replacement,IMP *original,const char *encoding) {
     Class cls=NSClassFromString(className); SEL selector=NSSelectorFromString(name); Method method=class_getInstanceMethod(cls,selector);
-    if(!CSCloseFriendMethodMatches(method,encoding)) return NO; *original=method_getImplementation(method); method_setImplementation(method,replacement); return YES;
+    if(!CSCloseFriendMethodMatches(method,encoding)) return NO; *original=method_getImplementation(method); class_replaceMethod(cls,selector,replacement,method_getTypeEncoding(method)); return YES;
 }
 // Compile the production action wrappers, rather than a test-only imitation of their control flow.
 #import "ProfileGuards.h"
@@ -81,7 +109,28 @@ BOOL CSCloseFriendInstallHook(NSString *className,NSString *name,IMP replacement
 - (void)onNewMessage:(id)sender {(void)sender; self.sent++;}
 @end
 #include "CloseFriendSearchInputFixture.h"
+static void SurfaceRefreshChecks(void) {
+    DeferredPage *page=[DeferredPage new];page.view=[UIView new];page.viewLoaded=YES;
+    __block NSUInteger old=0,latest=0;
+    CSCFRefreshSurface(page,^(__unused id owner){old++;});
+    CSCFRefreshSurface(page,^(id owner){latest++;Check(owner==page,@"refresh receives its original owner");});
+    Check(!old && !latest && !page.appearances,@"offscreen policy changes defer work");
+    [page viewWillAppear:YES];[page viewWillAppear:NO];
+    Check(!old && latest==1 && page.appearances==2,@"appearance runs latest refresh once and retains original lifecycle");
+    UIViewController *untracked=[UIViewController new];[untracked viewWillAppear:NO];
+    Check(untracked.appearances==1 && latest==1,@"inherited lifecycle hook is isolated to tracked class");
+    page.view.window=[NSObject new];CSCFRefreshSurface(page,^(__unused id owner){latest++;});
+    Check(latest==2,@"visible page refreshes immediately");
+    UIView *view=[UIView new];CSCFRefreshSurface(view,^(__unused id owner){latest++;});[view didMoveToWindow];
+    Check(latest==2 && view.moves==1,@"view remains deferred until attached to window");
+    view.window=[NSObject new];[view didMoveToWindow];[view didMoveToWindow];
+    Check(latest==3 && view.moves==3,@"window attachment consumes deferred refresh once");
+    UITableView *table=[UITableView new];UICollectionView *media=[UICollectionView new];
+    table.subviews=@[media];page.view.subviews=@[table];CSCFReloadTables(page);
+    Check(table.reloads==1 && !media.reloads,@"reload stops at owning table, preserving nested media layout");
+}
 int main(void) {@autoreleasepool {
+    SurfaceRefreshChecks();
     SearchInputChecks();
     CSCloseFriendIdentity identity=^NSString *(id item){return [item isKindOfClass:NSString.class] ? item : [item username];};
     Contact *visible=Person(@"ordinary"), *hidden=Person(@"secret"), *group=Person(@"private@chatroom");

@@ -41,7 +41,7 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 @property(nonatomic,strong) NSTimer *timer;
 @property(nonatomic,strong) CSCloseFriendShakeMonitor *shakeMonitor;
 @property(nonatomic,weak) UIViewController *recoveryPage;
-@property(nonatomic) BOOL started, lastRevealed, authenticating, backgroundCoverRequired, routingProtectedChat;
+@property(nonatomic) BOOL started, lastRevealed, authenticating, backgroundCoverRequired, routingProtectedChat, policyRefreshScheduled;
 @end
 @implementation CSCloseFriendManager
 + (instancetype)sharedManager { static CSCloseFriendManager *instance; static dispatch_once_t once; dispatch_once(&once,^{ instance=[self new]; }); return instance; }
@@ -65,15 +65,16 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
             return data && CSKeychainWrite(account,@"auth",data,YES,error);
         }];
         __weak typeof(self) weakSelf=self;
-        _runtime.didChange=^{
-            // Defer observers outside the runtime lock; no username or profile in notification payload.
-            dispatch_async(dispatch_get_main_queue(),^{
-                typeof(self) self=weakSelf; if(!self)return;
-                [self refreshShakeMonitoring];
-                [NSNotificationCenter.defaultCenter postNotificationName:CSCloseFriendPolicyDidChangeNotification object:nil];
-            });
-        };
+        _runtime.didChange=^{ [weakSelf schedulePolicyRefresh]; };
     } return self;
+}
+- (void)schedulePolicyRefresh {
+    @synchronized(self) { if(self.policyRefreshScheduled)return; self.policyRefreshScheduled=YES; }
+    dispatch_async(dispatch_get_main_queue(),^{
+        @synchronized(self) { self.policyRefreshScheduled=NO; }
+        [self refreshShakeMonitoring]; [self startExpiryTimer];
+        [NSNotificationCenter.defaultCenter postNotificationName:CSCloseFriendPolicyDidChangeNotification object:nil];
+    });
 }
 - (NSArray<UIWindow *> *)windows {
     NSMutableArray *windows=[NSMutableArray new];
@@ -97,7 +98,7 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 }
 - (void)lockAndReturnToSafePage {
     NSAssert(NSThread.isMainThread,@"UI on main");
-    [self.shakeMonitor stop];
+    [self.shakeMonitor stop]; [self.timer invalidate]; self.timer=nil;
     CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
     BOOL sensitive=snapshot.enabled || self.runtime.isAuthorized || self.lastRevealed || self.authenticating;
     if(sensitive)[self cover];
@@ -143,15 +144,22 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 }
 - (void)startExpiryTimer {
     NSAssert(NSThread.isMainThread,@"Expiry scheduling on main");
-    [self.timer invalidate];
+    [self.timer invalidate]; self.timer=nil;
+    NSTimeInterval remaining=self.runtime.revealTimeRemaining;
+    if(remaining<=0) {
+        // A policy read may observe expiry before the timer callback is delivered.
+        if(self.lastRevealed)[self lockAndReturnToSafePage];
+        return;
+    }
+    self.lastRevealed=YES;
     __weak typeof(self) weakSelf=self;
-    self.timer=[NSTimer timerWithTimeInterval:1 repeats:YES block:^(__unused NSTimer *timer){
+    self.timer=[NSTimer timerWithTimeInterval:remaining repeats:NO block:^(__unused NSTimer *timer){
         typeof(self) self=weakSelf; if(!self)return;
-        CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
-        if(self.lastRevealed && !snapshot.revealed)[self lockAndReturnToSafePage];
-        self.lastRevealed=snapshot.revealed;
+        self.timer=nil;
+        if(self.runtime.revealTimeRemaining>0) [self startExpiryTimer];
+        else [self lockAndReturnToSafePage];
     }];
-    // Keep expiry-driven covering/navigation active while a scroll view tracks a finger.
+    // One deadline wakeup, including while a scroll view tracks a finger.
     [NSRunLoop.mainRunLoop addTimer:self.timer forMode:NSRunLoopCommonModes];
 }
 - (void)resign:(NSNotification *)note { self.backgroundCoverRequired=YES; [self lockAndReturnToSafePage]; [self.runtime setActive:NO]; }
@@ -241,12 +249,13 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 }
 - (NSDictionary *)capabilities { @synchronized(self.capabilityMap) { return [self.capabilityMap copy]; } }
 - (void)recordCapability:(NSString *)name available:(BOOL)available { if(!name.length)return; @synchronized(self.capabilityMap) { self.capabilityMap[name]=@(available); } }
-- (BOOL)consumeHomepageSearchPassword:(NSString *)query {
-    if(!NSThread.isMainThread || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return NO;
+- (void)checkHomepageSearchPassword:(NSString *)query isCurrent:(BOOL (^)(void))isCurrent completion:(void (^)(BOOL))completion {
+    if(!NSThread.isMainThread || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) {completion(YES);return;}
     [self refreshAccount];
-    BOOL consumed=[self.runtime consumeSearchPassword:query token:self.runtime.authenticationToken];
-    if(consumed) self.lastRevealed=self.runtime.isAuthorized;
-    return consumed;
+    [self.runtime checkSearchPassword:query token:self.runtime.authenticationToken isCurrent:^BOOL{return UIApplication.sharedApplication.applicationState==UIApplicationStateActive && isCurrent();} completion:^(BOOL consumed){
+        if(consumed)self.lastRevealed=self.runtime.isAuthorized;
+        completion(consumed);
+    }];
 }
 - (void)recovery:(UILongPressGestureRecognizer *)gesture {
     if(gesture.state!=UIGestureRecognizerStateBegan || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return;

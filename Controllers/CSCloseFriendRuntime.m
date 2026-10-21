@@ -2,6 +2,7 @@
 #import "CSCloseFriendCrypto.h"
 #import <math.h>
 #import <CoreFoundation/CoreFoundation.h>
+#import <CommonCrypto/CommonCrypto.h>
 static BOOL CSRuntimeFail(NSError **error, NSString *message) {
     if(error)*error=[NSError errorWithDomain:@"CSCloseFriendRuntime" code:1 userInfo:@{NSLocalizedDescriptionKey:message}];
     return NO;
@@ -19,6 +20,10 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
 @property(nonatomic) NSUInteger epoch, generation, revision;
 @property(nonatomic) BOOL blocked, active, suspended;
 @property(nonatomic) NSTimeInterval revealUntil;
+@property(nonatomic,strong) dispatch_queue_t searchQueue;
+@property(nonatomic,strong) NSData *searchCacheKey;
+@property(nonatomic,strong) NSMutableDictionary<NSData *,NSNumber *> *searchCache;
+@property(nonatomic) NSUInteger searchCredentialVersion, searchRequest;
 @end
 @implementation CSCloseFriendRuntime
 - (instancetype)initWithStore:(CSCloseFriendStore *)store clock:(NSTimeInterval (^)(void))clock credentialReader:(CSCloseFriendCredentialReader)reader credentialWriter:(CSCloseFriendCredentialWriter)writer {
@@ -27,6 +32,10 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
 - (instancetype)initWithStore:(CSCloseFriendStore *)store wallClock:(NSTimeInterval (^)(void))wallClock elapsedClock:(NSTimeInterval (^)(void))elapsedClock credentialReader:(CSCloseFriendCredentialReader)reader credentialWriter:(CSCloseFriendCredentialWriter)writer {
     if((self=[super init])) { _store=store; _wallClock=[wallClock copy]; _elapsedClock=[elapsedClock copy]; _reader=[reader copy]; _writer=[writer copy]; _account=@""; _blocked=YES; _active=YES; }
     return self;
+}
+- (void)invalidateSearchVerification {
+    self.searchCredentialVersion++; self.searchRequest++;
+    self.searchCache=nil; self.searchCacheKey=nil;
 }
 - (void)changed { self.revision++; self.publishedSnapshot=nil; self.boundarySnapshot=nil; if(self.didChange)self.didChange(); }
 - (BOOL)validCredential:(NSDictionary *)value {
@@ -44,6 +53,7 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
     NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
     @synchronized(self) {
         if([self.account isEqual:account] && self.epoch==epoch && self.suspended==suspended && !self.blocked)return;
+        [self invalidateSearchVerification];
         self.account=[account copy]?:@""; self.epoch=epoch; self.suspended=suspended; self.generation++; self.revealUntil=0; self.state=nil; self.credential=nil; self.blocked=YES;
         if(account.length && !suspended) {
             NSError *error=nil;
@@ -77,7 +87,19 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
         return self.publishedSnapshot;
     }
 }
-- (void)lock { NSAssert(NSThread.isMainThread,@"Main-thread mutation required"); @synchronized(self) { self.revealUntil=0; self.generation++; [self changed]; } }
+- (void)lock {
+    NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
+    @synchronized(self) {
+        BOOL changed=self.publishedSnapshot.revealed || self.revealUntil>self.elapsedClock() ||
+            (self.publishedSnapshot && self.publishedSnapshot.blocked!=self.blocked);
+        self.revealUntil=0; self.generation++; self.searchRequest++;
+        // Authentication is invalidated even when display state was already locked.
+        if(changed)[self changed];
+    }
+}
+- (NSTimeInterval)revealTimeRemaining {
+    @synchronized(self) { return !self.blocked && !self.suspended && self.active ? MAX(0,self.revealUntil-self.elapsedClock()) : 0; }
+}
 - (void)setActive:(BOOL)active { NSAssert(NSThread.isMainThread,@"Main-thread mutation required"); @synchronized(self) { _active=active; if(!active)[self lock]; } }
 - (NSDictionary *)authenticationToken { @synchronized(self) { if(self.blocked || self.suspended || !self.active || !self.account.length)return nil; return @{@"account":self.account,@"epoch":@(self.epoch),@"generation":@(self.generation)}; } }
 - (BOOL)isTokenCurrent:(NSDictionary *)token { @synchronized(self) { return token && [[self authenticationToken] isEqual:token]; } }
@@ -93,7 +115,7 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
         if(!verifier)return NO;
         NSDictionary *credential=@{@"salt":salt,@"verifier":verifier,@"iterations":@210000,@"failures":@0,@"cooldown":@0};
         if(!self.writer(self.account,credential,error))return NO;
-        self.credential=credential; self.generation++; self.revealUntil=self.elapsedClock()+[self.state[@"profile"][@"options"][@"unlockSeconds"] doubleValue]; [self changed]; return YES;
+        [self invalidateSearchVerification]; self.credential=credential; self.generation++; self.revealUntil=self.elapsedClock()+[self.state[@"profile"][@"options"][@"unlockSeconds"] doubleValue]; [self changed]; return YES;
     }
 }
 - (BOOL)persistCredential:(NSDictionary *)credential error:(NSError **)error {
@@ -123,18 +145,54 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
         self.generation++; [self changed]; return YES;
     }
 }
-- (BOOL)consumeSearchPassword:(NSString *)query token:(NSDictionary *)token {
-    NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
+- (BOOL)consumeVerifiedSearchPassword:(NSDictionary *)token {
+    // Recognition always consumes the secret, including cooldown or stale authority.
+    if(![self isTokenCurrent:token] || ![self.state[@"profile"][@"enabled"] boolValue] ||
+       [self.credential[@"cooldown"] doubleValue]>self.wallClock())return YES;
+    if([self.credential[@"failures"] unsignedIntegerValue] || [self.credential[@"cooldown"] doubleValue]) {
+        NSMutableDictionary *next=[self.credential mutableCopy]; next[@"failures"]=@0; next[@"cooldown"]=@0;
+        if(![self persistCredential:next error:NULL])return YES;
+    }
+    [self revealWithShortcutToken:token]; return YES;
+}
+- (void)checkSearchPassword:(NSString *)query token:(NSDictionary *)token isCurrent:(BOOL (^)(void))isCurrent completion:(void (^)(BOOL))completion {
+    NSAssert(NSThread.isMainThread,@"Main-thread search dispatch required");
+    if(!completion)return;
+    void (^finish)(BOOL)=^(BOOL consumed){ dispatch_async(dispatch_get_main_queue(),^{completion(consumed);}); };
     @synchronized(self) {
         if(![query isKindOfClass:NSString.class] || query.length<6 || query.length>128 ||
-           ![self isTokenCurrent:token] || !self.credential || ![self.state[@"profile"][@"enabled"] boolValue]) return NO;
-        NSData *derived=CSCloseFriendPasswordVerifier(query,self.credential[@"salt"],[self.credential[@"iterations"] unsignedIntegerValue],NULL);
-        if(!derived || !CSCloseFriendConstantTimeEqual(derived,self.credential[@"verifier"])) return NO;
-        // Never forward a recognized credential to native search/history, including cooldown.
-        if([self.credential[@"cooldown"] doubleValue]>self.wallClock()) return YES;
-        NSMutableDictionary *next=[self.credential mutableCopy]; next[@"failures"]=@0; next[@"cooldown"]=@0;
-        if([self persistCredential:next error:NULL]) [self revealWithShortcutToken:token];
-        return YES;
+           !self.credential || ![self.state[@"profile"][@"enabled"] boolValue]) {finish(NO);return;}
+        if(![self isTokenCurrent:token] || !isCurrent()) {finish(YES);return;}
+        if(!self.searchCacheKey)self.searchCacheKey=CSCloseFriendRandomBytes(32,NULL);
+        if(!self.searchCacheKey) {finish(YES);return;}
+        NSData *input=[query dataUsingEncoding:NSUTF8StringEncoding]; uint8_t bytes[CC_SHA256_DIGEST_LENGTH];
+        CCHmac(kCCHmacAlgSHA256,self.searchCacheKey.bytes,self.searchCacheKey.length,input.bytes,input.length,bytes);
+        NSData *tag=[NSData dataWithBytes:bytes length:sizeof(bytes)];
+        NSUInteger request=++self.searchRequest, version=self.searchCredentialVersion;
+        if(self.searchCache[tag]) {finish(NO);return;}
+        if(!self.searchQueue)self.searchQueue=dispatch_queue_create("com.wechatimprove.closefriends.search",dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL,QOS_CLASS_USER_INITIATED,0));
+        NSData *salt=self.credential[@"salt"], *verifier=self.credential[@"verifier"];
+        NSUInteger iterations=[self.credential[@"iterations"] unsignedIntegerValue];
+        NSString *candidate=[query copy];
+        dispatch_async(self.searchQueue,^{
+            BOOL current;
+            @synchronized(self) {current=request==self.searchRequest && version==self.searchCredentialVersion;}
+            // Superseded queued queries never spend another PBKDF2 operation.
+            NSData *derived=current ? CSCloseFriendPasswordVerifier(candidate,salt,iterations,NULL) : nil;
+            BOOL match=derived && CSCloseFriendConstantTimeEqual(derived,verifier);
+            dispatch_async(dispatch_get_main_queue(),^{
+                @synchronized(self) {
+                    if(!derived || request!=self.searchRequest || version!=self.searchCredentialVersion || ![self isTokenCurrent:token] || !isCurrent()) {finish(YES);return;}
+                    // Cache only unrelated queries, never a fast verifier for the real password.
+                    if(!match) {
+                        if(!self.searchCache)self.searchCache=[NSMutableDictionary dictionary];
+                        if(self.searchCache.count>=32)[self.searchCache removeAllObjects];
+                        self.searchCache[tag]=@NO;
+                    }
+                    finish(match ? [self consumeVerifiedSearchPassword:token] : NO);
+                }
+            });
+        });
     }
 }
 - (BOOL)completeBiometricWithToken:(NSDictionary *)token {
@@ -145,7 +203,6 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
     }
 }
 - (NSDictionary *)currentProfile { @synchronized(self) { return self.blocked?nil:self.state[@"profile"]; } }
-- (NSDictionary *)muteRecords { @synchronized(self) { return self.blocked?@{}:self.state[@"muteRecords"]?:@{}; } }
 - (BOOL)saveState:(NSDictionary *)state error:(NSError **)error {
     if(![self.store saveState:state forAccountID:self.account error:error]) { self.blocked=YES; [self lock]; return NO; }
     // Read back immutable normalized data. A failure holds protection without replacing bytes.
@@ -158,14 +215,7 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
     @synchronized(self) {
         if(![self isAuthorized] || !self.credential)return CSRuntimeFail(error,@"请先设置密码并验证当前账号。");
         NSDictionary *normalized=CSCloseFriendNormalizeProfile(profile,error); if(!normalized)return NO;
-        return [self saveState:@{@"profile":normalized,@"muteRecords":[self muteRecords]} error:error];
-    }
-}
-- (BOOL)saveMuteRecords:(NSDictionary *)records account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error {
-    NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
-    @synchronized(self) {
-        if(self.blocked || self.suspended || !self.credential || ![self.account isEqual:account] || self.epoch!=epoch)return CSRuntimeFail(error,@"账号已改变，静音恢复记录未写入。");
-        return [self saveState:@{@"profile":self.state[@"profile"],@"muteRecords":records} error:error];
+        return [self saveState:@{@"profile":normalized,@"muteRecords":self.state[@"muteRecords"]?:@{}} error:error];
     }
 }
 @end

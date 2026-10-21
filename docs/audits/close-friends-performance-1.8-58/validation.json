@@ -1,0 +1,20 @@
+{
+  "version": "1.8-58",
+  "sha256": "caf6eb929f895fbf565b88c215ad944c5b871d3b0af2e9fcf20548aa699cc735",
+  "bytes": 1135958,
+  "delivery": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/com.wechat.improve_1.8-58_iphoneos-arm64.deb",
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "minimum_ios": "15.0",
+  "source_files_verified": 488,
+  "automatic_native_dnd_removed_from_binary": true,
+  "source_versions_build_stage_and_delivery_verified": true,
+  "historical_packages_preserved": true,
+  "dSYM_UUIDs": {
+    "arm64": "F8F6BF5B-C3F9-3424-9B5E-18885B7356E1",
+    "arm64e": "2CC016D7-4A75-36F2-B1A9-B9EA042EEBD7"
+  },
+  "validation": "Focused macOS production-body regressions, strict iOS compilation for both architectures and Rootless package checks. No device installation or live account/configuration writes; real-device performance acceptance pending."
+}

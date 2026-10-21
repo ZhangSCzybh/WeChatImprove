@@ -98,12 +98,20 @@
 @end
 @interface CSCloseFriendManager : NSObject
 @property(nonatomic) NSUInteger probes,unlocks;
+@property(nonatomic) BOOL deferred;
+@property(nonatomic,strong) NSMutableArray *checks;
+- (void)finishChecks;
 + (instancetype)sharedManager;
-- (BOOL)consumeHomepageSearchPassword:(NSString *)query;
+- (void)checkHomepageSearchPassword:(NSString *)query isCurrent:(BOOL (^)(void))isCurrent completion:(void (^)(BOOL))completion;
 @end
 @implementation CSCloseFriendManager
 + (instancetype)sharedManager {static id manager; if(!manager)manager=[self new];return manager;}
-- (BOOL)consumeHomepageSearchPassword:(NSString *)query {self.probes++;BOOL match=[query isEqual:@"654321"];if(match)self.unlocks++;return match;}
+- (void)checkHomepageSearchPassword:(NSString *)query isCurrent:(BOOL (^)(void))isCurrent completion:(void (^)(BOOL))completion {
+    self.probes++;
+    void (^check)(void)=^{BOOL match=[query isEqual:@"654321"];if(match && isCurrent())self.unlocks++;completion(match);};
+    if(self.deferred) {if(!self.checks)self.checks=[NSMutableArray new];[self.checks addObject:[check copy]];} else check();
+}
+- (void)finishChecks {NSArray *checks=[self.checks copy];[self.checks removeAllObjects];for(void (^check)(void) in checks)check();}
 @end
 static BOOL CSCFCallVoid(id object,NSString *name) {
     SEL selector=NSSelectorFromString(name); if(!CSCloseFriendMethodMatches(class_getInstanceMethod([object class],selector),"v@:")) return NO;
@@ -167,6 +175,26 @@ NATIVE_SECTION_METHODS
 @end
 #undef NATIVE_SECTION_METHODS
 #include "SearchSectionHooks.h"
+@interface CachedSearchSection : NSObject
+@property(nonatomic,copy) NSArray *contacts;
+@property(nonatomic) NSUInteger writes;
+@end
+@implementation CachedSearchSection
+- (void)setContacts:(NSArray *)contacts {_contacts=[contacts copy];self.writes++;}
+@end
+static void SearchProjectionCacheChecks(void) {
+    Current=Policy(NO,30);CachedSearchSection *section=[CachedSearchSection new];
+    Contact *secret=Person(@"secret"), *ordinary=Person(@"ordinary");
+    section.contacts=@[secret,ordinary];CSCFSearchDidUpdate(section,@"contacts");
+    NSUInteger writes=section.writes;
+    for(NSUInteger i=0;i<20;i++)Check(CSCFSearchPrepare(section),@"current search section remains available");
+    Check(section.writes==writes && [section.contacts isEqual:@[ordinary]],@"repeated count/cell reads reuse filtered search section");
+    Current=Policy(YES,31);CSCFSearchPrepare(section);
+    Check(section.writes==writes+1 && section.contacts.count==2,@"unlock invalidates search projection from preserved native source");
+    CSCFSearchWillUpdate(section);section.contacts=@[secret];CSCFSearchDidUpdate(section,@"contacts");
+    Current=Policy(NO,32);CSCFSearchPrepare(section);
+    Check(!section.contacts.count,@"native update and policy revision rebuild the search projection");
+}
 static void SearchSectionChecks(void) {
     NSUInteger epoch=Epoch;Current=Policy(NO,10);
     InstallSection(@"FTSMessageSectionController",nil);InstallSection(@"FTSSearchContactSectionController",nil);
@@ -186,6 +214,28 @@ static void SearchSectionChecks(void) {
     Epoch++;
     for(NativeSearchSection *section in sections)Check([section numberOfItems]==0,@"stale account cannot regain hidden search rows");
     Epoch=epoch;
+}
+static void DeferredSearchChecks(void) {
+    Current=Policy(NO,12);
+    CSCloseFriendManager *manager=CSCloseFriendManager.sharedManager;manager.deferred=YES;
+    FTSHomeViewController *page=SearchPage(YES);NSUInteger unlocks=manager.unlocks;
+    TypeSearch(page,@"654321");TypeSearch(page,@"61");[manager finishChecks];
+    Check(manager.unlocks==unlocks && [[page searchBarText] isEqual:@"61"] && [page.presenter.queries isEqual:@[@"61"]],@"shorter edit cancels pending unlock without hiding native suggestions");
+    TypeSearch(page,@"654321");TypeSearch(page,@"");[manager finishChecks];
+    Check(manager.unlocks==unlocks && ![page searchBarText].length,@"clear cancels pending unlock");
+    FTSHomeViewController *legacy=SearchPage(NO);TypeSearch(legacy,@"654321");
+    legacy.searchTextField.markedTextRange=[NSObject new];TypeSearch(legacy,@"654321");[manager finishChecks];
+    Check(manager.unlocks==unlocks && legacy.searchTextField.markedTextRange && [[legacy searchBarText] isEqual:@"654321"],@"entering legacy IME composition cancels prior verification even when text is unchanged");
+    TypeSearch(page,@"old ordinary");TypeSearch(page,@"new ordinary");[manager finishChecks];
+    Check([page.presenter.queries.lastObject isEqual:@"new ordinary"] && ![page.presenter.queries containsObject:@"old ordinary"],@"only current async ordinary query reaches native search");
+    NSUInteger probes=manager.probes;
+    TypeSearch(page,@"654321");[page shouldReturnStartSearch];
+    Check(manager.probes==probes+1 && ![page.presenter.queries containsObject:@"654321"],@"same pending query coalesces Return and never enters native history");
+    [manager finishChecks];
+    Check(manager.unlocks==unlocks+1 && ![page searchBarText].length && !page.presenter.searching,@"deferred exact match unlocks and ends native loading");
+    TypeSearch(page,@"654321");Epoch++;[manager finishChecks];
+    Check(manager.unlocks==unlocks+1 && !InputState(page).pendingCallbacks && !InputState(page).pendingQuery,@"account switch discards verification and releases native closures");
+    Epoch--;manager.deferred=NO;
 }
 static void SearchInputChecks(void) {
     Current=Policy(NO,1);InstallSearchInputHooks();
@@ -238,5 +288,7 @@ static void SearchInputChecks(void) {
     NSUInteger unlocks=CSCloseFriendManager.sharedManager.unlocks;TypeSearch(page,@"654321");
     Check(!CSCFSearchSuppressLoading(page) && [presenter.queries.lastObject isEqual:@"654321"] && CSCloseFriendManager.sharedManager.unlocks==unlocks,@"disabled feature leaves native live search intact");
     SearchSectionChecks();
+    DeferredSearchChecks();
+    SearchProjectionCacheChecks();
     printf("Search: zero unlock placeholders, native live suggestions/web/history/submit, full unlock, late callbacks and IME passed\n");
 }

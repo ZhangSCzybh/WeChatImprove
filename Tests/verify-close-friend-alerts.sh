@@ -29,6 +29,6 @@ start=s.index('    __block IMP add=NULL;');end=s.index('    for(NSString *name i
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -DCSCF_CALL_REPLY_TESTING=1 \
  -framework Foundation -I"$work" -IControllers \
- Controllers/CSCloseFriend{Policy,Signatures,NotificationAdapter,MuteAdapter,CallAdapter,CallReply}.m \
+ Controllers/CSCloseFriend{Policy,Signatures,NotificationAdapter,CallAdapter,CallReply}.m \
  Controllers/CSGroupProjection.m Controllers/WESessionTabItem.m Tests/CloseFriendAlertTests.m -o "$work/alerts"
 "$work/alerts"

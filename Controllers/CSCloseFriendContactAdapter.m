@@ -18,9 +18,50 @@ BOOL CSCFSetObject(id object,NSString *name,id value) {
     SEL selector=NSSelectorFromString(name); if(!object || !CSCloseFriendMethodMatches(class_getInstanceMethod([object class],selector),"v@:@")) return NO;
     ((void(*)(id,SEL,id))objc_msgSend)(object,selector,value); return YES;
 }
+static char PendingSurfaceRefreshKey, SurfaceAppearanceHookKey;
+static void ApplyPendingSurfaceRefresh(id owner) {
+    void (^refresh)(id)=objc_getAssociatedObject(owner,&PendingSurfaceRefreshKey);
+    objc_setAssociatedObject(owner,&PendingSurfaceRefreshKey,nil,OBJC_ASSOCIATION_COPY_NONATOMIC);
+    if(refresh)refresh(owner);
+}
+static BOOL WatchSurfaceAppearance(id owner) {
+    Class cls=[owner class]; NSNumber *installed=objc_getAssociatedObject(cls,&SurfaceAppearanceHookKey);
+    if(installed)return installed.boolValue;
+    __block IMP original=NULL; IMP replacement=NULL; NSString *name=nil; const char *types=NULL;
+    if([owner isKindOfClass:UIViewController.class]) {
+        name=@"viewWillAppear:"; types="v@:B";
+        replacement=imp_implementationWithBlock(^(id page,BOOL animated){
+            ApplyPendingSurfaceRefresh(page);
+            ((void(*)(id,SEL,BOOL))original)(page,@selector(viewWillAppear:),animated);
+        });
+    } else if([owner isKindOfClass:UIView.class]) {
+        name=@"didMoveToWindow"; types="v@:";
+        replacement=imp_implementationWithBlock(^(UIView *view){
+            ((void(*)(id,SEL))original)(view,@selector(didMoveToWindow));
+            if(view.window)ApplyPendingSurfaceRefresh(view);
+        });
+    } else return NO;
+    BOOL ok=CSCloseFriendInstallHook(NSStringFromClass(cls),name,replacement,&original,types);
+    if(!ok)imp_removeBlock(replacement);
+    objc_setAssociatedObject(cls,&SurfaceAppearanceHookKey,@(ok),OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    return ok;
+}
+void CSCFRefreshSurface(id owner,void (^refresh)(id)) {
+    if(!owner || !refresh)return;
+    BOOL visible=YES;
+    if([owner isKindOfClass:UIViewController.class])visible=[owner isViewLoaded] && [[owner view] window]!=nil;
+    else if([owner isKindOfClass:UIView.class])visible=[owner window]!=nil;
+    if(!visible && WatchSurfaceAppearance(owner)) {
+        // The block receives its weakly tracked owner; it never captures the page.
+        objc_setAssociatedObject(owner,&PendingSurfaceRefreshKey,refresh,OBJC_ASSOCIATION_COPY_NONATOMIC);
+        return;
+    }
+    objc_setAssociatedObject(owner,&PendingSurfaceRefreshKey,nil,OBJC_ASSOCIATION_COPY_NONATOMIC);
+    refresh(owner);
+}
 static void ReloadView(UIView *view) {
-    if([view isKindOfClass:UITableView.class]) [(UITableView *)view reloadData];
-    if([view isKindOfClass:UICollectionView.class]) [(UICollectionView *)view reloadData];
+    if([view isKindOfClass:UITableView.class]) {[(UITableView *)view reloadData];return;}
+    if([view isKindOfClass:UICollectionView.class]) {[(UICollectionView *)view reloadData];return;}
     for(UIView *child in view.subviews) ReloadView(child);
 }
 void CSCFReloadTables(id owner) {
@@ -35,7 +76,7 @@ void CSCFTrackSurface(id owner,NSString *refreshSelector) {
     dispatch_once(&once,^{
         owners=[NSMapTable weakToStrongObjectsMapTable];
         [NSNotificationCenter.defaultCenter addObserverForName:CSCloseFriendPolicyDidChangeNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note){
-            for(id page in owners.keyEnumerator.allObjects) {
+            for(id tracked in owners.keyEnumerator.allObjects) CSCFRefreshSurface(tracked,^(id page){
                 CSCFCancelSelection(page);
                 CSCFCallVoid(page,[owners objectForKey:page]);
                 if(CSCFIsClass(page,@"SessionSelectView")) CSCFRefreshForwardSearch(page);
@@ -48,7 +89,7 @@ void CSCFTrackSurface(id owner,NSString *refreshSelector) {
                         if([label isKindOfClass:UILabel.class]) label.text=[NSString stringWithFormat:@"%u 位联系人",count];
                     }
                 }
-            }
+            });
         }];
     });
     if(refreshSelector.length || ![owners objectForKey:owner]) [owners setObject:refreshSelector ?: @"" forKey:owner];

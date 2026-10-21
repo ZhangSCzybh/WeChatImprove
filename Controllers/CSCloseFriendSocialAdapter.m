@@ -23,7 +23,7 @@ void CSCFSocialTrack(id owner,void (^refresh)(id)) {
     dispatch_once(&once,^{
         pages=[NSMapTable weakToStrongObjectsMapTable];
         [NSNotificationCenter.defaultCenter addObserverForName:CSCloseFriendPolicyDidChangeNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note){
-            for(id page in pages.keyEnumerator.allObjects) { void(^update)(id)=[pages objectForKey:page]; update(page); }
+            for(id page in pages.keyEnumerator.allObjects) { void(^update)(id)=[pages objectForKey:page]; CSCFRefreshSurface(page,update); }
         }];
     });
     [pages setObject:[refresh copy] forKey:owner];

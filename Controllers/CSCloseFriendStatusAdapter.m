@@ -1,9 +1,20 @@
 #import "CSCloseFriendSocialAdapter.h"
 #import <objc/message.h>
 static id GridOwner;
-static char StatusRevisionKey, CardRevisionKey, EmptySupplementKey;
+static char StatusRevisionKey, CardRevisionKey, EmptySupplementKey, CardsCacheKey;
 static NSArray *RawNames(id owner) { id names=CSCloseFriendRead(owner,@"usernameList"); return [names isKindOfClass:NSArray.class] ? names : @[]; }
-static CSCloseFriendSocialProjection *Cards(id owner) { return CSCFSocialProject(CSCFPageIsCurrent(owner) ? RawNames(owner) : @[],CSCloseFriendSurfaceStatus); }
+static CSCloseFriendSocialProjection *Cards(id owner) {
+    NSArray *source=CSCFPageIsCurrent(owner) ? RawNames(owner) : @[];
+    CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
+    NSDictionary *cache=objc_getAssociatedObject(owner,&CardsCacheKey);
+    CSCloseFriendSocialProjection *projection=cache[@"projection"];
+    if(!projection || [cache[@"revision"] unsignedIntegerValue]!=snapshot.revision ||
+       ![projection.source isEqualToArray:source]) {
+        projection=CSCFSocialProject(source,CSCloseFriendSurfaceStatus);
+        objc_setAssociatedObject(owner,&CardsCacheKey,@{@"projection":projection,@"revision":@(snapshot.revision)},OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return projection;
+}
 static void Track(id owner) {
     CSCFPageIsCurrent(owner);
     CSCFSocialTrack(owner,^(id page){

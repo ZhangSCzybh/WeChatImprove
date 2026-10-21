@@ -9,6 +9,7 @@ FOUNDATION_EXPORT BOOL CSCFCallVoid(id object, NSString *selector);
 FOUNDATION_EXPORT BOOL CSCFSetObject(id object, NSString *selector, id value);
 FOUNDATION_EXPORT void CSCFTrackSurface(id owner, NSString *refreshSelector);
 FOUNDATION_EXPORT void CSCFReloadTables(id owner);
+FOUNDATION_EXPORT void CSCFRefreshSurface(id owner, void (^refresh)(id));
 FOUNDATION_EXPORT BOOL CSCFContactLogicSurface(id logic, CSCloseFriendSurface *surface);
 FOUNDATION_EXPORT BOOL CSCFPageIsCurrent(id owner);
 FOUNDATION_EXPORT void CSCFForwardSearchWillUpdate(id owner);

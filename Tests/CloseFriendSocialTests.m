@@ -57,7 +57,7 @@ static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(
 @end
 @interface WCDataItem : NSObject
 @property(nonatomic,copy) NSString *username,*itemID;
-@property(nonatomic,copy) NSArray *likeUsers,*commentUsers;
+@property(nonatomic,strong) NSArray *likeUsers,*commentUsers;
 @property(nonatomic) BOOL isPrivate;
 @property(nonatomic,copy) NSSet *selectContacts,*selectTags;
 - (int)likeCount;
@@ -68,9 +68,9 @@ static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(
 - (int)commentCount {return (int)_commentUsers.count;}
 @end
 @interface WCFacade : NSObject
-@property(nonatomic,copy) NSArray *source;
+@property(nonatomic,strong) NSArray *source;
 @property(nonatomic,strong) NSMutableDictionary *styleCache;
-@property(nonatomic) NSUInteger clears;
+@property(nonatomic) NSUInteger clears,reads;
 - (NSArray *)getTimelineDataItem;
 - (NSInteger)countOfTimelineDataItem;
 - (id)getTimelineDataItemOfIndex:(NSInteger)index;
@@ -80,7 +80,7 @@ static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(
 - (double)likeUserHeightForWidth:(double)width withDataItem:(WCDataItem *)item isSpringStyle:(BOOL)spring;
 @end
 @implementation WCFacade
-- (NSArray *)getTimelineDataItem {return self.source;}
+- (NSArray *)getTimelineDataItem {self.reads++;return self.source;}
 - (NSInteger)countOfTimelineDataItem {return (NSInteger)self.source.count;}
 - (id)getTimelineDataItemOfIndex:(NSInteger)index {return index>=0 && (NSUInteger)index<self.source.count ? self.source[(NSUInteger)index] : nil;}
 - (void)reloadTimelineDataItems {}
@@ -230,7 +230,23 @@ int main(void) { @autoreleasepool {
     Check(facade.source==originalPosts && post.likeUsers==originalLikes && post.commentUsers==originalComments);
     Check(post.likeCount==2 && post.commentCount==3 && post.isPrivate && post.selectContacts==acl && post.selectTags==tags);
     Check(facade.clears>0 && facade.styleCache.count==0);
-    Policy(YES,2); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==3 && post.commentCount==3); Leave(previous);
+    NSUInteger clears=facade.clears;
+    for(NSUInteger i=0;i<20;i++) {previous=Enter(page,nil);Check([facade countOfTimelineDataItem]==2);Leave(previous);}
+    Check(facade.clears==clears); // Scroll/count scope must not flush all post layouts.
+    previous=Enter(page,nil);NSUInteger reads=facade.reads;
+    Check([facade countOfTimelineDataItem]==2);NSArray *cachedLikes=post.likeUsers,*cachedComments=post.commentUsers;
+    for(NSUInteger i=0;i<20;i++)Check([facade countOfTimelineDataItem]==2 && post.likeUsers==cachedLikes && post.commentUsers==cachedComments);
+    Check(facade.reads==reads+1);Leave(previous); // One source validation within the native call.
+    NSMutableArray *mutablePosts=[originalPosts mutableCopy],*mutableLikes=[originalLikes mutableCopy],*mutableComments=[originalComments mutableCopy];
+    facade.source=mutablePosts;post.likeUsers=mutableLikes;post.commentUsers=mutableComments;
+    [mutablePosts removeObject:last];[mutableLikes removeObject:ordinary];[mutableComments addObject:ordinary];
+    previous=Enter(page,nil);Check([facade countOfTimelineDataItem]==1 && post.likeCount==0 && post.commentCount==2);Leave(previous);
+    Check(mutableLikes.count==1 && mutableComments.count==4); // Projection never edits source.
+    [mutablePosts addObject:last];[mutableLikes addObject:ordinary];[mutableComments removeLastObject];
+    previous=Enter(page,nil);Check([facade countOfTimelineDataItem]==2 && post.likeCount==1 && post.commentCount==1);Leave(previous);
+    facade.source=originalPosts;post.likeUsers=originalLikes;post.commentUsers=originalComments;
+    Policy(YES,2); previous=Enter(page,nil); Check(!Scope && [facade countOfTimelineDataItem]==3 && post.commentCount==3); Leave(previous);
+    Check(facade.clears==clears);
     Policy(NO,3); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==2 && post.commentCount==1); Leave(previous);
     NSDictionary *m1=@{@"comment":ordinary,@"objID":@"secret"};
     NSDictionary *m2=@{@"comment":hidden}, *m3=@{@"comment":ordinary,@"refComment":reply};

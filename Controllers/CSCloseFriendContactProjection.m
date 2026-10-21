@@ -1,12 +1,11 @@
 #import "CSCloseFriendContactProjection.h"
 BOOL CSCloseFriendSurfaceConcealed(CSCloseFriendSnapshot *snapshot, CSCloseFriendSurface surface) {
-    if(snapshot.blocked) return YES;
-    for(NSString *name in snapshot.protectedUserNames) if([snapshot hidesUserName:name surface:surface]) return YES;
-    return NO;
+    return [snapshot concealsSurface:surface];
 }
 NSArray *CSCloseFriendVisibleContacts(NSArray *source, CSCloseFriendSnapshot *snapshot, CSCloseFriendSurface surface, CSCloseFriendIdentity identity) {
     if(![source isKindOfClass:NSArray.class]) return @[];
     if(snapshot.blocked) return @[];
+    if(![snapshot concealsSurface:surface]) return [source copy];
     NSMutableArray *visible=[NSMutableArray array];
     for(id object in source) if(![snapshot hidesUserName:identity(object) surface:surface]) [visible addObject:object];
     return [visible copy];

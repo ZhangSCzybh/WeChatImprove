@@ -4,6 +4,7 @@ static char MessagesKey;
 static BOOL UnreadDisplay;
 static id MessageCountingOwner;
 static id DiscoveryCountingOwner;
+static NSMutableDictionary *DiscoveryCounts;
 static id (*NativeUnread)(id,SEL);
 BOOL CSCFUnreadBegin(void) { BOOL previous=UnreadDisplay; if(NSThread.isMainThread) UnreadDisplay=YES; return previous; }
 void CSCFUnreadEnd(BOOL previous) { if(NSThread.isMainThread) UnreadDisplay=previous; }
@@ -69,24 +70,32 @@ static BOOL DiscoveryRelatedMessage(id message,BOOL *known) {
     return type==4 || (flags & (1<<17))!=0 || ([referrer isKindOfClass:NSString.class] && [referrer isEqual:CSCloseFriendCurrentSnapshot().accountID]);
 }
 static unsigned int DiscoveryUnreadCount(id facade,NSString *name,unsigned int nativeCount) {
-    if(!CSCFPageIsCurrent(DiscoveryCountingOwner) || CSCloseFriendCurrentSnapshot().blocked || !NativeUnread) return 0;
-    NSArray *source=NativeUnread(facade,NSSelectorFromString(@"getUnReadMessages"));
-    if(![source isKindOfClass:NSArray.class]) return 0;
-    BOOL total=[name isEqual:@"getUnReadMessageCount"];
-    BOOL related=[name isEqual:@"getUnReadMessageCountReleatedToMe"];
-    NSUInteger removed=0;
-    for(id message in source) {
-        if(!CSCFSocialHidden(message,CSCloseFriendSurfaceInteraction)) continue;
-        if(!total) {
+    if(!CSCFPageIsCurrent(DiscoveryCountingOwner) || CSCloseFriendCurrentSnapshot().blocked || !NativeUnread)return 0;
+    NSArray *counts=DiscoveryCounts[[NSValue valueWithNonretainedObject:facade]];
+    if(!counts) {
+        NSArray *source=NativeUnread(facade,NSSelectorFromString(@"getUnReadMessages"));
+        if(![source isKindOfClass:NSArray.class])return 0;
+        NSUInteger total=0,related=0,mutual=0; BOOL partitionsKnown=YES;
+        for(id message in source) {
+            if(!CSCFSocialHidden(message,CSCloseFriendSurfaceInteraction))continue;
+            total++;
             BOOL known=NO,isRelated=DiscoveryRelatedMessage(message,&known);
-            if(!known) return 0;
-            if(isRelated!=related) continue;
+            partitionsKnown &= known;
+            if(isRelated)related++;else mutual++;
         }
-        removed++;
+        counts=@[@(total),@(related),@(mutual),@(partitionsKnown)];
+        if(DiscoveryCounts)DiscoveryCounts[[NSValue valueWithNonretainedObject:facade]]=counts;
     }
-    // Only the display count changes. Native arrays, hasRead flags and cached
-    // notification-manager counts never receive the filtered list or count.
-    return nativeCount-(unsigned int)MIN((NSUInteger)nativeCount,removed);
+    NSUInteger index=[name isEqual:@"getUnReadMessageCount"] ? 0 : [name isEqual:@"getUnReadMessageCountReleatedToMe"] ? 1 : 2;
+    if(index && ![counts[3] boolValue])return 0;
+    return nativeCount-(unsigned int)MIN((NSUInteger)nativeCount,[counts[index] unsignedIntegerValue]);
+}
+static void DiscoveryWithCounts(id page,void (^native)(void)) {
+    id previous=DiscoveryCountingOwner; NSMutableDictionary *counts=DiscoveryCounts; BOOL unread=UnreadDisplay;
+    if(!NSThread.isMainThread) {native();return;}
+    DiscoveryCountingOwner=page; UnreadDisplay=YES;
+    if(previous!=page || !DiscoveryCounts)DiscoveryCounts=[NSMutableDictionary dictionary];
+    @try {native();} @finally {DiscoveryCountingOwner=previous; DiscoveryCounts=counts; UnreadDisplay=unread;}
 }
 static void InstallUnread(void) {
     __block IMP unread=NULL;
@@ -168,9 +177,9 @@ static void DiscoveryViews(id page) {
 }
 static void InstallDiscovery(void) {
     DiscoveryCounters();
-    CSCFSocialHook1(@"FindFriendEntryViewController",@"updateWCTimeLineView:",^(id page,id cell,void(^orig)(id)){orig(cell); DiscoveryViews(page);});
-    CSCFSocialHook0(@"FindFriendEntryViewController",@"reloadData",^(id page,void(^orig)(void)){orig(); DiscoveryViews(page);});
-    CSCFSocialHook0(@"FindFriendEntryViewController",@"onMessageUnReadCountChanged",^(id page,void(^orig)(void)){orig(); DiscoveryViews(page);});
+    CSCFSocialHook1(@"FindFriendEntryViewController",@"updateWCTimeLineView:",^(id page,id cell,void(^orig)(id)){DiscoveryWithCounts(page,^{orig(cell);}); DiscoveryViews(page);});
+    CSCFSocialHook0(@"FindFriendEntryViewController",@"reloadData",^(id page,void(^orig)(void)){DiscoveryWithCounts(page,orig); DiscoveryViews(page);});
+    CSCFSocialHook0(@"FindFriendEntryViewController",@"onMessageUnReadCountChanged",^(id page,void(^orig)(void)){DiscoveryWithCounts(page,orig); DiscoveryViews(page);});
     __block IMP appear=NULL;
     IMP replacement=imp_implementationWithBlock(^(id page,BOOL animated){
         ((void(*)(id,SEL,BOOL))appear)(page,NSSelectorFromString(@"viewWillAppear:"),animated);

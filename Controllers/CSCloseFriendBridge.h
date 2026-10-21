@@ -18,8 +18,6 @@ FOUNDATION_EXPORT void CSCloseFriendAuthenticate(UIViewController *presenter, vo
 FOUNDATION_EXPORT void CSCloseFriendRecordCapability(NSString *name, BOOL available);
 FOUNDATION_EXPORT NSDictionary *CSCloseFriendCurrentProfile(void);
 FOUNDATION_EXPORT BOOL CSCloseFriendUpdateCurrentProfile(NSDictionary *profile, NSError **error);
-FOUNDATION_EXPORT NSDictionary *CSCloseFriendMuteRecords(void);
-FOUNDATION_EXPORT BOOL CSCloseFriendSaveMuteRecords(NSDictionary *records, NSString *accountID, NSUInteger accountEpoch, NSError **error);
 FOUNDATION_EXPORT BOOL CSCloseFriendInstallHook(NSString *className, NSString *selector, IMP replacement, IMP *original, const char *typeEncoding);
 /// Shared full normalized signature comparison for guarded reads/calls and hooks.
 FOUNDATION_EXPORT BOOL CSCloseFriendMethodMatches(Method method, const char *typeEncoding);

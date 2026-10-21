@@ -13,7 +13,6 @@ FOUNDATION_EXPORT BOOL CSCFSearchAllowsSelection(id section);
 FOUNDATION_EXPORT BOOL CSCFSearchGated(id section);
 FOUNDATION_EXPORT BOOL CSCFSearchRedactsGroupMatch(id contact);
 FOUNDATION_EXPORT void CSCFSearchUpdateGroupCell(id cell,id item);
-FOUNDATION_EXPORT BOOL CSCFSearchConsumePassword(id page,id input);
 FOUNDATION_EXPORT BOOL CSCFSearchSuppressLoading(id page);
 FOUNDATION_EXPORT void CSCFSearchClearResults(id page);
 FOUNDATION_EXPORT void CSCFSearchDispatchInput(id page,id input,BOOL composing,void (^native)(void));

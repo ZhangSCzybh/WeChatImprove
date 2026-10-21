@@ -55,7 +55,7 @@ void CSCFProfileBind(id controller) {
     static NSHashTable *pages; static dispatch_once_t once;
     dispatch_once(&once,^{
         pages=[NSHashTable weakObjectsHashTable];
-        [NSNotificationCenter.defaultCenter addObserverForName:CSCloseFriendPolicyDidChangeNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note){for(id page in pages.allObjects) CSCFProfileRefresh(page);}];
+        [NSNotificationCenter.defaultCenter addObserverForName:CSCloseFriendPolicyDidChangeNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note){for(id page in pages.allObjects) CSCFRefreshSurface(page,^(id owner){CSCFProfileRefresh(owner);});}];
     });
     [pages addObject:controller];
 }

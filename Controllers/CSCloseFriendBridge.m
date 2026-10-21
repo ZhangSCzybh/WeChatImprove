@@ -56,8 +56,6 @@ static BOOL CSBridgeMutation(NSString *account, NSUInteger epoch, BOOL (^mutatio
     return ok;
 }
 BOOL CSCloseFriendUpdateCurrentProfile(NSDictionary *profile, NSError **error) { return CSBridgeMutation(nil,CSBackupAccountEpoch(),^BOOL(NSError **e){ return [CSCloseFriendManager.sharedManager.runtime updateProfile:profile error:e]; },error); }
-NSDictionary *CSCloseFriendMuteRecords(void) { return CSCloseFriendCurrentSnapshot().blocked?@{}:CSCloseFriendManager.sharedManager.runtime.muteRecords; }
-BOOL CSCloseFriendSaveMuteRecords(NSDictionary *records, NSString *account, NSUInteger epoch, NSError **error) { return CSBridgeMutation(account,epoch,^BOOL(NSError **e){ return [CSCloseFriendManager.sharedManager.runtime saveMuteRecords:records account:account epoch:epoch error:e]; },error); }
 BOOL CSCloseFriendInstallHook(NSString *className, NSString *selector, IMP replacement, IMP *original, const char *encoding) {
     Class cls=NSClassFromString(className); SEL sel=NSSelectorFromString(selector);
     BOOL available=cls && replacement && original && CSCloseFriendMethodMatches(class_getInstanceMethod(cls,sel),encoding);

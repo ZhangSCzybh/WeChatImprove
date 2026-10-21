@@ -2,7 +2,6 @@
 #import <objc/message.h>
 #import "CSCloseFriendBridge.h"
 #import "CSCloseFriendNotificationAdapter.h"
-#import "CSCloseFriendMuteAdapter.h"
 #import "CSCloseFriendCallAdapter.h"
 #import "CSGroupProjection.h"
 #import "WESessionTabItem.h"
@@ -17,8 +16,6 @@ void CSCloseFriendRecordCapability(NSString *n,BOOL available){}
 id CSCloseFriendRead(id o,NSString *key) {if([o isKindOfClass:NSDictionary.class])return o[key];SEL s=NSSelectorFromString(key);return CSCloseFriendMethodMatches(class_getInstanceMethod([o class],s),"@@:")?((id(*)(id,SEL))objc_msgSend)(o,s):nil;}
 NSString *CSCloseFriendUserName(id o){return [o isKindOfClass:NSString.class]?o:CSCloseFriendRead(o,@"m_nsUsrName");}
 BOOL CSCloseFriendInstallHook(NSString *c,NSString *s,IMP r,IMP *o,const char *e){Method m=class_getInstanceMethod(NSClassFromString(c),NSSelectorFromString(s));if(!CSCloseFriendMethodMatches(m,e))return NO;*o=method_setImplementation(m,r);return YES;}
-NSDictionary *CSCloseFriendMuteRecords(void){return @{};}
-BOOL CSCloseFriendSaveMuteRecords(NSDictionary *r,NSString *a,NSUInteger e,NSError **error){return NO;}
 static NSMutableDictionary *FixtureServices;
 id CSGetService(Class c){return c ? FixtureServices[NSStringFromClass(c)] : nil;}
 static CSCloseFriendSnapshot *Snapshot(BOOL enabled,BOOL revealed,NSDictionary *options) {
@@ -81,6 +78,8 @@ static CSCloseFriendSnapshot *Snapshot(BOOL enabled,BOOL revealed,NSDictionary *
 @interface CSGroupListAdapter : NSObject
 @property id controller;
 @property NSArray *cachedNativeSections;
+@property NSNumber *alertBadge;
+@property NSArray *alertBadgeKey;
 @property NSUInteger changeDepth,snapshotRevision,modelRevision,snapshotEpoch;
 @property BOOL dirty;
 @property NSString *snapshotAccount;
@@ -91,7 +90,8 @@ static NSHashTable *Adapters(void){return Owners;}
 static BOOL CSGroupIsFoldedController(id c){return [c isEqual:@"folded"];}
 static NSString *CSGroupCurrentAccountID(void){return Policy.accountID;}
 typedef NS_ENUM(NSUInteger,CSGroupFoldedPrivacyState){CSGroupFoldedPrivacyUnknown,CSGroupFoldedPrivacyAllHidden,CSGroupFoldedPrivacyNoHidden};
-static NSArray *CSGroupCopyFoldedUserNames(void){return nil;}
+static NSArray *FoldedNames;
+static NSArray *CSGroupCopyFoldedUserNames(void){return FoldedNames;}
 static CSGroupFoldedPrivacyState CSGroupAssessFoldedUserNames(id names,id hidden){return CSGroupFoldedPrivacyUnknown;}
 @implementation CSGroupListAdapter
 #import "AlertBadgeBody.h"
@@ -172,26 +172,6 @@ int main(void){@autoreleasepool{
     CHECK([UNUserNotificationCenter.currentNotificationCenter.removedDelivered isEqual:@[@"stale"]]);
     Policy=Snapshot(YES,YES,nil);
 
-    // Durable write ownership survives a new engine; native pre-muted contacts are never restored.
-    __block NSDictionary *journal=@{};__block NSMutableDictionary *native=[@{@"friend":@YES,@"secret@chatroom":@NO} mutableCopy];__block NSUInteger writes=0;__block BOOL failCommit=NO,failRevoke=NO;
-    CSCloseFriendMuteAdapter *(^engine)(void)=^CSCloseFriendMuteAdapter *{
-        CSCloseFriendMuteAdapter *a=[CSCloseFriendMuteAdapter new];a.load=^NSDictionary *{return journal;};
-        a.current=^BOOL(NSString *account,NSUInteger epoch){return [account isEqual:Policy.accountID] && epoch==Epoch;};
-        a.save=^BOOL(NSDictionary *r,NSString *account,NSUInteger epoch){if((failCommit && [r[@"friend"][@"phase"] isEqual:@"applied"]) || (failRevoke && [r[@"friend"][@"phase"] isEqual:@"revoked"]))return NO;NSData *d=[NSPropertyListSerialization dataWithPropertyList:r format:NSPropertyListBinaryFormat_v1_0 options:0 error:NULL];journal=[NSPropertyListSerialization propertyListWithData:d options:0 format:NULL error:NULL];return YES;};
-        a.readOpen=^NSNumber *(NSString *name){return native[name];};a.writeOpen=^BOOL(NSString *name,BOOL open){writes++;native[name]=@(open);return YES;};return a;
-    };
-    CSCloseFriendMuteAdapter *mute=engine();[mute reconcile:Policy epoch:Epoch];CHECK(writes==1 && ![native[@"friend"] boolValue]);CHECK([journal[@"friend"][@"owned"] boolValue]);
-    Policy=Snapshot(NO,NO,nil);[engine() reconcile:Policy epoch:Epoch];CHECK(writes==2 && [native[@"friend"] boolValue] && ![native[@"secret@chatroom"] boolValue]);
-    Policy=Snapshot(YES,NO,nil);[mute reconcile:Policy epoch:Epoch];[mute externalMutation:@"friend" account:@"self" epoch:Epoch];
-    Policy=Snapshot(NO,NO,nil);NSUInteger before=writes;[mute reconcile:Policy epoch:Epoch];CHECK(writes==before && ![native[@"friend"] boolValue]);
-    journal=@{};native[@"friend"]=@YES;failCommit=YES;Policy=Snapshot(YES,NO,nil);[mute reconcile:Policy epoch:Epoch];CHECK([journal[@"friend"][@"phase"] isEqual:@"prepared"]);failCommit=NO;
-    [engine() reconcile:Policy epoch:Epoch];CHECK([journal[@"friend"][@"phase"] isEqual:@"revoked"]);Policy=Snapshot(NO,NO,nil);before=writes;[mute reconcile:Policy epoch:Epoch];CHECK(writes==before);
-    // A failed revocation must not revive old restoration authority on runtime reload.
-    journal=@{};native[@"friend"]=@YES;Policy=Snapshot(YES,NO,nil);[mute reconcile:Policy epoch:Epoch];
-    failRevoke=YES;[mute externalMutation:@"friend" account:@"self" epoch:Epoch];native[@"friend"]=@NO;
-    CHECK([journal[@"friend"][@"owned"] boolValue]);failRevoke=NO;before=writes;
-    Epoch++;Policy=Snapshot(NO,NO,nil);[engine() reconcile:Policy epoch:Epoch];
-    CHECK(writes==before && ![native[@"friend"] boolValue]);
     // Unified invitation: duplicate protection, current ordinary room preserved, ilink unsupported.
     Policy=Snapshot(YES,YES,nil);Mono *mono=[Mono new];mono.msgKey=@"invite-1";Info *info=[Info new];info.roomID=100;info.roomKey=7;info.roomType=1;info.contact=@"friend";info.monoMsg=mono;Invites *service=[Invites new];
     CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);
@@ -214,9 +194,16 @@ int main(void){@autoreleasepool{
     owner.cachedNativeSections=@[@[Row(0,@"friend",8,CSGroupRowKindSession),Row(1,@"ordinary",3,CSGroupRowKindSession),Row(2,@"chatroom_session_box",10,CSGroupRowKindAggregate)]];[Owners addObject:owner];
     CSGroupListAdapter *folded=[CSGroupListAdapter new];folded.controller=@"folded";folded.snapshotAccount=@"self";folded.cachedNativeSections=@[@[Row(0,@"ordinary",30,CSGroupRowKindSession)]];[Owners addObject:folded];
     CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@3]);CHECK(((CSGroupRow *)owner.cachedNativeSections[0][0]).unreadCount==8);
+    NSArray *badgeKey=owner.alertBadgeKey;NSNumber *badge=owner.alertBadge;
+    for(NSUInteger i=0;i<20;i++)CHECK([CSGroupListAdapter closeFriendAlertBadgeCount]==badge);
+    CHECK(owner.alertBadgeKey==badgeKey); // Same revision never rebuilds the projection.
+    FoldedNames=@[@"group@chatroom"];CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@3]);CHECK(owner.alertBadgeKey!=badgeKey);
+    owner.modelRevision++;owner.snapshotRevision=owner.modelRevision;
+    owner.cachedNativeSections=@[@[Row(0,@"friend",8,CSGroupRowKindSession),Row(1,@"ordinary",5,CSGroupRowKindSession)]];
+    CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@5]);
     owner.snapshotEpoch--;CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@0]);owner.snapshotEpoch=Epoch;
     owner.modelRevision++;CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@0]);Policy=Snapshot(NO,NO,nil);CHECK(![CSGroupListAdapter closeFriendAlertBadgeCount]);
     IncomingCallChecks();
     CallReplyChecks();
-    printf("Close-friend alerts: %lu focused checks passed (identity, durable mute, calls, reply, badge, payment policy)\n",(unsigned long)Checks);
+    printf("Close-friend alerts: %lu focused checks passed (identity, calls, reply, badge, payment policy)\n",(unsigned long)Checks);
 }return 0;}

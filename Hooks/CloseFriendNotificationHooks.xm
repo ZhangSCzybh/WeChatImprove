@@ -1,5 +1,4 @@
 #import "../Controllers/CSCloseFriendNotificationAdapter.h"
-#import "../Controllers/CSCloseFriendMuteAdapter.h"
 #import "../Controllers/CSCloseFriendCallAdapter.h"
 #import "../Controllers/CSCloseFriendBridge.h"
 #import "../Controllers/CSGroupListAdapter.h"
@@ -32,7 +31,7 @@ static BOOL ChatTab(id controller,NSUInteger index) {
     if(matches && NSThread.isMainThread)[TabOwners addObject:controller];return matches;
 }
 %ctor { dispatch_async(dispatch_get_main_queue(),^{
-    Requests=[NSMutableDictionary dictionary]; TabOwners=[NSHashTable weakObjectsHashTable]; [CSCloseFriendMuteAdapter start];
+    Requests=[NSMutableDictionary dictionary]; TabOwners=[NSHashTable weakObjectsHashTable];
     for(NSString *name in @[@"showQuickReplyItem:",@"showQuickReplyItem:timeout:"]) {
         __block IMP orig=NULL;SEL sel=NSSelectorFromString(name);BOOL timed=[name hasSuffix:@"timeout:"];
         IMP imp=timed?imp_implementationWithBlock(^(id owner,id item,double timeout){CSCloseFriendAlertSubject *s=ItemSubject(item);if(Silent(s))return;CSCFWithAlert(s,^{((void(*)(id,SEL,id,double))orig)(owner,sel,item,timeout);});}):imp_implementationWithBlock(^(id owner,id item){CSCloseFriendAlertSubject *s=ItemSubject(item);if(Silent(s))return;CSCFWithAlert(s,^{((void(*)(id,SEL,id))orig)(owner,sel,item);});});

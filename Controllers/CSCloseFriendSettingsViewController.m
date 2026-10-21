@@ -9,8 +9,8 @@
 @implementation CSCloseFriendSettingsViewController
 - (void)viewDidLoad {
     [super viewDidLoad]; self.title=@"密友";
-    self.keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"autoMute",@"rejectVoice",@"rejectVideo",@"callReplyEnabled",@"callReplyText",@"hidePrivacyIcons",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"unlockSeconds"];
-    self.labels=@[@"隐藏会话",@"隐藏联系人",@"隐藏转发候选",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏朋友圈内容",@"隐藏互动痕迹",@"隐藏状态",@"资料页显示添加到通讯录",@"静默消息通知",@"自动免打扰",@"拒接语音来电",@"拒接视频来电",@"挂断回复",@"挂断回复内容",@"隐藏全部朋友圈可见范围图标",@"隐藏密友设置入口",@"隐藏插件入口",@"允许生物识别解锁",@"摇动立即锁定",@"临时解锁时长"];
+    self.keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"rejectVoice",@"rejectVideo",@"callReplyEnabled",@"callReplyText",@"hidePrivacyIcons",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"unlockSeconds"];
+    self.labels=@[@"隐藏会话",@"隐藏联系人",@"隐藏转发候选",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏朋友圈内容",@"隐藏互动痕迹",@"隐藏状态",@"资料页显示添加到通讯录",@"静默消息通知",@"拒接语音来电",@"拒接视频来电",@"挂断回复",@"挂断回复内容",@"隐藏全部朋友圈可见范围图标",@"隐藏密友设置入口",@"隐藏插件入口",@"允许生物识别解锁",@"摇动立即锁定",@"临时解锁时长"];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(policyChanged:) name:CSCloseFriendPolicyDidChangeNotification object:nil];
 }
 - (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
@@ -33,7 +33,7 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return @[@"账号保护",@"保护选项"][section]; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if(section==0)return @"密码仅保存在本机钥匙串。临时解锁仍会静默通知、独立拒接来电。后台或账号切换会立即锁定。挂断回复默认关闭；开启后，仅对自动拒接的单人语音／视频来电发送私聊回复，同一人 5 分钟内最多一次。";
-    if(section==1)return @"长按微信首页顶部导航栏 1 秒直接临时解锁，或在首页搜索框输入完整密码解锁。开启“摇动立即锁定”后，临时解锁期间轻摇手机即可重新隐藏密友。密友隐藏时，搜索不显示“解锁后查看”占位，原生实时联想与网络搜索保持正常；解锁期间显示隐藏的密友设置入口。默认解锁 300 秒。免打扰恢复保留用户或远端后续修改。微信重启后，移出密友或停用功能可能仍保留免打扰，需在微信里手动关闭。";
+    if(section==1)return @"长按微信首页顶部导航栏 1 秒直接临时解锁，或在首页搜索框输入完整密码解锁。开启“摇动立即锁定”后，临时解锁期间轻摇手机即可重新隐藏密友。密友隐藏时，搜索不显示“解锁后查看”占位，原生实时联想与网络搜索保持正常；解锁期间显示隐藏的密友设置入口。默认解锁 300 秒。微信原生“消息免打扰”由你手动设置，插件不会自动开启或恢复。";
     return nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

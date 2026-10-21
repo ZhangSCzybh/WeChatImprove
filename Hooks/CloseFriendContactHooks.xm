@@ -1,25 +1,48 @@
 #import "../Controllers/CSCloseFriendContactAdapter.h"
 #import <objc/message.h>
 #import "../Controllers/CSCloseFriendGroupListAdapter.h"
+@interface CSCFContactsCache : NSObject
+@property(nonatomic,strong) CSCloseFriendContactProjection *projection;
+@property(nonatomic,copy) NSArray *keys;
+@property(nonatomic,copy) NSDictionary *sections;
+@property(nonatomic) NSUInteger revision,epoch;
+@end
+@implementation CSCFContactsCache @end
 static char ProjectionKey;
 static id (*OriginalKeys)(id,SEL);
 static id (*OriginalRows)(id,SEL,id);
 static CSCloseFriendContactProjection *Project(id logic) {
     CSCloseFriendSurface surface;
     if(!OriginalKeys || !OriginalRows || !CSCFContactLogicSurface(logic,&surface)) return nil;
+    CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
+    if(![snapshot concealsSurface:surface]) {objc_setAssociatedObject(logic,&ProjectionKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);return nil;}
     NSArray *keys=OriginalKeys(logic,NSSelectorFromString(@"getKeysArray"));
-    if(![keys isKindOfClass:NSArray.class]) return nil;
-    NSMutableDictionary *sections=[NSMutableDictionary dictionary];
-    for(id key in keys) { id rows=OriginalRows(logic,NSSelectorFromString(@"getContactsArrayWith:"),key); if([rows isKindOfClass:NSArray.class]) sections[key]=[rows copy]; }
-    CSCloseFriendContactProjection *projection=[[CSCloseFriendContactProjection alloc] initWithKeys:keys sections:sections snapshot:CSCloseFriendCurrentSnapshot() surface:surface identity:^NSString *(id item){return CSCloseFriendUserName(item);}];
-    objc_setAssociatedObject(logic,&ProjectionKey,projection,OBJC_ASSOCIATION_RETAIN_NONATOMIC); return projection;
+    if(![keys isKindOfClass:NSArray.class])return nil;
+    CSCFContactsCache *cache=objc_getAssociatedObject(logic,&ProjectionKey);
+    BOOL same=cache && cache.revision==snapshot.revision && cache.epoch==CSCloseFriendAccountEpoch() && [cache.keys isEqualToArray:keys];
+    NSMutableDictionary *sections=same ? nil : [NSMutableDictionary dictionary];
+    for(id key in keys) {
+        id rows=OriginalRows(logic,NSSelectorFromString(@"getContactsArrayWith:"),key);
+        if(![rows isKindOfClass:NSArray.class])rows=@[];
+        if(same && ![cache.sections[key] isEqualToArray:rows]) {same=NO;sections=[cache.sections mutableCopy];}
+        if(!same)sections[key]=[rows copy];
+    }
+    if(same)return cache.projection;
+    cache=[CSCFContactsCache new]; cache.keys=[keys copy]; cache.sections=sections;
+    cache.revision=snapshot.revision; cache.epoch=CSCloseFriendAccountEpoch();
+    cache.projection=[[CSCloseFriendContactProjection alloc] initWithKeys:keys sections:sections snapshot:snapshot surface:surface identity:^NSString *(id item){return CSCloseFriendUserName(item);}];
+    objc_setAssociatedObject(logic,&ProjectionKey,cache,OBJC_ASSOCIATION_RETAIN_NONATOMIC);return cache.projection;
 }
-static id Keys(id self,SEL cmd) { CSCloseFriendContactProjection *p=Project(self); return p ? p.keys : OriginalKeys(self,cmd); }
+static id Keys(id self,SEL cmd) {CSCloseFriendContactProjection *p=Project(self);return p ? p.keys : OriginalKeys(self,cmd);}
 static id Rows(id self,SEL cmd,id key) {
-    CSCloseFriendSurface surface; if(!CSCFContactLogicSurface(self,&surface)) return OriginalRows(self,cmd,key);
-    CSCloseFriendContactProjection *p=objc_getAssociatedObject(self,&ProjectionKey) ?: Project(self);
-    return p ? (p.sections[key] ?: @[]) : @[];
+    CSCloseFriendSurface surface;if(!CSCFContactLogicSurface(self,&surface))return OriginalRows(self,cmd,key);
+    CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
+    if(![snapshot concealsSurface:surface])return OriginalRows(self,cmd,key);
+    CSCFContactsCache *cache=objc_getAssociatedObject(self,&ProjectionKey);
+    CSCloseFriendContactProjection *p=cache && cache.revision==snapshot.revision && cache.epoch==CSCloseFriendAccountEpoch() ? cache.projection : Project(self);
+    return p.sections[key] ?: @[];
 }
+
 static void Hook0(NSString *cls,NSString *name,void (^body)(id,void(^)(void))) {
     __block IMP original=NULL; SEL selector=NSSelectorFromString(name);
     IMP replacement=imp_implementationWithBlock(^(id object){body(object,^{((void(*)(id,SEL))original)(object,selector);});});

@@ -18,10 +18,10 @@ for hook in "${hooks[@]}"; do
 done
 for arch in arm64 arm64e; do
  flags=(-target "$arch-apple-ios15.0" -isysroot "$sdk_dir" -fobjc-arc -fblocks -Wno-deprecated-declarations -Wno-unused-parameter -IControllers -IHeaders -IHooks -I"$theos_dir/vendor/include" -F"$theos_dir/vendor/lib")
- sources=(Controllers/CSCloseFriend{Policy,Crypto,Store,Account,Runtime,Signatures,Bridge,Manager,SettingsViewController,ContactProjection,ContactAdapter,GroupListAdapter,Navigation,SearchAdapter,ProfileAdapter,SocialProjection,SocialAdapter,TimelineAdapter,InteractionAdapter,StatusAdapter,AudienceAdapter,NotificationAdapter,MuteAdapter,CallAdapter,CallReply}.m)
+ sources=(Controllers/CSCloseFriend{Policy,Crypto,Store,Account,Runtime,Signatures,Bridge,Manager,SettingsViewController,ContactProjection,ContactAdapter,GroupListAdapter,Navigation,SearchAdapter,ProfileAdapter,SocialProjection,SocialAdapter,TimelineAdapter,InteractionAdapter,StatusAdapter,AudienceAdapter,NotificationAdapter,CallAdapter,CallReply}.m)
  if [[ "${1:-}" == "--surfaces" ]]; then sources=(Controllers/CSCloseFriend{ContactProjection,ContactAdapter,GroupListAdapter,Navigation,SearchAdapter,ProfileAdapter}.m); fi
  if [[ "${1:-}" == "--social" ]]; then sources=(Controllers/CSCloseFriend{SocialProjection,SocialAdapter,TimelineAdapter,InteractionAdapter,StatusAdapter,AudienceAdapter}.m); fi
- if [[ "${1:-}" == "--alerts" ]]; then sources=(Controllers/CSCloseFriend{NotificationAdapter,MuteAdapter,CallAdapter,CallReply}.m Controllers/CSGroupListAdapter.m Controllers/CSPaymentAutomation.m); fi
+ if [[ "${1:-}" == "--alerts" ]]; then sources=(Controllers/CSCloseFriend{NotificationAdapter,CallAdapter,CallReply}.m Controllers/CSGroupListAdapter.m Controllers/CSPaymentAutomation.m); fi
  for source in "${sources[@]}"; do
   xcrun --sdk iphoneos clang "${flags[@]}" -Wall -Wextra -Werror -Wno-unused-parameter -c "$source" -o "$work/$(basename "$source").$arch.o"
  done

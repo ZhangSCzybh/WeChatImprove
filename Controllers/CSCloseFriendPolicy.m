@@ -5,7 +5,7 @@ static BOOL CSBoolean(id value) { return [value isKindOfClass:NSNumber.class] &&
 static BOOL CSName(id value) { return [value isKindOfClass:NSString.class] && [value length]>0 && [value length]<=512 && [value rangeOfCharacterFromSet:NSCharacterSet.controlCharacterSet].location==NSNotFound; }
 static id CSInvalid(NSError **error) { if(error)*error=[NSError errorWithDomain:@"CSCloseFriendPolicy" code:1 userInfo:@{NSLocalizedDescriptionKey:@"Invalid close-friend profile."}]; return nil; }
 NSDictionary *CSCloseFriendDefaultOptions(void) {
-    return @{@"hideSessions":@YES,@"hideContacts":@YES,@"hideForwarding":@YES,@"hideTags":@YES,@"hideSearch":@YES,@"hideTimeline":@YES,@"hideInteractions":@YES,@"hideStatus":@YES,@"maskProfiles":@YES,@"silenceMessages":@YES,@"autoMute":@YES,@"rejectVoice":@YES,@"rejectVideo":@YES,@"callReplyEnabled":@NO,@"callReplyText":@"现在不方便接听，请留言。",@"hidePrivacyIcons":@YES,@"showBadges":@NO,@"hideSettingsEntry":@NO,@"hidePluginEntry":@NO,@"biometric":@NO,@"shakeToLock":@NO,@"unlockSeconds":@300};
+    return @{@"hideSessions":@YES,@"hideContacts":@YES,@"hideForwarding":@YES,@"hideTags":@YES,@"hideSearch":@YES,@"hideTimeline":@YES,@"hideInteractions":@YES,@"hideStatus":@YES,@"maskProfiles":@YES,@"silenceMessages":@YES,@"rejectVoice":@YES,@"rejectVideo":@YES,@"callReplyEnabled":@NO,@"callReplyText":@"现在不方便接听，请留言。",@"hidePrivacyIcons":@YES,@"showBadges":@NO,@"hideSettingsEntry":@NO,@"hidePluginEntry":@NO,@"biometric":@NO,@"shakeToLock":@NO,@"unlockSeconds":@300};
 }
 NSDictionary *CSCloseFriendNormalizeProfile(id profile, NSError **error) {
     if (![profile isKindOfClass:NSDictionary.class] || [profile count]>4) return CSInvalid(error);
@@ -24,6 +24,8 @@ NSDictionary *CSCloseFriendNormalizeProfile(id profile, NSError **error) {
     if (![input isKindOfClass:NSDictionary.class]) return CSInvalid(error);
     NSMutableDictionary *options=[CSCloseFriendDefaultOptions() mutableCopy];
     for(id key in input) {
+        // Retired in 1.8-58. Accept old encrypted profiles without restoring the feature.
+        if([key isEqual:@"autoMute"]) { if(!CSBoolean(input[key]))return CSInvalid(error); continue; }
         if(!options[key])return CSInvalid(error);
         id value=input[key];
         if([key isEqual:@"unlockSeconds"]) {
@@ -51,13 +53,15 @@ NSDictionary *CSCloseFriendNormalizeProfile(id profile, NSError **error) {
     } return self;
 }
 - (BOOL)containsUserName:(NSString *)name { return CSName(name) && [self.protectedUserNames containsObject:name]; }
-- (BOOL)hidesUserName:(NSString *)name surface:(CSCloseFriendSurface)surface {
-    if(!CSName(name))return NO;
-    // An unreadable/unknown-account snapshot cannot safely classify membership. Fail closed on presentation.
+- (BOOL)concealsSurface:(CSCloseFriendSurface)surface {
     if(self.blocked)return YES;
-    if(!self.enabled || self.revealed || ![self containsUserName:name])return NO;
-    NSArray *keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles"];
-    return surface<keys.count && [self.options[keys[surface]] boolValue];
+    if(!self.enabled || self.revealed || !self.protectedUserNames.count)return NO;
+    static NSString *const keys[]={@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles"};
+    return surface<sizeof(keys)/sizeof(*keys) && [self.options[keys[surface]] boolValue];
+}
+- (BOOL)hidesUserName:(NSString *)name surface:(CSCloseFriendSurface)surface {
+    if(![self concealsSurface:surface] || !CSName(name))return NO;
+    return self.blocked || [self.protectedUserNames containsObject:name];
 }
 - (BOOL)silencesSession:(NSString *)session sender:(NSString *)sender { return self.enabled && [self.options[@"silenceMessages"] boolValue] && ([self containsUserName:session] || [self containsUserName:sender]); }
 - (BOOL)rejectsCaller:(NSString *)caller chatRoom:(NSString *)room video:(BOOL)video { return self.enabled && [self.options[video?@"rejectVideo":@"rejectVoice"] boolValue] && ([self containsUserName:caller] || [self containsUserName:room]); }
