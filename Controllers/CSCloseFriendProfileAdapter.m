@@ -78,23 +78,6 @@ BOOL CSCFProfileBlocksAction(id object) {
     if(CSCloseFriendCurrentSnapshot().blocked) return YES;
     return ![actualUserName hasSuffix:@"@chatroom"] && CSCloseFriendShouldHideUserName(actualUserName,CSCloseFriendSurfaceProfile);
 }
-BOOL CSCFProfileBlocksNavigation(id object) {
-    // Keep ordinary/revealed native routing and the existing binding validation.
-    // Only a concealed CURRENT profile receives this read-only exception.
-    if(!CSCFProfileBlocksAction(object)) return NO;
-    if(CSCloseFriendCurrentSnapshot().blocked) return YES;
-    if(CSCFIsClass(object,@"ContactInfoViewController")) {
-        CSCFProfileState *state=objc_getAssociatedObject(object,&ProfileKey);
-        return !state || state.epoch!=CSCloseFriendAccountEpoch();
-    }
-    CSCFProfileAssistBinding *binding=objc_getAssociatedObject(object,&AssistBindingKey);
-    CSCFProfileState *state=objc_getAssociatedObject(binding.owner,&ProfileKey);
-    NSString *actualUserName=CSCloseFriendUserName(CSCloseFriendRead(object,@"m_contact"));
-    return !binding || !state || state.activeAssist!=object ||
-        state.epoch!=CSCloseFriendAccountEpoch() || binding.epoch!=state.epoch ||
-        binding.generation!=state.generation || ![binding.userName isEqual:state.userName] ||
-        ![binding.userName isEqual:actualUserName];
-}
 void CSCFProfileWithNativePresentation(id object,void (^render)(void)) {
     if(!NSThread.isMainThread || !CSCFProfileBlocksAction(object)) { render(); return; }
     NSUInteger depth=[objc_getAssociatedObject(object,&PresentationDepthKey) unsignedIntegerValue];
