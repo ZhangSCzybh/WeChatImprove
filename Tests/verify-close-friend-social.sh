@@ -18,7 +18,7 @@ def body(source,marker):
    if not depth: return source[start:end+1]
 s=Path('Controllers/CSCloseFriendTimelineAdapter.m').read_text()
 a=s.index('@interface CSCFTimelineState'); b=s.index('static void ClearLikes')
-(out/'TimelineBodies.h').write_text(s[a:b]+'\n'+'\n'.join(body(s,m) for m in ['static void ClearLikes(', 'static CSCFTimelineState *State(', 'id CSCFTimelineFacade(', 'static CSCFTimelineScope *Enter(', 'static void Leave(', 'static NSArray *ProjectedPosts(', 'static BOOL ModelScoped(', 'static NSArray *ProjectedUsers(', 'static void InstallModel(']))
+(out/'TimelineBodies.h').write_text(s[a:b]+'\n'+'\n'.join(body(s,m) for m in ['static void ClearLikes(', 'static CSCFTimelineState *State(', 'id CSCFTimelineFacade(', 'static CSCFTimelineScope *Enter(', 'static void Leave(', 'static BOOL TimelineNeedsPresentation(', 'static void FinishTimelineLayout(', 'static void RefreshTimelinePresentation(id owner) {', 'static void InstallTimelinePresentation(', 'static NSArray *ProjectedPosts(', 'static BOOL ModelScoped(', 'static NSArray *ProjectedUsers(', 'static void InstallModel(']))
 s=Path('Controllers/CSCloseFriendSocialAdapter.m').read_text()
 bridge=Path('Controllers/CSCloseFriendBridge.m').read_text()
 (out/'SocialRouteBodies.h').write_text(body(bridge,'NSString *CSCloseFriendUserName(')+'\n'+'\n'.join(body(s,m) for m in ['void CSCFSocialHook1(', 'static void RefreshRoute(', 'void CSCFSocialProtectRoute(']))

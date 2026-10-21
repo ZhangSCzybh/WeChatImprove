@@ -20,7 +20,11 @@ static BOOL CSCFPageIsCurrent(id page) {NSNumber *old=objc_getAssociatedObject(p
 static NSMapTable *Refreshes;
 static void CSCFSocialTrack(id owner,void(^refresh)(id)) {if(!Refreshes) Refreshes=[NSMapTable weakToStrongObjectsMapTable]; [Refreshes setObject:[refresh copy] forKey:owner];}
 static void CSCFSocialClearCaches(__unused id owner,__unused NSArray *names) {}
-static BOOL CSCFCallVoid(__unused id page,__unused NSString *selector) {return NO;}
+static BOOL CSCFCallVoid(id page,NSString *name) {
+    SEL selector=NSSelectorFromString(name);
+    if(!CSCloseFriendMethodMatches(class_getInstanceMethod([page class],selector),"v@:")) return NO;
+    ((void(*)(id,SEL))objc_msgSend)(page,selector); return YES;
+}
 static void CSCFReloadTables(__unused id page) {}
 static NSMapTable *RouteGates;
 static BOOL CSCFSocialGate(id owner,CSCloseFriendSurface surface,BOOL force) {
@@ -86,8 +90,7 @@ static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(
 - (id)layoutStylesOfLikeUserWithDataItem:(WCDataItem *)item width:(__unused double)width isSpringStyle:(__unused BOOL)spring {NSArray *names=self.styleCache[item.itemID]; if(!names) self.styleCache[item.itemID]=names=item.likeUsers; return names;}
 - (double)likeUserHeightForWidth:(__unused double)width withDataItem:(WCDataItem *)item isSpringStyle:(__unused BOOL)spring {return item.likeCount*20;}
 @end
-@interface WCTimeLineViewController : NSObject @end
-@implementation WCTimeLineViewController @end
+#include "CloseFriendTimelineLayoutFixture.h"
 @interface InteractionPage : NSObject
 @property(nonatomic,strong) NSMutableArray *_arrCommentList;
 @end
@@ -161,7 +164,9 @@ static void Policy(BOOL revealed,NSUInteger revision) {
 #include "CloseFriendSocialRouteFixture.h"
 int main(void) { @autoreleasepool {
     Check(TestSocialRoutes()==0);
-    Policy(NO,1); InstallModel();
+    Policy(NO,1); InstallModel(); InstallTimelinePresentation();
+    Check(TestTimelineFirstLayout()==0);
+    Policy(NO,1);
     TableMethod(@"tableView:cellForRowAtIndexPath:","@@:@@"); TableMethod(@"tableView:heightForRowAtIndexPath:","d@:@@");
     NSDictionary *ordinary=@{@"username":@"alice"}, *hidden=@{@"username":@"secret"}, *reply=@{@"username":@"alice",@"refUserName":@"secret"};
     WCDataItem *post=[WCDataItem new]; post.username=@"alice"; post.itemID=@"post-a"; post.likeUsers=@[ordinary,hidden]; post.commentUsers=@[hidden,reply,ordinary]; post.isPrivate=YES; post.selectContacts=[NSSet setWithArray:@[@"alice",@"secret"]]; post.selectTags=[NSSet setWithObject:@"original-tag"];

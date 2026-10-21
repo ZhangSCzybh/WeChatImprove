@@ -17,6 +17,13 @@ static void Guard1(NSString *cls,NSString *name) {
     IMP replacement=imp_implementationWithBlock(^(id object,id argument){if(!CSCFProfileBlocksAction(object)) ((void(*)(id,SEL,id))original)(object,selector,argument);});
     if(!CSCloseFriendInstallHook(cls,name,replacement,&original,"v@:@")) imp_removeBlock(replacement);
 }
+static void Navigate0(NSString *cls,NSString *name) {
+    __block IMP original=NULL; SEL selector=NSSelectorFromString(name);
+    IMP replacement=imp_implementationWithBlock(^(id object){
+        if(!CSCFProfileBlocksNavigation(object)) ((void(*)(id,SEL))original)(object,selector);
+    });
+    if(!CSCloseFriendInstallHook(cls,name,replacement,&original,"v@:")) imp_removeBlock(replacement);
+}
 static void Render0(NSString *cls,NSString *name) {
     __block IMP original=NULL; SEL selector=NSSelectorFromString(name);
     IMP replacement=imp_implementationWithBlock(^(id object){
@@ -40,10 +47,15 @@ static void DisplayFlag(NSString *cls,NSString *name) {
         if(!CSCloseFriendInstallHook(@"ContactInfoViewController",name,replacement,&original,"v@:B")) imp_removeBlock(replacement);
     }
     for(NSString *cls in @[@"CBaseContactInfoAssist",@"WeixinContactInfoAssist"]) {
-        for(NSString *name in @[@"onAddToContacts",@"doAddContact",@"doSendVerifyOrAddContact",@"onVerifyContactOk",@"doVerifyContactOk",@"onOpenIMVerifyContactOk",@"onClickSendVerifyMsg",@"onSayHelloToContact",@"onOpenVoipView",@"onOpenVoiceVoipView",@"doDeleteContact",@"opEditRemarkName",@"opEditSetPermission",@"onSocialInfoHandle",@"showAlbumList",@"opShareMyFriend"]) Guard0(cls,name);
+        for(NSString *name in @[@"onAddToContacts",@"doAddContact",@"doSendVerifyOrAddContact",@"onVerifyContactOk",@"doVerifyContactOk",@"onOpenIMVerifyContactOk",@"onClickSendVerifyMsg",@"onSayHelloToContact",@"onOpenVoipView",@"onOpenVoiceVoipView",@"doDeleteContact",@"opEditRemarkName",@"opEditSetPermission",@"opShareMyFriend"]) Guard0(cls,name);
+        // These callbacks push WeChat's own album/social-info pages. Album content
+        // masking belongs to its adapter, not these read-only entrance callbacks.
+        for(NSString *name in @[@"onSocialInfoHandle",@"showAlbumList"]) Navigate0(cls,name);
         for(NSString *name in @[@"onNewMessage:",@"onOpenVoipActionSheet:",@"onStartChat:",@"startForAddVerifyMsg:",@"onDoVerifyByAlertView:",@"opEditRemarkNameInViewController:"]) Guard1(cls,name);
     }
     for(NSString *name in @[@"onAddToContact",@"onSendVerifyMsg",@"onVerifyOK",@"onSayHello",@"onRemoveContact",@"onShareMyFriend",@"onTapAtTextStateHeadButton",@"onTextStateJumpSource",@"onFollowTextState"]) Guard0(@"ContactInfoViewController",name);
+    // jumpToContentViewController: opens a message controller in 8.0.78; it is
+    // intentionally kept with chat actions, not the two read-only routes above.
     for(NSString *name in @[@"onNewMessage:",@"onNewMessageWithPushOnTop:",@"onTalk:",@"jumpToContentViewController:",@"onVerifyOKWithContact:",@"onDeleteContact:",@"onTapAtTextStateDetailButtonWithHandler:"]) Guard1(@"ContactInfoViewController",name);
     __block IMP message=NULL;
     IMP replacement=imp_implementationWithBlock(^(id object,id argument,id info){if(!CSCFProfileBlocksAction(object)) ((void(*)(id,SEL,id,id))message)(object,NSSelectorFromString(@"onNewMessage:requestInfo:"),argument,info);});

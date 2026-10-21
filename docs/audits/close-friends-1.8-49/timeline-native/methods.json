@@ -1,0 +1,106 @@
+[
+  {
+    "cls": "WCBaseTimelineViewController",
+    "kind": "instance",
+    "selector": "initBackgroundView",
+    "address": "0x106b58628",
+    "end": "0x106b58958",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "viewDidAppear:",
+    "address": "0x10a0b747c",
+    "end": "0x10a0b7b68",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "reloadDataWrap",
+    "address": "0x10a0b9048",
+    "end": "0x10a0b9104",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "reloadTableView",
+    "address": "0x10a0b9114",
+    "end": "0x10a0b91ec",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "p_reloadTableViewContent",
+    "address": "0x10a0b926c",
+    "end": "0x10a0b92b0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "handleAfterReloadTableView",
+    "address": "0x10a0b92b0",
+    "end": "0x10a0b9310",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "loadTableFooterView",
+    "address": "0x10a0b9320",
+    "end": "0x10a0b965c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "layoutTableFooterView",
+    "address": "0x10a0b965c",
+    "end": "0x10a0b98f8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "viewDidLayoutSubviews",
+    "address": "0x10a0bae80",
+    "end": "0x10a0bb2e8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "viewDidLoad",
+    "address": "0x10a0bbc40",
+    "end": "0x10a0bc6bc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "tableView:cellForRowAtIndexPath:",
+    "address": "0x10a0c68e8",
+    "end": "0x10a0c7374",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "scrollViewDidScroll:",
+    "address": "0x10a0cc8c0",
+    "end": "0x10a0cd170",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCTimeLineViewController",
+    "kind": "instance",
+    "selector": "updateContentOffset",
+    "address": "0x10a0ee27c",
+    "end": "0x10a0ee3dc",
+    "types": "v16@0:8"
+  }
+]

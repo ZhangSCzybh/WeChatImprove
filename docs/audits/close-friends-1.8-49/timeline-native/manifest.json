@@ -1,0 +1,102 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "disassembly": [
+    {
+      "file": "WCBaseTimelineViewController--initBackgroundView.asm",
+      "start": "0x106b58628",
+      "stop": "0x106b58958",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--viewDidAppear_.asm",
+      "start": "0x10a0b747c",
+      "stop": "0x10a0b7b68",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--reloadDataWrap.asm",
+      "start": "0x10a0b9048",
+      "stop": "0x10a0b9104",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--reloadTableView.asm",
+      "start": "0x10a0b9114",
+      "stop": "0x10a0b91ec",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--p_reloadTableViewContent.asm",
+      "start": "0x10a0b926c",
+      "stop": "0x10a0b92b0",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--handleAfterReloadTableView.asm",
+      "start": "0x10a0b92b0",
+      "stop": "0x10a0b9310",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--loadTableFooterView.asm",
+      "start": "0x10a0b9320",
+      "stop": "0x10a0b965c",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--layoutTableFooterView.asm",
+      "start": "0x10a0b965c",
+      "stop": "0x10a0b98f8",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--viewDidLayoutSubviews.asm",
+      "start": "0x10a0bae80",
+      "stop": "0x10a0bb2e8",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--viewDidLoad.asm",
+      "start": "0x10a0bbc40",
+      "stop": "0x10a0bc6bc",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--tableView_cellForRowAtIndexPath_.asm",
+      "start": "0x10a0c68e8",
+      "stop": "0x10a0c7374",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--scrollViewDidScroll_.asm",
+      "start": "0x10a0cc8c0",
+      "stop": "0x10a0cd170",
+      "truncated": false
+    },
+    {
+      "file": "WCTimeLineViewController--updateContentOffset.asm",
+      "start": "0x10a0ee27c",
+      "stop": "0x10a0ee3dc",
+      "truncated": false
+    }
+  ],
+  "files": {
+    "WCTimeLineViewController--viewDidLayoutSubviews.asm": "fc3ef583827662bcc673c709afbbf2a38abf116c151dc33212d739bffaeb54ae",
+    "WCBaseTimelineViewController--initBackgroundView.asm": "cd84aa68246d070c5f93b8d88ba5a566aeacaac020b02aae0ea925dd3d4e34ca",
+    "WCTimeLineViewController--scrollViewDidScroll_.asm": "e68eedc0bd8a9b0ff405a873ede95e6b4a5300b1ed1622327a6d87d51c24043c",
+    "WCTimeLineViewController--tableView_cellForRowAtIndexPath_.asm": "394f43f29ec4ede0a4d4d79333b4ee85fe7d3100bfe33f03494b6ceb649ea7ff",
+    "WCTimeLineViewController--reloadDataWrap.asm": "c25762674a09a96a78ea20f6c8a74595f51856acf575ebf8822e4bd721abaed1",
+    "WCTimeLineViewController--handleAfterReloadTableView.asm": "92d822aa8a706478346d14fa8d128e63b00990231a397047ea3452d2ecd36abc",
+    "methods.json": "c2e6398213cbf634efea2556d4039aed37d38a5394072ade11a06951ad8e2bbf",
+    "WCTimeLineViewController--viewDidAppear_.asm": "745912edf7b7790c429bb709e848b48fc60dc10ccdce6e79ef83dfd4c7caebe7",
+    "WCTimeLineViewController--viewDidLoad.asm": "78b61be387600079e3daf921d45661f1cdac8cea27d051161d9946c201454b5e",
+    "disassemble.py": "10db41736e2608f4c299944b471d2d5dad8937d376b36b4200a9772798047c9e",
+    "WCTimeLineViewController--reloadTableView.asm": "a5ad202ff25d7857b18ef019dde8c8eaae32777f8d3004d51bca33ef287e24c4",
+    "WCTimeLineViewController--layoutTableFooterView.asm": "37c875a5dd8e05ea140febfc867161f4f2c240ddd74067cdb8460338b61621cf",
+    "WCTimeLineViewController--p_reloadTableViewContent.asm": "2db3449f910eec5c96f8bb43970fe7dedb1b085957ad17f9ba8af378f6ad5ca4",
+    "WCTimeLineViewController--updateContentOffset.asm": "846090e51227e64a3acb11193678f1c8b1fefe7613d8d1e0ead8814bf120072e",
+    "WCTimeLineViewController--loadTableFooterView.asm": "a8add90378f945bdfcf655d2c6da1a95ae44058ba5c1e3cfaeedd3ac75aab963"
+  }
+}
