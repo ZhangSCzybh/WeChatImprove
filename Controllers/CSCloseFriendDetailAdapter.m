@@ -207,7 +207,8 @@ static void DetailInstallRouter(void) {
             CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
             // Keep the same native detail surface during temporary reveal so relocking an
             // already-open page can refresh its interaction projection immediately.
-            BOOL nativeRequired=snapshot.blocked || (snapshot.enabled && snapshot.protectedUserNames.count && ([snapshot.options[@"hideInteractions"] boolValue] || [snapshot.options[@"hideTimeline"] boolValue]));
+            BOOL nativeRequired=snapshot.blocked || (snapshot.enabled && ([snapshot.options[@"hidePrivacyIcons"] boolValue] ||
+                (snapshot.protectedUserNames.count && ([snapshot.options[@"hideInteractions"] boolValue] || [snapshot.options[@"hideTimeline"] boolValue]))));
             if(DetailReady && nativeRequired) return NO;
             return ((BOOL(*)(id,SEL))original)(object,selector);
         });

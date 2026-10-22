@@ -21,6 +21,13 @@ syntax = ['xcrun', '--sdk', 'iphoneos', 'clang++', '-fsyntax-only', '-fobjc-arc'
           '-I' + str(theos / 'vendor/include'), '-F' + str(theos / 'vendor/lib'),
           '-Wno-deprecated-declarations', '-Wno-nullability-completeness']
 features = 0
+# These use independent encrypted state, outside the configuration backup registry.
+# Their native hooks are registered asynchronously, not through the settings-consumer gate.
+independent = {'CloseFriendCallHooks.xm', 'CloseFriendCallReplyHooks.xm',
+               'CloseFriendContactHooks.xm', 'CloseFriendLifecycleHooks.xm',
+               'CloseFriendNotificationHooks.xm', 'CloseFriendProfileHooks.xm',
+               'CloseFriendSearchHooks.xm', 'CloseFriendSocialHooks.xm'}
+independent_checked = 0
 for path in sorted((root / 'Hooks').glob('*.xm')):
     generated = subprocess.check_output([str(logos), str(path)], text=True)
     output = pathlib.Path(sys.argv[1]) / (path.stem + '.mm')
@@ -34,10 +41,21 @@ for path in sorted((root / 'Hooks').glob('*.xm')):
         continue
     features += 1
     ctor = generated.index('static __attribute__((constructor))')
+    if path.name in independent:
+        assert 'dispatch_async(dispatch_get_main_queue(),' in generated[ctor:], f'{path.name}: native registration must be deferred'
+        adapter = generated
+        if path.name == 'CloseFriendSocialHooks.xm':
+            assert 'CSCFSocialInstall();' in generated[ctor:], 'social native adapter must be registered'
+            adapter += (root / 'Controllers/CSCloseFriendSocialAdapter.m').read_text()
+        assert 'CSCloseFriendInstallHook(' in adapter, f'{path.name}: missing independent native adapter'
+        independent_checked += 1
+        features -= 1
+        continue
     callback = generated.index('CSBackupWhenReady(', ctor)
     assert not re.search(r'\b(?:MSHookMessageEx|MSHookFunction|class_addMethod)\(', generated[ctor:callback]), f'{path.name}: hooks installed before readiness'
     assert 'CSBackupWhenReady(^{ ' in generated[callback:] or 'CSBackupWhenReady(^{\n' in generated[callback:], f'{path.name}: missing guarded init block'
-print(f'Backup bootstrap: Logos generated {features} gated feature files and 2 always-available recovery files')
+assert independent_checked == len(independent), 'independent native adapters must all be checked'
+print(f'Backup bootstrap: Logos generated {features} gated feature files, {independent_checked} independent native adapters and 2 recovery files')
 if sdk.returncode == 0:
     compiled = subprocess.run(syntax + ['-x', 'objective-c', str(root / 'Controllers/CSBackupBootstrap.m')], capture_output=True, text=True)
     assert compiled.returncode == 0, 'CSBackupBootstrap.m: iOS syntax failed\n' + compiled.stderr

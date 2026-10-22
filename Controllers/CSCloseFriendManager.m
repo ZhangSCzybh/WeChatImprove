@@ -41,6 +41,8 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 @property(nonatomic,strong) NSTimer *timer;
 @property(nonatomic,strong) CSCloseFriendShakeMonitor *shakeMonitor;
 @property(nonatomic,weak) UIViewController *recoveryPage;
+@property(nonatomic,weak) UILongPressGestureRecognizer *recoveryGesture;
+@property(nonatomic) NSUInteger recoveryEpoch;
 @property(nonatomic) BOOL started, lastRevealed, authenticating, backgroundCoverRequired, routingProtectedChat, policyRefreshScheduled;
 @end
 @implementation CSCloseFriendManager
@@ -72,7 +74,7 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     @synchronized(self) { if(self.policyRefreshScheduled)return; self.policyRefreshScheduled=YES; }
     dispatch_async(dispatch_get_main_queue(),^{
         @synchronized(self) { self.policyRefreshScheduled=NO; }
-        [self refreshShakeMonitoring]; [self startExpiryTimer];
+        [self refreshShakeMonitoring]; [self refreshRecoveryGesture]; [self startExpiryTimer];
         [NSNotificationCenter.defaultCenter postNotificationName:CSCloseFriendPolicyDidChangeNotification object:nil];
     });
 }
@@ -258,14 +260,29 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     }];
 }
 - (void)recovery:(UILongPressGestureRecognizer *)gesture {
-    if(gesture.state!=UIGestureRecognizerStateBegan || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return;
+    if(gesture!=self.recoveryGesture || !gesture.enabled || gesture.state!=UIGestureRecognizerStateBegan || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return;
     UIViewController *page=self.recoveryPage;
     if(!page || page.navigationController.topViewController!=page || page.presentedViewController || gesture.view!=page.navigationController.navigationBar) return;
+    NSUInteger epoch=self.recoveryEpoch;
     [self refreshAccount];
+    CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
+    if(epoch!=CSCloseFriendAccountEpoch() || snapshot.blocked || !snapshot.enabled || ![snapshot.options[@"longPressUnlockEnabled"] boolValue] || gesture.minimumPressDuration!=[snapshot.options[@"longPressUnlockDuration"] doubleValue]) return;
     if([self.runtime revealWithShortcutToken:self.runtime.authenticationToken]) {
         self.lastRevealed=YES;
         [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
     }
+}
+- (void)refreshRecoveryGesture {
+    UILongPressGestureRecognizer *gesture=self.recoveryGesture;
+    if(!gesture) return;
+    CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
+    NSTimeInterval duration=[snapshot.options[@"longPressUnlockDuration"] doubleValue];
+    NSUInteger epoch=CSCloseFriendAccountEpoch();
+    // Cancel an in-flight touch when its account or threshold changes.
+    if(self.recoveryEpoch!=epoch || gesture.minimumPressDuration!=duration) gesture.enabled=NO;
+    self.recoveryEpoch=epoch;
+    gesture.minimumPressDuration=duration;
+    gesture.enabled=!snapshot.blocked && snapshot.enabled && [snapshot.options[@"longPressUnlockEnabled"] boolValue];
 }
 - (void)attachRecoveryGestureTo:(UIViewController *)controller {
     // Some WeChat builds expose an NSObject main-frame owner with curViewController.
@@ -274,10 +291,15 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     self.recoveryPage=page;
     UINavigationBar *bar=self.recoveryPage.navigationController.navigationBar; if(!bar)return;
     static char recoveryKey;
-    if(objc_getAssociatedObject(bar,&recoveryKey))return;
-    UILongPressGestureRecognizer *gesture=[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(recovery:)]; gesture.minimumPressDuration=1.0;
-    gesture.cancelsTouchesInView=NO;
-    [bar addGestureRecognizer:gesture]; objc_setAssociatedObject(bar,&recoveryKey,gesture,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    UILongPressGestureRecognizer *gesture=objc_getAssociatedObject(bar,&recoveryKey);
+    if(!gesture) {
+        gesture=[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(recovery:)];
+        gesture.cancelsTouchesInView=NO;
+        [bar addGestureRecognizer:gesture]; objc_setAssociatedObject(bar,&recoveryKey,gesture,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    if(self.recoveryGesture!=gesture) self.recoveryGesture.enabled=NO;
+    self.recoveryGesture=gesture;
+    [self refreshRecoveryGesture];
 }
 
 @end

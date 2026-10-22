@@ -163,6 +163,10 @@ int main(void) { @autoreleasepool {
     Policy(YES,NO,NO); [page setM_contact:secret]; refresh(page);
     Check(page->m_view->displayed.count==3);
     Policy(NO,NO,YES); refresh(page); Check([config Moments_enableFlutterUserPage] && [config Moments_enableFlutterTimeline]);
+    for(NSNumber *hide in @[@YES,@NO]) {
+        Snapshot=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"self" profile:@{@"enabled":@YES,@"friends":@[],@"groups":@[],@"options":@{@"hideTimeline":@NO,@"hideInteractions":@NO,@"hidePrivacyIcons":hide}} revealed:YES revision:Epoch blocked:NO];
+        Check([config Moments_enableFlutterUserPage]==!hide.boolValue && [config Moments_enableFlutterTimeline]==!hide.boolValue);
+    }
     // UI construction failure still restores original controller arrays.
     @try {AlbumWithEmptyPhotos(page,^{@throw [NSException exceptionWithName:@"fixture" reason:nil userInfo:nil];});} @catch(__unused NSException *exception) {}
     Check(page->m_arrPhotoDatas==posts && page->m_starredDataItems==stars);

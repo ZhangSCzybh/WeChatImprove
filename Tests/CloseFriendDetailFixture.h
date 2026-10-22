@@ -162,6 +162,10 @@ int main(void) {@autoreleasepool {
     Check([page tableView:nil numberOfRowsInSection:0]==3,@"timeline-only protection preserves all detail interactions");
     view=[page tableView:nil cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1]]; actions=page.actions; [page onClickContent:view way:0]; Check(page.actions==actions+1 && page.actedComment==hidden,@"disabled interaction hiding preserves native click");
     Check(![WCTimelineRouterHelper isFlutterDetailEnabled],@"timeline-only protection still selects refreshable native detail");
+    for(NSNumber *hide in @[@YES,@NO]) {
+        Snapshot=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"fixture" profile:@{@"enabled":@YES,@"friends":@[],@"groups":@[],@"options":@{@"hideTimeline":@NO,@"hideInteractions":@NO,@"hidePrivacyIcons":hide}} revealed:YES revision:6 blocked:NO];
+        Check([WCTimelineRouterHelper isFlutterDetailEnabled]==!hide.boolValue,@"icon option alone selects native detail even with empty protected list and during reveal");
+    }
     Epoch++; Check([page tableView:nil numberOfRowsInSection:0]==0,@"old-account detail cannot render another account's interactions");
     fprintf(stdout,"Close-friend detail: %lu checks passed (native ivar rendering, likes/comments, source preservation, action identity, reveal/relock, routes).\n",(unsigned long)Checks);
 } return 0;}

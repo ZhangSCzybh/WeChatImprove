@@ -1,0 +1,27 @@
+{
+  "original_files_checked": 488,
+  "unchanged_original_files": 471,
+  "changed_original_files": [
+    "Controllers/CSBackupEngine.m",
+    "Controllers/CSBackupManager.h",
+    "Controllers/CSBackupManager.m",
+    "Controllers/CSBackupSettingsViewController.m",
+    "Controllers/CSBackupStore.h",
+    "Controllers/CSBackupStore.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "README.md",
+    "Tests/verify-backup-bootstrap.sh",
+    "control"
+  ],
+  "removed_original_files": [
+    "Controllers/CSBackupInfo.h",
+    "Controllers/CSBackupInfo.m",
+    "Controllers/CSBackupLegacyReader.h",
+    "Controllers/CSBackupLegacyReader.m",
+    "Tests/BackupLegacyTests.m",
+    "Tests/verify-backup-legacy.sh"
+  ],
+  "unexpected_changes": [],
+  "audit_links_valid": true
+}

@@ -3,7 +3,6 @@
 #import "CSBackupCodec.h"
 #import "CSBackupAssets.h"
 #import "CSBackupRegistry.h"
-#import "CSBackupLegacyReader.h"
 #import "CSBackupScheduler.h"
 #import "CSBackupBootstrap.h"
 #import "CSServiceCenter.h"
@@ -17,7 +16,6 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
 @property(nonatomic) CSBackupScheduler *scheduler;
 @property(nonatomic) dispatch_queue_t queue;
 @property(nonatomic) dispatch_source_t timer;
-@property(nonatomic) NSURL *legacyRoot;
 @property(nonatomic,copy) NSString *standardDomain;
 @property(nonatomic,copy) NSString *installationID;
 @property(nonatomic,copy) NSString *signature;
@@ -31,7 +29,7 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
         _queue=dispatch_queue_create("com.wechat.improve.backup",DISPATCH_QUEUE_SERIAL);_scheduler=[CSBackupScheduler new];_status=@"本机备份尚未检查";
         NSURL *library=[NSFileManager.defaultManager URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask].firstObject;
         CSBackupStore *store=[[CSBackupStore alloc]initWithRoot:[library URLByAppendingPathComponent:@"Application Support/WeChatImprove/BackupV2" isDirectory:YES]];
-        _legacyRoot=[library URLByAppendingPathComponent:@"Backup" isDirectory:YES];_standardDomain=NSBundle.mainBundle.bundleIdentifier?:@"com.tencent.xin";
+        _standardDomain=NSBundle.mainBundle.bundleIdentifier?:@"com.tencent.xin";
         NSDictionary *domains=@{@"standard":_standardDomain,@"legacy":@"com.cyansmoke.wechattweak",@"layout":@"com.wechat.enhance"};
         NSDictionary *defaults=@{@"standard":NSUserDefaults.standardUserDefaults,@"legacy":[[NSUserDefaults alloc]initWithSuiteName:domains[@"legacy"]],@"layout":[[NSUserDefaults alloc]initWithSuiteName:domains[@"layout"]]};
         _engine=[[CSBackupEngine alloc]initWithDefaults:defaults domains:domains store:store resources:[library URLByAppendingPathComponent:@"Preferences/WeChatImprove" isDirectory:YES]];
@@ -75,15 +73,19 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
 }
 - (void)list:(CSBackupCompletion)completion {
     [self perform:^id(NSError **error){
-        NSMutableArray *records=[NSMutableArray array];NSUInteger bytes=0;
-        for(NSDictionary *s in [self.engine.store snapshots:error]){NSMutableDictionary *record=[s mutableCopy];record[@"metadata"]=[self.engine.store metadata:s[@"id"]];bytes+=[s[@"size"] unsignedIntegerValue];[records addObject:record];}
-        NSArray *legacy=[NSFileManager.defaultManager contentsOfDirectoryAtURL:self.legacyRoot includingPropertiesForKeys:nil options:0 error:NULL];
-        for(NSURL *url in legacy)if([[NSUUID alloc]initWithUUIDString:url.lastPathComponent]){
-            [records addObject:@{@"id":url.lastPathComponent,@"name":[@"旧版备份 · " stringByAppendingString:[url.lastPathComponent substringToIndex:8]],@"legacy":@YES,@"metadata":@{},@"kind":@"legacy"}];
+        NSMutableArray *records=[NSMutableArray array];NSUInteger bytes=0,unavailable=0,protectionIssues=0;
+        for(NSDictionary *s in [self.engine.store records:error]){
+            NSMutableDictionary *record=[s mutableCopy];NSError *metadataError=nil;
+            record[@"metadata"]=[self.engine.store metadata:s[@"id"] error:&metadataError];
+            if(metadataError){record[@"metadataWarning"]=metadataError.localizedDescription;protectionIssues++;}
+            if([s[@"unavailable"] boolValue])unavailable++;
+            bytes+=[s[@"size"] unsignedIntegerValue];[records addObject:record];
         }
         NSError *journalError=nil;NSDictionary *journal=[self.engine.store journal:&journalError];
         if(journalError){if(error)*error=journalError;}else if(journal)self.status=[NSString stringWithFormat:@"恢复状态：%@。本机备份占用 %@",[self stateTitle:journal[@"state"]],[NSByteCountFormatter stringFromByteCount:bytes countStyle:NSByteCountFormatterCountStyleFile]];
-        else if(!(error&&*error))self.status=[NSString stringWithFormat:@"%lu 份可用备份 · 占用 %@%@",(unsigned long)records.count,[NSByteCountFormatter stringFromByteCount:bytes countStyle:NSByteCountFormatterCountStyleFile],self.scheduler.dirty?@" · 自动备份等待中":@""];
+        else if(!(error&&*error))self.status=[NSString stringWithFormat:@"%lu 份可用备份 · %lu 份无法读取 · 占用 %@%@",(unsigned long)(records.count-unavailable),(unsigned long)unavailable,[NSByteCountFormatter stringFromByteCount:bytes countStyle:NSByteCountFormatterCountStyleFile],self.scheduler.dirty?@" · 自动备份等待中":@""];
+        if(protectionIssues)self.status=[self.status stringByAppendingFormat:@"\n%lu 份备份保护状态需确认，已保留且不自动清理。",(unsigned long)protectionIssues];
+        if(self.engine.store.cleanupStatus.length)self.status=[self.status stringByAppendingFormat:@"\n%@",self.engine.store.cleanupStatus];
         NSDate *last=[NSUserDefaults.standardUserDefaults objectForKey:@"com.wechat.enhance.backup.last_date"];
         if([last isKindOfClass:NSDate.class]){NSDateFormatter *date=[NSDateFormatter new];date.dateStyle=NSDateFormatterShortStyle;date.timeStyle=NSDateFormatterShortStyle;self.status=[self.status stringByAppendingFormat:@"\n最近自动备份：%@",[date stringFromDate:last]];}
         NSString *failure=[NSUserDefaults.standardUserDefaults stringForKey:@"com.wechat.enhance.backup.last_error"];
@@ -95,7 +97,7 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
 }
 - (NSString *)stateTitle:(NSString *)state {return @{@"prepared":@"已准备，重新打开微信后应用",@"applying":@"应用中，需要完成恢复",@"rollingBack":@"回滚待完成",@"rolledBack":@"已回滚并保留原配置",@"committed":@"已应用并核验"}[state]?:state;}
 - (void)load:(NSDictionary *)record completion:(CSBackupCompletion)completion {
-    [self perform:^id(NSError **error){if([record[@"legacy"] boolValue])return [CSBackupLegacyReader readURL:[self.legacyRoot URLByAppendingPathComponent:record[@"id"]] standardDomain:self.standardDomain error:error];return [self.engine.store snapshot:record[@"id"] error:error];} completion:completion];
+    [self perform:^id(NSError **error){return [self.engine.store snapshot:record[@"id"] error:error];} completion:completion];
 }
 - (void)create:(NSString *)name completion:(CSBackupCompletion)completion {[self perform:^id(NSError **error){NSDictionary *s=[self.engine save:name kind:@"manual" error:error];if(s)self.status=@"备份已完整保存在本机";return s;} completion:completion];}
 - (void)importURL:(NSURL *)url completion:(CSBackupCompletion)completion {
@@ -103,15 +105,14 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
         NSFileCoordinator *coordinator=[[NSFileCoordinator alloc]initWithFilePresenter:nil];
         [coordinator coordinateReadingItemAtURL:url options:0 error:&readError byAccessor:^(NSURL *readURL){
             NSData *data=CSBackupReadFile(readURL,CSBackupMaximumFileSize,&readError);if(!data)return;
-            if(data.length>=8&&!memcmp(data.bytes,"bplist00",8))snapshot=[CSBackupCodec decode:data error:&readError];else snapshot=[CSBackupLegacyReader readURL:readURL standardDomain:self.standardDomain error:&readError];
+            if(data.length<8||memcmp(data.bytes,"bplist00",8)){readError=CSBackupFailure(@"仅支持当前 .wcbak 格式，不再支持旧版 JSON 或目录备份。");return;}
+            snapshot=[CSBackupCodec decode:data error:&readError];
         }];if(access)[url stopAccessingSecurityScopedResource];
         if(!snapshot){if(error)*error=readError?:CSBackupFailure(@"无法读取备份");return nil;}
         // Validate asset references and image payloads before publishing imported files.
         NSMutableDictionary *writes=[NSMutableDictionary dictionary];
         if(![CSBackupAssets materializeFields:snapshot[@"fields"] assets:snapshot[@"assets"] root:self.engine.resourceRoot writes:writes error:error])return nil;
-        if(![self validateColors:snapshot error:error]||![self.engine.store publish:snapshot error:error])return nil;
-        NSMutableDictionary *metadata=[[self.engine.store metadata:snapshot[@"id"]] mutableCopy];metadata[@"importedAt"]=NSDate.date;
-        if(![self.engine.store setMetadata:metadata identifier:snapshot[@"id"] error:error])return nil;
+        if(![self validateColors:snapshot error:error]||![self.engine.store importSnapshot:snapshot error:error])return nil;
         self.status=@"导入完成，当前配置未改变";return snapshot;
     } completion:completion];
 }
@@ -121,8 +122,24 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
         NSURL *url=[folder URLByAppendingPathComponent:[NSUUID.UUID.UUIDString stringByAppendingPathExtension:@"wcbak"]];return CSBackupAtomicWrite(data,url,error)?url:nil;
     } completion:completion];
 }
-- (void)remove:(NSDictionary *)record completion:(CSBackupCompletion)completion {[self perform:^id(NSError **error){if([record[@"legacy"] boolValue]){if(error)*error=CSBackupFailure(@"旧版原件只读保留，可先导出为新格式");return nil;}return [self.engine.store remove:record[@"id"] error:error]?@YES:nil;} completion:completion];}
-- (void)updateMetadata:(NSDictionary *)metadata record:(NSDictionary *)record completion:(CSBackupCompletion)completion {[self perform:^id(NSError **error){return [self.engine.store setMetadata:metadata identifier:record[@"id"] error:error]?@YES:nil;} completion:completion];}
+- (void)exportOriginal:(NSDictionary *)record completion:(CSBackupCompletion)completion {
+    [self perform:^id(NSError **error){
+        NSData *data=[self.engine.store originalData:record[@"filename"] error:error];if(!data)return nil;
+        NSURL *folder=[NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"WeChatImproveBackupExports"] isDirectory:YES];
+        NSURL *url=[folder URLByAppendingPathComponent:[NSUUID.UUID.UUIDString stringByAppendingPathExtension:@"wcbak"]];
+        return CSBackupAtomicWrite(data,url,error)?url:nil;
+    } completion:completion];
+}
+- (void)remove:(NSDictionary *)record completion:(CSBackupCompletion)completion {[self perform:^id(NSError **error){return [self.engine.store remove:record[@"id"] error:error]?@YES:nil;} completion:completion];}
+- (void)updateMetadata:(NSDictionary *)metadata record:(NSDictionary *)record completion:(CSBackupCompletion)completion {
+    [self perform:^id(NSError **error){
+        if(![self.engine.store snapshot:record[@"id"] error:error])return nil;
+        NSError *metadataError=nil;NSMutableDictionary *current=[[self.engine.store metadata:record[@"id"] error:&metadataError] mutableCopy];
+        if(metadataError&&!metadata[@"favorite"]){if(error)*error=metadataError;return nil;}
+        [current addEntriesFromDictionary:metadata];
+        return [self.engine.store setMetadata:current identifier:record[@"id"] error:error]?@YES:nil;
+    } completion:completion];
+}
 - (BOOL)validateColors:(NSDictionary *)snapshot error:(NSError **)error {
     for(NSDictionary *f in snapshot[@"fields"])if([f[@"present"] boolValue]&&[[CSBackupRegistry entryForDomain:f[@"domain"] key:f[@"key"]][@"type"] isEqual:@"data"]){
         NSError *decodeError=nil;UIColor *color=nil;@try{color=[NSKeyedUnarchiver unarchivedObjectOfClass:UIColor.class fromData:f[@"value"] error:&decodeError];}@catch(__unused NSException *exception){}

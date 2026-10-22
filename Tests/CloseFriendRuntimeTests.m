@@ -122,6 +122,13 @@ int main(void) { @autoreleasepool {
     Check(credentials[@"alice"]==beforeQuery && !runtime.isAuthorized,"non-password queries do not write credentials or reveal");
     Check(SearchPassword(runtime,@"correct-password",token) && runtime.isAuthorized,"full search password reveals before native dispatch");
     Check([[runtime snapshotForEpoch:1 suspended:NO] silencesSession:@"protected" sender:nil],"search unlock retains silence");
+    NSMutableDictionary *gestureOptions=[runtime.currentProfile[@"options"] mutableCopy]; gestureOptions[@"longPressUnlockEnabled"]=@NO;
+    NSMutableDictionary *gestureProfile=[runtime.currentProfile mutableCopy]; gestureProfile[@"options"]=gestureOptions;
+    Check([runtime updateProfile:gestureProfile error:NULL],"long-press preference can be disabled independently");
+    [runtime lock];
+    Check(SearchPassword(runtime,@"correct-password",runtime.authenticationToken) && runtime.isAuthorized,"search password still unlocks when long press is disabled");
+    gestureOptions[@"longPressUnlockEnabled"]=@YES; gestureProfile[@"options"]=gestureOptions;
+    Check([runtime updateProfile:gestureProfile error:NULL],"re-enable long press for subsequent shortcut checks");
     [runtime lock]; token=runtime.authenticationToken;
     Check([runtime revealWithShortcutToken:token] && runtime.isAuthorized,"homepage gesture grants immediate temporary reveal");
     Check(![runtime revealWithShortcutToken:token],"old shortcut token cannot be replayed");

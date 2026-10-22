@@ -10,6 +10,7 @@ typedef void (^CSBackupCompletion)(id _Nullable result,NSError * _Nullable error
 - (void)create:(NSString *)name completion:(CSBackupCompletion)completion;
 - (void)importURL:(NSURL *)url completion:(CSBackupCompletion)completion;
 - (void)exportSnapshot:(NSDictionary *)snapshot completion:(CSBackupCompletion)completion;
+- (void)exportOriginal:(NSDictionary *)record completion:(CSBackupCompletion)completion;
 - (void)remove:(NSDictionary *)record completion:(CSBackupCompletion)completion;
 - (void)updateMetadata:(NSDictionary *)metadata record:(NSDictionary *)record completion:(CSBackupCompletion)completion;
 - (void)preview:(NSDictionary *)snapshot modules:(NSSet<NSString *> *)modules accounts:(NSSet<NSString *> *)accounts completion:(CSBackupCompletion)completion;

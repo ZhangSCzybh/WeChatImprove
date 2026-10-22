@@ -1,0 +1,33 @@
+[
+  {
+    "name": "privacy-regression",
+    "command": [
+      "bash",
+      "Tests/verify-close-friend-privacy.sh"
+    ],
+    "exit_code": 0,
+    "expected_exit": 0,
+    "output": "CloseFriendPrivacyTests: 26 checks passed\n"
+  },
+  {
+    "name": "privacy-before-fix",
+    "command": [
+      "bash",
+      "Tests/verify-close-friend-privacy.sh",
+      "docs/audits/close-friend-layout-1.9-8/CSCloseFriendPrivacyAdapter.m.before"
+    ],
+    "exit_code": 1,
+    "expected_exit": 1,
+    "output": "FAIL: hidden privacy keeps delete after timestamp instead of at the left edge\n"
+  },
+  {
+    "name": "settings-regression",
+    "command": [
+      "python3",
+      "docs/audits/close-friend-layout-1.9-8/verify-settings.py"
+    ],
+    "exit_code": 0,
+    "expected_exit": 0,
+    "output": "Settings regression: 7 moved rows, 22 unique options, 19 toggle mappings, duration routes and stored values passed\n"
+  }
+]

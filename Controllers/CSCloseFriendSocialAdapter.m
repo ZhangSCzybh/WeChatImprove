@@ -115,6 +115,7 @@ void CSCFSocialProtectRoute(NSString *cls,CSCloseFriendSurface surface) {
     });
 }
 void CSCFSocialInstall(void) {
+    CSCFPrivacyInstall();
     CSCFSocialHook1(@"WCTimeLineCellView",@"initPrivacyButton:",^(id cell,id item,void(^orig)(id)){ orig(item); Privacy(cell); CSCFSocialTrack(cell,^(id c){Privacy(c); [c setNeedsLayout];}); });
     CSCFSocialHook0(@"WCTimeLineCellView",@"layoutSubviews",^(id cell,void(^orig)(void)){Privacy(cell); orig();});
     CSCFSocialHook0(@"WCTimeLineCellView",@"onShowGroup",^(__unused id cell,void(^orig)(void)){if(!CSCloseFriendHidesPrivacyIcons()) orig();});

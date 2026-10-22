@@ -65,7 +65,7 @@
 
 @interface CSCloseFriendSettingsViewController ()
 @property(nonatomic) BOOL requestingAuthentication;
-@property(nonatomic,copy) NSArray<NSString *> *keys, *labels;
+@property(nonatomic,copy) NSArray<NSString *> *keys, *labels, *accountKeys, *protectionKeys;
 @property(nonatomic,copy) NSDictionary<NSString *, NSString *> *optionIcons;
 @end
 @implementation CSCloseFriendSettingsViewController
@@ -75,8 +75,9 @@
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 54, 0, 0);
     [CSCloseFriendSettingsCell registerToTableView:self.tableView];
-    self.keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"rejectVoice",@"rejectVideo",@"callReplyEnabled",@"callReplyText",@"hidePrivacyIcons",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"unlockSeconds"];
-    self.labels=@[@"隐藏会话",@"隐藏联系人",@"隐藏转发候选",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏朋友圈内容",@"隐藏互动痕迹",@"隐藏状态",@"资料页显示添加到通讯录",@"静默消息通知",@"拒接语音来电",@"拒接视频来电",@"挂断回复",@"挂断回复内容",@"隐藏全部朋友圈可见范围图标",@"隐藏密友设置入口",@"隐藏插件入口",@"允许生物识别解锁",@"摇动立即锁定",@"临时解锁时长"];
+    self.keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"rejectVoice",@"rejectVideo",@"callReplyEnabled",@"callReplyText",@"hidePrivacyIcons",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"longPressUnlockEnabled",@"longPressUnlockDuration",@"unlockSeconds"];
+    self.labels=@[@"隐藏会话",@"隐藏联系人",@"隐藏转发候选",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏朋友圈内容",@"隐藏互动痕迹",@"隐藏状态",@"资料页显示添加到通讯录",@"静默消息通知",@"拒接语音来电",@"拒接视频来电",@"挂断回复",@"挂断回复内容",@"隐藏全部朋友圈可见范围图标",@"隐藏密友设置",@"隐藏插件入口",@"生物识别解锁",@"摇动立即锁定",@"首页长按解锁",@"长按触发时长",@"临时解锁时长"];
+    [self configureOptionGroups];
     self.optionIcons = @{
         @"hideSessions": @"bubble.left.and.bubble.right.fill",
         @"hideContacts": @"person.crop.circle.fill",
@@ -97,9 +98,22 @@
         @"hidePluginEntry": @"square.grid.2x2.fill",
         @"biometric": @"faceid",
         @"shakeToLock": @"iphone.radiowaves.left.and.right",
+        @"longPressUnlockEnabled": @"hand.tap.fill",
+        @"longPressUnlockDuration": @"timer",
         @"unlockSeconds": @"clock.fill"
     };
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(policyChanged:) name:CSCloseFriendPolicyDidChangeNotification object:nil];
+}
+- (void)configureOptionGroups {
+    self.accountKeys=@[@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"longPressUnlockEnabled",@"longPressUnlockDuration",@"unlockSeconds"];
+    NSMutableArray *protection=[NSMutableArray new];
+    for(NSString *key in self.keys) if(![self.accountKeys containsObject:key]) [protection addObject:key];
+    self.protectionKeys=protection;
+}
+- (NSString *)optionKeyForIndexPath:(NSIndexPath *)path {
+    NSInteger row=path.section==0 ? path.row-6 : path.row;
+    NSArray *keys=path.section==0 ? self.accountKeys : self.protectionKeys;
+    return row>=0 && (NSUInteger)row<keys.count ? keys[(NSUInteger)row] : nil;
 }
 - (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
 - (BOOL)authorized { return !CSCloseFriendCurrentSnapshot().blocked && CSCloseFriendManager.sharedManager.runtime.isAuthorized; }
@@ -117,37 +131,44 @@
 }
 - (void)policyChanged:(NSNotification *)note { CSNativeContactPickerRevalidate(self); [self.tableView reloadData]; }
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return [self authorized]?2:0; }
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { return section==0?6:self.keys.count; }
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { return section==0?6+self.accountKeys.count:self.protectionKeys.count; }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return @[@"账号保护",@"保护选项"][section]; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if(section==0)return @"长按微信首页顶部导航栏 1 秒，或在首页搜索框输入完整密码，即可解锁并显示密友设置入口。密码验证信息仅保存在本机钥匙串；微信进入后台或切换账号时自动锁定。";
-    if(section==1)return @"解锁期间消息通知按静默设置处理。开启“摇动立即锁定”后，轻摇手机即可锁定。“挂断回复”默认关闭，开启后仅对自动拒接的私聊发送预设消息，同一人5分钟内最多一次。搭配“免打扰”使用更加，免打扰需手动设置。";
+    if(section==0) {
+        NSDictionary *options=CSCloseFriendCurrentProfile()[@"options"];
+        NSString *entry=[options[@"longPressUnlockEnabled"] boolValue] ?
+            [NSString stringWithFormat:@"长按微信首页顶部导航栏 %@ 秒，或在首页搜索框输入完整密码，即可解锁并显示密友设置入口。",options[@"longPressUnlockDuration"]] :
+            @"首页长按解锁已关闭；在首页搜索框输入完整密码，仍可解锁并显示密友设置入口。";
+        return [entry stringByAppendingString:@"密码验证信息仅保存在本机钥匙串；微信进入后台或切换账号时自动锁定。开启“摇动立即锁定”后，轻摇手机即可锁定。"];
+    }
+    if(section==1)return @"解锁期间消息通知按静默设置处理。“挂断回复”默认关闭，开启后仅对自动拒接的私聊发送预设消息，同一人5分钟内最多一次。搭配“免打扰”使用更加，免打扰需手动设置。";
     return nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     CSCloseFriendSettingsCell *cell=[tableView dequeueReusableCellWithIdentifier:[CSCloseFriendSettingsCell reuseIdentifier]];
     NSString *title, *iconName;
+    NSString *optionKey=[self optionKeyForIndexPath:indexPath];
     UIColor *iconColor = [UIColor systemBlueColor];
-    if(indexPath.section==0) {
+    if(!optionKey) {
         title=@[@"启用密友",@"密友名单",@"密友群聊",@"修改密码",@"立即锁定",@"当前状态"][indexPath.row];
         iconName=@[@"lock.shield.fill",@"person.fill",@"person.3.fill",@"key.fill",@"lock.fill",@"info.circle.fill"][indexPath.row];
         iconColor=@[[UIColor systemGreenColor],[UIColor systemBlueColor],[UIColor systemGreenColor],[UIColor systemOrangeColor],[UIColor systemRedColor],[UIColor systemGrayColor]][indexPath.row];
     } else {
-        title=self.labels[indexPath.row];
-        iconName=self.optionIcons[self.keys[indexPath.row]];
+        title=self.labels[[self.keys indexOfObject:optionKey]];
+        iconName=self.optionIcons[optionKey];
     }
     [cell configureWithItem:[CSSettingItem itemWithTitle:title iconName:iconName iconColor:iconColor detail:nil]];
     NSDictionary *profile=CSCloseFriendCurrentProfile();
-    if(indexPath.section==0) {
+    if(!optionKey) {
         if(indexPath.row==0) { UISwitch *toggle=[UISwitch new]; toggle.on=[profile[@"enabled"] boolValue]; toggle.tag=100; [toggle addTarget:self action:@selector(toggle:) forControlEvents:UIControlEventValueChanged]; [cell configureCloseFriendSwitch:toggle]; }
         else if(indexPath.row==1 || indexPath.row==2) { cell.detailTextLabel.text=[NSString stringWithFormat:@"%lu",(unsigned long)[profile[indexPath.row==1?@"friends":@"groups"] count]]; cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator; }
         else if(indexPath.row==5) { cell.detailTextLabel.text=@"临时显示中"; cell.selectionStyle=UITableViewCellSelectionStyleNone; }
         else cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
-    } else if(indexPath.section==1) {
-        NSString *key=self.keys[indexPath.row];
-        if([key isEqual:@"unlockSeconds"]) { cell.detailTextLabel.text=[NSString stringWithFormat:@"%@ 秒",profile[@"options"][key]]; cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator; }
+    } else {
+        NSString *key=optionKey;
+        if([key isEqual:@"unlockSeconds"] || [key isEqual:@"longPressUnlockDuration"]) { cell.detailTextLabel.text=[NSString stringWithFormat:@"%@ 秒",profile[@"options"][key]]; cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator; }
         else if([key isEqual:@"callReplyText"]) {cell.detailTextLabel.text=profile[@"options"][key]; cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;}
-        else { UISwitch *toggle=[UISwitch new]; toggle.tag=indexPath.row; toggle.on=[profile[@"options"][key] boolValue]; [toggle addTarget:self action:@selector(toggle:) forControlEvents:UIControlEventValueChanged]; [cell configureCloseFriendSwitch:toggle]; }
+        else { UISwitch *toggle=[UISwitch new]; toggle.tag=[self.keys indexOfObject:key]; toggle.on=[profile[@"options"][key] boolValue]; [toggle addTarget:self action:@selector(toggle:) forControlEvents:UIControlEventValueChanged]; [cell configureCloseFriendSwitch:toggle]; }
     }
     return cell;
 }
@@ -166,6 +187,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES]; if(![self authorized])return;
     NSDictionary *token=CSCloseFriendManager.sharedManager.runtime.authenticationToken;
+    NSString *optionKey=[self optionKeyForIndexPath:indexPath];
     if(indexPath.section==0 && (indexPath.row==1 || indexPath.row==2)) {
         NSString *key=indexPath.row==1?@"friends":@"groups";
         __weak typeof(self) weakSelf=self;
@@ -181,7 +203,7 @@
         if(!shown)[self showError:error];
     } else if(indexPath.section==0 && indexPath.row==3)[CSCloseFriendManager.sharedManager changePasswordFrom:self];
     else if(indexPath.section==0 && indexPath.row==4)CSCloseFriendLock();
-    else if(indexPath.section==1 && [self.keys[indexPath.row] isEqual:@"callReplyText"]) {
+    else if([optionKey isEqual:@"callReplyText"]) {
         UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"挂断回复内容" message:@"输入 1–200 字的单行回复。自动拒接单人语音／视频来电后发送，同一人 5 分钟内最多一次。" preferredStyle:UIAlertControllerStyleAlert];
         [alert addTextFieldWithConfigurationHandler:^(UITextField *field){field.text=CSCloseFriendCurrentProfile()[@"options"][@"callReplyText"];field.placeholder=@"现在不方便接听，请留言。";}];
         [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
@@ -199,7 +221,32 @@
         }]];
         [self presentViewController:alert animated:YES completion:nil];
     }
-    else if(indexPath.section==1 && [self.keys[indexPath.row] isEqual:@"unlockSeconds"]) {
+    else if([optionKey isEqual:@"longPressUnlockDuration"]) {
+        UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"长按触发时长" message:@"范围 0.5–2 秒，默认 1 秒；保存后立即生效。关闭“首页长按解锁”时仍保留此时长。" preferredStyle:UIAlertControllerStyleAlert];
+        [alert addTextFieldWithConfigurationHandler:^(UITextField *field){
+            field.keyboardType=UIKeyboardTypeDecimalPad;
+            field.text=[CSCloseFriendCurrentProfile()[@"options"][@"longPressUnlockDuration"] stringValue];
+        }];
+        [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"保存" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){
+            [CSCloseFriendManager.sharedManager refreshAccount];
+            if(![self authorized] || ![CSCloseFriendManager.sharedManager.runtime isTokenCurrent:token]) return;
+            NSString *text=[alert.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+            NSScanner *scanner=[NSScanner scannerWithString:[text stringByReplacingOccurrencesOfString:@"," withString:@"."]?:@""];
+            scanner.locale=[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+            double duration=0;
+            NSMutableDictionary *profile=[CSCloseFriendCurrentProfile() mutableCopy], *options=[profile[@"options"] mutableCopy];
+            BOOL parsed=[scanner scanDouble:&duration] && scanner.isAtEnd;
+            options[@"longPressUnlockDuration"]=@(duration); profile[@"options"]=options;
+            if(!parsed || !CSCloseFriendNormalizeProfile(profile,NULL)) {
+                [self showError:[NSError errorWithDomain:@"CSCloseFriendSettings" code:2 userInfo:@{NSLocalizedDescriptionKey:@"请输入 0.5–2 之间的秒数，例如 0.5、1 或 1.5。"}]];
+                return;
+            }
+            [self save:profile];
+        }]];
+        [self presentViewController:alert animated:YES completion:nil];
+    }
+    else if([optionKey isEqual:@"unlockSeconds"]) {
         UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"临时解锁时长" message:@"范围 1–86400 秒；下次验证后生效。" preferredStyle:UIAlertControllerStyleAlert];
         [alert addTextFieldWithConfigurationHandler:^(UITextField *field){ field.keyboardType=UIKeyboardTypeNumberPad; field.text=[CSCloseFriendCurrentProfile()[@"options"][@"unlockSeconds"] stringValue]; }];
         [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];

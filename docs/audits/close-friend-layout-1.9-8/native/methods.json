@@ -1,0 +1,514 @@
+[
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "initWithDataItem:enabledWrap:scene:isDynamicTagEnabled:isStarEnabled:pageContext:",
+    "address": "0x1067f8cdc",
+    "end": "0x1067f8dbc",
+    "types": "@52@0:8@16B24Q28B36B40@44"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "elementTypesAtRow:",
+    "address": "0x1067f8dbc",
+    "end": "0x1067f8e18",
+    "types": "@24@0:8Q16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "totalLine",
+    "address": "0x1067f8e18",
+    "end": "0x1067f8eac",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "enabledWrap",
+    "address": "0x1067f8eac",
+    "end": "0x1067f8f14",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "calculateLayoutInfoWithParams:",
+    "address": "0x1067f8f14",
+    "end": "0x1067f8fb4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "adjustElementsForOneLine",
+    "address": "0x1067f8fb4",
+    "end": "0x1067f92e8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "adjustElementsForMultiLine",
+    "address": "0x1067f92e8",
+    "end": "0x1067f9728",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "canDisplayForOneLine",
+    "address": "0x1067f9728",
+    "end": "0x1067f9798",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "totalMinWidth",
+    "address": "0x1067f9798",
+    "end": "0x1067f9970",
+    "types": "d16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "setupActionAreaElements",
+    "address": "0x1067f9970",
+    "end": "0x1067fa308",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "createElementWraps",
+    "address": "0x1067fa308",
+    "end": "0x1067fa994",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "createElementsRowInfo",
+    "address": "0x1067fa994",
+    "end": "0x1067face8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "prepareDisplayElements",
+    "address": "0x1067face8",
+    "end": "0x1067fb414",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "timeLabelDisplayText",
+    "address": "0x1067fb414",
+    "end": "0x1067fb4a4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "locationDisplayText",
+    "address": "0x1067fb4a4",
+    "end": "0x1067fb4f8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "canShowStarIcon",
+    "address": "0x1067fb4f8",
+    "end": "0x1067fb598",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "canShowSource",
+    "address": "0x1067fb598",
+    "end": "0x1067fb630",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "canShowLoactionInfo",
+    "address": "0x1067fb630",
+    "end": "0x1067fb6c8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "sourceShowType",
+    "address": "0x1067fb6c8",
+    "end": "0x1067fb774",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "sourceText",
+    "address": "0x1067fb774",
+    "end": "0x1067fb828",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "sourceUrl",
+    "address": "0x1067fb828",
+    "end": "0x1067fb8dc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "sourceBackupUrl",
+    "address": "0x1067fb8dc",
+    "end": "0x1067fb990",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "canShowWeAppInfo",
+    "address": "0x1067fb990",
+    "end": "0x1067fba2c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "weAppLabelDisplayText",
+    "address": "0x1067fba2c",
+    "end": "0x1067fbae8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "shouldFetchWeAppContact",
+    "address": "0x1067fbae8",
+    "end": "0x1067fbb9c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "canShowShareGroupButton",
+    "address": "0x1067fbb9c",
+    "end": "0x1067fbc24",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "canShowDeleteButton",
+    "address": "0x1067fbc24",
+    "end": "0x1067fbc90",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "isEqual:",
+    "address": "0x1067fbc90",
+    "end": "0x1067fbcf8",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "hash",
+    "address": "0x1067fbcf8",
+    "end": "0x1067fbf30",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "displayElementsHashString",
+    "address": "0x1067fbf30",
+    "end": "0x1067fc108",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "dataItem",
+    "address": "0x1067fcd04",
+    "end": "0x1067fcd0c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "setEnabledWrap:",
+    "address": "0x1067fcd0c",
+    "end": "0x1067fcd14",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "layoutInfoMap",
+    "address": "0x1067fcd14",
+    "end": "0x1067fcd1c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "setLayoutInfoMap:",
+    "address": "0x1067fcd1c",
+    "end": "0x1067fcd28",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "params",
+    "address": "0x1067fcd28",
+    "end": "0x1067fcd30",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "setParams:",
+    "address": "0x1067fcd30",
+    "end": "0x1067fcd3c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "pageContext",
+    "address": "0x1067fcd3c",
+    "end": "0x1067fcd44",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "elementTypes",
+    "address": "0x1067fcd44",
+    "end": "0x1067fcd4c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "setElementTypes:",
+    "address": "0x1067fcd4c",
+    "end": "0x1067fcd58",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "elementArr",
+    "address": "0x1067fcd58",
+    "end": "0x1067fcd60",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "setElementArr:",
+    "address": "0x1067fcd60",
+    "end": "0x1067fcd68",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "elementsRowInfo",
+    "address": "0x1067fcd68",
+    "end": "0x1067fcd70",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "setElementsRowInfo:",
+    "address": "0x1067fcd70",
+    "end": "0x1067fcd7c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "scene",
+    "address": "0x1067fcd7c",
+    "end": "0x1067fcd84",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "setScene:",
+    "address": "0x1067fcd84",
+    "end": "0x1067fcd8c",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "isDynamicTagEnabled",
+    "address": "0x1067fcd8c",
+    "end": "0x1067fcd94",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "setIsDynamicTagEnabled:",
+    "address": "0x1067fcd94",
+    "end": "0x1067fcd9c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "isStarEnabled",
+    "address": "0x1067fcd9c",
+    "end": "0x1067fcda4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": "setIsStarEnabled:",
+    "address": "0x1067fcda4",
+    "end": "0x1067fcdac",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1067fcdac",
+    "end": "0x1067fce18",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "timeLabelDisplayTextWithDataItem:scene:",
+    "address": "0x1067fc108",
+    "end": "0x1067fc17c",
+    "types": "@32@0:8@16Q24"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "canShowStarIconWithDataItem:scene:isStarEnabled:",
+    "address": "0x1067fc17c",
+    "end": "0x1067fc1e8",
+    "types": "B36@0:8@16Q24B32"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "isFromShakeWithDataItem:",
+    "address": "0x1067fc1e8",
+    "end": "0x1067fc2a8",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "canShowSourceWithDataItem:showType:text:url:backupUrl:pageContext:",
+    "address": "0x1067fc2a8",
+    "end": "0x1067fc4d8",
+    "types": "B64@0:8@16^Q24^@32^@40^@48@56"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "showsIndividualSourceWithDataItem:pageContext:",
+    "address": "0x1067fc4d8",
+    "end": "0x1067fc570",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "canShowLocationInfoWithDataItem:pageContext:",
+    "address": "0x1067fc570",
+    "end": "0x1067fc600",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "showsIndividualLocationWithDataItem:pageContext:",
+    "address": "0x1067fc600",
+    "end": "0x1067fc690",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "canShowWeAppInfoWithDataItem:pageContext:",
+    "address": "0x1067fc690",
+    "end": "0x1067fc7e4",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "showsIndividualAppInfoWithDataItem:pageContext:",
+    "address": "0x1067fc7e4",
+    "end": "0x1067fc938",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "canShowEcsViewWithDataItem:",
+    "address": "0x1067fc938",
+    "end": "0x1067fc998",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "canShowShareGroupButtonWithDataItem:isDynamicTagEnabled:",
+    "address": "0x1067fc998",
+    "end": "0x1067fca00",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "canShowDeleteButtonWithDataItem:",
+    "address": "0x1067fca00",
+    "end": "0x1067fcab4",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "weAppLabelDisplayTextWithAppUsername:",
+    "address": "0x1067fcab4",
+    "end": "0x1067fcc18",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "WCActionAreaVM",
+    "kind": "class",
+    "selector": "shouldFetchWeAppContactWithAppUsername:",
+    "address": "0x1067fcc18",
+    "end": "0x1067fcd04",
+    "types": "B24@0:8@16"
+  }
+]

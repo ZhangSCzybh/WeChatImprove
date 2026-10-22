@@ -1,0 +1,19 @@
+{
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "build_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friend-1.9-9-nulkrpkh/build",
+  "command": [
+    "make",
+    "package",
+    "-j4",
+    "SCHEME=rootless",
+    "PACKAGE_VERSION=1.9-9",
+    "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friend-1.9-9-nulkrpkh/build/.theos",
+    "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friend-1.9-9-nulkrpkh/build",
+    "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friend-1.9-9-nulkrpkh/build/packages"
+  ],
+  "scheme": "rootless",
+  "version": "1.9-9",
+  "started": "2026-10-22 11:43:05",
+  "exit_code": 0,
+  "finished": "2026-10-22 11:43:19"
+}

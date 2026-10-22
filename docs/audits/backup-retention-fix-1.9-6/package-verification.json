@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "Package": "com.wechat.improve",
+    "Version": "1.9-6",
+    "Architecture": "iphoneos-arm64",
+    "Depends": "mobilesubstrate (>= 0.9.5000)"
+  },
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "package_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/com.wechat.improve_1.9-6_iphoneos-arm64.deb",
+  "package_sha256": "b74f7ca2c45158915c93222e4f7b8e4e8d56116a266d2476a46dc81be6cc779b",
+  "binary_sha256": "f2bcc49e4fa1716a5b806e67087664a2ffaab27b0e9307bf5747b1a8404b8ef5",
+  "binary_uuids": [
+    "UUID: C267247F-6E84-3C1A-80F7-0956F9AC7A5F (arm64) /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-fix-1.9-6-jx9xy7yc/package-verification/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+    "UUID: A2C0F705-3A55-3472-98BD-E7D33181E79E (arm64e) /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-fix-1.9-6-jx9xy7yc/package-verification/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib"
+  ],
+  "symbol_uuids": [
+    "UUID: C267247F-6E84-3C1A-80F7-0956F9AC7A5F (arm64) /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-fix-1.9-6-jx9xy7yc/build/.theos/obj/arm64/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib",
+    "UUID: A2C0F705-3A55-3472-98BD-E7D33181E79E (arm64e) /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-backup-fix-1.9-6-jx9xy7yc/build/.theos/obj/arm64e/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib"
+  ],
+  "symbols_archive": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/WeChatImprove-1.9-6-dSYMs.zip",
+  "symbols_sha256": "f02de66b8520d9b8c3b7c68b8c0a625a834b6afe92d0e8494f40053b83a10954",
+  "removed_classes_absent": true,
+  "source_matches_build": true,
+  "prior_packages_preserved": true,
+  "injection_filter_preserved": true
+}

@@ -4,6 +4,7 @@
 #import "CSCloseFriendStore.h"
 #import <CommonCrypto/CommonCrypto.h>
 #import <sys/stat.h>
+#import <math.h>
 static NSUInteger checks;
 #define CHECK(...) do { checks++; if (!(__VA_ARGS__)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#__VA_ARGS__); exit(1); } } while(0)
 static NSDictionary *Profile(void) { return @{ @"enabled":@YES, @"friends":@[@"alice"], @"groups":@[@"room@chatroom"], @"options":@{} }; }
@@ -86,6 +87,24 @@ int main(void) { @autoreleasepool {
 
     for(NSString *name in @[@"showBadges",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"callReplyEnabled"])CHECK(![defaults[name] boolValue]);
     CHECK([defaults[@"unlockSeconds"] isEqual:@300]);
+    CHECK([defaults[@"longPressUnlockEnabled"] boolValue]);
+    CHECK([defaults[@"longPressUnlockDuration"] doubleValue]==1.0);
+    for(NSNumber *duration in @[@0.5,@0.75,@1,@1.5,@2]) {
+        NSMutableDictionary *p=[Profile() mutableCopy];
+        p[@"options"]=@{@"longPressUnlockEnabled":@NO,@"longPressUnlockDuration":duration};
+        NSDictionary *normalized=CSCloseFriendNormalizeProfile(p,NULL);
+        CHECK(normalized && ![normalized[@"options"][@"longPressUnlockEnabled"] boolValue]);
+        CHECK([normalized[@"options"][@"longPressUnlockDuration"] isEqual:duration]);
+        CHECK([store saveState:@{@"profile":normalized} forAccountID:@"one" error:&error]);
+        CHECK([[store loadStateForAccountID:@"one" error:&error][@"profile"] isEqual:normalized]);
+    }
+    CHECK([cipher writeToURL:files[0] options:0 error:&error]);
+    for(id duration in @[@0.49,@2.01,@(-1),@YES,@"1",@(NAN),@(INFINITY)]) {
+        NSMutableDictionary *p=[Profile() mutableCopy]; p[@"options"]=@{@"longPressUnlockDuration":duration};
+        CHECK(!CSCloseFriendNormalizeProfile(p,NULL));
+    }
+    NSMutableDictionary *invalidGesture=[Profile() mutableCopy]; invalidGesture[@"options"]=@{@"longPressUnlockEnabled":@1};
+    CHECK(!CSCloseFriendNormalizeProfile(invalidGesture,NULL));
     CSCloseFriendSnapshot *blocked=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"one" profile:@{} revealed:YES revision:4 blocked:NO];
     CHECK(blocked.blocked && !blocked.revealed);
     CHECK([blocked hidesUserName:@"bob" surface:CSCloseFriendSurfaceContact]);

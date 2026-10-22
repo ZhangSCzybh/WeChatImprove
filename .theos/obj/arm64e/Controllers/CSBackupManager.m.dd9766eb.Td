@@ -4,8 +4,8 @@
   Controllers/CSBackupManager.h Controllers/CSBackupEngine.h \
   Controllers/CSBackupStore.h Controllers/CSBackupCodec.h \
   Controllers/CSBackupAssets.h Controllers/CSBackupRegistry.h \
-  Controllers/CSBackupLegacyReader.h Controllers/CSBackupScheduler.h \
-  Controllers/CSBackupBootstrap.h Controllers/CSServiceCenter.h \
+  Controllers/CSBackupScheduler.h Controllers/CSBackupBootstrap.h \
+  Controllers/CSServiceCenter.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers/CSUserInfoHelper.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
 /Users/zhangshichao/theos/Prefix.pch:
@@ -15,7 +15,6 @@ Controllers/CSBackupStore.h:
 Controllers/CSBackupCodec.h:
 Controllers/CSBackupAssets.h:
 Controllers/CSBackupRegistry.h:
-Controllers/CSBackupLegacyReader.h:
 Controllers/CSBackupScheduler.h:
 Controllers/CSBackupBootstrap.h:
 Controllers/CSServiceCenter.h:

@@ -47,8 +47,8 @@ static BOOL AlbumNeedsNativeRoute(NSString *option) {
     CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
     // Keep the same native route during a temporary reveal, so a later relock
     // can refresh pages that were opened while unlocked.
-    return snapshot.blocked || (snapshot.enabled && snapshot.protectedUserNames.count &&
-        ([snapshot.options[option] boolValue] || ([option isEqual:@"hideTimeline"] && [snapshot.options[@"hideInteractions"] boolValue])));
+    return snapshot.blocked || (snapshot.enabled && ([snapshot.options[@"hidePrivacyIcons"] boolValue] ||
+        (snapshot.protectedUserNames.count && ([snapshot.options[option] boolValue] || ([option isEqual:@"hideTimeline"] && [snapshot.options[@"hideInteractions"] boolValue])))));
 }
 static void AlbumInstallRoutes(void) {
     for(NSString *name in @[@"Moments_enableFlutterUserPage",@"Moments_enableFlutterTimeline"]) {

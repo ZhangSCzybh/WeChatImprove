@@ -4,6 +4,7 @@
 extern "C" {
 #endif
 FOUNDATION_EXPORT void CSCFSocialInstall(void);
+FOUNDATION_EXPORT void CSCFPrivacyInstall(void);
 FOUNDATION_EXPORT void CSCFSocialProtectRoute(NSString *className,CSCloseFriendSurface surface);
 FOUNDATION_EXPORT CSCloseFriendSocialProjection *CSCFSocialProject(NSArray *source,CSCloseFriendSurface surface);
 FOUNDATION_EXPORT BOOL CSCFSocialHidden(id object,CSCloseFriendSurface surface);

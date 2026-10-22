@@ -1,0 +1,73 @@
+{
+  "WCActionAreaVM": {
+    "superclass": "<bound external>",
+    "ivars": [
+      {
+        "offset_address": "0x12023dac8",
+        "offset": 8,
+        "name": "_enabledWrap",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12023dacc",
+        "offset": 9,
+        "name": "_isDynamicTagEnabled",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12023dad0",
+        "offset": 10,
+        "name": "_isStarEnabled",
+        "type": "B"
+      },
+      {
+        "offset_address": "0x12023dad4",
+        "offset": 16,
+        "name": "_dataItem",
+        "type": "@\"WCDataItem\""
+      },
+      {
+        "offset_address": "0x12023dad8",
+        "offset": 24,
+        "name": "_layoutInfoMap",
+        "type": "@\"OrderedDictionary\""
+      },
+      {
+        "offset_address": "0x12023dadc",
+        "offset": 32,
+        "name": "_params",
+        "type": "@\"WCActionAreaVMParams\""
+      },
+      {
+        "offset_address": "0x12023dae0",
+        "offset": 40,
+        "name": "_pageContext",
+        "type": "@\"WCMomentsPageContext\""
+      },
+      {
+        "offset_address": "0x12023dae4",
+        "offset": 48,
+        "name": "_elementTypes",
+        "type": "@\"NSArray\""
+      },
+      {
+        "offset_address": "0x12023dae8",
+        "offset": 56,
+        "name": "_elementArr",
+        "type": "@\"NSArray\""
+      },
+      {
+        "offset_address": "0x12023daec",
+        "offset": 64,
+        "name": "_elementsRowInfo",
+        "type": "@\"NSMutableArray\""
+      },
+      {
+        "offset_address": "0x12023daf0",
+        "offset": 72,
+        "name": "_scene",
+        "type": "Q"
+      }
+    ]
+  }
+}

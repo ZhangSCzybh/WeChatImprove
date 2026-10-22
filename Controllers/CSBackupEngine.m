@@ -78,7 +78,7 @@ static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%
     NSDictionary *snapshot=[self capture:name kind:kind error:error];if(!snapshot)return nil;
     if([kind isEqual:@"automatic"]){for(NSDictionary *existing in [self.store snapshots:NULL])if([existing[@"kind"] isEqual:@"automatic"]&&[existing[@"source"][@"account"] isEqual:snapshot[@"source"][@"account"]]&&[existing[@"source"][@"installationID"] isEqual:snapshot[@"source"][@"installationID"]]){if([existing[@"contentDigest"] isEqual:[self.class contentDigest:snapshot]])return [self.store snapshot:existing[@"id"] error:error];break;}}
     if(![self.store publish:snapshot error:error])return nil;
-    // Retention runs only after successful publication; failures remain visible to caller.
+    // A published snapshot stays successful; cleanup failures have their own durable status.
     [self.store prune:NULL];return snapshot;
 }
 - (NSDictionary *)preview:(NSDictionary *)snapshot modules:(NSSet *)modules accounts:(NSSet *)accounts error:(NSError **)error {
