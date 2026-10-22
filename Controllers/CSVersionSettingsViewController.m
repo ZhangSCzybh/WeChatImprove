@@ -69,7 +69,7 @@ static NSString * const kWeChatCustomVersionKey = @"com.wechat.tweak.version.cus
     ];
     
     // 创建自定义版本开关项
-    CSSettingItem *customVersionToggle = [CSSettingItem switchItemWithTitle:@"使用自定义版本号"
+    CSSettingItem *customVersionToggle = [CSSettingItem switchItemWithTitle:@"自定义版本号"
                                                              iconName:@"gear.circle.fill"
                                                             iconColor:[UIColor systemPurpleColor]
                                                            switchValue:self.isCustomVersionEnabled
@@ -107,7 +107,7 @@ static NSString * const kWeChatCustomVersionKey = @"com.wechat.tweak.version.cus
     NSMutableArray *customItems = [NSMutableArray arrayWithObject:customVersionToggle];
     
     // 创建说明项
-    CSSettingItem *infoItem = [CSSettingItem itemWithTitle:@"功能说明"
+    CSSettingItem *infoItem = [CSSettingItem itemWithTitle:@"版本功能说明"
                                                  iconName:@"info.circle"
                                                 iconColor:[UIColor systemBlueColor]
                                                    detail:nil];

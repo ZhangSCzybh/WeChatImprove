@@ -231,7 +231,7 @@
     // 4. 创建头像形状设置分区
     __weak typeof(self) weakSelf = self;
     
-    CSSettingItem *roundAvatarItem = [CSSettingItem switchItemWithTitle:@"圆形头像"
+    CSSettingItem *roundAvatarItem = [CSSettingItem switchItemWithTitle:@"启用圆形头像"
                                                                iconName:@"circle"
                                                               iconColor:[UIColor systemBlueColor]
                                                             switchValue:self.isRoundAvatarEnabled
@@ -279,7 +279,7 @@
     if (currentCornerRadius == 0) currentCornerRadius = 1.0f;
     
     // 创建圆角大小设置项
-    self.cornerRadiusItem = [CSSettingItem inputItemWithTitle:@"圆角程度"
+    self.cornerRadiusItem = [CSSettingItem inputItemWithTitle:@"圆角程度设置"
                                                     iconName:@"slider.horizontal.3"
                                                    iconColor:[UIColor systemTealColor]
                                                   inputValue:[NSString stringWithFormat:@"%.1f", currentCornerRadius]
@@ -322,7 +322,7 @@
     }
     
     // 6. 创建头像旋转分区
-    CSSettingItem *rotateAvatarItem = [CSSettingItem switchItemWithTitle:@"头像旋转"
+    CSSettingItem *rotateAvatarItem = [CSSettingItem switchItemWithTitle:@"启用头像旋转"
                                                               iconName:@"arrow.clockwise.circle"
                                                              iconColor:[UIColor systemPurpleColor]
                                                            switchValue:self.isRotateEnabled

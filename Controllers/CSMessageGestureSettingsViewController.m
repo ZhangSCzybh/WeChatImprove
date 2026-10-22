@@ -70,7 +70,7 @@ static void setActionForKey(CSMessageAction action, NSString *key) {
 - (void)setupData {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
-    CSSettingItem *gestureEnabledItem = [CSSettingItem switchItemWithTitle:@"消息手势"
+    CSSettingItem *gestureEnabledItem = [CSSettingItem switchItemWithTitle:@"启用消息手势"
                                                                 iconName:@"hand.draw.fill"
                                                                iconColor:[UIColor systemBlueColor]
                                                              switchValue:[defaults boolForKey:CSMessageActionGestureEnabledKey]
@@ -134,7 +134,7 @@ static void setActionForKey(CSMessageAction action, NSString *key) {
     CSSettingSection *rightSwipeSection = [CSSettingSection sectionWithHeader:@"右滑操作"
                                                                         items:@[rightSwipeOtherItem, rightSwipeSelfItem]];
     
-    CSSettingItem *descItem = [CSSettingItem itemWithTitle:@"使用说明"
+    CSSettingItem *descItem = [CSSettingItem itemWithTitle:@"手势使用说明"
                                                  iconName:@"info.circle.fill"
                                                 iconColor:[UIColor systemGrayColor]
                                                   detail:@"左滑或右滑消息气泡可执行相应操作"];

@@ -43,7 +43,7 @@ static NSUserDefaults *getDefaults() {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.title = @"布局和字体设置";
+    self.title = @"布局字体设置";
     self.tableView.backgroundColor = [UIColor systemGroupedBackgroundColor];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 54, 0, 0);
@@ -95,7 +95,7 @@ static NSUserDefaults *getDefaults() {
     CSSettingSection *resetSection = [CSSettingSection sectionWithHeader:@"重置"
                                                                   items:@[resetItem]];
     
-    CSSettingItem *tipItem1 = [CSSettingItem itemWithTitle:@"聊天界面字体大小"
+    CSSettingItem *tipItem1 = [CSSettingItem itemWithTitle:@"聊天界面字体"
                                                 iconName:@"info.circle"
                                                iconColor:[UIColor systemGrayColor]
                                                  detail:@"范围：8.0-25.0，默认17.0"];
@@ -150,7 +150,7 @@ static NSUserDefaults *getDefaults() {
 }
 
 - (void)showChatFontSizeInputAlert {
-    NSString *title = @"聊天界面字体大小";
+    NSString *title = @"聊天界面字体";
     NSString *message = [NSString stringWithFormat:@"请输入字体大小 (%.1f ~ %.1f)", kMinChatFontSize, kMaxChatFontSize];
     
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:title

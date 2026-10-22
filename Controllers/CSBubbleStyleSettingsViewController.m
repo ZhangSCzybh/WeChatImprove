@@ -55,15 +55,15 @@ static UIColor *CSUIColor(CSBubbleRGBA c) { return [UIColor colorWithRed:c.red g
     self.tableView.tableHeaderView=self.style.enabled ? self.preview : nil;
     NSMutableArray *sections=[NSMutableArray array],*footers=[NSMutableArray array];
     __weak typeof(self) weakSelf=self;
-    CSSettingItem *enabled=[CSSettingItem switchItemWithTitle:@"自定义气泡" iconName:@"bubble.left.and.bubble.right.fill"
+    CSSettingItem *enabled=[CSSettingItem switchItemWithTitle:@"启用气泡样式" iconName:@"bubble.left.and.bubble.right.fill"
         iconColor:UIColor.systemBlueColor switchValue:self.style.enabled valueChangedBlock:^(BOOL on) {
             [defaults setBool:on forKey:CSEnabledKey];[weakSelf publishChanges];
         }];
     NSMutableArray *appearance=[NSMutableArray arrayWithObject:enabled];
     if (self.style.enabled) {
-        CSSettingItem *kind=[CSSettingItem itemWithTitle:@"气泡样式" iconName:@"rectangle.stack" iconColor:UIColor.systemPurpleColor detail:CSBubbleStyleKindTitle(self.style.kind)];
-        kind.actionBlock=^{ [weakSelf showChoice:@"气泡样式" message:@"经典圆角保持四角圆润；连续圆角在合并消息的连接处使用直角，发送方在右侧、接收方在左侧，单条保持四角圆角。" titles:@[@"经典圆角",@"连续圆角"] values:@[@0,@1] key:CSBubbleStyleKindKey selected:weakSelf.style.kind]; };
-        CSSettingItem *radius=[CSSettingItem itemWithTitle:@"圆角大小" iconName:@"slider.horizontal.3" iconColor:UIColor.systemOrangeColor detail:[NSString stringWithFormat:@"%.0f",self.style.radius]];
+        CSSettingItem *kind=[CSSettingItem itemWithTitle:@"选择气泡样式" iconName:@"rectangle.stack" iconColor:UIColor.systemPurpleColor detail:CSBubbleStyleKindTitle(self.style.kind)];
+        kind.actionBlock=^{ [weakSelf showChoice:@"选择气泡样式" message:@"经典圆角保持四角圆润；连续圆角在合并消息的连接处使用直角，发送方在右侧、接收方在左侧，单条保持四角圆角。" titles:@[@"经典圆角",@"连续圆角"] values:@[@0,@1] key:CSBubbleStyleKindKey selected:weakSelf.style.kind]; };
+        CSSettingItem *radius=[CSSettingItem itemWithTitle:@"圆角大小设置" iconName:@"slider.horizontal.3" iconColor:UIColor.systemOrangeColor detail:[NSString stringWithFormat:@"%.0f",self.style.radius]];
         radius.actionBlock=^{ [weakSelf showCornerRadiusPicker]; };
         [appearance addObjectsFromArray:@[kind,radius]];
     }
@@ -97,9 +97,9 @@ static UIColor *CSUIColor(CSBubbleRGBA c) { return [UIColor colorWithRed:c.red g
     NSMutableArray *mergeItems=[NSMutableArray arrayWithObject:mergeEnabled];
     if (merge.enabled) {
         NSArray *scopes=@[@"群聊",@"私聊",@"全部会话"];
-        CSSettingItem *scope=[CSSettingItem itemWithTitle:@"生效范围" iconName:@"scope" iconColor:UIColor.systemTealColor detail:scopes[merge.scope-1]];
+        CSSettingItem *scope=[CSSettingItem itemWithTitle:@"合并生效范围" iconName:@"scope" iconColor:UIColor.systemTealColor detail:scopes[merge.scope-1]];
         scope.actionBlock=^{ [weakSelf showChoice:@"合并生效范围" message:nil titles:scopes values:@[@1,@2,@3] key:CSMessageMergeScopeKey selected:merge.scope]; };
-        CSSettingItem *spacing=[CSSettingItem itemWithTitle:@"组内间距" iconName:@"arrow.up.and.down" iconColor:UIColor.systemOrangeColor detail:CSMessageSpacingModeTitle(merge.spacingMode)];
+        CSSettingItem *spacing=[CSSettingItem itemWithTitle:@"组内间距设置" iconName:@"arrow.up.and.down" iconColor:UIColor.systemOrangeColor detail:CSMessageSpacingModeTitle(merge.spacingMode)];
         spacing.actionBlock=^{ [weakSelf showChoice:@"组内间距" message:@"正常保留原生间距；紧密以组内 2pt（逻辑点）为目标，头像、昵称及附加内容仍保留必要空间。连续圆角在两种间距下均可使用。" titles:@[@"正常",@"紧密"] values:@[@0,@1] key:CSMessageMergeSpacingModeKey selected:merge.spacingMode]; };
         CSSettingItem *avatar=[CSSettingItem itemWithTitle:@"头像保留位置" iconName:@"person.crop.circle" iconColor:UIColor.systemIndigoColor detail:merge.avatarPosition==2 ? @"首条消息" : @"末条消息"];
         avatar.actionBlock=^{ [weakSelf showChoice:@"头像保留位置" message:@"选择一组连续消息保留哪一条的头像。连续圆角的首条和末条按消息顺序确定。" titles:@[@"首条消息",@"末条消息"] values:@[@2,@1] key:CSMessageMergeAvatarKey selected:merge.avatarPosition]; };
@@ -108,9 +108,9 @@ static UIColor *CSUIColor(CSBubbleRGBA c) { return [UIColor colorWithRed:c.red g
     [sections addObject:[CSSettingSection sectionWithHeader:@"连续消息" items:mergeItems]];
     [footers addObject:merge.enabled ? @"同一个人的连续消息保留一处头像。选择连续圆角后，连接处的圆角随组内位置变化；通话记录保持独立气泡。" : @"关闭时每条消息独立显示。开启后可设置范围、间距和头像位置，并启用连续圆角的连接效果。"];
     if (self.style.enabled) {
-        CSSettingItem *reset=[CSSettingItem actionItemWithTitle:@"恢复默认背景色" iconName:@"arrow.counterclockwise" iconColor:UIColor.systemRedColor];
+        CSSettingItem *reset=[CSSettingItem actionItemWithTitle:@"恢复气泡颜色" iconName:@"arrow.counterclockwise" iconColor:UIColor.systemRedColor];
         reset.actionBlock=^{ [weakSelf resetToDefaultColors]; };
-        CSSettingItem *resetText=[CSSettingItem actionItemWithTitle:@"字体恢复跟随微信" iconName:@"textformat" iconColor:UIColor.systemRedColor];
+        CSSettingItem *resetText=[CSSettingItem actionItemWithTitle:@"恢复字体颜色" iconName:@"textformat" iconColor:UIColor.systemRedColor];
         resetText.actionBlock=^{ [weakSelf resetTextColors]; };
         [sections addObject:[CSSettingSection sectionWithHeader:@"恢复默认" items:@[reset,resetText]]];
         [footers addObject:@"背景色与字体颜色分别恢复，保留样式、圆角和合并设置。"];
@@ -154,7 +154,7 @@ static UIColor *CSUIColor(CSBubbleRGBA c) { return [UIColor colorWithRed:c.red g
     [self presentViewController:alert animated:YES completion:nil];
 }
 - (void)showCornerRadiusPicker {
-    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"圆角大小" message:@"范围 1–30，默认 16。较短的气泡会自动限制圆角，保证内容完整。" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"圆角大小设置" message:@"范围 1–30，默认 16。较短的气泡会自动限制圆角，保证内容完整。" preferredStyle:UIAlertControllerStyleAlert];
     [alert addTextFieldWithConfigurationHandler:^(UITextField *field) { field.keyboardType=UIKeyboardTypeDecimalPad;field.text=[NSString stringWithFormat:@"%.0f",self.style.radius]; }];
     __weak typeof(self) weakSelf=self;
     __weak UIAlertController *weakAlert=alert;

@@ -14,7 +14,7 @@
 @implementation CSBackupRepairViewController
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title=@"修复当前配置";
+    self.title=@"修复当前的配置";
     self.tableView.backgroundColor=UIColor.systemGroupedBackgroundColor;
     self.tableView.separatorInset=UIEdgeInsetsMake(0,54,0,0);
     [CSBackupSettingsCell registerToTableView:self.tableView];
@@ -105,7 +105,7 @@
 - (void)rebuildSections {
     __weak typeof(self) weakSelf=self;
     CSSettingItem *create=[self action:@"创建备份" icon:@"plus.circle.fill" color:UIColor.systemGreenColor block:^{[weakSelf create];}];
-    CSSettingItem *import=[self action:@"从文件导入" icon:@"square.and.arrow.down" color:UIColor.systemBlueColor block:^{[weakSelf importFile];}];
+    CSSettingItem *import=[self action:@"导入备份" icon:@"square.and.arrow.down" color:UIColor.systemBlueColor block:^{[weakSelf importFile];}];
     CSSettingItem *automatic=[CSSettingItem switchItemWithTitle:@"自动备份" iconName:@"arrow.triangle.2.circlepath" iconColor:UIColor.systemOrangeColor switchValue:CSBackupManager.sharedManager.isAutoBackupEnabled valueChangedBlock:^(BOOL on){[CSBackupManager.sharedManager enableAutoBackup:on];}];
     NSMutableArray *backups=[NSMutableArray array];NSDateFormatter *date=[NSDateFormatter new];date.dateFormat=@"MM-dd HH:mm";
     for(NSDictionary *record in self.records){
@@ -114,11 +114,11 @@
         CSSettingItem *item=[self action:record[@"metadata"][@"name"]?:record[@"name"] icon:favorite?@"star.fill":(issue?@"exclamationmark.shield.fill":@"archivebox.fill") color:(favorite||issue)?UIColor.systemOrangeColor:UIColor.systemBlueColor block:^{[weakSelf openRecord:record];}];
         item.detail=[record[@"unavailable"] boolValue]?@"原件已保留":(record[@"metadataWarning"]?@"保护待确认":[date stringFromDate:record[@"createdAt"]]);[backups addObject:item];
     }
-    if(!backups.count)[backups addObject:[CSSettingItem itemWithTitle:@"暂无本机备份" iconName:@"archivebox" iconColor:UIColor.systemGrayColor detail:nil]];
+    if(!backups.count)[backups addObject:[CSSettingItem itemWithTitle:@"暂无备份" iconName:@"archivebox" iconColor:UIColor.systemGrayColor detail:nil]];
     CSSettingItem *status=[self action:@"备份与恢复状态" icon:@"info.circle" color:UIColor.systemBlueColor block:^{[weakSelf message:@"备份与恢复状态" detail:CSBackupManager.sharedManager.status];}];
     status.detail=@"查看";
     CSSettingItem *retry=[self action:@"重试备份与恢复" icon:@"arrow.clockwise" color:UIColor.systemOrangeColor block:^{[weakSelf retryStartup];}];
-    CSSettingItem *repair=[self action:@"修复当前配置" icon:@"wrench.and.screwdriver" color:UIColor.systemOrangeColor block:^{[weakSelf repair];}];
+    CSSettingItem *repair=[self action:@"修复当前的配置" icon:@"wrench.and.screwdriver" color:UIColor.systemOrangeColor block:^{[weakSelf repair];}];
     CSSettingItem *cancel=[self action:@"取消待执行计划" icon:@"xmark.circle" color:UIColor.systemRedColor block:^{[weakSelf confirmCancel];}];
     CSSettingItem *info=[self action:@"功能说明" icon:@"questionmark.circle" color:UIColor.systemGrayColor block:^{[weakSelf message:@"备份配置说明" detail:@"备份包含插件配置、自定义图片和已存档账号分组。仅支持当前 .wcbak 格式。点击备份可预览恢复、导出、重命名、收藏或删除。\n\n自动备份在配置停止变化约 30 秒后尝试保存，持续编辑时约 5 分钟检查一次，相同内容不重复保存。默认保留 20 份自动备份与 5 份操作保护备份；手动、导入、收藏及待执行计划使用的备份会保留。保护状态异常时会保留备份，确认收藏状态后重新按规则管理。\n\n无法读取的文件仍显示在列表，可导出可读取的原件并重新检查；历史清理结果可在“备份与恢复状态”查看。\n\n导出文件未加密，可能包含成员、联系人标识和自定义文字；不包含微信消息、登录凭据或支付账本。"]; }];
     self.sections=[@[[CSSettingSection sectionWithHeader:@"备份设置" items:@[create,import,automatic]],

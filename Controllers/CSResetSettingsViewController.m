@@ -15,7 +15,7 @@
     [CSBackupSettingsCell registerToTableView:self.tableView];
     __weak typeof(self) weakSelf=self;
     // Use the same inherited typography as the normal rows on the transfer settings page.
-    CSSettingItem *reset=[CSSettingItem itemWithTitle:@"选择重置范围" iconName:@"arrow.counterclockwise" iconColor:UIColor.systemRedColor detail:nil];
+    CSSettingItem *reset=[CSSettingItem itemWithTitle:@"重置范围" iconName:@"arrow.counterclockwise" iconColor:UIColor.systemRedColor detail:nil];
     reset.detail=@"预览";reset.actionBlock=^{[weakSelf previewReset];};
     CSSettingItem *backup=[CSSettingItem itemWithTitle:@"备份配置" iconName:@"archivebox.fill" iconColor:UIColor.systemBlueColor detail:nil];
     backup.actionBlock=^{[weakSelf.navigationController pushViewController:[[CSBackupSettingsViewController alloc]initWithStyle:UITableViewStyleInsetGrouped] animated:YES];};

@@ -256,7 +256,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
         [groupItems addObject:tabItem];
     }
     
-    CSSettingItem *addTabItem = [CSSettingItem itemWithTitle:@"添加自定义分组"
+    CSSettingItem *addTabItem = [CSSettingItem itemWithTitle:@"添加自定义组"
                                                    iconName:@"plus.circle"
                                                   iconColor:[UIColor systemBlueColor]
                                                      detail:@""];
@@ -279,7 +279,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
                                                      detail:[NSString stringWithFormat:@"%ld pt", (long)CSGroupTabFontSize(defaults)]];
     fontSizeItem.actionBlock = ^{ [weakSelf showTabFontSizePicker]; };
 
-    CSSettingItem *searchButtonItem = [CSSettingItem switchItemWithTitle:@"显示分组栏搜索按钮"
+    CSSettingItem *searchButtonItem = [CSSettingItem switchItemWithTitle:@"分组搜索按钮"
                                                               iconName:@"magnifyingglass"
                                                              iconColor:[UIColor systemBlueColor]
                                                            switchValue:CSGroupSearchButtonVisible(defaults)
@@ -290,7 +290,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
     }];
 
     self.indicatorColorPreview.previewColor = [self currentIndicatorColor];
-    CSSettingItem *indicatorColorItem = [CSSettingItem itemWithTitle:@"指示器颜色"
+    CSSettingItem *indicatorColorItem = [CSSettingItem itemWithTitle:@"指示器背景色"
                                                            iconName:@"rectangle"
                                                           iconColor:[self currentIndicatorColor]
                                                              detail:@""];
@@ -309,13 +309,13 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
         [weakSelf showColorPicker];
     };
     
-    CSSettingItem *indicatorAnimationItem = [CSSettingItem itemWithTitle:@"分组指示器切换动画"
+    CSSettingItem *indicatorAnimationItem = [CSSettingItem itemWithTitle:@"分组切换动画"
         iconName:@"wand.and.stars" iconColor:[UIColor systemPurpleColor]
         detail:CSGroupIndicatorStyleName(CSGroupCurrentIndicatorStyle(defaults))];
     indicatorAnimationItem.actionBlock = ^{ [weakSelf showIndicatorStylePicker]; };
 
     NSString *hapticDetail = [self hapticFeedbackName];
-    CSSettingItem *hapticFeedbackItem = [CSSettingItem itemWithTitle:@"切换触感"
+    CSSettingItem *hapticFeedbackItem = [CSSettingItem itemWithTitle:@"分组切换触感"
                                                            iconName:@"hand.tap"
                                                           iconColor:[UIColor systemPurpleColor]
                                                              detail:hapticDetail];
@@ -323,7 +323,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
         [weakSelf showHapticFeedbackPicker];
     };
     
-    CSSettingItem *filterDuplicateItem = [CSSettingItem switchItemWithTitle:@"过滤重复联系人"
+    CSSettingItem *filterDuplicateItem = [CSSettingItem switchItemWithTitle:@"过滤重复会话"
                                                                   iconName:@"person.crop.circle.badge.minus"
                                                                  iconColor:[UIColor systemRedColor]
                                                                switchValue:self.groupPreferences.filterDuplicates
@@ -370,7 +370,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
     }];
     
     NSString *sensitivityDetail = [self scrollSensitivityName];
-    CSSettingItem *scrollSensitivityItem = [CSSettingItem itemWithTitle:@"滑动灵敏度"
+    CSSettingItem *scrollSensitivityItem = [CSSettingItem itemWithTitle:@"滑动灵敏速度"
                                                               iconName:@"slider.horizontal.3"
                                                              iconColor:[UIColor systemCyanColor]
                                                                 detail:sensitivityDetail];
@@ -378,7 +378,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
         [weakSelf showScrollSensitivityPicker];
     };
     
-    CSSettingItem *infoItem = [CSSettingItem itemWithTitle:@"功能说明"
+    CSSettingItem *infoItem = [CSSettingItem itemWithTitle:@"分组功能说明"
                                                  iconName:@"info.circle"
                                                 iconColor:[UIColor systemBlueColor]
                                                    detail:@"点击查看"];
@@ -416,7 +416,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
     CSSettingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[CSSettingTableViewCell reuseIdentifier] forIndexPath:indexPath];
     [cell configureWithItem:item];
     
-    if ([item.title isEqualToString:@"指示器颜色"]) {
+    if ([item.title isEqualToString:@"指示器背景色"]) {
         cell.accessoryView = self.indicatorColorPreview;
     } else if ([item.title isEqualToString:@"选中文本颜色"]) {
         cell.accessoryView = self.selectedTextColorPreview;
@@ -436,7 +436,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
         if (!self.groupPreferences.accountID.length) return @"当前账号尚未确认，账号分组暂不可编辑；确认登录账号后将自动载入。";
         return @"点击右上角\"排序\"可拖拽调整分组顺序，左滑可编辑或隐藏或删除";
     } else if (section == 2){
-        return @"分组标签字号：默认 18 pt，可自定义 12–28 pt，并随系统文字大小缩放。\n显示分组栏搜索按钮：开启时使用标签栏右侧搜索入口，收起聊天列表整块原生搜索区域（含背景、留白和占位）；关闭时恢复。\n添加分组：请在本页点击“添加自定义分组”。\n过滤重复联系人：开启后分组内的好友、群聊将不会出现在私信和群列表，在列表安全更新后生效。\n分组切换手势：在会话区域左侧 85% 起手横滑可切换分组；从会话右侧 15% 起手左滑可展开原生菜单。按手指落点区分，滑动中途不改变用途；菜单展开时暂停切组。分组栏也支持横滑，标签过多时优先滚动标签。\n隐藏分组角标：隐藏除\"全部\"外的其他分组角标。\n隐藏全部角标：隐藏\"全部\"分组的角标。\n滑动灵敏度：建议默认，相对流畅。\n分组指示器切换动画：可选下划线、胶囊包裹或关闭，升级沿用原开关状态。下划线保留移动伸展；胶囊底色在标题原地收拢、展开，背景直接使用指示器颜色，标题使用选中文本颜色。关闭后保留下划线并直接落位。遵循系统减弱动态效果。";
+        return @"分组标签字号：默认 18 pt，可自定义 12–28 pt，并随系统文字大小缩放。\n显示分组栏搜索按钮：开启时使用标签栏右侧搜索入口，收起聊天列表整块原生搜索区域（含背景、留白和占位）；关闭时恢复。\n添加分组：请在本页点击“添加自定义分组”。\n过滤重复会话：开启后分组内的好友、群聊将不会出现在私信和群列表，在列表安全更新后生效。\n分组切换手势：在会话区域左侧 85% 起手横滑可切换分组；从会话右侧 15% 起手左滑可展开原生菜单。按手指落点区分，滑动中途不改变用途；菜单展开时暂停切组。分组栏也支持横滑，标签过多时优先滚动标签。\n隐藏分组角标：隐藏除\"全部\"外的其他分组角标。\n隐藏全部角标：隐藏\"全部\"分组的角标。\n滑动灵敏度：建议默认，相对流畅。\n分组指示器切换动画：可选下划线、胶囊包裹或关闭，升级沿用原开关状态。下划线保留移动伸展；胶囊底色在标题原地收拢、展开，背景直接使用指示器颜色，标题使用选中文本颜色。关闭后保留下划线并直接落位。遵循系统减弱动态效果。";
     } else {
         return nil;
     }
@@ -552,7 +552,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 }
 
 - (void)showColorPicker {
-    NSString *title = self.currentColorType == 0 ? @"指示器颜色" : @"选中文本颜色";
+    NSString *title = self.currentColorType == 0 ? @"指示器背景色" : @"选中文本颜色";
     UIColor *currentColor = self.currentColorType == 0 ? [self currentIndicatorColor] : [self currentSelectedTextColor];
     
     UIColorPickerViewController *colorPicker = [[UIColorPickerViewController alloc] init];
@@ -1121,7 +1121,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 
 - (void)showInfoAlert {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"聊天分组功能说明"
-                                                                            message:@"聊天分组功能在聊天列表顶部显示会话分组标签，方便您快速切换查看不同类型的会话。开启分组栏搜索按钮后，使用该按钮搜索，并收起整块原生搜索区域。\n\n【主要功能】\n• 预设分组：全部、群聊、私聊、服务\n• 自定义分组：在设置页点击“添加自定义分组”创建\n• 分组排序：拖拽调整分组顺序\n• 分组隐藏：可隐藏不需要的分组\n\n【高级设置】\n• 分组标签字号：默认 18 pt，可自定义 12–28 pt\n• 显示分组栏搜索按钮：开启时收起整块原生搜索区域及占位，关闭时恢复\n• 指示器颜色：自定义选中指示器颜色\n• 选中文本颜色：自定义选中文本颜色\n• 切换触感：切换分组时的触感反馈\n• 过滤重复联系人：避免会话重复显示\n• 分组切换手势：会话区域左侧 85% 起手横滑切组，右侧 15% 起手左滑展开菜单，按起点区分；菜单展开时暂停切组。分组栏也可横滑，标签过多时优先滚动标签\n• 隐藏角标：隐藏分组角标\n• 滑动灵敏度：调整列表滑动速度\n• 分组指示器切换动画：下划线、胶囊包裹或关闭；胶囊沿用指示器颜色与选中文本颜色，深浅色分别配置；关闭保留静态下划线，遵循系统减弱动态效果\n\n设置将在当前滚动或编辑结束后更新。"
+                                                                            message:@"聊天分组功能在聊天列表顶部显示会话分组标签，方便您快速切换查看不同类型的会话。开启分组栏搜索按钮后，使用该按钮搜索，并收起整块原生搜索区域。\n\n【主要功能】\n• 预设分组：全部、群聊、私聊、服务\n• 自定义分组：在设置页点击“添加自定义分组”创建\n• 分组排序：拖拽调整分组顺序\n• 分组隐藏：可隐藏不需要的分组\n\n【高级设置】\n• 分组标签字号：默认 18 pt，可自定义 12–28 pt\n• 显示分组栏搜索按钮：开启时收起整块原生搜索区域及占位，关闭时恢复\n• 指示器背景色：自定义选中指示器颜色\n• 选中文本颜色：自定义选中文本颜色\n• 切换触感：切换分组时的触感反馈\n• 过滤重复会话：避免会话重复显示\n• 分组切换手势：会话区域左侧 85% 起手横滑切组，右侧 15% 起手左滑展开菜单，按起点区分；菜单展开时暂停切组。分组栏也可横滑，标签过多时优先滚动标签\n• 隐藏角标：隐藏分组角标\n• 滑动灵敏度：调整列表滑动速度\n• 分组指示器切换动画：下划线、胶囊包裹或关闭；胶囊沿用指示器颜色与选中文本颜色，深浅色分别配置；关闭保留静态下划线，遵循系统减弱动态效果\n\n设置将在当前滚动或编辑结束后更新。"
                                                                      preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"了解了"

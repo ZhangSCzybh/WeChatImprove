@@ -130,7 +130,7 @@
 - (void)setupData {
     __weak typeof(self) weakSelf = self;
 
-    CSSettingItem *listEnabledItem = [CSSettingItem switchItemWithTitle:@"列表圆角"
+    CSSettingItem *listEnabledItem = [CSSettingItem switchItemWithTitle:@"启用列表圆角"
                                                               iconName:@"rectangle.on.rectangle"
                                                              iconColor:[UIColor systemIndigoColor]
                                                            switchValue:[[CSListCornerConfiguration sharedConfiguration] snapshot].enabled
@@ -142,7 +142,7 @@
     }];
 
     NSString *radiusDetail = [NSString stringWithFormat:@"%.0f", self.cornerRadius];
-    self.cornerRadiusItem = [CSSettingItem itemWithTitle:@"圆角半径"
+    self.cornerRadiusItem = [CSSettingItem itemWithTitle:@"圆角半径大小"
                                                iconName:@"slider.horizontal.3"
                                               iconColor:[UIColor systemOrangeColor]
                                                 detail:radiusDetail];
@@ -152,7 +152,7 @@
     };
 
     NSString *leftMarginDetail = [NSString stringWithFormat:@"%.0f", self.leftMargin];
-    self.leftMarginItem = [CSSettingItem itemWithTitle:@"左边距"
+    self.leftMarginItem = [CSSettingItem itemWithTitle:@"距离左侧边距"
                                              iconName:@"arrow.left.to.line"
                                             iconColor:[UIColor systemBlueColor]
                                               detail:leftMarginDetail];
@@ -161,7 +161,7 @@
     };
 
     NSString *rightMarginDetail = [NSString stringWithFormat:@"%.0f", self.rightMargin];
-    self.rightMarginItem = [CSSettingItem itemWithTitle:@"右边距"
+    self.rightMarginItem = [CSSettingItem itemWithTitle:@"距离右侧边距"
                                               iconName:@"arrow.right.to.line"
                                              iconColor:[UIColor systemBlueColor]
                                                detail:rightMarginDetail];
@@ -170,7 +170,7 @@
     };
 
     NSString *topSessionTopMarginDetail = [NSString stringWithFormat:@"%.0f", self.topSessionTopMargin];
-    self.topSessionTopMarginItem = [CSSettingItem itemWithTitle:@"置顶会话顶部距离"
+    self.topSessionTopMarginItem = [CSSettingItem itemWithTitle:@"置顶会话距离"
                                                       iconName:@"arrow.up.to.line"
                                                      iconColor:[UIColor systemPurpleColor]
                                                        detail:topSessionTopMarginDetail];
@@ -179,7 +179,7 @@
     };
 
     NSString *normalSessionTopMarginDetail = [NSString stringWithFormat:@"%.0f", self.normalSessionTopMargin];
-    self.normalSessionTopMarginItem = [CSSettingItem itemWithTitle:@"普通会话顶部距离"
+    self.normalSessionTopMarginItem = [CSSettingItem itemWithTitle:@"普通会话距离"
                                                          iconName:@"arrow.up.to.line.compact"
                                                         iconColor:[UIColor systemTealColor]
                                                           detail:normalSessionTopMarginDetail];
@@ -187,7 +187,7 @@
         [weakSelf showNormalSessionTopMarginPicker];
     };
 
-    self.topSessionTopMarginBgColorItem = [CSSettingItem itemWithTitle:@"置顶会话顶部距离背景色"
+    self.topSessionTopMarginBgColorItem = [CSSettingItem itemWithTitle:@"置顶会话颜色"
                                                              iconName:@"paintbrush.fill"
                                                             iconColor:[UIColor systemPinkColor]
                                                               detail:@""];
@@ -196,7 +196,7 @@
         [weakSelf showColorPickerWithTitle:@"置顶会话顶部距离背景色" currentColor:weakSelf.topSessionTopMarginBgColor];
     };
 
-    self.normalSessionTopMarginBgColorItem = [CSSettingItem itemWithTitle:@"普通会话顶部距离背景色"
+    self.normalSessionTopMarginBgColorItem = [CSSettingItem itemWithTitle:@"普通会话颜色"
                                                                iconName:@"paintbrush.fill"
                                                               iconColor:[UIColor systemCyanColor]
                                                                 detail:@""];
@@ -205,7 +205,7 @@
         [weakSelf showColorPickerWithTitle:@"普通会话顶部距离背景色" currentColor:weakSelf.normalSessionTopMarginBgColor];
     };
 
-    self.lightModeBgColorItem = [CSSettingItem itemWithTitle:@"浅色模式背景色"
+    self.lightModeBgColorItem = [CSSettingItem itemWithTitle:@"浅色模式背景"
                                                    iconName:@"paintbrush.fill"
                                                   iconColor:[UIColor systemGrayColor]
                                                     detail:@""];
@@ -214,7 +214,7 @@
         [weakSelf showColorPickerWithTitle:@"浅色模式 - 背景色" currentColor:weakSelf.lightModeBgColor];
     };
 
-    self.darkModeBgColorItem = [CSSettingItem itemWithTitle:@"深色模式背景色"
+    self.darkModeBgColorItem = [CSSettingItem itemWithTitle:@"深色模式背景"
                                                   iconName:@"paintbrush.fill"
                                                  iconColor:[UIColor systemGrayColor]
                                                    detail:@""];

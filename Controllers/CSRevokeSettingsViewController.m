@@ -31,7 +31,7 @@ static NSString * const kWCHideRevokeMessageEnabledKey = @"com.wechat.tweak.hide
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
     // 创建防撤回开关
-    CSSettingItem *enableItem = [CSSettingItem switchItemWithTitle:@"开启防撤回"
+    CSSettingItem *enableItem = [CSSettingItem switchItemWithTitle:@"开启防止撤回功能"
                                                          iconName:@"arrow.uturn.backward.circle"
                                                         iconColor:[UIColor systemRedColor]
                                                       switchValue:[defaults boolForKey:kRevokeEnabledKey]
@@ -43,7 +43,7 @@ static NSString * const kWCHideRevokeMessageEnabledKey = @"com.wechat.tweak.hide
     
     // 创建隐藏撤回消息提示标签开关
     BOOL hideRevokeMessageEnabled = [defaults objectForKey:kWCHideRevokeMessageEnabledKey] ? [defaults boolForKey:kWCHideRevokeMessageEnabledKey] : NO;
-    CSSettingItem *hideRevokeMessageItem = [CSSettingItem switchItemWithTitle:@"隐藏撤回消息提示标签"
+    CSSettingItem *hideRevokeMessageItem = [CSSettingItem switchItemWithTitle:@"隐藏撤回提示标签"
                                                                    iconName:@"eye.slash"
                                                                   iconColor:[UIColor systemPurpleColor]
                                                                 switchValue:hideRevokeMessageEnabled
@@ -63,7 +63,7 @@ static NSString * const kWCHideRevokeMessageEnabledKey = @"com.wechat.tweak.hide
     }];
     
     // 创建功能说明项
-    CSSettingItem *infoItem = [CSSettingItem itemWithTitle:@"功能说明"
+    CSSettingItem *infoItem = [CSSettingItem itemWithTitle:@"防止撤回功能说明"
                                                  iconName:@"info.circle"
                                                 iconColor:[UIColor systemBlueColor]
                                                   detail:nil];

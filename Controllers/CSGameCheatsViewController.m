@@ -35,7 +35,7 @@ static NSString * const kGameCheatEnabledKey = @"GameCheat_Enabled";
     BOOL isGameCheatEnabled = [defaults boolForKey:kGameCheatEnabledKey];
     
     // 创建游戏作弊开关项
-    self.gameCheatItem = [CSSettingItem switchItemWithTitle:@"启用游戏辅助"
+    self.gameCheatItem = [CSSettingItem switchItemWithTitle:@"启用功能"
                                                    iconName:@"gamecontroller.fill"
                                                   iconColor:[UIColor systemGreenColor]
                                                 switchValue:isGameCheatEnabled

@@ -253,7 +253,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     }];
     
     // 创建仅在录屏时显示的开关项（移动到高级设置区域）
-    self.onlyWhenRecordingItem = [CSSettingItem switchItemWithTitle:@"仅在录屏时显示"
+    self.onlyWhenRecordingItem = [CSSettingItem switchItemWithTitle:@"仅在录屏显示"
                                                           iconName:@"record.circle"
                                                          iconColor:[UIColor systemRedColor]
                                                        switchValue:onlyWhenRecording
@@ -282,7 +282,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     self.colorPreviewView.previewColor = trailColor;
     
     // 使用inputItemWithTitle替代disclosureItemWithTitle
-    self.colorItem = [CSSettingItem inputItemWithTitle:@"轨迹颜色"
+    self.colorItem = [CSSettingItem inputItemWithTitle:@"选择轨迹颜色"
                                              iconName:@"paintpalette.fill"
                                             iconColor:[UIColor systemRedColor]
                                            inputValue:@"点击选择"
@@ -299,7 +299,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     
     NSString *sizeText = [NSString stringWithFormat:@"%.1f", trailSize];
     // 使用inputItemWithTitle替代disclosureItemWithTitle
-    self.sizeItem = [CSSettingItem inputItemWithTitle:@"轨迹大小"
+    self.sizeItem = [CSSettingItem inputItemWithTitle:@"设置轨迹大小"
                                             iconName:@"circle.dashed"
                                            iconColor:[UIColor systemOrangeColor]
                                           inputValue:sizeText
@@ -316,7 +316,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     }
     
     // 创建边框开关项
-    self.borderEnabledItem = [CSSettingItem switchItemWithTitle:@"显示边框"
+    self.borderEnabledItem = [CSSettingItem switchItemWithTitle:@"启用显示边框"
                                                        iconName:@"square.dashed"
                                                       iconColor:[UIColor systemIndigoColor]
                                                     switchValue:isBorderEnabled
@@ -333,7 +333,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     self.borderColorPreviewView.previewColor = borderColor;
     
     // 使用inputItemWithTitle替代disclosureItemWithTitle
-    self.borderColorItem = [CSSettingItem inputItemWithTitle:@"边框颜色"
+    self.borderColorItem = [CSSettingItem inputItemWithTitle:@"设置边框颜色"
                                                    iconName:@"pencil.circle"
                                                   iconColor:[UIColor systemPurpleColor]
                                                  inputValue:@"点击选择"
@@ -343,7 +343,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     // 创建边框宽度设置项
     NSString *borderWidthText = [NSString stringWithFormat:@"%.1f", borderWidth];
     // 使用inputItemWithTitle替代disclosureItemWithTitle
-    self.borderWidthItem = [CSSettingItem inputItemWithTitle:@"边框宽度"
+    self.borderWidthItem = [CSSettingItem inputItemWithTitle:@"边框宽度大小"
                                                    iconName:@"decrease.indent"
                                                   iconColor:[UIColor systemTealColor]
                                                  inputValue:borderWidthText
@@ -370,7 +370,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     }
     
     // 创建拖尾效果开关项
-    self.tailEnabledItem = [CSSettingItem switchItemWithTitle:@"拖尾效果" 
+    self.tailEnabledItem = [CSSettingItem switchItemWithTitle:@"启用拖尾效果" 
                                                      iconName:@"waveform.path"
                                                     iconColor:[UIColor systemTealColor]
                                                   switchValue:isTailEnabled
@@ -385,7 +385,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     // 创建拖尾密度设置项
     NSString *densityText = [NSString stringWithFormat:@"%.0f", tailDensity];
     // 使用inputItemWithTitle替代disclosureItemWithTitle
-    self.tailDensityItem = [CSSettingItem inputItemWithTitle:@"拖尾密度"
+    self.tailDensityItem = [CSSettingItem inputItemWithTitle:@"拖尾密度大小"
                                                    iconName:@"chart.bar.fill"
                                                   iconColor:[UIColor systemBlueColor]
                                                  inputValue:densityText
@@ -416,7 +416,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     }
     
     // 创建自定义图片开关项
-    self.customImageEnabledItem = [CSSettingItem switchItemWithTitle:@"使用自定义图片" 
+    self.customImageEnabledItem = [CSSettingItem switchItemWithTitle:@"自选图片素材" 
                                                           iconName:@"photo.fill"
                                                          iconColor:[UIColor systemGreenColor]
                                                        switchValue:isCustomImageEnabled
@@ -430,7 +430,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     
     // 创建选择图片项
     NSString *imageStatus = imagePath ? @"已选择" : @"点击选择";
-    self.customImageSelectItem = [CSSettingItem inputItemWithTitle:@"选择图片"
+    self.customImageSelectItem = [CSSettingItem inputItemWithTitle:@"选择轨迹图片"
                                                           iconName:@"photo.on.rectangle"
                                                          iconColor:[UIColor systemBlueColor]
                                                         inputValue:imageStatus
@@ -439,7 +439,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     
     // 创建圆角设置项
     NSString *cornerRadiusText = [NSString stringWithFormat:@"%.1f", cornerRadius];
-    self.customImageCornerRadiusItem = [CSSettingItem inputItemWithTitle:@"圆角程度"
+    self.customImageCornerRadiusItem = [CSSettingItem inputItemWithTitle:@"圆角程度大小"
                                                              iconName:@"square.on.circle"
                                                             iconColor:[UIColor systemOrangeColor]
                                                            inputValue:cornerRadiusText
@@ -512,14 +512,14 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
             [tailItems addObject:self.tailDensityItem];
             [tailItems addObject:self.tailDurationItem];
         }
-        CSSettingSection *tailSection = [CSSettingSection sectionWithHeader:@"拖尾效果"
+        CSSettingSection *tailSection = [CSSettingSection sectionWithHeader:@"启用拖尾效果"
                                                                     items:tailItems];
         [sections addObject:tailSection];
     }
     
     // 5. 说明区域 - 始终显示
     // 使用inputItemWithTitle替代disclosureItemWithTitle
-    CSSettingItem *infoItem = [CSSettingItem inputItemWithTitle:@"功能说明"
+    CSSettingItem *infoItem = [CSSettingItem inputItemWithTitle:@"触摸轨迹说明"
                                                       iconName:@"info.circle"
                                                      iconColor:[UIColor systemBlueColor]
                                                     inputValue:@"点击查看"
@@ -551,11 +551,11 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     [cell configureWithItem:item];
     
     // 为颜色选项添加颜色预览
-    if ([item.title isEqualToString:@"轨迹颜色"]) {
+    if ([item.title isEqualToString:@"选择轨迹颜色"]) {
         cell.accessoryView = self.colorPreviewView;
-    } else if ([item.title isEqualToString:@"边框颜色"]) {
+    } else if ([item.title isEqualToString:@"设置边框颜色"]) {
         cell.accessoryView = self.borderColorPreviewView;
-    } else if ([item.title isEqualToString:@"选择图片"]) {
+    } else if ([item.title isEqualToString:@"选择轨迹图片"]) {
         cell.accessoryView = self.customImagePreviewView;
     }
     
@@ -605,25 +605,25 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     CSSettingItem *item = self.sections[indexPath.section].items[indexPath.row];
     
     // 处理轨迹颜色点击
-    if ([item.title isEqualToString:@"轨迹颜色"]) {
+    if ([item.title isEqualToString:@"选择轨迹颜色"]) {
         self.isSelectingBorderColor = NO;
         [self showColorPicker];
     }
     // 处理边框颜色点击
-    else if ([item.title isEqualToString:@"边框颜色"]) {
+    else if ([item.title isEqualToString:@"设置边框颜色"]) {
         self.isSelectingBorderColor = YES;
         [self showBorderColorPicker];
     }
     // 处理轨迹大小点击
-    else if ([item.title isEqualToString:@"轨迹大小"]) {
+    else if ([item.title isEqualToString:@"设置轨迹大小"]) {
         [self showSizeInputAlert];
     }
     // 处理边框宽度点击
-    else if ([item.title isEqualToString:@"边框宽度"]) {
+    else if ([item.title isEqualToString:@"边框宽度大小"]) {
         [self showBorderWidthInputAlert];
     }
     // 处理拖尾密度点击
-    else if ([item.title isEqualToString:@"拖尾密度"]) {
+    else if ([item.title isEqualToString:@"拖尾密度大小"]) {
         [self showTailDensityInputAlert];
     }
     // 处理拖尾持续时间点击
@@ -631,15 +631,15 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
         [self showTailDurationInputAlert];
     }
     // 处理功能说明点击
-    else if ([item.title isEqualToString:@"功能说明"]) {
+    else if ([item.title isEqualToString:@"触摸轨迹说明"]) {
         [self showInfoAlert];
     }
     // 处理选择图片点击
-    else if ([item.title isEqualToString:@"选择图片"]) {
+    else if ([item.title isEqualToString:@"选择轨迹图片"]) {
         [self showImagePicker];
     }
     // 处理圆角程度点击
-    else if ([item.title isEqualToString:@"圆角程度"]) {
+    else if ([item.title isEqualToString:@"圆角程度大小"]) {
         [self showCornerRadiusInputAlert];
     }
 }
@@ -673,7 +673,7 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     UIColorPickerViewController *colorPicker = [[UIColorPickerViewController alloc] init];
     colorPicker.delegate = self;
     colorPicker.selectedColor = [self getBorderColor];
-    colorPicker.title = @"选择边框颜色";
+    colorPicker.title = @"设置边框颜色";
     colorPicker.supportsAlpha = YES;
     [self presentViewController:colorPicker animated:YES completion:nil];
 }

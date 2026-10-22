@@ -124,7 +124,7 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
                                                                  items:@[enableItem]];
     
     // 显示位置区
-    CSSettingItem *belowAvatarItem = [CSSettingItem switchItemWithTitle:@"显示在头像下方" 
+    CSSettingItem *belowAvatarItem = [CSSettingItem switchItemWithTitle:@"显示头像下方" 
                                                              iconName:@"person.crop.circle.badge.clock" 
                                                             iconColor:[UIColor systemIndigoColor] 
                                                           switchValue:[defaults boolForKey:kMessageTimeShowBelowAvatarKey] 
@@ -136,7 +136,7 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
     }];
     
     // 添加加粗字体选项
-    CSSettingItem *boldFontItem = [CSSettingItem switchItemWithTitle:@"使用粗体字" 
+    CSSettingItem *boldFontItem = [CSSettingItem switchItemWithTitle:@"启用加粗字体" 
                                                           iconName:@"bold" 
                                                          iconColor:[UIColor systemOrangeColor] 
                                                        switchValue:[defaults boolForKey:kMessageTimeBoldFontKey] 
@@ -148,7 +148,7 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
     }];
     
     // 添加单行显示选项
-    CSSettingItem *singleLineItem = [CSSettingItem switchItemWithTitle:@"单行显示日期时间" 
+    CSSettingItem *singleLineItem = [CSSettingItem switchItemWithTitle:@"单行显示时间" 
                                                             iconName:@"text.justify" 
                                                            iconColor:[UIColor systemPurpleColor] 
                                                          switchValue:[defaults boolForKey:kMessageTimeSingleLineKey] 
@@ -160,7 +160,7 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
     }];
     
     // 添加点击显示选项
-    CSSettingItem *tapToShowItem = [CSSettingItem switchItemWithTitle:@"点击显示" 
+    CSSettingItem *tapToShowItem = [CSSettingItem switchItemWithTitle:@"启用点击显示" 
                                                             iconName:@"hand.tap.fill" 
                                                            iconColor:[UIColor systemCyanColor] 
                                                          switchValue:[defaults boolForKey:kMessageTimeTapToShowKey] 

@@ -270,7 +270,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     __weak typeof(self) weakSelf = self;
     
     // 1. 显示头像开关
-    CSSettingItem *showAvatarItem = [CSSettingItem switchItemWithTitle:@"显示头像" 
+    CSSettingItem *showAvatarItem = [CSSettingItem switchItemWithTitle:@"显示会话头像" 
                                                              iconName:@"person.crop.circle" 
                                                             iconColor:[UIColor systemBlueColor] 
                                                            switchValue:self.showAvatar 
@@ -292,7 +292,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     }];
     
     // 2. 点击头像显示信息开关
-    CSSettingItem *showPopoverWhenTapAvatarItem = [CSSettingItem switchItemWithTitle:@"点击头像显示信息" 
+    CSSettingItem *showPopoverWhenTapAvatarItem = [CSSettingItem switchItemWithTitle:@"点击显示信息" 
                                                                          iconName:@"person.crop.circle.badge.questionmark" 
                                                                         iconColor:[UIColor systemTealColor] 
                                                                        switchValue:self.showPopoverWhenTapAvatar 
@@ -333,7 +333,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
         [defaults synchronize];
     }];
     
-    CSSettingItem *showInOfficialItem = [CSSettingItem switchItemWithTitle:@"在公众号中显示" 
+    CSSettingItem *showInOfficialItem = [CSSettingItem switchItemWithTitle:@"公众号中显示" 
                                                                  iconName:@"newspaper.circle" 
                                                                 iconColor:[UIColor systemOrangeColor] 
                                                                switchValue:[defaults boolForKey:kNavigationShowInOfficialKey] 
@@ -347,7 +347,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                                                                  items:@[showInPrivateItem, showInGroupItem, showInOfficialItem]];
     
     // 2. 创建显示开关项
-    CSSettingItem *showOtherItem = [CSSettingItem switchItemWithTitle:@"只显示对方头像" 
+    CSSettingItem *showOtherItem = [CSSettingItem switchItemWithTitle:@"显示对方头像" 
                                                             iconName:@"person.crop.circle" 
                                                            iconColor:[UIColor systemOrangeColor] 
                                                           switchValue:(self.showOtherAvatar && !self.showSelfAvatar && !self.showOtherNickname) 
@@ -368,7 +368,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
         [weakSelf.tableView reloadData];
     }];
     
-    CSSettingItem *showSelfItem = [CSSettingItem switchItemWithTitle:@"只显示自己头像" 
+    CSSettingItem *showSelfItem = [CSSettingItem switchItemWithTitle:@"显示自己头像" 
                                                            iconName:@"person.crop.circle.fill" 
                                                           iconColor:[UIColor systemPurpleColor] 
                                                          switchValue:(self.showSelfAvatar && !self.showOtherAvatar && !self.showOtherNickname) 
@@ -390,7 +390,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     }];
     
     // 添加显示对方头像带网名的开关
-    CSSettingItem *showOtherWithNicknameItem = [CSSettingItem switchItemWithTitle:@"显示对方头像和网名" 
+    CSSettingItem *showOtherWithNicknameItem = [CSSettingItem switchItemWithTitle:@"显示头像网名" 
                                                                        iconName:@"person.text.rectangle" 
                                                                       iconColor:[UIColor systemBlueColor] 
                                                                      switchValue:(self.showOtherAvatar && !self.showSelfAvatar && self.showOtherNickname) 
@@ -413,7 +413,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     }];
     
     // 添加同时显示两个头像的开关
-    CSSettingItem *showBothItem = [CSSettingItem switchItemWithTitle:@"同时显示两个头像" 
+    CSSettingItem *showBothItem = [CSSettingItem switchItemWithTitle:@"显示双方头像" 
                                                            iconName:@"person.2.circle.fill" 
                                                           iconColor:[UIColor systemTealColor] 
                                                          switchValue:(self.showSelfAvatar && self.showOtherAvatar && !self.showOtherNickname) 
@@ -441,7 +441,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     
     // 创建外观设置项
     NSString *sizeText = [NSString stringWithFormat:@"%.0f", self.avatarSize];
-    CSSettingItem *sizeItem = [CSSettingItem inputItemWithTitle:@"头像大小" 
+    CSSettingItem *sizeItem = [CSSettingItem inputItemWithTitle:@"头像大小设置" 
                                                        iconName:@"ruler" 
                                                       iconColor:[UIColor systemBlueColor] 
                                                       inputValue:sizeText 
@@ -467,7 +467,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
             CSSettingSection *section = weakSelf.sections[sectionIndex];
             for (NSInteger rowIndex = 0; rowIndex < section.items.count; rowIndex++) {
                 CSSettingItem *item = section.items[rowIndex];
-                if ([item.title isEqualToString:@"头像大小"] && item.itemType == CSSettingItemTypeInput) {
+                if ([item.title isEqualToString:@"头像大小设置"] && item.itemType == CSSettingItemTypeInput) {
                     // 找到了正确的item
                     item.inputValue = displayValue;
                     item.detail = displayValue; // 更新detail显示
@@ -490,7 +490,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     // 直接使用百分比值显示圆角
     NSString *radiusText = [NSString stringWithFormat:@"%.0f%%", self.avatarRadius * 200]; // 乘以200转换为0-100%
     
-    CSSettingItem *radiusItem = [CSSettingItem inputItemWithTitle:@"圆角程度" 
+    CSSettingItem *radiusItem = [CSSettingItem inputItemWithTitle:@"头像圆角程度" 
                                                         iconName:@"rectangle.roundedtop" 
                                                        iconColor:[UIColor systemTealColor] 
                                                        inputValue:radiusText 
@@ -527,7 +527,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
             CSSettingSection *section = weakSelf.sections[sectionIndex];
             for (NSInteger rowIndex = 0; rowIndex < section.items.count; rowIndex++) {
                 CSSettingItem *item = section.items[rowIndex];
-                if ([item.title isEqualToString:@"圆角程度"] && item.itemType == CSSettingItemTypeInput) {
+                if ([item.title isEqualToString:@"头像圆角程度"] && item.itemType == CSSettingItemTypeInput) {
                     // 找到了正确的item
                     item.inputValue = displayValue;
                     item.detail = displayValue; // 更新detail显示
@@ -555,7 +555,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     
     if (self.showOtherNickname) {
         // 网名位置选择器
-        CSSettingItem *nicknamePositionItem = [CSSettingItem actionItemWithTitle:@"网名位置" 
+        CSSettingItem *nicknamePositionItem = [CSSettingItem actionItemWithTitle:@"对方网名位置" 
                                                                        iconName:@"arrow.up.and.down.and.arrow.left.and.right" 
                                                                       iconColor:[UIColor systemIndigoColor]];
         
@@ -577,7 +577,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
         
         // 网名大小设置
         NSString *sizeTxt = [NSString stringWithFormat:@"%.0f", self.nicknameSize];
-        CSSettingItem *nicknameSizeItem = [CSSettingItem inputItemWithTitle:@"网名大小" 
+        CSSettingItem *nicknameSizeItem = [CSSettingItem inputItemWithTitle:@"对方网名大小" 
                                                                   iconName:@"textformat.size" 
                                                                  iconColor:[UIColor systemBlueColor] 
                                                                  inputValue:sizeTxt 
@@ -603,7 +603,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                 CSSettingSection *section = weakSelf.sections[sectionIndex];
                 for (NSInteger rowIndex = 0; rowIndex < section.items.count; rowIndex++) {
                     CSSettingItem *item = section.items[rowIndex];
-                    if ([item.title isEqualToString:@"网名大小"] && item.itemType == CSSettingItemTypeInput) {
+                    if ([item.title isEqualToString:@"对方网名大小"] && item.itemType == CSSettingItemTypeInput) {
                         // 找到了正确的item
                         item.inputValue = displayValue;
                         item.detail = displayValue; // 更新detail显示
@@ -624,7 +624,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
         }];
         
         // 添加显示备注名而不是网名的开关
-        CSSettingItem *showRemarkNameItem = [CSSettingItem switchItemWithTitle:@"显示备注名而非网名"
+        CSSettingItem *showRemarkNameItem = [CSSettingItem switchItemWithTitle:@"显示备注名称"
                                                                      iconName:@"tag.fill"
                                                                     iconColor:[UIColor systemOrangeColor]
                                                                    switchValue:self.showRemarkName
@@ -647,14 +647,14 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
             
             // 创建综合分隔符设置项 - 我们不再将详情文本设为空值
             NSString *detailText = self.separatorImage ? @"图片" : currentSeparator; // 显示文本描述或实际分隔符
-            CSSettingItem *separatorItem = [CSSettingItem actionItemWithTitle:@"设置分隔符" 
+            CSSettingItem *separatorItem = [CSSettingItem actionItemWithTitle:@"设置分隔符号" 
                                                                  iconName:@"text.insert" 
                                                                 iconColor:[UIColor systemPinkColor]];
             separatorItem.detail = detailText; // 设置详情文本，不再留空
             
             // 分隔符大小设置项
             NSString *separatorSizeText = [NSString stringWithFormat:@"%.0f", self.separatorSize];
-            CSSettingItem *separatorSizeItem = [CSSettingItem inputItemWithTitle:@"分隔符大小" 
+            CSSettingItem *separatorSizeItem = [CSSettingItem inputItemWithTitle:@"分隔符号大小" 
                                                                      iconName:@"textformat.size" 
                                                                     iconColor:[UIColor systemPurpleColor] 
                                                                     inputValue:separatorSizeText 
@@ -680,7 +680,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                     CSSettingSection *section = weakSelf.sections[sectionIndex];
                     for (NSInteger rowIndex = 0; rowIndex < section.items.count; rowIndex++) {
                         CSSettingItem *item = section.items[rowIndex];
-                        if ([item.title isEqualToString:@"分隔符大小"] && item.itemType == CSSettingItemTypeInput) {
+                        if ([item.title isEqualToString:@"分隔符号大小"] && item.itemType == CSSettingItemTypeInput) {
                             // 找到了正确的item
                             item.inputValue = displayValue;
                             item.detail = displayValue; // 更新detail显示
@@ -695,7 +695,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
             
             // 头像间距设置项
             NSString *spacingText = [NSString stringWithFormat:@"%.0f", self.avatarSpacing];
-            CSSettingItem *spacingItem = [CSSettingItem inputItemWithTitle:@"头像间距" 
+            CSSettingItem *spacingItem = [CSSettingItem inputItemWithTitle:@"头像间距大小" 
                                                                  iconName:@"arrow.left.and.right" 
                                                                 iconColor:[UIColor systemGreenColor] 
                                                                 inputValue:spacingText 
@@ -721,7 +721,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                     CSSettingSection *section = weakSelf.sections[sectionIndex];
                     for (NSInteger rowIndex = 0; rowIndex < section.items.count; rowIndex++) {
                         CSSettingItem *item = section.items[rowIndex];
-                        if ([item.title isEqualToString:@"头像间距"] && item.itemType == CSSettingItemTypeInput) {
+                        if ([item.title isEqualToString:@"头像间距大小"] && item.itemType == CSSettingItemTypeInput) {
                             // 找到了正确的item
                             item.inputValue = displayValue;
                             item.detail = displayValue; // 更新detail显示
@@ -740,7 +740,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
         
         // 垂直偏移设置项
         NSString *offsetText = [NSString stringWithFormat:@"%.0f", self.verticalOffset];
-        CSSettingItem *offsetItem = [CSSettingItem inputItemWithTitle:@"垂直位置" 
+        CSSettingItem *offsetItem = [CSSettingItem inputItemWithTitle:@"头像垂直偏移" 
                                                            iconName:@"arrow.up.and.down" 
                                                           iconColor:[UIColor systemBlueColor] 
                                                           inputValue:offsetText 
@@ -766,7 +766,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                 CSSettingSection *section = weakSelf.sections[sectionIndex];
                 for (NSInteger rowIndex = 0; rowIndex < section.items.count; rowIndex++) {
                     CSSettingItem *item = section.items[rowIndex];
-                    if ([item.title isEqualToString:@"垂直位置"] && item.itemType == CSSettingItemTypeInput) {
+                    if ([item.title isEqualToString:@"头像垂直偏移"] && item.itemType == CSSettingItemTypeInput) {
                         // 找到了正确的item
                         item.inputValue = displayValue;
                         item.detail = displayValue; // 更新detail显示
@@ -795,14 +795,14 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
             
             // 创建综合分隔符设置项 - 我们不再将详情文本设为空值
             NSString *detailText = self.separatorImage ? @"图片" : currentSeparator; // 显示文本描述或实际分隔符
-            CSSettingItem *separatorItem = [CSSettingItem actionItemWithTitle:@"设置分隔符" 
+            CSSettingItem *separatorItem = [CSSettingItem actionItemWithTitle:@"设置分隔符号" 
                                                                  iconName:@"text.insert" 
                                                                 iconColor:[UIColor systemPinkColor]];
             separatorItem.detail = detailText; // 设置详情文本，不再留空
             
             // 分隔符大小设置项
             NSString *separatorSizeText = [NSString stringWithFormat:@"%.0f", self.separatorSize];
-            CSSettingItem *separatorSizeItem = [CSSettingItem inputItemWithTitle:@"分隔符大小" 
+            CSSettingItem *separatorSizeItem = [CSSettingItem inputItemWithTitle:@"分隔符号大小" 
                                                                      iconName:@"textformat.size" 
                                                                     iconColor:[UIColor systemPurpleColor] 
                                                                     inputValue:separatorSizeText 
@@ -828,7 +828,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                     CSSettingSection *section = weakSelf.sections[sectionIndex];
                     for (NSInteger rowIndex = 0; rowIndex < section.items.count; rowIndex++) {
                         CSSettingItem *item = section.items[rowIndex];
-                        if ([item.title isEqualToString:@"分隔符大小"] && item.itemType == CSSettingItemTypeInput) {
+                        if ([item.title isEqualToString:@"分隔符号大小"] && item.itemType == CSSettingItemTypeInput) {
                             // 找到了正确的item
                             item.inputValue = displayValue;
                             item.detail = displayValue; // 更新detail显示
@@ -843,7 +843,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
             
             // 头像间距设置项
             NSString *spacingText = [NSString stringWithFormat:@"%.0f", self.avatarSpacing];
-            CSSettingItem *spacingItem = [CSSettingItem inputItemWithTitle:@"头像间距" 
+            CSSettingItem *spacingItem = [CSSettingItem inputItemWithTitle:@"头像间距大小" 
                                                                  iconName:@"arrow.left.and.right" 
                                                                 iconColor:[UIColor systemGreenColor] 
                                                                 inputValue:spacingText 
@@ -869,7 +869,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                     CSSettingSection *section = weakSelf.sections[sectionIndex];
                     for (NSInteger rowIndex = 0; rowIndex < section.items.count; rowIndex++) {
                         CSSettingItem *item = section.items[rowIndex];
-                        if ([item.title isEqualToString:@"头像间距"] && item.itemType == CSSettingItemTypeInput) {
+                        if ([item.title isEqualToString:@"头像间距大小"] && item.itemType == CSSettingItemTypeInput) {
                             // 找到了正确的item
                             item.inputValue = displayValue;
                             item.detail = displayValue; // 更新detail显示
@@ -888,7 +888,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
         
         // 垂直偏移设置项
         NSString *offsetText = [NSString stringWithFormat:@"%.0f", self.verticalOffset];
-        CSSettingItem *offsetItem = [CSSettingItem inputItemWithTitle:@"垂直位置" 
+        CSSettingItem *offsetItem = [CSSettingItem inputItemWithTitle:@"头像垂直偏移" 
                                                            iconName:@"arrow.up.and.down" 
                                                           iconColor:[UIColor systemBlueColor] 
                                                           inputValue:offsetText 
@@ -914,7 +914,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                 CSSettingSection *section = weakSelf.sections[sectionIndex];
                 for (NSInteger rowIndex = 0; rowIndex < section.items.count; rowIndex++) {
                     CSSettingItem *item = section.items[rowIndex];
-                    if ([item.title isEqualToString:@"垂直位置"] && item.itemType == CSSettingItemTypeInput) {
+                    if ([item.title isEqualToString:@"头像垂直偏移"] && item.itemType == CSSettingItemTypeInput) {
                         // 找到了正确的item
                         item.inputValue = displayValue;
                         item.detail = displayValue; // 更新detail显示
@@ -954,7 +954,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     CSSettingItem *item = self.sections[indexPath.section].items[indexPath.row];
     
     // 特殊处理分隔符设置项
-    if ([item.title isEqualToString:@"设置分隔符"] && self.separatorImage) {
+    if ([item.title isEqualToString:@"设置分隔符号"] && self.separatorImage) {
         // 创建一个小型预览图像视图
         UIImageView *imageView = [[UIImageView alloc] initWithImage:self.separatorImage];
         imageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -971,7 +971,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
         
         // 隐藏详情文本，因为我们用图片代替
         item.detail = nil;
-    } else if ([item.title isEqualToString:@"设置分隔符"] && !self.separatorImage) {
+    } else if ([item.title isEqualToString:@"设置分隔符号"] && !self.separatorImage) {
         // 使用箭头指示器，并显示当前分隔符文本
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         NSString *currentSeparator = [[NSUserDefaults standardUserDefaults] objectForKey:kNavigationSeparatorTextKey] ?: @"💗";
@@ -1032,10 +1032,10 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     } 
     // 处理操作类型项的点击
     else if (item.itemType == CSSettingItemTypeAction) {
-        if ([item.title isEqualToString:@"设置分隔符"]) {
+        if ([item.title isEqualToString:@"设置分隔符号"]) {
             // 弹出分隔符设置选项
             [self showSeparatorOptions];
-        } else if ([item.title isEqualToString:@"网名位置"]) {
+        } else if ([item.title isEqualToString:@"对方网名位置"]) {
             // 弹出网名位置选择器
             [self showNicknamePositionOptions];
         }
@@ -1046,7 +1046,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
 
 // 显示分隔符设置选项
 - (void)showSeparatorOptions {
-    UIAlertController *actionSheet = [UIAlertController alertControllerWithTitle:@"设置分隔符"
+    UIAlertController *actionSheet = [UIAlertController alertControllerWithTitle:@"设置分隔符号"
                                                                     message:@"请选择分隔符类型"
                                                              preferredStyle:UIAlertControllerStyleActionSheet];
     
@@ -1485,7 +1485,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
             CSSettingSection *section = self.sections[sectionIndex];
             for (NSInteger rowIndex = 0; rowIndex < section.items.count; rowIndex++) {
                 CSSettingItem *item = section.items[rowIndex];
-                if ([item.title isEqualToString:@"网名位置"] && item.itemType == CSSettingItemTypeAction) {
+                if ([item.title isEqualToString:@"对方网名位置"] && item.itemType == CSSettingItemTypeAction) {
                     indexPath = [NSIndexPath indexPathForRow:rowIndex inSection:sectionIndex];
                     break;
                 }
@@ -1531,7 +1531,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
         CSSettingSection *section = self.sections[sectionIndex];
         for (NSInteger rowIndex = 0; rowIndex < section.items.count; rowIndex++) {
             CSSettingItem *item = section.items[rowIndex];
-            if ([item.title isEqualToString:@"网名位置"] && item.itemType == CSSettingItemTypeAction) {
+            if ([item.title isEqualToString:@"对方网名位置"] && item.itemType == CSSettingItemTypeAction) {
                 // 找到了正确的item
                 item.detail = positionText;
                 

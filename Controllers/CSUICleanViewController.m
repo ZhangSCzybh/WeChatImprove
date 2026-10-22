@@ -177,7 +177,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
 
 // 显示功能说明弹窗
 - (void)showFeatureDescription {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"功能说明"
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"净化功能说明"
                                                                    message:kFeatureDescription
                                                             preferredStyle:UIAlertControllerStyleAlert];
     
@@ -305,7 +305,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
     BOOL hideDiscoverMiniProgram = [defaults objectForKey:kWCHideDiscoverMiniProgramKey] ? [defaults boolForKey:kWCHideDiscoverMiniProgramKey] : NO;
     
     // 我的页面设置项
-    self.hideQRCodeItem = [CSSettingItem switchItemWithTitle:@"隐藏添加界面二维码" 
+    self.hideQRCodeItem = [CSSettingItem switchItemWithTitle:@"隐藏添加界面维码" 
                                                    iconName:@"qrcode" 
                                                   iconColor:[UIColor systemGreenColor]
                                                 switchValue:hideQRCodeEnabled
@@ -316,7 +316,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideChatTimeItem = [CSSettingItem switchItemWithTitle:@"隐藏聊天界面时间标签" 
+    self.hideChatTimeItem = [CSSettingItem switchItemWithTitle:@"隐藏原生时间标签" 
                                                      iconName:@"clock" 
                                                     iconColor:[UIColor systemBlueColor]
                                                   switchValue:hideChatTimeEnabled
@@ -327,7 +327,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hidePatMessageItem = [CSSettingItem switchItemWithTitle:@"隐藏拍一拍消息提示标签" 
+    self.hidePatMessageItem = [CSSettingItem switchItemWithTitle:@"隐藏拍拍提示标签" 
                                                        iconName:@"hand.tap" 
                                                       iconColor:[UIColor systemOrangeColor]
                                                     switchValue:hidePatMessageEnabled
@@ -338,7 +338,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideVoiceHintItem = [CSSettingItem switchItemWithTitle:@"隐藏语音红点和转文字标签" 
+    self.hideVoiceHintItem = [CSSettingItem switchItemWithTitle:@"隐藏红点文字标签" 
                                                        iconName:@"mic" 
                                                       iconColor:[UIColor systemRedColor]
                                                     switchValue:hideVoiceHintEnabled
@@ -349,7 +349,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideMomentsItem = [CSSettingItem switchItemWithTitle:@"隐藏朋友圈选项" 
+    self.hideMomentsItem = [CSSettingItem switchItemWithTitle:@"隐藏友圈选项" 
                                                      iconName:@"person.2.circle" 
                                                     iconColor:[UIColor systemPinkColor]
                                                   switchValue:hideMomentsEnabled
@@ -415,7 +415,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideChannelsItem = [CSSettingItem switchItemWithTitle:@"隐藏视频号与公众号选项" 
+    self.hideChannelsItem = [CSSettingItem switchItemWithTitle:@"隐藏视频选项" 
                                                       iconName:@"play.rectangle.on.rectangle" 
                                                      iconColor:[UIColor systemTealColor]
                                                    switchValue:hideChannelsEnabled
@@ -450,7 +450,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
     }];
     
     // 隐藏直播
-    self.hideDiscoverLiveItem = [CSSettingItem switchItemWithTitle:@"隐藏直播" 
+    self.hideDiscoverLiveItem = [CSSettingItem switchItemWithTitle:@"隐藏直播号" 
                                                          iconName:@"video.fill" 
                                                         iconColor:[UIColor systemRedColor]
                                                       switchValue:hideDiscoverLive
@@ -510,7 +510,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
     }];
     
     // 隐藏附近的人
-    self.hideDiscoverNearbyItem = [CSSettingItem switchItemWithTitle:@"隐藏附近的人" 
+    self.hideDiscoverNearbyItem = [CSSettingItem switchItemWithTitle:@"隐藏附近的" 
                                                            iconName:@"location.fill" 
                                                           iconColor:[UIColor systemMintColor]
                                                         switchValue:hideDiscoverNearby
@@ -522,7 +522,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
     }];
     
     // 隐藏游戏
-    self.hideDiscoverGameItem = [CSSettingItem switchItemWithTitle:@"隐藏游戏" 
+    self.hideDiscoverGameItem = [CSSettingItem switchItemWithTitle:@"隐藏小游戏" 
                                                          iconName:@"gamecontroller.fill" 
                                                         iconColor:[UIColor systemPurpleColor]
                                                       switchValue:hideDiscoverGame
@@ -587,7 +587,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideSettingPrivacyItem = [CSSettingItem switchItemWithTitle:@"隐藏个人信息与权限" 
+    self.hideSettingPrivacyItem = [CSSettingItem switchItemWithTitle:@"隐藏信息权限" 
                                                            iconName:@"hand.raised.fill" 
                                                           iconColor:[UIColor systemPurpleColor]
                                                         switchValue:hideSettingPrivacy
@@ -598,7 +598,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideSettingNotificationItem = [CSSettingItem switchItemWithTitle:@"隐藏通知" 
+    self.hideSettingNotificationItem = [CSSettingItem switchItemWithTitle:@"隐藏通知设置" 
                                                                 iconName:@"bell.fill" 
                                                                iconColor:[UIColor systemOrangeColor]
                                                              switchValue:hideSettingNotification
@@ -609,7 +609,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideSettingDisplayItem = [CSSettingItem switchItemWithTitle:@"隐藏界面与显示" 
+    self.hideSettingDisplayItem = [CSSettingItem switchItemWithTitle:@"隐藏界面显示" 
                                                            iconName:@"paintbrush.fill" 
                                                           iconColor:[UIColor systemPinkColor]
                                                         switchValue:hideSettingDisplay
@@ -642,7 +642,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideSettingMoreItem = [CSSettingItem switchItemWithTitle:@"隐藏更多" 
+    self.hideSettingMoreItem = [CSSettingItem switchItemWithTitle:@"隐藏更多设置" 
                                                         iconName:@"ellipsis.circle.fill" 
                                                        iconColor:[UIColor systemTealColor]
                                                      switchValue:hideSettingMore
@@ -653,7 +653,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideSettingChatItem = [CSSettingItem switchItemWithTitle:@"隐藏聊天" 
+    self.hideSettingChatItem = [CSSettingItem switchItemWithTitle:@"隐藏聊天页面" 
                                                         iconName:@"message.fill" 
                                                        iconColor:[UIColor systemGreenColor]
                                                      switchValue:hideSettingChat
@@ -664,7 +664,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideSettingCallItem = [CSSettingItem switchItemWithTitle:@"隐藏音视频通话" 
+    self.hideSettingCallItem = [CSSettingItem switchItemWithTitle:@"隐藏音视频页" 
                                                         iconName:@"video.fill" 
                                                        iconColor:[UIColor systemBlueColor]
                                                      switchValue:hideSettingCall
@@ -675,7 +675,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideSettingChatHistoryItem = [CSSettingItem switchItemWithTitle:@"隐藏聊天记录管理" 
+    self.hideSettingChatHistoryItem = [CSSettingItem switchItemWithTitle:@"隐藏聊天记录" 
                                                                iconName:@"doc.text.fill" 
                                                               iconColor:[UIColor systemBrownColor]
                                                             switchValue:hideSettingChatHistory
@@ -686,7 +686,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideSettingOtherItem = [CSSettingItem switchItemWithTitle:@"隐藏其他" 
+    self.hideSettingOtherItem = [CSSettingItem switchItemWithTitle:@"隐藏其他功能" 
                                                          iconName:@"square.grid.2x2.fill" 
                                                         iconColor:[UIColor systemIndigoColor]
                                                       switchValue:hideSettingOther
@@ -697,7 +697,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideSettingHelpItem = [CSSettingItem switchItemWithTitle:@"隐藏帮助与反馈" 
+    self.hideSettingHelpItem = [CSSettingItem switchItemWithTitle:@"隐藏帮助反馈" 
                                                         iconName:@"questionmark.circle.fill" 
                                                        iconColor:[UIColor systemCyanColor]
                                                      switchValue:hideSettingHelp
@@ -719,7 +719,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    self.hideSettingPluginItem = [CSSettingItem switchItemWithTitle:@"隐藏插件" 
+    self.hideSettingPluginItem = [CSSettingItem switchItemWithTitle:@"隐藏插件按钮" 
                                                           iconName:@"puzzlepiece.extension.fill" 
                                                          iconColor:[UIColor systemPurpleColor]
                                                        switchValue:hideSettingPlugin
@@ -752,7 +752,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge CFStringRef)kWCSettingsChangedNotification, NULL, NULL, true);
     }];
     
-    CSSettingItem *descriptionItem = [CSSettingItem itemWithTitle:@"功能说明" 
+    CSSettingItem *descriptionItem = [CSSettingItem itemWithTitle:@"净化功能说明" 
                                                         iconName:@"info.circle" 
                                                        iconColor:[UIColor systemGrayColor]
                                                          detail:@"点击查看"];
@@ -803,7 +803,7 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
     [cell configureWithItem:item];
     
     // 如果是功能说明项，添加箭头指示器
-    if ([item.title isEqualToString:@"功能说明"]) {
+    if ([item.title isEqualToString:@"净化功能说明"]) {
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     
@@ -821,8 +821,8 @@ static NSString * const kFeatureDescription = @"此功能将隐藏不必要的�
     
     CSSettingItem *item = self.sections[indexPath.section].items[indexPath.row];
     
-    // 如果点击的是功能说明
-    if ([item.title isEqualToString:@"功能说明"]) {
+    // 如果点击的是净化功能说明
+    if ([item.title isEqualToString:@"净化功能说明"]) {
         // 显示功能说明弹窗
         [self showFeatureDescription];
         return;

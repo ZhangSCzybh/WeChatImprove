@@ -58,7 +58,7 @@ static NSString * const kReceiveTransferTotalAmountKey = @"kReceiveTransferTotal
 - (void)setupData {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
-    CSSettingItem *autoReceiveItem = [CSSettingItem switchItemWithTitle:@"自动收款"
+    CSSettingItem *autoReceiveItem = [CSSettingItem switchItemWithTitle:@"启用自动收款"
                                                               iconName:@"yensign.circle.fill"
                                                              iconColor:[UIColor systemGreenColor]
                                                            switchValue:[defaults boolForKey:kReceiveTransferAutoEnableKey]
@@ -97,19 +97,19 @@ static NSString * const kReceiveTransferTotalAmountKey = @"kReceiveTransferTotal
     
     NSInteger delaySeconds = [defaults integerForKey:kReceiveTransferDelayKey];
     NSString *delayDetail = delaySeconds == 0 ? @"不延迟" : [NSString stringWithFormat:@"%ld秒", (long)delaySeconds];
-    CSSettingItem *delayItem = [CSSettingItem itemWithTitle:@"延迟收款"
+    CSSettingItem *delayItem = [CSSettingItem itemWithTitle:@"收款延迟时间"
                                                   iconName:@"clock.fill"
                                                  iconColor:[UIColor systemYellowColor]
                                                    detail:delayDetail];
     
     NSInteger notifyTarget = [defaults integerForKey:kReceiveTransferNotifyTargetKey];
     NSString *notifyDetail = notifyTarget == 0 ? @"关闭" : (notifyTarget == 1 ? @"通知自己" : @"通知文件传输助手");
-    CSSettingItem *notifyItem = [CSSettingItem itemWithTitle:@"收款通知"
+    CSSettingItem *notifyItem = [CSSettingItem itemWithTitle:@"收款通知方式"
                                                    iconName:@"bell.fill"
                                                   iconColor:[UIColor systemRedColor]
                                                     detail:notifyDetail];
     
-    CSSettingItem *autoReplyItem = [CSSettingItem switchItemWithTitle:@"自动回复"
+    CSSettingItem *autoReplyItem = [CSSettingItem switchItemWithTitle:@"收款自动回复"
                                                             iconName:@"bubble.left.and.bubble.right.fill"
                                                            iconColor:[UIColor systemPurpleColor]
                                                          switchValue:[defaults boolForKey:kReceiveTransferAutoReplyEnableKey]
@@ -135,12 +135,12 @@ static NSString * const kReceiveTransferTotalAmountKey = @"kReceiveTransferTotal
     NSInteger totalAmount = [defaults integerForKey:kReceiveTransferTotalAmountKey];
     double totalAmountYuan = totalAmount / 100.0;
     NSString *recordDetail = [NSString stringWithFormat:@"接收转账%ld次，累计%.2f元！", (long)totalCount, totalAmountYuan];
-    CSSettingItem *recordItem = [CSSettingItem itemWithTitle:@"收款记录"
+    CSSettingItem *recordItem = [CSSettingItem itemWithTitle:@"累计收款记录"
                                                    iconName:@"chart.line.uptrend.xyaxis"
                                                   iconColor:[UIColor systemOrangeColor]
                                                     detail:recordDetail];
     
-    CSSettingItem *infoItem = [CSSettingItem itemWithTitle:@"功能说明"
+    CSSettingItem *infoItem = [CSSettingItem itemWithTitle:@"收款功能说明"
                                                  iconName:@"info.circle"
                                                 iconColor:[UIColor systemGrayColor]
                                                   detail:@"自动收取转账，修改后需要重启微信。"];
@@ -157,7 +157,7 @@ static NSString * const kReceiveTransferTotalAmountKey = @"kReceiveTransferTotal
     CSSettingSection *recordSection = [CSSettingSection sectionWithHeader:@"收款记录"
                                                                    items:@[recordItem]];
     
-    CSSettingSection *infoSection = [CSSettingSection sectionWithHeader:@"说明"
+    CSSettingSection *infoSection = [CSSettingSection sectionWithHeader:@"功能说明"
                                                                  items:@[infoItem]];
     
     self.sections = @[switchSection, advancedSection, autoReplySection, recordSection, infoSection];
@@ -204,10 +204,10 @@ static NSString * const kReceiveTransferTotalAmountKey = @"kReceiveTransferTotal
         if (indexPath.row < section.items.count) {
             CSSettingItem *item = section.items[indexPath.row];
             
-            if ([item.title isEqualToString:@"延迟收款"]) {
+            if ([item.title isEqualToString:@"收款延迟时间"]) {
                 [self showDelayPicker];
             }
-            else if ([item.title isEqualToString:@"收款通知"]) {
+            else if ([item.title isEqualToString:@"收款通知方式"]) {
                 [self showNotifyTargetPicker];
             }
             else if ([item.title isEqualToString:@"私聊自动回复"]) {

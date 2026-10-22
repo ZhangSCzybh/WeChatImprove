@@ -163,7 +163,7 @@ static NSString * const kEntryShowInSettingKey = @"com.wechat.tweak.entry.show.i
     BOOL showInSetting = [defaults boolForKey:kEntryShowInSettingKey];
     
     // 创建显示在我页面开关项
-    self.showInMoreItem = [CSSettingItem switchItemWithTitle:@"显示在我页面" 
+    self.showInMoreItem = [CSSettingItem switchItemWithTitle:@"显示在我的页面" 
                                                   iconName:@"person.fill" 
                                                  iconColor:[UIColor systemBlueColor]
                                                switchValue:showInMore
@@ -205,7 +205,7 @@ static NSString * const kEntryShowInSettingKey = @"com.wechat.tweak.entry.show.i
     }];
     
     // 创建自定义标题设置项
-    self.customTitleItem = [CSSettingItem inputItemWithTitle:@"自定义标题" 
+    self.customTitleItem = [CSSettingItem inputItemWithTitle:@"自定义插件标题" 
                                                   iconName:@"textformat.alt" 
                                                  iconColor:[UIColor systemOrangeColor]
                                                  inputValue:self.customTitle
@@ -220,7 +220,7 @@ static NSString * const kEntryShowInSettingKey = @"com.wechat.tweak.entry.show.i
     }];
     
     // 创建说明文本设置项
-    CSSettingItem *aboutItem = [CSSettingItem itemWithTitle:@"说明" 
+    CSSettingItem *aboutItem = [CSSettingItem itemWithTitle:@"插件显示注意项" 
                                                  iconName:@"info.circle" 
                                                 iconColor:[UIColor systemGrayColor]
                                                   detail:@"调整后需要重启微信"];

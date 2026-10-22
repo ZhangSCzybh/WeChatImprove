@@ -163,7 +163,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 
 - (void)setupData {
     __weak typeof(self) weakSelf = self;
-    self.enableItem = [CSSettingItem switchItemWithTitle:@"启用悬浮导航栏"
+    self.enableItem = [CSSettingItem switchItemWithTitle:@"启用悬浮底栏"
                                               iconName:@"rectangle.bottomthird.inset.filled"
                                              iconColor:[UIColor systemBlueColor]
                                             switchValue:self.tabBarStyleEnabled
@@ -188,7 +188,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     UIImage *discoverIcon = [self loadIconForType:TabBarIconTypeDiscover isSelected:NO];
     UIImage *meIcon = [self loadIconForType:TabBarIconTypeMe isSelected:NO];
     
-    self.chatIconItem = [CSSettingItem itemWithTitle:@"微信图标"
+    self.chatIconItem = [CSSettingItem itemWithTitle:@"替换微信图标"
                                           iconName:chatIcon ? nil : @"message.fill"
                                          iconColor:[UIColor systemGreenColor]
                                             detail:chatIcon ? @"已设置" : @"点击设置"];
@@ -197,7 +197,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf showIconSelectionAlertForType:TabBarIconTypeChat];
     };
     
-    self.contactsIconItem = [CSSettingItem itemWithTitle:@"通讯录图标"
+    self.contactsIconItem = [CSSettingItem itemWithTitle:@"替换通讯图标"
                                              iconName:contactsIcon ? nil : @"person.2.fill"
                                             iconColor:[UIColor systemBlueColor]
                                                detail:contactsIcon ? @"已设置" : @"点击设置"];
@@ -206,7 +206,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf showIconSelectionAlertForType:TabBarIconTypeContacts];
     };
     
-    self.discoverIconItem = [CSSettingItem itemWithTitle:@"发现图标"
+    self.discoverIconItem = [CSSettingItem itemWithTitle:@"替换发现图标"
                                              iconName:discoverIcon ? nil : @"safari.fill"
                                             iconColor:[UIColor systemOrangeColor]
                                                detail:discoverIcon ? @"已设置" : @"点击设置"];
@@ -215,7 +215,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf showIconSelectionAlertForType:TabBarIconTypeDiscover];
     };
     
-    self.meIconItem = [CSSettingItem itemWithTitle:@"我图标"
+    self.meIconItem = [CSSettingItem itemWithTitle:@"替换我的图标"
                                        iconName:meIcon ? nil : @"person.crop.circle.fill"
                                       iconColor:[UIColor systemPurpleColor]
                                          detail:meIcon ? @"已设置" : @"点击设置"];
@@ -227,7 +227,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     [self updateIconItemsState];
     
     // 创建文本自定义设置项
-    self.chatTextItem = [CSSettingItem inputItemWithTitle:@"微信文本"
+    self.chatTextItem = [CSSettingItem inputItemWithTitle:@"替换微信文本"
                                                 iconName:@"message.fill"
                                                iconColor:[UIColor systemGreenColor]
                                                inputValue:self.chatText ?: @""
@@ -237,7 +237,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf saveSettings];
     }];
     
-    self.contactsTextItem = [CSSettingItem inputItemWithTitle:@"通讯录文本"
+    self.contactsTextItem = [CSSettingItem inputItemWithTitle:@"替换通讯文本"
                                                    iconName:@"person.2.fill"
                                                   iconColor:[UIColor systemBlueColor]
                                                   inputValue:self.contactsText ?: @""
@@ -247,7 +247,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf saveSettings];
     }];
     
-    self.discoverTextItem = [CSSettingItem inputItemWithTitle:@"发现文本"
+    self.discoverTextItem = [CSSettingItem inputItemWithTitle:@"替换发现文本"
                                                    iconName:@"safari.fill"
                                                   iconColor:[UIColor systemOrangeColor]
                                                   inputValue:self.discoverText ?: @""
@@ -257,7 +257,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf saveSettings];
     }];
     
-    self.meTextItem = [CSSettingItem inputItemWithTitle:@"我文本"
+    self.meTextItem = [CSSettingItem inputItemWithTitle:@"替换我的文本"
                                              iconName:@"person.crop.circle.fill"
                                             iconColor:[UIColor systemPurpleColor]
                                             inputValue:self.meText ?: @""
@@ -272,7 +272,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     NSArray *borderStyleOptions = @[@"半圆", @"圆角"];
     NSString *borderStyleDetail = borderStyleOptions[self.borderStyle];
     
-    self.borderStyleItem = [CSSettingItem itemWithTitle:@"边框样式"
+    self.borderStyleItem = [CSSettingItem itemWithTitle:@"选择边框样式"
                                              iconName:@"rectangle.roundedtop"
                                             iconColor:[UIColor systemOrangeColor]
                                                detail:borderStyleDetail];
@@ -301,7 +301,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf presentViewController:alert animated:YES completion:nil];
     };
     
-    self.cornerRadiusItem = [CSSettingItem inputItemWithTitle:@"圆角半径"
+    self.cornerRadiusItem = [CSSettingItem inputItemWithTitle:@"圆角半径大小"
                                                    iconName:@"rectangle.roundedtop"
                                                   iconColor:[UIColor systemPurpleColor]
                                                   inputValue:[NSString stringWithFormat:@"%.1f", self.cornerRadius]
@@ -321,7 +321,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         bgColorDetail = [NSString stringWithFormat:@"R:%.0f G:%.0f B:%.0f A:%.0f", red * 255, green * 255, blue * 255, alpha * 100];
     }
     
-    self.bgColorItem = [CSSettingItem itemWithTitle:@"背景颜色"
+    self.bgColorItem = [CSSettingItem itemWithTitle:@"选择背景颜色"
                                          iconName:@"paintpalette.fill"
                                         iconColor:[UIColor systemPinkColor]
                                            detail:bgColorDetail];
@@ -339,7 +339,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     NSArray *hapticOptions = @[@"无", @"舒适", @"轻柔", @"中度", @"强烈"];
     NSString *hapticDetail = hapticOptions[self.hapticFeedback];
     
-    self.hapticFeedbackItem = [CSSettingItem itemWithTitle:@"切换触感"
+    self.hapticFeedbackItem = [CSSettingItem itemWithTitle:@"切换点击触感"
                                                 iconName:@"hand.tap.fill"
                                                iconColor:[UIColor systemPurpleColor]
                                                   detail:hapticDetail];
@@ -398,7 +398,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     NSArray *animationOptions = @[@"无动画", @"扩散呼吸", @"扩散心跳", @"经典呼吸", @"经典心跳"];
     NSString *animationDetail = animationOptions[self.borderAnimation];
     
-    self.borderAnimationItem = [CSSettingItem itemWithTitle:@"描边动画"
+    self.borderAnimationItem = [CSSettingItem itemWithTitle:@"选择描边动画"
                                                  iconName:@"sparkles"
                                                 iconColor:[UIColor systemYellowColor]
                                                    detail:animationDetail];
@@ -435,7 +435,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         borderColorDetail = [NSString stringWithFormat:@"R:%.0f G:%.0f B:%.0f A:%.0f", red * 255, green * 255, blue * 255, alpha * 100];
     }
     
-    self.borderColorItem = [CSSettingItem itemWithTitle:@"描边颜色"
+    self.borderColorItem = [CSSettingItem itemWithTitle:@"选择描边颜色"
                                              iconName:@"paintbrush.fill"
                                             iconColor:[UIColor systemIndigoColor]
                                                detail:borderColorDetail];
@@ -443,7 +443,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf showBorderColorPicker];
     };
     
-    self.positionOffsetItem = [CSSettingItem inputItemWithTitle:@"向上偏移"
+    self.positionOffsetItem = [CSSettingItem inputItemWithTitle:@"向上偏移距离"
                                                      iconName:@"arrow.up.and.down"
                                                     iconColor:[UIColor systemOrangeColor]
                                                     inputValue:[NSString stringWithFormat:@"%.1f", self.positionOffset]
@@ -467,7 +467,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         }
     }
     
-    self.scaleItem = [CSSettingItem itemWithTitle:@"底栏宽度"
+    self.scaleItem = [CSSettingItem itemWithTitle:@"选择底栏宽度"
                                         iconName:@"slider.horizontal.3"
                                        iconColor:[UIColor systemTealColor]
                                           detail:scaleOptions[scaleIndex]];
@@ -496,7 +496,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf presentViewController:alert animated:YES completion:nil];
     };
     
-    self.contentHeightItem=[CSSettingItem inputItemWithTitle:@"底栏高度"
+    self.contentHeightItem=[CSSettingItem inputItemWithTitle:@"输入底栏高度"
         iconName:@"arrow.up.and.down" iconColor:UIColor.systemTealColor
         inputValue:[NSString stringWithFormat:@"%.0f",self.contentHeight]
         inputPlaceholder:@"内容高度（44–80 pt）" valueChangedBlock:^(NSString *value) {
@@ -504,7 +504,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
             [weakSelf saveSettings];
         }];
     self.contentHeightItem.inputKeyboardType=UIKeyboardTypeDecimalPad;
-    self.borderWidthItem=[CSSettingItem inputItemWithTitle:@"描边宽度"
+    self.borderWidthItem=[CSSettingItem inputItemWithTitle:@"描边宽度大小"
         iconName:@"pencil.tip" iconColor:UIColor.systemIndigoColor
         inputValue:[NSString stringWithFormat:@"%.1f",self.borderWidth]
         inputPlaceholder:@"描边宽度（0–6 pt，0 为关闭）" valueChangedBlock:^(NSString *value) {
@@ -589,16 +589,16 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     NSString *title;
     switch (type) {
         case TabBarIconTypeChat:
-            title = @"微信图标";
+            title = @"替换微信图标";
             break;
         case TabBarIconTypeContacts:
-            title = @"通讯录图标";
+            title = @"替换通讯图标";
             break;
         case TabBarIconTypeDiscover:
-            title = @"发现图标";
+            title = @"替换发现图标";
             break;
         case TabBarIconTypeMe:
-            title = @"我图标";
+            title = @"替换我的图标";
             break;
     }
     

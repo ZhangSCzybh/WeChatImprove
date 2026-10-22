@@ -204,7 +204,7 @@ static const int kGroupTagMusic = 18015;        // 音乐
     
     // 创建开关项
     __weak typeof(self) weakSelf = self;
-    CSSettingItem *enableItem = [CSSettingItem switchItemWithTitle:@"启用聊天附件2x5布局"
+    CSSettingItem *enableItem = [CSSettingItem switchItemWithTitle:@"启用附件布局"
                                                          iconName:@"square.grid.3x2"
                                                         iconColor:[UIColor systemTealColor]
                                                        switchValue:self.isEnabled
@@ -229,7 +229,7 @@ static const int kGroupTagMusic = 18015;        // 音乐
     
     // 创建列数设置项
     NSString *columnsStr = [NSString stringWithFormat:@"%d", columns];
-    __block CSSettingItem *columnsItem = [CSSettingItem inputItemWithTitle:@"每行列数"
+    __block CSSettingItem *columnsItem = [CSSettingItem inputItemWithTitle:@"每行显示列数"
                                                          iconName:@"rectangle.grid.3x2"
                                                         iconColor:[UIColor systemBlueColor]
                                                         inputValue:columnsStr
@@ -255,7 +255,7 @@ static const int kGroupTagMusic = 18015;        // 音乐
     
     // 创建间距设置项
     NSString *spacingStr = [NSString stringWithFormat:@"%.1f", spacing];
-    __block CSSettingItem *spacingItem = [CSSettingItem inputItemWithTitle:@"按钮间距"
+    __block CSSettingItem *spacingItem = [CSSettingItem inputItemWithTitle:@"按钮间距大小"
                                                          iconName:@"arrow.left.and.right"
                                                         iconColor:[UIColor systemOrangeColor]
                                                         inputValue:spacingStr
@@ -308,7 +308,7 @@ static const int kGroupTagMusic = 18015;        // 音乐
     }];
     
     // 创建场景控制项 - 公众号
-    CSSettingItem *officialItem = [CSSettingItem switchItemWithTitle:@"在公众号中显示"
+    CSSettingItem *officialItem = [CSSettingItem switchItemWithTitle:@"公众号中显示"
                                                            iconName:@"megaphone"
                                                           iconColor:[UIColor systemOrangeColor]
                                                          switchValue:showInOfficial
@@ -322,7 +322,7 @@ static const int kGroupTagMusic = 18015;        // 音乐
     }];
     
     // 创建公众号排序开关项
-    CSSettingItem *officialSortItem = [CSSettingItem switchItemWithTitle:@"公众号按钮自定义排序"
+    CSSettingItem *officialSortItem = [CSSettingItem switchItemWithTitle:@"公众号的排序"
                                                                iconName:@"arrow.up.arrow.down"
                                                               iconColor:[UIColor systemPurpleColor]
                                                              switchValue:self.isOfficialSortEnabled
@@ -346,7 +346,7 @@ static const int kGroupTagMusic = 18015;        // 音乐
     }];
     
     // 创建私聊排序开关项
-    CSSettingItem *privateSortItem = [CSSettingItem switchItemWithTitle:@"私聊按钮自定义排序"
+    CSSettingItem *privateSortItem = [CSSettingItem switchItemWithTitle:@"私聊按钮排序"
                                                               iconName:@"arrow.up.arrow.down"
                                                              iconColor:[UIColor systemBlueColor]
                                                             switchValue:self.isPrivateSortEnabled
@@ -370,7 +370,7 @@ static const int kGroupTagMusic = 18015;        // 音乐
     }];
     
     // 创建群聊排序开关项
-    CSSettingItem *groupSortItem = [CSSettingItem switchItemWithTitle:@"群聊按钮自定义排序"
+    CSSettingItem *groupSortItem = [CSSettingItem switchItemWithTitle:@"群聊按钮排序"
                                                              iconName:@"arrow.up.arrow.down"
                                                             iconColor:[UIColor systemGreenColor]
                                                            switchValue:self.isGroupSortEnabled
@@ -403,7 +403,7 @@ static const int kGroupTagMusic = 18015;        // 音乐
     [self setupGroupSortItems];
     
     // 创建说明项
-    CSSettingItem *descriptionItem = [CSSettingItem itemWithTitle:@"功能说明"
+    CSSettingItem *descriptionItem = [CSSettingItem itemWithTitle:@"附件功能说明"
                                                         iconName:@"info.circle"
                                                        iconColor:[UIColor systemBlueColor]
                                                           detail:@"点击查看"];
@@ -824,7 +824,7 @@ static const int kGroupTagMusic = 18015;        // 音乐
             }
             
             // 简化UI显示，只显示值本身
-            if ([item.title isEqualToString:@"每行列数"]) {
+            if ([item.title isEqualToString:@"每行显示列数"]) {
                 // 验证并调整值
                 int newValue = [value intValue];
                 if (newValue < kMinColumns) newValue = kMinColumns;
@@ -834,7 +834,7 @@ static const int kGroupTagMusic = 18015;        // 音乐
                 item.detail = [NSString stringWithFormat:@"%d", newValue];
                 item.inputValue = [NSString stringWithFormat:@"%d", newValue];
             } 
-            else if ([item.title isEqualToString:@"按钮间距"]) {
+            else if ([item.title isEqualToString:@"按钮间距大小"]) {
                 // 验证并调整值
                 float newValue = [value floatValue];
                 if (newValue < kMinSpacing) newValue = kMinSpacing;
@@ -864,7 +864,7 @@ static const int kGroupTagMusic = 18015;        // 音乐
     }
     
     // 如果是功能说明，显示说明
-    if ([item.title isEqualToString:@"功能说明"]) {
+    if ([item.title isEqualToString:@"附件功能说明"]) {
         [self showFeatureExplanation];
     }
 }

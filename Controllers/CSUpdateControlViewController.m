@@ -131,7 +131,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
         [self showRestartAlert];
     }];
     
-    CSSettingItem *forceUpdateItem = [CSSettingItem switchItemWithTitle:@"阻止强制更新"
+    CSSettingItem *forceUpdateItem = [CSSettingItem switchItemWithTitle:@"阻止官方强制更新"
                                                               iconName:@"arrow.clockwise.circle.fill"
                                                              iconColor:[UIColor systemGreenColor]
                                                             switchValue:[self.disableSettings[kDisableForceUpdateKey] boolValue]
@@ -142,7 +142,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
         [self showRestartAlert];
     }];
     
-    CSSettingItem *unzipBundleUpdatesItem = [CSSettingItem switchItemWithTitle:@"阻止解压更新包"
+    CSSettingItem *unzipBundleUpdatesItem = [CSSettingItem switchItemWithTitle:@"阻止解压的更新包"
                                                                     iconName:@"archivebox.fill"
                                                                    iconColor:[UIColor systemOrangeColor]
                                                                   switchValue:[self.disableSettings[kDisableUnzipBundleUpdatesKey] boolValue]
@@ -153,7 +153,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
         [self showRestartAlert];
     }];
     
-    CSSettingItem *unzipDownloadUpdatesItem = [CSSettingItem switchItemWithTitle:@"阻止解压下载的更新"
+    CSSettingItem *unzipDownloadUpdatesItem = [CSSettingItem switchItemWithTitle:@"阻止解压下载更新"
                                                                       iconName:@"doc.zipper"
                                                                      iconColor:[UIColor systemPurpleColor]
                                                                     switchValue:[self.disableSettings[kDisableUnzipDownloadUpdatesKey] boolValue]
@@ -171,7 +171,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
                                                                       unzipDownloadUpdatesItem]];
     
     // 创建执行部分
-    CSSettingItem *loadAndExecuteItem = [CSSettingItem switchItemWithTitle:@"阻止加载并执行更新"
+    CSSettingItem *loadAndExecuteItem = [CSSettingItem switchItemWithTitle:@"阻止加载执行更新"
                                                                 iconName:@"play.fill"
                                                                iconColor:[UIColor systemTealColor]
                                                               switchValue:[self.disableSettings[kDisableLoadAndExecuteKey] boolValue]
@@ -182,7 +182,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
         [self showRestartAlert];
     }];
     
-    CSSettingItem *registerUpdateItem = [CSSettingItem switchItemWithTitle:@"阻止注册更新"
+    CSSettingItem *registerUpdateItem = [CSSettingItem switchItemWithTitle:@"阻止官方注册更新"
                                                                 iconName:@"square.and.pencil"
                                                                iconColor:[UIColor systemYellowColor]
                                                               switchValue:[self.disableSettings[kDisableRegisterUpdateKey] boolValue]
@@ -204,7 +204,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
         [self showRestartAlert];
     }];
     
-    CSSettingItem *onPResUpdateFinishItem = [CSSettingItem switchItemWithTitle:@"阻止更新资源完成回调"
+    CSSettingItem *onPResUpdateFinishItem = [CSSettingItem switchItemWithTitle:@"阻止资源完成回调"
                                                                     iconName:@"checkmark.circle.fill"
                                                                    iconColor:[UIColor systemIndigoColor]
                                                                   switchValue:[self.disableSettings[kDisableOnPResUpdateFinishKey] boolValue]
@@ -222,7 +222,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
                                                                         onPResUpdateFinishItem]];
     
     // 创建高级功能部分
-    CSSettingItem *tryRenameTmpUpdateDataDirItem = [CSSettingItem switchItemWithTitle:@"阻止重命名临时更新目录"
+    CSSettingItem *tryRenameTmpUpdateDataDirItem = [CSSettingItem switchItemWithTitle:@"阻止临时更新目录"
                                                                           iconName:@"folder.fill"
                                                                          iconColor:[UIColor systemBrownColor]
                                                                         switchValue:[self.disableSettings[kDisableTryRenameTmpUpdateDataDirKey] boolValue]
@@ -233,7 +233,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
         [self showRestartAlert];
     }];
     
-    CSSettingItem *loadResourceItem = [CSSettingItem switchItemWithTitle:@"阻止加载资源"
+    CSSettingItem *loadResourceItem = [CSSettingItem switchItemWithTitle:@"阻止加载更新资源"
                                                                iconName:@"photo.fill"
                                                               iconColor:[UIColor systemRedColor]
                                                              switchValue:[self.disableSettings[kDisableLoadResourceKey] boolValue]
@@ -244,7 +244,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
         [self showRestartAlert];
     }];
     
-    CSSettingItem *loadPluginInBundleItem = [CSSettingItem switchItemWithTitle:@"阻止加载插件"
+    CSSettingItem *loadPluginInBundleItem = [CSSettingItem switchItemWithTitle:@"阻止加载更新插件"
                                                                     iconName:@"puzzlepiece.fill"
                                                                    iconColor:[UIColor systemGrayColor]
                                                                   switchValue:[self.disableSettings[kDisableLoadPluginInBundleKey] boolValue]
@@ -255,7 +255,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
         [self showRestartAlert];
     }];
     
-    CSSettingItem *loadBundleItem = [CSSettingItem switchItemWithTitle:@"阻止加载bundle"
+    CSSettingItem *loadBundleItem = [CSSettingItem switchItemWithTitle:@"阻止加载更新bundle"
                                                              iconName:@"cube.fill"
                                                             iconColor:[UIColor darkGrayColor]
                                                            switchValue:[self.disableSettings[kDisableLoadBundleKey] boolValue]
@@ -266,7 +266,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
         [self showRestartAlert];
     }];
     
-    CSSettingItem *shouldTraceItem = [CSSettingItem switchItemWithTitle:@"阻止追踪"
+    CSSettingItem *shouldTraceItem = [CSSettingItem switchItemWithTitle:@"阻止更新追踪更新"
                                                               iconName:@"binoculars.fill"
                                                              iconColor:[UIColor systemGreenColor]
                                                             switchValue:[self.disableSettings[kDisableShouldTraceKey] boolValue]
@@ -277,7 +277,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
         [self showRestartAlert];
     }];
     
-    CSSettingItem *immediateRenameUpdateItem = [CSSettingItem switchItemWithTitle:@"阻止立即重命名更新"
+    CSSettingItem *immediateRenameUpdateItem = [CSSettingItem switchItemWithTitle:@"阻止立即命名更新"
                                                                        iconName:@"tag.fill"
                                                                       iconColor:[UIColor systemOrangeColor]
                                                                      switchValue:[self.disableSettings[kDisableImmediateRenameUpdateKey] boolValue]

@@ -90,7 +90,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     __weak typeof(self) weakSelf = self; // 使用弱引用避免循环引用
     
     // 显示占位文本开关
-    CSSettingItem *enableItem = [CSSettingItem switchItemWithTitle:@"显示占位文本" 
+    CSSettingItem *enableItem = [CSSettingItem switchItemWithTitle:@"启用输入框占位" 
                                                          iconName:@"text.bubble" 
                                                         iconColor:[UIColor systemBlueColor] 
                                                       switchValue:[defaults boolForKey:kInputTextEnabledKey]
@@ -105,7 +105,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     }];
     
     // 输入框圆角开关
-    CSSettingItem *roundedCornersItem = [CSSettingItem switchItemWithTitle:@"输入框圆角" 
+    CSSettingItem *roundedCornersItem = [CSSettingItem switchItemWithTitle:@"启用输入框圆角" 
                                                           iconName:@"rectangle.roundedtop" 
                                                          iconColor:[UIColor systemPurpleColor] 
                                                        switchValue:[defaults boolForKey:kInputTextRoundedCornersKey]
@@ -120,7 +120,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     }];
     
     // 输入框边框开关
-    CSSettingItem *borderEnabledItem = [CSSettingItem switchItemWithTitle:@"输入框边框" 
+    CSSettingItem *borderEnabledItem = [CSSettingItem switchItemWithTitle:@"启用输入框边框" 
                                                           iconName:@"rectangle" 
                                                          iconColor:[UIColor systemOrangeColor] 
                                                        switchValue:[defaults boolForKey:kInputTextBorderEnabledKey]
@@ -155,7 +155,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         }
         
         // 添加圆角大小调整选项
-        CSSettingItem *cornerRadiusItem = [CSSettingItem itemWithTitle:@"圆角大小" 
+        CSSettingItem *cornerRadiusItem = [CSSettingItem itemWithTitle:@"输入框圆角大小" 
                                                          iconName:@"slider.horizontal.below.rectangle" 
                                                         iconColor:[UIColor systemIndigoColor] 
                                                           detail:[NSString stringWithFormat:@"%.1f", savedCornerRadius]];
@@ -176,13 +176,13 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         }
         
         // 添加边框宽度调整选项
-        CSSettingItem *borderWidthItem = [CSSettingItem itemWithTitle:@"边框宽度" 
+        CSSettingItem *borderWidthItem = [CSSettingItem itemWithTitle:@"输入框边框宽度" 
                                                          iconName:@"increase.indent" 
                                                         iconColor:[UIColor systemIndigoColor] 
                                                           detail:[NSString stringWithFormat:@"%.1f", savedBorderWidth]];
         
         // 添加边框颜色选项
-        CSSettingItem *borderColorItem = [CSSettingItem itemWithTitle:@"边框颜色" 
+        CSSettingItem *borderColorItem = [CSSettingItem itemWithTitle:@"输入框边框颜色" 
                                                         iconName:@"paintbrush.pointed" 
                                                        iconColor:[UIColor systemRedColor] 
                                                          detail:@""];
@@ -202,7 +202,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
             savedText = kDefaultInputText;
         }
         
-        CSSettingItem *textContentItem = [CSSettingItem itemWithTitle:@"占位文本" 
+        CSSettingItem *textContentItem = [CSSettingItem itemWithTitle:@"输入框占位文本" 
                                                           iconName:@"text.quote" 
                                                          iconColor:[UIColor systemGreenColor] 
                                                            detail:savedText];
@@ -213,7 +213,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         [sectionsArray addObject:contentSection];
         
         // 添加样式设置组
-        CSSettingItem *boldFontItem = [CSSettingItem switchItemWithTitle:@"使用粗体字" 
+        CSSettingItem *boldFontItem = [CSSettingItem switchItemWithTitle:@"占位文本粗体字" 
                                                             iconName:@"bold" 
                                                            iconColor:[UIColor systemOrangeColor] 
                                                          switchValue:[defaults boolForKey:kInputTextBoldKey]
@@ -234,12 +234,12 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
             savedFontSize = kDefaultFontSize;
         }
         
-        CSSettingItem *fontSizeItem = [CSSettingItem itemWithTitle:@"字体大小" 
+        CSSettingItem *fontSizeItem = [CSSettingItem itemWithTitle:@"占位文字体大小" 
                                                        iconName:@"textformat.size" 
                                                       iconColor:[UIColor systemOrangeColor] 
                                                         detail:[NSString stringWithFormat:@"%.1f", savedFontSize]];
         
-        CSSettingItem *textColorItem = [CSSettingItem itemWithTitle:@"文字颜色" 
+        CSSettingItem *textColorItem = [CSSettingItem itemWithTitle:@"占位文颜色选择" 
                                                         iconName:@"paintbrush.fill" 
                                                        iconColor:[UIColor systemRedColor] 
                                                          detail:@""];
@@ -249,7 +249,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
             savedTextAlpha = kDefaultTextAlpha;
         }
         
-        CSSettingItem *textAlphaItem = [CSSettingItem itemWithTitle:@"文字透明度" 
+        CSSettingItem *textAlphaItem = [CSSettingItem itemWithTitle:@"占位文字透明度" 
                                                         iconName:@"slider.horizontal.3" 
                                                        iconColor:[UIColor systemTealColor] 
                                                          detail:[NSString stringWithFormat:@"%.1f", savedTextAlpha]];

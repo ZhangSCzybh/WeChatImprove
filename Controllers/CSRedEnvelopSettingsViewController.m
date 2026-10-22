@@ -66,7 +66,7 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
     // 创建自动抢红包开关
-    CSSettingItem *autoReceiveItem = [CSSettingItem switchItemWithTitle:@"自动抢红包"
+    CSSettingItem *autoReceiveItem = [CSSettingItem switchItemWithTitle:@"启用自动领取"
                                                               iconName:@"gift.fill"
                                                              iconColor:[UIColor systemRedColor]
                                                            switchValue:[defaults boolForKey:kRedEnvelopAutoReceiveKey]
@@ -84,7 +84,7 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     }];
     
     // 创建私聊红包开关
-    CSSettingItem *privateEnableItem = [CSSettingItem switchItemWithTitle:@"私聊红包"
+    CSSettingItem *privateEnableItem = [CSSettingItem switchItemWithTitle:@"自动领取私聊"
                                                                iconName:@"person.fill"
                                                               iconColor:[UIColor systemBlueColor]
                                                             switchValue:[defaults boolForKey:kRedEnvelopPrivateEnableKey]
@@ -95,7 +95,7 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     // 创建群聊红包开关
     id groupEnableValue = [defaults objectForKey:kRedEnvelopGroupEnableKey];
     BOOL groupEnable = groupEnableValue ? [groupEnableValue boolValue] : YES;
-    CSSettingItem *groupEnableItem = [CSSettingItem switchItemWithTitle:@"群聊红包"
+    CSSettingItem *groupEnableItem = [CSSettingItem switchItemWithTitle:@"自动领取群聊"
                                                              iconName:@"person.3.fill"
                                                             iconColor:[UIColor systemGreenColor]
                                                           switchValue:groupEnable
@@ -104,7 +104,7 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     }];
     
     // 创建抢自己发的红包开关
-    CSSettingItem *receiveSelfItem = [CSSettingItem switchItemWithTitle:@"抢自己发的红包"
+    CSSettingItem *receiveSelfItem = [CSSettingItem switchItemWithTitle:@"领取自己红包"
                                                              iconName:@"arrow.uturn.left.circle"
                                                             iconColor:[UIColor systemOrangeColor]
                                                           switchValue:[defaults boolForKey:kRedEnvelopReceiveSelfKey]
@@ -113,7 +113,7 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     }];
     
     // 创建串行抢红包开关
-    CSSettingItem *serialReceiveItem = [CSSettingItem switchItemWithTitle:@"串行抢红包"
+    CSSettingItem *serialReceiveItem = [CSSettingItem switchItemWithTitle:@"同时领取多个"
                                                                iconName:@"list.bullet"
                                                               iconColor:[UIColor systemPurpleColor]
                                                             switchValue:[defaults boolForKey:kRedEnvelopSerialReceiveKey]
@@ -124,7 +124,7 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     // 创建延迟时间设置
     NSInteger delaySeconds = [defaults integerForKey:kRedEnvelopDelayKey];
     NSString *delayDetail = delaySeconds == 0 ? @"不延迟" : [NSString stringWithFormat:@"%ld秒", (long)delaySeconds];
-    CSSettingItem *delayItem = [CSSettingItem itemWithTitle:@"延迟抢红包"
+    CSSettingItem *delayItem = [CSSettingItem itemWithTitle:@"延迟领取红包"
                                                   iconName:@"clock.fill"
                                                  iconColor:[UIColor systemYellowColor]
                                                    detail:delayDetail];
@@ -142,21 +142,21 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     } else {
         scopeDetail = [NSString stringWithFormat:@"黑名单(%lu)", (unsigned long)blockedGroups.count];
     }
-    CSSettingItem *groupScopeItem = [CSSettingItem itemWithTitle:@"群聊范围"
+    CSSettingItem *groupScopeItem = [CSSettingItem itemWithTitle:@"设置群聊范围"
                                                        iconName:@"rectangle.stack.fill"
                                                       iconColor:[UIColor systemTealColor]
                                                         detail:scopeDetail];
     
     // 创建白名单设置
     NSString *whitelistDetail = [NSString stringWithFormat:@"%lu个群", (unsigned long)allowedGroups.count];
-    CSSettingItem *whitelistItem = [CSSettingItem itemWithTitle:@"白名单群"
+    CSSettingItem *whitelistItem = [CSSettingItem itemWithTitle:@"设置白名单群"
                                                       iconName:@"checkmark.circle"
                                                      iconColor:[UIColor systemGreenColor]
                                                        detail:whitelistDetail];
     
     // 创建黑名单设置
     NSString *blacklistDetail = [NSString stringWithFormat:@"%lu个群", (unsigned long)blockedGroups.count];
-    CSSettingItem *blacklistItem = [CSSettingItem itemWithTitle:@"黑名单群"
+    CSSettingItem *blacklistItem = [CSSettingItem itemWithTitle:@"设置黑名单群"
                                                       iconName:@"xmark.circle"
                                                      iconColor:[UIColor systemRedColor]
                                                        detail:blacklistDetail];
@@ -188,13 +188,13 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     // 创建抢到通知设置
     NSInteger notifyTarget = [defaults integerForKey:kRedEnvelopNotifyTargetKey];
     NSString *notifyDetail = notifyTarget == 0 ? @"关闭" : (notifyTarget == 1 ? @"通知自己" : @"通知文件传输助手");
-    CSSettingItem *notifyItem = [CSSettingItem itemWithTitle:@"抢到通知"
+    CSSettingItem *notifyItem = [CSSettingItem itemWithTitle:@"抢到提醒通知"
                                                    iconName:@"bell.fill"
                                                   iconColor:[UIColor systemRedColor]
                                                     detail:notifyDetail];
     
     // 创建红包详情页汇总开关
-    CSSettingItem *pageSummaryItem = [CSSettingItem switchItemWithTitle:@"红包详情页汇总"
+    CSSettingItem *pageSummaryItem = [CSSettingItem switchItemWithTitle:@"红包详情汇总"
                                                              iconName:@"doc.text.fill"
                                                             iconColor:[UIColor systemIndigoColor]
                                                           switchValue:[defaults boolForKey:kRedEnvelopPageSummaryKey]
@@ -207,7 +207,7 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     NSInteger totalCount = config.totalReceiveCount;
     long long totalAmount = config.totalReceiveAmount;
     NSString *recordDetail = [NSString stringWithFormat:@"已领%ld次，累计%.2f元！", (long)totalCount, (double)totalAmount / 100.0];
-    CSSettingItem *receiveRecordItem = [CSSettingItem itemWithTitle:@"领取记录"
+    CSSettingItem *receiveRecordItem = [CSSettingItem itemWithTitle:@"红包领取记录"
                                                          iconName:@"chart.bar.fill"
                                                         iconColor:[UIColor systemGreenColor]
                                                           detail:recordDetail];
@@ -279,19 +279,19 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
             CSSettingItem *item = section.items[indexPath.row];
             
             // 处理延迟时间设置
-            if ([item.title isEqualToString:@"延迟抢红包"]) {
+            if ([item.title isEqualToString:@"延迟领取红包"]) {
                 [self showDelayPicker];
             }
             // 处理群聊范围设置
-            else if ([item.title isEqualToString:@"群聊范围"]) {
+            else if ([item.title isEqualToString:@"设置群聊范围"]) {
                 [self showGroupScopePicker];
             }
             // 处理白名单设置
-            else if ([item.title isEqualToString:@"白名单群"]) {
+            else if ([item.title isEqualToString:@"设置白名单群"]) {
                 [self showWhitelistSelector];
             }
             // 处理黑名单设置
-            else if ([item.title isEqualToString:@"黑名单群"]) {
+            else if ([item.title isEqualToString:@"设置黑名单群"]) {
                 [self showBlacklistSelector];
             }
             // 处理私聊自动回复设置
@@ -303,11 +303,11 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
                 [self showGroupReplyInput];
             }
             // 处理抢到通知设置
-            else if ([item.title isEqualToString:@"抢到通知"]) {
+            else if ([item.title isEqualToString:@"抢到提醒通知"]) {
                 [self showNotifyTargetPicker];
             }
             // 处理领取记录
-            else if ([item.title isEqualToString:@"领取记录"]) {
+            else if ([item.title isEqualToString:@"红包领取记录"]) {
                 [self showReceiveRecordActions];
             }
         }
@@ -320,8 +320,8 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSInteger currentDelay = [defaults integerForKey:kRedEnvelopDelayKey];
     
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"延迟抢红包"
-                                                                   message:@"设置抢红包延迟时间（秒）"
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"延迟领取红包"
+                                                                   message:@"设置领取红包延迟时间（秒）"
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     
     for (NSInteger i = 0; i <= 10; i++) {
@@ -351,8 +351,8 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSInteger currentScope = [defaults integerForKey:kRedEnvelopGroupScopeKey];
     
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"群聊范围"
-                                                                   message:@"选择抢红包的群聊范围"
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"设置群聊范围"
+                                                                   message:@"选择领取红包的群聊范围"
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     
     UIAlertAction *allAction = [UIAlertAction actionWithTitle:@"所有群"
@@ -402,11 +402,11 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
 }
 
 - (void)showWhitelistSelector {
-    [self showGroupSelectorWithTitle:@"白名单群" key:kRedEnvelopAllowedGroupsKey];
+    [self showGroupSelectorWithTitle:@"设置白名单群" key:kRedEnvelopAllowedGroupsKey];
 }
 
 - (void)showBlacklistSelector {
-    [self showGroupSelectorWithTitle:@"黑名单群" key:kRedEnvelopBlockedGroupsKey];
+    [self showGroupSelectorWithTitle:@"设置黑名单群" key:kRedEnvelopBlockedGroupsKey];
 }
 
 - (void)showGroupSelectorWithTitle:(NSString *)title key:(NSString *)key {
@@ -494,7 +494,7 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     
     NSString *message = [NSString stringWithFormat:@"已领%ld次，累计%.2f元\n是否重置统计数据？", (long)totalCount, (double)totalAmount / 100.0];
     
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"领取记录"
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"红包领取记录"
                                                                    message:message
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     
@@ -520,7 +520,7 @@ static NSString * const kRedEnvelopPageSummaryKey = @"com.wechat.enhance.redenve
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSInteger currentTarget = [defaults integerForKey:kRedEnvelopNotifyTargetKey];
     
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"抢到通知"
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"抢到提醒通知"
                                                                    message:@"选择抢到红包后的通知方式"
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     
