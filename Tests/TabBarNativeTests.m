@@ -35,6 +35,9 @@ static void RemoveAllAnimations(CALayer *layer,SEL selector) {
 static NSUserDefaults *isolated;
 static NSUserDefaults *TestDefaults(id self,SEL selector) { return isolated; }
 @implementation MMTabbarItem @end
+@interface MMTabBarItemView ()
+@property(nonatomic,strong) UIView *customIconView;
+@end
 @implementation MMTabBarItemView
 - (void)layoutIcon {} - (void)layoutBadgeView {} - (void)reloadIconImage {}
 @end
@@ -62,6 +65,7 @@ static NSProcessInfoThermalState testThermalState=NSProcessInfoThermalStateNomin
 @implementation NSProcessInfo (CSThermalTest)
 - (NSProcessInfoThermalState)cs_testThermalState { return testThermalState; }
 @end
+#import "TabBarClickEffectTests.h"
 int main(int argc,const char *argv[]) { @autoreleasepool {
     NSString *suite=[@"com.wechatimprove.test.tabbar." stringByAppendingString:NSUUID.UUID.UUIDString];
     isolated=[[NSUserDefaults alloc] initWithSuiteName:suite];
@@ -202,6 +206,7 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         [isolated removeObjectForKey:kTabBarIconChatKey];[isolated removeObjectForKey:kTabBarTextChatKey];
         [CSTabBarPreferences reload];CSTabBarUpdate(bar);
         assert(first.imageView.image==nativeImage && !first.textLabel.hidden && [first.textLabel.text isEqual:@"Native"]);
+        TestClickEffects(controller,bar,items,buttons,suite,imagePath);
         // Border pulses must never tint a transparent bar interior or animate its background.
         [isolated setDouble:0 forKey:kTabBarBgColorAlphaKey];
         [isolated setDouble:1 forKey:kTabBarBorderColorAlphaKey];

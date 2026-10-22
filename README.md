@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`1.9-9`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`1.9-10`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -39,7 +39,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`。当前仓库提供 [1.9-9 Rootless 安装包](packages/com.wechat.improve_1.9-9_iphoneos-arm64.deb)，其他方案可参照下文编译。
+1. 获取与设备注入环境匹配的 `.deb`。当前仓库提供 [1.9-10 Rootless 安装包](packages/com.wechat.improve_1.9-10_iphoneos-arm64.deb)，其他方案可参照下文编译。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
@@ -155,7 +155,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_1.9-9_iphoneos-arm64.deb`。
+当前版本默认输出：`packages/com.wechat.improve_1.9-10_iphoneos-arm64.deb`。
 
 ### Rootful
 
@@ -164,7 +164,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_1.9-9_iphoneos-arm.deb`。此命令说明构建入口，当前交付记录仅验证了 Rootless 方案。
+当前版本默认输出：`packages/com.wechat.improve_1.9-10_iphoneos-arm.deb`。此命令说明构建入口，当前交付记录仅验证了 Rootless 方案。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -242,6 +242,8 @@ bash Tests/verify-payment-core.sh
 
 仓库另有搜索、手势、底栏、消息时间、防撤回、后台模糊等专项脚本。测试通过主机替身验证策略、接口调用和生命周期，不替代设备验收。
 
+`1.9-10` 在 **底栏样式 → 样式设置 → 切换点击特效** 新增“关闭 / 轻弹”，默认关闭，与切换触感独立。启用悬浮导航栏并选择轻弹后，切换成功时图标以约 0.34 秒完成轻微收缩、上弹和回位；支持自定义图标，快速切换只播放最新一次，系统减弱动态效果开启时停用。配置即时生效，并纳入备份和恢复默认。详见 [实现与验证记录](docs/audits/tabbar-click-effect-1.9-10/README.md)。
+
 `1.9-6` 修复备份保护记录异常时的误清理，增加双份保护记录、异常原件展示与清理审计；仅支持当前备份格式，移除旧格式兼容和旧模型。验证与交付见 [备份保护修复记录](docs/audits/backup-retention-fix-1.9-6/README.md)。
 
 `1.9-4` 修正密友临时解锁期间的通话策略：语音／视频来电恢复微信原生处理，资料页语音、视频和通话菜单允许主动拨打；重新锁定后恢复原拒接设置。消息静默保留，解锁后不再启动或重试挂断回复。核心回归与交付记录见 [1.9-4 密友通话修复](docs/audits/close-friends-calls-1.9-4/README.md)。
@@ -301,7 +303,7 @@ bash Tests/verify-payment-core.sh
 | 聊天分组 | [功能与实现](docs/session-groups.md) · [重构方案](docs/session-groups-refactor-proposal.md) |
 | 列表圆角 | [配置与实现](docs/list-corner-radius.md) · [圆角优化](docs/list-corners.md) |
 | 气泡与消息合并 | [消息合并说明](docs/message-merge.md) · [1.8-36 转文字语音间距](docs/audits/merge-voice-translation-1.8-36/README.md) |
-| 悬浮底栏 | [原生底栏改造](docs/tabbar-native-1.6-36.md) · [动画选项](docs/tabbar-animation-options-1.6-39.md) |
+| 悬浮底栏 | [原生底栏改造](docs/tabbar-native-1.6-36.md) · [描边动画](docs/tabbar-animation-options-1.6-39.md) · [切换轻弹特效](docs/audits/tabbar-click-effect-1.9-10/README.md) |
 | 后台模糊 | [功能说明](docs/background-blur-1.7-13.md) · [过渡与清理](docs/background-blur-cleanup-1.7-17.md) |
 | 历史分析与验证 | [专项记录](docs/audits/) · [验证材料](docs/evidence/) · [性能记录](docs/performance/) |
 

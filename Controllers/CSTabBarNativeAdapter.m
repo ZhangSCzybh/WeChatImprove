@@ -9,6 +9,9 @@ static char CSBarStateKey, CSItemStateKey;
 static NSHashTable<MMTabBar *> *CSBars;
 static NSString * const CSOutwardAnimationKey=@"cs.tabbar.outwardPulse";
 static NSString * const CSClassicAnimationKey=@"cs.tabbar.pulse";
+static NSString * const CSClickAnimationKey=@"cs.tabbar.clickBounce";
+static BOOL CSAnimationInactive;
+static NSHashTable *CSInactiveAnimationScenes;
 static CGRect CSRect(CSTabBarRect r) { return CGRectMake(r.x,r.y,r.width,r.height); }
 static void CSSetFrame(UIView *view, CGRect frame) {
     if (view && !CGRectEqualToRect(view.frame,frame)) {
@@ -60,6 +63,10 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 @property(nonatomic) CGFloat nativeInset, nativeIndicatorInset, appliedInset, appliedIndicatorInset;
 @property(nonatomic) BOOL insetApplied;
 @property(nonatomic) NSUInteger selectionBeforeTouch;
+@property(nonatomic) NSUInteger feedbackGeneration;
+@property(nonatomic, weak) UIControl *touchButton;
+@property(nonatomic, weak) UIView *animatedIcon;
+@property(nonatomic, weak) MMTabBarItemView *animatedItem;
 - (void)touchBegan:(UIControl *)sender;
 - (void)touchEnded:(UIControl *)sender;
 @end
@@ -89,6 +96,61 @@ static UIView *CSCustomIcon(MMTabBarItemView *item) {
     if (![item respondsToSelector:selector]) return nil;
     id value=((id (*)(id,SEL))[item methodForSelector:selector])(item,selector);
     return [value isKindOfClass:UIView.class] ? value : nil;
+}
+static UIView *CSClickIcon(MMTabBarItemView *item) {
+    UIView *custom=CSCustomIcon(item);
+    UIView *icon=custom && !custom.hidden && custom.alpha>.01 && [custom isDescendantOfView:item] ? custom : item.imageView;
+    if (!icon || ![icon isDescendantOfView:item]) return nil;
+    for (UIView *view=icon;view && view!=item;view=view.superview) if (view.hidden || view.alpha<.01) return nil;
+    return icon;
+}
+static BOOL CSFeedbackVisible(CSTabBarState *s) {
+    if (!s.applied || !CSTabBarPreferences.current.enabled || !s.bar.window ||
+        CSOwner(s.bar)!=s.controller || CSAnimationInactive || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return NO;
+    UIWindowScene *scene=s.bar.window.windowScene;
+    if (scene && ([CSInactiveAnimationScenes containsObject:scene] || scene.activationState!=UISceneActivationStateForegroundActive)) return NO;
+    for (UIView *view=s.bar;view;view=view.superview) if (view.hidden || view.alpha<.01) return NO;
+    return YES;
+}
+static BOOL CSCanAnimateClick(CSTabBarState *s) {
+    return CSFeedbackVisible(s) && CSTabBarPreferences.current.clickEffect==CSTabBarClickEffectBounce &&
+        !UIAccessibilityIsReduceMotionEnabled() && NSProcessInfo.processInfo.thermalState<NSProcessInfoThermalStateSerious;
+}
+static void CSCancelClickEffect(CSTabBarState *s) {
+    [s.animatedIcon.layer removeAnimationForKey:CSClickAnimationKey];
+    s.animatedIcon=nil; s.animatedItem=nil;
+}
+static void CSInvalidateFeedback(CSTabBarState *s) {
+    s.feedbackGeneration++; s.touchButton=nil;
+    CSCancelClickEffect(s);
+}
+static void CSReconcileClickEffect(CSTabBarState *s) {
+    if (!CSFeedbackVisible(s)) {CSInvalidateFeedback(s); return;}
+    if (!s.animatedIcon) return;
+    NSUInteger index=[s.bar.items indexOfObjectIdenticalTo:s.animatedItem.item];
+    if (!CSCanAnimateClick(s) || index==NSNotFound || index!=s.controller.selectedIndex ||
+        ![s.animatedItem isDescendantOfView:s.bar] || s.animatedItem.hidden || CSClickIcon(s.animatedItem)!=s.animatedIcon) CSCancelClickEffect(s);
+}
+static void CSPlayClickEffect(CSTabBarState *s,MMTabBarItemView *item) {
+    CSCancelClickEffect(s);
+    if (!CSCanAnimateClick(s) || item.hidden || item.alpha<.01) return;
+    UIView *icon=CSClickIcon(item);
+    if (!icon) return;
+    // Additive transforms are presentation-only: the native frame, hit target,
+    // underlying transform, text and badge remain owned by WeChat.
+    CAKeyframeAnimation *bounce=[CAKeyframeAnimation animationWithKeyPath:@"transform"];
+    NSMutableArray *values=[NSMutableArray array];
+    const CGFloat scales[]={1,.92,1.08,.98,1}, offsets[]={0,0,-4,1,0};
+    for (NSUInteger i=0;i<5;i++) {
+        CATransform3D transform=CATransform3DScale(CATransform3DMakeTranslation(0,offsets[i],0),scales[i],scales[i],1);
+        [values addObject:[NSValue valueWithCATransform3D:transform]];
+    }
+    bounce.values=values; bounce.keyTimes=@[@0,@.18,@.48,@.76,@1];
+    CAMediaTimingFunction *ease=[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    bounce.timingFunctions=@[ease,ease,ease,ease];
+    bounce.additive=YES; bounce.duration=.34; bounce.removedOnCompletion=YES;
+    s.animatedIcon=icon; s.animatedItem=item;
+    [icon.layer addAnimation:bounce forKey:CSClickAnimationKey];
 }
 static void CSRestoreItem(MMTabBarItemView *item) {
     CSTabBarItemState *s=objc_getAssociatedObject(item,&CSItemStateKey);
@@ -148,6 +210,7 @@ static void CSApplyItem(MMTabBarItemView *item, MMTabBar *bar) {
     badge.origin.y+=CGRectGetMinY(imageFrame)-CGRectGetMinY(s.imageFrame);
     s.badgeOffset=CGPointMake(badge.origin.x-s.badgeFrame.origin.x,badge.origin.y-s.badgeFrame.origin.y);
     CSSetFrame(item.badgeView,badge);
+    CSReconcileClickEffect(host);
 }
 
 static void CSRestoreInset(CSTabBarState *s) {
@@ -214,6 +277,7 @@ static void CSRestoreVisuals(CSTabBarState *s) {
 }
 static void CSStop(CSTabBarState *s) {
     if (!s) return;
+    CSInvalidateFeedback(s);
     CSRestoreVisuals(s); CSRestoreInset(s);
     [s.halo removeAnimationForKey:CSOutwardAnimationKey];
     [s.surface.layer removeAnimationForKey:CSClassicAnimationKey];
@@ -226,8 +290,6 @@ static void CSStop(CSTabBarState *s) {
     [s.observedButtons removeAllObjects];
     [s.surface removeFromSuperview];
 }
-static BOOL CSAnimationInactive;
-static NSHashTable *CSInactiveAnimationScenes;
 static NSInteger CSDesiredAnimation(CSTabBarState *s) {
     if (CSAnimationInactive || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive ||
         NSProcessInfo.processInfo.thermalState>=NSProcessInfoThermalStateSerious || !s.bar.window) return CSTabBarBorderAnimationNone;
@@ -418,6 +480,7 @@ void CSTabBarUpdate(MMTabBar *bar) {
     // They must not retain ownership of a page's scroll inset or receive touches.
     if (!bar.window || bar.hidden || bar.alpha<.01) CSRestoreInset(s);
     else CSUpdateInset(s);
+    CSReconcileClickEffect(s);
     s.applying=NO;
 }
 UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot) {
@@ -486,14 +549,27 @@ UIView *CSTabBarHitTest(MMTabBar *bar, CGPoint point, UIEvent *event, BOOL *hand
     return bar;
 }
 @implementation CSTabBarState
-- (void)touchBegan:(UIControl *)sender { self.selectionBeforeTouch=self.controller.selectedIndex; }
+- (void)touchBegan:(UIControl *)sender {
+    CSInvalidateFeedback(self);
+    self.touchButton=sender;
+    self.selectionBeforeTouch=self.controller.selectedIndex;
+}
 - (void)touchEnded:(UIControl *)sender {
+    if (self.touchButton!=sender) return;
+    self.touchButton=nil;
     NSUInteger previous=self.selectionBeforeTouch;
+    NSUInteger generation=self.feedbackGeneration;
     __weak typeof(self) weakSelf=self;
+    __weak UIControl *weakButton=sender;
     // Native targets complete first, regardless of UIControl target ordering.
     dispatch_async(dispatch_get_main_queue(), ^{
         CSTabBarState *s=weakSelf;
-        if (!s || !s.applied || s.controller.selectedIndex==previous) return;
+        if (!s || s.feedbackGeneration!=generation || !CSFeedbackVisible(s) || s.controller.selectedIndex==previous) return;
+        NSUInteger index=s.controller.selectedIndex;
+        if (index>=s.bar.items.count || [s.controller getTabBarBtnForIndex:index]!=weakButton) return;
+        MMTabBarItemView *selected=nil;
+        for (MMTabBarItemView *item in CSItems(s.bar)) if (item.item==s.bar.items[index]) {selected=item; break;}
+        if (selected) CSPlayClickEffect(s,selected);
         NSInteger haptic=CSTabBarPreferences.current.haptic;
         if (!haptic) return;
         UIImpactFeedbackStyle styles[]={UIImpactFeedbackStyleSoft,UIImpactFeedbackStyleLight,UIImpactFeedbackStyleMedium,UIImpactFeedbackStyleHeavy};
@@ -519,6 +595,7 @@ static void CSResumeVisibleAnimations(void) {
     [CATransaction begin]; [CATransaction setDisableActions:YES];
     for (MMTabBar *bar in CSBars.allObjects) {
         CSTabBarState *s=CSState(bar,NO);
+        CSReconcileClickEffect(s);
         if (s.applied && s.geometryApplied) CSEnsureBorderAnimation(s);
     }
     [CATransaction commit];

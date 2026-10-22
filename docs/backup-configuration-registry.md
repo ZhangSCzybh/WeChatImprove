@@ -1,6 +1,6 @@
 # Backup configuration registry inventory
 
-The registry in `Controllers/CSBackupRegistry.m` authorizes exact domain/key pairs. This inventory was checked against current settings writers and runtime readers on 2026-10-20. The registry has 313 fixed identities and one constrained per-account selection family; it never treats a namespace prefix as permission to restore a key.
+The registry in `Controllers/CSBackupRegistry.m` authorizes exact domain/key pairs. This inventory was checked against current settings writers and runtime readers on 2026-10-22. The registry has 314 fixed identities and one constrained per-account selection family; it never treats a namespace prefix as permission to restore a key.
 
 ## Domain mapping
 
@@ -192,6 +192,7 @@ The audit reviewed all settings controller constants and preference writes, then
 | `standard` | `com.wechat.enhance.tabbar_style.border_color.red` | `tabbar` | `number` | `global` | — |
 | `standard` | `com.wechat.enhance.tabbar_style.border_style` | `tabbar` | `number` | `global` | — |
 | `standard` | `com.wechat.enhance.tabbar_style.border_width` | `tabbar` | `number` | `global` | — |
+| `standard` | `com.wechat.enhance.tabbar_style.click_effect` | `tabbar` | `number` | `global` | — |
 | `standard` | `com.wechat.enhance.tabbar_style.content_height` | `tabbar` | `number` | `global` | — |
 | `standard` | `com.wechat.enhance.tabbar_style.corner_radius` | `tabbar` | `number` | `global` | — |
 | `standard` | `com.wechat.enhance.tabbar_style.enabled` | `tabbar` | `bool` | `global` | — |

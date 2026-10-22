@@ -14,6 +14,7 @@ extern NSString *const UIAccessibilityReduceMotionStatusDidChangeNotification;
 extern NSString *const UIApplicationDidBecomeActiveNotification;
 extern NSString *const UISceneDidActivateNotification;
 extern BOOL CSTestReduceMotionEnabled;
+extern NSUInteger CSTestHapticCount;
 extern NSString *const UIApplicationWillResignActiveNotification;
 extern NSString *const UISceneWillDeactivateNotification;
 typedef NS_ENUM(NSInteger, UIApplicationState) { UIApplicationStateActive, UIApplicationStateInactive, UIApplicationStateBackground };

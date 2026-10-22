@@ -34,6 +34,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, strong) CSSettingItem *contentHeightItem;
 @property (nonatomic, strong) CSSettingItem *borderWidthItem;
 @property (nonatomic, strong) CSSettingItem *hapticFeedbackItem;
+@property (nonatomic, strong) CSSettingItem *clickEffectItem;
 @property (nonatomic, strong) CSSettingItem *borderAnimationItem;
 @property (nonatomic, strong) CSSettingItem *borderColorItem;
 
@@ -47,6 +48,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, assign) BOOL hideText;
 @property (nonatomic, assign) NSInteger borderStyle;
 @property (nonatomic, assign) NSInteger hapticFeedback;
+@property (nonatomic, assign) CSTabBarClickEffect clickEffect;
 @property (nonatomic, assign) NSInteger borderAnimation;
 
 // 样式属性
@@ -92,6 +94,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     self.cornerRadius=p.cornerRadius; self.positionOffset=p.lift; self.scale=p.scale;
     self.contentHeight=p.contentHeight; self.borderWidth=p.borderWidth;
     self.borderStyle=p.borderStyle; self.hapticFeedback=p.haptic; self.borderAnimation=p.animation;
+    self.clickEffect=p.clickEffect;
     self.bgColor=p.backgroundColor; self.borderColor=p.borderColor;
     self.chatText=[p titleAtIndex:0]; self.contactsText=[p titleAtIndex:1];
     self.discoverText=[p titleAtIndex:2]; self.meText=[p titleAtIndex:3];
@@ -110,6 +113,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     [defaults setFloat:self.borderWidth forKey:kTabBarBorderWidthKey];
     [defaults setInteger:self.borderStyle forKey:kTabBarBorderStyleKey];
     [defaults setInteger:self.hapticFeedback forKey:kTabBarHapticFeedbackKey];
+    [defaults setInteger:self.clickEffect forKey:kTabBarClickEffectKey];
     [defaults setInteger:self.borderAnimation forKey:kTabBarBorderAnimationKey];
     
     // 保存背景颜色
@@ -364,6 +368,32 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [weakSelf presentViewController:alert animated:YES completion:nil];
     };
     
+    NSArray *clickOptions = @[@"关闭", @"轻弹"];
+    self.clickEffectItem = [CSSettingItem itemWithTitle:@"切换点击特效"
+                                             iconName:@"arrow.up.and.down"
+                                            iconColor:[UIColor systemPurpleColor]
+                                               detail:clickOptions[self.clickEffect]];
+    self.clickEffectItem.actionBlock = ^{
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"切换点击特效"
+            message:@"轻弹：切换时图标轻轻上弹并缩放回位。与切换触感独立设置，开启系统“减弱动态效果”时暂停。"
+            preferredStyle:UIAlertControllerStyleActionSheet];
+        for (NSUInteger i = 0; i < clickOptions.count; i++) {
+            [alert addAction:[UIAlertAction actionWithTitle:clickOptions[i] style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+                weakSelf.clickEffect=(CSTabBarClickEffect)i;
+                weakSelf.clickEffectItem.detail=clickOptions[i];
+                [weakSelf saveSettings];
+                [weakSelf.tableView reloadData];
+            }]];
+        }
+        [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+        if (alert.popoverPresentationController) {
+            alert.popoverPresentationController.sourceView=weakSelf.view;
+            alert.popoverPresentationController.sourceRect=CGRectMake(CGRectGetMidX(weakSelf.view.bounds),CGRectGetMidY(weakSelf.view.bounds),1,1);
+            alert.popoverPresentationController.permittedArrowDirections=0;
+        }
+        [weakSelf presentViewController:alert animated:YES completion:nil];
+    };
+
     // 底栏边框描边动画
     NSArray *animationOptions = @[@"无动画", @"扩散呼吸", @"扩散心跳", @"经典呼吸", @"经典心跳"];
     NSString *animationDetail = animationOptions[self.borderAnimation];
@@ -506,6 +536,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
                                                                        self.positionOffsetItem,
                                                                        self.bgColorItem,
                                                                        self.hapticFeedbackItem,
+                                                                       self.clickEffectItem,
                                                                        self.borderAnimationItem,
                                                                        self.borderColorItem,
                                                                        self.borderWidthItem]];
@@ -926,7 +957,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [defaults setFloat:kDefaultPositionOffset forKey:kTabBarPositionOffsetKey];
         [defaults setFloat:kDefaultScale forKey:kTabBarScaleKey];
         [defaults setInteger:kDefaultBorderStyle forKey:kTabBarBorderStyleKey];
-        for (NSString *key in @[kTabBarContentHeightKey,kTabBarBorderWidthKey,kTabBarHapticFeedbackKey,kTabBarBorderAnimationKey,kTabBarBorderColorRedKey,kTabBarBorderColorGreenKey,kTabBarBorderColorBlueKey,kTabBarBorderColorAlphaKey]) [defaults removeObjectForKey:key];
+        for (NSString *key in @[kTabBarContentHeightKey,kTabBarBorderWidthKey,kTabBarHapticFeedbackKey,kTabBarClickEffectKey,kTabBarBorderAnimationKey,kTabBarBorderColorRedKey,kTabBarBorderColorGreenKey,kTabBarBorderColorBlueKey,kTabBarBorderColorAlphaKey]) [defaults removeObjectForKey:key];
         
         [defaults removeObjectForKey:kTabBarBgColorRedKey];
         [defaults removeObjectForKey:kTabBarBgColorGreenKey];

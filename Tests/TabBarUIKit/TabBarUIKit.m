@@ -9,6 +9,7 @@ NSString *const UISceneWillDeactivateNotification=@"sceneInactive";
 @end
 @implementation UIWindowScene @end
 BOOL CSTestReduceMotionEnabled=NO;
+NSUInteger CSTestHapticCount=0;
 BOOL UIAccessibilityIsReduceMotionEnabled(void) { return CSTestReduceMotionEnabled; }
 @implementation UITraitCollection @end
 @implementation UIColor { CGColorRef _color; }
@@ -87,5 +88,5 @@ BOOL UIAccessibilityIsReduceMotionEnabled(void) { return CSTestReduceMotionEnabl
 @end
 @implementation UIImpactFeedbackGenerator
 - (instancetype)initWithStyle:(UIImpactFeedbackStyle)style { return [super init]; }
-- (void)impactOccurred {}
+- (void)impactOccurred { CSTestHapticCount++; }
 @end

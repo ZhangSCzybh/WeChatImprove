@@ -4,6 +4,10 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"1.9-10": @[
+            @{@"title": @"底栏切换新增轻弹特效", @"detail": @"底栏样式新增“切换点击特效”，可选关闭或轻弹；切换时图标轻微收缩、上弹并回到原位，与切换触感独立设置，默认关闭。"},
+            @{@"title": @"动效随操作及时恢复", @"detail": @"连续切换只播放最新一次，退出前台、关闭特效或开启系统减弱动态效果时自动停止；支持自定义图标及配置备份。"}
+        ],
         @"1.9-9": @[
             @{@"title": @"朋友圈删除按钮保持原位", @"detail": @"隐藏可见范围图标时保留原生占位和换行，删除按钮位置保持不变；同时关闭隐藏图标的点击与无障碍读取。"}
         ],

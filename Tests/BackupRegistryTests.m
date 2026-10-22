@@ -32,6 +32,10 @@ int main(void) { @autoreleasepool {
     CHECK([Entry(@"com.wechat.tweak.navigation.contact.overrides")[@"resource"] isEqual:@"contacts"]);
     CHECK([Entry(@"com.wechat.tweak.navigation.separator.image")[@"resource"] isEqual:@"file"]);
     CHECK([Entry(@"com.wechat.enhance.tabbar_style.icon.selected.chat")[@"resource"] isEqual:@"file"]);
+    NSDictionary *clickEffect=Entry(@"com.wechat.enhance.tabbar_style.click_effect");
+    CHECK([clickEffect[@"module"] isEqual:@"tabbar"] && [clickEffect[@"scope"] isEqual:@"global"]);
+    CHECK(Valid(@0,clickEffect) && Valid(@1,clickEffect));
+    CHECK(!Valid(@"1",clickEffect));
     for (NSString *base in @[@"sender_light",@"receiver_light",@"sender_dark",@"receiver_dark"]) {
         for (NSString *component in @[@"red",@"green",@"blue",@"alpha"]) CHECK(Entry([NSString stringWithFormat:@"com.wechat.enhance.bubble_style.%@_color.%@",base,component])!=nil);
         for (NSString *component in @[@"red",@"green",@"blue"]) CHECK(Entry([NSString stringWithFormat:@"com.wechat.enhance.bubble_style.%@_text_color.%@",base,component])!=nil);

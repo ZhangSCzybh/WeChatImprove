@@ -76,7 +76,7 @@
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 54, 0, 0);
     [CSCloseFriendSettingsCell registerToTableView:self.tableView];
     self.keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"rejectVoice",@"rejectVideo",@"callReplyEnabled",@"callReplyText",@"hidePrivacyIcons",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"longPressUnlockEnabled",@"longPressUnlockDuration",@"unlockSeconds"];
-    self.labels=@[@"隐藏会话",@"隐藏联系人",@"隐藏转发候选",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏朋友圈内容",@"隐藏互动痕迹",@"隐藏状态",@"资料页显示添加到通讯录",@"静默消息通知",@"拒接语音来电",@"拒接视频来电",@"挂断回复",@"挂断回复内容",@"隐藏全部朋友圈可见范围图标",@"隐藏密友设置",@"隐藏插件入口",@"生物识别解锁",@"摇动立即锁定",@"首页长按解锁",@"长按触发时长",@"临时解锁时长"];
+    self.labels=@[@"隐藏聊天会话",@"隐藏通讯录页",@"隐藏转发页面",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏友圈内容",@"隐藏互动痕迹",@"隐藏微信状态",@"隐藏个人资料",@"静默消息通知",@"拒接语音来电",@"拒接视频来电",@"挂断自动回复",@"挂断回复内容",@"隐藏可见图标",@"隐藏密友设置",@"隐藏插件入口",@"生物识别解锁",@"摇晃立即隐藏",@"首页长按解锁",@"长按触发时间",@"临时解锁时间"];
     [self configureOptionGroups];
     self.optionIcons = @{
         @"hideSessions": @"bubble.left.and.bubble.right.fill",
@@ -137,11 +137,11 @@
     if(section==0) {
         NSDictionary *options=CSCloseFriendCurrentProfile()[@"options"];
         NSString *entry=[options[@"longPressUnlockEnabled"] boolValue] ?
-            [NSString stringWithFormat:@"长按微信首页顶部导航栏 %@ 秒，或在首页搜索框输入完整密码，即可解锁并显示密友设置入口。",options[@"longPressUnlockDuration"]] :
+            [NSString stringWithFormat:@"长按微信首页顶部标题 %@ 秒，或在首页搜索框输入完整密码，即可解锁并显示密友设置入口。",options[@"longPressUnlockDuration"]] :
             @"首页长按解锁已关闭；在首页搜索框输入完整密码，仍可解锁并显示密友设置入口。";
-        return [entry stringByAppendingString:@"密码验证信息仅保存在本机钥匙串；微信进入后台或切换账号时自动锁定。开启“摇动立即锁定”后，轻摇手机即可锁定。"];
+        return [entry stringByAppendingString:@"密码验证信息仅保存在本机钥匙串；微信进入后台或切换账号时自动隐藏。开启“摇晃立即隐藏”后，轻摇手机即可隐藏。"];
     }
-    if(section==1)return @"解锁期间消息通知按静默设置处理。“挂断回复”默认关闭，开启后仅对自动拒接的私聊发送预设消息，同一人5分钟内最多一次。搭配“免打扰”使用更加，免打扰需手动设置。";
+    if(section==1)return @"解锁期间消息通知按静默设置处理。“挂断回复”默认关闭，开启后仅对自动拒接的私聊发送预设消息，同一人5分钟内最多一次。搭配“免打扰”使用更加，免打扰需手动设置。隐藏个人资料：资料页隐藏发消息和音视频通话入口，显示添加到通讯录。";
     return nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -150,7 +150,7 @@
     NSString *optionKey=[self optionKeyForIndexPath:indexPath];
     UIColor *iconColor = [UIColor systemBlueColor];
     if(!optionKey) {
-        title=@[@"启用密友",@"密友名单",@"密友群聊",@"修改密码",@"立即锁定",@"当前状态"][indexPath.row];
+        title=@[@"启用密友",@"密友名单",@"密友群聊",@"修改密码",@"立即隐藏",@"当前状态"][indexPath.row];
         iconName=@[@"lock.shield.fill",@"person.fill",@"person.3.fill",@"key.fill",@"lock.fill",@"info.circle.fill"][indexPath.row];
         iconColor=@[[UIColor systemGreenColor],[UIColor systemBlueColor],[UIColor systemGreenColor],[UIColor systemOrangeColor],[UIColor systemRedColor],[UIColor systemGrayColor]][indexPath.row];
     } else {
@@ -162,7 +162,7 @@
     if(!optionKey) {
         if(indexPath.row==0) { UISwitch *toggle=[UISwitch new]; toggle.on=[profile[@"enabled"] boolValue]; toggle.tag=100; [toggle addTarget:self action:@selector(toggle:) forControlEvents:UIControlEventValueChanged]; [cell configureCloseFriendSwitch:toggle]; }
         else if(indexPath.row==1 || indexPath.row==2) { cell.detailTextLabel.text=[NSString stringWithFormat:@"%lu",(unsigned long)[profile[indexPath.row==1?@"friends":@"groups"] count]]; cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator; }
-        else if(indexPath.row==5) { cell.detailTextLabel.text=@"临时显示中"; cell.selectionStyle=UITableViewCellSelectionStyleNone; }
+        else if(indexPath.row==5) { cell.detailTextLabel.text=@"临时显示"; cell.selectionStyle=UITableViewCellSelectionStyleNone; }
         else cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
     } else {
         NSString *key=optionKey;

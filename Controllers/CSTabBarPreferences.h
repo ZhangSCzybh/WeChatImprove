@@ -9,6 +9,11 @@ typedef NS_ENUM(NSInteger, CSTabBarBorderAnimation) {
     CSTabBarBorderAnimationClassicHeartbeat = 4,
 };
 
+typedef NS_ENUM(NSInteger, CSTabBarClickEffect) {
+    CSTabBarClickEffectNone = 0,
+    CSTabBarClickEffectBounce = 1,
+};
+
 static NSString * const kTabBarStyleEnabledKey = @"com.wechat.enhance.tabbar_style.enabled";
 static NSString * const kTabBarHideTextKey = @"com.wechat.enhance.tabbar_style.hide_text";
 
@@ -28,6 +33,7 @@ static NSString * const kTabBarPositionOffsetKey = @"com.wechat.enhance.tabbar_s
 static NSString * const kTabBarScaleKey = @"com.wechat.enhance.tabbar_style.scale";
 static NSString * const kTabBarBorderStyleKey = @"com.wechat.enhance.tabbar_style.border_style";
 static NSString * const kTabBarHapticFeedbackKey = @"com.wechat.enhance.tabbar_style.haptic_feedback";
+static NSString * const kTabBarClickEffectKey = @"com.wechat.enhance.tabbar_style.click_effect";
 static NSString * const kTabBarBorderAnimationKey = @"com.wechat.enhance.tabbar_style.border_animation";
 static NSString * const kTabBarBorderColorRedKey = @"com.wechat.enhance.tabbar_style.border_color.red";
 static NSString * const kTabBarBorderColorGreenKey = @"com.wechat.enhance.tabbar_style.border_color.green";
@@ -60,6 +66,7 @@ static NSString * const CSTabBarPreferencesDidChange = @"com.wechat.enhance.tabb
 @property(nonatomic) BOOL enabled, hideText;
 @property(nonatomic) CGFloat scale, contentHeight, lift, cornerRadius, borderWidth;
 @property(nonatomic) NSInteger borderStyle, haptic, animation;
+@property(nonatomic) CSTabBarClickEffect clickEffect;
 @property(nonatomic, strong) UIColor *backgroundColor, *borderColor;
 @property(nonatomic, copy) NSArray *titles, *icons, *selectedIcons;
 + (instancetype)current;

@@ -203,6 +203,7 @@ static BOOL CSContacts(id value) {
             @[@"standard",@"com.wechat.enhance.tabbar_style.border_color.red",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.border_style",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.border_width",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.click_effect",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.content_height",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.corner_radius",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.enabled",@"tabbar",@"bool",@"global",@""],
