@@ -1,0 +1,16 @@
+{
+  "changed_existing_files": [
+    "Controllers/CSBackgroundRunViewController.m",
+    "Controllers/CSBackgroundRunViewController.h",
+    "Hooks/BackgroundRun.xm",
+    "Makefile",
+    "README.md"
+  ],
+  "prior_packages_and_other_source_unchanged": true,
+  "artifacts": {
+    "packages/background-run-20261023/WeChatImprove-background-run-20261023.zip": "75a4481857ebbe3e64408c254df1d51d44b5211f69b9a19e9991f54360f0befb",
+    "packages/background-run-20261023/WeChatImprove.dylib": "0f07bb9cc717c75fad0bd1f180d57805a624d8b6a9c69a57f436358fde0d79d6",
+    "packages/background-run-20261023/WeChatImprove-background-run-dSYMs.zip": "54af67b349c9e0ed7520db9eeddd8f5885de070caee02ccce47b6e9b2fc76ebd",
+    "packages/background-run-20261023/\u4f7f\u7528\u8bf4\u660e.md": "75e2940b9fae6cf2e3f634db51b8897a952f9c80293f9fe914d1836d86fff5ff"
+  }
+}

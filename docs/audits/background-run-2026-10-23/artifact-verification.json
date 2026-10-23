@@ -1,0 +1,22 @@
+{
+  "version": "1.9-10",
+  "build_label": "background-run-20261023",
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "built_dylib_sha256": "4ff3b5aba5bea4ecc764a9774b04b05ea86593dd6d3588475236d34038afe1f1",
+  "injection_dylib_sha256": "0f07bb9cc717c75fad0bd1f180d57805a624d8b6a9c69a57f436358fde0d79d6",
+  "uuids": {
+    "arm64": "99801BD4-0D61-3135-A0A0-372418DF2353",
+    "arm64e": "83204063-9089-363D-BE37-D298A460A9B5"
+  },
+  "code_sections_unchanged_after_loader_adjustment": true,
+  "injection_dependency": "@rpath/CydiaSubstrate.framework/CydiaSubstrate",
+  "rpaths": [
+    "@loader_path",
+    "@executable_path/Frameworks"
+  ],
+  "signature": "ad-hoc verified; must be re-signed with the IPA",
+  "installed_to_device": false
+}
