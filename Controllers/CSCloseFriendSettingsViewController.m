@@ -150,7 +150,7 @@
     NSString *optionKey=[self optionKeyForIndexPath:indexPath];
     UIColor *iconColor = [UIColor systemBlueColor];
     if(!optionKey) {
-        title=@[@"启用密友",@"密友名单",@"密友群聊",@"修改密码",@"立即隐藏",@"当前状态"][indexPath.row];
+        title=@[@"启用密友功能",@"密友名单列表",@"密友群聊列表",@"修改解锁密码",@"立即隐藏密友",@"当前状态提醒"][indexPath.row];
         iconName=@[@"lock.shield.fill",@"person.fill",@"person.3.fill",@"key.fill",@"lock.fill",@"info.circle.fill"][indexPath.row];
         iconColor=@[[UIColor systemGreenColor],[UIColor systemBlueColor],[UIColor systemGreenColor],[UIColor systemOrangeColor],[UIColor systemRedColor],[UIColor systemGrayColor]][indexPath.row];
     } else {

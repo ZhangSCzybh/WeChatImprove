@@ -386,8 +386,8 @@ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(vo
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ReleaseNoteCell" forIndexPath:indexPath];
     UIListContentConfiguration *content = [cell defaultContentConfiguration];
     if (indexPath.section == 0) {
-        content.text = @"老公大人万岁🎉🎉🎉";
-        content.secondaryText = [NSString stringWithFormat:@"版本 %@", kPluginVersionString];
+        content.text = @"永远拥护老公，老公大人万岁🎉🎉🎉";
+        content.secondaryText = [NSString stringWithFormat:@"家风 %@", kPluginVersionString];
     } else {
         NSDictionary<NSString *, NSString *> *note = self.releaseNotes[indexPath.row];
         content.text = note[@"title"];
