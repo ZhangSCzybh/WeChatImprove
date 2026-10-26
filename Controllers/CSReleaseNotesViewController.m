@@ -4,6 +4,10 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"2.0-13+entry2": @[
+            @{@"title": @"新增独立重置", @"detail": @"在对应功能页验证密码并确认后，可清空当前账号的配置并恢复初始入口状态；普通“重置设置”保持原有范围。"},
+            @{@"title": @"完善重置保护", @"detail": @"账号切换和进入后台会使未完成的确认失效；已确认的清理若中断，下次进入当前账号时会继续重试。"}
+        ],
         @"2.0-13+entry1": @[
             @{@"title": @"完善设置入口显示", @"detail": @"入口显示偏好按账号保存，保留已有账号的配置与隐藏选择。"},
             @{@"title": @"保留既有保护规则", @"detail": @"入口显示与内容解锁独立处理；账号切换和进入后台会使未完成的操作失效。"}

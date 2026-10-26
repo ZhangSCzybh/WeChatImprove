@@ -11,14 +11,17 @@
     if((self=[super init])) _defaults=defaults;
     return self;
 }
-- (NSString *)keyForSnapshot:(CSCloseFriendSnapshot *)snapshot {
-    if(!snapshot || snapshot.blocked || !snapshot.accountID.length)return nil;
-    NSData *data=[snapshot.accountID dataUsingEncoding:NSUTF8StringEncoding];
+- (NSString *)keyForAccountID:(NSString *)accountID {
+    if(!accountID.length)return nil;
+    NSData *data=[accountID dataUsingEncoding:NSUTF8StringEncoding];
     uint8_t hash[CC_SHA256_DIGEST_LENGTH];
     CC_SHA256(data.bytes,(CC_LONG)data.length,hash);
     NSMutableString *key=[NSMutableString stringWithString:@"discovered.v1."];
     for(NSUInteger i=0;i<sizeof(hash);i++)[key appendFormat:@"%02x",hash[i]];
     return key;
+}
+- (NSString *)keyForSnapshot:(CSCloseFriendSnapshot *)snapshot {
+    return snapshot && !snapshot.blocked ? [self keyForAccountID:snapshot.accountID] : nil;
 }
 - (BOOL)hasDiscoveredEntryForSnapshot:(CSCloseFriendSnapshot *)snapshot hasCredential:(BOOL)hasCredential {
     NSString *key=[self keyForSnapshot:snapshot];
@@ -41,6 +44,15 @@
     if([self.defaults synchronize])return YES;
     if(previous)[self.defaults setObject:previous forKey:key];
     else [self.defaults removeObjectForKey:key];
+    return NO;
+}
+- (BOOL)removeDiscoveryForAccountID:(NSString *)accountID error:(NSError **)error {
+    NSString *key=[self keyForAccountID:accountID];
+    if(key) {
+        [self.defaults removeObjectForKey:key];
+        if([self.defaults synchronize] && ![self.defaults objectForKey:key])return YES;
+    }
+    if(error)*error=[NSError errorWithDomain:@"CSCloseFriendEntryState" code:1 userInfo:@{NSLocalizedDescriptionKey:@"入口发现记录暂时无法清除。"}];
     return NO;
 }
 @end

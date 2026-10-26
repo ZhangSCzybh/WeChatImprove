@@ -32,6 +32,13 @@ typedef BOOL (^CSCloseFriendCredentialWriter)(NSString *, NSDictionary *, NSErro
 - (BOOL)isAuthorized;
 - (nullable NSDictionary *)currentProfile;
 - (BOOL)updateProfile:(NSDictionary *)profile error:(NSError **)error;
+/// Separate password proof for destructive reset; shortcut/biometric authorization is insufficient.
+- (nullable NSDictionary *)prepareResetWithPassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error;
+- (void)cancelResetWithToken:(NSDictionary *)token;
+/// Consumes the proof after UI confirmation. Must run under the current account epoch lock.
+- (BOOL)resetWithToken:(NSDictionary *)token error:(NSError **)error;
+/// Injected account cleanup: begin=NO resumes only a previously confirmed reset before loading state.
+@property(nonatomic, copy, nullable) BOOL (^resetStorage)(NSString *account, BOOL begin, NSError **error);
 @property(nonatomic, copy, nullable) void (^didChange)(void);
 @end
 NS_ASSUME_NONNULL_END

@@ -20,6 +20,7 @@
 
 - (void)configureWithItem:(CSSettingItem *)item {
     [super configureWithItem:item];
+    self.textLabel.textColor=UIColor.labelColor;
     self.textLabel.numberOfLines = 1;
     self.detailTextLabel.numberOfLines = 1;
     self.textLabel.lineBreakMode = NSLineBreakByTruncatingTail;
@@ -64,7 +65,7 @@
 @end
 
 @interface CSCloseFriendSettingsViewController ()
-@property(nonatomic) BOOL requestingAuthentication;
+@property(nonatomic) BOOL requestingAuthentication, resetFinished;
 @property(nonatomic,copy) NSArray<NSString *> *keys, *labels, *accountKeys, *protectionKeys;
 @property(nonatomic,copy) NSDictionary<NSString *, NSString *> *optionIcons;
 @end
@@ -111,6 +112,7 @@
     self.protectionKeys=protection;
 }
 - (NSString *)optionKeyForIndexPath:(NSIndexPath *)path {
+    if(path.section>1)return nil;
     NSInteger row=path.section==0 ? path.row-6 : path.row;
     NSArray *keys=path.section==0 ? self.accountKeys : self.protectionKeys;
     return row>=0 && (NSUInteger)row<keys.count ? keys[(NSUInteger)row] : nil;
@@ -120,7 +122,7 @@
 - (void)viewWillAppear:(BOOL)animated { [super viewWillAppear:animated]; [self.tableView reloadData]; }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if(![self authorized] && !self.requestingAuthentication) {
+    if(![self authorized] && !self.requestingAuthentication && !self.resetFinished) {
         self.requestingAuthentication=YES;
         [CSCloseFriendManager.sharedManager authenticateFrom:self completion:^(BOOL success){
             self.requestingAuthentication=NO; [self.tableView reloadData];
@@ -130,9 +132,9 @@
     }
 }
 - (void)policyChanged:(NSNotification *)note { CSNativeContactPickerRevalidate(self); [self.tableView reloadData]; }
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return [self authorized]?2:0; }
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { return section==0?6+self.accountKeys.count:self.protectionKeys.count; }
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return @[@"账号保护",@"保护选项"][section]; }
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return [self authorized]?3:0; }
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { return section==0?6+self.accountKeys.count:section==1?self.protectionKeys.count:1; }
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return @[@"账号保护",@"保护选项",@"重置密友"][section]; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if(section==0) {
         NSDictionary *options=CSCloseFriendCurrentProfile()[@"options"];
@@ -142,10 +144,17 @@
         return [entry stringByAppendingString:@"开启“生物识别解锁”后，长按需通过面容或指纹验证；不可用或取消时可输入密友密码。密码验证信息仅保存在本机钥匙串；微信进入后台或切换账号时自动隐藏。开启“摇晃立即隐藏”后，轻摇手机即可隐藏。"];
     }
     if(section==1)return @"解锁期间消息通知按静默设置处理。“挂断回复”默认关闭，开启后仅对自动拒接的私聊发送预设消息，同一人5分钟内最多一次。搭配“免打扰”使用更加，免打扰需手动设置。隐藏个人资料：资料页隐藏发消息和音视频通话入口，显示添加到通讯录。";
+    if(section==2)return @"仅重置当前账号的密友数据和密码，入口恢复首次隐藏。需验证当前密友密码并确认；不随插件的“重置设置”执行。";
     return nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     CSCloseFriendSettingsCell *cell=[tableView dequeueReusableCellWithIdentifier:[CSCloseFriendSettingsCell reuseIdentifier]];
+    if(indexPath.section==2) {
+        [cell configureWithItem:[CSSettingItem itemWithTitle:@"重置密友" iconName:@"arrow.counterclockwise" iconColor:UIColor.systemRedColor detail:nil]];
+        cell.textLabel.textColor=UIColor.systemRedColor;
+        cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+        return cell;
+    }
     NSString *title, *iconName;
     NSString *optionKey=[self optionKeyForIndexPath:indexPath];
     UIColor *iconColor = [UIColor systemBlueColor];
@@ -186,6 +195,7 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES]; if(![self authorized])return;
+    if(indexPath.section==2) { [self resetCloseFriends]; return; }
     NSDictionary *token=CSCloseFriendManager.sharedManager.runtime.authenticationToken;
     NSString *optionKey=[self optionKeyForIndexPath:indexPath];
     if(indexPath.section==0 && (indexPath.row==1 || indexPath.row==2)) {
@@ -256,6 +266,36 @@
             if(!text.length || [text rangeOfCharacterFromSet:invalid].location!=NSNotFound) { [self showError:nil]; return; }
             NSMutableDictionary *profile=[CSCloseFriendCurrentProfile() mutableCopy], *options=[profile[@"options"] mutableCopy]; options[@"unlockSeconds"]=@([text integerValue]); profile[@"options"]=options; [self save:profile];
         }]]; [self presentViewController:alert animated:YES completion:nil];
+    }
+}
+- (void)resetCloseFriends {
+    if(self.requestingAuthentication || ![self authorized])return;
+    self.requestingAuthentication=YES;
+    __weak typeof(self) weakSelf=self;
+    [CSCloseFriendManager.sharedManager resetFrom:self completion:^(BOOL success){
+        typeof(self) self=weakSelf; if(!self)return;
+        self.requestingAuthentication=NO;
+        if(!success) { [self.tableView reloadData]; return; }
+        self.resetFinished=YES;
+        [self.tableView reloadData];
+        [self leaveAfterReset];
+    }];
+}
+- (void)leaveAfterReset {
+    if(!self.view.window)return;
+    UINavigationController *navigation=self.navigationController;
+    if(navigation && navigation.topViewController!=self)return;
+    UIAlertController *(^successAlert)(void)=^{
+        UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"密友已重置" message:@"“捉迷藏呀”已隐藏。需要重新使用时，在插件主设置页长按顶部头像 2 秒，再设置新的密友密码。" preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"好" style:UIAlertActionStyleDefault handler:nil]];
+        return alert;
+    };
+    if(navigation.viewControllers.count>1) {
+        [navigation popViewControllerAnimated:NO];
+        [navigation.topViewController presentViewController:successAlert() animated:YES completion:nil];
+    } else {
+        UIViewController *presenter=navigation.presentingViewController?:self.presentingViewController;
+        if(presenter)[presenter dismissViewControllerAnimated:YES completion:^{ [presenter presentViewController:successAlert() animated:YES completion:nil]; }];
     }
 }
 @end

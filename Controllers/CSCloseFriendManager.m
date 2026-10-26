@@ -4,6 +4,7 @@
 #import "CSCloseFriendCrypto.h"
 #import "CSCloseFriendAccount.h"
 #import "CSCloseFriendEntryState.h"
+#import "CSCloseFriendReset.h"
 #import "CSCloseFriendShakeMonitor.h"
 #import "CSCloseFriendNavigation.h"
 #import "CSBackupBootstrap.h"
@@ -44,6 +45,11 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     OSStatus status=replace?SecItemUpdate((__bridge CFDictionaryRef)query,(__bridge CFDictionaryRef)attributes):errSecItemNotFound;
     if(status==errSecItemNotFound) { [query addEntriesFromDictionary:attributes]; status=SecItemAdd((__bridge CFDictionaryRef)query,NULL); }
     if(status!=errSecSuccess)CSKeychainError(error,status); return status==errSecSuccess;
+}
+static BOOL CSKeychainRemove(NSString *account, NSString *kind, NSError **error) {
+    OSStatus status=SecItemDelete((__bridge CFDictionaryRef)CSKeychainQuery(account,kind));
+    if(status==errSecSuccess || status==errSecItemNotFound)return YES;
+    CSKeychainError(error,status); return NO;
 }
 @interface CSCloseFriendManager ()
 @property(nonatomic,strong,readwrite) CSCloseFriendRuntime *runtime;
@@ -86,6 +92,13 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
             NSData *data=[NSPropertyListSerialization dataWithPropertyList:credential format:NSPropertyListBinaryFormat_v1_0 options:0 error:error];
             return data && CSKeychainWrite(account,@"auth",data,YES,error);
         }];
+        CSCloseFriendReset *reset=[[CSCloseFriendReset alloc] initWithStore:store entryState:_entryState
+            reader:^NSData *(NSString *account,NSString *kind,NSError **error){ return CSKeychainRead(account,kind,error); }
+            writer:^BOOL(NSString *account,NSString *kind,NSData *data,NSError **error){ return CSKeychainWrite(account,kind,data,NO,error); }
+            remover:^BOOL(NSString *account,NSString *kind,NSError **error){ return CSKeychainRemove(account,kind,error); }];
+        _runtime.resetStorage=^BOOL(NSString *account,BOOL begin,NSError **error){
+            return begin ? [reset beginResetForAccountID:account error:error] : [reset resumeResetForAccountID:account error:error];
+        };
         __weak typeof(self) weakSelf=self;
         _runtime.didChange=^{ [weakSelf schedulePolicyRefresh]; };
     } return self;
@@ -227,7 +240,12 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
         [self recordCapability:@"当前账号读取" available:account.length>0];
     }
     if(epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended()) { suspended=YES; account=@""; }
-    [self.runtime synchronizeAccount:account epoch:epoch suspended:suspended];
+    // Recovery can finish a confirmed reset, so loading shares the account mutation lock.
+    BOOL ran=CSBackupPerformAtAccountEpoch(epoch,^{
+        BOOL unavailable=suspended || CSBackupAccountIsSuspended();
+        [self.runtime synchronizeAccount:unavailable?@"":account epoch:epoch suspended:unavailable];
+    });
+    if(!ran)[self.runtime synchronizeAccount:@"" epoch:CSBackupAccountEpoch() suspended:YES];
 }
 - (void)message:(NSString *)text presenter:(UIViewController *)presenter {
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"密友" message:text preferredStyle:UIAlertControllerStyleAlert];
@@ -385,6 +403,64 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     [self refreshAccount];
     if(!self.runtime.isAuthorized)return;
     [self passwordPrompt:presenter token:self.runtime.authenticationToken setup:YES completion:nil];
+}
+- (BOOL)canResetFrom:(UIViewController *)presenter token:(NSDictionary *)token {
+    return !self.backgroundCoverRequired && UIApplication.sharedApplication.applicationState==UIApplicationStateActive &&
+        presenter.view.window && [self validateToken:token] && self.runtime.isAuthorized &&
+        (!presenter.navigationController || presenter.navigationController.topViewController==presenter);
+}
+- (void)finishResetAlert:(UIAlertController *)alert presenter:(UIViewController *)presenter completion:(void (^)(void))completion {
+    // UIAlertAction may already be dismissing its alert. Never dismiss the settings
+    // navigation controller or a newer modal when a stale action finishes.
+    id<UIViewControllerTransitionCoordinator> transition=alert.transitionCoordinator;
+    if(alert.isBeingDismissed && transition && [transition animateAlongsideTransition:nil completion:^(__unused id<UIViewControllerTransitionCoordinatorContext> context){ completion(); }])return;
+    if(alert && presenter.presentedViewController==alert)[alert dismissViewControllerAnimated:YES completion:completion];
+    else completion();
+}
+- (void)confirmResetFrom:(UIViewController *)presenter token:(NSDictionary *)token completion:(void (^)(BOOL))completion {
+    if(![self canResetFrom:presenter token:token]) { [self.runtime cancelResetWithToken:token]; if(completion)completion(NO); return; }
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"重置当前账号的密友？"
+        message:@"将清空密友和密群名单、全部保护选项、密友密码、生物识别记录及入口发现记录。保护将关闭，“捉迷藏呀”重新隐藏。\n微信好友、聊天记录、免打扰设置和其他账号不受影响。此操作无法撤销。"
+        preferredStyle:UIAlertControllerStyleAlert];
+    __weak UIAlertController *weakAlert=alert;
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action){
+        [self.runtime cancelResetWithToken:token]; if(completion)completion(NO);
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"重置密友" style:UIAlertActionStyleDestructive handler:^(__unused UIAlertAction *action){
+        __block BOOL ok=NO; __block NSError *error=nil;
+        if([self canResetFrom:presenter token:token])CSBackupPerformAtAccountEpoch([token[@"epoch"] unsignedIntegerValue],^{
+            if(!CSBackupAccountIsSuspended() && [self.runtime isTokenCurrent:token])ok=[self.runtime resetWithToken:token error:&error];
+        });
+        [self.runtime cancelResetWithToken:token];
+        self.lastRevealed=self.runtime.isAuthorized;
+        [self flushPolicyRefresh];
+        [self finishResetAlert:weakAlert presenter:presenter completion:^{
+            if(completion)completion(ok);
+            if(!ok && presenter.view.window)[self message:error.localizedDescription?:@"重置已取消，当前验证或页面已失效。请重新进入密友设置。" presenter:presenter];
+        }];
+    }]];
+    [presenter presentViewController:alert animated:YES completion:nil];
+}
+- (void)resetFrom:(UIViewController *)presenter completion:(void (^)(BOOL))completion {
+    NSAssert(NSThread.isMainThread,@"Reset UI on main");
+    [self refreshAccount]; NSDictionary *token=self.runtime.authenticationToken;
+    if(![self canResetFrom:presenter token:token] || presenter.presentedViewController || self.authenticating) { if(completion)completion(NO); return; }
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"验证密友密码" message:@"重置前需输入当前密友密码。验证后仍需确认才会清空。" preferredStyle:UIAlertControllerStyleAlert];
+    __weak UIAlertController *weakAlert=alert;
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *field){ field.secureTextEntry=YES; field.textContentType=UITextContentTypePassword; field.placeholder=@"当前密友密码"; }];
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action){ if(completion)completion(NO); }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"验证" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){
+        __block NSDictionary *proof=nil; __block NSError *error=nil;
+        if([self canResetFrom:presenter token:token])CSBackupPerformAtAccountEpoch([token[@"epoch"] unsignedIntegerValue],^{
+            if(!CSBackupAccountIsSuspended())proof=[self.runtime prepareResetWithPassword:weakAlert.textFields.firstObject.text?:@"" token:token error:&error];
+        });
+        weakAlert.textFields.firstObject.text=@"";
+        [self finishResetAlert:weakAlert presenter:presenter completion:^{
+            if(proof)[self confirmResetFrom:presenter token:proof completion:completion];
+            else { if(completion)completion(NO); if(presenter.view.window)[self message:error.localizedDescription?:@"验证已失效，请重试。" presenter:presenter]; }
+        }];
+    }]];
+    [presenter presentViewController:alert animated:YES completion:nil];
 }
 - (NSDictionary *)capabilities { @synchronized(self.capabilityMap) { return [self.capabilityMap copy]; } }
 - (void)recordCapability:(NSString *)name available:(BOOL)available { if(!name.length)return; @synchronized(self.capabilityMap) { self.capabilityMap[name]=@(available); } }

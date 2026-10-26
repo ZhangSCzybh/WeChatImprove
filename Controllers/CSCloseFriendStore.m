@@ -132,4 +132,22 @@ static NSDictionary *CSState(id state,NSError **error) {
         return YES;
     }
 }
+- (BOOL)removeStateForAccountID:(NSString *)account error:(NSError **)error {
+    @synchronized(CSCloseFriendStore.class) {
+        if(!CSAccount(account) || !self.root.isFileURL)return CSStoreFail(error,CSCloseFriendStoreErrorInvalid);
+        // Finish relocation before deletion so a legacy copy cannot resurrect the profile.
+        if(self.migration && ![self.migration migrate:error])return NO;
+        int dir=open(self.root.path.fileSystemRepresentation,O_RDONLY|O_DIRECTORY|O_NOFOLLOW);
+        if(dir<0)return errno==ENOENT ? YES : CSStoreFail(error,CSCloseFriendStoreErrorIO);
+        const char *name=[self URLForAccount:account].lastPathComponent.fileSystemRepresentation;
+        struct stat st;
+        BOOL exists=fstatat(dir,name,&st,AT_SYMLINK_NOFOLLOW)==0;
+        BOOL ok=exists ? S_ISREG(st.st_mode) : errno==ENOENT;
+        if(ok && exists)ok=unlinkat(dir,name,0)==0;
+        // Also flush an already absent file when resuming an interrupted removal.
+        if(ok)ok=fsync(dir)==0;
+        close(dir);
+        return ok || CSStoreFail(error,CSCloseFriendStoreErrorIO);
+    }
+}
 @end

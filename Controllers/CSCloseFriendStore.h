@@ -24,6 +24,8 @@ typedef NS_ENUM(NSInteger, CSCloseFriendStoreErrorCode) {
 - (nullable NSDictionary *)loadStateForAccountID:(NSString *)accountID error:(NSError **)error;
 /// Refuses to overwrite existing corrupt, incompatible or wrongly keyed bytes. Atomic, protected, readback-verified replacement.
 - (BOOL)saveState:(NSDictionary *)state forAccountID:(NSString *)accountID error:(NSError **)error;
+/// Only after a durable, authenticated reset intent. Idempotent; flushes removal before keys may be deleted.
+- (BOOL)removeStateForAccountID:(NSString *)accountID error:(NSError **)error;
 @end
 #ifdef __cplusplus
 }

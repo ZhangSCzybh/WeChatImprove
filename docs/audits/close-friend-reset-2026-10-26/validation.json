@@ -1,0 +1,26 @@
+{
+  "version": "2.0-13+entry2",
+  "branch": "codex/close-friend-entry-gesture",
+  "parentCommit": "463cb17b5a33811dae9b53911b4bad669fb18442",
+  "regressionPolicy": "Stopped further regression runs per explicit user request; package builds only afterwards",
+  "completedBeforeStop": [
+    {
+      "suite": "CloseFriendResetTests",
+      "checks": 181,
+      "result": "passed"
+    },
+    {
+      "command": "bash Tests/verify-close-friend-ios.sh",
+      "result": "passed",
+      "scope": "arm64 and arm64e before final alert completion helper and wording changes"
+    }
+  ],
+  "deviceInstallation": false,
+  "deviceValidation": "not performed",
+  "realUserDataAccessed": false,
+  "packagesVerified": true,
+  "builds": {
+    "rootless": "passed",
+    "rootful": "passed"
+  }
+}
