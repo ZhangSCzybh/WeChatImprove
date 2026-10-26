@@ -120,7 +120,7 @@
     CSSettingItem *retry=[self action:@"重试备份与恢复" icon:@"arrow.clockwise" color:UIColor.systemOrangeColor block:^{[weakSelf retryStartup];}];
     CSSettingItem *repair=[self action:@"修复当前的配置" icon:@"wrench.and.screwdriver" color:UIColor.systemOrangeColor block:^{[weakSelf repair];}];
     CSSettingItem *cancel=[self action:@"取消待执行计划" icon:@"xmark.circle" color:UIColor.systemRedColor block:^{[weakSelf confirmCancel];}];
-    CSSettingItem *info=[self action:@"功能说明" icon:@"questionmark.circle" color:UIColor.systemGrayColor block:^{[weakSelf message:@"备份配置说明" detail:@"备份包含插件配置、自定义图片和已存档账号分组。仅支持当前 .wcbak 格式。点击备份可预览恢复、导出、重命名、收藏或删除。\n\n自动备份在配置停止变化约 30 秒后尝试保存，持续编辑时约 5 分钟检查一次，相同内容不重复保存。默认保留 20 份自动备份与 5 份操作保护备份；手动、导入、收藏及待执行计划使用的备份会保留。保护状态异常时会保留备份，确认收藏状态后重新按规则管理。\n\n无法读取的文件仍显示在列表，可导出可读取的原件并重新检查；历史清理结果可在“备份与恢复状态”查看。\n\n导出文件未加密，可能包含成员、联系人标识和自定义文字；不包含微信消息、登录凭据或支付账本。"]; }];
+    CSSettingItem *info=[self action:@"功能说明" icon:@"questionmark.circle" color:UIColor.systemGrayColor block:^{[weakSelf message:@"备份配置说明" detail:@"备份包含插件配置、自定义图片、已存档账号分组和当前账号的定时任务。定时任务恢复后总开关关闭，不导入执行记录或待发送状态。仅支持当前 .wcbak 格式。点击备份可预览恢复、导出、重命名、收藏或删除。\n\n自动备份在配置停止变化约 30 秒后尝试保存，持续编辑时约 5 分钟检查一次，相同内容不重复保存。默认保留 20 份自动备份与 5 份操作保护备份；手动、导入、收藏及待执行计划使用的备份会保留。保护状态异常时会保留备份，确认收藏状态后重新按规则管理。\n\n无法读取的文件仍显示在列表，可导出可读取的原件并重新检查；历史清理结果可在“备份与恢复状态”查看。\n\n导出文件未加密，可能包含成员、联系人标识和自定义文字；不包含微信消息、登录凭据或支付账本。"]; }];
     self.sections=[@[[CSSettingSection sectionWithHeader:@"备份设置" items:@[create,import,automatic]],
                      [CSSettingSection sectionWithHeader:[NSString stringWithFormat:@"本机备份 · %lu 份",(unsigned long)self.records.count] items:backups],
                      [CSSettingSection sectionWithHeader:@"恢复管理" items:@[status,retry,repair,cancel]],
@@ -192,7 +192,7 @@
     [self setWorking:YES];[CSBackupManager.sharedManager retryPendingWork:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"恢复仍待处理" detail:error.localizedDescription];else [self message:@"校验已完成" detail:@"备份检查已完成；若刚完成恢复处理，请重新打开微信。"];[self.tableView reloadData];}];
 }
 - (void)create {
-    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"创建完整备份" message:@"保存当前插件配置、图片和账号分组。" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"创建完整备份" message:@"保存当前插件配置、图片、账号分组和当前账号的定时任务。" preferredStyle:UIAlertControllerStyleAlert];
     [alert addTextFieldWithConfigurationHandler:^(UITextField *field){field.placeholder=@"名称（可留空）";}];
     [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
     [alert addAction:[UIAlertAction actionWithTitle:@"保存" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){NSString *name=[alert.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];if(!name.length){NSDateFormatter *date=[NSDateFormatter new];date.dateFormat=@"yyyy-MM-dd HH:mm";name=[@"手动备份 " stringByAppendingString:[date stringFromDate:NSDate.date]];}[self setWorking:YES];[CSBackupManager.sharedManager create:name completion:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"保存失败" detail:error.localizedDescription];else [self reload];}];}]];[self presentViewController:alert animated:YES completion:nil];

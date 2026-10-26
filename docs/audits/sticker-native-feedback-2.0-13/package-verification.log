@@ -1,0 +1,53 @@
+[
+  {
+    "path": "packages/com.wechat.improve_2.0-13_iphoneos-arm.deb",
+    "bytes": 1264774,
+    "sha256": "5e92188ec75f86d2485dcb29908d689d090fab82715b68ed57a49f4b323803bd",
+    "scheme": "rootful",
+    "version": "2.0-13",
+    "architecture": "iphoneos-arm",
+    "dylibSHA256": "8026eaac820842c956960faab269002764835bae966595b95688087e8f455f45",
+    "slices": [
+      {
+        "arch": "arm64",
+        "uuid": "9677D0F1-7529-3496-A636-FA88A7FAD707",
+        "firstInitializer": "CSPluginStorageLoad"
+      },
+      {
+        "arch": "arm64e",
+        "uuid": "53976B5B-6B27-3D05-BFB1-71627A850402",
+        "firstInitializer": "CSPluginStorageLoad"
+      }
+    ],
+    "newFeaturesPresent": true,
+    "testDoublesAbsent": true
+  },
+  {
+    "path": "packages/com.wechat.improve_2.0-13_iphoneos-arm64.deb",
+    "bytes": 1264630,
+    "sha256": "50deec195b48229b2b01f78b5649e30c3220cabc30962a70a805731c5b68820b",
+    "scheme": "rootless",
+    "version": "2.0-13",
+    "architecture": "iphoneos-arm64",
+    "dylibSHA256": "0a451ed46bfc8a6cefa50edbcd94dd01eaad982dfe2e5ea6792f3347a643ce5a",
+    "slices": [
+      {
+        "arch": "arm64",
+        "uuid": "C618439D-A381-3247-B374-9FB4098C77BC",
+        "firstInitializer": "CSPluginStorageLoad"
+      },
+      {
+        "arch": "arm64e",
+        "uuid": "F876BB78-1878-36FC-9333-F09329FA0CCA",
+        "firstInitializer": "CSPluginStorageLoad"
+      }
+    ],
+    "newFeaturesPresent": true,
+    "testDoublesAbsent": true
+  },
+  {
+    "path": "packages/com.wechat.improve_2.0-13_symbols.zip",
+    "bytes": 9642117,
+    "sha256": "6c8f87fac4414031788ee4061f8d75e8620142940c3c501534c4f66c52cc11bd"
+  }
+]

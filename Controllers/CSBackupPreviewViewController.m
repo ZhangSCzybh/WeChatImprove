@@ -47,11 +47,15 @@
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     (void)tableView;
     if(section==0)return self.message.length?self.message:@"未选中的模块和账号保持当前配置。";
-    if(section==2)return @"默认选择当前账号。其他账号的分组始终归属原账号；联系人和群关系仅支持同一本机、同一当前账号操作。";
+    if(section==2)return @"默认选择当前账号。其他账号的分组始终归属原账号；定时任务仅恢复到原所属的当前账号，恢复后总开关关闭。联系人和群关系仅支持同一本机、同一当前账号操作。";
     if(section==3)return self.resetting?@"准备重置前保存可读取的配置和图片。已丢失图片无法找回；重启前配置变化会使计划失效。":@"准备恢复前保存当前配置作为保护备份。重新打开微信时应用；期间配置变化会使计划失效。";
     return nil;
 }
 - (NSString *)changeDescription:(NSDictionary *)change {
+    if([change[@"module"] isEqual:@"scheduled_tasks"]){
+        if([change[@"reset"] boolValue])return @"清除当前账号的定时任务和执行记录；其他账号保持不变。";
+        return [NSString stringWithFormat:@"恢复 %lu 个任务的名称、会话、消息内容、开关和时间规则；总开关保持关闭，不导入执行记录或待发送状态。请检查后手动开启。",(unsigned long)[change[@"after"][@"value"][@"tasks"] count]];
+    }
     NSString *key=change[@"key"];
     NSDictionary *labels=@{@"com.wechat.enhance.redenvelop.autoReceive":@"自动领取红包",@"com.wechat.enhance.redenvelop.autoReplyEnable":@"红包自动回复",@"kReceiveTransferAutoEnableKey":@"自动收款",@"kReceiveTransferAutoReplyEnableKey":@"收款自动回复",@"com.wechat.enhance.chat_group.account_profiles":@"账号分组和成员"};
     NSString *label=labels[key]?:@"配置项";id before=change[@"before"][@"value"],after=change[@"after"][@"value"];

@@ -6,5 +6,10 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT BOOL CSNativeContactPickerPresent(UIViewController *presenter, NSString *title,
     BOOL groups, NSArray<NSString *> *selectedNames, BOOL (^_Nullable isValid)(void),
     void (^completion)(NSArray<NSString *> *names), NSError **error);
+/// Same native UI, limited to one resolvable contact. Empty/multiple results cannot finish.
+/// Changing the target requires unchecking the previous selection first.
+FOUNDATION_EXPORT BOOL CSNativeContactPickerPresentSingle(UIViewController *presenter, NSString *title,
+    BOOL groups, NSString *_Nullable selectedName, BOOL (^_Nullable isValid)(void),
+    void (^completion)(NSString *name), NSError **error);
 FOUNDATION_EXPORT void CSNativeContactPickerRevalidate(UIViewController *presenter);
 NS_ASSUME_NONNULL_END

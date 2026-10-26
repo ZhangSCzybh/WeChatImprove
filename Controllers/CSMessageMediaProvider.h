@@ -12,6 +12,7 @@ FOUNDATION_EXPORT BOOL CSMessageHasPendingVoiceDownloads(void);
 @interface CSMessageMediaProvider : NSObject
 - (instancetype)initWithReader:(NSData * _Nullable (^)(NSString *path))reader;
 - (instancetype)init;
+- (void)readImageForContext:(CSMessageActionContext *)context completion:(void (^)(NSData * _Nullable data))completion;
 // Native getters are snapshotted on main; only immutable bytes/path enter the single serial IO queue.
 - (void)prepareVoiceForContext:(CSMessageActionContext *)context operationID:(NSString *)operationID
     completion:(void (^)(CSMessageVoiceResource * _Nullable resource))completion;

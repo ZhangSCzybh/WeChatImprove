@@ -4,6 +4,7 @@
 #import "CSMessageSendAdapter.h"
 #import "CSVoiceForwardAdapter.h"
 #import "CSMessageActionMenuAdapter.h"
+#import "CSMessageImageStickerAdapter.h"
 static NSUInteger checks=0;
 #define CHECK(x) do { checks++; if (!(x)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#x); exit(1); } } while(0)
 static void Drain(void) { NSDate *end=[NSDate dateWithTimeIntervalSinceNow:0.03]; [NSRunLoop.currentRunLoop runUntilDate:end]; }
@@ -40,6 +41,8 @@ static BOOL Wait(BOOL (^predicate)(void)) { NSDate *end=[NSDate dateWithTimeInte
 - (NSString *)getVoicePath { CHECK(NSThread.isMainThread); return self.path; }
 + (NSString *)getPathOfAudio:(CMessageWrap *)wrap { CHECK(NSThread.isMainThread); return wrap.path; }
 + (void)GetPathOfAppDataByUserName:(NSString *)chat andMessageWrap:(CMessageWrap *)wrap retStrPath:(NSString * __autoreleasing *)path { CHECK([chat isEqualToString:@"chat"]); *path=wrap.path; }
++ (NSString *)getJpgPathOfMsgHdOrMiddleImg:(CMessageWrap *)wrap { CHECK(NSThread.isMainThread); return wrap.path; }
+- (NSString *)GetChatName { return [_m_nsFromUsr isEqual:@"me"] ? _m_nsToUsr : _m_nsFromUsr; }
 - (BOOL)IsFileMsg { return _file; }
 + (BOOL)IsRecordOrNoteMsg:(CMessageWrap *)wrap { return wrap.record; }
 @end
@@ -168,12 +171,13 @@ static NSMutableArray *factoryInputs;
 @property(nonatomic, strong) NSMutableArray *calls;
 @property(nonatomic) BOOL insertThrows;
 @property(nonatomic,strong) CMessageWrap *storedWrap;
-@property(nonatomic) NSUInteger lookups;
+@property(nonatomic) NSUInteger lookups,imageDownloads;
 @end
 @implementation TestManager
 - (instancetype)init { if ((self=[super init])) _calls=[NSMutableArray array]; return self; }
 - (id)GetMsg:(NSString *)chat LocalID:(unsigned int)localID { CHECK(NSThread.isMainThread && localID==42); if (_storedWrap) CHECK([chat isEqual:[_storedWrap.m_nsFromUsr isEqual:@"me"] ? _storedWrap.m_nsToUsr : _storedWrap.m_nsFromUsr]); _lookups++; return _storedWrap; }
 - (void)AddLocalMsg:(NSString *)chat MsgWrap:(CMessageWrap *)wrap { CHECK(wrap.m_uiMesLocalID==0); [_calls addObject:@[@"insert",chat,wrap]]; wrap.m_uiMesLocalID=(unsigned)_calls.count+100; if (_insertThrows) [NSException raise:@"after-insert" format:@"injected"]; }
+- (void)StartDownloadImage:(id)wrap HD:(BOOL)hd AutoDownload:(BOOL)automatic SaveAlbum:(BOOL)save Silent:(BOOL)silent { CHECK(wrap && !hd && !automatic && !save && silent); _imageDownloads++; }
 - (void)AddMsg:(NSString *)chat MsgWrap:(CMessageWrap *)wrap { [_calls addObject:@[@"add",chat,wrap]]; wrap.m_uiMesLocalID=(unsigned)_calls.count+200; }
 - (void)AddEmoticonMsg:(NSString *)chat MsgWrap:(CMessageWrap *)wrap { [_calls addObject:@[@"emoji",chat,wrap]]; wrap.m_uiMesLocalID=(unsigned)_calls.count+300; }
 - (id)AddVideoMsg:(NSString *)from ToUsr:(NSString *)to VideoInfo:(CaptureVideoInfo *)video MsgType:(unsigned int)type { CHECK(type==43 && [from isEqual:@"me"] && [to isEqual:video.m_nsSpecifiedChatName] && video.m_bForward); [_calls addObject:@[@"video",to,video]]; CMessageWrap *output=[[CMessageWrap alloc] initWithMsgType:type]; output.m_uiMesLocalID=(unsigned)_calls.count+400; output.m_nsToUsr=to; return output; }
@@ -234,13 +238,23 @@ static NSMutableDictionary *nativeServices;
 - (void)downloadMsg:(id)wrap { CHECK(wrap); _downloads++; }
 @end
 static MMServiceWrapper *WrappedService(id service) { MMServiceWrapper *wrapper=[MMServiceWrapper alloc]; wrapper.service=service; return wrapper; }
+@protocol IDownloadImageExt <NSObject>
+- (void)OnDownloadImageOk:(id)wrap;
+- (void)OnDownloadImageFail:(id)wrap;
+@end
 @interface MMContext : NSObject
+@property(nonatomic,weak) id imageListener;
+@property(nonatomic) NSUInteger imageRegisters,imageUnregisters;
+- (void)registerExtension:(Protocol *)protocol withTarget:(id)target;
+- (void)unRegisterExtension:(Protocol *)protocol withTarget:(id)target;
 + (id)currentContext;
 - (id)getService:(Class)serviceClass;
 @end
 @implementation MMContext
 + (id)currentContext { static MMContext *context; if (!context) context=[MMContext new]; return context; }
 - (id)getService:(Class)serviceClass { return nativeServices[NSStringFromClass(serviceClass)]; }
+- (void)registerExtension:(Protocol *)protocol withTarget:(id)target { CHECK(protocol==@protocol(IDownloadImageExt)); self.imageListener=target; self.imageRegisters++; }
+- (void)unRegisterExtension:(Protocol *)protocol withTarget:(id)target { CHECK(protocol==@protocol(IDownloadImageExt)); if (self.imageListener==target) self.imageListener=nil; self.imageUnregisters++; }
 @end
 @interface BaseMsgContentViewController : NSObject
 @property(nonatomic, strong) id m_delegate;
@@ -1110,7 +1124,154 @@ static void TestVoiceFlags(void) {
     cell.wrap.m_nsContent=@"<voicemsg voicelength='1000' voiceformat='0' length='700' endflag='1' cancelflag='1'/>"; dispatch_semaphore_signal(release);
     CHECK(Wait(^BOOL{ return callbacks==1; })); CHECK(!accepted); [NSFileManager.defaultManager removeItemAtPath:path error:nil];
 }
-int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_FIRST_VOICE")) {
+
+// Native-shaped sticker doubles exercise ownership and callbacks without uploading media.
+@interface EmoticonCustomAddingItem : NSObject @end
+@implementation EmoticonCustomAddingItem @end
+@interface TestStickerLogic : NSObject
+@property(nonatomic,weak) id delegate;
+@end
+@implementation TestStickerLogic @end
+@interface NSObject (StickerCallbacks)
+- (id)getPresetAddingItem;
+- (BOOL)handleAddingItemAndShouldContinueUploading:(id)item;
+- (void)AddEmoticonFinishedWithWrap:(id)wrap IsSuccessed:(BOOL)success;
+- (void)AddEmoticonFinishedWithWraps:(id)wraps sessionID:(id)sessionID;
+- (void)onAddEmoticonPendingUploadWithWrap:(id)wrap;
+- (void)AddEmoticonUploadedButExceedLimitWithWrap:(id)wrap;
+@end
+@interface TestStickerTask : NSObject
+@property(nonatomic,weak) id delegate;
+@property(nonatomic,strong) TestStickerLogic *addEmoticonLogic;
+@property(nonatomic,copy) void (^prepareFailBlock)(void);
+@property(nonatomic,copy) void (^uploadFailBlock)(void);
+@property(nonatomic) NSUInteger starts;
+@property(nonatomic) BOOL synchronousSuccess;
+@end
+@implementation TestStickerTask
+- (instancetype)init { if ((self=[super init])) _addEmoticonLogic=[TestStickerLogic new]; return self; }
+- (void)startUpload { CHECK(NSThread.isMainThread); CHECK([self.delegate handleAddingItemAndShouldContinueUploading:[self.delegate getPresetAddingItem]]); self.starts++; if (self.synchronousSuccess) [self.addEmoticonLogic.delegate AddEmoticonFinishedWithWrap:nil IsSuccessed:YES]; }
+@end
+@interface TestStickerMedia : CSMessageMediaProvider
+@property(nonatomic,copy) NSData *bytes;
+@property(nonatomic,copy) void (^held)(NSData *);
+@property(nonatomic) BOOL hold;
+@end
+@implementation TestStickerMedia
+- (void)readImageForContext:(CSMessageActionContext *)context completion:(void (^)(NSData *))completion { CHECK(NSThread.isMainThread && context.messageType==3); if (self.hold) self.held=completion; else completion(self.bytes); }
+@end
+static void TestScheduledTextRoute(void) {
+    TestEnvironment *env=[TestEnvironment new]; TestManager *manager=[TestManager new]; env.services[@"CMessageMgr"]=manager;
+    CSMessageSendAdapter *sender=[[CSMessageSendAdapter alloc] initWithEnvironment:env];
+    CHECK(![sender prepareScheduledText:@"hello" targetID:@"filehelper" accountID:@"another-account"]);
+    CHECK(![sender prepareScheduledText:@"" targetID:@"filehelper" accountID:@"me"]);
+    id previous=nil;
+    for (NSString *target in @[@"friend",@"test@chatroom",@"filehelper"]) {
+        NSUInteger count=manager.calls.count;
+        CSMessagePreparedSend *route=[sender prepareScheduledText:@"测试\n第二行" targetID:target accountID:@"me"]; CMessageWrap *wrap=route.outputWrap;
+        CHECK(route && manager.calls.count==count); CHECK(wrap!=previous && wrap.m_uiMessageType==1 && wrap.m_uiMesLocalID==0 && wrap.m_n64MesSvrID==0);
+        CHECK([wrap.m_nsToUsr isEqual:target] && [wrap.m_nsFromUsr isEqual:@"me"] && [wrap.m_nsContent isEqual:@"测试\n第二行"] && wrap.m_uiStatus==1 && wrap.m_uiCreateTime>0);
+        route.submissionStillAuthorized=^BOOL { return YES; }; CHECK([route submit]==CSMessageActionSubmissionStateUnknown && route.nativeHandoffReturned); CHECK(manager.calls.count==count+1 && [manager.calls.lastObject[1] isEqual:target]);
+        [route submit]; CHECK(manager.calls.count==count+1); previous=wrap;
+    }
+    CSMessagePreparedSend *cancel=[sender prepareScheduledText:@"do not send" targetID:@"filehelper" accountID:@"me"];
+    NSUInteger count=manager.calls.count; cancel.submissionStillAuthorized=^BOOL { return NO; }; CHECK([cancel submit]==CSMessageActionSubmissionStateFailedBeforeAcceptance && manager.calls.count==count && !cancel.nativeHandoffReturned);
+}
+static void TestImageStickerFeature(NSUserDefaults *defaults) {
+    [defaults setBool:NO forKey:CSMessageActionRepeatEnabledKey]; [defaults setBool:NO forKey:CSMessageActionVoiceForwardEnabledKey]; [defaults setBool:NO forKey:CSMessageActionImageStickerEnabledKey];
+    CSMessageActionPreferences *prefs=[[CSMessageActionPreferences alloc] initWithDefaults:defaults]; TestEnvironment *env=[TestEnvironment new]; TestManager *manager=[TestManager new]; env.services[@"CMessageMgr"]=manager;
+    TestController *controller=[TestController new]; env.controller=controller; TestCell *cell=Cell(3);
+    TestStickerMedia *media=[TestStickerMedia new]; media.bytes=[@"image bytes" dataUsingEncoding:NSUTF8StringEncoding];
+    CSMessageActionCoordinator *coordinator=[[CSMessageActionCoordinator alloc] initWithEnvironment:env preferences:prefs mediaProvider:media];
+    NSMutableArray *feedback=[NSMutableArray array]; coordinator.feedbackHandler=^(NSString *text){ [feedback addObject:text]; };
+    CSMessageImageStickerAdapter *sticker=[coordinator valueForKey:@"imageSticker"]; __block TestStickerTask *task=nil; __block NSUInteger factories=0;
+    sticker.taskFactory=^id(NSData *bytes){ CHECK(bytes.length); factories++; task=[TestStickerTask new]; return task; };
+    CSMessageActionMenuAdapter *menu=[[CSMessageActionMenuAdapter alloc] initWithCoordinator:coordinator];
+    CHECK([menu itemsByAddingActionsForCell:cell items:@[]].count==0);
+    [defaults setBool:YES forKey:CSMessageActionImageStickerEnabledKey]; [prefs requestRefresh]; Drain(); CHECK(prefs.snapshot.imageStickerEnabled);
+    NSArray *items=[menu itemsByAddingActionsForCell:cell items:@[]]; CHECK(items.count==1); MMMenuItem *item=items.firstObject; CHECK([item.title isEqual:@"添加到表情"] && item.action==NSSelectorFromString(@"cs_handleAddStickerMenuItem:"));
+    menuHookAdapter=menu; ImageMessageCellView *nativeCell=[ImageMessageCellView new]; nativeCell.wrap=Cell(3).wrap; nativeCell.nativeItems=@[];
+    CHECK(NativeMenuPipeline([nativeCell operationMenuItems],NO).count==1); CHECK(NativeMenuPipeline([nativeCell operationMenuItems],YES).count==0); menuHookAdapter=nil;
+    CHECK([menu itemsByAddingActionsForCell:cell items:items].count==1); CHECK([menu itemsByAddingActionsForCell:Cell(1) items:@[]].count==0); CHECK([menu itemsByAddingActionsForCell:Cell(47) items:@[]].count==0);
+    MMMenuItem *native=[[MMMenuItem alloc] initWithTitle:@"添加到表情" target:nil action:NSSelectorFromString(@"nativeAdd:")]; NSArray *nativeItems=@[native]; CHECK([menu itemsByAddingActionsForCell:cell items:nativeItems]==nativeItems);
+    // Restore a captured native menu context and execute through the coordinator.
+    [menu itemsByAddingActionsForCell:cell items:@[]]; [menu performSelector:item.action cell:cell]; CHECK(task.starts==1 && factories==1); CHECK(feedback.count==0);
+    [menu performSelector:item.action cell:cell]; CHECK(task.starts==1 && factories==1); CHECK(feedback.count==0);
+    NSUInteger messages=feedback.count;
+    id completed=task.addEmoticonLogic.delegate; [completed AddEmoticonFinishedWithWrap:nil IsSuccessed:YES];
+    CHECK(feedback.count==messages && !task.delegate && !task.addEmoticonLogic.delegate);
+    CHECK([[sticker valueForKey:@"operations"] count]==0);
+    [completed AddEmoticonFinishedWithWrap:nil IsSuccessed:NO]; CHECK(feedback.count==messages);
+    // Synchronous native success is legal and must survive delegate cleanup on the native stack.
+    sticker.taskFactory=^id(NSData *bytes){ CHECK(bytes.length); factories++; task=[TestStickerTask new]; task.synchronousSuccess=YES; return task; };
+    [menu performSelector:item.action cell:cell]; CHECK(task.starts==1 && feedback.count==messages);
+    CHECK(!task.delegate && !task.addEmoticonLogic.delegate && [[sticker valueForKey:@"operations"] count]==0);
+    sticker.taskFactory=^id(NSData *bytes){ CHECK(bytes.length); factories++; task=[TestStickerTask new]; return task; };
+    // Every native outcome completes silently; only WeChat owns presentation.
+    [menu performSelector:item.action cell:cell]; messages=feedback.count;
+    [task.addEmoticonLogic.delegate AddEmoticonFinishedWithWraps:@[@"native-result"] sessionID:nil];
+    CHECK(feedback.count==messages && !task.delegate && !task.addEmoticonLogic.delegate && [[sticker valueForKey:@"operations"] count]==0);
+    [menu performSelector:item.action cell:cell]; messages=feedback.count;
+    [task.addEmoticonLogic.delegate AddEmoticonFinishedWithWraps:nil sessionID:nil];
+    CHECK(feedback.count==messages && !task.delegate);
+    [menu performSelector:item.action cell:cell]; messages=feedback.count;
+    [task.addEmoticonLogic.delegate AddEmoticonFinishedWithWrap:nil IsSuccessed:NO];
+    CHECK(feedback.count==messages && !task.delegate);
+    [menu performSelector:item.action cell:cell]; [task.addEmoticonLogic.delegate onAddEmoticonPendingUploadWithWrap:nil]; CHECK(feedback.count==0 && !task.delegate);
+    [menu performSelector:item.action cell:cell]; CHECK(task.uploadFailBlock); task.uploadFailBlock(); CHECK(feedback.count==0 && !task.delegate);
+    [menu performSelector:item.action cell:cell]; CHECK(task.prepareFailBlock); task.prepareFailBlock(); CHECK(feedback.count==0 && !task.delegate);
+    [menu performSelector:item.action cell:cell]; [task.addEmoticonLogic.delegate AddEmoticonUploadedButExceedLimitWithWrap:nil];
+    CHECK(feedback.count==0 && !task.delegate && [[sticker valueForKey:@"operations"] count]==0);
+    id (^factory)(NSData *)=sticker.taskFactory;
+    sticker.taskFactory=^id(NSData *bytes){ (void)bytes; return nil; };
+    [menu performSelector:item.action cell:cell]; CHECK(feedback.count==0 && [[sticker valueForKey:@"operations"] count]==0);
+    sticker.taskFactory=factory;
+    // Reject excess requests silently while retaining the existing four native operations.
+    NSMutableArray *busyCells=[NSMutableArray array]; NSUInteger busyStart=factories;
+    for (NSUInteger i=0;i<5;i++) {
+        TestCell *busy=Cell(3); busy.wrap.m_uiMesLocalID=(unsigned int)(1000+i); busy.wrap.m_n64MesSvrID=2000+i; [busyCells addObject:busy];
+        [menu itemsByAddingActionsForCell:busy items:@[]]; [menu performSelector:item.action cell:busy];
+    }
+    CHECK(factories==busyStart+4 && [[sticker valueForKey:@"operations"] count]==4 && feedback.count==0);
+    [sticker cancelAllOperations]; CHECK([[sticker valueForKey:@"operations"] count]==0 && feedback.count==0);
+    media.hold=YES; [menu performSelector:item.action cell:cell]; NSUInteger before=factories;
+    [defaults setBool:NO forKey:CSMessageActionImageStickerEnabledKey]; [prefs requestRefresh]; Drain(); media.held(media.bytes); CHECK(factories==before); CHECK([menu itemsByAddingActionsForCell:cell items:items].count==0);
+    [defaults setBool:YES forKey:CSMessageActionImageStickerEnabledKey]; [prefs requestRefresh]; Drain(); [menu itemsByAddingActionsForCell:cell items:@[]];
+    [menu performSelector:item.action cell:cell]; cell.wrap=Cell(3).wrap; cell.wrap.m_uiMesLocalID=999; cell.wrap.m_n64MesSvrID=901; media.held(media.bytes); CHECK(factories==before); // Reused cell.
+    [menu itemsByAddingActionsForCell:cell items:@[]]; [menu performSelector:item.action cell:cell]; [coordinator accountWillChange]; env.account=@"new-account"; media.held(media.bytes); CHECK(factories==before); // Account boundary.
+    env.account=@"me"; [coordinator accountDidChange]; media.hold=NO; media.bytes=nil; [menu itemsByAddingActionsForCell:cell items:@[]];
+    MMContext *extensions=[MMContext currentContext]; NSUInteger registered=extensions.imageRegisters,unregistered=extensions.imageUnregisters;
+    [menu performSelector:item.action cell:cell]; CHECK(manager.imageDownloads==1 && extensions.imageRegisters==registered+1 && extensions.imageListener);
+    id<IDownloadImageExt> listener=extensions.imageListener; media.bytes=[@"downloaded" dataUsingEncoding:NSUTF8StringEncoding];
+    CMessageWrap *unrelated=Cell(3).wrap; [listener OnDownloadImageOk:unrelated]; Drain(); CHECK(factories==before);
+    [listener OnDownloadImageOk:cell.wrap]; Drain(); CHECK(factories==before+1 && task.starts==1 && extensions.imageUnregisters==unregistered+1);
+    [task.addEmoticonLogic.delegate AddEmoticonFinishedWithWrap:nil IsSuccessed:YES];
+    // Download failure quietly unregisters and never creates an upload task.
+    media.bytes=nil; [menu performSelector:item.action cell:cell]; listener=extensions.imageListener; before=factories; [listener OnDownloadImageFail:cell.wrap]; Drain(); CHECK(factories==before && feedback.count==0 && !extensions.imageListener);
+    // Cancellation only unregisters our observer; there is no shared-download stop call.
+    [menu performSelector:item.action cell:cell]; listener=extensions.imageListener; [sticker cancelAllOperations]; media.bytes=[@"late bytes" dataUsingEncoding:NSUTF8StringEncoding]; [listener OnDownloadImageOk:cell.wrap]; Drain(); CHECK(factories==before && !extensions.imageListener);
+    CHECK(feedback.count==0);
+    CSMessageActionContext *stale=[coordinator captureContextForCell:cell controller:controller bindingGeneration:1];
+    [defaults setBool:NO forKey:CSMessageActionImageStickerEnabledKey]; [prefs requestRefresh]; Drain(); before=factories;
+    [coordinator executeContext:stale action:CSMessageActionAddSticker entry:CSMessageActionEntryMenuAddSticker];
+    CHECK(feedback.count==0 && factories==before); // A stale menu must not use the generic failure toast.
+    [defaults removeObjectForKey:CSMessageActionImageStickerEnabledKey]; [prefs requestRefresh]; Drain();
+}
+static void TestImageFileRead(void) {
+    NSString *path=[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString]; NSData *bytes=[@"isolated image bytes" dataUsingEncoding:NSUTF8StringEncoding]; CHECK([bytes writeToFile:path atomically:YES]);
+    TestCell *cell=Cell(3); cell.wrap.path=path; TestController *controller=[TestController new]; CSMessageMediaProvider *media=[CSMessageMediaProvider new]; __block BOOL done=NO; __block NSData *output=nil;
+    [media readImageForContext:Context(cell,controller) completion:^(NSData *data){ CHECK(NSThread.isMainThread); output=data; done=YES; }]; CHECK(Wait(^BOOL{ return done; }) && [output isEqual:bytes]);
+    CHECK([NSFileManager.defaultManager removeItemAtPath:path error:NULL]); done=NO;
+    [media readImageForContext:Context(cell,controller) completion:^(NSData *data){ output=data; done=YES; }]; CHECK(Wait(^BOOL{ return done; }) && !output);
+    cell.wrap.path=NSTemporaryDirectory(); done=NO; [media readImageForContext:Context(cell,controller) completion:^(NSData *data){ output=data; done=YES; }]; CHECK(Wait(^BOOL{ return done; }) && !output);
+}
+int main(void) { @autoreleasepool { NSString *suite=[@"CSMessageActionExecutionTests." stringByAppendingString:NSUUID.UUID.UUIDString]; NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite]; if (getenv("CS_TEST_IMAGE_STICKER_FEEDBACK")) {
+    TestImageStickerFeature(defaults); TestImageFileRead(); TestNativeMenuPipeline(defaults); TestNativeStickerMenu(defaults); TestNativeTextAndFeedback(defaults);
+    [defaults removePersistentDomainForName:suite]; printf("PASS: %lu image-sticker silence / native menu / shared feedback checks (host doubles, no native uploads)\n",(unsigned long)checks); return 0;
+} if (getenv("CS_TEST_SCHEDULED_STICKER")) {
+    TestScheduledTextRoute(); TestImageStickerFeature(defaults); TestImageFileRead(); TestMenuNoOp(defaults); TestNativeMenuPipeline(defaults); TestMenuSnapshots(defaults); TestNativeStickerMenu(defaults); TestGameMenu(defaults);
+    [defaults removePersistentDomainForName:suite]; printf("PASS: %lu scheduled-send / image-sticker / shared-menu checks (host doubles, no native sends)\n",(unsigned long)checks); return 0;
+} if (getenv("CS_TEST_FIRST_VOICE")) {
     TestFirstVoiceRefresh(defaults); [defaults removePersistentDomainForName:suite]; return 0;
 } if (getenv("CS_TEST_GROUP_VOICE_CASE")) {
     TestGroupVoiceFlows(defaults); [defaults removePersistentDomainForName:suite]; return 0;

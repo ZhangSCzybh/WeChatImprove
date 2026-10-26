@@ -1,0 +1,63 @@
+{
+  "version": "2.0-13",
+  "date": "2026-10-26",
+  "scope": [
+    "silent image-to-sticker flow",
+    "root entries without arrows, sticker page renamed 表情功能",
+    "scheduled-task configuration backup and transactional restore"
+  ],
+  "checks": [
+    {
+      "name": "image-sticker silence / native menu / shared feedback",
+      "assertions": 190,
+      "log": "after-fix.log"
+    },
+    {
+      "name": "scheduled task backup round trip / crash rollback / account isolation",
+      "assertions": 148,
+      "log": "scheduled-backup-after-fix.log"
+    },
+    {
+      "name": "scheduled task core",
+      "assertions": 102,
+      "log": "verify-scheduled-tasks.log"
+    },
+    {
+      "name": "shared backup transactions",
+      "assertions": 89,
+      "log": "verify-backup-transactions.log"
+    },
+    {
+      "name": "backup registry",
+      "assertions": 1404,
+      "log": "verify-backup-registry.log"
+    }
+  ],
+  "totalAssertions": 1933,
+  "failingReproductions": [
+    "before-fix.log",
+    "scheduled-backup-before-fix.log"
+  ],
+  "fullSuiteRun": false,
+  "realMessageSends": false,
+  "realStickerUploads": false,
+  "deviceValidation": false,
+  "environment": {
+    "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+    "branch": "main",
+    "testData": "temporary Library/Preferences/WeChatImprove and unique disposable NSUserDefaults suites",
+    "preservedBaselineFiles": 1124,
+    "services": "No service processes, ports or real WeChat data were changed."
+  },
+  "buildLogs": [
+    "build-rootful.log",
+    "build-rootless.log"
+  ],
+  "artifactVerification": "packages.json",
+  "sourceHashes": "source-sha256.json",
+  "limitations": [
+    "No connected device; native private APIs and real iOS UI require device acceptance.",
+    "No iOS Simulator runtime available.",
+    "Existing UILocalNotification/statusBarFrame and multiply_defined deprecation warnings remain."
+  ]
+}

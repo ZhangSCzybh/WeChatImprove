@@ -28,6 +28,8 @@
 #import "CSMessageGestureSettingsViewController.h"
 #import "CSVoiceForwardSettingsViewController.h"
 #import "CSRepeatSettingsViewController.h"
+#import "CSImageStickerSettingsViewController.h"
+#import "CSScheduledTaskSettingsViewController.h"
 #import "CSResetSettingsViewController.h"
 #import "CSBackupSettingsViewController.h"
 #import "CSBubbleStyleSettingsViewController.h"
@@ -909,6 +911,8 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                   iconColor:[UIColor systemPurpleColor]
                                                     detail:nil];
 
+    CSSettingItem *scheduledItem = [CSSettingItem itemWithTitle:@"定时任务" iconName:@"calendar.badge.clock" iconColor:UIColor.systemOrangeColor detail:nil];
+    CSSettingItem *imageStickerItem = [CSSettingItem itemWithTitle:@"表情功能" iconName:@"face.smiling" iconColor:UIColor.systemOrangeColor detail:nil];
     CSSettingSection *enhancementSection = [CSSettingSection sectionWithHeader:@"功能增强" 
                                                                       items:@[backgroundRunItem,
                                                                              backgroundBlurItem,
@@ -921,7 +925,9 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                                              receiveTransferItem,
                                                                              messageGestureItem,
                                                                              voiceForwardItem,
-                                                                             repeatItem]];
+                                                                             repeatItem,
+                                                                             scheduledItem,
+                                                                             imageStickerItem]];
     
     // 添加插件设置组
     CSSettingItem *entrySettingsItem = [CSSettingItem itemWithTitle:@"入口设置"
@@ -1162,6 +1168,12 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
         else if ([item.title isEqualToString:@"语音转发"]) {
             CSVoiceForwardSettingsViewController *voiceForwardVC = [[CSVoiceForwardSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
             [self.navigationController pushViewController:voiceForwardVC animated:YES];
+        }
+        else if ([item.title isEqualToString:@"定时任务"]) {
+            [self.navigationController pushViewController:[[CSScheduledTaskSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped] animated:YES];
+        }
+        else if ([item.title isEqualToString:@"表情功能"]) {
+            [self.navigationController pushViewController:[[CSImageStickerSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped] animated:YES];
         }
         // 处理复读功能点击
         else if ([item.title isEqualToString:@"复读功能"]) {

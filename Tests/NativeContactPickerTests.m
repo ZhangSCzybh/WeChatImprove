@@ -78,6 +78,9 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 }
 - (void)onDone:(id)sender {toolDoneCalls++;if(self.completeHandler)self.completeHandler(sender);}
 @end
+@interface NSObject (PickerSelectionDelegate)
+- (BOOL)onShouldSelectContact:(id)contact;
+@end
 @interface MultiSelectContactsViewController : UIViewController
 @property(nonatomic,weak) id m_delegate;
 @property(nonatomic,strong) NSMutableDictionary *m_dicMultiSelect;
@@ -94,6 +97,7 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 - (void)onCancel:(id)sender;
 - (void)updateRightBarItemEnabled:(BOOL)enabled;
 - (void)updatePanelBtn;
+- (void)selectContact:(CContact *)contact;
 @end
 @implementation MultiSelectContactsViewController
 - (void)initData {}
@@ -125,6 +129,12 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
         self.navigationItem.rightBarButtonItem=nil;
         [self.m_toolView updateWithCompleteBarButtonItem:button];
     } else self.navigationItem.rightBarButtonItem=button;
+}
+- (void)selectContact:(CContact *)contact {
+    NSMutableDictionary *selected=self.m_selectView.m_dicMultiSelect;
+    if(selected[contact.m_nsUsrName])[selected removeObjectForKey:contact.m_nsUsrName];
+    else if([self.m_delegate onShouldSelectContact:contact])selected[contact.m_nsUsrName]=contact;
+    [self updatePanelBtn];
 }
 @end
 @protocol TestGroupPickerDelegate <NSObject>
@@ -315,5 +325,56 @@ int main(void){@autoreleasepool{
     Check(!friends.m_toolView.completeButton.enabled,@"account change disables bottom Done even without a navigation button");
     [friends.m_toolView onDone:nil];Check(saves==previous,@"bottom completion rejects a changed account");account=@"me";
     Check(nativeDoneCalls==0,@"bottom Done never enters native send or create-group business actions");
+    // Scheduled tasks reuse the native lists but require exactly one recipient.
+    __block NSUInteger singleSaves=0; __block NSString *singleName=nil;
+    void (^saveSingle)(NSString *)=^(NSString *name){
+        Check(presenter.presentedViewController==nil,@"single target is returned only after native dismissal");
+        singleSaves++;singleName=name;
+    };
+    for(NSNumber *bottom in @[@NO,@YES]) for(NSNumber *wrapped in @[@NO,@YES]) {
+        useBottomToolView=bottom.boolValue;wrapPickerBeforeLoad=wrapped.boolValue;
+        NSUInteger before=singleSaves;
+        Check(CSNativeContactPickerPresentSingle(presenter,@"选择一个好友",NO,nil,^BOOL{return valid;},saveSingle,&error),@"single native friend picker opens");
+        friends=(id)Picker(presenter);
+        Check([friends isKindOfClass:MultiSelectContactsViewController.class]&&!friends.m_panelBtnItem.enabled&&!friends.m_panelBtn.enabled,@"single picker uses native friend UI and cannot finish empty");
+        [friends actionDone];Check(presenter.presentedViewController!=nil&&singleSaves==before,@"forced empty Done stays open and never changes the target");
+        [friends selectContact:Contact(@"alice")];[friends selectContact:Contact(@"bob")];
+        Check(friends.m_selectView.m_dicMultiSelect.count==1&&friends.m_selectView.m_dicMultiSelect[@"alice"]&&friends.m_panelBtnItem.enabled,@"single friend selection rejects a second contact");
+        [friends selectContact:Contact(@"alice")];[friends selectContact:Contact(@"bob")];
+        Check(friends.m_selectView.m_dicMultiSelect.count==1&&friends.m_selectView.m_dicMultiSelect[@"bob"],@"uncheck then select changes the target");
+        // Search/tag bulk return can replace the dictionary without the delegate.
+        friends.m_selectView.m_dicMultiSelect=[@{@"alice":Contact(@"alice"),@"bob":Contact(@"bob")} mutableCopy];
+        [friends updatePanelBtn];[friends actionDone];
+        Check(!friends.m_panelBtnItem.enabled&&!friends.m_panelBtn.enabled&&presenter.presentedViewController&&singleSaves==before,@"bulk overflow disables native Done and never silently chooses the first contact");
+        [friends selectContact:Contact(@"alice")];TapFriendDone(friends);
+        Check(singleSaves==before+1&&[singleName isEqual:@"bob"],@"corrected single result saves once through native Done");
+        CSNativeContactPickerPresentSingle(presenter,@"选择一个好友",NO,@"missing-friend",nil,saveSingle,&error);friends=(id)Picker(presenter);
+        Check(friends.m_selectView.m_dicMultiSelect.count==0&&!friends.m_panelBtnItem.enabled,@"unresolvable target cannot be invisibly retained as a single selection");
+        [friends selectContact:Contact(@"gh_service")];[friends selectContact:Contact(@"me")];[friends selectContact:Contact(@"room@chatroom")];
+        Check(friends.m_selectView.m_dicMultiSelect.count==0,@"single private picker rejects service accounts, self and groups");
+        [friends actionCancel];Check(singleSaves==before+1,@"cancel preserves the existing scheduled target");
+    }
+    for(NSNumber *wrapped in @[@NO,@YES]) {
+        wrapPickerBeforeLoad=wrapped.boolValue;NSUInteger before=singleSaves;
+        Check(CSNativeContactPickerPresentSingle(presenter,@"选择一个群聊",YES,@"room@chatroom",nil,saveSingle,&error),@"single native group picker opens");
+        groups=(id)Picker(presenter);
+        Check([groups isKindOfClass:GroupSelectContactsViewController.class]&&[groups isSelected:Contact(@"room@chatroom")],@"single group target survives native initialization");
+        [groups selectContact:Contact(@"second@chatroom")];Check(groups.m_dicMultiSelect.count==1,@"single group rejects a second group");
+        [groups selectContact:Contact(@"room@chatroom")];[groups onDone];
+        Check(!groups.navigationItem.rightBarButtonItem.enabled&&presenter.presentedViewController&&singleSaves==before,@"single empty group cannot finish even through direct Done");
+        [groups selectContact:Contact(@"second@chatroom")];[groups initData];[groups updateRightBarBtn];TapGroupDone(groups);
+        Check(singleSaves==before+1&&[singleName isEqual:@"second@chatroom"],@"single group retains live edits across initialization and saves once");
+    }
+    NSUInteger before=singleSaves;
+    CSNativeContactPickerPresentSingle(presenter,@"选择一个好友",NO,@"alice",^BOOL{return valid;},saveSingle,&error);friends=(id)Picker(presenter);
+    valid=NO;CSNativeContactPickerRevalidate(presenter);valid=YES;[friends updatePanelBtn];[friends actionDone];
+    Check(friends.view.hidden&&singleSaves==before,@"privacy invalidation revokes the native single picker permanently");
+    CSNativeContactPickerPresentSingle(presenter,@"选择一个群聊",YES,@"room@chatroom",nil,saveSingle,&error);groups=(id)Picker(presenter);
+    account=@"another";[groups onDone];account=@"me";
+    Check(singleSaves==before,@"account change never writes a scheduled target");
+    CSNativeContactPickerPresentSingle(presenter,@"选择一个好友",NO,@"alice",^BOOL{return valid;},saveSingle,&error);friends=(id)Picker(presenter);
+    duringDismissal=^{valid=NO;};[friends actionDone];duringDismissal=nil;valid=YES;
+    Check(singleSaves==before,@"single target validity is rechecked after dismissal");
+    Check(nativeDoneCalls==0,@"single target selection never sends a message or creates a group");
     printf("Native contact picker: %lu checks passed\n",(unsigned long)checks);
 }return 0;}

@@ -11,18 +11,21 @@
 @end
 @interface CSMessageMenuInvocation : NSObject
 @property(nonatomic, strong) CSMessageActionContext *context;
-@property(nonatomic) BOOL repeat;
+@property(nonatomic) CSMessageAction pluginAction;
+@property(nonatomic) CSMessageActionEntry entry;
 @property(nonatomic, strong) CSMessageActionCoordinator *coordinator;
 - (void)cs_handleRepeatMenuItem:(id)sender;
 - (void)cs_handleVoiceForwardMenuItem:(id)sender;
+- (void)cs_handleAddStickerMenuItem:(id)sender;
 @end
 @implementation CSMessageMenuInvocation
 - (void)invoke {
-    [_coordinator executeContext:_context action:_repeat ? CSMessageActionRepeat : CSMessageActionForward entry:_repeat ? CSMessageActionEntryMenuRepeat : CSMessageActionEntryMenuVoiceForward];
+    [_coordinator executeContext:_context action:_pluginAction entry:_entry];
 }
 - (void)cs_handleRepeatMenuItem:(id)sender { (void)sender; [self invoke]; }
 - (void)cs_handleVoiceForwardMenuItem:(id)sender { (void)sender; [self invoke]; }
-- (BOOL)canPerformAction:(SEL)action withSender:(id)sender { (void)action; (void)sender; return [_coordinator canExecuteContext:_context action:_repeat ? CSMessageActionRepeat : CSMessageActionForward entry:_repeat ? CSMessageActionEntryMenuRepeat : CSMessageActionEntryMenuVoiceForward]; }
+- (void)cs_handleAddStickerMenuItem:(id)sender { (void)sender; [self invoke]; }
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender { (void)action; (void)sender; return [_coordinator canExecuteContext:_context action:_pluginAction entry:_entry]; }
 @end
 @interface CSMessageActionMenuAdapter ()
 @property(nonatomic, strong) CSMessageActionCoordinator *coordinator;
@@ -47,81 +50,98 @@
 }
 + (BOOL)canPerformSelector:(SEL)selector cell:(id)cell { return [[self sharedAdapter] canPerformSelector:selector cell:cell]; }
 + (void)performSelector:(SEL)selector cell:(id)cell { [[self sharedAdapter] performSelector:selector cell:cell]; }
-+ (BOOL)isPluginSelector:(SEL)selector { return selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:") || selector==NSSelectorFromString(@"cs_handleVoiceForwardMenuItem:"); }
++ (BOOL)isPluginSelector:(SEL)selector { return selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:") || selector==NSSelectorFromString(@"cs_handleVoiceForwardMenuItem:") || selector==NSSelectorFromString(@"cs_handleAddStickerMenuItem:"); }
 static const void *CSMenuContextKey=&CSMenuContextKey;
-- (BOOL)isPluginSelector:(SEL)selector { return selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:") || selector==NSSelectorFromString(@"cs_handleVoiceForwardMenuItem:"); }
+- (BOOL)isPluginSelector:(SEL)selector { return selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:") || selector==NSSelectorFromString(@"cs_handleVoiceForwardMenuItem:") || selector==NSSelectorFromString(@"cs_handleAddStickerMenuItem:"); }
+static CSMessageAction CSMenuAction(SEL selector) {
+    if (selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:")) return CSMessageActionRepeat;
+    if (selector==NSSelectorFromString(@"cs_handleAddStickerMenuItem:")) return CSMessageActionAddSticker;
+    return CSMessageActionForward;
+}
+static CSMessageActionEntry CSMenuEntry(CSMessageAction action) {
+    return action==CSMessageActionRepeat ? CSMessageActionEntryMenuRepeat : action==CSMessageActionAddSticker ? CSMessageActionEntryMenuAddSticker : CSMessageActionEntryMenuVoiceForward;
+}
+static NSString *CSMenuSelector(CSMessageAction action) {
+    return action==CSMessageActionRepeat ? @"cs_handleRepeatMenuItem:" : action==CSMessageActionAddSticker ? @"cs_handleAddStickerMenuItem:" : @"cs_handleVoiceForwardMenuItem:";
+}
 - (BOOL)canPerformSelector:(SEL)selector cell:(id)cell {
     if (![self isPluginSelector:selector]) return NO;
-    BOOL repeat=selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:");
-    if (!CSMessageActionEntryAllows(self.coordinator.settings,repeat ? CSMessageActionEntryMenuRepeat : CSMessageActionEntryMenuVoiceForward,repeat ? CSMessageActionRepeat : CSMessageActionForward)) return NO;
+    CSMessageAction action=CSMenuAction(selector); CSMessageActionEntry entry=CSMenuEntry(action);
+    if (!CSMessageActionEntryAllows(self.coordinator.settings,entry,action)) return NO;
     CSMessageActionContext *context=objc_getAssociatedObject(cell,CSMenuContextKey);
     if (!context) context=[self.coordinator captureContextForCell:cell controller:nil bindingGeneration:1];
-    return context && (repeat || context.messageType==34) && [self.coordinator canExecuteContext:context action:repeat ? CSMessageActionRepeat : CSMessageActionForward entry:repeat ? CSMessageActionEntryMenuRepeat : CSMessageActionEntryMenuVoiceForward];
+    return context && (action!=CSMessageActionForward || context.messageType==34) && [self.coordinator canExecuteContext:context action:action entry:entry];
 }
-- (id)itemForCell:(id)cell repeat:(BOOL)repeat {
+- (id)itemForCell:(id)cell action:(CSMessageAction)action {
     Class cls=NSClassFromString(@"MMMenuItem"); if (!cls) return nil;
     id icon=nil;
 #if TARGET_OS_IOS
-    static UIImage *repeatIcon, *forwardIcon; static dispatch_once_t once;
-    dispatch_once(&once,^{ repeatIcon=[[[UIImage systemImageNamed:@"repeat"] imageWithTintColor:UIColor.whiteColor] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]; forwardIcon=[[[UIImage systemImageNamed:@"arrowshape.turn.up.right"] imageWithTintColor:UIColor.whiteColor] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]; });
-    icon=repeat ? repeatIcon : forwardIcon;
+    static NSDictionary *icons; static dispatch_once_t once;
+    dispatch_once(&once,^{
+        NSMutableDictionary *map=[NSMutableDictionary dictionary];
+        for (NSString *name in @[@"repeat",@"arrowshape.turn.up.right",@"face.smiling"]) {
+            UIImage *image=[[[UIImage systemImageNamed:name] imageWithTintColor:UIColor.whiteColor] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]; if (image) map[name]=image;
+        }
+        icons=map;
+    });
+    icon=icons[action==CSMessageActionRepeat ? @"repeat" : action==CSMessageActionAddSticker ? @"face.smiling" : @"arrowshape.turn.up.right"];
 #endif
-    NSString *title=repeat ? @"复读" : @"语音转发"; SEL selector=NSSelectorFromString(repeat ? @"cs_handleRepeatMenuItem:" : @"cs_handleVoiceForwardMenuItem:");
-    CSMessageMenuInvocation *invocation=[CSMessageMenuInvocation new]; invocation.context=objc_getAssociatedObject(cell,CSMenuContextKey); invocation.repeat=repeat; invocation.coordinator=self.coordinator;
-    id allocated=[cls alloc], item=nil;
+    NSString *title=action==CSMessageActionRepeat ? @"复读" : action==CSMessageActionAddSticker ? @"添加到表情" : @"语音转发";
+    CSMessageMenuInvocation *invocation=[CSMessageMenuInvocation new]; invocation.context=objc_getAssociatedObject(cell,CSMenuContextKey); invocation.pluginAction=action; invocation.entry=CSMenuEntry(action); invocation.coordinator=self.coordinator;
+    SEL selector=NSSelectorFromString(CSMenuSelector(action)); id allocated=[cls alloc], item=nil;
     @try {
         if (CSMessageNativeSupports(allocated,@"initWithTitle:icon:target:action:",@"@",@[@"@",@"@",@"@",@":"])) item=[allocated initWithTitle:title icon:icon target:invocation action:selector];
         else if (CSMessageNativeSupports(allocated,@"initWithTitle:target:action:",@"@",@[@"@",@"@",@":"])) item=[allocated initWithTitle:title target:invocation action:selector];
-        if (item) { objc_setAssociatedObject(item,@selector(itemForCell:repeat:),invocation,OBJC_ASSOCIATION_RETAIN_NONATOMIC); CSMessageNativeSet(item,@"setIconImage:",icon,NO); CSMessageNativeSet(item,@"setLinePosition:",@0,NO); }
+        if (item) { objc_setAssociatedObject(item,@selector(itemForCell:action:),invocation,OBJC_ASSOCIATION_RETAIN_NONATOMIC); CSMessageNativeSet(item,@"setIconImage:",icon,NO); CSMessageNativeSet(item,@"setLinePosition:",@0,NO); }
     } @catch (__unused NSException *exception) { return nil; }
     return item;
 }
 - (NSArray *)itemsByAddingActionsForCell:(id)cell items:(NSArray *)items {
     NSArray *original=[items isKindOfClass:NSArray.class] ? items : @[];
     CSMessageActionSettings *settings=self.coordinator.settings;
-    BOOL repeat=NO,forward=NO;
+    NSMutableSet<NSNumber *> *wanted=[NSMutableSet set], *present=[NSMutableSet set];
     CSMessageActionContext *context=nil;
-    // Decide whether the message can need our menu before resolving account/page
-    // services. Disabled or unrelated menus retain the original array unchanged.
-    if (settings.repeatEnabled || settings.voiceForwardEnabled) {
+    // Disabled/unrelated menus never resolve account/page services.
+    if (settings.repeatEnabled || settings.voiceForwardEnabled || settings.imageStickerEnabled) {
         NSUInteger type=(NSUInteger)CSMessageNativeUnsigned(CSMessageActionResolveSourceWrap(cell),@"m_uiMessageType");
-        repeat=settings.repeatEnabled && CSMessageActionSupportsRepeatMenuType(type);
-        forward=settings.voiceForwardEnabled && type==34;
-        if (repeat || forward) {
+        if (settings.repeatEnabled && CSMessageActionSupportsRepeatMenuType(type)) [wanted addObject:@(CSMessageActionRepeat)];
+        if (settings.voiceForwardEnabled && type==34) [wanted addObject:@(CSMessageActionForward)];
+        if (settings.imageStickerEnabled && type==3) [wanted addObject:@(CSMessageActionAddSticker)];
+        if (wanted.count) {
             context=[self.coordinator captureContextForCell:cell controller:nil bindingGeneration:1];
-            repeat=repeat && [self.coordinator canExecuteContext:context action:CSMessageActionRepeat entry:CSMessageActionEntryMenuRepeat];
-            forward=forward && [self.coordinator canExecuteContext:context action:CSMessageActionForward entry:CSMessageActionEntryMenuVoiceForward];
+            for (NSNumber *raw in wanted.allObjects) if (![self.coordinator canExecuteContext:context action:raw.integerValue entry:CSMenuEntry(raw.integerValue)]) [wanted removeObject:raw];
+        }
+    }
+    // A host version already providing this exact action keeps its native item.
+    for (id item in original) {
+        SEL selector=CSMessageNativeSupports(item,@"action",@":",@[])?[item action]:NULL;
+        if (![self isPluginSelector:selector]) {
+            id title=CSMessageActionObjectGetter(item,@selector(title));
+            if ([title isEqual:@"添加到表情"] || [title isEqual:@"添加到表情包"]) [wanted removeObject:@(CSMessageActionAddSticker)];
         }
     }
     objc_setAssociatedObject(cell,CSMenuContextKey,context,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    SEL repeatAction=NSSelectorFromString(@"cs_handleRepeatMenuItem:"), forwardAction=NSSelectorFromString(@"cs_handleVoiceForwardMenuItem:");
-    BOOL hasRepeat=NO,hasForward=NO;
-    NSMutableIndexSet *removed=nil;
-    NSMutableSet *used=(repeat || forward) ? [NSMutableSet set] : nil;
+    NSMutableIndexSet *removed=[NSMutableIndexSet indexSet]; NSMutableSet *used=[NSMutableSet set];
     for (NSUInteger i=0;i<original.count;i++) {
-        id item=original[i]; SEL action=NULL;
-        if (CSMessageNativeSupports(item,@"action",@":",@[])) action=[item action];
-        BOOL isRepeat=action==repeatAction,isForward=action==forwardAction;
-        if (isRepeat || isForward) {
-            id target=CSMessageActionObjectGetter(item,@selector(target));
+        id item=original[i]; SEL selector=CSMessageNativeSupports(item,@"action",@":",@[])?[item action]:NULL;
+        if ([self isPluginSelector:selector]) {
+            NSNumber *action=@(CSMenuAction(selector)); id target=CSMessageActionObjectGetter(item,@selector(target));
             CSMessageActionContext *bound=[target isKindOfClass:CSMessageMenuInvocation.class] ? ((CSMessageMenuInvocation *)target).context : nil;
-            BOOL keep=(isRepeat ? repeat && !hasRepeat : forward && !hasForward) && context && [bound matchesSourceContext:context];
-            if (!keep) { if (!removed) removed=[NSMutableIndexSet indexSet]; [removed addIndex:i]; continue; }
-            if (isRepeat) hasRepeat=YES; else hasForward=YES;
+            if (![wanted containsObject:action] || [present containsObject:action] || !context || ![bound matchesSourceContext:context]) { [removed addIndex:i]; continue; }
+            [present addObject:action];
         }
-        if (used && CSMessageNativeSupports(item,@"menuType",@"q",@[])) [used addObject:@(CSMessageNativeUnsigned(item,@"menuType"))];
+        if (wanted.count && CSMessageNativeSupports(item,@"menuType",@"q",@[])) [used addObject:@(CSMessageNativeUnsigned(item,@"menuType"))];
     }
-    BOOL addForward=forward && !hasForward,addRepeat=repeat && !hasRepeat;
-    if (!removed.count && !addForward && !addRepeat) return original;
-    NSMutableArray *result=[original mutableCopy];
-    if (removed.count) [result removeObjectsAtIndexes:removed];
-    // Add only our items, before native uniq/filter stages, preserving host order.
-    for (NSUInteger i=0;i<2;i++) {
-        BOOL addingRepeat=i==1;
-        if (!(addingRepeat ? addRepeat : addForward)) continue;
-        unsigned long long menuType=addingRepeat ? 0x43535001ULL : 0x43535002ULL;
+    [wanted minusSet:present];
+    if (!removed.count && !wanted.count) return original;
+    NSMutableArray *result=[original mutableCopy]; [result removeObjectsAtIndexes:removed];
+    // Preserve native item order and the later native uniq/filter stages.
+    for (NSNumber *raw in @[@(CSMessageActionForward),@(CSMessageActionRepeat),@(CSMessageActionAddSticker)]) {
+        if (![wanted containsObject:raw]) continue;
+        CSMessageAction action=raw.integerValue;
+        unsigned long long menuType=action==CSMessageActionRepeat ? 0x43535001ULL : action==CSMessageActionForward ? 0x43535002ULL : 0x43535003ULL;
         while ([used containsObject:@(menuType)]) menuType++;
-        id item=[self itemForCell:cell repeat:addingRepeat];
+        id item=[self itemForCell:cell action:action];
         if (item && CSMessageNativeSet(item,@"setMenuType:",@(menuType),YES)) { [result addObject:item]; [used addObject:@(menuType)]; }
     }
     return result;
@@ -129,7 +149,6 @@ static const void *CSMenuContextKey=&CSMenuContextKey;
 - (void)performSelector:(SEL)selector cell:(id)cell {
     if (![self canPerformSelector:selector cell:cell]) return;
     CSMessageActionContext *context=objc_getAssociatedObject(cell,CSMenuContextKey); if (!context) return;
-    BOOL repeat=selector==NSSelectorFromString(@"cs_handleRepeatMenuItem:");
-    [self.coordinator executeContext:context action:repeat ? CSMessageActionRepeat : CSMessageActionForward entry:repeat ? CSMessageActionEntryMenuRepeat : CSMessageActionEntryMenuVoiceForward];
+    CSMessageAction action=CSMenuAction(selector); [self.coordinator executeContext:context action:action entry:CSMenuEntry(action)];
 }
 @end

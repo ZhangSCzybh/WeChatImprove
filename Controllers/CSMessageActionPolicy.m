@@ -16,12 +16,14 @@ CSMessageAction CSMessageActionForDirection(CSMessageActionSettings *settings, C
     return CSMessageActionDisabled;
 }
 BOOL CSMessageActionEntryAllows(CSMessageActionSettings *settings, CSMessageActionEntry entry, CSMessageAction action) {
+    if (entry==CSMessageActionEntryMenuAddSticker) return settings.imageStickerEnabled && action==CSMessageActionAddSticker;
     if (CSMessageActionValidated(action)==CSMessageActionDisabled) return NO;
     switch (entry) {
         case CSMessageActionEntryGesture: return settings.gestureEnabled;
         case CSMessageActionEntryMenuRepeat: return settings.repeatEnabled && action==CSMessageActionRepeat;
         case CSMessageActionEntryMenuVoiceForward: return settings.voiceForwardEnabled && action==CSMessageActionForward;
         case CSMessageActionEntryNativeForward: return action==CSMessageActionForward;
+        case CSMessageActionEntryMenuAddSticker: return NO; // Handled above; never enabled as a gesture.
     }
     return NO;
 }

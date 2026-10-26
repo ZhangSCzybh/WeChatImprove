@@ -54,6 +54,7 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Fo
   "$project_dir/Controllers/CSMessageActionPolicy.m" \
   "$project_dir/Controllers/CSMessageNativeActionAdapter.m" \
   "$project_dir/Controllers/CSMessageMediaProvider.m" \
+  "$project_dir/Controllers/CSMessageImageStickerAdapter.m" \
   "$project_dir/Controllers/CSMessageSendAdapter.m" \
   "$project_dir/Controllers/CSVoiceForwardAdapter.m" \
   "$project_dir/Controllers/CSMessageActionMenuAdapter.m" \

@@ -1,6 +1,6 @@
 # Backup configuration registry inventory
 
-The registry in `Controllers/CSBackupRegistry.m` authorizes exact domain/key pairs. This inventory was checked against current settings writers and runtime readers on 2026-10-22. The registry has 314 fixed identities and one constrained per-account selection family; it never treats a namespace prefix as permission to restore a key.
+The registry in `Controllers/CSBackupRegistry.m` authorizes exact domain/key pairs. This inventory was checked against current settings writers and runtime readers on 2026-10-26. The registry has 315 fixed identities, a constrained per-account selection family and an account-bound scheduled-task file family; it never treats a namespace prefix as permission to restore a key.
 
 ## Domain mapping
 
@@ -20,7 +20,9 @@ There are 10 `resource=file` string preferences: the eight normal/selected botto
 
 ## Dynamic keys and values
 
-The sole dynamic lookup family is `standard/com.wechat.enhance.chat_group.selection.<account>`. The suffix must be 1–128 ASCII letters, digits, underscores, hyphens or `@` characters, with no periods, whitespace or path separators. Lookup returns the concrete key with module `groups`, type `dictionary` and scope `account`. The stored value must contain exactly `version: 1` and a nonempty string `tabID`. The family is not represented by a writable wildcard row in `entries()`.
+The preference dynamic lookup family is `standard/com.wechat.enhance.chat_group.selection.<account>`. The suffix must be 1–128 ASCII letters, digits, underscores, hyphens or `@` characters, with no periods, whitespace or path separators. Lookup returns the concrete key with module `groups`, type `dictionary` and scope `account`. The stored value must contain exactly `version: 1` and a nonempty string `tabID`. The family is not represented by a writable wildcard row in `entries()`.
+
+`scheduled/<account>` is a file-backed identity in module `scheduled_tasks`, with type `dictionary` and scope `account`. The account key has the same restricted syntax as selection suffixes. It maps to `Library/Preferences/WeChatImprove/ScheduledTasks/<SHA-256(account)>.plist`, never to an NSUserDefaults domain. Capture reads only the current account without taking the live scheduler’s exclusive writer lock. Portable values contain schema, account, master switch and up to 100 validated task definitions; execution history, nextRun and lastOccurrence are excluded. Restore requires source account = field account = current selected account; it pauses the master switch and clears execution state. Transaction before-images retain validated complete local state for exact rollback. Missing fields in old backups leave task files untouched.
 
 All dynamic color field combinations are expanded as fixed keys: four bubble background RGBA palettes, four bubble text RGB palettes, six list-background RGBA palettes, bottom-bar background/border RGBA and touch-trail fill/border RGBA. Bubble text colors intentionally have no alpha preference. Color archive fields for message time, input text and group appearance are typed `data`.
 
@@ -99,6 +101,7 @@ The audit reviewed all settings controller constants and preference writes, then
 | `standard` | `com.wechat.enhance.chat_group.swipe_gesture_enabled` | `groups` | `bool` | `global` | — |
 | `standard` | `com.wechat.enhance.chat_group.tab_font_size` | `groups` | `number` | `global` | — |
 | `standard` | `com.wechat.enhance.consecutive_messages.spacing` | `bubble` | `number` | `global` | — |
+| `standard` | `com.wechat.enhance.image_sticker.enabled` | `message_actions` | `bool` | `global` | — |
 | `standard` | `com.wechat.enhance.inputText.alpha` | `input` | `number` | `global` | — |
 | `standard` | `com.wechat.enhance.inputText.bold` | `input` | `bool` | `global` | — |
 | `standard` | `com.wechat.enhance.inputText.border.color` | `input` | `data` | `global` | — |

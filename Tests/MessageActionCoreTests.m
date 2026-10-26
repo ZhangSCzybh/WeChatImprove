@@ -270,9 +270,9 @@ static void TestAllSubmissionTransitions(void) {
 }
 static void TestPreferences(CountingDefaults *d, NSString *suite) {
     CSMessageActionPreferences *p=[[CSMessageActionPreferences alloc] initWithDefaults:d];
-    CHECK(!p.snapshot.gestureEnabled && !p.snapshot.repeatEnabled && !p.snapshot.voiceForwardEnabled);
+    CHECK(!p.snapshot.gestureEnabled && !p.snapshot.repeatEnabled && !p.snapshot.voiceForwardEnabled && !p.snapshot.imageStickerEnabled);
     CHECK(p.snapshot.leftOtherAction==0 && p.snapshot.leftSelfAction==0 && p.snapshot.rightOtherAction==0 && p.snapshot.rightSelfAction==0);
-    CHECK(d.readKeys.count==7);
+    CHECK(d.readKeys.count==8);
     __block unsigned notifications=0; __block BOOL mainDelivery=YES;
     id observer=[[NSNotificationCenter defaultCenter] addObserverForName:CSMessageActionSettingsDidChangeNotification object:p queue:nil usingBlock:^(__unused NSNotification *n){ notifications++; mainDelivery &= NSThread.isMainThread; }];
     CSMessageActionSettings *initial=p.snapshot;
@@ -298,6 +298,11 @@ static void TestPreferences(CountingDefaults *d, NSString *suite) {
     [d setBool:YES forKey:CSMessageActionVoiceForwardEnabledKey];
     [[NSNotificationCenter defaultCenter] postNotificationName:NSUserDefaultsDidChangeNotification object:d];
     Drain(); CHECK(p.snapshot.voiceForwardEnabled && p.snapshot.version==version+3);
+    [d setBool:YES forKey:CSMessageActionImageStickerEnabledKey]; [p requestRefresh]; Drain();
+    CHECK(p.snapshot.imageStickerEnabled && p.snapshot.version==version+4);
+    CHECK(CSMessageActionEntryAllows(p.snapshot,CSMessageActionEntryMenuAddSticker,CSMessageActionAddSticker));
+    CHECK(!CSMessageActionEntryAllows(p.snapshot,CSMessageActionEntryGesture,CSMessageActionAddSticker));
+    CHECK(!CSMessageActionEntryAllows(p.snapshot,CSMessageActionEntryMenuAddSticker,CSMessageActionRepeat));
     // Backup import/reset may replace the domain without a feature-specific Darwin notification.
     [d setPersistentDomain:@{CSMessageActionGestureEnabledKey:@YES,CSMessageActionLeftSelfKey:@6} forName:suite];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"UIApplicationDidBecomeActiveNotification" object:nil];

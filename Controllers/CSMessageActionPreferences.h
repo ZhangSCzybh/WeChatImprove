@@ -5,11 +5,12 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSInteger, CSMessageAction) {
     CSMessageActionDisabled = 0, CSMessageActionQuote = 1, CSMessageActionDelete = 2,
     CSMessageActionForward = 3, CSMessageActionFavorite = 4, CSMessageActionRevoke = 5,
-    CSMessageActionRepeat = 6
+    CSMessageActionRepeat = 6, CSMessageActionAddSticker = 7
 };
 typedef NS_ENUM(NSInteger, CSMessageActionEntry) {
     CSMessageActionEntryGesture, CSMessageActionEntryMenuRepeat,
-    CSMessageActionEntryMenuVoiceForward, CSMessageActionEntryNativeForward
+    CSMessageActionEntryMenuVoiceForward, CSMessageActionEntryNativeForward,
+    CSMessageActionEntryMenuAddSticker
 };
 typedef NS_ENUM(NSInteger, CSMessageActionDirection) {
     CSMessageActionDirectionNone = 0, CSMessageActionDirectionLeft = -1,
@@ -18,6 +19,7 @@ typedef NS_ENUM(NSInteger, CSMessageActionDirection) {
 FOUNDATION_EXPORT NSString *const CSMessageActionGestureEnabledKey;
 FOUNDATION_EXPORT NSString *const CSMessageActionRepeatEnabledKey;
 FOUNDATION_EXPORT NSString *const CSMessageActionVoiceForwardEnabledKey;
+FOUNDATION_EXPORT NSString *const CSMessageActionImageStickerEnabledKey;
 FOUNDATION_EXPORT NSString *const CSMessageActionLeftOtherKey;
 FOUNDATION_EXPORT NSString *const CSMessageActionLeftSelfKey;
 FOUNDATION_EXPORT NSString *const CSMessageActionRightOtherKey;
@@ -32,6 +34,7 @@ FOUNDATION_EXPORT NSString *const CSMessageActionVoiceForwardDarwinNotification;
 @property(nonatomic, readonly) BOOL gestureEnabled;
 @property(nonatomic, readonly) BOOL repeatEnabled;
 @property(nonatomic, readonly) BOOL voiceForwardEnabled;
+@property(nonatomic, readonly) BOOL imageStickerEnabled;
 @property(nonatomic, readonly) NSUInteger version;
 // Raw values remain available; unknown values are interpreted as Disabled only by policy.
 @property(nonatomic, readonly) NSInteger leftOtherAction;
