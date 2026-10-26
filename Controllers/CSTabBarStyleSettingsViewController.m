@@ -1,4 +1,5 @@
 #import "CSBackupMutation.h"
+#import "CSManagedImageFile.h"
 #import "CSTabBarStyleSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
 #import <Photos/Photos.h>
@@ -729,13 +730,8 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     NSString *normalPath = [defaults stringForKey:normalKey];
     NSString *selectedPath = [defaults stringForKey:selectedKey];
     
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if (normalPath && [fileManager fileExistsAtPath:normalPath]) {
-        [fileManager removeItemAtPath:normalPath error:nil];
-    }
-    if (selectedPath && [fileManager fileExistsAtPath:selectedPath]) {
-        [fileManager removeItemAtPath:selectedPath error:nil];
-    }
+    CSManagedImageRemove(normalPath, NULL);
+    CSManagedImageRemove(selectedPath, NULL);
     
     // 清除NSUserDefaults中的路径
     [defaults removeObjectForKey:normalKey];
@@ -925,7 +921,6 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
                                               style:UIAlertActionStyleDestructive
                                             handler:^(UIAlertAction * _Nonnull action) {
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        NSFileManager *fileManager = [NSFileManager defaultManager];
         
         // 获取所有图标路径并删除文件
         NSArray *iconKeys = @[kTabBarIconChatKey, kTabBarIconContactsKey, kTabBarIconDiscoverKey, kTabBarIconMeKey,
@@ -934,9 +929,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         CSBackupResourceMutationScope();
         for (NSString *key in iconKeys) {
             NSString *filePath = [defaults stringForKey:key];
-            if (filePath && [fileManager fileExistsAtPath:filePath]) {
-                [fileManager removeItemAtPath:filePath error:nil];
-            }
+            CSManagedImageRemove(filePath, NULL);
         }
         
         [defaults setBool:NO forKey:kTabBarStyleEnabledKey];

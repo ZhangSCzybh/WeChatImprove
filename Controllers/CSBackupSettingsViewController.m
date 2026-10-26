@@ -116,7 +116,7 @@
     }
     if(!backups.count)[backups addObject:[CSSettingItem itemWithTitle:@"暂无备份" iconName:@"archivebox" iconColor:UIColor.systemGrayColor detail:nil]];
     CSSettingItem *status=[self action:@"备份与恢复状态" icon:@"info.circle" color:UIColor.systemBlueColor block:^{[weakSelf message:@"备份与恢复状态" detail:CSBackupManager.sharedManager.status];}];
-    status.detail=@"查看";
+    status.detail=CSBackupManager.sharedManager.lastRestoreFailure.length?@"恢复未完成 · 查看原因":@"查看";
     CSSettingItem *retry=[self action:@"重试备份与恢复" icon:@"arrow.clockwise" color:UIColor.systemOrangeColor block:^{[weakSelf retryStartup];}];
     CSSettingItem *repair=[self action:@"修复当前的配置" icon:@"wrench.and.screwdriver" color:UIColor.systemOrangeColor block:^{[weakSelf repair];}];
     CSSettingItem *cancel=[self action:@"取消待执行计划" icon:@"xmark.circle" color:UIColor.systemRedColor block:^{[weakSelf confirmCancel];}];
@@ -133,7 +133,7 @@
     (void)tableView;
     if(section==0)return @"保存当前插件配置和自定义图片。自动备份会在停止编辑后检查，内容相同时不重复保存。";
     if(section==1)return self.records.count?@"点击备份可预览恢复、分享及管理。标记为“原件已保留”或“保护待确认”的备份不会自动清理。":@"创建第一份备份，或从文件导入当前格式备份。";
-    if(section==2)return @"恢复和重置均在重新打开微信时应用。执行前可取消待处理计划。";
+    if(section==2){NSString *failure=CSBackupManager.sharedManager.lastRestoreFailure;return failure.length?[@"上次恢复未完成：\n" stringByAppendingString:failure]:@"恢复和重置在完全退出并重新打开微信后应用，切换前后台不会执行。执行前可取消待处理计划。";}
     return nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {

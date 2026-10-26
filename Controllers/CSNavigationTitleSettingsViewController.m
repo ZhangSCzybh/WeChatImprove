@@ -1,4 +1,5 @@
 #import "CSBackupMutation.h"
+#import "CSManagedImageFile.h"
 #import "CSNavigationTitleSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
 #import <objc/runtime.h>
@@ -1090,7 +1091,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                 self.separatorImage = nil;
                 NSString *imagePath = [defaults objectForKey:kNavigationSeparatorImageKey];
                 if (imagePath) {
-                    [[NSFileManager defaultManager] removeItemAtPath:imagePath error:nil];
+                    CSManagedImageRemove(imagePath, NULL);
                     [defaults removeObjectForKey:kNavigationSeparatorImageKey];
                 }
             }
@@ -1236,10 +1237,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     NSString *enhanceFolderPath = [prefsPath stringByAppendingPathComponent:@"WeChatImprove"];
     NSString *filePath = [enhanceFolderPath stringByAppendingPathComponent:@"separator_image.png"];
     
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if ([fileManager fileExistsAtPath:filePath]) {
-        [fileManager removeItemAtPath:filePath error:nil];
-    }
+    CSManagedImageRemove(filePath, NULL);
     
     // 从UserDefaults中删除图片路径
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -1409,17 +1407,11 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     
     // 确保文件夹存在
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    BOOL isDirectory = NO;
-    BOOL exists = [fileManager fileExistsAtPath:enhanceFolderPath isDirectory:&isDirectory];
-    
-    // 如果文件夹不存在或不是文件夹，则创建它
-    if (!exists || !isDirectory) {
-        // 如果存在但不是文件夹，先删除
-        if (exists) {
-            [fileManager removeItemAtPath:enhanceFolderPath error:nil];
-        }
-        // 创建文件夹
-        [fileManager createDirectoryAtPath:enhanceFolderPath withIntermediateDirectories:YES attributes:nil error:nil];
+    // 该目录也保存备份和关系数据，图片保存失败时不能删除或重建已有目录。
+    NSError *directoryError = nil;
+    if (![fileManager createDirectoryAtPath:enhanceFolderPath withIntermediateDirectories:YES attributes:nil error:&directoryError]) {
+        NSLog(@"创建图片资源目录失败: %@", directoryError.localizedDescription);
+        return;
     }
     
     // 使用固定文件名

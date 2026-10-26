@@ -1,0 +1,13 @@
+{
+  "Controllers/CSGroupProjection.m": "7c99034333387fd3cddfbee74b7ea469d2b423f5dca8a4b01934134a8c25c2dd",
+  "Controllers/CSGroupProjection.h": "bcdbab907d9ab72be29369a1278efef3459929ba7550808f7d59fcb750ee38c4",
+  "Controllers/CSGroupNativeBridge.m": "a31f2c6c48dcedd16616d64bbdf968a69d9273a7e4c7756a4c01c486bfd47cea",
+  "Controllers/CSGroupListAdapter.m": "010c3600986e5e24b608a02710fae398ba751eab1071cb9ea6bf1100d31a7fd8",
+  "Controllers/WESessionTabContainerView.m": "b7ce9e8eb8f07029668e5c47fb9735e7f234cd4e2c549b2fc169e8eef28c5764",
+  "Tests/CloseFriendSessionTests.m": "20af2e1c390ae77bf2783852badb009c14ec5421664d557530df7b15a8a5c80d",
+  "control": "9251d46c54ff0e600feb0c4f7eef183b94da439820cc518e7ab2238c72140bad",
+  "Headers/CSUserInfoHelper.h": "828c0df795d63cf7653193a8f497d7fa5789cefec628756ecc582275804a315f",
+  "Controllers/CSReleaseNotesViewController.m": "9b19f396cfca02b6d08c04699a5740f9d864f504ff2575b7adcd81a9490f2064",
+  "README.md": "83f606d0a3bc3efb29debacb71902e818596d4ce03cfa8f338f4fed06c6eb7ee",
+  "docs/session-groups.md": "4fd196c61ed11856307853cdad6f4215f54bcb3bcb6aa2ca123b3ceda1567fce"
+}

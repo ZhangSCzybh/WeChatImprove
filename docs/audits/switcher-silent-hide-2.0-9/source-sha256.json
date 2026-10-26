@@ -1,0 +1,9 @@
+{
+  "Controllers/CSCloseFriendManager.m": "d943d1eca76fb0cb0d7169f17496962de7a5faf6785a6331abddc5521da48527",
+  "Controllers/CSGroupListAdapter.m": "010c3600986e5e24b608a02710fae398ba751eab1071cb9ea6bf1100d31a7fd8",
+  "Controllers/CSCloseFriendListShield.h": "963bdecc871258f67d6d0b70b884a2dcf3e22af048b84bfcc763474b5b1406c2",
+  "Controllers/CSCloseFriendListShield.m": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b",
+  "control": "9251d46c54ff0e600feb0c4f7eef183b94da439820cc518e7ab2238c72140bad",
+  "Headers/CSUserInfoHelper.h": "828c0df795d63cf7653193a8f497d7fa5789cefec628756ecc582275804a315f",
+  "Controllers/CSReleaseNotesViewController.m": "9b19f396cfca02b6d08c04699a5740f9d864f504ff2575b7adcd81a9490f2064"
+}

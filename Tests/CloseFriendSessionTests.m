@@ -45,6 +45,7 @@ static CSCloseFriendSnapshot *Policy(NSArray *names,BOOL revealed,NSUInteger rev
 @interface NativeSession : NSObject
 @property(nonatomic,copy) NSString *m_nsUserName;
 @property(nonatomic) NSUInteger m_uUnReadCount;
+@property(nonatomic) BOOL m_bShowUnReadAsRedDot;
 @end
 @implementation NativeSession
 - (BOOL)isSingleChatSession { return YES; }
@@ -172,7 +173,9 @@ int main(void) { @autoreleasepool {
  Check(revealed.sections[0].count==3 && [revealed badgeForTabID:all.tabId].count==17 && [[revealed rowAtDisplayPath:Path(0)].nativePath isEqual:Path(0)],@"reveal restores native paths and unread");
  Check(!Project(@[Row(1,@"A",CSGroupRowKindSession,CSGroupRowCategoryPrivate,9)],tabs,all.tabId,hidden,1,nil).isValid,@"hidden rows still undergo full nativePaths validation");
  Check(!Project(@[rows[0],Row(1,@"A",CSGroupRowKindSession,CSGroupRowCategoryPrivate,9)],tabs,all.tabId,hidden,1,nil).isValid,@"hidden duplicate native identity still rejects snapshot");
- NSArray *retained=@[Row(0,@"A",CSGroupRowKindBusiness,CSGroupRowCategoryUnknown,9),Row(1,nil,CSGroupRowKindBusiness,CSGroupRowCategoryUnknown,0),Row(2,@"chatroom_session_box",CSGroupRowKindAggregate,CSGroupRowCategoryGroup,12)];
+ // Explicit native dot indication is required; a box counter alone is not a badge.
+ CSGroupRow *foldedDot=[[CSGroupRow alloc] initWithNativePath:Path(2) userName:@"chatroom_session_box" kind:CSGroupRowKindAggregate category:CSGroupRowCategoryGroup top:NO unreadCount:12 redDot:YES];
+ NSArray *retained=@[Row(0,@"A",CSGroupRowKindBusiness,CSGroupRowCategoryUnknown,9),Row(1,nil,CSGroupRowKindBusiness,CSGroupRowCategoryUnknown,0),foldedDot];
  CSGroupProjection *r=Project(retained,tabs,custom.tabId,hidden,1,nil);
  Check(r.sections[0].count==2 && ![r rowAtDisplayPath:Path(0)].userName,@"privacy precedes retained rules; unknown anonymous business row survives");
  NSArray *services=@[Row(0,@"brandsessionholder",CSGroupRowKindAggregate,CSGroupRowCategoryService,7),Row(1,@"brandservicesessionholder",CSGroupRowKindAggregate,CSGroupRowCategoryService,4)];
@@ -223,13 +226,18 @@ int main(void) { @autoreleasepool {
  Check(CSGroupAssessFoldedUserNames(@[@"A",@""],hidden)==CSGroupFoldedPrivacyUnknown,@"unknown child identity prevents all-hidden inference");
  Check(CSGroupAssessFoldedUserNames(@[@"B",@"C"],hidden)==CSGroupFoldedPrivacyNoHidden && CSGroupAssessFoldedUserNames(@[@"A",@"B"],hidden)==CSGroupFoldedPrivacyMixed && CSGroupAssessFoldedUserNames(@[@"A"],hidden)==CSGroupFoldedPrivacyAllHidden,@"folded assessment distinguishes no-hidden, mixed, and all-confirmed-hidden");
  ChatBoxMgr *manager=[ChatBoxMgr new];foldedService=manager;manager.sourceSessions=@[sourceA,folded.sessions[1]];
- NativeSession *aggregate=[NativeSession new];aggregate.m_nsUserName=@"chatroom_session_box";aggregate.m_uUnReadCount=12;
+ NativeSession *aggregate=[NativeSession new];aggregate.m_nsUserName=@"chatroom_session_box";aggregate.m_uUnReadCount=12;aggregate.m_bShowUnReadAsRedDot=YES;
  NativeHost *main=[NativeHost new];main.m_tableView=[TestTable new];main.sessions=[NSMutableArray arrayWithObject:aggregate];a.controller=main;a.table=main.m_tableView;
  policy=Policy(@[@"A"],NO,6);[a refresh];
  Check(a.projection.sections[0].count==1 && a.projection.sections[0][0].privacyMasked && ![a.projection badgeForTabID:@"preset_0"].redDot,@"verified mixed folded children retain neutral entry without private unread");
  manager.sourceSessions=@[sourceA];[a refresh];Check(a.projection.sections[0].count==0,@"all-confirmed-hidden children remove only the aggregate presentation");
  manager.sourceSessions=@[folded.sessions[1]];[a refresh];
  Check(a.projection.sections[0].count==1 && !a.projection.sections[0][0].privacyMasked && [a.projection badgeForTabID:@"preset_0"].redDot,@"verified no-hidden children preserve ordinary native aggregate preview and dot");
+ aggregate.m_bShowUnReadAsRedDot=NO;[a refresh];
+ Check(![a.projection badgeForTabID:@"preset_0"].redDot && aggregate.m_uUnReadCount==12,@"unmasked aggregate residual count without dot indication cannot manufacture a group dot");
+ aggregate.m_bShowUnReadAsRedDot=YES;aggregate.m_uUnReadCount=0;[a refresh];
+ Check(![a.projection badgeForTabID:@"preset_0"].redDot,@"unmasked aggregate clears its dot when unread reaches zero even if dot mode persists");
+ aggregate.m_uUnReadCount=12;
  manager.sourceSessions=@[[NSObject new]];[a refresh];Check(a.projection.sections[0].count==1 && a.projection.sections[0][0].privacyMasked,@"unreadable child identity retains conservative neutral entry");
  manager.sourceSessions=@[sourceA];manager.replaceEpoch=YES;[a refresh];Check(a.projection.sections.count==0,@"account epoch change during child read cannot publish its classification");
  Check(aggregate.m_uUnReadCount==12 && main.sessions.count==1 && manager.sourceSessions[0]==sourceA,@"folded assessment never mutates native aggregate, source children, or unread");

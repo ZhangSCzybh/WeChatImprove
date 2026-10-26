@@ -1,4 +1,6 @@
 #import "CSBackupStore.h"
+#import "CSPluginStorage.h"
+#import "CSBackupRestoreDiagnostics.h"
 #import "CSBackupCodec.h"
 #import "CSBackupRegistry.h"
 #import <TargetConditionals.h>
@@ -18,40 +20,62 @@ static BOOL ValidMetadata(id object) {
         (!imported||([imported isKindOfClass:NSDate.class]&&isfinite([imported timeIntervalSince1970])));
 }
 @interface CSBackupStore ()
+@property(nonatomic) CSPluginDirectoryMigration *migration;
 @property(nonatomic,copy,readwrite) NSString *cleanupStatus;
 @end
 static BOOL StoreFail(NSError **error, NSString *message) { if(error)*error=CSBackupFailure(message);return NO; }
 static BOOL Directory(NSURL *url,NSError **error) {
     if(![NSFileManager.defaultManager createDirectoryAtURL:url withIntermediateDirectories:YES attributes:nil error:error])return NO;
     struct stat st;
-    if(lstat(url.path.fileSystemRepresentation,&st)||!S_ISDIR(st.st_mode))return StoreFail(error,@"备份目录无效或为符号链接");
+    if(lstat(url.path.fileSystemRepresentation,&st)){if(error)*error=CSBackupFileError(url.path,@"inspect-directory",errno);return NO;}
+    if(!S_ISDIR(st.st_mode))return StoreFail(error,@"备份目录无效或为符号链接");
     return YES;
 }
 NSData *CSBackupReadFile(NSURL *url,NSUInteger limit,NSError **error) {
     int fd=open(url.path.fileSystemRepresentation,O_RDONLY|O_NOFOLLOW);
-    if(fd<0){StoreFail(error,@"无法读取备份文件");return nil;}
-    struct stat st; if(fstat(fd,&st)||!S_ISREG(st.st_mode)||st.st_size<0||(uint64_t)st.st_size>limit) {close(fd);StoreFail(error,@"文件无效或超过大小限制");return nil;}
-    NSMutableData *data=[NSMutableData dataWithLength:(NSUInteger)st.st_size];NSUInteger offset=0;
-    while(offset<data.length) {ssize_t n=read(fd,(uint8_t *)data.mutableBytes+offset,data.length-offset);if(n<0&&errno==EINTR)continue;if(n<=0)break;offset+=(NSUInteger)n;}
-    close(fd);if(offset!=data.length){StoreFail(error,@"文件读取不完整");return nil;}return data;
+    if(fd<0){if(error)*error=CSBackupFileError(url.path,@"open-read",errno);return nil;}
+    struct stat st;
+    if(fstat(fd,&st)){int saved=errno;close(fd);if(error)*error=CSBackupFileError(url.path,@"stat-read",saved);return nil;}
+    if(!S_ISREG(st.st_mode)||st.st_size<0||(uint64_t)st.st_size>limit){close(fd);StoreFail(error,@"文件无效或超过大小限制");return nil;}
+    NSMutableData *data=[NSMutableData dataWithLength:(NSUInteger)st.st_size];NSUInteger offset=0;int failure=0;
+    while(offset<data.length){ssize_t n=read(fd,(uint8_t *)data.mutableBytes+offset,data.length-offset);if(n<0&&errno==EINTR)continue;if(n<=0){failure=n<0?errno:EIO;break;}offset+=(NSUInteger)n;}
+    close(fd);if(failure){if(error)*error=CSBackupFileError(url.path,@"read",failure);return nil;}return data;
 }
 BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     if(!data)return StoreFail(error,@"没有可写入的数据");
-    NSURL *parent=[url URLByDeletingLastPathComponent];if(!Directory(parent,error))return NO;
+    NSURL *parent=url.URLByDeletingLastPathComponent;if(!Directory(parent,error))return NO;
     NSURL *temp=[parent URLByAppendingPathComponent:[@".pending-" stringByAppendingString:NSUUID.UUID.UUIDString]];
-    int fd=open(temp.path.fileSystemRepresentation,O_WRONLY|O_CREAT|O_EXCL|O_NOFOLLOW,0600);
-    if(fd<0)return StoreFail(error,@"无法创建临时文件，可能没有可用空间");
-    NSUInteger offset=0;BOOL ok=YES;
-    while(offset<data.length){ssize_t n=write(fd,(const uint8_t *)data.bytes+offset,data.length-offset);if(n<0&&errno==EINTR)continue;if(n<=0){ok=NO;break;}offset+=(NSUInteger)n;}
-    if(ok&&fsync(fd))ok=NO;if(close(fd))ok=NO;
+    int fd=open(temp.fileSystemRepresentation,O_WRONLY|O_CREAT|O_EXCL|O_NOFOLLOW,0600);
+    if(fd<0){if(error)*error=CSBackupFileError(url.path,@"create-temp",errno);return NO;}
+    NSUInteger offset=0;NSError *failure=nil;
+    while(offset<data.length){ssize_t n=write(fd,(const uint8_t *)data.bytes+offset,data.length-offset);if(n<0&&errno==EINTR)continue;if(n<=0){failure=CSBackupFileError(url.path,@"write",n<0?errno:EIO);break;}offset+=(NSUInteger)n;}
+    if(!failure&&fsync(fd))failure=CSBackupFileError(url.path,@"fsync-file",errno);
+    if(close(fd)&&!failure)failure=CSBackupFileError(url.path,@"close",errno);
 #if TARGET_OS_IPHONE
-    if(ok)ok=[NSFileManager.defaultManager setAttributes:@{NSFileProtectionKey:NSFileProtectionCompleteUntilFirstUserAuthentication} ofItemAtPath:temp.path error:error];
+    if(!failure&&![NSFileManager.defaultManager setAttributes:@{NSFileProtectionKey:NSFileProtectionCompleteUntilFirstUserAuthentication} ofItemAtPath:temp.path error:&failure]&&!failure)
+        failure=CSBackupFileError(url.path,@"file-protection",EACCES);
 #endif
-    if(ok&&rename(temp.path.fileSystemRepresentation,url.path.fileSystemRepresentation))ok=NO;
-    if(ok){int dirfd=open(parent.path.fileSystemRepresentation,O_RDONLY);if(dirfd<0)ok=NO;else{if(fsync(dirfd))ok=NO;close(dirfd);}}
-    if(!ok){unlink(temp.path.fileSystemRepresentation);return StoreFail(error,@"文件未完整提交，请检查存储空间后重试");}return YES;
+    if(!failure&&rename(temp.fileSystemRepresentation,url.fileSystemRepresentation))failure=CSBackupFileError(url.path,@"rename",errno);
+    if(!failure){int dirfd=open(parent.fileSystemRepresentation,O_RDONLY|O_DIRECTORY|O_NOFOLLOW);
+        if(dirfd<0)failure=CSBackupFileError(parent.path,@"open-parent",errno);
+        else{if(fsync(dirfd))failure=CSBackupFileError(parent.path,@"fsync-parent",errno);close(dirfd);}}
+    if(failure){unlink(temp.fileSystemRepresentation);if(error)*error=failure;return NO;}
+    return YES;
 }
 @implementation CSBackupStore
+- (void)emit:(NSString *)event details:(NSDictionary *)details {
+    @try {if(self.eventHandler)self.eventHandler(event,details);}
+    @catch(__unused NSException *exception) {} // Diagnostics must not change storage results.
+}
+- (void)recordRestoreStage:(NSString *)stage status:(NSString *)status error:(NSError *)error details:(NSDictionary *)details {
+    @try {
+        NSMutableDictionary *payload=[@{@"stage":stage,@"status":status,@"path":self.root.path,
+            @"writeRoot":self.root.path,@"readRoots":[(self.migration?self.migration.readRoots:@[self.root]) valueForKey:@"path"],
+            @"journalPath":[self.root URLByAppendingPathComponent:@"transaction.plist"].path} mutableCopy];
+        [payload addEntriesFromDictionary:details];[payload addEntriesFromDictionary:CSBackupRestoreErrorDetails(error)];
+        [self emit:[@"restore-" stringByAppendingString:stage] details:payload];
+    }@catch(__unused NSException *exception){}
+}
 - (instancetype)initWithRoot:(NSURL *)root {
     if((self=[super init])){
         _root=root;_cleanupStatus=@"";
@@ -59,6 +83,25 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
         id report=data?[NSPropertyListSerialization propertyListWithData:data options:0 format:NULL error:NULL]:nil;
         if([report isKindOfClass:NSDictionary.class]&&[report[@"summary"] isKindOfClass:NSString.class])_cleanupStatus=report[@"summary"];
     }return self;
+}
+- (instancetype)initWithMigration:(CSPluginDirectoryMigration *)migration {
+    [migration migrate:NULL];
+    if((self=[self initWithRoot:migration.destinationRoot]))_migration=migration;
+    return self;
+}
+- (BOOL)prepareForWriting:(NSError **)error {
+    if(!self.migration)return YES;
+    BOOL ok=[self.migration migrate:error];
+    if(!ok)[self emit:@"migration-pending" details:@{@"error":self.migration.lastError.localizedDescription?:@""}];
+    return ok;
+}
+- (BOOL)prepareForReading:(NSError **)error {
+    if(!self.migration||[self.migration migrate:NULL])return YES;
+    if(self.migration.lastError.code==CSPluginStorageErrorConflict){if(error)*error=self.migration.lastError;return NO;}
+    return YES; // Old readable files remain available while relocation awaits retry.
+}
+- (NSURL *)readURL:(NSURL *)url {
+    return self.migration?[self.migration readURLForName:url.lastPathComponent]:url;
 }
 - (NSURL *)URLForID:(NSString *)identifier extension:(NSString *)extension {
     if(![identifier isKindOfClass:NSString.class]||![[NSUUID alloc]initWithUUIDString:identifier])return nil;
@@ -71,6 +114,7 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     return [self publish:snapshot imported:YES error:error];
 }
 - (BOOL)publish:(NSDictionary *)snapshot imported:(BOOL)imported error:(NSError **)error {
+    if(![self prepareForWriting:error])return NO;
     NSURL *url=[self URLForID:snapshot[@"id"] extension:@"wcbak"];if(!url)return StoreFail(error,@"备份标识无效");
     NSData *encoded=[CSBackupCodec encode:snapshot error:error];if(!encoded||![CSBackupCodec decode:encoded error:error])return NO;
     struct stat st;
@@ -99,16 +143,55 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     }
     if(imported)initial[@"importedAt"]=NSDate.date;
     if(![self setMetadata:initial identifier:snapshot[@"id"] error:error])return NO;
-    return CSBackupAtomicWrite(encoded,url,error);
+    BOOL published=CSBackupAtomicWrite(encoded,url,error);
+    [self emit:published?@"published":@"publish-failed" details:@{@"id":snapshot[@"id"],@"kind":snapshot[@"kind"]?:@"",@"imported":@(imported),@"bytes":@(encoded.length)}];
+    return published;
 }
 - (NSDictionary *)snapshot:(NSString *)identifier error:(NSError **)error {
-    NSURL *url=[self URLForID:identifier extension:@"wcbak"];if(!url){StoreFail(error,@"备份标识无效");return nil;}
-    NSData *data=CSBackupReadFile(url,CSBackupMaximumFileSize,error);if(!data)return nil;
-    NSDictionary *s=[CSBackupCodec decode:data error:error];if(s&&![s[@"id"] isEqual:identifier]){StoreFail(error,@"文件名与备份标识不一致");return nil;}return s;
+    NSError *failure=nil;NSURL *url=[self URLForID:identifier extension:@"wcbak"];
+    if(!url){StoreFail(&failure,@"备份标识无效");}
+    else if([self prepareForReading:&failure]){
+        url=[self readURL:url];NSData *data=CSBackupReadFile(url,CSBackupMaximumFileSize,&failure);
+        NSDictionary *snapshot=data?[CSBackupCodec decode:data error:&failure]:nil;
+        if(snapshot&&[snapshot[@"id"] isEqual:identifier])return snapshot;
+        if(snapshot)StoreFail(&failure,@"文件名与备份标识不一致");
+    }
+    if(error)*error=CSBackupRestoreError(failure,@"validate",CSBackupRestoreValidation,url.path);return nil;
+}
+- (NSDictionary *)snapshotForRestore:(NSString *)identifier error:(NSError **)error {
+    NSURL *url=[self URLForID:identifier extension:@"wcbak"];
+    if(!url)return [self snapshot:identifier error:error];
+    [self recordRestoreStage:@"metadata" status:@"started" error:nil details:@{@"snapshotID":identifier}];
+    NSError *metadataError=nil;[self metadata:identifier error:&metadataError];
+    NSMutableArray *paths=[NSMutableArray array];for(NSString *extension in @[@"meta",@"meta.bak"])[paths addObject:[self readURL:[self URLForID:identifier extension:extension]].path];
+    [self recordRestoreStage:@"metadata" status:metadataError?@"warning":@"ok" error:metadataError details:@{@"paths":paths,@"requiredForRestore":@NO}];
+    // Local favorite/import metadata does not contain restore targets. A damaged
+    // mirror protects retention; it must not invalidate a self-contained snapshot.
+    [self recordRestoreStage:@"read-snapshot" status:@"started" error:nil details:@{@"path":[self readURL:url].path}];
+    NSError *failure=nil;NSDictionary *snapshot=[self snapshot:identifier error:&failure];
+    NSMutableDictionary *details=[@{@"path":[self readURL:url].path,@"snapshotID":identifier} mutableCopy];
+    if(snapshot){details[@"sourceVersion"]=snapshot[@"source"][@"pluginVersion"]?:@"";details[@"assetCount"]=@([snapshot[@"assets"] count]);}
+    [self recordRestoreStage:@"read-snapshot" status:snapshot?@"ok":@"failed" error:failure details:details];
+    if(!snapshot&&error)*error=failure;return snapshot;
 }
 - (NSArray *)records:(NSError **)error {
-    if(!Directory(self.root,error))return @[];
-    NSArray *urls=[NSFileManager.defaultManager contentsOfDirectoryAtURL:self.root includingPropertiesForKeys:nil options:0 error:error];
+    struct stat before;BOOL existed=lstat(self.root.path.fileSystemRepresentation,&before)==0;
+    if(!self.migration&&!Directory(self.root,error))return @[];
+    if(self.migration&&![self.migration migrate:error]){
+        [self emit:@"migration-pending" details:@{@"error":self.migration.lastError.localizedDescription?:@""}];
+    }
+    NSMutableArray *urls=[NSMutableArray array];NSMutableSet *seen=[NSMutableSet set];
+    for(NSURL *root in self.migration?self.migration.readRoots:@[self.root]){
+        struct stat st;if(lstat(root.fileSystemRepresentation,&st)&&errno==ENOENT)continue;
+        if(lstat(root.fileSystemRepresentation,&st)||!S_ISDIR(st.st_mode)){StoreFail(error,@"无法读取备份目录，原文件未修改");continue;}
+        NSArray *entries=[NSFileManager.defaultManager contentsOfDirectoryAtURL:root includingPropertiesForKeys:nil options:0 error:error];
+        for(NSURL *url in entries)if(![seen containsObject:url.lastPathComponent]){[urls addObject:url];[seen addObject:url.lastPathComponent];}
+    }
+    if(self.eventHandler&&urls) {
+        NSMutableArray *names=[NSMutableArray array];for(NSURL *url in urls)[names addObject:url.lastPathComponent];
+        [names sortUsingSelector:@selector(compare:)];
+        [self emit:@"inventory" details:@{@"readRoots":[(self.migration?self.migration.readRoots:@[self.root]) valueForKey:@"path"],@"directoryExistedBeforeRead":@(existed),@"fileCount":@(names.count),@"files":[names subarrayWithRange:NSMakeRange(0,MIN(names.count,1000))]}];
+    }
     NSMutableArray *items=[NSMutableArray array];
     for(NSURL *url in urls)if([url.pathExtension isEqual:@"wcbak"]) {
         NSError *readError=nil;NSString *identifier=url.lastPathComponent.stringByDeletingPathExtension;
@@ -133,17 +216,21 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
 }
 - (NSData *)originalData:(NSString *)filename error:(NSError **)error {
     if(![filename isKindOfClass:NSString.class]||![filename isEqual:filename.lastPathComponent]||[filename containsString:@"/"]||![filename.pathExtension isEqual:@"wcbak"]){StoreFail(error,@"备份文件名无效");return nil;}
-    return CSBackupReadFile([self.root URLByAppendingPathComponent:filename],CSBackupMaximumFileSize,error);
+    if(![self prepareForReading:error])return nil;
+    return CSBackupReadFile([self readURL:[self.root URLByAppendingPathComponent:filename]],CSBackupMaximumFileSize,error);
 }
 - (BOOL)remove:(NSString *)identifier error:(NSError **)error {
+    if(![self prepareForWriting:error])return NO;
     NSURL *url=[self URLForID:identifier extension:@"wcbak"];if(!url)return StoreFail(error,@"备份标识无效");
     NSError *journalError=nil;NSDictionary *journal=[self journal:&journalError];if(journalError){if(error)*error=journalError;return NO;}
     if([journal[@"protectionID"] isEqual:identifier]||[journal[@"sourceID"] isEqual:identifier])return StoreFail(error,@"恢复事务正在使用此备份，暂时不能删除");
-    if(![NSFileManager.defaultManager removeItemAtURL:url error:error])return NO;
+    [self emit:@"remove-requested" details:@{@"id":identifier}];
+    if(![NSFileManager.defaultManager removeItemAtURL:url error:error]){[self emit:@"remove-failed" details:@{@"id":identifier}];return NO;}
     for(NSString *extension in @[@"meta",@"meta.bak"]){
         NSURL *metadataURL=[self URLForID:identifier extension:extension];struct stat st;
         if(lstat(metadataURL.path.fileSystemRepresentation,&st)==0&&S_ISREG(st.st_mode))unlink(metadataURL.path.fileSystemRepresentation);
-    }return YES;
+    }
+    [self emit:@"removed" details:@{@"id":identifier}];return YES;
 }
 - (NSDictionary *)metadata:(NSString *)identifier {return [self metadata:identifier error:NULL];}
 - (NSDictionary *)readMetadata:(NSURL *)url identifier:(NSString *)identifier {
@@ -159,9 +246,10 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     return ValidMetadata(value)?value:nil;
 }
 - (NSDictionary *)metadata:(NSString *)identifier error:(NSError **)error {
+    if(![self prepareForReading:error])return @{};
     NSURL *primary=[self URLForID:identifier extension:@"meta"],*mirror=[self URLForID:identifier extension:@"meta.bak"];
     if(!primary){StoreFail(error,@"备份标识无效，保护状态未确认");return @{};}
-    NSDictionary *a=[self readMetadata:primary identifier:identifier],*b=[self readMetadata:mirror identifier:identifier];
+    NSDictionary *a=[self readMetadata:[self readURL:primary] identifier:identifier],*b=[self readMetadata:[self readURL:mirror] identifier:identifier];
     NSMutableDictionary *result=[(a?:b?:@{}) mutableCopy];
     // Conservative union protects collection/import across interrupted two-file updates.
     if([a[@"favorite"] boolValue]||[b[@"favorite"] boolValue])result[@"favorite"]=@YES;
@@ -170,6 +258,7 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     return result;
 }
 - (BOOL)setMetadata:(NSDictionary *)metadata identifier:(NSString *)identifier error:(NSError **)error {
+    if(![self prepareForWriting:error])return NO;
     NSURL *url=[self URLForID:identifier extension:@"meta"],*mirror=[self URLForID:identifier extension:@"meta.bak"];if(!url)return StoreFail(error,@"备份标识无效");
     if(!ValidMetadata(metadata))return StoreFail(error,@"备份保护信息无效，未覆盖原记录");
     NSMutableDictionary *normalized=[metadata mutableCopy];if(!normalized[@"favorite"])normalized[@"favorite"]=@NO;
@@ -179,12 +268,26 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     return CSBackupAtomicWrite(data,url,error)&&CSBackupAtomicWrite(data,mirror,error);
 }
 - (BOOL)writeJournal:(NSDictionary *)journal error:(NSError **)error {
+    NSError *failure=nil;BOOL ok=[self writeJournalContent:journal error:&failure];
+    [self recordRestoreStage:@"transaction" status:ok?@"saved":@"failed" error:failure
+        details:@{@"state":journal[@"state"]?:@"",@"transactionID":journal[@"transactionID"]?:@"",
+                  @"path":[self.root URLByAppendingPathComponent:@"transaction.plist"].path}];
+    if(!ok&&error)*error=failure;return ok;
+}
+- (BOOL)writeJournalContent:(NSDictionary *)journal error:(NSError **)error {
+    if(![self prepareForWriting:error])return NO;
     NSMutableDictionary *sealed=[journal mutableCopy];[sealed removeObjectForKey:@"integrity"];sealed[@"integrity"]=[CSBackupCodec digest:sealed];
     NSData *data=[NSPropertyListSerialization dataWithPropertyList:sealed format:NSPropertyListBinaryFormat_v1_0 options:0 error:error];if(data.length>80*1024*1024)return StoreFail(error,@"恢复日志超过 80 MiB，未发布待恢复计划");return data&&CSBackupAtomicWrite(data,[self.root URLByAppendingPathComponent:@"transaction.plist"],error);
 }
 - (NSDictionary *)journal:(NSError **)error {
-    NSURL *url=[self.root URLByAppendingPathComponent:@"transaction.plist"];
-    struct stat metadata;if(lstat(url.path.fileSystemRepresentation,&metadata)){if(errno==ENOENT)return nil;StoreFail(error,@"无法检查恢复日志，启动保持等待");return nil;}
+    NSError *failure=nil;NSDictionary *journal=[self readJournalContent:&failure];
+    if(failure&&error)*error=CSBackupRestoreError(failure,@"journal-read",CSBackupRestoreValidation,[self readURL:[self.root URLByAppendingPathComponent:@"transaction.plist"]].path);
+    return journal;
+}
+- (NSDictionary *)readJournalContent:(NSError **)error {
+    if(![self prepareForReading:error])return nil;
+    NSURL *url=[self readURL:[self.root URLByAppendingPathComponent:@"transaction.plist"]];
+    struct stat metadata;if(lstat(url.path.fileSystemRepresentation,&metadata)){if(errno==ENOENT)return nil;if(error)*error=CSBackupFileError(url.path,@"inspect-journal",errno);return nil;}
     if(!S_ISREG(metadata.st_mode)){StoreFail(error,@"恢复日志不是普通文件，启动保持等待");return nil;}
     NSData *data=CSBackupReadFile(url,80*1024*1024,error);if(!data)return nil;
     id value=[NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:error];
@@ -193,21 +296,30 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     if(![[CSBackupCodec digest:bare] isEqual:hash]){StoreFail(error,@"恢复日志校验失败，配置未继续修改");return nil;}return value;
 }
 - (BOOL)confirmActivation:(NSDictionary *)record error:(NSError **)error {
+    if(![self prepareForWriting:error])return NO;
     NSData *data=[NSPropertyListSerialization dataWithPropertyList:record format:NSPropertyListBinaryFormat_v1_0 options:0 error:error];
     if(!data||data.length>4096)return StoreFail(error,@"启动交接标记无效");
     return CSBackupAtomicWrite(data,[self.root URLByAppendingPathComponent:@"activation.plist"],error);
 }
 - (BOOL)activationConfirmed:(NSDictionary *)journal {
-    NSData *data=CSBackupReadFile([self.root URLByAppendingPathComponent:@"activation.plist"],4096,NULL);if(!data)return NO;
+    if(![self prepareForReading:NULL])return NO;
+    NSData *data=CSBackupReadFile([self readURL:[self.root URLByAppendingPathComponent:@"activation.plist"]],4096,NULL);if(!data)return NO;
     id record=[NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:NULL];
     return [record isKindOfClass:NSDictionary.class]&&[record[@"transactionID"] isEqual:journal[@"transactionID"]]&&[record[@"account"] isEqual:journal[@"account"]]&&[record[@"installationID"] isEqual:journal[@"installationID"]];
 }
 - (BOOL)archiveJournal:(NSError **)error {
+    NSError *failure=nil;BOOL ok=[self archiveJournalContent:&failure];
+    [self recordRestoreStage:@"archive" status:ok?@"ok":@"failed" error:failure details:@{@"path":[self.root URLByAppendingPathComponent:@"transaction.plist"].path,@"archivePath":[self.root URLByAppendingPathComponent:@"last-transaction.plist"].path}];
+    if(!ok&&error)*error=failure;return ok;
+}
+- (BOOL)archiveJournalContent:(NSError **)error {
+    if(![self prepareForWriting:error])return NO;
     NSURL *source=[self.root URLByAppendingPathComponent:@"transaction.plist"];NSData *data=CSBackupReadFile(source,80*1024*1024,error);if(!data)return NO;
     if(!CSBackupAtomicWrite(data,[self.root URLByAppendingPathComponent:@"last-transaction.plist"],error))return NO;
     return [NSFileManager.defaultManager removeItemAtURL:source error:error];
 }
 - (BOOL)writeCleanup:(NSMutableDictionary *)report error:(NSError **)error {
+    if(![self prepareForWriting:error])return NO;
     NSUInteger deleted=0,retained=0,failed=0,pending=0;
     for(NSDictionary *event in report[@"events"]){
         NSString *action=event[@"action"];
@@ -221,6 +333,7 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     self.cleanupStatus=report[@"summary"];return YES;
 }
 - (BOOL)prune:(NSError **)error {
+    if(![self prepareForWriting:error])return NO;
     NSError *listError=nil;NSArray *snapshots=[self records:&listError];
     NSDictionary *journal=listError?nil:[self journal:&listError];
     NSMutableArray *events=[NSMutableArray array];NSMutableDictionary *report=[@{@"date":NSDate.date,@"events":events} mutableCopy];

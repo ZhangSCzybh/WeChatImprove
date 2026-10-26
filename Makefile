@@ -22,8 +22,9 @@ export ARCHS = arm64 arm64e
 TARGET = iphone:clang:latest:15.0
 
 # 源文件
-WeChatImprove_FILES = $(wildcard Hooks/*.xm) \
-                     $(wildcard Controllers/*.m) \
+WeChatImprove_FILES = Controllers/CSPluginStorageStartup.m \
+                     $(wildcard Hooks/*.xm) \
+                     $(filter-out Controllers/CSPluginStorageStartup.m,$(wildcard Controllers/*.m)) \
 
 # 编译标志
 WeChatImprove_CFLAGS = -fobjc-arc \

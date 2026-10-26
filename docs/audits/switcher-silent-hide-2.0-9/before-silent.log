@@ -1,0 +1,5 @@
+FAIL: silent hiding must not submit a shake animation
+FAIL: silent hiding must not submit a scale animation or change table transform
+FAIL: repeated lock remains silent with no delayed animation
+Hidden native event publications: 0 / 20 events
+Group lifecycle: 98 checks, 3 failures

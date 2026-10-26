@@ -75,7 +75,7 @@
 
 服务分类共用微信 `CContact` 的 `isBrandContact`、`isServiceBrand`、`isSubscriptionBrand`，优先于好友判断，即使联系人用户名暂不可读也可按明确类型识别。`MMSessionInfo` 的 `isBrandServiceBoxSession`、`isBrandEcsMsgHolderSession` 同时确定聚合类型与服务归属，`isInBrandServiceBox` 补充识别服务会话；保留已有用户名规则。没有用户名的服务聚合行也遵循服务归属，且不会用于自定义成员查找或延迟动作身份。
 
-角标与列表使用同一行快照与成员规则，数字和红点分开。全部数字优先采用原生 `getTotalUnreadCount`。聚合入口不能确认覆盖范围时表达为红点，避免重复相加。红点标记不被解释为免打扰。
+角标与列表使用同一行快照与成员规则，数字和红点分开。全部数字在未启用隐私过滤时优先采用原生 `getTotalUnreadCount`，其他分组与隐私过滤状态使用投影计数。`m_bShowUnReadAsRedDot` 是原生未读的展示标记：只有它为真且 `m_uUnReadCount > 0` 时才贡献分组红点，未读清零后必须消失。聚合/业务入口不累加无法确认覆盖范围的数字，也不再仅凭残留计数推导红点；已知的正未读与红点标记同时存在时才保留提示。红点标记不被解释为免打扰。完整链路、修复前失败记录与回归见 [2.0-10 角标排查](audits/group-badge-clear-2.0-10/README.md)。
 
 分组数据使用 `com.wechat.enhance.chat_group.account_profiles` 的版本化账号档案；外观等通用选项保留原键。未知账号不保存或导入配置。旧 archive 原文保留；用户在设置中选择“导入旧版分组到当前账号”才建立归属。导入幂等，不自动给每个账号复制联系人集合。
 

@@ -107,6 +107,12 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @property(nonatomic,strong) id target;
 @end
 @implementation Proxy @end
+@interface SearchPrivacyShield : NSObject
+- (void)prepareForPublication;
+@end
+@implementation SearchPrivacyShield
+- (void)prepareForPublication {}
+@end
 @interface CSGroupListAdapter : NSObject
 @property(nonatomic,strong) UITableView *table;
 @property(nonatomic,strong) Chrome *chrome;
@@ -124,7 +130,8 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @property(nonatomic,copy) NSString *publishedTabID;
 @property(nonatomic) BOOL chromeVisible,searching,searchChromeVisible,pendingScrollToTop,presentationSuspended,updatingHeader;
 @property(nonatomic) BOOL publishing,privacyRefreshPending,dirty,swipeActive,recoveryPending,nativePresentation,projecting,publishedEnabled;
-@property(nonatomic) BOOL appearanceDirty,privacyShielded,privacyTableWasHidden,snapshotRetryAttempted;
+@property(nonatomic) BOOL appearanceDirty,snapshotRetryAttempted;
+@property(nonatomic,strong) SearchPrivacyShield *privacyShield;
 @property(nonatomic) NSUInteger changeDepth,interactionAttempts,publications;
 @property(nonatomic) CSGroupChangeKind pendingChanges;
 @property(nonatomic) NSTimeInterval interactionDeadline;
@@ -132,8 +139,10 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @property(nonatomic) NSUInteger invalidations,anchorSaves,titles,refreshes,requests;
 - (void)layout;
 - (void)publishHeader:(UIView *)header;
+- (void)shieldVisiblePrivateRows;
 @end
 @implementation CSGroupListAdapter
+- (void)shieldVisiblePrivateRows {}
 - (void)invalidateNativeSnapshot { self.invalidations++; }
 - (void)saveAnchor { self.anchorSaves++; }
 - (void)restoreAnchor {}
@@ -257,7 +266,7 @@ int main(void) { @autoreleasepool {
     Check([a.chrome.selectedTabID isEqual:@"preset_2"] && [a.publishedTabID isEqual:@"preset_2"] && a.chromeVisible,@"entry retains selected tab and navigation-title ownership");
     Check(a.table.tableHeaderView==searchHeader && [DisplayedNames(a) isEqual:@[@"ordinary"]],@"search transition never paints All rows under the retained group header");
     // A privacy change must rebuild the group, not freeze a stale visible friend.
-    hiddenNames=[NSSet setWithObjects:@"ordinary",@"hidden",nil]; a.privacyRefreshPending=YES; a.privacyShielded=YES; a.table.hidden=YES;
+    hiddenNames=[NSSet setWithObjects:@"ordinary",@"hidden",nil]; a.privacyRefreshPending=YES;
     [a refresh];
     Check(a.projecting && !a.table.hidden && !a.privacyRefreshPending && DisplayedNames(a).count==0,@"locking another friend during search republishes a safely filtered group");
     Check([a.publishedTabID isEqual:@"preset_2"] && [a.chrome.selectedTabID isEqual:@"preset_2"] && a.chromeVisible,@"privacy refresh retains the group selection and title behind search");
@@ -279,7 +288,17 @@ int main(void) { @autoreleasepool {
     account=@"B"; [a refresh];
     Check(!a.searchChromeVisible && a.table.tableHeaderView==a.nativeHeader && [a.preferences.accountID isEqual:@"B"],@"account changes discard the old search backing header before republishing");
     account=@"A";
-    appActive=NO; host.adapter.table.tableHeaderView=nil; [host.adapter layout];
+    // Same real refresh/projection chain as the switcher: selected group and its
+    // header survive, private rows are removed while the ordinary row remains.
+    host.isSearching=NO; a.nativePresentation=NO; privacyEnabled=NO; [a refresh];
+    UIView *switcherHeader=a.table.tableHeaderView;
+    Check([DisplayedNames(a) isEqual:@[@"ordinary",@"hidden"]],@"switcher baseline contains ordinary and revealed private rows");
+    appActive=NO; privacyEnabled=YES; a.privacyRefreshPending=YES; [a refresh];
+    Check([DisplayedNames(a) isEqual:@[@"ordinary"]] && !a.table.hidden,@"inactive privacy publication removes only private row before switcher snapshot");
+    Check(a.table.tableHeaderView==switcherHeader && a.chromeVisible && [a.publishedTabID isEqual:@"preset_2"],@"switcher privacy publication preserves group header and selection");
+    publications=a.publications; [a refresh];
+    Check(a.publications==publications,@"ordinary inactive publications remain deferred after privacy settles");
+    host.adapter.table.tableHeaderView=nil; [host.adapter layout];
     Check(!host.adapter.table.tableHeaderView,@"inactive application still blocks header publication");
     fprintf(stdout,"Group search: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;

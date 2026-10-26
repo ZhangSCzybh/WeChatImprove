@@ -6,6 +6,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic,readonly) NSURL *resourceRoot;
 @property(nonatomic) BOOL readPreferencesOnMain;
 @property(nonatomic,readonly,nullable) NSDictionary *appliedContext;
+/// A completed recovery may release startup while still reporting a cancelled plan.
+@property(nonatomic,readonly,nullable) NSError *recoveryNotice;
 @property(nonatomic,copy) NSDictionary *(^context)(void);
 /// Test-only failure/crash seam. Called after persistent transaction boundaries.
 @property(nonatomic,copy,nullable) void (^checkpoint)(NSString *point);

@@ -36,6 +36,21 @@ int main(void) { @autoreleasepool {
         [manager start]; [manager start];
         CHECK(!Blur(window) && !Blur(legacy));
 
+        // Explicit OFF must survive every switcher/background notification, including
+        // split settings/runtime defaults instances as used by the actual settings UI.
+        NSUserDefaults *settingsDefaults = [[NSUserDefaults alloc] initWithSuiteName:suite];
+        [settingsDefaults setBool:NO forKey:CSBackgroundBlurEnabledKey];
+        Post(CSBackgroundBlurSettingsChangedNotification, nil);
+        for (NSString *name in @[UIApplicationWillResignActiveNotification,
+                                UIApplicationDidEnterBackgroundNotification,
+                                UISceneWillDeactivateNotification, UISceneDidEnterBackgroundNotification]) {
+            Post(name, [name hasPrefix:@"UIScene"] ? scene : app);
+            CHECK(!Blur(window) && !Blur(second) && !Blur(legacy));
+            CHECK(window.subviews.count == 1 && second.subviews.count == 1 && legacy.subviews.count == 1);
+        }
+        Post(UISceneDidActivateNotification, scene);
+        Post(UIApplicationDidBecomeActiveNotification, app);
+
         // Disabled is a true no-op even on deactivation.
         Post(UISceneWillDeactivateNotification, scene);
         CHECK(!Blur(window));

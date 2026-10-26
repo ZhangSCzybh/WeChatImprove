@@ -1,0 +1,4602 @@
+[
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "isSupportStorageLoadingOptimization",
+    "address": "0x1029c8978",
+    "end": "0x1029c8a1c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "isProgressOptimizationEnabled",
+    "address": "0x1029c8a1c",
+    "end": "0x1029c8ac0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "useFastList",
+    "address": "0x1029c8ac0",
+    "end": "0x1029c8b64",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "useFastDelete",
+    "address": "0x1029c8b64",
+    "end": "0x1029c8c08",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "fastListUseBFTS",
+    "address": "0x1029c8c08",
+    "end": "0x1029c8cac",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "cleanOtherUserCache",
+    "address": "0x1029c8cac",
+    "end": "0x1029c8d50",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "GetFolderName:andFileName:withPath:",
+    "address": "0x1029c8d50",
+    "end": "0x1029c922c",
+    "types": "B40@0:8@16@24r*32"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "GetFileStat:fileSize:logicFileSize:accessTime:motifyTime:changeTime:birthTime:inode:nlink_t:",
+    "address": "0x1029c922c",
+    "end": "0x1029c9400",
+    "types": "B88@0:8@16^Q24^Q32^q40^q48^q56^q64^Q72^S80"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "DeleteBizFile:",
+    "address": "0x1029c9400",
+    "end": "0x1029c9484",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "DeleteBizUnknowFile:",
+    "address": "0x1029c9484",
+    "end": "0x1029c9508",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "DeleteBizDir:",
+    "address": "0x1029c9508",
+    "end": "0x1029c958c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "DeleteBizUnknowDir:",
+    "address": "0x1029c958c",
+    "end": "0x1029c9610",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "moveFileToTmpTrash:description:",
+    "address": "0x1029c9610",
+    "end": "0x1029c9954",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "moveFolderToTmpTrash:description:",
+    "address": "0x1029c9954",
+    "end": "0x1029c9c38",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "randomInt",
+    "address": "0x1029c9c38",
+    "end": "0x1029c9c7c",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "pathOfTrashFile",
+    "address": "0x1029c9c7c",
+    "end": "0x1029c9cf0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "pathOfTrashFolder",
+    "address": "0x1029c9d88",
+    "end": "0x1029c9dfc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "pathOfTrash",
+    "address": "0x1029c9e94",
+    "end": "0x1029c9f08",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "recreatePathOfTrash",
+    "address": "0x1029ca060",
+    "end": "0x1029ca18c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "createDir:",
+    "address": "0x1029ca18c",
+    "end": "0x1029ca390",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "pathExist:",
+    "address": "0x1029ca390",
+    "end": "0x1029ca44c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "removePath:",
+    "address": "0x1029ca44c",
+    "end": "0x1029ca620",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "movePath:to:",
+    "address": "0x1029ca620",
+    "end": "0x1029ca86c",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "decimalStringWithNumber:",
+    "address": "0x1029ca86c",
+    "end": "0x1029ca900",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "stringWithSecondsSince1970:",
+    "address": "0x1029ca948",
+    "end": "0x1029ca9fc",
+    "types": "@24@0:8Q16"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "secondsSince1970",
+    "address": "0x1029caa90",
+    "end": "0x1029caac0",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "LoadDataFromFile:forClass:",
+    "address": "0x1029caac0",
+    "end": "0x1029cacbc",
+    "types": "@32@0:8@16#24"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "SaveDataToFile:withObject:isPrintDescription:",
+    "address": "0x1029cacbc",
+    "end": "0x1029caf28",
+    "types": "B36@0:8@16@24B32"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "GetCurUserNameMD5",
+    "address": "0x1029caf28",
+    "end": "0x1029caf84",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "RemoveUnneedDiskScanTrash",
+    "address": "0x1029caf84",
+    "end": "0x1029cb4f0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageUtil",
+    "kind": "class",
+    "selector": "jsonStringFromDictByOrder:",
+    "address": "0x1029cb4f0",
+    "end": "0x1029cb6f8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "getCacheClassification:cancellation:",
+    "address": "0x1028fabe4",
+    "end": "0x1028fc8f8",
+    "types": "@28@0:8B16^B20"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "applyCleanBlockForClassification:weAppInfo:",
+    "address": "0x1028fcf88",
+    "end": "0x1028fd648",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "cleanWeAppCache",
+    "address": "0x1028fdc64",
+    "end": "0x1028fdd1c",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "preGetWeAppCacheSize",
+    "address": "0x1028fdd1c",
+    "end": "0x1028fddd4",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "cleanAppOtherCache",
+    "address": "0x1028fddd4",
+    "end": "0x1028fe070",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "preGetAppOtherCacheSize",
+    "address": "0x1028fe070",
+    "end": "0x1028fe30c",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "p_cleanTmpPath",
+    "address": "0x1028fe30c",
+    "end": "0x1028fe474",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "p_preGetTmpPathSize",
+    "address": "0x1028fe474",
+    "end": "0x1028fe4e8",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "p_cleanCachesWebkit",
+    "address": "0x1028fe4e8",
+    "end": "0x1028fe6b8",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "p_preGetWebkitCacheSize",
+    "address": "0x1028fe734",
+    "end": "0x1028fe834",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "p_cleanCacheAudio",
+    "address": "0x1028fe834",
+    "end": "0x1028fea38",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "p_preGetAudioCacheSize",
+    "address": "0x1028fea38",
+    "end": "0x1028fead8",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "p_cleanCacheMap",
+    "address": "0x1028fead8",
+    "end": "0x1028febdc",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "p_preGetMapCacheSize",
+    "address": "0x1028febdc",
+    "end": "0x1028fec7c",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "p_cleanAppGroupTmpPath",
+    "address": "0x1028fec7c",
+    "end": "0x1028fed58",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "p_preGetAppGroupTmpPathSize",
+    "address": "0x1028fed58",
+    "end": "0x1028fee20",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "p_cleanMatrixCrashBlockLog",
+    "address": "0x1028fee20",
+    "end": "0x1028ff07c",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMCleanCacheMgr",
+    "kind": "class",
+    "selector": "p_preGetMatrixCrashBlockLogSize",
+    "address": "0x1028ff07c",
+    "end": "0x1028ff278",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMLiveStorageCleanupLogic",
+    "kind": "class",
+    "selector": "evaluateStorageCleanup",
+    "address": "0x1042b8ab8",
+    "end": "0x1042b8ac8",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMLiveStorageCleanupLogic",
+    "kind": "class",
+    "selector": "executeStorageCleanup",
+    "address": "0x1042b8ac8",
+    "end": "0x1042b8ad8",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMLiveStorageCleanupLogic",
+    "kind": "class",
+    "selector": "cleanupStorageWithScenario:",
+    "address": "0x1042b8ad8",
+    "end": "0x1042b957c",
+    "types": "Q24@0:8Q16"
+  },
+  {
+    "cls": "MMLiveStorageCleanupLogic",
+    "kind": "class",
+    "selector": "markFilesWithPathComponents:relativeToDirectory:forDeviationDirectiveType:atLevel:enableVerboseLogging:",
+    "address": "0x1042b95ac",
+    "end": "0x1042b9b60",
+    "types": "v52@0:8@16@24Q32Q40B48"
+  },
+  {
+    "cls": "MMLiveStorageCleanupLogic",
+    "kind": "class",
+    "selector": "markFilesRecursivelyInDirectory:forDeviationDirectiveType:enableVerboseLogging:",
+    "address": "0x1042b9b60",
+    "end": "0x1042b9e88",
+    "types": "v36@0:8@16Q24B32"
+  },
+  {
+    "cls": "MMLiveStorageCleanupLogic",
+    "kind": "class",
+    "selector": "cleanupFilesInDirectory:forScenario:withFileReferences:enableVerboseLogging:",
+    "address": "0x1042b9e88",
+    "end": "0x1042ba73c",
+    "types": "Q44@0:8@16Q24@32B40"
+  },
+  {
+    "cls": "MMLiveStorageCleanupStaticResponder",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x1042bad98",
+    "end": "0x1042bae20",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMLiveStorageCleanupStaticResponder",
+    "kind": "instance",
+    "selector": "willBeginStorageCleanupInScenario:withContext:",
+    "address": "0x1042bae20",
+    "end": "0x1042baf70",
+    "types": "v32@0:8Q16@24"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": "addPathToBePreserved:",
+    "address": "0x1042b80d8",
+    "end": "0x1042b80ec",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": "addPathToBeCleanedUp:",
+    "address": "0x1042b80ec",
+    "end": "0x1042b8100",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": "addCleanupContributingTask:",
+    "address": "0x1042b8100",
+    "end": "0x1042b837c",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": "addDeviationDirectiveWithType:forPath:",
+    "address": "0x1042b85c4",
+    "end": "0x1042b88ac",
+    "types": "v32@0:8Q16@24"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": "contributionStage",
+    "address": "0x1042b8a00",
+    "end": "0x1042b8a08",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": "setContributionStage:",
+    "address": "0x1042b8a08",
+    "end": "0x1042b8a10",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": "deviationDirectives",
+    "address": "0x1042b8a10",
+    "end": "0x1042b8a18",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": "setDeviationDirectives:",
+    "address": "0x1042b8a18",
+    "end": "0x1042b8a24",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": "externalCleanupTasksGroup",
+    "address": "0x1042b8a24",
+    "end": "0x1042b8a2c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": "setExternalCleanupTasksGroup:",
+    "address": "0x1042b8a2c",
+    "end": "0x1042b8a38",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": "externalCleanupContribution",
+    "address": "0x1042b8a38",
+    "end": "0x1042b8a40",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": "setExternalCleanupContribution:",
+    "address": "0x1042b8a40",
+    "end": "0x1042b8a48",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MMLiveStorageCleanupContext",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1042b8a48",
+    "end": "0x1042b8a78",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x105a84d2c",
+    "end": "0x105a84d68",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "getClassSize",
+    "address": "0x105a84e0c",
+    "end": "0x105a85188",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "cleanData",
+    "address": "0x105a85188",
+    "end": "0x105a85574",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "stop",
+    "address": "0x105a85574",
+    "end": "0x105a85644",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "refreshState",
+    "address": "0x105a85644",
+    "end": "0x105a856a4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "progressLevel",
+    "address": "0x105a856a4",
+    "end": "0x105a856ac",
+    "types": "f16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "setProgressLevel:",
+    "address": "0x105a856ac",
+    "end": "0x105a856b4",
+    "types": "v20@0:8f16"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "lastProgress",
+    "address": "0x105a856b4",
+    "end": "0x105a856bc",
+    "types": "f16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "setLastProgress:",
+    "address": "0x105a856bc",
+    "end": "0x105a856c4",
+    "types": "v20@0:8f16"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "bCleanning",
+    "address": "0x105a856c4",
+    "end": "0x105a856cc",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "setBCleanning:",
+    "address": "0x105a856cc",
+    "end": "0x105a856d4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "bStop",
+    "address": "0x105a856d4",
+    "end": "0x105a856dc",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "setBStop:",
+    "address": "0x105a856dc",
+    "end": "0x105a856e4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "totalSize",
+    "address": "0x105a856e4",
+    "end": "0x105a856ec",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "instance",
+    "selector": "setTotalSize:",
+    "address": "0x105a856ec",
+    "end": "0x105a856f4",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "WCDeepCleanResource",
+    "kind": "class",
+    "selector": "getShouldDeleteHeadImg",
+    "address": "0x105a84d68",
+    "end": "0x105a84e0c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "stop",
+    "address": "0x105a82d1c",
+    "end": "0x105a82dec",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "refreshState",
+    "address": "0x105a82dec",
+    "end": "0x105a82e4c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "getClassSize",
+    "address": "0x105a82e4c",
+    "end": "0x105a83bdc",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "cleanData",
+    "address": "0x105a83bdc",
+    "end": "0x105a8426c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "progressLevel",
+    "address": "0x105a842bc",
+    "end": "0x105a842c4",
+    "types": "f16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "setProgressLevel:",
+    "address": "0x105a842c4",
+    "end": "0x105a842cc",
+    "types": "v20@0:8f16"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "lastProgress",
+    "address": "0x105a842cc",
+    "end": "0x105a842d4",
+    "types": "f16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "setLastProgress:",
+    "address": "0x105a842d4",
+    "end": "0x105a842dc",
+    "types": "v20@0:8f16"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "bCleanning",
+    "address": "0x105a842dc",
+    "end": "0x105a842e4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "setBCleanning:",
+    "address": "0x105a842e4",
+    "end": "0x105a842ec",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "bStop",
+    "address": "0x105a842ec",
+    "end": "0x105a842f4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "setBStop:",
+    "address": "0x105a842f4",
+    "end": "0x105a842fc",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "otherUserPaths",
+    "address": "0x105a842fc",
+    "end": "0x105a84304",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "setOtherUserPaths:",
+    "address": "0x105a84304",
+    "end": "0x105a84310",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "otherUserMapids",
+    "address": "0x105a84310",
+    "end": "0x105a84318",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "setOtherUserMapids:",
+    "address": "0x105a84318",
+    "end": "0x105a84324",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "totalSize",
+    "address": "0x105a84324",
+    "end": "0x105a8432c",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": "setTotalSize:",
+    "address": "0x105a8432c",
+    "end": "0x105a84334",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "WCDeepCleanOtherUser",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x105a84334",
+    "end": "0x105a84364",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x1175dfba0",
+    "end": "0x1175dfc30",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "initContextEnvironment",
+    "address": "0x1175dfc30",
+    "end": "0x1175dfd44",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "newGuestContext",
+    "address": "0x1175dfd44",
+    "end": "0x1175dfd5c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "newContextWithUser:uin:",
+    "address": "0x1175dfd5c",
+    "end": "0x1175dff4c",
+    "types": "@32@0:8@16{Uin64Adapter=Q}24"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "loginByContext:",
+    "address": "0x1175dff4c",
+    "end": "0x1175e01b4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "logout:",
+    "address": "0x1175e0228",
+    "end": "0x1175e02d0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "allContexts",
+    "address": "0x1175e02d0",
+    "end": "0x1175e0330",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "activeUserContext",
+    "address": "0x1175e0330",
+    "end": "0x1175e0378",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "contextByUin:",
+    "address": "0x1175e0378",
+    "end": "0x1175e04e0",
+    "types": "@24@0:8{Uin64Adapter=Q}16"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "contextByMarsContext:",
+    "address": "0x1175e04e0",
+    "end": "0x1175e0690",
+    "types": "@24@0:8r^v16"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "contextByMarsLongLinkName:",
+    "address": "0x1175e0690",
+    "end": "0x1175e084c",
+    "types": "@24@0:8r*16"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "callEnterForeground",
+    "address": "0x1175e084c",
+    "end": "0x1175e09d4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "callEnterBackground",
+    "address": "0x1175e09d4",
+    "end": "0x1175e0b5c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "callTerminate",
+    "address": "0x1175e0b5c",
+    "end": "0x1175e0ce4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "callMemoryWarning",
+    "address": "0x1175e0ce4",
+    "end": "0x1175e0e6c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "callClearMemoryCache:addedUserType:",
+    "address": "0x1175e0e6c",
+    "end": "0x1175e1004",
+    "types": "v32@0:8Q16Q24"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "callClearMemoryCacheInBackground",
+    "address": "0x1175e1004",
+    "end": "0x1175e118c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "callPauseBackgroundTask:",
+    "address": "0x1175e118c",
+    "end": "0x1175e131c",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "callResumeBackgroundTask:",
+    "address": "0x1175e131c",
+    "end": "0x1175e14ac",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "loginContextTimes",
+    "address": "0x1175e14ac",
+    "end": "0x1175e14b4",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "loginNonGuestContextTimes",
+    "address": "0x1175e14b4",
+    "end": "0x1175e14bc",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "documentPath",
+    "address": "0x1175e14bc",
+    "end": "0x1175e14c4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "setDocumentPath:",
+    "address": "0x1175e14c4",
+    "end": "0x1175e14d0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "libraryCachePath",
+    "address": "0x1175e14d0",
+    "end": "0x1175e14d8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": "setLibraryCachePath:",
+    "address": "0x1175e14d8",
+    "end": "0x1175e14e4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1175e14e4",
+    "end": "0x1175e1538",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMContextManager",
+    "kind": "class",
+    "selector": "defaultManager",
+    "address": "0x1175dfb44",
+    "end": "0x1175dfb74",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x1175ebc54",
+    "end": "0x1175ebcbc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "dealloc",
+    "address": "0x1175ebcbc",
+    "end": "0x1175ebd38",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "SetFileInfo:Mode:",
+    "address": "0x1175ebd38",
+    "end": "0x1175ebd6c",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "IsOpen",
+    "address": "0x1175ebd6c",
+    "end": "0x1175ebd74",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "Open",
+    "address": "0x1175ebd74",
+    "end": "0x1175ebfe8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "OpenWithFd:",
+    "address": "0x1175ebfe8",
+    "end": "0x1175ec170",
+    "types": "B20@0:8i16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "Close",
+    "address": "0x1175ec170",
+    "end": "0x1175ec1c4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "SetFileSize:",
+    "address": "0x1175ec1c4",
+    "end": "0x1175ec1fc",
+    "types": "B24@0:8q16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "Seek:",
+    "address": "0x1175ec1fc",
+    "end": "0x1175ec3c4",
+    "types": "B24@0:8q16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "SeekToEndOfFile",
+    "address": "0x1175ec3c4",
+    "end": "0x1175ec588",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "ReadData:Len:",
+    "address": "0x1175ec588",
+    "end": "0x1175ec894",
+    "types": "B28@0:8^@16I24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "WriteData:",
+    "address": "0x1175ec894",
+    "end": "0x1175eca9c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "WriteLargeData:",
+    "address": "0x1175eca9c",
+    "end": "0x1175ecda4",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "m_nsFilePath",
+    "address": "0x1175f48a8",
+    "end": "0x1175f48b0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "setM_nsFilePath:",
+    "address": "0x1175f48b0",
+    "end": "0x1175f48bc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "m_fhFile",
+    "address": "0x1175f48bc",
+    "end": "0x1175f48c4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": "setM_fhFile:",
+    "address": "0x1175f48c4",
+    "end": "0x1175f48d0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1175f48d0",
+    "end": "0x1175f4900",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "initialize",
+    "address": "0x1175eba74",
+    "end": "0x1175ebc48",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "BlockSizeForIO",
+    "address": "0x1175ebc48",
+    "end": "0x1175ebc54",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "CreateFile:",
+    "address": "0x1175ecda4",
+    "end": "0x1175ecffc",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "CreatePath:",
+    "address": "0x1175ecffc",
+    "end": "0x1175ed268",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "EnsureCreateParentDir:",
+    "address": "0x1175ed268",
+    "end": "0x1175ed4bc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "RenameFile:To:",
+    "address": "0x1175ed4bc",
+    "end": "0x1175ed4c8",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "SwapFile:withFile:",
+    "address": "0x1175ed8f4",
+    "end": "0x1175edab4",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "SafeRenameFiles:",
+    "address": "0x1175edab4",
+    "end": "0x1175edacc",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "SafeRenameFiles:error:",
+    "address": "0x1175edacc",
+    "end": "0x1175ee058",
+    "types": "B32@0:8@16^@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "CopyFile:To:",
+    "address": "0x1175ee42c",
+    "end": "0x1175ee69c",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "FileIsHardLink:",
+    "address": "0x1175eeb74",
+    "end": "0x1175eefb0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "GetFileDiskSpace:",
+    "address": "0x1175eefb0",
+    "end": "0x1175ef404",
+    "types": "q24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "File:inodeSameWith:",
+    "address": "0x1175ef404",
+    "end": "0x1175efa48",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "HardLinkFile:To:",
+    "address": "0x1175efa48",
+    "end": "0x1175effe0",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "FileExist:",
+    "address": "0x1175effe0",
+    "end": "0x1175f0064",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "GetFileModifyTime:",
+    "address": "0x1175f0064",
+    "end": "0x1175f00d8",
+    "types": "q24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "GetFileLastTimeOfAccessModifyChangeBirth:",
+    "address": "0x1175f00d8",
+    "end": "0x1175f0188",
+    "types": "q24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "GetFileSize:",
+    "address": "0x1175f0188",
+    "end": "0x1175f01fc",
+    "types": "q24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "GetFileRealSize:",
+    "address": "0x1175f01fc",
+    "end": "0x1175f0274",
+    "types": "q24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "FolderSizeAtPath:",
+    "address": "0x1175f0274",
+    "end": "0x1175f052c",
+    "types": "q24@0:8r*16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "SubFoldersName:",
+    "address": "0x1175f052c",
+    "end": "0x1175f083c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "SubFilesRecursively:",
+    "address": "0x1175f083c",
+    "end": "0x1175f0ac0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "SubFilesName:",
+    "address": "0x1175f0ac0",
+    "end": "0x1175f0ddc",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "LoadSubFolders:SubFiles:fromFolderPath:",
+    "address": "0x1175f0ddc",
+    "end": "0x1175f12ec",
+    "types": "B40@0:8@16@24@32"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "RemoveFile:",
+    "address": "0x1175f12ec",
+    "end": "0x1175f15fc",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "ClearPath:",
+    "address": "0x1175f15fc",
+    "end": "0x1175f1ad4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "SyncClearPath:",
+    "address": "0x1175f1ad4",
+    "end": "0x1175f1e50",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "ClearPath:WithOut:",
+    "address": "0x1175f1e50",
+    "end": "0x1175f21d8",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "CreateSymbolLink:LinkName:",
+    "address": "0x1175f21d8",
+    "end": "0x1175f23ec",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "LoadDataFromPath:Offset:Len:",
+    "address": "0x1175f23ec",
+    "end": "0x1175f256c",
+    "types": "@36@0:8@16Q24I32"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "LoadDataFromPathEx:Offset:MaxLen:",
+    "address": "0x1175f256c",
+    "end": "0x1175f26f4",
+    "types": "@36@0:8@16Q24I32"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "WriteDataToPath:Offset:Data:",
+    "address": "0x1175f26f4",
+    "end": "0x1175f2840",
+    "types": "B40@0:8@16Q24@32"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "AppendData:toPath:",
+    "address": "0x1175f2840",
+    "end": "0x1175f2930",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "OverWriteDataToPath:Data:",
+    "address": "0x1175f2930",
+    "end": "0x1175f29d0",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "SysOverWriteDataToPath:Data:",
+    "address": "0x1175f29d0",
+    "end": "0x1175f2d34",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "SysAppendData:toPath:",
+    "address": "0x1175f2d34",
+    "end": "0x1175f3064",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "GetFileCreateTime:",
+    "address": "0x1175f3064",
+    "end": "0x1175f32cc",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "IsFile:newerThanFile:",
+    "address": "0x1175f32cc",
+    "end": "0x1175f34e8",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "GetFileMD5:",
+    "address": "0x1175f34e8",
+    "end": "0x1175f3698",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "GetDataMD5:",
+    "address": "0x1175f3698",
+    "end": "0x1175f38d8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "GetFileSHA1:",
+    "address": "0x1175f38d8",
+    "end": "0x1175f3a88",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "GetDataSHA1:",
+    "address": "0x1175f3a88",
+    "end": "0x1175f3bc4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "GetFileSHA256:",
+    "address": "0x1175f3bc4",
+    "end": "0x1175f3d74",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "GetDataSHA256:",
+    "address": "0x1175f3d74",
+    "end": "0x1175f3eb0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "tryResetFileProtection:",
+    "address": "0x1175f3eb0",
+    "end": "0x1175f429c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "tryRemoveFileProtection:",
+    "address": "0x1175f429c",
+    "end": "0x1175f4688",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "CBaseFile",
+    "kind": "class",
+    "selector": "tryRemoveDirectoryProtection:",
+    "address": "0x1175f4688",
+    "end": "0x1175f48a8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "instance",
+    "selector": "Close",
+    "address": "0x114063208",
+    "end": "0x114063254",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "instance",
+    "selector": "ReadData:Len:",
+    "address": "0x114063254",
+    "end": "0x114063560",
+    "types": "B32@0:8@16Q24"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "instance",
+    "selector": "SetFileInfo:Mode:",
+    "address": "0x114063560",
+    "end": "0x114063594",
+    "types": "B28@0:8@16I24"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "instance",
+    "selector": "IsOpen",
+    "address": "0x114063594",
+    "end": "0x11406359c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "instance",
+    "selector": "Seek:",
+    "address": "0x11406359c",
+    "end": "0x114063748",
+    "types": "B24@0:8q16"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "instance",
+    "selector": "Open",
+    "address": "0x1140641d8",
+    "end": "0x114064404",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "instance",
+    "selector": "SeekToEndOfFile",
+    "address": "0x114064af8",
+    "end": "0x114064ca0",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "instance",
+    "selector": "WriteData:",
+    "address": "0x114064eac",
+    "end": "0x114065094",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "instance",
+    "selector": "WriteLargeData:",
+    "address": "0x114065094",
+    "end": "0x1140651c0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1140652b0",
+    "end": "0x1140652e0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "class",
+    "selector": "FileExist:",
+    "address": "0x114062ea4",
+    "end": "0x114063008",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "class",
+    "selector": "GetFileSize:",
+    "address": "0x114063008",
+    "end": "0x11406307c",
+    "types": "q24@0:8@16"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "class",
+    "selector": "LoadDataFromPathEx:Offset:MaxLen:",
+    "address": "0x11406307c",
+    "end": "0x114063208",
+    "types": "@40@0:8@16Q24Q32"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "class",
+    "selector": "CreatePath:",
+    "address": "0x114063748",
+    "end": "0x114063998",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "class",
+    "selector": "CreateFile:",
+    "address": "0x114063998",
+    "end": "0x114063d10",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "class",
+    "selector": "EnsureCreateParentDir:",
+    "address": "0x114063d10",
+    "end": "0x114063f54",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "class",
+    "selector": "RenameFile:To:",
+    "address": "0x114063f54",
+    "end": "0x1140641d8",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "class",
+    "selector": "CopyFile:To:",
+    "address": "0x114064404",
+    "end": "0x114064af8",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "class",
+    "selector": "RemoveFile:",
+    "address": "0x114064ca0",
+    "end": "0x114064eac",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "WPCoreBaseFile",
+    "kind": "class",
+    "selector": "AppendData:toPath:",
+    "address": "0x1140651c0",
+    "end": "0x1140652b0",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "close",
+    "address": "0x1140ec64c",
+    "end": "0x1140ec71c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "readData:Len:",
+    "address": "0x1140ec71c",
+    "end": "0x1140ec990",
+    "types": "B32@0:8@16Q24"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "setFileInfo:forUpdating:",
+    "address": "0x1140ec990",
+    "end": "0x1140eca0c",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "isOpen",
+    "address": "0x1140eca0c",
+    "end": "0x1140eca18",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "seek:",
+    "address": "0x1140eca18",
+    "end": "0x1140ecb8c",
+    "types": "B24@0:8q16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "open",
+    "address": "0x1140ecf74",
+    "end": "0x1140ed1d4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "seekToEndOfFile",
+    "address": "0x1140ed724",
+    "end": "0x1140ed894",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "writeData:",
+    "address": "0x1140ed9f4",
+    "end": "0x1140edbcc",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "writeLargeData:",
+    "address": "0x1140edbcc",
+    "end": "0x1140edcf8",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "fileHandle",
+    "address": "0x1140edf34",
+    "end": "0x1140edf3c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "setFileHandle:",
+    "address": "0x1140edf3c",
+    "end": "0x1140edf48",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "filePath",
+    "address": "0x1140edf48",
+    "end": "0x1140edf50",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "setFilePath:",
+    "address": "0x1140edf50",
+    "end": "0x1140edf5c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "fileOpen",
+    "address": "0x1140edf5c",
+    "end": "0x1140edf64",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "setFileOpen:",
+    "address": "0x1140edf64",
+    "end": "0x1140edf6c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "forUpdating",
+    "address": "0x1140edf6c",
+    "end": "0x1140edf74",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": "setForUpdating:",
+    "address": "0x1140edf74",
+    "end": "0x1140edf7c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1140edf7c",
+    "end": "0x1140edfac",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "class",
+    "selector": "fileExist:",
+    "address": "0x1140ec3bc",
+    "end": "0x1140ec44c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "class",
+    "selector": "getFileSize:",
+    "address": "0x1140ec44c",
+    "end": "0x1140ec4c0",
+    "types": "q24@0:8@16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "class",
+    "selector": "loadDataFromPathEx:Offset:MaxLen:",
+    "address": "0x1140ec4c0",
+    "end": "0x1140ec64c",
+    "types": "@40@0:8@16Q24Q32"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "class",
+    "selector": "createPath:",
+    "address": "0x1140ecb8c",
+    "end": "0x1140ecd2c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "class",
+    "selector": "createFile:",
+    "address": "0x1140ecd2c",
+    "end": "0x1140ecf74",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "class",
+    "selector": "copyFile:To:",
+    "address": "0x1140ed1d4",
+    "end": "0x1140ed618",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "class",
+    "selector": "ensureCreateParentDir:",
+    "address": "0x1140ed618",
+    "end": "0x1140ed724",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "class",
+    "selector": "removeFile:",
+    "address": "0x1140ed894",
+    "end": "0x1140ed9f4",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "class",
+    "selector": "appendData:toPath:",
+    "address": "0x1140edcf8",
+    "end": "0x1140edde8",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "TPBaseFile",
+    "kind": "class",
+    "selector": "writeDataToPath:Offset:Data:",
+    "address": "0x1140edde8",
+    "end": "0x1140edf34",
+    "types": "B40@0:8@16q24@32"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x1029baa24",
+    "end": "0x1029bab2c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "startWithScanConfig:",
+    "address": "0x1029bab2c",
+    "end": "0x1029bb210",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "startWithScanConfig:completion:",
+    "address": "0x1029bdc38",
+    "end": "0x1029bddcc",
+    "types": "v32@0:8@16@?24"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "stop",
+    "address": "0x1029bde14",
+    "end": "0x1029bdea4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "isRunning",
+    "address": "0x1029bdea4",
+    "end": "0x1029bdec8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "scanBeginWithRootFolderWithScanConfig:withScanData:",
+    "address": "0x1029bdec8",
+    "end": "0x1029be35c",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "waitingForScanFinish:withScanConfig:",
+    "address": "0x1029be418",
+    "end": "0x1029be55c",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "handleDeleteFolder:withFolderPath:withScanStat:",
+    "address": "0x1029be55c",
+    "end": "0x1029be7c0",
+    "types": "v40@0:8@16@24@32"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "scanFolderBegin:withParentPath:withScanConfig:withScanStat:depth:",
+    "address": "0x1029be7c0",
+    "end": "0x1029bec48",
+    "types": "v52@0:8@16@24@32@40i48"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "onScanFileInFolderFinish:withScanStat:",
+    "address": "0x1029becb8",
+    "end": "0x1029beedc",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "scanFileInFolder:withFolderPath:withScanConfig:",
+    "address": "0x1029beedc",
+    "end": "0x1029c145c",
+    "types": "B40@0:8@16@24@32"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "mergeFolderStat:intoScanStat:",
+    "address": "0x1029c1514",
+    "end": "0x1029c2428",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "isFileCanNotChangeSize:",
+    "address": "0x1029c2428",
+    "end": "0x1029c2430",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "scanSubFolder:withFolderPath:withScanConfig:withScanStat:depth:",
+    "address": "0x1029c2430",
+    "end": "0x1029c27cc",
+    "types": "v52@0:8@16@24@32@40i48"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "deleteFile:matchInfo:inFolder:withScanConfig:fileSize:logicFileSize:latestTimeInterval:",
+    "address": "0x1029c27f0",
+    "end": "0x1029c3378",
+    "types": "B88@0:8@16{MMBizMatchInfo=qqii}24@48@56^Q64^Q72^q80"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "addBizFileStat:bizType:fileSize:fileInterval:",
+    "address": "0x1029c3378",
+    "end": "0x1029c33a4",
+    "types": "v48@0:8@16q24Q32q40"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "addBizDelFileStat:bizType:delFileSize:",
+    "address": "0x1029c33a4",
+    "end": "0x1029c33cc",
+    "types": "v40@0:8@16q24Q32"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "addFileTypeInUseStat:fileTypeInUse:fileSize:",
+    "address": "0x1029c33cc",
+    "end": "0x1029c33f4",
+    "types": "v36@0:8@16i24Q28"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "addFileClassStat:fileClassType:fileSize:",
+    "address": "0x1029c33f4",
+    "end": "0x1029c341c",
+    "types": "v36@0:8@16i24Q28"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "addFileOtherDataBizStat:bizType:fileSize:",
+    "address": "0x1029c341c",
+    "end": "0x1029c3554",
+    "types": "v40@0:8@16q24Q32"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "addFileCacheDataBizStat:bizType:fileSize:",
+    "address": "0x1029c3554",
+    "end": "0x1029c368c",
+    "types": "v40@0:8@16q24Q32"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "registerBackgroundNotification",
+    "address": "0x1029c3704",
+    "end": "0x1029c37f0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "onWillSuspend:",
+    "address": "0x1029c37f0",
+    "end": "0x1029c3834",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "appDidBecomeActive:",
+    "address": "0x1029c3834",
+    "end": "0x1029c3874",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "onDidEnterBackground:",
+    "address": "0x1029c3874",
+    "end": "0x1029c3884",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "onWillEnterForeground:",
+    "address": "0x1029c3884",
+    "end": "0x1029c3894",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "getLastWholeWechatScanTime",
+    "address": "0x1029c3894",
+    "end": "0x1029c38f8",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "getLastWholeWechatReportTime",
+    "address": "0x1029c38f8",
+    "end": "0x1029c395c",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "getLastReportCacheAndOtherDataFastTime",
+    "address": "0x1029c395c",
+    "end": "0x1029c39c0",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "saveLastReportCacheAndOtherDataFastTime",
+    "address": "0x1029c39c0",
+    "end": "0x1029c3a60",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "saveLastWholeWechatReportTime",
+    "address": "0x1029c3a60",
+    "end": "0x1029c3b00",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "markEnterNewStorageUsageView",
+    "address": "0x1029c3b00",
+    "end": "0x1029c3ba0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "saveOtherDataDetail:",
+    "address": "0x1029c3ce0",
+    "end": "0x1029c3d60",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "getOtherDataDetail",
+    "address": "0x1029c3d60",
+    "end": "0x1029c3dd4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "saveOtherDataDictSize:",
+    "address": "0x1029c3dd4",
+    "end": "0x1029c3e34",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "saveCacheDataDetail:",
+    "address": "0x1029c3e34",
+    "end": "0x1029c3eb4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "getCacheDataDetail",
+    "address": "0x1029c3eb4",
+    "end": "0x1029c3f28",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "saveCacheDataDictSize:",
+    "address": "0x1029c3f28",
+    "end": "0x1029c3f88",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "reportLastWholeWechatDataAsync",
+    "address": "0x1029c3f88",
+    "end": "0x1029c4004",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "reportLastWholeWechatData",
+    "address": "0x1029c4014",
+    "end": "0x1029c56d4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "reportWxamConvertResult",
+    "address": "0x1029c56d4",
+    "end": "0x1029c58dc",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "reportAutoCleanRawMedia:cleanedRawVideoSize:",
+    "address": "0x1029c58dc",
+    "end": "0x1029c5cc8",
+    "types": "v32@0:8Q16Q24"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "getMessageWithLruCache:MsgLocalId:",
+    "address": "0x1029c5cc8",
+    "end": "0x1029c5f34",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "saveExistC2CFileData",
+    "address": "0x1029c5f34",
+    "end": "0x1029c7248",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "getReportValueFromMMKV:",
+    "address": "0x1029c7248",
+    "end": "0x1029c72d0",
+    "types": "q24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "analyseC2CFile:FolderPath:FileName:BizType:",
+    "address": "0x1029c72d0",
+    "end": "0x1029c7f80",
+    "types": "v48@0:8@16@24@32q40"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "getFileItemKey:",
+    "address": "0x1029c7f80",
+    "end": "0x1029c8044",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "getKeyFileSize:",
+    "address": "0x1029c8044",
+    "end": "0x1029c80f4",
+    "types": "q24@0:8Q16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "jsonStringFromDict:",
+    "address": "0x1029c80f4",
+    "end": "0x1029c8174",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "jsonDictFromString:",
+    "address": "0x1029c8174",
+    "end": "0x1029c8228",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "isTop50FileExt:",
+    "address": "0x1029c8228",
+    "end": "0x1029c853c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "getSendFileScene:ForwardType:",
+    "address": "0x1029c853c",
+    "end": "0x1029c858c",
+    "types": "i24@0:8I16I20"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "saveConvertWxamResult:CompressedSize:",
+    "address": "0x1029c858c",
+    "end": "0x1029c8644",
+    "types": "v32@0:8Q16Q24"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "ifForceWholeWechatScanForDebug",
+    "address": "0x1029c8644",
+    "end": "0x1029c864c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "storeOnlyChatLogFilesToFileIndexService",
+    "address": "0x1029c864c",
+    "end": "0x1029c86f4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "delegate",
+    "address": "0x1029c86f4",
+    "end": "0x1029c870c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setDelegate:",
+    "address": "0x1029c870c",
+    "end": "0x1029c8718",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "scannerStatus",
+    "address": "0x1029c8718",
+    "end": "0x1029c8720",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setScannerStatus:",
+    "address": "0x1029c8720",
+    "end": "0x1029c8728",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "isInBackground",
+    "address": "0x1029c8728",
+    "end": "0x1029c8734",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setIsInBackground:",
+    "address": "0x1029c8734",
+    "end": "0x1029c873c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "slowDownCheckSubFileNum",
+    "address": "0x1029c873c",
+    "end": "0x1029c8744",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setSlowDownCheckSubFileNum:",
+    "address": "0x1029c8744",
+    "end": "0x1029c874c",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "slowDownSleepMillisecond",
+    "address": "0x1029c874c",
+    "end": "0x1029c8754",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setSlowDownSleepMillisecond:",
+    "address": "0x1029c8754",
+    "end": "0x1029c875c",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "currentAppRootPath",
+    "address": "0x1029c875c",
+    "end": "0x1029c8764",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setCurrentAppRootPath:",
+    "address": "0x1029c8764",
+    "end": "0x1029c876c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "scanStat",
+    "address": "0x1029c876c",
+    "end": "0x1029c8774",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setScanStat:",
+    "address": "0x1029c8774",
+    "end": "0x1029c8780",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "exptConfig",
+    "address": "0x1029c8780",
+    "end": "0x1029c8788",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setExptConfig:",
+    "address": "0x1029c8788",
+    "end": "0x1029c8794",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "workQueue",
+    "address": "0x1029c8794",
+    "end": "0x1029c879c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setWorkQueue:",
+    "address": "0x1029c879c",
+    "end": "0x1029c87a8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "concurrentSemaphore",
+    "address": "0x1029c87a8",
+    "end": "0x1029c87b0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setConcurrentSemaphore:",
+    "address": "0x1029c87b0",
+    "end": "0x1029c87bc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "lock",
+    "address": "0x1029c87bc",
+    "end": "0x1029c87c4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setLock:",
+    "address": "0x1029c87c4",
+    "end": "0x1029c87d0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "hardlinkInodeDict",
+    "address": "0x1029c87d0",
+    "end": "0x1029c87d8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setHardlinkInodeDict:",
+    "address": "0x1029c87d8",
+    "end": "0x1029c87e4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "cowFileDict",
+    "address": "0x1029c87e4",
+    "end": "0x1029c87ec",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setCowFileDict:",
+    "address": "0x1029c87ec",
+    "end": "0x1029c87f8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "wrapCacheData",
+    "address": "0x1029c87f8",
+    "end": "0x1029c8800",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setWrapCacheData:",
+    "address": "0x1029c8800",
+    "end": "0x1029c880c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "sessionArray",
+    "address": "0x1029c880c",
+    "end": "0x1029c8814",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setSessionArray:",
+    "address": "0x1029c8814",
+    "end": "0x1029c8820",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "userNameDirHashDict",
+    "address": "0x1029c8820",
+    "end": "0x1029c8828",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setUserNameDirHashDict:",
+    "address": "0x1029c8828",
+    "end": "0x1029c8834",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "c2CFileItemDict",
+    "address": "0x1029c8834",
+    "end": "0x1029c883c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setC2CFileItemDict:",
+    "address": "0x1029c883c",
+    "end": "0x1029c8848",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "msgLruCache",
+    "address": "0x1029c8848",
+    "end": "0x1029c8850",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setMsgLruCache:",
+    "address": "0x1029c8850",
+    "end": "0x1029c885c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "startScanTime",
+    "address": "0x1029c885c",
+    "end": "0x1029c8864",
+    "types": "Q16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setStartScanTime:",
+    "address": "0x1029c8864",
+    "end": "0x1029c886c",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "flattFilePaths",
+    "address": "0x1029c886c",
+    "end": "0x1029c8874",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setFlattFilePaths:",
+    "address": "0x1029c8874",
+    "end": "0x1029c8880",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "reportSerialQueue",
+    "address": "0x1029c8880",
+    "end": "0x1029c8888",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setReportSerialQueue:",
+    "address": "0x1029c8888",
+    "end": "0x1029c8894",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "suspensionCheckFileCount",
+    "address": "0x1029c8894",
+    "end": "0x1029c889c",
+    "types": "q16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": "setSuspensionCheckFileCount:",
+    "address": "0x1029c889c",
+    "end": "0x1029c88a4",
+    "types": "v24@0:8q16"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1029c88a4",
+    "end": "0x1029c8978",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "class",
+    "selector": "latestTimeWithCurTime:accessTime:modifyTime:changeTime:birthTime:",
+    "address": "0x1029c368c",
+    "end": "0x1029c3704",
+    "types": "q56@0:8q16q24q32q40q48"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "class",
+    "selector": "markCleanCache",
+    "address": "0x1029c3ba0",
+    "end": "0x1029c3c40",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScaner",
+    "kind": "class",
+    "selector": "markCleanChatLog",
+    "address": "0x1029c3c40",
+    "end": "0x1029c3ce0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x1029aba90",
+    "end": "0x1029abae8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "loadConfigFromX",
+    "address": "0x1029abae8",
+    "end": "0x1029abc80",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "description",
+    "address": "0x1029abc80",
+    "end": "0x1029abe00",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "isDataValid",
+    "address": "0x1029abe00",
+    "end": "0x1029abe58",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_timeIntervalBetweenReport",
+    "address": "0x1029abe58",
+    "end": "0x1029abe60",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_timeIntervalBetweenReport:",
+    "address": "0x1029abe60",
+    "end": "0x1029abe68",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_timeIntervalBetweenScan",
+    "address": "0x1029abe68",
+    "end": "0x1029abe70",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_timeIntervalBetweenScan:",
+    "address": "0x1029abe70",
+    "end": "0x1029abe78",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_timeForEachScan",
+    "address": "0x1029abe78",
+    "end": "0x1029abe80",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_timeForEachScan:",
+    "address": "0x1029abe80",
+    "end": "0x1029abe88",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_timeForForceCleanTmp",
+    "address": "0x1029abe88",
+    "end": "0x1029abe90",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_timeForForceCleanTmp:",
+    "address": "0x1029abe90",
+    "end": "0x1029abe98",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_isDelete",
+    "address": "0x1029abe98",
+    "end": "0x1029abea0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_isDelete:",
+    "address": "0x1029abea0",
+    "end": "0x1029abea8",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_isDeleteUnknow",
+    "address": "0x1029abea8",
+    "end": "0x1029abeb0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_isDeleteUnknow:",
+    "address": "0x1029abeb0",
+    "end": "0x1029abeb8",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_isReportDelUnknow",
+    "address": "0x1029abeb8",
+    "end": "0x1029abec0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_isReportDelUnknow:",
+    "address": "0x1029abec0",
+    "end": "0x1029abec8",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_isEnableReport",
+    "address": "0x1029abec8",
+    "end": "0x1029abed0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_isEnableReport:",
+    "address": "0x1029abed0",
+    "end": "0x1029abed8",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_isEnableScan",
+    "address": "0x1029abed8",
+    "end": "0x1029abee0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_isEnableScan:",
+    "address": "0x1029abee0",
+    "end": "0x1029abee8",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_isEnableDeleteEmptyFolder",
+    "address": "0x1029abee8",
+    "end": "0x1029abef0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_isEnableDeleteEmptyFolder:",
+    "address": "0x1029abef0",
+    "end": "0x1029abef8",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_isEnablePreForceCleanTmp",
+    "address": "0x1029abef8",
+    "end": "0x1029abf00",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_isEnablePreForceCleanTmp:",
+    "address": "0x1029abf00",
+    "end": "0x1029abf08",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_timeIntervalBetweenEachScanFinish",
+    "address": "0x1029abf08",
+    "end": "0x1029abf10",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_timeIntervalBetweenEachScanFinish:",
+    "address": "0x1029abf10",
+    "end": "0x1029abf18",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_timeIntervalWholeScan",
+    "address": "0x1029abf18",
+    "end": "0x1029abf20",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_timeIntervalWholeScan:",
+    "address": "0x1029abf20",
+    "end": "0x1029abf28",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_timeIntervalWholeScanReport",
+    "address": "0x1029abf28",
+    "end": "0x1029abf30",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_timeIntervalWholeScanReport:",
+    "address": "0x1029abf30",
+    "end": "0x1029abf38",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "m_timeIntervalScanCacheAndOtherDataFast",
+    "address": "0x1029abf38",
+    "end": "0x1029abf40",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageConfigHandler",
+    "kind": "instance",
+    "selector": "setM_timeIntervalScanCacheAndOtherDataFast:",
+    "address": "0x1029abf40",
+    "end": "0x1029abf48",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "initWithName:",
+    "address": "0x1029ba5f4",
+    "end": "0x1029ba6ac",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "description",
+    "address": "0x1029ba6ac",
+    "end": "0x1029ba7f4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "name",
+    "address": "0x1029ba7f4",
+    "end": "0x1029ba7fc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_isDelete",
+    "address": "0x1029ba7fc",
+    "end": "0x1029ba804",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_isDelete:",
+    "address": "0x1029ba804",
+    "end": "0x1029ba80c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_isDeleteUnknow",
+    "address": "0x1029ba80c",
+    "end": "0x1029ba814",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_isDeleteUnknow:",
+    "address": "0x1029ba814",
+    "end": "0x1029ba81c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_isReportDelUnknow",
+    "address": "0x1029ba81c",
+    "end": "0x1029ba824",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_isReportDelUnknow:",
+    "address": "0x1029ba824",
+    "end": "0x1029ba82c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_isDeleteExpireFileForDebug",
+    "address": "0x1029ba82c",
+    "end": "0x1029ba834",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_isDeleteExpireFileForDebug:",
+    "address": "0x1029ba834",
+    "end": "0x1029ba83c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_isQuickScan",
+    "address": "0x1029ba83c",
+    "end": "0x1029ba844",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_isQuickScan:",
+    "address": "0x1029ba844",
+    "end": "0x1029ba84c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "useFolderCache",
+    "address": "0x1029ba84c",
+    "end": "0x1029ba854",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setUseFolderCache:",
+    "address": "0x1029ba854",
+    "end": "0x1029ba85c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_bSaveReportData",
+    "address": "0x1029ba85c",
+    "end": "0x1029ba864",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_bSaveReportData:",
+    "address": "0x1029ba864",
+    "end": "0x1029ba86c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_urgentLevel",
+    "address": "0x1029ba86c",
+    "end": "0x1029ba874",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_urgentLevel:",
+    "address": "0x1029ba874",
+    "end": "0x1029ba87c",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_bSuspendable",
+    "address": "0x1029ba87c",
+    "end": "0x1029ba884",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_bSuspendable:",
+    "address": "0x1029ba884",
+    "end": "0x1029ba88c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "regularExpressionsThatLogFilesToKV",
+    "address": "0x1029ba88c",
+    "end": "0x1029ba894",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setRegularExpressionsThatLogFilesToKV:",
+    "address": "0x1029ba894",
+    "end": "0x1029ba8a0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "isDeleteEmptyFolder",
+    "address": "0x1029ba8a0",
+    "end": "0x1029ba8a8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setIsDeleteEmptyFolder:",
+    "address": "0x1029ba8a8",
+    "end": "0x1029ba8b0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "isIgnoreCowFile",
+    "address": "0x1029ba8b0",
+    "end": "0x1029ba8b8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setIsIgnoreCowFile:",
+    "address": "0x1029ba8b8",
+    "end": "0x1029ba8c0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "isHighPriority",
+    "address": "0x1029ba8c0",
+    "end": "0x1029ba8c8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setIsHighPriority:",
+    "address": "0x1029ba8c8",
+    "end": "0x1029ba8d0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "concurrentCount",
+    "address": "0x1029ba8d0",
+    "end": "0x1029ba8d8",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setConcurrentCount:",
+    "address": "0x1029ba8d8",
+    "end": "0x1029ba8e0",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "willScanWholeWechat",
+    "address": "0x1029ba8e0",
+    "end": "0x1029ba8e8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setWillScanWholeWechat:",
+    "address": "0x1029ba8e8",
+    "end": "0x1029ba8f0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "willConvertMidImgWxam",
+    "address": "0x1029ba8f0",
+    "end": "0x1029ba8f8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setWillConvertMidImgWxam:",
+    "address": "0x1029ba8f8",
+    "end": "0x1029ba900",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "willReportExistC2CFile",
+    "address": "0x1029ba900",
+    "end": "0x1029ba908",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setWillReportExistC2CFile:",
+    "address": "0x1029ba908",
+    "end": "0x1029ba910",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "willStoreToFileIndex",
+    "address": "0x1029ba910",
+    "end": "0x1029ba918",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setWillStoreToFileIndex:",
+    "address": "0x1029ba918",
+    "end": "0x1029ba920",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "willSaveCacheAndOtherData",
+    "address": "0x1029ba920",
+    "end": "0x1029ba928",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setWillSaveCacheAndOtherData:",
+    "address": "0x1029ba928",
+    "end": "0x1029ba930",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1029ba930",
+    "end": "0x1029ba960",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "asyncGetDiskScanData",
+    "address": "0x1029b22cc",
+    "end": "0x1029b2370",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "sharedCacheData",
+    "address": "0x1029b2560",
+    "end": "0x1029b25ec",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "dealloc",
+    "address": "0x1029b25ec",
+    "end": "0x1029b2638",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "clearData",
+    "address": "0x1029b2638",
+    "end": "0x1029b2754",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "workQueue",
+    "address": "0x1029b2764",
+    "end": "0x1029b27b4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "configHandler",
+    "address": "0x1029b27b4",
+    "end": "0x1029b2800",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "diskUsageStatus",
+    "address": "0x1029b2800",
+    "end": "0x1029b2870",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "onServiceClearData",
+    "address": "0x1029b2870",
+    "end": "0x1029b287c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "onServiceTerminate",
+    "address": "0x1029b287c",
+    "end": "0x1029b2888",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "onServiceInit",
+    "address": "0x1029b2888",
+    "end": "0x1029b2d68",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "onServiceEnterForeground",
+    "address": "0x1029b3358",
+    "end": "0x1029b3410",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "shouldDiskUsageReport",
+    "address": "0x1029b3420",
+    "end": "0x1029b35c8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "reportIfNeeded",
+    "address": "0x1029b35c8",
+    "end": "0x1029b379c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "onReportFinished",
+    "address": "0x1029b379c",
+    "end": "0x1029b3884",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "wholeWechatReport",
+    "address": "0x1029b3a58",
+    "end": "0x1029b3af4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "startWholeScan:quickScan:completion:",
+    "address": "0x1029b3af4",
+    "end": "0x1029b3f10",
+    "types": "v32@0:8B16B20@?24"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "wholeWechatScan:",
+    "address": "0x1029b3f10",
+    "end": "0x1029b4554",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "finishScanPhase",
+    "address": "0x1029b47e8",
+    "end": "0x1029b499c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "rejectScan",
+    "address": "0x1029b499c",
+    "end": "0x1029b49f4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "startFinishScanDiskWithUrgentLevel:",
+    "address": "0x1029b49f4",
+    "end": "0x1029b4f78",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "startFastListScanForReportImpl:timeToScanAll:shouldSleep:cancelled:",
+    "address": "0x1029b5178",
+    "end": "0x1029b5eec",
+    "types": "v36@0:8B16B20B24^B28"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "startFastListScanForReportImpl:timeToScanAll:",
+    "address": "0x1029b5eec",
+    "end": "0x1029b5f0c",
+    "types": "v24@0:8B16B20"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "startFastListScanForReport",
+    "address": "0x1029b5f0c",
+    "end": "0x1029b65c4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "stopScanDisk",
+    "address": "0x1029b68d4",
+    "end": "0x1029b692c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "markLastForceCleanTmpTime",
+    "address": "0x1029b692c",
+    "end": "0x1029b69c8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "p_shouldForceCleanTmp",
+    "address": "0x1029b69c8",
+    "end": "0x1029b6b20",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "p_shouldFinishScanWithUrgentLevel:",
+    "address": "0x1029b6b20",
+    "end": "0x1029b6d48",
+    "types": "B20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "startScanAppGroup",
+    "address": "0x1029b6d48",
+    "end": "0x1029b6da0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "onDiskUsageScanStart",
+    "address": "0x1029b7204",
+    "end": "0x1029b72ec",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "onDiskUsageScanFinishedWithScanStat:",
+    "address": "0x1029b72ec",
+    "end": "0x1029b7698",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "onDiskUsageScanCancel",
+    "address": "0x1029b773c",
+    "end": "0x1029b7798",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "checkRunTooFrequently:",
+    "address": "0x1029b7798",
+    "end": "0x1029b79d4",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "ifForceWholeWechatScanForDebug",
+    "address": "0x1029b79d4",
+    "end": "0x1029b79dc",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "ifStoreToFileIndexService",
+    "address": "0x1029b79dc",
+    "end": "0x1029b7a84",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "setWorkQueue:",
+    "address": "0x1029b7a84",
+    "end": "0x1029b7a98",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "finishScanTimer",
+    "address": "0x1029b7a98",
+    "end": "0x1029b7aa8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "setFinishScanTimer:",
+    "address": "0x1029b7aa8",
+    "end": "0x1029b7abc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "scanner",
+    "address": "0x1029b7abc",
+    "end": "0x1029b7acc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "setScanner:",
+    "address": "0x1029b7acc",
+    "end": "0x1029b7ae0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "sharedCache",
+    "address": "0x1029b7ae0",
+    "end": "0x1029b7b00",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "setSharedCache:",
+    "address": "0x1029b7b00",
+    "end": "0x1029b7b14",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "reporter",
+    "address": "0x1029b7b14",
+    "end": "0x1029b7b24",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "setReporter:",
+    "address": "0x1029b7b24",
+    "end": "0x1029b7b38",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "setConfigHandler:",
+    "address": "0x1029b7b38",
+    "end": "0x1029b7b4c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "setDiskUsageStatus:",
+    "address": "0x1029b7b4c",
+    "end": "0x1029b7b60",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "appGroupScanner",
+    "address": "0x1029b7b60",
+    "end": "0x1029b7b70",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "setAppGroupScanner:",
+    "address": "0x1029b7b70",
+    "end": "0x1029b7b84",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "shouldToScan",
+    "address": "0x1029b7b84",
+    "end": "0x1029b7b94",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "setShouldToScan:",
+    "address": "0x1029b7b94",
+    "end": "0x1029b7ba4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "shouldReport",
+    "address": "0x1029b7ba4",
+    "end": "0x1029b7bb4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "setShouldReport:",
+    "address": "0x1029b7bb4",
+    "end": "0x1029b7bc4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "useFastListToReport",
+    "address": "0x1029b7bc4",
+    "end": "0x1029b7bd4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "setUseFastListToReport:",
+    "address": "0x1029b7bd4",
+    "end": "0x1029b7be4",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "fastListWorkQueue",
+    "address": "0x1029b7be4",
+    "end": "0x1029b7bf4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": "setFastListWorkQueue:",
+    "address": "0x1029b7bf4",
+    "end": "0x1029b7c08",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1029b7c08",
+    "end": "0x1029b7cd0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageMgr",
+    "kind": "class",
+    "selector": "getUrgentLevel",
+    "address": "0x1029b3884",
+    "end": "0x1029b3a58",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": "m_stat",
+    "address": "0x1029b0ba0",
+    "end": "0x1029b0ba8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": "setM_stat:",
+    "address": "0x1029b0ba8",
+    "end": "0x1029b0bb4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": "m_rootFolder",
+    "address": "0x1029b0bb4",
+    "end": "0x1029b0bbc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": "setM_rootFolder:",
+    "address": "0x1029b0bbc",
+    "end": "0x1029b0bc8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": "flattFilePaths",
+    "address": "0x1029b0bc8",
+    "end": "0x1029b0bd0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": "setFlattFilePaths:",
+    "address": "0x1029b0bd0",
+    "end": "0x1029b0bdc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1029b0bdc",
+    "end": "0x1029b0c18",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "class",
+    "selector": "scanRootDir",
+    "address": "0x1029b095c",
+    "end": "0x1029b09b8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "class",
+    "selector": "getNewDiskUsageScanData",
+    "address": "0x1029b09b8",
+    "end": "0x1029b0ba0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "instance",
+    "selector": "patchAppendBizRule:",
+    "address": "0x10299dc04",
+    "end": "0x10299e514",
+    "types": "v64@0:8{MMDiskUsageBizRule=qq@qiii}16"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "instance",
+    "selector": "getRootMatchNode",
+    "address": "0x10299e514",
+    "end": "0x10299e608",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "instance",
+    "selector": "loadPathMatchRulesWithOtherUser:",
+    "address": "0x10299e608",
+    "end": "0x10299f138",
+    "types": "@20@0:8B16"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "instance",
+    "selector": "addPathComponent:withRule:toRootNode:",
+    "address": "0x10299f138",
+    "end": "0x10299f148",
+    "types": "B40@0:8@16r^{MMDiskUsageBizRule=qq@qiii}24@32"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "instance",
+    "selector": "addPathComponent:withRule:toRootNode:supportModify:",
+    "address": "0x10299f148",
+    "end": "0x10299fac0",
+    "types": "B44@0:8@16r^{MMDiskUsageBizRule=qq@qiii}24@32B40"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "instance",
+    "selector": "p_makeArrayBizFileNodeOtherUser:",
+    "address": "0x10299fac0",
+    "end": "0x10299fc90",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "instance",
+    "selector": "p_makeArrayBizFileNodeZeroAppData:",
+    "address": "0x10299fc90",
+    "end": "0x10299fe78",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "instance",
+    "selector": "appRootMatchNode",
+    "address": "0x1029a0868",
+    "end": "0x1029a0870",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "instance",
+    "selector": "setAppRootMatchNode:",
+    "address": "0x1029a0870",
+    "end": "0x1029a087c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1029a087c",
+    "end": "0x1029a0888",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "class",
+    "selector": "p_validateStoreTimeType:",
+    "address": "0x10299fe78",
+    "end": "0x10299ff1c",
+    "types": "q24@0:8r^{MMDiskUsageBizRule=qq@qiii}16"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "class",
+    "selector": "p_isRuleValid:",
+    "address": "0x10299ff1c",
+    "end": "0x1029a00c8",
+    "types": "B24@0:8r^{MMDiskUsageBizRule=qq@qiii}16"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "class",
+    "selector": "ruleDescription:",
+    "address": "0x1029a00c8",
+    "end": "0x1029a010c",
+    "types": "@24@0:8r^{MMDiskUsageBizRule=qq@qiii}16"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "class",
+    "selector": "matchBizWithChildFolder:parentFolder:",
+    "address": "0x1029a010c",
+    "end": "0x1029a0568",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "MMDiskBizUsageHandler",
+    "kind": "class",
+    "selector": "fileMatchedBizType:inFolder:",
+    "address": "0x1029a0568",
+    "end": "0x1029a0868",
+    "types": "{MMBizMatchInfo=qqii}32@0:8@16@24"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "initWithName:",
+    "address": "0x1029ba5f4",
+    "end": "0x1029ba6ac",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "description",
+    "address": "0x1029ba6ac",
+    "end": "0x1029ba7f4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "name",
+    "address": "0x1029ba7f4",
+    "end": "0x1029ba7fc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_isDelete",
+    "address": "0x1029ba7fc",
+    "end": "0x1029ba804",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_isDelete:",
+    "address": "0x1029ba804",
+    "end": "0x1029ba80c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_isDeleteUnknow",
+    "address": "0x1029ba80c",
+    "end": "0x1029ba814",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_isDeleteUnknow:",
+    "address": "0x1029ba814",
+    "end": "0x1029ba81c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_isReportDelUnknow",
+    "address": "0x1029ba81c",
+    "end": "0x1029ba824",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_isReportDelUnknow:",
+    "address": "0x1029ba824",
+    "end": "0x1029ba82c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_isDeleteExpireFileForDebug",
+    "address": "0x1029ba82c",
+    "end": "0x1029ba834",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_isDeleteExpireFileForDebug:",
+    "address": "0x1029ba834",
+    "end": "0x1029ba83c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_isQuickScan",
+    "address": "0x1029ba83c",
+    "end": "0x1029ba844",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_isQuickScan:",
+    "address": "0x1029ba844",
+    "end": "0x1029ba84c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "useFolderCache",
+    "address": "0x1029ba84c",
+    "end": "0x1029ba854",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setUseFolderCache:",
+    "address": "0x1029ba854",
+    "end": "0x1029ba85c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_bSaveReportData",
+    "address": "0x1029ba85c",
+    "end": "0x1029ba864",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_bSaveReportData:",
+    "address": "0x1029ba864",
+    "end": "0x1029ba86c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_urgentLevel",
+    "address": "0x1029ba86c",
+    "end": "0x1029ba874",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_urgentLevel:",
+    "address": "0x1029ba874",
+    "end": "0x1029ba87c",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "m_bSuspendable",
+    "address": "0x1029ba87c",
+    "end": "0x1029ba884",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setM_bSuspendable:",
+    "address": "0x1029ba884",
+    "end": "0x1029ba88c",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "regularExpressionsThatLogFilesToKV",
+    "address": "0x1029ba88c",
+    "end": "0x1029ba894",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setRegularExpressionsThatLogFilesToKV:",
+    "address": "0x1029ba894",
+    "end": "0x1029ba8a0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "isDeleteEmptyFolder",
+    "address": "0x1029ba8a0",
+    "end": "0x1029ba8a8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setIsDeleteEmptyFolder:",
+    "address": "0x1029ba8a8",
+    "end": "0x1029ba8b0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "isIgnoreCowFile",
+    "address": "0x1029ba8b0",
+    "end": "0x1029ba8b8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setIsIgnoreCowFile:",
+    "address": "0x1029ba8b8",
+    "end": "0x1029ba8c0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "isHighPriority",
+    "address": "0x1029ba8c0",
+    "end": "0x1029ba8c8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setIsHighPriority:",
+    "address": "0x1029ba8c8",
+    "end": "0x1029ba8d0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "concurrentCount",
+    "address": "0x1029ba8d0",
+    "end": "0x1029ba8d8",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setConcurrentCount:",
+    "address": "0x1029ba8d8",
+    "end": "0x1029ba8e0",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "willScanWholeWechat",
+    "address": "0x1029ba8e0",
+    "end": "0x1029ba8e8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setWillScanWholeWechat:",
+    "address": "0x1029ba8e8",
+    "end": "0x1029ba8f0",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "willConvertMidImgWxam",
+    "address": "0x1029ba8f0",
+    "end": "0x1029ba8f8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setWillConvertMidImgWxam:",
+    "address": "0x1029ba8f8",
+    "end": "0x1029ba900",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "willReportExistC2CFile",
+    "address": "0x1029ba900",
+    "end": "0x1029ba908",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setWillReportExistC2CFile:",
+    "address": "0x1029ba908",
+    "end": "0x1029ba910",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "willStoreToFileIndex",
+    "address": "0x1029ba910",
+    "end": "0x1029ba918",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setWillStoreToFileIndex:",
+    "address": "0x1029ba918",
+    "end": "0x1029ba920",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "willSaveCacheAndOtherData",
+    "address": "0x1029ba920",
+    "end": "0x1029ba928",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": "setWillSaveCacheAndOtherData:",
+    "address": "0x1029ba928",
+    "end": "0x1029ba930",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "MMDiskUsageScanConfig",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1029ba930",
+    "end": "0x1029ba960",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": "m_stat",
+    "address": "0x1029b0ba0",
+    "end": "0x1029b0ba8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": "setM_stat:",
+    "address": "0x1029b0ba8",
+    "end": "0x1029b0bb4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": "m_rootFolder",
+    "address": "0x1029b0bb4",
+    "end": "0x1029b0bbc",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": "setM_rootFolder:",
+    "address": "0x1029b0bbc",
+    "end": "0x1029b0bc8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": "flattFilePaths",
+    "address": "0x1029b0bc8",
+    "end": "0x1029b0bd0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": "setFlattFilePaths:",
+    "address": "0x1029b0bd0",
+    "end": "0x1029b0bdc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1029b0bdc",
+    "end": "0x1029b0c18",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "class",
+    "selector": "scanRootDir",
+    "address": "0x1029b095c",
+    "end": "0x1029b09b8",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMDiskUsageScanData",
+    "kind": "class",
+    "selector": "getNewDiskUsageScanData",
+    "address": "0x1029b09b8",
+    "end": "0x1029b0ba0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "onServiceInit",
+    "address": "0x1046fca40",
+    "end": "0x1046fcb48",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "onServiceEnterBackground",
+    "address": "0x1046fcb48",
+    "end": "0x1046fcc10",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "registerTaskWithName:priority:earliestStart:launchBlock:cancelBlock:",
+    "address": "0x1046fccc4",
+    "end": "0x1046fcf7c",
+    "types": "v52@0:8@16i24q28@?36@?44"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "cancelTaskWithName:",
+    "address": "0x1046fcf7c",
+    "end": "0x1046fd0d0",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "setDebugCallback:",
+    "address": "0x1046fd0d0",
+    "end": "0x1046fd1bc",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "submitTaskRequest",
+    "address": "0x1046fd340",
+    "end": "0x1046fd804",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "handleBGTask:",
+    "address": "0x1046fd850",
+    "end": "0x1046fda30",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "taskQueue",
+    "address": "0x1046fe528",
+    "end": "0x1046fe538",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "setTaskQueue:",
+    "address": "0x1046fe538",
+    "end": "0x1046fe54c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "lock",
+    "address": "0x1046fe54c",
+    "end": "0x1046fe55c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "setLock:",
+    "address": "0x1046fe55c",
+    "end": "0x1046fe570",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "registry",
+    "address": "0x1046fe570",
+    "end": "0x1046fe580",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "setRegistry:",
+    "address": "0x1046fe580",
+    "end": "0x1046fe594",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "currentTask",
+    "address": "0x1046fe594",
+    "end": "0x1046fe5a4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "setCurrentTask:",
+    "address": "0x1046fe5a4",
+    "end": "0x1046fe5b8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "debugCB",
+    "address": "0x1046fe5b8",
+    "end": "0x1046fe5c8",
+    "types": "@?16@0:8"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": "setDebugCB:",
+    "address": "0x1046fe5c8",
+    "end": "0x1046fe5d4",
+    "types": "v24@0:8@?16"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x1046fe5d4",
+    "end": "0x1046fe650",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "MMStorageBGTaskMgr",
+    "kind": "class",
+    "selector": "registerBackgroundTask",
+    "address": "0x1046fd1bc",
+    "end": "0x1046fd1e4",
+    "types": "v16@0:8"
+  }
+]

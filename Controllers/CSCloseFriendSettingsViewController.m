@@ -139,7 +139,7 @@
         NSString *entry=[options[@"longPressUnlockEnabled"] boolValue] ?
             [NSString stringWithFormat:@"长按微信首页顶部标题 %@ 秒，或在首页搜索框输入完整密码，即可解锁并显示密友设置入口。",options[@"longPressUnlockDuration"]] :
             @"首页长按解锁已关闭；在首页搜索框输入完整密码，仍可解锁并显示密友设置入口。";
-        return [entry stringByAppendingString:@"密码验证信息仅保存在本机钥匙串；微信进入后台或切换账号时自动隐藏。开启“摇晃立即隐藏”后，轻摇手机即可隐藏。"];
+        return [entry stringByAppendingString:@"开启“生物识别解锁”后，长按需通过面容或指纹验证；不可用或取消时可输入密友密码。密码验证信息仅保存在本机钥匙串；微信进入后台或切换账号时自动隐藏。开启“摇晃立即隐藏”后，轻摇手机即可隐藏。"];
     }
     if(section==1)return @"解锁期间消息通知按静默设置处理。“挂断回复”默认关闭，开启后仅对自动拒接的私聊发送预设消息，同一人5分钟内最多一次。搭配“免打扰”使用更加，免打扰需手动设置。隐藏个人资料：资料页隐藏发消息和音视频通话入口，显示添加到通讯录。";
     return nil;

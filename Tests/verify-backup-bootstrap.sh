@@ -3,7 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
-xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -IControllers -IHeaders -framework Foundation Controllers/CSBackupBootstrap.m Tests/BackupBootstrapTests.m -o "$work/tests"
+xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -IControllers -IHeaders -framework Foundation Controllers/CSPluginStorage.m Controllers/CSBackupBootstrap.m Tests/BackupBootstrapTests.m -o "$work/tests"
 "$work/tests"
 # Logos creates an implicit _logosLocalInit when a file has hooks but no explicit %init,
 # even when %ctor exists. Verify every generated feature install is in the barrier block.

@@ -2,6 +2,7 @@
 static BOOL CSGroupAppInactive;
 static BOOL CSGroupApplicationActive(void) { return !CSGroupAppInactive; }
 #define UIApplicationDidBecomeActiveNotification @"UIApplicationDidBecomeActiveNotification"
+#define UIApplicationDidEnterBackgroundNotification @"UIApplicationDidEnterBackgroundNotification"
 @interface NSObject (GroupCacheFixture)
 - (void)discardComputationCache;
 - (void)refreshAppearance;

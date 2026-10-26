@@ -1,0 +1,378 @@
+--- a/Controllers/CSGroupProjection.m
++++ b/Controllers/CSGroupProjection.m
+@@ -49,7 +49,10 @@
+ }
+ 
+ static BOOL CSGroupDotUnread(CSGroupRow *row) {
+-    return row.redDot || ((row.kind == CSGroupRowKindAggregate || row.kind == CSGroupRowKindBusiness) && row.unreadCount > 0);
++    // The native show-as-dot flag is a presentation mode, not proof of unread.
++    // Aggregate/business counters have unknown coverage and may outlive their
++    // visible badge; never manufacture a dot from those counters alone.
++    return row.unreadCount > 0 && row.redDot;
+ }
+ 
+ static BOOL CSGroupRowsMatch(CSGroupRow *a, CSGroupRow *b, BOOL unread) {
+--- a/Controllers/CSGroupProjection.h
++++ b/Controllers/CSGroupProjection.h
+@@ -25,6 +25,7 @@
+ @property (nonatomic, readonly) CSGroupRowCategory category;
+ @property (nonatomic, readonly) BOOL top;
+ @property (nonatomic, readonly) NSUInteger unreadCount;
++/// Raw native show-as-dot flag. A displayed unread dot also requires a positive count.
+ @property (nonatomic, readonly) BOOL redDot;
+ @property (nonatomic, readonly) BOOL privacyMasked;
+ - (instancetype)initWithNativePath:(NSIndexPath *)nativePath
+--- a/Tests/CloseFriendSessionTests.m
++++ b/Tests/CloseFriendSessionTests.m
+@@ -45,6 +45,7 @@
+ @interface NativeSession : NSObject
+ @property(nonatomic,copy) NSString *m_nsUserName;
+ @property(nonatomic) NSUInteger m_uUnReadCount;
++@property(nonatomic) BOOL m_bShowUnReadAsRedDot;
+ @end
+ @implementation NativeSession
+ - (BOOL)isSingleChatSession { return YES; }
+@@ -172,7 +173,9 @@
+  Check(revealed.sections[0].count==3 && [revealed badgeForTabID:all.tabId].count==17 && [[revealed rowAtDisplayPath:Path(0)].nativePath isEqual:Path(0)],@"reveal restores native paths and unread");
+  Check(!Project(@[Row(1,@"A",CSGroupRowKindSession,CSGroupRowCategoryPrivate,9)],tabs,all.tabId,hidden,1,nil).isValid,@"hidden rows still undergo full nativePaths validation");
+  Check(!Project(@[rows[0],Row(1,@"A",CSGroupRowKindSession,CSGroupRowCategoryPrivate,9)],tabs,all.tabId,hidden,1,nil).isValid,@"hidden duplicate native identity still rejects snapshot");
+- NSArray *retained=@[Row(0,@"A",CSGroupRowKindBusiness,CSGroupRowCategoryUnknown,9),Row(1,nil,CSGroupRowKindBusiness,CSGroupRowCategoryUnknown,0),Row(2,@"chatroom_session_box",CSGroupRowKindAggregate,CSGroupRowCategoryGroup,12)];
++ // Explicit native dot indication is required; a box counter alone is not a badge.
++ CSGroupRow *foldedDot=[[CSGroupRow alloc] initWithNativePath:Path(2) userName:@"chatroom_session_box" kind:CSGroupRowKindAggregate category:CSGroupRowCategoryGroup top:NO unreadCount:12 redDot:YES];
++ NSArray *retained=@[Row(0,@"A",CSGroupRowKindBusiness,CSGroupRowCategoryUnknown,9),Row(1,nil,CSGroupRowKindBusiness,CSGroupRowCategoryUnknown,0),foldedDot];
+  CSGroupProjection *r=Project(retained,tabs,custom.tabId,hidden,1,nil);
+  Check(r.sections[0].count==2 && ![r rowAtDisplayPath:Path(0)].userName,@"privacy precedes retained rules; unknown anonymous business row survives");
+  NSArray *services=@[Row(0,@"brandsessionholder",CSGroupRowKindAggregate,CSGroupRowCategoryService,7),Row(1,@"brandservicesessionholder",CSGroupRowKindAggregate,CSGroupRowCategoryService,4)];
+@@ -223,13 +226,18 @@
+  Check(CSGroupAssessFoldedUserNames(@[@"A",@""],hidden)==CSGroupFoldedPrivacyUnknown,@"unknown child identity prevents all-hidden inference");
+  Check(CSGroupAssessFoldedUserNames(@[@"B",@"C"],hidden)==CSGroupFoldedPrivacyNoHidden && CSGroupAssessFoldedUserNames(@[@"A",@"B"],hidden)==CSGroupFoldedPrivacyMixed && CSGroupAssessFoldedUserNames(@[@"A"],hidden)==CSGroupFoldedPrivacyAllHidden,@"folded assessment distinguishes no-hidden, mixed, and all-confirmed-hidden");
+  ChatBoxMgr *manager=[ChatBoxMgr new];foldedService=manager;manager.sourceSessions=@[sourceA,folded.sessions[1]];
+- NativeSession *aggregate=[NativeSession new];aggregate.m_nsUserName=@"chatroom_session_box";aggregate.m_uUnReadCount=12;
++ NativeSession *aggregate=[NativeSession new];aggregate.m_nsUserName=@"chatroom_session_box";aggregate.m_uUnReadCount=12;aggregate.m_bShowUnReadAsRedDot=YES;
+  NativeHost *main=[NativeHost new];main.m_tableView=[TestTable new];main.sessions=[NSMutableArray arrayWithObject:aggregate];a.controller=main;a.table=main.m_tableView;
+  policy=Policy(@[@"A"],NO,6);[a refresh];
+  Check(a.projection.sections[0].count==1 && a.projection.sections[0][0].privacyMasked && ![a.projection badgeForTabID:@"preset_0"].redDot,@"verified mixed folded children retain neutral entry without private unread");
+  manager.sourceSessions=@[sourceA];[a refresh];Check(a.projection.sections[0].count==0,@"all-confirmed-hidden children remove only the aggregate presentation");
+  manager.sourceSessions=@[folded.sessions[1]];[a refresh];
+  Check(a.projection.sections[0].count==1 && !a.projection.sections[0][0].privacyMasked && [a.projection badgeForTabID:@"preset_0"].redDot,@"verified no-hidden children preserve ordinary native aggregate preview and dot");
++ aggregate.m_bShowUnReadAsRedDot=NO;[a refresh];
++ Check(![a.projection badgeForTabID:@"preset_0"].redDot && aggregate.m_uUnReadCount==12,@"unmasked aggregate residual count without dot indication cannot manufacture a group dot");
++ aggregate.m_bShowUnReadAsRedDot=YES;aggregate.m_uUnReadCount=0;[a refresh];
++ Check(![a.projection badgeForTabID:@"preset_0"].redDot,@"unmasked aggregate clears its dot when unread reaches zero even if dot mode persists");
++ aggregate.m_uUnReadCount=12;
+  manager.sourceSessions=@[[NSObject new]];[a refresh];Check(a.projection.sections[0].count==1 && a.projection.sections[0][0].privacyMasked,@"unreadable child identity retains conservative neutral entry");
+  manager.sourceSessions=@[sourceA];manager.replaceEpoch=YES;[a refresh];Check(a.projection.sections.count==0,@"account epoch change during child read cannot publish its classification");
+  Check(aggregate.m_uUnReadCount==12 && main.sessions.count==1 && manager.sourceSessions[0]==sourceA,@"folded assessment never mutates native aggregate, source children, or unread");
+--- a/control
++++ b/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.0-9
++Version: 2.0-10
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会
+--- a/Headers/CSUserInfoHelper.h
++++ b/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.0-9"  // 插件版本号
++#define kPluginVersionString @"2.0-10"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- a/Controllers/CSReleaseNotesViewController.m
++++ b/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,10 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"2.0-10": @[
++            @{@"title": @"修复聊天分组红点残留", @"detail": @"会话未读清零后同步消除分组红点；聚合入口与服务号容器不再仅凭残留计数产生红点。"},
++            @{@"title": @"保留有效未读提示", @"detail": @"组内仍有真实红点未读时继续提示，数字角标与隐藏角标设置保持原有规则。"}
++        ],
+         @"2.0-9": @[
+             @{@"title": @"密友改为静默隐藏", @"detail": @"切换器、后台与摇动锁定直接完成密友隐藏，保留普通会话和分组栏；移除抖动、缩放及隐藏提示占位。"},
+             @{@"title": @"修正隐藏时序", @"detail": @"锁定时同步更新会话列表，避免等待下一轮刷新导致空白；关闭后台模糊时仍不添加整屏遮罩。"}
+--- a/README.md
++++ b/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
+ 
+-**当前版本：`2.0-9`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`2.0-10`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
+ 
+@@ -31,8 +31,8 @@
+ | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
+ | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
+ | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
+-| Rootless | 仓库已提供 `2.0-9` 安装包；下方历史交付记录中的验证结论对应各自版本 |
+-| Rootful | 提供 `2.0-9` 安装包，可供现有 IPA 注入流程提取动态库；尚未真机验收 |
++| Rootless | 仓库已提供 `2.0-10` 安装包；下方历史交付记录中的验证结论对应各自版本 |
++| Rootful | 提供 `2.0-10` 安装包，可供现有 IPA 注入流程提取动态库；尚未真机验收 |
+ | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
+ | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
+ 
+@@ -40,7 +40,7 @@
+ 
+ ### 安装步骤
+ 
+-1. 获取与设备注入环境匹配的 `.deb`。当前仓库提供 [2.0-9 Rootless 安装包](packages/com.wechat.improve_2.0-9_iphoneos-arm64.deb) 和 [Rootful 安装包](packages/com.wechat.improve_2.0-9_iphoneos-arm.deb)，其他方案可参照下文编译。
++1. 获取与设备注入环境匹配的 `.deb`。当前仓库提供 [2.0-10 Rootless 安装包](packages/com.wechat.improve_2.0-10_iphoneos-arm64.deb) 和 [Rootful 安装包](packages/com.wechat.improve_2.0-10_iphoneos-arm.deb)，其他方案可参照下文编译。
+ 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
+ 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
+ 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
+@@ -132,6 +132,8 @@
+ 
+ 备份不包含微信聊天记录、登录凭据、授权缓存、支付去重账本或支付累计统计。文件可能包含联系人标识、分组成员和自定义文字，当前格式未加密。版本更新备份在插件正常初始化后检查，不作为插件启动条件，也不保证保存迁移前的状态；需要升级前配置时，应先手动创建完整备份。真正待执行或中断的恢复事务仍在功能初始化前校验。
+ 
++`2.0-10` 修复聊天分组红点残留：未读清零即清除红点，聚合与服务号容器不再仅凭残留计数生成红点；保留有效未读提示和原有数字规则。详见 [2.0-10 角标链路、失败复现与验收记录](docs/audits/group-badge-clear-2.0-10/README.md)。
++
+ `2.0-9` 将切换器、后台和摇动锁定统一为静默隐藏：在当前主线程调用内完成锁定、退出敏感页和隐私列表刷新，保留普通会话与分组栏。已移除 2.0-8 的抖动、缩放和“密友已隐藏”提示占位；后台模糊关闭时不添加全窗遮罩。详见 [2.0-9 时序对比、失败复现与验收记录](docs/audits/switcher-silent-hide-2.0-9/README.md)。
+ 
+ `2.0-7` 让密友后台整屏遮罩遵循“后台模糊”开关：关闭后立即移除，后续切换器和后台事件不再添加；密友后台锁定与验证取消仍有效。原实现仅模糊模块的关闭用例已通过，本轮复现并修复的是密友独立遮罩，真机毛玻璃效果来源仍需区分。详见 [2.0-7 后台遮罩修复记录](docs/audits/background-blur-disable-2.0-7/README.md)。
+@@ -172,7 +174,7 @@
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.0-9_iphoneos-arm64.deb`。
++当前版本默认输出：`packages/com.wechat.improve_2.0-10_iphoneos-arm64.deb`。
+ 
+ ### Rootful
+ 
+@@ -181,7 +183,7 @@
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.0-9_iphoneos-arm.deb`。仓库同时提供 Rootless 与 Rootful 安装包。
++当前版本默认输出：`packages/com.wechat.improve_2.0-10_iphoneos-arm.deb`。仓库同时提供 Rootless 与 Rootful 安装包。
+ 
+ | 方案 | 动态库安装目录 |
+ | --- | --- |
+--- a/docs/session-groups.md
++++ b/docs/session-groups.md
+@@ -75,7 +75,7 @@
+ 
+ 服务分类共用微信 `CContact` 的 `isBrandContact`、`isServiceBrand`、`isSubscriptionBrand`，优先于好友判断，即使联系人用户名暂不可读也可按明确类型识别。`MMSessionInfo` 的 `isBrandServiceBoxSession`、`isBrandEcsMsgHolderSession` 同时确定聚合类型与服务归属，`isInBrandServiceBox` 补充识别服务会话；保留已有用户名规则。没有用户名的服务聚合行也遵循服务归属，且不会用于自定义成员查找或延迟动作身份。
+ 
+-角标与列表使用同一行快照与成员规则，数字和红点分开。全部数字优先采用原生 `getTotalUnreadCount`。聚合入口不能确认覆盖范围时表达为红点，避免重复相加。红点标记不被解释为免打扰。
++角标与列表使用同一行快照与成员规则，数字和红点分开。全部数字在未启用隐私过滤时优先采用原生 `getTotalUnreadCount`，其他分组与隐私过滤状态使用投影计数。`m_bShowUnReadAsRedDot` 是原生未读的展示标记：只有它为真且 `m_uUnReadCount > 0` 时才贡献分组红点，未读清零后必须消失。聚合/业务入口不累加无法确认覆盖范围的数字，也不再仅凭残留计数推导红点；已知的正未读与红点标记同时存在时才保留提示。红点标记不被解释为免打扰。完整链路、修复前失败记录与回归见 [2.0-10 角标排查](audits/group-badge-clear-2.0-10/README.md)。
+ 
+ 分组数据使用 `com.wechat.enhance.chat_group.account_profiles` 的版本化账号档案；外观等通用选项保留原键。未知账号不保存或导入配置。旧 archive 原文保留；用户在设置中选择“导入旧版分组到当前账号”才建立归属。导入幂等，不自动给每个账号复制联系人集合。
+ 
+--- /dev/null
++++ b/Tests/GroupBadgeTests.m
+@@ -0,0 +1,173 @@
++#import <Foundation/Foundation.h>
++#import "CSGroupNativeBridge.h"
++#import "WESessionTabItem.h"
++
++// Native models and view storage are fixtures; bridge, projection, publication
++// and both badge update methods execute production code without replacement.
++id CSGetService(Class cls) { (void)cls; return nil; }
++static BOOL hideAll, hideGroups;
++static BOOL Option(NSString *key) { return [key isEqual:@"hide_all_badge"] ? hideAll : hideGroups; }
++@interface BadgeNativeSession : NSObject
++@property(nonatomic,copy) NSString *m_nsUserName;
++@property(nonatomic) NSUInteger m_uUnReadCount;
++@property(nonatomic) BOOL m_bShowUnReadAsRedDot;
++@end
++@implementation BadgeNativeSession
++- (BOOL)isSingleChatSession { return self.m_nsUserName.length>0; }
++@end
++@interface BadgeNativeLogic : NSObject
++@property(nonatomic,copy) NSArray<BadgeNativeSession *> *sessions;
++@property(nonatomic) NSInteger getTotalUnreadCount;
++@end
++@implementation BadgeNativeLogic
++- (id)getSessionInfoAtIndexPath:(NSIndexPath *)path { return self.sessions[[path indexAtPosition:1]]; }
++@end
++@interface BadgeNativeHost : NSObject
++@property(nonatomic,strong) BadgeNativeLogic *m_mainFrameLogicController;
++@end
++@implementation BadgeNativeHost
++- (NSInteger)numberOfSectionsInTableView:(id)table { (void)table; return 1; }
++- (NSInteger)tableView:(id)table numberOfRowsInSection:(NSInteger)section {
++    (void)table; (void)section; return (NSInteger)self.m_mainFrameLogicController.sessions.count;
++}
++@end
++@interface BadgeLabel : NSObject
++@property(nonatomic) BOOL hidden;
++@property(nonatomic,copy) NSString *text;
++@end
++@implementation BadgeLabel @end
++@interface WETabButton : NSObject
++@property(nonatomic) NSInteger unreadCount;
++@property(nonatomic) BOOL hasRedDot;
++@property(nonatomic,strong) BadgeLabel *unreadBadge;
++@property(nonatomic,copy) NSString *accessibilityValue;
++@property(nonatomic) NSUInteger layouts;
++@end
++@implementation WETabButton
++- (void)setNeedsLayout { self.layouts++; }
++#include "BadgeBody.h"
++@end
++@interface BadgeChrome : NSObject
++@property(nonatomic,copy) NSArray<WETabButton *> *tabButtons;
++@property(nonatomic) NSUInteger layouts;
++@end
++@implementation BadgeChrome
++- (void)setNeedsLayout { self.layouts++; }
++#include "ContainerBody.h"
++@end
++@interface BadgePublisher : NSObject
++@property(nonatomic,strong) BadgeNativeHost *controller;
++@property(nonatomic,strong) BadgeChrome *chrome;
++@end
++@implementation BadgePublisher
++#include "PublicationBody.h"
++@end
++static NSUInteger checks, failures;
++static void Check(BOOL ok, NSString *reason) {
++    checks++; if (!ok) { failures++; fprintf(stderr,"FAIL: %s\n",reason.UTF8String); }
++}
++static CSGroupProjection *Build(NSArray *sections, NSArray *tabs, CSGroupProjection *previous, NSSet *hidden) {
++    return [[CSGroupProjection alloc] initWithSections:sections tabs:tabs selectedTabID:@"custom"
++        filterDuplicates:NO accountID:@"badge-account" hiddenUserNames:hidden privacyRevision:1 previousProjection:previous];
++}
++static BadgePublisher *Publisher(NSArray *tabs) {
++    BadgePublisher *p=[BadgePublisher new]; p.controller=[BadgeNativeHost new];
++    p.controller.m_mainFrameLogicController=[BadgeNativeLogic new]; p.chrome=[BadgeChrome new];
++    NSMutableArray *buttons=[NSMutableArray array];
++    for (__unused id tab in tabs) {
++        WETabButton *b=[WETabButton new]; b.unreadBadge=[BadgeLabel new]; b.unreadBadge.hidden=YES; [buttons addObject:b];
++    }
++    p.chrome.tabButtons=buttons; return p;
++}
++int main(void) { @autoreleasepool {
++    // Session, folded group, two service containers, anonymous business row,
++    // and ordinary service session all pass through the real native bridge.
++    for (NSString *name in @[@"friend",@"group@chatroom",@"chatroom_session_box",@"brandsessionholder",@"brandservicesessionholder",@"",@"gh_service"]) {
++        NSMutableArray *tabs=[NSMutableArray array];
++        for (NSUInteger type=0;type<4;type++) [tabs addObject:[WESessionTabItem tabWithType:(WETabType)type]];
++        WESessionTabItem *custom=[WESessionTabItem customTabWithName:@"工作" sessionUserNames:name.length ? @[name] : @[]];
++        custom.tabId=@"custom"; [tabs addObject:custom];
++        BadgePublisher *p=Publisher(tabs); BadgeNativeLogic *logic=p.controller.m_mainFrameLogicController;
++        BadgeNativeSession *s=[BadgeNativeSession new]; s.m_nsUserName=name; s.m_uUnReadCount=7; s.m_bShowUnReadAsRedDot=YES; logic.sessions=@[s];
++        NSArray *before=CSGroupBuildNativeSections(p.controller,p,p.controller);
++        CSGroupProjection *unread=Build(before,tabs,nil,[NSSet set]);
++        [p publish:unread tabs:tabs privacy:NO];
++        Check(unread.valid && [unread badgeForTabID:custom.tabId].redDot && p.chrome.tabButtons.lastObject.hasRedDot,
++              [name stringByAppendingString:@": positive unread in dot mode publishes a real dot even when native numeric total is zero"]);
++        s.m_uUnReadCount=0; // Native presentation style can remain set after reading.
++        NSArray *after=CSGroupBuildNativeSectionsReusing(p.controller,p,p.controller,before);
++        CSGroupProjection *cleared=Build(after,tabs,unread,[NSSet set]);
++        [p publish:cleared tabs:tabs privacy:NO];
++        Check([after[0][0] redDot] && ![after[0][0] unreadCount] && [before[0][0] unreadCount]==7,
++              @"native values remain immutable and the style flag is preserved");
++        Check(cleared!=unread && [cleared changedUnreadPathsFrom:unread].count==1,@"clearing unread invalidates the cached projection and displayed row");
++        for (NSUInteger i=0;i<tabs.count;i++) {
++            WETabButton *b=p.chrome.tabButtons[i];
++            Check(![cleared badgeForTabID:[tabs[i] tabId]].redDot && !b.hasRedDot && b.unreadBadge.hidden && !b.accessibilityValue,
++                  [NSString stringWithFormat:@"%@ tab %lu: zero unread must publish hasRedDot=NO and hide the badge",name,(unsigned long)i]);
++        }
++        CSGroupProjection *cold=Build(after,tabs,nil,[NSSet set]);
++        Check(![cold badgeForTabID:custom.tabId].redDot && Build(after,tabs,cleared,[NSSet set])==cleared,
++              @"cold reconstruction and unchanged cached refresh cannot resurrect a cleared dot");
++        s.m_uUnReadCount=9; s.m_bShowUnReadAsRedDot=NO;
++        NSArray *residual=CSGroupBuildNativeSectionsReusing(p.controller,p,p.controller,after);
++        CSGroupProjection *noDot=Build(residual,tabs,cleared,[NSSet set]);
++        logic.getTotalUnreadCount=0; [p publish:noDot tabs:tabs privacy:NO];
++        Check(![noDot badgeForTabID:custom.tabId].redDot && !p.chrome.tabButtons[0].hasRedDot,
++              [name stringByAppendingString:@": positive count without native dot indication cannot manufacture a dot"]);
++        CSGroupRow *row=residual[0][0];
++        BOOL aggregate=row.kind==CSGroupRowKindAggregate || row.kind==CSGroupRowKindBusiness;
++        Check([noDot badgeForTabID:custom.tabId].count==(aggregate ? 0U : 9U),@"aggregate totals stay excluded; normal numeric unread stays unchanged");
++        Check(!aggregate || p.chrome.tabButtons.lastObject.unreadBadge.hidden,@"aggregate/business residual counts leave the custom tab badge hidden");
++        s.m_bShowUnReadAsRedDot=YES;
++        NSArray *dotOnly=CSGroupBuildNativeSectionsReusing(p.controller,p,p.controller,residual);
++        CSGroupProjection *restored=Build(dotOnly,tabs,noDot,[NSSet set]);
++        Check(restored!=noDot && [restored changedUnreadPathsFrom:noDot].count==1 && [restored badgeForTabID:custom.tabId].redDot,
++              @"a flag-only change at the same unread count invalidates reuse and restores a genuine dot");
++        s.m_bShowUnReadAsRedDot=NO;
++        NSArray *flagCleared=CSGroupBuildNativeSectionsReusing(p.controller,p,p.controller,dotOnly);
++        CSGroupProjection *flagOff=Build(flagCleared,tabs,restored,[NSSet set]);
++        [p publish:flagOff tabs:tabs privacy:NO];
++        Check([flagOff changedUnreadPathsFrom:restored].count==1 && !p.chrome.tabButtons.lastObject.hasRedDot,
++              @"clearing only the flag republishes hasRedDot=NO even while the native count is unchanged");
++        s.m_bShowUnReadAsRedDot=YES;
++        if (name.length) {
++            CSGroupProjection *private=Build(dotOnly,tabs,restored,[NSSet setWithObject:name]);
++            [p publish:private tabs:tabs privacy:YES];
++            Check(!p.chrome.tabButtons[0].hasRedDot && !p.chrome.tabButtons.lastObject.hasRedDot,@"hidden rows cannot contribute a dot through privacy publication");
++        }
++        hideAll=YES; hideGroups=YES; [p publish:restored tabs:tabs privacy:NO];
++        Check(p.chrome.tabButtons[0].unreadBadge.hidden && p.chrome.tabButtons.lastObject.unreadBadge.hidden,@"hide-badge settings clear both outputs");
++        hideAll=NO; hideGroups=NO; [p publish:restored tabs:tabs privacy:NO];
++        Check(p.chrome.tabButtons.lastObject.hasRedDot,@"reenabling badges restores only genuine unread");
++        logic.getTotalUnreadCount=42; [p publish:restored tabs:tabs privacy:NO];
++        Check([p.chrome.tabButtons[0].unreadBadge.text isEqual:@"42"],@"All retains native numeric total and numeric display priority");
++        [p publish:restored tabs:tabs privacy:YES];
++        Check(!p.chrome.tabButtons[0].unreadCount && p.chrome.tabButtons[0].hasRedDot,@"privacy uses the projected total instead of the unfiltered native total");
++    }
++    // Clearing one member must retain another member's real dot; clearing the
++    // last member must remove it even while a service container keeps a count.
++    WESessionTabItem *all=[WESessionTabItem tabWithType:WETabTypeAll];
++    WESessionTabItem *mixed=[WESessionTabItem customTabWithName:@"混合" sessionUserNames:@[@"a",@"b",@"brandsessionholder"]]; mixed.tabId=@"custom";
++    NSArray *tabs=@[all,mixed]; BadgePublisher *p=Publisher(tabs);
++    NSMutableArray *sessions=[NSMutableArray array];
++    for (NSString *name in mixed.sessionUserNames) {
++        BadgeNativeSession *s=[BadgeNativeSession new]; s.m_nsUserName=name; s.m_uUnReadCount=3;
++        s.m_bShowUnReadAsRedDot=![name isEqual:@"brandsessionholder"]; [sessions addObject:s];
++    }
++    p.controller.m_mainFrameLogicController.sessions=sessions;
++    NSArray *sections=CSGroupBuildNativeSections(p.controller,p,p.controller);
++    CSGroupProjection *projection=Build(sections,tabs,nil,[NSSet set]);
++    [p publish:projection tabs:tabs privacy:NO];
++    Check(p.chrome.tabButtons.lastObject.hasRedDot,@"multiple real unread members produce one group dot");
++    for (NSUInteger i=0;i<2;i++) {
++        ((BadgeNativeSession *)sessions[i]).m_uUnReadCount=0;
++        sections=CSGroupBuildNativeSectionsReusing(p.controller,p,p.controller,sections);
++        projection=Build(sections,tabs,projection,[NSSet set]);
++        [p publish:projection tabs:tabs privacy:NO];
++        Check(p.chrome.tabButtons.lastObject.hasRedDot==(i==0),@"only clearing the last real unread member clears the group dot despite residual container count");
++    }
++    Check(p.chrome.tabButtons.lastObject.unreadBadge.hidden,@"mixed group has no residual dot or number after the final unread clears");
++    printf("Group badges: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
++    return failures ? 1 : 0;
++} }
+--- /dev/null
++++ b/Tests/verify-group-badges.sh
+@@ -0,0 +1,31 @@
++#!/bin/bash
++set -euo pipefail
++project_dir="$(cd "$(dirname "$0")/.." && pwd)"
++test_dir="$(mktemp -d "${TMPDIR:-/tmp}/wechat-group-badges.XXXXXX")"
++trap 'rm -rf "$test_dir"' EXIT
++# Optional pre-fix projection provides a reproducible red/green control.
++projection_source="${1:-$project_dir/Controllers/CSGroupProjection.m}"
++python3 - "$project_dir" "$test_dir" <<'PY'
++from pathlib import Path
++import sys
++root, out = map(Path, sys.argv[1:])
++source = (root/'Controllers/WESessionTabContainerView.m').read_text()
++for name, marker in [('Badge', '- (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot {'),
++                     ('Container', '- (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot forTabIndex:')]:
++    start=source.index(marker); brace=source.index('{', start); depth=0
++    for end in range(brace, len(source)):
++        if source[end]=='{': depth+=1
++        elif source[end]=='}':
++            depth-=1
++            if not depth: break
++    (out/(name+'Body.h')).write_text(source[start:end+1])
++source = (root/'Controllers/CSGroupListAdapter.m').read_text()
++start=source.index('        id logic=CSGroupReadObject(self.controller,@"m_mainFrameLogicController");', source.index('- (void)refresh {'))
++end=source.index('        [self layout];',start)
++(out/'PublicationBody.h').write_text('- (void)publish:(CSGroupProjection *)projection tabs:(NSArray *)tabs privacy:(BOOL)privacy {\n'+source[start:end]+'\n}')
++PY
++xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-undeclared-selector \
++  -framework Foundation -I"$test_dir" -I"$project_dir/Controllers" \
++  "$projection_source" "$project_dir/Controllers/CSGroupNativeBridge.m" \
++  "$project_dir/Controllers/WESessionTabItem.m" "$project_dir/Tests/GroupBadgeTests.m" -o "$test_dir/tests"
++"$test_dir/tests"

@@ -1,10 +1,16 @@
 #import "CSBackupAssets.h"
 #import "CSBackupCodec.h"
 #import "CSBackupRegistry.h"
+#import "CSBackupRestoreDiagnostics.h"
 #import <ImageIO/ImageIO.h>
 #import <sys/stat.h>
 #import <errno.h>
 static id AssetError(NSError **error,NSString *message){if(error)*error=CSBackupFailure(message);return nil;}
+static id AssetReadError(NSError **error,NSString *message,NSError *cause) {
+    if(error){NSMutableDictionary *info=[@{NSLocalizedDescriptionKey:message} mutableCopy];if(cause)info[NSUnderlyingErrorKey]=cause;
+        if(cause.userInfo[NSFilePathErrorKey])info[NSFilePathErrorKey]=cause.userInfo[NSFilePathErrorKey];
+        *error=[NSError errorWithDomain:@"CSBackupAsset" code:1 userInfo:info];}return nil;
+}
 static NSString *FixedName(NSString *key) {
     if([key isEqual:@"com.wechat.tweak.touch.trail.custom.image.path"])return @"touch_trail.png";
     if([key isEqual:@"com.wechat.tweak.navigation.separator.image"])return @"separator_image.png";
@@ -34,16 +40,21 @@ static NSString *ReadAsset(NSString *path,NSURL *root,NSMutableDictionary *asset
     p=[resolvedBase stringByAppendingPathComponent:relative];
     struct stat rootStat;
     if((lstat(base.fileSystemRepresentation,&rootStat)==0&&S_ISLNK(rootStat.st_mode))||![p isEqual:p.stringByResolvingSymlinksInPath])return AssetError(error,@"图片路径不在插件资源目录内或包含符号链接");
-    struct stat st;if(lstat(p.fileSystemRepresentation,&st)||!S_ISREG(st.st_mode)||st.st_size<=0||st.st_size>4*1024*1024)return AssetError(error,@"图片不存在、不是普通文件或超过 4 MiB");
-    NSData *data=[NSData dataWithContentsOfFile:p options:NSDataReadingMappedIfSafe error:error];
+    struct stat st;if(lstat(p.fileSystemRepresentation,&st)){if(error)*error=CSBackupFileError(p,@"inspect-image",errno);return nil;}
+    if(!S_ISREG(st.st_mode)||st.st_size<=0||st.st_size>4*1024*1024)return AssetError(error,@"图片不是普通文件或超过 4 MiB");
+    NSData *data=[NSData dataWithContentsOfFile:p options:NSDataReadingMappedIfSafe error:error];if(!data)return nil;
     if(![CSBackupAssets validImage:data])return AssetError(error,@"自定义图片无效或尺寸过大");
     NSString *hash=[CSBackupCodec digest:data];assets[hash]=data;
     return [@"csbackup:" stringByAppendingString:hash];
 }
 static NSString *Materialize(NSString *reference,NSString *name,NSDictionary *assets,NSURL *root,NSMutableDictionary *writes,NSError **error) {
+    if([reference isKindOfClass:NSString.class]&&([reference isAbsolutePath]||[reference hasPrefix:@"file:"])){
+        if(error)*error=CSBackupRestoreError(CSBackupFailure(@"备份包含旧的绝对图片路径，无法仅凭路径找回图片。请在原版本重新导出包含图片资源的 .wcbak；原件未修改。"),@"asset-reference",CSBackupRestoreCompatibility,nil);return nil;
+    }
     if(![reference isKindOfClass:NSString.class]||![reference hasPrefix:@"csbackup:"]||reference.length!=73)return AssetError(error,@"图片引用无效");
     NSString *hash=[reference substringFromIndex:9];NSData *data=assets[hash];
-    if(![data isKindOfClass:NSData.class]||![[CSBackupCodec digest:data] isEqual:hash]||![CSBackupAssets validImage:data])return AssetError(error,@"备份缺少完整的图片资源");
+    if(!data){if(error)*error=CSBackupRestoreError(CSBackupFailure(@"备份引用的图片未包含在文件内，未创建恢复计划，原件已保留。"),@"asset-reference",CSBackupRestoreMissingResource,nil);return nil;}
+    if(![data isKindOfClass:NSData.class]||![[CSBackupCodec digest:data] isEqual:hash]||![CSBackupAssets validImage:data])return AssetError(error,@"备份图片资源校验失败");
     NSString *filename=name ?: [NSString stringWithFormat:@"backup_%@.png",hash];
     NSDictionary *record=@{@"present":@YES,@"data":data};
     if(writes[filename]&&![writes[filename] isEqual:record])return AssetError(error,@"多个配置引用了冲突的固定图片");
@@ -82,7 +93,7 @@ static NSString *Materialize(NSString *reference,NSString *name,NSDictionary *as
                 NSError *readError=nil;NSString *ref=ReadAsset(path,root,assets,&readError);
                 if(ref)f[@"value"]=ref;
                 else if(RecordMissing(path,field,nil,missing)){f[@"present"]=@NO;[f removeObjectForKey:@"value"];}
-                else return AssetError(error,[NSString stringWithFormat:@"%@：图片 %@ 无法完整读取。可在“修复当前配置”中重新选择图片后重试。",CSBackupRegistry.moduleTitles[entry[@"module"]],path.lastPathComponent]);
+                else return AssetReadError(error,[NSString stringWithFormat:@"%@：图片 %@ 无法完整读取。可在“修复当前配置”中重新选择图片后重试。",CSBackupRegistry.moduleTitles[entry[@"module"]],path.lastPathComponent],readError);
             } else if(fallback&&[NSFileManager.defaultManager fileExistsAtPath:fallback]) {
                 NSString *ref=ReadAsset(fallback,root,assets,error);if(!ref)return nil;f[@"fallbackAsset"]=ref;
             }
@@ -94,7 +105,7 @@ static NSString *Materialize(NSString *reference,NSString *name,NSDictionary *as
                     NSError *readError=nil;NSString *ref=ReadAsset(path,root,assets,&readError);
                     if(ref)config[@"separatorImagePath"]=ref;
                     else if(RecordMissing(path,field,contact,missing))[config removeObjectForKey:@"separatorImagePath"];
-                    else return AssetError(error,[NSString stringWithFormat:@"联系人 %@ 的分隔图片无法读取，可在“修复当前配置”中重新选择或清除图片。",contact]);
+                    else return AssetReadError(error,[NSString stringWithFormat:@"联系人 %@ 的分隔图片无法读取，可在“修复当前配置”中重新选择或清除图片。",contact],readError);
                 }
                 contacts[contact]=config;
             }

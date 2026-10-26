@@ -26,6 +26,7 @@ for marker in ['+ (instancetype)adapterForTable:', '+ (instancetype)adapterForCo
                '- (void)pruneNativeActions', '- (void)performNativeBatch:', '- (void)performInNativePresentation:', '- (void)useNativePresentation {']:
     methods.append(method(source, marker))
 for marker, fallback in [('+ (void)setPresentationSuspended:', '+ (void)setPresentationSuspended:(BOOL)value forController:(id)owner { (void)value; (void)owner; }'),
+                         ('- (void)shieldVisiblePrivateRows', '- (void)shieldVisiblePrivateRows {}'),
                          ('- (void)finishSuspendedBatches', '- (void)finishSuspendedBatches {}')]:
     methods.append(method(source, marker) if marker in source else fallback)
 refresh = method(source, '- (void)refresh {')

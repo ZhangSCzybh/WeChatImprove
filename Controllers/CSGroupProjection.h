@@ -25,6 +25,7 @@ typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
 @property (nonatomic, readonly) CSGroupRowCategory category;
 @property (nonatomic, readonly) BOOL top;
 @property (nonatomic, readonly) NSUInteger unreadCount;
+/// Raw native show-as-dot flag. A displayed unread dot also requires a positive count.
 @property (nonatomic, readonly) BOOL redDot;
 @property (nonatomic, readonly) BOOL privacyMasked;
 - (instancetype)initWithNativePath:(NSIndexPath *)nativePath

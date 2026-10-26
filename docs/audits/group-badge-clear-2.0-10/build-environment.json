@@ -1,0 +1,9 @@
+{
+  "buildRoot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-restore-compatibility-build-ujz1jtv7",
+  "strategy": "Incremental build in existing isolated Theos cache; no make clean; previous deb and symbol archives preserved",
+  "previousSymbolsSHA256": "a96cb8bf97df055b9c597bff5e4fada01c26f5c572ec1146a693afcd2bab19a8",
+  "previousPackageSHA256": {
+    "com.wechat.improve_2.0-9_iphoneos-arm.deb": "bb8769b0e48f4c20c53cd3281fa57a1e8678743edb4069c0e4d66a2ac777bfce",
+    "com.wechat.improve_2.0-9_iphoneos-arm64.deb": "9547cde8a79a606e8cf1eaff7e0997a937347dd75bd1da856bbdd869c44f56e0"
+  }
+}

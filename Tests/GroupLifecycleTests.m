@@ -1,18 +1,14 @@
+#import <UIKit/UIKit.h>
 #import "GroupRefreshFixture.h"
+#import "CSCloseFriendListShield.h"
+#import "CSCloseFriendPolicy.h"
+#import "CSGroupProjection.h"
 #import <Foundation/Foundation.h>
 #import <dispatch/dispatch.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
 @class CSGroupListAdapter;
-@interface UITableView : NSObject
-@property(nonatomic) BOOL tracking,dragging,decelerating,editing,hidden;
-@property(nonatomic) double decelerationRate;
-@property(nonatomic,strong) id tableHeaderView;
-@property(nonatomic) NSUInteger reloads;
-- (void)setEditing:(BOOL)value animated:(BOOL)animated;
-- (void)layoutIfNeeded;
-- (void)reloadData;
-@end
+@interface LifecycleTable : UITableView @end
 @interface Host : NSObject
 @property(nonatomic,strong) UITableView *m_tableView;
 @property(nonatomic) BOOL isSearching;
@@ -27,7 +23,7 @@
 @property(nonatomic,copy) NSString *accountID;
 @end
 @implementation CSGroupPreferences @end
-static char AdapterKey, PresentationSuspendedKey;
+static char AdapterKey, PresentationSuspendedKey, CellRowKey;
 static NSString *account=@"account-A";
 static BOOL enabled=YES;
 static BOOL privacyEnabled;
@@ -35,13 +31,13 @@ static BOOL CSGroupPrivacyActive(void) { return privacyEnabled; }
 static NSUInteger accountEpoch=1;
 static NSUInteger CSCloseFriendAccountEpoch(void) { return accountEpoch; }
 static BOOL CSGroupIsFoldedController(id owner) { (void)owner; return NO; }
-@interface PolicyFixture : NSObject
-@property(nonatomic) BOOL blocked;
-@end
-@implementation PolicyFixture @end
-static PolicyFixture *CSCloseFriendCurrentSnapshot(void) { return [PolicyFixture new]; }
+static BOOL policyBlocked;
+static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) {
+    return [[CSCloseFriendSnapshot alloc] initWithAccountID:account profile:@{@"enabled":@(privacyEnabled),@"friends":@[@"secret"],@"groups":@[],@"options":@{}} revealed:NO revision:1 blocked:policyBlocked];
+}
 static NSUInteger scopes,snapshotBuilds;
 static BOOL mutateDuringSnapshot,failPublication,rawPublicationFailure;
+static void (^publicationMutation)(id);
 static NSArray *CSGroupBuildNativeSections(id controller,id table,id source);
 static NSArray *CSGroupBuildNativeSectionsReusing(id controller,id table,id source,NSArray *previous);
 static NSHashTable *Adapters(void) {
@@ -55,7 +51,7 @@ static void CSGroupWithNativeIndices(id table,void (^body)(void)) { (void)table;
 static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table; scopes++; body(); }
 @interface CSGroupListAdapter : NSObject
 CS_GROUP_REFRESH_TEST_PROPERTIES
-@property(nonatomic) NSUInteger modelRevision,snapshotRevision,refreshGeneration;
+@property(nonatomic) NSUInteger modelRevision,snapshotRevision,snapshotEpoch,refreshGeneration;
 @property(nonatomic) BOOL coalescingNotification,scheduledCoalesced,coalescedDispatchPending;
 @property(nonatomic,copy) NSString *snapshotAccount;
 @property(nonatomic,strong) NSArray *cachedNativeSections;
@@ -67,6 +63,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
 @property(nonatomic,strong) id nativeHeader,projection,identityDisplayPaths;
 @property(nonatomic) BOOL chromeVisible,searchChromeVisible,privacyRefreshPending,privacyShielded,privacyTableWasHidden;
+@property(nonatomic,strong) CSCloseFriendListShield *privacyShield;
 @property(nonatomic) CSGroupChangeKind lastPublishedChanges;
 @property(nonatomic,strong) id chrome;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
@@ -82,6 +79,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (void)saveAnchor;
 - (void)refreshNavigationTitle;
 - (void)useNativePresentation;
+- (void)shieldVisiblePrivateRows;
 @end
 @implementation CSGroupListAdapter
 #include "GroupLifecycleBodies.h"
@@ -98,6 +96,8 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
     objc_setAssociatedObject(self.table,&AdapterKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 - (void)publishFixture {
+    [self.privacyShield prepareForPublication];
+    if (publicationMutation) publicationMutation(self);
     self.refreshCount++;
     if (!self.nativePresentation) [self nativeSectionsForAccount:account];
     self.preferences=[CSGroupPreferences new]; self.preferences.accountID=account;
@@ -126,9 +126,7 @@ static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.publishin
 }
 #include "GroupLifecycleHooks.h"
 @end
-@implementation UITableView
-- (void)layoutIfNeeded {}
-- (void)setEditing:(BOOL)value animated:(BOOL)animated { (void)animated; self.editing=value; }
+@implementation LifecycleTable
 #include "GroupLifecycleReload.h"
 @end
 static NSUInteger checks,failures;
@@ -137,12 +135,30 @@ static void Check(BOOL condition,NSString *message) {
 }
 static void RunFor(double interval) { [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:interval]]; }
 static CSGroupListAdapter *List(Host **owner) {
-    Host *host=[Host new]; host.m_tableView=[UITableView new];
+    Host *host=[Host new]; host.m_tableView=[LifecycleTable new];
     [CSGroupListAdapter attachToController:host]; *owner=host;
     return Adapter(host);
 }
+static UITableViewCell *Cell(NSString *name) {
+    UITableViewCell *cell=[[UITableViewCell alloc] initWithFrame:CGRectMake(0,0,320,64)];
+    NSUInteger indexes[]={0,0};
+    CSGroupRow *row=[[CSGroupRow alloc] initWithNativePath:[NSIndexPath indexPathWithIndexes:indexes length:2]
+        userName:name kind:CSGroupRowKindSession category:CSGroupRowCategoryPrivate top:NO unreadCount:0 redDot:NO];
+    objc_setAssociatedObject(cell,&CellRowKey,@{@"row":row,@"account":account},OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    cell.isAccessibilityElement=YES; cell.accessibilityElements=@[@"original-cell"];
+    return cell;
+}
 int main(void) { @autoreleasepool {
     Host *host=nil; CSGroupListAdapter *a=List(&host);
+    if (getenv("CS_PRIVACY_BLANK_PROBE")) {
+        NSUInteger before=a.refreshCount; privacyEnabled=YES;
+        [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:@"willResign" object:nil]];
+        [CSGroupListAdapter closeFriendPolicyChanged:nil];
+        Check(!a.table.hidden,@"switcher lock must keep ordinary list and header visible before returning");
+        Check(a.refreshCount==before+1 && !a.privacyRefreshPending,@"switcher lock must finish safe publication without foreground or another runloop");
+        fprintf(stdout,"Switcher blank boundary: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
+        return failures ? 1 : 0;
+    }
     NSUInteger before=a.refreshCount, layouts=a.layoutCount;
     [host viewWillDisappear:YES]; [host viewDidDisappear:YES]; RunFor(.02);
     Check(a.presentationSuspended && host.originalCalls==2,@"native disappearance runs and suspends grouping");
@@ -259,7 +275,7 @@ int main(void) { @autoreleasepool {
     [host viewWillAppear:NO];
     Check(a.refreshCount==1 && !a.presentationSuspended,@"replacement table initializes once when owner returns");
 
-    UITableView *chat=[UITableView new]; NSUInteger scopesBefore=scopes;
+    UITableView *chat=[LifecycleTable new]; NSUInteger scopesBefore=scopes;
     [chat reloadData];
     Check(chat.reloads==1 && scopes==scopesBefore,@"unrelated chat table reload bypasses grouping scopes");
     a=List(&host); [host viewWillDisappear:NO]; [a beginNativeChange];
@@ -352,7 +368,7 @@ int main(void) { @autoreleasepool {
     [CSGroupListAdapter closeFriendPolicyChanged:nil];
     Check(a.refreshCount==before+1 && !a.table.hidden && !a.privacyRefreshPending,@"privacy refresh bypasses tracking/edit/menu deferral and republishes immediately");
     [a beginNativeChange]; before=a.refreshCount; [CSGroupListAdapter closeFriendPolicyChanged:nil];
-    Check(a.table.hidden && a.privacyRefreshPending && a.refreshCount==before,@"policy change immediately hides old cells while native transaction is open");
+    Check(!a.table.hidden && a.privacyRefreshPending && a.refreshCount==before,@"policy change preserves list container while native transaction is open");
     [a endNativeChange]; RunFor(.03);
     Check(!a.table.hidden && a.refreshCount==before+1,@"transaction completion publishes current privacy and releases temporary shield");
     a.table.tracking=NO; a.table.editing=NO; a.menuState=0;
@@ -362,6 +378,83 @@ int main(void) { @autoreleasepool {
     accountEpoch++; [a refresh];
     Check(actions==actionBefore && !a.nativeActions.count,@"same-account epoch replacement discards queued native action");
     privacyEnabled=NO; enabled=YES;
+    // Device recording: opening the switcher locks close friends while the list
+    // is still visible. The privacy publication must not wait for foreground.
+    a=List(&host); before=a.refreshCount; privacyEnabled=YES;
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:@"willResign" object:nil]];
+    [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(!a.table.hidden,@"switcher privacy lock keeps the list/header container visible (no title-only frame)");
+    Check(a.refreshCount==before+1 && !a.privacyRefreshPending,@"switcher privacy lock synchronously publishes safe rows before foreground");
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:UIApplicationDidBecomeActiveNotification object:nil]];
+    RunFor(.03); privacyEnabled=NO;
+
+    // Deferred publication: suppress only private cells, with no visual transition.
+    a=List(&host); privacyEnabled=YES;
+    UIWindow *window=[UIWindow new]; [window addSubview:a.table];
+    UITableViewCell *ordinary=Cell(@"ordinary"), *secret=Cell(@"secret");
+    a.table.visibleCells=@[ordinary,secret]; [a.table addSubview:ordinary]; [a.table addSubview:secret];
+    UIView *header=[UIView new]; a.table.tableHeaderView=header;
+    [a beginNativeChange]; before=a.refreshCount;
+    UIApplication.sharedApplication.applicationState=UIApplicationStateInactive;
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:@"willResign" object:nil]];
+    [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(!a.table.hidden && a.table.tableHeaderView==header && !ordinary.subviews.count,@"native transaction preserves header and ordinary conversation during switcher lock");
+    Check(secret.hidden && !secret.subviews.count,@"pending private row disappears silently without adding a placeholder");
+    Check(secret.hidden && !ordinary.hidden && !a.table.hidden,@"only private cell is excluded from rendering, interaction and accessibility");
+    [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(secret.hidden && !secret.subviews.count && a.refreshCount==before,@"repeated policy events remain silent and never publish inside native mutation");
+    [a endNativeChange]; RunFor(.03);
+    Check(a.refreshCount==before+1 && !a.privacyRefreshPending && !a.table.hidden && !secret.hidden,@"inactive native transaction completion releases cell suppression after one safe publication");
+    Check(secret.userInteractionEnabled && secret.isAccessibilityElement && [secret.accessibilityElements isEqual:@[@"original-cell"]],@"publication releases row interaction and accessibility ownership");
+    CAKeyframeAnimation *shake=(id)[a.table.layer animationForKey:@"CSCloseFriendHideShake"];
+    CAKeyframeAnimation *settle=(id)[a.table.layer animationForKey:@"CSCloseFriendHideSettle"];
+    Check(!shake,@"silent hiding must not submit a shake animation");
+    Check(!settle && CATransform3DIsIdentity(a.table.layer.transform),@"silent hiding must not submit a scale animation or change table transform");
+    a.table.visibleCells=@[ordinary]; [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check([a.table.layer animationForKey:@"CSCloseFriendHideShake"]==nil,@"repeated lock remains silent with no delayed animation");
+    before=a.refreshCount; [a requestRefresh]; RunFor(.03);
+    Check(a.refreshCount==before && !a.scheduled,@"privacy exception does not enable passive background refresh loops");
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:UIApplicationDidEnterBackgroundNotification object:nil]];
+    Check(![a.table.layer animationForKey:@"CSCloseFriendHideShake"] && ![a.table.layer animationForKey:@"CSCloseFriendHideSettle"],@"true background contains no hiding animation");
+    UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:UIApplicationDidBecomeActiveNotification object:nil]];
+    RunFor(.03);
+    // Reduce Motion / suspension never depend on an animation completion callback.
+    CSTestReduceMotionEnabled=YES; a.table.visibleCells=@[secret]; [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(!secret.hidden && !secret.subviews.count && ![a.table.layer animationForKey:@"CSCloseFriendHideShake"],@"Reduce Motion also completes silent privacy publication without any overlay");
+    CSTestReduceMotionEnabled=NO; UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
+    [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(!secret.subviews.count && ![a.table.layer animationForKey:@"CSCloseFriendHideShake"],@"already-background lock never starts a suspended animation");
+    UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+    [host viewWillDisappear:NO]; before=a.refreshCount; [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(a.refreshCount==before && secret.hidden && !a.table.hidden,@"offscreen owner stays deferred with private rows suppressed, not a hidden table");
+    [host viewWillAppear:NO];
+    Check(!secret.hidden && a.refreshCount==before+1,@"return from protected chat publishes and releases cell suppression");
+    a.table.visibleCells=@[ordinary,secret]; policyBlocked=YES; [a beginNativeChange]; [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(ordinary.hidden && secret.hidden && !a.table.hidden,@"unreadable policy suppresses unknown rows without removing list chrome");
+    policyBlocked=NO; [a endNativeChange]; RunFor(.03);
+    a.table.hidden=YES; [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(a.table.hidden,@"privacy publication preserves pre-existing native table visibility");
+    a.table.hidden=NO;
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:@"willResign" object:nil]];
+    privacyEnabled=NO; before=a.refreshCount; [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(a.refreshCount==before && a.privacyRefreshPending,@"inactive exception cannot publish a reveal or unlock");
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:UIApplicationDidBecomeActiveNotification object:nil]];
+    RunFor(.03);
+    a=List(&host); privacyEnabled=YES; secret=Cell(@"secret"); a.table.visibleCells=@[secret];
+    publicationMutation=^(id current){ if (current==a) [NSException raise:@"FixtureNativePublicationFailure" format:@"native reload interrupted"]; };
+    BOOL threw=NO;
+    @try { [CSGroupListAdapter closeFriendPolicyChanged:nil]; } @catch (NSException *exception) { threw=[exception.name isEqual:@"FixtureNativePublicationFailure"]; }
+    Check(threw && a.privacyRefreshPending && secret.hidden && !a.table.hidden,@"failed native publication suppresses private rows before unwinding without blanking list");
+    publicationMutation=^(id current){ if (current==a) { secret.isAccessibilityElement=YES; secret.accessibilityElements=@[@"new-native-cell"]; secret.userInteractionEnabled=NO; } };
+    [a refresh]; publicationMutation=nil;
+    Check(!secret.subviews.count && secret.isAccessibilityElement && [secret.accessibilityElements isEqual:@[@"new-native-cell"]] && !secret.userInteractionEnabled,@"cell reuse keeps freshly configured accessibility and interaction after publication");
+    NSString *previousAccount=account; account=@""; policyBlocked=YES;
+    [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(secret.hidden && !a.table.hidden,@"account-unavailable fallback suppresses private rows after native reload without hiding table");
+    account=previousAccount; policyBlocked=NO; [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    Check(!secret.hidden,@"resolved account releases cell suppression after safe publication");
+    privacyEnabled=NO;
     fprintf(stdout,"Group lifecycle: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;
 } }

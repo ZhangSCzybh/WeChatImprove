@@ -1,6 +1,7 @@
 #import "CSBackupCodec.h"
 #import "CSBackupRegistry.h"
 #import "CSBackupAssets.h"
+#import "CSBackupRestoreDiagnostics.h"
 #import <CommonCrypto/CommonDigest.h>
 #import <CoreFoundation/CoreFoundation.h>
 #include <math.h>
@@ -47,7 +48,7 @@ static void Canonical(id v,NSMutableData *out) {
 static BOOL Validate(NSDictionary *s,NSError **error) {
     NSUInteger nodes=0;
     if(![s isKindOfClass:NSDictionary.class]||!Bounded(s,0,&nodes))return Fail(error,@"备份结构、大小或嵌套层级无效");
-    if(![s[@"magic"] isEqual:@"WeChatImproveBackup"]||![s[@"formatVersion"] isEqual:@2])return Fail(error,@"不支持此备份格式版本");
+    if(![s[@"magic"] isEqual:@"WeChatImproveBackup"]||![s[@"formatVersion"] isEqual:@2]){if(error)*error=CSBackupRestoreError(CSBackupFailure(@"不支持此备份格式版本；请使用原版本导出当前支持的 v2 .wcbak，原件已保留。"),@"format",CSBackupRestoreCompatibility,nil);return NO;}
     if(!Text(s[@"id"],64)||![[NSUUID alloc] initWithUUIDString:s[@"id"]]||!Text(s[@"name"],128)||![s[@"name"] length]||![s[@"createdAt"] isKindOfClass:NSDate.class])return Fail(error,@"备份名称、标识或创建时间无效");
     if(![@[@"manual",@"automatic",@"protection",@"upgrade",@"imported"] containsObject:s[@"kind"]])return Fail(error,@"备份类型无效");
     NSDictionary *source=s[@"source"];

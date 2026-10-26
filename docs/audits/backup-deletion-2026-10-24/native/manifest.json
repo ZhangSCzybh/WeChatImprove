@@ -1,0 +1,247 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "disassembly": [
+    {
+      "file": "MMDiskUsageUtil--DeleteBizUnknowFile_.asm",
+      "start": "0x1029c9484",
+      "stop": "0x1029c9508",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageUtil--DeleteBizUnknowDir_.asm",
+      "start": "0x1029c958c",
+      "stop": "0x1029c9610",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageUtil--moveFileToTmpTrash_description_.asm",
+      "start": "0x1029c9610",
+      "stop": "0x1029c9954",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageUtil--moveFolderToTmpTrash_description_.asm",
+      "start": "0x1029c9954",
+      "stop": "0x1029c9c38",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageUtil--pathOfTrashFile.asm",
+      "start": "0x1029c9c7c",
+      "stop": "0x1029c9cf0",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageUtil--pathOfTrashFolder.asm",
+      "start": "0x1029c9d88",
+      "stop": "0x1029c9dfc",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageUtil--pathOfTrash.asm",
+      "start": "0x1029c9e94",
+      "stop": "0x1029c9f08",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageUtil--removePath_.asm",
+      "start": "0x1029ca44c",
+      "stop": "0x1029ca620",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageUtil--movePath_to_.asm",
+      "start": "0x1029ca620",
+      "stop": "0x1029ca86c",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageUtil--RemoveUnneedDiskScanTrash.asm",
+      "start": "0x1029caf84",
+      "stop": "0x1029cb4f0",
+      "truncated": false
+    },
+    {
+      "file": "CBaseFile--RemoveFile_.asm",
+      "start": "0x1175f12ec",
+      "stop": "0x1175f15fc",
+      "truncated": false
+    },
+    {
+      "file": "CBaseFile--ClearPath_.asm",
+      "start": "0x1175f15fc",
+      "stop": "0x1175f1ad4",
+      "truncated": false
+    },
+    {
+      "file": "CBaseFile--SyncClearPath_.asm",
+      "start": "0x1175f1ad4",
+      "stop": "0x1175f1e50",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageScaner--scanBeginWithRootFolderWithScanConfig_withScanData_.asm",
+      "start": "0x1029bdec8",
+      "stop": "0x1029be35c",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageScaner--handleDeleteFolder_withFolderPath_withScanStat_.asm",
+      "start": "0x1029be55c",
+      "stop": "0x1029be7c0",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageScaner--scanFileInFolder_withFolderPath_withScanConfig_.asm",
+      "start": "0x1029beedc",
+      "stop": "0x1029c145c",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageScaner--deleteFile_matchInfo_inFolder_withScanConfig_fileSize_logicFileSize_latestTimeInterval_.asm",
+      "start": "0x1029c27f0",
+      "stop": "0x1029c3378",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageConfigHandler--init.asm",
+      "start": "0x1029aba90",
+      "stop": "0x1029abae8",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageConfigHandler--loadConfigFromX.asm",
+      "start": "0x1029abae8",
+      "stop": "0x1029abc80",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageMgr--onServiceEnterForeground.asm",
+      "start": "0x1029b3358",
+      "stop": "0x1029b3410",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageMgr--startWholeScan_quickScan_completion_.asm",
+      "start": "0x1029b3af4",
+      "stop": "0x1029b3f10",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageMgr--wholeWechatScan_.asm",
+      "start": "0x1029b3f10",
+      "stop": "0x1029b4554",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageMgr--finishScanPhase.asm",
+      "start": "0x1029b47e8",
+      "stop": "0x1029b499c",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageMgr--startFinishScanDiskWithUrgentLevel_.asm",
+      "start": "0x1029b49f4",
+      "stop": "0x1029b4f78",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageMgr--p_shouldFinishScanWithUrgentLevel_.asm",
+      "start": "0x1029b6b20",
+      "stop": "0x1029b6d48",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageScanData--scanRootDir.asm",
+      "start": "0x1029b095c",
+      "stop": "0x1029b09b8",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskBizUsageHandler--loadPathMatchRulesWithOtherUser_.asm",
+      "start": "0x10299e608",
+      "stop": "0x10299f138",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskBizUsageHandler--matchBizWithChildFolder_parentFolder_.asm",
+      "start": "0x1029a010c",
+      "stop": "0x1029a0568",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskBizUsageHandler--fileMatchedBizType_inFolder_.asm",
+      "start": "0x1029a0568",
+      "stop": "0x1029a0868",
+      "truncated": false
+    },
+    {
+      "file": "MMDiskUsageScanData--scanRootDir.asm",
+      "start": "0x1029b095c",
+      "stop": "0x1029b09b8",
+      "truncated": false
+    }
+  ],
+  "files": {
+    "CBaseFile--ClearPath_.asm": "fe039a9d5f053508919f3347572bbc16718521b044ebda2a4ac954bdeff90f2b",
+    "CBaseFile--RemoveFile_.asm": "2329791645dc873f2a9c6071af5601e83e21d4d8a4d35e078e3b6c9207b2d69d",
+    "CBaseFile--SyncClearPath_.asm": "d1a2859fba4c595b0fca0e23aaeccfa8a4e0ecf5f14171dae57e9b24224bb5c6",
+    "MMCleanCacheMgr--applyCleanBlockForClassification_weAppInfo_.asm": "17c5c057954c9a3c3cd07f38c1a6c1cf0bf2bf927c1730c119f8379d248f09f5",
+    "MMCleanCacheMgr--cleanAppOtherCache.asm": "c34050cf594fb2f37027aadbe2ad6b4df2ff4bac52327eaa592dd664cab185d4",
+    "MMCleanCacheMgr--p_cleanCacheAudio.asm": "ab0703b097b22ef32f683cdabe27b82d6f88014f3d2a04577a8ec762cd6ba444",
+    "MMCleanCacheMgr--p_cleanCachesWebkit.asm": "03d5118cef94a394cbbaac912965c25ab5bd0ef3143671b4d09c46fa8f529f64",
+    "MMCleanCacheMgr--p_cleanTmpPath.asm": "d38577bfb3b99eb8fc5292a7234a6ff04f64a582596fd989b61702b71247b289",
+    "MMDiskBizUsageHandler--fileMatchedBizType_inFolder_.asm": "ab804795eb51cb9c3593f2c993fec0c41fd9e20338fbdd5d685643c43e95efc1",
+    "MMDiskBizUsageHandler--loadPathMatchRulesWithOtherUser_.asm": "acfbf3fbf70a67f66ffc55185ab1d4dd9a130024db8d71caa4d6d68347547cf7",
+    "MMDiskBizUsageHandler--matchBizWithChildFolder_parentFolder_.asm": "e2a3724554383b46bee007c005007480fd564a9a6a61f5265dfe3ad7c18ece8f",
+    "MMDiskUsageConfigHandler--init.asm": "7ff2a1f04ae5a06324bc72e61a768df5a55eeece2cf31daf0d70b640e884b5e2",
+    "MMDiskUsageConfigHandler--loadConfigFromX.asm": "ccb09b09f9d0bb0a062e8d85b9eaba3a7e918532db153421949fa99f06695971",
+    "MMDiskUsageMgr--finishScanPhase.asm": "30b76f175dbbb7064f88c06a0109fe4a0e2f2f9ad5ba367631c4598c861ee7a5",
+    "MMDiskUsageMgr--onServiceEnterForeground.asm": "479808fdda51acac5b68778b88e9e4528f2f6aa0e84e386d0ca3b19612e3f79a",
+    "MMDiskUsageMgr--p_shouldFinishScanWithUrgentLevel_.asm": "fef0f8e61b469509c18b7fa9fdcf03f1befba55a073460feb4d695b5bc4d4ff7",
+    "MMDiskUsageMgr--startFinishScanDiskWithUrgentLevel_.asm": "97bd3d5ab6e804e7ce9698202136dafb6c8aa53777c5a6e1c6d821982a33a911",
+    "MMDiskUsageMgr--startWholeScan_quickScan_completion_.asm": "b5406c978cb25ea4487d0705244773925b5439edb68e5fed7127cbaa51182b63",
+    "MMDiskUsageMgr--wholeWechatScan_.asm": "66e3845d37dfbbf70fc71f9b2771b2ab48107e6e7b77d355263eb2dbea5f0f70",
+    "MMDiskUsageScanData--scanRootDir.asm": "db69d5e44b1b68ef60c3f71fb548126901d521629348b8cd3c94cb40386d1b6b",
+    "MMDiskUsageScaner--deleteFile_matchInfo_inFolder_withScanConfig_fileSize_logicFileSize_latestTimeInterval_.asm": "c53951f3c15fa599b9a7788f582e89b2bf537a837e61e2e519e405bf05fcfbd0",
+    "MMDiskUsageScaner--handleDeleteFolder_withFolderPath_withScanStat_.asm": "699049738ac178691ee99448102c3ce38ed304dea4c3c1f737d8171a4b4cd4d4",
+    "MMDiskUsageScaner--scanBeginWithRootFolderWithScanConfig_withScanData_.asm": "8a74a9ec6a4c6d0aeb56e0c70fd332d543aaec5bb56005baf6c3aaf77472691d",
+    "MMDiskUsageScaner--scanFileInFolder_withFolderPath_withScanConfig_.asm": "c61962e0de6b37ae9c190a3fa48fa7d78aad58dfb060024717a289cfd09eab38",
+    "MMDiskUsageUtil--DeleteBizUnknowDir_.asm": "4b25cba96bf20b6090783f12e25398e43d869af859c04c7ddaf52b4b738e9049",
+    "MMDiskUsageUtil--DeleteBizUnknowFile_.asm": "1c51ad1f99973e84a6931335c9f10fb35294075d278afe29bb30de9141ab6a43",
+    "MMDiskUsageUtil--RemoveUnneedDiskScanTrash.asm": "03f9d5e2c73cf8261a426c1eec06abf3b15be596dbd7db82078a554971570416",
+    "MMDiskUsageUtil--moveFileToTmpTrash_description_.asm": "10c59b181a6d727d4cdd375e400be0ee56349edefaec983d585e433e28ddde09",
+    "MMDiskUsageUtil--moveFolderToTmpTrash_description_.asm": "520423c899717cb748937e902124c51ee3a7a7af72eed4116f350a413515c67a",
+    "MMDiskUsageUtil--movePath_to_.asm": "0eba06ac07d27dcc6c1ec031a3867c7dc611b7fe2afd86f643de641249b7c0ce",
+    "MMDiskUsageUtil--pathOfTrash.asm": "0bebf2cbffef2f8fcdbe3f45436f75e358e332385c504b49d7b84a985138abfb",
+    "MMDiskUsageUtil--pathOfTrashFile.asm": "160de75d67d3e557c57397c4c84d4ef8dea9857f494a6c230ed2cddde32a25bd",
+    "MMDiskUsageUtil--pathOfTrashFolder.asm": "35dd04aeee778aeed011918bd7525476b87b9b77379399c195ce231ee530efdf",
+    "MMDiskUsageUtil--removePath_.asm": "88b60b8ea2ec0048fa7f2cd38743aa92bd24c97b027e8abef56eafee17ae6d41",
+    "MMLiveStorageCleanupLogic--cleanupFilesInDirectory_forScenario_withFileReferences_enableVerboseLogging_.asm": "58246a2e3c8a568337660add250f54ad96eecf6f09c1655e9da0e5d090cf69b2",
+    "MMLiveStorageCleanupLogic--cleanupStorageWithScenario_.asm": "37cf81d478ad810ea25f8cc7c8bfc8e1305246a72f7d4ffe33d8acbc4a17a24f",
+    "MMLiveStorageCleanupLogic--markFilesRecursivelyInDirectory_forDeviationDirectiveType_enableVerboseLogging_.asm": "a805570d162e93ec772ac9982e075eae2b5df8f74eacb5aa3dbc6d0400bbb0d2",
+    "MMLiveStorageCleanupStaticResponder--willBeginStorageCleanupInScenario_withContext_.asm": "7fcb37b58185dafc231fc884918e72a4e377f64209db4b03c49b55b963cc8263",
+    "compiled-path-rules.json": "58b90df8cdf049990f60b6572b0a49d34fee2443ed04cd85b73bf27efd0cd67f",
+    "decode-rules-table.py": "306505823ad08e1b380070edc0fa345167683882bb51cfdd4005046d214099f6",
+    "disassemble.py": "3b0febc70a66f62cafb613cab8bece48b2c2c8e88e9368fba8bcfca2e3e3fff9",
+    "extract.py": "e820f520843f805ae58e58836f47e9c2f7299ab55149b8a151b2c5eae41248ef",
+    "library-path-rules.json": "362e20fa3b0ca30b9dc69b15c1e00f33c64b1441cfa31fac5b7f48152cc17c96",
+    "methods.json": "f7108e1d000f5b387190fff7ed33c701eac832a91be132cb81515714203126e6",
+    "path-rule-findings.md": "d247209da007e275e12ebe916294957161c72dda640e094645e23e355adc2644",
+    "pathOfTrash-block.asm": "016b14e08c52433417b77026cadaa4b260c34aa8d3e865c2365141429773e1c1",
+    "pathOfTrashFile-block.asm": "ce4736ea4cabaa057387502d5ad8c2aae8a46e17f10e7d72462a0850929e8081",
+    "pathOfTrashFolder-block.asm": "c9fab0895e8327e97aec0878a131ed01e4f27813bae384cf32327d1dc98be389",
+    "rules-addPathComponent_withRule_toRootNode_supportModify_.asm": "3f9065227f48696c18c4f2814103c6040f5d39122082b5e579821c55975a8c5c",
+    "rules-node-init.asm": "63c03e43461322c5adee1bec853c4f5d082306a15ffea6cce5969dbf800353a8",
+    "rules-node-isMarkBizFileNode.asm": "fbaee3f82d2051ceb96b27d0f4f7e876c4844fda03ff42bf8a25b957f0cad11a",
+    "rules-node-isMatchWithName_.asm": "c0c03137dd4c6434560a0c67f8006448f49ff4d3ef40f5db5802b0dec05b9592",
+    "rules-node-methods.json": "f13863fbd22a217b78ce46abfa041f0d06f86a8482ae31f1c25e44903ef7ce8e",
+    "rules-p_isRuleValid_.asm": "5d8160fcc53ca67a220aa9bc7af08b382a2adef053e0ae44571cedd3624434e1",
+    "rules-p_validateStoreTimeType_.asm": "396f4c905d388db059e0a679037709f76f729174622d4b7e1d2cc08c2b631db6",
+    "rules-ruleDescription_.asm": "037d082beadece099a7cadb62baa1bb6080261d8dd5a6330716c4ebf4f2532e4",
+    "rules-table-initializer.asm": "1e615f016afd856adece16769e022ad5a3885b9e5c878fa8a8600cd50a52c4fe",
+    "trash-base-import.txt": "fd66883064f30d10a28b4250fdcba2d99348a9472d9ffd19097cd434a3501b96"
+  }
+}

@@ -71,18 +71,21 @@ static id CSCloseFriendRead(id object,NSString *key) {return [object isKindOfCla
 @property(nonatomic) NSUInteger recoveryEpoch;
 @property(nonatomic) BOOL lastRevealed,changeAccountOnRefresh;
 @property(nonatomic,strong) RecoveryRuntime *runtime;
+@property(nonatomic) NSUInteger authenticationRequests;
 - (void)refreshAccount;
 - (void)refreshRecoveryGesture;
 - (void)recovery:(UILongPressGestureRecognizer *)gesture;
 @end
 @implementation RecoveryManager
 - (void)refreshAccount {if(self.changeAccountOnRefresh)epoch++;}
+- (void)authenticateFrom:(__unused UIViewController *)presenter completion:(void (^)(BOOL))completion {self.authenticationRequests++;completion(NO);}
 #import "ManagerRecoveryUnderTest.h"
 @end
 static NSUInteger checks;
+static BOOL biometric;
 #define Check(x, message) do {checks++;if(!(x)){fprintf(stderr,"FAIL: %s\n",message);exit(1);}} while(0)
 static void Policy(BOOL enabled,BOOL shortcut,double duration,BOOL blocked) {
-    snapshot=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"gesture-fixture" profile:@{@"enabled":@(enabled),@"friends":@[],@"groups":@[],@"options":@{@"longPressUnlockEnabled":@(shortcut),@"longPressUnlockDuration":@(duration)}} revealed:NO revision:epoch blocked:blocked];
+    snapshot=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"gesture-fixture" profile:@{@"enabled":@(enabled),@"friends":@[],@"groups":@[],@"options":@{@"biometric":@(biometric),@"longPressUnlockEnabled":@(shortcut),@"longPressUnlockDuration":@(duration)}} revealed:NO revision:epoch blocked:blocked];
 }
 int main(void) {@autoreleasepool {
     RecoveryManager *manager=[RecoveryManager new];manager.runtime=[RecoveryRuntime new];
@@ -116,5 +119,10 @@ int main(void) {@autoreleasepool {
     Policy(YES,YES,1,NO);UINavigationBar *oldBar=page.navigationController.navigationBar;page.navigationController.navigationBar=[UINavigationBar new];[manager attachRecoveryGestureTo:page];
     Check(!gesture.enabled && manager.recoveryGesture!=gesture && oldBar.gestures.count==1,"moving to a new navigation bar disables old recognizer");
     [manager recovery:gesture];Check(manager.runtime.reveals==2,"obsolete recognizer cannot unlock");
+    biometric=YES;Policy(YES,YES,1,NO);[manager refreshRecoveryGesture];
+    manager.recoveryGesture.state=UIGestureRecognizerStateBegan;[manager recovery:manager.recoveryGesture];
+    Check(manager.authenticationRequests==1 && manager.runtime.reveals==2,"biometric-enabled long press must authenticate and cannot reveal on failure");
+    biometric=NO;Policy(YES,YES,1,NO);[manager recovery:manager.recoveryGesture];
+    Check(manager.authenticationRequests==1 && manager.runtime.reveals==3,"biometric-disabled long press retains existing shortcut behavior");
     printf("CloseFriendRecoveryTests: %lu checks passed\n",(unsigned long)checks);
 }return 0;}

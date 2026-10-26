@@ -3,6 +3,7 @@
 NOTIFICATION(UIApplicationWillResignActiveNotification);
 NOTIFICATION(UIApplicationDidEnterBackgroundNotification);
 NOTIFICATION(UIApplicationDidBecomeActiveNotification);
+NOTIFICATION(UIApplicationProtectedDataWillBecomeUnavailable);
 NOTIFICATION(UISceneWillDeactivateNotification);
 NOTIFICATION(UISceneDidEnterBackgroundNotification);
 NOTIFICATION(UISceneDidActivateNotification);
@@ -16,6 +17,7 @@ BOOL CSTestCompleteAnimationsImmediately = YES;
 NSUInteger CSTestAnimationStartCount;
 BOOL CSTestSnapshotFails;
 NSUInteger CSTestSnapshotCount;
+NSUInteger CSTestAnimationSuppressionDepth;
 static NSMutableArray<UIViewPropertyAnimator *> *running;
 static UIViewPropertyAnimator *recordingAnimator;
 @interface UIViewPropertyAnimator ()
@@ -84,12 +86,33 @@ void CSTestFinishAnimations(void) {
 }
 @end
 
-@implementation UIView
+// Unattached host layers discard animations at transaction commit. Keep the
+// submitted production animations observable; this does not simulate rendering.
+@interface CSFixtureLayer : CALayer
+@property(nonatomic,strong) NSMutableDictionary *submittedAnimations;
+@end
+@implementation CSFixtureLayer
+- (void)addAnimation:(CAAnimation *)animation forKey:(NSString *)key {
+    if (!self.submittedAnimations) self.submittedAnimations=[NSMutableDictionary new];
+    self.submittedAnimations[key]=[animation copy];
+}
+- (CAAnimation *)animationForKey:(NSString *)key { return self.submittedAnimations[key]; }
+- (void)removeAnimationForKey:(NSString *)key { [self.submittedAnimations removeObjectForKey:key]; }
+@end
+@implementation UIView {
+    CALayer *_fixtureLayer;
+}
+- (CALayer *)layer { if (!_fixtureLayer) _fixtureLayer=[CSFixtureLayer layer]; return _fixtureLayer; }
+- (UIView *)window { return [self isKindOfClass:UIWindow.class] ? self : self.superview.window; }
 - (instancetype)init {
     if ((self = [super init])) { _alpha = 1; _userInteractionEnabled = YES; _subviews = [NSMutableArray array]; }
     return self;
 }
-+ (void)performWithoutAnimation:(void (^)(void))actions { actions(); }
+- (instancetype)initWithFrame:(CGRect)frame { if((self=[self init]))self.frame=frame; return self; }
++ (void)performWithoutAnimation:(void (^)(void))actions {
+    CSTestAnimationSuppressionDepth++;
+    @try { actions(); } @finally { CSTestAnimationSuppressionDepth--; }
+}
 - (void)setFrame:(CGRect)frame { _frame = frame; _bounds.size = frame.size; }
 - (void)addSubview:(UIView *)view { [view removeFromSuperview]; view.superview = self; [self.subviews addObject:view]; }
 - (void)bringSubviewToFront:(UIView *)view {
@@ -106,6 +129,19 @@ void CSTestFinishAnimations(void) {
     [recordingAnimator recordAlphaForView:self from:_alpha to:alpha]; _alpha = alpha;
 }
 - (void)testApplyAnimatedAlpha:(CGFloat)alpha { _alpha = alpha; }
+@end
+@implementation UIColor
++ (instancetype)systemBackgroundColor {return [self new];}
++ (instancetype)secondaryLabelColor {return [self new];}
+@end
+@implementation UIFont
++ (instancetype)preferredFontForTextStyle:(NSString *)style { (void)style; return [self new]; }
+@end
+@implementation UILabel @end
+@implementation UITableViewCell @end
+@implementation UITableView
+- (void)setEditing:(BOOL)value animated:(BOOL)animated { (void)animated; self.editing=value; }
+- (void)reloadData { self.reloads++; }
 @end
 @implementation UIViewController @end
 @implementation UIWindow @end

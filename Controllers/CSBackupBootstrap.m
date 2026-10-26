@@ -1,5 +1,6 @@
 #import "CSBackupBootstrap.h"
 #import "CSBackupManager.h"
+#import "CSPluginStorage.h"
 #import "CSUserInfoHelper.h"
 #import <stdatomic.h>
 #import <sys/stat.h>
@@ -95,10 +96,12 @@ static CSBackupStartupGate *CSBackupSharedGate(void) {
     static CSBackupStartupGate *gate;
     static dispatch_once_t once;
     dispatch_once(&once, ^{
-        NSURL *library = [NSFileManager.defaultManager URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask].firstObject;
-        NSURL *journal = [library URLByAppendingPathComponent:@"Application Support/WeChatImprove/BackupV2/transaction.plist"];
-        NSString *protectedVersion = [NSUserDefaults.standardUserDefaults stringForKey:@"com.wechat.enhance.backup.protectedVersion"];
-        gate = [[CSBackupStartupGate alloc] initWithNeedsResolution:CSBackupStartupNeedsResolution(journal, protectedVersion, kPluginVersionString)
+        CSPluginDirectoryMigration *migration=CSPluginStorageMigration(@"BackupV2");
+        [migration migrate:NULL]; // Raw filesystem relocation precedes journal detection.
+        BOOL needsResolution=NO;
+        for(NSURL *root in @[migration.destinationRoot,migration.legacyRoot])
+            needsResolution |= CSBackupStartupNeedsResolution([root URLByAppendingPathComponent:@"transaction.plist"],nil,kPluginVersionString);
+        gate = [[CSBackupStartupGate alloc] initWithNeedsResolution:needsResolution
             resolver:^(CSBackupStartupCompletion completion) {
                 [CSBackupManager.sharedManager resolveStartup:^(id result, NSError *error) {
                     completion(error ?: (result ? nil : [NSError errorWithDomain:@"CSBackupStartup" code:2 userInfo:@{NSLocalizedDescriptionKey:@"启动配置尚未完成校验，可在备份与恢复中重试或取消。"}]));

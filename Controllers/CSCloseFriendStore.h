@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+@class CSPluginDirectoryMigration;
 NS_ASSUME_NONNULL_BEGIN
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +14,12 @@ typedef NS_ENUM(NSInteger, CSCloseFriendStoreErrorCode) {
 /// Reads/writes are serialized in-process. Never mutate the directory from another process.
 @interface CSCloseFriendStore : NSObject
 @property(nonatomic, copy, readonly) NSURL *root;
+/// Production readers must only retrieve an existing key, even if another process removes the file after it was read.
+/// Nil preserves the original keyProvider contract for isolated/custom stores.
+@property(nonatomic, copy, nullable) CSCloseFriendKeyProvider readKeyProvider;
 - (instancetype)initWithRoot:(NSURL *)root keyProvider:(CSCloseFriendKeyProvider)keyProvider;
+/// Production store: preserves ciphertext during migration and never writes into the legacy directory.
+- (instancetype)initWithMigration:(CSPluginDirectoryMigration *)migration keyProvider:(CSCloseFriendKeyProvider)keyProvider;
 /// A missing file returns nil and CSCloseFriendStoreErrorMissing; unreadable data never becomes an empty profile.
 - (nullable NSDictionary *)loadStateForAccountID:(NSString *)accountID error:(NSError **)error;
 /// Refuses to overwrite existing corrupt, incompatible or wrongly keyed bytes. Atomic, protected, readback-verified replacement.

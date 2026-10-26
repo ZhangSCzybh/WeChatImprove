@@ -11,6 +11,9 @@ FOUNDATION_EXPORT NSString * const CSBackgroundBlurSettingsChangedNotification;
 + (instancetype)sharedManager;
 /// Injectable preferences keep host-side tests away from the user's configuration.
 - (instancetype)initWithDefaults:(NSUserDefaults *)defaults;
+/// Read the effective setting, including changes made by another defaults instance.
+/// Background privacy covers use the same switch; authorization is independent.
+- (BOOL)isEnabled;
 /// Called on the main thread by the tweak entry point; repeated calls are safe.
 - (void)start;
 @end

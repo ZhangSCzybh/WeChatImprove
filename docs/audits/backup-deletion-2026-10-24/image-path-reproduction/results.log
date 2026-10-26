@@ -1,0 +1,26 @@
+PASS normal-image: genuine manual snapshot published
+PASS normal-image: backup directory preserved
+PASS normal-image: manual snapshot remains readable
+PASS normal-image: current capture rejects backup-directory image path
+PASS normal-image: current restore rejects raw backup-directory image path
+PASS directory-default: genuine manual snapshot published
+PASS directory-default: whole backup directory removed
+PASS directory-default: production list silently recreates empty directory
+PASS directory-default: current capture rejects backup-directory image path
+PASS directory-default: current restore rejects raw backup-directory image path
+PASS ancestor-default: genuine manual snapshot published
+PASS ancestor-default: whole backup directory removed
+PASS ancestor-default: production list silently recreates empty directory
+PASS ancestor-default: current capture rejects backup-directory image path
+PASS ancestor-default: current restore rejects raw backup-directory image path
+PASS final-symlink: genuine manual snapshot published
+PASS final-symlink: backup directory preserved
+PASS final-symlink: manual snapshot remains readable
+PASS final-symlink: current capture rejects backup-directory image path
+PASS final-symlink: current restore rejects raw backup-directory image path
+PASS intermediate-symlink: genuine manual snapshot published
+PASS intermediate-symlink: whole backup directory removed
+PASS intermediate-symlink: production list silently recreates empty directory
+PASS intermediate-symlink: current capture rejects backup-directory image path
+PASS intermediate-symlink: current restore rejects raw backup-directory image path
+Image-path deletion investigation: 25 checks passed

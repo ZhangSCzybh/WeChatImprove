@@ -1,0 +1,79 @@
+{
+  "isolatedTests": true,
+  "phoneConnected": false,
+  "checks": 1093,
+  "tests": [
+    {
+      "entry": "Tests/verify-backup-audit.sh",
+      "checks": 43,
+      "log": "test-backup-audit.log",
+      "status": "passed"
+    },
+    {
+      "entry": "Tests/verify-backup-bootstrap.sh",
+      "checks": 36,
+      "log": "test-backup-bootstrap.log",
+      "status": "passed"
+    },
+    {
+      "entry": "Tests/verify-backup-engine.sh",
+      "checks": 25,
+      "log": "test-backup-engine.log",
+      "status": "passed"
+    },
+    {
+      "entry": "Tests/verify-backup-reset.sh",
+      "checks": 32,
+      "log": "test-backup-reset.log",
+      "status": "passed"
+    },
+    {
+      "entry": "Tests/verify-backup-retention.sh",
+      "checks": 171,
+      "log": "test-backup-retention.log",
+      "status": "passed"
+    },
+    {
+      "entry": "Tests/verify-backup-store.sh",
+      "checks": 52,
+      "log": "test-backup-store.log",
+      "status": "passed"
+    },
+    {
+      "entry": "Tests/verify-backup-transactions.sh",
+      "checks": 89,
+      "log": "test-backup-transactions.log",
+      "status": "passed"
+    },
+    {
+      "entry": "Tests/verify-close-friend-core.sh",
+      "checks": 246,
+      "log": "test-close-friend-core.log",
+      "status": "passed"
+    },
+    {
+      "entry": "Tests/verify-close-friend-migration.sh",
+      "checks": 59,
+      "log": "test-close-friend-migration.log",
+      "status": "passed"
+    },
+    {
+      "entry": "Tests/verify-close-friend-runtime.sh",
+      "checks": 103,
+      "log": "test-close-friend-runtime.log",
+      "status": "passed"
+    },
+    {
+      "entry": "Tests/verify-managed-image-files.sh",
+      "checks": 154,
+      "log": "test-managed-image-files.log",
+      "status": "passed"
+    },
+    {
+      "entry": "Tests/verify-plugin-storage-migration.sh",
+      "checks": 83,
+      "log": "test-plugin-storage-migration.log",
+      "status": "passed"
+    }
+  ]
+}

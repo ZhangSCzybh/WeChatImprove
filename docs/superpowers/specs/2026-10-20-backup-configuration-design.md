@@ -1,5 +1,7 @@
 # 插件配置备份与恢复改造方案
 
+> 存储路径已按 2.0-3 更新（2026-10-24）：旧 Application Support 对应目录仅用于迁移读取，详见 `docs/audits/preferences-storage-migration-2026-10-24/README.md`。
+
 日期：2026-10-20
 
 基线：WeChatImprove `1.8-36`，提交 `a758a5f7`；以本次读取的工作区源码为准。
@@ -137,7 +139,7 @@
 
 ### 5.2 目录与文件提交
 
-新存储放在应用容器 `Library/Application Support/WeChatImprove/BackupV2/`，包含完整快照、临时工作目录、可重建索引和事务日志。旧 `Library/Backup` 只读保留。
+新存储放在应用容器 `Library/Preferences/WeChatImprove/BackupV2/`，包含完整快照、临时工作目录、可重建索引和事务日志。旧 `Library/Backup` 只读保留。
 
 文件由系统生成的 UUID 定位，用户名称只作显示，不能参与目录拼接。先写唯一临时文件、关闭并校验、再在同文件系统原子重命名发布。发布前不出现在可恢复列表。索引可以由快照重新生成，索引损坏不意味着备份全部丢失。
 

@@ -1,0 +1,93 @@
+--- 2.0-6/Controllers/CSBackgroundBlurManager.h
++++ 2.0-7/Controllers/CSBackgroundBlurManager.h
+@@ -11,6 +11,9 @@
+ + (instancetype)sharedManager;
+ /// Injectable preferences keep host-side tests away from the user's configuration.
+ - (instancetype)initWithDefaults:(NSUserDefaults *)defaults;
++/// Read the effective setting, including changes made by another defaults instance.
++/// Background privacy covers use the same switch; authorization is independent.
++- (BOOL)isEnabled;
+ /// Called on the main thread by the tweak entry point; repeated calls are safe.
+ - (void)start;
+ @end
+--- 2.0-6/Controllers/CSBackgroundBlurManager.m
++++ 2.0-7/Controllers/CSBackgroundBlurManager.m
+@@ -89,6 +89,8 @@
+     }
+     [self refreshOverlaysAnimated:NO];
+ }
++
++- (BOOL)isEnabled { return [self.defaults boolForKey:CSBackgroundBlurEnabledKey]; }
+ 
+ - (void)handleNotification:(NSNotification *)notification {
+     // UIKit lifecycle events arrive on main. Configuration importers may notify off-main.
+@@ -133,7 +135,7 @@
+     BOOL settingsChanged = [name isEqualToString:CSBackgroundBlurSettingsChangedNotification] ||
+         [name isEqualToString:@"com.wechat.tweak.settings_changed"] ||
+         [name isEqualToString:@"com.wechat.tweak.local_settings_changed"];
+-    BOOL enabledChanged = settingsChanged && self.enabled != [self.defaults boolForKey:CSBackgroundBlurEnabledKey];
++    BOOL enabledChanged = settingsChanged && self.enabled != [self isEnabled];
+     [self refreshOverlaysAnimated:!enabledChanged];
+ }
+ 
+@@ -259,7 +261,7 @@
+ }
+ 
+ - (void)refreshOverlaysAnimated:(BOOL)animated {
+-    BOOL enabled = [self.defaults boolForKey:CSBackgroundBlurEnabledKey];
++    BOOL enabled = [self isEnabled];
+     self.enabled = enabled;
+     if (!enabled && self.overlays.count == 0) return;
+     NSMutableSet<UIWindow *> *windows = [NSMutableSet set];
+--- 2.0-6/Controllers/CSBackgroundBlurSettingsViewController.m
++++ 2.0-7/Controllers/CSBackgroundBlurSettingsViewController.m
+@@ -40,7 +40,7 @@
+ }
+ 
+ - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+-    return @"开启后，拉起 App 切换器或切到后台时，微信页面会显示模糊效果；回到微信后恢复清晰。\n\n下拉控制中心、通知中心或系统认证导致微信暂时失去活跃状态时，也会暂时模糊。开关立即生效。";
++    return @"开启后，拉起 App 切换器或切到后台时，微信页面会显示模糊效果；回到微信后恢复清晰。\n\n下拉控制中心、通知中心或系统认证导致微信暂时失去活跃状态时，也会暂时模糊。关闭后立即移除后台模糊和密友的后台整屏遮罩；密友仍会在后台锁定，前台手动锁定时的短暂保护不受影响。";
+ }
+ 
+ @end
+--- 2.0-6/Controllers/CSCloseFriendManager.m
++++ 2.0-7/Controllers/CSCloseFriendManager.m
+@@ -7,6 +7,7 @@
+ #import "CSCloseFriendNavigation.h"
+ #import "CSBackupBootstrap.h"
+ #import "CSPluginStorage.h"
++#import "CSBackgroundBlurManager.h"
+ #import <Security/Security.h>
+ #import <LocalAuthentication/LocalAuthentication.h>
+ #import <CommonCrypto/CommonCrypto.h>
+@@ -100,12 +101,21 @@
+     return windows;
+ }
+ - (void)cover {
++    // The background appearance switch governs every plugin-wide cover. Keep
++    // foreground relock protection and authentication/token invalidation separate.
++    BOOL inactive=self.backgroundCoverRequired || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive;
++    if(inactive && ![CSBackgroundBlurManager.sharedManager isEnabled]) { [self uncover]; return; }
+     for(UIWindow *window in [self windows]) { if(window.hidden)continue;
+         UIView *cover=[[UIView alloc] initWithFrame:window.bounds]; cover.backgroundColor=UIColor.systemBackgroundColor; cover.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+         cover.accessibilityViewIsModal=YES; [window addSubview:cover]; [self.covers addObject:cover];
+     }
+ }
+ - (void)uncover { for(UIView *view in self.covers)[view removeFromSuperview]; [self.covers removeAllObjects]; }
++- (void)backgroundPrivacySettingsChanged:(NSNotification *)note {
++    if(!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(),^{ [self backgroundPrivacySettingsChanged:note]; }); return; }
++    BOOL inactive=self.backgroundCoverRequired || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive;
++    if(inactive && ![CSBackgroundBlurManager.sharedManager isEnabled]) [self uncover];
++}
+ - (void)returnToChatListIfNeeded {
+     if(self.routingProtectedChat) return;
+     self.routingProtectedChat=YES;
+@@ -137,6 +147,8 @@
+     [center addObserver:self selector:@selector(active:) name:UIApplicationDidBecomeActiveNotification object:nil];
+     [center addObserver:self selector:@selector(accountChanged:) name:@"CSBackupAccountChanged" object:nil];
+     [center addObserver:self selector:@selector(suspend:) name:UIApplicationProtectedDataWillBecomeUnavailable object:nil];
++    for(NSString *name in @[CSBackgroundBlurSettingsChangedNotification,@"com.wechat.tweak.settings_changed",@"com.wechat.tweak.local_settings_changed"])
++        [center addObserver:self selector:@selector(backgroundPrivacySettingsChanged:) name:name object:nil];
+     [self.runtime setActive:UIApplication.sharedApplication.applicationState==UIApplicationStateActive];
+     [self refreshAccount];
+     [self refreshShakeMonitoring];

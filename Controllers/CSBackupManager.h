@@ -5,6 +5,8 @@ typedef void (^CSBackupCompletion)(id _Nullable result,NSError * _Nullable error
 @interface CSBackupManager : NSObject
 + (instancetype)sharedManager;
 @property(atomic,copy,readonly) NSString *status;
+/// Persisted startup/restore failure, also shown on the backup page after relaunch.
+@property(nonatomic,copy,readonly) NSString *lastRestoreFailure;
 - (void)list:(CSBackupCompletion)completion;
 - (void)load:(NSDictionary *)record completion:(CSBackupCompletion)completion;
 - (void)create:(NSString *)name completion:(CSBackupCompletion)completion;

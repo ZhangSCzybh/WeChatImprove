@@ -1,0 +1,15 @@
+{
+  "Controllers/CSBackgroundBlurManager.h": "0a4fb5e142f29902efb72a1020cc207407fa404c958c271bb5933708e2b9caca",
+  "Controllers/CSBackgroundBlurManager.m": "d5ef25c4165ba02b4bb911935121858108aa71fee9d827a255f8b5304ccfb736",
+  "Controllers/CSBackgroundBlurSettingsViewController.m": "c41a4a839bc991b205981d0119775836b6d6dd778a14b0b5c846c6bf0cbc3b5e",
+  "Controllers/CSCloseFriendManager.m": "51b6cf4434b30731123b4f7289fdb12b7f11375cdf2b4828fa33508ac685d358",
+  "Controllers/CSReleaseNotesViewController.m": "9b2634c2c4377d3e21672e3563a037aab99e9507ba0b438c33e4f4c3c5826f25",
+  "Headers/CSUserInfoHelper.h": "2cfc97f21031db9da5ed6b6e3c8b0e9a14a4da2031d4db06263b0295078584d0",
+  "control": "4b9469b90e0c2867bbf2aa5fff2e551080b087a48281d820b1a346f07ef0f332",
+  "Tests/BackgroundPrivacyCoverTests.m": "4526fcb01ed44590e248b7961da6130224f61c202e0fdabeff6fbfeb66665f11",
+  "Tests/BackgroundBlurTests.m": "c85a183d8efafb238e10276613e2b10e469259aae7937d045fa6c104218a1a5d",
+  "Tests/BackgroundBlurUIKit/UIKit/UIKit.h": "fb7d6c517795b97357f19cf05b15b1bca28fbfe1c906a7dc3aae7d1f8eff8e7e",
+  "Tests/BackgroundBlurUIKit/BackgroundBlurUIKit.m": "e5c78937070f2ad0fc4f9a5825324a1c3b054d6768f003f555f4e39af91d6577",
+  "Tests/CloseFriendBiometricTests.m": "6365a845da4297f87afa5e3241b91538631f06e6f042f02a686653e0f23e99ca",
+  "Tests/verify-background-privacy.sh": "cee9321b74b63e9e8d040b7dec9a07e215983ee13935d5b1f8bb66c3b9c12972"
+}

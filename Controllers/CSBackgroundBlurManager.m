@@ -90,6 +90,8 @@ static NSTimeInterval const CSBackgroundBlurTransitionDuration = 0.22;
     [self refreshOverlaysAnimated:NO];
 }
 
+- (BOOL)isEnabled { return [self.defaults boolForKey:CSBackgroundBlurEnabledKey]; }
+
 - (void)handleNotification:(NSNotification *)notification {
     // UIKit lifecycle events arrive on main. Configuration importers may notify off-main.
     if (!NSThread.isMainThread) {
@@ -133,7 +135,7 @@ static NSTimeInterval const CSBackgroundBlurTransitionDuration = 0.22;
     BOOL settingsChanged = [name isEqualToString:CSBackgroundBlurSettingsChangedNotification] ||
         [name isEqualToString:@"com.wechat.tweak.settings_changed"] ||
         [name isEqualToString:@"com.wechat.tweak.local_settings_changed"];
-    BOOL enabledChanged = settingsChanged && self.enabled != [self.defaults boolForKey:CSBackgroundBlurEnabledKey];
+    BOOL enabledChanged = settingsChanged && self.enabled != [self isEnabled];
     [self refreshOverlaysAnimated:!enabledChanged];
 }
 
@@ -259,7 +261,7 @@ static NSTimeInterval const CSBackgroundBlurTransitionDuration = 0.22;
 }
 
 - (void)refreshOverlaysAnimated:(BOOL)animated {
-    BOOL enabled = [self.defaults boolForKey:CSBackgroundBlurEnabledKey];
+    BOOL enabled = [self isEnabled];
     self.enabled = enabled;
     if (!enabled && self.overlays.count == 0) return;
     NSMutableSet<UIWindow *> *windows = [NSMutableSet set];

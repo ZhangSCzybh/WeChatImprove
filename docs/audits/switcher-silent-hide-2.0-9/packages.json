@@ -1,0 +1,63 @@
+[
+  {
+    "path": "packages/com.wechat.improve_2.0-9_iphoneos-arm64.deb",
+    "bytes": 1214380,
+    "sha256": "9547cde8a79a606e8cf1eaff7e0997a937347dd75bd1da856bbdd869c44f56e0",
+    "scheme": "rootless",
+    "version": "2.0-9",
+    "architecture": "iphoneos-arm64",
+    "dylibSHA256": "377a5924cd53a0bad47010f324e29821872fc958f5246b5cf674f5e949f57072",
+    "constructors": [
+      {
+        "arch": "arm64",
+        "uuid": "0C7837FD-0B4E-3E65-879D-D526AB003BBB",
+        "firstInitializer": "0x4000",
+        "symbol": "CSPluginStorageLoad"
+      },
+      {
+        "arch": "arm64e",
+        "uuid": "97663A60-04AE-32C4-86C0-C6BA1C3E8421",
+        "firstInitializer": "0x4000",
+        "symbol": "CSPluginStorageLoad"
+      }
+    ],
+    "cleanupHooksAbsent": true,
+    "testShimsAbsent": true,
+    "backgroundPrivacyFixPresent": true,
+    "silentHidePresent": true,
+    "hideAnimationsAbsent": true
+  },
+  {
+    "path": "packages/com.wechat.improve_2.0-9_iphoneos-arm.deb",
+    "bytes": 1211084,
+    "sha256": "bb8769b0e48f4c20c53cd3281fa57a1e8678743edb4069c0e4d66a2ac777bfce",
+    "scheme": "rootful",
+    "version": "2.0-9",
+    "architecture": "iphoneos-arm",
+    "dylibSHA256": "b7b5e0a83987775cbaa428dd00ecfef5bc4ce36e4a887590bb726a29a8400bbd",
+    "constructors": [
+      {
+        "arch": "arm64",
+        "uuid": "F3668E51-6E0C-3AF0-9305-B31E4A8AF977",
+        "firstInitializer": "0x4000",
+        "symbol": "CSPluginStorageLoad"
+      },
+      {
+        "arch": "arm64e",
+        "uuid": "116F955B-C13E-329F-BE99-AB92A805520A",
+        "firstInitializer": "0x4000",
+        "symbol": "CSPluginStorageLoad"
+      }
+    ],
+    "cleanupHooksAbsent": true,
+    "testShimsAbsent": true,
+    "backgroundPrivacyFixPresent": true,
+    "silentHidePresent": true,
+    "hideAnimationsAbsent": true
+  },
+  {
+    "path": "packages/com.wechat.improve_2.0-9_symbols.zip",
+    "bytes": 9273456,
+    "sha256": "a96cb8bf97df055b9c597bff5e4fada01c26f5c572ec1146a693afcd2bab19a8"
+  }
+]

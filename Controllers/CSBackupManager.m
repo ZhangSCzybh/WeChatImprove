@@ -5,11 +5,15 @@
 #import "CSBackupRegistry.h"
 #import "CSBackupScheduler.h"
 #import "CSBackupBootstrap.h"
+#import "CSBackupAudit.h"
+#import "CSBackupRestoreDiagnostics.h"
+#import "CSPluginStorage.h"
 #import "CSServiceCenter.h"
 #import "CSUserInfoHelper.h"
 #import <UIKit/UIKit.h>
 #import <objc/message.h>
 static NSString *const UpgradeErrorKey=@"com.wechat.enhance.backup.upgrade_error";
+static NSString *const RestoreErrorKey=@"com.wechat.enhance.backup.last_restore_error";
 static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
 @interface CSBackupManager ()
 @property(nonatomic) CSBackupEngine *engine;
@@ -28,7 +32,9 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
     if((self=[super init])){
         _queue=dispatch_queue_create("com.wechat.improve.backup",DISPATCH_QUEUE_SERIAL);_scheduler=[CSBackupScheduler new];_status=@"本机备份尚未检查";
         NSURL *library=[NSFileManager.defaultManager URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask].firstObject;
-        CSBackupStore *store=[[CSBackupStore alloc]initWithRoot:[library URLByAppendingPathComponent:@"Application Support/WeChatImprove/BackupV2" isDirectory:YES]];
+        CSBackupStore *store=[[CSBackupStore alloc]initWithMigration:CSPluginStorageMigration(@"BackupV2")];
+        CSBackupAudit *audit=CSBackupDefaultAudit();
+        store.eventHandler=^(NSString *event,NSDictionary *details){[audit storeEvent:event details:details];};
         _standardDomain=NSBundle.mainBundle.bundleIdentifier?:@"com.tencent.xin";
         NSDictionary *domains=@{@"standard":_standardDomain,@"legacy":@"com.cyansmoke.wechattweak",@"layout":@"com.wechat.enhance"};
         NSDictionary *defaults=@{@"standard":NSUserDefaults.standardUserDefaults,@"legacy":[[NSUserDefaults alloc]initWithSuiteName:domains[@"legacy"]],@"layout":[[NSUserDefaults alloc]initWithSuiteName:domains[@"layout"]]};
@@ -46,6 +52,29 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
         dispatch_source_set_event_handler(_timer,^{[weakSelf tick];});dispatch_resume(_timer);
         dispatch_async(_queue,^{[weakSelf attemptUpgradeBackup:NULL];});
     }return self;
+}
+- (NSString *)lastRestoreFailure {return [NSUserDefaults.standardUserDefaults stringForKey:RestoreErrorKey]?:@"";}
+- (NSError *)restoreError:(NSError *)error stage:(NSString *)stage {
+    NSError *reported=CSBackupRestoreError(error,stage,CSBackupRestoreState,self.engine.store.root.path);
+    self.status=reported.localizedDescription;
+    [NSUserDefaults.standardUserDefaults setObject:self.status forKey:RestoreErrorKey];
+    [NSUserDefaults.standardUserDefaults synchronize];
+    [self.engine.store recordRestoreStage:stage status:@"failed" error:reported details:@{}];return reported;
+}
+- (void)clearRestoreFailure {
+    [NSUserDefaults.standardUserDefaults removeObjectForKey:RestoreErrorKey];[NSUserDefaults.standardUserDefaults synchronize];
+}
+- (void)performRestore:(NSString *)stage work:(id(^)(NSError **))work completion:(CSBackupCompletion)completion {
+    [self perform:^id(NSError **error){
+        [self.engine.store recordRestoreStage:stage status:@"started" error:nil details:@{}];return work(error);
+    } completion:^(id result,NSError *error){
+        if(error||!result){error=[self restoreError:error stage:stage];result=nil;}
+        else {
+            [self.engine.store recordRestoreStage:stage status:[stage isEqual:@"prepared"]?@"restart-required":@"ok" error:nil details:@{}];
+            if([@[@"prepared",@"cancel"] containsObject:stage])[self clearRestoreFailure];
+        }
+        if(completion)completion(result,error);
+    }];
 }
 - (NSDictionary *)currentContext {
     __block NSString *account=@"";__block NSUInteger epoch=0;
@@ -92,20 +121,24 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
         if(failure.length)self.status=[self.status stringByAppendingFormat:@"\n最近自动备份未完成：%@",failure];
         NSString *upgradeFailure=[NSUserDefaults.standardUserDefaults stringForKey:UpgradeErrorKey];
         if(upgradeFailure.length)self.status=[self.status stringByAppendingFormat:@"\n版本更新备份未完成：%@",upgradeFailure];
+        if(self.lastRestoreFailure.length)self.status=[self.status stringByAppendingFormat:@"\n上次恢复未完成：%@",self.lastRestoreFailure];
         return records;
     } completion:completion];
 }
 - (NSString *)stateTitle:(NSString *)state {return @{@"prepared":@"已准备，重新打开微信后应用",@"applying":@"应用中，需要完成恢复",@"rollingBack":@"回滚待完成",@"rolledBack":@"已回滚并保留原配置",@"committed":@"已应用并核验"}[state]?:state;}
 - (void)load:(NSDictionary *)record completion:(CSBackupCompletion)completion {
-    [self perform:^id(NSError **error){return [self.engine.store snapshot:record[@"id"] error:error];} completion:completion];
+    [self performRestore:@"selected" work:^id(NSError **error){
+        [self.engine.store recordRestoreStage:@"selected" status:@"read" error:nil details:@{@"snapshotID":record[@"id"]?:@"",@"filename":record[@"filename"]?:@""}];
+        return [self.engine.store snapshotForRestore:record[@"id"] error:error];} completion:completion];
 }
 - (void)create:(NSString *)name completion:(CSBackupCompletion)completion {[self perform:^id(NSError **error){NSDictionary *s=[self.engine save:name kind:@"manual" error:error];if(s)self.status=@"备份已完整保存在本机";return s;} completion:completion];}
 - (void)importURL:(NSURL *)url completion:(CSBackupCompletion)completion {
-    [self perform:^id(NSError **error){BOOL access=[url startAccessingSecurityScopedResource];__block NSDictionary *snapshot=nil;__block NSError *readError=nil;
+    [self performRestore:@"import" work:^id(NSError **error){BOOL access=[url startAccessingSecurityScopedResource];__block NSDictionary *snapshot=nil;__block NSError *readError=nil;
+        [self.engine.store recordRestoreStage:@"import" status:@"read" error:nil details:@{@"path":url.path?:@"",@"filename":url.lastPathComponent?:@""}];
         NSFileCoordinator *coordinator=[[NSFileCoordinator alloc]initWithFilePresenter:nil];
         [coordinator coordinateReadingItemAtURL:url options:0 error:&readError byAccessor:^(NSURL *readURL){
             NSData *data=CSBackupReadFile(readURL,CSBackupMaximumFileSize,&readError);if(!data)return;
-            if(data.length<8||memcmp(data.bytes,"bplist00",8)){readError=CSBackupFailure(@"仅支持当前 .wcbak 格式，不再支持旧版 JSON 或目录备份。");return;}
+            if(data.length<8||memcmp(data.bytes,"bplist00",8)){readError=CSBackupRestoreError(CSBackupFailure(@"仅支持 v2 .wcbak，不支持旧版 JSON 或目录备份；原文件未修改。"),@"import",CSBackupRestoreCompatibility,readURL.path);return;}
             snapshot=[CSBackupCodec decode:data error:&readError];
         }];if(access)[url stopAccessingSecurityScopedResource];
         if(!snapshot){if(error)*error=readError?:CSBackupFailure(@"无法读取备份");return nil;}
@@ -147,13 +180,13 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
     }
     return YES;
 }
-- (void)preview:(NSDictionary *)snapshot modules:(NSSet *)modules accounts:(NSSet *)accounts completion:(CSBackupCompletion)completion {[self perform:^id(NSError **error){if(![self validateColors:snapshot error:error])return nil;return [self.engine preview:snapshot modules:modules accounts:accounts error:error];} completion:completion];}
-- (void)prepare:(NSDictionary *)preview completion:(CSBackupCompletion)completion {[self perform:^id(NSError **error){BOOL ok=[self.engine prepare:preview error:error];if(ok)self.status=[preview[@"snapshot"][@"operation"] isEqual:@"reset"]?@"重置已准备，请退出并重新打开微信后应用":@"恢复已准备，请退出并重新打开微信后应用";return ok?@YES:nil;} completion:completion];}
+- (void)preview:(NSDictionary *)snapshot modules:(NSSet *)modules accounts:(NSSet *)accounts completion:(CSBackupCompletion)completion {[self performRestore:@"validate" work:^id(NSError **error){if(![self validateColors:snapshot error:error]){if(error)*error=CSBackupRestoreError(*error,@"validate",CSBackupRestoreValidation,self.engine.store.root.path);return nil;}return [self.engine preview:snapshot modules:modules accounts:accounts error:error];} completion:completion];}
+- (void)prepare:(NSDictionary *)preview completion:(CSBackupCompletion)completion {[self performRestore:@"prepared" work:^id(NSError **error){BOOL ok=[self.engine prepare:preview error:error];if(ok)self.status=[preview[@"snapshot"][@"operation"] isEqual:@"reset"]?@"重置已准备，请退出并重新打开微信后应用":@"恢复已准备，请退出并重新打开微信后应用";return ok?@YES:nil;} completion:completion];}
 - (void)resetSnapshot:(CSBackupCompletion)completion {[self perform:^id(NSError **error){return [self.engine resetSnapshot:error];} completion:completion];}
 - (void)checkRepairAccess:(CSBackupCompletion)completion {
     [self perform:^id(NSError **error){NSDictionary *journal=[self.engine.store journal:error];if(journal){if(error)*error=CSBackupFailure(@"请先取消尚未执行的恢复，或完成中断事务的回滚，再修复当前设置");return nil;}return (error&&*error)?nil:@YES;} completion:completion];
 }
-- (void)cancelPending:(CSBackupCompletion)completion {[self perform:^id(NSError **error){return [self.engine cancelPending:error]?@YES:nil;} completion:^(id result,NSError *error){if(!error)CSBackupResumeAfterRecovery();completion(result,error);}];}
+- (void)cancelPending:(CSBackupCompletion)completion {[self performRestore:@"cancel" work:^id(NSError **error){return [self.engine cancelPending:error]?@YES:nil;} completion:^(id result,NSError *error){if(!error)CSBackupResumeAfterRecovery();completion(result,error);}];}
 - (BOOL)isAutoBackupEnabled {return [NSUserDefaults.standardUserDefaults boolForKey:AutoKey];}
 - (void)enableAutoBackup:(BOOL)enabled {[NSUserDefaults.standardUserDefaults setBool:enabled forKey:AutoKey];[NSUserDefaults.standardUserDefaults synchronize];if(enabled)[self resourceChanged:nil];}
 - (void)foreground:(NSNotification *)notification {(void)notification;dispatch_async(self.queue,^{self.active=YES;[self.scheduler changedAt:NSProcessInfo.processInfo.systemUptime-30];[self attemptUpgradeBackup:NULL];[self tick];});}
@@ -204,13 +237,13 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
 }
 - (void)retryPendingWork:(CSBackupCompletion)completion {
     if(!CSBackupIsReady()){
-        CSBackupRetryStartup(^(NSError *error){completion(error?nil:@YES,error);});return;
+        CSBackupRetryStartup(^(NSError *error){if(error)error=[self restoreError:error stage:@"startup-retry"];completion(error?nil:@YES,error);});return;
     }
     [self perform:^id(NSError **error){
         NSDictionary *journal=[self.engine.store journal:error];if(error&&*error)return nil;
         if(journal){
             BOOL settled=[journal[@"state"] isEqual:@"rolledBack"]||([journal[@"state"] isEqual:@"committed"]&&[self.engine.store activationConfirmed:journal]);
-            if(!settled){if(error)*error=CSBackupFailure(@"已有待执行计划，请重新打开微信后应用，或先取消计划。");return nil;}
+            if(!settled){if(error)*error=CSBackupRestoreError(CSBackupFailure(@"已有待执行计划；请完全退出微信进程后重新打开，切换前后台不会应用。也可先取消计划。"),@"restart-required",CSBackupRestoreRestart,self.engine.store.root.path);return nil;}
             if(![self.engine.store archiveJournal:error])return nil;
         }
         return [self attemptUpgradeBackup:error]?@YES:nil;
@@ -218,18 +251,23 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
 }
 - (void)resolveStartup:(CSBackupCompletion)completion {
     [self perform:^id(NSError **error){
-        if(CSBackupIsReady()){if(error)*error=CSBackupFailure(@"插件已初始化，请重新打开微信后应用待恢复配置");return nil;}
+        if(CSBackupIsReady()){if(error)*error=CSBackupRestoreError(CSBackupFailure(@"插件已初始化，请完全退出并重新打开微信后应用待恢复配置。"),@"startup",CSBackupRestoreRestart,self.engine.store.root.path);return nil;}
+        [self.engine.store recordRestoreStage:@"startup" status:@"started" error:nil details:@{}];
+        NSString *initialState=[self.engine.store journal:NULL][@"state"];
         if(![self.engine applyPending:error])return nil;
+        if(self.engine.recoveryNotice)[self restoreError:self.engine.recoveryNotice stage:@"startup-recovered"];
+        else if([initialState isEqual:@"rolledBack"]||[[self.engine.store journal:NULL][@"state"] isEqual:@"rolledBack"])
+            [self restoreError:CSBackupFailure(@"上次恢复未完成，本次已回滚到恢复前配置；原备份仍保留，请检查原因后重新准备恢复。") stage:@"rolledBack"];
         NSDictionary *handoffContext=self.engine.appliedContext?:[self currentContext];
         if(![self.engine finishStartup:error])return nil;
         self.status=@"启动配置已就绪";return handoffContext;
     } completion:^(NSDictionary *context,NSError *error){
-        if(error||!context){completion(nil,error);return;}
+        if(error||!context){completion(nil,[self restoreError:error stage:@"startup"]);return;}
         __block BOOL delivered=NO;__block NSError *handoffError=nil;
         CSBackupPerformAtAccountEpoch([context[@"epoch"] unsignedIntegerValue],^{
-            if([context isEqual:[self currentContext]]&&[self.engine confirmStartup:&handoffError]){delivered=YES;completion(@YES,nil);dispatch_async(self.queue,^{[self attemptUpgradeBackup:NULL];});}
+            if([context isEqual:[self currentContext]]&&[self.engine confirmStartup:&handoffError]){delivered=YES;if(self.engine.appliedContext)[self clearRestoreFailure];[self.engine.store recordRestoreStage:@"startup" status:@"ready" error:nil details:@{}];completion(@YES,nil);dispatch_async(self.queue,^{[self attemptUpgradeBackup:NULL];});}
         });
-        if(!delivered)[self perform:^id(NSError **rollbackError){return [self.engine rollbackBeforeActivation:rollbackError]?@YES:nil;} completion:^(__unused id result,NSError *rollbackError){completion(nil,rollbackError?:handoffError?:CSBackupFailure(@"启动交接前账号发生变化，恢复已回滚，请重试"));}];
+        if(!delivered)[self perform:^id(NSError **rollbackError){return [self.engine rollbackBeforeActivation:rollbackError]?@YES:nil;} completion:^(__unused id result,NSError *rollbackError){completion(nil,[self restoreError:rollbackError?:handoffError?:CSBackupFailure(@"启动交接前账号发生变化，恢复已回滚，请重试") stage:@"account-handoff"]);}];
     } synchronousHandoff:YES];
 }
 @end

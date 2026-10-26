@@ -3,6 +3,9 @@
 #import "CSBackupCodec.h"
 #import "CSBackupAssets.h"
 #import "CSBackupMutation.h"
+#import "CSManagedImageFile.h"
+#import "CSBackupRestoreDiagnostics.h"
+#import <sys/stat.h>
 static NSString *const Profiles=@"com.wechat.enhance.chat_group.account_profiles";
 static NSString *const Selection=@"com.wechat.enhance.chat_group.selection.";
 static BOOL EngineFail(NSError **error,NSString *message){if(error)*error=CSBackupFailure(message);return NO;}
@@ -12,15 +15,66 @@ static NSString *Revision(NSDictionary *snapshot) {
 }
 static BOOL IsReset(NSDictionary *snapshot) {return [snapshot[@"operation"] isEqual:@"reset"];}
 static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%@/%@",f[@"domain"],f[@"key"]];}
+static NSString *StartupSession(void){static NSString *identifier;static dispatch_once_t once;dispatch_once(&once,^{identifier=NSUUID.UUID.UUIDString;});return identifier;}
 @interface CSBackupEngine ()
 @property(nonatomic) NSDictionary<NSString *,NSUserDefaults *> *defaults;
 @property(nonatomic) NSDictionary<NSString *,NSString *> *domains;
 @property(nonatomic,readwrite) NSDictionary *appliedContext;
 @property(nonatomic) NSDictionary *activationRecord;
+@property(nonatomic,readwrite) NSError *recoveryNotice;
 @end
 @implementation CSBackupEngine
 - (instancetype)initWithDefaults:(NSDictionary *)defaults domains:(NSDictionary *)domains store:(CSBackupStore *)store resources:(NSURL *)resources {
     if((self=[super init])){_defaults=defaults;_domains=domains;_store=store;_resourceRoot=resources;_context=^{return @{@"account":@"",@"installationID":@"",@"pluginVersion":@""};};}return self;
+}
+- (id)runRestoreStage:(NSString *)stage category:(CSBackupRestoreErrorCode)category details:(NSDictionary *)details work:(id(^)(NSError **))work error:(NSError **)error {
+    NSMutableDictionary *context=[@{@"resourceRoot":self.resourceRoot.path} mutableCopy];[context addEntriesFromDictionary:details];
+    [self.store recordRestoreStage:stage status:@"started" error:nil details:context];
+    NSError *failure=nil;id result=nil;
+    @try {result=work(&failure);}
+    @catch(NSException *exception){
+        NSError *caught=CSBackupRestoreError(CSBackupFailure(exception.reason?:@"恢复操作异常中断"),stage,category,self.store.root.path);
+        [self.store recordRestoreStage:stage status:@"failed" error:caught details:context];@throw;
+    }
+    if(!result)failure=CSBackupRestoreError(failure,stage,category,self.store.root.path);
+    [self.store recordRestoreStage:stage status:result?@"ok":@"failed" error:result?nil:failure details:context];
+    if(!result&&error)*error=failure;return result;
+}
+- (NSDictionary *)preview:(NSDictionary *)snapshot modules:(NSSet *)modules accounts:(NSSet *)accounts error:(NSError **)error {
+    return [self runRestoreStage:@"validate" category:CSBackupRestoreValidation details:@{@"snapshotID":snapshot[@"id"]?:@""}
+        work:^id(NSError **failure){return [self previewContent:snapshot modules:modules accounts:accounts error:failure];} error:error];
+}
+- (BOOL)prepare:(NSDictionary *)preview error:(NSError **)error {
+    BOOL ok=[self runRestoreStage:@"prepare" category:CSBackupRestoreState details:@{@"snapshotID":preview[@"snapshot"][@"id"]?:@""}
+        work:^id(NSError **failure){return [self prepareContent:preview error:failure]?@YES:nil;} error:error]!=nil;
+    if(ok)[self.store recordRestoreStage:@"prepared" status:@"restart-required" error:nil details:@{}];return ok;
+}
+- (BOOL)applyPending:(NSError **)error {
+    NSError *failure=nil;BOOL ok=[self runRestoreStage:@"apply" category:CSBackupRestoreState details:@{}
+        work:^id(NSError **cause){return [self applyPendingContent:cause]?@YES:nil;} error:&failure]!=nil;
+    if(!ok){
+        NSMutableDictionary *journal=[[self.store journal:NULL] mutableCopy];
+        id attempt=journal[@"startupAttempt"];
+        if([journal[@"state"] isEqual:@"prepared"]&&[attempt isKindOfClass:NSDictionary.class]&&[attempt[@"sessionID"] isEqual:StartupSession()]&&[self validJournal:journal error:NULL]){
+            NSString *reason=failure.localizedDescription?:@"上次启动未完成恢复前检查";
+            journal[@"startupFailure"]=[reason substringToIndex:MIN(reason.length,(NSUInteger)2048)];
+            NSError *recordError=nil;if(![self.store writeJournal:journal error:&recordError])
+                [self.store recordRestoreStage:@"attempt-failure" status:@"failed" error:recordError details:@{}];
+        }
+        if(error)*error=failure;
+    }return ok;
+}
+- (BOOL)finishStartup:(NSError **)error {
+    return [self runRestoreStage:@"verify" category:CSBackupRestoreState details:@{}
+        work:^id(NSError **failure){return [self finishStartupContent:failure]?@YES:nil;} error:error]!=nil;
+}
+- (BOOL)confirmStartup:(NSError **)error {
+    return [self runRestoreStage:@"activation" category:CSBackupRestoreStorage details:@{}
+        work:^id(NSError **failure){return [self confirmStartupContent:failure]?@YES:nil;} error:error]!=nil;
+}
+- (BOOL)cancelPending:(NSError **)error {
+    return [self runRestoreStage:@"cancel" category:CSBackupRestoreState details:@{}
+        work:^id(NSError **failure){return [self cancelPendingContent:failure]?@YES:nil;} error:error]!=nil;
 }
 - (NSArray *)rawFields:(NSError **)error {
     if(!self.readPreferencesOnMain||NSThread.isMainThread)return [self readRawFields:error];
@@ -81,7 +135,7 @@ static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%
     // A published snapshot stays successful; cleanup failures have their own durable status.
     [self.store prune:NULL];return snapshot;
 }
-- (NSDictionary *)preview:(NSDictionary *)snapshot modules:(NSSet *)modules accounts:(NSSet *)accounts error:(NSError **)error {
+- (NSDictionary *)previewContent:(NSDictionary *)snapshot modules:(NSSet *)modules accounts:(NSSet *)accounts error:(NSError **)error {
     NSData *encoded=[CSBackupCodec encode:snapshot error:error];if(!encoded)return nil;
     BOOL reset=IsReset(snapshot);
     if(reset){
@@ -100,6 +154,8 @@ static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%
         byID[identity]=field;
     }
     NSMutableArray *selected=[NSMutableArray array],*changes=[NSMutableArray array],*warnings=[(reset?current[@"warnings"]:snapshot[@"warnings"]) mutableCopy];
+    if(!reset&&![source[@"pluginVersion"] isEqual:context[@"pluginVersion"]])
+        [warnings addObject:[NSString stringWithFormat:@"备份来自插件 %@；已校验 v2 资源引用，图片会按当前资源目录重新生成路径。",source[@"pluginVersion"]?:@"未知版本"]];
     BOOL relationships=[source[@"installationID"] isEqual:context[@"installationID"]]&&[context[@"account"] length]&&[source[@"account"] isEqual:context[@"account"]];
     for(NSDictionary *field in snapshot[@"fields"]) {
         NSDictionary *entry=[CSBackupRegistry entryForDomain:field[@"domain"] key:field[@"key"]];if(![modules containsObject:entry[@"module"]])continue;
@@ -124,10 +180,12 @@ static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%
 }
 - (NSDictionary *)beforeWrites:(NSDictionary *)writes error:(NSError **)error {
     NSUInteger total=0;NSMutableDictionary *blobs=[NSMutableDictionary dictionary];NSMutableDictionary *result=[NSMutableDictionary dictionary];for(NSString *name in writes){NSURL *url=[self.resourceRoot URLByAppendingPathComponent:name];
-        if([NSFileManager.defaultManager fileExistsAtPath:url.path]){NSData *data=CSBackupReadFile(url,4*1024*1024,error);if(!data)return nil;NSString *hash=[CSBackupCodec digest:data];if(blobs[hash])data=blobs[hash];else{blobs[hash]=data;total+=data.length;}if(total>48*1024*1024){EngineFail(error,@"恢复前图片保护数据超过 48 MiB，未创建待恢复计划");return nil;}result[name]=@{@"present":@YES,@"data":data};}else result[name]=@{@"present":@NO};}
+        struct stat metadata;int status=lstat(url.fileSystemRepresentation,&metadata);
+        if(status&&errno!=ENOENT){if(error)*error=CSBackupFileError(url.path,@"inspect-resource",errno);return nil;}
+        if(!status){NSData *data=CSBackupReadFile(url,4*1024*1024,error);if(!data)return nil;NSString *hash=[CSBackupCodec digest:data];if(blobs[hash])data=blobs[hash];else{blobs[hash]=data;total+=data.length;}if(total>48*1024*1024){EngineFail(error,@"恢复前图片保护数据超过 48 MiB，未创建待恢复计划");return nil;}result[name]=@{@"present":@YES,@"data":data};}else result[name]=@{@"present":@NO};}
     return result;
 }
-- (BOOL)prepare:(NSDictionary *)preview error:(NSError **)error {
+- (BOOL)prepareContent:(NSDictionary *)preview error:(NSError **)error {
     NSError *existingError=nil;NSDictionary *existing=[self.store journal:&existingError];if(existingError){if(error)*error=existingError;return NO;}
     if(existing){if([existing[@"state"] isEqual:@"rolledBack"]||([existing[@"state"] isEqual:@"committed"]&&[self.store activationConfirmed:existing])){if(![self.store archiveJournal:error])return NO;}else return EngineFail(error,@"已有待处理的恢复，请先取消或完成它");}
     if(![self.context()[@"account"] length])return EngineFail(error,@"当前账号尚未就绪，请登录后重新预览恢复");
@@ -145,6 +203,10 @@ static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%
 }
 - (BOOL)validJournal:(NSDictionary *)journal error:(NSError **)error {
     if(![journal[@"version"] isEqual:@1]||![@[@"prepared",@"applying",@"rollingBack",@"rolledBack",@"committed"] containsObject:journal[@"state"]])return EngineFail(error,@"恢复日志版本或状态无效");
+    id attempt=journal[@"startupAttempt"];
+    if(attempt&&(![attempt isKindOfClass:NSDictionary.class]||![attempt[@"sessionID"] isKindOfClass:NSString.class]||![[NSUUID alloc]initWithUUIDString:attempt[@"sessionID"]]||![attempt[@"startedAt"] isKindOfClass:NSDate.class]))return EngineFail(error,@"恢复启动记录无效，原事务已保留");
+    for(NSString *key in @[@"startupFailure",@"resolutionReason"])if(journal[key]&&(![journal[key] isKindOfClass:NSString.class]||[journal[key] length]>2048))return EngineFail(error,@"恢复失败说明无效");
+    if(journal[@"resolution"]&&(![journal[@"resolution"] isEqual:@"cancelledBeforeApply"]||![journal[@"state"] isEqual:@"rolledBack"]))return EngineFail(error,@"恢复撤销状态无效");
     for(NSString *part in @[@"before",@"after"]){NSArray *fields=journal[part];if(![fields isKindOfClass:NSArray.class]||fields.count>4096)return EngineFail(error,@"恢复日志配置列表无效");
         NSMutableSet *seen=[NSMutableSet set];for(NSDictionary *f in fields){if(![f isKindOfClass:NSDictionary.class])return EngineFail(error,@"恢复字段损坏");NSDictionary *entry=[CSBackupRegistry entryForDomain:f[@"domain"] key:f[@"key"]];if(!entry||![f[@"present"] isKindOfClass:NSNumber.class]||[seen containsObject:Identity(f)])return EngineFail(error,@"恢复日志包含未登记或重复的配置");[seen addObject:Identity(f)];if([f[@"present"] boolValue]&&![CSBackupRegistry validateValue:f[@"value"] entry:entry error:error])return NO;}
     }
@@ -157,28 +219,64 @@ static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%
     for(NSString *name in [[writes allKeys] sortedArrayUsingSelector:@selector(compare:)]){
         if(context&&![context isEqual:self.context()])return EngineFail(error,@"恢复期间账号发生变化");
         NSURL *url=[self.resourceRoot URLByAppendingPathComponent:name];NSDictionary *r=writes[name];
-        if([r[@"present"] boolValue]){if(!CSBackupAtomicWrite(r[@"data"],url,error))return NO;}
-        else if([NSFileManager.defaultManager fileExistsAtPath:url.path]&&![NSFileManager.defaultManager removeItemAtURL:url error:error])return NO;
+        NSDictionary *details=@{@"path":url.path,@"action":[r[@"present"] boolValue]?@"write":@"remove"};
+        [self.store recordRestoreStage:@"write-resource" status:@"started" error:nil details:details];
+        NSError *failure=nil;BOOL ok=[r[@"present"] boolValue]?CSBackupAtomicWrite(r[@"data"],url,&failure):CSManagedImageRemoveInDirectory(url.path,self.resourceRoot,&failure);
+        if(!ok)failure=CSBackupRestoreError(failure,@"write-resource",CSBackupRestoreStorage,url.path);
+        [self.store recordRestoreStage:@"write-resource" status:ok?@"ok":@"failed" error:failure details:details];
+        if(!ok){if(error)*error=failure;return NO;}
         if(self.checkpoint)self.checkpoint(@"resource");
     }
+    return [self runRestoreStage:@"write-preferences" category:CSBackupRestoreStorage details:@{@"fieldCount":@(fields.count)}
+        work:^id(NSError **failure){return [self writePreferences:fields writes:writes context:context error:failure]?@YES:nil;} error:error]!=nil;
+}
+- (BOOL)writePreferences:(NSArray *)fields writes:(NSDictionary *)writes context:(NSDictionary *)context error:(NSError **)error {
     for(NSDictionary *f in fields){if(context&&![context isEqual:self.context()])return EngineFail(error,@"恢复期间账号发生变化");NSUserDefaults *defaults=self.defaults[f[@"domain"]];
         if([f[@"present"] boolValue])[defaults setObject:f[@"value"] forKey:f[@"key"]];else [defaults removeObjectForKey:f[@"key"]];if(self.checkpoint)self.checkpoint(@"field");}
     for(NSUserDefaults *defaults in self.defaults.allValues)if(![defaults synchronize])return EngineFail(error,@"偏好持久化失败");
     if(self.checkpoint)self.checkpoint(@"synchronized");
     if(context&&![context isEqual:self.context()])return EngineFail(error,@"恢复期间账号发生变化");
     BOOL verified=[self verifyFields:fields writes:writes error:error];
-    if(context&&![context isEqual:self.context()])return EngineFail(error,@"核验期间账号发生变化");return verified;
+    if(context&&![context isEqual:self.context()])return EngineFail(error,@"核验期间账号发生变化");
+    return verified;
 }
 - (BOOL)verifyFields:(NSArray *)fields writes:(NSDictionary *)writes error:(NSError **)error {
-    NSArray *current=[self beforeFields:fields error:error];if(![current isEqual:fields])return EngineFail(error,@"恢复配置回读校验失败");
-    NSDictionary *resources=[self beforeWrites:writes error:error];if(![resources isEqual:writes])return EngineFail(error,@"恢复图片回读校验失败");return YES;
+    NSArray *current=[self beforeFields:fields error:error];if(!current)return NO;if(![current isEqual:fields])return EngineFail(error,@"恢复配置回读校验失败");
+    NSDictionary *resources=[self beforeWrites:writes error:error];if(!resources)return NO;if(![resources isEqual:writes])return EngineFail(error,@"恢复图片回读校验失败");return YES;
 }
-- (BOOL)applyPending:(NSError **)error {
-    self.appliedContext=nil;self.activationRecord=nil;
+- (BOOL)applyPendingContent:(NSError **)error {
+    if(![self.store prepareForWriting:error])return NO;
+    self.appliedContext=nil;self.activationRecord=nil;self.recoveryNotice=nil;
     NSError *readError=nil;NSDictionary *record=[self.store journal:&readError];if(readError){if(error)*error=readError;return NO;}if(!record)return YES;
-    if(![self validJournal:record error:error])return NO;
+    if(![self validJournal:record error:error]){if(error)*error=CSBackupRestoreError(*error,@"journal-validate",CSBackupRestoreValidation,[self.store.root URLByAppendingPathComponent:@"transaction.plist"].path);return NO;}
     NSMutableDictionary *journal=[record mutableCopy];NSString *state=journal[@"state"];
-    if([state isEqual:@"rolledBack"])return [self.store archiveJournal:error];
+    [self.store recordRestoreStage:@"journal-read" status:@"ok" error:nil details:@{@"state":state?:@"",@"transactionID":journal[@"transactionID"]?:@""}];
+    if([state isEqual:@"rolledBack"]){
+        if([record[@"resolution"] isEqual:@"cancelledBeforeApply"])self.recoveryNotice=CSBackupRestoreError(CSBackupFailure(record[@"resolutionReason"]?:@"上次未应用的恢复计划已撤销，当前配置和原备份已保留。"),@"prepared-expired",CSBackupRestoreState,self.store.root.path);
+        return [self.store archiveJournal:error];
+    }
+    if([state isEqual:@"prepared"]){
+        NSDictionary *attempt=journal[@"startupAttempt"];
+        if(attempt&&![attempt[@"sessionID"] isEqual:StartupSession()]){
+            // Prepared has never written live fields/resources. Rewriting its stale
+            // before-image would lose edits or cross an account boundary. Retire it
+            // durably without touching live state; applying still uses real rollback.
+            NSString *reason=[NSString stringWithFormat:@"上次启动未能应用恢复计划，已自动撤销；当前配置和原备份已保留。原因：%@。请检查后重新准备恢复。",journal[@"startupFailure"]?:@"恢复前检查中断"];
+            reason=[reason substringToIndex:MIN(reason.length,(NSUInteger)2048)];
+            journal[@"state"]=@"rolledBack";journal[@"resolution"]=@"cancelledBeforeApply";journal[@"resolutionReason"]=reason;
+            [self.store recordRestoreStage:@"prepared-expired" status:@"started" error:nil details:@{@"transactionID":journal[@"transactionID"]?:@"",@"liveWrites":@NO}];
+            if(![self.store writeJournal:journal error:error]||![self.store archiveJournal:error]){
+                [self.store recordRestoreStage:@"prepared-expired" status:@"failed" error:error?*error:nil details:@{@"liveWrites":@NO}];return NO;
+            }
+            self.recoveryNotice=CSBackupRestoreError(CSBackupFailure(reason),@"prepared-expired",CSBackupRestoreState,self.store.root.path);
+            [self.store recordRestoreStage:@"prepared-expired" status:@"cancelled" error:self.recoveryNotice details:@{@"liveWrites":@NO,@"sourceRetained":@YES}];return YES;
+        }
+        if(!attempt){journal[@"startupAttempt"]=@{@"sessionID":StartupSession(),@"startedAt":NSDate.date};
+            if(![self.store writeJournal:journal error:error])return NO;
+            [self.store recordRestoreStage:@"startup-attempt" status:@"saved" error:nil details:@{@"sessionID":StartupSession(),@"transactionID":journal[@"transactionID"]?:@""}];
+            if(self.checkpoint)self.checkpoint(@"startupAttempt");
+        }
+    }
     if([state isEqual:@"committed"]&&[self.store activationConfirmed:journal]){
         // A durable handoff occurred before hooks were released. Subsequent edits win.
         return [self.store archiveJournal:error];
@@ -198,13 +296,18 @@ static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%
         journal[@"state"]=@"applying";if(![self.store writeJournal:journal error:error])return NO;if(self.checkpoint)self.checkpoint(@"applying");
         NSError *applyError=nil;
         if([self writeFields:journal[@"after"] writes:journal[@"afterWrites"] context:context error:&applyError]){
-            journal[@"state"]=@"committed";if([context isEqual:self.context()]&&[self.store writeJournal:journal error:&applyError]){if(self.checkpoint)self.checkpoint(@"committed");if([context isEqual:self.context()]){self.appliedContext=context;return YES;}}
+            journal[@"state"]=@"committed";if([context isEqual:self.context()]&&[self.store writeJournal:journal error:&applyError]){if(self.checkpoint)self.checkpoint(@"committed");if([context isEqual:self.context()]){self.appliedContext=context;[self.store recordRestoreStage:@"applied" status:@"committed" error:nil details:@{@"transactionID":journal[@"transactionID"]?:@""}];return YES;}}
         }
+        [self.store recordRestoreStage:@"write-back" status:@"failed" error:applyError details:@{}];
         if(error)*error=applyError;rollback=YES;
     }
     if(rollback){journal[@"state"]=@"rollingBack";NSError *rollbackError=nil;
-        if(![self.store writeJournal:journal error:&rollbackError]||![self writeFields:journal[@"before"] writes:journal[@"beforeWrites"] context:nil error:&rollbackError]){if(error)*error=rollbackError;return NO;}
-        journal[@"state"]=@"rolledBack";if(![self.store writeJournal:journal error:&rollbackError]){if(error)*error=rollbackError;return NO;}if(self.checkpoint)self.checkpoint(@"rolledBack");
+        [self.store recordRestoreStage:@"rollback" status:@"started" error:nil details:@{@"sourceRetained":@YES}];
+        [self.store recordRestoreStage:@"failure-cleanup" status:@"rollingBack" error:nil details:@{@"sourceRetained":@YES}];
+        if(![self.store writeJournal:journal error:&rollbackError]||![self writeFields:journal[@"before"] writes:journal[@"beforeWrites"] context:nil error:&rollbackError]){[self.store recordRestoreStage:@"failure-cleanup" status:@"failed" error:rollbackError details:@{@"sourceRetained":@YES}];[self.store recordRestoreStage:@"rollback" status:@"failed" error:rollbackError details:@{}];if(error)*error=rollbackError;return NO;}
+        journal[@"state"]=@"rolledBack";if(![self.store writeJournal:journal error:&rollbackError]){[self.store recordRestoreStage:@"rollback" status:@"failed" error:rollbackError details:@{}];if(error)*error=rollbackError;return NO;}if(self.checkpoint)self.checkpoint(@"rolledBack");
+        [self.store recordRestoreStage:@"failure-cleanup" status:@"rolledBack" error:nil details:@{@"sourceRetained":@YES}];
+        [self.store recordRestoreStage:@"rollback" status:@"verified" error:nil details:@{@"sourceRetained":@YES}];
         // Recovery of an interrupted transaction succeeds only after the before-image is verified.
         if([@[@"applying",@"rollingBack"] containsObject:state])return YES;
         return NO;
@@ -216,7 +319,7 @@ static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%
     NSMutableDictionary *journal=[record mutableCopy];journal[@"state"]=@"rollingBack";[journal removeObjectForKey:@"activated"];
     if(![self.store writeJournal:journal error:error])return NO;return [self applyPending:error];
 }
-- (BOOL)finishStartup:(NSError **)error {
+- (BOOL)finishStartupContent:(NSError **)error {
     NSError *readError=nil;NSDictionary *record=[self.store journal:&readError];if(readError){if(error)*error=readError;return NO;}if(!record)return YES;
     NSMutableDictionary *journal=[record mutableCopy];
     if([journal[@"state"] isEqual:@"committed"]){
@@ -228,7 +331,7 @@ static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%
     }
     return [journal[@"state"] isEqual:@"rolledBack"];
 }
-- (BOOL)confirmStartup:(NSError **)error {
+- (BOOL)confirmStartupContent:(NSError **)error {
     // Called on main under the native account boundary lock while the serial IO queue
     // waits for this handoff. Only the <=4 KiB confirmation is written here; all
     // preference/image work and the large journal have already completed off main.
@@ -243,7 +346,7 @@ static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%
     if(error)*error=publicationError?:CSBackupFailure(@"启动交接标记未保存");
     return NO;
 }
-- (BOOL)cancelPending:(NSError **)error {
+- (BOOL)cancelPendingContent:(NSError **)error {
     NSError *readError=nil;NSDictionary *journal=[self.store journal:&readError];if(readError){if(error)*error=readError;return NO;}if(!journal)return YES;
     if([journal[@"state"] isEqual:@"committed"]&&![self.store activationConfirmed:journal]){if(![self rollbackBeforeActivation:error])return NO;return [self.store archiveJournal:error];}
     if(![@[@"prepared",@"committed",@"rolledBack"] containsObject:journal[@"state"]])return EngineFail(error,@"恢复已开始，必须先完成回滚才能取消");

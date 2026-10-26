@@ -1,6 +1,6 @@
 # 备份逻辑与功能说明
 
-适用版本：**1.9-6**。核对日期：2026-10-22。本文依据当前源码整理，说明已实现的行为；真机交互验收范围见 [1.9-6 修复记录](audits/backup-retention-fix-1.9-6/README.md)。
+适用版本：**2.0-5**。核对日期：2026-10-24。存储迁移、规则证据与验收边界见 [2.0-3 迁移记录](audits/preferences-storage-migration-2026-10-24/README.md)，历史保留策略修复见 [1.9-6 修复记录](audits/backup-retention-fix-1.9-6/README.md)。
 
 ## 1. 备份用途与入口
 
@@ -236,7 +236,7 @@ flowchart TD
 以下路径均相对于当前微信应用容器，与本机源码 checkout 无关。
 
 ```text
-Library/Application Support/WeChatImprove/BackupV2/
+Library/Preferences/WeChatImprove/BackupV2/
 ├── <UUID>.wcbak          配置和图片快照
 ├── <UUID>.meta           本机收藏、名称和导入记录
 ├── <UUID>.meta.bak       本机保护记录的第二份副本
@@ -246,7 +246,15 @@ Library/Application Support/WeChatImprove/BackupV2/
 └── cleanup.plist         最近记录的清理计划和结果
 ```
 
+2.0-3 在插件加载阶段迁移旧 `Library/Application Support/WeChatImprove/BackupV2/`，同时将密友原始密文目录迁到 `Library/Preferences/WeChatImprove/CloseFriends/`。仅旧目录存在时使用不覆盖目标的原子改名；两边均存在时检查冲突后合并，全部核验并落盘后才清理旧目录。中断可重试；同名不同内容保留两边、提示冲突，不自动选择一份覆盖。迁移失败期间支持读取仍可访问的旧文件，写入和恢复应用必须等待迁移完成。旧 `BackupV2` 路径兼容与旧 `.wechatbackup`/JSON 格式兼容不是同一件事。
+
+审计位于 `Library/Preferences/com.wechat.improve.backup-audit.plist`，仅被动记录插件事件；不拦截微信清理、不捕获宿主删除调用栈。Preferences 在已核验微信 8.0.78 的扫描规则中对文件提供继承保护；空目录仍可能被清理，卸载、重装换容器或主动删除数据不受此规则保护。
+
 自定义图片继续使用 `Library/Preferences/WeChatImprove/`。旧 `Library/Backup` 不再扫描或转换，旧文件原样保留。日常操作通过插件页面进行；直接搬动单份 `.wcbak` 或移除 `.meta` 文件，可能使本机保护状态进入待确认。
+
+2.0-4 修复资源清理从 `/` 开始逐层打开目录对沙箱权限的依赖；现在直接打开资源目录并核对描述符的实际路径。恢复失败区分迁移、校验、权限、存储和重开微信要求。启动失败原因保存在备份页“恢复未完成 · 查看原因”及恢复管理说明中，不因重新列出备份而消失。
+
+被动审计增加 `restore-*` 阶段事件，包含 `stage/status/path/readRoots/journalPath/errorDomain/errorCode/causes`，不记录配置值、图片内容或密友名单。`lastRestore` 保存最后阶段，`lastRestoreFailure` 保留最近失败；详细说明见 [2.0-4 恢复修复记录](audits/restore-paths-2.0-4/README.md)。磁盘事务仍使用 `prepared → applying → committed`，成功的 `applied` 审计事件对应 `committed`，没有新增不兼容的事务状态。
 
 ## 13. 常见场景
 
@@ -287,3 +295,8 @@ Library/Application Support/WeChatImprove/BackupV2/
 1.9-6 已删除 `CSBackupInfo`、`CSBackupLegacyReader` 和旧格式专项测试。后续变更设置时，需同步检查登记表、资源标记、变更通知和账号范围，不能仅增加设置页而假设备份会自动覆盖。
 
 当前回归证据见 [1.9-6 验证报告](audits/backup-retention-fix-1.9-6/README.md)，原缺陷分析见 [备份保留分析](audits/backup-retention-2026-10-22/README.md)。历史设计文件描述的是设计时点，本文以当前实现为准。
+
+
+2.0-5 为有效的 `prepared` 事务持久记录一次进程启动尝试。同一进程的前台重试仍可继续；下一次启动若事务尚未进入写回阶段，则自动撤销并归档，保留当前配置、源备份及保护备份，同时在备份页显示上次失败原因。`prepared` 尚未写入配置，因此撤销时不重放可能已经过期的 before 数据；已经进入 `applying/rollingBack` 的事务继续执行并核验真实回滚。不能读取或校验的事务、迁移冲突、无法持久写入/归档的事务仍保留并报错，不以删除日志伪装成功。旧版本没有尝试记录的事务会先获得一次真实启动尝试。
+
+v2 快照的图片采用 `csbackup:<摘要>` 引用和内嵌图片数据。导入旧插件版本的有效 v2 快照时，预览会说明来源版本，恢复会重新构造当前资源目录下的路径；图片不会写回源容器。只有绝对图片路径而缺乏可移植引用的载荷明确拒绝，并保留原件；缺失引用资源也在准备前报错，不静默跳过图片。审计增加插件版本字段，以及 `restore-import`、`restore-metadata`、`restore-read-snapshot`、`restore-startup-attempt`、`restore-prepared-expired`、`restore-rollback`、`restore-archive`，详见 [2.0-5 兼容与事务收尾记录](audits/restore-compatibility-2.0-5/README.md)。

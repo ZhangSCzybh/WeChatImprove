@@ -33,7 +33,7 @@
 - (void)refreshPreview {
     NSUInteger generation=++self.generation;self.busy=YES;self.preview=nil;self.message=@"正在检查当前配置…";self.navigationItem.rightBarButtonItem.enabled=NO;[self.tableView reloadData];
     [CSBackupManager.sharedManager preview:self.snapshot modules:self.selectedModules.copy accounts:self.selectedAccounts.copy completion:^(NSDictionary *preview,NSError *error){
-        if(generation!=self.generation)return;self.busy=NO;self.preview=preview;self.message=error.localizedDescription?:[preview[@"warnings"] componentsJoinedByString:@"\n\n"];self.navigationItem.rightBarButtonItem.enabled=preview!=nil&&[preview[@"changes"] count]>0;[self.tableView reloadData];
+        if(generation!=self.generation)return;self.busy=NO;self.preview=preview;self.message=error.localizedDescription?:[preview[@"warnings"] componentsJoinedByString:@"\n\n"];if(error){UIAlertController *failure=[UIAlertController alertControllerWithTitle:self.resetting?@"无法预览重置":@"无法预览恢复" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];[failure addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleDefault handler:nil]];if(!self.presentedViewController)[self presentViewController:failure animated:YES completion:nil];}self.navigationItem.rightBarButtonItem.enabled=preview!=nil&&[preview[@"changes"] count]>0;[self.tableView reloadData];
     }];
 }
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {(void)tableView;return 4;}
@@ -117,7 +117,7 @@
         self.busy=YES;self.tableView.userInteractionEnabled=NO;self.navigationItem.rightBarButtonItem.enabled=NO;
         [CSBackupManager.sharedManager prepare:self.preview completion:^(__unused id result,NSError *error){
             self.busy=NO;self.tableView.userInteractionEnabled=YES;
-            UIAlertController *resultAlert=[UIAlertController alertControllerWithTitle:error?[@"未能准备" stringByAppendingString:verb]:[verb stringByAppendingString:@"已准备"] message:error.localizedDescription?:@"请手动退出并重新打开微信后应用。执行前可在备份页取消计划。" preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *resultAlert=[UIAlertController alertControllerWithTitle:error?[@"未能准备" stringByAppendingString:verb]:[verb stringByAppendingString:@"已准备"] message:error.localizedDescription?:@"计划已保存，尚未应用。请完全退出微信进程后重新打开；切换前后台不会执行。执行前可在备份页取消计划。" preferredStyle:UIAlertControllerStyleAlert];
             [resultAlert addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *a){if(!error)[self.navigationController popViewControllerAnimated:YES];else [self refreshPreview];}]];[self presentViewController:resultAlert animated:YES completion:nil];
         }];
     }]];[self presentViewController:alert animated:YES completion:nil];

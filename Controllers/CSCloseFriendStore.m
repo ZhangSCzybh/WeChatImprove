@@ -1,6 +1,7 @@
 #import "CSCloseFriendStore.h"
 #import "CSCloseFriendPolicy.h"
 #import "CSCloseFriendCrypto.h"
+#import "CSPluginStorage.h"
 #import <CommonCrypto/CommonCrypto.h>
 #import <CoreFoundation/CoreFoundation.h>
 #import <math.h>
@@ -36,9 +37,14 @@ static NSDictionary *CSState(id state,NSError **error) {
 }
 @interface CSCloseFriendStore ()
 @property(nonatomic,copy) CSCloseFriendKeyProvider keyProvider;
+@property(nonatomic,strong) CSPluginDirectoryMigration *migration;
 @end
 @implementation CSCloseFriendStore
 - (instancetype)initWithRoot:(NSURL *)root keyProvider:(CSCloseFriendKeyProvider)keyProvider { if((self=[super init])) { _root=[root copy]; _keyProvider=[keyProvider copy]; } return self; }
+- (instancetype)initWithMigration:(CSPluginDirectoryMigration *)migration keyProvider:(CSCloseFriendKeyProvider)keyProvider {
+    if((self=[self initWithRoot:migration.destinationRoot keyProvider:keyProvider]))_migration=migration;
+    return self;
+}
 - (NSURL *)URLForAccount:(NSString *)account {
     NSData *data=[account dataUsingEncoding:NSUTF8StringEncoding]; uint8_t hash[CC_SHA256_DIGEST_LENGTH];
     CC_SHA256(data.bytes,(CC_LONG)data.length,hash); NSMutableString *name=[NSMutableString stringWithString:@"state-"];
@@ -63,8 +69,21 @@ static NSDictionary *CSState(id state,NSError **error) {
 - (NSDictionary *)loadStateForAccountID:(NSString *)account error:(NSError **)error {
     @synchronized(CSCloseFriendStore.class) {
         if(!CSAccount(account) || !self.root.isFileURL || !self.keyProvider) { CSStoreFail(error,CSCloseFriendStoreErrorInvalid); return nil; }
-        NSData *data=[self readURL:[self URLForAccount:account] missing:NULL error:error]; if(!data)return nil;
-        NSError *keyError=nil; NSData *key=self.keyProvider(account,&keyError); if(!key) { if(error)*error=keyError; if(!keyError)CSStoreFail(error,CSCloseFriendStoreErrorInvalid); return nil; }
+        NSError *migrationError=nil;
+        BOOL migrated=!self.migration || [self.migration migrate:&migrationError];
+        // Two different encrypted versions must never be silently resolved by choosing one account policy.
+        if(!migrated && [migrationError.domain isEqual:CSPluginStorageErrorDomain] && migrationError.code==CSPluginStorageErrorConflict) { if(error)*error=migrationError; return nil; }
+        NSURL *url=[self URLForAccount:account];
+        if(self.migration)url=[self.migration readURLForName:url.lastPathComponent];
+        NSError *readError=nil; NSData *data=[self readURL:url missing:NULL error:&readError];
+        if(!data) {
+            // A failed migration is not evidence that this is a new account. Keep runtime protection enabled.
+            if(error)*error=migrated?readError:migrationError;
+            if(!migrated && !migrationError)CSStoreFail(error,CSCloseFriendStoreErrorIO);
+            return nil;
+        }
+        CSCloseFriendKeyProvider reader=self.readKeyProvider?:self.keyProvider;
+        NSError *keyError=nil; NSData *key=reader(account,&keyError); if(!key) { if(error)*error=keyError; if(!keyError)CSStoreFail(error,CSCloseFriendStoreErrorInvalid); return nil; }
         return [self decode:data key:key account:account error:error];
     }
 }
@@ -80,6 +99,12 @@ static NSDictionary *CSState(id state,NSError **error) {
 - (BOOL)saveState:(NSDictionary *)state forAccountID:(NSString *)account error:(NSError **)error {
     @synchronized(CSCloseFriendStore.class) {
         if(!CSAccount(account) || !self.root.isFileURL || !self.keyProvider)return CSStoreFail(error,CSCloseFriendStoreErrorInvalid);
+        NSError *migrationError=nil;
+        if(self.migration && ![self.migration migrate:&migrationError]) {
+            if(error)*error=migrationError;
+            if(!migrationError)CSStoreFail(error,CSCloseFriendStoreErrorIO);
+            return NO;
+        }
         NSDictionary *valid=CSState(state,error); if(!valid)return NO;
         NSError *keyError=nil; NSData *key=self.keyProvider(account,&keyError); if(!key && keyError) { if(error)*error=keyError; return NO; } if(![key isKindOfClass:NSData.class] || key.length!=64)return CSStoreFail(error,CSCloseFriendStoreErrorInvalid);
         NSURL *destination=[self URLForAccount:account]; BOOL missing=NO; NSError *readError=nil;

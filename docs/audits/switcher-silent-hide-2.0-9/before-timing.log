@@ -1,0 +1,6 @@
+FAIL: switcher callback must publish locked policy before returning, without a runloop gap
+FAIL: queued policy task must not republish after synchronous switcher settlement
+FAIL: background setActive invalidation must be included in the same synchronous policy publication
+FAIL: shake lock publishes the final policy in its current call
+FAIL: foreground shake lock leaves no visible cover awaiting a later runloop
+BackgroundPrivacyCoverTests: 37 checks, 5 failures

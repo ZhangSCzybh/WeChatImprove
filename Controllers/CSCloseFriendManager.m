@@ -6,6 +6,8 @@
 #import "CSCloseFriendShakeMonitor.h"
 #import "CSCloseFriendNavigation.h"
 #import "CSBackupBootstrap.h"
+#import "CSPluginStorage.h"
+#import "CSBackgroundBlurManager.h"
 #import <Security/Security.h>
 #import <LocalAuthentication/LocalAuthentication.h>
 #import <CommonCrypto/CommonCrypto.h>
@@ -14,6 +16,15 @@
 static NSString *CSAccountDigest(NSString *account) {
     NSData *data=[account dataUsingEncoding:NSUTF8StringEncoding]; uint8_t bytes[CC_SHA256_DIGEST_LENGTH]; CC_SHA256(data.bytes,(CC_LONG)data.length,bytes);
     NSMutableString *result=[NSMutableString new]; for(NSUInteger i=0;i<sizeof(bytes);i++)[result appendFormat:@"%02x",bytes[i]]; return result;
+}
+static BOOL CSCanCreatePolicyKey(CSPluginDirectoryMigration *migration, NSString *account) {
+    NSString *name=[NSString stringWithFormat:@"state-%@.bin",CSAccountDigest(account)];
+    // Missing/unavailable old state cannot authorize replacing its encryption key during a retry.
+    for(NSURL *root in @[migration.legacyRoot,migration.destinationRoot]) {
+        struct stat st;
+        if(lstat([root URLByAppendingPathComponent:name].path.fileSystemRepresentation,&st)==0 || errno!=ENOENT)return NO;
+    }
+    return YES;
 }
 static NSMutableDictionary *CSKeychainQuery(NSString *account, NSString *kind) {
     return [@{(__bridge id)kSecClass:(__bridge id)kSecClassGenericPassword,(__bridge id)kSecAttrService:@"com.wechatimprove.closefriends.v1",(__bridge id)kSecAttrAccount:[NSString stringWithFormat:@"%@.%@",kind,CSAccountDigest(account)],(__bridge id)kSecAttrSynchronizable:@NO} mutableCopy];
@@ -38,6 +49,9 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 @property(nonatomic,strong) NSMutableDictionary *capabilityMap;
 @property(nonatomic,strong) NSMutableArray<UIView *> *covers;
 @property(nonatomic,strong) LAContext *authenticationContext;
+@property(nonatomic,copy) void (^biometricCompletion)(BOOL);
+@property(nonatomic,copy) void (^pendingBiometricReply)(void);
+@property(nonatomic,copy) NSString *passwordFallbackReason;
 @property(nonatomic,strong) NSTimer *timer;
 @property(nonatomic,strong) CSCloseFriendShakeMonitor *shakeMonitor;
 @property(nonatomic,weak) UIViewController *recoveryPage;
@@ -50,14 +64,17 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 - (instancetype)init {
     if((self=[super init])) {
         _capabilityMap=[NSMutableDictionary new]; _covers=[NSMutableArray new];
-        NSURL *library=[NSFileManager.defaultManager URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask].firstObject;
-        NSURL *root=[library URLByAppendingPathComponent:@"Application Support/WeChatImprove/CloseFriends" isDirectory:YES];
-        CSCloseFriendStore *store=[[CSCloseFriendStore alloc] initWithRoot:root keyProvider:^NSData *(NSString *account,NSError **error){
+        CSPluginDirectoryMigration *migration=CSPluginStorageMigration(@"CloseFriends");
+        CSCloseFriendStore *store=[[CSCloseFriendStore alloc] initWithMigration:migration keyProvider:^NSData *(NSString *account,NSError **error){
             NSData *key=CSKeychainRead(account,@"policy",error); if(key || (error && *error))return key;
-            NSURL *existing=[root URLByAppendingPathComponent:[NSString stringWithFormat:@"state-%@.bin",CSAccountDigest(account)]];
-            struct stat st; if(lstat(existing.path.fileSystemRepresentation,&st)==0 || errno!=ENOENT) { CSKeychainError(error,errSecItemNotFound); return nil; }
+            if(!CSCanCreatePolicyKey(migration,account)) { CSKeychainError(error,errSecItemNotFound); return nil; }
             key=CSCloseFriendRandomBytes(64,error); if(!key || !CSKeychainWrite(account,@"policy",key,NO,error))return nil; return key;
         }];
+        store.readKeyProvider=^NSData *(NSString *account,NSError **error){
+            NSData *key=CSKeychainRead(account,@"policy",error);
+            if(!key && (!error || !*error))CSKeychainError(error,errSecItemNotFound);
+            return key;
+        };
         _runtime=[[CSCloseFriendRuntime alloc] initWithStore:store wallClock:^NSTimeInterval{ return NSDate.date.timeIntervalSince1970; } elapsedClock:^NSTimeInterval{ return NSProcessInfo.processInfo.systemUptime; } credentialReader:^NSDictionary *(NSString *account,NSError **error){
             NSData *data=CSKeychainRead(account,@"auth",error); if(!data)return nil;
             id value=[NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:error];
@@ -72,11 +89,13 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 }
 - (void)schedulePolicyRefresh {
     @synchronized(self) { if(self.policyRefreshScheduled)return; self.policyRefreshScheduled=YES; }
-    dispatch_async(dispatch_get_main_queue(),^{
-        @synchronized(self) { self.policyRefreshScheduled=NO; }
-        [self refreshShakeMonitoring]; [self refreshRecoveryGesture]; [self startExpiryTimer];
-        [NSNotificationCenter.defaultCenter postNotificationName:CSCloseFriendPolicyDidChangeNotification object:nil];
-    });
+    dispatch_async(dispatch_get_main_queue(),^{ [self flushPolicyRefresh]; });
+}
+- (void)flushPolicyRefresh {
+    NSAssert(NSThread.isMainThread,@"Policy publication on main");
+    @synchronized(self) { if(!self.policyRefreshScheduled)return; self.policyRefreshScheduled=NO; }
+    [self refreshShakeMonitoring]; [self refreshRecoveryGesture]; [self startExpiryTimer];
+    [NSNotificationCenter.defaultCenter postNotificationName:CSCloseFriendPolicyDidChangeNotification object:nil];
 }
 - (NSArray<UIWindow *> *)windows {
     NSMutableArray *windows=[NSMutableArray new];
@@ -84,12 +103,21 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     return windows;
 }
 - (void)cover {
+    // The background appearance switch governs every plugin-wide cover. Keep
+    // foreground relock protection and authentication/token invalidation separate.
+    BOOL inactive=self.backgroundCoverRequired || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive;
+    if(inactive && ![CSBackgroundBlurManager.sharedManager isEnabled]) { [self uncover]; return; }
     for(UIWindow *window in [self windows]) { if(window.hidden)continue;
         UIView *cover=[[UIView alloc] initWithFrame:window.bounds]; cover.backgroundColor=UIColor.systemBackgroundColor; cover.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
         cover.accessibilityViewIsModal=YES; [window addSubview:cover]; [self.covers addObject:cover];
     }
 }
 - (void)uncover { for(UIView *view in self.covers)[view removeFromSuperview]; [self.covers removeAllObjects]; }
+- (void)backgroundPrivacySettingsChanged:(NSNotification *)note {
+    if(!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(),^{ [self backgroundPrivacySettingsChanged:note]; }); return; }
+    BOOL inactive=self.backgroundCoverRequired || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive;
+    if(inactive && ![CSBackgroundBlurManager.sharedManager isEnabled]) [self uncover];
+}
 - (void)returnToChatListIfNeeded {
     if(self.routingProtectedChat) return;
     self.routingProtectedChat=YES;
@@ -103,23 +131,28 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     [self.shakeMonitor stop]; [self.timer invalidate]; self.timer=nil;
     CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
     BOOL sensitive=snapshot.enabled || self.runtime.isAuthorized || self.lastRevealed || self.authenticating;
-    if(sensitive)[self cover];
-    [self.authenticationContext invalidate]; self.authenticationContext=nil; self.authenticating=NO;
-    [self.runtime lock]; self.lastRevealed=NO;
-    if(sensitive) [self returnToChatListIfNeeded];
-    // Let the queued policy observers refresh the current page before lifting the
-    // privacy cover. Relocking must not reset an unrelated navigation stack.
-    dispatch_async(dispatch_get_main_queue(),^{
+    [UIView performWithoutAnimation:^{
+        if(sensitive)[self cover];
+        [self.runtime lock]; self.lastRevealed=NO;
+        [self cancelBiometricAuthentication]; self.authenticating=NO; self.passwordFallbackReason=nil;
+        if(sensitive) [self returnToChatListIfNeeded];
+        // Complete policy publication in this lifecycle callback rather than
+        // deferring past snapshot preparation. The queued coalescer becomes a no-op.
+        [self flushPolicyRefresh];
+        for(UIWindow *window in [self windows]) if(!window.hidden) [window layoutIfNeeded];
         if(!self.backgroundCoverRequired && UIApplication.sharedApplication.applicationState==UIApplicationStateActive) [self uncover];
-    });
+    }];
 }
 - (void)start {
     NSAssert(NSThread.isMainThread,@"UI on main"); if(self.started)return; self.started=YES;
     NSNotificationCenter *center=NSNotificationCenter.defaultCenter;
     [center addObserver:self selector:@selector(resign:) name:UIApplicationWillResignActiveNotification object:nil];
+    [center addObserver:self selector:@selector(suspend:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [center addObserver:self selector:@selector(active:) name:UIApplicationDidBecomeActiveNotification object:nil];
     [center addObserver:self selector:@selector(accountChanged:) name:@"CSBackupAccountChanged" object:nil];
-    [center addObserver:self selector:@selector(resign:) name:UIApplicationProtectedDataWillBecomeUnavailable object:nil];
+    [center addObserver:self selector:@selector(suspend:) name:UIApplicationProtectedDataWillBecomeUnavailable object:nil];
+    for(NSString *name in @[CSBackgroundBlurSettingsChangedNotification,@"com.wechat.tweak.settings_changed",@"com.wechat.tweak.local_settings_changed"])
+        [center addObserver:self selector:@selector(backgroundPrivacySettingsChanged:) name:name object:nil];
     [self.runtime setActive:UIApplication.sharedApplication.applicationState==UIApplicationStateActive];
     [self refreshAccount];
     [self refreshShakeMonitoring];
@@ -164,8 +197,24 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     // One deadline wakeup, including while a scroll view tracks a finger.
     [NSRunLoop.mainRunLoop addTimer:self.timer forMode:NSRunLoopCommonModes];
 }
-- (void)resign:(NSNotification *)note { self.backgroundCoverRequired=YES; [self lockAndReturnToSafePage]; [self.runtime setActive:NO]; }
-- (void)active:(NSNotification *)note { [self.runtime setActive:YES]; [self refreshAccount]; self.backgroundCoverRequired=NO; [self uncover]; }
+- (void)resign:(NSNotification *)note {
+    // LocalAuthentication can temporarily deactivate the app. Keep only this locked
+    // challenge alive; a real background/lock-screen notification still cancels it.
+    if(self.authenticationContext) { self.backgroundCoverRequired=YES; [self cover]; return; }
+    [self suspend:note];
+}
+- (void)suspend:(NSNotification *)note {
+    self.backgroundCoverRequired=YES;
+    // setActive:NO also invalidates policy; include it before the synchronous flush.
+    [self.runtime setActive:NO]; [self lockAndReturnToSafePage];
+}
+- (void)active:(NSNotification *)note {
+    [self.runtime setActive:YES]; [self refreshAccount]; self.backgroundCoverRequired=NO;
+    void (^reply)(void)=self.pendingBiometricReply; self.pendingBiometricReply=nil;
+    if(reply)reply();
+    [self flushPolicyRefresh];
+    [self uncover];
+}
 - (void)accountChanged:(NSNotification *)note { [self lockAndReturnToSafePage]; [self refreshAccount]; }
 - (void)refreshAccount {
     NSAssert(NSThread.isMainThread,@"Account service on main");
@@ -185,7 +234,10 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     [self refreshAccount]; return !CSBackupAccountIsSuspended() && [token[@"epoch"] unsignedIntegerValue]==CSBackupAccountEpoch() && [self.runtime isTokenCurrent:token];
 }
 - (void)passwordPrompt:(UIViewController *)presenter token:(NSDictionary *)token setup:(BOOL)setup completion:(void (^)(BOOL))completion {
-    UIAlertController *alert=[UIAlertController alertControllerWithTitle:setup?@"设置密友密码":@"验证密友密码" message:setup?@"设置至少 6 位数字或 8 个字符的密码后才可启用（最长 128 个字符）。请妥善保存；无法通过普通备份恢复凭据。":@"验证后临时显示密友。后台、锁定或账号切换会立即失效。" preferredStyle:UIAlertControllerStyleAlert];
+    NSString *reason=self.passwordFallbackReason; self.passwordFallbackReason=nil;
+    NSString *message=setup?@"设置至少 6 位数字或 8 个字符的密码后才可启用（最长 128 个字符）。请妥善保存；无法通过普通备份恢复凭据。":@"验证后临时显示密友。后台、锁定或账号切换会立即失效。";
+    if(reason.length && !setup)message=[NSString stringWithFormat:@"%@\n%@",reason,message];
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:setup?@"设置密友密码":@"验证密友密码" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alert addTextFieldWithConfigurationHandler:^(UITextField *field){ field.secureTextEntry=YES; field.placeholder=@"密码"; field.textContentType=setup?UITextContentTypeNewPassword:UITextContentTypePassword; }];
     if(setup)[alert addTextFieldWithConfigurationHandler:^(UITextField *field){ field.secureTextEntry=YES; field.placeholder=@"再次输入密码"; }];
     [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action){ self.authenticating=NO; if(completion)completion(NO); }]];
@@ -205,8 +257,69 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     }]];
     [presenter presentViewController:alert animated:YES completion:nil];
 }
+- (void)cancelBiometricAuthentication {
+    LAContext *context=self.authenticationContext;
+    void (^completion)(BOOL)=self.biometricCompletion;
+    self.authenticationContext=nil; self.biometricCompletion=nil; self.pendingBiometricReply=nil;
+    [context invalidate];
+    if(completion)completion(NO);
+}
+- (NSString *)biometricFailureReason:(NSError *)error {
+    if(![error.domain isEqual:LAErrorDomain])return @"生物识别暂不可用，请输入密友密码。";
+    switch(error.code) {
+        case LAErrorBiometryNotEnrolled: return @"设备尚未录入面容或指纹，请输入密友密码。";
+        case LAErrorBiometryNotAvailable: return @"设备不支持生物识别或未授权，请输入密友密码。";
+        case LAErrorPasscodeNotSet: return @"设备未设置锁屏密码，请输入密友密码。";
+        case LAErrorBiometryLockout: return @"系统生物识别已锁定，请输入密友密码。";
+        case LAErrorUserCancel: case LAErrorSystemCancel: case LAErrorAppCancel:
+            return @"生物识别已取消，请输入密友密码。";
+        case LAErrorUserFallback: return @"请输入密友密码。";
+        default: return @"生物识别未通过，请输入密友密码。";
+    }
+}
+- (void)biometricPasswordFallbackFrom:(UIViewController *)presenter token:(NSDictionary *)token reason:(NSString *)reason domainState:(NSData *)domain completion:(void (^)(BOOL))completion {
+    self.passwordFallbackReason=reason;
+    [self passwordPrompt:presenter token:token setup:NO completion:^(BOOL accepted){
+        // Enrollment changes are trusted only after the independent friend password.
+        if(accepted && domain.length)CSBackupPerformAtAccountEpoch([token[@"epoch"] unsignedIntegerValue],^{
+            if(!CSBackupAccountIsSuspended() && self.runtime.isAuthorized &&
+               [self.runtime.authenticationToken[@"account"] isEqual:token[@"account"]])
+                CSKeychainWrite(token[@"account"],@"biometric-domain",domain,YES,NULL);
+        });
+        if(completion)completion(accepted);
+    }];
+}
+- (void)finishBiometricContext:(LAContext *)context token:(NSDictionary *)token presenter:(UIViewController *)presenter success:(BOOL)success error:(NSError *)error {
+    NSAssert(NSThread.isMainThread,@"Biometric completion on main");
+    if(self.authenticationContext!=context)return; // Cancelled/older callbacks cannot finish a newer challenge.
+    if(self.backgroundCoverRequired || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) {
+        __weak typeof(self) weakSelf=self;
+        self.pendingBiometricReply=^{ [weakSelf finishBiometricContext:context token:token presenter:presenter success:success error:error]; };
+        return;
+    }
+    void (^completion)(BOOL)=self.biometricCompletion;
+    self.authenticationContext=nil; self.biometricCompletion=nil; self.pendingBiometricReply=nil;
+    NSData *domain=[context.evaluatedPolicyDomainState copy]; [context invalidate];
+    if(![self validateToken:token] || !presenter.view.window) { self.authenticating=NO; if(completion)completion(NO); return; }
+    NSString *reason=[self biometricFailureReason:error];
+    __block BOOL accepted=NO;
+    if(success) {
+        NSError *storageError=nil;
+        NSData *previous=CSKeychainRead(token[@"account"],@"biometric-domain",&storageError);
+        BOOL domainMatches=domain.length && !storageError && (!previous || [previous isEqual:domain]);
+        // First use establishes a device/account baseline without changing the password schema.
+        if(domainMatches && !previous)domainMatches=CSKeychainWrite(token[@"account"],@"biometric-domain",domain,YES,&storageError);
+        if(domainMatches)CSBackupPerformAtAccountEpoch([token[@"epoch"] unsignedIntegerValue],^{ if(!CSBackupAccountIsSuspended())accepted=[self.runtime completeBiometricWithToken:token]; });
+        reason=storageError || !domain.length ? @"生物识别安全记录不可用，请输入密友密码。" :
+            !domainMatches ? @"面容或指纹信息已变更，请先输入密友密码。" : @"当前验证未获授权，可能处于密码错误冷却期，请输入密友密码或稍后重试。";
+    }
+    if(accepted) { self.authenticating=NO; self.lastRevealed=YES; if(completion)completion(YES); }
+    else [self biometricPasswordFallbackFrom:presenter token:token reason:reason domainState:success?domain:nil completion:completion];
+}
 - (void)authenticateFrom:(UIViewController *)presenter completion:(void (^)(BOOL))completion {
+    if(!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(),^{ [self authenticateFrom:presenter completion:completion]; }); return; }
     [self start]; [self refreshAccount];
+    if(self.backgroundCoverRequired || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) { if(completion)completion(NO); return; }
     if([self.runtime isAuthorized]) { if(completion)completion(YES); return; }
     NSDictionary *token=self.runtime.authenticationToken;
     if(!token || self.authenticating || !presenter.view.window) {
@@ -218,21 +331,22 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     BOOL setup=![self.runtime hasCredential];
     if(!setup && [self.runtime.currentProfile[@"options"][@"biometric"] boolValue]) {
         LAContext *context=[LAContext new]; self.authenticationContext=context;
+        context.touchIDAuthenticationAllowableReuseDuration=0;
+        context.localizedFallbackTitle=@"使用密友密码";
         NSError *error=nil; BOOL available=[context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
         [self recordCapability:@"生物识别" available:available];
         if(available) {
-            [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics localizedReason:@"验证后临时显示密友" reply:^(BOOL success,__unused NSError *error){
+            self.biometricCompletion=completion;
+            __weak typeof(self) weakSelf=self;
+            [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics localizedReason:@"验证后临时显示密友" reply:^(BOOL success,NSError *error){
                 dispatch_async(dispatch_get_main_queue(),^{
-                    if(self.authenticationContext!=context) { if(completion)completion(NO); return; }
-                    self.authenticationContext=nil;
-                    if(![self validateToken:token]) { self.authenticating=NO; if(completion)completion(NO); return; }
-                    __block BOOL accepted=NO;
-                    if(success)CSBackupPerformAtAccountEpoch([token[@"epoch"] unsignedIntegerValue],^{ if(!CSBackupAccountIsSuspended())accepted=[self.runtime completeBiometricWithToken:token]; });
-                    if(accepted) { self.authenticating=NO; self.lastRevealed=YES; if(completion)completion(YES); }
-                    else [self passwordPrompt:presenter token:token setup:NO completion:completion];
+                    [weakSelf finishBiometricContext:context token:token presenter:presenter success:success error:error];
                 });
             }]; return;
         }
+        self.authenticationContext=nil; [context invalidate];
+        [self biometricPasswordFallbackFrom:presenter token:token reason:[self biometricFailureReason:error] domainState:nil completion:completion];
+        return;
     }
     [self passwordPrompt:presenter token:token setup:setup completion:completion];
 }
@@ -267,6 +381,12 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     [self refreshAccount];
     CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
     if(epoch!=CSCloseFriendAccountEpoch() || snapshot.blocked || !snapshot.enabled || ![snapshot.options[@"longPressUnlockEnabled"] boolValue] || gesture.minimumPressDuration!=[snapshot.options[@"longPressUnlockDuration"] doubleValue]) return;
+    if([snapshot.options[@"biometric"] boolValue]) {
+        [self authenticateFrom:page completion:^(BOOL accepted){
+            if(accepted)[[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
+        }];
+        return;
+    }
     if([self.runtime revealWithShortcutToken:self.runtime.authenticationToken]) {
         self.lastRevealed=YES;
         [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];

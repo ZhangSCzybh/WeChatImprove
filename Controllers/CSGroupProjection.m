@@ -49,7 +49,10 @@ static NSUInteger CSGroupNumericUnread(CSGroupRow *row) {
 }
 
 static BOOL CSGroupDotUnread(CSGroupRow *row) {
-    return row.redDot || ((row.kind == CSGroupRowKindAggregate || row.kind == CSGroupRowKindBusiness) && row.unreadCount > 0);
+    // The native show-as-dot flag is a presentation mode, not proof of unread.
+    // Aggregate/business counters have unknown coverage and may outlive their
+    // visible badge; never manufacture a dot from those counters alone.
+    return row.unreadCount > 0 && row.redDot;
 }
 
 static BOOL CSGroupRowsMatch(CSGroupRow *a, CSGroupRow *b, BOOL unread) {

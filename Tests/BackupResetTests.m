@@ -10,14 +10,21 @@ int main(void){@autoreleasepool{
     NSMutableDictionary *defaults=[NSMutableDictionary dictionary],*domains=[NSMutableDictionary dictionary];
     for(NSString *alias in @[@"standard",@"legacy",@"layout"]){NSString *suite=[@"reset.test." stringByAppendingString:NSUUID.UUID.UUIDString];domains[alias]=suite;defaults[alias]=[[NSUserDefaults alloc]initWithSuiteName:suite];}
     NSUserDefaults *standard=defaults[@"standard"];
-    CSBackupStore *store=[[CSBackupStore alloc]initWithRoot:[root URLByAppendingPathComponent:@"snapshots"]];
-    CSBackupEngine *engine=[[CSBackupEngine alloc]initWithDefaults:defaults domains:domains store:store resources:[root URLByAppendingPathComponent:@"resources"]];
+    NSURL *resources=[root URLByAppendingPathComponent:@"Library/Preferences/WeChatImprove"];
+    CSBackupStore *store=[[CSBackupStore alloc]initWithRoot:[resources URLByAppendingPathComponent:@"BackupV2"]];
+    CSBackupEngine *engine=[[CSBackupEngine alloc]initWithDefaults:defaults domains:domains store:store resources:resources];
     __block NSString *account=@"alice";engine.context=^{return @{@"account":account,@"epoch":@1,@"installationID":@"test-install",@"pluginVersion":@"test"};};
     [NSFileManager.defaultManager createDirectoryAtURL:engine.resourceRoot withIntermediateDirectories:YES attributes:nil error:NULL];
     NSString *icon=@"com.wechat.enhance.tabbar_style.icon.chat",*otherIcon=@"com.wechat.enhance.tabbar_style.icon.me",*text=@"com.wechat.tweak.navigation.separator.text",*contacts=@"com.wechat.tweak.navigation.contact.overrides",*navImage=@"com.wechat.tweak.navigation.separator.image";
     NSString *missing=[engine.resourceRoot URLByAppendingPathComponent:@"gone.png"].path;
     NSURL *good=[engine.resourceRoot URLByAppendingPathComponent:@"good.png"];
     NSData *png=[[NSData alloc]initWithBase64EncodedString:@"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=" options:0];
+    NSMutableArray *sentinels=[NSMutableArray array];
+    for(NSString *leaf in @[@"BackupV2",@"CloseFriends"]){
+        NSURL *folder=[resources URLByAppendingPathComponent:leaf];
+        [NSFileManager.defaultManager createDirectoryAtURL:folder withIntermediateDirectories:YES attributes:nil error:NULL];
+        NSURL *sentinel=[folder URLByAppendingPathComponent:@"keep.png"];[png writeToURL:sentinel atomically:YES];[sentinels addObject:sentinel];
+    }
     [png writeToURL:good atomically:YES];
     [standard setObject:missing forKey:icon];[standard setObject:good.path forKey:otherIcon];
     [standard setObject:missing forKey:navImage];
@@ -57,6 +64,7 @@ int main(void){@autoreleasepool{
     Check([standard objectForKey:contacts]==nil&&[standard objectForKey:navImage]==nil,@"full reset removes selected missing image references");
     Check([[standard objectForKey:@"host.account"] isEqual:@"host-secret"]&&[standard integerForKey:@"kReceiveTransferTotalCountKey"]==99,@"host account and payment statistics preserved");
     Check([engine save:@"after reset" kind:@"manual" error:&error]!=nil,@"complete backup works after full reset");
+    for(NSURL *sentinel in sentinels)Check([[NSData dataWithContentsOfURL:sentinel] isEqual:png],@"real reset and rollback preserve data subtrees including PNG files");
     // Existing corrupt files and dangling links are not silently treated as missing.
     [@"invalid image" writeToFile:missing atomically:YES encoding:NSUTF8StringEncoding error:NULL];[standard setObject:missing forKey:icon];
     Check([engine resetSnapshot:&error]==nil,@"existing corrupt image remains a visible repair error");

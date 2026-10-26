@@ -1,5 +1,7 @@
 # Close Friends Implementation Plan
 
+> 存储路径已按 2.0-3 更新（2026-10-24）：旧 Application Support 对应目录仅用于迁移读取，详见 `docs/audits/preferences-storage-migration-2026-10-24/README.md`。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Implement the approved account-owned close-friend privacy subsystem, including non-friend profile presentation from shared groups.
@@ -93,7 +95,7 @@ Options use these exact keys: `hideSessions`, `hideContacts`, `hideForwarding`, 
 **Interfaces:** Consumes Task 1. Produces all shared bridge APIs, guarded native hook installer, authenticated settings, durable journal API, thread-safe snapshots and change notification. Uses existing CSBackupAccountEpoch/CSBackupAccountIsSuspended rather than maintaining a conflicting native login hook owner.
 
 - [ ] Add behavioral runtime tests with fake account/lifecycle/key provider; cover late biometric reply, wrong PIN/cooldown, background invalidation, cross-account writes and corrupt store holding protection.
-- [ ] Implement device-only Keychain policy key and account credential verifier; root encrypted account store under Library/Application Support/WeChatImprove/CloseFriends. Preserve existing bytes on failure and never generate a replacement key over an existing unreadable store.
+- [ ] Implement device-only Keychain policy key and account credential verifier; root encrypted account store under Library/Preferences/WeChatImprove/CloseFriends. Preserve existing bytes on failure and never generate a replacement key over an existing unreadable store.
 - [ ] Implement account snapshot publication, main-thread profile edits, independent journal writes, setup requiring valid password before enable, 300-second temporary reveal, optional biometric verification, immediate lifecycle cover and safe-page return. Authentication resuming after background/account change fails. Hook constructor does no service discovery or disk-heavy work.
 - [ ] Add native-style settings in existing account/safety section, use WEContactSelectViewController for friends/groups, exact options above, password/change-password, explicit lock, expiry, hidden entry recovery via homepage navbar long press. Capability rows say interface available/unavailable and device verification pending, not complete protection. Gate direct settings instantiation and hidden plugin entry routes.
 - [ ] Test guards and compile iOS sources; commit task files and evidence. Existing settings and backup failure recovery remain usable.

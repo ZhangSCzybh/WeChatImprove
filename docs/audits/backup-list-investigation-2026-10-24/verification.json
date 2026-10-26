@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-24",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "head": "64aac10423168f97bce3395a498fe7ca5e144a3a",
+  "production_changed": false,
+  "device_accessed": false,
+  "data_source": "Isolated macOS temporary directories and random NSUserDefaults suites; no iPhone container or real backups accessed",
+  "checks": {
+    "Tests/verify-backup-store.sh": 52,
+    "Tests/verify-backup-retention.sh": 171,
+    "Tests/verify-backup-transactions.sh": 89,
+    "Tests/verify-backup-reset.sh": 30,
+    "isolated_directory_diagnosis": 29
+  },
+  "source_sha256": {
+    "Controllers/CSBackupStore.m": "a225d93a3f6f8efad81dfcb0b5be7b2c5fa690f9739b4e9b7b84f631b520ebea",
+    "Controllers/CSBackupManager.m": "0f287344eaf0bdb07b1e8a83d96e24cf09ede8022f9840f639755a692c67043a",
+    "Controllers/CSBackupSettingsViewController.m": "80d4b9891fa6c2d885976b001a8f280a68bfe094079304a6dfb5ea3bdaf083f7",
+    "Controllers/CSBackupEngine.m": "b7faa23ae724581d20dec74e34564b35ba396a78ba736f57dd8d008bb28ec939",
+    "Controllers/CSBackupCodec.m": "b05960e314049e4358b9960b76726079c6f330b4336b1367ac642aef0d990a17",
+    "Controllers/CSBackupRegistry.m": "42ca9c3c804f10c9877e534905434515a2f0debafba751bb1c57626d64bca079",
+    "Controllers/CSBackupBootstrap.m": "37080cc0e7f6b47a03a821c5016accc3b36029c0ba5edde05171a20649ba5422",
+    "Hooks/BackupLifecycleHooks.xm": "0ada7e7893bff0d6c3d1347c52a3b2a736050d5d84c70d0fa8ebbf5be793787c"
+  }
+}

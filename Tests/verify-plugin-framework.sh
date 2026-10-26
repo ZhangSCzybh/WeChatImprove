@@ -17,12 +17,12 @@ functions=[extract(entry,s) for s in ('static CSEntryDisplayMode getEntryDisplay
 methods=[extract(entry,s) for s in ('- (void)onCustomEntryClick {','- (void)openCustomViewController {','- (void)onCustomEntryClickInSetting:', '- (void)openCustomViewControllerFromSetting {')]
 (out/'EntryUnderTest.h').write_text(('\n'.join(functions)+'\n@implementation TestEntry\n'+'\n'.join(methods)+'\n@end\n').replace('[NSUserDefaults standardUserDefaults]','testDefaults'))
 manager=Path('Controllers/CSBackupManager.m').read_text()
-methods=[extract(manager,s) for s in ('- (BOOL)attemptUpgradeBackup:', '- (void)retryPendingWork:', '- (void)resolveStartup:')]
+methods=[extract(manager,s) for s in ('- (NSString *)lastRestoreFailure', '- (NSError *)restoreError:', '- (void)clearRestoreFailure', '- (BOOL)attemptUpgradeBackup:', '- (void)retryPendingWork:', '- (void)resolveStartup:')]
 (out/'ManagerUnderTest.h').write_text('\n'.join(methods).replace('NSUserDefaults.standardUserDefaults','self.testDefaults'))
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-function \
  -framework Foundation -I"$work" Tests/PluginEntryTests.m -o "$work/entry"
 "$work/entry"
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \
- -framework Foundation -I"$work" -IHeaders Tests/BackupStartupIntegrationTests.m -o "$work/startup"
+ -framework Foundation -I"$work" -IHeaders -IControllers Tests/BackupStartupIntegrationTests.m -o "$work/startup"
 "$work/startup"
