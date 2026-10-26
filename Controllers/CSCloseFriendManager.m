@@ -3,6 +3,7 @@
 #import "CSCloseFriendSettingsViewController.h"
 #import "CSCloseFriendCrypto.h"
 #import "CSCloseFriendAccount.h"
+#import "CSCloseFriendEntryState.h"
 #import "CSCloseFriendShakeMonitor.h"
 #import "CSCloseFriendNavigation.h"
 #import "CSBackupBootstrap.h"
@@ -46,6 +47,7 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 }
 @interface CSCloseFriendManager ()
 @property(nonatomic,strong,readwrite) CSCloseFriendRuntime *runtime;
+@property(nonatomic,strong) CSCloseFriendEntryState *entryState;
 @property(nonatomic,strong) NSMutableDictionary *capabilityMap;
 @property(nonatomic,strong) NSMutableArray<UIView *> *covers;
 @property(nonatomic,strong) LAContext *authenticationContext;
@@ -64,6 +66,7 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
 - (instancetype)init {
     if((self=[super init])) {
         _capabilityMap=[NSMutableDictionary new]; _covers=[NSMutableArray new];
+        _entryState=[[CSCloseFriendEntryState alloc] initWithDefaults:[[NSUserDefaults alloc] initWithSuiteName:@"com.wechatimprove.closefriends.entry-discovery"]];
         CSPluginDirectoryMigration *migration=CSPluginStorageMigration(@"CloseFriends");
         CSCloseFriendStore *store=[[CSCloseFriendStore alloc] initWithMigration:migration keyProvider:^NSData *(NSString *account,NSError **error){
             NSData *key=CSKeychainRead(account,@"policy",error); if(key || (error && *error))return key;
@@ -350,7 +353,27 @@ static BOOL CSKeychainWrite(NSString *account, NSString *kind, NSData *data, BOO
     }
     [self passwordPrompt:presenter token:token setup:setup completion:completion];
 }
+- (BOOL)settingsEntryVisible {
+    [self start]; [self refreshAccount];
+    return [self.entryState isEntryVisibleForSnapshot:CSCloseFriendCurrentSnapshot() hasCredential:self.runtime.hasCredential];
+}
+- (NSDictionary *)settingsEntryDiscoveryToken {
+    [self start]; [self refreshAccount];
+    if(self.backgroundCoverRequired || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive ||
+       [self.entryState hasDiscoveredEntryForSnapshot:CSCloseFriendCurrentSnapshot() hasCredential:self.runtime.hasCredential])return nil;
+    return self.runtime.authenticationToken;
+}
+- (BOOL)discoverSettingsEntryWithToken:(NSDictionary *)token {
+    if(!NSThread.isMainThread || !token || self.backgroundCoverRequired || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive)return NO;
+    __block BOOL discovered=NO;
+    CSBackupPerformAtAccountEpoch([token[@"epoch"] unsignedIntegerValue],^{
+        if(![self validateToken:token])return;
+        discovered=[self.entryState discoverEntryForSnapshot:CSCloseFriendCurrentSnapshot() hasCredential:self.runtime.hasCredential];
+    });
+    return discovered;
+}
 - (void)presentSettingsFrom:(UIViewController *)presenter {
+    if(![self settingsEntryVisible])return;
     [self authenticateFrom:presenter completion:^(BOOL success){
         if(!success)return;
         CSCloseFriendSettingsViewController *settings=[[CSCloseFriendSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];

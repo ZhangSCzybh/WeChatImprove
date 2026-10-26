@@ -4,6 +4,10 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"2.0-13+entry1": @[
+            @{@"title": @"完善设置入口显示", @"detail": @"入口显示偏好按账号保存，保留已有账号的配置与隐藏选择。"},
+            @{@"title": @"保留既有保护规则", @"detail": @"入口显示与内容解锁独立处理；账号切换和进入后台会使未完成的操作失效。"}
+        ],
         @"2.0-13": @[
             @{@"title": @"定时任务纳入配置备份", @"detail": @"备份当前账号的任务、会话、消息和时间规则，可按模块恢复或重置；恢复后总开关关闭，不导入执行记录和待发送状态。"},
             @{@"title": @"表情添加仅使用原生提示", @"detail": @"移除添加图片到表情全过程的插件提示，包括加载、添加、重复点击和失败提示，保留微信原生反馈。"},
