@@ -1,0 +1,6 @@
+arm64 Controllers/CSScheduledTaskSettingsViewController.m PASS
+arm64 Controllers/CSImageStickerSettingsViewController.m PASS
+arm64 Controllers/CSNativeContactPicker.m PASS
+arm64e Controllers/CSScheduledTaskSettingsViewController.m PASS
+arm64e Controllers/CSImageStickerSettingsViewController.m PASS
+arm64e Controllers/CSNativeContactPicker.m PASS

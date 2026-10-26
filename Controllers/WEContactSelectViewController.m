@@ -414,9 +414,11 @@
             [self.selectedUserNames removeObject:userName];
             cell.accessoryType = UITableViewCellAccessoryNone;
         } else {
+            if (self.singleSelection) [self.selectedUserNames removeAllObjects];
             [self.selectedUserNames addObject:userName];
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }
+        if (self.singleSelection) [tableView reloadData];
         
         [self updateRightBarButtonTitle];
         [self updateSelectAllButtonTitle];

@@ -1,0 +1,17 @@
+{
+  "count": 47068,
+  "sha256": "1287cfebf731b6a3899bb09825da96783b4fc7b199ad7eeb24bc35b3070126cf",
+  "authorizedChanges": [
+    "Controllers/CSMessageImageStickerAdapter.m",
+    "Tests/MessageActionExecutionTests.m",
+    "control",
+    "Headers/CSUserInfoHelper.h",
+    "Controllers/CSReleaseNotesViewController.m",
+    "README.md",
+    "docs/features/scheduled-tasks-and-image-stickers.md"
+  ],
+  "excludedNewPaths": [
+    "docs/audits/sticker-native-success-2.0-14/",
+    "packages/com.wechat.improve_2.0-14_"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "target": "/private/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "version": "8.0.78.34",
+  "architecture": "arm64",
+  "staticOnly": true,
+  "originalEvidence": "docs/evidence/image-to-emoticon-native-2026-10-26/manifest.json",
+  "nativeSuccessLocalizationKey": "Emoticon_Added_To_Board",
+  "files": {
+    "extract.py": "45c118c33fee04df4b83fe4c1979c8f650da10db7c86370ac64cc784c5566c37",
+    "methods.json": "e691adc925ac599727813af8639ada9685f4eac49d3b18acecf86b0421f396b2",
+    "ivars.json": "a88095ec4dd7615cb2f1ed46c42f9da755c59240235945c3254f501e139ddcb4",
+    "selected-disassembly.txt": "d52d68a8ab55bcfb71167bcab462c32ec6c14a07981cac181ca19a8b67ff90d9"
+  },
+  "limitations": [
+    "No device or live upload validation.",
+    "Annotations resolve adjacent static references, not complete register data flow.",
+    "Batch result uploadSuccess getter is evidenced by native consumer dispatch; runtime ABI checks are required."
+  ]
+}

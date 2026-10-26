@@ -1,0 +1,6 @@
+arm64 Controllers/CSMessageImageStickerAdapter.m PASS
+arm64 Controllers/CSMessageActionCoordinator.m PASS
+arm64 Controllers/CSImageStickerSettingsViewController.m PASS
+arm64e Controllers/CSMessageImageStickerAdapter.m PASS
+arm64e Controllers/CSMessageActionCoordinator.m PASS
+arm64e Controllers/CSImageStickerSettingsViewController.m PASS

@@ -32,5 +32,5 @@ xcrun --sdk macosx clang "${flags[@]}" -c "$work/image.m" -o "$work/image.o"
 xcrun --sdk macosx clang "${flags[@]}" -c "$work/store.m" -o "$work/store.o"
 nm -u "$work/image.o" | rg -q '_CSRestoreTestOpen$'
 nm -u "$work/store.o" | rg -q '_CSRestoreStoreOpen$'
-xcrun --sdk macosx clang "${flags[@]}" -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSPluginStorage.m Controllers/CSBackupAudit.m Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m Tests/BackupRestorePathTests.m "$work/image.o" "$work/store.o" -o "$work/tests"
+xcrun --sdk macosx clang "${flags[@]}" -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics Controllers/CSScheduledTaskStore.m Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSPluginStorage.m Controllers/CSBackupAudit.m Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m Tests/BackupRestorePathTests.m "$work/image.o" "$work/store.o" -o "$work/tests"
 "$work/tests" "$@"

@@ -38,6 +38,8 @@
 - (void)cs_handleRepeatMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
 %new
 - (void)cs_handleVoiceForwardMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
+%new
+- (void)cs_handleAddStickerMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
 %end
 
 %hook EmoticonMessageCellView

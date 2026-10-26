@@ -17,6 +17,8 @@ typedef void (^WEContactSelectCompletion)(NSArray<NSString *> *selectedUserNames
 @property (nonatomic, copy, nullable) WEContactSelectCompletion completion;
 // Opt in when the caller may present a save error after selection.
 @property (nonatomic) BOOL completesAfterDismissal;
+// Opt-in; existing group membership pickers remain multi-select.
+@property (nonatomic) BOOL singleSelection;
 
 - (instancetype)initWithTitle:(NSString *)title
                 selectedUserNames:(NSArray<NSString *> *)selectedUserNames

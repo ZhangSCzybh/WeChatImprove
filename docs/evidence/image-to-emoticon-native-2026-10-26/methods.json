@@ -1,0 +1,290 @@
+[
+  {
+    "cls": "ImageMessageCellView",
+    "kind": "instance",
+    "selector": "operationMenuItems",
+    "address": "0x101f78e48",
+    "end": "0x101f793e4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "ImageMessageViewModel",
+    "kind": "instance",
+    "selector": "isImageExists",
+    "address": "0x101f7f744",
+    "end": "0x101f7f768",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "ImageMessageViewModel",
+    "kind": "instance",
+    "selector": "imageData",
+    "address": "0x101f7f768",
+    "end": "0x101f7f78c",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "ImageMessageViewModel",
+    "kind": "instance",
+    "selector": "contentExists",
+    "address": "0x101f7f848",
+    "end": "0x101f7f8b8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "AddEmoticonWrap",
+    "kind": "instance",
+    "selector": "initWithMessageWrap:AndSource:",
+    "address": "0x101531518",
+    "end": "0x101531a28",
+    "types": "@28@0:8@16i24"
+  },
+  {
+    "cls": "EmoticonCustomManageAddLogic",
+    "kind": "instance",
+    "selector": "startAddEmoticonWithWrap:",
+    "address": "0x10146e430",
+    "end": "0x10146e520",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "EmoticonCustomManageAddLogic",
+    "kind": "instance",
+    "selector": "startAddEmoticonWithWraps:NeedCheckTotalCountLimit:",
+    "address": "0x10146ec94",
+    "end": "0x101470ed8",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "cls": "EmoticonCustomManageAddLogic",
+    "kind": "instance",
+    "selector": "onAddBackupEmoticonPendingUpload:",
+    "address": "0x101474008",
+    "end": "0x1014743dc",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "EmoticonCustomManageAddLogic",
+    "kind": "instance",
+    "selector": "onAddBackupEmoticonOK:addEmoticonWrap:",
+    "address": "0x1014743dc",
+    "end": "0x1014749f0",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "EmoticonCustomManageAddLogic",
+    "kind": "instance",
+    "selector": "onAddBackupEmoticonFailed:reason:remoteErrMsg:",
+    "address": "0x1014749f0",
+    "end": "0x101475200",
+    "types": "v40@0:8@16Q24@32"
+  },
+  {
+    "cls": "EmoticonCustomManageAddLogic",
+    "kind": "class",
+    "selector": "typeNumberForImageData:",
+    "address": "0x101471744",
+    "end": "0x101471870",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "EmoticonCustomAddLogicController",
+    "kind": "instance",
+    "selector": "MMImagePickerManager:didFinishPickingImageWithInfo:",
+    "address": "0x101444df4",
+    "end": "0x10144507c",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "EmoticonCustomAddLogicController",
+    "kind": "instance",
+    "selector": "handleGIFInfo:",
+    "address": "0x10144507c",
+    "end": "0x10144553c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "EmoticonCustomAddLogicController",
+    "kind": "instance",
+    "selector": "handleEmoticonUploadInfo:source:",
+    "address": "0x101445594",
+    "end": "0x101445828",
+    "types": "v28@0:8@16i24"
+  },
+  {
+    "cls": "EmoticonCustomCreateLogic",
+    "kind": "instance",
+    "selector": "startImageUploadTask:",
+    "address": "0x101454fa8",
+    "end": "0x10145509c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "EmoticonCreateImageUploadTask",
+    "kind": "instance",
+    "selector": "startStaticImageUpload",
+    "address": "0x10145e1c0",
+    "end": "0x10145e540",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "EmoticonCreateImageUploadTask",
+    "kind": "instance",
+    "selector": "startGifImageUpload",
+    "address": "0x10145e540",
+    "end": "0x10145e758",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "EmoticonCreateImageUploadTask",
+    "kind": "instance",
+    "selector": "handleStaticImg:withAddingItem:",
+    "address": "0x10145ea20",
+    "end": "0x10145ecf0",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "EmoticonCreateUploadTask",
+    "kind": "instance",
+    "selector": "handleAddingItem:",
+    "address": "0x10145bc84",
+    "end": "0x10145c460",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "EmoticonCreateUploadTask",
+    "kind": "instance",
+    "selector": "realDoAddImg:index:",
+    "address": "0x10145c460",
+    "end": "0x10145cec0",
+    "types": "@32@0:8@16Q24"
+  },
+  {
+    "cls": "EmoticonCreateUploadTask",
+    "kind": "instance",
+    "selector": "addEmoticonLogic",
+    "address": "0x10145cec0",
+    "end": "0x10145d010",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "EmoticonBoardView",
+    "kind": "instance",
+    "selector": "OnUpdateEmoticonListFor:",
+    "address": "0x101405528",
+    "end": "0x10140556c",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "cls": "EmoticonBoardView",
+    "kind": "instance",
+    "selector": "onAddBackupEmoticonOK:addEmoticonWrap:",
+    "address": "0x101405a00",
+    "end": "0x101405a9c",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "EmoticonBoardView",
+    "kind": "instance",
+    "selector": "updateCustomOrCameraEmoticonWithType:",
+    "address": "0x10140ac50",
+    "end": "0x10140ad74",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "EmoticonMessageCellView",
+    "kind": "instance",
+    "selector": "onSaveEmoticon:",
+    "address": "0x10152e4f8",
+    "end": "0x10152e6b4",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "CMessageWrap",
+    "kind": "class",
+    "selector": "getMsgHdOrMiddleImgData:",
+    "address": "0x104baaac0",
+    "end": "0x104baaad0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "CMessageWrap",
+    "kind": "class",
+    "selector": "getMsgHdOrMiddleImgData:canUseHeif:",
+    "address": "0x104baaad0",
+    "end": "0x104baabdc",
+    "types": "@28@0:8@16B24"
+  },
+  {
+    "cls": "EmoticonUtil",
+    "kind": "class",
+    "selector": "getStaticImgData:",
+    "address": "0x1015b2ab4",
+    "end": "0x1015b2acc",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "EmoticonUtil",
+    "kind": "class",
+    "selector": "getStaticImgData:isFuzzyAlphaCheck:",
+    "address": "0x1015b2acc",
+    "end": "0x1015b3074",
+    "types": "@28@0:8@16B24"
+  },
+  {
+    "cls": "AddEmoticonWrap",
+    "kind": "instance",
+    "selector": "source",
+    "address": "0x101531cd0",
+    "end": "0x101531ce0",
+    "types": "i16@0:8"
+  },
+  {
+    "cls": "AddEmoticonWrap",
+    "kind": "instance",
+    "selector": "setSource:",
+    "address": "0x101531ce0",
+    "end": "0x101531cf0",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "EmoticonCustomManageAddLogic",
+    "kind": "instance",
+    "selector": "startAddEmoticonWithWraps:",
+    "address": "0x10146e520",
+    "end": "0x10146e5b0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "cls": "EmoticonCreateImageUploadTask",
+    "kind": "instance",
+    "selector": "initWithImage:",
+    "address": "0x10145df88",
+    "end": "0x10145dffc",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "EmoticonCreateImageUploadTask",
+    "kind": "instance",
+    "selector": "initWithGifData:",
+    "address": "0x10145dffc",
+    "end": "0x10145e070",
+    "types": "@24@0:8@16"
+  },
+  {
+    "cls": "EmoticonCreateImageUploadTask",
+    "kind": "instance",
+    "selector": "startUpload",
+    "address": "0x10145e0fc",
+    "end": "0x10145e184",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "CMessageMgr",
+    "kind": "instance",
+    "selector": "StartDownloadImage:HD:AutoDownload:SaveAlbum:Silent:",
+    "address": "0x104b403cc",
+    "end": "0x104b403e4",
+    "types": "v40@0:8@16B24B28B32B36"
+  }
+]

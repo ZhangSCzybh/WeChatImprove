@@ -5,11 +5,14 @@
 #import "CSBackupMutation.h"
 #import "CSManagedImageFile.h"
 #import "CSBackupRestoreDiagnostics.h"
+#import "CSScheduledTaskStore.h"
 #import <sys/stat.h>
 static NSString *const Profiles=@"com.wechat.enhance.chat_group.account_profiles";
 static NSString *const Selection=@"com.wechat.enhance.chat_group.selection.";
 static BOOL EngineFail(NSError **error,NSString *message){if(error)*error=CSBackupFailure(message);return NO;}
-static NSString *Revision(NSDictionary *snapshot) {
+static BOOL HasScheduledFields(NSArray *fields) {for(NSDictionary *field in fields)if([field[@"domain"] isEqual:CSScheduledTaskBackupDomain])return YES;return NO;}
+static NSString *Revision(NSDictionary *snapshot, BOOL scheduled) {
+    if(scheduled&&snapshot[@"scheduledTaskRevision"])return [CSBackupCodec digest:@[snapshot[@"fields"],snapshot[@"assets"],snapshot[@"scheduledTaskRevision"],snapshot[@"resetRawRevision"]?:@"",snapshot[@"missingAssets"]?:@[]]];
     if(snapshot[@"resetRawRevision"])return [CSBackupCodec digest:@[snapshot[@"fields"],snapshot[@"assets"],snapshot[@"resetRawRevision"],snapshot[@"missingAssets"]?:@[]]];
     return [CSBackupCodec digest:@[snapshot[@"fields"],snapshot[@"assets"]]];
 }
@@ -76,10 +79,23 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     return [self runRestoreStage:@"cancel" category:CSBackupRestoreState details:@{}
         work:^id(NSError **failure){return [self cancelPendingContent:failure]?@YES:nil;} error:error]!=nil;
 }
-- (NSArray *)rawFields:(NSError **)error {
-    if(!self.readPreferencesOnMain||NSThread.isMainThread)return [self readRawFields:error];
+- (NSArray *)preferenceFields:(NSError **)error {
     __block NSArray *fields=nil;__block NSError *readError=nil;
-    dispatch_sync(dispatch_get_main_queue(),^{fields=[self readRawFields:&readError];});if(readError&&error)*error=readError;return fields;
+    if(!self.readPreferencesOnMain||NSThread.isMainThread)fields=[self readRawFields:&readError];
+    else dispatch_sync(dispatch_get_main_queue(),^{fields=[self readRawFields:&readError];});
+    if(!fields&&error)*error=readError;return fields;
+}
+- (NSArray *)rawFields:(NSError **)error {
+    NSArray *fields=[self preferenceFields:error];if(!fields)return nil;
+    NSMutableArray *result=[fields mutableCopy];NSString *account=self.context()[@"account"];
+    if(account.length){NSDictionary *scheduled=[self scheduledFieldForAccount:account error:error];if(!scheduled)return nil;if([scheduled[@"present"] boolValue])[result addObject:scheduled];}
+    [result sortUsingComparator:^NSComparisonResult(NSDictionary *a,NSDictionary *b){return [Identity(a) compare:Identity(b)];}];return result;
+}
+- (NSDictionary *)scheduledFieldForAccount:(NSString *)account error:(NSError **)error {
+    if(![CSBackupRegistry entryForDomain:CSScheduledTaskBackupDomain key:account]){EngineFail(error,@"定时任务所属账号无效");return nil;}
+    NSError *failure=nil;NSDictionary *state=[CSScheduledTaskStore readStateAtURL:CSScheduledTaskFileURL(self.resourceRoot,account) account:account error:&failure];
+    if(failure){if(error)*error=failure;return nil;}
+    NSMutableDictionary *field=[@{@"domain":CSScheduledTaskBackupDomain,@"key":account,@"present":state?@YES:@NO} mutableCopy];if(state)field[@"value"]=state;return field;
 }
 - (NSArray *)readRawFields:(NSError **)error {
     NSMutableDictionary *values=[NSMutableDictionary dictionary];
@@ -111,6 +127,15 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
         for(NSDictionary *f in raw)if([f[@"key"] isEqual:Profiles]&&[f[@"value"] isKindOfClass:NSDictionary.class])[coverage addObjectsFromArray:[f[@"value"] allKeys]];
         source[@"accounts"]=[coverage.allObjects sortedArrayUsingSelector:@selector(compare:)];
         NSMutableDictionary *snapshot=[@{@"magic":@"WeChatImproveBackup",@"formatVersion":@2,@"id":NSUUID.UUID.UUIDString,@"name":name,@"kind":kind,@"createdAt":NSDate.date,@"source":source,@"fields":fields,@"assets":assets,@"warnings":[context[@"account"] length]?@[]:@[@"当前账号尚未就绪；已保存现有账号记录，恢复关系配置前需要确认账号。"]} mutableCopy];
+        NSMutableArray *portable=[NSMutableArray array],*scheduledState=[NSMutableArray array];
+        for(NSDictionary *field in fields){
+            if([field[@"domain"] isEqual:CSScheduledTaskBackupDomain]&&[field[@"present"] boolValue]){
+                [scheduledState addObject:field];NSMutableDictionary *copy=[field mutableCopy];copy[@"value"]=CSScheduledTaskBackupConfiguration(field[@"value"]);[portable addObject:copy];
+            }else [portable addObject:field];
+        }
+        snapshot[@"fields"]=portable;
+        // Claims affect the restore revision, but are never exported as replayable work.
+        if(scheduledState.count)snapshot[@"scheduledTaskRevision"]=[CSBackupCodec digest:scheduledState];
         if(allowMissing){
             snapshot[@"resetRawRevision"]=[CSBackupCodec digest:raw];snapshot[@"missingAssets"]=missing;
             NSMutableArray *warnings=[snapshot[@"warnings"] mutableCopy];
@@ -161,22 +186,36 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
         NSDictionary *entry=[CSBackupRegistry entryForDomain:field[@"domain"] key:field[@"key"]];if(![modules containsObject:entry[@"module"]])continue;
         if([entry[@"scope"] isEqual:@"relationship"]&&!relationships){[warnings addObject:@"已跳过联系人/群关系配置：仅允许同一本机来源及同一当前账号恢复。"];continue;}
         NSMutableDictionary *f=[field mutableCopy];NSString *key=f[@"key"];
-        if([key isEqual:Profiles]) {
+        if([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]) {
+            if(![accounts containsObject:key]||![key isEqual:context[@"account"]]||![key isEqual:source[@"account"]]){
+                [warnings addObject:@"已跳过其他账号的定时任务：请登录备份原账号后选择恢复。"];continue;
+            }
+            if([f[@"present"] boolValue]){
+                NSMutableDictionary *state=[CSScheduledTaskBackupConfiguration(f[@"value"]) mutableCopy];state[@"enabled"]=@NO;state[@"history"]=@[];f[@"value"]=state;
+                [warnings addObject:@"定时任务恢复后总开关关闭；不导入执行记录或待发送状态。请确认会话和时间规则后手动开启，关闭期间的消息不会补发。"];
+            }
+        }else if([key isEqual:Profiles]) {
             if(!accounts.count)continue;
             NSDictionary *old=byID[Identity(f)][@"value"]?:@{};NSMutableDictionary *merged=[old mutableCopy];NSDictionary *incoming=f[@"value"]?:@{};
             for(NSString *account in accounts){if(incoming[account])merged[account]=incoming[account];else if(![f[@"present"] boolValue]&&old[account]&&([source[@"accounts"] containsObject:account]||[source[@"account"] isEqual:account]))[merged removeObjectForKey:account];}
             if(merged.count){f[@"present"]=@YES;f[@"value"]=merged;}else{f[@"present"]=@NO;[f removeObjectForKey:@"value"];}
         }else if([key hasPrefix:Selection]&&![accounts containsObject:[key substringFromIndex:Selection.length]])continue;
         [selected addObject:f];NSDictionary *before=byID[Identity(f)]?:@{@"domain":f[@"domain"],@"key":key,@"present":@NO};
-        if(![before isEqual:f])[changes addObject:@{@"module":entry[@"module"],@"key":key,@"before":before,@"after":f,@"reset":([f[@"present"] boolValue]?@NO:@YES)}];
+        NSMutableDictionary *comparison=[f mutableCopy];if([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]&&f[@"value"])comparison[@"value"]=CSScheduledTaskBackupConfiguration(f[@"value"]);
+        if(![before isEqual:comparison])[changes addObject:@{@"module":entry[@"module"],@"key":key,@"before":before,@"after":f,@"reset":([f[@"present"] boolValue]?@NO:@YES)}];
     }
     if(!selected.count){EngineFail(error,@"没有可恢复的配置，请选择模块和账号");return nil;}
     NSMutableDictionary *writes=[NSMutableDictionary dictionary];NSArray *desired=[CSBackupAssets materializeFields:selected assets:snapshot[@"assets"] root:self.resourceRoot writes:writes error:error];if(!desired)return nil;
-    return @{@"snapshot":snapshot,@"fields":desired,@"writes":writes,@"changes":changes,@"warnings":[NSOrderedSet orderedSetWithArray:warnings].array,@"revision":Revision(current),@"context":context,@"modules":modules.allObjects,@"accounts":accounts.allObjects};
+    return @{@"snapshot":snapshot,@"fields":desired,@"writes":writes,@"changes":changes,@"warnings":[NSOrderedSet orderedSetWithArray:warnings].array,@"revision":Revision(current,HasScheduledFields(desired)),@"context":context,@"modules":modules.allObjects,@"accounts":accounts.allObjects};
 }
 - (NSArray *)beforeFields:(NSArray *)fields error:(NSError **)error {
-    NSArray *raw=[self rawFields:error];if(!raw)return nil;NSMutableDictionary *byID=[NSMutableDictionary dictionary];for(NSDictionary *f in raw)byID[Identity(f)]=f;
-    NSMutableArray *result=[NSMutableArray array];for(NSDictionary *f in fields)[result addObject:byID[Identity(f)]?:@{@"domain":f[@"domain"],@"key":f[@"key"],@"present":@NO}];return result;
+    NSArray *raw=[self preferenceFields:error];if(!raw)return nil;NSMutableDictionary *byID=[NSMutableDictionary dictionary];for(NSDictionary *f in raw)byID[Identity(f)]=f;
+    NSMutableArray *result=[NSMutableArray array];for(NSDictionary *f in fields){
+        // Rollback may run after an account change; verify the journal's original file.
+        NSDictionary *before=[f[@"domain"] isEqual:CSScheduledTaskBackupDomain]?[self scheduledFieldForAccount:f[@"key"] error:error]:byID[Identity(f)];
+        if([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]&&!before)return nil;
+        [result addObject:before?:@{@"domain":f[@"domain"],@"key":f[@"key"],@"present":@NO}];
+    }return result;
 }
 - (NSDictionary *)beforeWrites:(NSDictionary *)writes error:(NSError **)error {
     NSUInteger total=0;NSMutableDictionary *blobs=[NSMutableDictionary dictionary];NSMutableDictionary *result=[NSMutableDictionary dictionary];for(NSString *name in writes){NSURL *url=[self.resourceRoot URLByAppendingPathComponent:name];
@@ -191,7 +230,7 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     if(![self.context()[@"account"] length])return EngineFail(error,@"当前账号尚未就绪，请登录后重新预览恢复");
     BOOL reset=IsReset(preview[@"snapshot"]);
     NSDictionary *current=[self capture:reset?@"重置前保护":@"恢复前保护" kind:@"protection" allowingMissingAssets:reset error:error];if(!current)return NO;
-    if(![preview[@"context"] isEqual:self.context()]||![preview[@"revision"] isEqual:Revision(current)])return EngineFail(error,@"配置或账号已变化，请重新打开恢复预览");
+    if(![preview[@"context"] isEqual:self.context()]||![preview[@"revision"] isEqual:Revision(current,HasScheduledFields(preview[@"fields"]))])return EngineFail(error,@"配置或账号已变化，请重新打开恢复预览");
     NSDictionary *rebuilt=[self preview:preview[@"snapshot"] modules:[NSSet setWithArray:preview[@"modules"]?:@[]] accounts:[NSSet setWithArray:preview[@"accounts"]?:@[]] error:error];
     if(!rebuilt)return NO;
     if(![rebuilt[@"fields"] isEqual:preview[@"fields"]]||![rebuilt[@"writes"] isEqual:preview[@"writes"]]||![rebuilt[@"revision"] isEqual:preview[@"revision"]])return EngineFail(error,@"恢复计划已变化，请重新预览");
@@ -208,7 +247,8 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     for(NSString *key in @[@"startupFailure",@"resolutionReason"])if(journal[key]&&(![journal[key] isKindOfClass:NSString.class]||[journal[key] length]>2048))return EngineFail(error,@"恢复失败说明无效");
     if(journal[@"resolution"]&&(![journal[@"resolution"] isEqual:@"cancelledBeforeApply"]||![journal[@"state"] isEqual:@"rolledBack"]))return EngineFail(error,@"恢复撤销状态无效");
     for(NSString *part in @[@"before",@"after"]){NSArray *fields=journal[part];if(![fields isKindOfClass:NSArray.class]||fields.count>4096)return EngineFail(error,@"恢复日志配置列表无效");
-        NSMutableSet *seen=[NSMutableSet set];for(NSDictionary *f in fields){if(![f isKindOfClass:NSDictionary.class])return EngineFail(error,@"恢复字段损坏");NSDictionary *entry=[CSBackupRegistry entryForDomain:f[@"domain"] key:f[@"key"]];if(!entry||![f[@"present"] isKindOfClass:NSNumber.class]||[seen containsObject:Identity(f)])return EngineFail(error,@"恢复日志包含未登记或重复的配置");[seen addObject:Identity(f)];if([f[@"present"] boolValue]&&![CSBackupRegistry validateValue:f[@"value"] entry:entry error:error])return NO;}
+        NSMutableSet *seen=[NSMutableSet set];for(NSDictionary *f in fields){if(![f isKindOfClass:NSDictionary.class])return EngineFail(error,@"恢复字段损坏");NSDictionary *entry=[CSBackupRegistry entryForDomain:f[@"domain"] key:f[@"key"]];if(!entry||![f[@"present"] isKindOfClass:NSNumber.class]||[seen containsObject:Identity(f)])return EngineFail(error,@"恢复日志包含未登记或重复的配置");[seen addObject:Identity(f)];if([f[@"present"] boolValue]&&![CSBackupRegistry validateValue:f[@"value"] entry:entry error:error])return NO;
+            if([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]&&(![f[@"key"] isEqual:journal[@"account"]]||([f[@"present"] boolValue]&&!f[@"value"][@"history"])))return EngineFail(error,@"定时任务恢复日志所属账号或状态无效");}
     }
     for(NSString *part in @[@"beforeWrites",@"afterWrites"]){NSDictionary *writes=journal[part];if(![writes isKindOfClass:NSDictionary.class]||writes.count>256)return EngineFail(error,@"恢复日志资源无效");
         for(NSString *name in writes){BOOL valid=[name isEqual:@"separator_image.png"]||[name isEqual:@"touch_trail.png"]||([name hasPrefix:@"backup_"]&&[name hasSuffix:@".png"]&&name.length==75&&[[name substringWithRange:NSMakeRange(7,64)] rangeOfCharacterFromSet:[[NSCharacterSet characterSetWithCharactersInString:@"0123456789abcdef"] invertedSet]].location==NSNotFound);
@@ -232,7 +272,14 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
 }
 - (BOOL)writePreferences:(NSArray *)fields writes:(NSDictionary *)writes context:(NSDictionary *)context error:(NSError **)error {
     for(NSDictionary *f in fields){if(context&&![context isEqual:self.context()])return EngineFail(error,@"恢复期间账号发生变化");NSUserDefaults *defaults=self.defaults[f[@"domain"]];
-        if([f[@"present"] boolValue])[defaults setObject:f[@"value"] forKey:f[@"key"]];else [defaults removeObjectForKey:f[@"key"]];if(self.checkpoint)self.checkpoint(@"field");}
+        if([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]){
+            NSURL *url=CSScheduledTaskFileURL(self.resourceRoot,f[@"key"]);NSDictionary *details=@{@"path":url.path,@"action":[f[@"present"] boolValue]?@"write":@"reset"};
+            [self.store recordRestoreStage:@"write-scheduled-tasks" status:@"started" error:nil details:details];NSError *failure=nil;
+            BOOL ok=[CSScheduledTaskStore replaceState:[f[@"present"] boolValue]?f[@"value"]:nil atURL:url account:f[@"key"] error:&failure];
+            [self.store recordRestoreStage:@"write-scheduled-tasks" status:ok?@"ok":@"failed" error:failure details:details];
+            if(!ok){if(error)*error=failure;return NO;}
+            if(self.checkpoint)self.checkpoint(@"scheduled-tasks");
+        }else if([f[@"present"] boolValue])[defaults setObject:f[@"value"] forKey:f[@"key"]];else [defaults removeObjectForKey:f[@"key"]];if(self.checkpoint)self.checkpoint(@"field");}
     for(NSUserDefaults *defaults in self.defaults.allValues)if(![defaults synchronize])return EngineFail(error,@"偏好持久化失败");
     if(self.checkpoint)self.checkpoint(@"synchronized");
     if(context&&![context isEqual:self.context()])return EngineFail(error,@"恢复期间账号发生变化");
@@ -292,7 +339,7 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     if(!rollback){
         if(![context[@"installationID"] isEqual:journal[@"installationID"]]||![context[@"account"] length]||![context[@"account"] isEqual:journal[@"account"]])return EngineFail(error,@"当前账号未就绪或已变化，恢复保持待处理；可在备份页取消");
         NSDictionary *current=[self capture:@"恢复核验" kind:@"protection" allowingMissingAssets:[journal[@"operation"] isEqual:@"reset"] error:error];if(!current)return NO;
-        if(![Revision(current) isEqual:journal[@"revision"]])return EngineFail(error,@"准备恢复后配置已变化，请取消待恢复计划并重新预览");
+        if(![Revision(current,HasScheduledFields(journal[@"after"])) isEqual:journal[@"revision"]])return EngineFail(error,@"准备恢复后配置已变化，请取消待恢复计划并重新预览");
         journal[@"state"]=@"applying";if(![self.store writeJournal:journal error:error])return NO;if(self.checkpoint)self.checkpoint(@"applying");
         NSError *applyError=nil;
         if([self writeFields:journal[@"after"] writes:journal[@"afterWrites"] context:context error:&applyError]){

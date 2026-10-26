@@ -8,6 +8,7 @@
 #import "CSBackupAudit.h"
 #import "CSBackupRestoreDiagnostics.h"
 #import "CSPluginStorage.h"
+#import "CSScheduledTaskStore.h"
 #import "CSServiceCenter.h"
 #import "CSUserInfoHelper.h"
 #import <UIKit/UIKit.h>
@@ -47,6 +48,7 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
         [center addObserver:self selector:@selector(foreground:) name:UIApplicationDidBecomeActiveNotification object:nil];
         [center addObserver:self selector:@selector(background:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [center addObserver:self selector:@selector(changed:) name:NSUserDefaultsDidChangeNotification object:nil];
+        [center addObserver:self selector:@selector(resourceChanged:) name:CSScheduledTaskConfigurationDidChange object:nil];
         for(NSString *name in @[@"CSBackupAccountChanged",@"CSBackupResourcesChanged",@"CSNavigationTitleSettingsChanged",@"CSTouchTrailImageDidChange",@"com.wechat.enhance.tabbar_style.changed",@"CSContactSeparatorSettingsChanged"])[center addObserver:self selector:@selector(resourceChanged:) name:name object:nil];
         _timer=dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,0,0,_queue);dispatch_source_set_timer(_timer,dispatch_time(DISPATCH_TIME_NOW,10*NSEC_PER_SEC),10*NSEC_PER_SEC,NSEC_PER_SEC);
         dispatch_source_set_event_handler(_timer,^{[weakSelf tick];});dispatch_resume(_timer);

@@ -1,0 +1,237 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "version": "8.0.78.34 (established artifact from previous repository investigations)",
+  "architecture": "arm64",
+  "static_only": true,
+  "method_inventory_source": "Objective-C method metadata decoded from the same Mach-O using the existing native/extract.py parser and classes.json",
+  "class_map": "docs/evidence/message-actions-native-2026-10-17/classes.json",
+  "class_map_sha256": "04f4578ba39d08f5e7115b532ef86197243eb56391d805631a14ad92b43834a1",
+  "disassembler": "Apple LLVM version 21.0.0",
+  "disassembly_command": [
+    "xcrun",
+    "llvm-objdump",
+    "-d",
+    "--start-address=<method-IMP>",
+    "--stop-address=<next-LC_FUNCTION_STARTS>",
+    "<target>"
+  ],
+  "ranges": [
+    {
+      "file": "ImageMessageCellView--operationMenuItems.asm",
+      "start": "0x101f78e48",
+      "stop": "0x101f793e4",
+      "truncated": false,
+      "line": 2
+    },
+    {
+      "file": "ImageMessageViewModel--isImageExists.asm",
+      "start": "0x101f7f744",
+      "stop": "0x101f7f768",
+      "truncated": false,
+      "line": 370
+    },
+    {
+      "file": "ImageMessageViewModel--imageData.asm",
+      "start": "0x101f7f768",
+      "stop": "0x101f7f78c",
+      "truncated": false,
+      "line": 388
+    },
+    {
+      "file": "ImageMessageViewModel--contentExists.asm",
+      "start": "0x101f7f848",
+      "stop": "0x101f7f8b8",
+      "truncated": false,
+      "line": 406
+    },
+    {
+      "file": "AddEmoticonWrap--initWithMessageWrap_AndSource_.asm",
+      "start": "0x101531518",
+      "stop": "0x101531a28",
+      "truncated": false,
+      "line": 443
+    },
+    {
+      "file": "EmoticonCustomManageAddLogic--startAddEmoticonWithWrap_.asm",
+      "start": "0x10146e430",
+      "stop": "0x10146e520",
+      "truncated": false,
+      "line": 776
+    },
+    {
+      "file": "EmoticonCustomManageAddLogic--startAddEmoticonWithWraps_NeedCheckTotalCountLimit_.asm",
+      "start": "0x10146ec94",
+      "stop": "0x101470ed8",
+      "truncated": false,
+      "line": 845
+    },
+    {
+      "file": "EmoticonCustomManageAddLogic--onAddBackupEmoticonPendingUpload_.asm",
+      "start": "0x101474008",
+      "stop": "0x1014743dc",
+      "truncated": false,
+      "line": 3047
+    },
+    {
+      "file": "EmoticonCustomManageAddLogic--onAddBackupEmoticonOK_addEmoticonWrap_.asm",
+      "start": "0x1014743dc",
+      "stop": "0x1014749f0",
+      "truncated": false,
+      "line": 3301
+    },
+    {
+      "file": "EmoticonCustomManageAddLogic--onAddBackupEmoticonFailed_reason_remoteErrMsg_.asm",
+      "start": "0x1014749f0",
+      "stop": "0x101475200",
+      "truncated": false,
+      "line": 3699
+    },
+    {
+      "file": "EmoticonCustomManageAddLogic--typeNumberForImageData_.asm",
+      "start": "0x101471744",
+      "stop": "0x101471870",
+      "truncated": false,
+      "line": 4224
+    },
+    {
+      "file": "EmoticonCustomAddLogicController--MMImagePickerManager_didFinishPickingImageWithInfo_.asm",
+      "start": "0x101444df4",
+      "stop": "0x10144507c",
+      "truncated": false,
+      "line": 4308
+    },
+    {
+      "file": "EmoticonCustomAddLogicController--handleGIFInfo_.asm",
+      "start": "0x10144507c",
+      "stop": "0x10144553c",
+      "truncated": false,
+      "line": 4479
+    },
+    {
+      "file": "EmoticonCustomAddLogicController--handleEmoticonUploadInfo_source_.asm",
+      "start": "0x101445594",
+      "stop": "0x101445828",
+      "truncated": false,
+      "line": 4792
+    },
+    {
+      "file": "EmoticonCustomCreateLogic--startImageUploadTask_.asm",
+      "start": "0x101454fa8",
+      "stop": "0x10145509c",
+      "truncated": false,
+      "line": 4966
+    },
+    {
+      "file": "EmoticonCreateImageUploadTask--startStaticImageUpload.asm",
+      "start": "0x10145e1c0",
+      "stop": "0x10145e540",
+      "truncated": false,
+      "line": 5036
+    },
+    {
+      "file": "EmoticonCreateImageUploadTask--startGifImageUpload.asm",
+      "start": "0x10145e540",
+      "stop": "0x10145e758",
+      "truncated": false,
+      "line": 5269
+    },
+    {
+      "file": "EmoticonCreateImageUploadTask--handleStaticImg_withAddingItem_.asm",
+      "start": "0x10145ea20",
+      "stop": "0x10145ecf0",
+      "truncated": false,
+      "line": 5412
+    },
+    {
+      "file": "EmoticonCreateUploadTask--handleAddingItem_.asm",
+      "start": "0x10145bc84",
+      "stop": "0x10145c460",
+      "truncated": false,
+      "line": 5601
+    },
+    {
+      "file": "EmoticonCreateUploadTask--realDoAddImg_index_.asm",
+      "start": "0x10145c460",
+      "stop": "0x10145cec0",
+      "truncated": false,
+      "line": 6113
+    },
+    {
+      "file": "EmoticonCreateUploadTask--addEmoticonLogic.asm",
+      "start": "0x10145cec0",
+      "stop": "0x10145d010",
+      "truncated": false,
+      "line": 6786
+    },
+    {
+      "file": "EmoticonBoardView--OnUpdateEmoticonListFor_.asm",
+      "start": "0x101405528",
+      "stop": "0x10140556c",
+      "truncated": false,
+      "line": 6879
+    },
+    {
+      "file": "EmoticonBoardView--onAddBackupEmoticonOK_addEmoticonWrap_.asm",
+      "start": "0x101405a00",
+      "stop": "0x101405a9c",
+      "truncated": false,
+      "line": 6905
+    },
+    {
+      "file": "EmoticonBoardView--updateCustomOrCameraEmoticonWithType_.asm",
+      "start": "0x10140ac50",
+      "stop": "0x10140ad74",
+      "truncated": false,
+      "line": 6953
+    },
+    {
+      "file": "EmoticonMessageCellView--onSaveEmoticon_.asm",
+      "start": "0x10152e4f8",
+      "stop": "0x10152e6b4",
+      "truncated": false,
+      "line": 7035
+    },
+    {
+      "file": "CMessageWrap--getMsgHdOrMiddleImgData_.asm",
+      "start": "0x104baaac0",
+      "stop": "0x104baaad0",
+      "truncated": false,
+      "line": 7155
+    },
+    {
+      "file": "CMessageWrap--getMsgHdOrMiddleImgData_canUseHeif_.asm",
+      "start": "0x104baaad0",
+      "stop": "0x104baabdc",
+      "truncated": false,
+      "line": 7168
+    },
+    {
+      "file": "EmoticonUtil--getStaticImgData_.asm",
+      "start": "0x1015b2ab4",
+      "stop": "0x1015b2acc",
+      "truncated": false,
+      "line": 7244
+    },
+    {
+      "file": "EmoticonUtil--getStaticImgData_isFuzzyAlphaCheck_.asm",
+      "start": "0x1015b2acc",
+      "stop": "0x1015b3074",
+      "truncated": false,
+      "line": 7259
+    }
+  ],
+  "limitations": [
+    "No device execution, live hooks, uploads, or account changes were performed.",
+    "Objective-C selector loads and branch inspection establish static behavior; dynamic configuration branches and server outcomes need device validation.",
+    "ADRP/LDR annotations are local decoded reference aids, not whole-function register or call-graph recovery. Printed nearest-symbol labels from llvm-objdump are not the owning Objective-C method; use the method metadata and addresses.",
+    "REA verified the target identity. Ghidra whole-image analysis emitted type-resolution errors and was stopped; no Ghidra pseudocode is used as evidence."
+  ],
+  "files": {
+    "methods.json": "9d51a2ffc740c5598a6fb880df0cc0ff35eecca7dddb26babcdee70fc42a380d",
+    "selected-disassembly.txt": "10a8061a5bd0a82feaa790849fac249e66660a711016b7db113219efac75bf97",
+    "findings.md": "cc2c2d974ee8c25e04abfd288d4f52acc0c391e6c9ed812961de55c14966f749"
+  },
+  "method_metadata_count": 36,
+  "disassembled_method_count": 29
+}

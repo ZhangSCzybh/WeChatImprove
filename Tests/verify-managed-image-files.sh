@@ -25,6 +25,6 @@ xcrun --sdk macosx clang "${flags[@]}" -Wno-deprecated-declarations -I"$test_dir
     -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics \
     "$project_dir/Controllers/CSManagedImageFile.m" \
     "$project_dir/Controllers/CSPluginStorage.m" "$project_dir/Controllers/CSBackupStore.m" "$project_dir/Controllers/CSBackupCodec.m" \
-    "$project_dir/Controllers/CSBackupRegistry.m" "$project_dir/Controllers/CSBackupAssets.m" \
+    "$project_dir/Controllers/CSScheduledTaskStore.m" "$project_dir/Controllers/CSBackupRegistry.m" "$project_dir/Controllers/CSBackupAssets.m" \
     "$project_dir/Tests/ManagedImageCleanupIntegrationTests.m" -o "$test_dir/integration"
 "$test_dir/integration" "$test_dir/integration-fixtures"

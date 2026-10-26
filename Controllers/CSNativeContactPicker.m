@@ -13,8 +13,9 @@ static char PickerStateKey;
 @property(nonatomic,copy) NSString *account;
 @property(nonatomic,copy) BOOL (^isValid)(void);
 @property(nonatomic,copy) void (^completion)(NSArray<NSString *> *);
-@property(nonatomic) BOOL groups, seeded, finished, revoked;
+@property(nonatomic) BOOL groups, seeded, finished, revoked, singleSelection;
 - (BOOL)valid;
+- (BOOL)canFinish;
 - (void)finish:(BOOL)save;
 @end
 
@@ -42,21 +43,38 @@ static id CurrentSelection(id picker) {
 - (BOOL)valid {
     return !self.finished && !self.revoked && [self.account isEqual:CSGroupCurrentAccountID()] && (!self.isValid || self.isValid());
 }
-- (BOOL)onShouldSelectContact:(id)contact {
+- (BOOL)acceptsContact:(id)contact {
     NSString *name=Get(contact,@"m_nsUsrName");
     return [self valid] && IsName(name,self.groups) && ![name isEqual:self.account] &&
         (self.groups || CSGroupCategoryForContact(contact)==CSGroupRowCategoryPrivate);
 }
+- (BOOL)onShouldSelectContact:(id)contact {
+    if(![self acceptsContact:contact])return NO;
+    if(!self.singleSelection)return YES;
+    id selection=CurrentSelection(self.picker);
+    if(![selection isKindOfClass:NSDictionary.class])return NO;
+    NSString *name=Get(contact,@"m_nsUsrName");
+    return [selection count]==0 || selection[name]!=nil;
+}
+- (BOOL)canFinish {
+    if(![self valid])return NO;
+    if(!self.singleSelection)return YES;
+    id selection=CurrentSelection(self.picker);
+    return [selection isKindOfClass:NSDictionary.class] && [selection count]==1 && [self acceptsContact:[selection allValues].firstObject];
+}
 - (void)finish:(BOOL)save {
     if(self.finished)return;
     BOOL allowed=[self valid];
+    // Search/tag bulk selection can bypass a per-contact delegate. Never pick
+    // an arbitrary first target, and keep the page open so the user can correct it.
+    if(save && allowed && self.singleSelection && ![self canFinish])return;
     id selection=CurrentSelection(self.picker);
     // A missing native result is not an intentional empty selection.
     save=save && allowed && [selection isKindOfClass:NSDictionary.class];
     NSMutableSet *names=[self.unavailableNames mutableCopy];
     if(save)for(id contact in [selection allValues]) {
         NSString *name=Get(contact,@"m_nsUsrName");
-        if([self onShouldSelectContact:contact])[names addObject:name];
+        if([self acceptsContact:contact])[names addObject:name];
     }
     NSArray *result=[names.allObjects sortedArrayUsingSelector:@selector(compare:)];
     self.finished=YES;
@@ -90,10 +108,10 @@ static void PickerInitData(id picker, SEL command) {
 }
 static void PickerUpdateGroupButton(UIViewController *picker, SEL command) {
     ((void(*)(id,SEL))NativeGroupUpdateButton)(picker,command);
-    picker.navigationItem.rightBarButtonItem.enabled=[State(picker) valid]; // An authorized empty list can be saved.
+    picker.navigationItem.rightBarButtonItem.enabled=[State(picker) canFinish]; // Multi-select settings still allow an empty list.
 }
 static void PickerUpdateFriendButton(id picker, SEL command, BOOL enabled) {
-    BOOL allowed=[State(picker) valid];
+    BOOL allowed=[State(picker) canFinish];
     ((void(*)(id,SEL,BOOL))NativeFriendUpdateButton)(picker,command,allowed);
     // Bottom-toolbar layouts have no navigation right item. WeChat moves the
     // internal item's custom UIButton into ContactSelectToolView and keeps its
@@ -149,7 +167,7 @@ static BOOL PickerError(NSError **error) {
     if(error)*error=[NSError errorWithDomain:@"CSNativeContactPicker" code:1 userInfo:@{NSLocalizedDescriptionKey:@"当前无法打开微信原生选择器，请返回后重试。原有名单已保留。"}];
     return NO;
 }
-BOOL CSNativeContactPickerPresent(UIViewController *presenter, NSString *title, BOOL groups, NSArray<NSString *> *selectedNames,
+static BOOL PresentPicker(UIViewController *presenter, NSString *title, BOOL groups, BOOL singleSelection, NSArray<NSString *> *selectedNames,
     BOOL (^isValid)(void), void (^completion)(NSArray<NSString *> *), NSError **error) {
     if(!NSThread.isMainThread || presenter.presentedViewController || !completion || (isValid && !isValid()))return PickerError(error);
     Class cls=PickerClass(groups),navClass=NSClassFromString(@"MMUINavigationController");
@@ -165,10 +183,11 @@ BOOL CSNativeContactPickerPresent(UIViewController *presenter, NSString *title, 
                 if(Matches([manager class],getter,"@@:@"))contact=((id(*)(id,SEL,id))objc_msgSend)(manager,NSSelectorFromString(getter),name);
                 if([Get(contact,@"m_nsUsrName") isEqual:name])break;contact=nil;
             }
-            if(contact)selected[name]=contact;else [unavailable addObject:name];
+            if(contact)selected[name]=contact;else if(!singleSelection)[unavailable addObject:name];
         }
         UIViewController *picker=[[cls alloc] init];if(!picker)return PickerError(error);
         CSNativePickerState *state=[CSNativePickerState new];state.groups=groups;state.preselected=selected;
+        state.singleSelection=singleSelection;
         state.unavailableNames=unavailable;state.account=account;state.isValid=isValid;state.completion=completion;state.picker=picker;
         objc_setAssociatedObject(picker,&PickerStateKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         Set(picker,@"setM_dicMultiSelect:",[selected mutableCopy]);
@@ -190,6 +209,17 @@ BOOL CSNativeContactPickerPresent(UIViewController *presenter, NSString *title, 
         [presenter presentViewController:nav animated:YES completion:nil];
         return YES;
     } @catch(__unused NSException *exception) {return PickerError(error);}
+}
+BOOL CSNativeContactPickerPresent(UIViewController *presenter, NSString *title, BOOL groups, NSArray<NSString *> *selectedNames,
+    BOOL (^isValid)(void), void (^completion)(NSArray<NSString *> *), NSError **error) {
+    return PresentPicker(presenter,title,groups,NO,selectedNames,isValid,completion,error);
+}
+BOOL CSNativeContactPickerPresentSingle(UIViewController *presenter, NSString *title, BOOL groups, NSString *selectedName,
+    BOOL (^isValid)(void), void (^completion)(NSString *), NSError **error) {
+    if(!completion)return PickerError(error);
+    return PresentPicker(presenter,title,groups,YES,selectedName.length?@[selectedName]:@[],isValid,^(NSArray<NSString *> *names){
+        if(names.count==1)completion(names.firstObject);
+    },error);
 }
 void CSNativeContactPickerRevalidate(UIViewController *presenter) {
     CSNativePickerState *state=State(presenter.presentedViewController);

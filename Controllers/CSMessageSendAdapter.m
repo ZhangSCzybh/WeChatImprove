@@ -50,6 +50,18 @@ static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArr
 }
 @implementation CSMessageSendAdapter
 - (instancetype)initWithEnvironment:(id<CSMessageActionEnvironment>)environment { if ((self=[super init])) _environment=environment; return self; }
+- (CSMessagePreparedSend *)prepareScheduledText:(NSString *)text targetID:(NSString *)targetID accountID:(NSString *)accountID {
+    if (!NSThread.isMainThread || !text.length || text.length>4000 || !targetID.length || !accountID.length || ![[_environment currentAccountID] isEqual:accountID]) return nil;
+    @try {
+        id manager=[_environment serviceNamed:@"CMessageMgr"], wrap=CSFreshWrap(1);
+        if (!wrap || !CSMessageNativeSupports(manager,@"AddMsg:MsgWrap:",@"v",@[@"@",@"@"])) return nil;
+        if (!CSMessageNativeSet(wrap,@"setM_nsFromUsr:",accountID,YES) || !CSMessageNativeSet(wrap,@"setM_nsToUsr:",targetID,YES) ||
+            !CSMessageNativeSet(wrap,@"setM_nsContent:",text,YES) || !CSMessageNativeSet(wrap,@"setM_uiCreateTime:",@((unsigned int)NSDate.date.timeIntervalSince1970),YES) ||
+            !CSMessageNativeSet(wrap,@"setM_uiStatus:",@1,YES) || !CSMessageNativeSet(wrap,@"setM_uiMesLocalID:",@0,YES) || !CSMessageNativeSet(wrap,@"setM_n64MesSvrID:",@0,YES)) return nil;
+        CSMessageNativeSet(wrap,@"setM_nsClientMsgID:",NSUUID.UUID.UUIDString,NO);
+        return CSVoidRoute(manager,@"AddMsg:MsgWrap:",@[targetID,wrap],wrap);
+    } @catch (__unused NSException *e) { return nil; }
+}
 - (CSMessagePreparedSend *)prepareContext:(CSMessageActionContext *)context targetID:(NSString *)targetID voice:(CSMessageVoiceResource *)voice {
     return [self prepareContext:context targetID:targetID voice:voice appData:nil appDataPath:nil];
 }

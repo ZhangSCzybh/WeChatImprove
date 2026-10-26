@@ -42,6 +42,29 @@ BOOL CSMessageHasPendingVoiceDownloads(void) { return atomic_load(&CSPendingVoic
 @implementation CSMessageMediaProvider
 - (instancetype)init { return [self initWithReader:^NSData *(NSString *path){ return [NSData dataWithContentsOfFile:path options:NSDataReadingMappedIfSafe error:nil]; }]; }
 - (instancetype)initWithReader:(NSData *(^)(NSString *))reader { if ((self=[super init])) { _reader=[reader copy]; _preparations=[NSMutableDictionary dictionary]; _appSubscribers=[NSMutableSet set]; _queue=dispatch_queue_create("com.wechat.enhance.message-media",DISPATCH_QUEUE_SERIAL); } return self; }
+- (void)readImageForContext:(CSMessageActionContext *)context completion:(void (^)(NSData *))completion {
+    if (!NSThread.isMainThread || context.messageType!=3) { completion(nil); return; }
+    NSMutableArray<NSString *> *paths=[NSMutableArray array]; Class cls=NSClassFromString(@"CMessageWrap");
+    // Native path getters run on main. Only immutable paths/bytes cross to IO; never read a cell thumbnail.
+    @try {
+        for (NSString *selector in @[@"getJpgPathOfMsgHdOrMiddleImg:",@"getPathOfHdOrMiddleImgForSender:",@"getPathOfRawMiddleImage:",@"getJpgPathOfMsgMiddleImg:"]) {
+            if ([selector isEqual:@"getPathOfHdOrMiddleImgForSender:"] && !context.outgoing) continue;
+            if (!CSMessageNativeSupports(cls,selector,@"@",@[@"@"])) continue;
+            id path=CSMessageNativeInvoke(cls,selector,@[context.sourceWrap]);
+            if ([path isKindOfClass:NSString.class] && [path isAbsolutePath] && ![paths containsObject:path]) [paths addObject:[path copy]];
+        }
+    } @catch (__unused NSException *exception) {}
+    NSArray *snapshot=[paths copy];
+    dispatch_async(_queue,^{
+        NSData *data=nil;
+        for (NSString *path in snapshot) {
+            NSDictionary *attrs=[NSFileManager.defaultManager attributesOfItemAtPath:path error:NULL];
+            if (![attrs[NSFileType] isEqual:NSFileTypeRegular] || [attrs fileSize]>32*1024*1024) continue;
+            data=self.reader(path); if (data.length && data.length<=32*1024*1024) break; data=nil;
+        }
+        dispatch_async(dispatch_get_main_queue(),^{ completion(data); });
+    });
+}
 // Presence matters: historical XML can omit flags, while explicit zero endflag
 // denies completeness until the correlated terminal native callback arrives.
 static BOOL CSVoiceXMLFlag(NSString *xml, NSString *attribute, unsigned int *value) {

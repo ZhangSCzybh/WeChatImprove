@@ -1,6 +1,7 @@
 #import "CSMessageActionCoordinator.h"
 #import "CSMessageSendAdapter.h"
 #import "CSVoiceForwardAdapter.h"
+#import "CSMessageImageStickerAdapter.h"
 #import <TargetConditionals.h>
 #include <stdatomic.h>
 @interface CSMessageActionCoordinator (CSAccountBoundary)
@@ -16,6 +17,7 @@ void CSMessageActionAccountWillChangeAtNativeBoundary(void) { CSMarkAccountBound
 void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBoundary(NO); }
 #if TARGET_OS_IOS
 #import <UIKit/UIKit.h>
+#import "CSCloseFriendBridge.h"
 #endif
 @interface CSMessageActionOperation : NSObject
 @property(nonatomic, copy) NSString *identifier;
@@ -57,6 +59,8 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
 @property(nonatomic, strong) CSMessageSendAdapter *sender;
 @property(nonatomic, strong) CSMessageNativeActionAdapter *native;
 @property(nonatomic, strong) CSVoiceForwardAdapter *forward;
+@property(nonatomic, strong) CSMessageImageStickerAdapter *imageSticker;
+@property(nonatomic, strong) NSArray *imageObservers;
 @property(nonatomic, strong) NSMutableDictionary<NSString *, CSMessageActionOperation *> *operations;
 @property(nonatomic, strong) NSMutableDictionary<NSString *, NSDictionary *> *completed;
 @property(nonatomic, strong) NSMutableArray<NSString *> *completedOrder;
@@ -86,6 +90,14 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
         _preferences=preferences; _media=provider; _sender=sender; _native=native; _forward=[CSVoiceForwardAdapter new];
         _operations=[NSMutableDictionary dictionary]; _completed=[NSMutableDictionary dictionary]; _completedOrder=[NSMutableArray array]; _pendingFeedback=[NSMutableArray array]; _accountEpoch=1; _boundaryToken=atomic_load_explicit(&CSActionAccountBoundary,memory_order_acquire); _accountSuspended=(_boundaryToken&1)!=0; _accountID=_accountSuspended ? nil : [environment.currentAccountID copy];
         __weak typeof(self) weakSelf=self;
+        _imageSticker=[[CSMessageImageStickerAdapter alloc] initWithEnvironment:environment media:provider];
+        _imageSticker.validate=^BOOL(CSMessageActionContext *context){ return [weakSelf canExecuteContext:context action:CSMessageActionAddSticker entry:CSMessageActionEntryMenuAddSticker]; };
+#if TARGET_OS_IOS
+        NSMutableArray *imageObservers=[NSMutableArray array];
+        for (NSString *name in @[UIApplicationWillResignActiveNotification,CSCloseFriendPolicyDidChangeNotification])
+            [imageObservers addObject:[NSNotificationCenter.defaultCenter addObserverForName:name object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note){ [weakSelf.imageSticker cancelAllOperations]; }]];
+        _imageObservers=imageObservers;
+#endif
         provider.waitingHandler=^(NSString *identifier){ [weakSelf showWaiting:identifier]; };
         provider.failureHandler=^(NSString *identifier, NSString *reason){ weakSelf.operations[identifier].failureDetail=[@"语音读取或校验失败：" stringByAppendingString:reason]; };
         provider.recordingState=^NSNumber *(CSMessageActionContext *context){
@@ -109,7 +121,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
         _settingsObserver=[NSNotificationCenter.defaultCenter addObserverForName:CSMessageActionSettingsDidChangeNotification object:preferences queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note){ [weakSelf settingsChanged]; }];
     } return self;
 }
-- (void)dealloc { if (_settingsObserver) [NSNotificationCenter.defaultCenter removeObserver:_settingsObserver]; }
+- (void)dealloc { if (_settingsObserver) [NSNotificationCenter.defaultCenter removeObserver:_settingsObserver]; for (id observer in _imageObservers) [NSNotificationCenter.defaultCenter removeObserver:observer]; }
 - (CSMessageActionSettings *)settings { return _preferences.snapshot; }
 - (void)synchronizeAccountBoundary {
     uint_fast64_t token=atomic_load_explicit(&CSActionAccountBoundary,memory_order_acquire);
@@ -145,6 +157,13 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
 }
 - (BOOL)canExecuteContext:(CSMessageActionContext *)context action:(CSMessageAction)action entry:(CSMessageActionEntry)entry {
     if (![self validateContext:context] || !CSMessageActionEntryAllows(self.settings,entry,action)) return NO;
+    if (action==CSMessageActionAddSticker) {
+        if (context.messageType!=3) return NO;
+#if TARGET_OS_IOS
+        if (UIApplication.sharedApplication.applicationState!=UIApplicationStateActive || CSCloseFriendCurrentSnapshot().blocked || CSCloseFriendShouldHideUserName(context.sourceConversationID,CSCloseFriendSurfaceSession)) return NO;
+#endif
+        return YES;
+    }
     if (action==CSMessageActionRepeat) {
         if (context.messageType==10000 || context.messageType==10002) return NO;
         if (entry==CSMessageActionEntryMenuRepeat && !CSMessageActionSupportsRepeatMenuType(context.messageType)) return NO;
@@ -216,7 +235,12 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     }];
 }
 - (NSString *)executeContext:(CSMessageActionContext *)context action:(CSMessageAction)action entry:(CSMessageActionEntry)entry {
-    if (![self canExecuteContext:context action:action entry:entry]) { [self feedback:@"消息或当前操作已失效，未执行。" context:context]; return nil; }
+    if (![self canExecuteContext:context action:action entry:entry]) {
+        // Adding an image to stickers uses only WeChat's own UI, including rejected/stale actions.
+        if (action!=CSMessageActionAddSticker) [self feedback:@"消息或当前操作已失效，未执行。" context:context];
+        return nil;
+    }
+    if (action==CSMessageActionAddSticker) { [_imageSticker addContext:context]; return nil; }
     BOOL enhancedForward=CSMessageActionUsesVoiceEnhancement(self.settings,entry,action,context.messageType);
     if (action!=CSMessageActionRepeat && !enhancedForward) {
         [self performNativeAction:action context:context entry:entry];
@@ -302,10 +326,12 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     for (CSMessageActionOperation *op in _operations.allValues) if (op.context.cell==cell && op.action!=CSMessageActionRepeat && !(op.action==CSMessageActionForward && op.logic)) [self cancelOperationID:op.identifier];
 }
 - (void)cancelAllUnsubmittedOperations {
+    [_imageSticker cancelAllOperations];
     for (CSMessageActionConfirmation *confirmation in _confirmations) confirmation.finished=YES;
     for (NSString *identifier in _operations.allKeys) [self cancelOperationID:identifier];
 }
 - (void)settingsChanged {
+    [_imageSticker cancelInvalidOperations];
     for (CSMessageActionConfirmation *confirmation in _confirmations) if (!CSMessageActionEntryAllows(self.settings,confirmation.entry,confirmation.action)) confirmation.finished=YES;
     for (CSMessageActionOperation *op in _operations.allValues) if (!CSMessageActionEntryAllows(self.settings,op.entry,op.action) || (op.enhanced && !self.settings.voiceForwardEnabled)) [self cancelOperationID:op.identifier];
 }

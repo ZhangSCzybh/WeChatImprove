@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CSMessageSendAdapter : NSObject
 - (instancetype)initWithEnvironment:(id<CSMessageActionEnvironment>)environment;
+// Fresh text for an explicitly configured task. Preparation never sends or opens a chat.
+- (nullable CSMessagePreparedSend *)prepareScheduledText:(NSString *)text targetID:(NSString *)targetID accountID:(NSString *)accountID;
 - (nullable CSMessagePreparedSend *)prepareContext:(CSMessageActionContext *)context targetID:(NSString *)targetID voice:(nullable CSMessageVoiceResource *)voice appData:(nullable NSData *)appData appDataPath:(nullable NSString *)path;
 - (nullable CSMessagePreparedSend *)prepareContext:(CSMessageActionContext *)context targetID:(NSString *)targetID voice:(nullable CSMessageVoiceResource *)voice;
 @end
