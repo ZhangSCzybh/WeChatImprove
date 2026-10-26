@@ -59,7 +59,7 @@ static NSString * const kAvatarCacheKey = @"com.wechat.tweak.avatar.cache";
 // 用户协议同意标记
 static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agreement.accepted.v3";
 
-@interface CSCustomViewController () <UITableViewDelegate, UITableViewDataSource>
+@interface CSCustomViewController () <UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate>
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSArray<CSSettingSection *> *sections;
 @property (nonatomic, strong) UIImageView *avatarImageView;
@@ -72,6 +72,9 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 @property (nonatomic, strong) UIAlertAction *continueAction; // 继续按钮引用
 @property (nonatomic, assign) BOOL isAuthorized; // 授权状态
 @property (nonatomic, strong) UIView *authorizationOverlay; // 授权提示遮罩视图
+@property (nonatomic, strong) UILongPressGestureRecognizer *closeFriendEntryGesture;
+@property (nonatomic, copy) NSDictionary *closeFriendEntryToken;
+@property (nonatomic, assign) BOOL closeFriendEntryVisible;
 @end
 
 @implementation CSCustomViewController
@@ -116,6 +119,10 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                              selector:@selector(settingsDidChange:)
                                                  name:@"com.wechat.tweak.local_settings_changed"
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(closeFriendEntryPolicyChanged:)
+                                                 name:CSCloseFriendPolicyDidChangeNotification
+                                               object:nil];
 }
 
 - (void)dealloc {
@@ -131,6 +138,9 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    // Rebuild before the first frame, including when returning under a different account.
+    [self setupData];
+    [self.tableView reloadData];
     // Covers direct third-party plugin registration routes before any settings content appears.
     UIView *cover=[self.view viewWithTag:871042];
     if(CSCloseFriendPluginEntryHidden() && !cover) {
@@ -747,9 +757,56 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     [self.headerView addSubview:self.avatarImageView];
     [self.headerView addSubview:self.nicknameLabel];
     [self.headerView addSubview:self.wxidLabel];
+    [self installCloseFriendEntryGesture];
     
     // 加载头像
     [self loadAvatarImage];
+}
+
+- (void)installCloseFriendEntryGesture {
+    if(self.closeFriendEntryGesture)return;
+    self.avatarImageView.userInteractionEnabled=YES;
+    UILongPressGestureRecognizer *gesture=[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(discoverCloseFriendEntry:)];
+    gesture.minimumPressDuration=2.0;
+    gesture.allowableMovement=10.0;
+    gesture.numberOfTouchesRequired=1;
+    gesture.cancelsTouchesInView=NO;
+    gesture.delegate=self;
+    [self.avatarImageView addGestureRecognizer:gesture];
+    self.closeFriendEntryGesture=gesture;
+}
+- (BOOL)canDiscoverCloseFriendEntry {
+    UIViewController *host=CSNativeSettingsHostForContent(self);
+    return self.isAuthorized && self.view.window && !self.authorizationOverlay.superview &&
+        UIApplication.sharedApplication.applicationState==UIApplicationStateActive &&
+        (!host.navigationController || host.navigationController.topViewController==host) &&
+        !host.presentedViewController && !self.presentedViewController;
+}
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:(UITouch *)touch {
+    if(gesture!=self.closeFriendEntryGesture)return YES;
+    self.closeFriendEntryToken=nil;
+    if(![self canDiscoverCloseFriendEntry])return NO;
+    self.closeFriendEntryToken=[CSCloseFriendManager.sharedManager settingsEntryDiscoveryToken];
+    return self.closeFriendEntryToken!=nil;
+}
+- (void)discoverCloseFriendEntry:(UILongPressGestureRecognizer *)gesture {
+    if(gesture!=self.closeFriendEntryGesture)return;
+    if(gesture.state!=UIGestureRecognizerStateBegan) {
+        if(gesture.state==UIGestureRecognizerStateEnded || gesture.state==UIGestureRecognizerStateCancelled || gesture.state==UIGestureRecognizerStateFailed)self.closeFriendEntryToken=nil;
+        return;
+    }
+    NSDictionary *token=self.closeFriendEntryToken;
+    self.closeFriendEntryToken=nil;
+    if(![self canDiscoverCloseFriendEntry] || ![CSCloseFriendManager.sharedManager discoverSettingsEntryWithToken:token])return;
+    [self setupData];
+    [self.tableView reloadData];
+    [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
+}
+- (void)closeFriendEntryPolicyChanged:(NSNotification *)notification {
+    if(!self.isViewLoaded)return;
+    if(self.closeFriendEntryVisible==[CSCloseFriendManager.sharedManager settingsEntryVisible])return;
+    [self setupData];
+    [self.tableView reloadData];
 }
 
 - (void)setupData {
@@ -765,8 +822,8 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                          detail:nil];
     
     NSMutableArray *accountItems=[NSMutableArray arrayWithArray:@[accountItem,favoriteAuthItem]];
-    CSCloseFriendSnapshot *closeFriendSnapshot=CSCloseFriendCurrentSnapshot();
-    if(!(closeFriendSnapshot.enabled && !closeFriendSnapshot.revealed && [closeFriendSnapshot.options[@"hideSettingsEntry"] boolValue])) {
+    self.closeFriendEntryVisible=[CSCloseFriendManager.sharedManager settingsEntryVisible];
+    if(self.closeFriendEntryVisible) {
         [accountItems addObject:[CSSettingItem itemWithTitle:@"捉迷藏呀" iconName:@"lock.shield" iconColor:UIColor.systemBlueColor detail:nil]];
     }
     CSSettingSection *accountSection = [CSSettingSection sectionWithHeader:@"账号与安全" items:accountItems];

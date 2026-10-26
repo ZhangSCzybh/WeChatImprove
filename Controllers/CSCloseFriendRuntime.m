@@ -17,6 +17,7 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
 @property(nonatomic,copy) CSCloseFriendCredentialWriter writer;
 @property(nonatomic,copy) NSString *account;
 @property(nonatomic,copy) NSDictionary *state, *credential;
+@property(nonatomic,copy) NSDictionary *resetToken;
 @property(nonatomic) NSUInteger epoch, generation, revision;
 @property(nonatomic) BOOL blocked, active, suspended;
 @property(nonatomic) NSTimeInterval revealUntil;
@@ -34,6 +35,7 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
     return self;
 }
 - (void)invalidateSearchVerification {
+    self.resetToken=nil;
     self.searchCredentialVersion++; self.searchRequest++;
     self.searchCache=nil; self.searchCacheKey=nil;
 }
@@ -55,7 +57,7 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
         if([self.account isEqual:account] && self.epoch==epoch && self.suspended==suspended && !self.blocked)return;
         [self invalidateSearchVerification];
         self.account=[account copy]?:@""; self.epoch=epoch; self.suspended=suspended; self.generation++; self.revealUntil=0; self.state=nil; self.credential=nil; self.blocked=YES;
-        if(account.length && !suspended) {
+        if(account.length && !suspended && (!self.resetStorage || self.resetStorage(account,NO,NULL))) {
             NSError *error=nil;
             NSDictionary *state=[self.store loadStateForAccountID:account error:&error];
             BOOL missing=[error.domain isEqual:CSCloseFriendStoreErrorDomain] && error.code==CSCloseFriendStoreErrorMissing;
@@ -92,7 +94,7 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
     @synchronized(self) {
         BOOL changed=self.publishedSnapshot.revealed || self.revealUntil>self.elapsedClock() ||
             (self.publishedSnapshot && self.publishedSnapshot.blocked!=self.blocked);
-        self.revealUntil=0; self.generation++; self.searchRequest++;
+        self.revealUntil=0; self.generation++; self.searchRequest++; self.resetToken=nil;
         // Authentication is invalidated even when display state was already locked.
         if(changed)[self changed];
     }
@@ -216,6 +218,33 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
         if(![self isAuthorized] || !self.credential)return CSRuntimeFail(error,@"请先设置密码并验证当前账号。");
         NSDictionary *normalized=CSCloseFriendNormalizeProfile(profile,error); if(!normalized)return NO;
         return [self saveState:@{@"profile":normalized,@"muteRecords":self.state[@"muteRecords"]?:@{}} error:error];
+    }
+}
+- (NSDictionary *)prepareResetWithPassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error {
+    NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
+    @synchronized(self) {
+        self.resetToken=nil;
+        if(!self.resetStorage || ![self isAuthorized]) { CSRuntimeFail(error,@"请先进入密友设置并验证当前账号。"); return nil; }
+        if(![self authenticatePassword:password token:token error:error])return nil;
+        self.resetToken=self.authenticationToken;
+        return self.resetToken;
+    }
+}
+- (void)cancelResetWithToken:(NSDictionary *)token {
+    NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
+    @synchronized(self) { if([self.resetToken isEqual:token])self.resetToken=nil; }
+}
+- (BOOL)resetWithToken:(NSDictionary *)token error:(NSError **)error {
+    NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
+    @synchronized(self) {
+        if(!self.resetStorage || ![self.resetToken isEqual:token] || ![self isTokenCurrent:token] || ![self isAuthorized])
+            return CSRuntimeFail(error,@"重置验证已失效，请重新输入密友密码。");
+        [self invalidateSearchVerification]; self.generation++; self.revealUntil=0; self.blocked=YES;
+        BOOL ok=self.resetStorage(self.account,YES,error);
+        if(ok) { self.state=@{@"profile":CSEmptyProfile(),@"muteRecords":@{}}; self.credential=nil; self.blocked=NO; }
+        // Any partial failure stays blocked; synchronizeAccount resumes the secure intent.
+        [self changed];
+        return ok;
     }
 }
 @end

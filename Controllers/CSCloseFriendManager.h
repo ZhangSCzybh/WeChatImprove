@@ -10,7 +10,12 @@
 - (void)returnToChatListIfNeeded;
 - (void)authenticateFrom:(UIViewController *)presenter completion:(void (^)(BOOL))completion;
 - (void)presentSettingsFrom:(UIViewController *)presenter;
+- (BOOL)settingsEntryVisible;
+/// Capture at touch-down; discovery revalidates the account and foreground generation.
+- (NSDictionary *)settingsEntryDiscoveryToken;
+- (BOOL)discoverSettingsEntryWithToken:(NSDictionary *)token;
 - (void)changePasswordFrom:(UIViewController *)presenter;
+- (void)resetFrom:(UIViewController *)presenter completion:(void (^)(BOOL success))completion;
 - (NSDictionary *)capabilities;
 - (void)recordCapability:(NSString *)name available:(BOOL)available;
 - (void)attachRecoveryGestureTo:(UIViewController *)controller;
