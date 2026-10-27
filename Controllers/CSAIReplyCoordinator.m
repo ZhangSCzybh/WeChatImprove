@@ -130,8 +130,18 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     NSDictionary *preset=[self presetForConversation:conversation configuration:self.configuration];if(!preset)return;
     NSArray *identifiers=event[@"identifiers"];
     if(![identifiers isKindOfClass:NSArray.class] || !identifiers.count || identifiers.count>10)return;
-    NSMutableSet *unique=[NSMutableSet set];
-    for(id identifier in identifiers){if(!AIString(identifier,1,1024) || [unique containsObject:identifier] || [self.store hasHandledMessageID:identifier])return;[unique addObject:identifier];}
+    NSMutableSet *unique=[NSMutableSet set];NSMutableArray *newAliases=[NSMutableArray array];BOOL duplicate=NO;
+    for(id identifier in identifiers){
+        if(!AIString(identifier,1,1024) || [unique containsObject:identifier])return;
+        [unique addObject:identifier];
+        if([self.store hasHandledMessageID:identifier])duplicate=YES;else [newAliases addObject:identifier];
+    }
+    if(duplicate){
+        // Native callbacks can acquire a server identity after their first local-only callback.
+        // Preserve every new alias before suppressing the duplicate, including unknown sends.
+        if(newAliases.count && ![self.store claimMessageIDs:newAliases error:NULL])[self cancelAll];
+        return;
+    }
     NSArray *key=@[conversation,sender];CSAIReplyBatch *batch=nil;
     for(CSAIReplyBatch *candidate in self.pending)if([candidate.contextKey isEqual:key] && now<candidate.expires){batch=candidate;break;}
     if(!batch && self.pending.count>=20)return;

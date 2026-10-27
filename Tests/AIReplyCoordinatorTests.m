@@ -129,6 +129,39 @@ static void DedupeBatchingAndSerialization(void) {
     // Existing ledger survives a coordinator replacement (and aliases are durable, not memory-only).
     CSAIReplyStore *reload=[[CSAIReplyStore alloc]initWithURL:CSAIReplyFileURL(f.root,@"me") account:@"me"];CHECK([reload load]);CHECK([reload hasHandledMessageID:@"server"]);CHECK([reload hasHandledMessageID:@"local"]);
 }
+static void EvolvingAliasDurability(void) {
+    for(NSString *result in @[@"submitted",@"unknown"]){
+        Fixture *f=[Fixture new];f.delegate.result=result;
+        NSMutableDictionary *event=[f event:@"c" sender:@"c" identity:@"local-only"];
+        [f.coordinator receiveEvent:event];[f advance:2];Complete(f,0,@"reply",nil);
+        CHECK(f.client.operations.count==1 && f.delegate.attempts==1 && f.delegate.sends==1);
+        event[@"identifiers"]=@[@"server-later",@"local-only"];
+        [f.coordinator receiveEvent:event];CHECK(!f.coordinator.pendingCount);
+        CHECK([f.store hasHandledMessageID:@"server-later"]);
+        // Independently read the file and reload the coordinator's store before the server-only replay.
+        CSAIReplyStore *reload=[[CSAIReplyStore alloc]initWithURL:CSAIReplyFileURL(f.root,@"me") account:@"me"];
+        CHECK([reload load] && [reload hasHandledMessageID:@"server-later"]);
+        CHECK([f.store load]);event[@"identifiers"]=@[@"server-later"];
+        [f.coordinator receiveEvent:event];[f advance:2];
+        CHECK(f.client.operations.count==1 && f.delegate.attempts==1 && f.delegate.sends==1);
+        CHECK(!f.coordinator.pendingCount && !f.coordinator.activeCount);
+    }
+    // Failure to persist an alias must cancel existing work before any later callback can send.
+    Fixture *f=[Fixture new];f.delegate.result=@"unknown";
+    NSMutableDictionary *event=[f event:@"c" sender:@"c" identity:@"local-only"];
+    [f.coordinator receiveEvent:event];[f advance:2];Complete(f,0,@"unknown reply",nil);
+    Receive(f,@"d",@"d",@"active-other");[f advance:2];Receive(f,@"e",@"e",@"pending-other");
+    CHECK(f.coordinator.activeCount==1 && f.coordinator.pendingCount==1);
+    f.store.failClaims=YES;event[@"identifiers"]=@[@"server-later",@"local-only"];
+    [f.coordinator receiveEvent:event];CHECK(![f.store hasHandledMessageID:@"server-later"]);
+    CHECK(f.client.operations[1].cancelled && !f.coordinator.activeCount && !f.coordinator.pendingCount);
+    Complete(f,1,@"late reply",nil);event[@"identifiers"]=@[@"server-later"];event[@"created"]=@(f.clock);[f.coordinator receiveEvent:event];[f advance:2];
+    CHECK(f.client.operations.count==2 && f.delegate.attempts==1 && f.delegate.sends==1);
+    // Complete validation precedes any new alias claim, even when an earlier identity is known.
+    f=[Fixture new];Receive(f,@"c",@"c",@"known");
+    event=[f event:@"c" sender:@"c" identity:nil];event[@"identifiers"]=@[@"known",@"must-not-claim",@1];
+    [f.coordinator receiveEvent:event];CHECK(![f.store hasHandledMessageID:@"must-not-claim"]);
+}
 static void CancellationAndBoundaries(void) {
     for(NSUInteger mode=0;mode<5;mode++){
         Fixture *f=[Fixture new];Receive(f,@"c",@"c",nil);Receive(f,@"d",@"d",nil);Receive(f,@"e",@"e",nil);[f advance:2];CHECK(f.coordinator.activeCount==2);
@@ -197,6 +230,6 @@ static void OneShotProductionWakeup(void) {
     CHECK(f.client.operations.count==1);[f.coordinator cancelAll];
 }
 int main(void){@autoreleasepool{
-    Filters();DedupeBatchingAndSerialization();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();OneShotProductionWakeup();
+    Filters();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();OneShotProductionWakeup();
     puts("AIReplyCoordinatorTests passed: filtering, alias claims, debounce, serialization, context bounds, cancellation, boundary authorization, expiry, concurrency, errors and one-shot timers");
 }return 0;}
