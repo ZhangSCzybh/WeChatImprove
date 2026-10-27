@@ -3,16 +3,47 @@
 #import "CSAIReplySettingsViewController.h"
 #import "CSMessageNativeActionAdapter.h"
 #import <UIKit/UIKit.h>
+#import <objc/message.h>
 #import <objc/runtime.h>
 
 static const void *DetailKey=&DetailKey;
 static const void *SectionKey=&SectionKey;
+static const void *CellKey=&CellKey;
 static id ReadIvar(id object,const char *name){
     Ivar ivar=class_getInstanceVariable(object_getClass(object),name);
     return ivar && ivar_getTypeEncoding(ivar)[0]=='@'?object_getIvar(object,ivar):nil;
 }
 static id Call(id receiver,NSString *selector,NSArray *types,NSArray *arguments){
     return CSMessageNativeSupports(receiver,selector,@"@",types)?CSMessageNativeInvoke(receiver,selector,arguments):nil;
+}
+static NSArray *Cells(id section){
+    id cells=CSMessageActionNativeObject(section,@"getAllCells");
+    if(![cells isKindOfClass:NSArray.class])cells=CSMessageActionNativeObject(section,@"cells");
+    return [cells isKindOfClass:NSArray.class]?[cells copy]:nil;
+}
+static BOOL IsChatSearchCell(id cell){
+    id config=CSMessageActionNativeObject(cell,@"cellConfig");
+    if(CSMessageNativeSupports(config,@"clickAction",@":",@[])){
+        SEL action=((SEL(*)(id,SEL))objc_msgSend)(config,NSSelectorFromString(@"clickAction"));
+        if(action==NSSelectorFromString(@"onEditAndSearch"))return YES;
+    }
+    // The action is language-independent; the visible title also supports host
+    // versions that route this native row through a different action handler.
+    id left=CSMessageActionNativeObject(config,@"leftConfig");
+    return [CSMessageActionNativeObject(left,@"title") isEqual:@"查找聊天内容"];
+}
+static id ChatSearchSection(NSArray *sections){
+    id match=nil;
+    for(id section in sections){
+        NSArray *cells=Cells(section);
+        for(NSUInteger row=0;row<cells.count;row++)if(IsChatSearchCell(cells[row])){
+            // Append inside the search section: every existing native index path
+            // stays intact, including the chatroom controller's cached paths.
+            if(match || row+1!=cells.count)return nil;
+            match=section;
+        }
+    }
+    return match;
 }
 @interface CSAIChatDetailState : NSObject
 @property(nonatomic,weak) id page;
@@ -62,28 +93,42 @@ static id Call(id receiver,NSString *selector,NSArray *types,NSArray *arguments)
         if(!tableInfo)tableInfo=CSMessageActionNativeObject(self.page,@"m_tableViewInfo");
         NSArray *sections=CSMessageActionNativeObject(tableInfo,@"getAllSections");
         if(![sections isKindOfClass:NSArray.class])sections=CSMessageActionNativeObject(tableInfo,@"sections");
-        if(![sections isKindOfClass:NSArray.class] || !CSMessageNativeSupports(tableInfo,@"addSection:",@"v",@[@"@"]) || !CSMessageNativeSupports(tableInfo,@"removeSectionAt:",@"v",@[@"Q"]))return;
+        if(![sections isKindOfClass:NSArray.class])return;
+        sections=[sections copy];
         for(NSInteger index=(NSInteger)sections.count-1;index>=0;index--){
-            if(objc_getAssociatedObject(sections[(NSUInteger)index],SectionKey)==self)CSMessageNativeInvoke(tableInfo,@"removeSectionAt:",@[@(index)]);
+            id section=sections[(NSUInteger)index];
+            if(objc_getAssociatedObject(section,SectionKey)==self && CSMessageNativeSupports(tableInfo,@"removeSectionAt:",@"v",@[@"Q"])){
+                CSMessageNativeInvoke(tableInfo,@"removeSectionAt:",@[@(index)]);continue;
+            }
+            NSArray *cells=Cells(section);
+            if(CSMessageNativeSupports(section,@"removeCellAt:",@"v",@[@"Q"]))for(NSInteger row=(NSInteger)cells.count-1;row>=0;row--){
+                if(objc_getAssociatedObject(cells[(NSUInteger)row],CellKey)==self)CSMessageNativeInvoke(section,@"removeCellAt:",@[@(row)]);
+            }
         }
         if([self current]){
             Class sectionClass=NSClassFromString(@"WCTableViewSectionManager"),cellClass=NSClassFromString(@"WCTableViewCellManager");
-            id section=Call(sectionClass,@"sectionWithHeader:",@[@"@"],@[@"AI 回复"]);
-            if(!section)section=Call(sectionClass,@"sectionInfoHeader:",@[@"@"],@[@"AI 回复"]);
-            if(!section || !CSMessageNativeSupports(section,@"addCell:",@"v",@[@"@"]))return;
+            BOOL group=[self.conversation hasSuffix:@"@chatroom"];
+            id section=group?ChatSearchSection(sections):Call(sectionClass,@"sectionWithHeader:",@[@"@"],@[@"AI 回复"]);
+            if(!group && !section)section=Call(sectionClass,@"sectionInfoHeader:",@[@"@"],@[@"AI 回复"]);
+            BOOL canInsert=section && CSMessageNativeSupports(section,@"addCell:",@"v",@[@"@"]) &&
+                (group?CSMessageNativeSupports(section,@"removeCellAt:",@"v",@[@"Q"]):
+                 (CSMessageNativeSupports(tableInfo,@"addSection:",@"v",@[@"@"]) && CSMessageNativeSupports(tableInfo,@"removeSectionAt:",@"v",@[@"Q"])));
             CSAIReplyManager *manager=CSAIReplyManager.sharedManager;
             BOOL enabled=[manager.store.configuration[@"conversations"][self.conversation][@"enabled"] boolValue];
-            id toggle=Call(cellClass,@"switchCellForSel:target:title:on:",@[@":",@"@",@"@",@"B"],@[@"toggle:",self,@"启用 AI 回复",@(enabled)]);
+            id toggle=nil;
+            if(group && enabled)toggle=Call(cellClass,@"switchCellForSel:target:leftImage:title:desc:on:",@[@":",@"@",@"@",@"@",@"@",@"B"],@[@"toggle:",self,NSNull.null,@"启用 AI 回复",[manager statusForConversation:self.conversation],@(enabled)]);
+            if(!toggle)toggle=Call(cellClass,@"switchCellForSel:target:title:on:",@[@":",@"@",@"@",@"B"],@[@"toggle:",self,@"启用 AI 回复",@(enabled)]);
             id preset=Call(cellClass,@"normalCellForSel:target:title:rightValue:",@[@":",@"@",@"@",@"@"],@[@"choosePreset",self,@"回复预设",[manager presetNameForConversation:self.conversation]]);
-            if(!toggle || !preset)return;
-            CSMessageNativeInvoke(section,@"addCell:",@[toggle]);CSMessageNativeInvoke(section,@"addCell:",@[preset]);
-            NSString *footer=[manager statusForConversation:self.conversation];
-            if([self.conversation hasSuffix:@"@chatroom"])footer=[footer stringByAppendingString:@"。群聊仅在成员单独 @ 当前账号时回复，@ 所有人不触发。"];
-            if(CSMessageNativeSupports(section,@"setFooterTitle:",@"v",@[@"@"]))CSMessageNativeInvoke(section,@"setFooterTitle:",@[footer]);
-            // Native sections retain cached indexes for their own special rows. Append our
-            // section rather than shift those indexes; deletion/footer actions remain native.
-            objc_setAssociatedObject(section,SectionKey,self,OBJC_ASSOCIATION_ASSIGN);
-            CSMessageNativeInvoke(tableInfo,@"addSection:",@[section]);
+            if(canInsert && toggle && preset){
+                objc_setAssociatedObject(toggle,CellKey,self,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+                objc_setAssociatedObject(preset,CellKey,self,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+                CSMessageNativeInvoke(section,@"addCell:",@[toggle]);CSMessageNativeInvoke(section,@"addCell:",@[preset]);
+                if(!group){
+                    if(CSMessageNativeSupports(section,@"setFooterTitle:",@"v",@[@"@"]))CSMessageNativeInvoke(section,@"setFooterTitle:",@[[manager statusForConversation:self.conversation]]);
+                    objc_setAssociatedObject(section,SectionKey,self,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+                    CSMessageNativeInvoke(tableInfo,@"addSection:",@[section]);
+                }
+            }
         }
         id table=CSMessageActionNativeObject(tableInfo,@"getTableView");if(!table)table=CSMessageActionNativeObject(tableInfo,@"tableView");
         if([table isKindOfClass:UITableView.class])[table reloadData];

@@ -6,7 +6,7 @@
 #import "CSAIReplyManager.h"
 #import "CSAIReplySettingsViewController.h"
 #import "AINativeDispatchUnderTest.m"
-static NSUInteger checks,mutations,pickerCalls;
+static NSUInteger checks,mutations,pickerCalls,searchCalls,muteCalls;
 #define CHECK(c) do{checks++;if(!(c)){NSLog(@"FAIL %d %s",__LINE__,#c);exit(1);}}while(0)
 @implementation UIView @end
 @implementation UISwitch @end
@@ -36,27 +36,45 @@ static NSUInteger checks,mutations,pickerCalls;
 @property NSString *m_nsUsrName;
 @end
 @implementation TestContact @end
+@interface TestLeftConfig : NSObject
+@property NSString *title;
+@end
+@implementation TestLeftConfig @end
+@interface TestCellConfig : NSObject
+@property SEL clickAction;
+@property TestLeftConfig *leftConfig;
+@end
+@implementation TestCellConfig @end
 @interface WCTableViewCellManager : NSObject
 @property SEL action;
 @property id target;
 @property NSString *title;
 @property BOOL on;
+@property TestCellConfig *cellConfig;
+@property NSString *detail;
 + (id)switchCellForSel:(SEL)sel target:(id)target title:(id)title on:(BOOL)on;
++ (id)switchCellForSel:(SEL)sel target:(id)target leftImage:(id)image title:(id)title desc:(id)detail on:(BOOL)on;
 + (id)normalCellForSel:(SEL)sel target:(id)target title:(id)title rightValue:(id)value;
 @end
 @implementation WCTableViewCellManager
-+ (id)switchCellForSel:(SEL)sel target:(id)target title:(id)title on:(BOOL)on{WCTableViewCellManager *cell=[self new];cell.action=sel;cell.target=target;cell.title=title;cell.on=on;return cell;}
++ (id)switchCellForSel:(SEL)sel target:(id)target title:(id)title on:(BOOL)on{WCTableViewCellManager *cell=[self new];cell.action=sel;cell.target=target;cell.title=title;cell.on=on;cell.cellConfig=[TestCellConfig new];cell.cellConfig.clickAction=sel;cell.cellConfig.leftConfig=[TestLeftConfig new];cell.cellConfig.leftConfig.title=title;return cell;}
++ (id)switchCellForSel:(SEL)sel target:(id)target leftImage:(id)image title:(id)title desc:(id)detail on:(BOOL)on{(void)image;WCTableViewCellManager *cell=[self switchCellForSel:sel target:target title:title on:on];cell.detail=detail;return cell;}
 + (id)normalCellForSel:(SEL)sel target:(id)target title:(id)title rightValue:(id)value{(void)value;return [self switchCellForSel:sel target:target title:title on:NO];}
 @end
 @interface WCTableViewSectionManager : NSObject
 @property NSMutableArray *cells;
+@property NSString *headerTitle;
 @property NSString *footerTitle;
 + (id)sectionWithHeader:(NSString *)title;
 - (void)addCell:(id)cell;
+- (NSArray *)getAllCells;
+- (void)removeCellAt:(NSUInteger)index;
 @end
 @implementation WCTableViewSectionManager
-+ (id)sectionWithHeader:(NSString *)title{(void)title;WCTableViewSectionManager *section=[self new];section.cells=[NSMutableArray array];return section;}
++ (id)sectionWithHeader:(NSString *)title{WCTableViewSectionManager *section=[self new];section.headerTitle=title;section.cells=[NSMutableArray array];return section;}
 - (void)addCell:(id)cell{[self.cells addObject:cell];}
+- (NSArray *)getAllCells{return self.cells;}
+- (void)removeCellAt:(NSUInteger)index{[self.cells removeObjectAtIndex:index];}
 @end
 @interface TestTableManager : NSObject
 @property NSMutableArray *sections;
@@ -80,12 +98,20 @@ static NSUInteger checks,mutations,pickerCalls;
 @property UIViewController *controller;
 - (id)getChatContact;
 - (id)getViewController;
+- (void)onEditAndSearch;
+- (void)onMute;
 @end
 @implementation TestDetailPage
 - (instancetype)init{if((self=[super init])){m_tableViewInfo=[TestTableManager new];_controller=[UIViewController new];_contact=[TestContact new];_contact.m_nsUsrName=@"friend";}return self;}
 - (id)getChatContact{return self.contact;}
 - (id)getViewController{return self.controller;}
+- (void)onEditAndSearch{searchCalls++;}
+- (void)onMute{muteCalls++;}
 @end
+static WCTableViewSectionManager *NativeSection(TestDetailPage *page,NSString *title,SEL action){
+    WCTableViewSectionManager *section=[WCTableViewSectionManager sectionWithHeader:nil];
+    [section addCell:[WCTableViewCellManager normalCellForSel:action target:page title:title rightValue:nil]];return section;
+}
 NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
 static CSAIReplyStore *testStore;
 static NSUInteger testEpoch=1;
@@ -123,7 +149,38 @@ int main(int argc,const char **argv){@autoreleasepool{
     UISwitch *control=[UISwitch new];control.on=YES;((void(*)(id,SEL,id))objc_msgSend)(toggle.target,toggle.action,control);CHECK(mutations==1);
     WCTableViewCellManager *preset=section.cells[1];((void(*)(id,SEL))objc_msgSend)(preset.target,preset.action);CHECK(pickerCalls==1);
     testEpoch++;CSAIRefreshChatDetail(page);CHECK(page->m_tableViewInfo.sections.count==1);((void(*)(id,SEL,id))objc_msgSend)(toggle.target,toggle.action,control);CHECK(mutations==1);((void(*)(id,SEL))objc_msgSend)(preset.target,preset.action);CHECK(pickerCalls==1);
-    TestDetailPage *next=[TestDetailPage new];next.contact.m_nsUsrName=@"group@chatroom";CSAIRefreshChatDetail(next);CHECK(next->m_tableViewInfo.sections.count==2);section=next->m_tableViewInfo.sections.lastObject;CHECK([section.footerTitle containsString:@"@ 所有人不触发"]);
-    allowed=NO;[NSNotificationCenter.defaultCenter postNotificationName:CSAIReplyDidChange object:nil];CHECK(next->m_tableViewInfo.sections.count==1);
+    TestDetailPage *next=[TestDetailPage new];next.contact.m_nsUsrName=@"group@chatroom";
+    WCTableViewSectionManager *members=NativeSection(next,@"群成员",NULL),*search=NativeSection(next,@"查找聊天内容",@selector(onEditAndSearch)),*mute=NativeSection(next,@"消息免打扰",@selector(onMute)),*exitSection=NativeSection(next,@"退出群聊",NULL);
+    next->m_tableViewInfo.sections=[@[members,search,mute,exitSection] mutableCopy];NSArray *nativeSections=[next->m_tableViewInfo.sections copy];id searchCell=search.cells[0],muteCell=mute.cells[0];
+    CSAIRefreshChatDetail(next);
+    CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);CHECK(search.cells.count==3);CHECK(search.cells[0]==searchCell);CHECK(!search.headerTitle && !search.footerTitle);
+    toggle=search.cells[1];preset=search.cells[2];CHECK([toggle.title isEqual:@"启用 AI 回复"]);CHECK(!toggle.on && !toggle.detail);CHECK([preset.title isEqual:@"回复预设"]);
+    CHECK(next->m_tableViewInfo.sections[2]==mute && mute.cells[0]==muteCell);CHECK(next->m_tableViewInfo.sections.lastObject==exitSection);
+    ((void(*)(id,SEL))objc_msgSend)([searchCell target],[searchCell action]);((void(*)(id,SEL))objc_msgSend)([muteCell target],[muteCell action]);CHECK(searchCalls==1 && muteCalls==1);
+    ((void(*)(id,SEL,id))objc_msgSend)(toggle.target,toggle.action,control);CHECK(mutations==2);
+    ((void(*)(id,SEL))objc_msgSend)(preset.target,preset.action);CHECK(pickerCalls==2);
+    for(NSUInteger i=0;i<5;i++)[NSNotificationCenter.defaultCenter postNotificationName:CSAIReplyDidChange object:nil];
+    CHECK(search.cells.count==3);CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);CHECK(search.cells[0]==searchCell && mute.cells[0]==muteCell);
+    NSMutableDictionary *configuration=[testStore.configuration mutableCopy];configuration[@"conversations"]=@{@"group@chatroom":@{@"enabled":@YES,@"presetID":@""}};CHECK([testStore saveConfiguration:configuration error:NULL]);
+    CSAIRefreshChatDetail(next);toggle=search.cells[1];CHECK(toggle.on);CHECK([toggle.detail isEqual:@"总开关已关闭"]);CHECK(!search.headerTitle && !search.footerTitle);
+    // Native rebuilds may move the search section. Resolve its action again;
+    // native section and row indices must stay exactly as rebuilt by WeChat.
+    WCTableViewSectionManager *localized=NativeSection(next,@"Search Chat History",@selector(onEditAndSearch));
+    next->m_tableViewInfo.sections=[@[members,mute,localized,exitSection] mutableCopy];nativeSections=[next->m_tableViewInfo.sections copy];CSAIRefreshChatDetail(next);
+    CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);CHECK(localized.cells.count==3);CHECK(mute.cells[0]==muteCell);
+    allowed=NO;[NSNotificationCenter.defaultCenter postNotificationName:CSAIReplyDidChange object:nil];CHECK(localized.cells.count==1);CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);allowed=YES;
+    CSAIRefreshChatDetail(next);CHECK(localized.cells.count==3);toggle=localized.cells[1];preset=localized.cells[2];testEpoch++;
+    CSAIRefreshChatDetail(next);CHECK(localized.cells.count==1);CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);
+    ((void(*)(id,SEL,id))objc_msgSend)(toggle.target,toggle.action,control);((void(*)(id,SEL))objc_msgSend)(preset.target,preset.action);CHECK(mutations==2 && pickerCalls==2);
+    // Exact visible-title fallback supports native versions with another action.
+    TestDetailPage *fallback=[TestDetailPage new];fallback.contact.m_nsUsrName=@"fallback@chatroom";
+    WCTableViewSectionManager *titleOnly=NativeSection(fallback,@"查找聊天内容",@selector(onMute));fallback->m_tableViewInfo.sections=[@[titleOnly,exitSection] mutableCopy];CSAIRefreshChatDetail(fallback);CHECK(titleOnly.cells.count==3);CHECK(fallback->m_tableViewInfo.sections.count==2);
+    // An absent/ambiguous/non-terminal anchor never creates a bottom fallback
+    // or shifts any pre-existing native row to an incorrect cached index path.
+    TestDetailPage *unsupported=[TestDetailPage new];unsupported.contact.m_nsUsrName=@"unsupported@chatroom";
+    unsupported->m_tableViewInfo.sections=[@[members,mute,exitSection] mutableCopy];nativeSections=[unsupported->m_tableViewInfo.sections copy];CSAIRefreshChatDetail(unsupported);CHECK([unsupported->m_tableViewInfo.sections isEqual:nativeSections]);
+    WCTableViewSectionManager *firstSearch=NativeSection(unsupported,@"查找聊天内容",@selector(onEditAndSearch)),*secondSearch=NativeSection(unsupported,@"Search",@selector(onEditAndSearch));
+    unsupported->m_tableViewInfo.sections=[@[firstSearch,secondSearch,exitSection] mutableCopy];CSAIRefreshChatDetail(unsupported);CHECK(firstSearch.cells.count==1 && secondSearch.cells.count==1);CHECK(unsupported->m_tableViewInfo.sections.count==3);
+    [firstSearch addCell:muteCell];unsupported->m_tableViewInfo.sections=[@[firstSearch,exitSection] mutableCopy];CSAIRefreshChatDetail(unsupported);CHECK(firstSearch.cells.count==2 && firstSearch.cells[1]==muteCell);CHECK(unsupported->m_tableViewInfo.sections.count==2);
     printf("AI native adapters: %lu checks passed\n",(unsigned long)checks);return 0;
 }}
