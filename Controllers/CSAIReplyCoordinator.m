@@ -106,12 +106,6 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 - (void)configurationDidChange {
     AIRequireMain();[self cancelAll];self.configuration=self.store.configuration;
 }
-- (void)manualReplyInConversation:(NSString *)conversation {
-    AIRequireMain();
-    for(CSAIReplyBatch *batch in [self.pending copy])if([batch.conversation isEqual:conversation])[self.pending removeObjectIdenticalTo:batch];
-    CSAIReplyBatch *active=self.active[conversation];if(active)[self cancelBatch:active];
-    [self clearContextsForConversation:conversation];[self processPending];
-}
 - (void)receiveEvent:(NSDictionary *)event {
     AIRequireMain();
     if(![self.configuration isEqual:self.store.configuration])[self configurationDidChange];
@@ -174,7 +168,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     BOOL (^valid)(void)=^BOOL {return [weakSelf isCurrent:batch];};
     if(!valid()){[self cancelBatch:batch];[self processPending];return;}
     NSString *result=[self.delegate coordinator:self submitText:reply conversation:batch.conversation valid:valid];
-    // Submission may itself trigger manual takeover or configuration/account cancellation.
+    // Submission may itself trigger configuration/account/privacy cancellation.
     if(self.active[batch.conversation]!=batch || batch.generation!=self.generation){[self processPending];return;}
     [self.active removeObjectForKey:batch.conversation];
     if([result isEqual:@"submitted"]){
@@ -188,7 +182,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 }
 - (void)startBatch:(CSAIReplyBatch *)batch {
     [self.pending removeObjectIdenticalTo:batch];
-    // Own the slot before credential lookup, so even a reentrant manual reply can revoke it.
+    // Own the slot before credential lookup, so even reentrant configuration/account cancellation can revoke it.
     batch.started=self.now();self.active[batch.conversation]=batch;
     NSError *error=nil;NSString *key=[self.delegate credentialForCoordinator:self error:&error];
     if(!key.length || error || ![self isCurrent:batch]){

@@ -272,7 +272,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
         [CSSettingSection sectionWithHeader:@"回复预设" items:@[AIRow(@"默认预设",@"text.bubble",[manager presetNameForConversation:nil],^{CSAIPresentPresetPicker(weakSelf,nil,weakSelf.account,weakSelf.epoch);}),AIRow(@"管理预设",@"square.stack",[NSString stringWithFormat:@"%lu 个",(unsigned long)[config[@"presets"] count]],^{[weakSelf openPage:CSAIPresetsPage.class];})]],
         [CSSettingSection sectionWithHeader:@"回复管理" items:@[AIRow(@"已开启的会话",@"bubble.left.and.bubble.right",[NSString stringWithFormat:@"%lu 个",(unsigned long)count],^{[weakSelf openPage:CSAIConversationsPage.class];}),AIRow(@"回复记录",@"clock",nil,^{[weakSelf openPage:CSAIHistoryPage.class];})]]
     ];
-    self.footers=@[@"总开关与会话开关同时开启才会回复。关闭时取消尚未提交的任务，重新开启不补回复历史消息。",@"兼容 Chat Completions 接口。测试仅调用模型，不发送微信消息；修改连接后需重新测试。",@"启用后，符合规则的文本及有限上下文会发送到你配置的模型服务，并以当前微信账号自动发送生成的回复。",@"群聊仅在被单独 @ 时回复。微信被系统挂起或退出时无法保证自动回复；本功能不会自动开启后台保活。"];
+    self.footers=@[@"总开关与会话开关同时开启才会回复。手动回复不会暂停 AI。关闭时取消尚未提交的任务，重新开启不补回复历史消息。",@"兼容 Chat Completions 接口。测试仅调用模型，不发送微信消息；修改连接后需重新测试。",@"启用后，符合规则的文本及有限上下文会发送到你配置的模型服务，并以当前微信账号自动发送生成的回复。",@"群聊仅在被单独 @ 时回复。微信被系统挂起或退出时无法保证自动回复；本功能不会自动开启后台保活。"];
     [super reload];
 }
 @end

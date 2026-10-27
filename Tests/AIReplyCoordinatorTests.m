@@ -163,25 +163,24 @@ static void EvolvingAliasDurability(void) {
     [f.coordinator receiveEvent:event];CHECK(![f.store hasHandledMessageID:@"must-not-claim"]);
 }
 static void CancellationAndBoundaries(void) {
-    for(NSUInteger mode=0;mode<5;mode++){
+    for(NSUInteger mode=0;mode<4;mode++){
         Fixture *f=[Fixture new];Receive(f,@"c",@"c",nil);Receive(f,@"d",@"d",nil);Receive(f,@"e",@"e",nil);[f advance:2];CHECK(f.coordinator.activeCount==2);
         f.client.operations[0].callbackOnCancel=YES;
         if(mode==0)[f save:^(NSMutableDictionary *c){c[@"enabled"]=@NO;}];
         if(mode==1)[f save:^(NSMutableDictionary *c){c[@"model"]=@"changed";}];
         if(mode==2){f.delegate.allowed=NO;[f.coordinator processPending];}
         if(mode==3)[f.coordinator cancelAll];
-        if(mode==4){[f.coordinator manualReplyInConversation:@"c"];[f.coordinator manualReplyInConversation:@"d"];[f.coordinator manualReplyInConversation:@"e"];}
         Complete(f,0,@"late private reply",nil);Complete(f,1,@"late reply",nil);[f advance:5];CHECK(!f.delegate.sends);CHECK(!f.coordinator.activeCount && !f.coordinator.pendingCount);CHECK(f.client.operations[0].cancelled);
     }
     // Cancellation frees capacity immediately; an old callback cannot remove a new active batch.
-    Fixture *f=[Fixture new];Receive(f,@"c",@"c",@"old");[f advance:2];[f.coordinator manualReplyInConversation:@"c"];
+    Fixture *f=[Fixture new];Receive(f,@"c",@"c",@"old");[f advance:2];[f.coordinator cancelAll];
     Receive(f,@"c",@"c",@"new");[f advance:2];CHECK(f.coordinator.activeCount==1);Complete(f,0,@"stale",nil);CHECK(f.coordinator.activeCount==1);Complete(f,1,@"new reply",nil);CHECK(f.delegate.sends==1);
     // Both the initial submission check and native boundary closure recheck privacy/configuration.
     f=[Fixture new];Receive(f,@"c",@"c",nil);[f advance:2];__weak Fixture *weak=f;
     f.delegate.beforeBoundary=^{weak.delegate.allowed=NO;};Complete(f,0,@"reply",nil);CHECK(f.delegate.attempts==1 && !f.delegate.sends);
     f=[Fixture new];Receive(f,@"c",@"c",nil);[f advance:2];weak=f;
     f.delegate.beforeBoundary=^{[weak.coordinator configurationDidChange];};Complete(f,0,@"reply",nil);CHECK(!f.delegate.sends && !f.store.history.count);
-    f=[Fixture new];weak=f;f.delegate.beforeCredential=^{[weak.coordinator manualReplyInConversation:@"c"];};Receive(f,@"c",@"c",nil);[f advance:2];CHECK(!f.client.operations.count && !f.coordinator.activeCount);
+    f=[Fixture new];weak=f;f.delegate.beforeCredential=^{[weak.coordinator configurationDidChange];};Receive(f,@"c",@"c",nil);[f advance:2];CHECK(!f.client.operations.count && !f.coordinator.activeCount);
     // Changes saved without a manager notification still fail closed on the callback.
     f=[Fixture new];Receive(f,@"c",@"c",nil);[f advance:2];NSMutableDictionary *c=[f.store.configuration mutableCopy];c[@"enabled"]=@NO;CHECK([f.store saveConfiguration:c error:NULL]);Complete(f,0,@"late",nil);CHECK(!f.delegate.sends);
     f=[Fixture new];f.clock+=50;[f.coordinator configurationDidChange];NSMutableDictionary *old=[f event:@"c" sender:@"c" identity:nil];old[@"created"]=@(f.clock-1);[f.coordinator receiveEvent:old];[f advance:3];CHECK(!f.client.operations.count);
@@ -214,7 +213,7 @@ static void ContextBudgetAndPreset(void) {
         Complete(f,i,[@"a" stringByPaddingToLength:2000 withString:@"a" startingAtIndex:0],nil);
     }
     CHECK([f.store.history.lastObject[@"preset"] isEqual:@"custom"]);
-    [f.coordinator manualReplyInConversation:@"c"];Receive(f,@"c",@"c",nil);[f advance:2];CHECK(f.client.operations.lastObject.messages.count==2);
+    [f.coordinator cancelAll];Receive(f,@"c",@"c",nil);[f advance:2];CHECK(f.client.operations.lastObject.messages.count==2);
     f=[Fixture new];for(NSUInteger i=0;i<8;i++){Receive(f,@"c",@"c",nil);[f advance:2];Complete(f,i,@"short reply",nil);}
     CHECK(f.client.operations.lastObject.messages.count==11);
     [f.coordinator configurationDidChange];Receive(f,@"c",@"c",nil);[f advance:2];CHECK(f.client.operations.lastObject.messages.count==2);

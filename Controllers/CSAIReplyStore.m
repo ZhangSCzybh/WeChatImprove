@@ -9,6 +9,7 @@
 
 NSNotificationName const CSAIReplyConfigurationDidChange = @"CSAIReplyConfigurationDidChange";
 NSString *const CSAIReplyBackupDomain = @"aiReply";
+NSString *const CSAIReplyStoreCommitUncertainKey = @"CSAIReplyStoreCommitUncertain";
 NSError *CSAIError(NSInteger code, NSString *message) { return [NSError errorWithDomain:@"com.wechatimprove.ai-reply" code:code userInfo:@{NSLocalizedDescriptionKey:message}]; }
 static BOOL Fail(NSError **error, NSString *message) { if(error) *error=CSAIError(1,message); return NO; }
 static BOOL String(id value, NSUInteger min, NSUInteger max) { return [value isKindOfClass:NSString.class] && [value length]>=min && [value length]<=max; }
@@ -118,9 +119,19 @@ static NSDictionary *ImmutableSnapshot(NSDictionary *state) { NSData *data=[NSPr
     // Recheck the destination immediately before rename; never follow or delete links.
     exists=lstat(url.fileSystemRepresentation,&existing)==0;
     if((!exists && errno!=ENOENT) || (exists && !S_ISREG(existing.st_mode))) success=NO;
-    if(success) success=rename(temporary.fileSystemRepresentation,url.fileSystemRepresentation)==0;
-    if(success) success=fsync(directory)==0;
-    close(directory); if(!success) { unlink(temporary.fileSystemRepresentation); return Fail(error,@"无法持久保存 AI 状态文件"); }
+    BOOL renamed=success && rename(temporary.fileSystemRepresentation,url.fileSystemRepresentation)==0;
+    success=renamed && fsync(directory)==0;
+    close(directory);
+    if(!success) {
+        unlink(temporary.fileSystemRepresentation);
+        if(renamed) {
+            if(error)*error=[NSError errorWithDomain:@"com.wechatimprove.ai-reply" code:2 userInfo:@{
+                NSLocalizedDescriptionKey:@"AI 配置文件已替换，但无法确认持久保存；自动回复已暂停，请重新打开设置并检查连接。",
+                CSAIReplyStoreCommitUncertainKey:@YES}];
+            return NO;
+        }
+        return Fail(error,@"无法持久保存 AI 状态文件");
+    }
     return YES;
 }
 - (BOOL)load { @synchronized(self) { NSError *error=nil; NSDictionary *state=[self.class readStateAtURL:self.url account:self.account error:&error]; self.ready=(error==nil); self.error=error; if(self.ready) self.state=state?:NewState(self.account); return self.ready; } }

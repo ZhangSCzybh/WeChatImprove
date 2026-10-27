@@ -20,6 +20,5 @@ FOUNDATION_EXPORT NSNotificationName const CSAIReplyDidChange;
 - (NSString *)presetNameForConversation:(nullable NSString *)conversation;
 - (BOOL)allowsConversation:(NSString *)conversation;
 - (void)receiveNativeSession:(id)session wrap:(id)wrap epoch:(NSUInteger)epoch;
-- (void)observeOutgoingWrap:(id)wrap epoch:(NSUInteger)epoch;
 @end
 NS_ASSUME_NONNULL_END

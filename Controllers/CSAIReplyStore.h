@@ -2,6 +2,9 @@
 NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSNotificationName const CSAIReplyConfigurationDidChange;
 FOUNDATION_EXPORT NSString *const CSAIReplyBackupDomain;
+/// YES in a save error's userInfo when rename succeeded but directory durability
+/// was not confirmed. The store is unready; retain credentials for both revisions.
+FOUNDATION_EXPORT NSString *const CSAIReplyStoreCommitUncertainKey;
 FOUNDATION_EXPORT NSURL *CSAIReplyFileURL(NSURL *root, NSString *account);
 FOUNDATION_EXPORT NSDictionary *CSAIReplyDefaultConfiguration(void);
 FOUNDATION_EXPORT BOOL CSAIReplyValidateConfiguration(id configuration, NSError **error);

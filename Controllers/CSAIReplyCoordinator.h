@@ -16,7 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic,readonly) NSUInteger pendingCount;
 - (instancetype)initWithStore:(CSAIReplyStore *)store client:(id<CSAIGenerating>)client;
 - (void)receiveEvent:(NSDictionary *)event;
-- (void)manualReplyInConversation:(NSString *)conversation;
 - (void)configurationDidChange;
 - (void)cancelAll;
 /// Deterministic timer seam. Production also schedules bounded one-shot wakeups.

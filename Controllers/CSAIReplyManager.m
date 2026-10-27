@@ -89,7 +89,15 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
     config[@"endpoint"]=endpoint?:@"";config[@"model"]=model?:@"";config[@"credentialRevision"]=revision;
     BOOL changed=![CSAIConnectionIdentifier(config) isEqual:CSAIConnectionIdentifier(self.store.configuration)];
     if(changed){config[@"verifiedConnection"]=@"";[config removeObjectForKey:@"verifiedAt"];}
-    if(![self saveConfiguration:config account:account epoch:epoch error:error]){if(keyChanged && revision.length)CSAIRemoveCredential(account,revision);return NO;}
+    NSError *saveError=nil;
+    if(![self saveConfiguration:config account:account epoch:epoch error:&saveError]){
+        // A successful rename followed by failed directory fsync may already expose
+        // this revision. Keep both immutable credentials so reopening either the
+        // old or new complete configuration remains coherent after recovery.
+        if(keyChanged && revision.length && ![saveError.userInfo[CSAIReplyStoreCommitUncertainKey] boolValue])CSAIRemoveCredential(account,revision);
+        if(error)*error=saveError;
+        return NO;
+    }
     // Keep prior immutable slots for the existing backup transaction's exact rollback.
     // They are never exported and cannot become active without an explicit local configuration reference.
     if(changed){[self.connectionTest cancel];self.connectionTest=nil;self.testGeneration++;self.connectionStatus=nil;}
@@ -179,13 +187,5 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
     if(![self.store.configuration[@"enabled"] boolValue])return;
     NSDictionary *event=CSAIEventFromWrap(wrap,self.store.account,[session isKindOfClass:NSString.class]?session:@"");
     if(event)[self.coordinator receiveEvent:event];
-}
-- (void)observeOutgoingWrap:(id)wrap epoch:(NSUInteger)epoch {
-    if(CSAIIsOwnedSend(wrap))return;
-    if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self observeOutgoingWrap:wrap epoch:epoch];});return;}
-    if(epoch!=self.epoch || ![self isCurrentAccount:self.store.account epoch:epoch])return;
-    if([CSMessageActionNativeObject(wrap,@"m_nsFromUsr") isEqual:self.store.account]){
-        id to=CSMessageActionNativeObject(wrap,@"m_nsToUsr");if([to isKindOfClass:NSString.class])[self.coordinator manualReplyInConversation:to];
-    }
 }
 @end

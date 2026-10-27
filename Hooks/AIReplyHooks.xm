@@ -7,7 +7,8 @@
 
 // Install only checked concrete ABIs. Calls retain the original chain and preserve
 // original arguments; reception is never delayed by networking or file IO.
-static void CSAIInstallMessageHook(NSString *name,BOOL incoming){
+static void CSAIInstallMessageHook(void){
+    NSString *name=@"AsyncOnAddMsg:MsgWrap:";
     Class cls=NSClassFromString(@"CMessageMgr");SEL selector=NSSelectorFromString(name);
     Method method=class_getInstanceMethod(cls,selector);if(!method)return;
     char result[16]={0},arg[16]={0};method_getReturnType(method,result,sizeof(result));
@@ -18,8 +19,7 @@ static void CSAIInstallMessageHook(NSString *name,BOOL incoming){
         NSUInteger epoch=CSBackupAccountEpoch();
         ((void(*)(id,SEL,id,id))original)(object,selector,session,wrap);
         dispatch_async(dispatch_get_main_queue(),^{
-            if(incoming)[CSAIReplyManager.sharedManager receiveNativeSession:session wrap:wrap epoch:epoch];
-            else [CSAIReplyManager.sharedManager observeOutgoingWrap:wrap epoch:epoch];
+            [CSAIReplyManager.sharedManager receiveNativeSession:session wrap:wrap epoch:epoch];
         });
     });
     MSHookMessageEx(cls,selector,replacement,&original);
@@ -37,8 +37,7 @@ static void CSAIInstallDetailHook(NSString *className,NSString *name,BOOL animat
 %ctor {
     CSBackupWhenReady(^{dispatch_async(dispatch_get_main_queue(),^{
         [CSAIReplyManager.sharedManager start];
-        CSAIInstallMessageHook(@"AsyncOnAddMsg:MsgWrap:",YES);
-        CSAIInstallMessageHook(@"AddMsg:MsgWrap:",NO);
+        CSAIInstallMessageHook();
         for(NSString *name in @[@"AddContactToChatRoomViewController",@"ChatRoomInfoViewController"]){
             CSAIInstallDetailHook(name,@"reloadTableData",NO);
             CSAIInstallDetailHook(name,@"reloadProfileTableData",NO);
