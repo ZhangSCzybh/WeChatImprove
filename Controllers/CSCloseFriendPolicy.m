@@ -5,7 +5,7 @@ static BOOL CSBoolean(id value) { return [value isKindOfClass:NSNumber.class] &&
 static BOOL CSName(id value) { return [value isKindOfClass:NSString.class] && [value length]>0 && [value length]<=512 && [value rangeOfCharacterFromSet:NSCharacterSet.controlCharacterSet].location==NSNotFound; }
 static id CSInvalid(NSError **error) { if(error)*error=[NSError errorWithDomain:@"CSCloseFriendPolicy" code:1 userInfo:@{NSLocalizedDescriptionKey:@"Invalid close-friend profile."}]; return nil; }
 NSDictionary *CSCloseFriendDefaultOptions(void) {
-    return @{@"hideSessions":@YES,@"hideContacts":@YES,@"hideForwarding":@YES,@"hideTags":@YES,@"hideSearch":@YES,@"hideTimeline":@YES,@"hideInteractions":@YES,@"hideStatus":@YES,@"maskProfiles":@YES,@"silenceMessages":@YES,@"rejectVoice":@YES,@"rejectVideo":@YES,@"callReplyEnabled":@NO,@"callReplyText":@"现在不方便接听，请留言。",@"hidePrivacyIcons":@YES,@"showBadges":@NO,@"hideSettingsEntry":@NO,@"hidePluginEntry":@NO,@"biometric":@NO,@"shakeToLock":@NO,@"longPressUnlockEnabled":@YES,@"longPressUnlockDuration":@1.0,@"unlockSeconds":@300};
+    return @{@"hideSessions":@YES,@"hideContacts":@YES,@"hideForwarding":@YES,@"hideTags":@YES,@"hideSearch":@YES,@"hideTimeline":@YES,@"hideInteractions":@YES,@"hideStatus":@YES,@"maskProfiles":@YES,@"hideScheduledTasks":@NO,@"hideAIReply":@NO,@"silenceMessages":@YES,@"rejectVoice":@YES,@"rejectVideo":@YES,@"callReplyEnabled":@NO,@"callReplyText":@"现在不方便接听，请留言。",@"hidePrivacyIcons":@YES,@"showBadges":@NO,@"hideSettingsEntry":@NO,@"hidePluginEntry":@NO,@"biometric":@NO,@"shakeToLock":@NO,@"longPressUnlockEnabled":@YES,@"longPressUnlockDuration":@1.0,@"unlockSeconds":@300};
 }
 NSDictionary *CSCloseFriendNormalizeProfile(id profile, NSError **error) {
     if (![profile isKindOfClass:NSDictionary.class] || [profile count]>4) return CSInvalid(error);
@@ -59,7 +59,7 @@ NSDictionary *CSCloseFriendNormalizeProfile(id profile, NSError **error) {
 - (BOOL)concealsSurface:(CSCloseFriendSurface)surface {
     if(self.blocked)return YES;
     if(!self.enabled || self.revealed || !self.protectedUserNames.count)return NO;
-    static NSString *const keys[]={@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles"};
+    static NSString *const keys[]={@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"hideScheduledTasks",@"hideAIReply"};
     return surface<sizeof(keys)/sizeof(*keys) && [self.options[keys[surface]] boolValue];
 }
 - (BOOL)hidesUserName:(NSString *)name surface:(CSCloseFriendSurface)surface {

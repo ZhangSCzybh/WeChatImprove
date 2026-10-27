@@ -2,6 +2,8 @@
 #import "CSAIReplyManager.h"
 #import "CSSettingTableViewCell.h"
 #import "CSNativeSettingsHost.h"
+#import "CSCloseFriendBridge.h"
+#import "CSCloseFriendAutomationProjection.h"
 
 static void AIAlert(UIViewController *page,NSString *message){
     if(page.presentedViewController)return;
@@ -45,7 +47,9 @@ static void AIConfigureTable(UITableView *table){table.backgroundColor=UIColor.s
 - (void)viewDidLoad{
     [super viewDidLoad];AIConfigureTable(self.tableView);
     if(!self.account){[CSAIReplyManager.sharedManager refresh];self.account=CSAIReplyManager.sharedManager.store.account?:@"";self.epoch=CSAIReplyManager.sharedManager.epoch;}
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(changed:) name:CSAIReplyDidChange object:nil];[self reload];
+    for(NSString *name in @[CSAIReplyDidChange,CSCloseFriendPolicyDidChangeNotification,@"CSBackupAccountChanged"])
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(changed:) name:name object:nil];
+    [self reload];
 }
 - (void)dealloc{[NSNotificationCenter.defaultCenter removeObserver:self];}
 - (void)viewWillAppear:(BOOL)animated{[super viewWillAppear:animated];[self reload];}
@@ -216,10 +220,14 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 - (void)reload{
     self.title=@"已开启的会话";CSAIReplyManager *manager=CSAIReplyManager.sharedManager;NSMutableArray *rows=[NSMutableArray array];__weak typeof(self) weakSelf=self;
     NSDictionary *conversations=manager.store.configuration[@"conversations"];
-    for(NSString *identifier in [conversations.allKeys sortedArrayUsingSelector:@selector(compare:)])if([conversations[identifier][@"enabled"] boolValue]){
-        [rows addObject:AIRow([manager displayNameForConversation:identifier],@"bubble.left.and.bubble.right",[manager presetNameForConversation:identifier],^{CSAIConversationPage *page=[[CSAIConversationPage alloc]initWithStyle:UITableViewStyleInsetGrouped];page.account=weakSelf.account;page.epoch=weakSelf.epoch;page.conversation=identifier;[weakSelf.navigationController pushViewController:page animated:YES];})];
+    NSArray *visible=[self current]?CSCloseFriendVisibleAIConversations(conversations,self.account,CSCloseFriendCurrentSnapshot()):@[];
+    for(NSString *identifier in visible){
+        [rows addObject:AIRow([manager displayNameForConversation:identifier],@"bubble.left.and.bubble.right",[manager presetNameForConversation:identifier],^{
+            if(![weakSelf current] || ![CSCloseFriendVisibleAIConversations(manager.store.configuration[@"conversations"],weakSelf.account,CSCloseFriendCurrentSnapshot()) containsObject:identifier])return;
+            CSAIConversationPage *page=[[CSAIConversationPage alloc]initWithStyle:UITableViewStyleInsetGrouped];page.account=weakSelf.account;page.epoch=weakSelf.epoch;page.conversation=identifier;[weakSelf.navigationController pushViewController:page animated:YES];
+        })];
     }
-    if(!rows.count)[rows addObject:AIRow(@"尚未开启任何会话",@"bubble.left",nil,nil)];
+    if(!rows.count)[rows addObject:AIRow(@"暂无可显示的会话",@"bubble.left",nil,nil)];
     self.sections=@[[CSSettingSection sectionWithHeader:@"会话" items:rows]];self.footers=@[@"在聊天窗口右上角“…”的聊天详情中，开启该会话的 AI 回复。"];
     [super reload];
 }
@@ -264,7 +272,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 - (void)reload{
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;NSDictionary *config=manager.store.configuration?:CSAIReplyDefaultConfiguration();__weak typeof(self) weakSelf=self;
     CSSettingItem *toggle=[CSSettingItem switchItemWithTitle:@"启用 AI 自动回复" iconName:@"sparkles" iconColor:UIColor.systemGreenColor switchValue:[config[@"enabled"] boolValue] valueChangedBlock:^(BOOL on){NSMutableDictionary *next=[manager.store.configuration mutableCopy];next[@"enabled"]=@(on);[weakSelf save:next];}];
-    NSUInteger count=0;for(NSDictionary *item in [config[@"conversations"] allValues])if([item[@"enabled"] boolValue])count++;
+    NSUInteger count=[self current]?CSCloseFriendVisibleAIConversations(config[@"conversations"],self.account,CSCloseFriendCurrentSnapshot()).count:0;
     NSString *connection=manager.connectionStatus;if(!connection.length)connection=[config[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(config)]?@"已通过连接测试":@"尚未验证当前配置";
     self.sections=@[
         [CSSettingSection sectionWithHeader:@"功能" items:@[toggle,AIRow(@"当前状态",@"info.circle",[self current]?[manager statusForConversation:nil]:@"账号已改变或尚未就绪",nil)]],

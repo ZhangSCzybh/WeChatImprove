@@ -6,7 +6,8 @@ extern "C" {
 typedef NS_ENUM(NSUInteger, CSCloseFriendSurface) {
     CSCloseFriendSurfaceSession, CSCloseFriendSurfaceContact, CSCloseFriendSurfaceForward,
     CSCloseFriendSurfaceTag, CSCloseFriendSurfaceSearch, CSCloseFriendSurfaceTimeline,
-    CSCloseFriendSurfaceInteraction, CSCloseFriendSurfaceStatus, CSCloseFriendSurfaceProfile
+    CSCloseFriendSurfaceInteraction, CSCloseFriendSurfaceStatus, CSCloseFriendSurfaceProfile,
+    CSCloseFriendSurfaceScheduledTasks, CSCloseFriendSurfaceAIReply
 };
 FOUNDATION_EXPORT NSDictionary *CSCloseFriendDefaultOptions(void);
 /// Rejects unknown fields, malformed booleans, invalid names and oversized profiles. Returns a deep immutable value.

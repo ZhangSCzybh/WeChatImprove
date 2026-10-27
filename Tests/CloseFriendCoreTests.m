@@ -72,11 +72,16 @@ int main(void) { @autoreleasepool {
     CHECK([[NSData dataWithContentsOfURL:files[0]] isEqual:cipher]);
     for(id invalid in @[@{}, @{@"enabled":@1,@"friends":@[],@"groups":@[],@"options":@{}}, @{@"enabled":@YES,@"friends":@[@1],@"groups":@[],@"options":@{}}, @{@"enabled":@YES,@"friends":@[],@"groups":@[],@"options":@{@"unlockSeconds":@0}}, @{@"enabled":@YES,@"friends":@[],@"groups":@[],@"options":@{@"hideSessions":@1}}]) CHECK(!CSCloseFriendNormalizeProfile(invalid,&error));
     // Every hiding switch controls exactly one surface.
-    NSArray *surfaceKeys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles"];
+    NSArray *surfaceKeys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"hideScheduledTasks",@"hideAIReply"];
     for(NSUInteger i=0;i<surfaceKeys.count;i++) {
-        NSMutableDictionary *p=[Profile() mutableCopy]; p[@"options"]=@{surfaceKeys[i]:@NO};
-        CSCloseFriendSnapshot *snap=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"one" profile:p revealed:NO revision:3 blocked:NO];
-        for(NSUInteger j=0;j<surfaceKeys.count;j++)CHECK([snap hidesUserName:@"alice" surface:j]==(i!=j));
+        for(NSNumber *on in @[@NO,@YES]) {
+            NSMutableDictionary *options=[NSMutableDictionary dictionary];
+            for(NSString *key in surfaceKeys)options[key]=on.boolValue?@NO:@YES;
+            options[surfaceKeys[i]]=on;
+            NSMutableDictionary *p=[Profile() mutableCopy]; p[@"options"]=options;
+            CSCloseFriendSnapshot *snap=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"one" profile:p revealed:NO revision:3 blocked:NO];
+            for(NSUInteger j=0;j<surfaceKeys.count;j++)CHECK([snap hidesUserName:@"alice" surface:j]==(i==j?on.boolValue:!on.boolValue));
+        }
     }
     NSDictionary *defaults=CSCloseFriendDefaultOptions(); CHECK([CSCloseFriendNormalizeProfile(Profile(),NULL)[@"options"] isEqual:defaults]);
     for(NSString *name in @[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"rejectVoice",@"rejectVideo",@"hidePrivacyIcons"])CHECK([defaults[name] boolValue]);
@@ -85,7 +90,17 @@ int main(void) { @autoreleasepool {
     NSDictionary *legacy=CSCloseFriendNormalizeProfile(@{@"enabled":@YES,@"friends":@[],@"groups":@[],@"options":legacyOptions},NULL);
     CHECK(legacy && !legacy[@"options"][@"autoMute"]);
 
-    for(NSString *name in @[@"showBadges",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"callReplyEnabled"])CHECK(![defaults[name] boolValue]);
+    for(NSString *name in @[@"showBadges",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"callReplyEnabled",@"hideScheduledTasks",@"hideAIReply"])CHECK(![defaults[name] boolValue]);
+    for(NSString *name in @[@"hideScheduledTasks",@"hideAIReply"]) {
+        NSMutableDictionary *p=[Profile() mutableCopy]; p[@"options"]=@{name:@YES};
+        NSDictionary *normalized=CSCloseFriendNormalizeProfile(p,NULL);
+        CHECK([normalized[@"options"][name] boolValue]);
+        CHECK([store saveState:@{@"profile":normalized} forAccountID:@"one" error:&error]);
+        CHECK([[store loadStateForAccountID:@"one" error:&error][@"profile"] isEqual:normalized]);
+        for(id value in @[@1,@"true",NSNull.null]) {
+            p[@"options"]=@{name:value};CHECK(!CSCloseFriendNormalizeProfile(p,NULL));
+        }
+    }
     CHECK([defaults[@"unlockSeconds"] isEqual:@300]);
     CHECK([defaults[@"longPressUnlockEnabled"] boolValue]);
     CHECK([defaults[@"longPressUnlockDuration"] doubleValue]==1.0);

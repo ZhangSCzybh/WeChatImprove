@@ -4,6 +4,7 @@
 #import "CSNativeContactPicker.h"
 #import "CSSettingTableViewCell.h"
 #import "CSCloseFriendBridge.h"
+#import "CSCloseFriendAutomationProjection.h"
 #import "CSBackupBootstrap.h"
 #include <math.h>
 
@@ -289,13 +290,15 @@ static void CSTaskConfigureTable(UITableView *table) {
     [super viewDidLoad]; self.title=@"定时任务"; CSTaskConfigureTable(self.tableView);
     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(add)];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(reload) name:CSScheduledTasksDidChange object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(reload) name:CSCloseFriendPolicyDidChangeNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(reload) name:@"CSBackupAccountChanged" object:nil];
     [CSScheduledTaskManager.sharedManager start]; [self reload];
 }
 - (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
 - (void)viewWillAppear:(BOOL)animated { [super viewWillAppear:animated]; [CSScheduledTaskManager.sharedManager refresh]; [self reload]; }
 - (void)reload {
     CSScheduledTaskManager *manager=CSScheduledTaskManager.sharedManager; CSScheduledTaskStore *store=manager.store;
-    self.displayedTasks=store.tasks?:@[]; self.displayedAccount=store.account;
+    self.displayedTasks=CSCloseFriendVisibleScheduledTasks(store.tasks,store.account,CSCloseFriendCurrentSnapshot()); self.displayedAccount=store.account;
     __weak typeof(self) weakSelf=self;
     NSString *account=store.account?:@"";
     CSSettingItem *enabled=[CSSettingItem switchItemWithTitle:@"开启定时任务" iconName:@"calendar.badge.clock" iconColor:UIColor.systemOrangeColor switchValue:store.enabled valueChangedBlock:^(BOOL value){
@@ -335,6 +338,7 @@ static void CSTaskConfigureTable(UITableView *table) {
 - (void)edit:(NSDictionary *)task account:(NSString *)account {
     CSScheduledTaskStore *store=CSScheduledTaskManager.sharedManager.store;
     if (!store.ready || ![store.account isEqual:account]) { CSTaskAlert(self,@"账号已改变或任务存储不可用，请重新打开定时任务。"); return; }
+    if (!CSCloseFriendVisibleScheduledTasks(@[task],account,CSCloseFriendCurrentSnapshot()).count) { [self reload]; return; }
     CSScheduledTaskEditor *vc=[[CSScheduledTaskEditor alloc] initWithStyle:UITableViewStyleInsetGrouped]; vc.task=[task mutableCopy]; vc.account=account; vc.accountEpoch=CSBackupAccountEpoch();
     [self.navigationController pushViewController:vc animated:YES];
 }
@@ -349,7 +353,9 @@ static void CSTaskConfigureTable(UITableView *table) {
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)path { return path.section==1 && path.row>=0 && (NSUInteger)path.row<self.displayedTasks.count; }
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)style forRowAtIndexPath:(NSIndexPath *)path {
     if (style!=UITableViewCellEditingStyleDelete || ![self tableView:tableView canEditRowAtIndexPath:path]) return;
+    NSDictionary *task=self.displayedTasks[path.row];
+    if (!CSCloseFriendVisibleScheduledTasks(@[task],self.displayedAccount,CSCloseFriendCurrentSnapshot()).count) { [self reload]; return; }
     NSError *error=nil;
-    if (![CSScheduledTaskManager.sharedManager removeTask:self.displayedTasks[path.row][@"id"] account:self.displayedAccount error:&error]) CSTaskAlert(self,error.localizedDescription?:@"删除失败");
+    if (![CSScheduledTaskManager.sharedManager removeTask:task[@"id"] account:self.displayedAccount error:&error]) CSTaskAlert(self,error.localizedDescription?:@"删除失败");
 }
 @end

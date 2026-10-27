@@ -76,8 +76,8 @@
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 54, 0, 0);
     [CSCloseFriendSettingsCell registerToTableView:self.tableView];
-    self.keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"rejectVoice",@"rejectVideo",@"callReplyEnabled",@"callReplyText",@"hidePrivacyIcons",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"longPressUnlockEnabled",@"longPressUnlockDuration",@"unlockSeconds"];
-    self.labels=@[@"隐藏聊天会话",@"隐藏通讯录页",@"隐藏转发页面",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏友圈内容",@"隐藏互动痕迹",@"隐藏微信状态",@"隐藏个人资料",@"静默消息通知",@"拒接语音来电",@"拒接视频来电",@"挂断自动回复",@"挂断回复内容",@"隐藏可见图标",@"隐藏密友设置",@"隐藏插件入口",@"生物识别解锁",@"摇晃立即隐藏",@"首页长按解锁",@"长按触发时间",@"临时解锁时间"];
+    self.keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"hideScheduledTasks",@"hideAIReply",@"silenceMessages",@"rejectVoice",@"rejectVideo",@"callReplyEnabled",@"callReplyText",@"hidePrivacyIcons",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"longPressUnlockEnabled",@"longPressUnlockDuration",@"unlockSeconds"];
+    self.labels=@[@"隐藏聊天会话",@"隐藏通讯录页",@"隐藏转发页面",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏友圈内容",@"隐藏互动痕迹",@"隐藏微信状态",@"隐藏个人资料",@"隐藏定时任务",@"隐藏 AI 自动回复",@"静默消息通知",@"拒接语音来电",@"拒接视频来电",@"挂断自动回复",@"挂断回复内容",@"隐藏可见图标",@"隐藏密友设置",@"隐藏插件入口",@"生物识别解锁",@"摇晃立即隐藏",@"首页长按解锁",@"长按触发时间",@"临时解锁时间"];
     [self configureOptionGroups];
     self.optionIcons = @{
         @"hideSessions": @"bubble.left.and.bubble.right.fill",
@@ -89,6 +89,8 @@
         @"hideInteractions": @"hand.thumbsup.fill",
         @"hideStatus": @"quote.bubble.fill",
         @"maskProfiles": @"person.crop.rectangle.fill",
+        @"hideScheduledTasks": @"calendar.badge.clock",
+        @"hideAIReply": @"sparkles",
         @"silenceMessages": @"bell.slash.fill",
         @"rejectVoice": @"phone.down.fill",
         @"rejectVideo": @"video.slash.fill",
@@ -143,7 +145,7 @@
             @"首页长按解锁已关闭；在首页搜索框输入完整密码，仍可解锁并显示密友设置入口。";
         return [entry stringByAppendingString:@"开启“生物识别解锁”后，长按需通过面容或指纹验证；不可用或取消时可输入密友密码。密码验证信息仅保存在本机钥匙串；微信进入后台或切换账号时自动隐藏。开启“摇晃立即隐藏”后，轻摇手机即可隐藏。"];
     }
-    if(section==1)return @"解锁期间消息通知按静默设置处理。“挂断回复”默认关闭，开启后仅对自动拒接的私聊发送预设消息，同一人5分钟内最多一次。搭配“免打扰”使用更加，免打扰需手动设置。隐藏个人资料：资料页隐藏发消息和音视频通话入口，显示添加到通讯录。";
+    if(section==1)return @"“隐藏定时任务”和“隐藏 AI 自动回复”默认关闭。开启后，锁定时分别隐藏任务列表中的密友任务、AI 回复管理中已开启的密友会话；解锁后显示。仅控制列表展示，保留原有任务和会话配置。解锁期间消息通知按静默设置处理。“挂断回复”默认关闭，开启后仅对自动拒接的私聊发送预设消息，同一人5分钟内最多一次。搭配“免打扰”使用更加，免打扰需手动设置。隐藏个人资料：资料页隐藏发消息和音视频通话入口，显示添加到通讯录。";
     if(section==2)return @"仅重置当前账号的密友数据和密码，入口恢复首次隐藏。需验证当前密友密码并确认；不随插件的“重置设置”执行。";
     return nil;
 }
