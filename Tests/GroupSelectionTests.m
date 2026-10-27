@@ -15,6 +15,8 @@ static NSString *CSGroupCurrentAccountID(void) { return currentAccount; }
 static NSUInteger CSCloseFriendAccountEpoch(void) { return 1; }
 typedef NS_ENUM(NSUInteger,CSGroupFoldedPrivacyState) { CSGroupFoldedPrivacyUnknown,CSGroupFoldedPrivacyNoHidden,CSGroupFoldedPrivacyMixed,CSGroupFoldedPrivacyAllHidden };
 static BOOL CSGroupIsFoldedController(id owner) { (void)owner; return NO; }
+static BOOL Option(NSString *key) { return [key isEqual:@"enabled"]; }
+static NSArray *CSGroupCopyFoldedRows(void) { return nil; }
 static NSArray *CSGroupCopyFoldedUserNames(void) { return nil; }
 static CSGroupFoldedPrivacyState CSGroupAssessFoldedUserNames(NSArray *names,NSSet *hidden) { (void)names;(void)hidden;return CSGroupFoldedPrivacyUnknown; }
 static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) {
@@ -88,6 +90,7 @@ typedef NSInteger UITableViewScrollPosition;
 @interface TestProxy : NSObject
 @property(nonatomic,strong) CSGroupListAdapter *adapter;
 @property(nonatomic,strong) Target *target;
+@property(nonatomic,strong) NSMutableDictionary *signatures;
 @end
 @implementation TestProxy
 #include "GroupProxySupport.h"

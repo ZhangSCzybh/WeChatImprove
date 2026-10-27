@@ -1,10 +1,19 @@
 #import "CSCloseFriendSessionPresentation.h"
 #import "CSGroupProjection.h"
 #import "CSCloseFriendBridge.h"
+#import "CSListCornerPageContext.h"
 #import <objc/runtime.h>
+#import <objc/message.h>
+#import <math.h>
 
 @interface CSCloseFriendSessionCover : UIView
 @property(nonatomic,strong) CSGroupRow *row;
+@property(nonatomic,strong) UILabel *titleLabel;
+@property(nonatomic,strong) UILabel *summaryLabel;
+@property(nonatomic,weak) UILabel *nativeMessage;
+@property(nonatomic,strong) UIView *nativePrefix;
+@property(nonatomic,copy) NSString *writtenMessage;
+@property(nonatomic) CGRect messageBaseFrame;
 @property(nonatomic,strong) NSMapTable<UIView *,NSNumber *> *hiddenStates;
 @property(nonatomic,strong) id originalAccessibilityElements;
 @property(nonatomic,copy) NSString *originalAccessibilityLabel;
@@ -12,14 +21,105 @@
 @end
 @implementation CSCloseFriendSessionCover @end
 static char CoverKey;
+static UIView *CSFoldedViewIvar(id object, const char *name, UIView *container) {
+    Ivar ivar=class_getInstanceVariable([object class],name);
+    const char *type=ivar ? ivar_getTypeEncoding(ivar) : NULL;
+    id value=type && type[0]=='@' ? object_getIvar(object,ivar) : nil;
+    return [value isKindOfClass:UIView.class] && value!=container && [value isDescendantOfView:container] ? value : nil;
+}
+static void CSFoldedRestoreHiddenViews(CSCloseFriendSessionCover *cover) {
+    for (UIView *child in cover.hiddenStates) child.hidden=[[cover.hiddenStates objectForKey:child] boolValue];
+    [cover.hiddenStates removeAllObjects];
+}
+static void CSFoldedHideView(CSCloseFriendSessionCover *cover, UIView *child) {
+    if (!child) return;
+    if (![cover.hiddenStates objectForKey:child]) [cover.hiddenStates setObject:@(child.hidden) forKey:child];
+    child.hidden=YES;
+}
+static void CSFoldedKeepView(CSCloseFriendSessionCover *cover,UIView *view) {
+    NSNumber *original=[cover.hiddenStates objectForKey:view];
+    if (original) { view.hidden=original.boolValue;[cover.hiddenStates removeObjectForKey:view]; }
+}
+static void CSFoldedConcealItem(CSCloseFriendSessionCover *cover, UIView *container, UIView *icon,UIView *title) {
+    for (UIView *child in container.subviews) {
+        if (child==cover) continue;
+        if (child==icon || child==title || child==cover.nativeMessage || child==cover.nativePrefix) { CSFoldedKeepView(cover,child);continue; }
+        if ([icon isDescendantOfView:child] || [title isDescendantOfView:child] || [cover.nativeMessage isDescendantOfView:child] || [cover.nativePrefix isDescendantOfView:child]) {
+            CSFoldedKeepView(cover,child);CSFoldedConcealItem(cover,child,icon,title);
+        }
+        else CSFoldedHideView(cover,child);
+    }
+}
+static BOOL CSFoldedValidFrame(CGRect frame) {
+    return isfinite(frame.origin.x) && isfinite(frame.origin.y) && isfinite(frame.size.width) && isfinite(frame.size.height) && frame.size.width>0 && frame.size.height>0;
+}
+static void CSFoldedLayoutLabel(UILabel *label, UIView *nativeLabel, UIView *container, CGRect fallback, BOOL summary) {
+    CGRect frame=nativeLabel ? [nativeLabel convertRect:nativeLabel.bounds toView:container] : CGRectZero;
+    if (!CSFoldedValidFrame(frame)) frame=fallback;
+    // Native aggregate labels can be sized to their old text or centered digest.
+    // Only borrow their vertical metrics; concealed time/badges reserve no width.
+    frame.origin.x=fallback.origin.x;frame.size.width=fallback.size.width;
+    label.frame=frame;
+    UILabel *native=[nativeLabel isKindOfClass:UILabel.class] ? (UILabel *)nativeLabel : nil;
+    label.font=native.font ?: [UIFont preferredFontForTextStyle:summary ? UIFontTextStyleSubheadline : UIFontTextStyleBody];
+    label.textColor=native.textColor ?: (summary ? UIColor.secondaryLabelColor : UIColor.labelColor);
+    label.numberOfLines=1;label.textAlignment=NSTextAlignmentLeft;
+    label.lineBreakMode=summary ? NSLineBreakByTruncatingTail : NSLineBreakByClipping;
+    label.adjustsFontSizeToFitWidth=NO;label.minimumScaleFactor=1;
+}
+static UIView *CSFoldedNativePrefix(UIView *item) {
+    for (UIView *child in item.subviews) if (child.tag==10001001) return child;
+    return nil;
+}
+static void CSFoldedReleaseNativeSummary(CSCloseFriendSessionCover *cover) {
+    // Never restore a saved global digest. On ordinary reuse, preserve a fresh
+    // native update; clear only our still-owned pair and geometry.
+    if (cover.nativePrefix.superview && [cover.nativeMessage.text isEqual:cover.writtenMessage]) {
+        cover.nativeMessage.text=nil;cover.nativeMessage.frame=cover.messageBaseFrame;
+    }
+    [cover.nativePrefix removeFromSuperview];
+    cover.nativePrefix=nil;cover.nativeMessage=nil;cover.writtenMessage=nil;
+}
+static BOOL CSFoldedRenderNativeSummary(CSCloseFriendSessionCover *cover,UIView *item,UILabel *message,NSString *body,NSString *prefix) {
+    SEL quote=NSSelectorFromString(@"quoteMessageLable:prefixText:"),remove=NSSelectorFromString(@"removeQuoteMessageLabel");
+    NSMethodSignature *sig=[item methodSignatureForSelector:quote],*removeSig=[item methodSignatureForSelector:remove];
+    if (!message || !body.length || !prefix.length || !sig || sig.numberOfArguments!=4 || strcmp(sig.methodReturnType,@encode(void)) ||
+        [sig getArgumentTypeAtIndex:2][0]!='@' || [sig getArgumentTypeAtIndex:3][0]!='@' ||
+        !removeSig || removeSig.numberOfArguments!=2 || strcmp(removeSig.methodReturnType,@encode(void))) return NO;
+    @try {
+        UIView *previous=CSFoldedNativePrefix(item);
+        CGRect base=message.frame;
+        // A native or our prior quote has already moved the message to the
+        // right. Its prefix carries the real unquoted origin. Never quote an
+        // already-quoted origin and accumulate indentation on repeated layout.
+        if (previous) base.origin.x=previous.frame.origin.x;
+        if (message==cover.nativeMessage && previous==cover.nativePrefix) base.origin.x=cover.messageBaseFrame.origin.x;
+        if (!isfinite(base.origin.x) || !isfinite(base.origin.y) || base.size.height<=0) return NO;
+        if (cover.nativeMessage!=message) CSFoldedReleaseNativeSummary(cover);
+        ((void(*)(id,SEL))objc_msgSend)(item,remove);
+        message.frame=base;message.text=body;
+        ((void(*)(id,SEL,id,id))objc_msgSend)(item,quote,message,prefix);
+        UIView *created=CSFoldedNativePrefix(item);
+        if (!created || ![created isKindOfClass:UILabel.class] || ![((UILabel *)created).text isEqual:prefix]) {
+            message.text=nil;[created removeFromSuperview];return NO;
+        }
+        cover.nativeMessage=message;cover.nativePrefix=created;cover.messageBaseFrame=base;cover.writtenMessage=[message.text copy];
+        CSFoldedKeepView(cover,message);message.hidden=NO;created.hidden=NO;
+        return YES;
+    } @catch (__unused NSException *exception) {
+        message.text=nil;CSFoldedReleaseNativeSummary(cover);return NO;
+    }
+}
 void CSCloseFriendUpdateSessionCover(UITableViewCell *cell, CSGroupRow *row) {
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
-    BOOL cover=row.privacyMasked && row.kind==CSGroupRowKindAggregate && [row.userName isEqual:@"chatroom_session_box"] && (policy.blocked ||
+    BOOL privacyCover=row.privacyMasked && row.kind==CSGroupRowKindAggregate && [row.userName isEqual:@"chatroom_session_box"] && (policy.blocked ||
         (policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue] && policy.protectedUserNames.count));
+    BOOL cover=privacyCover || row.foldedEntryScoped;
     CSCloseFriendSessionCover *view=objc_getAssociatedObject(cell,&CoverKey);
     if (!cover) {
         if (!view) return;
-        for (UIView *child in view.hiddenStates) child.hidden=[[view.hiddenStates objectForKey:child] boolValue];
+        CSFoldedReleaseNativeSummary(view);
+        CSFoldedRestoreHiddenViews(view);
         cell.isAccessibilityElement=view.originalAccessibilityElement;
         cell.accessibilityElements=view.originalAccessibilityElements;
         cell.accessibilityLabel=view.originalAccessibilityLabel;
@@ -34,21 +134,72 @@ void CSCloseFriendUpdateSessionCover(UITableViewCell *cell, CSGroupRow *row) {
         view.originalAccessibilityElement=cell.isAccessibilityElement;
         view.originalAccessibilityElements=cell.accessibilityElements;
         view.originalAccessibilityLabel=cell.accessibilityLabel;
-        UILabel *title=[[UILabel alloc] initWithFrame:CGRectInset(view.bounds,18,0)];
-        title.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-        title.text=@"折叠的群聊";
-        title.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody]; title.textColor=UIColor.labelColor;
-        [view addSubview:title]; view.isAccessibilityElement=YES; view.accessibilityLabel=title.text;
+        view.titleLabel=[[UILabel alloc] initWithFrame:CGRectZero];[view addSubview:view.titleLabel];
+        view.summaryLabel=[[UILabel alloc] initWithFrame:CGRectZero];[view addSubview:view.summaryLabel];
+        view.isAccessibilityElement=YES;
         objc_setAssociatedObject(cell,&CoverKey,view,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     view.row=row;
-    view.backgroundColor=cell.backgroundColor ?: UIColor.systemBackgroundColor;
-    for (UIView *child in cell.subviews) if (child!=view) {
-        if (![view.hiddenStates objectForKey:child]) [view.hiddenStates setObject:@(child.hidden) forKey:child];
-        child.hidden=YES;
+    // A policy transition may precede the next projection. Never retain a digest
+    // across accounts/revisions or read it from the global aggregate cell.
+    BOOL currentSummary=row.foldedEntryScoped && !policy.blocked && [policy.accountID isEqual:row.foldedEntryAccountID] &&
+        policy.revision==row.foldedEntryPrivacyRevision && row.foldedEntryCount.unsignedIntegerValue>0 && row.foldedEntrySummaryUserName.length &&
+        ![policy hidesUserName:row.foldedEntrySummaryUserName surface:CSCloseFriendSurfaceSession];
+    NSString *title=@"折叠的聊天";
+    view.titleLabel.text=title;view.accessibilityLabel=title;
+    view.summaryLabel.text=@"折叠的聊天";
+
+    // Keep native content inside the shared card. Even an unknown native view
+    // structure must not replace the configured card with a full-width slab.
+    UIView *item=CSFoldedViewIvar(cell,"m_itemView",cell);
+    if (!item) item=CSFoldedViewIvar(cell,"_itemView",cell);
+    UIView *icon=CSFoldedViewIvar(item,"m_frameHeadView",item);
+    UIView *name=CSFoldedViewIvar(item,"m_nameLabel",item);
+    UIView *message=CSFoldedViewIvar(item,"m_messageLabel",item);
+    BOOL nativeLayout=item && icon && name;
+    NSNumber *nameWasHidden=name ? [view.hiddenStates objectForKey:name] : nil;
+    BOOL nativeTitle=nativeLayout && [name isKindOfClass:UILabel.class] && [((UILabel *)name).text isEqual:title] &&
+        !(nameWasHidden ? nameWasHidden.boolValue : name.hidden);
+    view.titleLabel.hidden=nativeTitle;
+    UIView *card=CSListCornerExistingSessionBackground(cell);
+    UIView *container=nativeLayout ? item : (card ?: cell);
+    if (view.superview!=container) {
+        CSFoldedRestoreHiddenViews(view);
+        [view removeFromSuperview]; [container addSubview:view];
     }
-    if (view.superview!=cell) [cell addSubview:view];
-    if (cell.subviews.lastObject!=view) [cell bringSubviewToFront:view];
+    view.frame=container.bounds;
+    BOOL rendered=currentSummary && nativeLayout && [message isKindOfClass:UILabel.class] &&
+        CSFoldedRenderNativeSummary(view,item,(UILabel *)message,row.foldedEntrySummary,row.foldedEntryPrefix);
+    CSCloseFriendSnapshot *afterRender=CSCloseFriendCurrentSnapshot();
+    if (rendered && (afterRender.blocked || ![afterRender.accountID isEqual:row.foldedEntryAccountID] ||
+        afterRender.revision!=row.foldedEntryPrivacyRevision || [afterRender hidesUserName:row.foldedEntrySummaryUserName surface:CSCloseFriendSurfaceSession])) {
+        rendered=NO;currentSummary=NO;
+    }
+    if (!rendered) CSFoldedReleaseNativeSummary(view);
+    view.summaryLabel.hidden=rendered;
+    if (row.foldedEntryScoped) CSGroupLogFoldedDigest(@"display",rendered ? @"ok" : !currentSummary ? @"policy_stale" : @"native_pair_unavailable",
+        row.foldedEntryTabID,row.foldedEntryCount.unsignedIntegerValue,rendered ? row.foldedEntrySummarySource : @"neutral");
+    CGFloat x=18;
+    if (nativeLayout) {
+        CGRect nameFrame=[name convertRect:name.bounds toView:container];
+        CGRect iconFrame=[icon convertRect:icon.bounds toView:container];
+        x=CSFoldedValidFrame(nameFrame) ? nameFrame.origin.x : CGRectGetMaxX(iconFrame)+12;
+        view.backgroundColor=UIColor.clearColor;
+        // The real native title is already correct. Preserve its text, font,
+        // frame and ancestors; only the global message/time/badges are masked.
+        CSFoldedConcealItem(view,item,icon,nativeTitle ? name : nil);
+        CSFoldedHideView(view,CSFoldedViewIvar(item,"m_unreadCountView",item));
+    } else {
+        // Unknown native structure: retain conservative privacy protection, with
+        // a neutral two-line fallback. Never guess or display the global digest.
+        view.backgroundColor=card ? UIColor.clearColor : UIColor.systemBackgroundColor;
+        if (card) CSFoldedConcealItem(view,cell,card,nil);
+        else for (UIView *child in cell.subviews) if (child!=view) CSFoldedHideView(view,child);
+    }
+    CGFloat middle=CGRectGetMidY(view.bounds),width=MAX(1,view.bounds.size.width-x-12);
+    if (!nativeTitle) CSFoldedLayoutLabel(view.titleLabel,nativeLayout ? name : nil,container,CGRectMake(x,MAX(0,middle-24),width,22),NO);
+    CSFoldedLayoutLabel(view.summaryLabel,nativeLayout ? message : nil,container,CGRectMake(x,middle+4,width,18),YES);
+    if (container.subviews.lastObject!=view) [container bringSubviewToFront:view];
     cell.isAccessibilityElement=NO; cell.accessibilityLabel=nil; cell.accessibilityElements=@[view];
 }
 

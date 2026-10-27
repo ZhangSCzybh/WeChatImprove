@@ -1,5 +1,25 @@
 # 会话分组实现说明
 
+2026-10-27 / 2.0-25：折叠子会话没有内存消息或正文尚未加载时，按其用户名通过 CMessageMgr.GetLastMsg: 只读取得最新消息；格式化前后校验会话及消息身份，不回写 live session。仍通过原生名称和正文两个 label 显示。表格代理保留已向 UIKit 声明的回调签名，原生目标释放或不再支持回调时返回类型正确的中性结果。见 [异常证据、红绿回归与安装包](audits/group-header-crash-2.0-24/README.md)。
+
+2026-10-27 / 2.0-24 更新：纠正普通会话正文与原生折叠摘要的差异。原生入口由 `m_prefixTextForQuoteMessage`（会话名称）与 `m_textForMessageLabel`（消息正文）两个 label 共同显示；本版复用原生消息 label 和 `quoteMessageLable:prefixText:`，不自造名称/消息拼接、不设置额外宽度比例或缩字。只复用消息 ID、GetChatName 与候选一致的入口缓存；否则对消息副本调用原生 digest（空 sender）与 aggregate makeTextForQuoteMessage。后者由 GetChatName、联系人/群备注、genChatRoomName 原生规则生成名称，不再用普通群聊的发言人前缀。诊断增加 `source=entry_cache/native_formatter/neutral`，仍限32条/进程、去重且不记录正文或账号。原有分组过滤、排序、隐私、卡片与隐藏时间规则保留。详见 [原生证据与交付](audits/folded-native-parity-2.0-24/README.md)。
+
+2026-10-27 / 2.0-23b 补充修正：按用户澄清，折叠入口右侧时间/日期继续隐藏，不将缺失时间当作显示问题或摘要降级原因。撤销“任一可见候选时间不明就整组中性”及“读取期间仅时间变化就丢弃摘要”两处门禁，移除 `no_sort_time` 诊断。时间只用于排序：辅助会话字段缺失不否决其他可读字段，会话时间不可用时读取消息原生 `getSessionTime` / `m_uiCreateTime`；所有排序值都缺失时按同序候选处理，仍可展示身份有效的摘要。账号、隐私和消息身份门禁保留；原生 UI 与上一版字节不变。详见 [补充回归与交付](audits/folded-digest-no-time-gate-2.0-23b/README.md)。
+
+2026-10-27 / 2.0-23 更新：修复 8.0.78 的 `CMessageWrap.m_n64MesSvrID`（signed q）与 CellData 的 unsigned Q 类型差异，精确保留 64 位消息身份。原生 CellData 缺失、摘要为空或身份不匹配时，复制当前折叠会话消息，在脱离宿主模型的副本上调用原生 `ChangeForDisplay` / `MainFrameCellData.digestForMsg:withSender:`，群聊前缀通过原生 `getGroupName` 取得；不调用会创建缓存、处理红点的 `getCellData:` / `makeTextSession:`。冷启动无需先打开折叠页，有效原生消息可直接生成摘要；源数据尚未可用时保持中性，在既有消息/页面刷新中重试。默认最多 32 条去重原因日志，不记录消息正文或会话用户名。保留同一份子投影的计数/成员/隐私语义及 2.0-22 的展示布局。详见 [取数证据、回归和交付](audits/folded-digest-source-2.0-23/README.md)。
+
+2026-10-27 / 2.0-22 更新：折叠入口优先沿用原生“折叠的聊天”标题，不带数量、不改变原生字号。摘要来自 `ChatBoxMgr.chatBoxSessions` 经现有分组和隐私规则过滤后的最新会话，按 `MMSessionInfo.compare:` 使用的有效时间选取，通过 `MainFrameCellDataManager.getCellDataByUsrName:` 只读取得已有 `m_textForMessageLabel`；校验同一会话对象及精确 64 位消息 ID 后复制原生文本。无可见会话仍隐藏；原生摘要未就绪、身份/时间不可确认或账号/隐私修订失效时显示中性文案。保留 2.0-21 的连续卡片、原生图标、两行高度和时间/未读保护，不改变分组成员及角标规则。详见 [原生证据与核心回归](audits/folded-native-summary-2.0-22/README.md)。
+
+2026-10-27 / 2.0-21 更新：从指定快照完整恢复并验证 2.0-20 后，修复折叠入口标题被截断和摘要偏移。中性标题与摘要统一左边缘并使用可用内容宽度，必要时缩字；折叠行与同一 section 的会话共同组成连续卡片，不再独立分卡或添加行间距，仅整组首尾设置外侧圆角。保留浅深色配色、关闭圆角恢复及隐私保护。详见 [恢复证据、失败用例和回归](audits/folded-card-layout-2.0-21/README.md)。
+
+2026-10-27 / 2.0-20 更新：按用户澄清修复折叠入口没有跟随圆角卡片的问题。折叠入口独立成卡，沿用同一份圆角半径、左右边距、配色及普通会话间距；前一会话卡片正确收底。中性显示与兼容保护层均保留共享卡片，关闭圆角时清理旧样式；继续保留中性双行文案与原生图标。卡片周围的浅灰背景是既有样式，深色模式使用深色背景，短列表和空分组不再强制涂白。详见 [定位、核心回归与验收](audits/folded-card-style-2.0-20/README.md)。
+
+2026-10-26 / 2.0-19 历史记录：保留原生布局并补中性双行文案；当时将短列表下方改成会话白底的处理已由 2.0-20 纠正。原始证据保存在 [历史调查](audits/folded-entry-visual-2.0-19/README.md)。
+
+2026-10-26 / 2.0-18 更新：自定义组成员菜单移除“全部”，已有成员原样保留；标签入口改用微信原生标签批选与好友搜索/勾选流程。折叠列表跟随当前分组过滤，主入口显示组内可见会话数，确认无成员时隐藏，未知数据不显示假 0。原生折叠状态仍全局共享。详见 [原生证据、核心回归与真机验收](audits/group-tags-folded-2.0-18/README.md)。
+
+2026-10-26 / 2.0-17 更新：自定义组私聊/群聊接入 `CSNativeContactPickerPresent` 多选模式，标签/全部继续使用 `WEContactSelectViewController`。类型与标签菜单复用定时任务的菜单关闭工具；完成时合并当前类别与保留成员，校验账号代次、隐私修订和分组定义是否变化。详见 [核心回归及真机验收](audits/chatgroup-native-picker-2.0-17/README.md)。
+
 2026-10-16 / 1.6-32 更新：菜单展开前后均按起手位置执行左侧 85% 切组、右侧 15% 菜单；有效切组时先收起旧菜单。详见 [固定手势分区修复](session-groups-zones-1.6-32.md)。
 
 2026-10-16 / 1.6-31 更新：按微信自定义菜单的独立手势、展开和关闭动画状态延后分组刷新，收起后恢复；详见 [原生侧滑菜单修复](session-groups-menu-1.6-31.md)。
@@ -43,7 +63,9 @@
 | `Controllers/WESessionTabContainerView.h/.m` | 稳定选择、正间距横向标签、可调字号、可隐藏的搜索入口、数字/红点、配色、触感与无障碍。 |
 | `Hooks/ListCornerRadiusHooks.xm` | 主会话卡片首尾使用投影角色；保留聊天、通讯录、发现、我页面的原有布局入口，四处卡片绘制共用渲染器。 |
 | `Controllers/CSListCornerRenderer.h/.m` | 按卡片复用遮罩和路径，仅在形状改变时重建路径；检查并恢复原生重置的样式。 |
-| `Controllers/WEContactSelectViewController.m` | 共用联系人分类；分类和搜索变化保留不可见的已选成员。 |
+| `Controllers/CSNativeContactPicker.h/.m` | 私聊/群聊原生多选；标签使用原生好友页的标签入口。完成时校验账号及配置代次，取消不写入；旧自带选择页不再用于自定义组。 |
+| `Controllers/CSNativeContactPicker.m` | 自定义组私聊/群聊的原生全屏多选；复用密友和定时任务的原生适配层。 |
+| `Controllers/CSSettingsPresentation.h` | 设置页可见性检查、等待菜单自身关闭，不 dismiss 插件宿主。 |
 
 ## 路径、身份与刷新
 

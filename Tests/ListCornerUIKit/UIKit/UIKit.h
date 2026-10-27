@@ -2,6 +2,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <QuartzCore/QuartzCore.h>
+#import <CoreText/CoreText.h>
 #import <dispatch/dispatch.h>
 typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 static const UIEdgeInsets UIEdgeInsetsZero={0,0,0,0};
@@ -10,6 +11,13 @@ static inline BOOL UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsets a,UIEdgeInsets b) 
 typedef NS_ENUM(NSInteger, UIUserInterfaceStyle) { UIUserInterfaceStyleUnspecified,UIUserInterfaceStyleLight,UIUserInterfaceStyleDark };
 typedef NS_OPTIONS(NSUInteger, UIRectCorner) { UIRectCornerTopLeft=1,UIRectCornerTopRight=2,UIRectCornerBottomLeft=4,UIRectCornerBottomRight=8,UIRectCornerAllCorners=15 };
 typedef NS_ENUM(NSInteger, UITableViewCellSeparatorStyle) { UITableViewCellSeparatorStyleNone };
+typedef NSUInteger UIViewAutoresizing;
+static const UIViewAutoresizing UIViewAutoresizingFlexibleWidth=1,UIViewAutoresizingFlexibleHeight=2;
+static NSString *const UIFontTextStyleBody=@"body",*const UIFontTextStyleSubheadline=@"subheadline";
+@interface UIFont : NSObject
+@property(nonatomic) CGFloat pointSize;
++ (instancetype)preferredFontForTextStyle:(NSString *)style;
+@end
 @class UIGestureRecognizer,UITouch;
 @interface UITraitCollection : NSObject
 @property(nonatomic) UIUserInterfaceStyle userInterfaceStyle;
@@ -18,6 +26,10 @@ typedef NS_ENUM(NSInteger, UITableViewCellSeparatorStyle) { UITableViewCellSepar
 @property(nonatomic) CGFloat red,green,blue,alpha;
 + (instancetype)clearColor;
 + (instancetype)whiteColor;
++ (instancetype)blackColor;
++ (instancetype)systemBackgroundColor;
++ (instancetype)labelColor;
++ (instancetype)secondaryLabelColor;
 + (instancetype)colorWithRed:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue alpha:(CGFloat)alpha;
 - (BOOL)getRed:(CGFloat *)red green:(CGFloat *)green blue:(CGFloat *)blue alpha:(CGFloat *)alpha;
 @end
@@ -26,6 +38,10 @@ typedef NS_ENUM(NSInteger, UITableViewCellSeparatorStyle) { UITableViewCellSepar
 @property(nonatomic) CGFloat alpha;
 @property(nonatomic) NSInteger tag;
 @property(nonatomic) BOOL hidden,userInteractionEnabled,autoresizesSubviews;
+@property(nonatomic) BOOL isAccessibilityElement;
+@property(nonatomic) UIViewAutoresizing autoresizingMask;
+@property(nonatomic,copy) NSString *accessibilityLabel;
+@property(nonatomic,strong) id accessibilityElements;
 @property(nonatomic,strong) CALayer *layer;
 @property(nonatomic,strong) UIColor *backgroundColor;
 @property(nonatomic,strong) UITraitCollection *traitCollection;
@@ -37,6 +53,7 @@ typedef NS_ENUM(NSInteger, UITableViewCellSeparatorStyle) { UITableViewCellSepar
 - (void)addSubview:(UIView *)view;
 - (void)insertSubview:(UIView *)view atIndex:(NSInteger)index;
 - (void)removeFromSuperview;
+- (void)bringSubviewToFront:(UIView *)view;
 - (BOOL)isDescendantOfView:(UIView *)view;
 - (CGRect)convertRect:(CGRect)rect toView:(UIView *)view;
 - (id)nextResponder;
@@ -63,6 +80,7 @@ typedef NS_ENUM(NSInteger, UITableViewCellSeparatorStyle) { UITableViewCellSepar
 @property(nonatomic,strong) id groupAdapter;
 @property(nonatomic,copy) void (^onQuery)(void);
 @property(nonatomic,readonly) NSInteger numberOfSections;
+@property(nonatomic,readonly) NSArray<UITableViewCell *> *visibleCells;
 - (NSInteger)numberOfRowsInSection:(NSInteger)section;
 - (NSIndexPath *)indexPathForCell:(UITableViewCell *)cell;
 - (void)reloadData;
@@ -80,8 +98,18 @@ typedef NS_ENUM(NSInteger, UITableViewCellSeparatorStyle) { UITableViewCellSepar
 @interface UITableViewHeaderFooterView : UIView
 @property(nonatomic,strong) UIView *contentView,*backgroundView;
 @end
+typedef NS_ENUM(NSInteger, NSTextAlignment) { NSTextAlignmentLeft, NSTextAlignmentCenter };
+typedef NS_ENUM(NSInteger, NSLineBreakMode) { NSLineBreakByClipping=2, NSLineBreakByTruncatingTail=4 };
 @interface UILabel : UIView
+@property(nonatomic) NSInteger numberOfLines;
+@property(nonatomic) NSTextAlignment textAlignment;
+@property(nonatomic) NSLineBreakMode lineBreakMode;
+@property(nonatomic) BOOL adjustsFontSizeToFitWidth;
+@property(nonatomic) CGFloat minimumScaleFactor;
+- (CGSize)sizeThatFits:(CGSize)size;
 @property(nonatomic,copy) NSString *text;
+@property(nonatomic,strong) UIFont *font;
+@property(nonatomic,strong) UIColor *textColor;
 @end
 @interface UIBezierPath : NSObject
 @property(nonatomic,readonly) CGPathRef CGPath;

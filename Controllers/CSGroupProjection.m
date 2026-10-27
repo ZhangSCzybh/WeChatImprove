@@ -1,16 +1,59 @@
 #import "CSGroupProjection.h"
 #import "WESessionTabItem.h"
 
+void CSGroupLogFoldedDigest(NSString *stage,NSString *reason,NSString *tabID,NSUInteger count,NSString *source) {
+    static NSMutableSet *seen;
+    @synchronized (CSGroupRow.class) {
+        if (!seen) seen=[NSMutableSet set];
+        NSString *key=[NSString stringWithFormat:@"%@|%@|%@|%@",stage,reason,tabID ?: @"unknown",source ?: @"neutral"];
+        if (seen.count>=32 || [seen containsObject:key]) return;
+        [seen addObject:key];
+    }
+    NSLog(@"[WeChatImprove][FoldedDigest] stage=%@ reason=%@ tab=%@ count=%lu source=%@",stage,reason,tabID ?: @"unknown",(unsigned long)count,source ?: @"neutral");
+}
+
 @interface CSGroupRow ()
 @property (nonatomic, readwrite) BOOL privacyMasked;
+@property (nonatomic, readwrite) BOOL foldedEntryScoped;
+@property (nonatomic, copy, readwrite) NSNumber *foldedEntryCount;
+@property (nonatomic, copy, readwrite) NSString *foldedEntryAccountID;
+@property (nonatomic, copy, readwrite) NSString *foldedEntryTabID;
+@property (nonatomic, readwrite) NSUInteger foldedEntryPrivacyRevision;
+@property (nonatomic, copy, readwrite) NSString *foldedEntrySummary, *foldedEntrySummaryUserName, *foldedEntryPrefix, *foldedEntrySummarySource;
 @end
 @implementation CSGroupRow
 - (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(NSString *)userName
                              kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
                               top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot {
+    return [self initWithNativePath:nativePath userName:userName kind:kind category:category top:top
+        unreadCount:unreadCount redDot:redDot nativeSummary:nil sortTime:nil];
+}
+- (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(NSString *)userName
+                             kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
+                              top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
+                    nativeSummary:(NSString *)nativeSummary sortTime:(NSNumber *)sortTime {
+    return [self initWithNativePath:nativePath userName:userName kind:kind category:category top:top unreadCount:unreadCount
+        redDot:redDot nativeSummary:nativeSummary sortTime:sortTime summaryReason:nil];
+}
+- (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(NSString *)userName
+                             kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
+                              top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
+                    nativeSummary:(NSString *)nativeSummary sortTime:(NSNumber *)sortTime summaryReason:(NSString *)summaryReason {
+    return [self initWithNativePath:nativePath userName:userName kind:kind category:category top:top unreadCount:unreadCount
+        redDot:redDot nativeSummary:nativeSummary sortTime:sortTime summaryReason:summaryReason nativePrefix:nil summarySource:nil];
+}
+- (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(NSString *)userName
+                             kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
+                              top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
+                    nativeSummary:(NSString *)nativeSummary sortTime:(NSNumber *)sortTime summaryReason:(NSString *)summaryReason
+                     nativePrefix:(NSString *)nativePrefix summarySource:(NSString *)summarySource {
     if ((self = [super init])) {
+        _nativePrefix=[nativePrefix copy];_nativeSummarySource=[summarySource copy];
         _nativePath = [nativePath copy]; _userName = [userName copy]; _kind = kind;
         _category = category; _top = top; _unreadCount = unreadCount; _redDot = redDot;
+        _nativeSummary=[nativeSummary isKindOfClass:NSString.class] && nativeSummary.length ? [nativeSummary copy] : nil;
+        _nativeSortTime=[sortTime isKindOfClass:NSNumber.class] && sortTime.doubleValue>0 ? [sortTime copy] : nil;
+        _nativeSummaryReason=[summaryReason copy];
     }
     return self;
 }
@@ -55,11 +98,19 @@ static BOOL CSGroupDotUnread(CSGroupRow *row) {
     return row.unreadCount > 0 && row.redDot;
 }
 
+static BOOL CSGroupValueEqual(id a,id b) { return a==b || [a isEqual:b]; }
 static BOOL CSGroupRowsMatch(CSGroupRow *a, CSGroupRow *b, BOOL unread) {
     if (a && a==b) return YES; // Published base rows are immutable.
     return a && b && [a.nativePath isEqual:b.nativePath] &&
         (a.userName==b.userName || [a.userName isEqual:b.userName]) &&
         a.kind==b.kind && a.category==b.category && a.top==b.top && a.privacyMasked==b.privacyMasked &&
+        CSGroupValueEqual(a.nativePrefix,b.nativePrefix) && CSGroupValueEqual(a.nativeSummarySource,b.nativeSummarySource) &&
+        CSGroupValueEqual(a.foldedEntryPrefix,b.foldedEntryPrefix) && CSGroupValueEqual(a.foldedEntrySummarySource,b.foldedEntrySummarySource) &&
+        CSGroupValueEqual(a.nativeSummary,b.nativeSummary) && CSGroupValueEqual(a.nativeSortTime,b.nativeSortTime) &&
+        CSGroupValueEqual(a.foldedEntrySummary,b.foldedEntrySummary) && CSGroupValueEqual(a.foldedEntrySummaryUserName,b.foldedEntrySummaryUserName) &&
+        a.foldedEntryScoped==b.foldedEntryScoped && (a.foldedEntryCount==b.foldedEntryCount || [a.foldedEntryCount isEqual:b.foldedEntryCount]) &&
+        a.foldedEntryPrivacyRevision==b.foldedEntryPrivacyRevision &&
+        (a.foldedEntryAccountID==b.foldedEntryAccountID || [a.foldedEntryAccountID isEqual:b.foldedEntryAccountID]) &&
         (!unread || (a.unreadCount==b.unreadCount && a.redDot==b.redDot));
 }
 static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
@@ -82,6 +133,10 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
 @property (nonatomic) BOOL filterDuplicates;
 @property (nonatomic, copy) NSSet<NSString *> *hiddenUserNames, *unmaskedAggregateUserNames;
 @property (nonatomic) NSUInteger privacyRevision;
+@property (nonatomic, copy) NSDictionary<NSString *,NSNumber *> *sessionCounts, *foldedCounts;
+@property (nonatomic, copy) NSSet<NSString *> *foldedUnreadTabs;
+@property (nonatomic) BOOL scopeFoldedEntry;
+@property (nonatomic, strong) CSGroupRow *foldedSummaryRow;
 - (nullable NSIndexPath *)nativePathForDisplayPath:(NSIndexPath *)displayPath;
 @end
 
@@ -102,11 +157,19 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
 - (instancetype)initWithSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selectedTabID
                 filterDuplicates:(BOOL)filterDuplicates accountID:(NSString *)accountID hiddenUserNames:(NSSet *)hiddenUserNames
       unmaskedAggregateUserNames:(NSSet *)unmaskedAggregateUserNames privacyRevision:(NSUInteger)privacyRevision previousProjection:(CSGroupProjection *)previous {
+    return [self initWithSections:sections tabs:tabs selectedTabID:selectedTabID filterDuplicates:filterDuplicates accountID:accountID
+        hiddenUserNames:hiddenUserNames unmaskedAggregateUserNames:unmaskedAggregateUserNames privacyRevision:privacyRevision
+        scopeFoldedEntry:NO foldedProjection:nil previousProjection:previous];
+}
+- (instancetype)initWithSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates accountID:(NSString *)accountID hiddenUserNames:(NSSet *)hiddenUserNames
+      unmaskedAggregateUserNames:(NSSet *)unmaskedAggregateUserNames privacyRevision:(NSUInteger)privacyRevision
+                scopeFoldedEntry:(BOOL)scopeFoldedEntry foldedProjection:(CSGroupProjection *)foldedProjection previousProjection:(CSGroupProjection *)previous {
     if ((self = [super init])) {
         // Until every value is validated, no partial map, badge, or row is published.
         _sections = @[]; _accountID = [accountID isKindOfClass:[NSString class]] ? [accountID copy] : @"";
         _valid = NO;
-        _displayToNative = @{}; _nativeToDisplay = @{}; _badges = @{};
+        _displayToNative = @{}; _nativeToDisplay = @{}; _badges = @{}; _sessionCounts=@{};
         if (!_accountID.length || ![sections isKindOfClass:[NSArray class]] ||
             ![tabs isKindOfClass:[NSArray class]] || ![selectedTabID isKindOfClass:[NSString class]]) return self;
 
@@ -134,6 +197,37 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
             [records addObject:@[tabID,@(tab.type),[members copy]]];
         }
         if (!types[selectedTabID]) return self;
+        if (foldedProjection && (!foldedProjection.isValid || ![foldedProjection.accountID isEqual:accountID])) return self;
+        _scopeFoldedEntry=scopeFoldedEntry;
+        _foldedCounts=scopeFoldedEntry ? foldedProjection.sessionCounts : nil;
+        NSMutableSet *foldedUnread=[NSMutableSet set];
+        if (scopeFoldedEntry && foldedProjection) for (NSString *tabID in types) {
+            CSGroupBadge *badge=[foldedProjection badgeForTabID:tabID];
+            if (badge.count || badge.redDot) [foldedUnread addObject:tabID];
+        }
+        _foldedUnreadTabs=[foldedUnread copy];
+        // The child has already applied the ordinary group and privacy rules.
+        // Only consume its digest when its entire provenance matches this view.
+        BOOL currentFolded=scopeFoldedEntry && foldedProjection &&
+            foldedProjection.privacyRevision==privacyRevision &&
+            [foldedProjection.hiddenUserNames isEqual:hiddenUserNames] &&
+            [foldedProjection.selectedTabID isEqual:selectedTabID] &&
+            [foldedProjection.definitionRecords isEqual:records] && foldedProjection.filterDuplicates==filterDuplicates;
+        if (currentFolded) {
+            CSGroupRow *latest=nil;
+            for (NSArray *visibleRows in foldedProjection.sections) for (CSGroupRow *child in visibleRows) {
+                if (child.kind!=CSGroupRowKindSession) continue;
+                if (!latest || child.nativeSortTime.unsignedLongLongValue>latest.nativeSortTime.unsignedLongLongValue) latest=child;
+            }
+            // Time ranks candidates only; a missing value is a zero-rank tie,
+            // not a veto of this child's text or other visible children's text.
+            // Missing text on the selected child still never borrows a global digest.
+            if (latest.nativeSummary.length) _foldedSummaryRow=latest;
+        }
+        BOOL sameFolded=previous.scopeFoldedEntry==scopeFoldedEntry &&
+            (previous.foldedCounts==_foldedCounts || [previous.foldedCounts isEqual:_foldedCounts]) &&
+            [previous.foldedUnreadTabs isEqual:_foldedUnreadTabs] &&
+            ((_foldedSummaryRow==nil && previous.foldedSummaryRow==nil) || CSGroupRowsMatch(_foldedSummaryRow,previous.foldedSummaryRow,NO));
         BOOL sameDefinitions=previous.isValid && [previous.accountID isEqual:accountID] && [previous.definitionRecords isEqual:records];
         NSDictionary *presetIDs=previous.presetIDs, *memberTabIDs=previous.memberTabIDs;
         if (!sameDefinitions) {
@@ -177,14 +271,14 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
                 }
                 // Base rows are immutable; materialize subclasses so mutable host values cannot leak.
                 CSGroupRow *value = [row isMemberOfClass:CSGroupRow.class] ? row : [[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName
-                    kind:row.kind category:row.category top:row.top unreadCount:row.unreadCount redDot:row.redDot];
+                    kind:row.kind category:row.category top:row.top unreadCount:row.unreadCount redDot:row.redDot nativeSummary:row.nativeSummary sortTime:row.nativeSortTime summaryReason:row.nativeSummaryReason nativePrefix:row.nativePrefix summarySource:row.nativeSummarySource];
                 [copiedRows addObject:value];
             }
             [copiedSections addObject:[copiedRows copy]];
         }
 
         BOOL samePrivacy=previous.privacyRevision==privacyRevision && [previous.hiddenUserNames isEqual:hiddenUserNames] && [previous.unmaskedAggregateUserNames isEqual:unmaskedAggregateUserNames];
-        BOOL sameStructure=sameDefinitions && samePrivacy && previous.filterDuplicates==filterDuplicates && CSGroupSectionsMatch(copiedSections,previous.inputSections,NO);
+        BOOL sameStructure=sameDefinitions && samePrivacy && sameFolded && previous.filterDuplicates==filterDuplicates && CSGroupSectionsMatch(copiedSections,previous.inputSections,NO);
         BOOL sameValues=sameStructure && CSGroupSectionsMatch(copiedSections,previous.inputSections,YES);
         if (sameValues && [previous.selectedTabID isEqual:selectedTabID]) return previous;
         BOOL sameDisplay=sameStructure && [previous.selectedTabID isEqual:selectedTabID];
@@ -192,11 +286,12 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
         NSMutableDictionary *destinationsByPath=sameStructure ? nil : [NSMutableDictionary dictionary];
 
         NSMutableDictionary<NSString *, NSNumber *> *counts = [NSMutableDictionary dictionary];
+        NSMutableDictionary<NSString *, NSNumber *> *sessionCounts = [NSMutableDictionary dictionary];
         NSMutableSet<NSString *> *dotTabs = [NSMutableSet set];
         NSMutableDictionary<NSIndexPath *, NSIndexPath *> *displayToNative = sameDisplay ? nil : [NSMutableDictionary dictionary];
         NSMutableDictionary<NSIndexPath *, NSIndexPath *> *nativeToDisplay = sameDisplay ? nil : [NSMutableDictionary dictionary];
         NSMutableArray<NSArray<CSGroupRow *> *> *displaySections = [NSMutableArray arrayWithCapacity:sections.count];
-        NSUInteger retainedCount = 0; BOOL retainedDot = NO;
+        NSUInteger retainedCount = 0, retainedSessions=0; BOOL retainedDot = NO;
         for (NSUInteger sectionIndex = 0; sectionIndex < copiedSections.count; sectionIndex++) {
             NSMutableArray<CSGroupRow *> *visible = [NSMutableArray array];
             for (CSGroupRow * __strong row in copiedSections[sectionIndex]) {
@@ -209,11 +304,25 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
                     row=[[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName kind:row.kind category:row.category top:row.top unreadCount:0 redDot:NO];
                     row.privacyMasked=YES;
                 }
-                BOOL retained = CSGroupRetainsEveryTab(row);
+                BOOL scopedFolded=scopeFoldedEntry && row.kind==CSGroupRowKindAggregate && [row.userName isEqual:@"chatroom_session_box"];
+                BOOL retained = !scopedFolded && CSGroupRetainsEveryTab(row);
                 NSMutableSet<NSString *> *destinations = sameStructure ? previous.destinationsByPath[row.nativePath] : [NSMutableSet set];
-                if (retained) {
+                if (scopedFolded) {
+                    if (!sameStructure) {
+                        for (NSString *tabID in types) if (!_foldedCounts || [_foldedCounts[tabID] unsignedIntegerValue]>0) [destinations addObject:tabID];
+                        destinationsByPath[row.nativePath]=[destinations copy];
+                    }
+                    if (!sameValues) for (NSString *tabID in destinations) if ([_foldedUnreadTabs containsObject:tabID]) [dotTabs addObject:tabID];
+                    BOOL masked=row.privacyMasked;
+                    row=[[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName kind:row.kind category:row.category top:row.top unreadCount:0 redDot:NO];
+                    row.privacyMasked=masked;row.foldedEntryScoped=YES;row.foldedEntryCount=_foldedCounts[selectedTabID];
+                    row.foldedEntryAccountID=accountID;row.foldedEntryPrivacyRevision=privacyRevision;row.foldedEntryTabID=selectedTabID;
+                    row.foldedEntryPrefix=_foldedSummaryRow.nativePrefix;row.foldedEntrySummarySource=_foldedSummaryRow.nativeSummarySource;
+                    row.foldedEntrySummary=_foldedSummaryRow.nativeSummary;row.foldedEntrySummaryUserName=_foldedSummaryRow.userName;
+                } else if (retained) {
                     retainedCount = CSGroupSaturatedAdd(retainedCount, CSGroupNumericUnread(row));
                     retainedDot |= CSGroupDotUnread(row);
+                    if (row.kind==CSGroupRowKindSession || row.kind==CSGroupRowKindFake) retainedSessions++;
                 } else {
                     if (!sameStructure) {
                         [destinations addObjectsFromArray:presetIDs[@(WETabTypeAll)] ?: @[]];
@@ -230,6 +339,7 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
                     }
                     if (!sameValues) for (NSString *tabID in destinations) {
                         counts[tabID] = @(CSGroupSaturatedAdd([counts[tabID] unsignedIntegerValue], CSGroupNumericUnread(row)));
+                        if (row.kind==CSGroupRowKindSession || row.kind==CSGroupRowKindFake) sessionCounts[tabID]=@([sessionCounts[tabID] unsignedIntegerValue]+1);
                         if (CSGroupDotUnread(row)) [dotTabs addObject:tabID];
                     }
                 }
@@ -249,14 +359,17 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
         for (NSString *tabID in types) {
             NSUInteger count = CSGroupSaturatedAdd([counts[tabID] unsignedIntegerValue], retainedCount);
             badges[tabID] = [[CSGroupBadge alloc] initWithCount:count redDot:retainedDot || [dotTabs containsObject:tabID]];
+            sessionCounts[tabID]=@([sessionCounts[tabID] unsignedIntegerValue]+retainedSessions);
         }
         _destinationsByPath=sameStructure ? previous.destinationsByPath : [destinationsByPath copy];
         _sections = [displaySections copy]; _displayToNative = sameDisplay ? previous.displayToNative : [displayToNative copy];
         _nativeToDisplay = sameDisplay ? previous.nativeToDisplay : [nativeToDisplay copy]; _badges = sameValues ? previous.badges : [badges copy];
+        _sessionCounts=sameValues ? previous.sessionCounts : [sessionCounts copy];
         _valid = YES;
     }
     return self;
 }
+- (NSUInteger)sessionCountForTabID:(NSString *)tabID { return [self.sessionCounts[tabID] unsignedIntegerValue]; }
 - (BOOL)hasSameDisplayStructureAs:(CSGroupProjection *)other {
     return self.valid && other.valid && [self.accountID isEqual:other.accountID] &&
         [self.selectedTabID isEqual:other.selectedTabID] && CSGroupSectionsMatch(self.sections,other.sections,NO);

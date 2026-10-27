@@ -8,19 +8,41 @@ static BOOL wrapPickerBeforeLoad, useBottomToolView;
 static NSUInteger toolDoneCalls;
 static NSString *account=@"me";
 static void (^duringDismissal)(void);
+static BOOL requireVisiblePresentation, deferSheetDismissal;
+static NSUInteger invalidPresentations;
+static NSMutableArray *dismissReceivers;
+static void (^pendingSheetDismissal)(void);
+static BOOL deferPickerPresentation;
+static void (^pendingPickerPresentation)(void);
+static NSUInteger nativeTagEntrances;
+static void DetachPresentation(UIViewController *controller) {
+    controller.presentingViewController.presentedViewController=nil;
+    controller.presentingViewController=nil; controller.view.window=nil; controller.isBeingDismissed=NO;
+    if ([controller isKindOfClass:UINavigationController.class]) [(UINavigationController *)controller topViewController].view.window=nil;
+}
 static void Check(BOOL ok,NSString *message){checks++;if(!ok){fprintf(stderr,"FAIL: %s\n",message.UTF8String);exit(1);}}
 @implementation UIView @end
 @implementation UIControl @end
 @implementation UIButton @end
 @implementation UIBarButtonItem @end
 @implementation UINavigationItem @end
+@implementation UISheetPresentationController @end
+@implementation UISheetPresentationControllerDetent
++ (instancetype)mediumDetent { return [self new]; }
++ (instancetype)largeDetent { return [self new]; }
+@end
 @implementation UIViewController
 - (instancetype)init {if((self=[super init])){_view=[UIView new];_navigationItem=[UINavigationItem new];_navigationItem.rightBarButtonItem=[UIBarButtonItem new];}return self;}
 - (void)viewDidLoad {}
 - (void)presentViewController:(UIViewController *)controller animated:(BOOL)animated completion:(void(^)(void))completion {
+    if(requireVisiblePresentation && (!self.view.window || self.presentedViewController || self.isBeingDismissed)) { invalidPresentations++; return; }
     self.presentedViewController=controller;controller.presentingViewController=self;
-    if([controller isKindOfClass:UINavigationController.class]) [[(UINavigationController *)controller topViewController] loadViewIfNeeded];
-    if(completion)completion();
+    controller.view.window=self.view.window;
+    if([controller isKindOfClass:UINavigationController.class]) {
+        UIViewController *top=[(UINavigationController *)controller topViewController];top.view.window=controller.view.window;[top loadViewIfNeeded];
+    }
+    if(deferPickerPresentation && [controller isKindOfClass:UINavigationController.class]) pendingPickerPresentation=[completion copy];
+    else if(completion)completion();
 }
 - (void)loadViewIfNeeded {
     if(self.isViewLoaded)return;
@@ -34,12 +56,30 @@ static void Check(BOOL ok,NSString *message){checks++;if(!ok){fprintf(stderr,"FA
     self.isViewLoaded=YES;[self viewDidLoad];
 }
 - (void)dismissViewControllerAnimated:(BOOL)animated completion:(void(^)(void))completion {
-    self.presentingViewController.presentedViewController=nil;
-    if(duringDismissal)duringDismissal();if(completion)completion();
+    [dismissReceivers addObject:self];
+    // UIKit forwards a child's dismiss to its containing modal when the alert
+    // has already gone. The old stub only cleared self.presenting and missed it.
+    UIViewController *owner=self;
+    while(owner && !owner.presentedViewController && !owner.presentingViewController) owner=owner.parentViewController;
+    UIViewController *target=owner.presentedViewController?:owner;
+    void (^done)(void)=^{ if(target.presentingViewController)DetachPresentation(target);if(duringDismissal)duringDismissal();if(completion)completion(); };
+    if(deferSheetDismissal && [target isKindOfClass:UIAlertController.class]) { target.isBeingDismissed=YES;pendingSheetDismissal=done; }
+    else done();
 }
 @end
 @implementation UINavigationController
-- (instancetype)initWithRootViewController:(UIViewController *)root {if((self=[super init])){self.topViewController=root;root.navigationController=self;}return self;}
+- (instancetype)initWithRootViewController:(UIViewController *)root {if((self=[super init])){self.viewControllers=@[root];self.topViewController=root;root.navigationController=self;root.parentViewController=self;}return self;}
+- (void)pushViewController:(UIViewController *)controller animated:(BOOL)animated {
+    self.viewControllers=[self.viewControllers arrayByAddingObject:controller];self.topViewController=controller;
+    controller.navigationController=self;controller.parentViewController=self;controller.view.window=self.view.window;
+}
+@end
+@implementation UIAlertAction
++ (instancetype)actionWithTitle:(NSString *)title style:(UIAlertActionStyle)style handler:(void (^)(UIAlertAction *))handler { UIAlertAction *a=[self new];a.title=title;a.handler=handler;return a; }
+@end
+@implementation UIAlertController
++ (instancetype)alertControllerWithTitle:(NSString *)title message:(NSString *)message preferredStyle:(UIAlertControllerStyle)style { UIAlertController *a=[self new];a.title=title;a.actions=[NSMutableArray array];return a; }
+- (void)addAction:(UIAlertAction *)action { [self.actions addObject:action]; }
 @end
 @interface MMUINavigationController : UINavigationController @end
 @implementation MMUINavigationController @end
@@ -80,6 +120,19 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 @end
 @interface NSObject (PickerSelectionDelegate)
 - (BOOL)onShouldSelectContact:(id)contact;
+- (void)contactTagListViewController:(id)controller didSelectContactTag:(NSArray *)contacts;
+@end
+// Native tag callback selects contacts into the friend's live ContactSelectView.
+// No tag-management or plugin-owned list implementation participates in this fixture.
+@interface ContactTagListViewController : UIViewController
+@property(nonatomic,weak) id delegate;
+- (void)selectTagContacts:(NSArray *)contacts;
+@end
+@implementation ContactTagListViewController
+- (void)selectTagContacts:(NSArray *)contacts {
+    [self.delegate contactTagListViewController:self didSelectContactTag:contacts];
+    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+}
 @end
 @interface MultiSelectContactsViewController : UIViewController
 @property(nonatomic,weak) id m_delegate;
@@ -89,7 +142,7 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 @property(nonatomic,strong) UIBarButtonItem *m_panelBtnItem;
 @property(nonatomic,strong) UIButton *m_panelBtn;
 @property(nonatomic,copy) NSString *m_viewcontrllerTitle,*m_rightBarButtonTitle;
-@property(nonatomic) BOOL m_bShowHistoryGroup,m_bShowRadarCreateRoom,hideSelfContact;
+@property(nonatomic) BOOL m_bShowHistoryGroup,m_bShowRadarCreateRoom,hideSelfContact,m_bShowContactTag;
 - (void)initData;
 - (void)actionDone;
 - (void)onDone:(id)sender;
@@ -98,6 +151,7 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
 - (void)updateRightBarItemEnabled:(BOOL)enabled;
 - (void)updatePanelBtn;
 - (void)selectContact:(CContact *)contact;
+- (void)onSelectContactTag;
 @end
 @implementation MultiSelectContactsViewController
 - (void)initData {}
@@ -134,6 +188,16 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact){return [[contact m_nsUs
     NSMutableDictionary *selected=self.m_selectView.m_dicMultiSelect;
     if(selected[contact.m_nsUsrName])[selected removeObjectForKey:contact.m_nsUsrName];
     else if([self.m_delegate onShouldSelectContact:contact])selected[contact.m_nsUsrName]=contact;
+    [self updatePanelBtn];
+}
+- (void)onSelectContactTag {
+    nativeTagEntrances++;
+    Check(self.m_bShowContactTag && self.isViewLoaded && self.m_selectView!=nil && self.view.window!=nil,@"native tag entry waits until the native friend's presentation completes");
+    ContactTagListViewController *tags=[ContactTagListViewController new];tags.delegate=self;
+    [self presentViewController:[[MMUINavigationController alloc] initWithRootViewController:tags] animated:YES completion:nil];
+}
+- (void)contactTagListViewController:(id)controller didSelectContactTag:(NSArray *)contacts {
+    for(CContact *contact in contacts) self.m_selectView.m_dicMultiSelect[contact.m_nsUsrName]=contact;
     [self updatePanelBtn];
 }
 @end
@@ -200,7 +264,11 @@ static void TapGroupDone(GroupSelectContactsViewController *picker) {
     Check(button.enabled&&button.target==picker&&[button.target respondsToSelector:button.action],@"native Done button has an enabled action and target");
     ((void(*)(id,SEL))objc_msgSend)(button.target,button.action);
 }
+#import "ScheduledTaskPickerPresentationTests.h"
+#import "GroupPickerPresentationTests.h"
 int main(void){@autoreleasepool{
+    if(getenv("CS_TEST_GROUP_PICKER")) { TestGroupPickerPresentation();printf("Group picker presentation: %lu checks passed\n",(unsigned long)checks);return 0; }
+    if(getenv("CS_TEST_SCHEDULED_PICKER")) { TestScheduledPickerPresentation();printf("Scheduled picker presentation: %lu checks passed\n",(unsigned long)checks);return 0; }
     UIViewController *presenter=[UIViewController new];NSError *error=nil;
     __block NSUInteger saves=0;__block NSArray *saved=nil;__block BOOL valid=YES;
     void (^save)(NSArray *)=^(NSArray *names){Check(presenter.presentedViewController==nil,@"save occurs after dismissal");saves++;saved=names;};
