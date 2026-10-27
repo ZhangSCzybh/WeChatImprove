@@ -1,0 +1,72 @@
+[
+  {
+    "path": "Controllers/CSCloseFriendSessionPresentation.m",
+    "baseline21SHA256": "1dc3ead032ae5ed42f11b2f91d2cbe26253d1c6104112701e7dc33880dc44819",
+    "release22SHA256": "aa268316b57809263954e0be1228ff6b63c3e2e0dd1df7ded933a90fa3fa88ce"
+  },
+  {
+    "path": "Controllers/CSGroupNativeBridge.m",
+    "baseline21SHA256": "7ca7292da8bc5674e8d1a1b36ceaa50ae977ab621f1078c5b26dfee476d827fa",
+    "release22SHA256": "683df61121abbbf47628a787401aeb654be49b84e26703c9136674c600036d05"
+  },
+  {
+    "path": "Controllers/CSGroupProjection.h",
+    "baseline21SHA256": "c44a23428869a17efb6f6791b98793d30fcca14d153bc8ae6405eb66fd43f37e",
+    "release22SHA256": "fea5251d048fea33e214415914ebf8ec2b1215aa451a66b32cd509664d1eb16d"
+  },
+  {
+    "path": "Controllers/CSGroupProjection.m",
+    "baseline21SHA256": "c8df569f4e39a5fd7264c98ced10b39bec645bf0044f5009d872a010909becf6",
+    "release22SHA256": "1202c4ecdd52561de521c8e06f875e2ae937c610695a92f1b7c75fa40ac38ae0"
+  },
+  {
+    "path": "Controllers/CSReleaseNotesViewController.m",
+    "baseline21SHA256": "6e86183ec66e93a99936f0884b7cbeb1515f46b8379b1811ed7465f8d5d9ee8a",
+    "release22SHA256": "c67ecb6ec3ea95be529d32455fb4f4cae49679db84bd164a603467c3d1d99fc0"
+  },
+  {
+    "path": "Headers/CSUserInfoHelper.h",
+    "baseline21SHA256": "ea82f1bd34799cf93cbbebf8edca3feba93fdbc619c408ef7f4e33b0663de2da",
+    "release22SHA256": "da146fd04c55fcc5adf662c5c3ab316cf0780fea39a492090fc394666496810a"
+  },
+  {
+    "path": "Tests/CloseFriendSessionPresentationTests.m",
+    "baseline21SHA256": "97d9d26dd7a6c217699d91b4a70245ff7ac31c78f231ba931d071e8300df73d0",
+    "release22SHA256": "6740a9604b73c1cf029eea16f54ef220e849486315dd8c494a9604678685392e"
+  },
+  {
+    "path": "Tests/CloseFriendSessionTests.m",
+    "baseline21SHA256": "f4652b9ca5a36256d8c2db8e8f5dc72d690db6e959c07bd8f2ae8ad92067bed4",
+    "release22SHA256": "55ea03de4c96e44962541aea6d8a7f1e4f74e99879826ebc9ffd14c9245da102"
+  },
+  {
+    "path": "Tests/FoldedCardIntegrationTests.h",
+    "baseline21SHA256": "5ef367461dc531bf10ce36a4b1e22259ceac48fd3f3023c8ecd9509f56654812",
+    "release22SHA256": "138200f55f07a11658389ee395274df3aeeada8acfc456a5fc7678926b837c2e"
+  },
+  {
+    "path": "Tests/FoldedEntryVisualTests.h",
+    "baseline21SHA256": "a8521ec9dcccdc79779d050a1f06108f3378e489efe32c0c6f40060b77de47ae",
+    "release22SHA256": "7a3fb05f051925548320489ec7cb431f656ae7d4d4ca9cd008499e618d854a03"
+  },
+  {
+    "path": "Tests/verify-close-friend-session.sh",
+    "baseline21SHA256": "98dada2ec796003e0c4f2ff7011c98f41fa4251d25908c7c55528ad21dd159db",
+    "release22SHA256": "efa90ab46f26930fc52f69c8d5eb53c33ebb022cf597751cbae121e08927097f"
+  },
+  {
+    "path": "control",
+    "baseline21SHA256": "4dc7cdde15bd8ed12b670d04e3874172166d9a167d8d827e5c2590580b820cee",
+    "release22SHA256": "8b468626fc14da4a89ff74a5f654b07af72cd7152ae4439c21dc1c9a4142d404"
+  },
+  {
+    "path": "README.md",
+    "baseline21SHA256": "45f4abf933eea1945e4f4982c1ee2fe972f33a0d39d90b6105d32980bb93f1da",
+    "release22SHA256": "fae78f4d82c8b45c06e6e052e836dff2aa39e2453f6fa1f827b7e77f74ed8a1d"
+  },
+  {
+    "path": "docs/session-groups.md",
+    "baseline21SHA256": "82025717aee3bda54bb766e6c27c7a34662247c5fdb66999552632bd3c4cee0a",
+    "release22SHA256": "0941c00f99d1cdc59cff40fafd782957dcd4b58c6c9344c11596c7df56698a7e"
+  }
+]

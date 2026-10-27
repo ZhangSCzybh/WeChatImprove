@@ -1,0 +1,37 @@
+{
+  "scripts": [
+    "Tests/verify-list-corners.sh",
+    "Tests/verify-close-friend-session.sh"
+  ],
+  "red": [
+    {
+      "checks": 1020,
+      "failures": 0
+    },
+    {
+      "checks": 142,
+      "failures": 6
+    },
+    {
+      "checks": 40,
+      "failures": 0
+    }
+  ],
+  "green": [
+    {
+      "checks": 1020,
+      "failures": 0
+    },
+    {
+      "checks": 142,
+      "failures": 0
+    },
+    {
+      "checks": 40,
+      "failures": 0
+    }
+  ],
+  "productionFilesUnchangedAtRed": 341,
+  "netAddedChecks": 7,
+  "fullSuiteRun": false
+}

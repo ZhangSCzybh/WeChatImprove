@@ -1,0 +1,45 @@
+{
+  "removedDiagnosticsAbsentFromSource": true,
+  "symbolFileCount": 12,
+  "rootless": {
+    "version": "2.0-27",
+    "installPath": "var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+    "matchingSymbolUUIDs": {
+      "arm64": "E16CCF05-0ED2-3BB1-9C52-DA619BE901A0",
+      "arm64e": "DC7098F3-A178-397D-A73F-E3003DFCA13F"
+    },
+    "dylibSHA256": "ae5eb3122288ee2b0cb586d5ef6a6b7e99b55fd41cd87333762800ea5aa80259",
+    "warnings": 12,
+    "errors": 0,
+    "removedDiagnosticsAbsentFromDylib": true,
+    "warningMessagesMatchPreviousBuild": true
+  },
+  "rootful": {
+    "version": "2.0-27",
+    "installPath": "Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+    "matchingSymbolUUIDs": {
+      "arm64": "6C36247E-03C6-39C1-83CA-3233142A9526",
+      "arm64e": "F0FE94A4-6948-3284-8D04-818850181284"
+    },
+    "dylibSHA256": "1018edf5893d61cc75489d713e33a96ec512603400568dddaf1b16dabbc166c0",
+    "warnings": 12,
+    "errors": 0,
+    "removedDiagnosticsAbsentFromDylib": true,
+    "warningMessagesMatchPreviousBuild": true
+  },
+  "oldBuildAndPackagesUnchanged": true,
+  "preservedExistingBuildAndPackageFiles": 1236,
+  "coreRegression": {
+    "sessionChecks": 148,
+    "presentationChecks": 44,
+    "listCornerChecks": 1017,
+    "selectionChecks": 30,
+    "proxyLifecycleCases": 5,
+    "failures": 0
+  },
+  "deviceAcceptance": {
+    "version": "2.0-27",
+    "installedByThisTask": false,
+    "status": "not tested on device; 2.0-26 summary previously confirmed by user"
+  }
+}

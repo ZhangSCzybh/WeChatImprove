@@ -1,0 +1,25 @@
+FAIL: shared card retains scoped native summary without exposing native global business text
+FAIL: light card: native title has no count or font shrinking
+FAIL: light card: native child summary shares title left edge
+FAIL: configuration refresh never restores private preview
+FAIL: dark card after live radius/margin change: native title has no count or font shrinking
+FAIL: dark card after live radius/margin change: native child summary shares title left edge
+FAIL: flat mode keeps scoped text and privacy protection
+FAIL: flat after disabling corners: native title has no count or font shrinking
+FAIL: flat after disabling corners: native child summary shares title left edge
+FAIL: fallback protection relocates into the rebuilt card without revealing global content
+FAIL: reenabled card: native title has no count or font shrinking
+FAIL: reenabled card: native child summary shares title left edge
+FAIL: shared card retains scoped native summary without exposing native global business text
+FAIL: light card: native title has no count or font shrinking
+FAIL: light card: native child summary shares title left edge
+FAIL: configuration refresh never restores private preview
+FAIL: dark card after live radius/margin change: native title has no count or font shrinking
+FAIL: dark card after live radius/margin change: native child summary shares title left edge
+FAIL: flat mode keeps scoped text and privacy protection
+FAIL: flat after disabling corners: native title has no count or font shrinking
+FAIL: flat after disabling corners: native child summary shares title left edge
+FAIL: fallback protection relocates into the rebuilt card without revealing global content
+FAIL: reenabled card: native title has no count or font shrinking
+FAIL: reenabled card: native child summary shares title left edge
+List corners: 1020 checks, 24 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)

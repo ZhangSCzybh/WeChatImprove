@@ -1,0 +1,4 @@
+Close-friend sessions: 85 checks, 0 failures
+FAIL: native relayout/theme updates neutral summary geometry and color without another cover
+FAIL: native relayout hides new business content while retaining aggregate icon
+Close-friend session presentation: 32 checks, 2 failures

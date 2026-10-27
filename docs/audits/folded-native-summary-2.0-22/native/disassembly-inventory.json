@@ -1,0 +1,92 @@
+[
+  {
+    "file": "MMSessionInfo--compare_.asm",
+    "start": "0x1046ae32c",
+    "stop": "0x1046ae4d4",
+    "truncated": false
+  },
+  {
+    "file": "MMSessionInfo--m_uLastTime.asm",
+    "start": "0x1046aea18",
+    "stop": "0x1046aea20",
+    "truncated": false
+  },
+  {
+    "file": "MMSessionInfo--sortTime.asm",
+    "start": "0x1046aec0c",
+    "stop": "0x1046aec14",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--initWithSessionInfo_.asm",
+    "start": "0x104a765c8",
+    "stop": "0x104a766e8",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--makeTextForMessageLabel.asm",
+    "start": "0x104a76e94",
+    "stop": "0x104a7795c",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--makeTextSession_.asm",
+    "start": "0x104a7cfd4",
+    "stop": "0x104a7ff34",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--makeTextForQuoteMessage.asm",
+    "start": "0x104a80370",
+    "stop": "0x104a80c50",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--digestForMsg_withSender_.asm",
+    "start": "0x104a78584",
+    "stop": "0x104a7cfd4",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellDataManager--getCellData_.asm",
+    "start": "0x104a82bec",
+    "stop": "0x104a831b4",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellDataManager--getCellDataByUsrName_.asm",
+    "start": "0x104a836a8",
+    "stop": "0x104a836e4",
+    "truncated": false
+  },
+  {
+    "file": "ChatBoxMgr--genLastTimeForChatBoxSession.asm",
+    "start": "0x100e4935c",
+    "stop": "0x100e4942c",
+    "truncated": false
+  },
+  {
+    "file": "ChatBoxMgr--lastMsgForChatBoxSession.asm",
+    "start": "0x100e4942c",
+    "stop": "0x100e497dc",
+    "truncated": false
+  },
+  {
+    "file": "ChatBoxMgr--chatBoxSessions.asm",
+    "start": "0x100e49ac0",
+    "stop": "0x100e49ad0",
+    "truncated": false
+  },
+  {
+    "file": "ChatBoxSessionListViewController--logicGetSessionAtIndexPath_.asm",
+    "start": "0x100e4b324",
+    "stop": "0x100e4b3fc",
+    "truncated": false
+  },
+  {
+    "file": "ChatBoxSessionListViewController--logicGetCellDataAtIndexPath_.asm",
+    "start": "0x100e4b3fc",
+    "stop": "0x100e4b578",
+    "truncated": false
+  }
+]

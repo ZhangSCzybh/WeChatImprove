@@ -1,0 +1,14 @@
+{
+  "source": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "sourceCommit": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+  "version": "2.0-16",
+  "buildRoot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-scheduled-picker-2.0-16-q3_4t_s6",
+  "cacheClonedFrom": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-restore-compatibility-build-ujz1jtv7",
+  "strategy": "Build current checkout with separate task-owned Theos caches; no make clean; existing .theos and all previous packages preserved",
+  "previousPackagesSHA256": {
+    "com.wechat.improve_2.0-15_iphoneos-arm64.deb": "986d4005d4ee698aa3b7cbf4b481b8609ca4ab7784ca300497a3eb11aee12fab",
+    "com.wechat.improve_2.0-15-b1_iphoneos-arm64.deb": "c8229b3f7c4bc26bc667fc7509d773f72f884a80fdf87821be3bb459056a94e2",
+    "com.wechat.improve_2.0-15_iphoneos-arm.deb": "2886a922bc5682e5dacb4eb7781c3b385cee4ed511c7ff15aa87ec8aca80905b",
+    "com.wechat.improve_2.0-15_symbols.zip": "d4f713f83ec80e84fd3ee3be3d3c0bc96f3b76e0ead8e4fc34f2da4fe0fe8508"
+  }
+}

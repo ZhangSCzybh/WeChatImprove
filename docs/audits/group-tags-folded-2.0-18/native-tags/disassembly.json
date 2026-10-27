@@ -1,0 +1,146 @@
+[
+  {
+    "file": "MultiSelectContactsViewController--contactTagListViewController_didSelectContactTag_.asm",
+    "start": "0x104e9ee18",
+    "stop": "0x104e9f284",
+    "truncated": false
+  },
+  {
+    "file": "MultiSelectContactsViewController--actionDone.asm",
+    "start": "0x104ea1644",
+    "stop": "0x104ea1c28",
+    "truncated": false
+  },
+  {
+    "file": "MultiSelectContactsViewController--initView.asm",
+    "start": "0x104ea50c4",
+    "stop": "0x104ea6b2c",
+    "truncated": false
+  },
+  {
+    "file": "MultiSelectContactsViewController--onSelectContactTag.asm",
+    "start": "0x104eaa7b4",
+    "stop": "0x104eaabe4",
+    "truncated": false
+  },
+  {
+    "file": "MultiSelectContactsViewController--onFilterContactCandidate_.asm",
+    "start": "0x104eac018",
+    "stop": "0x104eac0cc",
+    "truncated": false
+  },
+  {
+    "file": "MultiSelectContactsViewController--makeFiterContactToTagSearchView_.asm",
+    "start": "0x104eac5f4",
+    "stop": "0x104eac928",
+    "truncated": false
+  },
+  {
+    "file": "MultiSelectContactsViewController--doTagSearch_arrContacts_.asm",
+    "start": "0x104eaf6ac",
+    "stop": "0x104eb000c",
+    "truncated": false
+  },
+  {
+    "file": "MultiSelectContactsViewController--onShowSearchContactTagViews.asm",
+    "start": "0x104eb35c4",
+    "stop": "0x104eb3614",
+    "truncated": false
+  },
+  {
+    "file": "ContactSelectView--handleSelectContactTag.asm",
+    "start": "0x101017dcc",
+    "stop": "0x101017e78",
+    "truncated": false
+  },
+  {
+    "file": "ContactTagListViewController--init.asm",
+    "start": "0x101045ef0",
+    "stop": "0x101045f98",
+    "truncated": false
+  },
+  {
+    "file": "ContactTagListViewController--tableView_didSelectRowAtIndexPath_.asm",
+    "start": "0x101049b04",
+    "stop": "0x101049d7c",
+    "truncated": false
+  },
+  {
+    "file": "SelectTagContactsViewController--init.asm",
+    "start": "0x105753e94",
+    "stop": "0x105753f7c",
+    "truncated": false
+  },
+  {
+    "file": "SelectTagContactsViewController--viewDidLoad.asm",
+    "start": "0x105753f7c",
+    "stop": "0x105753fec",
+    "truncated": false
+  },
+  {
+    "file": "SelectTagContactsViewController--initData.asm",
+    "start": "0x105754af8",
+    "stop": "0x105754b04",
+    "truncated": false
+  },
+  {
+    "file": "SelectTagContactsViewController--initView.asm",
+    "start": "0x105754c50",
+    "stop": "0x105754d44",
+    "truncated": false
+  },
+  {
+    "file": "SelectTagContactsViewController--updateRightBarBtn.asm",
+    "start": "0x1057554f0",
+    "stop": "0x105755928",
+    "truncated": false
+  },
+  {
+    "file": "SelectTagContactsViewController--onCancel_.asm",
+    "start": "0x105755a14",
+    "stop": "0x105755a24",
+    "truncated": false
+  },
+  {
+    "file": "SelectTagContactsViewController--onDone_.asm",
+    "start": "0x105755a24",
+    "stop": "0x105755adc",
+    "truncated": false
+  },
+  {
+    "file": "SelectTagContactsViewController--tableView_didSelectRowAtIndexPath_.asm",
+    "start": "0x10575701c",
+    "stop": "0x105757364",
+    "truncated": false
+  },
+  {
+    "file": "MMPageSheetAdapter--showWithAnimated_complete_.asm",
+    "start": "0x116790068",
+    "stop": "0x116790234",
+    "truncated": false
+  },
+  {
+    "file": "MMPageSheetAdapter--showInView_animated_complete_.asm",
+    "start": "0x116790244",
+    "stop": "0x1167903d0",
+    "truncated": false
+  },
+  {
+    "file": "MMPageSheetAdapter--showFromViewController_animated_.asm",
+    "start": "0x1167903d0",
+    "stop": "0x1167903e0",
+    "truncated": false
+  },
+  {
+    "file": "MMPageSheetAdapter--showFromViewController_animated_complete_.asm",
+    "start": "0x1167903e0",
+    "stop": "0x116790548",
+    "truncated": false
+  },
+  {
+    "file": "MMPageSheetContainerViewController--showPageSheetAnimated_parentView_parentViewController_complete_.asm",
+    "start": "0x116800128",
+    "stop": "0x11680057c",
+    "truncated": false
+  }
+]

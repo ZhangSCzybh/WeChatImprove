@@ -1,0 +1,17 @@
+[
+  {
+    "path": "packages/com.wechat.improve_2.0-27_iphoneos-arm.deb",
+    "sha256": "ecb5784990ef9ac3e0831a1ca74970b5a343635edcad018b228dbcc25b4b68bc",
+    "bytes": 1303418
+  },
+  {
+    "path": "packages/com.wechat.improve_2.0-27_iphoneos-arm64.deb",
+    "sha256": "a8dbd32bed702c9d02d5353d5012ff0bc838ebe6b2bfebcb29949e94186cd37e",
+    "bytes": 1301646
+  },
+  {
+    "path": "packages/com.wechat.improve_2.0-27_symbols.zip",
+    "sha256": "f420f358b10dd341ef3679f49550bd8bb35da3a5259c017d0b7160bb3adac4ca",
+    "bytes": 9864001
+  }
+]

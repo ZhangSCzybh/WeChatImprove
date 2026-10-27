@@ -1,0 +1,37 @@
+FAIL: newest visible folded native digest wins, excluding newer hidden and other-group children and ignoring pinned/list/lexical order
+FAIL: summary carries the selected visible child identity in the immutable row
+FAIL: native text-only update republishes even when count and unread stay equal
+FAIL: native sortTimeOverride participates in newest timestamp
+FAIL: native pinned effective timestamp participates without blindly preferring pinned rows
+FAIL: native untop time participates for non-pinned sessions
+FAIL: native sortTime participates for non-pinned sessions
+FAIL: native prefixes and message-type digest text copied verbatim
+FAIL: native prefixes and message-type digest text copied verbatim
+FAIL: native prefixes and message-type digest text copied verbatim
+FAIL: native prefixes and message-type digest text copied verbatim
+FAIL: row snapshot owns immutable native text, never a live cell/model reference
+FAIL: attributed native digest keeps visible text without native color overrides
+FAIL: snapshot uses only cache reads and leaves native sessions/unread unchanged
+FAIL: private group summary uses its own native folded child
+FAIL: epoch change during summary read publishes no prior account content
+FAIL: privacy revision change during summary read publishes no old policy content
+FAIL: next snapshot applies new privacy rules without stale digest
+FAIL: account change during native summary lookup rejects publication
+Close-friend sessions: 116 checks, 19 failures
+FAIL: native accessibility preview replaced with neutral folded title
+FAIL: scoped entry has a native-length title with no count and hides global preview/time/unread
+FAIL: privacy reveal does not remove scoped summary or expose global preview
+FAIL: changed group count reuses single presentation owner
+FAIL: same-count republication restores current native summary
+FAIL: native title label remains visible with original text/font/frame and no duplicate overlay title
+FAIL: title contains no count and never shrinks below native type size
+FAIL: verified native child summary uses native two-line geometry and title left edge
+FAIL: summary preserves native typography and left alignment without shrinking messages
+FAIL: native title is retained while global preview/time/nested badge remain concealed
+FAIL: native relayout/theme updates summary metrics and color without another cover
+FAIL: narrow card does not rewrite or shrink native title
+FAIL: widening preserves original title and refreshes summary width
+FAIL: unverified native title uses same-size fallback without rewriting the original
+FAIL: when native title becomes valid its owned hidden state is restored
+FAIL: folded-ordinary-folded reuse shows current summary and original native title
+Close-friend session presentation: 38 checks, 16 failures

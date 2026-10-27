@@ -1,0 +1,52 @@
+{
+  "allowedScripts": [
+    "Tests/verify-list-corners.sh",
+    "Tests/verify-close-friend-session.sh"
+  ],
+  "red": {
+    "productionVersion": "2.0-22",
+    "productionFilesByteIdentical": 341,
+    "sessionAndPresentation": [
+      {
+        "checks": 131,
+        "failures": 26
+      },
+      {
+        "checks": 38,
+        "failures": 0
+      }
+    ],
+    "listCorners": [
+      {
+        "checks": 1020,
+        "failures": 0
+      }
+    ]
+  },
+  "green": {
+    "sessionAndPresentation": [
+      {
+        "checks": 137,
+        "failures": 0
+      },
+      {
+        "checks": 38,
+        "failures": 0
+      }
+    ],
+    "listCorners": [
+      {
+        "checks": 1020,
+        "failures": 0
+      }
+    ]
+  },
+  "addedChecksSince22": 21,
+  "extraBoundaryChecksAfterInitialRed": 6,
+  "fullSuiteRun": false,
+  "diagnostics": {
+    "sourceSuccessCache": true,
+    "sourceSuccessUncached": true,
+    "displayStale": true
+  }
+}

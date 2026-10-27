@@ -1,0 +1,21 @@
+{
+  "baselineFiles": 47363,
+  "baselineSHA256": "51888c46420348d74285c1da8c3b0d9c184a2f323b7550d7752d8cfbb246022f",
+  "changedAuthorizedFiles": [
+    "Controllers/CSCloseFriendSessionPresentation.m",
+    "Controllers/CSListCornerPageContext.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/ListCornerRadiusHooks.xm",
+    "Hooks/SessionGroupHooks.xm",
+    "README.md",
+    "Tests/CloseFriendSessionPresentationTests.m",
+    "Tests/ListCornerSemanticsTests.m",
+    "Tests/extract-list-corners.py",
+    "Tests/verify-close-friend-session.sh",
+    "control",
+    "docs/session-groups.md"
+  ],
+  "allOtherPreexistingFilesUnchanged": true,
+  "deletedPreexistingFiles": []
+}

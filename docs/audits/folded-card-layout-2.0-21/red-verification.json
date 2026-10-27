@@ -1,0 +1,16 @@
+{
+  "unchanged20ProductionFiles": 343,
+  "allProductionMatches20": true,
+  "listCorners": {
+    "checks": 1004,
+    "failures": 37
+  },
+  "sessionLogic": {
+    "checks": 85,
+    "failures": 0
+  },
+  "presentation": {
+    "checks": 36,
+    "failures": 6
+  }
+}

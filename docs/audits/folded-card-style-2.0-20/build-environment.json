@@ -1,0 +1,14 @@
+{
+  "source": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "sourceCommit": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+  "version": "2.0-20",
+  "buildRoot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-folded-card-2.0-20-zjbutad9",
+  "baseline": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-folded-card-2.0-20-zjbutad9/baseline.json",
+  "baselineFiles": 47386,
+  "cacheClonedFrom": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-folded-visual-2.0-19-qjm5w5wl",
+  "previousPackagesSHA256": {
+    "com.wechat.improve_2.0-19_iphoneos-arm.deb": "be3bcdeb7d7b31435033af89916d19c11c63b1ee195db00a9e8428eaf31d747b",
+    "com.wechat.improve_2.0-19_symbols.zip": "2a37c20fdd5b39fcc502041e6c0efba3db7f0d95be0186bb89925ed4e0ab3f99",
+    "com.wechat.improve_2.0-19_iphoneos-arm64.deb": "3a8720d2216227a6eb49a3c241a6b7aae020b6de50bfaacb2255b06c3d154ea4"
+  }
+}

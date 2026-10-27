@@ -1,0 +1,64 @@
+2026-10-27 10:49:01.716 session-tests[90078:32951083] [WeChatImprove][FoldedDigest] stage=source reason=no_visible tab=custom-empty count=0 source=neutral
+2026-10-27 10:49:01.716 session-tests[90078:32951083] [WeChatImprove][FoldedDigest] stage=source reason=message_missing tab=custom-b count=1 source=neutral
+2026-10-27 10:49:01.717 session-tests[90078:32951083] [WeChatImprove][FoldedDigest] stage=source reason=message_missing tab=preset_2 count=1 source=neutral
+2026-10-27 10:49:01.717 session-tests[90078:32951083] [WeChatImprove][FoldedDigest] stage=source reason=message_missing tab=preset_0 count=4 source=neutral
+2026-10-27 10:49:01.717 session-tests[90078:32951083] [WeChatImprove][FoldedDigest] stage=source reason=message_missing tab=preset_1 count=3 source=neutral
+2026-10-27 10:49:01.718 session-tests[90078:32951083] [WeChatImprove][FoldedDigest] stage=source reason=no_visible tab=custom-b count=0 source=neutral
+2026-10-27 10:49:01.718 session-tests[90078:32951083] [WeChatImprove][FoldedDigest] stage=source reason=no_visible tab=preset_0 count=0 source=neutral
+2026-10-27 10:49:01.718 session-tests[90078:32951083] [WeChatImprove][FoldedDigest] stage=source reason=sessions_nil tab=custom-empty count=0 source=neutral
+2026-10-27 10:49:01.718 session-tests[90078:32951083] [WeChatImprove][FoldedDigest] stage=source reason=policy_stale tab=custom-b count=1 source=neutral
+2026-10-27 10:49:01.719 session-tests[90078:32951083] [WeChatImprove][FoldedDigest] stage=source reason=chat_mismatch tab=summary-tab count=2 source=neutral
+FAIL: cold-start group uses separate native conversation prefix and native message, not sender prefix
+FAIL: cold-start invokes native aggregate prefix builder and digest without opening folded list
+FAIL: newest visible child excludes newer hidden and outside-group messages
+FAIL: private prefix/message order and separator come from native builder
+FAIL: exact native entry cache copies both fields verbatim with signed/unsigned high message IDs
+FAIL: name-only native change invalidates summary reuse
+FAIL: native entry type placeholders pass through without plugin mapping
+FAIL: native entry type placeholders pass through without plugin mapping
+FAIL: native entry type placeholders pass through without plugin mapping
+FAIL: native entry type placeholders pass through without plugin mapping
+FAIL: native entry type placeholders pass through without plugin mapping
+FAIL: native entry type placeholders pass through without plugin mapping
+FAIL: native entry type placeholders pass through without plugin mapping
+FAIL: native entry type placeholders pass through without plugin mapping
+FAIL: native text is immutable snapshot, not live model storage
+FAIL: native attributed visible text retained while UI style remains native
+FAIL: distinct high-bit message ID rejects cached entry and formats current message
+FAIL: same ID but another conversation cannot supply entry prefix or text
+FAIL: global aggregate latest from another group is never fallback
+FAIL: uncached types preserve native digest while name stays separate
+FAIL: uncached types preserve native digest while name stays separate
+FAIL: uncached types preserve native digest while name stays separate
+FAIL: uncached types preserve native digest while name stays separate
+FAIL: long explicit native name is retained for native label truncation, never cut to ten chars by plugin
+FAIL: already shortened native generated group name passes through unchanged
+FAIL: latest visible conversation change updates both fields atomically
+FAIL: native pinned effective time remains the ordering source
+FAIL: native untop effective time remains the ordering source
+FAIL: native sort override remains independent of lexical/list order
+FAIL: native message session time remains available for ordering
+FAIL: hiding latest child advances to next visible child's native prefix/body
+2026-10-27 10:49:01.724 session-tests[90078:32951083] [WeChatImprove][FoldedDigest] stage=source reason=no_visible tab=summary-tab count=0 source=neutral
+FAIL: next list refresh automatically retries an initially absent digest
+FAIL: all zero time fields cannot veto verified text
+FAIL: missing optional time selectors do not gate digest
+FAIL: unsynced message formats through stable snapshot with no server ID
+FAIL: account epoch transition during formatting rejects old text
+FAIL: privacy revision transition rejects both old prefix and text
+FAIL: account switch rejects cached/formatter values
+FAIL: time-only changes during format do not invalidate message identity
+2026-10-27 10:49:01.725 session-tests[90078:32951083] [WeChatImprove][FoldedDigest] stage=source reason=message_missing tab=summary-tab count=1 source=neutral
+FAIL: cold folded session reads its own last message and renders the native name/body pair
+FAIL: last-message fallback is a scoped read and never populates live session or mutates stored message
+FAIL: distinct storage wrapper objects with the same 64-bit identity remain valid
+FAIL: unsynced storage message uses its stable local identity
+FAIL: stored message time ranks a cold session with no session timestamp
+FAIL: empty in-memory message loads the complete stored message without changing the session
+FAIL: epoch changes during cache lookup reject publication
+FAIL: fresh account snapshot recovers without modifying native collection or counters
+Close-friend sessions: 148 checks, 47 failures
+2026-10-27 10:49:02.502 presentation-tests[90085:32951113] [WeChatImprove][FoldedDigest] stage=display reason=native_pair_unavailable tab=preset_0 count=2 source=neutral
+2026-10-27 10:49:02.502 presentation-tests[90085:32951113] [WeChatImprove][FoldedDigest] stage=display reason=policy_stale tab=preset_0 count=0 source=neutral
+2026-10-27 10:49:02.509 presentation-tests[90085:32951113] [WeChatImprove][FoldedDigest] stage=display reason=ok tab=preset_0 count=4 source=entry_cache
+Close-friend session presentation: 44 checks, 0 failures

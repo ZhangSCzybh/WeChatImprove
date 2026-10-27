@@ -1,0 +1,140 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "disassembly": [
+    {
+      "file": "ChatBoxMgr--getChatBoxSession.asm",
+      "start": "0x100e46b9c",
+      "stop": "0x100e46bac",
+      "truncated": false
+    },
+    {
+      "file": "ChatBoxMgr--updateChatBoxSession.asm",
+      "start": "0x100e48adc",
+      "stop": "0x100e48aec",
+      "truncated": false
+    },
+    {
+      "file": "ChatBoxMgr--updateChatBoxSessionWithSortTime_.asm",
+      "start": "0x100e48aec",
+      "stop": "0x100e48f5c",
+      "truncated": false
+    },
+    {
+      "file": "ChatBoxMgr--generateSessionForUsername_.asm",
+      "start": "0x100e48f5c",
+      "stop": "0x100e49158",
+      "truncated": false
+    },
+    {
+      "file": "ChatBoxMgr--updateChatBoxSessionDesc.asm",
+      "start": "0x100e49158",
+      "stop": "0x100e49340",
+      "truncated": false
+    },
+    {
+      "file": "ChatBoxUtil--pushChatBoxListFrom_complete_.asm",
+      "start": "0x100e4c35c",
+      "stop": "0x100e4c3e8",
+      "truncated": false
+    },
+    {
+      "file": "ChatBoxUtil--isChatBox_.asm",
+      "start": "0x100e4c3e8",
+      "stop": "0x100e4c400",
+      "truncated": false
+    },
+    {
+      "file": "NewMainFrameViewController--updateFoldSessionEntry.asm",
+      "start": "0x105110ef4",
+      "stop": "0x1051112ac",
+      "truncated": false
+    },
+    {
+      "file": "NewMainFrameViewController--openMessageContentView_startSendMessage_msgWrapToAdd_animated_jumpToFirstUnreadNode_indexPath_.asm",
+      "start": "0x10511cddc",
+      "stop": "0x10511ce0c",
+      "truncated": false
+    },
+    {
+      "file": "NewMainFrameViewController--openMessageContentView_startSendMessage_msgWrapToAdd_animated_jumpToFirstUnreadNode_indexPath_reuse_extraInfo_.asm",
+      "start": "0x10511ceac",
+      "stop": "0x10511d010",
+      "truncated": false
+    },
+    {
+      "file": "NewMainFrameViewController--openMessageContentView_startSendMessage_msgWrapToAdd_animated_jumpToFirstUnreadNode_indexPath_reuse_extraInfo_navigationController_completion_.asm",
+      "start": "0x10511d09c",
+      "stop": "0x10511de20",
+      "truncated": false
+    },
+    {
+      "file": "NewMainFrameViewController--tryOpenMessageContentView_startSendMessage_msgWrapToAdd_animated_jumpToFirstUnreadNode_indexPath_reuse_extraInfo_navigationController_firstUnreadMessageWrap_completion_.asm",
+      "start": "0x10511deac",
+      "stop": "0x10511e968",
+      "truncated": false
+    },
+    {
+      "file": "NewMainFrameViewController--handleSelectIndexPath_tableView_.asm",
+      "start": "0x10511feac",
+      "stop": "0x1051203a0",
+      "truncated": false
+    },
+    {
+      "file": "MainFrameCellData--makeTextForNameLabel.asm",
+      "start": "0x104a769ec",
+      "stop": "0x104a76e94",
+      "truncated": false
+    },
+    {
+      "file": "MainFrameCellData--makeTextForMessageLabel.asm",
+      "start": "0x104a76e94",
+      "stop": "0x104a7795c",
+      "truncated": false
+    },
+    {
+      "file": "MainFrameAggregationCell--setCellData_.asm",
+      "start": "0x104a6dac8",
+      "stop": "0x104a6dadc",
+      "truncated": false
+    },
+    {
+      "file": "MainFrameItemView--updateNameLabel.asm",
+      "start": "0x104a8faf8",
+      "stop": "0x104a90ce8",
+      "truncated": false
+    },
+    {
+      "file": "MainFrameItemView--updateUnreadCountView.asm",
+      "start": "0x104a9bed0",
+      "stop": "0x104a9c100",
+      "truncated": false
+    }
+  ],
+  "files": {
+    "ChatBoxMgr--generateSessionForUsername_.asm": "c7a1f08753d1e584c12e3e22a2c697d4992adf4c9c0d5e676895cf1be9e555e5",
+    "ChatBoxUtil--isChatBox_.asm": "d268b2c0d036fd9982f3e1ed4b3f64f47d7742eeef41a9de1b55e6ab862a7495",
+    "NewMainFrameViewController--openMessageContentView_startSendMessage_msgWrapToAdd_animated_jumpToFirstUnreadNode_indexPath_reuse_extraInfo_.asm": "da04295e34a6e2f3c305eea35556960073b19839218f9ca8b9ca0952ec903a43",
+    "MainFrameItemView--updateUnreadCountView.asm": "6e226e0a3677fdf55d774c204bf89b95c5c294ccf3e468a21f482149dbbe6fd3",
+    "ChatBoxMgr--updateChatBoxSessionDesc.asm": "7240296b6aeee15375173d9d4c683682a759d5a4a46bfbb7c35091dcd45458b5",
+    "ChatBoxUtil--pushChatBoxListFrom_complete_.asm": "3afd7938b856496b604e80f09c22b3f2d3e0a6230971d11f41f1ba02b399dc0d",
+    "NewMainFrameViewController--tryOpenMessageContentView_startSendMessage_msgWrapToAdd_animated_jumpToFirstUnreadNode_indexPath_reuse_extraInfo_navigationController_firstUnreadMessageWrap_completion_.asm": "3df39d4f4cb19770adeaf0a04e0d8648d56b358ae7873a8c2f505a1b0fb5a9a2",
+    "MainFrameItemView--updateNameLabel.asm": "b48512cbe4525f60d99c3c43da14e223c7a112afcd7515cf4ddd2d06a748bdce",
+    "MainFrameCellData--makeTextForMessageLabel.asm": "0cda9b808ee200295cd8c860e4fa05ef529110b5b7b4d09f6a97505d27cece30",
+    "NewMainFrameViewController--handleSelectIndexPath_tableView_.asm": "5fe245f53c3b352ada4f3285de6fbdc07b57de3e178b03319941ce28dc7d9191",
+    "NewMainFrameViewController--openMessageContentView_startSendMessage_msgWrapToAdd_animated_jumpToFirstUnreadNode_indexPath_reuse_extraInfo_navigationController_completion_.asm": "9b8a4e52868eefa159b12922629b3ea25758853458fcd9bc5fa19eb6b9ff972e",
+    "README.md": "11b04d48584966976e5a43d698f94a3efe075901c11483693244b878fb951f8f",
+    "ChatBoxMgr--updateChatBoxSessionWithSortTime_.asm": "86f5d3ee2b07437e7303bc5747106c4f9a5db8e9abfe4aa1f56e8a2196a1c299",
+    "ChatBoxMgr--getChatBoxSession.asm": "8dbdfe484ad727ad155927d7fdab9e5d89b1e002ce50ef1f7e8b42a8bf7686a6",
+    "methods.json": "ef8106cd08435c578dac44e6be5bed7f2081e6c3cc5f2db3083f5cc51c0580fb",
+    "disassemble.py": "c96824459025133b58f1d1af87c4691e2d0f236f9a7e6eac34b284bcdc5b771c",
+    "ChatBoxMgr--updateChatBoxSession.asm": "6cd886fa2208c7ec615b914cc38312e595eb7d1778c70016635b4f838c03c829",
+    "NewMainFrameViewController--openMessageContentView_startSendMessage_msgWrapToAdd_animated_jumpToFirstUnreadNode_indexPath_.asm": "3290e5ccc48d951e05f06c7b48137b50aad4ce9e88a0b36343dc77fd1c895392",
+    "MainFrameCellData--makeTextForNameLabel.asm": "3b5704615b6f0366700fec009b023fa45800d2b58fe0891035f62ddf94dabf33",
+    "MainFrameAggregationCell--setCellData_.asm": "be4686e1931327fb52687c79a1a7839bdf171ee14d3a1639c88af71c7f3db32b",
+    "disassembly-inventory.json": "41d789dfcdecc9fb332e1795a43963672ff1d3968637bf211cf046bf43e15572",
+    "NewMainFrameViewController--updateFoldSessionEntry.asm": "324da158e0341aaa781d97e3b83794410d7dd200f2c464b924a4d7210680340a",
+    "extract.py": "ce2b512fff277b8785682d7758b51414988be4ffc95c4d7e49f4e52cf6bd4189"
+  }
+}

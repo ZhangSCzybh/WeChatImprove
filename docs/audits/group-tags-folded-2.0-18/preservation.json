@@ -1,0 +1,31 @@
+{
+  "baselineFiles": 47261,
+  "baselineSHA256": "5d291c67358a1eb9713fbb81c41320dade77a20ff881bd52eb07348034bf11fb",
+  "changedAuthorizedFiles": [
+    "Controllers/CSChatGroupSettingsViewController.m",
+    "Controllers/CSCloseFriendSessionPresentation.m",
+    "Controllers/CSGroupListAdapter.m",
+    "Controllers/CSGroupNativeBridge.h",
+    "Controllers/CSGroupNativeBridge.m",
+    "Controllers/CSGroupProjection.h",
+    "Controllers/CSGroupProjection.m",
+    "Controllers/CSNativeContactPicker.h",
+    "Controllers/CSNativeContactPicker.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/SessionGroupHooks.xm",
+    "README.md",
+    "Tests/CloseFriendSessionPresentationTests.m",
+    "Tests/CloseFriendSessionTests.m",
+    "Tests/GroupLifecycleTests.m",
+    "Tests/GroupPickerPresentationTests.h",
+    "Tests/GroupSelectionTests.m",
+    "Tests/NativeContactPickerTests.m",
+    "Tests/extract-group-lifecycle.py",
+    "Tests/verify-close-friend-session.sh",
+    "control",
+    "docs/session-groups.md"
+  ],
+  "allOtherPreexistingFilesUnchanged": true,
+  "deletedPreexistingFiles": []
+}

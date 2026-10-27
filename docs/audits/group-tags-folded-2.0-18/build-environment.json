@@ -1,0 +1,13 @@
+{
+  "source": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "sourceCommit": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+  "version": "2.0-18",
+  "buildRoot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-tags-folded-2.0-18-d6dydfdf",
+  "baseline": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-tags-folded-2.0-18-d6dydfdf/baseline.json",
+  "cacheClonedFrom": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-chatgroup-picker-2.0-17-vp6dt6lq",
+  "previousPackagesSHA256": {
+    "com.wechat.improve_2.0-17_iphoneos-arm.deb": "a96620d963179e8e64804c70b664d504632a5e154889ffc7b9ff1ce430ac5826",
+    "com.wechat.improve_2.0-17_iphoneos-arm64.deb": "09e6f6b767ebd7e4f3044322cf5e8f346ec7242e46c8c1a67ddd1325f43cd778",
+    "com.wechat.improve_2.0-17_symbols.zip": "1d975bdb7a58ce61703c788203cd6254139cf24ac6476ae605539606889ad479"
+  }
+}

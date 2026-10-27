@@ -1,0 +1,110 @@
+[
+  {
+    "file": "ChatBoxMgr--getChatBoxSession.asm",
+    "start": "0x100e46b9c",
+    "stop": "0x100e46bac",
+    "truncated": false
+  },
+  {
+    "file": "ChatBoxMgr--updateChatBoxSession.asm",
+    "start": "0x100e48adc",
+    "stop": "0x100e48aec",
+    "truncated": false
+  },
+  {
+    "file": "ChatBoxMgr--updateChatBoxSessionWithSortTime_.asm",
+    "start": "0x100e48aec",
+    "stop": "0x100e48f5c",
+    "truncated": false
+  },
+  {
+    "file": "ChatBoxMgr--generateSessionForUsername_.asm",
+    "start": "0x100e48f5c",
+    "stop": "0x100e49158",
+    "truncated": false
+  },
+  {
+    "file": "ChatBoxMgr--updateChatBoxSessionDesc.asm",
+    "start": "0x100e49158",
+    "stop": "0x100e49340",
+    "truncated": false
+  },
+  {
+    "file": "ChatBoxUtil--pushChatBoxListFrom_complete_.asm",
+    "start": "0x100e4c35c",
+    "stop": "0x100e4c3e8",
+    "truncated": false
+  },
+  {
+    "file": "ChatBoxUtil--isChatBox_.asm",
+    "start": "0x100e4c3e8",
+    "stop": "0x100e4c400",
+    "truncated": false
+  },
+  {
+    "file": "NewMainFrameViewController--updateFoldSessionEntry.asm",
+    "start": "0x105110ef4",
+    "stop": "0x1051112ac",
+    "truncated": false
+  },
+  {
+    "file": "NewMainFrameViewController--openMessageContentView_startSendMessage_msgWrapToAdd_animated_jumpToFirstUnreadNode_indexPath_.asm",
+    "start": "0x10511cddc",
+    "stop": "0x10511ce0c",
+    "truncated": false
+  },
+  {
+    "file": "NewMainFrameViewController--openMessageContentView_startSendMessage_msgWrapToAdd_animated_jumpToFirstUnreadNode_indexPath_reuse_extraInfo_.asm",
+    "start": "0x10511ceac",
+    "stop": "0x10511d010",
+    "truncated": false
+  },
+  {
+    "file": "NewMainFrameViewController--openMessageContentView_startSendMessage_msgWrapToAdd_animated_jumpToFirstUnreadNode_indexPath_reuse_extraInfo_navigationController_completion_.asm",
+    "start": "0x10511d09c",
+    "stop": "0x10511de20",
+    "truncated": false
+  },
+  {
+    "file": "NewMainFrameViewController--tryOpenMessageContentView_startSendMessage_msgWrapToAdd_animated_jumpToFirstUnreadNode_indexPath_reuse_extraInfo_navigationController_firstUnreadMessageWrap_completion_.asm",
+    "start": "0x10511deac",
+    "stop": "0x10511e968",
+    "truncated": false
+  },
+  {
+    "file": "NewMainFrameViewController--handleSelectIndexPath_tableView_.asm",
+    "start": "0x10511feac",
+    "stop": "0x1051203a0",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--makeTextForNameLabel.asm",
+    "start": "0x104a769ec",
+    "stop": "0x104a76e94",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--makeTextForMessageLabel.asm",
+    "start": "0x104a76e94",
+    "stop": "0x104a7795c",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameAggregationCell--setCellData_.asm",
+    "start": "0x104a6dac8",
+    "stop": "0x104a6dadc",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameItemView--updateNameLabel.asm",
+    "start": "0x104a8faf8",
+    "stop": "0x104a90ce8",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameItemView--updateUnreadCountView.asm",
+    "start": "0x104a9bed0",
+    "stop": "0x104a9c100",
+    "truncated": false
+  }
+]

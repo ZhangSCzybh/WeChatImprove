@@ -1,0 +1,35 @@
+2.0-22 真机反馈：折叠入口摘要仍显示中性的「折叠的聊天」，没有出现原生摘要。请排查修复（附带截图，务必自己看）。
+
+【截图素材】
+- 原始截图：docs/feedbacks/2026-10-27-folded-summary-still-neutral.jpg（1280x2774，iPhone，微信深色关）
+- 折叠行放大：docs/feedbacks/crop-folded-neutral-2026-10-27.png
+现象：标题已经正确了——显示原生「折叠的聊天」，没有数量括号，字号也正常。但摘要位置仍然显示「折叠的聊天」，不是本组最新会话的摘要；右侧也没有原生那个时间。也就是说本次走的是你自己描述的「中性兜底」分支，而不是取到了 m_textForMessageLabel。
+
+【请先定位为什么落到兜底分支，不要直接改文案】
+按 2.0-22 的实现路径逐段确认在哪一步断掉：
+1. ChatBoxMgr.chatBoxSessions 是否可读、是否为 nil/空、元素类型是否是预期会话对象；
+2. 经分组、排重、隐私投影过滤后，当前分组「Friend」下是否还有可见折叠会话（数量>0 才显示入口，这一条是好的，说明过滤后有量，但要注意计数来自 foldedProjection.sessionCounts，可能与摘要候选集合不是同一份数据，是否存在两份来源不一致）；
+3. MMSessionInfo.compare: 有效时间是否可用（sortTimeOverride/m_uLastTime 是否都为 0，导致「时间不可确认」）；
+4. MainFrameCellDataManager.getCellDataByUsrName: 是否返回 nil（缓存未生成）、m_sessionInfo 是否与源会话不同一、m_n64MesSvrID 是否为 0 或与当前消息不等、m_textForMessageLabel 是否为空/空串；
+5. 展示阶段再次校验（账号 epoch、隐私 revision、blocked、可见性）是否把已取到的摘要又清掉。
+
+【修复方向（要求正解，不要退化成中性）】
+- 摘要必须能在常见路径下真正显示出来。上面的 4 步里只要有一环在真机上不可用，就要换一条可靠来源，而不是一直显示中性。请评估并落实至少一条可用的读取路径，例如：
+  a) 折叠列表页 ChatBoxSessionListViewController 自身 cell 的 message label 文本（微信已生成的原生摘要，含前缀与图片/链接/引用文案）；
+  b) MMSessionInfo 上微信自带的摘要/消息描述字段或只读方法（需静态核对 8.0.78 反汇编，确认是纯读取、不写缓存、不触发红点处理）；
+  c) MainFrameCellData 其他不写缓存的读取入口。
+  无论选哪条，都必须保持「当前分组过滤后可见会话中的最新一条」这一语义，禁止用全局聚合摘要兜底。
+- 若确实存在「缓存尚未生成」的启动早期窗口，应保证在会话有新消息或列表刷新时自动重试成功，而不是永久中性。
+- 兜底策略保持不变：全被过滤 → 入口隐藏；身份/账号/revision 不可信 → 中性，绝不显示旧会话摘要。
+
+【诊断要求】
+请给这条链路加一条带原因码的日志（仅诊断用、默认不刷屏），例如：
+`[WeChatImprove][FoldedDigest] reason=<sessions_nil|no_visible|no_sort_time|cell_missing|msg_mismatch|text_empty|ok> tab=<id> count=<n>`
+这样若本轮仍未显示，用户可以直接把日志发回来定位，不用再来回猜。
+
+【要求】
+- 先补失败用例：以真机这种「缓存尚无 m_textForMessageLabel」的等价替身场景断言摘要仍能取到（走替代来源），当前 2.0-22 实现应失败；保留原有的「最新是密友顺延」「全隐藏不显示」「账号/revision 变化不显示旧摘要」用例。
+- 改动收敛在折叠入口摘要取数与展示，不动分组投影规则、未读角标、选择器、存储、密友隐藏策略；连续卡片、圆角、原生图标、两行布局、行高保持 2.0-22 现状。
+- 回归只跑 verify-list-corners.sh 与 verify-close-friend-session.sh，不要全量；两种架构编译，警告不得新增。
+- 出 deb（rootful arm + rootless arm64）+ symbols，版本 2.0-23，不覆盖历史包；说明根因落在哪一步、最终用的取数来源、失败/通过数量、以及真机验收步骤（含冷启动首次与「进一次折叠列表再返回」两种时机）。
+（另：如果结论是摘要必须等折叠列表页被打开过才有原生文案，请明确说出来，并给出「首次进入即中性、打开折叠列表后自动补齐」的可验证表现，不要含糊。）

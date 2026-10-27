@@ -1,0 +1,119 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "disassembly": [
+    {
+      "file": "MMSessionInfo--compare_.asm",
+      "start": "0x1046ae32c",
+      "stop": "0x1046ae4d4",
+      "truncated": false
+    },
+    {
+      "file": "MMSessionInfo--m_uLastTime.asm",
+      "start": "0x1046aea18",
+      "stop": "0x1046aea20",
+      "truncated": false
+    },
+    {
+      "file": "MMSessionInfo--sortTime.asm",
+      "start": "0x1046aec0c",
+      "stop": "0x1046aec14",
+      "truncated": false
+    },
+    {
+      "file": "MainFrameCellData--initWithSessionInfo_.asm",
+      "start": "0x104a765c8",
+      "stop": "0x104a766e8",
+      "truncated": false
+    },
+    {
+      "file": "MainFrameCellData--makeTextForMessageLabel.asm",
+      "start": "0x104a76e94",
+      "stop": "0x104a7795c",
+      "truncated": false
+    },
+    {
+      "file": "MainFrameCellData--makeTextSession_.asm",
+      "start": "0x104a7cfd4",
+      "stop": "0x104a7ff34",
+      "truncated": false
+    },
+    {
+      "file": "MainFrameCellData--makeTextForQuoteMessage.asm",
+      "start": "0x104a80370",
+      "stop": "0x104a80c50",
+      "truncated": false
+    },
+    {
+      "file": "MainFrameCellData--digestForMsg_withSender_.asm",
+      "start": "0x104a78584",
+      "stop": "0x104a7cfd4",
+      "truncated": false
+    },
+    {
+      "file": "MainFrameCellDataManager--getCellData_.asm",
+      "start": "0x104a82bec",
+      "stop": "0x104a831b4",
+      "truncated": false
+    },
+    {
+      "file": "MainFrameCellDataManager--getCellDataByUsrName_.asm",
+      "start": "0x104a836a8",
+      "stop": "0x104a836e4",
+      "truncated": false
+    },
+    {
+      "file": "ChatBoxMgr--genLastTimeForChatBoxSession.asm",
+      "start": "0x100e4935c",
+      "stop": "0x100e4942c",
+      "truncated": false
+    },
+    {
+      "file": "ChatBoxMgr--lastMsgForChatBoxSession.asm",
+      "start": "0x100e4942c",
+      "stop": "0x100e497dc",
+      "truncated": false
+    },
+    {
+      "file": "ChatBoxMgr--chatBoxSessions.asm",
+      "start": "0x100e49ac0",
+      "stop": "0x100e49ad0",
+      "truncated": false
+    },
+    {
+      "file": "ChatBoxSessionListViewController--logicGetSessionAtIndexPath_.asm",
+      "start": "0x100e4b324",
+      "stop": "0x100e4b3fc",
+      "truncated": false
+    },
+    {
+      "file": "ChatBoxSessionListViewController--logicGetCellDataAtIndexPath_.asm",
+      "start": "0x100e4b3fc",
+      "stop": "0x100e4b578",
+      "truncated": false
+    }
+  ],
+  "files": {
+    "MainFrameCellData--initWithSessionInfo_.asm": "8ab3e894ed830aea43f7f8cc739fa630eb0bb784b8bf705cd10bd7149956c310",
+    "ChatBoxSessionListViewController--logicGetCellDataAtIndexPath_.asm": "7a9f00f72ad35fbd66598a3cbccb3c4ccb774c6b714b00eeca12d0ea6a4e0619",
+    "MMSessionInfo--compare_.asm": "cd3e52e0b8f762221acaa329a9794914974d6ef3461c5df01b79a9d7b1058eb4",
+    "ChatBoxMgr--chatBoxSessions.asm": "27b2ac83d3c1090dc77bada891713a6050d722ea462ea749f802737dd6dad78d",
+    "MainFrameCellData--digestForMsg_withSender_.asm": "38d408847709058e47e924449f45a955fa219f4b5bebdb4deddecdc65909988a",
+    "rea-evidence.json": "000bef2a45fbd4b17adc4e2ab0acd65b076ef5c25f0d8479244c8088730de9cd",
+    "MainFrameCellData--makeTextForMessageLabel.asm": "0cda9b808ee200295cd8c860e4fa05ef529110b5b7b4d09f6a97505d27cece30",
+    "MMSessionInfo--m_uLastTime.asm": "c5c455997272ba788c8b93a7b14d11d17214c7e9db41ad722ab83981dea45a3d",
+    "MMSessionInfo--sortTime.asm": "790b15b7bf98b97e9ee8cc1bbfbc9721d813849fd0f52109842599a4e48b0975",
+    "methods.json": "aee968f1686ef837d453921e8400b2692056d89bd32bddf43d365f9460cd0f68",
+    "MainFrameCellDataManager--getCellData_.asm": "1eb82bb992f3cf40c5a845a9e5473281aa65c483b841f3bec66ea765a50cff96",
+    "disassemble.py": "18526f96f446cff15b8e27976f678ba4185b2dc6d646468082d84317453c8830",
+    "ChatBoxMgr--genLastTimeForChatBoxSession.asm": "902981af89e3ac5e041584b65d1011f1ecf0798dfb68beb9d4835267de90e66a",
+    "ChatBoxSessionListViewController--logicGetSessionAtIndexPath_.asm": "f220f27cdfdf99eef82e3bded279c2ace500f6828486a5fa41af52c0f1ad8516",
+    "findings.md": "51bbb3e3effbd095d48675d62509a8212326c4d2c29de025cb6f8564e8a2f851",
+    "MainFrameCellData--makeTextForQuoteMessage.asm": "297a5e6be15c2d9865d58bdcac27d1d2ed2eb026a7de7df7bfbfac94f6cb5270",
+    "disassembly-inventory.json": "b721d7934142b9998ee7e008c12ce4e5c854b752ad8ba21590ac0b25a4d68e57",
+    "MainFrameCellDataManager--getCellDataByUsrName_.asm": "426158f76a1596acbfd4924dca032191df4946a18b051f90f53943168e8d1aa5",
+    "MainFrameCellData--makeTextSession_.asm": "e3af882a7c0bf51aedbf72dcab09ffdd8115d0873868ca58c638f803a3747040",
+    "ChatBoxMgr--lastMsgForChatBoxSession.asm": "0bb2a5aa8547810867e34fc65fa89cbae3648f4e665373c074cfc4de9de3d4cf"
+  }
+}

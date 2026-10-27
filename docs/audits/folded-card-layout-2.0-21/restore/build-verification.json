@@ -1,0 +1,27 @@
+{
+  "controlVersion": "2.0-20",
+  "headerVersion": "2.0-20",
+  "releaseNotesVersion": "2.0-20",
+  "compileExit": 0,
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "warnings": [
+    "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+    "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+    "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+    "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+    "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+    "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+    "warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+    "warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+    "warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+    "warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+    "warning: -multiply_defined is obsolete",
+    "warning: -multiply_defined is obsolete"
+  ],
+  "warningCount": 12,
+  "historicalWarningCount": 12,
+  "newWarnings": []
+}

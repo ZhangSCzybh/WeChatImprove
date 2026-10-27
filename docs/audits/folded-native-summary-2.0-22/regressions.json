@@ -1,0 +1,50 @@
+{
+  "red": {
+    "suites": [
+      {
+        "suite": "List corners",
+        "checks": 1020,
+        "failures": 24,
+        "log": "logs/red-corners.log"
+      },
+      {
+        "suite": "Close-friend sessions",
+        "checks": 116,
+        "failures": 19,
+        "log": "logs/red-session.log"
+      },
+      {
+        "suite": "Close-friend session presentation",
+        "checks": 38,
+        "failures": 16,
+        "log": "logs/red-session.log"
+      }
+    ],
+    "checks": 1174,
+    "failures": 59
+  },
+  "green": {
+    "suites": [
+      {
+        "suite": "List corners",
+        "checks": 1020,
+        "failures": 0,
+        "log": "logs/green-corners-1.log"
+      },
+      {
+        "suite": "Close-friend sessions",
+        "checks": 116,
+        "failures": 0,
+        "log": "logs/green-session-1.log"
+      },
+      {
+        "suite": "Close-friend session presentation",
+        "checks": 38,
+        "failures": 0,
+        "log": "logs/green-session-1.log"
+      }
+    ],
+    "checks": 1174,
+    "failures": 0
+  }
+}

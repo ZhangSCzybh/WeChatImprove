@@ -7,11 +7,13 @@
   Controllers/CSCloseFriendBridge.h \
   Controllers/CSCloseFriendSettingsViewController.h \
   Controllers/CSCloseFriendCrypto.h Controllers/CSCloseFriendAccount.h \
+  Controllers/CSCloseFriendEntryState.h Controllers/CSCloseFriendReset.h \
   Controllers/CSCloseFriendShakeMonitor.h \
   Controllers/CSCloseFriendNavigation.h \
   Controllers/CSCloseFriendContactAdapter.h \
   Controllers/CSCloseFriendContactProjection.h \
-  Controllers/CSBackupBootstrap.h
+  Controllers/CSBackupBootstrap.h Controllers/CSPluginStorage.h \
+  Controllers/CSBackgroundBlurManager.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
 /Users/zhangshichao/theos/Prefix.pch:
 Controllers/CSCloseFriendManager.h:
@@ -22,8 +24,12 @@ Controllers/CSCloseFriendBridge.h:
 Controllers/CSCloseFriendSettingsViewController.h:
 Controllers/CSCloseFriendCrypto.h:
 Controllers/CSCloseFriendAccount.h:
+Controllers/CSCloseFriendEntryState.h:
+Controllers/CSCloseFriendReset.h:
 Controllers/CSCloseFriendShakeMonitor.h:
 Controllers/CSCloseFriendNavigation.h:
 Controllers/CSCloseFriendContactAdapter.h:
 Controllers/CSCloseFriendContactProjection.h:
 Controllers/CSBackupBootstrap.h:
+Controllers/CSPluginStorage.h:
+Controllers/CSBackgroundBlurManager.h:

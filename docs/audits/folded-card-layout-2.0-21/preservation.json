@@ -1,0 +1,38 @@
+{
+  "preexistingFiles": 47479,
+  "changedAuthorizedFiles": [
+    "README.md",
+    "control",
+    "Tests/verify-close-friend-session.sh",
+    "Tests/CloseFriendSessionPresentationTests.m",
+    "Tests/verify-list-corners.sh",
+    "Tests/extract-list-corners.py",
+    "Tests/ListCornerSemanticsTests.m",
+    "Tests/ListCornerUIKit/ListCornerUIKit.m",
+    "Tests/ListCornerUIKit/UIKit/UIKit.h",
+    "docs/session-groups.md",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/ListCornerRadiusHooks.xm",
+    "Hooks/SessionGroupHooks.xm",
+    "Controllers/CSGroupListAdapter.m",
+    "Controllers/CSListCornerPageContext.m",
+    "Controllers/CSCloseFriendSessionPresentation.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Controllers/CSListCornerPageContext.h",
+    "Controllers/CSListCornerSessionAdapter.m"
+  ],
+  "restoredNewFiles": [
+    "Tests/FoldedEntryVisualTests.h",
+    "Tests/FoldedCardIntegrationTests.h"
+  ],
+  "deletedPreexistingFiles": [],
+  "packagesPreserved": 42,
+  "historicalAuditFilesPreserved": 2926,
+  "workspaceTheosFilesPreserved": 1173,
+  "allOtherPreexistingFilesUnchanged": true,
+  "onlyAddedPackages": [
+    "packages/com.wechat.improve_2.0-21_iphoneos-arm.deb",
+    "packages/com.wechat.improve_2.0-21_iphoneos-arm64.deb",
+    "packages/com.wechat.improve_2.0-21_symbols.zip"
+  ]
+}

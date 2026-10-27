@@ -1,0 +1,28 @@
+FAIL: real signed q message ID matches unsigned Q cache ID without losing high bits
+FAIL: newest visible folded native digest wins, excluding newer hidden and other-group children and ignoring pinned/list/lexical order
+FAIL: summary carries the selected visible child identity in the immutable row
+FAIL: native text-only update republishes even when count and unread stay equal
+FAIL: native sortTimeOverride participates in newest timestamp
+FAIL: native pinned effective timestamp participates without blindly preferring pinned rows
+FAIL: native untop time participates for non-pinned sessions
+FAIL: native sortTime participates for non-pinned sessions
+FAIL: native prefixes and message-type digest text copied verbatim
+FAIL: native prefixes and message-type digest text copied verbatim
+FAIL: native prefixes and message-type digest text copied verbatim
+FAIL: native prefixes and message-type digest text copied verbatim
+FAIL: row snapshot owns immutable native text, never a live cell/model reference
+FAIL: attributed native digest keeps visible text without native color overrides
+FAIL: empty native message-label cache uses native formatting immediately on cold start
+FAIL: absent CellData uses native alternative before opening folded page
+FAIL: native formatting and group prefix use a detached message; no host-message or cache mutation
+FAIL: alternative retains native text, link and quote formatting on refresh
+FAIL: alternative retains native text, link and quote formatting on refresh
+FAIL: alternative retains native text, link and quote formatting on refresh
+FAIL: subsequent list/message refresh retries a formerly missing digest
+FAIL: local unsynced message can be formatted from its current stable snapshot without a server ID
+FAIL: epoch change during native alternative drops all old content
+FAIL: privacy revision change during native alternative cannot publish old digest
+FAIL: fresh valid snapshot recovers after policy transition
+FAIL: private group summary uses its own native folded child
+Close-friend sessions: 131 checks, 26 failures
+Close-friend session presentation: 38 checks, 0 failures

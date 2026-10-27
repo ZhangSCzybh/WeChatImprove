@@ -1,0 +1,22 @@
+{
+  "restoredFiles": 21,
+  "restoredAllMatch": true,
+  "archivedNewTests": 2,
+  "sourceManifestFiles": 555,
+  "sourceManifestAllMatch": true,
+  "packageFiles": 42,
+  "packagesUnchanged": true,
+  "existingAuditFiles": 2887,
+  "existingAuditsUnchanged": true,
+  "existingTheosFiles": 1173,
+  "existingTheosUnchanged": true,
+  "unexpectedChangesFromRollbackStart": [],
+  "compile": "rootful arm64+arm64e, isolated output, no packaging",
+  "regressions": {
+    "list-corners": 869,
+    "close-friend-sessions": 85,
+    "folded-presentation": 19,
+    "total": 973,
+    "failures": 0
+  }
+}

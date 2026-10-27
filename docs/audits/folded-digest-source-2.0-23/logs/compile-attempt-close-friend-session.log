@@ -1,0 +1,34 @@
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.m:1:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h:7:82: error: unknown type name 'nullable'
+    7 | FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, nullable NSString *tabID, NSUInteger count);
+      |                                                                                  ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h:7:100: error: expected ')'
+    7 | FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, nullable NSString *tabID, NSUInteger count);
+      |                                                                                                    ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h:7:46: note: to match this '('
+    7 | FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, nullable NSString *tabID, NSUInteger count);
+      |                                              ^
+2 errors generated.
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupNativeBridge.m:1:
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupNativeBridge.h:2:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h:7:82: error: unknown type name 'nullable'
+    7 | FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, nullable NSString *tabID, NSUInteger count);
+      |                                                                                  ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h:7:100: error: expected ')'
+    7 | FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, nullable NSString *tabID, NSUInteger count);
+      |                                                                                                    ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h:7:46: note: to match this '('
+    7 | FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, nullable NSString *tabID, NSUInteger count);
+      |                                              ^
+2 errors generated.
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/CloseFriendSessionTests.m:3:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h:7:82: error: unknown type name 'nullable'
+    7 | FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, nullable NSString *tabID, NSUInteger count);
+      |                                                                                  ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h:7:100: error: expected ')'
+    7 | FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, nullable NSString *tabID, NSUInteger count);
+      |                                                                                                    ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.h:7:46: note: to match this '('
+    7 | FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, nullable NSString *tabID, NSUInteger count);
+      |                                              ^
+2 errors generated.

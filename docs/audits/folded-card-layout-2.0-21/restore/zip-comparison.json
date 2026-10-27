@@ -1,0 +1,145 @@
+{
+  "zip": "docs/audits/rollback-to-2.0-18-2026-10-27/execution/source-before-rollback.zip",
+  "zipSHA256": "d7b818ed0e35d8b8bda6c67eecfacdacadfd0c3081998b767751dbe58ac348d5",
+  "files": [
+    {
+      "path": "Controllers/CSCloseFriendSessionPresentation.m",
+      "zipSHA256": "ed91edf95f9eb98762db718c55409c880198120690747478d9173d13be4b17df",
+      "workspaceSHA256": "ed91edf95f9eb98762db718c55409c880198120690747478d9173d13be4b17df",
+      "byteEqual": true
+    },
+    {
+      "path": "Controllers/CSGroupListAdapter.h",
+      "zipSHA256": "20fedadcd45935fe522833255be897647dcc04307109c8743f49343277d31504",
+      "workspaceSHA256": "20fedadcd45935fe522833255be897647dcc04307109c8743f49343277d31504",
+      "byteEqual": true
+    },
+    {
+      "path": "Controllers/CSGroupListAdapter.m",
+      "zipSHA256": "722ce34a340935e9e59fa57b9d446495fd8bcaa5e8d9c52d1cc07900f92f0c8b",
+      "workspaceSHA256": "722ce34a340935e9e59fa57b9d446495fd8bcaa5e8d9c52d1cc07900f92f0c8b",
+      "byteEqual": true
+    },
+    {
+      "path": "Controllers/CSListCornerPageContext.h",
+      "zipSHA256": "ff7eb2776f29c26c0b1759d19416f73d94026b6ac7e0f3f8dab4b21f1ab5aab6",
+      "workspaceSHA256": "ff7eb2776f29c26c0b1759d19416f73d94026b6ac7e0f3f8dab4b21f1ab5aab6",
+      "byteEqual": true
+    },
+    {
+      "path": "Controllers/CSListCornerPageContext.m",
+      "zipSHA256": "fbf9e03266a663423dd890f06c217116def2a63cd5fcdac05482b042ab46b45d",
+      "workspaceSHA256": "fbf9e03266a663423dd890f06c217116def2a63cd5fcdac05482b042ab46b45d",
+      "byteEqual": true
+    },
+    {
+      "path": "Controllers/CSListCornerSessionAdapter.h",
+      "zipSHA256": "5b2a44e9bfe518bc8287829d7ac6109a1baa7c9053056bc5e99ffe0d852fe92a",
+      "workspaceSHA256": "5b2a44e9bfe518bc8287829d7ac6109a1baa7c9053056bc5e99ffe0d852fe92a",
+      "byteEqual": true
+    },
+    {
+      "path": "Controllers/CSListCornerSessionAdapter.m",
+      "zipSHA256": "6bf6e73de73baf9fd8168eae445273a5ca42d4540dd3dca791a7a8951ce9755a",
+      "workspaceSHA256": "6bf6e73de73baf9fd8168eae445273a5ca42d4540dd3dca791a7a8951ce9755a",
+      "byteEqual": true
+    },
+    {
+      "path": "Controllers/CSReleaseNotesViewController.m",
+      "zipSHA256": "1f8100885947cd72afb25bbad0011e14e9b1fa05b2fd9e4254091792420b1240",
+      "workspaceSHA256": "1f8100885947cd72afb25bbad0011e14e9b1fa05b2fd9e4254091792420b1240",
+      "byteEqual": true
+    },
+    {
+      "path": "Headers/CSUserInfoHelper.h",
+      "zipSHA256": "226fdc39dbf68eec24199bb9fa464f95683d33dab773fecb1158db10c49602d3",
+      "workspaceSHA256": "226fdc39dbf68eec24199bb9fa464f95683d33dab773fecb1158db10c49602d3",
+      "byteEqual": true
+    },
+    {
+      "path": "Hooks/ListCornerRadiusHooks.xm",
+      "zipSHA256": "56815827dd785dd3d27fd9debc3d62208c3a478832f2dfd8fb95c88b06eebf0c",
+      "workspaceSHA256": "56815827dd785dd3d27fd9debc3d62208c3a478832f2dfd8fb95c88b06eebf0c",
+      "byteEqual": true
+    },
+    {
+      "path": "Hooks/SessionGroupHooks.xm",
+      "zipSHA256": "5716f9e7dc6158c13162bcad8e7ee45f7099901f61e3d0fde970f7bbf7888a46",
+      "workspaceSHA256": "5716f9e7dc6158c13162bcad8e7ee45f7099901f61e3d0fde970f7bbf7888a46",
+      "byteEqual": true
+    },
+    {
+      "path": "README.md",
+      "zipSHA256": "74478b66a4a9d522a8e08aab63ddde0170dfca777b573637589ec225d7f73b13",
+      "workspaceSHA256": "74478b66a4a9d522a8e08aab63ddde0170dfca777b573637589ec225d7f73b13",
+      "byteEqual": true
+    },
+    {
+      "path": "Tests/CloseFriendSessionPresentationTests.m",
+      "zipSHA256": "135f9e2f28a375ca4db1d5f52b8358a676d32ddbc445ba1f73415862b586787d",
+      "workspaceSHA256": "135f9e2f28a375ca4db1d5f52b8358a676d32ddbc445ba1f73415862b586787d",
+      "byteEqual": true
+    },
+    {
+      "path": "Tests/ListCornerSemanticsTests.m",
+      "zipSHA256": "f4ceef872fcb57557e44917eb46d3700f124e99d2f8537d64b568ab4327c88d1",
+      "workspaceSHA256": "f4ceef872fcb57557e44917eb46d3700f124e99d2f8537d64b568ab4327c88d1",
+      "byteEqual": true
+    },
+    {
+      "path": "Tests/ListCornerUIKit/ListCornerUIKit.m",
+      "zipSHA256": "b6bd38901be4a859cfbf7c83df94bf7822668246c3599619f0b31ade2ff8f410",
+      "workspaceSHA256": "b6bd38901be4a859cfbf7c83df94bf7822668246c3599619f0b31ade2ff8f410",
+      "byteEqual": true
+    },
+    {
+      "path": "Tests/ListCornerUIKit/UIKit/UIKit.h",
+      "zipSHA256": "cd38278c2048438e378f623231f4c1c0ee7d034aa31c7ac9ba2d0c42f671c7b3",
+      "workspaceSHA256": "cd38278c2048438e378f623231f4c1c0ee7d034aa31c7ac9ba2d0c42f671c7b3",
+      "byteEqual": true
+    },
+    {
+      "path": "Tests/extract-list-corners.py",
+      "zipSHA256": "0cab41d707566ee709d843752794c9dd9df937f18bfe60240ddb9a699513e6d2",
+      "workspaceSHA256": "0cab41d707566ee709d843752794c9dd9df937f18bfe60240ddb9a699513e6d2",
+      "byteEqual": true
+    },
+    {
+      "path": "Tests/verify-close-friend-session.sh",
+      "zipSHA256": "aa02cb3183eeb213cfeec4303659c99488715ac02ae2cc24866979229f0a8ca5",
+      "workspaceSHA256": "aa02cb3183eeb213cfeec4303659c99488715ac02ae2cc24866979229f0a8ca5",
+      "byteEqual": true
+    },
+    {
+      "path": "Tests/verify-list-corners.sh",
+      "zipSHA256": "01c93c0d09bc9d88de504cde2bd987be92dc27547d81dfb509b50d3002e77681",
+      "workspaceSHA256": "01c93c0d09bc9d88de504cde2bd987be92dc27547d81dfb509b50d3002e77681",
+      "byteEqual": true
+    },
+    {
+      "path": "control",
+      "zipSHA256": "89fd1fde13a66f7fcda97375129dd9e1aab35848cc96967bc70598801a449d71",
+      "workspaceSHA256": "89fd1fde13a66f7fcda97375129dd9e1aab35848cc96967bc70598801a449d71",
+      "byteEqual": true
+    },
+    {
+      "path": "docs/session-groups.md",
+      "zipSHA256": "e75f7363464f89044cf07b3ddcbc081e918ee56cae968647a8018676e04e6729",
+      "workspaceSHA256": "e75f7363464f89044cf07b3ddcbc081e918ee56cae968647a8018676e04e6729",
+      "byteEqual": true
+    },
+    {
+      "path": "Tests/FoldedEntryVisualTests.h",
+      "zipSHA256": "014d4ec109d9b6749ae49343494336612664cd7451b348dfce832ac1bcd4d0e1",
+      "workspaceSHA256": "014d4ec109d9b6749ae49343494336612664cd7451b348dfce832ac1bcd4d0e1",
+      "byteEqual": true
+    },
+    {
+      "path": "Tests/FoldedCardIntegrationTests.h",
+      "zipSHA256": "1d97b32ba783872d5d458280bce8c5e7acf6f0d7fd168cb6cd2938239e801449",
+      "workspaceSHA256": "1d97b32ba783872d5d458280bce8c5e7acf6f0d7fd168cb6cd2938239e801449",
+      "byteEqual": true
+    }
+  ],
+  "allEqual": true
+}

@@ -1,0 +1,414 @@
+--- before/Controllers/CSCloseFriendSessionPresentation.m
++++ after/Controllers/CSCloseFriendSessionPresentation.m
+@@ -3,12 +3,17 @@
+ #import "CSCloseFriendBridge.h"
+ #import "CSListCornerPageContext.h"
+ #import <objc/runtime.h>
++#import <objc/message.h>
+ #import <math.h>
+ 
+ @interface CSCloseFriendSessionCover : UIView
+ @property(nonatomic,strong) CSGroupRow *row;
+ @property(nonatomic,strong) UILabel *titleLabel;
+ @property(nonatomic,strong) UILabel *summaryLabel;
++@property(nonatomic,weak) UILabel *nativeMessage;
++@property(nonatomic,strong) UIView *nativePrefix;
++@property(nonatomic,copy) NSString *writtenMessage;
++@property(nonatomic) CGRect messageBaseFrame;
+ @property(nonatomic,strong) NSMapTable<UIView *,NSNumber *> *hiddenStates;
+ @property(nonatomic,strong) id originalAccessibilityElements;
+ @property(nonatomic,copy) NSString *originalAccessibilityLabel;
+@@ -38,8 +43,8 @@
+ static void CSFoldedConcealItem(CSCloseFriendSessionCover *cover, UIView *container, UIView *icon,UIView *title) {
+     for (UIView *child in container.subviews) {
+         if (child==cover) continue;
+-        if (child==icon || child==title) { CSFoldedKeepView(cover,child);continue; }
+-        if ([icon isDescendantOfView:child] || [title isDescendantOfView:child]) {
++        if (child==icon || child==title || child==cover.nativeMessage || child==cover.nativePrefix) { CSFoldedKeepView(cover,child);continue; }
++        if ([icon isDescendantOfView:child] || [title isDescendantOfView:child] || [cover.nativeMessage isDescendantOfView:child] || [cover.nativePrefix isDescendantOfView:child]) {
+             CSFoldedKeepView(cover,child);CSFoldedConcealItem(cover,child,icon,title);
+         }
+         else CSFoldedHideView(cover,child);
+@@ -62,6 +67,49 @@
+     label.lineBreakMode=summary ? NSLineBreakByTruncatingTail : NSLineBreakByClipping;
+     label.adjustsFontSizeToFitWidth=NO;label.minimumScaleFactor=1;
+ }
++static UIView *CSFoldedNativePrefix(UIView *item) {
++    for (UIView *child in item.subviews) if (child.tag==10001001) return child;
++    return nil;
++}
++static void CSFoldedReleaseNativeSummary(CSCloseFriendSessionCover *cover) {
++    // Never restore a saved global digest. On ordinary reuse, preserve a fresh
++    // native update; clear only our still-owned pair and geometry.
++    if (cover.nativePrefix.superview && [cover.nativeMessage.text isEqual:cover.writtenMessage]) {
++        cover.nativeMessage.text=nil;cover.nativeMessage.frame=cover.messageBaseFrame;
++    }
++    [cover.nativePrefix removeFromSuperview];
++    cover.nativePrefix=nil;cover.nativeMessage=nil;cover.writtenMessage=nil;
++}
++static BOOL CSFoldedRenderNativeSummary(CSCloseFriendSessionCover *cover,UIView *item,UILabel *message,NSString *body,NSString *prefix) {
++    SEL quote=NSSelectorFromString(@"quoteMessageLable:prefixText:"),remove=NSSelectorFromString(@"removeQuoteMessageLabel");
++    NSMethodSignature *sig=[item methodSignatureForSelector:quote],*removeSig=[item methodSignatureForSelector:remove];
++    if (!message || !body.length || !prefix.length || !sig || sig.numberOfArguments!=4 || strcmp(sig.methodReturnType,@encode(void)) ||
++        [sig getArgumentTypeAtIndex:2][0]!='@' || [sig getArgumentTypeAtIndex:3][0]!='@' ||
++        !removeSig || removeSig.numberOfArguments!=2 || strcmp(removeSig.methodReturnType,@encode(void))) return NO;
++    @try {
++        UIView *previous=CSFoldedNativePrefix(item);
++        CGRect base=message.frame;
++        // A native or our prior quote has already moved the message to the
++        // right. Its prefix carries the real unquoted origin. Never quote an
++        // already-quoted origin and accumulate indentation on repeated layout.
++        if (previous) base.origin.x=previous.frame.origin.x;
++        if (message==cover.nativeMessage && previous==cover.nativePrefix) base.origin.x=cover.messageBaseFrame.origin.x;
++        if (!isfinite(base.origin.x) || !isfinite(base.origin.y) || base.size.height<=0) return NO;
++        if (cover.nativeMessage!=message) CSFoldedReleaseNativeSummary(cover);
++        ((void(*)(id,SEL))objc_msgSend)(item,remove);
++        message.frame=base;message.text=body;
++        ((void(*)(id,SEL,id,id))objc_msgSend)(item,quote,message,prefix);
++        UIView *created=CSFoldedNativePrefix(item);
++        if (!created || ![created isKindOfClass:UILabel.class] || ![((UILabel *)created).text isEqual:prefix]) {
++            message.text=nil;[created removeFromSuperview];return NO;
++        }
++        cover.nativeMessage=message;cover.nativePrefix=created;cover.messageBaseFrame=base;cover.writtenMessage=[message.text copy];
++        CSFoldedKeepView(cover,message);message.hidden=NO;created.hidden=NO;
++        return YES;
++    } @catch (__unused NSException *exception) {
++        message.text=nil;CSFoldedReleaseNativeSummary(cover);return NO;
++    }
++}
+ void CSCloseFriendUpdateSessionCover(UITableViewCell *cell, CSGroupRow *row) {
+     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+     BOOL privacyCover=row.privacyMasked && row.kind==CSGroupRowKindAggregate && [row.userName isEqual:@"chatroom_session_box"] && (policy.blocked ||
+@@ -70,6 +118,7 @@
+     CSCloseFriendSessionCover *view=objc_getAssociatedObject(cell,&CoverKey);
+     if (!cover) {
+         if (!view) return;
++        CSFoldedReleaseNativeSummary(view);
+         CSFoldedRestoreHiddenViews(view);
+         cell.isAccessibilityElement=view.originalAccessibilityElement;
+         cell.accessibilityElements=view.originalAccessibilityElements;
+@@ -98,9 +147,7 @@
+         ![policy hidesUserName:row.foldedEntrySummaryUserName surface:CSCloseFriendSurfaceSession];
+     NSString *title=@"折叠的聊天";
+     view.titleLabel.text=title;view.accessibilityLabel=title;
+-    view.summaryLabel.text=currentSummary && row.foldedEntrySummary.length ? row.foldedEntrySummary : @"折叠的聊天";
+-    if (row.foldedEntryScoped && row.foldedEntrySummary.length)
+-        CSGroupLogFoldedDigest(@"display",currentSummary ? @"ok" : @"policy_stale",row.foldedEntryTabID,row.foldedEntryCount.unsignedIntegerValue);
++    view.summaryLabel.text=@"折叠的聊天";
+ 
+     // Keep native content inside the shared card. Even an unknown native view
+     // structure must not replace the configured card with a full-width slab.
+@@ -121,6 +168,12 @@
+         [view removeFromSuperview]; [container addSubview:view];
+     }
+     view.frame=container.bounds;
++    BOOL rendered=currentSummary && nativeLayout && [message isKindOfClass:UILabel.class] &&
++        CSFoldedRenderNativeSummary(view,item,(UILabel *)message,row.foldedEntrySummary,row.foldedEntryPrefix);
++    if (!rendered) CSFoldedReleaseNativeSummary(view);
++    view.summaryLabel.hidden=rendered;
++    if (row.foldedEntryScoped) CSGroupLogFoldedDigest(@"display",rendered ? @"ok" : !currentSummary ? @"policy_stale" : @"native_pair_unavailable",
++        row.foldedEntryTabID,row.foldedEntryCount.unsignedIntegerValue,rendered ? row.foldedEntrySummarySource : @"neutral");
+     CGFloat x=18;
+     if (nativeLayout) {
+         CGRect nameFrame=[name convertRect:name.bounds toView:container];
+--- before/Controllers/CSGroupListAdapter.m
++++ after/Controllers/CSGroupListAdapter.m
+@@ -649,6 +649,7 @@
+         // Diagnostics inspect the same filtered child snapshot used for count
+         // and digest. They neither change membership nor gate publication.
+         NSUInteger count=[foldedProjection sessionCountForTabID:selected];
++        NSString *source=@"neutral";
+         NSString *reason=stale ? @"policy_stale" : !foldedProjection ? @"sessions_nil" : @"no_visible";
+         if (!stale && count) {
+             CSGroupRow *latest=nil;
+@@ -656,9 +657,9 @@
+                 if (child.kind!=CSGroupRowKindSession) continue;
+                 if (!latest || child.nativeSortTime.unsignedLongLongValue>latest.nativeSortTime.unsignedLongLongValue) latest=child;
+             }
+-            reason=latest.nativeSummaryReason ?: @"text_empty";
+-        }
+-        CSGroupLogFoldedDigest(@"source",reason,selected,count);
++            reason=latest.nativeSummaryReason ?: @"text_empty";source=latest.nativeSummarySource ?: @"neutral";
++        }
++        CSGroupLogFoldedDigest(@"source",reason,selected,count,source);
+     }
+     CSGroupProjection *projection=sections ? [[CSGroupProjection alloc] initWithSections:sections tabs:tabs selectedTabID:selected
+         filterDuplicates:self.preferences.filterDuplicates accountID:account hiddenUserNames:hidden unmaskedAggregateUserNames:unmasked privacyRevision:policy.revision
+--- before/Controllers/CSGroupNativeBridge.m
++++ after/Controllers/CSGroupNativeBridge.m
+@@ -265,15 +265,17 @@
+     if ([text isKindOfClass:NSAttributedString.class]) text=[text string];
+     return [text isKindOfClass:NSString.class] && [text length] ? [text copy] : nil;
+ }
+-// getGroupName in 8.0.78 only reads these two selectors on m_sessionInfo.
+-// Bind it to these transient values, never a live MMSessionInfo setter (which
+-// can update timestamps). This object and native formatter are not cached.
++// Only the selectors read by 8.0.78 makeTextForQuoteMessage. Brand/favorite
++// state stays neutral; this is not a live session and is never put in a manager.
+ @interface CSFoldedDigestSessionInfo : NSObject
+ @property(nonatomic,strong) id m_contact, m_msgWrap;
++@property(nonatomic,copy) NSString *m_nsUserName, *m_nsBrandNotifyPrefixName;
++@property(nonatomic) unsigned int m_uBrandNotifyType, m_uUnReadCount;
++@property(nonatomic) BOOL m_bBrandNotifyNoPrefixName;
+ @end
+ @implementation CSFoldedDigestSessionInfo @end
+ 
+-static NSString *FoldedFormatMessage(id session,id message,NSString *name,NSString **reason) {
++static NSString *FoldedFormatMessage(id message,NSString *name,NSString **prefix,NSString **reason) {
+     Class cls=NSClassFromString(@"MainFrameCellData");
+     SEL digest=NSSelectorFromString(@"digestForMsg:withSender:");
+     NSMethodSignature *sig=Signature(cls,digest,4);
+@@ -285,66 +287,79 @@
+         *reason=@"message_uncopyable";return nil;
+     }
+     id copy=[message copy];
+-    if (!copy || copy==message || FoldedMessageID(copy)!=FoldedMessageID(message)) { *reason=@"copy_invalid";return nil; }
+-    // Native copyToMsg: copies these mutable items and rebinds their wrap to
+-    // the copy. Refuse an unexpected alias before ChangeForDisplay/formatting.
++    if (!copy || copy==message || FoldedMessageID(copy)!=FoldedMessageID(message) || ![CSGroupReadObject(copy,@"GetChatName") isEqual:name]) {
++        *reason=@"copy_invalid";return nil;
++    }
+     for (NSString *key in @[@"m_extendInfoWithMsgType",@"m_extendInfoWithFromUsr",@"m_extendInfoWithMsgTypeForBiz",@"referHostMsg"]) {
+         id item=CSGroupReadObject(message,key);
+         if (item && CSGroupReadObject(copy,key)==item) { *reason=@"copy_alias";return nil; }
+     }
+     SEL change=NSSelectorFromString(@"ChangeForDisplay");sig=Signature(copy,change,2);
+     if (!sig || strcmp(sig.methodReturnType,@encode(void))) { *reason=@"formatter_unavailable";return nil; }
+-    // The native digest is not a pure getter: it parses/modifies its argument.
+-    // All such work is restricted to the detached CMessageWrap, including sender
+-    // extraction for raw group messages. Never call getCellData:/makeTextSession:.
++    // Native formatting parses/mutates its argument: only give it an independent
++    // copy. Aggregate uses an empty sender; the conversation name is a separate
++    // native prefix, not the group sender prefix returned by getGroupName.
+     ((void(*)(id,SEL))objc_msgSend)(copy,change);
+-    NSString *sender=@"";
+-    if ([name hasSuffix:@"@chatroom"]) {
+-        id contact=CSGroupReadObject(session,@"m_contact");
+-        if (!contact) { *reason=@"contact_missing";return nil; }
+-        id formatter=[[cls alloc] init];
+-        SEL setter=NSSelectorFromString(@"setM_sessionInfo:");sig=Signature(formatter,setter,3);
+-        if (!sig || strcmp(sig.methodReturnType,@encode(void)) || !ObjectType([sig getArgumentTypeAtIndex:2])) { *reason=@"formatter_unavailable";return nil; }
+-        CSFoldedDigestSessionInfo *snapshot=[CSFoldedDigestSessionInfo new];snapshot.m_contact=contact;snapshot.m_msgWrap=copy;
+-        ((void(*)(id,SEL,id))objc_msgSend)(formatter,setter,snapshot);
+-        id prefix=CSGroupReadObject(formatter,@"getGroupName");
+-        if (![prefix isKindOfClass:NSString.class]) { *reason=@"sender_unavailable";return nil; }
+-        sender=prefix;
+-    }
+-    NSString *text=FoldedSummaryText(((id(*)(id,SEL,id,id))objc_msgSend)(cls,digest,copy,sender));
+-    if (!text.length) *reason=@"text_empty";
++    if (![CSGroupReadObject(copy,@"GetChatName") isEqual:name]) { *reason=@"chat_mismatch";return nil; }
++    NSString *text=FoldedSummaryText(((id(*)(id,SEL,id,id))objc_msgSend)(cls,digest,copy,@""));
++    if (!text.length) { *reason=@"text_empty";return nil; }
++    // Native holder/aggregate plain-text processing, without makeTextSession:
++    // (which can clear exclusive red-packet counts on the real account).
++    Class parser=NSClassFromString(@"LinkAnchorParser");SEL strip=NSSelectorFromString(@"stringByStrippingHref:");
++    sig=Signature(parser,strip,3);
++    if (sig && ObjectType(sig.methodReturnType) && ObjectType([sig getArgumentTypeAtIndex:2]))
++        text=FoldedSummaryText(((id(*)(id,SEL,id))objc_msgSend)(parser,strip,text));
++    id formatter=[[cls alloc] init];
++    SEL setter=NSSelectorFromString(@"setM_sessionInfo:"),make=NSSelectorFromString(@"makeTextForQuoteMessage");
++    sig=Signature(formatter,setter,3);NSMethodSignature *makeSig=Signature(formatter,make,2);
++    if (!sig || strcmp(sig.methodReturnType,@encode(void)) || !ObjectType([sig getArgumentTypeAtIndex:2]) ||
++        !makeSig || strcmp(makeSig.methodReturnType,@encode(void))) { *reason=@"prefix_unavailable";return nil; }
++    CSFoldedDigestSessionInfo *snapshot=[CSFoldedDigestSessionInfo new];
++    snapshot.m_nsUserName=@"chatroom_session_box";snapshot.m_msgWrap=copy;
++    ((void(*)(id,SEL,id))objc_msgSend)(formatter,setter,snapshot);
++    ((void(*)(id,SEL))objc_msgSend)(formatter,make);
++    *prefix=FoldedSummaryText(CSGroupReadObject(formatter,@"m_prefixTextForQuoteMessage"));
++    if (!(*prefix).length) { *reason=@"prefix_empty";return nil; }
+     return text;
+ }
+-static NSString *FoldedNativeSummary(id manager,id session,NSString *name,NSString **reason) {
+-    *reason=@"cell_missing";
++static NSString *FoldedNativeSummary(id manager,id session,NSString *name,NSString **prefix,NSString **reason,NSString **source) {
++    *reason=@"cell_missing";*source=@"neutral";*prefix=nil;
+     @try {
+         id message=CSGroupReadObject(session,@"m_msgWrap");
+         if (!message) { *reason=@"message_missing";return nil; }
++        if (![CSGroupReadObject(message,@"GetChatName") isEqual:name]) { *reason=@"chat_mismatch";return nil; }
+         unsigned long long messageID=FoldedMessageID(message);
+         SEL selector=NSSelectorFromString(@"getCellDataByUsrName:");NSMethodSignature *sig=Signature(manager,selector,3);
+         id data=nil;
+         if (sig && ObjectType(sig.methodReturnType) && ObjectType([sig getArgumentTypeAtIndex:2]))
+-            data=((id(*)(id,SEL,id))objc_msgSend)(manager,selector,name);
++            data=((id(*)(id,SEL,id))objc_msgSend)(manager,selector,@"chatroom_session_box");
+         NSString *text=nil;
+         if (data) {
+-            if (CSGroupReadObject(data,@"m_sessionInfo")!=session) *reason=@"session_mismatch";
+-            else if (!messageID || FoldedMessageID(data)!=messageID) *reason=@"msg_mismatch";
+-            else { text=FoldedSummaryText(CSGroupReadObject(data,@"m_textForMessageLabel"));*reason=text ? @"ok_cache" : @"text_empty"; }
++            id entry=CSGroupReadObject(data,@"m_sessionInfo"),entryMessage=CSGroupReadObject(entry,@"m_msgWrap");
++            if (![CSGroupReadObject(entry,@"m_nsUserName") isEqual:@"chatroom_session_box"]) *reason=@"session_mismatch";
++            else if (!messageID || FoldedMessageID(data)!=messageID || FoldedMessageID(entryMessage)!=messageID ||
++                ![CSGroupReadObject(entryMessage,@"GetChatName") isEqual:name]) *reason=@"msg_mismatch";
++            else {
++                text=FoldedSummaryText(CSGroupReadObject(data,@"m_textForMessageLabel"));
++                *prefix=FoldedSummaryText(CSGroupReadObject(data,@"m_prefixTextForQuoteMessage"));
++                *reason=!text ? @"text_empty" : !(*prefix).length ? @"prefix_empty" : @"ok_cache";
++                if (!(*prefix).length || CSGroupReadObject(entry,@"m_msgWrap")!=entryMessage || FoldedMessageID(data)!=messageID) text=nil;
++                if (text) *source=@"entry_cache";
++            }
+         }
+         if (!text) {
+-            NSString *cacheReason=*reason;
+-            text=FoldedFormatMessage(session,message,name,reason);
+-            if (text) *reason=[@"ok_copy_" stringByAppendingString:cacheReason];
++            NSString *cacheReason=*reason;*prefix=nil;
++            text=FoldedFormatMessage(message,name,prefix,reason);
++            if (text) { *reason=[@"ok_copy_" stringByAppendingString:cacheReason];*source=@"native_formatter"; }
+             else *reason=[NSString stringWithFormat:@"%@/%@",cacheReason,*reason];
+         }
+-        // Reentrant cache/formatter calls must preserve message identity. A
+-        // time-only change is not an identity failure and cannot suppress text.
+         if (CSGroupReadObject(session,@"m_msgWrap")!=message || FoldedMessageID(message)!=messageID ||
+-            ![CSGroupReadObject(session,@"m_nsUserName") isEqual:name]) {
+-            *reason=@"source_changed";return nil;
+-        }
++            ![CSGroupReadObject(message,@"GetChatName") isEqual:name] || ![CSGroupReadObject(session,@"m_nsUserName") isEqual:name]) {
++            *reason=@"source_changed";text=nil;
++        }
++        if (!text) { *prefix=nil;*source=@"neutral"; }
+         return text;
+-    } @catch (__unused NSException *exception) { *reason=@"native_exception";return nil; }
++    } @catch (__unused NSException *exception) { *reason=@"native_exception";*prefix=nil;*source=@"neutral";return nil; }
+ }
+ NSArray<CSGroupRow *> *CSGroupCopyFoldedRows(void) {
+     NSArray *sessions=CopyFoldedSessions(); if (!sessions) return nil;
+@@ -357,15 +372,15 @@
+         if (![name isKindOfClass:NSString.class] || ![name length] || [names containsObject:name] || [name isEqual:@"chatroom_session_box"]) return nil;
+         [names addObject:name];
+         NSUInteger indexes[]={0,rows.count};
+-        NSString *reason=nil;
+-        NSString *summary=FoldedNativeSummary(dataManager,session,name,&reason);
++        NSString *reason=nil,*prefix=nil,*source=nil;
++        NSString *summary=FoldedNativeSummary(dataManager,session,name,&prefix,&reason,&source);
+         NSNumber *time=FoldedSortTime(session);
+         [rows addObject:[[CSGroupRow alloc] initWithNativePath:[NSIndexPath indexPathWithIndexes:indexes length:2]
+             userName:name kind:CSGroupRowKindSession category:CategoryForSession(session,name,NO)
+             top:CSGroupReadInteger(session,@"m_bIsTop",0)!=0
+             unreadCount:(NSUInteger)MAX(0,CSGroupReadInteger(session,@"m_uUnReadCount",0))
+             redDot:CSGroupReadInteger(session,@"m_bShowUnReadAsRedDot",0)!=0
+-            nativeSummary:summary sortTime:time summaryReason:reason]];
++            nativeSummary:summary sortTime:time summaryReason:reason nativePrefix:prefix summarySource:source]];
+     }
+     return [rows copy];
+ }
+--- before/Controllers/CSGroupProjection.h
++++ after/Controllers/CSGroupProjection.h
+@@ -2,9 +2,9 @@
+ 
+ NS_ASSUME_NONNULL_BEGIN
+ @class WESessionTabItem;
+-/// Bounded diagnostic only: once per stage/reason/tab, at most 32 records/process.
++/// Bounded diagnostic only: once per stage/reason/tab/source, at most 32 records/process.
+ /// Never logs message text, account IDs or session usernames, and never writes storage.
+-FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, NSString * _Nullable tabID, NSUInteger count);
++FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, NSString * _Nullable tabID, NSUInteger count, NSString * _Nullable source);
+ 
+ typedef NS_ENUM(NSUInteger, CSGroupRowKind) {
+     CSGroupRowKindSession,
+@@ -33,6 +33,8 @@
+ @property (nonatomic, readonly) BOOL privacyMasked;
+ /// Copied native folded-session digest; no native models retained.
+ @property (nonatomic, copy, readonly, nullable) NSString *nativeSummary;
++/// Native aggregate name prefix, kept separate for the native two-label renderer.
++@property (nonatomic, copy, readonly, nullable) NSString *nativePrefix, *nativeSummarySource;
+ /// Optional ordering metadata only. A missing value cannot invalidate a digest
+ /// and never controls a visible time/date label on the folded entry.
+ @property (nonatomic, copy, readonly, nullable) NSNumber *nativeSortTime;
+@@ -44,6 +46,7 @@
+ @property (nonatomic, copy, readonly, nullable) NSString *foldedEntryTabID;
+ @property (nonatomic, readonly) NSUInteger foldedEntryPrivacyRevision;
+ @property (nonatomic, copy, readonly, nullable) NSString *foldedEntrySummary;
++@property (nonatomic, copy, readonly, nullable) NSString *foldedEntryPrefix, *foldedEntrySummarySource;
+ @property (nonatomic, copy, readonly, nullable) NSString *foldedEntrySummaryUserName;
+ - (instancetype)initWithNativePath:(NSIndexPath *)nativePath
+                          userName:(nullable NSString *)userName
+@@ -65,7 +68,13 @@
+                              kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
+                               top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
+                     nativeSummary:(nullable NSString *)nativeSummary sortTime:(nullable NSNumber *)sortTime
+-                    summaryReason:(nullable NSString *)summaryReason NS_DESIGNATED_INITIALIZER;
++                    summaryReason:(nullable NSString *)summaryReason;
++- (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(nullable NSString *)userName
++                             kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
++                              top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
++                    nativeSummary:(nullable NSString *)nativeSummary sortTime:(nullable NSNumber *)sortTime
++                    summaryReason:(nullable NSString *)summaryReason nativePrefix:(nullable NSString *)nativePrefix
++                    summarySource:(nullable NSString *)summarySource NS_DESIGNATED_INITIALIZER;
+ - (instancetype)init NS_UNAVAILABLE;
+ @end
+ 
+--- before/Controllers/CSGroupProjection.m
++++ after/Controllers/CSGroupProjection.m
+@@ -1,15 +1,15 @@
+ #import "CSGroupProjection.h"
+ #import "WESessionTabItem.h"
+ 
+-void CSGroupLogFoldedDigest(NSString *stage,NSString *reason,NSString *tabID,NSUInteger count) {
++void CSGroupLogFoldedDigest(NSString *stage,NSString *reason,NSString *tabID,NSUInteger count,NSString *source) {
+     static NSMutableSet *seen;
+     @synchronized (CSGroupRow.class) {
+         if (!seen) seen=[NSMutableSet set];
+-        NSString *key=[NSString stringWithFormat:@"%@|%@|%@",stage,reason,tabID ?: @"unknown"];
++        NSString *key=[NSString stringWithFormat:@"%@|%@|%@|%@",stage,reason,tabID ?: @"unknown",source ?: @"neutral"];
+         if (seen.count>=32 || [seen containsObject:key]) return;
+         [seen addObject:key];
+     }
+-    NSLog(@"[WeChatImprove][FoldedDigest] stage=%@ reason=%@ tab=%@ count=%lu",stage,reason,tabID ?: @"unknown",(unsigned long)count);
++    NSLog(@"[WeChatImprove][FoldedDigest] stage=%@ reason=%@ tab=%@ count=%lu source=%@",stage,reason,tabID ?: @"unknown",(unsigned long)count,source ?: @"neutral");
+ }
+ 
+ @interface CSGroupRow ()
+@@ -19,7 +19,7 @@
+ @property (nonatomic, copy, readwrite) NSString *foldedEntryAccountID;
+ @property (nonatomic, copy, readwrite) NSString *foldedEntryTabID;
+ @property (nonatomic, readwrite) NSUInteger foldedEntryPrivacyRevision;
+-@property (nonatomic, copy, readwrite) NSString *foldedEntrySummary, *foldedEntrySummaryUserName;
++@property (nonatomic, copy, readwrite) NSString *foldedEntrySummary, *foldedEntrySummaryUserName, *foldedEntryPrefix, *foldedEntrySummarySource;
+ @end
+ @implementation CSGroupRow
+ - (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(NSString *)userName
+@@ -39,7 +39,16 @@
+                              kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
+                               top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
+                     nativeSummary:(NSString *)nativeSummary sortTime:(NSNumber *)sortTime summaryReason:(NSString *)summaryReason {
++    return [self initWithNativePath:nativePath userName:userName kind:kind category:category top:top unreadCount:unreadCount
++        redDot:redDot nativeSummary:nativeSummary sortTime:sortTime summaryReason:summaryReason nativePrefix:nil summarySource:nil];
++}
++- (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(NSString *)userName
++                             kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
++                              top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
++                    nativeSummary:(NSString *)nativeSummary sortTime:(NSNumber *)sortTime summaryReason:(NSString *)summaryReason
++                     nativePrefix:(NSString *)nativePrefix summarySource:(NSString *)summarySource {
+     if ((self = [super init])) {
++        _nativePrefix=[nativePrefix copy];_nativeSummarySource=[summarySource copy];
+         _nativePath = [nativePath copy]; _userName = [userName copy]; _kind = kind;
+         _category = category; _top = top; _unreadCount = unreadCount; _redDot = redDot;
+         _nativeSummary=[nativeSummary isKindOfClass:NSString.class] && nativeSummary.length ? [nativeSummary copy] : nil;
+@@ -95,6 +104,8 @@
+     return a && b && [a.nativePath isEqual:b.nativePath] &&
+         (a.userName==b.userName || [a.userName isEqual:b.userName]) &&
+         a.kind==b.kind && a.category==b.category && a.top==b.top && a.privacyMasked==b.privacyMasked &&
++        CSGroupValueEqual(a.nativePrefix,b.nativePrefix) && CSGroupValueEqual(a.nativeSummarySource,b.nativeSummarySource) &&
++        CSGroupValueEqual(a.foldedEntryPrefix,b.foldedEntryPrefix) && CSGroupValueEqual(a.foldedEntrySummarySource,b.foldedEntrySummarySource) &&
+         CSGroupValueEqual(a.nativeSummary,b.nativeSummary) && CSGroupValueEqual(a.nativeSortTime,b.nativeSortTime) &&
+         CSGroupValueEqual(a.foldedEntrySummary,b.foldedEntrySummary) && CSGroupValueEqual(a.foldedEntrySummaryUserName,b.foldedEntrySummaryUserName) &&
+         a.foldedEntryScoped==b.foldedEntryScoped && (a.foldedEntryCount==b.foldedEntryCount || [a.foldedEntryCount isEqual:b.foldedEntryCount]) &&
+@@ -260,7 +271,7 @@
+                 }
+                 // Base rows are immutable; materialize subclasses so mutable host values cannot leak.
+                 CSGroupRow *value = [row isMemberOfClass:CSGroupRow.class] ? row : [[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName
+-                    kind:row.kind category:row.category top:row.top unreadCount:row.unreadCount redDot:row.redDot nativeSummary:row.nativeSummary sortTime:row.nativeSortTime summaryReason:row.nativeSummaryReason];
++                    kind:row.kind category:row.category top:row.top unreadCount:row.unreadCount redDot:row.redDot nativeSummary:row.nativeSummary sortTime:row.nativeSortTime summaryReason:row.nativeSummaryReason nativePrefix:row.nativePrefix summarySource:row.nativeSummarySource];
+                 [copiedRows addObject:value];
+             }
+             [copiedSections addObject:[copiedRows copy]];
+@@ -306,6 +317,7 @@
+                     row=[[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName kind:row.kind category:row.category top:row.top unreadCount:0 redDot:NO];
+                     row.privacyMasked=masked;row.foldedEntryScoped=YES;row.foldedEntryCount=_foldedCounts[selectedTabID];
+                     row.foldedEntryAccountID=accountID;row.foldedEntryPrivacyRevision=privacyRevision;row.foldedEntryTabID=selectedTabID;
++                    row.foldedEntryPrefix=_foldedSummaryRow.nativePrefix;row.foldedEntrySummarySource=_foldedSummaryRow.nativeSummarySource;
+                     row.foldedEntrySummary=_foldedSummaryRow.nativeSummary;row.foldedEntrySummaryUserName=_foldedSummaryRow.userName;
+                 } else if (retained) {
+                     retainedCount = CSGroupSaturatedAdd(retainedCount, CSGroupNumericUnread(row));

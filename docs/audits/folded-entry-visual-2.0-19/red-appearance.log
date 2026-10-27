@@ -1,0 +1,16 @@
+FAIL: disabled session appearance matches viewport background and preserves hidden scroll indicator
+FAIL: empty, short-with-folded and long session viewports are white through the bottom, with corners on/off
+FAIL: native layout updates replaced viewport and dark theme even with zero cells
+FAIL: empty, short-with-folded and long session viewports are white through the bottom, with corners on/off
+FAIL: native layout updates replaced viewport and dark theme even with zero cells
+FAIL: empty, short-with-folded and long session viewports are white through the bottom, with corners on/off
+FAIL: native layout updates replaced viewport and dark theme even with zero cells
+FAIL: empty, short-with-folded and long session viewports are white through the bottom, with corners on/off
+FAIL: native layout updates replaced viewport and dark theme even with zero cells
+FAIL: empty, short-with-folded and long session viewports are white through the bottom, with corners on/off
+FAIL: ordinary/folded final card paint matches exposed viewport below the short list
+FAIL: native layout updates replaced viewport and dark theme even with zero cells
+FAIL: empty, short-with-folded and long session viewports are white through the bottom, with corners on/off
+FAIL: ordinary/folded final card paint matches exposed viewport below the short list
+FAIL: native layout updates replaced viewport and dark theme even with zero cells
+List corners: 901 checks, 15 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)

@@ -1,0 +1,1058 @@
+--- 2.0-23b/Controllers/CSCloseFriendSessionPresentation.m
++++ 2.0-24/Controllers/CSCloseFriendSessionPresentation.m
+@@ -3,12 +3,17 @@
+ #import "CSCloseFriendBridge.h"
+ #import "CSListCornerPageContext.h"
+ #import <objc/runtime.h>
++#import <objc/message.h>
+ #import <math.h>
+ 
+ @interface CSCloseFriendSessionCover : UIView
+ @property(nonatomic,strong) CSGroupRow *row;
+ @property(nonatomic,strong) UILabel *titleLabel;
+ @property(nonatomic,strong) UILabel *summaryLabel;
++@property(nonatomic,weak) UILabel *nativeMessage;
++@property(nonatomic,strong) UIView *nativePrefix;
++@property(nonatomic,copy) NSString *writtenMessage;
++@property(nonatomic) CGRect messageBaseFrame;
+ @property(nonatomic,strong) NSMapTable<UIView *,NSNumber *> *hiddenStates;
+ @property(nonatomic,strong) id originalAccessibilityElements;
+ @property(nonatomic,copy) NSString *originalAccessibilityLabel;
+@@ -38,8 +43,8 @@
+ static void CSFoldedConcealItem(CSCloseFriendSessionCover *cover, UIView *container, UIView *icon,UIView *title) {
+     for (UIView *child in container.subviews) {
+         if (child==cover) continue;
+-        if (child==icon || child==title) { CSFoldedKeepView(cover,child);continue; }
+-        if ([icon isDescendantOfView:child] || [title isDescendantOfView:child]) {
++        if (child==icon || child==title || child==cover.nativeMessage || child==cover.nativePrefix) { CSFoldedKeepView(cover,child);continue; }
++        if ([icon isDescendantOfView:child] || [title isDescendantOfView:child] || [cover.nativeMessage isDescendantOfView:child] || [cover.nativePrefix isDescendantOfView:child]) {
+             CSFoldedKeepView(cover,child);CSFoldedConcealItem(cover,child,icon,title);
+         }
+         else CSFoldedHideView(cover,child);
+@@ -62,6 +67,49 @@
+     label.lineBreakMode=summary ? NSLineBreakByTruncatingTail : NSLineBreakByClipping;
+     label.adjustsFontSizeToFitWidth=NO;label.minimumScaleFactor=1;
+ }
++static UIView *CSFoldedNativePrefix(UIView *item) {
++    for (UIView *child in item.subviews) if (child.tag==10001001) return child;
++    return nil;
++}
++static void CSFoldedReleaseNativeSummary(CSCloseFriendSessionCover *cover) {
++    // Never restore a saved global digest. On ordinary reuse, preserve a fresh
++    // native update; clear only our still-owned pair and geometry.
++    if (cover.nativePrefix.superview && [cover.nativeMessage.text isEqual:cover.writtenMessage]) {
++        cover.nativeMessage.text=nil;cover.nativeMessage.frame=cover.messageBaseFrame;
++    }
++    [cover.nativePrefix removeFromSuperview];
++    cover.nativePrefix=nil;cover.nativeMessage=nil;cover.writtenMessage=nil;
++}
++static BOOL CSFoldedRenderNativeSummary(CSCloseFriendSessionCover *cover,UIView *item,UILabel *message,NSString *body,NSString *prefix) {
++    SEL quote=NSSelectorFromString(@"quoteMessageLable:prefixText:"),remove=NSSelectorFromString(@"removeQuoteMessageLabel");
++    NSMethodSignature *sig=[item methodSignatureForSelector:quote],*removeSig=[item methodSignatureForSelector:remove];
++    if (!message || !body.length || !prefix.length || !sig || sig.numberOfArguments!=4 || strcmp(sig.methodReturnType,@encode(void)) ||
++        [sig getArgumentTypeAtIndex:2][0]!='@' || [sig getArgumentTypeAtIndex:3][0]!='@' ||
++        !removeSig || removeSig.numberOfArguments!=2 || strcmp(removeSig.methodReturnType,@encode(void))) return NO;
++    @try {
++        UIView *previous=CSFoldedNativePrefix(item);
++        CGRect base=message.frame;
++        // A native or our prior quote has already moved the message to the
++        // right. Its prefix carries the real unquoted origin. Never quote an
++        // already-quoted origin and accumulate indentation on repeated layout.
++        if (previous) base.origin.x=previous.frame.origin.x;
++        if (message==cover.nativeMessage && previous==cover.nativePrefix) base.origin.x=cover.messageBaseFrame.origin.x;
++        if (!isfinite(base.origin.x) || !isfinite(base.origin.y) || base.size.height<=0) return NO;
++        if (cover.nativeMessage!=message) CSFoldedReleaseNativeSummary(cover);
++        ((void(*)(id,SEL))objc_msgSend)(item,remove);
++        message.frame=base;message.text=body;
++        ((void(*)(id,SEL,id,id))objc_msgSend)(item,quote,message,prefix);
++        UIView *created=CSFoldedNativePrefix(item);
++        if (!created || ![created isKindOfClass:UILabel.class] || ![((UILabel *)created).text isEqual:prefix]) {
++            message.text=nil;[created removeFromSuperview];return NO;
++        }
++        cover.nativeMessage=message;cover.nativePrefix=created;cover.messageBaseFrame=base;cover.writtenMessage=[message.text copy];
++        CSFoldedKeepView(cover,message);message.hidden=NO;created.hidden=NO;
++        return YES;
++    } @catch (__unused NSException *exception) {
++        message.text=nil;CSFoldedReleaseNativeSummary(cover);return NO;
++    }
++}
+ void CSCloseFriendUpdateSessionCover(UITableViewCell *cell, CSGroupRow *row) {
+     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+     BOOL privacyCover=row.privacyMasked && row.kind==CSGroupRowKindAggregate && [row.userName isEqual:@"chatroom_session_box"] && (policy.blocked ||
+@@ -70,6 +118,7 @@
+     CSCloseFriendSessionCover *view=objc_getAssociatedObject(cell,&CoverKey);
+     if (!cover) {
+         if (!view) return;
++        CSFoldedReleaseNativeSummary(view);
+         CSFoldedRestoreHiddenViews(view);
+         cell.isAccessibilityElement=view.originalAccessibilityElement;
+         cell.accessibilityElements=view.originalAccessibilityElements;
+@@ -98,9 +147,7 @@
+         ![policy hidesUserName:row.foldedEntrySummaryUserName surface:CSCloseFriendSurfaceSession];
+     NSString *title=@"折叠的聊天";
+     view.titleLabel.text=title;view.accessibilityLabel=title;
+-    view.summaryLabel.text=currentSummary && row.foldedEntrySummary.length ? row.foldedEntrySummary : @"折叠的聊天";
+-    if (row.foldedEntryScoped && row.foldedEntrySummary.length)
+-        CSGroupLogFoldedDigest(@"display",currentSummary ? @"ok" : @"policy_stale",row.foldedEntryTabID,row.foldedEntryCount.unsignedIntegerValue);
++    view.summaryLabel.text=@"折叠的聊天";
+ 
+     // Keep native content inside the shared card. Even an unknown native view
+     // structure must not replace the configured card with a full-width slab.
+@@ -121,6 +168,17 @@
+         [view removeFromSuperview]; [container addSubview:view];
+     }
+     view.frame=container.bounds;
++    BOOL rendered=currentSummary && nativeLayout && [message isKindOfClass:UILabel.class] &&
++        CSFoldedRenderNativeSummary(view,item,(UILabel *)message,row.foldedEntrySummary,row.foldedEntryPrefix);
++    CSCloseFriendSnapshot *afterRender=CSCloseFriendCurrentSnapshot();
++    if (rendered && (afterRender.blocked || ![afterRender.accountID isEqual:row.foldedEntryAccountID] ||
++        afterRender.revision!=row.foldedEntryPrivacyRevision || [afterRender hidesUserName:row.foldedEntrySummaryUserName surface:CSCloseFriendSurfaceSession])) {
++        rendered=NO;currentSummary=NO;
++    }
++    if (!rendered) CSFoldedReleaseNativeSummary(view);
++    view.summaryLabel.hidden=rendered;
++    if (row.foldedEntryScoped) CSGroupLogFoldedDigest(@"display",rendered ? @"ok" : !currentSummary ? @"policy_stale" : @"native_pair_unavailable",
++        row.foldedEntryTabID,row.foldedEntryCount.unsignedIntegerValue,rendered ? row.foldedEntrySummarySource : @"neutral");
+     CGFloat x=18;
+     if (nativeLayout) {
+         CGRect nameFrame=[name convertRect:name.bounds toView:container];
+--- 2.0-23b/Controllers/CSGroupListAdapter.m
++++ 2.0-24/Controllers/CSGroupListAdapter.m
+@@ -649,6 +649,7 @@
+         // Diagnostics inspect the same filtered child snapshot used for count
+         // and digest. They neither change membership nor gate publication.
+         NSUInteger count=[foldedProjection sessionCountForTabID:selected];
++        NSString *source=@"neutral";
+         NSString *reason=stale ? @"policy_stale" : !foldedProjection ? @"sessions_nil" : @"no_visible";
+         if (!stale && count) {
+             CSGroupRow *latest=nil;
+@@ -656,9 +657,9 @@
+                 if (child.kind!=CSGroupRowKindSession) continue;
+                 if (!latest || child.nativeSortTime.unsignedLongLongValue>latest.nativeSortTime.unsignedLongLongValue) latest=child;
+             }
+-            reason=latest.nativeSummaryReason ?: @"text_empty";
+-        }
+-        CSGroupLogFoldedDigest(@"source",reason,selected,count);
++            reason=latest.nativeSummaryReason ?: @"text_empty";source=latest.nativeSummarySource ?: @"neutral";
++        }
++        CSGroupLogFoldedDigest(@"source",reason,selected,count,source);
+     }
+     CSGroupProjection *projection=sections ? [[CSGroupProjection alloc] initWithSections:sections tabs:tabs selectedTabID:selected
+         filterDuplicates:self.preferences.filterDuplicates accountID:account hiddenUserNames:hidden unmaskedAggregateUserNames:unmasked privacyRevision:policy.revision
+--- 2.0-23b/Controllers/CSGroupNativeBridge.m
++++ 2.0-24/Controllers/CSGroupNativeBridge.m
+@@ -265,15 +265,17 @@
+     if ([text isKindOfClass:NSAttributedString.class]) text=[text string];
+     return [text isKindOfClass:NSString.class] && [text length] ? [text copy] : nil;
+ }
+-// getGroupName in 8.0.78 only reads these two selectors on m_sessionInfo.
+-// Bind it to these transient values, never a live MMSessionInfo setter (which
+-// can update timestamps). This object and native formatter are not cached.
++// Only the selectors read by 8.0.78 makeTextForQuoteMessage. Brand/favorite
++// state stays neutral; this is not a live session and is never put in a manager.
+ @interface CSFoldedDigestSessionInfo : NSObject
+ @property(nonatomic,strong) id m_contact, m_msgWrap;
++@property(nonatomic,copy) NSString *m_nsUserName, *m_nsBrandNotifyPrefixName;
++@property(nonatomic) unsigned int m_uBrandNotifyType, m_uUnReadCount;
++@property(nonatomic) BOOL m_bBrandNotifyNoPrefixName;
+ @end
+ @implementation CSFoldedDigestSessionInfo @end
+ 
+-static NSString *FoldedFormatMessage(id session,id message,NSString *name,NSString **reason) {
++static NSString *FoldedFormatMessage(id message,NSString *name,NSString **prefix,NSString **reason) {
+     Class cls=NSClassFromString(@"MainFrameCellData");
+     SEL digest=NSSelectorFromString(@"digestForMsg:withSender:");
+     NSMethodSignature *sig=Signature(cls,digest,4);
+@@ -285,66 +287,84 @@
+         *reason=@"message_uncopyable";return nil;
+     }
+     id copy=[message copy];
+-    if (!copy || copy==message || FoldedMessageID(copy)!=FoldedMessageID(message)) { *reason=@"copy_invalid";return nil; }
+-    // Native copyToMsg: copies these mutable items and rebinds their wrap to
+-    // the copy. Refuse an unexpected alias before ChangeForDisplay/formatting.
++    if (!copy || copy==message || FoldedMessageID(copy)!=FoldedMessageID(message) || ![CSGroupReadObject(copy,@"GetChatName") isEqual:name]) {
++        *reason=@"copy_invalid";return nil;
++    }
+     for (NSString *key in @[@"m_extendInfoWithMsgType",@"m_extendInfoWithFromUsr",@"m_extendInfoWithMsgTypeForBiz",@"referHostMsg"]) {
+         id item=CSGroupReadObject(message,key);
+         if (item && CSGroupReadObject(copy,key)==item) { *reason=@"copy_alias";return nil; }
+     }
+     SEL change=NSSelectorFromString(@"ChangeForDisplay");sig=Signature(copy,change,2);
+     if (!sig || strcmp(sig.methodReturnType,@encode(void))) { *reason=@"formatter_unavailable";return nil; }
+-    // The native digest is not a pure getter: it parses/modifies its argument.
+-    // All such work is restricted to the detached CMessageWrap, including sender
+-    // extraction for raw group messages. Never call getCellData:/makeTextSession:.
++    // Native formatting parses/mutates its argument: only give it an independent
++    // copy. Aggregate uses an empty sender; the conversation name is a separate
++    // native prefix, not the group sender prefix returned by getGroupName.
+     ((void(*)(id,SEL))objc_msgSend)(copy,change);
+-    NSString *sender=@"";
+-    if ([name hasSuffix:@"@chatroom"]) {
+-        id contact=CSGroupReadObject(session,@"m_contact");
+-        if (!contact) { *reason=@"contact_missing";return nil; }
+-        id formatter=[[cls alloc] init];
+-        SEL setter=NSSelectorFromString(@"setM_sessionInfo:");sig=Signature(formatter,setter,3);
+-        if (!sig || strcmp(sig.methodReturnType,@encode(void)) || !ObjectType([sig getArgumentTypeAtIndex:2])) { *reason=@"formatter_unavailable";return nil; }
+-        CSFoldedDigestSessionInfo *snapshot=[CSFoldedDigestSessionInfo new];snapshot.m_contact=contact;snapshot.m_msgWrap=copy;
+-        ((void(*)(id,SEL,id))objc_msgSend)(formatter,setter,snapshot);
+-        id prefix=CSGroupReadObject(formatter,@"getGroupName");
+-        if (![prefix isKindOfClass:NSString.class]) { *reason=@"sender_unavailable";return nil; }
+-        sender=prefix;
+-    }
+-    NSString *text=FoldedSummaryText(((id(*)(id,SEL,id,id))objc_msgSend)(cls,digest,copy,sender));
+-    if (!text.length) *reason=@"text_empty";
++    if (![CSGroupReadObject(copy,@"GetChatName") isEqual:name]) { *reason=@"chat_mismatch";return nil; }
++    NSString *text=FoldedSummaryText(((id(*)(id,SEL,id,id))objc_msgSend)(cls,digest,copy,@""));
++    if (!text.length) { *reason=@"text_empty";return nil; }
++    // Native holder/aggregate plain-text processing, without makeTextSession:
++    // (which can clear exclusive red-packet counts on the real account).
++    Class parser=NSClassFromString(@"LinkAnchorParser");SEL strip=NSSelectorFromString(@"stringByStrippingHref:");
++    sig=Signature(parser,strip,3);
++    if (sig && ObjectType(sig.methodReturnType) && ObjectType([sig getArgumentTypeAtIndex:2]))
++        text=FoldedSummaryText(((id(*)(id,SEL,id))objc_msgSend)(parser,strip,text));
++    if (!text.length) { *reason=@"text_empty";return nil; }
++    if (![CSGroupReadObject(copy,@"GetChatName") isEqual:name] || FoldedMessageID(copy)!=FoldedMessageID(message)) {
++        *reason=@"copy_changed";return nil;
++    }
++    id formatter=[[cls alloc] init];
++    SEL setter=NSSelectorFromString(@"setM_sessionInfo:"),make=NSSelectorFromString(@"makeTextForQuoteMessage");
++    sig=Signature(formatter,setter,3);NSMethodSignature *makeSig=Signature(formatter,make,2);
++    if (!sig || strcmp(sig.methodReturnType,@encode(void)) || !ObjectType([sig getArgumentTypeAtIndex:2]) ||
++        !makeSig || strcmp(makeSig.methodReturnType,@encode(void))) { *reason=@"prefix_unavailable";return nil; }
++    CSFoldedDigestSessionInfo *snapshot=[CSFoldedDigestSessionInfo new];
++    snapshot.m_nsUserName=@"chatroom_session_box";snapshot.m_msgWrap=copy;
++    ((void(*)(id,SEL,id))objc_msgSend)(formatter,setter,snapshot);
++    ((void(*)(id,SEL))objc_msgSend)(formatter,make);
++    *prefix=FoldedSummaryText(CSGroupReadObject(formatter,@"m_prefixTextForQuoteMessage"));
++    if (!(*prefix).length) { *reason=@"prefix_empty";return nil; }
+     return text;
+ }
+-static NSString *FoldedNativeSummary(id manager,id session,NSString *name,NSString **reason) {
+-    *reason=@"cell_missing";
++static NSString *FoldedNativeSummary(id manager,id session,NSString *name,NSString **prefix,NSString **reason,NSString **source) {
++    *reason=@"cell_missing";*source=@"neutral";*prefix=nil;
+     @try {
+         id message=CSGroupReadObject(session,@"m_msgWrap");
+         if (!message) { *reason=@"message_missing";return nil; }
++        if (![CSGroupReadObject(message,@"GetChatName") isEqual:name]) { *reason=@"chat_mismatch";return nil; }
+         unsigned long long messageID=FoldedMessageID(message);
+         SEL selector=NSSelectorFromString(@"getCellDataByUsrName:");NSMethodSignature *sig=Signature(manager,selector,3);
+         id data=nil;
+         if (sig && ObjectType(sig.methodReturnType) && ObjectType([sig getArgumentTypeAtIndex:2]))
+-            data=((id(*)(id,SEL,id))objc_msgSend)(manager,selector,name);
++            data=((id(*)(id,SEL,id))objc_msgSend)(manager,selector,@"chatroom_session_box");
+         NSString *text=nil;
+         if (data) {
+-            if (CSGroupReadObject(data,@"m_sessionInfo")!=session) *reason=@"session_mismatch";
+-            else if (!messageID || FoldedMessageID(data)!=messageID) *reason=@"msg_mismatch";
+-            else { text=FoldedSummaryText(CSGroupReadObject(data,@"m_textForMessageLabel"));*reason=text ? @"ok_cache" : @"text_empty"; }
++            id entry=CSGroupReadObject(data,@"m_sessionInfo"),entryMessage=CSGroupReadObject(entry,@"m_msgWrap");
++            if (![CSGroupReadObject(entry,@"m_nsUserName") isEqual:@"chatroom_session_box"]) *reason=@"session_mismatch";
++            else if (!messageID || FoldedMessageID(data)!=messageID || FoldedMessageID(entryMessage)!=messageID ||
++                ![CSGroupReadObject(entryMessage,@"GetChatName") isEqual:name]) *reason=@"msg_mismatch";
++            else {
++                text=FoldedSummaryText(CSGroupReadObject(data,@"m_textForMessageLabel"));
++                *prefix=FoldedSummaryText(CSGroupReadObject(data,@"m_prefixTextForQuoteMessage"));
++                *reason=!text ? @"text_empty" : !(*prefix).length ? @"prefix_empty" : @"ok_cache";
++                if (!(*prefix).length || CSGroupReadObject(entry,@"m_msgWrap")!=entryMessage || FoldedMessageID(data)!=messageID ||
++                    FoldedMessageID(entryMessage)!=messageID || ![CSGroupReadObject(entryMessage,@"GetChatName") isEqual:name]) text=nil;
++                if (text) *source=@"entry_cache";
++            }
+         }
+         if (!text) {
+-            NSString *cacheReason=*reason;
+-            text=FoldedFormatMessage(session,message,name,reason);
+-            if (text) *reason=[@"ok_copy_" stringByAppendingString:cacheReason];
++            NSString *cacheReason=*reason;*prefix=nil;
++            text=FoldedFormatMessage(message,name,prefix,reason);
++            if (text) { *reason=[@"ok_copy_" stringByAppendingString:cacheReason];*source=@"native_formatter"; }
+             else *reason=[NSString stringWithFormat:@"%@/%@",cacheReason,*reason];
+         }
+-        // Reentrant cache/formatter calls must preserve message identity. A
+-        // time-only change is not an identity failure and cannot suppress text.
+         if (CSGroupReadObject(session,@"m_msgWrap")!=message || FoldedMessageID(message)!=messageID ||
+-            ![CSGroupReadObject(session,@"m_nsUserName") isEqual:name]) {
+-            *reason=@"source_changed";return nil;
+-        }
++            ![CSGroupReadObject(message,@"GetChatName") isEqual:name] || ![CSGroupReadObject(session,@"m_nsUserName") isEqual:name]) {
++            *reason=@"source_changed";text=nil;
++        }
++        if (!text) { *prefix=nil;*source=@"neutral"; }
+         return text;
+-    } @catch (__unused NSException *exception) { *reason=@"native_exception";return nil; }
++    } @catch (__unused NSException *exception) { *reason=@"native_exception";*prefix=nil;*source=@"neutral";return nil; }
+ }
+ NSArray<CSGroupRow *> *CSGroupCopyFoldedRows(void) {
+     NSArray *sessions=CopyFoldedSessions(); if (!sessions) return nil;
+@@ -357,15 +377,15 @@
+         if (![name isKindOfClass:NSString.class] || ![name length] || [names containsObject:name] || [name isEqual:@"chatroom_session_box"]) return nil;
+         [names addObject:name];
+         NSUInteger indexes[]={0,rows.count};
+-        NSString *reason=nil;
+-        NSString *summary=FoldedNativeSummary(dataManager,session,name,&reason);
++        NSString *reason=nil,*prefix=nil,*source=nil;
++        NSString *summary=FoldedNativeSummary(dataManager,session,name,&prefix,&reason,&source);
+         NSNumber *time=FoldedSortTime(session);
+         [rows addObject:[[CSGroupRow alloc] initWithNativePath:[NSIndexPath indexPathWithIndexes:indexes length:2]
+             userName:name kind:CSGroupRowKindSession category:CategoryForSession(session,name,NO)
+             top:CSGroupReadInteger(session,@"m_bIsTop",0)!=0
+             unreadCount:(NSUInteger)MAX(0,CSGroupReadInteger(session,@"m_uUnReadCount",0))
+             redDot:CSGroupReadInteger(session,@"m_bShowUnReadAsRedDot",0)!=0
+-            nativeSummary:summary sortTime:time summaryReason:reason]];
++            nativeSummary:summary sortTime:time summaryReason:reason nativePrefix:prefix summarySource:source]];
+     }
+     return [rows copy];
+ }
+--- 2.0-23b/Controllers/CSGroupProjection.h
++++ 2.0-24/Controllers/CSGroupProjection.h
+@@ -2,9 +2,9 @@
+ 
+ NS_ASSUME_NONNULL_BEGIN
+ @class WESessionTabItem;
+-/// Bounded diagnostic only: once per stage/reason/tab, at most 32 records/process.
++/// Bounded diagnostic only: once per stage/reason/tab/source, at most 32 records/process.
+ /// Never logs message text, account IDs or session usernames, and never writes storage.
+-FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, NSString * _Nullable tabID, NSUInteger count);
++FOUNDATION_EXPORT void CSGroupLogFoldedDigest(NSString *stage, NSString *reason, NSString * _Nullable tabID, NSUInteger count, NSString * _Nullable source);
+ 
+ typedef NS_ENUM(NSUInteger, CSGroupRowKind) {
+     CSGroupRowKindSession,
+@@ -33,6 +33,8 @@
+ @property (nonatomic, readonly) BOOL privacyMasked;
+ /// Copied native folded-session digest; no native models retained.
+ @property (nonatomic, copy, readonly, nullable) NSString *nativeSummary;
++/// Native aggregate name prefix, kept separate for the native two-label renderer.
++@property (nonatomic, copy, readonly, nullable) NSString *nativePrefix, *nativeSummarySource;
+ /// Optional ordering metadata only. A missing value cannot invalidate a digest
+ /// and never controls a visible time/date label on the folded entry.
+ @property (nonatomic, copy, readonly, nullable) NSNumber *nativeSortTime;
+@@ -44,6 +46,7 @@
+ @property (nonatomic, copy, readonly, nullable) NSString *foldedEntryTabID;
+ @property (nonatomic, readonly) NSUInteger foldedEntryPrivacyRevision;
+ @property (nonatomic, copy, readonly, nullable) NSString *foldedEntrySummary;
++@property (nonatomic, copy, readonly, nullable) NSString *foldedEntryPrefix, *foldedEntrySummarySource;
+ @property (nonatomic, copy, readonly, nullable) NSString *foldedEntrySummaryUserName;
+ - (instancetype)initWithNativePath:(NSIndexPath *)nativePath
+                          userName:(nullable NSString *)userName
+@@ -65,7 +68,13 @@
+                              kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
+                               top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
+                     nativeSummary:(nullable NSString *)nativeSummary sortTime:(nullable NSNumber *)sortTime
+-                    summaryReason:(nullable NSString *)summaryReason NS_DESIGNATED_INITIALIZER;
++                    summaryReason:(nullable NSString *)summaryReason;
++- (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(nullable NSString *)userName
++                             kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
++                              top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
++                    nativeSummary:(nullable NSString *)nativeSummary sortTime:(nullable NSNumber *)sortTime
++                    summaryReason:(nullable NSString *)summaryReason nativePrefix:(nullable NSString *)nativePrefix
++                    summarySource:(nullable NSString *)summarySource NS_DESIGNATED_INITIALIZER;
+ - (instancetype)init NS_UNAVAILABLE;
+ @end
+ 
+--- 2.0-23b/Controllers/CSGroupProjection.m
++++ 2.0-24/Controllers/CSGroupProjection.m
+@@ -1,15 +1,15 @@
+ #import "CSGroupProjection.h"
+ #import "WESessionTabItem.h"
+ 
+-void CSGroupLogFoldedDigest(NSString *stage,NSString *reason,NSString *tabID,NSUInteger count) {
++void CSGroupLogFoldedDigest(NSString *stage,NSString *reason,NSString *tabID,NSUInteger count,NSString *source) {
+     static NSMutableSet *seen;
+     @synchronized (CSGroupRow.class) {
+         if (!seen) seen=[NSMutableSet set];
+-        NSString *key=[NSString stringWithFormat:@"%@|%@|%@",stage,reason,tabID ?: @"unknown"];
++        NSString *key=[NSString stringWithFormat:@"%@|%@|%@|%@",stage,reason,tabID ?: @"unknown",source ?: @"neutral"];
+         if (seen.count>=32 || [seen containsObject:key]) return;
+         [seen addObject:key];
+     }
+-    NSLog(@"[WeChatImprove][FoldedDigest] stage=%@ reason=%@ tab=%@ count=%lu",stage,reason,tabID ?: @"unknown",(unsigned long)count);
++    NSLog(@"[WeChatImprove][FoldedDigest] stage=%@ reason=%@ tab=%@ count=%lu source=%@",stage,reason,tabID ?: @"unknown",(unsigned long)count,source ?: @"neutral");
+ }
+ 
+ @interface CSGroupRow ()
+@@ -19,7 +19,7 @@
+ @property (nonatomic, copy, readwrite) NSString *foldedEntryAccountID;
+ @property (nonatomic, copy, readwrite) NSString *foldedEntryTabID;
+ @property (nonatomic, readwrite) NSUInteger foldedEntryPrivacyRevision;
+-@property (nonatomic, copy, readwrite) NSString *foldedEntrySummary, *foldedEntrySummaryUserName;
++@property (nonatomic, copy, readwrite) NSString *foldedEntrySummary, *foldedEntrySummaryUserName, *foldedEntryPrefix, *foldedEntrySummarySource;
+ @end
+ @implementation CSGroupRow
+ - (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(NSString *)userName
+@@ -39,7 +39,16 @@
+                              kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
+                               top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
+                     nativeSummary:(NSString *)nativeSummary sortTime:(NSNumber *)sortTime summaryReason:(NSString *)summaryReason {
++    return [self initWithNativePath:nativePath userName:userName kind:kind category:category top:top unreadCount:unreadCount
++        redDot:redDot nativeSummary:nativeSummary sortTime:sortTime summaryReason:summaryReason nativePrefix:nil summarySource:nil];
++}
++- (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(NSString *)userName
++                             kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
++                              top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
++                    nativeSummary:(NSString *)nativeSummary sortTime:(NSNumber *)sortTime summaryReason:(NSString *)summaryReason
++                     nativePrefix:(NSString *)nativePrefix summarySource:(NSString *)summarySource {
+     if ((self = [super init])) {
++        _nativePrefix=[nativePrefix copy];_nativeSummarySource=[summarySource copy];
+         _nativePath = [nativePath copy]; _userName = [userName copy]; _kind = kind;
+         _category = category; _top = top; _unreadCount = unreadCount; _redDot = redDot;
+         _nativeSummary=[nativeSummary isKindOfClass:NSString.class] && nativeSummary.length ? [nativeSummary copy] : nil;
+@@ -95,6 +104,8 @@
+     return a && b && [a.nativePath isEqual:b.nativePath] &&
+         (a.userName==b.userName || [a.userName isEqual:b.userName]) &&
+         a.kind==b.kind && a.category==b.category && a.top==b.top && a.privacyMasked==b.privacyMasked &&
++        CSGroupValueEqual(a.nativePrefix,b.nativePrefix) && CSGroupValueEqual(a.nativeSummarySource,b.nativeSummarySource) &&
++        CSGroupValueEqual(a.foldedEntryPrefix,b.foldedEntryPrefix) && CSGroupValueEqual(a.foldedEntrySummarySource,b.foldedEntrySummarySource) &&
+         CSGroupValueEqual(a.nativeSummary,b.nativeSummary) && CSGroupValueEqual(a.nativeSortTime,b.nativeSortTime) &&
+         CSGroupValueEqual(a.foldedEntrySummary,b.foldedEntrySummary) && CSGroupValueEqual(a.foldedEntrySummaryUserName,b.foldedEntrySummaryUserName) &&
+         a.foldedEntryScoped==b.foldedEntryScoped && (a.foldedEntryCount==b.foldedEntryCount || [a.foldedEntryCount isEqual:b.foldedEntryCount]) &&
+@@ -260,7 +271,7 @@
+                 }
+                 // Base rows are immutable; materialize subclasses so mutable host values cannot leak.
+                 CSGroupRow *value = [row isMemberOfClass:CSGroupRow.class] ? row : [[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName
+-                    kind:row.kind category:row.category top:row.top unreadCount:row.unreadCount redDot:row.redDot nativeSummary:row.nativeSummary sortTime:row.nativeSortTime summaryReason:row.nativeSummaryReason];
++                    kind:row.kind category:row.category top:row.top unreadCount:row.unreadCount redDot:row.redDot nativeSummary:row.nativeSummary sortTime:row.nativeSortTime summaryReason:row.nativeSummaryReason nativePrefix:row.nativePrefix summarySource:row.nativeSummarySource];
+                 [copiedRows addObject:value];
+             }
+             [copiedSections addObject:[copiedRows copy]];
+@@ -306,6 +317,7 @@
+                     row=[[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName kind:row.kind category:row.category top:row.top unreadCount:0 redDot:NO];
+                     row.privacyMasked=masked;row.foldedEntryScoped=YES;row.foldedEntryCount=_foldedCounts[selectedTabID];
+                     row.foldedEntryAccountID=accountID;row.foldedEntryPrivacyRevision=privacyRevision;row.foldedEntryTabID=selectedTabID;
++                    row.foldedEntryPrefix=_foldedSummaryRow.nativePrefix;row.foldedEntrySummarySource=_foldedSummaryRow.nativeSummarySource;
+                     row.foldedEntrySummary=_foldedSummaryRow.nativeSummary;row.foldedEntrySummaryUserName=_foldedSummaryRow.userName;
+                 } else if (retained) {
+                     retainedCount = CSGroupSaturatedAdd(retainedCount, CSGroupNumericUnread(row));
+--- 2.0-23b/Controllers/CSReleaseNotesViewController.m
++++ 2.0-24/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,10 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"2.0-24": @[
++            @{@"title": @"折叠摘要沿用微信原生呈现", @"detail": @"显示当前分组最新可见会话的名称与消息，沿用微信原生的名称、消息两部分排版和截断规则。标题仍为“折叠的聊天”，不显示时间。"},
++            @{@"title": @"完善冷启动与隐私校验", @"detail": @"无需先打开折叠列表；数据就绪后自动重取摘要。切组、切账号或隐藏密友后重新校验，避免显示过期内容。"}
++        ],
+         @"2.0-23b": @[
+             @{@"title": @"完善折叠入口摘要显示", @"detail": @"修复部分场景已有有效摘要仍显示中性文案的问题。折叠入口保留原生标题、摘要和图标，不显示右侧时间或日期。"}
+         ],
+--- 2.0-23b/Headers/CSUserInfoHelper.h
++++ 2.0-24/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.0-23b"  // 插件版本号
++#define kPluginVersionString @"2.0-24"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- 2.0-23b/README.md
++++ 2.0-24/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
+ 
+-**当前版本：`2.0-23b`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`2.0-24`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
+ 
+@@ -31,8 +31,8 @@
+ | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
+ | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
+ | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
+-| Rootless | 本地已生成 `2.0-23b` 安装包；尚未真机验收 |
+-| Rootful | 本地已生成 `2.0-23b` 安装包；尚未真机验收 |
++| Rootless | 本地已生成 `2.0-24` 安装包；尚未真机验收 |
++| Rootful | 本地已生成 `2.0-24` 安装包；尚未真机验收 |
+ | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
+ | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
+ 
+@@ -40,7 +40,7 @@
+ 
+ ### 安装步骤
+ 
+-1. 获取与设备注入环境匹配的 `.deb`。本地构建产物包括 [2.0-23b Rootless 安装包](packages/com.wechat.improve_2.0-23b_iphoneos-arm64.deb)、[Rootful 安装包](packages/com.wechat.improve_2.0-23b_iphoneos-arm.deb) 和 [调试符号](packages/com.wechat.improve_2.0-23b_symbols.zip)。
++1. 获取与设备注入环境匹配的 `.deb`。本地构建产物包括 [2.0-24 Rootless 安装包](packages/com.wechat.improve_2.0-24_iphoneos-arm64.deb)、[Rootful 安装包](packages/com.wechat.improve_2.0-24_iphoneos-arm.deb) 和 [调试符号](packages/com.wechat.improve_2.0-24_symbols.zip)。
+ 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
+ 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
+ 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
+@@ -69,9 +69,9 @@
+ 
+ `2.0-18` 的自定义组成员菜单仅有“私聊 / 群聊 / 标签”。私聊、群聊使用原生全屏多选器；标签使用微信原生标签列表批选，再回到原生好友页搜索、调整勾选，最终点完成保存。取消保持原名单；已有群聊、服务号和无法解析成员不会因编辑好友类别丢失。移除的是选人菜单的“全部”，顶部预设“全部”及旧自定义组成员集合均保留。弹窗与全屏显示都等待菜单和原生页各自转场结束，不使用固定延时。详见 [改动、原生证据与验收记录](docs/audits/group-tags-folded-2.0-18/README.md)。
+ 
+-“折叠的聊天”跟随当前分组：内容按同一成员及密友隐私规则过滤，入口优先沿用微信原生“折叠的聊天”标题及字号，不显示数量后缀、不缩字；确认当前组无可见折叠会话时隐藏。摘要只取当前分组可见折叠会话里，按原生有效排序时间最新一条的原生摘要；群聊前缀和图片、链接、引用等文案沿用微信格式。优先读取已校验的原生摘要缓存；缓存缺失、为空或消息不匹配时，复制当前消息并调用微信原生摘要格式化，冷启动无需先打开折叠列表。摘要文本不可用、消息身份不可确认或账号/隐私快照失效时保持中性，后续消息/页面刷新自动重取，不借用全局入口的消息。折叠状态仍是微信全局的一份：在某组中取消折叠，会影响其它包含同一会话的组。折叠页不增加分组栏，随当前选中组更新，不为每组另存折叠标记。
+-
+-`2.0-23b` 保留 2.0-21 的连续圆角卡片：折叠行按普通行参与同一 section，不额外分卡或增加间距，仅整组首尾保留外侧圆角。继续使用同一份圆角、边距、浅深色配色，关闭圆角恢复原生平面样式；摘要左对齐，保留原生图标、两行布局和行高，右侧时间/日期及全局未读仍被隐藏；时间仅参与摘要候选排序，缺失时间不再否决有效摘要。详见 [摘要来源、失败用例与核心回归](docs/audits/folded-digest-no-time-gate-2.0-23b/README.md)。
++“折叠的聊天”跟随当前分组：内容按同一成员及密友隐私规则过滤，入口优先沿用微信原生“折叠的聊天”标题及字号，不显示数量后缀、不缩字；确认当前组无可见折叠会话时隐藏。摘要只取当前分组可见折叠会话里，按原生有效排序时间最新一条的原生摘要；名称与消息分别使用微信原生 label，由原生方法决定名称来源、分隔、字号、颜色和截断。优先读取与当前候选消息严格匹配的原生折叠入口双字段；缓存缺失、为空或属于其它会话时，在消息副本上调用微信原生正文与折叠名称生成方法，冷启动无需先打开折叠列表。摘要文本不可用、消息身份不可确认或账号/隐私快照失效时保持中性，后续消息/页面刷新自动重取，不借用全局入口的消息。折叠状态仍是微信全局的一份：在某组中取消折叠，会影响其它包含同一会话的组。折叠页不增加分组栏，随当前选中组更新，不为每组另存折叠标记。
++
++`2.0-24` 保留 2.0-21 的连续圆角卡片：折叠行按普通行参与同一 section，不额外分卡或增加间距，仅整组首尾保留外侧圆角。继续使用同一份圆角、边距、浅深色配色，关闭圆角恢复原生平面样式；摘要左对齐，保留原生图标、两行布局和行高，右侧时间/日期及全局未读仍被隐藏；时间仅参与摘要候选排序，缺失时间不再否决有效摘要。详见 [摘要来源、失败用例与核心回归](docs/audits/folded-native-parity-2.0-24/README.md)。
+ 
+ “过滤重复联系人”开启后，已加入自定义分组的普通群聊或私聊会话会从对应预设组中移除。“全部”仍保留完整会话；服务号按服务归属显示，也可以手动加入自定义分组。无法可靠识别的其他业务入口可能保留显示。
+ 
+@@ -190,7 +190,7 @@
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.0-23b_iphoneos-arm64.deb`。
++当前版本默认输出：`packages/com.wechat.improve_2.0-24_iphoneos-arm64.deb`。
+ 
+ ### Rootful
+ 
+@@ -199,7 +199,7 @@
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.0-23b_iphoneos-arm.deb`。本地已生成两种方案的安装包。
++当前版本默认输出：`packages/com.wechat.improve_2.0-24_iphoneos-arm.deb`。本地已生成两种方案的安装包。
+ 
+ | 方案 | 动态库安装目录 |
+ | --- | --- |
+--- 2.0-23b/Tests/CloseFriendSessionPresentationTests.m
++++ 2.0-24/Tests/CloseFriendSessionPresentationTests.m
+@@ -2,6 +2,7 @@
+ #import <CoreGraphics/CoreGraphics.h>
+ #import <CoreText/CoreText.h>
+ #import <objc/runtime.h>
++#import <objc/message.h>
+ #import "CSGroupProjection.h"
+ #import "WESessionTabItem.h"
+ #import "CSCloseFriendPolicy.h"
+@@ -33,6 +34,7 @@
+ @end
+ @interface UIView : NSObject
+ @property(nonatomic) CGRect bounds,frame;
++@property(nonatomic) NSInteger tag;
+ @property(nonatomic) BOOL hidden,userInteractionEnabled,isAccessibilityElement;
+ @property(nonatomic) UIViewAutoresizing autoresizingMask;
+ @property(nonatomic,strong) UIColor *backgroundColor;
+@@ -95,6 +97,7 @@
+ }
+ @end
+ @implementation MainFrameItemView @end
++#include "FoldedNativeRendererFixture.h"
+ @interface NewMainFrameCell : UITableViewCell { @public MainFrameItemView *m_itemView; }
+ @end
+ @implementation NewMainFrameCell @end
+@@ -110,7 +113,7 @@
+ static CSGroupRow *ScopedRow(NSUInteger count,BOOL known,NSUInteger revision) {
+     WESessionTabItem *all=[WESessionTabItem tabWithType:WETabTypeAll];NSMutableArray *children=[NSMutableArray array];
+     for (NSUInteger i=0;i<count;i++) {
+-        NSUInteger path[]={0,i};[children addObject:SummaryFixtureRow([NSIndexPath indexPathWithIndexes:path length:2],[NSString stringWithFormat:@"visible-%lu",(unsigned long)i], [NSString stringWithFormat:@"visible-%lu: [图片]",(unsigned long)i],@(i+1))];
++        NSUInteger path[]={0,i};[children addObject:SummaryFixtureRow([NSIndexPath indexPathWithIndexes:path length:2],[NSString stringWithFormat:@"visible-%lu",(unsigned long)i], @"[图片]",@(i+1))];
+     }
+     CSGroupProjection *child=known ? [[CSGroupProjection alloc] initWithSections:@[children] tabs:@[all] selectedTabID:all.tabId filterDuplicates:NO accountID:@"fixture" hiddenUserNames:[NSSet setWithObject:@"hidden"] privacyRevision:revision previousProjection:nil] : nil;
+     NSUInteger path[]={0,0};CSGroupRow *entry=[[CSGroupRow alloc] initWithNativePath:[NSIndexPath indexPathWithIndexes:path length:2]
+@@ -156,7 +159,7 @@
+  CSCloseFriendRefreshSessionCover(cell);
+  Check([cover.accessibilityLabel isEqual:@"折叠的聊天"] && cell.subviews.lastObject==cover && [((CSCloseFriendSessionCover *)cover).summaryLabel.text isEqual:@"折叠的聊天"],@"policy revision invalidates previous summary immediately");
+  CSCloseFriendUpdateSessionCover(cell,ScopedRow(3,YES,2));
+- Check([((CSCloseFriendSessionCover *)cover).summaryLabel.text isEqual:@"visible-2: [图片]"],@"same-count republication restores current native summary");
++ Check([((CSCloseFriendSessionCover *)cover).summaryLabel.text isEqual:@"折叠的聊天"],@"unknown native structure stays neutral instead of inventing a single-label native imitation");
+  policy=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"other-account" profile:@{@"enabled":@NO,@"friends":@[],@"groups":@[],@"options":@{}} revealed:YES revision:2 blocked:NO];
+  CSCloseFriendRefreshSessionCover(cell);
+  Check([cover.accessibilityLabel isEqual:@"折叠的聊天"] && content.hidden && [((CSCloseFriendSessionCover *)cover).summaryLabel.text isEqual:@"折叠的聊天"],@"account transition never displays previous account summary");
+--- 2.0-23b/Tests/CloseFriendSessionTests.m
++++ 2.0-24/Tests/CloseFriendSessionTests.m
+@@ -50,7 +50,7 @@
+ // 8.0.78 CMessageWrap is q; MainFrameCellData below is Q.
+ @property(nonatomic) long long m_n64MesSvrID;
+ @property(nonatomic) unsigned int m_uiCreateTime,fixtureSessionTime;
+-@property(nonatomic,copy) NSString *fixtureDigest;
++@property(nonatomic,copy) NSString *fixtureDigest,*fixtureChatName,*fixtureDisplayName;
+ @property(nonatomic) NSUInteger displayChanges;
+ @property(nonatomic) BOOL aliasCopy;
+ @end
+@@ -58,8 +58,9 @@
+ - (id)copyWithZone:(NSZone *)zone {
+     if(self.aliasCopy)return self;
+     NativeMessage *value=[[[self class] allocWithZone:zone] init];
+-    value.m_n64MesSvrID=self.m_n64MesSvrID;value.fixtureDigest=self.fixtureDigest;return value;
+-}
++    value.m_n64MesSvrID=self.m_n64MesSvrID;value.fixtureDigest=self.fixtureDigest;value.fixtureChatName=self.fixtureChatName;value.fixtureDisplayName=self.fixtureDisplayName;return value;
++}
++- (NSString *)GetChatName { return self.fixtureChatName; }
+ - (void)ChangeForDisplay { self.displayChanges++; }
+ - (unsigned int)getSessionTime { return self.fixtureSessionTime ?: self.m_uiCreateTime; }
+ @end
+@@ -83,7 +84,7 @@
+ @interface NativeCellData : NSObject
+ @property(nonatomic,strong) NativeSession *m_sessionInfo;
+ @property(nonatomic) unsigned long long m_n64MesSvrID;
+-@property(nonatomic,strong) id m_textForMessageLabel;
++@property(nonatomic,strong) id m_textForMessageLabel,m_prefixTextForQuoteMessage;
+ @end
+ @implementation NativeCellData @end
+ static NSUInteger digestCalls,prefixCalls;
+@@ -91,9 +92,20 @@
+ static void (^onDigest)(void);
+ @interface MainFrameCellData : NSObject
+ @property(nonatomic,strong) id m_sessionInfo;
++@property(nonatomic,copy) NSString *m_prefixTextForQuoteMessage;
+ @end
+ @implementation MainFrameCellData
+-- (NSString *)getGroupName { prefixCalls++;return CSGroupReadObject(self.m_sessionInfo,@"m_contact"); }
++- (NSString *)getGroupName { return CSGroupReadObject(self.m_sessionInfo,@"m_contact"); }
++- (void)makeTextForQuoteMessage {
++    prefixCalls++;
++    if (![CSGroupReadObject(self.m_sessionInfo,@"m_nsUserName") isEqual:@"chatroom_session_box"]) return;
++    NativeMessage *m=CSGroupReadObject(self.m_sessionInfo,@"m_msgWrap");
++    NSString *name=m.fixtureDisplayName;
++    // Fixture for the documented native builder; no formatting in plugin code.
++    // Explicit remarks/nicknames are returned intact by native genChatRoomName.
++    // Generated unnamed-group text is supplied already shortened by this fixture.
++    self.m_prefixTextForQuoteMessage=name.length ? [name stringByAppendingString:@": "] : nil;
++}
+ + (NSString *)digestForMsg:(NativeMessage *)message withSender:(NSString *)sender {
+     digestCalls++;lastFormattedMessage=message;
+     [message ChangeForDisplay];if(onDigest)onDigest();
+--- 2.0-23b/Tests/FoldedCardIntegrationTests.h
++++ 2.0-24/Tests/FoldedCardIntegrationTests.h
+@@ -11,10 +11,11 @@
+     for(UIView *child in view.subviews){UILabel *found=CardText(child,text);if(found)return found;}return nil;
+ }
+ static void CheckFoldedTextLayout(UITableViewCell *cell,NSString *phase) {
+-    UILabel *title=CardText(cell,@"折叠的聊天"),*summary=CardText(cell,@"当前分组: [图片]");
++    UILabel *title=CardText(cell,@"折叠的聊天"),*summary=CardText(cell,@"[图片]"),*prefix=CardText(cell,@"folded-0@chatroom: ");
++    if (![cell isKindOfClass:NewMainFrameCell.class]) { Check(title && !summary,[phase stringByAppendingString:@": unknown native structure retains neutral protection"]);return; }
+     
+     Check(title && summary && title.numberOfLines==1 && !title.adjustsFontSizeToFitWidth && title.font.pointSize>=17,[phase stringByAppendingString:@": native title has no count or font shrinking"]);
+-    Check(summary.textAlignment==NSTextAlignmentLeft && title.textAlignment==NSTextAlignmentLeft && summary.frame.origin.x==title.frame.origin.x && summary.frame.size.width>0,[phase stringByAppendingString:@": native child summary shares title left edge"]);
++    Check(summary.textAlignment==NSTextAlignmentLeft && title.textAlignment==NSTextAlignmentLeft && prefix.frame.origin.x==title.frame.origin.x && summary.frame.origin.x==ceil(CGRectGetMaxX(prefix.frame)),[phase stringByAppendingString:@": native child summary shares title left edge"]);
+ }
+ static CSGroupProjection *CardProjectionAt(NSUInteger ordinary,NSUInteger folded,NSUInteger position) {
+     WESessionTabItem *all=[WESessionTabItem tabWithType:WETabTypeAll];NSMutableArray *native=[NSMutableArray array],*children=[NSMutableArray array];
+@@ -22,7 +23,7 @@
+         if(n==position)[native addObject:[[CSGroupRow alloc] initWithNativePath:Path(n,0) userName:@"chatroom_session_box" kind:CSGroupRowKindAggregate category:CSGroupRowCategoryGroup top:NO unreadCount:99 redDot:YES]];
+         else [native addObject:CardRow(n,[NSString stringWithFormat:@"group-%lu@chatroom",(unsigned long)n])];
+     }
+-    for(NSUInteger n=0;n<folded;n++)[children addObject:SummaryFixtureRow(Path(n,0),[NSString stringWithFormat:@"folded-%lu@chatroom",(unsigned long)n],@"当前分组: [图片]",@(n+1))];
++    for(NSUInteger n=0;n<folded;n++)[children addObject:SummaryFixtureRow(Path(n,0),[NSString stringWithFormat:@"folded-%lu@chatroom",(unsigned long)n],@"[图片]",@(n+1))];
+     CSGroupProjection *child=[[CSGroupProjection alloc] initWithSections:@[children] tabs:@[all] selectedTabID:all.tabId filterDuplicates:NO accountID:@"cards" hiddenUserNames:[NSSet set] privacyRevision:1 previousProjection:nil];
+     return [[CSGroupProjection alloc] initWithSections:@[native] tabs:@[all] selectedTabID:all.tabId filterDuplicates:NO accountID:@"cards" hiddenUserNames:[NSSet set] unmaskedAggregateUserNames:[NSSet set] privacyRevision:1 scopeFoldedEntry:YES foldedProjection:child previousProjection:nil];
+ }
+@@ -77,6 +78,7 @@
+         item->m_frameHeadView=View(MMHeadImageView.class,CGRectMake(12,14,48,48));[item addSubview:item->m_frameHeadView];
+         item->m_nameLabel=(id)View(UILabel.class,CGRectMake(72,14,150,22));item->m_nameLabel.text=@"折叠的聊天";[item addSubview:item->m_nameLabel];
+         item->m_messageLabel=(id)View(UILabel.class,CGRectMake(184,42,100,18));item->m_messageLabel.text=@"other group private preview";[item addSubview:item->m_messageLabel];
++        UILabel *globalPrefix=(id)View(UILabel.class,CGRectMake(72,42,112,18));globalPrefix.tag=10001001;globalPrefix.text=@"global: ";[item addSubview:globalPrefix];
+         item->m_timeLabel=(id)View(UILabel.class,CGRectMake(300,14,40,16));item->m_timeLabel.text=@"21:31";[item addSubview:item->m_timeLabel];
+         CSGroupWithNativeIndices(table,^{CSListCornerSessionDecorate(ordinary,table,Path(1,0),owner);CSListCornerSessionDecorate(fold,table,Path(2,0),owner);});
+         UIView *card=Background(fold),*normalCard=Background(ordinary);
+@@ -84,9 +86,13 @@
+         Check(CardVisible(card) && CardVisible(normalCard) && card.frame.origin.x==normalCard.frame.origin.x && card.frame.size.width==normalCard.frame.size.width,@"native and fallback folded covers preserve the real shared card background and horizontal margins");
+         Check(card.frame.origin.y==0 && card.frame.size.height==76 && Rounded(card,CGPointMake(1,1)) && !Rounded(card,CGPointMake(1,75)),@"last folded row joins the section with square top edges and only bottom corners");
+         Check(Rounded(normalCard,CGPointMake(1,59)),@"the preceding session keeps square bottom edges adjoining the folded row");
+-        UILabel *summary=CardText(fold,@"当前分组: [图片]");
+-        Check(summary && !CardText(fold,@"other group private preview") && !CardText(fold,@"21:31"),@"shared card retains scoped native summary without exposing native global business text");
++        UILabel *summary=CardText(fold,@"[图片]");
++        Check((nativeLayout.boolValue ? summary!=nil : summary==nil) && !CardText(fold,@"other group private preview") && !CardText(fold,@"21:31"),@"shared card retains scoped native summary without exposing native global business text");
+         CheckFoldedTextLayout(fold,@"light card");
++        if(nativeLayout.boolValue) {
++            UILabel *prefix=nil;for(UIView *v in item.subviews)if(v.tag==10001001)prefix=(id)v;
++            Check(prefix && CardVisible(prefix) && CardVisible(item->m_messageLabel),@"native parity: card contains native prefix plus native body label");
++        }
+         Check(!nativeLayout.boolValue || CardVisible(item->m_frameHeadView),@"verified native aggregate icon survives card rendering and privacy presentation");
+         UIColor *custom=[UIColor colorWithRed:.15 green:.22 blue:.3 alpha:1];
+         [FixtureConfiguration saveNumber:24 forKey:kListCornerRadiusKey];
+@@ -95,13 +101,13 @@
+         fold.contentView.traitCollection.userInterfaceStyle=UIUserInterfaceStyleDark;table.traitCollection.userInterfaceStyle=UIUserInterfaceStyleDark;
+         HookNewMainFrameCellLayout(fold,^{});CSCloseFriendRefreshSessionCover(fold);
+         Check(CardVisible(card) && card.frame.origin.x==25 && card.frame.size.width==334 && Rounded(card,CGPointMake(6,6)) && !Rounded(card,CGPointMake(3,73)) && [card.backgroundColor isEqual:[FixtureConfiguration.snapshot backgroundForStyle:UIUserInterfaceStyleDark]],@"radius, asymmetric margins and dark card color update on the same visible folded card");
+-        Check(CardText(fold,@"当前分组: [图片]") && !CardText(fold,@"other group private preview"),@"configuration refresh never restores private preview");
++        Check((nativeLayout.boolValue ? CardText(fold,@"[图片]")!=nil : CardText(fold,@"[图片]")==nil) && !CardText(fold,@"other group private preview"),@"configuration refresh never restores private preview");
+         CheckFoldedTextLayout(fold,@"dark card after live radius/margin change");
+         [FixtureConfiguration saveEnabled:NO];HookNewMainFrameCellLayout(fold,^{});CSCloseFriendRefreshSessionCover(fold);
+         Check(!card.superview,@"disabling rounding removes the owned folded card instead of freezing it");
+         Check(fold.contentView.backgroundColor==UIColor.whiteColor || [fold.contentView.backgroundColor isEqual:UIColor.whiteColor],@"disabling corners restores the native flat content surface");
+         if(nativeLayout.boolValue)Check(item.frame.origin.x==0 && item.frame.size.width==390 && item.frame.origin.y==0,@"disabled folded item restores native full-width coordinates");
+-        Check(CardText(fold,@"当前分组: [图片]") && !CardText(fold,@"other group private preview"),@"flat mode keeps scoped text and privacy protection");
++        Check((nativeLayout.boolValue ? CardText(fold,@"[图片]")!=nil : CardText(fold,@"[图片]")==nil) && !CardText(fold,@"other group private preview"),@"flat mode keeps scoped text and privacy protection");
+         CheckFoldedTextLayout(fold,@"flat after disabling corners");
+         Check(HookSessionRowHeight(owner,table,Path(2,0),76)==76,@"disabled cards retain native row height without an added gap");
+         [FixtureConfiguration saveEnabled:YES];
+@@ -109,7 +115,7 @@
+         CSCloseFriendRefreshSessionCover(fold);
+         UIView *rebuilt=CSListCornerExistingSessionBackground(fold);
+         Check(rebuilt && rebuilt!=card && CardVisible(rebuilt) && rebuilt.frame.origin.x==25 && Rounded(rebuilt,CGPointMake(6,6)) && !Rounded(rebuilt,CGPointMake(3,73)),@"reenabling on normal cell delivery rebuilds the shared card using current configuration");
+-        Check(CardText(fold,@"当前分组: [图片]") && !CardText(fold,@"other group private preview"),@"fallback protection relocates into the rebuilt card without revealing global content");
++        Check((nativeLayout.boolValue ? CardText(fold,@"[图片]")!=nil : CardText(fold,@"[图片]")==nil) && !CardText(fold,@"other group private preview"),@"fallback protection relocates into the rebuilt card without revealing global content");
+         CheckFoldedTextLayout(fold,@"reenabled card");
+         if(nativeLayout.boolValue) {
+             CGRect nativeFrame=CGRectMake(0,0,390,76);
+--- 2.0-23b/Tests/FoldedEntryVisualTests.h
++++ 2.0-24/Tests/FoldedEntryVisualTests.h
+@@ -1,68 +1,83 @@
+-// Behavioral layout/privacy checks against the production presentation source.
+-static BOOL Visible(UIView *view) { for(UIView *v=view;v;v=v.superview)if(v.hidden)return NO;return YES; }
++// Production presentation on host native view doubles; no device pixel claim.
++static BOOL Visible(UIView *view) { if(!view)return NO;for(UIView *v=view;v;v=v.superview)if(v.hidden)return NO;return YES; }
+ static UILabel *VisibleLabel(UIView *view,NSString *text) {
+     if(!Visible(view))return nil;
+     if([view isKindOfClass:UILabel.class] && [((UILabel *)view).text isEqual:text])return (UILabel *)view;
+     for(UIView *child in view.subviews){UILabel *found=VisibleLabel(child,text);if(found)return found;}return nil;
+ }
++static UILabel *Prefix(MainFrameItemView *item) { for(UIView *v in item.subviews)if(v.tag==10001001)return (id)v;return nil; }
+ static void NativeFoldedLayoutTests(void) {
+     policy=Policy(NO);
+     NewMainFrameCell *cell=[[NewMainFrameCell alloc] initWithFrame:CGRectMake(0,0,390,76)];
+     UIView *content=[[UIView alloc] initWithFrame:cell.bounds];[cell addSubview:content];
+-    UIView *card=[[UIView alloc] initWithFrame:CGRectMake(15,0,360,76)];card.backgroundColor=UIColor.systemBackgroundColor;[content addSubview:card];
++    UIView *card=[[UIView alloc] initWithFrame:CGRectMake(15,0,360,76)];[content addSubview:card];
+     MainFrameItemView *item=[[MainFrameItemView alloc] initWithFrame:card.frame];cell->m_itemView=item;[content addSubview:item];
+     item->m_frameHeadView=[[UIView alloc] initWithFrame:CGRectMake(12,14,48,48)];[item addSubview:item->m_frameHeadView];
+     item->m_nameLabel=[[UILabel alloc] initWithFrame:CGRectMake(72,14,150,22)];item->m_nameLabel.text=@"折叠的聊天";
+-    item->m_messageLabel=[[UILabel alloc] initWithFrame:CGRectMake(184,42,100,18)];item->m_messageLabel.text=@"another group secret";
++    item->m_messageLabel=[[UILabel alloc] initWithFrame:CGRectMake(72,42,276,18)];item->m_messageLabel.text=@"another group secret";
+     item->m_timeLabel=[[UILabel alloc] initWithFrame:CGRectMake(300,14,48,16)];item->m_timeLabel.text=@"10:24";
+-    item->m_unreadCountView=[[UIView alloc] initWithFrame:CGRectMake(45,0,18,18)];
+-    [item->m_frameHeadView addSubview:item->m_unreadCountView];
++    item->m_unreadCountView=[[UIView alloc] initWithFrame:CGRectMake(45,0,18,18)];[item->m_frameHeadView addSubview:item->m_unreadCountView];
+     for(UILabel *label in @[item->m_nameLabel,item->m_messageLabel,item->m_timeLabel]){
+         label.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody];label.textColor=UIColor.labelColor;[item addSubview:label];
+     }
+     item->m_messageLabel.font=[UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
++    [item quoteMessageLable:item->m_messageLabel prefixText:@"global name: "];
+     UIView *separator=[[UIView alloc] initWithFrame:CGRectMake(87,75.5,288,.5)];[content addSubview:separator];
+-    CGRect originalCell=cell.frame,originalCard=card.frame,originalIcon=item->m_frameHeadView.frame,originalTitle=item->m_nameLabel.frame;
+-    UIFont *originalFont=item->m_nameLabel.font;NSUInteger originalNativeChildren=item.subviews.count;
++    CGRect cellFrame=cell.frame,cardFrame=card.frame,iconFrame=item->m_frameHeadView.frame,titleFrame=item->m_nameLabel.frame;
++    UIFont *titleFont=item->m_nameLabel.font,*bodyFont=item->m_messageLabel.font;UIColor *bodyColor=item->m_messageLabel.textColor;
+     CSCloseFriendUpdateSessionCover(cell,ScopedRow(4,YES,1));
+     CSCloseFriendSessionCover *cover=objc_getAssociatedObject(cell,&CoverKey);
+-    UILabel *title=VisibleLabel(cell,@"折叠的聊天"),*summary=VisibleLabel(cell,@"visible-3: [图片]");
+-    Check(Visible(content) && Visible(card) && Visible(item) && Visible(item->m_frameHeadView) && Visible(separator),@"folded row retains native content, card, aggregate icon and separator");
+-    Check(CGRectEqualToRect(cell.frame,originalCell) && CGRectEqualToRect(card.frame,originalCard) && CGRectEqualToRect(item->m_frameHeadView.frame,originalIcon),@"folded row retains ordinary session height, margins and icon geometry");
+-    Check(title==item->m_nameLabel && Visible(title) && cover.titleLabel.hidden && title.font==originalFont && CGRectEqualToRect(title.frame,originalTitle),@"native title label remains visible with original text/font/frame and no duplicate overlay title");
+-    Check(title && [title.text isEqual:@"折叠的聊天"] && !title.adjustsFontSizeToFitWidth && title.font.pointSize>=17,@"title contains no count and never shrinks below native type size");
+-    Check(summary && summary.superview==cover && cover.backgroundColor.transparent && summary.frame.origin.x==72 && summary.frame.origin.y==42 && summary.frame.size.width==276,@"verified native child summary uses native two-line geometry and title left edge");
+-    Check(summary.textAlignment==NSTextAlignmentLeft && !summary.adjustsFontSizeToFitWidth && summary.font==item->m_messageLabel.font && summary.textColor==item->m_messageLabel.textColor,@"summary preserves native typography and left alignment without shrinking messages");
+-    Check(Visible(item->m_nameLabel) && !Visible(item->m_messageLabel) && !Visible(item->m_timeLabel) && !Visible(item->m_unreadCountView),@"native title is retained while global preview/time/nested badge remain concealed");
+-    Check([item->m_messageLabel.text isEqual:@"another group secret"] && [item->m_timeLabel.text isEqual:@"10:24"],@"presentation never rewrites global native message/time labels");
+-    UILabel *nativeTime=item->m_timeLabel;NSUInteger withTime=item.subviews.count;
+-    [nativeTime removeFromSuperview];item->m_timeLabel=nil;CSCloseFriendRefreshSessionCover(cell);
+-    Check(VisibleLabel(cell,@"visible-3: [图片]") && item.subviews.count==withTime-1,@"native folded entry without a time/date label still displays its digest and creates no time view");
+-    item->m_timeLabel=nativeTime;[item addSubview:nativeTime];CSCloseFriendRefreshSessionCover(cell);
+-    Check(!Visible(nativeTime) && VisibleLabel(cell,@"visible-3: [图片]"),@"a native time view reintroduced during reuse stays hidden without suppressing the digest");
+-    NSUInteger children=item.subviews.count;
+-    item->m_messageLabel.hidden=NO;item->m_timeLabel.hidden=NO;item->m_unreadCountView.hidden=NO;
+-    item->m_messageLabel.frame=CGRectMake(80,43,230,19);item->m_messageLabel.textColor=UIColor.secondaryLabelColor;
++    UILabel *title=VisibleLabel(cell,@"折叠的聊天"),*body=VisibleLabel(cell,@"[图片]"),*prefix=Prefix(item);
++    Check(body==item->m_messageLabel && Visible(body) && cover.summaryLabel.hidden,@"native parity: actual native message label replaces the plugin overlay");
++    Check(Visible(prefix) && [prefix.text isEqual:@"visible-3: "] && prefix.superview==item && body.superview==item,@"native parity: separate name and message labels preserve native delimiter/order");
++    Check(prefix.frame.origin.x==72 && body.frame.origin.x==ceil(CGRectGetMaxX(prefix.frame)) && body.frame.origin.y==prefix.frame.origin.y,@"native quote owns label width/position with no invented gap");
++    Check(title==item->m_nameLabel && title.font==titleFont && CGRectEqualToRect(title.frame,titleFrame) && !title.adjustsFontSizeToFitWidth && title.font.pointSize>=17,@"native title keeps text/font/frame with no count or shrink");
++    Check(prefix.font==bodyFont && prefix.textColor==bodyColor && body.font==bodyFont && body.textColor==bodyColor && !body.adjustsFontSizeToFitWidth,@"two labels inherit native typography/color without overrides");
++    Check(Visible(card) && Visible(content) && Visible(item->m_frameHeadView) && Visible(separator) && CGRectEqualToRect(cell.frame,cellFrame) && CGRectEqualToRect(card.frame,cardFrame) && CGRectEqualToRect(item->m_frameHeadView.frame,iconFrame),@"card geometry, native icon, row height and separator unchanged");
++    Check(!Visible(item->m_timeLabel) && !Visible(item->m_unreadCountView) && !VisibleLabel(cell,@"global name: ") && !VisibleLabel(cell,@"another group secret"),@"no global prefix/body/time/unread leakage");
++    CGRect written=body.frame;NSUInteger childCount=item.subviews.count;
++    for(NSUInteger i=0;i<12;i++)CSCloseFriendRefreshSessionCover(cell);
++    Check(CGRectEqualToRect(body.frame,written) && item.subviews.count==childCount,@"repeated quote restores base origin and never accumulates labels or indentation");
++    UILabel *time=item->m_timeLabel;[time removeFromSuperview];item->m_timeLabel=nil;CSCloseFriendRefreshSessionCover(cell);
++    Check(VisibleLabel(cell,@"[图片]") && item.subviews.count==childCount-1,@"absence of native time area does not gate valid summary or create a time label");
++    item->m_timeLabel=time;[item addSubview:time];
++    [item removeQuoteMessageLabel];body.frame=CGRectMake(78,43,240,19);body.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody];body.textColor=UIColor.secondaryLabelColor;
++    [item quoteMessageLable:body prefixText:@"new global: "];
+     UIView *late=[[UIView alloc] initWithFrame:CGRectMake(300,40,20,20)];[item addSubview:late];
+-    __block NSUInteger originalLayouts=0;HookMainFrameItemLayout(item,^{originalLayouts++;});summary=VisibleLabel(cell,@"visible-3: [图片]");
+-    Check(originalLayouts==1,@"native item layout executes once before privacy repair");
+-    Check(summary && summary.superview==cover && summary.frame.origin.x==72 && summary.frame.origin.y==43 && summary.frame.size.height==19 && summary.frame.size.width==276 && summary.textColor==item->m_messageLabel.textColor,@"native relayout/theme updates summary metrics and color without another cover");
+-    Check(!Visible(late) && !Visible(item->m_timeLabel) && !Visible(item->m_unreadCountView) && Visible(item->m_frameHeadView),@"native relayout hides new business content while retaining aggregate icon");
+-    item.frame=CGRectMake(15,0,190,76);CSCloseFriendRefreshSessionCover(cell);
+-    Check(!title.adjustsFontSizeToFitWidth && title.font==originalFont && CGRectEqualToRect(title.frame,originalTitle),@"narrow card does not rewrite or shrink native title");
+-    item.frame=originalCard;CSCloseFriendRefreshSessionCover(cell);
+-    Check(CGRectEqualToRect(title.frame,originalTitle) && summary.frame.size.width==276,@"widening preserves original title and refreshes summary width");
+-    for(NSUInteger n=0;n<8;n++)CSCloseFriendRefreshSessionCover(cell);
+-    Check(item.subviews.count==children+1 && CGRectEqualToRect(cell.frame,originalCell),@"repeated rendering adds no rows/overlays or height changes");
+-    item->m_nameLabel.text=@"unexpected global title";CSCloseFriendRefreshSessionCover(cell);
+-    Check(!Visible(item->m_nameLabel) && Visible(cover.titleLabel) && [cover.titleLabel.text isEqual:@"折叠的聊天"] && !cover.titleLabel.adjustsFontSizeToFitWidth && cover.titleLabel.font==originalFont,@"unverified native title uses same-size fallback without rewriting the original");
+-    item->m_nameLabel.text=@"折叠的聊天";CSCloseFriendRefreshSessionCover(cell);
+-    Check(Visible(item->m_nameLabel) && cover.titleLabel.hidden,@"when native title becomes valid its owned hidden state is restored");
+-    CSCloseFriendUpdateSessionCover(cell,ScopedRow(0,NO,1));
+-    Check([cover.summaryLabel.text isEqual:@"折叠的聊天"] && !VisibleLabel(cell,@"visible-3: [图片]") && !Visible(item->m_messageLabel),@"unknown source becomes neutral with no stale digest or global preview");
++    __block NSUInteger layouts=0;HookMainFrameItemLayout(item,^{layouts++;});prefix=Prefix(item);
++    Check(layouts==1 && prefix.frame.origin.x==78 && prefix.frame.origin.y==43 && body.frame.size.height==19,@"native relayout supplies fresh origin/vertical geometry before scoped quote");
++    Check(prefix.font==body.font && prefix.textColor==body.textColor && !Visible(late) && !Visible(time),@"theme/dynamic-font update propagates through native quote while private extras stay hidden");
++    for(NSNumber *width in @[@190,@360,@440]) {
++        item.frame=CGRectMake(15,0,width.doubleValue,76);CSCloseFriendRefreshSessionCover(cell);
++        MainFrameItemView *reference=[[MainFrameItemView alloc] initWithFrame:item.frame];
++        UILabel *label=[[UILabel alloc] initWithFrame:CGRectMake(78,43,240,19)];reference->m_messageLabel=label;
++        label.font=body.font;label.textColor=body.textColor;label.text=@"[图片]";[reference addSubview:label];
++        [reference quoteMessageLable:label prefixText:@"visible-3: "];
++        Check(CGRectEqualToRect(label.frame,body.frame) && CGRectEqualToRect(Prefix(reference).frame,Prefix(item).frame),@"narrow/wide card delegates exactly the native name/body width contract");
++        Check(title.font==titleFont && CGRectEqualToRect(title.frame,titleFrame),@"width changes never shrink or relayout native title");
++    }
++    // Long text remains native-owned: no plugin ellipsis, font scale or ratio.
++    CSGroupRow *longRow=ScopedRow(4,YES,1);
++    if([longRow respondsToSelector:NSSelectorFromString(@"foldedEntryPrefix")]) [longRow setValue:@"1234567890... : " forKey:@"foldedEntryPrefix"];
++    NSString *longBody=[@"很长的原生消息" stringByPaddingToLength:200 withString:@"很长的原生消息" startingAtIndex:0];
++    [longRow setValue:longBody forKey:@"foldedEntrySummary"];CSCloseFriendUpdateSessionCover(cell,longRow);
++    Check([Prefix(item).text isEqual:@"1234567890... : "] && [body.text isEqual:longBody] && body.lineBreakMode==NSLineBreakByTruncatingTail && !body.adjustsFontSizeToFitWidth,@"native-shortened name and long body keep native tail truncation without plugin text/size edits");
++    for(NSUInteger state=0;state<3;state++) {
++        policy=[[CSCloseFriendSnapshot alloc] initWithAccountID:state==0 ? @"other" : @"fixture" profile:@{@"enabled":@YES,@"friends":state==2 ? @[@"visible-3"] : @[],@"groups":@[],@"options":@{}} revealed:NO revision:state==1 ? 2 : 1 blocked:NO];
++        CSCloseFriendRefreshSessionCover(cell);
++        Check(!Prefix(item) && !Visible(body) && !VisibleLabel(cell,longBody),@"account/revision/visibility change removes both stale native labels");
++        policy=Policy(NO);CSCloseFriendUpdateSessionCover(cell,longRow);
++    }
++    FoldedQuoteHook=^{policy=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"other" profile:@{} revealed:NO revision:1 blocked:YES];};
++    CSCloseFriendUpdateSessionCover(cell,longRow);FoldedQuoteHook=nil;
++    Check(!Prefix(item) && !Visible(body),@"policy change inside native renderer cannot expose old pair for even one frame");
++    policy=Policy(NO);CSCloseFriendUpdateSessionCover(cell,longRow);
++    // Native can replace the pair before prepareForReuse; never undo fresh data.
++    [item removeQuoteMessageLabel];body.text=@"fresh ordinary text";body.frame=CGRectMake(72,42,276,18);
+     CSCloseFriendUpdateSessionCover(cell,nil);
+-    Check(Visible(item->m_nameLabel) && Visible(item->m_messageLabel) && Visible(item->m_timeLabel) && Visible(item->m_unreadCountView) && Visible(late) && item.subviews.count==originalNativeChildren+1,@"ordinary reuse restores native hidden states and removes only owned overlay");
+-    CSCloseFriendUpdateSessionCover(cell,ScopedRow(12,YES,1));
+-    title=VisibleLabel(cell,@"折叠的聊天");summary=VisibleLabel(cell,@"visible-11: [图片]");
+-    Check(title==item->m_nameLabel && summary && summary.frame.origin.x==title.frame.origin.x && !title.adjustsFontSizeToFitWidth,@"folded-ordinary-folded reuse shows current summary and original native title");
++    Check([body.text isEqual:@"fresh ordinary text"] && Visible(body) && Visible(time) && !Prefix(item),@"ordinary reuse preserves fresh native text and clears only owned prefix");
++    CSCloseFriendUpdateSessionCover(cell,ScopedRow(2,YES,1));
++    Check([Prefix(item).text isEqual:@"visible-1: "] && [body.text isEqual:@"[图片]"],@"folded-ordinary-folded reuse uses current pair");
++    CSCloseFriendUpdateSessionCover(cell,nil);
++    Check(!body.text.length && !Prefix(item),@"removing still-owned pair never restores stale global or group text");
+ }
+--- 2.0-23b/Tests/FoldedSummaryFixtures.h
++++ 2.0-24/Tests/FoldedSummaryFixtures.h
+@@ -1,12 +1,14 @@
+-// Optional initializer keeps these regressions executable against 2.0-21 (red).
++// Optional initializer keeps the new contract executable against 2.0-23b (red).
+ @interface CSGroupRow (FoldedSummaryFixture)
+ - (instancetype)initWithNativePath:(NSIndexPath *)path userName:(NSString *)name
+     kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category top:(BOOL)top
+-    unreadCount:(NSUInteger)unread redDot:(BOOL)dot nativeSummary:(NSString *)summary sortTime:(NSNumber *)time;
++    unreadCount:(NSUInteger)unread redDot:(BOOL)dot nativeSummary:(NSString *)summary sortTime:(NSNumber *)time
++    summaryReason:(NSString *)reason nativePrefix:(NSString *)prefix summarySource:(NSString *)source;
+ @end
+ static CSGroupRow *SummaryFixtureRow(NSIndexPath *path,NSString *name,NSString *summary,NSNumber *time) {
+-    if ([CSGroupRow instancesRespondToSelector:@selector(initWithNativePath:userName:kind:category:top:unreadCount:redDot:nativeSummary:sortTime:)])
++    if ([CSGroupRow instancesRespondToSelector:@selector(initWithNativePath:userName:kind:category:top:unreadCount:redDot:nativeSummary:sortTime:summaryReason:nativePrefix:summarySource:)])
+         return [[CSGroupRow alloc] initWithNativePath:path userName:name kind:CSGroupRowKindSession category:CSGroupRowCategoryGroup
+-            top:NO unreadCount:0 redDot:NO nativeSummary:summary sortTime:time];
+-    return [[CSGroupRow alloc] initWithNativePath:path userName:name kind:CSGroupRowKindSession category:CSGroupRowCategoryGroup top:NO unreadCount:0 redDot:NO];
++            top:NO unreadCount:0 redDot:NO nativeSummary:summary sortTime:time summaryReason:@"ok_cache" nativePrefix:[name stringByAppendingString:@": "] summarySource:@"entry_cache"];
++    return [[CSGroupRow alloc] initWithNativePath:path userName:name kind:CSGroupRowKindSession category:CSGroupRowCategoryGroup
++        top:NO unreadCount:0 redDot:NO nativeSummary:summary sortTime:time];
+ }
+--- 2.0-23b/Tests/FoldedSummaryTests.h
++++ 2.0-24/Tests/FoldedSummaryTests.h
+@@ -1,111 +1,89 @@
+-// Real readonly bridge + projection + adapter; no WeChat process or account.
+-static NSString *EntrySummary(CSGroupProjection *p) {
+-    return CSGroupReadObject([p rowAtDisplayPath:Path(0)],@"foldedEntrySummary");
++// Real bridge/projection/adapter, isolated native cache + formatter doubles.
++static NSString *EntrySummary(CSGroupProjection *p) { return CSGroupReadObject([p rowAtDisplayPath:Path(0)],@"foldedEntrySummary"); }
++static NSString *EntryPrefix(CSGroupProjection *p) { return CSGroupReadObject([p rowAtDisplayPath:Path(0)],@"foldedEntryPrefix"); }
++static NSString *EntrySource(CSGroupProjection *p) { return CSGroupReadObject([p rowAtDisplayPath:Path(0)],@"foldedEntrySummarySource"); }
++static NativeSession *SummarySession(NSString *name,NSString *display,unsigned int time,NSString *text) {
++    NativeSession *s=FoldedSession(name,0);s.m_uLastTime=time;s.m_msgWrap=[NativeMessage new];
++    s.m_msgWrap.m_n64MesSvrID=0xF000000000000000ULL+time;s.m_msgWrap.fixtureDigest=text;
++    s.m_msgWrap.fixtureChatName=name;s.m_msgWrap.fixtureDisplayName=display;return s;
+ }
+-static NativeSession *SummarySession(MainFrameCellDataManager *cache,NSString *name,unsigned int time,NSString *summary) {
+-    NativeSession *session=FoldedSession(name,0);session.m_uLastTime=time;
+-    session.m_msgWrap=[NativeMessage new];session.m_msgWrap.m_n64MesSvrID=0xF000000000000000ULL+time;
+-    NativeCellData *data=[NativeCellData new];data.m_sessionInfo=session;data.m_n64MesSvrID=session.m_msgWrap.m_n64MesSvrID;
+-    data.m_textForMessageLabel=summary;cache.cache[name]=data;return session;
++static NativeCellData *EntryCache(NativeSession *s,NSString *prefix,NSString *text) {
++    NativeCellData *d=[NativeCellData new];NativeSession *aggregate=FoldedSession(@"chatroom_session_box",0);
++    aggregate.m_msgWrap=[s.m_msgWrap copy];d.m_sessionInfo=aggregate;d.m_n64MesSvrID=s.m_msgWrap.m_n64MesSvrID;
++    d.m_prefixTextForQuoteMessage=prefix;d.m_textForMessageLabel=text;return d;
+ }
+ static void RunFoldedSummaryTests(void) {
+     NSString *oldAccount=account;CSCloseFriendSnapshot *oldPolicy=policy;id oldService=foldedService,oldCache=cellDataService;BOOL oldEnabled=groupEnabled;
+-    account=@"folded-summary-account";policy=Policy(@[@"hidden@chatroom"],NO,200);groupEnabled=YES;
++    account=@"summary-fixture";policy=Policy(@[@"hidden@chatroom"],NO,200);groupEnabled=YES;
+     MainFrameCellDataManager *cache=[MainFrameCellDataManager new];cache.cache=[NSMutableDictionary dictionary];cellDataService=cache;
+     ChatBoxMgr *manager=[ChatBoxMgr new];foldedService=manager;
+-    NativeSession *older=SummarySession(cache,@"z-old@chatroom",100,@"旧群: 小王: 早上好");
+-    NativeSession *newer=SummarySession(cache,@"a-new@chatroom",200,@"项目群: 小李: [图片]");
+-    NativeSession *hidden=SummarySession(cache,@"hidden@chatroom",500,@"密友秘密");
+-    NativeSession *outside=SummarySession(cache,@"outside@chatroom",900,@"其他分组秘密");
+-    NativeSession *private=SummarySession(cache,@"private",800,@"[链接] 原生标题");
+-    older.m_bIsTop=YES;manager.sourceSessions=@[outside,older,hidden,private,newer];
++    NativeSession *older=SummarySession(@"old@chatroom",@"家庭群",100,@"明天到");
++    NativeSession *newer=SummarySession(@"new@chatroom",@"工作群",200,@"[图片]");
++    NativeSession *hidden=SummarySession(@"hidden@chatroom",@"隐藏群",400,@"secret");
++    NativeSession *private=SummarySession(@"friend",@"张三",300,@"你好");
++    NativeSession *outside=SummarySession(@"other@chatroom",@"其他组",500,@"outside");
++    manager.sourceSessions=@[outside,older,hidden,private,newer];
+     WESessionTabItem *all=[WESessionTabItem tabWithType:WETabTypeAll],*tab=[WESessionTabItem tabWithType:WETabTypeCustom];
+-    tab.tabId=@"summary-custom";tab.sessionUserNames=@[older.m_nsUserName,newer.m_nsUserName,hidden.m_nsUserName];NSArray *tabs=@[all,tab];
++    tab.tabId=@"summary-tab";tab.sessionUserNames=@[older.m_nsUserName,newer.m_nsUserName,hidden.m_nsUserName];NSArray *tabs=@[all,tab];
+     CSGroupListAdapter *adapter=[CSGroupListAdapter new];adapter.controller=[NativeHost new];adapter.preferences=[Preferences new];
+     NSArray *native=@[@[Row(0,@"chatroom_session_box",CSGroupRowKindAggregate,CSGroupRowCategoryGroup,99)]];
+-    void (^publish)(void)=^{FoldedPublish(adapter,native,tabs,tab.tabId);};publish();
+-    Check(!strcmp([[newer.m_msgWrap methodSignatureForSelector:@selector(m_n64MesSvrID)] methodReturnType],@encode(long long)) &&
+-        [EntrySummary(adapter.projection) isEqual:@"项目群: 小李: [图片]"],@"real signed q message ID matches unsigned Q cache ID without losing high bits");
+-    Check([EntrySummary(adapter.projection) isEqual:@"项目群: 小李: [图片]"],@"newest visible folded native digest wins, excluding newer hidden and other-group children and ignoring pinned/list/lexical order");
+-    Check([CSGroupReadObject(adapter.projection.sections[0][0],@"foldedEntrySummaryUserName") isEqual:newer.m_nsUserName],@"summary carries the selected visible child identity in the immutable row");
+-    CSGroupProjection *unchanged=adapter.projection;publish();Check(adapter.projection==unchanged,@"unchanged verified summary reuses projection");
+-    NativeCellData *newData=cache.cache[newer.m_nsUserName];newData.m_textForMessageLabel=@"项目群: 小李: [引用] 原文";publish();
+-    Check(adapter.projection!=unchanged && [EntrySummary(adapter.projection) isEqual:newData.m_textForMessageLabel],@"native text-only update republishes even when count and unread stay equal");
+-    older.sortTimeOverride=300;publish();Check([EntrySummary(adapter.projection) isEqual:@"旧群: 小王: 早上好"],@"native sortTimeOverride participates in newest timestamp");
+-    older.sortTimeOverride=0;older.m_uTopTime=350;publish();Check([EntrySummary(adapter.projection) isEqual:@"旧群: 小王: 早上好"],@"native pinned effective timestamp participates without blindly preferring pinned rows");
+-    older.m_bIsTop=NO;older.m_uTopTime=0;older.m_uUnTopTime=400;publish();Check([EntrySummary(adapter.projection) isEqual:@"旧群: 小王: 早上好"],@"native untop time participates for non-pinned sessions");
+-    older.m_uUnTopTime=0;older.sortTime=450;publish();Check([EntrySummary(adapter.projection) isEqual:@"旧群: 小王: 早上好"],@"native sortTime participates for non-pinned sessions");older.sortTime=0;
+-    for(NSString *text in @[@"群名: 发言人: 消息",@"[图片]",@"[链接] https://example.invalid/a",@"[引用] 小明: 原文"]){
+-        newData.m_textForMessageLabel=text;publish();Check([EntrySummary(adapter.projection) isEqual:text],@"native prefixes and message-type digest text copied verbatim");
++    void (^publish)(void)=^{ adapter.projection=[adapter projectionForSections:native tabs:tabs selectedTabID:tab.tabId accountID:account]; };
++    publish();
++    Check([EntrySummary(adapter.projection) isEqual:@"[图片]"] && [EntryPrefix(adapter.projection) isEqual:@"工作群: "],@"cold-start group uses separate native conversation prefix and native message, not sender prefix");
++    Check([EntrySource(adapter.projection) isEqual:@"native_formatter"] && prefixCalls>0 && digestCalls>0,@"cold-start invokes native aggregate prefix builder and digest without opening folded list");
++    Check(lastFormattedMessage!=newer.m_msgWrap && newer.m_msgWrap.displayChanges==0 && cache.mutations==0,@"formatting mutates only copied message, not live session or native cache");
++    Check([CSGroupReadObject(adapter.projection.sections[0][0],@"foldedEntrySummaryUserName") isEqual:newer.m_nsUserName],@"newest visible child excludes newer hidden and outside-group messages");
++    CSGroupProjection *same=adapter.projection;publish();Check(same==adapter.projection,@"unchanged two-part summary reuses immutable projection");
++    tab.sessionUserNames=@[private.m_nsUserName];publish();
++    Check([EntryPrefix(adapter.projection) isEqual:@"张三: "] && [EntrySummary(adapter.projection) isEqual:@"你好"],@"private prefix/message order and separator come from native builder");
++    tab.sessionUserNames=@[older.m_nsUserName,newer.m_nsUserName,hidden.m_nsUserName];
++    NativeCellData *entry=EntryCache(newer,@"原生缓存名称: ",@"原生入口正文");cache.cache[@"chatroom_session_box"]=entry;publish();
++    Check([EntryPrefix(adapter.projection) isEqual:@"原生缓存名称: "] && [EntrySummary(adapter.projection) isEqual:@"原生入口正文"] && [EntrySource(adapter.projection) isEqual:@"entry_cache"],@"exact native entry cache copies both fields verbatim with signed/unsigned high message IDs");
++    NSUInteger calls=digestCalls;publish();Check(digestCalls>=calls && cache.mutations==0,@"entry cache lookup never uses cache-creating getCellData:");
++    same=adapter.projection;entry.m_prefixTextForQuoteMessage=@"改名: ";publish();Check(same!=adapter.projection && [EntryPrefix(adapter.projection) isEqual:@"改名: "],@"name-only native change invalidates summary reuse");
++    for(NSString *text in @[@"[图片]",@"[动画表情]",@"[链接] 标题",@"[引用] 原文",@"[语音] 3秒",@"撤回了一条消息",@"系统通知",@"[微信红包]"]) {
++        entry.m_textForMessageLabel=text;publish();Check([EntrySummary(adapter.projection) isEqual:text],@"native entry type placeholders pass through without plugin mapping");
+     }
+-    NSMutableString *mutable=[@"mutable native digest" mutableCopy];newData.m_textForMessageLabel=mutable;publish();NSString *captured=EntrySummary(adapter.projection);[mutable appendString:@" changed"];
+-    Check([captured isEqual:@"mutable native digest"],@"row snapshot owns immutable native text, never a live cell/model reference");
+-    newData.m_textForMessageLabel=[[NSAttributedString alloc] initWithString:@"原生富文本摘要"];publish();Check([EntrySummary(adapter.projection) isEqual:@"原生富文本摘要"],@"attributed native digest keeps visible text without native color overrides");
+-    newData.m_textForMessageLabel=nil;publish();Check(!EntrySummary(adapter.projection),@"missing latest native digest stays neutral instead of showing an older session as newest");
+-    // No native cell has ever been rendered: format the child's copied message,
+-    // not the global aggregate, live message, cache creator or older child.
+-    newer.m_msgWrap.fixtureDigest=@"[图片]";newer.m_contact=@"项目群成员: ";
+-    publish();Check([EntrySummary(adapter.projection) isEqual:@"项目群成员: [图片]"],@"empty native message-label cache uses native formatting immediately on cold start");
+-    [cache.cache removeObjectForKey:newer.m_nsUserName];publish();
+-    Check([EntrySummary(adapter.projection) isEqual:@"项目群成员: [图片]"],@"absent CellData uses native alternative before opening folded page");
+-    Check([CSGroupCopyFoldedRows().lastObject.nativeSummaryReason isEqual:@"ok_copy_cell_missing"],@"diagnostic distinguishes successful copy fallback after a cache miss");
+-    Check(lastFormattedMessage!=newer.m_msgWrap && newer.m_msgWrap.displayChanges==0 && cache.mutations==0 && digestCalls>0 && prefixCalls>0,
+-        @"native formatting and group prefix use a detached message; no host-message or cache mutation");
+-    for(NSString *digest in @[@"纯文本",@"[链接] 原生标题",@"[引用] 小明: 原文"]) {
+-        newer.m_msgWrap.fixtureDigest=digest;publish();Check([EntrySummary(adapter.projection) isEqual:[@"项目群成员: " stringByAppendingString:digest]],@"alternative retains native text, link and quote formatting on refresh");
++    NSMutableString *mutable=[@"原生正文" mutableCopy];entry.m_textForMessageLabel=mutable;publish();NSString *saved=EntrySummary(adapter.projection);[mutable appendString:@" mutated"];Check([saved isEqual:@"原生正文"],@"native text is immutable snapshot, not live model storage");
++    entry.m_textForMessageLabel=[[NSAttributedString alloc] initWithString:@"原生可见文本"];publish();Check([EntrySummary(adapter.projection) isEqual:@"原生可见文本"],@"native attributed visible text retained while UI style remains native");
++    entry.m_n64MesSvrID++;publish();Check([EntrySummary(adapter.projection) isEqual:@"[图片]"] && [EntrySource(adapter.projection) isEqual:@"native_formatter"],@"distinct high-bit message ID rejects cached entry and formats current message");entry.m_n64MesSvrID--;
++    entry.m_sessionInfo.m_msgWrap.fixtureChatName=outside.m_nsUserName;publish();Check([EntryPrefix(adapter.projection) isEqual:@"工作群: "],@"same ID but another conversation cannot supply entry prefix or text");
++    cache.cache[@"chatroom_session_box"]=EntryCache(outside,@"其他组: ",@"secret");publish();Check([EntrySummary(adapter.projection) isEqual:@"[图片]"],@"global aggregate latest from another group is never fallback");
++    [cache.cache removeAllObjects];
++    for(NSString *text in @[@"[图片]",@"[表情]",@"[引用] 文本",@"[链接] 原生标题"]) {
++        newer.m_msgWrap.fixtureDigest=text;publish();Check([EntrySummary(adapter.projection) isEqual:text] && [EntryPrefix(adapter.projection) isEqual:@"工作群: "],@"uncached types preserve native digest while name stays separate");
+     }
+-    newer.m_msgWrap.fixtureDigest=nil;publish();Check(!EntrySummary(adapter.projection),@"unavailable native formatter result stays neutral without borrowing another child");
+-    newer.m_msgWrap.fixtureDigest=@"刷新后可读";publish();Check([EntrySummary(adapter.projection) isEqual:@"项目群成员: 刷新后可读"],@"subsequent list/message refresh retries a formerly missing digest");
+-    newData.m_textForMessageLabel=@"obsolete cached text";newData.m_n64MesSvrID++;cache.cache[newer.m_nsUserName]=newData;publish();
+-    Check([EntrySummary(adapter.projection) isEqual:@"项目群成员: 刷新后可读"],@"mismatched cache cannot hide or replace a valid current message digest");
+-    [cache.cache removeObjectForKey:newer.m_nsUserName];newData.m_n64MesSvrID=newer.m_msgWrap.m_n64MesSvrID;
+-    newer.m_msgWrap.aliasCopy=YES;publish();Check(!EntrySummary(adapter.projection) && newer.m_msgWrap.displayChanges==0,@"copy returning the original cannot mutate the live message");newer.m_msgWrap.aliasCopy=NO;
+-    newer.m_msgWrap.m_n64MesSvrID=0;publish();Check([EntrySummary(adapter.projection) isEqual:@"项目群成员: 刷新后可读"],@"local unsynced message can be formatted from its current stable snapshot without a server ID");
+-    newer.m_msgWrap.m_n64MesSvrID=0xF0000000000000C8ULL;
+-    onDigest=^{epoch++;};publish();Check(adapter.projection.sections.count==0,@"epoch change during native alternative drops all old content");onDigest=nil;
+-    onDigest=^{policy=Policy(@[newer.m_nsUserName],NO,203);};publish();Check(adapter.projection.sections.count==0,@"privacy revision change during native alternative cannot publish old digest");onDigest=nil;
+-    policy=Policy(@[@"hidden@chatroom"],NO,204);publish();Check([EntrySummary(adapter.projection) isEqual:@"项目群成员: 刷新后可读"],@"fresh valid snapshot recovers after policy transition");
+-    onDigest=^{account=@"other-alternative-account";};publish();Check(adapter.projection.sections.count==0,@"account switch during uncached native formatting cannot publish prior account text");onDigest=nil;account=@"folded-summary-account";
+-    tab.sessionUserNames=@[hidden.m_nsUserName];publish();Check(adapter.projection.sections[0].count==0,@"uncached formatter does not make an all-hidden group visible");
+-    tab.sessionUserNames=@[older.m_nsUserName,newer.m_nsUserName,hidden.m_nsUserName];
+-    newer.m_uLastTime=0;newer.m_msgWrap.m_uiCreateTime=200;publish();
+-    Check([EntrySummary(adapter.projection) isEqual:@"项目群成员: 刷新后可读"],@"missing session sort time uses current message time without vetoing valid native summary");
+-    newer.m_msgWrap.m_uiCreateTime=50;newer.m_msgWrap.fixtureSessionTime=210;publish();
+-    Check([EntrySummary(adapter.projection) isEqual:@"项目群成员: 刷新后可读"],@"native getSessionTime takes precedence over raw message creation time for ordering");
+-    newer.m_msgWrap.fixtureSessionTime=0;newer.m_msgWrap.m_uiCreateTime=0;
+-    tab.sessionUserNames=@[newer.m_nsUserName];publish();
+-    Check([EntrySummary(adapter.projection) isEqual:@"项目群成员: 刷新后可读"],@"a visible verified digest is shown even when every time field is unavailable or zero");
+-    newer.m_uLastTime=200;newer.missingAuxSortGetters=YES;publish();
+-    Check([EntrySummary(adapter.projection) isEqual:@"项目群成员: 刷新后可读"],@"missing optional sort selectors cannot invalidate an otherwise verified digest");newer.missingAuxSortGetters=NO;
+-    tab.sessionUserNames=@[older.m_nsUserName,newer.m_nsUserName,hidden.m_nsUserName];older.m_uLastTime=0;publish();
+-    Check([EntrySummary(adapter.projection) isEqual:@"项目群成员: 刷新后可读"],@"one other visible child with no time cannot veto the newest child's digest");older.m_uLastTime=100;
+-    onDigest=^{newer.m_uLastTime=220;};publish();
+-    Check([EntrySummary(adapter.projection) isEqual:@"项目群成员: 刷新后可读"],@"sort-time-only change during native formatting does not discard the same verified message");onDigest=nil;newer.m_uLastTime=200;
+-    onDigest=^{newer.m_msgWrap=[NativeMessage new];};publish();Check(!EntrySummary(adapter.projection),@"message replaced while formatting cannot publish the previous message digest");onDigest=nil;
+-    newer.m_msgWrap=[NativeMessage new];newer.m_msgWrap.m_n64MesSvrID=0xF0000000000000C8ULL;newer.m_contact=nil;
+-    cache.cache[newer.m_nsUserName]=newData;
+-    tab.sessionUserNames=@[private.m_nsUserName];private.m_msgWrap.fixtureDigest=@"[链接] 冷启动私聊";NativeCellData *privateData=cache.cache[private.m_nsUserName];[cache.cache removeObjectForKey:private.m_nsUserName];publish();
+-    Check([EntrySummary(adapter.projection) isEqual:@"[链接] 冷启动私聊"],@"private folded child formats without a group contact or prior page visit");
+-    cache.cache[private.m_nsUserName]=privateData;private.m_msgWrap.fixtureDigest=nil;tab.sessionUserNames=@[older.m_nsUserName,newer.m_nsUserName,hidden.m_nsUserName];
+-    newData.m_textForMessageLabel=@"valid latest";newData.m_n64MesSvrID++;publish();Check(!EntrySummary(adapter.projection),@"distinct unsigned 64-bit server IDs above LLONG_MAX cannot accidentally match through saturation");
+-    newData.m_n64MesSvrID=newer.m_msgWrap.m_n64MesSvrID;newData.m_sessionInfo=outside;publish();Check(!EntrySummary(adapter.projection),@"cache entry for a different session is rejected");
+-    newData.m_sessionInfo=newer;newer.m_msgWrap.m_n64MesSvrID=0;newData.m_n64MesSvrID=0;publish();Check(!EntrySummary(adapter.projection),@"unverifiable message identity stays neutral");
+-    newer.m_msgWrap.m_n64MesSvrID=0xF0000000000000C8ULL;newData.m_n64MesSvrID=newer.m_msgWrap.m_n64MesSvrID;
+-    [cache.cache removeObjectForKey:newer.m_nsUserName];publish();Check(!EntrySummary(adapter.projection),@"cache miss cannot borrow the global aggregate preview");cache.cache[newer.m_nsUserName]=newData;
+-    WrongCellDataGetter *wrong=[WrongCellDataGetter new];cellDataService=wrong;publish();Check(!EntrySummary(adapter.projection) && wrong.calls==0,@"unsupported scalar cache getter is rejected before invocation");cellDataService=cache;
+-    publish();Check(cache.reads>0 && cache.mutations==0 && outside.m_uUnReadCount==0 && manager.sourceSessions.count==5,@"snapshot uses only cache reads and leaves native sessions/unread unchanged");
+-    tab.sessionUserNames=@[private.m_nsUserName];publish();Check([EntrySummary(adapter.projection) isEqual:@"[链接] 原生标题"],@"private group summary uses its own native folded child");
+-    tab.sessionUserNames=@[hidden.m_nsUserName];publish();Check(adapter.projection.sections[0].count==0 && !EntrySummary(adapter.projection),@"all group members hidden removes entry and summary");
+-    tab.sessionUserNames=@[newer.m_nsUserName];cache.onRead=^{epoch++;};publish();Check(adapter.projection.sections.count==0,@"epoch change during summary read publishes no prior account content");cache.onRead=nil;
+-    cache.onRead=^{policy=Policy(@[newer.m_nsUserName],NO,201);};publish();Check(adapter.projection.sections.count==0,@"privacy revision change during summary read publishes no old policy content");cache.onRead=nil;publish();Check(adapter.projection.sections[0].count==0,@"next snapshot applies new privacy rules without stale digest");
+-    policy=Policy(@[],YES,202);cache.onRead=^{account=@"other-account";};publish();Check(adapter.projection.sections.count==0,@"account change during native summary lookup rejects publication");cache.onRead=nil;account=@"folded-summary-account";
+-    // A child snapshot with mismatched provenance may still provide count metadata,
+-    // but must never provide sensitive preview text to the parent.
++    newer.m_msgWrap.fixtureDisplayName=@"1234567890超长群名";publish();Check([EntryPrefix(adapter.projection) isEqual:@"1234567890超长群名: "],@"long explicit native name is retained for native label truncation, never cut to ten chars by plugin");
++    newer.m_msgWrap.fixtureDisplayName=@"生成群名... ";publish();Check([EntryPrefix(adapter.projection) isEqual:@"生成群名... : "],@"already shortened native generated group name passes through unchanged");
++    newer.m_msgWrap.fixtureDisplayName=@"工作群";
++    older.sortTimeOverride=600;publish();Check([EntryPrefix(adapter.projection) isEqual:@"家庭群: "] && [EntrySummary(adapter.projection) isEqual:@"明天到"],@"latest visible conversation change updates both fields atomically");older.sortTimeOverride=0;
++    older.m_bIsTop=YES;older.m_uTopTime=700;publish();Check([EntryPrefix(adapter.projection) isEqual:@"家庭群: "],@"native pinned effective time remains the ordering source");
++    older.m_bIsTop=NO;older.m_uTopTime=0;older.m_uUnTopTime=700;publish();Check([EntryPrefix(adapter.projection) isEqual:@"家庭群: "],@"native untop effective time remains the ordering source");
++    older.m_uUnTopTime=0;older.sortTime=700;publish();Check([EntryPrefix(adapter.projection) isEqual:@"家庭群: "],@"native sort override remains independent of lexical/list order");older.sortTime=0;
++    older.m_uLastTime=0;older.m_msgWrap.fixtureSessionTime=800;publish();Check([EntryPrefix(adapter.projection) isEqual:@"家庭群: "],@"native message session time remains available for ordering");older.m_msgWrap.fixtureSessionTime=0;older.m_uLastTime=100;
++    policy=Policy(@[newer.m_nsUserName,hidden.m_nsUserName],NO,201);publish();Check([EntryPrefix(adapter.projection) isEqual:@"家庭群: "],@"hiding latest child advances to next visible child's native prefix/body");
++    tab.sessionUserNames=@[newer.m_nsUserName,hidden.m_nsUserName];publish();Check(adapter.projection.sections[0].count==0 && !EntrySummary(adapter.projection),@"all children hidden removes entry and text");
++    policy=Policy(@[hidden.m_nsUserName],NO,202);tab.sessionUserNames=@[newer.m_nsUserName];
++    newer.m_msgWrap.fixtureDigest=nil;publish();Check(!EntrySummary(adapter.projection),@"missing source text never borrows other group or invented placeholder");
++    newer.m_msgWrap.fixtureDigest=@"刷新后就绪";publish();Check([EntrySummary(adapter.projection) isEqual:@"刷新后就绪"],@"next list refresh automatically retries an initially absent digest");
++    newer.m_uLastTime=0;newer.m_msgWrap.m_uiCreateTime=0;publish();Check([EntrySummary(adapter.projection) isEqual:@"刷新后就绪"],@"all zero time fields cannot veto verified text");
++    newer.missingAuxSortGetters=YES;publish();Check([EntrySummary(adapter.projection) isEqual:@"刷新后就绪"],@"missing optional time selectors do not gate digest");newer.missingAuxSortGetters=NO;
++    newer.m_msgWrap.aliasCopy=YES;publish();Check(!EntrySummary(adapter.projection) && newer.m_msgWrap.displayChanges==0,@"aliasing copy is rejected without live-message mutation");newer.m_msgWrap.aliasCopy=NO;
++    newer.m_msgWrap.m_n64MesSvrID=0;publish();Check([EntrySummary(adapter.projection) isEqual:@"刷新后就绪"],@"unsynced message formats through stable snapshot with no server ID");
++    onDigest=^{epoch++;};publish();Check(adapter.projection.sections.count==0,@"account epoch transition during formatting rejects old text");onDigest=nil;
++    onDigest=^{policy=Policy(@[],YES,203);};publish();Check(adapter.projection.sections.count==0,@"privacy revision transition rejects both old prefix and text");onDigest=nil;
++    onDigest=^{account=@"other-account";};publish();Check(adapter.projection.sections.count==0,@"account switch rejects cached/formatter values");onDigest=nil;account=@"summary-fixture";
++    policy=Policy(@[],YES,204);onDigest=^{newer.m_uLastTime++;};publish();Check([EntrySummary(adapter.projection) isEqual:@"刷新后就绪"],@"time-only changes during format do not invalidate message identity");onDigest=nil;
++    onDigest=^{((NativeMessage *)lastFormattedMessage).fixtureChatName=@"outside";};publish();Check(!EntrySummary(adapter.projection),@"formatter cannot rebind the copied message to another conversation");onDigest=nil;
++    onDigest=^{newer.m_msgWrap=[NativeMessage new];};publish();Check(!EntrySummary(adapter.projection),@"message replacement during formatting rejects old pair");onDigest=nil;
++    WrongCellDataGetter *wrong=[WrongCellDataGetter new];cellDataService=wrong;publish();Check(wrong.calls==0,@"wrong native method return type is rejected before invocation");cellDataService=cache;
++    tab.sessionUserNames=@[private.m_nsUserName];cache.onRead=^{epoch++;};publish();Check(adapter.projection.sections.count==0,@"epoch changes during cache lookup reject publication");cache.onRead=nil;
++    publish();Check([EntryPrefix(adapter.projection) isEqual:@"张三: "] && cache.mutations==0 && manager.sourceSessions.count==5,@"fresh account snapshot recovers without modifying native collection or counters");
+     NSArray *rows=CSGroupCopyFoldedRows();
+     for(NSNumber *kind in @[@0,@1,@2,@3]) {
+-        CSGroupProjection *child=[[CSGroupProjection alloc] initWithSections:@[rows] tabs:tabs selectedTabID:kind.intValue==1 ? all.tabId : tab.tabId filterDuplicates:kind.intValue==2 accountID:account hiddenUserNames:kind.intValue==3 ? [NSSet setWithObject:@"other"] : [NSSet set] privacyRevision:kind.intValue==0 ? 201 : 202 previousProjection:nil];
+-        CSGroupProjection *parent=[[CSGroupProjection alloc] initWithSections:native tabs:tabs selectedTabID:tab.tabId filterDuplicates:NO accountID:account hiddenUserNames:[NSSet set] unmaskedAggregateUserNames:[NSSet set] privacyRevision:202 scopeFoldedEntry:YES foldedProjection:child previousProjection:nil];
+-        Check(!EntrySummary(parent),@"mismatched child policy/group/filter provenance cannot publish a summary");
++        CSGroupProjection *child=[[CSGroupProjection alloc] initWithSections:@[rows] tabs:tabs selectedTabID:kind.intValue==1 ? all.tabId : tab.tabId filterDuplicates:kind.intValue==2 accountID:account hiddenUserNames:kind.intValue==3 ? [NSSet setWithObject:@"other"] : [NSSet set] privacyRevision:kind.intValue==0 ? 203 : 204 previousProjection:nil];
++        CSGroupProjection *parent=[[CSGroupProjection alloc] initWithSections:native tabs:tabs selectedTabID:tab.tabId filterDuplicates:NO accountID:account hiddenUserNames:[NSSet set] unmaskedAggregateUserNames:[NSSet set] privacyRevision:204 scopeFoldedEntry:YES foldedProjection:child previousProjection:nil];
++        Check(!EntrySummary(parent) && !EntryPrefix(parent),@"mismatched child account/policy/group/filter provenance cannot publish either text part");
+     }
+     account=oldAccount;policy=oldPolicy;foldedService=oldService;cellDataService=oldCache;groupEnabled=oldEnabled;
+ }
+--- 2.0-23b/Tests/ListCornerSemanticsTests.m
++++ 2.0-24/Tests/ListCornerSemanticsTests.m
+@@ -1,5 +1,6 @@
+ #import <UIKit/UIKit.h>
+ #import <objc/runtime.h>
++#import <objc/message.h>
+ #import "CSListCornerConfiguration.h"
+ #import "CSListCornerSectionPolicy.h"
+ #import "CSListCornerPageContext.h"
+@@ -41,6 +42,7 @@
+ }
+ @end
+ @implementation MainFrameItemView @end
++#include "FoldedNativeRendererFixture.h"
+ @interface NewMainFrameCell : UITableViewCell { @public MainFrameItemView *m_itemView; }
+ @end
+ @implementation NewMainFrameCell @end
+--- 2.0-23b/control
++++ 2.0-24/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.0-23b
++Version: 2.0-24
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会
+--- 2.0-23b/docs/session-groups.md
++++ 2.0-24/docs/session-groups.md
+@@ -1,4 +1,6 @@
+ # 会话分组实现说明
++
++2026-10-27 / 2.0-24 更新：纠正普通会话正文与原生折叠摘要的差异。原生入口由 `m_prefixTextForQuoteMessage`（会话名称）与 `m_textForMessageLabel`（消息正文）两个 label 共同显示；本版复用原生消息 label 和 `quoteMessageLable:prefixText:`，不自造名称/消息拼接、不设置额外宽度比例或缩字。只复用消息 ID、GetChatName 与候选一致的入口缓存；否则对消息副本调用原生 digest（空 sender）与 aggregate makeTextForQuoteMessage。后者由 GetChatName、联系人/群备注、genChatRoomName 原生规则生成名称，不再用普通群聊的发言人前缀。诊断增加 `source=entry_cache/native_formatter/neutral`，仍限32条/进程、去重且不记录正文或账号。原有分组过滤、排序、隐私、卡片与隐藏时间规则保留。详见 [原生证据与交付](audits/folded-native-parity-2.0-24/README.md)。
+ 
+ 2026-10-27 / 2.0-23b 补充修正：按用户澄清，折叠入口右侧时间/日期继续隐藏，不将缺失时间当作显示问题或摘要降级原因。撤销“任一可见候选时间不明就整组中性”及“读取期间仅时间变化就丢弃摘要”两处门禁，移除 `no_sort_time` 诊断。时间只用于排序：辅助会话字段缺失不否决其他可读字段，会话时间不可用时读取消息原生 `getSessionTime` / `m_uiCreateTime`；所有排序值都缺失时按同序候选处理，仍可展示身份有效的摘要。账号、隐私和消息身份门禁保留；原生 UI 与上一版字节不变。详见 [补充回归与交付](audits/folded-digest-no-time-gate-2.0-23b/README.md)。
+ 

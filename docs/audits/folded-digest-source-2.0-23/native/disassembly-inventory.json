@@ -1,0 +1,122 @@
+[
+  {
+    "file": "CMessageWrap--copyToMsg_.asm",
+    "start": "0x104b9e4ac",
+    "stop": "0x104b9f00c",
+    "truncated": false
+  },
+  {
+    "file": "CMessageWrap--copyWithZone_.asm",
+    "start": "0x104b9f00c",
+    "stop": "0x104b9f07c",
+    "truncated": false
+  },
+  {
+    "file": "CMessageWrap--ChangeForDisplay.asm",
+    "start": "0x104ba1b9c",
+    "stop": "0x104ba20f4",
+    "truncated": false
+  },
+  {
+    "file": "CMessageWrap--GetDisplayContent.asm",
+    "start": "0x104ba5310",
+    "stop": "0x104ba53fc",
+    "truncated": false
+  },
+  {
+    "file": "CMessageWrap--getSessionTime.asm",
+    "start": "0x104ba6634",
+    "stop": "0x104ba673c",
+    "truncated": false
+  },
+  {
+    "file": "CMessageWrap--m_n64MesSvrID.asm",
+    "start": "0x104bb3fec",
+    "stop": "0x104bb3ffc",
+    "truncated": false
+  },
+  {
+    "file": "CMessageWrap--m_nsContent.asm",
+    "start": "0x104bb4050",
+    "stop": "0x104bb4060",
+    "truncated": false
+  },
+  {
+    "file": "CMessageWrap--m_nsPushContent.asm",
+    "start": "0x104bb40f4",
+    "stop": "0x104bb4104",
+    "truncated": false
+  },
+  {
+    "file": "MMSessionInfo--copyWithZone_.asm",
+    "start": "0x1046ade98",
+    "stop": "0x1046aded8",
+    "truncated": false
+  },
+  {
+    "file": "MMSessionInfo--setM_msgWrap_.asm",
+    "start": "0x1046ae114",
+    "stop": "0x1046ae2b0",
+    "truncated": false
+  },
+  {
+    "file": "MMSessionInfo--m_msgWrap.asm",
+    "start": "0x1046aea38",
+    "stop": "0x1046aea40",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--init.asm",
+    "start": "0x104a7657c",
+    "stop": "0x104a765c8",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--initWithSessionInfo_.asm",
+    "start": "0x104a765c8",
+    "stop": "0x104a766e8",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--makeTextForMessageLabel.asm",
+    "start": "0x104a76e94",
+    "stop": "0x104a7795c",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--getGroupName.asm",
+    "start": "0x104a781fc",
+    "stop": "0x104a78474",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--makeTextSession_.asm",
+    "start": "0x104a7cfd4",
+    "stop": "0x104a7ff34",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--makeTextForQuoteMessage.asm",
+    "start": "0x104a80370",
+    "stop": "0x104a80c50",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--setM_sessionInfo_.asm",
+    "start": "0x104a821e4",
+    "stop": "0x104a821f0",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellData--digestForMsg_withSender_.asm",
+    "start": "0x104a78584",
+    "stop": "0x104a7cfd4",
+    "truncated": false
+  },
+  {
+    "file": "MainFrameCellDataManager--getCellDataByUsrName_.asm",
+    "start": "0x104a836a8",
+    "stop": "0x104a836e4",
+    "truncated": false
+  }
+]

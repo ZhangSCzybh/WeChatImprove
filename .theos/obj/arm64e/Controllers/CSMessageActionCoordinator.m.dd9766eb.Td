@@ -8,7 +8,9 @@
   Controllers/CSMessageActionPreferences.h \
   Controllers/CSMessageActionContext.h \
   Controllers/CSMessageMediaProvider.h \
-  Controllers/CSMessageSendAdapter.h Controllers/CSVoiceForwardAdapter.h
+  Controllers/CSMessageSendAdapter.h Controllers/CSVoiceForwardAdapter.h \
+  Controllers/CSMessageImageStickerAdapter.h \
+  Controllers/CSCloseFriendBridge.h Controllers/CSCloseFriendPolicy.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
 /Users/zhangshichao/theos/Prefix.pch:
 Controllers/CSMessageActionCoordinator.h:
@@ -19,3 +21,6 @@ Controllers/CSMessageActionContext.h:
 Controllers/CSMessageMediaProvider.h:
 Controllers/CSMessageSendAdapter.h:
 Controllers/CSVoiceForwardAdapter.h:
+Controllers/CSMessageImageStickerAdapter.h:
+Controllers/CSCloseFriendBridge.h:
+Controllers/CSCloseFriendPolicy.h:

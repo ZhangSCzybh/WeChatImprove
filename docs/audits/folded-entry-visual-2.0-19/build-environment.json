@@ -1,0 +1,14 @@
+{
+  "source": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "sourceCommit": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+  "version": "2.0-19",
+  "buildRoot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-folded-visual-2.0-19-qjm5w5wl",
+  "baseline": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-folded-visual-2.0-19-qjm5w5wl/baseline.json",
+  "baselineFiles": 47363,
+  "cacheClonedFrom": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-tags-folded-2.0-18-d6dydfdf",
+  "previousPackagesSHA256": {
+    "com.wechat.improve_2.0-18_iphoneos-arm64.deb": "11d39621462d085ffc698d8173681a5106c2d4b373cc87f1ff7c087ffd7f86f8",
+    "com.wechat.improve_2.0-18_symbols.zip": "d9de402d5cb7fd2aef732f5384c9b079f4ee974eb466b8d23b4208baf49b0c06",
+    "com.wechat.improve_2.0-18_iphoneos-arm.deb": "201d627505a00ab44edca301f413a0a9ec1f22b0a119b2331bd833c8ede4586d"
+  }
+}

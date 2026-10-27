@@ -1,0 +1,655 @@
+{
+  "createdAt": "2026-10-27T00:36:33.190539+08:00",
+  "status": "stopped-before-source-restoration-missing-snapshots",
+  "sourceChangesApplied": false,
+  "compileRun": false,
+  "regressionRun": false,
+  "packagingRun": false,
+  "gitReference": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+  "before19Files": 5,
+  "modified19Count": 13,
+  "modified20Count": 19,
+  "combinedExistingFileScope": 21,
+  "before19Matches18": true,
+  "before19Missing": [
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/SessionGroupHooks.xm",
+    "README.md",
+    "Tests/extract-list-corners.py",
+    "Tests/verify-close-friend-session.sh",
+    "control",
+    "docs/session-groups.md"
+  ],
+  "verifiedCandidatesFound": 14,
+  "missingVerifiedSources": [
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/SessionGroupHooks.xm",
+    "README.md",
+    "Tests/verify-close-friend-session.sh",
+    "control",
+    "docs/session-groups.md"
+  ],
+  "source18Differences": [
+    "Controllers/CSCloseFriendSessionPresentation.m",
+    "Controllers/CSGroupListAdapter.h",
+    "Controllers/CSGroupListAdapter.m",
+    "Controllers/CSListCornerPageContext.h",
+    "Controllers/CSListCornerPageContext.m",
+    "Controllers/CSListCornerSessionAdapter.h",
+    "Controllers/CSListCornerSessionAdapter.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/ListCornerRadiusHooks.xm",
+    "Hooks/SessionGroupHooks.xm",
+    "Tests/CloseFriendSessionPresentationTests.m",
+    "Tests/ListCornerSemanticsTests.m",
+    "Tests/ListCornerUIKit/ListCornerUIKit.m",
+    "Tests/ListCornerUIKit/UIKit/UIKit.h",
+    "Tests/extract-list-corners.py",
+    "Tests/verify-close-friend-session.sh",
+    "Tests/verify-list-corners.sh",
+    "control"
+  ],
+  "unexpectedSource18Differences": [],
+  "baseline19SHA256": "51888c46420348d74285c1da8c3b0d9c184a2f323b7550d7752d8cfbb246022f",
+  "files": [
+    {
+      "file": "Controllers/CSCloseFriendSessionPresentation.m",
+      "modifiedIn19": true,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "9172fd4fbded0be84095e76a6376f42d409c8fb81c0e36836af8e22d9abb1be8",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "ed91edf95f9eb98762db718c55409c880198120690747478d9173d13be4b17df",
+      "before19Exists": true,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "19-before",
+          "path": "docs/audits/folded-entry-visual-2.0-19/before/Controllers/CSCloseFriendSessionPresentation.m",
+          "sha256": "9172fd4fbded0be84095e76a6376f42d409c8fb81c0e36836af8e22d9abb1be8",
+          "matches2_0_18": true
+        },
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Controllers/CSCloseFriendSessionPresentation.m",
+          "sha256": "fdb53d46ca70619f918b69191f93c56fc590fca75e270ee9c042be9c103b3f0e",
+          "matches2_0_18": false
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Controllers/CSCloseFriendSessionPresentation.m",
+          "sha256": "5befdd0f1b564b90e775be020b6ba2d1346c6f71ca1a5f5d0623d23926654b44",
+          "matches2_0_18": false
+        }
+      ]
+    },
+    {
+      "file": "Controllers/CSGroupListAdapter.h",
+      "modifiedIn19": false,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "caf5597cade74bea28a85d69003e7aabf96f3a6a1a214c2d18c8090078e7717e",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "20fedadcd45935fe522833255be897647dcc04307109c8743f49343277d31504",
+      "before19Exists": false,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Controllers/CSGroupListAdapter.h",
+          "sha256": "caf5597cade74bea28a85d69003e7aabf96f3a6a1a214c2d18c8090078e7717e",
+          "matches2_0_18": true
+        }
+      ]
+    },
+    {
+      "file": "Controllers/CSGroupListAdapter.m",
+      "modifiedIn19": false,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "c5a721ecf52e624b1aa51f52f5a03d131356bf26f004d78b02fb67656cd0e72d",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "722ce34a340935e9e59fa57b9d446495fd8bcaa5e8d9c52d1cc07900f92f0c8b",
+      "before19Exists": false,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Controllers/CSGroupListAdapter.m",
+          "sha256": "c5a721ecf52e624b1aa51f52f5a03d131356bf26f004d78b02fb67656cd0e72d",
+          "matches2_0_18": true
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Controllers/CSGroupListAdapter.m",
+          "sha256": "010c3600986e5e24b608a02710fae398ba751eab1071cb9ea6bf1100d31a7fd8",
+          "matches2_0_18": false
+        }
+      ]
+    },
+    {
+      "file": "Controllers/CSListCornerPageContext.h",
+      "modifiedIn19": false,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "3aebc011193267d26e904ed758c557de3489550b626da550e008fac2278cabf5",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "ff7eb2776f29c26c0b1759d19416f73d94026b6ac7e0f3f8dab4b21f1ab5aab6",
+      "before19Exists": false,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Controllers/CSListCornerPageContext.h",
+          "sha256": "3aebc011193267d26e904ed758c557de3489550b626da550e008fac2278cabf5",
+          "matches2_0_18": true
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Controllers/CSListCornerPageContext.h",
+          "sha256": "3aebc011193267d26e904ed758c557de3489550b626da550e008fac2278cabf5",
+          "matches2_0_18": true
+        }
+      ]
+    },
+    {
+      "file": "Controllers/CSListCornerPageContext.m",
+      "modifiedIn19": true,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "b9b9ed6af090dfcf64908f65136ea787c801c175ea0a8a4131b485cdf61da48f",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "fbf9e03266a663423dd890f06c217116def2a63cd5fcdac05482b042ab46b45d",
+      "before19Exists": true,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "19-before",
+          "path": "docs/audits/folded-entry-visual-2.0-19/before/Controllers/CSListCornerPageContext.m",
+          "sha256": "b9b9ed6af090dfcf64908f65136ea787c801c175ea0a8a4131b485cdf61da48f",
+          "matches2_0_18": true
+        },
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Controllers/CSListCornerPageContext.m",
+          "sha256": "429e577d690ec7cd057231f9808cde364ea86200caffdac9ae5cddb59e90b43c",
+          "matches2_0_18": false
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Controllers/CSListCornerPageContext.m",
+          "sha256": "b9b9ed6af090dfcf64908f65136ea787c801c175ea0a8a4131b485cdf61da48f",
+          "matches2_0_18": true
+        }
+      ]
+    },
+    {
+      "file": "Controllers/CSListCornerSessionAdapter.h",
+      "modifiedIn19": false,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "c6ef611543693449e2e0432ef2e807963c92c8764020a3e7c1b9dce0da64427f",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "5b2a44e9bfe518bc8287829d7ac6109a1baa7c9053056bc5e99ffe0d852fe92a",
+      "before19Exists": false,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Controllers/CSListCornerSessionAdapter.h",
+          "sha256": "c6ef611543693449e2e0432ef2e807963c92c8764020a3e7c1b9dce0da64427f",
+          "matches2_0_18": true
+        }
+      ]
+    },
+    {
+      "file": "Controllers/CSListCornerSessionAdapter.m",
+      "modifiedIn19": false,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "23f08171456bd16b50a6a33aee2542332e11b44c3312bbfe8df2d7b6456d9000",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "6bf6e73de73baf9fd8168eae445273a5ca42d4540dd3dca791a7a8951ce9755a",
+      "before19Exists": false,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Controllers/CSListCornerSessionAdapter.m",
+          "sha256": "23f08171456bd16b50a6a33aee2542332e11b44c3312bbfe8df2d7b6456d9000",
+          "matches2_0_18": true
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Controllers/CSListCornerSessionAdapter.m",
+          "sha256": "23f08171456bd16b50a6a33aee2542332e11b44c3312bbfe8df2d7b6456d9000",
+          "matches2_0_18": true
+        }
+      ]
+    },
+    {
+      "file": "Controllers/CSReleaseNotesViewController.m",
+      "modifiedIn19": true,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "416dc6b946a74e1ecb66cf9d527eb70d3479cf5d2c91c96e86ef0f33a7e7f236",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "1f8100885947cd72afb25bbad0011e14e9b1fa05b2fd9e4254091792420b1240",
+      "before19Exists": false,
+      "verifiedSourceFound": false,
+      "candidates": [
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Controllers/CSReleaseNotesViewController.m",
+          "sha256": "da2c62285302aa571321f9e8a21b47cb446c02a9d4189de97b0db8246a0b60a4",
+          "matches2_0_18": false
+        }
+      ]
+    },
+    {
+      "file": "Headers/CSUserInfoHelper.h",
+      "modifiedIn19": true,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "b08184bf5b5d71f6982c5e14d8f6803422633858f593ea0194b6eb05eaec2b2f",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "226fdc39dbf68eec24199bb9fa464f95683d33dab773fecb1158db10c49602d3",
+      "before19Exists": false,
+      "verifiedSourceFound": false,
+      "candidates": [
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Headers/CSUserInfoHelper.h",
+          "sha256": "e8040269e949a115439573e6ac5d085a7536d71a1d793f2aedc073f0dca15c97",
+          "matches2_0_18": false
+        }
+      ]
+    },
+    {
+      "file": "Hooks/ListCornerRadiusHooks.xm",
+      "modifiedIn19": true,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "a221726f7ceb03014ded3b70bf2d8f4cd5edfe0240d9d871b299d63721633fd1",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "56815827dd785dd3d27fd9debc3d62208c3a478832f2dfd8fb95c88b06eebf0c",
+      "before19Exists": true,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "19-before",
+          "path": "docs/audits/folded-entry-visual-2.0-19/before/Hooks/ListCornerRadiusHooks.xm",
+          "sha256": "a221726f7ceb03014ded3b70bf2d8f4cd5edfe0240d9d871b299d63721633fd1",
+          "matches2_0_18": true
+        },
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Hooks/ListCornerRadiusHooks.xm",
+          "sha256": "d397e3dab73a0ebed1f86f20787638274301ecbdc06ea35fcac84b9a38910185",
+          "matches2_0_18": false
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Hooks/ListCornerRadiusHooks.xm",
+          "sha256": "a221726f7ceb03014ded3b70bf2d8f4cd5edfe0240d9d871b299d63721633fd1",
+          "matches2_0_18": true
+        }
+      ]
+    },
+    {
+      "file": "Hooks/SessionGroupHooks.xm",
+      "modifiedIn19": true,
+      "modifiedIn20": false,
+      "expected2_0_18SHA256": "b56c592908053179b6e40af145c57f35c7923d39a7ee51cc1ff0874be4763b4c",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "5716f9e7dc6158c13162bcad8e7ee45f7099901f61e3d0fde970f7bbf7888a46",
+      "before19Exists": false,
+      "verifiedSourceFound": false,
+      "candidates": [
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Hooks/SessionGroupHooks.xm",
+          "sha256": "5716f9e7dc6158c13162bcad8e7ee45f7099901f61e3d0fde970f7bbf7888a46",
+          "matches2_0_18": false
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Hooks/SessionGroupHooks.xm",
+          "sha256": "a70c542721185d3c00723df8188713fbbc57e099f88ae45b9d7d575a821c0c5d",
+          "matches2_0_18": false
+        }
+      ]
+    },
+    {
+      "file": "README.md",
+      "modifiedIn19": true,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "bbc0d40e984704db4cd729daf5adaa33c5f4ecf21997a3d87b9600431ccaaa87",
+      "expectedFrom": "2.0-19 pre-change baseline.json",
+      "currentSHA256": "74478b66a4a9d522a8e08aab63ddde0170dfca777b573637589ec225d7f73b13",
+      "before19Exists": false,
+      "verifiedSourceFound": false,
+      "candidates": [
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "README.md",
+          "sha256": "ca41fe1dc5903504bcf1be75ac689bae6e830d269cfbe249d9bfb476e199ecbd",
+          "matches2_0_18": false
+        }
+      ]
+    },
+    {
+      "file": "Tests/CloseFriendSessionPresentationTests.m",
+      "modifiedIn19": true,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "392740c164a06cef0698c48439ff008e867d6aead217accc4643b7aeb71907e0",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "135f9e2f28a375ca4db1d5f52b8358a676d32ddbc445ba1f73415862b586787d",
+      "before19Exists": true,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "19-before",
+          "path": "docs/audits/folded-entry-visual-2.0-19/before/Tests/CloseFriendSessionPresentationTests.m",
+          "sha256": "392740c164a06cef0698c48439ff008e867d6aead217accc4643b7aeb71907e0",
+          "matches2_0_18": true
+        },
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Tests/CloseFriendSessionPresentationTests.m",
+          "sha256": "09d3d8fff9a0d46f904ffa67b1ca515b063d3021ca5070f0a85b4f20e13a1bbb",
+          "matches2_0_18": false
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Tests/CloseFriendSessionPresentationTests.m",
+          "sha256": "ed571c98d4e77c59fff159c4480b3b9eea36d8a397fd309e560229b4595d1e7e",
+          "matches2_0_18": false
+        }
+      ]
+    },
+    {
+      "file": "Tests/ListCornerSemanticsTests.m",
+      "modifiedIn19": true,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "94d45bf95099b9906da838f640ed6979c17ebfff4a0537383e98e56859b9db51",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "f4ceef872fcb57557e44917eb46d3700f124e99d2f8537d64b568ab4327c88d1",
+      "before19Exists": true,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "19-before",
+          "path": "docs/audits/folded-entry-visual-2.0-19/before/Tests/ListCornerSemanticsTests.m",
+          "sha256": "94d45bf95099b9906da838f640ed6979c17ebfff4a0537383e98e56859b9db51",
+          "matches2_0_18": true
+        },
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Tests/ListCornerSemanticsTests.m",
+          "sha256": "4ddad0228469fea263c9fcd3163b1e3e410a6a8677c81fa3d804fa6f8846e5d5",
+          "matches2_0_18": false
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Tests/ListCornerSemanticsTests.m",
+          "sha256": "94d45bf95099b9906da838f640ed6979c17ebfff4a0537383e98e56859b9db51",
+          "matches2_0_18": true
+        }
+      ]
+    },
+    {
+      "file": "Tests/ListCornerUIKit/ListCornerUIKit.m",
+      "modifiedIn19": false,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "fb091a5b0fbfca00670a161f34bd34796e36256f9ed76dacd27fe7ba12ffdaa5",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "b6bd38901be4a859cfbf7c83df94bf7822668246c3599619f0b31ade2ff8f410",
+      "before19Exists": false,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Tests/ListCornerUIKit/ListCornerUIKit.m",
+          "sha256": "fb091a5b0fbfca00670a161f34bd34796e36256f9ed76dacd27fe7ba12ffdaa5",
+          "matches2_0_18": true
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Tests/ListCornerUIKit/ListCornerUIKit.m",
+          "sha256": "fb091a5b0fbfca00670a161f34bd34796e36256f9ed76dacd27fe7ba12ffdaa5",
+          "matches2_0_18": true
+        }
+      ]
+    },
+    {
+      "file": "Tests/ListCornerUIKit/UIKit/UIKit.h",
+      "modifiedIn19": false,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "d50bf8031e62e506e93a1c9f5b73667133aabc70dc3f2c8e31611e37fc3da4b4",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "cd38278c2048438e378f623231f4c1c0ee7d034aa31c7ac9ba2d0c42f671c7b3",
+      "before19Exists": false,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Tests/ListCornerUIKit/UIKit/UIKit.h",
+          "sha256": "d50bf8031e62e506e93a1c9f5b73667133aabc70dc3f2c8e31611e37fc3da4b4",
+          "matches2_0_18": true
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Tests/ListCornerUIKit/UIKit/UIKit.h",
+          "sha256": "d50bf8031e62e506e93a1c9f5b73667133aabc70dc3f2c8e31611e37fc3da4b4",
+          "matches2_0_18": true
+        }
+      ]
+    },
+    {
+      "file": "Tests/extract-list-corners.py",
+      "modifiedIn19": true,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "8fbdc076334d980aafa1d2361a8a2facb680ad4ef3db27f199f7e3a12a398922",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "0cab41d707566ee709d843752794c9dd9df937f18bfe60240ddb9a699513e6d2",
+      "before19Exists": false,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Tests/extract-list-corners.py",
+          "sha256": "2e10d5b7eee119fa8905dc0ecb892d33f8e3f6bd4390acddaa7b2daaa8ef57a2",
+          "matches2_0_18": false
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Tests/extract-list-corners.py",
+          "sha256": "8fbdc076334d980aafa1d2361a8a2facb680ad4ef3db27f199f7e3a12a398922",
+          "matches2_0_18": true
+        }
+      ]
+    },
+    {
+      "file": "Tests/verify-close-friend-session.sh",
+      "modifiedIn19": true,
+      "modifiedIn20": false,
+      "expected2_0_18SHA256": "b388c4e52590b880ea7be6837f153706e1507a3cf28348e339ae973d35d08b6f",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "aa02cb3183eeb213cfeec4303659c99488715ac02ae2cc24866979229f0a8ca5",
+      "before19Exists": false,
+      "verifiedSourceFound": false,
+      "candidates": [
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Tests/verify-close-friend-session.sh",
+          "sha256": "aa02cb3183eeb213cfeec4303659c99488715ac02ae2cc24866979229f0a8ca5",
+          "matches2_0_18": false
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Tests/verify-close-friend-session.sh",
+          "sha256": "126a99e5b98269ec5bdfb29ed672b6a3fa31b9996fb6c9c4f7c4467c3904c07a",
+          "matches2_0_18": false
+        }
+      ]
+    },
+    {
+      "file": "Tests/verify-list-corners.sh",
+      "modifiedIn19": false,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "102976251a148f86ef210f1e0000ac1fcf37e588536760c17bbebea8703923f1",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "01c93c0d09bc9d88de504cde2bd987be92dc27547d81dfb509b50d3002e77681",
+      "before19Exists": false,
+      "verifiedSourceFound": true,
+      "candidates": [
+        {
+          "kind": "20-before",
+          "path": "docs/audits/folded-card-style-2.0-20/before/Tests/verify-list-corners.sh",
+          "sha256": "102976251a148f86ef210f1e0000ac1fcf37e588536760c17bbebea8703923f1",
+          "matches2_0_18": true
+        },
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "Tests/verify-list-corners.sh",
+          "sha256": "102976251a148f86ef210f1e0000ac1fcf37e588536760c17bbebea8703923f1",
+          "matches2_0_18": true
+        }
+      ]
+    },
+    {
+      "file": "control",
+      "modifiedIn19": true,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "67389be0ca314b37f9d9a2b9397214f9ae35408750e5d08297e996a7dde96635",
+      "expectedFrom": "2.0-18/source-sha256.json",
+      "currentSHA256": "89fd1fde13a66f7fcda97375129dd9e1aab35848cc96967bc70598801a449d71",
+      "before19Exists": false,
+      "verifiedSourceFound": false,
+      "candidates": [
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "control",
+          "sha256": "b6f38e45dacbce92d1ee9b24d7f46e2efe45b71e1cd39f426dc69c2d39b2117e",
+          "matches2_0_18": false
+        }
+      ]
+    },
+    {
+      "file": "docs/session-groups.md",
+      "modifiedIn19": true,
+      "modifiedIn20": true,
+      "expected2_0_18SHA256": "c0e7269f7a957723c099338f808a1516b1e548e3255706d96e381f7c226679dc",
+      "expectedFrom": "2.0-19 pre-change baseline.json",
+      "currentSHA256": "e75f7363464f89044cf07b3ddcbc081e918ee56cae968647a8018676e04e6729",
+      "before19Exists": false,
+      "verifiedSourceFound": false,
+      "candidates": [
+        {
+          "kind": "git-object",
+          "ref": "21bf426cdcf8f5e1af76c5c962eeee5b0e509303",
+          "path": "docs/session-groups.md",
+          "sha256": "426868eaf7815e28fa16074a7bd910e6606610800859abe067da5636d19cea83",
+          "matches2_0_18": false
+        }
+      ]
+    }
+  ],
+  "historicalPackages": [
+    {
+      "path": "packages/com.wechat.improve_2.0-16_iphoneos-arm.deb",
+      "sha256": "9b65ea81127894669e48c4bb40221cb6e2862ae512cc379bf5e873ee5210bc6f",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-16_iphoneos-arm64.deb",
+      "sha256": "afdddbd560a382356066355c89fd87a1a06626939fd2557a0691c7923daf07b4",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-16_symbols.zip",
+      "sha256": "dd58ce3729dd19b2b1b69cde80498336d8ea35513ab1c9172617dd06291135d1",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-17_iphoneos-arm.deb",
+      "sha256": "a96620d963179e8e64804c70b664d504632a5e154889ffc7b9ff1ce430ac5826",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-17_iphoneos-arm64.deb",
+      "sha256": "09e6f6b767ebd7e4f3044322cf5e8f346ec7242e46c8c1a67ddd1325f43cd778",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-17_symbols.zip",
+      "sha256": "1d975bdb7a58ce61703c788203cd6254139cf24ac6476ae605539606889ad479",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-18_iphoneos-arm.deb",
+      "sha256": "201d627505a00ab44edca301f413a0a9ec1f22b0a119b2331bd833c8ede4586d",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-18_iphoneos-arm64.deb",
+      "sha256": "11d39621462d085ffc698d8173681a5106c2d4b373cc87f1ff7c087ffd7f86f8",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-18_symbols.zip",
+      "sha256": "d9de402d5cb7fd2aef732f5384c9b079f4ee974eb466b8d23b4208baf49b0c06",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-19_iphoneos-arm.deb",
+      "sha256": "be3bcdeb7d7b31435033af89916d19c11c63b1ee195db00a9e8428eaf31d747b",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-19_iphoneos-arm64.deb",
+      "sha256": "3a8720d2216227a6eb49a3c241a6b7aae020b6de50bfaacb2255b06c3d154ea4",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-19_symbols.zip",
+      "sha256": "2a37c20fdd5b39fcc502041e6c0efba3db7f0d95be0186bb89925ed4e0ab3f99",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-20_iphoneos-arm.deb",
+      "sha256": "59cb94590ec03a2f5c469ed1355c532b7f1d67a4b9f1247d4c7dc1082ccd7b34",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-20_iphoneos-arm64.deb",
+      "sha256": "db8c33e62ee3ecb7ac22323025e3188fa54b19b2d2873f46d19af083ecfdfb2a",
+      "matchesHistoricalRecord": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-20_symbols.zip",
+      "sha256": "11dd3497c42a8b4001d428758f0c429dc7f7a2162b11d32fbd081702c23ad9ff",
+      "matchesHistoricalRecord": true
+    }
+  ],
+  "newTestFilesToArchiveOnRollback": [
+    "Tests/FoldedEntryVisualTests.h",
+    "Tests/FoldedCardIntegrationTests.h"
+  ],
+  "packagesUnchanged": true,
+  "historicalAuditsUnchanged": true
+}

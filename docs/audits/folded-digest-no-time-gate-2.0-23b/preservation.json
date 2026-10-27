@@ -1,0 +1,31 @@
+{
+  "preexistingFiles": 47612,
+  "changedAuthorizedFiles": [
+    "README.md",
+    "control",
+    "Tests/FoldedEntryVisualTests.h",
+    "Tests/CloseFriendSessionTests.m",
+    "Tests/FoldedSummaryTests.h",
+    "docs/session-groups.md",
+    "Headers/CSUserInfoHelper.h",
+    "Controllers/CSGroupListAdapter.m",
+    "Controllers/CSGroupProjection.h",
+    "Controllers/CSGroupNativeBridge.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Controllers/CSGroupProjection.m"
+  ],
+  "addedSourceFiles": [],
+  "independentlyAddedFeedbackPreserved": {
+    "docs/feedbacks/2026-10-27-folded-entry-native-digest-parity.txt": "90076061c800e9c82fd45dd2c5c219199bfde827df23ef2e2dc85c0eb8deb6bd"
+  },
+  "deletedPreexistingFiles": [],
+  "packagesPreserved": 51,
+  "historicalAuditFilesPreserved": 3042,
+  "workspaceTheosFilesPreserved": 1173,
+  "allOtherPreexistingFilesUnchanged": true,
+  "onlyAddedPackages": [
+    "packages/com.wechat.improve_2.0-23b_iphoneos-arm.deb",
+    "packages/com.wechat.improve_2.0-23b_iphoneos-arm64.deb",
+    "packages/com.wechat.improve_2.0-23b_symbols.zip"
+  ]
+}

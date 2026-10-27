@@ -1,0 +1,31 @@
+2026-10-27 09:33:45.669 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=no_visible tab=custom-empty count=0 source=neutral
+2026-10-27 09:33:45.669 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=message_missing tab=custom-b count=1 source=neutral
+2026-10-27 09:33:45.670 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=message_missing tab=preset_2 count=1 source=neutral
+2026-10-27 09:33:45.670 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=message_missing tab=preset_0 count=4 source=neutral
+2026-10-27 09:33:45.670 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=message_missing tab=preset_1 count=3 source=neutral
+2026-10-27 09:33:45.671 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=no_visible tab=custom-b count=0 source=neutral
+2026-10-27 09:33:45.671 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=no_visible tab=preset_0 count=0 source=neutral
+2026-10-27 09:33:45.671 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=sessions_nil tab=custom-empty count=0 source=neutral
+2026-10-27 09:33:45.671 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=policy_stale tab=custom-b count=1 source=neutral
+2026-10-27 09:33:45.672 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=ok_copy_cell_missing tab=summary-tab count=2 source=native_formatter
+2026-10-27 09:33:45.673 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=ok_cache tab=summary-tab count=2 source=entry_cache
+2026-10-27 09:33:45.675 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=ok_copy_msg_mismatch tab=summary-tab count=2 source=native_formatter
+2026-10-27 09:33:45.677 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=no_visible tab=summary-tab count=0 source=neutral
+2026-10-27 09:33:45.677 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=cell_missing/text_empty tab=summary-tab count=1 source=neutral
+2026-10-27 09:33:45.678 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=cell_missing/copy_invalid tab=summary-tab count=1 source=neutral
+2026-10-27 09:33:45.678 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=policy_stale tab=summary-tab count=1 source=neutral
+2026-10-27 09:33:45.679 session-tests[78016:32701169] [WeChatImprove][FoldedDigest] stage=source reason=chat_mismatch tab=summary-tab count=1 source=neutral
+Close-friend sessions: 133 checks, 0 failures
+2026-10-27 09:33:47.204 presentation-tests[78025:32701211] [WeChatImprove][FoldedDigest] stage=display reason=native_pair_unavailable tab=preset_0 count=2 source=neutral
+2026-10-27 09:33:47.205 presentation-tests[78025:32701211] [WeChatImprove][FoldedDigest] stage=display reason=policy_stale tab=preset_0 count=0 source=neutral
+FAIL: same-count republication restores current native summary
+FAIL: native parity: reuse actual message label instead of a plugin overlay
+FAIL: native parity: prefix label precedes body via native quote layout
+FAIL: verified native child summary uses native two-line geometry and title left edge
+FAIL: summary preserves native typography and left alignment without shrinking messages
+FAIL: native folded entry without a time/date label still displays its digest and creates no time view
+FAIL: a native time view reintroduced during reuse stays hidden without suppressing the digest
+FAIL: native relayout/theme updates summary metrics and color without another cover
+FAIL: widening preserves original title and refreshes summary width
+FAIL: folded-ordinary-folded reuse shows current summary and original native title
+Close-friend session presentation: 42 checks, 10 failures

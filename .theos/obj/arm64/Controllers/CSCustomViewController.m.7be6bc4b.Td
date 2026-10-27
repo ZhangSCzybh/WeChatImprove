@@ -32,6 +32,8 @@
   Controllers/CSMessageGestureSettingsViewController.h \
   Controllers/CSVoiceForwardSettingsViewController.h \
   Controllers/CSRepeatSettingsViewController.h \
+  Controllers/CSImageStickerSettingsViewController.h \
+  Controllers/CSScheduledTaskSettingsViewController.h \
   Controllers/CSResetSettingsViewController.h \
   Controllers/CSBackupSettingsViewController.h \
   Controllers/CSBubbleStyleSettingsViewController.h \
@@ -75,6 +77,8 @@ Controllers/CSReceiveTransferSettingsViewController.h:
 Controllers/CSMessageGestureSettingsViewController.h:
 Controllers/CSVoiceForwardSettingsViewController.h:
 Controllers/CSRepeatSettingsViewController.h:
+Controllers/CSImageStickerSettingsViewController.h:
+Controllers/CSScheduledTaskSettingsViewController.h:
 Controllers/CSResetSettingsViewController.h:
 Controllers/CSBackupSettingsViewController.h:
 Controllers/CSBubbleStyleSettingsViewController.h:

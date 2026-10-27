@@ -1,0 +1,258 @@
+{
+  "report": "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+  "sha256": "df17c58bdb619a16efe3d143fc2c8b7bbee9c63bbc53e858441dbeb20060b9ba",
+  "appVersion": "8.0.78",
+  "buildVersion": "8.0.78.34",
+  "system": {
+    "isEmbedded": true,
+    "train": "iPhone OS 27.0.1",
+    "releaseType": "User",
+    "build": "24A446"
+  },
+  "device": "iPhone15,3",
+  "captureTime": "2026-10-27 09:50:41.2926 +0800",
+  "exception": {
+    "codes": "0x0000000000000000, 0x0000000000000000",
+    "rawCodes": [
+      0,
+      0
+    ],
+    "type": "EXC_CRASH",
+    "signal": "SIGABRT"
+  },
+  "exceptionReason": {
+    "arguments": [
+      "%s",
+      "tableView:heightForHeaderInSection:",
+      "0x4107bb460"
+    ],
+    "format_string": "-[%s %s]: unrecognized selector sent to instance %p",
+    "name": "NSInvalidArgumentException",
+    "type": "objc-exception",
+    "composed_message": "-[%s tableView:heightForHeaderInSection:]: unrecognized selector sent to instance 0x4107bb460",
+    "class": "NSException"
+  },
+  "faultingThread": 0,
+  "plugin": {
+    "source": "P",
+    "arch": "arm64e",
+    "base": 4967514112,
+    "size": 2326528,
+    "uuid": "3a4a24d0-63c8-38c2-b90a-8869fb702a3d",
+    "path": "/private/var/containers/Bundle/Application/D5157E2E-B7C1-495E-A7CD-8C28022F89A5/WeChat.app/WeChatImprove.dylib",
+    "name": "WeChatImprove.dylib"
+  },
+  "crashFrames": [
+    {
+      "image": "libsystem_kernel.dylib",
+      "symbol": "__pthread_kill",
+      "symbolLocation": 8,
+      "imageOffset": "0xb1fc"
+    },
+    {
+      "image": "libsystem_pthread.dylib",
+      "symbol": "pthread_kill",
+      "symbolLocation": 268,
+      "imageOffset": "0x745c"
+    },
+    {
+      "image": "libsystem_c.dylib",
+      "symbol": "abort",
+      "symbolLocation": 148,
+      "imageOffset": "0x79944"
+    },
+    {
+      "image": "libc++abi.dylib",
+      "symbol": "__abort_message",
+      "symbolLocation": 132,
+      "imageOffset": "0x3d9c"
+    },
+    {
+      "image": "libc++abi.dylib",
+      "symbol": "demangling_terminate_handler()",
+      "symbolLocation": 296,
+      "imageOffset": "0x8fec"
+    },
+    {
+      "image": "libobjc.A.dylib",
+      "symbol": "_objc_terminate()",
+      "symbolLocation": 156,
+      "imageOffset": "0x313c4"
+    },
+    {
+      "image": "WeChat",
+      "symbol": null,
+      "symbolLocation": null,
+      "imageOffset": "0x14a4cc50"
+    },
+    {
+      "image": "libc++abi.dylib",
+      "symbol": "std::__terminate(void (*)())",
+      "symbolLocation": 16,
+      "imageOffset": "0x13c5c"
+    },
+    {
+      "image": "libc++abi.dylib",
+      "symbol": "__cxxabiv1::failed_throw(__cxxabiv1::__cxa_exception*)",
+      "symbolLocation": 88,
+      "imageOffset": "0x158bc"
+    },
+    {
+      "image": "libc++abi.dylib",
+      "symbol": "__cxa_throw",
+      "symbolLocation": 92,
+      "imageOffset": "0x1f74"
+    },
+    {
+      "image": "libobjc.A.dylib",
+      "symbol": "objc_exception_throw",
+      "symbolLocation": 448,
+      "imageOffset": "0xc4e8"
+    },
+    {
+      "image": "CoreFoundation",
+      "symbol": "-[NSObject(NSObject) doesNotRecognizeSelector:]",
+      "symbolLocation": 384,
+      "imageOffset": "0x19790c"
+    },
+    {
+      "image": "CoreFoundation",
+      "symbol": "___forwarding___",
+      "symbolLocation": 880,
+      "imageOffset": "0x538f8"
+    },
+    {
+      "image": "CoreFoundation",
+      "symbol": "_CF_forwarding_prep_0",
+      "symbolLocation": 96,
+      "imageOffset": "0x53bb0"
+    },
+    {
+      "image": "UIKitCore",
+      "symbol": "-[UITableView _delegateWantsHeaderForSection:]",
+      "symbolLocation": 152,
+      "imageOffset": "0x50c3b8"
+    },
+    {
+      "image": "UIKitCore",
+      "symbol": "-[UITableView _shouldDrawTopSeparatorDueToMergedBarForCellAtIndexPath:]",
+      "symbolLocation": 276,
+      "imageOffset": "0x6955e4"
+    },
+    {
+      "image": "UIKitCore",
+      "symbol": "-[UITableView _shouldDrawSeparatorAtTopOfSectionForCellAtIndexPath:]",
+      "symbolLocation": 64,
+      "imageOffset": "0x5d1838"
+    },
+    {
+      "image": "UIKitCore",
+      "symbol": "-[UITableView _updateSeparatorStateForCell:atIndexPath:]",
+      "symbolLocation": 80,
+      "imageOffset": "0x5c62e8"
+    },
+    {
+      "image": "UIKitCore",
+      "symbol": "-[UITableView _updateSeparatorStateForVisibleCells]",
+      "symbolLocation": 196,
+      "imageOffset": "0x505138"
+    },
+    {
+      "image": "UIKitCore",
+      "symbol": "-[UITableView _updateAnimationDidStopWithOldVisibleViews:finished:context:]",
+      "symbolLocation": 1128,
+      "imageOffset": "0x7808bc"
+    },
+    {
+      "image": "UIKitCore",
+      "symbol": "__UIVIEW_IS_EXECUTING_ANIMATION_COMPLETION_BLOCK__",
+      "symbolLocation": 36,
+      "imageOffset": "0xbb1a4"
+    },
+    {
+      "image": "UIKitCore",
+      "symbol": "-[UIViewAnimationBlockDelegate _didEndBlockAnimation:finished:context:]",
+      "symbolLocation": 628,
+      "imageOffset": "0x2fb00"
+    },
+    {
+      "image": "UIKitCore",
+      "symbol": "-[UIViewAnimationState sendDelegateAnimationDidStop:finished:]",
+      "symbolLocation": 256,
+      "imageOffset": "0x2fc40"
+    },
+    {
+      "image": "UIKitCore",
+      "symbol": "-[UIViewAnimationState animationDidStop:finished:]",
+      "symbolLocation": 192,
+      "imageOffset": "0xbacf4"
+    },
+    {
+      "image": "QuartzCore",
+      "symbol": "run_animation_callbacks(void*)",
+      "symbolLocation": 196,
+      "imageOffset": "0x11ea84"
+    },
+    {
+      "image": "libdispatch.dylib",
+      "symbol": "_dispatch_client_callout",
+      "symbolLocation": 16,
+      "imageOffset": "0x1bfb4"
+    },
+    {
+      "image": "libdispatch.dylib",
+      "symbol": "_dispatch_main_queue_drain",
+      "symbolLocation": 800,
+      "imageOffset": "0x11374"
+    },
+    {
+      "image": "libdispatch.dylib",
+      "symbol": "_dispatch_main_queue_callback_4CF",
+      "symbolLocation": 44,
+      "imageOffset": "0x11044"
+    },
+    {
+      "image": "CoreFoundation",
+      "symbol": "__CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__",
+      "symbolLocation": 16,
+      "imageOffset": "0x497a0"
+    },
+    {
+      "image": "CoreFoundation",
+      "symbol": "__CFRunLoopRun",
+      "symbolLocation": 1704,
+      "imageOffset": "0x3a88c"
+    },
+    {
+      "image": "CoreFoundation",
+      "symbol": "_CFRunLoopRunSpecificWithOptions",
+      "symbolLocation": 344,
+      "imageOffset": "0x3b7f4"
+    },
+    {
+      "image": "GraphicsServices",
+      "symbol": "GSEventRunModal",
+      "symbolLocation": 120,
+      "imageOffset": "0xf24"
+    },
+    {
+      "image": "UIKitCore",
+      "symbol": "UIApplicationMain",
+      "symbolLocation": 336,
+      "imageOffset": "0xba1cc"
+    },
+    {
+      "image": "WeChat",
+      "symbol": null,
+      "symbolLocation": null,
+      "imageOffset": "0xaa2a980"
+    },
+    {
+      "image": "dyld",
+      "symbol": "start",
+      "symbolLocation": 6616,
+      "imageOffset": "0x55b8"
+    }
+  ],
+  "pluginFrameCount": 0
+}

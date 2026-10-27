@@ -1,0 +1,27 @@
+2026-10-27 08:43:31.314 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=no_visible tab=custom-empty count=0
+2026-10-27 08:43:31.314 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=no_sort_time tab=custom-b count=1
+2026-10-27 08:43:31.315 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=no_sort_time tab=preset_2 count=1
+2026-10-27 08:43:31.315 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=no_sort_time tab=preset_0 count=4
+2026-10-27 08:43:31.315 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=no_sort_time tab=preset_1 count=3
+2026-10-27 08:43:31.315 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=no_visible tab=custom-b count=0
+2026-10-27 08:43:31.315 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=no_visible tab=preset_0 count=0
+2026-10-27 08:43:31.315 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=sessions_nil tab=custom-empty count=0
+2026-10-27 08:43:31.315 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=policy_stale tab=custom-b count=1
+2026-10-27 08:43:31.315 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=ok_cache tab=summary-custom count=2
+2026-10-27 08:43:31.317 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=text_empty/contact_missing tab=summary-custom count=2
+2026-10-27 08:43:31.317 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=ok_copy_text_empty tab=summary-custom count=2
+2026-10-27 08:43:31.317 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=ok_copy_cell_missing tab=summary-custom count=2
+2026-10-27 08:43:31.317 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=cell_missing/text_empty tab=summary-custom count=2
+2026-10-27 08:43:31.317 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=ok_copy_msg_mismatch tab=summary-custom count=2
+2026-10-27 08:43:31.318 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=cell_missing/copy_invalid tab=summary-custom count=2
+2026-10-27 08:43:31.318 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=policy_stale tab=summary-custom count=2
+2026-10-27 08:43:31.318 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=no_visible tab=summary-custom count=0
+2026-10-27 08:43:31.318 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=no_sort_time tab=summary-custom count=2
+2026-10-27 08:43:31.318 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=source_changed tab=summary-custom count=2
+2026-10-27 08:43:31.319 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=msg_mismatch/contact_missing tab=summary-custom count=2
+2026-10-27 08:43:31.319 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=session_mismatch/contact_missing tab=summary-custom count=2
+2026-10-27 08:43:31.319 session-tests[75297:32512794] [WeChatImprove][FoldedDigest] stage=source reason=cell_missing/contact_missing tab=summary-custom count=2
+Close-friend sessions: 137 checks, 0 failures
+2026-10-27 08:43:32.278 presentation-tests[75311:32512839] [WeChatImprove][FoldedDigest] stage=display reason=ok tab=preset_0 count=2
+2026-10-27 08:43:32.278 presentation-tests[75311:32512839] [WeChatImprove][FoldedDigest] stage=display reason=policy_stale tab=preset_0 count=3
+Close-friend session presentation: 38 checks, 0 failures

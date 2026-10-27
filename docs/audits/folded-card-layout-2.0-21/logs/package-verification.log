@@ -1,0 +1,99 @@
+{
+  "packages": [
+    {
+      "path": "packages/com.wechat.improve_2.0-21_iphoneos-arm.deb",
+      "bytes": 1289190,
+      "sha256": "06e2987ebd561dda14ee7ba0b995d8b943e475f90c536a2d3a5e5e2b6cbc9fd5",
+      "scheme": "rootful",
+      "version": "2.0-21",
+      "architecture": "iphoneos-arm",
+      "dylibSHA256": "a9180c875a2cf103b1d4ea3257c2586d338c7964ea376ce4279e104efbbcf5c4",
+      "slices": [
+        {
+          "arch": "arm64",
+          "uuid": "DE55E04D-00E5-3EB2-9597-D56D21EB64C7",
+          "firstInitializer": "CSPluginStorageLoad"
+        },
+        {
+          "arch": "arm64e",
+          "uuid": "FE35F3E4-AC03-33A8-9FF0-C025C20CE1D5",
+          "firstInitializer": "CSPluginStorageLoad"
+        }
+      ],
+      "removedSpacingHookAbsent": true,
+      "testDoublesAbsent": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-21_iphoneos-arm64.deb",
+      "bytes": 1289308,
+      "sha256": "8b5d8c3af8c0fde39cb5af102c67ab88655c277202ac82006fc7b348a7139713",
+      "scheme": "rootless",
+      "version": "2.0-21",
+      "architecture": "iphoneos-arm64",
+      "dylibSHA256": "2eadf27965d71e7ae475d9b6b4687bdcc14801e305657d4f94a866ca4444e077",
+      "slices": [
+        {
+          "arch": "arm64",
+          "uuid": "5598044B-2F24-3E73-9F62-F21F4E14D98D",
+          "firstInitializer": "CSPluginStorageLoad"
+        },
+        {
+          "arch": "arm64e",
+          "uuid": "EC9B53FA-A3A9-352B-B490-2857E5044F70",
+          "firstInitializer": "CSPluginStorageLoad"
+        }
+      ],
+      "removedSpacingHookAbsent": true,
+      "testDoublesAbsent": true
+    },
+    {
+      "path": "packages/com.wechat.improve_2.0-21_symbols.zip",
+      "bytes": 9818179,
+      "sha256": "d9c25b3c57d03bea62f4cf0902f076ad0074ca71daeda5725f06079b53888948"
+    }
+  ],
+  "warnings": [
+    {
+      "scheme": "rootful",
+      "warningCount": 12,
+      "historicalWarningCount": 12,
+      "newWarnings": [],
+      "warnings": [
+        "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+        "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+        "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+        "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+        "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+        "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+        "warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+        "warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+        "warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+        "warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+        "warning: -multiply_defined is obsolete",
+        "warning: -multiply_defined is obsolete"
+      ]
+    },
+    {
+      "scheme": "rootless",
+      "warningCount": 12,
+      "historicalWarningCount": 12,
+      "newWarnings": [],
+      "warnings": [
+        "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+        "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+        "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+        "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+        "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+        "warning: 'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
+        "warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+        "warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+        "warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+        "warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+        "warning: -multiply_defined is obsolete",
+        "warning: -multiply_defined is obsolete"
+      ]
+    }
+  ],
+  "changedSince20": 20,
+  "preservedOldPackages": 42
+}

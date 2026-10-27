@@ -1,0 +1,50 @@
+{
+  "scope": "macOS Foundation diagnostic; actual production proxy and invocation support list; adapter forwarding stub; no UIKit",
+  "cases": [
+    {
+      "scenario": "live_target",
+      "responds": true,
+      "threw": false,
+      "enteredAdapterForwarding": 1,
+      "targetIsNil": 0,
+      "value": 23,
+      "hasSignature": 1
+    },
+    {
+      "scenario": "weak_target_released_before_delayed_callback",
+      "responds": false,
+      "threw": false,
+      "enteredAdapterForwarding": 0,
+      "targetIsNil": 1,
+      "value": 0,
+      "hasSignature": 1
+    },
+    {
+      "scenario": "same_proxy_retargeted_without_header_method",
+      "responds": false,
+      "threw": false,
+      "enteredAdapterForwarding": 0,
+      "targetIsNil": 0,
+      "value": 0,
+      "hasSignature": 1
+    },
+    {
+      "scenario": "live_target_restored",
+      "responds": true,
+      "threw": false,
+      "enteredAdapterForwarding": 1,
+      "targetIsNil": 0,
+      "value": 23,
+      "hasSignature": 1
+    },
+    {
+      "scenario": "adapter_released_before_delayed_callback",
+      "responds": true,
+      "threw": false,
+      "enteredAdapterForwarding": 0,
+      "targetIsNil": 0,
+      "value": 0,
+      "hasSignature": 1
+    }
+  ]
+}

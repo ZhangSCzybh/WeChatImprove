@@ -1,0 +1,42 @@
+[
+  {
+    "cls": "NewMainFrameViewController",
+    "kind": "instance",
+    "selector": "tableView:cellForRowAtIndexPath:",
+    "address": "0x10511eafc",
+    "end": "0x10511f64c",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "cls": "NewMainFrameViewController",
+    "kind": "instance",
+    "selector": "tableView:heightForRowAtIndexPath:",
+    "address": "0x10511f7cc",
+    "end": "0x10511fa20",
+    "types": "d32@0:8@16@24"
+  },
+  {
+    "cls": "MainFrameAggregationCell",
+    "kind": "instance",
+    "selector": "updateCellData:tableViewFrame:",
+    "address": "0x104a6d778",
+    "end": "0x104a6d82c",
+    "types": "v56@0:8@16{CGRect={CGPoint=dd}{CGSize=dd}}24"
+  },
+  {
+    "cls": "MainFrameAggregationCell",
+    "kind": "instance",
+    "selector": "itemView",
+    "address": "0x104a6da94",
+    "end": "0x104a6daa4",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "NewMainFrameCell",
+    "kind": "instance",
+    "selector": "layoutSubviews",
+    "address": "0x1050fcf20",
+    "end": "0x1050fcfd4",
+    "types": "v16@0:8"
+  }
+]

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/folded-digest-no-time-gate-2.0-23b/verify-release.py", line 44, in <module>
+    assert all(n in authorized for n in new),new
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ['docs/feedbacks/2026-10-27-folded-entry-native-digest-parity.txt']

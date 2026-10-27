@@ -1,0 +1,272 @@
+[
+  {
+    "class": "MainFrameAggregationCell",
+    "superclass": "NewMainFrameCell",
+    "ivars": [
+      {
+        "name": "_itemView",
+        "type": "@\"MainFrameItemView\"",
+        "offset": 112
+      },
+      {
+        "name": "_cellData",
+        "type": "@\"MainFrameCellData\"",
+        "offset": 120
+      }
+    ]
+  },
+  {
+    "class": "NewMainFrameCell",
+    "superclass": "MMMultiMenuTableViewCell",
+    "ivars": [
+      {
+        "name": "m_itemView",
+        "type": "@\"MainFrameItemView\"",
+        "offset": 64
+      },
+      {
+        "name": "m_backGroundViewOfCell",
+        "type": "@\"UIImageView\"",
+        "offset": 72
+      },
+      {
+        "name": "m_cellBkgImageWithTop",
+        "type": "@\"UIImage\"",
+        "offset": 80
+      },
+      {
+        "name": "m_cellBkgImage",
+        "type": "@\"UIImage\"",
+        "offset": 88
+      },
+      {
+        "name": "m_cellData",
+        "type": "@\"MainFrameCellData\"",
+        "offset": 96
+      },
+      {
+        "name": "m_oldCellData",
+        "type": "@\"MainFrameCellData\"",
+        "offset": 104
+      },
+      {
+        "name": "_dragManager",
+        "type": "@\"MMDragManager\"",
+        "offset": 112
+      },
+      {
+        "name": "_dragInteraction",
+        "type": "@\"UIDragInteraction\"",
+        "offset": 120
+      },
+      {
+        "name": "_dragLiftingView",
+        "type": "@\"UIView\"",
+        "offset": 128
+      },
+      {
+        "name": "_horizonPadding",
+        "type": "d",
+        "offset": 136
+      },
+      {
+        "name": "_rightMaskView",
+        "type": "@\"ColorGradientView\"",
+        "offset": 144
+      }
+    ]
+  },
+  {
+    "class": "MainFrameItemView",
+    "superclass": "bound UIKit superclass",
+    "ivars": [
+      {
+        "name": "m_cellData",
+        "type": "@\"MainFrameCellData\"",
+        "offset": 8
+      },
+      {
+        "name": "m_frameHeadView",
+        "type": "@\"MMHeadImageView\"",
+        "offset": 16
+      },
+      {
+        "name": "m_unreadCountView",
+        "type": "@\"MMBadgeView\"",
+        "offset": 24
+      },
+      {
+        "name": "m_nameLabel",
+        "type": "@\"MMCPLabel\"",
+        "offset": 32
+      },
+      {
+        "name": "m_descPostfix",
+        "type": "@\"MMCPLabel\"",
+        "offset": 40
+      },
+      {
+        "name": "m_namePostIconView",
+        "type": "@\"UIImageView\"",
+        "offset": 48
+      },
+      {
+        "name": "m_textStateView",
+        "type": "@\"TextStateItemView\"",
+        "offset": 56
+      },
+      {
+        "name": "m_timeLabel",
+        "type": "@\"UILabel\"",
+        "offset": 64
+      },
+      {
+        "name": "m_greenLabel",
+        "type": "@\"MainFrameItemRedTipsLabel\"",
+        "offset": 72
+      },
+      {
+        "name": "m_statusView",
+        "type": "@\"UIImageView\"",
+        "offset": 80
+      },
+      {
+        "name": "m_messageLabel",
+        "type": "@\"MMCPLabel\"",
+        "offset": 88
+      },
+      {
+        "name": "m_msgPostfixLabel",
+        "type": "@\"MMCPLabel\"",
+        "offset": 96
+      },
+      {
+        "name": "m_chatNotPushView",
+        "type": "@\"UIImageView\"",
+        "offset": 104
+      },
+      {
+        "name": "m_trackRoomTipsView",
+        "type": "@\"UIImageView\"",
+        "offset": 112
+      },
+      {
+        "name": "m_multiTalkIconView",
+        "type": "@\"UIImageView\"",
+        "offset": 120
+      },
+      {
+        "name": "m_multiTalkingView",
+        "type": "@\"UIImageView\"",
+        "offset": 128
+      },
+      {
+        "name": "m_starView",
+        "type": "@\"UIImageView\"",
+        "offset": 136
+      },
+      {
+        "name": "m_strongNotifactionIconView",
+        "type": "@\"UIImageView\"",
+        "offset": 144
+      },
+      {
+        "name": "m_groupLiveIconView",
+        "type": "@\"UIImageView\"",
+        "offset": 152
+      },
+      {
+        "name": "m_groupView",
+        "type": "@\"MMGroupView\"",
+        "offset": 160
+      },
+      {
+        "name": "m_msgPlayingIconView",
+        "type": "@\"VoicePlayingView\"",
+        "offset": 168
+      },
+      {
+        "name": "_ignoreDraftMsg",
+        "type": "B",
+        "offset": 176
+      },
+      {
+        "name": "_m_liveStatusView",
+        "type": "@\"UIImageView\"",
+        "offset": 184
+      }
+    ]
+  },
+  {
+    "class": "MMCPLabel",
+    "superclass": "MMUILabel",
+    "ivars": [
+      {
+        "name": "m_cpKey",
+        "type": "@\"NSString\"",
+        "offset": 8
+      },
+      {
+        "name": "m_recognizer",
+        "type": "@\"UILongPressGestureRecognizer\"",
+        "offset": 16
+      },
+      {
+        "name": "m_restoreStr",
+        "type": "@\"NSString\"",
+        "offset": 24
+      },
+      {
+        "name": "m_bRegisterObserver",
+        "type": "B",
+        "offset": 32
+      },
+      {
+        "name": "_showRestoreMenuItem",
+        "type": "B",
+        "offset": 33
+      },
+      {
+        "name": "_showCopyMenuItem",
+        "type": "B",
+        "offset": 34
+      },
+      {
+        "name": "_isHighlighted",
+        "type": "B",
+        "offset": 35
+      },
+      {
+        "name": "_cpLabelDelegate",
+        "type": "@\"<MMCPLabelDelegate>\"",
+        "offset": 40
+      },
+      {
+        "name": "_prefixTitle",
+        "type": "@\"NSString\"",
+        "offset": 48
+      },
+      {
+        "name": "_hlBackgroundColor",
+        "type": "@\"UIColor\"",
+        "offset": 56
+      }
+    ]
+  },
+  {
+    "class": "MMMultiMenuTableViewCell",
+    "superclass": "MMBaseMultiMenuTableViewCell",
+    "ivars": [
+      {
+        "name": "m_dropManager",
+        "type": "@\"MMDropManager\"",
+        "offset": 56
+      },
+      {
+        "name": "_bkgColor",
+        "type": "@\"UIColor\"",
+        "offset": 64
+      }
+    ]
+  }
+]

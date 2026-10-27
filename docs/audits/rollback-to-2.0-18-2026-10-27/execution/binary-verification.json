@@ -1,0 +1,13 @@
+{
+  "package": "packages/com.wechat.improve_2.0-18_iphoneos-arm.deb",
+  "packageSHA256": "201d627505a00ab44edca301f413a0a9ec1f22b0a119b2331bd833c8ede4586d",
+  "deliveredDylibSHA256": "15da86049f5b00a11a730ef7055c2e0a631deae7a73f5e995e39a6d95b854dfa",
+  "rebuiltDylibSHA256": "8bbefc05f365f64f265701b063d634fdd3d163d827cf6bf05f2aeb7eb7415526",
+  "byteForByteEqual": false,
+  "rebuiltDylib": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-restore-2.0-18-dq1_6dht/compile-rootful/obj/WeChatImprove.dylib",
+  "architecture": "arm64 arm64e",
+  "packageCreated": false,
+  "allCodeAndDataSectionsMatchDelivered": true,
+  "onlyBuildUUIDAndCodeSignatureDiffer": true,
+  "semanticDifferenceDetected": false
+}

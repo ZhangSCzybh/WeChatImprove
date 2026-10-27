@@ -1,0 +1,379 @@
+[
+  {
+    "cls": "MainFrameItemView",
+    "address": "0x120379798",
+    "superclass": "bound UIKit superclass",
+    "ivars": [
+      {
+        "name": "m_cellData",
+        "types": "@\"MainFrameCellData\"",
+        "offset": 8,
+        "offsetref": "0x120223290"
+      },
+      {
+        "name": "m_frameHeadView",
+        "types": "@\"MMHeadImageView\"",
+        "offset": 16,
+        "offsetref": "0x120223268"
+      },
+      {
+        "name": "m_unreadCountView",
+        "types": "@\"MMBadgeView\"",
+        "offset": 24,
+        "offsetref": "0x120223298"
+      },
+      {
+        "name": "m_nameLabel",
+        "types": "@\"MMCPLabel\"",
+        "offset": 32,
+        "offsetref": "0x12022326c"
+      },
+      {
+        "name": "m_descPostfix",
+        "types": "@\"MMCPLabel\"",
+        "offset": 40,
+        "offsetref": "0x120223270"
+      },
+      {
+        "name": "m_namePostIconView",
+        "types": "@\"UIImageView\"",
+        "offset": 48,
+        "offsetref": "0x120223274"
+      },
+      {
+        "name": "m_textStateView",
+        "types": "@\"TextStateItemView\"",
+        "offset": 56,
+        "offsetref": "0x120223294"
+      },
+      {
+        "name": "m_timeLabel",
+        "types": "@\"UILabel\"",
+        "offset": 64,
+        "offsetref": "0x12022329c"
+      },
+      {
+        "name": "m_greenLabel",
+        "types": "@\"MainFrameItemRedTipsLabel\"",
+        "offset": 72,
+        "offsetref": "0x1202232ac"
+      },
+      {
+        "name": "m_statusView",
+        "types": "@\"UIImageView\"",
+        "offset": 80,
+        "offsetref": "0x1202232a0"
+      },
+      {
+        "name": "m_messageLabel",
+        "types": "@\"MMCPLabel\"",
+        "offset": 88,
+        "offsetref": "0x1202232a4"
+      },
+      {
+        "name": "m_msgPostfixLabel",
+        "types": "@\"MMCPLabel\"",
+        "offset": 96,
+        "offsetref": "0x1202232a8"
+      },
+      {
+        "name": "m_chatNotPushView",
+        "types": "@\"UIImageView\"",
+        "offset": 104,
+        "offsetref": "0x12022327c"
+      },
+      {
+        "name": "m_trackRoomTipsView",
+        "types": "@\"UIImageView\"",
+        "offset": 112,
+        "offsetref": "0x120223280"
+      },
+      {
+        "name": "m_multiTalkIconView",
+        "types": "@\"UIImageView\"",
+        "offset": 120,
+        "offsetref": "0x120223288"
+      },
+      {
+        "name": "m_multiTalkingView",
+        "types": "@\"UIImageView\"",
+        "offset": 128,
+        "offsetref": "0x120223284"
+      },
+      {
+        "name": "m_starView",
+        "types": "@\"UIImageView\"",
+        "offset": 136,
+        "offsetref": "0x1202232b8"
+      },
+      {
+        "name": "m_strongNotifactionIconView",
+        "types": "@\"UIImageView\"",
+        "offset": 144,
+        "offsetref": "0x1202232c0"
+      },
+      {
+        "name": "m_groupLiveIconView",
+        "types": "@\"UIImageView\"",
+        "offset": 152,
+        "offsetref": "0x12022328c"
+      },
+      {
+        "name": "m_groupView",
+        "types": "@\"MMGroupView\"",
+        "offset": 160,
+        "offsetref": "0x120223278"
+      },
+      {
+        "name": "m_msgPlayingIconView",
+        "types": "@\"VoicePlayingView\"",
+        "offset": 168,
+        "offsetref": "0x1202232b4"
+      },
+      {
+        "name": "_ignoreDraftMsg",
+        "types": "B",
+        "offset": 176,
+        "offsetref": "0x1202232b0"
+      },
+      {
+        "name": "_m_liveStatusView",
+        "types": "@\"UIImageView\"",
+        "offset": 184,
+        "offsetref": "0x1202232bc"
+      }
+    ]
+  },
+  {
+    "cls": "NewMainFrameCell",
+    "address": "0x120385228",
+    "superclass": "MMMultiMenuTableViewCell",
+    "ivars": [
+      {
+        "name": "m_itemView",
+        "types": "@\"MainFrameItemView\"",
+        "offset": 64,
+        "offsetref": "0x1202282c8"
+      },
+      {
+        "name": "m_backGroundViewOfCell",
+        "types": "@\"UIImageView\"",
+        "offset": 72,
+        "offsetref": "0x1202282f0"
+      },
+      {
+        "name": "m_cellBkgImageWithTop",
+        "types": "@\"UIImage\"",
+        "offset": 80,
+        "offsetref": "0x1202282ec"
+      },
+      {
+        "name": "m_cellBkgImage",
+        "types": "@\"UIImage\"",
+        "offset": 88,
+        "offsetref": "0x1202282e8"
+      },
+      {
+        "name": "m_cellData",
+        "types": "@\"MainFrameCellData\"",
+        "offset": 96,
+        "offsetref": "0x1202282d0"
+      },
+      {
+        "name": "m_oldCellData",
+        "types": "@\"MainFrameCellData\"",
+        "offset": 104,
+        "offsetref": "0x1202282d8"
+      },
+      {
+        "name": "_dragManager",
+        "types": "@\"MMDragManager\"",
+        "offset": 112,
+        "offsetref": "0x1202282dc"
+      },
+      {
+        "name": "_dragInteraction",
+        "types": "@\"UIDragInteraction\"",
+        "offset": 120,
+        "offsetref": "0x1202282e0"
+      },
+      {
+        "name": "_dragLiftingView",
+        "types": "@\"UIView\"",
+        "offset": 128,
+        "offsetref": "0x1202282e4"
+      },
+      {
+        "name": "_horizonPadding",
+        "types": "d",
+        "offset": 136,
+        "offsetref": "0x1202282cc"
+      },
+      {
+        "name": "_rightMaskView",
+        "types": "@\"ColorGradientView\"",
+        "offset": 144,
+        "offsetref": "0x1202282d4"
+      }
+    ]
+  },
+  {
+    "cls": "MainFrameAggregationCell",
+    "address": "0x120379270",
+    "superclass": "NewMainFrameCell",
+    "ivars": [
+      {
+        "name": "_itemView",
+        "types": "@\"MainFrameItemView\"",
+        "offset": 112,
+        "offsetref": "0x120223068"
+      },
+      {
+        "name": "_cellData",
+        "types": "@\"MainFrameCellData\"",
+        "offset": 120,
+        "offsetref": "0x12022306c"
+      }
+    ]
+  },
+  {
+    "cls": "NoLineBreakLabel",
+    "address": "0x120319258",
+    "superclass": "MMCPLabel",
+    "ivars": []
+  },
+  {
+    "cls": "MMUILabel",
+    "address": "0x1206339d0",
+    "superclass": "bound UIKit superclass",
+    "ivars": [
+      {
+        "name": "_useRedesignLinespacing",
+        "types": "B",
+        "offset": 8,
+        "offsetref": "0x120290b00"
+      },
+      {
+        "name": "_enableLongPressCopy",
+        "types": "B",
+        "offset": 9,
+        "offsetref": "0x120290b14"
+      },
+      {
+        "name": "_wantsExtendedDynamicRangeContent",
+        "types": "B",
+        "offset": 10,
+        "offsetref": "0x120290b0c"
+      },
+      {
+        "name": "_textStyle",
+        "types": "Q",
+        "offset": 16,
+        "offsetref": "0x120290afc"
+      },
+      {
+        "name": "_linespacingFactor",
+        "types": "d",
+        "offset": 24,
+        "offsetref": "0x120290b04"
+      },
+      {
+        "name": "_fixedLineHeight",
+        "types": "d",
+        "offset": 32,
+        "offsetref": "0x120290b08"
+      },
+      {
+        "name": "_highlightCopyColor",
+        "types": "@\"UIColor\"",
+        "offset": 40,
+        "offsetref": "0x120290b18"
+      },
+      {
+        "name": "_textToCopy",
+        "types": "@\"NSString\"",
+        "offset": 48,
+        "offsetref": "0x120290b1c"
+      },
+      {
+        "name": "_edrHeadroom",
+        "types": "d",
+        "offset": 56,
+        "offsetref": "0x120290b10"
+      },
+      {
+        "name": "_longPressCopyGesture",
+        "types": "@\"UILongPressGestureRecognizer\"",
+        "offset": 64,
+        "offsetref": "0x120290b20"
+      }
+    ]
+  },
+  {
+    "cls": "MMCPLabel",
+    "address": "0x120319208",
+    "superclass": "MMUILabel",
+    "ivars": [
+      {
+        "name": "m_cpKey",
+        "types": "@\"NSString\"",
+        "offset": 8,
+        "offsetref": "0x120201314"
+      },
+      {
+        "name": "m_recognizer",
+        "types": "@\"UILongPressGestureRecognizer\"",
+        "offset": 16,
+        "offsetref": "0x120201318"
+      },
+      {
+        "name": "m_restoreStr",
+        "types": "@\"NSString\"",
+        "offset": 24,
+        "offsetref": "0x12020132c"
+      },
+      {
+        "name": "m_bRegisterObserver",
+        "types": "B",
+        "offset": 32,
+        "offsetref": "0x120201310"
+      },
+      {
+        "name": "_showRestoreMenuItem",
+        "types": "B",
+        "offset": 33,
+        "offsetref": "0x12020131c"
+      },
+      {
+        "name": "_showCopyMenuItem",
+        "types": "B",
+        "offset": 34,
+        "offsetref": "0x120201320"
+      },
+      {
+        "name": "_isHighlighted",
+        "types": "B",
+        "offset": 35,
+        "offsetref": "0x120201328"
+      },
+      {
+        "name": "_cpLabelDelegate",
+        "types": "@\"<MMCPLabelDelegate>\"",
+        "offset": 40,
+        "offsetref": "0x120201330"
+      },
+      {
+        "name": "_prefixTitle",
+        "types": "@\"NSString\"",
+        "offset": 48,
+        "offsetref": "0x120201324"
+      },
+      {
+        "name": "_hlBackgroundColor",
+        "types": "@\"UIColor\"",
+        "offset": 56,
+        "offsetref": "0x120201334"
+      }
+    ]
+  }
+]

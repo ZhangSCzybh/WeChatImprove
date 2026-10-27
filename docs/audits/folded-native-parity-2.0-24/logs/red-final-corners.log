@@ -1,0 +1,15 @@
+2026-10-27 09:40:47.247 list-tests[79321:32712461] [WeChatImprove][FoldedDigest] stage=display reason=ok tab=preset_0 count=1
+FAIL: light card: native child summary shares title left edge
+FAIL: native parity: card contains native prefix plus native body label
+FAIL: dark card after live radius/margin change: native child summary shares title left edge
+FAIL: flat after disabling corners: native child summary shares title left edge
+FAIL: reenabled card: native child summary shares title left edge
+FAIL: shared card retains scoped native summary without exposing native global business text
+FAIL: light card: unknown native structure retains neutral protection
+FAIL: configuration refresh never restores private preview
+FAIL: dark card after live radius/margin change: unknown native structure retains neutral protection
+FAIL: flat mode keeps scoped text and privacy protection
+FAIL: flat after disabling corners: unknown native structure retains neutral protection
+FAIL: fallback protection relocates into the rebuilt card without revealing global content
+FAIL: reenabled card: unknown native structure retains neutral protection
+List corners: 1017 checks, 13 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)

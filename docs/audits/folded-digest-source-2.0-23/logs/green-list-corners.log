@@ -1,0 +1,2 @@
+2026-10-27 08:43:32.562 list-tests[75314:32512858] [WeChatImprove][FoldedDigest] stage=display reason=ok tab=preset_0 count=1
+List corners: 1020 checks, 0 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)

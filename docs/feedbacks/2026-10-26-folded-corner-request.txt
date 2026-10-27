@@ -1,0 +1,24 @@
+【对上一条 01a178b9 的澄清，以此条为准】用户指出真正的问题是：聊天分组里「折叠的聊天」这一行没有跟随列表圆角卡片样式。
+
+【素材】
+- 原图：docs/feedbacks/2026-10-26-folded-entry-visual.jpg（1280x2774）
+- 放大左上角（可见卡片样式基准）：docs/feedbacks/corner-topleft.png
+- 放大折叠行（可见问题）：docs/feedbacks/corner-folded.png
+- 入口区域裁切：docs/feedbacks/crop-folded.png
+
+【截图分析】
+放大后很清楚：上面的会话（苹果派3群、再也不会羊毛团）都是带左右边距的白色圆角卡片，卡片之间有灰色间隙，背景是浅灰。而「折叠的聊天（1）」这行是一行裸文字，直接贴着灰底，没有白色卡片底、没有左右边距、底部是直角、也没有和上一张卡片之间的间隙。所以之前看到的"整块灰色空白"其实是同一个原因——这一行根本没有作为卡片被渲染，它下方的灰就是列表背景。我把上一条里"白色容器高度没铺满"的猜测作废，按这条定性。
+
+【定位线索，请自行核实】
+- 卡片圆角由 CSListCornerConfiguration / CSListCornerSessionAdapter 的 CSListCornerSessionDecorate() 负责，它用 CSGroupCardPosition(table,path,&first,&last) 判断首末行，再 context renderFirst:last: 画卡片底和左右边距。
+- CSGroupCardPosition（Controllers/CSGroupListAdapter.m:1235）直接用 projection.sections[section] 的行数和 row==0 / row==count-1 判定；折叠入口是 CSGroupRowKindAggregate、userName==chatroom_session_box 的行，2.0-18 新加的 foldedEntryScoped 逻辑在 CSGroupProjection.m:243 一带。
+- 可能的原因：①该行没有真正进入 projection 的行数组（被当作 footer 或额外的辅助视图挂上去），所以 CSGroupCardPosition 返回 NO、decorate 直接 return；②该行走的是不同 cell 类，卡片装饰没挂到它上面；③它进了行数组但 renderFirst/renderLast 的判定把它当成普通行（既非首也非末），于是不画卡片底；④CSListCornerSessionItemFrame 只修了内容视图宽度，卡片底视图本身没建。请先确认是哪一种。
+
+【修复要求】
+- 「折叠的聊天」必须和普通会话行用同一套卡片规则：卡片背景色、左右边距、圆角半径、卡片之间的间隙、内边距一致；它作为分组内最后一行时底部两角要圆，上方与最后一条会话之间要有同等的卡片间隙。如果按原生表现它应当是独立一张卡片，就渲染成独立卡片，不要贴着上一张。
+- 不能只画个白底糊过去：必须走同一份圆角配置（CSListCornerConfiguration 的 enabled / radius / leftMargin / rightMargin / 卡片背景色），用户改圆角半径、边距、颜色、关闭圆角时，这一行都要跟着变；关闭圆角时回到原生平面样式，不得残留卡片。
+- 深色模式下卡片背景与圆角同样要正确。
+- 摘要仍不得泄露其他分组的最后一条消息、时间和全局未读；如果原生聚合入口有摘要行，按上一轮方案用中性文案占位，不要为了视觉擅自塞回原生内容。
+- 先补失败用例复现：①折叠入口行必须与普通会话行同宽、同左右边距、存在卡片背景；②它作为最后一行时必须有底部圆角；③关闭圆角开关后不残留卡片；④切换圆角半径/颜色后该行跟随。当前实现应失败。
+- 改动收敛，只跑列表圆角、折叠展示、分组列表相关回归，不要全量。
+- 出 deb（rootful arm + rootless arm64），说明根因、修改点、回归数量与真机验收步骤（含圆角开关、不同半径、深色模式、短列表和空分组）。
