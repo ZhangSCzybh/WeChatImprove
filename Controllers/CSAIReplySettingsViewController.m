@@ -13,6 +13,8 @@ static void AIAlert(UIViewController *page,NSString *message){
 static CSSettingItem *AIRow(NSString *title,NSString *icon,NSString *detail,void(^action)(void)){
     CSSettingItem *item=[CSSettingItem itemWithTitle:title iconName:icon iconColor:UIColor.systemBlueColor detail:detail];item.actionBlock=action;return item;
 }
+static NSString *AIUsageValue(NSDictionary *usage,NSString *key){return usage[key]?[usage[key] stringValue]:@"未提供";}
+static NSString *AIModeName(NSDictionary *config){return CSAIReplyUsesResponses(config)?@"百炼会话":@"通用兼容";}
 @interface CSAISettingsCell : CSSettingTableViewCell
 @end
 @implementation CSAISettingsCell
@@ -106,6 +108,9 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 @property UITextField *keyField;
 @property BOOL keyEdited;
 @property NSString *originalConnection;
+@property UISegmentedControl *modeControl;
+@property UISwitch *cacheSwitch;
+@property UILabel *connectionHelp;
 @end
 @implementation CSAIConnectionEditor
 - (UITextField *)field:(NSString *)label value:(NSString *)value secure:(BOOL)secure stack:(UIStackView *)stack{
@@ -119,13 +124,28 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
     UIStackView *stack=[UIStackView new];stack.axis=UILayoutConstraintAxisVertical;stack.spacing=10;stack.translatesAutoresizingMaskIntoConstraints=NO;[scroll addSubview:stack];
     [NSLayoutConstraint activateConstraints:@[[scroll.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor],[scroll.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor],[scroll.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],[scroll.bottomAnchor constraintEqualToAnchor:self.view.keyboardLayoutGuide.topAnchor],[stack.leadingAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.leadingAnchor constant:20],[stack.trailingAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.trailingAnchor constant:-20],[stack.topAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.topAnchor constant:20],[stack.bottomAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.bottomAnchor constant:-20],[stack.widthAnchor constraintEqualToAnchor:scroll.frameLayoutGuide.widthAnchor constant:-40]]];
     NSDictionary *config=CSAIReplyManager.sharedManager.store.configuration;self.originalConnection=CSAIConnectionIdentifier(config);
+    UILabel *modeLabel=[UILabel new];modeLabel.text=@"调用方式";modeLabel.font=[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];[stack addArrangedSubview:modeLabel];
+    self.modeControl=[[UISegmentedControl alloc]initWithItems:@[@"通用兼容",@"百炼会话"]];self.modeControl.selectedSegmentIndex=CSAIReplyUsesResponses(config)?1:0;[self.modeControl addTarget:self action:@selector(modeChanged) forControlEvents:UIControlEventValueChanged];[stack addArrangedSubview:self.modeControl];
     self.endpointField=[self field:@"API 请求地址" value:config[@"endpoint"] secure:NO stack:stack];self.endpointField.keyboardType=UIKeyboardTypeURL;self.endpointField.placeholder=@"https://服务域名/v1/chat/completions";
     self.modelField=[self field:@"模型名称" value:config[@"model"] secure:NO stack:stack];self.modelField.placeholder=@"输入服务商提供的模型名称";
     self.keyField=[self field:@"API Key" value:@"" secure:YES stack:stack];self.keyField.placeholder=[config[@"credentialRevision"] length]?@"已设置；留空保持原 Key":@"粘贴 API Key";
     [self.keyField addTarget:self action:@selector(keyChanged) forControlEvents:UIControlEventEditingChanged];
     UIButton *visibility=[UIButton buttonWithType:UIButtonTypeSystem];[visibility setTitle:@"显示 / 隐藏新输入的 Key" forState:UIControlStateNormal];[visibility addTarget:self action:@selector(toggleKey) forControlEvents:UIControlEventTouchUpInside];[stack addArrangedSubview:visibility];
     UIButton *clear=[UIButton buttonWithType:UIButtonTypeSystem];[clear setTitle:@"停用当前 Key" forState:UIControlStateNormal];[clear addTarget:self action:@selector(clearKey) forControlEvents:UIControlEventTouchUpInside];[stack addArrangedSubview:clear];
-    UILabel *help=[UILabel new];help.text=@"填写兼容 Chat Completions 的完整 HTTPS 请求地址。保存连接变化后需重新测试。API Key 保存在本机钥匙串中，不随配置备份导出。";help.numberOfLines=0;help.font=[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];help.textColor=UIColor.secondaryLabelColor;[stack addArrangedSubview:help];
+    UILabel *cacheLabel=[UILabel new];cacheLabel.text=@"百炼 Session 缓存";cacheLabel.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody];[stack addArrangedSubview:cacheLabel];
+    self.cacheSwitch=[UISwitch new];self.cacheSwitch.accessibilityLabel=@"百炼 Session 缓存";self.cacheSwitch.on=[config[@"sessionCache"] boolValue];[stack addArrangedSubview:self.cacheSwitch];
+    UILabel *help=[UILabel new];self.connectionHelp=help;help.numberOfLines=0;help.font=[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];help.textColor=UIColor.secondaryLabelColor;[stack addArrangedSubview:help];[self updateConnectionHelp];
+}
+- (void)updateConnectionHelp{
+    BOOL responses=self.modeControl.selectedSegmentIndex==1;self.cacheSwitch.enabled=responses;if(!responses)self.cacheSwitch.on=NO;
+    self.endpointField.placeholder=responses?@"https://服务域名/compatible-mode/v1/responses":@"https://服务域名/v1/chat/completions";
+    self.connectionHelp.text=responses?@"填写百炼完整的 HTTPS Responses 地址。服务端保存对话，后续通过响应 ID 延续角色与上下文（ID 有效期 7 天）。Session 缓存默认关闭，开启可能产生缓存创建费用；历史输入并非免费，实际用量见回复记录。切换连接后需重新测试。Key 仅保存在本机钥匙串。":@"填写兼容 Chat Completions 的完整 HTTPS 请求地址。支持的服务商可自动使用提示词缓存。保存连接变化后需重新测试。API Key 保存在本机钥匙串中，不随配置备份导出。";
+}
+- (void)modeChanged{
+    NSURLComponents *parts=[NSURLComponents componentsWithString:self.endpointField.text];BOOL responses=self.modeControl.selectedSegmentIndex==1;
+    NSString *from=responses?@"/chat/completions":@"/responses",*to=responses?@"/responses":@"/chat/completions";
+    if([parts.path hasSuffix:from]){parts.path=[[parts.path substringToIndex:parts.path.length-from.length] stringByAppendingString:to];self.endpointField.text=parts.string;}
+    [self updateConnectionHelp];
 }
 - (void)keyChanged{self.keyEdited=YES;}
 - (void)toggleKey{self.keyField.secureTextEntry=!self.keyField.secureTextEntry;}
@@ -134,7 +154,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;
     if(![manager isCurrentAccount:self.account epoch:self.epoch] || ![self.originalConnection isEqual:CSAIConnectionIdentifier(manager.store.configuration)]){AIAlert(self,@"账号或连接配置已改变，请返回后重新编辑。");return;}
     NSError *error=nil;
-    if([manager saveConnection:self.endpointField.text model:self.modelField.text key:self.keyEdited?self.keyField.text:nil account:self.account epoch:self.epoch error:&error]){self.keyField.text=@"";[self.navigationController popViewControllerAnimated:YES];}
+    if([manager saveConnection:self.endpointField.text model:self.modelField.text key:self.keyEdited?self.keyField.text:nil mode:self.modeControl.selectedSegmentIndex==1?@"bailianResponses":@"chat" sessionCache:self.cacheSwitch.on account:self.account epoch:self.epoch error:&error]){self.keyField.text=@"";[self.navigationController popViewControllerAnimated:YES];}
     else AIAlert(self,error.localizedDescription);
 }
 @end
@@ -211,7 +231,10 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 - (void)reload{
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;self.title=[manager displayNameForConversation:self.conversation];NSDictionary *item=manager.store.configuration[@"conversations"][self.conversation];__weak typeof(self) weakSelf=self;
     CSSettingItem *toggle=[CSSettingItem switchItemWithTitle:@"启用 AI 回复" iconName:@"sparkles" iconColor:UIColor.systemGreenColor switchValue:[item[@"enabled"] boolValue] valueChangedBlock:^(BOOL on){typeof(self) self=weakSelf;NSError *error=nil;if(![manager setConversation:self.conversation enabled:on presetID:item[@"presetID"]?:@"" account:self.account epoch:self.epoch error:&error])AIAlert(self,error.localizedDescription);[self reload];}];
-    self.sections=@[[CSSettingSection sectionWithHeader:@"AI 回复" items:@[toggle,AIRow(@"回复预设",@"text.bubble",[manager presetNameForConversation:self.conversation],^{CSAIPresentPresetPicker(weakSelf,weakSelf.conversation,weakSelf.account,weakSelf.epoch);})]]];self.footers=@[[manager statusForConversation:self.conversation]];[super reload];
+    NSMutableArray *rows=[NSMutableArray arrayWithObject:toggle];
+    if([self.conversation hasSuffix:@"@chatroom"])[rows addObject:[CSSettingItem switchItemWithTitle:@"免 @ 回复" iconName:@"at" iconColor:UIColor.systemBlueColor switchValue:[item[@"replyWithoutMention"] boolValue] valueChangedBlock:^(BOOL on){typeof(self) self=weakSelf;NSError *error=nil;if(![manager setConversation:self.conversation replyWithoutMention:on account:self.account epoch:self.epoch error:&error])AIAlert(self,error.localizedDescription);[self reload];}]];
+    [rows addObject:AIRow(@"回复预设",@"text.bubble",[manager presetNameForConversation:self.conversation],^{CSAIPresentPresetPicker(weakSelf,weakSelf.conversation,weakSelf.account,weakSelf.epoch);})];
+    self.sections=@[[CSSettingSection sectionWithHeader:@"AI 回复" items:rows]];self.footers=@[[manager statusForConversation:self.conversation]];[super reload];
 }
 @end
 @interface CSAIConversationsPage : CSAISettingsPage
@@ -241,10 +264,29 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
     for(NSDictionary *record in [manager.store.history reverseObjectEnumerator]){
         NSString *name=[manager displayNameForConversation:record[@"conversation"]],*result=titles[record[@"result"]]?:record[@"result"];
         NSString *presetName=@"已删除的预设";for(NSDictionary *preset in manager.store.configuration[@"presets"])if([preset[@"id"] isEqual:record[@"preset"]]){presetName=preset[@"name"];break;}
-        NSString *detail=[NSString stringWithFormat:@"%@\n%@\n预设：%@\n%@\n%@",name,[formatter stringFromDate:record[@"date"]],presetName,result,record[@"detail"]];
+        NSDictionary *usage=record[@"usage"]?:@{};
+        NSString *detail=[NSString stringWithFormat:@"%@\n%@\n预设：%@\n%@\n%@\n模型：%@\n方式：%@\n输入 Token：%@\n输出 Token：%@\n缓存命中：%@\n缓存创建：%@",name,[formatter stringFromDate:record[@"date"]],presetName,result,record[@"detail"],record[@"model"]?:@"未记录",record[@"mode"]?AIModeName(record):@"未记录",AIUsageValue(usage,@"inputTokens"),AIUsageValue(usage,@"outputTokens"),AIUsageValue(usage,@"cachedTokens"),AIUsageValue(usage,@"cacheCreationTokens")];
         [rows addObject:AIRow(name,@"clock",result,^{AIAlert(weakSelf,detail);})];
     }
     if(!rows.count)[rows addObject:AIRow(@"暂无回复记录",@"clock",nil,nil)];self.sections=@[[CSSettingSection sectionWithHeader:@"最近 200 条" items:rows]];self.footers=@[@"已提交微信不代表对方已收到。记录不保存聊天正文或 API Key。发送结果未知时不会自动重发。"];
+    [super reload];
+}
+@end
+
+@interface CSAIUsagePage : CSAISettingsPage
+@end
+@implementation CSAIUsagePage
+- (void)reload{
+    self.title=@"Token 用量";NSMutableArray *rows=[NSMutableArray array];
+    NSArray *history=CSAIReplyManager.sharedManager.store.history?:@[];
+    NSArray *fields=@[@[@"inputTokens",@"输入 Token"],@[@"outputTokens",@"输出 Token"],@[@"cachedTokens",@"缓存命中 Token"],@[@"cacheCreationTokens",@"缓存创建 Token"]];
+    for(NSArray *field in fields){unsigned long long total=0;NSUInteger reported=0;
+        for(NSDictionary *record in history){NSNumber *value=record[@"usage"][field[0]];if(value){reported++;total+=value.unsignedLongLongValue;}}
+        NSString *detail=reported?[NSString stringWithFormat:@"%llu · %lu 条",total,(unsigned long)reported]:@"未提供";
+        [rows addObject:AIRow(field[1],@"number",detail,nil)];
+    }
+    self.sections=@[[CSSettingSection sectionWithHeader:@"最近 200 条回复记录" items:rows]];
+    self.footers=@[@"仅汇总已记录响应中服务商实际返回的数字，包含失败回复的已返回用量；不含连接测试及未取得用量的取消／网络异常请求。每行标注提供该数字的记录数。输入已包含缓存部分，请勿重复相加。不同模型用量合计，费用以服务商账单为准。"];
     [super reload];
 }
 @end
@@ -276,11 +318,11 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
     NSString *connection=manager.connectionStatus;if(!connection.length)connection=[config[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(config)]?@"已通过连接测试":@"尚未验证当前配置";
     self.sections=@[
         [CSSettingSection sectionWithHeader:@"功能" items:@[toggle,AIRow(@"当前状态",@"info.circle",[self current]?[manager statusForConversation:nil]:@"账号已改变或尚未就绪",nil)]],
-        [CSSettingSection sectionWithHeader:@"模型连接" items:@[AIRow(@"API 请求地址",@"link",[config[@"endpoint"] length]?config[@"endpoint"]:@"未设置",^{[weakSelf openConnection];}),AIRow(@"API Key",@"key",[config[@"credentialRevision"] length]?@"已设置":@"未设置",^{[weakSelf openConnection];}),AIRow(@"模型名称",@"cpu",[config[@"model"] length]?config[@"model"]:@"未设置",^{[weakSelf openConnection];}),AIRow(self.testing?@"取消连接测试":@"测试连接",@"network",self.testing?@"测试中…":nil,^{[weakSelf testConnection];}),AIRow(@"连接状态",@"checkmark.circle",connection,nil)]],
+        [CSSettingSection sectionWithHeader:@"模型连接" items:@[AIRow(@"调用方式",@"arrow.triangle.branch",AIModeName(config),^{[weakSelf openConnection];}),AIRow(@"API 请求地址",@"link",[config[@"endpoint"] length]?config[@"endpoint"]:@"未设置",^{[weakSelf openConnection];}),AIRow(@"API Key",@"key",[config[@"credentialRevision"] length]?@"已设置":@"未设置",^{[weakSelf openConnection];}),AIRow(@"模型名称",@"cpu",[config[@"model"] length]?config[@"model"]:@"未设置",^{[weakSelf openConnection];}),AIRow(self.testing?@"取消连接测试":@"测试连接",@"network",self.testing?@"测试中…":nil,^{[weakSelf testConnection];}),AIRow(@"连接状态",@"checkmark.circle",connection,nil)]],
         [CSSettingSection sectionWithHeader:@"回复预设" items:@[AIRow(@"默认预设",@"text.bubble",[manager presetNameForConversation:nil],^{CSAIPresentPresetPicker(weakSelf,nil,weakSelf.account,weakSelf.epoch);}),AIRow(@"管理预设",@"square.stack",[NSString stringWithFormat:@"%lu 个",(unsigned long)[config[@"presets"] count]],^{[weakSelf openPage:CSAIPresetsPage.class];})]],
-        [CSSettingSection sectionWithHeader:@"回复管理" items:@[AIRow(@"已开启的会话",@"bubble.left.and.bubble.right",[NSString stringWithFormat:@"%lu 个",(unsigned long)count],^{[weakSelf openPage:CSAIConversationsPage.class];}),AIRow(@"回复记录",@"clock",nil,^{[weakSelf openPage:CSAIHistoryPage.class];})]]
+        [CSSettingSection sectionWithHeader:@"回复管理" items:@[AIRow(@"已开启的会话",@"bubble.left.and.bubble.right",[NSString stringWithFormat:@"%lu 个",(unsigned long)count],^{[weakSelf openPage:CSAIConversationsPage.class];}),AIRow(@"回复记录",@"clock",nil,^{[weakSelf openPage:CSAIHistoryPage.class];}),AIRow(@"Token 用量",@"chart.bar",nil,^{[weakSelf openPage:CSAIUsagePage.class];})]]
     ];
-    self.footers=@[@"总开关与会话开关同时开启才会回复。手动回复不会暂停 AI。关闭时取消尚未提交的任务，重新开启不补回复历史消息。",@"兼容 Chat Completions 接口。测试仅调用模型，不发送微信消息；修改连接后需重新测试。",@"启用后，符合规则的文本及有限上下文会发送到你配置的模型服务，并以当前微信账号自动发送生成的回复。",@"群聊仅在被单独 @ 时回复。微信被系统挂起或退出时无法保证自动回复；本功能不会自动开启后台保活。"];
+    self.footers=@[@"总开关与会话开关同时开启才会回复。手动回复不会暂停 AI。关闭时取消尚未提交的任务，重新开启不补回复历史消息。",@"通用模式兼容 Chat Completions；百炼会话模式可减少重复上传预设及历史。测试仅调用模型，不发送微信消息；修改连接后需重新测试。",@"启用后，符合规则的文本及有限上下文会发送到你配置的模型服务，并以当前微信账号自动发送生成的回复。",@"群聊默认仅被单独 @ 时回复，可在该群聊天详情开启“免 @ 回复”。微信被系统挂起或退出时无法保证自动回复；本功能不会自动开启后台保活。"];
     [super reload];
 }
 @end

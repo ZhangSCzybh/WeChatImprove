@@ -11,6 +11,8 @@ FOUNDATION_EXPORT BOOL CSAIReplyValidateConfiguration(id configuration, NSError 
 FOUNDATION_EXPORT BOOL CSAIReplyValidateState(id state, NSString *account, NSError **error);
 FOUNDATION_EXPORT NSDictionary *CSAIReplyPortableState(NSDictionary *state);
 FOUNDATION_EXPORT NSString *CSAIConnectionIdentifier(NSDictionary *configuration);
+FOUNDATION_EXPORT BOOL CSAIReplyUsesResponses(NSDictionary *configuration);
+FOUNDATION_EXPORT BOOL CSAIReplyValidateUsage(id usage);
 FOUNDATION_EXPORT NSError *CSAIError(NSInteger code, NSString *message);
 /// Single serialized owner. Configuration contains no credentials or chat text.
 @interface CSAIReplyStore : NSObject

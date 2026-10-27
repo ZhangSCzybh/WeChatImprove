@@ -33,6 +33,10 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 @property(nonatomic) NSTimeInterval started;
 @property(nonatomic) NSUInteger generation;
 @property(nonatomic,strong) id<CSAICancellable> task;
+@property(nonatomic,copy) NSString *previousResponseID;
+@property(nonatomic,copy) NSDictionary *usage;
+@property(nonatomic) BOOL retriedReference;
+@property(nonatomic) NSUInteger requestAttempt;
 @end
 @implementation CSAIReplyBatch
 @end
@@ -43,6 +47,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 @property(nonatomic,strong) NSMutableArray<CSAIReplyBatch *> *pending;
 @property(nonatomic,strong) NSMutableDictionary<NSString *,CSAIReplyBatch *> *active;
 @property(nonatomic,strong) NSMutableDictionary<NSArray<NSString *> *,NSArray<NSDictionary *> *> *contexts;
+@property(nonatomic,strong) NSMutableDictionary<NSArray<NSString *> *,NSDictionary *> *responses;
 @property(nonatomic,copy) NSDictionary *configuration;
 @property(nonatomic,strong) NSTimer *timer;
 @property(nonatomic) NSUInteger generation;
@@ -54,7 +59,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     AIRequireMain();
     if((self=[super init])) {
         _store=store;_client=client;_now=^{return NSDate.date.timeIntervalSince1970;};
-        _pending=[NSMutableArray array];_active=[NSMutableDictionary dictionary];_contexts=[NSMutableDictionary dictionary];
+        _pending=[NSMutableArray array];_active=[NSMutableDictionary dictionary];_contexts=[NSMutableDictionary dictionary];_responses=[NSMutableDictionary dictionary];
         _configuration=store.configuration;_admissionBoundary=_now();
     }
     return self;
@@ -86,11 +91,14 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 }
 - (void)record:(CSAIReplyBatch *)batch result:(NSString *)result detail:(NSString *)detail {
     // Only fixed, local status strings reach history. Never forward error descriptions or model output.
-    [self.store appendHistory:@{@"date":[NSDate dateWithTimeIntervalSince1970:self.now()],@"conversation":batch.conversation,
-        @"preset":batch.preset[@"id"]?:@"",@"result":result,@"detail":detail} error:NULL];
+    NSMutableDictionary *record=[@{@"date":[NSDate dateWithTimeIntervalSince1970:self.now()],@"conversation":batch.conversation,
+        @"preset":batch.preset[@"id"]?:@"",@"result":result,@"detail":detail,@"model":batch.configuration[@"model"]?:@"",@"mode":CSAIReplyUsesResponses(batch.configuration)?@"bailianResponses":@"chat"} mutableCopy];
+    if(batch.usage.count && CSAIReplyValidateUsage(batch.usage))record[@"usage"]=batch.usage;
+    [self.store appendHistory:record error:NULL];
 }
 - (void)clearContextsForConversation:(NSString *)conversation {
     for(NSArray *key in self.contexts.allKeys)if([key.firstObject isEqual:conversation])[self.contexts removeObjectForKey:key];
+    for(NSArray *key in self.responses.allKeys)if([key.firstObject isEqual:conversation])[self.responses removeObjectForKey:key];
 }
 - (void)cancelBatch:(CSAIReplyBatch *)batch {
     // Remove ownership before calling a cancellation implementation that may call back synchronously.
@@ -99,7 +107,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 }
 - (void)cancelAll {
     AIRequireMain();self.generation++;[self.timer invalidate];self.timer=nil;
-    NSArray *active=self.active.allValues;[self.active removeAllObjects];[self.pending removeAllObjects];[self.contexts removeAllObjects];
+    NSArray *active=self.active.allValues;[self.active removeAllObjects];[self.pending removeAllObjects];[self.contexts removeAllObjects];[self.responses removeAllObjects];
     self.admissionBoundary=self.now();
     for(CSAIReplyBatch *batch in active){id<CSAICancellable> task=batch.task;batch.task=nil;[task cancel];}
 }
@@ -115,7 +123,8 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
        [sender isEqual:self.store.account] || [conversation isEqual:self.store.account] || !AIString(text,1,12000) ||
        ![event[@"type"] isEqual:@1] || ![event[@"live"] isEqual:@YES])return;
     if(![event[@"group"] isEqual:@NO] && ![event[@"group"] isEqual:@YES])return;
-    if([event[@"group"] boolValue] && (![event[@"mentioned"] isEqual:@YES] || ![event[@"atAll"] isEqual:@NO]))return;
+    BOOL withoutMention=[self.configuration[@"conversations"][conversation][@"replyWithoutMention"] boolValue];
+    if([event[@"group"] boolValue] && !withoutMention && (![event[@"mentioned"] isEqual:@YES] || ![event[@"atAll"] isEqual:@NO]))return;
     if(![event[@"created"] isKindOfClass:NSNumber.class])return;
     NSTimeInterval now=self.now(),created=[event[@"created"] doubleValue];
     if(!isfinite(now) || !isfinite(created) || created<self.admissionBoundary || created<now-120 || created>now+30)return;
@@ -148,11 +157,17 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     batch.text=AITail(batch.text.length?[NSString stringWithFormat:@"%@\n%@",batch.text,text]:text,12000);
     batch.due=now+2;[self processPending];
 }
-- (void)finishBatch:(CSAIReplyBatch *)batch text:(NSString *)text error:(NSError *)error {
+- (void)finishBatch:(CSAIReplyBatch *)batch result:(NSDictionary *)result error:(NSError *)error {
     AIRequireMain();
     if(self.active[batch.conversation]!=batch || batch.generation!=self.generation)return;
     if(![self isCurrent:batch]){[self cancelBatch:batch];[self clearContextsForConversation:batch.conversation];[self processPending];return;}
     batch.task=nil;
+    if(error.code==CSAIResponseReferenceExpired && [error.domain isEqual:@"com.wechatimprove.ai-reply"] && batch.previousResponseID.length && !batch.retriedReference){
+        batch.retriedReference=YES;batch.previousResponseID=nil;[self.responses removeObjectForKey:batch.contextKey];
+        [self requestBatch:batch];return;
+    }
+    if(CSAIReplyValidateUsage(result[@"usage"]))batch.usage=result[@"usage"];
+    NSString *text=result[@"text"];
     NSString *reply=[text isKindOfClass:NSString.class]?[text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet]:nil;
     if(error || !reply.length || reply.length>4000){
         [self.active removeObjectForKey:batch.conversation];
@@ -167,15 +182,21 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     __weak typeof(self) weakSelf=self;
     BOOL (^valid)(void)=^BOOL {return [weakSelf isCurrent:batch];};
     if(!valid()){[self cancelBatch:batch];[self processPending];return;}
-    NSString *result=[self.delegate coordinator:self submitText:reply conversation:batch.conversation valid:valid];
+    NSString *submission=[self.delegate coordinator:self submitText:reply conversation:batch.conversation valid:valid];
     // Submission may itself trigger configuration/account cancellation.
     if(self.active[batch.conversation]!=batch || batch.generation!=self.generation){[self processPending];return;}
     [self.active removeObjectForKey:batch.conversation];
-    if([result isEqual:@"submitted"]){
+    if([submission isEqual:@"submitted"]){
         NSMutableArray *messages=[batch.messages mutableCopy];[messages addObject:@{@"role":@"assistant",@"content":reply}];
         self.contexts[batch.contextKey]=AIBoundedMessages(messages);
+        // Only commit server state after native handoff. Trimming the local
+        // window requires a new chain, otherwise the server would retain more
+        // history than the user-approved context limit.
+        if(CSAIReplyUsesResponses(batch.configuration) && AIString(result[@"responseID"],1,512) && [messages isEqual:self.contexts[batch.contextKey]])
+            self.responses[batch.contextKey]=@{@"id":result[@"responseID"],@"created":@(self.now())};
+        else [self.responses removeObjectForKey:batch.contextKey];
         [self record:batch result:@"submitted" detail:@"已提交，不代表送达"];
-    }else if([result isEqual:@"unknown"]){
+    }else if([submission isEqual:@"unknown"]){
         [self record:batch result:@"unknown" detail:@"提交结果未知，不会重试"];
     }else [self record:batch result:@"failed" detail:@"未通过最终发送校验或提交失败"];
     [self processPending];
@@ -184,20 +205,31 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     [self.pending removeObjectIdenticalTo:batch];
     // Own the slot before credential lookup, so even reentrant configuration/account cancellation can revoke it.
     batch.started=self.now();self.active[batch.conversation]=batch;
+    NSMutableArray *messages=[self.contexts[batch.contextKey] mutableCopy]?:[NSMutableArray array];
+    [messages addObject:@{@"role":@"user",@"content":batch.text}];batch.messages=AIBoundedMessages(messages);
+    NSDictionary *previous=self.responses[batch.contextKey];
+    if(CSAIReplyUsesResponses(batch.configuration) && previous && [messages isEqual:batch.messages] && self.now()<[previous[@"created"] doubleValue]+7*86400)
+        batch.previousResponseID=previous[@"id"];
+    [self requestBatch:batch];
+}
+- (void)requestBatch:(CSAIReplyBatch *)batch {
     NSError *error=nil;NSString *key=[self.delegate credentialForCoordinator:self error:&error];
     if(!key.length || error || ![self isCurrent:batch]){
         if(self.active[batch.conversation]==batch){[self.active removeObjectForKey:batch.conversation];[self record:batch result:@"failed" detail:@"凭据或当前会话状态不可用"];}return;
     }
-    NSMutableArray *messages=[self.contexts[batch.contextKey] mutableCopy]?:[NSMutableArray array];
-    [messages addObject:@{@"role":@"user",@"content":batch.text}];batch.messages=AIBoundedMessages(messages);
     NSMutableArray *request=[NSMutableArray arrayWithObject:@{@"role":@"system",@"content":batch.preset[@"prompt"]}];[request addObjectsFromArray:batch.messages];
     __weak typeof(self) weakSelf=self;
-    id<CSAICancellable> task=[self.client generateWithConfiguration:batch.configuration apiKey:key messages:request completion:^(NSString *text,NSError *failure){
-        if(NSThread.isMainThread)[weakSelf finishBatch:batch text:text error:failure];
-        else dispatch_async(dispatch_get_main_queue(),^{[weakSelf finishBatch:batch text:text error:failure];});
-    }];
+    NSUInteger attempt=++batch.requestAttempt;
+    CSAIResultCompletion completion=^(NSDictionary *result,NSError *failure){
+        void(^deliver)(void)=^{if(batch.requestAttempt==attempt)[weakSelf finishBatch:batch result:result error:failure];};
+        if(NSThread.isMainThread)deliver();else dispatch_async(dispatch_get_main_queue(),deliver);
+    };
+    id<CSAICancellable> task;
+    if([self.client respondsToSelector:@selector(generateWithConfiguration:apiKey:messages:previousResponseID:completion:)])
+        task=[self.client generateWithConfiguration:batch.configuration apiKey:key messages:request previousResponseID:batch.previousResponseID completion:completion];
+    else task=[self.client generateWithConfiguration:batch.configuration apiKey:key messages:request completion:^(NSString *text,NSError *failure){completion(text?@{@"text":text}:nil,failure);}];
     // A fake or preflight failure may complete inline; never attach that old task to a replacement.
-    if(self.active[batch.conversation]==batch)batch.task=task;else [task cancel];
+    if(self.active[batch.conversation]==batch && batch.requestAttempt==attempt)batch.task=task;else [task cancel];
 }
 - (void)scheduleWakeup {
     [self.timer invalidate];self.timer=nil;

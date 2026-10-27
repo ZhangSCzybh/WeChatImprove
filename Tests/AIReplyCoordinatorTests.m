@@ -7,6 +7,8 @@
 @property(nonatomic,copy) NSArray *messages;
 @property(nonatomic) BOOL cancelled;
 @property(nonatomic) BOOL callbackOnCancel;
+@property(nonatomic,copy) CSAIResultCompletion resultCompletion;
+@property(nonatomic,copy) NSString *previousResponseID;
 @end
 @implementation FakeOperation
 - (void)cancel {self.cancelled=YES;if(self.callbackOnCancel)self.completion(nil,CSAIError(NSURLErrorCancelled,@"secret cancellation body"));}
@@ -22,6 +24,14 @@
     FakeOperation *operation=[FakeOperation new];operation.messages=messages;operation.completion=completion;[self.operations addObject:operation];
     if(self.inlineCompletion)completion(@"inline reply",nil);
     return operation;
+}
+@end
+@interface ResponseClient : FakeClient
+@end
+@implementation ResponseClient
+- (id<CSAICancellable>)generateWithConfiguration:(NSDictionary *)configuration apiKey:(NSString *)key messages:(NSArray *)messages previousResponseID:(NSString *)previous completion:(CSAIResultCompletion)completion{
+    FakeOperation *operation=(id)[super generateWithConfiguration:configuration apiKey:key messages:messages completion:^(NSString *text,NSError *error){completion(text?@{@"text":text,@"responseID":@"generated-response"}:nil,error);}];
+    operation.previousResponseID=previous;operation.resultCompletion=completion;return operation;
 }
 @end
 @interface FakeDelegate : NSObject <CSAIReplyCoordinatorDelegate>
@@ -221,6 +231,51 @@ static void ContextBudgetAndPreset(void) {
     f=[Fixture new];for(NSUInteger i=0;i<8;i++){NSMutableDictionary *event=[f event:@"c" sender:@"c" identity:nil];event[@"text"]=[@"😀" stringByPaddingToLength:6000 withString:@"😀" startingAtIndex:0];[f.coordinator receiveEvent:event];}
     [f advance:2];CHECK([LastInput(f.client.operations[0]) length]<=12000);CHECK([LastInput(f.client.operations[0]) dataUsingEncoding:NSUTF8StringEncoding]);
 }
+static Fixture *ResponseFixture(void){
+    Fixture *f=[Fixture new];f.client=[ResponseClient new];[f.coordinator setValue:f.client forKey:@"client"];
+    [f save:^(NSMutableDictionary *c){c[@"mode"]=@"bailianResponses";c[@"endpoint"]=@"https://example.invalid/v1/responses";c[@"verifiedConnection"]=CSAIConnectionIdentifier(c);}];return f;
+}
+static void CompleteResponse(Fixture *f,NSString *identifier){
+    f.client.operations.lastObject.resultCompletion(@{@"text":@"session reply",@"responseID":identifier,@"usage":@{@"inputTokens":@1400,@"outputTokens":@20,@"cachedTokens":@1024}},nil);
+}
+static void ResponseChains(void){
+    Fixture *f=ResponseFixture();Receive(f,@"c",@"c",nil);[f advance:2];CHECK(!f.client.operations.lastObject.previousResponseID);CHECK([f.client.operations.lastObject.messages[0][@"content"] isEqual:@"default prompt"]);
+    CompleteResponse(f,@"response-one");CHECK([f.store.history.lastObject[@"usage"][@"cachedTokens"] isEqual:@1024]);CHECK(![f.store.history.description containsString:@"response-one"]);
+    Receive(f,@"c",@"c",nil);[f advance:2];CHECK([f.client.operations.lastObject.previousResponseID isEqual:@"response-one"]);
+    f.delegate.result=@"failed";CompleteResponse(f,@"not-sent");f.delegate.result=@"submitted";
+    Receive(f,@"c",@"c",nil);[f advance:2];CHECK([f.client.operations.lastObject.previousResponseID isEqual:@"response-one"]);CompleteResponse(f,@"response-two");
+    Receive(f,@"d",@"d",nil);[f advance:2];CHECK(!f.client.operations.lastObject.previousResponseID);CompleteResponse(f,@"other-chat");
+    Receive(f,@"room@chatroom",@"member-a",nil);[f advance:2];CHECK(!f.client.operations.lastObject.previousResponseID);CompleteResponse(f,@"member-a-id");
+    Receive(f,@"room@chatroom",@"member-b",nil);[f advance:2];CHECK(!f.client.operations.lastObject.previousResponseID);CompleteResponse(f,@"member-b-id");
+    Receive(f,@"room@chatroom",@"member-a",nil);[f advance:2];CHECK([f.client.operations.lastObject.previousResponseID isEqual:@"member-a-id"]);CompleteResponse(f,@"member-a-next");
+    [f advance:7*86400];Receive(f,@"c",@"c",nil);[f advance:2];CHECK(!f.client.operations.lastObject.previousResponseID);CompleteResponse(f,@"renewed");
+    // Rebuild only once on a positively identified rejected reference; stale
+    // completions cannot submit, and ordinary transport errors never retry.
+    f=ResponseFixture();Receive(f,@"c",@"c",nil);[f advance:2];CompleteResponse(f,@"old-id");Receive(f,@"c",@"c",nil);[f advance:2];FakeOperation *expired=f.client.operations.lastObject;
+    expired.resultCompletion(nil,CSAIError(CSAIResponseReferenceExpired,@"expired"));CHECK(f.client.operations.count==3);CHECK(!f.client.operations.lastObject.previousResponseID);CHECK(f.client.operations.lastObject.messages.count==4);
+    expired.resultCompletion(@{@"text":@"late",@"responseID":@"late-id"},nil);CHECK(f.delegate.sends==1);
+    CompleteResponse(f,@"rebuilt");CHECK(f.delegate.sends==2);Receive(f,@"c",@"c",nil);[f advance:2];CHECK([f.client.operations.lastObject.previousResponseID isEqual:@"rebuilt"]);
+    NSUInteger requests=f.client.operations.count;f.client.operations.lastObject.resultCompletion(nil,CSAIError(NSURLErrorTimedOut,@"timeout"));CHECK(f.client.operations.count==requests && !f.coordinator.activeCount);
+    Receive(f,@"c",@"c",nil);[f advance:2];f.client.operations.lastObject.resultCompletion(nil,CSAIError(CSAIResponseReferenceExpired,@"expired again"));requests=f.client.operations.count;f.client.operations.lastObject.resultCompletion(nil,CSAIError(CSAIResponseReferenceExpired,@"still invalid"));CHECK(f.client.operations.count==requests && !f.coordinator.activeCount);
+    // Cancelled/configuration-changed requests cannot resurrect server state.
+    Receive(f,@"c",@"c",nil);[f advance:2];FakeOperation *late=f.client.operations.lastObject;[f save:^(NSMutableDictionary *c){c[@"defaultPreset"]=@"custom";}];late.resultCompletion(@{@"text":@"late",@"responseID":@"late-id"},nil);
+    Receive(f,@"c",@"c",nil);[f advance:2];CHECK(!f.client.operations.lastObject.previousResponseID);CHECK([f.client.operations.lastObject.messages[0][@"content"] isEqual:@"custom prompt"]);CompleteResponse(f,@"fresh");
+    // The remote chain never bypasses the ten-message local history bound.
+    f=ResponseFixture();for(NSUInteger i=0;i<8;i++){Receive(f,@"c",@"c",nil);[f advance:2];if(i>=5)CHECK(!f.client.operations.lastObject.previousResponseID);CHECK(f.client.operations.lastObject.messages.count<=11);CompleteResponse(f,[NSString stringWithFormat:@"round-%lu",(unsigned long)i]);}
+    f=ResponseFixture();for(NSUInteger i=0;i<3;i++){NSMutableDictionary *event=[f event:@"c" sender:@"c" identity:nil];event[@"text"]=[@"u" stringByPaddingToLength:5000 withString:@"u" startingAtIndex:0];[f.coordinator receiveEvent:event];[f advance:2];if(i==2)CHECK(!f.client.operations.lastObject.previousResponseID);CompleteResponse(f,@"long-id");}
+    f=ResponseFixture();f.delegate.result=@"unknown";Receive(f,@"c",@"c",nil);[f advance:2];CompleteResponse(f,@"unknown-send");Receive(f,@"c",@"c",nil);[f advance:2];CHECK(!f.client.operations.lastObject.previousResponseID);
+}
+static void GroupsWithoutMention(void){
+    Fixture *f=[Fixture new];NSMutableDictionary *event=[f event:@"room@chatroom" sender:@"member" identity:nil];event[@"mentioned"]=@NO;[f.coordinator receiveEvent:event];[f advance:2];CHECK(!f.client.operations.count);
+    [f save:^(NSMutableDictionary *c){NSMutableDictionary *items=[c[@"conversations"] mutableCopy],*room=[items[@"room@chatroom"] mutableCopy];room[@"replyWithoutMention"]=@YES;items[@"room@chatroom"]=room;c[@"conversations"]=items;}];
+    for(NSNumber *all in @[@NO,@YES]){event=[f event:@"room@chatroom" sender:@"member" identity:nil];event[@"mentioned"]=@NO;event[@"atAll"]=all;[f.coordinator receiveEvent:event];[f advance:2];CHECK(f.coordinator.activeCount==1);Complete(f,f.client.operations.count-1,@"group reply",nil);}
+    CHECK(f.delegate.sends==2);
+    [f save:^(NSMutableDictionary *c){NSMutableDictionary *items=[c[@"conversations"] mutableCopy],*room=[items[@"room@chatroom"] mutableCopy];room[@"enabled"]=@NO;items[@"room@chatroom"]=room;c[@"conversations"]=items;}];
+    event=[f event:@"room@chatroom" sender:@"member" identity:nil];event[@"mentioned"]=@NO;[f.coordinator receiveEvent:event];[f advance:2];CHECK(f.client.operations.count==2);
+    [f save:^(NSMutableDictionary *c){NSMutableDictionary *items=[c[@"conversations"] mutableCopy],*room=[items[@"room@chatroom"] mutableCopy];room[@"enabled"]=@YES;room[@"replyWithoutMention"]=@NO;items[@"room@chatroom"]=room;c[@"conversations"]=items;}];
+    event=[f event:@"room@chatroom" sender:@"member" identity:nil];event[@"mentioned"]=@NO;[f.coordinator receiveEvent:event];[f advance:2];CHECK(f.client.operations.count==2);
+    Receive(f,@"room@chatroom",@"member",nil);[f advance:2];CHECK(f.client.operations.count==3);
+}
 static void OneShotProductionWakeup(void) {
     Fixture *f=[Fixture new];__block NSTimeInterval value=NSDate.date.timeIntervalSince1970;f.coordinator.now=^{return value;};[f.coordinator configurationDidChange];f.clock=value;
     Receive(f,@"c",@"c",nil);value+=2.1;
@@ -229,6 +284,6 @@ static void OneShotProductionWakeup(void) {
     CHECK(f.client.operations.count==1);[f.coordinator cancelAll];
 }
 int main(void){@autoreleasepool{
-    Filters();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();OneShotProductionWakeup();
+    Filters();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();ResponseChains();GroupsWithoutMention();OneShotProductionWakeup();
     puts("AIReplyCoordinatorTests passed: filtering, alias claims, debounce, serialization, context bounds, cancellation, boundary authorization, expiry, concurrency, errors and one-shot timers");
 }return 0;}
