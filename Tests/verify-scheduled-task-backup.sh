@@ -7,6 +7,6 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecat
   -IControllers -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics \
   Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m \
   Controllers/CSPluginStorage.m Controllers/CSBackupStore.m Controllers/CSManagedImageFile.m \
-  Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m Controllers/CSScheduledTaskStore.m \
+  Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m \
   Tests/ScheduledTaskBackupTests.m -o "$work/tests"
 "$work/tests" "$work/Library/Preferences/WeChatImprove"
