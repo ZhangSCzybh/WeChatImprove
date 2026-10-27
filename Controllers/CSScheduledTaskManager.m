@@ -61,7 +61,8 @@ NSNotificationName const CSScheduledTasksDidChange=@"CSScheduledTasksDidChange";
 }
 - (BOOL)targetAllowed:(NSString *)target {
     if ([target isEqual:@"filehelper"]) return YES;
-    if (CSCloseFriendCurrentSnapshot().blocked || CSCloseFriendShouldHideUserName(target,CSCloseFriendSurfaceSession)) return NO;
+    // Close-friend concealment only changes presentation. Scheduled delivery
+    // continues to validate the account, authorization and actual recipient.
     id manager=[_environment serviceNamed:@"CContactMgr"];
     id contact=nil;
     for (NSString *selector in @[@"getContactByName:",@"getContactByNameFromDB:"]) if (CSMessageNativeSupports(manager,selector,@"@",@[@"@"])) { contact=CSMessageNativeInvoke(manager,selector,@[target]); if (contact) break; }
@@ -75,7 +76,7 @@ NSNotificationName const CSScheduledTasksDidChange=@"CSScheduledTasksDidChange";
     @try {
         if (![self accountValid:store.account epoch:epoch]) detail=@"账号状态已改变，本次未发送。";
         else if (!CSAuthorizationManager.sharedManager.isAuthorized) detail=@"插件授权尚未就绪，本次未发送；请在插件设置中检查授权。";
-        else if (![self targetAllowed:task[@"target"]]) detail=@"会话不可用或正受密友保护，本次未发送。";
+        else if (![self targetAllowed:task[@"target"]]) detail=@"会话不可用，本次未发送。";
         else {
             CSMessagePreparedSend *route=[_sender prepareScheduledText:task[@"text"] targetID:task[@"target"] accountID:store.account];
             if (route) {

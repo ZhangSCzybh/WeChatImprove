@@ -39,8 +39,10 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
     [self refresh];
 }
 - (void)changed:(NSNotification *)note {
+    (void)note;
     dispatch_async(dispatch_get_main_queue(),^{
-        if([note.name isEqual:CSCloseFriendPolicyDidChangeNotification])[self.coordinator cancelAll];
+        // Close-friend visibility changes refresh settings without cancelling
+        // enabled replies or their context. refresh still handles account changes.
         [self refresh];
     });
 }
@@ -136,6 +138,12 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
 }
 - (BOOL)allowsConversation:(NSString *)conversation {
     if(!conversation.length || CSCloseFriendCurrentSnapshot().blocked || CSCloseFriendShouldHideUserName(conversation,CSCloseFriendSurfaceSession))return NO;
+    return [self supportsReplyConversation:conversation];
+}
+- (BOOL)supportsReplyConversation:(NSString *)conversation {
+    // UI concealment is independent of reply eligibility. The coordinator checks
+    // account, authorization, both AI switches and connection validity separately.
+    if(!conversation.length)return NO;
     id manager=[self.environment serviceNamed:@"CContactMgr"],contact=nil;
     @try{for(NSString *selector in @[@"getContactByName:",@"getContactByNameFromDB:"]){if(CSMessageNativeSupports(manager,selector,@"@",@[@"@"]))contact=CSMessageNativeInvoke(manager,selector,@[conversation]);if(contact)break;}}@catch(__unused NSException *e){return NO;}
     if(![CSGroupReadObject(contact,@"m_nsUsrName") isEqual:conversation])return NO;
@@ -160,12 +168,12 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
     if(conversation && ![config[@"conversations"][conversation][@"enabled"] boolValue])return @"此会话未启用";
     if(![config[@"enabled"] boolValue])return @"总开关已关闭";
     if(![config[@"verifiedConnection"] length] || ![config[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(config)])return @"连接待验证 · 自动回复已暂停";
-    if(conversation && ![self allowsConversation:conversation])return @"会话不可用或正受保护";
+    if(conversation && ![self supportsReplyConversation:conversation])return @"会话不可用";
     if(!CSAuthorizationManager.sharedManager.isAuthorized)return @"插件授权未就绪";
     return conversation && [conversation hasSuffix:@"@chatroom"]?@"已启用 · 仅被 @ 时回复":@"已启用 · 等待符合规则的新消息";
 }
 - (BOOL)coordinator:(CSAIReplyCoordinator *)coordinator allowsConversation:(NSString *)conversation {
-    return coordinator==self.coordinator && [self isCurrentAccount:coordinator.store.account epoch:self.epoch] && CSAuthorizationManager.sharedManager.isAuthorized && [self allowsConversation:conversation];
+    return coordinator==self.coordinator && [self isCurrentAccount:coordinator.store.account epoch:self.epoch] && CSAuthorizationManager.sharedManager.isAuthorized && [self supportsReplyConversation:conversation];
 }
 - (NSString *)credentialForCoordinator:(CSAIReplyCoordinator *)coordinator error:(NSError **)error {
     if(coordinator!=self.coordinator || ![self isCurrentAccount:coordinator.store.account epoch:self.epoch]){if(error)*error=CSAIError(20,@"账号状态已改变。");return nil;}

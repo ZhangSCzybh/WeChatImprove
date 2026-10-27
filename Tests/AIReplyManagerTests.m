@@ -5,6 +5,7 @@
 #import "CSMessageSendAdapter.h"
 #import "CSBackupBootstrap.h"
 #import "CSCloseFriendBridge.h"
+#import "CSCloseFriendAutomationProjection.h"
 #import "CSGroupNativeBridge.h"
 #import "CSAuthorizationManager.h"
 #import "AINativeDispatchUnderTest.m"
@@ -16,8 +17,11 @@
 #import <errno.h>
 static NSUInteger checks,epoch=7,submissions;
 static NSString *account=@"alice";
-static BOOL suspended,hidden,failKeyWrite,failDirectorySync,simulateSends;
+static BOOL suspended,failKeyWrite,failDirectorySync,simulateSends;
+static BOOL authorized=YES;
+static CSCloseFriendSnapshot *privacy;
 static NSUInteger failedDirectorySyncs,manualSends,ownedSends;
+static NSString *lastSentTo;
 static NSMutableArray<NSString *> *installedHooks;
 static void (^duringManualSend)(void);
 int CSAITestFsync(int descriptor){
@@ -35,7 +39,8 @@ void MSHookMessageEx(Class cls,SEL selector,IMP replacement,IMP *original){
 void CSBackupWhenReady(void(^callback)(void)){callback();}
 void CSAIRefreshChatDetail(id page){(void)page;}
 @interface TestMessageWrap : NSObject
-@property NSString *m_nsFromUsr,*m_nsToUsr,*m_nsContent;
+@property NSString *m_nsFromUsr,*m_nsToUsr,*m_nsContent,*m_nsRealChatUsr,*m_nsAtUserList;
+@property BOOL m_nsAtAll;
 @property unsigned int m_uiMessageType,m_uiMesLocalID,m_uiCreateTime;
 @end
 @implementation TestMessageWrap @end
@@ -45,7 +50,7 @@ void CSAIRefreshChatDetail(id page){(void)page;}
 @end
 @implementation CMessageMgr
 - (void)AddMsg:(id)session MsgWrap:(id)wrap{
-    if(CSAIIsOwnedSend(wrap))ownedSends++;else {manualSends++;if(duringManualSend)duringManualSend();}
+    if(CSAIIsOwnedSend(wrap)){ownedSends++;lastSentTo=session;}else {manualSends++;if(duringManualSend)duringManualSend();}
     // Native outgoing echo still passes through the production incoming hook/filter.
     [self AsyncOnAddMsg:session MsgWrap:wrap];
 }
@@ -67,10 +72,14 @@ BOOL CSBackupIsReady(void){return YES;}
 BOOL CSBackupAccountIsSuspended(void){return suspended;}
 NSUInteger CSBackupAccountEpoch(void){return epoch;}
 BOOL CSBackupPerformAtAccountEpoch(NSUInteger expected,void(^block)(void)){if(expected!=epoch || suspended)return NO;block();return YES;}
-BOOL CSCloseFriendShouldHideUserName(NSString *name,CSCloseFriendSurface surface){(void)name;(void)surface;return hidden;}
-CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void){return nil;}
+BOOL CSCloseFriendShouldHideUserName(NSString *name,CSCloseFriendSurface surface){return [privacy hidesUserName:name surface:surface];}
+CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void){return privacy;}
+static void SetPrivacy(BOOL revealed,BOOL hideSessions,BOOL hideAI){
+    NSDictionary *profile=@{@"enabled":@YES,@"friends":@[@"friend"],@"groups":@[@"room@chatroom"],@"options":@{@"hideSessions":@(hideSessions),@"hideAIReply":@(hideAI)}};
+    privacy=[[CSCloseFriendSnapshot alloc]initWithAccountID:account profile:profile revealed:revealed revision:1 blocked:NO];
+}
 id CSGroupReadObject(id object,NSString *name){return CSMessageActionNativeObject(object,name);}
-CSGroupRowCategory CSGroupCategoryForContact(id contact){return contact?CSGroupRowCategoryPrivate:CSGroupRowCategoryService;}
+CSGroupRowCategory CSGroupCategoryForContact(id contact){NSString *name=CSGroupReadObject(contact,@"m_nsUsrName");return !name || [name isEqual:@"service"]?CSGroupRowCategoryService:[name hasSuffix:@"@chatroom"]?CSGroupRowCategoryGroup:CSGroupRowCategoryPrivate;}
 NSString *CSAIReadCredential(NSString *owner,NSString *revision,NSError **error){(void)error;return keys[@[owner,revision]];}
 BOOL CSAIWriteCredential(NSString *owner,NSString *revision,NSString *key,NSError **error){if(failKeyWrite){if(error)*error=CSAIError(99,@"test key write denied");return NO;}keys[@[owner,revision]]=key;return YES;}
 void CSAIRemoveCredential(NSString *owner,NSString *revision){[keys removeObjectForKey:@[owner,revision]];}
@@ -82,7 +91,7 @@ void CSAIRemoveCredential(NSString *owner,NSString *revision){[keys removeObject
 - (id)getContactByName:(NSString *)name;
 @end
 @implementation TestContacts
-- (id)getContactByName:(NSString *)name{TestContact *contact=[TestContact new];contact.m_nsUsrName=name;return contact;}
+- (id)getContactByName:(NSString *)name{if([name isEqual:@"missing"])return nil;TestContact *contact=[TestContact new];contact.m_nsUsrName=name;return contact;}
 @end
 @implementation CSMessageNativeEnvironment
 - (NSString *)currentAccountID{return account;}
@@ -91,7 +100,7 @@ void CSAIRemoveCredential(NSString *owner,NSString *revision){[keys removeObject
 @end
 @implementation CSAuthorizationManager
 + (instancetype)sharedManager{static id value;static dispatch_once_t once;dispatch_once(&once,^{value=[self new];});return value;}
-- (BOOL)isAuthorized{return YES;}
+- (BOOL)isAuthorized{return authorized;}
 @end
 @implementation CSMessageSendAdapter
 - (instancetype)initWithEnvironment:(id<CSMessageActionEnvironment>)environment{(void)environment;return [super init];}
@@ -173,6 +182,98 @@ static void ManualCoexistence(NSURL *url){
     CHECK(coordinator.pendingCount==1 && !coordinator.activeCount && store.history.count==3);
     [coordinator cancelAll];simulateSends=NO;
 }
+static void HiddenConversationReplies(NSURL *url){
+    CSAIReplyStore *store=[[CSAIReplyStore alloc]initWithURL:url account:account];CHECK([store load]);
+    NSMutableDictionary *config=[store.configuration mutableCopy];config[@"enabled"]=@YES;config[@"endpoint"]=@"https://example.invalid/chat";
+    config[@"model"]=@"fake-model";config[@"credentialRevision"]=@"hidden-replies";keys[@[account,@"hidden-replies"]]=@"fake-key";
+    config[@"verifiedConnection"]=CSAIConnectionIdentifier(config);
+    config[@"conversations"]=@{@"friend":@{@"enabled":@YES,@"presetID":@""},@"room@chatroom":@{@"enabled":@YES,@"presetID":@""},@"missing":@{@"enabled":@YES,@"presetID":@""},@"service":@{@"enabled":@YES,@"presetID":@""}};
+    CHECK([store saveConfiguration:config error:NULL]);NSDictionary *original=store.configuration;
+    CSAIReplyManager *manager=CSAIReplyManager.sharedManager;TestClient *client=[TestClient new];
+    [manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager setValue:client forKey:@"client"];
+    CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:client];coordinator.delegate=(id)manager;
+    __block NSTimeInterval clock=2000;coordinator.now=^{return clock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];
+    SetPrivacy(YES,YES,YES);simulateSends=YES;submissions=0;
+    // start installs the production policy observer while retaining this isolated store.
+    [manager setValue:@NO forKey:@"started"];[manager start];
+    [nativeMessages AsyncOnAddMsg:@"friend" MsgWrap:Message(@"friend",account,1,clock)];DrainMain();
+    clock+=2;[coordinator processPending];CHECK(coordinator.activeCount==1 && client.callbacks.count==1);
+    SetPrivacy(NO,YES,YES);
+    [NSNotificationCenter.defaultCenter postNotificationName:CSCloseFriendPolicyDidChangeNotification object:nil];DrainMain();
+    CHECK(coordinator.activeCount==1 && !client.tasks[0].cancelled);
+    NSArray *visible=CSCloseFriendVisibleAIConversations(store.configuration[@"conversations"],account,privacy);
+    CHECK(![visible containsObject:@"friend"] && ![visible containsObject:@"room@chatroom"]);
+    CHECK(![manager allowsConversation:@"friend"]); // concealed editing surface remains protected
+    CHECK([[manager statusForConversation:@"friend"] hasPrefix:@"已启用"]);
+    [nativeMessages AsyncOnAddMsg:@"friend" MsgWrap:Message(@"friend",account,2,clock)];DrainMain();CHECK(coordinator.pendingCount==1);
+    SetPrivacy(NO,YES,NO);
+    [NSNotificationCenter.defaultCenter postNotificationName:CSCloseFriendPolicyDidChangeNotification object:nil];DrainMain();
+    CHECK(coordinator.activeCount==1 && coordinator.pendingCount==1 && !client.tasks[0].cancelled);
+    CHECK([CSCloseFriendVisibleAIConversations(store.configuration[@"conversations"],account,privacy) containsObject:@"friend"]);
+    SetPrivacy(NO,YES,YES);
+    [NSNotificationCenter.defaultCenter postNotificationName:CSCloseFriendPolicyDidChangeNotification object:nil];DrainMain();
+    client.callbacks[0](@"reply after lock",nil);DrainMain();
+    CHECK(submissions==1 && [lastSentTo isEqual:@"friend"] && coordinator.pendingCount==1);
+    clock+=2;[coordinator processPending];CHECK(coordinator.activeCount==1 && client.lastMessages.count==4);
+    SetPrivacy(YES,YES,YES);
+    [NSNotificationCenter.defaultCenter postNotificationName:CSCloseFriendPolicyDidChangeNotification object:nil];DrainMain();
+    CHECK(!client.tasks[1].cancelled && coordinator.activeCount==1);
+    client.callbacks[1](@"reply after unlock",nil);DrainMain();CHECK(submissions==2);
+
+    // New private replies work under every combination of list/session concealment.
+    NSUInteger identity=10;
+    for(NSNumber *sessions in @[@NO,@YES])for(NSNumber *list in @[@NO,@YES]){
+        SetPrivacy(NO,sessions.boolValue,list.boolValue);
+        [NSNotificationCenter.defaultCenter postNotificationName:CSCloseFriendPolicyDidChangeNotification object:nil];DrainMain();
+        BOOL listed=[CSCloseFriendVisibleAIConversations(store.configuration[@"conversations"],account,privacy) containsObject:@"friend"];
+        CHECK(listed==!list.boolValue);
+        NSUInteger before=submissions;
+        [nativeMessages AsyncOnAddMsg:@"friend" MsgWrap:Message(@"friend",account,identity++,clock)];DrainMain();
+        CHECK(coordinator.pendingCount==1);clock+=2;[coordinator processPending];CHECK(coordinator.activeCount==1);
+        client.callbacks.lastObject(@"hidden private reply",nil);DrainMain();
+        CHECK(submissions==before+1 && [lastSentTo isEqual:@"friend"]);
+    }
+    CHECK([store.configuration isEqual:original]); // visibility never rewrites enablement or presets
+
+    // Hidden groups still require a structured individual mention, and reject @all.
+    SetPrivacy(NO,YES,YES);NSUInteger requests=client.callbacks.count;
+    TestMessageWrap *group=Message(@"room@chatroom",account,identity++,clock);group.m_nsRealChatUsr=@"member";
+    [nativeMessages AsyncOnAddMsg:@"room@chatroom" MsgWrap:group];DrainMain();
+    CHECK(!coordinator.pendingCount && client.callbacks.count==requests);
+    group.m_nsAtUserList=account;group.m_nsAtAll=YES;
+    [nativeMessages AsyncOnAddMsg:@"room@chatroom" MsgWrap:group];DrainMain();CHECK(!coordinator.pendingCount);
+    group.m_nsAtAll=NO;[nativeMessages AsyncOnAddMsg:@"room@chatroom" MsgWrap:group];DrainMain();
+    CHECK(coordinator.pendingCount==1);clock+=2;[coordinator processPending];CHECK(client.callbacks.count==requests+1);
+    NSUInteger before=submissions;client.callbacks.lastObject(@"hidden group reply",nil);DrainMain();
+    CHECK(submissions==before+1 && [lastSentTo isEqual:@"room@chatroom"]);
+    CHECK(![CSCloseFriendVisibleAIConversations(store.configuration[@"conversations"],account,privacy) containsObject:@"room@chatroom"]);
+
+    // Execution guards still reject unsupported contacts, disabled AI, invalid connection and authorization.
+    for(NSString *target in @[@"service",@"missing"]){
+        [nativeMessages AsyncOnAddMsg:target MsgWrap:Message(target,account,identity++,clock)];DrainMain();CHECK(!coordinator.pendingCount);
+    }
+    for(NSUInteger gate=0;gate<4;gate++){
+        NSMutableDictionary *disabled=[original mutableCopy];
+        if(gate==0)disabled[@"enabled"]=@NO;
+        if(gate==1){NSMutableDictionary *items=[disabled[@"conversations"] mutableCopy];items[@"friend"]=@{@"enabled":@NO,@"presetID":@""};disabled[@"conversations"]=items;}
+        if(gate==2)disabled[@"verifiedConnection"]=@"";
+        if(gate==3)authorized=NO;
+        CHECK([manager saveConfiguration:disabled account:account epoch:epoch error:NULL]);requests=client.callbacks.count;
+        [nativeMessages AsyncOnAddMsg:@"friend" MsgWrap:Message(@"friend",account,identity++,clock)];DrainMain();
+        clock+=2;[coordinator processPending];CHECK(!coordinator.pendingCount && !coordinator.activeCount && client.callbacks.count==requests);
+        authorized=YES;CHECK([manager saveConfiguration:original account:account epoch:epoch error:NULL]);
+    }
+    // Turning AI off still cancels an in-flight hidden reply and rejects late completion.
+    [nativeMessages AsyncOnAddMsg:@"friend" MsgWrap:Message(@"friend",account,identity++,clock)];DrainMain();clock+=2;[coordinator processPending];
+    CHECK(coordinator.activeCount==1);CSAICompletion late=client.callbacks.lastObject;TestCancellation *active=client.tasks.lastObject;
+    NSMutableDictionary *off=[original mutableCopy];off[@"enabled"]=@NO;CHECK([manager saveConfiguration:off account:account epoch:epoch error:NULL]);
+    CHECK(active.cancelled && !coordinator.activeCount);before=submissions;late(@"late disabled reply",nil);DrainMain();CHECK(submissions==before);
+    CHECK([manager saveConfiguration:original account:account epoch:epoch error:NULL]);
+    // Account epoch invalidation still rejects completion even before async refresh runs.
+    [nativeMessages AsyncOnAddMsg:@"friend" MsgWrap:Message(@"friend",account,identity++,clock)];DrainMain();clock+=2;[coordinator processPending];CHECK(coordinator.activeCount==1);
+    epoch++;client.callbacks.lastObject(@"old account reply",nil);DrainMain();CHECK(submissions==before);epoch--;
+    [coordinator cancelAll];[NSNotificationCenter.defaultCenter removeObserver:manager];simulateSends=NO;SetPrivacy(YES,YES,YES);
+}
 int main(int argc,const char **argv){@autoreleasepool{
     CHECK(argc==2);keys=[NSMutableDictionary dictionary];NSURL *url=[NSURL fileURLWithPath:@(argv[1])];
     TestStore *store=[[TestStore alloc]initWithURL:url account:account];CHECK([store load]);
@@ -225,9 +326,10 @@ int main(int argc,const char **argv){@autoreleasepool{
     client.callbacks[5](@"old account",nil);CHECK(failure.code==22);CHECK([store.configuration isEqual:before]);
     CHECK(![manager saveConnection:endpoint model:@"wrong" key:@"wrong" account:@"alice" epoch:7 error:&error]);CHECK(keys.count==keyCount);account=@"alice";epoch=7;
     CHECK([manager setConversation:@"friend" enabled:YES presetID:@"" account:account epoch:epoch error:&error]);CHECK([store.configuration[@"conversations"][@"friend"][@"enabled"] boolValue]);
-    hidden=YES;CHECK(![manager setConversation:@"friend" enabled:NO presetID:@"" account:account epoch:epoch error:&error]);hidden=NO;
+    SetPrivacy(NO,YES,YES);CHECK(![manager setConversation:@"friend" enabled:NO presetID:@"" account:account epoch:epoch error:&error]);SetPrivacy(YES,YES,YES);
     suspended=YES;CHECK(![manager isCurrentAccount:account epoch:epoch]);suspended=NO;
     CHECK([manager saveConnection:endpoint model:@"model-b" key:@"" account:account epoch:epoch error:&error]);CHECK(![store.configuration[@"credentialRevision"] length]);CHECK([CSAIReadCredential(account,first,NULL) isEqual:@"key-a"]);CHECK(submissions==0);
     ManualCoexistence([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"coexistence.plist"]);
+    HiddenConversationReplies([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"hidden-replies.plist"]);
     printf("AI reply manager: %lu checks passed\n",(unsigned long)checks);return 0;
 }}

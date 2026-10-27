@@ -25,4 +25,5 @@ typedef NS_ENUM(NSInteger,UIAlertActionStyle){UIAlertActionStyleCancel};
 - (void)addAction:(UIAlertAction *)action;
 @end
 FOUNDATION_EXPORT NSNotificationName const UIApplicationDidBecomeActiveNotification;
+FOUNDATION_EXPORT NSNotificationName const UIApplicationSignificantTimeChangeNotification;
 FOUNDATION_EXPORT NSNotificationName const UIApplicationProtectedDataDidBecomeAvailable;

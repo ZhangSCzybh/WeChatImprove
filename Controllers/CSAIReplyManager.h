@@ -18,6 +18,7 @@ FOUNDATION_EXPORT NSNotificationName const CSAIReplyDidChange;
 - (NSString *)statusForConversation:(nullable NSString *)conversation;
 - (NSString *)displayNameForConversation:(NSString *)conversation;
 - (NSString *)presetNameForConversation:(nullable NSString *)conversation;
+/// Presentation/editing access only; hidden conversations may still auto-reply.
 - (BOOL)allowsConversation:(NSString *)conversation;
 - (void)receiveNativeSession:(id)session wrap:(id)wrap epoch:(NSUInteger)epoch;
 @end

@@ -168,7 +168,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     BOOL (^valid)(void)=^BOOL {return [weakSelf isCurrent:batch];};
     if(!valid()){[self cancelBatch:batch];[self processPending];return;}
     NSString *result=[self.delegate coordinator:self submitText:reply conversation:batch.conversation valid:valid];
-    // Submission may itself trigger configuration/account/privacy cancellation.
+    // Submission may itself trigger configuration/account cancellation.
     if(self.active[batch.conversation]!=batch || batch.generation!=self.generation){[self processPending];return;}
     [self.active removeObjectForKey:batch.conversation];
     if([result isEqual:@"submitted"]){
