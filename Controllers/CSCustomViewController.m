@@ -1,3 +1,4 @@
+#import "CSAIReplySettingsViewController.h"
 #import "CSCustomViewController.h"
 #import "CSCloseFriendBridge.h"
 #import "CSCloseFriendManager.h"
@@ -968,6 +969,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                   iconColor:[UIColor systemPurpleColor]
                                                     detail:nil];
 
+    CSSettingItem *aiReplyItem = [CSSettingItem itemWithTitle:@"AI 自动回复" iconName:@"sparkles" iconColor:UIColor.systemPurpleColor detail:nil];
     CSSettingItem *scheduledItem = [CSSettingItem itemWithTitle:@"定时任务" iconName:@"calendar.badge.clock" iconColor:UIColor.systemOrangeColor detail:nil];
     CSSettingItem *imageStickerItem = [CSSettingItem itemWithTitle:@"表情功能" iconName:@"face.smiling" iconColor:UIColor.systemOrangeColor detail:nil];
     CSSettingSection *enhancementSection = [CSSettingSection sectionWithHeader:@"功能增强" 
@@ -983,6 +985,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                                              messageGestureItem,
                                                                              voiceForwardItem,
                                                                              repeatItem,
+                                                                             aiReplyItem,
                                                                              scheduledItem,
                                                                              imageStickerItem]];
     
@@ -1225,6 +1228,9 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
         else if ([item.title isEqualToString:@"语音转发"]) {
             CSVoiceForwardSettingsViewController *voiceForwardVC = [[CSVoiceForwardSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
             [self.navigationController pushViewController:voiceForwardVC animated:YES];
+        }
+        else if ([item.title isEqualToString:@"AI 自动回复"]) {
+            [self.navigationController pushViewController:[[CSAIReplySettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped] animated:YES];
         }
         else if ([item.title isEqualToString:@"定时任务"]) {
             [self.navigationController pushViewController:[[CSScheduledTaskSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped] animated:YES];

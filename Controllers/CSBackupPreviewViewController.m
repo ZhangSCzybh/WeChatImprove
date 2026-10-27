@@ -52,6 +52,7 @@
     return nil;
 }
 - (NSString *)changeDescription:(NSDictionary *)change {
+    if([change[@"module"] isEqual:@"ai_reply"])return [change[@"reset"] boolValue]?@"清除当前账号的 AI 回复配置与运行记录；其他账号保持不变。":@"恢复当前账号的模型地址、预设和会话规则；总开关关闭，需重新输入 API Key 并测试连接。";
     if([change[@"module"] isEqual:@"scheduled_tasks"]){
         if([change[@"reset"] boolValue])return @"清除当前账号的定时任务和执行记录；其他账号保持不变。";
         return [NSString stringWithFormat:@"恢复 %lu 个任务的名称、会话、消息内容、开关和时间规则；总开关保持关闭，不导入执行记录或待发送状态。请检查后手动开启。",(unsigned long)[change[@"after"][@"value"][@"tasks"] count]];

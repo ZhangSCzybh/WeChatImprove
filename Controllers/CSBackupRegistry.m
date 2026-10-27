@@ -1,5 +1,6 @@
 #import "CSBackupRegistry.h"
 #import "CSScheduledTaskStore.h"
+#import "CSAIReplyStore.h"
 #include <math.h>
 
 static NSString *const CSSelectionPrefix = @"com.wechat.enhance.chat_group.selection.";
@@ -385,11 +386,13 @@ static BOOL CSContacts(id value) {
     return entries;
 }
 + (NSDictionary<NSString *,NSString *> *)moduleTitles {
-    return @{@"avatar":@"头像",@"background":@"后台与隐私模糊",@"privacy":@"收藏保护",@"layout":@"布局与字体",@"bubble":@"气泡与连续消息",@"groups":@"会话分组",@"list":@"列表圆角",@"input":@"输入文本",@"message_time":@"消息时间",@"red_envelopes":@"红包设置",@"tabbar":@"底栏样式",@"attachments":@"附件布局",@"updates":@"更新控制",@"entry":@"插件入口",@"ui":@"界面精简",@"navigation":@"聊天导航",@"touch":@"触摸轨迹",@"version":@"版本设置",@"backup":@"备份设置",@"revoke":@"防撤回",@"message_actions":@"消息操作",@"transfers":@"转账设置",@"timeline":@"朋友圈尾巴",@"games":@"游戏设置",@"custom_text":@"界面文字",@"scheduled_tasks":@"定时任务"};
+    return @{@"avatar":@"头像",@"background":@"后台与隐私模糊",@"privacy":@"收藏保护",@"layout":@"布局与字体",@"bubble":@"气泡与连续消息",@"groups":@"会话分组",@"list":@"列表圆角",@"input":@"输入文本",@"message_time":@"消息时间",@"red_envelopes":@"红包设置",@"tabbar":@"底栏样式",@"attachments":@"附件布局",@"updates":@"更新控制",@"entry":@"插件入口",@"ui":@"界面精简",@"navigation":@"聊天导航",@"touch":@"触摸轨迹",@"version":@"版本设置",@"backup":@"备份设置",@"revoke":@"防撤回",@"message_actions":@"消息操作",@"transfers":@"转账设置",@"timeline":@"朋友圈尾巴",@"games":@"游戏设置",@"custom_text":@"界面文字",@"scheduled_tasks":@"定时任务",@"ai_reply":@"AI 自动回复"};
 }
 + (NSDictionary *)entryForDomain:(NSString *)domain key:(NSString *)key {
     if (![domain isKindOfClass:NSString.class] || ![key isKindOfClass:NSString.class]) return nil;
     for (NSDictionary *entry in self.entries) if ([entry[@"domain"] isEqual:domain] && [entry[@"key"] isEqual:key]) return entry;
+    if ([domain isEqual:CSAIReplyBackupDomain] && CSAccountID(key))
+        return @{@"domain":CSAIReplyBackupDomain,@"key":key,@"module":@"ai_reply",@"type":@"dictionary",@"scope":@"account"};
     if ([domain isEqual:CSScheduledTaskBackupDomain] && CSAccountID(key))
         return @{@"domain":CSScheduledTaskBackupDomain,@"key":key,@"module":@"scheduled_tasks",@"type":@"dictionary",@"scope":@"account"};
     if ([domain isEqual:@"standard"] && [key hasPrefix:CSSelectionPrefix] && CSAccountID([key substringFromIndex:CSSelectionPrefix.length]))
@@ -416,6 +419,8 @@ static BOOL CSContacts(id value) {
         } else if ([type isEqual:@"dictionary"]) {
             if ([registered[@"domain"] isEqual:CSScheduledTaskBackupDomain]) {
                 valid=CSScheduledTaskBackupValueValidate(value,key,error);
+            } else if ([registered[@"domain"] isEqual:CSAIReplyBackupDomain]) {
+                valid=CSAIReplyValidateState(value,key,error);
             } else if ([key hasSuffix:@"account_profiles"]) {
                 valid=[value isKindOfClass:NSDictionary.class] && [value count]<=10000;
                 if (valid) for (id account in value) if (!CSAccountID(account) || !CSProfile(value[account])) { valid=NO; break; }
