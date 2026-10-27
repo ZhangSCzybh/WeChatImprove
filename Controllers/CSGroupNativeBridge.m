@@ -9,7 +9,13 @@ static BOOL ObjectType(const char *type) {
 }
 static NSMethodSignature *Signature(id object, SEL sel, NSUInteger arguments) {
     if (!object || ![object respondsToSelector:sel]) return nil;
-    NSMethodSignature *sig=[object methodSignatureForSelector:sel];
+    // CMessageWrap (8.0.78) returns catchUnImplementMethod's q@: signature
+    // from methodSignatureForSelector: even for implemented methods. Read
+    // their actual ABI from the class/metaclass; ask the object only when the
+    // selector has no concrete method and genuinely needs forwarding.
+    Method method=class_getInstanceMethod(object_getClass(object),sel);
+    const char *types=method ? method_getTypeEncoding(method) : NULL;
+    NSMethodSignature *sig=types ? [NSMethodSignature signatureWithObjCTypes:types] : [object methodSignatureForSelector:sel];
     return sig.numberOfArguments==arguments && ObjectType([sig getArgumentTypeAtIndex:0]) &&
         strcmp([sig getArgumentTypeAtIndex:1],@encode(SEL))==0 ? sig : nil;
 }
@@ -54,21 +60,30 @@ static id ObjectAtPath(id object, NSString *selector, NSIndexPath *path) {
     if (!sig || !ObjectType(sig.methodReturnType) || !ObjectType([sig getArgumentTypeAtIndex:2])) return nil;
     return ((id(*)(id,SEL,id))objc_msgSend)(object,sel,path);
 }
-NSArray<NSString *> *CSGroupCopyFoldedUserNames(void) {
+static NSArray *CopyFoldedSessions(void) {
     @try {
         id manager=CSGetService(NSClassFromString(@"ChatBoxMgr"));
         NSMethodSignature *signature=Signature(manager,NSSelectorFromString(@"chatBoxSessions"),2);
         if (!signature || !ObjectType(signature.methodReturnType)) return nil;
         id sessions=CSGroupReadObject(manager,@"chatBoxSessions");
         if (![sessions isKindOfClass:NSArray.class] || [sessions count]>100000) return nil;
-        NSArray *snapshot=[sessions copy]; NSMutableArray *names=[NSMutableArray arrayWithCapacity:snapshot.count];
+        NSArray *snapshot=[sessions copy];
         for (id session in snapshot) {
             id name=CSGroupReadObject(session,@"m_nsUserName");
             if (![name isKindOfClass:NSString.class] || ![name length]) return nil;
-            [names addObject:[name copy]];
         }
-        return [names copy];
+        return snapshot;
     } @catch (__unused NSException *exception) { return nil; }
+}
+NSArray<NSString *> *CSGroupCopyFoldedUserNames(void) {
+    NSArray *sessions=CopyFoldedSessions(); if (!sessions) return nil;
+    NSMutableArray *names=[NSMutableArray arrayWithCapacity:sessions.count];
+    for (id session in sessions) {
+        id name=CSGroupReadObject(session,@"m_nsUserName");
+        if (![name isKindOfClass:NSString.class] || ![name length]) return nil;
+        [names addObject:[name copy]];
+    }
+    return [names copy];
 }
 CSGroupFoldedPrivacyState CSGroupAssessFoldedUserNames(NSArray *names, NSSet *hiddenNames) {
     if (![names isKindOfClass:NSArray.class] || !names.count) return CSGroupFoldedPrivacyUnknown;
@@ -214,6 +229,182 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact) {
     if (CSGroupReadInteger(contact,@"isMyContact",0)) return CSGroupRowCategoryPrivate;
     return CSGroupRowCategoryUnknown;
 }
+static CSGroupRowCategory CategoryForSession(id session,NSString *name,BOOL serviceContainer) {
+    CSGroupRowCategory category=CSGroupCategoryForContact(CSGroupReadObject(session,@"m_contact"));
+    if ([name hasSuffix:@"@chatroom"] || [name isEqual:@"chatroom_session_box"]) return CSGroupRowCategoryGroup;
+    if (serviceContainer || ServiceName(name ?: @"") || CSGroupReadInteger(session,@"isInBrandServiceBox",0)) return CSGroupRowCategoryService;
+    if (category==CSGroupRowCategoryUnknown && CSGroupReadInteger(session,@"isSingleChatSession",0)) return CSGroupRowCategoryPrivate;
+    return category;
+}
+static NSNumber *FoldedSortTime(id session,id resolvedMessage) {
+    // MMSessionInfo.compare: (8.0.78): override/last time, then top time for
+    // pinned rows, or untop/sort time otherwise. This is only a ranking aid,
+    // never a digest validity gate or a source for a visible time/date label.
+    long long override=MAX(0,CSGroupReadInteger(session,@"sortTimeOverride",0)),last=MAX(0,CSGroupReadInteger(session,@"m_uLastTime",0));
+    BOOL top=CSGroupReadInteger(session,@"m_bIsTop",0)>0;
+    long long time=override>0 ? override : last;
+    time=MAX(time,CSGroupReadInteger(session,top ? @"m_uTopTime" : @"m_uUnTopTime",0));
+    if (!top) time=MAX(time,CSGroupReadInteger(session,@"sortTime",0));
+    if (!time) {
+        // Readonly native message time also handles the special pat-message
+        // timestamp. Missing optional session getters must not force neutral.
+        id message=resolvedMessage ?: CSGroupReadObject(session,@"m_msgWrap");
+        time=MAX(0,CSGroupReadInteger(message,@"getSessionTime",0));
+        if (!time) time=MAX(0,CSGroupReadInteger(message,@"m_uiCreateTime",0));
+    }
+    return time>0 ? @(time) : nil;
+}
+static unsigned long long FoldedMessageID(id object) {
+    // 8.0.78: CMessageWrap uses q, MainFrameCellData uses Q. These are identity
+    // bits, not counters; never saturate signed/unsigned IDs through LLONG_MAX.
+    @try {
+        SEL selector=NSSelectorFromString(@"m_n64MesSvrID");NSMethodSignature *sig=Signature(object,selector,2);
+        if (!sig || sig.methodReturnLength!=sizeof(unsigned long long)) return 0;
+        if (!strcmp(sig.methodReturnType,@encode(unsigned long long)))
+            return ((unsigned long long(*)(id,SEL))objc_msgSend)(object,selector);
+        if (!strcmp(sig.methodReturnType,@encode(long long)))
+            return (unsigned long long)((long long(*)(id,SEL))objc_msgSend)(object,selector);
+    } @catch (__unused NSException *exception) {}
+    return 0;
+}
+static NSString *FoldedSummaryText(id text) {
+    if ([text isKindOfClass:NSAttributedString.class]) text=[text string];
+    return [text isKindOfClass:NSString.class] && [text length] ? [text copy] : nil;
+}
+static id FoldedLastMessage(id manager,NSString *name) {
+    SEL selector=NSSelectorFromString(@"GetLastMsg:");NSMethodSignature *sig=Signature(manager,selector,3);
+    if (!sig || !ObjectType(sig.methodReturnType) || !ObjectType([sig getArgumentTypeAtIndex:2])) return nil;
+    id message=((id(*)(id,SEL,id))objc_msgSend)(manager,selector,name);
+    return [CSGroupReadObject(message,@"GetChatName") isEqual:name] ? message : nil;
+}
+static BOOL FoldedSameMessage(id a,id b) {
+    if (!a || !b || ![CSGroupReadObject(a,@"GetChatName") isEqual:CSGroupReadObject(b,@"GetChatName")]) return NO;
+    if (a==b) return YES;
+    unsigned long long server=FoldedMessageID(a);
+    if (server) return server==FoldedMessageID(b);
+    long long local=CSGroupReadInteger(a,@"m_uiMesLocalID",0);
+    return !FoldedMessageID(b) && local>0 && local==CSGroupReadInteger(b,@"m_uiMesLocalID",0);
+}
+// Only the selectors read by 8.0.78 makeTextForQuoteMessage. Brand/favorite
+// state stays neutral; this is not a live session and is never put in a manager.
+@interface CSFoldedDigestSessionInfo : NSObject
+@property(nonatomic,strong) id m_contact, m_msgWrap;
+@property(nonatomic,copy) NSString *m_nsUserName, *m_nsBrandNotifyPrefixName;
+@property(nonatomic) unsigned int m_uBrandNotifyType, m_uUnReadCount;
+@property(nonatomic) BOOL m_bBrandNotifyNoPrefixName;
+@end
+@implementation CSFoldedDigestSessionInfo @end
+
+static NSString *FoldedFormatMessage(id message,NSString *name,NSString **prefix) {
+    Class cls=NSClassFromString(@"MainFrameCellData");
+    SEL digest=NSSelectorFromString(@"digestForMsg:withSender:");
+    NSMethodSignature *sig=Signature(cls,digest,4);
+    if (!sig || !ObjectType(sig.methodReturnType) || !ObjectType([sig getArgumentTypeAtIndex:2]) || !ObjectType([sig getArgumentTypeAtIndex:3])) return nil;
+    sig=Signature(message,@selector(copyWithZone:),3);
+    if (!sig || !ObjectType(sig.methodReturnType) || strcmp([sig getArgumentTypeAtIndex:2],@encode(NSZone *))) return nil;
+    id copy=[message copy];
+    if (!copy || copy==message || FoldedMessageID(copy)!=FoldedMessageID(message) || ![CSGroupReadObject(copy,@"GetChatName") isEqual:name]) return nil;
+    for (NSString *key in @[@"m_extendInfoWithMsgType",@"m_extendInfoWithFromUsr",@"m_extendInfoWithMsgTypeForBiz",@"referHostMsg"]) {
+        id item=CSGroupReadObject(message,key);
+        if (item && CSGroupReadObject(copy,key)==item) return nil;
+    }
+    SEL change=NSSelectorFromString(@"ChangeForDisplay");sig=Signature(copy,change,2);
+    if (!sig || strcmp(sig.methodReturnType,@encode(void))) return nil;
+    // Native formatting parses/mutates its argument: only give it an independent
+    // copy. Aggregate uses an empty sender; the conversation name is a separate
+    // native prefix, not the group sender prefix returned by getGroupName.
+    ((void(*)(id,SEL))objc_msgSend)(copy,change);
+    if (![CSGroupReadObject(copy,@"GetChatName") isEqual:name]) return nil;
+    NSString *text=FoldedSummaryText(((id(*)(id,SEL,id,id))objc_msgSend)(cls,digest,copy,@""));
+    if (!text.length) return nil;
+    // Native holder/aggregate plain-text processing, without makeTextSession:
+    // (which can clear exclusive red-packet counts on the real account).
+    Class parser=NSClassFromString(@"LinkAnchorParser");SEL strip=NSSelectorFromString(@"stringByStrippingHref:");
+    sig=Signature(parser,strip,3);
+    if (sig && ObjectType(sig.methodReturnType) && ObjectType([sig getArgumentTypeAtIndex:2]))
+        text=FoldedSummaryText(((id(*)(id,SEL,id))objc_msgSend)(parser,strip,text));
+    if (!text.length) return nil;
+    if (![CSGroupReadObject(copy,@"GetChatName") isEqual:name] || FoldedMessageID(copy)!=FoldedMessageID(message)) return nil;
+    id formatter=[[cls alloc] init];
+    SEL setter=NSSelectorFromString(@"setM_sessionInfo:"),make=NSSelectorFromString(@"makeTextForQuoteMessage");
+    sig=Signature(formatter,setter,3);NSMethodSignature *makeSig=Signature(formatter,make,2);
+    if (!sig || strcmp(sig.methodReturnType,@encode(void)) || !ObjectType([sig getArgumentTypeAtIndex:2]) ||
+        !makeSig || strcmp(makeSig.methodReturnType,@encode(void))) return nil;
+    CSFoldedDigestSessionInfo *snapshot=[CSFoldedDigestSessionInfo new];
+    snapshot.m_nsUserName=@"chatroom_session_box";snapshot.m_msgWrap=copy;
+    ((void(*)(id,SEL,id))objc_msgSend)(formatter,setter,snapshot);
+    ((void(*)(id,SEL))objc_msgSend)(formatter,make);
+    *prefix=FoldedSummaryText(CSGroupReadObject(formatter,@"m_prefixTextForQuoteMessage"));
+    if (!(*prefix).length) return nil;
+    return text;
+}
+static NSString *FoldedNativeSummary(id manager,id session,NSString *name,NSString **prefix,id *sortMessage) {
+    *prefix=nil;
+    @try {
+        id sessionMessage=CSGroupReadObject(session,@"m_msgWrap"),message=sessionMessage;
+        // ChatBoxMgr.lastMsgForChatBoxSession (8.0.78) performs this same
+        // per-conversation read when its lightweight session has no content.
+        // Keep it detached: never set m_msgWrap or borrow the global candidate.
+        BOOL lookup=!message || ([message respondsToSelector:NSSelectorFromString(@"m_nsContent")] && ![FoldedSummaryText(CSGroupReadObject(message,@"m_nsContent")) length]);
+        id messageManager=lookup ? CSGetService(NSClassFromString(@"CMessageMgr")) : nil;
+        if (lookup) message=FoldedLastMessage(messageManager,name);
+        if (!message) return nil;
+        if (![CSGroupReadObject(message,@"GetChatName") isEqual:name]) return nil;
+        *sortMessage=message;
+        unsigned long long messageID=FoldedMessageID(message);
+        SEL selector=NSSelectorFromString(@"getCellDataByUsrName:");NSMethodSignature *sig=Signature(manager,selector,3);
+        id data=nil;
+        if (sig && ObjectType(sig.methodReturnType) && ObjectType([sig getArgumentTypeAtIndex:2]))
+            data=((id(*)(id,SEL,id))objc_msgSend)(manager,selector,@"chatroom_session_box");
+        NSString *text=nil;
+        if (data) {
+            id entry=CSGroupReadObject(data,@"m_sessionInfo"),entryMessage=CSGroupReadObject(entry,@"m_msgWrap");
+            if ([CSGroupReadObject(entry,@"m_nsUserName") isEqual:@"chatroom_session_box"] && messageID &&
+                FoldedMessageID(data)==messageID && FoldedMessageID(entryMessage)==messageID &&
+                [CSGroupReadObject(entryMessage,@"GetChatName") isEqual:name]) {
+                text=FoldedSummaryText(CSGroupReadObject(data,@"m_textForMessageLabel"));
+                *prefix=FoldedSummaryText(CSGroupReadObject(data,@"m_prefixTextForQuoteMessage"));
+                if (!(*prefix).length || CSGroupReadObject(entry,@"m_msgWrap")!=entryMessage || FoldedMessageID(data)!=messageID ||
+                    FoldedMessageID(entryMessage)!=messageID || ![CSGroupReadObject(entryMessage,@"GetChatName") isEqual:name]) text=nil;
+            }
+        }
+        if (!text) {
+            *prefix=nil;
+            text=FoldedFormatMessage(message,name,prefix);
+        }
+        if (CSGroupReadObject(session,@"m_msgWrap")!=sessionMessage || FoldedMessageID(message)!=messageID ||
+            (lookup && !FoldedSameMessage(message,FoldedLastMessage(messageManager,name))) ||
+            ![CSGroupReadObject(message,@"GetChatName") isEqual:name] || ![CSGroupReadObject(session,@"m_nsUserName") isEqual:name]) {
+            text=nil;*sortMessage=nil;
+        }
+        if (!text) *prefix=nil;
+        return text;
+    } @catch (__unused NSException *exception) { *prefix=nil;return nil; }
+}
+NSArray<CSGroupRow *> *CSGroupCopyFoldedRows(void) {
+    NSArray *sessions=CopyFoldedSessions(); if (!sessions) return nil;
+    id dataManager=nil;
+    @try { dataManager=CSGetService(NSClassFromString(@"MainFrameCellDataManager")); } @catch (__unused NSException *exception) {}
+    NSMutableArray *rows=[NSMutableArray arrayWithCapacity:sessions.count];
+    NSMutableSet *names=[NSMutableSet set];
+    for (id session in sessions) {
+        id name=CSGroupReadObject(session,@"m_nsUserName");
+        if (![name isKindOfClass:NSString.class] || ![name length] || [names containsObject:name] || [name isEqual:@"chatroom_session_box"]) return nil;
+        [names addObject:name];
+        NSUInteger indexes[]={0,rows.count};
+        NSString *prefix=nil;
+        id sortMessage=nil;
+        NSString *summary=FoldedNativeSummary(dataManager,session,name,&prefix,&sortMessage);
+        NSNumber *time=FoldedSortTime(session,sortMessage);
+        [rows addObject:[[CSGroupRow alloc] initWithNativePath:[NSIndexPath indexPathWithIndexes:indexes length:2]
+            userName:name kind:CSGroupRowKindSession category:CategoryForSession(session,name,NO)
+            top:CSGroupReadInteger(session,@"m_bIsTop",0)!=0
+            unreadCount:(NSUInteger)MAX(0,CSGroupReadInteger(session,@"m_uUnReadCount",0))
+            redDot:CSGroupReadInteger(session,@"m_bShowUnReadAsRedDot",0)!=0
+            nativeSummary:summary sortTime:time nativePrefix:prefix]];
+    }
+    return [rows copy];
+}
 NSArray *CSGroupBuildNativeSections(id controller,id table,id source) {
     return CSGroupBuildNativeSectionsReusing(controller,table,source,nil);
 }
@@ -262,10 +453,7 @@ NSArray *CSGroupBuildNativeSectionsReusing(id controller,id table,id source,NSAr
                 BOOL serviceContainer=[@[@"brandsessionholder",@"brandservicesessionholder"] containsObject:name ?: @""] ||
                     CSGroupReadInteger(session,@"isBrandServiceBoxSession",0) || CSGroupReadInteger(session,@"isBrandEcsMsgHolderSession",0);
                 if ([name isEqual:@"chatroom_session_box"] || serviceContainer) kind=CSGroupRowKindAggregate;
-                id contact=CSGroupReadObject(session,@"m_contact"); CSGroupRowCategory category=CSGroupCategoryForContact(contact);
-                if ([name hasSuffix:@"@chatroom"] || [name isEqual:@"chatroom_session_box"]) category=CSGroupRowCategoryGroup;
-                else if (serviceContainer || ServiceName(name ?: @"") || CSGroupReadInteger(session,@"isInBrandServiceBox",0)) category=CSGroupRowCategoryService;
-                else if (category==CSGroupRowCategoryUnknown && CSGroupReadInteger(session,@"isSingleChatSession",0)) category=CSGroupRowCategoryPrivate;
+                CSGroupRowCategory category=CategoryForSession(session,name,serviceContainer);
                 BOOL top=CSGroupReadInteger(session,@"m_bIsTop",CSGroupReadInteger(cellData,@"bTopCell",0))!=0;
                 NSUInteger unread=(NSUInteger)MAX(0,CSGroupReadInteger(session,@"m_uUnReadCount",0));
                 BOOL dot=CSGroupReadInteger(session,@"m_bShowUnReadAsRedDot",0)!=0;

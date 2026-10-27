@@ -3,6 +3,7 @@
 #import "CSCloseFriendListShield.h"
 #import "CSCloseFriendPolicy.h"
 #import "CSGroupProjection.h"
+#import "WESessionTabItem.h"
 #import <Foundation/Foundation.h>
 #import <dispatch/dispatch.h>
 #import <objc/runtime.h>
@@ -12,6 +13,7 @@
 @interface Host : NSObject
 @property(nonatomic,strong) UITableView *m_tableView;
 @property(nonatomic) BOOL isSearching;
+@property(nonatomic) BOOL folded;
 @property(nonatomic) NSUInteger originalCalls;
 - (void)nativeAppearance:(BOOL)animated;
 - (void)viewWillAppear:(BOOL)animated;
@@ -21,8 +23,16 @@
 @end
 @interface CSGroupPreferences : NSObject
 @property(nonatomic,copy) NSString *accountID;
+@property(nonatomic,copy) NSString *selectedTabID;
+@property(nonatomic,strong) NSArray *tabs;
 @end
-@implementation CSGroupPreferences @end
+static NSMutableDictionary *selectedGroups;
+@implementation CSGroupPreferences
+- (NSString *)selectedTabID { return selectedGroups[self.accountID] ?: @"preset_0"; }
+- (void)setSelectedTabID:(NSString *)value {
+    if (!selectedGroups) selectedGroups=[NSMutableDictionary dictionary];selectedGroups[self.accountID]=value;
+}
+@end
 static char AdapterKey, PresentationSuspendedKey, CellRowKey;
 static NSString *account=@"account-A";
 static BOOL enabled=YES;
@@ -30,7 +40,7 @@ static BOOL privacyEnabled;
 static BOOL CSGroupPrivacyActive(void) { return privacyEnabled; }
 static NSUInteger accountEpoch=1;
 static NSUInteger CSCloseFriendAccountEpoch(void) { return accountEpoch; }
-static BOOL CSGroupIsFoldedController(id owner) { (void)owner; return NO; }
+static BOOL CSGroupIsFoldedController(id owner) { return [owner isKindOfClass:Host.class] && [owner folded]; }
 static BOOL policyBlocked;
 static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) {
     return [[CSCloseFriendSnapshot alloc] initWithAccountID:account profile:@{@"enabled":@(privacyEnabled),@"friends":@[@"secret"],@"groups":@[],@"options":@{}} revealed:NO revision:1 blocked:policyBlocked];
@@ -49,6 +59,10 @@ static id CSGroupReadObject(id owner,NSString *key) { return [owner valueForKey:
 static long long CSGroupReadInteger(id owner,NSString *key,long long fallback) { return owner ? [[owner valueForKey:key] longLongValue] : fallback; }
 static void CSGroupWithNativeIndices(id table,void (^body)(void)) { (void)table; body(); }
 static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table; scopes++; body(); }
+@interface LifecycleChrome : NSObject
+@property(nonatomic,copy) NSString *selectedTabID;
+@end
+@implementation LifecycleChrome @end
 @interface CSGroupListAdapter : NSObject
 CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic) NSUInteger modelRevision,snapshotRevision,snapshotEpoch,refreshGeneration;
@@ -56,6 +70,8 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic,copy) NSString *snapshotAccount;
 @property(nonatomic,strong) NSArray *cachedNativeSections;
 @property(nonatomic,copy) NSString *nativeActionsAccount;
+@property(nonatomic,copy) NSString *publishedTabID;
+@property(nonatomic,strong) NSArray *displayedTabs;
 @property(nonatomic,weak) UITableView *table;
 @property(nonatomic,weak) Host *controller;
 @property(nonatomic,strong) NSMutableDictionary *proxies,*anchors;
@@ -65,11 +81,12 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic) BOOL chromeVisible,searchChromeVisible,privacyRefreshPending,privacyShielded,privacyTableWasHidden;
 @property(nonatomic,strong) CSCloseFriendListShield *privacyShield;
 @property(nonatomic) CSGroupChangeKind lastPublishedChanges;
-@property(nonatomic,strong) id chrome;
+@property(nonatomic,strong) LifecycleChrome *chrome;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
 @property(nonatomic) double baselineDeceleration;
 @property(nonatomic) BOOL active,presentationSuspended,publishedEnabled,searching,dirty,scheduled,publishing,groupPanMoving,swipeActive,nativePresentation,updatingHeader,snapshotRetryAttempted;
 @property(nonatomic) NSUInteger changeDepth,snapshotRetryGeneration,refreshCount,layoutCount,anchorOrTitleCount,menuReads,menuState;
+@property(nonatomic) BOOL pendingScrollToTop;
 + (instancetype)adapterForController:(id)controller;
 + (instancetype)adapterForTable:(id)table;
 + (void)setPresentationSuspended:(BOOL)value forController:(id)controller;
@@ -101,6 +118,9 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
     self.refreshCount++;
     if (!self.nativePresentation) [self nativeSectionsForAccount:account];
     self.preferences=[CSGroupPreferences new]; self.preferences.accountID=account;
+    WESessionTabItem *all=[WESessionTabItem tabWithType:WETabTypeAll],*a=[WESessionTabItem customTabWithName:@"A" sessionUserNames:@[@"a"]],*b=[WESessionTabItem customTabWithName:@"B" sessionUserNames:@[@"b"]];
+    a.tabId=@"custom-a";b.tabId=@"custom-b";self.preferences.tabs=@[all,a,b];self.displayedTabs=self.preferences.tabs;
+    self.publishedTabID=self.preferences.selectedTabID;
     self.publishedEnabled=enabled; self.searching=self.controller.isSearching;
     self.active=privacyEnabled || (enabled && !self.searching && !self.nativePresentation);
     [self layout];
@@ -119,6 +139,7 @@ static CSGroupListAdapter *Adapter(id owner) { return [CSGroupListAdapter adapte
 static void Native(id owner,BOOL change,void (^body)(void)) { (void)owner; (void)change; body(); }
 static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.publishing; }
 @implementation Host
+- (UITableView *)tableView { return self.m_tableView; }
 - (void)nativeAppearance:(BOOL)animated {
     (void)animated; self.originalCalls++;
     // Native lifecycle may itself produce a session/UI invalidation.
@@ -126,6 +147,9 @@ static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.publishin
 }
 #include "GroupLifecycleHooks.h"
 @end
+static void FoldedAppearOriginal(id owner,SEL selector,BOOL animated) { (void)selector;[owner nativeAppearance:animated]; }
+static void FoldedDisappearOriginal(id owner,SEL selector,BOOL animated) { (void)selector;[owner nativeAppearance:animated]; }
+#include "FoldedLifecycleHooks.h"
 @implementation LifecycleTable
 #include "GroupLifecycleReload.h"
 @end
@@ -455,6 +479,21 @@ int main(void) { @autoreleasepool {
     account=previousAccount; policyBlocked=NO; [CSGroupListAdapter closeFriendPolicyChanged:nil];
     Check(!secret.hidden,@"resolved account releases cell suppression after safe publication");
     privacyEnabled=NO;
+    // Replay both native owner lifecycles against independently cached adapters.
+    Host *groupHost=nil;CSGroupListAdapter *groupOwner=List(&groupHost);
+    Host *foldedHost=[Host new];foldedHost.folded=YES;foldedHost.m_tableView=[LifecycleTable new];
+    [CSGroupListAdapter attachToController:foldedHost];CSGroupListAdapter *foldedOwner=Adapter(foldedHost);
+    [groupOwner selectIndex:1];RunFor(.03);
+    Check([groupOwner.publishedTabID isEqual:@"custom-a"] && [foldedOwner.publishedTabID isEqual:@"custom-a"],@"selecting main group refreshes a visible folded owner of the same account");
+    FoldedDisappear(foldedHost,@selector(viewWillDisappear:),NO);before=foldedOwner.refreshCount;
+    [groupOwner selectIndex:2];RunFor(.03);
+    Check(foldedOwner.presentationSuspended && foldedOwner.dirty && foldedOwner.refreshCount==before,@"switching group keeps hidden folded owner deferred");
+    FoldedAppear(foldedHost,@selector(viewDidAppear:),NO);RunFor(.03);
+    Check(!foldedOwner.presentationSuspended && [foldedOwner.publishedTabID isEqual:@"custom-b"] && foldedOwner.refreshCount==before+1,@"folded appearance reloads selected group before publishing once");
+    Check(!groupOwner.nativePresentation && [groupOwner.preferences.selectedTabID isEqual:@"custom-b"],@"folded lifecycle never forces parent selection to All");
+    foldedOwner.preferences.accountID=@"stale-account";before=foldedOwner.refreshCount;
+    [groupOwner selectIndex:1];RunFor(.03);
+    Check(foldedOwner.refreshCount==before,@"selection broadcast does not refresh another account's stale folded owner");
     fprintf(stdout,"Group lifecycle: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;
 } }

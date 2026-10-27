@@ -439,8 +439,21 @@ static void InstallMenuTouchGate(void) {
 - (void)layoutSubviews { %orig; CSCloseFriendRefreshSessionCover(self); }
 %end
 
-// Folded lists share the projection/proxy owner, but never group chrome. Native
-// data-source methods still read ChatBoxMgr with original coordinates.
+%hook MainFrameItemView
+- (void)layoutSubviews {
+    %orig;
+    // The item's native layout may follow its cell and re-show global preview,
+    // time or unread. Repair only cells that already own a folded presentation.
+    for (UIView *parent=((UIView *)self).superview;parent;parent=parent.superview) {
+        if ([parent isKindOfClass:UITableViewCell.class]) {
+            CSCloseFriendRefreshSessionCover((UITableViewCell *)parent); break;
+        }
+    }
+}
+%end
+
+// Folded lists follow the current group's projection without group chrome.
+// Native data-source methods still read global ChatBoxMgr with original coordinates.
 static void (*FoldedLoadOriginal)(id,SEL);
 static void FoldedLoad(id owner,SEL selector) {
     FoldedLoadOriginal(owner,selector); [CSGroupListAdapter attachToController:owner];

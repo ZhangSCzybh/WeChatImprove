@@ -16,6 +16,8 @@ FOUNDATION_EXPORT UIView *CSListCornerOwnedBackground(UIView *container);
 FOUNDATION_EXPORT BOOL CSListCornerValidRect(CGRect rect);
 // Layout-only repair using an existing card role; never queries table rows or paths.
 FOUNDATION_EXPORT void CSListCornerRefreshSessionGeometry(UITableViewCell *cell);
+FOUNDATION_EXPORT UIView * _Nullable CSListCornerExistingSessionBackground(UITableViewCell *cell);
+FOUNDATION_EXPORT void CSListCornerRemoveSessionAppearance(UITableViewCell *cell);
 @interface CSListCornerPageContext : NSObject
 @property(nonatomic, readonly) UIView *content;
 @property(nonatomic, readonly) CSListCornerSnapshot *configuration;
@@ -27,4 +29,5 @@ FOUNDATION_EXPORT void CSListCornerRefreshSessionGeometry(UITableViewCell *cell)
 // Preserve native role classification and spacing across repeated decoration without native relayout.
 FOUNDATION_EXPORT CGRect CSListCornerNativeFrame(UIView *view);
 FOUNDATION_EXPORT void CSListCornerSetFrame(UIView *view, CGRect frame);
+FOUNDATION_EXPORT void CSListCornerRecordFrame(UIView *view, CGRect nativeFrame, CGRect appliedFrame);
 NS_ASSUME_NONNULL_END

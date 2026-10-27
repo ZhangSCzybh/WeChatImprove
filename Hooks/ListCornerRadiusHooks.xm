@@ -7,6 +7,7 @@
 #import "CSListCornerContactsAdapter.h"
 #import "CSListCornerDiscoverAdapter.h"
 #import "CSListCornerMoreAdapter.h"
+#import "CSCloseFriendSessionPresentation.h"
 
 static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *original, NSInteger section, CSListCornerPage page, BOOL footer) {
     CSListCornerSnapshot *configuration=[[CSListCornerConfiguration sharedConfiguration] snapshot];
@@ -40,9 +41,15 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 }
 %end
 %hook NewMainFrameCell
+- (void)prepareForReuse {
+    CSCloseFriendUpdateSessionCover((UITableViewCell *)self,nil);
+    CSListCornerRemoveSessionAppearance((UITableViewCell *)self);
+    %orig;
+}
 - (void)layoutSubviews {
     %orig;
     CSListCornerRefreshSessionGeometry((UITableViewCell *)self);
+    CSCloseFriendRefreshSessionCover((UITableViewCell *)self);
 }
 %end
 %hook FakeMainFrameCell
@@ -162,6 +169,15 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 %end
 
 %hook NewMainFrameViewController
+- (void)viewDidLayoutSubviews {
+    %orig;
+    // Native theme/layout can replace backgroundView even when there are no cells.
+    CSListCornerPrepareTable(self,CSListCornerPageSession,NO);
+    for (UITableViewCell *cell in CSListCornerOwnedTable(self,CSListCornerPageSession).visibleCells) {
+        CSListCornerRefreshSessionGeometry(cell);
+        CSCloseFriendRefreshSessionCover(cell);
+    }
+}
 - (void)viewDidAppear:(BOOL)animated {
     %orig;
     CSListCornerPrepareTable(self,CSListCornerPageSession,YES);

@@ -1,7 +1,8 @@
 #import "CSListCornerSessionAdapter.h"
 #import "CSGroupListAdapter.h"
 void CSListCornerSessionDecorate(UITableViewCell *cell, UITableView *table, NSIndexPath *path, id owner) {
-    if (![[CSListCornerConfiguration sharedConfiguration] snapshot].enabled || !(owner ? CSListCornerOwnsTable(owner,table,CSListCornerPageSession) : CSListCornerOwnerForTable(table,CSListCornerPageSession)!=nil)) return;
+    if (!(owner ? CSListCornerOwnsTable(owner,table,CSListCornerPageSession) : CSListCornerOwnerForTable(table,CSListCornerPageSession)!=nil)) return;
+    if (![[CSListCornerConfiguration sharedConfiguration] snapshot].enabled) { CSListCornerRemoveSessionAppearance(cell); return; }
     if (!CSListCornerBeginOperation(cell)) return;
     @try {
         CSListCornerPageContext *context=[CSListCornerPageContext contextForCell:cell table:table indexPath:path page:CSListCornerPageSession owner:owner];
@@ -32,5 +33,12 @@ CGRect CSListCornerSessionItemFrame(UIView *view, CGRect frame) {
     // Preserve native MainFrame/Fake nominal table width, repairing width even when x already matches.
     CGRect target=frame; target.origin.x=configuration.leftMargin;
     target.size.width=table.bounds.size.width-configuration.leftMargin-configuration.rightMargin;
-    return CSListCornerValidRect(target) ? target : frame;
+    for (UIView *parent=view.superview;parent;parent=parent.superview) if ([parent isKindOfClass:UITableViewCell.class]) {
+        UIView *card=CSListCornerExistingSessionBackground((UITableViewCell *)parent);
+        if (card && CSListCornerValidRect(card.bounds)) target=[card convertRect:card.bounds toView:view.superview];
+        break;
+    }
+    if (!CSListCornerValidRect(target)) return frame;
+    CSListCornerRecordFrame(view,frame,target);
+    return target;
 }

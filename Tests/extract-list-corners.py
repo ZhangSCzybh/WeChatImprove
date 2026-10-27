@@ -34,6 +34,15 @@ chunk=source[source.index('%hook ContactsViewController\n'):];chunk=chunk[:chunk
 for method,signature in [('- (void)initCountLabel:', 'HookContactsInitCount(id self,id arg1,void (^original)(void))'), ('- (void)viewDidLayoutSubviews', 'HookContactsCountLayout(id self,void (^original)(void))')]:
     code=body(chunk,chunk.index(method));assert code.count('%orig')==1
     output.append('static void '+signature+' {'+code.replace('%orig;', 'original();')+'}')
+chunk=source[source.index('%hook NewMainFrameViewController\n'):];chunk=chunk[:chunk.index('%end')]
+# Before the regression fix there is no layout hook: execute native layout alone.
+method='- (void)viewDidLayoutSubviews'
+code=body(chunk,chunk.index(method)) if method in chunk else '%orig;'
+assert code.count('%orig')==1
+output.append('static void HookSessionViewportLayout(id self,void (^original)(void)) {'+code.replace('%orig;', 'original();')+'}')
+method='- (CGFloat)tableView:(id)arg1 heightForRowAtIndexPath:'
+code=body(chunk,chunk.index(method)) if method in chunk else 'return %orig;'
+output.append('static CGFloat HookSessionRowHeight(id self,id arg1,id arg2,CGFloat originalRowHeight) {'+code.replace('%orig', 'originalRowHeight')+'}')
 group=(root/'Controllers/CSGroupListAdapter.m').read_text();start=group.index('BOOL CSGroupCardPosition(')
 output.append(group[start:group.index('{',start)+1]+body(group,start)+'}')
 settings=(root/'Controllers/CSListCornerRadiusSettingsViewController.m').read_text()
@@ -50,3 +59,6 @@ for name,method,variable in [('Radius','showCornerRadiusPicker','radiusValue'),(
 fixture=json.loads((root/'Tests/ListCornerBaseline.json').read_text())
 output.append('static NSArray *ProductionKeys(void) { return @['+','.join(f'@[@"{name}",{name}]' for name in fixture['keys'])+']; }')
 Path(sys.argv[1]).write_text('\n'.join(output)+'\n')
+
+presentation=(root/'Controllers/CSCloseFriendSessionPresentation.m').read_text()
+Path(sys.argv[1]).with_name('ListCornerFoldedPresentation.h').write_text('\n'.join(line for line in presentation.splitlines() if not line.startswith('#import'))+'\n')

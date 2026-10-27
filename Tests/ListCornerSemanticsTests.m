@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
+#import <objc/message.h>
 #import "CSListCornerConfiguration.h"
 #import "CSListCornerSectionPolicy.h"
 #import "CSListCornerPageContext.h"
@@ -10,6 +11,9 @@
 #import "CSListCornerMoreAdapter.h"
 #import "CSGroupListAdapter.h"
 #import <math.h>
+#import "CSGroupProjection.h"
+#import "WESessionTabItem.h"
+#import "CSCloseFriendPolicy.h"
 @interface MemoryDefaults : NSObject <CSListCornerDefaults>
 @property(nonatomic,strong) NSMutableDictionary *values;
 @property(nonatomic) NSUInteger reads,writes,syncs;
@@ -33,7 +37,15 @@ OWNER_CLASS(NewMainFrameViewController,m_tableView)
 OWNER_CLASS(FindFriendEntryViewController,m_tableView)
 OWNER_CLASS(MoreViewController,_frontTableView)
 #define VIEW_CLASS(name,base) @interface name : base @end @implementation name @end
-VIEW_CLASS(MainFrameItemView,UIView)
+@interface MainFrameItemView : UIView {
+@public UIView *m_frameHeadView,*m_unreadCountView; UILabel *m_nameLabel,*m_messageLabel,*m_timeLabel;
+}
+@end
+@implementation MainFrameItemView @end
+#include "FoldedNativeRendererFixture.h"
+@interface NewMainFrameCell : UITableViewCell { @public MainFrameItemView *m_itemView; }
+@end
+@implementation NewMainFrameCell @end
 VIEW_CLASS(FakeMainFrameItemView,UIView)
 VIEW_CLASS(MFBannerBtn,UIView)
 VIEW_CLASS(MFWebMMBtn,UIView)
@@ -84,6 +96,10 @@ static id SharedConfiguration(id self,SEL command) { return FixtureConfiguration
 @implementation SettingsFixture
 - (void)saveColor:(UIColor *)color redKey:(NSString *)red greenKey:(NSString *)green blueKey:(NSString *)blue alphaKey:(NSString *)alpha { [FixtureConfiguration saveColor:color redKey:red greenKey:green blueKey:blue alphaKey:alpha]; }
 @end
+static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) {
+    return [[CSCloseFriendSnapshot alloc] initWithAccountID:@"cards" profile:@{@"enabled":@NO,@"friends":@[],@"groups":@[],@"options":@{}} revealed:YES revision:1 blocked:NO];
+}
+#include "ListCornerFoldedPresentation.h"
 #include "ListCornerBodies.h"
 static NSUInteger checks,failures;
 static void Check(BOOL pass,NSString *message) { checks++;if(!pass) {failures++;fprintf(stderr,"FAIL: %s\n",message.UTF8String);} }
@@ -201,6 +217,9 @@ static void RendererTests(void) {
     CSListApplyCardBackground(view,CGRectMake(15,0,400,60),12,YES,YES,color);Check(((CAShapeLayer *)view.layer.mask).path!=NULL && view.frame.size.width==400,@"width and radius changes repair geometry");
     CGRect old=view.frame;CSListApplyCardBackground(view,CGRectMake(0,0,NAN,0),10,YES,YES,color);Check(CGRectEqualToRect(old,view.frame),@"invalid geometry is ignored");
 }
+static CSGroupRow *CardRow(NSUInteger row,NSString *name) {
+    return [[CSGroupRow alloc] initWithNativePath:Path(row,0) userName:name kind:CSGroupRowKindSession category:CSGroupRowCategoryGroup top:NO unreadCount:0 redDot:NO];
+}
 static void OwnershipAndSessionTests(void) {
     UITableView *t=Table();id owner=Owner(CSListCornerPageSession,t);UITableViewCell *c=Cell(t,0,0);
     UIView *item=View(MainFrameItemView.class,c.bounds);item.backgroundColor=UIColor.whiteColor;[c.contentView addSubview:item];
@@ -218,7 +237,7 @@ static void OwnershipAndSessionTests(void) {
     Check(Background(c)!=bg && bg.superview==nil && Background(c).superview==replacement && Background(c).frame.size.width==412,@"replacement actual content gets fresh owned background and new width");
     UITableView *search=Table();search.responder=owner;UITableViewCell *sc=Cell(search,0,0);search.throwsOnQuery=YES;
     CSListCornerSessionDecorate(sc,search,sc.path,owner);Check(search.queries==0 && sc.contentView.subviews.count==0,@"same owner/class search table is excluded");
-    CSGroupListAdapter *adapter=[CSGroupListAdapter new];adapter.active=YES;adapter.projection=[ProjectionFixture new];adapter.projection.sections=@[@[@"B",@"D"]];adapter.nativeToDisplay=@{Path(1,0):Path(0,0),Path(3,0):Path(1,0)};t.groupAdapter=adapter;t.throwsOnQuery=YES;
+    CSGroupListAdapter *adapter=[CSGroupListAdapter new];adapter.active=YES;adapter.projection=[ProjectionFixture new];adapter.projection.sections=@[@[CardRow(1,@"B"),CardRow(3,@"D")]];adapter.nativeToDisplay=@{Path(1,0):Path(0,0),Path(3,0):Path(1,0)};t.groupAdapter=adapter;t.throwsOnQuery=YES;
     CSGroupWithNativeIndices(t,^{CSListCornerSessionDecorate(c,t,Path(3,0),owner);Check(Rounded(Background(c),CGPointMake(1,1)) && !Rounded(Background(c),CGPointMake(1,69)),@"real group role lookup maps native D to display last role");});
     CSGroupWithDisplayIndices(t,^{CSListCornerSessionDecorate(c,t,Path(0,0),owner);Check(!Rounded(Background(c),CGPointMake(1,1)) && Rounded(Background(c),CGPointMake(1,69)),@"real group lookup respects display index scope");});
     NSUInteger queries=t.queries;CGRect before=Background(c).frame;
@@ -354,7 +373,7 @@ static void ReviewCompatibilityTests(void) {
     session.throwsOnQuery=YES;
     CSListCornerPrepareTable(owner,CSListCornerPageSession,YES);
     Check([session.backgroundColor isEqual:[FixtureConfiguration.snapshot backgroundForStyle:session.traitCollection.userInterfaceStyle]],@"disabled session appearance still applies configured background");
-    Check([session.backgroundView.backgroundColor isEqual:CSListCornerCanvasColor()] && !session.showsVerticalScrollIndicator,@"disabled session appearance retains canvas and hidden scroll indicator baseline");
+    Check([session.backgroundView.backgroundColor isEqual:session.backgroundColor] && !session.showsVerticalScrollIndicator,@"disabled session appearance matches viewport background and preserves hidden scroll indicator");
     Check(session.separatorStyle==(UITableViewCellSeparatorStyle)99 && session.queries==0,@"disabled session preparation changes only existing appearance properties without querying table data");
     CGRect nativeFrame=item.frame;NSUInteger contentSubviews=cell.contentView.subviews.count;
     CSListCornerSessionDecorate(cell,session,cell.path,owner);
@@ -363,6 +382,31 @@ static void ReviewCompatibilityTests(void) {
     UITableView *contacts=Table();id contactsOwner=Owner(CSListCornerPageContacts,contacts);contacts.backgroundColor=UIColor.whiteColor;contacts.showsVerticalScrollIndicator=YES;
     CSListCornerPrepareTable(contactsOwner,CSListCornerPageContacts,YES);
     Check([contacts.backgroundColor isEqual:UIColor.whiteColor] && contacts.showsVerticalScrollIndicator,@"disabled preparation exception is restricted to session appearance");
+    Configure();
+}
+static void SessionViewportTests(void) {
+    Configure();
+    for(NSNumber *enabled in @[@NO,@YES]) for(NSNumber *count in @[@0,@3,@40]) {
+        [FixtureConfiguration saveEnabled:enabled.boolValue];
+        UITableView *table=Table();table.rows=@[count];id owner=Owner(CSListCornerPageSession,table);
+        table.backgroundView=View(UIView.class,table.bounds);table.backgroundView.backgroundColor=CSListCornerCanvasColor();
+        table.traitCollection.userInterfaceStyle=UIUserInterfaceStyleLight;
+        CSListCornerPrepareTable(owner,CSListCornerPageSession,YES);
+        Check([table.backgroundColor isEqual:table.backgroundView.backgroundColor] && [table.backgroundColor isEqual:enabled.boolValue ? CSListCornerCanvasColor() : UIColor.whiteColor],@"empty, short and long lists retain gray card canvas only when corners are enabled");
+        Check(CGRectEqualToRect(table.backgroundView.frame,table.bounds),@"session viewport backing retains screen height instead of content height");
+        if(count.unsignedIntegerValue && enabled.boolValue){
+            UITableViewCell *last=Cell(table,count.integerValue-1,0);last.contentView.traitCollection.userInterfaceStyle=UIUserInterfaceStyleLight;
+            CSListCornerSessionDecorate(last,table,last.path,owner);
+            Check([Background(last).backgroundColor isEqual:UIColor.whiteColor] && ![Background(last).backgroundColor isEqual:table.backgroundView.backgroundColor],@"white session card stays distinct from its gray canvas below the short list");
+        }
+        table.throwsOnQuery=YES;NSUInteger queries=table.queries;__block NSUInteger calls=0;
+        HookSessionViewportLayout(owner,^{calls++;table.traitCollection.userInterfaceStyle=UIUserInterfaceStyleDark;table.backgroundView=View(UIView.class,table.bounds);table.backgroundView.backgroundColor=CSListCornerCanvasColor();});
+        Check(calls==1 && [table.backgroundColor isEqual:enabled.boolValue ? UIColor.blackColor : [FixtureConfiguration.snapshot backgroundForStyle:UIUserInterfaceStyleDark]] && [table.backgroundColor isEqual:table.backgroundView.backgroundColor],@"native layout updates replaced viewport and dark theme even with zero cells");
+        for(NSUInteger n=0;n<8;n++)HookSessionViewportLayout(owner,^{});
+        Check(table.queries==queries && table.reloads==0 && table.layoutInvalidations==0,@"viewport color repair needs no list query, reload or scheduled layout");
+        HookSessionViewportLayout(owner,^{table.traitCollection.userInterfaceStyle=UIUserInterfaceStyleLight;table.backgroundView=nil;});
+        Check(!table.backgroundView && [table.backgroundColor isEqual:enabled.boolValue ? CSListCornerCanvasColor() : UIColor.whiteColor],@"light theme retains configured canvas/flat mode without inventing a background container");
+    }
     Configure();
 }
 static void SessionFirstLayoutTests(void) {
@@ -391,9 +435,9 @@ static void SessionFirstLayoutTests(void) {
             UIView *oldContent=cell.contentView,*replacement=View(UIView.class,CGRectMake(0,0,450,76));
             layout(cell,^{cell.contentView=replacement;[cell addSubview:replacement];});
             Check(Background(cell)==background && background.superview==replacement && ![oldContent.subviews containsObject:background],@"first-layout actual content replacement retains only one correctly sized card");
-            [FixtureConfiguration saveEnabled:NO];CGRect previous=background.frame;
+            [FixtureConfiguration saveEnabled:NO];
             layout(cell,^{cell.contentView.frame=CGRectMake(0,0,450,90);});
-            Check(CGRectEqualToRect(previous,background.frame),@"disabled rounding performs no geometry repair");
+            Check(background.superview==nil,@"disabling corners removes the existing card even without another cell delivery");
             Configure();table.throwsOnQuery=NO;
         }
         UITableViewCell *fresh=Cell(table,0,0);table.throwsOnQuery=YES;
@@ -403,7 +447,7 @@ static void SessionFirstLayoutTests(void) {
         Check(search.queries==0 && searchCell.contentView.subviews.count==0,@"session-class cells in search tables are excluded");
     }
     UITableView *grouped=Table();id groupOwner=Owner(CSListCornerPageSession,grouped);
-    CSGroupListAdapter *adapter=[CSGroupListAdapter new];adapter.active=YES;adapter.projection=[ProjectionFixture new];adapter.projection.sections=@[@[@"B",@"D"]];adapter.nativeToDisplay=@{Path(3,0):Path(1,0)};grouped.groupAdapter=adapter;
+    CSGroupListAdapter *adapter=[CSGroupListAdapter new];adapter.active=YES;adapter.projection=[ProjectionFixture new];adapter.projection.sections=@[@[CardRow(1,@"B"),CardRow(3,@"D")]];adapter.nativeToDisplay=@{Path(3,0):Path(1,0)};grouped.groupAdapter=adapter;
     UITableViewCell *groupCell=Cell(grouped,3,0);groupCell.contentView.frame=CGRectMake(0,0,390,44);grouped.throwsOnQuery=YES;
     CSGroupWithNativeIndices(grouped,^{CSListCornerSessionDecorate(groupCell,grouped,Path(3,0),groupOwner);});
     CSGroupWithDisplayIndices(grouped,^{HookNewMainFrameCellLayout(groupCell,^{groupCell.contentView.frame=CGRectMake(0,0,390,70);});});
@@ -519,12 +563,13 @@ static void ScreenshotRegressionTests(void) {
     Check(!lateLine.hidden && more.queries==0,@"disabled More separator repair remains inactive");
     Configure();
 }
+#include "FoldedCardIntegrationTests.h"
 int main(int argc,const char **argv) { @autoreleasepool {
     if(argc!=2)return 2;
     NSDictionary *baseline=[NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:@(argv[1])] options:0 error:NULL];
     FixtureDefaults=[MemoryDefaults new];FixtureConfiguration=[[CSListCornerConfiguration alloc] initWithDefaults:FixtureDefaults];
     method_setImplementation(class_getClassMethod(CSListCornerConfiguration.class,@selector(sharedConfiguration)),(IMP)SharedConfiguration);
-    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();ScreenshotRegressionTests();ContactsCountFooterTests();SessionFirstLayoutTests();
+    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();ScreenshotRegressionTests();ContactsCountFooterTests();SessionFirstLayoutTests();SessionViewportTests();FoldedCardIntegrationTests();
     fprintf(stdout,"List corners: %lu checks, %lu failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)\n",(unsigned long)checks,(unsigned long)failures);
     return failures?1:0;
 } }

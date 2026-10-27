@@ -11,13 +11,25 @@ static NSString *account=@"session-test-account";
 static CSCloseFriendSnapshot *policy;
 static NSUInteger epoch=1;
 static BOOL appActive=YES;
+static BOOL groupEnabled=NO;
+static BOOL Option(NSString *key) { return [key isEqual:@"enabled"] && groupEnabled; }
 static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) { return policy; }
 static NSUInteger CSCloseFriendAccountEpoch(void) { return epoch; }
 static BOOL CSGroupApplicationActive(void) { return appActive; }
 static BOOL CSCloseFriendShouldHideUserName(NSString *name,CSCloseFriendSurface surface) { return [policy hidesUserName:name surface:surface]; }
 #include "PrivacyActive.h"
-static id foldedService;
-id CSGetService(Class cls) { return cls==NSClassFromString(@"ChatBoxMgr") ? foldedService : nil; }
+static id foldedService,cellDataService,messageService;
+id CSGetService(Class cls) {
+ return cls==NSClassFromString(@"ChatBoxMgr") ? foldedService : cls==NSClassFromString(@"MainFrameCellDataManager") ? cellDataService : cls==NSClassFromString(@"CMessageMgr") ? messageService : nil;
+}
+@interface CMessageMgr : NSObject
+@property(nonatomic,strong) NSMutableDictionary *messages;
+@property(nonatomic,strong) NSMutableArray *queries;
+@property(nonatomic) BOOL copyResults;
+@end
+@implementation CMessageMgr
+- (id)GetLastMsg:(NSString *)name { [self.queries addObject:name];return self.copyResults ? [self.messages[name] copy] : self.messages[name]; }
+@end
 @interface ChatBoxMgr : NSObject
 @property(nonatomic,strong) NSArray *sourceSessions;
 @property(nonatomic) BOOL replaceEpoch;
@@ -42,13 +54,98 @@ static CSGroupRow *Row(NSUInteger i,NSString *name,CSGroupRowKind kind,CSGroupRo
 static CSCloseFriendSnapshot *Policy(NSArray *names,BOOL revealed,NSUInteger revision) {
  return [[CSCloseFriendSnapshot alloc] initWithAccountID:account profile:@{@"enabled":@YES,@"friends":names,@"groups":@[],@"options":@{}} revealed:revealed revision:revision blocked:NO];
 }
+@interface NativeMessage : NSObject <NSCopying>
+// 8.0.78 CMessageWrap is q; MainFrameCellData below is Q.
+@property(nonatomic) long long m_n64MesSvrID;
+@property(nonatomic) unsigned int m_uiCreateTime,fixtureSessionTime,m_uiMesLocalID;
+@property(nonatomic,copy) NSString *fixtureDigest,*fixtureChatName,*fixtureDisplayName;
+@property(nonatomic) NSUInteger displayChanges;
+@property(nonatomic) BOOL aliasCopy;
+@end
+@implementation NativeMessage
+// WeChat 8.0.78 CMessageWrap returns its catchUnImplementMethod signature
+// even for implemented getters. This must not replace the runtime method ABI.
+- (long long)catchUnImplementMethod { return 0; }
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)selector {
+    (void)selector;
+    return [super methodSignatureForSelector:@selector(catchUnImplementMethod)];
+}
+- (id)copyWithZone:(NSZone *)zone {
+    if(self.aliasCopy)return self;
+    NativeMessage *value=[[[self class] allocWithZone:zone] init];
+    value.m_n64MesSvrID=self.m_n64MesSvrID;value.fixtureDigest=self.fixtureDigest;value.fixtureChatName=self.fixtureChatName;value.fixtureDisplayName=self.fixtureDisplayName;
+    value.m_uiMesLocalID=self.m_uiMesLocalID;value.m_uiCreateTime=self.m_uiCreateTime;value.fixtureSessionTime=self.fixtureSessionTime;return value;
+}
+- (NSString *)GetChatName { return self.fixtureChatName; }
+- (void)ChangeForDisplay { self.displayChanges++; }
+- (unsigned int)getSessionTime { return self.fixtureSessionTime ?: self.m_uiCreateTime; }
+@end
+@interface SparseNativeMessage : NativeMessage @end
+@implementation SparseNativeMessage
+- (NSString *)m_nsContent { return @""; }
+@end
 @interface NativeSession : NSObject
 @property(nonatomic,copy) NSString *m_nsUserName;
 @property(nonatomic) NSUInteger m_uUnReadCount;
 @property(nonatomic) BOOL m_bShowUnReadAsRedDot;
+@property(nonatomic) unsigned int m_uLastTime,sortTimeOverride,sortTime,m_uTopTime,m_uUnTopTime;
+@property(nonatomic) BOOL m_bIsTop;
+@property(nonatomic) BOOL missingAuxSortGetters;
+@property(nonatomic,strong) NativeMessage *m_msgWrap;
+@property(nonatomic,strong) id m_contact;
 @end
 @implementation NativeSession
 - (BOOL)isSingleChatSession { return YES; }
+- (BOOL)respondsToSelector:(SEL)selector {
+    if(self.missingAuxSortGetters && [@[@"sortTimeOverride",@"sortTime",@"m_uTopTime",@"m_uUnTopTime"] containsObject:NSStringFromSelector(selector)])return NO;
+    return [super respondsToSelector:selector];
+}
+@end
+@interface NativeCellData : NSObject
+@property(nonatomic,strong) NativeSession *m_sessionInfo;
+@property(nonatomic) unsigned long long m_n64MesSvrID;
+@property(nonatomic,strong) id m_textForMessageLabel,m_prefixTextForQuoteMessage;
+@end
+@implementation NativeCellData @end
+static NSUInteger digestCalls,prefixCalls;
+static id lastFormattedMessage;
+static void (^onDigest)(void);
+@interface MainFrameCellData : NSObject
+@property(nonatomic,strong) id m_sessionInfo;
+@property(nonatomic,copy) NSString *m_prefixTextForQuoteMessage;
+@end
+@implementation MainFrameCellData
+- (NSString *)getGroupName { return CSGroupReadObject(self.m_sessionInfo,@"m_contact"); }
+- (void)makeTextForQuoteMessage {
+    prefixCalls++;
+    if (![CSGroupReadObject(self.m_sessionInfo,@"m_nsUserName") isEqual:@"chatroom_session_box"]) return;
+    NativeMessage *m=CSGroupReadObject(self.m_sessionInfo,@"m_msgWrap");
+    NSString *name=m.fixtureDisplayName;
+    // Fixture for the documented native builder; no formatting in plugin code.
+    // Explicit remarks/nicknames are returned intact by native genChatRoomName.
+    // Generated unnamed-group text is supplied already shortened by this fixture.
+    self.m_prefixTextForQuoteMessage=name.length ? [name stringByAppendingString:@": "] : nil;
+}
++ (NSString *)digestForMsg:(NativeMessage *)message withSender:(NSString *)sender {
+    digestCalls++;lastFormattedMessage=message;
+    [message ChangeForDisplay];if(onDigest)onDigest();
+    return message.fixtureDigest.length ? [sender stringByAppendingString:message.fixtureDigest] : nil;
+}
+@end
+@interface MainFrameCellDataManager : NSObject
+@property(nonatomic,strong) NSMutableDictionary *cache;
+@property(nonatomic) NSUInteger reads,mutations;
+@property(nonatomic,copy) void (^onRead)(void);
+@end
+@implementation MainFrameCellDataManager
+- (id)getCellDataByUsrName:(NSString *)name { self.reads++;if(self.onRead)self.onRead();return self.cache[name]; }
+- (id)getCellData:(id)session { (void)session;self.mutations++;return nil; }
+@end
+@interface WrongCellDataGetter : NSObject
+@property(nonatomic) NSUInteger calls;
+@end
+@implementation WrongCellDataGetter
+- (NSInteger)getCellDataByUsrName:(id)name { (void)name;self.calls++;return 1; }
 @end
 @interface TestTable : NSObject
 @property(nonatomic,strong) NSIndexPath *indexPathForSelectedRow;
@@ -111,7 +208,7 @@ static const NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionSty
 @property(nonatomic,strong) CSGroupProjection *projection;
 @property(nonatomic,strong) Preferences *preferences;
 @property(nonatomic,strong) NSDictionary *identityDisplayPaths;
-@property(nonatomic) BOOL snapshotRetryAttempted,dirty,publishing,nativePresentation,pendingScrollToTop;
+@property(nonatomic) BOOL snapshotRetryAttempted,dirty,publishing,nativePresentation,pendingScrollToTop,searching;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
 @property(nonatomic,strong) NSMutableArray *queuedNavigation;
 @property(nonatomic) NSUInteger snapshotRetryGeneration,changeDepth,recoveries;
@@ -124,6 +221,7 @@ static const NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionSty
 @end
 @implementation CSGroupListAdapter
 #include "SessionBodies.h"
+#include "FoldedSelectionBody.h"
 - (BOOL)isActive { return self.projection.isValid; }
 - (void)requestRecovery { self.recoveries++; }
 - (void)scheduleRefresh {}
@@ -155,7 +253,10 @@ static void Check(BOOL pass,NSString *name) { checks++; if(!pass) {failures++; f
 static CSGroupProjection *Project(NSArray *rows,NSArray *tabs,NSString *tab,NSSet *hidden,NSUInteger revision,CSGroupProjection *previous) {
  return [[CSGroupProjection alloc] initWithSections:@[rows] tabs:tabs selectedTabID:tab filterDuplicates:NO accountID:account hiddenUserNames:hidden privacyRevision:revision previousProjection:previous];
 }
+#include "FoldedGroupTests.h"
+#include "FoldedSummaryTests.h"
 int main(void) { @autoreleasepool {
+ if (getenv("CS_TEST_FOLDED_ONLY")) { RunFoldedGroupTests(); fprintf(stdout,"Folded group integration: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures); return failures?1:0; }
  WESessionTabItem *all=[WESessionTabItem tabWithType:WETabTypeAll],*group=[WESessionTabItem tabWithType:WETabTypeGroup],*private=[WESessionTabItem tabWithType:WETabTypePrivate];
  WESessionTabItem *custom=[WESessionTabItem tabWithType:WETabTypeCustom]; custom.tabId=@"custom"; custom.sessionUserNames=@[@"A",@"B"];
  NSArray *tabs=@[all,group,private,custom];
@@ -252,6 +353,8 @@ int main(void) { @autoreleasepool {
  policy=Policy(@[@"A"],NO,8);
  NSArray *pending=[navigationAdapter.queuedNavigation copy];[navigationAdapter.queuedNavigation removeAllObjects];for (void (^action)(void) in pending) action();
  Check(queuedWhileRevealed && queuedHost.nativeTraversalCalls==0 && [queuedHost.opened isEqual:Path(2)],@"revealed queued next-chat rechecks lock and advances past hidden A to visible C at drain time");
+ RunFoldedGroupTests();
+ RunFoldedSummaryTests();
  fprintf(stdout,"Close-friend sessions: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
  return failures?1:0;
 } }

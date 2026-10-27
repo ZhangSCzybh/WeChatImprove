@@ -2,6 +2,7 @@
 #import "CSCloseFriendSignatures.h"
 #import "CSGroupNativeBridge.h"
 #import "CSServiceCenter.h"
+#import "CSSettingsPresentation.h"
 #import <objc/message.h>
 #import <objc/runtime.h>
 
@@ -167,13 +168,17 @@ static BOOL PickerError(NSError **error) {
     if(error)*error=[NSError errorWithDomain:@"CSNativeContactPicker" code:1 userInfo:@{NSLocalizedDescriptionKey:@"当前无法打开微信原生选择器，请返回后重试。原有名单已保留。"}];
     return NO;
 }
-static BOOL PresentPicker(UIViewController *presenter, NSString *title, BOOL groups, BOOL singleSelection, NSArray<NSString *> *selectedNames,
+static BOOL PresentPicker(UIViewController *presenter, NSString *title, BOOL groups, BOOL singleSelection, BOOL tags, NSArray<NSString *> *selectedNames,
     BOOL (^isValid)(void), void (^completion)(NSArray<NSString *> *), NSError **error) {
     if(!NSThread.isMainThread || presenter.presentedViewController || !completion || (isValid && !isValid()))return PickerError(error);
     Class cls=PickerClass(groups),navClass=NSClassFromString(@"MMUINavigationController");
     NSString *account=CSGroupCurrentAccountID();
     id manager=CSGetService(NSClassFromString(@"CContactMgr"));
     if(!cls || ![navClass isSubclassOfClass:UINavigationController.class] || !account.length || !manager)return PickerError(error);
+    // Verified in 8.0.78: the native friend controller owns the tag-list delegate,
+    // scenes and bulk selection. Do not invent tagName/scenes for this class.
+    if(tags && (!Matches(cls,@"setM_bShowContactTag:","v@:B") || !Matches(cls,@"onSelectContactTag","v@:") ||
+        ![NSClassFromString(@"ContactTagListViewController") isSubclassOfClass:UIViewController.class]))return PickerError(error);
     @try {
         NSMutableDictionary *selected=[NSMutableDictionary dictionary];NSMutableSet *unavailable=[NSMutableSet set];
         for(NSString *name in selectedNames) {
@@ -202,22 +207,33 @@ static BOOL PresentPicker(UIViewController *presenter, NSString *title, BOOL gro
         } else {
             for(NSString *selector in @[@"setM_bShowHistoryGroup:",@"setM_bShowRadarCreateRoom:",@"setHideSelfContact:"])
                 ((void(*)(id,SEL,BOOL))objc_msgSend)(picker,NSSelectorFromString(selector),[selector isEqual:@"setHideSelfContact:"]);
+            if(tags)((void(*)(id,SEL,BOOL))objc_msgSend)(picker,NSSelectorFromString(@"setM_bShowContactTag:"),YES);
         }
         UINavigationController *nav=[[navClass alloc] initWithRootViewController:picker];
         objc_setAssociatedObject(nav,&PickerStateKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         nav.modalPresentationStyle=UIModalPresentationFullScreen;
-        [presenter presentViewController:nav animated:YES completion:nil];
+        [presenter presentViewController:nav animated:YES completion:tags ? ^{
+            // The type sheet and this full-screen presentation must both finish.
+            // Recheck authorization/visibility at the actual UIKit completion.
+            if([state valid] && CSSettingsCanPresentFrom(picker))
+                ((void(*)(id,SEL))objc_msgSend)(picker,NSSelectorFromString(@"onSelectContactTag"));
+            else CSNativeContactPickerRevalidate(presenter);
+        } : nil];
         return YES;
     } @catch(__unused NSException *exception) {return PickerError(error);}
 }
 BOOL CSNativeContactPickerPresent(UIViewController *presenter, NSString *title, BOOL groups, NSArray<NSString *> *selectedNames,
     BOOL (^isValid)(void), void (^completion)(NSArray<NSString *> *), NSError **error) {
-    return PresentPicker(presenter,title,groups,NO,selectedNames,isValid,completion,error);
+    return PresentPicker(presenter,title,groups,NO,NO,selectedNames,isValid,completion,error);
+}
+BOOL CSNativeContactPickerPresentTags(UIViewController *presenter, NSString *title, NSArray<NSString *> *selectedNames,
+    BOOL (^isValid)(void), void (^completion)(NSArray<NSString *> *), NSError **error) {
+    return PresentPicker(presenter,title,NO,NO,YES,selectedNames,isValid,completion,error);
 }
 BOOL CSNativeContactPickerPresentSingle(UIViewController *presenter, NSString *title, BOOL groups, NSString *selectedName,
     BOOL (^isValid)(void), void (^completion)(NSString *), NSError **error) {
     if(!completion)return PickerError(error);
-    return PresentPicker(presenter,title,groups,YES,selectedName.length?@[selectedName]:@[],isValid,^(NSArray<NSString *> *names){
+    return PresentPicker(presenter,title,groups,YES,NO,selectedName.length?@[selectedName]:@[],isValid,^(NSArray<NSString *> *names){
         if(names.count==1)completion(names.firstObject);
     },error);
 }
@@ -230,5 +246,17 @@ void CSNativeContactPickerRevalidate(UIViewController *presenter) {
         state.picker.view.hidden=YES;
         state.picker.navigationItem.rightBarButtonItem.enabled=NO;
         if(!state.groups)PickerUpdateFriendButton(state.picker,NSSelectorFromString(@"updateRightBarItemEnabled:"),NO);
+        // Native tags are another presentation above the friend picker. Conceal
+        // them before closing only that child, leaving the outer native Cancel.
+        UIViewController *child=state.picker.presentedViewController ?: state.picker.navigationController.presentedViewController;
+        UIViewController *tagPresentation=child;
+        while(child) {
+            UIViewController *content=[child isKindOfClass:UINavigationController.class] ? [(UINavigationController *)child topViewController] : child;
+            content.view.hidden=YES;
+            content.navigationItem.rightBarButtonItem.enabled=NO;
+            child=content.presentedViewController ?: child.presentedViewController;
+        }
+        if(tagPresentation.presentingViewController && !tagPresentation.isBeingDismissed)
+            [tagPresentation dismissViewControllerAnimated:NO completion:nil];
     }
 }

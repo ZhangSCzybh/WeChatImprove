@@ -87,6 +87,7 @@ static BOOL Option(NSString *suffix) {
 @interface CSGroupTableProxy : NSObject
 @property (nonatomic, weak) CSGroupListAdapter *adapter;
 @property (nonatomic, weak) id target;
+@property (nonatomic, strong) NSMutableDictionary<NSString *,NSMethodSignature *> *signatures;
 @end
 @implementation CSGroupTableProxy
 - (UITableViewCell *)tableView:(UITableView *)table cellForRowAtIndexPath:(NSIndexPath *)path {
@@ -95,11 +96,30 @@ static BOOL Option(NSString *suffix) {
 - (BOOL)respondsToSelector:(SEL)selector {
     if ([super respondsToSelector:selector]) return YES;
     if (self.adapter.isActive && !CSGroupUsesNativeIndices(self.adapter.table) && !CSGroupInvocationIsSupported(selector)) return NO;
-    return [self.target respondsToSelector:selector];
+    id target=self.target;
+    BOOL responds=[target respondsToSelector:selector];
+    // UITableView caches optional delegate capabilities. Animation completion
+    // can arrive after the weak native owner has gone away or been replaced.
+    if (responds) {
+        NSMethodSignature *signature=[target methodSignatureForSelector:selector];
+        if (signature) {
+            if (!self.signatures) self.signatures=[NSMutableDictionary dictionary];
+            self.signatures[NSStringFromSelector(selector)]=signature;
+        }
+    }
+    return responds;
 }
 - (BOOL)conformsToProtocol:(Protocol *)protocol { return [self.target conformsToProtocol:protocol] || [super conformsToProtocol:protocol]; }
-- (NSMethodSignature *)methodSignatureForSelector:(SEL)selector { return [self.target methodSignatureForSelector:selector] ?: [super methodSignatureForSelector:selector]; }
-- (void)forwardInvocation:(NSInvocation *)invocation { [self.adapter forwardInvocation:invocation target:self.target]; }
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)selector {
+    return [self.target methodSignatureForSelector:selector] ?: self.signatures[NSStringFromSelector(selector)] ?: [super methodSignatureForSelector:selector];
+}
+- (void)forwardInvocation:(NSInvocation *)invocation {
+    NSUInteger length=invocation.methodSignature.methodReturnLength;
+    if (length) { void *zero=calloc(1,length); [invocation setReturnValue:zero]; free(zero); }
+    id target=self.target;
+    CSGroupListAdapter *adapter=self.adapter;
+    if (adapter && [target respondsToSelector:invocation.selector]) [adapter forwardInvocation:invocation target:target];
+}
 @end
 
 @implementation CSGroupListAdapter
@@ -497,7 +517,7 @@ static BOOL Option(NSString *suffix) {
         if (changed) { self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=self.nativeActions.count>0; self.projection=nil; self.snapshotRetryAttempted=NO; self.searchChromeVisible=NO; }
         self.searching=CSGroupReadInteger(self.controller,@"isSearching",0)!=0;
         if (!self.searching) self.searchChromeVisible=NO;
-        BOOL enabled=Option(@"enabled") && !CSGroupIsFoldedController(self.controller);
+        BOOL enabled=Option(@"enabled");
         BOOL privacy=CSGroupPrivacyActive();
         // Search owns a separate page. Preserve the selected list behind its
         // transition instead of publishing unfiltered rows underneath group tabs.
@@ -555,7 +575,7 @@ static BOOL Option(NSString *suffix) {
             [self.prefetchedPaths removeAllObjects];
         }
         self.projecting=projecting;
-        self.chromeVisible=enabled && (!self.searching || keepsSearchGroup) && account.length>0;
+        self.chromeVisible=enabled && !CSGroupIsFoldedController(self.controller) && (!self.searching || keepsSearchGroup) && account.length>0;
         self.publishedEnabled=Option(@"enabled");
         self.publishedTabID=selected;
         if (self.appearanceDirty) { [self.chrome refreshAppearance]; self.appearanceDirty=NO; }
@@ -624,16 +644,30 @@ static BOOL Option(NSString *suffix) {
     for (NSString *name in policy.protectedUserNames)
         if ([policy hidesUserName:name surface:CSCloseFriendSurfaceSession]) [hidden addObject:name];
     NSMutableSet *unmasked=[NSMutableSet set];
-    if (hidden.count && !CSGroupIsFoldedController(self.controller)) {
+    BOOL scopeFolded=Option(@"enabled") && !CSGroupIsFoldedController(self.controller) && !self.nativePresentation;
+    CSGroupProjection *foldedProjection=nil;
+    if (scopeFolded) {
+        NSArray *foldedRows=CSGroupCopyFoldedRows();
+        if (foldedRows) {
+            // Use exactly the same membership, duplicate and privacy rules as
+            // the child page. Never alter ChatBoxMgr's global source or unread.
+            foldedProjection=[[CSGroupProjection alloc] initWithSections:@[foldedRows] tabs:tabs selectedTabID:selected
+                filterDuplicates:self.preferences.filterDuplicates accountID:account hiddenUserNames:hidden
+                privacyRevision:policy.revision previousProjection:nil];
+            if (!foldedProjection.isValid) foldedProjection=nil;
+        }
+    } else if (hidden.count && !CSGroupIsFoldedController(self.controller)) {
         CSGroupFoldedPrivacyState folded=CSGroupAssessFoldedUserNames(CSGroupCopyFoldedUserNames(),hidden);
         if (folded==CSGroupFoldedPrivacyAllHidden) [hidden addObject:@"chatroom_session_box"];
         else if (folded==CSGroupFoldedPrivacyNoHidden) [unmasked addObject:@"chatroom_session_box"];
     }
     // Account transitions and unreadable policy never expose a partially classified list.
-    if (policy.blocked || ![policy.accountID isEqual:account] || ![account isEqual:CSGroupCurrentAccountID()] || epoch!=CSCloseFriendAccountEpoch() ||
-        CSCloseFriendCurrentSnapshot().revision!=policy.revision) sections=@[];
+    BOOL stale=policy.blocked || ![policy.accountID isEqual:account] || ![account isEqual:CSGroupCurrentAccountID()] || epoch!=CSCloseFriendAccountEpoch() ||
+        CSCloseFriendCurrentSnapshot().revision!=policy.revision;
+    if (stale) sections=@[];
     CSGroupProjection *projection=sections ? [[CSGroupProjection alloc] initWithSections:sections tabs:tabs selectedTabID:selected
-        filterDuplicates:self.preferences.filterDuplicates accountID:account hiddenUserNames:hidden unmaskedAggregateUserNames:unmasked privacyRevision:policy.revision previousProjection:self.projection] : nil;
+        filterDuplicates:self.preferences.filterDuplicates accountID:account hiddenUserNames:hidden unmaskedAggregateUserNames:unmasked privacyRevision:policy.revision
+        scopeFoldedEntry:scopeFolded foldedProjection:foldedProjection previousProjection:self.projection] : nil;
     if (projection.isValid) { self.snapshotRetryAttempted=NO; self.snapshotRetryGeneration++; return projection; }
     // A partially rebuilt native snapshot must not permanently select All.
     // Publish a safe empty projection for the selected group, then retry once.
@@ -1088,6 +1122,14 @@ static BOOL Option(NSString *suffix) {
     self.pendingScrollToTop=YES;
     [self.anchors removeObjectForKey:tabID];
     [self refresh];
+    if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];
+}
++ (void)refreshFoldedListsForAccount:(NSString *)account {
+    if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;
+    // Separate native owners cache the same account's group selection. A hidden
+    // folded page only becomes dirty; its appearance reloads preferences once.
+    for (CSGroupListAdapter *adapter in Adapters().allObjects)
+        if (CSGroupIsFoldedController(adapter.controller) && [adapter.preferences.accountID isEqual:account]) [adapter requestRefresh];
 }
 - (void)returnToGroupTop {
     if (self.presentationSuspended || !CSGroupApplicationActive()) return;
@@ -1218,5 +1260,8 @@ BOOL CSGroupCardPosition(UITableView *table, NSIndexPath *path, BOOL *first, BOO
     if (!path || path.length!=2 || path.section<0 || path.section>=(NSInteger)adapter.projection.sections.count) return NO;
     NSArray *rows=adapter.projection.sections[(NSUInteger)path.section];
     if (path.row<0 || path.row>=(NSInteger)rows.count) return NO;
-    if (first) *first=path.row==0; if (last) *last=path.row==(NSInteger)rows.count-1; return YES;
+    // Aggregates participate in the same continuous section card as sessions.
+    if (first) *first=path.row==0;
+    if (last) *last=path.row==(NSInteger)rows.count-1;
+    return YES;
 }

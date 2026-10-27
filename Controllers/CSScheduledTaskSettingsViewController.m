@@ -1,4 +1,5 @@
 #import "CSScheduledTaskSettingsViewController.h"
+#import "CSSettingsPresentation.h"
 #import "CSScheduledTaskManager.h"
 #import "CSNativeContactPicker.h"
 #import "CSSettingTableViewCell.h"
@@ -196,14 +197,25 @@ static void CSTaskConfigureTable(UITableView *table) {
     UIAlertController *sheet=[UIAlertController alertControllerWithTitle:@"选择发送会话" message:@"每个任务选择一个会话。更换选择时，请先取消原来的勾选。" preferredStyle:UIAlertControllerStyleActionSheet];
     [sheet addAction:[UIAlertAction actionWithTitle:@"文件传输助手" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){ self.task[@"target"]=@"filehelper"; [self reload]; }]];
     __weak typeof(self) weakSelf=self;
+    __weak UIAlertController *weakSheet=sheet;
     for (NSUInteger i=0;i<2;i++) [sheet addAction:[UIAlertAction actionWithTitle:i?@"群聊":@"私聊" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){
-        // The shared picker refuses a second presentation. Wait for the sheet's
-        // actual dismissal completion instead of racing it with a timer.
-        [weakSelf dismissViewControllerAnimated:YES completion:^{ [weakSelf presentTargetPicker:i==1]; }];
+        [weakSelf finishTargetSheet:weakSheet groups:i==1];
     }]];
     [self presentSheet:sheet section:0 row:2];
 }
+- (BOOL)canPresentTargetPicker {
+    return CSSettingsCanPresentFrom(self);
+}
+- (void)finishTargetSheet:(UIAlertController *)sheet groups:(BOOL)groups {
+    __weak typeof(self) weakSelf=self;
+    void (^showPicker)(void)=^{ [weakSelf presentTargetPicker:groups]; };
+    CSSettingsAfterDismissingSheet(sheet,showPicker);
+}
 - (void)presentTargetPicker:(BOOL)groups {
+    if (![self canPresentTargetPicker]) {
+        NSLog(@"[WeChatImprove][ScheduledPicker] skipped: editor detached, inactive, dismissing or presentation occupied");
+        return;
+    }
     if (![self canEdit]) { CSTaskAlert(self,@"账号已改变或任务存储不可用，请重新打开定时任务。"); return; }
     __weak typeof(self) weakSelf=self;
     NSUInteger privacyEpoch=CSCloseFriendAccountEpoch(), revision=CSCloseFriendCurrentSnapshot().revision;

@@ -28,13 +28,42 @@ typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
 /// Raw native show-as-dot flag. A displayed unread dot also requires a positive count.
 @property (nonatomic, readonly) BOOL redDot;
 @property (nonatomic, readonly) BOOL privacyMasked;
+/// Copied native folded-session digest; no native models retained.
+@property (nonatomic, copy, readonly, nullable) NSString *nativeSummary;
+/// Native aggregate name prefix, kept separate for the native two-label renderer.
+@property (nonatomic, copy, readonly, nullable) NSString *nativePrefix;
+/// Optional ordering metadata only. A missing value cannot invalidate a digest
+/// and never controls a visible time/date label on the folded entry.
+@property (nonatomic, copy, readonly, nullable) NSNumber *nativeSortTime;
+/// Presentation-only ChatBox summary. A nil count means its native children were unavailable.
+@property (nonatomic, readonly) BOOL foldedEntryScoped;
+@property (nonatomic, copy, readonly, nullable) NSNumber *foldedEntryCount;
+@property (nonatomic, copy, readonly, nullable) NSString *foldedEntryAccountID;
+@property (nonatomic, readonly) NSUInteger foldedEntryPrivacyRevision;
+@property (nonatomic, copy, readonly, nullable) NSString *foldedEntrySummary;
+@property (nonatomic, copy, readonly, nullable) NSString *foldedEntryPrefix;
+@property (nonatomic, copy, readonly, nullable) NSString *foldedEntrySummaryUserName;
 - (instancetype)initWithNativePath:(NSIndexPath *)nativePath
                          userName:(nullable NSString *)userName
                              kind:(CSGroupRowKind)kind
                          category:(CSGroupRowCategory)category
                               top:(BOOL)top
                       unreadCount:(NSUInteger)unreadCount
-                           redDot:(BOOL)redDot NS_DESIGNATED_INITIALIZER;
+                           redDot:(BOOL)redDot;
+- (instancetype)initWithNativePath:(NSIndexPath *)nativePath
+                         userName:(nullable NSString *)userName
+                             kind:(CSGroupRowKind)kind
+                         category:(CSGroupRowCategory)category
+                              top:(BOOL)top
+                      unreadCount:(NSUInteger)unreadCount
+                           redDot:(BOOL)redDot
+                    nativeSummary:(nullable NSString *)nativeSummary
+                         sortTime:(nullable NSNumber *)sortTime;
+- (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(nullable NSString *)userName
+                             kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
+                              top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
+                    nativeSummary:(nullable NSString *)nativeSummary sortTime:(nullable NSNumber *)sortTime
+                     nativePrefix:(nullable NSString *)nativePrefix NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 @end
 
@@ -78,7 +107,22 @@ typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
                  hiddenUserNames:(NSSet<NSString *> *)hiddenUserNames
        unmaskedAggregateUserNames:(NSSet<NSString *> *)unmaskedAggregateUserNames
                  privacyRevision:(NSUInteger)privacyRevision
+              previousProjection:(nullable CSGroupProjection *)previous;
+/// Scope only the ChatBox aggregate, using child membership computed by this same projection.
+/// A nil child projection retains a neutral entry without claiming a precise count.
+- (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+                            tabs:(NSArray<WESessionTabItem *> *)tabs
+                   selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates
+                       accountID:(NSString *)accountID
+                 hiddenUserNames:(NSSet<NSString *> *)hiddenUserNames
+       unmaskedAggregateUserNames:(NSSet<NSString *> *)unmaskedAggregateUserNames
+                 privacyRevision:(NSUInteger)privacyRevision
+                scopeFoldedEntry:(BOOL)scopeFoldedEntry
+                foldedProjection:(nullable CSGroupProjection *)foldedProjection
               previousProjection:(nullable CSGroupProjection *)previous NS_DESIGNATED_INITIALIZER;
+/// Number of ordinary session rows assigned to a tab, after the same privacy and membership rules.
+- (NSUInteger)sessionCountForTabID:(NSString *)tabID;
 - (BOOL)hasSameDisplayStructureAs:(nullable CSGroupProjection *)other;
 - (NSArray<NSIndexPath *> *)changedUnreadPathsFrom:(CSGroupProjection *)other;
 /// Release full-list computation caches when the list is not being presented.

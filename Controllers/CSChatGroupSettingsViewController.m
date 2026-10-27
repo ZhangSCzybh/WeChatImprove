@@ -6,6 +6,10 @@
 extern NSString *CSGroupCurrentAccountID(void);
 #import "CSSettingTableViewCell.h"
 #import "WEContactSelectViewController.h"
+#import "CSNativeContactPicker.h"
+#import "CSSettingsPresentation.h"
+#import "CSCloseFriendBridge.h"
+#import "CSGroupNativeBridge.h"
 #import "CSServiceCenter.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
@@ -82,6 +86,8 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
     
     [self loadAccountPreferences];
     [self setupData];
+    for (NSString *name in @[CSCloseFriendPolicyDidChangeNotification,@"CSBackupAccountChanged"])
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(contactSelectionPolicyChanged:) name:name object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -100,7 +106,11 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
     self.accountCheckTimer = nil;
 }
 
-- (void)dealloc { [_accountCheckTimer invalidate]; }
+- (void)dealloc { [_accountCheckTimer invalidate]; [NSNotificationCenter.defaultCenter removeObserver:self]; }
+
+- (void)contactSelectionPolicyChanged:(NSNotification *)notification {
+    CSNativeContactPickerRevalidate(self);
+}
 
 - (void)copyAccountPreferences {
     self.customTabs = [self.groupPreferences.customTabs mutableCopy];
@@ -742,42 +752,67 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
     }
 }
 
-- (void)showContactSelectForTab:(WESessionTabItem *)tab {
+- (BOOL (^)(void))contactSelectionValidatorForTab:(WESessionTabItem *)tab {
     NSString *accountID = [self.groupPreferences.accountID copy];
     NSString *tabID = [tab.tabId copy];
-    if (![self canEditAccount:accountID] || ![self customTabWithID:tabID]) return;
+    if (![self canEditAccount:accountID]) return ^BOOL { return NO; };
+    tab=[self customTabWithID:tabID];
+    if (!tab) return ^BOOL { return NO; };
+    CSGroupPreferences *preferences=self.groupPreferences;
+    NSUInteger epoch=CSCloseFriendAccountEpoch(),revision=CSCloseFriendCurrentSnapshot().revision;
+    __weak typeof(self) weakSelf=self;
+    __block BOOL current=YES;
+    return [^BOOL {
+        // reload preserves tab objects only while definitions are unchanged.
+        // Identity rejects deletion/recreation and edits by another settings instance;
+        // the account epoch also rejects A -> B -> A during a pending selection.
+        current=current && weakSelf && epoch==CSCloseFriendAccountEpoch() &&
+            revision==CSCloseFriendCurrentSnapshot().revision && !CSCloseFriendCurrentSnapshot().blocked &&
+            [weakSelf canEditAccount:accountID] && weakSelf.groupPreferences==preferences &&
+            [weakSelf customTabWithID:tabID]==tab;
+        return current;
+    } copy];
+}
+
+- (BOOL)contactName:(NSString *)name belongsToNativeGroups:(BOOL)groups {
+    if (![name isKindOfClass:NSString.class] || !name.length || [name hasSuffix:@"@chatroom"]!=groups ||
+        [name isEqual:self.groupPreferences.accountID]) return NO;
+    if (groups) return YES;
+    id manager=CSGetService(NSClassFromString(@"CContactMgr"));
+    for (NSString *getter in @[@"getContactByName:",@"getContactByNameFromDB:",@"getContactForSearchByName:"]) {
+        SEL selector=NSSelectorFromString(getter);
+        if (!CSCloseFriendMethodMatches(class_getInstanceMethod([manager class],selector),"@@:@")) continue;
+        @try {
+            id contact=((id(*)(id,SEL,id))objc_msgSend)(manager,selector,name);
+            if ([CSGroupReadObject(contact,@"m_nsUsrName") isEqual:name])
+                return CSGroupCategoryForContact(contact)==CSGroupRowCategoryPrivate;
+        } @catch (__unused NSException *exception) {}
+    }
+    return NO; // Unresolved existing members must survive opening/finishing a picker.
+}
+
+- (void)showContactSelectForTab:(WESessionTabItem *)tab {
+    BOOL (^isValid)(void)=[self contactSelectionValidatorForTab:tab];
+    if (!isValid() || !CSSettingsCanPresentFrom(self)) return;
+    tab=[self customTabWithID:tab.tabId];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"选择类型"
                                                                    message:@"请选择要添加的会话类型"
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     
     __weak typeof(self) weakSelf = self;
-    
-    [alert addAction:[UIAlertAction actionWithTitle:@"群聊" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        if (![weakSelf canEditAccount:accountID]) return;
-        WESessionTabItem *current = [weakSelf customTabWithID:tabID];
-        if (!current) return;
-        [weakSelf presentContactSelectWithType:WEContactSelectTypeGroup tab:current tagName:nil];
-    }]];
-    
-    [alert addAction:[UIAlertAction actionWithTitle:@"私聊" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        if (![weakSelf canEditAccount:accountID]) return;
-        WESessionTabItem *current = [weakSelf customTabWithID:tabID];
-        if (!current) return;
-        [weakSelf presentContactSelectWithType:WEContactSelectTypePrivate tab:current tagName:nil];
-    }]];
-    
-    [alert addAction:[UIAlertAction actionWithTitle:@"标签" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        if (![weakSelf canEditAccount:accountID]) return;
-        WESessionTabItem *current = [weakSelf customTabWithID:tabID];
-        if (current) [weakSelf showTagSelectForTab:current];
-    }]];
-    
-    [alert addAction:[UIAlertAction actionWithTitle:@"全部" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        if (![weakSelf canEditAccount:accountID]) return;
-        WESessionTabItem *current = [weakSelf customTabWithID:tabID];
-        if (!current) return;
-        [weakSelf presentContactSelectWithType:WEContactSelectTypeAll tab:current tagName:nil];
-    }]];
+    __weak UIAlertController *weakAlert=alert;
+    NSArray *titles=@[@"私聊",@"群聊",@"标签"];
+    NSArray *types=@[@(WEContactSelectTypePrivate),@(WEContactSelectTypeGroup),@(WEContactSelectTypeTag)];
+    for (NSUInteger index=0;index<titles.count;index++) {
+        WEContactSelectType type=[types[index] integerValue];
+        [alert addAction:[UIAlertAction actionWithTitle:titles[index] style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+            CSSettingsAfterDismissingSheet(weakAlert,^{
+                if (!isValid() || !CSSettingsCanPresentFrom(weakSelf)) return;
+                if (type==WEContactSelectTypeTag) [weakSelf showTagSelectForTab:tab];
+                else [weakSelf presentContactSelectWithType:type tab:tab tagName:nil];
+            });
+        }]];
+    }
     
     [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
     
@@ -785,105 +820,51 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 }
 
 - (void)showTagSelectForTab:(WESessionTabItem *)tab {
-    NSString *accountID = [self.groupPreferences.accountID copy];
-    NSString *tabID = [tab.tabId copy];
-    if (![self canEditAccount:accountID] || ![self customTabWithID:tabID]) return;
-    Class tagMgrClass = objc_getClass("ContactTagMgr");
-    if (!tagMgrClass) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示"
-                                                                       message:@"无法获取标签列表"
-                                                                preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
-        [self presentViewController:alert animated:YES completion:nil];
-        return;
-    }
-    
-    id tagMgr = CSGetService(tagMgrClass);
-    if (!tagMgr) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示"
-                                                                       message:@"无法获取标签列表"
-                                                                preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
-        [self presentViewController:alert animated:YES completion:nil];
-        return;
-    }
-    
-    SEL getAllLabelNameSel = NSSelectorFromString(@"getAllLabelName");
-    if (![tagMgr respondsToSelector:getAllLabelNameSel]) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示"
-                                                                       message:@"无法获取标签列表"
-                                                                preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
-        [self presentViewController:alert animated:YES completion:nil];
-        return;
-    }
-    
-    NSArray *tagNames = ((id (*)(id, SEL))objc_msgSend)(tagMgr, getAllLabelNameSel);
-    
-    if (![tagNames isKindOfClass:[NSArray class]] || tagNames.count == 0) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示"
-                                                                       message:@"暂无标签，请先在微信中创建标签"
-                                                                preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
-        [self presentViewController:alert animated:YES completion:nil];
-        return;
-    }
-    
-    UIAlertController *tagAlert = [UIAlertController alertControllerWithTitle:@"选择标签"
-                                                                      message:@"请选择要添加的标签"
-                                                               preferredStyle:UIAlertControllerStyleActionSheet];
-    
-    __weak typeof(self) weakSelf = self;
-    for (NSString *tagName in tagNames) {
-        if (![tagName isKindOfClass:[NSString class]]) continue;
-        [tagAlert addAction:[UIAlertAction actionWithTitle:tagName style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-            if (![weakSelf canEditAccount:accountID]) return;
-            WESessionTabItem *current = [weakSelf customTabWithID:tabID];
-            if (!current) return;
-            [weakSelf presentContactSelectWithType:WEContactSelectTypeTag tab:current tagName:tagName];
-        }]];
-    }
-    
-    [tagAlert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
-    
-    [self presentViewController:tagAlert animated:YES completion:nil];
+    // Let WeChat own the label list and its member-selection callback. Search
+    // and individual checkmarks stay in the shared native friend picker.
+    [self presentContactSelectWithType:WEContactSelectTypeTag tab:tab tagName:nil];
 }
 
 - (void)presentContactSelectWithType:(WEContactSelectType)selectType tab:(WESessionTabItem *)tab tagName:(NSString *)tagName {
-    NSString *accountID = [self.groupPreferences.accountID copy];
     NSString *tabID = [tab.tabId copy];
-    if (![self canEditAccount:accountID]) return;
+    BOOL (^isValid)(void)=[self contactSelectionValidatorForTab:tab];
+    if (!isValid() || !CSSettingsCanPresentFrom(self)) return;
     tab = [self customTabWithID:tabID];
-    if (!tab) return;
-    WEContactSelectViewController *selectVC = [[WEContactSelectViewController alloc] initWithTitle:tab.displayName
-                                                                                selectedUserNames:tab.sessionUserNames
-                                                                                      selectType:selectType
-                                                                                       tagName:tagName];
-    
+    if (selectType!=WEContactSelectTypePrivate && selectType!=WEContactSelectTypeGroup && selectType!=WEContactSelectTypeTag) return;
+    BOOL groups=selectType==WEContactSelectTypeGroup;
+    NSMutableArray *preselected=[NSMutableArray array],*preserved=[NSMutableArray array];
+    for (NSString *name in tab.sessionUserNames) {
+        if (![name isKindOfClass:NSString.class] || !name.length) continue;
+        // Native lists return only their own category. Preserve the rest of this
+        // mixed group's membership, including self/service/unresolved contacts.
+        NSMutableArray *destination=[self contactName:name belongsToNativeGroups:groups] ? preselected : preserved;
+        [destination addObject:name];
+    }
     __weak typeof(self) weakSelf = self;
-    selectVC.completion = ^(NSArray<NSString *> *selectedUserNames) {
-        if (![weakSelf canEditAccount:accountID]) return;
+    void (^save)(NSArray<NSString *> *) = ^(NSArray<NSString *> *selectedUserNames) {
+        if (!isValid()) return;
         WESessionTabItem *current = [weakSelf customTabWithID:tabID];
         if (!current) return;
-        current.sessionUserNames = selectedUserNames;
+        NSMutableSet *names=[NSMutableSet setWithArray:preserved];
+        for (NSString *name in selectedUserNames)
+            if ([name isKindOfClass:NSString.class] && name.length) [names addObject:name];
+        current.sessionUserNames = [names.allObjects sortedArrayUsingSelector:@selector(compare:)];
         current.updateTime = [NSDate date];
         [weakSelf saveCustomTabs];
         [weakSelf setupData];
         [weakSelf.tableView reloadData];
     };
-    
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:selectVC];
-    nav.modalPresentationStyle = UIModalPresentationPageSheet;
-    
-    if (@available(iOS 15.0, *)) {
-        if (nav.sheetPresentationController) {
-            UISheetPresentationControllerDetent *mediumDetent = [UISheetPresentationControllerDetent mediumDetent];
-            UISheetPresentationControllerDetent *largeDetent = [UISheetPresentationControllerDetent largeDetent];
-            nav.sheetPresentationController.detents = @[mediumDetent, largeDetent];
-        }
+
+    NSError *error=nil;
+    BOOL presented=selectType==WEContactSelectTypeTag
+        ? CSNativeContactPickerPresentTags(self,tab.displayName,preselected,isValid,save,&error)
+        : CSNativeContactPickerPresent(self,tab.displayName,groups,preselected,isValid,save,&error);
+    if (!presented) {
+        UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"无法选择会话"
+            message:error.localizedDescription?:@"当前无法打开微信原生选择器，原有分组成员已保留。" preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
+        if (CSSettingsCanPresentFrom(self)) [self presentViewController:alert animated:YES completion:nil];
     }
-    
-    [self presentViewController:nav animated:YES completion:nil];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {

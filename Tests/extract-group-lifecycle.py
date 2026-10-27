@@ -25,6 +25,9 @@ for marker in ['+ (instancetype)adapterForTable:', '+ (instancetype)adapterForCo
                '- (void)requestRefresh {', '- (void)requestRecovery {', '- (void)scheduleRefresh {', '- (void)cancelScheduledRefresh {', '+ (void)applicationActivityChanged:', '+ (void)closeFriendPolicyChanged:', '- (void)beginNativeChangeOfKind:', '- (void)requestCoalescedRefresh', '- (void)invalidateNativeSnapshot', '- (NSArray *)nativeSectionsForAccount:', '- (void)beginNativeChange', '- (void)endNativeChange {', '- (void)endNativeChangeCoalesced:',
                '- (void)pruneNativeActions', '- (void)performNativeBatch:', '- (void)performInNativePresentation:', '- (void)useNativePresentation {']:
     methods.append(method(source, marker))
+methods.append(method(source,'- (void)selectIndex:'))
+if '+ (void)refreshFoldedListsForAccount:' in source:
+    methods.append(method(source,'+ (void)refreshFoldedListsForAccount:'))
 for marker, fallback in [('+ (void)setPresentationSuspended:', '+ (void)setPresentationSuspended:(BOOL)value forController:(id)owner { (void)value; (void)owner; }'),
                          ('- (void)shieldVisiblePrivateRows', '- (void)shieldVisiblePrivateRows {}'),
                          ('- (void)finishSuspendedBatches', '- (void)finishSuspendedBatches {}')]:
@@ -55,5 +58,9 @@ for name in ['viewWillAppear', 'viewDidAppear', 'viewWillDisappear', 'viewDidDis
     body = method(hooks, marker) if marker in hooks else marker + '(BOOL)animated { %orig; }'
     life.append(body.replace('%orig', '[self nativeAppearance:animated]'))
 out.with_name('GroupLifecycleHooks.h').write_text('\n'.join(life)+'\n')
+folded=[]
+for name in ['FoldedAppear','FoldedDisappear']:
+    folded.append(method(hooks,'static void '+name+'('))
+out.with_name('FoldedLifecycleHooks.h').write_text('\n'.join(folded)+'\n')
 reload = method(hooks, '- (void)reloadData {').replace('%orig', 'self.reloads++')
 out.with_name('GroupLifecycleReload.h').write_text(reload+'\n')
