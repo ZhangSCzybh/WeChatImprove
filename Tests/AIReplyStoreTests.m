@@ -27,6 +27,17 @@ int main(void) { @autoreleasepool {
     NSDictionary *state=[CSAIReplyStore readStateAtURL:url account:@"alice" error:&error]; NSDictionary *portable=CSAIReplyPortableState(state);
     CHECK(!portable[@"handled"] && !portable[@"history"]); CHECK(!portable[@"configuration"][@"credentialRevision"] && !portable[@"configuration"][@"verifiedConnection"] && !portable[@"configuration"][@"verifiedAt"]); CHECK([portable[@"configuration"][@"enabled"] boolValue]); CHECK(CSAIReplyValidateState(portable,@"alice",&error)); CHECK(!CSAIReplyValidateState(portable,@"bob",&error));
     NSMutableDictionary *bad=[store.configuration mutableCopy]; bad[@"apiKey"]=@"must-never-persist"; CHECK(![store saveConfiguration:bad error:&error]);
+    NSMutableDictionary *legacy=[store.configuration mutableCopy];NSString *legacyID=CSAIConnectionIdentifier(legacy);
+    legacy[@"mode"]=@"chat";legacy[@"sessionCache"]=@NO;CHECK([legacyID isEqual:CSAIConnectionIdentifier(legacy)]);CHECK(CSAIReplyValidateConfiguration(legacy,&error));
+    CHECK(!CSAIReplyUsesResponses(store.configuration));CHECK(![store.configuration[@"sessionCache"] boolValue]);
+    legacy[@"mode"]=@"bailianResponses";CHECK(![legacyID isEqual:CSAIConnectionIdentifier(legacy)]);NSString *responseID=CSAIConnectionIdentifier(legacy);
+    legacy[@"sessionCache"]=@YES;CHECK(![responseID isEqual:CSAIConnectionIdentifier(legacy)]);CHECK(CSAIReplyValidateConfiguration(legacy,&error));
+    legacy[@"mode"]=@"chat";CHECK(!CSAIReplyValidateConfiguration(legacy,&error));legacy[@"mode"]=@"unknown";CHECK(!CSAIReplyValidateConfiguration(legacy,&error));
+    bad=[store.configuration mutableCopy];bad[@"conversations"]=@{@"contact":@{@"enabled":@YES,@"presetID":@"",@"replyWithoutMention":@YES}};CHECK(!CSAIReplyValidateConfiguration(bad,&error));
+    bad[@"conversations"]=@{@"room@chatroom":@{@"enabled":@YES,@"presetID":@"",@"replyWithoutMention":@YES}};CHECK(CSAIReplyValidateConfiguration(bad,&error));
+    NSMutableDictionary *withUsage=[record mutableCopy];withUsage[@"usage"]=@{@"inputTokens":@1200,@"cachedTokens":@1024,@"cacheCreationTokens":@0,@"outputTokens":@30};CHECK([store appendHistory:withUsage error:&error]);
+    for(id usage in @[@{@"inputTokens":@(-1)},@{@"cachedTokens":@YES},@{@"outputTokens":@1.5},@{@"inputTokens":@4,@"cachedTokens":@5},@{@"responseID":@"secret"},@{@"inputTokens":@(INFINITY)}]){withUsage[@"usage"]=usage;CHECK(![store appendHistory:withUsage error:&error]);}
+    withUsage[@"responseID"]=@"private-server-state";withUsage[@"usage"]=@{};CHECK(![store appendHistory:withUsage error:&error]);
     bad=[store.configuration mutableCopy]; bad[@"defaultPreset"]=@"missing"; CHECK(!CSAIReplyValidateConfiguration(bad,&error));
     bad=[store.configuration mutableCopy]; bad[@"presets"]=@[]; CHECK(!CSAIReplyValidateConfiguration(bad,&error));
     bad=[store.configuration mutableCopy]; bad[@"conversations"]=@{@"contact":@{@"enabled":@YES,@"presetID":@"missing"}}; CHECK(!CSAIReplyValidateConfiguration(bad,&error));

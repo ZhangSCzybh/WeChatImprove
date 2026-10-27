@@ -6,7 +6,7 @@
 #import "CSAIReplyManager.h"
 #import "CSAIReplySettingsViewController.h"
 #import "AINativeDispatchUnderTest.m"
-static NSUInteger checks,mutations,pickerCalls,searchCalls,muteCalls;
+static NSUInteger checks,mutations,mentionMutations,pickerCalls,searchCalls,muteCalls;
 #define CHECK(c) do{checks++;if(!(c)){NSLog(@"FAIL %d %s",__LINE__,#c);exit(1);}}while(0)
 @implementation UIView @end
 @implementation UISwitch @end
@@ -127,6 +127,11 @@ static BOOL allowed=YES;
 - (NSString *)presetNameForConversation:(NSString *)conversation{(void)conversation;return @"默认回复";}
 - (NSString *)statusForConversation:(NSString *)conversation{(void)conversation;return @"总开关已关闭";}
 - (BOOL)setConversation:(NSString *)conversation enabled:(BOOL)enabled presetID:(NSString *)presetID account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error{(void)conversation;(void)enabled;(void)presetID;(void)error;if(![self isCurrentAccount:account epoch:epoch])return NO;mutations++;return YES;}
+- (BOOL)setConversation:(NSString *)conversation replyWithoutMention:(BOOL)enabled account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error{
+    if(![self isCurrentAccount:account epoch:epoch] || ![conversation hasSuffix:@"@chatroom"])return NO;
+    NSMutableDictionary *config=[testStore.configuration mutableCopy],*conversations=[config[@"conversations"] mutableCopy];
+    NSMutableDictionary *item=[conversations[conversation] mutableCopy]?:[@{@"enabled":@NO,@"presetID":@""} mutableCopy];item[@"replyWithoutMention"]=@(enabled);conversations[conversation]=item;config[@"conversations"]=conversations;mentionMutations++;return [testStore saveConfiguration:config error:error];
+}
 @end
 #pragma clang diagnostic pop
 void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation,NSString *account,NSUInteger epoch){(void)controller;(void)conversation;(void)account;(void)epoch;pickerCalls++;}
@@ -141,6 +146,13 @@ int main(int argc,const char **argv){@autoreleasepool{
     wrap.m_nsMsgSource=@"<msgsource><atuserlist>alice";CHECK(!CSAIEventFromWrap(wrap,@"alice",@""));wrap.m_nsMsgSource=@"";CHECK(!CSAIEventFromWrap(wrap,@"alice",@""));
     wrap.m_nsAtUserList=@"alice";wrap.m_nsContent=@"bob:\n@Alice\u2005";CHECK(!CSAIEventFromWrap(wrap,@"alice",@""));wrap.m_nsContent=@"hello";wrap.m_nsRealChatUsr=@"alice";CHECK(!CSAIEventFromWrap(wrap,@"alice",@""));wrap.m_nsRealChatUsr=@"bob";
     CSAIMarkOwnedSend(wrap);CHECK(CSAIIsOwnedSend(wrap));CHECK(!CSAIEventFromWrap(wrap,@"alice",@""));
+    TestWrap *plain=[TestWrap new];plain.m_nsFromUsr=@"group@chatroom";plain.m_nsToUsr=@"alice";plain.m_nsRealChatUsr=@"bob";plain.m_nsContent=@"hello group";plain.m_uiMessageType=1;plain.m_uiMesLocalID=8;plain.m_uiCreateTime=1800000000;
+    CHECK(!CSAIEventFromWrap(plain,@"alice",@"group@chatroom"));
+    CHECK([CSAIEventFromWrapWithGroupPolicy(plain,@"alice",@"group@chatroom",YES)[@"text"] isEqual:@"hello group"]);
+    plain.m_nsAtAll=YES;CHECK(CSAIEventFromWrapWithGroupPolicy(plain,@"alice",@"group@chatroom",YES)!=nil);
+    plain.m_nsRealChatUsr=@"alice";CHECK(!CSAIEventFromWrapWithGroupPolicy(plain,@"alice",@"group@chatroom",YES));plain.m_nsRealChatUsr=@"bob";
+    plain.m_uiMessageType=3;CHECK(!CSAIEventFromWrapWithGroupPolicy(plain,@"alice",@"group@chatroom",YES));plain.m_uiMessageType=1;
+    plain.m_nsContent=@"@Alice\u2005";CHECK(!CSAIEventFromWrapWithGroupPolicy(plain,@"alice",@"group@chatroom",YES));
     testStore=[[CSAIReplyStore alloc]initWithURL:[NSURL fileURLWithPath:@(argv[1])] account:@"alice"];CHECK([testStore load]);
     TestDetailPage *page=[TestDetailPage new];id native=page->m_tableViewInfo.sections.firstObject;
     CSAIRefreshChatDetail(page);CHECK(page->m_tableViewInfo.sections.count==2);CHECK(page->m_tableViewInfo.sections.firstObject==native);
@@ -153,28 +165,32 @@ int main(int argc,const char **argv){@autoreleasepool{
     WCTableViewSectionManager *members=NativeSection(next,@"群成员",NULL),*search=NativeSection(next,@"查找聊天内容",@selector(onEditAndSearch)),*mute=NativeSection(next,@"消息免打扰",@selector(onMute)),*exitSection=NativeSection(next,@"退出群聊",NULL);
     next->m_tableViewInfo.sections=[@[members,search,mute,exitSection] mutableCopy];NSArray *nativeSections=[next->m_tableViewInfo.sections copy];id searchCell=search.cells[0],muteCell=mute.cells[0];
     CSAIRefreshChatDetail(next);
-    CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);CHECK(search.cells.count==3);CHECK(search.cells[0]==searchCell);CHECK(!search.headerTitle && !search.footerTitle);
-    toggle=search.cells[1];preset=search.cells[2];CHECK([toggle.title isEqual:@"启用 AI 回复"]);CHECK(!toggle.on && !toggle.detail);CHECK([preset.title isEqual:@"回复预设"]);
+    CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);CHECK(search.cells.count==4);CHECK(search.cells[0]==searchCell);CHECK(!search.headerTitle && !search.footerTitle);
+    toggle=search.cells[1];preset=search.cells[3];CHECK([toggle.title isEqual:@"启用 AI 回复"]);CHECK(!toggle.on && !toggle.detail);CHECK([preset.title isEqual:@"回复预设"]);
+    WCTableViewCellManager *withoutMention=search.cells[2];CHECK([withoutMention.title isEqual:@"免 @ 回复"]);CHECK(!withoutMention.on);
+    ((void(*)(id,SEL,id))objc_msgSend)(withoutMention.target,withoutMention.action,control);CHECK(mentionMutations==1);
+    CHECK([testStore.configuration[@"conversations"][@"group@chatroom"][@"replyWithoutMention"] boolValue]);CHECK(![testStore.configuration[@"conversations"][@"group@chatroom"][@"enabled"] boolValue]);CHECK([(WCTableViewCellManager *)search.cells[2] on]);
     CHECK(next->m_tableViewInfo.sections[2]==mute && mute.cells[0]==muteCell);CHECK(next->m_tableViewInfo.sections.lastObject==exitSection);
     ((void(*)(id,SEL))objc_msgSend)([searchCell target],[searchCell action]);((void(*)(id,SEL))objc_msgSend)([muteCell target],[muteCell action]);CHECK(searchCalls==1 && muteCalls==1);
     ((void(*)(id,SEL,id))objc_msgSend)(toggle.target,toggle.action,control);CHECK(mutations==2);
     ((void(*)(id,SEL))objc_msgSend)(preset.target,preset.action);CHECK(pickerCalls==2);
     for(NSUInteger i=0;i<5;i++)[NSNotificationCenter.defaultCenter postNotificationName:CSAIReplyDidChange object:nil];
-    CHECK(search.cells.count==3);CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);CHECK(search.cells[0]==searchCell && mute.cells[0]==muteCell);
+    CHECK(search.cells.count==4);CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);CHECK(search.cells[0]==searchCell && mute.cells[0]==muteCell);
     NSMutableDictionary *configuration=[testStore.configuration mutableCopy];configuration[@"conversations"]=@{@"group@chatroom":@{@"enabled":@YES,@"presetID":@""}};CHECK([testStore saveConfiguration:configuration error:NULL]);
     CSAIRefreshChatDetail(next);toggle=search.cells[1];CHECK(toggle.on);CHECK([toggle.detail isEqual:@"总开关已关闭"]);CHECK(!search.headerTitle && !search.footerTitle);
     // Native rebuilds may move the search section. Resolve its action again;
     // native section and row indices must stay exactly as rebuilt by WeChat.
     WCTableViewSectionManager *localized=NativeSection(next,@"Search Chat History",@selector(onEditAndSearch));
     next->m_tableViewInfo.sections=[@[members,mute,localized,exitSection] mutableCopy];nativeSections=[next->m_tableViewInfo.sections copy];CSAIRefreshChatDetail(next);
-    CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);CHECK(localized.cells.count==3);CHECK(mute.cells[0]==muteCell);
+    CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);CHECK(localized.cells.count==4);CHECK(mute.cells[0]==muteCell);
     allowed=NO;[NSNotificationCenter.defaultCenter postNotificationName:CSAIReplyDidChange object:nil];CHECK(localized.cells.count==1);CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);allowed=YES;
-    CSAIRefreshChatDetail(next);CHECK(localized.cells.count==3);toggle=localized.cells[1];preset=localized.cells[2];testEpoch++;
+    CSAIRefreshChatDetail(next);CHECK(localized.cells.count==4);toggle=localized.cells[1];preset=localized.cells[3];testEpoch++;
     CSAIRefreshChatDetail(next);CHECK(localized.cells.count==1);CHECK([next->m_tableViewInfo.sections isEqual:nativeSections]);
+    ((void(*)(id,SEL,id))objc_msgSend)(withoutMention.target,withoutMention.action,control);CHECK(mentionMutations==1);
     ((void(*)(id,SEL,id))objc_msgSend)(toggle.target,toggle.action,control);((void(*)(id,SEL))objc_msgSend)(preset.target,preset.action);CHECK(mutations==2 && pickerCalls==2);
     // Exact visible-title fallback supports native versions with another action.
     TestDetailPage *fallback=[TestDetailPage new];fallback.contact.m_nsUsrName=@"fallback@chatroom";
-    WCTableViewSectionManager *titleOnly=NativeSection(fallback,@"查找聊天内容",@selector(onMute));fallback->m_tableViewInfo.sections=[@[titleOnly,exitSection] mutableCopy];CSAIRefreshChatDetail(fallback);CHECK(titleOnly.cells.count==3);CHECK(fallback->m_tableViewInfo.sections.count==2);
+    WCTableViewSectionManager *titleOnly=NativeSection(fallback,@"查找聊天内容",@selector(onMute));fallback->m_tableViewInfo.sections=[@[titleOnly,exitSection] mutableCopy];CSAIRefreshChatDetail(fallback);CHECK(titleOnly.cells.count==4);CHECK(fallback->m_tableViewInfo.sections.count==2);
     // An absent/ambiguous/non-terminal anchor never creates a bottom fallback
     // or shifts any pre-existing native row to an incorrect cached index path.
     TestDetailPage *unsupported=[TestDetailPage new];unsupported.contact.m_nsUsrName=@"unsupported@chatroom";
