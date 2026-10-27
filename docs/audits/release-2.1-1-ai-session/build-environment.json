@@ -1,0 +1,35 @@
+{
+  "workspace": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "buildRoot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-ai-session-package-7o_ehfok",
+  "sourceCommit": "d6913bff711d887145cf45cfbc9ac014d6c8408a",
+  "branch": "codex/ai-session-cache-group-unmentioned",
+  "version": "2.1-1",
+  "sourceChangesIncluded": [
+    "Controllers/CSReleaseNotesViewController.m"
+  ],
+  "deliveryDirectory": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.1-1-ai-session-d6913bff",
+  "commands": {
+    "rootless": [
+      "make",
+      "-j4",
+      "package",
+      "SCHEME=rootless",
+      "PACKAGE_VERSION=2.1-1",
+      "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-ai-session-package-7o_ehfok/rootless",
+      "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-ai-session-package-7o_ehfok/rootless-stage",
+      "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-ai-session-package-7o_ehfok/packages",
+      "COLOR=0"
+    ],
+    "rootful": [
+      "make",
+      "-j4",
+      "package",
+      "SCHEME=rootful",
+      "PACKAGE_VERSION=2.1-1",
+      "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-ai-session-package-7o_ehfok/rootful",
+      "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-ai-session-package-7o_ehfok/rootful-stage",
+      "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-ai-session-package-7o_ehfok/packages",
+      "COLOR=0"
+    ]
+  }
+}

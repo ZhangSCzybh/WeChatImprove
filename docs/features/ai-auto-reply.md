@@ -62,6 +62,8 @@ API Key 保存在本机 Keychain，按账号与凭据版本隔离、不同步到
 
 基础功能已合入 main 并发布本地 `2.1-1` 包。本次会话／缓存／用量优化与群聊免 @ 在原项目目录分支 `codex/ai-session-cache-group-unmentioned` 开发，基于 `73d98eb0`；不变更版本，不覆盖已有安装包。
 
+功能提交 `d6913bff` 随后按用户要求重新打包，最新 Rootless／Rootful 包及符号独立放在 `packages/2.1-1-ai-session-d6913bff/`，版本仍为 `2.1-1`。校验与产物说明见 [最新打包记录](../audits/release-2.1-1-ai-session/README.md)。
+
 核心回归命令：
 
 ```sh
