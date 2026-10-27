@@ -1,0 +1,2 @@
+AIReplyStoreTests passed: defaults, validation, atomic claims, bounds, account isolation, portable redaction, corruption and failed writes
+AIClientTests passed: URLProtocol request, success, safe HTTP errors, malformed/empty, timeout, redirect, bounds, cancellation, invalid input and immutable credential slots with Security fakes

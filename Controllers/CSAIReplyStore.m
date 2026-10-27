@@ -6,7 +6,6 @@
 #import <fcntl.h>
 #import <unistd.h>
 #import <errno.h>
-#import <math.h>
 
 NSNotificationName const CSAIReplyConfigurationDidChange = @"CSAIReplyConfigurationDidChange";
 NSString *const CSAIReplyBackupDomain = @"aiReply";
@@ -19,23 +18,7 @@ static NSString *Digest(NSString *value) { NSData *data=[value dataUsingEncoding
 static BOOL OnlyKeys(NSDictionary *dictionary, NSArray *keys) { for(id key in dictionary) if(![keys containsObject:key]) return NO; return YES; }
 NSURL *CSAIReplyFileURL(NSURL *root, NSString *account) { return [root URLByAppendingPathComponent:[NSString stringWithFormat:@"ai-reply-%@.plist",Digest(account)]]; }
 NSDictionary *CSAIReplyDefaultConfiguration(void) { return @{@"enabled":@NO,@"endpoint":@"",@"model":@"",@"credentialRevision":@"",@"verifiedConnection":@"",@"presets":@[@{@"id":@"default",@"name":@"默认回复",@"prompt":@"请根据对方的消息，用自然、友好、简洁的中文回复。不编造事实，不代替我作出承诺；不确定时明确说明。只输出要发送的回复正文，不附加解释或格式标记。"}],@"defaultPreset":@"default",@"conversations":@{}}; }
-BOOL CSAIReplyUsesResponses(NSDictionary *configuration) { return [configuration[@"mode"] isEqual:@"bailianResponses"]; }
-NSString *CSAIConnectionIdentifier(NSDictionary *configuration) {
-    NSMutableString *value=[NSMutableString string];
-    for(NSString *key in @[@"endpoint",@"model",@"credentialRevision"]) { NSString *part=[configuration[key] isKindOfClass:NSString.class]?configuration[key]:@""; [value appendFormat:@"%lu:%@",(unsigned long)part.length,part]; }
-    // Preserve verified identifiers from older Chat Completions configurations.
-    if(CSAIReplyUsesResponses(configuration))[value appendFormat:@"|bailianResponses|cache:%d",[configuration[@"sessionCache"] boolValue]];
-    return Digest(value);
-}
-BOOL CSAIReplyValidateUsage(id usage) {
-    if(![usage isKindOfClass:NSDictionary.class] || !OnlyKeys(usage,@[@"inputTokens",@"outputTokens",@"cachedTokens",@"cacheCreationTokens",@"reasoningTokens"]))return NO;
-    for(id value in [usage allValues]) {
-        if(![value isKindOfClass:NSNumber.class] || CFGetTypeID((__bridge CFTypeRef)value)==CFBooleanGetTypeID())return NO;
-        double number=[value doubleValue];if(!isfinite(number) || number<0 || number>1e12 || floor(number)!=number)return NO;
-    }
-    if(usage[@"inputTokens"] && usage[@"cachedTokens"] && [usage[@"cachedTokens"] doubleValue]>[usage[@"inputTokens"] doubleValue])return NO;
-    return YES;
-}
+NSString *CSAIConnectionIdentifier(NSDictionary *configuration) { NSMutableString *value=[NSMutableString string]; for(NSString *key in @[@"endpoint",@"model",@"credentialRevision"]) { NSString *part=[configuration[key] isKindOfClass:NSString.class]?configuration[key]:@""; [value appendFormat:@"%lu:%@",(unsigned long)part.length,part]; } return Digest(value); }
 BOOL CSAIValidateEndpoint(NSString *endpoint, NSError **error) {
     if(!String(endpoint,1,8192) || ![endpoint isEqualToString:[endpoint stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet]]) return Fail(error,@"请输入完整 HTTPS 请求地址");
     NSURLComponents *parts=[NSURLComponents componentsWithString:endpoint];
@@ -45,10 +28,7 @@ BOOL CSAIValidateEndpoint(NSString *endpoint, NSError **error) {
 BOOL CSAIReplyValidateConfiguration(id configuration, NSError **error) {
     if(![configuration isKindOfClass:NSDictionary.class]) return Fail(error,@"AI 配置格式无效");
     NSDictionary *c=configuration;
-    if(!OnlyKeys(c,@[@"enabled",@"endpoint",@"model",@"credentialRevision",@"verifiedConnection",@"verifiedAt",@"presets",@"defaultPreset",@"conversations",@"mode",@"sessionCache"]) || !IsBoolean(c[@"enabled"]) || !String(c[@"endpoint"],0,8192) || !String(c[@"model"],0,200)) return Fail(error,@"AI 配置字段无效");
-    if(c[@"mode"] && ![@[@"chat",@"bailianResponses"] containsObject:c[@"mode"]])return Fail(error,@"调用方式无效");
-    if(c[@"sessionCache"] && !IsBoolean(c[@"sessionCache"]))return Fail(error,@"会话缓存设置无效");
-    if([c[@"sessionCache"] boolValue] && !CSAIReplyUsesResponses(c))return Fail(error,@"会话缓存仅适用于百炼会话模式");
+    if(!OnlyKeys(c,@[@"enabled",@"endpoint",@"model",@"credentialRevision",@"verifiedConnection",@"verifiedAt",@"presets",@"defaultPreset",@"conversations"]) || !IsBoolean(c[@"enabled"]) || !String(c[@"endpoint"],0,8192) || !String(c[@"model"],0,200)) return Fail(error,@"AI 配置字段无效");
     NSString *endpoint=c[@"endpoint"];
     if(endpoint.length && !CSAIValidateEndpoint(endpoint,error)) return NO;
     if(c[@"credentialRevision"] && !String(c[@"credentialRevision"],0,200)) return Fail(error,@"凭据版本无效");
@@ -59,14 +39,11 @@ BOOL CSAIReplyValidateConfiguration(id configuration, NSError **error) {
     for(id p in presets) { if(![p isKindOfClass:NSDictionary.class] || !OnlyKeys(p,@[@"id",@"name",@"prompt"]) || !String(p[@"id"],1,200) || !String(p[@"name"],1,60) || !String(p[@"prompt"],1,12000) || [ids containsObject:p[@"id"]]) return Fail(error,@"回复预设无效"); [ids addObject:p[@"id"]]; }
     if(!String(c[@"defaultPreset"],1,200) || ![ids containsObject:c[@"defaultPreset"]]) return Fail(error,@"默认预设无效");
     NSDictionary *conversations=c[@"conversations"]; if(![conversations isKindOfClass:NSDictionary.class] || conversations.count>1000) return Fail(error,@"会话配置无效");
-    for(id key in conversations) { id item=conversations[key]; if(!String(key,1,512) || ![item isKindOfClass:NSDictionary.class] || !OnlyKeys(item,@[@"enabled",@"presetID",@"replyWithoutMention"]) || !IsBoolean(item[@"enabled"]) || !String(item[@"presetID"],0,200) || ([item[@"presetID"] length] && ![ids containsObject:item[@"presetID"]]) || (item[@"replyWithoutMention"] && !IsBoolean(item[@"replyWithoutMention"])) || ([item[@"replyWithoutMention"] boolValue] && ![key hasSuffix:@"@chatroom"])) return Fail(error,@"会话预设无效"); }
+    for(id key in conversations) { id item=conversations[key]; if(!String(key,1,512) || ![item isKindOfClass:NSDictionary.class] || !OnlyKeys(item,@[@"enabled",@"presetID"]) || !IsBoolean(item[@"enabled"]) || !String(item[@"presetID"],0,200) || ([item[@"presetID"] length] && ![ids containsObject:item[@"presetID"]])) return Fail(error,@"会话预设无效"); }
     return YES;
 }
 static BOOL ValidRecord(id record) {
-    if(![record isKindOfClass:NSDictionary.class] || !OnlyKeys(record,@[@"date",@"conversation",@"preset",@"result",@"detail",@"usage",@"model",@"mode"])) return NO;
-    if(record[@"usage"] && !CSAIReplyValidateUsage(record[@"usage"]))return NO;
-    if(record[@"model"] && !String(record[@"model"],0,200))return NO;
-    if(record[@"mode"] && ![@[@"chat",@"bailianResponses"] containsObject:record[@"mode"]])return NO;
+    if(![record isKindOfClass:NSDictionary.class] || !OnlyKeys(record,@[@"date",@"conversation",@"preset",@"result",@"detail"])) return NO;
     return [record[@"date"] isKindOfClass:NSDate.class] && String(record[@"conversation"],1,512) && String(record[@"preset"],0,200) && String(record[@"result"],1,100) && String(record[@"detail"],0,300);
 }
 BOOL CSAIReplyValidateState(id state, NSString *account, NSError **error) {
@@ -80,7 +57,7 @@ BOOL CSAIReplyValidateState(id state, NSString *account, NSError **error) {
 }
 NSDictionary *CSAIReplyPortableState(NSDictionary *state) {
     NSMutableDictionary *c=[NSMutableDictionary dictionary]; NSDictionary *source=state[@"configuration"]?:CSAIReplyDefaultConfiguration();
-    for(NSString *key in @[@"enabled",@"endpoint",@"model",@"presets",@"defaultPreset",@"conversations",@"mode",@"sessionCache"]) if(source[key]) c[key]=source[key];
+    for(NSString *key in @[@"enabled",@"endpoint",@"model",@"presets",@"defaultPreset",@"conversations"]) if(source[key]) c[key]=source[key];
     return @{@"schema":@1,@"account":state[@"account"]?:@"",@"configuration":c};
 }
 static NSDictionary *NewState(NSString *account) { return @{@"schema":@1,@"account":account,@"configuration":CSAIReplyDefaultConfiguration(),@"handled":@{},@"history":@[]}; }

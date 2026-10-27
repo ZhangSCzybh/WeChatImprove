@@ -77,7 +77,7 @@
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 54, 0, 0);
     [CSCloseFriendSettingsCell registerToTableView:self.tableView];
     self.keys=@[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"hideScheduledTasks",@"hideAIReply",@"silenceMessages",@"rejectVoice",@"rejectVideo",@"callReplyEnabled",@"callReplyText",@"hidePrivacyIcons",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"longPressUnlockEnabled",@"longPressUnlockDuration",@"unlockSeconds"];
-    self.labels=@[@"隐藏聊天会话",@"隐藏通讯录页",@"隐藏转发页面",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏友圈内容",@"隐藏互动痕迹",@"隐藏微信状态",@"隐藏个人资料",@"隐藏定时任务",@"隐藏自动回复",@"静默消息通知",@"拒接语音来电",@"拒接视频来电",@"挂断自动回复",@"挂断回复内容",@"隐藏可见图标",@"隐藏密友设置",@"隐藏插件入口",@"生物识别解锁",@"摇晃立即隐藏",@"首页长按解锁",@"长按触发时间",@"临时解锁时间"];
+    self.labels=@[@"隐藏聊天会话",@"隐藏通讯录页",@"隐藏转发页面",@"隐藏标签成员",@"隐藏搜索结果",@"隐藏友圈内容",@"隐藏互动痕迹",@"隐藏微信状态",@"隐藏个人资料",@"隐藏定时任务",@"隐藏 AI 自动回复",@"静默消息通知",@"拒接语音来电",@"拒接视频来电",@"挂断自动回复",@"挂断回复内容",@"隐藏可见图标",@"隐藏密友设置",@"隐藏插件入口",@"生物识别解锁",@"摇晃立即隐藏",@"首页长按解锁",@"长按触发时间",@"临时解锁时间"];
     [self configureOptionGroups];
     self.optionIcons = @{
         @"hideSessions": @"bubble.left.and.bubble.right.fill",

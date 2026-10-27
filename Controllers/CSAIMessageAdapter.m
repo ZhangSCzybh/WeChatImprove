@@ -21,9 +21,6 @@ static NSString *String(id object,NSString *name) {
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)name namespaceURI:(NSString *)uri qualifiedName:(NSString *)qualified {(void)parser;(void)uri;(void)qualified;if([name isEqual:@"atuserlist"])self.inList=NO;}
 @end
 NSDictionary *CSAIEventFromWrap(id wrap,NSString *account,NSString *session) {
-    return CSAIEventFromWrapWithGroupPolicy(wrap,account,session,NO);
-}
-NSDictionary *CSAIEventFromWrapWithGroupPolicy(id wrap,NSString *account,NSString *session,BOOL replyWithoutMention) {
     if(!NSThread.isMainThread || !account.length || !wrap || CSAIIsOwnedSend(wrap))return nil;
     @try {
         NSString *from=String(wrap,@"m_nsFromUsr"),*to=String(wrap,@"m_nsToUsr");
@@ -47,7 +44,7 @@ NSDictionary *CSAIEventFromWrapWithGroupPolicy(id wrap,NSString *account,NSStrin
         NSArray *mentions=[list componentsSeparatedByCharactersInSet:separators];
         BOOL atAll=CSMessageNativeUnsigned(wrap,@"m_nsAtAll") || [mentions containsObject:@"notify@all"];
         BOOL mentioned=[mentions containsObject:account];
-        if(group && !replyWithoutMention && (!mentioned || atAll))return nil;
+        if(group && (!mentioned || atAll))return nil;
         if(group){
             // WeChat's mention token terminates with U+2005. Do not strip arbitrary prose containing @.
             NSRegularExpression *mention=[NSRegularExpression regularExpressionWithPattern:@"@[^\\n\\u2005]+\\u2005" options:0 error:NULL];
