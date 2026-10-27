@@ -85,12 +85,6 @@ static id ChatSearchSection(NSArray *sections){
     if(![self current])return;UIViewController *controller=[self controller];
     if(controller.view.window)CSAIPresentPresetPicker(controller,self.conversation,self.account,self.epoch);
 }
-- (void)toggleWithoutMention:(id)sender {
-    if(![sender isKindOfClass:UISwitch.class] || ![self current]){[self refresh];return;}
-    NSError *error=nil;
-    if(![CSAIReplyManager.sharedManager setConversation:self.conversation replyWithoutMention:[sender isOn] account:self.account epoch:self.epoch error:&error])[self showError:error];
-    [self refresh];
-}
 - (void)refresh {
     if(!NSThread.isMainThread || self.refreshing || !self.page)return;
     self.refreshing=YES;
@@ -125,13 +119,10 @@ static id ChatSearchSection(NSArray *sections){
             if(group && enabled)toggle=Call(cellClass,@"switchCellForSel:target:leftImage:title:desc:on:",@[@":",@"@",@"@",@"@",@"@",@"B"],@[@"toggle:",self,NSNull.null,@"启用 AI 回复",[manager statusForConversation:self.conversation],@(enabled)]);
             if(!toggle)toggle=Call(cellClass,@"switchCellForSel:target:title:on:",@[@":",@"@",@"@",@"B"],@[@"toggle:",self,@"启用 AI 回复",@(enabled)]);
             id preset=Call(cellClass,@"normalCellForSel:target:title:rightValue:",@[@":",@"@",@"@",@"@"],@[@"choosePreset",self,@"回复预设",[manager presetNameForConversation:self.conversation]]);
-            id withoutMention=group?Call(cellClass,@"switchCellForSel:target:title:on:",@[@":",@"@",@"@",@"B"],@[@"toggleWithoutMention:",self,@"免 @ 回复",@([manager.store.configuration[@"conversations"][self.conversation][@"replyWithoutMention"] boolValue])]):nil;
-            if(canInsert && toggle && preset && (!group || withoutMention)){
+            if(canInsert && toggle && preset){
                 objc_setAssociatedObject(toggle,CellKey,self,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
                 objc_setAssociatedObject(preset,CellKey,self,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-                CSMessageNativeInvoke(section,@"addCell:",@[toggle]);
-                if(withoutMention){objc_setAssociatedObject(withoutMention,CellKey,self,OBJC_ASSOCIATION_RETAIN_NONATOMIC);CSMessageNativeInvoke(section,@"addCell:",@[withoutMention]);}
-                CSMessageNativeInvoke(section,@"addCell:",@[preset]);
+                CSMessageNativeInvoke(section,@"addCell:",@[toggle]);CSMessageNativeInvoke(section,@"addCell:",@[preset]);
                 if(!group){
                     if(CSMessageNativeSupports(section,@"setFooterTitle:",@"v",@[@"@"]))CSMessageNativeInvoke(section,@"setFooterTitle:",@[[manager statusForConversation:self.conversation]]);
                     objc_setAssociatedObject(section,SectionKey,self,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
