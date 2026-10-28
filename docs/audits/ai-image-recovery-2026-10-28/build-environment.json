@@ -1,0 +1,31 @@
+{
+  "workspace": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "buildRoot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-image-recovery-w9sno20e",
+  "branch": "main",
+  "baseCommit": "b134e15713cc15e7f7a2c9cf83b9dbfa3ec1357d",
+  "version": "2.1-4",
+  "commands": {
+    "rootless": [
+      "make",
+      "-j4",
+      "package",
+      "SCHEME=rootless",
+      "PACKAGE_VERSION=2.1-4",
+      "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-image-recovery-w9sno20e/rootless",
+      "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-image-recovery-w9sno20e/rootless-build",
+      "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-image-recovery-w9sno20e/packages",
+      "COLOR=0"
+    ],
+    "rootful": [
+      "make",
+      "-j4",
+      "package",
+      "SCHEME=rootful",
+      "PACKAGE_VERSION=2.1-4",
+      "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-image-recovery-w9sno20e/rootful",
+      "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-image-recovery-w9sno20e/rootful-build",
+      "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-image-recovery-w9sno20e/packages",
+      "COLOR=0"
+    ]
+  }
+}

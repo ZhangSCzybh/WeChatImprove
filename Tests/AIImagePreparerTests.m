@@ -115,6 +115,9 @@ static void ResetNative(void){CHECK(!context.targets.count);context.contacts.con
 
 static void TestEncoding(NSString *directory) {
     CSAIImagePreparer *preparer=[CSAIImagePreparer new];NSString *path=[directory stringByAppendingPathComponent:@"large.png"];
+    // Encoding rejection tests have no downloader; recovery is exercised below.
+    __block NSUInteger unavailableDownloads=0;
+    preparer.requestDownload=^id<CSAICancellable>(NSDictionary *event,BOOL (^valid)(void),void (^result)(id,NSError *)){(void)event;(void)valid;(void)result;unavailableDownloads++;return nil;};
     CHECK([ImageData(3200,1600,NO,NO) writeToFile:path atomically:YES]);CMessageWrap *wrap=Wrap(path);NSError *error=nil;
     NSString *url=Prepare(preparer,Event(wrap,^BOOL{return YES;}),&error);CHECK(url && !error);CheckEncoded(url,NO);CHECK(!context.targets.count && !context.messages.starts);
     path=[directory stringByAppendingPathComponent:@"transparent.png"];CHECK([ImageData(2048,2048,YES,YES) writeToFile:path atomically:YES]);wrap=Wrap(path);
@@ -136,8 +139,9 @@ static void TestEncoding(NSString *directory) {
     __block NSUInteger encodes=0;preparer.encoder=^NSString *(NSData *data,BOOL (^cancelled)(void),NSError **failure){(void)data;(void)cancelled;(void)failure;encodes++;return @"file:///must-never-leave-device.png";};
     preparer.reader=^NSData *(NSString *file,BOOL (^cancelled)(void)){(void)file;(void)cancelled;return tiny;};
     CHECK(!Prepare(preparer,Event(wrap,^BOOL{return YES;}),&error) && error && encodes==1);
+    NSUInteger downloadsBeforeLimit=unavailableDownloads;
     preparer.reader=^NSData *(NSString *file,BOOL (^cancelled)(void)){(void)file;(void)cancelled;return [NSMutableData dataWithLength:32*1024*1024+1];};
-    CHECK(!Prepare(preparer,Event(wrap,^BOOL{return YES;}),&error) && error.code==6 && encodes==1);
+    CHECK(!Prepare(preparer,Event(wrap,^BOOL{return YES;}),&error) && error.code==6 && encodes==1 && unavailableDownloads==downloadsBeforeLimit);
     // The default reader refuses links and directories before opening image data.
     preparer=[CSAIImagePreparer new];preparer.requestDownload=^id<CSAICancellable>(NSDictionary *event,BOOL (^valid)(void),void (^result)(id,NSError *)){(void)event;(void)valid;(void)result;return nil;};
     NSString *link=[directory stringByAppendingPathComponent:@"linked.png"];CHECK([NSFileManager.defaultManager createSymbolicLinkAtPath:link withDestinationPath:path error:NULL]);
@@ -185,6 +189,33 @@ static void TestNativeDownload(NSString *directory) {
         CHECK(Wait(^BOOL{return !context.targets.count;}));Drain();CHECK(!callbacks && [[preparer valueForKey:@"operations"] count]==0);context.unregisterAction=nil;token=nil;
     }
     ResetNative();
+}
+static void TestIncompleteLocalImageRecovery(NSString *directory) {
+    ResetNative();CSAIImagePreparer *preparer=[CSAIImagePreparer new];
+    NSString *path=[directory stringByAppendingPathComponent:@"incomplete-local.png"];
+    NSData *complete=ImageData(64,48,NO,NO),*partial=[complete subdataWithRange:NSMakeRange(0,complete.length/2)];
+    CHECK([partial writeToFile:path atomically:YES]);CMessageWrap *wrap=Wrap(path);
+    __block NSUInteger callbacks=0;__block NSString *url=nil;__block NSError *failure=nil;
+    NSUInteger starts=context.messages.starts;
+    [preparer prepareImageForEvent:Event(wrap,^BOOL{return YES;}) completion:^(NSString *result,NSError *error){callbacks++;url=result;failure=error;}];
+    CHECK(Wait(^BOOL{return context.messages.starts==starts+1;}));CHECK(!callbacks && context.targets.count==1);
+    id<IDownloadImageExt> target=context.targets.anyObject;CMessageWrap *other=Wrap(path);other.m_n64MesSvrID=457;
+    [target OnDownloadImageOk:other];Drain();CHECK(!callbacks && context.messages.starts==starts+1);
+    CHECK([complete writeToFile:path atomically:YES]);[target OnDownloadImageOk:wrap];
+    CHECK(Wait(^BOOL{return callbacks==1;}));CHECK(url && !failure && !context.targets.count && context.messages.starts==starts+1);CheckEncoded(url,NO);
+    // A downloader that still leaves incomplete bytes must fail once, not loop.
+    CHECK([partial writeToFile:path atomically:YES]);starts=context.messages.starts;callbacks=0;url=nil;failure=nil;
+    [preparer prepareImageForEvent:Event(wrap,^BOOL{return YES;}) completion:^(NSString *result,NSError *error){callbacks++;url=result;failure=error;}];
+    CHECK(Wait(^BOOL{return context.messages.starts==starts+1;}));target=context.targets.anyObject;[target OnDownloadImageOk:wrap];
+    CHECK(Wait(^BOOL{return callbacks==1;}));CHECK(!url && [failure.domain isEqual:@"CSAIImagePreparation"] && failure.code==7);
+    [target OnDownloadImageOk:wrap];Drain();CHECK(callbacks==1 && context.messages.starts==starts+1 && !context.targets.count);
+    // Cancelling the bounded recovery detaches only our listener and sends nothing.
+    starts=context.messages.starts;callbacks=0;
+    id<CSAICancellable> token=[preparer prepareImageForEvent:Event(wrap,^BOOL{return YES;}) completion:^(NSString *result,NSError *error){(void)result;(void)error;callbacks++;}];
+    CHECK(Wait(^BOOL{return context.messages.starts==starts+1;}));target=context.targets.anyObject;[token cancel];
+    CHECK([complete writeToFile:path atomically:YES]);[target OnDownloadImageOk:wrap];Drain();CHECK(!callbacks && !context.targets.count && context.messages.starts==starts+1);
+    // A later complete local file takes the fast path without another download.
+    url=Prepare(preparer,Event(wrap,^BOOL{return YES;}),&failure);CHECK(url && !failure && context.messages.starts==starts+1);
 }
 static void TestTimeoutAndCancellation(NSString *directory) {
     CSAIImagePreparer *preparer=[CSAIImagePreparer new];CMessageWrap *wrap=Wrap(@"/missing-ai-image-fixture");preparer.downloadTimeout=.03;
@@ -247,6 +278,6 @@ static void TestSourceFailureAndGetterCancellation(NSString *directory) {
 int main(int argc,const char **argv){@autoreleasepool {
     CHECK(argc==2);NSString *directory=[NSString stringWithUTF8String:argv[1]];
     context=[MMContext new];context.targets=[NSMutableSet set];context.messages=[CMessageMgr new];context.contacts=[CContactMgr new];context.contacts.contact=[TestContact new];context.contacts.contact.m_nsUsrName=@"self";
-    TestEncoding(directory);TestNativeDownload(directory);TestTimeoutAndCancellation(directory);TestSourceFailureAndGetterCancellation(directory);CHECK(nativeReads>0 && !context.targets.count);
+    TestEncoding(directory);TestNativeDownload(directory);TestIncompleteLocalImageRecovery(directory);TestTimeoutAndCancellation(directory);TestSourceFailureAndGetterCancellation(directory);CHECK(nativeReads>0 && !context.targets.count);
     printf("AI image preparation: %lu checks passed; bounded ImageIO encoding, native download identity, cancellation and account reentry verified\n",(unsigned long)checks);
 }return 0;}

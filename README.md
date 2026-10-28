@@ -47,6 +47,8 @@
 
 默认入口名称为“再也不会”。在 **入口设置** 中可以修改名称，并选择显示在“我”、微信设置页或已有的插件管理入口；插件管理入口需要宿主环境提供 `WCPluginsMgr`。
 
+`2.1-4` 图片恢复修复候选：针对未点大图时本地图片文件不完整的失败分支，补充一次微信原生下载和可区分阶段的失败说明。独立 [Rootless 修复包](packages/2.1-4-image-recovery/com.wechat.improve_2.1-4_iphoneos-arm64.deb)、[Rootful 修复包](packages/2.1-4-image-recovery/com.wechat.improve_2.1-4_iphoneos-arm.deb) 与 [SHA-256](packages/2.1-4-image-recovery/SHA256SUMS.txt) 已生成；版本号保持 `2.1-4`，原发布包未替换。六条核心回归及双方案完整构建通过，具体问题是否消失仍需使用新消息真机验证，见 [修复记录](docs/audits/ai-image-recovery-2026-10-28/README.md)。
+
 仓库未提供可直接安装的 IPA、现成的重签名流程或 `install.sh`。
 
 ## 使用说明

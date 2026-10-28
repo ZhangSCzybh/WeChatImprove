@@ -341,7 +341,10 @@ static BOOL CSAIImageLease(NSDictionary *event,NSString *(^currentAccount)(void)
             typeof(self) self=weakSelf;if(!self || self.finished)return;self.reading=NO;
             if(![self valid]){[self finishURL:nil error:CSAIImageError(2)];return;}
             if(url.length)[self finishURL:url error:nil];
-            else if(!found && !self.requestedDownload)[self startDownload];
+            // A nonempty native file may still be a partial download. Recover
+            // once through WeChat's downloader, then fail if it is still invalid.
+            // A known input-limit failure cannot benefit from another download.
+            else if(!self.requestedDownload && (!found || ![error.domain isEqual:@"CSAIImagePreparation"] || error.code!=6))[self startDownload];
             else [self finishURL:nil error:error?:CSAIImageError(7)];
         });
     }});

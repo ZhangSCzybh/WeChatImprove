@@ -5,6 +5,38 @@ static BOOL AIString(id value, NSUInteger minimum, NSUInteger maximum) {
     return [value isKindOfClass:NSString.class] && [value length]>=minimum && [value length]<=maximum;
 }
 static void AIRequireMain(void) { NSCAssert(NSThread.isMainThread,@"AI reply coordinator requires the main thread"); }
+static BOOL AIClientFailure(NSError *error) { return [error.domain isEqual:@"com.wechatimprove.ai-reply"]; }
+static NSString *AIFailureDetail(NSError *error, BOOL preparingImage) {
+    // Classify only known local domains/codes. Error descriptions may contain private input or credentials.
+    BOOL imageError=[error.domain isEqual:@"CSAIImagePreparation"];
+    if(preparingImage || imageError){
+        if(imageError)switch(error.code){
+            case 1:return @"图片处理任务暂不可用，未请求 AI";
+            case 2:return @"图片消息或当前会话已失效，未请求 AI";
+            case 3:return @"图片未就绪，无法启动下载，未请求 AI";
+            case 4:return @"图片下载失败，未请求 AI";
+            case 5:return @"图片下载超时，未请求 AI";
+            case 6:return @"图片大小超过处理限制，未请求 AI";
+            case 7:return @"图片不完整、格式不支持或无法解码，未请求 AI";
+        }
+        return @"图片准备失败，未请求 AI";
+    }
+    if(AIClientFailure(error))switch(error.code){
+        case 401:case 403:return @"连接认证失效，请重新测试";
+        case 429:return @"AI 请求过于频繁，请稍后再试";
+        case NSURLErrorTimedOut:return @"AI 请求超时";
+        case 20:return @"AI 响应格式无效";
+        case 21:return @"AI 响应超过处理限制";
+        case 22:return @"网络请求失败，请检查连接";
+        case 23:return @"AI 返回为空、不完整或超过长度限制";
+        case 24:return @"图文请求配置无效，请检查模型及能力设置";
+        case 25:return @"AI 服务返回错误，请稍后再试";
+        case 400:return @"AI 服务拒绝请求，请检查模型及能力设置";
+        default:if(error.code>=300 && error.code<400)return @"请求地址发生重定向，请检查接口地址";
+            if(error.code>=400 && error.code<600)return @"AI 服务请求失败，请稍后再试";
+    }
+    return @"生成失败、超时或回复无效";
+}
 // Keep the newest complete UTF-16 characters when a burst exceeds the context budget.
 static NSString *AITail(NSString *text, NSUInteger limit) {
     if(text.length<=limit)return text;
@@ -34,6 +66,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 @property(nonatomic) NSTimeInterval started;
 @property(nonatomic) NSUInteger generation;
 @property(nonatomic) NSUInteger phase;
+@property(nonatomic) BOOL preparingImage;
 @property(nonatomic,strong) id<CSAICancellable> task;
 @end
 @implementation CSAIReplyBatch
@@ -212,8 +245,8 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     NSString *reply=[text isKindOfClass:NSString.class]?[text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet]:nil;
     if(error || !reply.length || reply.length>4000){
         [self.active removeObjectForKey:batch.conversation];
-        BOOL authentication=error && (error.code==401 || error.code==403);
-        [self record:batch result:@"failed" detail:authentication?@"连接认证失效，请重新测试":@"生成失败、超时或回复无效"];
+        BOOL authentication=!batch.preparingImage && AIClientFailure(error) && (error.code==401 || error.code==403);
+        [self record:batch result:@"failed" detail:AIFailureDetail(error,batch.preparingImage)];
         if(authentication){
             NSMutableDictionary *configuration=[self.store.configuration mutableCopy];configuration[@"verifiedConnection"]=@"";[configuration removeObjectForKey:@"verifiedAt"];
             [self.store saveConfiguration:configuration error:NULL];[self configurationDidChange];
@@ -238,6 +271,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 }
 - (void)generateBatch:(CSAIReplyBatch *)batch imageURL:(NSString *)imageURL {
     if(![self isCurrent:batch]){[self cancelBatch:batch];[self clearContextsForConversation:batch.conversation];[self processPending];return;}
+    batch.preparingImage=NO;
     batch.phase++;NSUInteger phase=batch.phase;
     NSError *error=nil;NSString *key=[self.delegate credentialForCoordinator:self error:&error];
     if(!key.length || error || ![self isCurrent:batch]){
@@ -266,6 +300,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     batch.started=self.now();self.active[batch.conversation]=batch;
     if(![self isCurrent:batch]){[self cancelBatch:batch];return;}
     if(!batch.imageEvent){[self generateBatch:batch imageURL:nil];return;}
+    batch.preparingImage=YES;
     if(!self.imagePreparer){[self finishBatch:batch text:nil error:CSAIError(25,@"图片处理不可用")];return;}
     NSMutableDictionary *event=[batch.imageEvent mutableCopy];batch.imageEvent=nil;
     __weak typeof(self) weakSelf=self;__weak CSAIReplyBatch *weakBatch=batch;

@@ -1,0 +1,3 @@
+f4943c73f4f5161449dc0fbb3d8275b8013f19490c629e0577726a4541e76ffc  com.wechat.improve_2.1-4_iphoneos-arm64.deb
+0686b97db34458182f66831d58296508ffb5cfcb677b02d171311926a154c9e3  com.wechat.improve_2.1-4_iphoneos-arm.deb
+d2fbf2062e060a105961cdc2df492c450775812b3a323e84d620595a6f2625b6  com.wechat.improve_2.1-4_symbols.zip

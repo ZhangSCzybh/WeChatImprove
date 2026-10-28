@@ -309,6 +309,57 @@ static void ImagePreparationAndOwnership(void){
         CHECK(!f.coordinator.pendingCount && ![[f.coordinator valueForKey:@"stagedImages"] count] && ![f.store hasHandledMessageID:[event[@"identifiers"] firstObject]]);
     }
 }
+static void CheckFailureHistory(Fixture *f,NSString *detail){
+    CHECK(f.store.history.count==1 && [f.store.history.lastObject[@"result"] isEqual:@"failed"]);
+    CHECK([f.store.history.lastObject[@"detail"] isEqual:detail]);
+    CHECK(!f.coordinator.activeCount && !f.delegate.sends);
+    NSString *history=f.store.history.description;
+    for(NSString *privateValue in @[@"RAW ERROR",@"private input body",@"secret-key",@"/private/media.png"])
+        CHECK(![history containsString:privateValue]);
+}
+static NSError *PrivateFailure(NSString *domain,NSInteger code){
+    return [NSError errorWithDomain:domain code:code userInfo:@{NSLocalizedDescriptionKey:@"RAW ERROR private input body secret-key /private/media.png"}];
+}
+static void SafeFailureDetails(void){
+    // Image-stage errors stay distinct from model/network errors and never expose upstream text.
+    NSDictionary *imageDetails=@{@1:@"图片处理任务暂不可用，未请求 AI",@2:@"图片消息或当前会话已失效，未请求 AI",
+        @3:@"图片未就绪，无法启动下载，未请求 AI",@4:@"图片下载失败，未请求 AI",@5:@"图片下载超时，未请求 AI",
+        @6:@"图片大小超过处理限制，未请求 AI",@7:@"图片不完整、格式不支持或无法解码，未请求 AI",
+        @401:@"图片准备失败，未请求 AI",@403:@"图片准备失败，未请求 AI",@999:@"图片准备失败，未请求 AI"};
+    for(NSNumber *code in imageDetails){
+        Fixture *f=[Fixture new];FakeImages *images=EnableImages(f);
+        [f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",nil)];[f advance:2];
+        images.operations[0].completion(nil,PrivateFailure(@"CSAIImagePreparation",code.integerValue));
+        CheckFailureHistory(f,imageDetails[code]);CHECK(!f.client.operations.count && [f.store.configuration[@"verifiedConnection"] length]);
+    }
+    // A missing preparer, empty result or unexpected preparer error uses the same safe stage fallback.
+    for(NSUInteger mode=0;mode<4;mode++){
+        Fixture *f=[Fixture new];FakeImages *images=EnableImages(f);
+        [f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",nil)];if(!mode)f.coordinator.imagePreparer=nil;[f advance:2];
+        if(mode)images.operations[0].completion(mode==1?@"":nil,mode==3?PrivateFailure(@"com.wechatimprove.ai-reply",401):nil);
+        CheckFailureHistory(f,@"图片准备失败，未请求 AI");CHECK(!f.client.operations.count && [f.store.configuration[@"verifiedConnection"] length]);
+    }
+    NSDictionary *requestDetails=@{@20:@"AI 响应格式无效",@21:@"AI 响应超过处理限制",@22:@"网络请求失败，请检查连接",
+        @23:@"AI 返回为空、不完整或超过长度限制",@24:@"图文请求配置无效，请检查模型及能力设置",@25:@"AI 服务返回错误，请稍后再试",
+        @302:@"请求地址发生重定向，请检查接口地址",@400:@"AI 服务拒绝请求，请检查模型及能力设置",
+        @401:@"连接认证失效，请重新测试",@403:@"连接认证失效，请重新测试",@429:@"AI 请求过于频繁，请稍后再试",
+        @500:@"AI 服务请求失败，请稍后再试",@(NSURLErrorTimedOut):@"AI 请求超时",@999:@"生成失败、超时或回复无效"};
+    for(NSNumber *code in requestDetails){
+        Fixture *f=[Fixture new];Receive(f,@"c",@"c",nil);[f advance:2];
+        Complete(f,0,nil,PrivateFailure(@"com.wechatimprove.ai-reply",code.integerValue));CheckFailureHistory(f,requestDetails[code]);
+        CHECK(([f.store.configuration[@"verifiedConnection"] length]==0)==(code.integerValue==401 || code.integerValue==403));
+    }
+    // Matching numeric codes from an unrelated domain cannot revoke connection verification.
+    for(NSNumber *code in @[@401,@403,@429,@(NSURLErrorTimedOut)]){
+        Fixture *f=[Fixture new];Receive(f,@"c",@"c",nil);[f advance:2];
+        Complete(f,0,nil,PrivateFailure(@"unrelated.private.domain",code.integerValue));CheckFailureHistory(f,@"生成失败、超时或回复无效");
+        CHECK([f.store.configuration[@"verifiedConnection"] length]);
+    }
+    // Completing image preparation moves diagnostics to the model stage; it must not retain the image fallback.
+    Fixture *f=[Fixture new];FakeImages *images=EnableImages(f);[f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",nil)];[f advance:2];
+    images.operations[0].completion(@"data:image/jpeg;base64,AQ==",nil);CHECK(f.client.operations.count==1);
+    Complete(f,0,nil,PrivateFailure(@"com.wechatimprove.ai-reply",429));CheckFailureHistory(f,@"AI 请求过于频繁，请稍后再试");
+}
 static void GroupImagesAndBudgets(void){
     Fixture *f=[Fixture new];FakeImages *images=EnableImages(f);NSMutableDictionary *image=ImageEvent(f,@"room@chatroom",@"member",@"staged-image");image[@"mentioned"]=@NO;
     [f.coordinator receiveEvent:image];CHECK(!f.coordinator.pendingCount && !images.operations.count && ![f.store hasHandledMessageID:@"staged-image"]);
@@ -339,6 +390,6 @@ static void GroupImagesAndBudgets(void){
     CHECK(![f.store hasHandledMessageID:@"second-image"]);[f advance:2];CHECK(images.operations.count==1 && [images.events[0][@"identifiers"] containsObject:@"first-image"]);
 }
 int main(void){@autoreleasepool{
-    Filters();GroupUnmentioned();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();ImagePreparationAndOwnership();GroupImagesAndBudgets();OneShotProductionWakeup();
-    puts("AIReplyCoordinatorTests passed: filtering, per-group unmentioned opt-in, alias claims, debounce, serialization, context bounds, cancellation, boundary authorization, expiry, concurrency, errors and one-shot timers");
+    Filters();GroupUnmentioned();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();ImagePreparationAndOwnership();SafeFailureDetails();GroupImagesAndBudgets();OneShotProductionWakeup();
+    puts("AIReplyCoordinatorTests passed: filtering, per-group unmentioned opt-in, alias claims, debounce, serialization, context bounds, cancellation, boundary authorization, expiry, concurrency, safe image/model failure details and one-shot timers");
 }return 0;}
