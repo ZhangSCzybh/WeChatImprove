@@ -88,6 +88,59 @@ static CGImageRef CSAIImageScaled(CGImageRef image,size_t limit) CF_RETURNS_RETA
     CGContextSetInterpolationQuality(context,kCGInterpolationHigh);CGContextDrawImage(context,CGRectMake(0,0,width,height),image);
     CGImageRef resized=CGBitmapContextCreateImage(context);CGContextRelease(context);return resized;
 }
+// Walk container boundaries rather than searching payload bytes or requiring EOF:
+// native images can carry a trailer, while ImageIO may also decode truncated files.
+static BOOL CSAICompletePNG(NSData *data,BOOL (^cancelled)(void)) {
+    const uint8_t *bytes=data.bytes;NSUInteger length=data.length,offset=8;BOOL sawImageData=NO;
+    static const uint8_t signature[]={137,80,78,71,13,10,26,10};
+    if(length<sizeof(signature) || memcmp(bytes,signature,sizeof(signature)))return NO;
+    while(offset<length){
+        if(cancelled() || length-offset<12)return NO;
+        uint32_t count=((uint32_t)bytes[offset]<<24)|((uint32_t)bytes[offset+1]<<16)|((uint32_t)bytes[offset+2]<<8)|bytes[offset+3];
+        if(count>length-offset-12)return NO;
+        const uint8_t *type=bytes+offset+4;
+        BOOL header=!memcmp(type,"IHDR",4);
+        if(offset==8?(!header || count!=13):header)return NO;
+        if(!memcmp(type,"IDAT",4))sawImageData=YES;
+        if(!memcmp(type,"IEND",4)){
+            static const uint8_t crc[]={0xae,0x42,0x60,0x82};
+            return sawImageData && !count && !memcmp(bytes+offset+8,crc,sizeof(crc));
+        }
+        offset+=(NSUInteger)count+12;
+    }
+    return NO;
+}
+static BOOL CSAICompleteJPEG(NSData *data,BOOL (^cancelled)(void)) {
+    const uint8_t *bytes=data.bytes;NSUInteger length=data.length,offset=2;BOOL scan=NO,sawScan=NO;
+    if(length<4 || bytes[0]!=0xff || bytes[1]!=0xd8)return NO;
+    while(offset<length){
+        if(cancelled())return NO;
+        BOOL fromScan=scan;
+        if(scan){
+            // Scan bounded spans so cancellation also interrupts large entropy payloads.
+            while(offset<length){
+                NSUInteger span=MIN(length-offset,(NSUInteger)65536);
+                const uint8_t *marker=memchr(bytes+offset,0xff,span);
+                if(marker){offset=(NSUInteger)(marker-bytes);break;}
+                offset+=span;if(cancelled())return NO;
+            }
+        }
+        if(offset>=length || bytes[offset++]!=0xff)return NO;
+        while(offset<length && bytes[offset]==0xff){offset++;if(!(offset%65536) && cancelled())return NO;}
+        if(offset>=length)return NO;
+        uint8_t marker=bytes[offset++];
+        if(marker==0 || (marker>=0xd0 && marker<=0xd7)){if(fromScan)continue;return NO;}
+        if(marker==0x01)continue; // TEM has no length, including within an arithmetic-coded scan.
+        if(marker==0xd9)return sawScan;
+        if(marker<0xc0 || marker==0xd8 || length-offset<2)return NO;
+        NSUInteger segment=((NSUInteger)bytes[offset]<<8)|bytes[offset+1];
+        if(segment<2 || segment>length-offset)return NO;
+        offset+=segment; // Skip APP/COM payloads, including any embedded false EOI.
+        scan=marker==0xda || (fromScan && marker==0xdc); // DNL resumes its current scan.
+        if(marker==0xda)sawScan=YES;
+    }
+    return NO;
+}
 static NSString *CSAIEncodeImage(NSData *data,BOOL (^cancelled)(void),NSError **error) {
     if(cancelled())return nil;
     if(!data.length || data.length>CSAIImageInputLimit){if(error)*error=CSAIImageError(6);return nil;}
@@ -96,10 +149,10 @@ static NSString *CSAIEncodeImage(NSData *data,BOOL (^cancelled)(void),NSError **
     NSDictionary *properties=CFBridgingRelease(CGImageSourceCopyPropertiesAtIndex(source,0,NULL));
     double width=[properties[(__bridge NSString *)kCGImagePropertyPixelWidth] doubleValue],height=[properties[(__bridge NSString *)kCGImagePropertyPixelHeight] doubleValue];
     BOOL valid=isfinite(width) && isfinite(height) && width>0 && height>0 && width*height<=100000000 && CGImageSourceGetCount(source)==1 && CGImageSourceGetStatus(source)==kCGImageStatusComplete;
-    // ImageIO can decode a truncated PNG/JPEG before the file's terminal marker.
+    // Preserve structural completeness while accepting data following the real end marker.
     NSString *type=(__bridge NSString *)CGImageSourceGetType(source);const uint8_t *bytes=data.bytes;
-    if([type isEqual:@"public.png"]){static const uint8_t end[]={0,0,0,0,'I','E','N','D',0xae,0x42,0x60,0x82};valid=valid && data.length>=sizeof(end) && !memcmp(bytes+data.length-sizeof(end),end,sizeof(end));}
-    else if([type isEqual:@"public.jpeg"])valid=valid && data.length>=2 && bytes[data.length-2]==0xff && bytes[data.length-1]==0xd9;
+    if([type isEqual:@"public.png"])valid=valid && CSAICompletePNG(data,cancelled);
+    else if([type isEqual:@"public.jpeg"])valid=valid && CSAICompleteJPEG(data,cancelled);
     else if([type isEqual:@"com.compuserve.gif"])valid=valid && data.length && bytes[data.length-1]==0x3b;
     CGImageRef image=NULL;
     if(valid && !cancelled())image=CGImageSourceCreateThumbnailAtIndex(source,0,(__bridge CFDictionaryRef)@{(__bridge NSString *)kCGImageSourceCreateThumbnailFromImageAlways:@YES,(__bridge NSString *)kCGImageSourceCreateThumbnailWithTransform:@YES,(__bridge NSString *)kCGImageSourceThumbnailMaxPixelSize:@2048,(__bridge NSString *)kCGImageSourceShouldCacheImmediately:@YES});

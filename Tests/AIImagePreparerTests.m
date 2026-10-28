@@ -112,6 +112,59 @@ static NSString *Prepare(CSAIImagePreparer *preparer,NSDictionary *event,NSError
     [preparer prepareImageForEvent:event completion:^(NSString *result,NSError *problem){CHECK(NSThread.isMainThread);url=result;failure=problem;done=YES;}];CHECK(Wait(^BOOL{return done;}));if(error)*error=failure;return url;
 }
 static void ResetNative(void){CHECK(!context.targets.count);context.contacts.contact.m_nsUsrName=@"self";context.lookupAction=context.registerAction=context.unregisterAction=context.messages.startAction=nil;}
+static NSData *JPEGData(NSData *png,BOOL progressive) {
+    CGImageSourceRef source=CGImageSourceCreateWithData((__bridge CFDataRef)png,NULL);CHECK(source);
+    CGImageRef image=CGImageSourceCreateImageAtIndex(source,0,NULL);CFRelease(source);CHECK(image);
+    NSMutableData *bytes=[NSMutableData data];CGImageDestinationRef destination=CGImageDestinationCreateWithData((__bridge CFMutableDataRef)bytes,CFSTR("public.jpeg"),1,NULL);CHECK(destination);
+    NSDictionary *options=@{(__bridge NSString *)kCGImagePropertyJFIFDictionary:@{(__bridge NSString *)kCGImagePropertyJFIFIsProgressive:@(progressive)}};
+    CGImageDestinationAddImage(destination,image,(__bridge CFDictionaryRef)options);CHECK(CGImageDestinationFinalize(destination));CFRelease(destination);CGImageRelease(image);return bytes;
+}
+static void AppendPNGChunk(NSMutableData *bytes,const char *type,NSData *payload) {
+    uint32_t length=(uint32_t)payload.length;uint8_t header[]={(uint8_t)(length>>24),(uint8_t)(length>>16),(uint8_t)(length>>8),(uint8_t)length};
+    [bytes appendBytes:header length:4];NSUInteger start=bytes.length;[bytes appendBytes:type length:4];[bytes appendData:payload];
+    uint32_t crc=(uint32_t)crc32(0,(const uint8_t *)bytes.bytes+start,(uInt)(payload.length+4));uint8_t tail[]={(uint8_t)(crc>>24),(uint8_t)(crc>>16),(uint8_t)(crc>>8),(uint8_t)crc};[bytes appendBytes:tail length:4];
+}
+static void TestStructuralCompleteness(NSString *directory) {
+    CSAIImagePreparer *preparer=[CSAIImagePreparer new];__block NSUInteger downloads=0;
+    preparer.requestDownload=^id<CSAICancellable>(NSDictionary *event,BOOL (^valid)(void),void (^result)(id,NSError *)){(void)event;(void)valid;(void)result;downloads++;return nil;};
+    NSData *png=ImageData(128,96,NO,YES),*jpeg=JPEGData(png,NO),*progressive=JPEGData(png,YES);
+    const uint8_t stuffed[]={0xff,0};CHECK([jpeg rangeOfData:[NSData dataWithBytes:stuffed length:sizeof(stuffed)] options:0 range:NSMakeRange(0,jpeg.length)].location!=NSNotFound);
+    CGImageSourceRef progressiveSource=CGImageSourceCreateWithData((__bridge CFDataRef)progressive,NULL);CHECK(progressiveSource);
+    NSDictionary *properties=CFBridgingRelease(CGImageSourceCopyPropertiesAtIndex(progressiveSource,0,NULL));CFRelease(progressiveSource);
+    CHECK([properties[(__bridge NSString *)kCGImagePropertyJFIFDictionary][(__bridge NSString *)kCGImagePropertyJFIFIsProgressive] boolValue]);
+    // Metadata may itself contain terminal-looking bytes; only its enclosing boundary determines the end.
+    const uint8_t app[]={0xff,0xef,0,6,0xff,0xd9,0,0};NSMutableData *metadataJPEG=[NSMutableData dataWithBytes:jpeg.bytes length:2];
+    [metadataJPEG appendBytes:app length:sizeof(app)];[metadataJPEG appendBytes:(const uint8_t *)jpeg.bytes+2 length:jpeg.length-2];
+    NSMutableData *fillJPEG=[[jpeg subdataWithRange:NSMakeRange(0,jpeg.length-2)] mutableCopy];[fillJPEG appendBytes:(uint8_t[]){0xff,0xff,0xff,0xd9} length:4];
+    // Independent 16x8 grayscale JPEG: two constant MCUs, restart interval 1, RST0 between them.
+    NSData *restartJPEG=[[NSData alloc]initWithBase64EncodedString:@"/9j/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAALCAAIABABAREA/8QAJgABAAAAAAAAAAAAAAAAAAAAABABAAAAAAAAAAAAAAAAAAAAAP/dAAQAAf/aAAgBAQAAPwA//9A//9k=" options:0];CHECK(restartJPEG.length==146);
+    NSData *iend=[png subdataWithRange:NSMakeRange(png.length-12,12)];NSMutableData *metadataPNG=[[png subdataWithRange:NSMakeRange(0,png.length-12)] mutableCopy];
+    AppendPNGChunk(metadataPNG,"raNd",iend);[metadataPNG appendData:iend];
+    // Complete local images with arbitrary trailing bytes must encode without starting a native download.
+    const uint8_t trailer[]={0,1,2,3,0xff,0xd9,0,0,0,'I','E','N','D',0xae,0x42,0x60,0x82,0,4,5,6,7,8,9};
+    NSUInteger index=0;NSError *error=nil;
+    for(NSData *complete in @[png,jpeg,progressive,metadataJPEG,fillJPEG,restartJPEG,metadataPNG]){
+        for(NSNumber *withTrailer in @[@NO,@YES]){
+            NSMutableData *input=[complete mutableCopy];if(withTrailer.boolValue)[input appendBytes:trailer length:sizeof(trailer)];
+            NSString *path=[directory stringByAppendingPathComponent:[NSString stringWithFormat:@"complete-%lu.image",(unsigned long)index++]];CHECK([input writeToFile:path atomically:YES]);
+            NSString *url=Prepare(preparer,Event(Wrap(path),^BOOL{return YES;}),&error);CHECK(url && !error && !downloads);CheckEncoded(url,NO);
+        }
+    }
+    // Missing true terminal markers remain invalid even when one occurs inside metadata.
+    NSMutableArray<NSData *> *invalid=[NSMutableArray arrayWithArray:@[
+        [jpeg subdataWithRange:NSMakeRange(0,jpeg.length-2)],[png subdataWithRange:NSMakeRange(0,png.length-12)],
+        [metadataJPEG subdataWithRange:NSMakeRange(0,metadataJPEG.length-2)],[metadataPNG subdataWithRange:NSMakeRange(0,metadataPNG.length-12)]]];
+    // Declared segment/chunk lengths must not escape the available input, wrap, or stall the walk.
+    for(NSData *segment in @[[NSData dataWithBytes:(uint8_t[]){0xff,0xef,0xff,0xff} length:4],[NSData dataWithBytes:(uint8_t[]){0xff,0xfe,0,1} length:4]]){
+        NSMutableData *broken=[NSMutableData dataWithBytes:jpeg.bytes length:2];[broken appendData:segment];[broken appendBytes:(const uint8_t *)jpeg.bytes+2 length:jpeg.length-2];[invalid addObject:broken];
+    }
+    NSMutableData *brokenPNG=[NSMutableData dataWithBytes:png.bytes length:33];
+    [brokenPNG appendBytes:(uint8_t[]){0xff,0xff,0xff,0xff,'r','a','N','d'} length:8];[brokenPNG appendBytes:(const uint8_t *)png.bytes+33 length:png.length-33];[invalid addObject:brokenPNG];
+    brokenPNG=[[png subdataWithRange:NSMakeRange(0,png.length-12)] mutableCopy];AppendPNGChunk(brokenPNG,"IEND",[NSData dataWithBytes:(uint8_t[]){0} length:1]);[invalid addObject:brokenPNG];
+    brokenPNG=[png mutableCopy];((uint8_t *)brokenPNG.mutableBytes)[brokenPNG.length-1]^=1;[invalid addObject:brokenPNG];
+    for(NSData *input in invalid){error=nil;CHECK(!preparer.encoder(input,^BOOL{return NO;},&error));CHECK([error.domain isEqual:@"CSAIImagePreparation"] && error.code==7);}
+    CHECK(!downloads && !context.targets.count);
+}
 
 static void TestEncoding(NSString *directory) {
     CSAIImagePreparer *preparer=[CSAIImagePreparer new];NSString *path=[directory stringByAppendingPathComponent:@"large.png"];
@@ -278,6 +331,6 @@ static void TestSourceFailureAndGetterCancellation(NSString *directory) {
 int main(int argc,const char **argv){@autoreleasepool {
     CHECK(argc==2);NSString *directory=[NSString stringWithUTF8String:argv[1]];
     context=[MMContext new];context.targets=[NSMutableSet set];context.messages=[CMessageMgr new];context.contacts=[CContactMgr new];context.contacts.contact=[TestContact new];context.contacts.contact.m_nsUsrName=@"self";
-    TestEncoding(directory);TestNativeDownload(directory);TestIncompleteLocalImageRecovery(directory);TestTimeoutAndCancellation(directory);TestSourceFailureAndGetterCancellation(directory);CHECK(nativeReads>0 && !context.targets.count);
+    TestStructuralCompleteness(directory);TestEncoding(directory);TestNativeDownload(directory);TestIncompleteLocalImageRecovery(directory);TestTimeoutAndCancellation(directory);TestSourceFailureAndGetterCancellation(directory);CHECK(nativeReads>0 && !context.targets.count);
     printf("AI image preparation: %lu checks passed; bounded ImageIO encoding, native download identity, cancellation and account reentry verified\n",(unsigned long)checks);
 }return 0;}

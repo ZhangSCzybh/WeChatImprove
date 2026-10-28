@@ -1,0 +1,54 @@
+{
+  "baselineCommit": "bf0ee6d2d7dcf2c0702a5c907da7ea4d695abd22",
+  "scope": "Local production reader and encoder on a serial worker; no WeChat data or model requests; attachments not retained",
+  "jpegEndMarkerOffset": 391443,
+  "jpegTrailingBytes": 24,
+  "before": [
+    {
+      "sample": 1,
+      "inputBytes": 682007,
+      "type": "public.png",
+      "imageIOStatus": 0,
+      "imageIOIndexStatus": 0,
+      "thumbnailDecoded": 1,
+      "encodedBytes": 221030,
+      "errorCode": 0,
+      "encodingSeconds": 0.01695916661992669
+    },
+    {
+      "sample": 2,
+      "inputBytes": 391469,
+      "type": "public.jpeg",
+      "imageIOStatus": 0,
+      "imageIOIndexStatus": 0,
+      "thumbnailDecoded": 1,
+      "encodedBytes": 0,
+      "errorCode": 7,
+      "encodingSeconds": 0.00008962512947618961
+    }
+  ],
+  "after": [
+    {
+      "encodedBytes": 221030,
+      "encodingSeconds": 0.017409791704267263,
+      "errorCode": 0,
+      "imageIOIndexStatus": 0,
+      "imageIOStatus": 0,
+      "inputBytes": 682007,
+      "sample": 1,
+      "thumbnailDecoded": 1,
+      "type": "public.png"
+    },
+    {
+      "encodedBytes": 711285,
+      "encodingSeconds": 0.018382125068455935,
+      "errorCode": 0,
+      "imageIOIndexStatus": 0,
+      "imageIOStatus": 0,
+      "inputBytes": 391469,
+      "sample": 2,
+      "thumbnailDecoded": 1,
+      "type": "public.jpeg"
+    }
+  ]
+}

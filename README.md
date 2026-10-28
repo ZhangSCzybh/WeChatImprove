@@ -47,7 +47,7 @@
 
 默认入口名称为“再也不会”。在 **入口设置** 中可以修改名称，并选择显示在“我”、微信设置页或已有的插件管理入口；插件管理入口需要宿主环境提供 `WCPluginsMgr`。
 
-`2.1-4` 图片恢复修复候选：针对未点大图时本地图片文件不完整的失败分支，补充一次微信原生下载和可区分阶段的失败说明。独立 [Rootless 修复包](packages/2.1-4-image-recovery/com.wechat.improve_2.1-4_iphoneos-arm64.deb)、[Rootful 修复包](packages/2.1-4-image-recovery/com.wechat.improve_2.1-4_iphoneos-arm.deb) 与 [SHA-256](packages/2.1-4-image-recovery/SHA256SUMS.txt) 已生成；版本号保持 `2.1-4`，原发布包未替换。六条核心回归及双方案完整构建通过，具体问题是否消失仍需使用新消息真机验证，见 [修复记录](docs/audits/ai-image-recovery-2026-10-28/README.md)。
+`2.1-4` 最新图片修复候选：修复完整 JPEG/PNG 在结束标记后带附加数据时被误判为无法解码的问题，保留上次一次微信下载恢复及具体失败提示。请使用独立 [Rootless 修复包](packages/2.1-4-image-format-fix/com.wechat.improve_2.1-4_iphoneos-arm64.deb)、[Rootful 修复包](packages/2.1-4-image-format-fix/com.wechat.improve_2.1-4_iphoneos-arm.deb) 与 [SHA-256](packages/2.1-4-image-format-fix/SHA256SUMS.txt)；版本号保持 `2.1-4`，此前包保留。本次已用实际 JPEG 复现错误码 7 并验证修复，图片 326 项、ASan/UBSan 和自动回复核心回归、双方案完整构建通过，仍需使用新消息真机验收，见 [本次修复记录](docs/audits/ai-image-container-2026-10-28/README.md) 和 [上次下载恢复记录](docs/audits/ai-image-recovery-2026-10-28/README.md)。
 
 仓库未提供可直接安装的 IPA、现成的重签名流程或 `install.sh`。
 
