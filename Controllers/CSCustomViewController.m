@@ -1229,7 +1229,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
             CSVoiceForwardSettingsViewController *voiceForwardVC = [[CSVoiceForwardSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
             [self.navigationController pushViewController:voiceForwardVC animated:YES];
         }
-        else if ([item.title isEqualToString:@"AI 自动回复"]) {
+        else if ([item.title isEqualToString:@"人工智能"]) {
             [self.navigationController pushViewController:[[CSAIReplySettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped] animated:YES];
         }
         else if ([item.title isEqualToString:@"定时任务"]) {
