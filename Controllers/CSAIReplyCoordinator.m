@@ -27,11 +27,13 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 @property(nonatomic,copy) NSDictionary *configuration;
 @property(nonatomic,copy) NSDictionary *preset;
 @property(nonatomic,copy) NSString *text;
+@property(nonatomic,copy) NSDictionary *imageEvent;
 @property(nonatomic,copy) NSArray<NSDictionary *> *messages;
 @property(nonatomic) NSTimeInterval due;
 @property(nonatomic) NSTimeInterval expires;
 @property(nonatomic) NSTimeInterval started;
 @property(nonatomic) NSUInteger generation;
+@property(nonatomic) NSUInteger phase;
 @property(nonatomic,strong) id<CSAICancellable> task;
 @end
 @implementation CSAIReplyBatch
@@ -43,6 +45,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 @property(nonatomic,strong) NSMutableArray<CSAIReplyBatch *> *pending;
 @property(nonatomic,strong) NSMutableDictionary<NSString *,CSAIReplyBatch *> *active;
 @property(nonatomic,strong) NSMutableDictionary<NSArray<NSString *> *,NSArray<NSDictionary *> *> *contexts;
+@property(nonatomic,strong) NSMutableDictionary<NSArray<NSString *> *,NSDictionary *> *stagedImages;
 @property(nonatomic,copy) NSDictionary *configuration;
 @property(nonatomic,strong) NSTimer *timer;
 @property(nonatomic) NSUInteger generation;
@@ -54,7 +57,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     AIRequireMain();
     if((self=[super init])) {
         _store=store;_client=client;_now=^{return NSDate.date.timeIntervalSince1970;};
-        _pending=[NSMutableArray array];_active=[NSMutableDictionary dictionary];_contexts=[NSMutableDictionary dictionary];
+        _pending=[NSMutableArray array];_active=[NSMutableDictionary dictionary];_contexts=[NSMutableDictionary dictionary];_stagedImages=[NSMutableDictionary dictionary];
         _configuration=store.configuration;_admissionBoundary=_now();
     }
     return self;
@@ -99,7 +102,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 }
 - (void)cancelAll {
     AIRequireMain();self.generation++;[self.timer invalidate];self.timer=nil;
-    NSArray *active=self.active.allValues;[self.active removeAllObjects];[self.pending removeAllObjects];[self.contexts removeAllObjects];
+    NSArray *active=self.active.allValues;[self.active removeAllObjects];[self.pending removeAllObjects];[self.contexts removeAllObjects];[self.stagedImages removeAllObjects];
     self.admissionBoundary=self.now();
     for(CSAIReplyBatch *batch in active){id<CSAICancellable> task=batch.task;batch.task=nil;[task cancel];}
 }
@@ -111,16 +114,25 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     if(![self.configuration isEqual:self.store.configuration])[self configurationDidChange];
     if(![event isKindOfClass:NSDictionary.class])return;
     NSString *conversation=event[@"conversation"],*sender=event[@"sender"],*text=event[@"text"];
+    BOOL image=[event[@"type"] isEqual:@3];
     if(![event[@"account"] isEqual:self.store.account] || !AIString(conversation,1,512) || !AIString(sender,1,512) ||
-       [sender isEqual:self.store.account] || [conversation isEqual:self.store.account] || !AIString(text,1,12000) ||
-       ![event[@"type"] isEqual:@1] || ![event[@"live"] isEqual:@YES])return;
+       [sender isEqual:self.store.account] || [conversation isEqual:self.store.account] ||
+       (!image && (!AIString(text,1,12000) || ![event[@"type"] isEqual:@1])) ||
+       (image && (![self.configuration[@"imageEnabled"] boolValue] || !self.imagePreparer || !event[@"imageSource"])) || ![event[@"live"] isEqual:@YES])return;
     if(![event[@"group"] isEqual:@NO] && ![event[@"group"] isEqual:@YES])return;
-    if([event[@"group"] boolValue] && (![event[@"mentioned"] isEqual:@YES] || ![event[@"atAll"] isEqual:@NO]))return;
+    BOOL stageImage=NO;
+    if([event[@"group"] boolValue]){
+        BOOL allowUnmentioned=[conversation hasSuffix:@"@chatroom"] && [self.configuration[@"conversations"][conversation][@"allowUnmentioned"] boolValue];
+        if(![event[@"atAll"] isEqual:@NO])return;
+        if(!allowUnmentioned && ![event[@"mentioned"] isEqual:@YES]){if(image)stageImage=YES;else return;}
+    }
     if(![event[@"created"] isKindOfClass:NSNumber.class])return;
     NSTimeInterval now=self.now(),created=[event[@"created"] doubleValue];
     if(!isfinite(now) || !isfinite(created) || created<self.admissionBoundary || created<now-120 || created>now+30)return;
-    text=[text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];if(!text.length)return;
-    if(![self allowsConversation:conversation configuration:self.configuration])return;
+    text=image?@"":[text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];if(!image && !text.length)return;
+    NSUInteger admissionGeneration=self.generation;NSDictionary *admissionConfiguration=self.configuration;
+    if(![self allowsConversation:conversation configuration:admissionConfiguration] || admissionGeneration!=self.generation ||
+       !self.store.ready || ![admissionConfiguration isEqual:self.configuration] || ![admissionConfiguration isEqual:self.store.configuration])return;
     NSDictionary *preset=[self presetForConversation:conversation configuration:self.configuration];if(!preset)return;
     NSArray *identifiers=event[@"identifiers"];
     if(![identifiers isKindOfClass:NSArray.class] || !identifiers.count || identifiers.count>10)return;
@@ -136,16 +148,60 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
         if(newAliases.count && ![self.store claimMessageIDs:newAliases error:NULL])[self cancelAll];
         return;
     }
-    NSArray *key=@[conversation,sender];CSAIReplyBatch *batch=nil;
+    NSArray *key=@[conversation,sender];
+    if(stageImage){
+        // Keep only bounded metadata until this same sender explicitly mentions us.
+        // No file read, download, upload or durable claim happens for an untriggered image.
+        NSDictionary *previous=self.stagedImages[key];
+        NSMutableDictionary *reference=[event mutableCopy];NSTimeInterval expiry=MIN(now+30,created+30);
+        NSArray *previousIDs=previous[@"event"][@"identifiers"];
+        NSMutableArray *superseded=[previous[@"supersededIDs"] mutableCopy]?:[NSMutableArray array];
+        BOOL sameImage=previous && previous[@"event"][@"imageSource"]==event[@"imageSource"];
+        for(NSString *identifier in identifiers)if([previousIDs containsObject:identifier])sameImage=YES;
+        BOOL supersededImage=NO;
+        for(NSString *identifier in identifiers)if([superseded containsObject:identifier])supersededImage=YES;
+        if(!sameImage && supersededImage){
+            // Remember evolving aliases even when native message timestamps share the same second.
+            for(NSString *identifier in identifiers)if(superseded.count<100 && ![superseded containsObject:identifier])[superseded addObject:identifier];
+            NSMutableDictionary *updated=[previous mutableCopy];updated[@"supersededIDs"]=superseded;self.stagedImages[key]=updated;return;
+        }
+        if(previous && !sameImage && created<[previous[@"event"][@"created"] doubleValue])return;
+        if(sameImage){
+            // Local/server aliases evolve across callbacks; retain their union and original deadline.
+            NSMutableArray *aliases=[previousIDs mutableCopy];
+            for(NSString *identifier in identifiers)if(![aliases containsObject:identifier])[aliases addObject:identifier];
+            if(aliases.count>10){[self.stagedImages removeObjectForKey:key];[self scheduleWakeup];return;}
+            reference[@"identifiers"]=aliases;expiry=MIN(expiry,[previous[@"expires"] doubleValue]);
+        }else if(previous){
+            // Keep a bounded identity-only history; high-volume bursts keep the current reference until expiry.
+            if(superseded.count+previousIDs.count>100)return;
+            for(NSString *identifier in previousIDs)if(![superseded containsObject:identifier])[superseded addObject:identifier];
+        }
+        if(expiry>now && (self.stagedImages.count<10 || previous))self.stagedImages[key]=@{@"event":reference,@"expires":@(expiry),@"supersededIDs":superseded};
+        [self scheduleWakeup];return;
+    }
+    CSAIReplyBatch *batch=nil;
     for(CSAIReplyBatch *candidate in self.pending)if([candidate.contextKey isEqual:key] && now<candidate.expires){batch=candidate;break;}
     if(!batch && self.pending.count>=20)return;
+    if(image && batch.imageEvent)return; // One image per request bounds memory and upload cost.
+    NSDictionary *attachedImage=image?event:nil;
+    NSDictionary *staged=self.stagedImages[key];
+    if(!image && !batch.imageEvent && [self.configuration[@"imageEnabled"] boolValue] && staged && now<[staged[@"expires"] doubleValue]){
+        NSDictionary *candidate=staged[@"event"];BOOL handled=NO;
+        for(NSString *identifier in candidate[@"identifiers"])if([self.store hasHandledMessageID:identifier]){handled=YES;break;}
+        if(!handled)attachedImage=candidate;
+    }
+    [self.stagedImages removeObjectForKey:key];
+    NSMutableArray *claims=[identifiers mutableCopy];
+    if(attachedImage && !image)for(NSString *identifier in attachedImage[@"identifiers"])if(![claims containsObject:identifier])[claims addObject:identifier];
     // Claim every server/local alias durably before retaining text or starting any model work.
-    if(![self.store claimMessageIDs:identifiers error:NULL]){[self cancelAll];return;}
+    if(![self.store claimMessageIDs:claims error:NULL]){[self cancelAll];return;}
     if(!batch){
         batch=[CSAIReplyBatch new];batch.conversation=conversation;batch.contextKey=key;batch.configuration=self.configuration;
         batch.preset=preset;batch.generation=self.generation;batch.expires=now+120;batch.text=@"";[self.pending addObject:batch];
     }
-    batch.text=AITail(batch.text.length?[NSString stringWithFormat:@"%@\n%@",batch.text,text]:text,12000);
+    if(attachedImage)batch.imageEvent=[attachedImage copy];
+    if(text.length)batch.text=AITail(batch.text.length?[NSString stringWithFormat:@"%@\n%@",batch.text,text]:text,12000);
     batch.due=now+2;[self processPending];
 }
 - (void)finishBatch:(CSAIReplyBatch *)batch text:(NSString *)text error:(NSError *)error {
@@ -180,29 +236,59 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     }else [self record:batch result:@"failed" detail:@"未通过最终发送校验或提交失败"];
     [self processPending];
 }
-- (void)startBatch:(CSAIReplyBatch *)batch {
-    [self.pending removeObjectIdenticalTo:batch];
-    // Own the slot before credential lookup, so even reentrant configuration/account cancellation can revoke it.
-    batch.started=self.now();self.active[batch.conversation]=batch;
+- (void)generateBatch:(CSAIReplyBatch *)batch imageURL:(NSString *)imageURL {
+    if(![self isCurrent:batch]){[self cancelBatch:batch];[self clearContextsForConversation:batch.conversation];[self processPending];return;}
+    batch.phase++;NSUInteger phase=batch.phase;
     NSError *error=nil;NSString *key=[self.delegate credentialForCoordinator:self error:&error];
     if(!key.length || error || ![self isCurrent:batch]){
-        if(self.active[batch.conversation]==batch){[self.active removeObjectForKey:batch.conversation];[self record:batch result:@"failed" detail:@"凭据或当前会话状态不可用"];}return;
+        if(self.active[batch.conversation]==batch){[self cancelBatch:batch];[self record:batch result:@"failed" detail:@"凭据或当前会话状态不可用"];}
+        [self processPending];return;
     }
     NSMutableArray *messages=[self.contexts[batch.contextKey] mutableCopy]?:[NSMutableArray array];
-    [messages addObject:@{@"role":@"user",@"content":batch.text}];batch.messages=AIBoundedMessages(messages);
+    NSString *input=batch.text.length?batch.text:@"请识别这张图片，并简洁回答。";
+    [messages addObject:@{@"role":@"user",@"content":input}];batch.messages=AIBoundedMessages(messages);
     NSMutableArray *request=[NSMutableArray arrayWithObject:@{@"role":@"system",@"content":batch.preset[@"prompt"]}];[request addObjectsFromArray:batch.messages];
+    if(imageURL.length){
+        // Only this request owns the encoded image. Text contexts never retain or resend it.
+        request[request.count-1]=@{@"role":@"user",@"content":@[@{@"type":@"image_url",@"image_url":@{@"url":imageURL}},@{@"type":@"text",@"text":input}]};
+    }
     __weak typeof(self) weakSelf=self;
     id<CSAICancellable> task=[self.client generateWithConfiguration:batch.configuration apiKey:key messages:request completion:^(NSString *text,NSError *failure){
         if(NSThread.isMainThread)[weakSelf finishBatch:batch text:text error:failure];
         else dispatch_async(dispatch_get_main_queue(),^{[weakSelf finishBatch:batch text:text error:failure];});
     }];
     // A fake or preflight failure may complete inline; never attach that old task to a replacement.
-    if(self.active[batch.conversation]==batch)batch.task=task;else [task cancel];
+    if(self.active[batch.conversation]==batch && batch.phase==phase)batch.task=task;else [task cancel];
+}
+- (void)startBatch:(CSAIReplyBatch *)batch {
+    [self.pending removeObjectIdenticalTo:batch];
+    // Preparation and generation share the same slot, deadline and cancellation owner.
+    batch.started=self.now();self.active[batch.conversation]=batch;
+    if(![self isCurrent:batch]){[self cancelBatch:batch];return;}
+    if(!batch.imageEvent){[self generateBatch:batch imageURL:nil];return;}
+    if(!self.imagePreparer){[self finishBatch:batch text:nil error:CSAIError(25,@"图片处理不可用")];return;}
+    NSMutableDictionary *event=[batch.imageEvent mutableCopy];batch.imageEvent=nil;
+    __weak typeof(self) weakSelf=self;__weak CSAIReplyBatch *weakBatch=batch;
+    event[@"imageStillValid"]=[^BOOL{typeof(self) self=weakSelf;CSAIReplyBatch *live=weakBatch;return self && live && [self isCurrent:live];} copy];
+    batch.phase++;NSUInteger phase=batch.phase;
+    id<CSAICancellable> task=[self.imagePreparer prepareImageForEvent:event completion:^(NSString *dataURL,NSError *error){
+        void (^complete)(void)=^{
+            typeof(self) self=weakSelf;CSAIReplyBatch *live=weakBatch;
+            if(!self || !live || self.active[live.conversation]!=live || live.phase!=phase)return;
+            live.task=nil;
+            if(![self isCurrent:live]){[self cancelBatch:live];[self processPending];return;}
+            if(error || !dataURL.length){[self finishBatch:live text:nil error:error?:CSAIError(25,@"图片未就绪")];return;}
+            [self generateBatch:live imageURL:dataURL];
+        };
+        if(NSThread.isMainThread)complete();else dispatch_async(dispatch_get_main_queue(),complete);
+    }];
+    if(self.active[batch.conversation]==batch && batch.phase==phase)batch.task=task;else [task cancel];
 }
 - (void)scheduleWakeup {
     [self.timer invalidate];self.timer=nil;
     NSTimeInterval now=self.now(),next=INFINITY;
     for(CSAIReplyBatch *batch in self.active.allValues)next=MIN(next,MIN(batch.expires,batch.started+60));
+    for(NSDictionary *staged in self.stagedImages.allValues)next=MIN(next,[staged[@"expires"] doubleValue]);
     for(CSAIReplyBatch *batch in self.pending){
         next=MIN(next,batch.expires);
         if(self.active.count<2 && !self.active[batch.conversation])next=MIN(next,batch.due);
@@ -218,6 +304,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     if(![self.configuration isEqual:self.store.configuration])[self configurationDidChange];
     NSTimeInterval now=self.now();
     if(!isfinite(now)){[self cancelAll];self.processing=NO;return;}
+    for(NSArray *key in self.stagedImages.allKeys)if(now>=[self.stagedImages[key][@"expires"] doubleValue])[self.stagedImages removeObjectForKey:key];
     for(CSAIReplyBatch *batch in self.active.allValues){
         if(![self isCurrent:batch]){
             BOOL expired=now>=batch.expires || now>=batch.started+60;

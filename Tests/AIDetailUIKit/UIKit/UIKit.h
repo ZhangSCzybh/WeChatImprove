@@ -1,4 +1,9 @@
 #import <Foundation/Foundation.h>
+typedef NS_ENUM(NSInteger,UIApplicationState){UIApplicationStateActive,UIApplicationStateInactive,UIApplicationStateBackground};
+@interface UIApplication : NSObject
++ (instancetype)sharedApplication;
+@property(nonatomic) UIApplicationState applicationState;
+@end
 @interface UIView : NSObject
 @property(nonatomic,strong) id window;
 @end
@@ -25,5 +30,7 @@ typedef NS_ENUM(NSInteger,UIAlertActionStyle){UIAlertActionStyleCancel};
 - (void)addAction:(UIAlertAction *)action;
 @end
 FOUNDATION_EXPORT NSNotificationName const UIApplicationDidBecomeActiveNotification;
+FOUNDATION_EXPORT NSNotificationName const UIApplicationDidEnterBackgroundNotification;
+FOUNDATION_EXPORT NSNotificationName const UIApplicationWillEnterForegroundNotification;
 FOUNDATION_EXPORT NSNotificationName const UIApplicationSignificantTimeChangeNotification;
 FOUNDATION_EXPORT NSNotificationName const UIApplicationProtectedDataDidBecomeAvailable;

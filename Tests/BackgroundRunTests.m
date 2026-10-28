@@ -50,11 +50,14 @@ int main(int argc,const char **argv) { @autoreleasepool {
     manager=[[CSBackgroundRunManager alloc] initWithDefaults:defaults audio:audio supportsBackgroundAudio:YES];
     [manager start]; [manager start];
     CHECK(!audio.playing && !CSTestPlayerCreates && !session.configurations);
+    CHECK(!manager.backgroundAudioActive);
     Background(); CHECK(audio.playing && session.active && audio.sessionOwned && !audio.hostBusy);
+    CHECK(manager.backgroundAudioActive);
     CHECK(CSTestPlayersAlive==1 && CSTestPlayerCreates==1);
     for (NSUInteger i=0;i<100;i++) { Background(); Post(NSUserDefaultsDidChangeNotification,nil,nil); }
     Drain(); CHECK(audio.playing && CSTestPlayerCreates==1 && !hostEvents);
     Foreground(); CHECK(!audio.playing && !session.active && CSTestPlayersAlive==0);
+    CHECK(!manager.backgroundAudioActive);
     CHECK([session.category isEqual:AVAudioSessionCategoryAmbient]);
     CHECK([manager.statusText isEqual:@"前台待机"] && [manager.lastBackgroundResult isEqual:@"后台音频已启动"]);
 
@@ -63,10 +66,13 @@ int main(int argc,const char **argv) { @autoreleasepool {
     for (NSUInteger i=0;i<50;i++) { Background(); CHECK(CSTestPlayersAlive==1); Foreground(); CHECK(CSTestPlayersAlive==0); }
     CHECK(CSTestPlayerCreates-initial==50);
     Background(); Enable(NO); CHECK(!audio.playing && !session.active);
+    CHECK(!manager.backgroundAudioActive);
     Enable(YES); CHECK(audio.playing); // Same background session, explicit enable.
+    CHECK(manager.backgroundAudioActive);
 
     Create(NO,YES); initial=CSTestPlayerCreates; Background();
     CHECK(!audio.playing && CSTestPlayerCreates==initial && [manager.statusText containsString:@"未声明"]);
+    CHECK(!manager.backgroundAudioActive);
     Create(YES,NO); initial=CSTestPlayerCreates; Background();
     CHECK(!audio.playing && CSTestPlayerCreates==initial);
 
@@ -107,8 +113,10 @@ int main(int argc,const char **argv) { @autoreleasepool {
     Create(YES,YES); Background(); initial=CSTestPlayerCreates;
     Interrupt(NO,NO); CHECK(audio.playing && session.active); // No matching interruption began.
     Interrupt(YES,NO); CHECK(!audio.playing && !session.active);
+    CHECK(!manager.backgroundAudioActive);
     Post(NSUserDefaultsDidChangeNotification,nil,nil); CHECK(CSTestPlayerCreates==initial);
     Interrupt(NO,YES); CHECK(audio.playing && CSTestPlayerCreates==initial+1);
+    CHECK(manager.backgroundAudioActive);
     Interrupt(YES,NO); Interrupt(NO,NO); CHECK(!audio.playing);
     initial=CSTestPlayerCreates; Background(); Post(NSUserDefaultsDidChangeNotification,nil,nil); CHECK(CSTestPlayerCreates==initial);
     Foreground(); Background(); CHECK(audio.playing); // Resume denial is not a permanent latch.
@@ -116,6 +124,7 @@ int main(int argc,const char **argv) { @autoreleasepool {
 
     Create(YES,YES); Background();
     Post(AVAudioSessionMediaServicesWereLostNotification,nil,nil); CHECK(!audio.playing);
+    CHECK(!manager.backgroundAudioActive);
     session.active=NO; session.category=AVAudioSessionCategorySoloAmbient;
     Post(AVAudioSessionMediaServicesWereResetNotification,nil,nil); CHECK(audio.playing);
     Post(CSBackgroundRunPlaybackFailedNotification,audio,nil); CHECK(!audio.playing);
@@ -164,7 +173,11 @@ int main(int argc,const char **argv) { @autoreleasepool {
 
     // Even a same-value native category write transfers ownership.
     [session setCategory:session.category mode:session.mode options:session.categoryOptions error:NULL];
-    CHECK(!audio.sessionOwned); Drain(); CHECK(!audio.playing);
+    CHECK(!audio.sessionOwned);
+    // Ownership is revoked synchronously, before the queued manager notification
+    // stops the player or replaces the last successful status text.
+    CHECK(audio.playing && [manager.statusText isEqual:@"后台音频已启动"] && !manager.backgroundAudioActive);
+    Drain(); CHECK(!audio.playing);
 
     // Failed native methods retain errors and returns. Exceptions unwind the
     // observer scope, so future native calls are still observed.

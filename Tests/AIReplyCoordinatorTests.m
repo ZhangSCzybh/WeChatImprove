@@ -24,6 +24,20 @@
     return operation;
 }
 @end
+@interface FakeImages : NSObject <CSAIImagePreparing>
+@property NSMutableArray<FakeOperation *> *operations;
+@property NSMutableArray<NSDictionary *> *events;
+@property BOOL inlineCompletion;
+@end
+@implementation FakeImages
+- (instancetype)init{if((self=[super init])){_operations=[NSMutableArray array];_events=[NSMutableArray array];}return self;}
+- (id<CSAICancellable>)prepareImageForEvent:(NSDictionary *)event completion:(CSAICompletion)completion{
+    CHECK(NSThread.isMainThread);BOOL (^valid)(void)=event[@"imageStillValid"];CHECK(valid && valid());
+    FakeOperation *task=[FakeOperation new];task.completion=completion;[self.events addObject:event];[self.operations addObject:task];
+    if(self.inlineCompletion)completion(@"data:image/jpeg;base64,AQ==",nil);
+    return task;
+}
+@end
 @interface FakeDelegate : NSObject <CSAIReplyCoordinatorDelegate>
 @property(nonatomic) BOOL allowed;
 @property(nonatomic) BOOL hasKey;
@@ -32,12 +46,13 @@
 @property(nonatomic,copy) NSString *result;
 @property(nonatomic,copy) void (^beforeBoundary)(void);
 @property(nonatomic,copy) void (^beforeCredential)(void);
+@property(nonatomic,copy) void (^beforeAllows)(void);
 @property(nonatomic,copy) BOOL (^lastValid)(void);
 @property(nonatomic,strong) NSMutableArray *conversations;
 @end
 @implementation FakeDelegate
 - (instancetype)init {if((self=[super init])){_allowed=YES;_hasKey=YES;_result=@"submitted";_conversations=[NSMutableArray array];}return self;}
-- (BOOL)coordinator:(CSAIReplyCoordinator *)coordinator allowsConversation:(NSString *)conversation {(void)coordinator;(void)conversation;CHECK(NSThread.isMainThread);return self.allowed;}
+- (BOOL)coordinator:(CSAIReplyCoordinator *)coordinator allowsConversation:(NSString *)conversation {(void)coordinator;(void)conversation;CHECK(NSThread.isMainThread);if(self.beforeAllows)self.beforeAllows();return self.allowed;}
 - (NSString *)credentialForCoordinator:(CSAIReplyCoordinator *)coordinator error:(NSError **)error {(void)coordinator;(void)error;if(self.beforeCredential)self.beforeCredential();return self.hasKey?@"secret-key":nil;}
 - (NSString *)coordinator:(CSAIReplyCoordinator *)coordinator submitText:(NSString *)text conversation:(NSString *)conversation valid:(BOOL (^)(void))valid {
     (void)coordinator;CHECK(text.length && text.length<=4000);self.attempts++;self.lastValid=valid;
@@ -106,6 +121,29 @@ static void Filters(void) {
     g=[Fixture new];g.delegate.allowed=NO;Receive(g,@"c",@"member",nil);[g advance:3];CHECK(!g.client.operations.count);
     g=[Fixture new];g.delegate.hasKey=NO;Receive(g,@"c",@"member",nil);[g advance:3];CHECK(!g.client.operations.count && !g.coordinator.activeCount);
     g=[Fixture new];Receive(g,@"room@chatroom",@"member",nil);[g advance:2];CHECK(g.client.operations.count==1);Complete(g,0,@"reply",nil);CHECK(g.delegate.sends==1);
+}
+static void GroupUnmentioned(void) {
+    Fixture *f=[Fixture new];NSMutableDictionary *event=[f event:@"room@chatroom" sender:@"member" identity:@"legacy-unmentioned"];event[@"mentioned"]=@NO;
+    [f.coordinator receiveEvent:event];[f advance:2];CHECK(!f.client.operations.count);CHECK(![f.store hasHandledMessageID:@"legacy-unmentioned"]);
+    [f save:^(NSMutableDictionary *c){NSMutableDictionary *items=[c[@"conversations"] mutableCopy];items[@"room@chatroom"]=@{@"enabled":@YES,@"presetID":@"",@"allowUnmentioned":@YES};items[@"other@chatroom"]=@{@"enabled":@YES,@"presetID":@""};c[@"conversations"]=items;}];
+    event=[f event:@"room@chatroom" sender:@"member" identity:@"unmentioned"];event[@"mentioned"]=@NO;[f.coordinator receiveEvent:event];CHECK(f.coordinator.pendingCount==1);
+    [f.coordinator receiveEvent:event];CHECK(f.coordinator.pendingCount==1);
+    NSMutableDictionary *other=[f event:@"other@chatroom" sender:@"member" identity:@"other-unmentioned"];other[@"mentioned"]=@NO;[f.coordinator receiveEvent:other];CHECK(![f.store hasHandledMessageID:@"other-unmentioned"]);
+    NSMutableDictionary *all=[f event:@"room@chatroom" sender:@"member" identity:@"at-all"];all[@"atAll"]=@YES;[f.coordinator receiveEvent:all];CHECK(![f.store hasHandledMessageID:@"at-all"]);
+    [f advance:2];CHECK(f.client.operations.count==1);Complete(f,0,@"unmentioned reply",nil);CHECK(f.delegate.sends==1 && [f.delegate.conversations.lastObject isEqual:@"room@chatroom"]);
+    // Private messages and individually mentioned messages in another group keep working.
+    Receive(f,@"c",@"friend",nil);Receive(f,@"other@chatroom",@"member",nil);[f advance:2];CHECK(f.client.operations.count==3);Complete(f,1,@"private reply",nil);Complete(f,2,@"mentioned reply",nil);CHECK(f.delegate.sends==3);
+    event=[f event:@"room@chatroom" sender:@"member" identity:@"cancel-active"];event[@"mentioned"]=@NO;[f.coordinator receiveEvent:event];[f advance:2];CHECK(f.coordinator.activeCount==1);
+    event=[f event:@"room@chatroom" sender:@"member" identity:@"cancel-pending"];event[@"mentioned"]=@NO;[f.coordinator receiveEvent:event];CHECK(f.coordinator.pendingCount==1);
+    [f save:^(NSMutableDictionary *c){NSMutableDictionary *items=[c[@"conversations"] mutableCopy];NSMutableDictionary *room=[items[@"room@chatroom"] mutableCopy];room[@"allowUnmentioned"]=@NO;items[@"room@chatroom"]=room;c[@"conversations"]=items;}];
+    CHECK(f.client.operations[3].cancelled && !f.coordinator.activeCount && !f.coordinator.pendingCount);Complete(f,3,@"late unmentioned reply",nil);CHECK(f.delegate.sends==3);
+    event=[f event:@"room@chatroom" sender:@"member" identity:@"disabled-unmentioned"];event[@"mentioned"]=@NO;[f.coordinator receiveEvent:event];[f advance:2];CHECK(f.client.operations.count==4);
+    Receive(f,@"room@chatroom",@"member",nil);[f advance:2];CHECK(f.client.operations.count==5);Complete(f,4,@"mentioned after off",nil);CHECK(f.delegate.sends==4);
+    // The opt-in never bypasses either the conversation or global enable switch.
+    for(NSNumber *global in @[@NO,@YES]){
+        Fixture *g=[Fixture new];[g save:^(NSMutableDictionary *c){c[@"enabled"]=global;NSMutableDictionary *items=[c[@"conversations"] mutableCopy];items[@"room@chatroom"]=@{@"enabled":@(!global.boolValue),@"presetID":@"",@"allowUnmentioned":@YES};c[@"conversations"]=items;}];
+        event=[g event:@"room@chatroom" sender:@"member" identity:nil];event[@"mentioned"]=@NO;[g.coordinator receiveEvent:event];[g advance:2];CHECK(!g.client.operations.count);
+    }
 }
 static void DedupeBatchingAndSerialization(void) {
     Fixture *f=[Fixture new];NSMutableDictionary *event=[f event:@"c" sender:@"member" identity:@"server"];
@@ -228,7 +266,79 @@ static void OneShotProductionWakeup(void) {
     NSDate *deadline=[NSDate dateWithTimeIntervalSinceNow:2.3];while(!f.client.operations.count && [deadline timeIntervalSinceNow]>0)[NSRunLoop.mainRunLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
     CHECK(f.client.operations.count==1);[f.coordinator cancelAll];
 }
+static FakeImages *EnableImages(Fixture *f){
+    [f save:^(NSMutableDictionary *c){c[@"imageEnabled"]=@YES;c[@"verifiedConnection"]=CSAIConnectionIdentifier(c);}];
+    FakeImages *images=[FakeImages new];f.coordinator.imagePreparer=images;return images;
+}
+static NSMutableDictionary *ImageEvent(Fixture *f,NSString *conversation,NSString *sender,NSString *identity){
+    NSMutableDictionary *event=[f event:conversation sender:sender identity:identity];event[@"type"]=@3;event[@"text"]=@"";event[@"imageSource"]=[NSObject new];return event;
+}
+static void ImagePreparationAndOwnership(void){
+    Fixture *f=[Fixture new];FakeImages *images=[FakeImages new];f.coordinator.imagePreparer=images;
+    [f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",@"disabled-image")];[f advance:2];CHECK(!images.operations.count && ![f.store hasHandledMessageID:@"disabled-image"]);
+    images=EnableImages(f);[f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",@"image")];CHECK([f.store hasHandledMessageID:@"image"] && !images.operations.count);
+    [f advance:2];CHECK(images.operations.count==1 && !f.client.operations.count && f.coordinator.activeCount==1);
+    images.operations[0].completion(@"data:image/jpeg;base64,AQ==",nil);CHECK(f.client.operations.count==1);
+    NSArray *parts=f.client.operations[0].messages.lastObject[@"content"];CHECK([parts isKindOfClass:NSArray.class] && parts.count==2 && [parts[0][@"type"] isEqual:@"image_url"]);
+    // A duplicate preparation completion cannot start a second model request.
+    images.operations[0].completion(@"data:image/jpeg;base64,AQ==",nil);CHECK(f.client.operations.count==1);
+    Complete(f,0,@"图中是一张照片。",nil);CHECK(f.delegate.sends==1);
+    Receive(f,@"c",@"c",@"followup");[f advance:2];CHECK(![f.client.operations.lastObject.messages.description containsString:@"base64"]);
+    [f.coordinator cancelAll];
+    f=[Fixture new];images=EnableImages(f);[f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",@"cancel-image")];[f advance:2];
+    [f.coordinator configurationDidChange];CHECK(images.operations[0].cancelled);images.operations[0].completion(@"data:image/jpeg;base64,AQ==",nil);CHECK(!f.client.operations.count && !f.delegate.sends);
+    BOOL (^valid)(void)=images.events[0][@"imageStillValid"];CHECK(!valid());
+    f=[Fixture new];images=EnableImages(f);[f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",@"failed-image")];[f advance:2];images.operations[0].completion(nil,CSAIError(25,@"private raw media error"));
+    CHECK(!f.client.operations.count && !f.coordinator.activeCount && ![f.store.history.description containsString:@"private raw"]);
+    f=[Fixture new];images=EnableImages(f);images.inlineCompletion=YES;[f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",@"inline-image")];[f advance:2];
+    CHECK(f.client.operations.count==1 && !f.client.operations[0].cancelled);[f.coordinator cancelAll];CHECK(f.client.operations[0].cancelled);
+    f=[Fixture new];images=EnableImages(f);for(NSString *c in @[@"c",@"d",@"e"])[f.coordinator receiveEvent:ImageEvent(f,c,c,nil)];[f advance:2];
+    CHECK(images.operations.count==2 && f.coordinator.activeCount==2 && f.coordinator.pendingCount==1);[f advance:60];CHECK(images.operations[0].cancelled && images.operations[1].cancelled && images.operations.count==3);
+    f=[Fixture new];images=EnableImages(f);f.store.failClaims=YES;[f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",@"failed-claim-image")];[f advance:2];CHECK(!images.operations.count && !f.coordinator.pendingCount);
+    // An asynchronous preparation failure to acquire credentials releases its slot immediately.
+    f=[Fixture new];images=EnableImages(f);for(NSString *c in @[@"c",@"d",@"e"])[f.coordinator receiveEvent:ImageEvent(f,c,c,nil)];[f advance:2];
+    f.delegate.hasKey=NO;images.operations[0].completion(@"data:image/jpeg;base64,AQ==",nil);
+    CHECK(images.operations.count==3 && f.coordinator.activeCount==2 && !f.coordinator.pendingCount && !f.client.operations.count);
+    f=[Fixture new];images=EnableImages(f);[f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",nil)];[f advance:2];
+    images.operations[0].callbackOnCancel=YES;[f.coordinator cancelAll];CHECK(!f.coordinator.activeCount && !f.client.operations.count && !f.delegate.sends);
+    for(NSNumber *image in @[@NO,@YES]){
+        f=[Fixture new];images=EnableImages(f);__weak CSAIReplyCoordinator *weakCoordinator=f.coordinator;
+        f.delegate.beforeAllows=^{[weakCoordinator cancelAll];};
+        NSMutableDictionary *event=image.boolValue?ImageEvent(f,@"room@chatroom",@"member",@"cancel-admission-image"):[f event:@"c" sender:@"c" identity:@"cancel-admission-text"];
+        event[@"mentioned"]=@NO;[f.coordinator receiveEvent:event];
+        CHECK(!f.coordinator.pendingCount && ![[f.coordinator valueForKey:@"stagedImages"] count] && ![f.store hasHandledMessageID:[event[@"identifiers"] firstObject]]);
+    }
+}
+static void GroupImagesAndBudgets(void){
+    Fixture *f=[Fixture new];FakeImages *images=EnableImages(f);NSMutableDictionary *image=ImageEvent(f,@"room@chatroom",@"member",@"staged-image");image[@"mentioned"]=@NO;
+    [f.coordinator receiveEvent:image];CHECK(!f.coordinator.pendingCount && !images.operations.count && ![f.store hasHandledMessageID:@"staged-image"]);
+    NSMutableDictionary *question=[f event:@"room@chatroom" sender:@"other-member" identity:@"other-question"];[f.coordinator receiveEvent:question];[f advance:2];CHECK(!images.operations.count && f.client.operations.count==1);Complete(f,0,@"other answer",nil);
+    question=[f event:@"room@chatroom" sender:@"member" identity:@"image-question"];question[@"text"]=@"请读图中的文字";[f.coordinator receiveEvent:question];CHECK([f.store hasHandledMessageID:@"staged-image"] && [f.store hasHandledMessageID:@"image-question"]);
+    [f advance:2];CHECK(images.operations.count==1);images.operations[0].completion(@"data:image/jpeg;base64,AQ==",nil);
+    CHECK([f.client.operations.lastObject.messages.lastObject[@"content"][1][@"text"] isEqual:@"请读图中的文字"]);Complete(f,1,@"recognized",nil);CHECK(f.delegate.sends==2);
+    f=[Fixture new];images=EnableImages(f);image=ImageEvent(f,@"room@chatroom",@"member",@"expired-image");image[@"mentioned"]=@NO;[f.coordinator receiveEvent:image];[f advance:20];[f.coordinator receiveEvent:image];[f advance:11];
+    CHECK([[f.coordinator valueForKey:@"stagedImages"] count]==0);Receive(f,@"room@chatroom",@"member",@"late-question");[f advance:2];CHECK(!images.operations.count && f.client.operations.count==1);
+    // Staged callbacks can add a server ID then lose the local ID; preserve every alias.
+    f=[Fixture new];images=EnableImages(f);image=ImageEvent(f,@"room@chatroom",@"member",@"stage-local");image[@"mentioned"]=@NO;[f.coordinator receiveEvent:image];
+    image[@"identifiers"]=@[@"stage-local",@"stage-server"];[f.coordinator receiveEvent:image];
+    image[@"identifiers"]=@[@"stage-server"];[f.coordinator receiveEvent:image];
+    Receive(f,@"room@chatroom",@"member",@"alias-question");CHECK([f.store hasHandledMessageID:@"stage-local"] && [f.store hasHandledMessageID:@"stage-server"]);
+    [f advance:2];CHECK(images.operations.count==1);images.operations[0].completion(@"data:image/jpeg;base64,AQ==",nil);Complete(f,0,@"one answer",nil);
+    image[@"identifiers"]=@[@"stage-local"];[f.coordinator receiveEvent:image];Receive(f,@"room@chatroom",@"member",@"another-question");[f advance:2];CHECK(images.operations.count==1);
+    f=[Fixture new];images=EnableImages(f);NSMutableDictionary *oldImage=ImageEvent(f,@"room@chatroom",@"member",@"old-image");oldImage[@"mentioned"]=@NO;[f.coordinator receiveEvent:oldImage];
+    image=ImageEvent(f,@"room@chatroom",@"member",@"newest-image");image[@"mentioned"]=@NO;[f.coordinator receiveEvent:image];oldImage[@"identifiers"]=@[@"old-image",@"old-image-server"];[f.coordinator receiveEvent:oldImage];
+    oldImage[@"identifiers"]=@[@"old-image-server"];[f.coordinator receiveEvent:oldImage];
+    Receive(f,@"room@chatroom",@"member",@"newest-question");[f advance:2];CHECK([images.events[0][@"identifiers"] containsObject:@"newest-image"] && ![f.store hasHandledMessageID:@"old-image"]);
+    f=[Fixture new];images=EnableImages(f);for(NSUInteger i=0;i<20;i++){image=ImageEvent(f,@"room@chatroom",[NSString stringWithFormat:@"sender%lu",(unsigned long)i],nil);image[@"mentioned"]=@NO;[f.coordinator receiveEvent:image];}
+    CHECK([[f.coordinator valueForKey:@"stagedImages"] count]==10 && !images.operations.count);[f advance:30];CHECK([[f.coordinator valueForKey:@"stagedImages"] count]==0);
+    f=[Fixture new];images=EnableImages(f);[f save:^(NSMutableDictionary *c){NSMutableDictionary *conversations=[c[@"conversations"] mutableCopy];conversations[@"room@chatroom"]=@{@"enabled":@YES,@"presetID":@"",@"allowUnmentioned":@YES};c[@"conversations"]=conversations;}];
+    image=ImageEvent(f,@"room@chatroom",@"member",@"direct-image");image[@"mentioned"]=@NO;[f.coordinator receiveEvent:image];[f advance:2];CHECK(images.operations.count==1);
+    image=ImageEvent(f,@"room@chatroom",@"member",@"all-image");image[@"atAll"]=@YES;[f.coordinator receiveEvent:image];CHECK(![f.store hasHandledMessageID:@"all-image"]);
+    // Metadata for a second image never inflates a pending batch into an album upload.
+    f=[Fixture new];images=EnableImages(f);[f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",@"first-image")];[f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",@"second-image")];
+    CHECK(![f.store hasHandledMessageID:@"second-image"]);[f advance:2];CHECK(images.operations.count==1 && [images.events[0][@"identifiers"] containsObject:@"first-image"]);
+}
 int main(void){@autoreleasepool{
-    Filters();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();OneShotProductionWakeup();
-    puts("AIReplyCoordinatorTests passed: filtering, alias claims, debounce, serialization, context bounds, cancellation, boundary authorization, expiry, concurrency, errors and one-shot timers");
+    Filters();GroupUnmentioned();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();ImagePreparationAndOwnership();GroupImagesAndBudgets();OneShotProductionWakeup();
+    puts("AIReplyCoordinatorTests passed: filtering, per-group unmentioned opt-in, alias claims, debounce, serialization, context bounds, cancellation, boundary authorization, expiry, concurrency, errors and one-shot timers");
 }return 0;}

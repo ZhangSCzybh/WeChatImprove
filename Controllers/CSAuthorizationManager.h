@@ -16,7 +16,6 @@ typedef void(^CSAuthorizationCompletion)(BOOL success, NSString *message);
 - (void)requestAuthorizationWithPresentingViewController:(UIViewController *)viewController
                                               completion:(nullable CSAuthorizationCompletion)completion;
 - (void)openOfficialAccountFromViewController:(UIViewController *)viewController;
-- (void)clearAuthorizationCache;
 
 @end
 

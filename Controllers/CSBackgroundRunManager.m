@@ -37,6 +37,7 @@ NSNotificationName const CSBackgroundRunStateChangedNotification=@"CSBackgroundR
     return self;
 }
 - (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
+- (BOOL)backgroundAudioActive { return self.enabled && self.background && self.audio.playing && self.audio.sessionOwned; }
 - (void)start {
     NSAssert(NSThread.isMainThread,@"Background manager is main-thread owned");
     if (self.started) return;

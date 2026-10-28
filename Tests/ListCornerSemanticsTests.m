@@ -6,6 +6,7 @@
 #import "CSListCornerPageContext.h"
 #import "CSListCornerRenderer.h"
 #import "CSListCornerSessionAdapter.h"
+#import "CSListCornerSessionRestore.h"
 #import "CSListCornerContactsAdapter.h"
 #import "CSListCornerDiscoverAdapter.h"
 #import "CSListCornerMoreAdapter.h"
@@ -564,12 +565,13 @@ static void ScreenshotRegressionTests(void) {
     Configure();
 }
 #include "FoldedCardIntegrationTests.h"
+#include "ListRestoreTests.h"
 int main(int argc,const char **argv) { @autoreleasepool {
     if(argc!=2)return 2;
     NSDictionary *baseline=[NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:@(argv[1])] options:0 error:NULL];
     FixtureDefaults=[MemoryDefaults new];FixtureConfiguration=[[CSListCornerConfiguration alloc] initWithDefaults:FixtureDefaults];
     method_setImplementation(class_getClassMethod(CSListCornerConfiguration.class,@selector(sharedConfiguration)),(IMP)SharedConfiguration);
-    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();ScreenshotRegressionTests();ContactsCountFooterTests();SessionFirstLayoutTests();SessionViewportTests();FoldedCardIntegrationTests();
+    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();ScreenshotRegressionTests();ContactsCountFooterTests();SessionFirstLayoutTests();SessionViewportTests();FoldedCardIntegrationTests();SessionLifecycleRestoreTests();SessionRestoreBoundaryTests();SessionRestorePaintTests();
     fprintf(stdout,"List corners: %lu checks, %lu failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)\n",(unsigned long)checks,(unsigned long)failures);
     return failures?1:0;
 } }

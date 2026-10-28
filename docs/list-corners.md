@@ -64,3 +64,14 @@
 ## 1.7-24 首次进入会话列表尺寸修复
 
 真实/占位会话 Cell 原生 layout 完成后，按当前真实内容尺寸校正已存在的卡片背景与遮罩，沿用渲染器中的首末角状态。修复显示回调早于最终行高确定时背景覆盖不足的问题；内容容器替换时转移已有背景。此路径无行数/路径查询、分组投影重算、列表刷新或异步补偿。八个高度回调不变。主机圆角868项、分组相关278项全部通过；实机首次启动显示待验收。见 [本轮记录](audits/list-corners-first-layout-1.7-24/README.md)。
+
+
+## 2.1-3 前台画布恢复
+
+2.1-2-muted-background 的实际构建输入为本轮基线。会话卡片内部的底色与左右画布由 cell 装饰绘制；section 间隔默认透明，依赖 table / backgroundView 的画布。返回前台不保证控制器重新出现或布局，旧链路没有激活通知与 table 自身布局后的补齐，可能留下“卡片正确、间隔和底部画布错误”的状态。
+
+新增 CSListCornerSessionRestore 仅跟踪真实 NewMainFrameViewController.m_tableView：前台/激活通知同步补齐已有外观、setNeedsDisplay 使旧帧失效，并 setNeedsLayout 交给 UIKit 正常提交；MainFrameTableView 原生布局和背景 setter 返回后再次校正，处理后续原生覆盖。注册按 table 生命周期持有、弱引用 table 和本插件创建的 gap；不处理其他列表。尺寸未就绪保留已有卡片，等待原生有效布局，不轮询。颜色、间距、section 角色及折叠行连续卡片规则沿用已有实现，不查询或 reload 数据，不设置 contentOffset/contentInset。
+
+仅运行 verify-list-corners.sh：失败复现 1,349 项 / 167 失败，补充显示失效用例后最终 1,357 项 / 0 失败。覆盖恢复首帧、未读与 section 变化、两轮前后台、scene、延后原生布局/背景替换、空组、零尺寸、重入及关闭再开。host 替身不能代替五条真机触发路径的概率/未读相关性测量。原生地址、构建、当时的诊断与验收记录见 [2.1-3 交付报告](audits/list-restore-2.1-3/README.md)。
+
+后续源码清理移除了临时 ListRestore 日志、诊断开关、去重缓存及仅供日志使用的状态字段。恢复入口使用明确的几何刷新参数：生命周期和布局回调刷新已有卡片几何，背景 setter 仅修复绘制状态；保留无变化时提前返回、重入保护、有效尺寸检查与首帧显示失效。历史 2.1-3 成品包及诊断记录保留，清理与验证见 [记录](audits/list-restore-cleanup-2026-10-28/README.md)。

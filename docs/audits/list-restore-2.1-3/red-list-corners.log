@@ -1,0 +1,168 @@
+FAIL: cold_then_background cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: cold_then_background cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: cold_then_background cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: cold_then_background cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: cold_then_background cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: cold_then_background cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: cold_then_background cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: cold_then_background cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: lock_unlock cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: lock_unlock cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: lock_unlock cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: lock_unlock cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: lock_unlock cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: lock_unlock cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: lock_unlock cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: lock_unlock cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: switcher_return cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: switcher_return cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: switcher_return cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: switcher_return cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: switcher_return cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: switcher_return cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: switcher_return cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: switcher_return cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: notification_control_center cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: notification_control_center cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: notification_control_center cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: notification_control_center cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: notification_control_center cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: notification_control_center cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: notification_control_center cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: notification_control_center cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: other_app_over_minute cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: other_app_over_minute cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: other_app_over_minute cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: other_app_over_minute cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: other_app_over_minute cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: other_app_over_minute cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: foreground repairs existing cards without cell or scroll callback
+FAIL: native-delivered roles persist: folded entry shares section card, singleton has four corners
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: other_app_over_minute cycle 0: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: other_app_over_minute cycle 1: first paint restores canvas without scrolling
+FAIL: foreground repairs live gap color, including transparent sentinel
+FAIL: post-native table layout repairs later replacement before returning
+FAIL: native paint after restoration cannot undo owned canvas
+FAIL: native backgroundView replacement is repaired after original setter
+FAIL: first valid native layout completes pending geometry without timer
+FAIL: matching scene activation covers scene-based return
+FAIL: disabled return removes cards and preserves existing flat appearance
+FAIL: reenabled native delivery restores cards without stale flat paint
+FAIL: offscreen pending restore completes on reattachment layout
+List corners: 1349 checks, 167 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)

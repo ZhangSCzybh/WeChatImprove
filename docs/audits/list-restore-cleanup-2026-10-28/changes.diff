@@ -1,0 +1,155 @@
+--- before/Controllers/CSListCornerSessionRestore.h
++++ after/Controllers/CSListCornerSessionRestore.h
+@@ -2,6 +2,7 @@
+ NS_ASSUME_NONNULL_BEGIN
+ // Only the verified NewMainFrameViewController.m_tableView is tracked.
+ FOUNDATION_EXPORT void CSListCornerTrackSessionTable(UITableView *table);
+-FOUNDATION_EXPORT void CSListCornerRestoreSessionTable(UITableView *table, NSString *stage);
++// Lifecycle/layout refresh geometry; background setters only repair paint.
++FOUNDATION_EXPORT void CSListCornerRestoreSessionTable(UITableView *table, BOOL refreshGeometry);
+ FOUNDATION_EXPORT UIView *CSListCornerCreateSessionGap(UITableView *table, NSInteger section, BOOL footer, CGRect frame);
+ NS_ASSUME_NONNULL_END
+--- before/Controllers/CSListCornerSessionRestore.m
++++ after/Controllers/CSListCornerSessionRestore.m
+@@ -3,16 +3,6 @@
+ #import <objc/runtime.h>
+ 
+ static char RestoreKey;
+-static void CSListRestoreLog(NSString *stage, NSString *reason) {
+-    // Opt in only; fixed tokens, no account, session, or message values. Main-thread callers.
+-    if (![NSUserDefaults.standardUserDefaults boolForKey:@"com.wechat.improve.listRestoreDiagnostics"]) return;
+-    static NSMutableSet<NSString *> *seen;
+-    if (!seen) seen=[NSMutableSet set];
+-    NSString *key=[stage stringByAppendingFormat:@"/%@",reason];
+-    if (seen.count>=48 || [seen containsObject:key]) return;
+-    [seen addObject:key];
+-    NSLog(@"[WeChatImprove][ListRestore] stage=%@ reason=%@",stage,reason);
+-}
+ 
+ @interface CSListCornerSessionGap : UIView
+ @property(nonatomic,weak) UITableView *table;
+@@ -42,8 +32,7 @@
+ @interface CSListCornerSessionRestore : NSObject
+ @property(nonatomic,weak) UITableView *table;
+ @property(nonatomic,strong) NSHashTable<CSListCornerSessionGap *> *gaps;
+-@property(nonatomic,strong) UIColor *lastCanvas;
+-@property(nonatomic) BOOL restoring,inactive,pending,restoredSinceResume;
++@property(nonatomic) BOOL restoring,inactive;
+ - (void)activityChanged:(NSNotification *)notification;
+ @end
+ @implementation CSListCornerSessionRestore
+@@ -70,13 +59,10 @@
+     if (scene && (!notification.object || notification.object!=table.window.windowScene)) return;
+     BOOL returning=[name isEqual:UIApplicationWillEnterForegroundNotification] || [name isEqual:UIApplicationDidBecomeActiveNotification] ||
+                    [name isEqual:UISceneWillEnterForegroundNotification] || [name isEqual:UISceneDidActivateNotification];
+-    if (!returning) { self.inactive=YES;self.pending=YES;self.restoredSinceResume=NO;return; }
++    if (!returning) { self.inactive=YES;return; }
+     self.inactive=NO;
+-    NSString *stage=[name isEqual:UIApplicationWillEnterForegroundNotification] ? @"foreground" :
+-        ([name isEqual:UIApplicationDidBecomeActiveNotification] ? @"active" :
+-         ([name isEqual:UISceneWillEnterForegroundNotification] ? @"scene_foreground" : @"scene_active"));
+-    if (!table.window) { self.pending=YES;CSListRestoreLog(stage,@"offscreen");return; }
+-    CSListCornerRestoreSessionTable(table,stage);
++    if (!table.window) return;
++    CSListCornerRestoreSessionTable(table,YES);
+     // A retained layer can need repaint even when its model color still matches.
+     // Invalidate existing surfaces without replacing views or rebuilding the list.
+     [table setNeedsDisplay];[table.backgroundView setNeedsDisplay];
+@@ -99,8 +85,6 @@
+         state=[CSListCornerSessionRestore new];state.table=table;
+         objc_setAssociatedObject(table,&RestoreKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+     }
+-    UIColor *expected=CSListCornerSessionTableColor(table);
+-    if ([table.backgroundColor isEqual:expected] && (!table.backgroundView || [table.backgroundView.backgroundColor isEqual:expected])) state.lastCanvas=expected;
+ }
+ 
+ UIView *CSListCornerCreateSessionGap(UITableView *table, NSInteger section, BOOL footer, CGRect frame) {
+@@ -112,37 +96,31 @@
+     return view;
+ }
+ 
+-void CSListCornerRestoreSessionTable(UITableView *table, NSString *stage) {
++void CSListCornerRestoreSessionTable(UITableView *table, BOOL refreshGeometry) {
+     if (!NSThread.isMainThread) return;
+     // Setters also run during table construction and in unrelated pages. Fast exclusion.
+     CSListCornerSessionRestore *state=objc_getAssociatedObject(table,&RestoreKey);
+     if (!state || state.restoring || state.inactive) return;
+     id owner=CSListCornerOwnerForTable(table,CSListCornerPageSession);
+     if (!owner || !table.window) return;
+-    BOOL paintOnly=[stage isEqual:@"table_color"] || [stage isEqual:@"background_view"];
+-    UIColor *expected=CSListCornerSessionTableColor(table);
+-    BOOL mismatch=![table.backgroundColor isEqual:expected] || (table.backgroundView && ![table.backgroundView.backgroundColor isEqual:expected]);
+-    for (CSListCornerSessionGap *gap in state.gaps) {
+-        if ([gap isDescendantOfView:table] && ![gap.backgroundColor isEqual:gap.expectedColor]) mismatch=YES;
++    if (!refreshGeometry) {
++        UIColor *expected=CSListCornerSessionTableColor(table);
++        BOOL mismatch=![table.backgroundColor isEqual:expected] || (table.backgroundView && ![table.backgroundView.backgroundColor isEqual:expected]);
++        for (CSListCornerSessionGap *gap in state.gaps) {
++            if (mismatch) break;
++            if ([gap isDescendantOfView:table] && ![gap.backgroundColor isEqual:gap.expectedColor]) mismatch=YES;
++        }
++        if (!mismatch) return;
+     }
+-    if (paintOnly && !mismatch) return;
+-    BOOL ready=CSListCornerValidRect(table.bounds);
+-    NSString *reason=!ready ? @"geometry_not_ready" :
+-        (mismatch && state.pending && !state.restoredSinceResume ? @"restore_trigger_missing" :
+-         (mismatch && [state.lastCanvas isEqual:expected] ? @"native_overwrite" : @"ok"));
+     state.restoring=YES;
+     @try {
+         CSListCornerPrepareTable(owner,CSListCornerPageSession,NO);
+         for (CSListCornerSessionGap *gap in state.gaps) if ([gap isDescendantOfView:table]) [gap repairPaint];
+-        if (!paintOnly) {
++        if (refreshGeometry) {
+             for (UITableViewCell *cell in table.visibleCells) {
+-                if (!CSListCornerValidRect(cell.contentView.bounds)) ready=NO;
+                 // Reuse the last native-delivered row role; never query rows or projection here.
+                 CSListCornerRefreshSessionGeometry(cell);
+             }
+-            state.pending=!ready;state.restoredSinceResume=ready;
+-            if (!ready) reason=@"geometry_not_ready";
+         }
+-        CSListRestoreLog(stage,reason);
+     } @finally { state.restoring=NO; }
+ }
+--- before/Hooks/ListCornerRadiusHooks.xm
++++ after/Hooks/ListCornerRadiusHooks.xm
+@@ -29,15 +29,15 @@
+ %hook MainFrameTableView
+ - (void)layoutSubviews {
+     %orig;
+-    CSListCornerRestoreSessionTable((UITableView *)self,@"table_layout");
++    CSListCornerRestoreSessionTable((UITableView *)self,YES);
+ }
+ - (void)setBackgroundColor:(UIColor *)color {
+     %orig;
+-    CSListCornerRestoreSessionTable((UITableView *)self,@"table_color");
++    CSListCornerRestoreSessionTable((UITableView *)self,NO);
+ }
+ - (void)setBackgroundView:(UIView *)view {
+     %orig;
+-    CSListCornerRestoreSessionTable((UITableView *)self,@"background_view");
++    CSListCornerRestoreSessionTable((UITableView *)self,NO);
+ }
+ %end
+ 
+--- before/Tests/ListCornerSemanticsTests.m
++++ after/Tests/ListCornerSemanticsTests.m
+@@ -568,7 +568,6 @@
+ #include "ListRestoreTests.h"
+ int main(int argc,const char **argv) { @autoreleasepool {
+     if(argc!=2)return 2;
+-    [NSUserDefaults.standardUserDefaults setVolatileDomain:@{@"com.wechat.improve.listRestoreDiagnostics":@YES} forName:NSArgumentDomain];
+     NSDictionary *baseline=[NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:@(argv[1])] options:0 error:NULL];
+     FixtureDefaults=[MemoryDefaults new];FixtureConfiguration=[[CSListCornerConfiguration alloc] initWithDefaults:FixtureDefaults];
+     method_setImplementation(class_getClassMethod(CSListCornerConfiguration.class,@selector(sharedConfiguration)),(IMP)SharedConfiguration);
+--- before/docs/list-corners.md
++++ after/docs/list-corners.md
+@@ -72,4 +72,6 @@
+ 
+ 新增 CSListCornerSessionRestore 仅跟踪真实 NewMainFrameViewController.m_tableView：前台/激活通知同步补齐已有外观、setNeedsDisplay 使旧帧失效，并 setNeedsLayout 交给 UIKit 正常提交；MainFrameTableView 原生布局和背景 setter 返回后再次校正，处理后续原生覆盖。注册按 table 生命周期持有、弱引用 table 和本插件创建的 gap；不处理其他列表。尺寸未就绪保留已有卡片，等待原生有效布局，不轮询。颜色、间距、section 角色及折叠行连续卡片规则沿用已有实现，不查询或 reload 数据，不设置 contentOffset/contentInset。
+ 
+-仅运行 verify-list-corners.sh：失败复现 1,349 项 / 167 失败，补充显示失效用例后最终 1,357 项 / 0 失败。覆盖恢复首帧、未读与 section 变化、两轮前后台、scene、延后原生布局/背景替换、空组、零尺寸、重入及关闭再开。host 替身不能代替五条真机触发路径的概率/未读相关性测量。诊断开关、原生地址、构建与验收记录见 [本轮报告](audits/list-restore-2.1-3/README.md)。
++仅运行 verify-list-corners.sh：失败复现 1,349 项 / 167 失败，补充显示失效用例后最终 1,357 项 / 0 失败。覆盖恢复首帧、未读与 section 变化、两轮前后台、scene、延后原生布局/背景替换、空组、零尺寸、重入及关闭再开。host 替身不能代替五条真机触发路径的概率/未读相关性测量。原生地址、构建、当时的诊断与验收记录见 [2.1-3 交付报告](audits/list-restore-2.1-3/README.md)。
++
++后续源码清理移除了临时 ListRestore 日志、诊断开关、去重缓存及仅供日志使用的状态字段。恢复入口使用明确的几何刷新参数：生命周期和布局回调刷新已有卡片几何，背景 setter 仅修复绘制状态；保留无变化时提前返回、重入保护、有效尺寸检查与首帧显示失效。历史 2.1-3 成品包及诊断记录保留，清理与验证见 [记录](audits/list-restore-cleanup-2026-10-28/README.md)。

@@ -4,6 +4,7 @@
 #import "CSListCornerSectionPolicy.h"
 #import "CSListCornerPageContext.h"
 #import "CSListCornerSessionAdapter.h"
+#import "CSListCornerSessionRestore.h"
 #import "CSListCornerContactsAdapter.h"
 #import "CSListCornerDiscoverAdapter.h"
 #import "CSListCornerMoreAdapter.h"
@@ -18,15 +19,27 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
         return original;
     }
     CGFloat height=footer ? 0 : CSListCornerSectionGap(page,section,configuration.pinnedGap,configuration.normalGap);
+    if (page==CSListCornerPageSession) return CSListCornerCreateSessionGap(table,section,footer,CGRectMake(0,0,table.bounds.size.width,height));
     UIView *view=[[UIView alloc] initWithFrame:CGRectMake(0,0,table.bounds.size.width,height)];
     view.userInteractionEnabled=NO;
     view.backgroundColor=footer ? CSListCornerCanvasColor() : [UIColor clearColor];
-    if (!footer && page==CSListCornerPageSession) {
-        UIUserInterfaceStyle style=table.traitCollection.userInterfaceStyle;
-        view.backgroundColor=section==0 ? [configuration pinnedColorForStyle:style] : (section==1 || section==2 ? [configuration normalColorForStyle:style] : [UIColor clearColor]);
-    }
     return view;
 }
+
+%hook MainFrameTableView
+- (void)layoutSubviews {
+    %orig;
+    CSListCornerRestoreSessionTable((UITableView *)self,YES);
+}
+- (void)setBackgroundColor:(UIColor *)color {
+    %orig;
+    CSListCornerRestoreSessionTable((UITableView *)self,NO);
+}
+- (void)setBackgroundView:(UIView *)view {
+    %orig;
+    CSListCornerRestoreSessionTable((UITableView *)self,NO);
+}
+%end
 
 %hook MainFrameItemView
 - (void)setFrame:(CGRect)frame {

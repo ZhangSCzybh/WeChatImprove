@@ -1,0 +1,67 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "target_sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "evidence_kind": "Objective-C metadata plus bounded ARM64 disassembly; static only",
+  "execution_or_device_validation": false,
+  "recommended_entry": {
+    "class": "NewSyncService",
+    "selector": "BackGroundFetchToSync",
+    "address": "0x1051825c8",
+    "end": "0x10518260c",
+    "types": "B16@0:8",
+    "dispatch_signature": "BOOL (*)(id, SEL)",
+    "scene": 12
+  },
+  "supporting_methods": [
+    {
+      "selector": "isGettingData",
+      "address": "0x1051809a0",
+      "end": "0x1051809b0",
+      "types": "B16@0:8"
+    },
+    {
+      "selector": "InternalCreateSync:",
+      "address": "0x1051818bc",
+      "end": "0x105181b34",
+      "types": "B20@0:8I16"
+    },
+    {
+      "selector": "creatPBNewSyncEvent:",
+      "address": "0x105181b34",
+      "end": "0x1051821cc",
+      "types": "B20@0:8I16"
+    },
+    {
+      "selector": "NotifyToSync",
+      "address": "0x1051821cc",
+      "end": "0x1051821e4",
+      "types": "B16@0:8"
+    },
+    {
+      "selector": "LongLinkTimerSync",
+      "address": "0x1051827c8",
+      "end": "0x10518287c",
+      "types": "v16@0:8"
+    }
+  ],
+  "observations": [
+    "BackGroundFetchToSync tail-calls InternalCreateSync with unsigned int scene 12; no UIApplication foreground-only branch is present in its bounded body.",
+    "InternalCreateSync preserves native pause, initialization, existing event-ID and event-creation checks. If paused, it flags needSync and returns false. If an event already exists, scene 12 returns false without adding a new needSync request.",
+    "creatPBNewSyncEvent writes the supplied scene into NewSyncRequest, creates ProtobufCGIWrap CGI 138, and requests EventService CreateProtobufEvent:Flag: with flag 5. No scene-12/foreground exclusion is present in the examined body.",
+    "The BOOL result indicates event creation/busy state only; a true return is not evidence of completed synchronization or received messages.",
+    "NotifyToSync reuses m_uiSyncScene. LongLinkTimerSync only checks isGettingData then records setNeedSyncWithScene: (2 or 4), so neither is as explicit a one-shot background-fetch entry.",
+    "onServiceEnterBackground [0x105180aa4,0x105180d40) and onWillSuspend [0x105180ff8,0x105181294) have login guards and report BgFgRequest online mode 2/3 through EventService command 312. Their complete bodies do not invoke makeSyncPause/setSyncPaused or access m_bIsSyncPause. This bounded finding does not exclude other lifecycle observers."
+  ],
+  "constraints": [
+    "Use current account native service, main-thread invocation and runtime ABI checks; revalidate account epoch, background execution eligibility and selected AI configuration before every call.",
+    "Prefer an outer isGettingData check plus native internal guards. Do not force resetGettingData, mutate event IDs/scene/pauses, or call makeSyncResume to defeat a native pause.",
+    "The examined methods contain no general timer scheduling or OS wake-up guarantee. Any polling interval is a product choice, not established by this static evidence."
+  ],
+  "unknowns": [
+    "Whether iOS grants continuing execution to this app while background audio is active on the user device.",
+    "Whether network policy, EventService or server sync selectors defer fetching muted group data in the real background state.",
+    "Actual callback thread conventions and end-to-end latency under the user device and plugin combination; main-thread dispatch is the conservative integration choice.",
+    "Behavior on other WeChat builds; runtime selector/type absence must fail closed."
+  ],
+  "lifecycle_evidence": "lifecycle/report.md"
+}

@@ -1,0 +1,442 @@
+[
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x105180644",
+    "end": "0x105180838",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "dealloc",
+    "address": "0x105180838",
+    "end": "0x1051808d8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "InitDB:Lock:",
+    "address": "0x1051808d8",
+    "end": "0x105180950",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "actionNotifySyncQueue",
+    "address": "0x105180950",
+    "end": "0x1051809a0",
+    "types": "@16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "isGettingData",
+    "address": "0x1051809a0",
+    "end": "0x1051809b0",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "resetGettingData",
+    "address": "0x1051809b0",
+    "end": "0x1051809c0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "SetLastNotifyTime:",
+    "address": "0x1051809c0",
+    "end": "0x105180a14",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "SetLastLongConnDisconectTime:",
+    "address": "0x105180a14",
+    "end": "0x105180a68",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "onServiceClearData",
+    "address": "0x105180a68",
+    "end": "0x105180aa4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "onServiceEnterBackground",
+    "address": "0x105180aa4",
+    "end": "0x105180d40",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "onServiceEnterForeground",
+    "address": "0x105180d40",
+    "end": "0x105180ff8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "onWillSuspend",
+    "address": "0x105180ff8",
+    "end": "0x105181294",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "StartNewInit:",
+    "address": "0x105181294",
+    "end": "0x1051818bc",
+    "types": "B20@0:8I16"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "InternalCreateSync:",
+    "address": "0x1051818bc",
+    "end": "0x105181b34",
+    "types": "B20@0:8I16"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "creatPBNewSyncEvent:",
+    "address": "0x105181b34",
+    "end": "0x1051821cc",
+    "types": "B20@0:8I16"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "NotifyToSync",
+    "address": "0x1051821cc",
+    "end": "0x1051821e4",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "NeedToSync",
+    "address": "0x1051821e4",
+    "end": "0x105182290",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "ApnsNotifySync",
+    "address": "0x105182290",
+    "end": "0x105182434",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "BackGroundToForeGroundSync",
+    "address": "0x105182434",
+    "end": "0x105182504",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "ProcessStartSync",
+    "address": "0x105182504",
+    "end": "0x1051825c8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "BackGroundFetchToSync",
+    "address": "0x1051825c8",
+    "end": "0x10518260c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "VOIPPushAwakeToNewSyncByLocalNotification",
+    "address": "0x10518260c",
+    "end": "0x105182650",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "VOIPPushAwakeToSyncByCallKit",
+    "address": "0x105182650",
+    "end": "0x105182694",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "VOIPPushAwakeToSyncByVoIP",
+    "address": "0x105182694",
+    "end": "0x1051826d8",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "SlientPushAwakeToNewSync",
+    "address": "0x1051826d8",
+    "end": "0x10518271c",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "AfterManualAuthNotifySync",
+    "address": "0x10518271c",
+    "end": "0x1051827c8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "LongLinkTimerSync",
+    "address": "0x1051827c8",
+    "end": "0x10518287c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "setNeedSyncWithScene:",
+    "address": "0x10518287c",
+    "end": "0x1051829d0",
+    "types": "v20@0:8i16"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "checkNeedSync",
+    "address": "0x1051829d0",
+    "end": "0x1051829f4",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "GetSelector",
+    "address": "0x1051829f4",
+    "end": "0x105182a38",
+    "types": "I16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "SetSelector:",
+    "address": "0x105182a38",
+    "end": "0x105182ac4",
+    "types": "v20@0:8I16"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "MessageReturn:Event:",
+    "address": "0x105182ac4",
+    "end": "0x105182e5c",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "HandleSyncResp:handleResult:",
+    "address": "0x105182e7c",
+    "end": "0x10518348c",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "markSyncOperating",
+    "address": "0x10518349c",
+    "end": "0x1051834b0",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "HandleNewSyncPush64:",
+    "address": "0x1051834b0",
+    "end": "0x10518395c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "HandleNewSyncPush:",
+    "address": "0x10518395c",
+    "end": "0x105183d7c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "__handleNewSyncResponse:flag:beginTime:",
+    "address": "0x105183d7c",
+    "end": "0x105184664",
+    "types": "v36@0:8@16I24Q28"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "lazyInitOplogData",
+    "address": "0x105184708",
+    "end": "0x105184798",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "startSyncOplog",
+    "address": "0x105184798",
+    "end": "0x1051849a8",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "InsertOplog:Oplog:Sync:",
+    "address": "0x1051849a8",
+    "end": "0x105184a58",
+    "types": "B32@0:8I16@20B28"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "checkSyncOplog",
+    "address": "0x105184a58",
+    "end": "0x105184a8c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "NeedToSyncOplog",
+    "address": "0x105184a8c",
+    "end": "0x105184b58",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "HandleOplog:Event:",
+    "address": "0x105184b58",
+    "end": "0x10518502c",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "StartOplog:Oplog:",
+    "address": "0x1051850b8",
+    "end": "0x1051853ac",
+    "types": "I28@0:8I16@20"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "StartOplog:Oplog:complete:",
+    "address": "0x1051853ac",
+    "end": "0x105185508",
+    "types": "v36@0:8I16@20@?28"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "StartMultipleOplog:callbackBlock:",
+    "address": "0x105185894",
+    "end": "0x105185a3c",
+    "types": "v32@0:8@16@?24"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "makeSyncPause",
+    "address": "0x1051860c4",
+    "end": "0x1051861ac",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "makeSyncResume",
+    "address": "0x1051861ac",
+    "end": "0x105186290",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "handleBatchMessages:ignoreSession:",
+    "address": "0x105186290",
+    "end": "0x105186328",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "onNewSyncOplogOK",
+    "address": "0x105186328",
+    "end": "0x10518633c",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "onNewSyncOplogFail",
+    "address": "0x10518633c",
+    "end": "0x105186350",
+    "types": "v16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "IsLastSyncFinishCallingExtension",
+    "address": "0x105186350",
+    "end": "0x105186360",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "m_bHasSync",
+    "address": "0x105186360",
+    "end": "0x105186374",
+    "types": "B16@0:8"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": "setM_bHasSync:",
+    "address": "0x105186374",
+    "end": "0x105186384",
+    "types": "v20@0:8B16"
+  },
+  {
+    "cls": "NewSyncService",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x105186384",
+    "end": "0x105186428",
+    "types": "v16@0:8"
+  }
+]

@@ -1,0 +1,51 @@
+
+/tmp/wechat-8.0.78-inset-analysis/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000103b2441c <_Flutter_MMFoundation_BindContext>:
+1051827c8: d100c3ff    	sub	sp, sp, #0x30
+1051827cc: a9014ff4    	stp	x20, x19, [sp, #0x10]
+1051827d0: a9027bfd    	stp	x29, x30, [sp, #0x20]
+1051827d4: 910083fd    	add	x29, sp, #0x20
+1051827d8: aa0003f3    	mov	x19, x0
+1051827dc: b00d70a8    	adrp	x8, 0x11ff97000 <dyld_stub_binder+0x11ff97000>
+1051827e0: f941dd01    	ldr	x1, [x8, #0x3b8]
+1051827e4: 94aa9256    	bl	0x107c2713c <_Flutter_MMFoundation_BindContext+0x4102d20>
+1051827e8: 340002c0    	cbz	w0, 0x105182840 <_Flutter_MMFoundation_BindContext+0x165e424>
+1051827ec: b00d7f88    	adrp	x8, 0x120173000 <dyld_stub_binder+0x120173000>
+1051827f0: f9453500    	ldr	x0, [x8, #0xa68]
+1051827f4: f00d65a8    	adrp	x8, 0x11fe39000 <dyld_stub_binder+0x11fe39000>
+1051827f8: f942a901    	ldr	x1, [x8, #0x550]
+1051827fc: b00cb2a8    	adrp	x8, 0x11e7d7000 <dyld_stub_binder+0x11e7d7000>
+105182800: 913d2108    	add	x8, x8, #0xf48
+105182804: f90003e8    	str	x8, [sp]
+105182808: d00b0ee3    	adrp	x3, 0x11b360000 <dyld_stub_binder+0x11b360000>
+10518280c: 91270063    	add	x3, x3, #0x9c0
+105182810: 900b36e5    	adrp	x5, 0x11b85e000 <dyld_stub_binder+0x11b85e000>
+105182814: 912b00a5    	add	x5, x5, #0xac0
+105182818: 900b36e7    	adrp	x7, 0x11b85e000 <dyld_stub_binder+0x11b85e000>
+10518281c: 9138f8e7    	add	x7, x7, #0xe3e
+105182820: 52800042    	mov	w2, #0x2                ; =2
+105182824: 52800004    	mov	w4, #0x0                ; =0
+105182828: 52803a06    	mov	w6, #0x1d0              ; =464
+10518282c: 94aa9244    	bl	0x107c2713c <_Flutter_MMFoundation_BindContext+0x4102d20>
+105182830: a9427bfd    	ldp	x29, x30, [sp, #0x20]
+105182834: a9414ff4    	ldp	x20, x19, [sp, #0x10]
+105182838: 9100c3ff    	add	sp, sp, #0x30
+10518283c: d65f03c0    	ret
+105182840: d00d7008    	adrp	x8, 0x11ff84000 <dyld_stub_binder+0x11ff84000>
+105182844: f9400101    	ldr	x1, [x8]
+105182848: aa1303e0    	mov	x0, x19
+10518284c: 94aa923c    	bl	0x107c2713c <_Flutter_MMFoundation_BindContext+0x4102d20>
+105182850: 7100001f    	cmp	w0, #0x0
+105182854: 52800048    	mov	w8, #0x2                ; =2
+105182858: 52800089    	mov	w9, #0x4                ; =4
+10518285c: 1a881122    	csel	w2, w9, w8, ne
+105182860: b00d7008    	adrp	x8, 0x11ff83000 <dyld_stub_binder+0x11ff83000>
+105182864: f947b501    	ldr	x1, [x8, #0xf68]
+105182868: aa1303e0    	mov	x0, x19
+10518286c: a9427bfd    	ldp	x29, x30, [sp, #0x20]
+105182870: a9414ff4    	ldp	x20, x19, [sp, #0x10]
+105182874: 9100c3ff    	add	sp, sp, #0x30
+105182878: 14aa9231    	b	0x107c2713c <_Flutter_MMFoundation_BindContext+0x4102d20>

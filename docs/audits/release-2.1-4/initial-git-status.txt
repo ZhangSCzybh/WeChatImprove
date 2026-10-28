@@ -1,0 +1,272 @@
+## main...origin/main [ahead 3]
+ M .DS_Store
+ M .theos/_/DEBIAN/control
+ M .theos/_/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib
+ M .theos/last_package
+ M .theos/obj/WeChatImprove.dylib
+ M .theos/obj/arm64/Controllers/CSAuthorizationManager.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSBackgroundRunManager.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSBackgroundRunViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSBackupAudit.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSBackupEngine.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSBackupEngine.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSBackupManager.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSBackupManager.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSBackupPreviewViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSBackupRegistry.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSBackupRegistry.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSChatGroupSettingsViewController.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSChatGroupSettingsViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendAlbumAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendAudienceAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendBridge.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendCallAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendCallReply.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendContactAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendContactProjection.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendDetailAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendEntryState.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendGroupListAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendInteractionAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendManager.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendNavigation.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendNotificationAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendPolicy.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendProfileAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendRuntime.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendSearchAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendSessionPresentation.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSCloseFriendSessionPresentation.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendSettingsViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendSocialAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendSocialProjection.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendStatusAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendStore.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCloseFriendTimelineAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSCustomViewController.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSCustomViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSGroupListAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSGroupNativeBridge.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSGroupProjection.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSListCornerContactsAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSListCornerDiscoverAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSListCornerMoreAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSListCornerPageContext.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSListCornerPageContext.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSListCornerSessionAdapter.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSMessageActionCoordinator.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSNativeContactPicker.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSNativeContactPicker.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSReleaseNotesViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSScheduledTaskManager.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/CSScheduledTaskSettingsViewController.m.7be6bc4b.Td
+ M .theos/obj/arm64/Controllers/CSScheduledTaskSettingsViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Controllers/WEContactSelectViewController.m.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/CloseFriendContactHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/CloseFriendSearchHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/CustomEntryHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/ListCornerRadiusHooks.xm.7be6bc4b.Td
+ M .theos/obj/arm64/Hooks/ListCornerRadiusHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/NavigationTitleHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/Hooks/SessionGroupHooks.xm.7be6bc4b.o
+ M .theos/obj/arm64/WeChatImprove.dylib
+ M .theos/obj/arm64/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib
+ M .theos/obj/arm64/WeChatImprove.dylib.dSYM/Contents/Resources/Relocations/aarch64/WeChatImprove.dylib.yml
+ M .theos/obj/arm64e/Controllers/CSAuthorizationManager.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSBackgroundRunManager.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSBackgroundRunViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSBackupAudit.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSBackupEngine.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSBackupEngine.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSBackupManager.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSBackupManager.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSBackupPreviewViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSBackupRegistry.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSBackupRegistry.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSChatGroupSettingsViewController.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSChatGroupSettingsViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendAlbumAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendAudienceAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendBridge.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendCallAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendCallReply.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendContactAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendContactProjection.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendDetailAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendEntryState.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendGroupListAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendInteractionAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendManager.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendNavigation.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendNotificationAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendPolicy.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendProfileAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendRuntime.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendSearchAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendSessionPresentation.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSCloseFriendSessionPresentation.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendSettingsViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendSocialAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendSocialProjection.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendStatusAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendStore.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCloseFriendTimelineAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSCustomViewController.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSCustomViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSGroupListAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSGroupNativeBridge.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSGroupProjection.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSListCornerContactsAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSListCornerDiscoverAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSListCornerMoreAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSListCornerPageContext.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSListCornerPageContext.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSListCornerSessionAdapter.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSMessageActionCoordinator.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSNativeContactPicker.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSNativeContactPicker.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSReleaseNotesViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSScheduledTaskManager.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/CSScheduledTaskSettingsViewController.m.dd9766eb.Td
+ M .theos/obj/arm64e/Controllers/CSScheduledTaskSettingsViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Controllers/WEContactSelectViewController.m.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/CloseFriendContactHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/CloseFriendSearchHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/CustomEntryHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/ListCornerRadiusHooks.xm.dd9766eb.Td
+ M .theos/obj/arm64e/Hooks/ListCornerRadiusHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/NavigationTitleHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/Hooks/SessionGroupHooks.xm.dd9766eb.o
+ M .theos/obj/arm64e/WeChatImprove.dylib
+ M .theos/obj/arm64e/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib
+ M .theos/obj/arm64e/WeChatImprove.dylib.dSYM/Contents/Resources/Relocations/arm64e/WeChatImprove.dylib.yml
+ M Controllers/CSAIChatDetailAdapter.m
+ M Controllers/CSAIClient.h
+ M Controllers/CSAIClient.m
+ M Controllers/CSAIMessageAdapter.h
+ M Controllers/CSAIMessageAdapter.m
+ M Controllers/CSAIReplyCoordinator.h
+ M Controllers/CSAIReplyCoordinator.m
+ M Controllers/CSAIReplyManager.h
+ M Controllers/CSAIReplyManager.m
+ M Controllers/CSAIReplySettingsViewController.m
+ M Controllers/CSAIReplyStore.h
+ M Controllers/CSAIReplyStore.m
+ M Controllers/CSAuthorizationManager.h
+ M Controllers/CSAuthorizationManager.m
+ M Controllers/CSBackgroundRunManager.h
+ M Controllers/CSBackgroundRunManager.m
+ M Controllers/CSCloseFriendSettingsViewController.m
+ M Controllers/CSCustomViewController.m
+ M Controllers/CSListCornerPageContext.h
+ M Controllers/CSListCornerPageContext.m
+ M Controllers/CSReleaseNotesViewController.m
+ M Headers/CSUserInfoHelper.h
+ M Hooks/ListCornerRadiusHooks.xm
+ M Makefile
+ M README.md
+ M Tests/AIClientTests.m
+ M Tests/AIDetailUIKit/UIKit/UIKit.h
+ M Tests/AIReplyBackupTests.m
+ M Tests/AIReplyCoordinatorTests.m
+ M Tests/AIReplyManagerTests.m
+ M Tests/AIReplyNativeTests.m
+ M Tests/AIReplyStoreTests.m
+ M Tests/BackgroundRunTests.m
+ M Tests/ListCornerSemanticsTests.m
+ M Tests/ListCornerUIKit/ListCornerUIKit.m
+ M Tests/ListCornerUIKit/UIKit/UIKit.h
+ M Tests/extract-list-corners.py
+ M Tests/verify-ai-manager.sh
+ M Tests/verify-list-corners.sh
+ M control
+ M docs/features/ai-auto-reply-validation.md
+ M docs/features/ai-auto-reply.md
+ M docs/list-corners.md
+ M packages/.DS_Store
+ D packages/2.1-1-ai-session-d6913bff/SHA256SUMS.txt
+ D packages/2.1-1-ai-session-d6913bff/com.wechat.improve_2.1-1_iphoneos-arm.deb
+ D packages/2.1-1-ai-session-d6913bff/com.wechat.improve_2.1-1_iphoneos-arm64.deb
+ D packages/2.1-1-ai-session-d6913bff/com.wechat.improve_2.1-1_symbols.zip
+ D packages/com.wechat.improve_2.1-1_iphoneos-arm.deb
+ D packages/com.wechat.improve_2.1-1_iphoneos-arm64.deb
+ D packages/com.wechat.improve_2.1-1_symbols.zip
+?? .theos/obj/arm64/Controllers/CSAIBackgroundSync.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSAIBackgroundSync.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSAIChatDetailAdapter.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSAIChatDetailAdapter.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSAIClient.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSAIClient.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSAICredentialStore.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSAICredentialStore.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSAIImagePreparer.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSAIImagePreparer.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSAIMessageAdapter.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSAIMessageAdapter.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSAIReplyCoordinator.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSAIReplyCoordinator.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSAIReplyManager.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSAIReplyManager.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSAIReplySettingsViewController.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSAIReplySettingsViewController.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSAIReplyStore.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSAIReplyStore.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSCloseFriendAutomationProjection.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSCloseFriendAutomationProjection.m.7be6bc4b.o
+?? .theos/obj/arm64/Controllers/CSListCornerSessionRestore.m.7be6bc4b.Td
+?? .theos/obj/arm64/Controllers/CSListCornerSessionRestore.m.7be6bc4b.o
+?? .theos/obj/arm64/Hooks/AIReplyHooks.xm.7be6bc4b.Td
+?? .theos/obj/arm64/Hooks/AIReplyHooks.xm.7be6bc4b.o
+?? .theos/obj/arm64e/Controllers/CSAIBackgroundSync.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSAIBackgroundSync.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSAIChatDetailAdapter.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSAIChatDetailAdapter.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSAIClient.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSAIClient.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSAICredentialStore.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSAICredentialStore.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSAIImagePreparer.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSAIImagePreparer.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSAIMessageAdapter.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSAIMessageAdapter.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSAIReplyCoordinator.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSAIReplyCoordinator.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSAIReplyManager.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSAIReplyManager.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSAIReplySettingsViewController.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSAIReplySettingsViewController.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSAIReplyStore.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSAIReplyStore.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSCloseFriendAutomationProjection.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSCloseFriendAutomationProjection.m.dd9766eb.o
+?? .theos/obj/arm64e/Controllers/CSListCornerSessionRestore.m.dd9766eb.Td
+?? .theos/obj/arm64e/Controllers/CSListCornerSessionRestore.m.dd9766eb.o
+?? .theos/obj/arm64e/Hooks/AIReplyHooks.xm.dd9766eb.Td
+?? .theos/obj/arm64e/Hooks/AIReplyHooks.xm.dd9766eb.o
+?? Controllers/CSAIBackgroundSync.h
+?? Controllers/CSAIBackgroundSync.m
+?? Controllers/CSAIImagePreparer.h
+?? Controllers/CSAIImagePreparer.m
+?? Controllers/CSListCornerSessionRestore.h
+?? Controllers/CSListCornerSessionRestore.m
+?? Tests/AIBackgroundSyncTests.m
+?? Tests/AIImagePreparerTests.m
+?? Tests/AuthorizationReadTests.m
+?? Tests/ListRestoreTests.h
+?? Tests/verify-ai-background-sync.sh
+?? Tests/verify-ai-images.sh
+?? Tests/verify-authorization-read.sh
+?? docs/.DS_Store
+?? docs/audits/ai-multimodal-web-2026-10-28/
+?? docs/audits/ai-muted-background-2.1-2/
+?? docs/audits/ai-performance-cleanup-2026-10-28/
+?? docs/audits/list-restore-2.1-3/
+?? docs/audits/list-restore-cleanup-2026-10-28/
+?? docs/audits/release-2.1-2/
+?? docs/audits/release-2.1-4/
+?? docs/feedbacks/2026-10-27-foreground-gap-background-lost.jpg
+?? docs/feedbacks/2026-10-27-foreground-gap-background-lost.txt
+?? packages/SHA256SUMS
+?? packages/com.wechat.improve_2.1-3_iphoneos-arm.deb
+?? packages/com.wechat.improve_2.1-3_iphoneos-arm64.deb
+?? packages/com.wechat.improve_2.1-3_symbols.zip

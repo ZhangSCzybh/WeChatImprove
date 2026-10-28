@@ -1,5 +1,6 @@
 #import "CSAIReplyStore.h"
 #import "CSAIClient.h"
+#import <CoreFoundation/CoreFoundation.h>
 #import <CommonCrypto/CommonDigest.h>
 #import <TargetConditionals.h>
 #import <sys/stat.h>
@@ -17,8 +18,21 @@ static BOOL IsBoolean(id value) { return [value isKindOfClass:NSNumber.class] &&
 static NSString *Digest(NSString *value) { NSData *data=[value dataUsingEncoding:NSUTF8StringEncoding]; unsigned char bytes[CC_SHA256_DIGEST_LENGTH]; CC_SHA256(data.bytes,(CC_LONG)data.length,bytes); NSMutableString *result=[NSMutableString string]; for(NSUInteger i=0;i<sizeof(bytes);i++) [result appendFormat:@"%02x",bytes[i]]; return result; }
 static BOOL OnlyKeys(NSDictionary *dictionary, NSArray *keys) { for(id key in dictionary) if(![keys containsObject:key]) return NO; return YES; }
 NSURL *CSAIReplyFileURL(NSURL *root, NSString *account) { return [root URLByAppendingPathComponent:[NSString stringWithFormat:@"ai-reply-%@.plist",Digest(account)]]; }
-NSDictionary *CSAIReplyDefaultConfiguration(void) { return @{@"enabled":@NO,@"endpoint":@"",@"model":@"",@"credentialRevision":@"",@"verifiedConnection":@"",@"presets":@[@{@"id":@"default",@"name":@"默认回复",@"prompt":@"请根据对方的消息，用自然、友好、简洁的中文回复。不编造事实，不代替我作出承诺；不确定时明确说明。只输出要发送的回复正文，不附加解释或格式标记。"}],@"defaultPreset":@"default",@"conversations":@{}}; }
-NSString *CSAIConnectionIdentifier(NSDictionary *configuration) { NSMutableString *value=[NSMutableString string]; for(NSString *key in @[@"endpoint",@"model",@"credentialRevision"]) { NSString *part=[configuration[key] isKindOfClass:NSString.class]?configuration[key]:@""; [value appendFormat:@"%lu:%@",(unsigned long)part.length,part]; } return Digest(value); }
+NSDictionary *CSAIReplyDefaultConfiguration(void) { return @{@"enabled":@NO,@"endpoint":@"",@"model":@"",@"credentialRevision":@"",@"verifiedConnection":@"",@"provider":@"openai-compatible",@"imageEnabled":@NO,@"searchMode":@"off",@"thinkingEnabled":@NO,@"presets":@[@{@"id":@"default",@"name":@"默认回复",@"prompt":@"请根据对方的消息，用自然、友好、简洁的中文回复。不编造事实，不代替我作出承诺；不确定时明确说明。只输出要发送的回复正文，不附加解释或格式标记。"}],@"defaultPreset":@"default",@"conversations":@{}}; }
+NSString *CSAIProvider(NSDictionary *configuration) { id value=configuration[@"provider"]; return [value isKindOfClass:NSString.class]?value:@"openai-compatible"; }
+NSString *CSAISearchMode(NSDictionary *configuration) { id value=configuration[@"searchMode"]; return [value isKindOfClass:NSString.class]?value:@"off"; }
+NSString *CSAIConnectionIdentifier(NSDictionary *configuration) {
+    NSMutableString *value=[NSMutableString string];
+    for(NSString *key in @[@"endpoint",@"model",@"credentialRevision"]) { NSString *part=[configuration[key] isKindOfClass:NSString.class]?configuration[key]:@""; [value appendFormat:@"%lu:%@",(unsigned long)part.length,part]; }
+    NSString *provider=CSAIProvider(configuration),*search=CSAISearchMode(configuration);
+    BOOL image=[configuration[@"imageEnabled"] isKindOfClass:NSNumber.class] && [configuration[@"imageEnabled"] boolValue];
+    BOOL thinking=[configuration[@"thinkingEnabled"] isKindOfClass:NSNumber.class] && [configuration[@"thinkingEnabled"] boolValue];
+    // The complete default capability set must keep already-verified legacy connections valid.
+    if(![provider isEqual:@"openai-compatible"] || image || ![search isEqual:@"off"] || thinking)
+        for(NSString *part in @[@"capabilities-v1",provider,image?@"1":@"0",search,thinking?@"1":@"0"])
+            [value appendFormat:@"%lu:%@",(unsigned long)part.length,part];
+    return Digest(value);
+}
 BOOL CSAIValidateEndpoint(NSString *endpoint, NSError **error) {
     if(!String(endpoint,1,8192) || ![endpoint isEqualToString:[endpoint stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet]]) return Fail(error,@"请输入完整 HTTPS 请求地址");
     NSURLComponents *parts=[NSURLComponents componentsWithString:endpoint];
@@ -28,7 +42,11 @@ BOOL CSAIValidateEndpoint(NSString *endpoint, NSError **error) {
 BOOL CSAIReplyValidateConfiguration(id configuration, NSError **error) {
     if(![configuration isKindOfClass:NSDictionary.class]) return Fail(error,@"AI 配置格式无效");
     NSDictionary *c=configuration;
-    if(!OnlyKeys(c,@[@"enabled",@"endpoint",@"model",@"credentialRevision",@"verifiedConnection",@"verifiedAt",@"presets",@"defaultPreset",@"conversations"]) || !IsBoolean(c[@"enabled"]) || !String(c[@"endpoint"],0,8192) || !String(c[@"model"],0,200)) return Fail(error,@"AI 配置字段无效");
+    if(!OnlyKeys(c,@[@"enabled",@"endpoint",@"model",@"credentialRevision",@"verifiedConnection",@"verifiedAt",@"provider",@"imageEnabled",@"searchMode",@"thinkingEnabled",@"presets",@"defaultPreset",@"conversations"]) || !IsBoolean(c[@"enabled"]) || !String(c[@"endpoint"],0,8192) || !String(c[@"model"],0,200)) return Fail(error,@"AI 配置字段无效");
+    if((c[@"provider"] && (!String(c[@"provider"],1,30) || ![@[@"openai-compatible",@"bailian"] containsObject:c[@"provider"]])) ||
+       (c[@"imageEnabled"] && !IsBoolean(c[@"imageEnabled"])) || (c[@"thinkingEnabled"] && !IsBoolean(c[@"thinkingEnabled"])) ||
+       (c[@"searchMode"] && (!String(c[@"searchMode"],1,10) || ![@[@"off",@"auto",@"always"] containsObject:c[@"searchMode"]]))) return Fail(error,@"模型能力配置无效");
+    if(![CSAIProvider(c) isEqual:@"bailian"] && (![CSAISearchMode(c) isEqual:@"off"] || [c[@"thinkingEnabled"] boolValue])) return Fail(error,@"联网与思考模式仅支持阿里云百炼接口");
     NSString *endpoint=c[@"endpoint"];
     if(endpoint.length && !CSAIValidateEndpoint(endpoint,error)) return NO;
     if(c[@"credentialRevision"] && !String(c[@"credentialRevision"],0,200)) return Fail(error,@"凭据版本无效");
@@ -39,7 +57,7 @@ BOOL CSAIReplyValidateConfiguration(id configuration, NSError **error) {
     for(id p in presets) { if(![p isKindOfClass:NSDictionary.class] || !OnlyKeys(p,@[@"id",@"name",@"prompt"]) || !String(p[@"id"],1,200) || !String(p[@"name"],1,60) || !String(p[@"prompt"],1,12000) || [ids containsObject:p[@"id"]]) return Fail(error,@"回复预设无效"); [ids addObject:p[@"id"]]; }
     if(!String(c[@"defaultPreset"],1,200) || ![ids containsObject:c[@"defaultPreset"]]) return Fail(error,@"默认预设无效");
     NSDictionary *conversations=c[@"conversations"]; if(![conversations isKindOfClass:NSDictionary.class] || conversations.count>1000) return Fail(error,@"会话配置无效");
-    for(id key in conversations) { id item=conversations[key]; if(!String(key,1,512) || ![item isKindOfClass:NSDictionary.class] || !OnlyKeys(item,@[@"enabled",@"presetID"]) || !IsBoolean(item[@"enabled"]) || !String(item[@"presetID"],0,200) || ([item[@"presetID"] length] && ![ids containsObject:item[@"presetID"]])) return Fail(error,@"会话预设无效"); }
+    for(id key in conversations) { id item=conversations[key]; if(!String(key,1,512) || ![item isKindOfClass:NSDictionary.class] || !OnlyKeys(item,@[@"enabled",@"presetID",@"allowUnmentioned"]) || !IsBoolean(item[@"enabled"]) || (item[@"allowUnmentioned"] && !IsBoolean(item[@"allowUnmentioned"])) || !String(item[@"presetID"],0,200) || ([item[@"presetID"] length] && ![ids containsObject:item[@"presetID"]])) return Fail(error,@"会话预设无效"); }
     return YES;
 }
 static BOOL ValidRecord(id record) {
@@ -57,11 +75,12 @@ BOOL CSAIReplyValidateState(id state, NSString *account, NSError **error) {
 }
 NSDictionary *CSAIReplyPortableState(NSDictionary *state) {
     NSMutableDictionary *c=[NSMutableDictionary dictionary]; NSDictionary *source=state[@"configuration"]?:CSAIReplyDefaultConfiguration();
-    for(NSString *key in @[@"enabled",@"endpoint",@"model",@"presets",@"defaultPreset",@"conversations"]) if(source[key]) c[key]=source[key];
+    for(NSString *key in @[@"enabled",@"endpoint",@"model",@"provider",@"imageEnabled",@"searchMode",@"thinkingEnabled",@"presets",@"defaultPreset",@"conversations"]) if(source[key]) c[key]=source[key];
     return @{@"schema":@1,@"account":state[@"account"]?:@"",@"configuration":c};
 }
 static NSDictionary *NewState(NSString *account) { return @{@"schema":@1,@"account":account,@"configuration":CSAIReplyDefaultConfiguration(),@"handled":@{},@"history":@[]}; }
-static NSDictionary *ImmutableSnapshot(NSDictionary *state) { NSData *data=[NSPropertyListSerialization dataWithPropertyList:state format:NSPropertyListBinaryFormat_v1_0 options:0 error:NULL]; return data?[NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:NULL]:nil; }
+// Freeze caller-owned input once; later commits share the immutable, unchanged branches.
+static id ImmutablePropertyList(id value) { return CFBridgingRelease(CFPropertyListCreateDeepCopy(kCFAllocatorDefault,(__bridge CFPropertyListRef)value,kCFPropertyListImmutable)); }
 @interface CSAIReplyStore ()
 @property(nonatomic,strong) NSURL *url;
 @property(nonatomic,copy,readwrite) NSString *account;
@@ -70,7 +89,7 @@ static NSDictionary *ImmutableSnapshot(NSDictionary *state) { NSData *data=[NSPr
 @property(nonatomic,strong,readwrite) NSError *error;
 @end
 @implementation CSAIReplyStore
-- (instancetype)initWithURL:(NSURL *)url account:(NSString *)account { if((self=[super init])) { _url=url; _account=[account copy]; _state=NewState(account); } return self; }
+- (instancetype)initWithURL:(NSURL *)url account:(NSString *)account { if((self=[super init])) { _url=url; _account=[account copy]; _state=NewState(_account); } return self; }
 - (NSDictionary *)configuration { @synchronized(self) { return self.state[@"configuration"]; } }
 - (NSArray *)history { @synchronized(self) { return self.state[@"history"]?:@[]; } }
 + (NSDictionary *)readStateAtURL:(NSURL *)url account:(NSString *)account error:(NSError **)error {
@@ -138,28 +157,34 @@ static NSDictionary *ImmutableSnapshot(NSDictionary *state) { NSData *data=[NSPr
 - (BOOL)commit:(NSDictionary *)state error:(NSError **)error {
     if(!self.ready) return Fail(error,@"AI 存储未就绪");
     NSError *failure=nil; if(![self.class replaceState:state atURL:self.url account:self.account error:&failure]) { self.ready=NO; self.error=failure; if(error) *error=failure; return NO; }
-    self.state=ImmutableSnapshot(state); return YES;
+    self.state=[state copy]; return YES;
 }
 - (BOOL)saveConfiguration:(NSDictionary *)configuration error:(NSError **)error { @synchronized(self) {
     if(!CSAIReplyValidateConfiguration(configuration,error)) return NO;
-    NSMutableDictionary *state=[self.state mutableCopy]; state[@"configuration"]=configuration;
+    NSDictionary *snapshot=ImmutablePropertyList(configuration);
+    if(!snapshot) return Fail(error,@"无法复制 AI 配置");
+    NSMutableDictionary *state=[self.state mutableCopy]; state[@"configuration"]=snapshot;
     if(![self commit:state error:error]) return NO;
     [[NSNotificationCenter defaultCenter] postNotificationName:CSAIReplyConfigurationDidChange object:self]; return YES;
 } }
 - (BOOL)hasHandledMessageID:(NSString *)identifier { @synchronized(self) { NSDate *date=self.state[@"handled"][identifier]; return date && [date timeIntervalSinceNow]>=-7*86400; } }
 - (BOOL)claimMessageIDs:(NSArray<NSString *> *)identifiers error:(NSError **)error { @synchronized(self) {
     if(![identifiers isKindOfClass:NSArray.class] || !identifiers.count || identifiers.count>5000) return Fail(error,@"消息身份无效");
-    NSMutableSet *seen=[NSMutableSet set]; NSMutableDictionary *handled=[self.state[@"handled"] mutableCopy]?:[NSMutableDictionary dictionary]; NSDate *now=[NSDate date];
+    NSMutableSet *seen=[NSMutableSet set]; NSMutableArray<NSString *> *keys=[NSMutableArray arrayWithCapacity:identifiers.count]; NSMutableDictionary *handled=[self.state[@"handled"] mutableCopy]?:[NSMutableDictionary dictionary]; NSDate *now=[NSDate date];
     for(NSString *key in [handled allKeys]) if([handled[key] timeIntervalSinceDate:now]<-7*86400) [handled removeObjectForKey:key];
-    for(id identifier in identifiers) { if(!String(identifier,1,1024) || handled[identifier] || [seen containsObject:identifier]) return Fail(error,@"消息已处理或身份无效"); [seen addObject:identifier]; }
-    for(NSString *identifier in identifiers) handled[identifier]=now;
-    NSArray *oldest=[handled keysSortedByValueUsingComparator:^NSComparisonResult(NSDate *a, NSDate *b) { return [a compare:b]; }];
-    NSUInteger removeCount=handled.count>5000?handled.count-5000:0; for(NSUInteger i=0;i<removeCount;i++) [handled removeObjectForKey:oldest[i]];
-    NSMutableDictionary *state=[self.state mutableCopy]; state[@"handled"]=handled; return [self commit:state error:error];
+    for(id identifier in identifiers) { if(!String(identifier,1,1024)) return Fail(error,@"消息已处理或身份无效"); NSString *key=[identifier copy]; if(handled[key] || [seen containsObject:key]) return Fail(error,@"消息已处理或身份无效"); [seen addObject:key]; [keys addObject:key]; }
+    for(NSString *identifier in keys) handled[identifier]=now;
+    if(handled.count>5000) {
+        NSArray *oldest=[handled keysSortedByValueUsingComparator:^NSComparisonResult(NSDate *a, NSDate *b) { return [a compare:b]; }];
+        NSUInteger removeCount=handled.count-5000; for(NSUInteger i=0;i<removeCount;i++) [handled removeObjectForKey:oldest[i]];
+    }
+    NSMutableDictionary *state=[self.state mutableCopy]; state[@"handled"]=[handled copy]; return [self commit:state error:error];
 } }
 - (BOOL)appendHistory:(NSDictionary *)record error:(NSError **)error { @synchronized(self) {
     if(!ValidRecord(record)) return Fail(error,@"回复记录无效");
-    NSMutableArray *history=[self.history mutableCopy]; [history addObject:record]; if(history.count>200) [history removeObjectsInRange:NSMakeRange(0,history.count-200)];
-    NSMutableDictionary *state=[self.state mutableCopy]; state[@"history"]=history; return [self commit:state error:error];
+    NSDictionary *snapshot=ImmutablePropertyList(record);
+    if(!snapshot) return Fail(error,@"无法复制回复记录");
+    NSMutableArray *history=[self.history mutableCopy]; [history addObject:snapshot]; if(history.count>200) [history removeObjectsInRange:NSMakeRange(0,history.count-200)];
+    NSMutableDictionary *state=[self.state mutableCopy]; state[@"history"]=[history copy]; return [self commit:state error:error];
 } }
 @end

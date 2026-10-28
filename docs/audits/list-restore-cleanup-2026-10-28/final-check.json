@@ -1,0 +1,21 @@
+{
+  "version": "2.1-3",
+  "changedFiles": [
+    "Controllers/CSListCornerSessionRestore.h",
+    "Controllers/CSListCornerSessionRestore.m",
+    "Hooks/ListCornerRadiusHooks.xm",
+    "Tests/ListCornerSemanticsTests.m",
+    "docs/list-corners.md"
+  ],
+  "unrelatedSourceDifferences": [],
+  "removedDiagnosticsScan": "no matches in Controllers, Hooks, Tests",
+  "testChecks": 1357,
+  "testFailures": 0,
+  "buildScheme": "rootful",
+  "buildArchitectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "newWarnings": [],
+  "packaged": false
+}

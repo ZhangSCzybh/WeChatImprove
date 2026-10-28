@@ -1,0 +1,15 @@
+
+/tmp/wechat-8.0.78-inset-analysis/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000103b2441c <_Flutter_MMFoundation_BindContext>:
+1051829d0: d00d8528    	adrp	x8, 0x120228000 <dyld_stub_binder+0x120228000>
+1051829d4: b9890908    	ldrsw	x8, [x8, #0x908] ; ivar NewSyncService.m_bNeedSync offset=87 type=B
+1051829d8: 38686808    	ldrb	w8, [x0, x8]
+1051829dc: 7100051f    	cmp	w8, #0x1
+1051829e0: 54000081    	b.ne	0x1051829f0 <_Flutter_MMFoundation_BindContext+0x165e5d4>
+1051829e4: d00d70c8    	adrp	x8, 0x11ff9c000 <dyld_stub_binder+0x11ff9c000>
+1051829e8: f942d101    	ldr	x1, [x8, #0x5a0] ; selector: NotifyToSync
+1051829ec: 14aa91d4    	b	0x107c2713c <_Flutter_MMFoundation_BindContext+0x4102d20>
+1051829f0: d65f03c0    	ret

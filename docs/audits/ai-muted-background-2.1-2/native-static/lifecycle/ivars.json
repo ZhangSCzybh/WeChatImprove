@@ -1,0 +1,178 @@
+[
+  {
+    "name": "m_bHasInit",
+    "type": "B",
+    "offset": 8,
+    "offset_address": "0x12022890c",
+    "size": 1,
+    "alignment": 0
+  },
+  {
+    "name": "m_uiSelector",
+    "type": "I",
+    "offset": 12,
+    "offset_address": "0x120228924",
+    "size": 4,
+    "alignment": 2
+  },
+  {
+    "name": "m_uiSyncScene",
+    "type": "I",
+    "offset": 16,
+    "offset_address": "0x120228928",
+    "size": 4,
+    "alignment": 2
+  },
+  {
+    "name": "m_uiSyncContinueCount",
+    "type": "I",
+    "offset": 20,
+    "offset_address": "0x12022892c",
+    "size": 4,
+    "alignment": 2
+  },
+  {
+    "name": "m_lastSyncKeyMd5",
+    "type": "@\"NSString\"",
+    "offset": 24,
+    "offset_address": "0x120228954",
+    "size": 8,
+    "alignment": 3
+  },
+  {
+    "name": "m_tLastNotify",
+    "type": "@\"NSDate\"",
+    "offset": 32,
+    "offset_address": "0x120228930",
+    "size": 8,
+    "alignment": 3
+  },
+  {
+    "name": "m_tLastLongConnDisconnect",
+    "type": "@\"NSDate\"",
+    "offset": 40,
+    "offset_address": "0x120228934",
+    "size": 8,
+    "alignment": 3
+  },
+  {
+    "name": "m_oMMDB",
+    "type": "@\"CMMDB\"",
+    "offset": 48,
+    "offset_address": "0x120228938",
+    "size": 8,
+    "alignment": 3
+  },
+  {
+    "name": "m_oLock",
+    "type": "@\"NSRecursiveLock\"",
+    "offset": 56,
+    "offset_address": "0x12022893c",
+    "size": 8,
+    "alignment": 3
+  },
+  {
+    "name": "m_oplogData",
+    "type": "@\"OplogDataLogic\"",
+    "offset": 64,
+    "offset_address": "0x120228958",
+    "size": 8,
+    "alignment": 3
+  },
+  {
+    "name": "m_bNeedSyncOplog",
+    "type": "B",
+    "offset": 72,
+    "offset_address": "0x120228910",
+    "size": 1,
+    "alignment": 0
+  },
+  {
+    "name": "m_bSyncOplog",
+    "type": "B",
+    "offset": 73,
+    "offset_address": "0x120228914",
+    "size": 1,
+    "alignment": 0
+  },
+  {
+    "name": "m_bSyncOpError",
+    "type": "B",
+    "offset": 74,
+    "offset_address": "0x120228940",
+    "size": 1,
+    "alignment": 0
+  },
+  {
+    "name": "m_bSyncOperating",
+    "type": "B",
+    "offset": 75,
+    "offset_address": "0x120228950",
+    "size": 1,
+    "alignment": 0
+  },
+  {
+    "name": "m_lastSyncFinishCallingExtension",
+    "type": "B",
+    "offset": 76,
+    "offset_address": "0x120228920",
+    "size": 1,
+    "alignment": 0
+  },
+  {
+    "name": "m_syncEventID",
+    "type": "I",
+    "offset": 80,
+    "offset_address": "0x12022891c",
+    "size": 4,
+    "alignment": 2
+  },
+  {
+    "name": "m_bIsSyncPause",
+    "type": "B",
+    "offset": 84,
+    "offset_address": "0x120228918",
+    "size": 1,
+    "alignment": 0
+  },
+  {
+    "name": "m_isGettingData",
+    "type": "B",
+    "offset": 85,
+    "offset_address": "0x12022894c",
+    "size": 1,
+    "alignment": 0
+  },
+  {
+    "name": "m_bFirstSyncAfterBgfgChange",
+    "type": "B",
+    "offset": 86,
+    "offset_address": "0x120228944",
+    "size": 1,
+    "alignment": 0
+  },
+  {
+    "name": "m_bNeedSync",
+    "type": "B",
+    "offset": 87,
+    "offset_address": "0x120228908",
+    "size": 1,
+    "alignment": 0
+  },
+  {
+    "name": "_m_bHasSync",
+    "type": "B",
+    "offset": 88,
+    "offset_address": "0x12022895c",
+    "size": 1,
+    "alignment": 0
+  },
+  {
+    "name": "m_actionNotifySyncQueue",
+    "type": "@\"NSObject<OS_dispatch_queue>\"",
+    "offset": 96,
+    "offset_address": "0x120228948",
+    "size": 8,
+    "alignment": 3
+  }
+]

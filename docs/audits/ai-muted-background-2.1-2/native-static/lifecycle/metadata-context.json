@@ -1,0 +1,11 @@
+{
+  "class_address": "0x1203859a8",
+  "class_ro_address": "0x11f1dca90",
+  "ivars_entry_size": 32,
+  "ivars_count": 22,
+  "encryption": [
+    32768,
+    492666880,
+    0
+  ]
+}

@@ -71,15 +71,35 @@ static void AIConfigureTable(UITableView *table){table.backgroundColor=UIColor.s
 @interface CSAIOptionsPage : CSAISettingsPage
 @property NSArray<NSDictionary *> *options;
 @property NSString *selected;
+@property NSString *optionsHeader;
 @property(copy) void(^choose)(NSString *);
 @end
 @implementation CSAIOptionsPage
 - (void)reload{
     NSMutableArray *rows=[NSMutableArray array];__weak typeof(self) weakSelf=self;
     for(NSDictionary *option in self.options)[rows addObject:AIRow(option[@"title"],@"text.bubble",[option[@"id"] isEqual:self.selected]?@"已选择":nil,^{if([weakSelf current] && weakSelf.choose)weakSelf.choose(option[@"id"]);})];
-    self.sections=@[[CSSettingSection sectionWithHeader:@"选择预设" items:rows]];[super reload];
+    self.sections=@[[CSSettingSection sectionWithHeader:self.optionsHeader?:@"选择预设" items:rows]];[super reload];
 }
 @end
+static NSString *AIProviderTitle(NSDictionary *configuration){return [CSAIProvider(configuration) isEqual:@"bailian"]?@"阿里云百炼":@"通用兼容接口（默认）";}
+static NSString *AISearchTitle(NSDictionary *configuration){NSString *mode=CSAISearchMode(configuration);return [mode isEqual:@"always"]?@"每次联网":[mode isEqual:@"auto"]?@"按需联网":@"关闭（默认）";}
+static BOOL AISaveCapabilityChanges(CSAISettingsPage *page,NSDictionary *changes,NSString *originalConnection){
+    CSAIReplyManager *manager=CSAIReplyManager.sharedManager;
+    if(!page || ![page current] || ![originalConnection isEqual:CSAIConnectionIdentifier(manager.store.configuration)]){if(page)AIAlert(page,@"账号或模型能力已改变，请返回后重新设置。");return NO;}
+    NSMutableDictionary *configuration=[manager.store.configuration mutableCopy];[configuration addEntriesFromDictionary:changes];
+    if([changes[@"provider"] isEqual:@"openai-compatible"]){configuration[@"searchMode"]=@"off";configuration[@"thinkingEnabled"]=@NO;}
+    if(![originalConnection isEqual:CSAIConnectionIdentifier(configuration)]){configuration[@"verifiedConnection"]=@"";[configuration removeObjectForKey:@"verifiedAt"];}
+    return [page save:configuration];
+}
+static void AIPresentCapabilityPicker(CSAISettingsPage *page,NSString *title,NSString *key,NSArray<NSDictionary *> *options,NSString *selected,NSString *footer){
+    if(![page current])return;
+    CSAIOptionsPage *picker=[[CSAIOptionsPage alloc]initWithStyle:UITableViewStyleInsetGrouped];picker.account=page.account;picker.epoch=page.epoch;
+    picker.title=title;picker.optionsHeader=title;picker.options=options;picker.selected=selected;picker.footers=@[footer];
+    NSString *original=CSAIConnectionIdentifier(CSAIReplyManager.sharedManager.store.configuration);
+    __weak CSAISettingsPage *weakPage=page;__weak CSAIOptionsPage *weakPicker=picker;
+    picker.choose=^(NSString *value){if(AISaveCapabilityChanges(weakPage,@{key:value},original))[weakPicker.navigationController popViewControllerAnimated:YES];};
+    [page.navigationController pushViewController:picker animated:YES];
+}
 void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation,NSString *account,NSUInteger epoch){
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;
     if(![manager isCurrentAccount:account epoch:epoch])return;
@@ -211,7 +231,12 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 - (void)reload{
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;self.title=[manager displayNameForConversation:self.conversation];NSDictionary *item=manager.store.configuration[@"conversations"][self.conversation];__weak typeof(self) weakSelf=self;
     CSSettingItem *toggle=[CSSettingItem switchItemWithTitle:@"启用 AI 回复" iconName:@"sparkles" iconColor:UIColor.systemGreenColor switchValue:[item[@"enabled"] boolValue] valueChangedBlock:^(BOOL on){typeof(self) self=weakSelf;NSError *error=nil;if(![manager setConversation:self.conversation enabled:on presetID:item[@"presetID"]?:@"" account:self.account epoch:self.epoch error:&error])AIAlert(self,error.localizedDescription);[self reload];}];
-    self.sections=@[[CSSettingSection sectionWithHeader:@"AI 回复" items:@[toggle,AIRow(@"回复预设",@"text.bubble",[manager presetNameForConversation:self.conversation],^{CSAIPresentPresetPicker(weakSelf,weakSelf.conversation,weakSelf.account,weakSelf.epoch);})]]];self.footers=@[[manager statusForConversation:self.conversation]];[super reload];
+    NSMutableArray *items=[NSMutableArray arrayWithObject:toggle];
+    if([self.conversation hasSuffix:@"@chatroom"]){
+        [items addObject:[CSSettingItem switchItemWithTitle:@"免 @ 回复" iconName:@"at" iconColor:UIColor.systemGreenColor switchValue:[item[@"allowUnmentioned"] boolValue] valueChangedBlock:^(BOOL on){typeof(self) self=weakSelf;NSError *error=nil;if(![manager setConversation:self.conversation allowUnmentioned:on account:self.account epoch:self.epoch error:&error])AIAlert(self,error.localizedDescription);[self reload];}]];
+    }
+    [items addObject:AIRow(@"回复预设",@"text.bubble",[manager presetNameForConversation:self.conversation],^{CSAIPresentPresetPicker(weakSelf,weakSelf.conversation,weakSelf.account,weakSelf.epoch);})];
+    self.sections=@[[CSSettingSection sectionWithHeader:@"AI 回复" items:items]];self.footers=@[[manager statusForConversation:self.conversation]];[super reload];
 }
 @end
 @interface CSAIConversationsPage : CSAISettingsPage
@@ -259,6 +284,14 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 - (void)openConnection{
     CSAIConnectionEditor *editor=[CSAIConnectionEditor new];editor.account=self.account;editor.epoch=self.epoch;[self.navigationController pushViewController:editor animated:YES];
 }
+- (void)chooseProvider{
+    AIPresentCapabilityPicker(self,@"服务商",@"provider",@[@{@"id":@"openai-compatible",@"title":@"通用兼容接口（默认）"},@{@"id":@"bailian",@"title":@"阿里云百炼"}],CSAIProvider(CSAIReplyManager.sharedManager.store.configuration),@"通用接口使用兼容 Chat Completions 的服务；百炼可配置联网与思考模式。切回通用接口会关闭联网与思考。服务商选择不会修改 API 地址、模型名或 Key，修改后需要重新测试连接。");
+}
+- (void)chooseSearchMode{
+    NSDictionary *configuration=CSAIReplyManager.sharedManager.store.configuration;
+    if(![CSAIProvider(configuration) isEqual:@"bailian"]){AIAlert(self,@"联网模式仅适用于阿里云百炼接口，请先选择对应服务商。通用接口默认关闭联网。");return;}
+    AIPresentCapabilityPicker(self,@"联网模式",@"searchMode",@[@{@"id":@"off",@"title":@"关闭（默认）"},@{@"id":@"auto",@"title":@"按需联网"},@{@"id":@"always",@"title":@"每次联网"}],CSAISearchMode(configuration),@"按需联网由服务根据问题决定是否搜索；每次联网要求服务执行搜索。需要当前百炼模型支持。连接测试会检查参数是否可用，不代表该次一定执行了搜索。修改后需要重新测试连接。");
+}
 - (void)openPage:(Class)cls{
     CSAISettingsPage *page=[(CSAISettingsPage *)[cls alloc]initWithStyle:UITableViewStyleInsetGrouped];page.account=self.account;page.epoch=self.epoch;[self.navigationController pushViewController:page animated:YES];
 }
@@ -272,15 +305,21 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 - (void)reload{
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;NSDictionary *config=manager.store.configuration?:CSAIReplyDefaultConfiguration();__weak typeof(self) weakSelf=self;
     CSSettingItem *toggle=[CSSettingItem switchItemWithTitle:@"启用 AI 自动回复" iconName:@"sparkles" iconColor:UIColor.systemGreenColor switchValue:[config[@"enabled"] boolValue] valueChangedBlock:^(BOOL on){NSMutableDictionary *next=[manager.store.configuration mutableCopy];next[@"enabled"]=@(on);[weakSelf save:next];}];
+    NSString *originalConnection=CSAIConnectionIdentifier(config);BOOL bailian=[CSAIProvider(config) isEqual:@"bailian"];
+    CSSettingItem *image=[CSSettingItem switchItemWithTitle:@"图片识别" iconName:@"photo" iconColor:UIColor.systemBlueColor switchValue:[config[@"imageEnabled"] boolValue] valueChangedBlock:^(BOOL on){AISaveCapabilityChanges(weakSelf,@{@"imageEnabled":@(on)},originalConnection);}];
+    CSSettingItem *thinking=[CSSettingItem switchItemWithTitle:@"思考模式" iconName:@"brain" iconColor:UIColor.systemBlueColor switchValue:[config[@"thinkingEnabled"] boolValue] valueChangedBlock:^(BOOL on){
+        if(on && !bailian){AIAlert(weakSelf,@"思考模式仅适用于阿里云百炼接口，请先选择对应服务商。");[weakSelf reload];return;}
+        AISaveCapabilityChanges(weakSelf,@{@"thinkingEnabled":@(on)},originalConnection);
+    }];
     NSUInteger count=[self current]?CSCloseFriendVisibleAIConversations(config[@"conversations"],self.account,CSCloseFriendCurrentSnapshot()).count:0;
     NSString *connection=manager.connectionStatus;if(!connection.length)connection=[config[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(config)]?@"已通过连接测试":@"尚未验证当前配置";
     self.sections=@[
         [CSSettingSection sectionWithHeader:@"功能" items:@[toggle,AIRow(@"当前状态",@"info.circle",[self current]?[manager statusForConversation:nil]:@"账号已改变或尚未就绪",nil)]],
-        [CSSettingSection sectionWithHeader:@"模型连接" items:@[AIRow(@"API 请求地址",@"link",[config[@"endpoint"] length]?config[@"endpoint"]:@"未设置",^{[weakSelf openConnection];}),AIRow(@"API Key",@"key",[config[@"credentialRevision"] length]?@"已设置":@"未设置",^{[weakSelf openConnection];}),AIRow(@"模型名称",@"cpu",[config[@"model"] length]?config[@"model"]:@"未设置",^{[weakSelf openConnection];}),AIRow(self.testing?@"取消连接测试":@"测试连接",@"network",self.testing?@"测试中…":nil,^{[weakSelf testConnection];}),AIRow(@"连接状态",@"checkmark.circle",connection,nil)]],
+        [CSSettingSection sectionWithHeader:@"模型连接" items:@[AIRow(@"服务商",@"cloud",AIProviderTitle(config),^{[weakSelf chooseProvider];}),AIRow(@"API 请求地址",@"link",[config[@"endpoint"] length]?config[@"endpoint"]:@"未设置",^{[weakSelf openConnection];}),AIRow(@"API Key",@"key",[config[@"credentialRevision"] length]?@"已设置":@"未设置",^{[weakSelf openConnection];}),AIRow(@"模型名称",@"cpu",[config[@"model"] length]?config[@"model"]:@"未设置",^{[weakSelf openConnection];}),image,AIRow(@"联网模式",@"globe",AISearchTitle(config),^{[weakSelf chooseSearchMode];}),thinking,AIRow(self.testing?@"取消连接测试":@"测试连接",@"network",self.testing?@"测试中…":nil,^{[weakSelf testConnection];}),AIRow(@"连接状态",@"checkmark.circle",connection,nil)]],
         [CSSettingSection sectionWithHeader:@"回复预设" items:@[AIRow(@"默认预设",@"text.bubble",[manager presetNameForConversation:nil],^{CSAIPresentPresetPicker(weakSelf,nil,weakSelf.account,weakSelf.epoch);}),AIRow(@"管理预设",@"square.stack",[NSString stringWithFormat:@"%lu 个",(unsigned long)[config[@"presets"] count]],^{[weakSelf openPage:CSAIPresetsPage.class];})]],
         [CSSettingSection sectionWithHeader:@"回复管理" items:@[AIRow(@"已开启的会话",@"bubble.left.and.bubble.right",[NSString stringWithFormat:@"%lu 个",(unsigned long)count],^{[weakSelf openPage:CSAIConversationsPage.class];}),AIRow(@"回复记录",@"clock",nil,^{[weakSelf openPage:CSAIHistoryPage.class];})]]
     ];
-    self.footers=@[@"总开关与会话开关同时开启才会回复。手动回复不会暂停 AI。关闭时取消尚未提交的任务，重新开启不补回复历史消息。",@"兼容 Chat Completions 接口。测试仅调用模型，不发送微信消息；修改连接后需重新测试。",@"启用后，符合规则的文本及有限上下文会发送到你配置的模型服务，并以当前微信账号自动发送生成的回复。",@"群聊仅在被单独 @ 时回复。微信被系统挂起或退出时无法保证自动回复；本功能不会自动开启后台保活。"];
+    self.footers=@[@"总开关与会话开关同时开启才会回复。手动回复不会暂停 AI。关闭时取消尚未提交的任务，重新开启不补回复历史消息。",@"能力设置作用于当前模型连接及所有已启用的会话。图片识别、联网、思考默认关闭，联网与思考仅支持百炼。修改连接或能力后需重新测试；启用图片时测试会发送合成图文样例，不发送微信消息。API Key 与原始图片不随配置备份导出。",@"启用后，符合规则的文本及有限上下文会发送到你配置的模型服务；开启图片识别后还会发送符合触发规则的图片，并以当前微信账号自动发送生成的回复。",@"群聊可发图后 30 秒内由同一人 @ 提问；免 @ 群可直接发图。群聊默认仅在被单独 @ 时回复，可在当前群开启“免 @ 回复”。微信被系统挂起或退出时无法保证自动回复；本功能不会自动开启后台保活。"];
     [super reload];
 }
 @end

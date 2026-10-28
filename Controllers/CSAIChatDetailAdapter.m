@@ -81,6 +81,12 @@ static id ChatSearchSection(NSArray *sections){
     if(![CSAIReplyManager.sharedManager setConversation:self.conversation enabled:[sender isOn] presetID:conversation[@"presetID"]?:@"" account:self.account epoch:self.epoch error:&error])[self showError:error];
     [self refresh];
 }
+- (void)toggleUnmentioned:(id)sender {
+    if(![sender isKindOfClass:UISwitch.class] || ![self current]){[self refresh];return;}
+    NSError *error=nil;
+    if(![CSAIReplyManager.sharedManager setConversation:self.conversation allowUnmentioned:[sender isOn] account:self.account epoch:self.epoch error:&error])[self showError:error];
+    [self refresh];
+}
 - (void)choosePreset {
     if(![self current])return;UIViewController *controller=[self controller];
     if(controller.view.window)CSAIPresentPresetPicker(controller,self.conversation,self.account,self.epoch);
@@ -114,15 +120,20 @@ static id ChatSearchSection(NSArray *sections){
                 (group?CSMessageNativeSupports(section,@"removeCellAt:",@"v",@[@"Q"]):
                  (CSMessageNativeSupports(tableInfo,@"addSection:",@"v",@[@"@"]) && CSMessageNativeSupports(tableInfo,@"removeSectionAt:",@"v",@[@"Q"])));
             CSAIReplyManager *manager=CSAIReplyManager.sharedManager;
-            BOOL enabled=[manager.store.configuration[@"conversations"][self.conversation][@"enabled"] boolValue];
+            NSDictionary *configuration=manager.store.configuration[@"conversations"][self.conversation];
+            BOOL enabled=[configuration[@"enabled"] boolValue];
             id toggle=nil;
             if(group && enabled)toggle=Call(cellClass,@"switchCellForSel:target:leftImage:title:desc:on:",@[@":",@"@",@"@",@"@",@"@",@"B"],@[@"toggle:",self,NSNull.null,@"启用 AI 回复",[manager statusForConversation:self.conversation],@(enabled)]);
             if(!toggle)toggle=Call(cellClass,@"switchCellForSel:target:title:on:",@[@":",@"@",@"@",@"B"],@[@"toggle:",self,@"启用 AI 回复",@(enabled)]);
+            id unmentioned=group?Call(cellClass,@"switchCellForSel:target:title:on:",@[@":",@"@",@"@",@"B"],@[@"toggleUnmentioned:",self,@"免 @ 回复",@([configuration[@"allowUnmentioned"] boolValue])]):nil;
+            if(group && !unmentioned)unmentioned=Call(cellClass,@"switchCellForSel:target:leftImage:title:desc:on:",@[@":",@"@",@"@",@"@",@"@",@"B"],@[@"toggleUnmentioned:",self,NSNull.null,@"免 @ 回复",@"",@([configuration[@"allowUnmentioned"] boolValue])]);
             id preset=Call(cellClass,@"normalCellForSel:target:title:rightValue:",@[@":",@"@",@"@",@"@"],@[@"choosePreset",self,@"回复预设",[manager presetNameForConversation:self.conversation]]);
-            if(canInsert && toggle && preset){
+            if(canInsert && toggle && preset && (!group || unmentioned)){
                 objc_setAssociatedObject(toggle,CellKey,self,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
                 objc_setAssociatedObject(preset,CellKey,self,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-                CSMessageNativeInvoke(section,@"addCell:",@[toggle]);CSMessageNativeInvoke(section,@"addCell:",@[preset]);
+                CSMessageNativeInvoke(section,@"addCell:",@[toggle]);
+                if(unmentioned){objc_setAssociatedObject(unmentioned,CellKey,self,OBJC_ASSOCIATION_RETAIN_NONATOMIC);CSMessageNativeInvoke(section,@"addCell:",@[unmentioned]);}
+                CSMessageNativeInvoke(section,@"addCell:",@[preset]);
                 if(!group){
                     if(CSMessageNativeSupports(section,@"setFooterTitle:",@"v",@[@"@"]))CSMessageNativeInvoke(section,@"setFooterTitle:",@[[manager statusForConversation:self.conversation]]);
                     objc_setAssociatedObject(section,SectionKey,self,OBJC_ASSOCIATION_RETAIN_NONATOMIC);

@@ -19,6 +19,15 @@ static NSString *const UIFontTextStyleBody=@"body",*const UIFontTextStyleSubhead
 + (instancetype)preferredFontForTextStyle:(NSString *)style;
 @end
 @class UIGestureRecognizer,UITouch;
+@class UIWindow;
+static NSString *const UIApplicationWillResignActiveNotification=@"UIApplicationWillResignActiveNotification";
+static NSString *const UIApplicationDidEnterBackgroundNotification=@"UIApplicationDidEnterBackgroundNotification";
+static NSString *const UIApplicationWillEnterForegroundNotification=@"UIApplicationWillEnterForegroundNotification";
+static NSString *const UIApplicationDidBecomeActiveNotification=@"UIApplicationDidBecomeActiveNotification";
+static NSString *const UISceneWillDeactivateNotification=@"UISceneWillDeactivateNotification";
+static NSString *const UISceneDidEnterBackgroundNotification=@"UISceneDidEnterBackgroundNotification";
+static NSString *const UISceneWillEnterForegroundNotification=@"UISceneWillEnterForegroundNotification";
+static NSString *const UISceneDidActivateNotification=@"UISceneDidActivateNotification";
 @interface UITraitCollection : NSObject
 @property(nonatomic) UIUserInterfaceStyle userInterfaceStyle;
 @end
@@ -47,8 +56,10 @@ static NSString *const UIFontTextStyleBody=@"body",*const UIFontTextStyleSubhead
 @property(nonatomic,strong) UITraitCollection *traitCollection;
 @property(nonatomic,weak) UIView *superview;
 @property(nonatomic,strong) id responder;
+@property(nonatomic,strong) UIWindow *window;
 @property(nonatomic,strong) NSMutableArray<UIView *> *subviews;
 @property(nonatomic) NSUInteger layoutInvalidations;
+@property(nonatomic) NSUInteger displayInvalidations;
 - (instancetype)initWithFrame:(CGRect)frame;
 - (void)addSubview:(UIView *)view;
 - (void)insertSubview:(UIView *)view atIndex:(NSInteger)index;
@@ -58,6 +69,11 @@ static NSString *const UIFontTextStyleBody=@"body",*const UIFontTextStyleSubhead
 - (CGRect)convertRect:(CGRect)rect toView:(UIView *)view;
 - (id)nextResponder;
 - (void)setNeedsLayout;
+- (void)setNeedsDisplay;
+- (void)layoutSubviews;
+@end
+@interface UIWindow : UIView
+@property(nonatomic,strong) id windowScene;
 @end
 @interface UITableViewCell : UIView {
 @public UIView *m_subContentView;
@@ -68,6 +84,7 @@ static NSString *const UIFontTextStyleBody=@"body",*const UIFontTextStyleSubhead
 @property(nonatomic,strong) NSIndexPath *path;
 @end
 @interface UITableView : UIView
+@property(nonatomic) CGPoint contentOffset;
 @property(nonatomic,strong) UIView *backgroundView,*tableHeaderView,*tableFooterView;
 @property(nonatomic,strong) UIColor *sectionIndexBackgroundColor,*sectionIndexTrackingBackgroundColor;
 @property(nonatomic) BOOL showsVerticalScrollIndicator;

@@ -1,0 +1,60 @@
+{
+  "release-2.1-1": {
+    "changed": [
+      "Controllers/CSAIChatDetailAdapter.m",
+      "Controllers/CSAIMessageAdapter.m",
+      "Controllers/CSAIReplyCoordinator.m",
+      "Controllers/CSAIReplyManager.h",
+      "Controllers/CSAIReplyManager.m",
+      "Controllers/CSAIReplySettingsViewController.m",
+      "Controllers/CSAIReplyStore.m",
+      "Controllers/CSBackgroundRunManager.h",
+      "Controllers/CSBackgroundRunManager.m",
+      "Controllers/CSReleaseNotesViewController.m",
+      "Headers/CSUserInfoHelper.h",
+      "control"
+    ],
+    "added": [
+      "Controllers/CSAIBackgroundSync.h",
+      "Controllers/CSAIBackgroundSync.m"
+    ]
+  },
+  "release-2.1-1-ai-session": {
+    "changed": [
+      "Controllers/CSAIChatDetailAdapter.m",
+      "Controllers/CSAIClient.h",
+      "Controllers/CSAIClient.m",
+      "Controllers/CSAIMessageAdapter.h",
+      "Controllers/CSAIMessageAdapter.m",
+      "Controllers/CSAIReplyCoordinator.m",
+      "Controllers/CSAIReplyManager.h",
+      "Controllers/CSAIReplyManager.m",
+      "Controllers/CSAIReplySettingsViewController.m",
+      "Controllers/CSAIReplyStore.h",
+      "Controllers/CSAIReplyStore.m",
+      "Controllers/CSBackgroundRunManager.h",
+      "Controllers/CSBackgroundRunManager.m",
+      "Controllers/CSCloseFriendSettingsViewController.m",
+      "Controllers/CSCustomViewController.m",
+      "Controllers/CSReleaseNotesViewController.m",
+      "Headers/CSUserInfoHelper.h",
+      "control"
+    ],
+    "added": [
+      "Controllers/CSAIBackgroundSync.h",
+      "Controllers/CSAIBackgroundSync.m"
+    ]
+  },
+  "release-2.1-2": {
+    "changed": [
+      "Controllers/CSAIReplyManager.m",
+      "Controllers/CSBackgroundRunManager.h",
+      "Controllers/CSBackgroundRunManager.m",
+      "Controllers/CSReleaseNotesViewController.m"
+    ],
+    "added": [
+      "Controllers/CSAIBackgroundSync.h",
+      "Controllers/CSAIBackgroundSync.m"
+    ]
+  }
+}

@@ -1,5 +1,6 @@
 #import "CSAIReplyStore.h"
 #import "CSAIClient.h"
+#import "CSAIImagePreparer.h"
 NS_ASSUME_NONNULL_BEGIN
 @class CSAIReplyCoordinator;
 @protocol CSAIReplyCoordinatorDelegate <NSObject>
@@ -12,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic,strong,readonly) CSAIReplyStore *store;
 @property(nonatomic,weak) id<CSAIReplyCoordinatorDelegate> delegate;
 @property(nonatomic,copy) NSTimeInterval (^now)(void);
+@property(nonatomic,strong,nullable) id<CSAIImagePreparing> imagePreparer;
 @property(nonatomic,readonly) NSUInteger activeCount;
 @property(nonatomic,readonly) NSUInteger pendingCount;
 - (instancetype)initWithStore:(CSAIReplyStore *)store client:(id<CSAIGenerating>)client;

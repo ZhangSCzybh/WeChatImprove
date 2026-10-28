@@ -1,0 +1,33 @@
+{
+  "protectedFilesUnchanged": 4576,
+  "historicalPackagesUnchanged": 18,
+  "historicalAuditFilesUnchanged": 3345,
+  "workspaceTheosFilesUnchanged": 1213,
+  "compiledInputsVerified": 366,
+  "changedAuthorizedFiles": [
+    "Controllers/CSListCornerPageContext.h",
+    "Controllers/CSListCornerPageContext.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/ListCornerRadiusHooks.xm",
+    "Tests/ListCornerSemanticsTests.m",
+    "Tests/ListCornerUIKit/ListCornerUIKit.m",
+    "Tests/ListCornerUIKit/UIKit/UIKit.h",
+    "Tests/extract-list-corners.py",
+    "Tests/verify-list-corners.sh",
+    "control",
+    "README.md",
+    "docs/list-corners.md"
+  ],
+  "addedAuthorizedFiles": [
+    "Controllers/CSListCornerSessionRestore.h",
+    "Controllers/CSListCornerSessionRestore.m",
+    "Tests/ListRestoreTests.h"
+  ],
+  "onlyAddedPackages": [
+    "packages/com.wechat.improve_2.1-3_iphoneos-arm.deb",
+    "packages/com.wechat.improve_2.1-3_iphoneos-arm64.deb",
+    "packages/com.wechat.improve_2.1-3_symbols.zip"
+  ],
+  "deviceInstalled": false
+}

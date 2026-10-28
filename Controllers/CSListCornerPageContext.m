@@ -1,5 +1,6 @@
 #import "CSListCornerPageContext.h"
 #import "CSListCornerRenderer.h"
+#import "CSListCornerSessionRestore.h"
 #import <objc/runtime.h>
 #import <math.h>
 @interface UITableView (CSListCornerNativeFooter)
@@ -151,14 +152,18 @@ void CSListCornerRepairCellSeparators(UITableViewCell *cell, UITableView *table)
     @try { CSListCornerHideSeparator(cell); }
     @finally { CSListCornerEndOperation(cell); }
 }
+UIColor *CSListCornerSessionTableColor(UITableView *table) {
+    CSListCornerSnapshot *configuration=CSListCornerConfiguration.sharedConfiguration.snapshot;
+    UIUserInterfaceStyle style=table.traitCollection.userInterfaceStyle;
+    return configuration.enabled ? CSListCornerSessionCanvas(style) : [configuration backgroundForStyle:style];
+}
 void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial) {
     CSListCornerSnapshot *configuration=[[CSListCornerConfiguration sharedConfiguration] snapshot];
     // Session appearance historically applies these three properties even when disabled.
     // Cell/layout decoration keeps its independent enabled gate.
     if (!configuration.enabled && page!=CSListCornerPageSession) return;
     UITableView *table=CSListCornerOwnedTable(owner,page); if (!table) return;
-    UIColor *background=page==CSListCornerPageSession ? [configuration backgroundForStyle:table.traitCollection.userInterfaceStyle] : CSListCornerCanvasColor();
-    if (page==CSListCornerPageSession && configuration.enabled) background=CSListCornerSessionCanvas(table.traitCollection.userInterfaceStyle);
+    UIColor *background=page==CSListCornerPageSession ? CSListCornerSessionTableColor(table) : CSListCornerCanvasColor();
     if (![table.backgroundColor isEqual:background]) table.backgroundColor=background;
     if (page==CSListCornerPageContacts) {
         table.sectionIndexBackgroundColor=[UIColor clearColor];
@@ -174,6 +179,7 @@ void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial) {
         table.showsVerticalScrollIndicator=NO;
         if (page==CSListCornerPageContacts) { table.sectionHeaderHeight=0; table.sectionFooterHeight=0; }
     }
+    if (page==CSListCornerPageSession) CSListCornerTrackSessionTable(table);
 }
 static void CSListCornerPrepareCellPaint(UITableViewCell *cell, UIView *content) {
     BOOL session=objc_getAssociatedObject(cell,&SessionStateKey)!=nil;

@@ -1,0 +1,17 @@
+[
+  {
+    "class": "MainFrameTableView",
+    "address": "0x120379928",
+    "superclass": "MMMainTableView"
+  },
+  {
+    "class": "MMMainTableView",
+    "address": "0x1203642f8",
+    "superclass": "MMTableView"
+  },
+  {
+    "class": "MMTableView",
+    "address": "0x120635550",
+    "superclass": "external superclass (bind)"
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "path": "packages/2.1-3-ai-multimodal-web/com.wechat.improve_2.1-3_iphoneos-arm64.deb",
+    "sha256": "031831b772981c0e651cf937badefa9bc0c5d057e887e13befff56a80d555926",
+    "bytes": 1422420
+  },
+  {
+    "path": "packages/2.1-3-ai-multimodal-web/com.wechat.improve_2.1-3_iphoneos-arm.deb",
+    "sha256": "6fed2b56fe9033b05b45e0dcce463deec974d233efb17bef5c80141f0f7073aa",
+    "bytes": 1422250
+  },
+  {
+    "path": "packages/2.1-3-ai-multimodal-web/com.wechat.improve_2.1-3_symbols.zip",
+    "sha256": "0b4b58a46c8e7e10739ed0aaeb9be9a3cca87f156d376fa862b5dd567ce97898",
+    "bytes": 10541420
+  }
+]

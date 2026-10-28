@@ -5,17 +5,6 @@
 #import "../Headers/WCHeaders.h"
 
 static NSString * const kOfficialAccountUserName = @"gh_cac882c8f729"; // 替换为你的公众号原始ID
-static NSString * const kAuthorizationCacheKey = @"CSAuthorizationStatus";
-static NSString * const kLastCheckTimeKey = @"CSLastAuthorizationCheckTime";
-
-@interface CSAuthorizationManager ()
-
-@property (nonatomic, assign) BOOL cachedAuthorizationStatus;
-@property (nonatomic, assign) BOOL hasChecked;
-@property (nonatomic, strong, nullable) NSDate *lastCheckTime;
-
-@end
-
 @implementation CSAuthorizationManager
 
 + (instancetype)sharedManager {
@@ -31,36 +20,16 @@ static NSString * const kLastCheckTimeKey = @"CSLastAuthorizationCheckTime";
     self = [super init];
     if (self) {
         _officialAccountUserName = kOfficialAccountUserName;
-        _hasChecked = NO;
-        
-        [self loadCache];
     }
     return self;
 }
 
-- (void)loadCache {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    self.cachedAuthorizationStatus = [defaults boolForKey:kAuthorizationCacheKey];
-    self.lastCheckTime = [defaults objectForKey:kLastCheckTimeKey];
-    self.hasChecked = (self.lastCheckTime != nil);
-}
-
-- (void)saveCache {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setBool:self.cachedAuthorizationStatus forKey:kAuthorizationCacheKey];
-    [defaults setObject:self.lastCheckTime forKey:kLastCheckTimeKey];
-    [defaults synchronize];
-}
-
 - (BOOL)isAuthorized {
-    // 不使用缓存，每次都重新检查
+    // Always check the live follow state; authorization reads need no persistent cache.
     return [self checkAuthorization];
 }
 
 - (BOOL)checkAuthorization {
-    // 先清除缓存，强制重新检查
-    [self clearAuthorizationCache];
-    
     Class contactMgrClass = NSClassFromString(@"CContactMgr");
     if (!contactMgrClass) {
         return NO;
@@ -77,17 +46,8 @@ static NSString * const kLastCheckTimeKey = @"CSLastAuthorizationCheckTime";
         SEL isBrandFollowedSelector = NSSelectorFromString(@"isBrandFollowedWithUsername:");
         if ([contactClass respondsToSelector:isBrandFollowedSelector]) {
             @try {
-                BOOL isFollowed = ((BOOL (*)(id, SEL, id))objc_msgSend)(contactClass, isBrandFollowedSelector, self.officialAccountUserName);
-                
-                self.cachedAuthorizationStatus = isFollowed;
-                self.hasChecked = YES;
-                self.lastCheckTime = [NSDate date];
-                [self saveCache];
-                
-                return isFollowed;
-            } @catch (NSException *exception) {
-                NSLog(@"[授权管理] isBrandFollowedWithUsername调用失败: %@", exception);
-            }
+                return ((BOOL (*)(id, SEL, id))objc_msgSend)(contactClass, isBrandFollowedSelector, self.officialAccountUserName);
+            } @catch (__unused NSException *exception) {}
         }
     }
     
@@ -100,10 +60,6 @@ static NSString * const kLastCheckTimeKey = @"CSLastAuthorizationCheckTime";
     @try {
         id contact = ((id (*)(id, SEL, id))objc_msgSend)(contactMgr, getContactByNameSelector, self.officialAccountUserName);
         if (!contact) {
-            self.cachedAuthorizationStatus = NO;
-            self.hasChecked = YES;
-            self.lastCheckTime = [NSDate date];
-            [self saveCache];
             return NO;
         }
         
@@ -113,18 +69,9 @@ static NSString * const kLastCheckTimeKey = @"CSLastAuthorizationCheckTime";
             unsigned int subscriptionSettings = ((unsigned int (*)(id, SEL))objc_msgSend)(contact, brandSubscriptionSettingsSelector);
             
             // 如果 subscriptionSettings > 0，表示已关注
-            BOOL isFollowed = (subscriptionSettings > 0);
-            
-            self.cachedAuthorizationStatus = isFollowed;
-            self.hasChecked = YES;
-            self.lastCheckTime = [NSDate date];
-            [self saveCache];
-            
-            return isFollowed;
+            return subscriptionSettings > 0;
         }
-    } @catch (NSException *exception) {
-        NSLog(@"[授权管理] 检查关注状态异常: %@", exception);
-    }
+    } @catch (__unused NSException *exception) {}
     
     return NO;
 }
@@ -327,19 +274,6 @@ static NSString * const kLastCheckTimeKey = @"CSLastAuthorizationCheckTime";
     });
     
     NSLog(@"[授权管理] 打开搜索公众号页面");
-}
-
-- (void)clearAuthorizationCache {
-    self.cachedAuthorizationStatus = NO;
-    self.hasChecked = NO;
-    self.lastCheckTime = nil;
-    
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults removeObjectForKey:kAuthorizationCacheKey];
-    [defaults removeObjectForKey:kLastCheckTimeKey];
-    [defaults synchronize];
-    
-    NSLog(@"[授权管理] 已清除授权缓存");
 }
 
 @end

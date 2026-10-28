@@ -7,6 +7,9 @@ FOUNDATION_EXPORT NSString *const CSAIReplyBackupDomain;
 FOUNDATION_EXPORT NSString *const CSAIReplyStoreCommitUncertainKey;
 FOUNDATION_EXPORT NSURL *CSAIReplyFileURL(NSURL *root, NSString *account);
 FOUNDATION_EXPORT NSDictionary *CSAIReplyDefaultConfiguration(void);
+/// Missing capability fields keep the original generic text-only connection behavior.
+FOUNDATION_EXPORT NSString *CSAIProvider(NSDictionary *configuration);
+FOUNDATION_EXPORT NSString *CSAISearchMode(NSDictionary *configuration);
 FOUNDATION_EXPORT BOOL CSAIReplyValidateConfiguration(id configuration, NSError **error);
 FOUNDATION_EXPORT BOOL CSAIReplyValidateState(id state, NSString *account, NSError **error);
 FOUNDATION_EXPORT NSDictionary *CSAIReplyPortableState(NSDictionary *state);

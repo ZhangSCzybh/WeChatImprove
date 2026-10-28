@@ -1,0 +1,17 @@
+2026-10-27 21:52:17.921 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=foreground reason=offscreen
+2026-10-27 21:52:17.921 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=foreground reason=restore_trigger_missing
+2026-10-27 21:52:17.921 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=active reason=offscreen
+2026-10-27 21:52:17.921 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=active reason=ok
+2026-10-27 21:52:17.921 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=table_layout reason=native_overwrite
+2026-10-27 21:52:17.923 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=active reason=restore_trigger_missing
+2026-10-27 21:52:17.925 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=table_color reason=native_overwrite
+2026-10-27 21:52:17.925 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=background_view reason=native_overwrite
+2026-10-27 21:52:17.925 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=active reason=geometry_not_ready
+2026-10-27 21:52:17.925 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=table_layout reason=restore_trigger_missing
+2026-10-27 21:52:17.925 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=scene_foreground reason=restore_trigger_missing
+2026-10-27 21:52:17.925 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=scene_active reason=ok
+2026-10-27 21:52:17.926 list-tests[75967:34679476] [WeChatImprove][ListRestore] stage=table_layout reason=ok
+FAIL: foreground invalidates stale canvas rendering even when color properties already match
+FAIL: foreground invalidates existing backing without replacing its identity
+FAIL: foreground invalidates owned gap rendering without changing its height
+List corners: 1357 checks, 3 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)

@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.1-1`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.1-4`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -31,8 +31,8 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | 本地已生成 `2.1-1` 安装包，包含 AI 自动回复及密友列表隐藏；尚未真机验收 |
-| Rootful | 本地已生成 `2.1-1` 安装包；尚未真机验收 |
+| Rootless | 本地已生成 `2.1-4` 安装包，含百炼联网、图片与性能优化；尚待真机验收 |
+| Rootful | 本地已生成 `2.1-4` 安装包；尚待真机验收 |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
@@ -40,7 +40,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`。本地构建产物包括 [2.1-1 Rootless 安装包](packages/com.wechat.improve_2.1-1_iphoneos-arm64.deb)、[Rootful 安装包](packages/com.wechat.improve_2.1-1_iphoneos-arm.deb) 和 [调试符号](packages/com.wechat.improve_2.1-1_symbols.zip)。
+1. 获取与设备注入环境匹配的 `.deb`：当前 `2.1-4` 交付 [Rootless 安装包](packages/2.1-4/com.wechat.improve_2.1-4_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-4/com.wechat.improve_2.1-4_iphoneos-arm.deb)、[调试符号](packages/2.1-4/com.wechat.improve_2.1-4_symbols.zip) 和 [SHA-256](packages/2.1-4/SHA256SUMS)。本次整合百炼联网、图片识别、性能清理和列表恢复，新增能力默认关闭；发布及 GitHub 核验见 [2.1-4 记录](docs/audits/release-2.1-4/README.md)，使用方法见 [AI 功能说明](docs/features/ai-auto-reply.md)。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
@@ -134,7 +134,7 @@
 
 **功能增强 → 定时任务**：总开关和各任务开关默认按账号独立保存，可创建单次、每 N 分钟（1–1440）、每 N 小时（1–168）、每天或每周任务，向一个私聊、群聊或文件传输助手发送文字。列表和编辑页沿用公共设置样式，私聊/群聊使用与密友相同的微信原生选择器，每个任务只接受一个目标。执行前记录去重状态；重启后不会自动重发结果未知的消息。微信被挂起、强退或设备关机时不能保证准点。可选择跳过错过的时刻，或只补发最近 10 分钟内的最后一次。
 
-**功能增强 → AI 自动回复**：当前源码新增 AI 回复，总开关与会话开关默认关闭。可填写兼容 Chat Completions 的 HTTPS API 地址、API Key 和模型，测试连接后启用；支持多个命名预设和会话独立选择。群聊在聊天详情「查找聊天内容」下方设置，仅被单独 @ 时回复。手动回复与 AI 并行。密友保护可分别隐藏 AI 已开启会话列表和定时任务列表，隐藏后自动回复、定时发送仍按原配置运行。详见 [功能说明](docs/features/ai-auto-reply.md) 与 [核心验证记录](docs/features/ai-auto-reply-validation.md)。`2.1-1` 安装包已包含以上功能，打包与符号校验见 [2.1-1 发布记录](docs/audits/release-2.1-1/README.md)。
+**功能增强 → 人工智能**：总开关与会话开关默认关闭。支持显式选择百炼服务商、联网模式、单图识别与思考开关，新增能力默认关闭；百炼流式收齐后一次回复，通用接口保留原文本行为。可填写兼容 Chat Completions 的 HTTPS API 地址、API Key 和模型，测试连接后启用；支持多个命名预设和会话独立选择。群聊在聊天详情「查找聊天内容」下方设置，默认仅被单独 @ 时回复；`2.1-2` 在「启用 AI 回复」下方新增「免 @ 回复」，开启后仅当前群无需艾特。后台同步修复版在后台音频保活有效且存在已启用 AI 和免 @ 的群时，约每 30 秒请求原生消息同步，保留群免打扰；增加网络与耗电，系统挂起或退出后无法保证回复。手动回复与 AI 并行。密友保护可分别隐藏 AI 已开启会话列表和定时任务列表，隐藏后自动回复、定时发送仍按原配置运行。详见 [功能说明](docs/features/ai-auto-reply.md) 与 [核心验证记录](docs/features/ai-auto-reply-validation.md)。首次免 @ 包见 [2.1-2 发布记录](docs/audits/release-2.1-2/README.md)，本次修复见 [后台同步修复记录](docs/audits/ai-muted-background-2.1-2/README.md)。
 
 `2.0-16` 修复弹窗样式下，定时任务选择私聊/群聊时整个插件退出的问题。等待会话类型菜单自身关闭后打开原生选择器，取消回到原编辑页并保留未保存内容；同样覆盖全屏/push 显示。见 [修复与验收记录](docs/audits/scheduled-picker-dismiss-2.0-16/README.md)。
 
@@ -198,7 +198,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.1-1_iphoneos-arm64.deb`。
+当前版本默认输出：`packages/com.wechat.improve_2.1-4_iphoneos-arm64.deb`。
 
 ### Rootful
 
@@ -207,7 +207,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.1-1_iphoneos-arm.deb`。本地已生成两种方案的安装包。
+当前版本默认输出：`packages/com.wechat.improve_2.1-4_iphoneos-arm.deb`。本地已生成两种方案的安装包。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -231,7 +231,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/com.wechat.improve_2.1-1_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/com.wechat.improve_2.1-4_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。

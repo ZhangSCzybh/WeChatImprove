@@ -6,6 +6,7 @@ FOUNDATION_EXPORT UITableView * _Nullable CSListCornerOwnedTable(id owner, CSLis
 FOUNDATION_EXPORT BOOL CSListCornerOwnsTable(id owner, UITableView *table, CSListCornerPage page);
 FOUNDATION_EXPORT id _Nullable CSListCornerOwnerForTable(UITableView *table, CSListCornerPage page);
 FOUNDATION_EXPORT UIColor *CSListCornerCanvasColor(void);
+FOUNDATION_EXPORT UIColor *CSListCornerSessionTableColor(UITableView *table);
 FOUNDATION_EXPORT UIView * _Nullable CSListCornerNativeContent(UITableViewCell *cell);
 FOUNDATION_EXPORT void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial);
 FOUNDATION_EXPORT void CSListCornerRepairCellSeparators(UITableViewCell *cell, UITableView *table);

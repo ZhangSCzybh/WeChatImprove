@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 @implementation UITraitCollection @end
+@implementation UIWindow @end
 @implementation UIFont
 + (instancetype)preferredFontForTextStyle:(NSString *)style { UIFont *font=[self new];font.pointSize=[style isEqual:UIFontTextStyleSubheadline] ? 15 : 17;return font; }
 @end
@@ -27,6 +28,8 @@
 - (CGRect)convertRect:(CGRect)rect toView:(UIView *)view { CGPoint a=self.origin,b=view.origin;rect.origin.x+=a.x-b.x;rect.origin.y+=a.y-b.y;return rect; }
 - (id)nextResponder { return self.responder ?: self.superview; }
 - (void)setNeedsLayout { self.layoutInvalidations++; }
+- (void)setNeedsDisplay { self.displayInvalidations++; }
+- (void)layoutSubviews {}
 @end
 @implementation UITableViewCell
 - (instancetype)init { if ((self=[super init])) { _contentView=[UIView new];[self addSubview:_contentView]; }return self; }

@@ -13,6 +13,7 @@ extern NSNotificationName const CSBackgroundRunStateChangedNotification;
 - (void)start;
 - (void)reloadSettings;
 @property(nonatomic, readonly) BOOL enabled;
+@property(nonatomic, readonly) BOOL backgroundAudioActive;
 @property(nonatomic, readonly) BOOL supportsBackgroundAudio;
 @property(nonatomic, copy, readonly) NSString *statusText;
 @property(nonatomic, copy, readonly) NSString *lastBackgroundResult;

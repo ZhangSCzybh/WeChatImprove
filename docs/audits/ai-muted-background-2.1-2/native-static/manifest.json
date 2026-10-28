@@ -1,0 +1,167 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "class": "NewSyncService",
+  "class_metadata_address": "0x1203859a8",
+  "analysis": "read-only mmap Objective-C metadata and bounded ARM64 llvm-objdump; target not executed",
+  "static_only": true,
+  "rea_shared_session_used": false,
+  "files": {
+    "BackGroundFetchToSync.asm": {
+      "sha256": "3ed993a8eaeb4a5acb8072aaf995f1d064390e5cf297c232104fe634af739752",
+      "bytes": 1120
+    },
+    "BackGroundFetchToSync.asm.annotated": {
+      "sha256": "7e269e759ad724928232faf6393f99df49b16319f688530b5de59cd71eace7e5",
+      "bytes": 1152
+    },
+    "InternalCreateSync_.asm": {
+      "sha256": "8f8ebb00112273e847d2dbef191d459be08887689a6a6e3a7103d956699c06ff",
+      "bytes": 9542
+    },
+    "InternalCreateSync_.asm.annotated": {
+      "sha256": "90d0dcd1f8b83191b1bb1abe8244c2b72566f68c22e9ef9ab9724c29ea5e22cd",
+      "bytes": 10856
+    },
+    "LongLinkTimerSync.asm": {
+      "sha256": "7b751972bc4bf37e9f48e015b4bb1c0716d6d5f1f916162215c2c300ddc6af3b",
+      "bytes": 2674
+    },
+    "LongLinkTimerSync.asm.annotated": {
+      "sha256": "ea21b36ce5076bbeef034f4266892baa1b36b8ce17cab963fc234bebfa7d95fb",
+      "bytes": 2978
+    },
+    "NotifyToSync.asm": {
+      "sha256": "3669f356944f5014778896b1c8d28b57e6fdd53c4272acf7ac6d944fd7a842d2",
+      "bytes": 531
+    },
+    "NotifyToSync.asm.annotated": {
+      "sha256": "87832ed7a2c1c799e2b7ef0426058f9a5e4afcfaba15670f957653dc892046d3",
+      "bytes": 616
+    },
+    "checkNeedSync.asm": {
+      "sha256": "1af420f73cd959f33fd68607891b2183c62e270ad43849e7ccbeae17ec7d8d22",
+      "bytes": 684
+    },
+    "checkNeedSync.asm.annotated": {
+      "sha256": "9ec49d68d97c846b9f518538c15ecab0308dca391db7f6e73352e9b2c09cc94c",
+      "bytes": 760
+    },
+    "creatPBNewSyncEvent_.asm": {
+      "sha256": "da70e0c3852fdbd9d9e9672084f5568bd775ea27d87495c9e8eb1bcbf07948f9",
+      "bytes": 24291
+    },
+    "creatPBNewSyncEvent_.asm.annotated": {
+      "sha256": "41aeb13eed65766bae64c81678b8ae90717640e1c14dc441d4c7cce730dfda23",
+      "bytes": 26067
+    },
+    "entry-review.json": {
+      "sha256": "07e5141edd4452c6aea404df3abd38ca97876d914e2bac107fabe571945cfe63",
+      "bytes": 3740
+    },
+    "extract.py": {
+      "sha256": "677cf3145d301d05c598906d45f0cd42c55555538fe15b0d45d5574d940af269",
+      "bytes": 3165
+    },
+    "lifecycle/NewSyncService--BackGroundToForeGroundSync.annotated.asm": {
+      "sha256": "465ecd462e370137ebc354e8205e5357a64c684ef36b99ea12801d64ec8357cc",
+      "bytes": 3582
+    },
+    "lifecycle/NewSyncService--BackGroundToForeGroundSync.asm": {
+      "sha256": "3ef13bedc79702eef2ed9ba9f86a9c807ad20fb05b19634fa6064a1000c14ee3",
+      "bytes": 3193
+    },
+    "lifecycle/NewSyncService--init.annotated.asm": {
+      "sha256": "80221633e5402b3e43f238d3d76539334f54568b87316e2b07b462317da2c4c4",
+      "bytes": 8494
+    },
+    "lifecycle/NewSyncService--init.asm": {
+      "sha256": "3b1d9b37dd85216436f91b6d2f4f55e023369d74200a4489335f28bc62afa8ad",
+      "bytes": 7282
+    },
+    "lifecycle/NewSyncService--makeSyncPause.annotated.asm": {
+      "sha256": "7ab5b8f2a67e69202784f991e451d510ef3d8f5829c8398b0fc3dc4e1205bbd1",
+      "bytes": 4058
+    },
+    "lifecycle/NewSyncService--makeSyncPause.asm": {
+      "sha256": "6c9b28d438891f2d3d32718b6e75027a6d10e18bb4cc9967f6829646b219fb22",
+      "bytes": 3513
+    },
+    "lifecycle/NewSyncService--makeSyncResume.annotated.asm": {
+      "sha256": "49ffa191a94ed3993e75bb3298fe8836e3d9e43c8bb03c29d502a85c7a0fe283",
+      "bytes": 4004
+    },
+    "lifecycle/NewSyncService--makeSyncResume.asm": {
+      "sha256": "60164010ac9bca5f8d9676a03e52d8ae91f1f994379175ddc7f47909af981b18",
+      "bytes": 3457
+    },
+    "lifecycle/NewSyncService--onServiceEnterBackground.annotated.asm": {
+      "sha256": "6e5d9d7355ab82915d1b1284ddca618ffe68dbb84967ec5caf9aaf589e341a22",
+      "bytes": 11000
+    },
+    "lifecycle/NewSyncService--onServiceEnterBackground.asm": {
+      "sha256": "cc9a4ee364e0cf5c403de40c509fcd8410eae9cd82108e0d2e78bc82e9ce3045",
+      "bytes": 9770
+    },
+    "lifecycle/NewSyncService--onServiceEnterForeground.annotated.asm": {
+      "sha256": "e9d80864461958680eb304ac06c6100b1e854a9f91a5fef11d7d2aafc9d95c23",
+      "bytes": 11463
+    },
+    "lifecycle/NewSyncService--onServiceEnterForeground.asm": {
+      "sha256": "2406eb44df169df7095bbaaf1311338ba99c228b82e4f1abb1646b7d5d5a1898",
+      "bytes": 10174
+    },
+    "lifecycle/NewSyncService--onWillSuspend.annotated.asm": {
+      "sha256": "906df239cce6b33e6a5480a7aa0d46cc810d9ec29fb472c30b299791f5dd65ee",
+      "bytes": 10980
+    },
+    "lifecycle/NewSyncService--onWillSuspend.asm": {
+      "sha256": "163888a323d31edb4caa1a6f121809c0bdb7bb56241cbd387d048bb15f81b6f2",
+      "bytes": 9770
+    },
+    "lifecycle/common-thunks-level2.asm": {
+      "sha256": "025f569a02e58dc057704acae1e3ccb649df8b223b3347db6c546cf42cff472d",
+      "bytes": 4092
+    },
+    "lifecycle/common-thunks.asm": {
+      "sha256": "fdcea6ff959e7f3ab1a3ffbd10ed41b9e8bcebc56a2c72fea9031fa82bd3d887",
+      "bytes": 3362
+    },
+    "lifecycle/ivars.json": {
+      "sha256": "04fd7e7f82fddca0518764f94e96884646a2e411e9c2c23fe5b5a73e640e71c6",
+      "bytes": 3332
+    },
+    "lifecycle/metadata-context.json": {
+      "sha256": "f8ef3decbd95061dcee0f12b1c93f724a1e80445a440bec75dc044b309be5d84",
+      "bytes": 176
+    },
+    "lifecycle/methods.json": {
+      "sha256": "7f353f5e31cc50d6e68e6c784771d3379a824dca1b1697c53e895ef54ab17f8a",
+      "bytes": 1778
+    },
+    "lifecycle/references.json": {
+      "sha256": "c57cdd98e9009ac4eb52597b13e812a4640b4a6f3b66db416443846654379d21",
+      "bytes": 26274
+    },
+    "lifecycle/registration.json": {
+      "sha256": "c9d4e724d614371e1950cfc1082882d9189515869681b711acf8884474abd59e",
+      "bytes": 280
+    },
+    "lifecycle/report.md": {
+      "sha256": "d63105cb0f191f0690307da31c18348ac0d359633a1e49a3ef98349dd3f3aad6",
+      "bytes": 7900
+    },
+    "methods.json": {
+      "sha256": "af2ae760006dafc8dd2689c41865d129cad96b851f617c111aa3a1dc4c5df25d",
+      "bytes": 10009
+    },
+    "setNeedSyncWithScene_.asm": {
+      "sha256": "911babb3965a7453322aee3f4190843ca529923e5fb4bab45063d8cf7ff66da8",
+      "bytes": 5039
+    },
+    "setNeedSyncWithScene_.asm.annotated": {
+      "sha256": "3302c890dbfa3281693fd73450c526c58470756db31f50d1f1537228142460eb",
+      "bytes": 5587
+    }
+  }
+}

@@ -15,6 +15,7 @@ FOUNDATION_EXPORT NSNotificationName const CSAIReplyDidChange;
 - (BOOL)saveConnection:(NSString *)endpoint model:(NSString *)model key:(nullable NSString *)key account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error;
 - (id<CSAICancellable>)testConnectionForAccount:(NSString *)account epoch:(NSUInteger)epoch completion:(CSAICompletion)completion;
 - (BOOL)setConversation:(NSString *)conversation enabled:(BOOL)enabled presetID:(NSString *)presetID account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error;
+- (BOOL)setConversation:(NSString *)conversation allowUnmentioned:(BOOL)allowUnmentioned account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error;
 - (NSString *)statusForConversation:(nullable NSString *)conversation;
 - (NSString *)displayNameForConversation:(NSString *)conversation;
 - (NSString *)presetNameForConversation:(nullable NSString *)conversation;

@@ -1,0 +1,33 @@
+{
+  "packages": [
+    {
+      "scheme": "rootless",
+      "version": "2.1-3",
+      "architecture": "iphoneos-arm64",
+      "installPath": "var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "archs": "arm64 arm64e",
+      "uuids": {
+        "arm64": "CBCACF34-5018-3180-9356-3E68C9F1ACB3",
+        "arm64e": "D183D85F-1541-3B27-9A1A-222B830D5A24"
+      },
+      "featureTokensVerified": true
+    },
+    {
+      "scheme": "rootful",
+      "version": "2.1-3",
+      "architecture": "iphoneos-arm",
+      "installPath": "Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "archs": "arm64 arm64e",
+      "uuids": {
+        "arm64": "EA9EDDF2-F4FA-3590-B8FC-C50D30F1916C",
+        "arm64e": "BB976518-1635-3D94-ACCC-D84B91E800D1"
+      },
+      "featureTokensVerified": true
+    }
+  ],
+  "symbolsArchiveVerified": true,
+  "protectedArtifactCount": 1234,
+  "changedExistingArtifacts": [],
+  "sourceChangesDuringBuild": [],
+  "deviceInstalled": false
+}

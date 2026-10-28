@@ -11,6 +11,7 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-p
     "$project_dir/Controllers/CSListCornerConfiguration.m" "$project_dir/Controllers/CSListCornerSectionPolicy.m" \
     "$project_dir/Controllers/CSListCornerPageContext.m" "$project_dir/Controllers/CSListCornerRenderer.m" \
     "$project_dir/Controllers/CSListCornerSessionAdapter.m" "$project_dir/Controllers/CSListCornerContactsAdapter.m" \
+    "$project_dir/Controllers/CSListCornerSessionRestore.m" \
     "$project_dir/Controllers/CSListCornerDiscoverAdapter.m" "$project_dir/Controllers/CSListCornerMoreAdapter.m" \
     "$project_dir/Controllers/CSGroupIndexScope.m" "$project_dir/Controllers/CSGroupProjection.m" \
     "$project_dir/Controllers/WESessionTabItem.m" "$project_dir/Controllers/CSCloseFriendPolicy.m" -o "$test_dir/list-tests"
