@@ -1,0 +1,6 @@
+{
+  "script": "verify-group-badges.sh",
+  "exit_code": 0,
+  "duration_seconds": 1.064,
+  "output": "Group badges: 136 checks, 0 failures"
+}

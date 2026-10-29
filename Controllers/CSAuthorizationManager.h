@@ -12,7 +12,6 @@ typedef void(^CSAuthorizationCompletion)(BOOL success, NSString *message);
 @property (nonatomic, copy, readonly) NSString *officialAccountUserName;
 @property (nonatomic, assign, readonly) BOOL isAuthorized;
 
-- (BOOL)checkAuthorization;
 - (void)requestAuthorizationWithPresentingViewController:(UIViewController *)viewController
                                               completion:(nullable CSAuthorizationCompletion)completion;
 - (void)openOfficialAccountFromViewController:(UIViewController *)viewController;

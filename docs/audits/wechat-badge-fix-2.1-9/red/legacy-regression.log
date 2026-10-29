@@ -1,0 +1,4 @@
+FAIL pending message must retain verified filtered 7: actual count=0 hidden=1 getter=0
+FAIL reliable source must publish without another native setter: ready=7 actual count=0 hidden=1
+FAIL visible ordinary dot must survive filtering: actual dot=0 hidden=1 getter=0
+Legacy regression requirements: 3 / 3 failed; controlled host, actual WeChat not loaded

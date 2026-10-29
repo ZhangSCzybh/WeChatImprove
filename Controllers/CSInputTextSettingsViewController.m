@@ -550,7 +550,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
 }
 
 - (void)showColorPicker:(UIColor *)initialColor {
-    if (@available(iOS 14.0, *)) {
+    {
         UIColorPickerViewController *colorPicker = [[UIColorPickerViewController alloc] init];
         colorPicker.delegate = self;
         colorPicker.selectedColor = initialColor ?: [UIColor blackColor];
@@ -560,13 +560,6 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         colorPicker.title = @"选择文字颜色";
         
         [self presentViewController:colorPicker animated:YES completion:nil];
-    } else {
-        // iOS 14之前，使用自定义的颜色选择方案或提示不支持
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"不支持的iOS版本"
-                                                                       message:@"颜色选择器需要iOS 14或更高版本"
-                                                                preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
-        [self presentViewController:alert animated:YES completion:nil];
     }
 }
 
@@ -624,19 +617,11 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     // 使用secondarySystemGroupedBackgroundColor来获得正确的深色模式下的背景色
-    if (@available(iOS 13.0, *)) {
-        cell.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
-    } else {
-        cell.backgroundColor = [UIColor whiteColor];
-    }
+    cell.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
     
     // 配置选中状态的背景色
     UIView *selectedBackgroundView = [[UIView alloc] init];
-    if (@available(iOS 13.0, *)) {
-        selectedBackgroundView.backgroundColor = [UIColor tertiarySystemGroupedBackgroundColor];
-    } else {
-        selectedBackgroundView.backgroundColor = [UIColor systemGray5Color];
-    }
+    selectedBackgroundView.backgroundColor = [UIColor tertiarySystemGroupedBackgroundColor];
     cell.selectedBackgroundView = selectedBackgroundView;
 }
 

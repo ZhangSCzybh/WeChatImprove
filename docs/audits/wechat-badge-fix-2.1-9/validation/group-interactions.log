@@ -1,0 +1,41 @@
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupInteractionTests.m:224:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:145:92: error: call to undeclared function 'CSCloseFriendAccountEpoch'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+  145 |     if (!self.table || !NSThread.isMainThread || [context[@"epoch"] unsignedIntegerValue]!=CSCloseFriendAccountEpoch() || ![context[@"account"] isEqual:CSGroupCurrentAccountID()]) return NO;
+      |                                                                                            ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:147:74: error: call to undeclared function 'CSCloseFriendShouldHideUserName'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+  147 |     if (![row isKindOfClass:CSGroupRow.class] || !row.userName.length || CSCloseFriendShouldHideUserName(row.userName,CSCloseFriendSurfaceSession)) return NO;
+      |                                                                          ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:147:119: error: use of undeclared identifier 'CSCloseFriendSurfaceSession'
+  147 |     if (![row isKindOfClass:CSGroupRow.class] || !row.userName.length || CSCloseFriendShouldHideUserName(row.userName,CSCloseFriendSurfaceSession)) return NO;
+      |                                                                                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:145:90: error: comparison of integers of different signs: 'NSUInteger' (aka 'unsigned long') and 'int' [-Werror,-Wsign-compare]
+  145 |     if (!self.table || !NSThread.isMainThread || [context[@"epoch"] unsignedIntegerValue]!=CSCloseFriendAccountEpoch() || ![context[@"account"] isEqual:CSGroupCurrentAccountID()]) return NO;
+      |                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:269:48: error: property 'privacyRefreshPending' not found on object of type 'CSGroupListAdapter *'
+  269 |     if ((!CSGroupApplicationActive() && !(self.privacyRefreshPending && CSGroupPrivacyActive())) || (self.presentationSuspended && !self.nativeActions.count)) {
+      |                                                ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:269:73: error: call to undeclared function 'CSGroupPrivacyActive'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+  269 |     if ((!CSGroupApplicationActive() && !(self.privacyRefreshPending && CSGroupPrivacyActive())) || (self.presentationSuspended && !self.nativeActions.count)) {
+      |                                                                         ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:274:15: error: property 'privacyRefreshPending' not found on object of type 'CSGroupListAdapter *'
+  274 |     if (!self.privacyRefreshPending && !self.presentationSuspended && (self.table.tracking || [self groupPanMoving])) { self.dirty=YES; [self scheduleRefresh]; return; }
+      |               ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:275:32: error: property 'privacyRefreshPending' not found on object of type 'CSGroupListAdapter *'
+  275 |     NSUInteger menuState=(self.privacyRefreshPending || self.presentationSuspended) ? 0 : [self nativeMenuState];
+      |                                ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:282:36: error: property 'privacyRefreshPending' not found on object of type 'CSGroupListAdapter *'
+  282 |     if (self.changeDepth || (!self.privacyRefreshPending && !self.presentationSuspended && (self.table.dragging || self.table.decelerating || self.table.editing || self.swipeActive))) { self.dirty=YES; return; }
+      |                                    ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:297:48: error: property 'privacyRefreshPending' not found on object of type 'CSGroupListAdapter *'
+  297 |     if ((!CSGroupApplicationActive() && !(self.privacyRefreshPending && CSGroupPrivacyActive())) || (self.presentationSuspended && !self.nativeActions.count)) { [self finishSuspendedBatches]; return; }
+      |                                                ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:297:73: error: call to undeclared function 'CSGroupPrivacyActive'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+  297 |     if ((!CSGroupApplicationActive() && !(self.privacyRefreshPending && CSGroupPrivacyActive())) || (self.presentationSuspended && !self.nativeActions.count)) { [self finishSuspendedBatches]; return; }
+      |                                                                         ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:299:26: error: property 'privacyRefreshPending' not found on object of type 'CSGroupListAdapter *'
+  299 |     BOOL coalesced=!self.privacyRefreshPending && self.coalescingNotification && !self.nativeActions.count;
+      |                          ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:300:24: error: property 'privacyRefreshPending' not found on object of type 'CSGroupListAdapter *'
+  300 |     BOOL waiting=!self.privacyRefreshPending && !self.presentationSuspended && (self.table.tracking || [self groupPanMoving] || ([self nativeMenuState]&2));
+      |                        ^
+13 errors generated.

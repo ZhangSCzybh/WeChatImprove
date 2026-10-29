@@ -1,0 +1,19 @@
+{
+  "ChatTab_equals_working_baseline": true,
+  "legacy_getter_equals_working_baseline": true,
+  "non_tab_ctor_equals_working_baseline": true,
+  "policy_observer_non_tab_prefix_equals_working_baseline": true,
+  "natural_numeric_payload_is_original": true,
+  "natural_string_payload_is_original": true,
+  "natural_dot_index_is_original": true,
+  "Pending_hidden_write_has_no_Known_token": true,
+  "legacy_getter_sha256": "18af0cb05d34aecde81d291157f1b792daeecd17ca1989bfdfe8d0f6ff52e618",
+  "file_sha256": {
+    "Hooks/CloseFriendNotificationHooks.xm": "d730ea7bfbc16326691a5eb69cc95c74e6f828dab41eb0baa18d8dfe80d56818",
+    "Controllers/CSGroupListAdapter.h": "71f845953bbf16c1d1732f042a3064b22596472a1503c5adb73a6c2e570d60ec",
+    "Controllers/CSGroupListAdapter.m": "e5e41ede849a82197144715c0767d98a4b153ff4aadb07c2e7288e9d9ee72599",
+    "Tests/CloseFriendTabBadgeTests.m": "de45cee80070d2d5776b3dc065f77427f9e4179fa8ac277609aec1fcfc09ea43",
+    "Tests/verify-close-friend-alerts.sh": "8e01df0c859cf58e28e2d9fe2fc27a95a3f3b76667bea961acb24e95b92a55f0"
+  },
+  "formal_result": "Close-friend alerts: 216 focused checks passed (identity, calls, reply, badge, payment policy)\nClose-friend tab badge: 782 focused checks passed (passthrough, reveal, pending, dot, boundary, publication, scoped bypass; host only)\n\n--- STDERR ---\n\nEXIT_CODE=0"
+}

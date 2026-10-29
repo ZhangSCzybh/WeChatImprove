@@ -214,7 +214,6 @@ static void CSTaskConfigureTable(UITableView *table) {
 }
 - (void)presentTargetPicker:(BOOL)groups {
     if (![self canPresentTargetPicker]) {
-        NSLog(@"[WeChatImprove][ScheduledPicker] skipped: editor detached, inactive, dismissing or presentation occupied");
         return;
     }
     if (![self canEdit]) { CSTaskAlert(self,@"账号已改变或任务存储不可用，请重新打开定时任务。"); return; }

@@ -1,0 +1,13 @@
+{
+  "reverse_apply_exit": 0,
+  "source_files": 602,
+  "matching": 602,
+  "mismatches": [],
+  "extra_source_files": [],
+  "removed_2_1_8_test": true,
+  "versions": {
+    "control": "2.1-6",
+    "plugin": "2.1-6"
+  },
+  "passed": true
+}

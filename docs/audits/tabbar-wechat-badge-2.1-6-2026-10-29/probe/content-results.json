@@ -1,0 +1,94 @@
+{
+  "status": "passed",
+  "production_sources_stable": true,
+  "quadrants": [
+    {
+      "style_label": false,
+      "phase": "cold",
+      "exit_code": 0,
+      "log": "content-style-0-cold.jsonl",
+      "log_sha256": "db5848c62b3173a32351bab739b086d8a5a6a168b7898acb6962d0fb12eec556",
+      "summary": {
+        "actualWeChatLoaded": false,
+        "checks": 123,
+        "failures": 0,
+        "kind": "summary",
+        "phase": "cold",
+        "rows": 15,
+        "scenarios": 15,
+        "styleImplementationLoaded": false,
+        "styleLabelOnly": false
+      }
+    },
+    {
+      "style_label": false,
+      "phase": "message",
+      "exit_code": 0,
+      "log": "content-style-0-message.jsonl",
+      "log_sha256": "df7696d610e5f698abfa8bfb40b8541709e76242e26c562bc121af91cbf7e872",
+      "summary": {
+        "actualWeChatLoaded": false,
+        "checks": 408,
+        "failures": 0,
+        "kind": "summary",
+        "phase": "message",
+        "rows": 75,
+        "scenarios": 15,
+        "styleImplementationLoaded": false,
+        "styleLabelOnly": false
+      }
+    },
+    {
+      "style_label": true,
+      "phase": "cold",
+      "exit_code": 0,
+      "log": "content-style-1-cold.jsonl",
+      "log_sha256": "9e7dfcd20982ea3581080e16c302ce7b299828e94a755280d2524d8852ffe775",
+      "summary": {
+        "actualWeChatLoaded": false,
+        "checks": 123,
+        "failures": 0,
+        "kind": "summary",
+        "phase": "cold",
+        "rows": 15,
+        "scenarios": 15,
+        "styleImplementationLoaded": false,
+        "styleLabelOnly": true
+      }
+    },
+    {
+      "style_label": true,
+      "phase": "message",
+      "exit_code": 0,
+      "log": "content-style-1-message.jsonl",
+      "log_sha256": "87175ccf569f75db9023c925002544bfe944e4f222b02b3d715d76e5d36264c8",
+      "summary": {
+        "actualWeChatLoaded": false,
+        "checks": 408,
+        "failures": 0,
+        "kind": "summary",
+        "phase": "message",
+        "rows": 75,
+        "scenarios": 15,
+        "styleImplementationLoaded": false,
+        "styleLabelOnly": true
+      }
+    }
+  ],
+  "style_label_content_parity_ignoring_object_addresses": {
+    "cold": true,
+    "message": true
+  },
+  "host_executable_sha256": "9e45a95722554c1ff22c5a16218caed226b65ad4dc004c19c35a745867d7153f",
+  "production_or_formal_tests_modified": false,
+  "device_data_read": false,
+  "package_build_or_install": false,
+  "limits": [
+    "style on/off is a controlled label; actual style implementation is deliberately not loaded",
+    "cold means no notification setter invoked in the controlled host, not an observed cold-start path",
+    "message invokes the exact extracted hook blocks with synthetic input; actual device state/order is unknown",
+    "badge content/hidden writes and fixed frame in original IMPs are explicit native host fixtures",
+    "real policy/projection/tab model sources are compiled; account/cache/controller/thread are controlled boundaries",
+    "this probe does not establish device clipping, geometry, visibility or causality of the user incident"
+  ]
+}

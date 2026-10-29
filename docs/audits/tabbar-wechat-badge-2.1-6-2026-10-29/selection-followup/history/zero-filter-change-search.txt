@@ -1,0 +1,3 @@
+571b80a8ba3bceb3c0ddf260d8b6bccaafb1e64d 2026-10-26T09:51:17+08:00 修复备份恢复、密友隐私与分组角标，更新至 2.0-10
+d35c3e002c7dc1f08e2c34f9467c973a7280437f 2026-10-21T15:20:18+08:00 perf: optimize close-friend filtering and remove automatic DND in 1.8-58
+f747a6a476d1ead2d9578840bd1ee6e4549d830d 2026-10-20T22:40:28+08:00 feat: add identity-bound close-friend alert and call privacy

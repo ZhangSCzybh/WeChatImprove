@@ -8,7 +8,12 @@
 #import <dispatch/dispatch.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
+#include "GroupLifecycleTabBadgeDependencies.h"
+#include "GroupLifecycleTabBadgeImplementation.inc"
 @class CSGroupListAdapter;
+@interface UITableView (LifecycleDataSource)
+@property(nonatomic,readonly) id dataSource;
+@end
 @interface LifecycleTable : UITableView @end
 @interface Host : NSObject
 @property(nonatomic,strong) UITableView *m_tableView;
@@ -42,10 +47,27 @@ static NSUInteger accountEpoch=1;
 static NSUInteger CSCloseFriendAccountEpoch(void) { return accountEpoch; }
 static BOOL CSGroupIsFoldedController(id owner) { return [owner isKindOfClass:Host.class] && [owner folded]; }
 static BOOL policyBlocked;
+static NSArray *policyFriends;
+static BOOL badgePolicyEnabled,policyRevealed;
+static NSDictionary *policyOptions;
+static NSUInteger policyRevision=1;
 static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) {
-    return [[CSCloseFriendSnapshot alloc] initWithAccountID:account profile:@{@"enabled":@(privacyEnabled),@"friends":@[@"secret"],@"groups":@[],@"options":@{}} revealed:NO revision:1 blocked:policyBlocked];
+    return [[CSCloseFriendSnapshot alloc] initWithAccountID:account profile:@{@"enabled":@((BOOL)(privacyEnabled || badgePolicyEnabled)),@"friends":policyFriends ?: @[@"secret"],@"groups":@[],@"options":policyOptions ?: @{}} revealed:policyRevealed revision:policyRevision blocked:policyBlocked];
 }
+#if CS_GROUP_LIFECYCLE_TAB_BADGE
+typedef NS_ENUM(NSUInteger, CSGroupFoldedPrivacyState) {
+    CSGroupFoldedPrivacyUnknown, CSGroupFoldedPrivacyNoHidden,
+    CSGroupFoldedPrivacyMixed, CSGroupFoldedPrivacyAllHidden
+};
+// This lifecycle fixture has no aggregate rows; folded membership stays unknown.
+static NSArray *CSGroupCopyFoldedUserNames(void) { return nil; }
+static CSGroupFoldedPrivacyState CSGroupAssessFoldedUserNames(NSArray *names,NSSet *hidden) {
+    (void)names; (void)hidden; return CSGroupFoldedPrivacyUnknown;
+}
+#endif
 static NSUInteger scopes,snapshotBuilds;
+static NSArray *fixtureNativeSections;
+static void (^snapshotMutation)(id);
 static BOOL mutateDuringSnapshot,failPublication,rawPublicationFailure;
 static void (^publicationMutation)(id);
 static NSArray *CSGroupBuildNativeSections(id controller,id table,id source);
@@ -69,6 +91,19 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic) BOOL coalescingNotification,scheduledCoalesced,coalescedDispatchPending;
 @property(nonatomic,copy) NSString *snapshotAccount;
 @property(nonatomic,strong) NSArray *cachedNativeSections;
+#if CS_GROUP_LIFECYCLE_TAB_BADGE
+@property(nonatomic,strong) CSGroupBadge *tabAlertBadge;
+@property(nonatomic,copy) NSArray *tabAlertBadgeKey,*tabBadgeSections,*tabBadgePublishedKey;
+@property(nonatomic,copy) NSString *tabBadgeAccount;
+@property(nonatomic) NSUInteger tabBadgeRevision,tabBadgeEpoch;
+@property(nonatomic) BOOL tabBadgeSourceRequired,tabBadgeRestorePending,tabBadgeSourceScheduled,tabBadgeSourceRefreshing,tabBadgeRequestDispatchPending,tabBadgeRefreshAgain;
++ (void)requestTabBadgeSourcesRefresh;
+- (void)requestTabBadgeSourceRefresh;
+- (void)refreshTabBadgeSource;
++ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecision;
++ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecisionForPublication:(BOOL)includeNative;
++ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecisionForController:(id)controller includeNative:(BOOL)includeNative;
+#endif
 @property(nonatomic,copy) NSString *nativeActionsAccount;
 @property(nonatomic,copy) NSString *publishedTabID;
 @property(nonatomic,strong) NSArray *displayedTabs;
@@ -130,7 +165,8 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 static NSArray *CSGroupBuildNativeSections(id controller,id table,id source) {
     (void)controller; (void)table; snapshotBuilds++;
     if (mutateDuringSnapshot) [source invalidateNativeSnapshot];
-    return @[@[]];
+    if(snapshotMutation)snapshotMutation(source);
+    return fixtureNativeSections ?: @[@[]];
 }
 static NSArray *CSGroupBuildNativeSectionsReusing(id controller,id table,id source,NSArray *previous) {
     (void)previous;return CSGroupBuildNativeSections(controller,table,source);
@@ -324,7 +360,11 @@ int main(void) { @autoreleasepool {
     [a beginNativeChange]; [a endNativeChange]; RunFor(.02);
     Check(snapshotBuilds==builds+1,@"native change invalidates snapshot before next publication");
     builds=snapshotBuilds; enabled=NO; [a refresh]; [a refresh];
+#if CS_GROUP_LIFECYCLE_TAB_BADGE
+    Check(snapshotBuilds==builds && !a.active,@"disabled grouping without tab ownership never builds a badge source");
+#else
     Check(snapshotBuilds==builds && !a.active,@"disabled grouping never builds a snapshot");
+#endif
     enabled=YES; [a refresh]; builds=snapshotBuilds;
     a.searchChromeVisible=YES; host.isSearching=YES; [a refresh]; [a refresh];
     Check(snapshotBuilds==builds && a.active,@"search retains selected rows without rebuilding or exposing native rows");
@@ -494,6 +534,125 @@ int main(void) { @autoreleasepool {
     foldedOwner.preferences.accountID=@"stale-account";before=foldedOwner.refreshCount;
     [groupOwner selectIndex:1];RunFor(.03);
     Check(foldedOwner.refreshCount==before,@"selection broadcast does not refresh another account's stale folded owner");
+#if CS_GROUP_LIFECYCLE_TAB_BADGE
+    // Full production decision, source request/refresh, native begin/end and
+    // notification paths run here. Only the immutable native row reader and UI
+    // publication sink are host boundaries; source timing is not hand-set.
+    RunFor(.03);[Adapters() removeAllObjects];
+    enabled=NO;privacyEnabled=NO;badgePolicyEnabled=NO;policyFriends=@[];policyOptions=nil;policyRevealed=NO;policyRevision++;
+    NSUInteger coldBuilds=snapshotBuilds;
+    __block NSUInteger sourceEvents=0;
+    __block BOOL sourceSawReady=NO,sourceSawDot=NO;
+    __block NSUInteger sourceCount=0,sourceRevision=0;
+    __block id sourceController=nil;
+    __block void (^sourceMutation)(CSGroupListAdapter *source);
+    id sourceObserver=[NSNotificationCenter.defaultCenter addObserverForName:CSGroupTabBadgeSourceDidRefreshNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+        CSGroupListAdapter *source=note.object;
+        CSGroupTabBadgeDecision *decision=[CSGroupListAdapter closeFriendTabBadgeDecisionForController:source.controller includeNative:YES];
+        sourceEvents++;sourceSawReady=!source.publishing && !source.changeDepth && decision.badge && decision.sourceController==source.controller;
+        sourceSawDot=decision.badge.redDot && decision.badge.count==0;sourceCount=decision.badge.count;sourceRevision=decision.sourceRevision;sourceController=decision.sourceController;
+        if(sourceMutation)sourceMutation(source);
+    }];
+    a=List(&host);[a refresh];[a refresh];RunFor(.03);
+    Check(snapshotBuilds==coldBuilds && !a.cachedNativeSections && !a.tabBadgeSections && !a.tabAlertBadge,@"cold empty protection list with grouping off never reads or retains a native badge snapshot");
+    Check(sourceEvents==0 && !a.active && !a.tabBadgeSourceScheduled,@"cold empty protection list never schedules or publishes badge-source work");
+    enabled=YES;[a refresh];RunFor(.02);
+    Check(a.active && a.cachedNativeSections && !a.tabAlertBadge && !sourceEvents,@"empty list with grouping on builds only the group source, without acquiring tab badge ownership");
+    coldBuilds=snapshotBuilds;enabled=NO;[a refresh];[a refresh];RunFor(.02);
+    Check(snapshotBuilds==coldBuilds && !a.cachedNativeSections && !a.tabBadgeSections && !sourceEvents,@"grouping off after an empty-list publication adds no badge source reads");
+
+    [Adapters() removeAllObjects];sourceEvents=0;
+    Host *lateHost=[Host new];
+    CSGroupTabBadgeDecision *latePending=[CSGroupListAdapter closeFriendTabBadgeDecisionForController:lateHost includeNative:YES];
+    Check(latePending && !latePending.badge && ![CSGroupListAdapter adapterForController:lateHost],@"an explicit native restoration request can stay pending before its root adapter exists");
+    NSUInteger latePath[]={0,0};CSGroupRow *lateRow=[[CSGroupRow alloc]initWithNativePath:[NSIndexPath indexPathWithIndexes:latePath length:2] userName:@"ordinary" kind:CSGroupRowKindSession category:CSGroupRowCategoryPrivate top:NO unreadCount:6 redDot:NO];
+    fixtureNativeSections=@[@[lateRow]];lateHost.m_tableView=[LifecycleTable new];coldBuilds=snapshotBuilds;
+    [CSGroupListAdapter attachToController:lateHost];RunFor(.02);
+    Check(sourceEvents==1 && sourceSawReady && sourceCount==6 && sourceController==lateHost && snapshotBuilds==coldBuilds+1,@"late attachment consumes the explicit root request and publishes one verified native source");
+    Check(![CSGroupListAdapter closeFriendTabBadgeDecisionForController:lateHost includeNative:NO],@"late native restoration never enables filtering or takes ordinary setter ownership");
+    sourceEvents=0;coldBuilds=snapshotBuilds;[CSGroupListAdapter attachToController:lateHost];RunFor(.02);
+    Check(!sourceEvents && snapshotBuilds==coldBuilds,@"a consumed late-attach restoration request does not persistently rebuild native sources");
+    [Adapters() removeAllObjects];
+    for(NSString *stale in @[@"epoch",@"account"]){
+        Host *staleHost=[Host new];[CSGroupListAdapter closeFriendTabBadgeDecisionForController:staleHost includeNative:YES];NSString *savedAccount=account;
+        if([stale isEqual:@"epoch"])accountEpoch++;else account=@"replacement-account";
+        staleHost.m_tableView=[LifecycleTable new];sourceEvents=0;coldBuilds=snapshotBuilds;[CSGroupListAdapter attachToController:staleHost];RunFor(.02);
+        Check(!sourceEvents && snapshotBuilds==coldBuilds,@"a late-attach request from another account or epoch is discarded without source reads");account=savedAccount;[Adapters() removeAllObjects];
+    }
+    fixtureNativeSections=nil;sourceEvents=0;
+
+    [Adapters() removeAllObjects];policyFriends=@[@"secret"];badgePolicyEnabled=YES;policyRevealed=YES;policyOptions=@{@"silenceMessages":@YES};policyRevision++;
+    coldBuilds=snapshotBuilds;a=List(&host);RunFor(.02);
+    Check(![CSGroupListAdapter closeFriendTabBadgeDecisionForController:host includeNative:NO] && !sourceEvents && snapshotBuilds==coldBuilds && !a.tabBadgeSections,@"revealed legacy silence option does not filter badges or acquire a badge source");
+    [Adapters() removeAllObjects];policyRevealed=NO;policyOptions=@{@"hideSessions":@NO,@"silenceMessages":@YES};policyRevision++;
+    a=List(&host);RunFor(.02);
+    Check(![CSGroupListAdapter closeFriendTabBadgeDecisionForController:host includeNative:NO] && !sourceEvents && snapshotBuilds==coldBuilds && !a.tabBadgeSourceRequired,@"locked legacy silence option with session hiding off leaves native badge ownership intact");
+    [Adapters() removeAllObjects];policyOptions=@{@"hideSessions":@YES,@"silenceMessages":@YES};policyRevision++;
+    CSGroupRow *(^nativeRow)(NSString *,NSUInteger,BOOL,BOOL)=^CSGroupRow *(NSString *name,NSUInteger count,BOOL dot,BOOL first){NSUInteger path[]={0,first?0:1};return [[CSGroupRow alloc]initWithNativePath:[NSIndexPath indexPathWithIndexes:path length:2] userName:name kind:CSGroupRowKindSession category:CSGroupRowCategoryPrivate top:NO unreadCount:count redDot:dot];};
+    fixtureNativeSections=@[@[nativeRow(@"secret",3,NO,YES),nativeRow(@"ordinary",7,NO,NO)]];
+    a=List(&host);
+    Check(!a.active && !a.cachedNativeSections && ![CSGroupListAdapter closeFriendTabBadgeDecisionForController:host includeNative:NO].badge,@"concealed session policy starts pending with grouping off and no UI cache");
+    RunFor(.02);
+    Check(sourceEvents==1 && sourceSawReady && sourceCount==7 && sourceController==host && sourceRevision==a.modelRevision,@"real source reader publishes ordinary 7 while protected sessions are concealed");
+    Check(!a.active && !a.cachedNativeSections && a.tabBadgeSections && !a.tabBadgeSourceScheduled,@"source maintenance does not activate grouping or install the UI cache");
+    [host viewWillDisappear:NO];RunFor(.02);before=a.refreshCount;layouts=a.layoutCount;NSUInteger sourceAnchors=a.anchorOrTitleCount;
+    sourceEvents=0;
+    [a beginNativeChange];
+    Check(![CSGroupListAdapter closeFriendTabBadgeDecisionForController:host includeNative:NO].badge,@"beginNativeChange invalidates the badge source before a synchronous native setter can read it");
+    fixtureNativeSections=@[@[nativeRow(@"secret",3,NO,YES),nativeRow(@"ordinary",9,NO,NO)]];
+    RunFor(.005);Check(!sourceEvents,@"an unfinished native transaction never publishes a badge source");
+    [a endNativeChange];RunFor(.02);
+    Check(sourceEvents==1 && sourceSawReady && sourceCount==9 && sourceRevision==a.modelRevision,@"endNativeChange rebuilds and publishes the latest source without returning to the list");
+    Check(a.presentationSuspended && a.refreshCount==before && a.layoutCount==layouts && a.anchorOrTitleCount==sourceAnchors,@"offscreen badge maintenance performs no list reload, header layout or anchor work");
+    sourceEvents=0;NSUInteger offscreenBuilds=snapshotBuilds;
+    for(NSUInteger i=0;i<20;i++){[a beginNativeChange];fixtureNativeSections=@[@[nativeRow(@"secret",3,NO,YES),nativeRow(@"ordinary",10+i,NO,NO)]];[a endNativeChange];RunFor(.004);}
+    Check(sourceEvents==20 && snapshotBuilds==offscreenBuilds+20 && sourceCount==29,@"twenty offscreen events on distinct run-loop turns publish twenty fresh badge sources");
+    Check(a.refreshCount==before && a.layoutCount==layouts && a.anchorOrTitleCount==sourceAnchors,@"independent offscreen source events still perform zero grouping UI work");
+    sourceEvents=0;offscreenBuilds=snapshotBuilds;
+    for(NSUInteger i=0;i<200;i++){[a beginNativeChange];[a endNativeChangeCoalesced:YES];}
+    RunFor(.02);Check(sourceEvents==1 && snapshotBuilds==offscreenBuilds+1,@"one synchronous burst of two hundred native changes coalesces to one source rebuild");
+    sourceEvents=0;offscreenBuilds=snapshotBuilds;[a beginNativeChange];[a beginNativeChange];[a endNativeChange];RunFor(.005);
+    Check(!sourceEvents && snapshotBuilds==offscreenBuilds,@"nested native transaction waits for the outer end");
+    [a endNativeChange];RunFor(.02);Check(sourceEvents==1 && sourceSawReady,@"outer native end releases one source publication");
+
+    sourceEvents=0;__block BOOL mutateOnSource=YES;
+    sourceMutation=^(CSGroupListAdapter *source){if(mutateOnSource){mutateOnSource=NO;[source beginNativeChange];fixtureNativeSections=@[@[nativeRow(@"secret",3,NO,YES),nativeRow(@"ordinary",33,NO,NO)]];[source endNativeChange];}};
+    [a beginNativeChange];[a endNativeChange];RunFor(.03);sourceMutation=nil;
+    Check(sourceEvents==2 && sourceCount==33 && sourceRevision==a.modelRevision && !a.tabBadgeSourceScheduled && !a.tabBadgeRefreshAgain,@"source notification reentry with a real native transaction schedules exactly one newer source");
+    Check(a.refreshCount==before && a.layoutCount==layouts,@"reentrant source transactions leave offscreen grouping UI untouched");
+
+    sourceEvents=0;[a beginNativeChange];[a endNativeChange];
+    __block BOOL flipEpoch=YES;snapshotMutation=^(id current){(void)current;if(flipEpoch){flipEpoch=NO;accountEpoch++;}};RunFor(.02);snapshotMutation=nil;
+    Check(!sourceEvents && ![CSGroupListAdapter closeFriendTabBadgeDecisionForController:host includeNative:NO].badge,@"epoch mutation inside the actual row reader prevents stale source publication");
+    [a requestTabBadgeSourceRefresh];RunFor(.02);Check(sourceEvents==1 && sourceSawReady && a.tabBadgeEpoch==accountEpoch,@"the next source event recovers only in the current epoch");
+    sourceEvents=0;[a beginNativeChange];[a endNativeChange];mutateDuringSnapshot=YES;RunFor(.02);mutateDuringSnapshot=NO;
+    Check(!sourceEvents && a.tabBadgeRevision!=a.modelRevision,@"model mutation inside the actual reader cannot publish a mismatched revision");
+    offscreenBuilds=snapshotBuilds;RunFor(.03);Check(snapshotBuilds==offscreenBuilds && !a.tabBadgeSourceScheduled,@"an unstable source does not start an endless retry or timer");
+    [a beginNativeChange];[a endNativeChange];RunFor(.02);Check(sourceEvents==1 && sourceSawReady,@"a later native event recovers after the unstable source ends");
+
+    sourceEvents=0;[CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:@"willResign" object:nil]];RunFor(.02);offscreenBuilds=snapshotBuilds;
+    [a beginNativeChange];[a endNativeChange];RunFor(.02);Check(!sourceEvents && snapshotBuilds==offscreenBuilds,@"inactive app neither reads nor publishes badge sources");
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:UIApplicationDidBecomeActiveNotification object:nil]];RunFor(.02);
+    Check(sourceEvents==1 && sourceSawReady && a.refreshCount==before,@"foreground activity restores the offscreen source without publishing grouping UI");
+
+    fixtureNativeSections=@[@[nativeRow(@"secret",3,YES,YES),nativeRow(@"ordinary",2,YES,NO)]];policyFriends=@[];badgePolicyEnabled=NO;policyRevision++;sourceEvents=0;
+    [CSGroupListAdapter closeFriendPolicyChanged:nil];RunFor(.02);
+    Check(![CSGroupListAdapter closeFriendTabBadgeDecisionForController:host includeNative:NO],@"removing the final protected name returns ordinary interception to Native");
+    Check(sourceEvents==1 && sourceSawReady && sourceSawDot && !a.tabBadgeSourceRequired && !a.tabBadgeRestorePending,@"clearing the final name offscreen publishes one verified native-dot source and completes source restoration");
+    Check(a.presentationSuspended && a.refreshCount==before && a.layoutCount==layouts,@"native-dot recovery leaves the hidden grouping UI suspended");
+    sourceEvents=0;offscreenBuilds=snapshotBuilds;[a beginNativeChange];[a endNativeChange];RunFor(.02);[CSGroupListAdapter requestTabBadgeSourcesRefresh];RunFor(.02);
+    Check(!sourceEvents && snapshotBuilds==offscreenBuilds,@"after restoration native-only changes add no repeated source reads or publications");
+
+    policyFriends=@[@"secret"];badgePolicyEnabled=YES;policyRevision++;[CSGroupListAdapter closeFriendPolicyChanged:nil];RunFor(.02);sourceEvents=0;
+    __block BOOL restorationReentry=YES,restorationRequested=NO;
+    sourceMutation=^(CSGroupListAdapter *source){if(restorationReentry){restorationReentry=NO;[source beginNativeChange];fixtureNativeSections=@[@[nativeRow(@"ordinary",5,NO,YES)]];[source endNativeChange];CSGroupTabBadgeDecision *pending=[CSGroupListAdapter closeFriendTabBadgeDecisionForController:source.controller includeNative:YES];restorationRequested=!pending.badge && source.tabBadgeRestorePending;}};
+    badgePolicyEnabled=NO;policyRevision++;[CSGroupListAdapter closeFriendPolicyChanged:nil];RunFor(.03);sourceMutation=nil;
+    if(!(restorationRequested && sourceEvents==2 && sourceCount==5))fprintf(stderr,"RESTORE reentry requested=%d events=%lu count=%lu model=%lu source=%lu pending=%d again=%d scheduled=%d required=%d\n",restorationRequested,(unsigned long)sourceEvents,(unsigned long)sourceCount,(unsigned long)a.modelRevision,(unsigned long)a.tabBadgeRevision,a.tabBadgeRestorePending,a.tabBadgeRefreshAgain,a.tabBadgeSourceScheduled,a.tabBadgeSourceRequired);
+    Check(restorationRequested && sourceEvents==2 && sourceCount==5 && !a.tabBadgeRestorePending && !a.tabBadgeRefreshAgain,@"native-restoration consumer reentry retains pending debt and publishes the newer real source once");
+    Check(sourceEvents==2 && sourceSawReady && ![CSGroupListAdapter closeFriendTabBadgeDecisionForController:host includeNative:NO],@"disabling protection with names retained returns to Native after the reentrant source settles");
+    [NSNotificationCenter.defaultCenter removeObserver:sourceObserver];
+    fixtureNativeSections=nil;policyFriends=nil;badgePolicyEnabled=NO;policyOptions=nil;policyRevealed=NO;enabled=YES;
+#endif
     fprintf(stdout,"Group lifecycle: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;
 } }

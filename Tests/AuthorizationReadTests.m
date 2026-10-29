@@ -3,7 +3,6 @@
 #import "CSAuthorizationManager.h"
 #import "CSServiceCenter.h"
 #include <limits.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -115,7 +114,7 @@ int main(void) {
         CHECK(!manager.isAuthorized);
         CHECK(serviceCalls == 1);
         contactService = [NSObject new];
-        CHECK(![manager checkAuthorization]);
+        CHECK(!manager.isAuthorized);
 
         AuthorizationTestContacts *contacts = [AuthorizationTestContacts new];
         AuthorizationTestContact *contact = [AuthorizationTestContact new];
@@ -130,7 +129,7 @@ int main(void) {
         contact.settings = 1;
         CHECK(manager.isAuthorized);
         contact.settings = UINT_MAX;
-        CHECK([manager checkAuthorization]);
+        CHECK(manager.isAuthorized);
         contact.settings = 0;
         CHECK(!manager.isAuthorized);
         CHECK(contact.settingsReads == 4);
@@ -158,7 +157,7 @@ int main(void) {
         followed = YES;
         CHECK(manager.isAuthorized);
         followed = NO;
-        CHECK(![manager checkAuthorization]);
+        CHECK(!manager.isAuthorized);
         CHECK(followCalls == 3 && contacts.lookups == beforeLookups);
         CHECK([lastFollowName isEqual:manager.officialAccountUserName]);
 

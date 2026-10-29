@@ -1,0 +1,12 @@
+{
+  "checked_at": "2026-10-29T00:31:00.683234+00:00",
+  "json_files_parsed_before_this_result": 16,
+  "jsonl_rows_parsed": 269,
+  "readme_relative_links_checked": 30,
+  "missing_links": [],
+  "runtime_probe_syntax_exit_code": 0,
+  "runtime_probe_sha256": "4819c4a5a0269f0b87f3fc07736bbb549c826127e01040c44d7148de50c7f02e",
+  "device_execution": false,
+  "production_or_formal_tests_modified_by_check": false,
+  "passed": true
+}

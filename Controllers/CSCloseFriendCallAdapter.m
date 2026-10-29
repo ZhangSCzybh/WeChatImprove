@@ -15,9 +15,9 @@ static NSString *String(id v){return [v isKindOfClass:NSString.class] && [v leng
     return [p rejectsCaller:self.subject.sender chatRoom:self.subject.session video:NO] && [p rejectsCaller:self.subject.sender chatRoom:self.subject.session video:YES];
 }
 - (BOOL)suppressesPresentation {
-    // Revealing restores native call handling while chat notifications stay silent.
+    // Revealing restores native call handling; locked calls follow rejection settings.
     if(CSCloseFriendCurrentSnapshot().revealed)return NO;
-    return [self.subject shouldSilence] || [self requiresRejection];
+    return [self requiresRejection];
 }
 @end
 @interface CSCloseFriendCallAdapter ()

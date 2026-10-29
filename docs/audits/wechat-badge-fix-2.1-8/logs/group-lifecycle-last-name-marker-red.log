@@ -1,0 +1,7 @@
+$ bash Tests/verify-group-lifecycle.sh <isolated last-name-marker control>
+Hidden native event publications: 0 / 20 events
+Group lifecycle: 113 checks, 2 failures
+FAIL: return with grouping off rebuilds one native source after clearing the last protected name
+FAIL: real refresh finally emits one verified native-dot source after publishing/depth/dirty ownership clears
+
+exit_code=1

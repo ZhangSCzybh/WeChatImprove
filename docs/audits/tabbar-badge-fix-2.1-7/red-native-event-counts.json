@@ -1,0 +1,450 @@
+{
+  "disabledRelayoutHook": 0,
+  "events": [
+    {
+      "event": "ordinaryUpdate",
+      "perEventEachItem": [
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        }
+      ],
+      "perEventTotal": {
+        "geometryCalls": 0,
+        "layoutBadgeView": 0,
+        "layoutIcon": 0,
+        "reloadIconImage": 0
+      },
+      "repetitions": 100,
+      "styleEnabled": false
+    },
+    {
+      "event": "layoutIcon",
+      "perEventEachItem": [
+        {
+          "geometryCalls": 1,
+          "layoutBadgeView": 0,
+          "layoutIcon": 1,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        }
+      ],
+      "perEventTotal": {
+        "geometryCalls": 1,
+        "layoutBadgeView": 0,
+        "layoutIcon": 1,
+        "reloadIconImage": 0
+      },
+      "repetitions": 100,
+      "styleEnabled": false
+    },
+    {
+      "event": "layoutBadgeView",
+      "perEventEachItem": [
+        {
+          "geometryCalls": 1,
+          "layoutBadgeView": 1,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        }
+      ],
+      "perEventTotal": {
+        "geometryCalls": 1,
+        "layoutBadgeView": 1,
+        "layoutIcon": 0,
+        "reloadIconImage": 0
+      },
+      "repetitions": 100,
+      "styleEnabled": false
+    },
+    {
+      "event": "relayoutIconAndBadge",
+      "perEventEachItem": [
+        {
+          "geometryCalls": 2,
+          "layoutBadgeView": 1,
+          "layoutIcon": 1,
+          "reloadIconImage": 1
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        }
+      ],
+      "perEventTotal": {
+        "geometryCalls": 2,
+        "layoutBadgeView": 1,
+        "layoutIcon": 1,
+        "reloadIconImage": 1
+      },
+      "repetitions": 100,
+      "styleEnabled": false
+    },
+    {
+      "event": "item.layoutSubviews",
+      "perEventEachItem": [
+        {
+          "geometryCalls": 2,
+          "layoutBadgeView": 1,
+          "layoutIcon": 1,
+          "reloadIconImage": 1
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        }
+      ],
+      "perEventTotal": {
+        "geometryCalls": 2,
+        "layoutBadgeView": 1,
+        "layoutIcon": 1,
+        "reloadIconImage": 1
+      },
+      "repetitions": 100,
+      "styleEnabled": false
+    },
+    {
+      "event": "bar.layout",
+      "perEventEachItem": [
+        {
+          "geometryCalls": 2,
+          "layoutBadgeView": 1,
+          "layoutIcon": 1,
+          "reloadIconImage": 1
+        },
+        {
+          "geometryCalls": 2,
+          "layoutBadgeView": 1,
+          "layoutIcon": 1,
+          "reloadIconImage": 1
+        },
+        {
+          "geometryCalls": 2,
+          "layoutBadgeView": 1,
+          "layoutIcon": 1,
+          "reloadIconImage": 1
+        },
+        {
+          "geometryCalls": 2,
+          "layoutBadgeView": 1,
+          "layoutIcon": 1,
+          "reloadIconImage": 1
+        }
+      ],
+      "perEventTotal": {
+        "geometryCalls": 8,
+        "layoutBadgeView": 4,
+        "layoutIcon": 4,
+        "reloadIconImage": 4
+      },
+      "repetitions": 100,
+      "styleEnabled": false
+    },
+    {
+      "event": "ordinaryUpdate",
+      "perEventEachItem": [
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        }
+      ],
+      "perEventTotal": {
+        "geometryCalls": 0,
+        "layoutBadgeView": 0,
+        "layoutIcon": 0,
+        "reloadIconImage": 0
+      },
+      "repetitions": 100,
+      "styleEnabled": true
+    },
+    {
+      "event": "layoutIcon",
+      "perEventEachItem": [
+        {
+          "geometryCalls": 1,
+          "layoutBadgeView": 0,
+          "layoutIcon": 1,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        }
+      ],
+      "perEventTotal": {
+        "geometryCalls": 1,
+        "layoutBadgeView": 0,
+        "layoutIcon": 1,
+        "reloadIconImage": 0
+      },
+      "repetitions": 100,
+      "styleEnabled": true
+    },
+    {
+      "event": "layoutBadgeView",
+      "perEventEachItem": [
+        {
+          "geometryCalls": 1,
+          "layoutBadgeView": 1,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        }
+      ],
+      "perEventTotal": {
+        "geometryCalls": 1,
+        "layoutBadgeView": 1,
+        "layoutIcon": 0,
+        "reloadIconImage": 0
+      },
+      "repetitions": 100,
+      "styleEnabled": true
+    },
+    {
+      "event": "relayoutIconAndBadge",
+      "perEventEachItem": [
+        {
+          "geometryCalls": 2,
+          "layoutBadgeView": 1,
+          "layoutIcon": 1,
+          "reloadIconImage": 1
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        }
+      ],
+      "perEventTotal": {
+        "geometryCalls": 2,
+        "layoutBadgeView": 1,
+        "layoutIcon": 1,
+        "reloadIconImage": 1
+      },
+      "repetitions": 100,
+      "styleEnabled": true
+    },
+    {
+      "event": "item.layoutSubviews",
+      "perEventEachItem": [
+        {
+          "geometryCalls": 2,
+          "layoutBadgeView": 1,
+          "layoutIcon": 1,
+          "reloadIconImage": 1
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        },
+        {
+          "geometryCalls": 0,
+          "layoutBadgeView": 0,
+          "layoutIcon": 0,
+          "reloadIconImage": 0
+        }
+      ],
+      "perEventTotal": {
+        "geometryCalls": 2,
+        "layoutBadgeView": 1,
+        "layoutIcon": 1,
+        "reloadIconImage": 1
+      },
+      "repetitions": 100,
+      "styleEnabled": true
+    },
+    {
+      "event": "bar.layout",
+      "perEventEachItem": [
+        {
+          "geometryCalls": 2,
+          "layoutBadgeView": 1,
+          "layoutIcon": 1,
+          "reloadIconImage": 1
+        },
+        {
+          "geometryCalls": 2,
+          "layoutBadgeView": 1,
+          "layoutIcon": 1,
+          "reloadIconImage": 1
+        },
+        {
+          "geometryCalls": 2,
+          "layoutBadgeView": 1,
+          "layoutIcon": 1,
+          "reloadIconImage": 1
+        },
+        {
+          "geometryCalls": 2,
+          "layoutBadgeView": 1,
+          "layoutIcon": 1,
+          "reloadIconImage": 1
+        }
+      ],
+      "perEventTotal": {
+        "geometryCalls": 8,
+        "layoutBadgeView": 4,
+        "layoutIcon": 4,
+        "reloadIconImage": 4
+      },
+      "repetitions": 100,
+      "styleEnabled": true
+    }
+  ],
+  "sourceRelayoutHook": 0
+}

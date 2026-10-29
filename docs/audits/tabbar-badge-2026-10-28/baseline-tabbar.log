@@ -1,0 +1,3 @@
+tabbar geometry: PASS
+2026-10-28 21:47:55.716 native[8849:36966849] tabbar click effect: 39 checks passed
+2026-10-28 21:47:55.722 native[8849:36966849] tabbar preferences/native lifecycle: PASS

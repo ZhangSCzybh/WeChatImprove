@@ -555,10 +555,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 }
 
 - (BOOL)isDarkMode {
-    if (@available(iOS 13.0, *)) {
-        return self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
-    }
-    return NO;
+    return self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
 }
 
 - (void)showColorPicker {

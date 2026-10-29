@@ -1,0 +1,16 @@
+[
+  {
+    "class": "StatusBarMonitorNavigationController",
+    "address": "0x12039eb38",
+    "superclass": "MMUINavigationController"
+  },
+  {
+    "class": "MMUINavigationController",
+    "address": "0x120632300",
+    "superclass": "UINavigationController"
+  },
+  {
+    "class": "UINavigationController",
+    "location": "imported/terminal"
+  }
+]

@@ -1,0 +1,182 @@
+[
+  {
+    "cls": "CContact",
+    "kind": "methods",
+    "selector": "isBrandContact",
+    "address": "0x100f8d638",
+    "types": "B16@0:8",
+    "end_exclusive": "0x100f8d694",
+    "file": "CContact--isBrandContact.asm"
+  },
+  {
+    "cls": "CContact",
+    "kind": "methods",
+    "selector": "m_uiBrandSubscriptionSettings",
+    "address": "0x100f92cf4",
+    "types": "I16@0:8",
+    "end_exclusive": "0x100f92d04",
+    "file": "CContact--m_uiBrandSubscriptionSettings.asm"
+  },
+  {
+    "cls": "CContact",
+    "kind": "class_methods",
+    "selector": "isBrandFollowedWithUsername:",
+    "address": "0x100bb11cc",
+    "types": "B24@0:8@16",
+    "end_exclusive": "0x100bb12e8",
+    "file": "CContact++isBrandFollowedWithUsername_.asm"
+  },
+  {
+    "cls": "CContactMgr",
+    "kind": "methods",
+    "selector": "getContactByName:",
+    "address": "0x100fcd954",
+    "types": "@24@0:8@16",
+    "end_exclusive": "0x100fcdef4",
+    "file": "CContactMgr--getContactByName_.asm"
+  },
+  {
+    "cls": "TingRouter",
+    "kind": "class_methods",
+    "selector": "openBrandProfileWithUsername:",
+    "address": "0x105e3071c",
+    "types": "v24@0:8@16",
+    "end_exclusive": "0x105e307e4",
+    "file": "TingRouter++openBrandProfileWithUsername_.asm"
+  },
+  {
+    "cls": "MicroMessengerAppDelegate",
+    "kind": "methods",
+    "selector": "handleOpenURL:bundleID:",
+    "address": "0x104bd1a30",
+    "types": "B32@0:8@16@24",
+    "end_exclusive": "0x104bd2f50",
+    "file": "MicroMessengerAppDelegate--handleOpenURL_bundleID_.asm"
+  },
+  {
+    "cls": "MicroMessengerAppDelegate",
+    "kind": "methods",
+    "selector": "application:handleOpenURL:bundleID:annotation:",
+    "address": "0x104bd3530",
+    "types": "B48@0:8@16@24@32@40",
+    "end_exclusive": "0x104bd3b58",
+    "file": "MicroMessengerAppDelegate--application_handleOpenURL_bundleID_annotation_.asm"
+  },
+  {
+    "cls": "MicroMessengerAppDelegate",
+    "kind": "methods",
+    "selector": "internalApplication:openURL:sourceApplication:annotation:",
+    "address": "0x104bd3ce0",
+    "types": "B48@0:8@16@24@32@40",
+    "end_exclusive": "0x104bd3e9c",
+    "file": "MicroMessengerAppDelegate--internalApplication_openURL_sourceApplication_annotation_.asm"
+  },
+  {
+    "cls": "MMURLHandler",
+    "kind": "methods",
+    "selector": "handleDeepLinkURL:withExtraInfo:",
+    "address": "0x1047a4dfc",
+    "types": "v32@0:8@16@24",
+    "end_exclusive": "0x1047a51cc",
+    "file": "MMURLHandler--handleDeepLinkURL_withExtraInfo_.asm"
+  },
+  {
+    "cls": "MMURLHandler",
+    "kind": "methods",
+    "selector": "handleNativeUrl:withViewController:",
+    "address": "0x1047a90ac",
+    "types": "v32@0:8@16@24",
+    "end_exclusive": "0x1047a92ac",
+    "file": "MMURLHandler--handleNativeUrl_withViewController_.asm"
+  },
+  {
+    "cls": "MMURLHandler",
+    "kind": "class_methods",
+    "selector": "canHandleNativeUrl:",
+    "address": "0x1047a8f5c",
+    "types": "B24@0:8@16",
+    "end_exclusive": "0x1047a90ac",
+    "file": "MMURLHandler++canHandleNativeUrl_.asm"
+  },
+  {
+    "cls": "WCDeepLinkHandler",
+    "kind": "class_methods",
+    "selector": "initialize",
+    "address": "0x10700ae2c",
+    "types": "v16@0:8",
+    "end_exclusive": "0x10700c910",
+    "file": "WCDeepLinkHandler++initialize.asm"
+  },
+  {
+    "cls": "WCDeepLinkHandler",
+    "kind": "class_methods",
+    "selector": "deepLinkByName:",
+    "address": "0x10700cde8",
+    "types": "@24@0:8@16",
+    "end_exclusive": "0x10700cdfc",
+    "file": "WCDeepLinkHandler++deepLinkByName_.asm"
+  },
+  {
+    "cls": "WCDeepLinkHandler",
+    "kind": "class_methods",
+    "selector": "getDeepLinkNameFromUrl:",
+    "address": "0x10700cdfc",
+    "types": "@24@0:8@16",
+    "end_exclusive": "0x10700ce7c",
+    "file": "WCDeepLinkHandler++getDeepLinkNameFromUrl_.asm"
+  },
+  {
+    "cls": "WCDeepLinkHandler",
+    "kind": "class_methods",
+    "selector": "deepLinkByUrl:",
+    "address": "0x10700ce7c",
+    "types": "@24@0:8@16",
+    "end_exclusive": "0x10700d050",
+    "file": "WCDeepLinkHandler++deepLinkByUrl_.asm"
+  },
+  {
+    "cls": "WCDeepLinkHandler",
+    "kind": "class_methods",
+    "selector": "isDeepLink:",
+    "address": "0x10700d050",
+    "types": "B24@0:8@16",
+    "end_exclusive": "0x10700d110",
+    "file": "WCDeepLinkHandler++isDeepLink_.asm"
+  },
+  {
+    "cls": "MMWebViewController",
+    "kind": "methods",
+    "selector": "shouldHandleJumpProfileUrl:",
+    "address": "0x1048c1828",
+    "types": "B24@0:8@16",
+    "end_exclusive": "0x1048c1858",
+    "file": "MMWebViewController--shouldHandleJumpProfileUrl_.asm"
+  },
+  {
+    "cls": "MMWebViewController",
+    "kind": "methods",
+    "selector": "handleJumpProfileUrl:",
+    "address": "0x1048c1858",
+    "types": "v24@0:8@16",
+    "end_exclusive": "0x1048c1a40",
+    "file": "MMWebViewController--handleJumpProfileUrl_.asm"
+  },
+  {
+    "cls": "UrlController",
+    "kind": "methods",
+    "selector": "handleUrl:withExtraInfo:",
+    "address": "0x105f6e634",
+    "types": "v32@0:8@16@24",
+    "end_exclusive": "0x105f70430",
+    "file": "UrlController--handleUrl_withExtraInfo_.asm"
+  },
+  {
+    "cls": "CBaseContact",
+    "kind": "methods",
+    "selector": "isMMContact",
+    "address": "0x100f84460",
+    "types": "B16@0:8",
+    "end_exclusive": "0x100f8446c",
+    "file": "CBaseContact--isMMContact.asm"
+  }
+]

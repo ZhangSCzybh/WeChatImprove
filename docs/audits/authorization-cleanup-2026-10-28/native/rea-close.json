@@ -1,0 +1,6 @@
+{
+  "tool": "close_binary",
+  "input": {},
+  "result": null,
+  "note": "Initial get_objc_classes required full Ghidra auto-analysis and did not return within the useful interval; its owned Ghidra helper was terminated, then close_binary returned successfully. No conclusions use partial REA analysis."
+}

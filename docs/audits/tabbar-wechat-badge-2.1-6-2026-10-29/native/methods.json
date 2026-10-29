@@ -1,0 +1,164 @@
+[
+  {
+    "cls": "MainFrameLogicController",
+    "kind": "methods",
+    "selector": "getTotalUnreadCount",
+    "address": "0x104aa64fc",
+    "types": "I16@0:8",
+    "end_exclusive": "0x104aa65b0",
+    "file": "MainFrameLogicController--getTotalUnreadCount.asm"
+  },
+  {
+    "cls": "MainFrameLogicController",
+    "kind": "methods",
+    "selector": "onSessionChanged:",
+    "address": "0x104aa79e8",
+    "types": "v24@0:8@16",
+    "end_exclusive": "0x104aa8180",
+    "file": "MainFrameLogicController--onSessionChanged_.asm"
+  },
+  {
+    "cls": "MainFrameLogicController",
+    "kind": "methods",
+    "selector": "onSessionTotalUnreadCountChange:",
+    "address": "0x104aa8180",
+    "types": "v20@0:8I16",
+    "end_exclusive": "0x104aa8214",
+    "file": "MainFrameLogicController--onSessionTotalUnreadCountChange_.asm"
+  },
+  {
+    "cls": "NewMainFrameViewController",
+    "kind": "methods",
+    "selector": "updateUnReadCount",
+    "address": "0x1051129d4",
+    "types": "v16@0:8",
+    "end_exclusive": "0x105112cc0",
+    "file": "NewMainFrameViewController--updateUnReadCount.asm"
+  },
+  {
+    "cls": "NewMainFrameViewController",
+    "kind": "methods",
+    "selector": "updateSession:",
+    "address": "0x105122c24",
+    "types": "v24@0:8@16",
+    "end_exclusive": "0x105122d1c",
+    "file": "NewMainFrameViewController--updateSession_.asm"
+  },
+  {
+    "cls": "NewMainFrameViewController",
+    "kind": "methods",
+    "selector": "newMessageByContact:msgWrapToAdd:",
+    "address": "0x1051240cc",
+    "types": "v32@0:8@16@24",
+    "end_exclusive": "0x1051240dc",
+    "file": "NewMainFrameViewController--newMessageByContact_msgWrapToAdd_.asm"
+  },
+  {
+    "cls": "NewMainFrameViewController",
+    "kind": "methods",
+    "selector": "getTotalUnreadCount",
+    "address": "0x10512416c",
+    "types": "I16@0:8",
+    "end_exclusive": "0x105124184",
+    "file": "NewMainFrameViewController--getTotalUnreadCount.asm"
+  },
+  {
+    "cls": "NewMainFrameViewController",
+    "kind": "methods",
+    "selector": "getAppIconTotalUnreadCount",
+    "address": "0x105124184",
+    "types": "I16@0:8",
+    "end_exclusive": "0x10512419c",
+    "file": "NewMainFrameViewController--getAppIconTotalUnreadCount.asm"
+  },
+  {
+    "cls": "MMNewSessionMgr",
+    "kind": "methods",
+    "selector": "GetTotalUnreadCount",
+    "address": "0x104521bf8",
+    "types": "I16@0:8",
+    "end_exclusive": "0x104521c2c",
+    "file": "MMNewSessionMgr--GetTotalUnreadCount.asm"
+  },
+  {
+    "cls": "MMNewSessionMgr",
+    "kind": "methods",
+    "selector": "recountUnReadCount",
+    "address": "0x10452e620",
+    "types": "v16@0:8",
+    "end_exclusive": "0x10452e9a8",
+    "file": "MMNewSessionMgr--recountUnReadCount.asm"
+  },
+  {
+    "cls": "MMNewSessionMgr",
+    "kind": "methods",
+    "selector": "recountUnReadCountAndFireExtension",
+    "address": "0x10452e9a8",
+    "types": "v16@0:8",
+    "end_exclusive": "0x10452ebb8",
+    "file": "MMNewSessionMgr--recountUnReadCountAndFireExtension.asm"
+  },
+  {
+    "cls": "MMNewSessionMgr",
+    "kind": "methods",
+    "selector": "OnAddMsg:MsgWrap:",
+    "address": "0x10452f328",
+    "types": "v32@0:8@16@24",
+    "end_exclusive": "0x10452f9cc",
+    "file": "MMNewSessionMgr--OnAddMsg_MsgWrap_.asm"
+  },
+  {
+    "cls": "MMNewSessionMgr",
+    "kind": "methods",
+    "selector": "OnUnReadCountChange:",
+    "address": "0x1045329d0",
+    "types": "v24@0:8@16",
+    "end_exclusive": "0x104532b44",
+    "file": "MMNewSessionMgr--OnUnReadCountChange_.asm"
+  },
+  {
+    "cls": "MMTabBarController",
+    "kind": "methods",
+    "selector": "setTabBarBadgeValue:forIndex:",
+    "address": "0x1047263ac",
+    "types": "v32@0:8Q16Q24",
+    "end_exclusive": "0x104726534",
+    "file": "MMTabBarController--setTabBarBadgeValue_forIndex_.asm"
+  },
+  {
+    "cls": "MMTabBarController",
+    "kind": "methods",
+    "selector": "setTabBarBadgeString:forIndex:",
+    "address": "0x104726534",
+    "types": "v32@0:8@16Q24",
+    "end_exclusive": "0x1047266e4",
+    "file": "MMTabBarController--setTabBarBadgeString_forIndex_.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "setBadgeViewHidden:",
+    "address": "0x104727298",
+    "types": "v20@0:8B16",
+    "end_exclusive": "0x1047272b0",
+    "file": "MMTabBarItemView--setBadgeViewHidden_.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "setTabBarBadgeValue:",
+    "address": "0x1047272b0",
+    "types": "v24@0:8q16",
+    "end_exclusive": "0x1047274b8",
+    "file": "MMTabBarItemView--setTabBarBadgeValue_.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "setTabBarBadgeString:",
+    "address": "0x1047274b8",
+    "types": "v24@0:8@16",
+    "end_exclusive": "0x104727694",
+    "file": "MMTabBarItemView--setTabBarBadgeString_.asm"
+  }
+]

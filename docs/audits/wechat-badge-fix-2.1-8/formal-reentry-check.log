@@ -1,0 +1,2 @@
+Close-friend alerts: 216 focused checks passed (identity, calls, reply, badge, payment policy)
+FAIL 203 [reentrant-boundary-before-outer-native-write]: Badge(same).hidden

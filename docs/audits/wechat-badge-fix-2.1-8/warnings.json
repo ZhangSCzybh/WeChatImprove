@@ -1,0 +1,26 @@
+{
+  "rootful": {
+    "count": 6,
+    "lines": [
+      "Hooks/CloseFriendNotificationHooks.xm:308:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+      "Hooks/CloseFriendNotificationHooks.xm:308:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+      "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+      "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+      "ld: warning: -multiply_defined is obsolete",
+      "ld: warning: -multiply_defined is obsolete"
+    ],
+    "new_warnings": 0
+  },
+  "rootless": {
+    "count": 6,
+    "lines": [
+      "Hooks/CloseFriendNotificationHooks.xm:308:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+      "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+      "ld: warning: -multiply_defined is obsolete",
+      "Hooks/CloseFriendNotificationHooks.xm:308:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+      "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+      "ld: warning: -multiply_defined is obsolete"
+    ],
+    "new_warnings": 0
+  }
+}

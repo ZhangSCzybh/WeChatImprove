@@ -1,0 +1,24 @@
+{
+  "baseline_existing_files": 1866,
+  "unchanged": 1853,
+  "changed": [
+    "Controllers/CSGroupListAdapter.m",
+    "Controllers/CSGroupListAdapter.h",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Hooks/CloseFriendNotificationHooks.xm",
+    "Headers/CSUserInfoHelper.h",
+    "Tests/GroupLifecycleTests.m",
+    "Tests/GroupViewportTests.m",
+    "Tests/extract-group-lifecycle.py",
+    "Tests/GroupInteractionTests.m",
+    "Tests/GroupSearchTests.m",
+    "Tests/verify-close-friend-alerts.sh",
+    "control",
+    "README.md"
+  ],
+  "missing": [],
+  "new_test": "Tests/CloseFriendTabBadgeTests.m",
+  "all_changes_within_expected_scope": true,
+  "build_inputs_still_match": true,
+  "test_capture_sources_still_match": true
+}

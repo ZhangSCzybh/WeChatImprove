@@ -1,0 +1,7 @@
+FAIL 288 [native chain filters both protected kinds, order and original identity]: [Names(panel.dataLogic.currentSessionList) isEqual:@[@"ordinary",@"second"]]
+FAIL 289 [native chain filters both protected kinds, order and original identity]: panel.dataLogic.sessionCount==2 && panel.dataLogic.notifySessionCount==2
+FAIL 290 [native chain filters both protected kinds, order and original identity]: [panel.dataLogic sessionAtIndex:0]==ordinary && [panel.dataLogic sessionAtIndex:1]==second
+FAIL 292 [native chain filters both protected kinds, order and original identity]: home.opens==1 && home.opened==second
+Close-friend unread panel (unhooked native control): 4 checks, 4 failures
+
+exit_code=1

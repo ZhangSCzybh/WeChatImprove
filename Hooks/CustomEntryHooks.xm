@@ -5,7 +5,6 @@
 #import "../Headers/WCHeaders.h"      // 微信相关的所有类和框架
 #import "../Headers/CSUserInfoHelper.h" // 用户信息助手和全局常量
 #import "../Headers/WCPluginsHeader.h"  // 其他插件提供的接口声明
-#import "../Controllers/CSCustomViewController.h" // 自定义设置页面
 #import "../Controllers/CSNativeSettingsHost.h"
 #import "../Controllers/CSEntrySettingsViewController.h" // 入口设置控制器
 #import "../Controllers/CSAuthorizationManager.h" // 授权管理器
@@ -15,7 +14,6 @@
 // 入口设置相关的键
 static NSString * const kEntryDisplayModeKey = @"com.wechat.tweak.entry.display.mode";
 static NSString * const kEntryCustomTitleKey = @"com.wechat.tweak.entry.custom.title";
-static NSString * const kEntrySettingsChangedNotification = @"com.wechat.tweak.entry.settings.changed";
 
 // 定义入口标题变量，可根据设置动态更改
 static NSString *gCustomEntryTitle = nil;
@@ -230,12 +228,8 @@ static void entrySettingsChangedCallback(CFNotificationCenterRef center, void *o
     // 创建导航控制器（用于模态展示）
     UINavigationController *navVC = [[UINavigationController alloc] initWithRootViewController:customVC];
     
-    // 设置模态展示样式（iOS 13+）
-    if (@available(iOS 13.0, *)) {
-        navVC.modalPresentationStyle = UIModalPresentationFormSheet; // 使用表单样式
-    } else {
-        navVC.modalPresentationStyle = UIModalPresentationPageSheet; // 向上滑动样式
-    }
+    // 设置模态展示样式
+    navVC.modalPresentationStyle = UIModalPresentationFormSheet; // 使用表单样式
     
     // 模态展示控制器
     [self presentViewController:navVC animated:YES completion:nil];
@@ -486,12 +480,8 @@ static int isRegister = 0;
     // 创建导航控制器（用于模态展示）
     UINavigationController *navVC = [[UINavigationController alloc] initWithRootViewController:customVC];
     
-    // 设置模态展示样式（iOS 13+）
-    if (@available(iOS 13.0, *)) {
-        navVC.modalPresentationStyle = UIModalPresentationFormSheet; // 使用表单样式
-    } else {
-        navVC.modalPresentationStyle = UIModalPresentationPageSheet; // 向上滑动样式
-    }
+    // 设置模态展示样式
+    navVC.modalPresentationStyle = UIModalPresentationFormSheet; // 使用表单样式
     
     // 获取navigationController并模态展示
     UINavigationController *navigationController = [self valueForKey:@"navigationController"];

@@ -9,6 +9,7 @@ root = Path(__file__).resolve().parent.parent
 source = (Path(sys.argv[2]) if len(sys.argv) > 2 else root/'Controllers/CSGroupListAdapter.m').read_text()
 hooks = (Path(sys.argv[3]) if len(sys.argv) > 3 else root/'Hooks/SessionGroupHooks.xm').read_text()
 out = Path(sys.argv[1])
+header = (root/'Controllers/CSGroupListAdapter.h').read_text()
 def method(text, marker):
     start = text.index(marker)
     brace = text.index('{', start)
@@ -20,6 +21,22 @@ def method(text, marker):
             if not depth: return text[start:end+1]
     raise AssertionError(marker)
 methods = []
+if '+ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecisionForPublication:' in source:
+    # Keep the refresh-tail dependency real: host boundaries supply immutable
+    # rows/account state, while production decides whether a source is verified.
+    interface = header.split('// BEGIN Chat tab badge decision', 1)[1].split('// END Chat tab badge decision', 1)[0]
+    implementation_start = source.index('@implementation CSGroupTabBadgeDecision')
+    implementation_end = source.index('@end', implementation_start)+len('@end')
+    constant = next(line for line in source.splitlines() if line.startswith('NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotification='))
+    out.with_name('GroupLifecycleTabBadgeDependencies.h').write_text('NS_ASSUME_NONNULL_BEGIN\n'+interface+'\nNS_ASSUME_NONNULL_END\n#define CS_GROUP_LIFECYCLE_TAB_BADGE 1\n')
+    out.with_name('GroupLifecycleTabBadgeImplementation.inc').write_text(source[implementation_start:implementation_end]+'\n'+constant+'\n')
+    methods.append(method(source, '+ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecision {'))
+    methods.append(method(source, '+ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecisionForPublication:'))
+    for marker in ['+ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecisionForController:', '+ (void)requestTabBadgeSourcesRefresh {', '- (void)requestTabBadgeSourceRefresh {', '- (void)refreshTabBadgeSource {']:
+        if marker in source: methods.append(method(source, marker))
+else:
+    out.with_name('GroupLifecycleTabBadgeDependencies.h').write_text('#define CS_GROUP_LIFECYCLE_TAB_BADGE 0\n')
+    out.with_name('GroupLifecycleTabBadgeImplementation.inc').write_text('')
 for marker in ['+ (instancetype)adapterForTable:', '+ (instancetype)adapterForController:',
                '+ (void)attachToController:', '+ (void)layoutForController:', '+ (void)settingsChanged',
                '- (void)requestRefresh {', '- (void)requestRecovery {', '- (void)scheduleRefresh {', '- (void)cancelScheduledRefresh {', '+ (void)applicationActivityChanged:', '+ (void)closeFriendPolicyChanged:', '- (void)beginNativeChangeOfKind:', '- (void)requestCoalescedRefresh', '- (void)invalidateNativeSnapshot', '- (NSArray *)nativeSectionsForAccount:', '- (void)beginNativeChange', '- (void)endNativeChange {', '- (void)endNativeChangeCoalesced:',

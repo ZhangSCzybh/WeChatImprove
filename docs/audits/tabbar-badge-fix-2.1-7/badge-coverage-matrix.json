@@ -1,0 +1,374 @@
+{
+  "derivedFrom": "Frozen test source loop cardinality plus complete green exits. Cells are derived coverage counts, not individually printed test result records.",
+  "testSourceSha256": "0bcdbde0e0cac0ee7389fb0d839d14ccea56c828a5efcc692f4c7b741f309a95",
+  "greenModes": [
+    "source",
+    "without-relayout"
+  ],
+  "eachMode": {
+    "combinations": 560,
+    "checks": 16000960,
+    "failures": 0
+  },
+  "defaultAxes": {
+    "pixelScale": [
+      2,
+      3
+    ],
+    "widthScale": [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+    ],
+    "contentHeight": [
+      44,
+      52,
+      80
+    ],
+    "hideText": [
+      false,
+      true
+    ],
+    "importedIcon": [
+      false,
+      true
+    ],
+    "initialBadgeContent": [
+      "dot",
+      "1",
+      "12",
+      "99+"
+    ],
+    "tabCount": 4
+  },
+  "defaultMatrix": [
+    {
+      "widthScale": 0.6,
+      "cells": [
+        {
+          "initialBadgeContent": "dot",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "1",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "12",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "99+",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        }
+      ]
+    },
+    {
+      "widthScale": 0.7,
+      "cells": [
+        {
+          "initialBadgeContent": "dot",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "1",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "12",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "99+",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        }
+      ]
+    },
+    {
+      "widthScale": 0.8,
+      "cells": [
+        {
+          "initialBadgeContent": "dot",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "1",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "12",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "99+",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        }
+      ]
+    },
+    {
+      "widthScale": 0.9,
+      "cells": [
+        {
+          "initialBadgeContent": "dot",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "1",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "12",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "99+",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        }
+      ]
+    },
+    {
+      "widthScale": 1.0,
+      "cells": [
+        {
+          "initialBadgeContent": "dot",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "1",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "12",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "99+",
+          "combinationCount": 24,
+          "result": "pass in both green modes"
+        }
+      ]
+    }
+  ],
+  "defaultCombinationCount": 480,
+  "edgeAxes": {
+    "pixelScale": [
+      2,
+      3
+    ],
+    "widthScale": [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+    ],
+    "initialBadgeContent": [
+      "dot",
+      "1",
+      "12",
+      "99+"
+    ],
+    "edgeCases": [
+      {
+        "name": "high native label",
+        "lineHeight": 20,
+        "contentHeight": 44,
+        "hideText": false,
+        "importedIcon": false
+      },
+      {
+        "name": "native customSize narrower than styled icon",
+        "nativeCustomSize": [
+          20,
+          20
+        ],
+        "contentHeight": 52,
+        "hideText": false,
+        "importedIcon": false
+      }
+    ]
+  },
+  "edgeMatrix": [
+    {
+      "widthScale": 0.6,
+      "cells": [
+        {
+          "initialBadgeContent": "dot",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "1",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "12",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "99+",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        }
+      ]
+    },
+    {
+      "widthScale": 0.7,
+      "cells": [
+        {
+          "initialBadgeContent": "dot",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "1",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "12",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "99+",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        }
+      ]
+    },
+    {
+      "widthScale": 0.8,
+      "cells": [
+        {
+          "initialBadgeContent": "dot",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "1",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "12",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "99+",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        }
+      ]
+    },
+    {
+      "widthScale": 0.9,
+      "cells": [
+        {
+          "initialBadgeContent": "dot",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "1",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "12",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "99+",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        }
+      ]
+    },
+    {
+      "widthScale": 1.0,
+      "cells": [
+        {
+          "initialBadgeContent": "dot",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "1",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "12",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        },
+        {
+          "initialBadgeContent": "99+",
+          "combinationCount": 4,
+          "result": "pass in both green modes"
+        }
+      ]
+    }
+  ],
+  "edgeCombinationCount": 80,
+  "perCombinationTransitions": [
+    "initial enable with visible native badge",
+    "100 ordinary adapter updates with steady frame",
+    "100 nested item layouts with steady frame",
+    "100 nested bar layouts with steady frame",
+    "unselected/light and selected/dark property state with relayout",
+    "detach and reattach",
+    "20 disable/enable cycles with native restore",
+    "final disable and native restore"
+  ],
+  "defaultOnlyTransitions": [
+    "live dot/1/12/99+ updates",
+    "native zero-value hidden badge remains hidden"
+  ],
+  "assertions": [
+    "same native badge identity and same item superview",
+    "finite nonempty frame; unchanged native pixel-aligned size",
+    "visible alpha 0.75 preserved; visible ancestors",
+    "nonempty intersection with item bounds",
+    "each side overflow no greater than native same-width getter frame",
+    "plugin surface below item; badge after image sibling",
+    "repeated steady frame does not drift",
+    "disable restores actual same-width native frame",
+    "native hidden-value path preserves hidden and identity"
+  ],
+  "limitations": [
+    "4-tab host fixture only; no fifth tab runtime execution.",
+    "State coverage uses light+unselected and dark+selected pairs; it is not all four independent cross-products and not a full native selection/trait transition.",
+    "Detach/reattach models association lifecycle, not full device foreground/background execution.",
+    "Native badge text dimensions are representative inputs (8/16/24/30pt), not measured native strings.",
+    "The host models the image FlexibleLeftMargin flag and confirmed layout formulas, not all UIKit autoresizing/rendering.",
+    "Structural z-order checks do not substitute for actual device pixel-visibility observation.",
+    "Natural same-width native 99+ overflow is allowed; unconditional full containment is intentionally not required."
+  ]
+}

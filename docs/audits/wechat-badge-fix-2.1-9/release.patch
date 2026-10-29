@@ -1,0 +1,109 @@
+--- a/control
++++ b/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.1-6
++Version: 2.1-9
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会
+--- a/Headers/CSUserInfoHelper.h
++++ b/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.1-6"  // 插件版本号
++#define kPluginVersionString @"2.1-9"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- a/Controllers/CSReleaseNotesViewController.m
++++ b/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,10 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"2.1-9": @[
++            @{@"title": @"修复密友保护下的微信角标更新", @"detail": @"设置密友或密群后，普通会话未读随新消息和已读变化更新；消息刷新期间保留安全的已有数字，数据就绪后自动更新。"},
++            @{@"title": @"完善页面切换后的未读显示", @"detail": @"进入聊天页、切换底栏或关闭聊天分组后继续维护未读角标；清空名单或关闭保护后恢复微信原生显示，沿用现有密友隐藏与消息静音规则。"}
++        ],
+         @"2.1-5": @[
+             @{@"title": @"整理插件代码与运行日志", @"detail": @"清理冗余日志和历史实现，精简旧系统兼容分支，保留现有设置、备份与消息处理能力。"},
+             @{@"title": @"完善 AI 图片识别兼容性", @"detail": @"整合近期 JPEG、PNG 图片完整性判断及下载恢复修复，保留现有自动回复规则。"}
+--- a/README.md
++++ b/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
+ 
+-**当前版本：`2.1-5`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`2.1-9`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
+ 
+@@ -31,8 +31,8 @@
+ | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
+ | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
+ | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
+-| Rootless | 本地已生成 `2.1-5` 安装包，整合代码清理及近期图片修复；尚待真机验收 |
+-| Rootful | 本地已生成 `2.1-5` 安装包；尚待真机验收 |
++| Rootless | 本地提供 `2.1-9` 安装包，修复设置密友／密群后的微信底栏角标更新；尚待真机验收 |
++| Rootful | 本地提供 `2.1-9` 安装包；尚待真机验收 |
+ | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
+ | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
+ 
+@@ -40,14 +40,14 @@
+ 
+ ### 安装步骤
+ 
+-1. 获取与设备注入环境匹配的 `.deb`：当前 `2.1-5` 交付 [Rootless 安装包](packages/2.1-5/com.wechat.improve_2.1-5_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-5/com.wechat.improve_2.1-5_iphoneos-arm.deb)、[调试符号](packages/2.1-5/com.wechat.improve_2.1-5_symbols.zip) 和 [SHA-256](packages/2.1-5/SHA256SUMS)。本次整合调试日志、历史代码清理及近期 AI 图片兼容修复；发布与验证见 [2.1-5 记录](docs/audits/release-2.1-5/README.md)，使用方法见 [AI 功能说明](docs/features/ai-auto-reply.md)。
++1. 获取与设备注入环境匹配的 `.deb`：当前 `2.1-9` 交付 [Rootless 安装包](packages/2.1-9-wechat-badge/com.wechat.improve_2.1-9_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-9-wechat-badge/com.wechat.improve_2.1-9_iphoneos-arm.deb)、[调试符号](packages/2.1-9-wechat-badge/com.wechat.improve_2.1-9_symbols.zip) 和 [SHA-256](packages/2.1-9-wechat-badge/SHA256SUMS)。本次基于 `2.1-6` 修复底栏“微信”角标，保留已有密友隐藏与消息静默规则；实现、测试与真机验收步骤见 [2.1-9 记录](docs/audits/wechat-badge-fix-2.1-9/README.md)。
+ 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
+ 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
+ 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
+ 
+ 默认入口名称为“再也不会”。在 **入口设置** 中可以修改名称，并选择显示在“我”、微信设置页或已有的插件管理入口；插件管理入口需要宿主环境提供 `WCPluginsMgr`。
+ 
+-`2.1-5` 已包含此前 `2.1-4` 图片修复候选的下载恢复，以及完整 JPEG/PNG 在结束标记后带附加数据时的兼容修复。此前安装包保留；当前版本请使用上方 `2.1-5` 安装包。实际 JPEG 复现、图片 326 项及 ASan/UBSan 验证见 [图片格式修复记录](docs/audits/ai-image-container-2026-10-28/README.md)，下载恢复见 [上次记录](docs/audits/ai-image-recovery-2026-10-28/README.md)；真机显示和图片回复仍需使用新消息验收。
++`2.1-5` 已包含此前 `2.1-4` 图片修复候选的下载恢复，以及完整 JPEG/PNG 在结束标记后带附加数据时的兼容修复，后续版本继续保留。此前安装包保留；当前版本请使用上方安装包。实际 JPEG 复现、图片 326 项及 ASan/UBSan 验证见 [图片格式修复记录](docs/audits/ai-image-container-2026-10-28/README.md)，下载恢复见 [上次记录](docs/audits/ai-image-recovery-2026-10-28/README.md)；真机显示和图片回复仍需使用新消息验收。
+ 
+ 仓库未提供可直接安装的 IPA、现成的重签名流程或 `install.sh`。
+ 
+@@ -113,6 +113,8 @@
+ **列表圆角**可调整卡片圆角、左右边距、置顶/普通会话顶部距离及浅深色背景。与聊天分组同时开启时，卡片首末行依据当前分组实际显示的会话确定。
+ 
+ **底栏样式**复用微信原生按钮、图标、文字与角标，支持悬浮布局、图标导入、文字隐藏、背景、描边、位置和触感设置。描边动画包括扩散呼吸、扩散心跳、经典呼吸、经典心跳和无动画；系统开启“减弱动态效果”时停止动画。修改后返回主页查看效果。
++
++`2.1-9` 修复设置密友／密群后底栏“微信”数字消失或不随消息更新的问题。普通消息刷新期间保留同账号、同策略下已验证的角标，新数据稳定后更新；在聊天页、设置页或关闭聊天分组时仍维护计数。清空密友／密群或关闭保护后主动恢复当前原生角标。密友会话隐藏或启用消息静默时，受保护会话继续按既有规则排除；未改动底栏布局和微信真实未读状态。详见 [修复记录与验收清单](docs/audits/wechat-badge-fix-2.1-9/README.md)。
+ 
+ ### 消息操作与辅助功能
+ 
+@@ -200,7 +202,7 @@
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.1-5_iphoneos-arm64.deb`。
++当前版本默认输出：`packages/com.wechat.improve_2.1-9_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-9-wechat-badge/`。
+ 
+ ### Rootful
+ 
+@@ -209,7 +211,7 @@
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.1-5_iphoneos-arm.deb`。本地已生成两种方案的安装包。
++当前版本默认输出：`packages/com.wechat.improve_2.1-9_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-9-wechat-badge/`。
+ 
+ | 方案 | 动态库安装目录 |
+ | --- | --- |
+@@ -233,7 +235,7 @@
+ `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
+ 
+ ```bash
+-dpkg-deb -f packages/com.wechat.improve_2.1-5_iphoneos-arm64.deb Version Architecture
++dpkg-deb -f packages/2.1-9-wechat-badge/com.wechat.improve_2.1-9_iphoneos-arm64.deb Version Architecture
+ ```
+ 
+ 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。

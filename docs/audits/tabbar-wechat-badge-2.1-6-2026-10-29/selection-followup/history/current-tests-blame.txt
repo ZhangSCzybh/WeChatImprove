@@ -1,0 +1,14 @@
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 195)     // The validated owner excludes protected counts while revealed; folded owner never doubles totals.
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 196)     Policy=Snapshot(YES,YES,@{@"showBadges":@YES});Owners=[NSHashTable hashTableWithOptions:NSPointerFunctionsStrongMemory];CSGroupListAdapter *owner=[CSGroupListAdapter new];owner.controller=@"main";owner.snapshotAccount=@"self";owner.modelRevision=owner.snapshotRevision=1;owner.snapshotEpoch=Epoch;
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 197)     owner.cachedNativeSections=@[@[Row(0,@"friend",8,CSGroupRowKindSession),Row(1,@"ordinary",3,CSGroupRowKindSession),Row(2,@"chatroom_session_box",10,CSGroupRowKindAggregate)]];[Owners addObject:owner];
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 198)     CSGroupListAdapter *folded=[CSGroupListAdapter new];folded.controller=@"folded";folded.snapshotAccount=@"self";folded.cachedNativeSections=@[@[Row(0,@"ordinary",30,CSGroupRowKindSession)]];[Owners addObject:folded];
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 199)     CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@3]);CHECK(((CSGroupRow *)owner.cachedNativeSections[0][0]).unreadCount==8);
+d35c3e002 (ZhangSCzybh 2026-10-21 15:20:18 +0800 200)     NSArray *badgeKey=owner.alertBadgeKey;NSNumber *badge=owner.alertBadge;
+d35c3e002 (ZhangSCzybh 2026-10-21 15:20:18 +0800 201)     for(NSUInteger i=0;i<20;i++)CHECK([CSGroupListAdapter closeFriendAlertBadgeCount]==badge);
+d35c3e002 (ZhangSCzybh 2026-10-21 15:20:18 +0800 202)     CHECK(owner.alertBadgeKey==badgeKey); // Same revision never rebuilds the projection.
+d35c3e002 (ZhangSCzybh 2026-10-21 15:20:18 +0800 203)     FoldedNames=@[@"group@chatroom"];CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@3]);CHECK(owner.alertBadgeKey!=badgeKey);
+d35c3e002 (ZhangSCzybh 2026-10-21 15:20:18 +0800 204)     owner.modelRevision++;owner.snapshotRevision=owner.modelRevision;
+d35c3e002 (ZhangSCzybh 2026-10-21 15:20:18 +0800 205)     owner.cachedNativeSections=@[@[Row(0,@"friend",8,CSGroupRowKindSession),Row(1,@"ordinary",5,CSGroupRowKindSession)]];
+d35c3e002 (ZhangSCzybh 2026-10-21 15:20:18 +0800 206)     CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@5]);
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 207)     owner.snapshotEpoch--;CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@0]);owner.snapshotEpoch=Epoch;
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 208)     owner.modelRevision++;CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@0]);Policy=Snapshot(NO,NO,nil);CHECK(![CSGroupListAdapter closeFriendAlertBadgeCount]);

@@ -110,18 +110,39 @@ static void IncomingCallChecks(void) {
     cached.roomid=8121;cached.callerUsername=@"ordinary";m=IncomingMessage(@"friend",8121,YES,NO);
     CHECK(CSCFHandleIncomingCall(ilink,m,YES) && IncomingSubcallRejects==subBefore+1);
     ilink.isConnected=NO;ilink.mRoomId=0;VoIPMPSubCallService.sharedInstance.cache=nil;
-    Policy=Snapshot(YES,NO,@{@"rejectVoice":@NO});m=IncomingMessage(@"friend",8112,YES,NO);CHECK(CSCFHandleIncomingCall(ilink,m,YES) && ilink.rejects==2);
+    Policy=Snapshot(YES,NO,@{@"rejectVoice":@NO,@"silenceMessages":@YES});m=IncomingMessage(@"friend",8112,YES,NO);
+    CHECK(!CSCFHandleIncomingCall(ilink,m,YES) && ilink.rejects==2);
+    CHECK(!CSCFIncomingCallToken(m).suppressesPresentation);
     m=IncomingMessage(@"friend",8113,YES,YES);CHECK(CSCFHandleIncomingCall(ilink,m,YES) && ilink.rejects==3);
+    // Locked calls also reach native UI when the matching rejection is off,
+    // including profiles retaining the retired message-silence option.
+    Policy=Snapshot(YES,NO,@{@"rejectVoice":@NO,@"rejectVideo":@NO,@"silenceMessages":@YES});
+    unsigned long long allowedRoom=8400;
+    Invites *allowedInvites=[Invites new];
+    for(NSNumber *transport in @[@YES,@NO])for(NSNumber *video in @[@NO,@YES]) {
+        id manager=transport.boolValue?(id)ilink:(id)legacy;
+        m=IncomingMessage(@"friend",allowedRoom++,transport.boolValue,video.boolValue);
+        CSCloseFriendCallToken *token=CSCFIncomingCallToken(m);
+        CHECK(token.subject.isCurrent && !token.requiresRejection && !token.suppressesPresentation);
+        NSUInteger starts=[manager starts];
+        BOOL intercepted=CSCFHandleIncomingCall(manager,m,transport.boolValue);
+        CHECK(!intercepted);
+        if(!intercepted)[manager onMonoServiceMsgStartWithMsg:m];
+        CHECK([manager starts]==starts+1);
+        Info *invitation=[VoIPInvitationInfo infoWithVoipMonoMsg:m scene:0];
+        CHECK(!CSCFHandleInvitation(allowedInvites,invitation,999));
+        CHECK(!CSCFInvitationOutputSuppressed(@{@"info":invitation}));
+    }
+    CHECK(ilink.rejects==3 && legacy.rejects==0 && allowedInvites.rejects==0);
     // Revealed friends reach the native incoming UI on both transports and media.
-    // Message silence remains enabled, so it cannot substitute for call rejection.
-    Policy=Snapshot(YES,YES,nil);
+    Policy=Snapshot(YES,YES,@{@"silenceMessages":@YES});
     unsigned long long openRoom=8300;
     Invites *openInvites=[Invites new];
     for(NSNumber *transport in @[@YES,@NO])for(NSNumber *video in @[@NO,@YES]) {
         id manager=transport.boolValue?(id)ilink:(id)legacy;
         m=IncomingMessage(@"friend",openRoom++,transport.boolValue,video.boolValue);
         CSCloseFriendCallToken *token=CSCFIncomingCallToken(m);
-        CHECK(token.subject.shouldSilence && !token.requiresRejection && !token.suppressesPresentation);
+        CHECK(token.subject.isCurrent && !token.requiresRejection && !token.suppressesPresentation);
         NSUInteger starts=[manager starts];
         BOOL intercepted=CSCFHandleIncomingCall(manager,m,transport.boolValue);
         CHECK(!intercepted);

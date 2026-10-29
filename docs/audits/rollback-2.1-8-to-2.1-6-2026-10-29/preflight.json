@@ -1,0 +1,23 @@
+{
+  "time": "2026-10-29T01:34:39.297361+00:00",
+  "source_matches_final_2_1_8": true,
+  "target": "2.1-6",
+  "authority": "docs/audits/authorization-cleanup-2026-10-28/source-sha256-after.json",
+  "reverse_patch": "docs/audits/wechat-badge-fix-2.1-8/release.patch",
+  "patch_sha256": "79beb4479b3e525e3305330d90a12238831fb5ca7f8e7382aca5a98ac659f4d4",
+  "changed_files": [
+    "Controllers/CSGroupListAdapter.m",
+    "Controllers/CSGroupListAdapter.h",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/CloseFriendNotificationHooks.xm",
+    "Tests/GroupLifecycleTests.m",
+    "Tests/extract-group-lifecycle.py",
+    "Tests/verify-close-friend-alerts.sh",
+    "control"
+  ],
+  "remove_added_files": [
+    "Tests/CloseFriendTabBadgeTests.m"
+  ],
+  "preserved_artifact_count": 1264,
+  "reverse_apply_check_exit": 0
+}

@@ -1,0 +1,23 @@
+{
+  "verified_at": "2026-10-28T23:11:37.720528+00:00",
+  "existing_baseline_files_checked": 1854,
+  "only_allowed_existing_files_changed": [
+    "Controllers/CSTabBarNativeAdapter.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/TabBarStyleHooks.xm",
+    "Tests/TabBarUIKit/TabBarUIKit.m",
+    "Tests/TabBarUIKit/UIKit/UIKit.h",
+    "Tests/verify-tabbar.sh",
+    "control"
+  ],
+  "historical_artifact_sha_preservation": true,
+  "packages_match_verified_sha256": true,
+  "current_inputs_match_green": true,
+  "red_snapshot_inputs_verified": 12,
+  "identical_red_green_current_tests": 6,
+  "markdown_targets_checked": 63,
+  "broken_links": 0,
+  "git_diff_check_exit_code": 0,
+  "new_production_changes_after_green": false,
+  "new_test_runs_after_successful_required_regressions": false
+}

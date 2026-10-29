@@ -1,0 +1,21 @@
+{
+  "results": [
+    {
+      "path": "Tests/GroupSearchTests.m",
+      "expected_sha256": "6a8d165391f3815ccdbebce21829303bd24f5adbd69fd81e1a01af199f48f50b",
+      "restored_sha256": "6a8d165391f3815ccdbebce21829303bd24f5adbd69fd81e1a01af199f48f50b",
+      "matches": true,
+      "method": "Exact reverse of this agent’s fixture-only additions; verified against pre-edit baseline SHA-256.",
+      "formal_source_modified": false
+    },
+    {
+      "path": "Tests/GroupViewportTests.m",
+      "expected_sha256": "aed04beaae11e94c934a143f078086047e65810afd1cf77c9022598454cfbff6",
+      "restored_sha256": "aed04beaae11e94c934a143f078086047e65810afd1cf77c9022598454cfbff6",
+      "matches": true,
+      "method": "Exact reverse of this agent’s fixture-only additions; verified against pre-edit baseline SHA-256.",
+      "formal_source_modified": false
+    }
+  ],
+  "all_match": true
+}

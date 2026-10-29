@@ -1,0 +1,12 @@
+{
+  "captured_at": "2026-10-29T01:56:55.669614+00:00",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "code_version": "2.1-6",
+  "target": "iOS WeChat injected Theos tweak",
+  "web_url_frontend_backend_ports": "not applicable; no service started",
+  "device_loaded_version": "not read",
+  "effective_build_configuration": "Makefile: arm64 arm64e, iOS15 target, ARC; isolated build directories will preserve existing .theos/packages",
+  "database": "no device database opened or replaced",
+  "other_tasks_sharing_checkout": "no other active task returned by list_threads",
+  "existing_files": 1866
+}

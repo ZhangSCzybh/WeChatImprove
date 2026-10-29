@@ -82,10 +82,10 @@ static UIViewController *CSNativeSettingsHostForContent(UIViewController *conten
 - (BOOL)settingsEntryVisible {return self.visible;}
 @end
 @interface EntryController : UIViewController
-@property(nonatomic,strong) UIView *avatarImageView,*authorizationOverlay;
+@property(nonatomic,strong) UIView *avatarImageView;
 @property(nonatomic,strong) UILongPressGestureRecognizer *closeFriendEntryGesture;
 @property(nonatomic,copy) NSDictionary *closeFriendEntryToken;
-@property(nonatomic) BOOL isAuthorized,closeFriendEntryVisible;
+@property(nonatomic) BOOL isAuthorized,closeFriendEntryVisible,authorizationPromptInFlight;
 @property(nonatomic,strong) UITableView *tableView;
 @property(nonatomic) NSUInteger setups;
 - (void)setupData;
@@ -116,8 +116,8 @@ int main(void) {@autoreleasepool {
     Check(manager.discoveries==0,"background at recognition blocks discovery");
     Check(![page gestureRecognizer:gesture shouldReceiveTouch:nil],"background cannot begin a touch");UIApplication.sharedApplication.applicationState=0;
     page.isAuthorized=NO;Check(![page gestureRecognizer:gesture shouldReceiveTouch:nil],"plugin authorization gate remains enforced");page.isAuthorized=YES;
-    page.authorizationOverlay=[UIView new];page.authorizationOverlay.superview=page.view;
-    Check(![page gestureRecognizer:gesture shouldReceiveTouch:nil],"visible authorization overlay blocks discovery");page.authorizationOverlay=nil;
+    page.authorizationPromptInFlight=YES;
+    Check(![page gestureRecognizer:gesture shouldReceiveTouch:nil],"pending native authorization alert blocks discovery");page.authorizationPromptInFlight=NO;
     page.presentedViewController=[UIViewController new];Check(![page gestureRecognizer:gesture shouldReceiveTouch:nil],"modal presentation blocks discovery");page.presentedViewController=nil;
     page.navigationController.topViewController=[UIViewController new];Check(![page gestureRecognizer:gesture shouldReceiveTouch:nil],"covered settings page cannot discover");page.navigationController.topViewController=page;
     page.view.window=nil;Check(![page gestureRecognizer:gesture shouldReceiveTouch:nil],"offscreen settings cannot discover");page.view.window=[NSObject new];

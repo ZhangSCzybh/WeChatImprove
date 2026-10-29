@@ -1,0 +1,53 @@
+{
+  "version": "2.1-5",
+  "builds": {
+    "rootless": {
+      "package": "packages/2.1-5-auth-native-alert/com.wechat.improve_2.1-5_iphoneos-arm64.deb",
+      "packageMetadata": "Package: com.wechat.improve\nVersion: 2.1-5\nArchitecture: iphoneos-arm64",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "libraryPath": "/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "uuids": [
+        "08E000D9-AC99-3968-8761-DE2794546BD4",
+        "3C2EC5DA-6739-3B82-AB61-4B76DAE90E49"
+      ],
+      "warnings": 6,
+      "size": 1413694
+    },
+    "rootful": {
+      "package": "packages/2.1-5-auth-native-alert/com.wechat.improve_2.1-5_iphoneos-arm.deb",
+      "packageMetadata": "Package: com.wechat.improve\nVersion: 2.1-5\nArchitecture: iphoneos-arm",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "libraryPath": "/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "uuids": [
+        "8A032941-5590-31A0-8531-55A51116244D",
+        "A4744256-57F7-3663-B65A-4BA7819ABE51"
+      ],
+      "warnings": 6,
+      "size": 1413224
+    }
+  },
+  "tests": {
+    "authorizationPrompt": 92,
+    "authorizationLiveRead": 67,
+    "pluginEntry": 21,
+    "backupStartupIntegration": 25,
+    "closeFriendEntry": 45,
+    "closeFriendGesture": 26,
+    "scheduledManager": 204,
+    "aiManager": 333,
+    "iOSArm64Syntax": "passed"
+  },
+  "sourceFilesUnchangedDuringBuild": 364,
+  "existingArtifactsUnchanged": 1246,
+  "sha256": {
+    "com.wechat.improve_2.1-5_iphoneos-arm.deb": "fa8313063332bad8a86237b39c66f8dd8c0c5573adb77d8b5be68e93bcdc3206",
+    "com.wechat.improve_2.1-5_iphoneos-arm64.deb": "526970580f6e6ef71affe750b94dbf69bbcedb1129cef25366dbfe3e67cb8f74",
+    "com.wechat.improve_2.1-5_symbols.zip": "8d1dc80f666d5b5eff7fe3788e16baa2ffa31eab1e4e04fe66c7b62dccbd0844"
+  }
+}

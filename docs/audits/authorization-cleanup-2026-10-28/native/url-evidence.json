@@ -1,0 +1,137 @@
+{
+  "search_boundary": "__cstring exact strings; __cfstring direct pointers; __text ADRP+ADD within six instructions before a direct branch/call; other reference forms are not covered",
+  "strings": [
+    {
+      "section": "__cstring",
+      "address": "0x11b7bf4fb",
+      "file_offset": "0x1b7bf4fb",
+      "value": "weixin://profile/"
+    },
+    {
+      "section": "__cstring",
+      "address": "0x11b960b32",
+      "file_offset": "0x1b960b32",
+      "value": "weixin://findfriend/verifycontact"
+    },
+    {
+      "section": "__cstring",
+      "address": "0x11b960b54",
+      "file_offset": "0x1b960b54",
+      "value": "weixin://findfriend/verifycontact/([^/]*)"
+    },
+    {
+      "section": "__cstring",
+      "address": "0x11ba7895b",
+      "file_offset": "0x1ba7895b",
+      "value": "weixin://profile/%@"
+    }
+  ],
+  "constants": [
+    {
+      "address": "0x11b7bf4fb",
+      "value": "weixin://profile/"
+    },
+    {
+      "address": "0x11b960b32",
+      "value": "weixin://findfriend/verifycontact"
+    },
+    {
+      "address": "0x11b960b54",
+      "value": "weixin://findfriend/verifycontact/([^/]*)"
+    },
+    {
+      "address": "0x11ba7895b",
+      "value": "weixin://profile/%@"
+    },
+    {
+      "address": "0x11e782c48",
+      "value": "weixin://profile/"
+    },
+    {
+      "address": "0x11e85ce28",
+      "value": "weixin://findfriend/verifycontact"
+    },
+    {
+      "address": "0x11e85ce48",
+      "value": "weixin://findfriend/verifycontact/([^/]*)"
+    },
+    {
+      "address": "0x11e8f8468",
+      "value": "weixin://profile/%@"
+    }
+  ],
+  "xrefs": [
+    {
+      "adrp": "0x1048c183c",
+      "add": "0x1048c1840",
+      "constant": "0x11e782c48",
+      "value": "weixin://profile/",
+      "function_start": "0x1048c1828",
+      "function_end_exclusive": "0x1048c1858"
+    },
+    {
+      "adrp": "0x1048c18a4",
+      "add": "0x1048c18a8",
+      "constant": "0x11e782c48",
+      "value": "weixin://profile/",
+      "function_start": "0x1048c1858",
+      "function_end_exclusive": "0x1048c1a40"
+    },
+    {
+      "adrp": "0x105f6e7d4",
+      "add": "0x105f6e7d8",
+      "constant": "0x11e85ce28",
+      "value": "weixin://findfriend/verifycontact",
+      "function_start": "0x105f6e634",
+      "function_end_exclusive": "0x105f70430"
+    },
+    {
+      "adrp": "0x105f6ea00",
+      "add": "0x105f6ea04",
+      "constant": "0x11e85ce48",
+      "value": "weixin://findfriend/verifycontact/([^/]*)",
+      "function_start": "0x105f6e634",
+      "function_end_exclusive": "0x105f70430"
+    },
+    {
+      "adrp": "0x106ffe640",
+      "add": "0x106ffe644",
+      "constant": "0x11e8f8468",
+      "value": "weixin://profile/%@",
+      "function_start": "0x106ffe328",
+      "function_end_exclusive": "0x1070003b8"
+    },
+    {
+      "adrp": "0x106fff2b8",
+      "add": "0x106fff2bc",
+      "constant": "0x11e8f8468",
+      "value": "weixin://profile/%@",
+      "function_start": "0x106ffe328",
+      "function_end_exclusive": "0x1070003b8"
+    },
+    {
+      "adrp": "0x1091197b8",
+      "add": "0x1091197bc",
+      "constant": "0x11e782c48",
+      "value": "weixin://profile/",
+      "function_start": "0x109119730",
+      "function_end_exclusive": "0x109119f34"
+    },
+    {
+      "adrp": "0x10918bee8",
+      "add": "0x10918beec",
+      "constant": "0x11e782c48",
+      "value": "weixin://profile/",
+      "function_start": "0x10918be50",
+      "function_end_exclusive": "0x10918c210"
+    },
+    {
+      "adrp": "0x10a4087e8",
+      "add": "0x10a4087ec",
+      "constant": "0x11e782c48",
+      "value": "weixin://profile/",
+      "function_start": "0x10a4085bc",
+      "function_end_exclusive": "0x10a409568"
+    }
+  ]
+}

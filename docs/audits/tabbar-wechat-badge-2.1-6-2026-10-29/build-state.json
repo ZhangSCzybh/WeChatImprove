@@ -1,0 +1,15 @@
+{
+  "root": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "build": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.1-6-rollback-build-m18xb8z1",
+  "command": [
+    "make",
+    "all",
+    "-j4",
+    "SCHEME=rootless",
+    "PACKAGE_VERSION=2.1-6",
+    "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.1-6-rollback-build-m18xb8z1/.theos",
+    "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.1-6-rollback-build-m18xb8z1",
+    "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.1-6-rollback-build-m18xb8z1/unused-packages"
+  ],
+  "purpose": "compile only rollback 2.1-6; no package/install target"
+}

@@ -1,0 +1,94 @@
+{
+  "verified_at": "2026-10-28T23:08:39.157056+00:00",
+  "baseline_captured_at": "2026-10-28T22:53:30.378098+00:00",
+  "root": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "existing_files_checked": 1854,
+  "unchanged_existing_files": 1847,
+  "allowed_changed_files": [
+    {
+      "path": "Controllers/CSTabBarNativeAdapter.m",
+      "before": "7eeac3627d62361d93a6bcdb8c3c00dc236286fb355c51455eaae4a71659374c",
+      "after": "820135a85ca3e70415b2e358023145063c4cb4636359b8b2446e3d6ec2ab1dfd"
+    },
+    {
+      "path": "Headers/CSUserInfoHelper.h",
+      "before": "e5113925798b4207be3aa8b751a6fff5c1aac12a67efd0320e7551d4301d4988",
+      "after": "f3ef8e5e943f0430ebc9d949d34febb5d82826b7aa264ca68ff2a9017110fabb"
+    },
+    {
+      "path": "Hooks/TabBarStyleHooks.xm",
+      "before": "a30fdb29e98707a944f2bdb2f020fdee7e8ecdcd29bc863a580140a85f7a5617",
+      "after": "d5d57ca0c76302803d75cf61eabc3a4062778f44bea28a17d069ecaab56cc522"
+    },
+    {
+      "path": "Tests/TabBarUIKit/TabBarUIKit.m",
+      "before": "e1a5bb9129bc5515e94535c406a5cd6529b7ea9d9300bf6b3cde01a23d6da4f9",
+      "after": "d5502e4a36eaf3c0df6c5dfd2a049df45e315991fd5d1ed4ddb77426f98ce8b8"
+    },
+    {
+      "path": "Tests/TabBarUIKit/UIKit/UIKit.h",
+      "before": "af7038e4a30904e143bf32c93b25b68a4221b2aafc6af21af7213b6b6705ad89",
+      "after": "3e6003b91782043ad2eebb839bc1f3c4e7c55683c1a84788f9f7870fbacac644"
+    },
+    {
+      "path": "Tests/verify-tabbar.sh",
+      "before": "a9ab113135fbfa18a49a785503ce8fc07558031fcfadbc66f426780b813fd878",
+      "after": "56b9d0e7b7fcdcd1ce35c4c6fc21d177ba611511cd7b4fac381d562719d315e3"
+    },
+    {
+      "path": "control",
+      "before": "f7f0b2ddcd7773e706b13db8a6c5b0ff59e2fbdb5beebbd2239910565e514d9a",
+      "after": "f03d069b5871fd6b39bbf40e2ade9d4aa71551be62f91d8b94e3541aed22be70"
+    }
+  ],
+  "missing_existing_files": [],
+  "unexpected_changed_files": [],
+  "historical_artifact_paths_checked": 1255,
+  "historical_artifact_counts": {
+    ".theos": 1225,
+    "packages": 30
+  },
+  "historical_artifacts_unchanged": true,
+  "new_files_in_captured_roots": [
+    "Tests/TabBarBadgeTests.m",
+    "Tests/extract-tabbar-badge-hooks.py",
+    "Tests/verify-tabbar-badge.sh",
+    "packages/2.1-7-tabbar-badge/SHA256SUMS",
+    "packages/2.1-7-tabbar-badge/com.wechat.improve_2.1-7_iphoneos-arm.deb",
+    "packages/2.1-7-tabbar-badge/com.wechat.improve_2.1-7_iphoneos-arm64.deb",
+    "packages/2.1-7-tabbar-badge/com.wechat.improve_2.1-7_symbols.zip"
+  ],
+  "unexpected_new_files_in_captured_roots": [],
+  "final_inputs_match_green_test_sha256": {
+    "Controllers/CSTabBarNativeAdapter.m": true,
+    "Controllers/CSTabBarNativeAdapter.h": true,
+    "Controllers/CSTabBarPreferences.m": true,
+    "Controllers/CSTabBarPreferences.h": true,
+    "Hooks/TabBarStyleHooks.xm": true,
+    "Headers/CSTabBarGeometry.h": true,
+    "Tests/TabBarBadgeTests.m": true,
+    "Tests/extract-tabbar-badge-hooks.py": true,
+    "Tests/verify-tabbar-badge.sh": true,
+    "Tests/verify-tabbar.sh": true,
+    "Tests/TabBarUIKit/UIKit/UIKit.h": true,
+    "Tests/TabBarUIKit/TabBarUIKit.m": true
+  },
+  "excluded_finder_metadata_files": [
+    "Controllers/.DS_Store",
+    "Tests/.DS_Store",
+    "Tests/MessageUIKit/.DS_Store",
+    "packages/.DS_Store"
+  ],
+  "limitations": [
+    "Start-of-task SHA manifest covers Controllers/Headers/Hooks/Tests/.theos/packages and Makefile/control/WeChatImprove.plist; it does not cover historical audit documents or .DS_Store metadata.",
+    "Existing unrelated dirty Git changes are the baseline, not attributed to this task."
+  ],
+  "environment_actions": {
+    "make_clean": false,
+    "make_install": false,
+    "device_install": false,
+    "service_restart": false,
+    "database_account_or_injection_environment_changed": false,
+    "build_isolation": "per-scheme Theos local data/build paths outside workspace historical .theos; packages only in new version directory"
+  }
+}

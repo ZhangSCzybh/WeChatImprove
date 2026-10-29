@@ -1,0 +1,33 @@
+commit/ref: HEAD
+path: Controllers/CSGroupListAdapter.m
+blob: bc944585e975a7486992212b43df8541f500e48b
+full_blob_sha256: dcea1b1e1f4b0eb7cc2f2ef4cd0af301527789bf79c9804455a852e601fbc811
+
+183: + (NSNumber *)closeFriendAlertBadgeCount {
+184:     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+185:     BOOL filtering=[policy concealsSurface:CSCloseFriendSurfaceSession] || (policy.enabled && [policy.options[@"silenceMessages"] boolValue]);
+186:     if(!policy.blocked && (!filtering || !policy.protectedUserNames.count))return nil;
+187:     NSMutableSet *hidden=[policy.protectedUserNames mutableCopy];
+188:     if(!NSThread.isMainThread || policy.blocked)return @0;
+189:     NSUInteger epoch=CSCloseFriendAccountEpoch();
+190:     for(CSGroupListAdapter *adapter in Adapters().allObjects) {
+191:         if(CSGroupIsFoldedController(adapter.controller) || !adapter.cachedNativeSections || adapter.changeDepth || adapter.dirty ||
+192:            adapter.snapshotRevision!=adapter.modelRevision || adapter.snapshotEpoch!=epoch || ![adapter.snapshotAccount isEqual:policy.accountID] ||
+193:            ![policy.accountID isEqual:CSGroupCurrentAccountID()])continue;
+194:         NSUInteger revision=adapter.modelRevision;
+195:         NSArray *foldedNames=CSGroupCopyFoldedUserNames();
+196:         NSArray *cacheKey=@[policy.accountID,@(epoch),@(revision),@(policy.revision),foldedNames ?: NSNull.null];
+197:         if(adapter.alertBadge && [adapter.alertBadgeKey isEqual:cacheKey])return adapter.alertBadge;
+198:         NSMutableSet *unmasked=[NSMutableSet set];
+199:         CSGroupFoldedPrivacyState folded=CSGroupAssessFoldedUserNames(foldedNames,hidden);
+200:         if(folded==CSGroupFoldedPrivacyAllHidden)[hidden addObject:@"chatroom_session_box"];
+201:         else if(folded==CSGroupFoldedPrivacyNoHidden)[unmasked addObject:@"chatroom_session_box"];
+202:         WESessionTabItem *all=[WESessionTabItem tabWithType:WETabTypeAll];
+203:         CSGroupProjection *projection=[[CSGroupProjection alloc] initWithSections:adapter.cachedNativeSections tabs:@[all] selectedTabID:all.tabId
+204:             filterDuplicates:NO accountID:policy.accountID hiddenUserNames:hidden unmaskedAggregateUserNames:unmasked privacyRevision:policy.revision previousProjection:nil];
+205:         if(!projection.isValid || revision!=adapter.modelRevision || epoch!=CSCloseFriendAccountEpoch() || policy.revision!=CSCloseFriendCurrentSnapshot().revision)return @0;
+206:         adapter.alertBadgeKey=cacheKey; adapter.alertBadge=@([projection badgeForTabID:all.tabId].count);
+207:         return adapter.alertBadge;
+208:     }
+209:     return @0;
+210: }

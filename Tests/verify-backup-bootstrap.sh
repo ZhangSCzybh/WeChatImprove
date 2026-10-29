@@ -53,7 +53,7 @@ for path in sorted((root / 'Hooks').glob('*.xm')):
         continue
     callback = generated.index('CSBackupWhenReady(', ctor)
     assert not re.search(r'\b(?:MSHookMessageEx|MSHookFunction|class_addMethod)\(', generated[ctor:callback]), f'{path.name}: hooks installed before readiness'
-    assert 'CSBackupWhenReady(^{ ' in generated[callback:] or 'CSBackupWhenReady(^{\n' in generated[callback:], f'{path.name}: missing guarded init block'
+    assert re.match(r'CSBackupWhenReady\(\s*\^\s*\{', generated[callback:]), f'{path.name}: missing guarded init block'
 assert independent_checked == len(independent), 'independent native adapters must all be checked'
 print(f'Backup bootstrap: Logos generated {features} gated feature files, {independent_checked} independent native adapters and 2 recovery files')
 if sdk.returncode == 0:

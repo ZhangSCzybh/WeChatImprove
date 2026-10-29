@@ -446,13 +446,11 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
     // ===== 保留接收方消息（左侧绿色） =====
     // 创建接收方头像（左上角固定位置）
     UIImageView *receiverAvatar = [[UIImageView alloc] initWithFrame:CGRectMake(horizontalMargin, 30, avatarSize, avatarSize)];
-    if (@available(iOS 13.0, *)) {
+    {
         UIImage *image = [UIImage systemImageNamed:@"person.crop.circle.fill"];
         UIImageSymbolConfiguration *config = [UIImageSymbolConfiguration configurationWithPointSize:30 weight:UIImageSymbolWeightRegular];
         receiverAvatar.image = [image imageWithConfiguration:config];
         receiverAvatar.tintColor = [UIColor systemGreenColor];
-    } else {
-        receiverAvatar.backgroundColor = [UIColor greenColor];
     }
     receiverAvatar.layer.cornerRadius = avatarSize / 2;
     receiverAvatar.clipsToBounds = YES;
@@ -820,7 +818,7 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
 }
 
 - (void)showColorPicker:(UIColor *)initialColor {
-    if (@available(iOS 14.0, *)) {
+    {
         UIColorPickerViewController *colorPicker = [[UIColorPickerViewController alloc] init];
         colorPicker.delegate = self;
         colorPicker.selectedColor = initialColor ?: [UIColor blackColor];
@@ -830,13 +828,6 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
         colorPicker.title = self.colorTagTextColor ? @"选择文字颜色" : @"选择背景颜色";
         
         [self presentViewController:colorPicker animated:YES completion:nil];
-    } else {
-        // iOS 14之前，使用自定义的颜色选择方案或提示不支持
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"不支持的iOS版本"
-                                                                       message:@"颜色选择器需要iOS 14或更高版本"
-                                                                preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
-        [self presentViewController:alert animated:YES completion:nil];
     }
 }
 
@@ -889,19 +880,11 @@ static CGFloat const kMaxLabelWidth = 90.0f; // 时间标签最大宽度
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     // 使用secondarySystemGroupedBackgroundColor来获得正确的深色模式下的背景色
-    if (@available(iOS 13.0, *)) {
-        cell.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
-    } else {
-        cell.backgroundColor = [UIColor whiteColor];
-    }
+    cell.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
     
     // 配置选中状态的背景色
     UIView *selectedBackgroundView = [[UIView alloc] init];
-    if (@available(iOS 13.0, *)) {
-        selectedBackgroundView.backgroundColor = [UIColor tertiarySystemGroupedBackgroundColor];
-    } else {
-        selectedBackgroundView.backgroundColor = [UIColor systemGray5Color];
-    }
+    selectedBackgroundView.backgroundColor = [UIColor tertiarySystemGroupedBackgroundColor];
     cell.selectedBackgroundView = selectedBackgroundView;
 }
 

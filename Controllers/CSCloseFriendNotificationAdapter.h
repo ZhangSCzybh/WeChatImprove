@@ -7,7 +7,6 @@ extern "C" {
 @property(nonatomic,readonly) NSUInteger epoch;
 + (instancetype)subjectForSession:(NSString *)session sender:(NSString *)sender;
 - (BOOL)isCurrent;
-- (BOOL)shouldSilence;
 // A known stale subject must be discarded without evaluating another account's membership.
 - (BOOL)shouldDiscardOutput;
 @end

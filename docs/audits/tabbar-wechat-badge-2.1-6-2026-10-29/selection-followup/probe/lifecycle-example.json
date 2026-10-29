@@ -1,0 +1,87 @@
+{
+  "source": "events.jsonl",
+  "selection": "friend",
+  "candidateUnread": 0,
+  "ordinaryNumericUnread": 7,
+  "manualStateModel": true,
+  "events": [
+    {
+      "event": "cold-valid-chat-matches-and-setter",
+      "snapshotState": "valid-cache",
+      "setterInvoked": true,
+      "getterDecision": 7,
+      "originalNumberArgument": 7,
+      "nativeCalls": 1,
+      "afterCount": 7,
+      "afterHidden": false,
+      "sameObject": 1
+    },
+    {
+      "event": "begin-invalid-no-setter",
+      "snapshotState": "manual-begin-invalid",
+      "setterInvoked": false,
+      "getterDecision": 0,
+      "originalNumberArgument": 7,
+      "nativeCalls": 1,
+      "afterCount": 7,
+      "afterHidden": false,
+      "sameObject": 1
+    },
+    {
+      "event": "setter-during-begin",
+      "snapshotState": "manual-begin-invalid",
+      "setterInvoked": true,
+      "getterDecision": 0,
+      "originalNumberArgument": 0,
+      "nativeCalls": 2,
+      "afterCount": 0,
+      "afterHidden": true,
+      "sameObject": 1
+    },
+    {
+      "event": "end-dirty-no-setter",
+      "snapshotState": "manual-end-dirty",
+      "setterInvoked": false,
+      "getterDecision": 0,
+      "originalNumberArgument": 0,
+      "nativeCalls": 2,
+      "afterCount": 0,
+      "afterHidden": true,
+      "sameObject": 1
+    },
+    {
+      "event": "setter-during-dirty",
+      "snapshotState": "manual-end-dirty",
+      "setterInvoked": true,
+      "getterDecision": 0,
+      "originalNumberArgument": 0,
+      "nativeCalls": 3,
+      "afterCount": 0,
+      "afterHidden": true,
+      "sameObject": 1
+    },
+    {
+      "event": "valid-refresh-does-not-touch-badge",
+      "snapshotState": "manual-valid-refresh-without-setter",
+      "setterInvoked": false,
+      "getterDecision": 7,
+      "originalNumberArgument": 0,
+      "nativeCalls": 3,
+      "afterCount": 0,
+      "afterHidden": true,
+      "sameObject": 1
+    },
+    {
+      "event": "new-setter-uses-valid-result",
+      "snapshotState": "manual-valid-subsequent-setter",
+      "setterInvoked": true,
+      "getterDecision": 7,
+      "originalNumberArgument": 7,
+      "nativeCalls": 4,
+      "afterCount": 7,
+      "afterHidden": false,
+      "sameObject": 1
+    }
+  ],
+  "eventsSha256": "c96ddec3055d225e91f00f9463dd1b3179c3794fde53626a22d9bb4218e3e473"
+}

@@ -11,6 +11,22 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 
+NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotification=@"CSGroupTabBadgeSourceDidRefreshNotification";
+@implementation CSGroupTabBadgeDecision
++ (instancetype)decisionWithPolicy:(CSCloseFriendSnapshot *)policy epoch:(NSUInteger)epoch
+                         boundary:(BOOL)boundary badge:(CSGroupBadge *)badge {
+    return [self decisionWithPolicy:policy epoch:epoch boundary:boundary badge:badge sourceController:nil sourceRevision:0];
+}
++ (instancetype)decisionWithPolicy:(CSCloseFriendSnapshot *)policy epoch:(NSUInteger)epoch
+                         boundary:(BOOL)boundary badge:(CSGroupBadge *)badge sourceController:(id)controller sourceRevision:(NSUInteger)revision {
+    CSGroupTabBadgeDecision *result=[self new];
+    result->_accountID=[policy.accountID copy]; result->_epoch=epoch;
+    result->_policyRevision=policy.revision; result->_boundary=boundary; result->_badge=badge;
+    if (badge && !boundary) { result->_sourceController=controller; result->_sourceRevision=revision; }
+    return result;
+}
+@end
+
 static BOOL CSGroupAppInactive;
 static BOOL CSGroupApplicationActive(void) { return !CSGroupAppInactive && UIApplication.sharedApplication.applicationState==UIApplicationStateActive; }
 
@@ -61,6 +77,19 @@ static BOOL Option(NSString *suffix) {
 @property (nonatomic, copy) NSString *snapshotAccount;
 @property (nonatomic, strong) NSNumber *alertBadge;
 @property (nonatomic, copy) NSArray *alertBadgeKey;
+@property (nonatomic, strong) CSGroupBadge *tabAlertBadge;
+@property (nonatomic, copy) NSArray *tabAlertBadgeKey;
+// Badge data is independent of the list's visibility, chrome and UI dirty state.
+@property (nonatomic, copy) NSArray *tabBadgeSections;
+@property (nonatomic, copy) NSString *tabBadgeAccount;
+@property (nonatomic) NSUInteger tabBadgeRevision, tabBadgeEpoch;
+@property (nonatomic) BOOL tabBadgeSourceRequired, tabBadgeRestorePending;
+@property (nonatomic) BOOL tabBadgeSourceScheduled, tabBadgeSourceRefreshing, tabBadgeRequestDispatchPending;
+@property (nonatomic) BOOL tabBadgeRefreshAgain;
+@property (nonatomic, copy) NSArray *tabBadgePublishedKey;
+- (void)requestTabBadgeSourceRefresh;
+- (void)refreshTabBadgeSource;
++ (void)requestTabBadgeSourcesRefresh;
 @property (atomic) NSUInteger modelRevision;
 @property (nonatomic) NSUInteger snapshotRevision, snapshotEpoch, refreshGeneration;
 @property (nonatomic) BOOL coalescingNotification, scheduledCoalesced;
@@ -142,6 +171,7 @@ static BOOL Option(NSString *suffix) {
         objc_setAssociatedObject(table,&AdapterKey,adapter,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [Adapters() addObject:adapter];
     }
+    [adapter requestTabBadgeSourceRefresh];
     if (adapter.presentationSuspended || !CSGroupApplicationActive()) { adapter.dirty=YES; return; }
     // Appearance is not a data change. Repeated reload/anchor restoration here
     // competes with WeChat's own search/task-bar inset and offset restoration.
@@ -165,6 +195,7 @@ static BOOL Option(NSString *suffix) {
         adapter.snapshotRetryAttempted=NO; adapter.snapshotRetryGeneration++;
         [adapter finishSuspendedBatches];
     }
+    [adapter requestTabBadgeSourceRefresh];
 }
 - (void)finishSuspendedBatches {
     if ((!self.presentationSuspended && CSGroupApplicationActive()) || self.changeDepth || self.publishing) return;
@@ -182,7 +213,7 @@ static BOOL Option(NSString *suffix) {
 }
 + (NSNumber *)closeFriendAlertBadgeCount {
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
-    BOOL filtering=[policy concealsSurface:CSCloseFriendSurfaceSession] || (policy.enabled && [policy.options[@"silenceMessages"] boolValue]);
+    BOOL filtering=[policy concealsSurface:CSCloseFriendSurfaceSession];
     if(!policy.blocked && (!filtering || !policy.protectedUserNames.count))return nil;
     NSMutableSet *hidden=[policy.protectedUserNames mutableCopy];
     if(!NSThread.isMainThread || policy.blocked)return @0;
@@ -208,8 +239,159 @@ static BOOL Option(NSString *suffix) {
     }
     return @0;
 }
++ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecision {
+    return [self closeFriendTabBadgeDecisionForPublication:NO];
+}
++ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecisionForPublication:(BOOL)includeNative {
+    return [self closeFriendTabBadgeDecisionForController:nil includeNative:includeNative];
+}
++ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecisionForController:(id)controller includeNative:(BOOL)includeNative {
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    NSUInteger epoch=CSCloseFriendAccountEpoch();
+    BOOL boundary=policy.blocked || (NSThread.isMainThread && ![policy.accountID isEqual:CSGroupCurrentAccountID()]);
+    if (boundary) return [CSGroupTabBadgeDecision decisionWithPolicy:policy epoch:epoch boundary:YES badge:nil];
+    // Public badges exclude protected sessions only while their rows are concealed.
+    BOOL filtering=[policy concealsSurface:CSCloseFriendSurfaceSession];
+    filtering=filtering && policy.protectedUserNames.count>0;
+    if (!includeNative && !filtering) return nil;
+    CSGroupTabBadgeDecision *pending=[CSGroupTabBadgeDecision decisionWithPolicy:policy epoch:epoch boundary:NO badge:nil];
+    if (!NSThread.isMainThread) return pending;
+    // A tab can owe native restoration before its chat table has an adapter.
+    // Keep only a root-scoped request, never a trusted count or display token.
+    SEL restoreKey=@selector(closeFriendTabBadgeDecisionForController:includeNative:);
+    if (includeNative && !filtering && controller)
+        objc_setAssociatedObject(controller,restoreKey,@[policy.accountID,@(epoch)],OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    NSSet *protected=filtering ? policy.protectedUserNames : [NSSet set];
+    for (CSGroupListAdapter *adapter in Adapters().allObjects) {
+        if ((controller && adapter.controller!=controller) || CSGroupIsFoldedController(adapter.controller)) continue;
+        NSUInteger revision=adapter.modelRevision;
+        NSArray *sections=nil;
+        if (!adapter.changeDepth && adapter.tabBadgeSections && adapter.tabBadgeRevision==revision &&
+            adapter.tabBadgeEpoch==epoch && [adapter.tabBadgeAccount isEqual:policy.accountID]) sections=adapter.tabBadgeSections;
+        else if (!adapter.changeDepth && !adapter.dirty && adapter.cachedNativeSections && adapter.snapshotRevision==revision &&
+            adapter.snapshotEpoch==epoch && [adapter.snapshotAccount isEqual:policy.accountID]) sections=adapter.cachedNativeSections;
+        if (!sections) {
+            if (includeNative && !filtering) adapter.tabBadgeRestorePending=YES;
+            [adapter requestTabBadgeSourceRefresh];
+            continue;
+        }
+        NSArray *foldedNames=CSGroupCopyFoldedUserNames();
+        NSArray *key=@[policy.accountID,@(epoch),@(revision),@(policy.revision),foldedNames ?: NSNull.null];
+        if (adapter.tabAlertBadge && [adapter.tabAlertBadgeKey isEqual:key]) {
+            CSCloseFriendSnapshot *current=CSCloseFriendCurrentSnapshot();
+            if (adapter.changeDepth || revision!=adapter.modelRevision || epoch!=CSCloseFriendAccountEpoch() || current.blocked ||
+                policy.revision!=current.revision || ![policy.accountID isEqual:current.accountID] || ![policy.accountID isEqual:CSGroupCurrentAccountID()]) return pending;
+            if (includeNative && !filtering && controller) objc_setAssociatedObject(controller,restoreKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            return [CSGroupTabBadgeDecision decisionWithPolicy:policy epoch:epoch boundary:NO badge:adapter.tabAlertBadge sourceController:adapter.controller sourceRevision:revision];
+        }
+        NSMutableSet *hidden=[protected mutableCopy], *unmasked=[NSMutableSet set];
+        CSGroupFoldedPrivacyState folded=CSGroupAssessFoldedUserNames(foldedNames,hidden);
+        if (folded==CSGroupFoldedPrivacyAllHidden) [hidden addObject:@"chatroom_session_box"];
+        else if (folded==CSGroupFoldedPrivacyNoHidden) [unmasked addObject:@"chatroom_session_box"];
+        WESessionTabItem *all=[WESessionTabItem tabWithType:WETabTypeAll];
+        CSGroupProjection *projection=[[CSGroupProjection alloc] initWithSections:sections tabs:@[all] selectedTabID:all.tabId
+            filterDuplicates:NO accountID:policy.accountID hiddenUserNames:hidden unmaskedAggregateUserNames:unmasked
+            privacyRevision:policy.revision previousProjection:nil];
+        CSCloseFriendSnapshot *current=CSCloseFriendCurrentSnapshot();
+        if (!projection.isValid || adapter.changeDepth || revision!=adapter.modelRevision || epoch!=CSCloseFriendAccountEpoch() ||
+            current.blocked || policy.revision!=current.revision || ![policy.accountID isEqual:current.accountID] ||
+            ![policy.accountID isEqual:CSGroupCurrentAccountID()]) return pending;
+        adapter.tabAlertBadgeKey=key; adapter.tabAlertBadge=[projection badgeForTabID:all.tabId];
+        if (includeNative && !filtering && controller) objc_setAssociatedObject(controller,restoreKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        return [CSGroupTabBadgeDecision decisionWithPolicy:policy epoch:epoch boundary:NO badge:adapter.tabAlertBadge sourceController:adapter.controller sourceRevision:revision];
+    }
+    return pending;
+}
++ (void)requestTabBadgeSourcesRefresh {
+    if (!NSThread.isMainThread) {
+        dispatch_async(dispatch_get_main_queue(), ^{ [self requestTabBadgeSourcesRefresh]; }); return;
+    }
+    for (CSGroupListAdapter *adapter in Adapters().allObjects) [adapter requestTabBadgeSourceRefresh];
+}
+- (void)requestTabBadgeSourceRefresh {
+    if (!NSThread.isMainThread) {
+        @synchronized (self) { if (self.tabBadgeRequestDispatchPending) return; self.tabBadgeRequestDispatchPending=YES; }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            @synchronized (self) { self.tabBadgeRequestDispatchPending=NO; }
+            [self requestTabBadgeSourceRefresh];
+        });
+        return;
+    }
+    if (!self.controller || !self.table || CSGroupIsFoldedController(self.controller)) return;
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    SEL restoreKey=@selector(closeFriendTabBadgeDecisionForController:includeNative:);
+    NSArray *restore=objc_getAssociatedObject(self.controller,restoreKey);
+    if (!policy.blocked && [restore isKindOfClass:NSArray.class] && restore.count==2) {
+        if ([restore[0] isEqual:policy.accountID] && [restore[1] unsignedIntegerValue]==CSCloseFriendAccountEpoch()) self.tabBadgeRestorePending=YES;
+        else objc_setAssociatedObject(self.controller,restoreKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    BOOL filtering=[policy concealsSurface:CSCloseFriendSurfaceSession] && policy.protectedUserNames.count>0;
+    if (!policy.blocked) {
+        if (filtering) self.tabBadgeSourceRequired=YES;
+        else if (self.tabBadgeSourceRequired) { self.tabBadgeSourceRequired=NO; self.tabBadgeRestorePending=YES; }
+    }
+    if ((!self.tabBadgeSourceRequired && !self.tabBadgeRestorePending) || policy.blocked || !CSGroupApplicationActive() || self.changeDepth) return;
+    if (self.tabBadgeSourceRefreshing) { self.tabBadgeRefreshAgain=YES; return; }
+    if (self.tabBadgeSourceScheduled) return;
+    self.tabBadgeSourceScheduled=YES;
+    __weak typeof(self) weakSelf=self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        CSGroupListAdapter *self=weakSelf;
+        if (!self) return;
+        self.tabBadgeSourceScheduled=NO;
+        [self refreshTabBadgeSource];
+    });
+}
+- (void)refreshTabBadgeSource {
+    if (!NSThread.isMainThread) { [self requestTabBadgeSourceRefresh]; return; }
+    if (self.tabBadgeSourceRefreshing || self.changeDepth || !CSGroupApplicationActive() ||
+        !self.controller || !self.table || CSGroupIsFoldedController(self.controller)) return;
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    NSString *account=CSGroupCurrentAccountID();
+    NSUInteger epoch=CSCloseFriendAccountEpoch(), revision=self.modelRevision;
+    id controller=self.controller;
+    UITableView *table=self.table;
+    if (policy.blocked || !account.length || ![account isEqual:policy.accountID] ||
+        (!self.tabBadgeSourceRequired && !self.tabBadgeRestorePending)) return;
+    self.tabBadgeSourceRefreshing=YES;
+    @try {
+        NSArray *sections=nil;
+        if (self.tabBadgeSections && self.tabBadgeRevision==revision && self.tabBadgeEpoch==epoch &&
+            [self.tabBadgeAccount isEqual:account]) sections=self.tabBadgeSections;
+        else if (!self.dirty && self.cachedNativeSections && self.snapshotRevision==revision && self.snapshotEpoch==epoch &&
+            [self.snapshotAccount isEqual:account]) sections=self.cachedNativeSections;
+        else {
+            id source=[self nativeSource] ?: table.dataSource;
+            NSArray *previous=self.tabBadgeEpoch==epoch && [self.tabBadgeAccount isEqual:account] ? self.tabBadgeSections : nil;
+            __block NSArray *built=nil;
+            // Only native data-source reads run here. Offscreen lists never reload,
+            // lay out, install chrome, or save/restore anchors for badge maintenance.
+            CSGroupWithNativeIndices(table, ^{ built=CSGroupBuildNativeSectionsReusing(controller,table,source,previous); });
+            if (self.controller!=controller || self.table!=table || source!=([self nativeSource] ?: table.dataSource)) return;
+            sections=built;
+        }
+        CSCloseFriendSnapshot *current=CSCloseFriendCurrentSnapshot();
+        if (!sections || self.changeDepth || revision!=self.modelRevision || epoch!=CSCloseFriendAccountEpoch() ||
+            current.blocked || current.revision!=policy.revision || ![current.accountID isEqual:account] ||
+            ![account isEqual:CSGroupCurrentAccountID()]) return;
+        self.tabBadgeSections=sections; self.tabBadgeAccount=account;
+        self.tabBadgeRevision=revision; self.tabBadgeEpoch=epoch;
+        CSGroupTabBadgeDecision *decision=[CSGroupListAdapter closeFriendTabBadgeDecisionForController:self.controller includeNative:YES];
+        if (!decision.badge || decision.boundary || decision.sourceController!=self.controller || decision.epoch!=epoch ||
+            ![decision.accountID isEqual:account] || decision.policyRevision!=policy.revision || revision!=self.modelRevision ||
+            self.changeDepth || epoch!=CSCloseFriendAccountEpoch() || ![account isEqual:CSGroupCurrentAccountID()]) return;
+        NSArray *key=@[account,@(epoch),@(revision),@(policy.revision),@(decision.badge.count),@(decision.badge.redDot)];
+        self.tabBadgeRestorePending=NO;
+        if ([self.tabBadgePublishedKey isEqual:key]) return;
+        self.tabBadgePublishedKey=key;
+        [NSNotificationCenter.defaultCenter postNotificationName:CSGroupTabBadgeSourceDidRefreshNotification object:self];
+    } @finally {
+        self.tabBadgeSourceRefreshing=NO;
+        if (self.tabBadgeRefreshAgain) { self.tabBadgeRefreshAgain=NO; [self requestTabBadgeSourceRefresh]; }
+    }
+}
 + (void)settingsChanged {
-    dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } [adapter invalidateNativeSnapshot]; adapter.appearanceDirty=YES; [adapter refresh]; [adapter layout]; } });
+    dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } [adapter invalidateNativeSnapshot]; adapter.appearanceDirty=YES; [adapter requestTabBadgeSourceRefresh]; [adapter refresh]; [adapter layout]; } });
 }
 + (void)closeFriendPolicyChanged:(NSNotification *)notification {
     (void)notification;
@@ -223,6 +405,7 @@ static BOOL Option(NSString *suffix) {
         [adapter shieldVisiblePrivateRows];
         [adapter cancelScheduledRefresh]; [adapter invalidateNativeSnapshot];
         @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; }
+        [adapter requestTabBadgeSourceRefresh];
         [adapter refresh];
     }
 }
@@ -253,6 +436,7 @@ static BOOL Option(NSString *suffix) {
         @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } adapter.dirty=YES; adapter.recoveryPending=NO;
         adapter.cachedNativeSections=nil; [adapter.projection discardComputationCache];
         adapter.snapshotRetryGeneration++; adapter.snapshotRetryAttempted=NO;
+        [adapter requestTabBadgeSourceRefresh];
         if (CSGroupApplicationActive() && !adapter.presentationSuspended) [adapter scheduleRefresh];
         else [adapter finishSuspendedBatches];
     }
@@ -275,6 +459,9 @@ static BOOL Option(NSString *suffix) {
     proxy.target=target; return proxy;
 }
 - (void)detach {
+    [Adapters() removeObject:self];
+    self.tabBadgeSections=nil; self.tabAlertBadge=nil; self.tabAlertBadgeKey=nil;
+    self.tabBadgeSourceRequired=NO; self.tabBadgeRestorePending=NO;
     UITableView *table=self.table; self.nativePresentation=YES; self.projecting=NO; self.chromeVisible=NO;
     [self.privacyShield prepareForPublication]; self.privacyShield=nil;
     [self refreshNavigationTitle];
@@ -468,6 +655,10 @@ static BOOL Option(NSString *suffix) {
 - (NSArray *)nativeSectionsForAccount:(NSString *)account {
     NSUInteger revision=self.modelRevision, epoch=CSCloseFriendAccountEpoch();
     if (self.cachedNativeSections && self.snapshotRevision==revision && self.snapshotEpoch==epoch && [self.snapshotAccount isEqual:account]) return self.cachedNativeSections;
+    if (!self.changeDepth && self.tabBadgeSections && self.tabBadgeRevision==revision && self.tabBadgeEpoch==epoch && [self.tabBadgeAccount isEqual:account]) {
+        self.cachedNativeSections=self.tabBadgeSections; self.snapshotAccount=account; self.snapshotRevision=revision; self.snapshotEpoch=epoch;
+        return self.cachedNativeSections;
+    }
     __block NSArray *sections=nil;
     NSArray *previous=self.snapshotEpoch==epoch && [self.snapshotAccount isEqual:account] ? self.cachedNativeSections : nil;
     CSGroupWithNativeIndices(self.table, ^{ sections=CSGroupBuildNativeSectionsReusing(self.controller,self.table,[self nativeSource],previous); });
@@ -612,6 +803,7 @@ static BOOL Option(NSString *suffix) {
             for (void (^action)(void) in actions) CSGroupWithNativeIndices(self.table,action);
         }
         if (self.dirty) [self scheduleRefresh];
+        if (finished) [self requestTabBadgeSourceRefresh];
     }
 }
 - (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous
@@ -773,7 +965,7 @@ static BOOL Option(NSString *suffix) {
 - (void)endNativeChange { [self endNativeChangeCoalesced:NO]; }
 - (void)endNativeChangeCoalesced:(BOOL)coalesced {
     BOOL outer=NO; @synchronized (self) { if (self.changeDepth) self.changeDepth--; outer=self.changeDepth==0; }
-    if (outer) { if (coalesced) [self requestCoalescedRefresh]; else [self scheduleRefresh]; }
+    if (outer) { [self requestTabBadgeSourceRefresh]; if (coalesced) [self requestCoalescedRefresh]; else [self scheduleRefresh]; }
 }
 - (void)performNativeBatch:(void (^)(void))updates completion:(void (^)(BOOL))completion {
     void (^callback)(BOOL)=[completion copy];

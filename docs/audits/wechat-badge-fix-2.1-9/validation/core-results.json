@@ -1,0 +1,42 @@
+[
+  {
+    "name": "group-badges",
+    "exit": 0,
+    "tail": "Group badges: 136 checks, 0 failures\n"
+  },
+  {
+    "name": "tabbar",
+    "exit": 0,
+    "tail": "tabbar geometry: PASS\n2026-10-29 10:13:53.038 native[4107:37845627] tabbar click effect: 39 checks passed\n2026-10-29 10:13:53.050 native[4107:37845627] tabbar preferences/native lifecycle: PASS\n"
+  },
+  {
+    "name": "group-incremental",
+    "exit": 0,
+    "tail": "Group incremental: 180 checks, 0 failures\n"
+  },
+  {
+    "name": "group-interactions",
+    "exit": 1,
+    "tail": "tionBodies.h:282:36: error: property 'privacyRefreshPending' not found on object of type 'CSGroupListAdapter *'\n  282 |     if (self.changeDepth || (!self.privacyRefreshPending && !self.presentationSuspended && (self.table.dragging || self.table.decelerating || self.table.editing || self.swipeActive))) { self.dirty=YES; return; }\n      |                                    ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:297:48: error: property 'privacyRefreshPending' not found on object of type 'CSGroupListAdapter *'\n  297 |     if ((!CSGroupApplicationActive() && !(self.privacyRefreshPending && CSGroupPrivacyActive())) || (self.presentationSuspended && !self.nativeActions.count)) { [self finishSuspendedBatches]; return; }\n      |                                                ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:297:73: error: call to undeclared function 'CSGroupPrivacyActive'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]\n  297 |     if ((!CSGroupApplicationActive() && !(self.privacyRefreshPending && CSGroupPrivacyActive())) || (self.presentationSuspended && !self.nativeActions.count)) { [self finishSuspendedBatches]; return; }\n      |                                                                         ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:299:26: error: property 'privacyRefreshPending' not found on object of type 'CSGroupListAdapter *'\n  299 |     BOOL coalesced=!self.privacyRefreshPending && self.coalescingNotification && !self.nativeActions.count;\n      |                          ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.wZCgtY/GroupInteractionBodies.h:300:24: error: property 'privacyRefreshPending' not found on object of type 'CSGroupListAdapter *'\n  300 |     BOOL waiting=!self.privacyRefreshPending && !self.presentationSuspended && (self.table.tracking || [self groupPanMoving] || ([self nativeMenuState]&2));\n      |                        ^\n13 errors generated.\n"
+  },
+  {
+    "name": "group-search",
+    "exit": 0,
+    "tail": "Group search: 54 checks, 0 failures\n"
+  },
+  {
+    "name": "group-header",
+    "exit": 0,
+    "tail": "Group header semantics: 46 checks, 0 failures\n"
+  },
+  {
+    "name": "group-business",
+    "exit": 0,
+    "tail": "Group business rows: 633 checks, 0 failures\n"
+  },
+  {
+    "name": "close-friend-session",
+    "exit": 0,
+    "tail": "Close-friend sessions: 148 checks, 0 failures\nClose-friend session presentation: 44 checks, 0 failures\n"
+  }
+]

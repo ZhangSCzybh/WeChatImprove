@@ -172,6 +172,65 @@ static void ConfigurationTests(NSDictionary *baseline) {
     }
     Configure();
 }
+// Preserve valid persisted-data cases from the retired helper API test.
+static void ConfigurationBoundaryTests(void) {
+    MemoryDefaults *memory=[MemoryDefaults new];
+    CSListCornerConfiguration *configuration=[[CSListCornerConfiguration alloc] initWithDefaults:memory];
+    NSArray *keys=@[kListCornerRadiusKey,kListLeftMarginKey,kListRightMarginKey,kListTopSessionTopMarginKey,kListNormalSessionTopMarginKey];
+    const CGFloat defaults[]={10,15,15,10,10};
+    NSArray *inputs=@[@0,@1,@5,@10.25,@15,@30,@50,@(-4)];
+    const CGFloat expected[][5]={
+        {10,15,15,0,0},{1,1,1,1,1},{5,5,5,5,5},{10.25,10.25,10.25,10.25,10.25},
+        {15,15,15,15,15},{30,30,30,30,30},{50,50,50,50,50},{10,15,15,-4,-4}
+    };
+    for(NSUInteger field=0;field<keys.count;field++) {
+        [memory.values removeAllObjects];
+        for(NSUInteger input=0;input<inputs.count;input++) {
+            memory.values[keys[field]]=inputs[input];
+            NSDictionary *before=memory.values.copy;
+            [configuration invalidate];CSListCornerSnapshot *snapshot=configuration.snapshot;
+            const CGFloat actual[]={snapshot.radius,snapshot.leftMargin,snapshot.rightMargin,snapshot.pinnedGap,snapshot.normalGap};
+            for(NSUInteger other=0;other<keys.count;other++) {
+                Check(Near(actual[other],other==field ? expected[input][field] : defaults[other]),@"persisted numeric boundaries preserve each field and leave missing fields at their defaults");
+            }
+            Check([before isEqual:memory.values],@"numeric snapshot reads preserve persisted values, including fallback inputs");
+        }
+    }
+    NSArray *colorKeys=@[
+        @[kListLightModeBgColorRedKey,kListLightModeBgColorGreenKey,kListLightModeBgColorBlueKey,kListLightModeBgColorAlphaKey],
+        @[kListDarkModeBgColorRedKey,kListDarkModeBgColorGreenKey,kListDarkModeBgColorBlueKey,kListDarkModeBgColorAlphaKey],
+        @[kTopSessionTopMarginLightBgColorRedKey,kTopSessionTopMarginLightBgColorGreenKey,kTopSessionTopMarginLightBgColorBlueKey,kTopSessionTopMarginLightBgColorAlphaKey],
+        @[kTopSessionTopMarginDarkBgColorRedKey,kTopSessionTopMarginDarkBgColorGreenKey,kTopSessionTopMarginDarkBgColorBlueKey,kTopSessionTopMarginDarkBgColorAlphaKey],
+        @[kNormalSessionTopMarginLightBgColorRedKey,kNormalSessionTopMarginLightBgColorGreenKey,kNormalSessionTopMarginLightBgColorBlueKey,kNormalSessionTopMarginLightBgColorAlphaKey],
+        @[kNormalSessionTopMarginDarkBgColorRedKey,kNormalSessionTopMarginDarkBgColorGreenKey,kNormalSessionTopMarginDarkBgColorBlueKey,kNormalSessionTopMarginDarkBgColorAlphaKey]
+    ];
+    for(NSUInteger role=0;role<colorKeys.count;role++) {
+        NSArray *rgbaKeys=colorKeys[role];
+        for(NSUInteger alphaOnly=0;alphaOnly<2;alphaOnly++) {
+            [memory.values removeAllObjects];
+            if(!alphaOnly) {
+                memory.values[rgbaKeys[0]]=@0.2;memory.values[rgbaKeys[1]]=@0.4;memory.values[rgbaKeys[2]]=@0.8;
+            }
+            memory.values[rgbaKeys[3]]=alphaOnly ? @0.5 : @0;
+            NSDictionary *before=memory.values.copy;
+            [configuration invalidate];CSListCornerSnapshot *snapshot=configuration.snapshot;
+            NSArray *colors=@[[snapshot backgroundForStyle:UIUserInterfaceStyleLight],[snapshot backgroundForStyle:UIUserInterfaceStyleDark],
+                [snapshot pinnedColorForStyle:UIUserInterfaceStyleLight],[snapshot pinnedColorForStyle:UIUserInterfaceStyleDark],
+                [snapshot normalColorForStyle:UIUserInterfaceStyleLight],[snapshot normalColorForStyle:UIUserInterfaceStyleDark]];
+            UIColor *color=colors[role];
+            Check(Near(color.red,alphaOnly ? 0 : .2) && Near(color.green,alphaOnly ? 0 : .4) && Near(color.blue,alphaOnly ? 0 : .8) && Near(color.alpha,alphaOnly ? .5 : 0),
+                alphaOnly ? @"alpha-only persisted palettes retain zero missing RGB channels" : @"nonzero RGB with zero alpha remains transparent in all six palettes");
+            Check([before isEqual:memory.values],@"color snapshot reads retain partial and transparent persisted palettes");
+        }
+    }
+    [memory.values removeAllObjects];[configuration invalidate];CSListCornerSnapshot *snapshot=configuration.snapshot;
+    UIColor *light=[snapshot backgroundForStyle:UIUserInterfaceStyleLight],*dark=[snapshot backgroundForStyle:UIUserInterfaceStyleDark];
+    UIColor *lightAgain=[snapshot backgroundForStyle:UIUserInterfaceStyleLight];
+    Check(Near(light.red,1) && Near(light.green,1) && Near(light.blue,1) && Near(light.alpha,1) &&
+        Near(dark.red,.11) && Near(dark.green,.11) && Near(dark.blue,.12) && Near(dark.alpha,1) && [lightAgain isEqual:light],
+        @"light-dark-light palette reads preserve distinct complete defaults without theme bleed");
+    Check(memory.values.count==0 && memory.writes==0 && memory.syncs==0,@"snapshot reads and invalidation never write, synchronize or populate missing persisted settings");
+}
 static void HeightTests(NSDictionary *baseline) {
     CGFloat (*hooks[4][2])(id,id,NSInteger)={{HookSessionHeader,HookSessionFooter},{HookContactsHeader,HookContactsFooter},{HookDiscoverHeader,HookDiscoverFooter},{HookMoreHeader,HookMoreFooter}};
     NSArray *names=@[@"Session",@"Contacts",@"Discover",@"More"];
@@ -571,7 +630,7 @@ int main(int argc,const char **argv) { @autoreleasepool {
     NSDictionary *baseline=[NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:@(argv[1])] options:0 error:NULL];
     FixtureDefaults=[MemoryDefaults new];FixtureConfiguration=[[CSListCornerConfiguration alloc] initWithDefaults:FixtureDefaults];
     method_setImplementation(class_getClassMethod(CSListCornerConfiguration.class,@selector(sharedConfiguration)),(IMP)SharedConfiguration);
-    ConfigurationTests(baseline);HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();ScreenshotRegressionTests();ContactsCountFooterTests();SessionFirstLayoutTests();SessionViewportTests();FoldedCardIntegrationTests();SessionLifecycleRestoreTests();SessionRestoreBoundaryTests();SessionRestorePaintTests();
+    ConfigurationTests(baseline);ConfigurationBoundaryTests();HeightTests(baseline);RendererTests();OwnershipAndSessionTests();ContactsDiscoverMoreTests();ReviewCompatibilityTests();ScreenshotRegressionTests();ContactsCountFooterTests();SessionFirstLayoutTests();SessionViewportTests();FoldedCardIntegrationTests();SessionLifecycleRestoreTests();SessionRestoreBoundaryTests();SessionRestorePaintTests();
     fprintf(stdout,"List corners: %lu checks, %lu failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)\n",(unsigned long)checks,(unsigned long)failures);
     return failures?1:0;
 } }

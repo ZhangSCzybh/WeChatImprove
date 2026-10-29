@@ -1,0 +1,39 @@
+{
+  "version": "2.1-8",
+  "verified_at": "2026-10-29T01:10:40.051830+00:00",
+  "source_and_formal_test_inputs_match": true,
+  "frozen_inputs": 603,
+  "rootful_build_exit": 0,
+  "rootless_build_exit": 0,
+  "historical_warnings_per_scheme": 6,
+  "new_warnings": 0,
+  "formal_alert_checks": 216,
+  "formal_tab_checks": 782,
+  "group_badge_checks": 136,
+  "group_lifecycle_checks": 113,
+  "tabbar": "geometry/click39/preferences-native lifecycle PASS",
+  "package_sha256": {
+    "com.wechat.improve_2.1-8_iphoneos-arm.deb": "4c287c1a1a107b62b0339a7d40fb1708e7c083994a637057ee72f74a1be2f0e2",
+    "com.wechat.improve_2.1-8_iphoneos-arm64.deb": "152376ec80eff2761ec740eb8d0dcceae47be95d8a5d47bbfb3bf23e9483e565",
+    "com.wechat.improve_2.1-8_symbols.zip": "09e047cc01368d2e34d33497f534bafbb248d3fcf55144751857ff9139edf4cc"
+  },
+  "matching_dylib_dsym_uuids": 4,
+  "symbols_crc": "passed",
+  "historical_artifacts_preserved": 1260,
+  "release_patch_reverse_check": "passed",
+  "source_modifications": [
+    "Controllers/CSGroupListAdapter.h",
+    "Controllers/CSGroupListAdapter.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/CloseFriendNotificationHooks.xm",
+    "Tests/GroupLifecycleTests.m",
+    "Tests/extract-group-lifecycle.py",
+    "Tests/verify-close-friend-alerts.sh",
+    "control"
+  ],
+  "source_additions": [
+    "Tests/CloseFriendTabBadgeTests.m"
+  ],
+  "device_installed_or_run": false,
+  "report_sha256": "58febb8cd10eb5bdc3e12702949932beb8ad040b09c03f77f31f30741548b9a7"
+}

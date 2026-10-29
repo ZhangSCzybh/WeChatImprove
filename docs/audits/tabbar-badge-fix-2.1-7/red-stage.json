@@ -1,0 +1,41 @@
+{
+  "baseline": "current working tree 2.1-6 before badge production fix",
+  "command": [
+    "bash",
+    "Tests/verify-tabbar-badge.sh",
+    "source"
+  ],
+  "exitCode": 1,
+  "elapsedSeconds": 6.88,
+  "sourceStableDuringRun": true,
+  "sha256Before": {
+    "Controllers/CSTabBarNativeAdapter.m": "7eeac3627d62361d93a6bcdb8c3c00dc236286fb355c51455eaae4a71659374c",
+    "Controllers/CSTabBarNativeAdapter.h": "f705323eb3ab4fb7b97f1a2ed17ea9954c2ea17c7536639a8457d0b558032f70",
+    "Controllers/CSTabBarPreferences.m": "8ea01d29e8a070a71e0fdf6608cf3d28a80701df3caaeb63ca4710364b82985d",
+    "Controllers/CSTabBarPreferences.h": "cceab3cb833fa81327bde062ccef52159041acac755c9b25ce7eb52d41449e88",
+    "Hooks/TabBarStyleHooks.xm": "a30fdb29e98707a944f2bdb2f020fdee7e8ecdcd29bc863a580140a85f7a5617",
+    "Headers/CSTabBarGeometry.h": "bbd05f3074ca9cc1935c6a219b034098fd4d515e6118679b9c35b6e306434686",
+    "Tests/TabBarBadgeTests.m": "0bcdbde0e0cac0ee7389fb0d839d14ccea56c828a5efcc692f4c7b741f309a95",
+    "Tests/extract-tabbar-badge-hooks.py": "fcf6a6f16da7bcad5a22dc203cfba85922748bbe67818e56e681394285c984bf",
+    "Tests/verify-tabbar-badge.sh": "543c36e4a3ff2ea689984583b5f57a53773b45e7f3e528a8cd2984589f74be18",
+    "Tests/verify-tabbar.sh": "56b9d0e7b7fcdcd1ce35c4c6fc21d177ba611511cd7b4fac381d562719d315e3",
+    "Tests/TabBarUIKit/UIKit/UIKit.h": "3e6003b91782043ad2eebb839bc1f3c4e7c55683c1a84788f9f7870fbacac644",
+    "Tests/TabBarUIKit/TabBarUIKit.m": "d5502e4a36eaf3c0df6c5dfd2a049df45e315991fd5d1ed4ddb77426f98ce8b8"
+  },
+  "sha256After": {
+    "Controllers/CSTabBarNativeAdapter.m": "7eeac3627d62361d93a6bcdb8c3c00dc236286fb355c51455eaae4a71659374c",
+    "Controllers/CSTabBarNativeAdapter.h": "f705323eb3ab4fb7b97f1a2ed17ea9954c2ea17c7536639a8457d0b558032f70",
+    "Controllers/CSTabBarPreferences.m": "8ea01d29e8a070a71e0fdf6608cf3d28a80701df3caaeb63ca4710364b82985d",
+    "Controllers/CSTabBarPreferences.h": "cceab3cb833fa81327bde062ccef52159041acac755c9b25ce7eb52d41449e88",
+    "Hooks/TabBarStyleHooks.xm": "a30fdb29e98707a944f2bdb2f020fdee7e8ecdcd29bc863a580140a85f7a5617",
+    "Headers/CSTabBarGeometry.h": "bbd05f3074ca9cc1935c6a219b034098fd4d515e6118679b9c35b6e306434686",
+    "Tests/TabBarBadgeTests.m": "0bcdbde0e0cac0ee7389fb0d839d14ccea56c828a5efcc692f4c7b741f309a95",
+    "Tests/extract-tabbar-badge-hooks.py": "fcf6a6f16da7bcad5a22dc203cfba85922748bbe67818e56e681394285c984bf",
+    "Tests/verify-tabbar-badge.sh": "543c36e4a3ff2ea689984583b5f57a53773b45e7f3e528a8cd2984589f74be18",
+    "Tests/verify-tabbar.sh": "56b9d0e7b7fcdcd1ce35c4c6fc21d177ba611511cd7b4fac381d562719d315e3",
+    "Tests/TabBarUIKit/UIKit/UIKit.h": "3e6003b91782043ad2eebb839bc1f3c4e7c55683c1a84788f9f7870fbacac644",
+    "Tests/TabBarUIKit/TabBarUIKit.m": "d5502e4a36eaf3c0df6c5dfd2a049df45e315991fd5d1ed4ddb77426f98ce8b8"
+  },
+  "log": "logs/red-final-source.log",
+  "snapshot": "red-source-snapshot/"
+}

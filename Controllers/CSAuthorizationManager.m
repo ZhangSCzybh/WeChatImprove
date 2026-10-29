@@ -1,10 +1,8 @@
 #import "CSAuthorizationManager.h"
 #import "CSServiceCenter.h"
-#import <objc/runtime.h>
 #import <objc/message.h>
-#import "../Headers/WCHeaders.h"
 
-static NSString * const kOfficialAccountUserName = @"gh_cac882c8f729"; // 替换为你的公众号原始ID
+static NSString * const kOfficialAccountUserName = @"gh_cac882c8f729";
 @implementation CSAuthorizationManager
 
 + (instancetype)sharedManager {
@@ -26,10 +24,6 @@ static NSString * const kOfficialAccountUserName = @"gh_cac882c8f729"; // 替换
 
 - (BOOL)isAuthorized {
     // Always check the live follow state; authorization reads need no persistent cache.
-    return [self checkAuthorization];
-}
-
-- (BOOL)checkAuthorization {
     Class contactMgrClass = NSClassFromString(@"CContactMgr");
     if (!contactMgrClass) {
         return NO;
@@ -40,7 +34,7 @@ static NSString * const kOfficialAccountUserName = @"gh_cac882c8f729"; // 替换
         return NO;
     }
     
-    // 尝试方式1: 使用 CContact 的类方法 isBrandFollowedWithUsername:
+    // 原生查询成功返回时直接采用结果，包括 NO。
     Class contactClass = NSClassFromString(@"CContact");
     if (contactClass) {
         SEL isBrandFollowedSelector = NSSelectorFromString(@"isBrandFollowedWithUsername:");
@@ -51,7 +45,7 @@ static NSString * const kOfficialAccountUserName = @"gh_cac882c8f729"; // 替换
         }
     }
     
-    // 尝试方式2: 获取联系人对象并检查属性
+    // 仅在 CContact 类/查询方法缺失或查询抛异常时读取联系人属性。
     SEL getContactByNameSelector = NSSelectorFromString(@"getContactByName:");
     if (![contactMgr respondsToSelector:getContactByNameSelector]) {
         return NO;
@@ -88,23 +82,29 @@ static NSString * const kOfficialAccountUserName = @"gh_cac882c8f729"; // 替换
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"需要授权"
                                                                    message:@"请先关注公众号以使用此功能"
                                                             preferredStyle:UIAlertControllerStyleAlert];
+    __weak UIAlertController *weakAlert = alert;
     
     UIAlertAction *openAction = [UIAlertAction actionWithTitle:@"关注公众号"
                                                          style:UIAlertActionStyleDefault
                                                        handler:^(UIAlertAction *action) {
-        [self openOfficialAccountFromViewController:viewController];
-        
-        if (completion) {
-            completion(NO, @"请关注公众号后重新打开插件");
-        }
+        // Finish the alert transition before opening another native page.
+        [weakAlert dismissViewControllerAnimated:YES completion:^{
+            [self openOfficialAccountFromViewController:viewController];
+            if (completion) {
+                completion(NO, @"请关注公众号后重新打开插件");
+            }
+        }];
     }];
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消"
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *action) {
-        if (completion) {
-            completion(NO, @"用户取消授权");
-        }
+        // The settings host can safely pop/dismiss once this alert is gone.
+        [weakAlert dismissViewControllerAnimated:YES completion:^{
+            if (completion) {
+                completion(NO, @"用户取消授权");
+            }
+        }];
     }];
     
     [alert addAction:openAction];
@@ -130,9 +130,7 @@ static NSString * const kOfficialAccountUserName = @"gh_cac882c8f729"; // 替换
     }
     
     @try {
-        NSLog(@"[授权管理] 尝试通过TingRouter打开公众号: %@", self.officialAccountUserName);
         ((void (*)(id, SEL, id))objc_msgSend)(tingRouterClass, openBrandProfileSelector, self.officialAccountUserName);
-        NSLog(@"[授权管理] 成功调用TingRouter打开公众号");
     } @catch (NSException *exception) {
         NSLog(@"[授权管理] TingRouter打开公众号失败: %@", exception);
         [self openBrandProfileDirectly];
@@ -145,28 +143,14 @@ static NSString * const kOfficialAccountUserName = @"gh_cac882c8f729"; // 替换
     NSString *urlString = [NSString stringWithFormat:@"weixin://profile/%@", self.officialAccountUserName];
     NSURL *url = [NSURL URLWithString:urlString];
     
-    NSLog(@"[授权管理] 尝试打开公众号: %@", urlString);
-    
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (@available(iOS 10.0, *)) {
-            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
-                if (!success) {
-                    NSLog(@"[授权管理] profile方式失败，尝试其他方式");
-                    // 如果失败，尝试其他URL scheme
-                    [self tryAlternativeURLScheme];
-                } else {
-                    NSLog(@"[授权管理] 成功打开公众号主页");
-                }
-            }];
-        } else {
-            BOOL success = [[UIApplication sharedApplication] openURL:url];
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
             if (!success) {
                 NSLog(@"[授权管理] profile方式失败，尝试其他方式");
+                // 如果失败，尝试其他URL scheme
                 [self tryAlternativeURLScheme];
-            } else {
-                NSLog(@"[授权管理] 成功打开公众号主页");
             }
-        }
+        }];
     });
 }
 
@@ -175,105 +159,13 @@ static NSString * const kOfficialAccountUserName = @"gh_cac882c8f729"; // 替换
     NSString *urlString = [NSString stringWithFormat:@"weixin://findfriend/verifycontact?username=%@", self.officialAccountUserName];
     NSURL *url = [NSURL URLWithString:urlString];
     
-    NSLog(@"[授权管理] 尝试备用方式: %@", urlString);
-    
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (@available(iOS 10.0, *)) {
-            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
-                if (!success) {
-                    NSLog(@"[授权管理] 所有方式都失败");
-                } else {
-                    NSLog(@"[授权管理] 备用方式成功");
-                }
-            }];
-        } else {
-            [[UIApplication sharedApplication] openURL:url];
-        }
-    });
-}
-
-- (void)openBrandProfileWithContact:(id)contact fromViewController:(UIViewController *)viewController {
-    Class brandProfileClass = NSClassFromString(@"BrandProfileMsgTabViewController");
-    if (!brandProfileClass) {
-        NSLog(@"[授权管理] 无法获取BrandProfileMsgTabViewController类");
-        [self openBrandProfileWithBizUtil:contact];
-        return;
-    }
-    
-    @try {
-        id brandProfileVC = nil;
-        
-        SEL initWithContactSelector = NSSelectorFromString(@"initWithContact:");
-        if ([brandProfileClass instancesRespondToSelector:initWithContactSelector]) {
-            brandProfileVC = ((id (*)(id, SEL, id))objc_msgSend)([[brandProfileClass alloc] init], initWithContactSelector, contact);
-        }
-        
-        if (!brandProfileVC) {
-            SEL initSelector = NSSelectorFromString(@"init");
-            if ([brandProfileClass instancesRespondToSelector:initSelector]) {
-                brandProfileVC = [[brandProfileClass alloc] init];
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
+            if (!success) {
+                NSLog(@"[授权管理] 所有方式都失败");
             }
-        }
-        
-        if (!brandProfileVC) {
-            NSLog(@"[授权管理] 无法初始化BrandProfileMsgTabViewController");
-            [self openBrandProfileWithBizUtil:contact];
-            return;
-        }
-        
-        UINavigationController *navVC = [[UINavigationController alloc] initWithRootViewController:brandProfileVC];
-        navVC.modalPresentationStyle = UIModalPresentationPageSheet;
-        
-        if (@available(iOS 13.0, *)) {
-            navVC.modalPresentationStyle = UIModalPresentationAutomatic;
-        }
-        
-        [viewController presentViewController:navVC animated:YES completion:nil];
-        
-        NSLog(@"[授权管理] 成功打开公众号主页");
-        
-    } @catch (NSException *exception) {
-        NSLog(@"[授权管理] 打开公众号主页失败: %@", exception);
-        [self openBrandProfileWithBizUtil:contact];
-    }
-}
-
-- (void)openBrandProfileWithBizUtil:(id)contact {
-    Class bizUtilClass = NSClassFromString(@"WCBizUtil");
-    if (!bizUtilClass) {
-        NSLog(@"[授权管理] 无法获取WCBizUtil类");
-        [self searchOfficialAccount];
-        return;
-    }
-    
-    SEL openBrandProfileSelector = NSSelectorFromString(@"openBrandProfileViewControllerWithContact:");
-    if ([bizUtilClass respondsToSelector:openBrandProfileSelector]) {
-        @try {
-            ((void (*)(id, SEL, id))objc_msgSend)(bizUtilClass, openBrandProfileSelector, contact);
-            NSLog(@"[授权管理] 通过WCBizUtil打开公众号主页");
-        } @catch (NSException *exception) {
-            NSLog(@"[授权管理] WCBizUtil打开公众号主页失败: %@", exception);
-            [self searchOfficialAccount];
-        }
-    } else {
-        NSLog(@"[授权管理] WCBizUtil不支持openBrandProfileViewControllerWithContact方法");
-        [self searchOfficialAccount];
-    }
-}
-
-- (void)searchOfficialAccount {
-    NSString *url = [NSString stringWithFormat:@"weixin://findfriend/verifycontact?username=%@", self.officialAccountUserName];
-    NSURL *nsurl = [NSURL URLWithString:url];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (@available(iOS 10.0, *)) {
-            [[UIApplication sharedApplication] openURL:nsurl options:@{} completionHandler:nil];
-        } else {
-            [[UIApplication sharedApplication] openURL:nsurl];
-        }
+        }];
     });
-    
-    NSLog(@"[授权管理] 打开搜索公众号页面");
 }
 
 @end

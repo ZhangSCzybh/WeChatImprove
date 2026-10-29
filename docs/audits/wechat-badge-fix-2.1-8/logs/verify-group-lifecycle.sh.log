@@ -1,0 +1,5 @@
+$ bash Tests/verify-group-lifecycle.sh
+Hidden native event publications: 0 / 20 events
+Group lifecycle: 113 checks, 0 failures
+
+exit_code=0

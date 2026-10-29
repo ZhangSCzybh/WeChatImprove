@@ -1,0 +1,22 @@
+{
+  "version": "2.1-10",
+  "tests": {
+    "unread_panel_behavior": 71,
+    "unread_panel_ABI": 7,
+    "alerts": 216,
+    "tabbar_badge": 897,
+    "session": 148,
+    "session_presentation": 44,
+    "lifecycle": 140,
+    "runtime": 94,
+    "scheduling": 9,
+    "biometric": 99
+  },
+  "all_passed": true,
+  "new_source_dual_arch_Werror": true,
+  "both_full_builds_passed": true,
+  "package_verification_passed": true,
+  "existing_artifact_files_preserved": 1268,
+  "device_installed": false,
+  "device_workflow_verified": false
+}

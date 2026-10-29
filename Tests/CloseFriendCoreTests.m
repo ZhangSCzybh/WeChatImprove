@@ -35,7 +35,6 @@ int main(void) { @autoreleasepool {
     CHECK([locked hidesUserName:@"alice" surface:CSCloseFriendSurfaceSession]);
     CHECK(![locked hidesUserName:@"bob" surface:CSCloseFriendSurfaceSession]);
     CHECK(![open hidesUserName:@"alice" surface:CSCloseFriendSurfaceSession]);
-    CHECK([open silencesSession:@"alice" sender:@"alice"]);
     CHECK([locked rejectsCaller:@"alice" chatRoom:nil video:NO]);
     CHECK([locked rejectsCaller:@"bob" chatRoom:@"room@chatroom" video:YES]);
     CHECK(![locked rejectsCaller:@"bob" chatRoom:@"other@chatroom" video:YES]);
@@ -84,11 +83,38 @@ int main(void) { @autoreleasepool {
         }
     }
     NSDictionary *defaults=CSCloseFriendDefaultOptions(); CHECK([CSCloseFriendNormalizeProfile(Profile(),NULL)[@"options"] isEqual:defaults]);
-    for(NSString *name in @[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"silenceMessages",@"rejectVoice",@"rejectVideo",@"hidePrivacyIcons"])CHECK([defaults[name] boolValue]);
-    CHECK(defaults[@"autoMute"]==nil);
-    NSMutableDictionary *legacyOptions=[defaults mutableCopy];legacyOptions[@"autoMute"]=@YES;
-    NSDictionary *legacy=CSCloseFriendNormalizeProfile(@{@"enabled":@YES,@"friends":@[],@"groups":@[],@"options":legacyOptions},NULL);
-    CHECK(legacy && !legacy[@"options"][@"autoMute"]);
+    for(NSString *name in @[@"hideSessions",@"hideContacts",@"hideForwarding",@"hideTags",@"hideSearch",@"hideTimeline",@"hideInteractions",@"hideStatus",@"maskProfiles",@"rejectVoice",@"rejectVideo",@"hidePrivacyIcons"])CHECK([defaults[name] boolValue]);
+    for(NSString *retired in @[@"autoMute",@"silenceMessages"]) {
+        CHECK(defaults[retired]==nil);
+        for(NSNumber *value in @[@NO,@YES]) {
+            NSMutableDictionary *legacyOptions=[defaults mutableCopy];legacyOptions[retired]=value;
+            NSMutableDictionary *legacyProfile=[Profile() mutableCopy];legacyProfile[@"options"]=legacyOptions;
+            CHECK([CSCloseFriendNormalizeProfile(legacyProfile,NULL) isEqual:profile]);
+        }
+        for(id value in @[@0,@1,@"true",NSNull.null]) {
+            NSMutableDictionary *invalid=[Profile() mutableCopy];invalid[@"options"]=@{retired:value};
+            CHECK(!CSCloseFriendNormalizeProfile(invalid,NULL));
+        }
+    }
+    // Read historical encrypted profiles directly: loading must preserve all other data and the source bytes.
+    for(NSNumber *enabled in @[@NO,@YES]) for(NSNumber *silence in @[@NO,@YES]) {
+        NSMutableDictionary *legacyOptions=[defaults mutableCopy];
+        legacyOptions[@"hideSearch"]=@NO;legacyOptions[@"rejectVoice"]=@NO;legacyOptions[@"callReplyText"]=@"保留原来的回复。";
+        NSMutableDictionary *expected=[Profile() mutableCopy];expected[@"enabled"]=enabled;expected[@"options"]=[legacyOptions copy];
+        legacyOptions[@"silenceMessages"]=silence;
+        NSMutableDictionary *legacyProfile=[expected mutableCopy];legacyProfile[@"options"]=legacyOptions;
+        NSDictionary *records=@{@"alice":@{@"before":@NO,@"applied":@YES}};
+        NSData *legacyCipher=EncryptedObject(@{@"schema":@1,@"accountID":@"one",@"state":@{@"profile":legacyProfile,@"muteRecords":records}},key);
+        CHECK([legacyCipher writeToURL:files[0] options:0 error:&error]);
+        NSDictionary *loaded=[store loadStateForAccountID:@"one" error:&error];
+        CHECK([loaded[@"profile"] isEqual:expected] && [loaded[@"muteRecords"] isEqual:records]);
+        CHECK([[NSData dataWithContentsOfURL:files[0]] isEqual:legacyCipher]);
+        CHECK([store saveState:loaded forAccountID:@"one" error:&error]);
+        NSDictionary *saved=[NSPropertyListSerialization propertyListWithData:CSCloseFriendDecrypt([NSData dataWithContentsOfURL:files[0]],key,NULL) options:NSPropertyListImmutable format:NULL error:NULL];
+        CHECK(!saved[@"state"][@"profile"][@"options"][@"silenceMessages"]);
+        CHECK([[store loadStateForAccountID:@"one" error:&error] isEqual:loaded]);
+    }
+    CHECK([cipher writeToURL:files[0] options:0 error:&error]);
 
     for(NSString *name in @[@"showBadges",@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"callReplyEnabled",@"hideScheduledTasks",@"hideAIReply"])CHECK(![defaults[name] boolValue]);
     for(NSString *name in @[@"hideScheduledTasks",@"hideAIReply"]) {
@@ -128,9 +154,9 @@ int main(void) { @autoreleasepool {
     CSCloseFriendSnapshot *frozen=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"one" profile:mutableProfile revealed:NO revision:5 blocked:NO];
     [mutableName setString:@"mallory"]; [mutableNames removeAllObjects];
     CHECK([frozen containsUserName:@"alice"] && ![frozen containsUserName:@"mallory"]);
-    NSMutableDictionary *callProfile=[Profile() mutableCopy]; callProfile[@"options"]=@{@"rejectVoice":@NO,@"silenceMessages":@NO};
+    NSMutableDictionary *callProfile=[Profile() mutableCopy]; callProfile[@"options"]=@{@"rejectVoice":@NO};
     CSCloseFriendSnapshot *calls=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"one" profile:callProfile revealed:NO revision:6 blocked:NO];
-    CHECK(![calls rejectsCaller:@"alice" chatRoom:nil video:NO]); CHECK([calls rejectsCaller:@"alice" chatRoom:nil video:YES]); CHECK(![calls silencesSession:@"alice" sender:nil]);
+    CHECK(![calls rejectsCaller:@"alice" chatRoom:nil video:NO]); CHECK([calls rejectsCaller:@"alice" chatRoom:nil video:YES]);
     // Version header, IV, ciphertext, MAC and truncation are independently rejected.
     for(NSNumber *offset in @[@0,@7,@8,@24,@(cipher.length-1)]) {
         NSMutableData *broken=[cipher mutableCopy]; ((uint8_t *)broken.mutableBytes)[offset.unsignedIntegerValue]^=1;

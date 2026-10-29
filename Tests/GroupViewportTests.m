@@ -83,6 +83,8 @@ static NSHashTable *Adapters(void) {
 }
 static BOOL Option(NSString *suffix) { (void)suffix; return enabled; }
 static NSString *CSGroupCurrentAccountID(void) { return account; }
+static BOOL CSGroupIsFoldedController(id owner) { (void)owner; return NO; }
+static BOOL CSGroupPrivacyActive(void) { return NO; }
 static id CSGroupReadObject(id object,NSString *name) { return [object valueForKey:name]; }
 static long long CSGroupReadInteger(id object,NSString *name,long long fallback) {
     return object ? [[object valueForKey:name] longLongValue] : fallback;
@@ -96,7 +98,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic,copy) NSString *snapshotAccount;
 @property(nonatomic,strong) NSArray *cachedNativeSections;
 @property(nonatomic,copy) NSString *nativeActionsAccount;
-@property(nonatomic) BOOL presentationSuspended;
+@property(nonatomic) BOOL presentationSuspended,privacyRefreshPending;
 @property(nonatomic,weak) UITableView *table;
 @property(nonatomic,weak) HostController *controller;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
@@ -115,6 +117,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (BOOL)isActive;
 + (instancetype)adapterForController:(id)controller;
 + (void)attachToController:(id)controller;
++ (void)refreshFoldedListsForAccount:(NSString *)accountID;
 - (void)refresh;
 - (void)layout;
 - (void)detach;
@@ -126,6 +129,9 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (void)selectIndex:(NSInteger)index;
 @end
 @implementation CSGroupListAdapter
+// Badge source lifecycle is exercised in GroupLifecycleTests.
+- (void)requestTabBadgeSourceRefresh {}
++ (void)refreshFoldedListsForAccount:(NSString *)accountID { (void)accountID; }
 - (void)invalidateNativeSnapshot { self.modelRevision++; }
 - (void)pruneNativeActions {}
 - (void)finishSuspendedBatches {}

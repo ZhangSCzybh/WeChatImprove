@@ -1,0 +1,202 @@
+[
+  {
+    "selection": "friend",
+    "candidateUnread": 0,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "valid-cache",
+    "nativeTotalInput": 7,
+    "getterDecision": 7,
+    "originalNumberArgument": 7,
+    "hidden": false
+  },
+  {
+    "selection": "friend",
+    "candidateUnread": 0,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "no-cache",
+    "nativeTotalInput": 7,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "friend",
+    "candidateUnread": 0,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "dirty",
+    "nativeTotalInput": 7,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "friend",
+    "candidateUnread": 0,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "change-depth",
+    "nativeTotalInput": 7,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "friend",
+    "candidateUnread": 0,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "revision-mismatch",
+    "nativeTotalInput": 7,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "friend",
+    "candidateUnread": 5,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "valid-cache",
+    "nativeTotalInput": 12,
+    "getterDecision": 7,
+    "originalNumberArgument": 7,
+    "hidden": false
+  },
+  {
+    "selection": "friend",
+    "candidateUnread": 5,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "no-cache",
+    "nativeTotalInput": 12,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "friend",
+    "candidateUnread": 5,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "dirty",
+    "nativeTotalInput": 12,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "friend",
+    "candidateUnread": 5,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "change-depth",
+    "nativeTotalInput": 12,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "friend",
+    "candidateUnread": 5,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "revision-mismatch",
+    "nativeTotalInput": 12,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "group",
+    "candidateUnread": 0,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "valid-cache",
+    "nativeTotalInput": 7,
+    "getterDecision": 7,
+    "originalNumberArgument": 7,
+    "hidden": false
+  },
+  {
+    "selection": "group",
+    "candidateUnread": 0,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "no-cache",
+    "nativeTotalInput": 7,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "group",
+    "candidateUnread": 0,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "dirty",
+    "nativeTotalInput": 7,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "group",
+    "candidateUnread": 0,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "change-depth",
+    "nativeTotalInput": 7,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "group",
+    "candidateUnread": 0,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "revision-mismatch",
+    "nativeTotalInput": 7,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "group",
+    "candidateUnread": 5,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "valid-cache",
+    "nativeTotalInput": 12,
+    "getterDecision": 7,
+    "originalNumberArgument": 7,
+    "hidden": false
+  },
+  {
+    "selection": "group",
+    "candidateUnread": 5,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "no-cache",
+    "nativeTotalInput": 12,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "group",
+    "candidateUnread": 5,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "dirty",
+    "nativeTotalInput": 12,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "group",
+    "candidateUnread": 5,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "change-depth",
+    "nativeTotalInput": 12,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  },
+  {
+    "selection": "group",
+    "candidateUnread": 5,
+    "ordinaryNumericUnread": 7,
+    "snapshotState": "revision-mismatch",
+    "nativeTotalInput": 12,
+    "getterDecision": 0,
+    "originalNumberArgument": 0,
+    "hidden": true
+  }
+]

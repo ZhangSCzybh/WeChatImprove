@@ -1,0 +1,8 @@
+{
+  "reason": "Candidate pending state incorrectly established a known-result token; rebuild after focused regression. No package was delivered.",
+  "packages_moved_to": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-badge-2.1-8-build-50ozjy9p/superseded-packages",
+  "sha256": {
+    "com.wechat.improve_2.1-8_iphoneos-arm64.deb": "e1f5f45be85909dec446915606a20c29aeae7d29e350ef1d50ea8b5bee58473d",
+    "com.wechat.improve_2.1-8_iphoneos-arm.deb": "03e61b27564dd3039015832f30c86d274d0ab8fdcfd9ea3fb3e43db17b1a6c78"
+  }
+}

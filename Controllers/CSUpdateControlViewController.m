@@ -402,11 +402,7 @@ static NSString * const kAllUpdateFunctionsDisabledKey = @"com.wechat.tweak.disa
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     // 使用secondarySystemGroupedBackgroundColor来获得正确的深色模式下的背景色
-    if (@available(iOS 13.0, *)) {
-        cell.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
-    } else {
-        cell.backgroundColor = [UIColor whiteColor];
-    }
+    cell.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
 }
 
 - (void)showRestartAlert {

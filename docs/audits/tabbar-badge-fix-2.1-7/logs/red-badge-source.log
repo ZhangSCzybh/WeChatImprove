@@ -1,0 +1,16 @@
+tabbar source wrappers verified; relayoutIconAndBadge hook=0
+badge FAIL line 235 [pixel=2 scale=0.6 height=44 hide=0 imported=0 badge=0 / first enable with existing badge]: !CGRectIsEmpty(CGRectIntersection(item.bounds,badge.frame))
+badge FAIL line 240 [pixel=2 scale=0.6 height=44 hide=0 imported=0 badge=0 / first enable with existing badge]: RightOverflow(badge.frame,width)<=RightOverflow(native,width)+.001
+badge FAIL line 235 [pixel=2 scale=0.6 height=44 hide=0 imported=0 badge=0 / first enable with existing badge]: !CGRectIsEmpty(CGRectIntersection(item.bounds,badge.frame))
+badge FAIL line 240 [pixel=2 scale=0.6 height=44 hide=0 imported=0 badge=0 / first enable with existing badge]: RightOverflow(badge.frame,width)<=RightOverflow(native,width)+.001
+badge FAIL line 235 [pixel=2 scale=0.6 height=44 hide=0 imported=0 badge=0 / first enable with existing badge]: !CGRectIsEmpty(CGRectIntersection(item.bounds,badge.frame))
+badge FAIL line 240 [pixel=2 scale=0.6 height=44 hide=0 imported=0 badge=0 / first enable with existing badge]: RightOverflow(badge.frame,width)<=RightOverflow(native,width)+.001
+badge FAIL line 235 [pixel=2 scale=0.6 height=44 hide=0 imported=0 badge=0 / first enable with existing badge]: !CGRectIsEmpty(CGRectIntersection(item.bounds,badge.frame))
+badge FAIL line 240 [pixel=2 scale=0.6 height=44 hide=0 imported=0 badge=0 / first enable with existing badge]: RightOverflow(badge.frame,width)<=RightOverflow(native,width)+.001
+badge FAIL line 235 [pixel=2 scale=0.6 height=44 hide=0 imported=0 badge=0 / 100 nested bar layouts]: !CGRectIsEmpty(CGRectIntersection(item.bounds,badge.frame))
+badge FAIL line 240 [pixel=2 scale=0.6 height=44 hide=0 imported=0 badge=0 / 100 nested bar layouts]: RightOverflow(badge.frame,width)<=RightOverflow(native,width)+.001
+badge FAIL line 235 [pixel=2 scale=0.6 height=44 hide=0 imported=0 badge=0 / 100 nested bar layouts]: !CGRectIsEmpty(CGRectIntersection(item.bounds,badge.frame))
+badge FAIL line 240 [pixel=2 scale=0.6 height=44 hide=0 imported=0 badge=0 / 100 nested bar layouts]: RightOverflow(badge.frame,width)<=RightOverflow(native,width)+.001
+tabbar native badges: 560 combinations, 16000960 checks, 302800 failures; source relayout hook=0, disabled=0
+native same-width counterfactual: 782720 getter samples, 36784 naturally partial
+100 compound native relayouts: reloadIconImage=100 layoutIcon=100 layoutBadgeView=100

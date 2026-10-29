@@ -596,8 +596,8 @@
     // 获取当前应用程序的keyWindow
     UIWindow *keyWindow = nil;
     
-    // iOS 13及以上版本
-    if (@available(iOS 13.0, *)) {
+    // 从前台活跃的 Scene 查找窗口
+    {
         NSSet<UIScene *> *connectedScenes = [UIApplication sharedApplication].connectedScenes;
         for (UIScene *scene in connectedScenes) {
             if (scene.activationState == UISceneActivationStateForegroundActive && [scene isKindOfClass:[UIWindowScene class]]) {
@@ -612,12 +612,6 @@
                 if (keyWindow) break;
             }
         }
-    } else {
-        // iOS 13以下版本
-        #pragma clang diagnostic push
-        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        keyWindow = [UIApplication sharedApplication].keyWindow;
-        #pragma clang diagnostic pop
     }
     
     if (!keyWindow) return;
@@ -669,8 +663,8 @@
     // 获取当前应用程序的keyWindow
     UIWindow *keyWindow = nil;
     
-    // iOS 13及以上版本
-    if (@available(iOS 13.0, *)) {
+    // 从前台活跃的 Scene 查找窗口
+    {
         NSSet<UIScene *> *connectedScenes = [UIApplication sharedApplication].connectedScenes;
         for (UIScene *scene in connectedScenes) {
             if (scene.activationState == UISceneActivationStateForegroundActive && [scene isKindOfClass:[UIWindowScene class]]) {
@@ -685,12 +679,6 @@
                 if (keyWindow) break;
             }
         }
-    } else {
-        // iOS 13以下版本
-        #pragma clang diagnostic push
-        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        keyWindow = [UIApplication sharedApplication].keyWindow;
-        #pragma clang diagnostic pop
     }
     
     if (!keyWindow) return;
@@ -866,8 +854,8 @@
 
 // 添加震动反馈方法
 - (void)playHapticFeedback {
-    // 根据iOS版本选择合适的震动类型
-    if (@available(iOS 10.0, *)) {
+    // 使用较轻的通知反馈
+    {
         // 选择较轻的震动效果，提供更好的用户体验
         UINotificationFeedbackGenerator *generator = [[UINotificationFeedbackGenerator alloc] init];
         [generator prepare];
@@ -1419,11 +1407,9 @@
     UINavigationController *navVC = [[UINavigationController alloc] initWithRootViewController:settingsVC];
     navVC.modalPresentationStyle = UIModalPresentationFormSheet;
     
-    if (@available(iOS 15.0, *)) {
-        if (navVC.sheetPresentationController) {
-            navVC.sheetPresentationController.detents = @[UISheetPresentationControllerDetent.mediumDetent];
-            navVC.sheetPresentationController.prefersGrabberVisible = YES;
-        }
+    if (navVC.sheetPresentationController) {
+        navVC.sheetPresentationController.detents = @[UISheetPresentationControllerDetent.mediumDetent];
+        navVC.sheetPresentationController.prefersGrabberVisible = YES;
     }
     
     [self presentViewController:navVC animated:YES completion:nil];
@@ -1534,14 +1520,12 @@
         UILabel *nameLabel = [cardView viewWithTag:1002];
         
         // 根据深色模式调整卡片样式
-        if (@available(iOS 13.0, *)) {
-            if (self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-                cardView.layer.shadowOpacity = 0.3;
-                avatarContainer.layer.shadowOpacity = 0.5;
-            } else {
-                cardView.layer.shadowOpacity = 0.2;
-                avatarContainer.layer.shadowOpacity = 0.4;
-            }
+        if (self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            cardView.layer.shadowOpacity = 0.3;
+            avatarContainer.layer.shadowOpacity = 0.5;
+        } else {
+            cardView.layer.shadowOpacity = 0.2;
+            avatarContainer.layer.shadowOpacity = 0.4;
         }
         
         // 设置数据
@@ -1651,18 +1635,16 @@
         UIView *selectedBgView = cell.selectedBackgroundView;
         
         // 根据深色模式调整卡片样式
-        if (@available(iOS 13.0, *)) {
-            if (self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-                cardView.backgroundColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:0.95];
-                titleLabel.textColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1.0];
-                detailLabel.textColor = [UIColor colorWithRed:0.8 green:0.8 blue:0.8 alpha:1.0];
-                selectedBgView.backgroundColor = [UIColor colorWithRed:0.3 green:0.35 blue:0.4 alpha:1.0];
-            } else {
-                cardView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.95];
-                titleLabel.textColor = [UIColor colorWithRed:0.3 green:0.3 blue:0.3 alpha:1.0];
-                detailLabel.textColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1.0];
-                selectedBgView.backgroundColor = [UIColor colorWithRed:0.9 green:0.95 blue:1.0 alpha:1.0];
-            }
+        if (self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            cardView.backgroundColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:0.95];
+            titleLabel.textColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1.0];
+            detailLabel.textColor = [UIColor colorWithRed:0.8 green:0.8 blue:0.8 alpha:1.0];
+            selectedBgView.backgroundColor = [UIColor colorWithRed:0.3 green:0.35 blue:0.4 alpha:1.0];
+        } else {
+            cardView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.95];
+            titleLabel.textColor = [UIColor colorWithRed:0.3 green:0.3 blue:0.3 alpha:1.0];
+            detailLabel.textColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1.0];
+            selectedBgView.backgroundColor = [UIColor colorWithRed:0.9 green:0.95 blue:1.0 alpha:1.0];
         }
         
         // 设置数据
@@ -1672,23 +1654,11 @@
         // 调整详情文本颜色，使特殊值更明显
         if ([item.detail isEqualToString:@"未设置"] || [item.detail isEqualToString:@"未知"]) {
             detailLabel.font = [UIFont italicSystemFontOfSize:15];
-            if (@available(iOS 13.0, *)) {
-                if (self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-                    detailLabel.textColor = [UIColor colorWithRed:0.6 green:0.6 blue:0.6 alpha:1.0];
-                } else {
-                    detailLabel.textColor = [UIColor colorWithRed:0.6 green:0.6 blue:0.6 alpha:1.0];
-                }
-            } else {
-                detailLabel.textColor = [UIColor colorWithRed:0.6 green:0.6 blue:0.6 alpha:1.0];
-            }
+            detailLabel.textColor = [UIColor colorWithRed:0.6 green:0.6 blue:0.6 alpha:1.0];
         } else {
             detailLabel.font = [UIFont systemFontOfSize:15];
-            if (@available(iOS 13.0, *)) {
-                if (self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-                    detailLabel.textColor = [UIColor colorWithRed:0.8 green:0.8 blue:0.8 alpha:1.0];
-                } else {
-                    detailLabel.textColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1.0];
-                }
+            if (self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+                detailLabel.textColor = [UIColor colorWithRed:0.8 green:0.8 blue:0.8 alpha:1.0];
             } else {
                 detailLabel.textColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1.0];
             }
@@ -1847,13 +1817,8 @@
     // 使用固定的绿色，不使用系统动态色
     UIColor *fixedGreenColor = [UIColor colorWithRed:0.2 green:0.8 blue:0.2 alpha:1.0];
     
-    if (@available(iOS 13.0, *)) {
-        checkImageView.image = [UIImage systemImageNamed:@"checkmark.circle.fill"];
-        checkImageView.tintColor = fixedGreenColor;
-    } else {
-        checkImageView.image = [UIImage imageNamed:@"check"];
-        checkImageView.tintColor = fixedGreenColor;
-    }
+    checkImageView.image = [UIImage systemImageNamed:@"checkmark.circle.fill"];
+    checkImageView.tintColor = fixedGreenColor;
     
     checkImageView.translatesAutoresizingMaskIntoConstraints = NO;
     [checkImageView.heightAnchor constraintEqualToConstant:24].active = YES;
@@ -1896,8 +1861,8 @@
 }
 
 - (void)playHapticFeedback {
-    // 根据iOS版本选择合适的震动类型
-    if (@available(iOS 10.0, *)) {
+    // 使用较轻的通知反馈
+    {
         // 选择较轻的震动效果，提供更好的用户体验
         UINotificationFeedbackGenerator *generator = [[UINotificationFeedbackGenerator alloc] init];
         [generator prepare];
@@ -1917,7 +1882,7 @@
     // 获取keyWindow
     UIWindow *keyWindow = nil;
     
-    if (@available(iOS 13.0, *)) {
+    {
         // 使用Scene API获取keyWindow (iOS 13+)
         NSSet<UIScene *> *connectedScenes = [UIApplication sharedApplication].connectedScenes;
         for (UIScene *scene in connectedScenes) {
@@ -1933,12 +1898,6 @@
                 if (keyWindow) break;
             }
         }
-    } else {
-        // iOS 13以下版本
-        #pragma clang diagnostic push
-        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        keyWindow = [UIApplication sharedApplication].keyWindow;
-        #pragma clang diagnostic pop
     }
     
     if (!keyWindow) return nil;

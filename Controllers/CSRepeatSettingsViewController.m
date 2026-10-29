@@ -98,18 +98,10 @@
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (@available(iOS 13.0, *)) {
-        cell.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
-    } else {
-        cell.backgroundColor = [UIColor whiteColor];
-    }
+    cell.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
     
     UIView *selectedBackgroundView = [[UIView alloc] init];
-    if (@available(iOS 13.0, *)) {
-        selectedBackgroundView.backgroundColor = [UIColor tertiarySystemGroupedBackgroundColor];
-    } else {
-        selectedBackgroundView.backgroundColor = [UIColor systemGray5Color];
-    }
+    selectedBackgroundView.backgroundColor = [UIColor tertiarySystemGroupedBackgroundColor];
     cell.selectedBackgroundView = selectedBackgroundView;
 }
 

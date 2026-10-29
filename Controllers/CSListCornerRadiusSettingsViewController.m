@@ -625,10 +625,7 @@
 - (void)colorPickerViewControllerDidFinish:(UIColorPickerViewController *)viewController {
     UIColor *selectedColor = viewController.selectedColor;
 
-    BOOL isDarkMode = NO;
-    if (@available(iOS 13.0, *)) {
-        isDarkMode = [UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark;
-    }
+    BOOL isDarkMode = [UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark;
 
     switch (self.currentColorType) {
         case 0:

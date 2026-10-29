@@ -1,0 +1,231 @@
+{
+  "version": "2.1-6",
+  "baseline": "current working tree 2.1-5 after native authorization alert fix",
+  "regressions": [
+    {
+      "command": "bash Tests/verify-authorization-prompt.sh",
+      "exit_code": 0,
+      "duration_seconds": 1.471,
+      "log": "docs/audits/authorization-cleanup-2026-10-28/logs/verify-authorization-prompt.log"
+    },
+    {
+      "command": "bash Tests/verify-authorization-read.sh",
+      "exit_code": 0,
+      "duration_seconds": 0.542,
+      "log": "docs/audits/authorization-cleanup-2026-10-28/logs/verify-authorization-read.log"
+    },
+    {
+      "command": "bash Tests/verify-plugin-framework.sh",
+      "exit_code": 0,
+      "duration_seconds": 1.086,
+      "log": "docs/audits/authorization-cleanup-2026-10-28/logs/verify-plugin-framework.log"
+    },
+    {
+      "command": "bash Tests/verify-close-friend-entry.sh",
+      "exit_code": 0,
+      "duration_seconds": 2.212,
+      "log": "docs/audits/authorization-cleanup-2026-10-28/logs/verify-close-friend-entry.log"
+    },
+    {
+      "command": "bash Tests/verify-scheduled-task-manager.sh",
+      "exit_code": 0,
+      "duration_seconds": 1.219,
+      "log": "docs/audits/authorization-cleanup-2026-10-28/logs/verify-scheduled-task-manager.log"
+    },
+    {
+      "command": "bash Tests/verify-ai-manager.sh",
+      "exit_code": 0,
+      "duration_seconds": 5.873,
+      "log": "docs/audits/authorization-cleanup-2026-10-28/logs/verify-ai-manager.log"
+    }
+  ],
+  "assertions": {
+    "authorizationPrompt": 92,
+    "authorizationRead": 67,
+    "pluginEntry": 21,
+    "startupIntegration": 25,
+    "closeFriendEntry": 45,
+    "closeFriendGesture": 26,
+    "scheduledManager": 204,
+    "aiManager": 333,
+    "total": 813
+  },
+  "warnings": {
+    "rootless": {
+      "count": 6,
+      "baseline_count": 6,
+      "matches_baseline": true,
+      "warnings": [
+        "Hooks/CloseFriendNotificationHooks.xm:98:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+        "Hooks/CloseFriendNotificationHooks.xm:98:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+        "ld: warning: -multiply_defined is obsolete",
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+        "ld: warning: -multiply_defined is obsolete"
+      ],
+      "errors": []
+    },
+    "rootful": {
+      "count": 6,
+      "baseline_count": 6,
+      "matches_baseline": true,
+      "warnings": [
+        "Hooks/CloseFriendNotificationHooks.xm:98:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+        "Hooks/CloseFriendNotificationHooks.xm:98:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+        "ld: warning: -multiply_defined is obsolete",
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+        "ld: warning: -multiply_defined is obsolete"
+      ],
+      "errors": []
+    }
+  },
+  "packages": {
+    "version": "2.1-6",
+    "builds": {
+      "rootless": {
+        "package": "packages/2.1-6-auth-cleanup/com.wechat.improve_2.1-6_iphoneos-arm64.deb",
+        "metadata": "Package: com.wechat.improve\nName: WeChatImprove\nDescription: 微信插件，支持聊天按钮布局自定义等。\nMaintainer: 再也不会\nAuthor: 再也不会\nSection: Tweaks\nDepends: mobilesubstrate (>= 0.9.5000)\nArchitecture: iphoneos-arm64\nVersion: 2.1-6\nInstalled-Size: 6064",
+        "size": 1414092,
+        "sha256": "432af8f61dbd79d660f80b811eb2fbb6333d9743d178007f6952e90a900c157b",
+        "library_path": "/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+        "library_sha256": "20b7f6347f9c1042ca88df03d3f887bee527aa48f17c1b8ecf0776d6fd09d737",
+        "architectures": [
+          "arm64",
+          "arm64e"
+        ],
+        "symbols": {
+          "arm64": {
+            "uuid": "C573ABE2-F016-3B45-AB11-7B93F8E8EAD7",
+            "path": "rootless/arm64/WeChatImprove.dylib.dSYM"
+          },
+          "arm64e": {
+            "uuid": "BFB1C21F-D700-35E1-B30F-3000ECC8ACE5",
+            "path": "rootless/arm64e/WeChatImprove.dylib.dSYM"
+          }
+        },
+        "minimum_ios_per_arch": [
+          "15.0",
+          "15.0"
+        ],
+        "warnings": 6,
+        "retained_selectors_and_version": {
+          "isAuthorized": true,
+          "requestAuthorizationWithPresentingViewController:completion:": true,
+          "openOfficialAccountFromViewController:": true,
+          "openBrandProfileDirectly": true,
+          "tryAlternativeURLScheme": true,
+          "returnFromUnauthorizedSettings": true,
+          "canDiscoverCloseFriendEntry": true,
+          "CSAIReplyManager": true,
+          "CSScheduledTaskManager": true,
+          "2.1-6": true
+        },
+        "removed_selector_checkAuthorization_absent": true,
+        "filter": {
+          "Filter": {
+            "Bundles": [
+              "com.tencent.xin"
+            ],
+            "Executables": [
+              "ZYBH"
+            ]
+          }
+        }
+      },
+      "rootful": {
+        "package": "packages/2.1-6-auth-cleanup/com.wechat.improve_2.1-6_iphoneos-arm.deb",
+        "metadata": "Package: com.wechat.improve\nName: WeChatImprove\nDescription: 微信插件，支持聊天按钮布局自定义等。\nMaintainer: 再也不会\nAuthor: 再也不会\nSection: Tweaks\nDepends: mobilesubstrate (>= 0.9.5000)\nArchitecture: iphoneos-arm\nVersion: 2.1-6\nInstalled-Size: 6064",
+        "size": 1412476,
+        "sha256": "b9772adf4e5adfb087cc0f77c934ad4f082cce35341e280a265125ef939f14e1",
+        "library_path": "/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+        "library_sha256": "b4777610d9b7bd6beba6dc23ece5a46135fd0e23e69f446ba3169586e8ec03fe",
+        "architectures": [
+          "arm64",
+          "arm64e"
+        ],
+        "symbols": {
+          "arm64": {
+            "uuid": "4C7861FE-5F2D-3BBE-BDDC-913A88D80CB2",
+            "path": "rootful/arm64/WeChatImprove.dylib.dSYM"
+          },
+          "arm64e": {
+            "uuid": "72F00851-3CC8-323D-868A-0849AEBC06FE",
+            "path": "rootful/arm64e/WeChatImprove.dylib.dSYM"
+          }
+        },
+        "minimum_ios_per_arch": [
+          "15.0",
+          "15.0"
+        ],
+        "warnings": 6,
+        "retained_selectors_and_version": {
+          "isAuthorized": true,
+          "requestAuthorizationWithPresentingViewController:completion:": true,
+          "openOfficialAccountFromViewController:": true,
+          "openBrandProfileDirectly": true,
+          "tryAlternativeURLScheme": true,
+          "returnFromUnauthorizedSettings": true,
+          "canDiscoverCloseFriendEntry": true,
+          "CSAIReplyManager": true,
+          "CSScheduledTaskManager": true,
+          "2.1-6": true
+        },
+        "removed_selector_checkAuthorization_absent": true,
+        "filter": {
+          "Filter": {
+            "Bundles": [
+              "com.tencent.xin"
+            ],
+            "Executables": [
+              "ZYBH"
+            ]
+          }
+        }
+      }
+    },
+    "symbols_zip": {
+      "file_count": 12,
+      "crc": "passed",
+      "size": 10413864,
+      "sha256": "fcff7b72a339e4b935924bf28791bf1d5fd8e4a45985c007e4cade7e07251395"
+    },
+    "sha256": {
+      "com.wechat.improve_2.1-6_iphoneos-arm.deb": "b9772adf4e5adfb087cc0f77c934ad4f082cce35341e280a265125ef939f14e1",
+      "com.wechat.improve_2.1-6_iphoneos-arm64.deb": "432af8f61dbd79d660f80b811eb2fbb6333d9743d178007f6952e90a900c157b",
+      "com.wechat.improve_2.1-6_symbols.zip": "fcff7b72a339e4b935924bf28791bf1d5fd8e4a45985c007e4cade7e07251395"
+    }
+  },
+  "scope": {
+    "Controllers/CSCustomViewController.m_body_unchanged": true,
+    "Hooks/CustomEntryHooks.xm_body_unchanged": true,
+    "manager_prompt_and_routing_byte_identical": true,
+    "query_body_unchanged_except_comments": true,
+    "Controllers/CSAIReplyManager.m_byte_identical": true,
+    "Controllers/CSScheduledTaskManager.m_byte_identical": true
+  },
+  "environment": {
+    "historical_files_unchanged": 1251,
+    "build_inputs_unchanged": 365,
+    "changed_source_files": [
+      "Controllers/CSAuthorizationManager.h",
+      "Controllers/CSAuthorizationManager.m",
+      "Controllers/CSCustomViewController.m",
+      "Headers/CSUserInfoHelper.h",
+      "Hooks/CustomEntryHooks.xm",
+      "Tests/AuthorizationPromptTests.m",
+      "Tests/AuthorizationReadTests.m",
+      "Tests/verify-authorization-prompt.sh",
+      "Tests/verify-authorization-read.sh",
+      "control"
+    ],
+    "added_source_files": [],
+    "removed_source_files": []
+  },
+  "native": {
+    "target_sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+    "static_only": true,
+    "rea_session_closed": true,
+    "evidence_manifest_hashes_verified": 31
+  }
+}

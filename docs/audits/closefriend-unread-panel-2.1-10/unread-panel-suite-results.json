@@ -1,0 +1,49 @@
+{
+  "captured_at_utc": "2026-10-29T03:18:14.816648+00:00",
+  "source_hash_capture": "after final validation; production and test owners confirmed their files frozen",
+  "source_sha256": {
+    "Controllers/CSCloseFriendUnreadPanelAdapter.h": "cc9d9b57c1eda25dee5ea8e989a5fd87a085edc47c78a5974dd5452edb264f88",
+    "Controllers/CSCloseFriendUnreadPanelAdapter.m": "eb95c613f157446f6f6025b0c3152a1a3fe791330c740d669059d5c5305fcbbd",
+    "Hooks/CloseFriendUnreadPanelHooks.xm": "b1073f08154a09b7ab36ca9e0dc6a5be72a7a36ec303f8cca73c1b6308fe48eb",
+    "Tests/CloseFriendUnreadPanelTests.m": "e6873f4e05d8b3e27376ff8dbf70e64b7aa567f178cb2f97600f9aed2769a04b",
+    "Tests/verify-close-friend-unread-panel.sh": "eda8476d4cb6c43949a739a9f3f264628e31824fc142a2b4b7f173b614d3d95e",
+    "Tests/verify-close-friend-ios.sh": "2ef49b8b0cee7b87a6b36013389cb8984074ec153724dd8e92d84c58dc2f870a"
+  },
+  "host": {
+    "command": "bash Tests/verify-close-friend-unread-panel.sh",
+    "behavior_checks": 71,
+    "abi_checks": 7,
+    "failures": 0,
+    "exit_code": 0,
+    "log": "unread-panel-tests.log"
+  },
+  "native_control": {
+    "command": "bash Tests/verify-close-friend-unread-panel.sh --native-control",
+    "kind": "compiled native aggregation fixture with new hook installation omitted",
+    "exact_pre_change_plugin_snapshot": false,
+    "behavior_checks": 4,
+    "behavior_failures": 4,
+    "exit_code": 1,
+    "log": "unread-panel-native-control.log"
+  },
+  "ios": {
+    "command": "bash Tests/verify-close-friend-ios.sh --unread-panel",
+    "architectures": [
+      "arm64",
+      "arm64e"
+    ],
+    "strict_flags": [
+      "-Wall",
+      "-Wextra",
+      "-Werror"
+    ],
+    "exit_code": 0,
+    "log": "unread-panel-ios.log"
+  },
+  "execution_boundary": "Production adapter, complete production hook registration bodies, production bridge read/install gates, and production contact page/visibility helpers are extracted without behavioral substitution. Foundation fixture represents native source/list/count/UI boundaries.",
+  "limits": [
+    "Host fixture is not the complete native WeChat implementation or a device run.",
+    "The original plugin has no new helper symbols, so the behavioral red is a clearly labeled unhooked native control, not a historical plugin build.",
+    "No device connection, installation, service restart, account change, or real user database access occurred."
+  ]
+}

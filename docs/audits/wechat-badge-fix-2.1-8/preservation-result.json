@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "baseline_files": 602,
+  "unchanged": 594,
+  "changed": [
+    "Controllers/CSGroupListAdapter.h",
+    "Controllers/CSGroupListAdapter.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/CloseFriendNotificationHooks.xm",
+    "Tests/GroupLifecycleTests.m",
+    "Tests/extract-group-lifecycle.py",
+    "Tests/verify-close-friend-alerts.sh",
+    "control"
+  ],
+  "added_tests": [
+    "Tests/CloseFriendTabBadgeTests.m"
+  ],
+  "historical_artifacts_matching": 1260,
+  "protected_code_sha256": {
+    "legacy_notification_badge_getter": "18af0cb05d34aecde81d291157f1b792daeecd17ca1989bfdfe8d0f6ff52e618",
+    "ChatTab": "c35bc61ec6cc34556c2510163fb9119ea42c5cb808dbb41d9c125da48ca83ecc",
+    "all_non_tab_hook_installations": "9a9bf70a995917c4ad4a7fe0687b2128f80013dd067d097645c81fac67253c7d",
+    "policy_observer_notification_and_app_icon_prefix": "8dbef4ac304814a67b340dc4053fa54edecebeb834aa814f6ab260d5cca5b616"
+  },
+  "version": "2.1-8"
+}

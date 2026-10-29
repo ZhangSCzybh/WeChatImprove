@@ -1,0 +1,60 @@
+{
+  "captured_at_utc": "2026-10-29T02:21:38.508023+00:00",
+  "working_directory": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "results": [
+    {
+      "name": "close-friend-alerts",
+      "command": "bash Tests/verify-close-friend-alerts.sh",
+      "exit_code": 0,
+      "checks": {
+        "alerts": 216,
+        "tab_badges": 897
+      },
+      "failures": 0,
+      "log": "close-friend-alerts.log",
+      "log_sha256": "d1f98b62ee27e977b956f67a2243bb0771b409cce11e3a1ae4284dccd8bd54dd"
+    },
+    {
+      "name": "group-lifecycle",
+      "command": "bash Tests/verify-group-lifecycle.sh",
+      "exit_code": 0,
+      "checks": {
+        "lifecycle": 140
+      },
+      "failures": 0,
+      "log": "group-lifecycle.log",
+      "log_sha256": "69b4e8daad081a91f825fe0df3822304b4222fbf8594d378963307b86a5538ec"
+    },
+    {
+      "name": "group-viewport",
+      "command": "bash Tests/verify-group-viewport.sh",
+      "exit_code": 0,
+      "checks": {
+        "viewport": 72
+      },
+      "failures": 0,
+      "log": "group-viewport.log",
+      "log_sha256": "fe76af0722ec141f823305a9f8f55320d4d2cb1b205c60507fd266fc3a20790c"
+    }
+  ],
+  "capture_method": "Exact successful stdout copied from the final tool executions in this session; no rerun solely to save logs. Exit codes are the observed tool exit codes.",
+  "new_cold_attach_production_code_was_present_in_final_alerts_and_lifecycle_runs": true,
+  "source_sha256_at_capture": {
+    "Tests/CloseFriendTabBadgeTests.m": "e93bffdf3a418c0d62a1bfd8ac04716840f983de06ecc77f89c602f2d1a15978",
+    "Tests/verify-close-friend-alerts.sh": "f287fbaf3970ca0764f3a0b99d5c48268d72d8efebab60793854dc4fc24cd7f9",
+    "Tests/extract-group-lifecycle.py": "cdb168699fa3ed0495377c6f133df2a35138907cacc9956849e9b6d5c410da02",
+    "Tests/GroupLifecycleTests.m": "13e0a1ee63487e17fb46b636392d3fa318b86c48cab149e0c5e1957085139969",
+    "Tests/GroupViewportTests.m": "16c6b9786f84b5768783a354e2811a8c4087383e01bfa23fd1786ac167fb37cd",
+    "Tests/GroupSearchTests.m": "fc47dc350cee701880d642b6876b4c2361ea105a79e07c881a7445f683c16e0b",
+    "Tests/GroupInteractionTests.m": "3f9d2f2a5acc27034d5ae2804cab1d621a2f0b116c57efd87aa33cc9dd7250dd",
+    "Controllers/CSGroupListAdapter.h": "90e6325b132ffc2e4dc884912bb6dc90859f894b65582abff795a9cd58c950c9",
+    "Controllers/CSGroupListAdapter.m": "5d94a3726abfb20b274bcd3988f722482a250d12df84a1fa88f5ca58254c8420",
+    "Hooks/CloseFriendNotificationHooks.xm": "b11728c2a6681e9f1afe380e62eae6387f8f58aaea6dff3b8595dbe5918917df"
+  },
+  "boundaries": [
+    "Foundation/macOS host tests; no real WeChat process or device rendering.",
+    "Focused badge suite executes exact extracted getter and Hook code; source-ready event emission is a labeled fixture.",
+    "Lifecycle suite executes exact production source maintenance, native transaction and notification logic; immutable native reader and UI sink are host fixtures.",
+    "No service restart, installation, real account database or notification mutation."
+  ]
+}

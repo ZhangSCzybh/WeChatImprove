@@ -142,6 +142,8 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 - (void)shieldVisiblePrivateRows;
 @end
 @implementation CSGroupListAdapter
+// Badge source lifecycle is exercised in GroupLifecycleTests.
+- (void)requestTabBadgeSourceRefresh {}
 - (void)shieldVisiblePrivateRows {}
 - (void)invalidateNativeSnapshot { self.invalidations++; }
 - (void)saveAnchor { self.anchorSaves++; }

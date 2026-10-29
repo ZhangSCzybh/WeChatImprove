@@ -1,0 +1,5317 @@
+{
+  "binary": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "classes": {
+    "MMNewSessionMgr": {
+      "address": "0x120366b98",
+      "super_raw": "0x10000020649180",
+      "super_addr": "0x120649180",
+      "methods": [
+        {
+          "selector": "getSessionFilterArray",
+          "address": "0x10451f258",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "isUserShouldHandled:",
+          "address": "0x10451f6c4",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "isMessageShouldHandled:",
+          "address": "0x10451f9fc",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "isUserHasSpecalSessionInfo:",
+          "address": "0x10451fd34",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "onServiceInit",
+          "address": "0x104520094",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "dealloc",
+          "address": "0x1045205ac",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onServiceClearData",
+          "address": "0x104520630",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "refreshServiceTriggerToRefresh:",
+          "address": "0x104520648",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "p_refreshNewSessionMgr",
+          "address": "0x1045206e4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "p_notifySessionChangeArrayAddObject:",
+          "address": "0x104520c10",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "p_notifyNewMsg:withNotifyFlag:",
+          "address": "0x104520de4",
+          "types": "v32@0:8@16q24"
+        },
+        {
+          "selector": "GetSessionCount",
+          "address": "0x104521000",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "GetSessionAtIndex:",
+          "address": "0x104521040",
+          "types": "@20@0:8I16"
+        },
+        {
+          "selector": "GetSessionUserNameAtIndex:",
+          "address": "0x1045211f4",
+          "types": "@20@0:8I16"
+        },
+        {
+          "selector": "GetFirstUntopSessionUserName",
+          "address": "0x104521294",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "GetSessionInfoList",
+          "address": "0x1045212d8",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "CleanupPreLoadSessionCache",
+          "address": "0x10452131c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "AsyncFulFillSession:",
+          "address": "0x104521334",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "SyncFulFillSession:",
+          "address": "0x10452134c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "getUnreadCountInSession:",
+          "address": "0x1045214ac",
+          "types": "q24@0:8@16"
+        },
+        {
+          "selector": "GetSessionByUserName:",
+          "address": "0x1045217ac",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "GetSessionIndexByUserName:",
+          "address": "0x1045219dc",
+          "types": "q24@0:8@16"
+        },
+        {
+          "selector": "GetTotalUnreadCount",
+          "address": "0x104521bf8",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "GetUnreadNotifySessionCount",
+          "address": "0x104521c2c",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "GetTotalMutedUnreadMsgCount",
+          "address": "0x104521c60",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "GetTotalMutedUnreadSessionCount",
+          "address": "0x104521c94",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "GetTotalUnreadCountForAppIcon",
+          "address": "0x104521cc8",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "GetActiveUserUnreadCount",
+          "address": "0x104521d10",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "SessionEnumerator",
+          "address": "0x104521ea0",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "mainSessionEnumerator",
+          "address": "0x104521edc",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "SessionNewArray",
+          "address": "0x104521efc",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "AddOrModifySession:withNotifyFlag:",
+          "address": "0x104521f50",
+          "types": "v32@0:8@16q24"
+        },
+        {
+          "selector": "AddOrModifySession:withNotifyFlag:immediateRefresh:",
+          "address": "0x104521fcc",
+          "types": "v36@0:8@16q24B32"
+        },
+        {
+          "selector": "AddOrModifySession:targetContactUserName:withNotifyFlag:",
+          "address": "0x104522058",
+          "types": "v40@0:8@16@24q32"
+        },
+        {
+          "selector": "AddOrModifySession:targetContactUserName:withNotifyFlag:immediateRefresh:",
+          "address": "0x104522068",
+          "types": "v44@0:8@16@24q32B40"
+        },
+        {
+          "selector": "updateTimeForSessionByUserName:",
+          "address": "0x104522590",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "ChangeSessionUnReadCount:to:",
+          "address": "0x1045226e8",
+          "types": "v28@0:8@16I24"
+        },
+        {
+          "selector": "clearAtMeCount:",
+          "address": "0x104522d40",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "clearNewInvCount:",
+          "address": "0x104522f40",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "clearNewInvApprove:",
+          "address": "0x104523140",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "clearTransferCount:",
+          "address": "0x104523340",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "clearAAMessageCount:",
+          "address": "0x104523578",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "clearExclusiveHbMessageCount:",
+          "address": "0x104523778",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "clearUpdatableMsgNotify:",
+          "address": "0x104523a04",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "clearNeedContactVerifyFlag:",
+          "address": "0x104523c3c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "clearGroupUndoneSessionFlag:",
+          "address": "0x104523e28",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "clearChatRoomSpecialAttentionFlag:",
+          "address": "0x10452402c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "clearEcsGiftUnhandledFlag:",
+          "address": "0x10452422c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "DeleteSessionOfUser:",
+          "address": "0x104524454",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "DeleteSessionOfUsernames:",
+          "address": "0x104524590",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "deleteMMKVDraftOfUsernames:",
+          "address": "0x10452483c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "DeleteSessionDraftOfUsernames:",
+          "address": "0x104524a34",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "DeleteSessionWithoutDeleteMessage:",
+          "address": "0x104524c04",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "hideSessionOfUsernames:",
+          "address": "0x1045250c8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "hideSession:",
+          "address": "0x104525530",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "showSession:",
+          "address": "0x10452585c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "DeleteAllSession",
+          "address": "0x104525a94",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "p_batchDeleteSessions",
+          "address": "0x104525b88",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "DeleteMsgButKeepSession:",
+          "address": "0x104526364",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "GetUserNamesOnSessionList",
+          "address": "0x1045266f4",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "GetSyncUserNamesOnSessionListWithMaxCount:",
+          "address": "0x104526898",
+          "types": "@20@0:8I16"
+        },
+        {
+          "selector": "SetActiveSession:",
+          "address": "0x104526da8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "IsActiveUser:",
+          "address": "0x104527094",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "GetActiveUser",
+          "address": "0x1045270b4",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "HasActiveUser",
+          "address": "0x1045270c4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "GenSendMsgTime",
+          "address": "0x1045270dc",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "GenSendMsgTimeWithChatName:",
+          "address": "0x104527368",
+          "types": "I24@0:8@16"
+        },
+        {
+          "selector": "GetSessionModifyTimeInSeconds:",
+          "address": "0x104527594",
+          "types": "I24@0:8@16"
+        },
+        {
+          "selector": "IsSessionNeedDelayLoad",
+          "address": "0x1045275ac",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "temporaryTopSessionByContact:",
+          "address": "0x1045275dc",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "temporaryTopSessionByContact:showSession:",
+          "address": "0x1045275ec",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "IsSessionWithNullMsg:",
+          "address": "0x1045277e0",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "recentForwardSessions",
+          "address": "0x1045278ac",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "deleteExpiredSessionForwardRecord",
+          "address": "0x104527b54",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "checkContactHasSession:",
+          "address": "0x104527b6c",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "TopSessionByName:",
+          "address": "0x104527cc8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "UntopSessionByName:",
+          "address": "0x104527f28",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "UntopSessionByName:needSync:",
+          "address": "0x104527f38",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "IsTopSessionCountExceed",
+          "address": "0x1045282cc",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "isSessionTopable:",
+          "address": "0x1045282e4",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "AddSessionToTop:",
+          "address": "0x1045284c0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "unfoldSessionByName:",
+          "address": "0x104528920",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "unfoldAllSessions",
+          "address": "0x1045289bc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "foldSessionByNames:",
+          "address": "0x1045289fc",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "foldSessionCount",
+          "address": "0x104528a3c",
+          "types": "q16@0:8"
+        },
+        {
+          "selector": "isFoldTopSession",
+          "address": "0x104528a54",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "shouldFoldSession:",
+          "address": "0x104528a6c",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "isSelfToSelfSession:",
+          "address": "0x104528b34",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "shouldUnfoldSessionForNewMsgWrap:",
+          "address": "0x104528bd0",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "genSessionInfoByUserName:",
+          "address": "0x104528e50",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "genSessionInfoByContact:",
+          "address": "0x104528f6c",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "genSessionInfoByContact:allowEmptyLastMsg:",
+          "address": "0x104528f7c",
+          "types": "@28@0:8@16B24"
+        },
+        {
+          "selector": "tryToBuildSession:",
+          "address": "0x10452969c",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "appFirstBecomeActive",
+          "address": "0x1045297f8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "p_buildSession:",
+          "address": "0x10452990c",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "checkWhetherTheSessionIsAbnormal:",
+          "address": "0x10452a308",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "checkIfSessionsCorrupted:",
+          "address": "0x10452a3f4",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "showWCDBSpecifiedRecoverVCAndReport",
+          "address": "0x10452a494",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "checkLoadData",
+          "address": "0x10452a5dc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "fixUnreadCountForLastSession",
+          "address": "0x10452ae6c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "filterSessionDeleted:modified:",
+          "address": "0x10452af20",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "resortSessions",
+          "address": "0x10452b3a0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "tryGetContactImage:",
+          "address": "0x10452ba50",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "getContactByNameForce:",
+          "address": "0x10452bc58",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "processContactWhenAddMsg:",
+          "address": "0x10452c208",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "checkStrangerFirstChat:",
+          "address": "0x10452c318",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "realCheckStrangerFirstChat:",
+          "address": "0x10452c45c",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "checkContactVerifySysmsgSwitch",
+          "address": "0x10452c6f8",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "executeContactVerifyBanner",
+          "address": "0x10452c7a0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "isUserNeedProcess:",
+          "address": "0x10452ca3c",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "isMsgNeedProcess:",
+          "address": "0x10452cbb0",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "isNeedSaveSessionInfo:",
+          "address": "0x10452ce98",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "processOnAddMsgWithNotifyFlag:UsrName:",
+          "address": "0x10452cf54",
+          "types": "v32@0:8q16@24"
+        },
+        {
+          "selector": "isNeedCallNewMsgArrival:",
+          "address": "0x10452d084",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "deleteSessionsAtIndexes:",
+          "address": "0x10452d158",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "getSessionIndexOfUser:",
+          "address": "0x10452dd60",
+          "types": "I24@0:8@16"
+        },
+        {
+          "selector": "fulFillSession:",
+          "address": "0x10452def4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "fulFillSession:loadDetails:",
+          "address": "0x10452df04",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "recountUnReadCount",
+          "address": "0x10452e620",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "recountUnReadCountAndFireExtension",
+          "address": "0x10452e9a8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "checkAutoClearUnreadForSession:",
+          "address": "0x10452ec00",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "InsertOrUpdateSessionDeleteInfo:",
+          "address": "0x10452f13c",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "GetSessionDeleteInfo:",
+          "address": "0x10452f154",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "OnMsgNotAddDBNotify:MsgWrap:",
+          "address": "0x10452f1b4",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "OnAddMsg:MsgWrap:",
+          "address": "0x10452f328",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "OnAddMsgListForSession:NotifyUsrName:",
+          "address": "0x10452f9cc",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "updateSessions:NotifyUsrName:",
+          "address": "0x104531778",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "OnModMsg:MsgWrap:",
+          "address": "0x104531bb8",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "OnDelMsg:",
+          "address": "0x104532428",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "OnDelMsg:MsgWrap:",
+          "address": "0x1045329c4",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "OnUnReadCountChange:",
+          "address": "0x1045329d0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "checkSessionTop:contact:",
+          "address": "0x104532b44",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "checkSessionTopWithContact:",
+          "address": "0x104532c20",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onAddMsgDigetstForSession:",
+          "address": "0x104532cd4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onGetEmoticonDesc:descList:",
+          "address": "0x104532e84",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "onModifyContact:",
+          "address": "0x10453318c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onGetDraft:contact:",
+          "address": "0x10453382c",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "shouldUpdateSessionInfo:fromDraftInfo:",
+          "address": "0x104533a08",
+          "types": "B32@0:8@16@24"
+        },
+        {
+          "selector": "updateSessionInfo:fromDraftInfo:",
+          "address": "0x104533c7c",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "onModifyDraft:contact:draftTime:",
+          "address": "0x104533d7c",
+          "types": "v36@0:8@16@24I32"
+        },
+        {
+          "selector": "deleteAtUserList:",
+          "address": "0x10453463c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setContact:AtUserList:",
+          "address": "0x10453478c",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "addContact:AtUser:",
+          "address": "0x10453499c",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "onDeleteContact:",
+          "address": "0x104534cb8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onDeleteContactIsShouldKeep:",
+          "address": "0x104534f38",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "OnChangeNotifyStatus:withStatus:",
+          "address": "0x1045352d4",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "onContactListUpdate:",
+          "address": "0x1045353b4",
+          "types": "v20@0:8I16"
+        },
+        {
+          "selector": "checkAndMergeTopFlag",
+          "address": "0x10453575c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "rebuildAndUpdateSessionInfo",
+          "address": "0x104535d94",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "updateSingleSessionForRecover:",
+          "address": "0x1045362f4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "GetUnReadCountExcludingActiveUser:",
+          "address": "0x1045365e8",
+          "types": "I24@0:8@16"
+        },
+        {
+          "selector": "updateGroupUndoneSessionFlagForRoom:msgSvrId:",
+          "address": "0x1045366bc",
+          "types": "v32@0:8@16q24"
+        },
+        {
+          "selector": "disableGroupUndoneSessionFlagForRoom:msgSvrId:",
+          "address": "0x104536908",
+          "types": "v32@0:8@16q24"
+        },
+        {
+          "selector": "ModifySessionOpenImChatRoomMigrateWithOpenIMChatRoomUserName:andAssociateChatRoomUserName:",
+          "address": "0x104536b68",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "onRecovered:",
+          "address": "0x104536e04",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "getTimeElapsedSinceLastSessionListFix",
+          "address": "0x104536e10",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "setTimeOfLastSessionListFix",
+          "address": "0x104536e84",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "modifySessionWithoutNotify:",
+          "address": "0x104536f3c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "updateSession:lastMsgSvrId:",
+          "address": "0x104536f54",
+          "types": "v32@0:8@16q24"
+        },
+        {
+          "selector": "recoverViewControllerShown",
+          "address": "0x104536f6c",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setRecoverViewControllerShown:",
+          "address": "0x104536f80",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "address": "0x104536f90",
+          "types": "v16@0:8"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_arrSession",
+          "offset": 8,
+          "type": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_sessionStorage",
+          "offset": 16,
+          "type": "@\"MMSessionDB\""
+        },
+        {
+          "name": "m_nsActiveUserName",
+          "offset": 24,
+          "type": "@\"NSString\""
+        },
+        {
+          "name": "m_oSessionSortLogic",
+          "offset": 32,
+          "type": "@\"SessionSortLogic\""
+        },
+        {
+          "name": "m_uiTotalUnReadCount",
+          "offset": 40,
+          "type": "I"
+        },
+        {
+          "name": "m_appIconTotalUnreadCount",
+          "offset": 44,
+          "type": "I"
+        },
+        {
+          "name": "m_totalNotifyUnreadSessionCount",
+          "offset": 48,
+          "type": "I"
+        },
+        {
+          "name": "m_totalMutedUnreadMsgCount",
+          "offset": 52,
+          "type": "I"
+        },
+        {
+          "name": "m_totalMutedUnreadSessionCount",
+          "offset": 56,
+          "type": "I"
+        },
+        {
+          "name": "m_dicAtMeCount",
+          "offset": 64,
+          "type": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "m_dicNewInvCount",
+          "offset": 72,
+          "type": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "m_dicTransferCount",
+          "offset": 80,
+          "type": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "m_dictAACount",
+          "offset": 88,
+          "type": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "m_dictExclusiveHbCount",
+          "offset": 96,
+          "type": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "m_dictUpdatableMsgDigest",
+          "offset": 104,
+          "type": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "m_dicGroupUndoneCount",
+          "offset": 112,
+          "type": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "m_chatUploadLogic",
+          "offset": 120,
+          "type": "@\"MMChatContentUploadLogic\""
+        },
+        {
+          "name": "m_sessionFilterArray",
+          "offset": 128,
+          "type": "@\"NSArray\""
+        },
+        {
+          "name": "m_shouldReload",
+          "offset": 136,
+          "type": "B"
+        },
+        {
+          "name": "m_shouldChangeUnreadCount",
+          "offset": 137,
+          "type": "B"
+        },
+        {
+          "name": "m_notifySessionChangeArray",
+          "offset": 144,
+          "type": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_notifyNewMsgArrivingArray",
+          "offset": 152,
+          "type": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_bNotifySound",
+          "offset": 160,
+          "type": "B"
+        },
+        {
+          "name": "m_forwardRecordLogic",
+          "offset": 168,
+          "type": "@\"SessionForwardRecordLogic\""
+        },
+        {
+          "name": "m_dicAtMeType",
+          "offset": 176,
+          "type": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "_recoverViewControllerShown",
+          "offset": 184,
+          "type": "B"
+        }
+      ],
+      "class_methods": [
+        {
+          "selector": "getSessionName:",
+          "address": "0x10452155c",
+          "types": "@24@0:8@16"
+        }
+      ],
+      "superclass": "MMUserService"
+    },
+    "MMTabBarController": {
+      "address": "0x12036d948",
+      "super_raw": "0x801000000000224c",
+      "super_addr": null,
+      "methods": [
+        {
+          "selector": "init",
+          "address": "0x104723508",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "dealloc",
+          "address": "0x104723904",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "viewWillAppear:",
+          "address": "0x1047239dc",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "makeSureFrame",
+          "address": "0x104723a2c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "viewWillLayoutSubviews",
+          "address": "0x104723d28",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "viewDidLayoutSubviews",
+          "address": "0x104723de4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "viewDidAppear:",
+          "address": "0x104723e78",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "relayoutButtons:",
+          "address": "0x104723f00",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setSelectedViewController:",
+          "address": "0x104724404",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setViewControllers:",
+          "address": "0x1047244d8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setAllTabBarItemEnabled:",
+          "address": "0x1047245a0",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "tabBarHeight",
+          "address": "0x1047245e8",
+          "types": "d16@0:8"
+        },
+        {
+          "selector": "hideTabBar",
+          "address": "0x1047246a0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "showTabBar",
+          "address": "0x104724734",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "hideTabBarForIndex:",
+          "address": "0x1047248c4",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "showTabBarForIndex:",
+          "address": "0x104724910",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "hideTabBarWithNoViewHeightUpdateForIndex:",
+          "address": "0x10472495c",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "showTabBarWithNoViewHeightUpdateForIndex:",
+          "address": "0x1047249a8",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "addTapGesture",
+          "address": "0x1047249f4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "removeTapGesture",
+          "address": "0x104724e38",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "isGestureInMainFrameTab:",
+          "address": "0x104724ec4",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "handleTapGesture:",
+          "address": "0x104725070",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "handleLongPressGesture:",
+          "address": "0x104725234",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "isGestureInMoreTab:",
+          "address": "0x104725360",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "handleMoreLongPressGesture:",
+          "address": "0x104725510",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "gestureRecognizerShouldBegin:",
+          "address": "0x104725758",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:",
+          "address": "0x1047258e8",
+          "types": "B32@0:8@16@24"
+        },
+        {
+          "selector": "getTabBarBtnViews",
+          "address": "0x104725998",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "getTabBarBtnForIndex:",
+          "address": "0x104725e74",
+          "types": "@24@0:8Q16"
+        },
+        {
+          "selector": "clearTabBtns",
+          "address": "0x104726050",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setTabBarItemSelectedIndex:",
+          "address": "0x104726068",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "tabBarItemIsSelectedAtIndex:",
+          "address": "0x1047260b0",
+          "types": "B24@0:8Q16"
+        },
+        {
+          "selector": "setTabBarItemTitle:forIndex:",
+          "address": "0x104726104",
+          "types": "v32@0:8@16Q24"
+        },
+        {
+          "selector": "setTabBarItemCustomIconView:forIndex:",
+          "address": "0x1047261ac",
+          "types": "v32@0:8@16Q24"
+        },
+        {
+          "selector": "currentViewController",
+          "address": "0x104726254",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "currentTopViewController",
+          "address": "0x104726260",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "getViewControllerAtIndex:",
+          "address": "0x1047262e8",
+          "types": "@20@0:8I16"
+        },
+        {
+          "selector": "setTabBarBadgeValue:forIndex:",
+          "address": "0x1047263ac",
+          "types": "v32@0:8Q16Q24"
+        },
+        {
+          "selector": "setTabBarBadgeString:forIndex:",
+          "address": "0x104726534",
+          "types": "v32@0:8@16Q24"
+        },
+        {
+          "selector": "showRedDotOnTabBarItemAtIndex:",
+          "address": "0x1047266e4",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "removeRedDotOnTabBarItemAtIndex:",
+          "address": "0x1047268f8",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "getTabbarItemForIndex:",
+          "address": "0x104726a70",
+          "types": "@24@0:8Q16"
+        },
+        {
+          "selector": "supportedInterfaceOrientations",
+          "address": "0x104726af0",
+          "types": "Q16@0:8"
+        },
+        {
+          "selector": "onTabBarItemViewsRelayout",
+          "address": "0x104726bec",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getCurrentViewController",
+          "address": "0x104726d80",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onTabBarHiddenChanged:",
+          "address": "0x104726e3c",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "badgeViewAtIndex:",
+          "address": "0x104726f6c",
+          "types": "@24@0:8Q16"
+        },
+        {
+          "selector": "customTabBar",
+          "address": "0x104726fec",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "singleTapGesture",
+          "address": "0x1047270d0",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setSingleTapGesture:",
+          "address": "0x1047270e0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setCustomTabBar:",
+          "address": "0x1047270f4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "moreLongPressGesture",
+          "address": "0x104727108",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setMoreLongPressGesture:",
+          "address": "0x104727118",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "address": "0x10472712c",
+          "types": "v16@0:8"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "_viewControllersCount",
+          "offset": 8,
+          "type": "Q"
+        },
+        {
+          "name": "_tabBarBtns",
+          "offset": 16,
+          "type": "@\"NSMutableArray\""
+        },
+        {
+          "name": "_doubleTapGesture",
+          "offset": 24,
+          "type": "@\"UITapGestureRecognizer\""
+        },
+        {
+          "name": "_longPressGesture",
+          "offset": 32,
+          "type": "@\"UILongPressGestureRecognizer\""
+        },
+        {
+          "name": "_hasAddTapGesture",
+          "offset": 40,
+          "type": "B"
+        },
+        {
+          "name": "_singleTapGesture",
+          "offset": 48,
+          "type": "@\"UITapGestureRecognizer\""
+        },
+        {
+          "name": "_customTabBar",
+          "offset": 56,
+          "type": "@\"MMTabBar\""
+        },
+        {
+          "name": "_moreLongPressGesture",
+          "offset": 64,
+          "type": "@\"UILongPressGestureRecognizer\""
+        }
+      ],
+      "class_methods": [],
+      "superclass": "UITabBarController"
+    },
+    "MMTabBarItemView": {
+      "address": "0x12036d998",
+      "super_raw": "0x80100000000021e1",
+      "super_addr": null,
+      "methods": [
+        {
+          "selector": "initWithItem:frame:",
+          "address": "0x1047271bc",
+          "types": "@56@0:8@16{CGRect={CGPoint=dd}{CGSize=dd}}24"
+        },
+        {
+          "selector": "setTitle:",
+          "address": "0x104727280",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setBadgeViewHidden:",
+          "address": "0x104727298",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "setTabBarBadgeValue:",
+          "address": "0x1047272b0",
+          "types": "v24@0:8q16"
+        },
+        {
+          "selector": "setTabBarBadgeString:",
+          "address": "0x1047274b8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "showSmallRedDot",
+          "address": "0x104727694",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "removeSmallRedDot",
+          "address": "0x104727854",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setCustomIconView:",
+          "address": "0x104727894",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "getBadgeView",
+          "address": "0x104727954",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "copyTransitionVisualStateFromItemView:",
+          "address": "0x104727960",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setupUI",
+          "address": "0x104727bb4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onBadgeViewExposeChange:isExposed:",
+          "address": "0x10472845c",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "relayoutIconAndBadge",
+          "address": "0x104728808",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "layoutIcon",
+          "address": "0x10472884c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "layoutBadgeView",
+          "address": "0x104728b94",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getBadgeViewRightMarginPortrait",
+          "address": "0x104728d64",
+          "types": "d16@0:8"
+        },
+        {
+          "selector": "layoutSubviews",
+          "address": "0x104728d90",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setSelected:",
+          "address": "0x104728ea0",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "isSelectedState",
+          "address": "0x104728f44",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "reloadIconImage",
+          "address": "0x104728f50",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "preloadURLImages",
+          "address": "0x1047291cc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "bindRedDotExposeEventCallback:tabIndex:",
+          "address": "0x104729518",
+          "types": "v32@0:8@16q24"
+        },
+        {
+          "selector": "item",
+          "address": "0x104729774",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setItem:",
+          "address": "0x104729784",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "isSelected",
+          "address": "0x104729798",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setIsSelected:",
+          "address": "0x1047297a8",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "unreadCount",
+          "address": "0x1047297b8",
+          "types": "q16@0:8"
+        },
+        {
+          "selector": "setUnreadCount:",
+          "address": "0x1047297c8",
+          "types": "v24@0:8q16"
+        },
+        {
+          "selector": "badgeString",
+          "address": "0x1047297d8",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setBadgeString:",
+          "address": "0x1047297e8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "imageView",
+          "address": "0x1047297fc",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setImageView:",
+          "address": "0x10472980c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "customIconView",
+          "address": "0x104729820",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "textLabel",
+          "address": "0x104729830",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setTextLabel:",
+          "address": "0x104729840",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "badgeView",
+          "address": "0x104729854",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setBadgeView:",
+          "address": "0x104729864",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "address": "0x104729878",
+          "types": "v16@0:8"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "_isSelected",
+          "offset": 8,
+          "type": "B"
+        },
+        {
+          "name": "_item",
+          "offset": 16,
+          "type": "@\"MMTabbarItem\""
+        },
+        {
+          "name": "_unreadCount",
+          "offset": 24,
+          "type": "q"
+        },
+        {
+          "name": "_badgeString",
+          "offset": 32,
+          "type": "@\"NSString\""
+        },
+        {
+          "name": "_imageView",
+          "offset": 40,
+          "type": "@\"MMWebImageView\""
+        },
+        {
+          "name": "_customIconView",
+          "offset": 48,
+          "type": "@\"MMTabBarItemIconView\""
+        },
+        {
+          "name": "_textLabel",
+          "offset": 56,
+          "type": "@\"UILabel\""
+        },
+        {
+          "name": "_badgeView",
+          "offset": 64,
+          "type": "@\"MMBadgeView\""
+        }
+      ],
+      "class_methods": [],
+      "superclass": "UIView"
+    },
+    "MainFrameLogicController": {
+      "address": "0x120379838",
+      "super_raw": "0x10000020648000",
+      "super_addr": "0x120648000",
+      "methods": [
+        {
+          "selector": "startupPreCreateForCellData",
+          "address": "0x104aa02fc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "startUpdateTimeLabelTimer",
+          "address": "0x104aa0540",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "stopUpdateTimeLabelTimer",
+          "address": "0x104aa05a8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onUpdateTimeLabelTimer:",
+          "address": "0x104aa05f4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "handleUIApplicationDidBecomeActiveNotification:",
+          "address": "0x104aa06c0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "isMsgUnread:NotifyFlag:",
+          "address": "0x104aa0754",
+          "types": "B32@0:8@16q24"
+        },
+        {
+          "selector": "isPlayingOrRecording",
+          "address": "0x104aa0838",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "playNewMsgNotify:NotifyFlag:",
+          "address": "0x104aa0958",
+          "types": "v32@0:8@16q24"
+        },
+        {
+          "selector": "callUpdateSession:",
+          "address": "0x104aa18a0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "callUpdateSessionByName:",
+          "address": "0x104aa193c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "registerExt",
+          "address": "0x104aa1a24",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "unRegisterExt",
+          "address": "0x104aa1c0c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "addNotificationCenterObservers",
+          "address": "0x104aa1df4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "removeNotificationCenterObservers",
+          "address": "0x104aa1f4c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "fixSelfHeadImage",
+          "address": "0x104aa1f9c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "syncSaveFrontUserName",
+          "address": "0x104aa2020",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "asyncSaveFrontUserName",
+          "address": "0x104aa2100",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "init",
+          "address": "0x104aa2460",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "dealloc",
+          "address": "0x104aa26b8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getFakeCellData:",
+          "address": "0x104aa2a5c",
+          "types": "@20@0:8I16"
+        },
+        {
+          "selector": "getFakeCellCount",
+          "address": "0x104aa2ac8",
+          "types": "q16@0:8"
+        },
+        {
+          "selector": "getCellDataAtIndexPath:",
+          "address": "0x104aa2ae0",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "getCellDataForFilterSession:",
+          "address": "0x104aa2e38",
+          "types": "@20@0:8I16"
+        },
+        {
+          "selector": "updateCellData:",
+          "address": "0x104aa2f08",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "cleanupCellDataCache",
+          "address": "0x104aa2fc8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "cleanupPreLoadCacheIfNeed:",
+          "address": "0x104aa304c",
+          "types": "v20@0:8I16"
+        },
+        {
+          "selector": "getCellDataByUsrName:",
+          "address": "0x104aa30fc",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "updateTimeForAllCellDatas",
+          "address": "0x104aa31bc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "willDisplayCell:isReloadingData:",
+          "address": "0x104aa3240",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "didEndDisplayCell:isReloadingData:",
+          "address": "0x104aa38ac",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "onDidSelectCellAt:",
+          "address": "0x104aa3dec",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onViewDidAppear",
+          "address": "0x104aa41e8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onPageAppearWithVisibleCellsIndexPath:reason:",
+          "address": "0x104aa43bc",
+          "types": "v32@0:8@16q24"
+        },
+        {
+          "selector": "onPageDisappearWithVisibleCellsIndexPath:reason:",
+          "address": "0x104aa4d08",
+          "types": "v32@0:8@16q24"
+        },
+        {
+          "selector": "onTableViewReloadDataWithVisibleCellsIndexPath:",
+          "address": "0x104aa52fc",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onPageDidSelectTab",
+          "address": "0x104aa5f68",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setReadyToLoadData",
+          "address": "0x104aa5fec",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getSessionCount",
+          "address": "0x104aa6000",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "getSessionCountForSection:",
+          "address": "0x104aa600c",
+          "types": "q24@0:8q16"
+        },
+        {
+          "selector": "getVisibleSessionCount",
+          "address": "0x104aa60cc",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "getSessionInfoAtIndexPath:",
+          "address": "0x104aa628c",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "getSessionBaseInfoAtIndexPath:",
+          "address": "0x104aa63c4",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "getTotalUnreadCount",
+          "address": "0x104aa64fc",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "getUnreadNotifyChatSessionCount",
+          "address": "0x104aa65b0",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "getTotalUnreadCountForAppIcon",
+          "address": "0x104aa6664",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "getTotalUnreadCountInRedDot",
+          "address": "0x104aa6718",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "deleteSessionByUsername:",
+          "address": "0x104aa68f8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "hideSession:",
+          "address": "0x104aa6a58",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "isHasActiveUsr",
+          "address": "0x104aa6bcc",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "getFilteredSessionCount",
+          "address": "0x104aa6c64",
+          "types": "Q16@0:8"
+        },
+        {
+          "selector": "getFilteredSessionInfo:",
+          "address": "0x104aa6c90",
+          "types": "@20@0:8I16"
+        },
+        {
+          "selector": "getFirstHasUnreadMsgSessionIndexFrom:",
+          "address": "0x104aa6cfc",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "findFirstIndexPathFrom:filter:",
+          "address": "0x104aa6f14",
+          "types": "@32@0:8@16@?24"
+        },
+        {
+          "selector": "getSessionInfoByContact:",
+          "address": "0x104aa7228",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "getCurNetworkStatusType",
+          "address": "0x104aa7374",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "clearResource",
+          "address": "0x104aa7408",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onMainSessionReload",
+          "address": "0x104aa7414",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onMainSessionDelayDeleteCancel:",
+          "address": "0x104aa74ec",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onSessionTopStatusChanged:bTop:",
+          "address": "0x104aa7780",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "onSessionRebuildBegin",
+          "address": "0x104aa782c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onSessionRebuildEnd",
+          "address": "0x104aa78c0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onNeedRebuild",
+          "address": "0x104aa7954",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onSessionChanged:",
+          "address": "0x104aa79e8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onSessionTotalUnreadCountChange:",
+          "address": "0x104aa8180",
+          "types": "v20@0:8I16"
+        },
+        {
+          "selector": "onNewMsgArriving:NotifyFlag:",
+          "address": "0x104aa8214",
+          "types": "v32@0:8@16q24"
+        },
+        {
+          "selector": "onActiveUsrNameChange:curUsrName:",
+          "address": "0x104aa8398",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "onWillDeleteSession:",
+          "address": "0x104aa8548",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onDeleteSession:withUser:",
+          "address": "0x104aa8718",
+          "types": "v28@0:8I16@20"
+        },
+        {
+          "selector": "onHideSessionWithUserName:",
+          "address": "0x104aa8728",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "reportBizSessionDelete:",
+          "address": "0x104aa88a8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onNewSyncBegin",
+          "address": "0x104aa8a80",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onBypSyncBegin",
+          "address": "0x104aa8a90",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "OnChangeGroup:",
+          "address": "0x104aa8aa0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "OnChangeNotifyStatus:withStatus:",
+          "address": "0x104aa8aac",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "onNetworkStatusChange:",
+          "address": "0x104aa8ab8",
+          "types": "v20@0:8I16"
+        },
+        {
+          "selector": "pluginsChanged:",
+          "address": "0x104aa8b54",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "indexOfSessionUserName:inSection:",
+          "address": "0x104aa8bac",
+          "types": "q32@0:8@16q24"
+        },
+        {
+          "selector": "indexPathOfSessionUserName:",
+          "address": "0x104aa8c88",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "indexInAllVisibleSessions:",
+          "address": "0x104aa8d54",
+          "types": "q24@0:8@16"
+        },
+        {
+          "selector": "deleteSessionInfoAndReload:",
+          "address": "0x104aa8e0c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setJumpUnreadSessionTime:",
+          "address": "0x104aa922c",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "isTopSessionFolding",
+          "address": "0x104aa9244",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "canFoldTopSession",
+          "address": "0x104aa92dc",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "checkUnfoldSession",
+          "address": "0x104aa9390",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getUnreadTopSessionCount",
+          "address": "0x104aa94f8",
+          "types": "q16@0:8"
+        },
+        {
+          "selector": "foldAllTopUnreadSession",
+          "address": "0x104aa9590",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "foldSessionUsernames:animate:",
+          "address": "0x104aa97ec",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "unfoldAllTopSessionWithAnimte:",
+          "address": "0x104aa9bd0",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "onClickAtMainFrameTab",
+          "address": "0x104aaa054",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "lastEnterMainTabTime",
+          "address": "0x104aaa09c",
+          "types": "Q16@0:8"
+        },
+        {
+          "selector": "m_delegate",
+          "address": "0x104aaa0b4",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setM_delegate:",
+          "address": "0x104aaa0d4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "m_bReadyToLoadData",
+          "address": "0x104aaa0e8",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "m_nsLastSearchText",
+          "address": "0x104aaa0f8",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setM_nsLastSearchText:",
+          "address": "0x104aaa108",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "m_frontSessionArray",
+          "address": "0x104aaa11c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setM_frontSessionArray:",
+          "address": "0x104aaa12c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "m_delayFoldSessionForGuide",
+          "address": "0x104aaa140",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setM_delayFoldSessionForGuide:",
+          "address": "0x104aaa150",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "hasLoadSessionData",
+          "address": "0x104aaa164",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setHasLoadSessionData:",
+          "address": "0x104aaa174",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "foldReporter",
+          "address": "0x104aaa184",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setFoldReporter:",
+          "address": "0x104aaa194",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "address": "0x104aaa1a8",
+          "types": "v16@0:8"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_delegate",
+          "offset": 8,
+          "type": "@\"<MainFrameLogicControllerDelegate>\""
+        },
+        {
+          "name": "m_bPlayNewMsgDuringOneSync",
+          "offset": 16,
+          "type": "B"
+        },
+        {
+          "name": "m_bHasPlayDuringOneByPassSync",
+          "offset": 17,
+          "type": "B"
+        },
+        {
+          "name": "m_arrFilteredSession",
+          "offset": 24,
+          "type": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_nsLastSearchText",
+          "offset": 32,
+          "type": "@\"NSString\""
+        },
+        {
+          "name": "m_updateTimeLabelTimer",
+          "offset": 40,
+          "type": "@\"MMTimer\""
+        },
+        {
+          "name": "m_bReadyToLoadData",
+          "offset": 48,
+          "type": "B"
+        },
+        {
+          "name": "m_dicPlayNewMsgNotify",
+          "offset": 56,
+          "type": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "m_shownCellMaxIndex",
+          "offset": 64,
+          "type": "I"
+        },
+        {
+          "name": "m_bIsPreCreatingCellData",
+          "offset": 68,
+          "type": "B"
+        },
+        {
+          "name": "m_lastPreCreateCellIndex",
+          "offset": 72,
+          "type": "q"
+        },
+        {
+          "name": "m_contactGetter",
+          "offset": 80,
+          "type": "@\"WAContactGetter\""
+        },
+        {
+          "name": "_hasLoadSessionData",
+          "offset": 88,
+          "type": "B"
+        },
+        {
+          "name": "m_frontSessionArray",
+          "offset": 96,
+          "type": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_delayFoldSessionForGuide",
+          "offset": 104,
+          "type": "@\"NSString\""
+        },
+        {
+          "name": "_foldReporter",
+          "offset": 112,
+          "type": "@\"MainFrameFoldReporter\""
+        }
+      ],
+      "class_methods": [
+        {
+          "selector": "hasMainFrameCache",
+          "address": "0x104aa2268",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "getLastFrontSessionArray",
+          "address": "0x104aa22ec",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "getPathOfLastFrontUserName",
+          "address": "0x104aa23fc",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "getFakeCellDataFromCellData:",
+          "address": "0x104aa2714",
+          "types": "@24@0:8@16"
+        }
+      ],
+      "superclass": "MMObject"
+    },
+    "MainTabBarViewController": {
+      "address": "0x120379c98",
+      "super_raw": "0x1000002036d948",
+      "super_addr": "0x12036d948",
+      "methods": [
+        {
+          "selector": "moveFromToTabIndex:lastSelectedIsFindPage:",
+          "address": "0x104abda04",
+          "types": "v28@0:8Q16B24"
+        },
+        {
+          "selector": "timeToLazyInitAfterOpenFirstView",
+          "address": "0x104abdaec",
+          "types": "d16@0:8"
+        },
+        {
+          "selector": "goToLazyInitObject",
+          "address": "0x104abdaf4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getNewMainFrameViewController",
+          "address": "0x104abdb88",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "getContactsViewController",
+          "address": "0x104abdbfc",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "getTabBarBaseViewController:",
+          "address": "0x104abdc70",
+          "types": "@24@0:8Q16"
+        },
+        {
+          "selector": "getAllTabBaseViewControllersIfExist",
+          "address": "0x104abdd38",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "getNavigationContollerAtIndex:",
+          "address": "0x104abdd48",
+          "types": "@24@0:8Q16"
+        },
+        {
+          "selector": "getAllNavigationControllers",
+          "address": "0x104abdd94",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "OnMainFrameDoubleClicked:",
+          "address": "0x104abddc8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "OnMainFrameSingleClicked:",
+          "address": "0x104abde80",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "OnMainFrameLongPressed:",
+          "address": "0x104abdf38",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "OnMainTabBarHiddenChange:",
+          "address": "0x104abdff0",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "tabBarController:shouldSelectViewController:",
+          "address": "0x104abe080",
+          "types": "B32@0:8@16@24"
+        },
+        {
+          "selector": "tabBarController:didSelectViewController:",
+          "address": "0x104abe150",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "preloadRedDotLogic:selectedIndex:findFriendPageIndex:",
+          "address": "0x104abe3bc",
+          "types": "v36@0:8B16Q20q28"
+        },
+        {
+          "selector": "checkDBCorrupt",
+          "address": "0x104abe5d4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "tabBarController:animationControllerForTransitionFromViewController:toViewController:",
+          "address": "0x104abe778",
+          "types": "@40@0:8@16@24@32"
+        },
+        {
+          "selector": "init",
+          "address": "0x104abe968",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setSelectedIndex:",
+          "address": "0x104abeb0c",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "p_tryToInitAllControllers",
+          "address": "0x104abec50",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "p_createTabBarItems",
+          "address": "0x104abecf0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "p_createSlimViewControllers",
+          "address": "0x104abf754",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "p_getNewMainFrameViewController",
+          "address": "0x104abf994",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "p_createNewMainFrameViewController",
+          "address": "0x104abfa30",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "p_getContactsViewController",
+          "address": "0x104abfb64",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "p_createContactsViewController",
+          "address": "0x104abfc00",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "findFriendEntryViewController",
+          "address": "0x104abfd44",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "p_getFindFriendEntryViewController",
+          "address": "0x104abfd54",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "p_createFindFriendViewController",
+          "address": "0x104abfdf0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "p_getMoreViewController",
+          "address": "0x104abff24",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "p_createMoreViewController",
+          "address": "0x104abffc0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "recreateFindFriendViewController",
+          "address": "0x104ac00b8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "removeAllTabBarBaseViewController",
+          "address": "0x104ac01a4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onCaptureScreen:",
+          "address": "0x104ac0244",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "haveLazyInit",
+          "address": "0x104ac0364",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setHaveLazyInit:",
+          "address": "0x104ac0374",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "mainDelegate",
+          "address": "0x104ac0384",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setMainDelegate:",
+          "address": "0x104ac03a4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "recoverTabBarItems",
+          "address": "0x104ac03b8",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setRecoverTabBarItems:",
+          "address": "0x104ac03c8",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "address": "0x104ac03d8",
+          "types": "v16@0:8"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_whatHasInit",
+          "offset": 8,
+          "type": "I"
+        },
+        {
+          "name": "m_mainFrameViewController",
+          "offset": 16,
+          "type": "@\"NewMainFrameViewController\""
+        },
+        {
+          "name": "m_mainFrameTabItem",
+          "offset": 24,
+          "type": "@\"MMTabbarItem\""
+        },
+        {
+          "name": "m_contactsViewController",
+          "offset": 32,
+          "type": "@\"ContactsViewController\""
+        },
+        {
+          "name": "m_contacsTabItem",
+          "offset": 40,
+          "type": "@\"MMTabbarItem\""
+        },
+        {
+          "name": "m_findFriendEntryViewController",
+          "offset": 48,
+          "type": "@\"FindFriendEntryViewController\""
+        },
+        {
+          "name": "m_findFrientTabItem",
+          "offset": 56,
+          "type": "@\"MMTabbarItem\""
+        },
+        {
+          "name": "m_moreViewController",
+          "offset": 64,
+          "type": "@\"MoreViewController\""
+        },
+        {
+          "name": "m_moreTabItem",
+          "offset": 72,
+          "type": "@\"MMTabbarItem\""
+        },
+        {
+          "name": "m_arrViewController",
+          "offset": 80,
+          "type": "@\"NSMutableArray\""
+        },
+        {
+          "name": "haveLazyInit",
+          "offset": 88,
+          "type": "B"
+        },
+        {
+          "name": "_recoverTabBarItems",
+          "offset": 89,
+          "type": "B"
+        },
+        {
+          "name": "_mainDelegate",
+          "offset": 96,
+          "type": "@\"<MainTabBarControllerDelegate>\""
+        }
+      ],
+      "class_methods": [],
+      "superclass": "MMTabBarController"
+    },
+    "NewMainFrameViewController": {
+      "address": "0x120385318",
+      "super_raw": "0x1000002036d8f8",
+      "super_addr": "0x12036d8f8",
+      "methods": [
+        {
+          "selector": "needFixMaxIssueForiOS14_2Plus",
+          "address": "0x10510929c",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "notifyTaskBarOnMainTableViewInitReady",
+          "address": "0x105109358",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyTaskBarOnMainTableViewWillBeginDragging:",
+          "address": "0x105109364",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "notifyTaskBarOnMainTableViewWillEndDragging:withVelocity:targetContentOffset:",
+          "address": "0x10510942c",
+          "types": "v48@0:8@16{CGPoint=dd}24N^{CGPoint=dd}40"
+        },
+        {
+          "selector": "showTableHeaderTopViewByPullDown:",
+          "address": "0x1051096f8",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "notifyTaskBarOnMainTableViewDidEndDragging:",
+          "address": "0x1051098c4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "notifyTaskBarOnMainTableViewDidScroll:",
+          "address": "0x1051098e0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "mainTableViewOffsetDidChangeTo:",
+          "address": "0x105109c38",
+          "types": "v32@0:8{CGPoint=dd}16"
+        },
+        {
+          "selector": "updateTabbarOffset:",
+          "address": "0x10510a22c",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "notifyTaskBarOnWillBeginSearch",
+          "address": "0x10510a384",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyTaskBarOnDidEndSearch",
+          "address": "0x10510a400",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyTaskBarOnWillFocusOnFirstUnreadSession",
+          "address": "0x10510a464",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyTaskBarOnViewDidAppear",
+          "address": "0x10510a4c0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyTaskBarOnViewWillAppear",
+          "address": "0x10510a678",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyTaskBarOnViewWillDisappear",
+          "address": "0x10510a740",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyTaskBarOnViewDidDisappear",
+          "address": "0x10510a844",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "checkDisappearScene",
+          "address": "0x10510a8fc",
+          "types": "Q16@0:8"
+        },
+        {
+          "selector": "resetNavBarButtonAlpha",
+          "address": "0x10510ab68",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "initTableHeaderTopView",
+          "address": "0x10510ac8c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setTableHeaderTopViewHiddenIfNotLimitedMode:",
+          "address": "0x10510ae84",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "notifyToLazyInit",
+          "address": "0x10510af48",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyTaskBarOnViewDidTransitionToNewSize",
+          "address": "0x10510b370",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getAddBarButton",
+          "address": "0x10510b38c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "startDragToShow",
+          "address": "0x10510b404",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "endDragToShow",
+          "address": "0x10510b510",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "changeNavigationFakeBackgroundColor",
+          "address": "0x10510b68c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "initFakeNavigatioBackgroundIfNeeded",
+          "address": "0x10510b860",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "navigationBarBackgroundColor",
+          "address": "0x10510bde8",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "navigationBarBlurEffect",
+          "address": "0x10510be94",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "beginSetShowTableHeaderTopView",
+          "address": "0x10510bf18",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "endSetShowTableHeaderTopView",
+          "address": "0x10510bf40",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "beginSetHideTableHeaderTopView",
+          "address": "0x10510bf54",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "endSetHideTableHeaderTopView",
+          "address": "0x10510bf84",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onTaskBarPlaceholderReady",
+          "address": "0x10510bf98",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "closePlaceholderRefreshWindow",
+          "address": "0x10510c12c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onPlaceholderRefreshWindowTimerFire",
+          "address": "0x10510c1cc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "restoreTaskBarSearchPlaceholderToDefault",
+          "address": "0x10510c23c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "showTableHeaderTopView:fromScene:",
+          "address": "0x10510c2b4",
+          "types": "v28@0:8B16Q20"
+        },
+        {
+          "selector": "setTableViewContentInsetAndOffsetWithIsTopViewShow:fromScene:completion:canceled:",
+          "address": "0x10510d480",
+          "types": "v44@0:8B16Q20@?28@?36"
+        },
+        {
+          "selector": "mainPullDown:",
+          "address": "0x10510e054",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "tableViewIsDragging",
+          "address": "0x10510e398",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setTableViewContentInsetOffsetWithoutScrollWithContentInset:contentOffset:",
+          "address": "0x10510e3b4",
+          "types": "v64@0:8{UIEdgeInsets=dddd}16{CGPoint=dd}48"
+        },
+        {
+          "selector": "hideNavigationBarForTaskBarCloseScene:",
+          "address": "0x10510e4ac",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "checkTaskBarHiddenState",
+          "address": "0x10510e4b0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "isNeedAnimateNavigationBarBeforeSettingContentOffSet",
+          "address": "0x10510e4d8",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "changeTaskBarViewHeightTo:",
+          "address": "0x10510e534",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "changeContentInsetTopTo:",
+          "address": "0x10510e5ac",
+          "types": "{UIEdgeInsets=dddd}24@0:8d16"
+        },
+        {
+          "selector": "useBlackStatusbar",
+          "address": "0x10510e64c",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "getFullScreenHeight",
+          "address": "0x10510e654",
+          "types": "d16@0:8"
+        },
+        {
+          "selector": "hideStatusBar",
+          "address": "0x10510e6f8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "showStatusBar",
+          "address": "0x10510ea7c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "isXDevice",
+          "address": "0x10510edc0",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "useWhiteStatusBarColorWhenShown",
+          "address": "0x10510ee04",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "taskBarDidDragUpToClose",
+          "address": "0x10510ee20",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onTaskBarDataStartUpdateFromSvr:",
+          "address": "0x10510ee9c",
+          "types": "v20@0:8I16"
+        },
+        {
+          "selector": "onTaskBarDataUpdatedFromSource:",
+          "address": "0x10510ef34",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "onTaskBarSectionShouldRemove:",
+          "address": "0x10510f064",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "updateTaskBarDataIfNeeded",
+          "address": "0x10510f0cc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "doUpdateTaskBarData",
+          "address": "0x10510f20c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "doRefreshTaskBarCommonUseDataImmediately:",
+          "address": "0x10510f334",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "onReceiveVisibleTick",
+          "address": "0x10510f45c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onDeleteToEmptyTaskBar",
+          "address": "0x10510f460",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onTaskBarHeightDidChangeTo:",
+          "address": "0x10510f4e0",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "didRotateToInterfaceOrientation:",
+          "address": "0x10510f568",
+          "types": "v24@0:8q16"
+        },
+        {
+          "selector": "onStarNodeShowStatusDidChangedTo:",
+          "address": "0x10510f698",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "onTapOnSearchButton",
+          "address": "0x10510f744",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onSearchPageClickCancel",
+          "address": "0x10510f80c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "didEnterWeappSearchPage",
+          "address": "0x10510f8dc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "willEndSearch",
+          "address": "0x10510f934",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onTapOnFoldButton",
+          "address": "0x10510f978",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onTapOnFakeRightMenuButton",
+          "address": "0x10510f9f4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "isTaskBarNeedHideTabBar",
+          "address": "0x10510fa70",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "willOpenWeapp:",
+          "address": "0x10510fa8c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "didOpenWeapp:isSuccess:",
+          "address": "0x10510fb1c",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "onEnterForeground",
+          "address": "0x10510fbe8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getTaskBarView",
+          "address": "0x10510fd00",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "getRightBarButton",
+          "address": "0x10510fd14",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "getLeftBarButton",
+          "address": "0x10510fd90",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "willOpenMainListVC",
+          "address": "0x10510fe0c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setTableViewContentOffset:",
+          "address": "0x10510fe18",
+          "types": "v32@0:8{CGPoint=dd}16"
+        },
+        {
+          "selector": "checkTaskBarViewWidth",
+          "address": "0x10510fe34",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "checkShouldBlockMainFrameScrollView",
+          "address": "0x105110084",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "handleTouchesShouldCancelInContentView:",
+          "address": "0x10511008c",
+          "types": "Q24@0:8@16"
+        },
+        {
+          "selector": "handleTouchesShouldBegin:withEvent:inContentView:",
+          "address": "0x105110294",
+          "types": "Q40@0:8@16@24@32"
+        },
+        {
+          "selector": "notifyTaskBarOnUpdateTitleView:title:",
+          "address": "0x105110454",
+          "types": "v28@0:8I16@20"
+        },
+        {
+          "selector": "notifyTaskBarOnUpdateTitleViewNearMode",
+          "address": "0x105110470",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyTaskBarOnRightBtnRedDotShow:",
+          "address": "0x10511048c",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "notifyLimitedModeUpdated",
+          "address": "0x1051104a8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifySilentModeUpdated",
+          "address": "0x1051104c4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "shouldMiniTaskGestureBegin",
+          "address": "0x1051104e0",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "notifyTaskBarUpdateLiveInfo",
+          "address": "0x105110510",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "delaySetJSC2QOSToAvoidWKMixedContentUpdate",
+          "address": "0x105110530",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onCreateNewMessage",
+          "address": "0x105107f84",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onAddContact",
+          "address": "0x105108018",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onCreateScanCamera",
+          "address": "0x105108090",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "createVoiceVOIPChat",
+          "address": "0x105108240",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "createVideoVOIPChat",
+          "address": "0x1051082ec",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onFilterContactCandidate:",
+          "address": "0x105108398",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "onSelectContactReturn:atScene:",
+          "address": "0x1051083a0",
+          "types": "v28@0:8@16I24"
+        },
+        {
+          "selector": "showMyWCView",
+          "address": "0x10510851c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "showWCPayView",
+          "address": "0x105108668",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "showEmoticonStoreView",
+          "address": "0x10510883c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "showQRInfoView",
+          "address": "0x105108920",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onMassSend",
+          "address": "0x105108a34",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onCreateNote",
+          "address": "0x105108ab0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onRadar",
+          "address": "0x105108b38",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "openFace2FaceReceiveMoney",
+          "address": "0x105108bbc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "openOverseaFacingReceiveMoney",
+          "address": "0x105108ca8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "openOverseaSelectReceiveOrPayMoney",
+          "address": "0x105108d40",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "openSelectReceiveOrPayMoney",
+          "address": "0x105108dd8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "openSelectReceiveOrPayMoneyFromShortcut",
+          "address": "0x1051090b4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "openSelectHKReceiveOrPayMoneyFromShortcut",
+          "address": "0x105109204",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyProtectLogicAtViewDidAppear",
+          "address": "0x1051074b4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyProtectLogicAtViewWillDisappear",
+          "address": "0x105107550",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "tryFixNavigationBar",
+          "address": "0x105107618",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onTitleView:alphaChange:",
+          "address": "0x105107f34",
+          "types": "v32@0:8@16d24"
+        },
+        {
+          "selector": "notifyToLazyInitMiniTaskVC",
+          "address": "0x105105ff4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyMiniTaskEntryWhenViewWillAppear",
+          "address": "0x105106244",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "animateStarEntryIfNeeded",
+          "address": "0x10510631c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyMiniTaskEntryWhenTaskViewDidHide",
+          "address": "0x105106520",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyMiniTaskEntryWhenViewDidAppear",
+          "address": "0x10510652c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyMiniTaskEntryWhenViewWillDisappear",
+          "address": "0x105106b8c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyMiniTaskEntryWhenViewDidDisappear",
+          "address": "0x105106c10",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "notifyMiniTaskEntryStateChanegd",
+          "address": "0x105106c14",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onMiniTaskPushGestureEnded:",
+          "address": "0x105106c20",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "leftItemView",
+          "address": "0x105106c8c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "reportMinimizeEntryExpose",
+          "address": "0x105106d50",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "shouldShowQuickReplyPush:",
+          "address": "0x1003df630",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "timeToLazyInitAfterOpenFirstView",
+          "address": "0x105110794",
+          "types": "d16@0:8"
+        },
+        {
+          "selector": "goToLazyInitObject",
+          "address": "0x1051107f8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "delayToLoadMainTableViewData",
+          "address": "0x10511096c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "doMainLazyThing",
+          "address": "0x105110a84",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "appBecomeActive",
+          "address": "0x105110df8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "updateFoldSessionEntry",
+          "address": "0x105110ef4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "firstSessionIndexPath",
+          "address": "0x1051112ac",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "isViewControllerVisible",
+          "address": "0x105111364",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "maxSessionCountInOneScreen",
+          "address": "0x10511144c",
+          "types": "q16@0:8"
+        },
+        {
+          "selector": "initWithNibName:bundle:",
+          "address": "0x105111674",
+          "types": "@32@0:8@16@24"
+        },
+        {
+          "selector": "setNewMainFrameTableViewContentOffset:",
+          "address": "0x105111a3c",
+          "types": "v32@0:8{CGPoint=dd}16"
+        },
+        {
+          "selector": "goToNextUnreadSessionWithOpen:",
+          "address": "0x105111acc",
+          "types": "@20@0:8B16"
+        },
+        {
+          "selector": "onClickAtMainFrameTab",
+          "address": "0x105112148",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onDoubleClickAtMainFrameTab",
+          "address": "0x105112310",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onLongPressAtMainFrameTab",
+          "address": "0x105112508",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "showAggregationWithShock:",
+          "address": "0x1051126b8",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "willAppear",
+          "address": "0x10511295c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "updateUnReadCount",
+          "address": "0x1051129d4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "updateTitleView",
+          "address": "0x105112cc0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "reLayoutSubviews",
+          "address": "0x105112d88",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "viewDidTransitionToNewSize",
+          "address": "0x105113010",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "viewDidLayoutSubviews",
+          "address": "0x10511320c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "initData",
+          "address": "0x105113380",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "tryDoLazyInitThing",
+          "address": "0x1051134d0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "initTitle",
+          "address": "0x10511368c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "initNavigationTitileView",
+          "address": "0x105113954",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "initTableView",
+          "address": "0x105113a28",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "initHeaderLogicAndHeaderView",
+          "address": "0x105113e9c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "isVoiceSearchLongPressEntranceEnabled",
+          "address": "0x105114118",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "updateVoiceSearchPlaceholderEnabled:",
+          "address": "0x10511429c",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "refreshVoiceSearchOrientationFromDetectorAnimated:",
+          "address": "0x10511446c",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "onVoiceSearchRotationChanged:",
+          "address": "0x1051145b8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "startVoiceSearchRotationDetection",
+          "address": "0x1051146e8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "stopVoiceSearchRotationDetection",
+          "address": "0x1051148e4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "lockVoiceSearchOrientationUpsideDown:",
+          "address": "0x105114990",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "unlockVoiceSearchOrientation",
+          "address": "0x105114a0c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "cancelVoiceFCProcessingTimeout",
+          "address": "0x105114a68",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "cancelVoiceFCMicStartTimeout",
+          "address": "0x105114ac0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "finishVoiceFCRequestForHint:requestGeneration:",
+          "address": "0x105114b18",
+          "types": "B32@0:8@16Q24"
+        },
+        {
+          "selector": "startVoiceFCProcessingTimeoutForHint:requestGeneration:",
+          "address": "0x105114e50",
+          "types": "v32@0:8@16Q24"
+        },
+        {
+          "selector": "onVoiceFCProcessingTimeout:",
+          "address": "0x105114fb8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "startVoiceFCMicStartTimeoutForHint:requestGeneration:",
+          "address": "0x1051152d0",
+          "types": "v32@0:8@16Q24"
+        },
+        {
+          "selector": "onVoiceFCMicStartTimeout:",
+          "address": "0x105115438",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "updateVoiceFCRecordingAppearanceForHint:requestGeneration:",
+          "address": "0x105115684",
+          "types": "v32@0:8@16Q24"
+        },
+        {
+          "selector": "initTableHeaderView",
+          "address": "0x1051157e4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "initFooterView",
+          "address": "0x105117a78",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "forceReInitTableView",
+          "address": "0x105118330",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "updateTopSessionFoldView",
+          "address": "0x1051183cc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "updateFoldViewFloatingOffset",
+          "address": "0x105118498",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "refreshAfterMuteFlagChange",
+          "address": "0x1051185d4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "reloadAll",
+          "address": "0x105118614",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "checkHeaderRowValid:",
+          "address": "0x10511862c",
+          "types": "B20@0:8I16"
+        },
+        {
+          "selector": "insertRow:",
+          "address": "0x10511868c",
+          "types": "v20@0:8I16"
+        },
+        {
+          "selector": "removeRow:",
+          "address": "0x105118770",
+          "types": "v20@0:8I16"
+        },
+        {
+          "selector": "PushViewController:",
+          "address": "0x105118854",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "PopViewContoller",
+          "address": "0x1051188c4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "OpenContactInfo:",
+          "address": "0x105118910",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "getViewController",
+          "address": "0x10511891c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "showInviteFriendList",
+          "address": "0x105118920",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "initView",
+          "address": "0x105118a04",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "viewWillAppear:",
+          "address": "0x105118b28",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "viewWillDisappear:",
+          "address": "0x105118ec4",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "viewDidAppear:",
+          "address": "0x1051190a0",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "viewDidPopOrDismiss:",
+          "address": "0x105119c08",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "removeMainFrameTip",
+          "address": "0x105119c3c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "viewWillPop:",
+          "address": "0x105119c88",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "viewDidPop:",
+          "address": "0x105119d34",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "viewDidDisappear:",
+          "address": "0x105119de0",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "viewDidLoad",
+          "address": "0x10511a05c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "unLoadView",
+          "address": "0x10511a630",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "resetViewStatus",
+          "address": "0x10511a7a0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "didReceiveMemoryWarning",
+          "address": "0x10511a8e0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "dealloc",
+          "address": "0x10511a9dc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onMainTabBarHiddenChange:",
+          "address": "0x10511ab28",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "backToSplitViewEmptyViewController:",
+          "address": "0x10511abe0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "isTopRightMenuShowID:",
+          "address": "0x10511ace4",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "getContentViewY",
+          "address": "0x10511ad80",
+          "types": "d16@0:8"
+        },
+        {
+          "selector": "onCreateChatContactReturn:",
+          "address": "0x10511adcc",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "updateNearMode",
+          "address": "0x10511aedc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "openWeSportView:completion:",
+          "address": "0x10511af1c",
+          "types": "v32@0:8@16@?24"
+        },
+        {
+          "selector": "openFinderBoxBrandFromSource:sessionInfo:indexPath:completion:",
+          "address": "0x10511b000",
+          "types": "v48@0:8Q16@24@32@?40"
+        },
+        {
+          "selector": "openBrandSessionViewFromSource:",
+          "address": "0x10511b454",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "openBrandSessionViewFromSource:source:",
+          "address": "0x10511b468",
+          "types": "v32@0:8@16Q24"
+        },
+        {
+          "selector": "openBrandSessionViewFromSource:sessionInfo:indexPath:",
+          "address": "0x10511b488",
+          "types": "v40@0:8Q16@24@32"
+        },
+        {
+          "selector": "openBrandSessionViewFromSource:sessionInfo:indexPath:completion:",
+          "address": "0x10511b498",
+          "types": "v48@0:8Q16@24@32@?40"
+        },
+        {
+          "selector": "openBrandSessionViewFromSource:sessionInfo:indexPath:curViewController:completion:",
+          "address": "0x10511b4ac",
+          "types": "v56@0:8Q16@24@32@40@?48"
+        },
+        {
+          "selector": "internalOpenBrandSessionViewFromSource:sessionInfo:indexPath:curViewController:completion:",
+          "address": "0x10511b86c",
+          "types": "v56@0:8Q16@24@32@40@?48"
+        },
+        {
+          "selector": "isBrandTLCacheExist",
+          "address": "0x10511c434",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "openBrandServiceSessionViewFromSource:",
+          "address": "0x10511c44c",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "openBrandServiceSessionViewFromSource:source:",
+          "address": "0x10511c468",
+          "types": "v32@0:8@16Q24"
+        },
+        {
+          "selector": "openBrandServiceSessionViewFromSource:sessionInfo:indexPath:completion:",
+          "address": "0x10511c488",
+          "types": "v48@0:8Q16@24@32@?40"
+        },
+        {
+          "selector": "openBrandServiceSessionViewFromSource:sessionInfo:indexPath:curViewController:completion:",
+          "address": "0x10511c49c",
+          "types": "v56@0:8Q16@24@32@40@?48"
+        },
+        {
+          "selector": "internalOpenBrandServiceSessionViewFromSource:sessionInfo:indexPath:curViewController:completion:",
+          "address": "0x10511c4a8",
+          "types": "v56@0:8Q16@24@32@40@?48"
+        },
+        {
+          "selector": "openWeAppSessionView:",
+          "address": "0x10511c694",
+          "types": "v24@0:8@?16"
+        },
+        {
+          "selector": "openWWKFSessionView:completion:",
+          "address": "0x10511c730",
+          "types": "v32@0:8@16@?24"
+        },
+        {
+          "selector": "openEnterpriseBrandSessionView:completion:",
+          "address": "0x10511caec",
+          "types": "v32@0:8@16@?24"
+        },
+        {
+          "selector": "openEnterpriseChatSessionListView:animated:completion:",
+          "address": "0x10511cc50",
+          "types": "v36@0:8@16B24@?28"
+        },
+        {
+          "selector": "openMessageContentView:startSendMessage:msgWrapToAdd:animated:jumpToFirstUnreadNode:indexPath:",
+          "address": "0x10511cddc",
+          "types": "v52@0:8@16B24@28B36B40@44"
+        },
+        {
+          "selector": "tryMoveToMainFrameTab",
+          "address": "0x10511ce0c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "openMessageContentView:startSendMessage:msgWrapToAdd:animated:jumpToFirstUnreadNode:indexPath:reuse:extraInfo:",
+          "address": "0x10511ceac",
+          "types": "v64@0:8@16B24@28B36B40@44B52@56"
+        },
+        {
+          "selector": "openMessageContentView:startSendMessage:msgWrapToAdd:animated:jumpToFirstUnreadNode:indexPath:reuse:extraInfo:navigationController:completion:",
+          "address": "0x10511d09c",
+          "types": "v80@0:8@16B24@28B36B40@44B52@56@64@?72"
+        },
+        {
+          "selector": "tryOpenMessageContentView:startSendMessage:msgWrapToAdd:animated:jumpToFirstUnreadNode:indexPath:reuse:extraInfo:navigationController:firstUnreadMessageWrap:completion:",
+          "address": "0x10511deac",
+          "types": "v88@0:8@16B24@28B36B40@44B52@56@64@72@?80"
+        },
+        {
+          "selector": "tableView:titleForDeleteConfirmationButtonForRowAtIndexPath:",
+          "address": "0x10511e968",
+          "types": "@32@0:8@16@24"
+        },
+        {
+          "selector": "numberOfSectionsInTableView:",
+          "address": "0x10511ea10",
+          "types": "q24@0:8@16"
+        },
+        {
+          "selector": "tableView:numberOfRowsInSection:",
+          "address": "0x10511ea44",
+          "types": "q32@0:8@16q24"
+        },
+        {
+          "selector": "tableView:cellForRowAtIndexPath:",
+          "address": "0x10511eafc",
+          "types": "@32@0:8@16@24"
+        },
+        {
+          "selector": "tableView:viewForFooterInSection:",
+          "address": "0x10511f64c",
+          "types": "@32@0:8@16q24"
+        },
+        {
+          "selector": "tableView:heightForFooterInSection:",
+          "address": "0x10511f73c",
+          "types": "d32@0:8@16q24"
+        },
+        {
+          "selector": "tableView:heightForRowAtIndexPath:",
+          "address": "0x10511f7cc",
+          "types": "d32@0:8@16@24"
+        },
+        {
+          "selector": "openPluginContactInfoView:",
+          "address": "0x10511fa20",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "isOpenPluginContactInfoView:",
+          "address": "0x10511fb9c",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "isNeedShowProfileInVoiceSearch:",
+          "address": "0x10511fc38",
+          "types": "B24@0:8q16"
+        },
+        {
+          "selector": "openContactInfoView:",
+          "address": "0x10511fc50",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "handleSelectIndexPath:tableView:",
+          "address": "0x10511feac",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "tableView:didSelectRowAtIndexPath:",
+          "address": "0x1051203a0",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "tableView:canEditRowAtIndexPath:",
+          "address": "0x105120630",
+          "types": "B32@0:8@16@24"
+        },
+        {
+          "selector": "tableView:editingStyleForRowAtIndexPath:",
+          "address": "0x105120658",
+          "types": "q32@0:8@16@24"
+        },
+        {
+          "selector": "tableView:willBeginEditingRowAtIndexPath:",
+          "address": "0x105120680",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "tableView:didEndEditingRowAtIndexPath:",
+          "address": "0x105120900",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "tableView:willDisplayCell:forRowAtIndexPath:",
+          "address": "0x1051209e4",
+          "types": "v40@0:8@16@24@32"
+        },
+        {
+          "selector": "tableView:didEndDisplayingCell:forRowAtIndexPath:",
+          "address": "0x105120c98",
+          "types": "v40@0:8@16@24@32"
+        },
+        {
+          "selector": "updateSelectCellByUsername:indexPath:cell:",
+          "address": "0x105120db8",
+          "types": "v40@0:8@16@24@32"
+        },
+        {
+          "selector": "shouldDeselectCellByUsername:indexPath:",
+          "address": "0x10512104c",
+          "types": "B32@0:8@16@24"
+        },
+        {
+          "selector": "tableView:commitEditingStyle:forRowAtIndexPath:",
+          "address": "0x1051211f0",
+          "types": "v40@0:8@16q24@32"
+        },
+        {
+          "selector": "visibleIndexPaths",
+          "address": "0x1051212a8",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "indexInAllVisibleSessions:",
+          "address": "0x10512148c",
+          "types": "q24@0:8@16"
+        },
+        {
+          "selector": "indexPathOfSessionUserName:",
+          "address": "0x1051214a4",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "logicGetSessionAtIndexPath:",
+          "address": "0x1051214bc",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "logicGetCellDataAtIndexPath:",
+          "address": "0x1051214d4",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "logicUpdateSession:",
+          "address": "0x1051214ec",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "logicGetCountForSection:",
+          "address": "0x1051214f8",
+          "types": "q24@0:8q16"
+        },
+        {
+          "selector": "onLogicHideSession:",
+          "address": "0x105121510",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onLogicDeleteSessionByUsername:",
+          "address": "0x105121528",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onLogicOpenSession:",
+          "address": "0x105121540",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "isSearching",
+          "address": "0x105121560",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "showSearchBar:",
+          "address": "0x1051215bc",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "showSearchBar:searchBar:",
+          "address": "0x105121630",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "setSearchBarActive:",
+          "address": "0x105121c68",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "cancelSearch",
+          "address": "0x105121cb0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "doGlobalSearchPrepareWork",
+          "address": "0x105121d6c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "deleteSessionCellAtIndexes:",
+          "address": "0x1051221b8",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "insertSessionCellAtIndexes:scrollToCell:",
+          "address": "0x1051224c0",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "reloadSessions",
+          "address": "0x105122814",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "clearSessionCache",
+          "address": "0x105122bdc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "updateSession:",
+          "address": "0x105122c24",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "updateAllItemTimeLabel",
+          "address": "0x105122d38",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "cancelSelectedCell",
+          "address": "0x105122dc0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "selectCellForName:",
+          "address": "0x105123168",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "deleteSessionCell:atSection:withUser:",
+          "address": "0x105123308",
+          "types": "v36@0:8I16q20@28"
+        },
+        {
+          "selector": "initLoadingView",
+          "address": "0x105123664",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "startLoadingForSessionRebuild",
+          "address": "0x105123708",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "stopLoadingForSessionRebuild",
+          "address": "0x1051237dc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "startLoading",
+          "address": "0x1051237e8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "stopLoading",
+          "address": "0x1051239b4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "newMessageFromContactInfo:",
+          "address": "0x105123b90",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "resetTableViewOffset:",
+          "address": "0x105123c8c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "newMessageByContact:msgWrapToAdd:animated:FromOtherTab:reuse:extraInfo:",
+          "address": "0x105123dd0",
+          "types": "v52@0:8@16@24B32B36B40@44"
+        },
+        {
+          "selector": "newMessageByContact:msgWrapToAdd:animated:FromOtherTab:reuse:extraInfo:completion:",
+          "address": "0x105123df8",
+          "types": "v60@0:8@16@24B32B36B40@44@?52"
+        },
+        {
+          "selector": "newMessageByContact:msgWrapToAdd:animated:FromOtherTab:reuse:extraInfo:navigationController:completion:",
+          "address": "0x105123e24",
+          "types": "v68@0:8@16@24B32B36B40@44@52@?60"
+        },
+        {
+          "selector": "newMessageByContact:msgWrapToAdd:animated:FromOtherTab:",
+          "address": "0x1051240a8",
+          "types": "v40@0:8@16@24B32B36"
+        },
+        {
+          "selector": "newMessageByContact:msgWrapToAdd:animated:",
+          "address": "0x1051240bc",
+          "types": "v36@0:8@16@24B32"
+        },
+        {
+          "selector": "newMessageByContact:msgWrapToAdd:",
+          "address": "0x1051240cc",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "clearResource",
+          "address": "0x1051240dc",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getTotalUnreadCount",
+          "address": "0x10512416c",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "getAppIconTotalUnreadCount",
+          "address": "0x105124184",
+          "types": "I16@0:8"
+        },
+        {
+          "selector": "changeNetworkStatus:",
+          "address": "0x10512419c",
+          "types": "v20@0:8I16"
+        },
+        {
+          "selector": "updateViewWhenSelectTab:",
+          "address": "0x1051241a8",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "shouldShowTabbar",
+          "address": "0x105124450",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "SearchBarBecomeUnActive",
+          "address": "0x105124544",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onAuthOK",
+          "address": "0x10512478c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "updateItem:",
+          "address": "0x105124850",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "OnRoomMemberChange:withNewMemberList:",
+          "address": "0x105124a58",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "OnTrackRoomMemberChange:withNewMemberList:",
+          "address": "0x105124a64",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "onSetStrangerRemark:",
+          "address": "0x105124a70",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "scrollViewDidScroll:",
+          "address": "0x105124aac",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "scrollViewWillBeginDragging:",
+          "address": "0x105124b88",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "scrollViewDidEndDragging:willDecelerate:",
+          "address": "0x105124ca4",
+          "types": "v28@0:8@16B24"
+        },
+        {
+          "selector": "scrollViewWillEndDragging:withVelocity:targetContentOffset:",
+          "address": "0x105124d68",
+          "types": "v48@0:8@16{CGPoint=dd}24N^{CGPoint=dd}40"
+        },
+        {
+          "selector": "scrollViewDidEndDecelerating:",
+          "address": "0x105124df0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "scrollViewDidScrollToTop:",
+          "address": "0x105124e80",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "checkIsMainFrameScrollView:",
+          "address": "0x105124ef0",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "onMMDynamicConfigUpdated",
+          "address": "0x105124f08",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onLimitedModeChanged",
+          "address": "0x105124f14",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onLimitedModeBizLevelChange:bizType:",
+          "address": "0x105124fac",
+          "types": "v32@0:8q16q24"
+        },
+        {
+          "selector": "onSilentModeChangeAllowPlaySoundTemporary",
+          "address": "0x105124fb8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onSilentModeChangeOnForRouteChange",
+          "address": "0x105124ff8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onMiniTaskEntryShowStateChanged",
+          "address": "0x105125038",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "openMassSend",
+          "address": "0x105125044",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "getVCWithDeepLinkName:",
+          "address": "0x1051250d4",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "setupDeepLinkConfig",
+          "address": "0x1051252ac",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "previewingContext:viewControllerForLocation:",
+          "address": "0x1051254c4",
+          "types": "@40@0:8@16{CGPoint=dd}24"
+        },
+        {
+          "selector": "previewingContext:commitViewController:",
+          "address": "0x105125c08",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "traitCollectionDidChange:",
+          "address": "0x105125e40",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "tagForCurrentPage",
+          "address": "0x10512611c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setSearchBarToTableHeaderView",
+          "address": "0x105126124",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onSearchButtonTapped",
+          "address": "0x1051261b4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onSearch",
+          "address": "0x1051261d4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onNextUnreadChat",
+          "address": "0x1051261e4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "newChat",
+          "address": "0x10512620c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "closeCurChat",
+          "address": "0x1051262a0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onNextChat",
+          "address": "0x1051263b4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onLastChat",
+          "address": "0x1051265d0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "MMUIViewControllerDidBeRemoved:",
+          "address": "0x1051267d0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onBrandTimelineReturn",
+          "address": "0x1051267f4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onBrandTimelineCacheTimeOut",
+          "address": "0x105126bac",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onMigrateBrandMsgFinish:",
+          "address": "0x105126db0",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "onBoxChangeBizTimelineDisplayMode",
+          "address": "0x105126e20",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onBrandTLExptStatusChange",
+          "address": "0x105126e90",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "checkReleaseBrandTLWithNewExptConfig:",
+          "address": "0x105126e9c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "onDeleteBrandSessionHolder",
+          "address": "0x105126f58",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onRequestCleanBrandTimelineVC",
+          "address": "0x105126fc8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onDeleteBrandEcsSessionHolder",
+          "address": "0x105127038",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onTextStateDataLoaded",
+          "address": "0x105127104",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onTextStateDataUpdated",
+          "address": "0x10512711c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onBoxMigrateBrandMsgFinish:",
+          "address": "0x105127134",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "onBoxBrandTLExptStatusChange",
+          "address": "0x1051271a4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onBoxDeleteBrandSessionHolder",
+          "address": "0x105127214",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onRedDotShowed:",
+          "address": "0x105127284",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "willEnterForeground:",
+          "address": "0x105127290",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "didEnterBackground:",
+          "address": "0x105127350",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "mmTableViewDidFinishedLoading:",
+          "address": "0x105127610",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "curViewController",
+          "address": "0x1051276cc",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "onSelectAtSectionFoldView",
+          "address": "0x1051276d0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "shouldShowFoldSectionTopSep",
+          "address": "0x105127910",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "onFTSSearchEnd",
+          "address": "0x105127944",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onMainFrameShowChatBoxGuideAnimation",
+          "address": "0x105127988",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setTableViewAccessibilityElementExceptTaskBar:",
+          "address": "0x105127f44",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "accessibilityScroll:",
+          "address": "0x105128080",
+          "types": "B24@0:8q16"
+        },
+        {
+          "selector": "isUnexpectedClickAtIndexPath:",
+          "address": "0x105128230",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "setupMenuBarSearchEntryConfig",
+          "address": "0x105128600",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "checkAndUpdateMenuBarItemSearchState:",
+          "address": "0x105128728",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "registerYReportSdk",
+          "address": "0x1051288e8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "onAggregation:openSession:",
+          "address": "0x1051289b4",
+          "types": "v32@0:8@16@24"
+        },
+        {
+          "selector": "getTabBarItemIndex",
+          "address": "0x1051289c4",
+          "types": "Q16@0:8"
+        },
+        {
+          "selector": "m_createChatLogic",
+          "address": "0x1051289cc",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setM_createChatLogic:",
+          "address": "0x1051289dc",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "m_nsTitle",
+          "address": "0x1051289f0",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setM_nsTitle:",
+          "address": "0x105128a00",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "haveLazyInit",
+          "address": "0x105128a14",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setHaveLazyInit:",
+          "address": "0x105128a24",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "m_tableView",
+          "address": "0x105128a34",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setM_tableView:",
+          "address": "0x105128a44",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "searchBar",
+          "address": "0x105128a58",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setSearchBar:",
+          "address": "0x105128a68",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "voiceHintVC",
+          "address": "0x105128a7c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setVoiceHintVC:",
+          "address": "0x105128a8c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "voiceLongPressBeginY",
+          "address": "0x105128aa0",
+          "types": "d16@0:8"
+        },
+        {
+          "selector": "setVoiceLongPressBeginY:",
+          "address": "0x105128ab0",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "voiceIsCancelState",
+          "address": "0x105128ac0",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setVoiceIsCancelState:",
+          "address": "0x105128ad0",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "voiceFCSessionID",
+          "address": "0x105128ae0",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setVoiceFCSessionID:",
+          "address": "0x105128af0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "voiceFCProcessingTimer",
+          "address": "0x105128afc",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setVoiceFCProcessingTimer:",
+          "address": "0x105128b0c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "voiceFCMicStartTimer",
+          "address": "0x105128b20",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setVoiceFCMicStartTimer:",
+          "address": "0x105128b30",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "voiceFCRequestGeneration",
+          "address": "0x105128b44",
+          "types": "Q16@0:8"
+        },
+        {
+          "selector": "setVoiceFCRequestGeneration:",
+          "address": "0x105128b54",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "voiceFCRequestFinished",
+          "address": "0x105128b64",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setVoiceFCRequestFinished:",
+          "address": "0x105128b74",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "voiceFCMicReady",
+          "address": "0x105128b84",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setVoiceFCMicReady:",
+          "address": "0x105128b94",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "voiceFCEntryAnimationFinished",
+          "address": "0x105128ba4",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setVoiceFCEntryAnimationFinished:",
+          "address": "0x105128bb4",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "voiceSearchReportRoundID",
+          "address": "0x105128bc4",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setVoiceSearchReportRoundID:",
+          "address": "0x105128bd4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "voiceSearchTouchHapticGenerator",
+          "address": "0x105128be0",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setVoiceSearchTouchHapticGenerator:",
+          "address": "0x105128bf0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "voiceSearchUpsideDown",
+          "address": "0x105128c04",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setVoiceSearchUpsideDown:",
+          "address": "0x105128c14",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "voiceSearchOrientationLocked",
+          "address": "0x105128c24",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setVoiceSearchOrientationLocked:",
+          "address": "0x105128c34",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "voiceSearchRotationDetector",
+          "address": "0x105128c44",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setVoiceSearchRotationDetector:",
+          "address": "0x105128c54",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "unreadReporter",
+          "address": "0x105128c68",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setUnreadReporter:",
+          "address": "0x105128c78",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "animator",
+          "address": "0x105128c8c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setAnimator:",
+          "address": "0x105128c9c",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "topSessionFoldView",
+          "address": "0x105128cb0",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setTopSessionFoldView:",
+          "address": "0x105128cc0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "lastHomeViewController",
+          "address": "0x105128cd4",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setLastHomeViewController:",
+          "address": "0x105128cf4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "disableTableAnimation",
+          "address": "0x105128d08",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setDisableTableAnimation:",
+          "address": "0x105128d18",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "foldViewFloatingOffset",
+          "address": "0x105128d28",
+          "types": "d16@0:8"
+        },
+        {
+          "selector": "setFoldViewFloatingOffset:",
+          "address": "0x105128d38",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "sessionEditingLogic",
+          "address": "0x105128d48",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setSessionEditingLogic:",
+          "address": "0x105128d58",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setMaxSessionCountInOneScreen:",
+          "address": "0x105128d6c",
+          "types": "v24@0:8q16"
+        },
+        {
+          "selector": "lastReloadTableTime",
+          "address": "0x105128d7c",
+          "types": "Q16@0:8"
+        },
+        {
+          "selector": "setLastReloadTableTime:",
+          "address": "0x105128d8c",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "isAppear",
+          "address": "0x105128d9c",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setIsAppear:",
+          "address": "0x105128dac",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "finderBoxOpener",
+          "address": "0x105128dbc",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setFinderBoxOpener:",
+          "address": "0x105128dcc",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "curTabPageSource",
+          "address": "0x105128de0",
+          "types": "q16@0:8"
+        },
+        {
+          "selector": "setCurTabPageSource:",
+          "address": "0x105128df0",
+          "types": "v24@0:8q16"
+        },
+        {
+          "selector": "hasReportNavBarBroken",
+          "address": "0x105128e00",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setHasReportNavBarBroken:",
+          "address": "0x105128e10",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": "fakeNavBarView",
+          "address": "0x105128e20",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setFakeNavBarView:",
+          "address": "0x105128e30",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "willAppearFromFailedMiniTaskPushAnimation",
+          "address": "0x105128e44",
+          "types": "B16@0:8"
+        },
+        {
+          "selector": "setWillAppearFromFailedMiniTaskPushAnimation:",
+          "address": "0x105128e54",
+          "types": "v20@0:8B16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "address": "0x105128e64",
+          "types": "v16@0:8"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_mainFrameLogicController",
+          "offset": 112,
+          "type": "@\"MainFrameLogicController\""
+        },
+        {
+          "name": "m_tableView",
+          "offset": 120,
+          "type": "@\"MainFrameTableView\""
+        },
+        {
+          "name": "m_logoImageView",
+          "offset": 128,
+          "type": "@\"UIImageView\""
+        },
+        {
+          "name": "m_titleView",
+          "offset": 136,
+          "type": "@\"MFTitleView\""
+        },
+        {
+          "name": "m_loadingView",
+          "offset": 144,
+          "type": "@\"MMLoadingView\""
+        },
+        {
+          "name": "m_tableContentOffset",
+          "offset": 152,
+          "type": "{CGPoint=\"x\"d\"y\"d}"
+        },
+        {
+          "name": "m_uiTipStatus",
+          "offset": 168,
+          "type": "I"
+        },
+        {
+          "name": "m_createChatLogic",
+          "offset": 176,
+          "type": "@\"CreateChatLogic\""
+        },
+        {
+          "name": "m_tableViewReady",
+          "offset": 184,
+          "type": "B"
+        },
+        {
+          "name": "m_headerLogic",
+          "offset": 192,
+          "type": "@\"MainFrameHeaderLogic\""
+        },
+        {
+          "name": "m_nsTitle",
+          "offset": 200,
+          "type": "@\"NSString\""
+        },
+        {
+          "name": "m_voiceSearchLevelNumber",
+          "offset": 208,
+          "type": "i"
+        },
+        {
+          "name": "m_tableViewOffset",
+          "offset": 216,
+          "type": "d"
+        },
+        {
+          "name": "m_bIsLastViewStatusBarHidden",
+          "offset": 224,
+          "type": "B"
+        },
+        {
+          "name": "m_needResetTableViewOffset",
+          "offset": 225,
+          "type": "B"
+        },
+        {
+          "name": "_peekedSession",
+          "offset": 232,
+          "type": "@\"MMSessionInfo\""
+        },
+        {
+          "name": "m_firstLoadFinished",
+          "offset": 240,
+          "type": "B"
+        },
+        {
+          "name": "m_messageCellHeight",
+          "offset": 248,
+          "type": "d"
+        },
+        {
+          "name": "m_taskBarLogic",
+          "offset": 256,
+          "type": "@\"WAMainFrameTaskBarLogic\""
+        },
+        {
+          "name": "m_tableHeaderTopView",
+          "offset": 264,
+          "type": "@\"WAMainFrameTopHeaderView\""
+        },
+        {
+          "name": "m_taskBarView",
+          "offset": 272,
+          "type": "@\"WAMainFrameTaskBarView\""
+        },
+        {
+          "name": "m_tableViewStartDraggingContentOffset",
+          "offset": 280,
+          "type": "{CGPoint=\"x\"d\"y\"d}"
+        },
+        {
+          "name": "m_tableViewLastContentOffset",
+          "offset": 296,
+          "type": "{CGPoint=\"x\"d\"y\"d}"
+        },
+        {
+          "name": "m_isDraggingDown",
+          "offset": 312,
+          "type": "B"
+        },
+        {
+          "name": "m_isScrollingDown",
+          "offset": 313,
+          "type": "B"
+        },
+        {
+          "name": "m_isShowTableHeaderTopView",
+          "offset": 314,
+          "type": "B"
+        },
+        {
+          "name": "m_isSettingShowTableHeaderTopView",
+          "offset": 315,
+          "type": "B"
+        },
+        {
+          "name": "m_isSettingHideTableHeaderTopView",
+          "offset": 316,
+          "type": "B"
+        },
+        {
+          "name": "m_placeholderRefreshWindowOpen",
+          "offset": 317,
+          "type": "B"
+        },
+        {
+          "name": "m_placeholderRefreshWindowTimer",
+          "offset": 320,
+          "type": "@\"MMTimer\""
+        },
+        {
+          "name": "m_dragCancelPreviousShowTableHeaderTopView",
+          "offset": 328,
+          "type": "B"
+        },
+        {
+          "name": "m_dragCancelPreviousHideTableHeaderTopView",
+          "offset": 329,
+          "type": "B"
+        },
+        {
+          "name": "m_isChangingTableHeaderTopViewHeight",
+          "offset": 330,
+          "type": "B"
+        },
+        {
+          "name": "m_shouldReloadOnAppear",
+          "offset": 331,
+          "type": "B"
+        },
+        {
+          "name": "m_navBGOriginColor",
+          "offset": 336,
+          "type": "@\"UIColor\""
+        },
+        {
+          "name": "m_originWindowLevel",
+          "offset": 344,
+          "type": "d"
+        },
+        {
+          "name": "m_lastRowNum",
+          "offset": 352,
+          "type": "q"
+        },
+        {
+          "name": "m_confirmingSessionName",
+          "offset": 360,
+          "type": "@\"NSString\""
+        },
+        {
+          "name": "m_swipedSession",
+          "offset": 368,
+          "type": "@\"MMSessionInfo\""
+        },
+        {
+          "name": "m_selectedSession",
+          "offset": 376,
+          "type": "@\"MMSessionInfo\""
+        },
+        {
+          "name": "m_firstDoMainLazyThing",
+          "offset": 384,
+          "type": "B"
+        },
+        {
+          "name": "lastScreenHeight",
+          "offset": 392,
+          "type": "d"
+        },
+        {
+          "name": "m_inviteFriendFooterView",
+          "offset": 400,
+          "type": "@\"UIView\""
+        },
+        {
+          "name": "m_menuBarButton",
+          "offset": 408,
+          "type": "@\"MMBarButtonItem\""
+        },
+        {
+          "name": "m_enableSearchBarButton",
+          "offset": 416,
+          "type": "B"
+        },
+        {
+          "name": "m_searchBarButtonShown",
+          "offset": 417,
+          "type": "B"
+        },
+        {
+          "name": "m_pendingSearchEntryType",
+          "offset": 424,
+          "type": "Q"
+        },
+        {
+          "name": "m_brandTimelineViewController",
+          "offset": 432,
+          "type": "@\"MMUIViewController<BrandTLViewControllerProtocol>\""
+        },
+        {
+          "name": "m_brandTimelineCacheTimer",
+          "offset": 440,
+          "type": "@\"MMTimer\""
+        },
+        {
+          "name": "_previewingContext",
+          "offset": 448,
+          "type": "@\"<UIViewControllerPreviewing>\""
+        },
+        {
+          "name": "_peekedIndexPath",
+          "offset": 456,
+          "type": "@\"NSIndexPath\""
+        },
+        {
+          "name": "haveLazyInit",
+          "offset": 464,
+          "type": "B"
+        },
+        {
+          "name": "_voiceIsCancelState",
+          "offset": 465,
+          "type": "B"
+        },
+        {
+          "name": "_voiceFCRequestFinished",
+          "offset": 466,
+          "type": "B"
+        },
+        {
+          "name": "_voiceFCMicReady",
+          "offset": 467,
+          "type": "B"
+        },
+        {
+          "name": "_voiceFCEntryAnimationFinished",
+          "offset": 468,
+          "type": "B"
+        },
+        {
+          "name": "_voiceSearchUpsideDown",
+          "offset": 469,
+          "type": "B"
+        },
+        {
+          "name": "_voiceSearchOrientationLocked",
+          "offset": 470,
+          "type": "B"
+        },
+        {
+          "name": "_disableTableAnimation",
+          "offset": 471,
+          "type": "B"
+        },
+        {
+          "name": "_isAppear",
+          "offset": 472,
+          "type": "B"
+        },
+        {
+          "name": "_hasReportNavBarBroken",
+          "offset": 473,
+          "type": "B"
+        },
+        {
+          "name": "_willAppearFromFailedMiniTaskPushAnimation",
+          "offset": 474,
+          "type": "B"
+        },
+        {
+          "name": "_searchBar",
+          "offset": 480,
+          "type": "@\"WCSearchBar\""
+        },
+        {
+          "name": "_voiceHintVC",
+          "offset": 488,
+          "type": "@\"VoiceHintFloatingVC\""
+        },
+        {
+          "name": "_voiceLongPressBeginY",
+          "offset": 496,
+          "type": "d"
+        },
+        {
+          "name": "_voiceFCSessionID",
+          "offset": 504,
+          "type": "@\"NSString\""
+        },
+        {
+          "name": "_voiceFCProcessingTimer",
+          "offset": 512,
+          "type": "@\"MMTimer\""
+        },
+        {
+          "name": "_voiceFCMicStartTimer",
+          "offset": 520,
+          "type": "@\"MMTimer\""
+        },
+        {
+          "name": "_voiceFCRequestGeneration",
+          "offset": 528,
+          "type": "Q"
+        },
+        {
+          "name": "_voiceSearchReportRoundID",
+          "offset": 536,
+          "type": "@\"NSString\""
+        },
+        {
+          "name": "_voiceSearchTouchHapticGenerator",
+          "offset": 544,
+          "type": "@\"UIImpactFeedbackGenerator\""
+        },
+        {
+          "name": "_voiceSearchRotationDetector",
+          "offset": 552,
+          "type": "@\"MMRotationDetector\""
+        },
+        {
+          "name": "_unreadReporter",
+          "offset": 560,
+          "type": "@\"MainFrameUnreadReporter\""
+        },
+        {
+          "name": "_animator",
+          "offset": 568,
+          "type": "@\"UIDynamicAnimator\""
+        },
+        {
+          "name": "_topSessionFoldView",
+          "offset": 576,
+          "type": "@\"MainFrameSectionFoldView\""
+        },
+        {
+          "name": "_lastHomeViewController",
+          "offset": 584,
+          "type": "@\"FTSHomeViewController\""
+        },
+        {
+          "name": "_foldViewFloatingOffset",
+          "offset": 592,
+          "type": "d"
+        },
+        {
+          "name": "_sessionEditingLogic",
+          "offset": 600,
+          "type": "@\"MainSessionEditingLogic\""
+        },
+        {
+          "name": "_maxSessionCountInOneScreen",
+          "offset": 608,
+          "type": "q"
+        },
+        {
+          "name": "_lastReloadTableTime",
+          "offset": 616,
+          "type": "Q"
+        },
+        {
+          "name": "_finderBoxOpener",
+          "offset": 624,
+          "type": "@\"WCFinderBoxOpener\""
+        },
+        {
+          "name": "_curTabPageSource",
+          "offset": 632,
+          "type": "q"
+        },
+        {
+          "name": "_fakeNavBarView",
+          "offset": 640,
+          "type": "@\"MainFrameCustomBarView\""
+        }
+      ],
+      "class_methods": [],
+      "superclass": "MMTabBarBaseViewController"
+    },
+    "MMBadgeView": {
+      "address": "0x120634e70",
+      "super_raw": "0x801000000000222d",
+      "super_addr": null,
+      "methods": [
+        {
+          "selector": "updateShape:",
+          "address": "0x1167146b8",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "setValue:",
+          "address": "0x116714774",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "innerSetCircleShape",
+          "address": "0x1167149c4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "innerSetBadgeShape",
+          "address": "0x116714ae4",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setString:",
+          "address": "0x116714cd0",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "setAsNew",
+          "address": "0x116714de8",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setAsSmallDot",
+          "address": "0x116714e60",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setAsSmallDotForChatSession",
+          "address": "0x116714e9c",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setAsSmallDotForLiveSession",
+          "address": "0x116714eac",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setCircleDotWithDiameter:",
+          "address": "0x116714ee8",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "removeSmallDot",
+          "address": "0x116714fc0",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "setTextColor:",
+          "address": "0x116715004",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "updateWithFontSize:",
+          "address": "0x116715070",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "updateWithContentInset:",
+          "address": "0x116715228",
+          "types": "v32@0:8{CGSize=dd}16"
+        },
+        {
+          "selector": "updateWithSize:",
+          "address": "0x1167152d4",
+          "types": "v32@0:8{CGSize=dd}16"
+        },
+        {
+          "selector": "useStaticSize",
+          "address": "0x1167153ac",
+          "types": "v16@0:8"
+        },
+        {
+          "selector": "pixelAlignedCeil:",
+          "address": "0x1167154b8",
+          "types": "d24@0:8d16"
+        },
+        {
+          "selector": "setFrame:",
+          "address": "0x11671553c",
+          "types": "v48@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16"
+        },
+        {
+          "selector": "setCenter:",
+          "address": "0x116715630",
+          "types": "v32@0:8{CGPoint=dd}16"
+        },
+        {
+          "selector": "shape",
+          "address": "0x116715710",
+          "types": "Q16@0:8"
+        },
+        {
+          "selector": "bgColor",
+          "address": "0x116715720",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "isPureInteger:",
+          "address": "0x11671577c",
+          "types": "B24@0:8@16"
+        },
+        {
+          "selector": "badgeLabel",
+          "address": "0x1167157f8",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "redDotImageWithDiameter:",
+          "address": "0x116715a30",
+          "types": "@24@0:8d16"
+        },
+        {
+          "selector": "setRedDotImageWithDiameter:shouldStretch:",
+          "address": "0x116715ab0",
+          "types": "v28@0:8d16B24"
+        },
+        {
+          "selector": "cacheColorKeyForCurrentBadge",
+          "address": "0x116715c30",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "strechBadgeImage:",
+          "address": "0x116715ce0",
+          "types": "@24@0:8@16"
+        },
+        {
+          "selector": "maxCount",
+          "address": "0x116715d64",
+          "types": "i16@0:8"
+        },
+        {
+          "selector": "setMaxCount:",
+          "address": "0x116715d74",
+          "types": "v20@0:8i16"
+        },
+        {
+          "selector": "maxCountTip",
+          "address": "0x116715d84",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "setMaxCountTip:",
+          "address": "0x116715d94",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "shapeChangeBlock",
+          "address": "0x116715da8",
+          "types": "@?16@0:8"
+        },
+        {
+          "selector": "setShapeChangeBlock:",
+          "address": "0x116715db8",
+          "types": "v24@0:8@?16"
+        },
+        {
+          "selector": "setBadgeLabel:",
+          "address": "0x116715dc4",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": "badgeFontSize",
+          "address": "0x116715dd8",
+          "types": "d16@0:8"
+        },
+        {
+          "selector": "setBadgeFontSize:",
+          "address": "0x116715de8",
+          "types": "v24@0:8d16"
+        },
+        {
+          "selector": "badgeInset",
+          "address": "0x116715df8",
+          "types": "{CGSize=dd}16@0:8"
+        },
+        {
+          "selector": "setBadgeInset:",
+          "address": "0x116715e0c",
+          "types": "v32@0:8{CGSize=dd}16"
+        },
+        {
+          "selector": "setShape:",
+          "address": "0x116715e20",
+          "types": "v24@0:8Q16"
+        },
+        {
+          "selector": "setBgColor:",
+          "address": "0x116715e30",
+          "types": "v24@0:8@16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "address": "0x116715e44",
+          "types": "v16@0:8"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "_maxCount",
+          "offset": 8,
+          "type": "i"
+        },
+        {
+          "name": "_maxCountTip",
+          "offset": 16,
+          "type": "@\"NSString\""
+        },
+        {
+          "name": "_shapeChangeBlock",
+          "offset": 24,
+          "type": "@?"
+        },
+        {
+          "name": "_badgeLabel",
+          "offset": 32,
+          "type": "@\"UILabel\""
+        },
+        {
+          "name": "_badgeFontSize",
+          "offset": 40,
+          "type": "d"
+        },
+        {
+          "name": "_shape",
+          "offset": 48,
+          "type": "Q"
+        },
+        {
+          "name": "_bgColor",
+          "offset": 56,
+          "type": "@\"UIColor\""
+        },
+        {
+          "name": "_badgeInset",
+          "offset": 64,
+          "type": "{CGSize=\"width\"d\"height\"d}"
+        }
+      ],
+      "class_methods": [
+        {
+          "selector": "smallRedDot",
+          "address": "0x116714554",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "liveSmallRedDot",
+          "address": "0x11671458c",
+          "types": "@16@0:8"
+        },
+        {
+          "selector": "liveSmallRedDotLen",
+          "address": "0x1167145c4",
+          "types": "d16@0:8"
+        },
+        {
+          "selector": "redDotWithNumber:",
+          "address": "0x1167145cc",
+          "types": "@24@0:8Q16"
+        },
+        {
+          "selector": "dotWithNumber:color:",
+          "address": "0x11671460c",
+          "types": "@32@0:8Q16@24"
+        },
+        {
+          "selector": "NEWRedDot",
+          "address": "0x116714680",
+          "types": "@16@0:8"
+        }
+      ],
+      "superclass": "UIImageView"
+    }
+  },
+  "categories": []
+}

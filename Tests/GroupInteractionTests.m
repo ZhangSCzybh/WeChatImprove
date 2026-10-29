@@ -150,6 +150,13 @@ static BOOL enabled=YES,gestureEnabled=YES,nativeScope,searchButtonVisible=YES;
 static BOOL CSGroupSearchButtonVisible(NSUserDefaults *defaults) { (void)defaults; return searchButtonVisible; }
 static NSString *account=@"account-A";
 static NSString *CSGroupCurrentAccountID(void) { return account; }
+// Interaction fixtures exercise ordinary sessions; privacy/source behavior is
+// covered by the focused close-friend and group lifecycle suites.
+static NSUInteger const FixtureAccountEpoch=1;
+static NSUInteger const CSCloseFriendSurfaceSession=0;
+static NSUInteger CSCloseFriendAccountEpoch(void) { return FixtureAccountEpoch; }
+static BOOL CSCloseFriendShouldHideUserName(NSString *name,NSUInteger surface) { (void)name; (void)surface; return NO; }
+static BOOL CSGroupPrivacyActive(void) { return NO; }
 static BOOL Option(NSString *suffix) { return [suffix isEqual:@"enabled"] ? enabled : gestureEnabled; }
 static BOOL CSGroupUsesNativeIndices(id table) { (void)table; return nativeScope; }
 static void CSGroupWithNativeIndices(id table,void (^body)(void)) {
@@ -182,7 +189,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic,strong) CSGroupRow *swipeRow;
 @property(nonatomic,copy) NSString *swipeAccount,*publishedTabID;
 @property(nonatomic,strong) NSIndexPath *swipeDisplayPath;
-@property(nonatomic) BOOL active,swipeActive,dirty,scheduled,publishing,pendingScrollToTop,chromeVisible,searching,searchChromeVisible,barTouchAllowed,listTouchAllowed;
+@property(nonatomic) BOOL active,swipeActive,dirty,scheduled,publishing,pendingScrollToTop,chromeVisible,searching,searchChromeVisible,barTouchAllowed,listTouchAllowed,privacyRefreshPending;
 @property(nonatomic) NSUInteger changeDepth,refreshRequests,refreshCount;
 @property(nonatomic,strong) CSGroupProjection *projection;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
@@ -311,17 +318,17 @@ int main(void) { @autoreleasepool {
     Check([a.controller.receivedPath isEqual:Path(15)] && a.changeDepth==0 && a.dirty,@"delete commit resolves the moved session identity and requests publication");
     a=Fixture(); [a forwardSwipeInvocation:Swipe(a.controller,NO,YES,a.table,Path(2)) target:a.controller];
     Check(a.controller.calls==0,@"commit from a different displayed row is rejected");
-    a=Fixture(); NSDictionary *context=@{@"row":a.swipeRow,@"account":account}; __block NSUInteger actions=0;
+    a=Fixture(); NSDictionary *context=@{@"row":a.swipeRow,@"account":account,@"epoch":@(FixtureAccountEpoch)}; __block NSUInteger actions=0;
     BOOL done=[a performNativeEditingContext:context action:^(NSIndexPath *path) { actions++; Check(nativeScope && a.changeDepth==1 && [path isEqual:Path(8)],@"private editing action enters a native change transaction"); [a.controller.paths removeObjectForKey:@"deleted"]; }];
     [a reconcileDeletedSwipeRow];
     Check(done && actions==1 && a.dirty && !a.swipeActive && !a.table.editing,@"private deletion without UIKit commit/end still drains the stale projected menu");
     [a performNativeEditingContext:context action:^(__unused NSIndexPath *path) { actions++; }];
     Check(actions==1 && a.refreshRequests>=2,@"repeated action on a deleted identity never targets its replacement and requests refresh");
-    a=Fixture(); context=@{@"row":a.swipeRow,@"account":account}; [a endSwipeEditing];
+    a=Fixture(); context=@{@"row":a.swipeRow,@"account":account,@"epoch":@(FixtureAccountEpoch)}; [a endSwipeEditing];
     [a performNativeEditingContext:context action:^(__unused NSIndexPath *path) { [a.controller.paths removeObjectForKey:@"deleted"]; }];
     [a reconcileDeletedSwipeRow];
     Check(!a.swipeActive && !a.table.editing && a.dirty,@"private deletion without willBegin or didEnd still clears native editing and requests publication");
-    a=Fixture(); context=@{@"row":a.swipeRow,@"account":@"different-account"};
+    a=Fixture(); context=@{@"row":a.swipeRow,@"account":@"different-account",@"epoch":@(FixtureAccountEpoch)};
     Check(![a performNativeEditingContext:context action:^(__unused NSIndexPath *path) { actions++; }] && actions==1,@"editing context cannot cross accounts");
     a=Fixture(); a.dirty=YES; account=@"account-B"; [a reconcileDeletedSwipeRow];
     Check(!a.swipeActive && !a.table.editing,@"account switch releases obsolete editing state"); account=@"account-A";

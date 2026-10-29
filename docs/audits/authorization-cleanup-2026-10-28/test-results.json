@@ -1,0 +1,38 @@
+[
+  {
+    "command": "bash Tests/verify-authorization-prompt.sh",
+    "exit_code": 0,
+    "duration_seconds": 1.471,
+    "log": "docs/audits/authorization-cleanup-2026-10-28/logs/verify-authorization-prompt.log"
+  },
+  {
+    "command": "bash Tests/verify-authorization-read.sh",
+    "exit_code": 0,
+    "duration_seconds": 0.542,
+    "log": "docs/audits/authorization-cleanup-2026-10-28/logs/verify-authorization-read.log"
+  },
+  {
+    "command": "bash Tests/verify-plugin-framework.sh",
+    "exit_code": 0,
+    "duration_seconds": 1.086,
+    "log": "docs/audits/authorization-cleanup-2026-10-28/logs/verify-plugin-framework.log"
+  },
+  {
+    "command": "bash Tests/verify-close-friend-entry.sh",
+    "exit_code": 0,
+    "duration_seconds": 2.212,
+    "log": "docs/audits/authorization-cleanup-2026-10-28/logs/verify-close-friend-entry.log"
+  },
+  {
+    "command": "bash Tests/verify-scheduled-task-manager.sh",
+    "exit_code": 0,
+    "duration_seconds": 1.219,
+    "log": "docs/audits/authorization-cleanup-2026-10-28/logs/verify-scheduled-task-manager.log"
+  },
+  {
+    "command": "bash Tests/verify-ai-manager.sh",
+    "exit_code": 0,
+    "duration_seconds": 5.873,
+    "log": "docs/audits/authorization-cleanup-2026-10-28/logs/verify-ai-manager.log"
+  }
+]

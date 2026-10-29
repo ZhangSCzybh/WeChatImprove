@@ -93,9 +93,7 @@ BOOL WCPLAddLocalMsgInsert(WCPLAddLocalMsgInsertRequest request,
             return YES;
         }
     } @catch (NSException *exception) {
-        NSLog(@"[语音转发] AddLocalMsg 异常: session=%@ reason=%@",
-              session,
-              exception.reason ?: exception);
+        NSLog(@"[语音转发] AddLocalMsg 异常: %@", exception.name);
         if (pathOut) {
             *pathOut = WCPLAddLocalMsgInsertPathException;
         }

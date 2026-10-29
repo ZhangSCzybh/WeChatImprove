@@ -1,0 +1,419 @@
+commit f747a6a476d1ead2d9578840bd1ee6e4549d830d
+parents 3e757d9246eda0187ee2ea2bc8132f54e9069e6f
+date 2026-10-20T22:40:28+08:00
+subject feat: add identity-bound close-friend alert and call privacy
+
+
+diff --git a/Controllers/CSGroupListAdapter.m b/Controllers/CSGroupListAdapter.m
+index b6c9d07f..44dcf406 100644
+--- a/Controllers/CSGroupListAdapter.m
++++ b/Controllers/CSGroupListAdapter.m
+@@ -58,7 +58,7 @@ @interface CSGroupListAdapter () <UIGestureRecognizerDelegate>
+ @property (nonatomic, copy) NSArray *cachedNativeSections;
+ @property (nonatomic, copy) NSString *snapshotAccount;
+ @property (atomic) NSUInteger modelRevision;
+-@property (nonatomic) NSUInteger snapshotRevision, refreshGeneration;
++@property (nonatomic) NSUInteger snapshotRevision, snapshotEpoch, refreshGeneration;
+ @property (nonatomic) BOOL coalescingNotification, scheduledCoalesced;
+ @property (nonatomic) BOOL coalescedDispatchPending;
+ @property (atomic) CSGroupChangeKind pendingChanges;
+@@ -156,6 +156,31 @@ + (void)layoutForController:(id)controller {
+     if (!adapter || adapter.table!=table) { [self attachToController:controller]; return; }
+     [adapter layout];
+ }
+++ (NSNumber *)closeFriendAlertBadgeCount {
++    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
++    NSMutableSet *hidden=[NSMutableSet set];
++    for(NSString *name in policy.protectedUserNames)
++        if([policy silencesSession:name sender:nil] || [policy hidesUserName:name surface:CSCloseFriendSurfaceSession]) [hidden addObject:name];
++    if(!policy.blocked && !hidden.count)return nil;
++    if(!NSThread.isMainThread || policy.blocked)return @0;
++    NSUInteger epoch=CSCloseFriendAccountEpoch();
++    for(CSGroupListAdapter *adapter in Adapters().allObjects) {
++        if(CSGroupIsFoldedController(adapter.controller) || !adapter.cachedNativeSections || adapter.changeDepth || adapter.dirty ||
++           adapter.snapshotRevision!=adapter.modelRevision || adapter.snapshotEpoch!=epoch || ![adapter.snapshotAccount isEqual:policy.accountID] ||
++           ![policy.accountID isEqual:CSGroupCurrentAccountID()])continue;
++        NSUInteger revision=adapter.modelRevision;
++        NSMutableSet *unmasked=[NSMutableSet set];
++        CSGroupFoldedPrivacyState folded=CSGroupAssessFoldedUserNames(CSGroupCopyFoldedUserNames(),hidden);
++        if(folded==CSGroupFoldedPrivacyAllHidden)[hidden addObject:@"chatroom_session_box"];
++        else if(folded==CSGroupFoldedPrivacyNoHidden)[unmasked addObject:@"chatroom_session_box"];
++        WESessionTabItem *all=[WESessionTabItem tabWithType:WETabTypeAll];
++        CSGroupProjection *projection=[[CSGroupProjection alloc] initWithSections:adapter.cachedNativeSections tabs:@[all] selectedTabID:all.tabId
++            filterDuplicates:NO accountID:policy.accountID hiddenUserNames:hidden unmaskedAggregateUserNames:unmasked privacyRevision:policy.revision previousProjection:nil];
++        if(!projection.isValid || revision!=adapter.modelRevision || epoch!=CSCloseFriendAccountEpoch() || policy.revision!=CSCloseFriendCurrentSnapshot().revision)return @0;
++        return @([projection badgeForTabID:all.tabId].count);
++    }
++    return @0;
++}
+ + (void)settingsChanged {
+     dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } [adapter invalidateNativeSnapshot]; adapter.appearanceDirty=YES; [adapter refresh]; [adapter layout]; } });
+ }
+@@ -399,14 +424,14 @@ - (void)invalidateNativeSnapshot {
+     @synchronized (self) { self.modelRevision++; }
+ }
+ - (NSArray *)nativeSectionsForAccount:(NSString *)account {
+-    NSUInteger revision=self.modelRevision;
+-    if (self.cachedNativeSections && self.snapshotRevision==revision && [self.snapshotAccount isEqual:account]) return self.cachedNativeSections;
++    NSUInteger revision=self.modelRevision, epoch=CSCloseFriendAccountEpoch();
++    if (self.cachedNativeSections && self.snapshotRevision==revision && self.snapshotEpoch==epoch && [self.snapshotAccount isEqual:account]) return self.cachedNativeSections;
+     __block NSArray *sections=nil;
+-    NSArray *previous=[self.snapshotAccount isEqual:account] ? self.cachedNativeSections : nil;
++    NSArray *previous=self.snapshotEpoch==epoch && [self.snapshotAccount isEqual:account] ? self.cachedNativeSections : nil;
+     CSGroupWithNativeIndices(self.table, ^{ sections=CSGroupBuildNativeSectionsReusing(self.controller,self.table,[self nativeSource],previous); });
+     // Only immutable row values are cached; never hold private sessions/contacts.
+-    if (revision!=self.modelRevision || ![account isEqual:CSGroupCurrentAccountID()]) { self.cachedNativeSections=nil; return nil; }
+-    self.cachedNativeSections=sections; self.snapshotAccount=account; self.snapshotRevision=revision;
++    if (revision!=self.modelRevision || epoch!=CSCloseFriendAccountEpoch() || ![account isEqual:CSGroupCurrentAccountID()]) { self.cachedNativeSections=nil; return nil; }
++    self.cachedNativeSections=sections; self.snapshotAccount=account; self.snapshotRevision=revision; self.snapshotEpoch=epoch;
+     return sections;
+ }
+ - (void)pruneNativeActions {
+diff --git a/Hooks/CloseFriendNotificationHooks.xm b/Hooks/CloseFriendNotificationHooks.xm
+new file mode 100644
+index 00000000..231c3b77
+--- /dev/null
++++ b/Hooks/CloseFriendNotificationHooks.xm
+@@ -0,0 +1,127 @@
++#import "../Controllers/CSCloseFriendNotificationAdapter.h"
++#import "../Controllers/CSCloseFriendMuteAdapter.h"
++#import "../Controllers/CSCloseFriendCallAdapter.h"
++#import "../Controllers/CSCloseFriendBridge.h"
++#import "../Controllers/CSGroupListAdapter.h"
++#import <UserNotifications/UserNotifications.h>
++#import <substrate.h>
++#import <objc/message.h>
++static NSMutableDictionary<NSString *,NSDictionary *> *Requests;
++static NSHashTable *TabOwners;
++static BOOL Silent(CSCloseFriendAlertSubject *subject) { return [subject shouldSilence] || CSCFCallOutputSuppressed(); }
++static CSCloseFriendAlertSubject *ItemSubject(id item) {
++    return CSCFBoundAlert(item) ?: CSCFMessageSubject(CSCloseFriendRead(item,@"message"),CSCloseFriendRead(item,@"contact") ?: CSCloseFriendRead(item,@"username"));
++}
++static void RemoveKnown(NSArray<UNNotificationRequest *> *requests,BOOL delivered) {
++    NSMutableArray *ids=[NSMutableArray array];
++    @synchronized(Requests) {
++        for(UNNotificationRequest *request in requests) {
++            NSDictionary *entry=Requests[request.identifier];
++            CSCloseFriendAlertSubject *subject=entry[@"subject"];
++            if([subject shouldSilence] && [entry[@"content"] isEqual:request.content])[ids addObject:request.identifier];
++        }
++        if(!ids.count)return;
++        if(delivered)[UNUserNotificationCenter.currentNotificationCenter removeDeliveredNotificationsWithIdentifiers:ids];
++        else [UNUserNotificationCenter.currentNotificationCenter removePendingNotificationRequestsWithIdentifiers:ids];
++    }
++}
++static BOOL ChatTab(id controller,NSUInteger index) {
++    id views=CSCloseFriendRead(controller,@"viewControllers");if(![views isKindOfClass:NSArray.class] || index>=[views count])return NO;
++    id root=views[index];if([root isKindOfClass:UINavigationController.class])root=[root viewControllers].firstObject;
++    Class cls=NSClassFromString(@"NewMainFrameViewController");BOOL matches=cls && [root isKindOfClass:cls];
++    if(matches && NSThread.isMainThread)[TabOwners addObject:controller];return matches;
++}
++%ctor { dispatch_async(dispatch_get_main_queue(),^{
++    Requests=[NSMutableDictionary dictionary]; TabOwners=[NSHashTable weakObjectsHashTable]; [CSCloseFriendMuteAdapter start];
++    for(NSString *name in @[@"showQuickReplyItem:",@"showQuickReplyItem:timeout:"]) {
++        __block IMP orig=NULL;SEL sel=NSSelectorFromString(name);BOOL timed=[name hasSuffix:@"timeout:"];
++        IMP imp=timed?imp_implementationWithBlock(^(id owner,id item,double timeout){CSCloseFriendAlertSubject *s=ItemSubject(item);if(Silent(s))return;CSCFWithAlert(s,^{((void(*)(id,SEL,id,double))orig)(owner,sel,item,timeout);});}):imp_implementationWithBlock(^(id owner,id item){CSCloseFriendAlertSubject *s=ItemSubject(item);if(Silent(s))return;CSCFWithAlert(s,^{((void(*)(id,SEL,id))orig)(owner,sel,item);});});
++        if(!CSCloseFriendInstallHook(@"QuickReplyMsgMgr",name,imp,&orig,timed?"v@:@d":"v@:@"))imp_removeBlock(imp);
++    }
++    __block IMP quick=NULL;
++    IMP imp=imp_implementationWithBlock(^(id owner,id contact,id message,double timeout){CSCloseFriendAlertSubject *s=CSCFMessageSubject(message,contact);if(Silent(s))return;CSCFWithAlert(s,^{((void(*)(id,SEL,id,id,double))quick)(owner,NSSelectorFromString(@"showQuickReplyMsg:message:timeout:"),contact,message,timeout);});});
++    if(!CSCloseFriendInstallHook(@"QuickReplyMsgMgr",@"showQuickReplyMsg:message:timeout:",imp,&quick,"v@:@@d"))imp_removeBlock(imp);
++    __block IMP canShow=NULL;
++    imp=imp_implementationWithBlock(^BOOL(id owner,id contact,id message){if([CSCFMessageSubject(message,contact) shouldSilence])return NO;return ((BOOL(*)(id,SEL,id,id))canShow)(owner,NSSelectorFromString(@"canShowPushForContact:msgWrap:"),contact,message);});
++    if(!CSCloseFriendInstallHook(@"QuickReplyMsgMgr",@"canShowPushForContact:msgWrap:",imp,&canShow,"B@:@@"))imp_removeBlock(imp);
++    __block IMP arriving=NULL;
++    imp=imp_implementationWithBlock(^(id owner,id message,long long flags){CSCFWithAlert(CSCFMessageSubject(message,nil),^{((void(*)(id,SEL,id,long long))arriving)(owner,NSSelectorFromString(@"onNewMsgArriving:NotifyFlag:"),message,flags);});});
++    if(!CSCloseFriendInstallHook(@"QuickReplyMsgMgr",@"onNewMsgArriving:NotifyFlag:",imp,&arriving,"v@:@q"))imp_removeBlock(imp);
++    // Never globally disable audio/haptics. These native output functions are
++    // gated only while an identity-bearing incoming alert scope is current.
++    Class audio=NSClassFromString(@"AudioHelper");SEL vibration=NSSelectorFromString(@"playVibration");
++    if(CSCloseFriendMethodMatches(class_getClassMethod(audio,vibration),"v@:")) {
++        __block IMP original=NULL;
++        IMP replacement=imp_implementationWithBlock(^(id owner){if(!Silent(CSCFCurrentAlert()))((void(*)(id,SEL))original)(owner,vibration);});
++        MSHookMessageEx(object_getClass(audio),vibration,replacement,&original);
++        CSCloseFriendRecordCapability(@"notifications.boundVibration",original!=NULL);
++    } else CSCloseFriendRecordCapability(@"notifications.boundVibration",NO);
++    SEL sound=NSSelectorFromString(@"playSound:fileType:volume:ambient:");
++    if(CSCloseFriendMethodMatches(class_getClassMethod(audio,sound),"v@:@@fB")) {
++        __block IMP original=NULL;
++        IMP replacement=imp_implementationWithBlock(^(id owner,id file,id type,float volume,BOOL ambient){if(!Silent(CSCFCurrentAlert()))((void(*)(id,SEL,id,id,float,BOOL))original)(owner,sound,file,type,volume,ambient);});
++        MSHookMessageEx(object_getClass(audio),sound,replacement,&original);
++        CSCloseFriendRecordCapability(@"notifications.boundSound",original!=NULL);
++    } else CSCloseFriendRecordCapability(@"notifications.boundSound",NO);
++    __block IMP push=NULL;
++    imp=imp_implementationWithBlock(^(id owner,id message,id identifier,id date,BOOL voip,BOOL silent){CSCFWithAlert(CSCFMessageSubject(message,nil),^{((void(*)(id,SEL,id,id,id,BOOL,BOOL))push)(owner,NSSelectorFromString(@"showPushWithMessageWrap:identifier:fireDate:isFromVoipPush:shouldSilent:"),message,identifier,date,voip,silent);});});
++    if(!CSCloseFriendInstallHook(@"MMLocalNotificationMgr",@"showPushWithMessageWrap:identifier:fireDate:isFromVoipPush:shouldSilent:",imp,&push,"v@:@@@BB"))imp_removeBlock(imp);
++    __block IMP info=NULL;
++    imp=imp_implementationWithBlock(^id(id owner,id message,id settings,BOOL voip){id result=((id(*)(id,SEL,id,id,BOOL))info)(owner,NSSelectorFromString(@"notificationInfoForMessage:withEnabledNotificationSettings:isFromVoipPush:"),message,settings,voip);CSCFBindAlert(result,CSCFMessageSubject(message,nil));return result;});
++    if(!CSCloseFriendInstallHook(@"MMLocalNotificationMgr",@"notificationInfoForMessage:withEnabledNotificationSettings:isFromVoipPush:",imp,&info,"@@:@@B"))imp_removeBlock(imp);
++    // Class-method boundary: full ABI gate, then hook its metaclass. Never inspect
++    // unverified notification dictionary keys as account/session identity.
++    Class utility=NSClassFromString(@"MMLocalNotificationUtil");SEL local=NSSelectorFromString(@"showLocalNotificationWithInfo:");
++    if(CSCloseFriendMethodMatches(class_getClassMethod(utility,local),"v@:@")) {
++        __block IMP original=NULL;
++        IMP replacement=imp_implementationWithBlock(^(id owner,id value){CSCloseFriendAlertSubject *s=CSCFBoundAlert(value)?:CSCFCurrentAlert();if(Silent(s))return;CSCFWithAlert(s,^{((void(*)(id,SEL,id))original)(owner,local,value);});});
++        // The installer takes class names for instance methods; install this
++        // metaclass method through the same signature predicate and substrate.
++        MSHookMessageEx(object_getClass(utility),local,replacement,&original);
++        CSCloseFriendRecordCapability(@"notifications.localInfo",original!=NULL);
++    } else CSCloseFriendRecordCapability(@"notifications.localInfo",NO);
++    __block IMP add=NULL;
++    imp=imp_implementationWithBlock(^(UNUserNotificationCenter *center,UNNotificationRequest *request,void (^completion)(NSError *)){
++        CSCloseFriendAlertSubject *s=CSCFBoundAlert(request)?:CSCFCurrentAlert();
++        if(Silent(s)) {if(completion)completion(nil);return;}
++        NSNumber *badge=[CSGroupListAdapter closeFriendAlertBadgeCount];
++        if(badge && request.content.badge) {UNMutableNotificationContent *content=[request.content mutableCopy];content.badge=badge;request=[UNNotificationRequest requestWithIdentifier:request.identifier content:content trigger:request.trigger];}
++        if([s isCurrent]) { @synchronized(Requests){
++            if(Requests.count>=512)[Requests removeAllObjects];
++            Requests[request.identifier]=@{@"subject":s,@"content":request.content};
++        }}
++        ((void(*)(id,SEL,id,id))add)(center,@selector(addNotificationRequest:withCompletionHandler:),request,completion);
++    });
++    if(!CSCloseFriendInstallHook(@"UNUserNotificationCenter",@"addNotificationRequest:withCompletionHandler:",imp,&add,"v@:@@?"))imp_removeBlock(imp);
++    for(NSString *name in @[@"presentLocalNotificationNow:",@"scheduleLocalNotification:"]) {
++        __block IMP original=NULL;SEL sel=NSSelectorFromString(name);
++        IMP replacement=imp_implementationWithBlock(^(id app,UILocalNotification *notification){CSCloseFriendAlertSubject *s=CSCFBoundAlert(notification)?:CSCFCurrentAlert();if(Silent(s))return;NSNumber *badge=[CSGroupListAdapter closeFriendAlertBadgeCount];if(badge){notification=[notification copy];notification.applicationIconBadgeNumber=badge.integerValue;}((void(*)(id,SEL,id))original)(app,sel,notification);});
++        if(!CSCloseFriendInstallHook(@"UIApplication",name,replacement,&original,"v@:@"))imp_removeBlock(replacement);
++    }
++    __block IMP badge=NULL;
++    imp=imp_implementationWithBlock(^(id app,NSInteger count){NSNumber *value=[CSGroupListAdapter closeFriendAlertBadgeCount];((void(*)(id,SEL,NSInteger))badge)(app,@selector(setApplicationIconBadgeNumber:),value?value.integerValue:count);});
++    if(!CSCloseFriendInstallHook(@"UIApplication",@"setApplicationIconBadgeNumber:",imp,&badge,"v@:q"))imp_removeBlock(imp);
++    __block IMP tab=NULL;
++    imp=imp_implementationWithBlock(^(id owner,unsigned long long count,unsigned long long index){NSNumber *value=ChatTab(owner,(NSUInteger)index)?[CSGroupListAdapter closeFriendAlertBadgeCount]:nil;((void(*)(id,SEL,unsigned long long,unsigned long long))tab)(owner,NSSelectorFromString(@"setTabBarBadgeValue:forIndex:"),value?value.unsignedLongLongValue:count,index);});
++    if(!CSCloseFriendInstallHook(@"MMTabBarController",@"setTabBarBadgeValue:forIndex:",imp,&tab,"v@:QQ"))imp_removeBlock(imp);
++    __block IMP tabString=NULL;
++    imp=imp_implementationWithBlock(^(id owner,id string,unsigned long long index){NSNumber *value=ChatTab(owner,(NSUInteger)index)?[CSGroupListAdapter closeFriendAlertBadgeCount]:nil;((void(*)(id,SEL,id,unsigned long long))tabString)(owner,NSSelectorFromString(@"setTabBarBadgeString:forIndex:"),value?(value.unsignedLongLongValue?value.stringValue:nil):string,index);});
++    if(!CSCloseFriendInstallHook(@"MMTabBarController",@"setTabBarBadgeString:forIndex:",imp,&tabString,"v@:@Q"))imp_removeBlock(imp);
++    __block IMP dot=NULL;
++    imp=imp_implementationWithBlock(^(id owner,unsigned long long index){NSNumber *value=ChatTab(owner,(NSUInteger)index)?[CSGroupListAdapter closeFriendAlertBadgeCount]:nil;if(value && !value.unsignedLongLongValue)return;((void(*)(id,SEL,unsigned long long))dot)(owner,NSSelectorFromString(@"showRedDotOnTabBarItemAtIndex:"),index);});
++    if(!CSCloseFriendInstallHook(@"MMTabBarController",@"showRedDotOnTabBarItemAtIndex:",imp,&dot,"v@:Q"))imp_removeBlock(imp);
++    [NSNotificationCenter.defaultCenter addObserverForName:CSCloseFriendPolicyDidChangeNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note){
++        [UNUserNotificationCenter.currentNotificationCenter getPendingNotificationRequestsWithCompletionHandler:^(NSArray *requests){dispatch_async(dispatch_get_main_queue(),^{RemoveKnown(requests,NO);});}];
++        [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications){NSMutableArray *requests=[NSMutableArray array];for(UNNotification *n in notifications)[requests addObject:n.request];dispatch_async(dispatch_get_main_queue(),^{RemoveKnown(requests,YES);});}];
++        NSNumber *value=[CSGroupListAdapter closeFriendAlertBadgeCount];if(value)UIApplication.sharedApplication.applicationIconBadgeNumber=value.integerValue;
++        if(value)for(id owner in TabOwners.allObjects) {
++            NSArray *views=CSCloseFriendRead(owner,@"viewControllers");if(![views isKindOfClass:NSArray.class])continue;
++            for(NSUInteger index=0;index<views.count;index++)if(ChatTab(owner,index)) {
++                SEL set=NSSelectorFromString(@"setTabBarBadgeValue:forIndex:");
++                if(CSCloseFriendMethodMatches(class_getInstanceMethod([owner class],set),"v@:QQ"))((void(*)(id,SEL,unsigned long long,unsigned long long))objc_msgSend)(owner,set,value.unsignedLongLongValue,(unsigned long long)index);
++                SEL remove=NSSelectorFromString(@"removeRedDotOnTabBarItemAtIndex:");
++                if(!value.unsignedLongLongValue && CSCloseFriendMethodMatches(class_getInstanceMethod([owner class],remove),"v@:Q"))((void(*)(id,SEL,unsigned long long))objc_msgSend)(owner,remove,(unsigned long long)index);
++            }
++        }
++    }];
++}); }
+diff --git a/Tests/CloseFriendAlertTests.m b/Tests/CloseFriendAlertTests.m
+new file mode 100644
+index 00000000..86e66db7
+--- /dev/null
++++ b/Tests/CloseFriendAlertTests.m
+@@ -0,0 +1,178 @@
++#import <Foundation/Foundation.h>
++#import <objc/message.h>
++#import "CSCloseFriendBridge.h"
++#import "CSCloseFriendNotificationAdapter.h"
++#import "CSCloseFriendMuteAdapter.h"
++#import "CSCloseFriendCallAdapter.h"
++#import "CSGroupProjection.h"
++#import "WESessionTabItem.h"
++static NSUInteger Checks,Epoch=1;
++static CSCloseFriendSnapshot *Policy;
++#define CHECK(c) do{Checks++;if(!(c)){fprintf(stderr,"FAIL %d: %s\n",__LINE__,#c);exit(1);}}while(0)
++NSString *const CSCloseFriendPolicyDidChangeNotification=@"test-policy";
++CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void){return Policy;}
++NSUInteger CSCloseFriendAccountEpoch(void){return Epoch;}
++void CSCloseFriendRecordCapability(NSString *n,BOOL available){}
++id CSCloseFriendRead(id o,NSString *key) {if([o isKindOfClass:NSDictionary.class])return o[key];SEL s=NSSelectorFromString(key);return CSCloseFriendMethodMatches(class_getInstanceMethod([o class],s),"@@:")?((id(*)(id,SEL))objc_msgSend)(o,s):nil;}
++NSString *CSCloseFriendUserName(id o){return [o isKindOfClass:NSString.class]?o:CSCloseFriendRead(o,@"m_nsUsrName");}
++BOOL CSCloseFriendInstallHook(NSString *c,NSString *s,IMP r,IMP *o,const char *e){Method m=class_getInstanceMethod(NSClassFromString(c),NSSelectorFromString(s));if(!CSCloseFriendMethodMatches(m,e))return NO;*o=method_setImplementation(m,r);return YES;}
++NSDictionary *CSCloseFriendMuteRecords(void){return @{};}
++BOOL CSCloseFriendSaveMuteRecords(NSDictionary *r,NSString *a,NSUInteger e,NSError **error){return NO;}
++id CSGetService(Class c){return nil;}
++static CSCloseFriendSnapshot *Snapshot(BOOL enabled,BOOL revealed,NSDictionary *options) {
++    return [[CSCloseFriendSnapshot alloc] initWithAccountID:@"self" profile:@{@"enabled":@(enabled),@"friends":@[@"friend"],@"groups":@[@"secret@chatroom"],@"options":options?:@{}} revealed:revealed revision:Epoch blocked:NO];
++}
++@interface Mono : NSObject
++@property BOOL cancel,expired;
++@property(copy) NSString *msgKey,*m_fromUser;
++@property id m_group;
++@property unsigned long long roomID;
++@end
++@implementation Mono
++- (BOOL)isCancelMsg{return self.cancel;}
++- (BOOL)isOutOfDate{return self.expired;}
++@end
++@interface Info : NSObject
++@property unsigned long long roomID,roomType;
++@property long long roomKey;
++@property BOOL isFromIlink;
++@property unsigned int receiveTime;
++@property id contact,monoMsg,inviteInfo;
++@end
++@implementation Info @end
++@interface Invites : NSObject
++@property NSUInteger rejects;
++@end
++@implementation Invites
++- (void)rejectInvitationWithInfo:(id)info{self.rejects++;}
++@end
++@interface Conf : NSObject
++@property unsigned long long roomid;
++@property NSString *callerUsername;
++@end
++@implementation Conf @end
++@interface VoIPMPSubCallService : NSObject
++@property id cache;
+++ (instancetype)sharedInstance;
++@end
++@implementation VoIPMPSubCallService
+++ (instancetype)sharedInstance{static VoIPMPSubCallService *service;static dispatch_once_t once;dispatch_once(&once,^{service=[self new];});return service;}
++@end
++@interface Group : NSObject
++@property long long mroomid;
++@property(copy) NSString *mWxGroupId;
++@end
++@implementation Group @end
++@interface Multi : NSObject
++@property BOOL connected;
++@property unsigned long long active,lastRejected;
++@property NSUInteger rejects;
++@end
++@implementation Multi
++- (BOOL)isMultiTalkConnected{return self.connected;}
++- (unsigned long long)getCurrentRoomID{return self.active;}
++- (void)MultiTalkReject:(unsigned long long)room{self.rejects++;self.lastRejected=room;}
++@end
++// Only the new public badge accessor is extracted. Its actual projection runs below.
++@interface CSGroupListAdapter : NSObject
++@property id controller;
++@property NSArray *cachedNativeSections;
++@property NSUInteger changeDepth,snapshotRevision,modelRevision,snapshotEpoch;
++@property BOOL dirty;
++@property NSString *snapshotAccount;
+++ (NSNumber *)closeFriendAlertBadgeCount;
++@end
++static NSHashTable *Owners;
++static NSHashTable *Adapters(void){return Owners;}
++static BOOL CSGroupIsFoldedController(id c){return [c isEqual:@"folded"];}
++static NSString *CSGroupCurrentAccountID(void){return Policy.accountID;}
++typedef NS_ENUM(NSUInteger,CSGroupFoldedPrivacyState){CSGroupFoldedPrivacyUnknown,CSGroupFoldedPrivacyAllHidden,CSGroupFoldedPrivacyNoHidden};
++static NSArray *CSGroupCopyFoldedUserNames(void){return nil;}
++static CSGroupFoldedPrivacyState CSGroupAssessFoldedUserNames(id names,id hidden){return CSGroupFoldedPrivacyUnknown;}
++@implementation CSGroupListAdapter
++#import "AlertBadgeBody.h"
++@end
++@interface UNMutableNotificationContent : NSObject <NSCopying>
++@property NSNumber *badge;
++@end
++@implementation UNMutableNotificationContent
++- (id)copyWithZone:(NSZone *)zone{UNMutableNotificationContent *c=[UNMutableNotificationContent new];c.badge=self.badge;return c;}
++- (id)mutableCopyWithZone:(NSZone *)zone{return [self copyWithZone:zone];}
++@end
++@interface UNNotificationRequest : NSObject
++@property NSString *identifier;
++@property UNMutableNotificationContent *content;
++@property id trigger;
+++ (instancetype)requestWithIdentifier:(NSString *)identifier content:(id)content trigger:(id)trigger;
++@end
++@implementation UNNotificationRequest
+++ (instancetype)requestWithIdentifier:(NSString *)identifier content:(id)content trigger:(id)trigger{UNNotificationRequest *r=[self new];r.identifier=identifier;r.content=content;r.trigger=trigger;return r;}
++@end
++@interface UNUserNotificationCenter : NSObject
++@property NSUInteger submissions;
++- (void)addNotificationRequest:(UNNotificationRequest *)r withCompletionHandler:(void(^)(NSError *))completion;
++@end
++@implementation UNUserNotificationCenter
++- (void)addNotificationRequest:(UNNotificationRequest *)r withCompletionHandler:(void(^)(NSError *))completion{self.submissions++;if(completion)completion(nil);}
++@end
++static NSMutableDictionary *Requests;
++static BOOL Silent(CSCloseFriendAlertSubject *subject){return [subject shouldSilence] || CSCFCallOutputSuppressed();}
++#import "AlertNotificationBody.h"
++static CSGroupRow *Row(NSUInteger index,NSString *name,NSUInteger count,CSGroupRowKind kind){NSUInteger path[]={0,index};return [[CSGroupRow alloc] initWithNativePath:[NSIndexPath indexPathWithIndexes:path length:2] userName:name kind:kind category:CSGroupRowCategoryPrivate top:NO unreadCount:count redDot:NO];}
++int main(void){@autoreleasepool{
++    Policy=Snapshot(YES,NO,nil);
++    NSDictionary *message=@{@"m_nsFromUsr":@"ordinary@chatroom",@"m_nsToUsr":@"self",@"m_nsRealChatUsr":@"friend"};
++    CSCloseFriendAlertSubject *s=CSCFMessageSubject(message,nil);CHECK(s.shouldSilence);
++    Policy=Snapshot(YES,YES,@{@"showBadges":@YES});CHECK(s.shouldSilence);
++    CHECK(!CSCFMessageSubject(@{@"m_nsFromUsr":@"friend",@"m_nsToUsr":@"another-account"},nil));
++    CHECK(![CSCFMessageSubject(@{@"m_nsFromUsr":@"ordinary",@"m_nsToUsr":@"self"},nil) shouldSilence]);
++    CSCFWithAlert(s,^{CHECK(CSCFCurrentAlert()==s);CSCFWithAlert(nil,^{CHECK(!CSCFCurrentAlert());});CHECK(CSCFCurrentAlert()==s);});CHECK(!CSCFCurrentAlert());
++    Epoch++;CHECK(!s.shouldSilence);CHECK(!CSCFMessageSubject(message,nil).isCurrent);
++    Policy=Snapshot(YES,YES,nil);CHECK(!CSCFPaymentOutputAllowed(@"self",@"ordinary@chatroom",@"friend"));CHECK(CSCFPaymentOutputAllowed(@"self",@"ordinary",@"ordinary"));CHECK(!CSCFPaymentOutputAllowed(@"other",@"ordinary",@"ordinary"));
++    Requests=[NSMutableDictionary dictionary];InstallNotificationOutput();
++    UNUserNotificationCenter *center=[UNUserNotificationCenter new];UNNotificationRequest *request=[UNNotificationRequest requestWithIdentifier:@"bound" content:[UNMutableNotificationContent new] trigger:nil];
++    __block NSUInteger completions=0;
++    CSCFWithAlert([CSCloseFriendAlertSubject subjectForSession:@"friend" sender:nil],^{[center addNotificationRequest:request withCompletionHandler:^(NSError *error){CHECK(!error);completions++;}];});
++    CHECK(completions==1 && center.submissions==0);
++    CSCFWithAlert([CSCloseFriendAlertSubject subjectForSession:@"ordinary" sender:nil],^{[center addNotificationRequest:request withCompletionHandler:^(NSError *error){CHECK(!error);completions++;}];});
++    CHECK(completions==2 && center.submissions==1);
++    // Durable write ownership survives a new engine; native pre-muted contacts are never restored.
++    __block NSDictionary *journal=@{};__block NSMutableDictionary *native=[@{@"friend":@YES,@"secret@chatroom":@NO} mutableCopy];__block NSUInteger writes=0;__block BOOL failCommit=NO;
++    CSCloseFriendMuteAdapter *(^engine)(void)=^CSCloseFriendMuteAdapter *{
++        CSCloseFriendMuteAdapter *a=[CSCloseFriendMuteAdapter new];a.load=^NSDictionary *{return journal;};
++        a.current=^BOOL(NSString *account,NSUInteger epoch){return [account isEqual:Policy.accountID] && epoch==Epoch;};
++        a.save=^BOOL(NSDictionary *r,NSString *account,NSUInteger epoch){if(failCommit && [r[@"friend"][@"phase"] isEqual:@"applied"])return NO;NSData *d=[NSPropertyListSerialization dataWithPropertyList:r format:NSPropertyListBinaryFormat_v1_0 options:0 error:NULL];journal=[NSPropertyListSerialization propertyListWithData:d options:0 format:NULL error:NULL];return YES;};
++        a.readOpen=^NSNumber *(NSString *name){return native[name];};a.writeOpen=^BOOL(NSString *name,BOOL open){writes++;native[name]=@(open);return YES;};return a;
++    };
++    CSCloseFriendMuteAdapter *mute=engine();[mute reconcile:Policy epoch:Epoch];CHECK(writes==1 && ![native[@"friend"] boolValue]);CHECK([journal[@"friend"][@"owned"] boolValue]);
++    Policy=Snapshot(NO,NO,nil);[engine() reconcile:Policy epoch:Epoch];CHECK(writes==2 && [native[@"friend"] boolValue] && ![native[@"secret@chatroom"] boolValue]);
++    Policy=Snapshot(YES,NO,nil);[mute reconcile:Policy epoch:Epoch];[mute externalMutation:@"friend" account:@"self" epoch:Epoch];
++    Policy=Snapshot(NO,NO,nil);NSUInteger before=writes;[mute reconcile:Policy epoch:Epoch];CHECK(writes==before && ![native[@"friend"] boolValue]);
++    journal=@{};native[@"friend"]=@YES;failCommit=YES;Policy=Snapshot(YES,NO,nil);[mute reconcile:Policy epoch:Epoch];CHECK([journal[@"friend"][@"phase"] isEqual:@"prepared"]);failCommit=NO;
++    [engine() reconcile:Policy epoch:Epoch];CHECK([journal[@"friend"][@"phase"] isEqual:@"revoked"]);Policy=Snapshot(NO,NO,nil);before=writes;[mute reconcile:Policy epoch:Epoch];CHECK(writes==before);
++    // Unified invitation: duplicate protection, current ordinary room preserved, ilink unsupported.
++    Policy=Snapshot(YES,YES,nil);Mono *mono=[Mono new];mono.msgKey=@"invite-1";Info *info=[Info new];info.roomID=100;info.roomKey=7;info.roomType=1;info.contact=@"friend";info.monoMsg=mono;Invites *service=[Invites new];
++    CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);
++    info.roomID=101;mono.msgKey=@"invite-2";info.isFromIlink=YES;CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);
++    info.contact=@"ordinary";CHECK(!CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);
++    info.contact=@"friend";info.isFromIlink=NO;mono.cancel=YES;CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==1);mono.cancel=NO;
++    Conf *conf=[Conf new];conf.roomid=102;conf.callerUsername=@"friend";VoIPMPSubCallService.sharedInstance.cache=@{@"inviteInfo":conf};info.inviteInfo=conf;info.roomID=102;info.roomKey=0;info.isFromIlink=YES;mono.msgKey=@"cached-ilink";
++    CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==2);CHECK(CSCFHandleInvitation(service,info,999));CHECK(service.rejects==2);
++    info.contact=@"ordinary";CHECK(!CSCFHandleInvitation(service,info,999));info.contact=@"friend";
++    // Group is its own subject; disabling either unknown-media switch disallows rejection.
++    Group *group=[Group new];group.mWxGroupId=@"secret@chatroom";group.mroomid=200;Mono *gm=[Mono new];gm.m_group=group;gm.roomID=200;gm.m_fromUser=@"ordinary";gm.msgKey=@"group-1";
++    Multi *multi=[Multi new];multi.connected=YES;multi.active=999;__block NSUInteger lifecycle=0;
++    CSCFHandleMultiTalk(multi,gm,^{lifecycle++;CHECK(CSCFCallOutputSuppressed());CHECK(CSCFCallBannerSuppressed(group,200));CHECK(!CSCFCallBannerSuppressed(group,999));});CHECK(lifecycle==1 && multi.rejects==1 && multi.lastRejected==200 && multi.active==999);CHECK(!CSCFCallOutputSuppressed());CHECK(!CSCFCallBannerSuppressed(group,200));
++    CSCFHandleMultiTalk(multi,gm,^{lifecycle++;});CHECK(multi.rejects==1 && lifecycle==2);
++    multi.active=200;CSCFHandleMultiTalk(multi,gm,^{CHECK(!CSCFCallOutputSuppressed());});CHECK(multi.rejects==1);multi.active=999;
++    Policy=Snapshot(YES,NO,@{@"rejectVoice":@NO});CHECK(![CSCFMultiTalkToken(gm) requiresRejection]);
++    group.mWxGroupId=@"ordinary@chatroom";CHECK(![CSCFMultiTalkToken(gm) suppressesPresentation]);CSCFHandleMultiTalk(multi,gm,^{CHECK(!CSCFCallOutputSuppressed());lifecycle++;});CHECK(lifecycle==3 && multi.rejects==1);
++    // The validated owner excludes protected counts while revealed; folded owner never doubles totals.
++    Policy=Snapshot(YES,YES,@{@"showBadges":@YES});Owners=[NSHashTable hashTableWithOptions:NSPointerFunctionsStrongMemory];CSGroupListAdapter *owner=[CSGroupListAdapter new];owner.controller=@"main";owner.snapshotAccount=@"self";owner.modelRevision=owner.snapshotRevision=1;owner.snapshotEpoch=Epoch;
++    owner.cachedNativeSections=@[@[Row(0,@"friend",8,CSGroupRowKindSession),Row(1,@"ordinary",3,CSGroupRowKindSession),Row(2,@"chatroom_session_box",10,CSGroupRowKindAggregate)]];[Owners addObject:owner];
++    CSGroupListAdapter *folded=[CSGroupListAdapter new];folded.controller=@"folded";folded.snapshotAccount=@"self";folded.cachedNativeSections=@[@[Row(0,@"ordinary",30,CSGroupRowKindSession)]];[Owners addObject:folded];
++    CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@3]);CHECK(((CSGroupRow *)owner.cachedNativeSections[0][0]).unreadCount==8);
++    owner.snapshotEpoch--;CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@0]);owner.snapshotEpoch=Epoch;
++    owner.modelRevision++;CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@0]);Policy=Snapshot(NO,NO,nil);CHECK(![CSGroupListAdapter closeFriendAlertBadgeCount]);
++    printf("Close-friend alerts: %lu focused checks passed (identity, durable mute, calls, badge, payment policy)\n",(unsigned long)Checks);
++}return 0;}
+diff --git a/Tests/verify-close-friend-alerts.sh b/Tests/verify-close-friend-alerts.sh
+new file mode 100755
+index 00000000..82864e18
+--- /dev/null
++++ b/Tests/verify-close-friend-alerts.sh
+@@ -0,0 +1,25 @@
++#!/bin/bash
++set -euo pipefail
++cd "$(dirname "$0")/.."
++work=$(mktemp -d)
++trap 'rm -rf "$work"' EXIT
++mkdir -p "$work/UIKit"
++printf '#import <Foundation/Foundation.h>\n@class UIViewController;\n' > "$work/UIKit/UIKit.h"
++python3 - "$work" <<'PY'
++from pathlib import Path
++import sys
++s=Path('Controllers/CSGroupListAdapter.m').read_text();start=s.index('+ (NSNumber *)closeFriendAlertBadgeCount');b=s.index('{',start);depth=0
++for end in range(b,len(s)):
++ if s[end]=='{':depth+=1
++ elif s[end]=='}':
++  depth-=1
++  if not depth:break
++(Path(sys.argv[1])/'AlertBadgeBody.h').write_text(s[start:end+1])
++s=Path('Hooks/CloseFriendNotificationHooks.xm').read_text();start=s.index('    __block IMP add=NULL;');end=s.index('    for(NSString *name in @[@"presentLocalNotificationNow:',start)
++(Path(sys.argv[1])/'AlertNotificationBody.h').write_text('static void InstallNotificationOutput(void) { IMP imp;\n'+s[start:end]+'\n}')
++PY
++xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \
++ -framework Foundation -I"$work" -IControllers \
++ Controllers/CSCloseFriend{Policy,Signatures,NotificationAdapter,MuteAdapter,CallAdapter}.m \
++ Controllers/CSGroupProjection.m Controllers/WESessionTabItem.m Tests/CloseFriendAlertTests.m -o "$work/alerts"
++"$work/alerts"

@@ -105,7 +105,24 @@ int main(void) { @autoreleasepool {
     Check([runtime updateProfile:profile error:NULL],"authenticated profile write succeeds");
     Check([runtime snapshotForEpoch:1 suspended:NO].revealed,"snapshot publishes reveal");
     Check([runtime snapshotForEpoch:1 suspended:NO]==[runtime snapshotForEpoch:1 suspended:NO],"stable reads reuse published immutable snapshot");
-    Check([[runtime snapshotForEpoch:1 suspended:NO] silencesSession:@"protected" sender:nil],"reveal preserves silence");
+    Check(![runtime snapshotForEpoch:1 suspended:NO].options[@"silenceMessages"],"new profiles omit the retired message silence option");
+    NSArray<NSURL *> *initialFiles=[NSFileManager.defaultManager contentsOfDirectoryAtURL:root includingPropertiesForKeys:nil options:0 error:NULL];
+    Check(initialFiles.count==1,"legacy compatibility fixture uses only the isolated account state");
+    NSDictionary *expectedProfile=runtime.currentProfile,*expectedCredential=credentials[@"alice"];
+    for(NSNumber *silence in @[@NO,@YES]) {
+        NSMutableDictionary *legacyOptions=[expectedProfile[@"options"] mutableCopy];legacyOptions[@"silenceMessages"]=silence;
+        NSMutableDictionary *legacyProfile=[expectedProfile mutableCopy];legacyProfile[@"options"]=legacyOptions;
+        NSDictionary *legacyState=@{@"schema":@1,@"accountID":@"alice",@"state":@{@"profile":legacyProfile,@"muteRecords":@{}}};
+        NSData *legacyCipher=CSCloseFriendEncrypt([NSPropertyListSerialization dataWithPropertyList:legacyState format:NSPropertyListBinaryFormat_v1_0 options:0 error:NULL],key,NULL);
+        Check([legacyCipher writeToURL:initialFiles[0] options:0 error:NULL],"write a historical encrypted profile in the isolated fixture");
+        CSCloseFriendRuntime *migrated=makeRuntime();[migrated synchronizeAccount:@"alice" epoch:1 suspended:NO];
+        Check(![migrated snapshotForEpoch:1 suspended:NO].blocked && migrated.hasCredential && !migrated.isAuthorized,"old silence values preserve credentials and load without implicit authorization");
+        Check([migrated.currentProfile isEqual:expectedProfile] && [credentials[@"alice"] isEqual:expectedCredential],"old silence values preserve enabled status, membership, other options and verifier");
+        Check([[NSData dataWithContentsOfURL:initialFiles[0]] isEqual:legacyCipher],"legacy profile reads preserve the original encrypted file");
+        Check([migrated authenticatePassword:@"correct-password" token:migrated.authenticationToken error:NULL],"existing password authenticates after reading either old silence value");
+        Check([migrated snapshotForEpoch:1 suspended:NO].revealed && !migrated.currentProfile[@"options"][@"silenceMessages"],"unlocking cannot restore the retired silence option");
+        Check([migrated updateProfile:migrated.currentProfile error:NULL] && [[store loadStateForAccountID:@"alice" error:NULL][@"profile"] isEqual:expectedProfile],"normal settings saves retain the compatible account profile");
+    }
     [runtime lock]; token=runtime.authenticationToken;
     NSUInteger lockedRevision=[runtime snapshotForEpoch:1 suspended:NO].revision;
     [runtime lock];
@@ -121,7 +138,7 @@ int main(void) { @autoreleasepool {
     for(int i=0;i<6;i++) Check(!SearchPassword(runtime,@"ordinary-search",token),"ordinary searches are not password failures");
     Check(credentials[@"alice"]==beforeQuery && !runtime.isAuthorized,"non-password queries do not write credentials or reveal");
     Check(SearchPassword(runtime,@"correct-password",token) && runtime.isAuthorized,"full search password reveals before native dispatch");
-    Check([[runtime snapshotForEpoch:1 suspended:NO] silencesSession:@"protected" sender:nil],"search unlock retains silence");
+    Check([[runtime snapshotForEpoch:1 suspended:NO] containsUserName:@"protected"] && ![runtime snapshotForEpoch:1 suspended:NO].options[@"silenceMessages"],"search unlock retains membership without the retired silence option");
     NSMutableDictionary *gestureOptions=[runtime.currentProfile[@"options"] mutableCopy]; gestureOptions[@"longPressUnlockEnabled"]=@NO;
     NSMutableDictionary *gestureProfile=[runtime.currentProfile mutableCopy]; gestureProfile[@"options"]=gestureOptions;
     Check([runtime updateProfile:gestureProfile error:NULL],"long-press preference can be disabled independently");
@@ -161,9 +178,9 @@ int main(void) { @autoreleasepool {
     token=runtime.authenticationToken; Check([runtime completeBiometricWithToken:token],"current biometric authorization succeeds");
     [runtime lock]; Check(![runtime updateProfile:profile error:NULL],"locked settings cannot mutate profile");
     Check([runtime snapshotForEpoch:2 suspended:NO].blocked,"immediate external epoch mismatch blocks snapshot");
-    Check(![[runtime snapshotForEpoch:2 suspended:NO] silencesSession:@"protected" sender:nil],"epoch boundary cannot silence using prior account membership");
+    Check(![[runtime snapshotForEpoch:2 suspended:NO] containsUserName:@"protected"],"epoch boundary cannot expose prior account membership");
     Check(![[runtime snapshotForEpoch:2 suspended:NO] rejectsCaller:@"protected" chatRoom:nil video:NO],"epoch boundary cannot reject calls using prior account membership");
-    Check(![[runtime snapshotForEpoch:1 suspended:YES] silencesSession:@"protected" sender:nil],"suspension cannot silence using prior account membership");
+    Check(![[runtime snapshotForEpoch:1 suspended:YES] containsUserName:@"protected"],"suspension cannot expose prior account membership");
     Check(![[runtime snapshotForEpoch:1 suspended:YES] rejectsCaller:@"protected" chatRoom:nil video:YES],"suspension cannot reject calls using prior account membership");
     Check([runtime snapshotForEpoch:1 suspended:YES].blocked,"external suspension blocks snapshot");
     token=runtime.authenticationToken; [runtime synchronizeAccount:@"bob" epoch:2 suspended:NO];

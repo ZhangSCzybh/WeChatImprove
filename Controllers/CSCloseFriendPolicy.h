@@ -22,7 +22,6 @@ FOUNDATION_EXPORT NSDictionary * _Nullable CSCloseFriendNormalizeProfile(id prof
 - (BOOL)containsUserName:(nullable NSString *)name;
 - (BOOL)concealsSurface:(CSCloseFriendSurface)surface;
 - (BOOL)hidesUserName:(nullable NSString *)name surface:(CSCloseFriendSurface)surface;
-- (BOOL)silencesSession:(nullable NSString *)session sender:(nullable NSString *)sender;
 - (BOOL)rejectsCaller:(nullable NSString *)caller chatRoom:(nullable NSString *)room video:(BOOL)video;
 @end
 #ifdef __cplusplus

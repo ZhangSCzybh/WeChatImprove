@@ -1,0 +1,7 @@
+command: node --check docs/audits/tabbar-wechat-badge-2.1-6-2026-10-29/runtime-badge-probe.js
+exit_code: 0
+stdout:
+<empty>
+stderr:
+<empty>
+scope: JavaScript syntax only; no Frida/device execution.

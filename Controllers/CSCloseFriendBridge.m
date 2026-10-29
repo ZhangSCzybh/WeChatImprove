@@ -10,7 +10,6 @@ CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) {
 }
 NSUInteger CSCloseFriendAccountEpoch(void) { return CSBackupAccountEpoch(); }
 BOOL CSCloseFriendShouldHideUserName(NSString *name, CSCloseFriendSurface surface) { return [CSCloseFriendCurrentSnapshot() hidesUserName:name surface:surface]; }
-BOOL CSCloseFriendShouldSilence(NSString *session, NSString *sender) { return [CSCloseFriendCurrentSnapshot() silencesSession:session sender:sender]; }
 BOOL CSCloseFriendShouldRejectCall(NSString *caller, NSString *room, BOOL video) { return [CSCloseFriendCurrentSnapshot() rejectsCaller:caller chatRoom:room video:video]; }
 BOOL CSCloseFriendHidesPrivacyIcons(void) { CSCloseFriendSnapshot *s=CSCloseFriendCurrentSnapshot(); return s.blocked || (s.enabled && [s.options[@"hidePrivacyIcons"] boolValue]); }
 BOOL CSCloseFriendPluginEntryHidden(void) { CSCloseFriendSnapshot *s=CSCloseFriendCurrentSnapshot(); return s.enabled && [s.options[@"hidePluginEntry"] boolValue] && !s.revealed; }

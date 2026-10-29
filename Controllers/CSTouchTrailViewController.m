@@ -124,7 +124,6 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
 // 处理屏幕录制状态变化
 - (void)screenCaptureDidChange {
     BOOL isRecording = UIScreen.mainScreen.isCaptured;
-    NSLog(@"屏幕录制状态变化: %@", isRecording ? @"开始录制" : @"停止录制");
     
     // 如果设置了仅在录屏时显示，则需要更新触摸轨迹的显示状态
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -1156,4 +1155,4 @@ static NSString * const kTouchTrailCustomImageCornerRadiusKey = @"com.wechat.twe
     }
 }
 
-@end 
+@end

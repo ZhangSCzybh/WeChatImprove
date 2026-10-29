@@ -1,0 +1,510 @@
+{
+  "derivedFrom": "events.jsonl",
+  "eventsSha256": "c96ddec3055d225e91f00f9463dd1b3179c3794fde53626a22d9bb4218e3e473",
+  "rows": [
+    {
+      "selection": "empty",
+      "candidateUnread": 0,
+      "ordinaryNumericUnread": 0,
+      "states": [
+        {
+          "snapshotState": "valid-cache",
+          "getterDecision": null,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "no-cache",
+          "getterDecision": null,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "dirty",
+          "getterDecision": null,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "change-depth",
+          "getterDecision": null,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "revision-mismatch",
+          "getterDecision": null,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "selection": "empty",
+      "candidateUnread": 0,
+      "ordinaryNumericUnread": 7,
+      "states": [
+        {
+          "snapshotState": "valid-cache",
+          "getterDecision": null,
+          "nativeInput": 7,
+          "originalCount": 7,
+          "hidden": false
+        },
+        {
+          "snapshotState": "no-cache",
+          "getterDecision": null,
+          "nativeInput": 7,
+          "originalCount": 7,
+          "hidden": false
+        },
+        {
+          "snapshotState": "dirty",
+          "getterDecision": null,
+          "nativeInput": 7,
+          "originalCount": 7,
+          "hidden": false
+        },
+        {
+          "snapshotState": "change-depth",
+          "getterDecision": null,
+          "nativeInput": 7,
+          "originalCount": 7,
+          "hidden": false
+        },
+        {
+          "snapshotState": "revision-mismatch",
+          "getterDecision": null,
+          "nativeInput": 7,
+          "originalCount": 7,
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "selection": "empty",
+      "candidateUnread": 5,
+      "ordinaryNumericUnread": 0,
+      "states": [
+        {
+          "snapshotState": "valid-cache",
+          "getterDecision": null,
+          "nativeInput": 5,
+          "originalCount": 5,
+          "hidden": false
+        },
+        {
+          "snapshotState": "no-cache",
+          "getterDecision": null,
+          "nativeInput": 5,
+          "originalCount": 5,
+          "hidden": false
+        },
+        {
+          "snapshotState": "dirty",
+          "getterDecision": null,
+          "nativeInput": 5,
+          "originalCount": 5,
+          "hidden": false
+        },
+        {
+          "snapshotState": "change-depth",
+          "getterDecision": null,
+          "nativeInput": 5,
+          "originalCount": 5,
+          "hidden": false
+        },
+        {
+          "snapshotState": "revision-mismatch",
+          "getterDecision": null,
+          "nativeInput": 5,
+          "originalCount": 5,
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "selection": "empty",
+      "candidateUnread": 5,
+      "ordinaryNumericUnread": 7,
+      "states": [
+        {
+          "snapshotState": "valid-cache",
+          "getterDecision": null,
+          "nativeInput": 12,
+          "originalCount": 12,
+          "hidden": false
+        },
+        {
+          "snapshotState": "no-cache",
+          "getterDecision": null,
+          "nativeInput": 12,
+          "originalCount": 12,
+          "hidden": false
+        },
+        {
+          "snapshotState": "dirty",
+          "getterDecision": null,
+          "nativeInput": 12,
+          "originalCount": 12,
+          "hidden": false
+        },
+        {
+          "snapshotState": "change-depth",
+          "getterDecision": null,
+          "nativeInput": 12,
+          "originalCount": 12,
+          "hidden": false
+        },
+        {
+          "snapshotState": "revision-mismatch",
+          "getterDecision": null,
+          "nativeInput": 12,
+          "originalCount": 12,
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "selection": "friend",
+      "candidateUnread": 0,
+      "ordinaryNumericUnread": 0,
+      "states": [
+        {
+          "snapshotState": "valid-cache",
+          "getterDecision": 0,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "no-cache",
+          "getterDecision": 0,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "dirty",
+          "getterDecision": 0,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "change-depth",
+          "getterDecision": 0,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "revision-mismatch",
+          "getterDecision": 0,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "selection": "friend",
+      "candidateUnread": 0,
+      "ordinaryNumericUnread": 7,
+      "states": [
+        {
+          "snapshotState": "valid-cache",
+          "getterDecision": 7,
+          "nativeInput": 7,
+          "originalCount": 7,
+          "hidden": false
+        },
+        {
+          "snapshotState": "no-cache",
+          "getterDecision": 0,
+          "nativeInput": 7,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "dirty",
+          "getterDecision": 0,
+          "nativeInput": 7,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "change-depth",
+          "getterDecision": 0,
+          "nativeInput": 7,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "revision-mismatch",
+          "getterDecision": 0,
+          "nativeInput": 7,
+          "originalCount": 0,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "selection": "friend",
+      "candidateUnread": 5,
+      "ordinaryNumericUnread": 0,
+      "states": [
+        {
+          "snapshotState": "valid-cache",
+          "getterDecision": 0,
+          "nativeInput": 5,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "no-cache",
+          "getterDecision": 0,
+          "nativeInput": 5,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "dirty",
+          "getterDecision": 0,
+          "nativeInput": 5,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "change-depth",
+          "getterDecision": 0,
+          "nativeInput": 5,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "revision-mismatch",
+          "getterDecision": 0,
+          "nativeInput": 5,
+          "originalCount": 0,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "selection": "friend",
+      "candidateUnread": 5,
+      "ordinaryNumericUnread": 7,
+      "states": [
+        {
+          "snapshotState": "valid-cache",
+          "getterDecision": 7,
+          "nativeInput": 12,
+          "originalCount": 7,
+          "hidden": false
+        },
+        {
+          "snapshotState": "no-cache",
+          "getterDecision": 0,
+          "nativeInput": 12,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "dirty",
+          "getterDecision": 0,
+          "nativeInput": 12,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "change-depth",
+          "getterDecision": 0,
+          "nativeInput": 12,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "revision-mismatch",
+          "getterDecision": 0,
+          "nativeInput": 12,
+          "originalCount": 0,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "selection": "group",
+      "candidateUnread": 0,
+      "ordinaryNumericUnread": 0,
+      "states": [
+        {
+          "snapshotState": "valid-cache",
+          "getterDecision": 0,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "no-cache",
+          "getterDecision": 0,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "dirty",
+          "getterDecision": 0,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "change-depth",
+          "getterDecision": 0,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "revision-mismatch",
+          "getterDecision": 0,
+          "nativeInput": 0,
+          "originalCount": 0,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "selection": "group",
+      "candidateUnread": 0,
+      "ordinaryNumericUnread": 7,
+      "states": [
+        {
+          "snapshotState": "valid-cache",
+          "getterDecision": 7,
+          "nativeInput": 7,
+          "originalCount": 7,
+          "hidden": false
+        },
+        {
+          "snapshotState": "no-cache",
+          "getterDecision": 0,
+          "nativeInput": 7,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "dirty",
+          "getterDecision": 0,
+          "nativeInput": 7,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "change-depth",
+          "getterDecision": 0,
+          "nativeInput": 7,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "revision-mismatch",
+          "getterDecision": 0,
+          "nativeInput": 7,
+          "originalCount": 0,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "selection": "group",
+      "candidateUnread": 5,
+      "ordinaryNumericUnread": 0,
+      "states": [
+        {
+          "snapshotState": "valid-cache",
+          "getterDecision": 0,
+          "nativeInput": 5,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "no-cache",
+          "getterDecision": 0,
+          "nativeInput": 5,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "dirty",
+          "getterDecision": 0,
+          "nativeInput": 5,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "change-depth",
+          "getterDecision": 0,
+          "nativeInput": 5,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "revision-mismatch",
+          "getterDecision": 0,
+          "nativeInput": 5,
+          "originalCount": 0,
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "selection": "group",
+      "candidateUnread": 5,
+      "ordinaryNumericUnread": 7,
+      "states": [
+        {
+          "snapshotState": "valid-cache",
+          "getterDecision": 7,
+          "nativeInput": 12,
+          "originalCount": 7,
+          "hidden": false
+        },
+        {
+          "snapshotState": "no-cache",
+          "getterDecision": 0,
+          "nativeInput": 12,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "dirty",
+          "getterDecision": 0,
+          "nativeInput": 12,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "change-depth",
+          "getterDecision": 0,
+          "nativeInput": 12,
+          "originalCount": 0,
+          "hidden": true
+        },
+        {
+          "snapshotState": "revision-mismatch",
+          "getterDecision": 0,
+          "nativeInput": 12,
+          "originalCount": 0,
+          "hidden": true
+        }
+      ]
+    }
+  ]
+}

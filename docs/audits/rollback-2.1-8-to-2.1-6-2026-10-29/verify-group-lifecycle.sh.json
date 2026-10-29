@@ -1,0 +1,6 @@
+{
+  "script": "verify-group-lifecycle.sh",
+  "exit_code": 0,
+  "stdout": "Hidden native event publications: 0 / 20 events\nGroup lifecycle: 103 checks, 0 failures\n",
+  "stderr": ""
+}

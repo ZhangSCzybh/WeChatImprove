@@ -1,0 +1,110 @@
+--- 2.1-6/Controllers/CSTabBarNativeAdapter.m
++++ 2.1-7/Controllers/CSTabBarNativeAdapter.m
+@@ -4,6 +4,7 @@
+ #import "CSTabBarGeometry.h"
+ #import <QuartzCore/QuartzCore.h>
+ #import <objc/runtime.h>
++#include <math.h>
+ 
+ static char CSBarStateKey, CSItemStateKey;
+ static NSHashTable<MMTabBar *> *CSBars;
+@@ -165,6 +166,36 @@
+     CSSetFrame(item.badgeView,badge);
+     if (s.customIcon) { s.customIcon.hidden=s.customHidden; CSSetFrame(s.customIcon,s.customFrame); }
+ }
++static void CSLayoutNativeItem(MMTabBarItemView *item, CSTabBarItemState *s) {
++    // Parent resizing can move the native icon without moving its sibling badge.
++    // Keep nested hooks inside this transaction while both native anchors settle.
++    s.depth++;
++    @try {
++        [UIView performWithoutAnimation:^{ [item layoutIcon]; [item layoutBadgeView]; }];
++    } @finally {
++        s.depth--;
++    }
++}
++static CGRect CSConstrainBadgePosition(CGRect frame, CGRect native, CGRect bounds) {
++    // Preserve native overflow at this item width; constrain only added overflow.
++    CGFloat minX=MIN(CGRectGetMinX(bounds),CGRectGetMinX(native));
++    CGFloat maxX=MAX(CGRectGetMaxX(bounds),CGRectGetMaxX(native))-CGRectGetWidth(frame);
++    CGFloat minY=MIN(CGRectGetMinY(bounds),CGRectGetMinY(native));
++    CGFloat maxY=MAX(CGRectGetMaxY(bounds),CGRectGetMaxY(native))-CGRectGetHeight(frame);
++    BOOL constrainX=frame.origin.x<minX || frame.origin.x>maxX;
++    BOOL constrainY=frame.origin.y<minY || frame.origin.y>maxY;
++    if (!constrainX && !constrainY) return frame;
++    CGFloat scale=MAX(1,UIScreen.mainScreen.scale);
++    if (constrainX) {
++        CGFloat lower=ceil(minX*scale-1e-6)/scale, upper=floor(maxX*scale+1e-6)/scale;
++        frame.origin.x=lower<=upper ? MIN(upper,MAX(lower,frame.origin.x)) : native.origin.x;
++    }
++    if (constrainY) {
++        CGFloat lower=ceil(minY*scale-1e-6)/scale, upper=floor(maxY*scale+1e-6)/scale;
++        frame.origin.y=lower<=upper ? MIN(upper,MAX(lower,frame.origin.y)) : native.origin.y;
++    }
++    return frame;
++}
+ static void CSApplyItem(MMTabBarItemView *item, MMTabBar *bar) {
+     CSTabBarState *host=CSState(bar,NO);
+     if (!host.applied || host.depth || !CSTabBarPreferences.current.enabled) return;
+@@ -177,6 +208,7 @@
+     }
+     if (s.depth) return;
+     CSRestoreItem(item);
++    CSLayoutNativeItem(item,s);
+     s.bar=bar; s.image=item.imageView.image; s.imageMode=item.imageView.contentMode;
+     s.imageFrame=item.imageView.frame; s.textFrame=item.textLabel.frame; s.badgeFrame=item.badgeView.frame;
+     s.textHidden=item.textLabel.hidden; s.imageHidden=item.imageView.hidden; s.text=item.textLabel.text;
+@@ -208,8 +240,11 @@
+     CGRect badge=s.badgeFrame;
+     badge.origin.x+=CGRectGetMaxX(imageFrame)-CGRectGetMaxX(s.imageFrame);
+     badge.origin.y+=CGRectGetMinY(imageFrame)-CGRectGetMinY(s.imageFrame);
+-    s.badgeOffset=CGPointMake(badge.origin.x-s.badgeFrame.origin.x,badge.origin.y-s.badgeFrame.origin.y);
+     CSSetFrame(item.badgeView,badge);
++    // MMBadgeView aligns its frame to pixels; record the final getter, not the request.
++    CSSetFrame(item.badgeView,CSConstrainBadgePosition(item.badgeView.frame,s.badgeFrame,item.bounds));
++    CGRect appliedBadge=item.badgeView.frame;
++    s.badgeOffset=CGPointMake(appliedBadge.origin.x-s.badgeFrame.origin.x,appliedBadge.origin.y-s.badgeFrame.origin.y);
+     CSReconcileClickEffect(host);
+ }
+ 
+@@ -263,6 +298,8 @@
+     for (CSTabBarButtonState *b in s.buttons) {
+         CSRestoreItem((MMTabBarItemView *)b.item);
+         CSSetFrame(b.button,b.frame); CSSetFrame(b.item,b.itemFrame);
++        CSTabBarItemState *itemState=objc_getAssociatedObject(b.item,&CSItemStateKey);
++        if (itemState) CSLayoutNativeItem((MMTabBarItemView *)b.item,itemState);
+     }
+ }
+ static void CSRestoreVisuals(CSTabBarState *s) {
+--- 2.1-6/Hooks/TabBarStyleHooks.xm
++++ 2.1-7/Hooks/TabBarStyleHooks.xm
+@@ -64,6 +64,9 @@
+ %end
+ 
+ %hook MMTabBarItemView
++- (void)relayoutIconAndBadge {
++    CSTabBarBeginItemUpdate(self); %orig; CSTabBarEndItemUpdate(self);
++}
+ - (void)layoutSubviews {
+     CSTabBarBeginItemUpdate(self); %orig; CSTabBarEndItemUpdate(self);
+ }
+--- 2.1-6/control
++++ 2.1-7/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.1-6
++Version: 2.1-7
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会
+--- 2.1-6/Headers/CSUserInfoHelper.h
++++ 2.1-7/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.1-6"  // 插件版本号
++#define kPluginVersionString @"2.1-7"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 

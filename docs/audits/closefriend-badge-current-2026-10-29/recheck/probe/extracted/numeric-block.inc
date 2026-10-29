@@ -1,0 +1,1 @@
+^(id owner,unsigned long long count,unsigned long long index){NSNumber *value=ChatTab(owner,(NSUInteger)index)?[CSGroupListAdapter closeFriendAlertBadgeCount]:nil;((void(*)(id,SEL,unsigned long long,unsigned long long))tab)(owner,NSSelectorFromString(@"setTabBarBadgeValue:forIndex:"),value?value.unsignedLongLongValue:count,index);}

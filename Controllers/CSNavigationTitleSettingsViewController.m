@@ -1440,11 +1440,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
 // 设置cell的背景色
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     // 使用secondarySystemGroupedBackgroundColor来获得正确的深色模式下的背景色
-    if (@available(iOS 13.0, *)) {
-        cell.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
-    } else {
-        cell.backgroundColor = [UIColor whiteColor];
-    }
+    cell.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
 }
 
 #pragma mark - 网名位置选择器

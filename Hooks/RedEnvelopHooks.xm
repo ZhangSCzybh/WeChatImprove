@@ -122,7 +122,7 @@ static void CSRedEnvelopSummaryLayoutLabel(UIView *container, UILabel *label) {
     if (width <= 0) return;
     
     CGFloat statusBarHeight = 0;
-    if (@available(iOS 13.0, *)) {
+    {
         UIWindowScene *scene = (UIWindowScene *)[UIApplication.sharedApplication.connectedScenes anyObject];
         if (scene) {
             statusBarHeight = scene.statusBarManager.statusBarFrame.size.height;

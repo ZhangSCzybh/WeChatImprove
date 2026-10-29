@@ -8,7 +8,6 @@ FOUNDATION_EXPORT NSString *const CSCloseFriendPolicyDidChangeNotification;
 FOUNDATION_EXPORT CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void);
 FOUNDATION_EXPORT NSUInteger CSCloseFriendAccountEpoch(void);
 FOUNDATION_EXPORT BOOL CSCloseFriendShouldHideUserName(NSString *name, CSCloseFriendSurface surface);
-FOUNDATION_EXPORT BOOL CSCloseFriendShouldSilence(NSString *session, NSString *sender);
 FOUNDATION_EXPORT BOOL CSCloseFriendShouldRejectCall(NSString *caller, NSString *room, BOOL video);
 FOUNDATION_EXPORT BOOL CSCloseFriendHidesPrivacyIcons(void);
 FOUNDATION_EXPORT id CSCloseFriendRead(id object, NSString *key);

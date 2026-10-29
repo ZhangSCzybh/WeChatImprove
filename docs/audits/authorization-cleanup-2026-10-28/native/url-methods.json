@@ -1,0 +1,44 @@
+[
+  {
+    "cls": "MMWebViewController",
+    "kind": "instance",
+    "selector": "shouldHandleJumpProfileUrl:",
+    "address": "0x1048c1828"
+  },
+  {
+    "cls": "MMWebViewController",
+    "kind": "instance",
+    "selector": "handleJumpProfileUrl:",
+    "address": "0x1048c1858"
+  },
+  {
+    "cls": "UrlController",
+    "kind": "instance",
+    "selector": "handleUrl:withExtraInfo:",
+    "address": "0x105f6e634"
+  },
+  {
+    "cls": "WCDataItem",
+    "kind": "instance",
+    "selector": "getDispalySourceContent:outputSourceUrl:outputSourceBackupUrl:withMaxWidth:withFont:",
+    "address": "0x106ffe328"
+  },
+  {
+    "cls": "WCMicroMerchantSubTimelineViewController",
+    "kind": "instance",
+    "selector": "handleUrl:backupUrl:item:extraAdInfo:clickSource:originView:",
+    "address": "0x109119730"
+  },
+  {
+    "cls": "WCMomentsClickHandler",
+    "kind": "instance",
+    "selector": "handleClickBrandProfileWithOptions:",
+    "address": "0x10918be50"
+  },
+  {
+    "cls": "WXBaseWebViewController",
+    "kind": "instance",
+    "selector": "webViewController:shouldStartLoadWithRequest:navigationType:isMainFrame:navigationAction:",
+    "address": "0x10a4085bc"
+  }
+]

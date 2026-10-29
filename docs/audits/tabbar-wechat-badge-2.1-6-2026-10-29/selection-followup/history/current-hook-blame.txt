@@ -1,0 +1,26 @@
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 101)     __block IMP badge=NULL;
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 102)     imp=imp_implementationWithBlock(^(id app,NSInteger count){NSNumber *value=[CSGroupListAdapter closeFriendAlertBadgeCount];((void(*)(id,SEL,NSInteger))badge)(app,@selector(setApplicationIconBadgeNumber:),value?value.integerValue:count);});
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 103)     if(!CSCloseFriendInstallHook(@"UIApplication",@"setApplicationIconBadgeNumber:",imp,&badge,"v@:q"))imp_removeBlock(imp);
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 104)     __block IMP tab=NULL;
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 105)     imp=imp_implementationWithBlock(^(id owner,unsigned long long count,unsigned long long index){NSNumber *value=ChatTab(owner,(NSUInteger)index)?[CSGroupListAdapter closeFriendAlertBadgeCount]:nil;((void(*)(id,SEL,unsigned long long,unsigned long long))tab)(owner,NSSelectorFromString(@"setTabBarBadgeValue:forIndex:"),value?value.unsignedLongLongValue:count,index);});
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 106)     if(!CSCloseFriendInstallHook(@"MMTabBarController",@"setTabBarBadgeValue:forIndex:",imp,&tab,"v@:QQ"))imp_removeBlock(imp);
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 107)     __block IMP tabString=NULL;
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 108)     imp=imp_implementationWithBlock(^(id owner,id string,unsigned long long index){NSNumber *value=ChatTab(owner,(NSUInteger)index)?[CSGroupListAdapter closeFriendAlertBadgeCount]:nil;((void(*)(id,SEL,id,unsigned long long))tabString)(owner,NSSelectorFromString(@"setTabBarBadgeString:forIndex:"),value?(value.unsignedLongLongValue?value.stringValue:nil):string,index);});
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 109)     if(!CSCloseFriendInstallHook(@"MMTabBarController",@"setTabBarBadgeString:forIndex:",imp,&tabString,"v@:@Q"))imp_removeBlock(imp);
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 110)     __block IMP dot=NULL;
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 111)     imp=imp_implementationWithBlock(^(id owner,unsigned long long index){NSNumber *value=ChatTab(owner,(NSUInteger)index)?[CSGroupListAdapter closeFriendAlertBadgeCount]:nil;if(value && !value.unsignedLongLongValue)return;((void(*)(id,SEL,unsigned long long))dot)(owner,NSSelectorFromString(@"showRedDotOnTabBarItemAtIndex:"),index);});
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 112)     if(!CSCloseFriendInstallHook(@"MMTabBarController",@"showRedDotOnTabBarItemAtIndex:",imp,&dot,"v@:Q"))imp_removeBlock(imp);
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 113)     [NSNotificationCenter.defaultCenter addObserverForName:CSCloseFriendPolicyDidChangeNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note){
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 114)         [UNUserNotificationCenter.currentNotificationCenter getPendingNotificationRequestsWithCompletionHandler:^(NSArray *requests){dispatch_async(dispatch_get_main_queue(),^{RemoveKnown(requests,NO);});}];
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 115)         [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications){NSMutableArray *requests=[NSMutableArray array];for(UNNotification *n in notifications)[requests addObject:n.request];dispatch_async(dispatch_get_main_queue(),^{RemoveKnown(requests,YES);});}];
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 116)         NSNumber *value=[CSGroupListAdapter closeFriendAlertBadgeCount];if(value)UIApplication.sharedApplication.applicationIconBadgeNumber=value.integerValue;
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 117)         if(value)for(id owner in TabOwners.allObjects) {
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 118)             NSArray *views=CSCloseFriendRead(owner,@"viewControllers");if(![views isKindOfClass:NSArray.class])continue;
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 119)             for(NSUInteger index=0;index<views.count;index++)if(ChatTab(owner,index)) {
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 120)                 SEL set=NSSelectorFromString(@"setTabBarBadgeValue:forIndex:");
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 121)                 if(CSCloseFriendMethodMatches(class_getInstanceMethod([owner class],set),"v@:QQ"))((void(*)(id,SEL,unsigned long long,unsigned long long))objc_msgSend)(owner,set,value.unsignedLongLongValue,(unsigned long long)index);
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 122)                 SEL remove=NSSelectorFromString(@"removeRedDotOnTabBarItemAtIndex:");
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 123)                 if(!value.unsignedLongLongValue && CSCloseFriendMethodMatches(class_getInstanceMethod([owner class],remove),"v@:Q"))((void(*)(id,SEL,unsigned long long))objc_msgSend)(owner,remove,(unsigned long long)index);
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 124)             }
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 125)         }
+f747a6a47 (ZhangSCzybh 2026-10-20 22:40:28 +0800 126)     }];

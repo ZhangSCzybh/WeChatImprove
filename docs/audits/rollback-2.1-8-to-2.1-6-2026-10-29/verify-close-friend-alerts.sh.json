@@ -1,0 +1,6 @@
+{
+  "script": "verify-close-friend-alerts.sh",
+  "exit_code": 0,
+  "stdout": "Close-friend alerts: 216 focused checks passed (identity, calls, reply, badge, payment policy)\n",
+  "stderr": ""
+}

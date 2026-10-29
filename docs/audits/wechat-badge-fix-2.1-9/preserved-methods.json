@@ -1,0 +1,37 @@
+[
+  {
+    "name": "legacy notification/app-icon getter",
+    "identical": true,
+    "sha256": "18af0cb05d34aecde81d291157f1b792daeecd17ca1989bfdfe8d0f6ff52e618"
+  },
+  {
+    "name": "static BOOL Silent(",
+    "identical": true,
+    "sha256": "1cea8062431d00925ae946b919b5e2df247fa9002b9b4d53b3c6a8b9e94f30fe"
+  },
+  {
+    "name": "static CSCloseFriendAlertSubject *ItemSubject(",
+    "identical": true,
+    "sha256": "2f62c27bb063ad89bc4735e289c3fc132fbade058f762371455bd6ae994a1423"
+  },
+  {
+    "name": "static void RemoveKnown(",
+    "identical": true,
+    "sha256": "cac6a2aff8f631247ca46c710c37e705abf714c28c6cf1621634f18651b0c237"
+  },
+  {
+    "name": "static BOOL ChatTab(",
+    "identical": true,
+    "sha256": "c35bc61ec6cc34556c2510163fb9119ea42c5cb808dbb41d9c125da48ca83ecc"
+  },
+  {
+    "name": "non-tab ctor notification/call/app-icon hooks",
+    "identical": true,
+    "sha256": "9a9bf70a995917c4ad4a7fe0687b2128f80013dd067d097645c81fac67253c7d"
+  },
+  {
+    "name": "policy observer notification and app-icon prefix",
+    "identical": true,
+    "sha256": "0a0cb71f37ca660e4fd112a41be08e98b551d9fcb91bbc3f9a88e275fce2731e"
+  }
+]

@@ -39,7 +39,6 @@
 #import "CSChatGroupSettingsViewController.h"
 #import "CSTabBarStyleSettingsViewController.h"
 #import "CSAuthorizationManager.h"
-#import <objc/runtime.h>
 
 // UI 常量
 static CGFloat const kHeaderViewHeight = 150.0f;        // 头部视图高度
@@ -72,7 +71,8 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 @property (nonatomic, assign) NSInteger countdownSeconds; // 倒计时剩余秒数
 @property (nonatomic, strong) UIAlertAction *continueAction; // 继续按钮引用
 @property (nonatomic, assign) BOOL isAuthorized; // 授权状态
-@property (nonatomic, strong) UIView *authorizationOverlay; // 授权提示遮罩视图
+@property (nonatomic, assign) BOOL authorizationPromptInFlight;
+@property (nonatomic, assign) BOOL returningFromAuthorization;
 @property (nonatomic, strong) UILongPressGestureRecognizer *closeFriendEntryGesture;
 @property (nonatomic, copy) NSDictionary *closeFriendEntryToken;
 @property (nonatomic, assign) BOOL closeFriendEntryVisible;
@@ -151,9 +151,10 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     } else if(!CSCloseFriendPluginEntryHidden())[cover removeFromSuperview];
 }
 
-// 添加viewDidAppear方法，在视图显示后检查用户协议
+// All entry routes use the authorization manager's native alert.
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    if (self.returningFromAuthorization || self.authorizationPromptInFlight) return;
     if(CSCloseFriendPluginEntryHidden()) {
         CSCloseFriendAuthenticate(self,^(BOOL success){
             if(success && !CSCloseFriendPluginEntryHidden()) { [[self.view viewWithTag:871042] removeFromSuperview]; [self viewDidAppear:NO]; }
@@ -162,271 +163,56 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
         return;
     }
     [[self.view viewWithTag:871042] removeFromSuperview];
-    
-    // 刷新设置项
+
     [self setupData];
     [self.tableView reloadData];
-    
-    // 先检查授权状态
+
     CSAuthorizationManager *authManager = [CSAuthorizationManager sharedManager];
-    
-    BOOL isAuthorized = [authManager isAuthorized];
-    
-    self.isAuthorized = isAuthorized;
-    
-    if (!isAuthorized) {
-        // 未授权，显示授权弹窗
-        [authManager requestAuthorizationWithPresentingViewController:self completion:^(BOOL success, NSString *message) {
-            // 只有在用户点击"取消"时才禁用功能
-            if ([message isEqualToString:@"用户取消授权"]) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    self.isAuthorized = NO;
-                    [self showAuthorizationOverlay];
-                });
-            } else {
-                // 用户点击关注公众号，保持插件页面打开，等待用户关注后返回
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    self.isAuthorized = NO;
-                    [self showAuthorizationOverlay];
-                });
+    self.isAuthorized = [authManager isAuthorized];
+    self.tableView.userInteractionEnabled = self.isAuthorized;
+    if (!self.isAuthorized) {
+        UIViewController *host = CSNativeSettingsHostForContent(self);
+        if (host.presentedViewController) return;
+        self.authorizationPromptInFlight = YES;
+        __weak typeof(self) weakSelf = self;
+        [authManager requestAuthorizationWithPresentingViewController:host completion:^(BOOL success, NSString *message) {
+            typeof(self) self = weakSelf;
+            if (!self) return;
+            self.authorizationPromptInFlight = NO;
+            self.isAuthorized = success;
+            self.tableView.userInteractionEnabled = success;
+            if (success) {
+                [self checkUserAgreement];
+            } else if ([message isEqualToString:@"用户取消授权"]) {
+                [self returnFromUnauthorizedSettings];
             }
         }];
         return;
     }
-    
-    // 已授权，检查用户是否已同意使用声明
     [self checkUserAgreement];
 }
 
-// 显示授权提示遮罩
-- (void)showAuthorizationOverlay {
-    // 如果已经存在遮罩，先移除
-    if (self.authorizationOverlay) {
-        [self.authorizationOverlay removeFromSuperview];
-    }
-    
-    // 创建遮罩视图
-    UIView *overlay = [[UIView alloc] initWithFrame:self.view.bounds];
-    overlay.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.6];
-    overlay.tag = 9999;
-    self.authorizationOverlay = overlay;
-    
-    // 创建提示容器视图
-    UIView *containerView = [[UIView alloc] init];
-    containerView.backgroundColor = [UIColor whiteColor];
-    containerView.layer.cornerRadius = 16;
-    containerView.layer.masksToBounds = NO;
-    containerView.layer.shadowColor = [[UIColor blackColor] CGColor];
-    containerView.layer.shadowOffset = CGSizeMake(0, 4);
-    containerView.layer.shadowOpacity = 0.3;
-    containerView.layer.shadowRadius = 20;
-    containerView.translatesAutoresizingMaskIntoConstraints = NO;
-    [overlay addSubview:containerView];
-    
-    // 创建顶部渐变背景视图
-    UIView *gradientView = [[UIView alloc] init];
-    gradientView.translatesAutoresizingMaskIntoConstraints = NO;
-    [containerView addSubview:gradientView];
-    
-    // 添加渐变层
-    CAGradientLayer *gradientLayer = [CAGradientLayer layer];
-    gradientLayer.frame = CGRectMake(0, 0, 300, 120);
-    gradientLayer.colors = @[
-        (id)[UIColor colorWithRed:0.07 green:0.78 blue:0.33 alpha:1.0].CGColor, // 微信绿 #1BC754
-        (id)[UIColor colorWithRed:0.05 green:0.68 blue:0.28 alpha:1.0].CGColor  // 深绿 #0FAD47
-    ];
-    gradientLayer.startPoint = CGPointMake(0, 0);
-    gradientLayer.endPoint = CGPointMake(1, 1);
-    [gradientView.layer insertSublayer:gradientLayer atIndex:0];
-    
-    // 创建圆形图标背景
-    UIView *iconBgView = [[UIView alloc] init];
-    iconBgView.backgroundColor = [UIColor whiteColor];
-    iconBgView.layer.cornerRadius = 40;
-    iconBgView.layer.masksToBounds = YES;
-    iconBgView.translatesAutoresizingMaskIntoConstraints = NO;
-    [containerView addSubview:iconBgView];
-    
-    // 创建微信图标
-    UIImageView *iconImageView = [[UIImageView alloc] init];
-    if (@available(iOS 13.0, *)) {
-        UIImage *icon = [UIImage systemImageNamed:@"person.badge.plus"];
-        if (!icon) {
-            icon = [UIImage systemImageNamed:@"person.crop.circle.badge.plus"];
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    self.returningFromAuthorization = NO;
+}
+
+- (void)returnFromUnauthorizedSettings {
+    UIViewController *host = CSNativeSettingsHostForContent(self);
+    UINavigationController *navigation = host.navigationController;
+    if (navigation) {
+        // A third-party plugin manager may push the native host onto its own stack.
+        if (navigation.topViewController != host) return;
+        if (navigation.viewControllers.firstObject != host) {
+            self.returningFromAuthorization = YES;
+            [navigation popViewControllerAnimated:YES];
+        } else if (navigation.presentingViewController) {
+            self.returningFromAuthorization = YES;
+            [navigation dismissViewControllerAnimated:YES completion:nil];
         }
-        iconImageView.image = icon;
-        iconImageView.tintColor = [UIColor colorWithRed:0.07 green:0.78 blue:0.33 alpha:1.0]; // 微信绿
-    }
-    iconImageView.contentMode = UIViewContentModeScaleAspectFit;
-    iconImageView.translatesAutoresizingMaskIntoConstraints = NO;
-    [iconBgView addSubview:iconImageView];
-    
-    // 创建提示标题
-    UILabel *titleLabel = [[UILabel alloc] init];
-    titleLabel.text = @"需要授权";
-    titleLabel.font = [UIFont boldSystemFontOfSize:22];
-    titleLabel.textAlignment = NSTextAlignmentCenter;
-    titleLabel.textColor = [UIColor blackColor];
-    titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [containerView addSubview:titleLabel];
-    
-    // 创建提示信息
-    UILabel *messageLabel = [[UILabel alloc] init];
-    messageLabel.text = @"请关注公众号后使用插件功能";
-    messageLabel.font = [UIFont systemFontOfSize:15];
-    messageLabel.textColor = [UIColor systemGrayColor];
-    messageLabel.textAlignment = NSTextAlignmentCenter;
-    messageLabel.numberOfLines = 0;
-    messageLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [containerView addSubview:messageLabel];
-    
-    // 创建公众号ID提示
-    UILabel *accountIdLabel = [[UILabel alloc] init];
-    accountIdLabel.text = @"公众号: 再也不会AI";
-    accountIdLabel.font = [UIFont systemFontOfSize:13];
-    accountIdLabel.textColor = [UIColor systemGray2Color];
-    accountIdLabel.textAlignment = NSTextAlignmentCenter;
-    accountIdLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [containerView addSubview:accountIdLabel];
-    
-    // 创建"关注公众号"按钮
-    UIButton *followButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [followButton setTitle:@"关注公众号" forState:UIControlStateNormal];
-    followButton.titleLabel.font = [UIFont boldSystemFontOfSize:17];
-    followButton.layer.cornerRadius = 25;
-    followButton.backgroundColor = [UIColor colorWithRed:0.07 green:0.78 blue:0.33 alpha:1.0]; // 微信绿
-    [followButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    followButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [followButton addTarget:self action:@selector(followOfficialAccount) forControlEvents:UIControlEventTouchUpInside];
-    [containerView addSubview:followButton];
-    
-    // 创建"重新检查"按钮
-    UIButton *checkButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [checkButton setTitle:@"重新检查授权" forState:UIControlStateNormal];
-    checkButton.titleLabel.font = [UIFont systemFontOfSize:16];
-    checkButton.layer.cornerRadius = 25;
-    checkButton.layer.borderWidth = 1.5;
-    checkButton.layer.borderColor = [UIColor colorWithRed:0.07 green:0.78 blue:0.33 alpha:1.0].CGColor;
-    checkButton.backgroundColor = [UIColor clearColor];
-    [checkButton setTitleColor:[UIColor colorWithRed:0.07 green:0.78 blue:0.33 alpha:1.0] forState:UIControlStateNormal];
-    checkButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [checkButton addTarget:self action:@selector(recheckAuthorization) forControlEvents:UIControlEventTouchUpInside];
-    [containerView addSubview:checkButton];
-    
-    // 设置约束
-    [NSLayoutConstraint activateConstraints:@[
-        // 容器视图约束
-        [containerView.centerXAnchor constraintEqualToAnchor:overlay.centerXAnchor],
-        [containerView.centerYAnchor constraintEqualToAnchor:overlay.centerYAnchor constant:-20],
-        [containerView.widthAnchor constraintEqualToConstant:300],
-        
-        // 渐变背景视图约束
-        [gradientView.topAnchor constraintEqualToAnchor:containerView.topAnchor],
-        [gradientView.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor],
-        [gradientView.trailingAnchor constraintEqualToAnchor:containerView.trailingAnchor],
-        [gradientView.heightAnchor constraintEqualToConstant:120],
-        
-        // 圆形图标背景约束
-        [iconBgView.centerXAnchor constraintEqualToAnchor:containerView.centerXAnchor],
-        [iconBgView.centerYAnchor constraintEqualToAnchor:gradientView.bottomAnchor],
-        [iconBgView.widthAnchor constraintEqualToConstant:80],
-        [iconBgView.heightAnchor constraintEqualToConstant:80],
-        
-        // 图标约束
-        [iconImageView.centerXAnchor constraintEqualToAnchor:iconBgView.centerXAnchor],
-        [iconImageView.centerYAnchor constraintEqualToAnchor:iconBgView.centerYAnchor],
-        [iconImageView.widthAnchor constraintEqualToConstant:40],
-        [iconImageView.heightAnchor constraintEqualToConstant:40],
-        
-        // 标题约束
-        [titleLabel.topAnchor constraintEqualToAnchor:iconBgView.bottomAnchor constant:25],
-        [titleLabel.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor constant:20],
-        [titleLabel.trailingAnchor constraintEqualToAnchor:containerView.trailingAnchor constant:-20],
-        
-        // 提示信息约束
-        [messageLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:12],
-        [messageLabel.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor constant:20],
-        [messageLabel.trailingAnchor constraintEqualToAnchor:containerView.trailingAnchor constant:-20],
-        
-        // 公众号ID约束
-        [accountIdLabel.topAnchor constraintEqualToAnchor:messageLabel.bottomAnchor constant:8],
-        [accountIdLabel.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor constant:20],
-        [accountIdLabel.trailingAnchor constraintEqualToAnchor:containerView.trailingAnchor constant:-20],
-        
-        // 关注公众号按钮约束
-        [followButton.topAnchor constraintEqualToAnchor:accountIdLabel.bottomAnchor constant:25],
-        [followButton.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor constant:20],
-        [followButton.trailingAnchor constraintEqualToAnchor:containerView.trailingAnchor constant:-20],
-        [followButton.heightAnchor constraintEqualToConstant:50],
-        
-        // 重新检查按钮约束
-        [checkButton.topAnchor constraintEqualToAnchor:followButton.bottomAnchor constant:12],
-        [checkButton.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor constant:20],
-        [checkButton.trailingAnchor constraintEqualToAnchor:containerView.trailingAnchor constant:-20],
-        [checkButton.bottomAnchor constraintEqualToAnchor:containerView.bottomAnchor constant:-25],
-        [checkButton.heightAnchor constraintEqualToConstant:50]
-    ]];
-    
-    // 添加遮罩到视图
-    [self.view addSubview:overlay];
-    
-    // 添加淡入动画
-    overlay.alpha = 0;
-    containerView.transform = CGAffineTransformMakeScale(0.9, 0.9);
-    [UIView animateWithDuration:0.3 animations:^{
-        overlay.alpha = 1;
-        containerView.transform = CGAffineTransformIdentity;
-    }];
-    
-    // 禁用 tableView 交互
-    self.tableView.userInteractionEnabled = NO;
-}
-
-// 隐藏授权提示遮罩
-- (void)hideAuthorizationOverlay {
-    if (self.authorizationOverlay) {
-        // 添加淡出动画
-        [UIView animateWithDuration:0.25 animations:^{
-            self.authorizationOverlay.alpha = 0;
-        } completion:^(BOOL finished) {
-            [self.authorizationOverlay removeFromSuperview];
-            self.authorizationOverlay = nil;
-        }];
-    }
-    
-    // 启用 tableView 交互
-    self.tableView.userInteractionEnabled = YES;
-    
-    // 检查用户协议
-    [self checkUserAgreement];
-}
-
-// 关注公众号
-- (void)followOfficialAccount {
-    CSAuthorizationManager *authManager = [CSAuthorizationManager sharedManager];
-    [authManager openOfficialAccountFromViewController:self];
-}
-
-// 重新检查授权
-- (void)recheckAuthorization {
-    CSAuthorizationManager *authManager = [CSAuthorizationManager sharedManager];
-    BOOL isAuthorized = [authManager isAuthorized];
-    
-    if (isAuthorized) {
-        // 授权成功，隐藏遮罩
-        self.isAuthorized = YES;
-        [self hideAuthorizationOverlay];
-    } else {
-        // 授权失败，显示提示
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示"
-                                                                       message:@"尚未关注公众号，请先关注公众号"
-                                                                preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定"
-                                                           style:UIAlertActionStyleDefault
-                                                         handler:nil];
-        [alert addAction:okAction];
-        [self presentViewController:alert animated:YES completion:nil];
+    } else if (host.presentingViewController) {
+        self.returningFromAuthorization = YES;
+        [host dismissViewControllerAnimated:YES completion:nil];
     }
 }
 
@@ -727,7 +513,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     self.avatarImageView.contentMode = UIViewContentModeScaleAspectFill;
     
     // 设置默认头像
-    if (@available(iOS 13.0, *)) {
+    {
         UIImage *defaultAvatar = [UIImage systemImageNamed:@"person.crop.circle.fill"];
         UIImageSymbolConfiguration *config = [UIImageSymbolConfiguration configurationWithPointSize:60 weight:UIImageSymbolWeightRegular];
         self.avatarImageView.image = [defaultAvatar imageWithConfiguration:config];
@@ -778,7 +564,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 }
 - (BOOL)canDiscoverCloseFriendEntry {
     UIViewController *host=CSNativeSettingsHostForContent(self);
-    return self.isAuthorized && self.view.window && !self.authorizationOverlay.superview &&
+    return self.isAuthorized && self.view.window && !self.authorizationPromptInFlight &&
         UIApplication.sharedApplication.applicationState==UIApplicationStateActive &&
         (!host.navigationController || host.navigationController.topViewController==host) &&
         !host.presentedViewController && !self.presentedViewController;
@@ -880,6 +666,16 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                           iconName:@"slider.horizontal.3"
                                                          iconColor:[UIColor systemOrangeColor]
                                                            detail:nil];
+
+    CSSettingItem *chatAttachmentItem = [CSSettingItem itemWithTitle:@"附件布局"
+                                                          iconName:@"square.grid.2x2"
+                                                         iconColor:[UIColor systemTealColor]
+                                                           detail:nil];
+
+    CSSettingItem *inputTextItem = [CSSettingItem itemWithTitle:@"文本占位"
+                                                      iconName:@"text.bubble.fill"
+                                                     iconColor:[UIColor systemPinkColor]
+                                                       detail:nil];
     
     // 添加聊天分组设置项
     CSSettingItem *chatGroupItem = [CSSettingItem itemWithTitle:@"聊天分组"
@@ -897,6 +693,8 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                                      listCornerRadiusItem,
                                                                      tabBarStyleItem,
                                                                      layoutSettingsItem,
+                                                                     chatAttachmentItem,
+                                                                     inputTextItem,
                                                                      chatGroupItem]];
     
     // 功能增强组
@@ -915,23 +713,11 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                      iconColor:[UIColor systemGreenColor]
                                                        detail:nil];
     
-    // 添加聊天按钮布局菜单项
-    CSSettingItem *chatAttachmentItem = [CSSettingItem itemWithTitle:@"附件布局"
-                                                          iconName:@"square.grid.2x2"
-                                                         iconColor:[UIColor systemTealColor]
-                                                           detail:nil];
-
     // 添加信息时间设置项
     CSSettingItem *messageTimeItem = [CSSettingItem itemWithTitle:@"信息时间"
                                                         iconName:@"clock.fill"
                                                        iconColor:[UIColor systemBlueColor]
                                                          detail:nil];
-
-    // 添加聊天占位文本设置项
-    CSSettingItem *inputTextItem = [CSSettingItem itemWithTitle:@"文本占位"
-                                                      iconName:@"text.bubble.fill"
-                                                     iconColor:[UIColor systemPinkColor]
-                                                       detail:nil];
 
     // 添加防止撤回设置项
     CSSettingItem *revokeItem = [CSSettingItem itemWithTitle:@"防止撤回"
@@ -976,9 +762,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                                       items:@[backgroundRunItem,
                                                                              backgroundBlurItem,
                                                                              gameCheatsItem,
-                                                                             chatAttachmentItem,
                                                                              messageTimeItem,
-                                                                             inputTextItem,
                                                                              revokeItem,
                                                                              redEnvelopItem,
                                                                              receiveTransferItem,
@@ -1298,19 +1082,11 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 // 设置cell的背景色
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     // 使用secondarySystemGroupedBackgroundColor来获得正确的深色模式下的背景色
-    if (@available(iOS 13.0, *)) {
-        cell.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
-    } else {
-        cell.backgroundColor = [UIColor whiteColor];
-    }
+    cell.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
     
     // 配置选中状态的背景色
     UIView *selectedBackgroundView = [[UIView alloc] init];
-    if (@available(iOS 13.0, *)) {
-        selectedBackgroundView.backgroundColor = [UIColor tertiarySystemGroupedBackgroundColor];
-    } else {
-        selectedBackgroundView.backgroundColor = [UIColor systemGray5Color];
-    }
+    selectedBackgroundView.backgroundColor = [UIColor tertiarySystemGroupedBackgroundColor];
     cell.selectedBackgroundView = selectedBackgroundView;
 }
 

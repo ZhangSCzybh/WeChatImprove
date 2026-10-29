@@ -1,0 +1,425 @@
+[
+  {
+    "cls": "MMBadgeView",
+    "kind": "methods",
+    "selector": "updateShape:",
+    "address": "0x1167146b8",
+    "types": "v24@0:8Q16",
+    "end_exclusive": "0x116714774",
+    "file": "MMBadgeView--updateShape_.asm"
+  },
+  {
+    "cls": "MMBadgeView",
+    "kind": "methods",
+    "selector": "setValue:",
+    "address": "0x116714774",
+    "types": "v24@0:8Q16",
+    "end_exclusive": "0x1167149c4",
+    "file": "MMBadgeView--setValue_.asm"
+  },
+  {
+    "cls": "MMBadgeView",
+    "kind": "methods",
+    "selector": "innerSetCircleShape",
+    "address": "0x1167149c4",
+    "types": "v16@0:8",
+    "end_exclusive": "0x116714ae4",
+    "file": "MMBadgeView--innerSetCircleShape.asm"
+  },
+  {
+    "cls": "MMBadgeView",
+    "kind": "methods",
+    "selector": "innerSetBadgeShape",
+    "address": "0x116714ae4",
+    "types": "v16@0:8",
+    "end_exclusive": "0x116714cd0",
+    "file": "MMBadgeView--innerSetBadgeShape.asm"
+  },
+  {
+    "cls": "MMBadgeView",
+    "kind": "methods",
+    "selector": "setString:",
+    "address": "0x116714cd0",
+    "types": "v24@0:8@16",
+    "end_exclusive": "0x116714de8",
+    "file": "MMBadgeView--setString_.asm"
+  },
+  {
+    "cls": "MMBadgeView",
+    "kind": "methods",
+    "selector": "setAsSmallDot",
+    "address": "0x116714e60",
+    "types": "v16@0:8",
+    "end_exclusive": "0x116714e9c",
+    "file": "MMBadgeView--setAsSmallDot.asm"
+  },
+  {
+    "cls": "MMBadgeView",
+    "kind": "methods",
+    "selector": "setCircleDotWithDiameter:",
+    "address": "0x116714ee8",
+    "types": "v24@0:8d16",
+    "end_exclusive": "0x116714fc0",
+    "file": "MMBadgeView--setCircleDotWithDiameter_.asm"
+  },
+  {
+    "cls": "MMBadgeView",
+    "kind": "methods",
+    "selector": "updateWithSize:",
+    "address": "0x1167152d4",
+    "types": "v32@0:8{CGSize=dd}16",
+    "end_exclusive": "0x1167153ac",
+    "file": "MMBadgeView--updateWithSize_.asm"
+  },
+  {
+    "cls": "MMBadgeView",
+    "kind": "methods",
+    "selector": "setFrame:",
+    "address": "0x11671553c",
+    "types": "v48@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16",
+    "end_exclusive": "0x116715630",
+    "file": "MMBadgeView--setFrame_.asm"
+  },
+  {
+    "cls": "MMBadgeView",
+    "kind": "methods",
+    "selector": "setCenter:",
+    "address": "0x116715630",
+    "types": "v32@0:8{CGPoint=dd}16",
+    "end_exclusive": "0x116715710",
+    "file": "MMBadgeView--setCenter_.asm"
+  },
+  {
+    "cls": "MMBadgeView",
+    "kind": "methods",
+    "selector": "badgeLabel",
+    "address": "0x1167157f8",
+    "types": "@16@0:8",
+    "end_exclusive": "0x116715a30",
+    "file": "MMBadgeView--badgeLabel.asm"
+  },
+  {
+    "cls": "MMBadgeView",
+    "kind": "class_methods",
+    "selector": "smallRedDot",
+    "address": "0x116714554",
+    "types": "@16@0:8",
+    "end_exclusive": "0x11671458c",
+    "file": "MMBadgeView++smallRedDot.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "initWithItem:frame:",
+    "address": "0x1047271bc",
+    "types": "@56@0:8@16{CGRect={CGPoint=dd}{CGSize=dd}}24",
+    "end_exclusive": "0x104727280",
+    "file": "MMTabBarItemView--initWithItem_frame_.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "setBadgeViewHidden:",
+    "address": "0x104727298",
+    "types": "v20@0:8B16",
+    "end_exclusive": "0x1047272b0",
+    "file": "MMTabBarItemView--setBadgeViewHidden_.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "setTabBarBadgeValue:",
+    "address": "0x1047272b0",
+    "types": "v24@0:8q16",
+    "end_exclusive": "0x1047274b8",
+    "file": "MMTabBarItemView--setTabBarBadgeValue_.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "setTabBarBadgeString:",
+    "address": "0x1047274b8",
+    "types": "v24@0:8@16",
+    "end_exclusive": "0x104727694",
+    "file": "MMTabBarItemView--setTabBarBadgeString_.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "showSmallRedDot",
+    "address": "0x104727694",
+    "types": "v16@0:8",
+    "end_exclusive": "0x104727854",
+    "file": "MMTabBarItemView--showSmallRedDot.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "removeSmallRedDot",
+    "address": "0x104727854",
+    "types": "v16@0:8",
+    "end_exclusive": "0x104727894",
+    "file": "MMTabBarItemView--removeSmallRedDot.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "setCustomIconView:",
+    "address": "0x104727894",
+    "types": "v24@0:8@16",
+    "end_exclusive": "0x104727954",
+    "file": "MMTabBarItemView--setCustomIconView_.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "getBadgeView",
+    "address": "0x104727954",
+    "types": "@16@0:8",
+    "end_exclusive": "0x104727960",
+    "file": "MMTabBarItemView--getBadgeView.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "setupUI",
+    "address": "0x104727bb4",
+    "types": "v16@0:8",
+    "end_exclusive": "0x104728194",
+    "file": "MMTabBarItemView--setupUI.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "relayoutIconAndBadge",
+    "address": "0x104728808",
+    "types": "v16@0:8",
+    "end_exclusive": "0x10472884c",
+    "file": "MMTabBarItemView--relayoutIconAndBadge.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "layoutIcon",
+    "address": "0x10472884c",
+    "types": "v16@0:8",
+    "end_exclusive": "0x104728b94",
+    "file": "MMTabBarItemView--layoutIcon.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "layoutBadgeView",
+    "address": "0x104728b94",
+    "types": "v16@0:8",
+    "end_exclusive": "0x104728d64",
+    "file": "MMTabBarItemView--layoutBadgeView.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "getBadgeViewRightMarginPortrait",
+    "address": "0x104728d64",
+    "types": "d16@0:8",
+    "end_exclusive": "0x104728d90",
+    "file": "MMTabBarItemView--getBadgeViewRightMarginPortrait.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "layoutSubviews",
+    "address": "0x104728d90",
+    "types": "v16@0:8",
+    "end_exclusive": "0x104728ea0",
+    "file": "MMTabBarItemView--layoutSubviews.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "setSelected:",
+    "address": "0x104728ea0",
+    "types": "v20@0:8B16",
+    "end_exclusive": "0x104728f44",
+    "file": "MMTabBarItemView--setSelected_.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "reloadIconImage",
+    "address": "0x104728f50",
+    "types": "v16@0:8",
+    "end_exclusive": "0x1047291cc",
+    "file": "MMTabBarItemView--reloadIconImage.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "badgeView",
+    "address": "0x104729854",
+    "types": "@16@0:8",
+    "end_exclusive": "0x104729864",
+    "file": "MMTabBarItemView--badgeView.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "setBadgeView:",
+    "address": "0x104729864",
+    "types": "v24@0:8@16",
+    "end_exclusive": "0x104729878",
+    "file": "MMTabBarItemView--setBadgeView_.asm"
+  },
+  {
+    "cls": "MMTabBarItemView",
+    "kind": "methods",
+    "selector": "<setupUI-shapeChangeBlock>",
+    "address": "0x10472825c",
+    "types": "block invoke",
+    "end_exclusive": "0x10472845c",
+    "file": "MMTabBarItemView--setupUI-shapeChangeBlock.asm"
+  },
+  {
+    "cls": "MMTabBar",
+    "kind": "methods",
+    "selector": "initWithFrame:",
+    "address": "0x10471e0c8",
+    "types": "@48@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16",
+    "end_exclusive": "0x10471e260",
+    "file": "MMTabBar--initWithFrame_.asm"
+  },
+  {
+    "cls": "MMTabBar",
+    "kind": "methods",
+    "selector": "tabBarItemCount",
+    "address": "0x10471e9c4",
+    "types": "q16@0:8",
+    "end_exclusive": "0x10471e9dc",
+    "file": "MMTabBar--tabBarItemCount.asm"
+  },
+  {
+    "cls": "MMTabBar",
+    "kind": "methods",
+    "selector": "setItems:animated:",
+    "address": "0x10471ebb4",
+    "types": "v28@0:8@16B24",
+    "end_exclusive": "0x10471ec04",
+    "file": "MMTabBar--setItems_animated_.asm"
+  },
+  {
+    "cls": "MMTabBar",
+    "kind": "methods",
+    "selector": "layoutSubviews",
+    "address": "0x10471f158",
+    "types": "v16@0:8",
+    "end_exclusive": "0x10471f280",
+    "file": "MMTabBar--layoutSubviews.asm"
+  },
+  {
+    "cls": "MMTabBar",
+    "kind": "methods",
+    "selector": "createTabBarItemViews",
+    "address": "0x10471f65c",
+    "types": "v16@0:8",
+    "end_exclusive": "0x10471f8e4",
+    "file": "MMTabBar--createTabBarItemViews.asm"
+  },
+  {
+    "cls": "MMTabBar",
+    "kind": "methods",
+    "selector": "relayoutTabBarItems",
+    "address": "0x10471f8e4",
+    "types": "v16@0:8",
+    "end_exclusive": "0x10471fbe0",
+    "file": "MMTabBar--relayoutTabBarItems.asm"
+  },
+  {
+    "cls": "MMTabBarController",
+    "kind": "methods",
+    "selector": "relayoutButtons:",
+    "address": "0x104723f00",
+    "types": "v24@0:8@16",
+    "end_exclusive": "0x104724404",
+    "file": "MMTabBarController--relayoutButtons_.asm"
+  },
+  {
+    "cls": "MMTabBarController",
+    "kind": "methods",
+    "selector": "setViewControllers:",
+    "address": "0x1047244d8",
+    "types": "v24@0:8@16",
+    "end_exclusive": "0x1047245a0",
+    "file": "MMTabBarController--setViewControllers_.asm"
+  },
+  {
+    "cls": "MMTabBarController",
+    "kind": "methods",
+    "selector": "getTabBarBtnForIndex:",
+    "address": "0x104725e74",
+    "types": "@24@0:8Q16",
+    "end_exclusive": "0x104726050",
+    "file": "MMTabBarController--getTabBarBtnForIndex_.asm"
+  },
+  {
+    "cls": "MMTabBarController",
+    "kind": "methods",
+    "selector": "setTabBarBadgeValue:forIndex:",
+    "address": "0x1047263ac",
+    "types": "v32@0:8Q16Q24",
+    "end_exclusive": "0x104726534",
+    "file": "MMTabBarController--setTabBarBadgeValue_forIndex_.asm"
+  },
+  {
+    "cls": "MMTabBarController",
+    "kind": "methods",
+    "selector": "setTabBarBadgeString:forIndex:",
+    "address": "0x104726534",
+    "types": "v32@0:8@16Q24",
+    "end_exclusive": "0x1047266e4",
+    "file": "MMTabBarController--setTabBarBadgeString_forIndex_.asm"
+  },
+  {
+    "cls": "MMTabBarController",
+    "kind": "methods",
+    "selector": "showRedDotOnTabBarItemAtIndex:",
+    "address": "0x1047266e4",
+    "types": "v24@0:8Q16",
+    "end_exclusive": "0x1047268f8",
+    "file": "MMTabBarController--showRedDotOnTabBarItemAtIndex_.asm"
+  },
+  {
+    "cls": "MMTabBarController",
+    "kind": "methods",
+    "selector": "removeRedDotOnTabBarItemAtIndex:",
+    "address": "0x1047268f8",
+    "types": "v24@0:8Q16",
+    "end_exclusive": "0x104726a70",
+    "file": "MMTabBarController--removeRedDotOnTabBarItemAtIndex_.asm"
+  },
+  {
+    "cls": "MMTabBarController",
+    "kind": "methods",
+    "selector": "onTabBarItemViewsRelayout",
+    "address": "0x104726bec",
+    "types": "v16@0:8",
+    "end_exclusive": "0x104726d80",
+    "file": "MMTabBarController--onTabBarItemViewsRelayout.asm"
+  },
+  {
+    "cls": "MainTabBarViewController",
+    "kind": "methods",
+    "selector": "p_createTabBarItems",
+    "address": "0x104abecf0",
+    "types": "v16@0:8",
+    "end_exclusive": "0x104abf754",
+    "file": "MainTabBarViewController--p_createTabBarItems.asm"
+  },
+  {
+    "cls": "MainTabBarViewController",
+    "kind": "methods",
+    "selector": "p_createSlimViewControllers",
+    "address": "0x104abf754",
+    "types": "v16@0:8",
+    "end_exclusive": "0x104abf994",
+    "file": "MainTabBarViewController--p_createSlimViewControllers.asm"
+  }
+]

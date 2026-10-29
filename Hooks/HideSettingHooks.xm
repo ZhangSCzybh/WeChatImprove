@@ -373,7 +373,6 @@ static void hideSettingCells(id tableViewMgr) {
                 
     } @catch (NSException *e) {
         NSLog(@"[HideSetting] CRASH in hideSettingCells: %@", e);
-        NSLog(@"[HideSetting] Stack trace: %@", [e callStackSymbols]);
     }
 }
 
