@@ -32,7 +32,7 @@ if '+ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecisionForPublication:' in 
     out.with_name('GroupLifecycleTabBadgeImplementation.inc').write_text(source[implementation_start:implementation_end]+'\n'+constant+'\n')
     methods.append(method(source, '+ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecision {'))
     methods.append(method(source, '+ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecisionForPublication:'))
-    for marker in ['+ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecisionForController:', '+ (void)requestTabBadgeSourcesRefresh {', '- (void)requestTabBadgeSourceRefresh {', '- (void)refreshTabBadgeSource {']:
+    for marker in ['+ (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecisionForController:', '+ (void)requestTabBadgeSourcesRefresh {', '- (void)requestTabBadgeSourceRefresh {', '- (void)requestTabBadgeSourceRefreshCoalesced:(BOOL)coalesced {', '- (void)cancelTabBadgeSourceRefresh {', '- (void)refreshTabBadgeSource {']:
         if marker in source: methods.append(method(source, marker))
 else:
     out.with_name('GroupLifecycleTabBadgeDependencies.h').write_text('#define CS_GROUP_LIFECYCLE_TAB_BADGE 0\n')

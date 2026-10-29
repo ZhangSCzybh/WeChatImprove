@@ -114,6 +114,7 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 - (void)prepareForPublication {}
 @end
 @interface CSGroupListAdapter : NSObject
+@property(nonatomic) BOOL tabBadgeSourceScheduled;
 @property(nonatomic,strong) UITableView *table;
 @property(nonatomic,strong) Chrome *chrome;
 @property(nonatomic,strong) UIView *nativeHeader,*headerContainer;

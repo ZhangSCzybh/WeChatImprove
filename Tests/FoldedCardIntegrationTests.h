@@ -89,6 +89,13 @@ static void FoldedCardIntegrationTests(void) {
         UILabel *summary=CardText(fold,@"[图片]");
         Check((nativeLayout.boolValue ? summary!=nil : summary==nil) && !CardText(fold,@"other group private preview") && !CardText(fold,@"21:31"),@"shared card retains scoped native summary without exposing native global business text");
         CheckFoldedTextLayout(fold,@"light card");
+        table.window=[UIWindow new];CSListCornerPrepareTable(owner,CSListCornerPageSession,NO);
+        HookSessionTableLayout(table,^{
+            HookNewMainFrameCellLayout(fold,^{});
+            item->m_messageLabel.text=@"late native private preview";
+        });
+        Check(!CardText(fold,@"late native private preview") && (nativeLayout.boolValue ? CardText(fold,@"[图片]")!=nil : CardText(fold,@"[图片]")==nil),@"final table geometry repair also refreshes folded protection after late native label changes");
+        CheckFoldedTextLayout(fold,@"after deferred table geometry");
         if(nativeLayout.boolValue) {
             UILabel *prefix=nil;for(UIView *v in item.subviews)if(v.tag==10001001)prefix=(id)v;
             Check(prefix && CardVisible(prefix) && CardVisible(item->m_messageLabel),@"native parity: card contains native prefix plus native body label");

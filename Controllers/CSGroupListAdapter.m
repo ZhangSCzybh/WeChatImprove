@@ -86,8 +86,15 @@ static BOOL Option(NSString *suffix) {
 @property (nonatomic) BOOL tabBadgeSourceRequired, tabBadgeRestorePending;
 @property (nonatomic) BOOL tabBadgeSourceScheduled, tabBadgeSourceRefreshing, tabBadgeRequestDispatchPending;
 @property (nonatomic) BOOL tabBadgeRefreshAgain;
+@property (nonatomic) BOOL tabBadgeRefreshAgainCoalesced, tabBadgeRequestImmediate, tabBadgeImmediatePending;
+@property (nonatomic, strong) NSTimer *tabBadgeSourceTimer;
+@property (nonatomic, copy) NSArray *tabBadgeScheduleKey;
+@property (nonatomic) NSUInteger tabBadgeSourceGeneration;
+@property (nonatomic) NSTimeInterval tabBadgeBurstStart, tabBadgeDue;
 @property (nonatomic, copy) NSArray *tabBadgePublishedKey;
 - (void)requestTabBadgeSourceRefresh;
+- (void)requestTabBadgeSourceRefreshCoalesced:(BOOL)coalesced;
+- (void)cancelTabBadgeSourceRefresh;
 - (void)refreshTabBadgeSource;
 + (void)requestTabBadgeSourcesRefresh;
 @property (atomic) NSUInteger modelRevision;
@@ -152,6 +159,7 @@ static BOOL Option(NSString *suffix) {
 @end
 
 @implementation CSGroupListAdapter
+- (void)dealloc { [_tabBadgeSourceTimer invalidate]; }
 + (instancetype)adapterForTable:(id)table { return objc_getAssociatedObject(table,&AdapterKey); }
 + (instancetype)adapterForController:(id)controller { return objc_getAssociatedObject(controller,&AdapterKey); }
 + (void)attachToController:(id)controller {
@@ -272,7 +280,11 @@ static BOOL Option(NSString *suffix) {
             adapter.snapshotEpoch==epoch && [adapter.snapshotAccount isEqual:policy.accountID]) sections=adapter.cachedNativeSections;
         if (!sections) {
             if (includeNative && !filtering) adapter.tabBadgeRestorePending=YES;
-            [adapter requestTabBadgeSourceRefresh];
+            // Passive bursts keep their deadline; native restoration is urgent.
+            NSArray *scheduleKey=@[policy.accountID ?: @"",@(epoch),@(policy.revision)];
+            if ((includeNative && !filtering) || (!adapter.changeDepth &&
+                (!adapter.tabBadgeSourceScheduled || ![adapter.tabBadgeScheduleKey isEqual:scheduleKey])))
+                [adapter requestTabBadgeSourceRefresh];
             continue;
         }
         NSArray *foldedNames=CSGroupCopyFoldedUserNames();
@@ -309,14 +321,32 @@ static BOOL Option(NSString *suffix) {
     for (CSGroupListAdapter *adapter in Adapters().allObjects) [adapter requestTabBadgeSourceRefresh];
 }
 - (void)requestTabBadgeSourceRefresh {
+    [self requestTabBadgeSourceRefreshCoalesced:NO];
+}
+- (void)cancelTabBadgeSourceRefresh {
+    self.tabBadgeSourceGeneration++;
+    [self.tabBadgeSourceTimer invalidate]; self.tabBadgeSourceTimer=nil;
+    self.tabBadgeSourceScheduled=NO; self.tabBadgeScheduleKey=nil;
+    self.tabBadgeBurstStart=0; self.tabBadgeDue=0;
+}
+- (void)requestTabBadgeSourceRefreshCoalesced:(BOOL)coalesced {
     if (!NSThread.isMainThread) {
-        @synchronized (self) { if (self.tabBadgeRequestDispatchPending) return; self.tabBadgeRequestDispatchPending=YES; }
+        @synchronized (self) {
+            self.tabBadgeRequestImmediate|=!coalesced;
+            if (self.tabBadgeRequestDispatchPending) return;
+            self.tabBadgeRequestDispatchPending=YES;
+        }
         dispatch_async(dispatch_get_main_queue(), ^{
-            @synchronized (self) { self.tabBadgeRequestDispatchPending=NO; }
-            [self requestTabBadgeSourceRefresh];
+            BOOL immediate;
+            @synchronized (self) {
+                immediate=self.tabBadgeRequestImmediate;
+                self.tabBadgeRequestImmediate=NO; self.tabBadgeRequestDispatchPending=NO;
+            }
+            [self requestTabBadgeSourceRefreshCoalesced:!immediate];
         });
         return;
     }
+    if (!coalesced) self.tabBadgeImmediatePending=YES;
     if (!self.controller || !self.table || CSGroupIsFoldedController(self.controller)) return;
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
     SEL restoreKey=@selector(closeFriendTabBadgeDecisionForController:includeNative:);
@@ -330,21 +360,49 @@ static BOOL Option(NSString *suffix) {
         if (filtering) self.tabBadgeSourceRequired=YES;
         else if (self.tabBadgeSourceRequired) { self.tabBadgeSourceRequired=NO; self.tabBadgeRestorePending=YES; }
     }
-    if ((!self.tabBadgeSourceRequired && !self.tabBadgeRestorePending) || policy.blocked || !CSGroupApplicationActive() || self.changeDepth) return;
-    if (self.tabBadgeSourceRefreshing) { self.tabBadgeRefreshAgain=YES; return; }
-    if (self.tabBadgeSourceScheduled) return;
+    NSArray *scheduleKey=@[policy.accountID ?: @"",@(CSCloseFriendAccountEpoch()),@(policy.revision)];
+    if (self.tabBadgeRestorePending || (self.tabBadgeScheduleKey && ![scheduleKey isEqual:self.tabBadgeScheduleKey])) coalesced=NO;
+    coalesced=coalesced && !self.tabBadgeImmediatePending;
+    if ((!self.tabBadgeSourceRequired && !self.tabBadgeRestorePending) || policy.blocked || !CSGroupApplicationActive() || self.changeDepth) {
+        if (!coalesced) [self cancelTabBadgeSourceRefresh];
+        return;
+    }
+    if (self.tabBadgeSourceRefreshing) {
+        self.tabBadgeRefreshAgainCoalesced=self.tabBadgeRefreshAgain ? self.tabBadgeRefreshAgainCoalesced && coalesced : coalesced;
+        self.tabBadgeRefreshAgain=YES; return;
+    }
+    if (self.tabBadgeSourceScheduled && !self.tabBadgeSourceTimer && [scheduleKey isEqual:self.tabBadgeScheduleKey]) {
+        self.tabBadgeImmediatePending=NO; return;
+    }
+    NSTimeInterval now=NSProcessInfo.processInfo.systemUptime;
+    if (coalesced && self.tabBadgeSourceTimer) {
+        self.tabBadgeDue=MIN(now+0.08,self.tabBadgeBurstStart+0.25);
+        self.tabBadgeSourceTimer.fireDate=[NSDate dateWithTimeIntervalSinceNow:MAX(0,self.tabBadgeDue-now)];
+        return;
+    }
+    [self cancelTabBadgeSourceRefresh];
     self.tabBadgeSourceScheduled=YES;
+    self.tabBadgeScheduleKey=scheduleKey;
+    self.tabBadgeImmediatePending=NO;
+    NSUInteger generation=self.tabBadgeSourceGeneration;
     __weak typeof(self) weakSelf=self;
-    dispatch_async(dispatch_get_main_queue(), ^{
+    void (^publish)(void)=^{
         CSGroupListAdapter *self=weakSelf;
-        if (!self) return;
-        self.tabBadgeSourceScheduled=NO;
+        if (!self || generation!=self.tabBadgeSourceGeneration) return;
+        [self cancelTabBadgeSourceRefresh];
+        CSCloseFriendSnapshot *current=CSCloseFriendCurrentSnapshot();
+        if (![scheduleKey isEqual:@[current.accountID ?: @"",@(CSCloseFriendAccountEpoch()),@(current.revision)]]) return;
         [self refreshTabBadgeSource];
-    });
+    };
+    if (coalesced) {
+        self.tabBadgeBurstStart=now; self.tabBadgeDue=now+0.08;
+        self.tabBadgeSourceTimer=[NSTimer timerWithTimeInterval:0.08 repeats:NO block:^(__unused NSTimer *timer) { publish(); }];
+        [NSRunLoop.mainRunLoop addTimer:self.tabBadgeSourceTimer forMode:NSRunLoopCommonModes];
+    } else dispatch_async(dispatch_get_main_queue(),publish);
 }
 - (void)refreshTabBadgeSource {
     if (!NSThread.isMainThread) { [self requestTabBadgeSourceRefresh]; return; }
-    if (self.tabBadgeSourceRefreshing || self.changeDepth || !CSGroupApplicationActive() ||
+    if (self.tabBadgeSourceRefreshing || self.publishing || self.changeDepth || !CSGroupApplicationActive() ||
         !self.controller || !self.table || CSGroupIsFoldedController(self.controller)) return;
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
     NSString *account=CSGroupCurrentAccountID();
@@ -387,7 +445,11 @@ static BOOL Option(NSString *suffix) {
         [NSNotificationCenter.defaultCenter postNotificationName:CSGroupTabBadgeSourceDidRefreshNotification object:self];
     } @finally {
         self.tabBadgeSourceRefreshing=NO;
-        if (self.tabBadgeRefreshAgain) { self.tabBadgeRefreshAgain=NO; [self requestTabBadgeSourceRefresh]; }
+        if (self.tabBadgeRefreshAgain) {
+            BOOL coalesced=self.tabBadgeRefreshAgainCoalesced;
+            self.tabBadgeRefreshAgain=NO; self.tabBadgeRefreshAgainCoalesced=NO;
+            [self requestTabBadgeSourceRefreshCoalesced:coalesced];
+        }
     }
 }
 + (void)settingsChanged {
@@ -459,6 +521,7 @@ static BOOL Option(NSString *suffix) {
     proxy.target=target; return proxy;
 }
 - (void)detach {
+    [self cancelTabBadgeSourceRefresh];
     [Adapters() removeObject:self];
     self.tabBadgeSections=nil; self.tabAlertBadge=nil; self.tabAlertBadgeKey=nil;
     self.tabBadgeSourceRequired=NO; self.tabBadgeRestorePending=NO;
@@ -803,7 +866,7 @@ static BOOL Option(NSString *suffix) {
             for (void (^action)(void) in actions) CSGroupWithNativeIndices(self.table,action);
         }
         if (self.dirty) [self scheduleRefresh];
-        if (finished) [self requestTabBadgeSourceRefresh];
+        if (finished && !self.tabBadgeSourceScheduled) [self requestTabBadgeSourceRefresh];
     }
 }
 - (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous
@@ -839,7 +902,17 @@ static BOOL Option(NSString *suffix) {
     BOOL scopeFolded=Option(@"enabled") && !CSGroupIsFoldedController(self.controller) && !self.nativePresentation;
     CSGroupProjection *foldedProjection=nil;
     if (scopeFolded) {
-        NSArray *foldedRows=CSGroupCopyFoldedRows();
+        NSArray *foldedRows=CSGroupCopyFoldedRowsSelectingSummary(^CSGroupRow *(NSArray<CSGroupRow *> *rows) {
+            CSGroupProjection *visible=[[CSGroupProjection alloc] initWithSections:@[rows] tabs:tabs selectedTabID:selected
+                filterDuplicates:self.preferences.filterDuplicates accountID:account hiddenUserNames:hidden
+                privacyRevision:policy.revision previousProjection:nil];
+            if (!visible.isValid) return nil;
+            CSGroupRow *latest=nil;
+            for (NSArray *section in visible.sections) for (CSGroupRow *row in section) {
+                if (row.kind==CSGroupRowKindSession && (!latest || row.nativeSortTime.unsignedLongLongValue>latest.nativeSortTime.unsignedLongLongValue)) latest=row;
+            }
+            return latest;
+        });
         if (foldedRows) {
             // Use exactly the same membership, duplicate and privacy rules as
             // the child page. Never alter ChatBoxMgr's global source or unread.
@@ -965,7 +1038,7 @@ static BOOL Option(NSString *suffix) {
 - (void)endNativeChange { [self endNativeChangeCoalesced:NO]; }
 - (void)endNativeChangeCoalesced:(BOOL)coalesced {
     BOOL outer=NO; @synchronized (self) { if (self.changeDepth) self.changeDepth--; outer=self.changeDepth==0; }
-    if (outer) { [self requestTabBadgeSourceRefresh]; if (coalesced) [self requestCoalescedRefresh]; else [self scheduleRefresh]; }
+    if (outer) { [self requestTabBadgeSourceRefreshCoalesced:coalesced]; if (coalesced) [self requestCoalescedRefresh]; else [self scheduleRefresh]; }
 }
 - (void)performNativeBatch:(void (^)(void))updates completion:(void (^)(BOOL))completion {
     void (^callback)(BOOL)=[completion copy];

@@ -63,9 +63,41 @@
 @end
 @interface ClaimFailureStore : CSAIReplyStore
 @property(nonatomic) BOOL failClaims;
+@property(nonatomic) BOOL deferClaims;
+@property(nonatomic) BOOL useAsyncStore;
+@property(nonatomic,strong) NSMutableArray<NSDictionary *> *claimRequests;
+- (void)completeNextClaim;
 @end
 @implementation ClaimFailureStore
 - (BOOL)claimMessageIDs:(NSArray<NSString *> *)identifiers error:(NSError **)error {return self.failClaims?NO:[super claimMessageIDs:identifiers error:error];}
+- (void)claimMessageIDs:(NSArray<NSString *> *)identifiers completion:(CSAIReplyStoreCompletion)completion {
+    if(self.useAsyncStore){[super claimMessageIDs:identifiers completion:completion];return;}
+    if(self.deferClaims){
+        if(!self.claimRequests)self.claimRequests=[NSMutableArray array];
+        [self.claimRequests addObject:@{@"ids":[identifiers copy],@"completion":[completion copy]}];return;
+    }
+    NSError *error=nil;BOOL success=[self claimMessageIDs:identifiers error:&error];completion(success,error);
+}
+- (void)claimMessageAliases:(NSArray<NSString *> *)identifiers completion:(CSAIReplyStoreCompletion)completion {
+    if(self.useAsyncStore){[super claimMessageAliases:identifiers completion:completion];return;}
+    [self claimMessageIDs:identifiers completion:completion];
+}
+- (void)completeNextClaim {
+    CHECK(self.claimRequests.count);NSDictionary *request=self.claimRequests.firstObject;[self.claimRequests removeObjectAtIndex:0];
+    CSAIReplyStoreCompletion completion=request[@"completion"];NSError *error=nil;
+    BOOL success=[self claimMessageIDs:request[@"ids"] error:&error];completion(success,error);
+}
+// Most fixtures isolate coordinator state transitions from disk scheduling.
+// Dedicated deferred-claim cases below exercise the asynchronous boundary.
+- (void)appendHistory:(NSDictionary *)record completion:(CSAIReplyStoreCompletion)completion {
+    if(self.useAsyncStore){[super appendHistory:record completion:completion];return;}
+    NSError *error=nil;BOOL success=[self appendHistory:record error:&error];if(completion)completion(success,error);
+}
+- (void)saveConfiguration:(NSDictionary *)configuration expectedConfiguration:(NSDictionary *)expected completion:(CSAIReplyStoreCompletion)completion {
+    if(self.useAsyncStore){[super saveConfiguration:configuration expectedConfiguration:expected completion:completion];return;}
+    NSError *error=nil;BOOL success=[expected isEqual:self.configuration] && [self saveConfiguration:configuration error:&error];
+    if(completion)completion(success,error);
+}
 @end
 @interface Fixture : NSObject
 @property(nonatomic,strong) NSURL *root;
@@ -259,6 +291,132 @@ static void ContextBudgetAndPreset(void) {
     f=[Fixture new];for(NSUInteger i=0;i<8;i++){NSMutableDictionary *event=[f event:@"c" sender:@"c" identity:nil];event[@"text"]=[@"😀" stringByPaddingToLength:6000 withString:@"😀" startingAtIndex:0];[f.coordinator receiveEvent:event];}
     [f advance:2];CHECK([LastInput(f.client.operations[0]) length]<=12000);CHECK([LastInput(f.client.operations[0]) dataUsingEncoding:NSUTF8StringEncoding]);
 }
+@interface CSAIReplyCoordinator (ContextTestAccess)
+- (NSArray *)contextForKey:(NSArray *)key;
+- (void)clearContextsForConversation:(NSString *)conversation;
+@end
+static void AddContext(Fixture *f,NSString *sender,NSUInteger length) {
+    NSMutableDictionary *event=[f event:@"room@chatroom" sender:sender identity:nil];
+    event[@"text"]=[@"u" stringByPaddingToLength:length withString:@"u" startingAtIndex:0];
+    [f.coordinator receiveEvent:event];[f advance:2];Complete(f,f.client.operations.count-1,@"reply",nil);
+}
+static void GlobalContextBoundsAndMemoryPressure(void) {
+    Fixture *f=[Fixture new];
+    for(NSUInteger i=0;i<32;i++)AddContext(f,[NSString stringWithFormat:@"member-%lu",(unsigned long)i],20);
+    NSDictionary *contexts=[f.coordinator valueForKey:@"contexts"];CHECK(contexts.count==32);
+    CHECK([f.coordinator contextForKey:@[@"room@chatroom",@"member-0"]]);
+    AddContext(f,@"member-32",20);CHECK(contexts.count==32);
+    CHECK(contexts[@[@"room@chatroom",@"member-0"]] && !contexts[@[@"room@chatroom",@"member-1"]]);
+    CHECK(![f.coordinator valueForKey:@"timer"]); // Cache retention never creates wakeups.
+    [f.coordinator clearContextsForConversation:@"room@chatroom"];
+    CHECK(!contexts.count && ![[f.coordinator valueForKey:@"contextUTF16Cost"] unsignedIntegerValue]);
+    f=[Fixture new];
+    for(NSUInteger i=0;i<22;i++)AddContext(f,[NSString stringWithFormat:@"long-%lu",(unsigned long)i],12000);
+    contexts=[f.coordinator valueForKey:@"contexts"];CHECK(contexts.count==21);
+    CHECK([[f.coordinator valueForKey:@"contextUTF16Cost"] unsignedIntegerValue]<=256*1024);
+    CHECK(!contexts[@[@"room@chatroom",@"long-0"]]);
+    [f.coordinator cancelAll];CHECK(![[f.coordinator valueForKey:@"contextUTF16Cost"] unsignedIntegerValue]);
+    f=[Fixture new];AddContext(f,@"ttl",20);NSTimeInterval last=f.clock;
+    f.clock=last+1799;CHECK([f.coordinator contextForKey:@[@"room@chatroom",@"ttl"]]);
+    f.clock+=1800;CHECK(![f.coordinator contextForKey:@[@"room@chatroom",@"ttl"]]);
+    AddContext(f,@"rollback",20);f.clock-=10;
+    CHECK(![f.coordinator contextForKey:@[@"room@chatroom",@"rollback"]]);
+    // Memory pressure discards cached history, without cancelling live requests.
+    f=[Fixture new];AddContext(f,@"member",20);Receive(f,@"room@chatroom",@"member",nil);[f advance:2];
+    Receive(f,@"d",@"d",nil);CHECK(f.coordinator.activeCount==1 && f.coordinator.pendingCount==1);
+    NSUInteger history=f.store.history.count;
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UIApplicationDidReceiveMemoryWarningNotification" object:nil];
+    CHECK(f.coordinator.activeCount==1 && f.coordinator.pendingCount==1 && !f.client.operations[1].cancelled);
+    CHECK(f.store.history.count==history && ![[f.coordinator valueForKey:@"contexts"] count]);
+    Complete(f,1,@"valid after warning",nil);CHECK(f.delegate.sends==2);
+    CHECK(![[f.coordinator valueForKey:@"contexts"] count]); // Old batch cannot repopulate cache.
+    [f advance:2];Complete(f,2,@"new batch",nil);CHECK([[f.coordinator valueForKey:@"contexts"] count]==1);
+}
+static void DeferredClaimsAndAliases(void) {
+    Fixture *f=[Fixture new];f.store.deferClaims=YES;
+    NSMutableDictionary *event=[f event:@"c" sender:@"c" identity:@"local-A"];
+    [f.coordinator receiveEvent:event];CHECK(f.coordinator.pendingCount==1 && f.store.claimRequests.count==1);
+    [f advance:2];CHECK(!f.client.operations.count && ![f.store hasHandledMessageID:@"local-A"]);
+    event[@"identifiers"]=@[@"local-A",@"server-B"];[f.coordinator receiveEvent:event];
+    event[@"identifiers"]=@[@"server-B"];[f.coordinator receiveEvent:event];CHECK(f.store.claimRequests.count==2);
+    [f.store completeNextClaim];CHECK(!f.client.operations.count);
+    [f.store completeNextClaim];CHECK(f.client.operations.count==1 && !f.coordinator.pendingCount);
+    // An alias arriving after model work begins still fences the final native send.
+    event[@"identifiers"]=@[@"server-B",@"later-C"];[f.coordinator receiveEvent:event];
+    Complete(f,0,@"reply",nil);Complete(f,0,@"duplicate completion",nil);
+    CHECK(!f.delegate.sends && f.coordinator.activeCount==1);
+    [f.store completeNextClaim];CHECK(f.delegate.sends==1 && !f.coordinator.activeCount);
+    CHECK([f.store hasHandledMessageID:@"later-C"]);
+    event[@"identifiers"]=@[@"later-C"];[f.coordinator receiveEvent:event];CHECK(!f.store.claimRequests.count && !f.coordinator.pendingCount);
+    // Late disk success cannot resurrect cancelled or expired work.
+    f=[Fixture new];f.store.deferClaims=YES;Receive(f,@"c",@"c",@"cancelled-claim");[f.coordinator cancelAll];
+    [f.store completeNextClaim];[f advance:2];CHECK(!f.client.operations.count && !f.delegate.sends);
+    CHECK([f.store hasHandledMessageID:@"cancelled-claim"]);
+    f=[Fixture new];f.store.deferClaims=YES;Receive(f,@"c",@"c",@"expired-claim");[f advance:121];
+    [f.store completeNextClaim];CHECK(!f.client.operations.count && !f.coordinator.pendingCount);
+    // A failed alias commit cancels the waiting reply instead of retrying it.
+    f=[Fixture new];Receive(f,@"c",@"c",@"known-local");[f advance:2];f.store.deferClaims=YES;
+    event=[f event:@"c" sender:@"c" identity:nil];event[@"identifiers"]=@[@"known-local",@"failed-alias"];[f.coordinator receiveEvent:event];
+    Complete(f,0,@"must not send",nil);f.store.failClaims=YES;[f.store completeNextClaim];
+    CHECK(!f.delegate.sends && !f.coordinator.activeCount && !f.coordinator.pendingCount);
+    // Waiting for a slow writer cannot build an unbounded admission queue.
+    f=[Fixture new];f.store.deferClaims=YES;
+    for(NSUInteger i=0;i<40;i++)Receive(f,@"c",@"c",nil);
+    CHECK(f.store.claimRequests.count==20 && f.coordinator.pendingCount==1);
+    [f advance:3];CHECK(!f.client.operations.count);
+    while(f.store.claimRequests.count)[f.store completeNextClaim];CHECK(f.client.operations.count==1);
+    // Business cancellation does not release ordinary disk queue capacity.
+    // Late aliases reach the Store immediately even when all 20 slots are full.
+    f=[Fixture new];f.store.deferClaims=YES;
+    for(NSUInteger i=0;i<20;i++)Receive(f,@"c",@"c",[NSString stringWithFormat:@"slow-%lu",(unsigned long)i]);
+    event=[f event:@"c" sender:@"c" identity:nil];event[@"identifiers"]=@[@"slow-0",@"buffered-server"];
+    [f.coordinator receiveEvent:event];CHECK(f.store.claimRequests.count==21);
+    CHECK([[f.coordinator valueForKey:@"outstandingClaimWrites"] unsignedIntegerValue]==20);
+    [f.coordinator cancelAll];
+    for(NSUInteger i=0;i<40;i++)Receive(f,@"d",@"d",nil);
+    CHECK(f.store.claimRequests.count==21 && !f.coordinator.pendingCount);
+    [f.store completeNextClaim];CHECK(f.store.claimRequests.count==20);
+    event[@"identifiers"]=@[@"buffered-server"];[f.coordinator receiveEvent:event];CHECK(!f.coordinator.pendingCount);
+    while(f.store.claimRequests.count)[f.store completeNextClaim];
+    CHECK([f.store hasHandledMessageID:@"buffered-server"] && !f.client.operations.count);
+    CHECK(![[f.coordinator valueForKey:@"outstandingClaimWrites"] unsignedIntegerValue]);
+    Receive(f,@"d",@"d",@"after-drain");CHECK(f.store.claimRequests.count==1);[f.store completeNextClaim];
+    [f advance:2];CHECK(f.client.operations.count==1);
+    // Hitting the resident identity limit must still persist a known message's
+    // newly discovered server ID. Seed the pressure directly to avoid 5000 fsyncs.
+    f=[Fixture new];Receive(f,@"c",@"c",@"capacity-local");[f advance:2];Complete(f,0,@"original reply",nil);
+    id resident=[NSClassFromString(@"CSAIReplyIdentityReservation") new];
+    NSMutableSet *residentIDs=[NSMutableSet set];NSMutableDictionary *reservations=[f.coordinator valueForKey:@"reservedIdentities"];
+    for(NSUInteger i=0;i<5000;i++){NSString *identifier=[NSString stringWithFormat:@"resident-%lu",(unsigned long)i];[residentIDs addObject:identifier];reservations[identifier]=resident;}
+    [resident setValue:residentIDs forKey:@"identifiers"];
+    f.store.deferClaims=YES;event=[f event:@"c" sender:@"c" identity:nil];
+    event[@"created"]=@(f.clock+20);event[@"identifiers"]=@[@"capacity-local",@"capacity-server"];
+    [f.coordinator receiveEvent:event];CHECK(f.store.claimRequests.count==1);
+    [f.store completeNextClaim];CHECK([f.store hasHandledMessageID:@"capacity-server"]);
+    [f.coordinator configurationDidChange];event[@"identifiers"]=@[@"capacity-server"];
+    [f.coordinator receiveEvent:event];[f advance:2];
+    CHECK(!f.store.claimRequests.count && f.client.operations.count==1 && f.delegate.sends==1);
+}
+static void WaitFor(BOOL (^condition)(void)) {
+    NSDate *deadline=[NSDate dateWithTimeIntervalSinceNow:5];
+    while(!condition() && deadline.timeIntervalSinceNow>0)
+        [NSRunLoop.mainRunLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.005]];
+    CHECK(condition());
+}
+static void ProductionAsyncStoreIntegration(void) {
+    Fixture *f=[Fixture new];f.store.useAsyncStore=YES;
+    Receive(f,@"c",@"c",@"async-c");Receive(f,@"d",@"d",@"async-d");Receive(f,@"e",@"e",@"async-e");
+    CHECK(!f.client.operations.count && f.coordinator.pendingCount==3);[f advance:2];
+    WaitFor(^BOOL{return f.client.operations.count==2;});
+    CHECK([f.store hasHandledMessageID:@"async-c"] && [f.store hasHandledMessageID:@"async-d"]);
+    Complete(f,0,@"reply c",nil);WaitFor(^BOOL{return f.client.operations.count==3;});
+    Complete(f,1,@"reply d",nil);Complete(f,2,@"reply e",nil);CHECK(f.delegate.sends==3);
+    WaitFor(^BOOL{return f.store.history.count==3;});
+    __block BOOL flushed=NO;[f.store flushHistoryWithCompletion:^(BOOL success,NSError *error){CHECK(success && !error);flushed=YES;}];
+    WaitFor(^BOOL{return flushed;});
+    NSDictionary *disk=[CSAIReplyStore readStateAtURL:CSAIReplyFileURL(f.root,@"me") account:@"me" error:NULL];
+    CHECK([disk[@"history"] count]==3 && [disk[@"handled"] count]==3);
+}
 static void OneShotProductionWakeup(void) {
     Fixture *f=[Fixture new];__block NSTimeInterval value=NSDate.date.timeIntervalSince1970;f.coordinator.now=^{return value;};[f.coordinator configurationDidChange];f.clock=value;
     Receive(f,@"c",@"c",nil);value+=2.1;
@@ -390,6 +548,6 @@ static void GroupImagesAndBudgets(void){
     CHECK(![f.store hasHandledMessageID:@"second-image"]);[f advance:2];CHECK(images.operations.count==1 && [images.events[0][@"identifiers"] containsObject:@"first-image"]);
 }
 int main(void){@autoreleasepool{
-    Filters();GroupUnmentioned();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();ImagePreparationAndOwnership();SafeFailureDetails();GroupImagesAndBudgets();OneShotProductionWakeup();
-    puts("AIReplyCoordinatorTests passed: filtering, per-group unmentioned opt-in, alias claims, debounce, serialization, context bounds, cancellation, boundary authorization, expiry, concurrency, safe image/model failure details and one-shot timers");
+    Filters();GroupUnmentioned();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();GlobalContextBoundsAndMemoryPressure();DeferredClaimsAndAliases();ProductionAsyncStoreIntegration();ImagePreparationAndOwnership();SafeFailureDetails();GroupImagesAndBudgets();OneShotProductionWakeup();
+    puts("AIReplyCoordinatorTests passed: filtering, alias durability fences, bounded async admissions, LRU/TTL/global text budget, memory pressure, serialization, cancellation, expiry, safe failure details and one-shot timers");
 }return 0;}

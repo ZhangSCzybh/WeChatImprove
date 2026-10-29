@@ -133,6 +133,9 @@ static BOOL allowed=YES;
 - (NSString *)statusForConversation:(NSString *)conversation{(void)conversation;return @"总开关已关闭";}
 - (BOOL)setConversation:(NSString *)conversation enabled:(BOOL)enabled presetID:(NSString *)presetID account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error{(void)conversation;(void)enabled;(void)presetID;(void)error;if(![self isCurrentAccount:account epoch:epoch])return NO;mutations++;return YES;}
 - (BOOL)setConversation:(NSString *)conversation allowUnmentioned:(BOOL)allowUnmentioned account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error{(void)error;if(![self isCurrentAccount:account epoch:epoch] || ![self allowsConversation:conversation] || ![conversation hasSuffix:@"@chatroom"])return NO;unmentionedMutations++;unmentionedTarget=conversation;unmentionedValue=allowUnmentioned;return YES;}
+- (void)setConversation:(NSString *)conversation enabled:(BOOL)enabled presetID:(NSString *)presetID account:(NSString *)account epoch:(NSUInteger)epoch completion:(CSAIReplyStoreCompletion)completion {NSError *error=nil;BOOL ok=[self setConversation:conversation enabled:enabled presetID:presetID account:account epoch:epoch error:&error];completion(ok,error);}
+- (void)setConversation:(NSString *)conversation allowUnmentioned:(BOOL)allowUnmentioned account:(NSString *)account epoch:(NSUInteger)epoch completion:(CSAIReplyStoreCompletion)completion {NSError *error=nil;BOOL ok=[self setConversation:conversation allowUnmentioned:allowUnmentioned account:account epoch:epoch error:&error];completion(ok,error);}
+
 @end
 #pragma clang diagnostic pop
 void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation,NSString *account,NSUInteger epoch){(void)controller;(void)conversation;(void)account;(void)epoch;pickerCalls++;}

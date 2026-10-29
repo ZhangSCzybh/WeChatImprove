@@ -1,8 +1,15 @@
 #import "CSNativeSettingsHost.h"
+#import "CSNativeRewardPresenter.h"
 #import <objc/message.h>
 #import <objc/runtime.h>
 
 static Class CSSettingsHostClass;
+
+static void CSSettingsHostViewDidAppear(UIViewController *host, SEL selector, BOOL animated) {
+    struct objc_super nativeSuper = { host, class_getSuperclass(CSSettingsHostClass) };
+    ((void (*)(struct objc_super *, SEL, BOOL))objc_msgSendSuper)(&nativeSuper, selector, animated);
+    CSNativeRewardSourceDidAppear(host);
+}
 
 static void CSSettingsHostViewDidLoad(UIViewController *host, SEL selector) {
     struct objc_super nativeSuper = { host, class_getSuperclass(CSSettingsHostClass) };
@@ -27,6 +34,11 @@ Class CSNativeSettingsControllerClass(void) {
     if (!host) return NSClassFromString(@"CSCustomViewController");
     Method viewDidLoad = class_getInstanceMethod(UIViewController.class, @selector(viewDidLoad));
     if (!class_addMethod(host, @selector(viewDidLoad), (IMP)CSSettingsHostViewDidLoad, method_getTypeEncoding(viewDidLoad))) {
+        objc_disposeClassPair(host);
+        return NSClassFromString(@"CSCustomViewController");
+    }
+    Method viewDidAppear = class_getInstanceMethod(UIViewController.class, @selector(viewDidAppear:));
+    if (!viewDidAppear || !class_addMethod(host, @selector(viewDidAppear:), (IMP)CSSettingsHostViewDidAppear, method_getTypeEncoding(viewDidAppear))) {
         objc_disposeClassPair(host);
         return NSClassFromString(@"CSCustomViewController");
     }

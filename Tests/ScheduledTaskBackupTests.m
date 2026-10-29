@@ -4,9 +4,40 @@
 #import "CSBackupCodec.h"
 #import "CSBackupRegistry.h"
 #import "CSScheduledTaskStore.h"
+#import "CSAIReplyStore.h"
+#import "CSBackupManager.h"
+#import "CSBackupRestoreDiagnostics.h"
+#import "CSBackupMutation.h"
 #import <unistd.h>
-static NSUInteger checks;
+#import <stdatomic.h>
+#import <sys/stat.h>
+static atomic_uint checks;
 #define CHECK(condition) do { checks++; if (!(condition)) { NSLog(@"FAIL line %d: %s", __LINE__, #condition); exit(1); } } while (0)
+static atomic_bool blockNextFile,boundaryEntered;
+static dispatch_semaphore_t entered,resumeIO;
+int CSScheduledBackupFsync(int descriptor){
+    CHECK(!NSThread.isMainThread);struct stat info;CHECK(fstat(descriptor,&info)==0);
+    if(S_ISREG(info.st_mode) && atomic_exchange(&blockNextFile,false)){
+        dispatch_semaphore_signal(entered);CHECK(dispatch_semaphore_wait(resumeIO,dispatch_time(DISPATCH_TIME_NOW,5*NSEC_PER_SEC))==0);
+    }
+    return fsync(descriptor);
+}
+@interface ScheduledBackupBoundary : NSObject
+@property(nonatomic) CSBackupEngine *engine;
+@property(nonatomic) NSString *status;
+- (void)performRestore:(NSString *)stage work:(id(^)(NSError **))work completion:(CSBackupCompletion)completion;
+- (BOOL)validateColors:(NSDictionary *)snapshot error:(NSError **)error;
+- (void)preview:(NSDictionary *)snapshot modules:(NSSet *)modules accounts:(NSSet *)accounts completion:(CSBackupCompletion)completion;
+- (void)prepare:(NSDictionary *)preview completion:(CSBackupCompletion)completion;
+@end
+@implementation ScheduledBackupBoundary
+- (void)performRestore:(NSString *)stage work:(id(^)(NSError **))work completion:(CSBackupCompletion)completion {
+    (void)stage;dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY,0),^{CHECK(!NSThread.isMainThread);atomic_store(&boundaryEntered,true);NSError *error=nil;id result=work(&error);dispatch_async(dispatch_get_main_queue(),^{completion(result,error);});});
+}
+- (BOOL)validateColors:(NSDictionary *)snapshot error:(NSError **)error {(void)snapshot;(void)error;return YES;}
+#import "ScheduledBackupManagerBoundary.h"
+@end
+static void Wait(BOOL(^done)(void)){NSDate *limit=[NSDate dateWithTimeIntervalSinceNow:5];while(!done() && limit.timeIntervalSinceNow>0)[NSRunLoop.mainRunLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:.002]];CHECK(done());}
 static NSURL *TaskURL(NSURL *resources, NSString *account) {
     NSData *data=[account dataUsingEncoding:NSUTF8StringEncoding]; unsigned char bytes[CC_SHA256_DIGEST_LENGTH];
     CC_SHA256(data.bytes,(CC_LONG)data.length,bytes); NSMutableString *name=[NSMutableString string];
@@ -37,6 +68,40 @@ static int Crash(NSString *binary, NSURL *root, NSString *suite, NSString *stage
     NSTask *process=[NSTask new];process.executableURL=[NSURL fileURLWithPath:binary];process.arguments=@[@"--crash",root.path,suite,stage];
     CHECK([process launchAndReturnError:NULL]);[process waitUntilExit];return process.terminationStatus;
 }
+static void PendingWriteRestoreBoundary(NSURL *root){
+    NSString *suite=[@"scheduled.pending.restore." stringByAppendingString:NSUUID.UUID.UUIDString];
+    NSUserDefaults *defaults=[[NSUserDefaults alloc]initWithSuiteName:suite];CSBackupEngine *engine=Engine(root,suite);
+    NSURL *url=TaskURL(root,@"alice");CSScheduledTaskStore *live=[[CSScheduledTaskStore alloc]initWithURL:url account:@"alice"];
+    NSDate *before=[NSDate dateWithTimeIntervalSince1970:1799999900],*due=[NSDate dateWithTimeIntervalSince1970:1800000000];
+    CHECK([live load]);CHECK([live saveTask:Task(@"pending",@"minutes",@"filehelper") now:before]);CHECK([live setEnabled:YES now:before]);
+    NSDictionary *snapshot=[engine capture:@"before async edit" kind:@"manual" error:NULL];CHECK(snapshot!=nil);
+    ScheduledBackupBoundary *boundary=[ScheduledBackupBoundary new];boundary.engine=engine;
+    entered=dispatch_semaphore_create(0);resumeIO=dispatch_semaphore_create(0);
+    NSMutableDictionary *edited=[Task(@"pending",@"minutes",@"filehelper") mutableCopy];edited[@"text"]=@"pending durable edit";
+    __block BOOL editedDone=NO,previewDone=NO;__block NSDictionary *preview=nil;
+    atomic_store(&blockNextFile,true);[live saveTask:edited now:before completion:^(BOOL ok,NSError *error){CHECK(ok && !error);editedDone=YES;}];
+    CHECK(dispatch_semaphore_wait(entered,dispatch_time(DISPATCH_TIME_NOW,3*NSEC_PER_SEC))==0);CHECK(CSBackupResourceWriteInProgress());
+    atomic_store(&boundaryEntered,false);[boundary preview:snapshot modules:[NSSet setWithObject:@"scheduled_tasks"] accounts:[NSSet setWithObject:@"alice"] completion:^(id result,NSError *error){CHECK(result && !error);preview=result;previewDone=YES;}];
+    Wait(^BOOL{return atomic_load(&boundaryEntered);});CHECK(!previewDone);dispatch_semaphore_signal(resumeIO);Wait(^BOOL{return editedDone && previewDone;});
+    CHECK([live.tasks[0][@"text"] isEqual:edited[@"text"]]);
+    NSDictionary *currentPreview=[engine preview:snapshot modules:[NSSet setWithObject:@"scheduled_tasks"] accounts:[NSSet setWithObject:@"alice"] error:NULL];CHECK([preview[@"revision"] isEqual:currentPreview[@"revision"]]);
+    // A durable execution admitted after preview must invalidate prepare, even
+    // when the facade starts while its fsync is still pending.
+    __block NSDictionary *claim=nil;__block BOOL claimed=NO,prepared=NO;
+    atomic_store(&blockNextFile,true);[live claimTask:@"pending" now:due completion:^(NSDictionary *value,NSError *error){CHECK(value && !error);claim=value;claimed=YES;}];
+    CHECK(dispatch_semaphore_wait(entered,dispatch_time(DISPATCH_TIME_NOW,3*NSEC_PER_SEC))==0);
+    atomic_store(&boundaryEntered,false);[boundary prepare:preview completion:^(id result,NSError *error){CHECK(!result && error);CHECK([error.localizedDescription containsString:@"配置或账号已变化"]);prepared=YES;}];
+    Wait(^BOOL{return atomic_load(&boundaryEntered);});CHECK(!prepared);dispatch_semaphore_signal(resumeIO);Wait(^BOOL{return claimed && prepared;});CHECK([engine.store journal:NULL]==nil);
+    // An already accepted finish drains to its original file after invalidation;
+    // its stale callback reports cancellation and cannot revive the scheduler.
+    __block BOOL finished=NO;atomic_store(&blockNextFile,true);[live finishClaim:claim[@"id"] result:@"submitted" detail:@"isolated test" completion:^(BOOL ok,NSError *error){CHECK(!ok && error);finished=YES;}];
+    CHECK(dispatch_semaphore_wait(entered,dispatch_time(DISPATCH_TIME_NOW,3*NSEC_PER_SEC))==0);[live invalidate];CHECK(!live.ready);dispatch_semaphore_signal(resumeIO);Wait(^BOOL{return finished;});
+    CHECK([[CSScheduledTaskStore readStateAtURL:url account:@"alice" error:NULL][@"history"][0][@"result"] isEqual:@"submitted"]);
+    previewDone=NO;[boundary preview:snapshot modules:[NSSet setWithObject:@"scheduled_tasks"] accounts:[NSSet setWithObject:@"alice"] completion:^(id result,NSError *error){CHECK(result && !error);preview=result;previewDone=YES;}];Wait(^BOOL{return previewDone;});
+    prepared=NO;[boundary prepare:preview completion:^(id result,NSError *error){CHECK(result && !error);prepared=YES;}];Wait(^BOOL{return prepared;});Complete(engine);
+    NSDictionary *restored=[CSScheduledTaskStore readStateAtURL:url account:@"alice" error:NULL];CHECK(![restored[@"enabled"] boolValue] && ![restored[@"history"] count]);CHECK([restored[@"tasks"][0][@"text"] isEqual:Task(@"pending",@"minutes",@"filehelper")[@"text"]]);
+    [defaults removePersistentDomainForName:suite];
+}
 int main(int argc, const char *argv[]) { @autoreleasepool {
     if (argc==5 && [@(argv[1]) isEqual:@"--crash"]) {
         CSBackupEngine *engine=Engine([NSURL fileURLWithPath:@(argv[2]) isDirectory:YES],@(argv[3]));
@@ -44,6 +109,7 @@ int main(int argc, const char *argv[]) { @autoreleasepool {
         return [engine applyPending:NULL]?0:2;
     }
     CHECK(argc==2); NSURL *root=[NSURL fileURLWithPath:@(argv[1]) isDirectory:YES];
+    PendingWriteRestoreBoundary([root URLByAppendingPathComponent:@"pending-boundary"]);
     NSString *suite=[@"scheduled.backup." stringByAppendingString:NSUUID.UUID.UUIDString];
     NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite];
     CSBackupEngine *engine=Engine(root,suite);

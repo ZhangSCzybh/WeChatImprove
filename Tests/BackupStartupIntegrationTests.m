@@ -61,11 +61,13 @@ static NSString *const UpgradeErrorKey=@"com.wechat.enhance.backup.upgrade_error
 - (void)perform:(id (^)(NSError **))work completion:(CSBackupCompletion)completion;
 - (void)perform:(id (^)(NSError **))work completion:(CSBackupCompletion)completion synchronousHandoff:(BOOL)handoff;
 - (BOOL)attemptUpgradeBackup:(NSError **)error;
+- (void)resumeScheduledWork;
 - (void)retryPendingWork:(CSBackupCompletion)completion;
 - (void)resolveStartup:(CSBackupCompletion)completion;
 @end
 @implementation TestManager
 - (NSDictionary *)currentContext{return @{@"epoch":@1,@"account":@"test"};}
+- (void)resumeScheduledWork {dispatch_async(self.queue,^{[self attemptUpgradeBackup:NULL];});} // Scheduling is exercised separately.
 - (void)perform:(id (^)(NSError **))work completion:(CSBackupCompletion)completion{[self perform:work completion:completion synchronousHandoff:NO];}
 - (void)perform:(id (^)(NSError **))work completion:(CSBackupCompletion)completion synchronousHandoff:(BOOL)handoff{NSError *error=nil;id value=work(&error);completion(value,error);}
 #import "ManagerUnderTest.h"
@@ -78,6 +80,7 @@ int main(void){@autoreleasepool{
     ready=NO;__block BOOL released=NO;
     [manager resolveStartup:^(id result,NSError *error){released=result!=nil&&error==nil;ready=released;}];
     Check(released&&ready,@"successful recovery releases plugin even when version backup fails");
+    [manager resumeScheduledWork]; // CSBackupWhenReady invokes this after the gate releases.
     dispatch_sync(manager.queue,^{});
     Check(manager.engine.applies==1&&manager.engine.saves==1,@"optional backup runs after recovery handoff");
     Check([[manager.testDefaults stringForKey:versionKey] isEqual:@"previous"],@"failed version backup is not marked complete");

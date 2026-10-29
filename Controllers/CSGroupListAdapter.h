@@ -60,7 +60,8 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 - (void)beginNativeChange;
 - (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind;
 - (void)endNativeChange;
-/// Only passive message/unread notifications use the bounded merge window.
+/// Passive badge-source reads merge 80ms after the latest notification, at most
+/// 250ms from the first; privacy, lifecycle and native restoration stay urgent.
 - (void)endNativeChangeCoalesced:(BOOL)coalesced;
 - (void)performNativeBatch:(void (^ _Nullable)(void))updates completion:(void (^ _Nullable)(BOOL))completion;
 - (void)performInNativePresentation:(void (^)(void))action;

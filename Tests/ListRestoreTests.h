@@ -64,6 +64,18 @@ static void SessionRestoreBoundaryTests(void) {
     Check(CGRectEqualToRect(Background(cell).frame,oldFrame),@"zero geometry preserves existing card until native layout supplies dimensions");
     HookSessionTableLayout(table,^{table.bounds=CGRectMake(0,0,430,800);cell.contentView.frame=CGRectMake(0,0,430,76);table.backgroundColor=UIColor.blackColor;});
     Check([table.backgroundColor isEqual:CSListCornerCanvasColor()] && Background(cell).frame.size.width==392 && Background(cell).frame.size.height==76,@"first valid native layout completes pending geometry without timer");
+    __block NSUInteger nestedLayouts=0;
+    HookSessionTableLayout(table,^{
+        for (NSUInteger n=0;n<3;n++) HookNewMainFrameCellLayout(cell,^{
+            nestedLayouts++;cell.contentView.frame=CGRectMake(0,0,430,80+n);
+        });
+        Check(Background(cell).frame.size.height==76,@"child geometry repairs are deferred throughout one enclosing native table layout");
+        // Native code can overwrite properties after the last child callback.
+        Background(cell).layer.mask=nil;Background(cell).hidden=YES;cell.contentView.backgroundColor=UIColor.blackColor;
+    });
+    Check(nestedLayouts==3 && Background(cell).frame.size.height==82 && Background(cell).layer.mask && !Background(cell).hidden && [cell.contentView.backgroundColor isEqual:CSListCornerCanvasColor()],@"one final table repair uses final geometry and repairs late mask, visibility and paint resets");
+    HookNewMainFrameCellLayout(cell,^{cell.contentView.frame=CGRectMake(0,0,430,84);});
+    Check(Background(cell).frame.size.height==84,@"independent cell layout still repairs immediately after the table boundary closes");
     RestorePost(UISceneWillDeactivateNotification,table.window.windowScene);table.backgroundColor=UIColor.blackColor;
     RestorePost(UISceneDidActivateNotification,[NSObject new]);Check([table.backgroundColor isEqual:UIColor.blackColor],@"another scene cannot restore this table");
     RestorePost(UISceneWillEnterForegroundNotification,table.window.windowScene);RestorePost(UISceneDidActivateNotification,table.window.windowScene);

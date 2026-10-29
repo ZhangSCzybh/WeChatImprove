@@ -18,6 +18,7 @@ static void CSAIInstallMessageHook(void){
     IMP replacement=imp_implementationWithBlock(^(id object,id session,id wrap){
         NSUInteger epoch=CSBackupAccountEpoch();
         ((void(*)(id,SEL,id,id))original)(object,selector,session,wrap);
+        if(!CSAIReplyMessageIngressEnabled())return;
         dispatch_async(dispatch_get_main_queue(),^{
             [CSAIReplyManager.sharedManager receiveNativeSession:session wrap:wrap epoch:epoch];
         });

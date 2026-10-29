@@ -28,8 +28,7 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 
 %hook MainFrameTableView
 - (void)layoutSubviews {
-    %orig;
-    CSListCornerRestoreSessionTable((UITableView *)self,YES);
+    CSListCornerPerformSessionTableLayout((UITableView *)self, ^{ %orig; });
 }
 - (void)setBackgroundColor:(UIColor *)color {
     %orig;

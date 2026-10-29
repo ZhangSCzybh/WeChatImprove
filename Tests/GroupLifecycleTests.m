@@ -97,8 +97,15 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic,copy) NSString *tabBadgeAccount;
 @property(nonatomic) NSUInteger tabBadgeRevision,tabBadgeEpoch;
 @property(nonatomic) BOOL tabBadgeSourceRequired,tabBadgeRestorePending,tabBadgeSourceScheduled,tabBadgeSourceRefreshing,tabBadgeRequestDispatchPending,tabBadgeRefreshAgain;
+@property(nonatomic) BOOL tabBadgeRefreshAgainCoalesced,tabBadgeRequestImmediate,tabBadgeImmediatePending;
+@property(nonatomic,strong) NSTimer *tabBadgeSourceTimer;
+@property(nonatomic,copy) NSArray *tabBadgeScheduleKey;
+@property(nonatomic) NSUInteger tabBadgeSourceGeneration;
+@property(nonatomic) NSTimeInterval tabBadgeBurstStart,tabBadgeDue;
 + (void)requestTabBadgeSourcesRefresh;
 - (void)requestTabBadgeSourceRefresh;
+- (void)requestTabBadgeSourceRefreshCoalesced:(BOOL)coalesced;
+- (void)cancelTabBadgeSourceRefresh;
 - (void)refreshTabBadgeSource;
 + (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecision;
 + (CSGroupTabBadgeDecision *)closeFriendTabBadgeDecisionForPublication:(BOOL)includeNative;
@@ -143,6 +150,9 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (id)nativeSource { return self; }
 - (void)applyPendingScrollToTop {}
 - (void)detach {
+#if CS_GROUP_LIFECYCLE_TAB_BADGE
+    [self cancelTabBadgeSourceRefresh];
+#endif
     self.presentationSuspended=YES; self.active=NO;
     [self.nativeActions removeAllObjects];
     objc_setAssociatedObject(self.table,&AdapterKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -163,6 +173,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 }
 @end
 static NSArray *CSGroupBuildNativeSections(id controller,id table,id source) {
+    NSCAssert(NSThread.isMainThread,@"Native session reads must stay on the main thread");
     (void)controller; (void)table; snapshotBuilds++;
     if (mutateDuringSnapshot) [source invalidateNativeSnapshot];
     if(snapshotMutation)snapshotMutation(source);
@@ -605,12 +616,81 @@ int main(void) { @autoreleasepool {
     Check(sourceEvents==1 && sourceSawReady && sourceCount==9 && sourceRevision==a.modelRevision,@"endNativeChange rebuilds and publishes the latest source without returning to the list");
     Check(a.presentationSuspended && a.refreshCount==before && a.layoutCount==layouts && a.anchorOrTitleCount==sourceAnchors,@"offscreen badge maintenance performs no list reload, header layout or anchor work");
     sourceEvents=0;NSUInteger offscreenBuilds=snapshotBuilds;
-    for(NSUInteger i=0;i<20;i++){[a beginNativeChange];fixtureNativeSections=@[@[nativeRow(@"secret",3,NO,YES),nativeRow(@"ordinary",10+i,NO,NO)]];[a endNativeChange];RunFor(.004);}
-    Check(sourceEvents==20 && snapshotBuilds==offscreenBuilds+20 && sourceCount==29,@"twenty offscreen events on distinct run-loop turns publish twenty fresh badge sources");
+    NSTimer *burstTimer=nil;
+    for(NSUInteger i=0;i<20;i++){
+        [a beginNativeChangeOfKind:CSGroupChangeUnread];
+        fixtureNativeSections=@[@[nativeRow(@"secret",3,NO,YES),nativeRow(@"ordinary",10+i,NO,NO)]];
+        [a endNativeChangeCoalesced:YES];
+        if(!burstTimer)burstTimer=a.tabBadgeSourceTimer;
+        Check(a.tabBadgeSourceTimer==burstTimer,@"separate passive notifications reuse one pending badge timer");
+        RunFor(.004);
+    }
+    Check(!sourceEvents && snapshotBuilds==offscreenBuilds,@"twenty offscreen notifications wait until the latest-event deadline");
+    CSGroupTabBadgeDecision *burstPending=[CSGroupListAdapter closeFriendTabBadgeDecisionForController:host includeNative:NO];
+    Check(!burstPending.badge && a.tabBadgeSourceTimer==burstTimer,@"a pending badge query does not bypass passive coalescing");
+    RunFor(.1);
+    Check(sourceEvents==1 && snapshotBuilds==offscreenBuilds+1 && sourceCount==29,@"twenty offscreen notifications publish the newest count with one native read");
     Check(a.refreshCount==before && a.layoutCount==layouts && a.anchorOrTitleCount==sourceAnchors,@"independent offscreen source events still perform zero grouping UI work");
     sourceEvents=0;offscreenBuilds=snapshotBuilds;
     for(NSUInteger i=0;i<200;i++){[a beginNativeChange];[a endNativeChangeCoalesced:YES];}
-    RunFor(.02);Check(sourceEvents==1 && snapshotBuilds==offscreenBuilds+1,@"one synchronous burst of two hundred native changes coalesces to one source rebuild");
+    RunFor(.02);Check(!sourceEvents && a.tabBadgeSourceTimer,@"two hundred native notifications retain a single delayed badge task");
+    RunFor(.1);Check(sourceEvents==1 && snapshotBuilds==offscreenBuilds+1 && !a.tabBadgeSourceTimer,@"one synchronous burst of two hundred native changes coalesces to one source rebuild");
+
+    sourceEvents=0;offscreenBuilds=snapshotBuilds;
+    [a beginNativeChange];[a endNativeChangeCoalesced:YES];RunFor(.04);
+    [a beginNativeChange];[a endNativeChangeCoalesced:YES];RunFor(.05);
+    Check(!sourceEvents,@"a later notification moves the 80ms trailing deadline beyond the first deadline");
+    RunFor(.05);Check(sourceEvents==1 && snapshotBuilds==offscreenBuilds+1,@"the trailing timer publishes once after the final message");
+
+    sourceEvents=0;offscreenBuilds=snapshotBuilds;
+    for(NSUInteger i=0;i<8;i++){
+        [a beginNativeChange];[a endNativeChangeCoalesced:YES];
+        Check(a.tabBadgeDue<=a.tabBadgeBurstStart+.250001,@"continuous notification deadlines never exceed 250ms from the first event");
+        RunFor(.03);
+    }
+    RunFor(.06);
+    Check(sourceEvents==1 && snapshotBuilds==offscreenBuilds+1 && !a.tabBadgeSourceScheduled,@"continuous notifications flush at the maximum window instead of waiting for silence");
+
+    sourceEvents=0;offscreenBuilds=snapshotBuilds;
+    [a beginNativeChange];[a endNativeChangeCoalesced:YES];NSTimer *supersededTimer=a.tabBadgeSourceTimer;
+    policyRevision++;[CSGroupListAdapter closeFriendPolicyChanged:nil];RunFor(.02);
+    Check(sourceEvents==1 && !supersededTimer.valid && !a.tabBadgeSourceTimer,@"privacy changes immediately supersede an ordinary pending badge timer");
+    [supersededTimer fire];RunFor(.1);
+    Check(sourceEvents==1 && snapshotBuilds==offscreenBuilds+1,@"a superseded privacy timer cannot read or publish a second source");
+
+    sourceEvents=0;offscreenBuilds=snapshotBuilds;
+    [a beginNativeChange];[a endNativeChangeCoalesced:YES];supersededTimer=a.tabBadgeSourceTimer;
+    accountEpoch++;policyRevision++;[CSGroupListAdapter closeFriendPolicyChanged:nil];RunFor(.02);
+    Check(sourceEvents==1 && a.tabBadgeEpoch==accountEpoch && !supersededTimer.valid,@"account-epoch changes replace the pending task with a current immediate source");
+    [supersededTimer fire];RunFor(.1);
+    Check(sourceEvents==1 && snapshotBuilds==offscreenBuilds+1,@"the old account-epoch task cannot publish after replacement");
+
+    sourceEvents=0;offscreenBuilds=snapshotBuilds;
+    [a beginNativeChange];[a endNativeChangeCoalesced:YES];supersededTimer=a.tabBadgeSourceTimer;
+    policyRevision++;
+    burstPending=[CSGroupListAdapter closeFriendTabBadgeDecisionForController:host includeNative:NO];
+    Check(!burstPending.badge && !supersededTimer.valid,@"a lookup observing a newer privacy token immediately invalidates a stale passive task");
+    RunFor(.02);Check(sourceEvents==1 && snapshotBuilds==offscreenBuilds+1,@"a newer-token lookup recovers without waiting for a separate policy notification");
+
+    sourceEvents=0;offscreenBuilds=snapshotBuilds;
+    [a requestTabBadgeSourceRefresh];RunFor(.02);
+    Check(!sourceEvents && snapshotBuilds==offscreenBuilds,@"unchanged source versions reuse sections and badge computation without another publication");
+
+    sourceEvents=0;offscreenBuilds=snapshotBuilds;
+    [a beginNativeChange];[a endNativeChangeCoalesced:YES];[a beginNativeChange];RunFor(.1);
+    Check(!sourceEvents && snapshotBuilds==offscreenBuilds,@"a timer reaching its deadline cannot read inside a native transaction");
+    [a endNativeChangeCoalesced:YES];RunFor(.1);
+    Check(sourceEvents==1 && sourceSawReady && snapshotBuilds==offscreenBuilds+1,@"a stable outer end wakes one badge read after a blocked deadline");
+
+    sourceEvents=0;offscreenBuilds=snapshotBuilds;
+    dispatch_semaphore_t workerDone=dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT,0),^{
+        for(NSUInteger i=0;i<100;i++){[a beginNativeChangeOfKind:CSGroupChangeUnread];[a endNativeChangeCoalesced:YES];}
+        dispatch_semaphore_signal(workerDone);
+    });
+    dispatch_semaphore_wait(workerDone,DISPATCH_TIME_FOREVER);RunFor(.02);
+    Check(!sourceEvents && a.tabBadgeSourceTimer,@"background notification bursts forward one passive request without native reads");
+    RunFor(.1);Check(sourceEvents==1 && snapshotBuilds==offscreenBuilds+1 && sourceSawReady,@"background notification sources are read once on the main thread after the merge window");
     sourceEvents=0;offscreenBuilds=snapshotBuilds;[a beginNativeChange];[a beginNativeChange];[a endNativeChange];RunFor(.005);
     Check(!sourceEvents && snapshotBuilds==offscreenBuilds,@"nested native transaction waits for the outer end");
     [a endNativeChange];RunFor(.02);Check(sourceEvents==1 && sourceSawReady,@"outer native end releases one source publication");
@@ -630,13 +710,19 @@ int main(void) { @autoreleasepool {
     offscreenBuilds=snapshotBuilds;RunFor(.03);Check(snapshotBuilds==offscreenBuilds && !a.tabBadgeSourceScheduled,@"an unstable source does not start an endless retry or timer");
     [a beginNativeChange];[a endNativeChange];RunFor(.02);Check(sourceEvents==1 && sourceSawReady,@"a later native event recovers after the unstable source ends");
 
-    sourceEvents=0;[CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:@"willResign" object:nil]];RunFor(.02);offscreenBuilds=snapshotBuilds;
+    sourceEvents=0;[a beginNativeChange];[a endNativeChangeCoalesced:YES];supersededTimer=a.tabBadgeSourceTimer;
+    [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:@"willResign" object:nil]];RunFor(.02);offscreenBuilds=snapshotBuilds;
+    Check(!supersededTimer.valid && !a.tabBadgeSourceScheduled,@"application inactivity cancels the pending passive badge task");
     [a beginNativeChange];[a endNativeChange];RunFor(.02);Check(!sourceEvents && snapshotBuilds==offscreenBuilds,@"inactive app neither reads nor publishes badge sources");
     [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:UIApplicationDidBecomeActiveNotification object:nil]];RunFor(.02);
     Check(sourceEvents==1 && sourceSawReady && a.refreshCount==before,@"foreground activity restores the offscreen source without publishing grouping UI");
+    [supersededTimer fire];RunFor(.1);Check(sourceEvents==1,@"the superseded pre-background timer cannot publish after foreground recovery");
 
+    [a beginNativeChange];[a endNativeChangeCoalesced:YES];supersededTimer=a.tabBadgeSourceTimer;
     fixtureNativeSections=@[@[nativeRow(@"secret",3,YES,YES),nativeRow(@"ordinary",2,YES,NO)]];policyFriends=@[];badgePolicyEnabled=NO;policyRevision++;sourceEvents=0;
-    [CSGroupListAdapter closeFriendPolicyChanged:nil];RunFor(.02);
+    CSGroupTabBadgeDecision *nativePending=[CSGroupListAdapter closeFriendTabBadgeDecisionForController:host includeNative:YES];
+    Check(!nativePending.badge && !supersededTimer.valid && a.tabBadgeRestorePending,@"explicit native restoration immediately promotes an ordinary pending source");
+    RunFor(.02);
     Check(![CSGroupListAdapter closeFriendTabBadgeDecisionForController:host includeNative:NO],@"removing the final protected name returns ordinary interception to Native");
     Check(sourceEvents==1 && sourceSawReady && sourceSawDot && !a.tabBadgeSourceRequired && !a.tabBadgeRestorePending,@"clearing the final name offscreen publishes one verified native-dot source and completes source restoration");
     Check(a.presentationSuspended && a.refreshCount==before && a.layoutCount==layouts,@"native-dot recovery leaves the hidden grouping UI suspended");
@@ -650,6 +736,11 @@ int main(void) { @autoreleasepool {
     if(!(restorationRequested && sourceEvents==2 && sourceCount==5))fprintf(stderr,"RESTORE reentry requested=%d events=%lu count=%lu model=%lu source=%lu pending=%d again=%d scheduled=%d required=%d\n",restorationRequested,(unsigned long)sourceEvents,(unsigned long)sourceCount,(unsigned long)a.modelRevision,(unsigned long)a.tabBadgeRevision,a.tabBadgeRestorePending,a.tabBadgeRefreshAgain,a.tabBadgeSourceScheduled,a.tabBadgeSourceRequired);
     Check(restorationRequested && sourceEvents==2 && sourceCount==5 && !a.tabBadgeRestorePending && !a.tabBadgeRefreshAgain,@"native-restoration consumer reentry retains pending debt and publishes the newer real source once");
     Check(sourceEvents==2 && sourceSawReady && ![CSGroupListAdapter closeFriendTabBadgeDecisionForController:host includeNative:NO],@"disabling protection with names retained returns to Native after the reentrant source settles");
+    badgePolicyEnabled=YES;policyRevision++;[CSGroupListAdapter closeFriendPolicyChanged:nil];RunFor(.02);
+    sourceEvents=0;offscreenBuilds=snapshotBuilds;
+    [a beginNativeChange];[a endNativeChangeCoalesced:YES];supersededTimer=a.tabBadgeSourceTimer;
+    [a detach];[supersededTimer fire];RunFor(.1);
+    Check(!supersededTimer.valid && !sourceEvents && snapshotBuilds==offscreenBuilds,@"detaching an adapter invalidates its sole pending badge task");
     [NSNotificationCenter.defaultCenter removeObserver:sourceObserver];
     fixtureNativeSections=nil;policyFriends=nil;badgePolicyEnabled=NO;policyOptions=nil;policyRevealed=NO;enabled=YES;
 #endif

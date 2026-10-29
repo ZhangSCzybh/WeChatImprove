@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.1-12`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.1-14`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -31,8 +31,8 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | 本地提供 `2.1-12` 安装包，调整插件首页设置分组；分组显示和页面跳转待真机验收 |
-| Rootful | 本地提供 `2.1-12` 安装包；分组显示和页面跳转待真机验收 |
+| Rootless | 本地提供 `2.1-14` 安装包，包含摘要、布局、AI 入口、定时任务和赞赏页性能优化；待真机验收 |
+| Rootful | 本地提供 `2.1-14` 安装包；待真机验收 |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
@@ -40,7 +40,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：当前 `2.1-12` 交付 [Rootless 安装包](packages/2.1-12-settings-groups/com.wechat.improve_2.1-12_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-12-settings-groups/com.wechat.improve_2.1-12_iphoneos-arm.deb)、[调试符号](packages/2.1-12-settings-groups/com.wechat.improve_2.1-12_symbols.zip) 和 [SHA-256](packages/2.1-12-settings-groups/SHA256SUMS)。本次将“附件布局”和“文本占位”从“功能增强”移至“界面定制”，位于“布局设置”之后，继续进入各自原设置页面。本版同时包含 `2.1-11` 的密友消息静默移除，保留会话隐藏、来电拒接、账号隔离和支付摘要保护。构建核验与验收步骤见 [2.1-12 记录](docs/audits/settings-groups-2.1-12/README.md)，静默移除的详细记录见 [2.1-11 记录](docs/audits/closefriend-no-message-silence-2.1-11/README.md)。
+1. 获取与设备注入环境匹配的 `.deb`：当前 `2.1-14` 交付 [Rootless 安装包](packages/2.1-14-performance/com.wechat.improve_2.1-14_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-14-performance/com.wechat.improve_2.1-14_iphoneos-arm.deb)、[调试符号](packages/2.1-14-performance/com.wechat.improve_2.1-14_symbols.zip) 和 [SHA-256](packages/2.1-14-performance/SHA256SUMS)。本次优化折叠摘要按需生成、消息手势关闭时的开销、列表圆角重复布局、AI 无关消息过滤及字体／缩放读取；定时任务改为后台保存，并降低赞赏页展示检查频率。发送前持久化、账号与过期校验、会话隐藏和原生支付流程继续有效。继续包含 `2.1-13` 的 AI 存储、上下文缓存、角标与自动备份优化，`2.1-12` 的设置分组调整，以及 `2.1-11` 的密友消息静默移除。构建核验见 [2.1-14 记录](docs/audits/performance-2.1-14/README.md)，本轮核心回归见 [性能优化记录](docs/audits/performance-followup-2026-10-29/README.md)。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
@@ -206,7 +206,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.1-12_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-12-settings-groups/`。
+当前版本默认输出：`packages/com.wechat.improve_2.1-14_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-14-performance/`。
 
 ### Rootful
 
@@ -215,7 +215,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.1-12_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-12-settings-groups/`。
+当前版本默认输出：`packages/com.wechat.improve_2.1-14_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-14-performance/`。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -239,7 +239,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.1-12-settings-groups/com.wechat.improve_2.1-12_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.1-14-performance/com.wechat.improve_2.1-14_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。

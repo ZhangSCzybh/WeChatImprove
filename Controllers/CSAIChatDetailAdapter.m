@@ -51,6 +51,7 @@ static id ChatSearchSection(NSArray *sections){
 @property(nonatomic,copy) NSString *conversation;
 @property(nonatomic) NSUInteger epoch;
 @property(nonatomic) BOOL refreshing;
+@property(nonatomic) BOOL saving;
 - (void)refresh;
 @end
 @implementation CSAIChatDetailState
@@ -76,16 +77,14 @@ static id ChatSearchSection(NSArray *sections){
     [alert addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleCancel handler:nil]];[controller presentViewController:alert animated:YES completion:nil];
 }
 - (void)toggle:(id)sender {
-    if(![sender isKindOfClass:UISwitch.class] || ![self current]){[self refresh];return;}
-    NSDictionary *conversation=CSAIReplyManager.sharedManager.store.configuration[@"conversations"][self.conversation];NSError *error=nil;
-    if(![CSAIReplyManager.sharedManager setConversation:self.conversation enabled:[sender isOn] presetID:conversation[@"presetID"]?:@"" account:self.account epoch:self.epoch error:&error])[self showError:error];
-    [self refresh];
+    if(self.saving || ![sender isKindOfClass:UISwitch.class] || ![self current]){[self refresh];return;}
+    NSDictionary *conversation=CSAIReplyManager.sharedManager.store.configuration[@"conversations"][self.conversation];self.saving=YES;
+    [CSAIReplyManager.sharedManager setConversation:self.conversation enabled:[sender isOn] presetID:conversation[@"presetID"]?:@"" account:self.account epoch:self.epoch completion:^(BOOL success,NSError *error){self.saving=NO;if(!success)[self showError:error];[self refresh];}];
 }
 - (void)toggleUnmentioned:(id)sender {
-    if(![sender isKindOfClass:UISwitch.class] || ![self current]){[self refresh];return;}
-    NSError *error=nil;
-    if(![CSAIReplyManager.sharedManager setConversation:self.conversation allowUnmentioned:[sender isOn] account:self.account epoch:self.epoch error:&error])[self showError:error];
-    [self refresh];
+    if(self.saving || ![sender isKindOfClass:UISwitch.class] || ![self current]){[self refresh];return;}
+    self.saving=YES;
+    [CSAIReplyManager.sharedManager setConversation:self.conversation allowUnmentioned:[sender isOn] account:self.account epoch:self.epoch completion:^(BOOL success,NSError *error){self.saving=NO;if(!success)[self showError:error];[self refresh];}];
 }
 - (void)choosePreset {
     if(![self current])return;UIViewController *controller=[self controller];

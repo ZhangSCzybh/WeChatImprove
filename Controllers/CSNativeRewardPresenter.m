@@ -12,12 +12,15 @@ static char CSRewardSessionKey;
 @property(nonatomic, weak) UIViewController *source;
 @property(nonatomic, strong) CSNativeRewardRoute *route;
 @property(nonatomic, strong) NSTimer *observer;
+@property(nonatomic, strong) NSTimer *openingDeadline;
 @property(nonatomic) NSTimeInterval beganAt;
 @property(nonatomic) BOOL observedPaymentPage;
 @property(nonatomic) BOOL lockedSettings;
 @property(nonatomic) BOOL priorInteractionEnabled;
+@property(nonatomic) BOOL finished;
 - (void)start;
 - (void)finish;
+- (void)observePresentation;
 @end
 
 @implementation CSNativeRewardSession
@@ -52,11 +55,39 @@ static char CSRewardSessionKey;
         }
     };
     self.beganAt = NSProcessInfo.processInfo.systemUptime;
-    self.observer = [NSTimer timerWithTimeInterval:0.2 repeats:YES block:^(NSTimer *timer) { [weakSelf observePresentation]; }];
-    [NSRunLoop.mainRunLoop addTimer:self.observer forMode:NSRunLoopCommonModes];
+    for (NSString *name in @[UIApplicationDidBecomeActiveNotification, UIApplicationWillResignActiveNotification, UIApplicationDidEnterBackgroundNotification]) {
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(applicationStateChanged:) name:name object:nil];
+    }
+    // The opening deadline is independent of display polling. In the background
+    // it leaves the native route alone; activation first checks the actual page.
+    self.openingDeadline = [NSTimer timerWithTimeInterval:12 repeats:NO block:^(NSTimer *timer) { [weakSelf observePresentation]; }];
+    [NSRunLoop.mainRunLoop addTimer:self.openingDeadline forMode:NSRunLoopCommonModes];
+    [self refreshObservation];
     [self.route start];
 }
+- (void)refreshObservation {
+    if (self.finished || UIApplication.sharedApplication.applicationState != UIApplicationStateActive) {
+        [self.observer invalidate]; self.observer = nil; return;
+    }
+    // Host appearance and the native End callback own normal return handling.
+    // A slower fallback also covers versions that omit End for a back gesture.
+    NSTimeInterval interval = self.observedPaymentPage ? 2 : 0.2;
+    if (self.observer.valid && self.observer.timeInterval == interval) return;
+    [self.observer invalidate];
+    __weak typeof(self) weakSelf = self;
+    self.observer = [NSTimer timerWithTimeInterval:interval repeats:YES block:^(NSTimer *timer) { [weakSelf observePresentation]; }];
+    self.observer.tolerance = self.observedPaymentPage ? 0.5 : 0.02;
+    [NSRunLoop.mainRunLoop addTimer:self.observer forMode:NSRunLoopCommonModes];
+}
+- (void)applicationStateChanged:(NSNotification *)note {
+    if ([note.name isEqual:UIApplicationWillResignActiveNotification] || [note.name isEqual:UIApplicationDidEnterBackgroundNotification]) {
+        [self.observer invalidate]; self.observer = nil; return;
+    }
+    [self observePresentation];
+    [self refreshObservation];
+}
 - (void)observePresentation {
+    if (self.finished || UIApplication.sharedApplication.applicationState != UIApplicationStateActive) return;
     UIViewController *source = self.source;
     UINavigationController *navigation = source.navigationController;
     if (!source || source.isBeingDismissed || navigation.isBeingDismissed ||
@@ -69,9 +100,13 @@ static char CSRewardSessionKey;
     if ([top isKindOfClass:UINavigationController.class]) top = ((UINavigationController *)top).topViewController;
     Class payer = NSClassFromString(@"WCPayQRCodeRewardPayerDetailViewController");
     if (payer && [top isKindOfClass:payer] && top.isViewLoaded && top.view.window) {
-        self.observedPaymentPage = YES;
-        [self unlockSettings];
-        [self.route paymentPageDidAppear];
+        if (!self.observedPaymentPage) {
+            self.observedPaymentPage = YES;
+            [self.openingDeadline invalidate]; self.openingDeadline = nil;
+            [self unlockSettings];
+            [self.route paymentPageDidAppear];
+            [self refreshObservation];
+        }
     } else if (self.observedPaymentPage && [self sourceIsCurrent] && !navigation.transitionCoordinator) {
         // Also release after a native back gesture if this WeChat version omits End.
         [self finish]; return;
@@ -88,7 +123,11 @@ static char CSRewardSessionKey;
     self.lockedSettings = NO;
 }
 - (void)finish {
+    if (self.finished) return;
+    self.finished = YES;
     [self.observer invalidate]; self.observer = nil;
+    [self.openingDeadline invalidate]; self.openingDeadline = nil;
+    [NSNotificationCenter.defaultCenter removeObserver:self];
     [self.route cancel];
     [self unlockSettings];
     UIViewController *source = self.source;
@@ -100,8 +139,13 @@ static char CSRewardSessionKey;
         objc_setAssociatedObject(source, &CSRewardSessionKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
 }
-- (void)dealloc { [self.observer invalidate]; [self.route cancel]; }
+- (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; [self.observer invalidate]; [self.openingDeadline invalidate]; [self.route cancel]; }
 @end
+
+void CSNativeRewardSourceDidAppear(UIViewController *source) {
+    CSNativeRewardSession *session = objc_getAssociatedObject(source, &CSRewardSessionKey);
+    [session observePresentation];
+}
 
 void CSOpenNativeAuthorReward(UIViewController *source) {
     source = CSNativeSettingsHostForContent(source);

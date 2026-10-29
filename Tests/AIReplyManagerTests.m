@@ -13,20 +13,28 @@
 #import "AINativeDispatchUnderTest.m"
 #import "CSAIMessageAdapter.h"
 #import "AIPreparedSendUnderTest.m"
+static NSUInteger hookMainDispatches;
+static void CSAITestHookDispatch(dispatch_queue_t queue,dispatch_block_t block){hookMainDispatches++;dispatch_async(queue,block);}
 #import "AIHooksUnderTest.m"
 #import <sys/stat.h>
 #import <unistd.h>
 #import <errno.h>
+#import <stdatomic.h>
+@interface CSAIReplyManager (AdmissionFixture)
+- (void)notify;
+@end
 static NSUInteger checks,epoch=7,submissions;
 static NSString *account=@"alice";
 static BOOL suspended,failKeyWrite,failDirectorySync,simulateSends;
 static BOOL authorized=YES;
 static CSCloseFriendSnapshot *privacy;
-static NSUInteger failedDirectorySyncs,manualSends,ownedSends;
+static NSUInteger failedDirectorySyncs,manualSends,ownedSends,nativeIncomingCalls;
 static NSString *lastSentTo;
 static NSMutableArray<NSString *> *installedHooks;
 static void (^duringManualSend)(void);
 static BOOL backgroundAudioActive,backupReady=YES;
+static atomic_bool pauseNextFsync,ioPaused;
+static dispatch_semaphore_t resumeFsync;
 static id nativeSyncService;
 static dispatch_block_t duringContactLookup;
 @interface TestNativeSync : NSObject
@@ -77,6 +85,9 @@ static dispatch_block_t duringContactLookup;
 @end
 int CSAITestFsync(int descriptor){
     struct stat info;
+    if(fstat(descriptor,&info)==0 && S_ISREG(info.st_mode) && atomic_exchange(&pauseNextFsync,false)){
+        atomic_store(&ioPaused,true);if(dispatch_semaphore_wait(resumeFsync,dispatch_time(DISPATCH_TIME_NOW,5*NSEC_PER_SEC))!=0)abort();atomic_store(&ioPaused,false);
+    }
     if(failDirectorySync && fstat(descriptor,&info)==0 && S_ISDIR(info.st_mode)){
         failedDirectorySyncs++;errno=EIO;return -1;
     }
@@ -93,15 +104,20 @@ void CSAIRefreshChatDetail(id page){(void)page;}
 @property NSString *m_nsFromUsr,*m_nsToUsr,*m_nsContent,*m_nsRealChatUsr,*m_nsAtUserList;
 @property BOOL m_nsAtAll;
 @property unsigned int m_uiMessageType,m_uiMesLocalID,m_uiCreateTime;
+@property unsigned long long m_n64MesSvrID;
 @end
 @implementation TestMessageWrap @end
 @interface TestAdmissionWrap : TestMessageWrap
 @property NSUInteger identityReads;
 @property NSUInteger typeReads;
+@property NSUInteger bodyReads,identifierReads;
+@property BOOL readOffMain;
 @end
 @implementation TestAdmissionWrap
 - (NSString *)m_nsFromUsr{self.identityReads++;return [super m_nsFromUsr];}
 - (unsigned int)m_uiMessageType{self.typeReads++;return [super m_uiMessageType];}
+- (NSString *)m_nsContent{self.bodyReads++;self.readOffMain|=!NSThread.isMainThread;return [super m_nsContent];}
+- (unsigned int)m_uiMesLocalID{self.identifierReads++;self.readOffMain|=!NSThread.isMainThread;return [super m_uiMesLocalID];}
 @end
 @interface CMessageMgr : NSObject
 - (void)AddMsg:(id)session MsgWrap:(id)wrap;
@@ -113,7 +129,7 @@ void CSAIRefreshChatDetail(id page){(void)page;}
     // Native outgoing echo still passes through the production incoming hook/filter.
     [self AsyncOnAddMsg:session MsgWrap:wrap];
 }
-- (void)AsyncOnAddMsg:(id)session MsgWrap:(id)wrap{(void)session;(void)wrap;}
+- (void)AsyncOnAddMsg:(id)session MsgWrap:(id)wrap{(void)session;(void)wrap;nativeIncomingCalls++;}
 @end
 static CMessageMgr *nativeMessages;
 static TestMessageWrap *Message(NSString *from,NSString *to,NSUInteger identity,NSTimeInterval created){
@@ -124,6 +140,7 @@ static void DrainMain(void){for(NSUInteger i=0;i<4;i++)[NSRunLoop.mainRunLoop ru
 
 static NSMutableDictionary *keys;
 #define CHECK(c) do{checks++;if(!(c)){NSLog(@"FAIL %d %s",__LINE__,#c);exit(1);}}while(0)
+static void WaitFor(BOOL(^condition)(void)){NSDate *limit=[NSDate dateWithTimeIntervalSinceNow:5];while(!condition() && [limit timeIntervalSinceNow]>0)[NSRunLoop.mainRunLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:.005]];CHECK(condition());}
 NSNotificationName const UIApplicationDidBecomeActiveNotification=@"test-active";
 NSNotificationName const UIApplicationDidEnterBackgroundNotification=@"test-background";
 NSNotificationName const UIApplicationWillEnterForegroundNotification=@"test-foreground";
@@ -214,9 +231,12 @@ void CSAIRemoveCredential(NSString *owner,NSString *revision){[keys removeObject
 @end
 @interface TestStore : CSAIReplyStore
 @property BOOL failSave;
+@property NSUInteger loadRequests;
 @end
 @implementation TestStore
+- (void)loadWithCompletion:(CSAIReplyStoreCompletion)completion {self.loadRequests++;[super loadWithCompletion:completion];}
 - (BOOL)saveConfiguration:(NSDictionary *)config error:(NSError **)error{if(self.failSave){if(error)*error=CSAIError(99,@"test disk write denied");return NO;}return [super saveConfiguration:config error:error];}
+- (void)saveConfiguration:(NSDictionary *)config expectedConfiguration:(NSDictionary *)expected completion:(CSAIReplyStoreCompletion)completion {if(self.failSave){dispatch_async(dispatch_get_main_queue(),^{completion(NO,CSAIError(99,@"test disk write denied"));});return;}[super saveConfiguration:config expectedConfiguration:expected completion:completion];}
 @end
 static void ManualCoexistence(NSURL *url){
     CSAIReplyStore *store=[[CSAIReplyStore alloc]initWithURL:url account:account];CHECK([store load]);
@@ -227,7 +247,7 @@ static void ManualCoexistence(NSURL *url){
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;TestClient *client=[TestClient new];
     [manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager setValue:client forKey:@"client"];[manager setValue:@YES forKey:@"started"];
     CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:client];coordinator.delegate=(id)manager;
-    __block NSTimeInterval clock=1000;coordinator.now=^{return clock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];
+    __block NSTimeInterval clock=1000;coordinator.now=^{return clock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];[manager notify];
     nativeMessages=[CMessageMgr new];installedHooks=[NSMutableArray array];simulateSends=YES;submissions=0;
     IMP outgoingBefore=class_getMethodImplementation(CMessageMgr.class,@selector(AddMsg:MsgWrap:));
     CSAITestInstallHooks();DrainMain();
@@ -275,7 +295,7 @@ static void HiddenConversationReplies(NSURL *url){
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;TestClient *client=[TestClient new];
     [manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager setValue:client forKey:@"client"];
     CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:client];coordinator.delegate=(id)manager;
-    __block NSTimeInterval clock=2000;coordinator.now=^{return clock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];
+    __block NSTimeInterval clock=2000;coordinator.now=^{return clock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];[manager notify];
     SetPrivacy(YES,YES,YES);simulateSends=YES;submissions=0;
     // start installs the production policy observer while retaining this isolated store.
     [manager setValue:@NO forKey:@"started"];[manager start];
@@ -366,7 +386,7 @@ static void GroupUnmentionedReplies(NSURL *url){
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;TestClient *client=[TestClient new];
     [manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager setValue:client forKey:@"client"];
     CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:client];coordinator.delegate=(id)manager;
-    __block NSTimeInterval clock=3000;coordinator.now=^{return clock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];
+    __block NSTimeInterval clock=3000;coordinator.now=^{return clock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];[manager notify];
     SetPrivacy(YES,YES,YES);simulateSends=YES;submissions=0;NSUInteger identity=1;NSError *error=nil;
     NSDictionary *other=store.configuration[@"conversations"][@"other@chatroom"],*friend=store.configuration[@"conversations"][@"friend"];
     CHECK(![store.configuration[@"conversations"][@"room@chatroom"][@"allowUnmentioned"] boolValue]);CHECK([[manager statusForConversation:@"room@chatroom"] isEqual:@"已启用 · 仅被 @ 时回复"]);
@@ -406,7 +426,7 @@ static void DisabledSessionFastPath(NSURL *url){
     config[@"credentialRevision"]=@"admission";config[@"verifiedConnection"]=CSAIConnectionIdentifier(config);config[@"conversations"]=@{@"friend":@{@"enabled":@YES,@"presetID":@""},@"disabled@chatroom":@{@"enabled":@NO,@"presetID":@"",@"allowUnmentioned":@YES}};
     CHECK([store saveConfiguration:config error:NULL]);
     CSAIReplyManager *manager=[CSAIReplyManager new];[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];
-    TestClient *client=[TestClient new];CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:client];coordinator.delegate=(id)manager;coordinator.now=^{return 5000.0;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];
+    TestClient *client=[TestClient new];CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:client];coordinator.delegate=(id)manager;coordinator.now=^{return 5000.0;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];[manager notify];
     TestAdmissionWrap *wrap=[TestAdmissionWrap new];wrap.m_nsFromUsr=@"friend";wrap.m_nsToUsr=account;wrap.m_nsContent=@"ordinary text";wrap.m_uiMessageType=1;wrap.m_uiMesLocalID=1;wrap.m_uiCreateTime=5000;
     for(NSUInteger i=0;i<1000;i++)[manager receiveNativeSession:i%2?@"disabled@chatroom":@"unconfigured" wrap:wrap epoch:epoch];
     CHECK(!wrap.identityReads && !coordinator.pendingCount && !client.callbacks.count);
@@ -416,6 +436,43 @@ static void DisabledSessionFastPath(NSURL *url){
     wrap.m_uiMesLocalID=3;[manager receiveNativeSession:@"friend" wrap:wrap epoch:epoch];CHECK(wrap.identityReads==3 && coordinator.pendingCount==1);
     [coordinator cancelAll];config[@"enabled"]=@NO;CHECK([store saveConfiguration:config error:NULL]);[manager receiveNativeSession:@"friend" wrap:wrap epoch:epoch];CHECK(wrap.identityReads==3 && !coordinator.pendingCount);
 }
+static void IngressAdmissionFastPath(NSURL *url){
+    CSAIReplyStore *store=[[CSAIReplyStore alloc]initWithURL:url account:account];CHECK([store load]);
+    NSMutableDictionary *config=[store.configuration mutableCopy];config[@"enabled"]=@NO;config[@"imageEnabled"]=@YES;
+    config[@"endpoint"]=@"https://example.invalid/chat";config[@"model"]=@"fake-model";config[@"credentialRevision"]=@"ingress";
+    config[@"verifiedConnection"]=CSAIConnectionIdentifier(config);config[@"conversations"]=@{@"room@chatroom":@{@"enabled":@YES,@"presetID":@""}};
+    CHECK([store saveConfiguration:config error:NULL]);
+    CSAIReplyManager *manager=CSAIReplyManager.sharedManager;[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager setValue:nil forKey:@"coordinator"];[manager refresh];
+    TestAdmissionWrap *wrap=[TestAdmissionWrap new];wrap.m_nsFromUsr=@"room@chatroom";wrap.m_nsToUsr=account;wrap.m_nsRealChatUsr=@"member";
+    wrap.m_nsContent=@"ordinary group text";wrap.m_uiMessageType=1;wrap.m_uiMesLocalID=1;wrap.m_uiCreateTime=5000;
+    NSUInteger before=hookMainDispatches,originalBefore=nativeIncomingCalls;CHECK(!CSAIReplyMessageIngressEnabled());
+    dispatch_sync(dispatch_get_global_queue(QOS_CLASS_DEFAULT,0),^{for(NSUInteger i=0;i<1000;i++)[nativeMessages AsyncOnAddMsg:@"room@chatroom" MsgWrap:wrap];});
+    CHECK(hookMainDispatches==before && nativeIncomingCalls==originalBefore+1000 && !wrap.typeReads && !wrap.identityReads && !wrap.bodyReads);DrainMain();
+    config[@"enabled"]=@YES;CHECK([store saveConfiguration:config error:NULL]);[manager refresh];CHECK(CSAIReplyMessageIngressEnabled());
+    backupReady=NO;[manager notify];CHECK(!CSAIReplyMessageIngressEnabled());backupReady=YES;
+    suspended=YES;[manager notify];CHECK(!CSAIReplyMessageIngressEnabled());suspended=NO;[manager notify];CHECK(CSAIReplyMessageIngressEnabled());
+    CSAIReplyCoordinator *coordinator=[manager valueForKey:@"coordinator"];TestImages *images=[TestImages new];coordinator.imagePreparer=images;coordinator.now=^{return 5000.0;};[coordinator configurationDidChange];
+    // Enabled ingress still transfers native parsing to main; ordinary unmentioned
+    // text never reads the body or builds IDs. The empty-session fallback agrees.
+    before=hookMainDispatches;dispatch_sync(dispatch_get_global_queue(QOS_CLASS_DEFAULT,0),^{[nativeMessages AsyncOnAddMsg:@"room@chatroom" MsgWrap:wrap];});
+    CHECK(hookMainDispatches==before+1 && !wrap.typeReads);DrainMain();
+    for(NSUInteger i=0;i<1000;i++)[manager receiveNativeSession:@"" wrap:wrap epoch:epoch];
+    CHECK(!wrap.bodyReads && !wrap.identifierReads && !wrap.readOffMain && !coordinator.pendingCount);
+    // Images stay staged, including a later native server alias, then attach to
+    // a same-sender mention. No untriggered image is durably claimed or prepared.
+    wrap.m_uiMessageType=3;[manager receiveNativeSession:@"room@chatroom" wrap:wrap epoch:epoch];wrap.m_n64MesSvrID=99;
+    [manager receiveNativeSession:@"room@chatroom" wrap:wrap epoch:epoch];CHECK(!coordinator.pendingCount && !images.event && ![store hasHandledMessageID:@"alice|room@chatroom|s:99"]);
+    TestMessageWrap *mention=Message(@"room@chatroom",account,2,5000);mention.m_nsRealChatUsr=@"member";mention.m_nsAtUserList=account;
+    [manager receiveNativeSession:@"room@chatroom" wrap:mention epoch:epoch];DrainMain();
+    CHECK(coordinator.pendingCount==1 && [store hasHandledMessageID:@"alice|room@chatroom|l:1:5000"] && [store hasHandledMessageID:@"alice|room@chatroom|s:99"]);
+    mention.m_n64MesSvrID=100;[manager receiveNativeSession:@"room@chatroom" wrap:mention epoch:epoch];DrainMain();
+    CHECK(coordinator.pendingCount==1 && [store hasHandledMessageID:@"alice|room@chatroom|s:100"]);
+    // A queued old-epoch callback cannot parse native data after account change.
+    NSUInteger reads=wrap.typeReads;[nativeMessages AsyncOnAddMsg:@"room@chatroom" MsgWrap:wrap];epoch++;DrainMain();CHECK(wrap.typeReads==reads);epoch--;
+    [coordinator cancelAll];config[@"enabled"]=@NO;CHECK([manager saveConfiguration:config account:account epoch:epoch error:NULL]);CHECK(!CSAIReplyMessageIngressEnabled());
+    before=hookMainDispatches;[nativeMessages AsyncOnAddMsg:@"room@chatroom" MsgWrap:wrap];CHECK(hookMainDispatches==before);
+    [manager setValue:nil forKey:@"store"];[manager notify];CHECK(!CSAIReplyMessageIngressEnabled());
+}
 static NSTimer *SyncTimer(CSAIBackgroundSync *scheduler){return [scheduler valueForKey:@"timer"];}
 static void FireSync(CSAIBackgroundSync *scheduler){[SyncTimer(scheduler) fire];}
 static void BackgroundSyncReplies(NSURL *url){
@@ -424,7 +481,7 @@ static void BackgroundSyncReplies(NSURL *url){
     config[@"credentialRevision"]=@"background-replies";keys[@[account,@"background-replies"]]=@"fake-key";config[@"verifiedConnection"]=CSAIConnectionIdentifier(config);
     config[@"conversations"]=@{@"friend":@{@"enabled":@YES,@"presetID":@""},@"room@chatroom":@{@"enabled":@YES,@"presetID":@"",@"allowUnmentioned":@YES},@"other@chatroom":@{@"enabled":@YES,@"presetID":@""}};CHECK([store saveConfiguration:config error:NULL]);NSDictionary *original=store.configuration;
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;TestClient *client=[TestClient new];[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager setValue:client forKey:@"client"];
-    CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:client];coordinator.delegate=(id)manager;__block NSTimeInterval messageClock=4000;coordinator.now=^{return messageClock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];
+    CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:client];coordinator.delegate=(id)manager;__block NSTimeInterval messageClock=4000;coordinator.now=^{return messageClock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];[manager notify];
     CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];[scheduler stop];__block NSTimeInterval syncClock=4000;scheduler.now=^{return syncClock;};
     TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;backgroundAudioActive=NO;SetPrivacy(NO,YES,YES);simulateSends=YES;submissions=0;
     [manager setValue:@NO forKey:@"started"];[manager start];DrainMain();CHECK(!scheduler.active && !service.syncCalls);
@@ -457,9 +514,9 @@ static void BackgroundSyncReplies(NSURL *url){
         if(gate==13)disabled[@"conversations"]=@{@"missing@chatroom":@{@"enabled":@YES,@"presetID":@"",@"allowUnmentioned":@YES}};
         CHECK([store saveConfiguration:disabled error:NULL]);
         if(gate==0)UIApplication.sharedApplication.applicationState=UIApplicationStateActive;if(gate==1)UIApplication.sharedApplication.applicationState=UIApplicationStateInactive;
-        if(gate==2)backgroundAudioActive=NO;if(gate==3)authorized=NO;if(gate==14)epoch++;if(gate==15)account=@"bob";if(gate==16)suspended=YES;if(gate==17)backupReady=NO;if(gate==18)[store setValue:@NO forKey:@"ready"];
+        if(gate==2)backgroundAudioActive=NO;if(gate==3)authorized=NO;if(gate==14)epoch++;if(gate==15)account=@"bob";if(gate==16)suspended=YES;if(gate==17)backupReady=NO;if(gate==18)[store setValue:@NO forKey:@"snapshotReady"];
         NSUInteger before=service.syncCalls;[scheduler refresh];CHECK(!scheduler.active && service.syncCalls==before);
-        UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;authorized=YES;epoch=7;account=@"alice";suspended=NO;backupReady=YES;[store setValue:@YES forKey:@"ready"];
+        UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;authorized=YES;epoch=7;account=@"alice";suspended=NO;backupReady=YES;[store setValue:@YES forKey:@"snapshotReady"];
         CHECK([store saveConfiguration:original error:NULL]);[scheduler refresh];DrainMain();CHECK(scheduler.active && service.syncCalls==before+1);
     }
     // Native busy and rejected attempts consume the same 30-second budget.
@@ -489,10 +546,10 @@ static void CapabilityAndImageIntegration(NSURL *url){
     CSAIReplyManager *manager=[CSAIReplyManager new];TestClient *client=[TestClient new];TestImages *images=[TestImages new];
     [manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager setValue:client forKey:@"client"];
     CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:client];coordinator.delegate=(id)manager;coordinator.imagePreparer=images;
-    __block NSTimeInterval clock=7000;coordinator.now=^{return clock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];
+    __block NSTimeInterval clock=7000;coordinator.now=^{return clock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];[manager notify];
     TestAdmissionWrap *off=[TestAdmissionWrap new];off.m_uiMessageType=3;[manager receiveNativeSession:@"friend" wrap:off epoch:epoch];CHECK(!off.identityReads && !images.event && off.typeReads==1);
     off.m_uiMessageType=1;off.m_nsFromUsr=@"friend";off.m_nsToUsr=account;off.m_nsContent=@"synthetic text";off.m_uiMesLocalID=66;off.m_uiCreateTime=(unsigned int)clock;off.typeReads=0;
-    [manager receiveNativeSession:@"friend" wrap:off epoch:epoch];CHECK(off.typeReads==1 && coordinator.pendingCount==1);[coordinator cancelAll];
+    [manager receiveNativeSession:@"friend" wrap:off epoch:epoch];CHECK(off.typeReads==1 && coordinator.pendingCount==1);DrainMain();[coordinator cancelAll];
     __block NSUInteger completions=0;__block NSError *failure=nil;
     [manager testConnectionForAccount:account epoch:epoch completion:^(NSString *text,NSError *error){(void)text;completions++;failure=error;}];
     TestCancellation *oldTask=client.tasks.lastObject;CSAICompletion oldCallback=client.callbacks.lastObject;
@@ -500,12 +557,12 @@ static void CapabilityAndImageIntegration(NSURL *url){
     config=[store.configuration mutableCopy];config[@"provider"]=@"bailian";config[@"imageEnabled"]=@YES;config[@"searchMode"]=@"auto";config[@"thinkingEnabled"]=@NO;
     CHECK([manager saveConfiguration:config account:account epoch:epoch error:NULL]);CHECK(oldTask.cancelled && failure.code==22 && completions==1);CHECK(!manager.connectionStatus && ![store.configuration[@"verifiedConnection"] length]);
     CHECK([store.configuration[@"endpoint"] isEqual:@"https://example.invalid/v1/chat/completions"] && [store.configuration[@"credentialRevision"] isEqual:@"image-integration"]);
-    client.inlineCompletion=YES;[manager testConnectionForAccount:account epoch:epoch completion:^(NSString *text,NSError *error){CHECK(text.length && !error);completions++;}];client.inlineCompletion=NO;
+    client.inlineCompletion=YES;[manager testConnectionForAccount:account epoch:epoch completion:^(NSString *text,NSError *error){CHECK(text.length && !error);completions++;}];client.inlineCompletion=NO;DrainMain();
     CHECK([client.lastMessages[0][@"content"] isKindOfClass:NSArray.class]);NSArray *parts=client.lastMessages[0][@"content"];CHECK(parts.count==2 && [parts[0][@"image_url"][@"url"] hasPrefix:@"data:image/png;base64,"]);
     CHECK([client.lastConfiguration[@"provider"] isEqual:@"bailian"] && [client.lastConfiguration[@"searchMode"] isEqual:@"auto"]);
     CHECK(![manager valueForKey:@"connectionTest"] && [store.configuration[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(store.configuration)]);
     client.callbacks.lastObject(@"duplicate inline completion",nil);CHECK(completions==2);
-    TestMessageWrap *wrap=Message(@"friend",account,77,clock);wrap.m_uiMessageType=3;wrap.m_nsContent=@"";[manager receiveNativeSession:@"friend" wrap:wrap epoch:epoch];
+    TestMessageWrap *wrap=Message(@"friend",account,77,clock);wrap.m_uiMessageType=3;wrap.m_nsContent=@"";[manager receiveNativeSession:@"friend" wrap:wrap epoch:epoch];DrainMain();
     CHECK(coordinator.pendingCount==1 && !images.event && [store hasHandledMessageID:@"alice|friend|l:77:7000"]);clock+=2;[coordinator processPending];
     CHECK([images.event[@"epoch"] isEqual:@(epoch)] && images.event[@"imageSource"]==wrap && coordinator.activeCount==1);
     BOOL (^valid)(void)=images.event[@"imageStillValid"];CHECK(valid());NSUInteger requests=client.callbacks.count;
@@ -513,6 +570,51 @@ static void CapabilityAndImageIntegration(NSURL *url){
     CHECK(images.task.cancelled && !valid() && !coordinator.activeCount && !manager.connectionStatus && ![store.configuration[@"verifiedConnection"] length]);
     images.completion(@"data:image/jpeg;base64,AQ==",nil);CHECK(client.callbacks.count==requests);
     [coordinator cancelAll];
+}
+static void AsyncManagerMutations(NSURL *url){
+    TestStore *store=[[TestStore alloc]initWithURL:url account:account];CHECK([store load]);
+    CSAIReplyManager *manager=[CSAIReplyManager new];TestClient *client=[TestClient new];
+    [manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager setValue:client forKey:@"client"];
+    // refresh loads the established isolated file once, without a blocking load or a new checkout/path.
+    store=[[TestStore alloc]initWithURL:url account:account];[manager setValue:store forKey:@"store"];
+    [manager refresh];CHECK([[manager valueForKey:@"loadingStore"] boolValue]);[manager refresh];CHECK(store.loadRequests==1);
+    WaitFor(^BOOL{return store.ready && ![[manager valueForKey:@"loadingStore"] boolValue];});
+    NSString *endpoint=@"https://example.invalid/v1/chat/completions";__block BOOL done=NO;__block NSError *failure=nil;
+    [manager saveConnection:endpoint model:@"async-model" key:@"async-key" account:account epoch:epoch completion:^(BOOL ok,NSError *error){CHECK(ok && !error && NSThread.isMainThread);done=YES;}];CHECK(!done);WaitFor(^BOOL{return done;});
+    NSString *revision=store.configuration[@"credentialRevision"];CHECK([CSAIReadCredential(account,revision,NULL) isEqual:@"async-key"]);
+    __block NSUInteger completions=0;
+    [manager testConnectionForAccount:account epoch:epoch completion:^(NSString *text,NSError *error){CHECK(text.length && !error);CHECK([store.configuration[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(store.configuration)]);completions++;}];
+    client.callbacks.lastObject(@"async verified",nil);CHECK(!completions);WaitFor(^BOOL{return completions==1;});
+    done=NO;[manager setConversation:@"friend" enabled:YES presetID:@"" account:account epoch:epoch completion:^(BOOL ok,NSError *error){CHECK(ok && !error);done=YES;}];WaitFor(^BOOL{return done;});
+    NSMutableDictionary *configuration=[store.configuration mutableCopy];configuration[@"enabled"]=@YES;
+    done=NO;[manager saveConfiguration:configuration account:account epoch:epoch completion:^(BOOL ok,NSError *error){CHECK(ok && !error);done=YES;}];WaitFor(^BOOL{return done;});
+    CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:client];coordinator.delegate=(id)manager;
+    __block NSTimeInterval clock=9000;coordinator.now=^{return clock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];[manager notify];
+    [manager receiveNativeSession:@"friend" wrap:Message(@"friend",account,1,clock) epoch:epoch];DrainMain();clock+=2;[coordinator processPending];CHECK(coordinator.activeCount==1);
+    TestCancellation *active=client.tasks.lastObject;CSAICompletion late=client.callbacks.lastObject;
+    configuration=[store.configuration mutableCopy];configuration[@"enabled"]=@NO;
+    done=NO;[manager saveConfiguration:configuration account:account epoch:epoch completion:^(BOOL ok,NSError *error){CHECK(ok && !error);done=YES;}];
+    CHECK(active.cancelled && !coordinator.activeCount && ![coordinator.delegate coordinator:coordinator allowsConversation:@"friend"]);
+    __block BOOL rejectedOverlap=NO;[manager saveConfiguration:configuration account:account epoch:epoch completion:^(BOOL ok,NSError *error){CHECK(!ok && error);rejectedOverlap=YES;}];CHECK(rejectedOverlap);
+    late(@"cancelled reply",nil);WaitFor(^BOOL{return done;});CHECK(![store.configuration[@"enabled"] boolValue]);
+    // A confirmed failure retains the previous configuration and cleans a newly staged Keychain slot.
+    NSUInteger keyCount=keys.count;NSDictionary *before=store.configuration;store.failSave=YES;done=NO;
+    [manager saveConnection:endpoint model:@"failed-async" key:@"failed-key" account:account epoch:epoch completion:^(BOOL ok,NSError *error){CHECK(!ok && error.code==99);failure=error;done=YES;}];WaitFor(^BOOL{return done;});
+    CHECK(failure && [store.configuration isEqual:before] && keys.count==keyCount);store.failSave=NO;
+    // Directory-fsync uncertainty retains the new credential actually named by the replacement file.
+    failDirectorySync=YES;done=NO;
+    [manager saveConnection:endpoint model:@"uncertain-async" key:@"uncertain-key" account:account epoch:epoch completion:^(BOOL ok,NSError *error){CHECK(!ok && [error.userInfo[CSAIReplyStoreCommitUncertainKey] boolValue]);done=YES;}];WaitFor(^BOOL{return done;});failDirectorySync=NO;
+    CHECK(!store.ready && keys.count==keyCount+1);CHECK([store load]);revision=store.configuration[@"credentialRevision"];
+    CHECK([store.configuration[@"model"] isEqual:@"uncertain-async"] && [CSAIReadCredential(account,revision,NULL) isEqual:@"uncertain-key"]);
+    // Switching accounts after rename-bound IO began must not delete an already referenced credential.
+    resumeFsync=dispatch_semaphore_create(0);atomic_store(&pauseNextFsync,true);done=NO;
+    [manager saveConnection:endpoint model:@"old-account-async" key:@"old-account-key" account:account epoch:epoch completion:^(BOOL ok,NSError *error){CHECK(!ok && [error.userInfo[CSAIReplyStoreCommitUncertainKey] boolValue]);done=YES;}];
+    WaitFor(^BOOL{return atomic_load(&ioPaused);});NSUInteger oldEpoch=epoch;NSString *oldAccount=account;account=@"bob";epoch++;
+    [store invalidate];[manager setValue:nil forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];dispatch_semaphore_signal(resumeFsync);
+    CSAIReplyStore *next=[[CSAIReplyStore alloc]initWithURL:[[url URLByDeletingLastPathComponent]URLByAppendingPathComponent:@"async-bob.plist"] account:account];CHECK([next load]);[manager setValue:next forKey:@"store"];WaitFor(^BOOL{return done;});
+    NSDictionary *written=[CSAIReplyStore readStateAtURL:url account:oldAccount error:NULL];revision=written[@"configuration"][@"credentialRevision"];
+    CHECK([written[@"configuration"][@"model"] isEqual:@"old-account-async"] && [CSAIReadCredential(oldAccount,revision,NULL) isEqual:@"old-account-key"]);
+    CHECK(![next.configuration[@"model"] length]);account=oldAccount;epoch=oldEpoch;[next invalidate];
 }
 int main(int argc,const char **argv){@autoreleasepool{
     CHECK(argc==2);keys=[NSMutableDictionary dictionary];NSURL *url=[NSURL fileURLWithPath:@(argv[1])];
@@ -527,10 +629,10 @@ int main(int argc,const char **argv){@autoreleasepool{
     CSAICompletion completion=^(NSString *text,NSError *e){result=text;failure=e;};
     [manager testConnectionForAccount:account epoch:epoch completion:completion];
     CHECK(client.callbacks.count==1);CHECK(client.lastMessages.count==1);CHECK([client.lastMessages[0][@"content"] isEqual:@"请只回复：连接正常。"]);CHECK(submissions==0);
-    client.callbacks[0](@"连接正常",nil);CHECK(!failure && result.length);CHECK([store.configuration[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(store.configuration)]);CHECK(![store.configuration[@"enabled"] boolValue]);
+    client.callbacks[0](@"连接正常",nil);DrainMain();CHECK(!failure && result.length);CHECK([store.configuration[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(store.configuration)]);CHECK(![store.configuration[@"enabled"] boolValue]);
     // A repeated failed test revokes an earlier successful verification.
-    [manager testConnectionForAccount:account epoch:epoch completion:completion];client.callbacks[1](nil,CSAIError(401,@"认证失败"));CHECK(failure.code==401);CHECK(![store.configuration[@"verifiedConnection"] length]);
-    [manager testConnectionForAccount:account epoch:epoch completion:completion];client.callbacks[2](@"正常",nil);NSString *verified=store.configuration[@"verifiedConnection"];
+    [manager testConnectionForAccount:account epoch:epoch completion:completion];client.callbacks[1](nil,CSAIError(401,@"认证失败"));DrainMain();CHECK(failure.code==401);CHECK(![store.configuration[@"verifiedConnection"] length]);
+    [manager testConnectionForAccount:account epoch:epoch completion:completion];client.callbacks[2](@"正常",nil);DrainMain();NSString *verified=store.configuration[@"verifiedConnection"];
     [manager testConnectionForAccount:account epoch:epoch completion:completion];client.callbacks[3](nil,CSAIError(NSURLErrorCancelled,@"取消"));CHECK([store.configuration[@"verifiedConnection"] isEqual:verified]);
     // Failed Keychain or plist writes keep the active slot unchanged; staged keys are discarded.
     NSDictionary *before=store.configuration;NSUInteger keyCount=keys.count;failKeyWrite=YES;
@@ -573,7 +675,9 @@ int main(int argc,const char **argv){@autoreleasepool{
     HiddenConversationReplies([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"hidden-replies.plist"]);
     GroupUnmentionedReplies([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"unmentioned-replies.plist"]);
     DisabledSessionFastPath([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"disabled-session.plist"]);
+    IngressAdmissionFastPath([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"ingress-admission.plist"]);
     BackgroundSyncReplies([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"background-replies.plist"]);
     CapabilityAndImageIntegration([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"image-integration.plist"]);
+    AsyncManagerMutations([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"async-manager.plist"]);
     printf("AI reply manager: %lu checks passed\n",(unsigned long)checks);return 0;
 }}

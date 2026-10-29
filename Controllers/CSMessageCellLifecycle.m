@@ -62,5 +62,10 @@ void CSMessageCellRefresh(id cell) {
 }
 void CSMessageCellWindowChanged(id cell) {
     if (![(UIView *)cell window]) [CSMessageGestureAdapterForCell(cell,NO) cancel];
-    else { [CSMessageGestureAdapterForCell(cell,YES) bind]; CSMessageCellRefresh(cell); }
+    else {
+        CSMessageGestureAdapter *adapter=CSMessageGestureAdapterForCell(cell,NO);
+        if (adapter) [adapter bind];
+        else CSMessageGestureAdapterForCell(cell,YES); // A new adapter binds in its initializer.
+        CSMessageCellRefresh(cell);
+    }
 }

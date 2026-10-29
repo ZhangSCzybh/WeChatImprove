@@ -1,0 +1,22 @@
+{
+  "version": "2.1-14",
+  "delivery_directory": "packages/2.1-14-performance",
+  "delivery_exists": false,
+  "build_started": false,
+  "tools": {
+    "python3": "/opt/homebrew/bin/python3",
+    "make": "/usr/bin/make",
+    "xcrun": "/usr/bin/xcrun",
+    "dpkg-deb": "/opt/homebrew/bin/dpkg-deb",
+    "plutil": "/usr/bin/plutil",
+    "clang": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+    "dwarfdump": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/dwarfdump",
+    "lipo": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo",
+    "nm": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm",
+    "otool": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/otool"
+  },
+  "iphoneos_sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk",
+  "preserved_file_count": 1292,
+  "prior_package_count": 28,
+  "scripts_compile": true
+}

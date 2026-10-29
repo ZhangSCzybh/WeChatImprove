@@ -4,17 +4,11 @@
 
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
+#import "CSLayoutPreferences.h"
 
 static NSString * const kPreferencesSuiteName = @"com.wechat.enhance";
-static NSString * const kChatFontSizeKey = @"font.chat_size";
-static NSString * const kGlobalScaleKey = @"global.scale";
-
-static const CGFloat kMinChatFontSize = 8.0;
-static const CGFloat kMaxChatFontSize = 25.0;
 static const CGFloat kDefaultChatFontSize = 17.0;
 
-static const CGFloat kMinGlobalScale = 0.5;
-static const CGFloat kMaxGlobalScale = 2.0;
 static const CGFloat kDefaultGlobalScale = 1.0;
 
 static NSUserDefaults *getDefaults() {
@@ -27,21 +21,11 @@ static NSUserDefaults *getDefaults() {
 }
 
 static CGFloat getChatFontSize() {
-    NSUserDefaults *defaults = getDefaults();
-    CGFloat size = [defaults floatForKey:kChatFontSizeKey];
-    if (size < kMinChatFontSize || size > kMaxChatFontSize) {
-        return kDefaultChatFontSize;
-    }
-    return size;
+    return CSLayoutPreferencesRead().chatFontSize;
 }
 
 static CGFloat getGlobalScale() {
-    NSUserDefaults *defaults = getDefaults();
-    CGFloat scale = [defaults floatForKey:kGlobalScaleKey];
-    if (scale < kMinGlobalScale || scale > kMaxGlobalScale) {
-        return kDefaultGlobalScale;
-    }
-    return scale;
+    return CSLayoutPreferencesRead().globalScale;
 }
 
 @interface UIFont (PreHot)
@@ -274,9 +258,9 @@ static void applyGlobalScale(SessionCellLayoutParam *layoutParam, CGFloat scale)
 
 %end
 
-// Layout getters read the current shared preferences directly. There is no
-// cache to invalidate and no observer that republishes its own notification.
+// Configuration notifications refresh an atomic numeric snapshot. Getters never
+// query Defaults, and refresh observers never write or republish settings.
 
 %ctor {
-    CSBackupWhenReady(^{ %init; });
+    CSBackupWhenReady(^{ CSLayoutPreferencesInstall(getDefaults()); %init; });
 }

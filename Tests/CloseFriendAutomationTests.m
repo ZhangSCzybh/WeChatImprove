@@ -20,20 +20,26 @@ static CSCloseFriendSnapshot *currentSnapshot;
 static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) { return currentSnapshot; }
 static NSString *removedID, *removedAccount;
 @interface CSScheduledTaskManager : NSObject
+@property(nonatomic) BOOL savingConfiguration;
 + (instancetype)sharedManager;
-- (BOOL)removeTask:(NSString *)identifier account:(NSString *)account error:(NSError **)error;
+- (void)removeTask:(NSString *)identifier account:(NSString *)account completion:(void(^)(BOOL,NSError *))completion;
 @end
 @implementation CSScheduledTaskManager
 + (instancetype)sharedManager { static id manager; if(!manager)manager=[self new]; return manager; }
-- (BOOL)removeTask:(NSString *)identifier account:(NSString *)account error:(NSError **)error {
-    removedID=identifier; removedAccount=account; return YES;
+- (void)removeTask:(NSString *)identifier account:(NSString *)account completion:(void(^)(BOOL,NSError *))completion {
+    removedID=identifier; removedAccount=account; completion(YES,nil);
 }
 @end
 static void CSTaskAlert(id page,NSString *message) { CHECK(NO); }
+@interface TestNavigationController : NSObject
+@property(nonatomic) id topViewController;
+@end
+@implementation TestNavigationController @end
 @interface CSScheduledTaskSettingsViewController : NSObject
 @property(nonatomic,copy) NSArray<NSDictionary *> *displayedTasks;
 @property(nonatomic,copy) NSString *displayedAccount;
 @property(nonatomic) NSUInteger reloads;
+@property(nonatomic) TestNavigationController *navigationController;
 @end
 @implementation CSScheduledTaskSettingsViewController
 - (void)reload { self.reloads++; }
@@ -118,13 +124,17 @@ int main(void) { @autoreleasepool {
     // A callback retained across relock or account switch cannot delete a newly hidden row.
     page.displayedTasks=tasks;
     [page tableView:nil commitEditingStyle:UITableViewCellEditingStyleDelete forRowAtIndexPath:Path(0)];
-    CHECK(!removedID && page.reloads==1);
+    CHECK(!removedID && page.reloads==3);
     page.displayedAccount=@"two";
     [page tableView:nil commitEditingStyle:UITableViewCellEditingStyleDelete forRowAtIndexPath:Path(1)];
-    CHECK(!removedID && page.reloads==2);
+    CHECK(!removedID && page.reloads==4);
     page.displayedAccount=@"one";currentSnapshot=open;
     [page tableView:nil commitEditingStyle:UITableViewCellEditingStyleDelete forRowAtIndexPath:Path(0)];
     CHECK([removedID isEqual:@"a1"]);
+    removedID=nil;CSScheduledTaskManager.sharedManager.savingConfiguration=YES;
+    CHECK(![page tableView:nil canEditRowAtIndexPath:Path(0)]);
+    [page tableView:nil commitEditingStyle:UITableViewCellEditingStyleDelete forRowAtIndexPath:Path(0)];CHECK(!removedID);
+    CSScheduledTaskManager.sharedManager.savingConfiguration=NO;
     page.displayedTasks=@[];
     CHECK(![page tableView:nil canEditRowAtIndexPath:Path(0)]);
     printf("PASS: %lu close-friend automation checks (production policy/projections/deletion handlers, no sends or user data)\n",(unsigned long)checks);

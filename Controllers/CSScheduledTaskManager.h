@@ -7,9 +7,10 @@ FOUNDATION_EXPORT NSNotificationName const CSScheduledTasksDidChange;
 - (void)refresh;
 @property(nonatomic, readonly, nullable) CSScheduledTaskStore *store;
 @property(nonatomic, readonly) NSString *statusText;
-- (BOOL)setEnabled:(BOOL)enabled account:(NSString *)account error:(NSError **)error;
-- (BOOL)saveTask:(NSDictionary *)task account:(NSString *)account error:(NSError **)error;
-- (BOOL)removeTask:(NSString *)identifier account:(NSString *)account error:(NSError **)error;
+@property(nonatomic, readonly) BOOL savingConfiguration;
+- (void)setEnabled:(BOOL)enabled account:(NSString *)account completion:(CSScheduledTaskStoreCompletion)completion;
+- (void)saveTask:(NSDictionary *)task account:(NSString *)account completion:(CSScheduledTaskStoreCompletion)completion;
+- (void)removeTask:(NSString *)identifier account:(NSString *)account completion:(CSScheduledTaskStoreCompletion)completion;
 - (NSString *)displayNameForTarget:(NSString *)target;
 @end
 NS_ASSUME_NONNULL_END

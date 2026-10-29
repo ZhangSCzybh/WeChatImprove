@@ -6,7 +6,7 @@ static NSUInteger checks;
 static NSDate *D(NSString *s) { NSISO8601DateFormatter *f=[NSISO8601DateFormatter new]; NSDate *d=[f dateFromString:s]; CHECK(d); return d; }
 static NSDate *At(NSDate *date, double offset) { return [date dateByAddingTimeInterval:offset]; }
 static NSMutableDictionary *Task(NSString *mode, NSDate *anchor) { return [@{@"id":NSUUID.UUID.UUIDString,@"title":@"测试任务",@"target":@"filehelper",@"text":@"你好\n第二行",@"enabled":@YES,@"catchUp":@NO,@"mode":mode,@"interval":@5,@"anchor":anchor,@"hour":@9,@"minute":@30,@"weekdays":@[@2,@4],@"zone":@"Asia/Shanghai"} mutableCopy]; }
-static CSScheduledTaskStore *Store(NSURL *url, NSString *account) { CSScheduledTaskStore *s=[[CSScheduledTaskStore alloc] initWithURL:url account:account]; CHECK([s load]); return s; }
+static CSScheduledTaskStore *Store(NSURL *url, NSString *account) { CSScheduledTaskStore *s=[[CSScheduledTaskStore alloc] initWithURL:url account:account]; BOOL loaded=[s load];if(!loaded)NSLog(@"load %@: %@",url.path,s.error);CHECK(loaded); return s; }
 static void Rules(void) {
     NSDate *base=D(@"2026-10-26T00:00:00Z"); NSMutableDictionary *t=Task(@"minutes",base);
     CHECK(CSScheduledTaskValidate(t,NULL)); CHECK([CSScheduledTaskNext(t,At(base,-1)) isEqual:base]);

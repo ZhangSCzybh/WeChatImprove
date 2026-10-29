@@ -1,5 +1,6 @@
 #import "CSListCornerSessionRestore.h"
 #import "CSListCornerPageContext.h"
+#import "CSCloseFriendSessionPresentation.h"
 #import <objc/runtime.h>
 
 static char RestoreKey;
@@ -33,6 +34,7 @@ static char RestoreKey;
 @property(nonatomic,weak) UITableView *table;
 @property(nonatomic,strong) NSHashTable<CSListCornerSessionGap *> *gaps;
 @property(nonatomic) BOOL restoring,inactive;
+@property(nonatomic) NSUInteger tableLayoutDepth;
 - (void)activityChanged:(NSNotification *)notification;
 @end
 @implementation CSListCornerSessionRestore
@@ -87,6 +89,23 @@ void CSListCornerTrackSessionTable(UITableView *table) {
     }
 }
 
+BOOL CSListCornerSessionTableLayoutInProgress(UITableView *table) {
+    CSListCornerSessionRestore *state=objc_getAssociatedObject(table,&RestoreKey);
+    return state.tableLayoutDepth && !state.inactive && table.window!=nil;
+}
+void CSListCornerPerformSessionTableLayout(UITableView *table, void (^nativeLayout)(void)) {
+    CSListCornerSessionRestore *state=objc_getAssociatedObject(table,&RestoreKey);
+    BOOL outer=!state || state.tableLayoutDepth==0;
+    if (state) state.tableLayoutDepth++;
+    @try { nativeLayout(); }
+    @finally {
+        if (state) state.tableLayoutDepth--;
+        // Inspect the final native properties, including paint/mask changes made
+        // after a child layout. Independent cell and foreground repairs stay immediate.
+        if (outer) CSListCornerRestoreSessionTable(table,YES);
+    }
+}
+
 UIView *CSListCornerCreateSessionGap(UITableView *table, NSInteger section, BOOL footer, CGRect frame) {
     CSListCornerSessionGap *view=[[CSListCornerSessionGap alloc] initWithFrame:frame];
     view.table=table;view.section=section;view.footer=footer;view.userInteractionEnabled=NO;
@@ -120,6 +139,9 @@ void CSListCornerRestoreSessionTable(UITableView *table, BOOL refreshGeometry) {
             for (UITableViewCell *cell in table.visibleCells) {
                 // Reuse the last native-delivered row role; never query rows or projection here.
                 CSListCornerRefreshSessionGeometry(cell);
+                // Child layout may have masked the folded entry before its final
+                // card/item geometry was available. Keep presentation after geometry.
+                CSCloseFriendRefreshSessionCover(cell);
             }
         }
     } @finally { state.restoring=NO; }

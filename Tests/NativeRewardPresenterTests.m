@@ -5,6 +5,12 @@
 #include <stdlib.h>
 static unsigned checks;
 #define CHECK(x) do { checks++; if (!(x)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#x); exit(1); } } while (0)
+NSNotificationName const UIApplicationDidBecomeActiveNotification=@"test-active";
+NSNotificationName const UIApplicationWillResignActiveNotification=@"test-inactive";
+NSNotificationName const UIApplicationDidEnterBackgroundNotification=@"test-background";
+@implementation UIApplication
++ (instancetype)sharedApplication {static UIApplication *app;static dispatch_once_t once;dispatch_once(&once,^{app=[self new];});return app;}
+@end
 @implementation UIView
 - (instancetype)init { if ((self=[super init])) _userInteractionEnabled=YES; return self; }
 - (void)addSubview:(UIView *)view { if (!self.subviews) self.subviews=[NSMutableArray new]; [self.subviews addObject:view]; }
@@ -13,6 +19,7 @@ static unsigned checks;
 - (instancetype)init { if ((self=[super init])) { _view=[UIView new]; _view.window=[NSObject new]; } return self; }
 - (UINavigationController *)navigationController { return _navigationController ?: self.parentViewController.navigationController; }
 - (void)viewDidLoad {}
+- (void)viewDidAppear:(BOOL)animated {}
 - (void)addChildViewController:(UIViewController *)child {
     if (!self.childViewControllers) self.childViewControllers=[NSMutableArray new];
     [self.childViewControllers addObject:child]; child.parentViewController=self;
@@ -100,6 +107,7 @@ static __weak UIViewController *receivedHost;
 @interface CSNativeRewardSession : NSObject
 - (void)start;
 - (void)observePresentation;
+- (void)finish;
 @end
 static void Tick(void) { [NSRunLoop.mainRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.25]]; }
 int main(void) { @autoreleasepool {
@@ -130,7 +138,8 @@ int main(void) { @autoreleasepool {
     CHECK(((MMUIViewController *)source).nativeLoads==1);
     CHECK(((MMUIViewController *)source).nativeStops==1);
     PresenterPayer *firstPayer=lastHandler.qrcodeRewardPayerLogic;
-    nav.viewControllers=@[source]; Tick(); // Native back gesture without an End callback.
+    nav.viewControllers=@[source]; [source viewDidAppear:YES]; // Native back gesture without an End callback.
+    Tick();
     CHECK(firstPayer.stops==1); CHECK(lastHandler.m_delegate==nil);
     CHECK(source.view.userInteractionEnabled);
     CHECK(nav.topViewController==source); CHECK(source.presentedViewController==nil);
@@ -163,5 +172,45 @@ int main(void) { @autoreleasepool {
     CSOpenNativeAuthorReward(content); CHECK(routeCalls==5);
     [lastHandler.m_delegate onScanQRCodeUrlPrefixHandlerEnd]; Tick();
     CHECK(nav.viewControllers.count==1); CHECK(source.presentedViewController==nil);
+    // Exercise the real session without relying on real-time polling. Presentation
+    // changes the high-frequency opening observer into a low-frequency fallback.
+    CSNativeRewardSession *background=[CSNativeRewardSession new];[background setValue:source forKey:@"source"];[background start];
+    NSTimer *opening=[background valueForKey:@"observer"];CHECK(opening.valid && opening.timeInterval==0.2);
+    [lastHandler showNativePage];[background observePresentation];
+    NSTimer *fallback=[background valueForKey:@"observer"];CHECK(!opening.valid && fallback.valid && fallback.timeInterval==2);
+    CHECK(![background valueForKey:@"openingDeadline"] && lastHandler.m_delegate.state==CSNativeRewardPresented);
+    UIApplication.sharedApplication.applicationState=UIApplicationStateInactive;
+    [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationWillResignActiveNotification object:nil];CHECK(!fallback.valid && ![background valueForKey:@"observer"]);
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
+    [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];
+    [background observePresentation];CHECK(lastHandler.m_delegate.state==CSNativeRewardPresented); // Keep native payment alive.
+    UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+    [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
+    CHECK([[background valueForKey:@"observer"] timeInterval]==2 && lastHandler.m_delegate.state==CSNativeRewardPresented);
+    nav.viewControllers=@[source];[background observePresentation];CHECK(lastHandler.m_delegate==nil && ![background valueForKey:@"observer"]);
+    // Only a low-frequency fallback is needed when a native return omits lifecycle.
+    CSNativeRewardSession *fallbackSession=[CSNativeRewardSession new];[fallbackSession setValue:source forKey:@"source"];[fallbackSession start];
+    [lastHandler showNativePage];[fallbackSession observePresentation];NSTimer *returnFallback=[fallbackSession valueForKey:@"observer"];
+    nav.viewControllers=@[source];[returnFallback fire];CHECK(lastHandler.m_delegate==nil && !returnFallback.valid);
+    // A background opening deadline never cancels a route or shows an alert.
+    CSNativeRewardSession *pending=[CSNativeRewardSession new];[pending setValue:source forKey:@"source"];[pending start];
+    [pending setValue:@(NSProcessInfo.processInfo.systemUptime-13) forKey:@"beganAt"];
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
+    [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[pending valueForKey:@"openingDeadline"] fire];CHECK(lastHandler.m_delegate!=nil && !source.presentedViewController && ![pending valueForKey:@"observer"]);
+    UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+    [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];CHECK(lastHandler.m_delegate==nil && [source.presentedViewController isKindOfClass:UIAlertController.class]);source.presentedViewController=nil;
+    CSNativeRewardSession *arrived=[CSNativeRewardSession new];[arrived setValue:source forKey:@"source"];[arrived start];
+    [arrived setValue:@(NSProcessInfo.processInfo.systemUptime-13) forKey:@"beganAt"];
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];
+    [lastHandler showNativePage];[[arrived valueForKey:@"openingDeadline"] fire];CHECK(lastHandler.m_delegate.state==CSNativeRewardOpening);
+    UIApplication.sharedApplication.applicationState=UIApplicationStateActive;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
+    CHECK(lastHandler.m_delegate.state==CSNativeRewardPresented && ![arrived valueForKey:@"openingDeadline"] && source.view.userInteractionEnabled);
+    [lastHandler.m_delegate onScanQRCodeUrlPrefixHandlerEnd];Tick();nav.viewControllers=@[source];
+    // Finishing while backgrounded cannot restart display observation on activation.
+    CSNativeRewardSession *completed=[CSNativeRewardSession new];[completed setValue:source forKey:@"source"];[completed start];
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];
+    [lastHandler.m_delegate onScanQRCodeUrlPrefixHandlerEnd];Tick();CHECK(![completed valueForKey:@"observer"] && ![completed valueForKey:@"openingDeadline"]);
+    UIApplication.sharedApplication.applicationState=UIApplicationStateActive;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];CHECK(![completed valueForKey:@"observer"]);
     printf("Native reward presenter: %u checks passed\n",checks);
 } return 0; }

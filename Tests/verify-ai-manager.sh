@@ -10,6 +10,7 @@ source=Path('Controllers/CSMessageNativeActionAdapter.m').read_text().split('@in
 Path(sys.argv[1],'AINativeDispatchUnderTest.m').write_text(source)
 Path(sys.argv[1],'AIPreparedSendUnderTest.m').write_text(Path('Controllers/CSMessageSendAdapter.m').read_text().split('@interface CSMessageSendAdapter ()',1)[0])
 hooks=Path('Hooks/AIReplyHooks.xm').read_text().replace('../Controllers/','').replace('%ctor {','static void CSAITestInstallHooks(void) {')
+hooks=hooks.replace('dispatch_async(', 'CSAITestHookDispatch(')
 Path(sys.argv[1],'AIHooksUnderTest.m').write_text(hooks)
 Path(sys.argv[1],'substrate.h').write_text('#import <objc/runtime.h>\nvoid MSHookMessageEx(Class, SEL, IMP, IMP *);\n')
 store='#import <Foundation/Foundation.h>\n#include <unistd.h>\nint CSAITestFsync(int);\n#define fsync(...) CSAITestFsync(__VA_ARGS__)\n#include "'+str(Path('Controllers/CSAIReplyStore.m').resolve())+'"\n'

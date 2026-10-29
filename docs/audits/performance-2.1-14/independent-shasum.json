@@ -1,0 +1,12 @@
+{
+  "command": [
+    "shasum",
+    "-a",
+    "256",
+    "-c",
+    "SHA256SUMS"
+  ],
+  "working_directory": "packages/2.1-14-performance",
+  "exit_code": 0,
+  "output": "com.wechat.improve_2.1-14_iphoneos-arm.deb: OK\ncom.wechat.improve_2.1-14_iphoneos-arm64.deb: OK\ncom.wechat.improve_2.1-14_symbols.zip: OK\n"
+}

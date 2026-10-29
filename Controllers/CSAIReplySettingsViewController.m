@@ -10,6 +10,9 @@ static void AIAlert(UIViewController *page,NSString *message){
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"AI 自动回复" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleCancel handler:nil]];[page presentViewController:alert animated:YES completion:nil];
 }
+static void AIPopIfVisible(UIViewController *page){
+    if(page.navigationController.topViewController==page)[page.navigationController popViewControllerAnimated:YES];
+}
 static CSSettingItem *AIRow(NSString *title,NSString *icon,NSString *detail,void(^action)(void)){
     CSSettingItem *item=[CSSettingItem itemWithTitle:title iconName:icon iconColor:UIColor.systemBlueColor detail:detail];item.actionBlock=action;return item;
 }
@@ -37,11 +40,13 @@ static void AIConfigureTable(UITableView *table){table.backgroundColor=UIColor.s
 @interface CSAISettingsPage ()
 @property(nonatomic,copy) NSString *account;
 @property(nonatomic) NSUInteger epoch;
+@property(nonatomic) BOOL saving;
 @property(nonatomic,copy) NSArray<CSSettingSection *> *sections;
 @property(nonatomic,copy) NSArray<NSString *> *footers;
 - (BOOL)current;
 - (void)reload;
-- (BOOL)save:(NSDictionary *)configuration;
+- (void)save:(NSDictionary *)configuration;
+- (void)save:(NSDictionary *)configuration completion:(void(^)(BOOL))completion;
 @end
 @implementation CSAISettingsPage
 - (void)viewDidLoad{
@@ -54,9 +59,15 @@ static void AIConfigureTable(UITableView *table){table.backgroundColor=UIColor.s
 - (void)dealloc{[NSNotificationCenter.defaultCenter removeObserver:self];}
 - (void)viewWillAppear:(BOOL)animated{[super viewWillAppear:animated];[self reload];}
 - (void)changed:(NSNotification *)note{(void)note;[self reload];}
-- (BOOL)current{return [CSAIReplyManager.sharedManager isCurrentAccount:self.account epoch:self.epoch];}
+- (BOOL)current{return !self.saving && [CSAIReplyManager.sharedManager isCurrentAccount:self.account epoch:self.epoch];}
 - (void)reload{[self.tableView reloadData];}
-- (BOOL)save:(NSDictionary *)configuration{NSError *error=nil;BOOL ok=[CSAIReplyManager.sharedManager saveConfiguration:configuration account:self.account epoch:self.epoch error:&error];if(!ok)AIAlert(self,error.localizedDescription);[self reload];return ok;}
+- (void)save:(NSDictionary *)configuration {[self save:configuration completion:nil];}
+- (void)save:(NSDictionary *)configuration completion:(void(^)(BOOL))completion {
+    if(self.saving)return;self.saving=YES;[self reload];
+    [CSAIReplyManager.sharedManager saveConfiguration:configuration account:self.account epoch:self.epoch completion:^(BOOL success,NSError *error){
+        self.saving=NO;[self reload];if(!success)AIAlert(self,error.localizedDescription);if(completion)completion(success);
+    }];
+}
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{(void)tableView;return self.sections.count;}
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{(void)tableView;return self.sections[section].items.count;}
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{(void)tableView;return self.sections[section].header;}
@@ -83,13 +94,13 @@ static void AIConfigureTable(UITableView *table){table.backgroundColor=UIColor.s
 @end
 static NSString *AIProviderTitle(NSDictionary *configuration){return [CSAIProvider(configuration) isEqual:@"bailian"]?@"阿里云百炼":@"通用兼容接口（默认）";}
 static NSString *AISearchTitle(NSDictionary *configuration){NSString *mode=CSAISearchMode(configuration);return [mode isEqual:@"always"]?@"每次联网":[mode isEqual:@"auto"]?@"按需联网":@"关闭（默认）";}
-static BOOL AISaveCapabilityChanges(CSAISettingsPage *page,NSDictionary *changes,NSString *originalConnection){
+static void AISaveCapabilityChanges(CSAISettingsPage *page,NSDictionary *changes,NSString *originalConnection,void(^completion)(BOOL)){
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;
-    if(!page || ![page current] || ![originalConnection isEqual:CSAIConnectionIdentifier(manager.store.configuration)]){if(page)AIAlert(page,@"账号或模型能力已改变，请返回后重新设置。");return NO;}
+    if(!page || ![page current] || ![originalConnection isEqual:CSAIConnectionIdentifier(manager.store.configuration)]){if(page)AIAlert(page,@"账号或模型能力已改变，请返回后重新设置。");if(completion)completion(NO);return;}
     NSMutableDictionary *configuration=[manager.store.configuration mutableCopy];[configuration addEntriesFromDictionary:changes];
     if([changes[@"provider"] isEqual:@"openai-compatible"]){configuration[@"searchMode"]=@"off";configuration[@"thinkingEnabled"]=@NO;}
     if(![originalConnection isEqual:CSAIConnectionIdentifier(configuration)]){configuration[@"verifiedConnection"]=@"";[configuration removeObjectForKey:@"verifiedAt"];}
-    return [page save:configuration];
+    [page save:configuration completion:completion];
 }
 static void AIPresentCapabilityPicker(CSAISettingsPage *page,NSString *title,NSString *key,NSArray<NSDictionary *> *options,NSString *selected,NSString *footer){
     if(![page current])return;
@@ -97,7 +108,7 @@ static void AIPresentCapabilityPicker(CSAISettingsPage *page,NSString *title,NSS
     picker.title=title;picker.optionsHeader=title;picker.options=options;picker.selected=selected;picker.footers=@[footer];
     NSString *original=CSAIConnectionIdentifier(CSAIReplyManager.sharedManager.store.configuration);
     __weak CSAISettingsPage *weakPage=page;__weak CSAIOptionsPage *weakPicker=picker;
-    picker.choose=^(NSString *value){if(AISaveCapabilityChanges(weakPage,@{key:value},original))[weakPicker.navigationController popViewControllerAnimated:YES];};
+    picker.choose=^(NSString *value){AISaveCapabilityChanges(weakPage,@{key:value},original,^(BOOL success){if(success)AIPopIfVisible(weakPicker);});};
     [page.navigationController pushViewController:picker animated:YES];
 }
 void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation,NSString *account,NSUInteger epoch){
@@ -110,10 +121,10 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
     picker.options=options;picker.selected=conversation?config[@"conversations"][conversation][@"presetID"]?:@"":config[@"defaultPreset"];
     __weak CSAIOptionsPage *weakPicker=picker;
     picker.choose=^(NSString *identifier){
-        NSError *error=nil;BOOL ok;
-        if(conversation){BOOL enabled=[manager.store.configuration[@"conversations"][conversation][@"enabled"] boolValue];ok=[manager setConversation:conversation enabled:enabled presetID:identifier account:account epoch:epoch error:&error];}
-        else{NSMutableDictionary *updated=[manager.store.configuration mutableCopy];updated[@"defaultPreset"]=identifier;ok=[manager saveConfiguration:updated account:account epoch:epoch error:&error];}
-        if(ok)[weakPicker.navigationController popViewControllerAnimated:YES];else AIAlert(weakPicker,error.localizedDescription);
+        CSAIOptionsPage *page=weakPicker;if(!page || page.saving)return;page.saving=YES;[page reload];
+        CSAIReplyStoreCompletion finish=^(BOOL success,NSError *error){page.saving=NO;[page reload];if(success)AIPopIfVisible(page);else AIAlert(page,error.localizedDescription);};
+        if(conversation){BOOL enabled=[manager.store.configuration[@"conversations"][conversation][@"enabled"] boolValue];[manager setConversation:conversation enabled:enabled presetID:identifier account:account epoch:epoch completion:finish];}
+        else{NSMutableDictionary *updated=[manager.store.configuration mutableCopy];updated[@"defaultPreset"]=identifier;[manager saveConfiguration:updated account:account epoch:epoch completion:finish];}
     };
     [controller.navigationController pushViewController:picker animated:YES];
 }
@@ -125,6 +136,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 @property UITextField *modelField;
 @property UITextField *keyField;
 @property BOOL keyEdited;
+@property BOOL saving;
 @property NSString *originalConnection;
 @end
 @implementation CSAIConnectionEditor
@@ -151,11 +163,14 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 - (void)toggleKey{self.keyField.secureTextEntry=!self.keyField.secureTextEntry;}
 - (void)clearKey{self.keyEdited=YES;self.keyField.text=@"";self.keyField.placeholder=@"保存后停用当前 Key";}
 - (void)save{
+    if(self.saving)return;
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;
     if(![manager isCurrentAccount:self.account epoch:self.epoch] || ![self.originalConnection isEqual:CSAIConnectionIdentifier(manager.store.configuration)]){AIAlert(self,@"账号或连接配置已改变，请返回后重新编辑。");return;}
-    NSError *error=nil;
-    if([manager saveConnection:self.endpointField.text model:self.modelField.text key:self.keyEdited?self.keyField.text:nil account:self.account epoch:self.epoch error:&error]){self.keyField.text=@"";[self.navigationController popViewControllerAnimated:YES];}
-    else AIAlert(self,error.localizedDescription);
+    self.saving=YES;self.navigationItem.rightBarButtonItem.enabled=NO;
+    [manager saveConnection:self.endpointField.text model:self.modelField.text key:self.keyEdited?self.keyField.text:nil account:self.account epoch:self.epoch completion:^(BOOL success,NSError *error){
+        self.saving=NO;self.navigationItem.rightBarButtonItem.enabled=YES;
+        if(success){self.keyField.text=@"";AIPopIfVisible(self);}else AIAlert(self,error.localizedDescription);
+    }];
 }
 @end
 
@@ -164,6 +179,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 @property NSUInteger epoch;
 @property NSDictionary *preset;
 @property NSDictionary *original;
+@property BOOL saving;
 @property UITextField *nameField;
 @property UITextView *promptView;
 @end
@@ -177,12 +193,13 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
     [NSLayoutConstraint activateConstraints:@[[name.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:20],[name.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor constant:16],[name.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor constant:-16],[name.heightAnchor constraintGreaterThanOrEqualToConstant:44],[label.topAnchor constraintEqualToAnchor:name.bottomAnchor constant:16],[label.leadingAnchor constraintEqualToAnchor:name.leadingAnchor],[prompt.topAnchor constraintEqualToAnchor:label.bottomAnchor constant:8],[prompt.leadingAnchor constraintEqualToAnchor:name.leadingAnchor],[prompt.trailingAnchor constraintEqualToAnchor:name.trailingAnchor],[prompt.bottomAnchor constraintEqualToAnchor:self.view.keyboardLayoutGuide.topAnchor constant:-16]]];
 }
 - (void)save{
+    if(self.saving)return;
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;if(![manager isCurrentAccount:self.account epoch:self.epoch]){AIAlert(self,@"账号已改变，请重新打开预设。");return;}
     NSString *name=[self.nameField.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet],*prompt=[self.promptView.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
     NSMutableDictionary *configuration=[manager.store.configuration mutableCopy];NSMutableArray *presets=[configuration[@"presets"] mutableCopy];NSUInteger index=[presets indexOfObjectPassingTest:^BOOL(NSDictionary *item,NSUInteger i,BOOL *stop){(void)i;(void)stop;return [item[@"id"] isEqual:self.preset[@"id"]];}];
     if(self.original && (index==NSNotFound || ![presets[index] isEqual:self.original])){AIAlert(self,@"此预设已被修改，请重新打开后编辑。");return;}
-    NSDictionary *updated=@{@"id":self.preset[@"id"],@"name":name?:@"",@"prompt":prompt?:@""};if(index==NSNotFound)[presets addObject:updated];else presets[index]=updated;configuration[@"presets"]=presets;NSError *error=nil;
-    if([manager saveConfiguration:configuration account:self.account epoch:self.epoch error:&error])[self.navigationController popViewControllerAnimated:YES];else AIAlert(self,error.localizedDescription);
+    NSDictionary *updated=@{@"id":self.preset[@"id"],@"name":name?:@"",@"prompt":prompt?:@""};if(index==NSNotFound)[presets addObject:updated];else presets[index]=updated;configuration[@"presets"]=presets;self.saving=YES;self.navigationItem.rightBarButtonItem.enabled=NO;
+    [manager saveConfiguration:configuration account:self.account epoch:self.epoch completion:^(BOOL success,NSError *error){self.saving=NO;self.navigationItem.rightBarButtonItem.enabled=YES;if(success)AIPopIfVisible(self);else AIAlert(self,error.localizedDescription);}];
 }
 @end
 
@@ -200,11 +217,11 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
     self.sections=@[[CSSettingSection sectionWithHeader:@"回复预设" items:rows]];self.footers=@[@"点击编辑，左滑复制或删除。每个会话可独立选择预设，未单独选择时跟随全局默认。"];
     self.navigationItem.rightBarButtonItem.enabled=[self current];[super reload];
 }
-- (void)remove:(NSDictionary *)preset replacement:(NSString *)replacement{
+- (void)remove:(NSDictionary *)preset replacement:(NSString *)replacement completion:(void(^)(BOOL))completion{
     if(![self current])return;NSMutableDictionary *config=[CSAIReplyManager.sharedManager.store.configuration mutableCopy];NSMutableArray *presets=[config[@"presets"] mutableCopy];
     NSIndexSet *indexes=[presets indexesOfObjectsPassingTest:^BOOL(NSDictionary *item,NSUInteger i,BOOL *stop){(void)i;(void)stop;return [item[@"id"] isEqual:preset[@"id"]];}];[presets removeObjectsAtIndexes:indexes];config[@"presets"]=presets;
     if([config[@"defaultPreset"] isEqual:preset[@"id"]])config[@"defaultPreset"]=replacement;
-    NSMutableDictionary *conversations=[config[@"conversations"] mutableCopy];for(NSString *conversation in conversations.allKeys){NSMutableDictionary *item=[conversations[conversation] mutableCopy];if([item[@"presetID"] isEqual:preset[@"id"]]){item[@"presetID"]=replacement;conversations[conversation]=item;}}config[@"conversations"]=conversations;[self save:config];
+    NSMutableDictionary *conversations=[config[@"conversations"] mutableCopy];for(NSString *conversation in conversations.allKeys){NSMutableDictionary *item=[conversations[conversation] mutableCopy];if([item[@"presetID"] isEqual:preset[@"id"]]){item[@"presetID"]=replacement;conversations[conversation]=item;}}config[@"conversations"]=conversations;[self save:config completion:completion];
 }
 - (void)deletePreset:(NSDictionary *)preset{
     NSDictionary *config=CSAIReplyManager.sharedManager.store.configuration;NSArray *presets=config[@"presets"];
@@ -214,7 +231,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
     picker.footers=@[[NSString stringWithFormat:@"删除“%@”并替换 %lu 个会话的关联。",preset[@"name"],(unsigned long)affected]];
     NSMutableArray *options=[NSMutableArray array];for(NSDictionary *item in presets)if(![item[@"id"] isEqual:preset[@"id"]])[options addObject:@{@"id":item[@"id"],@"title":item[@"name"]}];picker.options=options;
     __weak typeof(self) weakSelf=self;__weak CSAIOptionsPage *weakPicker=picker;
-    picker.choose=^(NSString *replacement){[weakSelf remove:preset replacement:replacement];[weakPicker.navigationController popViewControllerAnimated:YES];};[self.navigationController pushViewController:picker animated:YES];
+    picker.choose=^(NSString *replacement){if(weakPicker.saving)return;weakPicker.saving=YES;[weakPicker reload];[weakSelf remove:preset replacement:replacement completion:^(BOOL success){weakPicker.saving=NO;[weakPicker reload];if(success)AIPopIfVisible(weakPicker);}];};[self.navigationController pushViewController:picker animated:YES];
 }
 - (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)path{
     (void)tableView;if(![self current])return nil;NSArray *presets=CSAIReplyManager.sharedManager.store.configuration[@"presets"];if(path.row>=(NSInteger)presets.count)return nil;NSDictionary *preset=presets[path.row];__weak typeof(self) weakSelf=self;
@@ -230,10 +247,10 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 @implementation CSAIConversationPage
 - (void)reload{
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;self.title=[manager displayNameForConversation:self.conversation];NSDictionary *item=manager.store.configuration[@"conversations"][self.conversation];__weak typeof(self) weakSelf=self;
-    CSSettingItem *toggle=[CSSettingItem switchItemWithTitle:@"启用 AI 回复" iconName:@"sparkles" iconColor:UIColor.systemGreenColor switchValue:[item[@"enabled"] boolValue] valueChangedBlock:^(BOOL on){typeof(self) self=weakSelf;NSError *error=nil;if(![manager setConversation:self.conversation enabled:on presetID:item[@"presetID"]?:@"" account:self.account epoch:self.epoch error:&error])AIAlert(self,error.localizedDescription);[self reload];}];
+    CSSettingItem *toggle=[CSSettingItem switchItemWithTitle:@"启用 AI 回复" iconName:@"sparkles" iconColor:UIColor.systemGreenColor switchValue:[item[@"enabled"] boolValue] valueChangedBlock:^(BOOL on){typeof(self) self=weakSelf;if(!self || self.saving)return;self.saving=YES;[self reload];[manager setConversation:self.conversation enabled:on presetID:item[@"presetID"]?:@"" account:self.account epoch:self.epoch completion:^(BOOL success,NSError *error){self.saving=NO;if(!success)AIAlert(self,error.localizedDescription);[self reload];}];}];
     NSMutableArray *items=[NSMutableArray arrayWithObject:toggle];
     if([self.conversation hasSuffix:@"@chatroom"]){
-        [items addObject:[CSSettingItem switchItemWithTitle:@"免 @ 回复" iconName:@"at" iconColor:UIColor.systemGreenColor switchValue:[item[@"allowUnmentioned"] boolValue] valueChangedBlock:^(BOOL on){typeof(self) self=weakSelf;NSError *error=nil;if(![manager setConversation:self.conversation allowUnmentioned:on account:self.account epoch:self.epoch error:&error])AIAlert(self,error.localizedDescription);[self reload];}]];
+        [items addObject:[CSSettingItem switchItemWithTitle:@"免 @ 回复" iconName:@"at" iconColor:UIColor.systemGreenColor switchValue:[item[@"allowUnmentioned"] boolValue] valueChangedBlock:^(BOOL on){typeof(self) self=weakSelf;if(!self || self.saving)return;self.saving=YES;[self reload];[manager setConversation:self.conversation allowUnmentioned:on account:self.account epoch:self.epoch completion:^(BOOL success,NSError *error){self.saving=NO;if(!success)AIAlert(self,error.localizedDescription);[self reload];}];}]];
     }
     [items addObject:AIRow(@"回复预设",@"text.bubble",[manager presetNameForConversation:self.conversation],^{CSAIPresentPresetPicker(weakSelf,weakSelf.conversation,weakSelf.account,weakSelf.epoch);})];
     self.sections=@[[CSSettingSection sectionWithHeader:@"AI 回复" items:items]];self.footers=@[[manager statusForConversation:self.conversation]];[super reload];
@@ -306,10 +323,10 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;NSDictionary *config=manager.store.configuration?:CSAIReplyDefaultConfiguration();__weak typeof(self) weakSelf=self;
     CSSettingItem *toggle=[CSSettingItem switchItemWithTitle:@"启用 AI 自动回复" iconName:@"sparkles" iconColor:UIColor.systemGreenColor switchValue:[config[@"enabled"] boolValue] valueChangedBlock:^(BOOL on){NSMutableDictionary *next=[manager.store.configuration mutableCopy];next[@"enabled"]=@(on);[weakSelf save:next];}];
     NSString *originalConnection=CSAIConnectionIdentifier(config);BOOL bailian=[CSAIProvider(config) isEqual:@"bailian"];
-    CSSettingItem *image=[CSSettingItem switchItemWithTitle:@"图片识别" iconName:@"photo" iconColor:UIColor.systemBlueColor switchValue:[config[@"imageEnabled"] boolValue] valueChangedBlock:^(BOOL on){AISaveCapabilityChanges(weakSelf,@{@"imageEnabled":@(on)},originalConnection);}];
+    CSSettingItem *image=[CSSettingItem switchItemWithTitle:@"图片识别" iconName:@"photo" iconColor:UIColor.systemBlueColor switchValue:[config[@"imageEnabled"] boolValue] valueChangedBlock:^(BOOL on){AISaveCapabilityChanges(weakSelf,@{@"imageEnabled":@(on)},originalConnection,nil);}];
     CSSettingItem *thinking=[CSSettingItem switchItemWithTitle:@"思考模式" iconName:@"brain" iconColor:UIColor.systemBlueColor switchValue:[config[@"thinkingEnabled"] boolValue] valueChangedBlock:^(BOOL on){
         if(on && !bailian){AIAlert(weakSelf,@"思考模式仅适用于阿里云百炼接口，请先选择对应服务商。");[weakSelf reload];return;}
-        AISaveCapabilityChanges(weakSelf,@{@"thinkingEnabled":@(on)},originalConnection);
+        AISaveCapabilityChanges(weakSelf,@{@"thinkingEnabled":@(on)},originalConnection,nil);
     }];
     NSUInteger count=[self current]?CSCloseFriendVisibleAIConversations(config[@"conversations"],self.account,CSCloseFriendCurrentSnapshot()).count:0;
     NSString *connection=manager.connectionStatus;if(!connection.length)connection=[config[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(config)]?@"已通过连接测试":@"尚未验证当前配置";

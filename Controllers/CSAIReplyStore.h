@@ -15,7 +15,8 @@ FOUNDATION_EXPORT BOOL CSAIReplyValidateState(id state, NSString *account, NSErr
 FOUNDATION_EXPORT NSDictionary *CSAIReplyPortableState(NSDictionary *state);
 FOUNDATION_EXPORT NSString *CSAIConnectionIdentifier(NSDictionary *configuration);
 FOUNDATION_EXPORT NSError *CSAIError(NSInteger code, NSString *message);
-/// Single serialized owner. Configuration contains no credentials or chat text.
+typedef void (^CSAIReplyStoreCompletion)(BOOL success, NSError * _Nullable error);
+/// Disk operations share one serial queue; getters only read an immutable snapshot.
 @interface CSAIReplyStore : NSObject
 @property(nonatomic,copy,readonly) NSString *account;
 @property(nonatomic,copy,readonly) NSDictionary *configuration;
@@ -23,6 +24,22 @@ FOUNDATION_EXPORT NSError *CSAIError(NSInteger code, NSString *message);
 @property(nonatomic,readonly) BOOL ready;
 @property(nonatomic,strong,readonly,nullable) NSError *error;
 - (instancetype)initWithURL:(NSURL *)url account:(NSString *)account;
+/// Production APIs. Completion is always delivered asynchronously on main.
+- (void)loadWithCompletion:(nullable CSAIReplyStoreCompletion)completion;
+- (void)saveConfiguration:(NSDictionary *)configuration expectedConfiguration:(NSDictionary *)expected completion:(nullable CSAIReplyStoreCompletion)completion;
+- (void)claimMessageIDs:(NSArray<NSString *> *)identifiers completion:(nullable CSAIReplyStoreCompletion)completion;
+/// Known-message aliases survive invalidate on their original account path.
+/// Admissions coalesce into bounded batches; stale completions cannot resume business work.
+- (void)claimMessageAliases:(NSArray<NSString *> *)identifiers completion:(nullable CSAIReplyStoreCompletion)completion;
+/// Completion acknowledges an in-memory append; history flushes after 1s or 10 records.
+- (void)appendHistory:(NSDictionary *)record completion:(nullable CSAIReplyStoreCompletion)completion;
+- (void)flushHistoryWithCompletion:(nullable CSAIReplyStoreCompletion)completion;
+/// Revokes queued operations and late completions without waiting for disk I/O.
+- (void)invalidate;
+/// Background backup boundary: drains accepted history before revision capture.
+/// Refuses main-thread callers rather than blocking UI on disk I/O.
++ (BOOL)flushPendingHistory:(NSError **)error;
+/// Synchronous compatibility APIs for offline tools/tests, never production UI.
 - (BOOL)load;
 - (BOOL)saveConfiguration:(NSDictionary *)configuration error:(NSError **)error;
 - (BOOL)hasHandledMessageID:(NSString *)identifier;

@@ -11,8 +11,11 @@
 #import "CSAuthorizationManager.h"
 #import "CSGroupNativeBridge.h"
 #import <UIKit/UIKit.h>
+#import <stdatomic.h>
 
 NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
+static atomic_bool CSAIMessageIngressEnabled;
+BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMessageIngressEnabled,memory_order_acquire);}
 @interface CSAIEmptyCancellation : NSObject <CSAICancellable>
 @end
 @implementation CSAIEmptyCancellation
@@ -31,6 +34,8 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
 @property BOOL started;
 @property(nonatomic,strong) CSAIBackgroundSync *backgroundSync;
 @property BOOL enteringForeground;
+@property BOOL loadingStore;
+@property NSUInteger savingConfiguration;
 @end
 @implementation CSAIReplyManager
 + (instancetype)sharedManager {static id manager;static dispatch_once_t once;dispatch_once(&once,^{manager=[self new];});return manager;}
@@ -52,7 +57,7 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
 }
 - (void)changed:(NSNotification *)note {
     if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self changed:note];});return;}
-    if([note.name isEqual:UIApplicationDidEnterBackgroundNotification])self.enteringForeground=NO;
+    if([note.name isEqual:UIApplicationDidEnterBackgroundNotification]){self.enteringForeground=NO;[self.store flushHistoryWithCompletion:nil];}
     dispatch_async(dispatch_get_main_queue(),^{
         // Close-friend visibility changes refresh settings without cancelling
         // enabled replies or their context. refresh still handles account changes.
@@ -64,7 +69,12 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
     // UIApplication can still report Background during this notification.
     self.enteringForeground=YES;[self.backgroundSync stop];
 }
-- (void)notify {[NSNotificationCenter.defaultCenter postNotificationName:CSAIReplyDidChange object:self];}
+- (void)notify {
+    // Publish only immutable scalar state. Incoming native threads never inspect
+    // the Store, configuration or a WeChat wrap to reject the disabled path.
+    atomic_store_explicit(&CSAIMessageIngressEnabled,CSBackupIsReady() && !CSBackupAccountIsSuspended() && self.epoch==CSBackupAccountEpoch() && self.store.ready && self.coordinator && [self.store.configuration[@"enabled"] boolValue],memory_order_release);
+    [NSNotificationCenter.defaultCenter postNotificationName:CSAIReplyDidChange object:self];
+}
 - (void)invalidateConnectionTest {
     // Revoke ownership before cancellation, which may invoke a completion inline.
     id<CSAICancellable> task=self.connectionTest;self.connectionTest=nil;self.testGeneration++;self.connectionStatus=nil;[task cancel];
@@ -74,22 +84,31 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
     NSString *account=CSBackupIsReady() && !CSBackupAccountIsSuspended()?[self.environment currentAccountID]:nil;
     NSUInteger epoch=CSBackupAccountEpoch();
     if(!account.length || ![self.store.account isEqual:account] || self.epoch!=epoch){
+        atomic_store_explicit(&CSAIMessageIngressEnabled,false,memory_order_release);
         [self.backgroundSync stop];
         [self.coordinator cancelAll];self.coordinator=nil;[self invalidateConnectionTest];
-        self.store=nil;self.epoch=epoch;
+        [self.store invalidate];self.store=nil;self.epoch=epoch;self.loadingStore=NO;self.savingConfiguration=0;
         if(account.length){
             NSURL *library=[NSFileManager.defaultManager URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask].firstObject;
             NSURL *root=[library URLByAppendingPathComponent:@"Preferences/WeChatImprove" isDirectory:YES];
-            self.store=[[CSAIReplyStore alloc]initWithURL:CSAIReplyFileURL(root,account) account:account];[self.store load];
+            self.store=[[CSAIReplyStore alloc]initWithURL:CSAIReplyFileURL(root,account) account:account];
         }
     }
-    if(self.store && !self.store.ready)[self.store load];
+    if(self.store && !self.store.ready && !self.loadingStore){
+        self.loadingStore=YES;CSAIReplyStore *store=self.store;NSUInteger loadEpoch=self.epoch;
+        [store loadWithCompletion:^(BOOL success,NSError *error){
+            (void)error;if(self.store!=store || self.epoch!=loadEpoch)return;
+            self.loadingStore=NO;
+            if(success)[self refresh];else {[self.coordinator cancelAll];self.coordinator=nil;[self.backgroundSync stop];[self notify];}
+        }];
+    }
     if(self.store.ready && !self.coordinator){self.coordinator=[[CSAIReplyCoordinator alloc]initWithStore:self.store client:self.client];self.coordinator.delegate=self;self.coordinator.imagePreparer=[CSAIImagePreparer new];}
     [self.backgroundSync refresh];[self notify];
 }
 - (BOOL)isCurrentAccount:(NSString *)account epoch:(NSUInteger)epoch {
     return NSThread.isMainThread && account.length && self.store.ready && [account isEqual:self.store.account] && epoch==self.epoch && epoch==CSBackupAccountEpoch() && CSBackupIsReady() && !CSBackupAccountIsSuspended() && [[self.environment currentAccountID] isEqual:account];
 }
+#if !TARGET_OS_IPHONE
 - (BOOL)saveConfiguration:(NSDictionary *)configuration account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error {
     if(![self isCurrentAccount:account epoch:epoch]){if(error)*error=CSAIError(20,@"账号或配置状态已改变，请重新打开 AI 设置。");return NO;}
     if(!CSAIReplyValidateConfiguration(configuration,error))return NO;
@@ -102,8 +121,67 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
     if(connectionChanged)[self invalidateConnectionTest];
     [self.coordinator configurationDidChange];[self.backgroundSync refresh];[self notify];return YES;
 }
+#endif
+- (void)saveConfiguration:(NSDictionary *)configuration account:(NSString *)account epoch:(NSUInteger)epoch completion:(CSAIReplyStoreCompletion)completion {
+    if(self.savingConfiguration){completion(NO,CSAIError(20,@"配置正在保存，请完成后再修改。"));return;}
+    if(![self isCurrentAccount:account epoch:epoch]){completion(NO,CSAIError(20,@"账号或配置状态已改变，请重新打开 AI 设置。"));return;}
+    NSError *error=nil;if(!CSAIReplyValidateConfiguration(configuration,&error)){completion(NO,error);return;}
+    CSAIReplyStore *store=self.store;NSDictionary *expected=store.configuration;
+    BOOL connectionChanged=![CSAIConnectionIdentifier(configuration) isEqual:CSAIConnectionIdentifier(expected)];
+    if(connectionChanged){NSMutableDictionary *updated=[configuration mutableCopy];updated[@"verifiedConnection"]=@"";[updated removeObjectForKey:@"verifiedAt"];configuration=updated;}
+    self.savingConfiguration++;[self.coordinator cancelAll];[self.backgroundSync stop];
+    if(connectionChanged)[self invalidateConnectionTest];
+    [store saveConfiguration:configuration expectedConfiguration:expected completion:^(BOOL success,NSError *failure){
+        if(self.store!=store || self.epoch!=epoch || epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended() || !CSBackupIsReady() || ![[self.environment currentAccountID] isEqual:account]){
+            NSMutableDictionary *info=[@{NSLocalizedDescriptionKey:@"账号状态已改变，本次保存结果请在原账号检查。"} mutableCopy];
+            if(success || [failure.userInfo[CSAIReplyStoreCommitUncertainKey] boolValue])info[CSAIReplyStoreCommitUncertainKey]=@YES;
+            if(self.store==store && self.savingConfiguration)self.savingConfiguration--;
+            completion(NO,[NSError errorWithDomain:@"com.wechatimprove.ai-reply" code:20 userInfo:info]);return;
+        }
+        if(self.savingConfiguration)self.savingConfiguration--;
+        if(success)[self.coordinator configurationDidChange];else [self.coordinator cancelAll];
+        [self.backgroundSync refresh];[self notify];completion(success,failure);
+    }];
+}
+- (void)saveConnection:(NSString *)endpoint model:(NSString *)model key:(NSString *)key account:(NSString *)account epoch:(NSUInteger)epoch completion:(CSAIReplyStoreCompletion)completion {
+    if(self.savingConfiguration){completion(NO,CSAIError(20,@"配置正在保存，请完成后再修改。"));return;}
+    if(![self isCurrentAccount:account epoch:epoch]){completion(NO,CSAIError(20,@"账号已改变，请重新打开设置。"));return;}
+    endpoint=[endpoint stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];model=[model stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    NSError *error=nil;if(endpoint.length && !CSAIValidateEndpoint(endpoint,&error)){completion(NO,error);return;}
+    CSAIReplyStore *store=self.store;NSDictionary *expected=store.configuration;BOOL keyChanged=key!=nil;
+    NSString *secret=[key stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    NSString *revision=keyChanged?(secret.length?NSUUID.UUID.UUIDString:@""):(expected[@"credentialRevision"]?:@"");
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY,0),^{
+        NSError *failure=nil;BOOL wrote=!keyChanged || !secret.length || CSAIWriteCredential(account,revision,secret,&failure);
+        dispatch_async(dispatch_get_main_queue(),^{
+            if(!wrote){completion(NO,failure);return;}
+            if(self.store!=store || ![self isCurrentAccount:account epoch:epoch] || ![expected isEqual:store.configuration]){
+                if(keyChanged && revision.length)CSAIRemoveCredential(account,revision);
+                completion(NO,CSAIError(20,@"账号或配置已改变，请返回后重新保存。"));return;
+            }
+            NSMutableDictionary *configuration=[expected mutableCopy];configuration[@"endpoint"]=endpoint?:@"";configuration[@"model"]=model?:@"";configuration[@"credentialRevision"]=revision;
+            [self saveConfiguration:configuration account:account epoch:epoch completion:^(BOOL saved,NSError *saveError){
+                // An uncertain replacement may already reference the immutable credential slot.
+                if(!saved && keyChanged && revision.length && ![saveError.userInfo[CSAIReplyStoreCommitUncertainKey] boolValue])CSAIRemoveCredential(account,revision);
+                completion(saved,saveError);
+            }];
+        });
+    });
+}
+- (void)setConversation:(NSString *)conversation enabled:(BOOL)enabled presetID:(NSString *)presetID account:(NSString *)account epoch:(NSUInteger)epoch completion:(CSAIReplyStoreCompletion)completion {
+    if(![self isCurrentAccount:account epoch:epoch] || ![self allowsConversation:conversation]){completion(NO,CSAIError(23,@"当前会话不可用或正受保护，未修改配置。"));return;}
+    NSMutableDictionary *configuration=[self.store.configuration mutableCopy],*items=[configuration[@"conversations"] mutableCopy];
+    NSMutableDictionary *item=[items[conversation] mutableCopy]?:[NSMutableDictionary dictionary];item[@"enabled"]=@(enabled);item[@"presetID"]=presetID?:@"";items[conversation]=item;configuration[@"conversations"]=items;
+    [self saveConfiguration:configuration account:account epoch:epoch completion:completion];
+}
+- (void)setConversation:(NSString *)conversation allowUnmentioned:(BOOL)allowUnmentioned account:(NSString *)account epoch:(NSUInteger)epoch completion:(CSAIReplyStoreCompletion)completion {
+    if(![conversation hasSuffix:@"@chatroom"] || ![self isCurrentAccount:account epoch:epoch] || ![self allowsConversation:conversation]){completion(NO,CSAIError(23,@"当前群聊不可用或正受保护，未修改配置。"));return;}
+    NSMutableDictionary *configuration=[self.store.configuration mutableCopy],*items=[configuration[@"conversations"] mutableCopy];
+    NSMutableDictionary *item=[items[conversation] mutableCopy]?:[@{@"enabled":@NO,@"presetID":@""} mutableCopy];item[@"allowUnmentioned"]=@(allowUnmentioned);items[conversation]=item;configuration[@"conversations"]=items;
+    [self saveConfiguration:configuration account:account epoch:epoch completion:completion];
+}
 - (BOOL)allowsBackgroundSync {
-    if(!NSThread.isMainThread || self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground ||
+    if(self.savingConfiguration || !NSThread.isMainThread || self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground ||
        !CSBackgroundRunManager.sharedManager.backgroundAudioActive)return NO;
     NSDictionary *config=self.store.configuration;
     if(![config[@"enabled"] boolValue] || ![config[@"endpoint"] length] || ![config[@"model"] length] || ![config[@"credentialRevision"] length] ||
@@ -138,6 +216,7 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
         // Unsupported or temporarily unavailable native services wait for the next interval.
     }
 }
+#if !TARGET_OS_IPHONE
 - (BOOL)saveConnection:(NSString *)endpoint model:(NSString *)model key:(NSString *)key account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error {
     if(![self isCurrentAccount:account epoch:epoch]){if(error)*error=CSAIError(20,@"账号已改变，请重新打开设置。");return NO;}
     endpoint=[endpoint stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
@@ -166,6 +245,7 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
     // They are never exported and cannot become active without an explicit local configuration reference.
     return YES;
 }
+#endif
 - (id<CSAICancellable>)testConnectionForAccount:(NSString *)account epoch:(NSUInteger)epoch completion:(CSAICompletion)completion {
     NSError *error=nil;NSDictionary *config=self.store.configuration;
     if(![self isCurrentAccount:account epoch:epoch] || ![config[@"endpoint"] length] || ![config[@"model"] length])error=CSAIError(21,@"请先保存 API 地址、API Key 和模型名称。");
@@ -191,18 +271,21 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
         if(!self || self.testGeneration!=generation || ![self isCurrentAccount:account epoch:epoch] || ![identifier isEqual:CSAIConnectionIdentifier(self.store.configuration)]){completion(nil,CSAIError(22,@"配置或账号已改变，请重新测试。"));return;}
         self.connectionTest=nil;
         if(!failure && !text.length)failure=CSAIError(23,@"连接测试未返回有效内容。");
+        void (^finish)(NSError *)=^(NSError *resultError){
+            if(self.testGeneration!=generation || ![self isCurrentAccount:account epoch:epoch]){completion(nil,CSAIError(22,@"配置或账号已改变，请重新测试。"));return;}
+            self.connectionStatus=resultError?resultError.localizedDescription:[NSString stringWithFormat:@"连接成功 · %.1f 秒",-[started timeIntervalSinceNow]];
+            [self notify];completion(resultError?nil:text,resultError);
+        };
         if(!failure || failure.code!=NSURLErrorCancelled){
-            NSMutableDictionary *updated=[self.store.configuration mutableCopy];
-            updated[@"verifiedConnection"]=failure?@"":identifier;
+            NSMutableDictionary *updated=[self.store.configuration mutableCopy];updated[@"verifiedConnection"]=failure?@"":identifier;
             if(failure)[updated removeObjectForKey:@"verifiedAt"];else updated[@"verifiedAt"]=NSDate.date;
-            NSError *saveError=nil;if(![self saveConfiguration:updated account:account epoch:epoch error:&saveError])failure=saveError;
-        }
-        if(failure)self.connectionStatus=failure.localizedDescription;
-        else self.connectionStatus=[NSString stringWithFormat:@"连接成功 · %.1f 秒",-[started timeIntervalSinceNow]];
-        [self notify];completion(failure?nil:text,failure);
+            NSError *requestError=failure;
+            [self saveConfiguration:updated account:account epoch:epoch completion:^(BOOL saved,NSError *saveError){finish(saved?requestError:saveError);}];
+        }else finish(failure);
     }];
     if(!completed && self.testGeneration==generation)self.connectionTest=task;else [task cancel];return task;
 }
+#if !TARGET_OS_IPHONE
 - (BOOL)setConversation:(NSString *)conversation enabled:(BOOL)enabled presetID:(NSString *)presetID account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error {
     if(![self isCurrentAccount:account epoch:epoch] || ![self allowsConversation:conversation]){if(error)*error=CSAIError(23,@"当前会话不可用或正受保护，未修改配置。");return NO;}
     NSMutableDictionary *config=[self.store.configuration mutableCopy],*conversations=[config[@"conversations"] mutableCopy];
@@ -210,6 +293,8 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
     item[@"enabled"]=@(enabled);item[@"presetID"]=presetID?:@"";conversations[conversation]=item;config[@"conversations"]=conversations;
     return [self saveConfiguration:config account:account epoch:epoch error:error];
 }
+#endif
+#if !TARGET_OS_IPHONE
 - (BOOL)setConversation:(NSString *)conversation allowUnmentioned:(BOOL)allowUnmentioned account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error {
     if(![conversation hasSuffix:@"@chatroom"] || ![self isCurrentAccount:account epoch:epoch] || ![self allowsConversation:conversation]){if(error)*error=CSAIError(23,@"当前群聊不可用或正受保护，未修改配置。");return NO;}
     NSMutableDictionary *config=[self.store.configuration mutableCopy],*conversations=[config[@"conversations"] mutableCopy];
@@ -217,6 +302,7 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
     item[@"allowUnmentioned"]=@(allowUnmentioned);conversations[conversation]=item;config[@"conversations"]=conversations;
     return [self saveConfiguration:config account:account epoch:epoch error:error];
 }
+#endif
 - (BOOL)allowsConversation:(NSString *)conversation {
     if(!conversation.length || CSCloseFriendCurrentSnapshot().blocked || CSCloseFriendShouldHideUserName(conversation,CSCloseFriendSurfaceSession))return NO;
     return [self supportsReplyConversation:conversation];
@@ -244,7 +330,8 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
 }
 - (NSString *)statusForConversation:(NSString *)conversation {
     if(!self.store)return @"请登录微信后设置";
-    if(!self.store.ready)return self.store.error.localizedDescription?:@"配置存储不可用";
+    if(!self.store.ready)return self.loadingStore?@"正在读取配置…":self.store.error.localizedDescription?:@"配置存储不可用";
+    if(self.savingConfiguration)return @"正在保存配置…";
     NSDictionary *config=self.store.configuration;
     if(conversation && ![config[@"conversations"][conversation][@"enabled"] boolValue])return @"此会话未启用";
     if(![config[@"enabled"] boolValue])return @"总开关已关闭";
@@ -255,7 +342,7 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
     return @"已启用 · 等待符合规则的新消息";
 }
 - (BOOL)coordinator:(CSAIReplyCoordinator *)coordinator allowsConversation:(NSString *)conversation {
-    return coordinator==self.coordinator && [self isCurrentAccount:coordinator.store.account epoch:self.epoch] && CSAuthorizationManager.sharedManager.isAuthorized && [self supportsReplyConversation:conversation];
+    return !self.savingConfiguration && coordinator==self.coordinator && [self isCurrentAccount:coordinator.store.account epoch:self.epoch] && CSAuthorizationManager.sharedManager.isAuthorized && [self supportsReplyConversation:conversation];
 }
 - (NSString *)credentialForCoordinator:(CSAIReplyCoordinator *)coordinator error:(NSError **)error {
     if(coordinator!=self.coordinator || ![self isCurrentAccount:coordinator.store.account epoch:self.epoch]){if(error)*error=CSAIError(20,@"账号状态已改变。");return nil;}
@@ -272,14 +359,14 @@ NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
     return result==CSMessageActionSubmissionStateUnknown?@"unknown":@"failed";
 }
 - (void)receiveNativeSession:(id)session wrap:(id)wrap epoch:(NSUInteger)epoch {
-    if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self receiveNativeSession:session wrap:wrap epoch:epoch];});return;}
+    if(!NSThread.isMainThread){if(CSAIReplyMessageIngressEnabled())dispatch_async(dispatch_get_main_queue(),^{[self receiveNativeSession:session wrap:wrap epoch:epoch];});return;}
     if(epoch!=CSBackupAccountEpoch() || epoch!=self.epoch)return;
     NSDictionary *configuration=self.store.configuration;
-    if(![configuration[@"enabled"] boolValue])return;
+    if(!self.store.ready || !self.coordinator || ![configuration[@"enabled"] boolValue])return;
     // A nonempty native session must match the eventual event's conversation.
     // Avoid parsing content, mention XML and identities for disabled sessions.
     if([session isKindOfClass:NSString.class] && [session length] && ![configuration[@"conversations"][session][@"enabled"] boolValue])return;
-    NSDictionary *event=CSAIEventFromWrapWithImages(wrap,self.store.account,[session isKindOfClass:NSString.class]?session:@"",[configuration[@"imageEnabled"] boolValue]);
+    NSDictionary *event=CSAIEventFromWrapWithConfiguration(wrap,self.store.account,[session isKindOfClass:NSString.class]?session:@"",configuration);
     if(event){NSMutableDictionary *snapshot=[event mutableCopy];snapshot[@"epoch"]=@(epoch);[self.coordinator receiveEvent:snapshot];}
 }
 @end

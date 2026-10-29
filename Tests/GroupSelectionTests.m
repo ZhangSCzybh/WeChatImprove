@@ -16,7 +16,7 @@ static NSUInteger CSCloseFriendAccountEpoch(void) { return 1; }
 typedef NS_ENUM(NSUInteger,CSGroupFoldedPrivacyState) { CSGroupFoldedPrivacyUnknown,CSGroupFoldedPrivacyNoHidden,CSGroupFoldedPrivacyMixed,CSGroupFoldedPrivacyAllHidden };
 static BOOL CSGroupIsFoldedController(id owner) { (void)owner; return NO; }
 static BOOL Option(NSString *key) { return [key isEqual:@"enabled"]; }
-static NSArray *CSGroupCopyFoldedRows(void) { return nil; }
+static NSArray *CSGroupCopyFoldedRowsSelectingSummary(CSGroupRow *(^selector)(NSArray<CSGroupRow *> *)) { (void)selector; return nil; }
 static NSArray *CSGroupCopyFoldedUserNames(void) { return nil; }
 static CSGroupFoldedPrivacyState CSGroupAssessFoldedUserNames(NSArray *names,NSSet *hidden) { (void)names;(void)hidden;return CSGroupFoldedPrivacyUnknown; }
 static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) {

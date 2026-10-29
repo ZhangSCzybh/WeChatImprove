@@ -8,6 +8,9 @@ typedef NS_ENUM(NSUInteger, CSGroupFoldedPrivacyState) {
 FOUNDATION_EXPORT NSArray<NSString *> * _Nullable CSGroupCopyFoldedUserNames(void);
 /// Immutable native child rows; nil means unavailable, an empty array means confirmed empty.
 FOUNDATION_EXPORT NSArray<CSGroupRow *> * _Nullable CSGroupCopyFoldedRows(void);
+/// Read ranking metadata first, then format only the selected immutable row.
+/// The selector applies the caller's current group/privacy rules; nil selects no summary.
+FOUNDATION_EXPORT NSArray<CSGroupRow *> * _Nullable CSGroupCopyFoldedRowsSelectingSummary(CSGroupRow * _Nullable (^selector)(NSArray<CSGroupRow *> *rows));
 FOUNDATION_EXPORT CSGroupFoldedPrivacyState CSGroupAssessFoldedUserNames(NSArray<NSString *> * _Nullable names, NSSet<NSString *> *hiddenNames);
 FOUNDATION_EXPORT BOOL CSGroupIsFoldedController(id _Nullable controller);
 FOUNDATION_EXPORT id _Nullable CSGroupNativeLogic(id controller);

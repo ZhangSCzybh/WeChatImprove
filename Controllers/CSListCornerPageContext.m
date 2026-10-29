@@ -253,6 +253,7 @@ void CSListCornerRefreshSessionGeometry(UITableViewCell *cell) {
     CSListCornerSnapshot *configuration=[[CSListCornerConfiguration sharedConfiguration] snapshot];
     if (!configuration.enabled) { CSListCornerRemoveSessionAppearance(cell); return; }
     UITableView *table=CSListCornerTableForView(cell);
+    if (CSListCornerSessionTableLayoutInProgress(table)) return;
     if (!CSListCornerOwnerForTable(table,CSListCornerPageSession) || !CSListCornerBeginOperation(cell)) return;
     @try {
         UIView *background=objc_getAssociatedObject(cell,&PreviousBackgroundKey);

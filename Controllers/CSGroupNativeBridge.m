@@ -236,7 +236,7 @@ static CSGroupRowCategory CategoryForSession(id session,NSString *name,BOOL serv
     if (category==CSGroupRowCategoryUnknown && CSGroupReadInteger(session,@"isSingleChatSession",0)) return CSGroupRowCategoryPrivate;
     return category;
 }
-static NSNumber *FoldedSortTime(id session,id resolvedMessage) {
+static NSNumber *FoldedSessionSortTime(id session) {
     // MMSessionInfo.compare: (8.0.78): override/last time, then top time for
     // pinned rows, or untop/sort time otherwise. This is only a ranking aid,
     // never a digest validity gate or a source for a visible time/date label.
@@ -245,6 +245,11 @@ static NSNumber *FoldedSortTime(id session,id resolvedMessage) {
     long long time=override>0 ? override : last;
     time=MAX(time,CSGroupReadInteger(session,top ? @"m_uTopTime" : @"m_uUnTopTime",0));
     if (!top) time=MAX(time,CSGroupReadInteger(session,@"sortTime",0));
+    return time>0 ? @(time) : nil;
+}
+static NSNumber *FoldedSortTime(id session,id resolvedMessage) {
+    NSNumber *sessionTime=FoldedSessionSortTime(session);
+    long long time=sessionTime.longLongValue;
     if (!time) {
         // Readonly native message time also handles the special pat-message
         // timestamp. Missing optional session getters must not force neutral.
@@ -338,19 +343,38 @@ static NSString *FoldedFormatMessage(id message,NSString *name,NSString **prefix
     if (!(*prefix).length) return nil;
     return text;
 }
-static NSString *FoldedNativeSummary(id manager,id session,NSString *name,NSString **prefix,id *sortMessage) {
+// Transient native references live only for this synchronous snapshot. Published
+// rows retain copied Foundation values, never message/session objects.
+@interface CSFoldedMessageSnapshot : NSObject
+@property(nonatomic,strong) id sessionMessage, message, messageManager;
+@property(nonatomic) BOOL lookup;
+@end
+@implementation CSFoldedMessageSnapshot @end
+static CSFoldedMessageSnapshot *FoldedResolveMessage(id session,NSString *name) {
+    CSFoldedMessageSnapshot *snapshot=[CSFoldedMessageSnapshot new];
+    @try {
+        snapshot.sessionMessage=CSGroupReadObject(session,@"m_msgWrap");
+        snapshot.message=snapshot.sessionMessage;
+        snapshot.lookup=!snapshot.message || ([snapshot.message respondsToSelector:NSSelectorFromString(@"m_nsContent")] && ![FoldedSummaryText(CSGroupReadObject(snapshot.message,@"m_nsContent")) length]);
+        if (snapshot.lookup) {
+            snapshot.messageManager=CSGetService(NSClassFromString(@"CMessageMgr"));
+            snapshot.message=FoldedLastMessage(snapshot.messageManager,name);
+        }
+        if (![CSGroupReadObject(snapshot.message,@"GetChatName") isEqual:name]) snapshot.message=nil;
+    } @catch (__unused NSException *exception) { snapshot.message=nil; }
+    return snapshot;
+}
+static NSString *FoldedNativeSummary(id manager,id session,NSString *name,NSString **prefix,CSFoldedMessageSnapshot *snapshot) {
     *prefix=nil;
     @try {
-        id sessionMessage=CSGroupReadObject(session,@"m_msgWrap"),message=sessionMessage;
+        id sessionMessage=snapshot.sessionMessage,message=snapshot.message;
         // ChatBoxMgr.lastMsgForChatBoxSession (8.0.78) performs this same
         // per-conversation read when its lightweight session has no content.
         // Keep it detached: never set m_msgWrap or borrow the global candidate.
-        BOOL lookup=!message || ([message respondsToSelector:NSSelectorFromString(@"m_nsContent")] && ![FoldedSummaryText(CSGroupReadObject(message,@"m_nsContent")) length]);
-        id messageManager=lookup ? CSGetService(NSClassFromString(@"CMessageMgr")) : nil;
-        if (lookup) message=FoldedLastMessage(messageManager,name);
+        BOOL lookup=snapshot.lookup;
+        id messageManager=snapshot.messageManager;
         if (!message) return nil;
         if (![CSGroupReadObject(message,@"GetChatName") isEqual:name]) return nil;
-        *sortMessage=message;
         unsigned long long messageID=FoldedMessageID(message);
         SEL selector=NSSelectorFromString(@"getCellDataByUsrName:");NSMethodSignature *sig=Signature(manager,selector,3);
         id data=nil;
@@ -375,35 +399,54 @@ static NSString *FoldedNativeSummary(id manager,id session,NSString *name,NSStri
         if (CSGroupReadObject(session,@"m_msgWrap")!=sessionMessage || FoldedMessageID(message)!=messageID ||
             (lookup && !FoldedSameMessage(message,FoldedLastMessage(messageManager,name))) ||
             ![CSGroupReadObject(message,@"GetChatName") isEqual:name] || ![CSGroupReadObject(session,@"m_nsUserName") isEqual:name]) {
-            text=nil;*sortMessage=nil;
+            text=nil;
         }
         if (!text) *prefix=nil;
         return text;
     } @catch (__unused NSException *exception) { *prefix=nil;return nil; }
 }
-NSArray<CSGroupRow *> *CSGroupCopyFoldedRows(void) {
+static NSArray<CSGroupRow *> *CopyFoldedRows(CSGroupRow *(^selector)(NSArray<CSGroupRow *> *)) {
     NSArray *sessions=CopyFoldedSessions(); if (!sessions) return nil;
     id dataManager=nil;
     @try { dataManager=CSGetService(NSClassFromString(@"MainFrameCellDataManager")); } @catch (__unused NSException *exception) {}
     NSMutableArray *rows=[NSMutableArray arrayWithCapacity:sessions.count];
+    NSMutableArray *sourceSessions=[NSMutableArray arrayWithCapacity:sessions.count];
+    NSMutableDictionary<NSNumber *,CSFoldedMessageSnapshot *> *messages=[NSMutableDictionary dictionary];
     NSMutableSet *names=[NSMutableSet set];
     for (id session in sessions) {
         id name=CSGroupReadObject(session,@"m_nsUserName");
         if (![name isKindOfClass:NSString.class] || ![name length] || [names containsObject:name] || [name isEqual:@"chatroom_session_box"]) return nil;
         [names addObject:name];
         NSUInteger indexes[]={0,rows.count};
-        NSString *prefix=nil;
-        id sortMessage=nil;
-        NSString *summary=FoldedNativeSummary(dataManager,session,name,&prefix,&sortMessage);
-        NSNumber *time=FoldedSortTime(session,sortMessage);
+        NSNumber *time=FoldedSessionSortTime(session);
+        if (!time) {
+            CSFoldedMessageSnapshot *snapshot=FoldedResolveMessage(session,name);
+            messages[@(rows.count)]=snapshot;
+            time=FoldedSortTime(session,snapshot.message);
+        }
+        [sourceSessions addObject:session];
         [rows addObject:[[CSGroupRow alloc] initWithNativePath:[NSIndexPath indexPathWithIndexes:indexes length:2]
             userName:name kind:CSGroupRowKindSession category:CategoryForSession(session,name,NO)
             top:CSGroupReadInteger(session,@"m_bIsTop",0)!=0
             unreadCount:(NSUInteger)MAX(0,CSGroupReadInteger(session,@"m_uUnReadCount",0))
             redDot:CSGroupReadInteger(session,@"m_bShowUnReadAsRedDot",0)!=0
-            nativeSummary:summary sortTime:time nativePrefix:prefix]];
+            nativeSummary:nil sortTime:time nativePrefix:nil]];
+    }
+    CSGroupRow *selected=selector ? selector([rows copy]) : nil;
+    NSUInteger selectedIndex=selected ? [rows indexOfObjectIdenticalTo:selected] : NSNotFound;
+    for (NSUInteger index=0;index<rows.count;index++) {
+        if (selector && index!=selectedIndex) continue;
+        CSGroupRow *row=rows[index];id session=sourceSessions[index];
+        CSFoldedMessageSnapshot *snapshot=messages[@(index)] ?: FoldedResolveMessage(session,row.userName);
+        NSString *prefix=nil,*summary=FoldedNativeSummary(dataManager,session,row.userName,&prefix,snapshot);
+        rows[index]=[[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName kind:row.kind category:row.category
+            top:row.top unreadCount:row.unreadCount redDot:row.redDot nativeSummary:summary sortTime:row.nativeSortTime nativePrefix:prefix];
     }
     return [rows copy];
+}
+NSArray<CSGroupRow *> *CSGroupCopyFoldedRows(void) { return CopyFoldedRows(nil); }
+NSArray<CSGroupRow *> *CSGroupCopyFoldedRowsSelectingSummary(CSGroupRow *(^selector)(NSArray<CSGroupRow *> *)) {
+    return CopyFoldedRows(selector);
 }
 NSArray *CSGroupBuildNativeSections(id controller,id table,id source) {
     return CSGroupBuildNativeSectionsReusing(controller,table,source,nil);

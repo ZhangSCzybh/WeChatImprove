@@ -1,11 +1,48 @@
 #import <Foundation/Foundation.h>
 #import "CSAIReplyStore.h"
+#import "CSScheduledTaskStore.h"
 #import "CSBackupEngine.h"
 #import "CSBackupRegistry.h"
 #import "CSBackupCodec.h"
+#import "CSBackupManager.h"
+#import "CSBackupRestoreDiagnostics.h"
 static NSUInteger checks;
 #define CHECK(c) do{checks++;if(!(c)){NSLog(@"FAIL %d %s",__LINE__,#c);exit(1);}}while(0)
 static NSDictionary *AIField(NSDictionary *snapshot){for(NSDictionary *field in snapshot[@"fields"])if([field[@"domain"] isEqual:CSAIReplyBackupDomain])return field;return nil;}
+// Execute the real facade boundaries on a background queue with the real Store and Engine.
+@interface AIBackupBoundary : NSObject
+@property(nonatomic) CSBackupEngine *engine;
+@property(nonatomic) NSString *status;
+- (void)performRestore:(NSString *)stage work:(id(^)(NSError **))work completion:(CSBackupCompletion)completion;
+- (BOOL)validateColors:(NSDictionary *)snapshot error:(NSError **)error;
+- (void)preview:(NSDictionary *)snapshot modules:(NSSet *)modules accounts:(NSSet *)accounts completion:(CSBackupCompletion)completion;
+- (void)prepare:(NSDictionary *)preview completion:(CSBackupCompletion)completion;
+@end
+@implementation AIBackupBoundary
+- (void)performRestore:(NSString *)stage work:(id(^)(NSError **))work completion:(CSBackupCompletion)completion {
+    (void)stage;dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY,0),^{CHECK(!NSThread.isMainThread);NSError *error=nil;id result=work(&error);dispatch_async(dispatch_get_main_queue(),^{completion(result,error);});});
+}
+- (BOOL)validateColors:(NSDictionary *)snapshot error:(NSError **)error {(void)snapshot;(void)error;return YES;}
+#import "AIBackupManagerBoundary.h"
+@end
+static void Wait(BOOL(^done)(void)) {NSDate *limit=[NSDate dateWithTimeIntervalSinceNow:5];while(!done()&&limit.timeIntervalSinceNow>0)[NSRunLoop.mainRunLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:.002]];CHECK(done());}
+static void HistoryRestoreBoundary(NSURL *root) {
+    NSString *suite=[@"ai.history.restore." stringByAppendingString:NSUUID.UUID.UUIDString];NSUserDefaults *defaults=[[NSUserDefaults alloc]initWithSuiteName:suite];
+    CSBackupEngine *engine=[[CSBackupEngine alloc]initWithDefaults:@{@"standard":defaults} domains:@{@"standard":suite} store:[[CSBackupStore alloc]initWithRoot:[root URLByAppendingPathComponent:@"BackupV2"]] resources:root];
+    engine.context=^{return @{@"account":@"alice",@"epoch":@1,@"installationID":@"isolated-history-test",@"pluginVersion":@"test"};};
+    NSURL *url=CSAIReplyFileURL(root,@"alice");CSAIReplyStore *live=[[CSAIReplyStore alloc]initWithURL:url account:@"alice"];NSError *error=nil;
+    CHECK([live load]);CHECK([live saveConfiguration:live.configuration error:&error]);NSDictionary *snapshot=[engine capture:@"before completed reply" kind:@"manual" error:&error];CHECK(snapshot!=nil);
+    __block BOOL accepted=NO;[live appendHistory:@{@"date":NSDate.date,@"conversation":@"friend",@"preset":@"default",@"result":@"submitted",@"detail":@"已完成"} completion:^(BOOL ok,NSError *failure){CHECK(ok&&!failure);accepted=YES;}];Wait(^BOOL{return accepted;});
+    CHECK(live.history.count==1);CHECK([[CSAIReplyStore readStateAtURL:url account:@"alice" error:NULL][@"history"] count]==0);
+    AIBackupBoundary *boundary=[AIBackupBoundary new];boundary.engine=engine;__block NSDictionary *preview=nil;__block BOOL finished=NO;
+    [boundary preview:snapshot modules:[NSSet setWithObject:@"ai_reply"] accounts:[NSSet setWithObject:@"alice"] completion:^(id result,NSError *failure){CHECK(result&&!failure);preview=result;finished=YES;}];Wait(^BOOL{return finished;});
+    CHECK([[CSAIReplyStore readStateAtURL:url account:@"alice" error:NULL][@"history"] count]==1);
+    finished=NO;[boundary prepare:preview completion:^(id result,NSError *failure){CHECK(result&&!failure);finished=YES;}];Wait(^BOOL{return finished;});
+    // No new reply is admitted. The original one-second timer must not invalidate the plan.
+    NSDate *afterTimer=[NSDate dateWithTimeIntervalSinceNow:1.1];while(afterTimer.timeIntervalSinceNow>0)[NSRunLoop.mainRunLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:.005]];
+    CHECK([engine applyPending:&error]);CHECK([engine finishStartup:&error]);CHECK([engine confirmStartup:&error]);CHECK([engine cancelPending:&error]);
+    [live invalidate];[defaults removePersistentDomainForName:suite];
+}
 int main(int argc,const char **argv){@autoreleasepool{
     CHECK(argc==2);NSURL *root=[NSURL fileURLWithPath:@(argv[1]) isDirectory:YES];NSString *suite=[@"ai.backup.tests." stringByAppendingString:NSUUID.UUID.UUIDString];NSUserDefaults *defaults=[[NSUserDefaults alloc]initWithSuiteName:suite];
     CSBackupEngine *engine=[[CSBackupEngine alloc]initWithDefaults:@{@"standard":defaults} domains:@{@"standard":suite} store:[[CSBackupStore alloc]initWithRoot:[root URLByAppendingPathComponent:@"BackupV2"]] resources:root];
@@ -52,5 +89,6 @@ int main(int argc,const char **argv){@autoreleasepool{
     CHECK([engine preview:old modules:[NSSet setWithObject:@"entry"] accounts:accounts error:&error]!=nil);CHECK([[NSData dataWithContentsOfURL:url] isEqual:saved]);
     // Reset is scoped to the present account, with a protection snapshot before applying.
     NSDictionary *reset=[engine resetSnapshot:&error];CHECK(reset!=nil);preview=[engine preview:reset modules:modules accounts:accounts error:&error];CHECK(preview!=nil);CHECK([engine prepare:preview error:&error]);CHECK([engine applyPending:&error]);CHECK([engine finishStartup:&error]);CHECK([engine confirmStartup:&error]);CHECK([engine cancelPending:&error]);CHECK(![NSFileManager.defaultManager fileExistsAtPath:url.path]);
+    HistoryRestoreBoundary([root URLByAppendingPathComponent:@"completed-history-regression"]);
     [defaults removePersistentDomainForName:suite];printf("AI reply backup: %lu checks passed\n",(unsigned long)checks);return 0;
 }}

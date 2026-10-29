@@ -3,7 +3,7 @@
 #import "CSMessageCellLifecycle.h"
 #import "CSMessageMergeAdapter.h"
 #include <stdlib.h>
-static NSUInteger checks, captures, capabilities, executions, handoffs, cancels, timePrepares, timeResets;
+static NSUInteger checks, captures, capabilities, executions, handoffs, cancels, timePrepares, timeResets, geometryReads;
 static NSMutableArray<NSString *> *order;
 static CGAffineTransform expectedBaseline;
 static UIViewController *page;
@@ -59,7 +59,7 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { [accountHookOrder a
 - (id)getBgImageView;
 @end
 @implementation GestureCell
-- (id)getBgImageView { return self.bubble; }
+- (id)getBgImageView { geometryReads++;return self.bubble; }
 @end
 void CSMessageMergeRestore(UIView *cell) { [order addObject:@"merge-restore"];CHECK(CGAffineTransformEqualToTransform(cell.transform,expectedBaseline)); }
 void CSMessageMergeRender(UIView *cell) { [order addObject:@"merge-render-time-position"];CHECK(CGAffineTransformEqualToTransform(cell.transform,expectedBaseline)); }
@@ -81,9 +81,9 @@ static void move(CSMessageGestureAdapter *adapter, NSInteger state, CGFloat x, C
 int main(void) { @autoreleasepool {
     NSString *suite=[@"GestureTests." stringByAppendingString:NSUUID.UUID.UUIDString];
     GestureDefaults *defaults=[[GestureDefaults alloc] initWithSuiteName:suite];
-    [defaults setBool:YES forKey:CSMessageActionGestureEnabledKey];[defaults setInteger:6 forKey:CSMessageActionLeftOtherKey];
+    [defaults setBool:NO forKey:CSMessageActionGestureEnabledKey];[defaults setInteger:6 forKey:CSMessageActionLeftOtherKey];
     [defaults setInteger:0 forKey:CSMessageActionRightOtherKey];
-    snapshot=[[CSMessageActionSettings alloc] initWithDefaults:defaults version:1];
+    snapshot=[[CSMessageActionSettings alloc] initWithDefaults:defaults version:0];
     page=[GesturePage new];page.navigationController=[UINavigationController new];
     UIGestureRecognizer *pop=[UIGestureRecognizer new];pop.enabled=YES;page.navigationController.interactivePopGestureRecognizer=pop;
     order=[NSMutableArray array];executedSources=[NSMutableArray array];
@@ -91,7 +91,17 @@ int main(void) { @autoreleasepool {
     GestureCell *cell=[GestureCell new];cell.bounds=CGRectMake(0,0,320,70);cell.window=window;cell.viewModel=model(1);
     cell.bubble=[UIView new];cell.bubble.frame=CGRectMake(70,8,160,40);cell.bubble.bounds=CGRectMake(0,0,160,40);[cell addSubview:cell.bubble];
     expectedBaseline=CGAffineTransformMakeScale(.9,.9);expectedBaseline.tx=3;cell.transform=expectedBaseline;
-    CSMessageGestureAdapter *adapter=CSMessageGestureAdapterForCell(cell,YES);[adapter refreshForLayout];
+    // Disabled cells retain the shared merge/time lifecycle without constructing a pan,
+    // capturing a message/account context, probing actions, or resolving bubble geometry.
+    for (NSUInteger i=0;i<20;i++) CSMessageCellPerformLayout(cell,^{});
+    CSMessageCellPerformBinding(cell,cell.viewModel,^{});CSMessageCellWindowChanged(cell);
+    CHECK(!CSMessageGestureAdapterForCell(cell,NO) && cell.gestureRecognizers.count==0);
+    CHECK(captures==0 && capabilities==0 && geometryReads==0 && timePrepares==22);
+    [defaults setBool:YES forKey:CSMessageActionGestureEnabledKey];
+    snapshot=[[CSMessageActionSettings alloc] initWithDefaults:defaults version:1];
+    [NSNotificationCenter.defaultCenter postNotificationName:CSMessageActionSettingsDidChangeNotification object:nil];
+    CSMessageGestureAdapter *adapter=CSMessageGestureAdapterForCell(cell,NO);
+    CHECK(adapter && captures==1 && geometryReads==1);
     CHECK(cell.gestureRecognizers.count==1 && adapter.pan.delegate==adapter);
     NSUInteger initialReads=defaults.reads,initialCaptures=captures,initialCaps=capabilities;
     for (NSUInteger i=0;i<100;i++) CSMessageCellPerformLayout(cell,^{ [order addObject:@"native"]; });
@@ -192,6 +202,29 @@ int main(void) { @autoreleasepool {
     // Drain the main cleanup; it must not restore an old interaction or grow recognizer count.
     [NSRunLoop.mainRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.02]];
     CHECK(cell.gestureRecognizers.count==1 && CGAffineTransformEqualToTransform(cell.transform,expectedBaseline));
+    // Turning the feature off during a drag restores exactly the native baseline;
+    // a stale Ended cannot send. Disabled layouts/bindings perform no action work.
+    CHECK(admit(adapter,cell.bubble,90,-300,0));move(adapter,1,-30,-300);
+    [defaults setBool:NO forKey:CSMessageActionGestureEnabledKey];
+    snapshot=[[CSMessageActionSettings alloc] initWithDefaults:defaults version:4];
+    [NSNotificationCenter.defaultCenter postNotificationName:CSMessageActionSettingsDidChangeNotification object:nil];
+    CHECK(!adapter.pan.enabled && CGAffineTransformEqualToTransform(cell.transform,expectedBaseline));
+    GestureCell *offscreenCell=[GestureCell new];offscreenCell.viewModel=model(9);offscreenCell.bounds=cell.bounds;offscreenCell.transform=expectedBaseline;
+    CHECK(!CSMessageGestureAdapterForCell(offscreenCell,YES));
+    NSUInteger offCaptures=captures,offCaps=capabilities,offGeometry=geometryReads,offHandoffs=handoffs;
+    move(adapter,3,-100,-800);
+    for (NSUInteger i=0;i<20;i++) CSMessageCellPerformLayout(cell,^{});
+    CSMessageCellPerformBinding(cell,cell.viewModel,^{});CSMessageCellWindowChanged(cell);
+    CHECK(captures==offCaptures && capabilities==offCaps && geometryReads==offGeometry && handoffs==offHandoffs);
+    [defaults setBool:YES forKey:CSMessageActionGestureEnabledKey];
+    snapshot=[[CSMessageActionSettings alloc] initWithDefaults:defaults version:5];
+    [NSNotificationCenter.defaultCenter postNotificationName:CSMessageActionSettingsDidChangeNotification object:nil];
+    CHECK(adapter.pan.enabled && cell.gestureRecognizers.count==1 && captures==offCaptures+1);
+    CHECK(!CSMessageGestureAdapterForCell(offscreenCell,NO));
+    offscreenCell.window=window;CSMessageCellWindowChanged(offscreenCell);
+    CHECK(CSMessageGestureAdapterForCell(offscreenCell,NO) && offscreenCell.gestureRecognizers.count==1 && captures==offCaptures+2);
+    CHECK(admit(adapter,cell.bubble,90,-300,0));move(adapter,1,-30,-300);move(adapter,3,-80,0);
+    CHECK(executions==5 && allRestored);
     [defaults removePersistentDomainForName:suite];
     printf("PASS: %lu production gesture/lifecycle checks (UIKit/facade doubles, no native sends)\n",(unsigned long)checks);
  } return 0; }

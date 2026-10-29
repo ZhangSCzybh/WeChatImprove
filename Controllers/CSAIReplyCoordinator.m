@@ -53,6 +53,20 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     }
     return result;
 }
+// This budget covers resident text contexts. Active requests retain their own
+// bounded snapshots, and images / HTTP bodies have separate lifetimes.
+static const NSUInteger AIContextCountLimit=32;
+static const NSUInteger AIContextUTF16Limit=256*1024;
+static const NSTimeInterval AIContextIdleTTL=30*60;
+@interface CSAIReplyContextEntry : NSObject
+@property(nonatomic,copy) NSArray<NSDictionary *> *messages;
+@property(nonatomic) NSUInteger cost;
+@property(nonatomic) NSTimeInterval lastAccess;
+@property(nonatomic) NSUInteger accessOrder;
+@end
+@implementation CSAIReplyContextEntry
+@end
+@class CSAIReplyIdentityReservation;
 @interface CSAIReplyBatch : NSObject
 @property(nonatomic,copy) NSString *conversation;
 @property(nonatomic,copy) NSArray<NSString *> *contextKey;
@@ -66,10 +80,23 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 @property(nonatomic) NSTimeInterval started;
 @property(nonatomic) NSUInteger generation;
 @property(nonatomic) NSUInteger phase;
+@property(nonatomic) NSUInteger contextCacheEpoch;
+@property(nonatomic) NSUInteger outstandingClaims;
+@property(nonatomic) BOOL responseReceived;
+@property(nonatomic,copy) NSString *deferredReply;
+@property(nonatomic,strong) NSMutableSet<CSAIReplyIdentityReservation *> *identityReservations;
 @property(nonatomic) BOOL preparingImage;
 @property(nonatomic,strong) id<CSAICancellable> task;
 @end
 @implementation CSAIReplyBatch
+@end
+
+@interface CSAIReplyIdentityReservation : NSObject
+@property(nonatomic,weak) CSAIReplyBatch *batch;
+@property(nonatomic,strong) NSMutableSet<NSString *> *identifiers;
+@property(nonatomic) NSUInteger outstandingWrites;
+@end
+@implementation CSAIReplyIdentityReservation
 @end
 
 @interface CSAIReplyCoordinator ()
@@ -77,7 +104,14 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 @property(nonatomic,strong) id<CSAIGenerating> client;
 @property(nonatomic,strong) NSMutableArray<CSAIReplyBatch *> *pending;
 @property(nonatomic,strong) NSMutableDictionary<NSString *,CSAIReplyBatch *> *active;
-@property(nonatomic,strong) NSMutableDictionary<NSArray<NSString *> *,NSArray<NSDictionary *> *> *contexts;
+@property(nonatomic,strong) NSMutableDictionary<NSArray<NSString *> *,CSAIReplyContextEntry *> *contexts;
+@property(nonatomic) NSUInteger contextUTF16Cost;
+@property(nonatomic) NSUInteger contextAccessOrder;
+@property(nonatomic) NSUInteger contextCacheEpoch;
+@property(nonatomic) NSTimeInterval contextLastTime;
+@property(nonatomic,strong) NSMutableDictionary<NSString *,CSAIReplyIdentityReservation *> *reservedIdentities;
+@property(nonatomic) NSUInteger outstandingClaimWrites;
+@property(nonatomic) BOOL admissionSuspended;
 @property(nonatomic,strong) NSMutableDictionary<NSArray<NSString *> *,NSDictionary *> *stagedImages;
 @property(nonatomic,copy) NSDictionary *configuration;
 @property(nonatomic,strong) NSTimer *timer;
@@ -90,12 +124,13 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     AIRequireMain();
     if((self=[super init])) {
         _store=store;_client=client;_now=^{return NSDate.date.timeIntervalSince1970;};
-        _pending=[NSMutableArray array];_active=[NSMutableDictionary dictionary];_contexts=[NSMutableDictionary dictionary];_stagedImages=[NSMutableDictionary dictionary];
+        _pending=[NSMutableArray array];_active=[NSMutableDictionary dictionary];_contexts=[NSMutableDictionary dictionary];_stagedImages=[NSMutableDictionary dictionary];_reservedIdentities=[NSMutableDictionary dictionary];
         _configuration=store.configuration;_admissionBoundary=_now();
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(contextMemoryWarning:) name:@"UIApplicationDidReceiveMemoryWarningNotification" object:nil];
     }
     return self;
 }
-- (void)dealloc { [_timer invalidate];for(CSAIReplyBatch *batch in _active.allValues)[batch.task cancel]; }
+- (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self];[_timer invalidate];for(CSAIReplyBatch *batch in _active.allValues)[batch.task cancel]; }
 - (NSUInteger)activeCount { AIRequireMain();return self.active.count; }
 - (NSUInteger)pendingCount { AIRequireMain();return self.pending.count; }
 - (NSDictionary *)presetForConversation:(NSString *)conversation configuration:(NSDictionary *)configuration {
@@ -105,7 +140,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     return nil;
 }
 - (BOOL)allowsConversation:(NSString *)conversation configuration:(NSDictionary *)configuration {
-    return self.store.ready && [configuration isEqual:self.store.configuration] &&
+    return !self.admissionSuspended && self.reservedIdentities.count<=5000 && self.store.ready && [configuration isEqual:self.store.configuration] &&
         [configuration[@"enabled"] boolValue] && [configuration[@"conversations"][conversation][@"enabled"] boolValue] &&
         [configuration[@"endpoint"] length] && [configuration[@"model"] length] && [configuration[@"credentialRevision"] length] &&
         [configuration[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(configuration)] &&
@@ -123,24 +158,130 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
 - (void)record:(CSAIReplyBatch *)batch result:(NSString *)result detail:(NSString *)detail {
     // Only fixed, local status strings reach history. Never forward error descriptions or model output.
     [self.store appendHistory:@{@"date":[NSDate dateWithTimeIntervalSince1970:self.now()],@"conversation":batch.conversation,
-        @"preset":batch.preset[@"id"]?:@"",@"result":result,@"detail":detail} error:NULL];
+        @"preset":batch.preset[@"id"]?:@"",@"result":result,@"detail":detail} completion:nil];
+}
+- (void)removeReservation:(CSAIReplyIdentityReservation *)reservation {
+    for(NSString *identifier in reservation.identifiers)
+        if(self.reservedIdentities[identifier]==reservation)[self.reservedIdentities removeObjectForKey:identifier];
+}
+- (void)releaseIdentitiesForBatch:(CSAIReplyBatch *)batch {
+    for(CSAIReplyIdentityReservation *reservation in batch.identityReservations){
+        reservation.batch=nil;
+        // Keep in-flight aliases reserved until disk completion, even after a
+        // request expires. Committed identities remain in the Store snapshot.
+        if(!reservation.outstandingWrites)[self removeReservation:reservation];
+    }
+    [batch.identityReservations removeAllObjects];
+}
+- (void)claimIdentifiers:(NSArray<NSString *> *)identifiers reservation:(CSAIReplyIdentityReservation *)reservation aliases:(BOOL)aliases {
+    if(!identifiers.count)return;
+    NSUInteger additions=0;for(NSString *identifier in identifiers)if(!self.reservedIdentities[identifier])additions++;
+    if(self.reservedIdentities.count+additions>5000){
+        // Release durable batch owners, but still hand the newly learned alias
+        // to the Store before returning. Its accepted work survives account changes.
+        [self cancelAll];
+        if(self.reservedIdentities.count+additions>5000)self.admissionSuspended=YES;
+    }
+    for(NSString *identifier in identifiers){[reservation.identifiers addObject:identifier];self.reservedIdentities[identifier]=reservation;}
+    if(reservation.batch){
+        if(!reservation.batch.identityReservations)reservation.batch.identityReservations=[NSMutableSet set];
+        [reservation.batch.identityReservations addObject:reservation];
+    }
+    reservation.outstandingWrites++;reservation.batch.outstandingClaims++;
+    if(!aliases)self.outstandingClaimWrites++;
+    NSUInteger generation=self.generation;__weak typeof(self) weakSelf=self;
+    CSAIReplyStoreCompletion completion=^(BOOL success,NSError *error){
+        (void)error;typeof(self) self=weakSelf;if(!self)return;
+        AIRequireMain();
+        // Only ordinary admissions consume the 20-write allowance. The Store
+        // coalesces late aliases immediately, independently of this owner's lifetime.
+        if(!aliases)self.outstandingClaimWrites--;
+        reservation.outstandingWrites--;
+        CSAIReplyBatch *batch=reservation.batch;
+        if(batch)batch.outstandingClaims--;
+        if(!success){[self cancelAll];self.admissionSuspended=YES;return;}
+        if(!batch && !reservation.outstandingWrites)[self removeReservation:reservation];
+        if(generation!=self.generation)return;
+        if(batch && self.active[batch.conversation]==batch && !batch.outstandingClaims && batch.deferredReply){
+            NSString *reply=batch.deferredReply;batch.deferredReply=nil;[self submitBatch:batch reply:reply];
+        }
+        [self processPending];
+    };
+    if(aliases)[self.store claimMessageAliases:identifiers completion:completion];
+    else [self.store claimMessageIDs:identifiers completion:completion];
+}
+- (void)removeContextForKey:(NSArray<NSString *> *)key {
+    CSAIReplyContextEntry *entry=self.contexts[key];
+    if(!entry)return;
+    self.contextUTF16Cost-=entry.cost;[self.contexts removeObjectForKey:key];
+}
+- (void)clearContexts {
+    [self.contexts removeAllObjects];self.contextUTF16Cost=0;self.contextAccessOrder=0;
+    self.contextCacheEpoch++;self.contextLastTime=0;
+}
+- (void)contextMemoryWarning:(NSNotification *)notification {
+    (void)notification;
+    if(!NSThread.isMainThread){
+        __weak typeof(self) weakSelf=self;
+        dispatch_async(dispatch_get_main_queue(),^{[weakSelf contextMemoryWarning:nil];});return;
+    }
+    // A cache eviction must not cancel a pending reply or discard a staged image.
+    [self clearContexts];
+}
+- (BOOL)pruneContextsAtTime:(NSTimeInterval)now {
+    if(!isfinite(now)){[self clearContexts];return NO;}
+    if(self.contextLastTime && now<self.contextLastTime)[self clearContexts];
+    self.contextLastTime=now;
+    for(NSArray *key in self.contexts.allKeys){
+        CSAIReplyContextEntry *entry=self.contexts[key];
+        if(now-entry.lastAccess>=AIContextIdleTTL)[self removeContextForKey:key];
+    }
+    return YES;
+}
+- (NSArray<NSDictionary *> *)contextForKey:(NSArray<NSString *> *)key {
+    if(![self pruneContextsAtTime:self.now()])return nil;
+    CSAIReplyContextEntry *entry=self.contexts[key];
+    if(entry){entry.lastAccess=self.contextLastTime;entry.accessOrder=++self.contextAccessOrder;}
+    return entry.messages;
+}
+- (void)setContext:(NSArray<NSDictionary *> *)messages forBatch:(CSAIReplyBatch *)batch {
+    if(![self pruneContextsAtTime:self.now()] || batch.contextCacheEpoch!=self.contextCacheEpoch)return;
+    NSArray *bounded=AIBoundedMessages(messages);[self removeContextForKey:batch.contextKey];
+    if(!bounded.count)return;
+    CSAIReplyContextEntry *entry=[CSAIReplyContextEntry new];entry.messages=bounded;
+    for(NSDictionary *message in bounded)entry.cost+=[message[@"content"] length];
+    entry.lastAccess=self.contextLastTime;entry.accessOrder=++self.contextAccessOrder;
+    self.contexts[batch.contextKey]=entry;self.contextUTF16Cost+=entry.cost;
+    while(self.contexts.count>AIContextCountLimit || self.contextUTF16Cost>AIContextUTF16Limit){
+        NSArray *oldest=nil;NSUInteger order=NSUIntegerMax;
+        for(NSArray *key in self.contexts){CSAIReplyContextEntry *candidate=self.contexts[key];if(candidate.accessOrder<order){oldest=key;order=candidate.accessOrder;}}
+        if(!oldest)break;[self removeContextForKey:oldest];
+    }
 }
 - (void)clearContextsForConversation:(NSString *)conversation {
-    for(NSArray *key in self.contexts.allKeys)if([key.firstObject isEqual:conversation])[self.contexts removeObjectForKey:key];
+    for(NSArray *key in self.contexts.allKeys)if([key.firstObject isEqual:conversation])[self removeContextForKey:key];
 }
 - (void)cancelBatch:(CSAIReplyBatch *)batch {
     // Remove ownership before calling a cancellation implementation that may call back synchronously.
     if(self.active[batch.conversation]==batch)[self.active removeObjectForKey:batch.conversation];
+    [self releaseIdentitiesForBatch:batch];batch.deferredReply=nil;
     id<CSAICancellable> task=batch.task;batch.task=nil;[task cancel];
 }
 - (void)cancelAll {
     AIRequireMain();self.generation++;[self.timer invalidate];self.timer=nil;
-    NSArray *active=self.active.allValues;[self.active removeAllObjects];[self.pending removeAllObjects];[self.contexts removeAllObjects];[self.stagedImages removeAllObjects];
+    for(CSAIReplyBatch *batch in self.pending)[batch.identityReservations removeAllObjects];
+    for(CSAIReplyBatch *batch in self.active.allValues){[batch.identityReservations removeAllObjects];batch.deferredReply=nil;}
+    NSArray *active=self.active.allValues;[self.active removeAllObjects];[self.pending removeAllObjects];[self clearContexts];[self.stagedImages removeAllObjects];
+    // Keep identity fences for accepted disk work, including late aliases.
+    // Their callbacks release slots even after this business generation ends.
+    for(CSAIReplyIdentityReservation *reservation in [NSSet setWithArray:self.reservedIdentities.allValues]){
+        reservation.batch=nil;if(!reservation.outstandingWrites)[self removeReservation:reservation];
+    }
     self.admissionBoundary=self.now();
     for(CSAIReplyBatch *batch in active){id<CSAICancellable> task=batch.task;batch.task=nil;[task cancel];}
 }
 - (void)configurationDidChange {
-    AIRequireMain();[self cancelAll];self.configuration=self.store.configuration;
+    AIRequireMain();[self cancelAll];self.admissionSuspended=NO;self.configuration=self.store.configuration;
 }
 - (void)receiveEvent:(NSDictionary *)event {
     AIRequireMain();
@@ -169,16 +310,27 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     NSDictionary *preset=[self presetForConversation:conversation configuration:self.configuration];if(!preset)return;
     NSArray *identifiers=event[@"identifiers"];
     if(![identifiers isKindOfClass:NSArray.class] || !identifiers.count || identifiers.count>10)return;
-    NSMutableSet *unique=[NSMutableSet set];NSMutableArray *newAliases=[NSMutableArray array];BOOL duplicate=NO;
-    for(id identifier in identifiers){
-        if(!AIString(identifier,1,1024) || [unique containsObject:identifier])return;
-        [unique addObject:identifier];
-        if([self.store hasHandledMessageID:identifier])duplicate=YES;else [newAliases addObject:identifier];
+    NSMutableSet *unique=[NSMutableSet set],*knownReservations=[NSMutableSet set];NSMutableArray *newAliases=[NSMutableArray array],*normalizedIDs=[NSMutableArray array];BOOL duplicate=NO;
+    for(id value in identifiers){
+        if(!AIString(value,1,1024) || [unique containsObject:value])return;
+        NSString *identifier=[value copy];[unique addObject:identifier];[normalizedIDs addObject:identifier];
+        CSAIReplyIdentityReservation *reservation=self.reservedIdentities[identifier];
+        if(reservation)[knownReservations addObject:reservation];
+        if(reservation || [self.store hasHandledMessageID:identifier])duplicate=YES;else [newAliases addObject:identifier];
     }
+    identifiers=normalizedIDs;
     if(duplicate){
         // Native callbacks can acquire a server identity after their first local-only callback.
-        // Preserve every new alias before suppressing the duplicate, including unknown sends.
-        if(newAliases.count && ![self.store claimMessageIDs:newAliases error:NULL])[self cancelAll];
+        // A bridging callback can also reveal that two admitted events are the
+        // same message. Cancel both rather than allowing either stale owner on.
+        CSAIReplyIdentityReservation *reservation=knownReservations.anyObject;
+        if(knownReservations.count>1){[self cancelAll];reservation=nil;}
+        if(!newAliases.count)return;
+        if(!reservation){
+            reservation=[CSAIReplyIdentityReservation new];reservation.identifiers=[NSMutableSet set];
+        }
+        // A new alias fences the original batch's final send until it is durable.
+        [self claimIdentifiers:newAliases reservation:reservation aliases:YES];
         return;
     }
     NSArray *key=@[conversation,sender];
@@ -215,54 +367,71 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     }
     CSAIReplyBatch *batch=nil;
     for(CSAIReplyBatch *candidate in self.pending)if([candidate.contextKey isEqual:key] && now<candidate.expires){batch=candidate;break;}
-    if(!batch && self.pending.count>=20)return;
+    if((!batch && self.pending.count>=20) || self.outstandingClaimWrites>=20)return;
     if(image && batch.imageEvent)return; // One image per request bounds memory and upload cost.
     NSDictionary *attachedImage=image?event:nil;
     NSDictionary *staged=self.stagedImages[key];
     if(!image && !batch.imageEvent && [self.configuration[@"imageEnabled"] boolValue] && staged && now<[staged[@"expires"] doubleValue]){
         NSDictionary *candidate=staged[@"event"];BOOL handled=NO;
-        for(NSString *identifier in candidate[@"identifiers"])if([self.store hasHandledMessageID:identifier]){handled=YES;break;}
+        for(NSString *identifier in candidate[@"identifiers"])if(self.reservedIdentities[identifier] || [self.store hasHandledMessageID:identifier]){handled=YES;break;}
         if(!handled)attachedImage=candidate;
     }
     [self.stagedImages removeObjectForKey:key];
     NSMutableArray *claims=[identifiers mutableCopy];
     if(attachedImage && !image)for(NSString *identifier in attachedImage[@"identifiers"])if(![claims containsObject:identifier])[claims addObject:identifier];
-    // Claim every server/local alias durably before retaining text or starting any model work.
-    if(![self.store claimMessageIDs:claims error:NULL]){[self cancelAll];return;}
+    if(self.reservedIdentities.count+claims.count>5000)return;
     if(!batch){
         batch=[CSAIReplyBatch new];batch.conversation=conversation;batch.contextKey=key;batch.configuration=self.configuration;
         batch.preset=preset;batch.generation=self.generation;batch.expires=now+120;batch.text=@"";[self.pending addObject:batch];
     }
     if(attachedImage)batch.imageEvent=[attachedImage copy];
     if(text.length)batch.text=AITail(batch.text.length?[NSString stringWithFormat:@"%@\n%@",batch.text,text]:text,12000);
-    batch.due=now+2;[self processPending];
+    batch.due=now+2;
+    CSAIReplyIdentityReservation *reservation=[CSAIReplyIdentityReservation new];reservation.batch=batch;reservation.identifiers=[NSMutableSet set];
+    // Pending batches retain only bounded input while waiting. No image/model
+    // work can start until every original identity and subsequently known alias
+    // has completed the Store's file and directory durability checks.
+    [self claimIdentifiers:claims reservation:reservation aliases:NO];[self processPending];
 }
 - (void)finishBatch:(CSAIReplyBatch *)batch text:(NSString *)text error:(NSError *)error {
     AIRequireMain();
-    if(self.active[batch.conversation]!=batch || batch.generation!=self.generation)return;
+    if(self.active[batch.conversation]!=batch || batch.generation!=self.generation || batch.responseReceived)return;
     if(![self isCurrent:batch]){[self cancelBatch:batch];[self clearContextsForConversation:batch.conversation];[self processPending];return;}
-    batch.task=nil;
+    batch.task=nil;batch.responseReceived=YES;
     NSString *reply=[text isKindOfClass:NSString.class]?[text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet]:nil;
     if(error || !reply.length || reply.length>4000){
-        [self.active removeObjectForKey:batch.conversation];
+        [self.active removeObjectForKey:batch.conversation];[self releaseIdentitiesForBatch:batch];
         BOOL authentication=!batch.preparingImage && AIClientFailure(error) && (error.code==401 || error.code==403);
         [self record:batch result:@"failed" detail:AIFailureDetail(error,batch.preparingImage)];
         if(authentication){
-            NSMutableDictionary *configuration=[self.store.configuration mutableCopy];configuration[@"verifiedConnection"]=@"";[configuration removeObjectForKey:@"verifiedAt"];
-            [self.store saveConfiguration:configuration error:NULL];[self configurationDidChange];
+            NSDictionary *expected=self.store.configuration;
+            NSMutableDictionary *configuration=[expected mutableCopy];configuration[@"verifiedConnection"]=@"";[configuration removeObjectForKey:@"verifiedAt"];
+            [self cancelAll];self.admissionSuspended=YES;
+            NSUInteger generation=self.generation;__weak typeof(self) weakSelf=self;
+            [self.store saveConfiguration:configuration expectedConfiguration:expected completion:^(BOOL success,NSError *failure){
+                (void)success;(void)failure;typeof(self) self=weakSelf;
+                if(self && generation==self.generation)[self configurationDidChange];
+            }];
         }
         [self processPending];return;
     }
+    if(batch.outstandingClaims){batch.deferredReply=reply;[self scheduleWakeup];return;}
+    [self submitBatch:batch reply:reply];
+}
+- (void)submitBatch:(CSAIReplyBatch *)batch reply:(NSString *)reply {
+    AIRequireMain();
+    if(![self isCurrent:batch]){[self cancelBatch:batch];[self processPending];return;}
+    if(batch.outstandingClaims){batch.deferredReply=reply;return;}
     __weak typeof(self) weakSelf=self;
-    BOOL (^valid)(void)=^BOOL {return [weakSelf isCurrent:batch];};
+    BOOL (^valid)(void)=^BOOL {return [weakSelf isCurrent:batch] && !batch.outstandingClaims;};
     if(!valid()){[self cancelBatch:batch];[self processPending];return;}
     NSString *result=[self.delegate coordinator:self submitText:reply conversation:batch.conversation valid:valid];
     // Submission may itself trigger configuration/account cancellation.
     if(self.active[batch.conversation]!=batch || batch.generation!=self.generation){[self processPending];return;}
-    [self.active removeObjectForKey:batch.conversation];
+    [self.active removeObjectForKey:batch.conversation];[self releaseIdentitiesForBatch:batch];
     if([result isEqual:@"submitted"]){
         NSMutableArray *messages=[batch.messages mutableCopy];[messages addObject:@{@"role":@"assistant",@"content":reply}];
-        self.contexts[batch.contextKey]=AIBoundedMessages(messages);
+        [self setContext:messages forBatch:batch];
         [self record:batch result:@"submitted" detail:@"已提交，不代表送达"];
     }else if([result isEqual:@"unknown"]){
         [self record:batch result:@"unknown" detail:@"提交结果未知，不会重试"];
@@ -278,7 +447,8 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
         if(self.active[batch.conversation]==batch){[self cancelBatch:batch];[self record:batch result:@"failed" detail:@"凭据或当前会话状态不可用"];}
         [self processPending];return;
     }
-    NSMutableArray *messages=[self.contexts[batch.contextKey] mutableCopy]?:[NSMutableArray array];
+    NSMutableArray *messages=[[self contextForKey:batch.contextKey] mutableCopy]?:[NSMutableArray array];
+    batch.contextCacheEpoch=self.contextCacheEpoch;
     NSString *input=batch.text.length?batch.text:@"请识别这张图片，并简洁回答。";
     [messages addObject:@{@"role":@"user",@"content":input}];batch.messages=AIBoundedMessages(messages);
     NSMutableArray *request=[NSMutableArray arrayWithObject:@{@"role":@"system",@"content":batch.preset[@"prompt"]}];[request addObjectsFromArray:batch.messages];
@@ -326,7 +496,7 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     for(NSDictionary *staged in self.stagedImages.allValues)next=MIN(next,[staged[@"expires"] doubleValue]);
     for(CSAIReplyBatch *batch in self.pending){
         next=MIN(next,batch.expires);
-        if(self.active.count<2 && !self.active[batch.conversation])next=MIN(next,batch.due);
+        if(!batch.outstandingClaims && self.active.count<2 && !self.active[batch.conversation])next=MIN(next,batch.due);
     }
     if(!isfinite(now) || !isfinite(next))return;
     __weak typeof(self) weakSelf=self;
@@ -349,13 +519,13 @@ static NSArray<NSDictionary *> *AIBoundedMessages(NSArray<NSDictionary *> *messa
     }
     for(CSAIReplyBatch *batch in [self.pending copy]){
         if(now>=batch.expires || batch.generation!=self.generation || ![self allowsConversation:batch.conversation configuration:batch.configuration]){
-            [self.pending removeObjectIdenticalTo:batch];[self clearContextsForConversation:batch.conversation];
+            [self.pending removeObjectIdenticalTo:batch];[self releaseIdentitiesForBatch:batch];[self clearContextsForConversation:batch.conversation];
             if(now>=batch.expires)[self record:batch result:@"expired" detail:@"等待已过期，不会补发"];
         }
     }
     while(self.active.count<2){
         CSAIReplyBatch *next=nil;
-        for(CSAIReplyBatch *batch in self.pending)if(batch.due<=self.now() && !self.active[batch.conversation]){next=batch;break;}
+        for(CSAIReplyBatch *batch in self.pending)if(!batch.outstandingClaims && batch.due<=self.now() && !self.active[batch.conversation]){next=batch;break;}
         if(!next)break;[self startBatch:next];
     }
     self.processing=NO;[self scheduleWakeup];

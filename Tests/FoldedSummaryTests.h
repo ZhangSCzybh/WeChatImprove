@@ -30,7 +30,7 @@ static void RunFoldedSummaryTests(void) {
     NSUInteger initialPrefixes=prefixCalls,initialDigests=digestCalls;
     publish();
     Check([EntrySummary(adapter.projection) isEqual:@"[图片]"] && [EntryPrefix(adapter.projection) isEqual:@"工作群: "],@"cold-start group uses separate native conversation prefix and native message, not sender prefix");
-    Check(prefixCalls>initialPrefixes && digestCalls>initialDigests,@"cold-start invokes native aggregate prefix builder and digest without opening folded list");
+    Check(prefixCalls==initialPrefixes+1 && digestCalls==initialDigests+1,@"only the final visible folded candidate invokes native prefix and digest; hidden, outside-group and older rows skip formatting");
     Check(lastFormattedMessage!=newer.m_msgWrap && newer.m_msgWrap.displayChanges==0 && cache.mutations==0,@"formatting mutates only copied message, not live session or native cache");
     Check([CSGroupReadObject(adapter.projection.sections[0][0],@"foldedEntrySummaryUserName") isEqual:newer.m_nsUserName],@"newest visible child excludes newer hidden and outside-group messages");
     CSGroupProjection *same=adapter.projection;publish();Check(same==adapter.projection,@"unchanged two-part summary reuses immutable projection");
@@ -62,7 +62,7 @@ static void RunFoldedSummaryTests(void) {
     older.m_uUnTopTime=0;older.sortTime=700;publish();Check([EntryPrefix(adapter.projection) isEqual:@"家庭群: "],@"native sort override remains independent of lexical/list order");older.sortTime=0;
     older.m_uLastTime=0;older.m_msgWrap.fixtureSessionTime=800;publish();Check([EntryPrefix(adapter.projection) isEqual:@"家庭群: "],@"native message session time remains available for ordering");older.m_msgWrap.fixtureSessionTime=0;older.m_uLastTime=100;
     policy=Policy(@[newer.m_nsUserName,hidden.m_nsUserName],NO,201);publish();Check([EntryPrefix(adapter.projection) isEqual:@"家庭群: "],@"hiding latest child advances to next visible child's native prefix/body");
-    tab.sessionUserNames=@[newer.m_nsUserName,hidden.m_nsUserName];publish();Check(adapter.projection.sections[0].count==0 && !EntrySummary(adapter.projection),@"all children hidden removes entry and text");
+    tab.sessionUserNames=@[newer.m_nsUserName,hidden.m_nsUserName];initialDigests=digestCalls;publish();Check(adapter.projection.sections[0].count==0 && !EntrySummary(adapter.projection) && digestCalls==initialDigests,@"all children hidden removes entry and skips native formatting");
     policy=Policy(@[hidden.m_nsUserName],NO,202);tab.sessionUserNames=@[newer.m_nsUserName];
     newer.m_msgWrap.fixtureDigest=nil;publish();Check(!EntrySummary(adapter.projection),@"missing source text never borrows other group or invented placeholder");
     newer.m_msgWrap.fixtureDigest=@"刷新后就绪";publish();Check([EntrySummary(adapter.projection) isEqual:@"刷新后就绪"],@"next list refresh automatically retries an initially absent digest");

@@ -4,6 +4,8 @@
 
 static char CSAdapterKey;
 static NSHashTable<CSMessageGestureAdapter *> *CSAdapters;
+static NSHashTable<UIView *> *CSGestureCells;
+static void CSObserveGestureCells(void);
 // Verified native BOOL fields (artifact ivars.json), resolved once per binding.
 // Read scalar state without KVC, service resolution or arbitrary native callbacks in admission.
 static ptrdiff_t CSGestureFlagOffset(id object, const char *name) {
@@ -31,7 +33,6 @@ static BOOL CSGestureFlag(id object, ptrdiff_t offset) {
 @property(nonatomic, weak) UIView *region;
 @property(nonatomic, weak) UIGestureRecognizer *pop;
 @property(nonatomic, weak) UIScrollView *scroll;
-@property(nonatomic, strong) id settingsObserver;
 @property(nonatomic) CSMessageAction leftAction, rightAction, lockedAction;
 @property(nonatomic) CSMessageActionDirection direction;
 @property(nonatomic) BOOL tracking, ownsTransform, detached, hapticSent, touchAccepted;
@@ -51,20 +52,18 @@ static BOOL CSGestureFlag(id object, ptrdiff_t offset) {
         [cell addGestureRecognizer:_pan];
         if (!CSAdapters) CSAdapters=[NSHashTable weakObjectsHashTable];
         [CSAdapters addObject:self];
-        __weak typeof(self) weakSelf=self;
-        _settingsObserver=[NSNotificationCenter.defaultCenter addObserverForName:CSMessageActionSettingsDidChangeNotification
-            object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) { [weakSelf settingsDidChange]; }];
         [self bind];
     }
     return self;
 }
-- (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:_settingsObserver]; }
 - (void)invalidateBinding {
     [self cancel]; [_coordinator cancelOperationsForCell:_cell];
     _bindingGeneration++; _context=nil; _leftAction=0; _rightAction=0; _pan.enabled=NO;
 }
 - (void)bind {
     [self invalidateBinding];
+    _settings=_coordinator.settings;
+    if (!_settings.gestureEnabled) { _region=nil; _pop=nil; _scroll=nil; return; }
     _context=[_coordinator captureContextForCell:_cell controller:nil bindingGeneration:_bindingGeneration];
     _disabledOffset=CSGestureFlagOffset(_cell,"m_bDisableAllOperation");
     _multiSelectOffset=CSGestureFlagOffset(_context.controller,"m_bMultiSelectMode");
@@ -82,9 +81,19 @@ static BOOL CSGestureFlag(id object, ptrdiff_t offset) {
 }
 - (void)settingsDidChange {
     if (_settings.version==_coordinator.settings.version) return;
-    [self cancel]; [self updateCapabilities];
+    if (!_coordinator.settings.gestureEnabled) {
+        _settings=_coordinator.settings;
+        [self invalidateBinding]; _region=nil; _pop=nil; _scroll=nil;
+        return;
+    }
+    if (!_context) {
+        if (!_cell.window) { _settings=_coordinator.settings; return; }
+        [self bind];
+    } else { [self cancel]; [self updateCapabilities]; }
+    [self refreshForLayout];
 }
 - (void)refreshForLayout {
+    if (!_settings.gestureEnabled || !_pan.enabled) return;
     UIView *cell=_cell;
     // Binding/activation refresh resolves services once. Repeated layouts only update geometry.
     UIView *region=CSMessageActionObjectGetter(cell,NSSelectorFromString(@"getBgImageView"));
@@ -231,9 +240,27 @@ static BOOL CSGestureFlag(id object, ptrdiff_t offset) {
     // No cell access after handoff: repeat/native forwarding owns its immutable request.
 }
 @end
+static void CSObserveGestureCells(void) {
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        CSGestureCells=[NSHashTable weakObjectsHashTable];
+        // One observer also covers cells that have never needed a gesture adapter.
+        [NSNotificationCenter.defaultCenter addObserverForName:CSMessageActionSettingsDidChangeNotification
+            object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) {
+            for (UIView *cell in CSGestureCells.allObjects) {
+                CSMessageGestureAdapter *adapter=objc_getAssociatedObject(cell,&CSAdapterKey);
+                if (adapter) [adapter settingsDidChange];
+                else if (cell.window) [CSMessageGestureAdapterForCell(cell,YES) refreshForLayout];
+            }
+        }];
+    });
+}
 CSMessageGestureAdapter *CSMessageGestureAdapterForCell(id cell, BOOL create) {
     CSMessageGestureAdapter *adapter=objc_getAssociatedObject(cell,&CSAdapterKey);
-    if (!adapter && create && [cell isKindOfClass:UIView.class]) {
+    if (create && [cell isKindOfClass:UIView.class]) {
+        CSObserveGestureCells(); [CSGestureCells addObject:cell];
+    }
+    if (!adapter && create && [cell isKindOfClass:UIView.class] && CSMessageActionCoordinator.sharedCoordinator.settings.gestureEnabled) {
         adapter=[[CSMessageGestureAdapter alloc] initWithCell:cell coordinator:CSMessageActionCoordinator.sharedCoordinator];
         objc_setAssociatedObject(cell,&CSAdapterKey,adapter,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }

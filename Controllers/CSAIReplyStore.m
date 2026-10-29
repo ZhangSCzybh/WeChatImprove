@@ -7,6 +7,9 @@
 #import <fcntl.h>
 #import <unistd.h>
 #import <errno.h>
+#if TARGET_OS_IPHONE || defined(CSAI_STORE_TRACK_MUTATIONS)
+#import "CSBackupMutation.h"
+#endif
 
 NSNotificationName const CSAIReplyConfigurationDidChange = @"CSAIReplyConfigurationDidChange";
 NSString *const CSAIReplyBackupDomain = @"aiReply";
@@ -80,18 +83,98 @@ NSDictionary *CSAIReplyPortableState(NSDictionary *state) {
 }
 static NSDictionary *NewState(NSString *account) { return @{@"schema":@1,@"account":account,@"configuration":CSAIReplyDefaultConfiguration(),@"handled":@{},@"history":@[]}; }
 // Freeze caller-owned input once; later commits share the immutable, unchanged branches.
-static id ImmutablePropertyList(id value) { return CFBridgingRelease(CFPropertyListCreateDeepCopy(kCFAllocatorDefault,(__bridge CFPropertyListRef)value,kCFPropertyListImmutable)); }
+static id ImmutablePropertyList(id value) { if(!value)return nil;return CFBridgingRelease(CFPropertyListCreateDeepCopy(kCFAllocatorDefault,(__bridge CFPropertyListRef)value,kCFPropertyListImmutable)); }
+// This queue outlives individual stores so an old account writer cannot race a new load.
+static void *CSAIStoreQueueKey=&CSAIStoreQueueKey;
+static dispatch_queue_t CSAIStoreQueue(void) {
+    static dispatch_queue_t queue; static dispatch_once_t once;
+    dispatch_once(&once,^{queue=dispatch_queue_create("com.wechatimprove.ai-store",DISPATCH_QUEUE_SERIAL);dispatch_queue_set_specific(queue,CSAIStoreQueueKey,CSAIStoreQueueKey,NULL);});
+    return queue;
+}
+static void CSAIStoreSync(dispatch_block_t block) { if(dispatch_get_specific(CSAIStoreQueueKey))block();else dispatch_sync(CSAIStoreQueue(),block); }
+@interface CSAIReplyDiskState : NSObject
+@property NSDictionary *state;
+@property BOOL ready;
+@property NSError *error;
+@property NSUInteger dirtyHistory;
+@property dispatch_source_t historyTimer;
+@property NSHashTable<CSAIReplyStore *> *stores;
+@end
+@implementation CSAIReplyDiskState
+- (instancetype)init {if((self=[super init]))_stores=NSHashTable.weakObjectsHashTable;return self;}
+@end
+static NSMapTable<NSString *,CSAIReplyDiskState *> *CSAIStoreDiskStates(void) {
+    static NSMapTable *states;static dispatch_once_t once;
+    dispatch_once(&once,^{states=[NSMapTable strongToWeakObjectsMapTable];});return states;
+}
+@interface CSAIReplyAliasWaiter : NSObject
+@property NSUInteger generation;
+@property(copy) CSAIReplyStoreCompletion completion;
+@end
+@implementation CSAIReplyAliasWaiter @end
+@interface CSAIReplyAliasBatch : NSObject
+@property NSMutableSet<NSString *> *identifiers;
+@property NSMutableArray<CSAIReplyAliasWaiter *> *waiters;
+@end
+@implementation CSAIReplyAliasBatch
+- (instancetype)init {if((self=[super init])){_identifiers=[NSMutableSet set];_waiters=[NSMutableArray array];}return self;}
+@end
 @interface CSAIReplyStore ()
 @property(nonatomic,strong) NSURL *url;
 @property(nonatomic,copy,readwrite) NSString *account;
 @property(nonatomic,strong) NSDictionary *state;
-@property(nonatomic,readwrite) BOOL ready;
-@property(nonatomic,strong,readwrite) NSError *error;
+@property(nonatomic) BOOL snapshotReady;
+@property(nonatomic,strong) NSError *snapshotError;
+@property(nonatomic) BOOL invalidated;
+@property(nonatomic) NSUInteger generation;
+@property(nonatomic,strong) CSAIReplyDiskState *disk;
+// Admission-only lock state. No serialization or file work holds this lock.
+@property(nonatomic,strong) CSAIReplyAliasBatch *aliasBatch;
+@property(nonatomic) NSUInteger aliasPendingIDs;
+@property(nonatomic) NSUInteger aliasPendingCallbacks;
+@property(nonatomic,strong) NSError *aliasAdmissionError;
 @end
 @implementation CSAIReplyStore
 - (instancetype)initWithURL:(NSURL *)url account:(NSString *)account { if((self=[super init])) { _url=url; _account=[account copy]; _state=NewState(_account); } return self; }
 - (NSDictionary *)configuration { @synchronized(self) { return self.state[@"configuration"]; } }
 - (NSArray *)history { @synchronized(self) { return self.state[@"history"]?:@[]; } }
+- (BOOL)ready { @synchronized(self) {return self.snapshotReady && !self.invalidated;} }
+- (NSError *)error { @synchronized(self) {return self.snapshotError;} }
+- (void)invalidate { @synchronized(self) {self.invalidated=YES;self.generation++;self.snapshotReady=NO;} }
+- (BOOL)validGeneration:(NSUInteger)generation { @synchronized(self) {return !self.invalidated && self.generation==generation;} }
+- (CSAIReplyDiskState *)diskState {
+    NSAssert(dispatch_get_specific(CSAIStoreQueueKey),@"AI state must be queue owned");
+    if(!self.disk){
+        NSMapTable *states=CSAIStoreDiskStates();
+        NSString *key=[NSString stringWithFormat:@"%@|%@",self.url.path.stringByStandardizingPath,self.account];
+        self.disk=[states objectForKey:key];if(!self.disk){self.disk=[CSAIReplyDiskState new];self.disk.state=NewState(self.account);[states setObject:self.disk forKey:key];}
+        [self.disk.stores addObject:self];
+    }
+    return self.disk;
+}
+- (void)publish {
+    CSAIReplyDiskState *disk=[self diskState];
+    for(CSAIReplyStore *store in disk.stores.allObjects)@synchronized(store){
+        if(!store.invalidated){store.state=disk.state;store.snapshotReady=disk.ready && !store.aliasAdmissionError;store.snapshotError=store.aliasAdmissionError?:disk.error;}
+    }
+}
+- (void)cancelHistoryTimer {CSAIReplyDiskState *disk=[self diskState];if(disk.historyTimer){dispatch_source_cancel(disk.historyTimer);disk.historyTimer=nil;}}
+- (void)performAsync:(BOOL (^)(NSError **))work completion:(CSAIReplyStoreCompletion)completion {
+    NSUInteger generation;@synchronized(self){generation=self.generation;}
+    dispatch_async(CSAIStoreQueue(),^{@autoreleasepool{
+        NSError *error=nil;BOOL success=NO;
+        if([self validGeneration:generation])success=work(&error);else error=CSAIError(20,@"账号或存储状态已改变，本次操作已取消。");
+        if(!completion)return;
+        dispatch_async(dispatch_get_main_queue(),^{
+            if(![self validGeneration:generation]){
+                NSMutableDictionary *info=[@{NSLocalizedDescriptionKey:@"账号或存储状态已改变，本次操作已取消。"} mutableCopy];
+                if(success || [error.userInfo[CSAIReplyStoreCommitUncertainKey] boolValue])info[CSAIReplyStoreCommitUncertainKey]=@YES;
+                if(completion)completion(NO,[NSError errorWithDomain:@"com.wechatimprove.ai-reply" code:20 userInfo:info]);return;
+            }
+            if(completion)completion(success,error);
+        });
+    }});
+}
 + (NSDictionary *)readStateAtURL:(NSURL *)url account:(NSString *)account error:(NSError **)error {
     if(error) *error=nil;
     int descriptor=open(url.fileSystemRepresentation,O_RDONLY|O_NOFOLLOW|O_NONBLOCK);
@@ -153,38 +236,163 @@ static id ImmutablePropertyList(id value) { return CFBridgingRelease(CFPropertyL
     }
     return YES;
 }
-- (BOOL)load { @synchronized(self) { NSError *error=nil; NSDictionary *state=[self.class readStateAtURL:self.url account:self.account error:&error]; self.ready=(error==nil); self.error=error; if(self.ready) self.state=state?:NewState(self.account); return self.ready; } }
-- (BOOL)commit:(NSDictionary *)state error:(NSError **)error {
-    if(!self.ready) return Fail(error,@"AI 存储未就绪");
-    NSError *failure=nil; if(![self.class replaceState:state atURL:self.url account:self.account error:&failure]) { self.ready=NO; self.error=failure; if(error) *error=failure; return NO; }
-    self.state=[state copy]; return YES;
-}
-- (BOOL)saveConfiguration:(NSDictionary *)configuration error:(NSError **)error { @synchronized(self) {
-    if(!CSAIReplyValidateConfiguration(configuration,error)) return NO;
-    NSDictionary *snapshot=ImmutablePropertyList(configuration);
-    if(!snapshot) return Fail(error,@"无法复制 AI 配置");
-    NSMutableDictionary *state=[self.state mutableCopy]; state[@"configuration"]=snapshot;
-    if(![self commit:state error:error]) return NO;
-    [[NSNotificationCenter defaultCenter] postNotificationName:CSAIReplyConfigurationDidChange object:self]; return YES;
-} }
-- (BOOL)hasHandledMessageID:(NSString *)identifier { @synchronized(self) { NSDate *date=self.state[@"handled"][identifier]; return date && [date timeIntervalSinceNow]>=-7*86400; } }
-- (BOOL)claimMessageIDs:(NSArray<NSString *> *)identifiers error:(NSError **)error { @synchronized(self) {
-    if(![identifiers isKindOfClass:NSArray.class] || !identifiers.count || identifiers.count>5000) return Fail(error,@"消息身份无效");
-    NSMutableSet *seen=[NSMutableSet set]; NSMutableArray<NSString *> *keys=[NSMutableArray arrayWithCapacity:identifiers.count]; NSMutableDictionary *handled=[self.state[@"handled"] mutableCopy]?:[NSMutableDictionary dictionary]; NSDate *now=[NSDate date];
-    for(NSString *key in [handled allKeys]) if([handled[key] timeIntervalSinceDate:now]<-7*86400) [handled removeObjectForKey:key];
-    for(id identifier in identifiers) { if(!String(identifier,1,1024)) return Fail(error,@"消息已处理或身份无效"); NSString *key=[identifier copy]; if(handled[key] || [seen containsObject:key]) return Fail(error,@"消息已处理或身份无效"); [seen addObject:key]; [keys addObject:key]; }
-    for(NSString *identifier in keys) handled[identifier]=now;
-    if(handled.count>5000) {
-        NSArray *oldest=[handled keysSortedByValueUsingComparator:^NSComparisonResult(NSDate *a, NSDate *b) { return [a compare:b]; }];
-        NSUInteger removeCount=handled.count-5000; for(NSUInteger i=0;i<removeCount;i++) [handled removeObjectForKey:oldest[i]];
+- (BOOL)loadOnQueue:(NSError **)error {
+    NSError *admissionFailure;@synchronized(self){admissionFailure=self.aliasAdmissionError;}
+    if(admissionFailure){if(error)*error=admissionFailure;return NO;}
+    CSAIReplyDiskState *disk=[self diskState];
+    if(disk.dirtyHistory && disk.ready && ![self flushHistoryOnQueue:error])return NO;
+    NSError *failure=nil;NSDictionary *state=[self.class readStateAtURL:self.url account:self.account error:&failure];
+    disk.ready=(failure==nil);disk.error=failure;
+    if(disk.ready){
+        if(state && [state[@"configuration"] isEqual:disk.state[@"configuration"]]){NSMutableDictionary *stable=[state mutableCopy];stable[@"configuration"]=disk.state[@"configuration"];state=[stable copy];}
+        disk.state=state?:NewState(self.account);
     }
-    NSMutableDictionary *state=[self.state mutableCopy]; state[@"handled"]=[handled copy]; return [self commit:state error:error];
-} }
-- (BOOL)appendHistory:(NSDictionary *)record error:(NSError **)error { @synchronized(self) {
-    if(!ValidRecord(record)) return Fail(error,@"回复记录无效");
-    NSDictionary *snapshot=ImmutablePropertyList(record);
-    if(!snapshot) return Fail(error,@"无法复制回复记录");
-    NSMutableArray *history=[self.history mutableCopy]; [history addObject:snapshot]; if(history.count>200) [history removeObjectsInRange:NSMakeRange(0,history.count-200)];
-    NSMutableDictionary *state=[self.state mutableCopy]; state[@"history"]=[history copy]; return [self commit:state error:error];
-} }
+    [self publish];@synchronized(self){admissionFailure=self.aliasAdmissionError;}
+    if(error)*error=admissionFailure?:failure;return disk.ready && !admissionFailure;
+}
+- (BOOL)commitOnQueue:(NSDictionary *)state error:(NSError **)error {
+    CSAIReplyDiskState *disk=[self diskState];
+    if(!disk.ready)return Fail(error,@"AI 存储未就绪");
+    NSError *failure=nil;
+#if TARGET_OS_IPHONE || defined(CSAI_STORE_TRACK_MUTATIONS)
+    CSBackupResourceMutationScope();
+#endif
+    BOOL success=[self.class replaceState:state atURL:self.url account:self.account error:&failure];
+    if(success){disk.state=[state copy];disk.dirtyHistory=0;[self cancelHistoryTimer];}
+    else {disk.ready=NO;disk.error=failure;[self cancelHistoryTimer];if(error)*error=failure;}
+    [self publish];return success;
+}
+- (BOOL)saveOnQueue:(NSDictionary *)configuration expected:(NSDictionary *)expected error:(NSError **)error {
+    CSAIReplyDiskState *disk=[self diskState];
+    if(expected && ![expected isEqual:disk.state[@"configuration"]])return Fail(error,@"配置已改变，请刷新后重试。");
+    if(!CSAIReplyValidateConfiguration(configuration,error))return NO;
+    NSMutableDictionary *state=[disk.state mutableCopy];state[@"configuration"]=configuration;
+    return [self commitOnQueue:state error:error];
+}
+- (BOOL)claimOnQueue:(NSArray<NSString *> *)identifiers error:(NSError **)error {
+    CSAIReplyDiskState *disk=[self diskState];
+    if(![identifiers isKindOfClass:NSArray.class] || !identifiers.count || identifiers.count>5000)return Fail(error,@"消息身份无效");
+    NSMutableSet *seen=[NSMutableSet set];NSMutableArray<NSString *> *keys=[NSMutableArray arrayWithCapacity:identifiers.count];
+    NSMutableDictionary *handled=[disk.state[@"handled"] mutableCopy]?:[NSMutableDictionary dictionary];NSDate *now=NSDate.date;
+    for(NSString *key in handled.allKeys)if([handled[key] timeIntervalSinceDate:now]<-7*86400)[handled removeObjectForKey:key];
+    for(id identifier in identifiers){if(!String(identifier,1,1024) || handled[identifier] || [seen containsObject:identifier])return Fail(error,@"消息已处理或身份无效");[seen addObject:identifier];[keys addObject:identifier];}
+    for(NSString *identifier in keys)handled[identifier]=now;
+    if(handled.count>5000){NSArray *oldest=[handled keysSortedByValueUsingSelector:@selector(compare:)];NSUInteger removeCount=handled.count-5000;for(NSUInteger i=0;i<removeCount;i++)[handled removeObjectForKey:oldest[i]];}
+    NSMutableDictionary *state=[disk.state mutableCopy];state[@"handled"]=[handled copy];return [self commitOnQueue:state error:error];
+}
+- (BOOL)historyOnQueue:(NSDictionary *)record immediate:(BOOL)immediate error:(NSError **)error {
+    CSAIReplyDiskState *disk=[self diskState];if(!disk.ready)return Fail(error,@"AI 存储未就绪");
+    if(!ValidRecord(record))return Fail(error,@"回复记录无效");
+    NSMutableArray *history=[disk.state[@"history"] mutableCopy]?:[NSMutableArray array];[history addObject:record];
+    if(history.count>200)[history removeObjectsInRange:NSMakeRange(0,history.count-200)];
+    NSMutableDictionary *state=[disk.state mutableCopy];state[@"history"]=[history copy];
+    if(immediate)return [self commitOnQueue:state error:error];
+    disk.state=[state copy];disk.dirtyHistory++;[self publish];
+    if(disk.dirtyHistory>=10)return [self flushHistoryOnQueue:error];
+    if(!disk.historyTimer){
+        disk.historyTimer=dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,0,0,CSAIStoreQueue());
+        dispatch_source_set_timer(disk.historyTimer,dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC),DISPATCH_TIME_FOREVER,100*NSEC_PER_MSEC);
+        // The timer keeps accepted history alive until its one-shot flush, even after account switching.
+        dispatch_source_set_event_handler(disk.historyTimer,^{[self flushHistoryOnQueue:NULL];});dispatch_resume(disk.historyTimer);
+    }
+    return YES;
+}
+- (BOOL)flushHistoryOnQueue:(NSError **)error {CSAIReplyDiskState *disk=[self diskState];if(!disk.dirtyHistory)return disk.ready;return [self commitOnQueue:disk.state error:error];}
+- (void)loadWithCompletion:(CSAIReplyStoreCompletion)completion {[self performAsync:^BOOL(NSError **error){return [self loadOnQueue:error];} completion:completion];}
+- (void)saveConfiguration:(NSDictionary *)configuration expectedConfiguration:(NSDictionary *)expected completion:(CSAIReplyStoreCompletion)completion {
+    NSDictionary *snapshot=ImmutablePropertyList(configuration),*base=ImmutablePropertyList(expected);
+    [self performAsync:^BOOL(NSError **error){if(!base)return Fail(error,@"配置快照无效，请刷新后重试。");return [self saveOnQueue:snapshot expected:base error:error];} completion:^(BOOL success,NSError *error){if(success)[NSNotificationCenter.defaultCenter postNotificationName:CSAIReplyConfigurationDidChange object:self];if(completion)completion(success,error);}];
+}
+- (void)claimMessageIDs:(NSArray<NSString *> *)identifiers completion:(CSAIReplyStoreCompletion)completion {
+    NSArray *snapshot=ImmutablePropertyList(identifiers);[self performAsync:^BOOL(NSError **error){return [self claimOnQueue:snapshot error:error];} completion:completion];
+}
+- (void)drainAliasBatch:(CSAIReplyAliasBatch *)batch {
+    NSArray<NSString *> *identifiers;NSArray<CSAIReplyAliasWaiter *> *waiters;
+    @synchronized(self){
+        if(self.aliasBatch==batch)self.aliasBatch=nil;
+        identifiers=batch.identifiers.allObjects;waiters=[batch.waiters copy];
+    }
+    // Accepted identity-only writes remain bound to this path after invalidate.
+    // They must not use performAsync:, which revokes queued business operations.
+    CSAIReplyDiskState *disk=[self diskState];NSError *error=nil;BOOL success=NO;
+    if(!disk.ready)error=disk.error?:CSAIError(1,@"AI 存储未就绪");
+    else {
+        NSMutableArray *missing=[NSMutableArray array];NSDate *now=NSDate.date;
+        for(NSString *identifier in identifiers){NSDate *date=disk.state[@"handled"][identifier];if(!date || [date timeIntervalSinceDate:now]<-7*86400)[missing addObject:identifier];}
+        success=!missing.count || [self claimOnQueue:missing error:&error];
+    }
+    dispatch_async(dispatch_get_main_queue(),^{
+        NSError *admissionFailure;
+        @synchronized(self){
+            self.aliasPendingIDs-=identifiers.count;self.aliasPendingCallbacks-=waiters.count;
+            admissionFailure=self.aliasAdmissionError;
+        }
+        for(CSAIReplyAliasWaiter *waiter in waiters){
+            if(!waiter.completion)continue;
+            if(![self validGeneration:waiter.generation]){
+                NSMutableDictionary *info=[@{NSLocalizedDescriptionKey:@"账号或存储状态已改变，本次操作已取消。"} mutableCopy];
+                if(success || [error.userInfo[CSAIReplyStoreCommitUncertainKey] boolValue])info[CSAIReplyStoreCommitUncertainKey]=@YES;
+                waiter.completion(NO,[NSError errorWithDomain:@"com.wechatimprove.ai-reply" code:20 userInfo:info]);
+            }else waiter.completion(success && !admissionFailure,admissionFailure?:error);
+        }
+    });
+}
+- (void)claimMessageAliases:(NSArray<NSString *> *)identifiers completion:(CSAIReplyStoreCompletion)completion {
+    NSMutableSet<NSString *> *snapshot=[NSMutableSet set];NSError *failure=nil;
+    if(![identifiers isKindOfClass:NSArray.class] || !identifiers.count || identifiers.count>5000)failure=CSAIError(21,@"消息别名无效，自动回复已暂停。");
+    else for(id identifier in identifiers){
+        if(!String(identifier,1,1024)){failure=CSAIError(21,@"消息别名无效，自动回复已暂停。");break;}
+        [snapshot addObject:[identifier copy]];
+    }
+    @synchronized(self){
+        if(!failure)failure=self.aliasAdmissionError;
+        NSUInteger added=0;for(NSString *identifier in snapshot)if(![self.aliasBatch.identifiers containsObject:identifier])added++;
+        if(!failure && (added>5000-self.aliasPendingIDs || self.aliasPendingCallbacks>=256))failure=CSAIError(21,@"消息别名待保存数量过多，自动回复已暂停，请重新打开设置后重试。");
+        if(failure){
+            if(!self.aliasAdmissionError)self.aliasAdmissionError=failure;
+            self.snapshotReady=NO;self.snapshotError=self.aliasAdmissionError;
+            if(completion){NSError *reported=self.aliasAdmissionError;dispatch_async(dispatch_get_main_queue(),^{completion(NO,reported);});}
+            return;
+        }
+        BOOL enqueue=!self.aliasBatch;if(enqueue)self.aliasBatch=[CSAIReplyAliasBatch new];
+        CSAIReplyAliasBatch *batch=self.aliasBatch;[batch.identifiers unionSet:snapshot];
+        CSAIReplyAliasWaiter *waiter=[CSAIReplyAliasWaiter new];waiter.generation=self.generation;waiter.completion=completion;[batch.waiters addObject:waiter];
+        self.aliasPendingIDs+=added;self.aliasPendingCallbacks++;
+        // Enqueue while admission is locked so a following account load cannot overtake it.
+        if(enqueue)dispatch_async(CSAIStoreQueue(),^{@autoreleasepool{[self drainAliasBatch:batch];}});
+    }
+}
+- (void)appendHistory:(NSDictionary *)record completion:(CSAIReplyStoreCompletion)completion {
+    NSDictionary *snapshot=ImmutablePropertyList(record);[self performAsync:^BOOL(NSError **error){return [self historyOnQueue:snapshot immediate:NO error:error];} completion:completion];
+}
+- (void)flushHistoryWithCompletion:(CSAIReplyStoreCompletion)completion {[self performAsync:^BOOL(NSError **error){return [self flushHistoryOnQueue:error];} completion:completion];}
++ (BOOL)flushPendingHistory:(NSError **)error {
+    if(NSThread.isMainThread)return Fail(error,@"请在后台队列准备 AI 历史备份。");
+    __block NSError *failure=nil;__block BOOL success=YES;
+    CSAIStoreSync(^{
+        NSArray<CSAIReplyDiskState *> *states=CSAIStoreDiskStates().objectEnumerator.allObjects;
+        for(CSAIReplyDiskState *disk in states){
+            if(!disk.dirtyHistory)continue;
+            if(!disk.ready){success=NO;failure=disk.error?:CSAIError(1,@"AI 存储未就绪");break;}
+            CSAIReplyStore *store=disk.stores.allObjects.firstObject;
+            if(!store){success=NO;failure=CSAIError(1,@"无法刷新 AI 历史记录");break;}
+            if(![store flushHistoryOnQueue:&failure]){success=NO;break;}
+        }
+    });
+    if(error)*error=failure;return success;
+}
+// Only offline tools and host regression fixtures use these blocking compatibility methods.
+- (BOOL)load {__block BOOL result;CSAIStoreSync(^{result=[self loadOnQueue:NULL];});return result;}
+- (BOOL)saveConfiguration:(NSDictionary *)configuration error:(NSError **)error {
+    NSDictionary *snapshot=ImmutablePropertyList(configuration);__block BOOL result;__block NSError *failure=nil;
+    CSAIStoreSync(^{result=[self saveOnQueue:snapshot expected:nil error:&failure];});if(error)*error=failure;
+    if(result)[NSNotificationCenter.defaultCenter postNotificationName:CSAIReplyConfigurationDidChange object:self];return result;
+}
+- (BOOL)hasHandledMessageID:(NSString *)identifier {@synchronized(self){NSDate *date=self.state[@"handled"][identifier];return date && [date timeIntervalSinceNow]>=-7*86400;}}
+- (BOOL)claimMessageIDs:(NSArray<NSString *> *)identifiers error:(NSError **)error {
+    NSArray *snapshot=ImmutablePropertyList(identifiers);__block BOOL result;__block NSError *failure=nil;CSAIStoreSync(^{result=[self claimOnQueue:snapshot error:&failure];});if(error)*error=failure;return result;
+}
+- (BOOL)appendHistory:(NSDictionary *)record error:(NSError **)error {
+    NSDictionary *snapshot=ImmutablePropertyList(record);__block BOOL result;__block NSError *failure=nil;CSAIStoreSync(^{result=[self historyOnQueue:snapshot immediate:YES error:&failure];});if(error)*error=failure;return result;
+}
 @end

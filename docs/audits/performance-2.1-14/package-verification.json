@@ -1,0 +1,92 @@
+{
+  "packages": [
+    {
+      "scheme": "rootless",
+      "package": "com.wechat.improve_2.1-14_iphoneos-arm64.deb",
+      "version": "2.1-14",
+      "package_architecture": "iphoneos-arm64",
+      "dylib_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "install_path": "/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "minimum_iOS": [
+        "15.0",
+        "15.0"
+      ],
+      "retained_symbols": [
+        "_CSCFPaymentOutputAllowed",
+        "_CSCFUnreadPanelInstallHooks",
+        "_CSCFUnreadPanelNotifyCount",
+        "_CSCFIncomingCallToken",
+        "_CSLayoutPreferencesRead",
+        "_CSGroupCopyFoldedRowsSelectingSummary",
+        "_CSAIReplyMessageIngressEnabled",
+        "_CSListCornerPerformSessionTableLayout"
+      ],
+      "silence_bridge_symbol_absent": true,
+      "filter_matches_source": true,
+      "staged_payload_matches_package": true,
+      "version_string_present": true,
+      "uuid_matches_dSYM": {
+        "arm64": "F0F7A817-EF7D-3251-BC49-5C032187D808",
+        "arm64e": "9D7A2C1E-0F5E-3CC5-90A5-D50F77886FB3"
+      },
+      "dylib_sha256": "742c2a43ecb7937f7175b4d0e7b80021f76762ef5e8be9f8aa26e79ed1ed9426"
+    },
+    {
+      "scheme": "rootful",
+      "package": "com.wechat.improve_2.1-14_iphoneos-arm.deb",
+      "version": "2.1-14",
+      "package_architecture": "iphoneos-arm",
+      "dylib_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "install_path": "/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "minimum_iOS": [
+        "15.0",
+        "15.0"
+      ],
+      "retained_symbols": [
+        "_CSCFPaymentOutputAllowed",
+        "_CSCFUnreadPanelInstallHooks",
+        "_CSCFUnreadPanelNotifyCount",
+        "_CSCFIncomingCallToken",
+        "_CSLayoutPreferencesRead",
+        "_CSGroupCopyFoldedRowsSelectingSummary",
+        "_CSAIReplyMessageIngressEnabled",
+        "_CSListCornerPerformSessionTableLayout"
+      ],
+      "silence_bridge_symbol_absent": true,
+      "filter_matches_source": true,
+      "staged_payload_matches_package": true,
+      "version_string_present": true,
+      "uuid_matches_dSYM": {
+        "arm64": "C5391FE5-9D61-38EC-9E6B-C75B58EA3109",
+        "arm64e": "78D6592A-BD7A-3B28-A6CF-EADCE6D36D5C"
+      },
+      "dylib_sha256": "bc47521858164cf115c6a1e901dfdba6cc1523c8ce6f301bd9846ff2e09cce22"
+    }
+  ],
+  "symbols_zip_crc_valid": true,
+  "symbol_files": 12,
+  "artifacts": [
+    {
+      "file": "com.wechat.improve_2.1-14_iphoneos-arm.deb",
+      "bytes": 1483868,
+      "sha256": "37f215d097e1b63424091725ae0e01de83b3eb3893b3b7314cfa7b3911553755"
+    },
+    {
+      "file": "com.wechat.improve_2.1-14_iphoneos-arm64.deb",
+      "bytes": 1483810,
+      "sha256": "8b5103123329f7b896b7dba30f4a2c289f2722accac091c02655916c0e904a84"
+    },
+    {
+      "file": "com.wechat.improve_2.1-14_symbols.zip",
+      "bytes": 10873628,
+      "sha256": "ad2043e1e8ccc49c70d17fc2ba2ec9f12f72b6156f7e7e973f07d2c098be8a6d"
+    }
+  ],
+  "device_installed": false
+}

@@ -26,7 +26,8 @@ features = 0
 independent = {'CloseFriendCallHooks.xm', 'CloseFriendCallReplyHooks.xm',
                'CloseFriendContactHooks.xm', 'CloseFriendLifecycleHooks.xm',
                'CloseFriendNotificationHooks.xm', 'CloseFriendProfileHooks.xm',
-               'CloseFriendSearchHooks.xm', 'CloseFriendSocialHooks.xm'}
+               'CloseFriendSearchHooks.xm', 'CloseFriendSocialHooks.xm',
+               'CloseFriendUnreadPanelHooks.xm'}
 independent_checked = 0
 for path in sorted((root / 'Hooks').glob('*.xm')):
     generated = subprocess.check_output([str(logos), str(path)], text=True)

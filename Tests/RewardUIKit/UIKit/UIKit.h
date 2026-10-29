@@ -16,6 +16,7 @@ typedef NS_OPTIONS(NSUInteger, UIViewAutoresizing) { UIViewAutoresizingFlexibleW
 @property(nonatomic, weak) UIViewController *parentViewController;
 @property(nonatomic, strong) NSMutableArray<UIViewController *> *childViewControllers;
 - (void)viewDidLoad;
+- (void)viewDidAppear:(BOOL)animated;
 - (void)addChildViewController:(UIViewController *)child;
 - (void)didMoveToParentViewController:(UIViewController *)parent;
 @property(nonatomic, weak) UINavigationController *navigationController;
@@ -23,6 +24,14 @@ typedef NS_OPTIONS(NSUInteger, UIViewAutoresizing) { UIViewAutoresizingFlexibleW
 @property(nonatomic) BOOL isBeingDismissed;
 @property(nonatomic, readonly) BOOL isViewLoaded;
 - (void)presentViewController:(UIViewController *)controller animated:(BOOL)animated completion:(void (^)(void))completion;
+@end
+typedef NS_ENUM(NSInteger, UIApplicationState) { UIApplicationStateActive, UIApplicationStateInactive, UIApplicationStateBackground };
+FOUNDATION_EXPORT NSNotificationName const UIApplicationDidBecomeActiveNotification;
+FOUNDATION_EXPORT NSNotificationName const UIApplicationWillResignActiveNotification;
+FOUNDATION_EXPORT NSNotificationName const UIApplicationDidEnterBackgroundNotification;
+@interface UIApplication : NSObject
++ (instancetype)sharedApplication;
+@property(nonatomic) UIApplicationState applicationState;
 @end
 @interface UINavigationController : UIViewController
 @property(nonatomic, copy) NSArray<UIViewController *> *viewControllers;
