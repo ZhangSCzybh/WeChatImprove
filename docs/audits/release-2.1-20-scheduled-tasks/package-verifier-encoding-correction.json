@@ -1,0 +1,32 @@
+{
+  "initial_check": "Expected UTF-8 Chinese labels in Mach-O; failed before symbols publication.",
+  "correction": "Check UTF-16LE Objective-C __ustring constants as well as UTF-8; no production code or package changes.",
+  "evidence": [
+    {
+      "scheme": "rootful",
+      "labels": {
+        "时间段内执行": {
+          "utf-8": false,
+          "utf-16le": true
+        },
+        "停止": {
+          "utf-8": false,
+          "utf-16le": true
+        }
+      }
+    },
+    {
+      "scheme": "rootless",
+      "labels": {
+        "时间段内执行": {
+          "utf-8": false,
+          "utf-16le": true
+        },
+        "停止": {
+          "utf-8": false,
+          "utf-16le": true
+        }
+      }
+    }
+  ]
+}

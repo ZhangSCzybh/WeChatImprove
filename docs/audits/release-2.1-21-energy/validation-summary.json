@@ -1,0 +1,85 @@
+{
+  "version": "2.1-21",
+  "group_suites": [
+    {
+      "name": "group-incremental",
+      "passed": true,
+      "output": "Group incremental: 187 checks, 0 failures"
+    },
+    {
+      "name": "group-publication",
+      "passed": true,
+      "output": "Group publication plan: 62 checks, 0 failures"
+    },
+    {
+      "name": "group-selection",
+      "passed": true,
+      "output": "Group selection stability: 30 checks, 0 failures"
+    },
+    {
+      "name": "group-search",
+      "passed": true,
+      "output": "Group search: 54 checks, 0 failures"
+    },
+    {
+      "name": "group-header",
+      "passed": true,
+      "output": "Group header semantics: 46 checks, 0 failures"
+    },
+    {
+      "name": "group-appearance",
+      "passed": true,
+      "output": "Group appearance: 8 checks, 0 failures"
+    },
+    {
+      "name": "group-business",
+      "passed": true,
+      "output": "Group business rows: 633 checks, 0 failures"
+    },
+    {
+      "name": "group-badges",
+      "passed": true,
+      "output": "Group badges: 136 checks, 0 failures"
+    },
+    {
+      "name": "list-corners",
+      "passed": true,
+      "output": "List corners: 1631 checks, 0 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)"
+    },
+    {
+      "name": "group-lifecycle",
+      "passed": true,
+      "output": "Hidden native event publications: 0 / 20 events\nGroup lifecycle: 223 checks, 0 failures"
+    },
+    {
+      "name": "group-interactions",
+      "passed": true,
+      "output": "Group interactions: 124 checks, 0 failures"
+    },
+    {
+      "name": "group-viewport",
+      "passed": true,
+      "output": "Group viewport: 72 checks, 0 failures"
+    }
+  ],
+  "additional_privacy_suites": [
+    {
+      "name": "close-friend-session",
+      "checks": 229,
+      "passed": true
+    },
+    {
+      "name": "close-friend-privacy",
+      "checks": 38,
+      "passed": true
+    },
+    {
+      "name": "close-friend-recovery",
+      "checks": 24,
+      "passed": true
+    }
+  ],
+  "production_changes_frozen": true,
+  "device_installed": false,
+  "device_power_measurement_for_new_release": false
+}

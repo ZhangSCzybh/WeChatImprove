@@ -32,6 +32,7 @@ NSNotificationName const CSScheduledTasksDidChange=@"CSScheduledTasksDidChange";
 - (void)changed:(NSNotification *)note { (void)note; dispatch_async(dispatch_get_main_queue(),^{ [self refresh]; }); }
 - (void)stopTimer { if (_timer) { dispatch_source_cancel(_timer); _timer=nil; } }
 - (NSTimeInterval)elapsedTime {return NSProcessInfo.processInfo.systemUptime;}
+- (NSDate *)currentDate {return NSDate.date;}
 - (NSURL *)fileURLForAccount:(NSString *)account {
     NSURL *library=[NSFileManager.defaultManager URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask].firstObject;
     return CSScheduledTaskFileURL([library URLByAppendingPathComponent:@"Preferences/WeChatImprove" isDirectory:YES],account);
@@ -84,6 +85,9 @@ NSNotificationName const CSScheduledTasksDidChange=@"CSScheduledTasksDidChange";
 }
 - (BOOL)runSnapshotCurrent:(CSScheduledTaskStore *)store epoch:(NSUInteger)epoch generation:(NSUInteger)generation claim:(NSDictionary *)claim {
     if(self.store!=store || self.runningStore!=store || self.epoch!=epoch || self.operationGeneration!=generation || self.elapsedTime>self.runDeadline || self.savingConfiguration || !store.ready || !store.enabled || !CSBackupIsReady() || CSBackupAccountIsSuspended() || CSBackupAccountEpoch()!=epoch)return NO;
+    // Async durable writes and native preparation may cross the window end.
+    // Recheck at each existing handoff boundary; old rules keep their budget.
+    if([claim[@"task"][@"mode"] isEqual:@"window"] && !CSScheduledTaskAllowsExecution(claim[@"task"],claim[@"occurrence"],self.currentDate))return NO;
     // A single-use task may turn itself off while advancing its durable claim.
     // Match the exact post-claim task so edits/deletion cannot revive its old text.
     NSString *identifier=claim[@"task"][@"id"];NSDictionary *current=nil;
@@ -122,6 +126,9 @@ NSNotificationName const CSScheduledTasksDidChange=@"CSScheduledTasksDidChange";
                 }else detail=@"当前微信发送接口不可用，本次未发送。";
             }
         }@catch(__unused NSException *e){result=@"unknown";detail=@"发送过程异常，结果未确认；不会自动重发。";}
+        if([result isEqual:@"failed"] && [claim[@"task"][@"mode"] isEqual:@"window"] && !CSScheduledTaskAllowsExecution(claim[@"task"],claim[@"occurrence"],self.currentDate)){
+            result=@"skipped";detail=@"已超出本次执行时间段，本次未发送。";
+        }
         [store finishClaim:claim[@"id"] result:result detail:detail completion:^(BOOL success,NSError *failure){(void)success;(void)failure;[self finishedRunForStore:store];}];
     }];
 }

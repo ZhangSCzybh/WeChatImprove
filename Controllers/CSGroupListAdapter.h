@@ -59,6 +59,12 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 - (void)requestRefresh;
 - (void)beginNativeChange;
 - (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind;
+/// A nil set means the content event cannot be attributed to individual sessions.
+- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind sessionUserNames:(nullable NSSet<NSString *> *)names;
+/// Bounded in-memory sampling only; no per-message log or persistent identifiers.
+- (void)recordRefreshReason:(NSString *)reason;
+- (NSDictionary *)refreshDiagnosticsSnapshot;
+- (void)resetRefreshDiagnostics;
 - (void)endNativeChange;
 /// Passive badge-source reads merge 80ms after the latest notification, at most
 /// 250ms from the first; privacy, lifecycle and native restoration stay urgent.

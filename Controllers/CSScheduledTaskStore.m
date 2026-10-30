@@ -16,7 +16,7 @@ static NSError *CSTaskError(NSString *text) { return [NSError errorWithDomain:CS
 static BOOL CSString(id v, NSUInteger max) { return [v isKindOfClass:NSString.class] && [v length]>0 && [v length]<=max; }
 static BOOL CSInteger(id v, NSInteger low, NSInteger high) { return [v isKindOfClass:NSNumber.class] && isfinite([v doubleValue]) && [v doubleValue]==[v integerValue] && [v integerValue]>=low && [v integerValue]<=high; }
 static NSArray *CSDefinitionKeys(void) {
-    return @[@"id",@"title",@"target",@"text",@"enabled",@"catchUp",@"mode",@"anchor",@"zone",@"interval",@"hour",@"minute",@"weekdays"];
+    return @[@"id",@"title",@"target",@"text",@"enabled",@"catchUp",@"mode",@"anchor",@"zone",@"interval",@"hour",@"minute",@"weekdays",@"windowUnit",@"windowStart",@"windowEnd"];
 }
 NSURL *CSScheduledTaskFileURL(NSURL *resourceRoot, NSString *account) {
     NSData *data=[account dataUsingEncoding:NSUTF8StringEncoding]; unsigned char hash[CC_SHA256_DIGEST_LENGTH];
@@ -60,10 +60,16 @@ BOOL CSScheduledTaskValidate(NSDictionary *t, NSError **error) {
     BOOL ok=[t isKindOfClass:NSDictionary.class];
     if (ok) ok=CSString(t[@"id"],80) && CSString(t[@"title"],80) && CSString(t[@"target"],256) && CSString(t[@"text"],4000) && [t[@"text"] stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet].length &&
         [t[@"enabled"] isKindOfClass:NSNumber.class] && [t[@"catchUp"] isKindOfClass:NSNumber.class] && [t[@"anchor"] isKindOfClass:NSDate.class] && isfinite([t[@"anchor"] timeIntervalSince1970]) &&
-        CSString(t[@"zone"],100) && [NSTimeZone timeZoneWithName:t[@"zone"]] && [@[@"once",@"minutes",@"hours",@"daily",@"weekly"] containsObject:t[@"mode"]];
+        CSString(t[@"zone"],100) && [NSTimeZone timeZoneWithName:t[@"zone"]] && [@[@"once",@"minutes",@"hours",@"daily",@"weekly",@"window"] containsObject:t[@"mode"]];
     if (ok && [@[@"minutes",@"hours"] containsObject:t[@"mode"]]) ok=CSInteger(t[@"interval"],1,[t[@"mode"] isEqual:@"minutes"]?1440:168);
     if (ok && [@[@"daily",@"weekly"] containsObject:t[@"mode"]]) ok=CSInteger(t[@"hour"],0,23) && CSInteger(t[@"minute"],0,59);
-    if (ok && [t[@"mode"] isEqual:@"weekly"]) {
+    if (ok && [t[@"mode"] isEqual:@"window"]) {
+        ok=[@[@"minutes",@"hours"] containsObject:t[@"windowUnit"]] &&
+            CSInteger(t[@"interval"],1,[t[@"windowUnit"] isEqual:@"minutes"]?1440:168) &&
+            CSInteger(t[@"windowStart"],0,1439) && CSInteger(t[@"windowEnd"],0,1439) &&
+            ![t[@"windowStart"] isEqual:t[@"windowEnd"]];
+    }
+    if (ok && [@[@"weekly",@"window"] containsObject:t[@"mode"]]) {
         ok=[t[@"weekdays"] isKindOfClass:NSArray.class] && [t[@"weekdays"] count]>0 && [t[@"weekdays"] count]<=7;
         if (ok) for (id day in t[@"weekdays"]) if (!CSInteger(day,1,7)) { ok=NO; break; }
     }
@@ -83,10 +89,52 @@ static NSDate *CSCalendarOccurrence(NSDictionary *t, NSDate *pivot, BOOL backwar
     }
     return best;
 }
+static NSCalendar *CSWindowCalendar(NSDictionary *task) {
+    NSCalendar *calendar=[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    calendar.timeZone=[NSTimeZone timeZoneWithName:task[@"zone"]];
+    return calendar;
+}
+static NSDate *CSWindowTime(NSCalendar *calendar, NSDate *day, NSInteger minute) {
+    NSDateComponents *components=[NSDateComponents new];components.hour=minute/60;components.minute=minute%60;components.second=0;
+    NSDate *date=[calendar nextDateAfterDate:[day dateByAddingTimeInterval:-0.001] matchingComponents:components options:NSCalendarMatchNextTime|NSCalendarMatchFirst];
+    return date && [calendar isDate:date inSameDayAsDate:day]?date:nil;
+}
+static BOOL CSWindowBounds(NSDictionary *task, NSCalendar *calendar, NSDate *day, NSDate **start, NSDate **end) {
+    if (![task[@"weekdays"] containsObject:@([calendar component:NSCalendarUnitWeekday fromDate:day])]) return NO;
+    NSInteger from=[task[@"windowStart"] integerValue],to=[task[@"windowEnd"] integerValue];
+    NSDate *endDay=to<from?[calendar dateByAddingUnit:NSCalendarUnitDay value:1 toDate:day options:0]:day;
+    NSDate *first=CSWindowTime(calendar,day,from),*last=CSWindowTime(calendar,endDay,to);
+    // A DST gap can collapse a short window. Such a day contains no executions.
+    if (!first || !last || [first compare:last]!=NSOrderedAscending) return NO;
+    *start=first;*end=last;return YES;
+}
+static NSDate *CSWindowOccurrence(NSDictionary *task, NSDate *pivot, BOOL backward) {
+    NSCalendar *calendar=CSWindowCalendar(task);NSDate *anchor=task[@"anchor"];
+    NSDate *search=!backward && [pivot compare:anchor]==NSOrderedAscending?anchor:pivot;
+    NSDate *day=[calendar startOfDayForDate:search];
+    NSTimeInterval period=[task[@"interval"] doubleValue]*([task[@"windowUnit"] isEqual:@"minutes"]?60:3600);
+    // Search past a selected day's DST-collapsed window as well as the current
+    // week. Work stays bounded to local days; slots are located arithmetically.
+    for (NSInteger offset=backward?0:-1;backward?offset>=-22:offset<=21;backward?offset--:offset++) {
+        NSDate *start=nil,*end=nil,*candidateDay=[calendar dateByAddingUnit:NSCalendarUnitDay value:offset toDate:day options:0];
+        if (!CSWindowBounds(task,calendar,candidateDay,&start,&end)) continue;
+        double slot;
+        if (backward) slot=fmin(floor([pivot timeIntervalSinceDate:start]/period),ceil([end timeIntervalSinceDate:start]/period)-1);
+        else slot=fmax(0,fmax(floor([pivot timeIntervalSinceDate:start]/period)+1,ceil([anchor timeIntervalSinceDate:start]/period)));
+        if (slot<0) continue;
+        NSDate *candidate=[start dateByAddingTimeInterval:slot*period];
+        if ([candidate compare:anchor]==NSOrderedAscending || [candidate compare:start]==NSOrderedAscending || [candidate compare:end]!=NSOrderedAscending) continue;
+        // Start days are ordered and their windows cannot overlap. The first
+        // qualifying day's arithmetic slot is already the nearest occurrence.
+        if (backward?[candidate compare:pivot]!=NSOrderedDescending:[candidate compare:pivot]==NSOrderedDescending) return candidate;
+    }
+    return nil;
+}
 NSDate *CSScheduledTaskNext(NSDictionary *t, NSDate *after) {
     if (!CSScheduledTaskValidate(t,NULL)) return nil;
     NSDate *anchor=t[@"anchor"]; NSString *mode=t[@"mode"];
     if ([mode isEqual:@"once"]) return [anchor compare:after]==NSOrderedDescending?anchor:nil;
+    if ([mode isEqual:@"window"]) return CSWindowOccurrence(t,after,NO);
     if ([mode isEqual:@"minutes"] || [mode isEqual:@"hours"]) {
         double period=[t[@"interval"] doubleValue]*([mode isEqual:@"minutes"]?60:3600);
         double n=fmax(0,floor([after timeIntervalSinceDate:anchor]/period)+1); return [anchor dateByAddingTimeInterval:n*period];
@@ -98,17 +146,38 @@ NSDate *CSScheduledTaskLatest(NSDictionary *t, NSDate *now) {
     if (!CSScheduledTaskValidate(t,NULL) || [now compare:t[@"anchor"]]==NSOrderedAscending) return nil;
     NSString *mode=t[@"mode"]; NSDate *anchor=t[@"anchor"];
     if ([mode isEqual:@"once"]) return anchor;
+    if ([mode isEqual:@"window"]) return CSWindowOccurrence(t,now,YES);
     if ([mode isEqual:@"minutes"] || [mode isEqual:@"hours"]) {
         double period=[t[@"interval"] doubleValue]*([mode isEqual:@"minutes"]?60:3600);
         return [anchor dateByAddingTimeInterval:floor([now timeIntervalSinceDate:anchor]/period)*period];
     }
     return CSCalendarOccurrence(t,[now dateByAddingTimeInterval:0.001],YES);
 }
+BOOL CSScheduledTaskAllowsExecution(NSDictionary *task, NSDate *occurrence, NSDate *now) {
+    if (![task[@"mode"] isEqual:@"window"]) return YES;
+    if (!CSScheduledTaskValidate(task,NULL) || ![occurrence isKindOfClass:NSDate.class] || ![now isKindOfClass:NSDate.class] ||
+        !isfinite(occurrence.timeIntervalSince1970) || !isfinite(now.timeIntervalSince1970) ||
+        [occurrence compare:task[@"anchor"]]==NSOrderedAscending || [now compare:occurrence]==NSOrderedAscending) return NO;
+    NSCalendar *calendar=CSWindowCalendar(task);NSDate *day=[calendar startOfDayForDate:occurrence];
+    for (NSInteger offset=0;offset>=-1;offset--) {
+        NSDate *start=nil,*end=nil,*candidateDay=[calendar dateByAddingUnit:NSCalendarUnitDay value:offset toDate:day options:0];
+        if (CSWindowBounds(task,calendar,candidateDay,&start,&end) && [occurrence compare:start]!=NSOrderedAscending &&
+            [occurrence compare:end]==NSOrderedAscending && [now compare:end]==NSOrderedAscending) return YES;
+    }
+    return NO;
+}
 NSString *CSScheduledTaskRuleDescription(NSDictionary *t) {
     NSString *mode=t[@"mode"];
     if ([mode isEqual:@"minutes"]) return [NSString stringWithFormat:@"每 %@ 分钟",t[@"interval"]];
     if ([mode isEqual:@"hours"]) return [NSString stringWithFormat:@"每 %@ 小时",t[@"interval"]];
     if ([mode isEqual:@"once"]) return @"单次";
+    if ([mode isEqual:@"window"]) {
+        NSArray *names=@[@"日",@"一",@"二",@"三",@"四",@"五",@"六"];NSMutableArray *days=[NSMutableArray array];
+        for (NSInteger day=1;day<=7;day++) if ([t[@"weekdays"] containsObject:@(day)]) [days addObject:names[day-1]];
+        NSString *prefix=days.count==7?@"每天":[@"每周" stringByAppendingString:[days componentsJoinedByString:@"、"]];
+        NSInteger start=[t[@"windowStart"] integerValue],end=[t[@"windowEnd"] integerValue];
+        return [NSString stringWithFormat:@"%@ %02ld:%02ld–%@%02ld:%02ld · 每 %@ %@（%@）",prefix,(long)(start/60),(long)(start%60),end<start?@"次日 ":@"",(long)(end/60),(long)(end%60),t[@"interval"],[t[@"windowUnit"] isEqual:@"hours"]?@"小时":@"分钟",t[@"zone"]?:@""];
+    }
     NSString *prefix=@"每天";
     if ([mode isEqual:@"weekly"]) { NSMutableArray *days=[NSMutableArray array]; NSArray *names=@[@"日",@"一",@"二",@"三",@"四",@"五",@"六"]; for (NSNumber *d in t[@"weekdays"]) if (d.integerValue>=1 && d.integerValue<=7) [days addObject:names[d.integerValue-1]]; prefix=[@"每周" stringByAppendingString:[days componentsJoinedByString:@"、"]]; }
     return [NSString stringWithFormat:@"%@ %02ld:%02ld（%@）",prefix,(long)[t[@"hour"] integerValue],(long)[t[@"minute"] integerValue],t[@"zone"]?:@""];
@@ -265,9 +334,20 @@ static NSError *CSTaskCancelled(void) {return CSTaskError(@"账号或任务状�
     if (!self.queueEnabled || !_queueReady) return nil;
     NSMutableArray *tasks=[self.queueTasks mutableCopy]; NSUInteger i=[tasks indexOfObjectPassingTest:^BOOL(NSDictionary *t,NSUInteger index,BOOL *stop){ (void)index;(void)stop; return [t[@"id"] isEqual:identifier]; }]; if (i==NSNotFound) return nil;
     NSDictionary *task=tasks[i]; NSDate *due=task[@"nextRun"]; if (![task[@"enabled"] boolValue] || !due || [due compare:now]==NSOrderedDescending) return nil;
-    NSDate *occurrence=CSScheduledTaskLatest(task,now); if (!occurrence) return nil;
+    NSDate *occurrence=CSScheduledTaskLatest(task,now);
+    if (!occurrence) {
+        if ([task[@"mode"] isEqual:@"window"]) {
+            // Repair an overdue persisted timestamp with no legal occurrence.
+            // Leaving it due would make the manager retry it every second.
+            NSMutableDictionary *repaired=[task mutableCopy];NSDate *next=CSScheduledTaskNext(task,now);
+            if (next) repaired[@"nextRun"]=next;else {[repaired removeObjectForKey:@"nextRun"];repaired[@"enabled"]=@NO;}tasks[i]=repaired;
+            NSMutableArray *history=[self.queueHistory mutableCopy];[history insertObject:@{@"id":NSUUID.UUID.UUIDString,@"taskID":identifier,@"title":task[@"title"],@"date":now,@"result":@"skipped",@"detail":@"已跳过不在有效时间段内的执行时间"} atIndex:0];while(history.count>50)[history removeLastObject];
+            NSMutableDictionary *state=[_state mutableCopy];state[@"tasks"]=tasks;state[@"history"]=history;[self persist:state];
+        }
+        return nil;
+    }
     BOOL duplicate=task[@"lastOccurrence"] && [occurrence compare:task[@"lastOccurrence"]]!=NSOrderedDescending;
-    NSTimeInterval late=[now timeIntervalSinceDate:occurrence]; BOOL send=!duplicate && (late<=30 || ([task[@"catchUp"] boolValue] && late<=600));
+    NSTimeInterval late=[now timeIntervalSinceDate:occurrence]; BOOL send=!duplicate && CSScheduledTaskAllowsExecution(task,occurrence,now) && (late<=30 || ([task[@"catchUp"] boolValue] && late<=600));
     NSMutableDictionary *t=[task mutableCopy]; NSDate *base=duplicate?task[@"lastOccurrence"]:now; NSDate *next=CSScheduledTaskNext(t,base);
     if (next) t[@"nextRun"]=next; else { [t removeObjectForKey:@"nextRun"]; t[@"enabled"]=@NO; } if (!duplicate) t[@"lastOccurrence"]=occurrence; tasks[i]=t;
     NSString *claimID=NSUUID.UUID.UUIDString;

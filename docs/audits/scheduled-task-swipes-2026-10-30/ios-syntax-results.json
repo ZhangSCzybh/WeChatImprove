@@ -1,0 +1,50 @@
+[
+  {
+    "arch": "arm64",
+    "command": [
+      "xcrun",
+      "--sdk",
+      "iphoneos",
+      "clang",
+      "-fobjc-arc",
+      "-fblocks",
+      "-fsyntax-only",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-unused-parameter",
+      "-target",
+      "arm64-apple-ios15.0",
+      "-IHeaders",
+      "-IHooks",
+      "-IControllers",
+      "Controllers/CSScheduledTaskSettingsViewController.m"
+    ],
+    "exit_code": 0,
+    "warnings": 0
+  },
+  {
+    "arch": "arm64e",
+    "command": [
+      "xcrun",
+      "--sdk",
+      "iphoneos",
+      "clang",
+      "-fobjc-arc",
+      "-fblocks",
+      "-fsyntax-only",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-unused-parameter",
+      "-target",
+      "arm64e-apple-ios15.0",
+      "-IHeaders",
+      "-IHooks",
+      "-IControllers",
+      "Controllers/CSScheduledTaskSettingsViewController.m"
+    ],
+    "exit_code": 0,
+    "warnings": 0
+  }
+]

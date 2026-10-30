@@ -64,7 +64,7 @@ static BOOL Option(NSString *suffix) {
 @property (nonatomic, copy) NSArray<WESessionTabItem *> *displayedTabs;
 @property (nonatomic, copy) NSDictionary<NSString *,id> *identityDisplayPaths;
 @property (nonatomic, copy) NSString *publishedTabID;
-@property (nonatomic) BOOL projecting, chromeVisible;
+@property (nonatomic) BOOL projecting, chromeVisible, publicationNeedsFullReload;
 @property (nonatomic) BOOL privacyRefreshPending;
 @property (nonatomic,strong) CSCloseFriendListShield *privacyShield;
 @property (nonatomic) BOOL searchChromeVisible;
@@ -99,9 +99,20 @@ static BOOL Option(NSString *suffix) {
 + (void)requestTabBadgeSourcesRefresh;
 @property (atomic) NSUInteger modelRevision;
 @property (nonatomic) NSUInteger snapshotRevision, snapshotEpoch, refreshGeneration;
-@property (nonatomic) BOOL coalescingNotification, scheduledCoalesced;
+// Pending admission survives re-entrant publication. A UI wake never creates work.
+@property (nonatomic) BOOL coalescingNotification, scheduledCoalesced, pendingImmediateRefresh;
+@property (nonatomic) NSTimeInterval pendingRefreshDeadline, scheduledRefreshDeadline;
+@property (nonatomic, strong) NSMutableDictionary<NSString *,NSNumber *> *refreshDiagnosticCounts;
+@property (nonatomic, strong) NSMutableArray<NSDictionary *> *refreshDiagnosticEvents;
+@property (nonatomic) NSTimeInterval refreshDiagnosticStart;
+@property (nonatomic) NSUInteger refreshDiagnosticSamples;
+- (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay;
 @property (nonatomic) BOOL coalescedDispatchPending;
 @property (atomic) CSGroupChangeKind pendingChanges;
+@property (nonatomic, strong) NSMutableSet<NSString *> *pendingContentUserNames;
+@property (nonatomic) BOOL pendingContentUnattributed;
+@property (nonatomic, copy) NSSet<NSString *> *nativeChangeUserNames;
+@property (nonatomic, strong) NSMutableArray *nativeChangeIdentityStack;
 @property (atomic) BOOL recoveryPending;
 @property (nonatomic) BOOL scheduledInteraction, scheduledRecovery, appearanceDirty;
 @property (nonatomic) NSUInteger recoveryAttempts, recoveryRevision, interactionAttempts;
@@ -199,6 +210,7 @@ static BOOL Option(NSString *suffix) {
     adapter.presentationSuspended=suspended;
     if (suspended) {
         adapter.dirty=YES; [adapter invalidateNativeSnapshot]; adapter.cachedNativeSections=nil;
+        @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown|CSGroupChangeContent; adapter.pendingContentUnattributed=YES; }
         [adapter.projection discardComputationCache]; [adapter cancelScheduledRefresh];
         adapter.snapshotRetryAttempted=NO; adapter.snapshotRetryGeneration++;
         [adapter finishSuspendedBatches];
@@ -453,7 +465,7 @@ static BOOL Option(NSString *suffix) {
     }
 }
 + (void)settingsChanged {
-    dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } [adapter invalidateNativeSnapshot]; adapter.appearanceDirty=YES; [adapter requestTabBadgeSourceRefresh]; [adapter refresh]; [adapter layout]; } });
+    dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown|CSGroupChangeContent; adapter.pendingContentUnattributed=YES; } [adapter invalidateNativeSnapshot]; adapter.appearanceDirty=YES; [adapter requestTabBadgeSourceRefresh]; [adapter refresh]; [adapter layout]; } });
 }
 + (void)closeFriendPolicyChanged:(NSNotification *)notification {
     (void)notification;
@@ -495,7 +507,7 @@ static BOOL Option(NSString *suffix) {
     CSGroupAppInactive=![notification.name isEqual:UIApplicationDidBecomeActiveNotification];
     for (CSGroupListAdapter *adapter in Adapters().allObjects) {
         [adapter cancelScheduledRefresh]; [adapter invalidateNativeSnapshot];
-        @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } adapter.dirty=YES; adapter.recoveryPending=NO;
+        @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown|CSGroupChangeContent; adapter.pendingContentUnattributed=YES; } adapter.dirty=YES; adapter.recoveryPending=NO;
         adapter.cachedNativeSections=nil; [adapter.projection discardComputationCache];
         adapter.snapshotRetryGeneration++; adapter.snapshotRetryAttempted=NO;
         [adapter requestTabBadgeSourceRefresh];
@@ -509,9 +521,12 @@ static BOOL Option(NSString *suffix) {
 - (id)nativeSource { return self.proxies[@0].target; }
 - (void)installProxies {
     UITableView *table=self.table; if (!table) return;
-    table.dataSource=[self proxyForTarget:table.dataSource role:0];
-    table.delegate=[self proxyForTarget:table.delegate role:1];
-    table.prefetchDataSource=[self proxyForTarget:table.prefetchDataSource role:2];
+    id source=[self proxyForTarget:table.dataSource role:0];
+    id delegate=[self proxyForTarget:table.delegate role:1];
+    id prefetch=[self proxyForTarget:table.prefetchDataSource role:2];
+    if (table.dataSource!=source) table.dataSource=source;
+    if (table.delegate!=delegate) table.delegate=delegate;
+    if (table.prefetchDataSource!=prefetch) table.prefetchDataSource=prefetch;
 }
 - (id)proxyForTarget:(id)target role:(NSUInteger)role {
     if ([target isKindOfClass:CSGroupTableProxy.class]) return target;
@@ -759,9 +774,24 @@ static BOOL Option(NSString *suffix) {
     if (self.changeDepth || (!self.privacyRefreshPending && !self.presentationSuspended && (self.table.dragging || self.table.decelerating || self.table.editing || self.swipeActive))) { self.dirty=YES; return; }
     self.interactionDeadline=0; self.interactionAttempts=0;
     self.publishing=YES; self.dirty=NO;
+    // A synchronous privacy/selection publication consumes any queued generation.
+    // Otherwise an old timer can accidentally consume a later notification early.
+    self.refreshGeneration++; self.scheduled=NO;
+    self.scheduledCoalesced=NO; self.scheduledInteraction=NO; self.scheduledRecovery=NO;
+    self.coalescingNotification=NO; self.pendingImmediateRefresh=NO;
+    self.pendingRefreshDeadline=0; self.scheduledRefreshDeadline=0;
+    [self recordRefreshEvent:@"publish" delay:0];
     CSGroupChangeKind changes;
-    @synchronized (self) { changes=self.pendingChanges; self.pendingChanges=0; }
+    NSSet<NSString *> *contentUserNames; BOOL contentIdentityKnown;
+    @synchronized (self) {
+        changes=self.pendingChanges; self.pendingChanges=0;
+        contentUserNames=[self.pendingContentUserNames copy]; contentIdentityKnown=!self.pendingContentUnattributed;
+        self.pendingContentUserNames=nil; self.pendingContentUnattributed=NO;
+    }
     self.recoveryPending=NO;
+    NSUInteger publicationEpoch=CSCloseFriendAccountEpoch();
+    NSUInteger publicationPrivacyRevision=CSCloseFriendCurrentSnapshot().revision;
+    NSString *publicationAccount=CSGroupCurrentAccountID();
     BOOL finished=NO;
     @try {
         [self saveAnchor];
@@ -779,7 +809,14 @@ static BOOL Option(NSString *suffix) {
         BOOL keepsSearchGroup=enabled && self.searching && self.searchChromeVisible && account.length && !changed &&
             !self.nativePresentation && !self.nativeActions.count;
         if (keepsSearchGroup && !self.privacyRefreshPending && self.projecting) {
-            @synchronized (self) { self.pendingChanges|=changes|CSGroupChangeUnknown; }
+            @synchronized (self) {
+                self.pendingChanges|=changes|CSGroupChangeUnknown;
+                if (contentUserNames.count) {
+                    if (!self.pendingContentUserNames) self.pendingContentUserNames=[NSMutableSet set];
+                    [self.pendingContentUserNames unionSet:contentUserNames];
+                }
+                self.pendingContentUnattributed|=!contentIdentityKnown;
+            }
             self.cachedNativeSections=nil; [self.projection discardComputationCache];
             [self layout]; finished=YES; return;
         }
@@ -843,13 +880,35 @@ static BOOL Option(NSString *suffix) {
             [self.chrome updateUnreadCount:hidden ? 0 : count hasRedDot:!hidden && badge.redDot forTabIndex:(NSInteger)index];
         }];
         [self layout];
+        NSString *currentPublicationAccount=CSGroupCurrentAccountID();
+        if (publicationEpoch!=CSCloseFriendAccountEpoch() || publicationPrivacyRevision!=CSCloseFriendCurrentSnapshot().revision ||
+            !(publicationAccount==currentPublicationAccount || [publicationAccount isEqual:currentPublicationAccount])) return;
         [self.privacyShield prepareForPublication];
-        [self publishProjection:projection previous:previous changes:changes previouslyProjecting:previouslyProjecting];
+        [self publishProjection:projection previous:previous changes:changes contentUserNames:contentUserNames
+            contentIdentityKnown:contentIdentityKnown previouslyProjecting:previouslyProjecting];
         [self restoreAnchor];
         [self refreshNavigationTitle];
         finished=YES;
     } @finally {
         self.publishing=NO;
+        NSString *currentPublicationAccount=CSGroupCurrentAccountID();
+        BOOL publicationCurrent=publicationEpoch==CSCloseFriendAccountEpoch() &&
+            publicationPrivacyRevision==CSCloseFriendCurrentSnapshot().revision &&
+            (publicationAccount==currentPublicationAccount || [publicationAccount isEqual:currentPublicationAccount]);
+        if (!publicationCurrent) {
+            finished=NO; self.dirty=YES; self.publicationNeedsFullReload=YES;
+            // A policy callback may run inside native cell/layout work. The old
+            // publication cannot acknowledge it or remove the synchronous shield.
+            self.privacyRefreshPending|=CSGroupPrivacyActive();
+            @synchronized (self) {
+                self.pendingChanges|=changes|CSGroupChangeUnknown;
+                if (contentUserNames.count) {
+                    if (!self.pendingContentUserNames) self.pendingContentUserNames=[NSMutableSet set];
+                    [self.pendingContentUserNames unionSet:contentUserNames];
+                }
+                self.pendingContentUnattributed|=!contentIdentityKnown;
+            }
+        }
         if (!finished && self.privacyRefreshPending) [self shieldVisiblePrivateRows];
         if (finished) {
             self.privacyRefreshPending=NO;
@@ -870,26 +929,32 @@ static BOOL Option(NSString *suffix) {
     }
 }
 - (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous
-                  changes:(CSGroupChangeKind)changes previouslyProjecting:(BOOL)previouslyProjecting {
+                  changes:(CSGroupChangeKind)changes contentUserNames:(NSSet<NSString *> *)names
+     contentIdentityKnown:(BOOL)known previouslyProjecting:(BOOL)previouslyProjecting {
+    __block NSArray *visible;
+    CSGroupWithDisplayIndices(self.table, ^{ visible=self.table.indexPathsForVisibleRows ?: @[]; });
+    CSGroupPublicationPlan *plan=[projection publicationPlanFrom:previous changes:changes contentUserNames:names
+        contentIdentityKnown:known visiblePaths:visible];
     BOOL incremental=previouslyProjecting && self.projecting && !self.pendingScrollToTop &&
-        !(changes&CSGroupChangeUnknown) && [projection hasSameDisplayStructureAs:previous];
-    // Anonymous banners can change intrinsic geometry without a session event.
-    if (incremental) for (NSArray *section in projection.sections) for (CSGroupRow *row in section)
-        if (!row.userName.length || row.kind==CSGroupRowKindBusiness || row.kind==CSGroupRowKindAggregate) incremental=NO;
+        !self.publicationNeedsFullReload && projection && !plan.fullReload;
+    // An unchanged notification may rebuild the immutable snapshot without any
+    // table operation. This also breaks native layout/unread notification feedback.
+    if (incremental && !plan.reloadPaths.count && !plan.geometryChanged) {
+        [self recordRefreshEvent:@"publish.unchanged" delay:0]; return;
+    }
     CSGroupWithDisplayIndices(self.table, ^{
-        if (!incremental) [self.table reloadData];
-        else {
-            NSArray *visible=self.table.indexPathsForVisibleRows ?: @[];
-            NSArray *changed=[projection changedUnreadPathsFrom:previous];
-            NSMutableArray *reload=[NSMutableArray array];
-            for (NSIndexPath *path in visible) {
-                if (![projection rowAtDisplayPath:path]) continue;
-                if ((changes&(CSGroupChangeContent|CSGroupChangeStructure)) || [changed containsObject:path]) [reload addObject:path];
-            }
-            if (reload.count) [self.table reloadRowsAtIndexPaths:reload withRowAnimation:UITableViewRowAnimationNone];
+        if (!incremental) {
+            [self recordRefreshEvent:@"publish.full" delay:0];
+            [self.table reloadData];
+        } else if (plan.reloadPaths.count) {
+            [self recordRefreshEvent:@"publish.rows" delay:0];
+            [self.table reloadRowsAtIndexPaths:plan.reloadPaths withRowAnimation:UITableViewRowAnimationNone];
         }
-        [self.table layoutIfNeeded];
+        // Only structural/geometry changes need synchronous measurement for
+        // anchor restoration. Ordinary unread/text updates use UIKit's layout pass.
+        if (!incremental || plan.geometryChanged) [self.table layoutIfNeeded];
     });
+    self.publicationNeedsFullReload=NO;
 }
 - (CSGroupProjection *)projectionForSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selected accountID:(NSString *)account {
     if (!account.length) return nil;
@@ -950,60 +1015,124 @@ static BOOL Option(NSString *suffix) {
         filterDuplicates:self.preferences.filterDuplicates accountID:account];
     return projection.isValid ? projection : nil;
 }
+// A bounded sample can be exported once from the debugger/console. It stores
+// selector/counter state only, never session names, message contents or disk logs.
+- (void)resetRefreshDiagnostics {
+    @synchronized (self) {
+        self.refreshDiagnosticStart=NSProcessInfo.processInfo.systemUptime;
+        self.refreshDiagnosticSamples=0;
+        self.refreshDiagnosticCounts=[NSMutableDictionary dictionary];
+        self.refreshDiagnosticEvents=[NSMutableArray array];
+    }
+}
+- (void)recordRefreshReason:(NSString *)reason { [self recordRefreshEvent:reason delay:0]; }
+- (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay {
+    @synchronized (self) {
+        if (!self.refreshDiagnosticCounts) [self resetRefreshDiagnostics];
+        NSTimeInterval elapsed=NSProcessInfo.processInfo.systemUptime-self.refreshDiagnosticStart;
+        if (elapsed>60 || self.refreshDiagnosticSamples>=2048) return;
+        NSString *key=event.length<=96 ? event : @"other";
+        if (!self.refreshDiagnosticCounts[key] && self.refreshDiagnosticCounts.count>=48) key=@"other";
+        self.refreshDiagnosticCounts[key]=@([self.refreshDiagnosticCounts[key] unsignedIntegerValue]+1);
+        self.refreshDiagnosticSamples++;
+        if (self.refreshDiagnosticEvents.count==32) [self.refreshDiagnosticEvents removeObjectAtIndex:0];
+        [self.refreshDiagnosticEvents addObject:@{@"reason":key,@"elapsed":@(elapsed),@"publishing":@(self.publishing),
+            @"dirty":@(self.dirty),@"revision":@(self.modelRevision),@"changes":@(self.pendingChanges),
+            @"pendingTop":@(self.pendingScrollToTop),@"coalesced":@(self.coalescingNotification),@"delay":@(delay)}];
+    }
+}
+- (NSDictionary *)refreshDiagnosticsSnapshot {
+    @synchronized (self) {
+        NSTimeInterval elapsed=self.refreshDiagnosticStart ? NSProcessInfo.processInfo.systemUptime-self.refreshDiagnosticStart : 0;
+        return @{@"windowSeconds":@60,@"elapsedSeconds":@(elapsed),@"samples":@(self.refreshDiagnosticSamples),
+            @"complete":@(elapsed>=60 || self.refreshDiagnosticSamples>=2048),
+            @"counts":[self.refreshDiagnosticCounts copy] ?: @{},@"recent":[self.refreshDiagnosticEvents copy] ?: @[]};
+    }
+}
 - (void)cancelScheduledRefresh {
     self.refreshGeneration++; self.scheduled=NO; self.scheduledCoalesced=NO; self.scheduledInteraction=NO; self.scheduledRecovery=NO;
     self.interactionDeadline=0; self.interactionAttempts=0;
+    self.coalescingNotification=NO; self.pendingImmediateRefresh=NO;
+    self.pendingRefreshDeadline=0; self.scheduledRefreshDeadline=0;
 }
 - (void)requestRecovery {
     if (!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(), ^{ [self requestRecovery]; }); return; }
-    self.dirty=YES; self.recoveryPending=YES; @synchronized (self) { self.pendingChanges|=CSGroupChangeUnknown; }
+    self.dirty=YES; self.recoveryPending=YES;
+    @synchronized (self) {
+        // A native cell may have failed after a placeholder was delivered.
+        // Recovery must retry its content even if immutable row metadata matches.
+        self.pendingChanges|=CSGroupChangeUnknown|CSGroupChangeContent; self.pendingContentUnattributed=YES;
+    }
     // Do not invent a model revision for a failed rendering attempt. All failures
     // of the same account/revision share one finite retry budget.
     self.cachedNativeSections=nil;
+    [self recordRefreshEvent:@"recovery" delay:0];
     [self scheduleRefresh];
 }
 - (void)requestRefresh {
     if (!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(), ^{ [self requestRefresh]; }); return; }
     if (self.publishing && !self.changeDepth && !self.nativeActions.count) { [self requestRecovery]; return; }
-    self.dirty=YES;
-    if (!self.changeDepth) { self.recoveryPending=NO; @synchronized (self) { self.pendingChanges|=CSGroupChangeUnknown; } [self invalidateNativeSnapshot]; }
+    // A table invalidation inside a native transaction belongs to that event.
+    // Its outer end owns both content attribution and notification priority.
+    if (self.changeDepth) { self.dirty=YES; [self scheduleRefresh]; return; }
+    self.dirty=YES; self.pendingImmediateRefresh=YES;
+    self.coalescingNotification=NO; self.pendingRefreshDeadline=0;
+    if (!self.changeDepth) {
+        self.recoveryPending=NO;
+        @synchronized (self) { self.pendingChanges|=CSGroupChangeUnknown|CSGroupChangeContent; self.pendingContentUnattributed=YES; }
+        [self invalidateNativeSnapshot];
+    }
+    [self recordRefreshEvent:@"request" delay:0];
     [self scheduleRefresh];
 }
 - (void)scheduleRefresh {
     if (!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(), ^{ [self scheduleRefresh]; }); return; }
-    self.dirty=YES;
+    if (!self.dirty) { [self applyPendingScrollToTop]; return; }
     [self pruneNativeActions];
     if ((!CSGroupApplicationActive() && !(self.privacyRefreshPending && CSGroupPrivacyActive())) || (self.presentationSuspended && !self.nativeActions.count)) { [self finishSuspendedBatches]; return; }
+    // The request already retained its priority/deadline; publication must not
+    // turn a passive notification into an immediate refresh in its finally block.
     if (self.changeDepth || self.publishing) return;
-    BOOL coalesced=!self.privacyRefreshPending && self.coalescingNotification && !self.nativeActions.count;
+    NSTimeInterval now=NSProcessInfo.processInfo.systemUptime;
+    BOOL coalesced=!self.privacyRefreshPending && !self.pendingImmediateRefresh && self.coalescingNotification && !self.nativeActions.count;
     BOOL waiting=!self.privacyRefreshPending && !self.presentationSuspended && (self.table.tracking || [self groupPanMoving] || ([self nativeMenuState]&2));
     BOOL releasedWait=self.scheduledInteraction && !waiting;
     BOOL freshEvent=self.scheduledRecovery && !self.recoveryPending;
-    if (self.scheduled && !releasedWait && !freshEvent && (!self.scheduledCoalesced || coalesced)) return;
-    NSTimeInterval delay=coalesced ? 0.08 : 0;
+    NSTimeInterval delay=coalesced ? MAX(0,self.pendingRefreshDeadline-now) : 0;
     if (waiting) {
-        NSTimeInterval now=NSProcessInfo.processInfo.systemUptime;
         if (!self.interactionDeadline) self.interactionDeadline=now+2.0;
-        if (now>=self.interactionDeadline) return; // Keep dirty; actual end/lifecycle events wake it.
-        delay=MIN(self.interactionDeadline-now,MIN(0.4,0.05*(1UL<<MIN(self.interactionAttempts++,3UL))));
+        if (now>=self.interactionDeadline) return;
+        delay=MAX(delay,MIN(self.interactionDeadline-now,MIN(0.4,0.05*(1UL<<MIN(self.interactionAttempts,3UL)))));
     } else { self.interactionDeadline=0; self.interactionAttempts=0; }
-    if (self.recoveryPending && !waiting) {
+    BOOL recovery=self.recoveryPending && !waiting;
+    if (recovery) {
         NSString *account=CSGroupCurrentAccountID();
         BOOL sameAccount=self.recoveryAccount==account || [self.recoveryAccount isEqual:account];
         if (self.recoveryRevision!=self.modelRevision || !sameAccount) {
             self.recoveryRevision=self.modelRevision; self.recoveryAccount=account; self.recoveryAttempts=0;
         }
+        // A repeated UI wake does not spend or reset the finite recovery budget.
+        if (self.scheduled && self.scheduledRecovery && !releasedWait) return;
         if (self.recoveryAttempts>=3) return;
         static const NSTimeInterval delays[]={0.1,0.25,0.5};
-        delay=MAX(delay,delays[self.recoveryAttempts++]);
+        delay=MAX(delay,delays[self.recoveryAttempts]);
     }
-    self.scheduled=YES; self.scheduledCoalesced=coalesced; self.scheduledInteraction=waiting; self.scheduledRecovery=self.recoveryPending && !waiting;
+    NSTimeInterval due=now+delay;
+    if (self.scheduled && !releasedWait && !freshEvent && self.scheduledRefreshDeadline<=due+0.001) return;
+    if (waiting) self.interactionAttempts++;
+    if (recovery) self.recoveryAttempts++;
+    self.scheduled=YES; self.scheduledCoalesced=coalesced; self.scheduledInteraction=waiting; self.scheduledRecovery=recovery;
+    self.scheduledRefreshDeadline=due;
+    [self recordRefreshEvent:@"schedule" delay:delay];
     NSUInteger generation=++self.refreshGeneration;
+    NSUInteger epoch=CSCloseFriendAccountEpoch(); NSString *account=CSGroupCurrentAccountID();
     __weak typeof(self) weakSelf=self;
     void (^publish)(void)=^{
         CSGroupListAdapter *self=weakSelf;
         if (!self || generation!=self.refreshGeneration) return;
-        self.scheduled=NO;
+        self.scheduled=NO; self.scheduledRefreshDeadline=0;
+        NSString *currentAccount=CSGroupCurrentAccountID();
+        if (epoch!=CSCloseFriendAccountEpoch() || !(account==currentAccount || [account isEqual:currentAccount])) return;
         if (self.dirty) [self refresh];
     };
     if (delay>0) dispatch_after(dispatch_time(DISPATCH_TIME_NOW,(int64_t)(delay*NSEC_PER_SEC)),dispatch_get_main_queue(),publish);
@@ -1019,26 +1148,67 @@ static BOOL Option(NSString *suffix) {
         return;
     }
     self.dirty=YES;
-    self.coalescingNotification=YES;
-    @try { [self scheduleRefresh]; } @finally { self.coalescingNotification=NO; }
+    if (!self.pendingImmediateRefresh) {
+        self.coalescingNotification=YES;
+        if (!self.pendingRefreshDeadline) self.pendingRefreshDeadline=NSProcessInfo.processInfo.systemUptime+0.08;
+    }
+    [self recordRefreshEvent:@"notification" delay:0];
+    [self scheduleRefresh];
 }
 
 - (void)beginNativeChange { [self beginNativeChangeOfKind:CSGroupChangeStructure|CSGroupChangeContent]; }
 - (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind {
+    NSSet *names;
+    // Generic native/table wrappers inside an attributed event describe that
+    // event's work; an explicit unidentifiable notification still passes nil.
+    @synchronized (self) { names=self.changeDepth ? self.nativeChangeUserNames : nil; }
+    [self beginNativeChangeOfKind:kind sessionUserNames:names];
+}
+- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind sessionUserNames:(NSSet<NSString *> *)names {
     [self invalidateNativeSnapshot];
     BOOL captureAnchor=NO;
     @synchronized (self) {
-        self.recoveryPending=NO; self.pendingChanges|=kind;
+        self.recoveryPending=NO; self.pendingChanges|=kind; self.dirty=YES;
+        // Concurrent native callbacks do not have a shared LIFO identity scope.
+        // Keep their model change, and conservatively redraw content if any part
+        // of this publication crosses a background callback.
+        if (!NSThread.isMainThread) self.pendingContentUnattributed=YES;
+        if (!self.nativeChangeIdentityStack) self.nativeChangeIdentityStack=[NSMutableArray array];
+        [self.nativeChangeIdentityStack addObject:self.nativeChangeUserNames ?: (id)NSNull.null];
+        self.nativeChangeUserNames=[names copy];
+        if (kind&CSGroupChangeContent) {
+            if (!names) self.pendingContentUnattributed=YES;
+            else {
+                if (!self.pendingContentUserNames) self.pendingContentUserNames=[NSMutableSet set];
+                [self.pendingContentUserNames unionSet:names];
+            }
+        }
         captureAnchor=!self.changeDepth && NSThread.isMainThread && !self.presentationSuspended && !(self.dirty && self.scheduledCoalesced);
         self.changeDepth++;
     }
+    [self recordRefreshEvent:@"native.begin" delay:0];
     // Native/UI reads must not hold the lock used by background notifications.
     if (captureAnchor) [self saveAnchor];
 }
 - (void)endNativeChange { [self endNativeChangeCoalesced:NO]; }
 - (void)endNativeChangeCoalesced:(BOOL)coalesced {
-    BOOL outer=NO; @synchronized (self) { if (self.changeDepth) self.changeDepth--; outer=self.changeDepth==0; }
-    if (outer) { [self requestTabBadgeSourceRefreshCoalesced:coalesced]; if (coalesced) [self requestCoalescedRefresh]; else [self scheduleRefresh]; }
+    BOOL outer=NO;
+    @synchronized (self) {
+        if (self.changeDepth) {
+            self.changeDepth--; outer=self.changeDepth==0;
+            id previous=self.nativeChangeIdentityStack.lastObject;
+            self.nativeChangeUserNames=previous==NSNull.null ? nil : previous;
+            [self.nativeChangeIdentityStack removeLastObject];
+        }
+    }
+    if (outer) {
+        [self requestTabBadgeSourceRefreshCoalesced:coalesced];
+        if (coalesced) [self requestCoalescedRefresh];
+        else {
+            self.pendingImmediateRefresh=YES; self.coalescingNotification=NO; self.pendingRefreshDeadline=0;
+            [self scheduleRefresh];
+        }
+    }
 }
 - (void)performNativeBatch:(void (^)(void))updates completion:(void (^)(BOOL))completion {
     void (^callback)(BOOL)=[completion copy];

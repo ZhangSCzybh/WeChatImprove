@@ -144,6 +144,20 @@ static void CSTaskConfigureTable(UITableView *table) {
 }
 - (BOOL)intervalMode { return [@[@"minutes",@"hours"] containsObject:self.task[@"mode"]]; }
 - (BOOL)calendarMode { return [@[@"daily",@"weekly"] containsObject:self.task[@"mode"]]; }
+- (BOOL)windowMode { return [self.task[@"mode"] isEqual:@"window"]; }
+- (NSString *)windowDaysText {
+    NSArray *days=self.task[@"weekdays"];
+    if ([days isEqual:@[@1,@2,@3,@4,@5,@6,@7]]) return @"每天";
+    if ([days isEqual:@[@2,@3,@4,@5,@6]]) return @"周一至周五";
+    NSMutableArray *names=[NSMutableArray array]; NSArray *labels=@[@"周日",@"周一",@"周二",@"周三",@"周四",@"周五",@"周六"];
+    for (NSNumber *day in days) if (day.integerValue>=1 && day.integerValue<=7) [names addObject:labels[day.integerValue-1]];
+    return names.count?[names componentsJoinedByString:@"、"]:@"请选择星期";
+}
+- (NSInteger)timeRowForTitle:(NSString *)title {
+    NSArray *items=self.sections[1].items;
+    NSUInteger row=[items indexOfObjectPassingTest:^BOOL(CSSettingItem *item,NSUInteger index,BOOL *stop){ (void)index;(void)stop; return [item.title isEqual:title]; }];
+    return row==NSNotFound?0:(NSInteger)row;
+}
 - (void)reload {
     self.navigationItem.rightBarButtonItem.enabled=[self canEdit];
     self.navigationItem.rightBarButtonItem.title=self.saving?@"保存中…":@"保存";
@@ -154,9 +168,22 @@ static void CSTaskConfigureTable(UITableView *table) {
     CSSettingItem *target=CSTaskRow(@"发送到",@"person.crop.circle",UIColor.systemBlueColor,[CSScheduledTaskManager.sharedManager displayNameForTarget:self.task[@"target"]],^{ [weakSelf chooseTarget]; });
     NSString *preview=[self.task[@"text"] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
     CSSettingItem *text=CSTaskRow(@"消息内容",@"text.bubble",UIColor.systemGreenColor,preview.length?preview:@"请输入文字",^{ [weakSelf editText]; });
-    NSMutableArray *times=[NSMutableArray arrayWithObject:CSTaskRow(@"时间规则",@"repeat",UIColor.systemOrangeColor,CSScheduledTaskRuleDescription(self.task),^{ [weakSelf chooseRule]; })];
-    NSString *time=self.calendarMode?[NSString stringWithFormat:@"%02ld:%02ld",(long)[self.task[@"hour"] integerValue],(long)[self.task[@"minute"] integerValue]]:CSDateText(self.task[@"anchor"],self.task[@"zone"]);
-    [times addObject:CSTaskRow(self.calendarMode?@"每天时间":@"首次时间",@"clock",UIColor.systemOrangeColor,time,^{ [weakSelf editTime]; })];
+    NSMutableArray *times=[NSMutableArray arrayWithObject:CSTaskRow(@"时间规则",@"repeat",UIColor.systemOrangeColor,self.windowMode?@"时间段内执行":CSScheduledTaskRuleDescription(self.task),^{ [weakSelf chooseRule]; })];
+    if (self.windowMode) {
+        [times addObject:CSTaskRow(@"执行日期",@"calendar",UIColor.systemOrangeColor,[self windowDaysText],^{ [weakSelf chooseExecutionDays]; })];
+        NSInteger start=[self.task[@"windowStart"] integerValue], end=[self.task[@"windowEnd"] integerValue];
+        [times addObject:CSTaskRow(@"开始时间",@"clock",UIColor.systemOrangeColor,[NSString stringWithFormat:@"%02ld:%02ld",(long)(start/60),(long)(start%60)],^{ [weakSelf editWindowTime:@"windowStart"]; })];
+        [times addObject:CSTaskRow(@"结束时间",@"clock",UIColor.systemOrangeColor,[NSString stringWithFormat:@"%@%02ld:%02ld",end<start?@"次日 ":@"",(long)(end/60),(long)(end%60)],^{ [weakSelf editWindowTime:@"windowEnd"]; })];
+        BOOL minutes=[self.task[@"windowUnit"] isEqual:@"minutes"];
+        [times addObject:CSTaskRow(@"间隔单位",@"timer",UIColor.systemOrangeColor,minutes?@"分钟":@"小时",^{ [weakSelf chooseWindowUnit]; })];
+        [times addObject:CSTaskRow(@"执行间隔",@"timer",UIColor.systemOrangeColor,[NSString stringWithFormat:@"%@ %@",self.task[@"interval"],minutes?@"分钟":@"小时"],^{
+            [weakSelf input:@"interval" title:[weakSelf.task[@"windowUnit"] isEqual:@"minutes"]?@"间隔分钟数（1–1440）":@"间隔小时数（1–168）" numeric:YES];
+        })];
+        [times addObject:CSTaskRow(@"生效时间",@"calendar.badge.clock",UIColor.systemOrangeColor,CSDateText(self.task[@"anchor"],self.task[@"zone"]),^{ [weakSelf editTime]; })];
+    } else {
+        NSString *time=self.calendarMode?[NSString stringWithFormat:@"%02ld:%02ld",(long)[self.task[@"hour"] integerValue],(long)[self.task[@"minute"] integerValue]]:CSDateText(self.task[@"anchor"],self.task[@"zone"]);
+        [times addObject:CSTaskRow(self.calendarMode?@"每天时间":@"首次时间",@"clock",UIColor.systemOrangeColor,time,^{ [weakSelf editTime]; })];
+    }
     if (self.intervalMode) [times addObject:CSTaskRow(@"间隔",@"timer",UIColor.systemOrangeColor,[NSString stringWithFormat:@"%@ %@",self.task[@"interval"],[self.task[@"mode"] isEqual:@"minutes"]?@"分钟":@"小时"],^{
         [weakSelf input:@"interval" title:[weakSelf.task[@"mode"] isEqual:@"minutes"]?@"间隔分钟数（1–1440）":@"间隔小时数（1–168）" numeric:YES];
     })];
@@ -172,8 +199,10 @@ static void CSTaskConfigureTable(UITableView *table) {
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return self.sections[section].header; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if (section==0) return @"每个任务向一个会话发送文字，消息内容最多 4,000 个字符。修改完成后点击右上角“保存”。";
+    if (section==1 && self.windowMode) return [NSString stringWithFormat:@"不早于生效时间执行。包含开始时间，不包含结束时间；每个时段从开始时间重新计算间隔。结束早于开始表示次日，执行星期按开始当天计算。时段外不补发。任务按 %@ 执行；修改手机时区不会改变此任务的时区。",self.task[@"zone"]];
     if (section==1) return [NSString stringWithFormat:@"分钟/小时规则从首次时间起计算。每天/每周按 %@ 执行；修改手机时区不会改变此任务的时区。",self.task[@"zone"]];
-    return @"关闭：错过超过 30 秒即跳过。开启：恢复运行后仅补发最近 10 分钟内的最后一次。总开关关闭期间不补发。";
+    NSString *catchUp=@"关闭：错过超过 30 秒即跳过。开启：恢复运行后仅补发最近 10 分钟内的最后一次。总开关关闭期间不补发。";
+    return self.windowMode?[catchUp stringByAppendingString:@"时间段任务仅在原执行时段内补发，时段结束后跳过。"]:catchUp;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {
     CSScheduledTaskSettingsCell *cell=[tableView dequeueReusableCellWithIdentifier:CSScheduledTaskSettingsCell.reuseIdentifier forIndexPath:path];
@@ -242,7 +271,7 @@ static void CSTaskConfigureTable(UITableView *table) {
 }
 - (void)editTime {
     CSScheduledTaskTimeEditor *editor=[CSScheduledTaskTimeEditor new]; editor.calendarMode=self.calendarMode; editor.zone=self.task[@"zone"];
-    editor.title=self.calendarMode?@"每天时间":@"首次时间";
+    editor.title=self.windowMode?@"生效时间":self.calendarMode?@"每天时间":@"首次时间";
     NSCalendar *cal=[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian]; cal.timeZone=[NSTimeZone timeZoneWithName:editor.zone];
     editor.date=self.calendarMode?[cal dateBySettingHour:[self.task[@"hour"] integerValue] minute:[self.task[@"minute"] integerValue] second:0 ofDate:NSDate.date options:0]:self.task[@"anchor"];
     BOOL calendarMode=self.calendarMode; __weak typeof(self) weakSelf=self;
@@ -253,12 +282,50 @@ static void CSTaskConfigureTable(UITableView *table) {
     };
     [self.navigationController pushViewController:editor animated:YES];
 }
+- (void)editWindowTime:(NSString *)key {
+    CSScheduledTaskTimeEditor *editor=[CSScheduledTaskTimeEditor new]; editor.calendarMode=YES; editor.zone=self.task[@"zone"];
+    editor.title=[key isEqual:@"windowStart"]?@"开始时间":@"结束时间";
+    NSCalendar *cal=[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian]; cal.timeZone=[NSTimeZone timeZoneWithName:editor.zone];
+    NSInteger minute=[self.task[key] integerValue];
+    editor.date=[cal dateBySettingHour:minute/60 minute:minute%60 second:0 ofDate:NSDate.date options:0];
+    __weak typeof(self) weakSelf=self;
+    editor.completion=^(NSDate *date){
+        NSDateComponents *c=[cal components:NSCalendarUnitHour|NSCalendarUnitMinute fromDate:date];
+        weakSelf.task[key]=@(c.hour*60+c.minute); [weakSelf reload];
+    };
+    [self.navigationController pushViewController:editor animated:YES];
+}
+- (void)chooseExecutionDays {
+    UIAlertController *sheet=[UIAlertController alertControllerWithTitle:@"执行日期" message:@"跨午夜的时段按开始当天的星期计算。" preferredStyle:UIAlertControllerStyleActionSheet];
+    [sheet addAction:[UIAlertAction actionWithTitle:@"每天" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){ self.task[@"weekdays"]=@[@1,@2,@3,@4,@5,@6,@7]; [self reload]; }]];
+    [sheet addAction:[UIAlertAction actionWithTitle:@"周一至周五" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){ self.task[@"weekdays"]=@[@2,@3,@4,@5,@6]; [self reload]; }]];
+    __weak typeof(self) weakSelf=self; __weak UIAlertController *weakSheet=sheet;
+    [sheet addAction:[UIAlertAction actionWithTitle:@"自定义星期" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){
+        CSSettingsAfterDismissingSheet(weakSheet,^{ if ([weakSelf canEdit] && CSSettingsCanPresentFrom(weakSelf)) [weakSelf chooseWeekdays]; });
+    }]];
+    [self presentSheet:sheet section:1 row:[self timeRowForTitle:@"执行日期"]];
+}
+- (void)chooseWindowUnit {
+    UIAlertController *sheet=[UIAlertController alertControllerWithTitle:@"间隔单位" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    NSArray *units=@[@"minutes",@"hours"], *names=@[@"分钟",@"小时"];
+    for (NSUInteger i=0;i<units.count;i++) [sheet addAction:[UIAlertAction actionWithTitle:names[i] style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){
+        self.task[@"windowUnit"]=units[i];
+        if (i==1 && [self.task[@"interval"] integerValue]>168) self.task[@"interval"]=@1;
+        [self reload];
+    }]];
+    [self presentSheet:sheet section:1 row:[self timeRowForTitle:@"间隔单位"]];
+}
 - (void)chooseRule {
     UIAlertController *sheet=[UIAlertController alertControllerWithTitle:@"时间规则" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    NSArray *modes=@[@"once",@"minutes",@"hours",@"daily",@"weekly"], *names=@[@"单次",@"每 N 分钟",@"每 N 小时",@"每天",@"每周"];
+    NSArray *modes=@[@"once",@"minutes",@"hours",@"daily",@"weekly",@"window"], *names=@[@"单次",@"每 N 分钟",@"每 N 小时",@"每天",@"每周",@"时间段内执行"];
     for (NSUInteger i=0;i<modes.count;i++) [sheet addAction:[UIAlertAction actionWithTitle:names[i] style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){
         self.task[@"mode"]=modes[i]; if (self.calendarMode) self.task[@"anchor"]=NSDate.date;
         if ([modes[i] isEqual:@"hours"] && [self.task[@"interval"] integerValue]>168) self.task[@"interval"]=@1;
+        if (self.windowMode) {
+            if (!self.task[@"windowStart"]) { self.task[@"windowStart"]=@(9*60); self.task[@"windowEnd"]=@(18*60); self.task[@"weekdays"]=@[@1,@2,@3,@4,@5,@6,@7]; }
+            if (!self.task[@"windowUnit"]) self.task[@"windowUnit"]=@"minutes";
+            if ([self.task[@"windowUnit"] isEqual:@"hours"] && [self.task[@"interval"] integerValue]>168) self.task[@"interval"]=@1;
+        }
         [self reload];
     }]];
     [self presentSheet:sheet section:1 row:0];
@@ -273,7 +340,7 @@ static void CSTaskConfigureTable(UITableView *table) {
             self.task[@"weekdays"]=[days sortedArrayUsingSelector:@selector(compare:)]; [self reload];
         }]];
     }
-    [self presentSheet:sheet section:1 row:2];
+    [self presentSheet:sheet section:1 row:[self timeRowForTitle:self.windowMode?@"执行日期":@"星期"]];
 }
 - (void)save {
     if (![self canEdit]) { CSTaskAlert(self,@"账号已改变或任务存储不可用，请重新打开定时任务。"); return; }
@@ -289,6 +356,7 @@ static void CSTaskConfigureTable(UITableView *table) {
 @property(nonatomic,copy) NSArray<CSSettingSection *> *sections;
 @property(nonatomic,copy) NSArray<NSDictionary *> *displayedTasks;
 @property(nonatomic,copy) NSString *displayedAccount;
+@property(nonatomic) NSUInteger displayedEpoch;
 @end
 @implementation CSScheduledTaskSettingsViewController
 - (void)viewDidLoad {
@@ -304,7 +372,7 @@ static void CSTaskConfigureTable(UITableView *table) {
 - (void)reload {
     CSScheduledTaskManager *manager=CSScheduledTaskManager.sharedManager; CSScheduledTaskStore *store=manager.store;
     self.navigationItem.rightBarButtonItem.enabled=store.ready && !manager.savingConfiguration;
-    self.displayedTasks=CSCloseFriendVisibleScheduledTasks(store.tasks,store.account,CSCloseFriendCurrentSnapshot()); self.displayedAccount=store.account;
+    self.displayedTasks=CSCloseFriendVisibleScheduledTasks(store.tasks,store.account,CSCloseFriendCurrentSnapshot()); self.displayedAccount=store.account;self.displayedEpoch=CSBackupAccountEpoch();
     __weak typeof(self) weakSelf=self;
     NSString *account=store.account?:@"";
     CSSettingItem *enabled=[CSSettingItem switchItemWithTitle:@"开启定时任务" iconName:@"calendar.badge.clock" iconColor:UIColor.systemOrangeColor switchValue:store.enabled valueChangedBlock:^(BOOL value){
@@ -332,7 +400,7 @@ static void CSTaskConfigureTable(UITableView *table) {
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return self.sections[section].header; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if (section==0) return [CSScheduledTaskManager.sharedManager.statusText stringByAppendingString:@"\n微信被系统挂起、强退或手机关机时无法保证准点发送。可在“后台运行”设置中查看运行状态。未确认的发送不会在重启后自动重试。"];
-    if (section==1) return @"点击任务编辑并查看下次执行时间；左滑删除。任务按账号保存在本机，并纳入配置备份。恢复后总开关关闭，执行记录不恢复；请检查会话和时间规则后手动开启。";
+    if (section==1) return @"点击任务编辑并查看下次执行时间；左滑可启用、停止或删除。启用单项任务后仍需开启总开关才会执行。任务按账号保存在本机，并纳入配置备份。恢复后总开关关闭，执行记录不恢复；请检查会话和时间规则后手动开启。";
     return @"点击记录查看执行结果。“已提交微信发送”不代表对方已收到。";
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {
@@ -357,6 +425,47 @@ static void CSTaskConfigureTable(UITableView *table) {
     [tableView deselectRowAtIndexPath:path animated:YES]; CSSettingItem *item=self.sections[path.section].items[path.row]; if (item.actionBlock) item.actionBlock();
 }
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)path { return !CSScheduledTaskManager.sharedManager.savingConfiguration && path.section==1 && path.row>=0 && (NSUInteger)path.row<self.displayedTasks.count; }
+- (NSDictionary *)swipeTaskWithID:(NSString *)identifier account:(NSString *)account epoch:(NSUInteger)epoch {
+    CSScheduledTaskManager *manager=CSScheduledTaskManager.sharedManager;CSScheduledTaskStore *store=manager.store;
+    if (!store.ready || manager.savingConfiguration || CSBackupAccountEpoch()!=epoch || ![store.account isEqual:account]) return nil;
+    for (NSDictionary *task in store.tasks) if ([task[@"id"] isEqual:identifier]) {
+        return CSCloseFriendVisibleScheduledTasks(@[task],account,CSCloseFriendCurrentSnapshot()).count?task:nil;
+    }
+    return nil;
+}
+- (void)performTaskAction:(NSString *)identifier account:(NSString *)account epoch:(NSUInteger)epoch enabled:(BOOL)enabled remove:(BOOL)remove completion:(void(^)(BOOL))completion {
+    NSDictionary *task=[self swipeTaskWithID:identifier account:account epoch:epoch];
+    if (!task) { [self reload];completion(NO);return; }
+    // The menu names a target state, never another inversion of the latest flag.
+    // An explicit stop still saves: a single-use task turns itself off when
+    // claimed, but its pending native handoff must also be revoked by Manager.
+    if (!remove && enabled && [task[@"enabled"] boolValue]) { [self reload];completion(YES);return; }
+    __weak typeof(self) weakSelf=self;
+    CSScheduledTaskStoreCompletion finished=^(BOOL success,NSError *error){
+        typeof(self) controller=weakSelf;
+        if (!success && controller && controller.navigationController.topViewController==controller) CSTaskAlert(controller,error.localizedDescription?:@"操作失败");
+        [controller reload];completion(success);
+    };
+    CSScheduledTaskManager *manager=CSScheduledTaskManager.sharedManager;
+    if (remove) [manager removeTask:identifier account:account completion:finished];
+    else { NSMutableDictionary *updated=[task mutableCopy];updated[@"enabled"]=@(enabled);[manager saveTask:updated account:account completion:finished]; }
+}
+- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)path {
+    if (![self tableView:tableView canEditRowAtIndexPath:path]) return nil;
+    NSDictionary *task=self.displayedTasks[path.row];NSString *identifier=task[@"id"],*account=self.displayedAccount;NSUInteger epoch=self.displayedEpoch;
+    if (![self swipeTaskWithID:identifier account:account epoch:epoch]) return nil;
+    BOOL enabled=![task[@"enabled"] boolValue];__weak typeof(self) weakSelf=self;
+    UIContextualAction *toggle=[UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:enabled?@"启用":@"停止" handler:^(__unused UIContextualAction *action,__unused UIView *view,void(^done)(BOOL)){
+        typeof(self) controller=weakSelf;if (!controller) { done(NO);return; }
+        [controller performTaskAction:identifier account:account epoch:epoch enabled:enabled remove:NO completion:done];
+    }];
+    toggle.backgroundColor=enabled?UIColor.systemGreenColor:UIColor.systemOrangeColor;
+    UIContextualAction *remove=[UIContextualAction contextualActionWithStyle:UIContextualActionStyleDestructive title:@"删除" handler:^(__unused UIContextualAction *action,__unused UIView *view,void(^done)(BOOL)){
+        typeof(self) controller=weakSelf;if (!controller) { done(NO);return; }
+        [controller performTaskAction:identifier account:account epoch:epoch enabled:NO remove:YES completion:done];
+    }];
+    return [UISwipeActionsConfiguration configurationWithActions:@[remove,toggle]];
+}
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)style forRowAtIndexPath:(NSIndexPath *)path {
     if (style!=UITableViewCellEditingStyleDelete || ![self tableView:tableView canEditRowAtIndexPath:path]) return;
     NSDictionary *task=self.displayedTasks[path.row];

@@ -83,6 +83,7 @@ static NSHashTable *Adapters(void) {
 }
 static BOOL Option(NSString *suffix) { (void)suffix; return enabled; }
 static NSString *CSGroupCurrentAccountID(void) { return account; }
+static NSUInteger CSCloseFriendAccountEpoch(void) { return 1; }
 static BOOL CSGroupIsFoldedController(id owner) { (void)owner; return NO; }
 static BOOL CSGroupPrivacyActive(void) { return NO; }
 static id CSGroupReadObject(id object,NSString *name) { return [object valueForKey:name]; }
@@ -135,6 +136,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (void)invalidateNativeSnapshot { self.modelRevision++; }
 - (void)pruneNativeActions {}
 - (void)finishSuspendedBatches {}
+- (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay { (void)event; (void)delay; }
 #include "GroupViewportBodies.h"
 - (BOOL)isActive { return self.active; }
 - (void)refreshNavigationTitle {}

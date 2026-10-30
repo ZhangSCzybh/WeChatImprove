@@ -1,0 +1,25 @@
+{
+  "source": "current 2.1-19 metadata plus uncommitted scheduled-window and swipe changes",
+  "files": [
+    {
+      "file": "control",
+      "sha256": "5d9b0cc16b7bf40f90000d711acfcdc094b61dbffcc5a2437c4fda45df2d3e5d"
+    },
+    {
+      "file": "Headers/CSUserInfoHelper.h",
+      "sha256": "2c5572b53ef9c2596c87aa2200d81d20fcb6191532708b6858927370e6c69a8b"
+    },
+    {
+      "file": "Controllers/CSReleaseNotesViewController.m",
+      "sha256": "c6a411e280ff95d605363ebe697e4d0cb055132c448a0b41091decd039988099"
+    },
+    {
+      "file": "README.md",
+      "sha256": "fc063ccd3682c7c235900bf69042b730e22e938994dc1e37d0573fea14aa572a"
+    },
+    {
+      "file": "docs/features/scheduled-tasks-and-image-stickers.md",
+      "sha256": "9a0d22b3b0be95caf588922afbeddb4bdc0a085d294d783a4f4bac73acd2d276"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "version": "2.1-20",
+  "test_checks_passed": 3882,
+  "build_schemes": [
+    "rootful",
+    "rootless"
+  ],
+  "warnings_per_scheme": 6,
+  "warning_categories_match_2.1-19": true,
+  "warning_limit_baseline": "2.1-17: 6 per scheme",
+  "finished_task_runtime_files_unchanged": 5,
+  "existing_artifacts_preserved": 1279,
+  "production_build_inputs_unchanged": true,
+  "release_manifest_matches_current_files": true,
+  "git_diff_check": true,
+  "package_verification": true,
+  "device_acceptance": false,
+  "github_pushed": false
+}

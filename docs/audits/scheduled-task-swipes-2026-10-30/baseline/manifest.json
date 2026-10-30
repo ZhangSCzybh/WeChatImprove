@@ -1,0 +1,9 @@
+{
+  "Controllers/CSScheduledTaskSettingsViewController.m": "1f0ae54eb58d28dcc9a78f7df7fe9ecd49257afeab3e0f43ca507fe427121494",
+  "Controllers/CSScheduledTaskStore.h": "02038123c445a1bc3a0b033de028133654ec9e1bbbc6b3ad818eba159628140a",
+  "Controllers/CSScheduledTaskStore.m": "310af10abecf44334054c9b48a771551d222341c536e75120f509274b44fc134",
+  "Controllers/CSScheduledTaskManager.h": "4173131ad0c13e13f12adb9640be967be0eb3ea1d3777820eb387bb5365c0f85",
+  "Controllers/CSScheduledTaskManager.m": "d348cdd55fb6470375f6f76acd7e13287c9550f44be930fa730479fbdc7c0e58",
+  "docs/features/scheduled-tasks-and-image-stickers.md": "77e7c1354466e607412051921cbed1ed65fb1131929cf175f5a8f14d37644f6f",
+  "Tests/ScheduledTaskManagerTests.m": "964af71f70cd9b86fc5552b6d7ee6857065a308623b9c66094074100624362eb"
+}

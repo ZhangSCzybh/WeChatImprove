@@ -1,0 +1,15 @@
+{
+  "commit": "d15acffed6c2f6d5a6873d1d2c3f9ebacf218955",
+  "files": {
+    "Controllers/CSScheduledTaskStore.h": "dd8145557e8555415d50af7bd13f48da3ca6c2e5bd6b1b9b7d868ac22d252862",
+    "Controllers/CSScheduledTaskStore.m": "33ad6f1803a555a7a03cdb95e41177fcb1a97772b4a327e48cf446c570f8c47d",
+    "Controllers/CSScheduledTaskManager.m": "5f1b2d5af8802f3830e9f9dbcf028a147526e0ea2d3bde0234dc6c658a346ed2",
+    "Controllers/CSScheduledTaskSettingsViewController.m": "162baa7d0c01b5a769d539d03fd94741fac69c2b84c406d1b212cbf786d6a87b",
+    "Tests/ScheduledTaskTests.m": "a534e8959d1d93cec8c8101075f67b8d0571d60ed38c6a83e2b70dd082fd7511",
+    "Tests/ScheduledTaskManagerTests.m": "6e67c4570f1727b988c5c4b13bb53c4b0a6e0e5615dd1de6b4fe59307ac95216",
+    "Tests/ScheduledTaskBackupTests.m": "dea86332ea84aea427fe641622c2e87210652f11677a7cf18859d97ba7a1aefa",
+    "docs/features/scheduled-tasks-and-image-stickers.md": "43f7d5ea4cee2d2ce42c04775d67c20bb895bd2c091e8cfe4d5b9934bfb4561b",
+    "README.md": "d4b2ec12c189529ca1bd888d85af41ad1b21b5b2fe33b7ab06d1382c9553d0cc",
+    "docs/backup-guide.md": "7217da68d9bba632f15bc2032c5915a09b765072fc09a930e8732b64bc0ca3d7"
+  }
+}

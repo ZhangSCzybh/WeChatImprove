@@ -1,0 +1,65 @@
+{
+  "base_commit": "d15acffed6c2f6d5a6873d1d2c3f9ebacf218955",
+  "files": [
+    {
+      "file": "Controllers/CSScheduledTaskStore.h",
+      "before_sha256": "dd8145557e8555415d50af7bd13f48da3ca6c2e5bd6b1b9b7d868ac22d252862",
+      "after_sha256": "02038123c445a1bc3a0b033de028133654ec9e1bbbc6b3ad818eba159628140a",
+      "changed": true
+    },
+    {
+      "file": "Controllers/CSScheduledTaskStore.m",
+      "before_sha256": "33ad6f1803a555a7a03cdb95e41177fcb1a97772b4a327e48cf446c570f8c47d",
+      "after_sha256": "310af10abecf44334054c9b48a771551d222341c536e75120f509274b44fc134",
+      "changed": true
+    },
+    {
+      "file": "Controllers/CSScheduledTaskManager.m",
+      "before_sha256": "5f1b2d5af8802f3830e9f9dbcf028a147526e0ea2d3bde0234dc6c658a346ed2",
+      "after_sha256": "d348cdd55fb6470375f6f76acd7e13287c9550f44be930fa730479fbdc7c0e58",
+      "changed": true
+    },
+    {
+      "file": "Controllers/CSScheduledTaskSettingsViewController.m",
+      "before_sha256": "162baa7d0c01b5a769d539d03fd94741fac69c2b84c406d1b212cbf786d6a87b",
+      "after_sha256": "1f0ae54eb58d28dcc9a78f7df7fe9ecd49257afeab3e0f43ca507fe427121494",
+      "changed": true
+    },
+    {
+      "file": "Tests/ScheduledTaskTests.m",
+      "before_sha256": "a534e8959d1d93cec8c8101075f67b8d0571d60ed38c6a83e2b70dd082fd7511",
+      "after_sha256": "57963495f0d8f5cc789c0648f3a719b88d66a7b64bb565bbd8036487d507747b",
+      "changed": true
+    },
+    {
+      "file": "Tests/ScheduledTaskManagerTests.m",
+      "before_sha256": "6e67c4570f1727b988c5c4b13bb53c4b0a6e0e5615dd1de6b4fe59307ac95216",
+      "after_sha256": "964af71f70cd9b86fc5552b6d7ee6857065a308623b9c66094074100624362eb",
+      "changed": true
+    },
+    {
+      "file": "Tests/ScheduledTaskBackupTests.m",
+      "before_sha256": "dea86332ea84aea427fe641622c2e87210652f11677a7cf18859d97ba7a1aefa",
+      "after_sha256": "0ba1d196c494a4ad7149abf50335cdfb1759189cd8ddee45f691b81c77361851",
+      "changed": true
+    },
+    {
+      "file": "docs/features/scheduled-tasks-and-image-stickers.md",
+      "before_sha256": "43f7d5ea4cee2d2ce42c04775d67c20bb895bd2c091e8cfe4d5b9934bfb4561b",
+      "after_sha256": "77e7c1354466e607412051921cbed1ed65fb1131929cf175f5a8f14d37644f6f",
+      "changed": true
+    },
+    {
+      "file": "README.md",
+      "before_sha256": "d4b2ec12c189529ca1bd888d85af41ad1b21b5b2fe33b7ab06d1382c9553d0cc",
+      "after_sha256": "fc063ccd3682c7c235900bf69042b730e22e938994dc1e37d0573fea14aa572a",
+      "changed": true
+    },
+    {
+      "file": "docs/backup-guide.md",
+      "before_sha256": "7217da68d9bba632f15bc2032c5915a09b765072fc09a930e8732b64bc0ca3d7",
+      "after_sha256": "37b65b2bd0bea28d477662032231cef8fbc7b38628f848319cf476faa7ac88da",
+      "changed": true
+    }
+  ]
+}

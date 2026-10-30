@@ -1,0 +1,17 @@
+{
+  "swipe_checks": 165,
+  "close_friend_automation_checks": 187,
+  "manager_checks": 2360,
+  "manager_previous_checks": 2319,
+  "manager_new_checks": 41,
+  "ios_syntax_architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "ios_syntax_warnings": 0,
+  "all_passed": true,
+  "store_and_manager_production_unchanged": true,
+  "package_created": false,
+  "version_changed": false,
+  "device_acceptance_performed": false
+}

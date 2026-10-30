@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.1-19`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.1-21`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -31,8 +31,8 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | 本地提供 `2.1-19` 安装包，新增默认开启的“后台兜底补拉”开关；待真机验收 |
-| Rootful | 本地提供 `2.1-19` 安装包；待真机验收 |
+| Rootless | 提供 `2.1-21` 安装包；已在 iPhone 14 Pro Max、iOS 27.0.1、微信 8.0.78 完成前台 CPU 复测，详见 [真机记录](docs/audits/release-2.1-21-energy/device-validation.md) |
+| Rootful | 本地提供 `2.1-21` 安装包；待真机验收 |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
@@ -40,7 +40,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：当前 `2.1-19` 交付 [Rootless 安装包](packages/2.1-19-ai-fallback-toggle/com.wechat.improve_2.1-19_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-19-ai-fallback-toggle/com.wechat.improve_2.1-19_iphoneos-arm.deb)、[调试符号](packages/2.1-19-ai-fallback-toggle/com.wechat.improve_2.1-19_symbols.zip) 和 [SHA-256](packages/2.1-19-ai-fallback-toggle/SHA256SUMS)。本次仅将约 45 秒兜底补拉改为可开关设置，位于 AI 自动回复全局页“功能”分组，默认开启，旧配置保持 2.1-17 行为。可在设置中关闭以停止插件定时补拉，降低周期性网络唤醒；关闭后依靠微信自身事件或回到前台时同步，后台静默群消息可能延迟或收不到。账号配置及备份保留此偏好。原生验证、消息筛选、去重、过期和音频让出规则保留；既有包与历史记录不动。实现、回归和包校验见 [2.1-19 记录](docs/audits/ai-background-2.1-19-toggle/README.md)，原调度依据见 [2.1-17 记录](docs/audits/ai-background-2.1-17/README.md)。
+1. 获取与设备注入环境匹配的 `.deb`：当前 `2.1-21` 交付 [Rootless 安装包](packages/2.1-21-energy/com.wechat.improve_2.1-21_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-21-energy/com.wechat.improve_2.1-21_iphoneos-arm.deb)、[调试符号](packages/2.1-21-energy/com.wechat.improve_2.1-21_symbols.zip) 和 [SHA-256](packages/2.1-21-energy/SHA256SUMS)。本版完成分组与密友共享列表的两阶段优化：保留通知合并与有限恢复，按会话更新消息、草稿和未读，无变化时跳过表格重载及强制布局；密友锁定同步遮挡、切号取消和后台界面延后继续有效。Rootless 安装后的前台 CPU 复测已完成，静置均值为 4.67%，包含切换分组及进入聊天的一轮为 11.47%；温度、续航和本版后台尚未实测，见 [真机复测](docs/audits/release-2.1-21-energy/device-validation.md) 及 [实现与验证记录](docs/audits/release-2.1-21-energy/README.md)。继续包含 2.1-20 的定时任务“时间段内执行”及列表左滑启用／停止，详见 [定时任务文档](docs/features/scheduled-tasks-and-image-stickers.md) 和 [2.1-20 记录](docs/audits/release-2.1-20-scheduled-tasks/README.md)；2.1-19 的 AI 后台兜底开关继续保留。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
@@ -140,7 +140,7 @@
 
 ### 定时任务与图片添加到表情
 
-**功能增强 → 定时任务**：总开关和各任务开关默认按账号独立保存，可创建单次、每 N 分钟（1–1440）、每 N 小时（1–168）、每天或每周任务，向一个私聊、群聊或文件传输助手发送文字。列表和编辑页沿用公共设置样式，私聊/群聊使用与密友相同的微信原生选择器，每个任务只接受一个目标。执行前记录去重状态；重启后不会自动重发结果未知的消息。微信被挂起、强退或设备关机时不能保证准点。可选择跳过错过的时刻，或只补发最近 10 分钟内的最后一次。
+**功能增强 → 定时任务**：总开关和各任务开关默认按账号独立保存，可创建单次、每 N 分钟（1–1440）、每 N 小时（1–168）、每天或每周任务，向一个私聊、群聊或文件传输助手发送文字。`2.1-20` 新增“时间段内执行”：每天或指定星期，在开始至结束时间内每 N 分钟／每 N 小时执行，支持跨午夜，时段结束后不补发。列表左滑可启用、停止或删除任务；单项启用不打开总开关，停止撤销尚未提交微信的执行。列表和编辑页沿用公共设置样式，私聊/群聊使用与密友相同的微信原生选择器，每个任务只接受一个目标。执行前记录去重状态；重启后不会自动重发结果未知的消息。微信被挂起、强退或设备关机时不能保证准点。可选择跳过错过的时刻，或只补发最近 10 分钟内的最后一次。
 
 **功能增强 → 人工智能**：总开关与会话开关默认关闭。支持显式选择百炼服务商、联网模式、单图识别与思考开关，新增能力默认关闭；百炼流式收齐后一次回复，通用接口保留原文本行为。可填写兼容 Chat Completions 的 HTTPS API 地址、API Key 和模型，测试连接后启用；支持多个命名预设和会话独立选择。群聊在聊天详情「查找聊天内容」下方设置，默认仅被单独 @ 时回复；`2.1-2` 在「启用 AI 回复」下方新增「免 @ 回复」，开启后仅当前群无需艾特。`2.1-19` 在全局“功能”分组新增“后台兜底补拉”，默认开启，旧配置保持 2.1-17 的约 45 秒兜底及完整同步顺延规则；可在设置中关闭，关闭后不安排插件补拉，依靠微信自身同步，后台可能不再自动回复。周期性网络同步及符合规则消息触发的模型请求存在额外耗电。保留群免打扰设置；同步与保活仍有能耗，系统挂起或退出后无法保证回复。手动回复与 AI 并行。密友保护可分别隐藏 AI 已开启会话列表和定时任务列表，隐藏后自动回复、定时发送仍按原配置运行。详见 [功能说明](docs/features/ai-auto-reply.md) 与 [核心验证记录](docs/features/ai-auto-reply-validation.md)。首次免 @ 包见 [2.1-2 发布记录](docs/audits/release-2.1-2/README.md)，本次修复见 [后台同步修复记录](docs/audits/ai-muted-background-2.1-2/README.md)。
 
@@ -206,7 +206,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.1-19_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-19-ai-fallback-toggle/`。
+当前版本默认输出：`packages/com.wechat.improve_2.1-21_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-21-energy/`。
 
 ### Rootful
 
@@ -215,7 +215,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.1-19_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-19-ai-fallback-toggle/`。
+当前版本默认输出：`packages/com.wechat.improve_2.1-21_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-21-energy/`。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -239,7 +239,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.1-19-ai-fallback-toggle/com.wechat.improve_2.1-19_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.1-21-energy/com.wechat.improve_2.1-21_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。

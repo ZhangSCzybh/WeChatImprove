@@ -13,6 +13,9 @@ FOUNDATION_EXPORT BOOL CSScheduledTaskBackupValueValidate(id value, NSString *ac
 FOUNDATION_EXPORT BOOL CSScheduledTaskValidate(NSDictionary *task, NSError **error);
 FOUNDATION_EXPORT NSDate * _Nullable CSScheduledTaskNext(NSDictionary *task, NSDate *after);
 FOUNDATION_EXPORT NSDate * _Nullable CSScheduledTaskLatest(NSDictionary *task, NSDate *now);
+/// Window tasks may only submit within the same configured window as their occurrence.
+/// Existing modes retain their original execution rules.
+FOUNDATION_EXPORT BOOL CSScheduledTaskAllowsExecution(NSDictionary *task, NSDate *occurrence, NSDate *now);
 FOUNDATION_EXPORT NSString *CSScheduledTaskRuleDescription(NSDictionary *task);
 
 typedef void (^CSScheduledTaskStoreCompletion)(BOOL success, NSError * _Nullable error);

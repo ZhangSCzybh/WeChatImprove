@@ -42,6 +42,8 @@ for marker in ['+ (instancetype)adapterForTable:', '+ (instancetype)adapterForCo
                '- (void)requestRefresh {', '- (void)requestRecovery {', '- (void)scheduleRefresh {', '- (void)cancelScheduledRefresh {', '+ (void)applicationActivityChanged:', '+ (void)closeFriendPolicyChanged:', '- (void)beginNativeChangeOfKind:', '- (void)requestCoalescedRefresh', '- (void)invalidateNativeSnapshot', '- (NSArray *)nativeSectionsForAccount:', '- (void)beginNativeChange', '- (void)endNativeChange {', '- (void)endNativeChangeCoalesced:',
                '- (void)pruneNativeActions', '- (void)performNativeBatch:', '- (void)performInNativePresentation:', '- (void)useNativePresentation {']:
     methods.append(method(source, marker))
+if '- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind sessionUserNames:' in source:
+    methods.append(method(source, '- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind sessionUserNames:'))
 methods.append(method(source,'- (void)selectIndex:'))
 if '+ (void)refreshFoldedListsForAccount:' in source:
     methods.append(method(source,'+ (void)refreshFoldedListsForAccount:'))
@@ -60,7 +62,10 @@ account_reset+=refresh[account_end:mode_end]
 publication_start=refresh.index('    self.publishing=YES; self.dirty=NO;')
 publication_end=refresh.index('    @try {',publication_start)
 publication_state=refresh[publication_start:publication_end]
-methods.append(prefix + publication_state + '    @try {\n' + account_reset + ' self.lastPublishedChanges=changes; [self publishFixture]; finished=YES;\n' + tail)
+publication_fixture=' self.lastPublishedChanges=changes;'
+if 'contentUserNames' in publication_state:
+    publication_fixture+=' self.lastPublishedContentUserNames=contentUserNames; self.lastPublishedContentIdentityKnown=contentIdentityKnown;'
+methods.append(prefix + publication_state + '    @try {\n' + account_reset + publication_fixture + ' [self publishFixture]; finished=YES;\n' + tail)
 layout = method(source, '- (void)layout {')
 methods.append(layout[:layout.index('    __block UIView *installed')] + '    self.layoutCount++;\n}')
 # Actual save/restore/top method entry guards; the expensive UI work is counted.
@@ -80,4 +85,6 @@ for name in ['FoldedAppear','FoldedDisappear']:
     folded.append(method(hooks,'static void '+name+'('))
 out.with_name('FoldedLifecycleHooks.h').write_text('\n'.join(folded)+'\n')
 reload = method(hooks, '- (void)reloadData {').replace('%orig', 'self.reloads++')
+reload_helper=method(hooks,'static void RequestRefresh(') if 'static void RequestRefresh(' in hooks else ''
+out.with_name('GroupLifecycleReloadHelpers.h').write_text(reload_helper+'\n')
 out.with_name('GroupLifecycleReload.h').write_text(reload+'\n')

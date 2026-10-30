@@ -21,6 +21,7 @@ static BOOL suspended,missingContact;
 static BOOL authorized=YES;
 static void (^duringPreparation)(void);
 static void (^duringContactLookup)(void);
+static void (^duringEpochBoundary)(void);
 static CSCloseFriendSnapshot *privacy;
 #define CHECK(...) do { checks++; if(!(__VA_ARGS__)) { NSLog(@"FAIL %d %s",__LINE__,#__VA_ARGS__);exit(1); } } while(0)
 static atomic_bool blockNextFile,failNextFile;
@@ -43,7 +44,7 @@ NSString *const CSCloseFriendPolicyDidChangeNotification=@"test-privacy";
 BOOL CSBackupIsReady(void){return YES;}
 BOOL CSBackupAccountIsSuspended(void){return suspended;}
 NSUInteger CSBackupAccountEpoch(void){return epoch;}
-BOOL CSBackupPerformAtAccountEpoch(NSUInteger expected,void(^block)(void)){if(expected!=epoch || suspended)return NO;block();return YES;}
+BOOL CSBackupPerformAtAccountEpoch(NSUInteger expected,void(^block)(void)){if(duringEpochBoundary)duringEpochBoundary();if(expected!=epoch || suspended)return NO;block();return YES;}
 CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void){return privacy;}
 BOOL CSCloseFriendShouldHideUserName(NSString *name,CSCloseFriendSurface surface){return [privacy hidesUserName:name surface:surface];}
 id CSGroupReadObject(id object,NSString *key){return CSMessageActionNativeObject(object,key);}
@@ -87,15 +88,18 @@ static void SetPrivacy(BOOL revealed,BOOL sessions,BOOL tasks){
 @interface CSScheduledTaskManager (Testing)
 - (void)run:(NSDictionary *)task now:(NSDate *)now;
 - (NSTimeInterval)elapsedTime;
+- (NSDate *)currentDate;
 - (NSURL *)fileURLForAccount:(NSString *)account;
 @end
 @interface TestScheduledManager : CSScheduledTaskManager
 @property NSURL *testRoot;
 @property NSTimeInterval clockOffset;
+@property NSDate *testDate;
 @end
 @implementation TestScheduledManager
 - (NSURL *)fileURLForAccount:(NSString *)name{return CSScheduledTaskFileURL(self.testRoot,name);}
 - (NSTimeInterval)elapsedTime{return [super elapsedTime]+self.clockOffset;}
+- (NSDate *)currentDate{return self.testDate?:[super currentDate];}
 @end
 static void Run(CSScheduledTaskManager *manager,NSDictionary *task,NSDate *now){[manager run:task now:now];Wait(^BOOL{return [manager valueForKey:@"runningStore"]==nil;});}
 static NSDate *At(NSTimeInterval value){return [NSDate dateWithTimeIntervalSince1970:value];}
@@ -106,6 +110,79 @@ static CSScheduledTaskManager *Manager(NSURL *root,NSString *target,BOOL global,
     NSDictionary *task=@{@"id":@"task",@"title":@"synthetic task",@"target":target,@"text":@"synthetic text",@"enabled":@(taskEnabled),@"catchUp":@NO,@"mode":@"minutes",@"interval":@1,@"anchor":At(2060),@"hour":@9,@"minute":@0,@"weekdays":@[@2],@"zone":@"Asia/Shanghai"};
     CHECK([store saveTask:task now:At(2000)]);
     TestScheduledManager *manager=[TestScheduledManager new];manager.testRoot=[root URLByAppendingPathComponent:NSUUID.UUID.UUIDString];[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];return manager;
+}
+static void WindowSendBoundaries(NSURL *root){
+    NSISO8601DateFormatter *formatter=[NSISO8601DateFormatter new];
+    NSDate *due=[formatter dateFromString:@"2026-10-26T09:01:00Z"];CHECK(due);
+    NSDate *now=[due dateByAddingTimeInterval:10],*end=[due dateByAddingTimeInterval:60];
+    // Each case uses the production claim and prepared-send path, with an
+    // injected wall clock independent from the existing monotonic send budget.
+    for(NSUInteger gate=0;gate<7;gate++){
+        TestScheduledManager *manager=(TestScheduledManager *)Manager(root,@"friend",YES,YES);
+        manager.testDate=now;CSScheduledTaskStore *store=manager.store;
+        NSMutableDictionary *task=[store.tasks.firstObject mutableCopy];
+        task[@"mode"]=@"window";task[@"windowUnit"]=@"minutes";task[@"interval"]=@1;
+        task[@"windowStart"]=@(9*60);task[@"windowEnd"]=@(9*60+2);
+        task[@"weekdays"]=@[@1,@2,@3,@4,@5,@6,@7];task[@"zone"]=@"UTC";
+        task[@"anchor"]=[due dateByAddingTimeInterval:-60];task[@"catchUp"]=@YES;
+        CHECK([store saveTask:task now:[due dateByAddingTimeInterval:-30]]);
+        CHECK([store.tasks.firstObject[@"nextRun"] isEqual:due]);
+        NSUInteger before=submissions;__block NSUInteger lookups=0;
+        if(gate==2)duringPreparation=^{manager.testDate=end;};
+        if(gate==3)duringContactLookup=^{if(++lookups==3)manager.testDate=end;};
+        if(gate==4)duringEpochBoundary=^{manager.testDate=end;};
+        if(gate==5)manager.testDate=[due dateByAddingTimeInterval:-1];
+        if(gate==6)manager.testDate=[now dateByAddingTimeInterval:86400];
+        if(gate==1){
+            entered=dispatch_semaphore_create(0);resumeIO=dispatch_semaphore_create(0);
+            atomic_store(&blockNextFile,true);
+            [manager run:store.tasks.firstObject now:now];
+            CHECK(dispatch_semaphore_wait(entered,dispatch_time(DISPATCH_TIME_NOW,3*NSEC_PER_SEC))==0);
+            CHECK(submissions==before && CSBackupResourceWriteInProgress());
+            manager.testDate=end;dispatch_semaphore_signal(resumeIO);
+            Wait(^BOOL{return [manager valueForKey:@"runningStore"]==nil;});
+        }else Run(manager,store.tasks.firstObject,now);
+        duringPreparation=nil;duringContactLookup=nil;duringEpochBoundary=nil;
+        CHECK(submissions==before+(gate==0?1:0));
+        CHECK([store.history.firstObject[@"result"] isEqual:gate==0?@"submitted":@"skipped"]);
+        if(gate)CHECK([store.history.firstObject[@"detail"] containsString:@"执行时间段"]);
+        CHECK([store.tasks.firstObject[@"lastOccurrence"] isEqual:due]);
+        CHECK([store.tasks.firstObject[@"nextRun"] isEqual:[due dateByAddingTimeInterval:86400-60]]);
+        if(gate==3)CHECK(lookups==3);
+        // A stopped/expired claim remains consumed even if the same window is
+        // visible again; reopening the clock cannot replay that message.
+        manager.testDate=now;Run(manager,store.tasks.firstObject,now);
+        CHECK(submissions==before+(gate==0?1:0));
+    }
+    TestScheduledManager *manager=(TestScheduledManager *)Manager(root,@"friend",YES,YES);
+    CSScheduledTaskStore *store=manager.store;NSMutableDictionary *task=[store.tasks.firstObject mutableCopy];
+    task[@"mode"]=@"window";task[@"windowUnit"]=@"hours";task[@"interval"]=@1;
+    task[@"windowStart"]=@(9*60);task[@"windowEnd"]=@(10*60);
+    task[@"weekdays"]=@[@1,@2,@3,@4,@5,@6,@7];task[@"zone"]=@"UTC";
+    NSDate *start=[due dateByAddingTimeInterval:-60];task[@"anchor"]=start;task[@"catchUp"]=@YES;
+    CHECK([store saveTask:task now:[start dateByAddingTimeInterval:-1]]);
+    // Ending the window overrides the ten-minute catch-up allowance.
+    task[@"windowEnd"]=@(9*60+1);CHECK([store saveTask:task now:[start dateByAddingTimeInterval:-1]]);
+    manager.testDate=[start dateByAddingTimeInterval:60];NSUInteger before=submissions;
+    Run(manager,store.tasks.firstObject,manager.testDate);CHECK(submissions==before);
+    CHECK([store.history.firstObject[@"result"] isEqual:@"skipped"]);
+}
+static void StopClaimedSingleTask(NSURL *root){
+    CSScheduledTaskManager *manager=Manager(root,@"friend",YES,YES);CSScheduledTaskStore *store=manager.store;
+    NSMutableDictionary *task=[store.tasks.firstObject mutableCopy];task[@"mode"]=@"once";
+    CHECK([store saveTask:task now:At(2000)]);NSUInteger before=submissions;__block BOOL saved=NO,prepared=NO;
+    duringPreparation=^{
+        prepared=YES;NSDictionary *claimed=store.tasks.firstObject;
+        // Single-use claims persist enabled=NO before native handoff. An
+        // explicit stop must still pass through Manager to revoke this run.
+        CHECK(![claimed[@"enabled"] boolValue] && !claimed[@"nextRun"]);
+        [manager saveTask:claimed account:account completion:^(BOOL success,NSError *error){CHECK(success && !error);saved=YES;}];
+    };
+    Run(manager,store.tasks.firstObject,At(2060));Wait(^BOOL{return saved;});duringPreparation=nil;
+    CHECK(prepared && submissions==before && ![store.tasks.firstObject[@"enabled"] boolValue]);
+    CHECK([store.tasks.firstObject[@"anchor"] isEqual:At(2060)] && [store.tasks.firstObject[@"lastOccurrence"] isEqual:At(2060)]);
+    CHECK([store.history.firstObject[@"result"] isEqual:@"failed"]);
+    Run(manager,store.tasks.firstObject,At(2060));CHECK(submissions==before);
 }
 int main(int argc,const char **argv){@autoreleasepool{
     CHECK(argc==2);NSURL *root=[NSURL fileURLWithPath:@(argv[1]) isDirectory:YES];
@@ -174,5 +251,7 @@ int main(int argc,const char **argv){@autoreleasepool{
     account=@"other";epoch++;start=NSDate.timeIntervalSinceReferenceDate;[manager refresh];CHECK(!live.ready && manager.store!=live && NSDate.timeIntervalSinceReferenceDate-start<.1);
     dispatch_semaphore_signal(resumeIO);Wait(^BOOL{return manager.store.ready;});CHECK(submissions==before && [manager.store.account isEqual:@"other"] && !manager.store.enabled && !manager.store.tasks.count);
     account=@"account";epoch++;[manager refresh];Wait(^BOOL{return manager.store.ready;});CHECK(submissions==before); // the old late callback never sends into the new account
+    WindowSendBoundaries(root);
+    StopClaimedSingleTask(root);
     printf("Scheduled task manager: %lu checks passed (production scheduler/send route, isolated stores and native fakes)\n",(unsigned long)checks);
 }return 0;}

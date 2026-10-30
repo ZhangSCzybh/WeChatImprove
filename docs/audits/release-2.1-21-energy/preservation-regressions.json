@@ -1,0 +1,102 @@
+{
+  "scope": "isolated host regressions; no make package, phone, installation, live account, or real message send",
+  "executed_at": "2026-10-30T04:24:52.511350+00:00",
+  "results": [
+    {
+      "name": "background-run",
+      "command": [
+        "bash",
+        "Tests/verify-background-run.sh"
+      ],
+      "exit_code": 0,
+      "log": "preservation-background-run.log",
+      "log_sha256": "2a019b7c9bcb5f0b0a68b09fca322385f8af0e1d042c84d2324bd3f3af846673",
+      "result_lines": [
+        "Background run: 186 checks passed; production manager, audio ownership and native hook bodies verified"
+      ],
+      "warnings": 0
+    },
+    {
+      "name": "ai-background-sync",
+      "command": [
+        "bash",
+        "Tests/verify-ai-background-sync.sh"
+      ],
+      "exit_code": 0,
+      "log": "preservation-ai-background-sync.log",
+      "log_sha256": "a0d9bf103554d4eed373bce85ca5fe9112edde2e1f535c4a4fbf4edee29c0d12",
+      "result_lines": [
+        "AI background sync scheduler: 115 checks passed; 45-second one-shot deadlines, verified coverage, revocation, cooldown, stale/early timers, reentry, failed attempts, finite time and release"
+      ],
+      "warnings": 0
+    },
+    {
+      "name": "ai-native-sync-observer",
+      "command": [
+        "bash",
+        "Tests/verify-ai-native-sync-observer.sh"
+      ],
+      "exit_code": 0,
+      "log": "preservation-ai-native-sync-observer.log",
+      "log_sha256": "b1caa7aa04910fb734cb865af869e9d2e317356bee81b1fccd571153a4a0180d",
+      "result_lines": [
+        "AI native sync observer: 786 checks passed; real production hooks, original ordering/arguments/results, epoch-bound marker, full terminal response, main FIFO idle, rejection/exception/reentry fences",
+        "AI native sync observer ABI rejection create-return-c: 6 checks passed",
+        "AI native sync observer ABI rejection create-argument-Q: 6 checks passed",
+        "AI native sync observer ABI rejection create-argument-count: 6 checks passed",
+        "AI native sync observer ABI rejection return-result-B: 6 checks passed",
+        "AI native sync observer ABI rejection return-event-Q: 6 checks passed",
+        "AI native sync observer ABI rejection handle-result-B: 6 checks passed",
+        "AI native sync observer ABI rejection handle-processed-c: 6 checks passed"
+      ],
+      "warnings": 0
+    },
+    {
+      "name": "ai-manager",
+      "command": [
+        "bash",
+        "Tests/verify-ai-manager.sh"
+      ],
+      "exit_code": 0,
+      "log": "preservation-ai-manager.log",
+      "log_sha256": "ef49dcb4d519a3c2cf771f56035e1f08b03a122f44913937f790e8becca887d1",
+      "result_lines": [
+        "AI reply manager: 850 checks passed"
+      ],
+      "warnings": 0
+    },
+    {
+      "name": "scheduled-task-manager",
+      "command": [
+        "bash",
+        "Tests/verify-scheduled-task-manager.sh"
+      ],
+      "exit_code": 0,
+      "log": "preservation-scheduled-task-manager.log",
+      "log_sha256": "a70653519aac540a6da9d978e7bef16f6113878c093fa0c8d2ed810924fbe24f",
+      "result_lines": [
+        "Scheduled task manager: 2360 checks passed (production scheduler/send route, isolated stores and native fakes)"
+      ],
+      "warnings": 0
+    },
+    {
+      "name": "scheduled-task-backup",
+      "command": [
+        "bash",
+        "Tests/verify-scheduled-task-backup.sh"
+      ],
+      "exit_code": 0,
+      "log": "preservation-scheduled-task-backup.log",
+      "log_sha256": "1cb006dc4d48c01344443e112876faa11e7587f10efb82c10db2928cb27c7a56",
+      "result_lines": [
+        "Scheduled task backup: 505 checks passed"
+      ],
+      "warnings": 0
+    }
+  ],
+  "release_build_executed": false,
+  "version_files_owned_by_root": true,
+  "total_checks_passed": 4844,
+  "all_passed": true,
+  "compiler_warnings": 0
+}

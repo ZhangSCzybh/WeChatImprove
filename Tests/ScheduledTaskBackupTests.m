@@ -102,6 +102,105 @@ static void PendingWriteRestoreBoundary(NSURL *root){
     NSDictionary *restored=[CSScheduledTaskStore readStateAtURL:url account:@"alice" error:NULL];CHECK(![restored[@"enabled"] boolValue] && ![restored[@"history"] count]);CHECK([restored[@"tasks"][0][@"text"] isEqual:Task(@"pending",@"minutes",@"filehelper")[@"text"]]);
     [defaults removePersistentDomainForName:suite];
 }
+static NSDate *WindowDate(NSInteger day, NSInteger hour, NSInteger minute) {
+    NSCalendar *calendar=[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    calendar.timeZone=[NSTimeZone timeZoneWithName:@"Asia/Shanghai"];
+    NSDateComponents *parts=[NSDateComponents new];parts.year=2030;parts.month=1;parts.day=day;parts.hour=hour;parts.minute=minute;
+    return [calendar dateFromComponents:parts];
+}
+static NSDictionary *WindowTask(NSString *identifier, NSString *unit, NSNumber *interval, NSNumber *start, NSNumber *end, NSArray *weekdays) {
+    NSMutableDictionary *task=[Task(identifier,@"window",@"filehelper") mutableCopy];
+    task[@"anchor"]=WindowDate(7,8,0);task[@"windowUnit"]=unit;task[@"interval"]=interval;
+    task[@"windowStart"]=start;task[@"windowEnd"]=end;task[@"weekdays"]=weekdays;
+    return task;
+}
+static NSDictionary *TaskWithID(NSArray *tasks, NSString *identifier) {
+    for (NSDictionary *task in tasks) if ([task[@"id"] isEqual:identifier]) return task;
+    return nil;
+}
+static void WindowBackupRules(NSURL *root) {
+    NSString *suite=[@"scheduled.window.backup." stringByAppendingString:NSUUID.UUID.UUIDString];
+    NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite];CSBackupEngine *engine=Engine(root,suite);
+    NSURL *url=TaskURL(root,@"alice");CSScheduledTaskStore *live=[[CSScheduledTaskStore alloc] initWithURL:url account:@"alice"];
+    NSDate *before=WindowDate(7,8,0),*first=WindowDate(7,9,0),*reenable=WindowDate(7,23,50);
+    NSDictionary *minutes=WindowTask(@"window-minutes",@"minutes",@15,@540,@600,@[@1,@2,@3,@4,@5,@6,@7]);
+    // 2030-01-07 is Monday; its selected window also owns Tuesday 01:00.
+    NSDictionary *hours=WindowTask(@"window-hours",@"hours",@2,@1380,@180,@[@2]);
+    NSDictionary *legacy=Task(@"legacy-minutes",@"minutes",@"filehelper");
+    CHECK([live load]);
+    for (NSDictionary *task in @[minutes,hours,legacy]) CHECK([live saveTask:task now:before]);
+    CHECK([live setEnabled:YES now:before]);
+    NSDictionary *claim=[live claimTask:@"window-minutes" now:first];CHECK(claim!=nil);
+    CHECK([live finishClaim:claim[@"id"] result:@"submitted" detail:@"window backup test, no native sends"]);
+    NSDictionary *runtime=[CSScheduledTaskStore readStateAtURL:url account:@"alice" error:NULL];
+    CHECK([runtime[@"history"] count]==1);
+    CHECK(TaskWithID(runtime[@"tasks"],@"window-minutes")[@"nextRun"]!=nil);
+    CHECK(TaskWithID(runtime[@"tasks"],@"window-minutes")[@"lastOccurrence"]!=nil);
+    NSError *error=nil;NSDictionary *snapshot=[engine capture:@"window definitions" kind:@"manual" error:&error];CHECK(snapshot && !error);
+    NSDictionary *value=Field(snapshot,@"alice")[@"value"];
+    CHECK([value[@"enabled"] boolValue] && [value[@"tasks"] count]==3 && !value[@"history"]);
+    CHECK([TaskWithID(value[@"tasks"],@"window-minutes") isEqual:minutes]);
+    CHECK([TaskWithID(value[@"tasks"],@"window-hours") isEqual:hours]);
+    CHECK([TaskWithID(value[@"tasks"],@"legacy-minutes") isEqual:legacy]);
+    for (NSDictionary *task in value[@"tasks"]) CHECK(!task[@"nextRun"] && !task[@"lastOccurrence"] && !task[@"history"] && !task[@"claim"]);
+    NSDictionary *oldDefinition=TaskWithID(value[@"tasks"],@"legacy-minutes");
+    CHECK(!oldDefinition[@"windowUnit"] && !oldDefinition[@"windowStart"] && !oldDefinition[@"windowEnd"]);
+    NSData *encoded=[CSBackupCodec encode:snapshot error:&error];CHECK(encoded && !error);
+    NSDictionary *decoded=[CSBackupCodec decode:encoded error:&error];CHECK(decoded && !error);
+    CHECK([Field(decoded,@"alice")[@"value"] isEqual:value]);
+    CHECK([engine.store publish:decoded error:&error]);
+    decoded=[engine.store snapshot:decoded[@"id"] error:&error];CHECK(decoded && !error);
+    CHECK([Field(decoded,@"alice")[@"value"] isEqual:value]);
+    NSSet *module=[NSSet setWithObject:@"scheduled_tasks"],*accounts=[NSSet setWithObject:@"alice"];
+    NSDictionary *preview=[engine preview:decoded modules:module accounts:accounts error:&error];CHECK(preview && !error);
+    CHECK([[preview[@"warnings"] componentsJoinedByString:@" "] containsString:@"总开关关闭"]);
+    CHECK([engine prepare:preview error:&error]);live=nil;Complete(engine);
+    NSDictionary *restored=[CSScheduledTaskStore readStateAtURL:url account:@"alice" error:&error];CHECK(restored && !error);
+    CHECK(![restored[@"enabled"] boolValue] && [restored[@"history"] count]==0);
+    CHECK([restored[@"tasks"] isEqual:value[@"tasks"]]);
+    live=[[CSScheduledTaskStore alloc] initWithURL:url account:@"alice"];CHECK([live load]);
+    CHECK(!live.enabled && ![live claimTask:@"window-minutes" now:reenable] && ![live claimTask:@"window-hours" now:reenable]);
+    CHECK([live setEnabled:YES now:reenable]);
+    for (NSDictionary *task in live.tasks) CHECK([task[@"nextRun"] compare:reenable]==NSOrderedDescending);
+    CHECK([TaskWithID(live.tasks,@"window-minutes")[@"nextRun"] isEqual:WindowDate(8,9,0)]);
+    CHECK([TaskWithID(live.tasks,@"window-hours")[@"nextRun"] isEqual:WindowDate(8,1,0)]);
+    CHECK([TaskWithID(live.tasks,@"window-hours")[@"weekdays"] isEqual:@[@2]]);
+    CHECK(![live claimTask:@"window-hours" now:reenable]);
+    CHECK([live claimTask:@"window-hours" now:WindowDate(8,1,0)]!=nil);
+    CHECK([TaskWithID(live.tasks,@"window-hours")[@"nextRun"] isEqual:WindowDate(14,23,0)]);
+
+    // Invalid imported windows fail before a journal exists or the live state changes.
+    NSDictionary *entry=[CSBackupRegistry entryForDomain:@"scheduled" key:@"alice"];
+    NSData *beforeInvalid=[NSData dataWithContentsOfURL:url];CHECK(beforeInvalid!=nil);
+    NSArray *invalidOverrides=@[
+        @{@"windowUnit":@"seconds"},@{@"windowUnit":@""},@{@"windowUnit":@1},
+        @{@"interval":@0},@{@"interval":@1441},@{@"interval":@1.5},@{@"windowUnit":@"hours",@"interval":@169},
+        @{@"windowStart":@(-1)},@{@"windowStart":@1440},@{@"windowStart":@540.5},
+        @{@"windowEnd":@(-1)},@{@"windowEnd":@1440},@{@"windowEnd":@540},
+        @{@"weekdays":@[]},@{@"weekdays":@[@0]},@{@"weekdays":@[@8]},@{@"weekdays":@[@"2"]},
+        @{@"weekdays":@[@2.5]},@{@"weekdays":@"every day"},@{@"nextRun":first},@{@"lastOccurrence":first}
+    ];
+    NSMutableArray *invalidTasks=[NSMutableArray array];
+    for (NSDictionary *overrides in invalidOverrides) {NSMutableDictionary *task=[minutes mutableCopy];[task addEntriesFromDictionary:overrides];[invalidTasks addObject:task];}
+    for (NSString *missing in @[@"windowUnit",@"windowStart",@"windowEnd",@"weekdays",@"interval"]) {NSMutableDictionary *task=[minutes mutableCopy];[task removeObjectForKey:missing];[invalidTasks addObject:task];}
+    for (NSDictionary *task in invalidTasks) {
+        NSMutableDictionary *invalid=[value mutableCopy];invalid[@"tasks"]=@[task];error=nil;
+        CHECK(![CSBackupRegistry validateValue:invalid entry:entry error:&error] && error);
+        NSMutableDictionary *badSnapshot=[decoded mutableCopy];NSMutableArray *fields=[NSMutableArray array];
+        for (NSDictionary *field in decoded[@"fields"]) {NSMutableDictionary *copy=[field mutableCopy];if ([field[@"domain"] isEqual:@"scheduled"] && [field[@"key"] isEqual:@"alice"]) copy[@"value"]=invalid;[fields addObject:copy];}
+        badSnapshot[@"fields"]=fields;error=nil;
+        CHECK(![engine preview:badSnapshot modules:module accounts:accounts error:&error] && error);
+        CHECK([engine.store journal:NULL]==nil);
+        CHECK([[NSData dataWithContentsOfURL:url] isEqual:beforeInvalid]);
+    }
+    // Both interval limits and both ends of the minute-of-day range remain portable.
+    for (NSDictionary *task in @[WindowTask(@"minimum",@"minutes",@1,@0,@1439,@[@1]),WindowTask(@"maximum-minutes",@"minutes",@1440,@1439,@0,@[@7]),WindowTask(@"maximum-hours",@"hours",@168,@1439,@0,@[@7])]) {
+        NSMutableDictionary *valid=[value mutableCopy];valid[@"tasks"]=@[task];error=nil;
+        CHECK([CSBackupRegistry validateValue:valid entry:entry error:&error] && !error);
+        CHECK([CSScheduledTaskBackupConfiguration(valid)[@"tasks"][0] isEqual:task]);
+    }
+    [live invalidate];live=nil;[defaults removePersistentDomainForName:suite];
+}
 int main(int argc, const char *argv[]) { @autoreleasepool {
     if (argc==5 && [@(argv[1]) isEqual:@"--crash"]) {
         CSBackupEngine *engine=Engine([NSURL fileURLWithPath:@(argv[2]) isDirectory:YES],@(argv[3]));
@@ -110,6 +209,7 @@ int main(int argc, const char *argv[]) { @autoreleasepool {
     }
     CHECK(argc==2); NSURL *root=[NSURL fileURLWithPath:@(argv[1]) isDirectory:YES];
     PendingWriteRestoreBoundary([root URLByAppendingPathComponent:@"pending-boundary"]);
+    WindowBackupRules([root URLByAppendingPathComponent:@"window-rules"]);
     NSString *suite=[@"scheduled.backup." stringByAppendingString:NSUUID.UUID.UUIDString];
     NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite];
     CSBackupEngine *engine=Engine(root,suite);

@@ -43,12 +43,50 @@ static void Native(id owner, BOOL change, void (^body)(void)) {
     @try { CSGroupWithNativeIndices(a.table,body); }
     @finally { if (change) [a endNativeChange]; }
 }
-static void NativeNotification(id owner, CSGroupChangeKind kind, void (^body)(void)) {
+// BEGIN Session event identity
+static NSString *CSGroupDirectEventUserName(id value) {
+    if ([value isKindOfClass:NSString.class]) return [value length] ? [value copy] : nil;
+    NSString *result=nil;
+    for (NSString *key in @[@"m_nsUserName",@"m_nsUsrName",@"userName"]) {
+        id candidate=CSGroupReadObject(value,key);
+        if (![candidate isKindOfClass:NSString.class] || ![candidate length]) continue;
+        // Conflicting identities are not safe content invalidation hints.
+        if (result && ![result isEqual:candidate]) return nil;
+        result=candidate;
+    }
+    return [result copy];
+}
+static NSString *CSGroupSessionEventUserName(id value) {
+    // Match native row resolution: a real session outranks stale fake-cell data.
+    id session=CSGroupReadObject(value,@"m_sessionInfo");
+    if (session && session!=value) return CSGroupDirectEventUserName(session);
+    return CSGroupDirectEventUserName(value);
+}
+// END Session event identity
+static void NativeEvent(id owner, CSGroupChangeKind kind, id subject, NSString *reason,
+                        BOOL coalesced, void (^body)(void)) {
     CSGroupListAdapter *a=Adapter(owner);
     if (!a.table) { body(); return; }
-    [a beginNativeChangeOfKind:kind];
+    [a recordRefreshReason:reason];
+    NSString *name=CSGroupSessionEventUserName(subject);
+    // A real unattributed notification must remain unattributed, including when
+    // it arrives inside another session's native transaction.
+    [a beginNativeChangeOfKind:kind sessionUserNames:name.length ? [NSSet setWithObject:name] : nil];
     @try { CSGroupWithNativeIndices(a.table,body); }
-    @finally { [a endNativeChangeCoalesced:YES]; }
+    @finally { [a endNativeChangeCoalesced:coalesced]; }
+}
+static void NativeNotification(id owner, CSGroupChangeKind kind, id subject, NSString *reason, void (^body)(void)) {
+    NativeEvent(owner,kind,subject,reason,YES,body);
+}
+static void NativeReload(id owner, NSString *reason, void (^body)(void)) {
+    [Adapter(owner) recordRefreshReason:reason];
+    // The view's generic reload is derived work, so a nested call inherits its
+    // outer event. A logic-controller onMainSessionReload stays a real event.
+    Native(owner,YES,body);
+}
+static void RequestRefresh(CSGroupListAdapter *a, SEL selector) {
+    [a recordRefreshReason:NSStringFromSelector(selector)];
+    [a requestRefresh];
 }
 static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.publishing; }
 static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef info) {
@@ -90,16 +128,16 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
     if (a.isActive) return nil; // An incidental preview must not change the selected group.
     __block id result=nil; Native(self,NO,^{ result=%orig; }); return result;
 }
-- (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,^{ %orig; }); }
-- (void)updateSession:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,^{ %orig; }); }
-- (void)reloadSessions { Native(self,YES,^{ %orig; }); }
-- (void)updateItem:(id)item { Native(self,YES,^{ %orig; }); }
-- (void)insertSessionCellAtIndexes:(id)paths { Native(self,YES,^{ %orig; }); }
-- (void)deleteSessionCellAtIndexes:(id)paths { Native(self,YES,^{ %orig; }); }
-- (void)onLogicDeleteSessionByUsername:(id)name { Native(self,YES,^{ %orig; }); }
-- (void)logicUpdateSession:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,^{ %orig; }); }
-- (void)onAuthOK { Native(self,YES,^{ %orig; }); }
-- (void)onLogicHideSession:(id)session { Native(self,YES,^{ %orig; }); }
+- (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,contact,NSStringFromSelector(_cmd),^{ %orig; }); }
+- (void)updateSession:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,session,NSStringFromSelector(_cmd),^{ %orig; }); }
+- (void)reloadSessions { NativeReload(self,NSStringFromSelector(_cmd),^{ %orig; }); }
+- (void)updateItem:(id)item { NativeEvent(self,CSGroupChangeContent|CSGroupChangeStructure,item,NSStringFromSelector(_cmd),NO,^{ %orig; }); }
+- (void)insertSessionCellAtIndexes:(id)paths { NativeEvent(self,CSGroupChangeStructure,nil,NSStringFromSelector(_cmd),NO,^{ %orig; }); }
+- (void)deleteSessionCellAtIndexes:(id)paths { NativeEvent(self,CSGroupChangeStructure,nil,NSStringFromSelector(_cmd),NO,^{ %orig; }); }
+- (void)onLogicDeleteSessionByUsername:(id)name { NativeEvent(self,CSGroupChangeStructure,name,NSStringFromSelector(_cmd),NO,^{ %orig; }); }
+- (void)logicUpdateSession:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,session,NSStringFromSelector(_cmd),^{ %orig; }); }
+- (void)onAuthOK { NativeEvent(self,CSGroupChangeUnknown|CSGroupChangeContent|CSGroupChangeStructure,nil,NSStringFromSelector(_cmd),NO,^{ %orig; }); }
+- (void)onLogicHideSession:(id)session { NativeEvent(self,CSGroupChangeStructure,session,NSStringFromSelector(_cmd),NO,^{ %orig; }); }
 - (void)selectCellForName:(id)name {
     if (CSCloseFriendShouldHideUserName(name,CSCloseFriendSurfaceSession)) return;
     CSGroupListAdapter *a=Adapter(self);
@@ -196,11 +234,11 @@ static void InstallMenuTouchGate(void) {
 %hook MainFrameLogicController
 - (void)onSessionRebuildBegin { [Adapter(self) beginNativeChange]; Native(self,NO,^{ %orig; }); }
 - (void)onSessionRebuildEnd { @try { Native(self,NO,^{ %orig; }); } @finally { [Adapter(self) endNativeChange]; } }
-- (void)onActiveUsrNameChange:(id)oldName curUsrName:(id)newName { Native(self,YES,^{ %orig; }); }
-- (void)onSessionTotalUnreadCountChange:(unsigned int)count { NativeNotification(self,CSGroupChangeUnread,^{ %orig; }); }
-- (void)onSessionChanged:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,^{ %orig; }); }
-- (void)onSessionTopStatusChanged:(id)session bTop:(BOOL)top { Native(self,YES,^{ %orig; }); }
-- (void)onMainSessionReload { Native(self,YES,^{ %orig; }); }
+- (void)onActiveUsrNameChange:(id)oldName curUsrName:(id)newName { NativeEvent(self,CSGroupChangeContent|CSGroupChangeStructure,nil,NSStringFromSelector(_cmd),NO,^{ %orig; }); }
+- (void)onSessionTotalUnreadCountChange:(unsigned int)count { NativeNotification(self,CSGroupChangeUnread,nil,NSStringFromSelector(_cmd),^{ %orig; }); }
+- (void)onSessionChanged:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,session,NSStringFromSelector(_cmd),^{ %orig; }); }
+- (void)onSessionTopStatusChanged:(id)session bTop:(BOOL)top { NativeEvent(self,CSGroupChangeStructure,session,NSStringFromSelector(_cmd),NO,^{ %orig; }); }
+- (void)onMainSessionReload { NativeEvent(self,CSGroupChangeContent|CSGroupChangeStructure,nil,NSStringFromSelector(_cmd),NO,^{ %orig; }); }
 %end
 
 %hook UITableView
@@ -228,12 +266,12 @@ static void InstallMenuTouchGate(void) {
 - (void)setDataSource:(id)source {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
     %orig(a ? [a proxyForTarget:source role:0] : source);
-    if (a && !a.publishing) [a requestRefresh];
+    if (a && !a.publishing) RequestRefresh(a,_cmd);
 }
 - (void)setDelegate:(id)delegate {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
     %orig(a ? [a proxyForTarget:delegate role:1] : delegate);
-    if (a && !a.publishing) [a requestRefresh];
+    if (a && !a.publishing) RequestRefresh(a,_cmd);
 }
 - (void)setPrefetchDataSource:(id)source {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
@@ -312,7 +350,7 @@ static void InstallMenuTouchGate(void) {
 - (void)reloadData {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
     if (!a) { %orig; return; } // Chat and other tables need no grouping index scope.
-    if (Projected(a)) { [a requestRefresh]; return; }
+    if (Projected(a)) { RequestRefresh(a,_cmd); return; }
     CSGroupWithDisplayIndices(self, ^{ %orig; });
 }
 - (void)beginUpdates {
@@ -329,35 +367,35 @@ static void InstallMenuTouchGate(void) {
 }
 - (void)insertRowsAtIndexPaths:(NSArray *)paths withRowAnimation:(UITableViewRowAnimation)animation {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (Projected(a)) { [a requestRefresh]; return; } %orig;
+    if (Projected(a)) { RequestRefresh(a,_cmd); return; } %orig;
 }
 - (void)deleteRowsAtIndexPaths:(NSArray *)paths withRowAnimation:(UITableViewRowAnimation)animation {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (Projected(a)) { [a requestRefresh]; return; } %orig;
+    if (Projected(a)) { RequestRefresh(a,_cmd); return; } %orig;
 }
 - (void)reloadRowsAtIndexPaths:(NSArray *)paths withRowAnimation:(UITableViewRowAnimation)animation {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (Projected(a)) { [a requestRefresh]; return; } %orig;
+    if (Projected(a)) { RequestRefresh(a,_cmd); return; } %orig;
 }
 - (void)moveRowAtIndexPath:(NSIndexPath *)source toIndexPath:(NSIndexPath *)destination {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (Projected(a)) { [a requestRefresh]; return; } %orig;
+    if (Projected(a)) { RequestRefresh(a,_cmd); return; } %orig;
 }
 - (void)insertSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (Projected(a)) { [a requestRefresh]; return; } %orig;
+    if (Projected(a)) { RequestRefresh(a,_cmd); return; } %orig;
 }
 - (void)deleteSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (Projected(a)) { [a requestRefresh]; return; } %orig;
+    if (Projected(a)) { RequestRefresh(a,_cmd); return; } %orig;
 }
 - (void)reloadSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (Projected(a)) { [a requestRefresh]; return; } %orig;
+    if (Projected(a)) { RequestRefresh(a,_cmd); return; } %orig;
 }
 - (void)moveSection:(NSInteger)source toSection:(NSInteger)destination {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (Projected(a)) { [a requestRefresh]; return; } %orig;
+    if (Projected(a)) { RequestRefresh(a,_cmd); return; } %orig;
 }
 %end
 
@@ -471,13 +509,13 @@ static void FoldedDisappear(id owner,SEL selector,BOOL animated) {
 }
 static void (*FoldedChangedOriginal)(id,SEL);
 static void FoldedChanged(id owner,SEL selector) {
-    Native(owner,YES,^{ FoldedChangedOriginal(owner,selector); });
+    NativeEvent(owner,CSGroupChangeContent|CSGroupChangeStructure,nil,NSStringFromSelector(selector),NO,^{ FoldedChangedOriginal(owner,selector); });
     // The main aggregate assessment depends on these children as well.
     [CSGroupListAdapter settingsChanged];
 }
 static void (*FoldedSessionOriginal)(id,SEL,id);
 static void FoldedSession(id owner,SEL selector,id session) {
-    NativeNotification(owner,CSGroupChangeContent|CSGroupChangeStructure,^{ FoldedSessionOriginal(owner,selector,session); });
+    NativeNotification(owner,CSGroupChangeContent|CSGroupChangeStructure,session,NSStringFromSelector(selector),^{ FoldedSessionOriginal(owner,selector,session); });
 }
 static void (*FoldedOpenOriginal)(id,SEL,id,id);
 static void FoldedOpen(id owner,SEL selector,id session,id path) {

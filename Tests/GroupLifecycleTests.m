@@ -123,6 +123,8 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic) BOOL chromeVisible,searchChromeVisible,privacyRefreshPending,privacyShielded,privacyTableWasHidden;
 @property(nonatomic,strong) CSCloseFriendListShield *privacyShield;
 @property(nonatomic) CSGroupChangeKind lastPublishedChanges;
+@property(nonatomic,copy) NSSet<NSString *> *lastPublishedContentUserNames;
+@property(nonatomic) BOOL lastPublishedContentIdentityKnown;
 @property(nonatomic,strong) LifecycleChrome *chrome;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
 @property(nonatomic) double baselineDeceleration;
@@ -149,10 +151,13 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (void)reconcileDeletedSwipeRow {}
 - (id)nativeSource { return self; }
 - (void)applyPendingScrollToTop {}
+- (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay { (void)event; (void)delay; }
+- (void)recordRefreshReason:(NSString *)reason { (void)reason; }
 - (void)detach {
 #if CS_GROUP_LIFECYCLE_TAB_BADGE
     [self cancelTabBadgeSourceRefresh];
 #endif
+    [self cancelScheduledRefresh];
     self.presentationSuspended=YES; self.active=NO;
     [self.nativeActions removeAllObjects];
     objc_setAssociatedObject(self.table,&AdapterKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -197,6 +202,7 @@ static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.publishin
 static void FoldedAppearOriginal(id owner,SEL selector,BOOL animated) { (void)selector;[owner nativeAppearance:animated]; }
 static void FoldedDisappearOriginal(id owner,SEL selector,BOOL animated) { (void)selector;[owner nativeAppearance:animated]; }
 #include "FoldedLifecycleHooks.h"
+#include "GroupLifecycleReloadHelpers.h"
 @implementation LifecycleTable
 #include "GroupLifecycleReload.h"
 @end
@@ -396,6 +402,134 @@ int main(void) { @autoreleasepool {
     RunFor(.12); Check(a.refreshCount==before+1,@"superseded notification timer cannot publish twice");
     before=a.refreshCount; [a requestCoalescedRefresh]; [a refresh]; RunFor(.12);
     Check(a.refreshCount==before+1,@"synchronous user publication consumes pending notification work");
+
+    // A scheduled wake-up is not a model event. Replaying layout/menu callbacks
+    // must not manufacture another publication on a clean list.
+    a=List(&host); before=a.refreshCount; NSUInteger cleanRevision=a.modelRevision;
+    for (NSUInteger i=0;i<12;i++) [a scheduleRefresh];
+    RunFor(.025);
+    Check(a.refreshCount==before && !a.dirty && !a.scheduled && a.modelRevision==cleanRevision,@"clean scheduling wakes neither invalidate nor publish the list");
+    __block BOOL wakeDuringPublication=YES;
+    publicationMutation=^(CSGroupListAdapter *current) {
+        if (wakeDuringPublication && current==a) { wakeDuringPublication=NO; [current scheduleRefresh]; }
+    };
+    [a requestRefresh]; RunFor(.025); publicationMutation=nil;
+    Check(a.refreshCount==before+1 && !a.dirty && !a.scheduled,@"a clean UI wake during publication cannot create a follow-up refresh");
+
+    // Native notifications delivered by a synchronous host callback during
+    // reload retain their passive deadline after the outer publish unwinds.
+    a=List(&host); before=a.refreshCount;
+    __block BOOL notificationDuringPublication=YES;
+    publicationMutation=^(CSGroupListAdapter *current) {
+        if (notificationDuringPublication && current==a) {
+            notificationDuringPublication=NO;
+            [current beginNativeChangeOfKind:CSGroupChangeUnread];
+            [current endNativeChangeCoalesced:YES];
+        }
+    };
+    [a requestRefresh]; RunFor(.025); publicationMutation=nil;
+    Check(a.refreshCount==before+1 && a.dirty && a.scheduled,@"native notification during publication retains its merge delay");
+    RunFor(.12);
+    Check(a.refreshCount==before+2 && !a.dirty && !a.scheduled && a.lastPublishedChanges==CSGroupChangeUnread,@"the deferred native notification publishes once with its real change kind");
+
+    // A synchronous publication consumes the old timer. A later notification
+    // owns a new deadline that the obsolete timer must not shorten.
+    a=List(&host); before=a.refreshCount;
+    [a requestCoalescedRefresh]; RunFor(.04); [a refresh];
+    [a requestCoalescedRefresh]; RunFor(.055);
+    Check(a.refreshCount==before+1 && a.scheduled,@"an obsolete notification timer cannot consume a newer event early");
+    RunFor(.065);
+    Check(a.refreshCount==before+2 && !a.scheduled,@"the newer notification keeps its own deadline after a synchronous publication");
+
+    a=List(&host); before=a.refreshCount;
+    [a endNativeChange]; RunFor(.025);
+    Check(a.refreshCount==before && !a.dirty && !a.scheduled && !a.changeDepth,@"an unmatched native end cannot invent a model refresh");
+    [a beginNativeChangeOfKind:CSGroupChangeUnread];
+    [a beginNativeChangeOfKind:CSGroupChangeContent]; [a endNativeChange]; RunFor(.025);
+    Check(a.refreshCount==before && a.changeDepth==1 && !a.scheduled,@"an inner native end waits for the real outer transaction");
+    [a endNativeChange]; RunFor(.025);
+    Check(a.refreshCount==before+1 && !a.changeDepth && !a.dirty && a.lastPublishedChanges==(CSGroupChangeUnread|CSGroupChangeContent),@"only the outer native end publishes all accumulated change kinds");
+
+    a=List(&host);
+    NSSet *namesA=[NSSet setWithObject:@"ordinary-a"],*namesB=[NSSet setWithObject:@"ordinary-b"];
+    [a beginNativeChangeOfKind:CSGroupChangeContent sessionUserNames:namesA];
+    [a beginNativeChange]; [a endNativeChange]; [a endNativeChange]; RunFor(.025);
+    Check(a.lastPublishedContentIdentityKnown && [a.lastPublishedContentUserNames isEqual:namesA],@"generic native wrappers inherit the enclosing attributed session identity");
+    [a beginNativeChangeOfKind:CSGroupChangeContent sessionUserNames:namesA];
+    [a beginNativeChangeOfKind:CSGroupChangeContent sessionUserNames:namesB];
+    [a endNativeChange]; [a endNativeChange]; RunFor(.025);
+    Check(a.lastPublishedContentIdentityKnown && [a.lastPublishedContentUserNames isEqual:[namesA setByAddingObjectsFromSet:namesB]],@"nested real content events retain every affected session identity");
+    [a beginNativeChangeOfKind:CSGroupChangeContent sessionUserNames:namesA];
+    [a beginNativeChangeOfKind:CSGroupChangeContent sessionUserNames:nil];
+    [a endNativeChange]; [a endNativeChange]; RunFor(.025);
+    Check(!a.lastPublishedContentIdentityKnown,@"an explicitly unidentifiable nested content event cannot borrow a sibling identity");
+    [a beginNativeChangeOfKind:CSGroupChangeContent sessionUserNames:namesA];
+    [a beginNativeChangeOfKind:CSGroupChangeUnread sessionUserNames:namesB];
+    [a beginNativeChange]; [a endNativeChange]; [a endNativeChange];
+    Check([a.nativeChangeUserNames isEqual:namesA],@"ending a nested real event restores the outer session identity");
+    [a endNativeChange]; RunFor(.025);
+    Check(a.lastPublishedContentIdentityKnown && [a.lastPublishedContentUserNames isEqual:[namesA setByAddingObjectsFromSet:namesB]],@"a nested event's generic content wrapper uses that event's own identity");
+    [a beginNativeChangeOfKind:CSGroupChangeContent sessionUserNames:namesA];
+    [a beginNativeChangeOfKind:CSGroupChangeUnread sessionUserNames:nil];
+    [a beginNativeChange]; [a endNativeChange]; [a endNativeChange];
+    Check([a.nativeChangeUserNames isEqual:namesA],@"an explicitly unknown nested identity restores its outer scope when it ends");
+    [a endNativeChange]; RunFor(.025);
+    Check(!a.lastPublishedContentIdentityKnown && !a.nativeChangeIdentityStack.count,@"unknown nested content remains unattributed and balances every identity scope");
+
+    // Native notifications can arrive off-main. Their identities cannot rely on
+    // the adapter's shared LIFO scope, and publication must stay on the main loop.
+    a=List(&host); before=a.refreshCount; NSUInteger backgroundBuilds=snapshotBuilds;
+    __block BOOL nativeEventWasOffMain=NO;
+    dispatch_semaphore_t nativeEventDone=dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT,0),^{
+        nativeEventWasOffMain=!NSThread.isMainThread;
+        [a beginNativeChangeOfKind:CSGroupChangeContent sessionUserNames:namesA];
+        [a endNativeChangeCoalesced:YES];
+        dispatch_semaphore_signal(nativeEventDone);
+    });
+    long nativeEventWait=dispatch_semaphore_wait(nativeEventDone,dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC));
+    Check(!nativeEventWait && nativeEventWasOffMain && snapshotBuilds==backgroundBuilds && a.refreshCount==before,@"a real background native event completes without native reads or publication off-main");
+    RunFor(.12);
+    Check(a.refreshCount==before+1 && !a.lastPublishedContentIdentityKnown && [a.lastPublishedContentUserNames isEqual:namesA] && !a.changeDepth && !a.nativeChangeIdentityStack.count,@"a background content event preserves its change and uses conservative content publication");
+
+    a=List(&host); before=a.refreshCount;
+    __block BOOL contentDuringPublication=YES;
+    publicationMutation=^(CSGroupListAdapter *current) {
+        if (contentDuringPublication && current==a) {
+            contentDuringPublication=NO;
+            [current beginNativeChangeOfKind:CSGroupChangeContent sessionUserNames:namesB];
+            [current endNativeChangeCoalesced:YES];
+        }
+    };
+    [a beginNativeChangeOfKind:CSGroupChangeContent sessionUserNames:namesA]; [a endNativeChange];
+    RunFor(.025); publicationMutation=nil;
+    Check(a.refreshCount==before+1 && [a.lastPublishedContentUserNames isEqual:namesA] && [a.pendingContentUserNames isEqual:namesB],@"a reentrant content event remains pending outside the already admitted publication");
+    RunFor(.12);
+    Check(a.refreshCount==before+2 && a.lastPublishedContentIdentityKnown && [a.lastPublishedContentUserNames isEqual:namesB] && !a.pendingContentUserNames,@"the next publication consumes the reentrant session identity exactly once");
+
+    a=List(&host); before=a.refreshCount;
+    [a requestCoalescedRefresh]; [a detach];
+    Check(!a.scheduled,@"detaching immediately cancels a pending notification task");
+    RunFor(.12);
+    Check(a.refreshCount==before,@"a detached list cannot publish from its obsolete notification timer");
+
+    a=List(&host); before=a.refreshCount;
+    [a requestCoalescedRefresh]; NSString *scheduledAccount=account; NSUInteger scheduledEpoch=accountEpoch;
+    account=@"account-scheduler-replacement"; accountEpoch++;
+    RunFor(.12);
+    Check(a.refreshCount==before && a.dirty && !a.scheduled,@"a scheduled task cannot publish after its account or epoch is replaced");
+    [a requestRefresh]; RunFor(.025);
+    Check(a.refreshCount==before+1 && [a.preferences.accountID isEqual:account] && !a.dirty,@"a real event in the replacement account wakes one current publication");
+    account=scheduledAccount; accountEpoch=scheduledEpoch;
+
+    a=List(&host); NSString *accountBeforeLogout=account; account=nil;
+    NSUInteger nilAccountReloads=[(LifecycleTable *)a.table reloads];
+    [a requestRefresh]; RunFor(.03);
+    Check(!a.dirty && !a.scheduled && !a.publishing && !a.active && [(LifecycleTable *)a.table reloads]==nilAccountReloads+1,@"a queued logout publication accepts two nil accounts and settles in native presentation");
+    [a refresh]; RunFor(.12);
+    Check(!a.dirty && !a.scheduled && !a.publicationNeedsFullReload,@"a stable nil account cannot be mistaken for a superseded publication or create a refresh loop");
+    account=accountBeforeLogout;
+
     a=List(&host); before=a.refreshCount;
     [a requestRefresh];
     [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:@"willResign" object:nil]];
@@ -407,10 +541,19 @@ int main(void) { @autoreleasepool {
     [CSGroupListAdapter applicationActivityChanged:[NSNotification notificationWithName:UIApplicationDidBecomeActiveNotification object:nil]];
     RunFor(.03);
     Check(actions==actionBefore+1 && !a.nativeActions.count,@"active notification resumes valid navigation once");
+    a=List(&host); before=a.refreshCount; NSUInteger recoveryModelRevision=a.modelRevision;
+    [a requestRecovery]; RunFor(.14);
+    Check(a.refreshCount==before+1 && a.lastPublishedChanges==(CSGroupChangeUnknown|CSGroupChangeContent) && !a.lastPublishedContentIdentityKnown,@"placeholder recovery retries content even when native row metadata has not changed");
+    Check(a.modelRevision==recoveryModelRevision && !a.dirty && !a.scheduled && a.recoveryAttempts==1,@"a successful conservative recovery settles without inventing a model revision");
     a=List(&host); before=a.refreshCount; failPublication=YES; [a requestRefresh]; RunFor(1.1);
     Check(a.refreshCount==before+4 && a.recoveryAttempts==3 && a.dirty && !a.scheduled,@"persistent render failure stops after three bounded delayed retries");
     before=a.refreshCount; [a requestRecovery]; [a requestRecovery]; RunFor(.12);
     Check(a.refreshCount==before && !a.scheduled,@"duplicate failures of the exhausted revision cannot restart a loop");
+    a.pendingScrollToTop=YES;
+    for (NSUInteger i=0;i<12;i++) [a scheduleRefresh];
+    RunFor(.12);
+    Check(a.refreshCount==before && !a.scheduled && a.recoveryAttempts==3,@"UI and return-to-top wakes cannot restart an exhausted recovery revision");
+    a.pendingScrollToTop=NO;
     failPublication=NO; [a beginNativeChange]; [a endNativeChange]; RunFor(.03);
     Check(a.refreshCount==before+1 && !a.dirty,@"new model event wakes an exhausted recovery without waiting");
     a=List(&host); before=a.refreshCount; a.menuState=3; [a requestRefresh]; RunFor(2.5);
@@ -434,6 +577,26 @@ int main(void) { @autoreleasepool {
     [a requestRefresh]; RunFor(1.1);
     Check(a.refreshCount==before+4 && !a.scheduled,@"generic refresh requests during publication also share the bounded recovery budget");
     failPublication=NO; rawPublicationFailure=NO;
+
+    // A policy can change synchronously inside native reload. The old publish
+    // owns neither that new request nor its temporary private-cell suppression.
+    a=List(&host); before=a.refreshCount;
+    UITableViewCell *reentrantSecret=Cell(@"secret"); a.table.visibleCells=@[reentrantSecret];
+    __block BOOL lockDuringPublication=YES,shieldedDuringPublication=NO;
+    publicationMutation=^(CSGroupListAdapter *current) {
+        if (lockDuringPublication && current==a) {
+            lockDuringPublication=NO; privacyEnabled=YES; policyRevision++;
+            [CSGroupListAdapter closeFriendPolicyChanged:nil];
+            shieldedDuringPublication=reentrantSecret.hidden;
+        }
+    };
+    [a refresh]; publicationMutation=nil;
+    Check(shieldedDuringPublication && reentrantSecret.hidden && a.privacyRefreshPending && a.dirty,@"a new privacy lock stays synchronously shielded after an older publication returns");
+    Check(a.publicationNeedsFullReload,@"a superseded publication requires fresh table coordinates before incremental publication resumes");
+    RunFor(.03);
+    Check(a.refreshCount==before+2 && !a.privacyRefreshPending && !reentrantSecret.hidden && a.active,@"one current safe publication consumes the reentrant privacy lock and releases its shield");
+    privacyEnabled=NO;
+
     a=List(&host); privacyEnabled=YES; enabled=NO; before=a.refreshCount;
     [a refresh];
     Check(a.refreshCount==before+1 && a.active,@"privacy reaches publication with grouping disabled");

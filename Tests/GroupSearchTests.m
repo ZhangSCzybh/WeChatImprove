@@ -16,6 +16,7 @@ static NSSet *hiddenNames;
 static BOOL Option(NSString *key) { return [key isEqual:@"enabled"] && enabled; }
 static BOOL CSGroupApplicationActive(void) { return appActive; }
 static NSString *CSGroupCurrentAccountID(void) { return account; }
+static NSUInteger CSCloseFriendAccountEpoch(void) { return 1; }
 static BOOL CSGroupPrivacyActive(void) { return privacyEnabled; }
 static BOOL CSGroupIsFoldedController(id owner) { (void)owner; return NO; }
 static id CSGroupReadObject(id owner,NSString *key) { return [owner valueForKey:key]; }
@@ -24,6 +25,7 @@ static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table
 static void CSGroupWithNativeIndices(id table,void (^body)(void)) { (void)table; body(); }
 @interface SearchPolicy : NSObject
 @property(nonatomic) BOOL blocked;
+@property(nonatomic) NSUInteger revision;
 @end
 @implementation SearchPolicy @end
 static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
@@ -133,7 +135,11 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @property(nonatomic) BOOL publishing,privacyRefreshPending,dirty,swipeActive,recoveryPending,nativePresentation,projecting,publishedEnabled;
 @property(nonatomic) BOOL appearanceDirty,snapshotRetryAttempted;
 @property(nonatomic,strong) SearchPrivacyShield *privacyShield;
-@property(nonatomic) NSUInteger changeDepth,interactionAttempts,publications;
+@property(nonatomic) NSUInteger changeDepth,interactionAttempts,publications,refreshGeneration;
+@property(nonatomic) BOOL scheduled,scheduledCoalesced,scheduledInteraction,scheduledRecovery,coalescingNotification,pendingImmediateRefresh,publicationNeedsFullReload;
+@property(nonatomic) NSTimeInterval pendingRefreshDeadline,scheduledRefreshDeadline;
+@property(nonatomic,strong) NSMutableSet *pendingContentUserNames;
+@property(nonatomic) BOOL pendingContentUnattributed;
 @property(nonatomic) CSGroupChangeKind pendingChanges;
 @property(nonatomic) NSTimeInterval interactionDeadline;
 @property(nonatomic) double baselineDeceleration;
@@ -145,6 +151,7 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @implementation CSGroupListAdapter
 // Badge source lifecycle is exercised in GroupLifecycleTests.
 - (void)requestTabBadgeSourceRefresh {}
+- (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay { (void)event; (void)delay; }
 - (void)shieldVisiblePrivateRows {}
 - (void)invalidateNativeSnapshot { self.invalidations++; }
 - (void)saveAnchor { self.anchorSaves++; }
@@ -168,8 +175,9 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
     return [[CSGroupProjection alloc] initWithSections:sections tabs:tabs selectedTabID:selected filterDuplicates:NO
         accountID:accountID hiddenUserNames:privacyEnabled ? hiddenNames : [NSSet set] privacyRevision:self.publications+1 previousProjection:nil];
 }
-- (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous changes:(CSGroupChangeKind)changes previouslyProjecting:(BOOL)previouslyProjecting {
-    (void)projection; (void)previous; (void)changes; (void)previouslyProjecting; self.publications++;
+- (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous changes:(CSGroupChangeKind)changes
+        contentUserNames:(NSSet *)names contentIdentityKnown:(BOOL)known previouslyProjecting:(BOOL)previouslyProjecting {
+    (void)projection; (void)previous; (void)changes; (void)names; (void)known; (void)previouslyProjecting; self.publications++;
 }
 #include "SearchBodies.h"
 @end
