@@ -1,6 +1,5 @@
 #import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
-#import <objc/runtime.h>
 #import "CSListCornerConfiguration.h"
 #import "CSListCornerSectionPolicy.h"
 #import "CSListCornerPageContext.h"
@@ -83,8 +82,6 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 - (void)layoutSubviews {
     %orig;
     UITableViewCell *cell=(UITableViewCell *)self;
-    if (object_getClass(cell)==NSClassFromString(@"MMTableViewCell") && CSListCornerExistingSessionBackground(cell))
-        CSListCornerRefreshSessionGeometry(cell);
     UITableView *table=CSListCornerTableForView(cell);
     CSListCornerDiscoverDecorate(cell,table,nil,nil);
     CSListCornerRepairCellSeparators(cell,table);

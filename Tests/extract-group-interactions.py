@@ -4,7 +4,7 @@ import sys
 root = Path(__file__).resolve().parent.parent
 source = (Path(sys.argv[2]) if len(sys.argv) > 2 else root / 'Controllers/CSGroupListAdapter.m').read_text()
 methods = []
-for marker in ['- (void)cancelScheduledRefresh {', '- (void)requestRecovery {', '- (void)applyPendingScrollToTop {', '- (BOOL)groupPanMoving', '- (NSInteger)listZoneForTouch:', '- (BOOL)nativeMenuGesture:', '- (BOOL)closeMenusForGroupSwitch', '- (BOOL)gestureRecognizerShouldBegin:', '- (void)groupPan:', '- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldBeRequiredToFailByGestureRecognizer:', '- (NSUInteger)nativeMenuState', '- (void)nativeMenuDidChange', '- (void)updateGroupGestureAvailability', '- (void)endSwipeEditing', '- (void)reconcileDeletedSwipeRow',
+for marker in ['- (void)cancelScheduledRefresh {', '- (void)requestRecovery {', '- (BOOL)groupPanMoving', '- (NSInteger)listZoneForTouch:', '- (BOOL)nativeMenuGesture:', '- (BOOL)closeMenusForGroupSwitch', '- (BOOL)gestureRecognizerShouldBegin:', '- (void)groupPan:', '- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldBeRequiredToFailByGestureRecognizer:', '- (NSUInteger)nativeMenuState', '- (void)nativeMenuDidChange', '- (void)updateGroupGestureAvailability', '- (void)endSwipeEditing', '- (void)reconcileDeletedSwipeRow',
                '- (BOOL)performNativeEditingContext:', '- (BOOL)forwardSwipeInvocation:',
                '- (BOOL)keepsGroupHeaderDuringSearch', '+ (NSString *)groupTitleForTitleView:', '+ (void)recordNativeTitle:', '- (void)refreshNavigationTitle', '- (BOOL)groupSwipesAvailable',
                '- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:']:
@@ -25,12 +25,7 @@ for marker in ['- (void)cancelScheduledRefresh {', '- (void)requestRecovery {', 
         if source[end] == '}':
             depth -= 1
             if depth == 0:
-                body=source[start:end+1]
-                if marker=='- (void)applyPendingScrollToTop {':
-                    # Keep production state/visibility guards. ViewportTests runs
-                    # the remaining geometry; this fixture counts its consumption.
-                    body=body[:body.index('    CGFloat top=')]+'    self.pendingScrollToTop=NO; self.topApplications++;\n}'
-                methods.append(body)
+                methods.append(source[start:end+1])
                 break
 # Exercise the exact refresh admission and scheduling code. Stop before building
 # the host's private model; a counter stands in for the admitted reload.

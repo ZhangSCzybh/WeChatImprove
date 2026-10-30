@@ -45,12 +45,6 @@
     return self;
 }
 @end
-@interface CSGroupPublicationPlan ()
-@property (nonatomic, readwrite) BOOL fullReload, geometryChanged;
-@property (nonatomic, copy, readwrite) NSArray<NSIndexPath *> *reloadPaths;
-@end
-@implementation CSGroupPublicationPlan
-@end
 static BOOL CSGroupIsPath(id path) {
     return [path isKindOfClass:[NSIndexPath class]] && [path length] == 2;
 }
@@ -400,55 +394,6 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
         for (NSUInteger r=0;r<self.sections[s].count;r++)
             if (!CSGroupRowsMatch(self.sections[s][r],other.sections[s][r],YES)) [paths addObject:CSGroupPath(s,r)];
     return paths;
-}
-- (CSGroupPublicationPlan *)publicationPlanFrom:(CSGroupProjection *)previous
-                                       changes:(CSGroupChangeKind)changes
-                              contentUserNames:(NSSet<NSString *> *)names
-                          contentIdentityKnown:(BOOL)known
-                                  visiblePaths:(NSArray<NSIndexPath *> *)visiblePaths {
-    CSGroupPublicationPlan *plan=[CSGroupPublicationPlan new];
-    plan.reloadPaths=@[];
-    // Display text, badges and top flags are values, not coordinate identity.
-    // Anonymous rows may retain their verified slot when unrelated sessions change.
-    BOOL same=self.valid && previous.valid && [self.accountID isEqual:previous.accountID] &&
-        [self.selectedTabID isEqual:previous.selectedTabID] && self.privacyRevision==previous.privacyRevision &&
-        self.sections.count==previous.sections.count;
-    for (NSUInteger s=0;s<self.sections.count && same;s++) {
-        NSArray<CSGroupRow *> *left=self.sections[s], *right=previous.sections[s];
-        if (left.count!=right.count) { same=NO; break; }
-        for (NSUInteger r=0;r<left.count;r++) {
-            CSGroupRow *a=left[r], *b=right[r];
-            if (a.kind!=b.kind || ![a.nativePath isEqual:b.nativePath] ||
-                !CSGroupValueEqual(a.userName,b.userName) || a.privacyMasked!=b.privacyMasked) { same=NO; break; }
-        }
-    }
-    if (!same) { plan.fullReload=YES; plan.geometryChanged=YES; return plan; }
-    if (known) {
-        if (![names isKindOfClass:NSSet.class]) known=NO;
-        else for (id name in names) if (![name isKindOfClass:NSString.class] || ![name length]) { known=NO; break; }
-    }
-    NSSet<NSIndexPath *> *visible=[NSSet setWithArray:visiblePaths ?: @[]];
-    BOOL content=(changes&CSGroupChangeContent)!=0;
-    NSMutableArray<NSIndexPath *> *reload=[NSMutableArray array];
-    for (NSUInteger s=0;s<self.sections.count;s++) {
-        for (NSUInteger r=0;r<self.sections[s].count;r++) {
-            CSGroupRow *row=self.sections[s][r], *old=previous.sections[s][r];
-            NSIndexPath *path=CSGroupPath(s,r);
-            BOOL changed=!CSGroupRowsMatch(row,old,YES);
-            BOOL special=!row.userName.length || row.kind==CSGroupRowKindAggregate || row.kind==CSGroupRowKindBusiness;
-            BOOL geometry=(special && !CSGroupRowsMatch(row,old,NO)) || row.top!=old.top || row.category!=old.category;
-            BOOL affected=[names containsObject:row.userName ?: @""] ||
-                [names containsObject:row.foldedEntrySummaryUserName ?: @""] ||
-                [names containsObject:old.foldedEntrySummaryUserName ?: @""];
-            BOOL contentReload=content && (!known || affected) && ([visible containsObject:path] || special);
-            // A special row's changed native height also invalidates its cached
-            // geometry offscreen. Ordinary offscreen cells read current data on reuse.
-            if ((changed && ([visible containsObject:path] || geometry)) || contentReload) [reload addObject:path];
-            if (geometry || (contentReload && special)) plan.geometryChanged=YES;
-        }
-    }
-    plan.reloadPaths=[reload copy];
-    return plan;
 }
 - (void)discardComputationCache {
     self.inputSections=nil; self.destinationsByPath=nil;

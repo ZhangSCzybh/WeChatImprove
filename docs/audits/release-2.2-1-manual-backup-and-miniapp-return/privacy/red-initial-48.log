@@ -1,0 +1,11 @@
+FAIL: first exposed sections, row identities/y, card first/last and offset equal filtered stable layout
+FAIL: first exposed miniapp return layout never asks native cells for hidden sessions
+FAIL: locked/unlocked visible row membership is unchanged
+FAIL: late policy readiness does not publish a native/unfiltered layout
+FAIL: late policy readiness exposes zero protected native cells
+FAIL: unready content is coherently neutral without partial hidden-row holes
+FAIL: unready boundary wakes baseline publication without polling or an invented delay
+FAIL: ready policy resumes first content directly in filtered coordinates
+FAIL: new lock refuses stale unlocked projection before any content layout
+FAIL: new lock neutralizes all old content until filtered projection is ready
+Miniapp private layout: 48 checks, 10 failures

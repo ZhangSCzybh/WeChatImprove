@@ -21,21 +21,16 @@ assert source.count('%orig')==len(originals)
 for original in originals: source=source.replace('%orig',original,1)
 (out/'BackgroundAudioHooksUnderTest.h').write_text(source)
 production=(root/'Controllers/CSBackgroundRunManager.m').read_text()+(root/'Controllers/CSBackgroundRunAudio.m').read_text()+(root/'Hooks/BackgroundRun.xm').read_text()
-for forbidden in ('dispatch_source_create','dispatch_after','beginBackgroundTask','backgroundTimeRemaining','%hook AppDelegate','%hook SpringBoard','URLForResource:@"blank"'):
+for forbidden in ('NSTimer','dispatch_source_create','dispatch_after','beginBackgroundTask','backgroundTimeRemaining','%hook AppDelegate','%hook SpringBoard','URLForResource:@"blank"'):
  assert forbidden not in production, forbidden
-manager=(root/'Controllers/CSBackgroundRunManager.m').read_text()
-assert manager.count('timerWithTimeInterval:')==1
-assert 'repeats:NO' in manager and 'repeats:YES' not in manager
-assert manager.count('addTimer:')==1
-assert 'boundaryGeneration!=generation' in manager
-print('Background run: one boundary timer, no polling, renewal loop, private lifecycle hooks or host audio-file dependency')
+print('Background run: no polling, renewal loop, private lifecycle hooks or host audio-file dependency')
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \
     -Wno-nullability-completeness -framework Foundation \
     -DAVAudioSession=CSTestAudioSession -DAVAudioPlayer=CSTestAudioPlayer \
     -I"$project_dir/Tests/BackgroundRunNative" -I"$project_dir/Controllers" -I"$test_dir" \
     "$project_dir/Tests/BackgroundRunNative/BackgroundRunNative.m" \
-    "$project_dir/Controllers/CSBackgroundRunPolicy.m" "$project_dir/Controllers/CSBackgroundRunAudio.m" "$project_dir/Controllers/CSBackgroundRunManager.m" \
+    "$project_dir/Controllers/CSBackgroundRunAudio.m" "$project_dir/Controllers/CSBackgroundRunManager.m" \
     "$project_dir/Tests/BackgroundRunTests.m" -o "$test_dir/background-run"
 "$test_dir/background-run" "$test_dir/silence.wav"
 /usr/bin/afinfo "$test_dir/silence.wav"

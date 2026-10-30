@@ -1,0 +1,16 @@
+{
+  "baseline_manifest_entries": 42776,
+  "baseline_stage_all_matched": true,
+  "final_unchanged_manifest_entries": 42732,
+  "final_changed_or_deleted_manifest_entries": 44,
+  "final_added_source_tests": [
+    "Tests/BackupManualManagementTests.m",
+    "Tests/MiniappPrivateLayoutTests.m",
+    "Tests/verify-backup-manual-management.sh",
+    "Tests/verify-miniapp-private-layout.sh"
+  ],
+  "final_change_count_including_docs": 52,
+  "unexpected_differences": [],
+  "prior_audit_differences": [],
+  "all_final_changes_limited_to_two_requested_fixes_and_release_metadata": true
+}

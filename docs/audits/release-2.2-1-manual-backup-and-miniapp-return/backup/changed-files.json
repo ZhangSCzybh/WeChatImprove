@@ -1,0 +1,242 @@
+[
+  {
+    "path": "Controllers/CSBackupBootstrap.h",
+    "action": "modified",
+    "baseline_sha256": "37e517742fd557da99ebe4779cc8d699169c133d03332bd3a42a9ec00a7ebd72",
+    "current_sha256": "8222e2c404af9d3a2335b8d3f58e489557ace04ec58a723d47664461a9f22d28"
+  },
+  {
+    "path": "Controllers/CSBackupBootstrap.m",
+    "action": "modified",
+    "baseline_sha256": "0f5916558fb31b9935838c380dfcce26778d7a60c0dea4c5eff4c428c5c35e03",
+    "current_sha256": "3016c46b36541def9e3b54ca32bcf51f9bc5e6c3811fa7da93fcb60e0e13daff"
+  },
+  {
+    "path": "Controllers/CSBackupEngine.h",
+    "action": "modified",
+    "baseline_sha256": "5ae19a64fcb07ceb03576cf4683ad0cd1433096ee09ac317ba3f168241ebcbfa",
+    "current_sha256": "d0b8b857dba1a0838e37787383f20c5317dfa12dd40075c615f8ab598a96eb2a"
+  },
+  {
+    "path": "Controllers/CSBackupEngine.m",
+    "action": "modified",
+    "baseline_sha256": "3c37c61e497be828b297329a02abe3fd785ff651258790799931e88565cd7286",
+    "current_sha256": "ff423b783565e8bf65854cfd0d22cb5faf3c967b9fa767c6e63cdd74e8db5a4a"
+  },
+  {
+    "path": "Controllers/CSBackupManager.h",
+    "action": "modified",
+    "baseline_sha256": "fef8d138a322e1fb0a7d524a37bbb1f77d7359d4e12d91d781f6b20a3db17441",
+    "current_sha256": "faf791448e9ec84a695861ba487006647bc290f1180c483de349f81877df011c"
+  },
+  {
+    "path": "Controllers/CSBackupManager.m",
+    "action": "modified",
+    "baseline_sha256": "78f84ff17f0bbc798c1d112a2fba71c6caf82f3d5074bff63fdcad110625d4a1",
+    "current_sha256": "d24c5848636abbca433965f4004c6edd85c7722bd88484926089eec7958452ec"
+  },
+  {
+    "path": "Controllers/CSBackupPreviewViewController.m",
+    "action": "modified",
+    "baseline_sha256": "306c35dfea46181040188ab44d9293ce7ca561aba2e9d7fcbe17ef7c4fef6717",
+    "current_sha256": "8b67812952cfb4ccc5fb6045d732b7da6c73173e72cd8c10fd34dccf7bc55f3e"
+  },
+  {
+    "path": "Controllers/CSBackupRegistry.m",
+    "action": "modified",
+    "baseline_sha256": "76fc615a0dd0bb87d9edec7f77f799fdb4afa6d4bb03e5eadee48cb78afe0100",
+    "current_sha256": "432de58aaa01aa00a3fd3d8b81347ee440328e5f57ed8efd073357cfbd6b3c44"
+  },
+  {
+    "path": "Controllers/CSBackupScheduler.h",
+    "action": "deleted",
+    "baseline_sha256": "af1c74d9e5f336655a90d0869b25472c250e277852002f012bd33363a3593626",
+    "current_sha256": null
+  },
+  {
+    "path": "Controllers/CSBackupScheduler.m",
+    "action": "deleted",
+    "baseline_sha256": "40c7342a8658f03889b25caf91f812a78e7b6299bf0bc303ea04f1daa41013f6",
+    "current_sha256": null
+  },
+  {
+    "path": "Controllers/CSBackupSettingsViewController.m",
+    "action": "modified",
+    "baseline_sha256": "47890d69731000cd81ecf5b135552867335369a86668263e9081c8030d5cfc05",
+    "current_sha256": "890f1473dcd01e0edd1d57dbade25bb9ee31350de6280aba2eab0a02d54963e8"
+  },
+  {
+    "path": "Controllers/CSBackupStore.h",
+    "action": "modified",
+    "baseline_sha256": "f1ab50b6247a7fa0f7333d85a6b9a0bb502821f7fe548ef8f88fa3ffba84572d",
+    "current_sha256": "eb177b269950e92fed4fdc54f6317a6bd9baf1ae32cd35f8be3973710bc29a4c"
+  },
+  {
+    "path": "Controllers/CSBackupStore.m",
+    "action": "modified",
+    "baseline_sha256": "3cf2671a3688c3fee7a8b4ad0a4eb25653142fea36f590f129f8dc932a9d6a4e",
+    "current_sha256": "482a59b66deb017f3467f7e4e08c9dbfa854a3b84e80e2528cc50ac89c40a43d"
+  },
+  {
+    "path": "Tests/AIReplyBackupTests.m",
+    "action": "modified",
+    "baseline_sha256": "a1c3500001f2d20216dc04e686c3a262a1ea628d88c9796158603f4acc15c178",
+    "current_sha256": "78adf700b7ad92f9f50fdf0de9004c8954ab5658fbe66562b398125901e0d0b9"
+  },
+  {
+    "path": "Tests/BackupBootstrapTests.m",
+    "action": "modified",
+    "baseline_sha256": "2e75a9889b168f5007910f092bfc4b4aa5faef9dd6319def646f7bbd8be61d94",
+    "current_sha256": "6b55aee17a857bc8a2c59301cc9302d730d2e84126391ce2d54ea56d969bdb37"
+  },
+  {
+    "path": "Tests/BackupCompatibilityTests.m",
+    "action": "modified",
+    "baseline_sha256": "fb7b581b51cf2a6e8fe0c5e6eee7053f8300ed6ad72ad67d0c8c39488b0b705f",
+    "current_sha256": "4c035df001aeb5432a5fab503e3ae10a4b1c6bf32e2cec8a72cbdb81a8858136"
+  },
+  {
+    "path": "Tests/BackupDeletionUITests.m",
+    "action": "modified",
+    "baseline_sha256": "fb9b965d747771b8a6e0e413890054afa5981c97412e6891db4e4f2d847e2d5f",
+    "current_sha256": "29e2be36a974dd04e111a7e0598b102f5719beec164dc6bf3a7bb23a2bab8a9a"
+  },
+  {
+    "path": "Tests/BackupEngineTests.m",
+    "action": "modified",
+    "baseline_sha256": "2f12a8ab671cdd352667828677cb257aba383b09adc07a99c2fd5b84f6325ce1",
+    "current_sha256": "adcc49aea3f378f1897b7735c572758bd55836c061044a1be3de8cbbd217833d"
+  },
+  {
+    "path": "Tests/BackupManagerSchedulingTests.m",
+    "action": "deleted",
+    "baseline_sha256": "a6056820bf133b953c91159b7c35b82431a3e757b15aafdc05c73d429cfada8c",
+    "current_sha256": null
+  },
+  {
+    "path": "Tests/BackupPerformanceTests.m",
+    "action": "modified",
+    "baseline_sha256": "27fa0cd6da9a7d798fc55a714d51d9afd8968e391a9043e08c198730f810279a",
+    "current_sha256": "7f81af9107a50221c620c6aa6269572cdeb25720c4694cbec9536c1597ddaf7c"
+  },
+  {
+    "path": "Tests/BackupResetTests.m",
+    "action": "modified",
+    "baseline_sha256": "f25e5c936bc2042e8aeeb54569527f0c6a50ab05e1cd1c31802faeb1ce14b89e",
+    "current_sha256": "3d9996c347c78f0f664e06a16e8b7f6e72d76a51055d7fcd78e4a649764d2ded"
+  },
+  {
+    "path": "Tests/BackupRestorePathTests.m",
+    "action": "modified",
+    "baseline_sha256": "0c4cc9f12f345a43fc6deddfc2919feb3fefdb48da2802fbc03a2fdc69699851",
+    "current_sha256": "6afa3f3f4a14ba3e30f52999994fa2153fc983126261ad3aba4eae661d0d5fa3"
+  },
+  {
+    "path": "Tests/BackupRetentionTests.m",
+    "action": "deleted",
+    "baseline_sha256": "ccb44db5e71e4d3ce7409683b8f519b864fcf6952d7371f635fbbab58b66f5cf",
+    "current_sha256": null
+  },
+  {
+    "path": "Tests/BackupSchedulerTests.m",
+    "action": "deleted",
+    "baseline_sha256": "c2dc87571eb30d2491bc7ba35a3ba81b3e3fac341139c5c1472d6919b51d77f5",
+    "current_sha256": null
+  },
+  {
+    "path": "Tests/BackupStartupIntegrationTests.m",
+    "action": "modified",
+    "baseline_sha256": "c0ece3a788571ba32996ab02685d814ea7e4294ca6b9c5ec84401fa8607a9932",
+    "current_sha256": "5c2d5fc85062fb1e9322e495973376acb44e3d95e57185fb87294db6f70e5683"
+  },
+  {
+    "path": "Tests/BackupStoreTests.m",
+    "action": "modified",
+    "baseline_sha256": "844aff7837eaa9218622e0e0fdc00b25c5d7bc31df7b06ead1f7b904fdeb0313",
+    "current_sha256": "30640bd20998e34bbdec9178337f28a8a90b997b5202b0ebabea170f4020e1f5"
+  },
+  {
+    "path": "Tests/BackupTransactionTests.m",
+    "action": "modified",
+    "baseline_sha256": "58b99a6478ec5c4aaae9f43c18f8032521da0f3fa4f8cde5b066fbe81aa40e5e",
+    "current_sha256": "b69fc574e4ee597f39db186bf9059baae4066717f094da4ec8bfd5ce5b0b5b95"
+  },
+  {
+    "path": "Tests/ScheduledTaskBackupTests.m",
+    "action": "modified",
+    "baseline_sha256": "0ba1d196c494a4ad7149abf50335cdfb1759189cd8ddee45f691b81c77361851",
+    "current_sha256": "1ff39069aafb8047f47e5160b8b2e7d5aae96f1e6297aa28adcff8f7b46ec767"
+  },
+  {
+    "path": "Hooks/CustomEntryHooks.xm",
+    "action": "modified",
+    "baseline_sha256": "5a237f99b212c220d20f55addb24dba72eb9f69c18d5dc1101865d2cab7a49cc",
+    "current_sha256": "65c9e0e3649b67d2bad6b5061ed01e44d98257b51d1c8bbbf7f92b3424f7b2dd"
+  },
+  {
+    "path": "Controllers/CSResetSettingsViewController.m",
+    "action": "modified",
+    "baseline_sha256": "75d1dd87d977abde7a3914bf5b7e55c73d1480c49ae308efdd2ef7d47165e20b",
+    "current_sha256": "e79cb014c9acf16d355e1cf80ccf7691dd5a7e675999e7e8007c1de5b3b3ae05"
+  },
+  {
+    "path": "Tests/verify-backup-deletion-ui.sh",
+    "action": "modified",
+    "baseline_sha256": "0ff824f1569306f1cb44d119c644e2bc4b97136f5d9182818b948e86ac842abb",
+    "current_sha256": "100a12679c3a57e7ef421e8b7f21f4f534340d34e18d7c13d5233ff53db66184"
+  },
+  {
+    "path": "Tests/verify-plugin-framework.sh",
+    "action": "modified",
+    "baseline_sha256": "2807e7adba193a1eb2af17718d1ff1bb84128d7c5c189425bcf3fceea0b6481f",
+    "current_sha256": "42954b7afb2f0fe1739fc938aac41c4c53bd943faafc62bc6b35fa961b63a1a6"
+  },
+  {
+    "path": "Tests/verify-backup-manager-scheduling.sh",
+    "action": "deleted",
+    "baseline_sha256": "96078e452d73dc84aff129632ebfddcdc8d0b76e05a4d7e8c83a819688f7f389",
+    "current_sha256": null
+  },
+  {
+    "path": "Tests/verify-backup-retention.sh",
+    "action": "deleted",
+    "baseline_sha256": "85190dedff63e82e59ea6294027e969925096b6bdffe9f8cb3c33d63bf9f994d",
+    "current_sha256": null
+  },
+  {
+    "path": "Tests/verify-backup-scheduler.sh",
+    "action": "deleted",
+    "baseline_sha256": "ff90ae3be01018d6805a98df402955ba7d3ffc0bb2437dccac3ab009a01ed0ad",
+    "current_sha256": null
+  },
+  {
+    "path": "Tests/BackupManualManagementTests.m",
+    "action": "added",
+    "baseline_sha256": null,
+    "current_sha256": "651b3f162fe102aa44759c3187a8d777ae693b8abd7d03500f9a3e1af22507a7"
+  },
+  {
+    "path": "Tests/verify-backup-manual-management.sh",
+    "action": "added",
+    "baseline_sha256": null,
+    "current_sha256": "5bd72056eff16feb6f5a494b2b68a863e87f3a7cdf5f86fbcc5cd6a6ccb0e4c4"
+  },
+  {
+    "path": "docs/backup-guide.md",
+    "action": "modified",
+    "baseline_sha256": "37b65b2bd0bea28d477662032231cef8fbc7b38628f848319cf476faa7ac88da",
+    "current_sha256": "4bb5db6cb086eb15ddd31a815d134d684b1636d1008da5a369ca850955cd36d0"
+  },
+  {
+    "path": "docs/backup-configuration-registry.md",
+    "action": "modified",
+    "baseline_sha256": "f6b6c625693e46d942bc0313f82bf43f55874a9e73e47411b820b90786d57aa3",
+    "current_sha256": "1fba5ecba40be84376cbbf35e87aaf99b3a95ee3bd0517543c8dacc28e0dae9e"
+  },
+  {
+    "path": "Tests/PluginStorageMigrationTests.m",
+    "action": "modified",
+    "baseline_sha256": "8b8a7b0ff007b0cbeec9bdbce24f4e7839d1dad84c2f1adda2dd0edd0dfbfeef",
+    "current_sha256": "f0dff1bd6d9cc8e4d430cd683869b8395d8a3c7d11101b10cb392ab79a948a9f"
+  }
+]

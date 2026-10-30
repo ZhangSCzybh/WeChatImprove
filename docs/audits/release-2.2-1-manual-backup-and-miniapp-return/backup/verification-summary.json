@@ -1,0 +1,15 @@
+{
+  "scripts": 19,
+  "groups": 20,
+  "checks": 3812,
+  "failures": 0,
+  "initial_failed_scripts": [
+    "Tests/verify-plugin-storage-migration.sh: undeclared removed APIs prune: and save:kind:error:; reviewed reference test API changes applied, rerun passed"
+  ],
+  "warning_lines": 0,
+  "notes": [
+    "No live WeChat defaults/backup data used; each suite creates isolated temp roots/defaults domains.",
+    "No background policy changes imported; all unrelated reference assertions remain 2.1-20.",
+    "Initial compile-failure log preserved and excluded from successful checks."
+  ]
+}

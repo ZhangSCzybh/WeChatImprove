@@ -17,8 +17,7 @@ def extract(marker):
 markers=['- (CSGroupProjection *)projectionForSections:', '- (BOOL)accountMatches', '- (NSIndexPath *)currentPathForRow:', '- (NSIndexPath *)nativePath:', '- (NSArray *)nativePaths:', '- (NSIndexPath *)displayPath:', '- (BOOL)navigatePrivateSessionsForward:', '- (UITableViewCell *)cellForDisplayPath:(NSIndexPath *)path target:(id)target {', '- (void)forwardInvocation:(NSInvocation *)inv target:(id)target {']
 (Path(sys.argv[2])/'SessionBodies.h').write_text('\n'.join(extract(m) for m in markers))
 (Path(sys.argv[2])/'PrivacyActive.h').write_text(extract('static BOOL CSGroupPrivacyActive('))
-refresh=extract('- (void)refresh {')
-enabled=refresh[refresh.index('        BOOL enabled='):refresh.index('        BOOL privacy=')].strip()
+enabled=source[source.index('        BOOL enabled='):source.index('        BOOL privacy=')].strip()
 selection=extract('        if (self.nativePresentation || !enabled || (self.searching && !keepsSearchGroup))')
 chrome=source[source.index('        self.chromeVisible=enabled'):].split(';',1)[0].strip().replace('self.chromeVisible=','BOOL chrome=')+';'
 (Path(sys.argv[2])/'FoldedSelectionBody.h').write_text('- (NSDictionary *)foldedSelectionFixture:(NSArray *)tabs selected:(NSString *)selected { BOOL keepsSearchGroup=NO; '+enabled+'\n'+selection+'\n'+chrome+'\n return @{@"tabs":tabs,@"selected":selected,@"enabled":@(enabled),@"chrome":@(chrome)}; }')

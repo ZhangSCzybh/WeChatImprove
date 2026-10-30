@@ -7,27 +7,15 @@
 #import "CSBackupRestoreDiagnostics.h"
 #import "CSScheduledTaskStore.h"
 #import "CSAIReplyStore.h"
-#import "CSBackgroundRunPolicy.h"
 #import <sys/stat.h>
 static NSString *const Profiles=@"com.wechat.enhance.chat_group.account_profiles";
 static NSString *const Selection=@"com.wechat.enhance.chat_group.selection.";
 static BOOL EngineFail(NSError **error,NSString *message){if(error)*error=CSBackupFailure(message);return NO;}
 static BOOL HasRuntimeFields(NSArray *fields) {for(NSDictionary *field in fields)if([field[@"domain"] isEqual:CSScheduledTaskBackupDomain] || [field[@"domain"] isEqual:CSAIReplyBackupDomain])return YES;return NO;}
-static NSArray *RevisionFields(NSArray *fields) {
-    NSMutableArray *result=[NSMutableArray arrayWithCapacity:fields.count];
-    for(NSDictionary *field in fields) {
-        // Older pending transactions predate this optional preference. Keep explicit
-        // absence in portable snapshots, while preserving their original revision.
-        if([field[@"domain"] isEqual:@"legacy"]&&[field[@"key"] isEqual:CSBackgroundRunPolicyKey]&&![field[@"present"] boolValue])continue;
-        [result addObject:field];
-    }
-    return result;
-}
 static NSString *Revision(NSDictionary *snapshot, BOOL runtime) {
-    NSArray *fields=RevisionFields(snapshot[@"fields"]);
-    if(runtime&&(snapshot[@"scheduledTaskRevision"] || snapshot[@"aiReplyRevision"]))return [CSBackupCodec digest:@[fields,snapshot[@"assets"],snapshot[@"scheduledTaskRevision"]?:@"",snapshot[@"aiReplyRevision"]?:@"",snapshot[@"resetRawRevision"]?:@"",snapshot[@"missingAssets"]?:@[]]];
-    if(snapshot[@"resetRawRevision"])return [CSBackupCodec digest:@[fields,snapshot[@"assets"],snapshot[@"resetRawRevision"],snapshot[@"missingAssets"]?:@[]]];
-    return [CSBackupCodec digest:@[fields,snapshot[@"assets"]]];
+    if(runtime&&(snapshot[@"scheduledTaskRevision"] || snapshot[@"aiReplyRevision"]))return [CSBackupCodec digest:@[snapshot[@"fields"],snapshot[@"assets"],snapshot[@"scheduledTaskRevision"]?:@"",snapshot[@"aiReplyRevision"]?:@"",snapshot[@"resetRawRevision"]?:@"",snapshot[@"missingAssets"]?:@[]]];
+    if(snapshot[@"resetRawRevision"])return [CSBackupCodec digest:@[snapshot[@"fields"],snapshot[@"assets"],snapshot[@"resetRawRevision"],snapshot[@"missingAssets"]?:@[]]];
+    return [CSBackupCodec digest:@[snapshot[@"fields"],snapshot[@"assets"]]];
 }
 static BOOL IsReset(NSDictionary *snapshot) {return [snapshot[@"operation"] isEqual:@"reset"];}
 static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%@/%@",f[@"domain"],f[@"key"]];}
@@ -157,7 +145,7 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
         if(scheduledState.count)snapshot[@"scheduledTaskRevision"]=[CSBackupCodec digest:scheduledState];
         if(aiState.count)snapshot[@"aiReplyRevision"]=[CSBackupCodec digest:aiState];
         if(allowMissing){
-            snapshot[@"resetRawRevision"]=[CSBackupCodec digest:RevisionFields(raw)];snapshot[@"missingAssets"]=missing;
+            snapshot[@"resetRawRevision"]=[CSBackupCodec digest:raw];snapshot[@"missingAssets"]=missing;
             NSMutableArray *warnings=[snapshot[@"warnings"] mutableCopy];
             for(NSDictionary *record in missing){
                 NSDictionary *entry=[CSBackupRegistry entryForDomain:record[@"domain"] key:record[@"key"]];

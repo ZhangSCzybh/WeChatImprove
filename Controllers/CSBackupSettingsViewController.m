@@ -206,7 +206,7 @@
 }
 - (void)showRecord:(NSDictionary *)record snapshot:(NSDictionary *)snapshot anchor:(UIView *)anchor {
     NSDateFormatter *date=[NSDateFormatter new];date.dateStyle=NSDateFormatterMediumStyle;date.timeStyle=NSDateFormatterShortStyle;
-    NSString *kind=@{@"manual":@"手动备份",@"automatic":@"历史自动备份",@"protection":@"历史操作保护备份",@"upgrade":@"历史版本备份",@"imported":@"导入备份"}[snapshot[@"kind"]]?:@"备份";
+    NSString *kind=@{@"manual":@"手动备份",@"automatic":@"历史配置备份",@"protection":@"历史操作保护备份",@"upgrade":@"历史版本备份",@"imported":@"导入备份"}[snapshot[@"kind"]]?:@"备份";
     NSString *message=[NSString stringWithFormat:@"%@ · %@\n来源版本 %@ · %lu 项配置 · %lu 张图片%@",kind,[date stringFromDate:snapshot[@"createdAt"]],snapshot[@"source"][@"pluginVersion"],(unsigned long)[snapshot[@"fields"] count],(unsigned long)[snapshot[@"assets"] count],[snapshot[@"warnings"] count]?[@"\n" stringByAppendingString:[snapshot[@"warnings"] componentsJoinedByString:@"\n"]]:@""];
     if(record[@"metadataWarning"])message=[message stringByAppendingFormat:@"\n\n%@",record[@"metadataWarning"]];
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:record[@"metadata"][@"name"]?:snapshot[@"name"] message:message preferredStyle:UIAlertControllerStyleActionSheet];

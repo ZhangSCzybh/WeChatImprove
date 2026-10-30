@@ -1,0 +1,7 @@
+Tests/PluginStorageMigrationTests.m:76:130: error: no visible @interface for 'CSBackupStore' declares the selector 'prune:'
+   76 |     Check(![store writeJournal:@{} error:NULL]&&![store archiveJournal:NULL]&&![store confirmActivation:@{} error:NULL]&&![store prune:NULL],@"all mutation entry points wait for migration");
+      |                                                                                                                            ~~~~~ ^~~~~
+Tests/PluginStorageMigrationTests.m:93:33: error: no visible @interface for 'CSBackupEngine' declares the selector 'save:kind:error:'
+   93 |     NSDictionary *saved=[engine save:@"source" kind:@"manual" error:&error];Check(saved!=nil,@"recovery source saved");[defaults setObject:@"before" forKey:key];
+      |                          ~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2 errors generated.

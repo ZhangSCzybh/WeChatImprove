@@ -1,0 +1,45 @@
+{
+  "production_input_count": 42511,
+  "production_input_sha256_equal_after_package_check": true,
+  "missing_input_paths": [],
+  "extra_input_paths": [],
+  "changed_input_paths": [],
+  "package_count": 2,
+  "delivery_artifact_count": 4,
+  "symbol_file_count": 12,
+  "package_architectures": [
+    [
+      "arm64",
+      "arm64e"
+    ],
+    [
+      "arm64",
+      "arm64e"
+    ]
+  ],
+  "historical_file_count": 1333,
+  "historical_unchanged": true,
+  "warning_counts": {
+    "rootless": 6,
+    "rootful": 6
+  },
+  "warning_multisets_equal": true,
+  "shasum_check_exit_code": 0,
+  "artifacts": [
+    {
+      "file": "com.wechat.improve_2.2-1_iphoneos-arm.deb",
+      "bytes": 1519632,
+      "sha256": "0118be64951af9b49ae58c4133159839d44f2f76facffba052f4ce116e486eef"
+    },
+    {
+      "file": "com.wechat.improve_2.2-1_iphoneos-arm64.deb",
+      "bytes": 1523832,
+      "sha256": "fcc9f8417eaf3da2075fd3e177996fd720413a2afdd8107bd81ce93fca3123db"
+    },
+    {
+      "file": "com.wechat.improve_2.2-1_symbols.zip",
+      "bytes": 11047568,
+      "sha256": "07639f5dc33ae6a8dc6e0dd535d308617ca2d1f9e229eb53c6d8a5c4983e363b"
+    }
+  ]
+}

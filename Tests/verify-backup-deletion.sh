@@ -14,7 +14,7 @@ with tempfile.TemporaryDirectory(prefix="backup-deletion-build-") as work:
         "-framework", "Foundation", "-framework", "CoreFoundation",
         "-framework", "ImageIO", "-framework", "CoreGraphics",
         "Controllers/CSScheduledTaskStore.m", "Controllers/CSAIReplyStore.m",
-        "Controllers/CSBackupRegistry.m", "Controllers/CSBackgroundRunPolicy.m", "Controllers/CSBackupCodec.m",
+        "Controllers/CSBackupRegistry.m", "Controllers/CSBackupCodec.m",
         "Controllers/CSBackupAssets.m", "Controllers/CSPluginStorage.m",
         "Controllers/CSBackupStore.m", "Tests/BackupDeletionTests.m", "-o", binary,
     ], check=True)

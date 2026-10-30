@@ -1,7 +1,6 @@
 #import "CSBackupRegistry.h"
 #import "CSScheduledTaskStore.h"
 #import "CSAIReplyStore.h"
-#import "CSBackgroundRunPolicy.h"
 #include <math.h>
 
 static NSString *const CSSelectionPrefix = @"com.wechat.enhance.chat_group.selection.";
@@ -62,7 +61,6 @@ static BOOL CSContacts(id value) {
         NSArray *rows=@[
             @[@"legacy",@"BackgroundInterval",@"background",@"number",@"global",@""],
             @[@"legacy",@"BackgroundRunEnabled",@"background",@"bool",@"global",@""],
-            @[@"legacy",CSBackgroundRunPolicyKey,@"background",@"backgroundPolicy",@"global",@""],
             @[@"standard",@"GameCheat_Enabled",@"games",@"bool",@"global",@""],
             @[@"standard",@"WCTimeLineMessageTailEnabled",@"timeline",@"bool",@"global",@""],
             @[@"standard",@"WCTimeLineMessageTailText",@"timeline",@"string",@"global",@""],
@@ -413,7 +411,6 @@ static BOOL CSContacts(id value) {
         if ([type isEqual:@"bool"]) valid=CSBoolean(value);
         else if ([type isEqual:@"number"]) valid=CSNumber(value);
         else if ([type isEqual:@"string"]) valid=[value isKindOfClass:NSString.class] && [value length]<=1048576;
-        else if ([type isEqual:@"backgroundPolicy"]) valid=CSBackgroundRunValidatePolicy(value,error);
         // Existing UIColor archives are opaque data: never instantiate archive classes from a backup.
         else if ([type isEqual:@"data"]) valid=[value isKindOfClass:NSData.class] && [value length]>0 && [value length]<=1048576;
         else if ([type isEqual:@"array"]) {

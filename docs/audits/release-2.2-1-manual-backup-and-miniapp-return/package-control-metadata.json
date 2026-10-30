@@ -1,0 +1,10 @@
+[
+  {
+    "package": "com.wechat.improve_2.2-1_iphoneos-arm.deb",
+    "control": "Package: com.wechat.improve\nName: WeChatImprove\nDescription: 微信插件，支持聊天按钮布局自定义等。\nMaintainer: 再也不会\nAuthor: 再也不会\nSection: Tweaks\nDepends: mobilesubstrate (>= 0.9.5000)\nArchitecture: iphoneos-arm\nVersion: 2.2-1\nInstalled-Size: 6552\n"
+  },
+  {
+    "package": "com.wechat.improve_2.2-1_iphoneos-arm64.deb",
+    "control": "Package: com.wechat.improve\nName: WeChatImprove\nDescription: 微信插件，支持聊天按钮布局自定义等。\nMaintainer: 再也不会\nAuthor: 再也不会\nSection: Tweaks\nDepends: mobilesubstrate (>= 0.9.5000)\nArchitecture: iphoneos-arm64\nVersion: 2.2-1\nInstalled-Size: 6552\n"
+  }
+]

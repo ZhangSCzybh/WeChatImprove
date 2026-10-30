@@ -31,8 +31,6 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 + (void)attachToController:(id)controller;
 /// Suspend derived UI work while the native main-frame owner is offscreen.
 + (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller;
-/// Restore the entry height after native appearance finishes, then release it.
-+ (void)finishPresentationReturnForController:(id)controller;
 + (void)layoutForController:(id)controller;
 + (void)settingsChanged;
 /// Display-only total for identity-silent subjects; nil means native policy, zero means
@@ -57,20 +55,11 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 /// Restrict the native row pan using the original touch position in the table.
 - (BOOL)nativeMenuGesture:(UIGestureRecognizer *)gesture inCell:(UIView *)cell shouldReceiveTouch:(UITouch *)touch;
 - (void)layout;
-/// Keep UIKit delivery in display coordinates and require a current privacy projection.
-- (void)performVisibleLayout:(void (^)(void))layout;
-/// Reveal neutral content only after verified publication, viewport and visible cells agree.
-- (void)finishNeutralPublication:(BOOL)publicationCompleted;
+- (void)performSessionListLayout:(void (^)(void))layout;
 - (void)refresh;
 - (void)requestRefresh;
 - (void)beginNativeChange;
 - (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind;
-/// A nil set means the content event cannot be attributed to individual sessions.
-- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind sessionUserNames:(nullable NSSet<NSString *> *)names;
-/// Bounded in-memory sampling only; no per-message log or persistent identifiers.
-- (void)recordRefreshReason:(NSString *)reason;
-- (NSDictionary *)refreshDiagnosticsSnapshot;
-- (void)resetRefreshDiagnostics;
 - (void)endNativeChange;
 /// Passive badge-source reads merge 80ms after the latest notification, at most
 /// 250ms from the first; privacy, lifecycle and native restoration stay urgent.

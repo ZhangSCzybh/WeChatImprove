@@ -1,5 +1,4 @@
 #import <Foundation/Foundation.h>
-#import "CSGroupRefreshState.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class WESessionTabItem;
@@ -73,20 +72,10 @@ typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
 @property (nonatomic, readonly) BOOL redDot;
 @end
 
-/// A publication decision over immutable projections; contains no native models.
-@interface CSGroupPublicationPlan : NSObject
-@property (nonatomic, readonly) BOOL fullReload;
-@property (nonatomic, copy, readonly) NSArray<NSIndexPath *> *reloadPaths;
-/// Structural publication or a changed special row can require native geometry.
-@property (nonatomic, readonly) BOOL geometryChanged;
-@end
-
 @interface CSGroupProjection : NSObject
 @property (nonatomic, copy, readonly) NSArray<NSArray<CSGroupRow *> *> *sections;
 @property (nonatomic, copy, readonly) NSString *accountID;
 @property (nonatomic, readonly, getter=isValid) BOOL valid;
-/// Policy revision already applied to the immutable rows, before visible layout.
-@property (nonatomic, readonly) NSUInteger privacyRevision;
 - (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
                             tabs:(NSArray<WESessionTabItem *> *)tabs
                    selectedTabID:(NSString *)selectedTabID
@@ -139,15 +128,6 @@ typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
 - (nullable CSGroupProjection *)projectionByAttachingNativeSummaryRow:(CSGroupRow *)row;
 - (BOOL)hasSameDisplayStructureAs:(nullable CSGroupProjection *)other;
 - (NSArray<NSIndexPath *> *)changedUnreadPathsFrom:(CSGroupProjection *)other;
-/// Revalidate coordinates before using event identities. Content events are
-/// independent of row metadata, which does not contain every preview/draft.
-/// Unknown-only notifications with unchanged verified rows produce no UI work.
-/// Unknown content attribution conservatively refreshes all visible rows.
-- (CSGroupPublicationPlan *)publicationPlanFrom:(nullable CSGroupProjection *)previous
-                                       changes:(CSGroupChangeKind)changes
-                              contentUserNames:(nullable NSSet<NSString *> *)names
-                          contentIdentityKnown:(BOOL)known
-                                  visiblePaths:(NSArray<NSIndexPath *> *)visiblePaths;
 /// Release full-list computation caches when the list is not being presented.
 - (void)discardComputationCache;
 - (instancetype)init NS_UNAVAILABLE;

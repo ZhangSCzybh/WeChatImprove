@@ -25,25 +25,23 @@ static NSDictionary *Values(CSGroupProjection *p,NSArray *tabs) {
 }
 @interface UITableView : NSObject
 @property(nonatomic,copy) NSArray *indexPathsForVisibleRows,*reloaded;
-@property(nonatomic) NSUInteger fullReloads,layouts,rowReloads;
+@property(nonatomic) NSUInteger fullReloads,layouts;
 - (void)reloadData;
 - (void)reloadRowsAtIndexPaths:(NSArray *)paths withRowAnimation:(NSInteger)animation;
 - (void)layoutIfNeeded;
 @end
 @implementation UITableView
 - (void)reloadData { self.fullReloads++; }
-- (void)reloadRowsAtIndexPaths:(NSArray *)paths withRowAnimation:(NSInteger)animation { (void)animation; self.rowReloads++; self.reloaded=paths; }
+- (void)reloadRowsAtIndexPaths:(NSArray *)paths withRowAnimation:(NSInteger)animation { (void)animation; self.reloaded=paths; }
 - (void)layoutIfNeeded { self.layouts++; }
 @end
 #define UITableViewRowAnimationNone 0
 static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table; body(); }
 @interface CSGroupListAdapter : NSObject
 @property(nonatomic,strong) UITableView *table;
-@property(nonatomic) BOOL projecting,pendingScrollToTop,publicationNeedsFullReload;
-- (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay;
+@property(nonatomic) BOOL projecting,pendingScrollToTop;
 @end
 @implementation CSGroupListAdapter
-- (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay { (void)event; (void)delay; }
 #include "GroupPublicationBody.h"
 @end
 int main(void) { @autoreleasepool {
@@ -97,48 +95,26 @@ int main(void) { @autoreleasepool {
 
     CSGroupListAdapter *adapter=[CSGroupListAdapter new]; adapter.projecting=YES;
     UITableView *table=[UITableView new]; adapter.table=table; table.indexPathsForVisibleRows=@[Path(0,0),Path(0,1)];
-    [adapter publishProjection:unread previous:old changes:CSGroupChangeUnread contentUserNames:nil contentIdentityKnown:NO previouslyProjecting:YES];
+    [adapter publishProjection:unread previous:old changes:CSGroupChangeUnread previouslyProjecting:YES];
     Check(!table.fullReloads && [table.reloaded isEqual:@[Path(0,0)]],@"stable structure updates only visible changed unread rows");
-    Check(!table.layouts,@"ordinary unread rows do not force synchronous layout");
     table.reloaded=nil;
-    NSUInteger rowReloads=table.rowReloads;
-    [adapter publishProjection:old previous:old changes:CSGroupChangeUnread contentUserNames:nil contentIdentityKnown:NO previouslyProjecting:YES];
-    Check(!table.fullReloads && !table.reloaded && table.rowReloads==rowReloads && !table.layouts,@"unchanged values perform zero table operations");
-    [adapter publishProjection:old previous:old changes:CSGroupChangeContent contentUserNames:[NSSet setWithObject:@"a"] contentIdentityKnown:YES previouslyProjecting:YES];
-    Check([table.reloaded isEqual:@[Path(0,0)]] && !table.layouts,@"same-snapshot known preview/draft content refreshes only its session without layout");
-    table.reloaded=nil;
-    [adapter publishProjection:old previous:old changes:CSGroupChangeContent contentUserNames:[NSSet setWithObject:@"b"] contentIdentityKnown:YES previouslyProjecting:YES];
-    Check(!table.reloaded && !table.fullReloads && !table.layouts,@"known content outside the selected group leaves displayed rows alone");
-    [adapter publishProjection:old previous:old changes:CSGroupChangeContent contentUserNames:nil contentIdentityKnown:NO previouslyProjecting:YES];
+    [adapter publishProjection:old previous:old changes:CSGroupChangeUnread previouslyProjecting:YES];
+    Check(!table.fullReloads && !table.reloaded,@"unchanged values perform no cell reload");
+    [adapter publishProjection:old previous:old changes:CSGroupChangeContent previouslyProjecting:YES];
     Check(!table.fullReloads && table.reloaded.count==2,@"preview/draft changes refresh visible cells even when snapshot values match");
     table.reloaded=nil;
-    rowReloads=table.rowReloads;
-    [adapter publishProjection:old previous:old changes:CSGroupChangeUnknown contentUserNames:nil contentIdentityKnown:NO previouslyProjecting:YES];
-    Check(!table.fullReloads && !table.reloaded && table.rowReloads==rowReloads && !table.layouts,@"unknown-only feedback with verified unchanged metadata settles without table work");
+    [adapter publishProjection:old previous:old changes:CSGroupChangeUnknown previouslyProjecting:YES];
+    Check(table.fullReloads==1,@"unknown native changes retain full reload fallback");
     adapter.pendingScrollToTop=YES;
-    [adapter publishProjection:old previous:old changes:CSGroupChangeUnread contentUserNames:nil contentIdentityKnown:NO previouslyProjecting:YES];
-    Check(table.fullReloads==1 && table.layouts==1,@"explicit return-to-top keeps the full publication path"); adapter.pendingScrollToTop=NO;
+    [adapter publishProjection:old previous:old changes:CSGroupChangeUnread previouslyProjecting:YES];
+    Check(table.fullReloads==2,@"explicit return-to-top keeps the full publication path"); adapter.pendingScrollToTop=NO;
     CSGroupProjection *removed=Build(@[rows[0]],tabs,@"preset_2",NO,@"A",old);
-    [adapter publishProjection:removed previous:old changes:CSGroupChangeContent contentUserNames:[NSSet setWithObject:@"a"] contentIdentityKnown:YES previouslyProjecting:YES];
-    Check(table.fullReloads==2 && table.layouts==2,@"structural mismatch overrides even a targeted content hint");
+    [adapter publishProjection:removed previous:old changes:CSGroupChangeContent previouslyProjecting:YES];
+    Check(table.fullReloads==3,@"structural mismatch overrides even a content-only hint");
     CSGroupRow *banner=[[CSGroupRow alloc] initWithNativePath:Path(0,0) userName:nil kind:CSGroupRowKindBusiness category:CSGroupRowCategoryUnknown top:NO unreadCount:0 redDot:NO];
     CSGroupProjection *business=Build(@[banner],tabs,@"preset_2",NO,@"A",nil);
-    rowReloads=table.rowReloads;
-    [adapter publishProjection:business previous:business changes:CSGroupChangeUnknown contentUserNames:nil contentIdentityKnown:NO previouslyProjecting:YES];
-    Check(table.fullReloads==2 && table.layouts==2 && table.rowReloads==rowReloads,@"unchanged anonymous business rows no longer force full reload or layout");
-    [adapter publishProjection:business previous:business changes:CSGroupChangeContent contentUserNames:nil contentIdentityKnown:NO previouslyProjecting:YES];
-    Check(table.fullReloads==2 && table.layouts==3 && [table.reloaded isEqual:@[Path(0,0)]],@"unattributed business content refreshes its row and native geometry");
-    CSGroupRow *changedBanner=[[CSGroupRow alloc] initWithNativePath:Path(0,0) userName:nil kind:CSGroupRowKindBusiness category:CSGroupRowCategoryUnknown top:NO unreadCount:0 redDot:NO nativeSummary:@"changed banner" sortTime:nil];
-    CSGroupProjection *changedBusiness=Build(@[changedBanner],tabs,@"preset_2",NO,@"A",business);
-    table.indexPathsForVisibleRows=@[];
-    [adapter publishProjection:changedBusiness previous:business changes:CSGroupChangeUnknown contentUserNames:nil contentIdentityKnown:NO previouslyProjecting:YES];
-    Check(table.fullReloads==2 && table.layouts==4 && [table.reloaded isEqual:@[Path(0,0)]],@"changed offscreen special geometry updates its verified row height");
-    CSGroupProjection *privateRevision=[[CSGroupProjection alloc] initWithSections:@[@[banner]] tabs:tabs selectedTabID:@"preset_2" filterDuplicates:NO accountID:@"A" hiddenUserNames:NSSet.set privacyRevision:1 previousProjection:business];
-    [adapter publishProjection:privateRevision previous:business changes:CSGroupChangeUnknown contentUserNames:nil contentIdentityKnown:NO previouslyProjecting:YES];
-    Check(table.fullReloads==3 && table.layouts==5,@"privacy revision changes keep full publication semantics");
-    adapter.publicationNeedsFullReload=YES;
-    [adapter publishProjection:business previous:business changes:CSGroupChangeUnknown contentUserNames:nil contentIdentityKnown:NO previouslyProjecting:YES];
-    Check(table.fullReloads==4 && table.layouts==6 && !adapter.publicationNeedsFullReload,@"a stale aborted publication forces one complete table synchronization before clearing its guard");
+    [adapter publishProjection:business previous:business changes:CSGroupChangeContent previouslyProjecting:YES];
+    Check(table.fullReloads==4,@"business/header-like rows retain native geometry refresh fallback");
     fprintf(stdout,"Group incremental: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;
 } }

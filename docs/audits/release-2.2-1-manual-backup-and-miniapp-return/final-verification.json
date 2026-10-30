@@ -1,0 +1,13 @@
+{
+  "build-input-sha256.json": {
+    "files": 42511,
+    "changed_or_missing": []
+  },
+  "historical-artifacts-before.json": {
+    "files": 1333,
+    "changed_or_missing": []
+  },
+  "total_successful_checks": 4430,
+  "successful_failures": 0,
+  "shasum_exit": 0
+}

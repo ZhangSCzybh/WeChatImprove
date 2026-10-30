@@ -1,0 +1,51 @@
+[
+  {
+    "path": "Controllers/CSGroupListAdapter.h",
+    "baseline_sha256": "9aec959b483b4cfe1cf84dff503f4c5a4fc685ee792c8f55606a6130bf598e64",
+    "manifest_sha256": "9aec959b483b4cfe1cf84dff503f4c5a4fc685ee792c8f55606a6130bf598e64",
+    "current_sha256": "b4e908a40c86ad4c0ec47f5b5622448814abc837f32043ebb5fd5d0261e584b4",
+    "baseline_verified": true
+  },
+  {
+    "path": "Controllers/CSGroupListAdapter.m",
+    "baseline_sha256": "90bad936d0c153e891621399547b0177fa88412bb502db7d940fa35e7d4120f5",
+    "manifest_sha256": "90bad936d0c153e891621399547b0177fa88412bb502db7d940fa35e7d4120f5",
+    "current_sha256": "04347cc9a79cea7c5f210b450850e3dd8b967de7e2b3824581ec650daf1f06af",
+    "baseline_verified": true
+  },
+  {
+    "path": "Hooks/SessionGroupHooks.xm",
+    "baseline_sha256": "5716f9e7dc6158c13162bcad8e7ee45f7099901f61e3d0fde970f7bbf7888a46",
+    "manifest_sha256": "5716f9e7dc6158c13162bcad8e7ee45f7099901f61e3d0fde970f7bbf7888a46",
+    "current_sha256": "7e3ed572e1937a93cc6e82638972c45509fcd894dba6731dccf663a74411e806",
+    "baseline_verified": true
+  },
+  {
+    "path": "Tests/GroupRefreshFixture.h",
+    "baseline_sha256": "43ed9232788702e43c2c2ade1541b2fc7f8665ca42b7dcf6c4887a62a82b53f9",
+    "manifest_sha256": "43ed9232788702e43c2c2ade1541b2fc7f8665ca42b7dcf6c4887a62a82b53f9",
+    "current_sha256": "636710660758e092585c43fd61f326944a00d7c56dcb8b450c20383d16f695aa",
+    "baseline_verified": true
+  },
+  {
+    "path": "Tests/GroupSearchTests.m",
+    "baseline_sha256": "7a8b70dad1a684c78d53fef35b8f5e829809def65dd97eb90dfd1bb45ee8b535",
+    "manifest_sha256": "7a8b70dad1a684c78d53fef35b8f5e829809def65dd97eb90dfd1bb45ee8b535",
+    "current_sha256": "746dfd03765b04d4e8e49ce2e0626357c5436d356e9060bac9363e59545050cf",
+    "baseline_verified": true
+  },
+  {
+    "path": "Tests/MiniappPrivateLayoutTests.m",
+    "baseline_sha256": null,
+    "manifest_sha256": null,
+    "current_sha256": "b6666a0ada9c63171823c20603d239655149f385a86e8279b1a477b333fbb0fa",
+    "baseline_verified": true
+  },
+  {
+    "path": "Tests/verify-miniapp-private-layout.sh",
+    "baseline_sha256": null,
+    "manifest_sha256": null,
+    "current_sha256": "02a0576987f320a6800f37706370e890c709e951da91757e06533258a9365877",
+    "baseline_verified": true
+  }
+]

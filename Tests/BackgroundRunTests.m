@@ -27,7 +27,6 @@ static void Create(BOOL supported, BOOL enabled) {
     [session setActive:NO error:NULL]; Drain();
     UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
     UIApplication.sharedApplication.connectedScenes=[NSSet set];
-    [defaults removeObjectForKey:CSBackgroundRunPolicyKey];
     [defaults setBool:enabled forKey:CSBackgroundRunEnabledKey];
     audio=[CSBackgroundRunAudio new];
     manager=[[CSBackgroundRunManager alloc] initWithDefaults:defaults audio:audio supportsBackgroundAudio:supported];
@@ -37,160 +36,6 @@ static void Interrupt(BOOL began,BOOL resume) {
     if (began) AVAudioSession.sharedInstance.active=NO; // OS deactivation, not a host API call.
     Post(AVAudioSessionInterruptionNotification,nil,@{AVAudioSessionInterruptionTypeKey:@(began?AVAudioSessionInterruptionTypeBegan:AVAudioSessionInterruptionTypeEnded),AVAudioSessionInterruptionOptionKey:@(resume?AVAudioSessionInterruptionOptionShouldResume:0)});
 }
-// Deterministic time and device inputs exercise the real production manager.
-@interface CSClockedBackgroundManager : CSBackgroundRunManager
-@property(nonatomic) NSTimeInterval testWall, testContinuous;
-@property(nonatomic) BOOL testLowPower;
-@property(nonatomic) NSProcessInfoThermalState testThermal;
-@property(nonatomic, strong) NSCalendar *testCalendar;
-@property(nonatomic, strong) NSMutableArray<NSTimer *> *testTimers;
-@property(nonatomic, strong) NSMutableArray *testHandlers;
-@property(nonatomic) NSTimeInterval lastDelay;
-@end
-@implementation CSClockedBackgroundManager
-- (NSDate *)wallNow { return [NSDate dateWithTimeIntervalSince1970:self.testWall]; }
-- (NSTimeInterval)continuousNow { return self.testContinuous; }
-- (NSCalendar *)policyCalendar { return self.testCalendar; }
-- (BOOL)lowPowerModeEnabled { return self.testLowPower; }
-- (NSProcessInfoThermalState)thermalState { return self.testThermal; }
-- (NSTimer *)createBoundaryTimerAfter:(NSTimeInterval)delay handler:(void (^)(NSTimer *))handler {
-    for(NSTimer *existing in self.testTimers) CHECK(!existing.valid);
-    NSTimer *timer=[NSTimer timerWithTimeInterval:delay repeats:NO block:handler];
-    [self.testTimers addObject:timer];[self.testHandlers addObject:[handler copy]];self.lastDelay=delay;return timer;
-}
-@end
-static CSClockedBackgroundManager *Controlled(id policy,BOOL legacy) {
-    Create(YES,YES);manager=nil;
-    [defaults removeObjectForKey:CSBackgroundRunPolicyKey];
-    if(policy)[defaults setObject:policy forKey:CSBackgroundRunPolicyKey];
-    else if(!legacy)[defaults removeObjectForKey:CSBackgroundRunEnabledKey];
-    UIDevice.currentDevice.batteryLevel=.8f;UIDevice.currentDevice.batteryState=UIDeviceBatteryStateUnplugged;
-    CSClockedBackgroundManager *clocked=[[CSClockedBackgroundManager alloc]initWithDefaults:defaults audio:audio supportsBackgroundAudio:YES];
-    clocked.testCalendar=[[NSCalendar alloc]initWithCalendarIdentifier:NSCalendarIdentifierGregorian];clocked.testCalendar.timeZone=[NSTimeZone timeZoneForSecondsFromGMT:0];
-    clocked.testWall=[[[NSISO8601DateFormatter alloc]init] dateFromString:@"2026-10-30T10:00:00Z"].timeIntervalSince1970;
-    clocked.testTimers=[NSMutableArray array];clocked.testHandlers=[NSMutableArray array];manager=clocked;[manager start];return clocked;
-}
-static void Advance(CSClockedBackgroundManager *clocked,NSTimeInterval seconds) { clocked.testContinuous+=seconds;clocked.testWall+=seconds; }
-static void FireBoundary(CSClockedBackgroundManager *clocked) { void (^handler)(NSTimer *)=clocked.testHandlers.lastObject;CHECK(handler!=nil);handler(clocked.testTimers.lastObject); }
-static NSMutableDictionary *Policy(NSUInteger minutes) { NSMutableDictionary *policy=[CSBackgroundRunDefaultPolicy() mutableCopy];policy[@"maxMinutes"]=@(minutes);return policy; }
-static void TestPolicyManager(void) {
-    CSClockedBackgroundManager *clocked=Controlled(nil,YES);
-    CHECK(manager.usesLegacyPolicy && [manager.policy isEqual:CSBackgroundRunLegacyPolicy()]);
-    CHECK([defaults objectForKey:CSBackgroundRunPolicyKey]==nil);
-    [manager setEnabled:NO];[manager setEnabled:YES];CHECK(manager.usesLegacyPolicy && [defaults objectForKey:CSBackgroundRunPolicyKey]==nil);
-    Background();Advance(clocked,4000);CHECK(audio.playing && manager.remainingDuration==-1 && clocked.testTimers.count==0);
-    CHECK([manager savePolicy:Policy(30) error:NULL]);CHECK(!audio.playing && manager.remainingDuration==0); // No fresh budget on adoption.
-
-    clocked=Controlled(nil,NO);CHECK(!manager.enabled && !manager.usesLegacyPolicy && [manager.policy isEqual:CSBackgroundRunDefaultPolicy()]);
-    CHECK([defaults objectForKey:CSBackgroundRunPolicyKey]==nil);
-    [manager setEnabled:YES];CHECK([defaults objectForKey:CSBackgroundRunPolicyKey]!=nil);
-    CHECK([manager.policy[@"maxMinutes"] isEqual:@30] && [manager.policy[@"energySaving"] boolValue]);
-    Background();CHECK(audio.playing && manager.remainingDuration==1800 && UIDevice.currentDevice.batteryMonitoringEnabled);
-    // A zero continuous-clock origin is valid. All pauses count against it.
-    __block NSUInteger stateEvents=0;__block BOOL observedActive=NO;
-    id observation=[NSNotificationCenter.defaultCenter addObserverForName:CSBackgroundRunStateChangedNotification object:manager queue:nil usingBlock:^(NSNotification *note){stateEvents++;observedActive=manager.backgroundAudioActive;}];
-    NSUInteger timers=clocked.testTimers.count,players=CSTestPlayerCreates;
-    for(NSUInteger i=0;i<1000;i++)Post(NSUserDefaultsDidChangeNotification,nil,nil);
-    CHECK(clocked.testTimers.count==timers && CSTestPlayerCreates==players && stateEvents==0);
-    Advance(clocked,600);Interrupt(YES,NO);CHECK(!audio.playing && stateEvents==1 && !observedActive);
-    Advance(clocked,300);Interrupt(NO,YES);CHECK(audio.playing && manager.remainingDuration==900 && stateEvents==2 && observedActive);
-    [manager setEnabled:NO];Advance(clocked,300);[manager setEnabled:YES];CHECK(audio.playing && manager.remainingDuration==600);
-    clocked.testLowPower=YES;Post(NSProcessInfoPowerStateDidChangeNotification,nil,nil);CHECK(!audio.playing && !observedActive);
-    Advance(clocked,300);clocked.testLowPower=NO;Post(NSProcessInfoPowerStateDidChangeNotification,nil,nil);CHECK(audio.playing && manager.remainingDuration==300 && observedActive);
-    Advance(clocked,301);FireBoundary(clocked);CHECK(!audio.playing && manager.remainingDuration==0 && !observedActive);
-    CHECK([manager.statusText containsString:@"已用完"] && !((NSTimer *)[manager valueForKey:@"boundaryTimer"]).valid);
-    players=CSTestPlayerCreates;[manager setEnabled:NO];[manager setEnabled:YES];Interrupt(YES,NO);Interrupt(NO,YES);
-    Post(NSProcessInfoPowerStateDidChangeNotification,nil,nil);CHECK(!audio.playing && CSTestPlayerCreates==players);
-    Foreground();CHECK(manager.remainingDuration==-1 && !UIDevice.currentDevice.batteryMonitoringEnabled);
-    Background();CHECK(audio.playing && manager.remainingDuration==1800);
-    [NSNotificationCenter.defaultCenter removeObserver:observation];
-
-    // Editing limits uses the original success time, including an unlimited interval.
-    clocked=Controlled(Policy(30),NO);Background();Advance(clocked,600);
-    CHECK([manager savePolicy:Policy(5) error:NULL] && !audio.playing && manager.remainingDuration==0);
-    CHECK([manager savePolicy:Policy(15) error:NULL] && audio.playing && manager.remainingDuration==300);
-    CHECK([manager savePolicy:Policy(0) error:NULL] && audio.playing && manager.remainingDuration==-1);
-    Advance(clocked,400);CHECK([manager savePolicy:Policy(15) error:NULL] && !audio.playing);
-    Foreground();Background();CHECK(audio.playing && manager.remainingDuration==900);
-    // Invalid writes are rejected atomically; invalid persisted input fails closed.
-    NSDictionary *stored=[defaults objectForKey:CSBackgroundRunPolicyKey];NSMutableDictionary *bad=Policy(30);bad[@"maxMinutes"]=@1;NSError *failure=nil;
-    CHECK(![manager savePolicy:bad error:&failure] && failure && [[defaults objectForKey:CSBackgroundRunPolicyKey] isEqual:stored] && audio.playing);
-    [defaults setObject:@"corrupt" forKey:CSBackgroundRunPolicyKey];[manager reloadSettings];CHECK(!audio.playing && [manager.statusText containsString:@"无效"]);
-    CHECK([manager savePolicy:Policy(30) error:NULL] && audio.playing);
-
-    // Battery hysteresis, charging, unknown readings and thermal precedence.
-    clocked=Controlled(Policy(30),NO);Background();
-    UIDevice *device=UIDevice.currentDevice;device.batteryLevel=.20f;Post(UIDeviceBatteryLevelDidChangeNotification,nil,nil);CHECK(!audio.playing);
-    for(NSNumber *level in @[@.21f,@.24f]){device.batteryLevel=level.floatValue;Post(UIDeviceBatteryLevelDidChangeNotification,nil,nil);CHECK(!audio.playing);}
-    device.batteryLevel=.25f;Post(UIDeviceBatteryLevelDidChangeNotification,nil,nil);CHECK(audio.playing);
-    device.batteryLevel=.19f;Post(UIDeviceBatteryLevelDidChangeNotification,nil,nil);CHECK(!audio.playing);
-    device.batteryState=UIDeviceBatteryStateCharging;Post(UIDeviceBatteryStateDidChangeNotification,nil,nil);CHECK(audio.playing);
-    device.batteryState=UIDeviceBatteryStateUnplugged;Post(UIDeviceBatteryStateDidChangeNotification,nil,nil);CHECK(!audio.playing);
-    device.batteryLevel=-1;Post(UIDeviceBatteryLevelDidChangeNotification,nil,nil);CHECK(audio.playing);
-    clocked.testThermal=NSProcessInfoThermalStateSerious;Post(NSProcessInfoThermalStateDidChangeNotification,nil,nil);CHECK(!audio.playing);
-    clocked.testLowPower=YES;clocked.testThermal=NSProcessInfoThermalStateFair;Post(NSProcessInfoThermalStateDidChangeNotification,nil,nil);CHECK(!audio.playing && [manager.statusText containsString:@"低电量模式"]);
-    clocked.testLowPower=NO;Post(NSProcessInfoPowerStateDidChangeNotification,nil,nil);CHECK(audio.playing);
-    NSMutableDictionary *unprotected=Policy(30);unprotected[@"energySaving"]=@NO;CHECK([manager savePolicy:unprotected error:NULL]);
-    clocked.testThermal=NSProcessInfoThermalStateCritical;Post(NSProcessInfoThermalStateDidChangeNotification,nil,nil);CHECK(!audio.playing);
-    clocked.testThermal=NSProcessInfoThermalStateFair;Post(NSProcessInfoThermalStateDidChangeNotification,nil,nil);CHECK(audio.playing);
-    // Do not disable monitoring already enabled by the host before our lease.
-    Foreground();device.batteryMonitoringEnabled=YES;CHECK([manager savePolicy:Policy(30) error:NULL]);Background();Foreground();CHECK(device.batteryMonitoringEnabled);device.batteryMonitoringEnabled=NO;
-
-    // Window boundary vs budget; stale timers cannot cancel a new generation.
-    NSMutableDictionary *window=Policy(30);window[@"allDay"]=@NO;window[@"startMinute"]=@600;window[@"endMinute"]=@610;
-    clocked=Controlled(window,NO);Background();CHECK(audio.playing && clocked.lastDelay==600);
-    void (^stale)(NSTimer *)=clocked.testHandlers.lastObject;NSTimer *staleTimer=clocked.testTimers.lastObject;
-    Advance(clocked,600);FireBoundary(clocked);CHECK(!audio.playing && [manager.statusText containsString:@"不在允许时段"] && manager.remainingDuration==1200);
-    NSTimer *next=[manager valueForKey:@"boundaryTimer"];stale(staleTimer);CHECK([manager valueForKey:@"boundaryTimer"]==next && !audio.playing);
-    // A significant wall-clock jump does not alter the continuous budget.
-    clocked.testWall-=600;Post(UIApplicationSignificantTimeChangeNotification,nil,nil);CHECK(audio.playing && manager.remainingDuration==1200);
-    clocked.testWall+=86400;Post(NSSystemTimeZoneDidChangeNotification,nil,nil);CHECK(audio.playing && manager.remainingDuration==1200);
-    Advance(clocked,1201);FireBoundary(clocked);CHECK(!audio.playing && manager.remainingDuration==0);
-    // Outside the window there is no origin until the first successful start.
-    window[@"startMinute"]=@660;window[@"endMinute"]=@720;
-    clocked=Controlled(window,NO);Background();CHECK(!audio.playing && manager.remainingDuration==-1 && clocked.lastDelay==3600);
-    Advance(clocked,3600);FireBoundary(clocked);CHECK(audio.playing && manager.remainingDuration==1800);
-    // A later callback after a simulated long suspension uses continuous elapsed time.
-    Advance(clocked,7200);FireBoundary(clocked);CHECK(!audio.playing && manager.remainingDuration==0);
-
-    // The host retains audio even when a policy stops our expired lease.
-    clocked=Controlled(Policy(5),NO);Background();AVAudioSession *session=AVAudioSession.sharedInstance;
-    [session setCategory:AVAudioSessionCategoryPlayAndRecord mode:@"VoiceChat" options:4 error:NULL];[session setActive:YES error:NULL];Drain();
-    CHECK(!audio.playing && session.active);
-    NSUInteger deactivations=session.deactivations,configurations=session.configurations;
-    Advance(clocked,301);FireBoundary(clocked);CHECK(session.active && session.deactivations==deactivations && session.configurations==configurations);
-    [session setActive:NO error:NULL];Drain();CHECK(!audio.playing && manager.remainingDuration==0);
-    Foreground();Background();CHECK(audio.playing && manager.remainingDuration==300);
-    // A host-owned session before our first success does not spend a budget.
-    clocked=Controlled(Policy(5),NO);
-    [session setCategory:AVAudioSessionCategoryPlayAndRecord mode:@"VoiceChat" options:4 error:NULL];[session setActive:YES error:NULL];Drain();
-    Background();CHECK(!audio.playing && manager.remainingDuration==-1 && clocked.testTimers.count==0);
-    Advance(clocked,600);[session setActive:NO error:NULL];Drain();CHECK(audio.playing && manager.remainingDuration==300);
-    Advance(clocked,60);[session setMode:@"VoiceChat" error:NULL];Drain();CHECK(!audio.playing);
-    Advance(clocked,60);[session setActive:NO error:NULL];Drain();CHECK(audio.playing && manager.remainingDuration==180);
-    // Changing time zones recalculates only the wall-clock boundary.
-    window=Policy(30);window[@"allDay"]=@NO;window[@"startMinute"]=@600;window[@"endMinute"]=@660;
-    clocked=Controlled(window,NO);Background();Advance(clocked,60);
-    clocked.testCalendar.timeZone=[NSTimeZone timeZoneForSecondsFromGMT:3600];Post(NSSystemTimeZoneDidChangeNotification,nil,nil);
-    CHECK(!audio.playing && manager.remainingDuration==1740);
-    clocked.testCalendar.timeZone=[NSTimeZone timeZoneForSecondsFromGMT:0];Post(NSSystemTimeZoneDidChangeNotification,nil,nil);
-    CHECK(audio.playing && manager.remainingDuration==1740);
-    // A failed first attempt cannot consume the budget or retry on defaults noise.
-    clocked=Controlled(Policy(5),NO);CSTestFailPlayerPlay=YES;Background();CHECK(!audio.playing && manager.remainingDuration==-1);
-    timers=clocked.testTimers.count;players=CSTestPlayerCreates;Advance(clocked,600);Post(NSUserDefaultsDidChangeNotification,nil,nil);
-    CHECK(clocked.testTimers.count==timers && CSTestPlayerCreates==players && manager.remainingDuration==-1);
-    CSTestFailPlayerPlay=NO;Foreground();Background();CHECK(audio.playing && manager.remainingDuration==300);
-    [manager setEnabled:NO];manager=nil;clocked=nil;
-    __weak CSBackgroundRunManager *weakManager;void (^afterDeath)(NSTimer *);NSTimer *deathTimer;
-    @autoreleasepool {
-        clocked=Controlled(Policy(5),NO);Background();weakManager=manager;
-        afterDeath=clocked.testHandlers.lastObject;deathTimer=clocked.testTimers.lastObject;
-        [manager setEnabled:NO];manager=nil;clocked=nil;
-    }
-    CHECK(weakManager==nil && !deathTimer.valid);
-    afterDeath(deathTimer);CHECK(!audio.playing);
-}
-
 int main(int argc,const char **argv) { @autoreleasepool {
     NSString *suite=[@"background-run-tests-" stringByAppendingString:NSUUID.UUID.UUIDString];
     defaults=[[NSUserDefaults alloc] initWithSuiteName:suite];
@@ -359,8 +204,6 @@ int main(int argc,const char **argv) { @autoreleasepool {
         dispatch_semaphore_signal(finished);
     });
     CHECK(dispatch_semaphore_wait(finished,dispatch_time(DISPATCH_TIME_NOW,2*NSEC_PER_SEC))==0); Drain();
-
-    TestPolicyManager();
 
     NSData *wav=CSBackgroundRunSilentAudioData();
     CHECK(wav==CSBackgroundRunSilentAudioData() && wav.length==256044);

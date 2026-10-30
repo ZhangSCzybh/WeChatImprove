@@ -64,17 +64,12 @@ static BOOL Option(NSString *suffix) {
 @property (nonatomic, copy) NSArray<WESessionTabItem *> *displayedTabs;
 @property (nonatomic, copy) NSDictionary<NSString *,id> *identityDisplayPaths;
 @property (nonatomic, copy) NSString *publishedTabID;
-@property (nonatomic) BOOL projecting, chromeVisible, publicationNeedsFullReload;
+@property (nonatomic) BOOL projecting, chromeVisible;
 @property (nonatomic) BOOL privacyRefreshPending;
+@property (nonatomic) BOOL sessionLayoutHeld;
 @property (nonatomic,strong) CSCloseFriendListShield *privacyShield;
 @property (nonatomic) BOOL searchChromeVisible;
 @property (nonatomic) BOOL presentationSuspended;
-@property (nonatomic, copy) NSDictionary *presentationViewport;
-@property (nonatomic, copy) NSDictionary *neutralViewport;
-@property (nonatomic) BOOL finishingNeutralPublication;
-@property (nonatomic) CGSize retainedContentSize;
-@property (nonatomic,copy) NSArray<NSNumber *> *retainedSectionCounts;
-@property (nonatomic) BOOL neutralGeometryQueried;
 @property (nonatomic) BOOL publishedEnabled;
 @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *prefetchedPaths;
 @property (nonatomic, strong) NSMutableArray *nativeActions;
@@ -105,20 +100,9 @@ static BOOL Option(NSString *suffix) {
 + (void)requestTabBadgeSourcesRefresh;
 @property (atomic) NSUInteger modelRevision;
 @property (nonatomic) NSUInteger snapshotRevision, snapshotEpoch, refreshGeneration;
-// Pending admission survives re-entrant publication. A UI wake never creates work.
-@property (nonatomic) BOOL coalescingNotification, scheduledCoalesced, pendingImmediateRefresh;
-@property (nonatomic) NSTimeInterval pendingRefreshDeadline, scheduledRefreshDeadline;
-@property (nonatomic, strong) NSMutableDictionary<NSString *,NSNumber *> *refreshDiagnosticCounts;
-@property (nonatomic, strong) NSMutableArray<NSDictionary *> *refreshDiagnosticEvents;
-@property (nonatomic) NSTimeInterval refreshDiagnosticStart;
-@property (nonatomic) NSUInteger refreshDiagnosticSamples;
-- (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay;
+@property (nonatomic) BOOL coalescingNotification, scheduledCoalesced;
 @property (nonatomic) BOOL coalescedDispatchPending;
 @property (atomic) CSGroupChangeKind pendingChanges;
-@property (nonatomic, strong) NSMutableSet<NSString *> *pendingContentUserNames;
-@property (nonatomic) BOOL pendingContentUnattributed;
-@property (nonatomic, copy) NSSet<NSString *> *nativeChangeUserNames;
-@property (nonatomic, strong) NSMutableArray *nativeChangeIdentityStack;
 @property (atomic) BOOL recoveryPending;
 @property (nonatomic) BOOL scheduledInteraction, scheduledRecovery, appearanceDirty;
 @property (nonatomic) NSUInteger recoveryAttempts, recoveryRevision, interactionAttempts;
@@ -136,104 +120,15 @@ static BOOL Option(NSString *suffix) {
 - (void)useNativePresentation;
 - (void)forwardInvocation:(NSInvocation *)inv target:(id)target;
 - (UITableViewCell *)cellForDisplayPath:(NSIndexPath *)path target:(id)target;
-- (void)shieldVisiblePrivateRows;
-- (void)neutralizeVisibleContent;
-- (void)restoreAnchor;
 @end
 @interface CSGroupTableProxy : NSObject
 @property (nonatomic, weak) CSGroupListAdapter *adapter;
 @property (nonatomic, weak) id target;
 @property (nonatomic, strong) NSMutableDictionary<NSString *,NSMethodSignature *> *signatures;
 @end
-// Content-free slots keep the published topology and total scroll extent. Row
-// identities and offscreen UIKit measurements are unnecessary while masked.
-static void CSGroupProxyReturnNeutralGeometry(CSGroupTableProxy *proxy,NSInvocation *invocation) {
-    proxy.adapter.neutralGeometryQueried=YES;
-    NSArray<NSNumber *> *sections=proxy.adapter.privacyShield.sectionRowCounts;
-    NSString *name=NSStringFromSelector(invocation.selector);
-    if ([name isEqual:@"numberOfSectionsInTableView:"]) {
-        NSInteger count=(NSInteger)sections.count; [invocation setReturnValue:&count];
-    } else if ([name isEqual:@"tableView:numberOfRowsInSection:"]) {
-        NSInteger section=0; [invocation getArgument:&section atIndex:3];
-        NSInteger count=section>=0 && section<(NSInteger)sections.count ? sections[(NSUInteger)section].integerValue : 0;
-        [invocation setReturnValue:&count];
-    } else if ([name isEqual:@"tableView:heightForRowAtIndexPath:"] || [name isEqual:@"tableView:estimatedHeightForRowAtIndexPath:"]) {
-        UITableView *table=proxy.adapter.table;
-        __block CGFloat headerHeight=0;
-        CSGroupWithDisplayIndices(table, ^{ headerHeight=CGRectGetHeight(table.tableHeaderView.frame); });
-        NSUInteger rows=0; for (NSNumber *count in sections) rows+=count.unsignedIntegerValue;
-        CGFloat area=MAX(0,proxy.adapter.privacyShield.contentSize.height-headerHeight);
-        CGFloat height=rows ? floor(area/rows) : 0;
-        __unsafe_unretained NSIndexPath *path=nil; [invocation getArgument:&path atIndex:3];
-        NSUInteger last=sections.count;
-        while (last && !sections[last-1].unsignedIntegerValue) last--;
-        if (rows && path.length==2 && [path indexAtPosition:0]==last-1 &&
-            [path indexAtPosition:1]+1==sections[last-1].unsignedIntegerValue) height=area-height*(rows-1);
-        if (!isfinite(height)) height=0;
-        [invocation setReturnValue:&height];
-    }
-}
-static BOOL CSGroupProxyCanDeliverVisibleQuery(CSGroupListAdapter *adapter) {
-    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
-    NSString *account=CSGroupCurrentAccountID();
-    if (!adapter || !policy || policy.blocked || !account.length || ![policy.accountID isEqual:account]) return NO;
-    BOOL privacy=policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue];
-    if (!adapter.projecting) return !privacy;
-    CSGroupProjection *projection=adapter.projection;
-    return projection.isValid && [projection.accountID isEqual:account] && projection.privacyRevision==policy.revision;
-}
-static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
-    static NSSet<NSString *> *queries; static dispatch_once_t once;
-    dispatch_once(&once, ^{
-        queries=[NSSet setWithArray:@[@"numberOfSectionsInTableView:",@"tableView:numberOfRowsInSection:",
-            @"tableView:heightForRowAtIndexPath:",@"tableView:estimatedHeightForRowAtIndexPath:",
-            @"tableView:titleForHeaderInSection:",@"tableView:titleForFooterInSection:",
-            @"tableView:viewForHeaderInSection:",@"tableView:viewForFooterInSection:",
-            @"tableView:heightForHeaderInSection:",@"tableView:heightForFooterInSection:",
-            @"tableView:estimatedHeightForHeaderInSection:",@"tableView:estimatedHeightForFooterInSection:",
-            @"sectionIndexTitlesForTableView:",@"tableView:sectionForSectionIndexTitle:atIndex:"]];
-    });
-    return [queries containsObject:NSStringFromSelector(selector)];
-}
 @implementation CSGroupTableProxy
-- (void)forwardScrollEnd:(SEL)selector scrollView:(id)table decelerate:(BOOL)decelerate {
-    id target=self.target;
-    CSGroupListAdapter *adapter=self.adapter;
-    if ([target respondsToSelector:selector]) {
-        NSInvocation *invocation=[NSInvocation invocationWithMethodSignature:[target methodSignatureForSelector:selector]];
-        invocation.selector=selector;
-        [invocation setArgument:&table atIndex:2];
-        if (selector==@selector(scrollViewDidEndDragging:willDecelerate:)) [invocation setArgument:&decelerate atIndex:3];
-        [adapter forwardInvocation:invocation target:target];
-    }
-    // These callbacks are implemented even when the native delegate omits them.
-    // Recheck admission after native code and offset writes, both may reenter.
-    if (!decelerate && CSGroupProxyCanDeliverVisibleQuery(adapter) && adapter.neutralViewport) [adapter restoreAnchor];
-    [adapter finishNeutralPublication:NO];
-    if (adapter.dirty || adapter.pendingScrollToTop) [adapter scheduleRefresh];
-}
-- (void)scrollViewDidEndDragging:(id)table willDecelerate:(BOOL)decelerate {
-    [self forwardScrollEnd:_cmd scrollView:table decelerate:decelerate];
-}
-- (void)scrollViewDidEndDecelerating:(id)table {
-    [self forwardScrollEnd:_cmd scrollView:table decelerate:NO];
-}
 - (UITableViewCell *)tableView:(UITableView *)table cellForRowAtIndexPath:(NSIndexPath *)path {
-    (void)table;
-    CSGroupListAdapter *adapter=self.adapter;
-    if (!CSGroupProxyCanDeliverVisibleQuery(adapter)) {
-        [adapter neutralizeVisibleContent];
-        // Keep the retained slots scrollable without delivering native content.
-        UITableViewCell *cell=[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
-        cell.userInteractionEnabled=NO; cell.selectionStyle=UITableViewCellSelectionStyleNone;
-        objc_setAssociatedObject(cell,&CellRowKey,@{@"neutral":@YES},OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        return cell;
-    }
-    __block UITableViewCell *cell=nil;
-    // UIKit can request visible rows synchronously inside a native owner call,
-    // before table.layoutSubviews establishes its display-coordinate boundary.
-    CSGroupWithDisplayIndices(adapter.table, ^{ cell=[adapter cellForDisplayPath:path target:self.target]; });
-    return cell;
+    (void)table; return [self.adapter cellForDisplayPath:path target:self.target];
 }
 - (BOOL)respondsToSelector:(SEL)selector {
     if ([super respondsToSelector:selector]) return YES;
@@ -260,19 +155,7 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     if (length) { void *zero=calloc(1,length); [invocation setReturnValue:zero]; free(zero); }
     id target=self.target;
     CSGroupListAdapter *adapter=self.adapter;
-    if (adapter && [target respondsToSelector:invocation.selector]) {
-        BOOL ready=CSGroupProxyCanDeliverVisibleQuery(adapter);
-        if (!CSGroupProxyIsVisibleQuery(invocation.selector)) {
-            // A render mask does not intercept touches. Deny row callbacks while
-            // neutral, including inherited native scopes; scroll callbacks pass.
-            NSString *name=NSStringFromSelector(invocation.selector);
-            if (!ready && [name hasPrefix:@"tableView:"]) { [adapter neutralizeVisibleContent]; return; }
-            [adapter forwardInvocation:invocation target:target];
-            return;
-        }
-        if (!ready) { [adapter neutralizeVisibleContent]; CSGroupProxyReturnNeutralGeometry(self,invocation); return; }
-        CSGroupWithDisplayIndices(adapter.table, ^{ [adapter forwardInvocation:invocation target:target]; });
-    }
+    if (adapter && [target respondsToSelector:invocation.selector]) [adapter forwardInvocation:invocation target:target];
 }
 @end
 
@@ -314,33 +197,14 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     if (!NSThread.isMainThread || !controller) return;
     objc_setAssociatedObject(controller,&PresentationSuspendedKey,@(suspended),OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     CSGroupListAdapter *adapter=[self adapterForController:controller];
-    if (suspended && !adapter.presentationSuspended) {
-        adapter.presentationViewport=nil;
-        NSString *account=adapter.preferences.accountID;
-        CGFloat height=adapter.table.contentOffset.y+adapter.table.adjustedContentInset.top;
-        if (!CSGroupIsFoldedController(controller) && adapter.isActive && adapter.chromeVisible && !adapter.searching &&
-            !adapter.nativePresentation && !adapter.nativeActions.count && !adapter.pendingScrollToTop &&
-            account.length && [account isEqual:CSGroupCurrentAccountID()] && isfinite(height))
-            adapter.presentationViewport=@{@"height":@(MAX(0,height)),@"account":account,@"epoch":@(CSCloseFriendAccountEpoch())};
-    }
     adapter.presentationSuspended=suspended;
     if (suspended) {
         adapter.dirty=YES; [adapter invalidateNativeSnapshot]; adapter.cachedNativeSections=nil;
-        // Visibility only invalidates the snapshot. Preserve real content-event
-        // attribution so returning does not rebuild unchanged native banners.
-        @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; }
         [adapter.projection discardComputationCache]; [adapter cancelScheduledRefresh];
         adapter.snapshotRetryAttempted=NO; adapter.snapshotRetryGeneration++;
         [adapter finishSuspendedBatches];
     }
     [adapter requestTabBadgeSourceRefresh];
-}
-+ (void)finishPresentationReturnForController:(id)controller {
-    if (!NSThread.isMainThread || !controller) return;
-    CSGroupListAdapter *adapter=[self adapterForController:controller];
-    if (!adapter.presentationViewport) return;
-    [adapter restoreAnchor];
-    adapter.presentationViewport=nil;
 }
 - (void)finishSuspendedBatches {
     if ((!self.presentationSuspended && CSGroupApplicationActive()) || self.changeDepth || self.publishing) return;
@@ -590,7 +454,7 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     }
 }
 + (void)settingsChanged {
-    dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown|CSGroupChangeContent; adapter.pendingContentUnattributed=YES; } [adapter invalidateNativeSnapshot]; adapter.appearanceDirty=YES; [adapter requestTabBadgeSourceRefresh]; [adapter refresh]; [adapter layout]; } });
+    dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } [adapter invalidateNativeSnapshot]; adapter.appearanceDirty=YES; [adapter requestTabBadgeSourceRefresh]; [adapter refresh]; [adapter layout]; } });
 }
 + (void)closeFriendPolicyChanged:(NSNotification *)notification {
     (void)notification;
@@ -610,139 +474,18 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
 }
 - (void)shieldVisiblePrivateRows {
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
-    if (!policy || policy.blocked || ![policy.accountID isEqual:CSGroupCurrentAccountID()]) {
-        [self neutralizeVisibleContent]; return;
-    }
     if (!CSGroupPrivacyActive()) return;
     if (!self.privacyShield) self.privacyShield=[CSCloseFriendListShield new];
-    // Unknown delivery is a whole-content boundary, never a collection of holes.
-    for (UITableViewCell *cell in self.table.visibleCells) {
-        NSDictionary *delivery=objc_getAssociatedObject(cell,&CellRowKey);
-        if (![delivery[@"account"] isEqual:policy.accountID] || !delivery[@"row"]) {
-            [self neutralizeVisibleContent]; return;
-        }
-    }
     for (UITableViewCell *cell in self.table.visibleCells) {
         // Use the delivered identity, never current native indexes during mutation.
         NSDictionary *delivery=objc_getAssociatedObject(cell,&CellRowKey);
         CSGroupRow *row=delivery[@"row"];
-        BOOL sensitive=[policy hidesUserName:row.userName surface:CSCloseFriendSurfaceSession];
-        // Only the folded-chat aggregate can carry protected session previews.
-        // Its existing safe cover remains authoritative; service containers do
-        // not acquire sensitive content merely because a friend is configured.
-        if (row.kind==CSGroupRowKindAggregate && [row.userName isEqual:@"chatroom_session_box"] &&
-            !row.privacyMasked && policy.protectedUserNames.count) {
-            [self neutralizeVisibleContent]; return;
-        }
+        BOOL unknown=policy.blocked || ![delivery[@"account"] isEqual:policy.accountID] ||
+            ![policy.accountID isEqual:CSGroupCurrentAccountID()] || !row;
+        BOOL sensitive=unknown || [policy hidesUserName:row.userName surface:CSCloseFriendSurfaceSession] ||
+            (row.kind==CSGroupRowKindAggregate && policy.protectedUserNames.count>0);
         if (sensitive) [self.privacyShield shieldCell:cell];
     }
-}
-- (void)neutralizeVisibleContent {
-    if (!self.privacyShield) self.privacyShield=[CSCloseFriendListShield new];
-    if (!self.neutralViewport) {
-        NSString *account=CSGroupCurrentAccountID();
-        CGFloat height=self.table.contentOffset.y+self.table.adjustedContentInset.top;
-        if (account.length && [self.preferences.accountID isEqual:account] && isfinite(height))
-            self.neutralViewport=@{@"height":@(MAX(0,height)),@"account":account,@"epoch":@(CSCloseFriendAccountEpoch())};
-    }
-    CGSize size=self.table.contentSize;
-    CGFloat viewport=CGRectGetHeight(self.table.bounds),inset=self.table.adjustedContentInset.top+self.table.adjustedContentInset.bottom;
-    if ((!isfinite(size.height) || size.height+inset<=viewport) &&
-        isfinite(self.retainedContentSize.height) && self.retainedContentSize.height+inset>viewport)
-        size=self.retainedContentSize;
-    NSArray *counts=self.retainedSectionCounts;
-    if (!counts.count && self.projecting && self.projection.isValid) {
-        NSMutableArray *current=[NSMutableArray array];
-        for (NSArray *rows in self.projection.sections) [current addObject:@(rows.count)];
-        counts=current;
-    }
-    NSUInteger total=0; for (NSNumber *count in counts) total+=count.unsignedIntegerValue;
-    if (!total) counts=@[@1];
-    [self.privacyShield shieldTable:self.table contentSize:size sectionRowCounts:counts];
-}
-- (void)finishNeutralPublication:(BOOL)publicationCompleted {
-    UITableView *table=self.table;
-    BOOL (^ready)(void)=^BOOL {
-        CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
-        NSString *account=CSGroupCurrentAccountID();
-        if (!policy || policy.blocked || !account.length || ![policy.accountID isEqual:account]) return NO;
-        BOOL privacy=policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue];
-        return self.projecting ? (self.projection.isValid && [self.projection.accountID isEqual:account] &&
-            self.projection.privacyRevision==policy.revision) : !privacy;
-    };
-    if (!table || self.finishingNeutralPublication || !ready()) return;
-    if (!self.privacyShield.tableShielded) {
-        CGSize size=table.contentSize;
-        if (isfinite(size.width) && isfinite(size.height) && size.width>=0 && size.height>0)
-            self.retainedContentSize=size;
-        if (self.projecting && self.projection.isValid) {
-            NSMutableArray *counts=[NSMutableArray array];
-            for (NSArray *rows in self.projection.sections) [counts addObject:@(rows.count)];
-            self.retainedSectionCounts=counts;
-        }
-        return;
-    }
-    if (self.publishing && !publicationCompleted) {
-        // A native early-return publication may finish inside this layout. The
-        // next normal layout completes it after the publishing stack unwinds.
-        [table setNeedsLayout]; return;
-    }
-    NSNumber *returnHeight=[self presentationScrollHeight];
-    self.finishingNeutralPublication=YES;
-    @try {
-        NSString *account=CSGroupCurrentAccountID();
-        NSUInteger epoch=CSCloseFriendAccountEpoch(),revision=CSCloseFriendCurrentSnapshot().revision;
-        BOOL (^current)(void)=^BOOL {
-            return ready() && epoch==CSCloseFriendAccountEpoch() && revision==CSCloseFriendCurrentSnapshot().revision &&
-                [account isEqual:CSGroupCurrentAccountID()];
-        };
-        if (table.tracking || table.dragging || table.decelerating ||
-            table.editing || self.swipeActive || [self groupPanMoving]) return;
-        if (self.neutralGeometryQueried) {
-            self.neutralGeometryQueried=NO;
-            // Re-measure the retained slots after neutral scalar geometry,
-            // without replacing their cells or rebuilding the table.
-            CSGroupWithDisplayIndices(table, ^{
-                [UIView performWithoutAnimation:^{
-                    [table beginUpdates]; [table endUpdates]; [table layoutIfNeeded];
-                }];
-            });
-        }
-        if (!current()) return;
-        BOOL (^matches)(UITableViewCell *,NSIndexPath *)=^BOOL(UITableViewCell *cell,NSIndexPath *path) {
-            NSDictionary *delivery=objc_getAssociatedObject(cell,&CellRowKey);
-            if ([delivery[@"neutral"] boolValue]) return NO;
-            if (!self.projecting) return YES;
-            CSGroupRow *expected=[self.projection rowAtDisplayPath:path],*row=delivery[@"row"];
-            BOOL sameName=row.userName==expected.userName || [row.userName isEqual:expected.userName];
-            return expected && row && [delivery[@"account"] isEqual:account] && sameName && row.kind==expected.kind &&
-                [row.nativePath isEqual:expected.nativePath] && row.privacyMasked==expected.privacyMasked &&
-                row.foldedEntryScoped==expected.foldedEntryScoped && row.foldedEntryPrivacyRevision==expected.foldedEntryPrivacyRevision;
-        };
-        NSMutableArray<NSIndexPath *> *repairs=[NSMutableArray array];
-        for (UITableViewCell *cell in table.visibleCells) {
-            __block NSIndexPath *path=nil;
-            CSGroupWithDisplayIndices(table, ^{ path=[table indexPathForCell:cell]; });
-            if (!path || (self.projecting && ![self.projection rowAtDisplayPath:path])) { [table setNeedsLayout]; return; }
-            if (!matches(cell,path)) [repairs addObject:path];
-        }
-        if (repairs.count) CSGroupWithDisplayIndices(table, ^{
-            [table reloadRowsAtIndexPaths:repairs withRowAnimation:UITableViewRowAnimationNone];
-            [table layoutIfNeeded];
-        });
-        if (!current()) return;
-        for (UITableViewCell *cell in table.visibleCells) {
-            __block NSIndexPath *path=nil;
-            CSGroupWithDisplayIndices(table, ^{ path=[table indexPathForCell:cell]; });
-            if (!path || !matches(cell,path)) return;
-        }
-        if (returnHeight) [self restoreScrollHeight:returnHeight.doubleValue];
-        if (!current() || self.neutralViewport || table.tracking || table.dragging || table.decelerating) return;
-        [self.privacyShield finishTablePublication];
-        CGSize size=table.contentSize;
-        if (isfinite(size.width) && isfinite(size.height) && size.width>=0 && size.height>0)
-            self.retainedContentSize=size;
-    } @finally { self.finishingNeutralPublication=NO; }
 }
 // Ordinary background updates remain deferred. A pending privacy publication is
 // the one exception, so the switcher never waits for foreground to get safe rows.
@@ -753,7 +496,7 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     CSGroupAppInactive=![notification.name isEqual:UIApplicationDidBecomeActiveNotification];
     for (CSGroupListAdapter *adapter in Adapters().allObjects) {
         [adapter cancelScheduledRefresh]; [adapter invalidateNativeSnapshot];
-        @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown|CSGroupChangeContent; adapter.pendingContentUnattributed=YES; } adapter.dirty=YES; adapter.recoveryPending=NO;
+        @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } adapter.dirty=YES; adapter.recoveryPending=NO;
         adapter.cachedNativeSections=nil; [adapter.projection discardComputationCache];
         adapter.snapshotRetryGeneration++; adapter.snapshotRetryAttempted=NO;
         [adapter requestTabBadgeSourceRefresh];
@@ -767,12 +510,9 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
 - (id)nativeSource { return self.proxies[@0].target; }
 - (void)installProxies {
     UITableView *table=self.table; if (!table) return;
-    id source=[self proxyForTarget:table.dataSource role:0];
-    id delegate=[self proxyForTarget:table.delegate role:1];
-    id prefetch=[self proxyForTarget:table.prefetchDataSource role:2];
-    if (table.dataSource!=source) table.dataSource=source;
-    if (table.delegate!=delegate) table.delegate=delegate;
-    if (table.prefetchDataSource!=prefetch) table.prefetchDataSource=prefetch;
+    table.dataSource=[self proxyForTarget:table.dataSource role:0];
+    table.delegate=[self proxyForTarget:table.delegate role:1];
+    table.prefetchDataSource=[self proxyForTarget:table.prefetchDataSource role:2];
 }
 - (id)proxyForTarget:(id)target role:(NSUInteger)role {
     if ([target isKindOfClass:CSGroupTableProxy.class]) return target;
@@ -787,8 +527,7 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     self.tabBadgeSections=nil; self.tabAlertBadge=nil; self.tabAlertBadgeKey=nil;
     self.tabBadgeSourceRequired=NO; self.tabBadgeRestorePending=NO;
     UITableView *table=self.table; self.nativePresentation=YES; self.projecting=NO; self.chromeVisible=NO;
-    [self.privacyShield prepareForPublication]; [self.privacyShield finishTablePublication]; self.privacyShield=nil;
-    self.neutralViewport=nil;
+    [self.privacyShield prepareForPublication]; self.privacyShield=nil;
     [self refreshNavigationTitle];
     self.presentationSuspended=YES; [self cancelScheduledRefresh];
     [self publishHeader:self.nativeHeader]; [self.chrome removeFromSuperview]; [self.chrome removeGestureRecognizer:self.pan]; [table removeGestureRecognizer:self.listPan];
@@ -859,50 +598,6 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     @try { CSGroupWithDisplayIndices(self.table, ^{ self.table.tableHeaderView=header; }); }
     @finally { self.updatingHeader=NO; }
 }
-- (void)performVisibleLayout:(void (^)(void))layout {
-    // Appearance can synchronously lay out before attach consumes the offscreen
-    // invalidation. Prepare the current rows before measuring the return frame.
-    if ([self presentationScrollHeight] && self.dirty && !self.publishing) {
-        [self refresh];
-        if (self.dirty) { [self shieldVisiblePrivateRows]; return; }
-    }
-    BOOL (^ready)(void)=^BOOL {
-        CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
-        BOOL privacy=policy.blocked || (policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue]);
-        if (!self.projecting && !privacy) return YES;
-        CSGroupProjection *projection=self.projection;
-        if (!self.projecting || !projection.isValid) return NO;
-        NSString *account=CSGroupCurrentAccountID();
-        BOOL sameAccount=[projection.accountID isEqual:account];
-        BOOL empty=YES;
-        for (NSArray *rows in projection.sections) if (rows.count) { empty=NO; break; }
-        // Keep the existing empty recovery placeholder (revision zero) safe
-        // without turning every layout into another snapshot/reload attempt.
-        if (sameAccount && empty && (policy.blocked || !projection.privacyRevision)) return YES;
-        return !policy.blocked && sameAccount && [policy.accountID isEqual:account] &&
-            projection.privacyRevision==policy.revision;
-    };
-    if (!ready()) {
-        self.privacyRefreshPending=YES; self.dirty=YES;
-        [self shieldVisiblePrivateRows];
-        if (!self.publishing) [self refresh];
-        if (!ready()) { [self shieldVisiblePrivateRows]; return; }
-    }
-    // Native appearance owns native paths; UIKit must still render filtered rows.
-    CSGroupWithDisplayIndices(self.table,^{
-        NSNumber *height=[self presentationScrollHeight];
-        if (height) [self restoreScrollHeight:height.doubleValue];
-        layout();
-        // Native layout may change contentSize/insets or clamp its own offset.
-        // Finish the retained return position before this complete layout exits.
-        height=[self presentationScrollHeight];
-        if (height) [self restoreScrollHeight:height.doubleValue];
-    });
-    if (!ready()) {
-        self.privacyRefreshPending=YES; self.dirty=YES;
-        [self shieldVisiblePrivateRows];
-    }
-}
 - (void)layout {
     UITableView *table=self.table; if (self.presentationSuspended || !CSGroupApplicationActive() || !table || self.updatingHeader) return;
     __block UIView *installed=nil;
@@ -949,6 +644,54 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     table.decelerationRate=sensitivity==1 ? 0.998 : sensitivity==2 ? 0.9998 : sensitivity==3 ? 0.999 : self.baselineDeceleration;
     [self updateGroupGestureAvailability];
     [self applyPendingScrollToTop];
+}
+- (void)performSessionListLayout:(void (^)(void))layout {
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    BOOL privacy=policy.blocked || (policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue]);
+    if (!self.isActive && !privacy) {
+        layout();
+        self.sessionLayoutHeld=NO;
+        [self.privacyShield prepareForPublication];
+        return;
+    }
+    NSString *account=CSGroupCurrentAccountID();
+    NSUInteger epoch=CSCloseFriendAccountEpoch();
+    BOOL ready=!policy.blocked && [policy.accountID isEqual:account] &&
+        self.projection.isValid && !self.snapshotRetryAttempted && self.snapshotEpoch==epoch &&
+        [self.projection.accountID isEqual:account] &&
+        CSGroupReadInteger(self.projection,@"privacyRevision",-1)==(long long)policy.revision;
+    if (ready) for (NSArray *section in self.projection.sections) for (CSGroupRow *row in section)
+        if ([policy hidesUserName:row.userName surface:CSCloseFriendSurfaceSession]) ready=NO;
+    if (!ready) {
+        self.sessionLayoutHeld=YES;
+        if (!self.privacyShield) self.privacyShield=[CSCloseFriendListShield new];
+        for (UITableViewCell *cell in self.table.visibleCells) [self.privacyShield shieldCell:cell];
+        BOOL needsRefresh=!self.privacyRefreshPending;
+        self.privacyRefreshPending=YES;
+        if (!policy.blocked && [policy.accountID isEqual:account]) {
+            self.dirty=YES;
+            if (needsRefresh && !self.publishing && !self.changeDepth) [self requestRefresh];
+        }
+        return;
+    }
+    // A container can lay out this table inside its owner's native index scope.
+    // UIKit must consume the already filtered projection, including its geometry.
+    CSGroupWithDisplayIndices(self.table,layout);
+    CSCloseFriendSnapshot *current=CSCloseFriendCurrentSnapshot();
+    if (current.blocked || current.revision!=policy.revision || epoch!=CSCloseFriendAccountEpoch() ||
+        ![current.accountID isEqual:account] || ![account isEqual:CSGroupCurrentAccountID()]) {
+        self.sessionLayoutHeld=YES;
+        if (!self.privacyShield) self.privacyShield=[CSCloseFriendListShield new];
+        for (UITableViewCell *cell in self.table.visibleCells) [self.privacyShield shieldCell:cell];
+        self.privacyRefreshPending=YES;
+        if (!current.blocked && [current.accountID isEqual:CSGroupCurrentAccountID()]) {
+            self.dirty=YES;
+            if (!self.publishing && !self.changeDepth) [self requestRefresh];
+        }
+        return;
+    }
+    self.sessionLayoutHeld=NO;
+    [self.privacyShield prepareForPublication];
 }
 - (BOOL)groupPanMoving {
     return self.pan.state==UIGestureRecognizerStateBegan || self.pan.state==UIGestureRecognizerStateChanged ||
@@ -1065,28 +808,11 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     if (self.changeDepth || (!self.privacyRefreshPending && !self.presentationSuspended && (self.table.dragging || self.table.decelerating || self.table.editing || self.swipeActive))) { self.dirty=YES; return; }
     self.interactionDeadline=0; self.interactionAttempts=0;
     self.publishing=YES; self.dirty=NO;
-    // A synchronous privacy/selection publication consumes any queued generation.
-    // Otherwise an old timer can accidentally consume a later notification early.
-    self.refreshGeneration++; self.scheduled=NO;
-    self.scheduledCoalesced=NO; self.scheduledInteraction=NO; self.scheduledRecovery=NO;
-    self.coalescingNotification=NO; self.pendingImmediateRefresh=NO;
-    self.pendingRefreshDeadline=0; self.scheduledRefreshDeadline=0;
-    [self recordRefreshEvent:@"publish" delay:0];
     CSGroupChangeKind changes;
-    NSSet<NSString *> *contentUserNames; BOOL contentIdentityKnown;
-    @synchronized (self) {
-        changes=self.pendingChanges; self.pendingChanges=0;
-        contentUserNames=[self.pendingContentUserNames copy]; contentIdentityKnown=!self.pendingContentUnattributed;
-        self.pendingContentUserNames=nil; self.pendingContentUnattributed=NO;
-    }
+    @synchronized (self) { changes=self.pendingChanges; self.pendingChanges=0; }
     self.recoveryPending=NO;
-    NSUInteger publicationEpoch=CSCloseFriendAccountEpoch();
-    NSUInteger publicationPrivacyRevision=CSCloseFriendCurrentSnapshot().revision;
-    NSString *publicationAccount=CSGroupCurrentAccountID();
     BOOL finished=NO;
     @try {
-        NSString *viewportTab=(self.chromeVisible && self.isActive && !self.searching && !self.nativePresentation && !self.nativeActions.count) ? self.publishedTabID : nil;
-        CGFloat viewportHeight=self.table.contentOffset.y+self.table.adjustedContentInset.top;
         [self saveAnchor];
         [self installProxies];
         NSString *account=CSGroupCurrentAccountID();
@@ -1102,14 +828,7 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
         BOOL keepsSearchGroup=enabled && self.searching && self.searchChromeVisible && account.length && !changed &&
             !self.nativePresentation && !self.nativeActions.count;
         if (keepsSearchGroup && !self.privacyRefreshPending && self.projecting) {
-            @synchronized (self) {
-                self.pendingChanges|=changes|CSGroupChangeUnknown;
-                if (contentUserNames.count) {
-                    if (!self.pendingContentUserNames) self.pendingContentUserNames=[NSMutableSet set];
-                    [self.pendingContentUserNames unionSet:contentUserNames];
-                }
-                self.pendingContentUnattributed|=!contentIdentityKnown;
-            }
+            @synchronized (self) { self.pendingChanges|=changes|CSGroupChangeUnknown; }
             self.cachedNativeSections=nil; [self.projection discardComputationCache];
             [self layout]; finished=YES; return;
         }
@@ -1172,47 +891,20 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
             BOOL hidden=Option(tab.type==WETabTypeAll ? @"hide_all_badge" : @"hide_group_badge");
             [self.chrome updateUnreadCount:hidden ? 0 : count hasRedDot:!hidden && badge.redDot forTabIndex:(NSInteger)index];
         }];
-        // First activation mounts its header after reload invalidates old cells;
-        // a synchronous header layout must not create a throwaway banner cell.
-        if (previouslyProjecting || !projecting) [self layout];
-        NSString *currentPublicationAccount=CSGroupCurrentAccountID();
-        if (publicationEpoch!=CSCloseFriendAccountEpoch() || publicationPrivacyRevision!=CSCloseFriendCurrentSnapshot().revision ||
-            !(publicationAccount==currentPublicationAccount || [publicationAccount isEqual:currentPublicationAccount])) return;
+        [self layout];
         [self.privacyShield prepareForPublication];
-        [self publishProjection:projection previous:previous changes:changes contentUserNames:contentUserNames
-            contentIdentityKnown:contentIdentityKnown previouslyProjecting:previouslyProjecting];
-        currentPublicationAccount=CSGroupCurrentAccountID();
-        if (publicationEpoch!=CSCloseFriendAccountEpoch() || publicationPrivacyRevision!=CSCloseFriendCurrentSnapshot().revision ||
-            !(publicationAccount==currentPublicationAccount || [publicationAccount isEqual:currentPublicationAccount])) return;
-        [self restoreViewportFromTab:(changed ? nil : viewportTab) scrollHeight:viewportHeight];
+        [self publishProjection:projection previous:previous changes:changes previouslyProjecting:previouslyProjecting];
+        [self restoreAnchor];
         [self refreshNavigationTitle];
         finished=YES;
     } @finally {
         self.publishing=NO;
-        NSString *currentPublicationAccount=CSGroupCurrentAccountID();
-        BOOL publicationCurrent=publicationEpoch==CSCloseFriendAccountEpoch() &&
-            publicationPrivacyRevision==CSCloseFriendCurrentSnapshot().revision &&
-            (publicationAccount==currentPublicationAccount || [publicationAccount isEqual:currentPublicationAccount]);
-        if (!publicationCurrent) {
-            finished=NO; self.dirty=YES; self.publicationNeedsFullReload=YES;
-            // A policy callback may run inside native cell/layout work. The old
-            // publication cannot acknowledge it or remove the synchronous shield.
-            self.privacyRefreshPending|=CSGroupPrivacyActive();
-            @synchronized (self) {
-                self.pendingChanges|=changes|CSGroupChangeUnknown;
-                if (contentUserNames.count) {
-                    if (!self.pendingContentUserNames) self.pendingContentUserNames=[NSMutableSet set];
-                    [self.pendingContentUserNames unionSet:contentUserNames];
-                }
-                self.pendingContentUnattributed|=!contentIdentityKnown;
-            }
-        }
         if (!finished && self.privacyRefreshPending) [self shieldVisiblePrivateRows];
         if (finished) {
             self.privacyRefreshPending=NO;
             if (CSCloseFriendCurrentSnapshot().blocked && !CSGroupCurrentAccountID().length)
                 [self shieldVisiblePrivateRows];
-            else
+            else if (!self.sessionLayoutHeld)
                 [self.privacyShield prepareForPublication];
         }
         if (finished) [self applyPendingScrollToTop];
@@ -1227,33 +919,26 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     }
 }
 - (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous
-                  changes:(CSGroupChangeKind)changes contentUserNames:(NSSet<NSString *> *)names
-     contentIdentityKnown:(BOOL)known previouslyProjecting:(BOOL)previouslyProjecting {
-    __block NSArray *visible;
-    CSGroupWithDisplayIndices(self.table, ^{ visible=self.table.indexPathsForVisibleRows ?: @[]; });
-    CSGroupPublicationPlan *plan=[projection publicationPlanFrom:previous changes:changes contentUserNames:names
-        contentIdentityKnown:known visiblePaths:visible];
+                  changes:(CSGroupChangeKind)changes previouslyProjecting:(BOOL)previouslyProjecting {
     BOOL incremental=previouslyProjecting && self.projecting && !self.pendingScrollToTop &&
-        !self.publicationNeedsFullReload && projection && !plan.fullReload;
-    // An unchanged notification may rebuild the immutable snapshot without any
-    // table operation. This also breaks native layout/unread notification feedback.
-    if (incremental && !plan.reloadPaths.count && !plan.geometryChanged) {
-        [self recordRefreshEvent:@"publish.unchanged" delay:0]; return;
-    }
+        !(changes&CSGroupChangeUnknown) && [projection hasSameDisplayStructureAs:previous];
+    // Anonymous banners can change intrinsic geometry without a session event.
+    if (incremental) for (NSArray *section in projection.sections) for (CSGroupRow *row in section)
+        if (!row.userName.length || row.kind==CSGroupRowKindBusiness || row.kind==CSGroupRowKindAggregate) incremental=NO;
     CSGroupWithDisplayIndices(self.table, ^{
-        if (!incremental) {
-            [self recordRefreshEvent:@"publish.full" delay:0];
-            [self.table reloadData];
-            if (!previouslyProjecting && self.projecting) [self layout];
-        } else if (plan.reloadPaths.count) {
-            [self recordRefreshEvent:@"publish.rows" delay:0];
-            [self.table reloadRowsAtIndexPaths:plan.reloadPaths withRowAnimation:UITableViewRowAnimationNone];
+        if (!incremental) [self.table reloadData];
+        else {
+            NSArray *visible=self.table.indexPathsForVisibleRows ?: @[];
+            NSArray *changed=[projection changedUnreadPathsFrom:previous];
+            NSMutableArray *reload=[NSMutableArray array];
+            for (NSIndexPath *path in visible) {
+                if (![projection rowAtDisplayPath:path]) continue;
+                if ((changes&(CSGroupChangeContent|CSGroupChangeStructure)) || [changed containsObject:path]) [reload addObject:path];
+            }
+            if (reload.count) [self.table reloadRowsAtIndexPaths:reload withRowAnimation:UITableViewRowAnimationNone];
         }
-        // Only structural/geometry changes need synchronous measurement for
-        // anchor restoration. Ordinary unread/text updates use UIKit's layout pass.
-        if (!incremental || plan.geometryChanged) [self.table layoutIfNeeded];
+        [self.table layoutIfNeeded];
     });
-    self.publicationNeedsFullReload=NO;
 }
 - (CSGroupProjection *)projectionForSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selected accountID:(NSString *)account {
     if (!account.length) return nil;
@@ -1314,124 +999,60 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
         filterDuplicates:self.preferences.filterDuplicates accountID:account];
     return projection.isValid ? projection : nil;
 }
-// A bounded sample can be exported once from the debugger/console. It stores
-// selector/counter state only, never session names, message contents or disk logs.
-- (void)resetRefreshDiagnostics {
-    @synchronized (self) {
-        self.refreshDiagnosticStart=NSProcessInfo.processInfo.systemUptime;
-        self.refreshDiagnosticSamples=0;
-        self.refreshDiagnosticCounts=[NSMutableDictionary dictionary];
-        self.refreshDiagnosticEvents=[NSMutableArray array];
-    }
-}
-- (void)recordRefreshReason:(NSString *)reason { [self recordRefreshEvent:reason delay:0]; }
-- (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay {
-    @synchronized (self) {
-        if (!self.refreshDiagnosticCounts) [self resetRefreshDiagnostics];
-        NSTimeInterval elapsed=NSProcessInfo.processInfo.systemUptime-self.refreshDiagnosticStart;
-        if (elapsed>60 || self.refreshDiagnosticSamples>=2048) return;
-        NSString *key=event.length<=96 ? event : @"other";
-        if (!self.refreshDiagnosticCounts[key] && self.refreshDiagnosticCounts.count>=48) key=@"other";
-        self.refreshDiagnosticCounts[key]=@([self.refreshDiagnosticCounts[key] unsignedIntegerValue]+1);
-        self.refreshDiagnosticSamples++;
-        if (self.refreshDiagnosticEvents.count==32) [self.refreshDiagnosticEvents removeObjectAtIndex:0];
-        [self.refreshDiagnosticEvents addObject:@{@"reason":key,@"elapsed":@(elapsed),@"publishing":@(self.publishing),
-            @"dirty":@(self.dirty),@"revision":@(self.modelRevision),@"changes":@(self.pendingChanges),
-            @"pendingTop":@(self.pendingScrollToTop),@"coalesced":@(self.coalescingNotification),@"delay":@(delay)}];
-    }
-}
-- (NSDictionary *)refreshDiagnosticsSnapshot {
-    @synchronized (self) {
-        NSTimeInterval elapsed=self.refreshDiagnosticStart ? NSProcessInfo.processInfo.systemUptime-self.refreshDiagnosticStart : 0;
-        return @{@"windowSeconds":@60,@"elapsedSeconds":@(elapsed),@"samples":@(self.refreshDiagnosticSamples),
-            @"complete":@(elapsed>=60 || self.refreshDiagnosticSamples>=2048),
-            @"counts":[self.refreshDiagnosticCounts copy] ?: @{},@"recent":[self.refreshDiagnosticEvents copy] ?: @[]};
-    }
-}
 - (void)cancelScheduledRefresh {
     self.refreshGeneration++; self.scheduled=NO; self.scheduledCoalesced=NO; self.scheduledInteraction=NO; self.scheduledRecovery=NO;
     self.interactionDeadline=0; self.interactionAttempts=0;
-    self.coalescingNotification=NO; self.pendingImmediateRefresh=NO;
-    self.pendingRefreshDeadline=0; self.scheduledRefreshDeadline=0;
 }
 - (void)requestRecovery {
     if (!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(), ^{ [self requestRecovery]; }); return; }
-    self.dirty=YES; self.recoveryPending=YES;
-    @synchronized (self) {
-        // A native cell may have failed after a placeholder was delivered.
-        // Recovery must retry its content even if immutable row metadata matches.
-        self.pendingChanges|=CSGroupChangeUnknown|CSGroupChangeContent; self.pendingContentUnattributed=YES;
-    }
+    self.dirty=YES; self.recoveryPending=YES; @synchronized (self) { self.pendingChanges|=CSGroupChangeUnknown; }
     // Do not invent a model revision for a failed rendering attempt. All failures
     // of the same account/revision share one finite retry budget.
     self.cachedNativeSections=nil;
-    [self recordRefreshEvent:@"recovery" delay:0];
     [self scheduleRefresh];
 }
 - (void)requestRefresh {
     if (!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(), ^{ [self requestRefresh]; }); return; }
     if (self.publishing && !self.changeDepth && !self.nativeActions.count) { [self requestRecovery]; return; }
-    // A table invalidation inside a native transaction belongs to that event.
-    // Its outer end owns both content attribution and notification priority.
-    if (self.changeDepth) { self.dirty=YES; [self scheduleRefresh]; return; }
-    self.dirty=YES; self.pendingImmediateRefresh=YES;
-    self.coalescingNotification=NO; self.pendingRefreshDeadline=0;
-    if (!self.changeDepth) {
-        self.recoveryPending=NO;
-        @synchronized (self) { self.pendingChanges|=CSGroupChangeUnknown|CSGroupChangeContent; self.pendingContentUnattributed=YES; }
-        [self invalidateNativeSnapshot];
-    }
-    [self recordRefreshEvent:@"request" delay:0];
+    self.dirty=YES;
+    if (!self.changeDepth) { self.recoveryPending=NO; @synchronized (self) { self.pendingChanges|=CSGroupChangeUnknown; } [self invalidateNativeSnapshot]; }
     [self scheduleRefresh];
 }
 - (void)scheduleRefresh {
     if (!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(), ^{ [self scheduleRefresh]; }); return; }
-    if (!self.dirty) { [self applyPendingScrollToTop]; return; }
+    self.dirty=YES;
     [self pruneNativeActions];
     if ((!CSGroupApplicationActive() && !(self.privacyRefreshPending && CSGroupPrivacyActive())) || (self.presentationSuspended && !self.nativeActions.count)) { [self finishSuspendedBatches]; return; }
-    // The request already retained its priority/deadline; publication must not
-    // turn a passive notification into an immediate refresh in its finally block.
     if (self.changeDepth || self.publishing) return;
-    NSTimeInterval now=NSProcessInfo.processInfo.systemUptime;
-    BOOL coalesced=!self.privacyRefreshPending && !self.pendingImmediateRefresh && self.coalescingNotification && !self.nativeActions.count;
+    BOOL coalesced=!self.privacyRefreshPending && self.coalescingNotification && !self.nativeActions.count;
     BOOL waiting=!self.privacyRefreshPending && !self.presentationSuspended && (self.table.tracking || [self groupPanMoving] || ([self nativeMenuState]&2));
     BOOL releasedWait=self.scheduledInteraction && !waiting;
     BOOL freshEvent=self.scheduledRecovery && !self.recoveryPending;
-    NSTimeInterval delay=coalesced ? MAX(0,self.pendingRefreshDeadline-now) : 0;
+    if (self.scheduled && !releasedWait && !freshEvent && (!self.scheduledCoalesced || coalesced)) return;
+    NSTimeInterval delay=coalesced ? 0.08 : 0;
     if (waiting) {
+        NSTimeInterval now=NSProcessInfo.processInfo.systemUptime;
         if (!self.interactionDeadline) self.interactionDeadline=now+2.0;
-        if (now>=self.interactionDeadline) return;
-        delay=MAX(delay,MIN(self.interactionDeadline-now,MIN(0.4,0.05*(1UL<<MIN(self.interactionAttempts,3UL)))));
+        if (now>=self.interactionDeadline) return; // Keep dirty; actual end/lifecycle events wake it.
+        delay=MIN(self.interactionDeadline-now,MIN(0.4,0.05*(1UL<<MIN(self.interactionAttempts++,3UL))));
     } else { self.interactionDeadline=0; self.interactionAttempts=0; }
-    BOOL recovery=self.recoveryPending && !waiting;
-    if (recovery) {
+    if (self.recoveryPending && !waiting) {
         NSString *account=CSGroupCurrentAccountID();
         BOOL sameAccount=self.recoveryAccount==account || [self.recoveryAccount isEqual:account];
         if (self.recoveryRevision!=self.modelRevision || !sameAccount) {
             self.recoveryRevision=self.modelRevision; self.recoveryAccount=account; self.recoveryAttempts=0;
         }
-        // A repeated UI wake does not spend or reset the finite recovery budget.
-        if (self.scheduled && self.scheduledRecovery && !releasedWait) return;
         if (self.recoveryAttempts>=3) return;
         static const NSTimeInterval delays[]={0.1,0.25,0.5};
-        delay=MAX(delay,delays[self.recoveryAttempts]);
+        delay=MAX(delay,delays[self.recoveryAttempts++]);
     }
-    NSTimeInterval due=now+delay;
-    if (self.scheduled && !releasedWait && !freshEvent && self.scheduledRefreshDeadline<=due+0.001) return;
-    if (waiting) self.interactionAttempts++;
-    if (recovery) self.recoveryAttempts++;
-    self.scheduled=YES; self.scheduledCoalesced=coalesced; self.scheduledInteraction=waiting; self.scheduledRecovery=recovery;
-    self.scheduledRefreshDeadline=due;
-    [self recordRefreshEvent:@"schedule" delay:delay];
+    self.scheduled=YES; self.scheduledCoalesced=coalesced; self.scheduledInteraction=waiting; self.scheduledRecovery=self.recoveryPending && !waiting;
     NSUInteger generation=++self.refreshGeneration;
-    NSUInteger epoch=CSCloseFriendAccountEpoch(); NSString *account=CSGroupCurrentAccountID();
     __weak typeof(self) weakSelf=self;
     void (^publish)(void)=^{
         CSGroupListAdapter *self=weakSelf;
         if (!self || generation!=self.refreshGeneration) return;
-        self.scheduled=NO; self.scheduledRefreshDeadline=0;
-        NSString *currentAccount=CSGroupCurrentAccountID();
-        if (epoch!=CSCloseFriendAccountEpoch() || !(account==currentAccount || [account isEqual:currentAccount])) return;
+        self.scheduled=NO;
         if (self.dirty) [self refresh];
     };
     if (delay>0) dispatch_after(dispatch_time(DISPATCH_TIME_NOW,(int64_t)(delay*NSEC_PER_SEC)),dispatch_get_main_queue(),publish);
@@ -1447,67 +1068,26 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
         return;
     }
     self.dirty=YES;
-    if (!self.pendingImmediateRefresh) {
-        self.coalescingNotification=YES;
-        if (!self.pendingRefreshDeadline) self.pendingRefreshDeadline=NSProcessInfo.processInfo.systemUptime+0.08;
-    }
-    [self recordRefreshEvent:@"notification" delay:0];
-    [self scheduleRefresh];
+    self.coalescingNotification=YES;
+    @try { [self scheduleRefresh]; } @finally { self.coalescingNotification=NO; }
 }
 
 - (void)beginNativeChange { [self beginNativeChangeOfKind:CSGroupChangeStructure|CSGroupChangeContent]; }
 - (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind {
-    NSSet *names;
-    // Generic native/table wrappers inside an attributed event describe that
-    // event's work; an explicit unidentifiable notification still passes nil.
-    @synchronized (self) { names=self.changeDepth ? self.nativeChangeUserNames : nil; }
-    [self beginNativeChangeOfKind:kind sessionUserNames:names];
-}
-- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind sessionUserNames:(NSSet<NSString *> *)names {
     [self invalidateNativeSnapshot];
     BOOL captureAnchor=NO;
     @synchronized (self) {
-        self.recoveryPending=NO; self.pendingChanges|=kind; self.dirty=YES;
-        // Concurrent native callbacks do not have a shared LIFO identity scope.
-        // Keep their model change, and conservatively redraw content if any part
-        // of this publication crosses a background callback.
-        if (!NSThread.isMainThread) self.pendingContentUnattributed=YES;
-        if (!self.nativeChangeIdentityStack) self.nativeChangeIdentityStack=[NSMutableArray array];
-        [self.nativeChangeIdentityStack addObject:self.nativeChangeUserNames ?: (id)NSNull.null];
-        self.nativeChangeUserNames=[names copy];
-        if (kind&CSGroupChangeContent) {
-            if (!names) self.pendingContentUnattributed=YES;
-            else {
-                if (!self.pendingContentUserNames) self.pendingContentUserNames=[NSMutableSet set];
-                [self.pendingContentUserNames unionSet:names];
-            }
-        }
+        self.recoveryPending=NO; self.pendingChanges|=kind;
         captureAnchor=!self.changeDepth && NSThread.isMainThread && !self.presentationSuspended && !(self.dirty && self.scheduledCoalesced);
         self.changeDepth++;
     }
-    [self recordRefreshEvent:@"native.begin" delay:0];
     // Native/UI reads must not hold the lock used by background notifications.
     if (captureAnchor) [self saveAnchor];
 }
 - (void)endNativeChange { [self endNativeChangeCoalesced:NO]; }
 - (void)endNativeChangeCoalesced:(BOOL)coalesced {
-    BOOL outer=NO;
-    @synchronized (self) {
-        if (self.changeDepth) {
-            self.changeDepth--; outer=self.changeDepth==0;
-            id previous=self.nativeChangeIdentityStack.lastObject;
-            self.nativeChangeUserNames=previous==NSNull.null ? nil : previous;
-            [self.nativeChangeIdentityStack removeLastObject];
-        }
-    }
-    if (outer) {
-        [self requestTabBadgeSourceRefreshCoalesced:coalesced];
-        if (coalesced) [self requestCoalescedRefresh];
-        else {
-            self.pendingImmediateRefresh=YES; self.coalescingNotification=NO; self.pendingRefreshDeadline=0;
-            [self scheduleRefresh];
-        }
-    }
+    BOOL outer=NO; @synchronized (self) { if (self.changeDepth) self.changeDepth--; outer=self.changeDepth==0; }
+    if (outer) { [self requestTabBadgeSourceRefreshCoalesced:coalesced]; if (coalesced) [self requestCoalescedRefresh]; else [self scheduleRefresh]; }
 }
 - (void)performNativeBatch:(void (^)(void))updates completion:(void (^)(BOOL))completion {
     void (^callback)(BOOL)=[completion copy];
@@ -1808,7 +1388,7 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     UITableView *table=self.table;
     // Do not turn a pull-down/bounce or a native top-area transition into a
     // persistent row anchor. The host owns these positions, including short lists.
-    return !self.neutralViewport && [self hasScrollableContent] && !self.searching && !table.tracking &&
+    return [self hasScrollableContent] && !self.searching && !table.tracking &&
         !table.dragging && !table.decelerating && isfinite(table.contentOffset.y) &&
         table.contentOffset.y>=-table.adjustedContentInset.top-0.5;
 }
@@ -1826,8 +1406,6 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
 - (void)restoreAnchor {
     if (self.presentationSuspended || !CSGroupApplicationActive()) return;
     if (self.pendingScrollToTop) { [self applyPendingScrollToTop]; return; }
-    NSNumber *returnHeight=[self presentationScrollHeight];
-    if (returnHeight) { [self restoreScrollHeight:returnHeight.doubleValue]; return; }
     NSDictionary *anchor=self.anchors[self.publishedTabID];
     if (!self.isActive || !anchor || ![self canRestoreAnchor]) return;
     for (NSUInteger s=0;s<self.projection.sections.count;s++) {
@@ -1849,51 +1427,6 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
         }
     }
 }
-- (NSNumber *)presentationScrollHeight {
-    if (self.finishingNeutralPublication) return nil;
-    NSDictionary *viewport=self.presentationViewport ?: self.neutralViewport;
-    if (!viewport) return nil;
-    NSString *account=CSGroupCurrentAccountID();
-    if (![viewport[@"account"] isEqual:account] || ![self.preferences.accountID isEqual:account] ||
-        [viewport[@"epoch"] unsignedIntegerValue]!=CSCloseFriendAccountEpoch()) {
-        self.presentationViewport=nil; self.neutralViewport=nil; return nil;
-    }
-    if (viewport!=self.neutralViewport &&
-        (!self.isActive || !self.chromeVisible || self.searching || self.nativePresentation || self.nativeActions.count)) return nil;
-    return viewport[@"height"];
-}
-- (void)restoreViewportFromTab:(NSString *)previousTab scrollHeight:(CGFloat)height {
-    @try {
-    NSNumber *returnHeight=[self presentationScrollHeight];
-    if (returnHeight) { [self restoreScrollHeight:returnHeight.doubleValue]; return; }
-    if (!previousTab.length || !self.publishedTabID.length || [previousTab isEqual:self.publishedTabID] ||
-        !self.isActive || !self.chromeVisible || self.searching || self.nativePresentation || self.nativeActions.count || self.pendingScrollToTop) {
-        [self restoreAnchor]; return;
-    }
-    [self restoreScrollHeight:height];
-    } @finally {
-        [self finishNeutralPublication:YES];
-    }
-}
-- (void)restoreScrollHeight:(CGFloat)height {
-    // Switching groups and returning from chat both retain absolute height.
-    [self.anchors removeObjectForKey:self.publishedTabID];
-    UITableView *table=self.table;
-    if (self.presentationSuspended || !CSGroupApplicationActive() || [self groupPanMoving] ||
-        table.tracking || table.dragging || table.decelerating || table.editing || self.swipeActive || [self nativeMenuState]) return;
-    CGFloat top=table.adjustedContentInset.top, bottom=table.adjustedContentInset.bottom;
-    CGFloat viewport=CGRectGetHeight(table.bounds), content=table.contentSize.height;
-    if (!isfinite(height) || !isfinite(top) || !isfinite(bottom) || !isfinite(viewport) || !isfinite(content) || viewport<=0) return;
-    CGFloat min=-top, max=MAX(min,content-viewport+bottom);
-    CGFloat target=MIN(max,MAX(min,MAX(0,height)-top));
-    if (!isfinite(max) || !isfinite(target)) return;
-    CSGroupWithDisplayIndices(table, ^{
-        if (fabs(target-table.contentOffset.y)>0.5)
-            [table setContentOffset:CGPointMake(table.contentOffset.x,target) animated:NO];
-    });
-    self.neutralViewport=nil;
-    [self saveAnchor];
-}
 - (void)selectIndex:(NSInteger)index {
     if (self.swipeActive || self.table.editing || [self nativeMenuState]) { self.chrome.selectedTabID=self.publishedTabID; return; }
     NSArray *tabs=self.displayedTabs; if (index<0 || index>=(NSInteger)tabs.count) return;
@@ -1904,9 +1437,8 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     [self.nativeActions removeAllObjects];
     self.snapshotRetryAttempted=NO; self.recoveryAttempts=0; self.recoveryPending=NO;
     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;
-    // Refresh carries the current height across groups. A new selection also
-    // supersedes any older explicit top request.
-    self.presentationViewport=nil; self.pendingScrollToTop=NO;
+    self.pendingScrollToTop=YES;
+    [self.anchors removeObjectForKey:tabID];
     [self refresh];
     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];
 }
@@ -1920,7 +1452,7 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
 - (void)returnToGroupTop {
     if (self.presentationSuspended || !CSGroupApplicationActive()) return;
     if (!Option(@"enabled") || !self.chromeVisible || self.searching) return;
-    self.presentationViewport=nil; self.pendingScrollToTop=YES;
+    self.pendingScrollToTop=YES;
     if (self.publishedTabID) [self.anchors removeObjectForKey:self.publishedTabID];
     [self.table layoutIfNeeded];
     [self applyPendingScrollToTop];

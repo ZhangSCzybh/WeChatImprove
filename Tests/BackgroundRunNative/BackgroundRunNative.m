@@ -3,16 +3,12 @@
 #import <AVFoundation/AVFoundation.h>
 #import "CSBackgroundRunAudio.h"
 #define NAME(n) NSString *const n=@#n
-NAME(UIDeviceBatteryLevelDidChangeNotification); NAME(UIDeviceBatteryStateDidChangeNotification); NAME(UIApplicationSignificantTimeChangeNotification);
 NAME(UIApplicationDidEnterBackgroundNotification); NAME(UIApplicationWillEnterForegroundNotification); NAME(UIApplicationDidBecomeActiveNotification);
 NAME(UISceneDidEnterBackgroundNotification); NAME(UISceneWillEnterForegroundNotification); NAME(UISceneDidActivateNotification); NAME(UISceneDidDisconnectNotification);
 NAME(AVAudioSessionCategoryAmbient); NAME(AVAudioSessionCategorySoloAmbient); NAME(AVAudioSessionCategoryPlayback); NAME(AVAudioSessionCategoryPlayAndRecord); NAME(AVAudioSessionModeDefault);
 NAME(AVAudioSessionInterruptionNotification); NAME(AVAudioSessionMediaServicesWereLostNotification); NAME(AVAudioSessionMediaServicesWereResetNotification); NAME(AVAudioSessionRouteChangeNotification);
 NAME(AVAudioSessionInterruptionTypeKey); NAME(AVAudioSessionInterruptionOptionKey);
 @implementation UIScene @end
-@implementation UIDevice
-+ (instancetype)currentDevice { static UIDevice *device; if(!device){device=[self new];device.batteryLevel=-1;}return device; }
-@end
 @implementation UIApplication
 + (instancetype)sharedApplication { static UIApplication *app; if (!app) { app=[self new]; app.connectedScenes=[NSSet set]; } return app; }
 @end

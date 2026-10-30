@@ -190,7 +190,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic,copy) NSString *swipeAccount,*publishedTabID;
 @property(nonatomic,strong) NSIndexPath *swipeDisplayPath;
 @property(nonatomic) BOOL active,swipeActive,dirty,scheduled,publishing,pendingScrollToTop,chromeVisible,searching,searchChromeVisible,barTouchAllowed,listTouchAllowed,privacyRefreshPending;
-@property(nonatomic) NSUInteger changeDepth,refreshRequests,refreshCount,topApplications;
+@property(nonatomic) NSUInteger changeDepth,refreshRequests,refreshCount;
 @property(nonatomic,strong) CSGroupProjection *projection;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
 @property(nonatomic,strong) NSArray *displayedTabs;
@@ -226,7 +226,6 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (void)invalidateNativeSnapshot { self.modelRevision++; }
 - (void)pruneNativeActions {}
 - (void)finishSuspendedBatches {}
-- (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay { (void)event; (void)delay; }
 #include "GroupInteractionBodies.h"
 - (BOOL)isActive { return self.active; }
 - (NSIndexPath *)currentPathForRow:(CSGroupRow *)row { return CSGroupResolveNativeRowPath(self.controller,row,YES); }
@@ -400,7 +399,7 @@ int main(void) { @autoreleasepool {
     a=Fixture(); a.dirty=YES; [a.table setEditing:NO animated:NO]; RunFor(0.02);
     Check(!a.swipeActive && !a.dirty && a.refreshCount==1,@"closing a dirty menu still publishes once through nested editing setters");
     a=Fixture(); a.pendingScrollToTop=YES; [a.table setEditing:NO]; RunFor(0.02);
-    Check(!a.swipeActive && !a.pendingScrollToTop && a.topApplications==1 && !a.refreshCount,@"closing a menu consumes return-to-top without rebuilding a clean list");
+    Check(!a.swipeActive && a.refreshCount==1,@"closing a menu wakes a pending return-to-top operation");
 
     a=Fixture(); [a endSwipeEditing]; a.table.editing=NO; a.table.tracking=YES;
     [a refresh]; RunFor(0.12);
@@ -457,7 +456,7 @@ int main(void) { @autoreleasepool {
     Check(a.refreshCount==1 && !a.scheduled,@"nonanimated close hook wakes dormant dirty update");
     a=Fixture(); menu=MenuFixture(a); a.pendingScrollToTop=YES;
     [menu setMenuOptionsViewHidden:YES animated:NO completionHandler:nil]; RunFor(0.02);
-    Check(!a.pendingScrollToTop && a.topApplications==1 && !a.refreshCount,@"custom menu close consumes pending top without manufacturing a refresh");
+    Check(a.refreshCount==1,@"custom menu close wakes pending top request");
 
     a=Fixture(); menu=MenuFixture(a); menu->_panGestureRecognizer.state=UIGestureRecognizerStateChanged;
     [a requestRefresh]; RunFor(0.02);
