@@ -1,0 +1,25 @@
+FAIL: active-user-hook/valid-pair / requirement: fully identified active-user event remains attributed before publication
+FAIL: active-user-hook/valid-pair / requirement: old and new active-user identities are both retained
+FAIL: active-user-hook/valid-pair / requirement: known active-user event preserves one total initial banner delivery
+FAIL: active-user-hook/valid-pair / requirement: known active-user event preserves banner superview identity
+FAIL: active-user-hook/valid-pair / requirement: known active-user event never remounts unchanged banner
+FAIL: active-user-hook/valid-pair / requirement: known active-user event preserves one total initial banner delivery
+FAIL: active-user-hook/valid-pair / requirement: known active-user event preserves banner superview identity
+FAIL: active-user-hook/valid-pair / requirement: known active-user event never remounts unchanged banner
+FAIL: active-user-hook/valid-old-nil-new / requirement: fully identified active-user event remains attributed before publication
+FAIL: active-user-hook/valid-old-nil-new / requirement: old and new active-user identities are both retained
+FAIL: active-user-hook/valid-old-nil-new / requirement: known active-user event preserves one total initial banner delivery
+FAIL: active-user-hook/valid-old-nil-new / requirement: known active-user event preserves banner superview identity
+FAIL: active-user-hook/valid-old-nil-new / requirement: known active-user event never remounts unchanged banner
+FAIL: active-user-hook/valid-old-nil-new / requirement: known active-user event preserves one total initial banner delivery
+FAIL: active-user-hook/valid-old-nil-new / requirement: known active-user event preserves banner superview identity
+FAIL: active-user-hook/valid-old-nil-new / requirement: known active-user event never remounts unchanged banner
+FAIL: active-user-hook/nil-old-valid-new / requirement: fully identified active-user event remains attributed before publication
+FAIL: active-user-hook/nil-old-valid-new / requirement: old and new active-user identities are both retained
+FAIL: active-user-hook/nil-old-valid-new / requirement: known active-user event preserves one total initial banner delivery
+FAIL: active-user-hook/nil-old-valid-new / requirement: known active-user event preserves banner superview identity
+FAIL: active-user-hook/nil-old-valid-new / requirement: known active-user event never remounts unchanged banner
+FAIL: active-user-hook/nil-old-valid-new / requirement: known active-user event preserves one total initial banner delivery
+FAIL: active-user-hook/nil-old-valid-new / requirement: known active-user event preserves banner superview identity
+FAIL: active-user-hook/nil-old-valid-new / requirement: known active-user event never remounts unchanged banner
+Group return banner HOST probe: 563 checks, 24 failures, 39 synthetic scenarios

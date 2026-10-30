@@ -1,0 +1,44 @@
+- (void)performVisibleLayout:(void (^)(void))layout {
+    // Appearance can synchronously lay out before attach consumes the offscreen
+    // invalidation. Prepare the current rows before measuring the return frame.
+    if ([self presentationScrollHeight] && self.dirty && !self.publishing) {
+        [self refresh];
+        if (self.dirty) { [self shieldVisiblePrivateRows]; return; }
+    }
+    BOOL (^ready)(void)=^BOOL {
+        CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+        BOOL privacy=policy.blocked || (policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue]);
+        if (!self.projecting && !privacy) return YES;
+        CSGroupProjection *projection=self.projection;
+        if (!self.projecting || !projection.isValid) return NO;
+        NSString *account=CSGroupCurrentAccountID();
+        BOOL sameAccount=[projection.accountID isEqual:account];
+        BOOL empty=YES;
+        for (NSArray *rows in projection.sections) if (rows.count) { empty=NO; break; }
+        // Keep the existing empty recovery placeholder (revision zero) safe
+        // without turning every layout into another snapshot/reload attempt.
+        if (sameAccount && empty && (policy.blocked || !projection.privacyRevision)) return YES;
+        return !policy.blocked && sameAccount && [policy.accountID isEqual:account] &&
+            projection.privacyRevision==policy.revision;
+    };
+    if (!ready()) {
+        self.privacyRefreshPending=YES; self.dirty=YES;
+        [self shieldVisiblePrivateRows];
+        if (!self.publishing) [self refresh];
+        if (!ready()) { [self shieldVisiblePrivateRows]; return; }
+    }
+    // Native appearance owns native paths; UIKit must still render filtered rows.
+    CSGroupWithDisplayIndices(self.table,^{
+        NSNumber *height=[self presentationScrollHeight];
+        if (height) [self restoreScrollHeight:height.doubleValue];
+        layout();
+        // Native layout may change contentSize/insets or clamp its own offset.
+        // Finish the retained return position before this complete layout exits.
+        height=[self presentationScrollHeight];
+        if (height) [self restoreScrollHeight:height.doubleValue];
+    });
+    if (!ready()) {
+        self.privacyRefreshPending=YES; self.dirty=YES;
+        [self shieldVisiblePrivateRows];
+    }
+}

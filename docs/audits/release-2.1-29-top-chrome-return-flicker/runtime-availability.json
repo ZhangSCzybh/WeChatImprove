@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-10-30T11:38:39Z",
+  "baselineCommit": "11a3d078f7f0c6a7751f5ca8a1d7e3a0c5213b41",
+  "evidence": "host-read-only-device-discovery",
+  "usb": {
+    "command": "idevice_id -l",
+    "exitCode": 0,
+    "deviceCount": 0,
+    "stdout": ""
+  },
+  "xcode": {
+    "command": "xcrun devicectl list devices",
+    "exitCode": 0,
+    "physicalDevices": [
+      {
+        "model": "iPhone 14 Pro Max (iPhone15,3)",
+        "state": "unavailable"
+      }
+    ],
+    "identifiers": "redacted"
+  },
+  "observer": {
+    "attached": false,
+    "applicationLaunched": false,
+    "applicationInstalled": false,
+    "productionInstrumentationAdded": false
+  },
+  "fridaDiscovery": {
+    "command": "frida.enumerate_devices() through the existing Python installation",
+    "exitCode": 0,
+    "deviceTypes": ["local", "remote", "remote"],
+    "deviceIDs": ["local", "socket", "barebone"],
+    "usbDeviceCount": 0,
+    "interpretation": "Only standard host/local-socket/GDB endpoints were listed; no phone target was available. The interactive frida-ls-devices CLI failed because its stdin was not a TTY; the Python API avoids that CLI limitation."
+  },
+  "deviceRuntimeCounters": {
+    "fullReloads": null,
+    "rowReloads": null,
+    "businessCellDeliveries": null,
+    "bannerRemoves": null,
+    "bannerAdds": null,
+    "bannerSuperviewIdentity": null,
+    "headerClosingCalls": null,
+    "restoreAnchorOffsetTrace": null
+  },
+  "interpretation": "null means unmeasured, never zero. No real chat-return event trace captured. Host-controlled probes do not establish the actual device event sequence.",
+  "requiredForDeviceMeasurement": "Connect the affected trusted device, unlock it, and provide the installed tweak version; establish a compatible read-only method observation channel."
+}

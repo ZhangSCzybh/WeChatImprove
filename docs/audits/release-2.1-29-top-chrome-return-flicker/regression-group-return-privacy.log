@@ -1,0 +1,10 @@
+locked: 1 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","ordinary-b"]]; native secret cell calls=0; full reloads=0; row reloads=0
+revealed: 1 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","secret-friend","secret@chatroom","ordinary-b"]]; native secret cell calls=2; full reloads=0; row reloads=0
+relock: 2 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","ordinary-b"],["favorite-banner","mac-banner","ordinary-a","ordinary-b"]]; native secret cell calls=0; full reloads=1; row reloads=0
+late policy blocked phase: 2 visible-layout samples; identities=[[],[]]; native secret cell calls=0; full reloads=1; row reloads=0
+late policy: 4 visible-layout samples; identities=[[],[],["favorite-banner","mac-banner","ordinary-a","ordinary-b"],["favorite-banner","mac-banner","ordinary-a","ordinary-b"]]; native secret cell calls=0; full reloads=2; row reloads=0
+native transaction: 2 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","ordinary-b"],["favorite-banner","mac-banner","ordinary-a","ordinary-b"]]; native secret cell calls=0; full reloads=1; row reloads=0
+display: 1 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","ordinary-b"]]; native secret cell calls=0; full reloads=0; row reloads=0
+native fallback placeholder: 2 visible-layout samples; identities=[[],[]]; native secret cell calls=0; full reloads=0; row reloads=0
+blocked empty section: 1 visible-layout samples; identities=[[]]; native secret cell calls=0; full reloads=0; row reloads=0
+Group return privacy: 37 checks, 0 failures

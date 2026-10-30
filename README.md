@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.1-28`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.1-29`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -31,8 +31,8 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | 提供 `2.1-28` 安装包，待本版真机验收；前版 `2.1-21` 的前台 CPU 复测见 [真机记录](docs/audits/release-2.1-21-energy/device-validation.md) |
-| Rootful | 本地提供 `2.1-28` 安装包；待真机验收 |
+| Rootless | 提供 `2.1-29` 安装包，待本版真机验收；前版 `2.1-21` 的前台 CPU 复测见 [真机记录](docs/audits/release-2.1-21-energy/device-validation.md) |
+| Rootful | 本地提供 `2.1-29` 安装包；待真机验收 |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
@@ -40,12 +40,12 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：当前推荐 `2.1-28` 首帧布局候选 `layout-firstframe-candidate-1`：[Rootless 安装包](packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/com.wechat.improve_2.1-28_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/com.wechat.improve_2.1-28_iphoneos-arm.deb)、[调试符号](packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/com.wechat.improve_2.1-28_symbols.zip) 和 [SHA-256](packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/SHA256SUMS)。本候选在返回聊天列表的首轮显示前同步准备卡片内容、隐私过滤与列表位置，修复密友、密群先显示再隐藏以及随后出现的卡片和位置跳变；保留锁定与解锁语义、顶部业务行、分组切换和搜索返回，详见 [候选审计](docs/audits/release-2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/README.md)。继续包含 `2.1-22` 的手动备份与后台时段、时长及节能策略，见 [上一版发布记录](docs/audits/release-2.1-22-background-policy/README.md)、[备份指南](docs/backup-guide.md) 和 [后台运行说明](docs/background-run-policy-proposal.md)。本版尚未进行真机返回隐私、顶部区域与位置验收；`2.1-21` 的 [前台 CPU 复测](docs/audits/release-2.1-21-energy/device-validation.md) 保留为历史证据。原有定时任务时间段规则、左滑启用／停止和 AI 后台兜底开关继续提供。
+1. 获取与设备注入环境匹配的 `.deb`：当前仅推荐 `2.1-29` 顶部返回刷新候选：[Rootless 安装包](packages/2.1-29-top-chrome-return-flicker/com.wechat.improve_2.1-29_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-29-top-chrome-return-flicker/com.wechat.improve_2.1-29_iphoneos-arm.deb)、[调试符号](packages/2.1-29-top-chrome-return-flicker/com.wechat.improve_2.1-29_symbols.zip) 和 [SHA-256](packages/2.1-29-top-chrome-return-flicker/SHA256SUMS)。生产 Hook 的受控回放确认：活跃会话变化事件持有有效的新旧会话身份，却按未知内容变化发布，造成顶部收藏置顶和电脑登录内容重复交付、重挂。本候选只修正该事件的身份归属，真实未知事件继续更新；保留 2.1-26 的返回复用、2.1-27 的首次发布顺序及 2.1-28 的密友过滤和首轮布局位置保护，详见 [候选审计](docs/audits/release-2.1-29-top-chrome-return-flicker/README.md)。上述机制尚未确认为用户录屏的真机根因，返回闪烁仍待真机计数与复录验收。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
 
-首批 `2.1-28` 安装包、符号与校验值仍保留在 [历史交付目录](packages/2.1-28-closefriend-return-leak/)，对应 [首批审计](docs/audits/release-2.1-28-closefriend-return-leak/README.md)。它与当前候选使用相同包版本，下载时请核对完整子目录和 SHA-256。
+历史 `2.1-28` 首批产物仍保留在 [历史交付目录](packages/2.1-28-closefriend-return-leak/)，首帧布局候选保留在 [历史候选目录](packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/)，对应 [首批审计](docs/audits/release-2.1-28-closefriend-return-leak/README.md) 和 [布局审计](docs/audits/release-2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/README.md)。当前版本与下载入口以上方 `2.1-29` 为准。
 
 默认入口名称为“再也不会”。在 **入口设置** 中可以修改名称，并选择显示在“我”、微信设置页或已有的插件管理入口；插件管理入口需要宿主环境提供 `WCPluginsMgr`。
 
@@ -212,7 +212,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.1-28_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/`。
+当前版本默认输出：`packages/com.wechat.improve_2.1-29_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-29-top-chrome-return-flicker/`。
 
 ### Rootful
 
@@ -221,7 +221,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.1-28_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/`。
+当前版本默认输出：`packages/com.wechat.improve_2.1-29_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-29-top-chrome-return-flicker/`。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -245,7 +245,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/com.wechat.improve_2.1-28_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.1-29-top-chrome-return-flicker/com.wechat.improve_2.1-29_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。

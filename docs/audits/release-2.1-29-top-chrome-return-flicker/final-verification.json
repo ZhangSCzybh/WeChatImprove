@@ -1,0 +1,27 @@
+{
+  "checked_at": "2026-10-30T11:55:34.253082+00:00",
+  "production_inputs_verified": 42513,
+  "historical_files_verified": 1321,
+  "protected_methods_byte_identical": 4,
+  "candidate_hook_matches_green_test_input": true,
+  "new_requirements": {
+    "v1_prechange_red_failures": 24,
+    "v2_frozen_old_checks": 626,
+    "v2_frozen_old_failures": 40,
+    "v2_candidate_checks": 626,
+    "v2_candidate_failures": 0
+  },
+  "focused_existing_regression_checks": 1606,
+  "final_success_checks_without_red_or_measurement_double_count": 2232,
+  "build_schemes": 2,
+  "architectures_per_scheme": [
+    "arm64",
+    "arm64e"
+  ],
+  "warnings_per_scheme": 6,
+  "warning_multisets_identical_to_2_1_28": true,
+  "package_and_host_manifests_valid": true,
+  "device_runtime_sampled": false,
+  "real_device_flicker_resolved": "unverified",
+  "device_limitations_file": "runtime-availability.json"
+}

@@ -1,0 +1,38 @@
+{
+  "baseline_commit": "11a3d078f7f0c6a7751f5ca8a1d7e3a0c5213b41",
+  "methods": [
+    {
+      "origin_version": "2.1-26",
+      "production_file": "Controllers/CSGroupListAdapter.m",
+      "marker": "+ (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller {",
+      "snapshot_file": "source-guards/setPresentationSuspended-2.1-26.txt",
+      "bytes": 1692,
+      "sha256": "24e6cc06ede2f289ca83486198b56b0f1a929cd7bd7c6f8cf0a13a67a58241cf"
+    },
+    {
+      "origin_version": "2.1-27",
+      "production_file": "Controllers/CSGroupListAdapter.m",
+      "marker": "- (void)refresh {",
+      "snapshot_file": "source-guards/refresh-2.1-27.txt",
+      "bytes": 12778,
+      "sha256": "8e631a48ce5b9d3560484af0917ad6093e89993cce0e89f1b09dabf6793cf140"
+    },
+    {
+      "origin_version": "2.1-27",
+      "production_file": "Controllers/CSGroupListAdapter.m",
+      "marker": "- (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous",
+      "snapshot_file": "source-guards/publishProjection-2.1-27.txt",
+      "bytes": 1835,
+      "sha256": "ec8054e434786a5981548586cb72035a82fe3892ec7ffe6356e94372fa1484d7"
+    },
+    {
+      "origin_version": "2.1-28",
+      "production_file": "Controllers/CSGroupListAdapter.m",
+      "marker": "- (void)performVisibleLayout:(void (^)(void))layout {",
+      "snapshot_file": "source-guards/performVisibleLayout-2.1-28.txt",
+      "bytes": 2339,
+      "sha256": "857e35c052dec406ff55fdafd34c61eed1a237f6ca5c85842a75002d9cb11a8e"
+    }
+  ],
+  "comparison": "Exact source bytes from definition start through its closing brace; no newline, whitespace, comment or token normalization."
+}

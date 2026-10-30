@@ -62,6 +62,16 @@ static NSString *CSGroupSessionEventUserName(id value) {
     if (session && session!=value) return CSGroupDirectEventUserName(session);
     return CSGroupDirectEventUserName(value);
 }
+static NSSet<NSString *> *CSGroupActiveSessionEventUserNames(id oldValue, id newValue) {
+    NSString *oldName=CSGroupSessionEventUserName(oldValue), *newName=CSGroupSessionEventUserName(newValue);
+    // An unresolved non-nil side may affect another session. Preserve the
+    // unknown fallback rather than narrowing that event to its other side.
+    if ((oldValue && !oldName.length) || (newValue && !newName.length)) return nil;
+    NSMutableSet<NSString *> *names=[NSMutableSet set];
+    if (oldName.length) [names addObject:oldName];
+    if (newName.length) [names addObject:newName];
+    return names.count ? [names copy] : nil;
+}
 // END Session event identity
 static void NativeEvent(id owner, CSGroupChangeKind kind, id subject, NSString *reason,
                         BOOL coalesced, void (^body)(void)) {
@@ -234,7 +244,15 @@ static void InstallMenuTouchGate(void) {
 %hook MainFrameLogicController
 - (void)onSessionRebuildBegin { [Adapter(self) beginNativeChange]; Native(self,NO,^{ %orig; }); }
 - (void)onSessionRebuildEnd { @try { Native(self,NO,^{ %orig; }); } @finally { [Adapter(self) endNativeChange]; } }
-- (void)onActiveUsrNameChange:(id)oldName curUsrName:(id)newName { NativeEvent(self,CSGroupChangeContent|CSGroupChangeStructure,nil,NSStringFromSelector(_cmd),NO,^{ %orig; }); }
+- (void)onActiveUsrNameChange:(id)oldName curUsrName:(id)newName {
+    CSGroupListAdapter *a=Adapter(self);
+    if (!a.table) { %orig; return; }
+    [a recordRefreshReason:NSStringFromSelector(_cmd)];
+    [a beginNativeChangeOfKind:CSGroupChangeContent|CSGroupChangeStructure
+             sessionUserNames:CSGroupActiveSessionEventUserNames(oldName,newName)];
+    @try { CSGroupWithNativeIndices(a.table,^{ %orig; }); }
+    @finally { [a endNativeChangeCoalesced:NO]; }
+}
 - (void)onSessionTotalUnreadCountChange:(unsigned int)count { NativeNotification(self,CSGroupChangeUnread,nil,NSStringFromSelector(_cmd),^{ %orig; }); }
 - (void)onSessionChanged:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,session,NSStringFromSelector(_cmd),^{ %orig; }); }
 - (void)onSessionTopStatusChanged:(id)session bTop:(BOOL)top { NativeEvent(self,CSGroupChangeStructure,session,NSStringFromSelector(_cmd),NO,^{ %orig; }); }

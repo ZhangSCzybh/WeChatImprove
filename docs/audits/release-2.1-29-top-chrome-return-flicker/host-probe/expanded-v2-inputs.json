@@ -1,0 +1,44 @@
+{
+  "base_commit": "11a3d078f7f0c6a7751f5ca8a1d7e3a0c5213b41",
+  "boundary": "Host-controlled exact production hook execution only. Not natural phone callback or frame evidence.",
+  "source_inputs": {
+    "Controllers/CSGroupListAdapter.m": {
+      "sha256": "4fd9b6cc6a1dda85f4f04a17cdf67e89f0e1831821a128c01abb6cfa5ebff426",
+      "equals_base_commit": true
+    },
+    "Hooks/SessionGroupHooks.xm": {
+      "sha256": "cc739fba9c41721fc445a9c4eb720e5a52658e25978b4ae3bc2f39b5f1cdaf75",
+      "snapshot": "SessionGroupHooks.xm-working-green.txt"
+    },
+    "Controllers/CSGroupProjection.m": {
+      "sha256": "4bccf64b07aad45ecbbceb428c87af78181099de6cfdeb6eaa749e4f46e65971",
+      "equals_base_commit": true
+    },
+    "Controllers/CSGroupProjection.h": {
+      "sha256": "c22af3510b013530afe4138eeea2fa807c08cb5977bd60f436519576701f85bb",
+      "equals_base_commit": true
+    },
+    "Controllers/CSGroupIndexScope.m": {
+      "sha256": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780",
+      "equals_base_commit": true
+    },
+    "Controllers/CSGroupIndexScope.h": {
+      "sha256": "09cd2719a4439feb264be1666dfed459b776c595ef7772774a7e9bac0e3d24f5",
+      "equals_base_commit": true
+    },
+    "Controllers/WESessionTabItem.m": {
+      "sha256": "dfb12f2a1eb44a0d35a175419bfe914cf7d22ff042e75cbc679ce6959928a6e0",
+      "equals_base_commit": true
+    },
+    "Controllers/WESessionTabItem.h": {
+      "sha256": "11fab1658de7f1d3252b0465380dda5230f38614b417df33bc1fb24dfad96a9b",
+      "equals_base_commit": true
+    }
+  },
+  "probe_source_hashes": {
+    "Tests/GroupReturnBannerProbeTests.m": "7ae7108d9f45cda281f0afb807a02478c162f6479a7609a2ed51ca963a9b3841",
+    "Tests/extract-group-return-banner-probe.py": "fd0862e1aa150aaf95c4d457a655d9f1e3ad209bea3c99879631741801ba3010",
+    "Tests/probe-group-return-banner.sh": "42d8de3b7183c663cedcf59310bfc84eabd978cf7a4ad27bf215a4d8edddd130",
+    "Tests/verify-group-return-banner.sh": "52e506f97905d54875896223ca075576425ac34299256dac137c54d87c965d96"
+  }
+}

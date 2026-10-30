@@ -1,0 +1,3779 @@
+{
+  "input": "working production hook, inputs/hash in expanded-v2-inputs.json",
+  "boundary": "Host-controlled exact production hook execution only. Not natural phone callback or frame evidence.",
+  "raw_event_count": 2457,
+  "result": {
+    "checks": 586,
+    "evidence": "host-controlled",
+    "failures": 0,
+    "kind": "probe-result",
+    "phase": "return",
+    "requireIdentityMode": false,
+    "scenario": "active-user-hook/known-outer-real-unattributed-inner",
+    "scenarios": 46,
+    "sequence": 2457
+  },
+  "return_counters": [
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 0,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 8,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 2
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 10,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 3
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        8,
+        10
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 8,
+          "contentIdentityKnown": true,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 0,
+      "rowReloadCalls": 0,
+      "rowReloadPaths": [],
+      "scenario": "no-event/deferred/stable-viewport/no-header-input",
+      "sequence": 48,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 0,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 20,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 14
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 22,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 15
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        20,
+        22
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 8,
+          "contentIdentityKnown": true,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 0,
+      "rowReloadCalls": 0,
+      "rowReloadPaths": [],
+      "scenario": "no-event/deferred/stable-viewport/requested-header-closures",
+      "sequence": 99,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 0,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 32,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 26
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 34,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 27
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        32,
+        34
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 8,
+          "contentIdentityKnown": true,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 0,
+      "rowReloadCalls": 0,
+      "rowReloadPaths": [],
+      "scenario": "no-event/deferred/native-viewport-input/no-header-input",
+      "sequence": 149,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 0,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 44,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 38
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 46,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 39
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        44,
+        46
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 8,
+          "contentIdentityKnown": true,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 0,
+      "rowReloadCalls": 0,
+      "rowReloadPaths": [],
+      "scenario": "no-event/deferred/native-viewport-input/requested-header-closures",
+      "sequence": 203,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 0,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 56,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 50
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 58,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 51
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        56,
+        58
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 8,
+          "contentIdentityKnown": true,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 0,
+      "rowReloadCalls": 0,
+      "rowReloadPaths": [],
+      "scenario": "no-event/reentrant/stable-viewport/no-header-input",
+      "sequence": 250,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 0,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 68,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 62
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 70,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 63
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        68,
+        70
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 8,
+          "contentIdentityKnown": true,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 0,
+      "rowReloadCalls": 0,
+      "rowReloadPaths": [],
+      "scenario": "no-event/reentrant/stable-viewport/requested-header-closures",
+      "sequence": 301,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 0,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 80,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 74
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 82,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 75
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        80,
+        82
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 8,
+          "contentIdentityKnown": true,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 0,
+      "rowReloadCalls": 0,
+      "rowReloadPaths": [],
+      "scenario": "no-event/reentrant/native-viewport-input/no-header-input",
+      "sequence": 351,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 0,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 92,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 86
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 94,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 87
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        92,
+        94
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 8,
+          "contentIdentityKnown": true,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 0,
+      "rowReloadCalls": 0,
+      "rowReloadPaths": [],
+      "scenario": "no-event/reentrant/native-viewport-input/requested-header-closures",
+      "sequence": 405,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 104,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 98
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 106,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 99
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        104,
+        106
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 11,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "attributed-unread-clear/deferred/stable-viewport/no-header-input",
+      "sequence": 458,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 118,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 112
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 120,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 113
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        118,
+        120
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 11,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "attributed-unread-clear/deferred/stable-viewport/requested-header-closures",
+      "sequence": 515,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 132,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 126
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 134,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 127
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        132,
+        134
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 11,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "attributed-unread-clear/deferred/native-viewport-input/no-header-input",
+      "sequence": 571,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 146,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 140
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 148,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 141
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        146,
+        148
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 11,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "attributed-unread-clear/deferred/native-viewport-input/requested-header-closures",
+      "sequence": 631,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 160,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 154
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 162,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 155
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        160,
+        162
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 11,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "attributed-unread-clear/reentrant/stable-viewport/no-header-input",
+      "sequence": 684,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 174,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 168
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 176,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 169
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        174,
+        176
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 11,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "attributed-unread-clear/reentrant/stable-viewport/requested-header-closures",
+      "sequence": 741,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 188,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 182
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 190,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 183
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        188,
+        190
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 11,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "attributed-unread-clear/reentrant/native-viewport-input/no-header-input",
+      "sequence": 797,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 202,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 196
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 204,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 197
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        202,
+        204
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 11,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "attributed-unread-clear/reentrant/native-viewport-input/requested-header-closures",
+      "sequence": 857,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 222,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 210
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 224,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 211
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        216,
+        218
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "unattributed-content/deferred/stable-viewport/no-header-input",
+      "sequence": 913,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 240,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 228
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 242,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 229
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        234,
+        236
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "unattributed-content/deferred/stable-viewport/requested-header-closures",
+      "sequence": 973,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 258,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 246
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 260,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 247
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        252,
+        254
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "unattributed-content/deferred/native-viewport-input/no-header-input",
+      "sequence": 1032,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 276,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 264
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 278,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 265
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        270,
+        272
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "unattributed-content/deferred/native-viewport-input/requested-header-closures",
+      "sequence": 1095,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 294,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 282
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 296,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 283
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        288,
+        290
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "unattributed-content/reentrant/stable-viewport/no-header-input",
+      "sequence": 1151,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 312,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 300
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 314,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 301
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        306,
+        308
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "unattributed-content/reentrant/stable-viewport/requested-header-closures",
+      "sequence": 1211,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 330,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 318
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 332,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 319
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        324,
+        326
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "unattributed-content/reentrant/native-viewport-input/no-header-input",
+      "sequence": 1270,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 348,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 336
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 350,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 337
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        342,
+        344
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "unattributed-content/reentrant/native-viewport-input/requested-header-closures",
+      "sequence": 1333,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 366,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-updated",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 354
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 368,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Windows",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 355
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        360,
+        362
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "business-content-change/deferred/stable-viewport/no-header-input",
+      "sequence": 1391,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 384,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-updated",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 372
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 386,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Windows",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 373
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        378,
+        380
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "business-content-change/deferred/stable-viewport/requested-header-closures",
+      "sequence": 1453,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 402,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-updated",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 390
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 404,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Windows",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 391
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        396,
+        398
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "business-content-change/deferred/native-viewport-input/no-header-input",
+      "sequence": 1514,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 420,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-updated",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 408
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 422,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Windows",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 409
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        414,
+        416
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "business-content-change/deferred/native-viewport-input/requested-header-closures",
+      "sequence": 1579,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 438,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-updated",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 426
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 440,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Windows",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 427
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        432,
+        434
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "business-content-change/reentrant/stable-viewport/no-header-input",
+      "sequence": 1637,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 456,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-updated",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 444
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 458,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Windows",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 445
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        450,
+        452
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "business-content-change/reentrant/stable-viewport/requested-header-closures",
+      "sequence": 1699,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 474,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-updated",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 462
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 476,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Windows",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 463
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        468,
+        470
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "business-content-change/reentrant/native-viewport-input/no-header-input",
+      "sequence": 1760,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 8,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 492,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-updated",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 480
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 494,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Windows",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 481
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "initTableHeaderView": 1,
+        "setSearchBarToTableHeaderView": 1,
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        486,
+        488
+      ],
+      "insetTop": 140,
+      "kind": "return-counters",
+      "offset": -20,
+      "offsetTrace": [
+        -25,
+        -20
+      ],
+      "offsetWrites": 2,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 10,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": -20,
+          "before": -20,
+          "insetTop": 140
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "business-content-change/reentrant/native-viewport-input/requested-header-closures",
+      "sequence": 1825,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 1,
+      "adapterDeliveryRequests": 0,
+      "adapterLayoutCalls": 4,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 504,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 498
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 506,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 499
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {
+        "viewDidLayoutSubviews": 1
+      },
+      "initialBannerParents": [
+        504,
+        506
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 8,
+          "contentIdentityKnown": true,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 1,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 0,
+      "rowReloadCalls": 0,
+      "rowReloadPaths": [],
+      "scenario": "no-event/actual-return-header-setter-reentry/host-width-change",
+      "sequence": 1864,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 516,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 510
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 518,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 511
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 2,
+      "expectedNamesForRequirement": [
+        "other",
+        "friend"
+      ],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        516,
+        518
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "other",
+            "friend"
+          ],
+          "contentUserNamesCount": 2,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/valid-pair",
+      "sequence": 1903,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 530,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 524
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 532,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 525
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 1,
+      "expectedNamesForRequirement": [
+        "friend"
+      ],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        530,
+        532
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/valid-old-nil-new",
+      "sequence": 1942,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 544,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 538
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 546,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 539
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 1,
+      "expectedNamesForRequirement": [
+        "friend"
+      ],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        544,
+        546
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/nil-old-valid-new",
+      "sequence": 1981,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 564,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 552
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 566,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 553
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 0,
+      "expectedNamesForRequirement": [],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        558,
+        560
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/both-nil",
+      "sequence": 2030,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 582,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 570
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 584,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 571
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 0,
+      "expectedNamesForRequirement": [],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        576,
+        578
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/conflicting-old-valid-new",
+      "sequence": 2079,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 600,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 588
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 602,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 589
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 0,
+      "expectedNamesForRequirement": [],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        594,
+        596
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/valid-old-conflicting-new",
+      "sequence": 2128,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 618,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 606
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 620,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 607
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 0,
+      "expectedNamesForRequirement": [],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        612,
+        614
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/empty-old-valid-new",
+      "sequence": 2177,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 636,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 624
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 638,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 625
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 0,
+      "expectedNamesForRequirement": [],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        630,
+        632
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/valid-old-empty-new",
+      "sequence": 2226,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 654,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 642
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 656,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 643
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 0,
+      "expectedNamesForRequirement": [],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        648,
+        650
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/null-old-valid-new",
+      "sequence": 2275,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 672,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 660
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 674,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 661
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 0,
+      "expectedNamesForRequirement": [],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        666,
+        668
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": false,
+          "contentUserNames": [],
+          "contentUserNamesCount": 0,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/valid-old-null-new",
+      "sequence": 2324,
+      "tableLayoutIfNeededCalls": 1
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 684,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 678
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 686,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 679
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 1,
+      "expectedNamesForRequirement": [
+        "friend"
+      ],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        684,
+        686
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/same-identity-deduplicated",
+      "sequence": 2363,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 1,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 698,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "favorite-initial",
+          "row": 0,
+          "superviewChanges": 0,
+          "view": 692
+        },
+        {
+          "adapterDeliveries": 0,
+          "adds": 0,
+          "currentSuperview": 700,
+          "hostNativeConstructConfigureCalls": 0,
+          "removes": 0,
+          "renderedValue": "logged-in-Mac",
+          "row": 1,
+          "superviewChanges": 0,
+          "view": 693
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 1,
+      "expectedNamesForRequirement": [
+        "friend"
+      ],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        698,
+        700
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": true,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 0,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/matching-identity-object",
+      "sequence": 2402,
+      "tableLayoutIfNeededCalls": 0
+    },
+    {
+      "actualHeaderWrites": 0,
+      "adapterDeliveryRequests": 3,
+      "adapterLayoutCalls": 3,
+      "banners": [
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 718,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "nested-favorite-updated",
+          "row": 0,
+          "superviewChanges": 2,
+          "view": 706
+        },
+        {
+          "adapterDeliveries": 1,
+          "adds": 1,
+          "currentSuperview": 720,
+          "hostNativeConstructConfigureCalls": 1,
+          "removes": 1,
+          "renderedValue": "nested-login-updated",
+          "row": 1,
+          "superviewChanges": 2,
+          "view": 707
+        }
+      ],
+      "blankRetiredContainers": 0,
+      "evidence": "host-controlled",
+      "expectedNamesCount": 1,
+      "expectedNamesForRequirement": [
+        "friend"
+      ],
+      "fullReloads": 0,
+      "headerClosuresRequestedByHost": {},
+      "initialBannerParents": [
+        712,
+        714
+      ],
+      "insetTop": 100,
+      "kind": "return-counters",
+      "offset": 20,
+      "offsetTrace": [],
+      "offsetWrites": 0,
+      "phase": "return",
+      "publicationRequests": 1,
+      "publicationTrace": [
+        {
+          "changes": 14,
+          "contentIdentityKnown": false,
+          "contentUserNames": [
+            "friend"
+          ],
+          "contentUserNamesCount": 1,
+          "previouslyProjecting": true
+        }
+      ],
+      "publishHeaderCalls": 0,
+      "restoreAnchorTrace": [
+        {
+          "after": 20,
+          "before": 20,
+          "insetTop": 100
+        }
+      ],
+      "returnBannerNativeConstructConfigureCalls": 2,
+      "returnNativeChatCalls": 1,
+      "rowReloadCalls": 1,
+      "rowReloadPaths": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      ],
+      "scenario": "active-user-hook/known-outer-real-unattributed-inner",
+      "sequence": 2456,
+      "tableLayoutIfNeededCalls": 1
+    }
+  ]
+}

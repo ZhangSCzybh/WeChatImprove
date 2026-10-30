@@ -1,0 +1,1629 @@
+{
+  "boundary": "Host-controlled exact production hook execution only. Not natural phone callback or frame evidence.",
+  "comparisons": [
+    {
+      "scenario": "active-user-hook/valid-pair",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 522,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 510
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 524,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 511
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": true,
+            "contentUserNames": [
+              "other",
+              "friend"
+            ],
+            "contentUserNamesCount": 2,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 0,
+            "adds": 0,
+            "currentSuperview": 516,
+            "hostNativeConstructConfigureCalls": 0,
+            "removes": 0,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 0,
+            "view": 510
+          },
+          {
+            "adapterDeliveries": 0,
+            "adds": 0,
+            "currentSuperview": 518,
+            "hostNativeConstructConfigureCalls": 0,
+            "removes": 0,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 0,
+            "view": 511
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "active-user-hook/valid-old-nil-new",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 540,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 528
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 542,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 529
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": true,
+            "contentUserNames": [
+              "friend"
+            ],
+            "contentUserNamesCount": 1,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 0,
+            "adds": 0,
+            "currentSuperview": 530,
+            "hostNativeConstructConfigureCalls": 0,
+            "removes": 0,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 0,
+            "view": 524
+          },
+          {
+            "adapterDeliveries": 0,
+            "adds": 0,
+            "currentSuperview": 532,
+            "hostNativeConstructConfigureCalls": 0,
+            "removes": 0,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 0,
+            "view": 525
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "active-user-hook/nil-old-valid-new",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 558,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 546
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 560,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 547
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": true,
+            "contentUserNames": [
+              "friend"
+            ],
+            "contentUserNamesCount": 1,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 0,
+            "adds": 0,
+            "currentSuperview": 544,
+            "hostNativeConstructConfigureCalls": 0,
+            "removes": 0,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 0,
+            "view": 538
+          },
+          {
+            "adapterDeliveries": 0,
+            "adds": 0,
+            "currentSuperview": 546,
+            "hostNativeConstructConfigureCalls": 0,
+            "removes": 0,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 0,
+            "view": 539
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "active-user-hook/both-nil",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 576,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 564
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 578,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 565
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 564,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 552
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 566,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 553
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "active-user-hook/conflicting-old-valid-new",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 594,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 582
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 596,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 583
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 582,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 570
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 584,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 571
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "active-user-hook/valid-old-conflicting-new",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 612,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 600
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 614,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 601
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 600,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 588
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 602,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 589
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "active-user-hook/empty-old-valid-new",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 630,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 618
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 632,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 619
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 618,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 606
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 620,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 607
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "active-user-hook/valid-old-empty-new",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 648,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 636
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 650,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 637
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 636,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 624
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 638,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 625
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "active-user-hook/null-old-valid-new",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 666,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 654
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 668,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 655
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 654,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 642
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 656,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 643
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "active-user-hook/valid-old-null-new",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 684,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 672
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 686,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 673
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 672,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 660
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 674,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 661
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "active-user-hook/same-identity-deduplicated",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 702,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 690
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 704,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 691
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": true,
+            "contentUserNames": [
+              "friend"
+            ],
+            "contentUserNamesCount": 1,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 0,
+            "adds": 0,
+            "currentSuperview": 684,
+            "hostNativeConstructConfigureCalls": 0,
+            "removes": 0,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 0,
+            "view": 678
+          },
+          {
+            "adapterDeliveries": 0,
+            "adds": 0,
+            "currentSuperview": 686,
+            "hostNativeConstructConfigureCalls": 0,
+            "removes": 0,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 0,
+            "view": 679
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "active-user-hook/matching-identity-object",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 720,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 708
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 722,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 709
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": true,
+            "contentUserNames": [
+              "friend"
+            ],
+            "contentUserNamesCount": 1,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 0,
+            "adds": 0,
+            "currentSuperview": 698,
+            "hostNativeConstructConfigureCalls": 0,
+            "removes": 0,
+            "renderedValue": "favorite-initial",
+            "row": 0,
+            "superviewChanges": 0,
+            "view": 692
+          },
+          {
+            "adapterDeliveries": 0,
+            "adds": 0,
+            "currentSuperview": 700,
+            "hostNativeConstructConfigureCalls": 0,
+            "removes": 0,
+            "renderedValue": "logged-in-Mac",
+            "row": 1,
+            "superviewChanges": 0,
+            "view": 693
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "active-user-hook/known-outer-real-unattributed-inner",
+      "before": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [],
+            "contentUserNamesCount": 0,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 738,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "nested-favorite-updated",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 726
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 740,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "nested-login-updated",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 727
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      },
+      "after": {
+        "fullReloads": 0,
+        "rowReloadCalls": 1,
+        "rowReloadPaths": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "publicationTrace": [
+          {
+            "changes": 14,
+            "contentIdentityKnown": false,
+            "contentUserNames": [
+              "friend"
+            ],
+            "contentUserNamesCount": 1,
+            "previouslyProjecting": true
+          }
+        ],
+        "banners": [
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 718,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "nested-favorite-updated",
+            "row": 0,
+            "superviewChanges": 2,
+            "view": 706
+          },
+          {
+            "adapterDeliveries": 1,
+            "adds": 1,
+            "currentSuperview": 720,
+            "hostNativeConstructConfigureCalls": 1,
+            "removes": 1,
+            "renderedValue": "nested-login-updated",
+            "row": 1,
+            "superviewChanges": 2,
+            "view": 707
+          }
+        ],
+        "actualHeaderWrites": 0,
+        "offsetTrace": [],
+        "restoreAnchorTrace": [
+          {
+            "after": 20,
+            "before": 20,
+            "insetTop": 100
+          }
+        ]
+      }
+    }
+  ]
+}
