@@ -1,0 +1,28 @@
+{
+  "version": "2.1-30",
+  "baseline_commit": "73e8e78ad5bbc87cb2b73bcf64ed8e0e9ac13f8e",
+  "protected_definitions_byte_identical": true,
+  "protected_definitions": 6,
+  "current_production_inputs_match_build": true,
+  "production_input_count": 42513,
+  "task_start_artifact_count": 1325,
+  "task_start_artifact_changes": [],
+  "tests": {
+    "formal_red_checks": 1148,
+    "formal_red_failures": 415,
+    "red_passes_counted_as_success": false,
+    "green_new_checks": 1103,
+    "green_existing_checks": 3863,
+    "green_distinct_checks": 4966,
+    "all_current_tests_passed": true,
+    "repeat_measurement_and_old_compatibility_not_double_counted": true
+  },
+  "package_manifest_verified": true,
+  "device_validation_completed": false,
+  "real_runtime_counts_collected": false,
+  "feedback_media_and_derived_images_in_commit": false,
+  "production_behavior_files": [
+    "Controllers/CSGroupListAdapter.m",
+    "Hooks/ListCornerRadiusHooks.xm"
+  ]
+}

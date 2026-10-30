@@ -1,0 +1,39 @@
+{
+  "evidence": "Device not accessible. All natural runtime counts and identities below are unknown, not zero. Host counts are in miniapp-probe and top-transition.",
+  "device_accessible": false,
+  "miniapp": {
+    "container_lifecycle_sequence": null,
+    "list_viewWillDisappear": null,
+    "list_viewDidDisappear": null,
+    "list_viewWillAppear": null,
+    "list_viewDidAppear": null,
+    "policy_ready_before_first_query": null,
+    "native_or_display_scope_of_first_query": null,
+    "content_publications": null,
+    "layout_calculations": null,
+    "first_visible_sections_rows_geometry_corners_offset_equal_stable": null,
+    "unfiltered_intermediate_frames": null,
+    "contentOffset_trajectory": null
+  },
+  "chat": {
+    "transition_begin_end_times": null,
+    "top_cell_deliveries": null,
+    "banner_superview_identity": null,
+    "banner_removeFromSuperview": null,
+    "banner_addSubview": null,
+    "cell_layoutSubviews": null,
+    "card_drawRect": null,
+    "card_background_setters": null,
+    "cell_and_card_setFrame": null,
+    "reloadRows": null,
+    "reloadData": null,
+    "viewDidLayoutSubviews": null,
+    "initTableHeaderView": null,
+    "setSearchBarToTableHeaderView": null,
+    "contentOffset_trajectory": null,
+    "missing_card_intermediate_frames": null,
+    "core_animation_commits": null
+  },
+  "optional_observer_miniapp_coverage_complete": false,
+  "source_instrumentation_in_production_package": false
+}

@@ -1,0 +1,15 @@
+{
+  "command": [
+    "bash",
+    "Tests/verify-top-transition-compatibility.sh",
+    "."
+  ],
+  "exitCode": 0,
+  "testSourceSHA256": {
+    "Tests/TopTransitionTests.m": "9eec6a3bdfb0ef7e2f02af4b5ec0b98e18f23980bec5879cbcc88358f3dd2037",
+    "Tests/extract-top-transition.py": "ec561c39981da71d722fc6901a9fa3e960be17401f49b3e176e7d35e9e08ec9b",
+    "Tests/TopTransitionCompatibilityTests.m": "3d2e368182709f91ff0f03e3ca0ed6c3c6227debe991714127fb0a4b44121e83",
+    "Tests/verify-top-transition-compatibility.sh": "b7011afcd26eac1bcb5dd5e0f6af12420025e76fe619312a45448b75879b4508"
+  },
+  "scope": "supplemental compatibility, separate from 14-check red/green; controlled native inputs"
+}

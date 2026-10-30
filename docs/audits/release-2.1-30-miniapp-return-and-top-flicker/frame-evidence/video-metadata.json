@@ -1,0 +1,151 @@
+{
+  "script_sha256": "9e4b65d548970126e9cd8961bc43d09abf417aef4d57c34d411335880b9b7f96",
+  "python": "3.12.9",
+  "numpy": "2.5.2",
+  "pillow": "11.3.0",
+  "ffmpeg": "ffmpeg version 9.0.1 Copyright (c) 2000-2026 the FFmpeg developers",
+  "ffprobe": "ffprobe version 9.0.1 Copyright (c) 2007-2026 the FFmpeg developers",
+  "numbering": "frame0 is original presentation-order decoded sample index; frame1=frame0+1",
+  "decoder": "rgb24 rawvideo, fps_mode=passthrough; no fps filter, resampling, padding or OCR",
+  "rois_xyxy_half_open": {
+    "card": [
+      25,
+      225,
+      560,
+      320
+    ],
+    "upper_list": [
+      25,
+      220,
+      560,
+      650
+    ],
+    "local_patch_a": [
+      44,
+      905,
+      100,
+      967
+    ],
+    "local_patch_b": [
+      44,
+      993,
+      100,
+      1057
+    ]
+  },
+  "chat_visible_widths": {
+    "49": 25,
+    "50": 35,
+    "51": 45,
+    "52": 110,
+    "53": 265,
+    "54": 420
+  },
+  "sources": {
+    "miniapp": {
+      "source": "docs/feedbacks/2026-10-30-miniapp-return-leak.mp4",
+      "sha256": "b597286081b8e05b6a00ffa2965e92e3066a5ab39d01e7131b3d481316a35adb",
+      "bytes": 541943,
+      "stream": {
+        "codec_name": "hevc",
+        "width": 592,
+        "height": 1280,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "time_base": "1/600",
+        "duration_ts": 3500,
+        "duration": "5.833333",
+        "nb_frames": "175",
+        "nb_read_frames": "175",
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "creation_time": "2026-10-30T12:44:03.000000Z",
+          "language": "und",
+          "handler_name": "Core Media Video"
+        }
+      },
+      "decoded_count": 175,
+      "pts_delta_histogram_ticks": {
+        "20": 174
+      },
+      "non_nominal_delta_after_frame0": []
+    },
+    "chat": {
+      "source": "docs/feedbacks/2026-10-30-chat-return-top-flicker.mp4",
+      "sha256": "93441305457f7b3c4be894d70cb8bca49c897d9cd4e4fd1f79c3bea415bfd697",
+      "bytes": 377000,
+      "stream": {
+        "codec_name": "hevc",
+        "width": 592,
+        "height": 1280,
+        "pix_fmt": "yuv420p",
+        "color_range": "tv",
+        "color_space": "bt709",
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "3540/119",
+        "time_base": "1/600",
+        "duration_ts": 2380,
+        "duration": "3.966667",
+        "nb_frames": "118",
+        "nb_read_frames": "118",
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "creation_time": "2026-10-30T12:44:06.000000Z",
+          "language": "und",
+          "handler_name": "Core Media Video"
+        }
+      },
+      "decoded_count": 118,
+      "pts_delta_histogram_ticks": {
+        "20": 116,
+        "40": 1
+      },
+      "non_nominal_delta_after_frame0": [
+        100
+      ]
+    }
+  }
+}

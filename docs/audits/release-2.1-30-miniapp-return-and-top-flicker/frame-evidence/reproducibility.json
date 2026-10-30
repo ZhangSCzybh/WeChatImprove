@@ -1,0 +1,13 @@
+{
+  "independent_same_machine_decode_exit_code": 0,
+  "byte_identical_numeric_files": {
+    "video-metadata.json": true,
+    "numeric-summary.json": true,
+    "miniapp-timeline.csv": true,
+    "chat-timeline.csv": true,
+    "miniapp-pts.json": true,
+    "chat-pts.json": true
+  },
+  "no_images_generated_on_reproduction": true,
+  "boundary": "Reproducible decode/analysis only; no app/device runtime count or post-fix recording."
+}

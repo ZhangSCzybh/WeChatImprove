@@ -1,0 +1,296 @@
+{
+  "binary": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "classes": {
+    "NewMainFrameCell": {
+      "address": "0x120385228",
+      "superRaw": "0x100000203654c8",
+      "methods": [
+        {
+          "selector": "layoutSubviews",
+          "address": "0x1050fcf20",
+          "types": "v16@0:8",
+          "endExclusive": "0x1050fcfd4",
+          "file": "NewMainFrameCell--layoutSubviews.asm"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_itemView",
+          "offset": 64,
+          "type": "@\"MainFrameItemView\""
+        },
+        {
+          "name": "m_backGroundViewOfCell",
+          "offset": 72,
+          "type": "@\"UIImageView\""
+        },
+        {
+          "name": "m_cellBkgImageWithTop",
+          "offset": 80,
+          "type": "@\"UIImage\""
+        },
+        {
+          "name": "m_cellBkgImage",
+          "offset": 88,
+          "type": "@\"UIImage\""
+        },
+        {
+          "name": "m_cellData",
+          "offset": 96,
+          "type": "@\"MainFrameCellData\""
+        },
+        {
+          "name": "m_oldCellData",
+          "offset": 104,
+          "type": "@\"MainFrameCellData\""
+        },
+        {
+          "name": "_dragManager",
+          "offset": 112,
+          "type": "@\"MMDragManager\""
+        },
+        {
+          "name": "_dragInteraction",
+          "offset": 120,
+          "type": "@\"UIDragInteraction\""
+        },
+        {
+          "name": "_dragLiftingView",
+          "offset": 128,
+          "type": "@\"UIView\""
+        },
+        {
+          "name": "_horizonPadding",
+          "offset": 136,
+          "type": "d"
+        },
+        {
+          "name": "_rightMaskView",
+          "offset": 144,
+          "type": "@\"ColorGradientView\""
+        }
+      ],
+      "superclass": "MMMultiMenuTableViewCell"
+    },
+    "MMTableViewCell": {
+      "address": "0x120634920",
+      "superRaw": "0x8010000000002232",
+      "methods": [
+        {
+          "selector": "layoutSubviews",
+          "address": "0x1166fd0c4",
+          "types": "v16@0:8",
+          "endExclusive": "0x1166fd46c",
+          "file": "MMTableViewCell--layoutSubviews.asm"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_switchAccessoryView",
+          "offset": 8,
+          "type": "@\"UISwitch\""
+        },
+        {
+          "name": "_keepTouchInView",
+          "offset": 16,
+          "type": "B"
+        },
+        {
+          "name": "m_subContentView",
+          "offset": 24,
+          "type": "@\"MMUIView\""
+        },
+        {
+          "name": "_cellInfo",
+          "offset": 32,
+          "type": "@\"WCTableViewCellManager\""
+        },
+        {
+          "name": "_deselectDuration",
+          "offset": 40,
+          "type": "d"
+        },
+        {
+          "name": "_selectedBackgroundViewInsets",
+          "offset": 48,
+          "type": "{UIEdgeInsets=\"top\"d\"left\"d\"bottom\"d\"right\"d}"
+        }
+      ],
+      "superclass": "UITableViewCell"
+    },
+    "MMBaseMultiMenuTableViewCell": {
+      "address": "0x1206360e0",
+      "superRaw": "0x10000020634920",
+      "methods": [
+        {
+          "selector": "setFrame:",
+          "address": "0x116752c68",
+          "types": "v48@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16"
+        },
+        {
+          "selector": "layoutSubviews",
+          "address": "0x116756564",
+          "types": "v16@0:8",
+          "endExclusive": "0x1167566bc",
+          "file": "MMBaseMultiMenuTableViewCell--layoutSubviews.asm"
+        },
+        {
+          "selector": "contentView",
+          "address": "0x116756a10",
+          "types": "@16@0:8",
+          "endExclusive": "0x116756a7c",
+          "file": "MMBaseMultiMenuTableViewCell--contentView.asm"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "_menuContentView",
+          "offset": 8,
+          "type": "@\"UIView\""
+        },
+        {
+          "name": "_actualContentView",
+          "offset": 16,
+          "type": "@\"UIView\""
+        },
+        {
+          "name": "_panGestureRecognizer",
+          "offset": 24,
+          "type": "@\"UIGestureRecognizer\""
+        },
+        {
+          "name": "_shouldDisplayContextMenuView",
+          "offset": 32,
+          "type": "B"
+        },
+        {
+          "name": "_contextMenuHidden",
+          "offset": 33,
+          "type": "B"
+        },
+        {
+          "name": "_copyedBackgroundView",
+          "offset": 40,
+          "type": "@\"UIImageView\""
+        },
+        {
+          "name": "m_bIsNeedUpdateMenu",
+          "offset": 48,
+          "type": "B"
+        },
+        {
+          "name": "_initialTouchPositionX",
+          "offset": 56,
+          "type": "d"
+        },
+        {
+          "name": "_lastTouchPositionX",
+          "offset": 64,
+          "type": "d"
+        },
+        {
+          "name": "_initialContentViewX",
+          "offset": 72,
+          "type": "d"
+        },
+        {
+          "name": "bNotAddDeleteBtn",
+          "offset": 80,
+          "type": "B"
+        },
+        {
+          "name": "_currentMenuItems",
+          "offset": 88,
+          "type": "@\"NSArray\""
+        },
+        {
+          "name": "_inHideAnimation",
+          "offset": 96,
+          "type": "B"
+        },
+        {
+          "name": "_panGestureHasBegin",
+          "offset": 97,
+          "type": "B"
+        },
+        {
+          "name": "_animationCounter",
+          "offset": 100,
+          "type": "i"
+        },
+        {
+          "name": "_menuContentLeftMargin",
+          "offset": 104,
+          "type": "d"
+        },
+        {
+          "name": "_contextMenuEnabled",
+          "offset": 112,
+          "type": "B"
+        },
+        {
+          "name": "_disablePanOnHideAnimated",
+          "offset": 113,
+          "type": "B"
+        },
+        {
+          "name": "_bNeedCopyBackgroundView",
+          "offset": 114,
+          "type": "B"
+        },
+        {
+          "name": "_keepSwipeStateOnResue",
+          "offset": 115,
+          "type": "B"
+        },
+        {
+          "name": "_forbidDisplayMenuWithGestures",
+          "offset": 116,
+          "type": "B"
+        },
+        {
+          "name": "_releaseToTriggerCurrItem",
+          "offset": 117,
+          "type": "B"
+        },
+        {
+          "name": "_indexPath",
+          "offset": 120,
+          "type": "@\"NSIndexPath\""
+        },
+        {
+          "name": "_arrMenuItems",
+          "offset": 128,
+          "type": "@\"NSMutableArray\""
+        },
+        {
+          "name": "_menuBackgroundColor",
+          "offset": 136,
+          "type": "@\"UIColor\""
+        },
+        {
+          "name": "_fCardRightMargin",
+          "offset": 144,
+          "type": "d"
+        },
+        {
+          "name": "_rootContentView",
+          "offset": 152,
+          "type": "@\"UIView\""
+        },
+        {
+          "name": "_menuAnimateTimingFunction",
+          "offset": 160,
+          "type": "@\"CAMediaTimingFunction\""
+        },
+        {
+          "name": "_menuAnimateDuration",
+          "offset": 168,
+          "type": "d"
+        }
+      ],
+      "superclass": "MMTableViewCell"
+    }
+  }
+}

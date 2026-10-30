@@ -1,0 +1,77 @@
+{
+  "baseline_commit": "73e8e78ad5bbc87cb2b73bcf64ed8e0e9ac13f8e",
+  "boundary": "Controlled host UI datasource reentry only; no claim of natural miniapp callback order.",
+  "sources": {
+    "Controllers/CSGroupListAdapter.m": {
+      "snapshot": "CSGroupListAdapter.m-2.1-29.txt",
+      "sha256": "4fd9b6cc6a1dda85f4f04a17cdf67e89f0e1831821a128c01abb6cfa5ebff426"
+    },
+    "Hooks/SessionGroupHooks.xm": {
+      "snapshot": "SessionGroupHooks.xm-2.1-29.txt",
+      "sha256": "cc739fba9c41721fc445a9c4eb720e5a52658e25978b4ae3bc2f39b5f1cdaf75"
+    },
+    "Controllers/CSGroupProjection.m": {
+      "snapshot": "CSGroupProjection.m-2.1-29.txt",
+      "sha256": "4bccf64b07aad45ecbbceb428c87af78181099de6cfdeb6eaa749e4f46e65971"
+    },
+    "Controllers/CSGroupProjection.h": {
+      "snapshot": "CSGroupProjection.h-2.1-29.txt",
+      "sha256": "c22af3510b013530afe4138eeea2fa807c08cb5977bd60f436519576701f85bb"
+    },
+    "Controllers/CSGroupNativeBridge.m": {
+      "snapshot": "CSGroupNativeBridge.m-2.1-29.txt",
+      "sha256": "92807c6978c4a65a176ce21f62561b68f0343874019ee744ed8791eeae26d107"
+    },
+    "Controllers/CSGroupIndexScope.m": {
+      "snapshot": "CSGroupIndexScope.m-2.1-29.txt",
+      "sha256": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780"
+    },
+    "Controllers/CSCloseFriendPolicy.m": {
+      "snapshot": "CSCloseFriendPolicy.m-2.1-29.txt",
+      "sha256": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1"
+    },
+    "Controllers/CSCloseFriendListShield.m": {
+      "snapshot": "CSCloseFriendListShield.m-2.1-29.txt",
+      "sha256": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b"
+    },
+    "Hooks/ListCornerRadiusHooks.xm": {
+      "snapshot": "ListCornerRadiusHooks.xm-2.1-29.txt",
+      "sha256": "ceefff7aead3cfe33ce97cbd04c1c3953dc4c73ecdcec09fdbc87cd584677f0a"
+    },
+    "Controllers/CSListCornerSessionRestore.m": {
+      "snapshot": "CSListCornerSessionRestore.m-2.1-29.txt",
+      "sha256": "b8b91879859daf84ebc42b064c8e1bd8d1a33a9d9dc4ec267ae95e3eb97fcbfe"
+    }
+  },
+  "red_test_hashes": {
+    "Tests/GroupContainerReturnTests.m": {
+      "snapshot": "GroupContainerReturnTests.m-red-input.txt",
+      "sha256": "77afa277aa300c000612474326508f23b5e58b42993399aaabae2ccd8bc990e1"
+    },
+    "Tests/extract-group-container-return.py": {
+      "snapshot": "extract-group-container-return.py-red-input.txt",
+      "sha256": "3f9d2145ecfd0dc8e5b443f93c3e5c357a885c9bcbc4ad095ee1c24e22754947"
+    },
+    "Tests/verify-group-container-return.sh": {
+      "snapshot": "verify-group-container-return.sh-red-input.txt",
+      "sha256": "f151eec980fe860b73fa8e130a57a57a53e3b15a3595f48241adfed3ff56a3c4"
+    },
+    "Tests/extract-group-return-layout.py": {
+      "snapshot": "extract-group-return-layout.py-red-input.txt",
+      "sha256": "70335d74030e1be408f15d2ab5f09ca31dedc340bbe10dfae494bdc4bdea8009"
+    },
+    "Tests/extract-group-return-privacy.py": {
+      "snapshot": "extract-group-return-privacy.py-red-input.txt",
+      "sha256": "080380b85f129f2f34e6a75d49a2673f636ec04ed89681c56335411221e025c6"
+    }
+  },
+  "red_result": {
+    "checks": 1052,
+    "evidence": "host-controlled",
+    "failures": 378,
+    "kind": "result",
+    "scenario": "explicit-native-action/unlocked",
+    "sequence": 1096
+  },
+  "red_log_sha256": "20dd1e0c4a54fa8c94e0ac0e33149b5cb3dc0b9e6e75e931b3beea537df2eca3"
+}

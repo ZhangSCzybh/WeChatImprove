@@ -1,0 +1,35 @@
+FAIL: readiness-contract/nil-policy-projecting / unready UI query returns neutral counts
+FAIL: readiness-contract/nil-policy-projecting / unready UI query returns neutral row/section layout
+FAIL: readiness-contract/nil-policy-projecting / unready required cell is nonnil empty and noninteractive
+FAIL: readiness-contract/nil-policy-projecting / unready query never asks native source for protected cell
+FAIL: readiness-contract/nil-policy-native / unready UI query returns neutral counts
+FAIL: readiness-contract/nil-policy-native / unready UI query returns neutral row/section layout
+FAIL: readiness-contract/nil-policy-native / unready required cell is nonnil empty and noninteractive
+FAIL: readiness-contract/nil-policy-native / unready query never asks native source for protected cell
+FAIL: readiness-contract/wrong-policy-account / unready UI query returns neutral counts
+FAIL: readiness-contract/wrong-policy-account / unready UI query returns neutral row/section layout
+FAIL: readiness-contract/wrong-policy-account / unready required cell is nonnil empty and noninteractive
+FAIL: readiness-contract/wrong-policy-account / unready query never asks native source for protected cell
+FAIL: readiness-contract/nil-projection / unready UI query returns neutral counts
+FAIL: readiness-contract/nil-projection / unready UI query returns neutral row/section layout
+FAIL: readiness-contract/nil-projection / unready required cell is nonnil empty and noninteractive
+FAIL: readiness-contract/nil-projection / unready query never asks native source for protected cell
+FAIL: readiness-contract/invalid-projection / unready UI query returns neutral counts
+FAIL: readiness-contract/invalid-projection / unready UI query returns neutral row/section layout
+FAIL: readiness-contract/invalid-projection / unready required cell is nonnil empty and noninteractive
+FAIL: readiness-contract/invalid-projection / unready query never asks native source for protected cell
+FAIL: readiness-contract/wrong-projection-account / unready UI query returns neutral counts
+FAIL: readiness-contract/wrong-projection-account / unready UI query returns neutral row/section layout
+FAIL: readiness-contract/wrong-projection-account / unready required cell is nonnil empty and noninteractive
+FAIL: readiness-contract/wrong-projection-account / unready query never asks native source for protected cell
+FAIL: readiness-contract/stale-policy-revision / unready UI query returns neutral counts
+FAIL: readiness-contract/stale-policy-revision / unready UI query returns neutral row/section layout
+FAIL: readiness-contract/stale-policy-revision / unready required cell is nonnil empty and noninteractive
+FAIL: readiness-contract/stale-policy-revision / unready query never asks native source for protected cell
+FAIL: readiness-contract/nonprojecting-locked / unready UI query returns neutral counts
+FAIL: readiness-contract/nonprojecting-locked / unready UI query returns neutral row/section layout
+FAIL: readiness-contract/nonprojecting-locked / unready required cell is nonnil empty and noninteractive
+FAIL: readiness-contract/nonprojecting-locked / unready query never asks native source for protected cell
+FAIL: readiness-contract/dirty-same-valid-revision / dirty same-revision query keeps verified filtered group counts
+FAIL: readiness-contract/dirty-same-valid-revision / dirty same-revision query never delivers protected identity
+Group container readiness contracts HOST: 82 checks, 34 failures

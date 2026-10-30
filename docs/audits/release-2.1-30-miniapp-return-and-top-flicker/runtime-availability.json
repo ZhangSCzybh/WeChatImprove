@@ -1,0 +1,16 @@
+{
+  "deviceUsbCount": 0,
+  "pairedXcodeDeviceState": "unavailable",
+  "observedCommands": [
+    "idevice_id -l",
+    "xcrun devicectl list devices"
+  ],
+  "deviceAttached": false,
+  "wechatLaunchedOrRestarted": false,
+  "deviceInstalledOrModified": false,
+  "realMiniappLifecycleCounts": null,
+  "realTopTransitionOperationCounts": null,
+  "realUIViewIdentities": null,
+  "realScreenIntermediateFrameValidation": null,
+  "reason": "No accessible device; user clarification pending. Missing observations are unknown, not zero."
+}

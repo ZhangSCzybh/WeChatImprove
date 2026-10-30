@@ -1,0 +1,70 @@
+{
+  "baseline_commit": "73e8e78ad5bbc87cb2b73bcf64ed8e0e9ac13f8e",
+  "protected_methods": [
+    {
+      "origin_version": "2.1-26",
+      "marker": "+ (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller {",
+      "snapshot_sha256_matches": true,
+      "snapshot_length_matches": true,
+      "snapshot_matches_git_baseline_bytes": true,
+      "production_matches_frozen_bytes": true,
+      "current_sha256": "24e6cc06ede2f289ca83486198b56b0f1a929cd7bd7c6f8cf0a13a67a58241cf",
+      "passed": true
+    },
+    {
+      "origin_version": "2.1-27",
+      "marker": "- (void)refresh {",
+      "snapshot_sha256_matches": true,
+      "snapshot_length_matches": true,
+      "snapshot_matches_git_baseline_bytes": true,
+      "production_matches_frozen_bytes": true,
+      "current_sha256": "8e631a48ce5b9d3560484af0917ad6093e89993cce0e89f1b09dabf6793cf140",
+      "passed": true
+    },
+    {
+      "origin_version": "2.1-27",
+      "marker": "- (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous",
+      "snapshot_sha256_matches": true,
+      "snapshot_length_matches": true,
+      "snapshot_matches_git_baseline_bytes": true,
+      "production_matches_frozen_bytes": true,
+      "current_sha256": "ec8054e434786a5981548586cb72035a82fe3892ec7ffe6356e94372fa1484d7",
+      "passed": true
+    },
+    {
+      "origin_version": "2.1-28",
+      "marker": "- (void)performVisibleLayout:(void (^)(void))layout {",
+      "snapshot_sha256_matches": true,
+      "snapshot_length_matches": true,
+      "snapshot_matches_git_baseline_bytes": true,
+      "production_matches_frozen_bytes": true,
+      "current_sha256": "857e35c052dec406ff55fdafd34c61eed1a237f6ca5c85842a75002d9cb11a8e",
+      "passed": true
+    },
+    {
+      "origin_version": "2.1-29",
+      "marker": "static NSSet<NSString *> *CSGroupActiveSessionEventUserNames(id oldValue, id newValue) {",
+      "snapshot_sha256_matches": true,
+      "snapshot_length_matches": true,
+      "snapshot_matches_git_baseline_bytes": true,
+      "production_matches_frozen_bytes": true,
+      "current_sha256": "7ccbd5145d809106721c7dda8bb35afc3938859cdcdc39c370f7299d70ce1d65",
+      "passed": true
+    },
+    {
+      "origin_version": "2.1-29",
+      "marker": "- (void)onActiveUsrNameChange:(id)oldName curUsrName:(id)newName {",
+      "snapshot_sha256_matches": true,
+      "snapshot_length_matches": true,
+      "snapshot_matches_git_baseline_bytes": true,
+      "production_matches_frozen_bytes": true,
+      "current_sha256": "a3f7ba59223d7890216350e70f9a3c27676baa8259135ab57af2d27d7d5c84ee",
+      "passed": true
+    }
+  ],
+  "protected_count": 6,
+  "all_protected_methods_byte_identical": true,
+  "production_files_different_from_current_HEAD": [],
+  "device_frames_measured": false,
+  "runtime_event_counts_collected": false
+}

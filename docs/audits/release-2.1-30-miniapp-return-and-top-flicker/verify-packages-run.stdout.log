@@ -1,0 +1,22 @@
+{
+  "packages_verified": 2,
+  "dSYMs_verified": 4,
+  "symbol_files": 12,
+  "artifacts": [
+    {
+      "file": "com.wechat.improve_2.1-30_iphoneos-arm.deb",
+      "bytes": 1551786,
+      "sha256": "ad39334ee627f07b46231d8c9568f333c4c19f21b23da200d8382b489e5a0c9a"
+    },
+    {
+      "file": "com.wechat.improve_2.1-30_iphoneos-arm64.deb",
+      "bytes": 1551552,
+      "sha256": "f7f701e8dd5019d03543242189a06d1e63f29ba34fa4e84bfff71f2d48440ee0"
+    },
+    {
+      "file": "com.wechat.improve_2.1-30_symbols.zip",
+      "bytes": 11215763,
+      "sha256": "85165420b52d0893a296e15b535ecfaa65e43c534a5afc5922bc91fb9c96b6b9"
+    }
+  ]
+}

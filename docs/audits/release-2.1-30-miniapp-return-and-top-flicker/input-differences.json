@@ -1,0 +1,32 @@
+{
+  "baseline_commit": "73e8e78ad5bbc87cb2b73bcf64ed8e0e9ac13f8e",
+  "baseline_production_file_count": 42513,
+  "differences": [
+    {
+      "path": "Controllers/CSGroupListAdapter.m",
+      "before": "4fd9b6cc6a1dda85f4f04a17cdf67e89f0e1831821a128c01abb6cfa5ebff426",
+      "after": "c5036ba4bac9c5bcd58232c729f4565a110875349e0cfa15cfb6cb449e99dcef"
+    },
+    {
+      "path": "Controllers/CSReleaseNotesViewController.m",
+      "before": "7783ebbb986e50af1b02d781f15284bb304b8e4f96b20c6ebe58a4ea96614ceb",
+      "after": "55cf62d9380083900779aa644b12972f05a3d0506d72046a29abe807496a6603"
+    },
+    {
+      "path": "Headers/CSUserInfoHelper.h",
+      "before": "35b8476120d5572059bb6141ba63895b801ba6e88db5c4b3082d50e1b5974618",
+      "after": "ab5c4a5dead686dab1142f1477aa75dc08fb49c07206c3a07d202a2073cb1666"
+    },
+    {
+      "path": "Hooks/ListCornerRadiusHooks.xm",
+      "before": "ceefff7aead3cfe33ce97cbd04c1c3953dc4c73ecdcec09fdbc87cd584677f0a",
+      "after": "a5e6cd46b234337641924444495dfdc7aff1d8809aff533b25985f9fd4f87061"
+    },
+    {
+      "path": "control",
+      "before": "9aec4082aa67f5823eb3e7f09dba147f93e253cfaa7d77d6b106a8bd4b8d9b8c",
+      "after": "51cc39efe5584422456114200079f9999ea7b928a564622c3bf7fe43fd50d5ff"
+    }
+  ],
+  "note": "README and test/audit files tracked separately by git diff; no historical production input deleted."
+}

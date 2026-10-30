@@ -1,0 +1,168 @@
+{
+  "scope": "host-only; no screen/compositor/natural device callback observations",
+  "suites": [
+    {
+      "suite": "group-lifecycle",
+      "command": [
+        "bash",
+        "Tests/verify-group-lifecycle.sh"
+      ],
+      "exit_code": 1,
+      "duration_seconds": 1.179,
+      "checks": 0,
+      "failures": 0,
+      "log_sha256": "e9145f4021e36c49be753e2a8652ab9fdf28bb8e3b12d5286184498a42d1c53f",
+      "summaries": []
+    },
+    {
+      "suite": "group-launch-banner",
+      "command": [
+        "bash",
+        "Tests/verify-group-launch-banner.sh"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.073,
+      "checks": 32,
+      "failures": 0,
+      "log_sha256": "a17116cad5076e3bdbc2246774fd5e32d803626c084a25821f15ea3c0c5f3635",
+      "summaries": [
+        {
+          "checks": 32,
+          "failures": 0
+        }
+      ]
+    },
+    {
+      "suite": "group-viewport",
+      "command": [
+        "bash",
+        "Tests/verify-group-viewport.sh"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.826,
+      "checks": 151,
+      "failures": 0,
+      "log_sha256": "046f1186f9c7254c80bbac25d07f804572f07d71f4ea2c5ab94b11f587083d33",
+      "summaries": [
+        {
+          "checks": 151,
+          "failures": 0
+        }
+      ]
+    },
+    {
+      "suite": "group-search",
+      "command": [
+        "bash",
+        "Tests/verify-group-search.sh"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.848,
+      "checks": 57,
+      "failures": 0,
+      "log_sha256": "69893764488da3996d0c34bc80fb663600c7f8945dcec4ba60e42c32e9ba2e89",
+      "summaries": [
+        {
+          "checks": 57,
+          "failures": 0
+        }
+      ]
+    },
+    {
+      "suite": "close-friend-session",
+      "command": [
+        "bash",
+        "Tests/verify-close-friend-session.sh"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.748,
+      "checks": 229,
+      "failures": 0,
+      "log_sha256": "f5b973894f8683331673bd9c9df73d2fe3dbfc29350b5f574bd8aee1edb609be",
+      "summaries": [
+        {
+          "checks": 174,
+          "failures": 0
+        },
+        {
+          "checks": 55,
+          "failures": 0
+        }
+      ]
+    },
+    {
+      "suite": "group-return-privacy",
+      "command": [
+        "bash",
+        "Tests/verify-group-return-privacy.sh"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.669,
+      "checks": 37,
+      "failures": 0,
+      "log_sha256": "136a84fc4ffb978e19f21b5e3e4375be26f68c156f8557d9f660b960f13062b7",
+      "summaries": [
+        {
+          "checks": 37,
+          "failures": 0
+        }
+      ]
+    },
+    {
+      "suite": "group-return-layout",
+      "command": [
+        "bash",
+        "Tests/verify-group-return-layout.sh"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.695,
+      "checks": 861,
+      "failures": 0,
+      "log_sha256": "7b98e9320b01e0796b0ad64fc977a2869725d185de6f4103800bd0b6e7e76b88",
+      "summaries": [
+        {
+          "checks": 861,
+          "failures": 0
+        }
+      ]
+    },
+    {
+      "suite": "group-return-banner",
+      "command": [
+        "bash",
+        "Tests/verify-group-return-banner.sh"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.084,
+      "checks": 626,
+      "failures": 0,
+      "log_sha256": "c0a8c132960f11e72185cc4ca50d64c996e2012eda749d0ae510e9c4d1e704bf",
+      "summaries": [
+        {
+          "checks": 626,
+          "failures": 0
+        }
+      ]
+    },
+    {
+      "suite": "list-corners",
+      "command": [
+        "bash",
+        "Tests/verify-list-corners.sh"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.138,
+      "checks": 1631,
+      "failures": 0,
+      "log_sha256": "dd40385b2b62dc90c08b6460c6c591e0c5a528404bb15e377a87640c36c065a8",
+      "summaries": [
+        {
+          "checks": 1631,
+          "failures": 0
+        }
+      ]
+    }
+  ],
+  "green_checks": 3624,
+  "all_passed": false
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "label": "baseline",
+    "command": [
+      "bash",
+      "Tests/verify-group-lifecycle.sh",
+      "docs/audits/release-2.1-30-miniapp-return-and-top-flicker/miniapp-probe/CSGroupListAdapter.m-2.1-29.txt",
+      "docs/audits/release-2.1-30-miniapp-return-and-top-flicker/miniapp-probe/SessionGroupHooks.xm-2.1-29.txt"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 13.726,
+    "summaries": [
+      {
+        "checks": 239,
+        "failures": 0
+      }
+    ]
+  },
+  {
+    "label": "working",
+    "command": [
+      "bash",
+      "Tests/verify-group-lifecycle.sh"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 13.413,
+    "summaries": [
+      {
+        "checks": 239,
+        "failures": 0
+      }
+    ]
+  }
+]

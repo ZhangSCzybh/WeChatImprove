@@ -1,0 +1,10 @@
+{
+  "formal_red_checks": 1148,
+  "formal_red_failures": 415,
+  "red_passes_counted_as_success": false,
+  "green_new_checks": 1103,
+  "green_existing_checks": 3863,
+  "green_distinct_checks": 4966,
+  "all_current_tests_passed": true,
+  "repeat_measurement_and_old_compatibility_not_double_counted": true
+}

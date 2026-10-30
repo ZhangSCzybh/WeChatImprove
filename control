@@ -1,6 +1,6 @@
 Package: com.wechat.improve
 Name: WeChatImprove
-Version: 2.1-29
+Version: 2.1-30
 Architecture: iphoneos-arm
 Description: 微信插件，支持聊天按钮布局自定义等。
 Maintainer: 再也不会

@@ -52,7 +52,7 @@ methods.append(method(source,'- (void)publishProjection:'))
 if '+ (void)refreshFoldedListsForAccount:' in source:
     methods.append(method(source,'+ (void)refreshFoldedListsForAccount:'))
 for marker, fallback in [('+ (void)setPresentationSuspended:', '+ (void)setPresentationSuspended:(BOOL)value forController:(id)owner { (void)value; (void)owner; }'),
-                         ('- (void)shieldVisiblePrivateRows', '- (void)shieldVisiblePrivateRows {}'),
+                         ('- (void)shieldVisiblePrivateRows {', '- (void)shieldVisiblePrivateRows {}'),
                          ('- (void)finishSuspendedBatches', '- (void)finishSuspendedBatches {}')]:
     methods.append(method(source, marker) if marker in source else fallback)
 refresh = method(source, '- (void)refresh {')

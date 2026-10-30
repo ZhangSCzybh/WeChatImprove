@@ -1,0 +1,10 @@
+{
+  "command": [
+    "bash",
+    "Tests/verify-top-transition.sh",
+    "docs/audits/release-2.1-30-miniapp-return-and-top-flicker/top-transition/baseline"
+  ],
+  "exitCode": 1,
+  "baselineCommit": "73e8e78a",
+  "scope": "controlled host native content/paint inputs; no device observations"
+}

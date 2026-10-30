@@ -1,0 +1,379 @@
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content section counts equal filtered stable collection
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row count equals filtered stable row count
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content has no protected identity
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content has no protected identity
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/retained-content / first UI content never calls protected native cell getter
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content section counts equal filtered stable collection
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row count equals filtered stable row count
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content has no protected identity
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content has no protected identity
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/privacy-outer/native-owner-scope/blank-before-content / first UI content never calls protected native cell getter
+FAIL: blocked-policy-late/privacy-outer/no-transaction / blocked policy exposes neutral empty section count before first UI content
+FAIL: blocked-policy-late/privacy-outer/no-transaction / blocked policy has no native protected row geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / blocked policy exposes neutral header height/title rather than native section work
+FAIL: blocked-policy-late/privacy-outer/no-transaction / stale required cell request never returns protected identity
+FAIL: blocked-policy-late/privacy-outer/no-transaction / blocked policy never invokes protected native cell getter
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content section counts equal filtered stable collection
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row count equals filtered stable row count
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content has no protected identity
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content has no protected identity
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/no-transaction / first UI content never calls protected native cell getter
+FAIL: blocked-policy-late/privacy-outer/native-transaction / blocked policy exposes neutral empty section count before first UI content
+FAIL: blocked-policy-late/privacy-outer/native-transaction / blocked policy has no native protected row geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / blocked policy exposes neutral header height/title rather than native section work
+FAIL: blocked-policy-late/privacy-outer/native-transaction / stale required cell request never returns protected identity
+FAIL: blocked-policy-late/privacy-outer/native-transaction / blocked policy never invokes protected native cell getter
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content section counts equal filtered stable collection
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row count equals filtered stable row count
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content has no protected identity
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content has no protected identity
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/privacy-outer/native-transaction / first UI content never calls protected native cell getter
+FAIL: lock-unlock/privacy-outer/locked / protected group visibility follows unchanged lock/unlock semantics
+FAIL: lock-unlock/privacy-outer/locked / selected Group still excludes private sessions in either lock state
+FAIL: lock-unlock/privacy-outer/unlocked / selected Group still excludes private sessions in either lock state
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content section counts equal filtered stable collection
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row count equals filtered stable row count
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content has no protected identity
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content has no protected identity
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/retained-content / first UI content never calls protected native cell getter
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content section counts equal filtered stable collection
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row count equals filtered stable row count
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content has no protected identity
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content has no protected identity
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content y and height match filtered stable geometry
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content row identity matches filtered stable order
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first content card roles/corners equal filtered stable roles
+FAIL: container-no-appearance/decorator-outer/native-owner-scope/blank-before-content / first UI content never calls protected native cell getter
+FAIL: blocked-policy-late/decorator-outer/no-transaction / blocked policy exposes neutral empty section count before first UI content
+FAIL: blocked-policy-late/decorator-outer/no-transaction / blocked policy has no native protected row geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / blocked policy exposes neutral header height/title rather than native section work
+FAIL: blocked-policy-late/decorator-outer/no-transaction / stale required cell request never returns protected identity
+FAIL: blocked-policy-late/decorator-outer/no-transaction / blocked policy never invokes protected native cell getter
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content section counts equal filtered stable collection
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row count equals filtered stable row count
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content has no protected identity
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content has no protected identity
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/no-transaction / first UI content never calls protected native cell getter
+FAIL: blocked-policy-late/decorator-outer/native-transaction / blocked policy exposes neutral empty section count before first UI content
+FAIL: blocked-policy-late/decorator-outer/native-transaction / blocked policy has no native protected row geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / blocked policy exposes neutral header height/title rather than native section work
+FAIL: blocked-policy-late/decorator-outer/native-transaction / stale required cell request never returns protected identity
+FAIL: blocked-policy-late/decorator-outer/native-transaction / blocked policy never invokes protected native cell getter
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content section counts equal filtered stable collection
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row count equals filtered stable row count
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content has no protected identity
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content has no protected identity
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content y and height match filtered stable geometry
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content row identity matches filtered stable order
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first content card roles/corners equal filtered stable roles
+FAIL: blocked-policy-late/decorator-outer/native-transaction / first UI content never calls protected native cell getter
+FAIL: lock-unlock/decorator-outer/locked / protected group visibility follows unchanged lock/unlock semantics
+FAIL: lock-unlock/decorator-outer/locked / selected Group still excludes private sessions in either lock state
+FAIL: lock-unlock/decorator-outer/unlocked / selected Group still excludes private sessions in either lock state
+Group container return HOST: 1052 checks, 378 failures

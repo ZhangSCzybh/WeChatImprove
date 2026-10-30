@@ -131,15 +131,52 @@ static BOOL Option(NSString *suffix) {
 - (void)useNativePresentation;
 - (void)forwardInvocation:(NSInvocation *)inv target:(id)target;
 - (UITableViewCell *)cellForDisplayPath:(NSIndexPath *)path target:(id)target;
+- (void)shieldVisiblePrivateRows;
 @end
 @interface CSGroupTableProxy : NSObject
 @property (nonatomic, weak) CSGroupListAdapter *adapter;
 @property (nonatomic, weak) id target;
 @property (nonatomic, strong) NSMutableDictionary<NSString *,NSMethodSignature *> *signatures;
 @end
+static BOOL CSGroupProxyCanDeliverVisibleQuery(CSGroupListAdapter *adapter) {
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    NSString *account=CSGroupCurrentAccountID();
+    if (!adapter || !policy || policy.blocked || !account.length || ![policy.accountID isEqual:account]) return NO;
+    BOOL privacy=policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue];
+    if (!adapter.projecting) return !privacy;
+    CSGroupProjection *projection=adapter.projection;
+    return projection.isValid && [projection.accountID isEqual:account] && projection.privacyRevision==policy.revision;
+}
+static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
+    static NSSet<NSString *> *queries; static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        queries=[NSSet setWithArray:@[@"numberOfSectionsInTableView:",@"tableView:numberOfRowsInSection:",
+            @"tableView:heightForRowAtIndexPath:",@"tableView:estimatedHeightForRowAtIndexPath:",
+            @"tableView:titleForHeaderInSection:",@"tableView:titleForFooterInSection:",
+            @"tableView:viewForHeaderInSection:",@"tableView:viewForFooterInSection:",
+            @"tableView:heightForHeaderInSection:",@"tableView:heightForFooterInSection:",
+            @"tableView:estimatedHeightForHeaderInSection:",@"tableView:estimatedHeightForFooterInSection:",
+            @"sectionIndexTitlesForTableView:",@"tableView:sectionForSectionIndexTitle:atIndex:"]];
+    });
+    return [queries containsObject:NSStringFromSelector(selector)];
+}
 @implementation CSGroupTableProxy
 - (UITableViewCell *)tableView:(UITableView *)table cellForRowAtIndexPath:(NSIndexPath *)path {
-    (void)table; return [self.adapter cellForDisplayPath:path target:self.target];
+    (void)table;
+    CSGroupListAdapter *adapter=self.adapter;
+    if (!CSGroupProxyCanDeliverVisibleQuery(adapter)) {
+        [adapter shieldVisiblePrivateRows];
+        // A stale required callback still needs a cell, even after a neutral
+        // count. Policy readiness is resolved by its normal publication path.
+        UITableViewCell *cell=[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+        cell.userInteractionEnabled=NO; cell.selectionStyle=UITableViewCellSelectionStyleNone;
+        return cell;
+    }
+    __block UITableViewCell *cell=nil;
+    // UIKit can request visible rows synchronously inside a native owner call,
+    // before table.layoutSubviews establishes its display-coordinate boundary.
+    CSGroupWithDisplayIndices(adapter.table, ^{ cell=[adapter cellForDisplayPath:path target:self.target]; });
+    return cell;
 }
 - (BOOL)respondsToSelector:(SEL)selector {
     if ([super respondsToSelector:selector]) return YES;
@@ -166,7 +203,11 @@ static BOOL Option(NSString *suffix) {
     if (length) { void *zero=calloc(1,length); [invocation setReturnValue:zero]; free(zero); }
     id target=self.target;
     CSGroupListAdapter *adapter=self.adapter;
-    if (adapter && [target respondsToSelector:invocation.selector]) [adapter forwardInvocation:invocation target:target];
+    if (adapter && [target respondsToSelector:invocation.selector]) {
+        if (!CSGroupProxyIsVisibleQuery(invocation.selector)) { [adapter forwardInvocation:invocation target:target]; return; }
+        if (!CSGroupProxyCanDeliverVisibleQuery(adapter)) { [adapter shieldVisiblePrivateRows]; return; }
+        CSGroupWithDisplayIndices(adapter.table, ^{ [adapter forwardInvocation:invocation target:target]; });
+    }
 }
 @end
 
