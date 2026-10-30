@@ -1,0 +1,17 @@
+privacy outside locked: originalLayout calculations=1; completed hook returns=1; first sections=[2,2,14]; first offset=360; expected offset=360; full reloads=0; row reloads=0
+privacy outside empty selected section: originalLayout calculations=1; completed hook returns=1; first sections=[2,0,14]; first offset=360; expected offset=360; full reloads=0; row reloads=0
+privacy outside relock: originalLayout calculations=2; completed hook returns=2; first sections=[2,2,14]; first offset=360; expected offset=360; full reloads=1; row reloads=0
+privacy outside blocked: originalLayout calculations=2; completed hook returns=2; first sections=[]; first offset=-140; expected offset=-140; full reloads=1; row reloads=0
+privacy outside ready: originalLayout calculations=2; completed hook returns=2; first sections=[2,2,14]; first offset=360; expected offset=360; full reloads=1; row reloads=0
+privacy outside revealed: originalLayout calculations=1; completed hook returns=1; first sections=[2,2,15]; first offset=360; expected offset=360; full reloads=0; row reloads=0
+privacy outside same-owner reentry: originalLayout calculations=2; completed hook returns=2; first sections=[2,2,14]; first offset=360; expected offset=360; full reloads=0; row reloads=0
+privacy outside dirty structure: originalLayout calculations=2; completed hook returns=2; first sections=[2,3,14]; first offset=360; expected offset=360; full reloads=1; row reloads=0
+decorator outside locked: originalLayout calculations=1; completed hook returns=1; first sections=[2,2,14]; first offset=360; expected offset=360; full reloads=0; row reloads=0
+decorator outside empty selected section: originalLayout calculations=1; completed hook returns=1; first sections=[2,0,14]; first offset=360; expected offset=360; full reloads=0; row reloads=0
+decorator outside relock: originalLayout calculations=2; completed hook returns=2; first sections=[2,2,14]; first offset=360; expected offset=360; full reloads=1; row reloads=0
+decorator outside blocked: originalLayout calculations=2; completed hook returns=2; first sections=[]; first offset=-140; expected offset=-140; full reloads=1; row reloads=0
+decorator outside ready: originalLayout calculations=2; completed hook returns=2; first sections=[2,2,14]; first offset=360; expected offset=360; full reloads=1; row reloads=0
+decorator outside revealed: originalLayout calculations=1; completed hook returns=1; first sections=[2,2,15]; first offset=360; expected offset=360; full reloads=0; row reloads=0
+decorator outside same-owner reentry: originalLayout calculations=2; completed hook returns=2; first sections=[2,2,14]; first offset=360; expected offset=360; full reloads=0; row reloads=0
+decorator outside dirty structure: originalLayout calculations=2; completed hook returns=2; first sections=[2,3,14]; first offset=360; expected offset=360; full reloads=1; row reloads=0
+Group return layout: 861 checks, 0 failures

@@ -1,5 +1,7 @@
 # 2.1-28：返回聊天列表的密友／密群短暂露出
 
+> 本文保留首批交付的历史记录。补充首轮 section／行位置／圆角／滚动位置要求后的推荐安装包及审计位于 [layout-firstframe-candidate-1](layout-firstframe-candidate-1/README.md)。首批包及校验值保持原样；相同版本请按完整路径与 SHA-256 区分。
+
 日期：2026-10-30，Asia/Shanghai。沿用 `/Users/zhangshichao/Documents/Workspace/WeChatImprove`、`main`，基线为未修改的 2.1-27 提交 `e9d4601c63fbfdeb11b208777ae9dc99f5f1c3c9`。没有切换 checkout、启动服务、安装到手机或更改账号、配置和数据库。
 
 ## 根因与修改范围

@@ -1,0 +1,627 @@
+FAIL: privacy outside locked: first section structure equals selected Group stable state
+FAIL: privacy outside locked: first layout row count equals filtered stable state
+FAIL: privacy outside locked: row 0 native decorator gets stable first/last card role
+FAIL: privacy outside locked: row 1 native decorator gets stable first/last card role
+FAIL: privacy outside locked: row 2 uses stable filtered identity
+FAIL: privacy outside locked: row 2 y/height equals stable geometry
+FAIL: privacy outside locked: row 2 native decorator gets stable first/last card role
+FAIL: privacy outside locked: row 3 uses stable filtered identity
+FAIL: privacy outside locked: row 3 y/height equals stable geometry
+FAIL: privacy outside locked: row 3 native decorator gets stable first/last card role
+FAIL: privacy outside locked: row 4 uses stable filtered identity
+FAIL: privacy outside locked: row 4 y/height equals stable geometry
+FAIL: privacy outside locked: row 4 native decorator gets stable first/last card role
+FAIL: privacy outside locked: row 5 uses stable filtered identity
+FAIL: privacy outside locked: row 5 y/height equals stable geometry
+FAIL: privacy outside locked: row 5 native decorator gets stable first/last card role
+FAIL: privacy outside locked: row 6 uses stable filtered identity
+FAIL: privacy outside locked: row 6 y/height equals stable geometry
+FAIL: privacy outside locked: row 6 native decorator gets stable first/last card role
+FAIL: privacy outside locked: row 7 uses stable filtered identity
+FAIL: privacy outside locked: row 7 y/height equals stable geometry
+FAIL: privacy outside locked: row 7 native decorator gets stable first/last card role
+FAIL: privacy outside locked: row 8 uses stable filtered identity
+FAIL: privacy outside locked: row 8 native decorator gets stable first/last card role
+FAIL: privacy outside locked: row 9 uses stable filtered identity
+FAIL: privacy outside locked: row 9 y/height equals stable geometry
+FAIL: privacy outside locked: row 9 native decorator gets stable first/last card role
+FAIL: privacy outside locked: row 10 uses stable filtered identity
+FAIL: privacy outside locked: row 10 y/height equals stable geometry
+FAIL: privacy outside locked: row 11 uses stable filtered identity
+FAIL: privacy outside locked: row 11 native decorator gets stable first/last card role
+FAIL: privacy outside locked: row 12 uses stable filtered identity
+FAIL: privacy outside locked: row 12 y/height equals stable geometry
+FAIL: privacy outside locked: row 12 native decorator gets stable first/last card role
+FAIL: privacy outside locked: row 13 uses stable filtered identity
+FAIL: privacy outside locked: row 13 y/height equals stable geometry
+FAIL: privacy outside locked: row 14 uses stable filtered identity
+FAIL: privacy outside locked: row 15 uses stable filtered identity
+FAIL: privacy outside locked: row 15 y/height equals stable geometry
+FAIL: privacy outside locked: row 16 uses stable filtered identity
+FAIL: privacy outside locked: row 16 y/height equals stable geometry
+FAIL: privacy outside locked: row 17 uses stable filtered identity
+FAIL: privacy outside locked: row 17 native decorator gets stable first/last card role
+FAIL: privacy outside locked: first complete layout offset equals restored stable viewport
+FAIL: privacy outside locked: every complete layout uses the same safe final geometry and viewport
+FAIL: privacy outside empty selected section: first section structure equals selected Group stable state
+FAIL: privacy outside empty selected section: first layout row count equals filtered stable state
+FAIL: privacy outside empty selected section: row 2 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 2 y/height equals stable geometry
+FAIL: privacy outside empty selected section: row 2 native decorator gets stable first/last card role
+FAIL: privacy outside empty selected section: row 3 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 3 y/height equals stable geometry
+FAIL: privacy outside empty selected section: row 3 native decorator gets stable first/last card role
+FAIL: privacy outside empty selected section: row 4 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 4 y/height equals stable geometry
+FAIL: privacy outside empty selected section: row 4 native decorator gets stable first/last card role
+FAIL: privacy outside empty selected section: row 5 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 5 y/height equals stable geometry
+FAIL: privacy outside empty selected section: row 5 native decorator gets stable first/last card role
+FAIL: privacy outside empty selected section: row 6 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 6 native decorator gets stable first/last card role
+FAIL: privacy outside empty selected section: row 7 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 7 y/height equals stable geometry
+FAIL: privacy outside empty selected section: row 7 native decorator gets stable first/last card role
+FAIL: privacy outside empty selected section: row 8 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 8 y/height equals stable geometry
+FAIL: privacy outside empty selected section: row 9 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 9 native decorator gets stable first/last card role
+FAIL: privacy outside empty selected section: row 10 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 10 y/height equals stable geometry
+FAIL: privacy outside empty selected section: row 10 native decorator gets stable first/last card role
+FAIL: privacy outside empty selected section: row 11 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 11 y/height equals stable geometry
+FAIL: privacy outside empty selected section: row 12 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 13 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 13 y/height equals stable geometry
+FAIL: privacy outside empty selected section: row 14 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 14 y/height equals stable geometry
+FAIL: privacy outside empty selected section: row 15 uses stable filtered identity
+FAIL: privacy outside empty selected section: row 15 native decorator gets stable first/last card role
+FAIL: privacy outside empty selected section: first complete layout offset equals restored stable viewport
+FAIL: privacy outside empty selected section: every complete layout uses the same safe final geometry and viewport
+FAIL: privacy outside relock: first section structure equals selected Group stable state
+FAIL: privacy outside relock: first layout row count equals filtered stable state
+FAIL: privacy outside relock: row 2 uses stable filtered identity
+FAIL: privacy outside relock: row 2 y/height equals stable geometry
+FAIL: privacy outside relock: row 2 native decorator gets stable first/last card role
+FAIL: privacy outside relock: row 3 uses stable filtered identity
+FAIL: privacy outside relock: row 3 y/height equals stable geometry
+FAIL: privacy outside relock: row 3 native decorator gets stable first/last card role
+FAIL: privacy outside relock: row 4 uses stable filtered identity
+FAIL: privacy outside relock: row 4 y/height equals stable geometry
+FAIL: privacy outside relock: row 4 native decorator gets stable first/last card role
+FAIL: privacy outside relock: row 5 uses stable filtered identity
+FAIL: privacy outside relock: row 5 y/height equals stable geometry
+FAIL: privacy outside relock: row 5 native decorator gets stable first/last card role
+FAIL: privacy outside relock: row 6 uses stable filtered identity
+FAIL: privacy outside relock: row 6 y/height equals stable geometry
+FAIL: privacy outside relock: row 6 native decorator gets stable first/last card role
+FAIL: privacy outside relock: row 7 uses stable filtered identity
+FAIL: privacy outside relock: row 7 y/height equals stable geometry
+FAIL: privacy outside relock: row 7 native decorator gets stable first/last card role
+FAIL: privacy outside relock: row 8 uses stable filtered identity
+FAIL: privacy outside relock: row 9 uses stable filtered identity
+FAIL: privacy outside relock: row 9 y/height equals stable geometry
+FAIL: privacy outside relock: row 9 native decorator gets stable first/last card role
+FAIL: privacy outside relock: row 10 uses stable filtered identity
+FAIL: privacy outside relock: row 10 y/height equals stable geometry
+FAIL: privacy outside relock: row 11 uses stable filtered identity
+FAIL: privacy outside relock: row 11 native decorator gets stable first/last card role
+FAIL: privacy outside relock: row 12 uses stable filtered identity
+FAIL: privacy outside relock: row 12 y/height equals stable geometry
+FAIL: privacy outside relock: row 12 native decorator gets stable first/last card role
+FAIL: privacy outside relock: row 13 uses stable filtered identity
+FAIL: privacy outside relock: row 13 y/height equals stable geometry
+FAIL: privacy outside relock: row 14 uses stable filtered identity
+FAIL: privacy outside relock: row 15 uses stable filtered identity
+FAIL: privacy outside relock: row 15 y/height equals stable geometry
+FAIL: privacy outside relock: row 16 uses stable filtered identity
+FAIL: privacy outside relock: row 16 y/height equals stable geometry
+FAIL: privacy outside relock: row 17 uses stable filtered identity
+FAIL: privacy outside relock: row 17 native decorator gets stable first/last card role
+FAIL: privacy outside relock: first complete layout offset equals restored stable viewport
+FAIL: privacy outside relock: every complete layout uses the same safe final geometry and viewport
+FAIL: privacy outside blocked: first section structure equals selected Group stable state
+FAIL: privacy outside blocked: first layout row count equals filtered stable state
+FAIL: privacy outside blocked: first complete layout offset equals restored stable viewport
+FAIL: privacy outside blocked: every complete layout uses the same safe final geometry and viewport
+FAIL: privacy outside ready: first section structure equals selected Group stable state
+FAIL: privacy outside ready: first layout row count equals filtered stable state
+FAIL: privacy outside ready: row 2 uses stable filtered identity
+FAIL: privacy outside ready: row 2 y/height equals stable geometry
+FAIL: privacy outside ready: row 2 native decorator gets stable first/last card role
+FAIL: privacy outside ready: row 3 uses stable filtered identity
+FAIL: privacy outside ready: row 3 y/height equals stable geometry
+FAIL: privacy outside ready: row 3 native decorator gets stable first/last card role
+FAIL: privacy outside ready: row 4 uses stable filtered identity
+FAIL: privacy outside ready: row 4 y/height equals stable geometry
+FAIL: privacy outside ready: row 4 native decorator gets stable first/last card role
+FAIL: privacy outside ready: row 5 uses stable filtered identity
+FAIL: privacy outside ready: row 5 y/height equals stable geometry
+FAIL: privacy outside ready: row 5 native decorator gets stable first/last card role
+FAIL: privacy outside ready: row 6 uses stable filtered identity
+FAIL: privacy outside ready: row 6 y/height equals stable geometry
+FAIL: privacy outside ready: row 6 native decorator gets stable first/last card role
+FAIL: privacy outside ready: row 7 uses stable filtered identity
+FAIL: privacy outside ready: row 7 y/height equals stable geometry
+FAIL: privacy outside ready: row 7 native decorator gets stable first/last card role
+FAIL: privacy outside ready: row 8 uses stable filtered identity
+FAIL: privacy outside ready: row 8 native decorator gets stable first/last card role
+FAIL: privacy outside ready: row 9 uses stable filtered identity
+FAIL: privacy outside ready: row 9 y/height equals stable geometry
+FAIL: privacy outside ready: row 9 native decorator gets stable first/last card role
+FAIL: privacy outside ready: row 10 uses stable filtered identity
+FAIL: privacy outside ready: row 10 y/height equals stable geometry
+FAIL: privacy outside ready: row 11 uses stable filtered identity
+FAIL: privacy outside ready: row 11 native decorator gets stable first/last card role
+FAIL: privacy outside ready: row 12 uses stable filtered identity
+FAIL: privacy outside ready: row 12 y/height equals stable geometry
+FAIL: privacy outside ready: row 12 native decorator gets stable first/last card role
+FAIL: privacy outside ready: row 13 uses stable filtered identity
+FAIL: privacy outside ready: row 13 y/height equals stable geometry
+FAIL: privacy outside ready: row 14 uses stable filtered identity
+FAIL: privacy outside ready: row 15 uses stable filtered identity
+FAIL: privacy outside ready: row 15 y/height equals stable geometry
+FAIL: privacy outside ready: row 16 uses stable filtered identity
+FAIL: privacy outside ready: row 16 y/height equals stable geometry
+FAIL: privacy outside ready: row 17 uses stable filtered identity
+FAIL: privacy outside ready: row 17 native decorator gets stable first/last card role
+FAIL: privacy outside ready: first complete layout offset equals restored stable viewport
+FAIL: privacy outside ready: every complete layout uses the same safe final geometry and viewport
+FAIL: privacy outside revealed: first section structure equals selected Group stable state
+FAIL: privacy outside revealed: first layout row count equals filtered stable state
+FAIL: privacy outside revealed: row 2 uses stable filtered identity
+FAIL: privacy outside revealed: row 2 y/height equals stable geometry
+FAIL: privacy outside revealed: row 2 native decorator gets stable first/last card role
+FAIL: privacy outside revealed: row 3 uses stable filtered identity
+FAIL: privacy outside revealed: row 3 y/height equals stable geometry
+FAIL: privacy outside revealed: row 3 native decorator gets stable first/last card role
+FAIL: privacy outside revealed: row 4 uses stable filtered identity
+FAIL: privacy outside revealed: row 4 y/height equals stable geometry
+FAIL: privacy outside revealed: row 4 native decorator gets stable first/last card role
+FAIL: privacy outside revealed: row 5 uses stable filtered identity
+FAIL: privacy outside revealed: row 5 y/height equals stable geometry
+FAIL: privacy outside revealed: row 5 native decorator gets stable first/last card role
+FAIL: privacy outside revealed: row 6 uses stable filtered identity
+FAIL: privacy outside revealed: row 6 y/height equals stable geometry
+FAIL: privacy outside revealed: row 6 native decorator gets stable first/last card role
+FAIL: privacy outside revealed: row 7 uses stable filtered identity
+FAIL: privacy outside revealed: row 7 y/height equals stable geometry
+FAIL: privacy outside revealed: row 7 native decorator gets stable first/last card role
+FAIL: privacy outside revealed: row 8 uses stable filtered identity
+FAIL: privacy outside revealed: row 8 y/height equals stable geometry
+FAIL: privacy outside revealed: row 9 uses stable filtered identity
+FAIL: privacy outside revealed: row 9 y/height equals stable geometry
+FAIL: privacy outside revealed: row 9 native decorator gets stable first/last card role
+FAIL: privacy outside revealed: row 10 uses stable filtered identity
+FAIL: privacy outside revealed: row 10 y/height equals stable geometry
+FAIL: privacy outside revealed: row 11 uses stable filtered identity
+FAIL: privacy outside revealed: row 11 y/height equals stable geometry
+FAIL: privacy outside revealed: row 11 native decorator gets stable first/last card role
+FAIL: privacy outside revealed: row 12 uses stable filtered identity
+FAIL: privacy outside revealed: row 12 y/height equals stable geometry
+FAIL: privacy outside revealed: row 12 native decorator gets stable first/last card role
+FAIL: privacy outside revealed: row 13 uses stable filtered identity
+FAIL: privacy outside revealed: row 13 y/height equals stable geometry
+FAIL: privacy outside revealed: row 14 uses stable filtered identity
+FAIL: privacy outside revealed: row 14 y/height equals stable geometry
+FAIL: privacy outside revealed: row 15 uses stable filtered identity
+FAIL: privacy outside revealed: row 15 y/height equals stable geometry
+FAIL: privacy outside revealed: row 16 uses stable filtered identity
+FAIL: privacy outside revealed: row 16 y/height equals stable geometry
+FAIL: privacy outside revealed: row 17 uses stable filtered identity
+FAIL: privacy outside revealed: row 17 y/height equals stable geometry
+FAIL: privacy outside revealed: row 18 uses stable filtered identity
+FAIL: privacy outside revealed: row 18 y/height equals stable geometry
+FAIL: privacy outside revealed: row 18 native decorator gets stable first/last card role
+FAIL: privacy outside revealed: first complete layout offset equals restored stable viewport
+FAIL: privacy outside revealed: every complete layout uses the same safe final geometry and viewport
+FAIL: privacy outside same-owner reentry: first section structure equals selected Group stable state
+FAIL: privacy outside same-owner reentry: first layout row count equals filtered stable state
+FAIL: privacy outside same-owner reentry: row 2 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 2 y/height equals stable geometry
+FAIL: privacy outside same-owner reentry: row 2 native decorator gets stable first/last card role
+FAIL: privacy outside same-owner reentry: row 3 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 3 y/height equals stable geometry
+FAIL: privacy outside same-owner reentry: row 3 native decorator gets stable first/last card role
+FAIL: privacy outside same-owner reentry: row 4 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 4 y/height equals stable geometry
+FAIL: privacy outside same-owner reentry: row 4 native decorator gets stable first/last card role
+FAIL: privacy outside same-owner reentry: row 5 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 5 y/height equals stable geometry
+FAIL: privacy outside same-owner reentry: row 5 native decorator gets stable first/last card role
+FAIL: privacy outside same-owner reentry: row 6 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 6 y/height equals stable geometry
+FAIL: privacy outside same-owner reentry: row 6 native decorator gets stable first/last card role
+FAIL: privacy outside same-owner reentry: row 7 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 7 y/height equals stable geometry
+FAIL: privacy outside same-owner reentry: row 7 native decorator gets stable first/last card role
+FAIL: privacy outside same-owner reentry: row 8 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 8 native decorator gets stable first/last card role
+FAIL: privacy outside same-owner reentry: row 9 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 9 y/height equals stable geometry
+FAIL: privacy outside same-owner reentry: row 9 native decorator gets stable first/last card role
+FAIL: privacy outside same-owner reentry: row 10 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 10 y/height equals stable geometry
+FAIL: privacy outside same-owner reentry: row 11 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 11 native decorator gets stable first/last card role
+FAIL: privacy outside same-owner reentry: row 12 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 12 y/height equals stable geometry
+FAIL: privacy outside same-owner reentry: row 12 native decorator gets stable first/last card role
+FAIL: privacy outside same-owner reentry: row 13 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 13 y/height equals stable geometry
+FAIL: privacy outside same-owner reentry: row 14 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 15 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 15 y/height equals stable geometry
+FAIL: privacy outside same-owner reentry: row 16 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 16 y/height equals stable geometry
+FAIL: privacy outside same-owner reentry: row 17 uses stable filtered identity
+FAIL: privacy outside same-owner reentry: row 17 native decorator gets stable first/last card role
+FAIL: privacy outside same-owner reentry: first complete layout offset equals restored stable viewport
+FAIL: privacy outside same-owner reentry: every complete layout uses the same safe final geometry and viewport
+FAIL: privacy outside dirty structure: first section structure equals selected Group stable state
+FAIL: privacy outside dirty structure: first layout row count equals filtered stable state
+FAIL: privacy outside dirty structure: row 0 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 1 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 2 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 2 y/height equals stable geometry
+FAIL: privacy outside dirty structure: row 2 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 3 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 3 y/height equals stable geometry
+FAIL: privacy outside dirty structure: row 3 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 4 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 4 y/height equals stable geometry
+FAIL: privacy outside dirty structure: row 4 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 5 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 5 y/height equals stable geometry
+FAIL: privacy outside dirty structure: row 5 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 6 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 6 y/height equals stable geometry
+FAIL: privacy outside dirty structure: row 6 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 7 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 7 y/height equals stable geometry
+FAIL: privacy outside dirty structure: row 7 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 8 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 8 y/height equals stable geometry
+FAIL: privacy outside dirty structure: row 8 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 9 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 9 y/height equals stable geometry
+FAIL: privacy outside dirty structure: row 9 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 10 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 10 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 11 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 12 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 12 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 13 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 13 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: row 14 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 15 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 16 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 17 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 18 uses stable filtered identity
+FAIL: privacy outside dirty structure: row 18 native decorator gets stable first/last card role
+FAIL: privacy outside dirty structure: first complete layout offset equals restored stable viewport
+FAIL: privacy outside dirty structure: every complete layout uses the same safe final geometry and viewport
+FAIL: decorator outside locked: first section structure equals selected Group stable state
+FAIL: decorator outside locked: first layout row count equals filtered stable state
+FAIL: decorator outside locked: row 0 native decorator gets stable first/last card role
+FAIL: decorator outside locked: row 1 native decorator gets stable first/last card role
+FAIL: decorator outside locked: row 2 uses stable filtered identity
+FAIL: decorator outside locked: row 2 y/height equals stable geometry
+FAIL: decorator outside locked: row 2 native decorator gets stable first/last card role
+FAIL: decorator outside locked: row 3 uses stable filtered identity
+FAIL: decorator outside locked: row 3 y/height equals stable geometry
+FAIL: decorator outside locked: row 3 native decorator gets stable first/last card role
+FAIL: decorator outside locked: row 4 uses stable filtered identity
+FAIL: decorator outside locked: row 4 y/height equals stable geometry
+FAIL: decorator outside locked: row 4 native decorator gets stable first/last card role
+FAIL: decorator outside locked: row 5 uses stable filtered identity
+FAIL: decorator outside locked: row 5 y/height equals stable geometry
+FAIL: decorator outside locked: row 5 native decorator gets stable first/last card role
+FAIL: decorator outside locked: row 6 uses stable filtered identity
+FAIL: decorator outside locked: row 6 y/height equals stable geometry
+FAIL: decorator outside locked: row 6 native decorator gets stable first/last card role
+FAIL: decorator outside locked: row 7 uses stable filtered identity
+FAIL: decorator outside locked: row 7 y/height equals stable geometry
+FAIL: decorator outside locked: row 7 native decorator gets stable first/last card role
+FAIL: decorator outside locked: row 8 uses stable filtered identity
+FAIL: decorator outside locked: row 8 native decorator gets stable first/last card role
+FAIL: decorator outside locked: row 9 uses stable filtered identity
+FAIL: decorator outside locked: row 9 y/height equals stable geometry
+FAIL: decorator outside locked: row 9 native decorator gets stable first/last card role
+FAIL: decorator outside locked: row 10 uses stable filtered identity
+FAIL: decorator outside locked: row 10 y/height equals stable geometry
+FAIL: decorator outside locked: row 11 uses stable filtered identity
+FAIL: decorator outside locked: row 11 native decorator gets stable first/last card role
+FAIL: decorator outside locked: row 12 uses stable filtered identity
+FAIL: decorator outside locked: row 12 y/height equals stable geometry
+FAIL: decorator outside locked: row 12 native decorator gets stable first/last card role
+FAIL: decorator outside locked: row 13 uses stable filtered identity
+FAIL: decorator outside locked: row 13 y/height equals stable geometry
+FAIL: decorator outside locked: row 14 uses stable filtered identity
+FAIL: decorator outside locked: row 15 uses stable filtered identity
+FAIL: decorator outside locked: row 15 y/height equals stable geometry
+FAIL: decorator outside locked: row 16 uses stable filtered identity
+FAIL: decorator outside locked: row 16 y/height equals stable geometry
+FAIL: decorator outside locked: row 17 uses stable filtered identity
+FAIL: decorator outside locked: row 17 native decorator gets stable first/last card role
+FAIL: decorator outside locked: first complete layout offset equals restored stable viewport
+FAIL: decorator outside locked: every complete layout uses the same safe final geometry and viewport
+FAIL: decorator outside empty selected section: first section structure equals selected Group stable state
+FAIL: decorator outside empty selected section: first layout row count equals filtered stable state
+FAIL: decorator outside empty selected section: row 2 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 2 y/height equals stable geometry
+FAIL: decorator outside empty selected section: row 2 native decorator gets stable first/last card role
+FAIL: decorator outside empty selected section: row 3 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 3 y/height equals stable geometry
+FAIL: decorator outside empty selected section: row 3 native decorator gets stable first/last card role
+FAIL: decorator outside empty selected section: row 4 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 4 y/height equals stable geometry
+FAIL: decorator outside empty selected section: row 4 native decorator gets stable first/last card role
+FAIL: decorator outside empty selected section: row 5 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 5 y/height equals stable geometry
+FAIL: decorator outside empty selected section: row 5 native decorator gets stable first/last card role
+FAIL: decorator outside empty selected section: row 6 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 6 native decorator gets stable first/last card role
+FAIL: decorator outside empty selected section: row 7 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 7 y/height equals stable geometry
+FAIL: decorator outside empty selected section: row 7 native decorator gets stable first/last card role
+FAIL: decorator outside empty selected section: row 8 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 8 y/height equals stable geometry
+FAIL: decorator outside empty selected section: row 9 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 9 native decorator gets stable first/last card role
+FAIL: decorator outside empty selected section: row 10 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 10 y/height equals stable geometry
+FAIL: decorator outside empty selected section: row 10 native decorator gets stable first/last card role
+FAIL: decorator outside empty selected section: row 11 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 11 y/height equals stable geometry
+FAIL: decorator outside empty selected section: row 12 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 13 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 13 y/height equals stable geometry
+FAIL: decorator outside empty selected section: row 14 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 14 y/height equals stable geometry
+FAIL: decorator outside empty selected section: row 15 uses stable filtered identity
+FAIL: decorator outside empty selected section: row 15 native decorator gets stable first/last card role
+FAIL: decorator outside empty selected section: first complete layout offset equals restored stable viewport
+FAIL: decorator outside empty selected section: every complete layout uses the same safe final geometry and viewport
+FAIL: decorator outside relock: first section structure equals selected Group stable state
+FAIL: decorator outside relock: first layout row count equals filtered stable state
+FAIL: decorator outside relock: row 2 uses stable filtered identity
+FAIL: decorator outside relock: row 2 y/height equals stable geometry
+FAIL: decorator outside relock: row 2 native decorator gets stable first/last card role
+FAIL: decorator outside relock: row 3 uses stable filtered identity
+FAIL: decorator outside relock: row 3 y/height equals stable geometry
+FAIL: decorator outside relock: row 3 native decorator gets stable first/last card role
+FAIL: decorator outside relock: row 4 uses stable filtered identity
+FAIL: decorator outside relock: row 4 y/height equals stable geometry
+FAIL: decorator outside relock: row 4 native decorator gets stable first/last card role
+FAIL: decorator outside relock: row 5 uses stable filtered identity
+FAIL: decorator outside relock: row 5 y/height equals stable geometry
+FAIL: decorator outside relock: row 5 native decorator gets stable first/last card role
+FAIL: decorator outside relock: row 6 uses stable filtered identity
+FAIL: decorator outside relock: row 6 y/height equals stable geometry
+FAIL: decorator outside relock: row 6 native decorator gets stable first/last card role
+FAIL: decorator outside relock: row 7 uses stable filtered identity
+FAIL: decorator outside relock: row 7 y/height equals stable geometry
+FAIL: decorator outside relock: row 7 native decorator gets stable first/last card role
+FAIL: decorator outside relock: row 8 uses stable filtered identity
+FAIL: decorator outside relock: row 9 uses stable filtered identity
+FAIL: decorator outside relock: row 9 y/height equals stable geometry
+FAIL: decorator outside relock: row 9 native decorator gets stable first/last card role
+FAIL: decorator outside relock: row 10 uses stable filtered identity
+FAIL: decorator outside relock: row 10 y/height equals stable geometry
+FAIL: decorator outside relock: row 11 uses stable filtered identity
+FAIL: decorator outside relock: row 11 native decorator gets stable first/last card role
+FAIL: decorator outside relock: row 12 uses stable filtered identity
+FAIL: decorator outside relock: row 12 y/height equals stable geometry
+FAIL: decorator outside relock: row 12 native decorator gets stable first/last card role
+FAIL: decorator outside relock: row 13 uses stable filtered identity
+FAIL: decorator outside relock: row 13 y/height equals stable geometry
+FAIL: decorator outside relock: row 14 uses stable filtered identity
+FAIL: decorator outside relock: row 15 uses stable filtered identity
+FAIL: decorator outside relock: row 15 y/height equals stable geometry
+FAIL: decorator outside relock: row 16 uses stable filtered identity
+FAIL: decorator outside relock: row 16 y/height equals stable geometry
+FAIL: decorator outside relock: row 17 uses stable filtered identity
+FAIL: decorator outside relock: row 17 native decorator gets stable first/last card role
+FAIL: decorator outside relock: first complete layout offset equals restored stable viewport
+FAIL: decorator outside relock: every complete layout uses the same safe final geometry and viewport
+FAIL: decorator outside blocked: first section structure equals selected Group stable state
+FAIL: decorator outside blocked: first layout row count equals filtered stable state
+FAIL: decorator outside blocked: first complete layout offset equals restored stable viewport
+FAIL: decorator outside blocked: every complete layout uses the same safe final geometry and viewport
+FAIL: decorator outside ready: first section structure equals selected Group stable state
+FAIL: decorator outside ready: first layout row count equals filtered stable state
+FAIL: decorator outside ready: row 2 uses stable filtered identity
+FAIL: decorator outside ready: row 2 y/height equals stable geometry
+FAIL: decorator outside ready: row 2 native decorator gets stable first/last card role
+FAIL: decorator outside ready: row 3 uses stable filtered identity
+FAIL: decorator outside ready: row 3 y/height equals stable geometry
+FAIL: decorator outside ready: row 3 native decorator gets stable first/last card role
+FAIL: decorator outside ready: row 4 uses stable filtered identity
+FAIL: decorator outside ready: row 4 y/height equals stable geometry
+FAIL: decorator outside ready: row 4 native decorator gets stable first/last card role
+FAIL: decorator outside ready: row 5 uses stable filtered identity
+FAIL: decorator outside ready: row 5 y/height equals stable geometry
+FAIL: decorator outside ready: row 5 native decorator gets stable first/last card role
+FAIL: decorator outside ready: row 6 uses stable filtered identity
+FAIL: decorator outside ready: row 6 y/height equals stable geometry
+FAIL: decorator outside ready: row 6 native decorator gets stable first/last card role
+FAIL: decorator outside ready: row 7 uses stable filtered identity
+FAIL: decorator outside ready: row 7 y/height equals stable geometry
+FAIL: decorator outside ready: row 7 native decorator gets stable first/last card role
+FAIL: decorator outside ready: row 8 uses stable filtered identity
+FAIL: decorator outside ready: row 8 native decorator gets stable first/last card role
+FAIL: decorator outside ready: row 9 uses stable filtered identity
+FAIL: decorator outside ready: row 9 y/height equals stable geometry
+FAIL: decorator outside ready: row 9 native decorator gets stable first/last card role
+FAIL: decorator outside ready: row 10 uses stable filtered identity
+FAIL: decorator outside ready: row 10 y/height equals stable geometry
+FAIL: decorator outside ready: row 11 uses stable filtered identity
+FAIL: decorator outside ready: row 11 native decorator gets stable first/last card role
+FAIL: decorator outside ready: row 12 uses stable filtered identity
+FAIL: decorator outside ready: row 12 y/height equals stable geometry
+FAIL: decorator outside ready: row 12 native decorator gets stable first/last card role
+FAIL: decorator outside ready: row 13 uses stable filtered identity
+FAIL: decorator outside ready: row 13 y/height equals stable geometry
+FAIL: decorator outside ready: row 14 uses stable filtered identity
+FAIL: decorator outside ready: row 15 uses stable filtered identity
+FAIL: decorator outside ready: row 15 y/height equals stable geometry
+FAIL: decorator outside ready: row 16 uses stable filtered identity
+FAIL: decorator outside ready: row 16 y/height equals stable geometry
+FAIL: decorator outside ready: row 17 uses stable filtered identity
+FAIL: decorator outside ready: row 17 native decorator gets stable first/last card role
+FAIL: decorator outside ready: first complete layout offset equals restored stable viewport
+FAIL: decorator outside ready: every complete layout uses the same safe final geometry and viewport
+FAIL: decorator outside revealed: first section structure equals selected Group stable state
+FAIL: decorator outside revealed: first layout row count equals filtered stable state
+FAIL: decorator outside revealed: row 2 uses stable filtered identity
+FAIL: decorator outside revealed: row 2 y/height equals stable geometry
+FAIL: decorator outside revealed: row 2 native decorator gets stable first/last card role
+FAIL: decorator outside revealed: row 3 uses stable filtered identity
+FAIL: decorator outside revealed: row 3 y/height equals stable geometry
+FAIL: decorator outside revealed: row 3 native decorator gets stable first/last card role
+FAIL: decorator outside revealed: row 4 uses stable filtered identity
+FAIL: decorator outside revealed: row 4 y/height equals stable geometry
+FAIL: decorator outside revealed: row 4 native decorator gets stable first/last card role
+FAIL: decorator outside revealed: row 5 uses stable filtered identity
+FAIL: decorator outside revealed: row 5 y/height equals stable geometry
+FAIL: decorator outside revealed: row 5 native decorator gets stable first/last card role
+FAIL: decorator outside revealed: row 6 uses stable filtered identity
+FAIL: decorator outside revealed: row 6 y/height equals stable geometry
+FAIL: decorator outside revealed: row 6 native decorator gets stable first/last card role
+FAIL: decorator outside revealed: row 7 uses stable filtered identity
+FAIL: decorator outside revealed: row 7 y/height equals stable geometry
+FAIL: decorator outside revealed: row 7 native decorator gets stable first/last card role
+FAIL: decorator outside revealed: row 8 uses stable filtered identity
+FAIL: decorator outside revealed: row 8 y/height equals stable geometry
+FAIL: decorator outside revealed: row 9 uses stable filtered identity
+FAIL: decorator outside revealed: row 9 y/height equals stable geometry
+FAIL: decorator outside revealed: row 9 native decorator gets stable first/last card role
+FAIL: decorator outside revealed: row 10 uses stable filtered identity
+FAIL: decorator outside revealed: row 10 y/height equals stable geometry
+FAIL: decorator outside revealed: row 11 uses stable filtered identity
+FAIL: decorator outside revealed: row 11 y/height equals stable geometry
+FAIL: decorator outside revealed: row 11 native decorator gets stable first/last card role
+FAIL: decorator outside revealed: row 12 uses stable filtered identity
+FAIL: decorator outside revealed: row 12 y/height equals stable geometry
+FAIL: decorator outside revealed: row 12 native decorator gets stable first/last card role
+FAIL: decorator outside revealed: row 13 uses stable filtered identity
+FAIL: decorator outside revealed: row 13 y/height equals stable geometry
+FAIL: decorator outside revealed: row 14 uses stable filtered identity
+FAIL: decorator outside revealed: row 14 y/height equals stable geometry
+FAIL: decorator outside revealed: row 15 uses stable filtered identity
+FAIL: decorator outside revealed: row 15 y/height equals stable geometry
+FAIL: decorator outside revealed: row 16 uses stable filtered identity
+FAIL: decorator outside revealed: row 16 y/height equals stable geometry
+FAIL: decorator outside revealed: row 17 uses stable filtered identity
+FAIL: decorator outside revealed: row 17 y/height equals stable geometry
+FAIL: decorator outside revealed: row 18 uses stable filtered identity
+FAIL: decorator outside revealed: row 18 y/height equals stable geometry
+FAIL: decorator outside revealed: row 18 native decorator gets stable first/last card role
+FAIL: decorator outside revealed: first complete layout offset equals restored stable viewport
+FAIL: decorator outside revealed: every complete layout uses the same safe final geometry and viewport
+FAIL: decorator outside same-owner reentry: first section structure equals selected Group stable state
+FAIL: decorator outside same-owner reentry: first layout row count equals filtered stable state
+FAIL: decorator outside same-owner reentry: row 2 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 2 y/height equals stable geometry
+FAIL: decorator outside same-owner reentry: row 2 native decorator gets stable first/last card role
+FAIL: decorator outside same-owner reentry: row 3 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 3 y/height equals stable geometry
+FAIL: decorator outside same-owner reentry: row 3 native decorator gets stable first/last card role
+FAIL: decorator outside same-owner reentry: row 4 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 4 y/height equals stable geometry
+FAIL: decorator outside same-owner reentry: row 4 native decorator gets stable first/last card role
+FAIL: decorator outside same-owner reentry: row 5 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 5 y/height equals stable geometry
+FAIL: decorator outside same-owner reentry: row 5 native decorator gets stable first/last card role
+FAIL: decorator outside same-owner reentry: row 6 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 6 y/height equals stable geometry
+FAIL: decorator outside same-owner reentry: row 6 native decorator gets stable first/last card role
+FAIL: decorator outside same-owner reentry: row 7 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 7 y/height equals stable geometry
+FAIL: decorator outside same-owner reentry: row 7 native decorator gets stable first/last card role
+FAIL: decorator outside same-owner reentry: row 8 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 8 native decorator gets stable first/last card role
+FAIL: decorator outside same-owner reentry: row 9 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 9 y/height equals stable geometry
+FAIL: decorator outside same-owner reentry: row 9 native decorator gets stable first/last card role
+FAIL: decorator outside same-owner reentry: row 10 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 10 y/height equals stable geometry
+FAIL: decorator outside same-owner reentry: row 11 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 11 native decorator gets stable first/last card role
+FAIL: decorator outside same-owner reentry: row 12 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 12 y/height equals stable geometry
+FAIL: decorator outside same-owner reentry: row 12 native decorator gets stable first/last card role
+FAIL: decorator outside same-owner reentry: row 13 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 13 y/height equals stable geometry
+FAIL: decorator outside same-owner reentry: row 14 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 15 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 15 y/height equals stable geometry
+FAIL: decorator outside same-owner reentry: row 16 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 16 y/height equals stable geometry
+FAIL: decorator outside same-owner reentry: row 17 uses stable filtered identity
+FAIL: decorator outside same-owner reentry: row 17 native decorator gets stable first/last card role
+FAIL: decorator outside same-owner reentry: first complete layout offset equals restored stable viewport
+FAIL: decorator outside same-owner reentry: every complete layout uses the same safe final geometry and viewport
+FAIL: decorator outside dirty structure: first section structure equals selected Group stable state
+FAIL: decorator outside dirty structure: first layout row count equals filtered stable state
+FAIL: decorator outside dirty structure: row 0 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 1 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 2 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 2 y/height equals stable geometry
+FAIL: decorator outside dirty structure: row 2 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 3 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 3 y/height equals stable geometry
+FAIL: decorator outside dirty structure: row 3 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 4 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 4 y/height equals stable geometry
+FAIL: decorator outside dirty structure: row 4 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 5 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 5 y/height equals stable geometry
+FAIL: decorator outside dirty structure: row 5 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 6 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 6 y/height equals stable geometry
+FAIL: decorator outside dirty structure: row 6 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 7 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 7 y/height equals stable geometry
+FAIL: decorator outside dirty structure: row 7 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 8 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 8 y/height equals stable geometry
+FAIL: decorator outside dirty structure: row 8 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 9 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 9 y/height equals stable geometry
+FAIL: decorator outside dirty structure: row 9 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 10 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 10 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 11 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 12 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 12 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 13 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 13 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: row 14 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 15 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 16 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 17 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 18 uses stable filtered identity
+FAIL: decorator outside dirty structure: row 18 native decorator gets stable first/last card role
+FAIL: decorator outside dirty structure: first complete layout offset equals restored stable viewport
+FAIL: decorator outside dirty structure: every complete layout uses the same safe final geometry and viewport
+privacy outside locked: originalLayout calculations=1; completed hook returns=1; first sections=[2,5,18]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+privacy outside empty selected section: originalLayout calculations=1; completed hook returns=1; first sections=[2,3,18]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+privacy outside relock: originalLayout calculations=1; completed hook returns=1; first sections=[2,5,18]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+privacy outside blocked: originalLayout calculations=1; completed hook returns=1; first sections=[2,5,18]; first offset=-25; expected offset=-140; full reloads=0; row reloads=0
+privacy outside ready: originalLayout calculations=1; completed hook returns=1; first sections=[2,5,18]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+privacy outside revealed: originalLayout calculations=1; completed hook returns=1; first sections=[2,5,18]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+privacy outside same-owner reentry: originalLayout calculations=2; completed hook returns=2; first sections=[2,5,18]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+privacy outside dirty structure: originalLayout calculations=1; completed hook returns=1; first sections=[2,6,17]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+decorator outside locked: originalLayout calculations=1; completed hook returns=1; first sections=[2,5,18]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+decorator outside empty selected section: originalLayout calculations=1; completed hook returns=1; first sections=[2,3,18]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+decorator outside relock: originalLayout calculations=1; completed hook returns=1; first sections=[2,5,18]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+decorator outside blocked: originalLayout calculations=1; completed hook returns=1; first sections=[2,5,18]; first offset=-25; expected offset=-140; full reloads=0; row reloads=0
+decorator outside ready: originalLayout calculations=1; completed hook returns=1; first sections=[2,5,18]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+decorator outside revealed: originalLayout calculations=1; completed hook returns=1; first sections=[2,5,18]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+decorator outside same-owner reentry: originalLayout calculations=2; completed hook returns=2; first sections=[2,5,18]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+decorator outside dirty structure: originalLayout calculations=1; completed hook returns=1; first sections=[2,6,17]; first offset=-25; expected offset=360; full reloads=0; row reloads=0
+Group return layout: 861 checks, 610 failures

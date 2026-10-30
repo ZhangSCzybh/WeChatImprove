@@ -1,0 +1,53 @@
+{
+  "same_final_test_inputs_for_all_controls": {
+    "Tests/GroupReturnLayoutTests.m": "c97e1164c2c7356e4097af1c2b8009ba64c00bbe225574f09c52e7bc6bc6a007",
+    "Tests/extract-group-return-layout.py": "70335d74030e1be408f15d2ab5f09ca31dedc340bbe10dfae494bdc4bdea8009",
+    "Tests/verify-group-return-layout.sh": "206cde4258f565c3849cb446d4a6b8decc58d06b298d1daf4b02f7d2366fb7ee",
+    "Tests/GroupReturnPrivacyTests.m": "2b1dae7c2c6cf6fb2bc4c688f5659e65c7a0da9c76ff2f9cdf11e74dff32f733",
+    "Tests/extract-group-return-privacy.py": "080380b85f129f2f34e6a75d49a2673f636ec04ed89681c56335411221e025c6",
+    "Tests/verify-group-return-privacy.sh": "08093334b643833ac86ad98d896a9d092812b1992e2d8f3ddff0ea18527b25a3"
+  },
+  "source_inputs": {
+    "docs/audits/release-2.1-28-closefriend-return-leak/regressions/CSGroupListAdapter.m-2.1-27.txt": "70184a2d3be3ec55039a145809c5b3f20def9fd1ca3ddfd5d3cd8055b3e8a1db",
+    "docs/audits/release-2.1-28-closefriend-return-leak/regressions/SessionGroupHooks.xm-2.1-27.txt": "3042fc03b62a3f987ba3755143edeca7dac6c7b8ebb4d32b3a72fc8643511e2d",
+    "docs/audits/release-2.1-28-closefriend-return-leak/layout-followup/CSGroupListAdapter.m-initial-2.1-28.txt": "01631ed18df321bbdcc22bbe8c45c5df276318d6334ad4cc644d82cb424e8e87",
+    "docs/audits/release-2.1-28-closefriend-return-leak/layout-followup/SessionGroupHooks.xm-initial-2.1-28.txt": "10a5bdfb1984542d5844d5797abf87acbe3ce2a1a7f9da4beb1ccad1d747af97",
+    "Controllers/CSGroupListAdapter.m": "4fd9b6cc6a1dda85f4f04a17cdf67e89f0e1831821a128c01abb6cfa5ebff426",
+    "Hooks/SessionGroupHooks.xm": "10a5bdfb1984542d5844d5797abf87acbe3ce2a1a7f9da4beb1ccad1d747af97",
+    "Controllers/CSGroupProjection.h": "c22af3510b013530afe4138eeea2fa807c08cb5977bd60f436519576701f85bb",
+    "Controllers/CSGroupProjection.m": "4bccf64b07aad45ecbbceb428c87af78181099de6cfdeb6eaa749e4f46e65971",
+    "Controllers/CSListCornerSessionRestore.m": "b8b91879859daf84ebc42b064c8e1bd8d1a33a9d9dc4ec267ae95e3eb97fcbfe",
+    "Hooks/ListCornerRadiusHooks.xm": "ceefff7aead3cfe33ce97cbd04c1c3953dc4c73ecdcec09fdbc87cd584677f0a",
+    "Controllers/CSCloseFriendListShield.m": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b"
+  },
+  "results": {
+    "layout_27": {
+      "checks": 861,
+      "failures": 610,
+      "passed": 251
+    },
+    "layout_initial28_af84d15d": {
+      "checks": 861,
+      "failures": 170,
+      "passed": 691
+    },
+    "layout_fixed28": {
+      "checks": 861,
+      "failures": 0,
+      "passed": 861
+    },
+    "privacy_27": {
+      "checks": 37,
+      "failures": 12,
+      "passed": 25
+    },
+    "privacy_fixed28": {
+      "checks": 37,
+      "failures": 0,
+      "passed": 37
+    }
+  },
+  "counting": "originalLayout calculations count every executed geometry-double calculation. Completed hook returns count fully unwound table layout invocations. Neither count is a frame count or UIKit committed transaction count.",
+  "test_boundary": "Real Native index scope, MainFrameTableView privacy hook, visible-layout guard, projection and Group membership filtering, per-section source/count/height invocation mapping, native identity resolution, card first/last CSGroupCardPosition, list shield, presentationScrollHeight/restoreScrollHeight/saveAnchor and helper methods. UIKit y geometry uses fixed section gaps and native fixture heights. Real decorator table hook and CSListCornerPerformSessionTableLayout depth wrapper run in both hook orders; post-layout paint repair counts reuse only. Host refresh admission/chrome are fixtures and invoke real projection/publication seam.",
+  "stable_locked_return": "dirty=YES models actual departure invalidation while the visible structure is unchanged; it still executes originalLayout once and performs no full/row reload."
+}

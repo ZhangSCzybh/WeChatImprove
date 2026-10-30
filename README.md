@@ -40,10 +40,12 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：当前 `2.1-28` 交付 [Rootless 安装包](packages/2.1-28-closefriend-return-leak/com.wechat.improve_2.1-28_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-28-closefriend-return-leak/com.wechat.improve_2.1-28_iphoneos-arm.deb)、[调试符号](packages/2.1-28-closefriend-return-leak/com.wechat.improve_2.1-28_symbols.zip) 和 [SHA-256](packages/2.1-28-closefriend-return-leak/SHA256SUMS)。本版修复从其他页面返回聊天列表时密友、密群先显示再隐藏的问题，在发布内容前落实隐私过滤；保留锁定与解锁语义、顶部业务行、分组切换、搜索返回与滚动位置，详见 [发布记录](docs/audits/release-2.1-28-closefriend-return-leak/README.md)。继续包含 `2.1-22` 的手动备份与后台时段、时长及节能策略，见 [上一版发布记录](docs/audits/release-2.1-22-background-policy/README.md)、[备份指南](docs/backup-guide.md) 和 [后台运行说明](docs/background-run-policy-proposal.md)。本版尚未进行真机返回隐私、顶部区域与位置验收；`2.1-21` 的 [前台 CPU 复测](docs/audits/release-2.1-21-energy/device-validation.md) 保留为历史证据。原有定时任务时间段规则、左滑启用／停止和 AI 后台兜底开关继续提供。
+1. 获取与设备注入环境匹配的 `.deb`：当前推荐 `2.1-28` 首帧布局候选 `layout-firstframe-candidate-1`：[Rootless 安装包](packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/com.wechat.improve_2.1-28_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/com.wechat.improve_2.1-28_iphoneos-arm.deb)、[调试符号](packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/com.wechat.improve_2.1-28_symbols.zip) 和 [SHA-256](packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/SHA256SUMS)。本候选在返回聊天列表的首轮显示前同步准备卡片内容、隐私过滤与列表位置，修复密友、密群先显示再隐藏以及随后出现的卡片和位置跳变；保留锁定与解锁语义、顶部业务行、分组切换和搜索返回，详见 [候选审计](docs/audits/release-2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/README.md)。继续包含 `2.1-22` 的手动备份与后台时段、时长及节能策略，见 [上一版发布记录](docs/audits/release-2.1-22-background-policy/README.md)、[备份指南](docs/backup-guide.md) 和 [后台运行说明](docs/background-run-policy-proposal.md)。本版尚未进行真机返回隐私、顶部区域与位置验收；`2.1-21` 的 [前台 CPU 复测](docs/audits/release-2.1-21-energy/device-validation.md) 保留为历史证据。原有定时任务时间段规则、左滑启用／停止和 AI 后台兜底开关继续提供。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
+
+首批 `2.1-28` 安装包、符号与校验值仍保留在 [历史交付目录](packages/2.1-28-closefriend-return-leak/)，对应 [首批审计](docs/audits/release-2.1-28-closefriend-return-leak/README.md)。它与当前候选使用相同包版本，下载时请核对完整子目录和 SHA-256。
 
 默认入口名称为“再也不会”。在 **入口设置** 中可以修改名称，并选择显示在“我”、微信设置页或已有的插件管理入口；插件管理入口需要宿主环境提供 `WCPluginsMgr`。
 
@@ -210,7 +212,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.1-28_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-28-closefriend-return-leak/`。
+当前版本默认输出：`packages/com.wechat.improve_2.1-28_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/`。
 
 ### Rootful
 
@@ -219,7 +221,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.1-28_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-28-closefriend-return-leak/`。
+当前版本默认输出：`packages/com.wechat.improve_2.1-28_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/`。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -243,7 +245,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.1-28-closefriend-return-leak/com.wechat.improve_2.1-28_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/com.wechat.improve_2.1-28_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。

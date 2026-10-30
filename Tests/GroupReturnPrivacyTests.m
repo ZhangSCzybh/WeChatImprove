@@ -136,6 +136,10 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 - (void)beginNativeChange;
 - (void)endNativeChange;
 - (BOOL)forwardSwipeInvocation:(NSInvocation *)inv target:(id)target;
+// This suite has no retained return viewport; the layout-followup suite uses
+// the real production viewport helpers and an inset/offset lifecycle double.
+- (NSNumber *)presentationScrollHeight;
+- (void)restoreScrollHeight:(CGFloat)height;
 - (void)shieldVisiblePrivateRows;
 - (void)performVisibleLayout:(void (^)(void))layout;
 + (instancetype)adapterForTable:(id)table;
@@ -149,6 +153,8 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 - (void)requestRefresh { self.dirty=YES; }
 - (void)scheduleRefresh {}
 - (void)layout {}
+- (NSNumber *)presentationScrollHeight { return nil; }
+- (void)restoreScrollHeight:(CGFloat)height { (void)height; }
 - (void)beginNativeChange { self.changeDepth++; }
 - (void)endNativeChange { self.changeDepth--; }
 - (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay { (void)event;(void)delay; }

@@ -632,6 +632,12 @@ static BOOL Option(NSString *suffix) {
     @finally { self.updatingHeader=NO; }
 }
 - (void)performVisibleLayout:(void (^)(void))layout {
+    // Appearance can synchronously lay out before attach consumes the offscreen
+    // invalidation. Prepare the current rows before measuring the return frame.
+    if ([self presentationScrollHeight] && self.dirty && !self.publishing) {
+        [self refresh];
+        if (self.dirty) { [self shieldVisiblePrivateRows]; return; }
+    }
     BOOL (^ready)(void)=^BOOL {
         CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
         BOOL privacy=policy.blocked || (policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue]);
@@ -655,7 +661,15 @@ static BOOL Option(NSString *suffix) {
         if (!ready()) { [self shieldVisiblePrivateRows]; return; }
     }
     // Native appearance owns native paths; UIKit must still render filtered rows.
-    CSGroupWithDisplayIndices(self.table,layout);
+    CSGroupWithDisplayIndices(self.table,^{
+        NSNumber *height=[self presentationScrollHeight];
+        if (height) [self restoreScrollHeight:height.doubleValue];
+        layout();
+        // Native layout may change contentSize/insets or clamp its own offset.
+        // Finish the retained return position before this complete layout exits.
+        height=[self presentationScrollHeight];
+        if (height) [self restoreScrollHeight:height.doubleValue];
+    });
     if (!ready()) {
         self.privacyRefreshPending=YES; self.dirty=YES;
         [self shieldVisiblePrivateRows];
