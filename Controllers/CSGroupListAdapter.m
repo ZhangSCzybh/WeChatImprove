@@ -900,7 +900,9 @@ static BOOL Option(NSString *suffix) {
             BOOL hidden=Option(tab.type==WETabTypeAll ? @"hide_all_badge" : @"hide_group_badge");
             [self.chrome updateUnreadCount:hidden ? 0 : count hasRedDot:!hidden && badge.redDot forTabIndex:(NSInteger)index];
         }];
-        [self layout];
+        // First activation mounts its header after reload invalidates old cells;
+        // a synchronous header layout must not create a throwaway banner cell.
+        if (previouslyProjecting || !projecting) [self layout];
         NSString *currentPublicationAccount=CSGroupCurrentAccountID();
         if (publicationEpoch!=CSCloseFriendAccountEpoch() || publicationPrivacyRevision!=CSCloseFriendCurrentSnapshot().revision ||
             !(publicationAccount==currentPublicationAccount || [publicationAccount isEqual:currentPublicationAccount])) return;
@@ -970,6 +972,7 @@ static BOOL Option(NSString *suffix) {
         if (!incremental) {
             [self recordRefreshEvent:@"publish.full" delay:0];
             [self.table reloadData];
+            if (!previouslyProjecting && self.projecting) [self layout];
         } else if (plan.reloadPaths.count) {
             [self recordRefreshEvent:@"publish.rows" delay:0];
             [self.table reloadRowsAtIndexPaths:plan.reloadPaths withRowAnimation:UITableViewRowAnimationNone];

@@ -1,0 +1,10 @@
+FAIL: reentrant header: business row 0 is delivered exactly once during first publication
+FAIL: reentrant header: business row 0 keeps its first published container
+FAIL: reentrant header: business row 0 never loses its shared native content to a replacement container
+FAIL: reentrant header: business row 1 is delivered exactly once during first publication
+FAIL: reentrant header: business row 1 keeps its first published container
+FAIL: reentrant header: business row 1 never loses its shared native content to a replacement container
+FAIL: reentrant header: no newly published banner container is stripped to a white board
+FAIL: reentrant header: old cells are invalidated before mounting the first grouped header
+FAIL: deferred header: old cells are invalidated before mounting the first grouped header
+Group launch banners: 32 checks, 9 failures

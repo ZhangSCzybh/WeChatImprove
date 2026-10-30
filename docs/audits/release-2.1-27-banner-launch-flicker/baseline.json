@@ -1,0 +1,7 @@
+{
+  "baseline_commit": "2bbb6cae3b4e63cdd7bd76b4b70e94e6434b46b1",
+  "branch": "main",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "adapter_before_sha256": "9075b5de0b7ca0dc06d3414b571953692878a918e767c5d789587e9915a14ecb",
+  "environment": "Existing local native tweak checkout. No web service, device installation, account or database switch requested or performed."
+}

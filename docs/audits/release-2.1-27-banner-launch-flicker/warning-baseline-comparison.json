@@ -1,0 +1,18 @@
+{
+  "baseline_version": "2.1-26",
+  "version": "2.1-27",
+  "exact_warning_multisets_match": {
+    "rootful": true,
+    "rootless": true
+  },
+  "counts": {
+    "rootful": {
+      "2.1-26": 6,
+      "2.1-27": 6
+    },
+    "rootless": {
+      "2.1-26": 6,
+      "2.1-27": 6
+    }
+  }
+}
