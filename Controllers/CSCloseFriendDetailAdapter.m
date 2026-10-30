@@ -11,7 +11,7 @@
 @property(nonatomic,strong) NSMutableArray *visibleLikes,*visibleComments;
 @property(nonatomic,strong) id renderedCommentView;
 @property(nonatomic) NSUInteger epoch,revision,depth;
-@property(nonatomic) BOOL gridDirty;
+@property(nonatomic) BOOL gridDirty,substituted;
 @end
 @implementation CSCFDetailState @end
 @interface CSCFDetailCommentBinding : NSObject
@@ -51,12 +51,23 @@ static CSCFDetailState *DetailEnter(id page) {
     if(!NSThread.isMainThread) return nil;
     CSCFDetailState *state=DetailState(page);
     if(state.depth++) return state;
-    state.savedLikes=DetailIvar(page,"_arrLikeList"); state.savedComments=DetailIvar(page,"_arrCommentList");
     id item=CSCloseFriendRead(page,@"dataItem");
     BOOL current=CSCFPageIsCurrent(page) && state.epoch==CSCloseFriendAccountEpoch();
+    CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
+    if(current && ![snapshot concealsSurface:CSCloseFriendSurfaceInteraction]) {
+        // Native rendering owns the live arrays when no interaction is concealed.
+        // Do not scan/copy them or restore a reference that native code may replace.
+        if(state.item!=item || state.revision!=snapshot.revision || state.likes || state.comments) state.gridDirty=YES;
+        state.item=item; state.revision=snapshot.revision;
+        state.likes=nil; state.comments=nil; state.visibleLikes=nil; state.visibleComments=nil;
+        state.substituted=NO;
+        CSCFSocialTrack(page,^(id owner){DetailRefresh(owner);});
+        return state;
+    }
+    state.savedLikes=DetailIvar(page,"_arrLikeList"); state.savedComments=DetailIvar(page,"_arrCommentList");
+    state.substituted=YES;
     NSArray *likes=current ? DetailArray(item,"_likeUsers") : @[];
     NSArray *comments=current ? DetailArray(item,"_commentUsers") : @[];
-    CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
     if(state.item!=item || state.revision!=snapshot.revision || !DetailSameObjects(state.likes.source,likes) || !DetailSameObjects(state.comments.source,comments)) {
         state.item=item; state.revision=snapshot.revision;
         state.likes=CSCFSocialProject(likes,CSCloseFriendSurfaceInteraction);
@@ -71,8 +82,11 @@ static CSCFDetailState *DetailEnter(id page) {
 }
 static void DetailLeave(id page,CSCFDetailState *state) {
     if(!state || !state.depth || --state.depth) return;
-    CSCFSocialSetIvar(page,@"_arrLikeList",state.savedLikes);
-    CSCFSocialSetIvar(page,@"_arrCommentList",state.savedComments);
+    if(state.substituted) {
+        CSCFSocialSetIvar(page,@"_arrLikeList",state.savedLikes);
+        CSCFSocialSetIvar(page,@"_arrCommentList",state.savedComments);
+    }
+    state.substituted=NO;
     state.savedLikes=nil; state.savedComments=nil;
 }
 static void DetailEnsureGrid(id page,CSCFDetailState *state) {

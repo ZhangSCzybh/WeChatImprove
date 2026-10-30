@@ -1,0 +1,48 @@
+{
+  "all_passed": true,
+  "baseline_copy_count": 21,
+  "actual_project_files": 19,
+  "historical_hash_verified_files": 16,
+  "baseline_and_behavior_verified_files": 3,
+  "production_inputs_matching_2_1_17": 42513,
+  "production_input_differences": {
+    "missing": [],
+    "extra": [],
+    "changed": []
+  },
+  "existing_artifact_count_preserved": 1275,
+  "packages_and_existing_theos_paths_and_hashes_unchanged": true,
+  "no_new_packages": true,
+  "only_expected_test_doc_changes": [
+    "Tests/AIBackgroundSyncTests.m",
+    "Tests/AINativeSyncObserverTests.m",
+    "Tests/AIReplyManagerTests.m",
+    "Tests/verify-ai-native-sync-observer.sh",
+    "docs/features/ai-auto-reply-validation.md",
+    "docs/features/ai-auto-reply.md",
+    "README.md"
+  ],
+  "required_regression_counts": {
+    "scheduler": 78,
+    "manager": 729
+  },
+  "observer_checks": 828,
+  "observer_checks_detail": [
+    786,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6
+  ],
+  "built_architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "built_binary": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.1-17-rollback-compile-k3bfvr_i/.theos/obj/WeChatImprove.dylib",
+  "rootless_builds_executed": 1,
+  "warning_count": 6,
+  "new_audit_directory": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-17-rollback"
+}

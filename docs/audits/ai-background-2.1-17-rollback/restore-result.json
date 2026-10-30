@@ -1,0 +1,209 @@
+{
+  "restored_targets": 19,
+  "baseline_copies_checked": 21,
+  "all_baseline_bytes_match": true,
+  "files": [
+    {
+      "target": "Tests/AINativeSyncObserverTests.m",
+      "baseline_path": "AINativeSyncObserverTests.m",
+      "baseline_sha256": "3348612ecd78c8589a70384d6feef86d529dbee4882c3ef205dff5bafcd46978",
+      "references": {
+        "baseline/manifest.json": "3348612ecd78c8589a70384d6feef86d529dbee4882c3ef205dff5bafcd46978"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "3348612ecd78c8589a70384d6feef86d529dbee4882c3ef205dff5bafcd46978"
+    },
+    {
+      "target": "Controllers/CSAIBackgroundSync.h",
+      "baseline_path": "Controllers/CSAIBackgroundSync.h",
+      "baseline_sha256": "2dbfeed9f46dee8482475240a6777179e16f8cc4da9466ac6f0d71d8dab6bf16",
+      "references": {
+        "2.1-17/build-input-sha256.json": "2dbfeed9f46dee8482475240a6777179e16f8cc4da9466ac6f0d71d8dab6bf16",
+        "2.1-17/build-input-sha256-after.json": "2dbfeed9f46dee8482475240a6777179e16f8cc4da9466ac6f0d71d8dab6bf16"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "2dbfeed9f46dee8482475240a6777179e16f8cc4da9466ac6f0d71d8dab6bf16"
+    },
+    {
+      "target": "Controllers/CSAIBackgroundSync.m",
+      "baseline_path": "Controllers/CSAIBackgroundSync.m",
+      "baseline_sha256": "66c8b213863e88626975c16c41ba4a98280b0989e590e4c7b6cfc7bd200e0e0d",
+      "references": {
+        "2.1-17/build-input-sha256.json": "66c8b213863e88626975c16c41ba4a98280b0989e590e4c7b6cfc7bd200e0e0d",
+        "2.1-17/build-input-sha256-after.json": "66c8b213863e88626975c16c41ba4a98280b0989e590e4c7b6cfc7bd200e0e0d"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "66c8b213863e88626975c16c41ba4a98280b0989e590e4c7b6cfc7bd200e0e0d"
+    },
+    {
+      "target": "Controllers/CSAINativeSyncObserver.h",
+      "baseline_path": "Controllers/CSAINativeSyncObserver.h",
+      "baseline_sha256": "50972613f5d454e82c073e9ca5e2dac69698807523fcdcf19147b7de5441a32e",
+      "references": {
+        "baseline/manifest.json": "50972613f5d454e82c073e9ca5e2dac69698807523fcdcf19147b7de5441a32e",
+        "2.1-17/build-input-sha256.json": "50972613f5d454e82c073e9ca5e2dac69698807523fcdcf19147b7de5441a32e",
+        "2.1-17/build-input-sha256-after.json": "50972613f5d454e82c073e9ca5e2dac69698807523fcdcf19147b7de5441a32e"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "50972613f5d454e82c073e9ca5e2dac69698807523fcdcf19147b7de5441a32e"
+    },
+    {
+      "target": "Controllers/CSAINativeSyncObserver.m",
+      "baseline_path": "Controllers/CSAINativeSyncObserver.m",
+      "baseline_sha256": "a27088eb7e788ed572498a82a8254d0636c9268ec7dd88c95ff6073923064455",
+      "references": {
+        "baseline/manifest.json": "a27088eb7e788ed572498a82a8254d0636c9268ec7dd88c95ff6073923064455",
+        "2.1-17/build-input-sha256.json": "a27088eb7e788ed572498a82a8254d0636c9268ec7dd88c95ff6073923064455",
+        "2.1-17/build-input-sha256-after.json": "a27088eb7e788ed572498a82a8254d0636c9268ec7dd88c95ff6073923064455"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "a27088eb7e788ed572498a82a8254d0636c9268ec7dd88c95ff6073923064455"
+    },
+    {
+      "target": "Controllers/CSAIReplyManager.h",
+      "baseline_path": "Controllers/CSAIReplyManager.h",
+      "baseline_sha256": "434c1520e967c6e989264b7ba028b598a0251cba0dbb435cab49ed3105de9025",
+      "references": {
+        "baseline/manifest.json": "434c1520e967c6e989264b7ba028b598a0251cba0dbb435cab49ed3105de9025",
+        "2.1-17/build-input-sha256.json": "434c1520e967c6e989264b7ba028b598a0251cba0dbb435cab49ed3105de9025",
+        "2.1-17/build-input-sha256-after.json": "434c1520e967c6e989264b7ba028b598a0251cba0dbb435cab49ed3105de9025"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "434c1520e967c6e989264b7ba028b598a0251cba0dbb435cab49ed3105de9025"
+    },
+    {
+      "target": "Controllers/CSAIReplyManager.m",
+      "baseline_path": "Controllers/CSAIReplyManager.m",
+      "baseline_sha256": "3545484aefe47a85577a31b10b03957019b198d508abcababd89aed9d203020e",
+      "references": {
+        "baseline/manifest.json": "3545484aefe47a85577a31b10b03957019b198d508abcababd89aed9d203020e",
+        "2.1-17/build-input-sha256.json": "3545484aefe47a85577a31b10b03957019b198d508abcababd89aed9d203020e",
+        "2.1-17/build-input-sha256-after.json": "3545484aefe47a85577a31b10b03957019b198d508abcababd89aed9d203020e"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "3545484aefe47a85577a31b10b03957019b198d508abcababd89aed9d203020e"
+    },
+    {
+      "target": "Controllers/CSReleaseNotesViewController.m",
+      "baseline_path": "Controllers/CSReleaseNotesViewController.m",
+      "baseline_sha256": "2a4bb551d70868b7329338552410b29c7ca556f7d0b909321073abbcbbf6da18",
+      "references": {
+        "baseline/manifest.json": "2a4bb551d70868b7329338552410b29c7ca556f7d0b909321073abbcbbf6da18",
+        "2.1-17/build-input-sha256.json": "2a4bb551d70868b7329338552410b29c7ca556f7d0b909321073abbcbbf6da18",
+        "2.1-17/build-input-sha256-after.json": "2a4bb551d70868b7329338552410b29c7ca556f7d0b909321073abbcbbf6da18"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "2a4bb551d70868b7329338552410b29c7ca556f7d0b909321073abbcbbf6da18"
+    },
+    {
+      "target": "Headers/CSUserInfoHelper.h",
+      "baseline_path": "Headers/CSUserInfoHelper.h",
+      "baseline_sha256": "f91d0a63cc806e69508e2d738e917e07f6c5d1421bbd8c6e4cf58a647ec390bb",
+      "references": {
+        "baseline/manifest.json": "f91d0a63cc806e69508e2d738e917e07f6c5d1421bbd8c6e4cf58a647ec390bb",
+        "2.1-17/build-input-sha256.json": "f91d0a63cc806e69508e2d738e917e07f6c5d1421bbd8c6e4cf58a647ec390bb",
+        "2.1-17/build-input-sha256-after.json": "f91d0a63cc806e69508e2d738e917e07f6c5d1421bbd8c6e4cf58a647ec390bb"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "f91d0a63cc806e69508e2d738e917e07f6c5d1421bbd8c6e4cf58a647ec390bb"
+    },
+    {
+      "target": "Hooks/AIReplyHooks.xm",
+      "baseline_path": "Hooks/AIReplyHooks.xm",
+      "baseline_sha256": "e9f3c8b37fa6d9adb4bda1caeb159dcc4fc90cf953af9bc8b69de327dc411b8a",
+      "references": {
+        "baseline/manifest.json": "e9f3c8b37fa6d9adb4bda1caeb159dcc4fc90cf953af9bc8b69de327dc411b8a",
+        "2.1-17/build-input-sha256.json": "e9f3c8b37fa6d9adb4bda1caeb159dcc4fc90cf953af9bc8b69de327dc411b8a",
+        "2.1-17/build-input-sha256-after.json": "e9f3c8b37fa6d9adb4bda1caeb159dcc4fc90cf953af9bc8b69de327dc411b8a"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "e9f3c8b37fa6d9adb4bda1caeb159dcc4fc90cf953af9bc8b69de327dc411b8a"
+    },
+    {
+      "target": "README.md",
+      "baseline_path": "README.md",
+      "baseline_sha256": "4d8f93d8c116b8d54a9d94b18d0476206f46d9eaf1ba19d123c9ea4586bdca10",
+      "references": {
+        "baseline/manifest.json": "4d8f93d8c116b8d54a9d94b18d0476206f46d9eaf1ba19d123c9ea4586bdca10"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "4d8f93d8c116b8d54a9d94b18d0476206f46d9eaf1ba19d123c9ea4586bdca10"
+    },
+    {
+      "target": "Tests/AIBackgroundSyncTests.m",
+      "baseline_path": "Tests/AIBackgroundSyncTests.m",
+      "baseline_sha256": "969f941a831411f52a07cc03e30df823eeff118dc57f585987498dfc42b2c964",
+      "references": {},
+      "evidence": "baseline restore + behavior counts",
+      "restored_sha256": "969f941a831411f52a07cc03e30df823eeff118dc57f585987498dfc42b2c964"
+    },
+    {
+      "target": "Tests/AIReplyManagerTests.m",
+      "baseline_path": "Tests/AIReplyManagerTests.m",
+      "baseline_sha256": "803b02ead4ff04d987a54f3efaeaf72e0824860fb91eec4a4ab8b9c34e3e067a",
+      "references": {
+        "baseline/manifest.json": "803b02ead4ff04d987a54f3efaeaf72e0824860fb91eec4a4ab8b9c34e3e067a"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "803b02ead4ff04d987a54f3efaeaf72e0824860fb91eec4a4ab8b9c34e3e067a"
+    },
+    {
+      "target": "Tests/verify-ai-background-sync.sh",
+      "baseline_path": "Tests/verify-ai-background-sync.sh",
+      "baseline_sha256": "8d6f0e6b83cab7a0d8f5defff478e040ba6c6fd8dd6758bf8915322d156a8e25",
+      "references": {},
+      "evidence": "baseline restore + behavior counts",
+      "restored_sha256": "8d6f0e6b83cab7a0d8f5defff478e040ba6c6fd8dd6758bf8915322d156a8e25"
+    },
+    {
+      "target": "Tests/verify-ai-manager.sh",
+      "baseline_path": "Tests/verify-ai-manager.sh",
+      "baseline_sha256": "a44a73cae03d67d788e63ec44c04906c27da6488a5e33dd2f068a53ec0413749",
+      "references": {},
+      "evidence": "baseline restore + behavior counts",
+      "restored_sha256": "a44a73cae03d67d788e63ec44c04906c27da6488a5e33dd2f068a53ec0413749"
+    },
+    {
+      "target": "Tests/verify-ai-native-sync-observer.sh",
+      "baseline_path": "Tests/verify-ai-native-sync-observer.sh",
+      "baseline_sha256": "8f78ada50875b4eb8a83a96e984e9dd9efd9f46335da931c06fef4d239e6f517",
+      "references": {
+        "baseline/manifest.json": "8f78ada50875b4eb8a83a96e984e9dd9efd9f46335da931c06fef4d239e6f517"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "8f78ada50875b4eb8a83a96e984e9dd9efd9f46335da931c06fef4d239e6f517"
+    },
+    {
+      "target": "control",
+      "baseline_path": "control",
+      "baseline_sha256": "a7a58000074af6d0782a4d62454ff65ac53ebe9d3936553867d8cbf1f4785f6a",
+      "references": {
+        "baseline/manifest.json": "a7a58000074af6d0782a4d62454ff65ac53ebe9d3936553867d8cbf1f4785f6a",
+        "2.1-17/build-input-sha256.json": "a7a58000074af6d0782a4d62454ff65ac53ebe9d3936553867d8cbf1f4785f6a",
+        "2.1-17/build-input-sha256-after.json": "a7a58000074af6d0782a4d62454ff65ac53ebe9d3936553867d8cbf1f4785f6a"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "a7a58000074af6d0782a4d62454ff65ac53ebe9d3936553867d8cbf1f4785f6a"
+    },
+    {
+      "target": "docs/features/ai-auto-reply-validation.md",
+      "baseline_path": "docs/features/ai-auto-reply-validation.md",
+      "baseline_sha256": "ff9f319b3515f10c6f2399499d0c510aa5339562a4183b601466b6a7486db028",
+      "references": {
+        "baseline/manifest.json": "ff9f319b3515f10c6f2399499d0c510aa5339562a4183b601466b6a7486db028"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "ff9f319b3515f10c6f2399499d0c510aa5339562a4183b601466b6a7486db028"
+    },
+    {
+      "target": "docs/features/ai-auto-reply.md",
+      "baseline_path": "docs/features/ai-auto-reply.md",
+      "baseline_sha256": "9e4391adcac372797dd3fd6b3fb28de5b7ca403ffa631c9a758550c1a4313b3a",
+      "references": {
+        "baseline/manifest.json": "9e4391adcac372797dd3fd6b3fb28de5b7ca403ffa631c9a758550c1a4313b3a"
+      },
+      "evidence": "byte-for-byte historical reference",
+      "restored_sha256": "9e4391adcac372797dd3fd6b3fb28de5b7ca403ffa631c9a758550c1a4313b3a"
+    }
+  ]
+}

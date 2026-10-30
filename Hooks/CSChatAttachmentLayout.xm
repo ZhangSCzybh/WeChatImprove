@@ -104,357 +104,98 @@ static BOOL currentChatIsGroup = NO;
 static BOOL currentChatIsOfficial = NO;
 static NSString *currentChatID = nil;
 
-// 检查功能是否整体启用
-static BOOL isLayoutEnabled() {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kChatAttachmentLayoutEnabledKey];
+// BEGIN Attachment layout snapshot
+// The cache owns Foundation values only. Geometry and native frame side effects stay live.
+@interface CSAttachmentLayoutSnapshot : NSObject
+@property(nonatomic) NSUInteger revision, scene;
+@property(nonatomic,copy) NSString *chatID;
+@property(nonatomic) BOOL enabled, sorting;
+@property(nonatomic) int columns;
+@property(nonatomic) float spacing;
+@property(nonatomic,copy) NSArray<NSNumber *> *tags, *visiblePrefix;
+@property(nonatomic,copy) NSDictionary<NSNumber *,NSNumber *> *positions;
+@property(nonatomic,copy) NSSet *hidden;
+@end
+@implementation CSAttachmentLayoutSnapshot @end
+static NSUInteger CSAttachmentLayoutRevision;
+static CSAttachmentLayoutSnapshot *CSAttachmentLayoutCached;
+static void CSAttachmentLayoutInvalidate(void) {
+    CSAttachmentLayoutRevision++;CSAttachmentLayoutCached=nil;
 }
-
-// 获取列数设置
-static int getColumnsCount() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    int columns = [defaults objectForKey:kChatAttachmentColumnsKey] ? 
-                 [defaults integerForKey:kChatAttachmentColumnsKey] : kDefaultColumns;
-    return columns;
+static void CSAttachmentLayoutObserveSettings(NSUserDefaults *defaults) {
+    [NSNotificationCenter.defaultCenter addObserverForName:@"CSChatAttachmentLayoutSettingsChanged"
+        object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) {
+            CSAttachmentLayoutInvalidate();
+        }];
+    [NSNotificationCenter.defaultCenter addObserverForName:NSUserDefaultsDidChangeNotification
+        object:defaults queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) {
+            CSAttachmentLayoutInvalidate();
+        }];
 }
-
-// 获取间距设置
-static float getSpacing() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    float spacing = [defaults objectForKey:kChatAttachmentSpacingKey] ? 
-                   [defaults floatForKey:kChatAttachmentSpacingKey] : kDefaultSpacing;
-    
-    // 使用基础间距加上自定义间距
-    float totalSpacing = kBaseSpacing + spacing;
-    return totalSpacing;
+static NSUInteger CSAttachmentLayoutScene(void) {
+    return currentChatIsOfficial ? 3 : currentChatIsPrivate ? 1 : currentChatIsGroup ? 2 : 0;
 }
-
-// 检查公众号排序功能是否启用
-static BOOL isOfficialSortEnabled() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults boolForKey:kChatAttachmentOfficialSortEnabledKey];
+static NSArray *CSAttachmentDefaultTags(NSUInteger scene) {
+    static NSArray *officialTags, *privateTags, *groupTags;
+    static dispatch_once_t once;dispatch_once(&once, ^{
+        officialTags=@[@(kTagPhoto),@(kTagCamera),@(kTagLocation),@(kTagVoiceInput),@(kTagFavorite),@(kTagContact)];
+        privateTags=@[@(kPrivateTagPhoto),@(kPrivateTagCamera),@(kPrivateTagVideoCall),@(kPrivateTagLocation),@(kPrivateTagRedPacket),@(kPrivateTagGift),@(kPrivateTagTransfer),@(kPrivateTagVoiceInput),@(kPrivateTagFavorite),@(kPrivateTagContact),@(kPrivateTagFile),@(kPrivateTagCard),@(kPrivateTagMusic)];
+        groupTags=@[@(kGroupTagPhoto),@(kGroupTagCamera),@(kGroupTagVoiceCall),@(kGroupTagLocation),@(kGroupTagRedPacket),@(kGroupTagGift),@(kGroupTagTransfer),@(kGroupTagVoiceInput),@(kGroupTagFavorite),@(kGroupTagGroupTool),@(kGroupTagChain),@(kGroupTagLiveStream),@(kGroupTagContact),@(kGroupTagFile),@(kGroupTagCard),@(kGroupTagMusic)];
+    });
+    return scene==3 ? officialTags : scene==2 ? groupTags : privateTags;
 }
-
-// 获取公众号自定义排序顺序
-static NSArray *getOfficialSortOrder() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *sortOrder = [defaults arrayForKey:kChatAttachmentOfficialSortOrderKey];
-    
-    // 如果没有保存过排序或者数组为空，返回默认排序
-    if (!sortOrder || sortOrder.count == 0) {
-        sortOrder = @[
-            @(kTagPhoto),      // 照片
-            @(kTagCamera),     // 拍摄
-            @(kTagLocation),   // 位置
-            @(kTagVoiceInput), // 语音输入
-            @(kTagFavorite),   // 收藏
-            @(kTagContact)     // 个人名片
-        ];
-        // 保存默认排序
-        [defaults setObject:sortOrder forKey:kChatAttachmentOfficialSortOrderKey];
-        [defaults synchronize];
+static CSAttachmentLayoutSnapshot *CSAttachmentLayoutConfiguration(void) {
+    NSUInteger scene=CSAttachmentLayoutScene();NSString *chatID=currentChatID ?: @"";
+    CSAttachmentLayoutSnapshot *cached=CSAttachmentLayoutCached;
+    if (cached && cached.revision==CSAttachmentLayoutRevision && cached.scene==scene && [cached.chatID isEqual:chatID]) return cached;
+    NSUserDefaults *defaults=NSUserDefaults.standardUserDefaults;
+    CSAttachmentLayoutSnapshot *snapshot=[CSAttachmentLayoutSnapshot new];
+    snapshot.scene=scene;snapshot.chatID=chatID;snapshot.tags=CSAttachmentDefaultTags(scene);
+    snapshot.enabled=[defaults boolForKey:kChatAttachmentLayoutEnabledKey];
+    if (snapshot.enabled) {
+        NSString *showKey=scene==3 ? kChatAttachmentShowInOfficialKey : scene==2 ? kChatAttachmentShowInGroupKey : kChatAttachmentShowInPrivateKey;
+        snapshot.enabled=[defaults boolForKey:showKey];
     }
-    
-    return sortOrder;
-}
-
-// 根据按钮索引获取公众号对应的Tag
-static int getOfficialButtonTagAtIndex(unsigned int index) {
-    // 公众号按钮的默认tag顺序
-    static int defaultOfficialTags[] = {
-        kTagPhoto,      // 照片 - 18000
-        kTagCamera,     // 拍摄 - 18001
-        kTagLocation,   // 位置 - 18002
-        kTagVoiceInput, // 语音输入 - 18003
-        kTagFavorite,   // 收藏 - 18004
-        kTagContact     // 个人名片 - 18005
-    };
-    
-    // 如果索引超出范围，返回原始索引对应的Tag
-    if (index >= 6) {
-        return defaultOfficialTags[index % 6];
+    snapshot.columns=kDefaultColumns;snapshot.spacing=kBaseSpacing+kDefaultSpacing;
+    snapshot.hidden=[NSSet set];snapshot.positions=@{};snapshot.visiblePrefix=@[@0];
+    if (snapshot.enabled) {
+        snapshot.columns=[defaults objectForKey:kChatAttachmentColumnsKey] ? (int)[defaults integerForKey:kChatAttachmentColumnsKey] : kDefaultColumns;
+        snapshot.spacing=kBaseSpacing+([defaults objectForKey:kChatAttachmentSpacingKey] ? [defaults floatForKey:kChatAttachmentSpacingKey] : kDefaultSpacing);
+        NSString *sortKey=scene==3 ? kChatAttachmentOfficialSortEnabledKey : scene==2 ? kChatAttachmentGroupSortEnabledKey : kChatAttachmentPrivateSortEnabledKey;
+        snapshot.sorting=scene!=0 && [defaults boolForKey:sortKey];
+        if (snapshot.sorting) {
+            NSString *orderKey=scene==3 ? kChatAttachmentOfficialSortOrderKey : scene==2 ? kChatAttachmentGroupSortOrderKey : kChatAttachmentPrivateSortOrderKey;
+            NSString *hiddenKey=scene==3 ? kChatAttachmentOfficialHiddenButtonsKey : scene==2 ? kChatAttachmentGroupHiddenButtonsKey : kChatAttachmentPrivateHiddenButtonsKey;
+            NSArray *order=[[defaults arrayForKey:orderKey] copy];
+            // Preserve the original lazy default initialization, including empty orders.
+            if (!order.count) { order=snapshot.tags;[defaults setObject:order forKey:orderKey];[defaults synchronize]; }
+            snapshot.hidden=[NSSet setWithArray:[defaults arrayForKey:hiddenKey] ?: @[]];
+            NSMutableDictionary *positions=[NSMutableDictionary dictionary];
+            NSMutableArray *prefix=[NSMutableArray arrayWithObject:@0];NSUInteger visible=0;
+            for (id tag in order) {
+                if (!positions[tag]) positions[tag]=@(prefix.count-1); // indexOfObject used the first occurrence.
+                if (![snapshot.hidden containsObject:tag]) visible++;
+                [prefix addObject:@(visible)];
+            }
+            snapshot.positions=positions;snapshot.visiblePrefix=prefix;
+        }
     }
-    
-    return defaultOfficialTags[index];
+    snapshot.revision=CSAttachmentLayoutRevision;CSAttachmentLayoutCached=snapshot;return snapshot;
 }
-
-// 检查私聊排序功能是否启用
-static BOOL isPrivateSortEnabled() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults boolForKey:kChatAttachmentPrivateSortEnabledKey];
-}
-
-// 检查群聊排序功能是否启用
-static BOOL isGroupSortEnabled() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults boolForKey:kChatAttachmentGroupSortEnabledKey];
-}
-
-// 根据按钮索引获取私聊对应的Tag
-static int getPrivateButtonTagAtIndex(unsigned int index) {
-    // 私聊按钮的默认tag顺序
-    static int defaultPrivateTags[] = {
-        kPrivateTagPhoto,       // 照片 - 18000
-        kPrivateTagCamera,      // 拍摄 - 18001
-        kPrivateTagVideoCall,   // 视频通话 - 18002
-        kPrivateTagLocation,    // 位置 - 18003
-        kPrivateTagRedPacket,   // 红包 - 18004
-        kPrivateTagGift,        // 礼物 - 18005
-        kPrivateTagTransfer,    // 转账 - 18006
-        kPrivateTagVoiceInput,  // 语音输入 - 18007
-        kPrivateTagFavorite,    // 收藏 - 18008
-        kPrivateTagContact,     // 个人名片 - 18009
-        kPrivateTagFile,        // 文件 - 18010
-        kPrivateTagCard,        // 卡券 - 18011
-        kPrivateTagMusic        // 音乐 - 18012
-    };
-    
-    // 如果索引超出范围，返回原始索引对应的Tag
-    if (index >= 13) {
-        return defaultPrivateTags[index % 13];
+static CGRect CSAttachmentLayoutFrame(CSAttachmentLayoutSnapshot *config,unsigned int index,CGFloat width) {
+    NSUInteger mapped=index;
+    if (config.sorting) {
+        NSNumber *tag=config.tags[index % config.tags.count];
+        if ([config.hidden containsObject:tag]) return CGRectMake(width*100,0,0,0);
+        NSNumber *position=config.positions[tag];if (position) mapped=position.unsignedIntegerValue;
     }
-    
-    return defaultPrivateTags[index];
+    // Preserve existing no-sort and unknown-index placement semantics.
+    NSUInteger visible=[config.visiblePrefix[MIN(mapped,config.visiblePrefix.count-1)] unsignedIntegerValue];
+    NSUInteger perPage=(NSUInteger)config.columns*2, page=visible/perPage, inPage=visible%perPage;
+    CGFloat start=(width-(65.0*config.columns+config.spacing*(config.columns-1)))/2.0;
+    return CGRectMake(start+(inPage%config.columns)*(65.0+config.spacing)+page*width,(inPage/config.columns)*96.0,65.0,96.0);
 }
-
-// 获取私聊自定义排序顺序
-static NSArray *getPrivateSortOrder() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *sortOrder = [defaults arrayForKey:kChatAttachmentPrivateSortOrderKey];
-    
-    // 如果没有保存过排序或者数组为空，返回默认排序
-    if (!sortOrder || sortOrder.count == 0) {
-        sortOrder = @[
-            @(kPrivateTagPhoto),       // 照片
-            @(kPrivateTagCamera),      // 拍摄
-            @(kPrivateTagVideoCall),   // 视频通话
-            @(kPrivateTagLocation),    // 位置
-            @(kPrivateTagRedPacket),   // 红包
-            @(kPrivateTagGift),        // 礼物
-            @(kPrivateTagTransfer),    // 转账
-            @(kPrivateTagVoiceInput),  // 语音输入
-            @(kPrivateTagFavorite),    // 收藏
-            @(kPrivateTagContact),     // 个人名片
-            @(kPrivateTagFile),        // 文件
-            @(kPrivateTagCard),        // 卡券
-            @(kPrivateTagMusic)        // 音乐
-        ];
-        // 保存默认排序
-        [defaults setObject:sortOrder forKey:kChatAttachmentPrivateSortOrderKey];
-        [defaults synchronize];
-    }
-    
-    return sortOrder;
-}
-
-// 根据自定义排序顺序映射私聊按钮索引
-static unsigned int mapPrivateButtonIndexByCustomSort(unsigned int originalIndex) {
-    // 获取自定义排序顺序
-    NSArray *sortOrder = getPrivateSortOrder();
-    
-    // 获取原始按钮的Tag
-    int originalTag = getPrivateButtonTagAtIndex(originalIndex);
-    
-    // 在自定义排序中查找该Tag的位置
-    NSUInteger newPosition = [sortOrder indexOfObject:@(originalTag)];
-    
-    // 如果找不到，返回原始索引
-    if (newPosition == NSNotFound) {
-        return originalIndex;
-    }
-    
-    return (unsigned int)newPosition;
-}
-
-// 根据自定义排序顺序映射按钮索引
-static unsigned int mapButtonIndexByCustomSort(unsigned int originalIndex) {
-    // 获取自定义排序顺序
-    NSArray *sortOrder = getOfficialSortOrder();
-    
-    // 获取原始按钮的Tag
-    int originalTag = getOfficialButtonTagAtIndex(originalIndex);
-    
-    // 在自定义排序中查找该Tag的位置
-    NSUInteger newPosition = [sortOrder indexOfObject:@(originalTag)];
-    
-    // 如果找不到，返回原始索引
-    if (newPosition == NSNotFound) {
-        return originalIndex;
-    }
-    
-    return (unsigned int)newPosition;
-}
-
-// 获取群聊自定义排序顺序
-static NSArray *getGroupSortOrder() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *sortOrder = [defaults arrayForKey:kChatAttachmentGroupSortOrderKey];
-    
-    // 如果没有保存过排序或者数组为空，返回默认排序
-    if (!sortOrder || sortOrder.count == 0) {
-        sortOrder = @[
-            @(kGroupTagPhoto),        // 照片
-            @(kGroupTagCamera),       // 拍摄
-            @(kGroupTagVoiceCall),    // 语音通话
-            @(kGroupTagLocation),     // 位置
-            @(kGroupTagRedPacket),    // 红包
-            @(kGroupTagGift),         // 礼物
-            @(kGroupTagTransfer),     // 转账
-            @(kGroupTagVoiceInput),   // 语音输入
-            @(kGroupTagFavorite),     // 收藏
-            @(kGroupTagGroupTool),    // 群工具
-            @(kGroupTagChain),        // 接龙
-            @(kGroupTagLiveStream),   // 直播
-            @(kGroupTagContact),      // 个人名片
-            @(kGroupTagFile),         // 文件
-            @(kGroupTagCard),         // 卡券
-            @(kGroupTagMusic)         // 音乐
-        ];
-        // 保存默认排序
-        [defaults setObject:sortOrder forKey:kChatAttachmentGroupSortOrderKey];
-        [defaults synchronize];
-    }
-    
-    return sortOrder;
-}
-
-// 根据按钮索引获取群聊对应的Tag
-static int getGroupButtonTagAtIndex(unsigned int index) {
-    // 群聊按钮的默认tag顺序
-    static int defaultGroupTags[] = {
-        kGroupTagPhoto,        // 照片 - 18000
-        kGroupTagCamera,       // 拍摄 - 18001
-        kGroupTagVoiceCall,    // 语音通话 - 18002
-        kGroupTagLocation,     // 位置 - 18003
-        kGroupTagRedPacket,    // 红包 - 18004
-        kGroupTagGift,         // 礼物 - 18005
-        kGroupTagTransfer,     // 转账 - 18006
-        kGroupTagVoiceInput,   // 语音输入 - 18007
-        kGroupTagFavorite,     // 收藏 - 18008
-        kGroupTagGroupTool,    // 群工具 - 18009
-        kGroupTagChain,        // 接龙 - 18010
-        kGroupTagLiveStream,   // 直播 - 18011
-        kGroupTagContact,      // 个人名片 - 18012
-        kGroupTagFile,         // 文件 - 18013
-        kGroupTagCard,         // 卡券 - 18014
-        kGroupTagMusic         // 音乐 - 18015
-    };
-    
-    // 如果索引超出范围，返回原始索引对应的Tag
-    if (index >= 16) {
-        return defaultGroupTags[index % 16];
-    }
-    
-    return defaultGroupTags[index];
-}
-
-// 根据自定义排序顺序映射群聊按钮索引
-static unsigned int mapGroupButtonIndexByCustomSort(unsigned int originalIndex) {
-    // 获取自定义排序顺序
-    NSArray *sortOrder = getGroupSortOrder();
-    
-    // 获取原始按钮的Tag
-    int originalTag = getGroupButtonTagAtIndex(originalIndex);
-    
-    // 在自定义排序中查找该Tag的位置
-    NSUInteger newPosition = [sortOrder indexOfObject:@(originalTag)];
-    
-    // 如果找不到，返回原始索引
-    if (newPosition == NSNotFound) {
-        return originalIndex;
-    }
-    
-    return (unsigned int)newPosition;
-}
-
-// 获取公众号隐藏按钮列表
-static NSArray *getOfficialHiddenButtons() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *hiddenButtons = [defaults arrayForKey:kChatAttachmentOfficialHiddenButtonsKey];
-    
-    // 如果没有保存过隐藏按钮或者数组为空，返回空数组
-    if (!hiddenButtons) {
-        return @[];
-    }
-    
-    return hiddenButtons;
-}
-
-// 获取私聊隐藏按钮列表
-static NSArray *getPrivateHiddenButtons() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *hiddenButtons = [defaults arrayForKey:kChatAttachmentPrivateHiddenButtonsKey];
-    
-    // 如果没有保存过隐藏按钮或者数组为空，返回空数组
-    if (!hiddenButtons) {
-        return @[];
-    }
-    
-    return hiddenButtons;
-}
-
-// 获取群聊隐藏按钮列表
-static NSArray *getGroupHiddenButtons() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *hiddenButtons = [defaults arrayForKey:kChatAttachmentGroupHiddenButtonsKey];
-    
-    // 如果没有保存过隐藏按钮或者数组为空，返回空数组
-    if (!hiddenButtons) {
-        return @[];
-    }
-    
-    return hiddenButtons;
-}
-
-// 判断公众号按钮是否被隐藏
-static BOOL isOfficialButtonHidden(int buttonTag) {
-    NSArray *hiddenButtons = getOfficialHiddenButtons();
-    return [hiddenButtons containsObject:@(buttonTag)];
-}
-
-// 判断私聊按钮是否被隐藏
-static BOOL isPrivateButtonHidden(int buttonTag) {
-    NSArray *hiddenButtons = getPrivateHiddenButtons();
-    return [hiddenButtons containsObject:@(buttonTag)];
-}
-
-// 判断群聊按钮是否被隐藏
-static BOOL isGroupButtonHidden(int buttonTag) {
-    NSArray *hiddenButtons = getGroupHiddenButtons();
-    return [hiddenButtons containsObject:@(buttonTag)];
-}
-
-// 判断当前聊天环境是否应该启用布局功能
-static BOOL shouldEnableLayout() {
-    // 如果总开关关闭，直接返回false
-    if (!isLayoutEnabled()) {
-        return NO;
-    }
-    
-    // 记录场景设置状态
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    BOOL showInPrivate = [defaults boolForKey:kChatAttachmentShowInPrivateKey];
-    BOOL showInGroup = [defaults boolForKey:kChatAttachmentShowInGroupKey];
-    BOOL showInOfficial = [defaults boolForKey:kChatAttachmentShowInOfficialKey];
-    
-    // 根据已存储的聊天类型判断是否应该启用
-    BOOL shouldEnable = NO;
-    
-    if (currentChatIsOfficial) {
-        // 公众号聊天
-        shouldEnable = showInOfficial;
-    } else if (currentChatIsGroup) {
-        // 群聊
-        shouldEnable = showInGroup;
-    } else if (currentChatIsPrivate) {
-        // 私聊
-        shouldEnable = showInPrivate;
-    } else {
-        // 其他未知类型，启用布局功能但保持默认排序
-        shouldEnable = showInPrivate; // 使用私聊设置作为默认行为
-    }
-    
-    return shouldEnable;
-}
+// END Attachment layout snapshot
 
 // 钩住BaseMsgContentViewController来识别聊天类型
 %hook BaseMsgContentViewController
@@ -549,6 +290,8 @@ static BOOL shouldEnableLayout() {
 
 // 钩住layoutSubviews来观察整体布局和保存实际宽度
 - (void)layoutSubviews {
+    // Recheck effective preferences once per native layout, including external changes.
+    CSAttachmentLayoutInvalidate();
     %orig;
     
     // 保存实际宽度
@@ -557,130 +300,11 @@ static BOOL shouldEnableLayout() {
 
 // 完全重写计算方法，使用我们存储的视图实际宽度
 - (struct CGRect)calculateEmoticonViewFrameAtIndex:(unsigned int)arg1 forViewWidth:(double)arg2 {
-    // 检查当前聊天环境是否应该启用布局功能
-    if (!shouldEnableLayout()) {
-        return %orig(arg1, arg2);
-    }
-    
-    // 首先记录原始索引
-    unsigned int originalIndex = arg1;
-    unsigned int mappedIndex = originalIndex;
-    
-    // 检查按钮是否被隐藏
-    BOOL isHidden = NO;
-    int buttonTag = 0;
-    
-    // 如果是公众号聊天并且启用了自定义排序
-    if (currentChatIsOfficial && isOfficialSortEnabled()) {
-        // 获取原始Tag
-        buttonTag = getOfficialButtonTagAtIndex(originalIndex);
-        // 检查是否被隐藏
-        isHidden = isOfficialButtonHidden(buttonTag);
-        // 对按钮索引进行映射
-        mappedIndex = mapButtonIndexByCustomSort(originalIndex);
-    }
-    // 如果是私聊并且启用了自定义排序
-    else if (currentChatIsPrivate && isPrivateSortEnabled()) {
-        // 获取原始Tag
-        buttonTag = getPrivateButtonTagAtIndex(originalIndex);
-        // 检查是否被隐藏
-        isHidden = isPrivateButtonHidden(buttonTag);
-        // 对按钮索引进行映射
-        mappedIndex = mapPrivateButtonIndexByCustomSort(originalIndex);
-    }
-    // 如果是群聊并且启用了自定义排序
-    else if (currentChatIsGroup && isGroupSortEnabled()) {
-        // 获取原始Tag
-        buttonTag = getGroupButtonTagAtIndex(originalIndex);
-        // 检查是否被隐藏
-        isHidden = isGroupButtonHidden(buttonTag);
-        // 对按钮索引进行映射
-        mappedIndex = mapGroupButtonIndexByCustomSort(originalIndex);
-    }
-    // 未知类型聊天不参与排序，直接使用原始索引
-    
-    // 调用原始方法，但不使用其返回值
+    CSAttachmentLayoutSnapshot *config=CSAttachmentLayoutConfiguration();
+    if (!config.enabled) return %orig(arg1,arg2);
+    // Native implementations may update bookkeeping; retain the original call.
     %orig;
-    
-    // 使用我们存储的真实视图宽度而不是arg2
-    double screenWidth = viewWidth;
-    
-    // 如果按钮被隐藏，将其移到屏幕外非常远的位置
-    if (isHidden) {
-        // 创建一个在屏幕外非常远的frame（使用一个非常大的值，确保用户无法滑动到）
-        return CGRectMake(screenWidth * 100, 0, 0, 0);
-    }
-    
-    // 使用自定义的列数
-    int columnsPerRow = getColumnsCount();
-    int buttonsPerPage = columnsPerRow * 2;
-    
-    // 获取当前聊天类型中隐藏的按钮数组
-    NSArray *hiddenButtons = @[];
-    if (currentChatIsOfficial && isOfficialSortEnabled()) {
-        hiddenButtons = getOfficialHiddenButtons();
-    } else if (currentChatIsPrivate && isPrivateSortEnabled()) {
-        hiddenButtons = getPrivateHiddenButtons();
-    } else if (currentChatIsGroup && isGroupSortEnabled()) {
-        hiddenButtons = getGroupHiddenButtons();
-    }
-    
-    // 计算当前显示位置的偏移量 - 根据前面被隐藏的按钮数量
-    int visibleButtonIndex = 0;
-    NSArray *sortOrder = @[];
-    
-    if (currentChatIsOfficial && isOfficialSortEnabled()) {
-        sortOrder = getOfficialSortOrder();
-    } else if (currentChatIsPrivate && isPrivateSortEnabled()) {
-        sortOrder = getPrivateSortOrder();
-    } else if (currentChatIsGroup && isGroupSortEnabled()) {
-        sortOrder = getGroupSortOrder();
-    }
-    
-    // 计算在排序序列中该按钮前有多少个被隐藏的按钮
-    for (int i = 0; i < mappedIndex && i < sortOrder.count; i++) {
-        NSNumber *currentTag = sortOrder[i];
-        if ([hiddenButtons containsObject:currentTag]) {
-            // 前面有按钮被隐藏，需要减少实际显示的索引
-            visibleButtonIndex--;
-        }
-        visibleButtonIndex++;
-    }
-    
-    // 使用调整后的可见索引计算位置
-    // 计算按钮应该在哪一页
-    unsigned long long page = visibleButtonIndex / buttonsPerPage;
-    
-    // 计算在当前页中的索引（从0开始）
-    unsigned long long indexInPage = visibleButtonIndex % buttonsPerPage;
-    
-    // 计算在当前页中的行和列
-    unsigned long long row = indexInPage / columnsPerRow;
-    unsigned long long col = indexInPage % columnsPerRow;
-    
-    // 获取按钮间距
-    float spacing = getSpacing();
-    
-    // 计算按钮的宽度和高度
-    double itemHeight = 96.0; // 保持原始高度
-    
-    // 计算每个按钮的宽度
-    double buttonWidth = 65.0; // 微信默认按钮宽度
-    
-    // 计算整行按钮加间距的总宽度
-    double totalRowWidth = (buttonWidth * columnsPerRow) + (spacing * (columnsPerRow - 1));
-    
-    // 计算起始X坐标以居中整行
-    double startX = (screenWidth - totalRowWidth) / 2.0;
-    
-    // 计算当前按钮的X、Y坐标
-    double x = startX + (col * (buttonWidth + spacing));
-    double y = (row * itemHeight); // 每行的高度为itemHeight
-    
-    // 创建页面偏移的frame
-    CGRect newFrame = CGRectMake(x + (page * screenWidth), y, buttonWidth, itemHeight);
-    
-    return newFrame;
+    return CSAttachmentLayoutFrame(config,arg1,viewWidth);
 }
 
 %end
@@ -722,13 +346,7 @@ static BOOL shouldEnableLayout() {
         // 同步设置
         [defaults synchronize];
 
-        // 注册通知监听
-        [[NSNotificationCenter defaultCenter] addObserverForName:@"CSChatAttachmentLayoutSettingsChanged"
-                                                         object:nil
-                                                          queue:[NSOperationQueue mainQueue]
-                                                     usingBlock:^(NSNotification *notification) {
-            // 设置已更新
-        }];
+        CSAttachmentLayoutObserveSettings(defaults);
         %init;
     });
 }

@@ -5,7 +5,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CSAIReplyCoordinator;
 @protocol CSAIReplyCoordinatorDelegate <NSObject>
 - (BOOL)coordinator:(CSAIReplyCoordinator *)coordinator allowsConversation:(NSString *)conversation;
-- (nullable NSString *)credentialForCoordinator:(CSAIReplyCoordinator *)coordinator error:(NSError **)error;
+- (id<CSAICancellable>)credentialForCoordinator:(CSAIReplyCoordinator *)coordinator completion:(CSAICompletion)completion;
 /// Returns submitted, unknown or failed. Must execute valid immediately at the native boundary.
 - (NSString *)coordinator:(CSAIReplyCoordinator *)coordinator submitText:(NSString *)text conversation:(NSString *)conversation valid:(BOOL (^)(void))valid;
 @end

@@ -1,0 +1,3 @@
+Command: bash Tests/verify-ai-manager.sh
+Exit: 0
+AI reply manager: 501 checks passed

@@ -1,0 +1,12 @@
+{
+  "command": [
+    "shasum",
+    "-a",
+    "256",
+    "-c",
+    "SHA256SUMS"
+  ],
+  "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.1-16-performance",
+  "exit_code": 0,
+  "stdout": "com.wechat.improve_2.1-16_iphoneos-arm.deb: OK\ncom.wechat.improve_2.1-16_iphoneos-arm64.deb: OK\ncom.wechat.improve_2.1-16_symbols.zip: OK\n"
+}

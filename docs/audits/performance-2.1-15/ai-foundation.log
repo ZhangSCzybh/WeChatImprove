@@ -1,0 +1,2 @@
+AIReplyStoreTests passed: legacy capability defaults/fingerprint, provider validation, immutable inputs, portable capabilities, atomic claims, bounds, account isolation, corruption and failed writes
+AIClientTests passed: generic/Bailian CC, search modes, strict image/request bounds, fragmented SSE, terminal/error handling, cancellation, immutable inputs, safe HTTP failures and credential isolation

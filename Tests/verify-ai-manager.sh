@@ -22,4 +22,18 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecat
  "$test_dir/AIStoreUnderTest.m" Controllers/CSAIClient.m Controllers/CSAIReplyCoordinator.m Controllers/CSAIMessageAdapter.m Controllers/CSAIBackgroundSync.m \
  Controllers/CSAIImagePreparer.m Controllers/CSAIReplyManager.m Controllers/CSBackupMutation.m Controllers/CSCloseFriendPolicy.m \
  Controllers/CSCloseFriendAutomationProjection.m Tests/AIReplyManagerTests.m -o "$test_dir/tests"
-"$test_dir/tests" "$test_dir/state.plist"
+test_output=$("$test_dir/tests" "$test_dir/state.plist")
+printf '%s\n' "$test_output"
+if [[ "$test_output" != 'AI reply manager: 850 checks passed' ]]; then
+ printf 'Unexpected AI reply manager check count (expected 850).\n' >&2
+ exit 1
+fi
+if [[ "${1:-}" == "--ios" ]]; then
+ sdk_dir=$(xcrun --sdk iphoneos --show-sdk-path)
+ for arch in arm64 arm64e; do
+  xcrun --sdk iphoneos clang -target "$arch-apple-ios15.0" -isysroot "$sdk_dir" \
+   -fobjc-arc -fblocks -Wall -Wextra -Werror -IControllers \
+   -c Controllers/CSAIReplyManager.m -o "$test_dir/manager.$arch.o"
+ done
+ printf 'AI reply manager iOS: arm64 + arm64e source objects compiled\n'
+fi

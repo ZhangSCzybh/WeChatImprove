@@ -438,15 +438,10 @@ static const NSTimeInterval AIContextIdleTTL=30*60;
     }else [self record:batch result:@"failed" detail:@"未通过最终发送校验或提交失败"];
     [self processPending];
 }
-- (void)generateBatch:(CSAIReplyBatch *)batch imageURL:(NSString *)imageURL {
+- (void)generateBatch:(CSAIReplyBatch *)batch imageURL:(NSString *)imageURL credential:(NSString *)key {
     if(![self isCurrent:batch]){[self cancelBatch:batch];[self clearContextsForConversation:batch.conversation];[self processPending];return;}
     batch.preparingImage=NO;
     batch.phase++;NSUInteger phase=batch.phase;
-    NSError *error=nil;NSString *key=[self.delegate credentialForCoordinator:self error:&error];
-    if(!key.length || error || ![self isCurrent:batch]){
-        if(self.active[batch.conversation]==batch){[self cancelBatch:batch];[self record:batch result:@"failed" detail:@"凭据或当前会话状态不可用"];}
-        [self processPending];return;
-    }
     NSMutableArray *messages=[[self contextForKey:batch.contextKey] mutableCopy]?:[NSMutableArray array];
     batch.contextCacheEpoch=self.contextCacheEpoch;
     NSString *input=batch.text.length?batch.text:@"请识别这张图片，并简洁回答。";
@@ -462,6 +457,27 @@ static const NSTimeInterval AIContextIdleTTL=30*60;
         else dispatch_async(dispatch_get_main_queue(),^{[weakSelf finishBatch:batch text:text error:failure];});
     }];
     // A fake or preflight failure may complete inline; never attach that old task to a replacement.
+    if(self.active[batch.conversation]==batch && batch.phase==phase)batch.task=task;else [task cancel];
+}
+- (void)generateBatch:(CSAIReplyBatch *)batch imageURL:(NSString *)imageURL {
+    if(![self isCurrent:batch]){[self cancelBatch:batch];[self clearContextsForConversation:batch.conversation];[self processPending];return;}
+    batch.preparingImage=NO;
+    batch.phase++;NSUInteger phase=batch.phase;
+    __weak typeof(self) weakSelf=self;__weak CSAIReplyBatch *weakBatch=batch;
+    id<CSAICancellable> task=[self.delegate credentialForCoordinator:self completion:^(NSString *key,NSError *error){
+        void (^complete)(void)=^{
+            typeof(self) self=weakSelf;CSAIReplyBatch *live=weakBatch;
+            if(!self || !live || self.active[live.conversation]!=live || live.phase!=phase)return;
+            live.task=nil;
+            if(!key.length || error || ![self isCurrent:live]){
+                if(self.active[live.conversation]==live){[self cancelBatch:live];[self record:live result:@"failed" detail:@"凭据或当前会话状态不可用"];}
+                [self processPending];return;
+            }
+            [self generateBatch:live imageURL:imageURL credential:key];
+        };
+        if(NSThread.isMainThread)complete();else dispatch_async(dispatch_get_main_queue(),complete);
+    }];
+    // Inline delegates may already have attached the network operation.
     if(self.active[batch.conversation]==batch && batch.phase==phase)batch.task=task;else [task cancel];
 }
 - (void)startBatch:(CSAIReplyBatch *)batch {

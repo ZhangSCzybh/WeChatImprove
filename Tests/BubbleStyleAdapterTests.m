@@ -31,6 +31,27 @@ BOOL CSMessageMergeReadAppearance(id model, CSMessageMergeDecision *decision) {
 @property(nonatomic) unsigned long long position;
 @end
 @implementation BubbleInfo @end
+// A different actual class may expose the same selector with another integer ABI,
+// even when -class reports the ordinary native class.
+@interface AlternateBubbleInfo : NSObject
+@property(nonatomic) unsigned int position;
+@end
+@implementation AlternateBubbleInfo
+- (Class)class { return BubbleInfo.class; }
+@end
+static NSUInteger invalidPositionReads;
+@interface InvalidBubbleInfo : NSObject
+- (id)position;
+@end
+@implementation InvalidBubbleInfo
+- (Class)class { return BubbleInfo.class; }
+- (id)position { invalidPositionReads++;return @0; }
+@end
+@interface LateBubbleInfo : NSObject @end
+@implementation LateBubbleInfo @end
+static unsigned long long LatePosition(id object, SEL selector) { return 0; }
+static NSUInteger replacementTypeReads;
+static unsigned int ReplacementMessageType(id object, SEL selector) { replacementTypeReads++;return 49; }
 @interface TextMessageViewModel : NSObject
 @property(nonatomic) BOOL isSender;
 @property(nonatomic, strong) BubbleWrap *messageWrap;
@@ -348,6 +369,22 @@ int main(void) { @autoreleasepool {
     id custom=cell.background->m_image; NSUInteger writes=cell.background.assignments;
     for (int i=0;i<100;i++) CSBubbleStyleApply(cell);
     CHECK(cell.background->m_image==custom && cell.background.assignments==writes);
+    // An ABI cache must still dispatch through a hook installed after its first hit.
+    Method typeGetter=class_getInstanceMethod(BubbleWrap.class,@selector(m_uiMessageType));
+    IMP nativeTypeGetter=method_setImplementation(typeGetter,(IMP)ReplacementMessageType);
+    CSBubbleStyleApply(cell);CHECK(replacementTypeReads>0 && cell.background->m_image==baseline);
+    method_setImplementation(typeGetter,nativeTypeGetter);
+    CSBubbleStyleApply(cell);CHECK(cell.background->m_image!=baseline);
+    BubbleInfo *ordinaryInfo=model.bgBubbleInfo;
+    AlternateBubbleInfo *alternate=[AlternateBubbleInfo new];alternate.position=1;model.bgBubbleInfo=(id)alternate;
+    CSBubbleStyleApply(cell);id alternateShape=cell.background->m_image;CHECK(alternateShape!=baseline);
+    alternate.position=3;CSBubbleStyleApply(cell);CHECK(cell.background->m_image!=alternateShape);
+    model.bgBubbleInfo=(id)[InvalidBubbleInfo new];CSBubbleStyleApply(cell);
+    CHECK(invalidPositionReads==0 && cell.background->m_image==baseline);
+    model.bgBubbleInfo=(id)[LateBubbleInfo new];CSBubbleStyleApply(cell);CHECK(cell.background->m_image==baseline);
+    CHECK(class_addMethod(LateBubbleInfo.class,@selector(position),(IMP)LatePosition,"Q@:"));
+    CSBubbleStyleApply(cell);CHECK(cell.background->m_image!=baseline);
+    model.bgBubbleInfo=ordinaryInfo;CSBubbleStyleApply(cell);custom=cell.background->m_image;
     cell.background.image=baseline; CHECK(cell.background->m_image==custom); Drain(); CHECK(cell.background->m_image==custom);
     YYImage *newBaseline=[YYImage imageWithUIImage:Native(.8)]; cell.background.image=newBaseline; Drain(); CHECK(cell.background->m_image!=newBaseline);
     Settings(NO); CHECK(cell.background->m_image==newBaseline); CHECK(cell.background->m_highlightedImage==nativeHighlight);

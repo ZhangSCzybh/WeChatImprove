@@ -5,9 +5,20 @@
 @property(nonatomic,strong) CSCloseFriendContactProjection *projection;
 @property(nonatomic,copy) NSArray *keys;
 @property(nonatomic,copy) NSDictionary *sections;
+@property(nonatomic,copy) NSString *accountID;
 @property(nonatomic) NSUInteger revision,epoch;
 @end
 @implementation CSCFContactsCache @end
+@interface CSCFContactsIndexRead : NSObject
+@property(nonatomic,weak) id logic;
+@property(nonatomic,strong) CSCloseFriendContactProjection *projection;
+@property(nonatomic,copy) NSString *accountID;
+@property(nonatomic) NSUInteger revision,epoch;
+@end
+@implementation CSCFContactsIndexRead @end
+// Only the synchronous native index-title builder owns this scope; never a reload,
+// run-loop turn, cell callback or time-based cache.
+static CSCFContactsIndexRead *ContactsIndexRead;
 static char ProjectionKey;
 static id (*OriginalKeys)(id,SEL);
 static id (*OriginalRows)(id,SEL,id);
@@ -16,10 +27,13 @@ static CSCloseFriendContactProjection *Project(id logic) {
     if(!OriginalKeys || !OriginalRows || !CSCFContactLogicSurface(logic,&surface)) return nil;
     CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
     if(![snapshot concealsSurface:surface]) {objc_setAssociatedObject(logic,&ProjectionKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);return nil;}
+    NSUInteger epoch=CSCloseFriendAccountEpoch();
+    CSCFContactsIndexRead *read=NSThread.isMainThread && ContactsIndexRead.logic==logic ? ContactsIndexRead : nil;
+    if(read.projection && read.revision==snapshot.revision && read.epoch==epoch && [read.accountID isEqual:snapshot.accountID]) return read.projection;
     NSArray *keys=OriginalKeys(logic,NSSelectorFromString(@"getKeysArray"));
     if(![keys isKindOfClass:NSArray.class])return nil;
     CSCFContactsCache *cache=objc_getAssociatedObject(logic,&ProjectionKey);
-    BOOL same=cache && cache.revision==snapshot.revision && cache.epoch==CSCloseFriendAccountEpoch() && [cache.keys isEqualToArray:keys];
+    BOOL same=cache && cache.revision==snapshot.revision && cache.epoch==epoch && [cache.accountID isEqual:snapshot.accountID] && [cache.keys isEqualToArray:keys];
     NSMutableDictionary *sections=same ? nil : [NSMutableDictionary dictionary];
     for(id key in keys) {
         id rows=OriginalRows(logic,NSSelectorFromString(@"getContactsArrayWith:"),key);
@@ -27,11 +41,19 @@ static CSCloseFriendContactProjection *Project(id logic) {
         if(same && ![cache.sections[key] isEqualToArray:rows]) {same=NO;sections=[cache.sections mutableCopy];}
         if(!same)sections[key]=[rows copy];
     }
-    if(same)return cache.projection;
-    cache=[CSCFContactsCache new]; cache.keys=[keys copy]; cache.sections=sections;
-    cache.revision=snapshot.revision; cache.epoch=CSCloseFriendAccountEpoch();
-    cache.projection=[[CSCloseFriendContactProjection alloc] initWithKeys:keys sections:sections snapshot:snapshot surface:surface identity:^NSString *(id item){return CSCloseFriendUserName(item);}];
-    objc_setAssociatedObject(logic,&ProjectionKey,cache,OBJC_ASSOCIATION_RETAIN_NONATOMIC);return cache.projection;
+    if(!same) {
+        cache=[CSCFContactsCache new]; cache.keys=[keys copy]; cache.sections=sections;
+        cache.revision=snapshot.revision; cache.epoch=epoch; cache.accountID=snapshot.accountID;
+        cache.projection=[[CSCloseFriendContactProjection alloc] initWithKeys:keys sections:sections snapshot:snapshot surface:surface identity:^NSString *(id item){return CSCloseFriendUserName(item);}];
+    }
+    CSCloseFriendSnapshot *latest=CSCloseFriendCurrentSnapshot();
+    if(epoch!=CSCloseFriendAccountEpoch() || latest.revision!=snapshot.revision || ![latest.accountID isEqual:snapshot.accountID]) {
+        read.projection=nil; objc_setAssociatedObject(logic,&ProjectionKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        return [[CSCloseFriendContactProjection alloc] initWithKeys:@[] sections:@{} snapshot:latest surface:surface identity:^NSString *(id item){return CSCloseFriendUserName(item);}];
+    }
+    objc_setAssociatedObject(logic,&ProjectionKey,cache,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    read.projection=cache.projection; read.revision=snapshot.revision; read.epoch=epoch; read.accountID=snapshot.accountID;
+    return cache.projection;
 }
 static id Keys(id self,SEL cmd) {CSCloseFriendContactProjection *p=Project(self);return p ? p.keys : OriginalKeys(self,cmd);}
 static id Rows(id self,SEL cmd,id key) {
@@ -39,8 +61,25 @@ static id Rows(id self,SEL cmd,id key) {
     CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
     if(![snapshot concealsSurface:surface])return OriginalRows(self,cmd,key);
     CSCFContactsCache *cache=objc_getAssociatedObject(self,&ProjectionKey);
-    CSCloseFriendContactProjection *p=cache && cache.revision==snapshot.revision && cache.epoch==CSCloseFriendAccountEpoch() ? cache.projection : Project(self);
+    CSCloseFriendContactProjection *p=cache && cache.revision==snapshot.revision && cache.epoch==CSCloseFriendAccountEpoch() && [cache.accountID isEqual:snapshot.accountID] ? cache.projection : Project(self);
     return p.sections[key] ?: @[];
+}
+static void InstallContactIndexRead(void) {
+    // WeChat 8.0.78: 0x1010edbb8 and 0x1010edc08 read getKeysArray twice,
+    // with only count + appending to a NEW local array in between. No source writes.
+    __block IMP original=NULL;
+    IMP replacement=imp_implementationWithBlock(^id(id owner,id table){
+        id logic=CSCloseFriendRead(owner,@"m_contactsDataLogic");
+        if(!NSThread.isMainThread || !logic || table!=CSCloseFriendRead(owner,@"m_tableView") || CSCloseFriendRead(logic,@"m_delegate")!=owner)
+            return ((id(*)(id,SEL,id))original)(owner,NSSelectorFromString(@"mmsectionIndexTitlesForTableView:"),table);
+        CSCFContactsIndexRead *previous=ContactsIndexRead;
+        // Unexpected native reentry starts a fresh verification for both scopes.
+        previous.projection=nil;
+        CSCFContactsIndexRead *read=[CSCFContactsIndexRead new]; read.logic=logic; ContactsIndexRead=read;
+        @try {return ((id(*)(id,SEL,id))original)(owner,NSSelectorFromString(@"mmsectionIndexTitlesForTableView:"),table);}
+        @finally {read.projection=nil; ContactsIndexRead=previous;}
+    });
+    if(!CSCloseFriendInstallHook(@"ContactsViewController",@"mmsectionIndexTitlesForTableView:",replacement,&original,"@@:@")) imp_removeBlock(replacement);
 }
 
 static void Hook0(NSString *cls,NSString *name,void (^body)(id,void(^)(void))) {
@@ -91,6 +130,7 @@ static void InstallContacts(void) {
         __block IMP count=NULL;
         IMP replacement=imp_implementationWithBlock(^unsigned int(id object){CSCloseFriendContactProjection *p=Project(object); return p ? (unsigned int)MIN(p.count,UINT_MAX) : ((unsigned int(*)(id,SEL))count)(object,NSSelectorFromString(@"getContactCount"));});
         if(!CSCloseFriendInstallHook(@"ContactsDataLogic",@"getContactCount",replacement,&count,"I@:")) imp_removeBlock(replacement);
+        InstallContactIndexRead();
     }
     FilterGetter(@"ContactsViewController",@"favourContactArray",CSCloseFriendSurfaceContact);
     FilterGetter(@"RecentForwardScrollView",@"contactsForRecentForwardMenu",CSCloseFriendSurfaceForward);

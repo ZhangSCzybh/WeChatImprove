@@ -9,6 +9,8 @@ typedef NS_ENUM(NSInteger, UIImageOrientation) { UIImageOrientationUp };
 @end
 @interface UIImageView : NSObject
 @property(nonatomic,strong) UIImage *image;
+@property(nonatomic,strong) id window;
+@property(nonatomic,weak) id superview;
 @end
 @interface UIScreen : NSObject
 @property(class,nonatomic,readonly) UIScreen *mainScreen;

@@ -1,0 +1,351 @@
+{
+  "target": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "static_only": true,
+  "target_executed": false,
+  "producer": "read-only mmap ObjC metadata and bounded xcrun llvm-objdump; not REA function Evidence",
+  "rea_session": "binary_session confirmed no active target; existing same-target audit records costly Ghidra import, so bounded parser reused",
+  "limitations": [
+    "No device, response, server-coverage or runtime thread observation.",
+    "Annotations are direct ADRP/load decoding aids; raw instructions and metadata remain evidence."
+  ],
+  "methods": [
+    {
+      "class": "NewSyncService",
+      "kind": "instance",
+      "selector": "isGettingData",
+      "address": "0x1051809a0",
+      "end_exclusive": "0x1051809b0",
+      "types": "B16@0:8"
+    },
+    {
+      "class": "NewSyncService",
+      "kind": "instance",
+      "selector": "resetGettingData",
+      "address": "0x1051809b0",
+      "end_exclusive": "0x1051809c0",
+      "types": "v16@0:8"
+    },
+    {
+      "class": "NewSyncService",
+      "kind": "instance",
+      "selector": "InternalCreateSync:",
+      "address": "0x1051818bc",
+      "end_exclusive": "0x105181b34",
+      "types": "B20@0:8I16"
+    },
+    {
+      "class": "NewSyncService",
+      "kind": "instance",
+      "selector": "creatPBNewSyncEvent:",
+      "address": "0x105181b34",
+      "end_exclusive": "0x1051821cc",
+      "types": "B20@0:8I16"
+    },
+    {
+      "class": "NewSyncService",
+      "kind": "instance",
+      "selector": "GetSelector",
+      "address": "0x1051829f4",
+      "end_exclusive": "0x105182a38",
+      "types": "I16@0:8"
+    },
+    {
+      "class": "NewSyncService",
+      "kind": "instance",
+      "selector": "SetSelector:",
+      "address": "0x105182a38",
+      "end_exclusive": "0x105182ac4",
+      "types": "v20@0:8I16"
+    },
+    {
+      "class": "NewSyncService",
+      "kind": "instance",
+      "selector": "MessageReturn:Event:",
+      "address": "0x105182ac4",
+      "end_exclusive": "0x105182e5c",
+      "types": "v28@0:8@16I24"
+    },
+    {
+      "class": "NewSyncService",
+      "kind": "instance",
+      "selector": "HandleSyncResp:handleResult:",
+      "address": "0x105182e7c",
+      "end_exclusive": "0x10518348c",
+      "types": "v28@0:8@16B24"
+    },
+    {
+      "class": "NewSyncService",
+      "kind": "instance",
+      "selector": "__handleNewSyncResponse:flag:beginTime:",
+      "address": "0x105183d7c",
+      "end_exclusive": "0x105184664",
+      "types": "v36@0:8@16I24Q28"
+    },
+    {
+      "class": "NewSyncService",
+      "kind": "instance",
+      "selector": "IsLastSyncFinishCallingExtension",
+      "address": "0x105186350",
+      "end_exclusive": "0x105186360",
+      "types": "B16@0:8"
+    },
+    {
+      "class": "CUtility",
+      "kind": "class",
+      "selector": "NeedNewSync:",
+      "address": "0x116557f4c",
+      "end_exclusive": "0x116557f58",
+      "types": "B20@0:8I16"
+    },
+    {
+      "class": "SyncCmdHandler",
+      "kind": "instance",
+      "selector": "handleCmds:isFromPushData:showLocalPush:",
+      "address": "0x105b3c450",
+      "end_exclusive": "0x105b3e734",
+      "types": "B32@0:8@16B24B28"
+    },
+    {
+      "class": "SyncCmdHandler",
+      "kind": "instance",
+      "selector": "HandleBatch:ShowPush:",
+      "address": "0x105b3e794",
+      "end_exclusive": "0x105b3e8fc",
+      "types": "B24@0:8B16B20"
+    },
+    {
+      "class": "SyncCmdHandler",
+      "kind": "instance",
+      "selector": "BatchAddMsg:ShowPush:",
+      "address": "0x105b3ee10",
+      "end_exclusive": "0x105b40dec",
+      "types": "B24@0:8B16B20"
+    },
+    {
+      "class": "NewSyncEventHandler",
+      "kind": "instance",
+      "selector": "OnProtocolStart:shouldContinue:",
+      "address": "0x10517ca40",
+      "end_exclusive": "0x10517cc6c",
+      "types": "v32@0:8@16^B24"
+    },
+    {
+      "class": "NewSyncEventHandler",
+      "kind": "instance",
+      "selector": "OnProtocolResponse:shouldContinue:",
+      "address": "0x10517cc7c",
+      "end_exclusive": "0x10517d518",
+      "types": "v32@0:8@16^B24"
+    },
+    {
+      "class": "bounded_function",
+      "kind": "function",
+      "selector": "response_processor",
+      "address": "0x10517d528",
+      "end_exclusive": "0x10517db50",
+      "types": "unknown"
+    },
+    {
+      "class": "bounded_function",
+      "kind": "function",
+      "selector": "response_key_store_block",
+      "address": "0x10517dbe0",
+      "end_exclusive": "0x10517de74",
+      "types": "unknown"
+    },
+    {
+      "class": "bounded_function",
+      "kind": "function",
+      "selector": "response_status_block",
+      "address": "0x10517de94",
+      "end_exclusive": "0x10517df88",
+      "types": "unknown"
+    },
+    {
+      "class": "bounded_function",
+      "kind": "function",
+      "selector": "response_end_block",
+      "address": "0x10517dfb0",
+      "end_exclusive": "0x10517e0cc",
+      "types": "unknown"
+    },
+    {
+      "class": "bounded_function",
+      "kind": "function",
+      "selector": "queue_helper_thunk",
+      "address": "0x107c0d220",
+      "end_exclusive": "0x107c0d224",
+      "types": "unknown"
+    },
+    {
+      "class": "bounded_function",
+      "kind": "function",
+      "selector": "queue_helper",
+      "address": "0x10f833874",
+      "end_exclusive": "0x10f833878",
+      "types": "unknown"
+    },
+    {
+      "class": "bounded_function",
+      "kind": "function",
+      "selector": "queue_helper_impl",
+      "address": "0x1175791a4",
+      "end_exclusive": "0x117579258",
+      "types": "unknown"
+    },
+    {
+      "class": "bounded_function",
+      "kind": "function",
+      "selector": "queue_helper_global_classifier",
+      "address": "0x1175b7694",
+      "end_exclusive": "0x1175b76ec",
+      "types": "unknown"
+    },
+    {
+      "class": "bounded_function",
+      "kind": "thunk-final",
+      "selector": "batch_group_wait",
+      "thunk_chain": [
+        "0x107c27324",
+        "0x10f85b62c",
+        "0x117475f58",
+        "0x118328120"
+      ],
+      "address": "0x118328120",
+      "end_exclusive": "0x11832812c",
+      "types": "unknown"
+    },
+    {
+      "class": "bounded_function",
+      "kind": "thunk-final",
+      "selector": "batch_group_async",
+      "thunk_chain": [
+        "0x107c0d230",
+        "0x10f833888",
+        "0x1175798b8"
+      ],
+      "address": "0x1175798b8",
+      "end_exclusive": "0x117579938",
+      "types": "unknown"
+    },
+    {
+      "class": "bounded_function",
+      "kind": "thunk-final",
+      "selector": "batch_group_create",
+      "thunk_chain": [
+        "0x107c2730c",
+        "0x10f85b614",
+        "0x117475f40",
+        "0x1183280fc"
+      ],
+      "address": "0x1183280fc",
+      "end_exclusive": "0x118328108",
+      "types": "unknown"
+    },
+    {
+      "class": "block_invoke",
+      "kind": "block",
+      "selector": "onNewSyncEnd_error",
+      "block_address": "0x11d66e6c0",
+      "address": "0x10518348c",
+      "end_exclusive": "0x10518349c",
+      "types": "block invoke"
+    },
+    {
+      "class": "block_invoke",
+      "kind": "block",
+      "selector": "onNewSyncBegin_push",
+      "block_address": "0x11d66e6e0",
+      "address": "0x105184664",
+      "end_exclusive": "0x105184674",
+      "types": "block invoke"
+    },
+    {
+      "class": "block_invoke",
+      "kind": "block",
+      "selector": "onNewSyncStart_processor",
+      "block_address": "0x11d66e580",
+      "address": "0x10517dbd0",
+      "end_exclusive": "0x10517dbe0",
+      "types": "block invoke"
+    },
+    {
+      "class": "block_invoke",
+      "kind": "block",
+      "selector": "onNewSyncFinish_processor",
+      "block_address": "0x11d66e5c0",
+      "address": "0x10517de84",
+      "end_exclusive": "0x10517de94",
+      "types": "block invoke"
+    }
+  ],
+  "files": {
+    "bounded_function--queue_helper_impl.annotated.asm": "5946e60a2acaea553f9791330db8d5352cf84e874ddb70c4332075901dbbebdf",
+    "SyncCmdHandler--BatchAddMsg_ShowPush_.asm": "37bdc0df91782317ea5f3990be084d0ec903653e515938cee778260c64600bfd",
+    "block_invoke--onNewSyncFinish_processor.annotated.asm": "6727ef0a4eced621a89262caa58468a2f20b5d9f7ac8d9a7766861d08f1d1720",
+    "NewSyncService--HandleSyncResp_handleResult_.annotated.asm": "6d9fd263d8424bb501ee2c3e17317965372950a63483902ccce5f0d0d50d112b",
+    "NewSyncService--__handleNewSyncResponse_flag_beginTime_.asm": "d5a3475bca25ac96b4c082ac7aff7d706c67f75ac3367dfee92f866b5ae76eee",
+    "NewSyncService--IsLastSyncFinishCallingExtension.annotated.asm": "9165a86b3dfb0d6497a0f9bee7d58f631cef209bf3a7bef50b6f4f4429d05248",
+    "bounded_function--queue_helper_global_classifier.annotated.asm": "be9d9221c2bb4a6c8b38d5d19f2e8fb9db8b434fdb8693a45745637c918dac71",
+    "bounded_function--batch_group_wait.annotated.asm": "e99561655da092485571a0a4753cd81a0bd161f07cd0a9a6ae947d47bfa09a96",
+    "bounded_function--queue_helper.asm": "0af951b7961224d4363e5783f6f68373aafa6e3ce09d164ca7d65a770dad0768",
+    "bounded_function--response_key_store_block.asm": "6ee4edd430ca1ab5fb91a8d11bbf42ef820d5af7bdcbf7806843c303de30b927",
+    "block_invoke--onNewSyncBegin_push.annotated.asm": "f1d5035a88b1ed1edd76d9b7b5206d39e22ce04e751a358682236ba70b1c3585",
+    "report.md": "b46a3d409cfec2e11f6c0d69188a4ca7a035517fa507a87a7c4d36eb6f3c1eca",
+    "bounded_function--response_processor.annotated.asm": "0cbd951438c2b609b68e1d29b713b77aaec1c59aa2b4feb369b4d61796a586bf",
+    "NewSyncEventHandler--OnProtocolResponse_shouldContinue_.asm": "0c957972a5201d704ce4729f1b6055fcb8bb2041539dc4a8ec3ad9f6553f7889",
+    "bounded_function--queue_helper_thunk.asm": "69e2a9d19c6b1fdfcf8e0465a978afe51d568dac03365ef4aaf6b88a76290dbe",
+    "NewSyncService--InternalCreateSync_.asm": "8f8ebb00112273e847d2dbef191d459be08887689a6a6e3a7103d956699c06ff",
+    "NewSyncService--creatPBNewSyncEvent_.annotated.asm": "47cd62cc236adac70d649385ec2a3e9b5dbc1f1c2327b22099f8568b0a4165ce",
+    "SyncCmdHandler--handleCmds_isFromPushData_showLocalPush_.annotated.asm": "c51e215e7c40b105ba9f2d41ca545717fc8f99ea01cc66ef528ace67503ae5c0",
+    "NewSyncService--InternalCreateSync_.annotated.asm": "5bc4c7202c8401f6f7a35ac4ff8475ab09231684d11fb01d160f5ddd77ebbd04",
+    "bounded_function--batch_group_wait.asm": "10716528736780015e9184e2943bceb4e2ed91c86275e1fd6d8b66e5cee27786",
+    "bounded_function--queue_helper.annotated.asm": "0af951b7961224d4363e5783f6f68373aafa6e3ce09d164ca7d65a770dad0768",
+    "ivars.json": "8a2a8e7af542841f982612b24ede264c50321ad9f7cc52ff7f589868ae75e80d",
+    "bounded_function--response_status_block.annotated.asm": "862ac8e788aa0194a0aded0bbfe4ec5a9e30d81a49f61b8efe07b1240a5e026a",
+    "NewSyncService--creatPBNewSyncEvent_.asm": "da70e0c3852fdbd9d9e9672084f5568bd775ea27d87495c9e8eb1bcbf07948f9",
+    "NewSyncService--isGettingData.asm": "e8cd743e02153a5cb8e55fd59e9fab04b4d30c821e6589f14f8bd5f5d25adeae",
+    "NewSyncService--__handleNewSyncResponse_flag_beginTime_.annotated.asm": "0976aa6dd1e72c8cd62e28a48f341a6c877b52dcb5b8cdee8414a972957891c3",
+    "SyncCmdHandler--HandleBatch_ShowPush_.asm": "6faca6ef88747866898844f3fa1d8de9b9645e77b83f1320f4d53435a6f3a031",
+    "bounded_function--batch_group_create.asm": "0b5cda6eb9db669543445d3da037e9ea94673c63431c5cd2fe7d95595e5dc113",
+    "bounded_function--response_status_block.asm": "d9b7136b053f652fa070fddb3d6a51dc0abcebb5124a1b39324df797a3f7d55c",
+    "methods.json": "395500126727f095c46755a3542334d9bf1957ff10d3ebf7e61f29ab67bebbb1",
+    "NewSyncService--isGettingData.annotated.asm": "c0afb789acb8d048ef2b263453f89c15ef24bea3606368fff598a5e147a1f941",
+    "NewSyncService--MessageReturn_Event_.asm": "1949cb860839655352792382fc2c6cca5cf9752d7c5b2f77064aab7797e2eb7c",
+    "bounded_function--queue_helper_thunk.annotated.asm": "69e2a9d19c6b1fdfcf8e0465a978afe51d568dac03365ef4aaf6b88a76290dbe",
+    "NewSyncService--resetGettingData.asm": "3d392009a23c98942017ff96d205557322363f8b49ec74e2a7f346d41836dfc9",
+    "CUtility--NeedNewSync_.annotated.asm": "ad401ffbbcbe31653deaec36091c16f782fe7343d3727f1ae4e75313efe6139a",
+    "CUtility--NeedNewSync_.asm": "ad401ffbbcbe31653deaec36091c16f782fe7343d3727f1ae4e75313efe6139a",
+    "bounded_function--queue_helper_impl.asm": "28ec248b9c3ceb4581aafbb1339d76870a7d9604dc2fbb657718c8a062255a2d",
+    "NewSyncService--SetSelector_.asm": "afb1f0d56a382e340b7904438189f919d2d280450b22bde2ff07d8b2b7c885d5",
+    "NewSyncService--GetSelector.annotated.asm": "3b7ad6842f36d55a44d004912b76f94e2b214c193a32a5d8c292e161d1c8626e",
+    "bounded_function--batch_group_create.annotated.asm": "22e6c769b3a1cdd853f4bc307e29ffddf3806e5c2e874d198aba416a0a294168",
+    "NewSyncService--resetGettingData.annotated.asm": "1d6da1a33c15d02722757363168d3f7be7c69ff4ac77351dc9e8cefd22edead5",
+    "block_invoke--onNewSyncStart_processor.asm": "502da1fe4fdb33501efa1ab3e905c222c47d39bb8e1d2895a4dc656328e99036",
+    "bounded_function--queue_helper_global_classifier.asm": "be9d9221c2bb4a6c8b38d5d19f2e8fb9db8b434fdb8693a45745637c918dac71",
+    "bounded_function--batch_group_async.asm": "878f1af8151f591f342c729fc4de34738978334068f38ea0fc0cf3f83d98fad2",
+    "block_invoke--onNewSyncEnd_error.asm": "cd0c107666e0c36fc36b45c4f4c5618423cb92e0d7e41bc8f0d12e31a53cdbc5",
+    "NewSyncEventHandler--OnProtocolStart_shouldContinue_.annotated.asm": "43e7347785c0c7bbd55e1349901fa7ee32873142f6ebc4e8e89419ae787a7bf5",
+    "SyncCmdHandler--handleCmds_isFromPushData_showLocalPush_.asm": "3e4c716a19d9bf2c416eca05b28e9b0d146198559f21ac381d1cef457ed584f6",
+    "bounded_function--batch_group_async.annotated.asm": "72ab8738b7a0d2847b924e53002948fff6cc755036a5689b81035d493b3b35bd",
+    "NewSyncService--MessageReturn_Event_.annotated.asm": "a397a3cb315a272f4bc240b9f777adc53a7f7b0f05b4eaa385aeb38d16c0acf5",
+    "NewSyncEventHandler--OnProtocolResponse_shouldContinue_.annotated.asm": "5a0950489dc27a1a4d963789bb7f49f7d06211f7dec9c71ce18e560e868a0cb4",
+    "block_invoke--onNewSyncEnd_error.annotated.asm": "8b7ebd5689d9d2d38bc11b67df4078b049c5d839b58a9ddfe4a52d4ecb56a7fd",
+    "SyncCmdHandler--HandleBatch_ShowPush_.annotated.asm": "a52b1f486ddb0e0c3d5c9e26e6a48356b68863b729ab5df9b665acb3bd048b0e",
+    "block_invoke--onNewSyncStart_processor.annotated.asm": "b664b3ce480f41143c5f25c6de99eae06604848742caaad913b1919b97ba37eb",
+    "NewSyncService--HandleSyncResp_handleResult_.asm": "593808bd5076216ac8a482427cdcea1ff0c26e7d351301ceeecbea1b451978d5",
+    "block_invoke--onNewSyncBegin_push.asm": "4e3ae8d5cbe6023ed0e8472409a2b804db68b4108c4224281bbb7213208c1c07",
+    "bounded_function--response_end_block.annotated.asm": "319c21b5a34e43eb1d5c8d09c4dd44244aefb9d992534452d1384322863dd5a9",
+    "block_invoke--onNewSyncFinish_processor.asm": "55708eeb5b6a74bc94e2d63c71d63119f957adbebd50d98475e7937272358da0",
+    "NewSyncService--SetSelector_.annotated.asm": "28721d03e5c3ad8615b6eccbeed8645b396bd59ff130c32bd34cde1e413c0ebb",
+    "extract.py": "339472570805586ceb10c9beb8db40fb2dc8ae9a01de51c4feff971f05e08fec",
+    "NewSyncService--GetSelector.asm": "c1882235e3bfcd90d2f249daaff147115111d152e9734abcf826413fd7174525",
+    "SyncCmdHandler--BatchAddMsg_ShowPush_.annotated.asm": "cc5314a2cdcf1a0f8cc5c9817fc3720d139dbf1c15ad1f947209493285264460",
+    "NewSyncService--IsLastSyncFinishCallingExtension.asm": "5b230b3b752d4931e18b890c639a0abcac3b0e8595b53d4ff7cdd8daa29e95d6",
+    "bounded_function--response_key_store_block.annotated.asm": "25bbc79c5f5aa0ec7f9bca941f488c3d649dea1b8d3109a5e0d6a3ed6ecb3ca2",
+    "bounded_function--response_processor.asm": "56b942989e67434bf05f773658ec295b52eb01b8df1d0cbb3feb320d8f02d330",
+    "bounded_function--response_end_block.asm": "962192566ec3d1e975fd2459bf5b689b1dbcfb794a2e35b37d953b586e20c0e7",
+    "NewSyncEventHandler--OnProtocolStart_shouldContinue_.asm": "9b34c692680e2094bbc6c3dd0e4dd3763cef53fc9e4b139f06a1a097e3e78698"
+  }
+}

@@ -22,8 +22,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<NSDictionary *> *)snapshots:(NSError **)error;
 /// Includes unreadable files as unavailable records so the UI can preserve/export originals.
 - (NSArray<NSDictionary *> *)records:(NSError **)error;
+/// Reuse verified summaries and one matching automatic snapshot only inside this serial save.
+/// Every reuse checks current file identity; finally clears all operation state.
+- (nullable NSDictionary *)withInventoryForSource:(NSDictionary *)source operation:(NSDictionary * _Nullable (^)(void))operation;
+/// Reuses the matching immutable automatic snapshot only while its file identity is unchanged.
+- (nullable NSDictionary *)snapshotUsingInventory:(NSString *)identifier error:(NSError **)error;
 - (nullable NSData *)originalData:(NSString *)filename error:(NSError **)error;
 - (BOOL)remove:(NSString *)identifier error:(NSError **)error;
+/// Manual deletion also accepts unreadable or renamed leaf .wcbak files; never follows links or removes directories.
+- (BOOL)removeFile:(NSString *)filename error:(NSError **)error;
 - (NSDictionary *)metadata:(NSString *)identifier;
 /// A readable copy is returned even when redundancy is degraded; error means retain it.
 - (NSDictionary *)metadata:(NSString *)identifier error:(NSError **)error;

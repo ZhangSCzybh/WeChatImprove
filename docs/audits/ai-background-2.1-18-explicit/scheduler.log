@@ -1,0 +1,2 @@
+AI background sync scheduler: 72 checks passed; no timers, explicit event requests, 45-second event throttle, no queued/replayed retries, revocation, reentry, exceptions, finite time and release
+AI background sync iOS: arm64 + arm64e source objects compiled

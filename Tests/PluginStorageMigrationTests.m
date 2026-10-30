@@ -71,6 +71,7 @@ int main(int argc,const char **argv){@autoreleasepool{
     Check([[store journal:NULL][@"state"] isEqual:@"prepared"],@"failed migration still sees pending transaction");
     Check(![store publish:Snapshot() error:NULL],@"ENOSPC blocks new backup");
     Check(![store remove:snapshot[@"id"] error:NULL],@"ENOSPC blocks source deletion");
+    Check(![store removeFile:[snapshot[@"id"] stringByAppendingPathExtension:@"wcbak"] error:NULL],@"ENOSPC also blocks filename deletion");
     Check(![store setMetadata:@{@"favorite":@YES} identifier:snapshot[@"id"] error:NULL],@"ENOSPC blocks metadata mutation");
     Check(![store writeJournal:@{} error:NULL]&&![store archiveJournal:NULL]&&![store confirmActivation:@{} error:NULL]&&![store prune:NULL],@"all mutation entry points wait for migration");
     fault=nil;Check([m migrate:&error],@"real retry succeeds after fault removed");

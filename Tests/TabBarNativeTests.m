@@ -57,6 +57,12 @@ static NSUserDefaults *TestDefaults(id self,SEL selector) { return isolated; }
 - (id)getTabBarBtnForIndex:(unsigned long long)i { return i<self.buttons.count ? self.buttons[i] : nil; }
 - (void)nativeClick:(UIControl *)button { self.nativeClicks++;self.selectedIndex=[self.buttons indexOfObjectIdenticalTo:button]; }
 @end
+@interface CountingPageView : UIView
+@property(nonatomic) NSUInteger treeReads;
+@end
+@implementation CountingPageView
+- (NSMutableArray *)subviews { self.treeReads++; return [super subviews]; }
+@end
 static BOOL equal(CGFloat a,CGFloat b) { return fabs(a-b)<.001; }
 static NSProcessInfoThermalState testThermalState=NSProcessInfoThermalStateNominal;
 @interface NSProcessInfo (CSThermalTest)
@@ -108,7 +114,7 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         UIColor *nativeColor=bar.backgroundColor;
         bar.backgroundView=[[UIView alloc] initWithFrame:bar.bounds];[bar addSubview:bar.backgroundView];
         MainTabBarViewController *controller=[MainTabBarViewController new];controller.view=root;controller.tabBar=bar;bar.customDelegate=controller;
-        UIViewController *page=[UIViewController new]; page.view=[[UIView alloc] initWithFrame:CGRectMake(0,0,390,761)];[root addSubview:page.view];controller.selectedViewController=page;
+        UIViewController *page=[UIViewController new]; page.view=[[CountingPageView alloc] initWithFrame:CGRectMake(0,0,390,761)];[root addSubview:page.view];controller.selectedViewController=page;
         UITableView *table=[[UITableView alloc] initWithFrame:page.view.bounds];[page.view addSubview:table];
         table.contentInset=(UIEdgeInsets){7,3,2,4};table.verticalScrollIndicatorInsets=(UIEdgeInsets){8,1,5,2};
         NSMutableArray *models=[NSMutableArray array],*items=[NSMutableArray array],*buttons=[NSMutableArray array];
@@ -148,6 +154,40 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         assert(CGRectEqualToRect(first.frame,originalItem) && CGRectEqualToRect([buttons[0] frame],originalButton));
         CSTabBarEndLayout(bar);
         assert(CGRectEqualToRect(first.frame,floating));
+        // One controller layout can synchronously update geometry several times.
+        // Discover the largest visible table only after its final native boundary.
+        CountingPageView *pageTree=(id)page.view;
+        NSUInteger reads=pageTree.treeReads;
+        CSTabBarBeginControllerLayout(controller);
+        for (NSUInteger pass=0;pass<3;pass++) {
+            CSTabBarBeginLayout(bar);CSTabBarEndLayout(bar);
+            assert(CGRectEqualToRect(first.frame,floating));
+        }
+        assert(pageTree.treeReads==reads);
+        UIView *scopeRaw=[[UIView alloc] initWithFrame:bar.frame];
+        for (MMTabBarItemView *item in items) {
+            UIImageView *image=[[UIImageView alloc] initWithFrame:item.frame];image.image=[UIImage new];[scopeRaw addSubview:image];
+        }
+        UIView *scopeSnapshot=CSTabBarStyleSnapshot(bar,scopeRaw);
+        assert(scopeSnapshot!=scopeRaw && scopeSnapshot.subviews.count==5);
+        assert(CGRectEqualToRect(scopeSnapshot.subviews[1].frame,first.frame));
+        UITableView *larger=[[UITableView alloc] initWithFrame:CGRectMake(0,0,390,850)];[page.view addSubview:larger];
+        reads=pageTree.treeReads;CSTabBarUpdate(bar);CSTabBarEndControllerLayout(controller);
+        assert(pageTree.treeReads==reads+1 && larger.contentInset.bottom>0 && equal(table.contentInset.bottom,2));
+        reads=pageTree.treeReads;CSTabBarEndControllerLayout(controller);assert(pageTree.treeReads==reads);
+        // No discovery cache survives into the next generation or a visibility change.
+        larger.hidden=YES;CSTabBarBeginControllerLayout(controller);CSTabBarUpdate(bar);CSTabBarEndControllerLayout(controller);
+        assert(pageTree.treeReads==reads+1 && equal(larger.contentInset.bottom,0));
+        larger.hidden=NO;[larger removeFromSuperview];
+        // A missing did-layout callback is bounded to the current main-queue turn.
+        CSTabBarBeginControllerLayout(controller);CSTabBarUpdate(bar);reads=pageTree.treeReads;
+        for (NSUInteger turn=0;turn<3;turn++) CFRunLoopRunInMode(kCFRunLoopDefaultMode,.005,false);
+        assert(pageTree.treeReads==reads+1);
+        CSTabBarUpdate(bar);assert(pageTree.treeReads==reads+2);
+        // Hidden or detached bars release inset ownership immediately inside a scope.
+        CSTabBarBeginControllerLayout(controller);CSTabBarUpdate(bar);bar.hidden=YES;CSTabBarUpdate(bar);
+        reads=pageTree.treeReads;CSTabBarEndControllerLayout(controller);assert(pageTree.treeReads==reads);
+        bar.hidden=NO;CSTabBarUpdate(bar);
         // A native badge update may change width before calling layoutBadgeView.
         CGRect newBadge=badge.frame;newBadge.size.width=30;badge.frame=newBadge;
         CSTabBarBeginItemUpdate(first);CSTabBarEndItemUpdate(first);

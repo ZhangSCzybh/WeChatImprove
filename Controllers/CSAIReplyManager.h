@@ -6,6 +6,8 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSNotificationName const CSAIReplyDidChange;
 /// Thread-safe admission hint only. Native objects and final account checks stay on main.
 FOUNDATION_EXPORT BOOL CSAIReplyMessageIngressEnabled(void);
+/// Reads an immutable admission snapshot; unknown session shapes retain main-thread validation.
+FOUNDATION_EXPORT BOOL CSAIReplyMessageIngressAllowsSession(id _Nullable session, NSUInteger epoch);
 @interface CSAIReplyManager : NSObject
 + (instancetype)sharedManager;
 @property(nonatomic,strong,readonly,nullable) CSAIReplyStore *store;
@@ -13,6 +15,10 @@ FOUNDATION_EXPORT BOOL CSAIReplyMessageIngressEnabled(void);
 @property(nonatomic,copy,readonly,nullable) NSString *connectionStatus;
 - (void)start;
 - (void)refresh;
+/// Opaque, one-use scope captured before a native full synchronization starts.
+/// Both methods are main-thread only; stale account/configuration scopes are ignored.
+- (nullable id)captureBackgroundSyncContextForEpoch:(NSUInteger)epoch;
+- (void)nativeFullSyncCompletedWithContext:(id)context;
 - (BOOL)isCurrentAccount:(NSString *)account epoch:(NSUInteger)epoch;
 /// Saves complete asynchronously on main after durable storage and account revalidation.
 - (void)saveConfiguration:(NSDictionary *)configuration account:(NSString *)account epoch:(NSUInteger)epoch completion:(CSAIReplyStoreCompletion)completion;

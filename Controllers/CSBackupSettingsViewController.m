@@ -120,7 +120,7 @@
     CSSettingItem *retry=[self action:@"重试备份与恢复" icon:@"arrow.clockwise" color:UIColor.systemOrangeColor block:^{[weakSelf retryStartup];}];
     CSSettingItem *repair=[self action:@"修复当前的配置" icon:@"wrench.and.screwdriver" color:UIColor.systemOrangeColor block:^{[weakSelf repair];}];
     CSSettingItem *cancel=[self action:@"取消待执行计划" icon:@"xmark.circle" color:UIColor.systemRedColor block:^{[weakSelf confirmCancel];}];
-    CSSettingItem *info=[self action:@"功能说明" icon:@"questionmark.circle" color:UIColor.systemGrayColor block:^{[weakSelf message:@"备份配置说明" detail:@"备份包含插件配置、自定义图片、已存档账号分组和当前账号的定时任务。定时任务恢复后总开关关闭，不导入执行记录或待发送状态。仅支持当前 .wcbak 格式。点击备份可预览恢复、导出、重命名、收藏或删除。\n\n自动备份在配置停止变化约 30 秒后尝试保存，持续编辑时约 5 分钟检查一次，相同内容不重复保存。默认保留 20 份自动备份与 5 份操作保护备份；手动、导入、收藏及待执行计划使用的备份会保留。保护状态异常时会保留备份，确认收藏状态后重新按规则管理。\n\n无法读取的文件仍显示在列表，可导出可读取的原件并重新检查；历史清理结果可在“备份与恢复状态”查看。\n\n导出文件未加密，可能包含成员、联系人标识和自定义文字；不包含微信消息、登录凭据或支付账本。"]; }];
+    CSSettingItem *info=[self action:@"功能说明" icon:@"questionmark.circle" color:UIColor.systemGrayColor block:^{[weakSelf message:@"备份配置说明" detail:@"备份包含插件配置、自定义图片、已存档账号分组和当前账号的定时任务。定时任务恢复后总开关关闭，不导入执行记录或待发送状态。仅支持当前 .wcbak 格式。点击备份可预览恢复、导出、重命名、收藏或删除。\n\n自动备份在配置停止变化约 30 秒后尝试保存，持续编辑时约 5 分钟检查一次，相同内容不重复保存。默认保留 20 份自动备份与 5 份操作保护备份；手动、导入、收藏及待执行计划使用的备份会保留。保护状态异常时会保留备份，确认收藏状态后重新按规则管理。\n\n所有备份都提供手动删除入口，包括收藏、保护状态异常和无法读取的备份；无法读取的文件可先导出原件或重新检查。恢复事务正在使用的备份需先取消待执行计划或完成恢复、回滚，再删除。历史清理结果可在“备份与恢复状态”查看。\n\n导出文件未加密，可能包含成员、联系人标识和自定义文字；不包含微信消息、登录凭据或支付账本。"]; }];
     self.sections=[@[[CSSettingSection sectionWithHeader:@"备份设置" items:@[create,import,automatic]],
                      [CSSettingSection sectionWithHeader:[NSString stringWithFormat:@"本机备份 · %lu 份",(unsigned long)self.records.count] items:backups],
                      [CSSettingSection sectionWithHeader:@"恢复管理" items:@[status,retry,repair,cancel]],
@@ -132,7 +132,7 @@
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     (void)tableView;
     if(section==0)return @"保存当前插件配置和自定义图片。自动备份会在停止编辑后检查，内容相同时不重复保存。";
-    if(section==1)return self.records.count?@"点击备份可预览恢复、分享及管理。标记为“原件已保留”或“保护待确认”的备份不会自动清理。":@"创建第一份备份，或从文件导入当前格式备份。";
+    if(section==1)return self.records.count?@"点击备份可预览恢复、分享及管理。所有备份均可手动删除；标记为“原件已保留”或“保护待确认”的备份不会自动清理。":@"创建第一份备份，或从文件导入当前格式备份。";
     if(section==2){NSString *failure=CSBackupManager.sharedManager.lastRestoreFailure;return failure.length?[@"上次恢复未完成：\n" stringByAppendingString:failure]:@"恢复和重置在完全退出并重新打开微信后应用，切换前后台不会执行。执行前可取消待处理计划。";}
     return nil;
 }
@@ -150,7 +150,11 @@
 - (void)openRecord:(NSDictionary *)record {
     if([record[@"unavailable"] boolValue]){[self showUnavailableRecord:record];return;}
     [self setWorking:YES];[CSBackupManager.sharedManager load:record completion:^(NSDictionary *snapshot,NSError *error){
-        [self setWorking:NO];if(error){[self message:@"无法读取备份" detail:error.localizedDescription];return;}
+        [self setWorking:NO];if(error||!snapshot){
+            NSMutableDictionary *unavailable=[record mutableCopy];unavailable[@"unavailable"]=@YES;
+            unavailable[@"issue"]=error.localizedDescription?:@"文件校验未通过，原件已保留";
+            [self showUnavailableRecord:unavailable];return;
+        }
         NSUInteger row=[self.records indexOfObject:record];UIView *anchor=row!=NSNotFound?[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:1]]:self.view;
         [self showRecord:record snapshot:snapshot anchor:anchor];
     }];
@@ -162,11 +166,12 @@
     [self presentViewController:share animated:YES completion:nil];
 }
 - (void)showUnavailableRecord:(NSDictionary *)record {
-    UIAlertController *alert=[UIAlertController alertControllerWithTitle:record[@"name"] message:[NSString stringWithFormat:@"%@\n\n原件已保留，不会自动清理；校验通过前不能恢复。",record[@"issue"]] preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:record[@"metadata"][@"name"]?:record[@"name"] message:[NSString stringWithFormat:@"%@\n\n原件不会自动清理，可手动删除；校验通过前不能恢复。",record[@"issue"]] preferredStyle:UIAlertControllerStyleActionSheet];
     [alert addAction:[UIAlertAction actionWithTitle:@"导出原件 / 分享" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *a){
         [self setWorking:YES];[CSBackupManager.sharedManager exportOriginal:record completion:^(NSURL *url,NSError *error){[self setWorking:NO];if(error)[self message:@"导出失败" detail:error.localizedDescription];else [self shareURL:url];}];
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"重新检查" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *a){[self reload];}]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"删除备份" style:UIAlertActionStyleDestructive handler:^(__unused UIAlertAction *a){[self deleteRecord:record];}]];
     [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
     alert.popoverPresentationController.sourceView=self.view;alert.popoverPresentationController.sourceRect=self.view.bounds;
     [self presentViewController:alert animated:YES completion:nil];
@@ -222,7 +227,9 @@
 }
 - (void)deleteRecord:(NSDictionary *)record {
     BOOL favorite=[record[@"metadata"][@"favorite"] boolValue];
-    UIAlertController *alert=[UIAlertController alertControllerWithTitle:favorite?@"删除这份收藏备份？":@"删除这份备份？" message:favorite?@"这份备份已收藏。确认后会删除备份及其保护记录，当前配置保持不变。":@"只删除所选备份及其保护记录，不改变当前配置。" preferredStyle:UIAlertControllerStyleAlert];[alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];[alert addAction:[UIAlertAction actionWithTitle:@"删除" style:UIAlertActionStyleDestructive handler:^(__unused UIAlertAction *a){[self setWorking:YES];[CSBackupManager.sharedManager remove:record completion:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"删除失败" detail:error.localizedDescription];else [self reload];}];}]];[self presentViewController:alert animated:YES completion:nil];
+    NSString *message=favorite?@"这份备份已收藏。确认后会删除备份及其保护记录，当前配置保持不变。":@"只删除所选备份及其保护记录，不改变当前配置。";
+    if([record[@"unavailable"] boolValue])message=[@"这份备份目前无法读取，删除后原件无法找回，建议先导出原件。\n\n" stringByAppendingString:message];
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:favorite?@"删除这份收藏备份？":@"删除这份备份？" message:message preferredStyle:UIAlertControllerStyleAlert];[alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];[alert addAction:[UIAlertAction actionWithTitle:@"删除" style:UIAlertActionStyleDestructive handler:^(__unused UIAlertAction *a){[self setWorking:YES];[CSBackupManager.sharedManager remove:record completion:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"删除失败" detail:error.localizedDescription];else [self reload];}];}]];[self presentViewController:alert animated:YES completion:nil];
 }
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {(void)controller;if(!urls.count)return;[self setWorking:YES];[CSBackupManager.sharedManager importURL:urls.firstObject completion:^(__unused id value,NSError *error){[self setWorking:NO];if(error)[self message:@"导入失败" detail:error.localizedDescription];else [self reload];}];}
 @end

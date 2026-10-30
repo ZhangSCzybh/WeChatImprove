@@ -163,10 +163,21 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
 }
 - (NSDictionary *)save:(NSString *)name kind:(NSString *)kind error:(NSError **)error {
     NSDictionary *snapshot=[self capture:name kind:kind error:error];if(!snapshot)return nil;
-    if([kind isEqual:@"automatic"]){for(NSDictionary *existing in [self.store snapshots:NULL])if([existing[@"kind"] isEqual:@"automatic"]&&[existing[@"source"][@"account"] isEqual:snapshot[@"source"][@"account"]]&&[existing[@"source"][@"installationID"] isEqual:snapshot[@"source"][@"installationID"]]){if([existing[@"contentDigest"] isEqual:[self.class contentDigest:snapshot]])return [self.store snapshot:existing[@"id"] error:error];break;}}
-    if(![self.store publish:snapshot error:error])return nil;
-    // A published snapshot stays successful; cleanup failures have their own durable status.
-    [self.store prune:NULL];return snapshot;
+    __block NSError *failure=nil;
+    NSDictionary *result=[self.store withInventoryForSource:snapshot[@"source"] operation:^NSDictionary *{
+        if([kind isEqual:@"automatic"]){
+            for(NSDictionary *existing in [self.store snapshots:NULL]){
+                if(![existing[@"kind"] isEqual:@"automatic"]||![existing[@"source"][@"account"] isEqual:snapshot[@"source"][@"account"]]||
+                   ![existing[@"source"][@"installationID"] isEqual:snapshot[@"source"][@"installationID"]])continue;
+                if([existing[@"contentDigest"] isEqual:[self.class contentDigest:snapshot]])return [self.store snapshotUsingInventory:existing[@"id"] error:&failure];
+                break;
+            }
+        }
+        if(![self.store publish:snapshot error:&failure])return nil;
+        // A published snapshot stays successful; cleanup failures have their own durable status.
+        [self.store prune:NULL];return snapshot;
+    }];
+    if(!result&&error)*error=failure;return result;
 }
 - (NSDictionary *)previewContent:(NSDictionary *)snapshot modules:(NSSet *)modules accounts:(NSSet *)accounts error:(NSError **)error {
     NSData *encoded=[CSBackupCodec encode:snapshot error:error];if(!encoded)return nil;

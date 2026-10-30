@@ -5,7 +5,7 @@
 #import "CSCloseFriendSignatures.h"
 #import "CSCloseFriendContactProjection.h"
 static CSCloseFriendSnapshot *Snapshot;
-static NSUInteger Epoch=1,Checks;
+static NSUInteger Epoch=1,Checks,ProjectionCalls;
 static BOOL OuterTimelineProjection;
 static char EpochKey;
 static NSMapTable *Refreshes;
@@ -21,7 +21,7 @@ static id CSCloseFriendRead(id object,NSString *name) {
 }
 static NSString *CSCloseFriendUserName(id object) {if([object isKindOfClass:NSString.class]) return object; return CSCloseFriendRead(object,@"m_nsUsrName") ?: CSCloseFriendRead(object,@"username");}
 static BOOL CSCFSocialSetIvar(id page,NSString *name,id value) {Ivar ivar=class_getInstanceVariable([page class],name.UTF8String); if(!ivar || ivar_getTypeEncoding(ivar)[0]!='@') return NO; object_setIvar(page,ivar,value); return YES;}
-static CSCloseFriendSocialProjection *CSCFSocialProject(NSArray *source,CSCloseFriendSurface surface) {return [[CSCloseFriendSocialProjection alloc] initWithSource:source snapshot:Snapshot surface:surface read:^id(id item,NSString *name){return CSCloseFriendRead(item,name);}];}
+static CSCloseFriendSocialProjection *CSCFSocialProject(NSArray *source,CSCloseFriendSurface surface) {ProjectionCalls++; return [[CSCloseFriendSocialProjection alloc] initWithSource:source snapshot:Snapshot surface:surface read:^id(id item,NSString *name){return CSCloseFriendRead(item,name);}];}
 static BOOL CSCFSocialHidden(id value,CSCloseFriendSurface surface) {return CSCloseFriendSocialObjectHidden(value,Snapshot,surface,^id(id item,NSString *name){return CSCloseFriendRead(item,name);});}
 static BOOL CSCFCallVoid(id owner,NSString *name) {SEL sel=NSSelectorFromString(name); if(!CSCloseFriendMethodMatches(class_getInstanceMethod([owner class],sel),"v@:")) return NO; ((void(*)(id,SEL))objc_msgSend)(owner,sel); return YES;}
 static void CSCFSocialClearCaches(id owner,NSArray *names) {for(NSString *name in names) [CSCloseFriendRead(owner,name) removeAllObjects];}
@@ -72,6 +72,7 @@ static void CSCFSocialHook1(NSString *cls,NSString *name,void(^body)(id,id,void(
 @property(nonatomic) NSInteger actedIndex;
 @property(nonatomic) NSUInteger actions,reloads;
 @property(nonatomic) BOOL readTail,throwDuringCell;
+@property(nonatomic,strong) NSMutableArray *replacementDuringCount;
 - (NSInteger)tableView:(id)table numberOfRowsInSection:(NSInteger)section;
 - (id)tableView:(id)table cellForRowAtIndexPath:(NSIndexPath *)path;
 - (double)tableView:(id)table heightForRowAtIndexPath:(NSIndexPath *)path;
@@ -87,7 +88,7 @@ static void CSCFSocialHook1(NSString *cls,NSString *name,void(^body)(id,id,void(
 @implementation WCCommentDetailViewControllerFB
 - (instancetype)init {if((self=[super init])) m_dicUserCommentsUICache=[NSMutableDictionary dictionary]; return self;}
 - (void)setDataItem:(WCDataItem *)item {_dataItem=item; _arrLikeList=item.likeUsers; _arrCommentList=item.commentUsers;}
-- (NSInteger)tableView:(__unused id)table numberOfRowsInSection:(__unused NSInteger)section {return (_arrLikeList.count>0)+_arrCommentList.count+self.readTail;}
+- (NSInteger)tableView:(__unused id)table numberOfRowsInSection:(__unused NSInteger)section {if(self.replacementDuringCount) {_arrCommentList=self.replacementDuringCount; self.replacementDuringCount=nil;} return (_arrLikeList.count>0)+_arrCommentList.count+self.readTail;}
 - (id)tableView:(__unused id)table cellForRowAtIndexPath:(NSIndexPath *)path {
     if(self.throwDuringCell) @throw [NSException exceptionWithName:@"fixture" reason:nil userInfo:nil];
     NSInteger row=path.row-(_arrLikeList.count>0);
@@ -121,6 +122,18 @@ static void Check(BOOL ok,NSString *message) {Checks++; if(!ok) {fprintf(stderr,
 static void Policy(BOOL enabled,BOOL revealed,NSUInteger revision) {Snapshot=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"fixture" profile:@{@"enabled":@(enabled),@"friends":@[@"secret"],@"groups":@[],@"options":CSCloseFriendDefaultOptions()} revealed:revealed revision:revision blocked:NO];}
 static NSDictionary *DetailComment(NSString *name,NSString *identity,NSUInteger height) {return @{@"username":name,@"id":identity,@"height":@(height)};}
 static void Refresh(WCCommentDetailViewControllerFB *page) {void(^block)(id)=[Refreshes objectForKey:page]; if(block) block(page);}
+@interface DetailCountingArray : NSMutableArray
+@property(nonatomic,strong) NSMutableArray *storage;
+@property(nonatomic) NSUInteger reads;
+@end
+@implementation DetailCountingArray
+- (instancetype)init {if((self=[super init])) _storage=[NSMutableArray array]; return self;}
+- (NSUInteger)count {return self.storage.count;}
+- (id)objectAtIndex:(NSUInteger)index {self.reads++; return self.storage[index];}
+- (void)insertObject:(id)object atIndex:(NSUInteger)index {[self.storage insertObject:object atIndex:index];}
+- (void)removeObjectAtIndex:(NSUInteger)index {[self.storage removeObjectAtIndex:index];}
+- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)object {self.storage[index]=object;}
+@end
 int main(void) {@autoreleasepool {
     Policy(YES,NO,1); CSCFDetailInstall(); Check([Capabilities[@"social.personal-detail.filtered"] boolValue],@"complete native ABI gate");
     Check(![WCTimelineRouterHelper isFlutterDetailEnabled],@"concealed interactions select native details");
@@ -162,6 +175,18 @@ int main(void) {@autoreleasepool {
     Check([page tableView:nil numberOfRowsInSection:0]==3,@"timeline-only protection preserves all detail interactions");
     view=[page tableView:nil cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1]]; actions=page.actions; [page onClickContent:view way:0]; Check(page.actions==actions+1 && page.actedComment==hidden,@"disabled interaction hiding preserves native click");
     Check(![WCTimelineRouterHelper isFlutterDetailEnabled],@"timeline-only protection still selects refreshable native detail");
+    DetailCountingArray *liveComments=[DetailCountingArray new]; [liveComments addObjectsFromArray:@[hidden,ordinary]];
+    item.commentUsers=liveComments; page.dataItem=item; Refresh(page); liveComments.reads=0; ProjectionCalls=0;
+    for(NSUInteger i=0;i<100;i++) Check([page tableView:nil numberOfRowsInSection:0]==3,@"inactive conceal uses native counts");
+    Check(!liveComments.reads && !ProjectionCalls,@"100 native count callbacks do not scan or project interaction arrays");
+    liveComments[0]=ordinary; Check([page tableView:nil heightForRowAtIndexPath:[NSIndexPath indexPathForRow:1]]==55,@"native fast path observes in-place source replacement");
+    NSMutableArray *nativeReplacement=[@[ordinary] mutableCopy]; page.replacementDuringCount=nativeReplacement;
+    Check([page tableView:nil numberOfRowsInSection:0]==2 && page->_arrCommentList==nativeReplacement,@"native array replacement survives an unsubstituted callback");
+    page.dataItem=item; page.throwDuringCell=YES;
+    @try {[page tableView:nil cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1]];} @catch(__unused NSException *exception) {}
+    page.throwDuringCell=NO; Check([page tableView:nil numberOfRowsInSection:0]==3,@"native exception leaves later callbacks usable");
+    Policy(YES,NO,6); Refresh(page); Check([page tableView:nil numberOfRowsInSection:0]==2,@"relock projects latest live source");
+    liveComments[0]=hidden; Check([page tableView:nil numberOfRowsInSection:0]==1,@"concealed path detects same-pointer same-count source replacement");
     for(NSNumber *hide in @[@YES,@NO]) {
         Snapshot=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"fixture" profile:@{@"enabled":@YES,@"friends":@[],@"groups":@[],@"options":@{@"hideTimeline":@NO,@"hideInteractions":@NO,@"hidePrivacyIcons":hide}} revealed:YES revision:6 blocked:NO];
         Check([WCTimelineRouterHelper isFlutterDetailEnabled]==!hide.boolValue,@"icon option alone selects native detail even with empty protected list and during reveal");

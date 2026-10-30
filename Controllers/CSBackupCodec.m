@@ -75,7 +75,7 @@ static BOOL Validate(NSDictionary *s,NSError **error) {
     NSUInteger total=0;
     for(id key in assets) {
         NSData *data=assets[key];
-        if(!Text(key,64)||[key length]!=64||![data isKindOfClass:NSData.class]||!data.length||data.length>4*1024*1024||![[CSBackupCodec digest:data] isEqual:key]||![CSBackupAssets validImage:data])return Fail(error,@"图片资源损坏或超过限制");
+        if(!Text(key,64)||[key length]!=64||![data isKindOfClass:NSData.class]||!data.length||data.length>4*1024*1024)return Fail(error,@"图片资源损坏或超过限制");
         total+=data.length;if(total>24*1024*1024)return Fail(error,@"图片资源总大小超过限制");
     }
     NSMutableDictionary *writes=[NSMutableDictionary dictionary];
@@ -89,8 +89,11 @@ static BOOL Validate(NSDictionary *s,NSError **error) {
     NSMutableString *s=[NSMutableString string];for(NSUInteger i=0;i<sizeof(hash);i++)[s appendFormat:@"%02x",hash[i]];return s;
 }
 + (NSData *)encode:(NSDictionary *)snapshot error:(NSError **)error {
-    if(!Validate(snapshot,error))return nil;
-    NSMutableDictionary *sealed=[snapshot mutableCopy];[sealed removeObjectForKey:@"integrity"];
+    if(![snapshot isKindOfClass:NSDictionary.class]){Fail(error,@"备份结构无效");return nil;}
+    NSMutableDictionary *sealed=[snapshot mutableCopy];
+    if(sealed[@"assets"]){NSDictionary *assets=[CSBackupAssets immutableAssets:sealed[@"assets"] error:error];if(!assets)return nil;sealed[@"assets"]=assets;}
+    if(!Validate(sealed,error))return nil;
+    [sealed removeObjectForKey:@"integrity"];
     sealed[@"integrity"]=[self digest:sealed];
     NSData *data=[NSPropertyListSerialization dataWithPropertyList:sealed format:NSPropertyListBinaryFormat_v1_0 options:0 error:error];
     if(data.length>CSBackupMaximumFileSize) { Fail(error,@"备份超过 32 MiB，未保存不完整文件");return nil; }

@@ -1,0 +1,59 @@
+{
+  "NewSyncService": [
+    {
+      "name": "NewSyncService",
+      "address": "0x1203859a8"
+    },
+    {
+      "name": "MMUserService",
+      "address": "0x120649180"
+    },
+    {
+      "name": "MMBaseService",
+      "address": "0x120649108"
+    },
+    {
+      "external_bind": "_OBJC_CLASS_$_NSObject"
+    }
+  ],
+  "MMUserService": [
+    {
+      "name": "MMUserService",
+      "address": "0x120649180"
+    },
+    {
+      "name": "MMBaseService",
+      "address": "0x120649108"
+    },
+    {
+      "external_bind": "_OBJC_CLASS_$_NSObject"
+    }
+  ],
+  "MMBaseService": [
+    {
+      "name": "MMBaseService",
+      "address": "0x120649108"
+    },
+    {
+      "external_bind": "_OBJC_CLASS_$_NSObject"
+    }
+  ],
+  "MMContext": [
+    {
+      "name": "MMContext",
+      "address": "0x120649388"
+    },
+    {
+      "external_bind": "_OBJC_CLASS_$_NSObject"
+    }
+  ],
+  "MMServiceWrapper": [
+    {
+      "name": "MMServiceWrapper",
+      "address": "0x120649798"
+    },
+    {
+      "external_bind": "_OBJC_CLASS_$_NSProxy"
+    }
+  ]
+}

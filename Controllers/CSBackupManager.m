@@ -179,7 +179,7 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
         return CSBackupAtomicWrite(data,url,error)?url:nil;
     } completion:completion];
 }
-- (void)remove:(NSDictionary *)record completion:(CSBackupCompletion)completion {[self perform:^id(NSError **error){return [self.engine.store remove:record[@"id"] error:error]?@YES:nil;} completion:completion];}
+- (void)remove:(NSDictionary *)record completion:(CSBackupCompletion)completion {[self perform:^id(NSError **error){return [self.engine.store removeFile:record[@"filename"] error:error]?@YES:nil;} completion:completion];}
 - (void)updateMetadata:(NSDictionary *)metadata record:(NSDictionary *)record completion:(CSBackupCompletion)completion {
     [self perform:^id(NSError **error){
         if(![self.engine.store snapshot:record[@"id"] error:error])return nil;

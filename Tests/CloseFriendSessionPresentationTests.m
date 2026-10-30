@@ -32,12 +32,17 @@ static NSString *UIFontTextStyleSubheadline=@"subheadline";
 @implementation UIFont
 + (instancetype)preferredFontForTextStyle:(NSString *)style { UIFont *font=[self new];font.pointSize=[style isEqual:UIFontTextStyleSubheadline] ? 15 : 17;return font; }
 @end
+@interface UITraitCollection : NSObject
+@property(nonatomic) NSInteger userInterfaceStyle;
+@end
+@implementation UITraitCollection @end
 @interface UIView : NSObject
 @property(nonatomic) CGRect bounds,frame;
 @property(nonatomic) NSInteger tag;
 @property(nonatomic) BOOL hidden,userInteractionEnabled,isAccessibilityElement;
 @property(nonatomic) UIViewAutoresizing autoresizingMask;
 @property(nonatomic,strong) UIColor *backgroundColor;
+@property(nonatomic,strong) UITraitCollection *traitCollection;
 @property(nonatomic,copy) NSString *accessibilityLabel;
 @property(nonatomic,strong) id accessibilityElements;
 @property(nonatomic,weak) UIView *superview;
@@ -76,6 +81,7 @@ typedef NS_ENUM(NSInteger, NSLineBreakMode) { NSLineBreakByClipping=2, NSLineBre
 @property(nonatomic,copy) NSString *text;
 @property(nonatomic,strong) UIFont *font;
 @property(nonatomic,strong) UIColor *textColor;
+@property(nonatomic,strong) UIColor *highlightedTextColor;
 @end
 @implementation UILabel
 - (instancetype)initWithFrame:(CGRect)frame { if((self=[super initWithFrame:frame])) {self.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody];self.numberOfLines=1;self.lineBreakMode=NSLineBreakByTruncatingTail;}return self; }

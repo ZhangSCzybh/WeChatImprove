@@ -1,0 +1,604 @@
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Controllers/CSAIBackgroundSync.h b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSAIBackgroundSync.h
+index 5f842742..7b2b1c04 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Controllers/CSAIBackgroundSync.h
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSAIBackgroundSync.h
+@@ -6,6 +6,9 @@ NS_ASSUME_NONNULL_BEGIN
+ - (instancetype)initWithEligibility:(BOOL (^)(void))eligibility synchronize:(void (^)(void))synchronize;
+ @property(nonatomic,copy) NSTimeInterval (^now)(void);
+ @property(nonatomic,readonly) BOOL active;
++/// Defaults to YES. Disabling stops immediately without clearing deadlines or
++/// attempt cooldown; enabling waits for refresh to resume the existing deadline.
++@property(nonatomic) BOOL fallbackEnabled;
+ - (void)refresh;
+ - (void)stop;
+ /// The manager must verify current account/epoch and complete message coverage.
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Controllers/CSAIBackgroundSync.m b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSAIBackgroundSync.m
+index f49bd722..78904799 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Controllers/CSAIBackgroundSync.m
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSAIBackgroundSync.m
+@@ -17,12 +17,19 @@ @implementation CSAIBackgroundSync
+ - (instancetype)initWithEligibility:(BOOL (^)(void))eligibility synchronize:(void (^)(void))synchronize {
+     if((self=[super init])){
+         _eligibility=[eligibility copy];_synchronize=[synchronize copy];
++        _fallbackEnabled=YES;
+         _now=^{return NSProcessInfo.processInfo.systemUptime;};
+     }
+     return self;
+ }
+ - (void)dealloc {[_timer invalidate];}
+ - (BOOL)active {return self.running && self.timer.valid;}
++- (void)setFallbackEnabled:(BOOL)fallbackEnabled {
++    NSAssert(NSThread.isMainThread,@"AI background sync requires the main thread");
++    if(_fallbackEnabled==fallbackEnabled)return;
++    _fallbackEnabled=fallbackEnabled;
++    if(!fallbackEnabled)[self stop];
++}
+ - (void)stop {
+     NSAssert(NSThread.isMainThread,@"AI background sync requires the main thread");
+     self.running=NO;self.generation++;[self.timer invalidate];self.timer=nil;
+@@ -64,6 +71,7 @@ - (void)tick:(NSTimer *)timer {
+ }
+ - (void)refresh {
+     NSAssert(NSThread.isMainThread,@"AI background sync requires the main thread");
++    if(!self.fallbackEnabled)return;
+     NSUInteger generation=self.generation;
+     if(!self.eligibility()){[self stop];return;}
+     if(generation!=self.generation)return;
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Controllers/CSAIReplyManager.m b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSAIReplyManager.m
+index 156d8e72..5e6cd5a2 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Controllers/CSAIReplyManager.m
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSAIReplyManager.m
+@@ -191,6 +191,7 @@ - (void)invalidateBackgroundSyncContext {
+ - (void)reconcileBackgroundSyncContext {
+     if(!NSThread.isMainThread)return;
+     CSAIReplyStore *store=self.store;NSDictionary *configuration=store.configuration;NSString *account=store.account;
++    self.backgroundSync.fallbackEnabled=configuration[@"backgroundFallback"]==nil || [configuration[@"backgroundFallback"] boolValue];
+     NSUInteger epoch=self.epoch,backupEpoch=CSBackupAccountEpoch();
+     if(self.backgroundSyncSnapshotCaptured && self.backgroundSyncObservedStore==store &&
+        self.backgroundSyncObservedConfiguration==configuration &&
+@@ -331,6 +332,7 @@ - (BOOL)allowsBackgroundSync {
+     if(self.savingConfiguration || !NSThread.isMainThread || self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground ||
+        !CSBackgroundRunManager.sharedManager.backgroundAudioActive)return NO;
+     NSDictionary *config=self.store.configuration;
++    if(config[@"backgroundFallback"] && ![config[@"backgroundFallback"] boolValue])return NO;
+     if(![config[@"enabled"] boolValue] || ![config[@"endpoint"] length] || ![config[@"model"] length] || ![config[@"credentialRevision"] length] ||
+        ![config[@"verifiedConnection"] length] || ![config[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(config)])return NO;
+     NSMutableArray<NSString *> *candidates=[NSMutableArray array];
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Controllers/CSAIReplyStore.m b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSAIReplyStore.m
+index 5971b98e..b8f26dd5 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Controllers/CSAIReplyStore.m
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSAIReplyStore.m
+@@ -18,10 +18,11 @@
+ static BOOL Fail(NSError **error, NSString *message) { if(error) *error=CSAIError(1,message); return NO; }
+ static BOOL String(id value, NSUInteger min, NSUInteger max) { return [value isKindOfClass:NSString.class] && [value length]>=min && [value length]<=max; }
+ static BOOL IsBoolean(id value) { return [value isKindOfClass:NSNumber.class] && ([value isEqual:@NO] || [value isEqual:@YES]); }
++static BOOL IsStrictBoolean(id value) { return [value isKindOfClass:NSNumber.class] && CFGetTypeID((__bridge CFTypeRef)value)==CFBooleanGetTypeID(); }
+ static NSString *Digest(NSString *value) { NSData *data=[value dataUsingEncoding:NSUTF8StringEncoding]; unsigned char bytes[CC_SHA256_DIGEST_LENGTH]; CC_SHA256(data.bytes,(CC_LONG)data.length,bytes); NSMutableString *result=[NSMutableString string]; for(NSUInteger i=0;i<sizeof(bytes);i++) [result appendFormat:@"%02x",bytes[i]]; return result; }
+ static BOOL OnlyKeys(NSDictionary *dictionary, NSArray *keys) { for(id key in dictionary) if(![keys containsObject:key]) return NO; return YES; }
+ NSURL *CSAIReplyFileURL(NSURL *root, NSString *account) { return [root URLByAppendingPathComponent:[NSString stringWithFormat:@"ai-reply-%@.plist",Digest(account)]]; }
+-NSDictionary *CSAIReplyDefaultConfiguration(void) { return @{@"enabled":@NO,@"endpoint":@"",@"model":@"",@"credentialRevision":@"",@"verifiedConnection":@"",@"provider":@"openai-compatible",@"imageEnabled":@NO,@"searchMode":@"off",@"thinkingEnabled":@NO,@"presets":@[@{@"id":@"default",@"name":@"默认回复",@"prompt":@"请根据对方的消息，用自然、友好、简洁的中文回复。不编造事实，不代替我作出承诺；不确定时明确说明。只输出要发送的回复正文，不附加解释或格式标记。"}],@"defaultPreset":@"default",@"conversations":@{}}; }
++NSDictionary *CSAIReplyDefaultConfiguration(void) { return @{@"enabled":@NO,@"backgroundFallback":@YES,@"endpoint":@"",@"model":@"",@"credentialRevision":@"",@"verifiedConnection":@"",@"provider":@"openai-compatible",@"imageEnabled":@NO,@"searchMode":@"off",@"thinkingEnabled":@NO,@"presets":@[@{@"id":@"default",@"name":@"默认回复",@"prompt":@"请根据对方的消息，用自然、友好、简洁的中文回复。不编造事实，不代替我作出承诺；不确定时明确说明。只输出要发送的回复正文，不附加解释或格式标记。"}],@"defaultPreset":@"default",@"conversations":@{}}; }
+ NSString *CSAIProvider(NSDictionary *configuration) { id value=configuration[@"provider"]; return [value isKindOfClass:NSString.class]?value:@"openai-compatible"; }
+ NSString *CSAISearchMode(NSDictionary *configuration) { id value=configuration[@"searchMode"]; return [value isKindOfClass:NSString.class]?value:@"off"; }
+ NSString *CSAIConnectionIdentifier(NSDictionary *configuration) {
+@@ -45,7 +46,7 @@ BOOL CSAIValidateEndpoint(NSString *endpoint, NSError **error) {
+ BOOL CSAIReplyValidateConfiguration(id configuration, NSError **error) {
+     if(![configuration isKindOfClass:NSDictionary.class]) return Fail(error,@"AI 配置格式无效");
+     NSDictionary *c=configuration;
+-    if(!OnlyKeys(c,@[@"enabled",@"endpoint",@"model",@"credentialRevision",@"verifiedConnection",@"verifiedAt",@"provider",@"imageEnabled",@"searchMode",@"thinkingEnabled",@"presets",@"defaultPreset",@"conversations"]) || !IsBoolean(c[@"enabled"]) || !String(c[@"endpoint"],0,8192) || !String(c[@"model"],0,200)) return Fail(error,@"AI 配置字段无效");
++    if(!OnlyKeys(c,@[@"enabled",@"backgroundFallback",@"endpoint",@"model",@"credentialRevision",@"verifiedConnection",@"verifiedAt",@"provider",@"imageEnabled",@"searchMode",@"thinkingEnabled",@"presets",@"defaultPreset",@"conversations"]) || !IsBoolean(c[@"enabled"]) || (c[@"backgroundFallback"] && !IsStrictBoolean(c[@"backgroundFallback"])) || !String(c[@"endpoint"],0,8192) || !String(c[@"model"],0,200)) return Fail(error,@"AI 配置字段无效");
+     if((c[@"provider"] && (!String(c[@"provider"],1,30) || ![@[@"openai-compatible",@"bailian"] containsObject:c[@"provider"]])) ||
+        (c[@"imageEnabled"] && !IsBoolean(c[@"imageEnabled"])) || (c[@"thinkingEnabled"] && !IsBoolean(c[@"thinkingEnabled"])) ||
+        (c[@"searchMode"] && (!String(c[@"searchMode"],1,10) || ![@[@"off",@"auto",@"always"] containsObject:c[@"searchMode"]]))) return Fail(error,@"模型能力配置无效");
+@@ -78,7 +79,7 @@ BOOL CSAIReplyValidateState(id state, NSString *account, NSError **error) {
+ }
+ NSDictionary *CSAIReplyPortableState(NSDictionary *state) {
+     NSMutableDictionary *c=[NSMutableDictionary dictionary]; NSDictionary *source=state[@"configuration"]?:CSAIReplyDefaultConfiguration();
+-    for(NSString *key in @[@"enabled",@"endpoint",@"model",@"provider",@"imageEnabled",@"searchMode",@"thinkingEnabled",@"presets",@"defaultPreset",@"conversations"]) if(source[key]) c[key]=source[key];
++    for(NSString *key in @[@"enabled",@"backgroundFallback",@"endpoint",@"model",@"provider",@"imageEnabled",@"searchMode",@"thinkingEnabled",@"presets",@"defaultPreset",@"conversations"]) if(source[key]) c[key]=source[key];
+     return @{@"schema":@1,@"account":state[@"account"]?:@"",@"configuration":c};
+ }
+ static NSDictionary *NewState(NSString *account) { return @{@"schema":@1,@"account":account,@"configuration":CSAIReplyDefaultConfiguration(),@"handled":@{},@"history":@[]}; }
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Controllers/CSAIReplySettingsViewController.m b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSAIReplySettingsViewController.m
+index fc3b727d..eb3eaf22 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Controllers/CSAIReplySettingsViewController.m
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSAIReplySettingsViewController.m
+@@ -322,6 +322,7 @@ - (void)testConnection{
+ - (void)reload{
+     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;NSDictionary *config=manager.store.configuration?:CSAIReplyDefaultConfiguration();__weak typeof(self) weakSelf=self;
+     CSSettingItem *toggle=[CSSettingItem switchItemWithTitle:@"启用 AI 自动回复" iconName:@"sparkles" iconColor:UIColor.systemGreenColor switchValue:[config[@"enabled"] boolValue] valueChangedBlock:^(BOOL on){NSMutableDictionary *next=[manager.store.configuration mutableCopy];next[@"enabled"]=@(on);[weakSelf save:next];}];
++    CSSettingItem *fallback=[CSSettingItem switchItemWithTitle:@"后台兜底补拉" iconName:@"arrow.clockwise" iconColor:UIColor.systemBlueColor switchValue:!config[@"backgroundFallback"] || [config[@"backgroundFallback"] boolValue] valueChangedBlock:^(BOOL on){NSMutableDictionary *next=[manager.store.configuration mutableCopy];next[@"backgroundFallback"]=@(on);[weakSelf save:next];}];
+     NSString *originalConnection=CSAIConnectionIdentifier(config);BOOL bailian=[CSAIProvider(config) isEqual:@"bailian"];
+     CSSettingItem *image=[CSSettingItem switchItemWithTitle:@"图片识别" iconName:@"photo" iconColor:UIColor.systemBlueColor switchValue:[config[@"imageEnabled"] boolValue] valueChangedBlock:^(BOOL on){AISaveCapabilityChanges(weakSelf,@{@"imageEnabled":@(on)},originalConnection,nil);}];
+     CSSettingItem *thinking=[CSSettingItem switchItemWithTitle:@"思考模式" iconName:@"brain" iconColor:UIColor.systemBlueColor switchValue:[config[@"thinkingEnabled"] boolValue] valueChangedBlock:^(BOOL on){
+@@ -331,12 +332,12 @@ - (void)reload{
+     NSUInteger count=[self current]?CSCloseFriendVisibleAIConversations(config[@"conversations"],self.account,CSCloseFriendCurrentSnapshot()).count:0;
+     NSString *connection=manager.connectionStatus;if(!connection.length)connection=[config[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(config)]?@"已通过连接测试":@"尚未验证当前配置";
+     self.sections=@[
+-        [CSSettingSection sectionWithHeader:@"功能" items:@[toggle,AIRow(@"当前状态",@"info.circle",[self current]?[manager statusForConversation:nil]:@"账号已改变或尚未就绪",nil)]],
++        [CSSettingSection sectionWithHeader:@"功能" items:@[toggle,fallback,AIRow(@"当前状态",@"info.circle",[self current]?[manager statusForConversation:nil]:@"账号已改变或尚未就绪",nil)]],
+         [CSSettingSection sectionWithHeader:@"模型连接" items:@[AIRow(@"服务商",@"cloud",AIProviderTitle(config),^{[weakSelf chooseProvider];}),AIRow(@"API 请求地址",@"link",[config[@"endpoint"] length]?config[@"endpoint"]:@"未设置",^{[weakSelf openConnection];}),AIRow(@"API Key",@"key",[config[@"credentialRevision"] length]?@"已设置":@"未设置",^{[weakSelf openConnection];}),AIRow(@"模型名称",@"cpu",[config[@"model"] length]?config[@"model"]:@"未设置",^{[weakSelf openConnection];}),image,AIRow(@"联网模式",@"globe",AISearchTitle(config),^{[weakSelf chooseSearchMode];}),thinking,AIRow(self.testing?@"取消连接测试":@"测试连接",@"network",self.testing?@"测试中…":nil,^{[weakSelf testConnection];}),AIRow(@"连接状态",@"checkmark.circle",connection,nil)]],
+         [CSSettingSection sectionWithHeader:@"回复预设" items:@[AIRow(@"默认预设",@"text.bubble",[manager presetNameForConversation:nil],^{CSAIPresentPresetPicker(weakSelf,nil,weakSelf.account,weakSelf.epoch);}),AIRow(@"管理预设",@"square.stack",[NSString stringWithFormat:@"%lu 个",(unsigned long)[config[@"presets"] count]],^{[weakSelf openPage:CSAIPresetsPage.class];})]],
+         [CSSettingSection sectionWithHeader:@"回复管理" items:@[AIRow(@"已开启的会话",@"bubble.left.and.bubble.right",[NSString stringWithFormat:@"%lu 个",(unsigned long)count],^{[weakSelf openPage:CSAIConversationsPage.class];}),AIRow(@"回复记录",@"clock",nil,^{[weakSelf openPage:CSAIHistoryPage.class];})]]
+     ];
+-    self.footers=@[@"总开关与会话开关同时开启才会回复。手动回复不会暂停 AI。关闭时取消尚未提交的任务，重新开启不补回复历史消息。",@"能力设置作用于当前模型连接及所有已启用的会话。图片识别、联网、思考默认关闭，联网与思考仅支持百炼。修改连接或能力后需重新测试；启用图片时测试会发送合成图文样例，不发送微信消息。API Key 与原始图片不随配置备份导出。",@"启用后，符合规则的文本及有限上下文会发送到你配置的模型服务；开启图片识别后还会发送符合触发规则的图片，并以当前微信账号自动发送生成的回复。",@"群聊可发图后 30 秒内由同一人 @ 提问；免 @ 群可直接发图。群聊默认仅在被单独 @ 时回复，可在当前群开启“免 @ 回复”。微信被系统挂起或退出时无法保证自动回复；本功能不会自动开启后台保活。"];
++    self.footers=@[@"总开关与会话开关同时开启才会回复。手动回复不会暂停 AI。关闭时取消尚未提交的任务，重新开启不补回复历史消息。\n后台兜底补拉：默认开启，满足后台运行和 AI 条件时，以约 45 秒为兜底期限尝试补拉会话；已验证的完整同步会顺延下一次补拉。适合免打扰群的后台自动回复；会周期性唤醒网络，收到符合规则的消息后还可能触发模型请求，存在额外耗电。关闭后仅依靠微信自身事件或回到前台时同步，更省电，但后台可能不再自动回复。",@"能力设置作用于当前模型连接及所有已启用的会话。图片识别、联网、思考默认关闭，联网与思考仅支持百炼。修改连接或能力后需重新测试；启用图片时测试会发送合成图文样例，不发送微信消息。API Key 与原始图片不随配置备份导出。",@"启用后，符合规则的文本及有限上下文会发送到你配置的模型服务；开启图片识别后还会发送符合触发规则的图片，并以当前微信账号自动发送生成的回复。",@"群聊可发图后 30 秒内由同一人 @ 提问；免 @ 群可直接发图。群聊默认仅在被单独 @ 时回复，可在当前群开启“免 @ 回复”。微信被系统挂起或退出时无法保证自动回复；本功能不会自动开启后台保活。"];
+     [super reload];
+ }
+ @end
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Tests/AIBackgroundSyncTests.m b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/AIBackgroundSyncTests.m
+index 8c4d06d4..c0e3b43b 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Tests/AIBackgroundSyncTests.m
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/AIBackgroundSyncTests.m
+@@ -146,7 +146,58 @@ static void CompletionReentryAndFailures(void) {
+     now=345;@try{Fire(scheduler);CHECK(NO);}@catch(NSException *exception){CHECK([exception.name isEqual:@"fixture"]);}
+     CHECK(attempts==2 && scheduler.active);[scheduler stop];
+ }
++static void FallbackToggleDeadlines(void) {
++    __block NSTimeInterval now=100;__block NSUInteger attempts=0,eligibilityReads=0;
++    CSAIBackgroundSync *scheduler=[[CSAIBackgroundSync alloc]initWithEligibility:^BOOL{eligibilityReads++;return YES;} synchronize:^{attempts++;}];scheduler.now=^{return now;};
++    CHECK(scheduler.fallbackEnabled && !scheduler.active);
++    scheduler.fallbackEnabled=NO;[scheduler refresh];[scheduler verifiedFullSyncCompleted];
++    CHECK(!scheduler.active && !Timer(scheduler) && !attempts && !eligibilityReads);
++    scheduler.fallbackEnabled=YES;CHECK(!scheduler.active && !Timer(scheduler) && !attempts);
++    [scheduler refresh];CHECK(scheduler.active && attempts==1 && DelayIs(Timer(scheduler),45));
++    now=120;[scheduler verifiedFullSyncCompleted];NSTimer *covered=Timer(scheduler);CHECK(DelayIs(covered,45));
++    now=125;scheduler.fallbackEnabled=NO;CHECK(!scheduler.active && !Timer(scheduler) && !covered.valid);
++    now=130;[scheduler refresh];[scheduler verifiedFullSyncCompleted];[scheduler tick:covered];
++    CHECK(!scheduler.active && !Timer(scheduler) && attempts==1);
++    // Direct toggles preserve valid coverage as well as the attempt budget.
++    scheduler.fallbackEnabled=YES;CHECK(!scheduler.active && attempts==1);
++    [scheduler refresh];CHECK(scheduler.active && attempts==1 && DelayIs(Timer(scheduler),35) && Timer(scheduler).tolerance==3);
++    now=145;Fire(scheduler);CHECK(attempts==1 && DelayIs(Timer(scheduler),20));
++    now=164.999;Fire(scheduler);CHECK(attempts==1);now=165;Fire(scheduler);CHECK(attempts==2);
++    now=170;scheduler.fallbackEnabled=NO;[scheduler invalidateVerifiedSync];[scheduler refresh];
++    CHECK(!scheduler.active && !Timer(scheduler) && attempts==2);
++    now=180;scheduler.fallbackEnabled=YES;[scheduler refresh];CHECK(attempts==2 && DelayIs(Timer(scheduler),30));
++    // Repeated assignments and a stale timer cannot spend another budget.
++    NSTimer *current=Timer(scheduler);scheduler.fallbackEnabled=YES;[scheduler refresh];[scheduler tick:covered];
++    CHECK(Timer(scheduler)==current && attempts==2);
++    now=209.999;Fire(scheduler);CHECK(attempts==2);now=210;Fire(scheduler);CHECK(attempts==3);
++    scheduler.fallbackEnabled=NO;now=1000;[scheduler refresh];[scheduler verifiedFullSyncCompleted];CHECK(!scheduler.active && attempts==3);
++    scheduler.fallbackEnabled=YES;CHECK(!scheduler.active && attempts==3);[scheduler refresh];CHECK(scheduler.active && attempts==4);[scheduler stop];
++}
++static void FallbackToggleReentry(void) {
++    for(NSUInteger boundary=0;boundary<3;boundary++){
++        __block NSTimeInterval now=100;__block NSUInteger attempts=0;__block BOOL disable=NO;
++        __block __weak CSAIBackgroundSync *weak;
++        CSAIBackgroundSync *scheduler=[[CSAIBackgroundSync alloc]initWithEligibility:^BOOL{
++            if(disable && boundary==0){disable=NO;weak.fallbackEnabled=NO;}return YES;
++        } synchronize:^{
++            attempts++;
++            if(disable && boundary==2){
++                disable=NO;weak.fallbackEnabled=NO;[weak refresh];[weak verifiedFullSyncCompleted];
++                CHECK(!weak.active && !Timer(weak));weak.fallbackEnabled=YES;[weak refresh];
++            }
++        }];weak=scheduler;scheduler.now=^{if(disable && boundary==1){disable=NO;weak.fallbackEnabled=NO;}return now;};
++        [scheduler refresh];CHECK(attempts==1 && scheduler.active);
++        NSTimer *stale=Timer(scheduler);now=145;disable=YES;Fire(scheduler);
++        if(boundary<2){
++            CHECK(attempts==1 && !scheduler.active && !scheduler.fallbackEnabled && !Timer(scheduler));
++            [scheduler refresh];[scheduler verifiedFullSyncCompleted];[scheduler tick:stale];CHECK(attempts==1 && !scheduler.active);
++            scheduler.fallbackEnabled=YES;[scheduler refresh];CHECK(attempts==2 && scheduler.active);
++        }else CHECK(attempts==2 && scheduler.active && DelayIs(Timer(scheduler),45));
++        now=189.999;Fire(scheduler);CHECK(attempts==2);now=190;Fire(scheduler);CHECK(attempts==3);[scheduler stop];
++    }
++}
+ int main(void) { @autoreleasepool {
+     EligibilityAndCadence();StopRestartAndStaleTimers();ReentryAndRejectedAttempts();InvalidTimeAndRelease();RevocationInsideBoundaries();VerifiedCoverageAndInvalidation();CompletionReentryAndFailures();
++    FallbackToggleDeadlines();FallbackToggleReentry();
+     printf("AI background sync scheduler: %lu checks passed; 45-second one-shot deadlines, verified coverage, revocation, cooldown, stale/early timers, reentry, failed attempts, finite time and release\n",(unsigned long)checks);
+ } return 0; }
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Tests/AIReplyManagerTests.m b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/AIReplyManagerTests.m
+index 532a4272..4d29f0c4 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Tests/AIReplyManagerTests.m
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/AIReplyManagerTests.m
+@@ -32,6 +32,7 @@ void CSAIObserveBackgroundSyncRequest(NSUInteger expectedEpoch,void (^request)(v
+ #import <unistd.h>
+ #import <errno.h>
+ #import <stdatomic.h>
++#import <math.h>
+ @interface CSAIReplyManager (AdmissionFixture)
+ - (void)notify;
+ - (void)invalidateConnectionTest;
+@@ -702,6 +703,94 @@ static void BackgroundSyncRequestReentry(NSURL *root){
+     }
+     nativeSyncService=nil;backgroundAudioActive=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+ }
++static BOOL SyncDelayIs(CSAIBackgroundSync *scheduler,NSTimeInterval delay){NSTimer *timer=SyncTimer(scheduler);return timer.valid && fabs([timer.fireDate timeIntervalSinceNow]-delay)<1;}
++static void SaveBackgroundFallback(CSAIReplyManager *manager,BOOL enabled,BOOL expectedSuccess){
++    NSMutableDictionary *configuration=[manager.store.configuration mutableCopy];configuration[@"backgroundFallback"]=@(enabled);
++    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block BOOL done=NO;
++    [manager saveConfiguration:configuration account:account epoch:epoch completion:^(BOOL success,NSError *error){CHECK(success==expectedSuccess && (success || error));done=YES;}];
++    CHECK(!done && !scheduler.active);WaitFor(^BOOL{return done;});
++}
++static void BackgroundFallbackConfiguration(NSURL *root){
++    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;SetPrivacy(YES,YES,YES);
++    TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:@"fallback-toggle.plist"],&store);
++    NSMutableDictionary *legacy=[store.configuration mutableCopy];[legacy removeObjectForKey:@"backgroundFallback"];CHECK([store saveConfiguration:legacy error:NULL]);
++    CHECK(!store.configuration[@"backgroundFallback"]);NSString *connection=store.configuration[@"verifiedConnection"];
++    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=40000;scheduler.now=^{return clock;};
++    TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;[manager refresh];
++    CHECK(scheduler.fallbackEnabled && scheduler.active && service.syncCalls==1 && SyncDelayIs(scheduler,45));
++    clock=40005;id oldContext=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(oldContext);NSTimer *old=SyncTimer(scheduler);
++    clock=40010;SaveBackgroundFallback(manager,NO,YES);
++    CHECK(![store.configuration[@"backgroundFallback"] boolValue] && !scheduler.fallbackEnabled && !scheduler.active && !SyncTimer(scheduler) && !old.valid);
++    CHECK([store.configuration[@"verifiedConnection"] isEqual:connection] && [CSAIConnectionIdentifier(store.configuration) isEqual:connection]);
++    [manager nativeFullSyncCompletedWithContext:oldContext];CHECK(!HasVerifiedSync(scheduler));
++    clock=40020;for(NSUInteger i=0;i<5;i++){[manager refresh];[scheduler refresh];[scheduler verifiedFullSyncCompleted];[old fire];}
++    CHECK(!scheduler.active && !SyncTimer(scheduler) && service.syncCalls==1);
++    CHECK(![manager captureBackgroundSyncContextForEpoch:epoch]);
++    // Disabling fallback leaves incoming-message admission and model work intact.
++    CSAIReplyCoordinator *coordinator=[manager valueForKey:@"coordinator"];coordinator.now=^{return clock;};[coordinator configurationDidChange];keys[@[account,@"context-fixture"]]=@"fake-key";
++    CHECK(CSAIReplyMessageIngressEnabled() && CSAIReplyMessageIngressAllowsSession(@"room@chatroom",epoch));
++    TestMessageWrap *message=Message(@"room@chatroom",account,901,clock);message.m_nsRealChatUsr=@"member";
++    [manager receiveNativeSession:@"room@chatroom" wrap:message epoch:epoch];DrainMain();CHECK(coordinator.pendingCount==1 && service.syncCalls==1);
++    clock+=2;[coordinator processPending];CHECK([(TestClient *)[manager valueForKey:@"client"] callbacks].count==1 && service.syncCalls==1);[coordinator cancelAll];
++    clock=40030;SaveBackgroundFallback(manager,YES,YES);
++    CHECK(scheduler.fallbackEnabled && scheduler.active && service.syncCalls==1 && SyncDelayIs(scheduler,15) && SyncTimer(scheduler).tolerance==3);
++    CHECK([store.configuration[@"verifiedConnection"] isEqual:connection]);
++    clock=40044;FireSync(scheduler);CHECK(service.syncCalls==1);clock=40045;FireSync(scheduler);CHECK(service.syncCalls==2);
++    clock=40050;oldContext=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(oldContext);[manager nativeFullSyncCompletedWithContext:oldContext];
++    CHECK(HasVerifiedSync(scheduler) && SyncDelayIs(scheduler,45));oldContext=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(oldContext);
++    // Saving a new configuration retains the original evidence revocation rule:
++    // attempt+45 remains; old configuration coverage+45 is deliberately revoked.
++    clock=40060;SaveBackgroundFallback(manager,NO,YES);CHECK(!HasVerifiedSync(scheduler) && !scheduler.active);
++    clock=40070;SaveBackgroundFallback(manager,YES,YES);CHECK(!HasVerifiedSync(scheduler) && service.syncCalls==2 && SyncDelayIs(scheduler,20));
++    [manager nativeFullSyncCompletedWithContext:oldContext];CHECK(!HasVerifiedSync(scheduler) && service.syncCalls==2);
++    clock=40090;FireSync(scheduler);CHECK(service.syncCalls==3);
++    // A failed save restores behavior from the still-persisted configuration.
++    store.failSave=YES;clock=40100;SaveBackgroundFallback(manager,NO,NO);
++    CHECK([store.configuration[@"backgroundFallback"] boolValue] && scheduler.fallbackEnabled && scheduler.active && service.syncCalls==3 && SyncDelayIs(scheduler,35));
++    store.failSave=NO;clock=40105;SaveBackgroundFallback(manager,NO,YES);CHECK(!scheduler.active && !scheduler.fallbackEnabled);
++    store.failSave=YES;clock=40110;SaveBackgroundFallback(manager,YES,NO);
++    CHECK(![store.configuration[@"backgroundFallback"] boolValue] && !scheduler.fallbackEnabled && !scheduler.active && !SyncTimer(scheduler) && service.syncCalls==3);
++    store.failSave=NO;clock=40120;SaveBackgroundFallback(manager,YES,YES);CHECK(scheduler.active && service.syncCalls==3 && SyncDelayIs(scheduler,15));
++    clock=40135;FireSync(scheduler);CHECK(service.syncCalls==4);
++    CHECK([store.configuration[@"verifiedConnection"] isEqual:connection]);
++    // The switch follows each account's Store; a stale former-account scope
++    // cannot establish coverage or bring that account's fallback back.
++    oldContext=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(oldContext);
++    TestStore *bob=[[TestStore alloc]initWithURL:[root URLByAppendingPathComponent:@"fallback-bob.plist"] account:@"bob"];CHECK([bob load]);
++    NSMutableDictionary *bobConfig=[store.configuration mutableCopy];bobConfig[@"backgroundFallback"]=@NO;CHECK([bob saveConfiguration:bobConfig error:NULL]);
++    account=@"bob";epoch++;[manager setValue:bob forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager refresh];
++    CHECK(!scheduler.active && !scheduler.fallbackEnabled && service.syncCalls==4);[manager nativeFullSyncCompletedWithContext:oldContext];CHECK(!HasVerifiedSync(scheduler));
++    account=@"alice";epoch=7;[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];clock=40140;[manager refresh];
++    CHECK(scheduler.active && scheduler.fallbackEnabled && service.syncCalls==4 && SyncDelayIs(scheduler,40));
++    [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];nativeSyncService=nil;backgroundAudioActive=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
++}
++static void BackgroundFallbackReentry(NSURL *root){
++    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;
++    for(NSUInteger boundary=0;boundary<4;boundary++){
++        TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:[NSString stringWithFormat:@"fallback-reentry-%lu.plist",(unsigned long)boundary]],&store);
++        CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=50000;scheduler.now=^{return clock;};
++        TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;[manager refresh];CHECK(service.syncCalls==1 && scheduler.active);
++        id oldContext=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(oldContext);
++        dispatch_block_t toggle=^{
++            NSMutableDictionary *off=[store.configuration mutableCopy];off[@"backgroundFallback"]=@NO;CHECK([store saveConfiguration:off error:NULL]);[manager refresh];
++            CHECK(!scheduler.active && !scheduler.fallbackEnabled && !SyncTimer(scheduler));
++            if(boundary==3){NSMutableDictionary *on=[store.configuration mutableCopy];on[@"backgroundFallback"]=@YES;CHECK([store saveConfiguration:on error:NULL]);[manager refresh];}
++        };
++        if(boundary==0)duringContactLookup=toggle;else if(boundary==1)service.afterBusyCheck=toggle;else duringBackgroundSyncObservation=toggle;
++        clock=50045;FireSync(scheduler);service.afterBusyCheck=nil;
++        CHECK(service.syncCalls==1 && !HasVerifiedSync(scheduler) && !nativeGetterReadsInObservedRequest);
++        [manager nativeFullSyncCompletedWithContext:oldContext];CHECK(!HasVerifiedSync(scheduler));
++        if(boundary<3)CHECK(!scheduler.active && !scheduler.fallbackEnabled);else CHECK(scheduler.active && scheduler.fallbackEnabled && SyncDelayIs(scheduler,45));
++        clock=50050;SaveBackgroundFallback(manager,YES,YES);
++        if(boundary==0)CHECK(service.syncCalls==2 && scheduler.active && SyncDelayIs(scheduler,45));
++        else{
++            CHECK(service.syncCalls==1 && scheduler.active && SyncDelayIs(scheduler,40));
++            clock=50089.999;FireSync(scheduler);CHECK(service.syncCalls==1);clock=50090;FireSync(scheduler);CHECK(service.syncCalls==2);
++        }
++        [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];duringContactLookup=nil;duringBackgroundSyncObservation=nil;
++    }
++    nativeSyncService=nil;backgroundAudioActive=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
++}
+ static void CapabilityAndImageIntegration(NSURL *url){
+     CSAIReplyStore *store=[[CSAIReplyStore alloc]initWithURL:url account:account];CHECK([store load]);
+     NSMutableDictionary *config=[store.configuration mutableCopy];config[@"enabled"]=@YES;config[@"endpoint"]=@"https://example.invalid/v1/chat/completions";config[@"model"]=@"qwen3.8-flash";
+@@ -899,6 +988,8 @@ int main(int argc,const char **argv){@autoreleasepool{
+     BackgroundSyncReplies([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"background-replies.plist"]);
+     BackgroundSyncContexts([url URLByDeletingLastPathComponent]);
+     BackgroundSyncRequestReentry([url URLByDeletingLastPathComponent]);
++    BackgroundFallbackConfiguration([url URLByDeletingLastPathComponent]);
++    BackgroundFallbackReentry([url URLByDeletingLastPathComponent]);
+     CHECK(!insideBackgroundSyncRequest && !nativeGetterReadsInObservedRequest);
+     CapabilityAndImageIntegration([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"image-integration.plist"]);
+     AsyncManagerMutations([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"async-manager.plist"]);
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Tests/AIReplyCoordinatorTests.m b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/AIReplyCoordinatorTests.m
+index 0e1db14a..5cf335ef 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Tests/AIReplyCoordinatorTests.m
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/AIReplyCoordinatorTests.m
+@@ -586,7 +586,79 @@ static void AsyncCredentialOwnership(void){
+     read.completion(nil,CSAIError(30,@"private backend text"));CHECK(!f.client.operations.count && !f.coordinator.activeCount);
+     CHECK([f.store.history.lastObject[@"detail"] isEqual:@"凭据或当前会话状态不可用"]);
+ }
++static void BackgroundFallbackConfiguration(void){
++    NSUInteger before=checks;
++    NSString *account=@"fallback-toggle-test";
++    NSURL *root=[NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString] isDirectory:YES];
++    NSURL *url=CSAIReplyFileURL(root,account);
++    CSAIReplyStore *store=[[CSAIReplyStore alloc] initWithURL:url account:account];
++    CHECK([store load] && [store.configuration[@"backgroundFallback"] isEqual:@YES]);
++    CHECK([CSAIReplyDefaultConfiguration()[@"backgroundFallback"] isEqual:@YES]);
++
++    // A pre-toggle configuration remains valid and loads without rewriting its file.
++    NSMutableDictionary *legacy=[CSAIReplyDefaultConfiguration() mutableCopy];
++    [legacy removeObjectForKey:@"backgroundFallback"];
++    legacy[@"enabled"]=@YES;legacy[@"endpoint"]=@"https://example.invalid/chat";
++    legacy[@"model"]=@"fake-model";legacy[@"credentialRevision"]=@"existing-key-revision";
++    NSString *fingerprint=CSAIConnectionIdentifier(legacy);
++    NSDate *verifiedAt=[NSDate dateWithTimeIntervalSince1970:1700000000];
++    legacy[@"verifiedConnection"]=fingerprint;legacy[@"verifiedAt"]=verifiedAt;
++    CHECK(CSAIReplyValidateConfiguration(legacy,NULL));
++    CHECK([store saveConfiguration:legacy error:NULL]);
++    NSData *legacyBytes=[NSData dataWithContentsOfURL:url];CHECK(legacyBytes.length>0);
++    CSAIReplyStore *legacyReader=[[CSAIReplyStore alloc] initWithURL:url account:account];
++    CHECK([legacyReader load] && !legacyReader.configuration[@"backgroundFallback"]);
++    CHECK([[NSData dataWithContentsOfURL:url] isEqual:legacyBytes]);
++    CHECK([legacyReader.configuration[@"verifiedConnection"] isEqual:fingerprint] && [legacyReader.configuration[@"verifiedAt"] isEqual:verifiedAt]);
++    NSDictionary *legacyState=[CSAIReplyStore readStateAtURL:url account:account error:NULL];
++    NSDictionary *legacyPortable=CSAIReplyPortableState(legacyState);
++    CHECK(!legacyPortable[@"configuration"][@"backgroundFallback"] && CSAIReplyValidateState(legacyPortable,account,NULL));
++    NSURL *legacyRestoreURL=[root URLByAppendingPathComponent:@"legacy-restored.plist"];
++    CHECK([CSAIReplyStore replaceState:legacyPortable atURL:legacyRestoreURL account:account error:NULL]);
++    CSAIReplyStore *legacyRestored=[[CSAIReplyStore alloc] initWithURL:legacyRestoreURL account:account];
++    CHECK([legacyRestored load] && !legacyRestored.configuration[@"backgroundFallback"]);
++
++    // Exercise both values through real disk persistence and the portable backup boundary.
++    NSUInteger revision=0;
++    for(NSNumber *value in @[@YES,@NO,@YES]){
++        NSMutableDictionary *configuration=[store.configuration mutableCopy];configuration[@"backgroundFallback"]=value;
++        CHECK(CSAIReplyValidateConfiguration(configuration,NULL));
++        CHECK([CSAIConnectionIdentifier(configuration) isEqual:fingerprint]);
++        CHECK([store saveConfiguration:configuration error:NULL]);
++        NSDictionary *saved=[CSAIReplyStore readStateAtURL:url account:account error:NULL];
++        CHECK([saved[@"configuration"][@"backgroundFallback"] isEqual:value]);
++        CHECK([saved[@"configuration"][@"verifiedConnection"] isEqual:fingerprint] && [saved[@"configuration"][@"verifiedAt"] isEqual:verifiedAt]);
++        CSAIReplyStore *reader=[[CSAIReplyStore alloc] initWithURL:url account:account];
++        CHECK([reader load] && [reader.configuration[@"backgroundFallback"] isEqual:value]);
++        CHECK([CSAIConnectionIdentifier(reader.configuration) isEqual:fingerprint] && [reader.configuration[@"enabled"] boolValue]);
++        NSDictionary *portable=CSAIReplyPortableState(saved);
++        CHECK([portable[@"configuration"][@"backgroundFallback"] isEqual:value]);
++        CHECK(!portable[@"configuration"][@"credentialRevision"] && !portable[@"configuration"][@"verifiedConnection"] && !portable[@"configuration"][@"verifiedAt"]);
++        // Preserve BackupEngine's existing restore safety while retaining the new preference.
++        NSMutableDictionary *restoring=[portable mutableCopy],*restoredConfiguration=[portable[@"configuration"] mutableCopy];
++        restoredConfiguration[@"enabled"]=@NO;restoredConfiguration[@"credentialRevision"]=@"";restoredConfiguration[@"verifiedConnection"]=@"";
++        restoring[@"configuration"]=restoredConfiguration;restoring[@"handled"]=@{};restoring[@"history"]=@[];
++        NSURL *restoredURL=[root URLByAppendingPathComponent:[NSString stringWithFormat:@"restored-%lu.plist",(unsigned long)revision++]];
++        CHECK([CSAIReplyStore replaceState:restoring atURL:restoredURL account:account error:NULL]);
++        CSAIReplyStore *restored=[[CSAIReplyStore alloc] initWithURL:restoredURL account:account];
++        CHECK([restored load] && [restored.configuration[@"backgroundFallback"] isEqual:value]);
++        CHECK(![restored.configuration[@"enabled"] boolValue] && ![restored.configuration[@"credentialRevision"] length] && ![restored.configuration[@"verifiedConnection"] length]);
++    }
++
++    // Reject coercible strings and numeric 0/1 as well as malformed container/null values.
++    NSDictionary *accepted=[store.configuration copy];NSData *acceptedBytes=[NSData dataWithContentsOfURL:url];
++    for(id invalid in @[@"YES",@"false",@0,@1,@2,@(-1),@0.0,@1.0,NSNull.null,@[],@{}]){
++        NSMutableDictionary *configuration=[accepted mutableCopy];configuration[@"backgroundFallback"]=invalid;
++        NSError *validationError=nil,*saveError=nil;
++        CHECK(!CSAIReplyValidateConfiguration(configuration,&validationError) && validationError);
++        CHECK(![store saveConfiguration:configuration error:&saveError] && saveError);
++        CHECK(store.ready && [store.configuration isEqual:accepted]);
++        CHECK([[NSData dataWithContentsOfURL:url] isEqual:acceptedBytes]);
++    }
++    CHECK([NSFileManager.defaultManager removeItemAtURL:root error:NULL]);
++    printf("BackgroundFallbackConfiguration: %lu checks passed: legacy compatibility, strict booleans, persisted toggles, portable restore and connection verification preservation\n",(unsigned long)(checks-before));
++}
+ int main(void){@autoreleasepool{
+-    AsyncCredentialOwnership();Filters();GroupUnmentioned();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();GlobalContextBoundsAndMemoryPressure();DeferredClaimsAndAliases();ProductionAsyncStoreIntegration();ImagePreparationAndOwnership();SafeFailureDetails();GroupImagesAndBudgets();OneShotProductionWakeup();
++    BackgroundFallbackConfiguration();AsyncCredentialOwnership();Filters();GroupUnmentioned();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();GlobalContextBoundsAndMemoryPressure();DeferredClaimsAndAliases();ProductionAsyncStoreIntegration();ImagePreparationAndOwnership();SafeFailureDetails();GroupImagesAndBudgets();OneShotProductionWakeup();
+     printf("AIReplyCoordinatorTests: %lu checks passed: filtering, alias durability fences, bounded async admissions, LRU/TTL/global text budget, memory pressure, serialization, cancellation, expiry, safe failure details and one-shot timers\n",(unsigned long)checks);
+ }return 0;}
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Tests/verify-ai-background-sync.sh b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/verify-ai-background-sync.sh
+index 1b01c4bd..9e543978 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Tests/verify-ai-background-sync.sh
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/verify-ai-background-sync.sh
+@@ -5,7 +5,12 @@ test_dir=$(mktemp -d "${TMPDIR:-/tmp}/wechat-ai-background-sync.XXXXXX")
+ trap 'rm -rf "$test_dir"' EXIT
+ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \
+  -IControllers -framework Foundation Controllers/CSAIBackgroundSync.m Tests/AIBackgroundSyncTests.m -o "$test_dir/tests"
+-"$test_dir/tests"
++test_output=$("$test_dir/tests")
++printf '%s\n' "$test_output"
++if [[ "$test_output" != 'AI background sync scheduler: 115 checks passed;'* ]]; then
++ printf 'Unexpected AI background sync check count (expected 115).\n' >&2
++ exit 1
++fi
+ if [[ "${1:-}" == "--ios" ]]; then
+  sdk_dir=$(xcrun --sdk iphoneos --show-sdk-path)
+  for arch in arm64 arm64e; do
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Tests/verify-ai-manager.sh b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/verify-ai-manager.sh
+index a1698b7f..896b7dce 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Tests/verify-ai-manager.sh
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/verify-ai-manager.sh
+@@ -22,7 +22,12 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecat
+  "$test_dir/AIStoreUnderTest.m" Controllers/CSAIClient.m Controllers/CSAIReplyCoordinator.m Controllers/CSAIMessageAdapter.m Controllers/CSAIBackgroundSync.m \
+  Controllers/CSAIImagePreparer.m Controllers/CSAIReplyManager.m Controllers/CSBackupMutation.m Controllers/CSCloseFriendPolicy.m \
+  Controllers/CSCloseFriendAutomationProjection.m Tests/AIReplyManagerTests.m -o "$test_dir/tests"
+-"$test_dir/tests" "$test_dir/state.plist"
++test_output=$("$test_dir/tests" "$test_dir/state.plist")
++printf '%s\n' "$test_output"
++if [[ "$test_output" != 'AI reply manager: 850 checks passed' ]]; then
++ printf 'Unexpected AI reply manager check count (expected 850).\n' >&2
++ exit 1
++fi
+ if [[ "${1:-}" == "--ios" ]]; then
+  sdk_dir=$(xcrun --sdk iphoneos --show-sdk-path)
+  for arch in arm64 arm64e; do
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/control b/Users/zhangshichao/Documents/Workspace/WeChatImprove/control
+index d837324c..ec0e91d7 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/control
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.1-17
++Version: 2.1-19
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Headers/CSUserInfoHelper.h b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers/CSUserInfoHelper.h
+index 03ad7e9a..a40bfbec 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Headers/CSUserInfoHelper.h
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@ extern NSString * const kUserAvatarURLKey;    // 用户头像URL缓存键
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.1-17"  // 插件版本号
++#define kPluginVersionString @"2.1-19"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Controllers/CSReleaseNotesViewController.m b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSReleaseNotesViewController.m
+index a347d515..82b4a8ee 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/Controllers/CSReleaseNotesViewController.m
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,9 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"2.1-19": @[
++            @{@"title": @"后台兜底补拉可开关", @"detail": @"AI 自动回复全局设置的“功能”分组新增“后台兜底补拉”，默认开启，旧配置保持原有约 45 秒兜底。适合免打扰群的后台自动回复；周期性同步及收到消息后的模型请求存在额外耗电。关闭立即停止插件兜底，仅依靠微信自身事件或回到前台时同步，后台可能不再自动回复。"}
++        ],
+         @"2.1-17": @[
+             @{@"title": @"优化 AI 后台消息同步", @"detail": @"后台同步兜底间隔调整为约 45 秒；微信 8.0.78 在确认原生完整同步成功后重排额外请求，减少重复同步。其他版本或无法确认完成时继续兜底尝试，保留免打扰群的后台消息接收路径。"},
+             @{@"title": @"保留自动回复与通话保护", @"detail": @"未开启 AI 的会话继续提前过滤；切号、配置变化和迟到同步回调重新校验。消息去重、过期拦截及通话音频让出规则继续有效，系统挂起或网络异常时仍无法保证后台回复。"}
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/README.md b/Users/zhangshichao/Documents/Workspace/WeChatImprove/README.md
+index f8d6ca0c..2dfb3bf1 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/README.md
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
+ 
+-**当前版本：`2.1-17`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`2.1-19`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
+ 
+@@ -31,8 +31,8 @@
+ | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
+ | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
+ | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
+-| Rootless | 本地提供 `2.1-17` 安装包，包含 AI 原生完整同步验证与约 45 秒后台兜底协同；待真机验收 |
+-| Rootful | 本地提供 `2.1-17` 安装包；待真机验收 |
++| Rootless | 本地提供 `2.1-19` 安装包，新增默认开启的“后台兜底补拉”开关；待真机验收 |
++| Rootful | 本地提供 `2.1-19` 安装包；待真机验收 |
+ | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
+ | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
+ 
+@@ -40,7 +40,7 @@
+ 
+ ### 安装步骤
+ 
+-1. 获取与设备注入环境匹配的 `.deb`：当前 `2.1-17` 交付 [Rootless 安装包](packages/2.1-17-ai-background/com.wechat.improve_2.1-17_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-17-ai-background/com.wechat.improve_2.1-17_iphoneos-arm.deb)、[调试符号](packages/2.1-17-ai-background/com.wechat.improve_2.1-17_symbols.zip) 和 [SHA-256](packages/2.1-17-ai-background/SHA256SUMS)。本次调整 AI 后台同步：微信 `8.0.78` 验证原生完整同步结果后重排额外请求，兜底间隔由约 30 秒调整为约 45 秒；其他版本或未确认完成时保留定期尝试。未启用会话过滤、账号隔离、消息去重、过期拦截和通话音频让出继续有效。保留 `2.1-16` 及此前优化和备份手动删除修复，前轮记录见 [2.1-16 记录](docs/audits/performance-2.1-16/README.md)；本次实现、原生证据、核心回归和构建核验见 [2.1-17 记录](docs/audits/ai-background-2.1-17/README.md)。
++1. 获取与设备注入环境匹配的 `.deb`：当前 `2.1-19` 交付 [Rootless 安装包](packages/2.1-19-ai-fallback-toggle/com.wechat.improve_2.1-19_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-19-ai-fallback-toggle/com.wechat.improve_2.1-19_iphoneos-arm.deb)、[调试符号](packages/2.1-19-ai-fallback-toggle/com.wechat.improve_2.1-19_symbols.zip) 和 [SHA-256](packages/2.1-19-ai-fallback-toggle/SHA256SUMS)。本次仅将约 45 秒兜底补拉改为可开关设置，位于 AI 自动回复全局页“功能”分组，默认开启，旧配置保持 2.1-17 行为。可在设置中关闭以停止插件定时补拉，降低周期性网络唤醒；关闭后依靠微信自身事件或回到前台时同步，后台静默群消息可能延迟或收不到。账号配置及备份保留此偏好。原生验证、消息筛选、去重、过期和音频让出规则保留；既有包与历史记录不动。实现、回归和包校验见 [2.1-19 记录](docs/audits/ai-background-2.1-19-toggle/README.md)，原调度依据见 [2.1-17 记录](docs/audits/ai-background-2.1-17/README.md)。
+ 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
+ 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
+ 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
+@@ -142,7 +142,7 @@
+ 
+ **功能增强 → 定时任务**：总开关和各任务开关默认按账号独立保存，可创建单次、每 N 分钟（1–1440）、每 N 小时（1–168）、每天或每周任务，向一个私聊、群聊或文件传输助手发送文字。列表和编辑页沿用公共设置样式，私聊/群聊使用与密友相同的微信原生选择器，每个任务只接受一个目标。执行前记录去重状态；重启后不会自动重发结果未知的消息。微信被挂起、强退或设备关机时不能保证准点。可选择跳过错过的时刻，或只补发最近 10 分钟内的最后一次。
+ 
+-**功能增强 → 人工智能**：总开关与会话开关默认关闭。支持显式选择百炼服务商、联网模式、单图识别与思考开关，新增能力默认关闭；百炼流式收齐后一次回复，通用接口保留原文本行为。可填写兼容 Chat Completions 的 HTTPS API 地址、API Key 和模型，测试连接后启用；支持多个命名预设和会话独立选择。群聊在聊天详情「查找聊天内容」下方设置，默认仅被单独 @ 时回复；`2.1-2` 在「启用 AI 回复」下方新增「免 @ 回复」，开启后仅当前群无需艾特。`2.1-17` 在后台音频保活有效且存在已启用 AI 和免 @ 的群时，以约 45 秒为兜底间隔请求原生消息同步；确认当前账号的原生完整同步后重排额外请求，无法确认的事件不延后兜底。保留群免打扰设置；同步与保活仍有能耗，系统挂起或退出后无法保证回复。手动回复与 AI 并行。密友保护可分别隐藏 AI 已开启会话列表和定时任务列表，隐藏后自动回复、定时发送仍按原配置运行。详见 [功能说明](docs/features/ai-auto-reply.md) 与 [核心验证记录](docs/features/ai-auto-reply-validation.md)。首次免 @ 包见 [2.1-2 发布记录](docs/audits/release-2.1-2/README.md)，本次修复见 [后台同步修复记录](docs/audits/ai-muted-background-2.1-2/README.md)。
++**功能增强 → 人工智能**：总开关与会话开关默认关闭。支持显式选择百炼服务商、联网模式、单图识别与思考开关，新增能力默认关闭；百炼流式收齐后一次回复，通用接口保留原文本行为。可填写兼容 Chat Completions 的 HTTPS API 地址、API Key 和模型，测试连接后启用；支持多个命名预设和会话独立选择。群聊在聊天详情「查找聊天内容」下方设置，默认仅被单独 @ 时回复；`2.1-2` 在「启用 AI 回复」下方新增「免 @ 回复」，开启后仅当前群无需艾特。`2.1-19` 在全局“功能”分组新增“后台兜底补拉”，默认开启，旧配置保持 2.1-17 的约 45 秒兜底及完整同步顺延规则；可在设置中关闭，关闭后不安排插件补拉，依靠微信自身同步，后台可能不再自动回复。周期性网络同步及符合规则消息触发的模型请求存在额外耗电。保留群免打扰设置；同步与保活仍有能耗，系统挂起或退出后无法保证回复。手动回复与 AI 并行。密友保护可分别隐藏 AI 已开启会话列表和定时任务列表，隐藏后自动回复、定时发送仍按原配置运行。详见 [功能说明](docs/features/ai-auto-reply.md) 与 [核心验证记录](docs/features/ai-auto-reply-validation.md)。首次免 @ 包见 [2.1-2 发布记录](docs/audits/release-2.1-2/README.md)，本次修复见 [后台同步修复记录](docs/audits/ai-muted-background-2.1-2/README.md)。
+ 
+ `2.0-16` 修复弹窗样式下，定时任务选择私聊/群聊时整个插件退出的问题。等待会话类型菜单自身关闭后打开原生选择器，取消回到原编辑页并保留未保存内容；同样覆盖全屏/push 显示。见 [修复与验收记录](docs/audits/scheduled-picker-dismiss-2.0-16/README.md)。
+ 
+@@ -206,7 +206,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.1-17_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-17-ai-background/`。
++当前版本默认输出：`packages/com.wechat.improve_2.1-19_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-19-ai-fallback-toggle/`。
+ 
+ ### Rootful
+ 
+@@ -215,7 +215,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.1-17_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-17-ai-background/`。
++当前版本默认输出：`packages/com.wechat.improve_2.1-19_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-19-ai-fallback-toggle/`。
+ 
+ | 方案 | 动态库安装目录 |
+ | --- | --- |
+@@ -239,7 +239,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
+ `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
+ 
+ ```bash
+-dpkg-deb -f packages/2.1-17-ai-background/com.wechat.improve_2.1-17_iphoneos-arm64.deb Version Architecture
++dpkg-deb -f packages/2.1-19-ai-fallback-toggle/com.wechat.improve_2.1-19_iphoneos-arm64.deb Version Architecture
+ ```
+ 
+ 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/docs/features/ai-auto-reply.md b/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/features/ai-auto-reply.md
+index eabf46b5..b2152c41 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/docs/features/ai-auto-reply.md
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/features/ai-auto-reply.md
+@@ -10,7 +10,7 @@
+ 4. 在「管理预设」新增、编辑或复制多个命名预设。提示词用于定义角色、语气和回复规则。选择全局默认预设；删除预设时选择替代项并更新会话引用，至少保留一个预设。
+ 5. 开启总开关，进入某个聊天窗口右上角「…」的聊天详情，群聊在「查找聊天内容」下方开启「启用 AI 回复」，并通过「回复预设」选择跟随默认或独立预设；私聊仍使用「AI 回复」分组。
+ 6. 群聊需要免 @ 自动回复时，打开「启用 AI 回复」正下方的「免 @ 回复」。该开关默认关闭，仅对当前群生效；也可在「已开启的会话」中进入该群修改。仍需总开关和当前群的 AI 开关同时开启。
+-7. 群聊设置「消息免打扰」后仍需后台免 @ 回复时，开启插件的「后台运行」，确认显示「后台音频已启动」。`2.1-17` 在后台保活实际有效且 AI 连接已验证时，以约 45 秒为兜底间隔请求微信原生消息同步。已验证的微信 8.0.78 正常完整同步请求，只有事务、账号、配置、终批响应和处理结果均通过校验后，才重排下一次额外同步；未知版本或无法确认的结果继续走兜底。不修改群免打扰设置。保活和同步仍有能耗，关闭后台运行、AI 总开关或最后一个免 @ 群的相关开关后停止。
++7. 群聊设置「消息免打扰」后仍需后台免 @ 回复时，开启插件的「后台运行」，确认显示「后台音频已启动」。`2.1-19` 在 AI 自动回复全局页「功能」分组、总开关下方新增「后台兜底补拉」，默认开启，旧配置缺少该项也按开启处理。开启时保持 2.1-17：后台保活实际有效且 AI 连接已验证时，以约 45 秒为兜底期限请求微信原生消息同步。已验证的微信 8.0.78 正常完整同步请求，只有事务、账号、配置、终批响应和处理结果均通过校验后，才重排下一次额外同步；未知版本或无法确认的结果继续走兜底。可在设置中关闭，立即停止插件定时补拉；关闭后依靠微信自身事件或回到前台时同步，后台静默群消息可能延迟或收不到。不修改群免打扰设置。开启会周期性唤醒网络，符合规则的新消息还可能触发模型请求，存在额外耗电；不是每 45 秒固定调用模型。关闭后台运行、AI 总开关或最后一个免 @ 群的相关开关后仍按原规则停止。
+ 
+ 群聊的三行设置按「启用 AI 回复 → 免 @ 回复 → 回复预设」排列，与「查找聊天内容」使用同一个原生分组，复用微信的开关行、右值箭头行、分隔线和默认间距，不另外增加标题或长篇页脚。开启会话后，连接待验证、总开关关闭等状态使用原生行内说明展示。
+ 
+@@ -44,6 +44,7 @@
+ 
+ - 普通私聊处理符合条件的新文本消息，以及显式开启图片后的新图片消息。群聊默认必须在结构化 @ 名单中精确包含当前账号，手打 `@名字` 不算真实 @；当前群开启「免 @ 回复」后，普通新文本无须 @ 即可触发。`@所有人`、仅有 @ 没有正文仍不触发。
+ - 「免 @ 回复」按账号和群聊单独保存。修改回复预设、临时关闭再开启该群 AI 会保留此偏好；旧配置缺少此字段时按关闭处理。
++- 「后台兜底补拉」按微信账号保存在 AI 配置中，默认开启，可在设置中关闭。关闭后不排 timer，`refresh` 或已验证同步完成不会重启插件补拉；重新开启按原有期限恢复，并保留已经发生的尝试预算与 45 秒冷却。切换仍走现有配置保存流程，沿用取消待回复任务和撤销旧配置证据的规则，不要求重启微信，也不改变模型连接指纹。
+ - 本人消息、历史消息、重复消息、系统消息、公众号/服务号和未支持的消息类型不触发。
+ - 同一会话同一发送者的连续消息等待 2 秒后合并。同一会话串行处理，全局最多 2 个活动会话（含图片准备），最多等待 20 批；排队批次 120 秒过期，单次请求 60 秒超时。
+ - 模型上下文仅包含启用之后产生的内存对话，最近最多 10 条、正文总计最多 12000 个 UTF-16 单元；群按群与发送者分开。预设系统提示词另计。回复最多 4000 个 UTF-16 单元，不拆分发送。
+@@ -62,11 +63,11 @@
+ 
+ API Key 保存在本机 Keychain，按账号与凭据版本隔离、不同步到其他设备；首次解锁后可在后台读取。新 Key 写入成功且配置保存成功后才启用；替换文件前保存失败会保留旧连接并清理新 Key。如果文件已替换、但目录同步失败，系统会保留前后两版 Key 并暂停使用配置；重新读取后无论落在哪一版，凭据都保持有效引用，新连接仍需重新测试。历史凭据版本仅保留在本机，供已有恢复事务精确回滚；停用当前 Key 会解除活动引用。配置导出不包含 Key 或凭据版本。
+ 
+-备份增加「AI 自动回复」模块，只导出预设、连接地址/模型、服务商与能力设置和会话规则（包括各群的免 @ 偏好），不导出 API Key、连接验证、去重账本、队列或结果记录。仅在备份原账号恢复，恢复后总开关关闭，需重新填写 Key 并测试连接。旧备份没有此模块时不会改写当前 AI 配置。事务回滚恢复原始本地状态。
++备份增加「AI 自动回复」模块，只导出预设、连接地址/模型、服务商与能力设置和会话规则（包括各群的免 @ 偏好），以及「后台兜底补拉」偏好，不导出 API Key、连接验证、去重账本、队列或结果记录。仅在备份原账号恢复，恢复后总开关关闭，需重新填写 Key 并测试连接；兜底偏好保留，旧配置缺少该键时按开启处理。旧备份没有此模块时不会改写当前 AI 配置。事务回滚恢复原始本地状态。
+ 
+ ## 开发与验证
+ 
+-2026-10-28 的性能清理移除了 AI 调用到的授权检查无效缓存及日志，减少了去重／历史提交的重复序列化和无须淘汰时的排序，提前过滤未启用的已知会话，并复用群消息解析规则。实时授权与持久去重继续生效；本轮后台同步规则已由 `2.1-17` 的约 45 秒兜底协同替代。性能排查、主机操作计数和真机测量边界见 [性能清理记录](../audits/ai-performance-cleanup-2026-10-28/README.md)。
++2026-10-28 的性能清理移除了 AI 调用到的授权检查无效缓存及日志，减少了去重／历史提交的重复序列化和无须淘汰时的排序，提前过滤未启用的已知会话，并复用群消息解析规则。实时授权与持久去重继续生效；当前沿用 `2.1-17` 的约 45 秒兜底协同，`2.1-19` 仅增加默认开启、可在设置中关闭的兜底开关。性能排查、主机操作计数和真机测量边界见 [性能清理记录](../audits/ai-performance-cleanup-2026-10-28/README.md)。
+ 
+ AI 首版在 `codex/ai-auto-reply` 开发并已合入 `main`；本次在原工作目录继续开发，本次已统一发布为 `2.1-4`。隔离构建、包校验及核心回归见 [2.1-4 发布记录](../audits/release-2.1-4/README.md)，功能接入依据见 [联网与图片记录](../audits/ai-multimodal-web-2026-10-28/README.md)。
+ 
+
+diff --git a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/docs/features/ai-auto-reply-validation.md b/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/features/ai-auto-reply-validation.md
+index de65a3a9..251c7940 100644
+--- a/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/ai-background-2.1-19-toggle/baseline/docs/features/ai-auto-reply-validation.md
++++ b/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/features/ai-auto-reply-validation.md
+@@ -1,5 +1,13 @@
+ # AI 自动回复核心验证记录
+ 
++## 2.1-19 后台兜底补拉开关（2026-10-30）
++
++在已恢复的 2.1-17 基础上，仅增加 AI 全局「功能」分组中的「后台兜底补拉」，默认开启，旧配置缺键按开启处理。可在设置中关闭；关闭时停止插件兜底 timer，`refresh` 和已验证同步结果不会重新起表。重新开启按原有 deadline 恢复，保留尝试预算与冷却。开启时沿用约 45 秒、3 秒 tolerance、完整同步顺延和原生/账号终检，没有恢复 2.1-18 的事件驱动改造。
++
++开关保存在账号 AI 配置并随现有备份/恢复，不参与模型连接指纹。开启会带来周期性网络唤醒及符合规则的新消息触发的模型调用，存在额外耗电；关闭后依靠微信自身事件或回到前台同步，后台静默群消息可能延迟或收不到。没有实测续航或发热收益。
++
++本轮新增用例、scheduler/manager 的实际检查数及脚本期望值变化、其它相关回归、双包日志与 SHA-256 见 [2.1-19 审计报告](../audits/ai-background-2.1-19-toggle/README.md)。以下早期记录保留当时的版本、周期与检查数量。
++
+ ## 完整 JPEG/PNG 尾随数据兼容（2026-10-28）
+ 
+ 用户提供的 1920×1080 JPEG 在真实 EOI 后带 24 字节附加数据，ImageIO 可完整解码，但旧末尾判断返回错误码 7。本次改为按 JPEG 段/PNG chunk 结构验证真实结束，保留截断、伪结束、长度与解码检查。修复后两张当前附件本地编码通过；PNG 副本修复前已能通过，手机缓存仍待真机验证。

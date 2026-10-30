@@ -116,6 +116,7 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
 @property (nonatomic) BOOL scopeFoldedEntry;
 @property (nonatomic, strong) CSGroupRow *foldedSummaryRow;
 - (nullable NSIndexPath *)nativePathForDisplayPath:(NSIndexPath *)displayPath;
+- (instancetype)initWithProjection:(CSGroupProjection *)projection summaryRow:(CSGroupRow *)row NS_DESIGNATED_INITIALIZER;
 @end
 
 @implementation CSGroupProjection
@@ -348,6 +349,40 @@ static BOOL CSGroupSectionsMatch(NSArray *a, NSArray *b, BOOL unread) {
     return self;
 }
 - (NSUInteger)sessionCountForTabID:(NSString *)tabID { return [self.sessionCounts[tabID] unsignedIntegerValue]; }
+- (CSGroupProjection *)projectionByAttachingNativeSummaryRow:(CSGroupRow *)row {
+    if (!self.valid || self.scopeFoldedEntry || !self.inputSections || ![row isMemberOfClass:CSGroupRow.class] ||
+        row.kind!=CSGroupRowKindSession || (row.nativeSummary && ![row.nativeSummary isKindOfClass:NSString.class]) ||
+        (row.nativePrefix && ![row.nativePrefix isKindOfClass:NSString.class])) return nil;
+    NSIndexPath *display=[self displayPathForNativePath:row.nativePath];
+    CSGroupRow *original=[self rowAtDisplayPath:display], *latest=nil;
+    for (NSArray *section in self.sections) for (CSGroupRow *candidate in section)
+        if (candidate.kind==CSGroupRowKindSession && (!latest || candidate.nativeSortTime.unsignedLongLongValue>latest.nativeSortTime.unsignedLongLongValue)) latest=candidate;
+    if (!original || original!=latest || original.privacyMasked || row.privacyMasked || original.foldedEntryScoped || row.foldedEntryScoped ||
+        row.foldedEntryCount || row.foldedEntryAccountID || row.foldedEntryPrivacyRevision || row.foldedEntrySummary || row.foldedEntryPrefix || row.foldedEntrySummaryUserName) return nil;
+    CSGroupRow *metadata=[[CSGroupRow alloc] initWithNativePath:row.nativePath userName:row.userName kind:row.kind category:row.category
+        top:row.top unreadCount:row.unreadCount redDot:row.redDot nativeSummary:original.nativeSummary sortTime:row.nativeSortTime nativePrefix:original.nativePrefix];
+    if (!CSGroupRowsMatch(original,metadata,YES)) return nil;
+    if (CSGroupRowsMatch(original,row,YES)) return self;
+    return [[CSGroupProjection alloc] initWithProjection:self summaryRow:row];
+}
+- (instancetype)initWithProjection:(CSGroupProjection *)projection summaryRow:(CSGroupRow *)row {
+    if ((self=[super init])) {
+        _accountID=projection.accountID; _valid=projection.valid;
+        _displayToNative=projection.displayToNative; _nativeToDisplay=projection.nativeToDisplay; _badges=projection.badges;
+        _definitionRecords=projection.definitionRecords; _memberTabIDs=projection.memberTabIDs; _presetIDs=projection.presetIDs;
+        _destinationsByPath=projection.destinationsByPath; _selectedTabID=projection.selectedTabID; _filterDuplicates=projection.filterDuplicates;
+        _hiddenUserNames=projection.hiddenUserNames; _unmaskedAggregateUserNames=projection.unmaskedAggregateUserNames; _privacyRevision=projection.privacyRevision;
+        _sessionCounts=projection.sessionCounts; _foldedCounts=projection.foldedCounts; _foldedUnreadTabs=projection.foldedUnreadTabs;
+        _scopeFoldedEntry=projection.scopeFoldedEntry; _foldedSummaryRow=projection.foldedSummaryRow;
+        NSUInteger sourceSection=[row.nativePath indexAtPosition:0], sourceRow=[row.nativePath indexAtPosition:1];
+        NSMutableArray *input=[projection.inputSections mutableCopy], *inputRows=[input[sourceSection] mutableCopy];
+        inputRows[sourceRow]=row; input[sourceSection]=[inputRows copy]; _inputSections=[input copy];
+        NSIndexPath *display=projection.nativeToDisplay[row.nativePath]; NSUInteger section=[display indexAtPosition:0], index=[display indexAtPosition:1];
+        NSMutableArray *visible=[projection.sections mutableCopy], *visibleRows=[visible[section] mutableCopy];
+        visibleRows[index]=row; visible[section]=[visibleRows copy]; _sections=[visible copy];
+    }
+    return self;
+}
 - (BOOL)hasSameDisplayStructureAs:(CSGroupProjection *)other {
     return self.valid && other.valid && [self.accountID isEqual:other.accountID] &&
         [self.selectedTabID isEqual:other.selectedTabID] && CSGroupSectionsMatch(self.sections,other.sections,NO);

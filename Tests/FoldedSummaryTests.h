@@ -27,8 +27,9 @@ static void RunFoldedSummaryTests(void) {
     CSGroupListAdapter *adapter=[CSGroupListAdapter new];adapter.controller=[NativeHost new];adapter.preferences=[Preferences new];
     NSArray *native=@[@[Row(0,@"chatroom_session_box",CSGroupRowKindAggregate,CSGroupRowCategoryGroup,99)]];
     void (^publish)(void)=^{ adapter.projection=[adapter projectionForSections:native tabs:tabs selectedTabID:tab.tabId accountID:account]; };
-    NSUInteger initialPrefixes=prefixCalls,initialDigests=digestCalls;
+    NSUInteger initialPrefixes=prefixCalls,initialDigests=digestCalls,initialBuilds=fullProjectionBuilds;
     publish();
+    Check(fullProjectionBuilds==initialBuilds+2,@"folded publication builds one complete child projection and one parent projection");
     Check([EntrySummary(adapter.projection) isEqual:@"[图片]"] && [EntryPrefix(adapter.projection) isEqual:@"工作群: "],@"cold-start group uses separate native conversation prefix and native message, not sender prefix");
     Check(prefixCalls==initialPrefixes+1 && digestCalls==initialDigests+1,@"only the final visible folded candidate invokes native prefix and digest; hidden, outside-group and older rows skip formatting");
     Check(lastFormattedMessage!=newer.m_msgWrap && newer.m_msgWrap.displayChanges==0 && cache.mutations==0,@"formatting mutates only copied message, not live session or native cache");
@@ -106,5 +107,18 @@ static void RunFoldedSummaryTests(void) {
         CSGroupProjection *parent=[[CSGroupProjection alloc] initWithSections:native tabs:tabs selectedTabID:tab.tabId filterDuplicates:NO accountID:account hiddenUserNames:[NSSet set] unmaskedAggregateUserNames:[NSSet set] privacyRevision:204 scopeFoldedEntry:YES foldedProjection:child previousProjection:nil];
         Check(!EntrySummary(parent) && !EntryPrefix(parent),@"mismatched child account/policy/group/filter provenance cannot publish either text part");
     }
+    CSGroupRow *plain=[[CSGroupRow alloc] initWithNativePath:Path(0) userName:@"visible" kind:CSGroupRowKindSession category:CSGroupRowCategoryPrivate top:NO unreadCount:2 redDot:NO nativeSummary:nil sortTime:@20];
+    CSGroupRow *old=[[CSGroupRow alloc] initWithNativePath:Path(1) userName:@"older" kind:CSGroupRowKindSession category:CSGroupRowCategoryPrivate top:NO unreadCount:3 redDot:NO nativeSummary:nil sortTime:@10];
+    CSGroupRow *excluded=[[CSGroupRow alloc] initWithNativePath:Path(2) userName:@"excluded" kind:CSGroupRowKindSession category:CSGroupRowCategoryPrivate top:NO unreadCount:7 redDot:NO nativeSummary:nil sortTime:@30];
+    CSGroupProjection *before=[[CSGroupProjection alloc] initWithSections:@[@[plain,old,excluded],@[]] tabs:@[all] selectedTabID:all.tabId filterDuplicates:NO accountID:account hiddenUserNames:[NSSet setWithObject:@"excluded"] privacyRevision:204 previousProjection:nil];
+    CSGroupRow *text=[[CSGroupRow alloc] initWithNativePath:plain.nativePath userName:plain.userName kind:plain.kind category:plain.category top:plain.top unreadCount:plain.unreadCount redDot:plain.redDot nativeSummary:@"body" sortTime:plain.nativeSortTime nativePrefix:@"name: "];
+    initialBuilds=fullProjectionBuilds; CSGroupProjection *after=[before projectionByAttachingNativeSummaryRow:text];
+    Check(after && after!=before && fullProjectionBuilds==initialBuilds,@"attaching summary creates an immutable value without invoking the complete constructor");
+    Check(![before rowAtDisplayPath:Path(0)].nativeSummary && [[after rowAtDisplayPath:Path(0)].nativeSummary isEqual:@"body"] && before.sections[0][1]==after.sections[0][1] && before.sections[1]==after.sections[1],@"summary replacement preserves old rows and shares unaffected sections");
+    Check([before sessionCountForTabID:all.tabId]==[after sessionCountForTabID:all.tabId] && [before badgeForTabID:all.tabId]==[after badgeForTabID:all.tabId] && [[before displayPathForNativePath:old.nativePath] isEqual:[after displayPathForNativePath:old.nativePath]],@"immutable summary replacement preserves counts, badge and identity maps");
+    Check([after projectionByAttachingNativeSummaryRow:text]==after,@"unchanged summary returns the same immutable projection");
+    Check(![before projectionByAttachingNativeSummaryRow:excluded] && ![before projectionByAttachingNativeSummaryRow:old],@"hidden and older children cannot replace the chosen visible summary");
+    CSGroupRow *changed=[[CSGroupRow alloc] initWithNativePath:plain.nativePath userName:plain.userName kind:plain.kind category:plain.category top:plain.top unreadCount:99 redDot:plain.redDot nativeSummary:@"body" sortTime:plain.nativeSortTime];
+    Check(![before projectionByAttachingNativeSummaryRow:changed],@"summary attachment cannot change source metadata or unread counts");
     account=oldAccount;policy=oldPolicy;foldedService=oldService;cellDataService=oldCache;groupEnabled=oldEnabled;
 }

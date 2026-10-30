@@ -1,0 +1,9 @@
+
+/tmp/wechat-8.0.78-inset-analysis/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__stubs:
+
+000000011831ae84 <__stubs>:
+118328120: f0029630    	adrp	x16, 0x11d5ef000 <dyld_stub_binder+0x11d5ef000>
+118328124: f9422210    	ldr	x16, [x16, #0x440] ; bind _dispatch_group_wait
+118328128: d61f0200    	br	x16

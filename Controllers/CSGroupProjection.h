@@ -123,6 +123,9 @@ typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
               previousProjection:(nullable CSGroupProjection *)previous NS_DESIGNATED_INITIALIZER;
 /// Number of ordinary session rows assigned to a tab, after the same privacy and membership rules.
 - (NSUInteger)sessionCountForTabID:(NSString *)tabID;
+/// Attach the verified native digest to the latest visible session without recomputing
+/// membership, maps or counts. Rejects any change to the candidate's source metadata.
+- (nullable CSGroupProjection *)projectionByAttachingNativeSummaryRow:(CSGroupRow *)row;
 - (BOOL)hasSameDisplayStructureAs:(nullable CSGroupProjection *)other;
 - (NSArray<NSIndexPath *> *)changedUnreadPathsFrom:(CSGroupProjection *)other;
 /// Release full-list computation caches when the list is not being presented.

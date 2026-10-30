@@ -31,6 +31,8 @@ extern "C" {
 
 void CSTabBarBeginLayout(MMTabBar *bar);
 void CSTabBarEndLayout(MMTabBar *bar);
+void CSTabBarBeginControllerLayout(MMTabBarController *controller);
+void CSTabBarEndControllerLayout(MMTabBarController *controller);
 void CSTabBarUpdate(MMTabBar *bar);
 UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot);
 void CSTabBarBeginItemUpdate(MMTabBarItemView *item);

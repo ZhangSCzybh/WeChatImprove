@@ -54,6 +54,9 @@
 @property (nonatomic, copy) NSArray *separatorRequestKey;
 @property (nonatomic) BOOL otherAvatarLoaded, selfAvatarLoaded;
 @property (nonatomic) NSUInteger separatorGeneration;
+@property (nonatomic) NSUInteger titleUpdateDepth;
+@property (nonatomic) BOOL titleLayoutPending;
+- (void)performTitleUpdates:(dispatch_block_t)updates;
 - (void)updateOtherAvatarWithUrl:(NSString *)url;
 - (void)updateSelfAvatarWithUrl:(NSString *)url;
 - (void)updateAvatarWithURL:(NSString *)url other:(BOOL)other;
@@ -261,8 +264,29 @@
     }];
 }
 
+- (void)performTitleUpdates:(dispatch_block_t)updates {
+    self.titleUpdateDepth++;
+    @try { if (updates) updates(); }
+    @finally {
+        self.titleUpdateDepth--;
+        if (!self.titleUpdateDepth && self.titleLayoutPending) {
+            self.titleLayoutPending=NO;
+            [self updateLayoutWithMode:self.avatarMode];
+        }
+    }
+}
+
 - (void)updateLayoutWithMode:(CSNavigationAvatarMode)mode {
     self.avatarMode = mode;
+    if (self.titleUpdateDepth) { self.titleLayoutPending=YES; return; }
+
+    // All setters remain synchronous outside a batch. Inside a logical update,
+    // measure only the final separator and nickname after contact overrides.
+    UIFont *separatorFont = [UIFont systemFontOfSize:self.separatorSize];
+    self.separatorLabel.font = separatorFont;
+    CGSize separatorTextSize = [self.separatorText sizeWithAttributes:@{NSFontAttributeName: separatorFont}];
+    self.separatorWidth = ceil(separatorTextSize.width) + 4.0;
+    self.separatorLabel.frame = CGRectMake(0, 0, self.separatorWidth, self.avatarSize);
     
     CGRect frame = self.frame;
     
@@ -404,11 +428,6 @@
             self.selfAvatarContainer.hidden = NO;
             self.separatorContainer.hidden = NO;  // 显示分隔符
             
-            // 计算分隔符容器宽度（根据文本内容自适应）
-            UIFont *separatorFont = [UIFont systemFontOfSize:self.separatorSize];
-            CGSize textSize = [self.separatorText sizeWithAttributes:@{NSFontAttributeName: separatorFont}];
-            self.separatorWidth = ceil(textSize.width) + 4.0; // 添加少量padding
-            
             // 计算总宽度：头像 + 间距 + 分隔符容器 + 间距 + 头像
             CGFloat totalWidth = (containerSize * 2) + self.separatorWidth + (self.avatarSpacing * 2);
             
@@ -448,14 +467,6 @@
     self.selfAvatarImageView.frame = CGRectMake(0, 0, size, size);
     self.selfAvatarImageView.layer.cornerRadius = size * radius;
     
-    // 重新计算分隔符宽度
-    UIFont *separatorFont = [UIFont systemFontOfSize:self.separatorSize];
-    CGSize textSize = [self.separatorText sizeWithAttributes:@{NSFontAttributeName: separatorFont}];
-    self.separatorWidth = ceil(textSize.width) + 4.0;
-    
-    // 更新分隔符标签
-    self.separatorLabel.frame = CGRectMake(0, 0, self.separatorWidth, size);
-    
     // 更新整体布局
     [self updateLayoutWithMode:self.avatarMode];
     if (sizeChanged) {
@@ -467,19 +478,8 @@
 - (void)updateSeparatorText:(NSString *)text {
     self.separatorText = text;
     
-    // 设置字体大小
-    self.separatorLabel.font = [UIFont systemFontOfSize:self.separatorSize];
-    
     // 直接设置文本，让系统处理显示
     self.separatorLabel.text = text;
-    
-    // 重新计算分隔符宽度
-    UIFont *separatorFont = [UIFont systemFontOfSize:self.separatorSize];
-    CGSize textSize = [text sizeWithAttributes:@{NSFontAttributeName: separatorFont}];
-    self.separatorWidth = ceil(textSize.width) + 4.0;
-    
-    // 更新分隔符标签frame
-    self.separatorLabel.frame = CGRectMake(0, 0, self.separatorWidth, self.avatarSize);
     
     // 更新整体布局
     [self updateLayoutWithMode:self.avatarMode];
@@ -512,17 +512,6 @@
 
 - (void)updateSeparatorSize:(CGFloat)size {
     self.separatorSize = size;
-    
-    // 更新字体大小
-    self.separatorLabel.font = [UIFont systemFontOfSize:size];
-    
-    // 重新计算分隔符宽度
-    UIFont *separatorFont = [UIFont systemFontOfSize:size];
-    CGSize textSize = [self.separatorText sizeWithAttributes:@{NSFontAttributeName: separatorFont}];
-    self.separatorWidth = ceil(textSize.width) + 4.0;
-    
-    // 更新分隔符标签frame
-    self.separatorLabel.frame = CGRectMake(0, 0, self.separatorWidth, self.avatarSize);
     
     // 更新整体布局
     [self updateLayoutWithMode:self.avatarMode];
@@ -732,6 +721,7 @@
 - (void)updateOtherAvatarWithContact:(CContact *)contact forGroup:(BOOL)isGroup {
     if (!contact) return;
     
+    [self performTitleUpdates:^{
     // 保存联系人信息以便后续使用
     self.otherContact = contact;
     
@@ -751,11 +741,13 @@
         [self updateOtherAvatarWithUrl:contact.m_nsHeadImgUrl];
         [self updateOtherNickname:contact.m_nsNickName];
     }
+    }];
 }
 
 - (void)updateSeparatorForContactId:(NSString *)contactId {
     if (!contactId) return;
     
+    [self performTitleUpdates:^{
     CSContactSeparatorManager *manager = [CSContactSeparatorManager sharedManager];
     
     // 获取联系人个性化配置的分隔符文本
@@ -775,10 +767,12 @@
     // 获取联系人个性化配置的垂直偏移
     CGFloat verticalOffset = [manager verticalOffsetForContactId:contactId];
     [self updateVerticalOffset:verticalOffset];
+    }];
 }
 
 // 处理设置变更通知
 - (void)settingsChanged:(NSNotification *)notification {
+    [self performTitleUpdates:^{
     // 从UserDefaults重新加载所有设置
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
@@ -799,7 +793,6 @@
     CGFloat nicknameSize = [defaults objectForKey:kNavigationNicknameSizeKey] ? 
                           [defaults floatForKey:kNavigationNicknameSizeKey] : kDefaultNicknameSize;
     self.nicknameSize = nicknameSize;
-    self.nicknameLabel.font = [UIFont systemFontOfSize:nicknameSize];
     
     // 更新头像大小和圆角
     CGFloat newSize = [defaults floatForKey:kNavigationAvatarSizeKey];
@@ -844,6 +837,7 @@
     
     // 更新布局
     [self updateLayoutWithMode:newMode];
+    }];
 }
 
 // 在dealloc中移除通知观察者
@@ -965,6 +959,7 @@
     CSAvatarTitleView *avatarTitleView = (CSAvatarTitleView *)self.navigationItem.titleView;
     if (!avatarTitleView || ![avatarTitleView isKindOfClass:[CSAvatarTitleView class]]) return;
     
+    [avatarTitleView performTitleUpdates:^{
     // 获取头像大小和圆角设置
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     CGFloat avatarSize = [defaults objectForKey:kNavigationAvatarSizeKey] ? 
@@ -1021,6 +1016,7 @@
         // 个人或公众号头像
         [avatarTitleView updateOtherAvatarWithContact:contact forGroup:NO];
     }
+    }];
 }
 
 // 在聊天界面即将出现时更新头像
@@ -1119,6 +1115,51 @@
     UITableView *_tableView;
     CContact *_contact;
     NSMutableArray<CSSettingSection *> *_sections;
+    NSString *_avatarAccount;
+    CSNavigationImageBinding *_avatarBinding;
+    __weak UITableViewCell *_avatarCell;
+    __weak UIImageView *_avatarView;
+    CSSettingItem *_avatarItem;
+    BOOL _avatarActive;
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    _avatarActive=YES;
+    [self loadPopoverAvatar];
+}
+- (void)viewWillDisappear:(BOOL)animated {
+    _avatarActive=NO;[_avatarBinding cancel];
+    [super viewWillDisappear:animated];
+}
+- (void)loadPopoverAvatar {
+    UITableViewCell *cell=_avatarCell;UIImageView *view=_avatarView;
+    if (!cell || !view || !_avatarItem) return;
+    if (!_avatarBinding) _avatarBinding=[CSNavigationImageBinding new];
+    NSString *account=[_avatarAccount copy] ?: @"";
+    NSString *contactID=[_contact.m_nsUsrName copy] ?: @"";
+    NSString *url=[(NSString *)objc_getAssociatedObject(_avatarItem,"contactHeadImgUrl") copy] ?: @"";
+    __weak typeof(self) weakSelf=self;
+    __weak UITableViewCell *weakCell=cell;
+    __weak UIImageView *weakView=view;
+    [_avatarBinding displayURL:url.length ? [NSURL URLWithString:url] : nil scope:account identity:@[contactID]
+        maxPixelSize:(NSUInteger)ceil(80*UIScreen.mainScreen.scale) inImageView:view ifCurrent:^BOOL {
+            CSUserInfoPopoverController *live=weakSelf;
+            return live && live->_avatarActive && live.viewIfLoaded.window && weakView.window &&
+                live->_avatarCell==weakCell && live->_avatarView==weakView &&
+                [live->_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]==weakCell &&
+                [account isEqual:CSMessageCurrentAccount()] && [account isEqual:live->_avatarAccount] &&
+                [contactID isEqual:live->_contact.m_nsUsrName ?: @""] &&
+                [url isEqual:live->_contact.m_nsHeadImgUrl ?: @""];
+        }];
+}
+- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (cell==_avatarCell) { [_avatarBinding cancel];_avatarCell=nil;_avatarView=nil;_avatarItem=nil; }
+}
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (cell!=_avatarCell) return;
+    __weak typeof(self) weakSelf=self;
+    dispatch_async(dispatch_get_main_queue(),^{ [weakSelf loadPopoverAvatar]; });
 }
 
 - (void)viewDidLoad {
@@ -1193,6 +1234,8 @@
 }
 
 - (void)setupWithContact:(CContact *)contact {
+    [_avatarBinding cancel];
+    _avatarAccount=[CSMessageCurrentAccount() copy];
     _contact = contact;
     
     // 如果视图已加载，则更新UI
@@ -1203,6 +1246,7 @@
 
 - (void)updateUIWithContact:(CContact *)contact {
     if (!contact) return;
+    [_avatarBinding cancel];_avatarCell=nil;_avatarView=nil;_avatarItem=nil;
     
     // 清空现有数据
     [_sections removeAllObjects];
@@ -1389,20 +1433,13 @@
 
 - (void)showSeparatorSettingsForContact:(CContact *)contact {
     NSString *contactName = contact.m_nsNickName;
-    
-    UIImage *contactAvatar = nil;
-    if (contact.m_nsHeadImgUrl.length > 0) {
-        NSURL *url = [NSURL URLWithString:contact.m_nsHeadImgUrl];
-        NSData *data = [NSData dataWithContentsOfURL:url];
-        if (data) {
-            contactAvatar = [UIImage imageWithData:data];
-        }
-    }
+    if (![_avatarAccount isEqual:CSMessageCurrentAccount()] || contact!=_contact) return;
     
     CSContactSeparatorSettingsViewController *settingsVC = [[CSContactSeparatorSettingsViewController alloc]
                                                             initWithContactId:contact.m_nsUsrName
                                                             contactName:contactName
-                                                            contactAvatar:contactAvatar];
+                                                            contactAvatar:nil];
+    [settingsVC configureContactAvatarURL:contact.m_nsHeadImgUrl account:_avatarAccount];
     
     UINavigationController *navVC = [[UINavigationController alloc] initWithRootViewController:settingsVC];
     navVC.modalPresentationStyle = UIModalPresentationFormSheet;
@@ -1531,30 +1568,12 @@
         // 设置数据
         nameLabel.text = item.title;
         
-        // 加载头像
-        NSString *avatarUrl = (NSString *)objc_getAssociatedObject(item, "contactHeadImgUrl");
-        if (avatarUrl.length > 0) {
-            // 设置默认头像作为占位图
-            avatarView.image = [UIImage imageNamed:@"DefaultProfileHead_phone"];
-            
-            // 异步加载图片
-            NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
-            NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:avatarUrl]
-                                                     cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                                 timeoutInterval:10.0];
-            
-            NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-                if (!error && data) {
-                    UIImage *image = [UIImage imageWithData:data];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        avatarView.image = image;
-                    });
-                }
-            }];
-            [task resume];
-        } else {
-            avatarView.image = [UIImage imageNamed:@"DefaultProfileHead_phone"];
+        if (_avatarCell!=cell || _avatarItem!=item) {
+            [_avatarBinding cancel];
+            avatarView.image=[UIImage imageNamed:@"DefaultProfileHead_phone"];
         }
+        _avatarCell=cell;_avatarView=avatarView;_avatarItem=item;
+        [self loadPopoverAvatar];
         
         return cell;
     } else {

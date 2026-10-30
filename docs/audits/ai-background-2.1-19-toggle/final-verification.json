@@ -1,0 +1,31 @@
+{
+  "all_passed": true,
+  "production_inputs_verified": 42513,
+  "unchanged_production_inputs": 42505,
+  "changed_production_paths": [
+    "Controllers/CSAIBackgroundSync.h",
+    "Controllers/CSAIBackgroundSync.m",
+    "Controllers/CSAIReplyManager.m",
+    "Controllers/CSAIReplySettingsViewController.m",
+    "Controllers/CSAIReplyStore.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "control"
+  ],
+  "production_paths_added_or_removed": false,
+  "frozen_files_verified": 20,
+  "original_artifacts_preserved": 1275,
+  "only_new_artifact_paths": [
+    "packages/2.1-19-ai-fallback-toggle/SHA256SUMS",
+    "packages/2.1-19-ai-fallback-toggle/com.wechat.improve_2.1-19_iphoneos-arm.deb",
+    "packages/2.1-19-ai-fallback-toggle/com.wechat.improve_2.1-19_iphoneos-arm64.deb",
+    "packages/2.1-19-ai-fallback-toggle/com.wechat.improve_2.1-19_symbols.zip"
+  ],
+  "artifact_sha256_valid": true,
+  "rootful_rootless_exit_zero": true,
+  "rootful_warning_count": 6,
+  "rootless_warning_count": 6,
+  "warning_baseline_2_1_17": 6,
+  "report_links_valid": 25,
+  "device_installed": false
+}

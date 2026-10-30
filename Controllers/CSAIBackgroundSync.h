@@ -6,7 +6,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithEligibility:(BOOL (^)(void))eligibility synchronize:(void (^)(void))synchronize;
 @property(nonatomic,copy) NSTimeInterval (^now)(void);
 @property(nonatomic,readonly) BOOL active;
+/// Defaults to YES. Disabling stops immediately without clearing deadlines or
+/// attempt cooldown; enabling waits for refresh to resume the existing deadline.
+@property(nonatomic) BOOL fallbackEnabled;
 - (void)refresh;
 - (void)stop;
+/// The manager must verify current account/epoch and complete message coverage.
+/// An inactive scheduler ignores this signal; this never starts synchronization.
+- (void)verifiedFullSyncCompleted;
+/// Revoke account/configuration coverage, preserving the last-attempt cooldown.
+- (void)invalidateVerifiedSync;
 @end
 NS_ASSUME_NONNULL_END

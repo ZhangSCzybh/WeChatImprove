@@ -1,0 +1,104 @@
+{
+  "packages": [
+    {
+      "scheme": "rootless",
+      "package": "com.wechat.improve_2.1-16_iphoneos-arm64.deb",
+      "version": "2.1-16",
+      "package_architecture": "iphoneos-arm64",
+      "dylib_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "install_path": "/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "minimum_iOS": [
+        "15.0",
+        "15.0"
+      ],
+      "retained_symbols": [
+        "_CSCFPaymentOutputAllowed",
+        "_CSCFUnreadPanelInstallHooks",
+        "_CSCFUnreadPanelNotifyCount",
+        "_CSCFIncomingCallToken",
+        "_CSLayoutPreferencesRead",
+        "_CSGroupCopyFoldedRowsSelectingSummary",
+        "_CSAIReplyMessageIngressEnabled",
+        "_CSAIReplyMessageIngressAllowsSession",
+        "_CSGroupResolveNativeRowPathReusing",
+        "_OBJC_CLASS_$_CSNavigationImageBinding",
+        "_CSListCornerPerformSessionTableLayout",
+        "_CSAIReadCredentialAsync",
+        "_CSTabBarBeginControllerLayout",
+        "_CSTabBarEndControllerLayout"
+      ],
+      "silence_bridge_symbol_absent": true,
+      "filter_matches_source": true,
+      "staged_payload_matches_package": true,
+      "version_string_present": true,
+      "uuid_matches_dSYM": {
+        "arm64": "52B038CB-B671-3CF5-88A7-AB00F51B1CE5",
+        "arm64e": "32ECD9EC-79B1-3317-95A1-BDC9ABA3F9BA"
+      },
+      "dylib_sha256": "b7a99f866042b803908e18eb54692033fa29ed86114440eeb88650c834b15344"
+    },
+    {
+      "scheme": "rootful",
+      "package": "com.wechat.improve_2.1-16_iphoneos-arm.deb",
+      "version": "2.1-16",
+      "package_architecture": "iphoneos-arm",
+      "dylib_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "install_path": "/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "minimum_iOS": [
+        "15.0",
+        "15.0"
+      ],
+      "retained_symbols": [
+        "_CSCFPaymentOutputAllowed",
+        "_CSCFUnreadPanelInstallHooks",
+        "_CSCFUnreadPanelNotifyCount",
+        "_CSCFIncomingCallToken",
+        "_CSLayoutPreferencesRead",
+        "_CSGroupCopyFoldedRowsSelectingSummary",
+        "_CSAIReplyMessageIngressEnabled",
+        "_CSAIReplyMessageIngressAllowsSession",
+        "_CSGroupResolveNativeRowPathReusing",
+        "_OBJC_CLASS_$_CSNavigationImageBinding",
+        "_CSListCornerPerformSessionTableLayout",
+        "_CSAIReadCredentialAsync",
+        "_CSTabBarBeginControllerLayout",
+        "_CSTabBarEndControllerLayout"
+      ],
+      "silence_bridge_symbol_absent": true,
+      "filter_matches_source": true,
+      "staged_payload_matches_package": true,
+      "version_string_present": true,
+      "uuid_matches_dSYM": {
+        "arm64": "0DD1E3D6-4EFE-31D7-BE2E-D70F35C29CAE",
+        "arm64e": "D897A3C8-2206-3161-BBFA-78A8597174D0"
+      },
+      "dylib_sha256": "0474903bc15e82e069e5c3cb5a43232e36876033efa2ca516af8e862907b3df5"
+    }
+  ],
+  "symbols_zip_crc_valid": true,
+  "symbol_files": 12,
+  "artifacts": [
+    {
+      "file": "com.wechat.improve_2.1-16_iphoneos-arm.deb",
+      "bytes": 1516188,
+      "sha256": "61069ed212875929cac7e3edbb5ee4e9bccf071eb33c4bfce0ae98e6a618030c"
+    },
+    {
+      "file": "com.wechat.improve_2.1-16_iphoneos-arm64.deb",
+      "bytes": 1515102,
+      "sha256": "b79df1fe0a3008615c0e71943509f4de203d7ddedf6cfef8d3d6dd66f0aa3a15"
+    },
+    {
+      "file": "com.wechat.improve_2.1-16_symbols.zip",
+      "bytes": 11020132,
+      "sha256": "792e601fe7239ae692975d58a7124faf40b9cbcfe509d3d30d14d8da0b4a954b"
+    }
+  ],
+  "device_installed": false
+}

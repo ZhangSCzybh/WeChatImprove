@@ -12,6 +12,8 @@ static CSCloseFriendSnapshot *policy;
 static NSUInteger epoch=1;
 static BOOL appActive=YES;
 static BOOL groupEnabled=NO;
+static NSUInteger fullProjectionBuilds;
+void CSCFTestProjectionConstructed(void) {fullProjectionBuilds++;}
 static BOOL Option(NSString *key) { return [key isEqual:@"enabled"] && groupEnabled; }
 static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) { return policy; }
 static NSUInteger CSCloseFriendAccountEpoch(void) { return epoch; }
@@ -112,6 +114,7 @@ static id lastFormattedMessage;
 static void (^onDigest)(void);
 @interface MainFrameCellData : NSObject
 @property(nonatomic,strong) id m_sessionInfo;
+@property(nonatomic,copy) NSString *userName;
 @property(nonatomic,copy) NSString *m_prefixTextForQuoteMessage;
 @end
 @implementation MainFrameCellData
@@ -192,11 +195,20 @@ static const NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionSty
 - (id)indexPathOfSessionUserName:(NSString *)name { for (NSUInteger i=0;i<self.sessions.count;i++) if ([self.sessions[i].m_nsUserName isEqual:name]) return Path(i); return nil; }
 - (void)handleSelectIndexPath:(NSIndexPath *)path tableView:(id)table { (void)table; self.calls++; self.opened=path; }
 @end
-@interface ChatBoxSessionListViewController : NativeHost @end
+@interface ChatBoxSessionListViewController : NativeHost
+@property(nonatomic) NSUInteger pathReads;
+@property(nonatomic) BOOL throwsPathGetter;
+@property(nonatomic,copy) void (^onPathRead)(void);
+@property(nonatomic,strong) NSDictionary *lookupData;
+@end
 @implementation ChatBoxSessionListViewController
 - (id)tableView { return self.m_tableView; }
-- (id)logicGetSessionAtIndexPath:(NSIndexPath *)path { return [self getSessionInfoAtIndexPath:path]; }
-- (id)logicGetCellDataAtIndexPath:(NSIndexPath *)path { (void)path; return nil; }
+- (id)logicGetSessionAtIndexPath:(NSIndexPath *)path {
+    self.pathReads++;if (self.onPathRead) self.onPathRead();
+    if (self.throwsPathGetter) [NSException raise:@"fixture" format:@"unavailable folded getter"];
+    id session=[self getSessionInfoAtIndexPath:path];return session==NSNull.null ? nil : session;
+}
+- (id)logicGetCellDataAtIndexPath:(NSIndexPath *)path { return self.lookupData[path]; }
 @end
 @interface Preferences : NSObject
 @property(nonatomic) BOOL filterDuplicates;
@@ -212,6 +224,7 @@ static const NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionSty
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
 @property(nonatomic,strong) NSMutableArray *queuedNavigation;
 @property(nonatomic) NSUInteger snapshotRetryGeneration,changeDepth,recoveries;
+@property(nonatomic) NSUInteger modelRevision;
 - (BOOL)isActive;
 - (void)refresh;
 - (void)requestRecovery;
@@ -255,6 +268,7 @@ static CSGroupProjection *Project(NSArray *rows,NSArray *tabs,NSString *tab,NSSe
 }
 #include "FoldedGroupTests.h"
 #include "FoldedSummaryTests.h"
+#include "FoldedRowLookupTests.h"
 int main(void) { @autoreleasepool {
  if (getenv("CS_TEST_FOLDED_ONLY")) { RunFoldedGroupTests(); fprintf(stdout,"Folded group integration: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures); return failures?1:0; }
  WESessionTabItem *all=[WESessionTabItem tabWithType:WETabTypeAll],*group=[WESessionTabItem tabWithType:WETabTypeGroup],*private=[WESessionTabItem tabWithType:WETabTypePrivate];
@@ -355,6 +369,7 @@ int main(void) { @autoreleasepool {
  Check(queuedWhileRevealed && queuedHost.nativeTraversalCalls==0 && [queuedHost.opened isEqual:Path(2)],@"revealed queued next-chat rechecks lock and advances past hidden A to visible C at drain time");
  RunFoldedGroupTests();
  RunFoldedSummaryTests();
+ RunFoldedRowLookupTests();
  fprintf(stdout,"Close-friend sessions: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
  return failures?1:0;
 } }

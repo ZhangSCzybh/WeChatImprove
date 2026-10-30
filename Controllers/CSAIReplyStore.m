@@ -18,10 +18,11 @@ NSError *CSAIError(NSInteger code, NSString *message) { return [NSError errorWit
 static BOOL Fail(NSError **error, NSString *message) { if(error) *error=CSAIError(1,message); return NO; }
 static BOOL String(id value, NSUInteger min, NSUInteger max) { return [value isKindOfClass:NSString.class] && [value length]>=min && [value length]<=max; }
 static BOOL IsBoolean(id value) { return [value isKindOfClass:NSNumber.class] && ([value isEqual:@NO] || [value isEqual:@YES]); }
+static BOOL IsStrictBoolean(id value) { return [value isKindOfClass:NSNumber.class] && CFGetTypeID((__bridge CFTypeRef)value)==CFBooleanGetTypeID(); }
 static NSString *Digest(NSString *value) { NSData *data=[value dataUsingEncoding:NSUTF8StringEncoding]; unsigned char bytes[CC_SHA256_DIGEST_LENGTH]; CC_SHA256(data.bytes,(CC_LONG)data.length,bytes); NSMutableString *result=[NSMutableString string]; for(NSUInteger i=0;i<sizeof(bytes);i++) [result appendFormat:@"%02x",bytes[i]]; return result; }
 static BOOL OnlyKeys(NSDictionary *dictionary, NSArray *keys) { for(id key in dictionary) if(![keys containsObject:key]) return NO; return YES; }
 NSURL *CSAIReplyFileURL(NSURL *root, NSString *account) { return [root URLByAppendingPathComponent:[NSString stringWithFormat:@"ai-reply-%@.plist",Digest(account)]]; }
-NSDictionary *CSAIReplyDefaultConfiguration(void) { return @{@"enabled":@NO,@"endpoint":@"",@"model":@"",@"credentialRevision":@"",@"verifiedConnection":@"",@"provider":@"openai-compatible",@"imageEnabled":@NO,@"searchMode":@"off",@"thinkingEnabled":@NO,@"presets":@[@{@"id":@"default",@"name":@"默认回复",@"prompt":@"请根据对方的消息，用自然、友好、简洁的中文回复。不编造事实，不代替我作出承诺；不确定时明确说明。只输出要发送的回复正文，不附加解释或格式标记。"}],@"defaultPreset":@"default",@"conversations":@{}}; }
+NSDictionary *CSAIReplyDefaultConfiguration(void) { return @{@"enabled":@NO,@"backgroundFallback":@YES,@"endpoint":@"",@"model":@"",@"credentialRevision":@"",@"verifiedConnection":@"",@"provider":@"openai-compatible",@"imageEnabled":@NO,@"searchMode":@"off",@"thinkingEnabled":@NO,@"presets":@[@{@"id":@"default",@"name":@"默认回复",@"prompt":@"请根据对方的消息，用自然、友好、简洁的中文回复。不编造事实，不代替我作出承诺；不确定时明确说明。只输出要发送的回复正文，不附加解释或格式标记。"}],@"defaultPreset":@"default",@"conversations":@{}}; }
 NSString *CSAIProvider(NSDictionary *configuration) { id value=configuration[@"provider"]; return [value isKindOfClass:NSString.class]?value:@"openai-compatible"; }
 NSString *CSAISearchMode(NSDictionary *configuration) { id value=configuration[@"searchMode"]; return [value isKindOfClass:NSString.class]?value:@"off"; }
 NSString *CSAIConnectionIdentifier(NSDictionary *configuration) {
@@ -45,7 +46,7 @@ BOOL CSAIValidateEndpoint(NSString *endpoint, NSError **error) {
 BOOL CSAIReplyValidateConfiguration(id configuration, NSError **error) {
     if(![configuration isKindOfClass:NSDictionary.class]) return Fail(error,@"AI 配置格式无效");
     NSDictionary *c=configuration;
-    if(!OnlyKeys(c,@[@"enabled",@"endpoint",@"model",@"credentialRevision",@"verifiedConnection",@"verifiedAt",@"provider",@"imageEnabled",@"searchMode",@"thinkingEnabled",@"presets",@"defaultPreset",@"conversations"]) || !IsBoolean(c[@"enabled"]) || !String(c[@"endpoint"],0,8192) || !String(c[@"model"],0,200)) return Fail(error,@"AI 配置字段无效");
+    if(!OnlyKeys(c,@[@"enabled",@"backgroundFallback",@"endpoint",@"model",@"credentialRevision",@"verifiedConnection",@"verifiedAt",@"provider",@"imageEnabled",@"searchMode",@"thinkingEnabled",@"presets",@"defaultPreset",@"conversations"]) || !IsBoolean(c[@"enabled"]) || (c[@"backgroundFallback"] && !IsStrictBoolean(c[@"backgroundFallback"])) || !String(c[@"endpoint"],0,8192) || !String(c[@"model"],0,200)) return Fail(error,@"AI 配置字段无效");
     if((c[@"provider"] && (!String(c[@"provider"],1,30) || ![@[@"openai-compatible",@"bailian"] containsObject:c[@"provider"]])) ||
        (c[@"imageEnabled"] && !IsBoolean(c[@"imageEnabled"])) || (c[@"thinkingEnabled"] && !IsBoolean(c[@"thinkingEnabled"])) ||
        (c[@"searchMode"] && (!String(c[@"searchMode"],1,10) || ![@[@"off",@"auto",@"always"] containsObject:c[@"searchMode"]]))) return Fail(error,@"模型能力配置无效");
@@ -78,7 +79,7 @@ BOOL CSAIReplyValidateState(id state, NSString *account, NSError **error) {
 }
 NSDictionary *CSAIReplyPortableState(NSDictionary *state) {
     NSMutableDictionary *c=[NSMutableDictionary dictionary]; NSDictionary *source=state[@"configuration"]?:CSAIReplyDefaultConfiguration();
-    for(NSString *key in @[@"enabled",@"endpoint",@"model",@"provider",@"imageEnabled",@"searchMode",@"thinkingEnabled",@"presets",@"defaultPreset",@"conversations"]) if(source[key]) c[key]=source[key];
+    for(NSString *key in @[@"enabled",@"backgroundFallback",@"endpoint",@"model",@"provider",@"imageEnabled",@"searchMode",@"thinkingEnabled",@"presets",@"defaultPreset",@"conversations"]) if(source[key]) c[key]=source[key];
     return @{@"schema":@1,@"account":state[@"account"]?:@"",@"configuration":c};
 }
 static NSDictionary *NewState(NSString *account) { return @{@"schema":@1,@"account":account,@"configuration":CSAIReplyDefaultConfiguration(),@"handled":@{},@"history":@[]}; }

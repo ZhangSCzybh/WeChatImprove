@@ -2,6 +2,7 @@
 #import "../Controllers/CSAIChatDetailAdapter.h"
 #import "../Controllers/CSBackupBootstrap.h"
 #import "../Controllers/CSMessageNativeActionAdapter.h"
+#import "../Controllers/CSAINativeSyncObserver.h"
 #import <objc/runtime.h>
 #import <substrate.h>
 
@@ -18,7 +19,7 @@ static void CSAIInstallMessageHook(void){
     IMP replacement=imp_implementationWithBlock(^(id object,id session,id wrap){
         NSUInteger epoch=CSBackupAccountEpoch();
         ((void(*)(id,SEL,id,id))original)(object,selector,session,wrap);
-        if(!CSAIReplyMessageIngressEnabled())return;
+        if(!CSAIReplyMessageIngressAllowsSession(session,epoch))return;
         dispatch_async(dispatch_get_main_queue(),^{
             [CSAIReplyManager.sharedManager receiveNativeSession:session wrap:wrap epoch:epoch];
         });
@@ -39,6 +40,7 @@ static void CSAIInstallDetailHook(NSString *className,NSString *name,BOOL animat
     CSBackupWhenReady(^{dispatch_async(dispatch_get_main_queue(),^{
         [CSAIReplyManager.sharedManager start];
         CSAIInstallMessageHook();
+        CSAIInstallNativeSyncObserver();
         for(NSString *name in @[@"AddContactToChatRoomViewController",@"ChatRoomInfoViewController"]){
             CSAIInstallDetailHook(name,@"reloadTableData",NO);
             CSAIInstallDetailHook(name,@"reloadProfileTableData",NO);

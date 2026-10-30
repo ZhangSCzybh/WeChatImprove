@@ -1,0 +1,23 @@
+
+/tmp/wechat-8.0.78-inset-analysis/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000103b2441c <_Flutter_MMFoundation_BindContext>:
+1051825c8: a9be4ff4    	stp	x20, x19, [sp, #-0x20]!
+1051825cc: a9017bfd    	stp	x29, x30, [sp, #0x10]
+1051825d0: 910043fd    	add	x29, sp, #0x10
+1051825d4: aa0003f3    	mov	x19, x0
+1051825d8: 52801200    	mov	w0, #0x90               ; =144
+1051825dc: 528002c1    	mov	w1, #0x16               ; =22
+1051825e0: 52800022    	mov	w2, #0x1                ; =1
+1051825e4: 52800003    	mov	w3, #0x0                ; =0
+1051825e8: 52800004    	mov	w4, #0x0                ; =0
+1051825ec: 973736e4    	bl	0x101f5017c <_Flutter_Image_provideRelativePathByUrl+0x35d02c>
+1051825f0: d00d70c8    	adrp	x8, 0x11ff9c000 <dyld_stub_binder+0x11ff9c000>
+1051825f4: f942cd01    	ldr	x1, [x8, #0x598] ; selector/string InternalCreateSync:
+1051825f8: aa1303e0    	mov	x0, x19
+1051825fc: 52800182    	mov	w2, #0xc                ; =12
+105182600: a9417bfd    	ldp	x29, x30, [sp, #0x10]
+105182604: a8c24ff4    	ldp	x20, x19, [sp], #0x20
+105182608: 14aa92cd    	b	0x107c2713c <_Flutter_MMFoundation_BindContext+0x4102d20>

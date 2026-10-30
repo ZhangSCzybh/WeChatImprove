@@ -22,8 +22,24 @@ static BOOL ValidMetadata(id object) {
 @interface CSBackupStore ()
 @property(nonatomic) CSPluginDirectoryMigration *migration;
 @property(nonatomic,copy,readwrite) NSString *cleanupStatus;
+@property(nonatomic) NSMutableDictionary *inventory;
+@property(nonatomic) NSDictionary *inventorySource;
+@property(nonatomic) NSDictionary *inventorySnapshot;
+@property(nonatomic) NSDictionary *inventorySnapshotIdentity;
 @end
 static BOOL StoreFail(NSError **error, NSString *message) { if(error)*error=CSBackupFailure(message);return NO; }
+static NSDictionary *FileIdentityAtPath(NSString *path,const struct stat *st) {
+    // Foundation enumeration may expand system aliases (/var -> /private/var).
+    // Resolve only the parent; a leaf symlink remains its own identity.
+    NSString *canonical=[path.stringByDeletingLastPathComponent.stringByResolvingSymlinksInPath stringByAppendingPathComponent:path.lastPathComponent];
+    return @{@"path":canonical,@"device":@((uint64_t)st->st_dev),@"inode":@((uint64_t)st->st_ino),
+        @"mode":@(st->st_mode),@"size":@(st->st_size),@"modified":@(st->st_mtimespec.tv_sec),
+        @"modifiedNS":@(st->st_mtimespec.tv_nsec),@"changed":@(st->st_ctimespec.tv_sec),@"changedNS":@(st->st_ctimespec.tv_nsec)};
+}
+static NSDictionary *FileIdentity(NSURL *url) {
+    struct stat st;if(lstat(url.fileSystemRepresentation,&st))return nil;
+    return FileIdentityAtPath(url.path,&st);
+}
 static BOOL Directory(NSURL *url,NSError **error) {
     if(![NSFileManager.defaultManager createDirectoryAtURL:url withIntermediateDirectories:YES attributes:nil error:error])return NO;
     struct stat st;
@@ -63,6 +79,13 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     return YES;
 }
 @implementation CSBackupStore
+- (NSDictionary *)withInventoryForSource:(NSDictionary *)source operation:(NSDictionary *(^)(void))operation {
+    // The Store is serial-queue-owned. A nested operation shares its owner's scope.
+    if(self.inventory)return operation();
+    self.inventory=[NSMutableDictionary dictionary];self.inventorySource=[source copy];
+    @try{return operation();}
+    @finally{self.inventory=nil;self.inventorySource=nil;self.inventorySnapshot=nil;self.inventorySnapshotIdentity=nil;}
+}
 - (void)emit:(NSString *)event details:(NSDictionary *)details {
     @try {if(self.eventHandler)self.eventHandler(event,details);}
     @catch(__unused NSException *exception) {} // Diagnostics must not change storage results.
@@ -151,12 +174,19 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     NSError *failure=nil;NSURL *url=[self URLForID:identifier extension:@"wcbak"];
     if(!url){StoreFail(&failure,@"备份标识无效");}
     else if([self prepareForReading:&failure]){
-        url=[self readURL:url];NSData *data=CSBackupReadFile(url,CSBackupMaximumFileSize,&failure);
+        url=[self readURL:url];
+        NSData *data=CSBackupReadFile(url,CSBackupMaximumFileSize,&failure);
         NSDictionary *snapshot=data?[CSBackupCodec decode:data error:&failure]:nil;
         if(snapshot&&[snapshot[@"id"] isEqual:identifier])return snapshot;
         if(snapshot)StoreFail(&failure,@"文件名与备份标识不一致");
     }
     if(error)*error=CSBackupRestoreError(failure,@"validate",CSBackupRestoreValidation,url.path);return nil;
+}
+- (NSDictionary *)snapshotUsingInventory:(NSString *)identifier error:(NSError **)error {
+    NSURL *url=[self URLForID:identifier extension:@"wcbak"];
+    if(url&&self.inventorySnapshot&&[self.inventorySnapshot[@"id"] isEqual:identifier]&&[self prepareForReading:error]&&
+       [self.inventorySnapshotIdentity isEqual:FileIdentity([self readURL:url])])return self.inventorySnapshot;
+    return [self snapshot:identifier error:error];
 }
 - (NSDictionary *)snapshotForRestore:(NSString *)identifier error:(NSError **)error {
     NSURL *url=[self URLForID:identifier extension:@"wcbak"];
@@ -175,6 +205,9 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     if(!snapshot&&error)*error=failure;return snapshot;
 }
 - (NSArray *)records:(NSError **)error {
+    return [self records:error contentDigests:YES];
+}
+- (NSArray *)records:(NSError **)error contentDigests:(BOOL)contentDigests {
     struct stat before;BOOL existed=lstat(self.root.path.fileSystemRepresentation,&before)==0;
     if(!self.migration&&!Directory(self.root,error))return @[];
     if(self.migration&&![self.migration migrate:error]){
@@ -194,13 +227,27 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     }
     NSMutableArray *items=[NSMutableArray array];
     for(NSURL *url in urls)if([url.pathExtension isEqual:@"wcbak"]) {
+        NSURL *effective=[self readURL:url];NSDictionary *identity=FileIdentity(effective),*cached=self.inventory[effective.path];
+        if(identity&&[cached[@"identity"] isEqual:identity]&&(!contentDigests||cached[@"record"][@"contentDigest"]||[cached[@"record"][@"unavailable"] boolValue])){
+            [items addObject:cached[@"record"]];continue;
+        }
         NSError *readError=nil;NSString *identifier=url.lastPathComponent.stringByDeletingPathExtension;
         NSDictionary *attributes=[NSFileManager.defaultManager attributesOfItemAtPath:url.path error:NULL];
-        NSDictionary *s=[self snapshot:identifier error:&readError];if(s){
+        NSDictionary *s=[self snapshot:identifier error:&readError];
+        if(!identity||![identity isEqual:FileIdentity([self readURL:url])]){s=nil;readError=CSBackupFailure(@"备份文件正在变化，已保留，稍后重试");}
+        NSMutableDictionary *record=nil;
+        if(s){
             NSMutableArray *stable=[NSMutableArray array];NSMutableSet *modules=[NSMutableSet set],*accounts=[NSMutableSet set];
             for(NSDictionary *f in s[@"fields"]){if(![f[@"key"] hasPrefix:@"com.wechat.enhance.chat_group.selection."])[stable addObject:f];[modules addObject:[CSBackupRegistry entryForDomain:f[@"domain"] key:f[@"key"]][@"module"]];if([f[@"key"] isEqual:@"com.wechat.enhance.chat_group.account_profiles"]&&[f[@"value"] isKindOfClass:NSDictionary.class])[accounts addObjectsFromArray:[f[@"value"] allKeys]];}
-            [items addObject:@{@"id":s[@"id"],@"filename":url.lastPathComponent,@"name":s[@"name"],@"createdAt":s[@"createdAt"],@"kind":s[@"kind"],@"source":s[@"source"],@"warnings":s[@"warnings"],@"fieldCount":@([s[@"fields"] count]),@"assetCount":@([s[@"assets"] count]),@"modules":modules.allObjects,@"accounts":accounts.allObjects,@"size":attributes[NSFileSize]?:@0,@"contentDigest":[CSBackupCodec digest:@{@"fields":stable,@"assets":s[@"assets"]}]}];
-        }else [items addObject:@{@"id":identifier,@"filename":url.lastPathComponent,@"name":[@"无法读取的备份 · " stringByAppendingString:identifier],@"unavailable":@YES,@"issue":readError.localizedDescription?:@"文件校验未通过，原件已保留",@"size":attributes[NSFileSize]?:@0}];
+            record=[@{@"id":s[@"id"],@"filename":url.lastPathComponent,@"name":s[@"name"],@"createdAt":s[@"createdAt"],@"kind":s[@"kind"],@"source":s[@"source"],@"warnings":s[@"warnings"],@"fieldCount":@([s[@"fields"] count]),@"assetCount":@([s[@"assets"] count]),@"modules":modules.allObjects,@"accounts":accounts.allObjects,@"size":attributes[NSFileSize]?:@0,@"_fileIdentity":identity} mutableCopy];
+            if(contentDigests)record[@"contentDigest"]=[CSBackupCodec digest:@{@"fields":stable,@"assets":s[@"assets"]}];
+            if(self.inventory&&[s[@"kind"] isEqual:@"automatic"]&&[s[@"source"][@"account"] isEqual:self.inventorySource[@"account"]]&&[s[@"source"][@"installationID"] isEqual:self.inventorySource[@"installationID"]]&&
+               (!self.inventorySnapshot||[s[@"createdAt"] compare:self.inventorySnapshot[@"createdAt"]]==NSOrderedDescending)){
+                self.inventorySnapshot=s;self.inventorySnapshotIdentity=identity;
+            }
+        }else record=[@{@"id":identifier,@"filename":url.lastPathComponent,@"name":[@"无法读取的备份 · " stringByAppendingString:identifier],@"unavailable":@YES,@"issue":readError.localizedDescription?:@"文件校验未通过，原件已保留",@"size":attributes[NSFileSize]?:@0} mutableCopy];
+        [items addObject:record];
+        if(identity&&[identity isEqual:FileIdentity([self readURL:url])])self.inventory[effective.path]=@{@"identity":identity,@"record":[record copy]};
     }
     [items sortUsingComparator:^NSComparisonResult(NSDictionary *a,NSDictionary *b){
         if(a[@"createdAt"]&&b[@"createdAt"])return [b[@"createdAt"] compare:a[@"createdAt"]];
@@ -220,17 +267,51 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
     return CSBackupReadFile([self readURL:[self.root URLByAppendingPathComponent:filename]],CSBackupMaximumFileSize,error);
 }
 - (BOOL)remove:(NSString *)identifier error:(NSError **)error {
-    if(![self prepareForWriting:error])return NO;
     NSURL *url=[self URLForID:identifier extension:@"wcbak"];if(!url)return StoreFail(error,@"备份标识无效");
+    return [self removeFile:url.lastPathComponent error:error];
+}
+- (BOOL)removeFile:(NSString *)filename error:(NSError **)error {
+    return [self removeFile:filename expectedIdentity:nil error:error];
+}
+- (BOOL)removeFile:(NSString *)filename expectedIdentity:(NSDictionary *)expectedIdentity error:(NSError **)error {
+    if(![filename isKindOfClass:NSString.class]||!filename.length||![filename isEqual:filename.lastPathComponent]||
+       [filename containsString:@"/"]||[filename rangeOfString:[NSString stringWithFormat:@"%C",(unichar)0]].location!=NSNotFound||
+       ![filename.pathExtension isEqual:@"wcbak"])return StoreFail(error,@"备份文件名无效");
+    if(![self prepareForWriting:error])return NO;
+    NSString *identifier=filename.stringByDeletingPathExtension;
     NSError *journalError=nil;NSDictionary *journal=[self journal:&journalError];if(journalError){if(error)*error=journalError;return NO;}
-    if([journal[@"protectionID"] isEqual:identifier]||[journal[@"sourceID"] isEqual:identifier])return StoreFail(error,@"恢复事务正在使用此备份，暂时不能删除");
-    [self emit:@"remove-requested" details:@{@"id":identifier}];
-    if(![NSFileManager.defaultManager removeItemAtURL:url error:error]){[self emit:@"remove-failed" details:@{@"id":identifier}];return NO;}
-    for(NSString *extension in @[@"meta",@"meta.bak"]){
-        NSURL *metadataURL=[self URLForID:identifier extension:extension];struct stat st;
-        if(lstat(metadataURL.path.fileSystemRepresentation,&st)==0&&S_ISREG(st.st_mode))unlink(metadataURL.path.fileSystemRepresentation);
+    NSUUID *uuid=[[NSUUID alloc]initWithUUIDString:identifier];
+    for(NSString *key in @[@"protectionID",@"sourceID"]){
+        id reference=journal[key];
+        if([reference isEqual:identifier]||(uuid&&[reference isKindOfClass:NSString.class]&&[uuid isEqual:[[NSUUID alloc]initWithUUIDString:reference]]))
+            return StoreFail(error,@"恢复事务正在使用此备份，暂时不能删除");
     }
-    [self emit:@"removed" details:@{@"id":identifier}];return YES;
+    NSDictionary *details=@{@"id":identifier,@"filename":filename};
+    [self emit:@"remove-requested" details:details];
+    NSURL *url=[self.root URLByAppendingPathComponent:filename];NSError *failure=nil;
+    int directory=open(self.root.fileSystemRepresentation,O_RDONLY|O_DIRECTORY|O_NOFOLLOW);
+    if(directory<0)failure=CSBackupFileError(self.root.path,@"open-delete-directory",errno);
+    else {
+        struct stat st;
+        if(expectedIdentity){
+            NSDictionary *metadata=[self metadata:identifier error:&failure];
+            if(!failure&&([metadata[@"favorite"] boolValue]||metadata[@"importedAt"]))StoreFail(&failure,@"备份保护状态已变化，原件已保留");
+            NSDictionary *currentJournal=failure?nil:[self journal:&failure];
+            for(NSString *key in @[@"protectionID",@"sourceID"]){id reference=currentJournal[key];
+                if([reference isEqual:identifier]||(uuid&&[reference isKindOfClass:NSString.class]&&[uuid isEqual:[[NSUUID alloc]initWithUUIDString:reference]]))StoreFail(&failure,@"恢复事务正在使用此备份，暂时不能删除");}
+        }
+        if(failure){}
+        else if(fstatat(directory,filename.fileSystemRepresentation,&st,AT_SYMLINK_NOFOLLOW))failure=CSBackupFileError(url.path,@"inspect-delete",errno);
+        else if(expectedIdentity&&![expectedIdentity isEqual:FileIdentityAtPath(url.path,&st)])StoreFail(&failure,@"备份文件已变化，原件已保留");
+        else if(!S_ISREG(st.st_mode)&&!S_ISLNK(st.st_mode))StoreFail(&failure,@"备份不是普通文件或符号链接，未删除任何目录");
+        else if(unlinkat(directory,filename.fileSystemRepresentation,0))failure=CSBackupFileError(url.path,@"delete",errno);
+    }
+    if(failure){if(directory>=0)close(directory);if(error)*error=failure;[self emit:@"remove-failed" details:details];return NO;}
+    for(NSString *extension in @[@"meta",@"meta.bak"]){
+        NSString *name=[identifier stringByAppendingPathExtension:extension];struct stat st;
+        if(!fstatat(directory,name.fileSystemRepresentation,&st,AT_SYMLINK_NOFOLLOW)&&(S_ISREG(st.st_mode)||S_ISLNK(st.st_mode)))unlinkat(directory,name.fileSystemRepresentation,0);
+    }
+    close(directory);[self emit:@"removed" details:details];return YES;
 }
 - (NSDictionary *)metadata:(NSString *)identifier {return [self metadata:identifier error:NULL];}
 - (NSDictionary *)readMetadata:(NSURL *)url identifier:(NSString *)identifier {
@@ -334,7 +415,7 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
 }
 - (BOOL)prune:(NSError **)error {
     if(![self prepareForWriting:error])return NO;
-    NSError *listError=nil;NSArray *snapshots=[self records:&listError];
+    NSError *listError=nil;NSArray *snapshots=[self records:&listError contentDigests:NO];
     NSDictionary *journal=listError?nil:[self journal:&listError];
     NSMutableArray *events=[NSMutableArray array];NSMutableDictionary *report=[@{@"date":NSDate.date,@"events":events} mutableCopy];
     if(listError){report[@"issue"]=listError.localizedDescription;[self writeCleanup:report error:NULL];if(error)*error=listError;return NO;}
@@ -358,7 +439,7 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
         NSUInteger n=[counts[bucket] unsignedIntegerValue]+1;counts[bucket]=@(n);
         if(n<=quota||events.count>=100)continue;
         BOOL active=[journal[@"sourceID"] isEqual:s[@"id"]]||[journal[@"protectionID"] isEqual:s[@"id"]];
-        [events addObject:[@{@"id":s[@"id"],@"kind":kind,@"action":active?@"retained":@"planned",@"reason":active?@"恢复事务正在使用":@"超过保留数量，已确认未收藏且非导入备份",@"metadataVerified":@YES} mutableCopy]];
+        [events addObject:[@{@"id":s[@"id"],@"kind":kind,@"action":active?@"retained":@"planned",@"reason":active?@"恢复事务正在使用":@"超过保留数量，已确认未收藏且非导入备份",@"metadataVerified":@YES,@"fileIdentity":s[@"_fileIdentity"]} mutableCopy]];
     }
     if(!events.count&&!protectionError)return YES;
     if(protectionError)report[@"issue"]=protectionError.localizedDescription;
@@ -370,7 +451,7 @@ BOOL CSBackupAtomicWrite(NSData *data,NSURL *url,NSError **error) {
         NSError *currentError=nil;NSDictionary *metadata=[self metadata:event[@"id"] error:&currentError];
         if(currentError||[metadata[@"favorite"] boolValue]||metadata[@"importedAt"]){
             event[@"action"]=@"retained";event[@"reason"]=currentError.localizedDescription?:@"备份保护状态已变化";
-        }else if([self remove:event[@"id"] error:&currentError])event[@"action"]=@"deleted";
+        }else if([self removeFile:[event[@"id"] stringByAppendingPathExtension:@"wcbak"] expectedIdentity:event[@"fileIdentity"] error:&currentError])event[@"action"]=@"deleted";
         else {event[@"action"]=@"failed";event[@"reason"]=currentError.localizedDescription?:@"文件删除失败";deletionError=currentError?:CSBackupFailure(event[@"reason"]);}
         if(![self writeCleanup:report error:error])return NO;
     }

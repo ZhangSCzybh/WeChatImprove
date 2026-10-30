@@ -127,6 +127,7 @@ typedef NS_ENUM(NSInteger, NSLineBreakMode) { NSLineBreakByClipping=2, NSLineBre
 @property(nonatomic,copy) NSString *text;
 @property(nonatomic,strong) UIFont *font;
 @property(nonatomic,strong) UIColor *textColor;
+@property(nonatomic,strong) UIColor *highlightedTextColor;
 @end
 @interface UIBezierPath : NSObject
 @property(nonatomic,readonly) CGPathRef CGPath;

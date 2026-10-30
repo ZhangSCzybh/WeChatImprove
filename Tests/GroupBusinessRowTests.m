@@ -9,6 +9,7 @@ static const NSUInteger CSCloseFriendSurfaceSession=0;
 static void CSCloseFriendUpdateSessionCover(id cell, id row) { (void)cell; (void)row; }
 static char CellRowKey;
 static NSString *account=@"test-account";
+static NSUInteger CSCloseFriendAccountEpoch(void) { return 1; }
 id CSGetService(Class cls) { (void)cls; return nil; }
 @interface MMContext : NSObject
 + (NSString *)currentUserName;
@@ -91,6 +92,7 @@ static NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionStyleNone
 @property(nonatomic,strong) NSDictionary *identityDisplayPaths;
 @property(nonatomic) BOOL dirty;
 @property(nonatomic) NSUInteger refreshRequests;
+@property(nonatomic) NSUInteger modelRevision;
 - (BOOL)isActive;
 - (void)requestRefresh;
 - (void)requestRecovery;

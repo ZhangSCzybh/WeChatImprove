@@ -176,11 +176,49 @@ static BOOL AnonymousPathStillBusiness(id logic, NSIndexPath *path) {
     id name=CSGroupReadObject(data,@"userName");
     return !name || ([name isKindOfClass:NSString.class] && ![name length]);
 }
-NSIndexPath *CSGroupResolveNativeRowPath(id controller, CSGroupRow *row, BOOL modelDirty) {
+@interface CSGroupFoldedPathIndex : NSObject
+@property(nonatomic,copy) NSArray *version;
+@property(nonatomic,copy) NSDictionary<NSString *,NSArray<NSIndexPath *> *> *paths;
+@end
+@implementation CSGroupFoldedPathIndex @end
+static char FoldedPathIndexKey;
+static NSIndexPath *FoldedIndexedPath(id controller,id logic,CSGroupRow *row,NSArray *version) {
+    CSGroupFoldedPathIndex *index=objc_getAssociatedObject(controller,&FoldedPathIndexKey);
+    if ([index.version isEqual:version]) {
+        for (NSIndexPath *path in index.paths[row.userName]) if (NativeIdentityMatches(logic,path,row)) return path;
+    }
+    // A same-pointer, same-count native array may have reordered or replaced
+    // rows without a known host callback. Never treat its shape as a version.
+    objc_setAssociatedObject(controller,&FoldedPathIndexKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    id table=CSGroupReadObject(controller,@"tableView");
+    long long count=ControllerCount(controller,table,@selector(tableView:numberOfRowsInSection:),0,YES);
+    if (count<0 || count>100000) return nil;
+    NSMutableDictionary *paths=[NSMutableDictionary dictionary];
+    for (NSUInteger i=0;i<(NSUInteger)count;i++) {
+        NSUInteger indexes[]={0,i};NSIndexPath *path=[NSIndexPath indexPathWithIndexes:indexes length:2];
+        NSString *name=CSGroupNativeUserNameAtPath(controller,path);
+        if (!name.length) continue;
+        NSMutableArray *positions=paths[name];
+        if (!positions) paths[[name copy]]=positions=[NSMutableArray array];
+        [positions addObject:path];
+    }
+    if (ControllerCount(controller,table,@selector(tableView:numberOfRowsInSection:),0,YES)!=count) return nil;
+    NSMutableDictionary *immutable=[NSMutableDictionary dictionaryWithCapacity:paths.count];
+    for (NSString *name in paths) immutable[name]=[paths[name] copy];
+    index=[CSGroupFoldedPathIndex new];index.version=version;index.paths=immutable;
+    objc_setAssociatedObject(controller,&FoldedPathIndexKey,index,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    for (NSIndexPath *path in index.paths[row.userName]) if (NativeIdentityMatches(logic,path,row)) return path;
+    return nil;
+}
+static NSIndexPath *ResolveNativeRowPath(id controller, CSGroupRow *row, BOOL modelDirty,NSArray *version) {
     @try {
         if (![row isKindOfClass:CSGroupRow.class] || !IsNativePath(row.nativePath)) return nil;
         id logic=CSGroupNativeLogic(controller);
         if (!logic) return nil;
+        if (version.count && CSGroupIsFoldedController(controller)) {
+            CSGroupFoldedPathIndex *index=objc_getAssociatedObject(controller,&FoldedPathIndexKey);
+            if (index && ![index.version isEqual:version]) objc_setAssociatedObject(controller,&FoldedPathIndexKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
         if (![row.userName isKindOfClass:NSString.class] || !row.userName.length) {
             if (row.kind!=CSGroupRowKindBusiness && row.kind!=CSGroupRowKindAggregate) return nil;
             if (!AnonymousPathWithinBounds(controller,row.nativePath)) return nil;
@@ -188,6 +226,7 @@ NSIndexPath *CSGroupResolveNativeRowPath(id controller, CSGroupRow *row, BOOL mo
         }
         if (NativeIdentityMatches(logic,row.nativePath,row)) return row.nativePath;
         if (CSGroupIsFoldedController(controller)) {
+            if (version.count) return FoldedIndexedPath(controller,logic,row,version);
             id table=CSGroupReadObject(controller,@"tableView");
             long long count=ControllerCount(controller,table,@selector(tableView:numberOfRowsInSection:),0,YES);
             if (count<0 || count>100000) return nil;
@@ -200,6 +239,12 @@ NSIndexPath *CSGroupResolveNativeRowPath(id controller, CSGroupRow *row, BOOL mo
         id path=ResolverObjectAtPath(logic,@"indexPathOfSessionUserName:",row.userName);
         return NativeIdentityMatches(logic,path,row) ? [path copy] : nil;
     } @catch (__unused NSException *e) { return nil; }
+}
+NSIndexPath *CSGroupResolveNativeRowPath(id controller, CSGroupRow *row, BOOL modelDirty) {
+    return ResolveNativeRowPath(controller,row,modelDirty,nil);
+}
+NSIndexPath *CSGroupResolveNativeRowPathReusing(id controller, CSGroupRow *row, BOOL modelDirty,NSArray *sourceVersion) {
+    return ResolveNativeRowPath(controller,row,modelDirty,sourceVersion);
 }
 NSString *CSGroupCurrentAccountID(void) {
     for (NSArray *entry in @[@[@"MMContext",@"currentUserName"],@[@"SettingUtil",@"getCurUsrName"]]) {

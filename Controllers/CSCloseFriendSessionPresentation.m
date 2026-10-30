@@ -14,6 +14,7 @@
 @property(nonatomic,strong) UIView *nativePrefix;
 @property(nonatomic,copy) NSString *writtenMessage;
 @property(nonatomic) CGRect messageBaseFrame;
+@property(nonatomic,copy) NSArray *nativeRenderState;
 @property(nonatomic,strong) NSMapTable<UIView *,NSNumber *> *hiddenStates;
 @property(nonatomic,strong) id originalAccessibilityElements;
 @property(nonatomic,copy) NSString *originalAccessibilityLabel;
@@ -71,6 +72,52 @@ static UIView *CSFoldedNativePrefix(UIView *item) {
     for (UIView *child in item.subviews) if (child.tag==10001001) return child;
     return nil;
 }
+static id CSFoldedThemeValue(id object,NSString *name,NSArray *arguments) {
+    @try {
+    SEL selector=NSSelectorFromString(name);
+    Method method=class_getInstanceMethod(object_getClass(object),selector);
+    const char *types=method ? method_getTypeEncoding(method) : NULL;
+    NSMethodSignature *sig=types ? [NSMethodSignature signatureWithObjCTypes:types] : nil;
+    if (!sig || sig.numberOfArguments!=arguments.count+2 || sig.methodReturnType[0]!='@') return nil;
+    for (NSUInteger i=0;i<arguments.count;i++) if (!strchr("@#",[sig getArgumentTypeAtIndex:i+2][0])) return nil;
+    if (!arguments.count) return ((id(*)(id,SEL))objc_msgSend)(object,selector);
+    if (arguments.count==1) return ((id(*)(id,SEL,id))objc_msgSend)(object,selector,arguments[0]);
+    if (arguments.count==2) return ((id(*)(id,SEL,id,id))objc_msgSend)(object,selector,arguments[0],arguments[1]);
+    return nil;
+    } @catch (__unused NSException *exception) { return nil; }
+}
+static id CSFoldedFreezeThemeValue(id value,NSUInteger depth) {
+    if (!value) return nil;
+    if ([value isKindOfClass:NSString.class] || [value isKindOfClass:NSNumber.class]) return [value copy];
+    if (depth>3 || ![value isKindOfClass:NSArray.class] || [value count]>32) return nil;
+    NSMutableArray *copy=[NSMutableArray arrayWithCapacity:[value count]];
+    for (id child in value) { id frozen=CSFoldedFreezeThemeValue(child,depth+1);if (!frozen) return nil;[copy addObject:frozen]; }
+    return [copy copy];
+}
+static NSArray *CSFoldedNativeRenderState(UIView *item,UILabel *message,UILabel *prefix) {
+    // quoteMessageLable: reads these two native theme properties (8.0.78).
+    // Copy their values: retaining a mutable theme collection cannot detect an
+    // in-place change. Unknown accessors/values disable reuse; rendering still
+    // delegates to the native quote method.
+    id context=CSFoldedThemeValue(NSClassFromString(@"MMContext"),@"currentContext",@[]);
+    Class themeClass=NSClassFromString(@"MMThemeManager");
+    id manager=themeClass ? CSFoldedThemeValue(context,@"getService:",@[themeClass]) : nil;
+    if (!manager) return nil;
+    id margin=CSFoldedFreezeThemeValue(CSFoldedThemeValue(manager,@"getValueOfProperty:inRuleSet:",@[@"cell_headimg_left_margin",@"#mainframe_table"]),0);
+    id size=CSFoldedFreezeThemeValue(CSFoldedThemeValue(manager,@"getValueOfProperty:inRuleSet:",@[@"cell_headimg_size",@"#mainframe_table"]),0);
+    if (!margin || !size) return nil;
+    id null=NSNull.null;
+    CGRect bounds=item.bounds,itemFrame=item.frame,messageFrame=message.frame,prefixFrame=prefix.frame;
+    return @[[NSValue value:&bounds withObjCType:@encode(CGRect)],[NSValue value:&itemFrame withObjCType:@encode(CGRect)],
+        [NSValue value:&messageFrame withObjCType:@encode(CGRect)],
+        [NSValue value:&prefixFrame withObjCType:@encode(CGRect)],
+        message.text ?: null,prefix.text ?: null,message.font ?: null,message.textColor ?: null,message.backgroundColor ?: null,
+        message.highlightedTextColor ?: null,@(message.textAlignment),@(message.numberOfLines),@(message.lineBreakMode),
+        @(message.adjustsFontSizeToFitWidth),@(message.minimumScaleFactor),
+        prefix.font ?: null,prefix.textColor ?: null,prefix.backgroundColor ?: null,prefix.highlightedTextColor ?: null,
+        @(prefix.textAlignment),@(prefix.numberOfLines),@(prefix.lineBreakMode),@(prefix.adjustsFontSizeToFitWidth),@(prefix.minimumScaleFactor),
+        item.traitCollection ?: null,message.traitCollection ?: null,margin,size];
+}
 static void CSFoldedReleaseNativeSummary(CSCloseFriendSessionCover *cover) {
     // Never restore a saved global digest. On ordinary reuse, preserve a fresh
     // native update; clear only our still-owned pair and geometry.
@@ -78,7 +125,7 @@ static void CSFoldedReleaseNativeSummary(CSCloseFriendSessionCover *cover) {
         cover.nativeMessage.text=nil;cover.nativeMessage.frame=cover.messageBaseFrame;
     }
     [cover.nativePrefix removeFromSuperview];
-    cover.nativePrefix=nil;cover.nativeMessage=nil;cover.writtenMessage=nil;
+    cover.nativePrefix=nil;cover.nativeMessage=nil;cover.writtenMessage=nil;cover.nativeRenderState=nil;
 }
 static BOOL CSFoldedRenderNativeSummary(CSCloseFriendSessionCover *cover,UIView *item,UILabel *message,NSString *body,NSString *prefix) {
     SEL quote=NSSelectorFromString(@"quoteMessageLable:prefixText:"),remove=NSSelectorFromString(@"removeQuoteMessageLabel");
@@ -88,6 +135,13 @@ static BOOL CSFoldedRenderNativeSummary(CSCloseFriendSessionCover *cover,UIView 
         !removeSig || removeSig.numberOfArguments!=2 || strcmp(removeSig.methodReturnType,@encode(void))) return NO;
     @try {
         UIView *previous=CSFoldedNativePrefix(item);
+        if (message==cover.nativeMessage && previous==cover.nativePrefix && previous.superview==item &&
+            [message isDescendantOfView:item] && [message.text isEqual:body] && [((UILabel *)previous).text isEqual:prefix] &&
+            cover.nativeRenderState && [cover.nativeRenderState isEqual:CSFoldedNativeRenderState(item,message,(UILabel *)previous)]) {
+            CSFoldedKeepView(cover,message);CSFoldedKeepView(cover,previous);
+            message.hidden=NO;previous.hidden=NO;
+            return YES;
+        }
         CGRect base=message.frame;
         // A native or our prior quote has already moved the message to the
         // right. Its prefix carries the real unquoted origin. Never quote an
@@ -104,6 +158,7 @@ static BOOL CSFoldedRenderNativeSummary(CSCloseFriendSessionCover *cover,UIView 
             message.text=nil;[created removeFromSuperview];return NO;
         }
         cover.nativeMessage=message;cover.nativePrefix=created;cover.messageBaseFrame=base;cover.writtenMessage=[message.text copy];
+        cover.nativeRenderState=CSFoldedNativeRenderState(item,message,(UILabel *)created);
         CSFoldedKeepView(cover,message);message.hidden=NO;created.hidden=NO;
         return YES;
     } @catch (__unused NSException *exception) {

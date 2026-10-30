@@ -54,7 +54,7 @@ static NSString *Materialize(NSString *reference,NSString *name,NSDictionary *as
     if(![reference isKindOfClass:NSString.class]||![reference hasPrefix:@"csbackup:"]||reference.length!=73)return AssetError(error,@"图片引用无效");
     NSString *hash=[reference substringFromIndex:9];NSData *data=assets[hash];
     if(!data){if(error)*error=CSBackupRestoreError(CSBackupFailure(@"备份引用的图片未包含在文件内，未创建恢复计划，原件已保留。"),@"asset-reference",CSBackupRestoreMissingResource,nil);return nil;}
-    if(![data isKindOfClass:NSData.class]||![[CSBackupCodec digest:data] isEqual:hash]||![CSBackupAssets validImage:data])return AssetError(error,@"备份图片资源校验失败");
+    // assets contains only immutable bytes verified once by this materialization.
     NSString *filename=name ?: [NSString stringWithFormat:@"backup_%@.png",hash];
     NSDictionary *record=@{@"present":@YES,@"data":data};
     if(writes[filename]&&![writes[filename] isEqual:record])return AssetError(error,@"多个配置引用了冲突的固定图片");
@@ -116,6 +116,12 @@ static NSString *Materialize(NSString *reference,NSString *name,NSDictionary *as
     return result;
 }
 + (NSArray *)materializeFields:(NSArray *)fields assets:(NSDictionary *)assets root:(NSURL *)root writes:(NSMutableDictionary *)writes error:(NSError **)error {
+    assets=[self immutableAssets:assets error:error];if(!assets)return nil;
+    for(id hash in assets){
+        NSData *data=assets[hash];
+        if(![hash isKindOfClass:NSString.class]||[hash length]!=64||![data isKindOfClass:NSData.class]||
+           ![[CSBackupCodec digest:data] isEqual:hash]||![self validImage:data])return AssetError(error,@"备份图片资源校验失败");
+    }
     NSMutableArray *result=[NSMutableArray array];
     for(NSDictionary *field in fields) {
         NSMutableDictionary *f=[field mutableCopy];NSDictionary *entry=[CSBackupRegistry entryForDomain:f[@"domain"] key:f[@"key"]];NSString *resource=entry[@"resource"];
@@ -136,5 +142,19 @@ static NSString *Materialize(NSString *reference,NSString *name,NSDictionary *as
         [f removeObjectForKey:@"fallbackAsset"];[result addObject:f];
     }
     return result;
+}
++ (NSDictionary *)immutableAssets:(NSDictionary *)assets error:(NSError **)error {
+    if(![assets isKindOfClass:NSDictionary.class]||assets.count>256)return AssetError(error,@"图片资源清单无效");
+    NSDictionary *source=[assets copy];NSUInteger total=0;
+    NSMutableDictionary *frozen=[NSMutableDictionary dictionaryWithCapacity:assets.count];
+    for(id key in source){
+        NSData *data=source[key];
+        if(![data isKindOfClass:NSData.class]||!data.length||data.length>4*1024*1024)return AssetError(error,@"图片资源损坏或超过限制");
+        total+=data.length;if(total>24*1024*1024)return AssetError(error,@"图片资源总大小超过限制");
+        // -copy may retain immutable/mapped NSData. Own the actual bytes so a
+        // later external write cannot change what validation/sealing observes.
+        frozen[key]=[[NSData alloc]initWithBytes:data.bytes length:data.length];
+    }
+    return [frozen copy];
 }
 @end

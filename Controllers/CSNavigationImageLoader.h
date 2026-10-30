@@ -17,4 +17,12 @@ NS_ASSUME_NONNULL_BEGIN
                         maxPixelSize:(NSUInteger)maxPixelSize
                           completion:(void (^)(UIImage * _Nullable image, NSURL * _Nullable resolvedURL))completion;
 @end
+
+// Owns one image-view subscription. The caller revalidates its account, model and visible target.
+@interface CSNavigationImageBinding : NSObject
+- (void)displayURL:(nullable NSURL *)url scope:(NSString *)scope identity:(NSArray *)identity
+     maxPixelSize:(NSUInteger)maxPixelSize inImageView:(UIImageView *)imageView
+        ifCurrent:(BOOL (^)(void))ifCurrent;
+- (void)cancel;
+@end
 NS_ASSUME_NONNULL_END

@@ -1,0 +1,142 @@
+[
+  {
+    "file": "Controllers/CSAIBackgroundSync.h",
+    "before_sha256": "2dbfeed9f46dee8482475240a6777179e16f8cc4da9466ac6f0d71d8dab6bf16",
+    "after_sha256": "3629c9c7ce4e3bba60a215fe0f1efbbb589dcaf5c27797e2ed9dd6888f09910e",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "Controllers/CSAIBackgroundSync.m",
+    "before_sha256": "66c8b213863e88626975c16c41ba4a98280b0989e590e4c7b6cfc7bd200e0e0d",
+    "after_sha256": "6b96295cdcfa0e9c103999a870fe351ca5a08875f6006146463f2ab65c3d0bed",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "Controllers/CSAIReplyManager.m",
+    "before_sha256": "3545484aefe47a85577a31b10b03957019b198d508abcababd89aed9d203020e",
+    "after_sha256": "c73595a82766247707afe35e7fce42a607a222060f787775bf418944367af1ce",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "Controllers/CSAIReplyStore.h",
+    "before_sha256": "a4f48bbe945922a90990d07eef258fad25cf31814497293a58ff8edf4f5572fc",
+    "after_sha256": "a4f48bbe945922a90990d07eef258fad25cf31814497293a58ff8edf4f5572fc",
+    "changed": false,
+    "conclusion": "保护文件逐字节未变"
+  },
+  {
+    "file": "Controllers/CSAIReplyStore.m",
+    "before_sha256": "ec154647a31d7fa892125646cd6efb90c0ac91b13b9dee309793dba59416faf2",
+    "after_sha256": "4937f4bb757f1145ab6f89561a91c88683c03d8eb03499fb4ed93651845cec7a",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "Controllers/CSAIReplySettingsViewController.m",
+    "before_sha256": "7c9c00507bf119eda8b8b962977c7fb4b50f44609df9c9592a840806e5a76aca",
+    "after_sha256": "6ba96063b229d4a7f766a3d3e63fb43091b0744a5fc896ae2b6d1710349e88c8",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "Controllers/CSAINativeSyncObserver.h",
+    "before_sha256": "50972613f5d454e82c073e9ca5e2dac69698807523fcdcf19147b7de5441a32e",
+    "after_sha256": "50972613f5d454e82c073e9ca5e2dac69698807523fcdcf19147b7de5441a32e",
+    "changed": false,
+    "conclusion": "保护文件逐字节未变"
+  },
+  {
+    "file": "Controllers/CSAINativeSyncObserver.m",
+    "before_sha256": "a27088eb7e788ed572498a82a8254d0636c9268ec7dd88c95ff6073923064455",
+    "after_sha256": "a27088eb7e788ed572498a82a8254d0636c9268ec7dd88c95ff6073923064455",
+    "changed": false,
+    "conclusion": "保护文件逐字节未变"
+  },
+  {
+    "file": "Hooks/AIReplyHooks.xm",
+    "before_sha256": "e9f3c8b37fa6d9adb4bda1caeb159dcc4fc90cf953af9bc8b69de327dc411b8a",
+    "after_sha256": "e9f3c8b37fa6d9adb4bda1caeb159dcc4fc90cf953af9bc8b69de327dc411b8a",
+    "changed": false,
+    "conclusion": "保护文件逐字节未变"
+  },
+  {
+    "file": "Tests/AIBackgroundSyncTests.m",
+    "before_sha256": "969f941a831411f52a07cc03e30df823eeff118dc57f585987498dfc42b2c964",
+    "after_sha256": "b160d9acf80104481094060d6332e8485dd4992464b7722461ec23b1b2e79905",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "Tests/AIReplyManagerTests.m",
+    "before_sha256": "803b02ead4ff04d987a54f3efaeaf72e0824860fb91eec4a4ab8b9c34e3e067a",
+    "after_sha256": "c3ba47c60049ea82b9dd577f5002cf7348f571516276c1d37fd903a30bfc21b0",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "Tests/AIReplyCoordinatorTests.m",
+    "before_sha256": "594135e9b78c5b78dc5936dd736510bdf1cba3ff9d1fd5cdeb6f488f31be80e3",
+    "after_sha256": "7b672a22e331ffb2fb0cfc4558a4c745395ca8774b1528d672902bff6ec4cada",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "Tests/verify-ai-background-sync.sh",
+    "before_sha256": "8d6f0e6b83cab7a0d8f5defff478e040ba6c6fd8dd6758bf8915322d156a8e25",
+    "after_sha256": "b2d551c7261911d2fa9aecc3de2056c0a4661d4d393fb882302d31b16b6d9ca4",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "Tests/verify-ai-manager.sh",
+    "before_sha256": "a44a73cae03d67d788e63ec44c04906c27da6488a5e33dd2f068a53ec0413749",
+    "after_sha256": "fded93c17090a4931ce9c7040e47744fc80c6a33d7007d81bd309ee71251b15e",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "control",
+    "before_sha256": "a7a58000074af6d0782a4d62454ff65ac53ebe9d3936553867d8cbf1f4785f6a",
+    "after_sha256": "5d9b0cc16b7bf40f90000d711acfcdc094b61dbffcc5a2437c4fda45df2d3e5d",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "Headers/CSUserInfoHelper.h",
+    "before_sha256": "f91d0a63cc806e69508e2d738e917e07f6c5d1421bbd8c6e4cf58a647ec390bb",
+    "after_sha256": "2c5572b53ef9c2596c87aa2200d81d20fcb6191532708b6858927370e6c69a8b",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "Controllers/CSReleaseNotesViewController.m",
+    "before_sha256": "2a4bb551d70868b7329338552410b29c7ca556f7d0b909321073abbcbbf6da18",
+    "after_sha256": "c6a411e280ff95d605363ebe697e4d0cb055132c448a0b41091decd039988099",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "README.md",
+    "before_sha256": "4d8f93d8c116b8d54a9d94b18d0476206f46d9eaf1ba19d123c9ea4586bdca10",
+    "after_sha256": "d4b2ec12c189529ca1bd888d85af41ad1b21b5b2fe33b7ab06d1382c9553d0cc",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "docs/features/ai-auto-reply.md",
+    "before_sha256": "9e4391adcac372797dd3fd6b3fb28de5b7ca403ffa631c9a758550c1a4313b3a",
+    "after_sha256": "2bd0bff0ec2f8fc3eb3bdd3174c1de6a79625ddee150f41a22853e4ce82cf38c",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  },
+  {
+    "file": "docs/features/ai-auto-reply-validation.md",
+    "before_sha256": "ff9f319b3515f10c6f2399499d0c510aa5339562a4183b601466b6a7486db028",
+    "after_sha256": "8e95ac50282ae450ac2c0db5bb1ad752199e7a780694425a24089f72f2e8deaa",
+    "changed": true,
+    "conclusion": "仅本次兜底开关/配套测试/版本文档变更"
+  }
+]

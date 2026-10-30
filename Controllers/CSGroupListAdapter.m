@@ -900,26 +900,26 @@ static BOOL Option(NSString *suffix) {
         if ([policy hidesUserName:name surface:CSCloseFriendSurfaceSession]) [hidden addObject:name];
     NSMutableSet *unmasked=[NSMutableSet set];
     BOOL scopeFolded=Option(@"enabled") && !CSGroupIsFoldedController(self.controller) && !self.nativePresentation;
-    CSGroupProjection *foldedProjection=nil;
+    __block CSGroupProjection *foldedProjection=nil;
     if (scopeFolded) {
+        __block CSGroupRow *summaryCandidate=nil;
         NSArray *foldedRows=CSGroupCopyFoldedRowsSelectingSummary(^CSGroupRow *(NSArray<CSGroupRow *> *rows) {
-            CSGroupProjection *visible=[[CSGroupProjection alloc] initWithSections:@[rows] tabs:tabs selectedTabID:selected
+            foldedProjection=[[CSGroupProjection alloc] initWithSections:@[rows] tabs:tabs selectedTabID:selected
                 filterDuplicates:self.preferences.filterDuplicates accountID:account hiddenUserNames:hidden
                 privacyRevision:policy.revision previousProjection:nil];
-            if (!visible.isValid) return nil;
+            if (!foldedProjection.isValid) {foldedProjection=nil; return nil;}
             CSGroupRow *latest=nil;
-            for (NSArray *section in visible.sections) for (CSGroupRow *row in section) {
+            for (NSArray *section in foldedProjection.sections) for (CSGroupRow *row in section) {
                 if (row.kind==CSGroupRowKindSession && (!latest || row.nativeSortTime.unsignedLongLongValue>latest.nativeSortTime.unsignedLongLongValue)) latest=row;
             }
-            return latest;
+            summaryCandidate=latest; return latest;
         });
-        if (foldedRows) {
-            // Use exactly the same membership, duplicate and privacy rules as
-            // the child page. Never alter ChatBoxMgr's global source or unread.
-            foldedProjection=[[CSGroupProjection alloc] initWithSections:@[foldedRows] tabs:tabs selectedTabID:selected
-                filterDuplicates:self.preferences.filterDuplicates accountID:account hiddenUserNames:hidden
-                privacyRevision:policy.revision previousProjection:nil];
-            if (!foldedProjection.isValid) foldedProjection=nil;
+        if (!foldedRows) foldedProjection=nil;
+        else if (summaryCandidate) {
+            // The bridge changes only the selected candidate's verified native text.
+            // Retain the complete child membership/counts and replace that immutable row.
+            NSUInteger index=[summaryCandidate.nativePath indexAtPosition:1];
+            foldedProjection=index<foldedRows.count ? [foldedProjection projectionByAttachingNativeSummaryRow:foldedRows[index]] : nil;
         }
     } else if (hidden.count && !CSGroupIsFoldedController(self.controller)) {
         CSGroupFoldedPrivacyState folded=CSGroupAssessFoldedUserNames(CSGroupCopyFoldedUserNames(),hidden);
@@ -1116,9 +1116,13 @@ static BOOL Option(NSString *suffix) {
 - (BOOL)accountMatches { return [self.projection.accountID isEqualToString:CSGroupCurrentAccountID()]; }
 - (NSIndexPath *)currentPathForRow:(CSGroupRow *)row {
     if (!row || ![self accountMatches] || CSCloseFriendShouldHideUserName(row.userName,CSCloseFriendSurfaceSession)) return nil;
+    NSString *account=self.projection.accountID;
+    NSUInteger epoch=CSCloseFriendAccountEpoch(),revision=self.modelRevision;
+    NSArray *version=CSGroupIsFoldedController(self.controller) ? @[account,@(epoch),@(revision)] : @[];
     __block NSIndexPath *path=nil;
-    CSGroupWithNativeIndices(self.table, ^{ path=CSGroupResolveNativeRowPath(self.controller,row,self.dirty); });
-    return path;
+    CSGroupWithNativeIndices(self.table, ^{ path=CSGroupResolveNativeRowPathReusing(self.controller,row,self.dirty,version); });
+    return epoch==CSCloseFriendAccountEpoch() && revision==self.modelRevision && [account isEqual:CSGroupCurrentAccountID()] &&
+        !CSCloseFriendShouldHideUserName(row.userName,CSCloseFriendSurfaceSession) ? path : nil;
 }
 - (NSIndexPath *)nativePath:(NSIndexPath *)displayPath {
     if (!displayPath) return nil;

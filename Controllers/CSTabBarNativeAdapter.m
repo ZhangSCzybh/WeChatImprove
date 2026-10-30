@@ -5,7 +5,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import <objc/runtime.h>
 
-static char CSBarStateKey, CSItemStateKey;
+static char CSBarStateKey, CSItemStateKey, CSControllerLayoutKey;
 static NSHashTable<MMTabBar *> *CSBars;
 static NSString * const CSOutwardAnimationKey=@"cs.tabbar.outwardPulse";
 static NSString * const CSClassicAnimationKey=@"cs.tabbar.pulse";
@@ -40,6 +40,11 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 @end
 @implementation CSTabBarButtonState @end
 
+@interface CSTabBarControllerLayout : NSObject
+@property(nonatomic, weak) MMTabBar *bar;
+@end
+@implementation CSTabBarControllerLayout @end
+
 @interface CSTabBarState : NSObject
 @property(nonatomic, weak) MMTabBar *bar;
 @property(nonatomic, weak) MMTabBarController *controller;
@@ -62,6 +67,7 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 @property(nonatomic, weak) UIScrollView *scrollView;
 @property(nonatomic) CGFloat nativeInset, nativeIndicatorInset, appliedInset, appliedIndicatorInset;
 @property(nonatomic) BOOL insetApplied;
+@property(nonatomic) BOOL insetDeferred;
 @property(nonatomic) NSUInteger selectionBeforeTouch;
 @property(nonatomic) NSUInteger feedbackGeneration;
 @property(nonatomic, weak) UIControl *touchButton;
@@ -255,6 +261,11 @@ static void CSUpdateInset(CSTabBarState *s) {
     s.insetApplied=YES;
     if (fabs(inset.bottom-desired)>.01) { inset.bottom=desired; table.contentInset=inset; }
     if (fabs(indicator.bottom-s.appliedIndicatorInset)>.01) { indicator.bottom=s.appliedIndicatorInset; table.verticalScrollIndicatorInsets=indicator; }
+}
+static void CSUpdateVisibleInset(CSTabBarState *s) {
+    MMTabBar *bar=s.bar;
+    if (!s.applied || !CSTabBarPreferences.current.enabled || !bar.window || bar.hidden || bar.alpha<.01) CSRestoreInset(s);
+    else CSUpdateInset(s);
 }
 static void CSRestoreGeometry(CSTabBarState *s) {
     if (!s.geometryApplied) return;
@@ -478,8 +489,9 @@ void CSTabBarUpdate(MMTabBar *bar) {
     [CATransaction begin]; [CATransaction setDisableActions:YES]; CSRenderSurface(s,bar); [CATransaction commit];
     // Hidden/detached bars retain their styled appearance for native transition snapshots.
     // They must not retain ownership of a page's scroll inset or receive touches.
-    if (!bar.window || bar.hidden || bar.alpha<.01) CSRestoreInset(s);
-    else CSUpdateInset(s);
+    CSTabBarControllerLayout *scope=objc_getAssociatedObject(s.controller,&CSControllerLayoutKey);
+    if (scope.bar==bar && bar.window && !bar.hidden && bar.alpha>=.01) s.insetDeferred=YES;
+    else { s.insetDeferred=NO; CSUpdateVisibleInset(s); }
     CSReconcileClickEffect(s);
     s.applying=NO;
 }
@@ -521,6 +533,30 @@ void CSTabBarEndLayout(MMTabBar *bar) {
     CSTabBarState *s=CSState(bar,NO);
     if (s.depth) s.depth--;
     if (!s.depth) CSTabBarUpdate(bar);
+}
+void CSTabBarEndControllerLayout(MMTabBarController *controller) {
+    CSTabBarControllerLayout *scope=objc_getAssociatedObject(controller,&CSControllerLayoutKey);
+    if (!scope) return;
+    objc_setAssociatedObject(controller,&CSControllerLayoutKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    CSTabBarState *s=CSState(scope.bar,NO);
+    if (s.insetDeferred) { s.insetDeferred=NO; CSUpdateVisibleInset(s); }
+}
+void CSTabBarBeginControllerLayout(MMTabBarController *controller) {
+    // A new will-layout boundary always closes a missing previous did-layout.
+    // Only table discovery is deferred. Geometry and snapshots remain synchronous,
+    // and no discovery result is retained across layout generations.
+    CSTabBarEndControllerLayout(controller);
+    MMTabBar *bar=[controller.tabBar isKindOfClass:NSClassFromString(@"MMTabBar")] ? (MMTabBar *)controller.tabBar : nil;
+    if (!bar || !CSState(bar,CSTabBarPreferences.current.enabled)) return;
+    CSTabBarControllerLayout *scope=[CSTabBarControllerLayout new];scope.bar=bar;
+    objc_setAssociatedObject(controller,&CSControllerLayoutKey,scope,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    __weak MMTabBarController *weakController=controller;
+    // UIKit normally closes synchronously in did-layout. Bound a missing callback
+    // (including a detached controller) to this turn rather than leaving work deferred.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        MMTabBarController *live=weakController;
+        if (live && objc_getAssociatedObject(live,&CSControllerLayoutKey)==scope) CSTabBarEndControllerLayout(live);
+    });
 }
 void CSTabBarBeginItemUpdate(MMTabBarItemView *item) {
     CSTabBarItemState *s=objc_getAssociatedObject(item,&CSItemStateKey);

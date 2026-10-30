@@ -27,4 +27,8 @@ FOUNDATION_EXPORT NSArray<NSArray<CSGroupRow *> *> * _Nullable CSGroupBuildNativ
 /// proving the slot still has no native session or named fake row. This permits
 /// rendering, not identity-based editing (callers must still require a username).
 FOUNDATION_EXPORT NSIndexPath * _Nullable CSGroupResolveNativeRowPath(id controller, CSGroupRow *row, BOOL modelDirty);
+/// sourceVersion is the caller's immutable account/epoch/model revision. The
+/// folded-only index owns names/coordinates, never native sessions. Every hit
+/// revalidates native identity; misses or changed coordinates rebuild it.
+FOUNDATION_EXPORT NSIndexPath * _Nullable CSGroupResolveNativeRowPathReusing(id controller, CSGroupRow *row, BOOL modelDirty, NSArray *sourceVersion);
 NS_ASSUME_NONNULL_END

@@ -3,6 +3,8 @@
 #import "CSSettingTableViewCell.h"
 #import "CSContactSeparatorManager.h"
 #import "CSNavigationTitleSettingsViewController.h"
+#import "CSNavigationImageLoader.h"
+#import "CSChatNativeBridge.h"
 
 @interface CSContactSeparatorSettingsViewController ()
 
@@ -14,10 +16,54 @@
 @property (nonatomic, assign) CGFloat separatorSize;
 @property (nonatomic, assign) CGFloat avatarSpacing;
 @property (nonatomic, assign) CGFloat verticalOffset;
+@property (nonatomic, strong) CSNavigationImageBinding *avatarBinding;
+@property (nonatomic, copy) NSString *avatarURL, *avatarAccount;
+@property (nonatomic, weak) UIImageView *avatarImageView;
+@property (nonatomic, assign) BOOL avatarActive;
 
 @end
 
 @implementation CSContactSeparatorSettingsViewController
+
+- (void)configureContactAvatarURL:(NSString *)url account:(NSString *)account {
+    [self.avatarBinding cancel];
+    self.avatarURL=[url copy];self.avatarAccount=[account copy];
+    [self loadContactAvatar];
+}
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];self.avatarActive=YES;[self loadContactAvatar];
+}
+- (void)viewWillDisappear:(BOOL)animated {
+    self.avatarActive=NO;[self.avatarBinding cancel];[super viewWillDisappear:animated];
+}
+- (void)loadContactAvatar {
+    UIImageView *view=self.avatarImageView;
+    if (!view) return;
+    if (!self.avatarURL.length) {
+        [self.avatarBinding cancel];view.image=self.contactAvatar ?: [UIImage imageNamed:@"DefaultProfileHead_phone"];return;
+    }
+    if (!self.avatarBinding) self.avatarBinding=[CSNavigationImageBinding new];
+    NSString *account=[self.avatarAccount copy] ?: @"", *contactID=[self.contactId copy] ?: @"", *url=[self.avatarURL copy];
+    __weak typeof(self) weakSelf=self;
+    __weak UIImageView *weakView=view;
+    [self.avatarBinding displayURL:[NSURL URLWithString:url] scope:account identity:@[contactID]
+        maxPixelSize:(NSUInteger)ceil(40*UIScreen.mainScreen.scale) inImageView:view ifCurrent:^BOOL {
+            CSContactSeparatorSettingsViewController *live=weakSelf;
+            return live && live.avatarActive && live.viewIfLoaded.window && weakView.window &&
+                live.avatarImageView==weakView && [account isEqual:CSMessageCurrentAccount()] &&
+                [account isEqual:live.avatarAccount] && [contactID isEqual:live.contactId] && [url isEqual:live.avatarURL];
+        }];
+}
+- (void)tableView:(UITableView *)tableView didEndDisplayingHeaderView:(UIView *)view forSection:(NSInteger)section {
+    if (section==0 && self.avatarImageView.superview==view) {
+        [self.avatarBinding cancel];self.avatarImageView=nil;
+    }
+}
+- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(UIView *)view forSection:(NSInteger)section {
+    if (section!=0) return;
+    __weak typeof(self) weakSelf=self;
+    dispatch_async(dispatch_get_main_queue(),^{ [weakSelf loadContactAvatar]; });
+}
 
 - (instancetype)initWithContactId:(NSString *)contactId contactName:(nullable NSString *)contactName contactAvatar:(nullable UIImage *)contactAvatar {
     if (self = [super initWithStyle:UITableViewStyleGrouped]) {
@@ -388,6 +434,8 @@
             avatarView.backgroundColor = [UIColor systemGray5Color];
         }
         [headerView addSubview:avatarView];
+        self.avatarImageView=avatarView;
+        [self loadContactAvatar];
         
         UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(70, 15, tableView.bounds.size.width - 90, 30)];
         nameLabel.text = self.contactName;

@@ -9,6 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) UIImage *contactAvatar;
 
 - (instancetype)initWithContactId:(NSString *)contactId contactName:(nullable NSString *)contactName contactAvatar:(nullable UIImage *)contactAvatar;
+- (void)configureContactAvatarURL:(nullable NSString *)url account:(NSString *)account;
 
 @end
 

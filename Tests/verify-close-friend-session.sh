@@ -31,10 +31,16 @@ else:item_layout='%orig;'
 (Path(sys.argv[2])/'FoldedItemLayoutHook.h').write_text('static void HookMainFrameItemLayout(id self,void (^original)(void)) { (void)self; '+item_layout.replace('%orig;', 'original();')+' }')
 presentation=(Path(sys.argv[1])/'Controllers/CSCloseFriendSessionPresentation.m').read_text()
 (Path(sys.argv[2])/'SessionPresentationBody.h').write_text('\n'.join(line for line in presentation.splitlines() if not line.startswith('#import')))
+# Instrument only the complete production constructor in this temporary test copy.
+# Summary replacement must not rebuild grouping/maps/counts a second time.
+projection=(Path(sys.argv[1])/'Controllers/CSGroupProjection.m').read_text()
+marker='    if ((self = [super init])) {\n        // Until every value is validated'
+assert projection.count(marker)==1
+(Path(sys.argv[2])/'MeasuredProjection.m').write_text('extern void CSCFTestProjectionConstructed(void);\n'+projection.replace(marker,'    CSCFTestProjectionConstructed();\n'+marker))
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-undeclared-selector \
  -framework Foundation -I"$test_dir" -I"$project_dir/Controllers" \
- "$project_dir/Controllers/CSGroupProjection.m" "$project_dir/Controllers/WESessionTabItem.m" \
+ "$test_dir/MeasuredProjection.m" "$project_dir/Controllers/WESessionTabItem.m" \
  "$project_dir/Controllers/CSGroupInvocationMapper.m" "$project_dir/Controllers/CSGroupNativeBridge.m" "$project_dir/Controllers/CSGroupIndexScope.m" \
  "$project_dir/Controllers/CSCloseFriendPolicy.m" "$project_dir/Controllers/CSCloseFriendSignatures.m" \
  "$project_dir/Tests/CloseFriendSessionTests.m" -o "$test_dir/session-tests"

@@ -95,12 +95,30 @@ static BOOL CSBodyPadding(UIImage *native, CSBubbleInsets *padding) {
     return metrics.valid;
 }
 
+static char CSUnsignedABIKey;
 static BOOL CSUnsigned(id object, NSString *name, unsigned long long *result) {
-    SEL sel=NSSelectorFromString(name); Method method=class_getInstanceMethod([object class],sel);
-    if (!method || method_getNumberOfArguments(method)!=2) return NO;
-    char type[32]={0}; method_getReturnType(method,type,sizeof(type));
+    Class cls=object_getClass(object);
+    if (!cls) return NO;
+    SEL sel=NSSelectorFromString(name);
+    // Main-thread owned, per actual runtime class. Cache only a supported ABI,
+    // never a native value or IMP: later hooks and in-place model updates remain visible.
+    NSMutableDictionary *abis=objc_getAssociatedObject(cls,&CSUnsignedABIKey);
+    NSNumber *cached=abis[name];
+    char type=cached.charValue;
+    if (!cached) {
+        Method method=class_getInstanceMethod(cls,sel);
+        if (!method || method_getNumberOfArguments(method)!=2) return NO;
+        char encoding[32]={0}; method_getReturnType(method,encoding,sizeof(encoding));
+        type=encoding[0];
+        if (type!='B' && type!='c' && type!='C' && type!='I' && type!='Q') return NO;
+        if (!abis) {
+            abis=[NSMutableDictionary dictionary];
+            objc_setAssociatedObject(cls,&CSUnsignedABIKey,abis,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        abis[name]=@(type);
+    }
     @try {
-        switch (type[0]) {
+        switch (type) {
             case 'B': if (result) *result=((BOOL(*)(id,SEL))objc_msgSend)(object,sel); return YES;
             case 'c': if (result) *result=((char(*)(id,SEL))objc_msgSend)(object,sel); return YES;
             case 'C': if (result) *result=((unsigned char(*)(id,SEL))objc_msgSend)(object,sel); return YES;

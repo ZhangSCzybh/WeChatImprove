@@ -1,0 +1,16 @@
+{
+  "Controllers/CSAIReplyManager.h": "434c1520e967c6e989264b7ba028b598a0251cba0dbb435cab49ed3105de9025",
+  "Controllers/CSAIReplyManager.m": "3545484aefe47a85577a31b10b03957019b198d508abcababd89aed9d203020e",
+  "Controllers/CSAINativeSyncObserver.h": "50972613f5d454e82c073e9ca5e2dac69698807523fcdcf19147b7de5441a32e",
+  "Controllers/CSAINativeSyncObserver.m": "a27088eb7e788ed572498a82a8254d0636c9268ec7dd88c95ff6073923064455",
+  "Hooks/AIReplyHooks.xm": "e9f3c8b37fa6d9adb4bda1caeb159dcc4fc90cf953af9bc8b69de327dc411b8a",
+  "Tests/AIReplyManagerTests.m": "803b02ead4ff04d987a54f3efaeaf72e0824860fb91eec4a4ab8b9c34e3e067a",
+  "Tests/AINativeSyncObserverTests.m": "3348612ecd78c8589a70384d6feef86d529dbee4882c3ef205dff5bafcd46978",
+  "Tests/verify-ai-native-sync-observer.sh": "8f78ada50875b4eb8a83a96e984e9dd9efd9f46335da931c06fef4d239e6f517",
+  "control": "a7a58000074af6d0782a4d62454ff65ac53ebe9d3936553867d8cbf1f4785f6a",
+  "Headers/CSUserInfoHelper.h": "f91d0a63cc806e69508e2d738e917e07f6c5d1421bbd8c6e4cf58a647ec390bb",
+  "Controllers/CSReleaseNotesViewController.m": "2a4bb551d70868b7329338552410b29c7ca556f7d0b909321073abbcbbf6da18",
+  "README.md": "4d8f93d8c116b8d54a9d94b18d0476206f46d9eaf1ba19d123c9ea4586bdca10",
+  "docs/features/ai-auto-reply.md": "9e4391adcac372797dd3fd6b3fb28de5b7ca403ffa631c9a758550c1a4313b3a",
+  "docs/features/ai-auto-reply-validation.md": "ff9f319b3515f10c6f2399499d0c510aa5339562a4183b601466b6a7486db028"
+}

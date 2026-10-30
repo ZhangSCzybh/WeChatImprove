@@ -1,6 +1,7 @@
 #import "CSAIReplyManager.h"
 #import "CSAIReplyCoordinator.h"
 #import "CSAIBackgroundSync.h"
+#import "CSAINativeSyncObserver.h"
 #import "CSBackgroundRunManager.h"
 #import "CSAIMessageAdapter.h"
 #import "CSAICredentialStore.h"
@@ -12,15 +13,72 @@
 #import "CSGroupNativeBridge.h"
 #import <UIKit/UIKit.h>
 #import <stdatomic.h>
+#import <os/lock.h>
 
 NSNotificationName const CSAIReplyDidChange=@"CSAIReplyDidChange";
 static atomic_bool CSAIMessageIngressEnabled;
+static os_unfair_lock CSAIMessageIngressLock=OS_UNFAIR_LOCK_INIT;
+static NSSet<NSString *> *CSAIMessageIngressSessions;
+static NSUInteger CSAIMessageIngressEpoch;
 BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMessageIngressEnabled,memory_order_acquire);}
+BOOL CSAIReplyMessageIngressAllowsSession(id session,NSUInteger epoch) {
+    if(!CSAIReplyMessageIngressEnabled())return NO;
+    // Retain Foundation values under the lock, then release it before inspecting
+    // the caller's session. Never touch the Store or a native message off main.
+    os_unfair_lock_lock(&CSAIMessageIngressLock);
+    NSSet<NSString *> *sessions=CSAIMessageIngressSessions;
+    NSUInteger publishedEpoch=CSAIMessageIngressEpoch;
+    os_unfair_lock_unlock(&CSAIMessageIngressLock);
+    if(!sessions || epoch!=publishedEpoch || epoch!=CSBackupAccountEpoch())return NO;
+    return ![session isKindOfClass:NSString.class] || ![session length] || [sessions containsObject:session];
+}
 @interface CSAIEmptyCancellation : NSObject <CSAICancellable>
 @end
 @implementation CSAIEmptyCancellation
 - (void)cancel {}
 @end
+// One owner spans credential I/O and the subsequent request. All state belongs
+// to main, including cancellation and the shared 60-second deadline.
+@interface CSAIConnectionTestOperation : NSObject <CSAICancellable>
+@property(nonatomic) BOOL finished;
+@property(nonatomic) NSUInteger phase;
+@property(nonatomic) NSTimeInterval deadline;
+@property(nonatomic,strong) id<CSAICancellable> child;
+@property(nonatomic,strong) NSTimer *timer;
+@property(nonatomic,copy) CSAICompletion completion;
+- (void)attach:(id<CSAICancellable>)child phase:(NSUInteger)phase;
+- (void)finishText:(NSString *)text error:(NSError *)error;
+- (void)timedOut;
+@end
+@implementation CSAIConnectionTestOperation
+- (void)attach:(id<CSAICancellable>)child phase:(NSUInteger)phase {
+    if(self.finished || self.phase!=phase)[child cancel];else self.child=child;
+}
+- (void)finishText:(NSString *)text error:(NSError *)error {
+    if(self.finished)return;self.finished=YES;self.phase++;
+    self.child=nil;[self.timer invalidate];self.timer=nil;
+    CSAICompletion completion=self.completion;self.completion=nil;if(completion)completion(text,error);
+}
+- (void)cancel {
+    if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self cancel];});return;}
+    id<CSAICancellable> child=self.child;
+    [self finishText:nil error:CSAIError(NSURLErrorCancelled,@"已取消连接测试。")];[child cancel];
+}
+- (void)timedOut {
+    id<CSAICancellable> child=self.child;
+    [self finishText:nil error:CSAIError(NSURLErrorTimedOut,@"AI 请求超时")];[child cancel];
+}
+- (void)dealloc {[_timer invalidate];[_child cancel];}
+@end
+@interface CSAIBackgroundSyncContext : NSObject
+@property(nonatomic,weak) CSAIReplyManager *owner;
+@property(nonatomic,weak) CSAIReplyStore *store;
+@property(nonatomic,strong) NSDictionary *configuration;
+@property(nonatomic,copy) NSString *account;
+@property(nonatomic) NSUInteger epoch,generation;
+@property(nonatomic) BOOL consumed;
+@end
+@implementation CSAIBackgroundSyncContext @end
 @interface CSAIReplyManager () <CSAIReplyCoordinatorDelegate>
 @property(nonatomic,strong,readwrite) CSAIReplyStore *store;
 @property(nonatomic,readwrite) NSUInteger epoch;
@@ -36,6 +94,15 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
 @property BOOL enteringForeground;
 @property BOOL loadingStore;
 @property NSUInteger savingConfiguration;
+@property(nonatomic,strong) NSDictionary *ingressConfiguration;
+@property(nonatomic,copy) NSSet<NSString *> *ingressSessions;
+@property(nonatomic) NSUInteger backgroundSyncContextGeneration;
+@property(nonatomic) BOOL backgroundSyncSnapshotCaptured;
+@property(nonatomic,weak) CSAIReplyStore *backgroundSyncObservedStore;
+@property(nonatomic,strong) NSDictionary *backgroundSyncObservedConfiguration;
+@property(nonatomic,copy) NSString *backgroundSyncObservedAccount;
+@property(nonatomic) NSUInteger backgroundSyncObservedEpoch,backgroundSyncObservedBackupEpoch;
+@property(nonatomic,strong) CSAIBackgroundSyncContext *verifyingBackgroundSyncContext;
 @end
 @implementation CSAIReplyManager
 + (instancetype)sharedManager {static id manager;static dispatch_once_t once;dispatch_once(&once,^{manager=[self new];});return manager;}
@@ -43,7 +110,7 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
     if((self=[super init])){
         _environment=[CSMessageNativeEnvironment new];_sender=[[CSMessageSendAdapter alloc]initWithEnvironment:_environment];_client=[CSAIClient new];
         __weak typeof(self) weakSelf=self;
-        _backgroundSync=[[CSAIBackgroundSync alloc]initWithEligibility:^BOOL{return [weakSelf allowsBackgroundSync];} synchronize:^{[weakSelf requestBackgroundSync];}];
+        _backgroundSync=[[CSAIBackgroundSync alloc]initWithEligibility:^BOOL{return [weakSelf backgroundSyncSchedulerEligible];} synchronize:^{[weakSelf requestBackgroundSync];}];
     }
     return self;
 }
@@ -70,9 +137,21 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
     self.enteringForeground=YES;[self.backgroundSync stop];
 }
 - (void)notify {
-    // Publish only immutable scalar state. Incoming native threads never inspect
-    // the Store, configuration or a WeChat wrap to reject the disabled path.
-    atomic_store_explicit(&CSAIMessageIngressEnabled,CSBackupIsReady() && !CSBackupAccountIsSuspended() && self.epoch==CSBackupAccountEpoch() && self.store.ready && self.coordinator && [self.store.configuration[@"enabled"] boolValue],memory_order_release);
+    [self reconcileBackgroundSyncContext];
+    NSDictionary *configuration=self.store.configuration;
+    BOOL enabled=CSBackupIsReady() && !CSBackupAccountIsSuspended() && self.epoch==CSBackupAccountEpoch() && self.store.ready && self.coordinator && [configuration[@"enabled"] boolValue];
+    // Store configurations are frozen property lists. Reuse this projection for
+    // status/history notifications; build it only when configuration changes.
+    if(enabled && configuration!=self.ingressConfiguration){
+        NSMutableSet *sessions=[NSMutableSet set];
+        NSDictionary *conversations=configuration[@"conversations"];
+        for(NSString *session in conversations)if([conversations[session][@"enabled"] boolValue])[sessions addObject:session];
+        self.ingressSessions=[sessions copy];self.ingressConfiguration=configuration;
+    }else if(!enabled){self.ingressSessions=nil;self.ingressConfiguration=nil;}
+    os_unfair_lock_lock(&CSAIMessageIngressLock);
+    CSAIMessageIngressSessions=enabled?self.ingressSessions:nil;CSAIMessageIngressEpoch=self.epoch;
+    os_unfair_lock_unlock(&CSAIMessageIngressLock);
+    atomic_store_explicit(&CSAIMessageIngressEnabled,enabled,memory_order_release);
     [NSNotificationCenter.defaultCenter postNotificationName:CSAIReplyDidChange object:self];
 }
 - (void)invalidateConnectionTest {
@@ -103,7 +182,74 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
         }];
     }
     if(self.store.ready && !self.coordinator){self.coordinator=[[CSAIReplyCoordinator alloc]initWithStore:self.store client:self.client];self.coordinator.delegate=self;self.coordinator.imagePreparer=[CSAIImagePreparer new];}
-    [self.backgroundSync refresh];[self notify];
+    [self reconcileBackgroundSyncContext];[self.backgroundSync refresh];[self notify];
+}
+- (void)invalidateBackgroundSyncContext {
+    self.backgroundSyncContextGeneration++;
+    [self.backgroundSync invalidateVerifiedSync];
+}
+- (void)reconcileBackgroundSyncContext {
+    if(!NSThread.isMainThread)return;
+    CSAIReplyStore *store=self.store;NSDictionary *configuration=store.configuration;NSString *account=store.account;
+    self.backgroundSync.fallbackEnabled=configuration[@"backgroundFallback"]==nil || [configuration[@"backgroundFallback"] boolValue];
+    NSUInteger epoch=self.epoch,backupEpoch=CSBackupAccountEpoch();
+    if(self.backgroundSyncSnapshotCaptured && self.backgroundSyncObservedStore==store &&
+       self.backgroundSyncObservedConfiguration==configuration &&
+       (self.backgroundSyncObservedAccount==account || [self.backgroundSyncObservedAccount isEqual:account]) &&
+       self.backgroundSyncObservedEpoch==epoch && self.backgroundSyncObservedBackupEpoch==backupEpoch)return;
+    // Publish the new snapshot before invalidation, whose eligibility callback
+    // can itself reenter the manager. Identity revokes even equal replacements.
+    self.backgroundSyncSnapshotCaptured=YES;self.backgroundSyncObservedStore=store;
+    self.backgroundSyncObservedConfiguration=configuration;self.backgroundSyncObservedAccount=account;
+    self.backgroundSyncObservedEpoch=epoch;self.backgroundSyncObservedBackupEpoch=backupEpoch;
+    [self invalidateBackgroundSyncContext];
+}
+- (BOOL)matchesBackgroundSyncContext:(CSAIBackgroundSyncContext *)context {
+    return context.owner==self && context.store && context.store==self.store &&
+        context.configuration==self.store.configuration && [context.account isEqual:self.store.account] &&
+        context.epoch==self.epoch && context.epoch==CSBackupAccountEpoch() &&
+        context.generation==self.backgroundSyncContextGeneration && self.backgroundSync.active;
+}
+- (BOOL)backgroundSyncSchedulerEligible {
+    BOOL eligible=[self allowsBackgroundSync];
+    CSAIBackgroundSyncContext *context=self.verifyingBackgroundSyncContext;
+    if(!context)return eligible;
+    // verifiedFullSyncCompleted queries eligibility once more. Fence mutations
+    // in that last native getter before the scheduler can record coverage.
+    [self reconcileBackgroundSyncContext];
+    return eligible && [self matchesBackgroundSyncContext:context];
+}
+- (id)captureBackgroundSyncContextForEpoch:(NSUInteger)epoch {
+    if(!NSThread.isMainThread)return nil;
+    [self reconcileBackgroundSyncContext];
+    if(epoch!=self.epoch || epoch!=CSBackupAccountEpoch() || !self.backgroundSync.active)return nil;
+    CSAIBackgroundSyncContext *context=[CSAIBackgroundSyncContext new];context.owner=self;context.store=self.store;
+    context.configuration=self.store.configuration;context.account=self.store.account;context.epoch=epoch;
+    context.generation=self.backgroundSyncContextGeneration;
+    BOOL eligible=[self allowsBackgroundSync] && [self isCurrentAccount:context.account epoch:epoch];
+    [self reconcileBackgroundSyncContext];
+    if(!eligible){
+        // A failed observer preflight must not submit the old wrapper. Never
+        // stop a replacement account/configuration that a getter installed.
+        if([self matchesBackgroundSyncContext:context])[self.backgroundSync stop];
+        return nil;
+    }
+    return [self matchesBackgroundSyncContext:context]?context:nil;
+}
+- (void)nativeFullSyncCompletedWithContext:(id)value {
+    if(!NSThread.isMainThread || ![value isKindOfClass:CSAIBackgroundSyncContext.class])return;
+    CSAIBackgroundSyncContext *context=value;
+    if(context.owner!=self || context.consumed)return;
+    context.consumed=YES;
+    [self reconcileBackgroundSyncContext];
+    if(![self matchesBackgroundSyncContext:context])return;
+    BOOL eligible=[self allowsBackgroundSync] && [self isCurrentAccount:context.account epoch:context.epoch];
+    [self reconcileBackgroundSyncContext];
+    if(!eligible || ![self matchesBackgroundSyncContext:context])return;
+    CSAIBackgroundSyncContext *previous=self.verifyingBackgroundSyncContext;
+    self.verifyingBackgroundSyncContext=context;
+    @try {[self.backgroundSync verifiedFullSyncCompleted];}
+    @finally {self.verifyingBackgroundSyncContext=previous;}
 }
 - (BOOL)isCurrentAccount:(NSString *)account epoch:(NSUInteger)epoch {
     return NSThread.isMainThread && account.length && self.store.ready && [account isEqual:self.store.account] && epoch==self.epoch && epoch==CSBackupAccountEpoch() && CSBackupIsReady() && !CSBackupAccountIsSuspended() && [[self.environment currentAccountID] isEqual:account];
@@ -114,12 +260,14 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
     if(!CSAIReplyValidateConfiguration(configuration,error))return NO;
     BOOL connectionChanged=![CSAIConnectionIdentifier(configuration) isEqual:CSAIConnectionIdentifier(self.store.configuration)];
     if(connectionChanged){NSMutableDictionary *updated=[configuration mutableCopy];updated[@"verifiedConnection"]=@"";[updated removeObjectForKey:@"verifiedAt"];configuration=updated;}
+    self.savingConfiguration++;[self invalidateBackgroundSyncContext];
     __block BOOL saved=NO;__block NSError *failure=nil;
     CSBackupResourceMutationScope();
     CSBackupPerformAtAccountEpoch(epoch,^{if([self isCurrentAccount:account epoch:epoch])saved=[self.store saveConfiguration:configuration error:&failure];});
-    if(!saved){if(error)*error=failure?:CSAIError(20,@"账号状态已改变，本次未保存。");return NO;}
+    if(self.savingConfiguration)self.savingConfiguration--;
+    if(!saved){[self reconcileBackgroundSyncContext];[self.backgroundSync refresh];[self notify];if(error)*error=failure?:CSAIError(20,@"账号状态已改变，本次未保存。");return NO;}
     if(connectionChanged)[self invalidateConnectionTest];
-    [self.coordinator configurationDidChange];[self.backgroundSync refresh];[self notify];return YES;
+    [self.coordinator configurationDidChange];[self reconcileBackgroundSyncContext];[self.backgroundSync refresh];[self notify];return YES;
 }
 #endif
 - (void)saveConfiguration:(NSDictionary *)configuration account:(NSString *)account epoch:(NSUInteger)epoch completion:(CSAIReplyStoreCompletion)completion {
@@ -129,7 +277,7 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
     CSAIReplyStore *store=self.store;NSDictionary *expected=store.configuration;
     BOOL connectionChanged=![CSAIConnectionIdentifier(configuration) isEqual:CSAIConnectionIdentifier(expected)];
     if(connectionChanged){NSMutableDictionary *updated=[configuration mutableCopy];updated[@"verifiedConnection"]=@"";[updated removeObjectForKey:@"verifiedAt"];configuration=updated;}
-    self.savingConfiguration++;[self.coordinator cancelAll];[self.backgroundSync stop];
+    self.savingConfiguration++;[self invalidateBackgroundSyncContext];[self.coordinator cancelAll];[self.backgroundSync stop];
     if(connectionChanged)[self invalidateConnectionTest];
     [store saveConfiguration:configuration expectedConfiguration:expected completion:^(BOOL success,NSError *failure){
         if(self.store!=store || self.epoch!=epoch || epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended() || !CSBackupIsReady() || ![[self.environment currentAccountID] isEqual:account]){
@@ -140,7 +288,7 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
         }
         if(self.savingConfiguration)self.savingConfiguration--;
         if(success)[self.coordinator configurationDidChange];else [self.coordinator cancelAll];
-        [self.backgroundSync refresh];[self notify];completion(success,failure);
+        [self reconcileBackgroundSyncContext];[self.backgroundSync refresh];[self notify];completion(success,failure);
     }];
 }
 - (void)saveConnection:(NSString *)endpoint model:(NSString *)model key:(NSString *)key account:(NSString *)account epoch:(NSUInteger)epoch completion:(CSAIReplyStoreCompletion)completion {
@@ -184,6 +332,7 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
     if(self.savingConfiguration || !NSThread.isMainThread || self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground ||
        !CSBackgroundRunManager.sharedManager.backgroundAudioActive)return NO;
     NSDictionary *config=self.store.configuration;
+    if(config[@"backgroundFallback"] && ![config[@"backgroundFallback"] boolValue])return NO;
     if(![config[@"enabled"] boolValue] || ![config[@"endpoint"] length] || ![config[@"model"] length] || ![config[@"credentialRevision"] length] ||
        ![config[@"verifiedConnection"] length] || ![config[@"verifiedConnection"] isEqual:CSAIConnectionIdentifier(config)])return NO;
     NSMutableArray<NSString *> *candidates=[NSMutableArray array];
@@ -199,11 +348,13 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
         if([self supportsReplyConversation:conversation]){eligible=YES;break;}
     }
     return eligible && [config isEqual:self.store.configuration] && [self isCurrentAccount:self.store.account epoch:self.epoch] &&
-        !self.enteringForeground && UIApplication.sharedApplication.applicationState==UIApplicationStateBackground && CSBackgroundRunManager.sharedManager.backgroundAudioActive;
+        !self.savingConfiguration && CSAuthorizationManager.sharedManager.isAuthorized && !self.enteringForeground &&
+        UIApplication.sharedApplication.applicationState==UIApplicationStateBackground && CSBackgroundRunManager.sharedManager.backgroundAudioActive;
 }
 - (void)requestBackgroundSync {
     if(![self allowsBackgroundSync])return;
-    NSString *account=self.store.account;NSUInteger epoch=self.epoch;
+    CSAIReplyStore *store=self.store;NSDictionary *configuration=store.configuration;NSString *account=store.account;NSUInteger epoch=self.epoch;
+    NSUInteger generation=self.backgroundSyncContextGeneration;
     @try {
         // Keep the account-bound service wrapper and its native pause/busy guards.
         id service=[self.environment serviceNamed:@"NewSyncService"];
@@ -211,7 +362,16 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
         if([CSMessageNativeInvoke(service,@"isGettingData",@[]) boolValue])return;
         if(![self allowsBackgroundSync] || ![self isCurrentAccount:account epoch:epoch])return;
         // YES means accepted by the native service, not that messages arrived.
-        CSMessageNativeInvoke(service,@"BackGroundFetchToSync",@[]);
+        CSAIObserveBackgroundSyncRequest(epoch,^{
+            // The observer has finished its guarded eligibility capture. Its
+            // request frame can now be claimed: use only local snapshots here,
+            // then invoke this wrapper directly without more native getters.
+            if(self.store!=store || self.store.configuration!=configuration || !store.ready || ![store.account isEqual:account] ||
+               self.epoch!=epoch || epoch!=CSBackupAccountEpoch() || generation!=self.backgroundSyncContextGeneration ||
+               self.savingConfiguration || !self.backgroundSync.active || !CSBackupIsReady() || CSBackupAccountIsSuspended() ||
+               self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground)return;
+            CSMessageNativeInvoke(service,@"BackGroundFetchToSync",@[]);
+        });
     } @catch(__unused NSException *exception) {
         // Unsupported or temporarily unavailable native services wait for the next interval.
     }
@@ -249,42 +409,74 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
 - (id<CSAICancellable>)testConnectionForAccount:(NSString *)account epoch:(NSUInteger)epoch completion:(CSAICompletion)completion {
     NSError *error=nil;NSDictionary *config=self.store.configuration;
     if(![self isCurrentAccount:account epoch:epoch] || ![config[@"endpoint"] length] || ![config[@"model"] length])error=CSAIError(21,@"请先保存 API 地址、API Key 和模型名称。");
-    NSString *key=error?nil:CSAIReadCredential(account,config[@"credentialRevision"]?:@"",&error);
-    if(!error && !key.length)error=CSAIError(21,@"请先设置 API Key。");
     if(error){dispatch_async(dispatch_get_main_queue(),^{completion(nil,error);});return [CSAIEmptyCancellation new];}
     [self invalidateConnectionTest];NSUInteger generation=self.testGeneration;
-    NSString *identifier=CSAIConnectionIdentifier(config);NSDate *started=NSDate.date;self.connectionStatus=@"正在测试连接";[self notify];
-    if(self.testGeneration!=generation || ![self isCurrentAccount:account epoch:epoch] || ![identifier isEqual:CSAIConnectionIdentifier(self.store.configuration)]){
-        completion(nil,CSAIError(22,@"配置或账号已改变，请重新测试。"));return [CSAIEmptyCancellation new];
-    }
-    id content=@"请只回复：连接正常。";
-    if([config[@"imageEnabled"] boolValue]){
-        // A fixed 32x32 blue PNG tests the image request without touching chat media.
-        NSString *image=@"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAJ0lEQVR4nO3NsQkAAAgDsJ7u5/YKByGQPcnsLYFAIBAIBAKBQPAlKPAr/Ez/cO8XAAAAAElFTkSuQmCC";
-        content=@[@{@"type":@"image_url",@"image_url":@{@"url":image}},@{@"type":@"text",@"text":@"这张图片主要是什么颜色？请简短回答。"}];
-    }
-    __block BOOL completed=NO;
-    __weak typeof(self) weakSelf=self;
-    id<CSAICancellable> task=[self.client generateWithConfiguration:config apiKey:key messages:@[@{@"role":@"user",@"content":content}] completion:^(NSString *text,NSError *failure){
-        if(completed)return;completed=YES;
+    NSString *identifier=CSAIConnectionIdentifier(config);NSDate *started=NSDate.date;
+    CSAIReplyStore *store=self.store;
+    CSAIConnectionTestOperation *operation=[CSAIConnectionTestOperation new];
+    operation.deadline=NSProcessInfo.processInfo.systemUptime+60;
+    __weak typeof(self) weakSelf=self;__weak CSAIConnectionTestOperation *weakOperation=operation;
+    __block BOOL networkStarted=NO;
+    BOOL (^current)(void)=^BOOL{
+        typeof(self) self=weakSelf;CSAIConnectionTestOperation *live=weakOperation;
+        return self && live && self.connectionTest==live && self.testGeneration==generation && self.store==store &&
+            [self isCurrentAccount:account epoch:epoch] && [config isEqual:self.store.configuration];
+    };
+    operation.completion=^(NSString *text,NSError *failure){
         typeof(self) self=weakSelf;
-        if(!self || self.testGeneration!=generation || ![self isCurrentAccount:account epoch:epoch] || ![identifier isEqual:CSAIConnectionIdentifier(self.store.configuration)]){completion(nil,CSAIError(22,@"配置或账号已改变，请重新测试。"));return;}
+        if(!current()){
+            if(self.connectionTest==weakOperation){self.connectionTest=nil;self.connectionStatus=nil;[self notify];}
+            completion(nil,CSAIError(22,@"配置或账号已改变，请重新测试。"));return;
+        }
         self.connectionTest=nil;
         if(!failure && !text.length)failure=CSAIError(23,@"连接测试未返回有效内容。");
         void (^finish)(NSError *)=^(NSError *resultError){
-            if(self.testGeneration!=generation || ![self isCurrentAccount:account epoch:epoch]){completion(nil,CSAIError(22,@"配置或账号已改变，请重新测试。"));return;}
+            if(self.testGeneration!=generation || ![self isCurrentAccount:account epoch:epoch] || ![identifier isEqual:CSAIConnectionIdentifier(self.store.configuration)]){completion(nil,CSAIError(22,@"配置或账号已改变，请重新测试。"));return;}
             self.connectionStatus=resultError?resultError.localizedDescription:[NSString stringWithFormat:@"连接成功 · %.1f 秒",-[started timeIntervalSinceNow]];
             [self notify];completion(resultError?nil:text,resultError);
         };
-        if(!failure || failure.code!=NSURLErrorCancelled){
+        if(networkStarted && (!failure || failure.code!=NSURLErrorCancelled)){
             NSMutableDictionary *updated=[self.store.configuration mutableCopy];updated[@"verifiedConnection"]=failure?@"":identifier;
             if(failure)[updated removeObjectForKey:@"verifiedAt"];else updated[@"verifiedAt"]=NSDate.date;
             NSError *requestError=failure;
             [self saveConfiguration:updated account:account epoch:epoch completion:^(BOOL saved,NSError *saveError){finish(saved?requestError:saveError);}];
         }else finish(failure);
-    }];
-    if(!completed && self.testGeneration==generation)self.connectionTest=task;else [task cancel];return task;
+    };
+    self.connectionTest=operation;
+    operation.timer=[NSTimer timerWithTimeInterval:60 repeats:NO block:^(__unused NSTimer *timer){[weakOperation timedOut];}];
+    [NSRunLoop.mainRunLoop addTimer:operation.timer forMode:NSRunLoopCommonModes];
+    self.connectionStatus=@"正在测试连接";[self notify];
+    if(operation.finished)return operation;
+    if(!current()){[operation finishText:nil error:CSAIError(22,@"配置或账号已改变，请重新测试。")];return operation;}
+    NSUInteger phase=++operation.phase;
+    id<CSAICancellable> credentialTask=CSAIReadCredentialAsync(account,config[@"credentialRevision"]?:@"",^(NSString *key,NSError *failure){
+        CSAIConnectionTestOperation *live=weakOperation;typeof(self) self=weakSelf;
+        if(!live || live.finished || live.phase!=phase)return;
+        live.child=nil;
+        if(!current()){[live finishText:nil error:CSAIError(22,@"配置或账号已改变，请重新测试。")];return;}
+        if(NSProcessInfo.processInfo.systemUptime>=live.deadline){[live timedOut];return;}
+        if(failure || !key.length){[live finishText:nil error:failure?:CSAIError(21,@"请先设置 API Key。")];return;}
+        id content=@"请只回复：连接正常。";
+        if([config[@"imageEnabled"] boolValue]){
+            // A fixed 32x32 blue PNG tests the image request without touching chat media.
+            NSString *image=@"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAJ0lEQVR4nO3NsQkAAAgDsJ7u5/YKByGQPcnsLYFAIBAIBAKBQPAlKPAr/Ez/cO8XAAAAAElFTkSuQmCC";
+            content=@[@{@"type":@"image_url",@"image_url":@{@"url":image}},@{@"type":@"text",@"text":@"这张图片主要是什么颜色？请简短回答。"}];
+        }
+        networkStarted=YES;NSUInteger networkPhase=++live.phase;
+        id<CSAICancellable> request=[self.client generateWithConfiguration:config apiKey:key messages:@[@{@"role":@"user",@"content":content}] completion:^(NSString *text,NSError *requestError){
+            void (^complete)(void)=^{
+                CSAIConnectionTestOperation *owner=weakOperation;
+                if(!owner || owner.finished || owner.phase!=networkPhase)return;
+                if(NSProcessInfo.processInfo.systemUptime>=owner.deadline)[owner timedOut];
+                else [owner finishText:text error:requestError];
+            };
+            if(NSThread.isMainThread)complete();else dispatch_async(dispatch_get_main_queue(),complete);
+        }];
+        [live attach:request phase:networkPhase];
+    });
+    [operation attach:credentialTask phase:phase];return operation;
 }
+
 #if !TARGET_OS_IPHONE
 - (BOOL)setConversation:(NSString *)conversation enabled:(BOOL)enabled presetID:(NSString *)presetID account:(NSString *)account epoch:(NSUInteger)epoch error:(NSError **)error {
     if(![self isCurrentAccount:account epoch:epoch] || ![self allowsConversation:conversation]){if(error)*error=CSAIError(23,@"当前会话不可用或正受保护，未修改配置。");return NO;}
@@ -344,9 +536,20 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
 - (BOOL)coordinator:(CSAIReplyCoordinator *)coordinator allowsConversation:(NSString *)conversation {
     return !self.savingConfiguration && coordinator==self.coordinator && [self isCurrentAccount:coordinator.store.account epoch:self.epoch] && CSAuthorizationManager.sharedManager.isAuthorized && [self supportsReplyConversation:conversation];
 }
-- (NSString *)credentialForCoordinator:(CSAIReplyCoordinator *)coordinator error:(NSError **)error {
-    if(coordinator!=self.coordinator || ![self isCurrentAccount:coordinator.store.account epoch:self.epoch]){if(error)*error=CSAIError(20,@"账号状态已改变。");return nil;}
-    return CSAIReadCredential(coordinator.store.account,coordinator.store.configuration[@"credentialRevision"]?:@"",error);
+- (id<CSAICancellable>)credentialForCoordinator:(CSAIReplyCoordinator *)coordinator completion:(CSAICompletion)completion {
+    CSAIReplyStore *store=coordinator.store;NSString *account=store.account;NSUInteger epoch=self.epoch;
+    NSDictionary *configuration=store.configuration;
+    if(coordinator!=self.coordinator || ![self isCurrentAccount:account epoch:epoch]){
+        completion(nil,CSAIError(20,@"账号状态已改变。"));return [CSAIEmptyCancellation new];
+    }
+    __weak typeof(self) weakSelf=self;
+    return CSAIReadCredentialAsync(account,configuration[@"credentialRevision"]?:@"",^(NSString *key,NSError *error){
+        typeof(self) self=weakSelf;
+        if(!self || self.coordinator!=coordinator || self.store!=store || ![self isCurrentAccount:account epoch:epoch] || ![configuration isEqual:store.configuration]){
+            completion(nil,CSAIError(20,@"账号或配置状态已改变。"));return;
+        }
+        completion(key,error);
+    });
 }
 - (NSString *)coordinator:(CSAIReplyCoordinator *)coordinator submitText:(NSString *)text conversation:(NSString *)conversation valid:(BOOL (^)(void))valid {
     if(![self coordinator:coordinator allowsConversation:conversation] || !valid())return @"failed";
@@ -359,7 +562,7 @@ BOOL CSAIReplyMessageIngressEnabled(void) {return atomic_load_explicit(&CSAIMess
     return result==CSMessageActionSubmissionStateUnknown?@"unknown":@"failed";
 }
 - (void)receiveNativeSession:(id)session wrap:(id)wrap epoch:(NSUInteger)epoch {
-    if(!NSThread.isMainThread){if(CSAIReplyMessageIngressEnabled())dispatch_async(dispatch_get_main_queue(),^{[self receiveNativeSession:session wrap:wrap epoch:epoch];});return;}
+    if(!NSThread.isMainThread){if(CSAIReplyMessageIngressAllowsSession(session,epoch))dispatch_async(dispatch_get_main_queue(),^{[self receiveNativeSession:session wrap:wrap epoch:epoch];});return;}
     if(epoch!=CSBackupAccountEpoch() || epoch!=self.epoch)return;
     NSDictionary *configuration=self.store.configuration;
     if(!self.store.ready || !self.coordinator || ![configuration[@"enabled"] boolValue])return;

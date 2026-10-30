@@ -1,0 +1,2962 @@
+[
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x105180644",
+    "end_exclusive": "0x105180838",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "dealloc",
+    "address": "0x105180838",
+    "end_exclusive": "0x1051808d8",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "InitDB:Lock:",
+    "address": "0x1051808d8",
+    "end_exclusive": "0x105180950",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "actionNotifySyncQueue",
+    "address": "0x105180950",
+    "end_exclusive": "0x1051809a0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "isGettingData",
+    "address": "0x1051809a0",
+    "end_exclusive": "0x1051809b0",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "resetGettingData",
+    "address": "0x1051809b0",
+    "end_exclusive": "0x1051809c0",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "SetLastNotifyTime:",
+    "address": "0x1051809c0",
+    "end_exclusive": "0x105180a14",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "SetLastLongConnDisconectTime:",
+    "address": "0x105180a14",
+    "end_exclusive": "0x105180a68",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "onServiceClearData",
+    "address": "0x105180a68",
+    "end_exclusive": "0x105180aa4",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "onServiceEnterBackground",
+    "address": "0x105180aa4",
+    "end_exclusive": "0x105180d40",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "onServiceEnterForeground",
+    "address": "0x105180d40",
+    "end_exclusive": "0x105180ff8",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "onWillSuspend",
+    "address": "0x105180ff8",
+    "end_exclusive": "0x105181294",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "StartNewInit:",
+    "address": "0x105181294",
+    "end_exclusive": "0x1051818bc",
+    "types": "B20@0:8I16"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "InternalCreateSync:",
+    "address": "0x1051818bc",
+    "end_exclusive": "0x105181b34",
+    "types": "B20@0:8I16"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "creatPBNewSyncEvent:",
+    "address": "0x105181b34",
+    "end_exclusive": "0x1051821cc",
+    "types": "B20@0:8I16"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "NotifyToSync",
+    "address": "0x1051821cc",
+    "end_exclusive": "0x1051821e4",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "NeedToSync",
+    "address": "0x1051821e4",
+    "end_exclusive": "0x105182290",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "ApnsNotifySync",
+    "address": "0x105182290",
+    "end_exclusive": "0x105182434",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "BackGroundToForeGroundSync",
+    "address": "0x105182434",
+    "end_exclusive": "0x105182504",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "ProcessStartSync",
+    "address": "0x105182504",
+    "end_exclusive": "0x1051825c8",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "BackGroundFetchToSync",
+    "address": "0x1051825c8",
+    "end_exclusive": "0x10518260c",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "VOIPPushAwakeToNewSyncByLocalNotification",
+    "address": "0x10518260c",
+    "end_exclusive": "0x105182650",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "VOIPPushAwakeToSyncByCallKit",
+    "address": "0x105182650",
+    "end_exclusive": "0x105182694",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "VOIPPushAwakeToSyncByVoIP",
+    "address": "0x105182694",
+    "end_exclusive": "0x1051826d8",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "SlientPushAwakeToNewSync",
+    "address": "0x1051826d8",
+    "end_exclusive": "0x10518271c",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "AfterManualAuthNotifySync",
+    "address": "0x10518271c",
+    "end_exclusive": "0x1051827c8",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "LongLinkTimerSync",
+    "address": "0x1051827c8",
+    "end_exclusive": "0x10518287c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "setNeedSyncWithScene:",
+    "address": "0x10518287c",
+    "end_exclusive": "0x1051829d0",
+    "types": "v20@0:8i16"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "checkNeedSync",
+    "address": "0x1051829d0",
+    "end_exclusive": "0x1051829f4",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "GetSelector",
+    "address": "0x1051829f4",
+    "end_exclusive": "0x105182a38",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "SetSelector:",
+    "address": "0x105182a38",
+    "end_exclusive": "0x105182ac4",
+    "types": "v20@0:8I16"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "MessageReturn:Event:",
+    "address": "0x105182ac4",
+    "end_exclusive": "0x105182e5c",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "HandleSyncResp:handleResult:",
+    "address": "0x105182e7c",
+    "end_exclusive": "0x10518348c",
+    "types": "v28@0:8@16B24"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "markSyncOperating",
+    "address": "0x10518349c",
+    "end_exclusive": "0x1051834b0",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "HandleNewSyncPush64:",
+    "address": "0x1051834b0",
+    "end_exclusive": "0x10518395c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "HandleNewSyncPush:",
+    "address": "0x10518395c",
+    "end_exclusive": "0x105183d7c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "__handleNewSyncResponse:flag:beginTime:",
+    "address": "0x105183d7c",
+    "end_exclusive": "0x105184664",
+    "types": "v36@0:8@16I24Q28"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "lazyInitOplogData",
+    "address": "0x105184708",
+    "end_exclusive": "0x105184798",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "startSyncOplog",
+    "address": "0x105184798",
+    "end_exclusive": "0x1051849a8",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "InsertOplog:Oplog:Sync:",
+    "address": "0x1051849a8",
+    "end_exclusive": "0x105184a58",
+    "types": "B32@0:8I16@20B28"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "checkSyncOplog",
+    "address": "0x105184a58",
+    "end_exclusive": "0x105184a8c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "NeedToSyncOplog",
+    "address": "0x105184a8c",
+    "end_exclusive": "0x105184b58",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "HandleOplog:Event:",
+    "address": "0x105184b58",
+    "end_exclusive": "0x10518502c",
+    "types": "v28@0:8@16I24"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "StartOplog:Oplog:",
+    "address": "0x1051850b8",
+    "end_exclusive": "0x1051853ac",
+    "types": "I28@0:8I16@20"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "StartOplog:Oplog:complete:",
+    "address": "0x1051853ac",
+    "end_exclusive": "0x105185508",
+    "types": "v36@0:8I16@20@?28"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "StartMultipleOplog:callbackBlock:",
+    "address": "0x105185894",
+    "end_exclusive": "0x105185a3c",
+    "types": "v32@0:8@16@?24"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "makeSyncPause",
+    "address": "0x1051860c4",
+    "end_exclusive": "0x1051861ac",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "makeSyncResume",
+    "address": "0x1051861ac",
+    "end_exclusive": "0x105186290",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "handleBatchMessages:ignoreSession:",
+    "address": "0x105186290",
+    "end_exclusive": "0x105186328",
+    "types": "B28@0:8@16B24"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "onNewSyncOplogOK",
+    "address": "0x105186328",
+    "end_exclusive": "0x10518633c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "onNewSyncOplogFail",
+    "address": "0x10518633c",
+    "end_exclusive": "0x105186350",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "IsLastSyncFinishCallingExtension",
+    "address": "0x105186350",
+    "end_exclusive": "0x105186360",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "m_bHasSync",
+    "address": "0x105186360",
+    "end_exclusive": "0x105186374",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": "setM_bHasSync:",
+    "address": "0x105186374",
+    "end_exclusive": "0x105186384",
+    "types": "v20@0:8B16"
+  },
+  {
+    "class": "NewSyncService",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x105186384",
+    "end_exclusive": "0x105186428",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncResponse",
+    "kind": "class",
+    "selector": "initialize",
+    "address": "0x10aa507bc",
+    "end_exclusive": "0x10aa507e0",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "BaseResponse",
+    "kind": "class",
+    "selector": "initialize",
+    "address": "0x10aa30a84",
+    "end_exclusive": "0x10aa30aa8",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncRequest",
+    "kind": "class",
+    "selector": "initialize",
+    "address": "0x10aa50798",
+    "end_exclusive": "0x10aa507bc",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesImg:LocalID:DocPath:",
+    "address": "0x11655dec4",
+    "end_exclusive": "0x11655dfd8",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesHDImg:LocalID:DocPath:",
+    "address": "0x11655dfd8",
+    "end_exclusive": "0x11655e0ec",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "TransformPath:",
+    "address": "0x105f72990",
+    "end_exclusive": "0x105f72d10",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ShortenPath:",
+    "address": "0x105f72d10",
+    "end_exclusive": "0x105f72e28",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "CheckUsrNameType:",
+    "address": "0x105f72e28",
+    "end_exclusive": "0x105f72efc",
+    "types": "I24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ChatNotifyS2C:",
+    "address": "0x105f72efc",
+    "end_exclusive": "0x105f72f08",
+    "types": "I20@0:8I16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ChatNotifyC2S:",
+    "address": "0x105f72f08",
+    "end_exclusive": "0x105f72f14",
+    "types": "I20@0:8I16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "CheckSyncMediaNote:",
+    "address": "0x105f72f14",
+    "end_exclusive": "0x105f72fa0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "DebugFeatureId",
+    "address": "0x105f72fa0",
+    "end_exclusive": "0x105f72fac",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "DebugBuildInfo",
+    "address": "0x105f72fac",
+    "end_exclusive": "0x105f72fb8",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getIconImageByFileExt:iconSize:",
+    "address": "0x105f72fb8",
+    "end_exclusive": "0x105f72fc8",
+    "types": "@28@0:8@16i24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getIconImageByFileExt:iconSize:iconType:",
+    "address": "0x105f72fc8",
+    "end_exclusive": "0x105f73018",
+    "types": "@36@0:8@16i24Q28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getIconImageByFileType:iconSize:",
+    "address": "0x105f73018",
+    "end_exclusive": "0x105f73028",
+    "types": "@24@0:8i16i20"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getIconImageByFileType:iconSize:iconType:",
+    "address": "0x105f73028",
+    "end_exclusive": "0x105f732f4",
+    "types": "@32@0:8i16i20Q24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getFileTypeByFileExt:",
+    "address": "0x105f732f4",
+    "end_exclusive": "0x105f73714",
+    "types": "i24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getIconNameByFileExt:",
+    "address": "0x105f73714",
+    "end_exclusive": "0x105f73724",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getIconNameByFileExt:iconType:",
+    "address": "0x105f73724",
+    "end_exclusive": "0x105f73764",
+    "types": "@32@0:8@16Q24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getIconNameByFileType:",
+    "address": "0x105f73764",
+    "end_exclusive": "0x105f73774",
+    "types": "@20@0:8i16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getIconNameByFileType:iconType:",
+    "address": "0x105f73774",
+    "end_exclusive": "0x105f739c0",
+    "types": "@28@0:8i16Q20"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getIconColorByFileType:",
+    "address": "0x105f739c0",
+    "end_exclusive": "0x105f73bcc",
+    "types": "@20@0:8i16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getMinimizeIconNameByFileType:",
+    "address": "0x105f73bcc",
+    "end_exclusive": "0x105f73bf4",
+    "types": "@20@0:8i16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetMimeTypeByFileExt:",
+    "address": "0x105f73bf4",
+    "end_exclusive": "0x105f73e74",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "checkDeviceUUIDMatch:",
+    "address": "0x105f73e74",
+    "end_exclusive": "0x105f73f7c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "DecodePack:Output:",
+    "address": "0x105f73f7c",
+    "end_exclusive": "0x105f744d4",
+    "types": "i32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ClearAllWebViewCookies",
+    "address": "0x105f744d4",
+    "end_exclusive": "0x105f746ac",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "fetchAndRemoveWebCookiesInWebDataStore",
+    "address": "0x105f746ac",
+    "end_exclusive": "0x105f7481c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "removeAllWebDatasInWebDataStore",
+    "address": "0x105f74b14",
+    "end_exclusive": "0x105f74c4c",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "removeAllWebDatasInWebDataStoreExceptCookies",
+    "address": "0x105f74d78",
+    "end_exclusive": "0x105f74db8",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "reportEventOnClearWebData:costTime:recordCount:",
+    "address": "0x105f74f04",
+    "end_exclusive": "0x105f74f80",
+    "types": "v32@0:8I16Q20I28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetKeyValueFromPB:",
+    "address": "0x105f74f80",
+    "end_exclusive": "0x105f751a0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isNeedUseWebpFormatUrl:",
+    "address": "0x105f751a0",
+    "end_exclusive": "0x105f75454",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "genWebpUrlWithOriUrl:",
+    "address": "0x105f75454",
+    "end_exclusive": "0x105f75558",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfJSApiLocalDataFile:CurrentUrl:",
+    "address": "0x105f75558",
+    "end_exclusive": "0x105f757dc",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "hashPathForString:",
+    "address": "0x11654db70",
+    "end_exclusive": "0x11654dce8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "hashForString:",
+    "address": "0x11654dce8",
+    "end_exclusive": "0x11654de34",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "SetDoNotBackupForPath:",
+    "address": "0x11654de34",
+    "end_exclusive": "0x11654dfa8",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "IsNotBackupPath:",
+    "address": "0x11654dfa8",
+    "end_exclusive": "0x11654e114",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "checkIsHttpUrl:",
+    "address": "0x11654e114",
+    "end_exclusive": "0x11654e250",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetUUIDNew",
+    "address": "0x11654e250",
+    "end_exclusive": "0x11654e280",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetDeviceUUID",
+    "address": "0x11654e9e8",
+    "end_exclusive": "0x11654ebac",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetLastApnsToken",
+    "address": "0x11654ebac",
+    "end_exclusive": "0x11654ebd0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "SaveApnsToken:",
+    "address": "0x11654ebd0",
+    "end_exclusive": "0x11654ebf8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetDeviceBirthTime",
+    "address": "0x11654ebf8",
+    "end_exclusive": "0x11654ec28",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "obfuscate:withKey:",
+    "address": "0x11654edc4",
+    "end_exclusive": "0x11654eef8",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GUID",
+    "address": "0x11654eef8",
+    "end_exclusive": "0x11654ef40",
+    "types": "^{Md5Hash=[16C]^{MD5_CTX}}16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "md5GUID",
+    "address": "0x11654efe0",
+    "end_exclusive": "0x11654f074",
+    "types": "^{Md5Hash=[16C]^{MD5_CTX}}16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "vecSystemInfo",
+    "address": "0x11654f0a4",
+    "end_exclusive": "0x11654f0d4",
+    "types": "^v16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GUIDData",
+    "address": "0x11654f264",
+    "end_exclusive": "0x11654f2d8",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "SystemInfoData",
+    "address": "0x11654f340",
+    "end_exclusive": "0x11654f3b4",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRandomDataWithLength:",
+    "address": "0x11654f414",
+    "end_exclusive": "0x11654f494",
+    "types": "@24@0:8Q16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRandomUUID",
+    "address": "0x11654f494",
+    "end_exclusive": "0x11654f4d4",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRandomKey",
+    "address": "0x11654f4d4",
+    "end_exclusive": "0x11654f5e4",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRandomKeyWithSalt:",
+    "address": "0x11654f5e4",
+    "end_exclusive": "0x11654f7bc",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetNetWorkReachable",
+    "address": "0x11654f7bc",
+    "end_exclusive": "0x11654f854",
+    "types": "q16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GenID",
+    "address": "0x11654f854",
+    "end_exclusive": "0x11654f8a4",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GenSeq",
+    "address": "0x11654f8a4",
+    "end_exclusive": "0x11654f8f4",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "computeKey:fromString:",
+    "address": "0x11654f8f4",
+    "end_exclusive": "0x11654f9a8",
+    "types": "r^v32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRandomMD5",
+    "address": "0x11654f9a8",
+    "end_exclusive": "0x11654fa78",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRandomFileName",
+    "address": "0x11654fa78",
+    "end_exclusive": "0x11654fb44",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getMd5:",
+    "address": "0x11654fb44",
+    "end_exclusive": "0x11654fcb4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "NewStrFromNSStr:",
+    "address": "0x11654fcb4",
+    "end_exclusive": "0x11654fd5c",
+    "types": "*24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetHttpEndData",
+    "address": "0x11654fd5c",
+    "end_exclusive": "0x11654fd7c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetMd5StrOfLocalUsr",
+    "address": "0x11654fd7c",
+    "end_exclusive": "0x11654fd90",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetMd5StrsOfOtherUsrs",
+    "address": "0x11654fd90",
+    "end_exclusive": "0x116550078",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetMd5StrOfUsr:",
+    "address": "0x116550078",
+    "end_exclusive": "0x116550158",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfUsrChatBKSetting",
+    "address": "0x116550158",
+    "end_exclusive": "0x1165501f0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfUsrWCBKSetting",
+    "address": "0x1165501f0",
+    "end_exclusive": "0x116550288",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfLocalUsrDirAsync",
+    "address": "0x116550288",
+    "end_exclusive": "0x116550354",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfLocalUsrDir",
+    "address": "0x116550354",
+    "end_exclusive": "0x116550420",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfCacheLocalUsrDir",
+    "address": "0x116550420",
+    "end_exclusive": "0x1165504ec",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfUsrShakeImg:",
+    "address": "0x1165504ec",
+    "end_exclusive": "0x1165505b4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfShakeBgImgTmp:",
+    "address": "0x1165505b4",
+    "end_exclusive": "0x11655065c",
+    "types": "@20@0:8I16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfShakeBgImg",
+    "address": "0x11655065c",
+    "end_exclusive": "0x1165506f4",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfFileTempPath",
+    "address": "0x1165506f4",
+    "end_exclusive": "0x11655075c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfBakChat",
+    "address": "0x11655075c",
+    "end_exclusive": "0x1165507ec",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfWeSport",
+    "address": "0x1165507ec",
+    "end_exclusive": "0x11655087c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetVoiceInputTypeDicPath",
+    "address": "0x11655087c",
+    "end_exclusive": "0x1165508f4",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfSystemAuthorization",
+    "address": "0x1165508f4",
+    "end_exclusive": "0x11655096c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfWCAddressBaseFile",
+    "address": "0x11655096c",
+    "end_exclusive": "0x1165509fc",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfWCMallBaseFile",
+    "address": "0x1165509fc",
+    "end_exclusive": "0x116550a8c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfWCPayBaseFile",
+    "address": "0x116550a8c",
+    "end_exclusive": "0x116550b1c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfEcsBaseFile",
+    "address": "0x116550b1c",
+    "end_exclusive": "0x116550bac",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfKindaBaseFile",
+    "address": "0x116550bac",
+    "end_exclusive": "0x116550c68",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfKindaFileCacheBaseFile",
+    "address": "0x116550c68",
+    "end_exclusive": "0x116550d24",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfWCPayTempDir",
+    "address": "0x116550d24",
+    "end_exclusive": "0x116550db4",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfJSApiLocalDataBaseFile",
+    "address": "0x116550db4",
+    "end_exclusive": "0x116550e70",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfWCRedEnvelopesBaseFile",
+    "address": "0x116550e70",
+    "end_exclusive": "0x116550f00",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRootPathOfTrash",
+    "address": "0x116550f00",
+    "end_exclusive": "0x116550f78",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRandomPathOfTrash",
+    "address": "0x116550f78",
+    "end_exclusive": "0x116551030",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRandomPathOfOneDayClean",
+    "address": "0x116551030",
+    "end_exclusive": "0x116551100",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRootPathOfOneDayClean",
+    "address": "0x116551100",
+    "end_exclusive": "0x116551178",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRootPathOfThreeDayClean",
+    "address": "0x116551178",
+    "end_exclusive": "0x1165511f0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRootPathOfOneWeekClean",
+    "address": "0x1165511f0",
+    "end_exclusive": "0x116551268",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetUserAlbumRootDir",
+    "address": "0x116551268",
+    "end_exclusive": "0x1165512e0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfShakePeopleStoragePB",
+    "address": "0x1165512e0",
+    "end_exclusive": "0x116551378",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfSHakePeopleStorage",
+    "address": "0x116551378",
+    "end_exclusive": "0x116551410",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfShakeMusicStoragePB",
+    "address": "0x116551410",
+    "end_exclusive": "0x1165514a8",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfShakeMusicStorage",
+    "address": "0x1165514a8",
+    "end_exclusive": "0x116551540",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfShakeTvStoragePB",
+    "address": "0x116551540",
+    "end_exclusive": "0x1165515d8",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfShakeTvStorage",
+    "address": "0x1165515d8",
+    "end_exclusive": "0x116551670",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfShakeTvMsgStorage",
+    "address": "0x116551670",
+    "end_exclusive": "0x116551708",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfShakeBkgUp",
+    "address": "0x116551708",
+    "end_exclusive": "0x116551798",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfSnsMusicStoragePB",
+    "address": "0x116551798",
+    "end_exclusive": "0x11655183c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfLyricsRootPath",
+    "address": "0x11655183c",
+    "end_exclusive": "0x1165518d4",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfAlbumCoverRootPath",
+    "address": "0x1165518d4",
+    "end_exclusive": "0x11655196c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfProductDetail",
+    "address": "0x11655196c",
+    "end_exclusive": "0x116551a04",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfProductItem:",
+    "address": "0x116551a04",
+    "end_exclusive": "0x116551ac0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesImgDir:DocPath:",
+    "address": "0x116551ac0",
+    "end_exclusive": "0x116551ce4",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRootPathOfMesImgDirV2:",
+    "address": "0x116551ce4",
+    "end_exclusive": "0x116551dac",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesImgDirV2:DocPath:",
+    "address": "0x116551dac",
+    "end_exclusive": "0x116551fd0",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMiddleImgForSender:LocalID:DocPath:",
+    "address": "0x116551fd0",
+    "end_exclusive": "0x1165520e4",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesImgThumb:LocalID:DocPath:",
+    "address": "0x1165520e4",
+    "end_exclusive": "0x1165521f8",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMaskedMesImgThumb:LocalID:DocPath:",
+    "address": "0x1165521f8",
+    "end_exclusive": "0x1165522a4",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMaskedMesVideoThumb:LocalID:DocPath:",
+    "address": "0x1165522a4",
+    "end_exclusive": "0x116552350",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfSquareMesImgThumb:LocalID:DocPath:",
+    "address": "0x116552350",
+    "end_exclusive": "0x1165523fc",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesImgTemp:LocalID:DocPath:",
+    "address": "0x1165523fc",
+    "end_exclusive": "0x1165524b0",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesHDImgTemp:LocalID:DocPath:",
+    "address": "0x1165524b0",
+    "end_exclusive": "0x116552564",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfDraftUsrDir",
+    "address": "0x116552564",
+    "end_exclusive": "0x116552678",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesImgDir:",
+    "address": "0x116552678",
+    "end_exclusive": "0x116552740",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesSettingDir",
+    "address": "0x116552740",
+    "end_exclusive": "0x1165527d8",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesAudioDir:DocPath:",
+    "address": "0x1165527d8",
+    "end_exclusive": "0x1165529fc",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesAudio:LocalID:DocPath:",
+    "address": "0x1165529fc",
+    "end_exclusive": "0x116552aa8",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfOriAudioMesForSend:LocalID:DocPath:",
+    "address": "0x116552aa8",
+    "end_exclusive": "0x116552b54",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesAudioDir:",
+    "address": "0x116552b54",
+    "end_exclusive": "0x116552c1c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesAudioTrans:LocalID:DocPath:",
+    "address": "0x116552c1c",
+    "end_exclusive": "0x116552cc8",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfWebMesAudioTrans:LocalID:DocPath:",
+    "address": "0x116552cc8",
+    "end_exclusive": "0x116552da0",
+    "types": "@40@0:8@16@24@32"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesVideoDir:DocPath:",
+    "address": "0x116552da0",
+    "end_exclusive": "0x116552fcc",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRootPathOfMesVideoDirV2:",
+    "address": "0x116552fcc",
+    "end_exclusive": "0x116553094",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesVideoDirV2:DocPath:",
+    "address": "0x116553094",
+    "end_exclusive": "0x1165532c0",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesVideo:LocalID:DocPath:",
+    "address": "0x1165532c0",
+    "end_exclusive": "0x1165533d4",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMes3rdVideo:LocalID:DocPath:",
+    "address": "0x1165533d4",
+    "end_exclusive": "0x116553480",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isMesOriginVideoAssetPath:",
+    "address": "0x116553480",
+    "end_exclusive": "0x11655352c",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "fixMesOriginVideoAssetPath:",
+    "address": "0x11655352c",
+    "end_exclusive": "0x1165536e0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetTempPathOfMesVideo:LocalID:DocPath:",
+    "address": "0x1165536e0",
+    "end_exclusive": "0x1165538c0",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetTempPathOfRawVideo:LocalID:DocPath:",
+    "address": "0x1165538c0",
+    "end_exclusive": "0x11655396c",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesVideoThumb:LocalID:DocPath:",
+    "address": "0x11655396c",
+    "end_exclusive": "0x116553a80",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesVideoHDThumb:LocalID:DocPath:",
+    "address": "0x116553a80",
+    "end_exclusive": "0x116553b2c",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesVideoRawHDThumb:LocalID:DocPath:",
+    "address": "0x116553b2c",
+    "end_exclusive": "0x116553bd8",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesVideoDir:",
+    "address": "0x116553bd8",
+    "end_exclusive": "0x116553ca0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetClientIDOfMsg:LocalID:Time:",
+    "address": "0x116553ca0",
+    "end_exclusive": "0x116553d88",
+    "types": "@32@0:8@16I24I28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getCrc32ClientIDOfMsg:LocalID:Time:",
+    "address": "0x116553d88",
+    "end_exclusive": "0x116553e54",
+    "types": "I32@0:8@16I24I28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfTempCacheVideo",
+    "address": "0x116553e54",
+    "end_exclusive": "0x116553ebc",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesOpenDataDir:DocPath:",
+    "address": "0x116553ebc",
+    "end_exclusive": "0x1165540e0",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMesOpenDataDir:",
+    "address": "0x1165540e0",
+    "end_exclusive": "0x1165541a8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetTempPathOfDocVideoPath:ensureCreate:",
+    "address": "0x1165541a8",
+    "end_exclusive": "0x11655441c",
+    "types": "@28@0:8@16B24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetRelativePath:",
+    "address": "0x11655441c",
+    "end_exclusive": "0x11655450c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getPathOfVcodec2ToJpgTmpDir:docPath:",
+    "address": "0x11655450c",
+    "end_exclusive": "0x116554730",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getPathOfVcodec2ImageDir:",
+    "address": "0x116554730",
+    "end_exclusive": "0x1165547f8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getPathOfVcodec2ImageDir:docPath:",
+    "address": "0x1165547f8",
+    "end_exclusive": "0x1165549d8",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getPathOfMsgVcodec2ImgThumb:localID:docPath:",
+    "address": "0x1165549d8",
+    "end_exclusive": "0x116554aec",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getPathOfMsgVcodec2Img:localID:docPath:",
+    "address": "0x116554aec",
+    "end_exclusive": "0x116554c00",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getPathOfMsgVcodec2HDImg:localID:docPath:",
+    "address": "0x116554c00",
+    "end_exclusive": "0x116554d14",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getPathOfMsgVcodec2NormalImg:localID:docPath:",
+    "address": "0x116554d14",
+    "end_exclusive": "0x116554e28",
+    "types": "@36@0:8@16I24@28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfMassShortVideoDir:andVideoName:DocPath:",
+    "address": "0x116554e28",
+    "end_exclusive": "0x11655501c",
+    "types": "@40@0:8@16@24@32"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfPackage:",
+    "address": "0x11655501c",
+    "end_exclusive": "0x1165550fc",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetThumbPathOfPackage:",
+    "address": "0x1165550fc",
+    "end_exclusive": "0x11655516c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfTempPackage:",
+    "address": "0x11655516c",
+    "end_exclusive": "0x11655524c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetDownloadPathOfEmoticonPackage:",
+    "address": "0x11655524c",
+    "end_exclusive": "0x116555308",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfXNetModelCache",
+    "address": "0x116555308",
+    "end_exclusive": "0x1165553a0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfURLCache",
+    "address": "0x1165553a0",
+    "end_exclusive": "0x1165554a0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfLocationCache",
+    "address": "0x1165554a0",
+    "end_exclusive": "0x116555530",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfAudioTemplateMsg:",
+    "address": "0x116555530",
+    "end_exclusive": "0x11655564c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetDocPath",
+    "address": "0x116555754",
+    "end_exclusive": "0x116555784",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetTmpPath",
+    "address": "0x1165558a8",
+    "end_exclusive": "0x1165558ac",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetLibraryCachePath",
+    "address": "0x1165558ac",
+    "end_exclusive": "0x116555a70",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetWebKitStoragePath",
+    "address": "0x116555a70",
+    "end_exclusive": "0x116555b58",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetSystemCachePath",
+    "address": "0x116555b58",
+    "end_exclusive": "0x116555c5c",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getVideoFileExtension",
+    "address": "0x116555c5c",
+    "end_exclusive": "0x116555c98",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "EncodeStringWithBase64:",
+    "address": "0x116555c98",
+    "end_exclusive": "0x116555d6c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "DecodeStringWithBase64:",
+    "address": "0x116555d6c",
+    "end_exclusive": "0x116555e4c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "EncodeDataWithBase64:",
+    "address": "0x116555e4c",
+    "end_exclusive": "0x116555ed0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "DecodeStringAsDataWithBase64:",
+    "address": "0x116555ed0",
+    "end_exclusive": "0x116555f58",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetVersion",
+    "address": "0x116555f58",
+    "end_exclusive": "0x116555fcc",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetVersionFromPList",
+    "address": "0x11655628c",
+    "end_exclusive": "0x1165562bc",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetAppStoreVersion",
+    "address": "0x116556590",
+    "end_exclusive": "0x1165565c0",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "SetNewVersion:",
+    "address": "0x116556834",
+    "end_exclusive": "0x1165568f0",
+    "types": "v20@0:8I16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "convertDataToHexStrForToken:",
+    "address": "0x1165568f0",
+    "end_exclusive": "0x116556a20",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "convertDataToHexStr:",
+    "address": "0x116556b84",
+    "end_exclusive": "0x116556ca0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "convertDataToSafePrintHexStr:left:right:",
+    "address": "0x116556da0",
+    "end_exclusive": "0x116557050",
+    "types": "@32@0:8@16I24I28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ParseVersion:Major:Minor:Minorex:",
+    "address": "0x116557050",
+    "end_exclusive": "0x11655706c",
+    "types": "v44@0:8I16^I20^I28^I36"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ParseVersionString:",
+    "address": "0x11655706c",
+    "end_exclusive": "0x1165570e0",
+    "types": "@20@0:8I16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ParseXWeChatVersion:Major:Minor:Minorex:",
+    "address": "0x1165570e0",
+    "end_exclusive": "0x1165570fc",
+    "types": "v44@0:8I16^I20^I28^I36"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ParseXWeChatVersionString:",
+    "address": "0x1165570fc",
+    "end_exclusive": "0x116557170",
+    "types": "@20@0:8I16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ParseFullVersionString:",
+    "address": "0x116557170",
+    "end_exclusive": "0x1165571bc",
+    "types": "@20@0:8I16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "PrintClientInfo",
+    "address": "0x1165571bc",
+    "end_exclusive": "0x1165574f8",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "is64BitEnvironment",
+    "address": "0x1165574f8",
+    "end_exclusive": "0x116557500",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ReplaceInvalidChar:",
+    "address": "0x116557500",
+    "end_exclusive": "0x11655763c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ReplaceSingleQuote:",
+    "address": "0x11655763c",
+    "end_exclusive": "0x11655774c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isEnterpriseUsrName:",
+    "address": "0x11655774c",
+    "end_exclusive": "0x1165577e4",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isEnterpriseSingleUsrName:",
+    "address": "0x1165577e4",
+    "end_exclusive": "0x116557818",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getRealUptime",
+    "address": "0x116557818",
+    "end_exclusive": "0x116557954",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isStartPhoneTimeChanged",
+    "address": "0x116557954",
+    "end_exclusive": "0x116557ac4",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "genServerCurrentTimeNotABTest",
+    "address": "0x116557ac4",
+    "end_exclusive": "0x116557bdc",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "genServerCurrentTimeInterval",
+    "address": "0x116557bdc",
+    "end_exclusive": "0x116557bec",
+    "types": "d16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "genServerCurrentTimeIntervalWithMinSecondsDiff:",
+    "address": "0x116557bec",
+    "end_exclusive": "0x116557d90",
+    "types": "d20@0:8i16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "genServerCurrentTimeWithMinDiffInSeconds:",
+    "address": "0x116557d90",
+    "end_exclusive": "0x116557db0",
+    "types": "I20@0:8i16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "genServerCurrentTime",
+    "address": "0x116557db0",
+    "end_exclusive": "0x116557dd0",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "genServerCurrentTimeInMs",
+    "address": "0x116557dd0",
+    "end_exclusive": "0x116557dfc",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "genCurrentTime",
+    "address": "0x116557dfc",
+    "end_exclusive": "0x116557e64",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "genCurrentTimeInMs",
+    "address": "0x116557e64",
+    "end_exclusive": "0x116557e88",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "genCurrentTimeInMsFrom1970",
+    "address": "0x116557e88",
+    "end_exclusive": "0x116557efc",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getCurrentClock",
+    "address": "0x116557efc",
+    "end_exclusive": "0x116557f4c",
+    "types": "d16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "NeedNewSync:",
+    "address": "0x116557f4c",
+    "end_exclusive": "0x116557f58",
+    "types": "B20@0:8I16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "IPStringToInt:",
+    "address": "0x116557f58",
+    "end_exclusive": "0x116557ff8",
+    "types": "I24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "SockAddrToIPV4String:",
+    "address": "0x116557ff8",
+    "end_exclusive": "0x11655808c",
+    "types": "@24@0:8^{sockaddr_in=CCS{in_addr=I}[8c]}16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "IntToIPString:",
+    "address": "0x11655808c",
+    "end_exclusive": "0x116558100",
+    "types": "@20@0:8I16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "MergeSyncBuffer:NewBuffer:",
+    "address": "0x116558100",
+    "end_exclusive": "0x1165583b4",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "SyncBufferToString:",
+    "address": "0x1165583b4",
+    "end_exclusive": "0x1165586e8",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "stringOfFriendlySize:maxFractionDigits:",
+    "address": "0x1165586e8",
+    "end_exclusive": "0x11655887c",
+    "types": "@32@0:8d16Q24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "stringOfFriendlySizeForApple:maxFractionDigits:",
+    "address": "0x11655887c",
+    "end_exclusive": "0x116558adc",
+    "types": "@32@0:8d16Q24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "stringOfFriendlySizeForAppleInStorage:",
+    "address": "0x116558adc",
+    "end_exclusive": "0x116558b50",
+    "types": "@24@0:8d16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getRegSrcVersionNum",
+    "address": "0x116558b50",
+    "end_exclusive": "0x116558cb8",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "IsURLFromAppStore:",
+    "address": "0x116558cb8",
+    "end_exclusive": "0x116558cec",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getSystemTimeZoneString",
+    "address": "0x116558cec",
+    "end_exclusive": "0x116558dac",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getCurSystemLanguage",
+    "address": "0x116558dac",
+    "end_exclusive": "0x116558e70",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "IsCurLanguageChineseTraditional",
+    "address": "0x116558e70",
+    "end_exclusive": "0x116558f2c",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "componentsSeparated:byString:",
+    "address": "0x116558f2c",
+    "end_exclusive": "0x116559114",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "SafeUtf8WithCString:",
+    "address": "0x116559114",
+    "end_exclusive": "0x116559160",
+    "types": "@24@0:8r*16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "IsFacebookAuthName:",
+    "address": "0x116559160",
+    "end_exclusive": "0x116559178",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "UTF8HexToNSString:",
+    "address": "0x116559178",
+    "end_exclusive": "0x116559414",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ReplaceClientVersion:",
+    "address": "0x116559458",
+    "end_exclusive": "0x116559560",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getDomainName:",
+    "address": "0x116559560",
+    "end_exclusive": "0x1165597f0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getStringFromUrl:needle:",
+    "address": "0x1165597f0",
+    "end_exclusive": "0x1165599a4",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "MakeLocationCoordinate2D:andLongitude:",
+    "address": "0x1165599a4",
+    "end_exclusive": "0x1165599a8",
+    "types": "{CLLocationCoordinate2D=dd}32@0:8d16d24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isGIFFile:",
+    "address": "0x1165599a8",
+    "end_exclusive": "0x116559acc",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "md5OfString:",
+    "address": "0x116559acc",
+    "end_exclusive": "0x116559c48",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "SHA256Hash:",
+    "address": "0x116559c48",
+    "end_exclusive": "0x116559ea0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetDNSServers",
+    "address": "0x116559ea0",
+    "end_exclusive": "0x11655a000",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "DoDns:",
+    "address": "0x11655a000",
+    "end_exclusive": "0x11655a2d0",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "DoNewDns:DnsType:",
+    "address": "0x11655a2d0",
+    "end_exclusive": "0x11655a728",
+    "types": "@32@0:8@16^I24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "DoNewDnsForSns:DnsType:IsOldData:",
+    "address": "0x11655a728",
+    "end_exclusive": "0x11655ac0c",
+    "types": "@36@0:8@16^I24B32"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "DoNewDns:",
+    "address": "0x11655ac0c",
+    "end_exclusive": "0x11655ac40",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ReportFailIPToNewDNS:",
+    "address": "0x11655ac40",
+    "end_exclusive": "0x11655acf8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "convertHeif:toJpg:",
+    "address": "0x11655acf8",
+    "end_exclusive": "0x11655ae78",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "convertHeifDataToJpg:",
+    "address": "0x11655ae78",
+    "end_exclusive": "0x11655b01c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "imageTypeForImageData:",
+    "address": "0x11655b01c",
+    "end_exclusive": "0x11655b194",
+    "types": "q24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "imageTypeForImageFile:",
+    "address": "0x11655b194",
+    "end_exclusive": "0x11655b284",
+    "types": "q24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "genImageTypeExtension:",
+    "address": "0x11655b284",
+    "end_exclusive": "0x11655b2a8",
+    "types": "@24@0:8q16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetUserAgentSuffix",
+    "address": "0x11655b2a8",
+    "end_exclusive": "0x11655b2b8",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetUserAgentSuffixWithDetailInfo:",
+    "address": "0x11655b2b8",
+    "end_exclusive": "0x11655b424",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetMMUserAgent",
+    "address": "0x11655b424",
+    "end_exclusive": "0x11655b494",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetMMUserAgentWithDetailInfo:",
+    "address": "0x11655b494",
+    "end_exclusive": "0x11655b534",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "UpdateUserAgent",
+    "address": "0x11655b534",
+    "end_exclusive": "0x11655b590",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetExcutablePath",
+    "address": "0x11655b590",
+    "end_exclusive": "0x11655b600",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "weAppSDKBundleOrMainBundle",
+    "address": "0x11655b600",
+    "end_exclusive": "0x11655b6a0",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "trimString:",
+    "address": "0x11655b6a0",
+    "end_exclusive": "0x11655b764",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "filterString:",
+    "address": "0x11655b764",
+    "end_exclusive": "0x11655b84c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "filterWhiteSpaceAndNewLineString:",
+    "address": "0x11655b84c",
+    "end_exclusive": "0x11655b8d4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "filterAllWhiteSpaceAndNewLineString:",
+    "address": "0x11655b8d4",
+    "end_exclusive": "0x11655ba2c",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "dumpSqlString:",
+    "address": "0x11655ba2c",
+    "end_exclusive": "0x11655bb70",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "snapshotForUIView:",
+    "address": "0x11655bb70",
+    "end_exclusive": "0x11655bbec",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "snapshotForUIView:opaque:",
+    "address": "0x11655bbec",
+    "end_exclusive": "0x11655bc6c",
+    "types": "@28@0:8@16B24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "snapshotForUIView:checkCustomImpl:",
+    "address": "0x11655bc6c",
+    "end_exclusive": "0x11655bcf8",
+    "types": "@28@0:8@16B24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "snapshotForUIView:opaque:checkCustomImpl:",
+    "address": "0x11655bcf8",
+    "end_exclusive": "0x11655bd20",
+    "types": "@32@0:8@16B24B28"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "snapshotForUIView:opaque:checkCustomImpl:renderWithLayer:",
+    "address": "0x11655bd20",
+    "end_exclusive": "0x11655bf1c",
+    "types": "@36@0:8@16B24B28B32"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "containsViewControllerConformingToProtocol:",
+    "address": "0x11655bfe8",
+    "end_exclusive": "0x11655c224",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "ellipseImageFromColor:size:",
+    "address": "0x11655c224",
+    "end_exclusive": "0x11655c334",
+    "types": "@40@0:8@16{CGSize=dd}24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetEmoticonLinkPid:",
+    "address": "0x11655c3c0",
+    "end_exclusive": "0x11655c4cc",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isEnglishWord:",
+    "address": "0x11655c4cc",
+    "end_exclusive": "0x11655c594",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isNumber:",
+    "address": "0x11655c594",
+    "end_exclusive": "0x11655c654",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isEnglishOrNumber:",
+    "address": "0x11655c654",
+    "end_exclusive": "0x11655c728",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "containOnlyLetterOrDigit:",
+    "address": "0x11655c728",
+    "end_exclusive": "0x11655c7fc",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isValidWeChatID:",
+    "address": "0x11655c7fc",
+    "end_exclusive": "0x11655c8e0",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isLeadSurrogates:",
+    "address": "0x11655c8e0",
+    "end_exclusive": "0x11655c8f4",
+    "types": "B20@0:8S16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isTrailSurrogates:",
+    "address": "0x11655c8f4",
+    "end_exclusive": "0x11655c908",
+    "types": "B20@0:8S16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isEnglishLetter:",
+    "address": "0x11655c908",
+    "end_exclusive": "0x11655c91c",
+    "types": "B20@0:8S16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getMatchPinYinText:searchText:isShort:",
+    "address": "0x11655c91c",
+    "end_exclusive": "0x11655d0a4",
+    "types": "@36@0:8@16@24B32"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getGeneralNetworkType",
+    "address": "0x11655d0a4",
+    "end_exclusive": "0x11655d1b4",
+    "types": "i16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "isBeingDebugged",
+    "address": "0x11655d1b4",
+    "end_exclusive": "0x11655d24c",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "processStartTime",
+    "address": "0x11655d24c",
+    "end_exclusive": "0x11655d370",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "kernalBootTime",
+    "address": "0x11655d370",
+    "end_exclusive": "0x11655d450",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathOfTranslateImgDir",
+    "address": "0x11655d450",
+    "end_exclusive": "0x11655d4e8",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "GetPathTranslateImgForKey:",
+    "address": "0x11655d4e8",
+    "end_exclusive": "0x11655d588",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "addParamsIntoUrl:params:",
+    "address": "0x11655d588",
+    "end_exclusive": "0x11655d938",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getParamValueFromUrl:withParamKey:",
+    "address": "0x11655d938",
+    "end_exclusive": "0x11655dc18",
+    "types": "@32@0:8@16@24"
+  },
+  {
+    "class": "CUtility",
+    "kind": "class",
+    "selector": "getAllDBFileName:",
+    "address": "0x11655dc18",
+    "end_exclusive": "0x11655dec4",
+    "types": "@24@0:8@16"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "init",
+    "address": "0x105b3c224",
+    "end_exclusive": "0x105b3c450",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "handleCmds:isFromPushData:showLocalPush:",
+    "address": "0x105b3c450",
+    "end_exclusive": "0x105b3e734",
+    "types": "B32@0:8@16B24B28"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "HandleBatch:ShowPush:",
+    "address": "0x105b3e794",
+    "end_exclusive": "0x105b3e8fc",
+    "types": "B24@0:8B16B20"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "handleBatchMessages:",
+    "address": "0x105b3e920",
+    "end_exclusive": "0x105b3e934",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "handleBatchMessages:isFromPushData:ShowPush:",
+    "address": "0x105b3e934",
+    "end_exclusive": "0x105b3eb24",
+    "types": "B32@0:8@16B24B28"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "getReceiveMsgList",
+    "address": "0x105b3eb24",
+    "end_exclusive": "0x105b3eb34",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "processSpecialMessage:",
+    "address": "0x105b3eb34",
+    "end_exclusive": "0x105b3edf8",
+    "types": "B24@0:8@16"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "BatchAddMsg:ShowPush:",
+    "address": "0x105b3ee10",
+    "end_exclusive": "0x105b40dec",
+    "types": "B24@0:8B16B20"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "checkLastAddMsg:chatName:",
+    "address": "0x105b436b4",
+    "end_exclusive": "0x105b439b8",
+    "types": "B32@0:8@16@24"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "StatusNotifyParseUsrName:msgWrap:",
+    "address": "0x105b439b8",
+    "end_exclusive": "0x105b43ac0",
+    "types": "@32@0:8^{XmlReaderNode_t=i*^{XmlReaderNode_t}^{XmlReaderNode_t}^{XmlReaderNode_t}^^{XmlReaderNode_t}^{XmlReaderAttr_t}^^{XmlReaderAttr_t}i}16@24"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "ParseStatusNotify:map:",
+    "address": "0x105b43ac0",
+    "end_exclusive": "0x105b4440c",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "StatusNotifyParseCreateTime:chatName:",
+    "address": "0x105b4440c",
+    "end_exclusive": "0x105b447a4",
+    "types": "I32@0:8@16@24"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "AddSpecialMsg:ChatName:MsgWrap:",
+    "address": "0x105b447a4",
+    "end_exclusive": "0x105b4489c",
+    "types": "v40@0:8@16@24@32"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "HandleHelloMsg:SpcialSession:NotAddDBSession:GetChangeDisplay:",
+    "address": "0x105b4489c",
+    "end_exclusive": "0x105b44be4",
+    "types": "B48@0:8@16@24@32^B40"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "AddHelloMsg:HelloUser:ChatName:Des:OpCode:DBRet:GetChangeDisplay:",
+    "address": "0x105b44be4",
+    "end_exclusive": "0x105b44ec4",
+    "types": "B64@0:8@16@24@32I40I44^B48^B56"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "AddHelloMessageToDB:HelloUser:MsgWrap:Des:OpCode:GetChangeDisplay:",
+    "address": "0x105b45220",
+    "end_exclusive": "0x105b457c4",
+    "types": "B56@0:8@16@24@32I40I44^B48"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "handleClearHadDeleteHelloInInsertNewHelloMsg:HelloUser:",
+    "address": "0x105b457c4",
+    "end_exclusive": "0x105b45cf8",
+    "types": "v32@0:8@16@24"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "HandleModContact:",
+    "address": "0x105b45cf8",
+    "end_exclusive": "0x105b48bc8",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "HandleMemContactDetail:isSimplify:",
+    "address": "0x105b48bc8",
+    "end_exclusive": "0x105b48dec",
+    "types": "@28@0:8@16B24"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "BatchModContact",
+    "address": "0x105b48dec",
+    "end_exclusive": "0x105b49050",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "BatchModChatroomMember",
+    "address": "0x105b49068",
+    "end_exclusive": "0x105b492e8",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "HandleModUsrImg:",
+    "address": "0x105b49300",
+    "end_exclusive": "0x105b49550",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "handleAddMessageActionNotifyData:",
+    "address": "0x105b49568",
+    "end_exclusive": "0x105b497f8",
+    "types": "i24@0:8@16"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "m_ignoreSession",
+    "address": "0x105b497f8",
+    "end_exclusive": "0x105b49808",
+    "types": "B16@0:8"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "setM_ignoreSession:",
+    "address": "0x105b49808",
+    "end_exclusive": "0x105b49818",
+    "types": "v20@0:8B16"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "syncMsgNum",
+    "address": "0x105b49818",
+    "end_exclusive": "0x105b49828",
+    "types": "I16@0:8"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "setSyncMsgNum:",
+    "address": "0x105b49828",
+    "end_exclusive": "0x105b49838",
+    "types": "v20@0:8I16"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "addMsgTime",
+    "address": "0x105b49838",
+    "end_exclusive": "0x105b49848",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "setAddMsgTime:",
+    "address": "0x105b49848",
+    "end_exclusive": "0x105b49858",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "clearUnReadTime",
+    "address": "0x105b49858",
+    "end_exclusive": "0x105b49868",
+    "types": "Q16@0:8"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "setClearUnReadTime:",
+    "address": "0x105b49868",
+    "end_exclusive": "0x105b49878",
+    "types": "v24@0:8Q16"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "arrNewInsertMsg",
+    "address": "0x105b49878",
+    "end_exclusive": "0x105b49888",
+    "types": "@16@0:8"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": "setArrNewInsertMsg:",
+    "address": "0x105b49888",
+    "end_exclusive": "0x105b4989c",
+    "types": "v24@0:8@16"
+  },
+  {
+    "class": "SyncCmdHandler",
+    "kind": "instance",
+    "selector": ".cxx_destruct",
+    "address": "0x105b4989c",
+    "end_exclusive": "0x105b49968",
+    "types": "v16@0:8"
+  },
+  {
+    "class": "NewSyncEventHandler",
+    "kind": "instance",
+    "selector": "OnProtocolStart:shouldContinue:",
+    "address": "0x10517ca40",
+    "end_exclusive": "0x10517cc6c",
+    "types": "v32@0:8@16^B24"
+  },
+  {
+    "class": "NewSyncEventHandler",
+    "kind": "instance",
+    "selector": "OnProtocolResponse:shouldContinue:",
+    "address": "0x10517cc7c",
+    "end_exclusive": "0x10517d518",
+    "types": "v32@0:8@16^B24"
+  }
+]

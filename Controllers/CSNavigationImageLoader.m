@@ -5,6 +5,47 @@
 @property(nonatomic, readonly) BOOL cancelled;
 - (void)installCancellation:(dispatch_block_t)block;
 @end
+
+@implementation CSNavigationImageBinding {
+    CSNavigationImageRequest *_request;
+    NSArray *_key;
+    __weak UIImageView *_target;
+    UIImage *_image;
+    NSUInteger _generation;
+}
+- (void)displayURL:(NSURL *)url scope:(NSString *)scope identity:(NSArray *)identity
+     maxPixelSize:(NSUInteger)maxPixelSize inImageView:(UIImageView *)imageView
+        ifCurrent:(BOOL (^)(void))ifCurrent {
+    if (!NSThread.isMainThread) return;
+    if (!ifCurrent()) {
+        [self cancel];imageView.image=[UIImage imageNamed:@"DefaultProfileHead_phone"];return;
+    }
+    NSArray *key=@[scope ?: @"",identity ?: @[],url.absoluteString ?: @"",@(maxPixelSize)];
+    if (_target==imageView && [_key isEqual:key] && (_request || _image)) {
+        if (_image) imageView.image=_image;
+        return;
+    }
+    [self cancel];
+    _key=key;_target=imageView;
+    imageView.image=[UIImage imageNamed:@"DefaultProfileHead_phone"];
+    if (!url || !scope.length) return;
+    NSUInteger generation=_generation;
+    __weak typeof(self) weakSelf=self;
+    __weak UIImageView *weakTarget=imageView;
+    _request=[CSNavigationImageLoader.sharedLoader loadURL:url fallbackFileURL:nil scope:scope maxPixelSize:maxPixelSize
+        completion:^(UIImage *image,__unused NSURL *resolvedURL) {
+            CSNavigationImageBinding *live=weakSelf;
+            UIImageView *target=weakTarget;
+            if (!live || generation!=live->_generation || ![key isEqual:live->_key] || target!=live->_target) return;
+            live->_request=nil;
+            if (image && target && ifCurrent()) { live->_image=image;target.image=image; }
+        }];
+}
+- (void)cancel {
+    _generation++;[_request cancel];_request=nil;_key=nil;_target=nil;_image=nil;
+}
+- (void)dealloc { [_request cancel]; }
+@end
 @implementation CSNavigationImageRequest {
     BOOL _cancelled;
     dispatch_block_t _cancellation;

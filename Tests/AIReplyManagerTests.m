@@ -15,13 +15,27 @@
 #import "AIPreparedSendUnderTest.m"
 static NSUInteger hookMainDispatches;
 static void CSAITestHookDispatch(dispatch_queue_t queue,dispatch_block_t block){hookMainDispatches++;dispatch_async(queue,block);}
+// Native full-sync hooks have their own fixtures; keep the ingress hook isolated.
+static dispatch_block_t duringBackgroundSyncObservation;
+static CSAIReplyManager *backgroundSyncObservationManager;
+static BOOL insideBackgroundSyncRequest;
+static NSUInteger nativeGetterReadsInObservedRequest;
+void CSAIInstallNativeSyncObserver(void) {}
+void CSAIObserveBackgroundSyncRequest(NSUInteger expectedEpoch,void (^request)(void)) {
+    if(duringBackgroundSyncObservation){dispatch_block_t action=duringBackgroundSyncObservation;duringBackgroundSyncObservation=nil;action();}
+    if(backgroundSyncObservationManager)[backgroundSyncObservationManager captureBackgroundSyncContextForEpoch:expectedEpoch];
+    BOOL previous=insideBackgroundSyncRequest;insideBackgroundSyncRequest=YES;
+    @try {request();} @finally {insideBackgroundSyncRequest=previous;}
+}
 #import "AIHooksUnderTest.m"
 #import <sys/stat.h>
 #import <unistd.h>
 #import <errno.h>
 #import <stdatomic.h>
+#import <math.h>
 @interface CSAIReplyManager (AdmissionFixture)
 - (void)notify;
+- (void)invalidateConnectionTest;
 @end
 static NSUInteger checks,epoch=7,submissions;
 static NSString *account=@"alice";
@@ -37,6 +51,7 @@ static atomic_bool pauseNextFsync,ioPaused;
 static dispatch_semaphore_t resumeFsync;
 static id nativeSyncService;
 static dispatch_block_t duringContactLookup;
+static dispatch_block_t duringAccountLookup;
 @interface TestNativeSync : NSObject
 @property BOOL busy,accepts,throwBusy,throwSync;
 @property NSUInteger busyChecks,syncCalls;
@@ -180,16 +195,16 @@ void CSAIRemoveCredential(NSString *owner,NSString *revision){[keys removeObject
 - (id)getContactByName:(NSString *)name;
 @end
 @implementation TestContacts
-- (id)getContactByName:(NSString *)name{if(duringContactLookup){dispatch_block_t action=duringContactLookup;duringContactLookup=nil;action();}if([name isEqual:@"missing"] || [name isEqual:@"missing@chatroom"])return nil;TestContact *contact=[TestContact new];contact.m_nsUsrName=name;return contact;}
+- (id)getContactByName:(NSString *)name{if(insideBackgroundSyncRequest)nativeGetterReadsInObservedRequest++;if(duringContactLookup){dispatch_block_t action=duringContactLookup;duringContactLookup=nil;action();}if([name isEqual:@"missing"] || [name isEqual:@"missing@chatroom"])return nil;TestContact *contact=[TestContact new];contact.m_nsUsrName=name;return contact;}
 @end
 @implementation CSMessageNativeEnvironment
-- (NSString *)currentAccountID{return account;}
+- (NSString *)currentAccountID{if(insideBackgroundSyncRequest)nativeGetterReadsInObservedRequest++;if(duringAccountLookup){dispatch_block_t action=duringAccountLookup;duringAccountLookup=nil;action();}return account;}
 - (id)serviceNamed:(NSString *)name{if([name isEqual:@"NewSyncService"])return nativeSyncService;return [name isEqual:@"CMessageMgr"]?nativeMessages:[TestContacts new];}
 - (id)controllerForCell:(id)cell{(void)cell;return nil;}
 @end
 @implementation CSAuthorizationManager
 + (instancetype)sharedManager{static id value;static dispatch_once_t once;dispatch_once(&once,^{value=[self new];});return value;}
-- (BOOL)isAuthorized{return authorized;}
+- (BOOL)isAuthorized{if(insideBackgroundSyncRequest)nativeGetterReadsInObservedRequest++;return authorized;}
 @end
 @implementation CSMessageSendAdapter
 - (instancetype)initWithEnvironment:(id<CSMessageActionEnvironment>)environment{(void)environment;return [super init];}
@@ -210,6 +225,15 @@ void CSAIRemoveCredential(NSString *owner,NSString *revision){[keys removeObject
 @implementation TestCancellation
 - (void)cancel{self.cancelled=YES;if(self.onCancel)self.onCancel();}
 @end
+static BOOL deferCredentialReads;
+static NSMutableArray<CSAICompletion> *credentialCallbacks;
+static NSMutableArray<TestCancellation *> *credentialTasks;
+id<CSAICancellable> CSAIReadCredentialAsync(NSString *owner,NSString *revision,CSAICompletion completion){
+    CHECK(NSThread.isMainThread);TestCancellation *task=[TestCancellation new];
+    if(deferCredentialReads){[credentialCallbacks addObject:[completion copy]];[credentialTasks addObject:task];}
+    else completion(CSAIReadCredential(owner,revision,NULL),nil);
+    return task;
+}
 @interface TestClient : CSAIClient
 @property NSMutableArray<CSAICompletion> *callbacks;
 @property NSMutableArray<TestCancellation *> *tasks;
@@ -440,7 +464,7 @@ static void IngressAdmissionFastPath(NSURL *url){
     CSAIReplyStore *store=[[CSAIReplyStore alloc]initWithURL:url account:account];CHECK([store load]);
     NSMutableDictionary *config=[store.configuration mutableCopy];config[@"enabled"]=@NO;config[@"imageEnabled"]=@YES;
     config[@"endpoint"]=@"https://example.invalid/chat";config[@"model"]=@"fake-model";config[@"credentialRevision"]=@"ingress";
-    config[@"verifiedConnection"]=CSAIConnectionIdentifier(config);config[@"conversations"]=@{@"room@chatroom":@{@"enabled":@YES,@"presetID":@""}};
+    config[@"verifiedConnection"]=CSAIConnectionIdentifier(config);config[@"conversations"]=@{@"room@chatroom":@{@"enabled":@YES,@"presetID":@""},@"disabled@chatroom":@{@"enabled":@NO,@"presetID":@""}};
     CHECK([store saveConfiguration:config error:NULL]);
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager setValue:nil forKey:@"coordinator"];[manager refresh];
     TestAdmissionWrap *wrap=[TestAdmissionWrap new];wrap.m_nsFromUsr=@"room@chatroom";wrap.m_nsToUsr=account;wrap.m_nsRealChatUsr=@"member";
@@ -451,11 +475,32 @@ static void IngressAdmissionFastPath(NSURL *url){
     config[@"enabled"]=@YES;CHECK([store saveConfiguration:config error:NULL]);[manager refresh];CHECK(CSAIReplyMessageIngressEnabled());
     backupReady=NO;[manager notify];CHECK(!CSAIReplyMessageIngressEnabled());backupReady=YES;
     suspended=YES;[manager notify];CHECK(!CSAIReplyMessageIngressEnabled());suspended=NO;[manager notify];CHECK(CSAIReplyMessageIngressEnabled());
+    // A globally enabled AI must not enqueue messages from disabled/unconfigured
+    // sessions. Exercise the actual installed ingress, keeping native reception.
+    before=hookMainDispatches;originalBefore=nativeIncomingCalls;
+    dispatch_sync(dispatch_get_global_queue(QOS_CLASS_DEFAULT,0),^{for(NSUInteger i=0;i<1000;i++)[nativeMessages AsyncOnAddMsg:i%2?@"disabled@chatroom":@"unconfigured" MsgWrap:wrap];});
+    CHECK(hookMainDispatches==before && nativeIncomingCalls==originalBefore+1000 && !wrap.typeReads && !wrap.identityReads && !wrap.bodyReads);
+    CHECK(CSAIReplyMessageIngressAllowsSession(@"room@chatroom",epoch));
+    CHECK(!CSAIReplyMessageIngressAllowsSession(@"room@chatroom",epoch+1));
+    CHECK(CSAIReplyMessageIngressAllowsSession(@"",epoch) && CSAIReplyMessageIngressAllowsSession(@42,epoch) && CSAIReplyMessageIngressAllowsSession(nil,epoch));
+    epoch++;CHECK(!CSAIReplyMessageIngressAllowsSession(@"room@chatroom",epoch-1));epoch--;
+    __block atomic_uint admissionFailures;atomic_init(&admissionFailures,0);
+    dispatch_apply(1000,dispatch_get_global_queue(QOS_CLASS_DEFAULT,0),^(size_t index){
+        (void)index;if(CSAIReplyMessageIngressAllowsSession(@"disabled@chatroom",epoch) || !CSAIReplyMessageIngressAllowsSession(@"room@chatroom",epoch))atomic_fetch_add(&admissionFailures,1);
+    });CHECK(!atomic_load(&admissionFailures));
+    // Configuration replacement updates the immutable admission projection in
+    // both directions. Unknown session shapes still reach main validation.
+    config[@"conversations"]=@{@"room@chatroom":@{@"enabled":@YES,@"presetID":@""},@"disabled@chatroom":@{@"enabled":@YES,@"presetID":@""}};
+    CHECK([manager saveConfiguration:config account:account epoch:epoch error:NULL]);CHECK(CSAIReplyMessageIngressAllowsSession(@"disabled@chatroom",epoch));
+    config[@"conversations"]=@{@"room@chatroom":@{@"enabled":@YES,@"presetID":@""},@"disabled@chatroom":@{@"enabled":@NO,@"presetID":@""}};
+    CHECK([manager saveConfiguration:config account:account epoch:epoch error:NULL]);CHECK(!CSAIReplyMessageIngressAllowsSession(@"disabled@chatroom",epoch));
     CSAIReplyCoordinator *coordinator=[manager valueForKey:@"coordinator"];TestImages *images=[TestImages new];coordinator.imagePreparer=images;coordinator.now=^{return 5000.0;};[coordinator configurationDidChange];
     // Enabled ingress still transfers native parsing to main; ordinary unmentioned
     // text never reads the body or builds IDs. The empty-session fallback agrees.
     before=hookMainDispatches;dispatch_sync(dispatch_get_global_queue(QOS_CLASS_DEFAULT,0),^{[nativeMessages AsyncOnAddMsg:@"room@chatroom" MsgWrap:wrap];});
     CHECK(hookMainDispatches==before+1 && !wrap.typeReads);DrainMain();
+    before=hookMainDispatches;[nativeMessages AsyncOnAddMsg:@"" MsgWrap:wrap];[nativeMessages AsyncOnAddMsg:@42 MsgWrap:wrap];[nativeMessages AsyncOnAddMsg:nil MsgWrap:wrap];
+    CHECK(hookMainDispatches==before+3);DrainMain();
     for(NSUInteger i=0;i<1000;i++)[manager receiveNativeSession:@"" wrap:wrap epoch:epoch];
     CHECK(!wrap.bodyReads && !wrap.identifierReads && !wrap.readOffMain && !coordinator.pendingCount);
     // Images stay staged, including a later native server alias, then attach to
@@ -492,20 +537,20 @@ static void BackgroundSyncReplies(NSURL *url){
     backgroundAudioActive=YES;[NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunStateChangedNotification object:nil];DrainMain();CHECK(scheduler.active && service.syncCalls==1 && coordinator.pendingCount==1);
     messageClock+=2;[coordinator processPending];CHECK(client.callbacks.count==1);client.callbacks.lastObject(@"background unmentioned reply",nil);DrainMain();CHECK(submissions==1 && [lastSentTo isEqual:@"room@chatroom"]);
     for(NSUInteger i=0;i<5;i++){[NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunStateChangedNotification object:nil];[manager refresh];}DrainMain();CHECK(service.syncCalls==1);
-    syncClock=4029;FireSync(scheduler);CHECK(service.syncCalls==1);syncClock=4030;FireSync(scheduler);DrainMain();CHECK(service.syncCalls==2 && !coordinator.pendingCount && client.callbacks.count==1 && submissions==1);service.didSynchronize=nil;
+    syncClock=4044;FireSync(scheduler);CHECK(service.syncCalls==1);syncClock=4045;FireSync(scheduler);DrainMain();CHECK(service.syncCalls==2 && !coordinator.pendingCount && client.callbacks.count==1 && submissions==1);service.didSynchronize=nil;
     CHECK([store.configuration isEqual:original]); // No mute, audio or AI preference is rewritten by a sync.
     // WillEnterForeground stops immediately even while UIKit still reports Background.
     NSTimer *old=SyncTimer(scheduler);[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationWillEnterForegroundNotification object:nil];CHECK(!scheduler.active && !old.valid);[manager refresh];CHECK(!scheduler.active);
     UIApplication.sharedApplication.applicationState=UIApplicationStateActive;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];DrainMain();CHECK(!scheduler.active);
-    syncClock=4060;UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];DrainMain();CHECK(scheduler.active && service.syncCalls==3);
+    syncClock=4090;UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];DrainMain();CHECK(scheduler.active && service.syncCalls==3);
     // A queued background refresh must not override a newer foreground transition.
     [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationWillEnterForegroundNotification object:nil];CHECK(!scheduler.active);DrainMain();CHECK(!scheduler.active && service.syncCalls==3);
-    syncClock=4090;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];DrainMain();CHECK(scheduler.active && service.syncCalls==4);
-    backgroundAudioActive=NO;[NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunStateChangedNotification object:nil];DrainMain();CHECK(!scheduler.active);syncClock=4120;[old fire];CHECK(service.syncCalls==4);backgroundAudioActive=YES;
+    syncClock=4135;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];DrainMain();CHECK(scheduler.active && service.syncCalls==4);
+    backgroundAudioActive=NO;[NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunStateChangedNotification object:nil];DrainMain();CHECK(!scheduler.active);syncClock=4180;[old fire];CHECK(service.syncCalls==4);backgroundAudioActive=YES;
     [NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunStateChangedNotification object:nil];DrainMain();CHECK(scheduler.active && service.syncCalls==5);
     // Each eligibility requirement independently closes the scheduler without switching the test store.
     for(NSUInteger gate=0;gate<19;gate++){
-        [scheduler stop];syncClock+=30;NSMutableDictionary *disabled=[original mutableCopy];
+        [scheduler stop];syncClock+=45;NSMutableDictionary *disabled=[original mutableCopy];
         if(gate==4)disabled[@"enabled"]=@NO;
         if(gate==5 || gate==6){NSMutableDictionary *items=[disabled[@"conversations"] mutableCopy];NSMutableDictionary *room=[items[@"room@chatroom"] mutableCopy];room[gate==5?@"enabled":@"allowUnmentioned"]=@NO;items[@"room@chatroom"]=room;disabled[@"conversations"]=items;}
         if(gate==7)disabled[@"verifiedConnection"]=@"";if(gate==8)disabled[@"verifiedConnection"]=@"stale";
@@ -519,25 +564,232 @@ static void BackgroundSyncReplies(NSURL *url){
         UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;authorized=YES;epoch=7;account=@"alice";suspended=NO;backupReady=YES;[store setValue:@YES forKey:@"snapshotReady"];
         CHECK([store saveConfiguration:original error:NULL]);[scheduler refresh];DrainMain();CHECK(scheduler.active && service.syncCalls==before+1);
     }
-    // Native busy and rejected attempts consume the same 30-second budget.
-    NSUInteger before=service.syncCalls,busyChecks=service.busyChecks;syncClock+=30;service.busy=YES;FireSync(scheduler);CHECK(service.syncCalls==before && service.busyChecks==busyChecks+1);service.busy=NO;FireSync(scheduler);CHECK(service.syncCalls==before && service.busyChecks==busyChecks+1);
-    syncClock+=30;service.accepts=NO;FireSync(scheduler);CHECK(service.syncCalls==before+1);FireSync(scheduler);CHECK(service.syncCalls==before+1);service.accepts=YES;
-    service.throwBusy=YES;syncClock+=30;FireSync(scheduler);CHECK(service.syncCalls==before+1);service.throwBusy=NO;FireSync(scheduler);CHECK(service.syncCalls==before+1);
-    service.throwSync=YES;syncClock+=30;FireSync(scheduler);CHECK(service.syncCalls==before+2);service.throwSync=NO;FireSync(scheduler);CHECK(service.syncCalls==before+2);
+    // Native busy and rejected attempts consume the same 45-second budget.
+    NSUInteger before=service.syncCalls,busyChecks=service.busyChecks;syncClock+=45;service.busy=YES;FireSync(scheduler);CHECK(service.syncCalls==before && service.busyChecks==busyChecks+1);service.busy=NO;FireSync(scheduler);CHECK(service.syncCalls==before && service.busyChecks==busyChecks+1);
+    syncClock+=45;service.accepts=NO;FireSync(scheduler);CHECK(service.syncCalls==before+1);FireSync(scheduler);CHECK(service.syncCalls==before+1);service.accepts=YES;
+    service.throwBusy=YES;syncClock+=45;FireSync(scheduler);CHECK(service.syncCalls==before+1);service.throwBusy=NO;FireSync(scheduler);CHECK(service.syncCalls==before+1);
+    service.throwSync=YES;syncClock+=45;FireSync(scheduler);CHECK(service.syncCalls==before+2);service.throwSync=NO;FireSync(scheduler);CHECK(service.syncCalls==before+2);
     // Revalidate immediately after a native boundary that can revoke authorization.
-    service.afterBusyCheck=^{authorized=NO;};syncClock+=30;FireSync(scheduler);CHECK(service.syncCalls==before+2);service.afterBusyCheck=nil;authorized=YES;FireSync(scheduler);CHECK(service.syncCalls==before+2);
+    service.afterBusyCheck=^{authorized=NO;};syncClock+=45;FireSync(scheduler);CHECK(service.syncCalls==before+2);service.afterBusyCheck=nil;authorized=YES;FireSync(scheduler);CHECK(service.syncCalls==before+2);
     // A contact lookup can reenter account switching while the old service is retained.
     CSAIReplyStore *nextStore=[[CSAIReplyStore alloc]initWithURL:[[url URLByDeletingLastPathComponent]URLByAppendingPathComponent:@"background-bob.plist"] account:@"bob"];CHECK([nextStore load]);CHECK([nextStore saveConfiguration:original error:NULL]);DrainMain();
     service.afterBusyCheck=^{duringContactLookup=^{account=@"bob";epoch++;[manager setValue:nextStore forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];};};
-    syncClock+=30;FireSync(scheduler);CHECK(service.syncCalls==before+2 && [account isEqual:@"bob"]);service.afterBusyCheck=nil;duringContactLookup=nil;account=@"alice";epoch=7;[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];
+    syncClock+=45;FireSync(scheduler);CHECK(service.syncCalls==before+2 && [account isEqual:@"bob"]);service.afterBusyCheck=nil;duringContactLookup=nil;account=@"alice";epoch=7;[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];
     // Missing and mismatched methods are ignored before invoking either method.
-    TestWrongBusyReturn *badBusy=[TestWrongBusyReturn new];nativeSyncService=badBusy;syncClock+=30;FireSync(scheduler);CHECK(!badBusy.calls);
-    TestWrongSyncReturn *badSync=[TestWrongSyncReturn new];nativeSyncService=badSync;syncClock+=30;FireSync(scheduler);CHECK(!badSync.calls);
-    nativeSyncService=[NSObject new];syncClock+=30;FireSync(scheduler);nativeSyncService=nil;syncClock+=30;FireSync(scheduler);CHECK(service.syncCalls==before+2);
-    TestBoolNativeSync *boolean=[TestBoolNativeSync new];nativeSyncService=boolean;syncClock+=30;FireSync(scheduler);CHECK(boolean.calls==1); // B as well as platform BOOL/c encodings.
-    MMServiceWrapper *wrapper=[MMServiceWrapper alloc];wrapper.target=service;nativeSyncService=wrapper;syncClock+=30;FireSync(scheduler);CHECK(wrapper.forwards==0 && service.syncCalls==before+2);
-    objc_setAssociatedObject(wrapper,CSNativeServiceClassKey,TestNativeSync.class,OBJC_ASSOCIATION_RETAIN_NONATOMIC);syncClock+=30;FireSync(scheduler);CHECK(wrapper.forwards==2 && service.syncCalls==before+3);
+    TestWrongBusyReturn *badBusy=[TestWrongBusyReturn new];nativeSyncService=badBusy;syncClock+=45;FireSync(scheduler);CHECK(!badBusy.calls);
+    TestWrongSyncReturn *badSync=[TestWrongSyncReturn new];nativeSyncService=badSync;syncClock+=45;FireSync(scheduler);CHECK(!badSync.calls);
+    nativeSyncService=[NSObject new];syncClock+=45;FireSync(scheduler);nativeSyncService=nil;syncClock+=45;FireSync(scheduler);CHECK(service.syncCalls==before+2);
+    TestBoolNativeSync *boolean=[TestBoolNativeSync new];nativeSyncService=boolean;syncClock+=45;FireSync(scheduler);CHECK(boolean.calls==1); // B as well as platform BOOL/c encodings.
+    MMServiceWrapper *wrapper=[MMServiceWrapper alloc];wrapper.target=service;nativeSyncService=wrapper;syncClock+=45;FireSync(scheduler);CHECK(wrapper.forwards==0 && service.syncCalls==before+2);
+    objc_setAssociatedObject(wrapper,CSNativeServiceClassKey,TestNativeSync.class,OBJC_ASSOCIATION_RETAIN_NONATOMIC);syncClock+=45;FireSync(scheduler);CHECK(wrapper.forwards==2 && service.syncCalls==before+3);
     nativeSyncService=service;[coordinator cancelAll];[scheduler stop];[NSNotificationCenter.defaultCenter removeObserver:manager];UIApplication.sharedApplication.applicationState=UIApplicationStateActive;backgroundAudioActive=NO;simulateSends=NO;nativeSyncService=nil;SetPrivacy(YES,YES,YES);CHECK([store.configuration isEqual:original]);
+}
+static CSAIReplyManager *BackgroundSyncContextManager(NSURL *url,TestStore **result){
+    TestStore *store=[[TestStore alloc]initWithURL:url account:account];CHECK([store load]);
+    NSMutableDictionary *config=[store.configuration mutableCopy];config[@"enabled"]=@YES;
+    config[@"endpoint"]=@"https://example.invalid/chat";config[@"model"]=@"fake-model";config[@"credentialRevision"]=@"context-fixture";
+    config[@"verifiedConnection"]=CSAIConnectionIdentifier(config);
+    config[@"conversations"]=@{@"room@chatroom":@{@"enabled":@YES,@"presetID":@"",@"allowUnmentioned":@YES}};
+    CHECK([store saveConfiguration:config error:NULL]);
+    CSAIReplyManager *manager=[CSAIReplyManager new];[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];
+    [manager setValue:[TestClient new] forKey:@"client"];*result=store;return manager;
+}
+static BOOL HasVerifiedSync(CSAIBackgroundSync *scheduler){return [[scheduler valueForKey:@"verifiedSync"] boolValue];}
+static void BackgroundSyncContexts(NSURL *root){
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;SetPrivacy(YES,YES,YES);
+    TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:@"sync-context-valid.plist"],&store);
+    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=10000;scheduler.now=^{return clock;};
+    TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;
+    CHECK(![manager captureBackgroundSyncContextForEpoch:epoch]);[manager refresh];CHECK(scheduler.active && service.syncCalls==1 && !HasVerifiedSync(scheduler));
+    CHECK(![manager captureBackgroundSyncContextForEpoch:epoch+1]);
+    clock=10010;id context=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(context && !HasVerifiedSync(scheduler));
+    dispatch_semaphore_t offMain=dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT,0),^{CHECK(!NSThread.isMainThread && ![manager captureBackgroundSyncContextForEpoch:epoch]);[manager nativeFullSyncCompletedWithContext:context];dispatch_semaphore_signal(offMain);});
+    CHECK(dispatch_semaphore_wait(offMain,dispatch_time(DISPATCH_TIME_NOW,5*NSEC_PER_SEC))==0);
+    CHECK(!HasVerifiedSync(scheduler));[manager nativeFullSyncCompletedWithContext:[NSObject new]];CHECK(!HasVerifiedSync(scheduler));
+    CSAIReplyManager *other=[CSAIReplyManager new];[other nativeFullSyncCompletedWithContext:context];CHECK(!HasVerifiedSync(scheduler));
+    duringContactLookup=^{[manager nativeFullSyncCompletedWithContext:context];};
+    clock=10020;[manager nativeFullSyncCompletedWithContext:context];CHECK(HasVerifiedSync(scheduler) && [[scheduler valueForKey:@"lastVerifiedSync"] doubleValue]==clock);
+    clock=10030;[manager nativeFullSyncCompletedWithContext:context];CHECK([[scheduler valueForKey:@"lastVerifiedSync"] doubleValue]==10020);
+    clock=10045;FireSync(scheduler);CHECK(service.syncCalls==1);clock=10064;FireSync(scheduler);CHECK(service.syncCalls==1);
+    clock=10065;FireSync(scheduler);CHECK(service.syncCalls==2);
+    context=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(context);[scheduler stop];clock=10070;
+    [manager nativeFullSyncCompletedWithContext:context];CHECK(!scheduler.active && [[scheduler valueForKey:@"lastVerifiedSync"] doubleValue]==10020);
+    // Ordinary messages, accepted native starts and busy native attempts do not
+    // establish complete coverage and therefore cannot extend the deadline.
+    [scheduler invalidateVerifiedSync];[manager refresh];CHECK(scheduler.active && !HasVerifiedSync(scheduler));
+    CSAIReplyCoordinator *coordinator=[manager valueForKey:@"coordinator"];coordinator.now=^{return clock;};
+    TestMessageWrap *message=Message(@"room@chatroom",account,123,clock);message.m_nsRealChatUsr=@"member";
+    [manager receiveNativeSession:@"room@chatroom" wrap:message epoch:epoch];CHECK(!HasVerifiedSync(scheduler));[coordinator cancelAll];
+    clock=10110;service.busy=YES;NSUInteger calls=service.syncCalls;FireSync(scheduler);CHECK(service.syncCalls==calls && !HasVerifiedSync(scheduler));
+    clock=10154;service.busy=NO;FireSync(scheduler);CHECK(service.syncCalls==calls);clock=10155;FireSync(scheduler);CHECK(service.syncCalls==calls+1 && !HasVerifiedSync(scheduler));[scheduler stop];
+    // Every fixture starts with the same account, epoch, configuration and one
+    // accepted attempt; each mutation independently invalidates the old scope.
+    for(NSUInteger variant=0;variant<22;variant++){
+        NSURL *url=[root URLByAppendingPathComponent:[NSString stringWithFormat:@"sync-context-%lu.plist",(unsigned long)variant]];
+        manager=BackgroundSyncContextManager(url,&store);scheduler=[manager valueForKey:@"backgroundSync"];
+        clock=20000;scheduler.now=^{return clock;};service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;[manager refresh];
+        CHECK(scheduler.active && service.syncCalls==1);clock=20010;context=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(context);
+        NSDictionary *original=store.configuration;
+        CSAIReplyStore *replacement=nil;
+        if(variant==0 || variant==11 || variant==20 || variant==21){
+            replacement=[[CSAIReplyStore alloc]initWithURL:[root URLByAppendingPathComponent:[NSString stringWithFormat:@"sync-context-replacement-%lu.plist",(unsigned long)variant]] account:variant==21?@"bob":account];
+            CHECK([replacement load] && [replacement saveConfiguration:original error:NULL]);
+        }
+        if(variant==0)[manager setValue:replacement forKey:@"store"];
+        if(variant==1)CHECK([store saveConfiguration:original error:NULL]); // Equal values, new immutable snapshot.
+        if(variant==2)account=@"bob";
+        if(variant==3){epoch++;[manager setValue:@(epoch) forKey:@"epoch"];}
+        if(variant==4){NSMutableDictionary *changed=[original mutableCopy];changed[@"enabled"]=@NO;CHECK([store saveConfiguration:changed error:NULL]);}
+        if(variant==5)authorized=NO;
+        if(variant==6)UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+        if(variant==7)backgroundAudioActive=NO;
+        if(variant==8)suspended=YES;
+        if(variant==9)backupReady=NO;
+        if(variant==10)duringContactLookup=^{CHECK([store saveConfiguration:original error:NULL]);};
+        if(variant==11)duringContactLookup=^{[manager setValue:replacement forKey:@"store"];};
+        if(variant==12)duringAccountLookup=^{account=@"bob";epoch++;[manager setValue:@(epoch) forKey:@"epoch"];};
+        if(variant==13)duringContactLookup=^{duringContactLookup=^{CHECK([store saveConfiguration:original error:NULL]);};};
+        if(variant==14){duringContactLookup=^{CHECK([store saveConfiguration:original error:NULL]);};CHECK(![manager captureBackgroundSyncContextForEpoch:epoch]);}
+        if(variant>=15 && variant<=17){
+            // Revoke existing healthy coverage at save *start*, even if the
+            // write fails or republishes exactly the same configuration.
+            [manager nativeFullSyncCompletedWithContext:context];CHECK(HasVerifiedSync(scheduler));context=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(context);
+            store.failSave=variant!=16;
+            if(variant==17){CHECK(![manager saveConfiguration:original account:account epoch:epoch error:NULL]);}
+            else{
+                __block BOOL done=NO;[manager saveConfiguration:original account:account epoch:epoch completion:^(BOOL success,NSError *error){CHECK(success==(variant==16) && (success || error));done=YES;}];
+                CHECK(!done && !scheduler.active && !HasVerifiedSync(scheduler));WaitFor(^BOOL{return done;});
+            }
+            CHECK(!HasVerifiedSync(scheduler) && scheduler.active && service.syncCalls==1);store.failSave=NO;
+        }
+        if(variant==18){epoch++;} // Backup epoch alone changes before manager refresh.
+        if(variant==19)duringContactLookup=^{duringContactLookup=^{authorized=NO;};};
+        if(variant==20){[manager setValue:replacement forKey:@"store"];[manager notify];[manager setValue:store forKey:@"store"];[manager notify];}
+        if(variant==21){
+            duringAccountLookup=^{account=@"bob";epoch++;[manager setValue:replacement forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager refresh];};
+            NSUInteger oldEpoch=epoch;CHECK(![manager captureBackgroundSyncContextForEpoch:oldEpoch]);
+            CHECK(scheduler.active && ![manager captureBackgroundSyncContextForEpoch:oldEpoch]);
+            CHECK(scheduler.active && [manager captureBackgroundSyncContextForEpoch:epoch]);
+        }
+        clock=20020;[manager nativeFullSyncCompletedWithContext:context];CHECK(!HasVerifiedSync(scheduler));
+        clock=20030;[manager nativeFullSyncCompletedWithContext:context];CHECK(!HasVerifiedSync(scheduler));
+        if(variant==15 || variant==16 || variant==17){clock=20044;FireSync(scheduler);CHECK(service.syncCalls==1);clock=20045;FireSync(scheduler);CHECK(service.syncCalls==2);}
+        [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];duringContactLookup=nil;duringAccountLookup=nil;
+        account=@"alice";epoch=7;authorized=YES;suspended=NO;backupReady=YES;backgroundAudioActive=YES;UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
+    }
+    nativeSyncService=nil;backgroundAudioActive=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+}
+static void BackgroundSyncRequestReentry(NSURL *root){
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;
+    for(NSUInteger variant=0;variant<5;variant++){
+        TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:[NSString stringWithFormat:@"sync-request-reentry-%lu.plist",(unsigned long)variant]],&store);
+        backgroundSyncObservationManager=manager;
+        CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=30000;scheduler.now=^{return clock;};
+        TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;NSDictionary *original=store.configuration;
+        CSAIReplyStore *replacement=nil;
+        if(variant==4){replacement=[[CSAIReplyStore alloc]initWithURL:[root URLByAppendingPathComponent:@"sync-request-replacement.plist"] account:account];CHECK([replacement load] && [replacement saveConfiguration:original error:NULL]);}
+        duringBackgroundSyncObservation=^{
+            if(variant==0)account=@"bob";
+            if(variant==1)CHECK([store saveConfiguration:original error:NULL]);
+            if(variant==2)authorized=NO;
+            if(variant==3){epoch++;[manager setValue:@(epoch) forKey:@"epoch"];}
+            if(variant==4)[manager setValue:replacement forKey:@"store"];
+        };
+        [manager refresh];CHECK(!duringBackgroundSyncObservation && !service.syncCalls && !HasVerifiedSync(scheduler));CHECK(!nativeGetterReadsInObservedRequest);
+        account=@"alice";epoch=7;authorized=YES;[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager refresh];CHECK(scheduler.active && !service.syncCalls);
+        clock=30044;FireSync(scheduler);CHECK(!service.syncCalls);clock=30045;FireSync(scheduler);CHECK(service.syncCalls==1);
+        [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];backgroundSyncObservationManager=nil;
+    }
+    nativeSyncService=nil;backgroundAudioActive=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+}
+static BOOL SyncDelayIs(CSAIBackgroundSync *scheduler,NSTimeInterval delay){NSTimer *timer=SyncTimer(scheduler);return timer.valid && fabs([timer.fireDate timeIntervalSinceNow]-delay)<1;}
+static void SaveBackgroundFallback(CSAIReplyManager *manager,BOOL enabled,BOOL expectedSuccess){
+    NSMutableDictionary *configuration=[manager.store.configuration mutableCopy];configuration[@"backgroundFallback"]=@(enabled);
+    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block BOOL done=NO;
+    [manager saveConfiguration:configuration account:account epoch:epoch completion:^(BOOL success,NSError *error){CHECK(success==expectedSuccess && (success || error));done=YES;}];
+    CHECK(!done && !scheduler.active);WaitFor(^BOOL{return done;});
+}
+static void BackgroundFallbackConfiguration(NSURL *root){
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;SetPrivacy(YES,YES,YES);
+    TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:@"fallback-toggle.plist"],&store);
+    NSMutableDictionary *legacy=[store.configuration mutableCopy];[legacy removeObjectForKey:@"backgroundFallback"];CHECK([store saveConfiguration:legacy error:NULL]);
+    CHECK(!store.configuration[@"backgroundFallback"]);NSString *connection=store.configuration[@"verifiedConnection"];
+    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=40000;scheduler.now=^{return clock;};
+    TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;[manager refresh];
+    CHECK(scheduler.fallbackEnabled && scheduler.active && service.syncCalls==1 && SyncDelayIs(scheduler,45));
+    clock=40005;id oldContext=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(oldContext);NSTimer *old=SyncTimer(scheduler);
+    clock=40010;SaveBackgroundFallback(manager,NO,YES);
+    CHECK(![store.configuration[@"backgroundFallback"] boolValue] && !scheduler.fallbackEnabled && !scheduler.active && !SyncTimer(scheduler) && !old.valid);
+    CHECK([store.configuration[@"verifiedConnection"] isEqual:connection] && [CSAIConnectionIdentifier(store.configuration) isEqual:connection]);
+    [manager nativeFullSyncCompletedWithContext:oldContext];CHECK(!HasVerifiedSync(scheduler));
+    clock=40020;for(NSUInteger i=0;i<5;i++){[manager refresh];[scheduler refresh];[scheduler verifiedFullSyncCompleted];[old fire];}
+    CHECK(!scheduler.active && !SyncTimer(scheduler) && service.syncCalls==1);
+    CHECK(![manager captureBackgroundSyncContextForEpoch:epoch]);
+    // Disabling fallback leaves incoming-message admission and model work intact.
+    CSAIReplyCoordinator *coordinator=[manager valueForKey:@"coordinator"];coordinator.now=^{return clock;};[coordinator configurationDidChange];keys[@[account,@"context-fixture"]]=@"fake-key";
+    CHECK(CSAIReplyMessageIngressEnabled() && CSAIReplyMessageIngressAllowsSession(@"room@chatroom",epoch));
+    TestMessageWrap *message=Message(@"room@chatroom",account,901,clock);message.m_nsRealChatUsr=@"member";
+    [manager receiveNativeSession:@"room@chatroom" wrap:message epoch:epoch];DrainMain();CHECK(coordinator.pendingCount==1 && service.syncCalls==1);
+    clock+=2;[coordinator processPending];CHECK([(TestClient *)[manager valueForKey:@"client"] callbacks].count==1 && service.syncCalls==1);[coordinator cancelAll];
+    clock=40030;SaveBackgroundFallback(manager,YES,YES);
+    CHECK(scheduler.fallbackEnabled && scheduler.active && service.syncCalls==1 && SyncDelayIs(scheduler,15) && SyncTimer(scheduler).tolerance==3);
+    CHECK([store.configuration[@"verifiedConnection"] isEqual:connection]);
+    clock=40044;FireSync(scheduler);CHECK(service.syncCalls==1);clock=40045;FireSync(scheduler);CHECK(service.syncCalls==2);
+    clock=40050;oldContext=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(oldContext);[manager nativeFullSyncCompletedWithContext:oldContext];
+    CHECK(HasVerifiedSync(scheduler) && SyncDelayIs(scheduler,45));oldContext=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(oldContext);
+    // Saving a new configuration retains the original evidence revocation rule:
+    // attempt+45 remains; old configuration coverage+45 is deliberately revoked.
+    clock=40060;SaveBackgroundFallback(manager,NO,YES);CHECK(!HasVerifiedSync(scheduler) && !scheduler.active);
+    clock=40070;SaveBackgroundFallback(manager,YES,YES);CHECK(!HasVerifiedSync(scheduler) && service.syncCalls==2 && SyncDelayIs(scheduler,20));
+    [manager nativeFullSyncCompletedWithContext:oldContext];CHECK(!HasVerifiedSync(scheduler) && service.syncCalls==2);
+    clock=40090;FireSync(scheduler);CHECK(service.syncCalls==3);
+    // A failed save restores behavior from the still-persisted configuration.
+    store.failSave=YES;clock=40100;SaveBackgroundFallback(manager,NO,NO);
+    CHECK([store.configuration[@"backgroundFallback"] boolValue] && scheduler.fallbackEnabled && scheduler.active && service.syncCalls==3 && SyncDelayIs(scheduler,35));
+    store.failSave=NO;clock=40105;SaveBackgroundFallback(manager,NO,YES);CHECK(!scheduler.active && !scheduler.fallbackEnabled);
+    store.failSave=YES;clock=40110;SaveBackgroundFallback(manager,YES,NO);
+    CHECK(![store.configuration[@"backgroundFallback"] boolValue] && !scheduler.fallbackEnabled && !scheduler.active && !SyncTimer(scheduler) && service.syncCalls==3);
+    store.failSave=NO;clock=40120;SaveBackgroundFallback(manager,YES,YES);CHECK(scheduler.active && service.syncCalls==3 && SyncDelayIs(scheduler,15));
+    clock=40135;FireSync(scheduler);CHECK(service.syncCalls==4);
+    CHECK([store.configuration[@"verifiedConnection"] isEqual:connection]);
+    // The switch follows each account's Store; a stale former-account scope
+    // cannot establish coverage or bring that account's fallback back.
+    oldContext=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(oldContext);
+    TestStore *bob=[[TestStore alloc]initWithURL:[root URLByAppendingPathComponent:@"fallback-bob.plist"] account:@"bob"];CHECK([bob load]);
+    NSMutableDictionary *bobConfig=[store.configuration mutableCopy];bobConfig[@"backgroundFallback"]=@NO;CHECK([bob saveConfiguration:bobConfig error:NULL]);
+    account=@"bob";epoch++;[manager setValue:bob forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager refresh];
+    CHECK(!scheduler.active && !scheduler.fallbackEnabled && service.syncCalls==4);[manager nativeFullSyncCompletedWithContext:oldContext];CHECK(!HasVerifiedSync(scheduler));
+    account=@"alice";epoch=7;[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];clock=40140;[manager refresh];
+    CHECK(scheduler.active && scheduler.fallbackEnabled && service.syncCalls==4 && SyncDelayIs(scheduler,40));
+    [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];nativeSyncService=nil;backgroundAudioActive=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+}
+static void BackgroundFallbackReentry(NSURL *root){
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;
+    for(NSUInteger boundary=0;boundary<4;boundary++){
+        TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:[NSString stringWithFormat:@"fallback-reentry-%lu.plist",(unsigned long)boundary]],&store);
+        CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=50000;scheduler.now=^{return clock;};
+        TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;[manager refresh];CHECK(service.syncCalls==1 && scheduler.active);
+        id oldContext=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(oldContext);
+        dispatch_block_t toggle=^{
+            NSMutableDictionary *off=[store.configuration mutableCopy];off[@"backgroundFallback"]=@NO;CHECK([store saveConfiguration:off error:NULL]);[manager refresh];
+            CHECK(!scheduler.active && !scheduler.fallbackEnabled && !SyncTimer(scheduler));
+            if(boundary==3){NSMutableDictionary *on=[store.configuration mutableCopy];on[@"backgroundFallback"]=@YES;CHECK([store saveConfiguration:on error:NULL]);[manager refresh];}
+        };
+        if(boundary==0)duringContactLookup=toggle;else if(boundary==1)service.afterBusyCheck=toggle;else duringBackgroundSyncObservation=toggle;
+        clock=50045;FireSync(scheduler);service.afterBusyCheck=nil;
+        CHECK(service.syncCalls==1 && !HasVerifiedSync(scheduler) && !nativeGetterReadsInObservedRequest);
+        [manager nativeFullSyncCompletedWithContext:oldContext];CHECK(!HasVerifiedSync(scheduler));
+        if(boundary<3)CHECK(!scheduler.active && !scheduler.fallbackEnabled);else CHECK(scheduler.active && scheduler.fallbackEnabled && SyncDelayIs(scheduler,45));
+        clock=50050;SaveBackgroundFallback(manager,YES,YES);
+        if(boundary==0)CHECK(service.syncCalls==2 && scheduler.active && SyncDelayIs(scheduler,45));
+        else{
+            CHECK(service.syncCalls==1 && scheduler.active && SyncDelayIs(scheduler,40));
+            clock=50089.999;FireSync(scheduler);CHECK(service.syncCalls==1);clock=50090;FireSync(scheduler);CHECK(service.syncCalls==2);
+        }
+        [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];duringContactLookup=nil;duringBackgroundSyncObservation=nil;
+    }
+    nativeSyncService=nil;backgroundAudioActive=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
 }
 static void CapabilityAndImageIntegration(NSURL *url){
     CSAIReplyStore *store=[[CSAIReplyStore alloc]initWithURL:url account:account];CHECK([store load]);
@@ -616,6 +868,63 @@ static void AsyncManagerMutations(NSURL *url){
     CHECK([written[@"configuration"][@"model"] isEqual:@"old-account-async"] && [CSAIReadCredential(oldAccount,revision,NULL) isEqual:@"old-account-key"]);
     CHECK(![next.configuration[@"model"] length]);account=oldAccount;epoch=oldEpoch;[next invalidate];
 }
+static void AsyncCredentialBoundaries(NSURL *root){
+    SetPrivacy(YES,YES,YES);
+    for(NSUInteger variant=0;variant<7;variant++){
+        NSURL *url=[root URLByAppendingPathComponent:[NSString stringWithFormat:@"credential-%lu.plist",(unsigned long)variant]];
+        TestStore *store=[[TestStore alloc]initWithURL:url account:account];CHECK([store load]);
+        NSMutableDictionary *config=[store.configuration mutableCopy];config[@"endpoint"]=@"https://example.invalid/chat";config[@"model"]=@"fake-model";config[@"credentialRevision"]=@"delayed";
+        config[@"enabled"]=@YES;config[@"conversations"]=@{@"friend":@{@"enabled":@YES,@"presetID":@""}};config[@"verifiedConnection"]=CSAIConnectionIdentifier(config);
+        CHECK([store saveConfiguration:config error:NULL]);keys[@[account,@"delayed"]]=@"synthetic-key";
+        CSAIReplyManager *manager=[CSAIReplyManager new];TestClient *client=[TestClient new];
+        [manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager setValue:client forKey:@"client"];
+        credentialCallbacks=[NSMutableArray array];credentialTasks=[NSMutableArray array];deferCredentialReads=YES;
+        __block NSUInteger completions=0;__block NSError *failure=nil;
+        id<CSAICancellable> operation=[manager testConnectionForAccount:account epoch:epoch completion:^(NSString *text,NSError *error){(void)text;CHECK(NSThread.isMainThread);completions++;failure=error;}];
+        CHECK(!client.callbacks.count && !completions && credentialCallbacks.count==1);
+        CSAICompletion late=credentialCallbacks[0];TestCancellation *read=credentialTasks[0];
+        if(variant==0){
+            late(@"synthetic-key",nil);CHECK(client.callbacks.count==1 && !completions);
+            late(@"synthetic-key",nil);CHECK(client.callbacks.count==1);
+            [operation cancel];CHECK(client.tasks[0].cancelled && completions==1 && failure.code==NSURLErrorCancelled);
+            client.callbacks[0](@"late model",nil);CHECK(completions==1 && [store.configuration[@"verifiedConnection"] isEqual:config[@"verifiedConnection"]]);
+        }else if(variant==1){
+            [operation cancel];CHECK(read.cancelled && completions==1 && failure.code==NSURLErrorCancelled);late(@"synthetic-key",nil);CHECK(!client.callbacks.count && completions==1);
+        }else if(variant==2){
+            CHECK([manager saveConnection:config[@"endpoint"] model:@"replacement" key:@"replacement-key" account:account epoch:epoch error:NULL]);
+            CHECK(read.cancelled && completions==1 && failure.code==22);late(@"synthetic-key",nil);CHECK(!client.callbacks.count && completions==1);
+        }else if(variant==3){
+            NSString *oldAccount=account;NSUInteger oldEpoch=epoch;account=@"bob";epoch++;
+            late(@"synthetic-key",nil);CHECK(!client.callbacks.count && completions==1 && failure.code==22);account=oldAccount;epoch=oldEpoch;
+        }else if(variant==4){
+            [(NSTimer *)[(id)operation valueForKey:@"timer"] fire];CHECK(read.cancelled && completions==1 && failure.code==NSURLErrorTimedOut);
+            late(@"synthetic-key",nil);CHECK(!client.callbacks.count && completions==1);
+        }else if(variant==5){
+            NSMutableDictionary *changed=[store.configuration mutableCopy];changed[@"enabled"]=@NO;CHECK([manager saveConfiguration:changed account:account epoch:epoch error:NULL]);
+            late(@"synthetic-key",nil);CHECK(!client.callbacks.count && completions==1 && failure.code==22);
+        }else{
+            [(id)operation setValue:@0 forKey:@"deadline"];late(@"synthetic-key",nil);CHECK(!client.callbacks.count && completions==1 && failure.code==NSURLErrorTimedOut);
+        }
+        CHECK(![manager valueForKey:@"connectionTest"]);
+        [manager invalidateConnectionTest];[store invalidate];
+    }
+    // The coordinator's delegate boundary revalidates even when an external
+    // caller did not yet deliver account/config change notifications.
+    TestStore *store=[[TestStore alloc]initWithURL:[root URLByAppendingPathComponent:@"credential-delegate.plist"] account:account];CHECK([store load]);
+    CSAIReplyManager *manager=[CSAIReplyManager new];[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];
+    CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:[TestClient new]];[manager setValue:coordinator forKey:@"coordinator"];
+    for(NSUInteger variant=0;variant<4;variant++){
+        credentialCallbacks=[NSMutableArray array];credentialTasks=[NSMutableArray array];__block NSString *key=nil;__block NSError *failure=nil;__block NSUInteger completions=0;
+        [(id<CSAIReplyCoordinatorDelegate>)manager credentialForCoordinator:coordinator completion:^(NSString *value,NSError *error){CHECK(NSThread.isMainThread);key=value;failure=error;completions++;}];
+        CHECK(!completions && credentialCallbacks.count==1);
+        NSString *oldAccount=account;NSUInteger oldEpoch=epoch;
+        if(variant==1)epoch++;else if(variant==2)account=@"bob";else if(variant==3){NSMutableDictionary *config=[store.configuration mutableCopy];config[@"credentialRevision"]=@"changed";CHECK([store saveConfiguration:config error:NULL]);}
+        credentialCallbacks[0](@"synthetic-key",nil);
+        CHECK(completions==1 && (variant?(!key && failure.code==20):([key isEqual:@"synthetic-key"] && !failure)));
+        account=oldAccount;epoch=oldEpoch;
+    }
+    [coordinator cancelAll];[store invalidate];deferCredentialReads=NO;credentialCallbacks=nil;credentialTasks=nil;
+}
 int main(int argc,const char **argv){@autoreleasepool{
     CHECK(argc==2);keys=[NSMutableDictionary dictionary];NSURL *url=[NSURL fileURLWithPath:@(argv[1])];
     TestStore *store=[[TestStore alloc]initWithURL:url account:account];CHECK([store load]);
@@ -677,7 +986,13 @@ int main(int argc,const char **argv){@autoreleasepool{
     DisabledSessionFastPath([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"disabled-session.plist"]);
     IngressAdmissionFastPath([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"ingress-admission.plist"]);
     BackgroundSyncReplies([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"background-replies.plist"]);
+    BackgroundSyncContexts([url URLByDeletingLastPathComponent]);
+    BackgroundSyncRequestReentry([url URLByDeletingLastPathComponent]);
+    BackgroundFallbackConfiguration([url URLByDeletingLastPathComponent]);
+    BackgroundFallbackReentry([url URLByDeletingLastPathComponent]);
+    CHECK(!insideBackgroundSyncRequest && !nativeGetterReadsInObservedRequest);
     CapabilityAndImageIntegration([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"image-integration.plist"]);
     AsyncManagerMutations([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"async-manager.plist"]);
+    AsyncCredentialBoundaries([url URLByDeletingLastPathComponent]);
     printf("AI reply manager: %lu checks passed\n",(unsigned long)checks);return 0;
 }}

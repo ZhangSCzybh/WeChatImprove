@@ -50,16 +50,25 @@
 
 %hook MMTabBarController
 - (void)viewWillLayoutSubviews {
+    CSTabBarBeginControllerLayout(self);
     MMTabBar *bar=[self.tabBar isKindOfClass:NSClassFromString(@"MMTabBar")] ? (MMTabBar *)self.tabBar : nil;
     if (bar) CSTabBarBeginLayout(bar);
-    %orig;
-    if (bar) CSTabBarEndLayout(bar);
+    @try { %orig; }
+    @catch (__unused NSException *exception) { CSTabBarEndControllerLayout(self); @throw; }
+    @finally { if (bar) CSTabBarEndLayout(bar); }
 }
 - (void)viewDidLayoutSubviews {
     MMTabBar *bar=[self.tabBar isKindOfClass:NSClassFromString(@"MMTabBar")] ? (MMTabBar *)self.tabBar : nil;
     if (bar) CSTabBarBeginLayout(bar);
+    @try { %orig; }
+    @finally {
+        @try { if (bar) CSTabBarEndLayout(bar); }
+        @finally { CSTabBarEndControllerLayout(self); }
+    }
+}
+- (void)viewDidDisappear:(BOOL)animated {
+    CSTabBarEndControllerLayout(self);
     %orig;
-    if (bar) CSTabBarEndLayout(bar);
 }
 %end
 

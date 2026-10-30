@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import "CSAIReplyCoordinator.h"
-#define CHECK(...) do { if(!(__VA_ARGS__)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#__VA_ARGS__); exit(1); } } while(0)
+static NSUInteger checks;
+#define CHECK(...) do { checks++;if(!(__VA_ARGS__)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#__VA_ARGS__); exit(1); } } while(0)
 
 @interface FakeOperation : NSObject <CSAICancellable>
 @property(nonatomic,copy) CSAICompletion completion;
@@ -41,6 +42,8 @@
 @interface FakeDelegate : NSObject <CSAIReplyCoordinatorDelegate>
 @property(nonatomic) BOOL allowed;
 @property(nonatomic) BOOL hasKey;
+@property(nonatomic) BOOL deferCredentials;
+@property(nonatomic,strong) NSMutableArray<FakeOperation *> *credentialOperations;
 @property(nonatomic) NSUInteger attempts;
 @property(nonatomic) NSUInteger sends;
 @property(nonatomic,copy) NSString *result;
@@ -51,9 +54,12 @@
 @property(nonatomic,strong) NSMutableArray *conversations;
 @end
 @implementation FakeDelegate
-- (instancetype)init {if((self=[super init])){_allowed=YES;_hasKey=YES;_result=@"submitted";_conversations=[NSMutableArray array];}return self;}
+- (instancetype)init {if((self=[super init])){_allowed=YES;_hasKey=YES;_result=@"submitted";_conversations=[NSMutableArray array];_credentialOperations=[NSMutableArray array];}return self;}
 - (BOOL)coordinator:(CSAIReplyCoordinator *)coordinator allowsConversation:(NSString *)conversation {(void)coordinator;(void)conversation;CHECK(NSThread.isMainThread);if(self.beforeAllows)self.beforeAllows();return self.allowed;}
-- (NSString *)credentialForCoordinator:(CSAIReplyCoordinator *)coordinator error:(NSError **)error {(void)coordinator;(void)error;if(self.beforeCredential)self.beforeCredential();return self.hasKey?@"secret-key":nil;}
+- (id<CSAICancellable>)credentialForCoordinator:(CSAIReplyCoordinator *)coordinator completion:(CSAICompletion)completion {
+    (void)coordinator;CHECK(NSThread.isMainThread);FakeOperation *task=[FakeOperation new];task.completion=completion;[self.credentialOperations addObject:task];
+    if(self.beforeCredential)self.beforeCredential();if(!self.deferCredentials)completion(self.hasKey?@"secret-key":nil,nil);return task;
+}
 - (NSString *)coordinator:(CSAIReplyCoordinator *)coordinator submitText:(NSString *)text conversation:(NSString *)conversation valid:(BOOL (^)(void))valid {
     (void)coordinator;CHECK(text.length && text.length<=4000);self.attempts++;self.lastValid=valid;
     if(self.beforeBoundary)self.beforeBoundary();
@@ -547,7 +553,112 @@ static void GroupImagesAndBudgets(void){
     f=[Fixture new];images=EnableImages(f);[f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",@"first-image")];[f.coordinator receiveEvent:ImageEvent(f,@"c",@"c",@"second-image")];
     CHECK(![f.store hasHandledMessageID:@"second-image"]);[f advance:2];CHECK(images.operations.count==1 && [images.events[0][@"identifiers"] containsObject:@"first-image"]);
 }
+static void AsyncCredentialOwnership(void){
+    Fixture *f=[Fixture new];f.delegate.deferCredentials=YES;
+    Receive(f,@"c",@"c",nil);[f advance:2];CHECK(f.coordinator.activeCount==1 && !f.client.operations.count && f.delegate.credentialOperations.count==1);
+    FakeOperation *read=f.delegate.credentialOperations[0];read.completion(@"secret-key",nil);
+    CHECK(f.client.operations.count==1 && f.coordinator.activeCount==1);read.completion(@"secret-key",nil);CHECK(f.client.operations.count==1);
+    [f.coordinator cancelAll];CHECK(f.client.operations.lastObject.cancelled);
+    // Inline credentials cannot overwrite the network cancellation owner.
+    f=[Fixture new];Receive(f,@"c",@"c",nil);[f advance:2];CHECK(f.delegate.credentialOperations[0].cancelled);[f.coordinator cancelAll];CHECK(f.client.operations[0].cancelled);
+    // Cancelling a blocked read, including reentrant cancellation completion,
+    // revokes its phase before a later success can start a request.
+    f=[Fixture new];f.delegate.deferCredentials=YES;Receive(f,@"c",@"c",nil);[f advance:2];read=f.delegate.credentialOperations[0];read.callbackOnCancel=YES;
+    [f.coordinator cancelAll];CHECK(read.cancelled && !f.coordinator.activeCount);read.completion(@"secret-key",nil);CHECK(!f.client.operations.count);
+    // An old credential completion cannot attach to a replacement batch.
+    Receive(f,@"c",@"c",nil);[f advance:2];FakeOperation *replacement=f.delegate.credentialOperations.lastObject;
+    read.completion(@"secret-key",nil);CHECK(!f.client.operations.count && f.coordinator.activeCount==1);
+    replacement.completion(@"secret-key",nil);CHECK(f.client.operations.count==1);Complete(f,0,@"new reply",nil);CHECK(f.delegate.sends==1);
+    // A key/config revision change invalidates a pending read before dispatch.
+    f=[Fixture new];f.delegate.deferCredentials=YES;Receive(f,@"c",@"c",nil);[f advance:2];read=f.delegate.credentialOperations[0];
+    [f save:^(NSMutableDictionary *config){config[@"credentialRevision"]=@"replacement";config[@"verifiedConnection"]=CSAIConnectionIdentifier(config);}];
+    CHECK(read.cancelled);read.completion(@"secret-key",nil);CHECK(!f.client.operations.count && !f.coordinator.activeCount);
+    // Both timer-driven expiry and a late completion without a timer tick
+    // respect the original shared deadline; reading does not reset it.
+    for(NSNumber *tick in @[@NO,@YES]){
+        f=[Fixture new];f.delegate.deferCredentials=YES;Receive(f,@"c",@"c",nil);[f advance:2];read=f.delegate.credentialOperations[0];
+        f.clock+=60;if(tick.boolValue)[f.coordinator processPending];read.completion(@"secret-key",nil);CHECK(!f.client.operations.count && !f.coordinator.activeCount);
+    }
+    f=[Fixture new];f.delegate.deferCredentials=YES;Receive(f,@"c",@"c",nil);[f advance:2];read=f.delegate.credentialOperations[0];
+    f.delegate.allowed=NO;read.completion(@"secret-key",nil);CHECK(!f.client.operations.count && !f.coordinator.activeCount);
+    // Credential failure releases the active slot and reports only a fixed status.
+    f=[Fixture new];f.delegate.deferCredentials=YES;Receive(f,@"c",@"c",nil);[f advance:2];read=f.delegate.credentialOperations[0];
+    read.completion(nil,CSAIError(30,@"private backend text"));CHECK(!f.client.operations.count && !f.coordinator.activeCount);
+    CHECK([f.store.history.lastObject[@"detail"] isEqual:@"凭据或当前会话状态不可用"]);
+}
+static void BackgroundFallbackConfiguration(void){
+    NSUInteger before=checks;
+    NSString *account=@"fallback-toggle-test";
+    NSURL *root=[NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString] isDirectory:YES];
+    NSURL *url=CSAIReplyFileURL(root,account);
+    CSAIReplyStore *store=[[CSAIReplyStore alloc] initWithURL:url account:account];
+    CHECK([store load] && [store.configuration[@"backgroundFallback"] isEqual:@YES]);
+    CHECK([CSAIReplyDefaultConfiguration()[@"backgroundFallback"] isEqual:@YES]);
+
+    // A pre-toggle configuration remains valid and loads without rewriting its file.
+    NSMutableDictionary *legacy=[CSAIReplyDefaultConfiguration() mutableCopy];
+    [legacy removeObjectForKey:@"backgroundFallback"];
+    legacy[@"enabled"]=@YES;legacy[@"endpoint"]=@"https://example.invalid/chat";
+    legacy[@"model"]=@"fake-model";legacy[@"credentialRevision"]=@"existing-key-revision";
+    NSString *fingerprint=CSAIConnectionIdentifier(legacy);
+    NSDate *verifiedAt=[NSDate dateWithTimeIntervalSince1970:1700000000];
+    legacy[@"verifiedConnection"]=fingerprint;legacy[@"verifiedAt"]=verifiedAt;
+    CHECK(CSAIReplyValidateConfiguration(legacy,NULL));
+    CHECK([store saveConfiguration:legacy error:NULL]);
+    NSData *legacyBytes=[NSData dataWithContentsOfURL:url];CHECK(legacyBytes.length>0);
+    CSAIReplyStore *legacyReader=[[CSAIReplyStore alloc] initWithURL:url account:account];
+    CHECK([legacyReader load] && !legacyReader.configuration[@"backgroundFallback"]);
+    CHECK([[NSData dataWithContentsOfURL:url] isEqual:legacyBytes]);
+    CHECK([legacyReader.configuration[@"verifiedConnection"] isEqual:fingerprint] && [legacyReader.configuration[@"verifiedAt"] isEqual:verifiedAt]);
+    NSDictionary *legacyState=[CSAIReplyStore readStateAtURL:url account:account error:NULL];
+    NSDictionary *legacyPortable=CSAIReplyPortableState(legacyState);
+    CHECK(!legacyPortable[@"configuration"][@"backgroundFallback"] && CSAIReplyValidateState(legacyPortable,account,NULL));
+    NSURL *legacyRestoreURL=[root URLByAppendingPathComponent:@"legacy-restored.plist"];
+    CHECK([CSAIReplyStore replaceState:legacyPortable atURL:legacyRestoreURL account:account error:NULL]);
+    CSAIReplyStore *legacyRestored=[[CSAIReplyStore alloc] initWithURL:legacyRestoreURL account:account];
+    CHECK([legacyRestored load] && !legacyRestored.configuration[@"backgroundFallback"]);
+
+    // Exercise both values through real disk persistence and the portable backup boundary.
+    NSUInteger revision=0;
+    for(NSNumber *value in @[@YES,@NO,@YES]){
+        NSMutableDictionary *configuration=[store.configuration mutableCopy];configuration[@"backgroundFallback"]=value;
+        CHECK(CSAIReplyValidateConfiguration(configuration,NULL));
+        CHECK([CSAIConnectionIdentifier(configuration) isEqual:fingerprint]);
+        CHECK([store saveConfiguration:configuration error:NULL]);
+        NSDictionary *saved=[CSAIReplyStore readStateAtURL:url account:account error:NULL];
+        CHECK([saved[@"configuration"][@"backgroundFallback"] isEqual:value]);
+        CHECK([saved[@"configuration"][@"verifiedConnection"] isEqual:fingerprint] && [saved[@"configuration"][@"verifiedAt"] isEqual:verifiedAt]);
+        CSAIReplyStore *reader=[[CSAIReplyStore alloc] initWithURL:url account:account];
+        CHECK([reader load] && [reader.configuration[@"backgroundFallback"] isEqual:value]);
+        CHECK([CSAIConnectionIdentifier(reader.configuration) isEqual:fingerprint] && [reader.configuration[@"enabled"] boolValue]);
+        NSDictionary *portable=CSAIReplyPortableState(saved);
+        CHECK([portable[@"configuration"][@"backgroundFallback"] isEqual:value]);
+        CHECK(!portable[@"configuration"][@"credentialRevision"] && !portable[@"configuration"][@"verifiedConnection"] && !portable[@"configuration"][@"verifiedAt"]);
+        // Preserve BackupEngine's existing restore safety while retaining the new preference.
+        NSMutableDictionary *restoring=[portable mutableCopy],*restoredConfiguration=[portable[@"configuration"] mutableCopy];
+        restoredConfiguration[@"enabled"]=@NO;restoredConfiguration[@"credentialRevision"]=@"";restoredConfiguration[@"verifiedConnection"]=@"";
+        restoring[@"configuration"]=restoredConfiguration;restoring[@"handled"]=@{};restoring[@"history"]=@[];
+        NSURL *restoredURL=[root URLByAppendingPathComponent:[NSString stringWithFormat:@"restored-%lu.plist",(unsigned long)revision++]];
+        CHECK([CSAIReplyStore replaceState:restoring atURL:restoredURL account:account error:NULL]);
+        CSAIReplyStore *restored=[[CSAIReplyStore alloc] initWithURL:restoredURL account:account];
+        CHECK([restored load] && [restored.configuration[@"backgroundFallback"] isEqual:value]);
+        CHECK(![restored.configuration[@"enabled"] boolValue] && ![restored.configuration[@"credentialRevision"] length] && ![restored.configuration[@"verifiedConnection"] length]);
+    }
+
+    // Reject coercible strings and numeric 0/1 as well as malformed container/null values.
+    NSDictionary *accepted=[store.configuration copy];NSData *acceptedBytes=[NSData dataWithContentsOfURL:url];
+    for(id invalid in @[@"YES",@"false",@0,@1,@2,@(-1),@0.0,@1.0,NSNull.null,@[],@{}]){
+        NSMutableDictionary *configuration=[accepted mutableCopy];configuration[@"backgroundFallback"]=invalid;
+        NSError *validationError=nil,*saveError=nil;
+        CHECK(!CSAIReplyValidateConfiguration(configuration,&validationError) && validationError);
+        CHECK(![store saveConfiguration:configuration error:&saveError] && saveError);
+        CHECK(store.ready && [store.configuration isEqual:accepted]);
+        CHECK([[NSData dataWithContentsOfURL:url] isEqual:acceptedBytes]);
+    }
+    CHECK([NSFileManager.defaultManager removeItemAtURL:root error:NULL]);
+    printf("BackgroundFallbackConfiguration: %lu checks passed: legacy compatibility, strict booleans, persisted toggles, portable restore and connection verification preservation\n",(unsigned long)(checks-before));
+}
 int main(void){@autoreleasepool{
-    Filters();GroupUnmentioned();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();GlobalContextBoundsAndMemoryPressure();DeferredClaimsAndAliases();ProductionAsyncStoreIntegration();ImagePreparationAndOwnership();SafeFailureDetails();GroupImagesAndBudgets();OneShotProductionWakeup();
-    puts("AIReplyCoordinatorTests passed: filtering, alias durability fences, bounded async admissions, LRU/TTL/global text budget, memory pressure, serialization, cancellation, expiry, safe failure details and one-shot timers");
+    BackgroundFallbackConfiguration();AsyncCredentialOwnership();Filters();GroupUnmentioned();DedupeBatchingAndSerialization();EvolvingAliasDurability();CancellationAndBoundaries();LimitsExpiryAndErrors();ContextBudgetAndPreset();GlobalContextBoundsAndMemoryPressure();DeferredClaimsAndAliases();ProductionAsyncStoreIntegration();ImagePreparationAndOwnership();SafeFailureDetails();GroupImagesAndBudgets();OneShotProductionWakeup();
+    printf("AIReplyCoordinatorTests: %lu checks passed: filtering, alias durability fences, bounded async admissions, LRU/TTL/global text budget, memory pressure, serialization, cancellation, expiry, safe failure details and one-shot timers\n",(unsigned long)checks);
 }return 0;}

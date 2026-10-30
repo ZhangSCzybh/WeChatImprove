@@ -80,6 +80,138 @@ static NSString *CSMessageCurrentAccount(void) { return currentAccount; }
 @implementation CSAvatarTitleView
 #include "NavigationAvatarBodies.h"
 @end
+// Actual popover/settings binding and lifecycle methods, with visible-target fixtures.
+@interface UIView : UIImageView @end
+@implementation UIView @end
+@interface UITableViewCell : UIView @end
+@implementation UITableViewCell @end
+@interface UITableView : NSObject
+@property(nonatomic,strong) UITableViewCell *displayed;
+- (UITableViewCell *)cellForRowAtIndexPath:(NSIndexPath *)path;
+@end
+@implementation UITableView
+- (UITableViewCell *)cellForRowAtIndexPath:(__unused NSIndexPath *)path { return self.displayed; }
+@end
+@interface NSIndexPath (NavigationFixture)
++ (instancetype)indexPathForRow:(NSInteger)row inSection:(NSInteger)section;
+@end
+@implementation NSIndexPath (NavigationFixture)
++ (instancetype)indexPathForRow:(NSInteger)row inSection:(NSInteger)section { NSUInteger indexes[]={(NSUInteger)section,(NSUInteger)row};return [self indexPathWithIndexes:indexes length:2]; }
+@end
+@interface CContact : NSObject
+@property(nonatomic,copy) NSString *m_nsUsrName,*m_nsHeadImgUrl;
+@end
+@implementation CContact @end
+@interface CSSettingItem : NSObject @end
+@implementation CSSettingItem @end
+@interface AvatarControllerFixture : NSObject
+@property(nonatomic,strong) UIView *viewIfLoaded;
+- (void)viewDidAppear:(BOOL)animated;
+- (void)viewWillDisappear:(BOOL)animated;
+@end
+@implementation AvatarControllerFixture
+- (void)viewDidAppear:(__unused BOOL)animated {}
+- (void)viewWillDisappear:(__unused BOOL)animated {}
+@end
+@interface CSUserInfoPopoverController : AvatarControllerFixture {
+@public
+    UITableView *_tableView;
+    CContact *_contact;
+    NSString *_avatarAccount;
+    CSNavigationImageBinding *_avatarBinding;
+    __weak UITableViewCell *_avatarCell;
+    __weak UIImageView *_avatarView;
+    CSSettingItem *_avatarItem;
+    BOOL _avatarActive;
+}
+- (void)loadPopoverAvatar;
+- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath;
+@end
+@implementation CSUserInfoPopoverController
+#include "NavigationPopoverBodies.h"
+@end
+@interface CSContactSeparatorSettingsViewController : AvatarControllerFixture
+@property(nonatomic,strong) CSNavigationImageBinding *avatarBinding;
+@property(nonatomic,copy) NSString *avatarURL,*avatarAccount,*contactId;
+@property(nonatomic,weak) UIImageView *avatarImageView;
+@property(nonatomic,strong) UIImage *contactAvatar;
+@property(nonatomic) BOOL avatarActive;
+- (void)configureContactAvatarURL:(NSString *)url account:(NSString *)account;
+- (void)loadContactAvatar;
+- (void)tableView:(UITableView *)tableView didEndDisplayingHeaderView:(UIView *)view forSection:(NSInteger)section;
+@end
+@implementation CSContactSeparatorSettingsViewController
+#include "NavigationSettingsAvatarBodies.h"
+@end
+static CSUserInfoPopoverController *Popover(NSString *path,UIImageView *target,UITableViewCell *cell) {
+    CSUserInfoPopoverController *owner=[CSUserInfoPopoverController new];
+    owner.viewIfLoaded=[UIView new];owner.viewIfLoaded.window=@YES;target.window=@YES;
+    owner->_tableView=[UITableView new];owner->_tableView.displayed=cell;
+    owner->_avatarCell=cell;owner->_avatarView=target;owner->_avatarAccount=@"A";
+    owner->_contact=[CContact new];owner->_contact.m_nsUsrName=@"friend";owner->_contact.m_nsHeadImgUrl=URL(path).absoluteString;
+    owner->_avatarItem=[CSSettingItem new];objc_setAssociatedObject(owner->_avatarItem,"contactHeadImgUrl",owner->_contact.m_nsHeadImgUrl,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    return owner;
+}
+static void PopoverChecks(void) {
+    currentAccount=@"A";
+    UIImageView *first=[UIImageView new],*second=[UIImageView new];UITableViewCell *cell=[UITableViewCell new],*cell2=[UITableViewCell new];
+    CSUserInfoPopoverController *a=Popover(@"popover-shared",first,cell),*b=Popover(@"popover-shared",second,cell2);
+    NSUInteger starts=networkStarts;
+    [a viewDidAppear:NO];[b viewDidAppear:NO];
+    CHECK(first.image==[UIImage imageNamed:@"DefaultProfileHead_phone"] && second.image==first.image);
+    Wait(^BOOL { return first.image.CGImage && second.image.CGImage; });
+    CHECK(networkStarts==starts+1);CHECK(CGImageGetWidth(first.image.CGImage)==160);CHECK(first.image==second.image);
+    starts=networkStarts;for (int i=0;i<100;i++) [a loadPopoverAvatar];Run(.01);CHECK(networkStarts==starts);
+    currentAccount=@"B";[a loadPopoverAvatar];CHECK(!first.image.CGImage);
+    currentAccount=@"A";[a loadPopoverAvatar];Wait(^BOOL { return first.image.CGImage!=NULL; });
+    CSUserInfoPopoverController *invalidPending=Popover(@"popover-pending-invalid",second,cell2);
+    starts=networkStarts;[invalidPending viewDidAppear:NO];Wait(^BOOL {return networkStarts>starts;});
+    NSUInteger stops=networkStops;currentAccount=@"B";[invalidPending loadPopoverAvatar];
+    Wait(^BOOL {return networkStops>stops;});Run(.07);CHECK(!second.image.CGImage);currentAccount=@"A";
+    // Exercise actual caller guards independently: account, contact, URL and current cell.
+    for (NSUInteger guard=0;guard<4;guard++) {
+        NSString *path=[NSString stringWithFormat:@"popover-guard-%lu",(unsigned long)guard];
+        CSUserInfoPopoverController *owner=Popover(path,first,cell);[owner viewDidAppear:NO];
+        if (guard==0) currentAccount=@"B";
+        if (guard==1) owner->_contact.m_nsUsrName=@"changed";
+        if (guard==2) owner->_contact.m_nsHeadImgUrl=URL(@"changed-url").absoluteString;
+        if (guard==3) owner->_tableView.displayed=cell2;
+        Run(.09);CHECK(first.image==[UIImage imageNamed:@"DefaultProfileHead_phone"]);currentAccount=@"A";
+    }
+    CSUserInfoPopoverController *leaving=Popover(@"popover-leave",first,cell);[leaving viewDidAppear:NO];
+    [leaving viewWillDisappear:NO];Run(.09);CHECK(first.image==[UIImage imageNamed:@"DefaultProfileHead_phone"]);
+    [leaving viewDidAppear:NO];Wait(^BOOL { return first.image.CGImage!=NULL; });
+    CSUserInfoPopoverController *reused=Popover(@"popover-reuse",second,cell2);[reused viewDidAppear:NO];
+    [reused tableView:reused->_tableView didEndDisplayingCell:cell2 forRowAtIndexPath:nil];Run(.09);
+    CHECK(second.image==[UIImage imageNamed:@"DefaultProfileHead_phone"] && !reused->_avatarCell);
+    // Settings are constructed immediately with a placeholder; loading starts only for its visible header.
+    CSContactSeparatorSettingsViewController *settings=[CSContactSeparatorSettingsViewController new];
+    settings.contactId=@"friend";settings.viewIfLoaded=[UIView new];settings.viewIfLoaded.window=@YES;
+    first=[UIImageView new];first.window=@YES;settings.avatarImageView=first;
+    [settings configureContactAvatarURL:URL(@"settings-slow").absoluteString account:@"A"];
+    CHECK(first.image==[UIImage imageNamed:@"DefaultProfileHead_phone"]);
+    [settings viewDidAppear:NO];CHECK(!first.image.CGImage);
+    Wait(^BOOL { return first.image.CGImage!=NULL; });CHECK(CGImageGetWidth(first.image.CGImage)==80);
+    for (NSUInteger guard=0;guard<4;guard++) {
+        settings.contactId=@"friend";settings.avatarImageView=first;settings.avatarAccount=@"A";
+        [settings configureContactAvatarURL:URL([NSString stringWithFormat:@"settings-guard-%lu",(unsigned long)guard]).absoluteString account:@"A"];
+        if (guard==0) currentAccount=@"B";
+        if (guard==1) settings.contactId=@"changed";
+        if (guard==2) settings.avatarURL=URL(@"new-settings-url").absoluteString;
+        if (guard==3) settings.avatarImageView=second;
+        Run(.09);CHECK(!first.image.CGImage);currentAccount=@"A";
+    }
+    settings.contactId=@"friend";settings.avatarImageView=first;
+    [settings configureContactAvatarURL:URL(@"settings-dismiss").absoluteString account:@"A"];
+    [settings viewWillDisappear:NO];Run(.09);CHECK(!first.image.CGImage);
+    [settings viewDidAppear:NO];Wait(^BOOL { return first.image.CGImage!=NULL; });
+    [settings configureContactAvatarURL:nil account:@"A"];CHECK(!first.image.CGImage);
+    UIView *header=[UIView new];first.superview=header;
+    [settings configureContactAvatarURL:URL(@"settings-reused-header").absoluteString account:@"A"];
+    [settings tableView:nil didEndDisplayingHeaderView:header forSection:0];Run(.09);CHECK(!first.image.CGImage && !settings.avatarImageView);
+    CHECK(mainDecodes==0);
+    printf("Navigation popover/settings: 2 consumers -> 1 network start; 100 stable rebinds -> 0 additional starts; same-key invalidation cancels pending work and clears stale images; lifecycle/account/contact/URL/target guards passed; main-thread thumbnail decodes=0.\n");
+}
 int main(void) { @autoreleasepool {
     fixture=PNG(.2);
     NSURLSessionConfiguration *config=NSURLSessionConfiguration.ephemeralSessionConfiguration;config.protocolClasses=@[ImageProtocol.class];
@@ -134,6 +266,7 @@ int main(void) { @autoreleasepool {
     currentAccount=@"B";
     [view updateSelfAvatarWithUrl:URL(@"account-late").absoluteString];Wait(^BOOL{return view.selfAvatarLoaded;});
     [view updateOtherAvatarWithUrl:nil];CHECK(view.otherAvatarImageView.image==[UIImage imageNamed:@"DefaultProfileHead_phone"]);
+    PopoverChecks();
     method_setImplementation(sharedMethod,sharedImplementation);fixtureLoader=nil;
     printf("Navigation images: %lu checks passed; shared downloads, cancellation, account/size/file invalidation and background thumbnail decoding\n",(unsigned long)checks);
     return 0;
