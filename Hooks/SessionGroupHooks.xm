@@ -400,6 +400,11 @@ static void InstallMenuTouchGate(void) {
 %end
 
 %hook MainFrameTableView
+- (void)layoutSubviews {
+    CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
+    if (a) [a performVisibleLayout:^{ %orig; }];
+    else %orig;
+}
 - (BOOL)hasSearchBarHeader {
     if (![CSGroupListAdapter adapterForTable:self]) return %orig;
     // MMTableView switches BOTH contentInset getter and setter semantics based

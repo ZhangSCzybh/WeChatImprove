@@ -85,6 +85,8 @@ typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
 @property (nonatomic, copy, readonly) NSArray<NSArray<CSGroupRow *> *> *sections;
 @property (nonatomic, copy, readonly) NSString *accountID;
 @property (nonatomic, readonly, getter=isValid) BOOL valid;
+/// Policy revision already applied to the immutable rows, before visible layout.
+@property (nonatomic, readonly) NSUInteger privacyRevision;
 - (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
                             tabs:(NSArray<WESessionTabItem *> *)tabs
                    selectedTabID:(NSString *)selectedTabID

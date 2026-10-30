@@ -57,6 +57,8 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 /// Restrict the native row pan using the original touch position in the table.
 - (BOOL)nativeMenuGesture:(UIGestureRecognizer *)gesture inCell:(UIView *)cell shouldReceiveTouch:(UITouch *)touch;
 - (void)layout;
+/// Keep UIKit delivery in display coordinates and require a current privacy projection.
+- (void)performVisibleLayout:(void (^)(void))layout;
 - (void)refresh;
 - (void)requestRefresh;
 - (void)beginNativeChange;

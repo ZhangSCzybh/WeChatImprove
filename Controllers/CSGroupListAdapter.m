@@ -631,6 +631,36 @@ static BOOL Option(NSString *suffix) {
     @try { CSGroupWithDisplayIndices(self.table, ^{ self.table.tableHeaderView=header; }); }
     @finally { self.updatingHeader=NO; }
 }
+- (void)performVisibleLayout:(void (^)(void))layout {
+    BOOL (^ready)(void)=^BOOL {
+        CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+        BOOL privacy=policy.blocked || (policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue]);
+        if (!self.projecting && !privacy) return YES;
+        CSGroupProjection *projection=self.projection;
+        if (!self.projecting || !projection.isValid) return NO;
+        NSString *account=CSGroupCurrentAccountID();
+        BOOL sameAccount=[projection.accountID isEqual:account];
+        BOOL empty=YES;
+        for (NSArray *rows in projection.sections) if (rows.count) { empty=NO; break; }
+        // Keep the existing empty recovery placeholder (revision zero) safe
+        // without turning every layout into another snapshot/reload attempt.
+        if (sameAccount && empty && (policy.blocked || !projection.privacyRevision)) return YES;
+        return !policy.blocked && sameAccount && [policy.accountID isEqual:account] &&
+            projection.privacyRevision==policy.revision;
+    };
+    if (!ready()) {
+        self.privacyRefreshPending=YES; self.dirty=YES;
+        [self shieldVisiblePrivateRows];
+        if (!self.publishing) [self refresh];
+        if (!ready()) { [self shieldVisiblePrivateRows]; return; }
+    }
+    // Native appearance owns native paths; UIKit must still render filtered rows.
+    CSGroupWithDisplayIndices(self.table,layout);
+    if (!ready()) {
+        self.privacyRefreshPending=YES; self.dirty=YES;
+        [self shieldVisiblePrivateRows];
+    }
+}
 - (void)layout {
     UITableView *table=self.table; if (self.presentationSuspended || !CSGroupApplicationActive() || !table || self.updatingHeader) return;
     __block UIView *installed=nil;

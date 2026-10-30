@@ -1,0 +1,22 @@
+FAIL: locked first visible submission already filters friend and group
+FAIL: locked return never asks native renderer for secret cells
+FAIL: relock before async notification filters the stale revealed projection before first delivery
+FAIL: relock return has no intermediate unfiltered submission
+FAIL: late blocked policy never publishes native unfiltered content
+FAIL: unready policy keeps safe prior content or publishes an empty list
+FAIL: late ready policy publishes filtered rows with no unfiltered intermediate frame
+FAIL: pending native transaction refuses unsafe visible-layout submission
+FAIL: pending native transaction synchronously shields only prior secret cells
+FAIL: native transaction completion delivers only the safe projection
+FAIL: revision-zero native-recovery placeholder stays empty through repeated layout
+FAIL: blocked policy accepts empty sections without native content
+locked: 1 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","secret-friend","secret@chatroom","ordinary-b"]]; native secret cell calls=2; full reloads=0; row reloads=0
+revealed: 1 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","secret-friend","secret@chatroom","ordinary-b"]]; native secret cell calls=2; full reloads=0; row reloads=0
+relock: 1 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","secret-friend","secret@chatroom","ordinary-b"]]; native secret cell calls=2; full reloads=0; row reloads=0
+late policy blocked phase: 1 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","secret-friend","secret@chatroom","ordinary-b"]]; native secret cell calls=2; full reloads=0; row reloads=0
+late policy: 2 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","secret-friend","secret@chatroom","ordinary-b"],["favorite-banner","mac-banner","ordinary-a","secret-friend","secret@chatroom","ordinary-b"]]; native secret cell calls=4; full reloads=0; row reloads=0
+native transaction: 2 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","secret-friend","secret@chatroom","ordinary-b"],["favorite-banner","mac-banner","ordinary-a","secret-friend","secret@chatroom","ordinary-b"]]; native secret cell calls=4; full reloads=0; row reloads=0
+display: 1 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","ordinary-b"]]; native secret cell calls=0; full reloads=0; row reloads=0
+native fallback placeholder: 2 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","secret-friend","secret@chatroom","ordinary-b"],["favorite-banner","mac-banner","ordinary-a","secret-friend","secret@chatroom","ordinary-b"]]; native secret cell calls=4; full reloads=0; row reloads=0
+blocked empty section: 1 visible-layout samples; identities=[["favorite-banner","mac-banner","ordinary-a","secret-friend","secret@chatroom","ordinary-b"]]; native secret cell calls=2; full reloads=0; row reloads=0
+Group return privacy: 37 checks, 12 failures
