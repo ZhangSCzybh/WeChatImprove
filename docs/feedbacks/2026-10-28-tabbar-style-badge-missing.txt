@@ -1,0 +1,30 @@
+基线：当前工作区（2.1-6 授权清理后），微信 8.0.78
+
+一、用户反馈
+开启「底栏样式」功能后，微信底部 tabbar 上的原生小红点角标（无数字那种）和数字角标（如 12、99+）都看不到了。关掉底栏样式就正常。其他表现（点击、切换、动画）暂未反馈异常。
+
+二、这轮先要分析，不要急着改
+请先把"角标为什么消失"定位清楚，给出证据链，再决定改法。重点核对下面这些可能断点（以实际代码为准，不限于此）：
+
+1. Hooks/TabBarStyleHooks.xm 里已经 hook 了 `MMTabBarItemView.layoutBadgeView`，说明原生 badge 布局是会走我们代码的。确认它在自定义样式下是否被正确调用、调用顺序相对 `CSApplyItem` 是什么。
+2. Controllers/CSTabBarNativeAdapter.m 的 `CSApplyItem`：
+   - `s.badgeFrame=item.badgeView.frame` 记录的是清理前的原生 frame，随后用 `CGRectGetMaxX(imageFrame)-CGRectGetMaxX(s.imageFrame)` 和 `CGRectGetMinY(imageFrame)-CGRectGetMinY(s.imageFrame)` 做位移。需要确认 `item.badgeView` 的坐标系到底是 item 还是 imageView：如果 badgeView 是 imageView 的子视图，这套位移会算错并把它推出可视区或推到图标底下被盖住。
+   - 自定义图标分支把 `imageView` 换成自定义图、`contentMode` 改成 ScaleAspectFit，`imageFrame` 按 factor 缩放。确认 badge 位移是否仍锚在缩放后的图标右上角；确认缩放后 badge 是否超出 `item.bounds` 而被 `clipsToBounds` 裁掉。
+   - `if (index==NSNotFound || index>=4) return;` 只处理前 4 个 item，确认当前微信 tab 数（是否可能有第 5 个、或某些模式下的临时 tab），以及未处理的 item 会不会状态错乱。
+   - `CSRestoreItem` 里 badge 只回退 origin 偏移，不回退 size；确认反复 apply/restore（滚动、切 tab、前后台、样式切换）后 badge frame 是否漂移或被设成零。
+3. 自定义底栏背景/模糊/描边层：确认是否有新加的覆盖层压在 badge 之上（z 序），或把 badge 所在父视图的 `hidden/alpha` 改了。注意 `CSTabBarStyleSnapshot` 只在快照路径用，别把快照当成活视图证据。
+4. 确认是不是所有 tab 都消失、还是只有「微信/通讯录/发现/我」中的某几个；是数字和无数字都消失；是首次开启就消失，还是切换 tab/收到新消息后才消失。这决定是"从未被布局"还是"被覆盖/被裁剪"。
+5. 确认样式维度的影响：无文字/保留文字、自定义图标/系统图标、紧凑或悬浮等不同样式下是否表现不同。列出哪些样式必现、哪些不出现。
+
+三、修复要求（分析确认根因后）
+- 角标必须继续是微信原生的那个 badge 对象：不新建、不复制、不改数值、不改形状、不改显隐规则，插件最多只调位置（必要时连位置也交还原生，只保证不被遮挡）。
+- 不许用"隐藏我们的覆盖层"这种蒙住问题的做法，也不许为了露出角标而改变自定义图标的尺寸语义。
+- 不许引入固定延时；不许在每次 layout 里叠加偏移（必须有幂等的 restore/apply 配对）。
+- 修复后要在所有样式、深浅色、选中/未选中、数字角标与纯红点、99+ 溢出、多 tab、切 tab、前后台恢复、反复开关样式这些组合下都不丢角标、不漂移、不遮住图标。
+
+四、验证与交付
+- 先在 `Tests/TabBarNativeTests.m`（或对应脚本）补失败用例：自定义样式下 badge frame 不为零、在 item 可见范围内、不被其它视图覆盖、restore 后回到原生位置，然后先红后绿。
+- 跑既有回归脚本（tabbar 相关、verify-list-corners.sh 里与 tabbar 交互的部分若有），并确认没有把其它底栏行为改坏。
+- 测试用 host 替身，注意别把替身里的 badgeView 层级当成真机层级；真机层级请用静态核对或运行时日志说明。
+- 如果修复需要改代码，版本顺延 2.1-7，双包 + symbols 放独立目录，历史产物不动；报告放 docs/audits/ 新目录，必须包含：根因结论、证据、涉及样式矩阵、回归结果、真机验收步骤。
+- 如果这轮只分析不改，也请给出明确的根因结论 + 最小改动方案，供确认后再动手。

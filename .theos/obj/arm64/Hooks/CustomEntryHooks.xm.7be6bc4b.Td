@@ -5,7 +5,6 @@
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Headers/WCHeaders.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Headers/CSUserInfoHelper.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Headers/WCPluginsHeader.h \
-  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSCustomViewController.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSNativeSettingsHost.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSEntrySettingsViewController.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSSettingTableViewCell.h \
@@ -21,7 +20,6 @@
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Headers/WCHeaders.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Headers/CSUserInfoHelper.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Headers/WCPluginsHeader.h:
-/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSCustomViewController.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSNativeSettingsHost.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSEntrySettingsViewController.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/../Controllers/CSSettingTableViewCell.h:

@@ -7,9 +7,11 @@
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerSectionPolicy.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerPageContext.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerSessionAdapter.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerSessionRestore.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerContactsAdapter.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerDiscoverAdapter.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerMoreAdapter.h \
+  /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendSessionPresentation.h \
   /Users/zhangshichao/theos/vendor/include/substrate.h \
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap \
   /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h
@@ -20,9 +22,11 @@
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerSectionPolicy.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerPageContext.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerSessionAdapter.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerSessionRestore.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerContactsAdapter.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerDiscoverAdapter.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSListCornerMoreAdapter.h:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendSessionPresentation.h:
 /Users/zhangshichao/theos/vendor/include/substrate.h:
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Modules/module.modulemap:
 /Users/zhangshichao/theos/vendor/lib/iphone/rootless/CydiaSubstrate.framework/Headers/CydiaSubstrate.h:

@@ -1,7 +1,9 @@
 """Replay production lifecycle, queue admission and completion paths on the host.
 
-Only native snapshot/UI publication is replaced with a counted fixture; this is
-not an iOS frame-time benchmark. Optional old source/hooks provide a control.
+Native snapshot/refresh publication normally uses a counted fixture. Targeted
+return regressions feed its admitted event state into the real projection/table
+publication method. This is not an iOS frame-time benchmark. Optional old
+source/hooks provide a control.
 """
 from pathlib import Path
 import sys
@@ -46,6 +48,7 @@ if '- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind sessionUserNames:' i
     methods.append(method(source, '- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind sessionUserNames:'))
 methods.append(method(source,'- (void)selectIndex:'))
 methods.append(method(source,'+ (void)finishPresentationReturnForController:'))
+methods.append(method(source,'- (void)publishProjection:'))
 if '+ (void)refreshFoldedListsForAccount:' in source:
     methods.append(method(source,'+ (void)refreshFoldedListsForAccount:'))
 for marker, fallback in [('+ (void)setPresentationSuspended:', '+ (void)setPresentationSuspended:(BOOL)value forController:(id)owner { (void)value; (void)owner; }'),

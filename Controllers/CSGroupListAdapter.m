@@ -220,7 +220,9 @@ static BOOL Option(NSString *suffix) {
     adapter.presentationSuspended=suspended;
     if (suspended) {
         adapter.dirty=YES; [adapter invalidateNativeSnapshot]; adapter.cachedNativeSections=nil;
-        @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown|CSGroupChangeContent; adapter.pendingContentUnattributed=YES; }
+        // Visibility only invalidates the snapshot. Preserve real content-event
+        // attribution so returning does not rebuild unchanged native banners.
+        @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; }
         [adapter.projection discardComputationCache]; [adapter cancelScheduledRefresh];
         adapter.snapshotRetryAttempted=NO; adapter.snapshotRetryGeneration++;
         [adapter finishSuspendedBatches];

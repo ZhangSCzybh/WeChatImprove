@@ -2,10 +2,8 @@
   /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json \
   Controllers/CSAuthorizationManager.m \
   /Users/zhangshichao/theos/Prefix.pch \
-  Controllers/CSAuthorizationManager.h Controllers/CSServiceCenter.h \
-  Controllers/../Headers/WCHeaders.h
+  Controllers/CSAuthorizationManager.h Controllers/CSServiceCenter.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
 /Users/zhangshichao/theos/Prefix.pch:
 Controllers/CSAuthorizationManager.h:
 Controllers/CSServiceCenter.h:
-Controllers/../Headers/WCHeaders.h:

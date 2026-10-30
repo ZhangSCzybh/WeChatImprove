@@ -1,0 +1,1122 @@
+{
+  "binary": "/tmp/wechat-8.0.78-inset-analysis/WeChat",
+  "uuid": "9cd58b8e-b7ab-3487-adbd-2ac0aa16a5de",
+  "sha256": "0b3cd1e2ed1da493a6fe12c9ef6e9b9421c95bcac63417c677f309536f7c1c8e",
+  "text_vm_base": "0x100000000",
+  "executable_vm_ranges": [
+    [
+      "0x100000000",
+      "0x11d5e4000"
+    ]
+  ],
+  "LC_FUNCTION_STARTS_count": 2036031,
+  "snapshots": [
+    {
+      "file": "/tmp/wechat-energy-20261030.pVHImp/no-corners-stack-01.json",
+      "sha256": "14e04a9140626e07b3c40398399b8f8f05f4fb84e12ec5dc2bb03182122d77be",
+      "host_timestamp": "2026-10-30T03:52:05.817288+00:00",
+      "usecs_since_epoch": 1793332325021467,
+      "pid": 64070,
+      "thread_id": 13374264,
+      "thread_queue": "com.apple.main-thread",
+      "runtime_uuid": "9cd58b8e-b7ab-3487-adbd-2ac0aa16a5de",
+      "runtime_load_base": "0x102cd0000",
+      "slide": "0x2cd0000",
+      "main_total_frames": 51
+    },
+    {
+      "file": "/tmp/wechat-energy-20261030.pVHImp/no-corners-stack-02.json",
+      "sha256": "b9649c8921e594e64bbc596d3fb611bc1bf1200f67a14b14c012fdc84a08eaa3",
+      "host_timestamp": "2026-10-30T03:52:09.328117+00:00",
+      "usecs_since_epoch": 1793332328747560,
+      "pid": 64070,
+      "thread_id": 13374264,
+      "thread_queue": "com.apple.main-thread",
+      "runtime_uuid": "9cd58b8e-b7ab-3487-adbd-2ac0aa16a5de",
+      "runtime_load_base": "0x102cd0000",
+      "slide": "0x2cd0000",
+      "main_total_frames": 56
+    },
+    {
+      "file": "/tmp/wechat-energy-20261030.pVHImp/no-corners-stack-03.json",
+      "sha256": "7dc60f3f78ddec9a99c68fa428596ee75390ac14d677017f3c4f742ffae3b1c9",
+      "host_timestamp": "2026-10-30T03:52:17.160865+00:00",
+      "usecs_since_epoch": 1793332335817130,
+      "pid": 64070,
+      "thread_id": 13374264,
+      "thread_queue": "com.apple.main-thread",
+      "runtime_uuid": "9cd58b8e-b7ab-3487-adbd-2ac0aa16a5de",
+      "runtime_load_base": "0x102cd0000",
+      "slide": "0x2cd0000",
+      "main_total_frames": 11
+    },
+    {
+      "file": "/tmp/wechat-energy-20261030.pVHImp/no-corners-stack-04.json",
+      "sha256": "bdd4c06deb1d8acb4fb33fc0c6d74696d78bba6354c80e2d4e06d00662532b88",
+      "host_timestamp": "2026-10-30T03:52:22.436425+00:00",
+      "usecs_since_epoch": 1793332341573645,
+      "pid": 64070,
+      "thread_id": 13374264,
+      "thread_queue": "com.apple.main-thread",
+      "runtime_uuid": "9cd58b8e-b7ab-3487-adbd-2ac0aa16a5de",
+      "runtime_load_base": "0x102cd0000",
+      "slide": "0x2cd0000",
+      "main_total_frames": 11
+    }
+  ],
+  "frames": [
+    {
+      "snapshot": "no-corners-stack-01.json",
+      "thread_id": 13374264,
+      "ordinal": 9,
+      "raw_field": "lr",
+      "runtime_address": "0x119426790",
+      "image_offset": "0x16756790",
+      "unslid_address": "0x116756790",
+      "lookup_address": "0x11675678f",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x116756760",
+        "end_exclusive": "0x116756840",
+        "offset_within_function": "0x30"
+      },
+      "boundary_before_raw": {
+        "start": "0x116756760",
+        "end_exclusive": "0x116756840",
+        "offset_within_function": "0x2f"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x116756760",
+      "end_exclusive": "0x116756840",
+      "offset_within_function": "0x2f",
+      "methods": [
+        "-[MMBaseMultiMenuTableViewCell prepareForReuse]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-01.json",
+      "thread_id": 13374264,
+      "ordinal": 10,
+      "raw_field": "lr",
+      "runtime_address": "0x107dcced8",
+      "image_offset": "0x50fced8",
+      "unslid_address": "0x1050fced8",
+      "lookup_address": "0x1050fced7",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x1050fcea8",
+        "end_exclusive": "0x1050fcf20",
+        "offset_within_function": "0x30"
+      },
+      "boundary_before_raw": {
+        "start": "0x1050fcea8",
+        "end_exclusive": "0x1050fcf20",
+        "offset_within_function": "0x2f"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x1050fcea8",
+      "end_exclusive": "0x1050fcf20",
+      "offset_within_function": "0x2f",
+      "methods": [
+        "-[NewMainFrameCell prepareForReuse]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-01.json",
+      "thread_id": 13374264,
+      "ordinal": 14,
+      "raw_field": "lr",
+      "runtime_address": "0x107deec4c",
+      "image_offset": "0x511ec4c",
+      "unslid_address": "0x10511ec4c",
+      "lookup_address": "0x10511ec4b",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x10511eafc",
+        "end_exclusive": "0x10511f64c",
+        "offset_within_function": "0x150"
+      },
+      "boundary_before_raw": {
+        "start": "0x10511eafc",
+        "end_exclusive": "0x10511f64c",
+        "offset_within_function": "0x14f"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x10511eafc",
+      "end_exclusive": "0x10511f64c",
+      "offset_within_function": "0x14f",
+      "methods": [
+        "-[NewMainFrameViewController tableView:cellForRowAtIndexPath:]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-01.json",
+      "thread_id": 13374264,
+      "ordinal": 24,
+      "raw_field": "lr",
+      "runtime_address": "0x1193f9ec0",
+      "image_offset": "0x16729ec0",
+      "unslid_address": "0x116729ec0",
+      "lookup_address": "0x116729ebf",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x116729e84",
+        "end_exclusive": "0x11672a124",
+        "offset_within_function": "0x3c"
+      },
+      "boundary_before_raw": {
+        "start": "0x116729e84",
+        "end_exclusive": "0x11672a124",
+        "offset_within_function": "0x3b"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x116729e84",
+      "end_exclusive": "0x11672a124",
+      "offset_within_function": "0x3b",
+      "methods": [
+        "-[MMTableView layoutSubviews]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-01.json",
+      "thread_id": 13374264,
+      "ordinal": 48,
+      "raw_field": "lr",
+      "runtime_address": "0x10d6fa980",
+      "image_offset": "0xaa2a980",
+      "unslid_address": "0x10aa2a980",
+      "lookup_address": "0x10aa2a97f",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x10aa2a44c",
+        "end_exclusive": "0x10aa2aa58",
+        "offset_within_function": "0x534"
+      },
+      "boundary_before_raw": {
+        "start": "0x10aa2a44c",
+        "end_exclusive": "0x10aa2aa58",
+        "offset_within_function": "0x533"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x10aa2a44c",
+      "end_exclusive": "0x10aa2aa58",
+      "offset_within_function": "0x533",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 0,
+      "raw_field": "lr",
+      "runtime_address": "0x11834af10",
+      "image_offset": "0x1567af10",
+      "unslid_address": "0x11567af10",
+      "lookup_address": "0x11567af10",
+      "lookup_rule": "frame0_raw_address_pc_assumption",
+      "boundary_at_raw": {
+        "start": "0x11567af0c",
+        "end_exclusive": "0x11567af78",
+        "offset_within_function": "0x4"
+      },
+      "boundary_before_raw": {
+        "start": "0x11567af0c",
+        "end_exclusive": "0x11567af78",
+        "offset_within_function": "0x3"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x11567af0c",
+      "end_exclusive": "0x11567af78",
+      "offset_within_function": "0x4",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 1,
+      "raw_field": "lr",
+      "runtime_address": "0x1183a0634",
+      "image_offset": "0x156d0634",
+      "unslid_address": "0x1156d0634",
+      "lookup_address": "0x1156d0633",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x1156d05b8",
+        "end_exclusive": "0x1156d0680",
+        "offset_within_function": "0x7c"
+      },
+      "boundary_before_raw": {
+        "start": "0x1156d05b8",
+        "end_exclusive": "0x1156d0680",
+        "offset_within_function": "0x7b"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x1156d05b8",
+      "end_exclusive": "0x1156d0680",
+      "offset_within_function": "0x7b",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 2,
+      "raw_field": "lr",
+      "runtime_address": "0x11830e8ec",
+      "image_offset": "0x1563e8ec",
+      "unslid_address": "0x11563e8ec",
+      "lookup_address": "0x11563e8eb",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x11563e8a0",
+        "end_exclusive": "0x11563e910",
+        "offset_within_function": "0x4c"
+      },
+      "boundary_before_raw": {
+        "start": "0x11563e8a0",
+        "end_exclusive": "0x11563e910",
+        "offset_within_function": "0x4b"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x11563e8a0",
+      "end_exclusive": "0x11563e910",
+      "offset_within_function": "0x4b",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 3,
+      "raw_field": "lr",
+      "runtime_address": "0x11830ef60",
+      "image_offset": "0x1563ef60",
+      "unslid_address": "0x11563ef60",
+      "lookup_address": "0x11563ef5f",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x11563ef18",
+        "end_exclusive": "0x11563efb8",
+        "offset_within_function": "0x48"
+      },
+      "boundary_before_raw": {
+        "start": "0x11563ef18",
+        "end_exclusive": "0x11563efb8",
+        "offset_within_function": "0x47"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x11563ef18",
+      "end_exclusive": "0x11563efb8",
+      "offset_within_function": "0x47",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 4,
+      "raw_field": "lr",
+      "runtime_address": "0x11830ec18",
+      "image_offset": "0x1563ec18",
+      "unslid_address": "0x11563ec18",
+      "lookup_address": "0x11563ec17",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x11563ebc0",
+        "end_exclusive": "0x11563ef18",
+        "offset_within_function": "0x58"
+      },
+      "boundary_before_raw": {
+        "start": "0x11563ebc0",
+        "end_exclusive": "0x11563ef18",
+        "offset_within_function": "0x57"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x11563ebc0",
+      "end_exclusive": "0x11563ef18",
+      "offset_within_function": "0x57",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 5,
+      "raw_field": "lr",
+      "runtime_address": "0x118386bbc",
+      "image_offset": "0x156b6bbc",
+      "unslid_address": "0x1156b6bbc",
+      "lookup_address": "0x1156b6bbb",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x1156b253c",
+        "end_exclusive": "0x1156b6e64",
+        "offset_within_function": "0x4680"
+      },
+      "boundary_before_raw": {
+        "start": "0x1156b253c",
+        "end_exclusive": "0x1156b6e64",
+        "offset_within_function": "0x467f"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x1156b253c",
+      "end_exclusive": "0x1156b6e64",
+      "offset_within_function": "0x467f",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 6,
+      "raw_field": "lr",
+      "runtime_address": "0x11832619c",
+      "image_offset": "0x1565619c",
+      "unslid_address": "0x11565619c",
+      "lookup_address": "0x11565619b",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x1156560f0",
+        "end_exclusive": "0x1156562c4",
+        "offset_within_function": "0xac"
+      },
+      "boundary_before_raw": {
+        "start": "0x1156560f0",
+        "end_exclusive": "0x1156562c4",
+        "offset_within_function": "0xab"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x1156560f0",
+      "end_exclusive": "0x1156562c4",
+      "offset_within_function": "0xab",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 7,
+      "raw_field": "lr",
+      "runtime_address": "0x118325fe4",
+      "image_offset": "0x15655fe4",
+      "unslid_address": "0x115655fe4",
+      "lookup_address": "0x115655fe3",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x115655f7c",
+        "end_exclusive": "0x1156560b4",
+        "offset_within_function": "0x68"
+      },
+      "boundary_before_raw": {
+        "start": "0x115655f7c",
+        "end_exclusive": "0x1156560b4",
+        "offset_within_function": "0x67"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x115655f7c",
+      "end_exclusive": "0x1156560b4",
+      "offset_within_function": "0x67",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 8,
+      "raw_field": "lr",
+      "runtime_address": "0x11823d760",
+      "image_offset": "0x1556d760",
+      "unslid_address": "0x11556d760",
+      "lookup_address": "0x11556d75f",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x11556d724",
+        "end_exclusive": "0x11556d810",
+        "offset_within_function": "0x3c"
+      },
+      "boundary_before_raw": {
+        "start": "0x11556d724",
+        "end_exclusive": "0x11556d810",
+        "offset_within_function": "0x3b"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x11556d724",
+      "end_exclusive": "0x11556d810",
+      "offset_within_function": "0x3b",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 9,
+      "raw_field": "lr",
+      "runtime_address": "0x1145659f0",
+      "image_offset": "0x118959f0",
+      "unslid_address": "0x1118959f0",
+      "lookup_address": "0x1118959ef",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x1118959a8",
+        "end_exclusive": "0x111895b4c",
+        "offset_within_function": "0x48"
+      },
+      "boundary_before_raw": {
+        "start": "0x1118959a8",
+        "end_exclusive": "0x111895b4c",
+        "offset_within_function": "0x47"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x1118959a8",
+      "end_exclusive": "0x111895b4c",
+      "offset_within_function": "0x47",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 10,
+      "raw_field": "lr",
+      "runtime_address": "0x114565668",
+      "image_offset": "0x11895668",
+      "unslid_address": "0x111895668",
+      "lookup_address": "0x111895667",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x111895618",
+        "end_exclusive": "0x111895714",
+        "offset_within_function": "0x50"
+      },
+      "boundary_before_raw": {
+        "start": "0x111895618",
+        "end_exclusive": "0x111895714",
+        "offset_within_function": "0x4f"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x111895618",
+      "end_exclusive": "0x111895714",
+      "offset_within_function": "0x4f",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 11,
+      "raw_field": "lr",
+      "runtime_address": "0x11455aae0",
+      "image_offset": "0x1188aae0",
+      "unslid_address": "0x11188aae0",
+      "lookup_address": "0x11188aadf",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x11188aa7c",
+        "end_exclusive": "0x11188ab18",
+        "offset_within_function": "0x64"
+      },
+      "boundary_before_raw": {
+        "start": "0x11188aa7c",
+        "end_exclusive": "0x11188ab18",
+        "offset_within_function": "0x63"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x11188aa7c",
+      "end_exclusive": "0x11188ab18",
+      "offset_within_function": "0x63",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 12,
+      "raw_field": "lr",
+      "runtime_address": "0x11455d944",
+      "image_offset": "0x1188d944",
+      "unslid_address": "0x11188d944",
+      "lookup_address": "0x11188d943",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x11188ce44",
+        "end_exclusive": "0x11188dfb4",
+        "offset_within_function": "0xb00"
+      },
+      "boundary_before_raw": {
+        "start": "0x11188ce44",
+        "end_exclusive": "0x11188dfb4",
+        "offset_within_function": "0xaff"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x11188ce44",
+      "end_exclusive": "0x11188dfb4",
+      "offset_within_function": "0xaff",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 13,
+      "raw_field": "lr",
+      "runtime_address": "0x11456c0c4",
+      "image_offset": "0x1189c0c4",
+      "unslid_address": "0x11189c0c4",
+      "lookup_address": "0x11189c0c3",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x11189c048",
+        "end_exclusive": "0x11189c24c",
+        "offset_within_function": "0x7c"
+      },
+      "boundary_before_raw": {
+        "start": "0x11189c048",
+        "end_exclusive": "0x11189c24c",
+        "offset_within_function": "0x7b"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x11189c048",
+      "end_exclusive": "0x11189c24c",
+      "offset_within_function": "0x7b",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 14,
+      "raw_field": "lr",
+      "runtime_address": "0x1145791e4",
+      "image_offset": "0x118a91e4",
+      "unslid_address": "0x1118a91e4",
+      "lookup_address": "0x1118a91e3",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x1118a9148",
+        "end_exclusive": "0x1118a934c",
+        "offset_within_function": "0x9c"
+      },
+      "boundary_before_raw": {
+        "start": "0x1118a9148",
+        "end_exclusive": "0x1118a934c",
+        "offset_within_function": "0x9b"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x1118a9148",
+      "end_exclusive": "0x1118a934c",
+      "offset_within_function": "0x9b",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 15,
+      "raw_field": "lr",
+      "runtime_address": "0x11457fc20",
+      "image_offset": "0x118afc20",
+      "unslid_address": "0x1118afc20",
+      "lookup_address": "0x1118afc1f",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x1118afbe4",
+        "end_exclusive": "0x1118afc7c",
+        "offset_within_function": "0x3c"
+      },
+      "boundary_before_raw": {
+        "start": "0x1118afbe4",
+        "end_exclusive": "0x1118afc7c",
+        "offset_within_function": "0x3b"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x1118afbe4",
+      "end_exclusive": "0x1118afc7c",
+      "offset_within_function": "0x3b",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 16,
+      "raw_field": "lr",
+      "runtime_address": "0x112f9c228",
+      "image_offset": "0x102cc228",
+      "unslid_address": "0x1102cc228",
+      "lookup_address": "0x1102cc227",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x1102cc0ec",
+        "end_exclusive": "0x1102cc488",
+        "offset_within_function": "0x13c"
+      },
+      "boundary_before_raw": {
+        "start": "0x1102cc0ec",
+        "end_exclusive": "0x1102cc488",
+        "offset_within_function": "0x13b"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x1102cc0ec",
+      "end_exclusive": "0x1102cc488",
+      "offset_within_function": "0x13b",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 17,
+      "raw_field": "lr",
+      "runtime_address": "0x112f9c058",
+      "image_offset": "0x102cc058",
+      "unslid_address": "0x1102cc058",
+      "lookup_address": "0x1102cc057",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x1102cbf98",
+        "end_exclusive": "0x1102cc0ec",
+        "offset_within_function": "0xc0"
+      },
+      "boundary_before_raw": {
+        "start": "0x1102cbf98",
+        "end_exclusive": "0x1102cc0ec",
+        "offset_within_function": "0xbf"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x1102cbf98",
+      "end_exclusive": "0x1102cc0ec",
+      "offset_within_function": "0xbf",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 18,
+      "raw_field": "lr",
+      "runtime_address": "0x112f98ff4",
+      "image_offset": "0x102c8ff4",
+      "unslid_address": "0x1102c8ff4",
+      "lookup_address": "0x1102c8ff3",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x1102c8f50",
+        "end_exclusive": "0x1102c90e4",
+        "offset_within_function": "0xa4"
+      },
+      "boundary_before_raw": {
+        "start": "0x1102c8f50",
+        "end_exclusive": "0x1102c90e4",
+        "offset_within_function": "0xa3"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x1102c8f50",
+      "end_exclusive": "0x1102c90e4",
+      "offset_within_function": "0xa3",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 19,
+      "raw_field": "lr",
+      "runtime_address": "0x112f98ea0",
+      "image_offset": "0x102c8ea0",
+      "unslid_address": "0x1102c8ea0",
+      "lookup_address": "0x1102c8e9f",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x1102c8e10",
+        "end_exclusive": "0x1102c8f50",
+        "offset_within_function": "0x90"
+      },
+      "boundary_before_raw": {
+        "start": "0x1102c8e10",
+        "end_exclusive": "0x1102c8f50",
+        "offset_within_function": "0x8f"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x1102c8e10",
+      "end_exclusive": "0x1102c8f50",
+      "offset_within_function": "0x8f",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 20,
+      "raw_field": "lr",
+      "runtime_address": "0x114b556e8",
+      "image_offset": "0x11e856e8",
+      "unslid_address": "0x111e856e8",
+      "lookup_address": "0x111e856e7",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x111e854f0",
+        "end_exclusive": "0x111e859e4",
+        "offset_within_function": "0x1f8"
+      },
+      "boundary_before_raw": {
+        "start": "0x111e854f0",
+        "end_exclusive": "0x111e859e4",
+        "offset_within_function": "0x1f7"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x111e854f0",
+      "end_exclusive": "0x111e859e4",
+      "offset_within_function": "0x1f7",
+      "methods": [
+        "-[StatusStorageManager selectStatusInfoWithUsername:offset:count:timeMsLimit:]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 21,
+      "raw_field": "lr",
+      "runtime_address": "0x10873c240",
+      "image_offset": "0x5a6c240",
+      "unslid_address": "0x105a6c240",
+      "lookup_address": "0x105a6c23f",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x105a6c194",
+        "end_exclusive": "0x105a6c548",
+        "offset_within_function": "0xac"
+      },
+      "boundary_before_raw": {
+        "start": "0x105a6c194",
+        "end_exclusive": "0x105a6c548",
+        "offset_within_function": "0xab"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x105a6c194",
+      "end_exclusive": "0x105a6c548",
+      "offset_within_function": "0xab",
+      "methods": [
+        "-[StatusDBCache prepareCacheSync:]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 22,
+      "raw_field": "lr",
+      "runtime_address": "0x10873b3e4",
+      "image_offset": "0x5a6b3e4",
+      "unslid_address": "0x105a6b3e4",
+      "lookup_address": "0x105a6b3e3",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x105a6aff0",
+        "end_exclusive": "0x105a6b500",
+        "offset_within_function": "0x3f4"
+      },
+      "boundary_before_raw": {
+        "start": "0x105a6aff0",
+        "end_exclusive": "0x105a6b500",
+        "offset_within_function": "0x3f3"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x105a6aff0",
+      "end_exclusive": "0x105a6b500",
+      "offset_within_function": "0x3f3",
+      "methods": [
+        "-[StatusDBCache mostRecentTextStateForUsername:]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 23,
+      "raw_field": "lr",
+      "runtime_address": "0x10873ebe0",
+      "image_offset": "0x5a6ebe0",
+      "unslid_address": "0x105a6ebe0",
+      "lookup_address": "0x105a6ebdf",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x105a6eb78",
+        "end_exclusive": "0x105a6edfc",
+        "offset_within_function": "0x68"
+      },
+      "boundary_before_raw": {
+        "start": "0x105a6eb78",
+        "end_exclusive": "0x105a6edfc",
+        "offset_within_function": "0x67"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x105a6eb78",
+      "end_exclusive": "0x105a6edfc",
+      "offset_within_function": "0x67",
+      "methods": [
+        "-[StatusDBImpl mostRecentTextStateForUsername:]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 24,
+      "raw_field": "lr",
+      "runtime_address": "0x1087437bc",
+      "image_offset": "0x5a737bc",
+      "unslid_address": "0x105a737bc",
+      "lookup_address": "0x105a737bb",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x105a7377c",
+        "end_exclusive": "0x105a737cc",
+        "offset_within_function": "0x40"
+      },
+      "boundary_before_raw": {
+        "start": "0x105a7377c",
+        "end_exclusive": "0x105a737cc",
+        "offset_within_function": "0x3f"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x105a7377c",
+      "end_exclusive": "0x105a737cc",
+      "offset_within_function": "0x3f",
+      "methods": [
+        "-[StatusDBWrapper mostRecentTextStateForUsername:]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 25,
+      "raw_field": "lr",
+      "runtime_address": "0x108937684",
+      "image_offset": "0x5c67684",
+      "unslid_address": "0x105c67684",
+      "lookup_address": "0x105c67683",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x105c6758c",
+        "end_exclusive": "0x105c67804",
+        "offset_within_function": "0xf8"
+      },
+      "boundary_before_raw": {
+        "start": "0x105c6758c",
+        "end_exclusive": "0x105c67804",
+        "offset_within_function": "0xf7"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x105c6758c",
+      "end_exclusive": "0x105c67804",
+      "offset_within_function": "0xf7",
+      "methods": [
+        "-[TextStateDataLogic mostRecentTextStateForUsername:]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 26,
+      "raw_field": "lr",
+      "runtime_address": "0x1089947dc",
+      "image_offset": "0x5cc47dc",
+      "unslid_address": "0x105cc47dc",
+      "lookup_address": "0x105cc47db",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x105cc4778",
+        "end_exclusive": "0x105cc49ac",
+        "offset_within_function": "0x64"
+      },
+      "boundary_before_raw": {
+        "start": "0x105cc4778",
+        "end_exclusive": "0x105cc49ac",
+        "offset_within_function": "0x63"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x105cc4778",
+      "end_exclusive": "0x105cc49ac",
+      "offset_within_function": "0x63",
+      "methods": [
+        "-[TextStateMgr mostRecentTextStateForUsername:]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 27,
+      "raw_field": "lr",
+      "runtime_address": "0x103882b90",
+      "image_offset": "0xbb2b90",
+      "unslid_address": "0x100bb2b90",
+      "lookup_address": "0x100bb2b8f",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x100bb2a88",
+        "end_exclusive": "0x100bb2bc8",
+        "offset_within_function": "0x108"
+      },
+      "boundary_before_raw": {
+        "start": "0x100bb2a88",
+        "end_exclusive": "0x100bb2bc8",
+        "offset_within_function": "0x107"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x100bb2a88",
+      "end_exclusive": "0x100bb2bc8",
+      "offset_within_function": "0x107",
+      "methods": [
+        "-[CContact mostRecentTextState]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 28,
+      "raw_field": "lr",
+      "runtime_address": "0x10776aea8",
+      "image_offset": "0x4a9aea8",
+      "unslid_address": "0x104a9aea8",
+      "lookup_address": "0x104a9aea7",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x104a9adcc",
+        "end_exclusive": "0x104a9af44",
+        "offset_within_function": "0xdc"
+      },
+      "boundary_before_raw": {
+        "start": "0x104a9adcc",
+        "end_exclusive": "0x104a9af44",
+        "offset_within_function": "0xdb"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x104a9adcc",
+      "end_exclusive": "0x104a9af44",
+      "offset_within_function": "0xdb",
+      "methods": [
+        "-[MainFrameItemView updateTextStateView]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 29,
+      "raw_field": "lr",
+      "runtime_address": "0x107760adc",
+      "image_offset": "0x4a90adc",
+      "unslid_address": "0x104a90adc",
+      "lookup_address": "0x104a90adb",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x104a8faf8",
+        "end_exclusive": "0x104a90ce8",
+        "offset_within_function": "0xfe4"
+      },
+      "boundary_before_raw": {
+        "start": "0x104a8faf8",
+        "end_exclusive": "0x104a90ce8",
+        "offset_within_function": "0xfe3"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x104a8faf8",
+      "end_exclusive": "0x104a90ce8",
+      "offset_within_function": "0xfe3",
+      "methods": [
+        "-[MainFrameItemView updateNameLabel]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 30,
+      "raw_field": "lr",
+      "runtime_address": "0x10775f2f0",
+      "image_offset": "0x4a8f2f0",
+      "unslid_address": "0x104a8f2f0",
+      "lookup_address": "0x104a8f2ef",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x104a8f280",
+        "end_exclusive": "0x104a8f354",
+        "offset_within_function": "0x70"
+      },
+      "boundary_before_raw": {
+        "start": "0x104a8f280",
+        "end_exclusive": "0x104a8f354",
+        "offset_within_function": "0x6f"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x104a8f280",
+      "end_exclusive": "0x104a8f354",
+      "offset_within_function": "0x6f",
+      "methods": [
+        "-[MainFrameItemView layoutSubviews]"
+      ]
+    },
+    {
+      "snapshot": "no-corners-stack-02.json",
+      "thread_id": 13374264,
+      "ordinal": 53,
+      "raw_field": "lr",
+      "runtime_address": "0x10d6fa980",
+      "image_offset": "0xaa2a980",
+      "unslid_address": "0x10aa2a980",
+      "lookup_address": "0x10aa2a97f",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x10aa2a44c",
+        "end_exclusive": "0x10aa2aa58",
+        "offset_within_function": "0x534"
+      },
+      "boundary_before_raw": {
+        "start": "0x10aa2a44c",
+        "end_exclusive": "0x10aa2aa58",
+        "offset_within_function": "0x533"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x10aa2a44c",
+      "end_exclusive": "0x10aa2aa58",
+      "offset_within_function": "0x533",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-03.json",
+      "thread_id": 13374264,
+      "ordinal": 8,
+      "raw_field": "lr",
+      "runtime_address": "0x10d6fa980",
+      "image_offset": "0xaa2a980",
+      "unslid_address": "0x10aa2a980",
+      "lookup_address": "0x10aa2a97f",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x10aa2a44c",
+        "end_exclusive": "0x10aa2aa58",
+        "offset_within_function": "0x534"
+      },
+      "boundary_before_raw": {
+        "start": "0x10aa2a44c",
+        "end_exclusive": "0x10aa2aa58",
+        "offset_within_function": "0x533"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x10aa2a44c",
+      "end_exclusive": "0x10aa2aa58",
+      "offset_within_function": "0x533",
+      "methods": []
+    },
+    {
+      "snapshot": "no-corners-stack-04.json",
+      "thread_id": 13374264,
+      "ordinal": 8,
+      "raw_field": "lr",
+      "runtime_address": "0x10d6fa980",
+      "image_offset": "0xaa2a980",
+      "unslid_address": "0x10aa2a980",
+      "lookup_address": "0x10aa2a97f",
+      "lookup_rule": "caller_return_address_minus_1",
+      "boundary_at_raw": {
+        "start": "0x10aa2a44c",
+        "end_exclusive": "0x10aa2aa58",
+        "offset_within_function": "0x534"
+      },
+      "boundary_before_raw": {
+        "start": "0x10aa2a44c",
+        "end_exclusive": "0x10aa2aa58",
+        "offset_within_function": "0x533"
+      },
+      "boundary_ambiguous": false,
+      "start": "0x10aa2a44c",
+      "end_exclusive": "0x10aa2aa58",
+      "offset_within_function": "0x533",
+      "methods": []
+    }
+  ],
+  "class_metadata_scanned": 46098,
+  "methods_scanned": 791526,
+  "skipped_class_metadata": 0,
+  "limitations": [
+    "Only exact ObjC class/metaclass method IMPs matching the LC_FUNCTION_STARTS start are named. Category-only methods and C/C++ functions may remain unnamed.",
+    "LC_FUNCTION_STARTS gives exact contiguous function-start boundaries; the next start is used as the exclusive upper boundary, which can include alignment padding.",
+    "Stackshot user frames are all keyed lr. Frame 0 is mapped as raw PC; later frames use raw-1 for return-address containment. Both intervals are retained and ambiguity is explicit.",
+    "Static symbols and sampled stacks identify the call chain, not CPU attribution for each native method or the full event frequency."
+  ]
+}

@@ -1,0 +1,10 @@
+Local host state-machine replay only; this does not establish the device producer.
+
+Production scheduling methods were extracted by Tests/extract-group-lifecycle.py into this directory. The existing fixture replaces expensive native UI publication. A copied test source adds one outside-publication coalesced event control and a maximum of 20 inside-publication begin/end coalesced events. No repository source was edited.
+
+Observed stdout:
+Hidden native event publications: 0 / 20 events
+FEEDBACK_REPLAY outside_before_25ms=0 outside_after_125ms=1 inside_before_25ms=21 synthesized_events=20 elapsed=0.028433 recoveryAttempts=0 revision=21
+Group lifecycle: 193 checks, 0 failures
+
+Conclusion: coalescing is lost when scheduleRefresh returns early during publication, and the native events follow the ordinary scheduling path rather than the three-retry recovery path. The replay deliberately synthesizes the conditional native events; it cannot establish that actual reload/layout produces those events on the phone.

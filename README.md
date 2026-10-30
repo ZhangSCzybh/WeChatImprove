@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.1-25`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.1-26`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -31,8 +31,8 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | 提供 `2.1-25` 安装包，待本版真机验收；前版 `2.1-21` 的前台 CPU 复测见 [真机记录](docs/audits/release-2.1-21-energy/device-validation.md) |
-| Rootful | 本地提供 `2.1-25` 安装包；待真机验收 |
+| Rootless | 提供 `2.1-26` 安装包，待本版真机验收；前版 `2.1-21` 的前台 CPU 复测见 [真机记录](docs/audits/release-2.1-21-energy/device-validation.md) |
+| Rootful | 本地提供 `2.1-26` 安装包；待真机验收 |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
@@ -40,7 +40,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：当前 `2.1-25` 交付 [Rootless 安装包](packages/2.1-25-shared-height-return/com.wechat.improve_2.1-25_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-25-shared-height-return/com.wechat.improve_2.1-25_iphoneos-arm.deb)、[调试符号](packages/2.1-25-shared-height-return/com.wechat.improve_2.1-25_symbols.zip) 和 [SHA-256](packages/2.1-25-shared-height-return/SHA256SUMS)。本版让所有分组共用切换时的当前滚动高度：A 切 B 沿用 A 的高度，在 B 滚动后再切其他组沿用 B 的高度；内容不足时限制到实际可滚动范围，从聊天会话返回列表时也恢复进入前的滚动高度，详见 [发布记录](docs/audits/release-2.1-25-shared-height-return/README.md)。继续包含 `2.1-22` 的手动备份与后台时段、时长及节能策略，见 [上一版发布记录](docs/audits/release-2.1-22-background-policy/README.md)、[备份指南](docs/backup-guide.md) 和 [后台运行说明](docs/background-run-policy-proposal.md)。本版尚未进行真机位置与能耗验收；`2.1-21` 的 [前台 CPU 复测](docs/audits/release-2.1-21-energy/device-validation.md) 保留为历史证据。原有定时任务时间段规则、左滑启用／停止和 AI 后台兜底开关继续提供。
+1. 获取与设备注入环境匹配的 `.deb`：当前 `2.1-26` 交付 [Rootless 安装包](packages/2.1-26-banner-return/com.wechat.improve_2.1-26_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-26-banner-return/com.wechat.improve_2.1-26_iphoneos-arm.deb)、[调试符号](packages/2.1-26-banner-return/com.wechat.improve_2.1-26_symbols.zip) 和 [SHA-256](packages/2.1-26-banner-return/SHA256SUMS)。本版修正从其他页面返回聊天列表时对未变化的收藏置顶、电脑登录内容的重复重载；真实内容变化继续更新，并保留分组共享滚动高度与聊天返回位置，详见 [发布记录](docs/audits/release-2.1-26-banner-return/README.md)。继续包含 `2.1-22` 的手动备份与后台时段、时长及节能策略，见 [上一版发布记录](docs/audits/release-2.1-22-background-policy/README.md)、[备份指南](docs/backup-guide.md) 和 [后台运行说明](docs/background-run-policy-proposal.md)。本版尚未进行真机顶部区域、位置与能耗验收；`2.1-21` 的 [前台 CPU 复测](docs/audits/release-2.1-21-energy/device-validation.md) 保留为历史证据。原有定时任务时间段规则、左滑启用／停止和 AI 后台兜底开关继续提供。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
@@ -210,7 +210,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.1-25_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-25-shared-height-return/`。
+当前版本默认输出：`packages/com.wechat.improve_2.1-26_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-26-banner-return/`。
 
 ### Rootful
 
@@ -219,7 +219,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.1-25_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-25-shared-height-return/`。
+当前版本默认输出：`packages/com.wechat.improve_2.1-26_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-26-banner-return/`。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -243,7 +243,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.1-25-shared-height-return/com.wechat.improve_2.1-25_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.1-26-banner-return/com.wechat.improve_2.1-26_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。

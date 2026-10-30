@@ -2,7 +2,9 @@
   /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json \
   Controllers/CSNativeSettingsHost.m \
   /Users/zhangshichao/theos/Prefix.pch \
-  Controllers/CSNativeSettingsHost.h
+  Controllers/CSNativeSettingsHost.h \
+  Controllers/CSNativeRewardPresenter.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
 /Users/zhangshichao/theos/Prefix.pch:
 Controllers/CSNativeSettingsHost.h:
+Controllers/CSNativeRewardPresenter.h:

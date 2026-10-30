@@ -1,0 +1,328 @@
+{
+  "shared_cache_uuid": "86ed7643-2a9c-366a-a5ea-4aaa0174fcbf",
+  "sources": [
+    {
+      "path": "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+      "sha256": "df17c58bdb619a16efe3d143fc2c8b7bbee9c63bbc53e858441dbeb20060b9ba",
+      "os_version": {
+        "isEmbedded": true,
+        "train": "iPhone OS 27.0.1",
+        "releaseType": "User",
+        "build": "24A446"
+      },
+      "shared_cache": {
+        "base": 6725058560,
+        "size": 6403145728,
+        "uuid": "86ed7643-2a9c-366a-a5ea-4aaa0174fcbf"
+      }
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+      "sha256": "a51b4971d8355cdecc70cc31ec2ce536c6b9842b7da875baaaccb17839849a4e",
+      "os_version": {
+        "isEmbedded": true,
+        "train": "iPhone OS 27.0.1",
+        "releaseType": "User",
+        "build": "24A446"
+      },
+      "shared_cache": {
+        "base": 6970327040,
+        "size": 6403145728,
+        "uuid": "86ed7643-2a9c-366a-a5ea-4aaa0174fcbf"
+      }
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+      "sha256": "05db1997fdf62120b50f3f29fde1a340929bf4a18b51c3606d8a6234e305bfb6",
+      "os_version": {
+        "isEmbedded": true,
+        "train": "iPhone OS 27.0.1",
+        "releaseType": "User",
+        "build": "24A446"
+      },
+      "shared_cache": {
+        "base": 6652608512,
+        "size": 6403145728,
+        "uuid": "86ed7643-2a9c-366a-a5ea-4aaa0174fcbf"
+      }
+    }
+  ],
+  "images": [
+    {
+      "uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "name": "libobjc.A.dylib",
+      "path": "/usr/lib/libobjc.A.dylib",
+      "cache_offset": 4210688,
+      "cache_offset_hex": "0x404000",
+      "size": 318040,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "d3f59b02-ee07-371b-b091-3f150a078ed8",
+      "name": "dyld",
+      "path": "/usr/lib/dyld",
+      "cache_offset": 4726784,
+      "cache_offset_hex": "0x482000",
+      "size": 751416,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "694c772a-a9f8-3ac0-9417-7c304043a771",
+      "name": "libsystem_pthread.dylib",
+      "path": "/usr/lib/system/libsystem_pthread.dylib",
+      "cache_offset": 5480448,
+      "cache_offset_hex": "0x53a000",
+      "size": 49736,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "77f8a820-161c-35a7-a427-6f9840958c1f",
+      "name": "libsystem_malloc.dylib",
+      "path": "/usr/lib/system/libsystem_malloc.dylib",
+      "cache_offset": 5533696,
+      "cache_offset_hex": "0x547000",
+      "size": 334080,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "name": "CoreFoundation",
+      "path": "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+      "cache_offset": 6270976,
+      "cache_offset_hex": "0x5fb000",
+      "size": 5121912,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "name": "Foundation",
+      "path": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "cache_offset": 11395072,
+      "cache_offset_hex": "0xade000",
+      "size": 18047316,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "76ce2a6e-dba4-335d-a5ac-77a1c1b286a6",
+      "name": "QuartzCore",
+      "path": "/System/Library/Frameworks/QuartzCore.framework/QuartzCore",
+      "cache_offset": 71200768,
+      "cache_offset_hex": "0x43e7000",
+      "size": 4662048,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "name": "UIKitCore",
+      "path": "/System/Library/PrivateFrameworks/UIKitCore.framework/UIKitCore",
+      "cache_offset": 75866112,
+      "cache_offset_hex": "0x485a000",
+      "size": 33777976,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "28af3269-1c11-3e0e-a0de-3c428d05cee6",
+      "name": "libsystem_c.dylib",
+      "path": "/usr/lib/system/libsystem_c.dylib",
+      "cache_offset": 133169152,
+      "cache_offset_hex": "0x7f00000",
+      "size": 528364,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "39ae6f2b-b6ba-3116-9d5b-f97a6d41ff20",
+      "name": "libsystem_platform.dylib",
+      "path": "/usr/lib/system/libsystem_platform.dylib",
+      "cache_offset": 204959744,
+      "cache_offset_hex": "0xc377000",
+      "size": 34432,
+      "sources": [
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+      ]
+    },
+    {
+      "uuid": "0da1f378-7a96-3e21-8f6c-938253ea2ac5",
+      "name": "CFNetwork",
+      "path": "/System/Library/Frameworks/CFNetwork.framework/CFNetwork",
+      "cache_offset": 215396352,
+      "cache_offset_hex": "0xcd6b000",
+      "size": 3631412,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "38dd6d30-4343-3f3f-8869-0938bf2ca23d",
+      "name": "IOKit",
+      "path": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+      "cache_offset": 252116992,
+      "cache_offset_hex": "0xf070000",
+      "size": 817604,
+      "sources": [
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+      ]
+    },
+    {
+      "uuid": "e550c41e-55f6-358a-98b6-18f51ca72123",
+      "name": "libc++.1.dylib",
+      "path": "/usr/lib/libc++.1.dylib",
+      "cache_offset": 393080832,
+      "cache_offset_hex": "0x176df000",
+      "size": 614296,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "name": "JavaScriptCore",
+      "path": "/System/Library/Frameworks/JavaScriptCore.framework/JavaScriptCore",
+      "cache_offset": 440655872,
+      "cache_offset_hex": "0x1a43e000",
+      "size": 40016496,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "d12a79a6-98cb-323c-8f72-613ad0983bbc",
+      "name": "WebKit",
+      "path": "/System/Library/Frameworks/WebKit.framework/WebKit",
+      "cache_offset": 480673792,
+      "cache_offset_hex": "0x1ca68000",
+      "size": 25384788,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "4da48b94-63f8-365c-9969-9ed54a2f813d",
+      "name": "CoreMotion",
+      "path": "/System/Library/Frameworks/CoreMotion.framework/CoreMotion",
+      "cache_offset": 675299328,
+      "cache_offset_hex": "0x28404000",
+      "size": 4697016,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "name": "libdispatch.dylib",
+      "path": "/usr/lib/system/libdispatch.dylib",
+      "cache_offset": 783224832,
+      "cache_offset_hex": "0x2eaf1000",
+      "size": 290072,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+      ]
+    },
+    {
+      "uuid": "d0170165-a973-3dbb-86ea-8eb7d0ea9acb",
+      "name": "GraphicsServices",
+      "path": "/System/Library/PrivateFrameworks/GraphicsServices.framework/GraphicsServices",
+      "cache_offset": 2865725440,
+      "cache_offset_hex": "0xaacf8000",
+      "size": 32420,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "name": "libsystem_kernel.dylib",
+      "path": "/usr/lib/system/libsystem_kernel.dylib",
+      "cache_offset": 3085926400,
+      "cache_offset_hex": "0xb7ef8000",
+      "size": 250396,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "2fc1a9e2-8ade-3559-a13f-0dd8e4dc6e74",
+      "name": "UpdateCycle",
+      "path": "/System/Library/PrivateFrameworks/UpdateCycle.framework/UpdateCycle",
+      "cache_offset": 5149995008,
+      "cache_offset_hex": "0x132f6b000",
+      "size": 7702,
+      "sources": [
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+      ]
+    },
+    {
+      "uuid": "3dced231-83fd-3e80-b36a-1d0a6b66cc1f",
+      "name": "libc++abi.dylib",
+      "path": "/usr/lib/libc++abi.dylib",
+      "cache_offset": 5386575872,
+      "cache_offset_hex": "0x14110a000",
+      "size": 105496,
+      "sources": [
+        "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+      ]
+    },
+    {
+      "uuid": "eeb02d1e-1d99-382a-80f0-d58f6b43e860",
+      "name": "libsystem_blocks.dylib",
+      "path": "/usr/lib/system/libsystem_blocks.dylib",
+      "cache_offset": 5418471424,
+      "cache_offset_hex": "0x142f75000",
+      "size": 12264,
+      "sources": [
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+      ]
+    }
+  ],
+  "limitations": [
+    "Only images present in these crash reports are covered.",
+    "Image ranges use crash usedImages base and size; no function boundaries are inferred."
+  ]
+}

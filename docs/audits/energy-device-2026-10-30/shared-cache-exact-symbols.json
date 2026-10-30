@@ -1,0 +1,2558 @@
+{
+  "shared_cache_uuid": "86ed7643-2a9c-366a-a5ea-4aaa0174fcbf",
+  "sources": [
+    {
+      "path": "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips",
+      "sha256": "df17c58bdb619a16efe3d143fc2c8b7bbee9c63bbc53e858441dbeb20060b9ba",
+      "os_version": {
+        "isEmbedded": true,
+        "train": "iPhone OS 27.0.1",
+        "releaseType": "User",
+        "build": "24A446"
+      },
+      "shared_cache": {
+        "base": 6725058560,
+        "size": 6403145728,
+        "uuid": "86ed7643-2a9c-366a-a5ea-4aaa0174fcbf"
+      }
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+      "sha256": "a51b4971d8355cdecc70cc31ec2ce536c6b9842b7da875baaaccb17839849a4e",
+      "os_version": {
+        "isEmbedded": true,
+        "train": "iPhone OS 27.0.1",
+        "releaseType": "User",
+        "build": "24A446"
+      },
+      "shared_cache": {
+        "base": 6970327040,
+        "size": 6403145728,
+        "uuid": "86ed7643-2a9c-366a-a5ea-4aaa0174fcbf"
+      }
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+      "sha256": "05db1997fdf62120b50f3f29fde1a340929bf4a18b51c3606d8a6234e305bfb6",
+      "os_version": {
+        "isEmbedded": true,
+        "train": "iPhone OS 27.0.1",
+        "releaseType": "User",
+        "build": "24A446"
+      },
+      "shared_cache": {
+        "base": 6652608512,
+        "size": 6403145728,
+        "uuid": "86ed7643-2a9c-366a-a5ea-4aaa0174fcbf"
+      }
+    }
+  ],
+  "symbols": [
+    {
+      "image_uuid": "0da1f378-7a96-3e21-8f6c-938253ea2ac5",
+      "image_offset": 922476,
+      "image_offset_hex": "0xe136c",
+      "variants": [
+        {
+          "symbol": "+[__CFN_CoreSchedulingSetRunnable _run:]",
+          "symbol_location": 392,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "28af3269-1c11-3e0e-a0de-3c428d05cee6",
+      "image_offset": 54624,
+      "image_offset_hex": "0xd560",
+      "variants": [
+        {
+          "symbol": "usleep",
+          "symbol_location": 68,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "28af3269-1c11-3e0e-a0de-3c428d05cee6",
+      "image_offset": 54856,
+      "image_offset_hex": "0xd648",
+      "variants": [
+        {
+          "symbol": "nanosleep",
+          "symbol_location": 220,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "28af3269-1c11-3e0e-a0de-3c428d05cee6",
+      "image_offset": 497988,
+      "image_offset_hex": "0x79944",
+      "variants": [
+        {
+          "symbol": "abort",
+          "symbol_location": 148,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "2fc1a9e2-8ade-3559-a13f-0dd8e4dc6e74",
+      "image_offset": 3008,
+      "image_offset_hex": "0xbc0",
+      "variants": [
+        {
+          "symbol": "UC::DriverCore::continueProcessing()",
+          "symbol_location": 84,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "38dd6d30-4343-3f3f-8869-0938bf2ca23d",
+      "image_offset": 7776,
+      "image_offset_hex": "0x1e60",
+      "variants": [
+        {
+          "symbol": "__IOHIDEventSystemClientQueueCallback",
+          "symbol_location": 364,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "39ae6f2b-b6ba-3116-9d5b-f97a6d41ff20",
+      "image_offset": 8280,
+      "image_offset_hex": "0x2058",
+      "variants": [
+        {
+          "symbol": "_os_unfair_lock_lock_slow",
+          "symbol_location": 192,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "3dced231-83fd-3e80-b36a-1d0a6b66cc1f",
+      "image_offset": 8052,
+      "image_offset_hex": "0x1f74",
+      "variants": [
+        {
+          "symbol": "__cxa_throw",
+          "symbol_location": 92,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "3dced231-83fd-3e80-b36a-1d0a6b66cc1f",
+      "image_offset": 15772,
+      "image_offset_hex": "0x3d9c",
+      "variants": [
+        {
+          "symbol": "__abort_message",
+          "symbol_location": 132,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "3dced231-83fd-3e80-b36a-1d0a6b66cc1f",
+      "image_offset": 36844,
+      "image_offset_hex": "0x8fec",
+      "variants": [
+        {
+          "symbol": "demangling_terminate_handler()",
+          "symbol_location": 296,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "3dced231-83fd-3e80-b36a-1d0a6b66cc1f",
+      "image_offset": 80988,
+      "image_offset_hex": "0x13c5c",
+      "variants": [
+        {
+          "symbol": "std::__terminate(void (*)())",
+          "symbol_location": 16,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "3dced231-83fd-3e80-b36a-1d0a6b66cc1f",
+      "image_offset": 88252,
+      "image_offset_hex": "0x158bc",
+      "variants": [
+        {
+          "symbol": "__cxxabiv1::failed_throw(__cxxabiv1::__cxa_exception*)",
+          "symbol_location": 88,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 53532,
+      "image_offset_hex": "0xd11c",
+      "variants": [
+        {
+          "symbol": "scavenger_thread_main",
+          "symbol_location": 932,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 53972,
+      "image_offset_hex": "0xd2d4",
+      "variants": [
+        {
+          "symbol": "scavenger_thread_main",
+          "symbol_location": 1372,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1602468,
+      "image_offset_hex": "0x1873a4",
+      "variants": [
+        {
+          "symbol": "WTF::ParallelHelperClient::runTask(WTF::RefPtr<WTF::SharedTask<void ()>, WTF::RawPtrTraits<WTF::SharedTask<void ()>>, WTF::DefaultRefDerefTraits<WTF::SharedTask<void ()>>> const&)",
+          "symbol_location": 72,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1610872,
+      "image_offset_hex": "0x189478",
+      "variants": [
+        {
+          "symbol": "WTF::ParallelHelperPool::Thread::work()",
+          "symbol_location": 32,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1613176,
+      "image_offset_hex": "0x189d78",
+      "variants": [
+        {
+          "symbol": "JSC::MarkingConstraintSolver::runExecutionThread(JSC::SlotVisitor&, JSC::MarkingConstraintSolver::SchedulerPreference, WTF::ScopedLambda<std::__1::optional<unsigned int> ()>)",
+          "symbol_location": 836,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1614028,
+      "image_offset_hex": "0x18a0cc",
+      "variants": [
+        {
+          "symbol": "JSC::SlotVisitor::drain(WTF::MonotonicTime)",
+          "symbol_location": 348,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1614076,
+      "image_offset_hex": "0x18a0fc",
+      "variants": [
+        {
+          "symbol": "JSC::SlotVisitor::drain(WTF::MonotonicTime)",
+          "symbol_location": 396,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1614580,
+      "image_offset_hex": "0x18a2f4",
+      "variants": [
+        {
+          "symbol": "JSC::SlotVisitor::drain(WTF::MonotonicTime)",
+          "symbol_location": 900,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1615900,
+      "image_offset_hex": "0x18a81c",
+      "variants": [
+        {
+          "symbol": "JSC::Heap::runFixpointPhase(JSC::GCConductor)",
+          "symbol_location": 196,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1629628,
+      "image_offset_hex": "0x18ddbc",
+      "variants": [
+        {
+          "symbol": "JSC::JSObjectWithButterfly::visitChildren(JSC::JSCell*, JSC::SlotVisitor&)",
+          "symbol_location": 9440,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1642448,
+      "image_offset_hex": "0x190fd0",
+      "variants": [
+        {
+          "symbol": "JSC::MarkingConstraintSet::executeConvergenceImpl(JSC::SlotVisitor&)",
+          "symbol_location": 604,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1666744,
+      "image_offset_hex": "0x196eb8",
+      "variants": [
+        {
+          "symbol": "WTF::ParkingLot::parkConditionallyImpl(void const*, WTF::ScopedLambda<bool ()> const&, WTF::ScopedLambda<void ()> const&, WTF::TimeWithDynamicClockType const&)",
+          "symbol_location": 764,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1678500,
+      "image_offset_hex": "0x199ca4",
+      "variants": [
+        {
+          "symbol": "JSC::SlotVisitor::drainFromShared(JSC::SlotVisitor::SharedDrainMode, WTF::MonotonicTime)",
+          "symbol_location": 700,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1702688,
+      "image_offset_hex": "0x19fb20",
+      "variants": [
+        {
+          "symbol": "WTF::Thread::entryPoint(WTF::Thread::NewThreadContext*)",
+          "symbol_location": 316,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 1703064,
+      "image_offset_hex": "0x19fc98",
+      "variants": [
+        {
+          "symbol": "WTF::wtfThreadEntryPoint(void*)",
+          "symbol_location": 16,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2073104,
+      "image_offset_hex": "0x1fa210",
+      "variants": [
+        {
+          "symbol": "JSC::JSLexicalEnvironment::visitChildren(JSC::JSCell*, JSC::SlotVisitor&)",
+          "symbol_location": 556,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2131088,
+      "image_offset_hex": "0x208490",
+      "variants": [
+        {
+          "symbol": "WTF::SharedTaskFunctor<void (), JSC::Heap::runBeginPhase(JSC::GCConductor)::$_1>::run()",
+          "symbol_location": 172,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2131708,
+      "image_offset_hex": "0x2086fc",
+      "variants": [
+        {
+          "symbol": "JSC::MarkingConstraintSolver::execute(JSC::MarkingConstraintSolver::SchedulerPreference, WTF::ScopedLambda<std::__1::optional<unsigned int> ()>)",
+          "symbol_location": 172,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2140812,
+      "image_offset_hex": "0x20aa8c",
+      "variants": [
+        {
+          "symbol": "JSC::GetterSetter::visitChildren(JSC::JSCell*, JSC::SlotVisitor&)",
+          "symbol_location": 464,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2153600,
+      "image_offset_hex": "0x20dc80",
+      "variants": [
+        {
+          "symbol": "JSC::MachineThreads::tryCopyOtherThreadStack(WTF::ThreadSuspendLocker const&, WTF::Thread&, void*, unsigned long, unsigned long*)",
+          "symbol_location": 80,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2445104,
+      "image_offset_hex": "0x254f30",
+      "variants": [
+        {
+          "symbol": "WTF::Detail::CallableWrapper<WTF::AutomaticThread::start(WTF::AbstractLocker const&)::$_0, void>::call()",
+          "symbol_location": 380,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2445272,
+      "image_offset_hex": "0x254fd8",
+      "variants": [
+        {
+          "symbol": "WTF::Detail::CallableWrapper<WTF::AutomaticThread::start(WTF::AbstractLocker const&)::$_0, void>::call()",
+          "symbol_location": 548,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2445988,
+      "image_offset_hex": "0x2552a4",
+      "variants": [
+        {
+          "symbol": "JSC::Heap::runCurrentPhase(JSC::GCConductor, JSC::CurrentThreadState*)",
+          "symbol_location": 172,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2446024,
+      "image_offset_hex": "0x2552c8",
+      "variants": [
+        {
+          "symbol": "JSC::Heap::runCurrentPhase(JSC::GCConductor, JSC::CurrentThreadState*)",
+          "symbol_location": 208,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2447860,
+      "image_offset_hex": "0x2559f4",
+      "variants": [
+        {
+          "symbol": "JSC::Heap::runTaskInParallel(WTF::RefPtr<WTF::SharedTask<void (JSC::SlotVisitor&)>, WTF::RawPtrTraits<WTF::SharedTask<void (JSC::SlotVisitor&)>>, WTF::DefaultRefDerefTraits<WTF::SharedTask<void (JSC::SlotVisitor&)>>>)",
+          "symbol_location": 212,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2453496,
+      "image_offset_hex": "0x256ff8",
+      "variants": [
+        {
+          "symbol": "WTF::Detail::CallableWrapper<JSC::Heap::addCoreConstraints()::$_1, void, JSC::SlotVisitor&>::call(JSC::SlotVisitor&)",
+          "symbol_location": 528,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2455012,
+      "image_offset_hex": "0x2575e4",
+      "variants": [
+        {
+          "symbol": "JSC::MachineThreads::gatherConservativeRoots(JSC::ConservativeRoots&, JSC::JITStubRoutineSet&, JSC::CodeBlockSet&, JSC::CurrentThreadState*, WTF::Thread*)",
+          "symbol_location": 308,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 2460284,
+      "image_offset_hex": "0x258a7c",
+      "variants": [
+        {
+          "symbol": "JSC::MachineThreads::tryCopyOtherThreadStacks(WTF::AbstractLocker const&, void*, unsigned long, unsigned long*, WTF::Thread&)",
+          "symbol_location": 880,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 3028104,
+      "image_offset_hex": "0x2e3488",
+      "variants": [
+        {
+          "symbol": "JSC::Heap::runConcurrentPhase(JSC::GCConductor)",
+          "symbol_location": 648,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "491b0c39-bd9e-38d5-8e0b-99717ac3531b",
+      "image_offset": 24755572,
+      "image_offset_hex": "0x179bd74",
+      "variants": [
+        {
+          "symbol": "JSC::Heap::HeapThread::work()",
+          "symbol_location": 36,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 2792,
+      "image_offset_hex": "0xae8",
+      "variants": [
+        {
+          "symbol": "__ulock_wait2",
+          "symbol_location": 8,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 3152,
+      "image_offset_hex": "0xc50",
+      "variants": [
+        {
+          "symbol": "semaphore_wait_trap",
+          "symbol_location": 8,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 3284,
+      "image_offset_hex": "0xcd4",
+      "variants": [
+        {
+          "symbol": "mach_msg2_trap",
+          "symbol_location": 8,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 3776,
+      "image_offset_hex": "0xec0",
+      "variants": [
+        {
+          "symbol": "mach_absolute_time",
+          "symbol_location": 108,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 6800,
+      "image_offset_hex": "0x1a90",
+      "variants": [
+        {
+          "symbol": "thread_get_state",
+          "symbol_location": 256,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 8912,
+      "image_offset_hex": "0x22d0",
+      "variants": [
+        {
+          "symbol": "thread_suspend",
+          "symbol_location": 108,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 16500,
+      "image_offset_hex": "0x4074",
+      "variants": [
+        {
+          "symbol": "mach_msg",
+          "symbol_location": 24,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 16936,
+      "image_offset_hex": "0x4228",
+      "variants": [
+        {
+          "symbol": "mach_msg_overwrite",
+          "symbol_location": 424,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 17160,
+      "image_offset_hex": "0x4308",
+      "variants": [
+        {
+          "symbol": "mach_msg2_internal",
+          "symbol_location": 76,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 17304,
+      "image_offset_hex": "0x4398",
+      "variants": [
+        {
+          "symbol": "mach_msg2_internal",
+          "symbol_location": 220,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 26104,
+      "image_offset_hex": "0x65f8",
+      "variants": [
+        {
+          "symbol": "__psynch_cvwait",
+          "symbol_location": 8,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 26280,
+      "image_offset_hex": "0x66a8",
+      "variants": [
+        {
+          "symbol": "__getattrlist",
+          "symbol_location": 8,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 26648,
+      "image_offset_hex": "0x6818",
+      "variants": [
+        {
+          "symbol": "__semwait_signal",
+          "symbol_location": 8,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 30964,
+      "image_offset_hex": "0x78f4",
+      "variants": [
+        {
+          "symbol": "kevent",
+          "symbol_location": 8,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 45564,
+      "image_offset_hex": "0xb1fc",
+      "variants": [
+        {
+          "symbol": "__pthread_kill",
+          "symbol_location": 8,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "5a7dc6be-551b-3b29-a928-a4079a90d4d2",
+      "image_offset": 86236,
+      "image_offset_hex": "0x150dc",
+      "variants": [
+        {
+          "symbol": "poll",
+          "symbol_location": 8,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "694c772a-a9f8-3ac0-9417-7c304043a771",
+      "image_offset": 2320,
+      "image_offset_hex": "0x910",
+      "variants": [
+        {
+          "symbol": "start_wqthread",
+          "symbol_location": 8,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "694c772a-a9f8-3ac0-9417-7c304043a771",
+      "image_offset": 2332,
+      "image_offset_hex": "0x91c",
+      "variants": [
+        {
+          "symbol": "thread_start",
+          "symbol_location": 8,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "694c772a-a9f8-3ac0-9417-7c304043a771",
+      "image_offset": 4664,
+      "image_offset_hex": "0x1238",
+      "variants": [
+        {
+          "symbol": "_pthread_wqthread",
+          "symbol_location": 292,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "694c772a-a9f8-3ac0-9417-7c304043a771",
+      "image_offset": 7584,
+      "image_offset_hex": "0x1da0",
+      "variants": [
+        {
+          "symbol": "_pthread_cond_wait",
+          "symbol_location": 980,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "694c772a-a9f8-3ac0-9417-7c304043a771",
+      "image_offset": 7628,
+      "image_offset_hex": "0x1dcc",
+      "variants": [
+        {
+          "symbol": "_pthread_cond_wait",
+          "symbol_location": 1024,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "694c772a-a9f8-3ac0-9417-7c304043a771",
+      "image_offset": 16440,
+      "image_offset_hex": "0x4038",
+      "variants": [
+        {
+          "symbol": "_pthread_start",
+          "symbol_location": 136,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "694c772a-a9f8-3ac0-9417-7c304043a771",
+      "image_offset": 16452,
+      "image_offset_hex": "0x4044",
+      "variants": [
+        {
+          "symbol": "_pthread_start",
+          "symbol_location": 148,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "694c772a-a9f8-3ac0-9417-7c304043a771",
+      "image_offset": 18864,
+      "image_offset_hex": "0x49b0",
+      "variants": [
+        {
+          "symbol": "_pthread_tsd_cleanup",
+          "symbol_location": 536,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "694c772a-a9f8-3ac0-9417-7c304043a771",
+      "image_offset": 19136,
+      "image_offset_hex": "0x4ac0",
+      "variants": [
+        {
+          "symbol": "_pthread_exit",
+          "symbol_location": 84,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "694c772a-a9f8-3ac0-9417-7c304043a771",
+      "image_offset": 29788,
+      "image_offset_hex": "0x745c",
+      "variants": [
+        {
+          "symbol": "pthread_kill",
+          "symbol_location": 268,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "76ce2a6e-dba4-335d-a5ac-77a1c1b286a6",
+      "image_offset": 59272,
+      "image_offset_hex": "0xe788",
+      "variants": [
+        {
+          "symbol": "CA::Layer::update_if_needed_(CA::Transaction*, CA::LayerUpdateReason)",
+          "symbol_location": 1120,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "76ce2a6e-dba4-335d-a5ac-77a1c1b286a6",
+      "image_offset": 60368,
+      "image_offset_hex": "0xebd0",
+      "variants": [
+        {
+          "symbol": "CA::Layer::perform_update_(CA::Layer*, CALayer*, unsigned int, CA::LayerUpdateReason, CA::Transaction*)",
+          "symbol_location": 596,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "76ce2a6e-dba4-335d-a5ac-77a1c1b286a6",
+      "image_offset": 62900,
+      "image_offset_hex": "0xf5b4",
+      "variants": [
+        {
+          "symbol": "-[CALayer layoutSublayers]",
+          "symbol_location": 496,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "76ce2a6e-dba4-335d-a5ac-77a1c1b286a6",
+      "image_offset": 120256,
+      "image_offset_hex": "0x1d5c0",
+      "variants": [
+        {
+          "symbol": "CA::Transaction::flush_as_runloop_observer(bool)",
+          "symbol_location": 224,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "76ce2a6e-dba4-335d-a5ac-77a1c1b286a6",
+      "image_offset": 120768,
+      "image_offset_hex": "0x1d7c0",
+      "variants": [
+        {
+          "symbol": "CA::Transaction::commit()",
+          "symbol_location": 428,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "76ce2a6e-dba4-335d-a5ac-77a1c1b286a6",
+      "image_offset": 122904,
+      "image_offset_hex": "0x1e018",
+      "variants": [
+        {
+          "symbol": "CA::Transaction::flush()",
+          "symbol_location": 84,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "76ce2a6e-dba4-335d-a5ac-77a1c1b286a6",
+      "image_offset": 123848,
+      "image_offset_hex": "0x1e3c8",
+      "variants": [
+        {
+          "symbol": "CA::Context::commit_transaction(CA::Transaction*, double, double*)",
+          "symbol_location": 568,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "76ce2a6e-dba4-335d-a5ac-77a1c1b286a6",
+      "image_offset": 138908,
+      "image_offset_hex": "0x21e9c",
+      "variants": [
+        {
+          "symbol": "CA::Layer::layout_and_display_if_needed(CA::Transaction*)",
+          "symbol_location": 132,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "76ce2a6e-dba4-335d-a5ac-77a1c1b286a6",
+      "image_offset": 1174148,
+      "image_offset_hex": "0x11ea84",
+      "variants": [
+        {
+          "symbol": "run_animation_callbacks(void*)",
+          "symbol_location": 196,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "image_offset": 7372,
+      "image_offset_hex": "0x1ccc",
+      "variants": [
+        {
+          "symbol": "_dispatch_call_block_and_release",
+          "symbol_location": 32,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "image_offset": 42768,
+      "image_offset_hex": "0xa710",
+      "variants": [
+        {
+          "symbol": "_dispatch_lane_serial_drain",
+          "symbol_location": 280,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "image_offset": 43132,
+      "image_offset_hex": "0xa87c",
+      "variants": [
+        {
+          "symbol": "_dispatch_lane_serial_drain",
+          "symbol_location": 644,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "image_offset": 46192,
+      "image_offset_hex": "0xb470",
+      "variants": [
+        {
+          "symbol": "_dispatch_lane_invoke",
+          "symbol_location": 312,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "image_offset": 69700,
+      "image_offset_hex": "0x11044",
+      "variants": [
+        {
+          "symbol": "_dispatch_main_queue_callback_4CF",
+          "symbol_location": 44,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "image_offset": 70516,
+      "image_offset_hex": "0x11374",
+      "variants": [
+        {
+          "symbol": "_dispatch_main_queue_drain",
+          "symbol_location": 800,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "image_offset": 87728,
+      "image_offset_hex": "0x156b0",
+      "variants": [
+        {
+          "symbol": "_dispatch_workloop_worker_thread",
+          "symbol_location": 640,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "image_offset": 89228,
+      "image_offset_hex": "0x15c8c",
+      "variants": [
+        {
+          "symbol": "_dispatch_root_queue_drain_deferred_wlh",
+          "symbol_location": 248,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "image_offset": 100980,
+      "image_offset_hex": "0x18a74",
+      "variants": [
+        {
+          "symbol": "_dispatch_source_invoke",
+          "symbol_location": 1124,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "image_offset": 104684,
+      "image_offset_hex": "0x198ec",
+      "variants": [
+        {
+          "symbol": "_dispatch_source_handler_dispose",
+          "symbol_location": 36,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "image_offset": 105448,
+      "image_offset_hex": "0x19be8",
+      "variants": [
+        {
+          "symbol": "_dispatch_source_latch_and_call",
+          "symbol_location": 216,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "8cdf4610-f6a5-39cb-94bf-687fe349a4be",
+      "image_offset": 114612,
+      "image_offset_hex": "0x1bfb4",
+      "variants": [
+        {
+          "symbol": "_dispatch_client_callout",
+          "symbol_location": 16,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 157644,
+      "image_offset_hex": "0x267cc",
+      "variants": [
+        {
+          "symbol": "__CFMachPortPerform",
+          "symbol_location": 144,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 238468,
+      "image_offset_hex": "0x3a384",
+      "variants": [
+        {
+          "symbol": "__CFRunLoopRun",
+          "symbol_location": 416,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 238648,
+      "image_offset_hex": "0x3a438",
+      "variants": [
+        {
+          "symbol": "__CFRunLoopRun",
+          "symbol_location": 596,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 239156,
+      "image_offset_hex": "0x3a634",
+      "variants": [
+        {
+          "symbol": "__CFRunLoopRun",
+          "symbol_location": 1104,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 239756,
+      "image_offset_hex": "0x3a88c",
+      "variants": [
+        {
+          "symbol": "__CFRunLoopRun",
+          "symbol_location": 1704,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 242280,
+      "image_offset_hex": "0x3b268",
+      "variants": [
+        {
+          "symbol": "__CFRunLoopDoSources0",
+          "symbol_location": 316,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 242796,
+      "image_offset_hex": "0x3b46c",
+      "variants": [
+        {
+          "symbol": "__CFRunLoopServiceMachPort",
+          "symbol_location": 136,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 243700,
+      "image_offset_hex": "0x3b7f4",
+      "variants": [
+        {
+          "symbol": "_CFRunLoopRunSpecificWithOptions",
+          "symbol_location": 344,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 300960,
+      "image_offset_hex": "0x497a0",
+      "variants": [
+        {
+          "symbol": "__CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__",
+          "symbol_location": 16,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 303692,
+      "image_offset_hex": "0x4a24c",
+      "variants": [
+        {
+          "symbol": "__CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE1_PERFORM_FUNCTION__",
+          "symbol_location": 60,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 304220,
+      "image_offset_hex": "0x4a45c",
+      "variants": [
+        {
+          "symbol": "__CFRunLoopDoSource1",
+          "symbol_location": 508,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 342264,
+      "image_offset_hex": "0x538f8",
+      "variants": [
+        {
+          "symbol": "___forwarding___",
+          "symbol_location": 880,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 342960,
+      "image_offset_hex": "0x53bb0",
+      "variants": [
+        {
+          "symbol": "_CF_forwarding_prep_0",
+          "symbol_location": 96,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 367508,
+      "image_offset_hex": "0x59b94",
+      "variants": [
+        {
+          "symbol": "__CFRunLoopDoSource0",
+          "symbol_location": 192,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 367648,
+      "image_offset_hex": "0x59c20",
+      "variants": [
+        {
+          "symbol": "__CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__",
+          "symbol_location": 28,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 743604,
+      "image_offset_hex": "0xb58b4",
+      "variants": [
+        {
+          "symbol": "-[__NSCFNumber descriptionWithLocale:]",
+          "symbol_location": 56,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 908712,
+      "image_offset_hex": "0xddda8",
+      "variants": [
+        {
+          "symbol": "CFRunLoopRun",
+          "symbol_location": 64,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "9426fc9a-b36c-3096-b836-d17d6744a75b",
+      "image_offset": 1669388,
+      "image_offset_hex": "0x19790c",
+      "variants": [
+        {
+          "symbol": "-[NSObject(NSObject) doesNotRecognizeSelector:]",
+          "symbol_location": 384,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 31576,
+      "image_offset_hex": "0x7b58",
+      "variants": [
+        {
+          "symbol": "-[UIView(Hierarchy) layoutBelowIfNeeded]",
+          "symbol_location": 320,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 38712,
+      "image_offset_hex": "0x9738",
+      "variants": [
+        {
+          "symbol": "-[UIView(CALayerDelegate) layoutSublayersOfLayer:]",
+          "symbol_location": 2600,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 104248,
+      "image_offset_hex": "0x19738",
+      "variants": [
+        {
+          "symbol": "-[UIViewController loadViewIfRequired]",
+          "symbol_location": 964,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 122364,
+      "image_offset_hex": "0x1ddfc",
+      "variants": [
+        {
+          "symbol": "-[UIViewController _sendViewDidLoadWithAppearanceProxyObjectTaggingEnabled]",
+          "symbol_location": 92,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 148196,
+      "image_offset_hex": "0x242e4",
+      "variants": [
+        {
+          "symbol": "+[UIView(Animation) performWithoutAnimation:]",
+          "symbol_location": 76,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 195328,
+      "image_offset_hex": "0x2fb00",
+      "variants": [
+        {
+          "symbol": "-[UIViewAnimationBlockDelegate _didEndBlockAnimation:finished:context:]",
+          "symbol_location": 628,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 195648,
+      "image_offset_hex": "0x2fc40",
+      "variants": [
+        {
+          "symbol": "-[UIViewAnimationState sendDelegateAnimationDidStop:finished:]",
+          "symbol_location": 256,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 338256,
+      "image_offset_hex": "0x52950",
+      "variants": [
+        {
+          "symbol": "-[UIViewController view]",
+          "symbol_location": 24,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 394600,
+      "image_offset_hex": "0x60568",
+      "variants": [
+        {
+          "symbol": "-[_UIAfterCACommitBlock run]",
+          "symbol_location": 72,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 405108,
+      "image_offset_hex": "0x62e74",
+      "variants": [
+        {
+          "symbol": "__setupUpdateSequence_block_invoke_2",
+          "symbol_location": 336,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 407552,
+      "image_offset_hex": "0x63800",
+      "variants": [
+        {
+          "symbol": "_UIApplicationFlushCATransaction",
+          "symbol_location": 52,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 432424,
+      "image_offset_hex": "0x69928",
+      "variants": [
+        {
+          "symbol": "schedulerStepScheduledMainSectionContinue",
+          "symbol_location": 48,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 433032,
+      "image_offset_hex": "0x69b88",
+      "variants": [
+        {
+          "symbol": "_UIUpdateSequenceRunNext",
+          "symbol_location": 128,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 762316,
+      "image_offset_hex": "0xba1cc",
+      "variants": [
+        {
+          "symbol": "UIApplicationMain",
+          "symbol_location": 336,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 765172,
+      "image_offset_hex": "0xbacf4",
+      "variants": [
+        {
+          "symbol": "-[UIViewAnimationState animationDidStop:finished:]",
+          "symbol_location": 192,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 766372,
+      "image_offset_hex": "0xbb1a4",
+      "variants": [
+        {
+          "symbol": "__UIVIEW_IS_EXECUTING_ANIMATION_COMPLETION_BLOCK__",
+          "symbol_location": 36,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 1228944,
+      "image_offset_hex": "0x12c090",
+      "variants": [
+        {
+          "symbol": "-[_UIAfterCACommitQueue flush]",
+          "symbol_location": 168,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 1526588,
+      "image_offset_hex": "0x174b3c",
+      "variants": [
+        {
+          "symbol": "__77-[UIPresentationController runTransitionForCurrentStateAnimated:handoffData:]_block_invoke_3",
+          "symbol_location": 128,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 3799684,
+      "image_offset_hex": "0x39fa84",
+      "variants": [
+        {
+          "symbol": "-[UINavigationController _preferredContentSizeForcingLoad:]",
+          "symbol_location": 148,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 5263672,
+      "image_offset_hex": "0x505138",
+      "variants": [
+        {
+          "symbol": "-[UITableView _updateSeparatorStateForVisibleCells]",
+          "symbol_location": 196,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 5292984,
+      "image_offset_hex": "0x50c3b8",
+      "variants": [
+        {
+          "symbol": "-[UITableView _delegateWantsHeaderForSection:]",
+          "symbol_location": 152,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 6031872,
+      "image_offset_hex": "0x5c0a00",
+      "variants": [
+        {
+          "symbol": "-[UITableView layoutSubviews]",
+          "symbol_location": 152,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 6039840,
+      "image_offset_hex": "0x5c2920",
+      "variants": [
+        {
+          "symbol": "-[UITableView _updateVisibleCellsNow:]",
+          "symbol_location": 1100,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 6041368,
+      "image_offset_hex": "0x5c2f18",
+      "variants": [
+        {
+          "symbol": "-[UITableView _updateVisibleCellsForRanges:createIfNecessary:]",
+          "symbol_location": 444,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 6054632,
+      "image_offset_hex": "0x5c62e8",
+      "variants": [
+        {
+          "symbol": "-[UITableView _updateSeparatorStateForCell:atIndexPath:]",
+          "symbol_location": 80,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 6059584,
+      "image_offset_hex": "0x5c7640",
+      "variants": [
+        {
+          "symbol": "-[UITableView _createPreparedCellForGlobalRow:withIndexPath:willDisplay:]",
+          "symbol_location": 1776,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 6101048,
+      "image_offset_hex": "0x5d1838",
+      "variants": [
+        {
+          "symbol": "-[UITableView _shouldDrawSeparatorAtTopOfSectionForCellAtIndexPath:]",
+          "symbol_location": 64,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 6404296,
+      "image_offset_hex": "0x61b8c8",
+      "variants": [
+        {
+          "symbol": "-[UIPresentationController preferredContentSizeDidChangeForChildContentContainer:]",
+          "symbol_location": 48,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 6903268,
+      "image_offset_hex": "0x6955e4",
+      "variants": [
+        {
+          "symbol": "-[UITableView _shouldDrawTopSeparatorDueToMergedBarForCellAtIndexPath:]",
+          "symbol_location": 276,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "aac84a00-13ab-3b06-b622-a4e676971eb8",
+      "image_offset": 7866556,
+      "image_offset_hex": "0x7808bc",
+      "variants": [
+        {
+          "symbol": "-[UITableView _updateAnimationDidStopWithOldVisibleViews:finished:context:]",
+          "symbol_location": 1128,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 138664,
+      "image_offset_hex": "0x21da8",
+      "variants": [
+        {
+          "symbol": "-[NSRunLoop(NSRunLoop) runMode:beforeDate:]",
+          "symbol_location": 212,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 451616,
+      "image_offset_hex": "0x6e420",
+      "variants": [
+        {
+          "symbol": "+[NSBlockOperation blockOperationWithBlock:]",
+          "symbol_location": 32,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 451676,
+      "image_offset_hex": "0x6e45c",
+      "variants": [
+        {
+          "symbol": "-[NSOperationQueue addOperationWithBlock:]",
+          "symbol_location": 32,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 473644,
+      "image_offset_hex": "0x73a2c",
+      "variants": [
+        {
+          "symbol": "-[NSBlockOperation init]",
+          "symbol_location": 60,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 913616,
+      "image_offset_hex": "0xdf0d0",
+      "variants": [
+        {
+          "symbol": "specialized NSFileManager.withFileSystemRepresentation<A>(for:_:)",
+          "symbol_location": 184,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 1154276,
+      "image_offset_hex": "0x119ce4",
+      "variants": [
+        {
+          "symbol": "specialized static _FileManagerImpl._fileProtectionValueForPath(_:)",
+          "symbol_location": 80,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 1259752,
+      "image_offset_hex": "0x1338e8",
+      "variants": [
+        {
+          "symbol": "@objc _NSFileManagerBridge.attributesOfItem(atPath:)",
+          "symbol_location": 136,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 1269684,
+      "image_offset_hex": "0x135fb4",
+      "variants": [
+        {
+          "symbol": "closure #1 in _FileManagerImpl.attributesOfItem(atPath:)",
+          "symbol_location": 9520,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 1276112,
+      "image_offset_hex": "0x1378d0",
+      "variants": [
+        {
+          "symbol": "-[NSBlockOperation initWithBlock:]",
+          "symbol_location": 36,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 1617340,
+      "image_offset_hex": "0x18adbc",
+      "variants": [
+        {
+          "symbol": "partial apply for closure #1 in _FileManagerImpl.attributesOfItem(atPath:)",
+          "symbol_location": 24,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 2223836,
+      "image_offset_hex": "0x21eedc",
+      "variants": [
+        {
+          "symbol": "__NSThread__start__",
+          "symbol_location": 732,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 3283596,
+      "image_offset_hex": "0x321a8c",
+      "variants": [
+        {
+          "symbol": "+[NSThread sleepForTimeInterval:]",
+          "symbol_location": 152,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "c041f1d0-5ef1-30a3-bf96-830976173b56",
+      "image_offset": 3688872,
+      "image_offset_hex": "0x3849a8",
+      "variants": [
+        {
+          "symbol": "specialized String.withFileSystemRepresentation<A>(_:)",
+          "symbol_location": 244,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "d0170165-a973-3dbb-86ea-8eb7d0ea9acb",
+      "image_offset": 3876,
+      "image_offset_hex": "0xf24",
+      "variants": [
+        {
+          "symbol": "GSEventRunModal",
+          "symbol_location": 120,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "d12a79a6-98cb-323c-8f72-613ad0983bbc",
+      "image_offset": 776088,
+      "image_offset_hex": "0xbd798",
+      "variants": [
+        {
+          "symbol": "WTF::Detail::CallableWrapper<IPC::StreamConnectionWorkQueue::startProcessingThread()::$_0, void>::call()",
+          "symbol_location": 48,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "d3f59b02-ee07-371b-b091-3f150a078ed8",
+      "image_offset": 9016,
+      "image_offset_hex": "0x2338",
+      "variants": [
+        {
+          "symbol": "dyld4::APIs::_dyld_for_each_objc_class(char const*, dyld4::ReadOnlyCallback<void (void*, bool, bool*) block_pointer>)",
+          "symbol_location": 184,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "d3f59b02-ee07-371b-b091-3f150a078ed8",
+      "image_offset": 9232,
+      "image_offset_hex": "0x2410",
+      "variants": [
+        {
+          "symbol": "void dyld3::MultiMapBase<prebuilt_objc::ObjCStringKeyOnDisk, prebuilt_objc::ObjCObjectOnDiskLocation, prebuilt_objc::HashObjCStringKeyOnDisk, prebuilt_objc::EqualObjCStringKeyOnDisk>::forEachEntry<char const*>(dyld3::Array<unsigned long long> const&, dyld3::Array<dyld3::MultiMapBase<prebuilt_objc::ObjCStringKeyOnDisk, prebuilt_objc::ObjCObjectOnDiskLocation, prebuilt_objc::HashObjCStringKeyOnDisk, prebuilt_objc::EqualObjCStringKeyOnDisk>::NodeEntryT> const&, void*, char const* const&, void (dyld3::Array<prebuilt_objc::ObjCObjectOnDiskLocation const*> const&) block_pointer) const",
+          "symbol_location": 52,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "d3f59b02-ee07-371b-b091-3f150a078ed8",
+      "image_offset": 11424,
+      "image_offset_hex": "0x2ca0",
+      "variants": [
+        {
+          "symbol": "prebuilt_objc::forEachClass(dyld4::RuntimeState*, dyld3::MultiMapView<prebuilt_objc::ObjCStringKeyOnDisk, prebuilt_objc::ObjCObjectOnDiskLocation, prebuilt_objc::HashObjCStringKeyOnDisk, prebuilt_objc::EqualObjCStringKeyOnDisk> const&, char const*, void (dyld3::Array<dyld4::PrebuiltLoader::BindTargetRef const*> const&) block_pointer)",
+          "symbol_location": 120,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "d3f59b02-ee07-371b-b091-3f150a078ed8",
+      "image_offset": 21944,
+      "image_offset_hex": "0x55b8",
+      "variants": [
+        {
+          "symbol": "start",
+          "symbol_location": 6616,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e550c41e-55f6-358a-98b6-18f51ca72123",
+      "image_offset": 43680,
+      "image_offset_hex": "0xaaa0",
+      "variants": [
+        {
+          "symbol": "std::__1::this_thread::sleep_for(std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l>> const&)",
+          "symbol_location": 84,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e550c41e-55f6-358a-98b6-18f51ca72123",
+      "image_offset": 43752,
+      "image_offset_hex": "0xaae8",
+      "variants": [
+        {
+          "symbol": "std::__1::condition_variable::wait(std::__1::unique_lock<std::__1::mutex>&)",
+          "symbol_location": 32,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e550c41e-55f6-358a-98b6-18f51ca72123",
+      "image_offset": 43904,
+      "image_offset_hex": "0xab80",
+      "variants": [
+        {
+          "symbol": "std::__1::condition_variable::__do_timed_wait(std::__1::unique_lock<std::__1::mutex>&, std::__1::chrono::time_point<std::__1::chrono::system_clock, std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l>>>)",
+          "symbol_location": 104,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips",
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips",
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 4724,
+      "image_offset_hex": "0x1274",
+      "variants": [
+        {
+          "symbol": "objc_retain",
+          "symbol_location": 8,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/merge-runtime-1.8-34/WeChat-2026-10-20-110818.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 14040,
+      "image_offset_hex": "0x36d8",
+      "variants": [
+        {
+          "symbol": "objc_destructInstance",
+          "symbol_location": 44,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 14196,
+      "image_offset_hex": "0x3774",
+      "variants": [
+        {
+          "symbol": "_object_remove_associations",
+          "symbol_location": 128,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 15300,
+      "image_offset_hex": "0x3bc4",
+      "variants": [
+        {
+          "symbol": "objc_destructInstance_nonnull_realized(objc_object*)",
+          "symbol_location": 92,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 39864,
+      "image_offset_hex": "0x9bb8",
+      "variants": [
+        {
+          "symbol": "objc_getAssociatedObject",
+          "symbol_location": 84,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 41124,
+      "image_offset_hex": "0xa0a4",
+      "variants": [
+        {
+          "symbol": "look_up_class",
+          "symbol_location": 92,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 41928,
+      "image_offset_hex": "0xa3c8",
+      "variants": [
+        {
+          "symbol": "getPreoptimizedClass",
+          "symbol_location": 132,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 42024,
+      "image_offset_hex": "0xa428",
+      "variants": [
+        {
+          "symbol": "getClassExceptSomeSwift(char const*)",
+          "symbol_location": 36,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 44892,
+      "image_offset_hex": "0xaf5c",
+      "variants": [
+        {
+          "symbol": "objc_setAssociatedObject",
+          "symbol_location": 452,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 50408,
+      "image_offset_hex": "0xc4e8",
+      "variants": [
+        {
+          "symbol": "objc_exception_throw",
+          "symbol_location": 448,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 186160,
+      "image_offset_hex": "0x2d730",
+      "variants": [
+        {
+          "symbol": "bool objc::DenseMapBase<objc::DenseMap<DisguisedPtr<objc_object>, objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>, objc::DenseMapValueInfo<objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>>, objc::DenseMapInfo<DisguisedPtr<objc_object>>, objc::detail::DenseMapPair<DisguisedPtr<objc_object>, objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>>>, DisguisedPtr<objc_object>, objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>, objc::DenseMapValueInfo<objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>>, objc::DenseMapInfo<DisguisedPtr<objc_object>>, objc::detail::DenseMapPair<DisguisedPtr<objc_object>, objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>>>::LookupBucketFor<DisguisedPtr<objc_object>>(DisguisedPtr<objc_object> const&, objc::detail::DenseMapPair<DisguisedPtr<objc_object>, objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>> const*&) const",
+          "symbol_location": 4,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 186476,
+      "image_offset_hex": "0x2d86c",
+      "variants": [
+        {
+          "symbol": "objc::DenseMapBase<objc::DenseMap<DisguisedPtr<objc_object>, objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>, objc::DenseMapValueInfo<objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>>, objc::DenseMapInfo<DisguisedPtr<objc_object>>, objc::detail::DenseMapPair<DisguisedPtr<objc_object>, objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>>>, DisguisedPtr<objc_object>, objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>, objc::DenseMapValueInfo<objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>>, objc::DenseMapInfo<DisguisedPtr<objc_object>>, objc::detail::DenseMapPair<DisguisedPtr<objc_object>, objc::SmallDenseMap<void const*, objc::ObjcAssociation, 1u, objc::DenseMapValueInfo<objc::ObjcAssociation>, objc::DenseMapInfo<void const*>, objc::detail::DenseMapPair<void const*, objc::ObjcAssociation>>>>::find(DisguisedPtr<objc_object> const&)",
+          "symbol_location": 28,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "e8ced84c-011d-3351-9180-4127735b298e",
+      "image_offset": 201668,
+      "image_offset_hex": "0x313c4",
+      "variants": [
+        {
+          "symbol": "_objc_terminate()",
+          "symbol_location": 156,
+          "sources": [
+            "/Users/zhangshichao/Downloads/WeChat-2026-10-27-095047.ips"
+          ]
+        }
+      ]
+    },
+    {
+      "image_uuid": "eeb02d1e-1d99-382a-80f0-d58f6b43e860",
+      "image_offset": 4048,
+      "image_offset_hex": "0xfd0",
+      "variants": [
+        {
+          "symbol": "_Block_release",
+          "symbol_location": 252,
+          "sources": [
+            "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/inbound/WeChat-2026-10-21-122331.ips"
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Symbols apply only to exact image UUID and image offset matches.",
+    "Nearby addresses are deliberately left unresolved."
+  ]
+}

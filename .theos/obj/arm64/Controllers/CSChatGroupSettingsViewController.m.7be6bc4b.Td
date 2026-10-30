@@ -6,7 +6,10 @@
   Controllers/WESessionTabItem.h Controllers/CSGroupPreferences.h \
   Controllers/CSGroupAppearance.h Controllers/CSSettingTableViewCell.h \
   Controllers/WEContactSelectViewController.h \
-  Controllers/CSServiceCenter.h
+  Controllers/CSNativeContactPicker.h \
+  Controllers/CSSettingsPresentation.h Controllers/CSCloseFriendBridge.h \
+  Controllers/CSCloseFriendPolicy.h Controllers/CSGroupNativeBridge.h \
+  Controllers/CSGroupProjection.h Controllers/CSServiceCenter.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
 /Users/zhangshichao/theos/Prefix.pch:
 Controllers/CSChatGroupSettingsViewController.h:
@@ -15,4 +18,10 @@ Controllers/CSGroupPreferences.h:
 Controllers/CSGroupAppearance.h:
 Controllers/CSSettingTableViewCell.h:
 Controllers/WEContactSelectViewController.h:
+Controllers/CSNativeContactPicker.h:
+Controllers/CSSettingsPresentation.h:
+Controllers/CSCloseFriendBridge.h:
+Controllers/CSCloseFriendPolicy.h:
+Controllers/CSGroupNativeBridge.h:
+Controllers/CSGroupProjection.h:
 Controllers/CSServiceCenter.h:

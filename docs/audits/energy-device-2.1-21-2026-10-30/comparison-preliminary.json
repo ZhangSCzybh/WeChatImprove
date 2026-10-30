@@ -1,0 +1,298 @@
+{
+  "status": "preliminary_round1_only; parent is collecting independent round2",
+  "generated_utc": "2026-10-30T05:00:00.293629+00:00",
+  "method": {
+    "cpu_formula": "100 * delta(cpuTotalUser + cpuTotalSystem) / delta(procAge)",
+    "cpu_scale": "100 percent = one CPU core",
+    "sample_interval_ms": 1000,
+    "exclude_first_initial_sample": true,
+    "aggregation": "sum interval CPU seconds / sum valid device interval seconds * 100",
+    "energy_gauge": false,
+    "power_or_battery_life_claim": false
+  },
+  "sources": [
+    {
+      "path": "docs/audits/energy-device-2026-10-30/measurements.json",
+      "sha256": "182c7013384351b2d7a36e8aba74eb040714814a4be612bb7a1d5a758e5272c7"
+    },
+    {
+      "path": "docs/audits/energy-device-2.1-21-2026-10-30/foreground-static-lowrate.summary.json",
+      "sha256": "c2886b90dfcdd8b4f59259777b09a8830bd42b612c171e637c9a09ea7459cdac"
+    }
+  ],
+  "primary_comparison": {
+    "old_version": "2.1-19",
+    "new_version": "2.1-21",
+    "old_state": "original styles, groups enabled, close-friend privacy enabled and locked",
+    "new_state": "groups_on_privacy_locked_original_styles_static_list",
+    "old_metrics": {
+      "pid": 64070,
+      "samples": 33,
+      "device_span_s": 33.824425541000004,
+      "cpu_s": 29.150169334,
+      "avg_cpu_pct_one_core": 86.18082603846696,
+      "median_interval_cpu_pct": 106.386505231808,
+      "max_interval_cpu_pct": 112.3992875908434,
+      "first_timestamp": "2026-10-30T03:03:07.897916+00:00",
+      "last_timestamp": "2026-10-30T03:03:40.897196+00:00",
+      "diskBytesWritten_per_s": 643745.9218222764,
+      "diskBytesRead_per_s": 2203340.302399609,
+      "intWakeups_per_s": 441.69264550821714,
+      "ctxSwitch_per_s": 3418.5946442708273,
+      "interval_count": 32,
+      "disk_write_mib_s": 0.6139239519331707
+    },
+    "new_metrics": {
+      "pid": 67466,
+      "samples": 56,
+      "device_span_s": 57.976256417,
+      "cpu_s": 2.708979042,
+      "avg_cpu_pct_one_core": 4.672566339080948,
+      "median_interval_cpu_pct": 2.065776948963593,
+      "p90_interval_cpu_pct": 10.050966818448062,
+      "max_interval_cpu_pct": 35.72572044445416,
+      "first_timestamp": "2026-10-30T04:56:28.683291+00:00",
+      "last_timestamp": "2026-10-30T04:57:26.665565+00:00",
+      "proc_age_start_s": 364.162137583,
+      "diskBytesWritten_per_s": 108235.20502713937,
+      "diskBytesRead_per_s": 464662.49573335226,
+      "intWakeups_per_s": 246.65269687552478,
+      "ctxSwitch_per_s": 383.398331898543,
+      "interval_count": 55,
+      "disk_write_mib_s": 0.10322113516534745
+    },
+    "differences": {
+      "avg_cpu_pct_one_core": {
+        "before": 86.18082603846696,
+        "after": 4.672566339080948,
+        "after_minus_before": -81.50825969938602,
+        "relative_reduction_percent": 94.57818339198172
+      },
+      "median_interval_cpu_pct": {
+        "before": 106.386505231808,
+        "after": 2.065776948963593,
+        "after_minus_before": -104.32072828284441,
+        "relative_reduction_percent": 98.05823403592173
+      },
+      "diskBytesWritten_per_s": {
+        "before": 643745.9218222764,
+        "after": 108235.20502713937,
+        "after_minus_before": -535510.716795137,
+        "relative_reduction_percent": 83.18665775454485
+      },
+      "diskBytesRead_per_s": {
+        "before": 2203340.302399609,
+        "after": 464662.49573335226,
+        "after_minus_before": -1738677.8066662564,
+        "relative_reduction_percent": 78.91099730589511
+      },
+      "intWakeups_per_s": {
+        "before": 441.69264550821714,
+        "after": 246.65269687552478,
+        "after_minus_before": -195.03994863269236,
+        "relative_reduction_percent": 44.157391031104204
+      },
+      "ctxSwitch_per_s": {
+        "before": 3418.5946442708273,
+        "after": 383.398331898543,
+        "after_minus_before": -3035.1963123722844,
+        "relative_reduction_percent": 88.78491392534431
+      }
+    },
+    "new_scene_checks": {
+      "count": 5,
+      "all_foreground_true": true,
+      "all_target_pid": true
+    },
+    "new_sustained_load": {
+      "10": {
+        "intervals": 6,
+        "device_seconds": 6.262831082
+      },
+      "20": {
+        "intervals": 2,
+        "device_seconds": 2.065353957
+      },
+      "30": {
+        "intervals": 2,
+        "device_seconds": 2.065353957
+      },
+      "50": {
+        "intervals": 0,
+        "device_seconds": 0
+      },
+      "90": {
+        "intervals": 0,
+        "device_seconds": 0
+      }
+    }
+  },
+  "other_old_states_for_context_only": [
+    {
+      "label": "foreground-no-border-animation",
+      "state": "border animation disabled, other original settings retained",
+      "metrics": {
+        "pid": 64070,
+        "samples": 34,
+        "device_span_s": 34.676425959,
+        "cpu_s": 37.087776416,
+        "avg_cpu_pct_one_core": 106.95386098858943,
+        "median_interval_cpu_pct": 106.86584992292634,
+        "max_interval_cpu_pct": 108.70757290376743,
+        "first_timestamp": "2026-10-30T03:09:35.936589+00:00",
+        "last_timestamp": "2026-10-30T03:10:09.276148+00:00",
+        "diskBytesWritten_per_s": 785738.1851352059,
+        "diskBytesRead_per_s": 72407.92355500319,
+        "intWakeups_per_s": 419.67992944852153,
+        "ctxSwitch_per_s": 3937.026271433454,
+        "interval_count": 33,
+        "disk_write_mib_s": 0.749338326583105
+      }
+    },
+    {
+      "label": "foreground-no-list-corners",
+      "state": "Groups enabled, close-friend locked, list corners off; 30.57 s process window foreground. Later stack03/04 crossed user-confirmed screen lock and are excluded as optimization evidence.",
+      "metrics": {
+        "pid": 64070,
+        "samples": 30,
+        "device_span_s": 30.572159,
+        "cpu_s": 31.900463875,
+        "avg_cpu_pct_one_core": 104.34481867963595,
+        "median_interval_cpu_pct": 105.87095894604889,
+        "max_interval_cpu_pct": 108.25764030918654,
+        "first_timestamp": "2026-10-30T03:50:38.324450+00:00",
+        "last_timestamp": "2026-10-30T03:51:08.232640+00:00",
+        "diskBytesWritten_per_s": 1429814.3614914473,
+        "diskBytesRead_per_s": 22374.343925137902,
+        "intWakeups_per_s": 418.9105519175142,
+        "ctxSwitch_per_s": 3638.735491333798,
+        "interval_count": 29,
+        "disk_write_mib_s": 1.3635772337831948
+      }
+    },
+    {
+      "label": "foreground-no-projection",
+      "state": "Groups off, close-friend unlocked, list corners off, last confirmed tabbar master off; chat-list foreground.",
+      "metrics": {
+        "pid": 64070,
+        "samples": 24,
+        "device_span_s": 24.389553875,
+        "cpu_s": 1.402535125,
+        "avg_cpu_pct_one_core": 5.750556702218482,
+        "median_interval_cpu_pct": 4.914461602829624,
+        "max_interval_cpu_pct": 13.978390889063755,
+        "first_timestamp": "2026-10-30T03:57:33.404180+00:00",
+        "last_timestamp": "2026-10-30T03:57:57.467388+00:00",
+        "diskBytesWritten_per_s": 44000.476822989855,
+        "diskBytesRead_per_s": 13099.378596157287,
+        "intWakeups_per_s": 446.09262046208704,
+        "ctxSwitch_per_s": 578.6083694817071,
+        "interval_count": 23,
+        "disk_write_mib_s": 0.041962124655713896
+      }
+    },
+    {
+      "label": "foreground-groups-only-unlocked",
+      "state": "Groups on, close-friend unlocked, other conditions same; chat-list foreground.",
+      "metrics": {
+        "pid": 64070,
+        "samples": 23,
+        "device_span_s": 23.243476542,
+        "cpu_s": 25.366332208,
+        "avg_cpu_pct_one_core": 109.13312456578554,
+        "median_interval_cpu_pct": 108.68028650570068,
+        "max_interval_cpu_pct": 113.9200387522194,
+        "first_timestamp": "2026-10-30T03:59:41.279308+00:00",
+        "last_timestamp": "2026-10-30T04:00:04.650198+00:00",
+        "diskBytesWritten_per_s": 1167819.794554036,
+        "diskBytesRead_per_s": 145735.16977458698,
+        "intWakeups_per_s": 416.54698179530186,
+        "ctxSwitch_per_s": 6008.3524832289695,
+        "interval_count": 22,
+        "disk_write_mib_s": 1.1137197442570077
+      }
+    },
+    {
+      "label": "foreground-privacy-only-locked",
+      "state": "Groups off, close-friend locked, other conditions same; chat-list foreground.",
+      "metrics": {
+        "pid": 64070,
+        "samples": 24,
+        "device_span_s": 24.012749042,
+        "cpu_s": 25.02312275,
+        "avg_cpu_pct_one_core": 104.20765530107687,
+        "median_interval_cpu_pct": 104.0469529884806,
+        "max_interval_cpu_pct": 105.28391886432807,
+        "first_timestamp": "2026-10-30T04:02:32.867144+00:00",
+        "last_timestamp": "2026-10-30T04:02:57.203653+00:00",
+        "diskBytesWritten_per_s": 1440514.784021537,
+        "diskBytesRead_per_s": 65501.20509938073,
+        "intWakeups_per_s": 279.89298469094456,
+        "ctxSwitch_per_s": 2625.8551192832642,
+        "interval_count": 23,
+        "disk_write_mib_s": 1.3737819519248362
+      }
+    }
+  ],
+  "system_process_comparison": [
+    {
+      "name": "assetsd",
+      "old_original_cpu_percent": 10.994428276867188,
+      "new_round1_cpu_percent": 98.60176965248286,
+      "old_missing_means": null,
+      "interpretation": "observed process load; no evidence assigning all work to the plugin"
+    },
+    {
+      "name": "fileindexerd",
+      "old_original_cpu_percent": 2.620661331676985,
+      "new_round1_cpu_percent": 32.75352560082065,
+      "old_missing_means": null,
+      "interpretation": "observed process load; no evidence assigning all work to the plugin"
+    },
+    {
+      "name": "backboardd",
+      "old_original_cpu_percent": 18.641432373555144,
+      "new_round1_cpu_percent": 17.047724642819563,
+      "old_missing_means": null,
+      "interpretation": "observed process load; no evidence assigning all work to the plugin"
+    },
+    {
+      "name": "searchd",
+      "old_original_cpu_percent": null,
+      "new_round1_cpu_percent": 8.918106504500278,
+      "old_missing_means": "not retained in selected process evidence, not proof of zero",
+      "interpretation": "observed process load; no evidence assigning all work to the plugin"
+    },
+    {
+      "name": "sysmond",
+      "old_original_cpu_percent": 11.180112678498677,
+      "new_round1_cpu_percent": 13.24061590046821,
+      "old_missing_means": null,
+      "interpretation": "developer capture infrastructure overhead; not normal unplugged phone baseline"
+    },
+    {
+      "name": "DTServiceHub",
+      "old_original_cpu_percent": 5.027029868298784,
+      "new_round1_cpu_percent": 9.032290372193337,
+      "old_missing_means": null,
+      "interpretation": "developer capture infrastructure overhead; not normal unplugged phone baseline"
+    },
+    {
+      "name": "diagnosticd",
+      "old_original_cpu_percent": 24.539019714262803,
+      "new_round1_cpu_percent": 0.0,
+      "old_missing_means": null,
+      "interpretation": "developer capture infrastructure overhead; not normal unplugged phone baseline"
+    }
+  ],
+  "limits": [
+    "Different versions ran at different times and with different PIDs; rates compare each full valid window, not a paired randomized power experiment.",
+    "Original 2.1-19 average includes a transient lower-load segment; median106.3865 and other projection-enabled scenes104-109 provide context.",
+    "Old projection-off5.7506 required groups off and close-friend unlocked plus disabled styles; it is a mechanism control, not the current configured target.",
+    "Process disk counters do not represent net file growth or physical flash writes.",
+    "System assetsd/fileindexerd load is higher in round1; this does not establish that the plugin caused their activity.",
+    "Developer monitoring adds sysmond/DTServiceHub/diagnosticd work; do not subtract their CPU to compute plugin net power.",
+    "No natural battery-drain, wattage or temperature conclusion is supported by these captures.",
+    "The first initial sample exclusion is not a cold-start warmup exclusion; round1 WeChat first retained process age364.162s."
+  ]
+}

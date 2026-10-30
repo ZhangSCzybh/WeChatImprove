@@ -17,16 +17,22 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @property(nonatomic,readonly) id dataSource;
 @property(nonatomic,readonly) CGPoint contentOffset;
 @property(nonatomic,readonly) UIEdgeInsets adjustedContentInset;
+@property(nonatomic,readonly) NSArray<NSIndexPath *> *indexPathsForVisibleRows;
+- (void)reloadRowsAtIndexPaths:(NSArray<NSIndexPath *> *)paths withRowAnimation:(NSInteger)animation;
 @end
+#define UITableViewRowAnimationNone 0
 @interface LifecycleTable : UITableView
 @property(nonatomic) CGPoint contentOffset;
 @property(nonatomic) UIEdgeInsets adjustedContentInset;
+@property(nonatomic,copy) NSArray<NSIndexPath *> *indexPathsForVisibleRows,*reloadedPaths;
+@property(nonatomic) NSUInteger rowReloads,layoutMeasurements;
 @end
 @interface Host : NSObject
 @property(nonatomic,strong) UITableView *m_tableView;
 @property(nonatomic) BOOL isSearching;
 @property(nonatomic) BOOL folded;
 @property(nonatomic) NSUInteger originalCalls;
+@property(nonatomic) BOOL suppressNativeInvalidation;
 - (void)nativeAppearance:(BOOL)animated;
 - (void)viewWillAppear:(BOOL)animated;
 - (void)viewDidAppear:(BOOL)animated;
@@ -150,6 +156,9 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (void)refreshNavigationTitle;
 - (void)useNativePresentation;
 - (void)shieldVisiblePrivateRows;
+- (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous
+                  changes:(CSGroupChangeKind)changes contentUserNames:(NSSet<NSString *> *)names
+     contentIdentityKnown:(BOOL)known previouslyProjecting:(BOOL)previouslyProjecting;
 @end
 @implementation CSGroupListAdapter
 #include "GroupLifecycleBodies.h"
@@ -204,7 +213,7 @@ static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.publishin
 - (void)nativeAppearance:(BOOL)animated {
     (void)animated; self.originalCalls++;
     // Native lifecycle may itself produce a session/UI invalidation.
-    [Adapter(self) requestRefresh];
+    if (!self.suppressNativeInvalidation) [Adapter(self) requestRefresh];
 }
 #include "GroupLifecycleHooks.h"
 @end
@@ -214,6 +223,10 @@ static void FoldedDisappearOriginal(id owner,SEL selector,BOOL animated) { (void
 #include "GroupLifecycleReloadHelpers.h"
 @implementation LifecycleTable
 #include "GroupLifecycleReload.h"
+- (void)reloadRowsAtIndexPaths:(NSArray<NSIndexPath *> *)paths withRowAnimation:(NSInteger)animation {
+    (void)animation; self.rowReloads++; self.reloadedPaths=paths;
+}
+- (void)layoutIfNeeded { self.layoutMeasurements++; }
 @end
 static NSUInteger checks,failures;
 static void Check(BOOL condition,NSString *message) {
@@ -234,6 +247,112 @@ static UITableViewCell *Cell(NSString *name) {
     cell.isAccessibilityElement=YES; cell.accessibilityElements=@[@"original-cell"];
     return cell;
 }
+static NSIndexPath *BannerPath(NSUInteger row) {
+    NSUInteger indexes[]={0,row}; return [NSIndexPath indexPathWithIndexes:indexes length:2];
+}
+static CSGroupRow *BannerRow(NSString *name,NSUInteger index,CSGroupRowKind kind,NSString *summary) {
+    return [[CSGroupRow alloc] initWithNativePath:BannerPath(index) userName:name kind:kind
+        category:kind==CSGroupRowKindSession ? CSGroupRowCategoryPrivate : CSGroupRowCategoryUnknown
+        top:NO unreadCount:0 redDot:NO nativeSummary:summary sortTime:nil];
+}
+static CSGroupProjection *BannerProjection(CSGroupListAdapter *adapter) {
+    return [[CSGroupProjection alloc] initWithSections:adapter.cachedNativeSections tabs:adapter.preferences.tabs
+        selectedTabID:adapter.preferences.selectedTabID filterDuplicates:NO accountID:account
+        hiddenUserNames:NSSet.set privacyRevision:policyRevision previousProjection:adapter.projection];
+}
+static CSGroupListAdapter *BannerList(Host **owner,NSArray *rows,CSGroupProjection **previous) {
+    fixtureNativeSections=@[rows];
+    CSGroupListAdapter *adapter=List(owner);
+    (*owner).suppressNativeInvalidation=YES;
+    adapter.projection=BannerProjection(adapter); *previous=adapter.projection;
+    ((LifecycleTable *)adapter.table).indexPathsForVisibleRows=@[BannerPath(0),BannerPath(1),BannerPath(2)];
+    return adapter;
+}
+static void BannerDepart(Host *host) { [host viewWillDisappear:YES]; [host viewDidDisappear:YES]; }
+static void BannerReturn(Host *host) { [host viewWillAppear:YES]; [host viewDidAppear:YES]; }
+static LifecycleTable *PublishRecordedReturn(CSGroupListAdapter *adapter,CSGroupProjection *previous) {
+    // Keep lifecycle admission/merging and both production publication layers
+    // real. Only the native data reader and UIKit operations are host doubles.
+    CSGroupProjection *next=BannerProjection(adapter); adapter.projection=next;
+    LifecycleTable *table=(LifecycleTable *)adapter.table;
+    table.reloads=0; table.rowReloads=0; table.layoutMeasurements=0; table.reloadedPaths=nil;
+    adapter.publishing=YES;
+    @try {
+        [adapter publishProjection:next previous:previous changes:adapter.lastPublishedChanges
+            contentUserNames:adapter.lastPublishedContentUserNames contentIdentityKnown:adapter.lastPublishedContentIdentityKnown
+            previouslyProjecting:YES];
+    } @finally { adapter.publishing=NO; }
+    return table;
+}
+static void CheckReturnBannerPublication(void) {
+    // Synthetic immutable row values exercise projection input changes. They
+    // do not cover WeChat's private banner-text reader or UIView identity.
+    NSArray *rows=@[BannerRow(nil,0,CSGroupRowKindBusiness,@"收藏置顶"),
+                    BannerRow(nil,1,CSGroupRowKindBusiness,@"已登录 Mac"),
+                    BannerRow(@"ordinary-a",2,CSGroupRowKindSession,nil)];
+    Host *host=nil; CSGroupProjection *previous=nil;
+    CSGroupListAdapter *adapter=BannerList(&host,rows,&previous);
+    NSUInteger before=adapter.refreshCount,builds=snapshotBuilds;
+    BannerDepart(host);
+    Check(adapter.pendingChanges==CSGroupChangeUnknown && !adapter.pendingContentUnattributed,
+        @"departure without native invalidation requests reconciliation without inventing banner content");
+    BannerReturn(host);
+    Check(host.originalCalls==4 && adapter.refreshCount==before+1 && snapshotBuilds==builds+1,
+        @"the complete quiet departure/return runs native callbacks and rebuilds one fresh snapshot");
+    LifecycleTable *table=PublishRecordedReturn(adapter,previous);
+    Check(!table.reloads && !table.rowReloads && !table.layoutMeasurements,
+        @"real lifecycle event state and real publication perform no table operation for unchanged business rows on return");
+
+    NSSet *names=[NSSet setWithObject:@"ordinary-a"];
+    for (NSUInteger timing=0;timing<2;timing++) {
+        adapter=BannerList(&host,rows,&previous);
+        if (!timing) [adapter beginNativeChangeOfKind:CSGroupChangeContent sessionUserNames:names];
+        [host viewWillDisappear:YES];
+        if (timing) [adapter beginNativeChangeOfKind:CSGroupChangeContent sessionUserNames:names];
+        [adapter endNativeChange]; [host viewDidDisappear:YES];
+        Check(!adapter.pendingContentUnattributed && [adapter.pendingContentUserNames isEqual:names],
+            @"both disappearance callbacks preserve a real session event's existing content attribution");
+        BannerReturn(host); table=PublishRecordedReturn(adapter,previous);
+        Check(adapter.lastPublishedContentIdentityKnown && [adapter.lastPublishedContentUserNames isEqual:names] &&
+              !table.reloads && table.rowReloads==1 && [table.reloadedPaths isEqual:@[BannerPath(2)]] && !table.layoutMeasurements,
+            @"real content queued before or during departure refreshes only its session after return");
+    }
+
+    adapter=BannerList(&host,rows,&previous); BannerDepart(host); [adapter requestRefresh]; BannerReturn(host);
+    table=PublishRecordedReturn(adapter,previous);
+    Check((adapter.lastPublishedChanges&CSGroupChangeContent) && !adapter.lastPublishedContentIdentityKnown &&
+          !table.reloads && [table.reloadedPaths isEqual:@[BannerPath(0),BannerPath(1),BannerPath(2)]] && table.layoutMeasurements==1,
+        @"a genuine unknown refresh while away still republishes both business rows and their native geometry");
+
+    adapter=BannerList(&host,rows,&previous); BannerDepart(host);
+    fixtureNativeSections=@[@[rows[0],BannerRow(nil,1,CSGroupRowKindBusiness,@"已登录 Windows"),rows[2]]];
+    BannerReturn(host); table=PublishRecordedReturn(adapter,previous);
+    Check(!table.reloads && [table.reloadedPaths isEqual:@[BannerPath(1)]] && table.layoutMeasurements==1,
+        @"a changed verified business-row value refreshes its row even on a reconciliation-only return");
+    for (NSUInteger adding=0;adding<2;adding++) {
+        adapter=BannerList(&host,rows,&previous); BannerDepart(host);
+        fixtureNativeSections=adding ? @[@[rows[0],rows[1],BannerRow(nil,2,CSGroupRowKindBusiness,@"new business row"),
+            BannerRow(@"ordinary-a",3,CSGroupRowKindSession,nil)]] :
+            @[@[rows[0],BannerRow(@"ordinary-a",1,CSGroupRowKindSession,nil)]];
+        BannerReturn(host); table=PublishRecordedReturn(adapter,previous);
+        Check(table.reloads==1 && !table.rowReloads && table.layoutMeasurements==1,
+            @"business-row insertion and removal retain the full structural publication boundary");
+    }
+
+    adapter=BannerList(&host,rows,&previous); BannerDepart(host);
+    NSString *oldAccount=account; NSUInteger oldEpoch=accountEpoch;
+    account=@"banner-return-replacement"; accountEpoch++;
+    BannerReturn(host); table=PublishRecordedReturn(adapter,previous);
+    Check(table.reloads==1 && table.layoutMeasurements==1 && [adapter.preferences.accountID isEqual:account],
+        @"a return across accounts still rebuilds table coordinates in the current account");
+    account=oldAccount; accountEpoch=oldEpoch;
+    adapter=BannerList(&host,rows,&previous); BannerDepart(host);
+    privacyEnabled=YES; policyRevision++; [CSGroupListAdapter closeFriendPolicyChanged:nil];
+    BannerReturn(host); table=PublishRecordedReturn(adapter,previous);
+    Check(table.reloads==1 && table.layoutMeasurements==1 && !adapter.privacyRefreshPending,
+        @"a privacy policy change while away retains the safe full publication boundary on return");
+    privacyEnabled=NO; fixtureNativeSections=nil;
+}
 int main(void) { @autoreleasepool {
     Host *host=nil; CSGroupListAdapter *a=List(&host);
     if (getenv("CS_PRIVACY_BLANK_PROBE")) {
@@ -245,6 +364,7 @@ int main(void) { @autoreleasepool {
         fprintf(stdout,"Switcher blank boundary: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
         return failures ? 1 : 0;
     }
+    CheckReturnBannerPublication();
     NSUInteger before=a.refreshCount, layouts=a.layoutCount;
     [host viewWillDisappear:YES]; [host viewDidDisappear:YES]; RunFor(.02);
     Check(a.presentationSuspended && host.originalCalls==2,@"native disappearance runs and suspends grouping");

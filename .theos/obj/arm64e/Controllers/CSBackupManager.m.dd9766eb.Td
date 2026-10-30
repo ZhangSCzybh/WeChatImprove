@@ -4,9 +4,10 @@
   Controllers/CSBackupManager.h Controllers/CSBackupEngine.h \
   Controllers/CSBackupStore.h Controllers/CSBackupCodec.h \
   Controllers/CSBackupAssets.h Controllers/CSBackupRegistry.h \
-  Controllers/CSBackupScheduler.h Controllers/CSBackupBootstrap.h \
-  Controllers/CSBackupAudit.h Controllers/CSBackupRestoreDiagnostics.h \
-  Controllers/CSPluginStorage.h Controllers/CSScheduledTaskStore.h \
+  Controllers/CSBackupScheduler.h Controllers/CSBackupMutation.h \
+  Controllers/CSBackupBootstrap.h Controllers/CSBackupAudit.h \
+  Controllers/CSBackupRestoreDiagnostics.h Controllers/CSPluginStorage.h \
+  Controllers/CSScheduledTaskStore.h Controllers/CSAIReplyStore.h \
   Controllers/CSServiceCenter.h \
   /Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers/CSUserInfoHelper.h
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/SDKSettings.json:
@@ -18,10 +19,12 @@ Controllers/CSBackupCodec.h:
 Controllers/CSBackupAssets.h:
 Controllers/CSBackupRegistry.h:
 Controllers/CSBackupScheduler.h:
+Controllers/CSBackupMutation.h:
 Controllers/CSBackupBootstrap.h:
 Controllers/CSBackupAudit.h:
 Controllers/CSBackupRestoreDiagnostics.h:
 Controllers/CSPluginStorage.h:
 Controllers/CSScheduledTaskStore.h:
+Controllers/CSAIReplyStore.h:
 Controllers/CSServiceCenter.h:
 /Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers/CSUserInfoHelper.h:
