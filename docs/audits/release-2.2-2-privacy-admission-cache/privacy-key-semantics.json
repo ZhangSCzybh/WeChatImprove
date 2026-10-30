@@ -1,0 +1,231 @@
+{
+  "head": "8467df87bebb2998f021238b7d88eaea65266214",
+  "scope": "Read-only Policy/Runtime audit for scheme C only; no production/test/build edits or builds",
+  "verdict": "Proposed key is sufficient under current production immutable projection and Runtime revision semantics, conditional on per-layout live prechecks, original postcheck and successful-proof stamping tied to the exact scanned projection/table.",
+  "proposed_keys": [
+    "weak immutable projection object identity",
+    "copied account string",
+    "live account epoch",
+    "policy revision",
+    "enabled/revealed/blocked/hideSessions bits",
+    "known projection privacyRevision matching policy",
+    "retry false and projection valid each layout",
+    "current snapshotEpoch matching live epoch each layout"
+  ],
+  "publication_safety": [
+    "Capture exact scanned projection and table locally; never stamp whichever projection happens to be current after layout.",
+    "Only publish proof after unchanged original post-layout mismatch branch has passed.",
+    "Before publishing proof recheck projection/table identities, validity, snapshotEpoch, retry, known projection privacyRevision and current policy signature; if changed, skip proof publication only.",
+    "Cache hit skips only full row scan: still read snapshot, execute all readiness prechecks, execute display-scope native layout and existing post-layout mismatch branch.",
+    "Unknown/unreadable revision is never cached; a known valid revision 0 is allowed if all original preconditions match."
+  ],
+  "semantics": [
+    {
+      "event": "reveal_expiry_on_read",
+      "source": "Controllers/CSCloseFriendRuntime.m:77",
+      "details": "84 computes revealed from elapsedClock;85 calls changed if cached publishedSnapshot.revealed differs;42 increments revision and clears both snapshots. Fresh layout snapshot read observes expiry without waiting for timer/notification."
+    },
+    {
+      "event": "friends_groups_enabled_surface_option_update",
+      "source": "Controllers/CSCloseFriendRuntime.m:215",
+      "details": "updateProfile normalizes at219 then saveState at220; successful save/readback calls changed at213. All profile fields share this path. Snapshot freezes names/options atPolicy48-55."
+    },
+    {
+      "event": "manual_lock",
+      "source": "Controllers/CSCloseFriendRuntime.m:92",
+      "details": "95-99 calls changed only if revealed/deadline/block display state differs; already-locked unchanged policy can keep revision. generation/search token changes alone do not affect session hiding."
+    },
+    {
+      "event": "unlock",
+      "source": "Controllers/CSCloseFriendRuntime.m:110",
+      "details": "Password setup120, successful password139, shortcut147 and biometric204 call changed when revealing."
+    },
+    {
+      "event": "account_epoch_boundary",
+      "source": "Controllers/CSBackupBootstrap.m:124",
+      "details": "Will142 and did143-145 both call atomic epoch increment135-140; did notification is asynchronous. Bridge8-11 passes live epoch/suspended into Runtime;Runtime80-82 returns blocked empty-account boundary snapshot on mismatch even at unchanged policy revision."
+    },
+    {
+      "event": "account_runtime_sync",
+      "source": "Controllers/CSCloseFriendRuntime.m:54",
+      "details": "Same account/epoch/suspended and !blocked returns57; otherwise resets/loading59-73 then changed74."
+    },
+    {
+      "event": "app_inactive",
+      "source": "Controllers/CSCloseFriendRuntime.m:105",
+      "details": "setActive:NO calls lock. Manager222-225 invokes it before synchronous policy flush; active227-232 synchronizes account and flushes."
+    },
+    {
+      "event": "storage_failure_or_reset",
+      "source": "Controllers/CSCloseFriendRuntime.m:208",
+      "details": "Save/readback failure209/212 sets blocked and lock;reset242-246 always changed. Cache must gate blocked directly, not assume every failure necessarily advances revision."
+    }
+  ],
+  "clear_points": [
+    {
+      "source": "Controllers/CSGroupListAdapter.m:459",
+      "reason": "Policy notification loop before shielding/refresh."
+    },
+    {
+      "source": "Controllers/CSGroupListAdapter.m:492",
+      "reason": "Application activity loop before invalidation/refresh."
+    },
+    {
+      "source": "Controllers/CSGroupListAdapter.m:524",
+      "reason": "Detach old table before UI/proxy handoff."
+    },
+    {
+      "source": "Controllers/CSGroupListAdapter.m:820",
+      "reason": "Detected account change before clearing projection."
+    },
+    {
+      "source": "Controllers/CSGroupListAdapter.m:173",
+      "reason": "New table already detaches old adapter and allocates a new empty adapter; no extra lifecycle hook required."
+    }
+  ],
+  "no_extra_keys_needed_under_current_model": [
+    "protected name set/fingerprint: Runtime profile changes always advance revision",
+    "other surface option bits: this proof always queries Session surface; all option edits conservatively advance revision",
+    "geometry/offset: proof caches only row membership admission; real layout is never skipped",
+    "modelRevision: immutable projected row identity/membership remains same only when the validated projection object is reused; live snapshotEpoch remains a precondition"
+  ],
+  "inputs": [
+    {
+      "path": "Controllers/CSCloseFriendRuntime.m",
+      "head_sha256": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829",
+      "worktree_sha256": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829",
+      "matches_head": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendPolicy.m",
+      "head_sha256": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+      "worktree_sha256": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+      "matches_head": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendPolicy.h",
+      "head_sha256": "4ccefb7f1a2c173a68316c0f2e0daa9b4d1be189b1cf1cab862271205cd06575",
+      "worktree_sha256": "4ccefb7f1a2c173a68316c0f2e0daa9b4d1be189b1cf1cab862271205cd06575",
+      "matches_head": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendBridge.m",
+      "head_sha256": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf",
+      "worktree_sha256": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf",
+      "matches_head": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendManager.m",
+      "head_sha256": "32029613b26321429e662eccfb778e4ff90532618b4605e00cc17256dd2e8548",
+      "worktree_sha256": "32029613b26321429e662eccfb778e4ff90532618b4605e00cc17256dd2e8548",
+      "matches_head": true
+    },
+    {
+      "path": "Controllers/CSBackupBootstrap.m",
+      "head_sha256": "3016c46b36541def9e3b54ca32bcf51f9bc5e6c3811fa7da93fcb60e0e13daff",
+      "worktree_sha256": "3016c46b36541def9e3b54ca32bcf51f9bc5e6c3811fa7da93fcb60e0e13daff",
+      "matches_head": true
+    },
+    {
+      "path": "Controllers/CSGroupProjection.m",
+      "head_sha256": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a",
+      "worktree_sha256": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a",
+      "matches_head": true
+    },
+    {
+      "path": "Controllers/CSGroupProjection.h",
+      "head_sha256": "f92f2377662d0d684d683ee5b3b3352ef100e825b6e8398268a15990febb2f19",
+      "worktree_sha256": "f92f2377662d0d684d683ee5b3b3352ef100e825b6e8398268a15990febb2f19",
+      "matches_head": true
+    }
+  ],
+  "limitations": [
+    "Source semantics audit, not real UIKit/device lifetime verification.",
+    "Runtime/source paths were reviewed; no production instrumentation or runtime mutation tests were added by this subtask."
+  ],
+  "implementation_review": {
+    "source_path": "Controllers/CSGroupListAdapter.m",
+    "source_sha256": "82e96b805c63593b036804ca46159de95e44b15c3dfb59f6377ebc0b423c8ec8",
+    "baseline_head": "8467df87bebb2998f021238b7d88eaea65266214",
+    "verdict": "No remaining new privacy/failclosed/expiry correctness gap found in source review. Initial concurrent associated-object lifetime issue corrected by atomic retained association. Device behavior/performance remains unverified by this subtask.",
+    "existing_post_layout_mismatch_branch_unchanged": true,
+    "existing_post_layout_mismatch_branch_sha256": "a11cdde4fbb55a042745b54b3f2c4a1afc85645894800b83938db1101e4a0cf7",
+    "proof_writes": [
+      {
+        "line": 525,
+        "atomic": true,
+        "text": "objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);"
+      },
+      {
+        "line": 653,
+        "atomic": true,
+        "text": "objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);"
+      },
+      {
+        "line": 684,
+        "atomic": true,
+        "text": "if (!admitted) objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);"
+      },
+      {
+        "line": 714,
+        "atomic": true,
+        "text": "if (!proofStillValid) objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);"
+      },
+      {
+        "line": 734,
+        "atomic": true,
+        "text": "objc_setAssociatedObject(self,@selector(performSessionListLayout:),proof,OBJC_ASSOCIATION_RETAIN);"
+      },
+      {
+        "line": 808,
+        "atomic": true,
+        "text": "objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);"
+      }
+    ],
+    "implementation_keys": [
+      "strong projection identity",
+      "strong current policy snapshot identity",
+      "copied account string",
+      "live account epoch",
+      "policy revision",
+      "enabled/revealed/blocked/hideSessions",
+      "known privacyRevision",
+      "retry false",
+      "modelRevision",
+      "weak table identity via one-element NSHashTable"
+    ],
+    "differences_from_initial_design": [
+      "Strong references, not weak; bounded single proof per adapter, no projection/policy back-reference to adapter, no ownership cycle. Atomic association retains returned proof while concurrent clears happen.",
+      "ModelRevision and clear on every native invalidation are conservative; immutable projection reuse after an ordinary model event will scan again.",
+      "Account-changed branch calls invalidateNativeSnapshot, also increasing modelRevision."
+    ],
+    "reviewed_guards": [
+      {
+        "lines": "650-686",
+        "finding": "Fresh snapshot/prechecks always run; blocked/invalid/retry/epoch/account mismatch cannot cache-hit; known version0 remains allowed; exact policy object identity also binds immutable names."
+      },
+      {
+        "lines": "701-725",
+        "finding": "Native display-scope layout and original postcheck always run. Expiry before entry misses; expiry inside layout changes current snapshot/revision and takes existing shield branch."
+      },
+      {
+        "lines": "706-734",
+        "finding": "Success stamp only after original mismatch branch returns safely, tied to scanned projection/table and stable model/epoch/policy signature; reentrant replacements never inherit old proof. Stored weak table identity also prevents reusing a proof across a table swap between calls."
+      },
+      {
+        "lines": "525,653,684,714,734,808",
+        "finding": "All six proof association stores/clears use atomic OBJC_ASSOCIATION_RETAIN; main-thread getter can race background native invalidation without nonatomic returned-object lifetime gap."
+      },
+      {
+        "lines": "808-809",
+        "finding": "A clear/increment interleave can only leave an obsolete modelRevision proof that later fails admission; immutable membership proof is not broadened."
+      }
+    ],
+    "not_verified": [
+      "Natural UIView/table lifetime and UIKit reentry on device",
+      "Concurrency stress/TSAN on a real Objective-C runtime by this subtask",
+      "Measured CPU benefit or natural event frequency"
+    ],
+    "final_delta_review": "Final delta from previous reviewed SHA only requires table != nil for cache eligibility; no visible-layout or readiness semantics changed."
+  }
+}

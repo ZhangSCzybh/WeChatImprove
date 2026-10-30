@@ -1,0 +1,2442 @@
+{
+  "head" : "8467df87bebb2998f021238b7d88eaea65266214",
+  "layoutMode" : 1,
+  "measurement" : "macOS host extracted full production methods; deterministic bounded queue and UIKit boundary doubles",
+  "results" : [
+    {
+      "case" : "valid-empty-native",
+      "counters" : {
+        "badge-source-stub" : 1,
+        "original-table-layout" : 1,
+        "queue-async" : 1,
+        "table-header-set" : 1,
+        "table-layoutIfNeeded" : 1,
+        "table-reloadData" : 1
+      },
+      "inputTriggers" : 1,
+      "profile" : {
+        "layout" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 731083,
+          "inclusiveWall_ns" : 3570000,
+          "selfCPU_ns" : 731083,
+          "selfWall_ns" : 3570000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 7417,
+          "inclusiveWall_ns" : 8000,
+          "selfCPU_ns" : 7417,
+          "selfWall_ns" : 8000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 10792,
+          "inclusiveWall_ns" : 10000,
+          "selfCPU_ns" : 10792,
+          "selfWall_ns" : 10000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 41250,
+          "inclusiveWall_ns" : 42000,
+          "selfCPU_ns" : 41250,
+          "selfWall_ns" : 42000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 14500,
+          "inclusiveWall_ns" : 15000,
+          "selfCPU_ns" : 3708,
+          "selfWall_ns" : 5000
+        },
+        "refresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 837750,
+          "inclusiveWall_ns" : 3676000,
+          "selfCPU_ns" : 43500,
+          "selfWall_ns" : 41000
+        },
+        "requestRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 18792,
+          "inclusiveWall_ns" : 18000,
+          "selfCPU_ns" : 4125,
+          "selfWall_ns" : 4000
+        },
+        "scheduleRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 14667,
+          "inclusiveWall_ns" : 14000,
+          "selfCPU_ns" : 14667,
+          "selfWall_ns" : 14000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 844292,
+        "eventLimitHit" : 0,
+        "events" : 1,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+          {
+            "event" : 1,
+            "kind" : "async",
+            "pending" : 0,
+            "refreshCalls" : 1,
+            "virtual_ns" : 3679000
+          }
+        ],
+        "virtualElapsed_ns" : 3679000,
+        "wall_ns" : 3683000
+      },
+      "rowsN" : 0,
+      "sourceReads" : 1,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 1,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 1,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "valid-both-on",
+      "counters" : {
+        "badge-source-stub" : 1,
+        "original-table-layout" : 1,
+        "queue-async" : 1,
+        "table-header-set" : 1,
+        "table-layoutIfNeeded" : 1,
+        "table-reloadData" : 1
+      },
+      "inputTriggers" : 1,
+      "profile" : {
+        "layout" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 6792,
+          "inclusiveWall_ns" : 6000,
+          "selfCPU_ns" : 6792,
+          "selfWall_ns" : 6000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1833,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 1833,
+          "selfWall_ns" : 2000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 21375,
+          "inclusiveWall_ns" : 21000,
+          "selfCPU_ns" : 21375,
+          "selfWall_ns" : 21000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 140250,
+          "inclusiveWall_ns" : 140000,
+          "selfCPU_ns" : 140250,
+          "selfWall_ns" : 140000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 23375,
+          "inclusiveWall_ns" : 24000,
+          "selfCPU_ns" : 2000,
+          "selfWall_ns" : 3000
+        },
+        "refresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 209959,
+          "inclusiveWall_ns" : 210000,
+          "selfCPU_ns" : 37709,
+          "selfWall_ns" : 38000
+        },
+        "requestRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 7458,
+          "inclusiveWall_ns" : 8000,
+          "selfCPU_ns" : 2208,
+          "selfWall_ns" : 3000
+        },
+        "scheduleRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 5250,
+          "inclusiveWall_ns" : 5000,
+          "selfCPU_ns" : 5250,
+          "selfWall_ns" : 5000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 213042,
+        "eventLimitHit" : 0,
+        "events" : 1,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+          {
+            "event" : 1,
+            "kind" : "async",
+            "pending" : 0,
+            "refreshCalls" : 1,
+            "virtual_ns" : 211000
+          }
+        ],
+        "virtualElapsed_ns" : 211000,
+        "wall_ns" : 213000
+      },
+      "rowsN" : 100,
+      "sourceReads" : 1,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 1,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 1,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "invalid-both-on-rev2",
+      "counters" : {
+        "badge-source-stub" : 4,
+        "clean-layout-noop" : 2,
+        "queue-after" : 2,
+        "queue-async" : 3,
+        "table-header-set" : 1,
+        "table-layoutIfNeeded" : 4,
+        "table-reloadData" : 2
+      },
+      "inputTriggers" : 1,
+      "profile" : {
+        "layout" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 10167,
+          "inclusiveWall_ns" : 10000,
+          "selfCPU_ns" : 10167,
+          "selfWall_ns" : 10000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 2749,
+          "inclusiveWall_ns" : 4000,
+          "selfCPU_ns" : 2749,
+          "selfWall_ns" : 4000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 2,
+          "inclusiveCPU_ns" : 18208,
+          "inclusiveWall_ns" : 18000,
+          "selfCPU_ns" : 18208,
+          "selfWall_ns" : 18000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 174583,
+          "inclusiveWall_ns" : 175000,
+          "selfCPU_ns" : 174583,
+          "selfWall_ns" : 175000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 24376,
+          "inclusiveWall_ns" : 24000,
+          "selfCPU_ns" : 6168,
+          "selfWall_ns" : 6000
+        },
+        "refresh" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 248417,
+          "inclusiveWall_ns" : 249000,
+          "selfCPU_ns" : 32792,
+          "selfWall_ns" : 32000
+        },
+        "requestRecovery" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 2833,
+          "inclusiveWall_ns" : 3000,
+          "selfCPU_ns" : 750,
+          "selfWall_ns" : 1000
+        },
+        "requestRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 4375,
+          "inclusiveWall_ns" : 4000,
+          "selfCPU_ns" : 1541,
+          "selfWall_ns" : 2000
+        },
+        "scheduleRefresh" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 8667,
+          "inclusiveWall_ns" : 8000,
+          "selfCPU_ns" : 8667,
+          "selfWall_ns" : 8000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 259292,
+        "eventLimitHit" : 0,
+        "events" : 5,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+          {
+            "event" : 1,
+            "kind" : "async",
+            "pending" : 2,
+            "refreshCalls" : 1,
+            "virtual_ns" : 91000
+          },
+          {
+            "event" : 2,
+            "kind" : "async",
+            "pending" : 1,
+            "refreshCalls" : 2,
+            "virtual_ns" : 146000
+          },
+          {
+            "event" : 3,
+            "kind" : "after",
+            "pending" : 1,
+            "refreshCalls" : 2,
+            "virtual_ns" : 50004000
+          },
+          {
+            "event" : 4,
+            "kind" : "after",
+            "pending" : 1,
+            "refreshCalls" : 3,
+            "virtual_ns" : 150058000
+          },
+          {
+            "event" : 5,
+            "kind" : "async",
+            "pending" : 0,
+            "refreshCalls" : 4,
+            "virtual_ns" : 150106000
+          }
+        ],
+        "virtualElapsed_ns" : 150106000,
+        "wall_ns" : 260000
+      },
+      "rowsN" : 100,
+      "sourceReads" : 2,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : true,
+        "originalLayouts" : 0,
+        "policyRevision" : 2,
+        "projectionRevision" : 0,
+        "reloadData" : 2,
+        "retry" : true,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "invalid-both-on-rev0",
+      "counters" : {
+        "badge-source-stub" : 4,
+        "clean-layout-noop" : 2,
+        "queue-after" : 2,
+        "queue-async" : 3,
+        "table-header-set" : 1,
+        "table-layoutIfNeeded" : 4,
+        "table-reloadData" : 2
+      },
+      "inputTriggers" : 1,
+      "profile" : {
+        "layout" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 7709,
+          "inclusiveWall_ns" : 8000,
+          "selfCPU_ns" : 7709,
+          "selfWall_ns" : 8000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 1583,
+          "inclusiveWall_ns" : 3000,
+          "selfCPU_ns" : 1583,
+          "selfWall_ns" : 3000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 2,
+          "inclusiveCPU_ns" : 7833,
+          "inclusiveWall_ns" : 8000,
+          "selfCPU_ns" : 7833,
+          "selfWall_ns" : 8000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 155583,
+          "inclusiveWall_ns" : 155000,
+          "selfCPU_ns" : 155583,
+          "selfWall_ns" : 155000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 11999,
+          "inclusiveWall_ns" : 12000,
+          "selfCPU_ns" : 4166,
+          "selfWall_ns" : 4000
+        },
+        "refresh" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 203500,
+          "inclusiveWall_ns" : 204000,
+          "selfCPU_ns" : 24293,
+          "selfWall_ns" : 24000
+        },
+        "requestRecovery" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 2000,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 625,
+          "selfWall_ns" : 1000
+        },
+        "requestRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 2667,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 1125,
+          "selfWall_ns" : 0
+        },
+        "scheduleRefresh" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 5250,
+          "inclusiveWall_ns" : 5000,
+          "selfCPU_ns" : 5250,
+          "selfWall_ns" : 5000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 211708,
+        "eventLimitHit" : 0,
+        "events" : 5,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+          {
+            "event" : 1,
+            "kind" : "async",
+            "pending" : 2,
+            "refreshCalls" : 1,
+            "virtual_ns" : 62000
+          },
+          {
+            "event" : 2,
+            "kind" : "async",
+            "pending" : 1,
+            "refreshCalls" : 2,
+            "virtual_ns" : 112000
+          },
+          {
+            "event" : 3,
+            "kind" : "after",
+            "pending" : 1,
+            "refreshCalls" : 2,
+            "virtual_ns" : 50003000
+          },
+          {
+            "event" : 4,
+            "kind" : "after",
+            "pending" : 1,
+            "refreshCalls" : 3,
+            "virtual_ns" : 150043000
+          },
+          {
+            "event" : 5,
+            "kind" : "async",
+            "pending" : 0,
+            "refreshCalls" : 4,
+            "virtual_ns" : 150095000
+          }
+        ],
+        "virtualElapsed_ns" : 150095000,
+        "wall_ns" : 211000
+      },
+      "rowsN" : 100,
+      "sourceReads" : 2,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : true,
+        "originalLayouts" : 0,
+        "policyRevision" : 0,
+        "projectionRevision" : 0,
+        "reloadData" : 2,
+        "retry" : true,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "nil-native-both-on",
+      "counters" : {
+        "badge-source-stub" : 4,
+        "clean-layout-noop" : 2,
+        "queue-after" : 2,
+        "queue-async" : 3,
+        "table-header-set" : 1,
+        "table-layoutIfNeeded" : 4,
+        "table-reloadData" : 2
+      },
+      "inputTriggers" : 1,
+      "profile" : {
+        "layout" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 6959,
+          "inclusiveWall_ns" : 7000,
+          "selfCPU_ns" : 6959,
+          "selfWall_ns" : 7000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 1708,
+          "inclusiveWall_ns" : 1000,
+          "selfCPU_ns" : 1708,
+          "selfWall_ns" : 1000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 2,
+          "inclusiveCPU_ns" : 4916,
+          "inclusiveWall_ns" : 6000,
+          "selfCPU_ns" : 4916,
+          "selfWall_ns" : 6000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 26249,
+          "inclusiveWall_ns" : 27000,
+          "selfCPU_ns" : 26249,
+          "selfWall_ns" : 27000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 8707,
+          "inclusiveWall_ns" : 8000,
+          "selfCPU_ns" : 3791,
+          "selfWall_ns" : 2000
+        },
+        "refresh" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 69125,
+          "inclusiveWall_ns" : 70000,
+          "selfCPU_ns" : 23293,
+          "selfWall_ns" : 25000
+        },
+        "requestRecovery" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 2250,
+          "inclusiveWall_ns" : 3000,
+          "selfCPU_ns" : 792,
+          "selfWall_ns" : 2000
+        },
+        "requestRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 2125,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 917,
+          "selfWall_ns" : 1000
+        },
+        "scheduleRefresh" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 4875,
+          "inclusiveWall_ns" : 4000,
+          "selfCPU_ns" : 4875,
+          "selfWall_ns" : 4000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 78042,
+        "eventLimitHit" : 0,
+        "events" : 5,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+          {
+            "event" : 1,
+            "kind" : "async",
+            "pending" : 2,
+            "refreshCalls" : 1,
+            "virtual_ns" : 23000
+          },
+          {
+            "event" : 2,
+            "kind" : "async",
+            "pending" : 1,
+            "refreshCalls" : 2,
+            "virtual_ns" : 39000
+          },
+          {
+            "event" : 3,
+            "kind" : "after",
+            "pending" : 1,
+            "refreshCalls" : 2,
+            "virtual_ns" : 50003000
+          },
+          {
+            "event" : 4,
+            "kind" : "after",
+            "pending" : 1,
+            "refreshCalls" : 3,
+            "virtual_ns" : 150017000
+          },
+          {
+            "event" : 5,
+            "kind" : "async",
+            "pending" : 0,
+            "refreshCalls" : 4,
+            "virtual_ns" : 150031000
+          }
+        ],
+        "virtualElapsed_ns" : 150031000,
+        "wall_ns" : 78000
+      },
+      "rowsN" : 100,
+      "sourceReads" : 4,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : true,
+        "originalLayouts" : 0,
+        "policyRevision" : 2,
+        "projectionRevision" : 0,
+        "reloadData" : 2,
+        "retry" : true,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "invalid-group-only",
+      "counters" : {
+        "badge-source-stub" : 4,
+        "clean-layout-noop" : 2,
+        "queue-after" : 2,
+        "queue-async" : 3,
+        "table-header-set" : 1,
+        "table-layoutIfNeeded" : 4,
+        "table-reloadData" : 2
+      },
+      "inputTriggers" : 1,
+      "profile" : {
+        "layout" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 6625,
+          "inclusiveWall_ns" : 8000,
+          "selfCPU_ns" : 6625,
+          "selfWall_ns" : 8000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 1249,
+          "inclusiveWall_ns" : 0,
+          "selfCPU_ns" : 1249,
+          "selfWall_ns" : 0
+        },
+        "performSessionListLayout:" : {
+          "calls" : 2,
+          "inclusiveCPU_ns" : 3959,
+          "inclusiveWall_ns" : 4000,
+          "selfCPU_ns" : 3959,
+          "selfWall_ns" : 4000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 146876,
+          "inclusiveWall_ns" : 146000,
+          "selfCPU_ns" : 146876,
+          "selfWall_ns" : 146000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 7500,
+          "inclusiveWall_ns" : 7000,
+          "selfCPU_ns" : 3541,
+          "selfWall_ns" : 3000
+        },
+        "refresh" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 185500,
+          "inclusiveWall_ns" : 186000,
+          "selfCPU_ns" : 21250,
+          "selfWall_ns" : 23000
+        },
+        "requestRecovery" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1709,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 584,
+          "selfWall_ns" : 0
+        },
+        "requestRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1916,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 832,
+          "selfWall_ns" : 0
+        },
+        "scheduleRefresh" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 4209,
+          "inclusiveWall_ns" : 6000,
+          "selfCPU_ns" : 4209,
+          "selfWall_ns" : 6000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 193084,
+        "eventLimitHit" : 0,
+        "events" : 5,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+          {
+            "event" : 1,
+            "kind" : "async",
+            "pending" : 2,
+            "refreshCalls" : 1,
+            "virtual_ns" : 47000
+          },
+          {
+            "event" : 2,
+            "kind" : "async",
+            "pending" : 1,
+            "refreshCalls" : 2,
+            "virtual_ns" : 97000
+          },
+          {
+            "event" : 3,
+            "kind" : "after",
+            "pending" : 1,
+            "refreshCalls" : 2,
+            "virtual_ns" : 50002000
+          },
+          {
+            "event" : 4,
+            "kind" : "after",
+            "pending" : 1,
+            "refreshCalls" : 3,
+            "virtual_ns" : 150046000
+          },
+          {
+            "event" : 5,
+            "kind" : "async",
+            "pending" : 0,
+            "refreshCalls" : 4,
+            "virtual_ns" : 150090000
+          }
+        ],
+        "virtualElapsed_ns" : 150090000,
+        "wall_ns" : 194000
+      },
+      "rowsN" : 100,
+      "sourceReads" : 2,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : true,
+        "originalLayouts" : 0,
+        "policyRevision" : 2,
+        "projectionRevision" : 0,
+        "reloadData" : 2,
+        "retry" : true,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "invalid-privacy-only",
+      "counters" : {
+        "badge-source-stub" : 4,
+        "clean-layout-noop" : 2,
+        "queue-after" : 2,
+        "queue-async" : 3,
+        "table-header-set" : 1,
+        "table-layoutIfNeeded" : 4,
+        "table-reloadData" : 2
+      },
+      "inputTriggers" : 1,
+      "profile" : {
+        "layout" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 1500,
+          "inclusiveWall_ns" : 1000,
+          "selfCPU_ns" : 1500,
+          "selfWall_ns" : 1000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 1375,
+          "inclusiveWall_ns" : 1000,
+          "selfCPU_ns" : 1375,
+          "selfWall_ns" : 1000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 2,
+          "inclusiveCPU_ns" : 4833,
+          "inclusiveWall_ns" : 5000,
+          "selfCPU_ns" : 4833,
+          "selfWall_ns" : 5000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 151624,
+          "inclusiveWall_ns" : 152000,
+          "selfCPU_ns" : 151624,
+          "selfWall_ns" : 152000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 8416,
+          "inclusiveWall_ns" : 7000,
+          "selfCPU_ns" : 3583,
+          "selfWall_ns" : 2000
+        },
+        "refresh" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 209791,
+          "inclusiveWall_ns" : 209000,
+          "selfCPU_ns" : 44751,
+          "selfWall_ns" : 46000
+        },
+        "requestRecovery" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1542,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 500,
+          "selfWall_ns" : 1000
+        },
+        "requestRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1917,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 875,
+          "selfWall_ns" : 1000
+        },
+        "scheduleRefresh" : {
+          "calls" : 4,
+          "inclusiveCPU_ns" : 4209,
+          "inclusiveWall_ns" : 4000,
+          "selfCPU_ns" : 4209,
+          "selfWall_ns" : 4000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 219792,
+        "eventLimitHit" : 0,
+        "events" : 5,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+          {
+            "event" : 1,
+            "kind" : "async",
+            "pending" : 2,
+            "refreshCalls" : 1,
+            "virtual_ns" : 73000
+          },
+          {
+            "event" : 2,
+            "kind" : "async",
+            "pending" : 1,
+            "refreshCalls" : 2,
+            "virtual_ns" : 117000
+          },
+          {
+            "event" : 3,
+            "kind" : "after",
+            "pending" : 1,
+            "refreshCalls" : 2,
+            "virtual_ns" : 50002000
+          },
+          {
+            "event" : 4,
+            "kind" : "after",
+            "pending" : 1,
+            "refreshCalls" : 3,
+            "virtual_ns" : 150052000
+          },
+          {
+            "event" : 5,
+            "kind" : "async",
+            "pending" : 0,
+            "refreshCalls" : 4,
+            "virtual_ns" : 150096000
+          }
+        ],
+        "virtualElapsed_ns" : 150096000,
+        "wall_ns" : 220000
+      },
+      "rowsN" : 100,
+      "sourceReads" : 2,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : true,
+        "originalLayouts" : 0,
+        "policyRevision" : 2,
+        "projectionRevision" : 0,
+        "reloadData" : 2,
+        "retry" : true,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "invalid-both-off",
+      "counters" : {
+        "badge-source-stub" : 1,
+        "queue-async" : 1,
+        "table-header-set" : 1
+      },
+      "inputTriggers" : 1,
+      "profile" : {
+        "layout" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 542,
+          "inclusiveWall_ns" : 1000,
+          "selfCPU_ns" : 542,
+          "selfWall_ns" : 1000
+        },
+        "refresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 2375,
+          "inclusiveWall_ns" : 3000,
+          "selfCPU_ns" : 1833,
+          "selfWall_ns" : 2000
+        },
+        "requestRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1875,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 875,
+          "selfWall_ns" : 1000
+        },
+        "scheduleRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1000,
+          "inclusiveWall_ns" : 1000,
+          "selfCPU_ns" : 1000,
+          "selfWall_ns" : 1000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 4041,
+        "eventLimitHit" : 0,
+        "events" : 1,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+          {
+            "event" : 1,
+            "kind" : "async",
+            "pending" : 0,
+            "refreshCalls" : 1,
+            "virtual_ns" : 3000
+          }
+        ],
+        "virtualElapsed_ns" : 3000,
+        "wall_ns" : 4000
+      },
+      "rowsN" : 100,
+      "sourceReads" : 0,
+      "state" : {
+        "active" : false,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 0,
+        "policyRevision" : 2,
+        "projectionRevision" : -1,
+        "reloadData" : 0,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 0,
+        "tableNeedsLayout" : true
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "blocked-policy",
+      "counters" : {
+        "badge-source-stub" : 1,
+        "queue-async" : 1,
+        "table-header-set" : 1,
+        "table-layoutIfNeeded" : 1,
+        "table-reloadData" : 1
+      },
+      "inputTriggers" : 1,
+      "profile" : {
+        "layout" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 2291,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 2291,
+          "selfWall_ns" : 2000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 416,
+          "inclusiveWall_ns" : 0,
+          "selfCPU_ns" : 416,
+          "selfWall_ns" : 0
+        },
+        "performSessionListLayout:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 3125,
+          "inclusiveWall_ns" : 4000,
+          "selfCPU_ns" : 3125,
+          "selfWall_ns" : 4000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 6250,
+          "inclusiveWall_ns" : 6000,
+          "selfCPU_ns" : 6250,
+          "selfWall_ns" : 6000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 4334,
+          "inclusiveWall_ns" : 4000,
+          "selfCPU_ns" : 1209,
+          "selfWall_ns" : 0
+        },
+        "refresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 18250,
+          "inclusiveWall_ns" : 18000,
+          "selfCPU_ns" : 4959,
+          "selfWall_ns" : 6000
+        },
+        "requestRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1833,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 833,
+          "selfWall_ns" : 1000
+        },
+        "scheduleRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1000,
+          "inclusiveWall_ns" : 1000,
+          "selfCPU_ns" : 1000,
+          "selfWall_ns" : 1000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 19834,
+        "eventLimitHit" : 0,
+        "events" : 1,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+          {
+            "event" : 1,
+            "kind" : "async",
+            "pending" : 0,
+            "refreshCalls" : 1,
+            "virtual_ns" : 19000
+          }
+        ],
+        "virtualElapsed_ns" : 19000,
+        "wall_ns" : 19000
+      },
+      "rowsN" : 100,
+      "sourceReads" : 1,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : true,
+        "originalLayouts" : 0,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 1,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "single-stale-epoch",
+      "counters" : {
+        "badge-source-stub" : 1,
+        "original-table-layout" : 1,
+        "queue-async" : 1,
+        "table-layoutIfNeeded" : 1,
+        "table-reloadData" : 1
+      },
+      "inputTriggers" : 1,
+      "profile" : {
+        "layout" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1792,
+          "inclusiveWall_ns" : 1000,
+          "selfCPU_ns" : 1792,
+          "selfWall_ns" : 1000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 500,
+          "inclusiveWall_ns" : 0,
+          "selfCPU_ns" : 500,
+          "selfWall_ns" : 0
+        },
+        "performSessionListLayout:" : {
+          "calls" : 2,
+          "inclusiveCPU_ns" : 183625,
+          "inclusiveWall_ns" : 185000,
+          "selfCPU_ns" : 181459,
+          "selfWall_ns" : 183000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 288833,
+          "inclusiveWall_ns" : 289000,
+          "selfCPU_ns" : 288833,
+          "selfWall_ns" : 289000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 177167,
+          "inclusiveWall_ns" : 177000,
+          "selfCPU_ns" : 1000,
+          "selfWall_ns" : 0
+        },
+        "refresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 476000,
+          "inclusiveWall_ns" : 476000,
+          "selfCPU_ns" : 7708,
+          "selfWall_ns" : 9000
+        },
+        "requestRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 2166,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 832,
+          "selfWall_ns" : 0
+        },
+        "scheduleRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1334,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 1334,
+          "selfWall_ns" : 2000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 477750,
+        "eventLimitHit" : 0,
+        "events" : 1,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+          {
+            "event" : 1,
+            "kind" : "async",
+            "pending" : 0,
+            "refreshCalls" : 1,
+            "virtual_ns" : 477000
+          }
+        ],
+        "virtualElapsed_ns" : 477000,
+        "wall_ns" : 478000
+      },
+      "rowsN" : 1000,
+      "sourceReads" : 1,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 2,
+        "held" : false,
+        "originalLayouts" : 2,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 2,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 2,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "single-stale-policy-revision",
+      "counters" : {
+        "badge-source-stub" : 1,
+        "original-table-layout" : 1,
+        "queue-async" : 1,
+        "table-layoutIfNeeded" : 1,
+        "table-reloadData" : 1
+      },
+      "inputTriggers" : 1,
+      "profile" : {
+        "layout" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1750,
+          "inclusiveWall_ns" : 1000,
+          "selfCPU_ns" : 1750,
+          "selfWall_ns" : 1000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 583,
+          "inclusiveWall_ns" : 0,
+          "selfCPU_ns" : 583,
+          "selfWall_ns" : 0
+        },
+        "performSessionListLayout:" : {
+          "calls" : 2,
+          "inclusiveCPU_ns" : 182459,
+          "inclusiveWall_ns" : 182000,
+          "selfCPU_ns" : 180459,
+          "selfWall_ns" : 180000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 889709,
+          "inclusiveWall_ns" : 890000,
+          "selfCPU_ns" : 889709,
+          "selfWall_ns" : 890000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 177750,
+          "inclusiveWall_ns" : 178000,
+          "selfCPU_ns" : 958,
+          "selfWall_ns" : 1000
+        },
+        "refresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1098916,
+          "inclusiveWall_ns" : 1099000,
+          "selfCPU_ns" : 29124,
+          "selfWall_ns" : 30000
+        },
+        "requestRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 2000,
+          "inclusiveWall_ns" : 2000,
+          "selfCPU_ns" : 875,
+          "selfWall_ns" : 1000
+        },
+        "scheduleRefresh" : {
+          "calls" : 1,
+          "inclusiveCPU_ns" : 1125,
+          "inclusiveWall_ns" : 1000,
+          "selfCPU_ns" : 1125,
+          "selfWall_ns" : 1000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 1100625,
+        "eventLimitHit" : 0,
+        "events" : 1,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+          {
+            "event" : 1,
+            "kind" : "async",
+            "pending" : 0,
+            "refreshCalls" : 1,
+            "virtual_ns" : 1100000
+          }
+        ],
+        "virtualElapsed_ns" : 1100000,
+        "wall_ns" : 1100000
+      },
+      "rowsN" : 1000,
+      "sourceReads" : 1,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 2,
+        "policyRevision" : 3,
+        "projectionRevision" : 3,
+        "reloadData" : 2,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "externally-driven-60Hz",
+      "counters" : {
+        "badge-source-stub" : 60,
+        "original-table-layout" : 60,
+        "queue-async" : 60,
+        "queue-external-60Hz" : 60,
+        "table-header-set" : 1,
+        "table-layoutIfNeeded" : 60,
+        "table-reloadData" : 60
+      },
+      "inputTriggers" : 60,
+      "profile" : {
+        "layout" : {
+          "calls" : 60,
+          "inclusiveCPU_ns" : 99627,
+          "inclusiveWall_ns" : 101000,
+          "selfCPU_ns" : 99627,
+          "selfWall_ns" : 101000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 60,
+          "inclusiveCPU_ns" : 25457,
+          "inclusiveWall_ns" : 19000,
+          "selfCPU_ns" : 25457,
+          "selfWall_ns" : 19000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 60,
+          "inclusiveCPU_ns" : 10531130,
+          "inclusiveWall_ns" : 10535000,
+          "selfCPU_ns" : 10531130,
+          "selfWall_ns" : 10535000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 60,
+          "inclusiveCPU_ns" : 17323630,
+          "inclusiveWall_ns" : 17327000,
+          "selfCPU_ns" : 17323630,
+          "selfWall_ns" : 17327000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 60,
+          "inclusiveCPU_ns" : 10581420,
+          "inclusiveWall_ns" : 10588000,
+          "selfCPU_ns" : 50290,
+          "selfWall_ns" : 53000
+        },
+        "refresh" : {
+          "calls" : 60,
+          "inclusiveCPU_ns" : 28408497,
+          "inclusiveWall_ns" : 28410000,
+          "selfCPU_ns" : 378363,
+          "selfWall_ns" : 375000
+        },
+        "requestRefresh" : {
+          "calls" : 60,
+          "inclusiveCPU_ns" : 102878,
+          "inclusiveWall_ns" : 102000,
+          "selfCPU_ns" : 36752,
+          "selfWall_ns" : 34000
+        },
+        "scheduleRefresh" : {
+          "calls" : 60,
+          "inclusiveCPU_ns" : 66126,
+          "inclusiveWall_ns" : 68000,
+          "selfCPU_ns" : 66126,
+          "selfWall_ns" : 68000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 28803875,
+        "eventLimitHit" : 0,
+        "events" : 120,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+          {
+            "event" : 1,
+            "kind" : "external-60Hz",
+            "pending" : 60,
+            "refreshCalls" : 0,
+            "virtual_ns" : 3000
+          },
+          {
+            "event" : 2,
+            "kind" : "async",
+            "pending" : 59,
+            "refreshCalls" : 1,
+            "virtual_ns" : 1217000
+          },
+          {
+            "event" : 3,
+            "kind" : "external-60Hz",
+            "pending" : 59,
+            "refreshCalls" : 1,
+            "virtual_ns" : 16669667
+          },
+          {
+            "event" : 4,
+            "kind" : "async",
+            "pending" : 58,
+            "refreshCalls" : 2,
+            "virtual_ns" : 17131667
+          },
+          {
+            "event" : 5,
+            "kind" : "external-60Hz",
+            "pending" : 58,
+            "refreshCalls" : 2,
+            "virtual_ns" : 33335334
+          },
+          {
+            "event" : 6,
+            "kind" : "async",
+            "pending" : 57,
+            "refreshCalls" : 3,
+            "virtual_ns" : 33798334
+          },
+          {
+            "event" : 7,
+            "kind" : "external-60Hz",
+            "pending" : 57,
+            "refreshCalls" : 3,
+            "virtual_ns" : 50002001
+          },
+          {
+            "event" : 8,
+            "kind" : "async",
+            "pending" : 56,
+            "refreshCalls" : 4,
+            "virtual_ns" : 50463001
+          },
+          {
+            "event" : 32,
+            "kind" : "async",
+            "pending" : 44,
+            "refreshCalls" : 16,
+            "virtual_ns" : 250462005
+          }
+        ],
+        "virtualElapsed_ns" : 983789353,
+        "wall_ns" : 28809000
+      },
+      "rowsN" : 1000,
+      "sourceReads" : 60,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 60,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 60,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "cost-cached-identical",
+      "counters" : {
+        "badge-source-stub" : 20,
+        "clean-layout-noop" : 20,
+        "table-layoutIfNeeded" : 20
+      },
+      "inputTriggers" : 20,
+      "profile" : {
+        "layout" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 28335,
+          "inclusiveWall_ns" : 30000,
+          "selfCPU_ns" : 28335,
+          "selfWall_ns" : 30000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 3914,
+          "inclusiveWall_ns" : 3000,
+          "selfCPU_ns" : 3914,
+          "selfWall_ns" : 3000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 712831,
+          "inclusiveWall_ns" : 715000,
+          "selfCPU_ns" : 712831,
+          "selfWall_ns" : 715000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 141959,
+          "inclusiveWall_ns" : 143000,
+          "selfCPU_ns" : 141959,
+          "selfWall_ns" : 143000
+        },
+        "refresh" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 959210,
+          "inclusiveWall_ns" : 959000,
+          "selfCPU_ns" : 72171,
+          "selfWall_ns" : 68000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 250,
+        "eventLimitHit" : 0,
+        "events" : 0,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+
+        ],
+        "virtualElapsed_ns" : 0,
+        "wall_ns" : 0
+      },
+      "rowsN" : 100,
+      "sourceReads" : 0,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 1,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 1,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "cost-new-structure",
+      "counters" : {
+        "badge-source-stub" : 20,
+        "original-table-layout" : 20,
+        "table-layoutIfNeeded" : 20,
+        "table-reloadData" : 20
+      },
+      "inputTriggers" : 20,
+      "profile" : {
+        "layout" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 30455,
+          "inclusiveWall_ns" : 32000,
+          "selfCPU_ns" : 30455,
+          "selfWall_ns" : 32000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 12582,
+          "inclusiveWall_ns" : 10000,
+          "selfCPU_ns" : 12582,
+          "selfWall_ns" : 10000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 370087,
+          "inclusiveWall_ns" : 370000,
+          "selfCPU_ns" : 370087,
+          "selfWall_ns" : 370000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 2004293,
+          "inclusiveWall_ns" : 2005000,
+          "selfCPU_ns" : 2004293,
+          "selfWall_ns" : 2005000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 390956,
+          "inclusiveWall_ns" : 390000,
+          "selfCPU_ns" : 20869,
+          "selfWall_ns" : 20000
+        },
+        "refresh" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 2925876,
+          "inclusiveWall_ns" : 2924000,
+          "selfCPU_ns" : 487590,
+          "selfWall_ns" : 487000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 208,
+        "eventLimitHit" : 0,
+        "events" : 0,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+
+        ],
+        "virtualElapsed_ns" : 0,
+        "wall_ns" : 0
+      },
+      "rowsN" : 100,
+      "sourceReads" : 20,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 21,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 21,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "cost-cached-identical",
+      "counters" : {
+        "badge-source-stub" : 20,
+        "clean-layout-noop" : 20,
+        "table-layoutIfNeeded" : 20
+      },
+      "inputTriggers" : 20,
+      "profile" : {
+        "layout" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 32628,
+          "inclusiveWall_ns" : 33000,
+          "selfCPU_ns" : 32628,
+          "selfWall_ns" : 33000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 4250,
+          "inclusiveWall_ns" : 4000,
+          "selfCPU_ns" : 4250,
+          "selfWall_ns" : 4000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 815291,
+          "inclusiveWall_ns" : 815000,
+          "selfCPU_ns" : 815291,
+          "selfWall_ns" : 815000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 150499,
+          "inclusiveWall_ns" : 153000,
+          "selfCPU_ns" : 150499,
+          "selfWall_ns" : 153000
+        },
+        "refresh" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 1103460,
+          "inclusiveWall_ns" : 1105000,
+          "selfCPU_ns" : 100792,
+          "selfWall_ns" : 100000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 292,
+        "eventLimitHit" : 0,
+        "events" : 0,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+
+        ],
+        "virtualElapsed_ns" : 0,
+        "wall_ns" : 0
+      },
+      "rowsN" : 100,
+      "sourceReads" : 0,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 1,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 1,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 12,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "cost-new-structure",
+      "counters" : {
+        "badge-source-stub" : 20,
+        "original-table-layout" : 20,
+        "table-layoutIfNeeded" : 20,
+        "table-reloadData" : 20
+      },
+      "inputTriggers" : 20,
+      "profile" : {
+        "layout" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 37002,
+          "inclusiveWall_ns" : 38000,
+          "selfCPU_ns" : 37002,
+          "selfWall_ns" : 38000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 14707,
+          "inclusiveWall_ns" : 15000,
+          "selfCPU_ns" : 14707,
+          "selfWall_ns" : 15000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 374832,
+          "inclusiveWall_ns" : 377000,
+          "selfCPU_ns" : 374832,
+          "selfWall_ns" : 377000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 2161541,
+          "inclusiveWall_ns" : 2161000,
+          "selfCPU_ns" : 2161541,
+          "selfWall_ns" : 2161000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 397415,
+          "inclusiveWall_ns" : 397000,
+          "selfCPU_ns" : 22583,
+          "selfWall_ns" : 20000
+        },
+        "refresh" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 3154792,
+          "inclusiveWall_ns" : 3161000,
+          "selfCPU_ns" : 544127,
+          "selfWall_ns" : 550000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 417,
+        "eventLimitHit" : 0,
+        "events" : 0,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+
+        ],
+        "virtualElapsed_ns" : 0,
+        "wall_ns" : 0
+      },
+      "rowsN" : 100,
+      "sourceReads" : 20,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 21,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 21,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 12,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "cost-cached-identical",
+      "counters" : {
+        "badge-source-stub" : 20,
+        "clean-layout-noop" : 20,
+        "table-layoutIfNeeded" : 20
+      },
+      "inputTriggers" : 20,
+      "profile" : {
+        "layout" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 29830,
+          "inclusiveWall_ns" : 27000,
+          "selfCPU_ns" : 29830,
+          "selfWall_ns" : 27000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 3962,
+          "inclusiveWall_ns" : 5000,
+          "selfCPU_ns" : 3962,
+          "selfWall_ns" : 5000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 5638708,
+          "inclusiveWall_ns" : 5641000,
+          "selfCPU_ns" : 5638708,
+          "selfWall_ns" : 5641000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 1282915,
+          "inclusiveWall_ns" : 1281000,
+          "selfCPU_ns" : 1282915,
+          "selfWall_ns" : 1281000
+        },
+        "refresh" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 7029792,
+          "inclusiveWall_ns" : 7028000,
+          "selfCPU_ns" : 74377,
+          "selfWall_ns" : 74000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 250,
+        "eventLimitHit" : 0,
+        "events" : 0,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+
+        ],
+        "virtualElapsed_ns" : 0,
+        "wall_ns" : 0
+      },
+      "rowsN" : 1000,
+      "sourceReads" : 0,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 1,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 1,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "cost-new-structure",
+      "counters" : {
+        "badge-source-stub" : 20,
+        "original-table-layout" : 20,
+        "table-layoutIfNeeded" : 20,
+        "table-reloadData" : 20
+      },
+      "inputTriggers" : 20,
+      "profile" : {
+        "layout" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 42457,
+          "inclusiveWall_ns" : 44000,
+          "selfCPU_ns" : 42457,
+          "selfWall_ns" : 44000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 58331,
+          "inclusiveWall_ns" : 64000,
+          "selfCPU_ns" : 58331,
+          "selfWall_ns" : 64000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 3523669,
+          "inclusiveWall_ns" : 3544000,
+          "selfCPU_ns" : 3523669,
+          "selfWall_ns" : 3544000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 19036542,
+          "inclusiveWall_ns" : 19076000,
+          "selfCPU_ns" : 19036542,
+          "selfWall_ns" : 19076000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 3548792,
+          "inclusiveWall_ns" : 3570000,
+          "selfCPU_ns" : 25123,
+          "selfWall_ns" : 26000
+        },
+        "refresh" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 27141331,
+          "inclusiveWall_ns" : 27201000,
+          "selfCPU_ns" : 4455209,
+          "selfWall_ns" : 4447000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 416,
+        "eventLimitHit" : 0,
+        "events" : 0,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+
+        ],
+        "virtualElapsed_ns" : 0,
+        "wall_ns" : 0
+      },
+      "rowsN" : 1000,
+      "sourceReads" : 20,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 21,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 21,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "cost-cached-identical",
+      "counters" : {
+        "badge-source-stub" : 20,
+        "clean-layout-noop" : 20,
+        "table-layoutIfNeeded" : 20
+      },
+      "inputTriggers" : 20,
+      "profile" : {
+        "layout" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 29876,
+          "inclusiveWall_ns" : 26000,
+          "selfCPU_ns" : 29876,
+          "selfWall_ns" : 26000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 3835,
+          "inclusiveWall_ns" : 4000,
+          "selfCPU_ns" : 3835,
+          "selfWall_ns" : 4000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 5713041,
+          "inclusiveWall_ns" : 5712000,
+          "selfCPU_ns" : 5713041,
+          "selfWall_ns" : 5712000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 1295623,
+          "inclusiveWall_ns" : 1297000,
+          "selfCPU_ns" : 1295623,
+          "selfWall_ns" : 1297000
+        },
+        "refresh" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 7132124,
+          "inclusiveWall_ns" : 7131000,
+          "selfCPU_ns" : 89749,
+          "selfWall_ns" : 92000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 209,
+        "eventLimitHit" : 0,
+        "events" : 0,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+
+        ],
+        "virtualElapsed_ns" : 0,
+        "wall_ns" : 0
+      },
+      "rowsN" : 1000,
+      "sourceReads" : 0,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 1,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 1,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 12,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "cost-new-structure",
+      "counters" : {
+        "badge-source-stub" : 20,
+        "original-table-layout" : 20,
+        "table-layoutIfNeeded" : 20,
+        "table-reloadData" : 20
+      },
+      "inputTriggers" : 20,
+      "profile" : {
+        "layout" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 37622,
+          "inclusiveWall_ns" : 37000,
+          "selfCPU_ns" : 37622,
+          "selfWall_ns" : 37000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 43795,
+          "inclusiveWall_ns" : 44000,
+          "selfCPU_ns" : 43795,
+          "selfWall_ns" : 44000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 3467500,
+          "inclusiveWall_ns" : 3471000,
+          "selfCPU_ns" : 3467500,
+          "selfWall_ns" : 3471000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 19153628,
+          "inclusiveWall_ns" : 19155000,
+          "selfCPU_ns" : 19153628,
+          "selfWall_ns" : 19155000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 3490459,
+          "inclusiveWall_ns" : 3491000,
+          "selfCPU_ns" : 22959,
+          "selfWall_ns" : 20000
+        },
+        "refresh" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 27169249,
+          "inclusiveWall_ns" : 27170000,
+          "selfCPU_ns" : 4443745,
+          "selfWall_ns" : 4443000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 292,
+        "eventLimitHit" : 0,
+        "events" : 0,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+
+        ],
+        "virtualElapsed_ns" : 0,
+        "wall_ns" : 1000
+      },
+      "rowsN" : 1000,
+      "sourceReads" : 20,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 21,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 21,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 12,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "cost-cached-identical",
+      "counters" : {
+        "badge-source-stub" : 20,
+        "clean-layout-noop" : 20,
+        "table-layoutIfNeeded" : 20
+      },
+      "inputTriggers" : 20,
+      "profile" : {
+        "layout" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 36499,
+          "inclusiveWall_ns" : 38000,
+          "selfCPU_ns" : 36499,
+          "selfWall_ns" : 38000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 4418,
+          "inclusiveWall_ns" : 5000,
+          "selfCPU_ns" : 4418,
+          "selfWall_ns" : 5000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 63205124,
+          "inclusiveWall_ns" : 63233000,
+          "selfCPU_ns" : 63205124,
+          "selfWall_ns" : 63233000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 13755954,
+          "inclusiveWall_ns" : 13755000,
+          "selfCPU_ns" : 13755954,
+          "selfWall_ns" : 13755000
+        },
+        "refresh" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 77096668,
+          "inclusiveWall_ns" : 77122000,
+          "selfCPU_ns" : 94673,
+          "selfWall_ns" : 91000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 417,
+        "eventLimitHit" : 0,
+        "events" : 0,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+
+        ],
+        "virtualElapsed_ns" : 0,
+        "wall_ns" : 0
+      },
+      "rowsN" : 10000,
+      "sourceReads" : 0,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 1,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 1,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "cost-new-structure",
+      "counters" : {
+        "badge-source-stub" : 20,
+        "original-table-layout" : 20,
+        "table-layoutIfNeeded" : 20,
+        "table-reloadData" : 20
+      },
+      "inputTriggers" : 20,
+      "profile" : {
+        "layout" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 64627,
+          "inclusiveWall_ns" : 62000,
+          "selfCPU_ns" : 64627,
+          "selfWall_ns" : 62000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 606752,
+          "inclusiveWall_ns" : 606000,
+          "selfCPU_ns" : 606752,
+          "selfWall_ns" : 606000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 33725918,
+          "inclusiveWall_ns" : 33724000,
+          "selfCPU_ns" : 33725918,
+          "selfWall_ns" : 33724000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 193674207,
+          "inclusiveWall_ns" : 193721000,
+          "selfCPU_ns" : 193674207,
+          "selfWall_ns" : 193721000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 33755919,
+          "inclusiveWall_ns" : 33750000,
+          "selfCPU_ns" : 30001,
+          "selfWall_ns" : 26000
+        },
+        "refresh" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 276173664,
+          "inclusiveWall_ns" : 276233000,
+          "selfCPU_ns" : 48072159,
+          "selfWall_ns" : 48094000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 542,
+        "eventLimitHit" : 0,
+        "events" : 0,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+
+        ],
+        "virtualElapsed_ns" : 0,
+        "wall_ns" : 1000
+      },
+      "rowsN" : 10000,
+      "sourceReads" : 20,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 21,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 21,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 4,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "cost-cached-identical",
+      "counters" : {
+        "badge-source-stub" : 20,
+        "clean-layout-noop" : 20,
+        "table-layoutIfNeeded" : 20
+      },
+      "inputTriggers" : 20,
+      "profile" : {
+        "layout" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 52251,
+          "inclusiveWall_ns" : 55000,
+          "selfCPU_ns" : 52251,
+          "selfWall_ns" : 55000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 5339,
+          "inclusiveWall_ns" : 3000,
+          "selfCPU_ns" : 5339,
+          "selfWall_ns" : 3000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 64803623,
+          "inclusiveWall_ns" : 64875000,
+          "selfCPU_ns" : 64803623,
+          "selfWall_ns" : 64875000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 13857543,
+          "inclusiveWall_ns" : 13865000,
+          "selfCPU_ns" : 13857543,
+          "selfWall_ns" : 13865000
+        },
+        "refresh" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 78879832,
+          "inclusiveWall_ns" : 78956000,
+          "selfCPU_ns" : 161076,
+          "selfWall_ns" : 158000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 542,
+        "eventLimitHit" : 0,
+        "events" : 0,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+
+        ],
+        "virtualElapsed_ns" : 0,
+        "wall_ns" : 1000
+      },
+      "rowsN" : 10000,
+      "sourceReads" : 0,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 1,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 1,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 12,
+      "visibleCellV" : 12
+    },
+    {
+      "case" : "cost-new-structure",
+      "counters" : {
+        "badge-source-stub" : 20,
+        "original-table-layout" : 20,
+        "table-layoutIfNeeded" : 20,
+        "table-reloadData" : 20
+      },
+      "inputTriggers" : 20,
+      "profile" : {
+        "layout" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 67207,
+          "inclusiveWall_ns" : 65000,
+          "selfCPU_ns" : 67207,
+          "selfWall_ns" : 65000
+        },
+        "nativeSectionsForAccount:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 622960,
+          "inclusiveWall_ns" : 623000,
+          "selfCPU_ns" : 622960,
+          "selfWall_ns" : 623000
+        },
+        "performSessionListLayout:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 34261586,
+          "inclusiveWall_ns" : 34268000,
+          "selfCPU_ns" : 34261586,
+          "selfWall_ns" : 34268000
+        },
+        "projectionForSections:tabs:selectedTabID:accountID:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 199917584,
+          "inclusiveWall_ns" : 199989000,
+          "selfCPU_ns" : 199917584,
+          "selfWall_ns" : 199989000
+        },
+        "publishProjection:previous:changes:previouslyProjecting:" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 34293168,
+          "inclusiveWall_ns" : 34299000,
+          "selfCPU_ns" : 31582,
+          "selfWall_ns" : 31000
+        },
+        "refresh" : {
+          "calls" : 20,
+          "inclusiveCPU_ns" : 283216373,
+          "inclusiveWall_ns" : 283302000,
+          "selfCPU_ns" : 48315454,
+          "selfWall_ns" : 48326000
+        }
+      },
+      "pump" : {
+        "cpu_ns" : 667,
+        "eventLimitHit" : 0,
+        "events" : 0,
+        "pending" : 0,
+        "quiescent" : 1,
+        "samples" : [
+
+        ],
+        "virtualElapsed_ns" : 0,
+        "wall_ns" : 1000
+      },
+      "rowsN" : 10000,
+      "sourceReads" : 20,
+      "state" : {
+        "active" : true,
+        "dirty" : false,
+        "epoch" : 1,
+        "held" : false,
+        "originalLayouts" : 21,
+        "policyRevision" : 2,
+        "projectionRevision" : 2,
+        "reloadData" : 21,
+        "retry" : false,
+        "scheduled" : false,
+        "snapshotEpoch" : 1,
+        "tableNeedsLayout" : false
+      },
+      "tabsM" : 12,
+      "visibleCellV" : 12
+    }
+  ]
+}

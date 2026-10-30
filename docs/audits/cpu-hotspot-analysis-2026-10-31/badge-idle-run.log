@@ -1,0 +1,56 @@
+{
+  "HEAD": "8467df87bebb2998f021238b7d88eaea65266214",
+  "output_directory": "/tmp/wechat-cpu-badge-idle-5w8m8arc",
+  "command": [
+    "xcrun",
+    "--sdk",
+    "macosx",
+    "clang",
+    "-fobjc-arc",
+    "-fblocks",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-unused-variable",
+    "-Wno-unused-function",
+    "-framework",
+    "Foundation",
+    "-framework",
+    "CoreGraphics",
+    "-framework",
+    "QuartzCore",
+    "-I/tmp/wechat-cpu-badge-idle-5w8m8arc",
+    "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests",
+    "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/BackgroundBlurUIKit",
+    "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/BackgroundBlurUIKit/BackgroundBlurUIKit.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendListShield.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendPolicy.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupProjection.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/WESessionTabItem.m",
+    "/tmp/wechat-cpu-badge-idle-5w8m8arc/probe.m",
+    "-o",
+    "/tmp/wechat-cpu-badge-idle-5w8m8arc/probe"
+  ],
+  "limitations": "Native reader returns immutable supplied rows; publication/UI sink is counted fixture. No natural phone event-frequency or UIKit CPU proof."
+}
+{
+  "idle" : {
+    "newListPublications" : 0,
+    "newSnapshotBuilds" : 0,
+    "newSourceEvents" : 0,
+    "observedHostIdleSeconds" : 0.40000000000000002,
+    "sourceRefreshAgain" : false,
+    "sourceScheduled" : false
+  },
+  "requests" : {
+    "newListPublications" : 0,
+    "newSnapshotBuilds" : 0,
+    "newSourceEvents" : 0,
+    "sourceRefreshAgain" : false,
+    "sourceScheduled" : false,
+    "suppliedDecisionReads" : 600,
+    "suppliedImmediateRequests" : 600
+  }
+}
+

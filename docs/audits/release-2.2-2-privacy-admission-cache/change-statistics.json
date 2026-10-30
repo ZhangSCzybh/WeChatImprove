@@ -1,0 +1,47 @@
+[
+  {
+    "path": "Controllers/CSGroupListAdapter.m",
+    "additions": 49,
+    "deletions": 5
+  },
+  {
+    "path": "Controllers/CSReleaseNotesViewController.m",
+    "additions": 3,
+    "deletions": 0
+  },
+  {
+    "path": "Headers/CSUserInfoHelper.h",
+    "additions": 1,
+    "deletions": 1
+  },
+  {
+    "path": "README.md",
+    "additions": 7,
+    "deletions": 7
+  },
+  {
+    "path": "control",
+    "additions": 1,
+    "deletions": 1
+  },
+  {
+    "path": "Tests/PrivacyAdmissionCacheTests.m",
+    "additions": 208,
+    "deletions": 0
+  },
+  {
+    "path": "Tests/PrivacyAdmissionCacheAdditionalTests.m",
+    "additions": 84,
+    "deletions": 0
+  },
+  {
+    "path": "Tests/verify-privacy-admission-cache.sh",
+    "additions": 38,
+    "deletions": 0
+  },
+  {
+    "path": "Tests/verify-privacy-admission-cache-events.sh",
+    "additions": 23,
+    "deletions": 0
+  }
+]

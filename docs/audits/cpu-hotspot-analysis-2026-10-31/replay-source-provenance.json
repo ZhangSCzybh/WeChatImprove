@@ -1,0 +1,102 @@
+{
+  "head": "8467df87bebb2998f021238b7d88eaea65266214",
+  "methods": [
+    {
+      "marker": "- (UIView *)nativeTableHeaderView",
+      "line": 567,
+      "sha256": "8055e35f9c2db887504762ebaef962b7c717036ddca0c8ad32923231ae94f9ab"
+    },
+    {
+      "marker": "- (void)setNativeTableHeaderView:",
+      "line": 568,
+      "sha256": "1d77ea72ae2b3120d1ab4dadcc70365dcddd2966a4c1e94128ad057715f0bfa4"
+    },
+    {
+      "marker": "- (void)prepareForNativeSearch",
+      "line": 577,
+      "sha256": "cab0401797e09a6aee4a516e55286edafb9a9c0f229becfb198d4029a29cd9db"
+    },
+    {
+      "marker": "- (BOOL)keepsGroupHeaderDuringSearch",
+      "line": 590,
+      "sha256": "f85d776a413789789db5dc557b9c6476b7116cc1affcb15ac8928d795075d77f"
+    },
+    {
+      "marker": "- (void)publishHeader:",
+      "line": 595,
+      "sha256": "e7c06b788a5b465da716f3d1d95fe80f971168ad9dc73eb89fbf104c6519aebc"
+    },
+    {
+      "marker": "- (void)layout {",
+      "line": 601,
+      "sha256": "9f1556afa65c624d68a4ab2303d39fb793b44d67ee368742931a7b32c16e2cfc"
+    },
+    {
+      "marker": "- (void)refresh {",
+      "line": 789,
+      "sha256": "586d62b003cc4035d407ddf520d6d4c8362f7c7709262baaf02b2f55f3e0e988"
+    },
+    {
+      "marker": "- (void)performSessionListLayout:",
+      "line": 648,
+      "sha256": "798b421cdf775e3d2319ce8f6eac89ee5b071d4507b97359f216073f3f118d02"
+    },
+    {
+      "marker": "- (void)requestRefresh {",
+      "line": 1014,
+      "sha256": "45de5586d6b9b83824a7eef6a302f2e116800c56dea7cade8cea87c2d2bdbebe"
+    },
+    {
+      "marker": "- (void)requestRecovery {",
+      "line": 1006,
+      "sha256": "d416592518e19ea4717046e3a088954dfacb5a55248e8e472b5e86c92ea69d44"
+    },
+    {
+      "marker": "- (void)scheduleRefresh {",
+      "line": 1021,
+      "sha256": "56255895340c85ef69e1f985f48c8019575af4b8fbf252a1640bb89ba2156c6d"
+    },
+    {
+      "marker": "- (void)cancelScheduledRefresh {",
+      "line": 1002,
+      "sha256": "a009d05f9194e1183128ce51fa99808fb20ee22756693f3342d31b62de521441"
+    },
+    {
+      "marker": "- (void)invalidateNativeSnapshot",
+      "line": 764,
+      "sha256": "3f1473ba4338fcf7410c31e04883d034e148219040babcb53b2d65ce31f8bed7"
+    },
+    {
+      "marker": "- (NSArray *)nativeSectionsForAccount:",
+      "line": 767,
+      "sha256": "8cc11c9fd367f03e2182d6e753f0754e52d54100073d916f3ec625c0c044239c"
+    },
+    {
+      "marker": "- (CSGroupProjection *)projectionForSections:",
+      "line": 943,
+      "sha256": "c6a58fc7e5e446563e0cf2de6c08fd4daeed515d5c61fbfe06c5ed286f04be8c"
+    },
+    {
+      "marker": "- (void)publishProjection:",
+      "line": 921,
+      "sha256": "715e977c1bb1ea4a0b05b63fe617349e41be5686f7567552ab56ce48a69d8d3b"
+    }
+  ],
+  "native_ui_inputs_are_doubles": true,
+  "input_sha256": {
+    "Controllers/CSGroupListAdapter.m": "04347cc9a79cea7c5f210b450850e3dd8b967de7e2b3824581ec650daf1f06af",
+    "Controllers/CSGroupListAdapter.h": "b4e908a40c86ad4c0ec47f5b5622448814abc837f32043ebb5fd5d0261e584b4",
+    "Controllers/CSGroupProjection.m": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a",
+    "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+    "Controllers/WESessionTabItem.m": "dfb12f2a1eb44a0d35a175419bfe914cf7d22ff042e75cbc679ce6959928a6e0",
+    "Hooks/SessionGroupHooks.xm": "7e3ed572e1937a93cc6e82638972c45509fcd894dba6731dccf663a74411e806",
+    "Tests/GroupSearchTests.m": "746dfd03765b04d4e8e49ce2e0626357c5436d356e9060bac9363e59545050cf",
+    "Controllers/CSCloseFriendListShield.m": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b",
+    "Controllers/CSCloseFriendListShield.h": "963bdecc871258f67d6d0b70b884a2dcf3e22af048b84bfcc763474b5b1406c2",
+    "Controllers/CSGroupProjection.h": "f92f2377662d0d684d683ee5b3b3352ef100e825b6e8398268a15990febb2f19",
+    "Controllers/CSCloseFriendPolicy.h": "4ccefb7f1a2c173a68316c0f2e0daa9b4d1be189b1cf1cab862271205cd06575",
+    "Controllers/WESessionTabItem.h": "11fab1658de7f1d3252b0465380dda5230f38614b417df33bc1fb24dfad96a9b",
+    "Controllers/CSGroupAppearance.h": "4beff6f101ae90b26fe67481d8f905a463b45374db6ef907a84f4734bc839ad8",
+    "Controllers/CSGroupRefreshState.h": "3435bd06d51be0818ecbebe7dc378a019f4114c2ecd25e530d8c86f8d7b016af"
+  }
+}

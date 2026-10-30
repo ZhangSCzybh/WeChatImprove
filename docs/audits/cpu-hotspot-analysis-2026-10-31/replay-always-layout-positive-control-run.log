@@ -1,0 +1,12 @@
+valid-empty-native N=0 M=4 inputs=1 refresh=1 layoutGuard=1 events=1 pending=0 quiescent=1 pumpCPUms=0.665 refreshCPUms=0.659
+valid-both-on N=100 M=4 inputs=1 refresh=1 layoutGuard=1 events=1 pending=0 quiescent=1 pumpCPUms=0.191 refreshCPUms=0.188
+invalid-both-on-rev2 N=100 M=4 inputs=1 refresh=512 layoutGuard=512 events=512 pending=2 quiescent=0 pumpCPUms=23.402 refreshCPUms=22.960
+invalid-both-on-rev0 N=100 M=4 inputs=1 refresh=512 layoutGuard=512 events=512 pending=2 quiescent=0 pumpCPUms=24.100 refreshCPUms=23.639
+nil-native-both-on N=100 M=4 inputs=1 refresh=512 layoutGuard=512 events=512 pending=2 quiescent=0 pumpCPUms=8.380 refreshCPUms=7.953
+invalid-group-only N=100 M=4 inputs=1 refresh=512 layoutGuard=512 events=512 pending=2 quiescent=0 pumpCPUms=23.726 refreshCPUms=23.285
+invalid-privacy-only N=100 M=4 inputs=1 refresh=512 layoutGuard=512 events=512 pending=2 quiescent=0 pumpCPUms=23.067 refreshCPUms=22.581
+invalid-both-off N=100 M=4 inputs=1 refresh=1 layoutGuard=0 events=1 pending=0 quiescent=1 pumpCPUms=0.004 refreshCPUms=0.002
+blocked-policy N=100 M=4 inputs=1 refresh=1 layoutGuard=1 events=1 pending=0 quiescent=1 pumpCPUms=0.025 refreshCPUms=0.023
+single-stale-epoch N=1000 M=4 inputs=1 refresh=1 layoutGuard=2 events=1 pending=0 quiescent=1 pumpCPUms=0.481 refreshCPUms=0.479
+single-stale-policy-revision N=1000 M=4 inputs=1 refresh=1 layoutGuard=2 events=1 pending=0 quiescent=1 pumpCPUms=1.105 refreshCPUms=1.104
+externally-driven-60Hz N=1000 M=4 inputs=60 refresh=60 layoutGuard=60 events=120 pending=0 quiescent=1 pumpCPUms=27.952 refreshCPUms=27.558

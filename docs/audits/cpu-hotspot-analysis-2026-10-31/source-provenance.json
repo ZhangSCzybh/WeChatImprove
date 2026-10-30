@@ -1,0 +1,167 @@
+{
+  "head": "8467df87bebb2998f021238b7d88eaea65266214",
+  "sources": [
+    {
+      "path": "Controllers/CSGroupListAdapter.m",
+      "baseline_sha256": "04347cc9a79cea7c5f210b450850e3dd8b967de7e2b3824581ec650daf1f06af",
+      "working_sha256": "04347cc9a79cea7c5f210b450850e3dd8b967de7e2b3824581ec650daf1f06af",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSGroupListAdapter.h",
+      "baseline_sha256": "b4e908a40c86ad4c0ec47f5b5622448814abc837f32043ebb5fd5d0261e584b4",
+      "working_sha256": "b4e908a40c86ad4c0ec47f5b5622448814abc837f32043ebb5fd5d0261e584b4",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSGroupRefreshState.h",
+      "baseline_sha256": "3435bd06d51be0818ecbebe7dc378a019f4114c2ecd25e530d8c86f8d7b016af",
+      "working_sha256": "3435bd06d51be0818ecbebe7dc378a019f4114c2ecd25e530d8c86f8d7b016af",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSGroupProjection.m",
+      "baseline_sha256": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a",
+      "working_sha256": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSGroupProjection.h",
+      "baseline_sha256": "f92f2377662d0d684d683ee5b3b3352ef100e825b6e8398268a15990febb2f19",
+      "working_sha256": "f92f2377662d0d684d683ee5b3b3352ef100e825b6e8398268a15990febb2f19",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSGroupPreferences.m",
+      "baseline_sha256": "1ec46fe99d45a47d56319ec5149d54ddbccb3831dbdd52de6f7f4e590bd58bd4",
+      "working_sha256": "1ec46fe99d45a47d56319ec5149d54ddbccb3831dbdd52de6f7f4e590bd58bd4",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSGroupNativeBridge.m",
+      "baseline_sha256": "92807c6978c4a65a176ce21f62561b68f0343874019ee744ed8791eeae26d107",
+      "working_sha256": "92807c6978c4a65a176ce21f62561b68f0343874019ee744ed8791eeae26d107",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendManager.m",
+      "baseline_sha256": "32029613b26321429e662eccfb778e4ff90532618b4605e00cc17256dd2e8548",
+      "working_sha256": "32029613b26321429e662eccfb778e4ff90532618b4605e00cc17256dd2e8548",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendPolicy.m",
+      "baseline_sha256": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+      "working_sha256": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendBridge.m",
+      "baseline_sha256": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf",
+      "working_sha256": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendSessionPresentation.m",
+      "baseline_sha256": "ff4480590eac0728d39c43a209f911db59ec107aa1188c9176316df35b09dd9e",
+      "working_sha256": "ff4480590eac0728d39c43a209f911db59ec107aa1188c9176316df35b09dd9e",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendListShield.m",
+      "baseline_sha256": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b",
+      "working_sha256": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b",
+      "identical": true
+    },
+    {
+      "path": "Controllers/WESessionTabContainerView.m",
+      "baseline_sha256": "b7ce9e8eb8f07029668e5c47fb9735e7f234cd4e2c549b2fc169e8eef28c5764",
+      "working_sha256": "b7ce9e8eb8f07029668e5c47fb9735e7f234cd4e2c549b2fc169e8eef28c5764",
+      "identical": true
+    },
+    {
+      "path": "Hooks/SessionGroupHooks.xm",
+      "baseline_sha256": "7e3ed572e1937a93cc6e82638972c45509fcd894dba6731dccf663a74411e806",
+      "working_sha256": "7e3ed572e1937a93cc6e82638972c45509fcd894dba6731dccf663a74411e806",
+      "identical": true
+    },
+    {
+      "path": "Hooks/ListCornerRadiusHooks.xm",
+      "baseline_sha256": "ceefff7aead3cfe33ce97cbd04c1c3953dc4c73ecdcec09fdbc87cd584677f0a",
+      "working_sha256": "ceefff7aead3cfe33ce97cbd04c1c3953dc4c73ecdcec09fdbc87cd584677f0a",
+      "identical": true
+    },
+    {
+      "path": "Hooks/CloseFriendNotificationHooks.xm",
+      "baseline_sha256": "a7bc24a2b19fca0191b57d6d9e12a80412cd77815dfdf65118c66a8ca23d0faf",
+      "working_sha256": "a7bc24a2b19fca0191b57d6d9e12a80412cd77815dfdf65118c66a8ca23d0faf",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSTabBarNativeAdapter.m",
+      "baseline_sha256": "3aa55870afc6d5752f8f255f3d5f2c08bbc5dc1147ab31eb435645aeba7fa508",
+      "working_sha256": "3aa55870afc6d5752f8f255f3d5f2c08bbc5dc1147ab31eb435645aeba7fa508",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSMessageNavigation.m",
+      "baseline_sha256": "c822176151c6d95fd579c8b2101ed3ff0b1dcccc3da168f1dd0ad84b5f42308d",
+      "working_sha256": "c822176151c6d95fd579c8b2101ed3ff0b1dcccc3da168f1dd0ad84b5f42308d",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendRuntime.m",
+      "baseline_sha256": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829",
+      "working_sha256": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendStore.m",
+      "baseline_sha256": "eaaf39fe06c2a365971502015ac0cd1fc5a932a1eecbea1e6f5530fa12e8bf8b",
+      "working_sha256": "eaaf39fe06c2a365971502015ac0cd1fc5a932a1eecbea1e6f5530fa12e8bf8b",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSListCornerRenderer.m",
+      "baseline_sha256": "645bb38c4cab8ee9a943c68ab574b98a56a92dc730fc3c99630592b93c1a1360",
+      "working_sha256": "645bb38c4cab8ee9a943c68ab574b98a56a92dc730fc3c99630592b93c1a1360",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSListCornerPageContext.m",
+      "baseline_sha256": "9f1d23f9594c655dca9c862e92724b211505feee6bba7cd1a291b43e9a2dae4d",
+      "working_sha256": "9f1d23f9594c655dca9c862e92724b211505feee6bba7cd1a291b43e9a2dae4d",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSListCornerSessionRestore.m",
+      "baseline_sha256": "b8b91879859daf84ebc42b064c8e1bd8d1a33a9d9dc4ec267ae95e3eb97fcbfe",
+      "working_sha256": "b8b91879859daf84ebc42b064c8e1bd8d1a33a9d9dc4ec267ae95e3eb97fcbfe",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSChatGroupSettingsViewController.m",
+      "baseline_sha256": "d0c456222042ce4e71a817cbc5f460208d0d2d1e788b12826422b4690a4be253",
+      "working_sha256": "d0c456222042ce4e71a817cbc5f460208d0d2d1e788b12826422b4690a4be253",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSNativeRewardPresenter.m",
+      "baseline_sha256": "43452224d6b16e4d18ed637ed1f3dfffe9e216161c924f215f38692b0c220c7a",
+      "working_sha256": "43452224d6b16e4d18ed637ed1f3dfffe9e216161c924f215f38692b0c220c7a",
+      "identical": true
+    },
+    {
+      "path": "Hooks/CloseFriendLifecycleHooks.xm",
+      "baseline_sha256": "92ab6300d49c7e981d901db8ecab1febbf66fa5218bac5bee10b55ed0299681e",
+      "working_sha256": "92ab6300d49c7e981d901db8ecab1febbf66fa5218bac5bee10b55ed0299681e",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSCustomViewController.m",
+      "baseline_sha256": "6975fce8d7d5e50f91564c0118a7d891808d06aa92da776410ee48386cc28a25",
+      "working_sha256": "6975fce8d7d5e50f91564c0118a7d891808d06aa92da776410ee48386cc28a25",
+      "identical": true
+    }
+  ]
+}

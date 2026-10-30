@@ -1,0 +1,25 @@
+PROVENANCE {"boundaries": "UIKit table/cells and native source are host doubles; real policy, runtime expiry, projection, safe numeric reader, and index scopes compile unchanged.", "head": "8467df87bebb2998f021238b7d88eaea65266214", "methods": {"- (void)invalidateNativeSnapshot": "3f1473ba4338fcf7410c31e04883d034e148219040babcb53b2d65ce31f8bed7", "- (void)performSessionListLayout:": "798b421cdf775e3d2319ce8f6eac89ee5b071d4507b97359f216073f3f118d02"}, "source_sha256": {"Controllers/CSCloseFriendListShield.m": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b", "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1", "Controllers/CSCloseFriendRuntime.m": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829", "Controllers/CSGroupIndexScope.m": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780", "Controllers/CSGroupListAdapter.m": "04347cc9a79cea7c5f210b450850e3dd8b967de7e2b3824581ec650daf1f06af", "Controllers/CSGroupNativeBridge.m": "92807c6978c4a65a176ce21f62561b68f0343874019ee744ed8791eeae26d107", "Controllers/CSGroupProjection.m": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a"}}
+FAIL: 25 stable layouts scan the 32-row projection exactly once
+FAIL: enabled stable changed value is reused only after its fresh scan
+FAIL: revealed stable changed value is reused only after its fresh scan
+FAIL: hideSessions stable changed value is reused only after its fresh scan
+ADMISSION {"case":"stable-K25-N32","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":25,"requests":0,"rowHidesQueries":800,"snapshotReads":50}
+ADMISSION {"case":"new-projection-identity","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"new-policy-identity","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"same-policy-mutated-enabled","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"same-policy-mutated-revealed","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"same-policy-mutated-hideSessions","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"unknown-hideSessions-type","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":3,"requests":0,"rowHidesQueries":96,"snapshotReads":6}
+ADMISSION {"case":"blocked-then-ready","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"epoch-then-ready","dirty":true,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"account-then-ready","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"revision-then-ready","dirty":true,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"unknown-projection-revision-then-known","dirty":true,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"retry-then-ready","dirty":true,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"table-identity","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"native-invalidation","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"unsafe-projection","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":32,"snapshotReads":1}
+ADMISSION {"case":"safe-then-unsafe-identity","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":32,"snapshotReads":1}
+ADMISSION {"case":"policy-changed-during-original","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"real-runtime-expiry","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":52}
+Privacy admission cache: 218 checks, 4 failures

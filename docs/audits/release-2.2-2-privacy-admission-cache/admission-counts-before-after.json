@@ -1,0 +1,678 @@
+{
+  "red": {
+    "records": [
+      {
+        "case": "stable-K25-N32",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 25,
+        "requests": 0,
+        "rowHidesQueries": 800,
+        "snapshotReads": 50
+      },
+      {
+        "case": "new-projection-identity",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "new-policy-identity",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "same-policy-mutated-enabled",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "same-policy-mutated-revealed",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "same-policy-mutated-hideSessions",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "unknown-hideSessions-type",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 3,
+        "requests": 0,
+        "rowHidesQueries": 96,
+        "snapshotReads": 6
+      },
+      {
+        "case": "blocked-then-ready",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "epoch-then-ready",
+        "dirty": true,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "account-then-ready",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "revision-then-ready",
+        "dirty": true,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "unknown-projection-revision-then-known",
+        "dirty": true,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "retry-then-ready",
+        "dirty": true,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "table-identity",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "native-invalidation",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "unsafe-projection",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 1
+      },
+      {
+        "case": "safe-then-unsafe-identity",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 1
+      },
+      {
+        "case": "policy-changed-during-original",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 1,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "real-runtime-expiry",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 52
+      }
+    ],
+    "summary": "Privacy admission cache: 218 checks, 4 failures",
+    "failures": [
+      "FAIL: 25 stable layouts scan the 32-row projection exactly once",
+      "FAIL: enabled stable changed value is reused only after its fresh scan",
+      "FAIL: revealed stable changed value is reused only after its fresh scan",
+      "FAIL: hideSessions stable changed value is reused only after its fresh scan"
+    ]
+  },
+  "green": {
+    "records": [
+      {
+        "case": "stable-K25-N32",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 25,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 50
+      },
+      {
+        "case": "new-projection-identity",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "new-policy-identity",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "same-policy-mutated-enabled",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "same-policy-mutated-revealed",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "same-policy-mutated-hideSessions",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "unknown-hideSessions-type",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 3,
+        "requests": 0,
+        "rowHidesQueries": 96,
+        "snapshotReads": 6
+      },
+      {
+        "case": "blocked-then-ready",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "epoch-then-ready",
+        "dirty": true,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "account-then-ready",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "revision-then-ready",
+        "dirty": true,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "unknown-projection-revision-then-known",
+        "dirty": true,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "retry-then-ready",
+        "dirty": true,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "table-identity",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "native-invalidation",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "unsafe-projection",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 1
+      },
+      {
+        "case": "safe-then-unsafe-identity",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 1
+      },
+      {
+        "case": "policy-changed-during-original",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 1,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "real-runtime-expiry",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 52
+      }
+    ],
+    "summary": "Privacy admission cache: 218 checks, 0 failures",
+    "failures": []
+  },
+  "events-red": {
+    "records": [
+      {
+        "case": "reentry-projection",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "reentry-table",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "reentry-native-invalidation",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "reentry-enabled",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "reentry-revision-readable",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "reentry-retry",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "reentry-unsafe-projection",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "runtime-add-friend",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 3
+      },
+      {
+        "case": "runtime-remove-friend",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 3
+      },
+      {
+        "case": "runtime-add-group",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 3
+      },
+      {
+        "case": "runtime-remove-group",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 3
+      },
+      {
+        "case": "runtime-manual-lock",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 3
+      },
+      {
+        "case": "runtime-other-surface-option",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 3
+      }
+    ],
+    "summary": "Privacy admission events/reentry: 115 checks, 6 failures",
+    "failures": [
+      "FAIL: projection: initial call reuses an existing safe admission",
+      "FAIL: table: initial call reuses an existing safe admission",
+      "FAIL: native-invalidation: initial call reuses an existing safe admission",
+      "FAIL: enabled: initial call reuses an existing safe admission",
+      "FAIL: revision-readable: initial call reuses an existing safe admission",
+      "FAIL: retry: initial call reuses an existing safe admission"
+    ]
+  },
+  "events-green": {
+    "records": [
+      {
+        "case": "reentry-projection",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "reentry-table",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "reentry-native-invalidation",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "reentry-enabled",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "reentry-revision-readable",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "reentry-retry",
+        "dirty": false,
+        "held": false,
+        "hiddenCells": 0,
+        "originalLayouts": 1,
+        "requests": 0,
+        "rowHidesQueries": 32,
+        "snapshotReads": 2
+      },
+      {
+        "case": "reentry-unsafe-projection",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 32,
+        "snapshotReads": 3
+      },
+      {
+        "case": "runtime-add-friend",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 3
+      },
+      {
+        "case": "runtime-remove-friend",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 3
+      },
+      {
+        "case": "runtime-add-group",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 3
+      },
+      {
+        "case": "runtime-remove-group",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 3
+      },
+      {
+        "case": "runtime-manual-lock",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 3
+      },
+      {
+        "case": "runtime-other-surface-option",
+        "dirty": true,
+        "held": true,
+        "hiddenCells": 3,
+        "originalLayouts": 0,
+        "requests": 1,
+        "rowHidesQueries": 0,
+        "snapshotReads": 3
+      }
+    ],
+    "summary": "Privacy admission events/reentry: 115 checks, 0 failures",
+    "failures": []
+  }
+}

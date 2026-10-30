@@ -1,0 +1,11 @@
+{
+  "head": "8467df87bebb2998f021238b7d88eaea65266214",
+  "source_sha256": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "processor": "arm",
+  "clang": "Apple clang version 21.0.0 (clang-2100.4.1.1)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "name_example": "wxid_ordinary_00000000@chatroom",
+  "name_length": 31,
+  "benchmark_notes": "Full unchanged production Policy.m, -O2, Foundation, -fobjc-arc; no UIKit; times in policy_bench.json were measured before metadata-only correction."
+}

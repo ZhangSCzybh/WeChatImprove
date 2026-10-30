@@ -1,0 +1,20 @@
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/MiniappPrivateLayoutTests.m:58:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-miniapp-private-layout.ZOeXVo/MiniappLayoutBody.h:14:5: error: use of undeclared identifier 'UITableView'
+   14 |     UITableView *table=self.table;
+      |     ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-miniapp-private-layout.ZOeXVo/MiniappLayoutBody.h:14:18: error: use of undeclared identifier 'table'; did you mean '_table'?
+   14 |     UITableView *table=self.table;
+      |                  ^~~~~
+      |                  _table
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/CloseFriendSessionTests.m:218:40: note: '_table' declared here
+  218 | @property(nonatomic,strong) TestTable *table;
+      |                                        ^
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/MiniappPrivateLayoutTests.m:58:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-miniapp-private-layout.ZOeXVo/MiniappLayoutBody.h:57:101: error: use of undeclared identifier 'table'; did you mean '_table'?
+   57 |     BOOL proofStillValid=cacheable && current==policy && self.projection==projection && self.table==table &&
+      |                                                                                                     ^~~~~
+      |                                                                                                     _table
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/CloseFriendSessionTests.m:218:40: note: '_table' declared here
+  218 | @property(nonatomic,strong) TestTable *table;
+      |                                        ^
+3 errors generated.

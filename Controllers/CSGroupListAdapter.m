@@ -522,6 +522,7 @@ static BOOL Option(NSString *suffix) {
     proxy.target=target; return proxy;
 }
 - (void)detach {
+    objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);
     [self cancelTabBadgeSourceRefresh];
     [Adapters() removeObject:self];
     self.tabBadgeSections=nil; self.tabAlertBadge=nil; self.tabAlertBadgeKey=nil;
@@ -649,6 +650,7 @@ static BOOL Option(NSString *suffix) {
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
     BOOL privacy=policy.blocked || (policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue]);
     if (!self.isActive && !privacy) {
+        objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);
         layout();
         self.sessionLayoutHeld=NO;
         [self.privacyShield prepareForPublication];
@@ -656,11 +658,31 @@ static BOOL Option(NSString *suffix) {
     }
     NSString *account=CSGroupCurrentAccountID();
     NSUInteger epoch=CSCloseFriendAccountEpoch();
+    CSGroupProjection *projection=self.projection;
+    id table=self.table;
+    NSUInteger modelRevision=self.modelRevision, revision=policy.revision;
+    BOOL enabled=policy.enabled, revealed=policy.revealed, blocked=policy.blocked;
+    BOOL retry=self.snapshotRetryAttempted;
+    id hideOption=policy.options[@"hideSessions"];
+    BOOL hideSessions=[hideOption boolValue];
+    long long privacyRevision=CSGroupReadInteger(projection,@"privacyRevision",-1);
     BOOL ready=!policy.blocked && [policy.accountID isEqual:account] &&
-        self.projection.isValid && !self.snapshotRetryAttempted && self.snapshotEpoch==epoch &&
-        [self.projection.accountID isEqual:account] &&
-        CSGroupReadInteger(self.projection,@"privacyRevision",-1)==(long long)policy.revision;
-    if (ready) for (NSArray *section in self.projection.sections) for (CSGroupRow *row in section)
+        projection.isValid && !retry && self.snapshotEpoch==epoch &&
+        [projection.accountID isEqual:account] && privacyRevision==(long long)revision;
+    // A proof belongs to one immutable projection and one fully known policy.
+    // Snapshot reads above and below still detect synchronous unlock expiry.
+    BOOL cacheable=ready && table && account.length && privacyRevision>=0 && [hideOption isKindOfClass:NSNumber.class];
+    NSDictionary *proof=objc_getAssociatedObject(self,@selector(performSessionListLayout:));
+    BOOL admitted=cacheable && proof[@"projection"]==projection && proof[@"policy"]==policy &&
+        [proof[@"table"] anyObject]==table &&
+        [proof[@"account"] isEqual:account] && [proof[@"epoch"] unsignedIntegerValue]==epoch &&
+        [proof[@"revision"] unsignedIntegerValue]==revision &&
+        [proof[@"enabled"] boolValue]==enabled && [proof[@"revealed"] boolValue]==revealed &&
+        [proof[@"blocked"] boolValue]==blocked && [proof[@"hideSessions"] boolValue]==hideSessions &&
+        [proof[@"privacyRevision"] longLongValue]==privacyRevision && [proof[@"retry"] boolValue]==retry &&
+        [proof[@"modelRevision"] unsignedIntegerValue]==modelRevision;
+    if (!admitted) objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);
+    if (ready && !admitted) for (NSArray *section in projection.sections) for (CSGroupRow *row in section)
         if ([policy hidesUserName:row.userName surface:CSCloseFriendSurfaceSession]) ready=NO;
     if (!ready) {
         self.sessionLayoutHeld=YES;
@@ -678,6 +700,18 @@ static BOOL Option(NSString *suffix) {
     // UIKit must consume the already filtered projection, including its geometry.
     CSGroupWithDisplayIndices(self.table,layout);
     CSCloseFriendSnapshot *current=CSCloseFriendCurrentSnapshot();
+    // Layout can synchronously replace the table/projection or invalidate policy.
+    // Never attach the old scan's proof to a replacement or an unknown key.
+    id currentHideOption=current.options[@"hideSessions"];
+    BOOL proofStillValid=cacheable && current==policy && self.projection==projection && self.table==table &&
+        projection.isValid && !self.snapshotRetryAttempted && self.snapshotEpoch==epoch &&
+        self.modelRevision==modelRevision && epoch==CSCloseFriendAccountEpoch() &&
+        [account isEqual:CSGroupCurrentAccountID()] && [current.accountID isEqual:account] &&
+        [projection.accountID isEqual:account] && current.revision==revision &&
+        current.enabled==enabled && current.revealed==revealed && current.blocked==blocked &&
+        [currentHideOption isKindOfClass:NSNumber.class] && [currentHideOption boolValue]==hideSessions &&
+        CSGroupReadInteger(projection,@"privacyRevision",-1)==privacyRevision;
+    if (!proofStillValid) objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);
     if (current.blocked || current.revision!=policy.revision || epoch!=CSCloseFriendAccountEpoch() ||
         ![current.accountID isEqual:account] || ![account isEqual:CSGroupCurrentAccountID()]) {
         self.sessionLayoutHeld=YES;
@@ -689,6 +723,15 @@ static BOOL Option(NSString *suffix) {
             if (!self.publishing && !self.changeDepth) [self requestRefresh];
         }
         return;
+    }
+    if (proofStillValid && !admitted) {
+        NSHashTable *tables=[NSHashTable weakObjectsHashTable];
+        if (table) [tables addObject:table];
+        proof=@{@"projection":projection,@"policy":policy,@"account":[account copy],@"epoch":@(epoch),
+            @"revision":@(revision),@"enabled":@(enabled),@"revealed":@(revealed),@"blocked":@(blocked),
+            @"hideSessions":@(hideSessions),@"privacyRevision":@(privacyRevision),@"retry":@(retry),
+            @"modelRevision":@(modelRevision),@"table":tables};
+        objc_setAssociatedObject(self,@selector(performSessionListLayout:),proof,OBJC_ASSOCIATION_RETAIN);
     }
     self.sessionLayoutHeld=NO;
     [self.privacyShield prepareForPublication];
@@ -762,6 +805,7 @@ static BOOL Option(NSString *suffix) {
     if (self.dirty || self.pendingScrollToTop) [self scheduleRefresh];
 }
 - (void)invalidateNativeSnapshot {
+    objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);
     @synchronized (self) { self.modelRevision++; }
 }
 - (NSArray *)nativeSectionsForAccount:(NSString *)account {
@@ -817,7 +861,7 @@ static BOOL Option(NSString *suffix) {
         [self installProxies];
         NSString *account=CSGroupCurrentAccountID();
         BOOL changed= ![self.preferences.accountID isEqualToString:account];
-        if (changed) { self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=self.nativeActions.count>0; self.projection=nil; self.snapshotRetryAttempted=NO; self.searchChromeVisible=NO; }
+        if (changed) { [self invalidateNativeSnapshot]; self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=self.nativeActions.count>0; self.projection=nil; self.snapshotRetryAttempted=NO; self.searchChromeVisible=NO; }
         self.searching=CSGroupReadInteger(self.controller,@"isSearching",0)!=0;
         if (!self.searching) self.searchChromeVisible=NO;
         BOOL enabled=Option(@"enabled");

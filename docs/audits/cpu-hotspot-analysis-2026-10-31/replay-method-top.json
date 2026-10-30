@@ -1,0 +1,3856 @@
+[
+  {
+    "mode": "strict-layout",
+    "case": "valid-empty-native",
+    "N": 0,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 731083,
+        "inclusiveWall_ns": 3570000,
+        "selfCPU_ns": 731083,
+        "selfWall_ns": 3570000,
+        "inclusiveCPU_ms": 0.731083,
+        "selfCPU_ms": 0.731083
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 837750,
+        "inclusiveWall_ns": 3676000,
+        "selfCPU_ns": 43500,
+        "selfWall_ns": 41000,
+        "inclusiveCPU_ms": 0.83775,
+        "selfCPU_ms": 0.0435
+      },
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 41250,
+        "inclusiveWall_ns": 42000,
+        "selfCPU_ns": 41250,
+        "selfWall_ns": 42000,
+        "inclusiveCPU_ms": 0.04125,
+        "selfCPU_ms": 0.04125
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 14667,
+        "inclusiveWall_ns": 14000,
+        "selfCPU_ns": 14667,
+        "selfWall_ns": 14000,
+        "inclusiveCPU_ms": 0.014667,
+        "selfCPU_ms": 0.014667
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 1,
+        "inclusiveCPU_ns": 10792,
+        "inclusiveWall_ns": 10000,
+        "selfCPU_ns": 10792,
+        "selfWall_ns": 10000,
+        "inclusiveCPU_ms": 0.010792,
+        "selfCPU_ms": 0.010792
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 7417,
+        "inclusiveWall_ns": 8000,
+        "selfCPU_ns": 7417,
+        "selfWall_ns": 8000,
+        "inclusiveCPU_ms": 0.007417,
+        "selfCPU_ms": 0.007417
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 18792,
+        "inclusiveWall_ns": 18000,
+        "selfCPU_ns": 4125,
+        "selfWall_ns": 4000,
+        "inclusiveCPU_ms": 0.018792,
+        "selfCPU_ms": 0.004125
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 14500,
+        "inclusiveWall_ns": 15000,
+        "selfCPU_ns": 3708,
+        "selfWall_ns": 5000,
+        "inclusiveCPU_ms": 0.0145,
+        "selfCPU_ms": 0.003708
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "valid-both-on",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 140250,
+        "inclusiveWall_ns": 140000,
+        "selfCPU_ns": 140250,
+        "selfWall_ns": 140000,
+        "inclusiveCPU_ms": 0.14025,
+        "selfCPU_ms": 0.14025
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 209959,
+        "inclusiveWall_ns": 210000,
+        "selfCPU_ns": 37709,
+        "selfWall_ns": 38000,
+        "inclusiveCPU_ms": 0.209959,
+        "selfCPU_ms": 0.037709
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 1,
+        "inclusiveCPU_ns": 21375,
+        "inclusiveWall_ns": 21000,
+        "selfCPU_ns": 21375,
+        "selfWall_ns": 21000,
+        "inclusiveCPU_ms": 0.021375,
+        "selfCPU_ms": 0.021375
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 6792,
+        "inclusiveWall_ns": 6000,
+        "selfCPU_ns": 6792,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.006792,
+        "selfCPU_ms": 0.006792
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 5250,
+        "inclusiveWall_ns": 5000,
+        "selfCPU_ns": 5250,
+        "selfWall_ns": 5000,
+        "inclusiveCPU_ms": 0.00525,
+        "selfCPU_ms": 0.00525
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 7458,
+        "inclusiveWall_ns": 8000,
+        "selfCPU_ns": 2208,
+        "selfWall_ns": 3000,
+        "inclusiveCPU_ms": 0.007458,
+        "selfCPU_ms": 0.002208
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 23375,
+        "inclusiveWall_ns": 24000,
+        "selfCPU_ns": 2000,
+        "selfWall_ns": 3000,
+        "inclusiveCPU_ms": 0.023375,
+        "selfCPU_ms": 0.002
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 1833,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1833,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.001833,
+        "selfCPU_ms": 0.001833
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "invalid-both-on-rev2",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 4,
+        "inclusiveCPU_ns": 174583,
+        "inclusiveWall_ns": 175000,
+        "selfCPU_ns": 174583,
+        "selfWall_ns": 175000,
+        "inclusiveCPU_ms": 0.174583,
+        "selfCPU_ms": 0.174583
+      },
+      {
+        "method": "refresh",
+        "calls": 4,
+        "inclusiveCPU_ns": 248417,
+        "inclusiveWall_ns": 249000,
+        "selfCPU_ns": 32792,
+        "selfWall_ns": 32000,
+        "inclusiveCPU_ms": 0.248417,
+        "selfCPU_ms": 0.032792
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 2,
+        "inclusiveCPU_ns": 18208,
+        "inclusiveWall_ns": 18000,
+        "selfCPU_ns": 18208,
+        "selfWall_ns": 18000,
+        "inclusiveCPU_ms": 0.018208,
+        "selfCPU_ms": 0.018208
+      },
+      {
+        "method": "layout",
+        "calls": 4,
+        "inclusiveCPU_ns": 10167,
+        "inclusiveWall_ns": 10000,
+        "selfCPU_ns": 10167,
+        "selfWall_ns": 10000,
+        "inclusiveCPU_ms": 0.010167,
+        "selfCPU_ms": 0.010167
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 4,
+        "inclusiveCPU_ns": 8667,
+        "inclusiveWall_ns": 8000,
+        "selfCPU_ns": 8667,
+        "selfWall_ns": 8000,
+        "inclusiveCPU_ms": 0.008667,
+        "selfCPU_ms": 0.008667
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 4,
+        "inclusiveCPU_ns": 24376,
+        "inclusiveWall_ns": 24000,
+        "selfCPU_ns": 6168,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.024376,
+        "selfCPU_ms": 0.006168
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 4,
+        "inclusiveCPU_ns": 2749,
+        "inclusiveWall_ns": 4000,
+        "selfCPU_ns": 2749,
+        "selfWall_ns": 4000,
+        "inclusiveCPU_ms": 0.002749,
+        "selfCPU_ms": 0.002749
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 4375,
+        "inclusiveWall_ns": 4000,
+        "selfCPU_ns": 1541,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.004375,
+        "selfCPU_ms": 0.001541
+      },
+      {
+        "method": "requestRecovery",
+        "calls": 1,
+        "inclusiveCPU_ns": 2833,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 750,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.002833,
+        "selfCPU_ms": 0.00075
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "invalid-both-on-rev0",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 4,
+        "inclusiveCPU_ns": 155583,
+        "inclusiveWall_ns": 155000,
+        "selfCPU_ns": 155583,
+        "selfWall_ns": 155000,
+        "inclusiveCPU_ms": 0.155583,
+        "selfCPU_ms": 0.155583
+      },
+      {
+        "method": "refresh",
+        "calls": 4,
+        "inclusiveCPU_ns": 203500,
+        "inclusiveWall_ns": 204000,
+        "selfCPU_ns": 24293,
+        "selfWall_ns": 24000,
+        "inclusiveCPU_ms": 0.2035,
+        "selfCPU_ms": 0.024293
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 2,
+        "inclusiveCPU_ns": 7833,
+        "inclusiveWall_ns": 8000,
+        "selfCPU_ns": 7833,
+        "selfWall_ns": 8000,
+        "inclusiveCPU_ms": 0.007833,
+        "selfCPU_ms": 0.007833
+      },
+      {
+        "method": "layout",
+        "calls": 4,
+        "inclusiveCPU_ns": 7709,
+        "inclusiveWall_ns": 8000,
+        "selfCPU_ns": 7709,
+        "selfWall_ns": 8000,
+        "inclusiveCPU_ms": 0.007709,
+        "selfCPU_ms": 0.007709
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 4,
+        "inclusiveCPU_ns": 5250,
+        "inclusiveWall_ns": 5000,
+        "selfCPU_ns": 5250,
+        "selfWall_ns": 5000,
+        "inclusiveCPU_ms": 0.00525,
+        "selfCPU_ms": 0.00525
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 4,
+        "inclusiveCPU_ns": 11999,
+        "inclusiveWall_ns": 12000,
+        "selfCPU_ns": 4166,
+        "selfWall_ns": 4000,
+        "inclusiveCPU_ms": 0.011999,
+        "selfCPU_ms": 0.004166
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 4,
+        "inclusiveCPU_ns": 1583,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 1583,
+        "selfWall_ns": 3000,
+        "inclusiveCPU_ms": 0.001583,
+        "selfCPU_ms": 0.001583
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2667,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1125,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.002667,
+        "selfCPU_ms": 0.001125
+      },
+      {
+        "method": "requestRecovery",
+        "calls": 1,
+        "inclusiveCPU_ns": 2000,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 625,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.002,
+        "selfCPU_ms": 0.000625
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "nil-native-both-on",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 4,
+        "inclusiveCPU_ns": 26249,
+        "inclusiveWall_ns": 27000,
+        "selfCPU_ns": 26249,
+        "selfWall_ns": 27000,
+        "inclusiveCPU_ms": 0.026249,
+        "selfCPU_ms": 0.026249
+      },
+      {
+        "method": "refresh",
+        "calls": 4,
+        "inclusiveCPU_ns": 69125,
+        "inclusiveWall_ns": 70000,
+        "selfCPU_ns": 23293,
+        "selfWall_ns": 25000,
+        "inclusiveCPU_ms": 0.069125,
+        "selfCPU_ms": 0.023293
+      },
+      {
+        "method": "layout",
+        "calls": 4,
+        "inclusiveCPU_ns": 6959,
+        "inclusiveWall_ns": 7000,
+        "selfCPU_ns": 6959,
+        "selfWall_ns": 7000,
+        "inclusiveCPU_ms": 0.006959,
+        "selfCPU_ms": 0.006959
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 2,
+        "inclusiveCPU_ns": 4916,
+        "inclusiveWall_ns": 6000,
+        "selfCPU_ns": 4916,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.004916,
+        "selfCPU_ms": 0.004916
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 4,
+        "inclusiveCPU_ns": 4875,
+        "inclusiveWall_ns": 4000,
+        "selfCPU_ns": 4875,
+        "selfWall_ns": 4000,
+        "inclusiveCPU_ms": 0.004875,
+        "selfCPU_ms": 0.004875
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 4,
+        "inclusiveCPU_ns": 8707,
+        "inclusiveWall_ns": 8000,
+        "selfCPU_ns": 3791,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.008707,
+        "selfCPU_ms": 0.003791
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 4,
+        "inclusiveCPU_ns": 1708,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 1708,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001708,
+        "selfCPU_ms": 0.001708
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2125,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 917,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.002125,
+        "selfCPU_ms": 0.000917
+      },
+      {
+        "method": "requestRecovery",
+        "calls": 1,
+        "inclusiveCPU_ns": 2250,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 792,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.00225,
+        "selfCPU_ms": 0.000792
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "invalid-group-only",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 4,
+        "inclusiveCPU_ns": 146876,
+        "inclusiveWall_ns": 146000,
+        "selfCPU_ns": 146876,
+        "selfWall_ns": 146000,
+        "inclusiveCPU_ms": 0.146876,
+        "selfCPU_ms": 0.146876
+      },
+      {
+        "method": "refresh",
+        "calls": 4,
+        "inclusiveCPU_ns": 185500,
+        "inclusiveWall_ns": 186000,
+        "selfCPU_ns": 21250,
+        "selfWall_ns": 23000,
+        "inclusiveCPU_ms": 0.1855,
+        "selfCPU_ms": 0.02125
+      },
+      {
+        "method": "layout",
+        "calls": 4,
+        "inclusiveCPU_ns": 6625,
+        "inclusiveWall_ns": 8000,
+        "selfCPU_ns": 6625,
+        "selfWall_ns": 8000,
+        "inclusiveCPU_ms": 0.006625,
+        "selfCPU_ms": 0.006625
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 4,
+        "inclusiveCPU_ns": 4209,
+        "inclusiveWall_ns": 6000,
+        "selfCPU_ns": 4209,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.004209,
+        "selfCPU_ms": 0.004209
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 2,
+        "inclusiveCPU_ns": 3959,
+        "inclusiveWall_ns": 4000,
+        "selfCPU_ns": 3959,
+        "selfWall_ns": 4000,
+        "inclusiveCPU_ms": 0.003959,
+        "selfCPU_ms": 0.003959
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 4,
+        "inclusiveCPU_ns": 7500,
+        "inclusiveWall_ns": 7000,
+        "selfCPU_ns": 3541,
+        "selfWall_ns": 3000,
+        "inclusiveCPU_ms": 0.0075,
+        "selfCPU_ms": 0.003541
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 4,
+        "inclusiveCPU_ns": 1249,
+        "inclusiveWall_ns": 0,
+        "selfCPU_ns": 1249,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.001249,
+        "selfCPU_ms": 0.001249
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1916,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 832,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.001916,
+        "selfCPU_ms": 0.000832
+      },
+      {
+        "method": "requestRecovery",
+        "calls": 1,
+        "inclusiveCPU_ns": 1709,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 584,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.001709,
+        "selfCPU_ms": 0.000584
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "invalid-privacy-only",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 4,
+        "inclusiveCPU_ns": 151624,
+        "inclusiveWall_ns": 152000,
+        "selfCPU_ns": 151624,
+        "selfWall_ns": 152000,
+        "inclusiveCPU_ms": 0.151624,
+        "selfCPU_ms": 0.151624
+      },
+      {
+        "method": "refresh",
+        "calls": 4,
+        "inclusiveCPU_ns": 209791,
+        "inclusiveWall_ns": 209000,
+        "selfCPU_ns": 44751,
+        "selfWall_ns": 46000,
+        "inclusiveCPU_ms": 0.209791,
+        "selfCPU_ms": 0.044751
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 2,
+        "inclusiveCPU_ns": 4833,
+        "inclusiveWall_ns": 5000,
+        "selfCPU_ns": 4833,
+        "selfWall_ns": 5000,
+        "inclusiveCPU_ms": 0.004833,
+        "selfCPU_ms": 0.004833
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 4,
+        "inclusiveCPU_ns": 4209,
+        "inclusiveWall_ns": 4000,
+        "selfCPU_ns": 4209,
+        "selfWall_ns": 4000,
+        "inclusiveCPU_ms": 0.004209,
+        "selfCPU_ms": 0.004209
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 4,
+        "inclusiveCPU_ns": 8416,
+        "inclusiveWall_ns": 7000,
+        "selfCPU_ns": 3583,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.008416,
+        "selfCPU_ms": 0.003583
+      },
+      {
+        "method": "layout",
+        "calls": 4,
+        "inclusiveCPU_ns": 1500,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 1500,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.0015,
+        "selfCPU_ms": 0.0015
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 4,
+        "inclusiveCPU_ns": 1375,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 1375,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001375,
+        "selfCPU_ms": 0.001375
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1917,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 875,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001917,
+        "selfCPU_ms": 0.000875
+      },
+      {
+        "method": "requestRecovery",
+        "calls": 1,
+        "inclusiveCPU_ns": 1542,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 500,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001542,
+        "selfCPU_ms": 0.0005
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "invalid-both-off",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2375,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 1833,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.002375,
+        "selfCPU_ms": 0.001833
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1000,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 1000,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001,
+        "selfCPU_ms": 0.001
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1875,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 875,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001875,
+        "selfCPU_ms": 0.000875
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 542,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 542,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.000542,
+        "selfCPU_ms": 0.000542
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "blocked-policy",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 6250,
+        "inclusiveWall_ns": 6000,
+        "selfCPU_ns": 6250,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.00625,
+        "selfCPU_ms": 0.00625
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 18250,
+        "inclusiveWall_ns": 18000,
+        "selfCPU_ns": 4959,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.01825,
+        "selfCPU_ms": 0.004959
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 1,
+        "inclusiveCPU_ns": 3125,
+        "inclusiveWall_ns": 4000,
+        "selfCPU_ns": 3125,
+        "selfWall_ns": 4000,
+        "inclusiveCPU_ms": 0.003125,
+        "selfCPU_ms": 0.003125
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 2291,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 2291,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.002291,
+        "selfCPU_ms": 0.002291
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 4334,
+        "inclusiveWall_ns": 4000,
+        "selfCPU_ns": 1209,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.004334,
+        "selfCPU_ms": 0.001209
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1000,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 1000,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001,
+        "selfCPU_ms": 0.001
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1833,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 833,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001833,
+        "selfCPU_ms": 0.000833
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 416,
+        "inclusiveWall_ns": 0,
+        "selfCPU_ns": 416,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.000416,
+        "selfCPU_ms": 0.000416
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "single-stale-epoch",
+    "N": 1000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 288833,
+        "inclusiveWall_ns": 289000,
+        "selfCPU_ns": 288833,
+        "selfWall_ns": 289000,
+        "inclusiveCPU_ms": 0.288833,
+        "selfCPU_ms": 0.288833
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 2,
+        "inclusiveCPU_ns": 183625,
+        "inclusiveWall_ns": 185000,
+        "selfCPU_ns": 181459,
+        "selfWall_ns": 183000,
+        "inclusiveCPU_ms": 0.183625,
+        "selfCPU_ms": 0.181459
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 476000,
+        "inclusiveWall_ns": 476000,
+        "selfCPU_ns": 7708,
+        "selfWall_ns": 9000,
+        "inclusiveCPU_ms": 0.476,
+        "selfCPU_ms": 0.007708
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 1792,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 1792,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001792,
+        "selfCPU_ms": 0.001792
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1334,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1334,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.001334,
+        "selfCPU_ms": 0.001334
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 177167,
+        "inclusiveWall_ns": 177000,
+        "selfCPU_ns": 1000,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.177167,
+        "selfCPU_ms": 0.001
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2166,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 832,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.002166,
+        "selfCPU_ms": 0.000832
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 500,
+        "inclusiveWall_ns": 0,
+        "selfCPU_ns": 500,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.0005,
+        "selfCPU_ms": 0.0005
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "single-stale-policy-revision",
+    "N": 1000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 889709,
+        "inclusiveWall_ns": 890000,
+        "selfCPU_ns": 889709,
+        "selfWall_ns": 890000,
+        "inclusiveCPU_ms": 0.889709,
+        "selfCPU_ms": 0.889709
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 2,
+        "inclusiveCPU_ns": 182459,
+        "inclusiveWall_ns": 182000,
+        "selfCPU_ns": 180459,
+        "selfWall_ns": 180000,
+        "inclusiveCPU_ms": 0.182459,
+        "selfCPU_ms": 0.180459
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1098916,
+        "inclusiveWall_ns": 1099000,
+        "selfCPU_ns": 29124,
+        "selfWall_ns": 30000,
+        "inclusiveCPU_ms": 1.098916,
+        "selfCPU_ms": 0.029124
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 1750,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 1750,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.00175,
+        "selfCPU_ms": 0.00175
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1125,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 1125,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001125,
+        "selfCPU_ms": 0.001125
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 177750,
+        "inclusiveWall_ns": 178000,
+        "selfCPU_ns": 958,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.17775,
+        "selfCPU_ms": 0.000958
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2000,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 875,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.002,
+        "selfCPU_ms": 0.000875
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 583,
+        "inclusiveWall_ns": 0,
+        "selfCPU_ns": 583,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.000583,
+        "selfCPU_ms": 0.000583
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "externally-driven-60Hz",
+    "N": 1000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 60,
+        "inclusiveCPU_ns": 17323630,
+        "inclusiveWall_ns": 17327000,
+        "selfCPU_ns": 17323630,
+        "selfWall_ns": 17327000,
+        "inclusiveCPU_ms": 17.32363,
+        "selfCPU_ms": 17.32363
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 60,
+        "inclusiveCPU_ns": 10531130,
+        "inclusiveWall_ns": 10535000,
+        "selfCPU_ns": 10531130,
+        "selfWall_ns": 10535000,
+        "inclusiveCPU_ms": 10.53113,
+        "selfCPU_ms": 10.53113
+      },
+      {
+        "method": "refresh",
+        "calls": 60,
+        "inclusiveCPU_ns": 28408497,
+        "inclusiveWall_ns": 28410000,
+        "selfCPU_ns": 378363,
+        "selfWall_ns": 375000,
+        "inclusiveCPU_ms": 28.408497,
+        "selfCPU_ms": 0.378363
+      },
+      {
+        "method": "layout",
+        "calls": 60,
+        "inclusiveCPU_ns": 99627,
+        "inclusiveWall_ns": 101000,
+        "selfCPU_ns": 99627,
+        "selfWall_ns": 101000,
+        "inclusiveCPU_ms": 0.099627,
+        "selfCPU_ms": 0.099627
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 60,
+        "inclusiveCPU_ns": 66126,
+        "inclusiveWall_ns": 68000,
+        "selfCPU_ns": 66126,
+        "selfWall_ns": 68000,
+        "inclusiveCPU_ms": 0.066126,
+        "selfCPU_ms": 0.066126
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 60,
+        "inclusiveCPU_ns": 10581420,
+        "inclusiveWall_ns": 10588000,
+        "selfCPU_ns": 50290,
+        "selfWall_ns": 53000,
+        "inclusiveCPU_ms": 10.58142,
+        "selfCPU_ms": 0.05029
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 60,
+        "inclusiveCPU_ns": 102878,
+        "inclusiveWall_ns": 102000,
+        "selfCPU_ns": 36752,
+        "selfWall_ns": 34000,
+        "inclusiveCPU_ms": 0.102878,
+        "selfCPU_ms": 0.036752
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 60,
+        "inclusiveCPU_ns": 25457,
+        "inclusiveWall_ns": 19000,
+        "selfCPU_ns": 25457,
+        "selfWall_ns": 19000,
+        "inclusiveCPU_ms": 0.025457,
+        "selfCPU_ms": 0.025457
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "cost-cached-identical",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 20,
+        "inclusiveCPU_ns": 712831,
+        "inclusiveWall_ns": 715000,
+        "selfCPU_ns": 712831,
+        "selfWall_ns": 715000,
+        "inclusiveCPU_ms": 0.712831,
+        "selfCPU_ms": 0.712831
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 20,
+        "inclusiveCPU_ns": 141959,
+        "inclusiveWall_ns": 143000,
+        "selfCPU_ns": 141959,
+        "selfWall_ns": 143000,
+        "inclusiveCPU_ms": 0.141959,
+        "selfCPU_ms": 0.141959
+      },
+      {
+        "method": "refresh",
+        "calls": 20,
+        "inclusiveCPU_ns": 959210,
+        "inclusiveWall_ns": 959000,
+        "selfCPU_ns": 72171,
+        "selfWall_ns": 68000,
+        "inclusiveCPU_ms": 0.95921,
+        "selfCPU_ms": 0.072171
+      },
+      {
+        "method": "layout",
+        "calls": 20,
+        "inclusiveCPU_ns": 28335,
+        "inclusiveWall_ns": 30000,
+        "selfCPU_ns": 28335,
+        "selfWall_ns": 30000,
+        "inclusiveCPU_ms": 0.028335,
+        "selfCPU_ms": 0.028335
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 20,
+        "inclusiveCPU_ns": 3914,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 3914,
+        "selfWall_ns": 3000,
+        "inclusiveCPU_ms": 0.003914,
+        "selfCPU_ms": 0.003914
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "cost-new-structure",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 20,
+        "inclusiveCPU_ns": 2004293,
+        "inclusiveWall_ns": 2005000,
+        "selfCPU_ns": 2004293,
+        "selfWall_ns": 2005000,
+        "inclusiveCPU_ms": 2.004293,
+        "selfCPU_ms": 2.004293
+      },
+      {
+        "method": "refresh",
+        "calls": 20,
+        "inclusiveCPU_ns": 2925876,
+        "inclusiveWall_ns": 2924000,
+        "selfCPU_ns": 487590,
+        "selfWall_ns": 487000,
+        "inclusiveCPU_ms": 2.925876,
+        "selfCPU_ms": 0.48759
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 20,
+        "inclusiveCPU_ns": 370087,
+        "inclusiveWall_ns": 370000,
+        "selfCPU_ns": 370087,
+        "selfWall_ns": 370000,
+        "inclusiveCPU_ms": 0.370087,
+        "selfCPU_ms": 0.370087
+      },
+      {
+        "method": "layout",
+        "calls": 20,
+        "inclusiveCPU_ns": 30455,
+        "inclusiveWall_ns": 32000,
+        "selfCPU_ns": 30455,
+        "selfWall_ns": 32000,
+        "inclusiveCPU_ms": 0.030455,
+        "selfCPU_ms": 0.030455
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 20,
+        "inclusiveCPU_ns": 390956,
+        "inclusiveWall_ns": 390000,
+        "selfCPU_ns": 20869,
+        "selfWall_ns": 20000,
+        "inclusiveCPU_ms": 0.390956,
+        "selfCPU_ms": 0.020869
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 20,
+        "inclusiveCPU_ns": 12582,
+        "inclusiveWall_ns": 10000,
+        "selfCPU_ns": 12582,
+        "selfWall_ns": 10000,
+        "inclusiveCPU_ms": 0.012582,
+        "selfCPU_ms": 0.012582
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "cost-cached-identical",
+    "N": 100,
+    "M": 12,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 20,
+        "inclusiveCPU_ns": 815291,
+        "inclusiveWall_ns": 815000,
+        "selfCPU_ns": 815291,
+        "selfWall_ns": 815000,
+        "inclusiveCPU_ms": 0.815291,
+        "selfCPU_ms": 0.815291
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 20,
+        "inclusiveCPU_ns": 150499,
+        "inclusiveWall_ns": 153000,
+        "selfCPU_ns": 150499,
+        "selfWall_ns": 153000,
+        "inclusiveCPU_ms": 0.150499,
+        "selfCPU_ms": 0.150499
+      },
+      {
+        "method": "refresh",
+        "calls": 20,
+        "inclusiveCPU_ns": 1103460,
+        "inclusiveWall_ns": 1105000,
+        "selfCPU_ns": 100792,
+        "selfWall_ns": 100000,
+        "inclusiveCPU_ms": 1.10346,
+        "selfCPU_ms": 0.100792
+      },
+      {
+        "method": "layout",
+        "calls": 20,
+        "inclusiveCPU_ns": 32628,
+        "inclusiveWall_ns": 33000,
+        "selfCPU_ns": 32628,
+        "selfWall_ns": 33000,
+        "inclusiveCPU_ms": 0.032628,
+        "selfCPU_ms": 0.032628
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 20,
+        "inclusiveCPU_ns": 4250,
+        "inclusiveWall_ns": 4000,
+        "selfCPU_ns": 4250,
+        "selfWall_ns": 4000,
+        "inclusiveCPU_ms": 0.00425,
+        "selfCPU_ms": 0.00425
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "cost-new-structure",
+    "N": 100,
+    "M": 12,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 20,
+        "inclusiveCPU_ns": 2161541,
+        "inclusiveWall_ns": 2161000,
+        "selfCPU_ns": 2161541,
+        "selfWall_ns": 2161000,
+        "inclusiveCPU_ms": 2.161541,
+        "selfCPU_ms": 2.161541
+      },
+      {
+        "method": "refresh",
+        "calls": 20,
+        "inclusiveCPU_ns": 3154792,
+        "inclusiveWall_ns": 3161000,
+        "selfCPU_ns": 544127,
+        "selfWall_ns": 550000,
+        "inclusiveCPU_ms": 3.154792,
+        "selfCPU_ms": 0.544127
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 20,
+        "inclusiveCPU_ns": 374832,
+        "inclusiveWall_ns": 377000,
+        "selfCPU_ns": 374832,
+        "selfWall_ns": 377000,
+        "inclusiveCPU_ms": 0.374832,
+        "selfCPU_ms": 0.374832
+      },
+      {
+        "method": "layout",
+        "calls": 20,
+        "inclusiveCPU_ns": 37002,
+        "inclusiveWall_ns": 38000,
+        "selfCPU_ns": 37002,
+        "selfWall_ns": 38000,
+        "inclusiveCPU_ms": 0.037002,
+        "selfCPU_ms": 0.037002
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 20,
+        "inclusiveCPU_ns": 397415,
+        "inclusiveWall_ns": 397000,
+        "selfCPU_ns": 22583,
+        "selfWall_ns": 20000,
+        "inclusiveCPU_ms": 0.397415,
+        "selfCPU_ms": 0.022583
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 20,
+        "inclusiveCPU_ns": 14707,
+        "inclusiveWall_ns": 15000,
+        "selfCPU_ns": 14707,
+        "selfWall_ns": 15000,
+        "inclusiveCPU_ms": 0.014707,
+        "selfCPU_ms": 0.014707
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "cost-cached-identical",
+    "N": 1000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 20,
+        "inclusiveCPU_ns": 5638708,
+        "inclusiveWall_ns": 5641000,
+        "selfCPU_ns": 5638708,
+        "selfWall_ns": 5641000,
+        "inclusiveCPU_ms": 5.638708,
+        "selfCPU_ms": 5.638708
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 20,
+        "inclusiveCPU_ns": 1282915,
+        "inclusiveWall_ns": 1281000,
+        "selfCPU_ns": 1282915,
+        "selfWall_ns": 1281000,
+        "inclusiveCPU_ms": 1.282915,
+        "selfCPU_ms": 1.282915
+      },
+      {
+        "method": "refresh",
+        "calls": 20,
+        "inclusiveCPU_ns": 7029792,
+        "inclusiveWall_ns": 7028000,
+        "selfCPU_ns": 74377,
+        "selfWall_ns": 74000,
+        "inclusiveCPU_ms": 7.029792,
+        "selfCPU_ms": 0.074377
+      },
+      {
+        "method": "layout",
+        "calls": 20,
+        "inclusiveCPU_ns": 29830,
+        "inclusiveWall_ns": 27000,
+        "selfCPU_ns": 29830,
+        "selfWall_ns": 27000,
+        "inclusiveCPU_ms": 0.02983,
+        "selfCPU_ms": 0.02983
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 20,
+        "inclusiveCPU_ns": 3962,
+        "inclusiveWall_ns": 5000,
+        "selfCPU_ns": 3962,
+        "selfWall_ns": 5000,
+        "inclusiveCPU_ms": 0.003962,
+        "selfCPU_ms": 0.003962
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "cost-new-structure",
+    "N": 1000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 20,
+        "inclusiveCPU_ns": 19036542,
+        "inclusiveWall_ns": 19076000,
+        "selfCPU_ns": 19036542,
+        "selfWall_ns": 19076000,
+        "inclusiveCPU_ms": 19.036542,
+        "selfCPU_ms": 19.036542
+      },
+      {
+        "method": "refresh",
+        "calls": 20,
+        "inclusiveCPU_ns": 27141331,
+        "inclusiveWall_ns": 27201000,
+        "selfCPU_ns": 4455209,
+        "selfWall_ns": 4447000,
+        "inclusiveCPU_ms": 27.141331,
+        "selfCPU_ms": 4.455209
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 20,
+        "inclusiveCPU_ns": 3523669,
+        "inclusiveWall_ns": 3544000,
+        "selfCPU_ns": 3523669,
+        "selfWall_ns": 3544000,
+        "inclusiveCPU_ms": 3.523669,
+        "selfCPU_ms": 3.523669
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 20,
+        "inclusiveCPU_ns": 58331,
+        "inclusiveWall_ns": 64000,
+        "selfCPU_ns": 58331,
+        "selfWall_ns": 64000,
+        "inclusiveCPU_ms": 0.058331,
+        "selfCPU_ms": 0.058331
+      },
+      {
+        "method": "layout",
+        "calls": 20,
+        "inclusiveCPU_ns": 42457,
+        "inclusiveWall_ns": 44000,
+        "selfCPU_ns": 42457,
+        "selfWall_ns": 44000,
+        "inclusiveCPU_ms": 0.042457,
+        "selfCPU_ms": 0.042457
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 20,
+        "inclusiveCPU_ns": 3548792,
+        "inclusiveWall_ns": 3570000,
+        "selfCPU_ns": 25123,
+        "selfWall_ns": 26000,
+        "inclusiveCPU_ms": 3.548792,
+        "selfCPU_ms": 0.025123
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "cost-cached-identical",
+    "N": 1000,
+    "M": 12,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 20,
+        "inclusiveCPU_ns": 5713041,
+        "inclusiveWall_ns": 5712000,
+        "selfCPU_ns": 5713041,
+        "selfWall_ns": 5712000,
+        "inclusiveCPU_ms": 5.713041,
+        "selfCPU_ms": 5.713041
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 20,
+        "inclusiveCPU_ns": 1295623,
+        "inclusiveWall_ns": 1297000,
+        "selfCPU_ns": 1295623,
+        "selfWall_ns": 1297000,
+        "inclusiveCPU_ms": 1.295623,
+        "selfCPU_ms": 1.295623
+      },
+      {
+        "method": "refresh",
+        "calls": 20,
+        "inclusiveCPU_ns": 7132124,
+        "inclusiveWall_ns": 7131000,
+        "selfCPU_ns": 89749,
+        "selfWall_ns": 92000,
+        "inclusiveCPU_ms": 7.132124,
+        "selfCPU_ms": 0.089749
+      },
+      {
+        "method": "layout",
+        "calls": 20,
+        "inclusiveCPU_ns": 29876,
+        "inclusiveWall_ns": 26000,
+        "selfCPU_ns": 29876,
+        "selfWall_ns": 26000,
+        "inclusiveCPU_ms": 0.029876,
+        "selfCPU_ms": 0.029876
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 20,
+        "inclusiveCPU_ns": 3835,
+        "inclusiveWall_ns": 4000,
+        "selfCPU_ns": 3835,
+        "selfWall_ns": 4000,
+        "inclusiveCPU_ms": 0.003835,
+        "selfCPU_ms": 0.003835
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "cost-new-structure",
+    "N": 1000,
+    "M": 12,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 20,
+        "inclusiveCPU_ns": 19153628,
+        "inclusiveWall_ns": 19155000,
+        "selfCPU_ns": 19153628,
+        "selfWall_ns": 19155000,
+        "inclusiveCPU_ms": 19.153628,
+        "selfCPU_ms": 19.153628
+      },
+      {
+        "method": "refresh",
+        "calls": 20,
+        "inclusiveCPU_ns": 27169249,
+        "inclusiveWall_ns": 27170000,
+        "selfCPU_ns": 4443745,
+        "selfWall_ns": 4443000,
+        "inclusiveCPU_ms": 27.169249,
+        "selfCPU_ms": 4.443745
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 20,
+        "inclusiveCPU_ns": 3467500,
+        "inclusiveWall_ns": 3471000,
+        "selfCPU_ns": 3467500,
+        "selfWall_ns": 3471000,
+        "inclusiveCPU_ms": 3.4675,
+        "selfCPU_ms": 3.4675
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 20,
+        "inclusiveCPU_ns": 43795,
+        "inclusiveWall_ns": 44000,
+        "selfCPU_ns": 43795,
+        "selfWall_ns": 44000,
+        "inclusiveCPU_ms": 0.043795,
+        "selfCPU_ms": 0.043795
+      },
+      {
+        "method": "layout",
+        "calls": 20,
+        "inclusiveCPU_ns": 37622,
+        "inclusiveWall_ns": 37000,
+        "selfCPU_ns": 37622,
+        "selfWall_ns": 37000,
+        "inclusiveCPU_ms": 0.037622,
+        "selfCPU_ms": 0.037622
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 20,
+        "inclusiveCPU_ns": 3490459,
+        "inclusiveWall_ns": 3491000,
+        "selfCPU_ns": 22959,
+        "selfWall_ns": 20000,
+        "inclusiveCPU_ms": 3.490459,
+        "selfCPU_ms": 0.022959
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "cost-cached-identical",
+    "N": 10000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 20,
+        "inclusiveCPU_ns": 63205124,
+        "inclusiveWall_ns": 63233000,
+        "selfCPU_ns": 63205124,
+        "selfWall_ns": 63233000,
+        "inclusiveCPU_ms": 63.205124,
+        "selfCPU_ms": 63.205124
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 20,
+        "inclusiveCPU_ns": 13755954,
+        "inclusiveWall_ns": 13755000,
+        "selfCPU_ns": 13755954,
+        "selfWall_ns": 13755000,
+        "inclusiveCPU_ms": 13.755954,
+        "selfCPU_ms": 13.755954
+      },
+      {
+        "method": "refresh",
+        "calls": 20,
+        "inclusiveCPU_ns": 77096668,
+        "inclusiveWall_ns": 77122000,
+        "selfCPU_ns": 94673,
+        "selfWall_ns": 91000,
+        "inclusiveCPU_ms": 77.096668,
+        "selfCPU_ms": 0.094673
+      },
+      {
+        "method": "layout",
+        "calls": 20,
+        "inclusiveCPU_ns": 36499,
+        "inclusiveWall_ns": 38000,
+        "selfCPU_ns": 36499,
+        "selfWall_ns": 38000,
+        "inclusiveCPU_ms": 0.036499,
+        "selfCPU_ms": 0.036499
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 20,
+        "inclusiveCPU_ns": 4418,
+        "inclusiveWall_ns": 5000,
+        "selfCPU_ns": 4418,
+        "selfWall_ns": 5000,
+        "inclusiveCPU_ms": 0.004418,
+        "selfCPU_ms": 0.004418
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "cost-new-structure",
+    "N": 10000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 20,
+        "inclusiveCPU_ns": 193674207,
+        "inclusiveWall_ns": 193721000,
+        "selfCPU_ns": 193674207,
+        "selfWall_ns": 193721000,
+        "inclusiveCPU_ms": 193.674207,
+        "selfCPU_ms": 193.674207
+      },
+      {
+        "method": "refresh",
+        "calls": 20,
+        "inclusiveCPU_ns": 276173664,
+        "inclusiveWall_ns": 276233000,
+        "selfCPU_ns": 48072159,
+        "selfWall_ns": 48094000,
+        "inclusiveCPU_ms": 276.173664,
+        "selfCPU_ms": 48.072159
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 20,
+        "inclusiveCPU_ns": 33725918,
+        "inclusiveWall_ns": 33724000,
+        "selfCPU_ns": 33725918,
+        "selfWall_ns": 33724000,
+        "inclusiveCPU_ms": 33.725918,
+        "selfCPU_ms": 33.725918
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 20,
+        "inclusiveCPU_ns": 606752,
+        "inclusiveWall_ns": 606000,
+        "selfCPU_ns": 606752,
+        "selfWall_ns": 606000,
+        "inclusiveCPU_ms": 0.606752,
+        "selfCPU_ms": 0.606752
+      },
+      {
+        "method": "layout",
+        "calls": 20,
+        "inclusiveCPU_ns": 64627,
+        "inclusiveWall_ns": 62000,
+        "selfCPU_ns": 64627,
+        "selfWall_ns": 62000,
+        "inclusiveCPU_ms": 0.064627,
+        "selfCPU_ms": 0.064627
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 20,
+        "inclusiveCPU_ns": 33755919,
+        "inclusiveWall_ns": 33750000,
+        "selfCPU_ns": 30001,
+        "selfWall_ns": 26000,
+        "inclusiveCPU_ms": 33.755919,
+        "selfCPU_ms": 0.030001
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "cost-cached-identical",
+    "N": 10000,
+    "M": 12,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 20,
+        "inclusiveCPU_ns": 64803623,
+        "inclusiveWall_ns": 64875000,
+        "selfCPU_ns": 64803623,
+        "selfWall_ns": 64875000,
+        "inclusiveCPU_ms": 64.803623,
+        "selfCPU_ms": 64.803623
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 20,
+        "inclusiveCPU_ns": 13857543,
+        "inclusiveWall_ns": 13865000,
+        "selfCPU_ns": 13857543,
+        "selfWall_ns": 13865000,
+        "inclusiveCPU_ms": 13.857543,
+        "selfCPU_ms": 13.857543
+      },
+      {
+        "method": "refresh",
+        "calls": 20,
+        "inclusiveCPU_ns": 78879832,
+        "inclusiveWall_ns": 78956000,
+        "selfCPU_ns": 161076,
+        "selfWall_ns": 158000,
+        "inclusiveCPU_ms": 78.879832,
+        "selfCPU_ms": 0.161076
+      },
+      {
+        "method": "layout",
+        "calls": 20,
+        "inclusiveCPU_ns": 52251,
+        "inclusiveWall_ns": 55000,
+        "selfCPU_ns": 52251,
+        "selfWall_ns": 55000,
+        "inclusiveCPU_ms": 0.052251,
+        "selfCPU_ms": 0.052251
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 20,
+        "inclusiveCPU_ns": 5339,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 5339,
+        "selfWall_ns": 3000,
+        "inclusiveCPU_ms": 0.005339,
+        "selfCPU_ms": 0.005339
+      }
+    ]
+  },
+  {
+    "mode": "strict-layout",
+    "case": "cost-new-structure",
+    "N": 10000,
+    "M": 12,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 20,
+        "inclusiveCPU_ns": 199917584,
+        "inclusiveWall_ns": 199989000,
+        "selfCPU_ns": 199917584,
+        "selfWall_ns": 199989000,
+        "inclusiveCPU_ms": 199.917584,
+        "selfCPU_ms": 199.917584
+      },
+      {
+        "method": "refresh",
+        "calls": 20,
+        "inclusiveCPU_ns": 283216373,
+        "inclusiveWall_ns": 283302000,
+        "selfCPU_ns": 48315454,
+        "selfWall_ns": 48326000,
+        "inclusiveCPU_ms": 283.216373,
+        "selfCPU_ms": 48.315454
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 20,
+        "inclusiveCPU_ns": 34261586,
+        "inclusiveWall_ns": 34268000,
+        "selfCPU_ns": 34261586,
+        "selfWall_ns": 34268000,
+        "inclusiveCPU_ms": 34.261586,
+        "selfCPU_ms": 34.261586
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 20,
+        "inclusiveCPU_ns": 622960,
+        "inclusiveWall_ns": 623000,
+        "selfCPU_ns": 622960,
+        "selfWall_ns": 623000,
+        "inclusiveCPU_ms": 0.62296,
+        "selfCPU_ms": 0.62296
+      },
+      {
+        "method": "layout",
+        "calls": 20,
+        "inclusiveCPU_ns": 67207,
+        "inclusiveWall_ns": 65000,
+        "selfCPU_ns": 67207,
+        "selfWall_ns": 65000,
+        "inclusiveCPU_ms": 0.067207,
+        "selfCPU_ms": 0.067207
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 20,
+        "inclusiveCPU_ns": 34293168,
+        "inclusiveWall_ns": 34299000,
+        "selfCPU_ns": 31582,
+        "selfWall_ns": 31000,
+        "inclusiveCPU_ms": 34.293168,
+        "selfCPU_ms": 0.031582
+      }
+    ]
+  },
+  {
+    "mode": "dirty-until-original",
+    "case": "valid-empty-native",
+    "N": 0,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 627875,
+        "inclusiveWall_ns": 1787000,
+        "selfCPU_ns": 627875,
+        "selfWall_ns": 1787000,
+        "inclusiveCPU_ms": 0.627875,
+        "selfCPU_ms": 0.627875
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 704417,
+        "inclusiveWall_ns": 1863000,
+        "selfCPU_ns": 33751,
+        "selfWall_ns": 33000,
+        "inclusiveCPU_ms": 0.704417,
+        "selfCPU_ms": 0.033751
+      },
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 25958,
+        "inclusiveWall_ns": 26000,
+        "selfCPU_ns": 25958,
+        "selfWall_ns": 26000,
+        "inclusiveCPU_ms": 0.025958,
+        "selfCPU_ms": 0.025958
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 13625,
+        "inclusiveWall_ns": 14000,
+        "selfCPU_ns": 13625,
+        "selfWall_ns": 14000,
+        "inclusiveCPU_ms": 0.013625,
+        "selfCPU_ms": 0.013625
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 1,
+        "inclusiveCPU_ns": 8417,
+        "inclusiveWall_ns": 9000,
+        "selfCPU_ns": 8417,
+        "selfWall_ns": 9000,
+        "inclusiveCPU_ms": 0.008417,
+        "selfCPU_ms": 0.008417
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 5583,
+        "inclusiveWall_ns": 5000,
+        "selfCPU_ns": 5583,
+        "selfWall_ns": 5000,
+        "inclusiveCPU_ms": 0.005583,
+        "selfCPU_ms": 0.005583
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 17542,
+        "inclusiveWall_ns": 18000,
+        "selfCPU_ns": 3917,
+        "selfWall_ns": 4000,
+        "inclusiveCPU_ms": 0.017542,
+        "selfCPU_ms": 0.003917
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 11250,
+        "inclusiveWall_ns": 12000,
+        "selfCPU_ns": 2833,
+        "selfWall_ns": 3000,
+        "inclusiveCPU_ms": 0.01125,
+        "selfCPU_ms": 0.002833
+      }
+    ]
+  },
+  {
+    "mode": "dirty-until-original",
+    "case": "valid-both-on",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 138709,
+        "inclusiveWall_ns": 139000,
+        "selfCPU_ns": 138709,
+        "selfWall_ns": 139000,
+        "inclusiveCPU_ms": 0.138709,
+        "selfCPU_ms": 0.138709
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 207417,
+        "inclusiveWall_ns": 208000,
+        "selfCPU_ns": 36541,
+        "selfWall_ns": 37000,
+        "inclusiveCPU_ms": 0.207417,
+        "selfCPU_ms": 0.036541
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 1,
+        "inclusiveCPU_ns": 21708,
+        "inclusiveWall_ns": 21000,
+        "selfCPU_ns": 21708,
+        "selfWall_ns": 21000,
+        "inclusiveCPU_ms": 0.021708,
+        "selfCPU_ms": 0.021708
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 6542,
+        "inclusiveWall_ns": 6000,
+        "selfCPU_ns": 6542,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.006542,
+        "selfCPU_ms": 0.006542
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 5250,
+        "inclusiveWall_ns": 5000,
+        "selfCPU_ns": 5250,
+        "selfWall_ns": 5000,
+        "inclusiveCPU_ms": 0.00525,
+        "selfCPU_ms": 0.00525
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 23792,
+        "inclusiveWall_ns": 24000,
+        "selfCPU_ns": 2084,
+        "selfWall_ns": 3000,
+        "inclusiveCPU_ms": 0.023792,
+        "selfCPU_ms": 0.002084
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 7250,
+        "inclusiveWall_ns": 8000,
+        "selfCPU_ns": 2000,
+        "selfWall_ns": 3000,
+        "inclusiveCPU_ms": 0.00725,
+        "selfCPU_ms": 0.002
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 1833,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1833,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.001833,
+        "selfCPU_ms": 0.001833
+      }
+    ]
+  },
+  {
+    "mode": "dirty-until-original",
+    "case": "invalid-both-on-rev2",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 512,
+        "inclusiveCPU_ns": 17212477,
+        "inclusiveWall_ns": 17238000,
+        "selfCPU_ns": 17212477,
+        "selfWall_ns": 17238000,
+        "inclusiveCPU_ms": 17.212477,
+        "selfCPU_ms": 17.212477
+      },
+      {
+        "method": "refresh",
+        "calls": 512,
+        "inclusiveCPU_ns": 22707913,
+        "inclusiveWall_ns": 22716000,
+        "selfCPU_ns": 2918845,
+        "selfWall_ns": 2931000,
+        "inclusiveCPU_ms": 22.707913,
+        "selfCPU_ms": 2.918845
+      },
+      {
+        "method": "layout",
+        "calls": 512,
+        "inclusiveCPU_ns": 760049,
+        "inclusiveWall_ns": 765000,
+        "selfCPU_ns": 760049,
+        "selfWall_ns": 765000,
+        "inclusiveCPU_ms": 0.760049,
+        "selfCPU_ms": 0.760049
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 512,
+        "inclusiveCPU_ns": 701874,
+        "inclusiveWall_ns": 691000,
+        "selfCPU_ns": 701874,
+        "selfWall_ns": 691000,
+        "inclusiveCPU_ms": 0.701874,
+        "selfCPU_ms": 0.701874
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 512,
+        "inclusiveCPU_ns": 1264503,
+        "inclusiveWall_ns": 1258000,
+        "selfCPU_ns": 562629,
+        "selfWall_ns": 567000,
+        "inclusiveCPU_ms": 1.264503,
+        "selfCPU_ms": 0.562629
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 513,
+        "inclusiveCPU_ns": 459894,
+        "inclusiveWall_ns": 447000,
+        "selfCPU_ns": 459894,
+        "selfWall_ns": 447000,
+        "inclusiveCPU_ms": 0.459894,
+        "selfCPU_ms": 0.459894
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 512,
+        "inclusiveCPU_ns": 94937,
+        "inclusiveWall_ns": 80000,
+        "selfCPU_ns": 94937,
+        "selfWall_ns": 80000,
+        "inclusiveCPU_ms": 0.094937,
+        "selfCPU_ms": 0.094937
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 4458,
+        "inclusiveWall_ns": 5000,
+        "selfCPU_ns": 1666,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.004458,
+        "selfCPU_ms": 0.001666
+      }
+    ]
+  },
+  {
+    "mode": "dirty-until-original",
+    "case": "invalid-both-on-rev0",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 512,
+        "inclusiveCPU_ns": 17339029,
+        "inclusiveWall_ns": 17346000,
+        "selfCPU_ns": 17339029,
+        "selfWall_ns": 17346000,
+        "inclusiveCPU_ms": 17.339029,
+        "selfCPU_ms": 17.339029
+      },
+      {
+        "method": "refresh",
+        "calls": 512,
+        "inclusiveCPU_ns": 22692749,
+        "inclusiveWall_ns": 22702000,
+        "selfCPU_ns": 2885053,
+        "selfWall_ns": 2884000,
+        "inclusiveCPU_ms": 22.692749,
+        "selfCPU_ms": 2.885053
+      },
+      {
+        "method": "layout",
+        "calls": 512,
+        "inclusiveCPU_ns": 723694,
+        "inclusiveWall_ns": 732000,
+        "selfCPU_ns": 723694,
+        "selfWall_ns": 732000,
+        "inclusiveCPU_ms": 0.723694,
+        "selfCPU_ms": 0.723694
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 512,
+        "inclusiveCPU_ns": 668967,
+        "inclusiveWall_ns": 681000,
+        "selfCPU_ns": 668967,
+        "selfWall_ns": 681000,
+        "inclusiveCPU_ms": 0.668967,
+        "selfCPU_ms": 0.668967
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 512,
+        "inclusiveCPU_ns": 1224663,
+        "inclusiveWall_ns": 1224000,
+        "selfCPU_ns": 555696,
+        "selfWall_ns": 543000,
+        "inclusiveCPU_ms": 1.224663,
+        "selfCPU_ms": 0.555696
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 513,
+        "inclusiveCPU_ns": 430551,
+        "inclusiveWall_ns": 434000,
+        "selfCPU_ns": 430551,
+        "selfWall_ns": 434000,
+        "inclusiveCPU_ms": 0.430551,
+        "selfCPU_ms": 0.430551
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 512,
+        "inclusiveCPU_ns": 91343,
+        "inclusiveWall_ns": 83000,
+        "selfCPU_ns": 91343,
+        "selfWall_ns": 83000,
+        "inclusiveCPU_ms": 0.091343,
+        "selfCPU_ms": 0.091343
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 3167,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 1583,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.003167,
+        "selfCPU_ms": 0.001583
+      }
+    ]
+  },
+  {
+    "mode": "dirty-until-original",
+    "case": "nil-native-both-on",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "refresh",
+        "calls": 512,
+        "inclusiveCPU_ns": 8270445,
+        "inclusiveWall_ns": 8273000,
+        "selfCPU_ns": 2980164,
+        "selfWall_ns": 2968000,
+        "inclusiveCPU_ms": 8.270445,
+        "selfCPU_ms": 2.980164
+      },
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 512,
+        "inclusiveCPU_ns": 2591167,
+        "inclusiveWall_ns": 2611000,
+        "selfCPU_ns": 2591167,
+        "selfWall_ns": 2611000,
+        "inclusiveCPU_ms": 2.591167,
+        "selfCPU_ms": 2.591167
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 512,
+        "inclusiveCPU_ns": 794526,
+        "inclusiveWall_ns": 799000,
+        "selfCPU_ns": 794526,
+        "selfWall_ns": 799000,
+        "inclusiveCPU_ms": 0.794526,
+        "selfCPU_ms": 0.794526
+      },
+      {
+        "method": "layout",
+        "calls": 512,
+        "inclusiveCPU_ns": 724427,
+        "inclusiveWall_ns": 720000,
+        "selfCPU_ns": 724427,
+        "selfWall_ns": 720000,
+        "inclusiveCPU_ms": 0.724427,
+        "selfCPU_ms": 0.724427
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 512,
+        "inclusiveCPU_ns": 1355796,
+        "inclusiveWall_ns": 1357000,
+        "selfCPU_ns": 561270,
+        "selfWall_ns": 558000,
+        "inclusiveCPU_ms": 1.355796,
+        "selfCPU_ms": 0.56127
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 513,
+        "inclusiveCPU_ns": 447935,
+        "inclusiveWall_ns": 448000,
+        "selfCPU_ns": 447935,
+        "selfWall_ns": 448000,
+        "inclusiveCPU_ms": 0.447935,
+        "selfCPU_ms": 0.447935
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 512,
+        "inclusiveCPU_ns": 172206,
+        "inclusiveWall_ns": 170000,
+        "selfCPU_ns": 172206,
+        "selfWall_ns": 170000,
+        "inclusiveCPU_ms": 0.172206,
+        "selfCPU_ms": 0.172206
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2459,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1209,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.002459,
+        "selfCPU_ms": 0.001209
+      }
+    ]
+  },
+  {
+    "mode": "dirty-until-original",
+    "case": "invalid-group-only",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 512,
+        "inclusiveCPU_ns": 17397832,
+        "inclusiveWall_ns": 17396000,
+        "selfCPU_ns": 17397832,
+        "selfWall_ns": 17396000,
+        "inclusiveCPU_ms": 17.397832,
+        "selfCPU_ms": 17.397832
+      },
+      {
+        "method": "refresh",
+        "calls": 512,
+        "inclusiveCPU_ns": 22657833,
+        "inclusiveWall_ns": 22658000,
+        "selfCPU_ns": 2831067,
+        "selfWall_ns": 2849000,
+        "inclusiveCPU_ms": 22.657833,
+        "selfCPU_ms": 2.831067
+      },
+      {
+        "method": "layout",
+        "calls": 512,
+        "inclusiveCPU_ns": 717864,
+        "inclusiveWall_ns": 704000,
+        "selfCPU_ns": 717864,
+        "selfWall_ns": 704000,
+        "inclusiveCPU_ms": 0.717864,
+        "selfCPU_ms": 0.717864
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 512,
+        "inclusiveCPU_ns": 641000,
+        "inclusiveWall_ns": 633000,
+        "selfCPU_ns": 641000,
+        "selfWall_ns": 633000,
+        "inclusiveCPU_ms": 0.641,
+        "selfCPU_ms": 0.641
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 512,
+        "inclusiveCPU_ns": 1195373,
+        "inclusiveWall_ns": 1190000,
+        "selfCPU_ns": 554373,
+        "selfWall_ns": 557000,
+        "inclusiveCPU_ms": 1.195373,
+        "selfCPU_ms": 0.554373
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 513,
+        "inclusiveCPU_ns": 426494,
+        "inclusiveWall_ns": 441000,
+        "selfCPU_ns": 426494,
+        "selfWall_ns": 441000,
+        "inclusiveCPU_ms": 0.426494,
+        "selfCPU_ms": 0.426494
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 512,
+        "inclusiveCPU_ns": 90369,
+        "inclusiveWall_ns": 80000,
+        "selfCPU_ns": 90369,
+        "selfWall_ns": 80000,
+        "inclusiveCPU_ms": 0.090369,
+        "selfCPU_ms": 0.090369
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2208,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1042,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.002208,
+        "selfCPU_ms": 0.001042
+      }
+    ]
+  },
+  {
+    "mode": "dirty-until-original",
+    "case": "invalid-privacy-only",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 512,
+        "inclusiveCPU_ns": 17801793,
+        "inclusiveWall_ns": 17804000,
+        "selfCPU_ns": 17801793,
+        "selfWall_ns": 17804000,
+        "inclusiveCPU_ms": 17.801793,
+        "selfCPU_ms": 17.801793
+      },
+      {
+        "method": "refresh",
+        "calls": 512,
+        "inclusiveCPU_ns": 22820536,
+        "inclusiveWall_ns": 22816000,
+        "selfCPU_ns": 3131460,
+        "selfWall_ns": 3133000,
+        "inclusiveCPU_ms": 22.820536,
+        "selfCPU_ms": 3.13146
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 512,
+        "inclusiveCPU_ns": 697362,
+        "inclusiveWall_ns": 710000,
+        "selfCPU_ns": 697362,
+        "selfWall_ns": 710000,
+        "inclusiveCPU_ms": 0.697362,
+        "selfCPU_ms": 0.697362
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 512,
+        "inclusiveCPU_ns": 1254175,
+        "inclusiveWall_ns": 1241000,
+        "selfCPU_ns": 556813,
+        "selfWall_ns": 531000,
+        "inclusiveCPU_ms": 1.254175,
+        "selfCPU_ms": 0.556813
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 513,
+        "inclusiveCPU_ns": 423692,
+        "inclusiveWall_ns": 435000,
+        "selfCPU_ns": 423692,
+        "selfWall_ns": 435000,
+        "inclusiveCPU_ms": 0.423692,
+        "selfCPU_ms": 0.423692
+      },
+      {
+        "method": "layout",
+        "calls": 512,
+        "inclusiveCPU_ns": 116668,
+        "inclusiveWall_ns": 123000,
+        "selfCPU_ns": 116668,
+        "selfWall_ns": 123000,
+        "inclusiveCPU_ms": 0.116668,
+        "selfCPU_ms": 0.116668
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 512,
+        "inclusiveCPU_ns": 93831,
+        "inclusiveWall_ns": 81000,
+        "selfCPU_ns": 93831,
+        "selfWall_ns": 81000,
+        "inclusiveCPU_ms": 0.093831,
+        "selfCPU_ms": 0.093831
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2000,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 917,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.002,
+        "selfCPU_ms": 0.000917
+      }
+    ]
+  },
+  {
+    "mode": "dirty-until-original",
+    "case": "invalid-both-off",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2417,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1917,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.002417,
+        "selfCPU_ms": 0.001917
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 959,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 959,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.000959,
+        "selfCPU_ms": 0.000959
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1916,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 957,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001916,
+        "selfCPU_ms": 0.000957
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 500,
+        "inclusiveWall_ns": 0,
+        "selfCPU_ns": 500,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.0005,
+        "selfCPU_ms": 0.0005
+      }
+    ]
+  },
+  {
+    "mode": "dirty-until-original",
+    "case": "blocked-policy",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "performSessionListLayout:",
+        "calls": 1,
+        "inclusiveCPU_ns": 5750,
+        "inclusiveWall_ns": 6000,
+        "selfCPU_ns": 5750,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.00575,
+        "selfCPU_ms": 0.00575
+      },
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 5750,
+        "inclusiveWall_ns": 6000,
+        "selfCPU_ns": 5750,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.00575,
+        "selfCPU_ms": 0.00575
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 20917,
+        "inclusiveWall_ns": 21000,
+        "selfCPU_ns": 4959,
+        "selfWall_ns": 4000,
+        "inclusiveCPU_ms": 0.020917,
+        "selfCPU_ms": 0.004959
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 2625,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 2625,
+        "selfWall_ns": 3000,
+        "inclusiveCPU_ms": 0.002625,
+        "selfCPU_ms": 0.002625
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 7042,
+        "inclusiveWall_ns": 7000,
+        "selfCPU_ns": 1292,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.007042,
+        "selfCPU_ms": 0.001292
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1042,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 1042,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001042,
+        "selfCPU_ms": 0.001042
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1875,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 833,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001875,
+        "selfCPU_ms": 0.000833
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 541,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 541,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.000541,
+        "selfCPU_ms": 0.000541
+      }
+    ]
+  },
+  {
+    "mode": "dirty-until-original",
+    "case": "single-stale-epoch",
+    "N": 1000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 268333,
+        "inclusiveWall_ns": 269000,
+        "selfCPU_ns": 268333,
+        "selfWall_ns": 269000,
+        "inclusiveCPU_ms": 0.268333,
+        "selfCPU_ms": 0.268333
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 2,
+        "inclusiveCPU_ns": 166874,
+        "inclusiveWall_ns": 167000,
+        "selfCPU_ns": 163166,
+        "selfWall_ns": 164000,
+        "inclusiveCPU_ms": 0.166874,
+        "selfCPU_ms": 0.163166
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 435875,
+        "inclusiveWall_ns": 436000,
+        "selfCPU_ns": 7793,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.435875,
+        "selfCPU_ms": 0.007793
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2208,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 2208,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.002208,
+        "selfCPU_ms": 0.002208
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 1541,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1541,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.001541,
+        "selfCPU_ms": 0.001541
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 3708,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 1500,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.003708,
+        "selfCPU_ms": 0.0015
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 157333,
+        "inclusiveWall_ns": 158000,
+        "selfCPU_ns": 1000,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.157333,
+        "selfCPU_ms": 0.001
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 875,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 875,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.000875,
+        "selfCPU_ms": 0.000875
+      }
+    ]
+  },
+  {
+    "mode": "dirty-until-original",
+    "case": "single-stale-policy-revision",
+    "N": 1000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 839375,
+        "inclusiveWall_ns": 839000,
+        "selfCPU_ns": 839375,
+        "selfWall_ns": 839000,
+        "inclusiveCPU_ms": 0.839375,
+        "selfCPU_ms": 0.839375
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 2,
+        "inclusiveCPU_ns": 165625,
+        "inclusiveWall_ns": 166000,
+        "selfCPU_ns": 163000,
+        "selfWall_ns": 164000,
+        "inclusiveCPU_ms": 0.165625,
+        "selfCPU_ms": 0.163
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1027625,
+        "inclusiveWall_ns": 1028000,
+        "selfCPU_ns": 26624,
+        "selfWall_ns": 27000,
+        "inclusiveCPU_ms": 1.027625,
+        "selfCPU_ms": 0.026624
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1625,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1625,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.001625,
+        "selfCPU_ms": 0.001625
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 1542,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1542,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.001542,
+        "selfCPU_ms": 0.001542
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 159375,
+        "inclusiveWall_ns": 159000,
+        "selfCPU_ns": 1000,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.159375,
+        "selfCPU_ms": 0.001
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2625,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1000,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.002625,
+        "selfCPU_ms": 0.001
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 709,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 709,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.000709,
+        "selfCPU_ms": 0.000709
+      }
+    ]
+  },
+  {
+    "mode": "dirty-until-original",
+    "case": "externally-driven-60Hz",
+    "N": 1000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 60,
+        "inclusiveCPU_ns": 16823793,
+        "inclusiveWall_ns": 16822000,
+        "selfCPU_ns": 16823793,
+        "selfWall_ns": 16822000,
+        "inclusiveCPU_ms": 16.823793,
+        "selfCPU_ms": 16.823793
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 60,
+        "inclusiveCPU_ns": 9952957,
+        "inclusiveWall_ns": 9957000,
+        "selfCPU_ns": 9952957,
+        "selfWall_ns": 9957000,
+        "inclusiveCPU_ms": 9.952957,
+        "selfCPU_ms": 9.952957
+      },
+      {
+        "method": "refresh",
+        "calls": 60,
+        "inclusiveCPU_ns": 27278666,
+        "inclusiveWall_ns": 27283000,
+        "selfCPU_ns": 344737,
+        "selfWall_ns": 344000,
+        "inclusiveCPU_ms": 27.278666,
+        "selfCPU_ms": 0.344737
+      },
+      {
+        "method": "layout",
+        "calls": 60,
+        "inclusiveCPU_ns": 88206,
+        "inclusiveWall_ns": 93000,
+        "selfCPU_ns": 88206,
+        "selfWall_ns": 93000,
+        "inclusiveCPU_ms": 0.088206,
+        "selfCPU_ms": 0.088206
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 60,
+        "inclusiveCPU_ns": 53708,
+        "inclusiveWall_ns": 57000,
+        "selfCPU_ns": 53708,
+        "selfWall_ns": 57000,
+        "inclusiveCPU_ms": 0.053708,
+        "selfCPU_ms": 0.053708
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 60,
+        "inclusiveCPU_ns": 9999467,
+        "inclusiveWall_ns": 9999000,
+        "selfCPU_ns": 46510,
+        "selfWall_ns": 42000,
+        "inclusiveCPU_ms": 9.999467,
+        "selfCPU_ms": 0.04651
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 60,
+        "inclusiveCPU_ns": 87543,
+        "inclusiveWall_ns": 91000,
+        "selfCPU_ns": 33835,
+        "selfWall_ns": 34000,
+        "inclusiveCPU_ms": 0.087543,
+        "selfCPU_ms": 0.033835
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 60,
+        "inclusiveCPU_ns": 22463,
+        "inclusiveWall_ns": 25000,
+        "selfCPU_ns": 22463,
+        "selfWall_ns": 25000,
+        "inclusiveCPU_ms": 0.022463,
+        "selfCPU_ms": 0.022463
+      }
+    ]
+  },
+  {
+    "mode": "always-layout-positive-control",
+    "case": "valid-empty-native",
+    "N": 0,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 587709,
+        "inclusiveWall_ns": 1759000,
+        "selfCPU_ns": 587709,
+        "selfWall_ns": 1759000,
+        "inclusiveCPU_ms": 0.587709,
+        "selfCPU_ms": 0.587709
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 659458,
+        "inclusiveWall_ns": 1831000,
+        "selfCPU_ns": 31749,
+        "selfWall_ns": 33000,
+        "inclusiveCPU_ms": 0.659458,
+        "selfCPU_ms": 0.031749
+      },
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 24750,
+        "inclusiveWall_ns": 24000,
+        "selfCPU_ns": 24750,
+        "selfWall_ns": 24000,
+        "inclusiveCPU_ms": 0.02475,
+        "selfCPU_ms": 0.02475
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 12500,
+        "inclusiveWall_ns": 13000,
+        "selfCPU_ns": 12500,
+        "selfWall_ns": 13000,
+        "inclusiveCPU_ms": 0.0125,
+        "selfCPU_ms": 0.0125
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 1,
+        "inclusiveCPU_ns": 7708,
+        "inclusiveWall_ns": 8000,
+        "selfCPU_ns": 7708,
+        "selfWall_ns": 8000,
+        "inclusiveCPU_ms": 0.007708,
+        "selfCPU_ms": 0.007708
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 5292,
+        "inclusiveWall_ns": 5000,
+        "selfCPU_ns": 5292,
+        "selfWall_ns": 5000,
+        "inclusiveCPU_ms": 0.005292,
+        "selfCPU_ms": 0.005292
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 16334,
+        "inclusiveWall_ns": 17000,
+        "selfCPU_ns": 3834,
+        "selfWall_ns": 4000,
+        "inclusiveCPU_ms": 0.016334,
+        "selfCPU_ms": 0.003834
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 9958,
+        "inclusiveWall_ns": 10000,
+        "selfCPU_ns": 2250,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.009958,
+        "selfCPU_ms": 0.00225
+      }
+    ]
+  },
+  {
+    "mode": "always-layout-positive-control",
+    "case": "valid-both-on",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 126500,
+        "inclusiveWall_ns": 127000,
+        "selfCPU_ns": 126500,
+        "selfWall_ns": 127000,
+        "inclusiveCPU_ms": 0.1265,
+        "selfCPU_ms": 0.1265
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 188375,
+        "inclusiveWall_ns": 189000,
+        "selfCPU_ns": 33333,
+        "selfWall_ns": 34000,
+        "inclusiveCPU_ms": 0.188375,
+        "selfCPU_ms": 0.033333
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 1,
+        "inclusiveCPU_ns": 19167,
+        "inclusiveWall_ns": 19000,
+        "selfCPU_ns": 19167,
+        "selfWall_ns": 19000,
+        "inclusiveCPU_ms": 0.019167,
+        "selfCPU_ms": 0.019167
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 5833,
+        "inclusiveWall_ns": 6000,
+        "selfCPU_ns": 5833,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.005833,
+        "selfCPU_ms": 0.005833
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 5750,
+        "inclusiveWall_ns": 6000,
+        "selfCPU_ns": 5750,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.00575,
+        "selfCPU_ms": 0.00575
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 8042,
+        "inclusiveWall_ns": 8000,
+        "selfCPU_ns": 2292,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.008042,
+        "selfCPU_ms": 0.002292
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 1917,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1917,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.001917,
+        "selfCPU_ms": 0.001917
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 20792,
+        "inclusiveWall_ns": 20000,
+        "selfCPU_ns": 1625,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.020792,
+        "selfCPU_ms": 0.001625
+      }
+    ]
+  },
+  {
+    "mode": "always-layout-positive-control",
+    "case": "invalid-both-on-rev2",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 512,
+        "inclusiveCPU_ns": 17510788,
+        "inclusiveWall_ns": 17518000,
+        "selfCPU_ns": 17510788,
+        "selfWall_ns": 17518000,
+        "inclusiveCPU_ms": 17.510788,
+        "selfCPU_ms": 17.510788
+      },
+      {
+        "method": "refresh",
+        "calls": 512,
+        "inclusiveCPU_ns": 22960372,
+        "inclusiveWall_ns": 22952000,
+        "selfCPU_ns": 2925898,
+        "selfWall_ns": 2936000,
+        "inclusiveCPU_ms": 22.960372,
+        "selfCPU_ms": 2.925898
+      },
+      {
+        "method": "layout",
+        "calls": 512,
+        "inclusiveCPU_ns": 748956,
+        "inclusiveWall_ns": 747000,
+        "selfCPU_ns": 748956,
+        "selfWall_ns": 747000,
+        "inclusiveCPU_ms": 0.748956,
+        "selfCPU_ms": 0.748956
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 512,
+        "inclusiveCPU_ns": 673111,
+        "inclusiveWall_ns": 657000,
+        "selfCPU_ns": 673111,
+        "selfWall_ns": 657000,
+        "inclusiveCPU_ms": 0.673111,
+        "selfCPU_ms": 0.673111
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 512,
+        "inclusiveCPU_ns": 1231847,
+        "inclusiveWall_ns": 1236000,
+        "selfCPU_ns": 558736,
+        "selfWall_ns": 579000,
+        "inclusiveCPU_ms": 1.231847,
+        "selfCPU_ms": 0.558736
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 513,
+        "inclusiveCPU_ns": 451877,
+        "inclusiveWall_ns": 423000,
+        "selfCPU_ns": 451877,
+        "selfWall_ns": 423000,
+        "inclusiveCPU_ms": 0.451877,
+        "selfCPU_ms": 0.451877
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 512,
+        "inclusiveCPU_ns": 93672,
+        "inclusiveWall_ns": 95000,
+        "selfCPU_ns": 93672,
+        "selfWall_ns": 95000,
+        "inclusiveCPU_ms": 0.093672,
+        "selfCPU_ms": 0.093672
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 4292,
+        "inclusiveWall_ns": 4000,
+        "selfCPU_ns": 1626,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.004292,
+        "selfCPU_ms": 0.001626
+      }
+    ]
+  },
+  {
+    "mode": "always-layout-positive-control",
+    "case": "invalid-both-on-rev0",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 512,
+        "inclusiveCPU_ns": 18043586,
+        "inclusiveWall_ns": 18062000,
+        "selfCPU_ns": 18043586,
+        "selfWall_ns": 18062000,
+        "inclusiveCPU_ms": 18.043586,
+        "selfCPU_ms": 18.043586
+      },
+      {
+        "method": "refresh",
+        "calls": 512,
+        "inclusiveCPU_ns": 23639129,
+        "inclusiveWall_ns": 23631000,
+        "selfCPU_ns": 2983417,
+        "selfWall_ns": 2960000,
+        "inclusiveCPU_ms": 23.639129,
+        "selfCPU_ms": 2.983417
+      },
+      {
+        "method": "layout",
+        "calls": 512,
+        "inclusiveCPU_ns": 759090,
+        "inclusiveWall_ns": 744000,
+        "selfCPU_ns": 759090,
+        "selfWall_ns": 744000,
+        "inclusiveCPU_ms": 0.75909,
+        "selfCPU_ms": 0.75909
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 512,
+        "inclusiveCPU_ns": 740033,
+        "inclusiveWall_ns": 725000,
+        "selfCPU_ns": 740033,
+        "selfWall_ns": 725000,
+        "inclusiveCPU_ms": 0.740033,
+        "selfCPU_ms": 0.740033
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 512,
+        "inclusiveCPU_ns": 1311336,
+        "inclusiveWall_ns": 1321000,
+        "selfCPU_ns": 571303,
+        "selfWall_ns": 596000,
+        "inclusiveCPU_ms": 1.311336,
+        "selfCPU_ms": 0.571303
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 513,
+        "inclusiveCPU_ns": 450156,
+        "inclusiveWall_ns": 452000,
+        "selfCPU_ns": 450156,
+        "selfWall_ns": 452000,
+        "inclusiveCPU_ms": 0.450156,
+        "selfCPU_ms": 0.450156
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 512,
+        "inclusiveCPU_ns": 93127,
+        "inclusiveWall_ns": 93000,
+        "selfCPU_ns": 93127,
+        "selfWall_ns": 93000,
+        "inclusiveCPU_ms": 0.093127,
+        "selfCPU_ms": 0.093127
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 3292,
+        "inclusiveWall_ns": 4000,
+        "selfCPU_ns": 1709,
+        "selfWall_ns": 3000,
+        "inclusiveCPU_ms": 0.003292,
+        "selfCPU_ms": 0.001709
+      }
+    ]
+  },
+  {
+    "mode": "always-layout-positive-control",
+    "case": "nil-native-both-on",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "refresh",
+        "calls": 512,
+        "inclusiveCPU_ns": 7952579,
+        "inclusiveWall_ns": 7944000,
+        "selfCPU_ns": 2859140,
+        "selfWall_ns": 2882000,
+        "inclusiveCPU_ms": 7.952579,
+        "selfCPU_ms": 2.85914
+      },
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 512,
+        "inclusiveCPU_ns": 2550051,
+        "inclusiveWall_ns": 2546000,
+        "selfCPU_ns": 2550051,
+        "selfWall_ns": 2546000,
+        "inclusiveCPU_ms": 2.550051,
+        "selfCPU_ms": 2.550051
+      },
+      {
+        "method": "layout",
+        "calls": 512,
+        "inclusiveCPU_ns": 714408,
+        "inclusiveWall_ns": 698000,
+        "selfCPU_ns": 714408,
+        "selfWall_ns": 698000,
+        "inclusiveCPU_ms": 0.714408,
+        "selfCPU_ms": 0.714408
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 512,
+        "inclusiveCPU_ns": 678478,
+        "inclusiveWall_ns": 691000,
+        "selfCPU_ns": 678478,
+        "selfWall_ns": 691000,
+        "inclusiveCPU_ms": 0.678478,
+        "selfCPU_ms": 0.678478
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 512,
+        "inclusiveCPU_ns": 1237121,
+        "inclusiveWall_ns": 1230000,
+        "selfCPU_ns": 558643,
+        "selfWall_ns": 539000,
+        "inclusiveCPU_ms": 1.237121,
+        "selfCPU_ms": 0.558643
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 513,
+        "inclusiveCPU_ns": 427771,
+        "inclusiveWall_ns": 409000,
+        "selfCPU_ns": 427771,
+        "selfWall_ns": 409000,
+        "inclusiveCPU_ms": 0.427771,
+        "selfCPU_ms": 0.427771
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 512,
+        "inclusiveCPU_ns": 165629,
+        "inclusiveWall_ns": 180000,
+        "selfCPU_ns": 165629,
+        "selfWall_ns": 180000,
+        "inclusiveCPU_ms": 0.165629,
+        "selfCPU_ms": 0.165629
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2917,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 1376,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.002917,
+        "selfCPU_ms": 0.001376
+      }
+    ]
+  },
+  {
+    "mode": "always-layout-positive-control",
+    "case": "invalid-group-only",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 512,
+        "inclusiveCPU_ns": 17819377,
+        "inclusiveWall_ns": 17829000,
+        "selfCPU_ns": 17819377,
+        "selfWall_ns": 17829000,
+        "inclusiveCPU_ms": 17.819377,
+        "selfCPU_ms": 17.819377
+      },
+      {
+        "method": "refresh",
+        "calls": 512,
+        "inclusiveCPU_ns": 23285011,
+        "inclusiveWall_ns": 23301000,
+        "selfCPU_ns": 2909962,
+        "selfWall_ns": 2926000,
+        "inclusiveCPU_ms": 23.285011,
+        "selfCPU_ms": 2.909962
+      },
+      {
+        "method": "layout",
+        "calls": 512,
+        "inclusiveCPU_ns": 744001,
+        "inclusiveWall_ns": 744000,
+        "selfCPU_ns": 744001,
+        "selfWall_ns": 744000,
+        "inclusiveCPU_ms": 0.744001,
+        "selfCPU_ms": 0.744001
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 512,
+        "inclusiveCPU_ns": 687955,
+        "inclusiveWall_ns": 708000,
+        "selfCPU_ns": 687955,
+        "selfWall_ns": 708000,
+        "inclusiveCPU_ms": 0.687955,
+        "selfCPU_ms": 0.687955
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 512,
+        "inclusiveCPU_ns": 1260511,
+        "inclusiveWall_ns": 1242000,
+        "selfCPU_ns": 572556,
+        "selfWall_ns": 534000,
+        "inclusiveCPU_ms": 1.260511,
+        "selfCPU_ms": 0.572556
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 513,
+        "inclusiveCPU_ns": 454561,
+        "inclusiveWall_ns": 468000,
+        "selfCPU_ns": 454561,
+        "selfWall_ns": 468000,
+        "inclusiveCPU_ms": 0.454561,
+        "selfCPU_ms": 0.454561
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 512,
+        "inclusiveCPU_ns": 97641,
+        "inclusiveWall_ns": 93000,
+        "selfCPU_ns": 97641,
+        "selfWall_ns": 93000,
+        "inclusiveCPU_ms": 0.097641,
+        "selfCPU_ms": 0.097641
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2041,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 999,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.002041,
+        "selfCPU_ms": 0.000999
+      }
+    ]
+  },
+  {
+    "mode": "always-layout-positive-control",
+    "case": "invalid-privacy-only",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 512,
+        "inclusiveCPU_ns": 17435129,
+        "inclusiveWall_ns": 17429000,
+        "selfCPU_ns": 17435129,
+        "selfWall_ns": 17429000,
+        "inclusiveCPU_ms": 17.435129,
+        "selfCPU_ms": 17.435129
+      },
+      {
+        "method": "refresh",
+        "calls": 512,
+        "inclusiveCPU_ns": 22581497,
+        "inclusiveWall_ns": 22598000,
+        "selfCPU_ns": 3144788,
+        "selfWall_ns": 3165000,
+        "inclusiveCPU_ms": 22.581497,
+        "selfCPU_ms": 3.144788
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 512,
+        "inclusiveCPU_ns": 812241,
+        "inclusiveWall_ns": 817000,
+        "selfCPU_ns": 812241,
+        "selfWall_ns": 817000,
+        "inclusiveCPU_ms": 0.812241,
+        "selfCPU_ms": 0.812241
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 512,
+        "inclusiveCPU_ns": 1362118,
+        "inclusiveWall_ns": 1369000,
+        "selfCPU_ns": 549877,
+        "selfWall_ns": 552000,
+        "inclusiveCPU_ms": 1.362118,
+        "selfCPU_ms": 0.549877
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 513,
+        "inclusiveCPU_ns": 433954,
+        "inclusiveWall_ns": 428000,
+        "selfCPU_ns": 433954,
+        "selfWall_ns": 428000,
+        "inclusiveCPU_ms": 0.433954,
+        "selfCPU_ms": 0.433954
+      },
+      {
+        "method": "layout",
+        "calls": 512,
+        "inclusiveCPU_ns": 114326,
+        "inclusiveWall_ns": 114000,
+        "selfCPU_ns": 114326,
+        "selfWall_ns": 114000,
+        "inclusiveCPU_ms": 0.114326,
+        "selfCPU_ms": 0.114326
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 512,
+        "inclusiveCPU_ns": 92598,
+        "inclusiveWall_ns": 94000,
+        "selfCPU_ns": 92598,
+        "selfWall_ns": 94000,
+        "inclusiveCPU_ms": 0.092598,
+        "selfCPU_ms": 0.092598
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 3000,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 1584,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.003,
+        "selfCPU_ms": 0.001584
+      }
+    ]
+  },
+  {
+    "mode": "always-layout-positive-control",
+    "case": "invalid-both-off",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2458,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 1875,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.002458,
+        "selfCPU_ms": 0.001875
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1875,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1000,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001875,
+        "selfCPU_ms": 0.001
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 875,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 875,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.000875,
+        "selfCPU_ms": 0.000875
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 583,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 583,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.000583,
+        "selfCPU_ms": 0.000583
+      }
+    ]
+  },
+  {
+    "mode": "always-layout-positive-control",
+    "case": "blocked-policy",
+    "N": 100,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "performSessionListLayout:",
+        "calls": 1,
+        "inclusiveCPU_ns": 6959,
+        "inclusiveWall_ns": 7000,
+        "selfCPU_ns": 6959,
+        "selfWall_ns": 7000,
+        "inclusiveCPU_ms": 0.006959,
+        "selfCPU_ms": 0.006959
+      },
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 6167,
+        "inclusiveWall_ns": 6000,
+        "selfCPU_ns": 6167,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.006167,
+        "selfCPU_ms": 0.006167
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 23250,
+        "inclusiveWall_ns": 23000,
+        "selfCPU_ns": 5125,
+        "selfWall_ns": 6000,
+        "inclusiveCPU_ms": 0.02325,
+        "selfCPU_ms": 0.005125
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 3042,
+        "inclusiveWall_ns": 3000,
+        "selfCPU_ns": 3042,
+        "selfWall_ns": 3000,
+        "inclusiveCPU_ms": 0.003042,
+        "selfCPU_ms": 0.003042
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 8291,
+        "inclusiveWall_ns": 8000,
+        "selfCPU_ns": 1332,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.008291,
+        "selfCPU_ms": 0.001332
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1125,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1125,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.001125,
+        "selfCPU_ms": 0.001125
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2000,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 875,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.002,
+        "selfCPU_ms": 0.000875
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 625,
+        "inclusiveWall_ns": 0,
+        "selfCPU_ns": 625,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.000625,
+        "selfCPU_ms": 0.000625
+      }
+    ]
+  },
+  {
+    "mode": "always-layout-positive-control",
+    "case": "single-stale-epoch",
+    "N": 1000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 288375,
+        "inclusiveWall_ns": 289000,
+        "selfCPU_ns": 288375,
+        "selfWall_ns": 289000,
+        "inclusiveCPU_ms": 0.288375,
+        "selfCPU_ms": 0.288375
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 2,
+        "inclusiveCPU_ns": 186667,
+        "inclusiveWall_ns": 187000,
+        "selfCPU_ns": 184500,
+        "selfWall_ns": 185000,
+        "inclusiveCPU_ms": 0.186667,
+        "selfCPU_ms": 0.1845
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 479416,
+        "inclusiveWall_ns": 480000,
+        "selfCPU_ns": 7707,
+        "selfWall_ns": 7000,
+        "inclusiveCPU_ms": 0.479416,
+        "selfCPU_ms": 0.007707
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 1667,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 1667,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.001667,
+        "selfCPU_ms": 0.001667
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1333,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 1333,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001333,
+        "selfCPU_ms": 0.001333
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 181125,
+        "inclusiveWall_ns": 181000,
+        "selfCPU_ns": 1041,
+        "selfWall_ns": 0,
+        "inclusiveCPU_ms": 0.181125,
+        "selfCPU_ms": 0.001041
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2167,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 834,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.002167,
+        "selfCPU_ms": 0.000834
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 542,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 542,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.000542,
+        "selfCPU_ms": 0.000542
+      }
+    ]
+  },
+  {
+    "mode": "always-layout-positive-control",
+    "case": "single-stale-policy-revision",
+    "N": 1000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 1,
+        "inclusiveCPU_ns": 895125,
+        "inclusiveWall_ns": 895000,
+        "selfCPU_ns": 895125,
+        "selfWall_ns": 895000,
+        "inclusiveCPU_ms": 0.895125,
+        "selfCPU_ms": 0.895125
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 2,
+        "inclusiveCPU_ns": 179125,
+        "inclusiveWall_ns": 179000,
+        "selfCPU_ns": 177041,
+        "selfWall_ns": 177000,
+        "inclusiveCPU_ms": 0.179125,
+        "selfCPU_ms": 0.177041
+      },
+      {
+        "method": "refresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1103583,
+        "inclusiveWall_ns": 1104000,
+        "selfCPU_ns": 31750,
+        "selfWall_ns": 32000,
+        "inclusiveCPU_ms": 1.103583,
+        "selfCPU_ms": 0.03175
+      },
+      {
+        "method": "layout",
+        "calls": 1,
+        "inclusiveCPU_ns": 2084,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 2084,
+        "selfWall_ns": 2000,
+        "inclusiveCPU_ms": 0.002084,
+        "selfCPU_ms": 0.002084
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 1208,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 1208,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.001208,
+        "selfCPU_ms": 0.001208
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 1,
+        "inclusiveCPU_ns": 174083,
+        "inclusiveWall_ns": 174000,
+        "selfCPU_ns": 917,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.174083,
+        "selfCPU_ms": 0.000917
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 1,
+        "inclusiveCPU_ns": 2084,
+        "inclusiveWall_ns": 2000,
+        "selfCPU_ns": 876,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.002084,
+        "selfCPU_ms": 0.000876
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 1,
+        "inclusiveCPU_ns": 541,
+        "inclusiveWall_ns": 1000,
+        "selfCPU_ns": 541,
+        "selfWall_ns": 1000,
+        "inclusiveCPU_ms": 0.000541,
+        "selfCPU_ms": 0.000541
+      }
+    ]
+  },
+  {
+    "mode": "always-layout-positive-control",
+    "case": "externally-driven-60Hz",
+    "N": 1000,
+    "M": 4,
+    "top_by_exclusive_CPU": [
+      {
+        "method": "projectionForSections:tabs:selectedTabID:accountID:",
+        "calls": 60,
+        "inclusiveCPU_ns": 16897125,
+        "inclusiveWall_ns": 16905000,
+        "selfCPU_ns": 16897125,
+        "selfWall_ns": 16905000,
+        "inclusiveCPU_ms": 16.897125,
+        "selfCPU_ms": 16.897125
+      },
+      {
+        "method": "performSessionListLayout:",
+        "calls": 60,
+        "inclusiveCPU_ns": 10134041,
+        "inclusiveWall_ns": 10137000,
+        "selfCPU_ns": 10134041,
+        "selfWall_ns": 10137000,
+        "inclusiveCPU_ms": 10.134041,
+        "selfCPU_ms": 10.134041
+      },
+      {
+        "method": "refresh",
+        "calls": 60,
+        "inclusiveCPU_ns": 27558294,
+        "inclusiveWall_ns": 27560000,
+        "selfCPU_ns": 360245,
+        "selfWall_ns": 347000,
+        "inclusiveCPU_ms": 27.558294,
+        "selfCPU_ms": 0.360245
+      },
+      {
+        "method": "layout",
+        "calls": 60,
+        "inclusiveCPU_ns": 92254,
+        "inclusiveWall_ns": 99000,
+        "selfCPU_ns": 92254,
+        "selfWall_ns": 99000,
+        "inclusiveCPU_ms": 0.092254,
+        "selfCPU_ms": 0.092254
+      },
+      {
+        "method": "scheduleRefresh",
+        "calls": 60,
+        "inclusiveCPU_ns": 59289,
+        "inclusiveWall_ns": 62000,
+        "selfCPU_ns": 59289,
+        "selfWall_ns": 62000,
+        "inclusiveCPU_ms": 0.059289,
+        "selfCPU_ms": 0.059289
+      },
+      {
+        "method": "publishProjection:previous:changes:previouslyProjecting:",
+        "calls": 60,
+        "inclusiveCPU_ns": 10182458,
+        "inclusiveWall_ns": 10185000,
+        "selfCPU_ns": 48417,
+        "selfWall_ns": 48000,
+        "inclusiveCPU_ms": 10.182458,
+        "selfCPU_ms": 0.048417
+      },
+      {
+        "method": "requestRefresh",
+        "calls": 60,
+        "inclusiveCPU_ns": 94751,
+        "inclusiveWall_ns": 97000,
+        "selfCPU_ns": 35462,
+        "selfWall_ns": 35000,
+        "inclusiveCPU_ms": 0.094751,
+        "selfCPU_ms": 0.035462
+      },
+      {
+        "method": "nativeSectionsForAccount:",
+        "calls": 60,
+        "inclusiveCPU_ns": 26212,
+        "inclusiveWall_ns": 24000,
+        "selfCPU_ns": 26212,
+        "selfWall_ns": 24000,
+        "inclusiveCPU_ms": 0.026212,
+        "selfCPU_ms": 0.026212
+      }
+    ]
+  }
+]

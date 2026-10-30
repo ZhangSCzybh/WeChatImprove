@@ -1,0 +1,7 @@
+ADMISSION {"case":"reentry-projection","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-table","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-native-invalidation","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-enabled","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-revision-readable","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-unsafe-projection","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+Privacy admission reentry probe: 35 checks, 0 failures
