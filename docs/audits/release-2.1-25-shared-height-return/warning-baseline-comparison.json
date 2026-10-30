@@ -1,0 +1,21 @@
+{
+  "baseline_version": "2.1-24",
+  "version": "2.1-25",
+  "schemes": {
+    "rootless": {
+      "baseline_count": 6,
+      "current_count": 6,
+      "exact_warning_multisets_match": true,
+      "added": [],
+      "removed": []
+    },
+    "rootful": {
+      "baseline_count": 6,
+      "current_count": 6,
+      "exact_warning_multisets_match": true,
+      "added": [],
+      "removed": []
+    }
+  },
+  "all_exact_warning_multisets_match": true
+}

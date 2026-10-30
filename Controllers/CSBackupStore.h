@@ -4,7 +4,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// Serial-queue-owned storage. Every published snapshot is immutable and independently valid.
 @interface CSBackupStore : NSObject
 @property(nonatomic,readonly) NSURL *root;
-@property(nonatomic,copy,readonly) NSString *cleanupStatus;
 /// Optional diagnostics. Never used to decide which snapshots exist or may be removed.
 @property(nonatomic,copy,nullable) void (^eventHandler)(NSString *event,NSDictionary *details);
 - (instancetype)initWithRoot:(NSURL *)root;
@@ -14,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// Passive phase events; neither audit failures nor handlers alter operation results.
 - (void)recordRestoreStage:(NSString *)stage status:(NSString *)status error:(nullable NSError *)error details:(NSDictionary *)details;
 - (BOOL)publish:(NSDictionary *)snapshot error:(NSError **)error;
-/// Imported protection is durable before a new snapshot becomes visible.
+/// Import provenance is durable before a snapshot becomes visible.
 - (BOOL)importSnapshot:(NSDictionary *)snapshot error:(NSError **)error;
 - (nullable NSDictionary *)snapshot:(NSString *)identifier error:(NSError **)error;
 /// Audits selected-file/meta reads without flooding diagnostics during list scans.
@@ -22,11 +21,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<NSDictionary *> *)snapshots:(NSError **)error;
 /// Includes unreadable files as unavailable records so the UI can preserve/export originals.
 - (NSArray<NSDictionary *> *)records:(NSError **)error;
-/// Reuse verified summaries and one matching automatic snapshot only inside this serial save.
-/// Every reuse checks current file identity; finally clears all operation state.
-- (nullable NSDictionary *)withInventoryForSource:(NSDictionary *)source operation:(NSDictionary * _Nullable (^)(void))operation;
-/// Reuses the matching immutable automatic snapshot only while its file identity is unchanged.
-- (nullable NSDictionary *)snapshotUsingInventory:(NSString *)identifier error:(NSError **)error;
 - (nullable NSData *)originalData:(NSString *)filename error:(NSError **)error;
 - (BOOL)remove:(NSString *)identifier error:(NSError **)error;
 /// Manual deletion also accepts unreadable or renamed leaf .wcbak files; never follows links or removes directories.
@@ -40,7 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)confirmActivation:(NSDictionary *)record error:(NSError **)error;
 - (BOOL)activationConfirmed:(NSDictionary *)journal;
 - (BOOL)archiveJournal:(NSError **)error;
-- (BOOL)prune:(NSError **)error;
 @end
 FOUNDATION_EXPORT BOOL CSBackupAtomicWrite(NSData *data, NSURL *url, NSError **error);
 FOUNDATION_EXPORT NSData * _Nullable CSBackupReadFile(NSURL *url, NSUInteger limit, NSError **error);

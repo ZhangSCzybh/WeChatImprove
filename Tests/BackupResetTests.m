@@ -31,7 +31,7 @@ int main(void){@autoreleasepool{
     [standard setObject:@{@"friend":@{@"enabled":@YES,@"separatorImagePath":missing,@"separatorText":@"keep"}} forKey:contacts];
     [standard setObject:@"keep" forKey:text];[standard setObject:@"host-secret" forKey:@"host.account"];[standard setInteger:99 forKey:@"kReceiveTransferTotalCountKey"];
     NSError *error=nil;NSSet *all=[NSSet setWithArray:CSBackupRegistry.moduleTitles.allKeys],*alice=[NSSet setWithObject:@"alice"],*tabbar=[NSSet setWithObject:@"tabbar"];
-    Check(![engine save:@"strict" kind:@"manual" error:&error]&&error!=nil,@"ordinary backups still reject missing images");
+    Check(![engine save:@"strict" error:&error]&&error!=nil,@"ordinary backups still reject missing images");
     error=nil;NSDictionary *reset=[engine resetSnapshot:&error];Check(reset!=nil&&error==nil,@"missing tabbar, navigation and contact images do not block reset entry");
     NSDictionary *preview=[engine preview:reset modules:tabbar accounts:alice error:&error];Check(preview!=nil,@"missing images do not block reset preview");
     Check([preview[@"warnings"] count]>0,@"preview discloses lost images");
@@ -40,9 +40,9 @@ int main(void){@autoreleasepool{
     [standard setObject:[engine.resourceRoot URLByAppendingPathComponent:@"another-gone.png"].path forKey:icon];
     Check(![engine prepare:preview error:&error],@"changing one missing path invalidates preview");[standard setObject:missing forKey:icon];
     preview=[engine preview:reset modules:tabbar accounts:alice error:&error];Check([engine prepare:preview error:&error],@"prepare reset with missing resources");
-    NSDictionary *journal=[store journal:NULL],*protection=[store snapshot:journal[@"protectionID"] error:&error];
-    Check(protection!=nil&&[protection[@"assets"] count]==1&&[protection[@"warnings"] count]>0,@"protection preserves available image bytes and discloses missing images");
-    Check([Field(protection[@"fields"],contacts)[@"value"][@"friend"][@"separatorText"] isEqual:@"keep"],@"protection keeps other fields of a contact with a missing image");
+    NSDictionary *journal=[store journal:NULL];
+    Check(journal[@"protectionID"]==nil&&[store records:NULL].count==0,@"reset preparation creates no protection backup file");
+    Check([Field(journal[@"before"],otherIcon)[@"value"] isEqual:good.path],@"journal retains available image references needed for rollback");
     Check([Field(journal[@"before"],icon)[@"value"] isEqual:missing],@"transaction retains exact original missing reference for rollback");
     Check([[standard objectForKey:icon] isEqual:missing],@"preparation does not change live settings");
     [png writeToFile:missing atomically:YES];Check(![engine applyPending:&error],@"reappearing image invalidates prepared reset");
@@ -63,7 +63,8 @@ int main(void){@autoreleasepool{
     Check([engine prepare:preview error:&error]&&[engine applyPending:&error]&&[engine finishStartup:&error]&&[engine confirmStartup:&error],@"full reset with missing contact and fixed-path images completes");
     Check([standard objectForKey:contacts]==nil&&[standard objectForKey:navImage]==nil,@"full reset removes selected missing image references");
     Check([[standard objectForKey:@"host.account"] isEqual:@"host-secret"]&&[standard integerForKey:@"kReceiveTransferTotalCountKey"]==99,@"host account and payment statistics preserved");
-    Check([engine save:@"after reset" kind:@"manual" error:&error]!=nil,@"complete backup works after full reset");
+    Check([store records:NULL].count==0,@"prepare, reset, interrupted rollback and startup never create backup files");
+    Check([engine save:@"after reset" error:&error]!=nil,@"complete backup works after full reset");
     for(NSURL *sentinel in sentinels)Check([[NSData dataWithContentsOfURL:sentinel] isEqual:png],@"real reset and rollback preserve data subtrees including PNG files");
     // Existing corrupt files and dangling links are not silently treated as missing.
     [@"invalid image" writeToFile:missing atomically:YES encoding:NSUTF8StringEncoding error:NULL];[standard setObject:missing forKey:icon];

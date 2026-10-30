@@ -1,0 +1,550 @@
+{
+  "version": "2.1-23",
+  "production_input_hashes_match_build": true,
+  "production_input_file_count": 42513,
+  "verification_script_sha256": "c44fa298813f8d98bf821a6e6a1a390ff6737d67667e76c7bf8725768773f5e5",
+  "build_input_manifest_sha256": "fbc9130fd8ba6a0b54c31a5c372c45ff643ece972ba391bd6a275442b6a8e996",
+  "build_result_sha256": "d4ecce825c108bd9374176561eaa311bc9e48566ab6cd71e40a7929238e64a08",
+  "packages": [
+    {
+      "scheme": "rootless",
+      "package": "com.wechat.improve_2.1-23_iphoneos-arm64.deb",
+      "metadata": {
+        "Package": "com.wechat.improve",
+        "Name": "WeChatImprove",
+        "Version": "2.1-23",
+        "Architecture": "iphoneos-arm64",
+        "Depends": "mobilesubstrate (>= 0.9.5000)",
+        "Section": "Tweaks"
+      },
+      "version": "2.1-23",
+      "package_architecture": "iphoneos-arm64",
+      "install_path": "/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "dylib_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "minimum_iOS": [
+        "15.0",
+        "15.0"
+      ],
+      "dependencies_per_architecture": {
+        "arm64": {
+          "platform": "iOS",
+          "platform_id": 2,
+          "minimum_iOS": "15.0",
+          "install_id": "@rpath/WeChatImprove.dylib",
+          "substrate": "@rpath/CydiaSubstrate.framework/CydiaSubstrate",
+          "rpaths": [
+            "/var/jb/Library/Frameworks",
+            "/var/jb/usr/lib",
+            "@loader_path/.jbroot/Library/Frameworks",
+            "@loader_path/.jbroot/usr/lib"
+          ]
+        },
+        "arm64e": {
+          "platform": "iOS",
+          "platform_id": 2,
+          "minimum_iOS": "15.0",
+          "install_id": "@rpath/WeChatImprove.dylib",
+          "substrate": "@rpath/CydiaSubstrate.framework/CydiaSubstrate",
+          "rpaths": [
+            "/var/jb/Library/Frameworks",
+            "/var/jb/usr/lib",
+            "@loader_path/.jbroot/Library/Frameworks",
+            "@loader_path/.jbroot/usr/lib"
+          ]
+        }
+      },
+      "payload_files": {
+        "var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib": {
+          "type": "file",
+          "bytes": 6788784,
+          "sha256": "fc6eb445e4d29d443fba8bde215cdede8dedb66e2fab4cd70a8e7ddcfaaa0dbd",
+          "mode": 493
+        },
+        "var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.plist": {
+          "type": "file",
+          "bytes": 111,
+          "sha256": "2a2caeaba6155b2c2e4ad1456806fa9e600e4a24b02d4ddf389ed26b35122b46",
+          "mode": 420
+        }
+      },
+      "full_payload_matches_staging": true,
+      "filter_matches_source": true,
+      "filter": {
+        "Filter": {
+          "Bundles": [
+            "com.tencent.xin"
+          ],
+          "Executables": [
+            "ZYBH"
+          ]
+        }
+      },
+      "retained_symbols": [
+        "_OBJC_CLASS_$_CSAIBackgroundSync",
+        "_CSAIInstallNativeSyncObserver",
+        "_CSAIObserveBackgroundSyncRequest",
+        "_OBJC_CLASS_$_CSAINativeSyncObservation",
+        "_OBJC_CLASS_$_CSAIBackgroundSyncContext",
+        "_CSCFPaymentOutputAllowed",
+        "_CSCFUnreadPanelInstallHooks",
+        "_CSCFUnreadPanelNotifyCount",
+        "_CSCFIncomingCallToken",
+        "_CSLayoutPreferencesRead",
+        "_CSGroupCopyFoldedRowsSelectingSummary",
+        "_CSAIReplyMessageIngressEnabled",
+        "_CSAIReplyMessageIngressAllowsSession",
+        "_CSGroupResolveNativeRowPathReusing",
+        "_OBJC_CLASS_$_CSNavigationImageBinding",
+        "_CSListCornerPerformSessionTableLayout",
+        "_CSAIReadCredentialAsync",
+        "_CSTabBarBeginControllerLayout",
+        "_CSTabBarEndControllerLayout",
+        "_OBJC_CLASS_$_CSGroupPublicationPlan",
+        "_CSScheduledTaskAllowsExecution",
+        "_OBJC_CLASS_$_CSScheduledTaskStore",
+        "_OBJC_CLASS_$_CSScheduledTaskManager",
+        "_OBJC_CLASS_$_CSScheduledTaskSettingsViewController"
+      ],
+      "policy_symbols": [
+        "_CSBackgroundRunPolicyKey",
+        "_CSBackgroundRunDefaultPolicy",
+        "_CSBackgroundRunLegacyPolicy",
+        "_CSBackgroundRunValidatePolicy",
+        "_CSBackgroundRunPolicyAllowsDate",
+        "_CSBackgroundRunPolicyNextBoundary",
+        "_CSBackgroundRunPolicyWindowDescription",
+        "_CSBackgroundRunSilentAudioData",
+        "_CSBackgroundRunAudioWillChange",
+        "_CSBackgroundRunAudioDidChange",
+        "_CSBackgroundRunStateChangedNotification",
+        "_OBJC_CLASS_$_CSBackgroundRunManager",
+        "_OBJC_CLASS_$_CSBackgroundRunAudio",
+        "_OBJC_CLASS_$_CSBackgroundRunViewController",
+        "_OBJC_CLASS_$_CSBackupManager",
+        "_OBJC_CLASS_$_CSBackupEngine",
+        "_OBJC_CLASS_$_CSBackgroundRunWindowEditor"
+      ],
+      "absent_symbols": [
+        "_OBJC_CLASS_$_CSBackupScheduler",
+        "_OBJC_METACLASS_$_CSBackupScheduler",
+        "_CSCloseFriendShouldSilence"
+      ],
+      "selectors_per_architecture": {
+        "arm64": [
+          "savePolicy:error:",
+          "updateBoundaryTimerAt:",
+          "energyPauseReason",
+          "setBackgroundState:",
+          "remainingDuration",
+          "reconcile",
+          "publish:",
+          "hostBusy",
+          "startWithError:",
+          "saveWindowAllDay:start:end:error:",
+          "create:completion:",
+          "save:error:",
+          "prepareContent:error:",
+          "capture:kind:allowingMissingAssets:error:",
+          "recordRefreshEvent:delay:",
+          "refreshDiagnosticsSnapshot",
+          "publicationPlanFrom:changes:contentUserNames:contentIdentityKnown:visiblePaths:"
+        ],
+        "arm64e": [
+          "savePolicy:error:",
+          "updateBoundaryTimerAt:",
+          "energyPauseReason",
+          "setBackgroundState:",
+          "remainingDuration",
+          "reconcile",
+          "publish:",
+          "hostBusy",
+          "startWithError:",
+          "saveWindowAllDay:start:end:error:",
+          "create:completion:",
+          "save:error:",
+          "prepareContent:error:",
+          "capture:kind:allowingMissingAssets:error:",
+          "recordRefreshEvent:delay:",
+          "refreshDiagnosticsSnapshot",
+          "publicationPlanFrom:changes:contentUserNames:contentIdentityKnown:visiblePaths:"
+        ]
+      },
+      "retired_scheduler_and_automatic_save_absent": true,
+      "uuid_matches_dSYM": {
+        "arm64": "78A57892-1C43-3FF5-B747-DA6D799D26E2",
+        "arm64e": "4846A91D-59F6-3707-8169-4D9C42911C96"
+      },
+      "dylib_sha256": "fc6eb445e4d29d443fba8bde215cdede8dedb66e2fab4cd70a8e7ddcfaaa0dbd",
+      "external_resources": [],
+      "silent_audio_embedded_generator_present": true
+    },
+    {
+      "scheme": "rootful",
+      "package": "com.wechat.improve_2.1-23_iphoneos-arm.deb",
+      "metadata": {
+        "Package": "com.wechat.improve",
+        "Name": "WeChatImprove",
+        "Version": "2.1-23",
+        "Architecture": "iphoneos-arm",
+        "Depends": "mobilesubstrate (>= 0.9.5000)",
+        "Section": "Tweaks"
+      },
+      "version": "2.1-23",
+      "package_architecture": "iphoneos-arm",
+      "install_path": "/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "dylib_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "minimum_iOS": [
+        "15.0",
+        "15.0"
+      ],
+      "dependencies_per_architecture": {
+        "arm64": {
+          "platform": "iOS",
+          "platform_id": 2,
+          "minimum_iOS": "15.0",
+          "install_id": "/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+          "substrate": "/Library/Frameworks/CydiaSubstrate.framework/CydiaSubstrate",
+          "rpaths": []
+        },
+        "arm64e": {
+          "platform": "iOS",
+          "platform_id": 2,
+          "minimum_iOS": "15.0",
+          "install_id": "/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+          "substrate": "/Library/Frameworks/CydiaSubstrate.framework/CydiaSubstrate",
+          "rpaths": []
+        }
+      },
+      "payload_files": {
+        "Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib": {
+          "type": "file",
+          "bytes": 6788784,
+          "sha256": "2f9cdc6980533bbf80badcc1d5999aa6ae5eb47725233532d7fee33d1f97169a",
+          "mode": 493
+        },
+        "Library/MobileSubstrate/DynamicLibraries/WeChatImprove.plist": {
+          "type": "file",
+          "bytes": 111,
+          "sha256": "2a2caeaba6155b2c2e4ad1456806fa9e600e4a24b02d4ddf389ed26b35122b46",
+          "mode": 420
+        }
+      },
+      "full_payload_matches_staging": true,
+      "filter_matches_source": true,
+      "filter": {
+        "Filter": {
+          "Bundles": [
+            "com.tencent.xin"
+          ],
+          "Executables": [
+            "ZYBH"
+          ]
+        }
+      },
+      "retained_symbols": [
+        "_OBJC_CLASS_$_CSAIBackgroundSync",
+        "_CSAIInstallNativeSyncObserver",
+        "_CSAIObserveBackgroundSyncRequest",
+        "_OBJC_CLASS_$_CSAINativeSyncObservation",
+        "_OBJC_CLASS_$_CSAIBackgroundSyncContext",
+        "_CSCFPaymentOutputAllowed",
+        "_CSCFUnreadPanelInstallHooks",
+        "_CSCFUnreadPanelNotifyCount",
+        "_CSCFIncomingCallToken",
+        "_CSLayoutPreferencesRead",
+        "_CSGroupCopyFoldedRowsSelectingSummary",
+        "_CSAIReplyMessageIngressEnabled",
+        "_CSAIReplyMessageIngressAllowsSession",
+        "_CSGroupResolveNativeRowPathReusing",
+        "_OBJC_CLASS_$_CSNavigationImageBinding",
+        "_CSListCornerPerformSessionTableLayout",
+        "_CSAIReadCredentialAsync",
+        "_CSTabBarBeginControllerLayout",
+        "_CSTabBarEndControllerLayout",
+        "_OBJC_CLASS_$_CSGroupPublicationPlan",
+        "_CSScheduledTaskAllowsExecution",
+        "_OBJC_CLASS_$_CSScheduledTaskStore",
+        "_OBJC_CLASS_$_CSScheduledTaskManager",
+        "_OBJC_CLASS_$_CSScheduledTaskSettingsViewController"
+      ],
+      "policy_symbols": [
+        "_CSBackgroundRunPolicyKey",
+        "_CSBackgroundRunDefaultPolicy",
+        "_CSBackgroundRunLegacyPolicy",
+        "_CSBackgroundRunValidatePolicy",
+        "_CSBackgroundRunPolicyAllowsDate",
+        "_CSBackgroundRunPolicyNextBoundary",
+        "_CSBackgroundRunPolicyWindowDescription",
+        "_CSBackgroundRunSilentAudioData",
+        "_CSBackgroundRunAudioWillChange",
+        "_CSBackgroundRunAudioDidChange",
+        "_CSBackgroundRunStateChangedNotification",
+        "_OBJC_CLASS_$_CSBackgroundRunManager",
+        "_OBJC_CLASS_$_CSBackgroundRunAudio",
+        "_OBJC_CLASS_$_CSBackgroundRunViewController",
+        "_OBJC_CLASS_$_CSBackupManager",
+        "_OBJC_CLASS_$_CSBackupEngine",
+        "_OBJC_CLASS_$_CSBackgroundRunWindowEditor"
+      ],
+      "absent_symbols": [
+        "_OBJC_CLASS_$_CSBackupScheduler",
+        "_OBJC_METACLASS_$_CSBackupScheduler",
+        "_CSCloseFriendShouldSilence"
+      ],
+      "selectors_per_architecture": {
+        "arm64": [
+          "savePolicy:error:",
+          "updateBoundaryTimerAt:",
+          "energyPauseReason",
+          "setBackgroundState:",
+          "remainingDuration",
+          "reconcile",
+          "publish:",
+          "hostBusy",
+          "startWithError:",
+          "saveWindowAllDay:start:end:error:",
+          "create:completion:",
+          "save:error:",
+          "prepareContent:error:",
+          "capture:kind:allowingMissingAssets:error:",
+          "recordRefreshEvent:delay:",
+          "refreshDiagnosticsSnapshot",
+          "publicationPlanFrom:changes:contentUserNames:contentIdentityKnown:visiblePaths:"
+        ],
+        "arm64e": [
+          "savePolicy:error:",
+          "updateBoundaryTimerAt:",
+          "energyPauseReason",
+          "setBackgroundState:",
+          "remainingDuration",
+          "reconcile",
+          "publish:",
+          "hostBusy",
+          "startWithError:",
+          "saveWindowAllDay:start:end:error:",
+          "create:completion:",
+          "save:error:",
+          "prepareContent:error:",
+          "capture:kind:allowingMissingAssets:error:",
+          "recordRefreshEvent:delay:",
+          "refreshDiagnosticsSnapshot",
+          "publicationPlanFrom:changes:contentUserNames:contentIdentityKnown:visiblePaths:"
+        ]
+      },
+      "retired_scheduler_and_automatic_save_absent": true,
+      "uuid_matches_dSYM": {
+        "arm64": "AC56BDC5-FF95-3FE9-A464-3F940D8745B8",
+        "arm64e": "F49227A0-90F9-3FED-A384-B3499582B46C"
+      },
+      "dylib_sha256": "2f9cdc6980533bbf80badcc1d5999aa6ae5eb47725233532d7fee33d1f97169a",
+      "external_resources": [],
+      "silent_audio_embedded_generator_present": true
+    }
+  ],
+  "symbols_zip_crc_valid": true,
+  "symbol_files": 12,
+  "symbol_archive_members": {
+    "rootless/arm64/WeChatImprove.dylib.dSYM/Contents/Info.plist": {
+      "bytes": 648,
+      "sha256": "cd66470857eda947f1b60afcd61c26ef695cc98a8d92c9a7428cda30e6d93f12"
+    },
+    "rootless/arm64/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib": {
+      "bytes": 7915667,
+      "sha256": "ffe53bde3a153d7894b434f163f933edb960b34ba94f7c29bb03eb2199194027"
+    },
+    "rootless/arm64/WeChatImprove.dylib.dSYM/Contents/Resources/Relocations/aarch64/WeChatImprove.dylib.yml": {
+      "bytes": 1735148,
+      "sha256": "830684b47af751f661e7fca54478bf98d9e4d0bc6732bae5c8444b9880f1b21e"
+    },
+    "rootless/arm64e/WeChatImprove.dylib.dSYM/Contents/Info.plist": {
+      "bytes": 648,
+      "sha256": "cd66470857eda947f1b60afcd61c26ef695cc98a8d92c9a7428cda30e6d93f12"
+    },
+    "rootless/arm64e/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib": {
+      "bytes": 7927122,
+      "sha256": "2565b137c1176523e4e73aa20ab1de67de8c485d912175b775770dce9a88879e"
+    },
+    "rootless/arm64e/WeChatImprove.dylib.dSYM/Contents/Resources/Relocations/arm64e/WeChatImprove.dylib.yml": {
+      "bytes": 1735806,
+      "sha256": "4da932cd98a8e5987c8aa1b1cfd03088ff29d838193ed32d1929a60d0350a139"
+    },
+    "rootful/arm64/WeChatImprove.dylib.dSYM/Contents/Info.plist": {
+      "bytes": 648,
+      "sha256": "cd66470857eda947f1b60afcd61c26ef695cc98a8d92c9a7428cda30e6d93f12"
+    },
+    "rootful/arm64/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib": {
+      "bytes": 7914952,
+      "sha256": "f8dc333c781271c2d0e7b59e10f4095deda0d57f14ab5bdc59dfa9b3bd02c5ed"
+    },
+    "rootful/arm64/WeChatImprove.dylib.dSYM/Contents/Resources/Relocations/aarch64/WeChatImprove.dylib.yml": {
+      "bytes": 1735147,
+      "sha256": "f138964fe7a24d628265989b85d8b12ade2d60aa60534e2cc9b1206897224c3b"
+    },
+    "rootful/arm64e/WeChatImprove.dylib.dSYM/Contents/Info.plist": {
+      "bytes": 648,
+      "sha256": "cd66470857eda947f1b60afcd61c26ef695cc98a8d92c9a7428cda30e6d93f12"
+    },
+    "rootful/arm64e/WeChatImprove.dylib.dSYM/Contents/Resources/DWARF/WeChatImprove.dylib": {
+      "bytes": 7926407,
+      "sha256": "3380ab3f35086ff2d5207a6904d676ade691625799c4a283383b72022b6dcb16"
+    },
+    "rootful/arm64e/WeChatImprove.dylib.dSYM/Contents/Resources/Relocations/arm64e/WeChatImprove.dylib.yml": {
+      "bytes": 1735805,
+      "sha256": "cbb0229513658f40d3eb8d779217e5ac17ecb9ade44cc847ef2668670bda0580"
+    }
+  },
+  "archived_dSYM_checks": [
+    {
+      "scheme": "rootless",
+      "architecture": "arm64",
+      "uuid": "78A57892-1C43-3FF5-B747-DA6D799D26E2",
+      "debug_file_sha256": "ffe53bde3a153d7894b434f163f933edb960b34ba94f7c29bb03eb2199194027",
+      "methods_present": [
+        "-[CSBackgroundRunManager savePolicy:error:]",
+        "-[CSBackgroundRunManager updateBoundaryTimerAt:]",
+        "-[CSBackgroundRunManager energyPauseReason]",
+        "-[CSBackgroundRunManager setBackgroundState:]",
+        "-[CSBackgroundRunManager remainingDuration]",
+        "-[CSBackgroundRunManager reconcile]",
+        "-[CSBackgroundRunManager publish:]",
+        "-[CSBackgroundRunAudio hostBusy]",
+        "-[CSBackgroundRunAudio startWithError:]",
+        "-[CSBackgroundRunViewController saveWindowAllDay:start:end:error:]",
+        "-[CSBackupManager create:completion:]",
+        "-[CSBackupEngine save:error:]",
+        "-[CSBackupEngine prepareContent:error:]",
+        "-[CSBackupEngine capture:kind:allowingMissingAssets:error:]",
+        "-[CSGroupListAdapter recordRefreshEvent:delay:]",
+        "-[CSGroupListAdapter refreshDiagnosticsSnapshot]",
+        "-[CSGroupProjection publicationPlanFrom:changes:contentUserNames:contentIdentityKnown:visiblePaths:]"
+      ],
+      "methods_absent": [
+        "-[CSBackupEngine save:kind:error:]",
+        "+[CSBackupEngine contentDigest:]",
+        "-[CSBackupManager processScheduledWork]",
+        "-[CSBackupManager isAutoBackupEnabled]"
+      ]
+    },
+    {
+      "scheme": "rootless",
+      "architecture": "arm64e",
+      "uuid": "4846A91D-59F6-3707-8169-4D9C42911C96",
+      "debug_file_sha256": "2565b137c1176523e4e73aa20ab1de67de8c485d912175b775770dce9a88879e",
+      "methods_present": [
+        "-[CSBackgroundRunManager savePolicy:error:]",
+        "-[CSBackgroundRunManager updateBoundaryTimerAt:]",
+        "-[CSBackgroundRunManager energyPauseReason]",
+        "-[CSBackgroundRunManager setBackgroundState:]",
+        "-[CSBackgroundRunManager remainingDuration]",
+        "-[CSBackgroundRunManager reconcile]",
+        "-[CSBackgroundRunManager publish:]",
+        "-[CSBackgroundRunAudio hostBusy]",
+        "-[CSBackgroundRunAudio startWithError:]",
+        "-[CSBackgroundRunViewController saveWindowAllDay:start:end:error:]",
+        "-[CSBackupManager create:completion:]",
+        "-[CSBackupEngine save:error:]",
+        "-[CSBackupEngine prepareContent:error:]",
+        "-[CSBackupEngine capture:kind:allowingMissingAssets:error:]",
+        "-[CSGroupListAdapter recordRefreshEvent:delay:]",
+        "-[CSGroupListAdapter refreshDiagnosticsSnapshot]",
+        "-[CSGroupProjection publicationPlanFrom:changes:contentUserNames:contentIdentityKnown:visiblePaths:]"
+      ],
+      "methods_absent": [
+        "-[CSBackupEngine save:kind:error:]",
+        "+[CSBackupEngine contentDigest:]",
+        "-[CSBackupManager processScheduledWork]",
+        "-[CSBackupManager isAutoBackupEnabled]"
+      ]
+    },
+    {
+      "scheme": "rootful",
+      "architecture": "arm64",
+      "uuid": "AC56BDC5-FF95-3FE9-A464-3F940D8745B8",
+      "debug_file_sha256": "f8dc333c781271c2d0e7b59e10f4095deda0d57f14ab5bdc59dfa9b3bd02c5ed",
+      "methods_present": [
+        "-[CSBackgroundRunManager savePolicy:error:]",
+        "-[CSBackgroundRunManager updateBoundaryTimerAt:]",
+        "-[CSBackgroundRunManager energyPauseReason]",
+        "-[CSBackgroundRunManager setBackgroundState:]",
+        "-[CSBackgroundRunManager remainingDuration]",
+        "-[CSBackgroundRunManager reconcile]",
+        "-[CSBackgroundRunManager publish:]",
+        "-[CSBackgroundRunAudio hostBusy]",
+        "-[CSBackgroundRunAudio startWithError:]",
+        "-[CSBackgroundRunViewController saveWindowAllDay:start:end:error:]",
+        "-[CSBackupManager create:completion:]",
+        "-[CSBackupEngine save:error:]",
+        "-[CSBackupEngine prepareContent:error:]",
+        "-[CSBackupEngine capture:kind:allowingMissingAssets:error:]",
+        "-[CSGroupListAdapter recordRefreshEvent:delay:]",
+        "-[CSGroupListAdapter refreshDiagnosticsSnapshot]",
+        "-[CSGroupProjection publicationPlanFrom:changes:contentUserNames:contentIdentityKnown:visiblePaths:]"
+      ],
+      "methods_absent": [
+        "-[CSBackupEngine save:kind:error:]",
+        "+[CSBackupEngine contentDigest:]",
+        "-[CSBackupManager processScheduledWork]",
+        "-[CSBackupManager isAutoBackupEnabled]"
+      ]
+    },
+    {
+      "scheme": "rootful",
+      "architecture": "arm64e",
+      "uuid": "F49227A0-90F9-3FED-A384-B3499582B46C",
+      "debug_file_sha256": "3380ab3f35086ff2d5207a6904d676ade691625799c4a283383b72022b6dcb16",
+      "methods_present": [
+        "-[CSBackgroundRunManager savePolicy:error:]",
+        "-[CSBackgroundRunManager updateBoundaryTimerAt:]",
+        "-[CSBackgroundRunManager energyPauseReason]",
+        "-[CSBackgroundRunManager setBackgroundState:]",
+        "-[CSBackgroundRunManager remainingDuration]",
+        "-[CSBackgroundRunManager reconcile]",
+        "-[CSBackgroundRunManager publish:]",
+        "-[CSBackgroundRunAudio hostBusy]",
+        "-[CSBackgroundRunAudio startWithError:]",
+        "-[CSBackgroundRunViewController saveWindowAllDay:start:end:error:]",
+        "-[CSBackupManager create:completion:]",
+        "-[CSBackupEngine save:error:]",
+        "-[CSBackupEngine prepareContent:error:]",
+        "-[CSBackupEngine capture:kind:allowingMissingAssets:error:]",
+        "-[CSGroupListAdapter recordRefreshEvent:delay:]",
+        "-[CSGroupListAdapter refreshDiagnosticsSnapshot]",
+        "-[CSGroupProjection publicationPlanFrom:changes:contentUserNames:contentIdentityKnown:visiblePaths:]"
+      ],
+      "methods_absent": [
+        "-[CSBackupEngine save:kind:error:]",
+        "+[CSBackupEngine contentDigest:]",
+        "-[CSBackupManager processScheduledWork]",
+        "-[CSBackupManager isAutoBackupEnabled]"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "com.wechat.improve_2.1-23_iphoneos-arm.deb",
+      "bytes": 1541390,
+      "sha256": "f171ea755909935cbc66bcc86f5fa16572b0f9261186e08e1c04e3e0f1d4abc9"
+    },
+    {
+      "file": "com.wechat.improve_2.1-23_iphoneos-arm64.deb",
+      "bytes": 1543316,
+      "sha256": "428a6b7d29e8d3a196e0725ccf93ccb72fa03dda31437775e32cd7008b6978e8"
+    },
+    {
+      "file": "com.wechat.improve_2.1-23_symbols.zip",
+      "bytes": 11188598,
+      "sha256": "5c9fee596964732ffba21eae2dda9eb03e4de542fa9a91b5c824dc68f92f1426"
+    }
+  ],
+  "sha256_manifest_verified": true,
+  "historical_artifacts_preserved_by_build": true,
+  "historical_artifacts_independently_rehashed": 1291,
+  "device_installed": false,
+  "device_energy_measured": false
+}

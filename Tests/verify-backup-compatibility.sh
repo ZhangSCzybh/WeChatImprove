@@ -7,7 +7,7 @@ engine_source="${CS_COMPAT_ENGINE_SOURCE:-Controllers/CSBackupEngine.m}"
 test_source="${CS_COMPAT_TEST_SOURCE:-Tests/BackupCompatibilityTests.m}"
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers \
  -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics \
- Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSPluginStorage.m Controllers/CSBackupStore.m \
+ Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackgroundRunPolicy.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSPluginStorage.m Controllers/CSBackupStore.m \
  Controllers/CSBackupAudit.m Controllers/CSManagedImageFile.m "$engine_source" Controllers/CSBackupMutation.m \
  "$test_source" -o "$work/tests"
 "$work/tests" "$@"

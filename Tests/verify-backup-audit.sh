@@ -8,5 +8,5 @@ if rg -n 'MSHook|method_setImplementation|method_exchangeImplementations|imp_imp
     echo 'Passive audit unexpectedly contains interception code' >&2
     exit 1
 fi
-xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSBackupStore.m Controllers/CSPluginStorage.m Controllers/CSBackupAudit.m Tests/BackupAuditTests.m -o "$work/tests"
+xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackgroundRunPolicy.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSBackupStore.m Controllers/CSPluginStorage.m Controllers/CSBackupAudit.m Tests/BackupAuditTests.m -o "$work/tests"
 "$work/tests"

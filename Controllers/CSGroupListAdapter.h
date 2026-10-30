@@ -31,6 +31,8 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 + (void)attachToController:(id)controller;
 /// Suspend derived UI work while the native main-frame owner is offscreen.
 + (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller;
+/// Restore the entry height after native appearance finishes, then release it.
++ (void)finishPresentationReturnForController:(id)controller;
 + (void)layoutForController:(id)controller;
 + (void)settingsChanged;
 /// Display-only total for identity-silent subjects; nil means native policy, zero means

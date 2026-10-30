@@ -48,7 +48,7 @@
     (void)tableView;
     if(section==0)return self.message.length?self.message:@"未选中的模块和账号保持当前配置。";
     if(section==2)return @"默认选择当前账号。其他账号的分组始终归属原账号；定时任务仅恢复到原所属的当前账号，恢复后总开关关闭。联系人和群关系仅支持同一本机、同一当前账号操作。";
-    if(section==3)return self.resetting?@"准备重置前保存可读取的配置和图片。已丢失图片无法找回；重启前配置变化会使计划失效。":@"准备恢复前保存当前配置作为保护备份。重新打开微信时应用；期间配置变化会使计划失效。";
+    if(section==3)return self.resetting?@"如需保留当前完整配置，请先手动创建备份。已丢失图片无法找回；重启前配置变化会使计划失效。":@"如需保留当前完整配置，请先手动创建备份。重新打开微信时应用；期间配置变化会使计划失效。";
     return nil;
 }
 - (NSString *)changeDescription:(NSDictionary *)change {
@@ -115,7 +115,7 @@
 - (void)confirm {
     if(self.busy||!self.preview||![self.preview[@"changes"] count])return;
     NSString *verb=self.resetting?@"重置":@"恢复";
-    NSString *message=self.resetting?@"先保存可读取的配置和图片作为保护备份，再生成重置计划。已丢失的图片无法找回。请随后手动退出并重新打开微信。":@"先保存恢复前保护备份，再生成待执行计划。请随后手动退出并重新打开微信。";
+    NSString *message=self.resetting?@"将生成重置计划。如需保留当前完整配置，请先取消并手动创建备份。已丢失的图片无法找回。准备后请手动退出并重新打开微信。":@"将生成恢复计划。如需保留当前完整配置，请先取消并手动创建备份。准备后请手动退出并重新打开微信。";
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"准备%@所选配置",verb] message:message preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
     [alert addAction:[UIAlertAction actionWithTitle:[@"准备" stringByAppendingString:verb] style:UIAlertActionStyleDestructive handler:^(__unused UIAlertAction *action){

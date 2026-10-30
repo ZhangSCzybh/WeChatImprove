@@ -239,16 +239,18 @@ int main(int argc, const char *argv[]) { @autoreleasepool {
     error=nil; CHECK(![CSScheduledTaskStore replaceState:original atURL:aliceURL account:@"alice" error:&error] && error!=nil);
     CHECK([CSScheduledTaskStore readStateAtURL:aliceURL account:@"alice" error:NULL]!=nil && live.enabled);
 
-    // Editing a task marks auto backup dirty; execution bookkeeping does not.
+    // Manual backups preserve task configuration and exclude execution bookkeeping.
     __block NSUInteger notifications=0;
     id observer=[NSNotificationCenter.defaultCenter addObserverForName:CSScheduledTaskConfigurationDidChange object:nil queue:nil usingBlock:^(__unused NSNotification *note){notifications++;}];
-    NSDictionary *automatic=[engine save:@"auto" kind:@"automatic" error:&error]; CHECK(automatic!=nil);
+    NSDictionary *manual=[engine save:@"before execution" error:&error]; CHECK(manual!=nil);
     claim=[live claimTask:@"minutes" now:[due dateByAddingTimeInterval:300]]; CHECK(claim!=nil);
     CHECK([live finishClaim:claim[@"id"] result:@"submitted" detail:@"test only"]); CHECK(notifications==0);
-    NSDictionary *same=[engine save:@"auto" kind:@"automatic" error:&error]; CHECK([same[@"id"] isEqual:automatic[@"id"]]);
+    NSDictionary *afterRun=[engine save:@"after execution" error:&error]; CHECK(afterRun&&![manual[@"id"] isEqual:afterRun[@"id"]]);
+    CHECK([Field(manual,@"alice")[@"value"] isEqual:Field(afterRun,@"alice")[@"value"]]);
     NSMutableDictionary *changed=[Task(@"minutes",@"minutes",@"filehelper") mutableCopy];changed[@"text"]=@"修改后的内容";
     CHECK([live saveTask:changed now:before]); CHECK(notifications==1);
-    NSDictionary *newAuto=[engine save:@"auto" kind:@"automatic" error:&error]; CHECK(![newAuto[@"id"] isEqual:automatic[@"id"]]);
+    NSDictionary *afterEdit=[engine save:@"after edit" error:&error]; CHECK(afterEdit&&[afterEdit[@"kind"] isEqual:@"manual"]);
+    CHECK(![Field(manual,@"alice")[@"value"] isEqual:Field(afterEdit,@"alice")[@"value"]]);
     [NSNotificationCenter.defaultCenter removeObserver:observer];
 
     NSSet *module=[NSSet setWithObject:@"scheduled_tasks"],*alice=[NSSet setWithObject:@"alice"];

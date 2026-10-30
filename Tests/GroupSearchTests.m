@@ -1,15 +1,19 @@
 // Host replay of real header publication / search-hook bodies, not an iOS render test.
 #import <Foundation/Foundation.h>
+#import <math.h>
 #import "CSGroupAppearance.h"
 #import "CSGroupRefreshState.h"
 #import "CSGroupProjection.h"
 #import "WESessionTabItem.h"
 #define CGRect NSRect
 #define CGSize NSSize
+#define CGPoint NSPoint
+#define CGPointMake NSMakePoint
 #define CGRectMake NSMakeRect
 #define CGRectGetHeight NSHeight
 #define CGRectGetWidth NSWidth
 #define CGRectEqualToRect NSEqualRects
+typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 static BOOL enabled=YES,appActive=YES,privacyEnabled;
 static NSString *account=@"A";
 static NSSet *hiddenNames;
@@ -78,14 +82,20 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @implementation Pan @end
 @interface UITableView : UIView
 @property(nonatomic,strong) UIView *tableHeaderView;
+@property(nonatomic) CGPoint contentOffset;
+@property(nonatomic) CGSize contentSize;
+@property(nonatomic) UIEdgeInsets adjustedContentInset;
+@property(nonatomic) NSUInteger offsetWrites;
 @property(nonatomic) double decelerationRate;
 @property(nonatomic) BOOL tracking,dragging,decelerating,editing;
 - (void)reloadData;
 - (void)layoutIfNeeded;
+- (void)setContentOffset:(CGPoint)point animated:(BOOL)animated;
 @end
 @implementation UITableView
 - (void)reloadData {}
 - (void)layoutIfNeeded {}
+- (void)setContentOffset:(CGPoint)point animated:(BOOL)animated { (void)animated; self.offsetWrites++; self.contentOffset=point; }
 @end
 @interface CSGroupPreferences : NSObject
 @property(nonatomic,copy) NSString *accountID;
@@ -125,6 +135,7 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @property(nonatomic,weak) id controller;
 @property(nonatomic,strong) CSGroupProjection *projection;
 @property(nonatomic,strong) NSMutableDictionary *anchors;
+@property(nonatomic,copy) NSDictionary *presentationViewport;
 @property(nonatomic,strong) NSArray *sourceSections,*cachedNativeSections,*displayedTabs;
 @property(nonatomic,strong) NSDictionary *identityDisplayPaths;
 @property(nonatomic,strong) NSMutableArray *completions,*nativeActions;
@@ -144,6 +155,7 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @property(nonatomic) NSTimeInterval interactionDeadline;
 @property(nonatomic) double baselineDeceleration;
 @property(nonatomic) NSUInteger invalidations,anchorSaves,titles,refreshes,requests;
+@property(nonatomic) BOOL resetsViewportOnPublication;
 - (void)layout;
 - (void)publishHeader:(UIView *)header;
 - (void)shieldVisiblePrivateRows;
@@ -178,6 +190,9 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 - (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous changes:(CSGroupChangeKind)changes
         contentUserNames:(NSSet *)names contentIdentityKnown:(BOOL)known previouslyProjecting:(BOOL)previouslyProjecting {
     (void)projection; (void)previous; (void)changes; (void)names; (void)known; (void)previouslyProjecting; self.publications++;
+    // A native reload can reset the table before production restores the viewport.
+    if (self.resetsViewportOnPublication)
+        self.table.contentOffset=CGPointMake(self.table.contentOffset.x,-self.table.adjustedContentInset.top);
 }
 #include "SearchBodies.h"
 @end
@@ -202,6 +217,8 @@ static NSUInteger checks,failures;
 static void Check(BOOL ok,NSString *message) { checks++; if (!ok) { failures++; fprintf(stderr,"FAIL: %s\n",message.UTF8String); } }
 static CSGroupListAdapter *List(void) {
     CSGroupListAdapter *a=[CSGroupListAdapter new]; a.table=[UITableView new]; a.table.bounds=NSMakeRect(0,0,430,900);
+    a.table.contentSize=NSMakeSize(430,2400); a.table.adjustedContentInset=(UIEdgeInsets){100,0,30,0};
+    a.table.contentOffset=CGPointMake(7,-100);
     a.nativeHeader=[UIView new]; a.nativeHeader.frame=NSMakeRect(0,0,430,47);
     a.chrome=[Chrome new]; a.chrome.intrinsicContentSize=NSMakeSize(430,52);
     a.pan=[Pan new]; a.listPan=[Pan new]; a.preferences=[[CSGroupPreferences alloc] initWithDefaults:nil accountID:account];
@@ -270,6 +287,12 @@ int main(void) { @autoreleasepool {
     a.sourceSections=@[@[Row(0,@"ordinary",CSGroupRowCategoryPrivate), Row(1,@"hidden",CSGroupRowCategoryPrivate), Row(2,@"group",CSGroupRowCategoryGroup)]];
     [a refresh];
     Check([a.publishedTabID isEqual:@"preset_2"] && [DisplayedNames(a) isEqual:@[@"ordinary"]],@"private-group baseline filters protected sessions before search");
+    a.table.contentOffset=CGPointMake(7,400); a.resetsViewportOnPublication=YES;
+    a.anchors[@"preset_1"]=@{@"name":@"obsolete-target"}; a.preferences.selectedTabID=@"preset_1"; [a refresh];
+    Check([a.publishedTabID isEqual:@"preset_1"] && a.table.contentOffset.y==400 && a.table.contentOffset.x==7 &&
+          a.table.offsetWrites==1 && !a.anchors[@"preset_1"],@"real refresh and shared-height helper restore current height after a native group reload");
+    a.preferences.selectedTabID=@"preset_2"; [a refresh];
+    NSUInteger viewportWrites=a.table.offsetWrites;
     CSGroupProjection *beforeSearch=a.projection; NSUInteger publications=a.publications;
     UIView *searchHeader=a.table.tableHeaderView;
     host.isSearching=YES; [host onSearch]; [host setSearchBarActive:YES];
@@ -283,14 +306,18 @@ int main(void) { @autoreleasepool {
     Check([a.publishedTabID isEqual:@"preset_2"] && [a.chrome.selectedTabID isEqual:@"preset_2"] && a.chromeVisible,@"privacy refresh retains the group selection and title behind search");
     privacyEnabled=NO; a.privacyRefreshPending=YES; [a refresh];
     Check(a.projecting && [DisplayedNames(a) isEqual:@[@"ordinary",@"hidden"]] && [a.publishedTabID isEqual:@"preset_2"],@"unlock during search restores only the selected group's rows");
+    Check(a.table.contentOffset.y==-100 && a.table.offsetWrites==viewportWrites,@"search privacy publication leaves the native viewport instead of applying shared group height");
     beforeSearch=a.projection; [a refresh];
     Check(a.projection==beforeSearch && a.table.tableHeaderView==searchHeader,@"ordinary search refresh also preserves the group backing view");
     // WeChat can begin its return while isSearching still reports YES.
     a.presentationSuspended=YES; [a refresh]; a.presentationSuspended=NO; [a refresh];
     Check([a.publishedTabID isEqual:@"preset_2"] && a.projecting && a.table.tableHeaderView==searchHeader,@"early return frame keeps the group before native search state resets");
+    a.table.contentOffset=CGPointMake(7,175);
     host.isSearching=NO; [host cancelSearch]; [host onFTSSearchEnd]; [host setSearchBarActive:NO];
     Check([a.publishedTabID isEqual:@"preset_2"] && a.chromeVisible && !a.searching && !a.searchChromeVisible && [DisplayedNames(a) isEqual:@[@"ordinary",@"hidden"]],@"completed cancellation returns directly to the original group");
     Check(a.chrome.userInteractionEnabled && a.table.tableHeaderView==searchHeader,@"return restores interaction without replacing the group header");
+    Check(a.table.contentOffset.y==-100 && a.table.offsetWrites==viewportWrites,@"search cancellation does not replay a shared-height request captured before search");
+    a.resetsViewportOnPublication=NO;
     // Result navigation is still allowed to resolve global native coordinates.
     privacyEnabled=YES; hiddenNames=[NSSet setWithObject:@"hidden"];
     host.isSearching=YES; [host onSearch]; a.nativePresentation=YES; [a refresh];

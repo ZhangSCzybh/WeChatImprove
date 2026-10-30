@@ -69,6 +69,7 @@ static BOOL Option(NSString *suffix) {
 @property (nonatomic,strong) CSCloseFriendListShield *privacyShield;
 @property (nonatomic) BOOL searchChromeVisible;
 @property (nonatomic) BOOL presentationSuspended;
+@property (nonatomic, copy) NSDictionary *presentationViewport;
 @property (nonatomic) BOOL publishedEnabled;
 @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *prefetchedPaths;
 @property (nonatomic, strong) NSMutableArray *nativeActions;
@@ -207,6 +208,15 @@ static BOOL Option(NSString *suffix) {
     if (!NSThread.isMainThread || !controller) return;
     objc_setAssociatedObject(controller,&PresentationSuspendedKey,@(suspended),OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     CSGroupListAdapter *adapter=[self adapterForController:controller];
+    if (suspended && !adapter.presentationSuspended) {
+        adapter.presentationViewport=nil;
+        NSString *account=adapter.preferences.accountID;
+        CGFloat height=adapter.table.contentOffset.y+adapter.table.adjustedContentInset.top;
+        if (!CSGroupIsFoldedController(controller) && adapter.isActive && adapter.chromeVisible && !adapter.searching &&
+            !adapter.nativePresentation && !adapter.nativeActions.count && !adapter.pendingScrollToTop &&
+            account.length && [account isEqual:CSGroupCurrentAccountID()] && isfinite(height))
+            adapter.presentationViewport=@{@"height":@(MAX(0,height)),@"account":account,@"epoch":@(CSCloseFriendAccountEpoch())};
+    }
     adapter.presentationSuspended=suspended;
     if (suspended) {
         adapter.dirty=YES; [adapter invalidateNativeSnapshot]; adapter.cachedNativeSections=nil;
@@ -216,6 +226,13 @@ static BOOL Option(NSString *suffix) {
         [adapter finishSuspendedBatches];
     }
     [adapter requestTabBadgeSourceRefresh];
+}
++ (void)finishPresentationReturnForController:(id)controller {
+    if (!NSThread.isMainThread || !controller) return;
+    CSGroupListAdapter *adapter=[self adapterForController:controller];
+    if (!adapter.presentationViewport) return;
+    [adapter restoreAnchor];
+    adapter.presentationViewport=nil;
 }
 - (void)finishSuspendedBatches {
     if ((!self.presentationSuspended && CSGroupApplicationActive()) || self.changeDepth || self.publishing) return;
@@ -794,6 +811,8 @@ static BOOL Option(NSString *suffix) {
     NSString *publicationAccount=CSGroupCurrentAccountID();
     BOOL finished=NO;
     @try {
+        NSString *viewportTab=(self.chromeVisible && self.isActive && !self.searching && !self.nativePresentation && !self.nativeActions.count) ? self.publishedTabID : nil;
+        CGFloat viewportHeight=self.table.contentOffset.y+self.table.adjustedContentInset.top;
         [self saveAnchor];
         [self installProxies];
         NSString *account=CSGroupCurrentAccountID();
@@ -886,7 +905,10 @@ static BOOL Option(NSString *suffix) {
         [self.privacyShield prepareForPublication];
         [self publishProjection:projection previous:previous changes:changes contentUserNames:contentUserNames
             contentIdentityKnown:contentIdentityKnown previouslyProjecting:previouslyProjecting];
-        [self restoreAnchor];
+        currentPublicationAccount=CSGroupCurrentAccountID();
+        if (publicationEpoch!=CSCloseFriendAccountEpoch() || publicationPrivacyRevision!=CSCloseFriendCurrentSnapshot().revision ||
+            !(publicationAccount==currentPublicationAccount || [publicationAccount isEqual:currentPublicationAccount])) return;
+        [self restoreViewportFromTab:(changed ? nil : viewportTab) scrollHeight:viewportHeight];
         [self refreshNavigationTitle];
         finished=YES;
     } @finally {
@@ -1527,6 +1549,8 @@ static BOOL Option(NSString *suffix) {
 - (void)restoreAnchor {
     if (self.presentationSuspended || !CSGroupApplicationActive()) return;
     if (self.pendingScrollToTop) { [self applyPendingScrollToTop]; return; }
+    NSNumber *returnHeight=[self presentationScrollHeight];
+    if (returnHeight) { [self restoreScrollHeight:returnHeight.doubleValue]; return; }
     NSDictionary *anchor=self.anchors[self.publishedTabID];
     if (!self.isActive || !anchor || ![self canRestoreAnchor]) return;
     for (NSUInteger s=0;s<self.projection.sections.count;s++) {
@@ -1548,6 +1572,44 @@ static BOOL Option(NSString *suffix) {
         }
     }
 }
+- (NSNumber *)presentationScrollHeight {
+    NSDictionary *viewport=self.presentationViewport;
+    if (!viewport) return nil;
+    NSString *account=CSGroupCurrentAccountID();
+    if (![viewport[@"account"] isEqual:account] || ![self.preferences.accountID isEqual:account] ||
+        [viewport[@"epoch"] unsignedIntegerValue]!=CSCloseFriendAccountEpoch()) {
+        self.presentationViewport=nil; return nil;
+    }
+    if (!self.isActive || !self.chromeVisible || self.searching || self.nativePresentation || self.nativeActions.count) return nil;
+    return viewport[@"height"];
+}
+- (void)restoreViewportFromTab:(NSString *)previousTab scrollHeight:(CGFloat)height {
+    NSNumber *returnHeight=[self presentationScrollHeight];
+    if (returnHeight) { [self restoreScrollHeight:returnHeight.doubleValue]; return; }
+    if (!previousTab.length || !self.publishedTabID.length || [previousTab isEqual:self.publishedTabID] ||
+        !self.isActive || !self.chromeVisible || self.searching || self.nativePresentation || self.nativeActions.count || self.pendingScrollToTop) {
+        [self restoreAnchor]; return;
+    }
+    [self restoreScrollHeight:height];
+}
+- (void)restoreScrollHeight:(CGFloat)height {
+    // Switching groups and returning from chat both retain absolute height.
+    [self.anchors removeObjectForKey:self.publishedTabID];
+    UITableView *table=self.table;
+    if (self.presentationSuspended || !CSGroupApplicationActive() || [self groupPanMoving] ||
+        table.tracking || table.dragging || table.decelerating || table.editing || self.swipeActive || [self nativeMenuState]) return;
+    CGFloat top=table.adjustedContentInset.top, bottom=table.adjustedContentInset.bottom;
+    CGFloat viewport=CGRectGetHeight(table.bounds), content=table.contentSize.height;
+    if (!isfinite(height) || !isfinite(top) || !isfinite(bottom) || !isfinite(viewport) || !isfinite(content) || viewport<=0) return;
+    CGFloat min=-top, max=MAX(min,content-viewport+bottom);
+    CGFloat target=MIN(max,MAX(min,MAX(0,height)-top));
+    if (!isfinite(max) || !isfinite(target)) return;
+    CSGroupWithDisplayIndices(table, ^{
+        if (fabs(target-table.contentOffset.y)>0.5)
+            [table setContentOffset:CGPointMake(table.contentOffset.x,target) animated:NO];
+    });
+    [self saveAnchor];
+}
 - (void)selectIndex:(NSInteger)index {
     if (self.swipeActive || self.table.editing || [self nativeMenuState]) { self.chrome.selectedTabID=self.publishedTabID; return; }
     NSArray *tabs=self.displayedTabs; if (index<0 || index>=(NSInteger)tabs.count) return;
@@ -1558,8 +1620,9 @@ static BOOL Option(NSString *suffix) {
     [self.nativeActions removeAllObjects];
     self.snapshotRetryAttempted=NO; self.recoveryAttempts=0; self.recoveryPending=NO;
     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;
-    self.pendingScrollToTop=YES;
-    [self.anchors removeObjectForKey:tabID];
+    // Refresh carries the current height across groups. A new selection also
+    // supersedes any older explicit top request.
+    self.presentationViewport=nil; self.pendingScrollToTop=NO;
     [self refresh];
     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];
 }
@@ -1573,7 +1636,7 @@ static BOOL Option(NSString *suffix) {
 - (void)returnToGroupTop {
     if (self.presentationSuspended || !CSGroupApplicationActive()) return;
     if (!Option(@"enabled") || !self.chromeVisible || self.searching) return;
-    self.pendingScrollToTop=YES;
+    self.presentationViewport=nil; self.pendingScrollToTop=YES;
     if (self.publishedTabID) [self.anchors removeObjectForKey:self.publishedTabID];
     [self.table layoutIfNeeded];
     [self applyPendingScrollToTop];

@@ -19,11 +19,9 @@ typedef void (^CSBackupCompletion)(id _Nullable result,NSError * _Nullable error
 - (void)prepare:(NSDictionary *)preview completion:(CSBackupCompletion)completion;
 - (void)resetSnapshot:(CSBackupCompletion)completion;
 - (void)checkRepairAccess:(CSBackupCompletion)completion;
-/// Retry pending recovery before activation, or optional version backup after activation.
+/// Retry pending startup recovery or archive a settled recovery transaction.
 - (void)retryPendingWork:(CSBackupCompletion)completion;
 - (void)cancelPending:(CSBackupCompletion)completion;
-- (BOOL)isAutoBackupEnabled;
-- (void)enableAutoBackup:(BOOL)enabled;
 - (NSDictionary *)currentContext;
 /// Called only by the startup barrier before feature hooks are installed.
 - (void)resolveStartup:(CSBackupCompletion)completion;

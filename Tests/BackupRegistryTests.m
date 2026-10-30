@@ -1,11 +1,48 @@
 #import <Foundation/Foundation.h>
 #import "CSBackupRegistry.h"
+#import "CSBackgroundRunPolicy.h"
 #include <math.h>
 static NSUInteger assertions;
 #define CHECK(condition) do { assertions++; if (!(condition)) { NSLog(@"FAIL line %d: %s", __LINE__, #condition); exit(1); } } while (0)
 static NSDictionary *Entry(NSString *key) { return [CSBackupRegistry entryForDomain:@"standard" key:key]; }
 static BOOL Valid(id value, NSDictionary *entry) { NSError *error=nil; BOOL ok=[CSBackupRegistry validateValue:value entry:entry error:&error]; CHECK(ok || error != nil); return ok; }
+static void BackgroundPolicyRegistry(void) {
+    NSDictionary *entry=[CSBackupRegistry entryForDomain:@"legacy" key:CSBackgroundRunPolicyKey];
+    CHECK(entry!=nil);
+    CHECK([entry[@"module"] isEqual:@"background"] && [entry[@"scope"] isEqual:@"global"]);
+    CHECK([entry[@"type"] isEqual:@"backgroundPolicy"]);
+    CHECK([CSBackupRegistry entryForDomain:@"standard" key:CSBackgroundRunPolicyKey]==nil);
+    CHECK(Valid(CSBackgroundRunDefaultPolicy(),entry));
+    CHECK(Valid(CSBackgroundRunLegacyPolicy(),entry));
+    NSMutableDictionary *policy=[CSBackgroundRunDefaultPolicy() mutableCopy];
+    policy[@"allDay"]=@NO;policy[@"startMinute"]=@1320;policy[@"endMinute"]=@420;
+    CHECK(Valid(policy,entry));
+    for (id invalid in @[@"invalid",@[],@YES]) CHECK(!Valid(invalid,entry));
+    for (NSString *key in @[@"version",@"allDay",@"startMinute",@"endMinute",@"maxMinutes",@"energySaving"]) {
+        policy=[CSBackgroundRunDefaultPolicy() mutableCopy];[policy removeObjectForKey:key];
+        CHECK(!Valid(policy,entry));
+    }
+    for (NSDictionary *change in @[
+        @{@"version":@2},@{@"version":@YES},@{@"version":@1.0},
+        @{@"allDay":@1},@{@"allDay":@"YES"},@{@"energySaving":@0},@{@"energySaving":@"NO"},
+        @{@"startMinute":@(-1)},@{@"startMinute":@1440},@{@"startMinute":@YES},@{@"startMinute":@480.0},
+        @{@"endMinute":@(-1)},@{@"endMinute":@1440},@{@"endMinute":@YES},@{@"endMinute":@1380.0},
+        @{@"maxMinutes":@(-1)},@{@"maxMinutes":@4},@{@"maxMinutes":@YES},@{@"maxMinutes":@30.0},
+        @{@"allDay":@NO,@"startMinute":@480,@"endMinute":@480},@{@"unexpected":@YES}
+    ]) {
+        policy=[CSBackgroundRunDefaultPolicy() mutableCopy];[policy addEntriesFromDictionary:change];
+        CHECK(!Valid(policy,entry));
+    }
+    for (NSNumber *minutes in @[@0,@5,@15,@30,@60,@120]) {
+        policy=[CSBackgroundRunDefaultPolicy() mutableCopy];policy[@"maxMinutes"]=minutes;
+        CHECK(Valid(policy,entry));
+    }
+    NSMutableDictionary *spoof=[entry mutableCopy];spoof[@"type"]=@"dictionary";
+    CHECK(!Valid(CSBackgroundRunDefaultPolicy(),spoof));
+    CHECK(Valid(@YES,[CSBackupRegistry entryForDomain:@"legacy" key:@"BackgroundRunEnabled"]));
+}
 int main(void) { @autoreleasepool {
+    BackgroundPolicyRegistry();
     CHECK([CSBackupRegistry entryForDomain:@"legacy" key:@"roundAvatar"] != nil);
     CHECK([CSBackupRegistry entryForDomain:@"standard" key:@"roundAvatar"] == nil);
     CHECK([CSBackupRegistry entryForDomain:@"layout" key:@"font.chat_size"] != nil);
@@ -78,12 +115,21 @@ int main(void) { @autoreleasepool {
     for (NSDictionary *entry in [CSBackupRegistry entries]) {
         NSString *identity=[NSString stringWithFormat:@"%@/%@",entry[@"domain"],entry[@"key"]]; CHECK(![identities containsObject:identity]); [identities addObject:identity];
         CHECK([CSBackupRegistry moduleTitles][entry[@"module"]]!=nil);
-        CHECK(([@[@"bool",@"number",@"string",@"data",@"array",@"dictionary"] containsObject:entry[@"type"]]));
+        CHECK(([@[@"bool",@"number",@"string",@"data",@"array",@"dictionary",@"backgroundPolicy"] containsObject:entry[@"type"]]));
         CHECK(([@[@"standard",@"legacy",@"layout"] containsObject:entry[@"domain"]]));
     }
     // Exercise the allowlist against a disposable preference domain, never live defaults.
     NSString *suite=[@"CSBackupRegistryTests." stringByAppendingString:NSUUID.UUID.UUIDString];
     NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:suite];
-    [defaults setBool:YES forKey:@"GameCheat_Enabled"]; CHECK(Valid([defaults objectForKey:@"GameCheat_Enabled"],Entry(@"GameCheat_Enabled"))); [defaults removePersistentDomainForName:suite];
+    [defaults setBool:YES forKey:@"GameCheat_Enabled"]; CHECK(Valid([defaults objectForKey:@"GameCheat_Enabled"],Entry(@"GameCheat_Enabled")));
+    // Legacy preferences without a policy stay absent; registry validation never
+    // materializes new defaults while reading an older backup's optional fields.
+    [defaults setBool:YES forKey:@"BackgroundRunEnabled"];
+    CHECK([defaults objectForKey:CSBackgroundRunPolicyKey]==nil);
+    CHECK(Valid([defaults objectForKey:@"BackgroundRunEnabled"],[CSBackupRegistry entryForDomain:@"legacy" key:@"BackgroundRunEnabled"]));
+    CHECK([defaults objectForKey:CSBackgroundRunPolicyKey]==nil);
+    [defaults setObject:CSBackgroundRunDefaultPolicy() forKey:CSBackgroundRunPolicyKey];
+    CHECK(Valid([defaults objectForKey:CSBackgroundRunPolicyKey],[CSBackupRegistry entryForDomain:@"legacy" key:CSBackgroundRunPolicyKey]));
+    [defaults removePersistentDomainForName:suite];
     NSLog(@"Backup registry passed %lu assertions",(unsigned long)assertions);
 } return 0; }

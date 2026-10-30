@@ -19,7 +19,7 @@ Path(sys.argv[1],'ScheduledStoreUnderTest.m').write_text('#import <Foundation/Fo
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations \
   -DCS_SCHEDULED_STORE_TRACK_MUTATIONS=1 -IControllers -I"$work" -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics \
-  Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m \
+  Controllers/CSBackupRegistry.m Controllers/CSBackgroundRunPolicy.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m \
   Controllers/CSPluginStorage.m Controllers/CSBackupStore.m Controllers/CSManagedImageFile.m \
   Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m "$work/ScheduledStoreUnderTest.m" Controllers/CSAIReplyStore.m \
   Tests/ScheduledTaskBackupTests.m -o "$work/tests"

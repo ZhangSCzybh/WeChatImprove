@@ -25,10 +25,13 @@ typedef NS_ENUM(NSInteger,UIAlertControllerStyle){UIAlertControllerStyleActionSh
 @end
 @interface UITableView : UIView
 @property UIView *anchor;
+@property NSUInteger reloads;
 - (UIView *)cellForRowAtIndexPath:(NSIndexPath *)path;
+- (void)reloadData;
 @end
 @implementation UITableView
 - (UIView *)cellForRowAtIndexPath:(NSIndexPath *)path{CHECK(path.length==2);return self.anchor;}
+- (void)reloadData{self.reloads++;}
 @end
 @interface NSIndexPath (BackupDeletionUI)
 + (instancetype)indexPathForRow:(NSInteger)row inSection:(NSInteger)section;
@@ -94,10 +97,11 @@ typedef void (^CSBackupCompletion)(id,NSError *);
 @end
 @implementation DeletionEngine @end
 @interface CSBackupManager : NSObject
-@property NSUInteger loads,removals,exports,metadataUpdates;
+@property NSUInteger loads,removals,exports,metadataUpdates,recoveryRetries;
 @property NSDictionary *loadedRecord;
 @property DeletionEngine *engine;
 @property(copy) CSBackupCompletion pendingLoad,pendingRemove;
+@property(copy) CSBackupCompletion pendingRetry;
 @property(copy) id (^pendingWork)(NSError **);
 + (instancetype)sharedManager;
 - (void)load:(NSDictionary *)record completion:(CSBackupCompletion)completion;
@@ -105,6 +109,7 @@ typedef void (^CSBackupCompletion)(id,NSError *);
 - (void)exportOriginal:(NSDictionary *)record completion:(CSBackupCompletion)completion;
 - (void)exportSnapshot:(NSDictionary *)snapshot completion:(CSBackupCompletion)completion;
 - (void)updateMetadata:(NSDictionary *)metadata record:(NSDictionary *)record completion:(CSBackupCompletion)completion;
+- (void)retryPendingWork:(CSBackupCompletion)completion;
 - (void)perform:(id (^)(NSError **))work completion:(CSBackupCompletion)completion;
 @end
 static CSBackupManager *manager;
@@ -117,6 +122,7 @@ static CSBackupManager *manager;
 - (void)exportOriginal:(NSDictionary *)record completion:(CSBackupCompletion)completion{(void)record;(void)completion;self.exports++;}
 - (void)exportSnapshot:(NSDictionary *)snapshot completion:(CSBackupCompletion)completion{(void)snapshot;(void)completion;self.exports++;}
 - (void)updateMetadata:(NSDictionary *)metadata record:(NSDictionary *)record completion:(CSBackupCompletion)completion{(void)metadata;(void)record;(void)completion;self.metadataUpdates++;}
+- (void)retryPendingWork:(CSBackupCompletion)completion{self.recoveryRetries++;self.pendingRetry=completion;}
 @end
 
 @interface CSBackupSettingsViewController : UIViewController
@@ -128,19 +134,20 @@ static CSBackupManager *manager;
 - (void)reload;
 - (void)message:(NSString *)title detail:(NSString *)detail;
 - (void)shareURL:(NSURL *)url;
-- (void)confirmProtection:(NSDictionary *)record;
+- (void)confirmMetadata:(NSDictionary *)record;
 - (void)renameRecord:(NSDictionary *)record;
 - (void)openRecord:(NSDictionary *)record;
 - (void)showUnavailableRecord:(NSDictionary *)record;
 - (void)showRecord:(NSDictionary *)record snapshot:(NSDictionary *)snapshot anchor:(UIView *)anchor;
 - (void)deleteRecord:(NSDictionary *)record;
+- (void)retryRestore;
 @end
 @implementation CSBackupSettingsViewController
 - (void)setWorking:(BOOL)working{self.busy=working;}
 - (void)reload{self.reloads++;}
 - (void)message:(NSString *)title detail:(NSString *)detail{self.messageTitle=title;self.messageDetail=detail;}
 - (void)shareURL:(NSURL *)url{(void)url;}
-- (void)confirmProtection:(NSDictionary *)record{(void)record;}
+- (void)confirmMetadata:(NSDictionary *)record{(void)record;}
 - (void)renameRecord:(NSDictionary *)record{(void)record;}
 #include "BackupDeletionUIUnderTest.h"
 @end
@@ -222,7 +229,36 @@ static void OpenRecords(void){
     controller=Controller(record);[controller openRecord:record];completion=manager.pendingLoad;manager.pendingLoad=nil;completion(nil,nil);
     CHECK(!controller.busy && !controller.messageTitle);(void)Action(controller.presentedViewController,@"删除备份");
 }
+static void LegacySnapshotManagement(void){
+    NSDictionary *record=Record(NO,NO,NO);
+    for(NSString *kind in @[@"automatic",@"upgrade",@"protection"]){
+        CSBackupSettingsViewController *controller=Controller(record);NSMutableDictionary *snapshot=[Snapshot() mutableCopy];snapshot[@"kind"]=kind;
+        [controller showRecord:record snapshot:snapshot anchor:controller.tableView.anchor];
+        UIAlertController *menu=controller.presentedViewController;CHECK([menu.message containsString:@"历史"]);
+        (void)Action(menu,@"预览恢复");(void)Action(menu,@"导出到文件 / 分享");(void)Action(menu,@"重命名");
+        [Action(menu,@"收藏") activate];CHECK(manager.metadataUpdates==1 && !manager.removals);
+        [controller setWorking:NO];[controller deleteRecord:record];[Action(controller.presentedViewController,@"删除") activate];FinishRemoval(nil);
+        CHECK(manager.removals==1 && controller.reloads==1);
+    }
+    CSBackupSettingsViewController *controller=Controller(Record(NO,NO,YES));
+    [controller showRecord:controller.records.firstObject snapshot:Snapshot() anchor:controller.tableView.anchor];
+    UIAlertController *menu=controller.presentedViewController;(void)Action(menu,@"确认名称与收藏信息");
+    for(UIAlertAction *action in menu.actions)CHECK(![action.title containsString:@"保护状态"]);
+}
+static void RecoveryRetry(void){
+    for(NSNumber *failure in @[@NO,@YES]){
+        CSBackupSettingsViewController *controller=Controller(Record(NO,NO,NO));[controller retryRestore];
+        CHECK(controller.busy && manager.recoveryRetries==1 && manager.pendingRetry);
+        CHECK(!manager.loads && !manager.removals && !manager.exports && !manager.metadataUpdates);
+        CSBackupCompletion completion=manager.pendingRetry;manager.pendingRetry=nil;
+        NSError *error=failure.boolValue?[NSError errorWithDomain:@"fixture" code:3 userInfo:@{NSLocalizedDescriptionKey:@"recovery remains pending"}]:nil;
+        completion(nil,error);CHECK(!controller.busy && controller.tableView.reloads==1);
+        if(error)CHECK([controller.messageTitle isEqual:@"恢复仍待处理"] && [controller.messageDetail isEqual:error.localizedDescription]);
+        else CHECK([controller.messageTitle isEqual:@"恢复检查已完成"] && [controller.messageDetail containsString:@"不会创建备份"]);
+        CHECK(manager.recoveryRetries==1 && !manager.loads && !manager.removals && !manager.exports && !manager.metadataUpdates);
+    }
+}
 int main(void){@autoreleasepool{
-    MenuAndConfirmation();DeleteFailure();OpenRecords();
+    MenuAndConfirmation();DeleteFailure();OpenRecords();LegacySnapshotManagement();RecoveryRetry();
     printf("Backup deletion UI: %lu checks passed (real menus/load/confirmation/manager removal; in-memory Store)\n",(unsigned long)checks);
 }return 0;}

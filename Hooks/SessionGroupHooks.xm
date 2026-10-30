@@ -106,7 +106,7 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
     [CSGroupListAdapter setPresentationSuspended:NO forController:self];
     Native(self,NO,^{ %orig; });
     [CSGroupListAdapter attachToController:self];
-    [Adapter(self) returnToGroupTop];
+    [CSGroupListAdapter finishPresentationReturnForController:self];
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [CSGroupListAdapter setPresentationSuspended:YES forController:self];

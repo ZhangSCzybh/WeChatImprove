@@ -1,6 +1,8 @@
 # Backup configuration registry inventory
 
-The registry in `Controllers/CSBackupRegistry.m` authorizes exact domain/key pairs. This inventory was checked against current settings writers and runtime readers on 2026-10-26. The registry has 315 fixed identities, a constrained per-account selection family and an account-bound scheduled-task file family; it never treats a namespace prefix as permission to restore a key.
+The registry in `Controllers/CSBackupRegistry.m` authorizes exact domain/key pairs. This inventory includes the 2026-10-30 removal of automatic backup behavior and addition of the background-run policy. The registry has 316 fixed identities, including the inert historical automatic-backup field, a constrained per-account selection family and account-bound file families; it never treats a namespace prefix as permission to restore a key.
+
+The fixed inventory contains 296 `standard`, 18 `legacy` and 2 `layout` identities. Its types are 139 `bool`, 129 `number`, 28 `string`, 8 `data`, 8 `array`, 3 `dictionary` and 1 `backgroundPolicy`. These counts come from the current `CSBackupRegistry.entries` result; dynamic lookup families are additional identities and are not included in these totals.
 
 ## Domain mapping
 
@@ -30,11 +32,17 @@ Validation rejects unregistered or forged metadata, wrong classes, non-finite nu
 
 Archived UIColor bytes are retained as opaque bounded nonempty `NSData` (maximum 1 MiB). This layer does not decode or instantiate classes from them. Color interpretation remains the existing runtime's responsibility. Numbers are required to be finite `NSNumber` values; the registry does not reinterpret strings or normalize existing setting ranges. All accepted values must serialize as a binary property list. Array and dictionary collection limits protect restore planning from excessive input.
 
+`legacy/BackgroundRunPolicy` belongs to module `background`, scope `global`, and uses the dedicated `backgroundPolicy` type rather than the generic string-to-string dictionary validator. `CSBackgroundRunValidatePolicy` requires exactly six keys: integer `version: 1`, CFBoolean `allDay`, integer `startMinute` and `endMinute` in 0–1439, integer `maxMinutes` from 0/5/15/30/60/120, and CFBoolean `energySaving`. Here 0 minutes means unlimited. Booleans cannot stand in for integer fields, and floating-point values are rejected even when numerically integral. A specified window requires different endpoints; an all-day policy may retain equal unused endpoints. Unknown fields, missing fields and future versions are rejected.
+
+Fresh policy defaults are all-day operation, 08:00/23:00 retained window endpoints, a 30-minute maximum and energy saving enabled. Existing users with `BackgroundRunEnabled` but no policy retain their previous all-day, unlimited behavior without writing a new policy until they explicitly save one. An older backup without this optional field remains valid and does not replace the current policy. `BackgroundInterval` retains its separate historical identity and is not reinterpreted as the maximum duration. Successful-start time, remaining duration, timer generations and audio leases are runtime state and are not backup fields.
+
+New snapshots retain an explicit `present: false` policy field so a user can restore the absence of a policy. For prepared-transaction compatibility, only this exact absent `legacy/BackgroundRunPolicy` field is excluded from current-state revision hashes and the raw reset fingerprint. All other fields, including every present policy value, still participate. Old prepared restore/reset journals therefore keep their original revision when no policy exists, while adding, changing or removing a stored policy invalidates a stale plan.
+
 ## Deliberate exclusions
 
 - Authorization state and check timestamps (`CSAuthorizationStatus`, `CSLastAuthorizationCheckTime`), user agreement acceptance, cached avatar data and avatar URLs.
 - Red-envelope and transfer total counts/amounts, the payment event ledger and payment processing state. Automation switches, delays, reply text and notification preferences are configuration and remain included.
-- Backup history/metadata, last automatic-backup timestamp, and historical backup files. The user preference `backup.auto_enabled` remains included.
+- Backup history/metadata, last automatic-backup timestamp, and historical backup files. `com.wechat.enhance.backup.auto_enabled` remains an inert registered compatibility field so existing v2 files and prepared transaction revisions retain their exact field identities. It has no settings control, observer or scheduling consumer; capturing or restoring its old value cannot create a backup. New snapshots are created only by the explicit manual action; importing, reading and managing historical snapshot kinds remain supported.
 - Group migration originals and historical snapshots: `chat_group.legacy_backup`, `chat_group.profile_backups`, and old import-only `custom_tabs`, `preset_names`, `tab_order`, `hidden_preset_tabs`, `filter_duplicate_contacts`, `selected_tab_id`, `selected_tab_index`, `currentTabIndex` values. Current account profiles are the supported group-definition configuration.
 - Attachment tutorial acknowledgement, Darwin notification names, old abandoned indicator-animation preference and unknown/host defaults.
 
@@ -50,6 +58,7 @@ The audit reviewed all settings controller constants and preference writes, then
 | --- | --- | --- | --- | --- | --- |
 | `legacy` | `BackgroundInterval` | `background` | `number` | `global` | — |
 | `legacy` | `BackgroundRunEnabled` | `background` | `bool` | `global` | — |
+| `legacy` | `BackgroundRunPolicy` | `background` | `backgroundPolicy` | `global` | — |
 | `standard` | `GameCheat_Enabled` | `games` | `bool` | `global` | — |
 | `standard` | `WCTimeLineMessageTailEnabled` | `timeline` | `bool` | `global` | — |
 | `standard` | `WCTimeLineMessageTailText` | `timeline` | `string` | `global` | — |
@@ -366,6 +375,6 @@ The audit reviewed all settings controller constants and preference writes, then
 
 ## Verification
 
-`bash Tests/verify-backup-registry.sh` compiles and executes Objective-C tests against the macOS Foundation framework using `xcrun --sdk macosx clang`, ARC, blocks and `-Wall -Wextra -Werror`. The executable is built in a unique temporary directory that is removed on exit. Its single defaults round-trip uses a uniquely named test suite and removes that suite afterward; it never reads or writes the user's established plugin or host defaults. No services, live data, installed application or package directories are modified.
+`bash Tests/verify-backup-registry.sh` compiles and executes Objective-C tests, including the production background policy validator, against the macOS Foundation framework using `xcrun --sdk macosx clang`, ARC, blocks and `-Wall -Wextra -Werror`. The executable is built in a unique temporary directory that is removed on exit. Its defaults round-trips use a uniquely named test suite and remove that suite afterward; they never read or write the user's established plugin or host defaults. No services, live data, installed application or package directories are modified.
 
-The tests cover domain separation, non-prefixed preferences, unknown and payment denial, full bubble color expansion, concrete account selection constraints, stored NSNumber booleans, numeric/date/type rejection, nested group profiles, contact override structure, numeric attachment IDs, schema changes and forged entry metadata. Current result: 1,390 assertions passed. These are host-side preference registry tests; device rendering and restore integration belong to the backup coordinator/codec/asset tests.
+The tests cover domain separation, non-prefixed preferences, unknown and payment denial, full bubble color expansion, concrete account selection constraints, stored NSNumber booleans, numeric/date/type rejection, nested group profiles, contact override structure, numeric attachment IDs, background policy metadata and strict six-key validation, legacy preferences without a policy, schema changes and forged entry metadata. Current result: 1,500 assertions passed. These are host-side preference registry tests; device rendering and restore integration belong to the backup coordinator/codec/asset tests.

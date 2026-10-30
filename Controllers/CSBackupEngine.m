@@ -7,15 +7,27 @@
 #import "CSBackupRestoreDiagnostics.h"
 #import "CSScheduledTaskStore.h"
 #import "CSAIReplyStore.h"
+#import "CSBackgroundRunPolicy.h"
 #import <sys/stat.h>
 static NSString *const Profiles=@"com.wechat.enhance.chat_group.account_profiles";
 static NSString *const Selection=@"com.wechat.enhance.chat_group.selection.";
 static BOOL EngineFail(NSError **error,NSString *message){if(error)*error=CSBackupFailure(message);return NO;}
 static BOOL HasRuntimeFields(NSArray *fields) {for(NSDictionary *field in fields)if([field[@"domain"] isEqual:CSScheduledTaskBackupDomain] || [field[@"domain"] isEqual:CSAIReplyBackupDomain])return YES;return NO;}
+static NSArray *RevisionFields(NSArray *fields) {
+    NSMutableArray *result=[NSMutableArray arrayWithCapacity:fields.count];
+    for(NSDictionary *field in fields) {
+        // Older pending transactions predate this optional preference. Keep explicit
+        // absence in portable snapshots, while preserving their original revision.
+        if([field[@"domain"] isEqual:@"legacy"]&&[field[@"key"] isEqual:CSBackgroundRunPolicyKey]&&![field[@"present"] boolValue])continue;
+        [result addObject:field];
+    }
+    return result;
+}
 static NSString *Revision(NSDictionary *snapshot, BOOL runtime) {
-    if(runtime&&(snapshot[@"scheduledTaskRevision"] || snapshot[@"aiReplyRevision"]))return [CSBackupCodec digest:@[snapshot[@"fields"],snapshot[@"assets"],snapshot[@"scheduledTaskRevision"]?:@"",snapshot[@"aiReplyRevision"]?:@"",snapshot[@"resetRawRevision"]?:@"",snapshot[@"missingAssets"]?:@[]]];
-    if(snapshot[@"resetRawRevision"])return [CSBackupCodec digest:@[snapshot[@"fields"],snapshot[@"assets"],snapshot[@"resetRawRevision"],snapshot[@"missingAssets"]?:@[]]];
-    return [CSBackupCodec digest:@[snapshot[@"fields"],snapshot[@"assets"]]];
+    NSArray *fields=RevisionFields(snapshot[@"fields"]);
+    if(runtime&&(snapshot[@"scheduledTaskRevision"] || snapshot[@"aiReplyRevision"]))return [CSBackupCodec digest:@[fields,snapshot[@"assets"],snapshot[@"scheduledTaskRevision"]?:@"",snapshot[@"aiReplyRevision"]?:@"",snapshot[@"resetRawRevision"]?:@"",snapshot[@"missingAssets"]?:@[]]];
+    if(snapshot[@"resetRawRevision"])return [CSBackupCodec digest:@[fields,snapshot[@"assets"],snapshot[@"resetRawRevision"],snapshot[@"missingAssets"]?:@[]]];
+    return [CSBackupCodec digest:@[fields,snapshot[@"assets"]]];
 }
 static BOOL IsReset(NSDictionary *snapshot) {return [snapshot[@"operation"] isEqual:@"reset"];}
 static NSString *Identity(NSDictionary *f){return [NSString stringWithFormat:@"%@/%@",f[@"domain"],f[@"key"]];}
@@ -145,7 +157,7 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
         if(scheduledState.count)snapshot[@"scheduledTaskRevision"]=[CSBackupCodec digest:scheduledState];
         if(aiState.count)snapshot[@"aiReplyRevision"]=[CSBackupCodec digest:aiState];
         if(allowMissing){
-            snapshot[@"resetRawRevision"]=[CSBackupCodec digest:raw];snapshot[@"missingAssets"]=missing;
+            snapshot[@"resetRawRevision"]=[CSBackupCodec digest:RevisionFields(raw)];snapshot[@"missingAssets"]=missing;
             NSMutableArray *warnings=[snapshot[@"warnings"] mutableCopy];
             for(NSDictionary *record in missing){
                 NSDictionary *entry=[CSBackupRegistry entryForDomain:record[@"domain"] key:record[@"key"]];
@@ -157,27 +169,9 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     }
     EngineFail(error,@"配置或图片正在变化，未保存混合快照，请停止编辑后重试");return nil;
 }
-+ (NSString *)contentDigest:(NSDictionary *)snapshot {
-    NSMutableArray *fields=[NSMutableArray array];for(NSDictionary *f in snapshot[@"fields"])if(![f[@"key"] hasPrefix:Selection])[fields addObject:f];
-    return [CSBackupCodec digest:@{@"fields":fields,@"assets":snapshot[@"assets"]?:@{}}];
-}
-- (NSDictionary *)save:(NSString *)name kind:(NSString *)kind error:(NSError **)error {
-    NSDictionary *snapshot=[self capture:name kind:kind error:error];if(!snapshot)return nil;
-    __block NSError *failure=nil;
-    NSDictionary *result=[self.store withInventoryForSource:snapshot[@"source"] operation:^NSDictionary *{
-        if([kind isEqual:@"automatic"]){
-            for(NSDictionary *existing in [self.store snapshots:NULL]){
-                if(![existing[@"kind"] isEqual:@"automatic"]||![existing[@"source"][@"account"] isEqual:snapshot[@"source"][@"account"]]||
-                   ![existing[@"source"][@"installationID"] isEqual:snapshot[@"source"][@"installationID"]])continue;
-                if([existing[@"contentDigest"] isEqual:[self.class contentDigest:snapshot]])return [self.store snapshotUsingInventory:existing[@"id"] error:&failure];
-                break;
-            }
-        }
-        if(![self.store publish:snapshot error:&failure])return nil;
-        // A published snapshot stays successful; cleanup failures have their own durable status.
-        [self.store prune:NULL];return snapshot;
-    }];
-    if(!result&&error)*error=failure;return result;
+- (NSDictionary *)save:(NSString *)name error:(NSError **)error {
+    NSDictionary *snapshot=[self capture:name kind:@"manual" error:error];if(!snapshot)return nil;
+    return [self.store publish:snapshot error:error]?snapshot:nil;
 }
 - (NSDictionary *)previewContent:(NSDictionary *)snapshot modules:(NSSet *)modules accounts:(NSSet *)accounts error:(NSError **)error {
     NSData *encoded=[CSBackupCodec encode:snapshot error:error];if(!encoded)return nil;
@@ -256,14 +250,14 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     if(existing){if([existing[@"state"] isEqual:@"rolledBack"]||([existing[@"state"] isEqual:@"committed"]&&[self.store activationConfirmed:existing])){if(![self.store archiveJournal:error])return NO;}else return EngineFail(error,@"已有待处理的恢复，请先取消或完成它");}
     if(![self.context()[@"account"] length])return EngineFail(error,@"当前账号尚未就绪，请登录后重新预览恢复");
     BOOL reset=IsReset(preview[@"snapshot"]);
-    NSDictionary *current=[self capture:reset?@"重置前保护":@"恢复前保护" kind:@"protection" allowingMissingAssets:reset error:error];if(!current)return NO;
+    NSDictionary *current=[self capture:reset?@"重置状态核验":@"恢复状态核验" kind:@"protection" allowingMissingAssets:reset error:error];if(!current)return NO;
     if(![preview[@"context"] isEqual:self.context()]||![preview[@"revision"] isEqual:Revision(current,HasRuntimeFields(preview[@"fields"]))])return EngineFail(error,@"配置或账号已变化，请重新打开恢复预览");
     NSDictionary *rebuilt=[self preview:preview[@"snapshot"] modules:[NSSet setWithArray:preview[@"modules"]?:@[]] accounts:[NSSet setWithArray:preview[@"accounts"]?:@[]] error:error];
     if(!rebuilt)return NO;
     if(![rebuilt[@"fields"] isEqual:preview[@"fields"]]||![rebuilt[@"writes"] isEqual:preview[@"writes"]]||![rebuilt[@"revision"] isEqual:preview[@"revision"]])return EngineFail(error,@"恢复计划已变化，请重新预览");
-    if(![self.store publish:current error:error])return NO;
+    // Only transaction before-images are persisted; no backup file is published here.
     NSArray *before=[self beforeFields:preview[@"fields"] error:error];NSDictionary *beforeWrites=[self beforeWrites:preview[@"writes"] error:error];if(!before||!beforeWrites)return NO;
-    NSDictionary *journal=@{@"operation":reset?@"reset":@"restore",@"version":@1,@"transactionID":NSUUID.UUID.UUIDString,@"state":@"prepared",@"sourceID":preview[@"snapshot"][@"id"],@"protectionID":current[@"id"],@"account":preview[@"context"][@"account"],@"installationID":preview[@"context"][@"installationID"],@"revision":preview[@"revision"],@"before":before,@"after":preview[@"fields"],@"beforeWrites":beforeWrites,@"afterWrites":preview[@"writes"]};
+    NSDictionary *journal=@{@"operation":reset?@"reset":@"restore",@"version":@1,@"transactionID":NSUUID.UUID.UUIDString,@"state":@"prepared",@"sourceID":preview[@"snapshot"][@"id"],@"account":preview[@"context"][@"account"],@"installationID":preview[@"context"][@"installationID"],@"revision":preview[@"revision"],@"before":before,@"after":preview[@"fields"],@"beforeWrites":beforeWrites,@"afterWrites":preview[@"writes"]};
     if(![self validJournal:journal error:error])return NO;
     BOOL ok=[self.store writeJournal:journal error:error];if(ok&&self.checkpoint)self.checkpoint(@"prepared");return ok;
 }

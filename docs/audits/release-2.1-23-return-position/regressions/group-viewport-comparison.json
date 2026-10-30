@@ -1,0 +1,74 @@
+{
+  "description": "Reconstructed old-Hook control and fixed-Hook replay; the original first red run was not saved to disk. These are new raw stdout/stderr captures, not the original first-run logs.",
+  "recorded_at_utc": "2026-10-30T07:21:32.039123+00:00",
+  "working_directory": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "git_head": "00c1d9dc8ea48f5af8f46a6e77043adad7e44b06",
+  "old_hook_export_command": [
+    "git",
+    "show",
+    "HEAD:Hooks/SessionGroupHooks.xm"
+  ],
+  "old_hook_reproducible_source": "00c1d9dc8ea48f5af8f46a6e77043adad7e44b06:Hooks/SessionGroupHooks.xm",
+  "adapter": {
+    "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupListAdapter.m",
+    "sha256": "1b878f629ee3af7083414b1eeee21e45604e3566d227b2bc6448105785c75ab4",
+    "git_blob_sha1": "04b7c098b344708a386ef32e58d60cc7ad6bb876"
+  },
+  "runs": [
+    {
+      "name": "old-hook",
+      "command": [
+        "bash",
+        "Tests/verify-group-viewport.sh",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSGroupListAdapter.m",
+        "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-viewport-old-hook-gomy9z99/SessionGroupHooks.xm"
+      ],
+      "hook_source": "00c1d9dc8ea48f5af8f46a6e77043adad7e44b06:Hooks/SessionGroupHooks.xm",
+      "hook_sha256": "52d52f3884cfb521867be2733037bed2900232d5af21c40d4d184cb17264ca26",
+      "hook_git_blob_sha1": "d12611b73f35aeaeae267caeee0153f7971127a8",
+      "adapter_sha256": "1b878f629ee3af7083414b1eeee21e45604e3566d227b2bc6448105785c75ab4",
+      "exit_code": 1,
+      "checks": 120,
+      "failures": 16,
+      "expected": {
+        "checks": 120,
+        "failures": 16,
+        "exit_code": 1
+      },
+      "matches_expected": true,
+      "log": "docs/audits/release-2.1-23-return-position/regressions/group-viewport-old-hook.log",
+      "log_sha256": "41af8c8a5522e9f6566a936f652f0e1d1717a62f916c51da21f2e27c69955a5d",
+      "capture": "Raw combined stdout/stderr (stderr redirected into stdout); no postprocessing.",
+      "included_in_successful_suite_total": false
+    },
+    {
+      "name": "fixed",
+      "command": [
+        "bash",
+        "Tests/verify-group-viewport.sh"
+      ],
+      "hook_source": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/SessionGroupHooks.xm",
+      "hook_sha256": "a180ef4d56bb7adba44fd044d76238de985b7ca00af705e3046a0a7696216512",
+      "hook_git_blob_sha1": "057b769f987a58dcbae2f8689afbc4680cac5775",
+      "adapter_sha256": "1b878f629ee3af7083414b1eeee21e45604e3566d227b2bc6448105785c75ab4",
+      "exit_code": 0,
+      "checks": 120,
+      "failures": 0,
+      "expected": {
+        "checks": 120,
+        "failures": 0,
+        "exit_code": 0
+      },
+      "matches_expected": true,
+      "log": "docs/audits/release-2.1-23-return-position/regressions/group-viewport-fixed.log",
+      "log_sha256": "030e377f8825486975cb6aba2b559dbaa588f9fb0cd13114c04a67f60675f1fa",
+      "capture": "Raw combined stdout/stderr (stderr redirected into stdout); no postprocessing.",
+      "included_in_successful_suite_total": true
+    }
+  ],
+  "device_accessed": false,
+  "production_or_test_files_modified": false,
+  "limitation": "Host method tests with counted publication/native boundaries; no UIKit device rendering or scrolling measurement.",
+  "source_files_unchanged_during_replay": true,
+  "all_runs_match_expected": true
+}

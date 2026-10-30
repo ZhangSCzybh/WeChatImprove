@@ -93,7 +93,7 @@ int main(int argc,const char **argv){@autoreleasepool{
     // A valid prepared transaction that fails before applying must not block every future launch.
     NSString *suite=[@"backup.prepared." stringByAppendingString:NSUUID.UUID.UUIDString];[suites addObject:suite];NSUserDefaults *defaults=[[NSUserDefaults alloc]initWithSuiteName:suite];
     NSString *path=[base stringByAppendingPathComponent:@"prepared"];CSBackupEngine *engine=Engine(path,suite,@"alice",@"current",NO);
-    [defaults setObject:@"wanted" forKey:TextKey];NSDictionary *snapshot=[engine save:@"prepared expiry" kind:@"manual" error:&error];[defaults setObject:@"before" forKey:TextKey];
+    [defaults setObject:@"wanted" forKey:TextKey];NSDictionary *snapshot=[engine save:@"prepared expiry" error:&error];[defaults setObject:@"before" forKey:TextKey];
     NSDictionary *preview=[engine preview:snapshot modules:modules accounts:accounts error:&error];Check([engine prepare:preview error:&error],@"prepare expiry fixture");[defaults synchronize];
     Check(Run(binary,@[@"--retry",path,suite,@"bob"])==2,@"first startup cannot apply another account plan");
     Check([[engine.store journal:NULL][@"state"] isEqual:@"prepared"],@"first rejected startup leaves a valid prepared transaction");
@@ -105,7 +105,7 @@ int main(int argc,const char **argv){@autoreleasepool{
         NSDictionary *last=[NSDictionary dictionaryWithContentsOfURL:[engine.store.root URLByAppendingPathComponent:@"last-transaction.plist"]];
         Check([last[@"resolution"] isEqual:@"cancelledBeforeApply"]&&[last[@"resolutionReason"] containsString:@"账号"],@"archived journal preserves cancellation and original failure reason");
         Check([engine.store snapshot:snapshot[@"id"] error:NULL]!=nil,@"auto-retirement retains source backup");
-        Check([engine.store snapshot:last[@"protectionID"] error:NULL]!=nil,@"auto-retirement retains before-state protection snapshot");
+        Check(last[@"protectionID"]==nil&&[last[@"before"] count]>0&&[engine.store records:NULL].count==1,@"retirement retains rollback journal without creating an automatic protection file");
         // A process death after recording the attempt but before any writes retires safely too.
         preview=[engine preview:snapshot modules:modules accounts:accounts error:&error];Check([engine prepare:preview error:&error],@"prepare crash-before-apply fixture");[defaults synchronize];
         Check(Run(binary,@[@"--kill-attempt",path,suite,@"alice"])==77,@"kill after durable startup attempt before live writes");

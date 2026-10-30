@@ -17,7 +17,7 @@ Path(sys.argv[1],'AIBackupManagerBoundary.h').write_text('\n'.join(methods))
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations \
   -IControllers -I"$test_dir" -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics \
-  Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m \
+  Controllers/CSBackupRegistry.m Controllers/CSBackgroundRunPolicy.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m \
   Controllers/CSPluginStorage.m Controllers/CSBackupStore.m Controllers/CSManagedImageFile.m \
   Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m \
   Tests/AIReplyBackupTests.m -o "$test_dir/tests"

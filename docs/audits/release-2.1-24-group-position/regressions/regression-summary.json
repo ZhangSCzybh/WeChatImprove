@@ -1,0 +1,46 @@
+{
+  "version": "2.1-24",
+  "suites": [
+    {
+      "script": "Tests/verify-group-viewport.sh",
+      "log": "group-viewport-fixed.log",
+      "checks": 131,
+      "failures": 0,
+      "exit_code": 0,
+      "log_sha256": "6294d3f1628fed64eefb86a2fcb5e10e5ed1ba0bbfcb50e6fd5691d57a1d22b7"
+    },
+    {
+      "script": "Tests/verify-group-selection.sh",
+      "log": "group-selection.log",
+      "checks": 30,
+      "failures": 0,
+      "exit_code": 0,
+      "log_sha256": "4725843ed26dc3c1698a740f3a391a5337b01997bdf33d1c3841180f4e3498cc"
+    },
+    {
+      "script": "Tests/verify-group-interactions.sh",
+      "log": "group-interactions.log",
+      "checks": 124,
+      "failures": 0,
+      "exit_code": 0,
+      "log_sha256": "2b57dbfc22bf57d3bdb22ad61982481bc86594ad2da7794b0cd1cadad9a6cf1a"
+    }
+  ],
+  "total_suites": 3,
+  "total_checks": 285,
+  "total_failures": 0,
+  "all_passed": true,
+  "before_fix_control": {
+    "log": "group-viewport-before-fix.log",
+    "checks": 131,
+    "failures": 13,
+    "exit_code": 1,
+    "log_sha256": "e8544db0009751791713394ef56fce122d6925eadc1b93bc3c4e6e9183b03c9a",
+    "adapter_source_sha256": "1b878f629ee3af7083414b1eeee21e45604e3566d227b2bc6448105785c75ab4",
+    "adapter_source_matches_2_1_23_build": true,
+    "included_in_success_total": false
+  },
+  "fixed_adapter_sha256": "1448e986ca16d91b198fcd06f08d90406583e7fad4a30ff54f6865ac3536cbcd",
+  "viewport_test_source_sha256": "44d0291fc721b6a15fc6e4efcc2298de0f93c445ccf5f343433e5b07dd732c4e",
+  "device_accessed": false
+}

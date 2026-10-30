@@ -6,19 +6,17 @@
 #import "CSBackupCodec.h"
 #import "CSBackupAssets.h"
 #import "CSPluginStorage.h"
-static NSUInteger checks,imageCalls,digestCalls;
-static IMP imageOriginal,digestOriginal;
+static NSUInteger checks,imageCalls;
+static IMP imageOriginal;
 static void (^imageAction)(void);
 static void Check(BOOL ok,NSString *message){checks++;if(!ok){fprintf(stderr,"FAIL: %s\n",message.UTF8String);exit(1);}}
 @interface CountingBackupStore:CSBackupStore
 @property(nonatomic) NSUInteger reads;
-@property(nonatomic) NSUInteger prunes;
 @property(nonatomic) BOOL failPublish;
 @end
 @implementation CountingBackupStore
 - (NSDictionary *)snapshot:(NSString *)identifier error:(NSError **)error {self.reads++;return [super snapshot:identifier error:error];}
 - (BOOL)publish:(NSDictionary *)snapshot error:(NSError **)error {if(self.failPublish){if(error)*error=CSBackupFailure(@"isolated publish failure");return NO;}return [super publish:snapshot error:error];}
-- (BOOL)prune:(NSError **)error {self.prunes++;return [super prune:error];}
 @end
 static NSDictionary *Snapshot(NSString *kind,NSTimeInterval time){
     return @{@"magic":@"WeChatImproveBackup",@"formatVersion":@2,@"id":NSUUID.UUID.UUIDString,@"name":@"fixture",@"createdAt":[NSDate dateWithTimeIntervalSince1970:time],@"kind":kind,@"source":@{@"account":@"audit",@"installationID":@"audit",@"pluginVersion":@"test"},@"fields":@[],@"assets":@{},@"warnings":@[]};
@@ -33,93 +31,65 @@ static void Counts(NSURL *base,NSUInteger manualCount){
     __block NSString *account=@"audit",*installation=@"audit";
     engine.context=^{return @{@"account":account,@"epoch":@1,@"installationID":installation,@"pluginVersion":@"test"};};
     NSString *key=@"com.wechat.tweak.navigation.separator.text";[defaults setObject:@"same" forKey:key];
-    NSDictionary *original=[engine save:@"first" kind:@"automatic" error:NULL];Check(original!=nil,@"seed automatic");
     for(NSUInteger n=0;n<manualCount;n++)Check([store publish:Snapshot(@"manual",n+1) error:NULL],@"seed manual history");
-    store.reads=0;NSDictionary *same=[engine save:@"same" kind:@"automatic" error:NULL];NSUInteger unchanged=store.reads;
-    Check([same[@"id"] isEqual:original[@"id"]],@"unchanged automatic remains deduplicated");
-    if(unchanged!=manualCount+1)fprintf(stderr,"count diagnostic: N=%lu unchanged=%lu\n",(unsigned long)manualCount,(unsigned long)unchanged);
-    Check(unchanged==manualCount+1,@"unchanged save reads each historical file once");
+    store.reads=0;NSDictionary *original=[engine save:@"first" error:NULL];
+    Check(original&&store.reads==0,@"manual save publishes without scanning historical snapshots");
+    store.reads=0;NSDictionary *same=[engine save:@"same" error:NULL];NSUInteger unchanged=store.reads;
+    Check(same&&![same[@"id"] isEqual:original[@"id"]],@"unchanged manual save creates the requested snapshot");
+    Check(unchanged==0,@"unchanged manual save does not read historical snapshots");
     [defaults setObject:@"changed" forKey:key];store.reads=0;
-    NSDictionary *changed=[engine save:@"changed" kind:@"automatic" error:NULL];NSUInteger changedReads=store.reads;
-    Check(changed&&! [changed[@"id"] isEqual:original[@"id"]],@"changed automatic publishes");
-    Check(changedReads==manualCount+2,@"prune reuses history and verifies newly published file once");
-    printf("Inventory N=%lu: unchanged snapshot reads %lu -> %lu; changed+prune %lu -> %lu\n",(unsigned long)manualCount,(unsigned long)(manualCount+2),(unsigned long)unchanged,(unsigned long)(2*manualCount+3),(unsigned long)changedReads);
-    account=@"other";Check(![[engine save:@"other account" kind:@"automatic" error:NULL][@"id"] isEqual:changed[@"id"]],@"account changes do not deduplicate");
-    account=@"audit";installation=@"other";Check(![[engine save:@"other install" kind:@"automatic" error:NULL][@"id"] isEqual:changed[@"id"]],@"installation changes do not deduplicate");
-    NSUInteger prunes=store.prunes;store.failPublish=YES;[defaults setObject:@"failed" forKey:key];NSError *failure=nil;
-    Check(![engine save:@"failure" kind:@"automatic" error:&failure]&&failure&&store.prunes==prunes,@"publication failure propagates and never prunes");
+    NSDictionary *changed=[engine save:@"changed" error:NULL];NSUInteger changedReads=store.reads;
+    Check(changed&&![changed[@"id"] isEqual:original[@"id"]],@"changed manual save publishes");
+    Check(changedReads==0,@"changed manual save does not scan historical snapshots");
+    account=@"other";NSDictionary *otherAccount=[engine save:@"other account" error:NULL];
+    Check([otherAccount[@"source"][@"account"] isEqual:account],@"manual save records the current account");
+    account=@"audit";installation=@"other";NSDictionary *otherInstall=[engine save:@"other install" error:NULL];
+    Check([otherInstall[@"source"][@"installationID"] isEqual:installation],@"manual save records the current installation");
+    store.failPublish=YES;[defaults setObject:@"failed" forKey:key];NSError *failure=nil;store.reads=0;
+    Check(![engine save:@"failure" error:&failure]&&failure&&store.reads==0,@"publication failure propagates without scanning history");
+    store.reads=0;NSArray *records=[store records:NULL];
+    Check(records.count==manualCount+5&&store.reads==records.count,@"manual inventory reads each historical file once and retains every requested snapshot");
+    printf("Manual history N=%lu: unchanged save reads %lu; changed save reads %lu; inventory reads %lu for %lu records\n",(unsigned long)manualCount,(unsigned long)unchanged,(unsigned long)changedReads,(unsigned long)store.reads,(unsigned long)records.count);
     [defaults removePersistentDomainForName:suite];
 }
 static void InventoryBoundaries(NSURL *base){
     CountingBackupStore *store=[[CountingBackupStore alloc]initWithRoot:[base URLByAppendingPathComponent:@"identity"]];
-    NSDictionary *s=Snapshot(@"automatic",1);Check([store publish:s error:NULL],@"identity fixture");
-    [store withInventoryForSource:s[@"source"] operation:^NSDictionary *{
-        [store records:NULL];NSUInteger reads=store.reads;[store records:NULL];Check(store.reads==reads,@"unchanged scope reuses summaries");
-        NSMutableDictionary *replacement=[s mutableCopy];replacement[@"name"]=@"changed";
-        NSData *bytes=[CSBackupCodec encode:replacement error:NULL];Check(CSBackupAtomicWrite(bytes,File(store,s),NULL),@"replace same filename during scope");
-        Check([Record([store records:NULL],s[@"id"])[@"name"] isEqual:@"changed"]&&store.reads==reads+1,@"replacement is reread inside scope");
-        NSDictionary *cached=[store snapshotUsingInventory:s[@"id"] error:NULL];Check([cached[@"name"] isEqual:@"changed"],@"dedup return uses current replacement");
-        NSData *broken=[@"broken!" dataUsingEncoding:NSUTF8StringEncoding];Check(CSBackupAtomicWrite(broken,File(store,s),NULL),@"corrupt inside scope");
-        Check([Record([store records:NULL],s[@"id"])[@"unavailable"] boolValue],@"scope corruption is retained as unavailable");
-        NSDictionary *added=Snapshot(@"manual",2);Check([store publish:added error:NULL],@"publish during scope");
-        Check([store records:NULL].count==2,@"new scope file is discovered");
-        Check([NSFileManager.defaultManager removeItemAtURL:File(store,added) error:NULL],@"external deletion during scope");
-        Check([store records:NULL].count==1,@"removed scope file disappears");return nil;
-    }];
-    NSUInteger reads=store.reads;[store records:NULL];Check(store.reads==reads+1,@"scope completion drops cache");
-    @try{[store withInventoryForSource:s[@"source"] operation:^NSDictionary *{[store records:NULL];@throw [NSException exceptionWithName:@"fixture" reason:@"scope unwind" userInfo:nil];}];}
-    @catch(NSException *exception){Check([exception.name isEqual:@"fixture"],@"scope exception propagated");}
-    reads=store.reads;[store records:NULL];Check(store.reads==reads+1,@"finally drops cache after exception");
+    NSDictionary *s=Snapshot(@"manual",1);Check([store publish:s error:NULL],@"identity fixture");
+    Check([store records:NULL].count==1&&store.reads==1,@"initial inventory reads its snapshot once");
+    NSUInteger reads=store.reads;[store records:NULL];Check(store.reads==reads+1,@"independent inventory reads revalidate their snapshots");
+    NSMutableDictionary *replacement=[s mutableCopy];replacement[@"name"]=@"changed";
+    NSData *bytes=[CSBackupCodec encode:replacement error:NULL];Check(CSBackupAtomicWrite(bytes,File(store,s),NULL),@"replace same filename");
+    reads=store.reads;
+    Check([Record([store records:NULL],s[@"id"])[@"name"] isEqual:@"changed"]&&store.reads==reads+1,@"next inventory reads the replacement once");
+    NSDictionary *selected=[store snapshot:s[@"id"] error:NULL];Check([selected[@"name"] isEqual:@"changed"],@"selected snapshot reads the current replacement");
+    NSData *broken=[@"broken!" dataUsingEncoding:NSUTF8StringEncoding];Check(CSBackupAtomicWrite(broken,File(store,s),NULL),@"corrupt existing snapshot");
+    Check([Record([store records:NULL],s[@"id"])[@"unavailable"] boolValue]&&[NSFileManager.defaultManager fileExistsAtPath:File(store,s).path],@"corruption is retained as an unavailable original");
+    NSDictionary *added=Snapshot(@"manual",2);Check([store publish:added error:NULL],@"publish another snapshot");
+    Check([store records:NULL].count==2,@"new file is discovered");
+    Check([NSFileManager.defaultManager removeItemAtURL:File(store,added) error:NULL],@"external file deletion");
+    Check([store records:NULL].count==1,@"removed file disappears from the next inventory");
 
     // Exact same byte length and preserved mtime still change inode/ctime.
     Check(CSBackupAtomicWrite([CSBackupCodec encode:s error:NULL],File(store,s),NULL),@"repair identity fixture");
-    [store withInventoryForSource:s[@"source"] operation:^NSDictionary *{
-        [store records:NULL];NSUInteger before=store.reads;
-        NSMutableDictionary *replacement=[s mutableCopy];replacement[@"name"]=@"changed";
-        NSData *old=[NSData dataWithContentsOfURL:File(store,s)],*new=[CSBackupCodec encode:replacement error:NULL];
-        Check(old.length==new.length,@"same-length replacement fixture");
-        struct stat st;Check(!stat(File(store,s).fileSystemRepresentation,&st),@"read original timestamp");
-        Check(CSBackupAtomicWrite(new,File(store,s),NULL),@"same-size replace");
-        struct timespec times[2]={st.st_atimespec,st.st_mtimespec};Check(!utimensat(AT_FDCWD,File(store,s).fileSystemRepresentation,times,0),@"restore original mtime");
-        Check([Record([store records:NULL],s[@"id"])[@"name"] isEqual:@"changed"]&&store.reads==before+1,@"inode and ctime invalidate same-size same-mtime replacement");return nil;
-    }];
-    // Migration is retried before reuse, including late reappearance of a legacy root.
+    [store records:NULL];NSUInteger before=store.reads;
+    NSData *old=[NSData dataWithContentsOfURL:File(store,s)],*new=[CSBackupCodec encode:replacement error:NULL];
+    Check(old.length==new.length,@"same-length replacement fixture");
+    struct stat st;Check(!stat(File(store,s).fileSystemRepresentation,&st),@"read original timestamp");
+    Check(CSBackupAtomicWrite(new,File(store,s),NULL),@"same-size replace");
+    struct timespec times[2]={st.st_atimespec,st.st_mtimespec};Check(!utimensat(AT_FDCWD,File(store,s).fileSystemRepresentation,times,0),@"restore original mtime");
+    struct stat replaced;Check(!stat(File(store,s).fileSystemRepresentation,&replaced)&&replaced.st_ino!=st.st_ino&&replaced.st_size==st.st_size&&
+        replaced.st_mtimespec.tv_sec==st.st_mtimespec.tv_sec&&replaced.st_mtimespec.tv_nsec==st.st_mtimespec.tv_nsec,@"replacement changes inode while preserving size and mtime");
+    Check([Record([store records:NULL],s[@"id"])[@"name"] isEqual:@"changed"]&&store.reads==before+1,@"same-size same-mtime replacement is read on the next inventory");
+    // Each inventory retries migration, including late reappearance of a legacy root.
     NSURL *library=[base URLByAppendingPathComponent:@"migration/Library"];
     Check([NSFileManager.defaultManager createDirectoryAtURL:library withIntermediateDirectories:YES attributes:nil error:NULL],@"isolated migration library");
     CSPluginDirectoryMigration *migration=[[CSPluginDirectoryMigration alloc]initWithLibrary:library leaf:@"BackupV2"];
     CountingBackupStore *moving=[[CountingBackupStore alloc]initWithMigration:migration];
-    NSDictionary *first=Snapshot(@"automatic",1);Check([moving publish:first error:NULL],@"migration scoped seed");
-    [moving withInventoryForSource:first[@"source"] operation:^NSDictionary *{
-        [moving records:NULL];CSBackupStore *legacy=[[CSBackupStore alloc]initWithRoot:migration.legacyRoot];
-        NSDictionary *late=Snapshot(@"manual",2);Check([legacy publish:late error:NULL],@"late legacy scoped fixture");
-        Check([moving records:NULL].count==2&&![NSFileManager.defaultManager fileExistsAtPath:migration.legacyRoot.path],@"late migration files discovered before scope reuse");return nil;
-    }];
-}
-static void RetentionBoundaries(NSURL *base){
-    for(NSString *change in @[@"favorite",@"imported",@"journal",@"bad-journal",@"bad-metadata",@"replace",@"inplace"]){
-        CountingBackupStore *store=[[CountingBackupStore alloc]initWithRoot:[base URLByAppendingPathComponent:change]];
-        NSDictionary *old=Snapshot(@"automatic",1);Check([store publish:old error:NULL],@"retention target");
-        for(NSUInteger n=0;n<20;n++)Check([store publish:Snapshot(@"automatic",n+10) error:NULL],@"retention newer fixture");
-        __block BOOL fired=NO;__weak CSBackupStore *weak=store;
-        store.eventHandler=^(NSString *event,NSDictionary *details){
-            if(fired||![event isEqual:@"remove-requested"]||![details[@"id"] isEqual:old[@"id"]])return;fired=YES;
-            CSBackupStore *strong=weak;
-            if([change isEqual:@"favorite"])Check([strong setMetadata:@{@"favorite":@YES} identifier:old[@"id"] error:NULL],@"late favorite");
-            else if([change isEqual:@"imported"])Check([strong importSnapshot:old error:NULL],@"late imported protection");
-            else if([change isEqual:@"journal"])Check([strong writeJournal:@{@"sourceID":old[@"id"]} error:NULL],@"late active transaction");
-            else if([change isEqual:@"bad-journal"])Check(CSBackupAtomicWrite([@"bad" dataUsingEncoding:NSUTF8StringEncoding],[strong.root URLByAppendingPathComponent:@"transaction.plist"],NULL),@"late journal corruption");
-            else if([change isEqual:@"bad-metadata"])Check(CSBackupAtomicWrite([@"bad" dataUsingEncoding:NSUTF8StringEncoding],[strong.root URLByAppendingPathComponent:[old[@"id"] stringByAppendingPathExtension:@"meta"]],NULL),@"late metadata corruption");
-            else {NSMutableDictionary *replacement=[old mutableCopy];replacement[@"kind"]=@"manual";NSData *data=[CSBackupCodec encode:replacement error:NULL];
-                if([change isEqual:@"inplace"])Check([data writeToURL:File(strong,old) options:0 error:NULL],@"late in-place file mutation");
-                else Check(CSBackupAtomicWrite(data,File(strong,old),NULL),@"late replacement");}
-        };
-        [store withInventoryForSource:old[@"source"] operation:^NSDictionary *{[store records:NULL];[store prune:NULL];return nil;}];
-        Check(fired&&[NSFileManager.defaultManager fileExistsAtPath:File(store,old).path],[@"delete-time protection: " stringByAppendingString:change]);
-        store.eventHandler=nil;
-    }
-    CSBackupStore *store=[[CSBackupStore alloc]initWithRoot:[base URLByAppendingPathComponent:@"digest"]];
-    Check([store publish:Snapshot(@"automatic",1) error:NULL],@"digest fixture");digestCalls=0;
-    Check([store prune:NULL]&&digestCalls==0,@"standalone prune avoids unused content digests");
+    NSDictionary *first=Snapshot(@"manual",1);Check([moving publish:first error:NULL],@"migration seed");
+    Check([moving records:NULL].count==1,@"initial migrated inventory");
+    CSBackupStore *legacy=[[CSBackupStore alloc]initWithRoot:migration.legacyRoot];
+    NSDictionary *late=Snapshot(@"manual",2);Check([legacy publish:late error:NULL],@"late legacy fixture");
+    Check([moving records:NULL].count==2&&![NSFileManager.defaultManager fileExistsAtPath:migration.legacyRoot.path],@"next inventory discovers and migrates late legacy files");
 }
 static void Images(NSURL *base){
     NSData *png=[[NSData alloc]initWithBase64EncodedString:@"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWZcAAAAASUVORK5CYII=" options:0];
@@ -172,16 +142,14 @@ static void Images(NSURL *base){
     [defaults removePersistentDomainForName:suite];
 }
 int main(void){@autoreleasepool{
-    printf("Before counts: recorded baseline in performance-followup-2.1-15.md; after counts: current production methods, forwarded by counters.\n");
+    printf("Manual backup performance: current production methods, forwarded by counters.\n");
     Method imageMethod=class_getClassMethod(CSBackupAssets.class,@selector(validImage:));
     imageOriginal=method_getImplementation(imageMethod);
     method_setImplementation(imageMethod,imp_implementationWithBlock(^BOOL(id owner,NSData *data){imageCalls++;if(imageAction)imageAction();return ((BOOL(*)(id,SEL,id))imageOriginal)(owner,@selector(validImage:),data);}));
-    Method digestMethod=class_getClassMethod(CSBackupCodec.class,@selector(digest:));digestOriginal=method_getImplementation(digestMethod);
-    method_setImplementation(digestMethod,imp_implementationWithBlock(^NSString *(id owner,id value){if([value isKindOfClass:NSDictionary.class]&&[value count]==2&&value[@"fields"]&&value[@"assets"])digestCalls++;return ((id(*)(id,SEL,id))digestOriginal)(owner,@selector(digest:),value);}));
     NSURL *base=[NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString]];
     for(NSNumber *n in @[@0,@20,@80])Counts(base,n.unsignedIntegerValue);
-    InventoryBoundaries(base);RetentionBoundaries(base);Images(base);
+    InventoryBoundaries(base);Images(base);
     Check([NSFileManager.defaultManager removeItemAtURL:base error:NULL],@"remove isolated fixtures");
-    method_setImplementation(imageMethod,imageOriginal);method_setImplementation(digestMethod,digestOriginal);
+    method_setImplementation(imageMethod,imageOriginal);
     printf("Backup performance: %lu checks passed\n",(unsigned long)checks);
 }return 0;}

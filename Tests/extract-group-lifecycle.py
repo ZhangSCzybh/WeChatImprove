@@ -45,6 +45,7 @@ for marker in ['+ (instancetype)adapterForTable:', '+ (instancetype)adapterForCo
 if '- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind sessionUserNames:' in source:
     methods.append(method(source, '- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind sessionUserNames:'))
 methods.append(method(source,'- (void)selectIndex:'))
+methods.append(method(source,'+ (void)finishPresentationReturnForController:'))
 if '+ (void)refreshFoldedListsForAccount:' in source:
     methods.append(method(source,'+ (void)refreshFoldedListsForAccount:'))
 for marker, fallback in [('+ (void)setPresentationSuspended:', '+ (void)setPresentationSuspended:(BOOL)value forController:(id)owner { (void)value; (void)owner; }'),

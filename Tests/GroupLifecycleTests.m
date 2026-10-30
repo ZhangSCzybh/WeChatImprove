@@ -8,13 +8,20 @@
 #import <dispatch/dispatch.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
+#import <math.h>
 #include "GroupLifecycleTabBadgeDependencies.h"
 #include "GroupLifecycleTabBadgeImplementation.inc"
 @class CSGroupListAdapter;
+typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @interface UITableView (LifecycleDataSource)
 @property(nonatomic,readonly) id dataSource;
+@property(nonatomic,readonly) CGPoint contentOffset;
+@property(nonatomic,readonly) UIEdgeInsets adjustedContentInset;
 @end
-@interface LifecycleTable : UITableView @end
+@interface LifecycleTable : UITableView
+@property(nonatomic) CGPoint contentOffset;
+@property(nonatomic) UIEdgeInsets adjustedContentInset;
+@end
 @interface Host : NSObject
 @property(nonatomic,strong) UITableView *m_tableView;
 @property(nonatomic) BOOL isSearching;
@@ -117,6 +124,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic,weak) UITableView *table;
 @property(nonatomic,weak) Host *controller;
 @property(nonatomic,strong) NSMutableDictionary *proxies,*anchors;
+@property(nonatomic,copy) NSDictionary *presentationViewport;
 @property(nonatomic,strong) NSMutableArray *completions,*nativeActions;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
 @property(nonatomic,strong) id nativeHeader,projection,identityDisplayPaths;
@@ -134,6 +142,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 + (instancetype)adapterForController:(id)controller;
 + (instancetype)adapterForTable:(id)table;
 + (void)setPresentationSuspended:(BOOL)value forController:(id)controller;
++ (void)finishPresentationReturnForController:(id)controller;
 - (void)refresh;
 - (void)requestRefresh;
 - (void)finishSuspendedBatches;
@@ -265,6 +274,16 @@ int main(void) { @autoreleasepool {
     // A cancelled push gives appearance callbacks back to the list.
     [host viewWillAppear:YES]; [host viewDidAppear:YES]; RunFor(.02);
     Check(!a.presentationSuspended && !a.dirty,@"cancelled departure resumes on appearance callbacks");
+
+    a=List(&host); a.chromeVisible=YES;
+    LifecycleTable *returnTable=(LifecycleTable *)a.table;
+    returnTable.contentOffset=CGPointMake(0,400); returnTable.adjustedContentInset=(UIEdgeInsets){100,0,0,0};
+    [host viewWillDisappear:YES];
+    Check([a.presentationViewport[@"height"] doubleValue]==500,@"real suspension captures the main list's effective scroll height");
+    returnTable.contentOffset=CGPointMake(0,900); [host viewDidDisappear:YES];
+    Check([a.presentationViewport[@"height"] doubleValue]==500,@"didDisappear preserves the earlier willDisappear height");
+    [host viewWillAppear:YES]; [host viewDidAppear:YES]; RunFor(.02);
+    Check(!a.presentationViewport && host.originalCalls==4,@"real didAppear Hook finishes and clears the presentation return record");
 
     // A visible sync burst retains the first viewport anchor, then publishes
     // one final snapshot. Native model mutation still runs for every event.

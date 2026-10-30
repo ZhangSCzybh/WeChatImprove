@@ -13,7 +13,7 @@ def method(text,marker):
    depth-=1
    if not depth: return text[start:end+1]
  raise AssertionError(marker)
-markers=['- (UIView *)nativeTableHeaderView','- (void)setNativeTableHeaderView:', '- (void)prepareForNativeSearch', '- (BOOL)keepsGroupHeaderDuringSearch', '- (void)publishHeader:', '- (void)layout {']
+markers=['- (UIView *)nativeTableHeaderView','- (void)setNativeTableHeaderView:', '- (void)prepareForNativeSearch', '- (BOOL)keepsGroupHeaderDuringSearch', '- (void)publishHeader:', '- (void)layout {', '- (NSNumber *)presentationScrollHeight', '- (void)restoreScrollHeight:', '- (void)restoreViewportFromTab:']
 out.write_text('\n'.join(method(source,m) for m in markers) + '\n' +
                method(source, '- (void)refresh {').replace('- (void)refresh {', '- (void)refreshProjection {', 1))
 markers=['- (void)onSearch {','- (void)setSearchBarActive:', '- (void)onFTSSearchEnd {','- (void)cancelSearch {']

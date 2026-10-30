@@ -73,7 +73,7 @@ int main(int argc,const char **argv){@autoreleasepool{
     Check(![store remove:snapshot[@"id"] error:NULL],@"ENOSPC blocks source deletion");
     Check(![store removeFile:[snapshot[@"id"] stringByAppendingPathExtension:@"wcbak"] error:NULL],@"ENOSPC also blocks filename deletion");
     Check(![store setMetadata:@{@"favorite":@YES} identifier:snapshot[@"id"] error:NULL],@"ENOSPC blocks metadata mutation");
-    Check(![store writeJournal:@{} error:NULL]&&![store archiveJournal:NULL]&&![store confirmActivation:@{} error:NULL]&&![store prune:NULL],@"all mutation entry points wait for migration");
+    Check(![store writeJournal:@{} error:NULL]&&![store archiveJournal:NULL]&&![store confirmActivation:@{} error:NULL],@"all mutation entry points wait for migration");
     fault=nil;Check([m migrate:&error],@"real retry succeeds after fault removed");
     Check([store snapshot:snapshot[@"id"] error:NULL]!=nil&&!Has(m.legacyRoot),@"retry now reads only destination");
 
@@ -90,7 +90,7 @@ int main(int argc,const char **argv){@autoreleasepool{
     CSBackupEngine *engine=[[CSBackupEngine alloc]initWithDefaults:@{@"standard":defaults,@"legacy":defaults,@"layout":defaults} domains:@{@"standard":suite,@"legacy":suite,@"layout":suite} store:[[CSBackupStore alloc]initWithRoot:m.legacyRoot] resources:resources];
     NSDictionary *(^context)(void)=^{return @{@"account":@"alice",@"epoch":@1,@"installationID":@"migration-test",@"pluginVersion":@"test"};};engine.context=context;
     NSString *key=@"com.wechat.tweak.navigation.separator.text";[defaults setObject:@"after" forKey:key];
-    NSDictionary *saved=[engine save:@"source" kind:@"manual" error:&error];Check(saved!=nil,@"recovery source saved");[defaults setObject:@"before" forKey:key];
+    NSDictionary *saved=[engine save:@"source" error:&error];Check(saved!=nil,@"recovery source saved");[defaults setObject:@"before" forKey:key];
     NSDictionary *preview=[engine preview:saved modules:[NSSet setWithObject:@"navigation"] accounts:[NSSet setWithObject:@"alice"] error:&error];
     Check([engine prepare:preview error:&error],error.description?:@"prepare old recovery");
     Put(Child(resources,@"CloseFriends/state-test.bin"),@"encrypted sentinel");

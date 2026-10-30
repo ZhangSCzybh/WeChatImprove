@@ -3,8 +3,6 @@
 #import "CSBackupCodec.h"
 #import "CSBackupAssets.h"
 #import "CSBackupRegistry.h"
-#import "CSBackupScheduler.h"
-#import "CSBackupMutation.h"
 #import "CSBackupBootstrap.h"
 #import "CSBackupAudit.h"
 #import "CSBackupRestoreDiagnostics.h"
@@ -15,34 +13,19 @@
 #import "CSUserInfoHelper.h"
 #import <UIKit/UIKit.h>
 #import <objc/message.h>
-static NSString *const UpgradeErrorKey=@"com.wechat.enhance.backup.upgrade_error";
 static NSString *const RestoreErrorKey=@"com.wechat.enhance.backup.last_restore_error";
-static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
 @interface CSBackupManager ()
 @property(nonatomic) CSBackupEngine *engine;
-@property(nonatomic) CSBackupScheduler *scheduler;
-@property(nonatomic) CSBackupChangeBatch *changes;
 @property(nonatomic) dispatch_queue_t queue;
-@property(nonatomic) dispatch_source_t timer;
 @property(nonatomic,copy) NSString *standardDomain;
 @property(nonatomic,copy) NSString *installationID;
-@property(nonatomic,copy) NSString *signature;
-@property(nonatomic,copy) NSDictionary *observedContext;
-@property(nonatomic) uint64_t observedResourceRevision;
-@property(nonatomic) BOOL hasObservation;
-@property(nonatomic) BOOL lastAutoEnabled;
-@property(nonatomic) BOOL forceReconcile;
-@property(nonatomic) BOOL forceAutomaticBackup;
-@property(nonatomic) BOOL waitingForRecovery;
-@property(nonatomic) BOOL upgradeRequested;
 @property(atomic,copy,readwrite) NSString *status;
-@property(atomic) BOOL active;
 @end
 @implementation CSBackupManager
 + (instancetype)sharedManager {static CSBackupManager *manager;static dispatch_once_t once;dispatch_once(&once,^{manager=[self new];});return manager;}
 - (instancetype)init {
     if((self=[super init])){
-        _queue=dispatch_queue_create("com.wechat.improve.backup",DISPATCH_QUEUE_SERIAL);_scheduler=[CSBackupScheduler new];_changes=[CSBackupChangeBatch new];_status=@"本机备份尚未检查";
+        _queue=dispatch_queue_create("com.wechat.improve.backup",DISPATCH_QUEUE_SERIAL);_status=@"本机备份尚未检查";
         NSURL *library=[NSFileManager.defaultManager URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask].firstObject;
         CSBackupStore *store=[[CSBackupStore alloc]initWithMigration:CSPluginStorageMigration(@"BackupV2")];
         CSBackupAudit *audit=CSBackupDefaultAudit();
@@ -55,18 +38,6 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
         NSString *identity=[NSUserDefaults.standardUserDefaults stringForKey:@"com.wechat.enhance.backup.installationID"];
         if(!identity.length){identity=NSUUID.UUID.UUIDString;[NSUserDefaults.standardUserDefaults setObject:identity forKey:@"com.wechat.enhance.backup.installationID"];[NSUserDefaults.standardUserDefaults synchronize];}_installationID=identity;
         __weak typeof(self) weakSelf=self;_engine.context=^{return [weakSelf currentContext];};
-        NSNotificationCenter *center=NSNotificationCenter.defaultCenter;
-        [center addObserver:self selector:@selector(foreground:) name:UIApplicationDidBecomeActiveNotification object:nil];
-        [center addObserver:self selector:@selector(background:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-        [center addObserver:self selector:@selector(changed:) name:NSUserDefaultsDidChangeNotification object:nil];
-        [center addObserver:self selector:@selector(resourceChanged:) name:CSScheduledTaskConfigurationDidChange object:nil];
-        [center addObserver:self selector:@selector(resourceChanged:) name:CSAIReplyConfigurationDidChange object:nil];
-        for(NSString *name in @[@"CSBackupAccountChanged",@"CSBackupResourcesChanged",@"CSNavigationTitleSettingsChanged",@"CSTouchTrailImageDidChange",@"com.wechat.enhance.tabbar_style.changed",@"CSContactSeparatorSettingsChanged"])[center addObserver:self selector:@selector(resourceChanged:) name:name object:nil];
-        _timer=dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,0,0,_queue);
-        dispatch_source_set_timer(_timer,DISPATCH_TIME_FOREVER,DISPATCH_TIME_FOREVER,0);
-        dispatch_source_set_event_handler(_timer,^{[weakSelf processScheduledWork];});dispatch_resume(_timer);
-        CSBackupWhenReady(^{[weakSelf resumeScheduledWork];});
-        dispatch_async(dispatch_get_main_queue(),^{if(UIApplication.sharedApplication.applicationState==UIApplicationStateActive)[weakSelf foreground:nil];});
     }return self;
 }
 - (NSString *)lastRestoreFailure {return [NSUserDefaults.standardUserDefaults stringForKey:RestoreErrorKey]?:@"";}
@@ -128,15 +99,8 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
         }
         NSError *journalError=nil;NSDictionary *journal=[self.engine.store journal:&journalError];
         if(journalError){if(error)*error=journalError;}else if(journal)self.status=[NSString stringWithFormat:@"恢复状态：%@。本机备份占用 %@",[self stateTitle:journal[@"state"]],[NSByteCountFormatter stringFromByteCount:bytes countStyle:NSByteCountFormatterCountStyleFile]];
-        else if(!(error&&*error))self.status=[NSString stringWithFormat:@"%lu 份可用备份 · %lu 份无法读取 · 占用 %@%@",(unsigned long)(records.count-unavailable),(unsigned long)unavailable,[NSByteCountFormatter stringFromByteCount:bytes countStyle:NSByteCountFormatterCountStyleFile],self.scheduler.dirty?@" · 自动备份等待中":@""];
-        if(protectionIssues)self.status=[self.status stringByAppendingFormat:@"\n%lu 份备份保护状态需确认，已保留且不自动清理。",(unsigned long)protectionIssues];
-        if(self.engine.store.cleanupStatus.length)self.status=[self.status stringByAppendingFormat:@"\n%@",self.engine.store.cleanupStatus];
-        NSDate *last=[NSUserDefaults.standardUserDefaults objectForKey:@"com.wechat.enhance.backup.last_date"];
-        if([last isKindOfClass:NSDate.class]){NSDateFormatter *date=[NSDateFormatter new];date.dateStyle=NSDateFormatterShortStyle;date.timeStyle=NSDateFormatterShortStyle;self.status=[self.status stringByAppendingFormat:@"\n最近自动备份：%@",[date stringFromDate:last]];}
-        NSString *failure=[NSUserDefaults.standardUserDefaults stringForKey:@"com.wechat.enhance.backup.last_error"];
-        if(failure.length)self.status=[self.status stringByAppendingFormat:@"\n最近自动备份未完成：%@",failure];
-        NSString *upgradeFailure=[NSUserDefaults.standardUserDefaults stringForKey:UpgradeErrorKey];
-        if(upgradeFailure.length)self.status=[self.status stringByAppendingFormat:@"\n版本更新备份未完成：%@",upgradeFailure];
+        else if(!(error&&*error))self.status=[NSString stringWithFormat:@"%lu 份可用备份 · %lu 份无法读取 · 占用 %@",(unsigned long)(records.count-unavailable),(unsigned long)unavailable,[NSByteCountFormatter stringFromByteCount:bytes countStyle:NSByteCountFormatterCountStyleFile]];
+        if(protectionIssues)self.status=[self.status stringByAppendingFormat:@"\n%lu 份备份的名称与收藏信息需确认，原文件已保留。",(unsigned long)protectionIssues];
         if(self.lastRestoreFailure.length)self.status=[self.status stringByAppendingFormat:@"\n上次恢复未完成：%@",self.lastRestoreFailure];
         return records;
     } completion:completion];
@@ -147,7 +111,7 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
         [self.engine.store recordRestoreStage:@"selected" status:@"read" error:nil details:@{@"snapshotID":record[@"id"]?:@"",@"filename":record[@"filename"]?:@""}];
         return [self.engine.store snapshotForRestore:record[@"id"] error:error];} completion:completion];
 }
-- (void)create:(NSString *)name completion:(CSBackupCompletion)completion {[self perform:^id(NSError **error){NSDictionary *s=[self.engine save:name kind:@"manual" error:error];if(s)self.status=@"备份已完整保存在本机";return s;} completion:completion];}
+- (void)create:(NSString *)name completion:(CSBackupCompletion)completion {[self perform:^id(NSError **error){NSDictionary *s=[self.engine save:name error:error];if(s)self.status=@"备份已完整保存在本机";return s;} completion:completion];}
 - (void)importURL:(NSURL *)url completion:(CSBackupCompletion)completion {
     [self performRestore:@"import" work:^id(NSError **error){BOOL access=[url startAccessingSecurityScopedResource];__block NSDictionary *snapshot=nil;__block NSError *readError=nil;
         [self.engine.store recordRestoreStage:@"import" status:@"read" error:nil details:@{@"path":url.path?:@"",@"filename":url.lastPathComponent?:@""}];
@@ -202,127 +166,7 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
 - (void)checkRepairAccess:(CSBackupCompletion)completion {
     [self perform:^id(NSError **error){NSDictionary *journal=[self.engine.store journal:error];if(journal){if(error)*error=CSBackupFailure(@"请先取消尚未执行的恢复，或完成中断事务的回滚，再修复当前设置");return nil;}return (error&&*error)?nil:@YES;} completion:completion];
 }
-- (void)cancelPending:(CSBackupCompletion)completion {[self performRestore:@"cancel" work:^id(NSError **error){return [self.engine cancelPending:error]?@YES:nil;} completion:^(id result,NSError *error){if(!error){CSBackupResumeAfterRecovery();[self resumeScheduledWork];}completion(result,error);}];}
-- (BOOL)isAutoBackupEnabled {return [NSUserDefaults.standardUserDefaults boolForKey:AutoKey];}
-- (void)enableAutoBackup:(BOOL)enabled {[NSUserDefaults.standardUserDefaults setBool:enabled forKey:AutoKey];[NSUserDefaults.standardUserDefaults synchronize];[self changed:nil];}
-- (NSTimeInterval)uptime {return NSProcessInfo.processInfo.systemUptime;}
-- (void)foreground:(NSNotification *)notification {
-    (void)notification;
-    self.active=YES;
-    [self noteChange:CSBackupChangePreferences|CSBackupChangeContext];
-    dispatch_async(self.queue,^{self.forceReconcile=YES;self.waitingForRecovery=NO;self.upgradeRequested=YES;[self processScheduledWork];});
-}
-- (void)background:(NSNotification *)notification {(void)notification;self.active=NO;dispatch_async(self.queue,^{[self armTimerForDeadline:DBL_MAX];});}
-- (void)resumeScheduledWork {
-    dispatch_async(self.queue,^{self.waitingForRecovery=NO;self.upgradeRequested=YES;self.forceReconcile=YES;[self processScheduledWork];});
-}
-- (NSString *)preferenceSignature {
-    NSMutableDictionary *values=[NSMutableDictionary dictionary];NSMutableDictionary *domains=[NSMutableDictionary dictionary];
-    for(NSDictionary *entry in CSBackupRegistry.entries){NSString *alias=entry[@"domain"],*domain=[alias isEqual:@"standard"]?self.standardDomain:([alias isEqual:@"legacy"]?@"com.cyansmoke.wechattweak":@"com.wechat.enhance");
-        if(!domains[alias])domains[alias]=[NSUserDefaults.standardUserDefaults persistentDomainForName:domain]?:@{};
-        id value=domains[alias][entry[@"key"]];if(value)values[[NSString stringWithFormat:@"%@/%@",alias,entry[@"key"]]]=value;}
-    return [CSBackupCodec digest:values];
-}
-- (void)noteChange:(CSBackupChangeKind)kind {
-    // Notification callbacks never enumerate defaults, read images, or wait for the I/O queue.
-    if(![self.changes note:kind at:[self uptime]])return;
-    dispatch_async(self.queue,^{[self.changes dequeued];[self processScheduledWork];});
-}
-- (void)changed:(NSNotification *)notification {(void)notification;[self noteChange:CSBackupChangePreferences];}
-- (void)resourceChanged:(NSNotification *)notification {
-    CSBackupChangeKind kind=[notification.name isEqual:@"CSBackupAccountChanged"]?CSBackupChangeContext|CSBackupChangePreferences:CSBackupChangeResources;
-    [self noteChange:kind];
-}
-- (void)armTimerForDeadline:(NSTimeInterval)deadline {
-    dispatch_time_t when=deadline==DBL_MAX?DISPATCH_TIME_FOREVER:dispatch_time(DISPATCH_TIME_NOW,(int64_t)(MAX(0,deadline-[self uptime])*NSEC_PER_SEC));
-    dispatch_source_set_timer(self.timer,when,DISPATCH_TIME_FOREVER,50*NSEC_PER_MSEC);
-}
-- (void)reconcileChangesAt:(NSTimeInterval)now {
-    NSDictionary *batch=[self.changes take];
-    CSBackupChangeKind kind=[batch[@"kind"] unsignedIntegerValue];
-    BOOL full=self.forceReconcile||!self.hasObservation;
-    self.forceReconcile=NO;
-    uint64_t revision=CSBackupResourceRevision();
-    NSDictionary *context=[self currentContext];
-    NSString *signature=(full||(kind&CSBackupChangePreferences))?[self preferenceSignature]:self.signature;
-    BOOL changed=self.forceAutomaticBackup||!self.hasObservation||![signature isEqual:self.signature]||
-        revision!=self.observedResourceRevision||![context isEqual:self.observedContext]||(kind&CSBackupChangeResources);
-    self.forceAutomaticBackup=NO;
-    self.signature=signature;self.observedContext=context;self.observedResourceRevision=revision;self.hasObservation=YES;
-    if(changed){
-        NSTimeInterval first=batch?[batch[@"first"] doubleValue]:now,last=batch?[batch[@"last"] doubleValue]:now;
-        if(!self.scheduler.dirty)[self.scheduler changedAt:first];
-        [self.scheduler changedAt:last];
-    }
-    // take consumed only its generation. An event arriving during digest/context reads stays pending.
-}
-- (void)processScheduledWork {
-    BOOL enabled=self.isAutoBackupEnabled;
-    if(enabled&&!self.lastAutoEnabled){self.forceReconcile=YES;self.forceAutomaticBackup=YES;}
-    self.lastAutoEnabled=enabled;
-    if(!CSBackupIsReady()||CSBackupResourceWriteInProgress()||CSBackupAccountIsSuspended()){
-        // Readiness, the last writer, and the native account boundary explicitly wake us.
-        [self armTimerForDeadline:DBL_MAX];return;
-    }
-    // Optional version protection stays independent of the automatic switch and app activity.
-    if(self.upgradeRequested){self.upgradeRequested=NO;[self attemptUpgradeBackup:NULL];if(CSBackupResourceWriteInProgress())self.upgradeRequested=YES;}
-    if(!self.isAutoBackupEnabled||!self.active||self.waitingForRecovery){[self armTimerForDeadline:DBL_MAX];return;}
-    NSTimeInterval now=[self uptime];
-    if(self.forceReconcile||[self.changes deadline]<=now)[self reconcileChangesAt:now];
-    [self tick];
-    NSTimeInterval deadline=MIN([self.changes deadline],self.scheduler.deadline);
-    if(!self.isAutoBackupEnabled||!self.active||self.waitingForRecovery||CSBackupResourceWriteInProgress()||CSBackupAccountIsSuspended())deadline=DBL_MAX;
-    [self armTimerForDeadline:deadline];
-}
-- (void)tick {
-    if(!CSBackupIsReady()||CSBackupResourceWriteInProgress()||CSBackupAccountIsSuspended()||![self.scheduler shouldRunAt:[self uptime] enabled:self.isAutoBackupEnabled active:self.active])return;
-    NSError *error=nil;NSDictionary *journal=[self.engine.store journal:&error];
-    if(journal&&!error){
-        if(([journal[@"state"] isEqual:@"committed"]&&[self.engine.store activationConfirmed:journal])||[journal[@"state"] isEqual:@"rolledBack"]){if(![self.engine.store archiveJournal:&error])error=error?:CSBackupFailure(@"恢复记录归档未完成");}
-        else {self.waitingForRecovery=YES;return;}
-    }
-    uint64_t generation=self.changes.generation,revision=CSBackupResourceRevision();
-    NSDictionary *context=[self currentContext];
-    NSDictionary *saved=error?nil:[self.engine save:@"自动备份" kind:@"automatic" error:&error];
-    [self.scheduler completed:saved!=nil at:[self uptime]];
-    // Never clear a later notification/resource/account generation with this save's completion.
-    // Reconciliation decides whether later defaults notices changed any registered value.
-    uint64_t afterRevision=CSBackupResourceRevision();
-    NSDictionary *afterContext=saved?[self currentContext]:context;
-    if(saved&&(generation!=self.changes.generation||revision!=afterRevision||![context isEqual:afterContext])){
-        if(revision!=afterRevision)[self noteChange:CSBackupChangeResources];
-        if(![context isEqual:afterContext])[self noteChange:CSBackupChangeContext|CSBackupChangePreferences];
-    }
-    if(saved){[NSUserDefaults.standardUserDefaults removeObjectForKey:@"com.wechat.enhance.backup.last_error"];[NSUserDefaults.standardUserDefaults setObject:saved[@"createdAt"] forKey:@"com.wechat.enhance.backup.last_date"];self.status=@"自动备份已保存，未变化的内容会自动去重";}else {self.status=error.localizedDescription?:@"自动备份等待重试";[NSUserDefaults.standardUserDefaults setObject:self.status forKey:@"com.wechat.enhance.backup.last_error"];}
-}
-- (BOOL)attemptUpgradeBackup:(NSError **)error {
-    // This method runs only on the serial I/O queue, after normal feature initialization.
-    // Failure is local to backup settings and never participates in the startup gate.
-    if(!CSBackupIsReady())return YES;
-    NSUserDefaults *defaults=NSUserDefaults.standardUserDefaults;
-    if([[defaults stringForKey:@"com.wechat.enhance.backup.protectedVersion"] isEqual:kPluginVersionString])return YES;
-    NSError *failure=nil;NSDictionary *journal=[self.engine.store journal:&failure];
-    if(journal){
-        BOOL settled=[journal[@"state"] isEqual:@"rolledBack"]||([journal[@"state"] isEqual:@"committed"]&&[self.engine.store activationConfirmed:journal]);
-        if(!settled)return YES; // Never compete with a prepared or unfinished transaction.
-        if(![self.engine.store archiveJournal:&failure])failure=failure?:CSBackupFailure(@"恢复记录归档未完成");
-    }
-    NSDictionary *saved=failure?nil:[self.engine save:[@"版本更新备份 · " stringByAppendingString:kPluginVersionString] kind:@"upgrade" error:&failure];
-    if(saved){
-        [defaults setObject:kPluginVersionString forKey:@"com.wechat.enhance.backup.protectedVersion"];
-        [defaults removeObjectForKey:UpgradeErrorKey];
-        if(![defaults synchronize]){
-            [defaults removeObjectForKey:@"com.wechat.enhance.backup.protectedVersion"];
-            failure=CSBackupFailure(@"版本更新备份标记未保存");
-        }
-    }
-    if(!saved||failure){
-        NSString *message=failure.localizedDescription?:@"版本更新备份未完成";
-        [defaults setObject:message forKey:UpgradeErrorKey];self.status=message;
-        if(error)*error=failure?:CSBackupFailure(message);return NO;
-    }
-    return YES;
-}
+- (void)cancelPending:(CSBackupCompletion)completion {[self performRestore:@"cancel" work:^id(NSError **error){return [self.engine cancelPending:error]?@YES:nil;} completion:^(id result,NSError *error){if(!error)CSBackupResumeAfterRecovery();completion(result,error);}];}
 - (void)retryPendingWork:(CSBackupCompletion)completion {
     if(!CSBackupIsReady()){
         CSBackupRetryStartup(^(NSError *error){if(error)error=[self restoreError:error stage:@"startup-retry"];completion(error?nil:@YES,error);});return;
@@ -334,8 +178,8 @@ static NSString *const AutoKey=@"com.wechat.enhance.backup.auto_enabled";
             if(!settled){if(error)*error=CSBackupRestoreError(CSBackupFailure(@"已有待执行计划；请完全退出微信进程后重新打开，切换前后台不会应用。也可先取消计划。"),@"restart-required",CSBackupRestoreRestart,self.engine.store.root.path);return nil;}
             if(![self.engine.store archiveJournal:error])return nil;
         }
-        return [self attemptUpgradeBackup:error]?@YES:nil;
-    } completion:^(id result,NSError *error){if(result&&!error)[self resumeScheduledWork];completion(result,error);}];
+        return @YES;
+    } completion:completion];
 }
 - (void)resolveStartup:(CSBackupCompletion)completion {
     [self perform:^id(NSError **error){

@@ -10,9 +10,7 @@ static NSError *CSBackupRestartRequired(void) {
     return [NSError errorWithDomain:@"CSBackupStartup" code:1 userInfo:@{NSLocalizedDescriptionKey:@"插件功能已启动，请重新打开微信后应用待恢复配置。"}];
 }
 
-BOOL CSBackupStartupNeedsResolution(NSURL *journalURL, NSString *protectedVersion, NSString *currentVersion) {
-    // A version backup is optional work, never a prerequisite for the plugin framework.
-    (void)protectedVersion;(void)currentVersion;
+BOOL CSBackupStartupNeedsResolution(NSURL *journalURL) {
     // lstat detects dangling symlinks too; never interpret an unreadable journal as absent.
     struct stat metadata;
     if (lstat(journalURL.fileSystemRepresentation, &metadata) == 0) return YES;
@@ -100,7 +98,7 @@ static CSBackupStartupGate *CSBackupSharedGate(void) {
         [migration migrate:NULL]; // Raw filesystem relocation precedes journal detection.
         BOOL needsResolution=NO;
         for(NSURL *root in @[migration.destinationRoot,migration.legacyRoot])
-            needsResolution |= CSBackupStartupNeedsResolution([root URLByAppendingPathComponent:@"transaction.plist"],nil,kPluginVersionString);
+            needsResolution |= CSBackupStartupNeedsResolution([root URLByAppendingPathComponent:@"transaction.plist"]);
         gate = [[CSBackupStartupGate alloc] initWithNeedsResolution:needsResolution
             resolver:^(CSBackupStartupCompletion completion) {
                 [CSBackupManager.sharedManager resolveStartup:^(id result, NSError *error) {

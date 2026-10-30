@@ -23,8 +23,7 @@ void CSBackupAccountWillChangeAtNativeBoundary(void);
 void CSBackupAccountDidChangeAtNativeBoundary(void);
 
 /// Metadata-only startup probe. Only a journal or inaccessible journal path holds startup.
-/// Version changes never block the original plugin framework.
-BOOL CSBackupStartupNeedsResolution(NSURL *journalURL, NSString * _Nullable protectedVersion, NSString *currentVersion);
+BOOL CSBackupStartupNeedsResolution(NSURL *journalURL);
 #ifdef __cplusplus
 }
 #endif

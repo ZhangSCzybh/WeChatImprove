@@ -41,15 +41,26 @@ int main(int argc,const char **argv){@autoreleasepool{
  NSData *image=[[NSData alloc]initWithBase64EncodedString:@"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWZcAAAAASUVORK5CYII=" options:0];
  [NSFileManager.defaultManager createDirectoryAtURL:engine.resourceRoot withIntermediateDirectories:YES attributes:nil error:NULL];
  [image writeToURL:[engine.resourceRoot URLByAppendingPathComponent:@"separator_image.png"] atomically:YES];
- [standard setObject:@"wanted" forKey:Key];NSDictionary *snapshot=[engine save:@"original" kind:@"manual" error:&error];Check(snapshot!=nil,error.description?:@"save");
+ [standard setObject:@"wanted" forKey:Key];NSDictionary *snapshot=[engine save:@"original" error:&error];Check(snapshot!=nil,error.description?:@"save");
  for(NSString *point in @[@"applying",@"resource",@"field",@"synchronized",@"committed"]){
   [engine.store archiveJournal:NULL];[standard setObject:@"before" forKey:Key];[standard synchronize];
   NSDictionary *preview=[engine preview:snapshot modules:navigation accounts:alice error:&error];Check([engine prepare:preview error:&error],error.description?:@"prepare crash fixture");
+  Check([engine.store journal:NULL][@"protectionID"]==nil&&[engine.store records:NULL].count==1,@"prepare publishes no new backup across every interruption point");
   Check(Run(binary,@[@"--apply",path,suite,point,@"1"])==77,[@"crash at " stringByAppendingString:point]);
   Check(Run(binary,@[@"--apply",path,suite])==0,[@"recover after " stringByAppendingString:point]);
   NSString *want=[point isEqual:@"committed"]?@"wanted":@"before";
   Check(Run(binary,@[@"--verify",path,suite,want])==0,[@"cross-process persisted result for " stringByAppendingString:point]);
  }
+ // A transaction prepared by an older version may reference a protection file
+ // and include the now-inert auto flag in its full-state revision.
+ [engine.store archiveJournal:NULL];[standard setBool:YES forKey:@"com.wechat.enhance.backup.auto_enabled"];[standard setObject:@"before" forKey:Key];[standard synchronize];
+ NSDictionary *legacyProtection=[engine capture:@"historical protection fixture" kind:@"protection" error:&error];Check([engine.store publish:legacyProtection error:&error],@"publish historical protection fixture");
+ NSDictionary *legacyPreview=[engine preview:snapshot modules:navigation accounts:alice error:&error];Check([engine prepare:legacyPreview error:&error],@"prepare old transaction compatibility fixture");
+ NSMutableDictionary *legacyJournal=[[engine.store journal:NULL] mutableCopy];legacyJournal[@"protectionID"]=legacyProtection[@"id"];Check([engine.store writeJournal:legacyJournal error:&error],@"persist historical protectionID journal shape");
+ Check(![engine.store remove:legacyProtection[@"id"] error:&error],@"old protection reference remains guarded during pending recovery");
+ Check(Run(binary,@[@"--apply",path,suite,@"synchronized",@"1"])==77&&Run(binary,@[@"--apply",path,suite])==0,@"legacy transaction with inert auto flag applies and recovers after interruption");
+ Check(Run(binary,@[@"--verify",path,suite,@"before"])==0&&[standard boolForKey:@"com.wechat.enhance.backup.auto_enabled"],@"legacy rollback preserves before-state and inert compatibility field");
+ Check([engine.store archiveJournal:&error]&&[engine.store remove:legacyProtection[@"id"] error:&error],@"historical protection becomes manually deletable after recovery is released");
  // Interrupt recovery itself, then recover again. The before-image must remain immutable.
  [engine.store archiveJournal:NULL];[standard setObject:@"before" forKey:Key];[standard synchronize];NSDictionary *preview=[engine preview:snapshot modules:navigation accounts:alice error:&error];Check([engine prepare:preview error:&error],@"prepare repeated interruption");
  Check(Run(binary,@[@"--apply",path,suite,@"synchronized",@"1"])==77,@"interrupt application after persistence");Check(Run(binary,@[@"--apply",path,suite,@"field",@"1"])==77,@"interrupt rollback");Check(Run(binary,@[@"--apply",path,suite])==0,@"recover interrupted rollback");Check(Run(binary,@[@"--verify",path,suite,@"before"])==0,@"rollback retained original state across two crashes");
@@ -66,22 +77,21 @@ int main(int argc,const char **argv){@autoreleasepool{
  preview=[engine preview:snapshot modules:navigation accounts:alice error:&error];Check([engine prepare:preview error:&error],@"prepare epoch fixture");__block BOOL switched=NO;engine.checkpoint=^(NSString *point){if([point isEqual:@"synchronized"]&&!switched){switched=YES;epoch++;}};
  Check(![engine applyPending:&error],@"epoch change at synchronization is rejected");Check([[standard objectForKey:Key]isEqual:@"before"],@"epoch change rolls back");engine.checkpoint=nil;[engine.store archiveJournal:NULL];
  // Restore alice's prior profile; preserve bob's edits and new carol profile.
- [standard setObject:@{@"alice":Profile(@"old alice"),@"bob":Profile(@"old bob")} forKey:Profiles];NSDictionary *groups=[engine save:@"groups" kind:@"manual" error:&error];Check(groups!=nil,@"capture profiles");
+ [standard setObject:@{@"alice":Profile(@"old alice"),@"bob":Profile(@"old bob")} forKey:Profiles];NSDictionary *groups=[engine save:@"groups" error:&error];Check(groups!=nil,@"capture profiles");
  [standard setObject:@{@"alice":Profile(@"new alice"),@"bob":Profile(@"new bob"),@"carol":Profile(@"new carol")} forKey:Profiles];
  preview=[engine preview:groups modules:[NSSet setWithObject:@"groups"] accounts:alice error:&error];Check([engine prepare:preview error:&error]&&[engine applyPending:&error],error.description?:@"selected account restore");NSDictionary *profiles=[standard dictionaryForKey:Profiles];Check([profiles[@"alice"] isEqual:Profile(@"old alice")],@"selected account restored");Check([profiles[@"bob"] isEqual:Profile(@"new bob")]&&[profiles[@"carol"] isEqual:Profile(@"new carol")],@"unselected and new accounts preserved");[engine finishStartup:NULL];[engine.store archiveJournal:NULL];
  // An old snapshot with absent profile storage does not delete an account created later.
  NSMutableDictionary *empty=[snapshot mutableCopy];NSMutableArray *fields=[NSMutableArray array];for(NSDictionary *f in snapshot[@"fields"])if([f[@"key"]isEqual:Profiles])[fields addObject:@{@"domain":@"standard",@"key":Profiles,@"present":@NO}];else [fields addObject:f];empty[@"fields"]=fields;
  preview=[engine preview:empty modules:[NSSet setWithObject:@"groups"] accounts:[NSSet setWithObject:@"carol"] error:&error];Check([engine prepare:preview error:&error]&&[engine applyPending:&error],@"restore old absent account scope");Check([[[standard dictionaryForKey:Profiles] objectForKey:@"carol"]isEqual:Profile(@"new carol")],@"new account is outside old coverage");[engine finishStartup:NULL];[engine.store archiveJournal:NULL];
  // A stale/corrupt historical file does not convert successful publication into failure.
- NSURL *bad=[engine.store.root URLByAppendingPathComponent:[NSUUID.UUID.UUIDString stringByAppendingPathExtension:@"wcbak"]];[[@"broken" dataUsingEncoding:NSUTF8StringEncoding] writeToURL:bad atomically:YES];error=nil;Check([engine save:@"still works" kind:@"manual" error:&error]!=nil,@"corrupt old file does not undo new publication");
+ NSURL *bad=[engine.store.root URLByAppendingPathComponent:[NSUUID.UUID.UUIDString stringByAppendingPathExtension:@"wcbak"]];[[@"broken" dataUsingEncoding:NSUTF8StringEncoding] writeToURL:bad atomically:YES];error=nil;Check([engine save:@"still works" error:&error]!=nil,@"corrupt old file does not undo new publication");
  // No account must never produce an unusable prepared plan.
  engine.context=^{return @{@"account":@"",@"epoch":@1,@"installationID":@"test-install",@"pluginVersion":@"test"};};preview=[engine preview:snapshot modules:navigation accounts:[NSSet set] error:&error];Check(preview!=nil&&![engine prepare:preview error:&error],@"unknown account cannot stage a permanently blocked plan");
  // File+path writes explicitly hold snapshot publication out of the mutation window.
  {CSBackupResourceMutationScope();Check(![engine capture:@"racing" kind:@"manual" error:&error],@"active resource writer blocks mixed capture");}
- // No-change dedupe ignores selection churn and retains the first automatic ID.
- engine.context=^{return @{@"account":@"alice",@"epoch":@1,@"installationID":@"test-install",@"pluginVersion":@"test"};};NSDictionary *automatic=[engine save:@"auto" kind:@"automatic" error:&error];[standard setObject:@{@"version":@1,@"tabID":@"work"} forKey:@"com.wechat.enhance.chat_group.selection.alice"];NSDictionary *second=[engine save:@"auto again" kind:@"automatic" error:&error];Check([automatic[@"id"] isEqual:second[@"id"]],@"selection-only changes do not duplicate backups");
- // Account ownership remains part of automatic deduplication even with equal settings.
- engine.context=^{return @{@"account":@"bob",@"epoch":@2,@"installationID":@"test-install",@"pluginVersion":@"test"};};NSDictionary *bobAuto=[engine save:@"bob auto" kind:@"automatic" error:&error];Check(![bobAuto[@"id"] isEqual:second[@"id"]]&&[bobAuto[@"source"][@"account"] isEqual:@"bob"],@"equal content in another account keeps its original ownership");
+ // Each explicit request creates an independent manual snapshot with current ownership.
+ engine.context=^{return @{@"account":@"alice",@"epoch":@1,@"installationID":@"test-install",@"pluginVersion":@"test"};};NSDictionary *first=[engine save:@"manual first" error:&error];[standard setObject:@{@"version":@1,@"tabID":@"work"} forKey:@"com.wechat.enhance.chat_group.selection.alice"];NSDictionary *second=[engine save:@"manual again" error:&error];Check(first&&second&&![first[@"id"] isEqual:second[@"id"]]&&[second[@"kind"] isEqual:@"manual"],@"manual requests retain independent snapshots even with selection-only edits");
+ engine.context=^{return @{@"account":@"bob",@"epoch":@2,@"installationID":@"test-install",@"pluginVersion":@"test"};};NSDictionary *bob=[engine save:@"bob manual" error:&error];Check(bob&&![bob[@"id"] isEqual:second[@"id"]]&&[bob[@"source"][@"account"] isEqual:@"bob"],@"manual snapshots preserve the requesting account ownership");
  // A dangling recovery journal is an error, never absence.
  NSURL *journalURL=[engine.store.root URLByAppendingPathComponent:@"transaction.plist"];[NSFileManager.defaultManager removeItemAtURL:journalURL error:NULL];[NSFileManager.defaultManager createSymbolicLinkAtURL:journalURL withDestinationURL:[engine.store.root URLByAppendingPathComponent:@"missing"] error:NULL];error=nil;Check(![engine applyPending:&error]&&error!=nil,@"dangling journal cannot bypass startup recovery");[NSFileManager.defaultManager removeItemAtURL:journalURL error:NULL];
  // Account changes during activation preparation roll back before handoff.

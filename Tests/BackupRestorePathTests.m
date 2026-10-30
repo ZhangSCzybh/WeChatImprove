@@ -52,7 +52,7 @@ int main(int argc,const char **argv){@autoreleasepool{
         CSBackupAudit *audit=[[CSBackupAudit alloc]initWithRoot:store.root auditURL:auditURL];
         void (^handler)(NSString *,NSDictionary *)=^(NSString *event,NSDictionary *details){[audit storeEvent:event details:details];};store.eventHandler=handler;
         CSBackupEngine *engine=Engine(store,resources,suite,defaults);
-        NSDictionary *saved=[engine save:@"with assets" kind:@"manual" error:&error];Check(saved!=nil&&[saved[@"assets"] count]>0,error.description?:@"publish snapshot with embedded PNG");
+        NSDictionary *saved=[engine save:@"with assets" error:&error];Check(saved!=nil&&[saved[@"assets"] count]>0,error.description?:@"publish snapshot with embedded PNG");
         if(merged.boolValue){[fm createDirectoryAtURL:migration.legacyRoot withIntermediateDirectories:YES attributes:nil error:NULL];
             NSString *filename=[saved[@"id"] stringByAppendingPathExtension:@"wcbak"];
             Check([fm copyItemAtURL:[migration.destinationRoot URLByAppendingPathComponent:filename] toURL:[migration.legacyRoot URLByAppendingPathComponent:filename] error:&error],@"same snapshot in both roots");

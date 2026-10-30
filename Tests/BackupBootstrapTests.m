@@ -29,19 +29,17 @@ static void TestMetadataProbe(void) {
     NSURL *root = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString] isDirectory:YES];
     Check([NSFileManager.defaultManager createDirectoryAtURL:root withIntermediateDirectories:YES attributes:nil error:NULL], @"Create isolated test root");
     NSURL *journal = [root URLByAppendingPathComponent:@"transaction.plist"];
-    Check(!CSBackupStartupNeedsResolution(journal, @"v1", @"v1"), @"Ordinary launch requires no resolution");
-    Check(!CSBackupStartupNeedsResolution(journal, nil, @"v1"), @"First startup keeps the original plugin available");
-    Check(!CSBackupStartupNeedsResolution(journal, @"v0", @"v1"), @"Version backup cannot block plugin initialization");
+    Check(!CSBackupStartupNeedsResolution(journal), @"Ordinary launch requires no resolution");
     __block NSUInteger initialized=0,resolutions=0;
-    CSBackupStartupGate *upgraded=[[CSBackupStartupGate alloc]initWithNeedsResolution:CSBackupStartupNeedsResolution(journal,@"v0",@"v1") resolver:^(CSBackupStartupCompletion done){resolutions++;done(Failure());}];
-    for(NSUInteger i=0;i<33;i++)[upgraded whenReady:^{initialized++;}];
-    Check(upgraded.isReady&&initialized==33&&resolutions==0,@"All original feature consumers initialize even when a version backup would fail");
+    CSBackupStartupGate *ordinary=[[CSBackupStartupGate alloc]initWithNeedsResolution:CSBackupStartupNeedsResolution(journal) resolver:^(CSBackupStartupCompletion done){resolutions++;done(Failure());}];
+    for(NSUInteger i=0;i<33;i++)[ordinary whenReady:^{initialized++;}];
+    Check(ordinary.isReady&&initialized==33&&resolutions==0,@"All feature consumers initialize without invoking recovery when no journal exists");
     Check([[@"not a valid journal" dataUsingEncoding:NSUTF8StringEncoding] writeToURL:journal atomically:YES], @"Create corrupt journal");
-    Check(CSBackupStartupNeedsResolution(journal, @"v1", @"v1"), @"Any journal is held without parsing on main");
-    Check(CSBackupStartupNeedsResolution([journal URLByAppendingPathComponent:@"child"], @"v1", @"v1"), @"Invalid parent path fails closed");
+    Check(CSBackupStartupNeedsResolution(journal), @"Any journal is held without parsing on main");
+    Check(CSBackupStartupNeedsResolution([journal URLByAppendingPathComponent:@"child"]), @"Invalid parent path fails closed");
     [NSFileManager.defaultManager removeItemAtURL:journal error:NULL];
     Check([NSFileManager.defaultManager createSymbolicLinkAtURL:journal withDestinationURL:[root URLByAppendingPathComponent:@"missing"] error:NULL], @"Create dangling journal link");
-    Check(CSBackupStartupNeedsResolution(journal, @"v1", @"v1"), @"Dangling journal link cannot bypass recovery");
+    Check(CSBackupStartupNeedsResolution(journal), @"Dangling journal link cannot bypass recovery");
     [NSFileManager.defaultManager removeItemAtURL:root error:NULL];
 }
 

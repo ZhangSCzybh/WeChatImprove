@@ -40,7 +40,7 @@
     [tableView deselectRowAtIndexPath:path animated:YES];if(!self.busy)[self.sections[path.section].items[path.row] performAction];
 }
 - (void)showExplanation {
-    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"重置设置说明" message:@"只清除已登记且选中的插件配置，未选模块和其他账号保留。\n\n准备重置时会保存可读取的配置和图片作为保护备份，执行中断时依据日志回退。已丢失的图片会在预览中说明，保护备份无法找回这些图片。\n\n准备后请手动退出并重新打开微信。执行前可在备份页取消计划。" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"重置设置说明" message:@"只清除已登记且选中的插件配置，未选模块和其他账号保留。\n\n如需保留当前完整配置，请先到“备份配置”手动创建备份。重置不会额外创建备份，执行中断时依据本次操作日志回退；已丢失的图片会在预览中说明，无法找回。\n\n准备后请手动退出并重新打开微信。执行前可在备份页取消计划。" preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleDefault handler:nil]];[self presentViewController:alert animated:YES completion:nil];
 }
 - (void)previewReset {

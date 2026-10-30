@@ -13,8 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic,copy,nullable) void (^checkpoint)(NSString *point);
 - (instancetype)initWithDefaults:(NSDictionary<NSString *,NSUserDefaults *> *)defaults domains:(NSDictionary<NSString *,NSString *> *)domains store:(CSBackupStore *)store resources:(NSURL *)resources;
 - (nullable NSDictionary *)capture:(NSString *)name kind:(NSString *)kind error:(NSError **)error;
-- (nullable NSDictionary *)save:(NSString *)name kind:(NSString *)kind error:(NSError **)error;
-+ (NSString *)contentDigest:(NSDictionary *)snapshot;
+/// Only an explicit manual action publishes a new local backup.
+- (nullable NSDictionary *)save:(NSString *)name error:(NSError **)error;
 - (nullable NSDictionary *)preview:(NSDictionary *)snapshot modules:(NSSet<NSString *> *)modules accounts:(NSSet<NSString *> *)accounts error:(NSError **)error;
 - (BOOL)prepare:(NSDictionary *)preview error:(NSError **)error;
 - (BOOL)applyPending:(NSError **)error;

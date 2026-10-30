@@ -1,0 +1,13 @@
+{
+  "baseline_version": "2.1-22",
+  "version": "2.1-23",
+  "added": [],
+  "removed": [],
+  "changed": [
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/SessionGroupHooks.xm",
+    "control"
+  ],
+  "unchanged_count": 42509
+}

@@ -1,0 +1,14 @@
+{
+  "baseline_version": "2.1-23",
+  "version": "2.1-24",
+  "added": [],
+  "removed": [],
+  "changed": [
+    "Controllers/CSGroupListAdapter.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/SessionGroupHooks.xm",
+    "control"
+  ],
+  "unchanged_count": 42508
+}
