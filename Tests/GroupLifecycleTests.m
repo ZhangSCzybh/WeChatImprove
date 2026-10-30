@@ -156,12 +156,17 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (void)refreshNavigationTitle;
 - (void)useNativePresentation;
 - (void)shieldVisiblePrivateRows;
+- (void)neutralizeVisibleContent;
 - (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous
                   changes:(CSGroupChangeKind)changes contentUserNames:(NSSet<NSString *> *)names
      contentIdentityKnown:(BOOL)known previouslyProjecting:(BOOL)previouslyProjecting;
 @end
 @implementation CSGroupListAdapter
 #include "GroupLifecycleBodies.h"
+- (void)neutralizeVisibleContent {
+    if(!self.privacyShield)self.privacyShield=[CSCloseFriendListShield new];
+    [self.privacyShield shieldTable:self.table];
+}
 - (BOOL)isActive { return self.active; }
 - (BOOL)projecting { return self.active; }
 - (void)setProjecting:(BOOL)value { self.active=value; }
@@ -192,6 +197,9 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
     self.publishedEnabled=enabled; self.searching=self.controller.isSearching;
     self.active=privacyEnabled || (enabled && !self.searching && !self.nativePresentation);
     [self layout];
+    // This counted publication double has no viewport method; the real helper
+    // is covered in GroupNeutralScrollTests. Finish only a ready fixture policy.
+    if(!policyBlocked && account.length)[self.privacyShield finishTablePublication];
     if (failPublication) { if (rawPublicationFailure) [self requestRefresh]; else [self requestRecovery]; }
 }
 @end
@@ -808,7 +816,7 @@ int main(void) { @autoreleasepool {
     [host viewWillAppear:NO];
     Check(!secret.hidden && a.refreshCount==before+1,@"return from protected chat publishes and releases cell suppression");
     a.table.visibleCells=@[ordinary,secret]; policyBlocked=YES; [a beginNativeChange]; [CSGroupListAdapter closeFriendPolicyChanged:nil];
-    Check(ordinary.hidden && secret.hidden && !a.table.hidden,@"unreadable policy suppresses unknown rows without removing list chrome");
+    Check(!ordinary.hidden && !secret.hidden && a.table.layer.mask!=nil && a.table.accessibilityElementsHidden && !a.table.hidden,@"unreadable policy neutralizes all rendering coherently while retaining visible cell geometry");
     policyBlocked=NO; [a endNativeChange]; RunFor(.03);
     a.table.hidden=YES; [CSGroupListAdapter closeFriendPolicyChanged:nil];
     Check(a.table.hidden,@"privacy publication preserves pre-existing native table visibility");
@@ -828,7 +836,7 @@ int main(void) { @autoreleasepool {
     Check(!secret.subviews.count && secret.isAccessibilityElement && [secret.accessibilityElements isEqual:@[@"new-native-cell"]] && !secret.userInteractionEnabled,@"cell reuse keeps freshly configured accessibility and interaction after publication");
     NSString *previousAccount=account; account=@""; policyBlocked=YES;
     [CSGroupListAdapter closeFriendPolicyChanged:nil];
-    Check(secret.hidden && !a.table.hidden,@"account-unavailable fallback suppresses private rows after native reload without hiding table");
+    Check(a.table.layer.mask!=nil && a.table.accessibilityElementsHidden && !a.table.hidden,@"account-unavailable fallback neutralizes rendering and accessibility without hiding table");
     account=previousAccount; policyBlocked=NO; [CSGroupListAdapter closeFriendPolicyChanged:nil];
     Check(!secret.hidden,@"resolved account releases cell suppression after safe publication");
     privacyEnabled=NO;

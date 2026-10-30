@@ -1,0 +1,27 @@
+{
+  "version": "2.1-30",
+  "warnings": [
+    {
+      "scheme": "rootless",
+      "source": "docs/audits/release-2.1-30-miniapp-return-and-top-flicker/build-rootless-result.json",
+      "sha256": "c06c9a1b6d6a6fe1d66b2d909d234c020200154911e3be993c32ca44465f42a2",
+      "warning_count": 6,
+      "normalized_warnings": {
+        "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]": 2,
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]": 2,
+        "ld: warning: -multiply_defined is obsolete": 2
+      }
+    },
+    {
+      "scheme": "rootful",
+      "source": "docs/audits/release-2.1-30-miniapp-return-and-top-flicker/build-rootful-result.json",
+      "sha256": "7f9c85b8627bc5acf72b25ad2498245eea8c3dad6cc86e7595661406b523b15c",
+      "warning_count": 6,
+      "normalized_warnings": {
+        "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]": 2,
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]": 2,
+        "ld: warning: -multiply_defined is obsolete": 2
+      }
+    }
+  ]
+}

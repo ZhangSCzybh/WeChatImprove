@@ -101,13 +101,18 @@ static NSArray *ProbeSourceSections(LaunchHost *host);
 @property(nonatomic,copy) NSString *accountID;
 @property(nonatomic) NSUInteger revision;
 @property(nonatomic) BOOL blocked;
+@property(nonatomic) BOOL enabled,revealed;
+@property(nonatomic,strong) NSDictionary *options;
 @end
 @implementation LaunchPolicy @end
+typedef LaunchPolicy CSCloseFriendSnapshot;
 @interface LaunchShield : NSObject
 - (void)prepareForPublication;
+- (void)finishTablePublication;
 @end
 @implementation LaunchShield
 - (void)prepareForPublication {}
+- (void)finishTablePublication {}
 @end
 @interface CSGroupPreferences : NSObject
 @property(nonatomic,copy) NSString *accountID,*selectedTabID;
@@ -205,6 +210,8 @@ static NSIndexPath *Path(NSUInteger row) { NSUInteger indexes[]={0,row};return [
 @property(nonatomic,strong) NSMutableArray *nativeChangeIdentityStack;
 @property(nonatomic,copy) NSSet *nativeChangeUserNames;
 @property(nonatomic,copy) NSDictionary *presentationViewport;
+@property(nonatomic,copy) NSDictionary *neutralViewport;
+@property(nonatomic) BOOL finishingNeutralPublication;
 @property(nonatomic) NSUInteger modelRevision;
 @property(nonatomic) BOOL coalescedDispatchPending;
 @property(nonatomic,copy) NSArray *cachedNativeSections,*displayedTabs;
@@ -227,6 +234,7 @@ static NSIndexPath *Path(NSUInteger row) { NSUInteger indexes[]={0,row};return [
 - (UITableViewCell *)probe_cellBody:(NSIndexPath *)path target:(id)target;
 - (void)probe_restoreAnchorBody;
 - (void)restoreAnchor;
+- (void)finishNeutralPublication:(BOOL)completed;
 - (void)restoreScrollHeight:(CGFloat)height;
 - (NSNumber *)presentationScrollHeight;
 - (void)beginNativeChange;
@@ -271,6 +279,9 @@ static NSIndexPath *Path(NSUInteger row) { NSUInteger indexes[]={0,row};return [
 @property(nonatomic) BOOL tabBadgeSourceScheduled;
 @end
 @implementation CSGroupListAdapter
+// This probe supplies ready policies only; neutral rendering is verified by
+// the separate real-shield/proxy regression suite.
+- (void)finishNeutralPublication:(BOOL)completed { (void)completed; }
 #include "GroupReturnBannerProbeBodies.h"
 + (instancetype)adapterForTable:(id)table { return [table adapter]; }
 + (instancetype)adapterForController:(id)controller { return [(LaunchHost *)controller m_tableView].adapter; }

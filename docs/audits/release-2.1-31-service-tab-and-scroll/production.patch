@@ -1,0 +1,537 @@
+diff --git a/Controllers/CSCloseFriendListShield.h b/Controllers/CSCloseFriendListShield.h
+index af40ffc0..60ee1c1a 100644
+--- a/Controllers/CSCloseFriendListShield.h
++++ b/Controllers/CSCloseFriendListShield.h
+@@ -1,8 +1,16 @@
+ #import <UIKit/UIKit.h>
+ 
+-// Only suppresses sensitive rendered cells while native publication is deferred.
+-// No table/window mask, placeholder, snapshot, animation or delayed completion.
++// Known sensitive cells may be suppressed individually. An unknown content
++// boundary neutralizes rendering coherently without changing scroll geometry,
++// hit testing or gesture recognizers. No snapshots or deferred reveal.
+ @interface CSCloseFriendListShield : NSObject
++@property(nonatomic,readonly) CGSize contentSize;
++@property(nonatomic,copy,readonly) NSArray<NSNumber *> *sectionRowCounts;
++@property(nonatomic,readonly) BOOL tableShielded;
+ - (void)shieldCell:(UITableViewCell *)cell;
++- (void)shieldTable:(UITableView *)table;
++- (void)shieldTable:(UITableView *)table contentSize:(CGSize)contentSize;
++- (void)shieldTable:(UITableView *)table contentSize:(CGSize)contentSize sectionRowCounts:(NSArray<NSNumber *> *)counts;
+ - (void)prepareForPublication;
++- (void)finishTablePublication;
+ @end
+diff --git a/Controllers/CSCloseFriendListShield.m b/Controllers/CSCloseFriendListShield.m
+index 23904fdc..60ebd057 100644
+--- a/Controllers/CSCloseFriendListShield.m
++++ b/Controllers/CSCloseFriendListShield.m
+@@ -1,9 +1,16 @@
+ #import "CSCloseFriendListShield.h"
++#import <QuartzCore/QuartzCore.h>
+ 
+ @interface CSCloseFriendListShield ()
+ @property(nonatomic,strong) NSMapTable<UITableViewCell *,NSNumber *> *hiddenStates;
++@property(nonatomic,weak) UITableView *table;
++@property(nonatomic,strong) CALayer *originalMask;
++@property(nonatomic) BOOL originalAccessibilityHidden;
++@property(nonatomic,readwrite) CGSize contentSize;
++@property(nonatomic,copy,readwrite) NSArray<NSNumber *> *sectionRowCounts;
+ @end
+ @implementation CSCloseFriendListShield
++- (BOOL)tableShielded { return self.table!=nil; }
+ - (void)shieldCell:(UITableViewCell *)cell {
+     if (!cell || cell.hidden) return;
+     if (!self.hiddenStates) self.hiddenStates=[NSMapTable weakToStrongObjectsMapTable];
+@@ -12,9 +19,36 @@ - (void)shieldCell:(UITableViewCell *)cell {
+     // Keep the table/header and known ordinary cells visible throughout.
+     cell.hidden=YES;
+ }
++- (void)shieldTable:(UITableView *)table {
++    [self shieldTable:table contentSize:table.contentSize];
++}
++- (void)shieldTable:(UITableView *)table contentSize:(CGSize)contentSize {
++    [self shieldTable:table contentSize:contentSize sectionRowCounts:@[@1]];
++}
++- (void)shieldTable:(UITableView *)table contentSize:(CGSize)contentSize sectionRowCounts:(NSArray<NSNumber *> *)counts {
++    if (!table || self.table==table) return;
++    self.table=table; self.originalMask=table.layer.mask; self.contentSize=contentSize;
++    self.sectionRowCounts=counts;
++    self.originalAccessibilityHidden=table.accessibilityElementsHidden;
++    // An empty render mask has no pixels. It does not remove the scroll view,
++    // shrink its content or insert a view into the touch/gesture chain.
++    [CATransaction begin]; [CATransaction setDisableActions:YES];
++    table.layer.mask=[CALayer layer]; table.accessibilityElementsHidden=YES;
++    [CATransaction commit];
++    [self prepareForPublication];
++}
+ - (void)prepareForPublication {
+     // Restore before reload configures reused cells, never after native setup.
+     for (UITableViewCell *cell in self.hiddenStates) cell.hidden=[[self.hiddenStates objectForKey:cell] boolValue];
+     [self.hiddenStates removeAllObjects];
+ }
++- (void)finishTablePublication {
++    UITableView *table=self.table;
++    if (!table) return;
++    [CATransaction begin]; [CATransaction setDisableActions:YES];
++    table.layer.mask=self.originalMask;
++    table.accessibilityElementsHidden=self.originalAccessibilityHidden;
++    [CATransaction commit];
++    self.table=nil; self.originalMask=nil;
++}
+ @end
+diff --git a/Controllers/CSGroupListAdapter.h b/Controllers/CSGroupListAdapter.h
+index 6a6dc07c..b513ff12 100644
+--- a/Controllers/CSGroupListAdapter.h
++++ b/Controllers/CSGroupListAdapter.h
+@@ -59,6 +59,8 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
+ - (void)layout;
+ /// Keep UIKit delivery in display coordinates and require a current privacy projection.
+ - (void)performVisibleLayout:(void (^)(void))layout;
++/// Reveal neutral content only after verified publication, viewport and visible cells agree.
++- (void)finishNeutralPublication:(BOOL)publicationCompleted;
+ - (void)refresh;
+ - (void)requestRefresh;
+ - (void)beginNativeChange;
+diff --git a/Controllers/CSGroupListAdapter.m b/Controllers/CSGroupListAdapter.m
+index 1312888c..253b02f3 100644
+--- a/Controllers/CSGroupListAdapter.m
++++ b/Controllers/CSGroupListAdapter.m
+@@ -70,6 +70,11 @@ @interface CSGroupListAdapter () <UIGestureRecognizerDelegate>
+ @property (nonatomic) BOOL searchChromeVisible;
+ @property (nonatomic) BOOL presentationSuspended;
+ @property (nonatomic, copy) NSDictionary *presentationViewport;
++@property (nonatomic, copy) NSDictionary *neutralViewport;
++@property (nonatomic) BOOL finishingNeutralPublication;
++@property (nonatomic) CGSize retainedContentSize;
++@property (nonatomic,copy) NSArray<NSNumber *> *retainedSectionCounts;
++@property (nonatomic) BOOL neutralGeometryQueried;
+ @property (nonatomic) BOOL publishedEnabled;
+ @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *prefetchedPaths;
+ @property (nonatomic, strong) NSMutableArray *nativeActions;
+@@ -132,12 +137,42 @@ - (void)useNativePresentation;
+ - (void)forwardInvocation:(NSInvocation *)inv target:(id)target;
+ - (UITableViewCell *)cellForDisplayPath:(NSIndexPath *)path target:(id)target;
+ - (void)shieldVisiblePrivateRows;
++- (void)neutralizeVisibleContent;
++- (void)restoreAnchor;
+ @end
+ @interface CSGroupTableProxy : NSObject
+ @property (nonatomic, weak) CSGroupListAdapter *adapter;
+ @property (nonatomic, weak) id target;
+ @property (nonatomic, strong) NSMutableDictionary<NSString *,NSMethodSignature *> *signatures;
+ @end
++// Content-free slots keep the published topology and total scroll extent. Row
++// identities and offscreen UIKit measurements are unnecessary while masked.
++static void CSGroupProxyReturnNeutralGeometry(CSGroupTableProxy *proxy,NSInvocation *invocation) {
++    proxy.adapter.neutralGeometryQueried=YES;
++    NSArray<NSNumber *> *sections=proxy.adapter.privacyShield.sectionRowCounts;
++    NSString *name=NSStringFromSelector(invocation.selector);
++    if ([name isEqual:@"numberOfSectionsInTableView:"]) {
++        NSInteger count=(NSInteger)sections.count; [invocation setReturnValue:&count];
++    } else if ([name isEqual:@"tableView:numberOfRowsInSection:"]) {
++        NSInteger section=0; [invocation getArgument:&section atIndex:3];
++        NSInteger count=section>=0 && section<(NSInteger)sections.count ? sections[(NSUInteger)section].integerValue : 0;
++        [invocation setReturnValue:&count];
++    } else if ([name isEqual:@"tableView:heightForRowAtIndexPath:"] || [name isEqual:@"tableView:estimatedHeightForRowAtIndexPath:"]) {
++        UITableView *table=proxy.adapter.table;
++        __block CGFloat headerHeight=0;
++        CSGroupWithDisplayIndices(table, ^{ headerHeight=CGRectGetHeight(table.tableHeaderView.frame); });
++        NSUInteger rows=0; for (NSNumber *count in sections) rows+=count.unsignedIntegerValue;
++        CGFloat area=MAX(0,proxy.adapter.privacyShield.contentSize.height-headerHeight);
++        CGFloat height=rows ? floor(area/rows) : 0;
++        __unsafe_unretained NSIndexPath *path=nil; [invocation getArgument:&path atIndex:3];
++        NSUInteger last=sections.count;
++        while (last && !sections[last-1].unsignedIntegerValue) last--;
++        if (rows && path.length==2 && [path indexAtPosition:0]==last-1 &&
++            [path indexAtPosition:1]+1==sections[last-1].unsignedIntegerValue) height=area-height*(rows-1);
++        if (!isfinite(height)) height=0;
++        [invocation setReturnValue:&height];
++    }
++}
+ static BOOL CSGroupProxyCanDeliverVisibleQuery(CSGroupListAdapter *adapter) {
+     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+     NSString *account=CSGroupCurrentAccountID();
+@@ -161,15 +196,37 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
+     return [queries containsObject:NSStringFromSelector(selector)];
+ }
+ @implementation CSGroupTableProxy
++- (void)forwardScrollEnd:(SEL)selector scrollView:(id)table decelerate:(BOOL)decelerate {
++    id target=self.target;
++    CSGroupListAdapter *adapter=self.adapter;
++    if ([target respondsToSelector:selector]) {
++        NSInvocation *invocation=[NSInvocation invocationWithMethodSignature:[target methodSignatureForSelector:selector]];
++        invocation.selector=selector;
++        [invocation setArgument:&table atIndex:2];
++        if (selector==@selector(scrollViewDidEndDragging:willDecelerate:)) [invocation setArgument:&decelerate atIndex:3];
++        [adapter forwardInvocation:invocation target:target];
++    }
++    // These callbacks are implemented even when the native delegate omits them.
++    // Recheck admission after native code and offset writes, both may reenter.
++    if (!decelerate && CSGroupProxyCanDeliverVisibleQuery(adapter) && adapter.neutralViewport) [adapter restoreAnchor];
++    [adapter finishNeutralPublication:NO];
++    if (adapter.dirty || adapter.pendingScrollToTop) [adapter scheduleRefresh];
++}
++- (void)scrollViewDidEndDragging:(id)table willDecelerate:(BOOL)decelerate {
++    [self forwardScrollEnd:_cmd scrollView:table decelerate:decelerate];
++}
++- (void)scrollViewDidEndDecelerating:(id)table {
++    [self forwardScrollEnd:_cmd scrollView:table decelerate:NO];
++}
+ - (UITableViewCell *)tableView:(UITableView *)table cellForRowAtIndexPath:(NSIndexPath *)path {
+     (void)table;
+     CSGroupListAdapter *adapter=self.adapter;
+     if (!CSGroupProxyCanDeliverVisibleQuery(adapter)) {
+-        [adapter shieldVisiblePrivateRows];
+-        // A stale required callback still needs a cell, even after a neutral
+-        // count. Policy readiness is resolved by its normal publication path.
++        [adapter neutralizeVisibleContent];
++        // Keep the retained slots scrollable without delivering native content.
+         UITableViewCell *cell=[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+         cell.userInteractionEnabled=NO; cell.selectionStyle=UITableViewCellSelectionStyleNone;
++        objc_setAssociatedObject(cell,&CellRowKey,@{@"neutral":@YES},OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+         return cell;
+     }
+     __block UITableViewCell *cell=nil;
+@@ -204,8 +261,16 @@ - (void)forwardInvocation:(NSInvocation *)invocation {
+     id target=self.target;
+     CSGroupListAdapter *adapter=self.adapter;
+     if (adapter && [target respondsToSelector:invocation.selector]) {
+-        if (!CSGroupProxyIsVisibleQuery(invocation.selector)) { [adapter forwardInvocation:invocation target:target]; return; }
+-        if (!CSGroupProxyCanDeliverVisibleQuery(adapter)) { [adapter shieldVisiblePrivateRows]; return; }
++        BOOL ready=CSGroupProxyCanDeliverVisibleQuery(adapter);
++        if (!CSGroupProxyIsVisibleQuery(invocation.selector)) {
++            // A render mask does not intercept touches. Deny row callbacks while
++            // neutral, including inherited native scopes; scroll callbacks pass.
++            NSString *name=NSStringFromSelector(invocation.selector);
++            if (!ready && [name hasPrefix:@"tableView:"]) { [adapter neutralizeVisibleContent]; return; }
++            [adapter forwardInvocation:invocation target:target];
++            return;
++        }
++        if (!ready) { [adapter neutralizeVisibleContent]; CSGroupProxyReturnNeutralGeometry(self,invocation); return; }
+         CSGroupWithDisplayIndices(adapter.table, ^{ [adapter forwardInvocation:invocation target:target]; });
+     }
+ }
+@@ -545,19 +610,140 @@ + (void)closeFriendPolicyChanged:(NSNotification *)notification {
+ }
+ - (void)shieldVisiblePrivateRows {
+     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
++    if (!policy || policy.blocked || ![policy.accountID isEqual:CSGroupCurrentAccountID()]) {
++        [self neutralizeVisibleContent]; return;
++    }
+     if (!CSGroupPrivacyActive()) return;
+     if (!self.privacyShield) self.privacyShield=[CSCloseFriendListShield new];
++    // Unknown delivery is a whole-content boundary, never a collection of holes.
++    for (UITableViewCell *cell in self.table.visibleCells) {
++        NSDictionary *delivery=objc_getAssociatedObject(cell,&CellRowKey);
++        if (![delivery[@"account"] isEqual:policy.accountID] || !delivery[@"row"]) {
++            [self neutralizeVisibleContent]; return;
++        }
++    }
+     for (UITableViewCell *cell in self.table.visibleCells) {
+         // Use the delivered identity, never current native indexes during mutation.
+         NSDictionary *delivery=objc_getAssociatedObject(cell,&CellRowKey);
+         CSGroupRow *row=delivery[@"row"];
+-        BOOL unknown=policy.blocked || ![delivery[@"account"] isEqual:policy.accountID] ||
+-            ![policy.accountID isEqual:CSGroupCurrentAccountID()] || !row;
+-        BOOL sensitive=unknown || [policy hidesUserName:row.userName surface:CSCloseFriendSurfaceSession] ||
+-            (row.kind==CSGroupRowKindAggregate && policy.protectedUserNames.count>0);
++        BOOL sensitive=[policy hidesUserName:row.userName surface:CSCloseFriendSurfaceSession];
++        // Only the folded-chat aggregate can carry protected session previews.
++        // Its existing safe cover remains authoritative; service containers do
++        // not acquire sensitive content merely because a friend is configured.
++        if (row.kind==CSGroupRowKindAggregate && [row.userName isEqual:@"chatroom_session_box"] &&
++            !row.privacyMasked && policy.protectedUserNames.count) {
++            [self neutralizeVisibleContent]; return;
++        }
+         if (sensitive) [self.privacyShield shieldCell:cell];
+     }
+ }
++- (void)neutralizeVisibleContent {
++    if (!self.privacyShield) self.privacyShield=[CSCloseFriendListShield new];
++    if (!self.neutralViewport) {
++        NSString *account=CSGroupCurrentAccountID();
++        CGFloat height=self.table.contentOffset.y+self.table.adjustedContentInset.top;
++        if (account.length && [self.preferences.accountID isEqual:account] && isfinite(height))
++            self.neutralViewport=@{@"height":@(MAX(0,height)),@"account":account,@"epoch":@(CSCloseFriendAccountEpoch())};
++    }
++    CGSize size=self.table.contentSize;
++    CGFloat viewport=CGRectGetHeight(self.table.bounds),inset=self.table.adjustedContentInset.top+self.table.adjustedContentInset.bottom;
++    if ((!isfinite(size.height) || size.height+inset<=viewport) &&
++        isfinite(self.retainedContentSize.height) && self.retainedContentSize.height+inset>viewport)
++        size=self.retainedContentSize;
++    NSArray *counts=self.retainedSectionCounts;
++    if (!counts.count && self.projecting && self.projection.isValid) {
++        NSMutableArray *current=[NSMutableArray array];
++        for (NSArray *rows in self.projection.sections) [current addObject:@(rows.count)];
++        counts=current;
++    }
++    NSUInteger total=0; for (NSNumber *count in counts) total+=count.unsignedIntegerValue;
++    if (!total) counts=@[@1];
++    [self.privacyShield shieldTable:self.table contentSize:size sectionRowCounts:counts];
++}
++- (void)finishNeutralPublication:(BOOL)publicationCompleted {
++    UITableView *table=self.table;
++    BOOL (^ready)(void)=^BOOL {
++        CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
++        NSString *account=CSGroupCurrentAccountID();
++        if (!policy || policy.blocked || !account.length || ![policy.accountID isEqual:account]) return NO;
++        BOOL privacy=policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue];
++        return self.projecting ? (self.projection.isValid && [self.projection.accountID isEqual:account] &&
++            self.projection.privacyRevision==policy.revision) : !privacy;
++    };
++    if (!table || self.finishingNeutralPublication || !ready()) return;
++    if (!self.privacyShield.tableShielded) {
++        CGSize size=table.contentSize;
++        if (isfinite(size.width) && isfinite(size.height) && size.width>=0 && size.height>0)
++            self.retainedContentSize=size;
++        if (self.projecting && self.projection.isValid) {
++            NSMutableArray *counts=[NSMutableArray array];
++            for (NSArray *rows in self.projection.sections) [counts addObject:@(rows.count)];
++            self.retainedSectionCounts=counts;
++        }
++        return;
++    }
++    if (self.publishing && !publicationCompleted) {
++        // A native early-return publication may finish inside this layout. The
++        // next normal layout completes it after the publishing stack unwinds.
++        [table setNeedsLayout]; return;
++    }
++    NSNumber *returnHeight=[self presentationScrollHeight];
++    self.finishingNeutralPublication=YES;
++    @try {
++        NSString *account=CSGroupCurrentAccountID();
++        NSUInteger epoch=CSCloseFriendAccountEpoch(),revision=CSCloseFriendCurrentSnapshot().revision;
++        BOOL (^current)(void)=^BOOL {
++            return ready() && epoch==CSCloseFriendAccountEpoch() && revision==CSCloseFriendCurrentSnapshot().revision &&
++                [account isEqual:CSGroupCurrentAccountID()];
++        };
++        if (table.tracking || table.dragging || table.decelerating ||
++            table.editing || self.swipeActive || [self groupPanMoving]) return;
++        if (self.neutralGeometryQueried) {
++            self.neutralGeometryQueried=NO;
++            // Re-measure the retained slots after neutral scalar geometry,
++            // without replacing their cells or rebuilding the table.
++            CSGroupWithDisplayIndices(table, ^{
++                [UIView performWithoutAnimation:^{
++                    [table beginUpdates]; [table endUpdates]; [table layoutIfNeeded];
++                }];
++            });
++        }
++        if (!current()) return;
++        BOOL (^matches)(UITableViewCell *,NSIndexPath *)=^BOOL(UITableViewCell *cell,NSIndexPath *path) {
++            NSDictionary *delivery=objc_getAssociatedObject(cell,&CellRowKey);
++            if ([delivery[@"neutral"] boolValue]) return NO;
++            if (!self.projecting) return YES;
++            CSGroupRow *expected=[self.projection rowAtDisplayPath:path],*row=delivery[@"row"];
++            BOOL sameName=row.userName==expected.userName || [row.userName isEqual:expected.userName];
++            return expected && row && [delivery[@"account"] isEqual:account] && sameName && row.kind==expected.kind &&
++                [row.nativePath isEqual:expected.nativePath] && row.privacyMasked==expected.privacyMasked &&
++                row.foldedEntryScoped==expected.foldedEntryScoped && row.foldedEntryPrivacyRevision==expected.foldedEntryPrivacyRevision;
++        };
++        NSMutableArray<NSIndexPath *> *repairs=[NSMutableArray array];
++        for (UITableViewCell *cell in table.visibleCells) {
++            __block NSIndexPath *path=nil;
++            CSGroupWithDisplayIndices(table, ^{ path=[table indexPathForCell:cell]; });
++            if (!path || (self.projecting && ![self.projection rowAtDisplayPath:path])) { [table setNeedsLayout]; return; }
++            if (!matches(cell,path)) [repairs addObject:path];
++        }
++        if (repairs.count) CSGroupWithDisplayIndices(table, ^{
++            [table reloadRowsAtIndexPaths:repairs withRowAnimation:UITableViewRowAnimationNone];
++            [table layoutIfNeeded];
++        });
++        if (!current()) return;
++        for (UITableViewCell *cell in table.visibleCells) {
++            __block NSIndexPath *path=nil;
++            CSGroupWithDisplayIndices(table, ^{ path=[table indexPathForCell:cell]; });
++            if (!path || !matches(cell,path)) return;
++        }
++        if (returnHeight) [self restoreScrollHeight:returnHeight.doubleValue];
++        if (!current() || self.neutralViewport || table.tracking || table.dragging || table.decelerating) return;
++        [self.privacyShield finishTablePublication];
++        CGSize size=table.contentSize;
++        if (isfinite(size.width) && isfinite(size.height) && size.width>=0 && size.height>0)
++            self.retainedContentSize=size;
++    } @finally { self.finishingNeutralPublication=NO; }
++}
+ // Ordinary background updates remain deferred. A pending privacy publication is
+ // the one exception, so the switcher never waits for foreground to get safe rows.
+ + (void)applicationActivityChanged:(NSNotification *)notification {
+@@ -601,7 +787,8 @@ - (void)detach {
+     self.tabBadgeSections=nil; self.tabAlertBadge=nil; self.tabAlertBadgeKey=nil;
+     self.tabBadgeSourceRequired=NO; self.tabBadgeRestorePending=NO;
+     UITableView *table=self.table; self.nativePresentation=YES; self.projecting=NO; self.chromeVisible=NO;
+-    [self.privacyShield prepareForPublication]; self.privacyShield=nil;
++    [self.privacyShield prepareForPublication]; [self.privacyShield finishTablePublication]; self.privacyShield=nil;
++    self.neutralViewport=nil;
+     [self refreshNavigationTitle];
+     self.presentationSuspended=YES; [self cancelScheduledRefresh];
+     [self publishHeader:self.nativeHeader]; [self.chrome removeFromSuperview]; [self.chrome removeGestureRecognizer:self.pan]; [table removeGestureRecognizer:self.listPan];
+@@ -1621,7 +1808,7 @@ - (BOOL)canRestoreAnchor {
+     UITableView *table=self.table;
+     // Do not turn a pull-down/bounce or a native top-area transition into a
+     // persistent row anchor. The host owns these positions, including short lists.
+-    return [self hasScrollableContent] && !self.searching && !table.tracking &&
++    return !self.neutralViewport && [self hasScrollableContent] && !self.searching && !table.tracking &&
+         !table.dragging && !table.decelerating && isfinite(table.contentOffset.y) &&
+         table.contentOffset.y>=-table.adjustedContentInset.top-0.5;
+ }
+@@ -1663,17 +1850,20 @@ - (void)restoreAnchor {
+     }
+ }
+ - (NSNumber *)presentationScrollHeight {
+-    NSDictionary *viewport=self.presentationViewport;
++    if (self.finishingNeutralPublication) return nil;
++    NSDictionary *viewport=self.presentationViewport ?: self.neutralViewport;
+     if (!viewport) return nil;
+     NSString *account=CSGroupCurrentAccountID();
+     if (![viewport[@"account"] isEqual:account] || ![self.preferences.accountID isEqual:account] ||
+         [viewport[@"epoch"] unsignedIntegerValue]!=CSCloseFriendAccountEpoch()) {
+-        self.presentationViewport=nil; return nil;
++        self.presentationViewport=nil; self.neutralViewport=nil; return nil;
+     }
+-    if (!self.isActive || !self.chromeVisible || self.searching || self.nativePresentation || self.nativeActions.count) return nil;
++    if (viewport!=self.neutralViewport &&
++        (!self.isActive || !self.chromeVisible || self.searching || self.nativePresentation || self.nativeActions.count)) return nil;
+     return viewport[@"height"];
+ }
+ - (void)restoreViewportFromTab:(NSString *)previousTab scrollHeight:(CGFloat)height {
++    @try {
+     NSNumber *returnHeight=[self presentationScrollHeight];
+     if (returnHeight) { [self restoreScrollHeight:returnHeight.doubleValue]; return; }
+     if (!previousTab.length || !self.publishedTabID.length || [previousTab isEqual:self.publishedTabID] ||
+@@ -1681,6 +1871,9 @@ - (void)restoreViewportFromTab:(NSString *)previousTab scrollHeight:(CGFloat)hei
+         [self restoreAnchor]; return;
+     }
+     [self restoreScrollHeight:height];
++    } @finally {
++        [self finishNeutralPublication:YES];
++    }
+ }
+ - (void)restoreScrollHeight:(CGFloat)height {
+     // Switching groups and returning from chat both retain absolute height.
+@@ -1698,6 +1891,7 @@ - (void)restoreScrollHeight:(CGFloat)height {
+         if (fabs(target-table.contentOffset.y)>0.5)
+             [table setContentOffset:CGPointMake(table.contentOffset.x,target) animated:NO];
+     });
++    self.neutralViewport=nil;
+     [self saveAnchor];
+ }
+ - (void)selectIndex:(NSInteger)index {
+diff --git a/Controllers/CSReleaseNotesViewController.m b/Controllers/CSReleaseNotesViewController.m
+index 4c3c4a70..383fe23d 100644
+--- a/Controllers/CSReleaseNotesViewController.m
++++ b/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,10 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"2.1-31": @[
++            @{@"title": @"修正服务分组返回时的显示", @"detail": @"公众号、服务号等普通入口不再因为设置了其他密友而被单独遮挡。保留密友与密群隐藏，以及原有锁定和解锁规则。"},
++            @{@"title": @"保留列表准备期间的滚动能力", @"detail": @"返回时如安全内容尚未准备好，统一留空并保留列表的可滚动范围；内容准备好后再恢复显示和原有位置，避免局部留白与滚动暂时失效。"}
++        ],
+         @"2.1-30": @[
+             @{@"title": @"补齐容器页面返回时的列表就绪检查", @"detail": @"小程序等容器页面返回时，在列表查询与显示之前检查可见内容是否已经准备好；未就绪时沿用占位，保持原有密友锁定与解锁规则。真实返回生命周期和首帧效果仍需真机计数与复录验收。"},
+             @{@"title": @"同步顶部卡片的内容容器几何", @"detail": @"微信原生内容容器的位置或宽度改变后，同步更新既有卡片几何，避免等待后续布局。保留此前返回复用、首次发布和隐私布局修复；转场绘制与残留闪烁仍待真机验收。"}
+diff --git a/Headers/CSUserInfoHelper.h b/Headers/CSUserInfoHelper.h
+index 76d1fbbf..e8b83e5a 100644
+--- a/Headers/CSUserInfoHelper.h
++++ b/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@ extern NSString * const kUserAvatarURLKey;    // 用户头像URL缓存键
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.1-30"  // 插件版本号
++#define kPluginVersionString @"2.1-31"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+diff --git a/Hooks/SessionGroupHooks.xm b/Hooks/SessionGroupHooks.xm
+index 3e47dc0a..107188ae 100644
+--- a/Hooks/SessionGroupHooks.xm
++++ b/Hooks/SessionGroupHooks.xm
+@@ -422,6 +422,7 @@ static void InstallMenuTouchGate(void) {
+     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
+     if (a) [a performVisibleLayout:^{ %orig; }];
+     else %orig;
++    [a finishNeutralPublication:NO];
+ }
+ - (BOOL)hasSearchBarHeader {
+     if (![CSGroupListAdapter adapterForTable:self]) return %orig;
+diff --git a/README.md b/README.md
+index 13ec57eb..1bea714d 100644
+--- a/README.md
++++ b/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
+ 
+-**当前版本：`2.1-30`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`2.1-31`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
+ 
+@@ -31,8 +31,8 @@
+ | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
+ | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
+ | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
+-| Rootless | 提供 `2.1-30` 安装包，待本版真机验收；前版 `2.1-21` 的前台 CPU 复测见 [真机记录](docs/audits/release-2.1-21-energy/device-validation.md) |
+-| Rootful | 本地提供 `2.1-30` 安装包；待真机验收 |
++| Rootless | 提供 `2.1-31` 安装包，待本版真机验收；前版 `2.1-21` 的前台 CPU 复测见 [真机记录](docs/audits/release-2.1-21-energy/device-validation.md) |
++| Rootful | 本地提供 `2.1-31` 安装包；待真机验收 |
+ | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
+ | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
+ 
+@@ -40,12 +40,12 @@
+ 
+ ### 安装步骤
+ 
+-1. 获取与设备注入环境匹配的 `.deb`：当前候选为 `2.1-30`：[Rootless 安装包](packages/2.1-30-miniapp-return-and-top-flicker/com.wechat.improve_2.1-30_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-30-miniapp-return-and-top-flicker/com.wechat.improve_2.1-30_iphoneos-arm.deb)、[调试符号](packages/2.1-30-miniapp-return-and-top-flicker/com.wechat.improve_2.1-30_symbols.zip) 和 [SHA-256](packages/2.1-30-miniapp-return-and-top-flicker/SHA256SUMS)。本候选针对两个源码缺口：容器覆盖后原生查询或显示列表时可能尚未准备过滤投影；微信原生 cell 内容容器改变位置或宽度后，既有卡片几何未及时同步。帧证据只能确认画面变化，不能推出自然生命周期或 UIKit 调用次数；转场中的横移与共同变暗也不能直接认作白卡漏绘。保留 2.1-26／27／28／29 的完整保护定义，详见 [候选审计](docs/audits/release-2.1-30-miniapp-return-and-top-flicker/README.md) 与 [原录屏数值时间线](docs/audits/release-2.1-30-miniapp-return-and-top-flicker/frame-evidence/README.md)。两个现场问题的真实事件链及本版效果仍待真机计数与复录验收。
++1. 获取与设备注入环境匹配的 `.deb`：当前候选为 `2.1-31`：[Rootless 安装包](packages/2.1-31-service-tab-and-scroll/com.wechat.improve_2.1-31_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.1-31-service-tab-and-scroll/com.wechat.improve_2.1-31_iphoneos-arm.deb)、[调试符号](packages/2.1-31-service-tab-and-scroll/com.wechat.improve_2.1-31_symbols.zip) 和 [SHA-256](packages/2.1-31-service-tab-and-scroll/SHA256SUMS)。本候选修正服务分组的聚合入口被无关密友名单误遮挡的问题，并在隐私内容未就绪时统一中性显示、保留安全的显示几何和滚动能力；准备好后同步恢复过滤内容与原有位置。六处 2.1-26／27／28／29 保护定义逐字节保留，同时保持 2.1-30 的可见查询与原生源数据边界及卡片几何修复。详见 [候选审计](docs/audits/release-2.1-31-service-tab-and-scroll/README.md) 与 [原录屏数值时间线](docs/audits/release-2.1-31-service-tab-and-scroll/frame-evidence/README.md)。主机替身只能证明受控路径的判据、几何与手势状态；真实触摸链路、UIView 身份及屏幕中间帧仍待真机复录验收。
+ 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
+ 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
+ 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
+ 
+-历史 `2.1-29` 保留在 [历史交付目录](packages/2.1-29-top-chrome-return-flicker/)，对应 [当版审计](docs/audits/release-2.1-29-top-chrome-return-flicker/README.md)。历史 `2.1-28` 首批产物与布局候选分别保留在 [首批目录](packages/2.1-28-closefriend-return-leak/) 和 [布局候选目录](packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/)。当前版本与下载入口以上方 `2.1-30` 为准。
++历史 `2.1-30` 保留在 [历史交付目录](packages/2.1-30-miniapp-return-and-top-flicker/)，对应 [当版审计](docs/audits/release-2.1-30-miniapp-return-and-top-flicker/README.md)。历史 `2.1-29` 保留在 [历史交付目录](packages/2.1-29-top-chrome-return-flicker/)，对应 [当版审计](docs/audits/release-2.1-29-top-chrome-return-flicker/README.md)。历史 `2.1-28` 首批产物与布局候选分别保留在 [首批目录](packages/2.1-28-closefriend-return-leak/) 和 [布局候选目录](packages/2.1-28-closefriend-return-leak/layout-firstframe-candidate-1/)。当前版本与下载入口以上方 `2.1-31` 为准。
+ 
+ 默认入口名称为“再也不会”。在 **入口设置** 中可以修改名称，并选择显示在“我”、微信设置页或已有的插件管理入口；插件管理入口需要宿主环境提供 `WCPluginsMgr`。
+ 
+@@ -212,7 +212,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.1-30_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-30-miniapp-return-and-top-flicker/`。
++当前版本默认输出：`packages/com.wechat.improve_2.1-31_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.1-31-service-tab-and-scroll/`。
+ 
+ ### Rootful
+ 
+@@ -221,7 +221,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.1-30_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-30-miniapp-return-and-top-flicker/`。
++当前版本默认输出：`packages/com.wechat.improve_2.1-31_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.1-31-service-tab-and-scroll/`。
+ 
+ | 方案 | 动态库安装目录 |
+ | --- | --- |
+@@ -245,7 +245,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
+ `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
+ 
+ ```bash
+-dpkg-deb -f packages/2.1-30-miniapp-return-and-top-flicker/com.wechat.improve_2.1-30_iphoneos-arm64.deb Version Architecture
++dpkg-deb -f packages/2.1-31-service-tab-and-scroll/com.wechat.improve_2.1-31_iphoneos-arm64.deb Version Architecture
+ ```
+ 
+ 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
+diff --git a/control b/control
+index 8526a7b1..ee445f92 100644
+--- a/control
++++ b/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.1-30
++Version: 2.1-31
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会

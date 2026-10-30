@@ -1,0 +1,114 @@
+[
+  {
+    "script": "verify-group-service-shield.sh",
+    "exit": 0,
+    "seconds": 1.642,
+    "checks": 706,
+    "failures": 0
+  },
+  {
+    "script": "verify-group-neutral-scroll.sh",
+    "exit": 0,
+    "seconds": 1.921,
+    "checks": 148,
+    "failures": 0
+  },
+  {
+    "script": "verify-group-neutral-completion.sh",
+    "exit": 0,
+    "seconds": 1.765,
+    "checks": 36,
+    "failures": 0
+  },
+  {
+    "script": "verify-group-container-return.sh",
+    "exit": 1,
+    "seconds": 1.794,
+    "checks": 996,
+    "failures": 4
+  },
+  {
+    "script": "verify-group-container-contracts.sh",
+    "exit": 1,
+    "seconds": 2.002,
+    "checks": 82,
+    "failures": 8
+  },
+  {
+    "script": "verify-group-lifecycle.sh",
+    "exit": 1,
+    "seconds": 13.7,
+    "checks": 239,
+    "failures": 1
+  },
+  {
+    "script": "verify-group-launch-banner.sh",
+    "exit": 0,
+    "seconds": 1.086,
+    "checks": 32,
+    "failures": 0
+  },
+  {
+    "script": "verify-group-viewport.sh",
+    "exit": 0,
+    "seconds": 0.443,
+    "checks": 151,
+    "failures": 0
+  },
+  {
+    "script": "verify-group-search.sh",
+    "exit": 0,
+    "seconds": 0.624,
+    "checks": 57,
+    "failures": 0
+  },
+  {
+    "script": "verify-close-friend-session.sh",
+    "exit": 0,
+    "seconds": 2.863,
+    "checks": 229,
+    "failures": 0
+  },
+  {
+    "script": "verify-group-return-privacy.sh",
+    "exit": 0,
+    "seconds": 1.358,
+    "checks": 37,
+    "failures": 0
+  },
+  {
+    "script": "verify-group-return-layout.sh",
+    "exit": 0,
+    "seconds": 1.449,
+    "checks": 861,
+    "failures": 0
+  },
+  {
+    "script": "verify-group-return-banner.sh",
+    "exit": 0,
+    "seconds": 0.866,
+    "checks": 626,
+    "failures": 0
+  },
+  {
+    "script": "verify-list-corners.sh",
+    "exit": 0,
+    "seconds": 3.259,
+    "checks": 1631,
+    "failures": 0
+  },
+  {
+    "script": "verify-top-transition.sh",
+    "exit": 0,
+    "seconds": 3.186,
+    "checks": 14,
+    "failures": 0
+  },
+  {
+    "script": "verify-top-transition-compatibility.sh",
+    "exit": 0,
+    "seconds": 3.176,
+    "checks": 11,
+    "failures": 0
+  }
+]

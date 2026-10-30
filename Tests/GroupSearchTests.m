@@ -136,6 +136,8 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @property(nonatomic,strong) CSGroupProjection *projection;
 @property(nonatomic,strong) NSMutableDictionary *anchors;
 @property(nonatomic,copy) NSDictionary *presentationViewport;
+@property(nonatomic,copy) NSDictionary *neutralViewport;
+@property(nonatomic) BOOL finishingNeutralPublication;
 @property(nonatomic,strong) NSArray *sourceSections,*cachedNativeSections,*displayedTabs;
 @property(nonatomic,strong) NSDictionary *identityDisplayPaths;
 @property(nonatomic,strong) NSMutableArray *completions,*nativeActions;
@@ -159,12 +161,16 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 - (void)layout;
 - (void)publishHeader:(UIView *)header;
 - (void)shieldVisiblePrivateRows;
+- (void)finishNeutralPublication:(BOOL)completed;
 @end
 @implementation CSGroupListAdapter
 // Badge source lifecycle is exercised in GroupLifecycleTests.
 - (void)requestTabBadgeSourceRefresh {}
 - (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay { (void)event; (void)delay; }
 - (void)shieldVisiblePrivateRows {}
+// Search tests do not enter a closed content gate. The full neutral lifecycle
+// uses the real helper in GroupNeutralScrollTests.
+- (void)finishNeutralPublication:(BOOL)completed { (void)completed; }
 - (void)invalidateNativeSnapshot { self.invalidations++; }
 - (void)saveAnchor { self.anchorSaves++; }
 - (void)restoreAnchor {}

@@ -1,0 +1,16 @@
+FAIL: neutral-completion/placeholder/unchanged-plan / only mismatched visible placement is repaired through local row refresh
+FAIL: neutral-completion/placeholder/unchanged-plan / content mask remains installed during row repair and layout
+FAIL: neutral-completion/unknown-raw-cell/unchanged-plan / only mismatched visible placement is repaired through local row refresh
+FAIL: neutral-completion/unknown-raw-cell/unchanged-plan / content mask remains installed during row repair and layout
+FAIL: neutral-completion/unknown-raw-cell/unchanged-plan / first revealed content contains no protected identity
+FAIL: neutral-completion/placeholder/policy-reentry / only mismatched visible placement is repaired through local row refresh
+FAIL: neutral-completion/placeholder/policy-reentry / content mask remains installed during row repair and layout
+FAIL: neutral-completion/placeholder/policy-reentry / policy reentry keeps all content masked
+FAIL: neutral-completion/unknown-raw-cell/policy-reentry / only mismatched visible placement is repaired through local row refresh
+FAIL: neutral-completion/unknown-raw-cell/policy-reentry / content mask remains installed during row repair and layout
+FAIL: neutral-completion/unknown-raw-cell/policy-reentry / policy reentry keeps all content masked
+FAIL: neutral-completion/ready-filtered/publication-in-progress / nested table layout never reveals a publication in progress
+FAIL: neutral-completion/ready-filtered/publication-in-progress / nested native publication requests a natural completion layout
+FAIL: neutral-completion/ready-native-unlocked/publication-in-progress / nested table layout never reveals a publication in progress
+FAIL: neutral-completion/ready-native-unlocked/publication-in-progress / nested native publication requests a natural completion layout
+Group neutral completion HOST: 36 checks, 15 failures

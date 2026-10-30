@@ -1,0 +1,66 @@
+{
+  "baselineCommit": "58e0b0dfc611e14aa2d2f8e07c0f2ffb80a7ec6a",
+  "service": {
+    "testSha256": "ce05e9da6545c5773acf725a2bb0674e77de497219f0df371fce97a770273e53",
+    "red": {
+      "checks": 706,
+      "failures": 76,
+      "log": "red-service-final-frozen30.jsonl"
+    },
+    "green": {
+      "checks": 706,
+      "failures": 0,
+      "log": "green-service-final.jsonl"
+    }
+  },
+  "completion": {
+    "testSha256": "e2a012529561e3a3eaf540d82dc3eb9320d933c81f0a9c2cfd9714c6e5edb2f6",
+    "redOriginal30": {
+      "checks": 36,
+      "failures": 15,
+      "log": "red-completion-frozen30.jsonl"
+    },
+    "redDraftWithoutHelper": {
+      "checks": 36,
+      "failures": 19,
+      "log": "red-draft-completion.jsonl"
+    },
+    "green": {
+      "checks": 36,
+      "failures": 0,
+      "log": "green-completion-final.jsonl"
+    }
+  },
+  "baselineSources": {
+    "Controllers/CSGroupListAdapter.m": {
+      "sha256": "c5036ba4bac9c5bcd58232c729f4565a110875349e0cfa15cfb6cb449e99dcef",
+      "matchesImmutableGitBaseline": true
+    },
+    "Hooks/SessionGroupHooks.xm": {
+      "sha256": "cc739fba9c41721fc445a9c4eb720e5a52658e25978b4ae3bc2f39b5f1cdaf75",
+      "matchesImmutableGitBaseline": true
+    },
+    "Controllers/CSCloseFriendListShield.m": {
+      "sha256": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b",
+      "matchesImmutableGitBaseline": true
+    }
+  },
+  "greenSources": {
+    "Controllers/CSGroupListAdapter.m": {
+      "sha256": "8186a42e512dfc2b41c1ff27c303ad08c9c8edaac28098140d2cf8856f8c5e95"
+    },
+    "Hooks/SessionGroupHooks.xm": {
+      "sha256": "4dfa6d802eb1dda2a3197b16ccd282c4e489e92e14cc3ee732134c78ec3948a7"
+    },
+    "Controllers/CSCloseFriendListShield.m": {
+      "sha256": "6a2352f559b8fd3bab7e1f4293c022f319f117c07999cf7d5889ce8c87aad241"
+    }
+  },
+  "testFixtureInputs": {
+    "Tests/GroupContainerReturnTests.m": "2f1827d4322391d244fdf5fc5c261a01b9dccc0380224b1706c2432ab5fde2f5",
+    "Tests/GroupNeutralUIKitDouble.h": "3a5a24f5eaebf9bbe52a51ae00965439ce586af4ab307e06eb8d89f5766935a4",
+    "Tests/extract-group-container-return.py": "ae36b2c38ef55922559ef04d435e8be45072366f089ee00c4c067a5482b7dc0d",
+    "Tests/extract-group-return-layout.py": "8854449dce54bd77fd1946893dbac88574ce6e1ba1eb1be0d01955e002bd49a6",
+    "Tests/extract-group-return-privacy.py": "7d7441fe61b10c3bdf37284e1cd9fbfc1c4cad4b0bcc91cfa5f4d62dbcec34dc"
+  }
+}

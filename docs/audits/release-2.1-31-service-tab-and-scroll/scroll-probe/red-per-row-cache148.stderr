@@ -1,0 +1,74 @@
+FAIL: neutral-scroll/miniapp-container/blocked / unready queries retain ready numeric section and row geometry
+FAIL: neutral-scroll/miniapp-container/blocked / unready queries preserve table contentSize instead of collapsing scroll extent
+FAIL: neutral-scroll/miniapp-container/blocked / neutral state retains a scrollable bounding box
+FAIL: neutral-scroll/miniapp-container/blocked / controlled neutral drag advances contentOffset by requested delta
+FAIL: neutral-scroll/miniapp-container/blocked / unready native-owner row action cannot reach invisible native content
+FAIL: neutral-scroll/miniapp-container/blocked / ready content restores genuine pre-neutral scroll position after blank dragging
+FAIL: neutral-scroll/miniapp-container/stale-revision / unready queries retain ready numeric section and row geometry
+FAIL: neutral-scroll/miniapp-container/stale-revision / unready queries preserve table contentSize instead of collapsing scroll extent
+FAIL: neutral-scroll/miniapp-container/stale-revision / neutral state retains a scrollable bounding box
+FAIL: neutral-scroll/miniapp-container/stale-revision / controlled neutral drag advances contentOffset by requested delta
+FAIL: neutral-scroll/miniapp-container/stale-revision / unready native-owner row action cannot reach invisible native content
+FAIL: neutral-scroll/miniapp-container/stale-revision / ready content restores genuine pre-neutral scroll position after blank dragging
+FAIL: neutral-scroll/miniapp-container/nil-policy / unready queries retain ready numeric section and row geometry
+FAIL: neutral-scroll/miniapp-container/nil-policy / unready queries preserve table contentSize instead of collapsing scroll extent
+FAIL: neutral-scroll/miniapp-container/nil-policy / neutral state retains a scrollable bounding box
+FAIL: neutral-scroll/miniapp-container/nil-policy / controlled neutral drag advances contentOffset by requested delta
+FAIL: neutral-scroll/miniapp-container/nil-policy / unready native-owner row action cannot reach invisible native content
+FAIL: neutral-scroll/miniapp-container/nil-policy / ready content restores genuine pre-neutral scroll position after blank dragging
+FAIL: neutral-scroll/miniapp-container/wrong-policy-account / unready queries retain ready numeric section and row geometry
+FAIL: neutral-scroll/miniapp-container/wrong-policy-account / unready queries preserve table contentSize instead of collapsing scroll extent
+FAIL: neutral-scroll/miniapp-container/wrong-policy-account / neutral state retains a scrollable bounding box
+FAIL: neutral-scroll/miniapp-container/wrong-policy-account / controlled neutral drag advances contentOffset by requested delta
+FAIL: neutral-scroll/miniapp-container/wrong-policy-account / unready native-owner row action cannot reach invisible native content
+FAIL: neutral-scroll/miniapp-container/wrong-policy-account / ready content restores genuine pre-neutral scroll position after blank dragging
+FAIL: neutral-scroll/chat-return/blocked / unready queries retain ready numeric section and row geometry
+FAIL: neutral-scroll/chat-return/blocked / unready queries preserve table contentSize instead of collapsing scroll extent
+FAIL: neutral-scroll/chat-return/blocked / neutral state retains a scrollable bounding box
+FAIL: neutral-scroll/chat-return/blocked / controlled neutral drag advances contentOffset by requested delta
+FAIL: neutral-scroll/chat-return/blocked / unready native-owner row action cannot reach invisible native content
+FAIL: neutral-scroll/chat-return/blocked / ready content restores genuine pre-neutral scroll position after blank dragging
+FAIL: neutral-scroll/chat-return/stale-revision / unready queries retain ready numeric section and row geometry
+FAIL: neutral-scroll/chat-return/stale-revision / unready queries preserve table contentSize instead of collapsing scroll extent
+FAIL: neutral-scroll/chat-return/stale-revision / neutral state retains a scrollable bounding box
+FAIL: neutral-scroll/chat-return/stale-revision / controlled neutral drag advances contentOffset by requested delta
+FAIL: neutral-scroll/chat-return/stale-revision / unready native-owner row action cannot reach invisible native content
+FAIL: neutral-scroll/chat-return/stale-revision / ready content restores genuine pre-neutral scroll position after blank dragging
+FAIL: neutral-scroll/chat-return/nil-policy / unready queries retain ready numeric section and row geometry
+FAIL: neutral-scroll/chat-return/nil-policy / unready queries preserve table contentSize instead of collapsing scroll extent
+FAIL: neutral-scroll/chat-return/nil-policy / neutral state retains a scrollable bounding box
+FAIL: neutral-scroll/chat-return/nil-policy / controlled neutral drag advances contentOffset by requested delta
+FAIL: neutral-scroll/chat-return/nil-policy / unready native-owner row action cannot reach invisible native content
+FAIL: neutral-scroll/chat-return/nil-policy / ready content restores genuine pre-neutral scroll position after blank dragging
+FAIL: neutral-scroll/chat-return/wrong-policy-account / unready queries retain ready numeric section and row geometry
+FAIL: neutral-scroll/chat-return/wrong-policy-account / unready queries preserve table contentSize instead of collapsing scroll extent
+FAIL: neutral-scroll/chat-return/wrong-policy-account / neutral state retains a scrollable bounding box
+FAIL: neutral-scroll/chat-return/wrong-policy-account / controlled neutral drag advances contentOffset by requested delta
+FAIL: neutral-scroll/chat-return/wrong-policy-account / unready native-owner row action cannot reach invisible native content
+FAIL: neutral-scroll/chat-return/wrong-policy-account / ready content restores genuine pre-neutral scroll position after blank dragging
+FAIL: neutral-scroll/ready-during-drag/miniapp-container / blocked content installs one empty rendering mask and retains original layer mask
+FAIL: neutral-scroll/ready-during-drag/miniapp-container / whole-content neutral state suppresses accessibility content
+FAIL: neutral-scroll/ready-during-drag/miniapp-container / active neutral dragging remains responsive without revealing content
+FAIL: neutral-scroll/ready-during-drag/miniapp-container / ready publication during active drag retains pending genuine viewport
+FAIL: neutral-scroll/ready-during-drag/miniapp-container / ready rows stay fully neutral until gesture permits safe viewport restoration
+FAIL: neutral-scroll/ready-during-drag/miniapp-container / ready publication does not reset contentOffset underneath active drag
+FAIL: neutral-scroll/ready-during-drag/miniapp-container / scroll-end restores genuine viewport once and clears neutral restoration state
+FAIL: neutral-scroll/ready-during-drag/chat-return / blocked content installs one empty rendering mask and retains original layer mask
+FAIL: neutral-scroll/ready-during-drag/chat-return / whole-content neutral state suppresses accessibility content
+FAIL: neutral-scroll/ready-during-drag/chat-return / active neutral dragging remains responsive without revealing content
+FAIL: neutral-scroll/ready-during-drag/chat-return / ready publication during active drag retains pending genuine viewport
+FAIL: neutral-scroll/ready-during-drag/chat-return / ready rows stay fully neutral until gesture permits safe viewport restoration
+FAIL: neutral-scroll/ready-during-drag/chat-return / ready publication does not reset contentOffset underneath active drag
+FAIL: neutral-scroll/ready-during-drag/chat-return / scroll-end restores genuine viewport once and clears neutral restoration state
+FAIL: neutral-scroll/unlocked-native-after-blocked / blocked transition captures native return viewport and neutralizes rendering
+FAIL: neutral-scroll/unlocked-native-after-blocked / blocked transition keeps native destination geometry scrollable
+FAIL: neutral-scroll/unlocked-native-after-blocked / unlocked native publication consumes neutral viewport and restores genuine position
+FAIL: neutral-scroll/cold-scalar-cache/miniapp-container / cold gate preserves previous scrollable content bounding box with one content-free spacer
+FAIL: neutral-scroll/cold-scalar-cache/miniapp-container / cold gate supplies only one empty placeholder without native content
+FAIL: neutral-scroll/cold-scalar-cache/miniapp-container / cold spacer supports controlled neutral drag
+FAIL: neutral-scroll/cold-scalar-cache/miniapp-container / repeated cold neutral query does not inflate or collapse content bounds
+FAIL: neutral-scroll/cold-scalar-cache/chat-return / cold gate preserves previous scrollable content bounding box with one content-free spacer
+FAIL: neutral-scroll/cold-scalar-cache/chat-return / cold gate supplies only one empty placeholder without native content
+FAIL: neutral-scroll/cold-scalar-cache/chat-return / cold spacer supports controlled neutral drag
+FAIL: neutral-scroll/cold-scalar-cache/chat-return / repeated cold neutral query does not inflate or collapse content bounds
+Group neutral scroll HOST: 148 checks, 73 failures

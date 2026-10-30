@@ -21,7 +21,7 @@ def method(text,marker):
 markers=['- (void)refresh {','- (void)publishProjection:','- (void)layout {','- (void)publishHeader:',
  '- (UITableViewCell *)cellForDisplayPath:(NSIndexPath *)path target:(id)target {','- (BOOL)isActive {',
  '+ (void)setPresentationSuspended:','+ (void)finishPresentationReturnForController:',
- '- (BOOL)hasScrollableContent','- (BOOL)canRestoreAnchor','- (void)saveAnchor','- (void)restoreAnchor',
+ '- (BOOL)hasScrollableContent','- (BOOL)canRestoreAnchor','- (void)saveAnchor','- (void)restoreAnchor {',
  '- (NSNumber *)presentationScrollHeight','- (void)restoreViewportFromTab:','- (void)restoreScrollHeight:',
  '- (void)setNativeTableHeaderView:', '- (void)cancelScheduledRefresh {', '- (void)requestRefresh {',
  '- (void)beginNativeChange {','- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind {',

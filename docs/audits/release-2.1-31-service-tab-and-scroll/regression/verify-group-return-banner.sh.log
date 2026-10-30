@@ -1,0 +1,96 @@
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:274:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-return-banner-probe.vGEOmy/GroupReturnBannerProbeBodies.h:357:32: error: semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]
+  357 | - (void)probe_restoreAnchorBody;
+      |                                ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-return-banner-probe.vGEOmy/GroupReturnBannerProbeBodies.h:358:1: error: expected method body
+  358 | @end
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-return-banner-probe.vGEOmy/GroupReturnBannerProbeBodies.h:361:1: error: unexpected '@' in program
+  361 | @property (nonatomic, weak) id target;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-return-banner-probe.vGEOmy/GroupReturnBannerProbeBodies.h:362:1: error: unexpected '@' in program
+  362 | @property (nonatomic, strong) NSMutableDictionary<NSString *,NSMethodSignature *> *signatures;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-return-banner-probe.vGEOmy/GroupReturnBannerProbeBodies.h:363:1: error: unexpected '@' in program
+  363 | @property (nonatomic, strong) NSMutableDictionary<NSString *,NSData *> *geometry;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-return-banner-probe.vGEOmy/GroupReturnBannerProbeBodies.h:312:64: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'cancelScheduledRefresh'
+  312 |         [adapter.projection discardComputationCache]; [adapter cancelScheduledRefresh];
+      |                                                        ~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-return-banner-probe.vGEOmy/GroupReturnBannerProbeBodies.h:340:18: error: property 'neutralViewport' not found on object of type 'CSGroupListAdapter *'
+  340 |     return !self.neutralViewport && [self hasScrollableContent] && !self.searching && !table.tracking &&
+      |                  ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:273:17: error: method definition for 'restoreAnchor' not found [-Werror,-Wincomplete-implementation]
+  273 | @implementation CSGroupListAdapter
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:229:1: note: method 'restoreAnchor' declared here
+  229 | - (void)restoreAnchor;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:273:17: error: method definition for 'restoreScrollHeight:' not found [-Werror,-Wincomplete-implementation]
+  273 | @implementation CSGroupListAdapter
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:230:1: note: method 'restoreScrollHeight:' declared here
+  230 | - (void)restoreScrollHeight:(CGFloat)height;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:273:17: error: method definition for 'presentationScrollHeight' not found [-Werror,-Wincomplete-implementation]
+  273 | @implementation CSGroupListAdapter
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:231:1: note: method 'presentationScrollHeight' declared here
+  231 | - (NSNumber *)presentationScrollHeight;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:273:17: error: method definition for 'beginNativeChange' not found [-Werror,-Wincomplete-implementation]
+  273 | @implementation CSGroupListAdapter
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:232:1: note: method 'beginNativeChange' declared here
+  232 | - (void)beginNativeChange;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:273:17: error: method definition for 'beginNativeChangeOfKind:' not found [-Werror,-Wincomplete-implementation]
+  273 | @implementation CSGroupListAdapter
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:233:1: note: method 'beginNativeChangeOfKind:' declared here
+  233 | - (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:273:17: error: method definition for 'beginNativeChangeOfKind:sessionUserNames:' not found [-Werror,-Wincomplete-implementation]
+  273 | @implementation CSGroupListAdapter
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:234:1: note: method 'beginNativeChangeOfKind:sessionUserNames:' declared here
+  234 | - (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind sessionUserNames:(NSSet *)names;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:273:17: error: method definition for 'endNativeChange' not found [-Werror,-Wincomplete-implementation]
+  273 | @implementation CSGroupListAdapter
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:235:1: note: method 'endNativeChange' declared here
+  235 | - (void)endNativeChange;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:273:17: error: method definition for 'endNativeChangeCoalesced:' not found [-Werror,-Wincomplete-implementation]
+  273 | @implementation CSGroupListAdapter
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:236:1: note: method 'endNativeChangeCoalesced:' declared here
+  236 | - (void)endNativeChangeCoalesced:(BOOL)coalesced;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:273:17: error: method definition for 'requestCoalescedRefresh' not found [-Werror,-Wincomplete-implementation]
+  273 | @implementation CSGroupListAdapter
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:237:1: note: method 'requestCoalescedRefresh' declared here
+  237 | - (void)requestCoalescedRefresh;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:273:17: error: method definition for 'requestTabBadgeSourceRefreshCoalesced:' not found [-Werror,-Wincomplete-implementation]
+  273 | @implementation CSGroupListAdapter
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:238:1: note: method 'requestTabBadgeSourceRefreshCoalesced:' declared here
+  238 | - (void)requestTabBadgeSourceRefreshCoalesced:(BOOL)coalesced;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:273:17: error: method definition for 'invalidateNativeSnapshot' not found [-Werror,-Wincomplete-implementation]
+  273 | @implementation CSGroupListAdapter
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:239:1: note: method 'invalidateNativeSnapshot' declared here
+  239 | - (void)invalidateNativeSnapshot;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:273:17: error: method definition for 'recordRefreshReason:' not found [-Werror,-Wincomplete-implementation]
+  273 | @implementation CSGroupListAdapter
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupReturnBannerProbeTests.m:240:1: note: method 'recordRefreshReason:' declared here
+  240 | - (void)recordRefreshReason:(NSString *)reason;
+      | ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.

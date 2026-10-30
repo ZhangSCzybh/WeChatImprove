@@ -18,7 +18,7 @@ def method(text,marker):
             depth-=1
             if not depth:return text[start:end+1]
     raise AssertionError(marker)
-markers=['- (BOOL)hasScrollableContent','- (BOOL)canRestoreAnchor','- (void)saveAnchor','- (void)restoreAnchor','- (NSNumber *)presentationScrollHeight','- (void)restoreViewportFromTab:','- (void)restoreScrollHeight:']
+markers=['- (BOOL)hasScrollableContent','- (BOOL)canRestoreAnchor','- (void)saveAnchor','- (void)restoreAnchor {','- (NSNumber *)presentationScrollHeight','- (void)restoreViewportFromTab:','- (void)restoreScrollHeight:']
 out.with_name('GroupReturnLayoutViewport.h').write_text('\n\n'.join(method(source,m) for m in markers)+'\n')
 out.with_name('GroupReturnLayoutCard.h').write_text(method(source,'BOOL CSGroupCardPosition(')+'\n')
 hooks=(root/'Hooks/ListCornerRadiusHooks.xm').read_text().split('%hook MainFrameTableView',1)[1].split('%end',1)[0]

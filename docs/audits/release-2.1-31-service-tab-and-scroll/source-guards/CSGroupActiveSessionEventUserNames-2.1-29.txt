@@ -1,0 +1,10 @@
+static NSSet<NSString *> *CSGroupActiveSessionEventUserNames(id oldValue, id newValue) {
+    NSString *oldName=CSGroupSessionEventUserName(oldValue), *newName=CSGroupSessionEventUserName(newValue);
+    // An unresolved non-nil side may affect another session. Preserve the
+    // unknown fallback rather than narrowing that event to its other side.
+    if ((oldValue && !oldName.length) || (newValue && !newName.length)) return nil;
+    NSMutableSet<NSString *> *names=[NSMutableSet set];
+    if (oldName.length) [names addObject:oldName];
+    if (newName.length) [names addObject:newName];
+    return names.count ? [names copy] : nil;
+}

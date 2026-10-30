@@ -65,6 +65,9 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @implementation CSGroupRow @end
 @interface CSGroupProjection : NSObject
 @property(nonatomic,strong) NSArray<NSArray<CSGroupRow *> *> *sections;
+@property(nonatomic,copy) NSString *accountID;
+@property(nonatomic,getter=isValid) BOOL valid;
+@property(nonatomic) NSUInteger privacyRevision;
 - (CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)path;
 @end
 @implementation CSGroupProjection
@@ -92,6 +95,22 @@ static NSHashTable *Adapters(void) {
 static BOOL Option(NSString *suffix) { (void)suffix; return enabled; }
 static NSString *CSGroupCurrentAccountID(void) { return account; }
 static NSUInteger CSCloseFriendAccountEpoch(void) { return accountEpoch; }
+@interface CSCloseFriendSnapshot : NSObject
+@property(nonatomic,copy) NSString *accountID;
+@property(nonatomic) BOOL enabled,revealed,blocked;
+@property(nonatomic,strong) NSDictionary *options;
+@property(nonatomic) NSUInteger revision;
+@end
+@implementation CSCloseFriendSnapshot @end
+static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) {
+    CSCloseFriendSnapshot *policy=[CSCloseFriendSnapshot new];policy.accountID=account;return policy;
+}
+@interface ViewportShield : NSObject
+- (void)finishTablePublication;
+@end
+@implementation ViewportShield
+- (void)finishTablePublication {}
+@end
 static BOOL CSGroupIsFoldedController(id owner) { (void)owner; return NO; }
 static BOOL CSGroupPrivacyActive(void) { return NO; }
 static id CSGroupReadObject(id object,NSString *name) { return [object valueForKey:name]; }
@@ -114,12 +133,16 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic,strong) CSGroupProjection *projection;
 @property(nonatomic,strong) NSMutableDictionary *proxies,*anchors;
 @property(nonatomic,copy) NSDictionary *presentationViewport;
+@property(nonatomic,copy) NSDictionary *neutralViewport;
+@property(nonatomic) BOOL finishingNeutralPublication;
+@property(nonatomic,strong) ViewportShield *privacyShield;
 @property(nonatomic,strong) NSMutableArray *completions,*nativeActions;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
 @property(nonatomic,strong) id nativeHeader;
 @property(nonatomic) CGFloat baselineDeceleration;
 @property(nonatomic) BOOL dirty,searching,publishedEnabled,scheduled,publishing,groupPanMoving;
 @property(nonatomic) BOOL active,pendingScrollToTop,chromeVisible,swipeActive,nativePresentation,snapshotRetryAttempted;
+@property(nonatomic,readonly) BOOL projecting;
 @property(nonatomic,strong) NSArray *displayedTabs;
 @property(nonatomic,strong) TestChrome *chrome;
 @property(nonatomic) NSUInteger changeDepth,refreshCount,layoutCount,detachCount,nativeMenuState;
@@ -144,6 +167,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (void)applyPendingScrollToTop;
 - (void)returnToGroupTop;
 - (void)selectIndex:(NSInteger)index;
+- (void)finishNeutralPublication:(BOOL)completed;
 @end
 @implementation CSGroupListAdapter
 // Badge source lifecycle is exercised in GroupLifecycleTests.
@@ -155,6 +179,10 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (void)recordRefreshEvent:(NSString *)event delay:(NSTimeInterval)delay { (void)event; (void)delay; }
 #include "GroupViewportBodies.h"
 - (BOOL)isActive { return self.active; }
+- (BOOL)projecting { return self.active; }
+// Neutral publication is exercised by GroupNeutralScrollTests, not this
+// viewport-only fixture, whose inputs never install a privacy render mask.
+- (void)finishNeutralPublication:(BOOL)completed { (void)completed; }
 - (void)refreshNavigationTitle {}
 - (void)refresh {
     // Capture and restore calls are extracted from the actual refresh method.

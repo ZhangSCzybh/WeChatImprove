@@ -1,0 +1,37 @@
+{
+  "initial_parallel_run": {
+    "checks": 239,
+    "failures": 1,
+    "failed_assertion": "continuous notifications flush at the maximum window instead of waiting for silence",
+    "log": "regression-final/verify-group-lifecycle.sh.log"
+  },
+  "baseline_control": {
+    "checks": 239,
+    "failures": 0,
+    "source_and_test_fixture": "immutable 2.1-30",
+    "log": "regression-final/lifecycle-baseline-untouched30-attempt2.log"
+  },
+  "current_serial_control": {
+    "checks": 239,
+    "failures": 0,
+    "log": "regression-final/lifecycle-current-serial.log"
+  },
+  "related_production_methods": [
+    {
+      "method": "- (void)requestTabBadgeSourceRefreshCoalesced:(BOOL)coalesced {",
+      "byte_identical": true,
+      "sha256": "667215ee6c69f59bec0bb52474894776b5050b849277fff026dc1418be23b51f"
+    },
+    {
+      "method": "- (void)cancelTabBadgeSourceRefresh {",
+      "byte_identical": true,
+      "sha256": "66d7627ca78454708bb5c307e19465cad95a7d6d6c9fb9077a6ed199925925e9"
+    },
+    {
+      "method": "- (void)refreshTabBadgeSource {",
+      "byte_identical": true,
+      "sha256": "cd08daf88e2cdf583865b923442b1c03de233f6fa471cb6e25873eeabcd196c3"
+    }
+  ],
+  "note": "First baseline control compile lacked Tests include path; failed compile retained as lifecycle-baseline-untouched30.log, corrected isolated invocation then passed. No production timer logic modified; wall-clock scheduling cause not measured."
+}

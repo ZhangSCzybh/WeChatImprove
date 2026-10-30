@@ -35,7 +35,7 @@ methods = [method(text, marker) for marker in [
     "+ (void)attachToController:", "+ (void)setPresentationSuspended:", "+ (void)finishPresentationReturnForController:",
     "- (void)cancelScheduledRefresh {", "- (void)requestRefresh {", "- (void)scheduleRefresh {", "- (void)requestRecovery {",
     "- (BOOL)hasScrollableContent", "- (BOOL)canRestoreAnchor",
-    "- (void)saveAnchor", "- (void)restoreAnchor", "- (NSNumber *)presentationScrollHeight",
+    "- (void)saveAnchor", "- (void)restoreAnchor {", "- (NSNumber *)presentationScrollHeight",
     "- (void)restoreViewportFromTab:", "- (void)restoreScrollHeight:",
     "- (void)returnToGroupTop", "- (void)applyPendingScrollToTop", "- (void)selectIndex:",
 ]]

@@ -1,0 +1,79 @@
+objc[22450]: Class CALayer is implemented in both /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore (0x1eb4d39d8) and /private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-service-shield.GZROcB/service-shield-tests (0x1007849e0). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+objc[22450]: Class CATransaction is implemented in both /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore (0x1eb4d3b40) and /private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-service-shield.GZROcB/service-shield-tests (0x100784a30). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+FAIL: service-shield/miniapp-container-return/Whole/locked / unrelated official/service aggregate never individually disappears
+FAIL: service-shield/miniapp-container-return/Whole/locked / known ordinary row remains visible during return shielding
+FAIL: service-shield/miniapp-container-return/Whole/locked / unrelated official/service aggregate never individually disappears
+FAIL: service-shield/miniapp-container-return/Whole/locked / known ordinary row remains visible during return shielding
+FAIL: service-shield/miniapp-container-return/Service/locked / unrelated official/service aggregate never individually disappears
+FAIL: service-shield/miniapp-container-return/Service/locked / known ordinary row remains visible during return shielding
+FAIL: service-shield/miniapp-container-return/Service/locked / unrelated official/service aggregate never individually disappears
+FAIL: service-shield/miniapp-container-return/Service/locked / known ordinary row remains visible during return shielding
+FAIL: service-shield/chat-return/Whole/locked / unrelated official/service aggregate never individually disappears
+FAIL: service-shield/chat-return/Whole/locked / known ordinary row remains visible during return shielding
+FAIL: service-shield/chat-return/Whole/locked / unrelated official/service aggregate never individually disappears
+FAIL: service-shield/chat-return/Whole/locked / known ordinary row remains visible during return shielding
+FAIL: service-shield/chat-return/Service/locked / unrelated official/service aggregate never individually disappears
+FAIL: service-shield/chat-return/Service/locked / known ordinary row remains visible during return shielding
+FAIL: service-shield/chat-return/Service/locked / unrelated official/service aggregate never individually disappears
+FAIL: service-shield/chat-return/Service/locked / known ordinary row remains visible during return shielding
+FAIL: service-shield/miniapp-container-return/visible-unlocked-to-locked / lock transition does not conceal unrelated service aggregate
+FAIL: service-shield/miniapp-container-return/visible-unlocked-to-locked / lock transition does not conceal unrelated service aggregate
+FAIL: service-shield/chat-return/visible-unlocked-to-locked / lock transition does not conceal unrelated service aggregate
+FAIL: service-shield/chat-return/visible-unlocked-to-locked / lock transition does not conceal unrelated service aggregate
+FAIL: service-shield/miniapp-container-return/unknown-nil-policy/old-mask-no / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/miniapp-container-return/unknown-nil-policy/old-mask-no / whole neutral content is unavailable to accessibility
+FAIL: service-shield/miniapp-container-return/unknown-nil-policy/old-mask-no / prepare-for-publication retains whole mask until verified content and viewport finish
+FAIL: service-shield/miniapp-container-return/unknown-nil-policy/old-mask-yes / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/miniapp-container-return/unknown-blocked-policy/old-mask-no / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/miniapp-container-return/unknown-blocked-policy/old-mask-no / whole neutral content is unavailable to accessibility
+FAIL: service-shield/miniapp-container-return/unknown-blocked-policy/old-mask-no / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/miniapp-container-return/unknown-blocked-policy/old-mask-no / prepare-for-publication retains whole mask until verified content and viewport finish
+FAIL: service-shield/miniapp-container-return/unknown-blocked-policy/old-mask-yes / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/miniapp-container-return/unknown-blocked-policy/old-mask-yes / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/miniapp-container-return/unknown-missing-delivery/old-mask-no / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/miniapp-container-return/unknown-missing-delivery/old-mask-no / whole neutral content is unavailable to accessibility
+FAIL: service-shield/miniapp-container-return/unknown-missing-delivery/old-mask-no / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/miniapp-container-return/unknown-missing-delivery/old-mask-no / prepare-for-publication retains whole mask until verified content and viewport finish
+FAIL: service-shield/miniapp-container-return/unknown-missing-delivery/old-mask-yes / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/miniapp-container-return/unknown-missing-delivery/old-mask-yes / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/miniapp-container-return/unknown-delivery-account-mismatch/old-mask-no / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/miniapp-container-return/unknown-delivery-account-mismatch/old-mask-no / whole neutral content is unavailable to accessibility
+FAIL: service-shield/miniapp-container-return/unknown-delivery-account-mismatch/old-mask-no / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/miniapp-container-return/unknown-delivery-account-mismatch/old-mask-no / prepare-for-publication retains whole mask until verified content and viewport finish
+FAIL: service-shield/miniapp-container-return/unknown-delivery-account-mismatch/old-mask-yes / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/miniapp-container-return/unknown-delivery-account-mismatch/old-mask-yes / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/miniapp-container-return/unknown-policy-account-mismatch/old-mask-no / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/miniapp-container-return/unknown-policy-account-mismatch/old-mask-no / whole neutral content is unavailable to accessibility
+FAIL: service-shield/miniapp-container-return/unknown-policy-account-mismatch/old-mask-no / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/miniapp-container-return/unknown-policy-account-mismatch/old-mask-no / prepare-for-publication retains whole mask until verified content and viewport finish
+FAIL: service-shield/miniapp-container-return/unknown-policy-account-mismatch/old-mask-yes / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/miniapp-container-return/unknown-policy-account-mismatch/old-mask-yes / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/chat-return/unknown-nil-policy/old-mask-no / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/chat-return/unknown-nil-policy/old-mask-no / whole neutral content is unavailable to accessibility
+FAIL: service-shield/chat-return/unknown-nil-policy/old-mask-no / prepare-for-publication retains whole mask until verified content and viewport finish
+FAIL: service-shield/chat-return/unknown-nil-policy/old-mask-yes / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/chat-return/unknown-blocked-policy/old-mask-no / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/chat-return/unknown-blocked-policy/old-mask-no / whole neutral content is unavailable to accessibility
+FAIL: service-shield/chat-return/unknown-blocked-policy/old-mask-no / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/chat-return/unknown-blocked-policy/old-mask-no / prepare-for-publication retains whole mask until verified content and viewport finish
+FAIL: service-shield/chat-return/unknown-blocked-policy/old-mask-yes / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/chat-return/unknown-blocked-policy/old-mask-yes / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/chat-return/unknown-missing-delivery/old-mask-no / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/chat-return/unknown-missing-delivery/old-mask-no / whole neutral content is unavailable to accessibility
+FAIL: service-shield/chat-return/unknown-missing-delivery/old-mask-no / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/chat-return/unknown-missing-delivery/old-mask-no / prepare-for-publication retains whole mask until verified content and viewport finish
+FAIL: service-shield/chat-return/unknown-missing-delivery/old-mask-yes / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/chat-return/unknown-missing-delivery/old-mask-yes / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/chat-return/unknown-delivery-account-mismatch/old-mask-no / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/chat-return/unknown-delivery-account-mismatch/old-mask-no / whole neutral content is unavailable to accessibility
+FAIL: service-shield/chat-return/unknown-delivery-account-mismatch/old-mask-no / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/chat-return/unknown-delivery-account-mismatch/old-mask-no / prepare-for-publication retains whole mask until verified content and viewport finish
+FAIL: service-shield/chat-return/unknown-delivery-account-mismatch/old-mask-yes / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/chat-return/unknown-delivery-account-mismatch/old-mask-yes / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/chat-return/unknown-policy-account-mismatch/old-mask-no / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/chat-return/unknown-policy-account-mismatch/old-mask-no / whole neutral content is unavailable to accessibility
+FAIL: service-shield/chat-return/unknown-policy-account-mismatch/old-mask-no / unknown content never hides isolated cells or creates row holes
+FAIL: service-shield/chat-return/unknown-policy-account-mismatch/old-mask-no / prepare-for-publication retains whole mask until verified content and viewport finish
+FAIL: service-shield/chat-return/unknown-policy-account-mismatch/old-mask-yes / unknown policy/delivery neutralizes complete content layer with one empty mask
+FAIL: service-shield/chat-return/unknown-policy-account-mismatch/old-mask-yes / unknown content never hides isolated cells or creates row holes
+Group service shield HOST: 690 checks, 76 failures

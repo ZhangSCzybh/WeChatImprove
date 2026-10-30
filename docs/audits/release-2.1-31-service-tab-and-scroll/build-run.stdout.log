@@ -1,0 +1,93 @@
+{
+  "input_hashes_unchanged": true,
+  "existing_artifacts_preserved": true,
+  "task_start_artifact_count": 1329,
+  "protected_definitions_verified": 6,
+  "warning_limit": 6,
+  "warning_baseline_version": "2.1-30",
+  "warning_limits_satisfied": true,
+  "warning_multisets_match_baseline": true,
+  "packages_published": true,
+  "builds": [
+    {
+      "scheme": "rootless",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "SCHEME=rootless",
+        "PACKAGE_VERSION=2.1-31",
+        "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-service-tab-and-scroll-2.1-31-build-eeo40taz/rootless/.theos",
+        "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-service-tab-and-scroll-2.1-31-build-eeo40taz/rootless",
+        "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-service-tab-and-scroll-2.1-31-build-eeo40taz/packages"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 20.16,
+      "warning_count": 6,
+      "warnings": [
+        "\u001b[1mHooks/CloseFriendNotificationHooks.xm:393:62: \u001b[0m\u001b[0;1;35mwarning: \u001b[0m\u001b[1m'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]\u001b[0m",
+        "\u001b[1mHooks/CloseFriendNotificationHooks.xm:393:62: \u001b[0m\u001b[0;1;35mwarning: \u001b[0m\u001b[1m'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]\u001b[0m",
+        "\u001b[1mHooks/RedEnvelopHooks.xm:132:61: \u001b[0m\u001b[0;1;35mwarning: \u001b[0m\u001b[1m'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]\u001b[0m",
+        "ld: warning: -multiply_defined is obsolete",
+        "\u001b[1mHooks/RedEnvelopHooks.xm:132:61: \u001b[0m\u001b[0;1;35mwarning: \u001b[0m\u001b[1m'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]\u001b[0m",
+        "ld: warning: -multiply_defined is obsolete"
+      ],
+      "warning_limit": 6,
+      "warning_baseline_version": "2.1-30",
+      "warning_limit_satisfied": true,
+      "warning_baseline_record": "docs/audits/release-2.1-30-miniapp-return-and-top-flicker/build-rootless-result.json",
+      "warning_baseline_record_sha256": "c06c9a1b6d6a6fe1d66b2d909d234c020200154911e3be993c32ca44465f42a2",
+      "normalized_warnings": {
+        "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]": 2,
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]": 2,
+        "ld: warning: -multiply_defined is obsolete": 2
+      },
+      "normalized_baseline_warnings": {
+        "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]": 2,
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]": 2,
+        "ld: warning: -multiply_defined is obsolete": 2
+      },
+      "warnings_match_baseline": true
+    },
+    {
+      "scheme": "rootful",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "SCHEME=rootful",
+        "PACKAGE_VERSION=2.1-31",
+        "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-service-tab-and-scroll-2.1-31-build-eeo40taz/rootful/.theos",
+        "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-service-tab-and-scroll-2.1-31-build-eeo40taz/rootful",
+        "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-service-tab-and-scroll-2.1-31-build-eeo40taz/packages"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 20.153,
+      "warning_count": 6,
+      "warnings": [
+        "\u001b[1mHooks/CloseFriendNotificationHooks.xm:393:62: \u001b[0m\u001b[0;1;35mwarning: \u001b[0m\u001b[1m'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]\u001b[0m",
+        "\u001b[1mHooks/CloseFriendNotificationHooks.xm:393:62: \u001b[0m\u001b[0;1;35mwarning: \u001b[0m\u001b[1m'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]\u001b[0m",
+        "\u001b[1mHooks/RedEnvelopHooks.xm:132:61: \u001b[0m\u001b[0;1;35mwarning: \u001b[0m\u001b[1m'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]\u001b[0m",
+        "ld: warning: -multiply_defined is obsolete",
+        "\u001b[1mHooks/RedEnvelopHooks.xm:132:61: \u001b[0m\u001b[0;1;35mwarning: \u001b[0m\u001b[1m'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]\u001b[0m",
+        "ld: warning: -multiply_defined is obsolete"
+      ],
+      "warning_limit": 6,
+      "warning_baseline_version": "2.1-30",
+      "warning_limit_satisfied": true,
+      "warning_baseline_record": "docs/audits/release-2.1-30-miniapp-return-and-top-flicker/build-rootful-result.json",
+      "warning_baseline_record_sha256": "7f9c85b8627bc5acf72b25ad2498245eea8c3dad6cc86e7595661406b523b15c",
+      "normalized_warnings": {
+        "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]": 2,
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]": 2,
+        "ld: warning: -multiply_defined is obsolete": 2
+      },
+      "normalized_baseline_warnings": {
+        "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]": 2,
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]": 2,
+        "ld: warning: -multiply_defined is obsolete": 2
+      },
+      "warnings_match_baseline": true
+    }
+  ]
+}

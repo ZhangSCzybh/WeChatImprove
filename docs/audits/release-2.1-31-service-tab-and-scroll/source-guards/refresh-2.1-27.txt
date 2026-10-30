@@ -1,0 +1,183 @@
+- (void)refresh {
+    if (!NSThread.isMainThread) { [self requestRefresh]; return; }
+    if (self.publishing) return;
+    [self pruneNativeActions];
+    // Explicit native navigation is the only offscreen publication exception.
+    // Ordinary message/unread/draft updates merely invalidate the cached list.
+    if ((!CSGroupApplicationActive() && !(self.privacyRefreshPending && CSGroupPrivacyActive())) || (self.presentationSuspended && !self.nativeActions.count)) {
+        self.dirty=YES; [self finishSuspendedBatches]; return;
+    }
+    // A horizontal row swipe starts tracking before UIKit reports editing or
+    // dragging. Reloading in that window replaces the cell under the finger.
+    if (!self.privacyRefreshPending && !self.presentationSuspended && (self.table.tracking || [self groupPanMoving])) { self.dirty=YES; [self scheduleRefresh]; return; }
+    NSUInteger menuState=(self.privacyRefreshPending || self.presentationSuspended) ? 0 : [self nativeMenuState];
+    if (menuState) {
+        self.dirty=YES;
+        if (menuState&2) [self scheduleRefresh];
+        return;
+    }
+    if (!self.presentationSuspended) [self reconcileDeletedSwipeRow];
+    if (self.changeDepth || (!self.privacyRefreshPending && !self.presentationSuspended && (self.table.dragging || self.table.decelerating || self.table.editing || self.swipeActive))) { self.dirty=YES; return; }
+    self.interactionDeadline=0; self.interactionAttempts=0;
+    self.publishing=YES; self.dirty=NO;
+    // A synchronous privacy/selection publication consumes any queued generation.
+    // Otherwise an old timer can accidentally consume a later notification early.
+    self.refreshGeneration++; self.scheduled=NO;
+    self.scheduledCoalesced=NO; self.scheduledInteraction=NO; self.scheduledRecovery=NO;
+    self.coalescingNotification=NO; self.pendingImmediateRefresh=NO;
+    self.pendingRefreshDeadline=0; self.scheduledRefreshDeadline=0;
+    [self recordRefreshEvent:@"publish" delay:0];
+    CSGroupChangeKind changes;
+    NSSet<NSString *> *contentUserNames; BOOL contentIdentityKnown;
+    @synchronized (self) {
+        changes=self.pendingChanges; self.pendingChanges=0;
+        contentUserNames=[self.pendingContentUserNames copy]; contentIdentityKnown=!self.pendingContentUnattributed;
+        self.pendingContentUserNames=nil; self.pendingContentUnattributed=NO;
+    }
+    self.recoveryPending=NO;
+    NSUInteger publicationEpoch=CSCloseFriendAccountEpoch();
+    NSUInteger publicationPrivacyRevision=CSCloseFriendCurrentSnapshot().revision;
+    NSString *publicationAccount=CSGroupCurrentAccountID();
+    BOOL finished=NO;
+    @try {
+        NSString *viewportTab=(self.chromeVisible && self.isActive && !self.searching && !self.nativePresentation && !self.nativeActions.count) ? self.publishedTabID : nil;
+        CGFloat viewportHeight=self.table.contentOffset.y+self.table.adjustedContentInset.top;
+        [self saveAnchor];
+        [self installProxies];
+        NSString *account=CSGroupCurrentAccountID();
+        BOOL changed= ![self.preferences.accountID isEqualToString:account];
+        if (changed) { self.anchors=[NSMutableDictionary dictionary]; self.nativePresentation=self.nativeActions.count>0; self.projection=nil; self.snapshotRetryAttempted=NO; self.searchChromeVisible=NO; }
+        self.searching=CSGroupReadInteger(self.controller,@"isSearching",0)!=0;
+        if (!self.searching) self.searchChromeVisible=NO;
+        BOOL enabled=Option(@"enabled");
+        BOOL privacy=CSGroupPrivacyActive();
+        // Search owns a separate page. Preserve the selected list behind its
+        // transition instead of publishing unfiltered rows underneath group tabs.
+        // Explicit result navigation may still require native coordinates.
+        BOOL keepsSearchGroup=enabled && self.searching && self.searchChromeVisible && account.length && !changed &&
+            !self.nativePresentation && !self.nativeActions.count;
+        if (keepsSearchGroup && !self.privacyRefreshPending && self.projecting) {
+            @synchronized (self) {
+                self.pendingChanges|=changes|CSGroupChangeUnknown;
+                if (contentUserNames.count) {
+                    if (!self.pendingContentUserNames) self.pendingContentUserNames=[NSMutableSet set];
+                    [self.pendingContentUserNames unionSet:contentUserNames];
+                }
+                self.pendingContentUnattributed|=!contentIdentityKnown;
+            }
+            self.cachedNativeSections=nil; [self.projection discardComputationCache];
+            [self layout]; finished=YES; return;
+        }
+        if ((!privacy && (!enabled || (self.searching && !keepsSearchGroup))) || !account.length) {
+            BOOL needsReload=self.projecting || self.nativeActions.count>0;
+            BOOL hadChrome=self.chromeVisible;
+            self.projecting=NO; self.chromeVisible=NO; self.publishedEnabled=enabled;
+            self.projection=nil; self.identityDisplayPaths=nil; self.cachedNativeSections=nil;
+            [self layout];
+            if (needsReload) CSGroupWithDisplayIndices(self.table, ^{
+                [self.privacyShield prepareForPublication];
+                [self.table reloadData]; [self.table layoutIfNeeded];
+            });
+            if (hadChrome) [self refreshNavigationTitle];
+            finished=YES; return;
+        }
+        if (!self.preferences || changed) self.preferences=[[CSGroupPreferences alloc] initWithDefaults:NSUserDefaults.standardUserDefaults accountID:account];
+        else [self.preferences reload];
+        [self ensureChrome];
+        NSArray *tabs=self.preferences.tabs; NSString *selected=self.preferences.selectedTabID;
+        // A privacy change during search must rebuild this same group. It must
+        // neither retain newly hidden rows nor replace the transition with All.
+        if (self.nativePresentation || !enabled || (self.searching && !keepsSearchGroup)) {
+            selected=@"preset_0";
+            if (![tabs filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(WESessionTabItem *tab, NSDictionary *bindings) { (void)bindings; return [tab.tabId isEqual:selected]; }]].count)
+                tabs=[@[[WESessionTabItem tabWithType:WETabTypeAll]] arrayByAddingObjectsFromArray:tabs];
+        }
+        CSGroupProjection *previous=self.projection;
+        BOOL previouslyProjecting=self.projecting;
+        NSArray *sections=(self.nativePresentation && !privacy) ? nil : [self nativeSectionsForAccount:account];
+        CSGroupProjection *projection=(self.nativePresentation && !privacy) ? nil : [self projectionForSections:sections tabs:tabs selectedTabID:selected accountID:account];
+        self.projection=projection;
+        if (![projection hasSameDisplayStructureAs:previous]) {
+            NSMutableDictionary *identities=[NSMutableDictionary dictionary];
+            [self.projection.sections enumerateObjectsUsingBlock:^(NSArray *rows, NSUInteger s, BOOL *stop) {
+                (void)stop; [rows enumerateObjectsUsingBlock:^(CSGroupRow *row, NSUInteger r, BOOL *end) {
+                    (void)end; if (row.userName.length) identities[row.userName]=identities[row.userName] ? (id)NSNull.null : [NSIndexPath indexPathForRow:(NSInteger)r inSection:(NSInteger)s];
+                }];
+            }]; self.identityDisplayPaths=identities;
+        }
+        self.displayedTabs=tabs;
+        BOOL projecting=(privacy || (enabled && (!self.searching || keepsSearchGroup) && !self.nativePresentation)) && self.projection.isValid && account.length>0;
+        if (projecting && self.prefetchedPaths.count) {
+            id prefetch=self.proxies[@2].target;
+            NSArray *paths=self.prefetchedPaths.allObjects;
+            CSGroupWithNativeIndices(self.table, ^{ if ([prefetch respondsToSelector:@selector(tableView:cancelPrefetchingForRowsAtIndexPaths:)]) [prefetch tableView:self.table cancelPrefetchingForRowsAtIndexPaths:paths]; });
+            [self.prefetchedPaths removeAllObjects];
+        }
+        self.projecting=projecting;
+        self.chromeVisible=enabled && !CSGroupIsFoldedController(self.controller) && (!self.searching || keepsSearchGroup) && account.length>0;
+        self.publishedEnabled=Option(@"enabled");
+        self.publishedTabID=selected;
+        if (self.appearanceDirty) { [self.chrome refreshAppearance]; self.appearanceDirty=NO; }
+        self.chrome.selectedTabID=selected; [self.chrome updateTabs:tabs]; self.chrome.selectedTabID=selected;
+        id logic=CSGroupReadObject(self.controller,@"m_mainFrameLogicController");
+        [tabs enumerateObjectsUsingBlock:^(WESessionTabItem *tab, NSUInteger index, BOOL *stop) {
+            (void)stop; if (!projection && tab.type!=WETabTypeAll) return;
+            CSGroupBadge *badge=[projection badgeForTabID:tab.tabId];
+            NSInteger count=tab.type==WETabTypeAll && !privacy ? (NSInteger)MAX(0,CSGroupReadInteger(logic,@"getTotalUnreadCount",(long long)badge.count)) : (NSInteger)MIN(badge.count,(NSUInteger)NSIntegerMax);
+            BOOL hidden=Option(tab.type==WETabTypeAll ? @"hide_all_badge" : @"hide_group_badge");
+            [self.chrome updateUnreadCount:hidden ? 0 : count hasRedDot:!hidden && badge.redDot forTabIndex:(NSInteger)index];
+        }];
+        // First activation mounts its header after reload invalidates old cells;
+        // a synchronous header layout must not create a throwaway banner cell.
+        if (previouslyProjecting || !projecting) [self layout];
+        NSString *currentPublicationAccount=CSGroupCurrentAccountID();
+        if (publicationEpoch!=CSCloseFriendAccountEpoch() || publicationPrivacyRevision!=CSCloseFriendCurrentSnapshot().revision ||
+            !(publicationAccount==currentPublicationAccount || [publicationAccount isEqual:currentPublicationAccount])) return;
+        [self.privacyShield prepareForPublication];
+        [self publishProjection:projection previous:previous changes:changes contentUserNames:contentUserNames
+            contentIdentityKnown:contentIdentityKnown previouslyProjecting:previouslyProjecting];
+        currentPublicationAccount=CSGroupCurrentAccountID();
+        if (publicationEpoch!=CSCloseFriendAccountEpoch() || publicationPrivacyRevision!=CSCloseFriendCurrentSnapshot().revision ||
+            !(publicationAccount==currentPublicationAccount || [publicationAccount isEqual:currentPublicationAccount])) return;
+        [self restoreViewportFromTab:(changed ? nil : viewportTab) scrollHeight:viewportHeight];
+        [self refreshNavigationTitle];
+        finished=YES;
+    } @finally {
+        self.publishing=NO;
+        NSString *currentPublicationAccount=CSGroupCurrentAccountID();
+        BOOL publicationCurrent=publicationEpoch==CSCloseFriendAccountEpoch() &&
+            publicationPrivacyRevision==CSCloseFriendCurrentSnapshot().revision &&
+            (publicationAccount==currentPublicationAccount || [publicationAccount isEqual:currentPublicationAccount]);
+        if (!publicationCurrent) {
+            finished=NO; self.dirty=YES; self.publicationNeedsFullReload=YES;
+            // A policy callback may run inside native cell/layout work. The old
+            // publication cannot acknowledge it or remove the synchronous shield.
+            self.privacyRefreshPending|=CSGroupPrivacyActive();
+            @synchronized (self) {
+                self.pendingChanges|=changes|CSGroupChangeUnknown;
+                if (contentUserNames.count) {
+                    if (!self.pendingContentUserNames) self.pendingContentUserNames=[NSMutableSet set];
+                    [self.pendingContentUserNames unionSet:contentUserNames];
+                }
+                self.pendingContentUnattributed|=!contentIdentityKnown;
+            }
+        }
+        if (!finished && self.privacyRefreshPending) [self shieldVisiblePrivateRows];
+        if (finished) {
+            self.privacyRefreshPending=NO;
+            if (CSCloseFriendCurrentSnapshot().blocked && !CSGroupCurrentAccountID().length)
+                [self shieldVisiblePrivateRows];
+            else
+                [self.privacyShield prepareForPublication];
+        }
+        if (finished) [self applyPendingScrollToTop];
+        NSArray *callbacks=[self.completions copy]; [self.completions removeAllObjects];
+        for (void (^completion)(BOOL) in callbacks) completion(finished);
+        if (finished && CSGroupApplicationActive() && (!self.isActive || CSGroupPrivacyActive()) && !self.changeDepth) {
+            NSArray *actions=[self.nativeActions copy]; [self.nativeActions removeAllObjects];
+            for (void (^action)(void) in actions) CSGroupWithNativeIndices(self.table,action);
+        }
+        if (self.dirty) [self scheduleRefresh];
+        if (finished && !self.tabBadgeSourceScheduled) [self requestTabBadgeSourceRefresh];
+    }
+}

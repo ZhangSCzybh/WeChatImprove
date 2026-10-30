@@ -1,0 +1,57 @@
+[
+  {
+    "script": "verify-group-lifecycle.sh",
+    "exit": 1,
+    "seconds": 1.047
+  },
+  {
+    "script": "verify-group-launch-banner.sh",
+    "exit": 0,
+    "seconds": 1.024
+  },
+  {
+    "script": "verify-group-viewport.sh",
+    "exit": 1,
+    "seconds": 0.212
+  },
+  {
+    "script": "verify-group-search.sh",
+    "exit": 1,
+    "seconds": 0.46
+  },
+  {
+    "script": "verify-close-friend-session.sh",
+    "exit": 0,
+    "seconds": 2.587
+  },
+  {
+    "script": "verify-group-return-privacy.sh",
+    "exit": 0,
+    "seconds": 1.325
+  },
+  {
+    "script": "verify-group-return-layout.sh",
+    "exit": 0,
+    "seconds": 1.623
+  },
+  {
+    "script": "verify-group-return-banner.sh",
+    "exit": 1,
+    "seconds": 0.611
+  },
+  {
+    "script": "verify-list-corners.sh",
+    "exit": 0,
+    "seconds": 3.284
+  },
+  {
+    "script": "verify-top-transition.sh",
+    "exit": 0,
+    "seconds": 3.092
+  },
+  {
+    "script": "verify-top-transition-compatibility.sh",
+    "exit": 0,
+    "seconds": 3.11
+  }
+]

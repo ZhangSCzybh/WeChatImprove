@@ -85,6 +85,7 @@ typedef NS_ENUM(NSInteger, NSTextAlignment) { NSTextAlignmentCenter = 1 };
 @end
 @interface UITableViewCell : UIView @end
 @interface UITableView : UIView
+@property(nonatomic) CGSize contentSize;
 @property(nonatomic) BOOL tracking,dragging,decelerating,editing;
 @property(nonatomic) double decelerationRate;
 @property(nonatomic,strong) id tableHeaderView;

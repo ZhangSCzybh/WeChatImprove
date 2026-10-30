@@ -70,6 +70,11 @@ static BOOL Option(NSString *suffix) {
 @property (nonatomic) BOOL searchChromeVisible;
 @property (nonatomic) BOOL presentationSuspended;
 @property (nonatomic, copy) NSDictionary *presentationViewport;
+@property (nonatomic, copy) NSDictionary *neutralViewport;
+@property (nonatomic) BOOL finishingNeutralPublication;
+@property (nonatomic) CGSize retainedContentSize;
+@property (nonatomic,copy) NSArray<NSNumber *> *retainedSectionCounts;
+@property (nonatomic) BOOL neutralGeometryQueried;
 @property (nonatomic) BOOL publishedEnabled;
 @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *prefetchedPaths;
 @property (nonatomic, strong) NSMutableArray *nativeActions;
@@ -132,12 +137,42 @@ static BOOL Option(NSString *suffix) {
 - (void)forwardInvocation:(NSInvocation *)inv target:(id)target;
 - (UITableViewCell *)cellForDisplayPath:(NSIndexPath *)path target:(id)target;
 - (void)shieldVisiblePrivateRows;
+- (void)neutralizeVisibleContent;
+- (void)restoreAnchor;
 @end
 @interface CSGroupTableProxy : NSObject
 @property (nonatomic, weak) CSGroupListAdapter *adapter;
 @property (nonatomic, weak) id target;
 @property (nonatomic, strong) NSMutableDictionary<NSString *,NSMethodSignature *> *signatures;
 @end
+// Content-free slots keep the published topology and total scroll extent. Row
+// identities and offscreen UIKit measurements are unnecessary while masked.
+static void CSGroupProxyReturnNeutralGeometry(CSGroupTableProxy *proxy,NSInvocation *invocation) {
+    proxy.adapter.neutralGeometryQueried=YES;
+    NSArray<NSNumber *> *sections=proxy.adapter.privacyShield.sectionRowCounts;
+    NSString *name=NSStringFromSelector(invocation.selector);
+    if ([name isEqual:@"numberOfSectionsInTableView:"]) {
+        NSInteger count=(NSInteger)sections.count; [invocation setReturnValue:&count];
+    } else if ([name isEqual:@"tableView:numberOfRowsInSection:"]) {
+        NSInteger section=0; [invocation getArgument:&section atIndex:3];
+        NSInteger count=section>=0 && section<(NSInteger)sections.count ? sections[(NSUInteger)section].integerValue : 0;
+        [invocation setReturnValue:&count];
+    } else if ([name isEqual:@"tableView:heightForRowAtIndexPath:"] || [name isEqual:@"tableView:estimatedHeightForRowAtIndexPath:"]) {
+        UITableView *table=proxy.adapter.table;
+        __block CGFloat headerHeight=0;
+        CSGroupWithDisplayIndices(table, ^{ headerHeight=CGRectGetHeight(table.tableHeaderView.frame); });
+        NSUInteger rows=0; for (NSNumber *count in sections) rows+=count.unsignedIntegerValue;
+        CGFloat area=MAX(0,proxy.adapter.privacyShield.contentSize.height-headerHeight);
+        CGFloat height=rows ? floor(area/rows) : 0;
+        __unsafe_unretained NSIndexPath *path=nil; [invocation getArgument:&path atIndex:3];
+        NSUInteger last=sections.count;
+        while (last && !sections[last-1].unsignedIntegerValue) last--;
+        if (rows && path.length==2 && [path indexAtPosition:0]==last-1 &&
+            [path indexAtPosition:1]+1==sections[last-1].unsignedIntegerValue) height=area-height*(rows-1);
+        if (!isfinite(height)) height=0;
+        [invocation setReturnValue:&height];
+    }
+}
 static BOOL CSGroupProxyCanDeliverVisibleQuery(CSGroupListAdapter *adapter) {
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
     NSString *account=CSGroupCurrentAccountID();
@@ -161,15 +196,37 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     return [queries containsObject:NSStringFromSelector(selector)];
 }
 @implementation CSGroupTableProxy
+- (void)forwardScrollEnd:(SEL)selector scrollView:(id)table decelerate:(BOOL)decelerate {
+    id target=self.target;
+    CSGroupListAdapter *adapter=self.adapter;
+    if ([target respondsToSelector:selector]) {
+        NSInvocation *invocation=[NSInvocation invocationWithMethodSignature:[target methodSignatureForSelector:selector]];
+        invocation.selector=selector;
+        [invocation setArgument:&table atIndex:2];
+        if (selector==@selector(scrollViewDidEndDragging:willDecelerate:)) [invocation setArgument:&decelerate atIndex:3];
+        [adapter forwardInvocation:invocation target:target];
+    }
+    // These callbacks are implemented even when the native delegate omits them.
+    // Recheck admission after native code and offset writes, both may reenter.
+    if (!decelerate && CSGroupProxyCanDeliverVisibleQuery(adapter) && adapter.neutralViewport) [adapter restoreAnchor];
+    [adapter finishNeutralPublication:NO];
+    if (adapter.dirty || adapter.pendingScrollToTop) [adapter scheduleRefresh];
+}
+- (void)scrollViewDidEndDragging:(id)table willDecelerate:(BOOL)decelerate {
+    [self forwardScrollEnd:_cmd scrollView:table decelerate:decelerate];
+}
+- (void)scrollViewDidEndDecelerating:(id)table {
+    [self forwardScrollEnd:_cmd scrollView:table decelerate:NO];
+}
 - (UITableViewCell *)tableView:(UITableView *)table cellForRowAtIndexPath:(NSIndexPath *)path {
     (void)table;
     CSGroupListAdapter *adapter=self.adapter;
     if (!CSGroupProxyCanDeliverVisibleQuery(adapter)) {
-        [adapter shieldVisiblePrivateRows];
-        // A stale required callback still needs a cell, even after a neutral
-        // count. Policy readiness is resolved by its normal publication path.
+        [adapter neutralizeVisibleContent];
+        // Keep the retained slots scrollable without delivering native content.
         UITableViewCell *cell=[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
         cell.userInteractionEnabled=NO; cell.selectionStyle=UITableViewCellSelectionStyleNone;
+        objc_setAssociatedObject(cell,&CellRowKey,@{@"neutral":@YES},OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         return cell;
     }
     __block UITableViewCell *cell=nil;
@@ -204,8 +261,16 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     id target=self.target;
     CSGroupListAdapter *adapter=self.adapter;
     if (adapter && [target respondsToSelector:invocation.selector]) {
-        if (!CSGroupProxyIsVisibleQuery(invocation.selector)) { [adapter forwardInvocation:invocation target:target]; return; }
-        if (!CSGroupProxyCanDeliverVisibleQuery(adapter)) { [adapter shieldVisiblePrivateRows]; return; }
+        BOOL ready=CSGroupProxyCanDeliverVisibleQuery(adapter);
+        if (!CSGroupProxyIsVisibleQuery(invocation.selector)) {
+            // A render mask does not intercept touches. Deny row callbacks while
+            // neutral, including inherited native scopes; scroll callbacks pass.
+            NSString *name=NSStringFromSelector(invocation.selector);
+            if (!ready && [name hasPrefix:@"tableView:"]) { [adapter neutralizeVisibleContent]; return; }
+            [adapter forwardInvocation:invocation target:target];
+            return;
+        }
+        if (!ready) { [adapter neutralizeVisibleContent]; CSGroupProxyReturnNeutralGeometry(self,invocation); return; }
         CSGroupWithDisplayIndices(adapter.table, ^{ [adapter forwardInvocation:invocation target:target]; });
     }
 }
@@ -545,18 +610,139 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
 }
 - (void)shieldVisiblePrivateRows {
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    if (!policy || policy.blocked || ![policy.accountID isEqual:CSGroupCurrentAccountID()]) {
+        [self neutralizeVisibleContent]; return;
+    }
     if (!CSGroupPrivacyActive()) return;
     if (!self.privacyShield) self.privacyShield=[CSCloseFriendListShield new];
+    // Unknown delivery is a whole-content boundary, never a collection of holes.
+    for (UITableViewCell *cell in self.table.visibleCells) {
+        NSDictionary *delivery=objc_getAssociatedObject(cell,&CellRowKey);
+        if (![delivery[@"account"] isEqual:policy.accountID] || !delivery[@"row"]) {
+            [self neutralizeVisibleContent]; return;
+        }
+    }
     for (UITableViewCell *cell in self.table.visibleCells) {
         // Use the delivered identity, never current native indexes during mutation.
         NSDictionary *delivery=objc_getAssociatedObject(cell,&CellRowKey);
         CSGroupRow *row=delivery[@"row"];
-        BOOL unknown=policy.blocked || ![delivery[@"account"] isEqual:policy.accountID] ||
-            ![policy.accountID isEqual:CSGroupCurrentAccountID()] || !row;
-        BOOL sensitive=unknown || [policy hidesUserName:row.userName surface:CSCloseFriendSurfaceSession] ||
-            (row.kind==CSGroupRowKindAggregate && policy.protectedUserNames.count>0);
+        BOOL sensitive=[policy hidesUserName:row.userName surface:CSCloseFriendSurfaceSession];
+        // Only the folded-chat aggregate can carry protected session previews.
+        // Its existing safe cover remains authoritative; service containers do
+        // not acquire sensitive content merely because a friend is configured.
+        if (row.kind==CSGroupRowKindAggregate && [row.userName isEqual:@"chatroom_session_box"] &&
+            !row.privacyMasked && policy.protectedUserNames.count) {
+            [self neutralizeVisibleContent]; return;
+        }
         if (sensitive) [self.privacyShield shieldCell:cell];
     }
+}
+- (void)neutralizeVisibleContent {
+    if (!self.privacyShield) self.privacyShield=[CSCloseFriendListShield new];
+    if (!self.neutralViewport) {
+        NSString *account=CSGroupCurrentAccountID();
+        CGFloat height=self.table.contentOffset.y+self.table.adjustedContentInset.top;
+        if (account.length && [self.preferences.accountID isEqual:account] && isfinite(height))
+            self.neutralViewport=@{@"height":@(MAX(0,height)),@"account":account,@"epoch":@(CSCloseFriendAccountEpoch())};
+    }
+    CGSize size=self.table.contentSize;
+    CGFloat viewport=CGRectGetHeight(self.table.bounds),inset=self.table.adjustedContentInset.top+self.table.adjustedContentInset.bottom;
+    if ((!isfinite(size.height) || size.height+inset<=viewport) &&
+        isfinite(self.retainedContentSize.height) && self.retainedContentSize.height+inset>viewport)
+        size=self.retainedContentSize;
+    NSArray *counts=self.retainedSectionCounts;
+    if (!counts.count && self.projecting && self.projection.isValid) {
+        NSMutableArray *current=[NSMutableArray array];
+        for (NSArray *rows in self.projection.sections) [current addObject:@(rows.count)];
+        counts=current;
+    }
+    NSUInteger total=0; for (NSNumber *count in counts) total+=count.unsignedIntegerValue;
+    if (!total) counts=@[@1];
+    [self.privacyShield shieldTable:self.table contentSize:size sectionRowCounts:counts];
+}
+- (void)finishNeutralPublication:(BOOL)publicationCompleted {
+    UITableView *table=self.table;
+    BOOL (^ready)(void)=^BOOL {
+        CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+        NSString *account=CSGroupCurrentAccountID();
+        if (!policy || policy.blocked || !account.length || ![policy.accountID isEqual:account]) return NO;
+        BOOL privacy=policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue];
+        return self.projecting ? (self.projection.isValid && [self.projection.accountID isEqual:account] &&
+            self.projection.privacyRevision==policy.revision) : !privacy;
+    };
+    if (!table || self.finishingNeutralPublication || !ready()) return;
+    if (!self.privacyShield.tableShielded) {
+        CGSize size=table.contentSize;
+        if (isfinite(size.width) && isfinite(size.height) && size.width>=0 && size.height>0)
+            self.retainedContentSize=size;
+        if (self.projecting && self.projection.isValid) {
+            NSMutableArray *counts=[NSMutableArray array];
+            for (NSArray *rows in self.projection.sections) [counts addObject:@(rows.count)];
+            self.retainedSectionCounts=counts;
+        }
+        return;
+    }
+    if (self.publishing && !publicationCompleted) {
+        // A native early-return publication may finish inside this layout. The
+        // next normal layout completes it after the publishing stack unwinds.
+        [table setNeedsLayout]; return;
+    }
+    NSNumber *returnHeight=[self presentationScrollHeight];
+    self.finishingNeutralPublication=YES;
+    @try {
+        NSString *account=CSGroupCurrentAccountID();
+        NSUInteger epoch=CSCloseFriendAccountEpoch(),revision=CSCloseFriendCurrentSnapshot().revision;
+        BOOL (^current)(void)=^BOOL {
+            return ready() && epoch==CSCloseFriendAccountEpoch() && revision==CSCloseFriendCurrentSnapshot().revision &&
+                [account isEqual:CSGroupCurrentAccountID()];
+        };
+        if (table.tracking || table.dragging || table.decelerating ||
+            table.editing || self.swipeActive || [self groupPanMoving]) return;
+        if (self.neutralGeometryQueried) {
+            self.neutralGeometryQueried=NO;
+            // Re-measure the retained slots after neutral scalar geometry,
+            // without replacing their cells or rebuilding the table.
+            CSGroupWithDisplayIndices(table, ^{
+                [UIView performWithoutAnimation:^{
+                    [table beginUpdates]; [table endUpdates]; [table layoutIfNeeded];
+                }];
+            });
+        }
+        if (!current()) return;
+        BOOL (^matches)(UITableViewCell *,NSIndexPath *)=^BOOL(UITableViewCell *cell,NSIndexPath *path) {
+            NSDictionary *delivery=objc_getAssociatedObject(cell,&CellRowKey);
+            if ([delivery[@"neutral"] boolValue]) return NO;
+            if (!self.projecting) return YES;
+            CSGroupRow *expected=[self.projection rowAtDisplayPath:path],*row=delivery[@"row"];
+            BOOL sameName=row.userName==expected.userName || [row.userName isEqual:expected.userName];
+            return expected && row && [delivery[@"account"] isEqual:account] && sameName && row.kind==expected.kind &&
+                [row.nativePath isEqual:expected.nativePath] && row.privacyMasked==expected.privacyMasked &&
+                row.foldedEntryScoped==expected.foldedEntryScoped && row.foldedEntryPrivacyRevision==expected.foldedEntryPrivacyRevision;
+        };
+        NSMutableArray<NSIndexPath *> *repairs=[NSMutableArray array];
+        for (UITableViewCell *cell in table.visibleCells) {
+            __block NSIndexPath *path=nil;
+            CSGroupWithDisplayIndices(table, ^{ path=[table indexPathForCell:cell]; });
+            if (!path || (self.projecting && ![self.projection rowAtDisplayPath:path])) { [table setNeedsLayout]; return; }
+            if (!matches(cell,path)) [repairs addObject:path];
+        }
+        if (repairs.count) CSGroupWithDisplayIndices(table, ^{
+            [table reloadRowsAtIndexPaths:repairs withRowAnimation:UITableViewRowAnimationNone];
+            [table layoutIfNeeded];
+        });
+        if (!current()) return;
+        for (UITableViewCell *cell in table.visibleCells) {
+            __block NSIndexPath *path=nil;
+            CSGroupWithDisplayIndices(table, ^{ path=[table indexPathForCell:cell]; });
+            if (!path || !matches(cell,path)) return;
+        }
+        if (returnHeight) [self restoreScrollHeight:returnHeight.doubleValue];
+        if (!current() || self.neutralViewport || table.tracking || table.dragging || table.decelerating) return;
+        [self.privacyShield finishTablePublication];
+        CGSize size=table.contentSize;
+        if (isfinite(size.width) && isfinite(size.height) && size.width>=0 && size.height>0)
+            self.retainedContentSize=size;
+    } @finally { self.finishingNeutralPublication=NO; }
 }
 // Ordinary background updates remain deferred. A pending privacy publication is
 // the one exception, so the switcher never waits for foreground to get safe rows.
@@ -601,7 +787,8 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     self.tabBadgeSections=nil; self.tabAlertBadge=nil; self.tabAlertBadgeKey=nil;
     self.tabBadgeSourceRequired=NO; self.tabBadgeRestorePending=NO;
     UITableView *table=self.table; self.nativePresentation=YES; self.projecting=NO; self.chromeVisible=NO;
-    [self.privacyShield prepareForPublication]; self.privacyShield=nil;
+    [self.privacyShield prepareForPublication]; [self.privacyShield finishTablePublication]; self.privacyShield=nil;
+    self.neutralViewport=nil;
     [self refreshNavigationTitle];
     self.presentationSuspended=YES; [self cancelScheduledRefresh];
     [self publishHeader:self.nativeHeader]; [self.chrome removeFromSuperview]; [self.chrome removeGestureRecognizer:self.pan]; [table removeGestureRecognizer:self.listPan];
@@ -1621,7 +1808,7 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     UITableView *table=self.table;
     // Do not turn a pull-down/bounce or a native top-area transition into a
     // persistent row anchor. The host owns these positions, including short lists.
-    return [self hasScrollableContent] && !self.searching && !table.tracking &&
+    return !self.neutralViewport && [self hasScrollableContent] && !self.searching && !table.tracking &&
         !table.dragging && !table.decelerating && isfinite(table.contentOffset.y) &&
         table.contentOffset.y>=-table.adjustedContentInset.top-0.5;
 }
@@ -1663,17 +1850,20 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
     }
 }
 - (NSNumber *)presentationScrollHeight {
-    NSDictionary *viewport=self.presentationViewport;
+    if (self.finishingNeutralPublication) return nil;
+    NSDictionary *viewport=self.presentationViewport ?: self.neutralViewport;
     if (!viewport) return nil;
     NSString *account=CSGroupCurrentAccountID();
     if (![viewport[@"account"] isEqual:account] || ![self.preferences.accountID isEqual:account] ||
         [viewport[@"epoch"] unsignedIntegerValue]!=CSCloseFriendAccountEpoch()) {
-        self.presentationViewport=nil; return nil;
+        self.presentationViewport=nil; self.neutralViewport=nil; return nil;
     }
-    if (!self.isActive || !self.chromeVisible || self.searching || self.nativePresentation || self.nativeActions.count) return nil;
+    if (viewport!=self.neutralViewport &&
+        (!self.isActive || !self.chromeVisible || self.searching || self.nativePresentation || self.nativeActions.count)) return nil;
     return viewport[@"height"];
 }
 - (void)restoreViewportFromTab:(NSString *)previousTab scrollHeight:(CGFloat)height {
+    @try {
     NSNumber *returnHeight=[self presentationScrollHeight];
     if (returnHeight) { [self restoreScrollHeight:returnHeight.doubleValue]; return; }
     if (!previousTab.length || !self.publishedTabID.length || [previousTab isEqual:self.publishedTabID] ||
@@ -1681,6 +1871,9 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
         [self restoreAnchor]; return;
     }
     [self restoreScrollHeight:height];
+    } @finally {
+        [self finishNeutralPublication:YES];
+    }
 }
 - (void)restoreScrollHeight:(CGFloat)height {
     // Switching groups and returning from chat both retain absolute height.
@@ -1698,6 +1891,7 @@ static BOOL CSGroupProxyIsVisibleQuery(SEL selector) {
         if (fabs(target-table.contentOffset.y)>0.5)
             [table setContentOffset:CGPointMake(table.contentOffset.x,target) animated:NO];
     });
+    self.neutralViewport=nil;
     [self saveAnchor];
 }
 - (void)selectIndex:(NSInteger)index {

@@ -1,0 +1,56 @@
+{
+  "baseline_commit": "58e0b0dfc611e14aa2d2f8e07c0f2ffb80a7ec6a",
+  "baseline_production_input_count": 42513,
+  "current_production_input_count": 42513,
+  "changed_count": 8,
+  "differences": [
+    {
+      "file": "Controllers/CSCloseFriendListShield.h",
+      "baseline_sha256": "963bdecc871258f67d6d0b70b884a2dcf3e22af048b84bfcc763474b5b1406c2",
+      "current_sha256": "7c4528cfc5eaea625a714fa4d463968ad4ccbcabbc4fcafcd5afec15dd9d5b1d",
+      "change": "changed"
+    },
+    {
+      "file": "Controllers/CSCloseFriendListShield.m",
+      "baseline_sha256": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b",
+      "current_sha256": "6a2352f559b8fd3bab7e1f4293c022f319f117c07999cf7d5889ce8c87aad241",
+      "change": "changed"
+    },
+    {
+      "file": "Controllers/CSGroupListAdapter.h",
+      "baseline_sha256": "f3ab7d3fdc230818045641dee885837168eeb63e525c04348e42606de77e583c",
+      "current_sha256": "9f857b121bb3236f2e964da0daec66aba86651548d3192869b6a6ade9c4a610f",
+      "change": "changed"
+    },
+    {
+      "file": "Controllers/CSGroupListAdapter.m",
+      "baseline_sha256": "c5036ba4bac9c5bcd58232c729f4565a110875349e0cfa15cfb6cb449e99dcef",
+      "current_sha256": "8186a42e512dfc2b41c1ff27c303ad08c9c8edaac28098140d2cf8856f8c5e95",
+      "change": "changed"
+    },
+    {
+      "file": "Controllers/CSReleaseNotesViewController.m",
+      "baseline_sha256": "55cf62d9380083900779aa644b12972f05a3d0506d72046a29abe807496a6603",
+      "current_sha256": "93e17d6e2ae6155e3d7547766cee30385ab1805511a7061e86ce32649fc887b1",
+      "change": "changed"
+    },
+    {
+      "file": "Headers/CSUserInfoHelper.h",
+      "baseline_sha256": "ab5c4a5dead686dab1142f1477aa75dc08fb49c07206c3a07d202a2073cb1666",
+      "current_sha256": "751cc28eb471ea53a3f730aab06fa41eba9abfa48a92b21e4912e97e888e6102",
+      "change": "changed"
+    },
+    {
+      "file": "Hooks/SessionGroupHooks.xm",
+      "baseline_sha256": "cc739fba9c41721fc445a9c4eb720e5a52658e25978b4ae3bc2f39b5f1cdaf75",
+      "current_sha256": "4dfa6d802eb1dda2a3197b16ccd282c4e489e92e14cc3ee732134c78ec3948a7",
+      "change": "changed"
+    },
+    {
+      "file": "control",
+      "baseline_sha256": "51cc39efe5584422456114200079f9999ea7b928a564622c3bf7fe43fd50d5ff",
+      "current_sha256": "76f43c814a947b5e2da84bd6f1bae504463e09d5741627fcb31a3d4356808935",
+      "change": "changed"
+    }
+  ]
+}

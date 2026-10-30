@@ -1,0 +1,52 @@
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupSearchTests.m:197:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:83:62: error: property 'neutralViewport' not found on object of type 'CSGroupListAdapter *'
+   83 |     NSDictionary *viewport=self.presentationViewport ?: self.neutralViewport;
+      |                                                              ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:88:45: error: property 'neutralViewport' not found on object of type 'CSGroupListAdapter *'
+   88 |         self.presentationViewport=nil; self.neutralViewport=nil; return nil;
+      |                                             ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:90:24: error: property 'neutralViewport' not found on object of type 'CSGroupListAdapter *'
+   90 |     if (viewport!=self.neutralViewport &&
+      |                        ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:110:10: error: property 'neutralViewport' not found on object of type 'CSGroupListAdapter *'
+  110 |     self.neutralViewport=nil;
+      |          ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:124:9: error: use of undeclared identifier 'CSCloseFriendSnapshot'; did you mean 'CSCloseFriendCurrentSnapshot'?
+  124 |         CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+      |         ^~~~~~~~~~~~~~~~~~~~~
+      |         CSCloseFriendCurrentSnapshot
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupSearchTests.m:35:22: note: 'CSCloseFriendCurrentSnapshot' declared here
+   35 | static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
+      |                      ^
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupSearchTests.m:197:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:124:32: error: use of undeclared identifier 'policy'
+  124 |         CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+      |                                ^~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:126:22: error: use of undeclared identifier 'policy'
+  126 |         BOOL privacy=policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue];
+      |                      ^~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:126:41: error: use of undeclared identifier 'policy'
+  126 |         BOOL privacy=policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue];
+      |                                         ^~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:126:61: error: use of undeclared identifier 'policy'
+  126 |         BOOL privacy=policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue];
+      |                                                             ^~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:127:20: error: use of undeclared identifier 'policy'
+  127 |         BOOL ready=policy && !policy.blocked && account.length && [policy.accountID isEqual:account] &&
+      |                    ^~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:127:31: error: use of undeclared identifier 'policy'
+  127 |         BOOL ready=policy && !policy.blocked && account.length && [policy.accountID isEqual:account] &&
+      |                               ^~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:127:68: error: use of undeclared identifier 'policy'
+  127 |         BOOL ready=policy && !policy.blocked && account.length && [policy.accountID isEqual:account] &&
+      |                                                                    ^~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:129:50: error: use of undeclared identifier 'policy'
+  129 |                 self.projection.privacyRevision==policy.revision) : !privacy);
+      |                                                  ^~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:130:28: error: property 'neutralViewport' not found on object of type 'CSGroupListAdapter *'
+  130 |         if (ready && !self.neutralViewport) [self.privacyShield finishTablePublication];
+      |                            ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.TkRHpW/SearchBodies.h:130:65: error: no visible @interface for 'SearchPrivacyShield' declares the selector 'finishTablePublication'
+  130 |         if (ready && !self.neutralViewport) [self.privacyShield finishTablePublication];
+      |                                              ~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~
+15 errors generated.

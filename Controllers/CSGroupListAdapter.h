@@ -59,6 +59,8 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 - (void)layout;
 /// Keep UIKit delivery in display coordinates and require a current privacy projection.
 - (void)performVisibleLayout:(void (^)(void))layout;
+/// Reveal neutral content only after verified publication, viewport and visible cells agree.
+- (void)finishNeutralPublication:(BOOL)publicationCompleted;
 - (void)refresh;
 - (void)requestRefresh;
 - (void)beginNativeChange;

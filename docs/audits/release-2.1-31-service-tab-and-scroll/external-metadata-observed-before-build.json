@@ -1,0 +1,9 @@
+{
+  "file": "packages/.DS_Store",
+  "task_start_sha256": "de06f285eef9582d828d6ba2eab25c475793960e004696e198a3e0fe7efb2607",
+  "observed_current_sha256": "de06f285eef9582d828d6ba2eab25c475793960e004696e198a3e0fe7efb2607",
+  "current_bytes": 12292,
+  "changed_before_any_2_1_31_build": false,
+  "resolution": "Correction: comparison against the task-start SHA256 proves no task-period drift. The earlier size observation compared with Git HEAD, not task start. No exception applies: all 1329 historical artifact files and 92 package-directory files are hard checked. Keep pre-existing user/Finder edits in place; do not revert or stage.",
+  "artifact_exception_paths": []
+}

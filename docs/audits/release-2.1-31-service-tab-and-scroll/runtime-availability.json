@@ -1,0 +1,25 @@
+{
+  "usb": {
+    "command": [
+      "idevice_id",
+      "-l"
+    ],
+    "exit_code": 0,
+    "output": ""
+  },
+  "xcode": {
+    "command": [
+      "xcrun",
+      "devicectl",
+      "list",
+      "devices"
+    ],
+    "exit_code": 0,
+    "output": "One previously paired physical iPhone is listed with state unavailable. Device name and identifier omitted."
+  },
+  "deviceRuntimeCountsCollected": false,
+  "realTouchChainVerified": false,
+  "wechatLaunchedOrInstalled": false,
+  "usb_device_count": 0,
+  "paired_xcode_device_state": "unavailable"
+}

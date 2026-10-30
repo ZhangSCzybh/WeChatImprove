@@ -75,18 +75,28 @@ static const NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionSty
     (void)style;(void)identifier;if ((self=[super init])) self.textLabel=[Label new];return self;
 }
 @end
+@class MainFrameTableView;
+typedef MainFrameTableView UITableView;
+#include "GroupNeutralUIKitDouble.h"
 @interface CSCloseFriendListShield : NSObject
+@property(nonatomic,readonly) CGSize contentSize;
+@property(nonatomic,copy,readonly) NSArray<NSNumber *> *sectionRowCounts;
 - (void)shieldCell:(UITableViewCell *)cell;
+- (void)shieldTable:(UITableView *)table;
+- (void)shieldTable:(UITableView *)table contentSize:(CGSize)size;
+- (void)shieldTable:(UITableView *)table contentSize:(CGSize)size sectionRowCounts:(NSArray<NSNumber *> *)counts;
+- (void)finishTablePublication;
 - (void)prepareForPublication;
 @end
-#include "GroupReturnPrivacyShield.h"
 static void CSCloseFriendUpdateSessionCover(id cell,id row) { (void)cell;(void)row; }
 static void CSCloseFriendRefreshSessionCover(id cell) { (void)cell; }
 @class CSGroupListAdapter,NativeHost,MainFrameTableView;
-typedef MainFrameTableView UITableView;
 static BOOL CSGroupCardPosition(UITableView *table,NSIndexPath *path,BOOL *first,BOOL *last);
 typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @interface MainFrameTableView : NSObject
+@property(nonatomic,strong) CALayer *layer;
+@property(nonatomic,strong) GroupNeutralHeader *tableHeaderView;
+@property(nonatomic) BOOL accessibilityElementsHidden;
 @property(nonatomic,weak) CSGroupListAdapter *adapter;
 @property(nonatomic,weak) NativeHost *host;
 @property(nonatomic,strong) NSMutableArray<NSArray<NSString *> *> *submissions;
@@ -110,6 +120,7 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 - (void)reloadData;
 - (void)reloadRowsAtIndexPaths:(NSArray *)paths withRowAnimation:(NSInteger)animation;
 @end
+#include "GroupReturnPrivacyShield.h"
 @interface NativeHost : NSObject
 @property(nonatomic,strong) MainFrameTableView *m_tableView;
 @property(nonatomic,strong) NSArray<NSArray<NativeSession *> *> *sections;
@@ -142,6 +153,10 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @property(nonatomic,strong) NativeHost *controller;
 @property(nonatomic,strong) Preferences *preferences;
 @property(nonatomic,strong) CSCloseFriendListShield *privacyShield;
+@property(nonatomic,copy) NSDictionary *neutralViewport;
+@property(nonatomic) BOOL finishingNeutralPublication;
+@property(nonatomic) CGSize retainedContentSize;
+@property(nonatomic,copy) NSArray<NSNumber *> *retainedSectionCounts;
 @property(nonatomic,strong) CSGroupProjection *projection;
 @property(nonatomic,strong) NSDictionary *identityDisplayPaths;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
@@ -170,6 +185,8 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 - (NSNumber *)presentationScrollHeight;
 - (void)restoreScrollHeight:(CGFloat)height;
 - (void)shieldVisiblePrivateRows;
+- (void)neutralizeVisibleContent;
+- (void)finishNeutralPublication:(BOOL)completed;
 - (void)performVisibleLayout:(void (^)(void))layout;
 + (instancetype)adapterForTable:(id)table;
 - (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous changes:(CSGroupChangeKind)changes contentUserNames:(NSSet *)names contentIdentityKnown:(BOOL)known previouslyProjecting:(BOOL)previouslyProjecting;
@@ -239,6 +256,7 @@ static CGFloat Height(CSGroupListAdapter *adapter,NSIndexPath *path) {
     [adapter forwardInvocation:inv target:adapter.controller];CGFloat value=0;[inv getReturnValue:&value];return value;
 }
 @implementation MainFrameTableView
+- (CALayer *)layer { if(!_layer)_layer=[CALayer layer];return _layer; }
 - (void)setContentOffset:(CGPoint)value { _contentOffset=value;self.offsetWrites++; }
 - (void)setContentOffset:(CGPoint)point animated:(BOOL)animated { (void)animated;self.contentOffset=point; }
 - (CGRect)rectForRowAtIndexPath:(NSIndexPath *)path { return CGRectMake(0,[self.rowOrigins[path] doubleValue],320,Height(self.adapter,path)); }

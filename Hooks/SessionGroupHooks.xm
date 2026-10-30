@@ -422,6 +422,7 @@ static void InstallMenuTouchGate(void) {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
     if (a) [a performVisibleLayout:^{ %orig; }];
     else %orig;
+    [a finishNeutralPublication:NO];
 }
 - (BOOL)hasSearchBarHeader {
     if (![CSGroupListAdapter adapterForTable:self]) return %orig;

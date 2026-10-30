@@ -1,0 +1,25 @@
++ (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller {
+    if (!NSThread.isMainThread || !controller) return;
+    objc_setAssociatedObject(controller,&PresentationSuspendedKey,@(suspended),OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    CSGroupListAdapter *adapter=[self adapterForController:controller];
+    if (suspended && !adapter.presentationSuspended) {
+        adapter.presentationViewport=nil;
+        NSString *account=adapter.preferences.accountID;
+        CGFloat height=adapter.table.contentOffset.y+adapter.table.adjustedContentInset.top;
+        if (!CSGroupIsFoldedController(controller) && adapter.isActive && adapter.chromeVisible && !adapter.searching &&
+            !adapter.nativePresentation && !adapter.nativeActions.count && !adapter.pendingScrollToTop &&
+            account.length && [account isEqual:CSGroupCurrentAccountID()] && isfinite(height))
+            adapter.presentationViewport=@{@"height":@(MAX(0,height)),@"account":account,@"epoch":@(CSCloseFriendAccountEpoch())};
+    }
+    adapter.presentationSuspended=suspended;
+    if (suspended) {
+        adapter.dirty=YES; [adapter invalidateNativeSnapshot]; adapter.cachedNativeSections=nil;
+        // Visibility only invalidates the snapshot. Preserve real content-event
+        // attribution so returning does not rebuild unchanged native banners.
+        @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; }
+        [adapter.projection discardComputationCache]; [adapter cancelScheduledRefresh];
+        adapter.snapshotRetryAttempted=NO; adapter.snapshotRetryGeneration++;
+        [adapter finishSuspendedBatches];
+    }
+    [adapter requestTabBadgeSourceRefresh];
+}

@@ -1,0 +1,34 @@
+{
+  "version": "2.1-31",
+  "build_success": true,
+  "warning_counts": {
+    "rootless": 6,
+    "rootful": 6
+  },
+  "warning_multisets_equal_to_2_1_30": true,
+  "production_inputs_unchanged_during_build": true,
+  "protected_definitions_byte_identical": 6,
+  "task_start_artifacts_all_original_bytes": 1329,
+  "packages_verified": 2,
+  "dsym_uuid_checks": 4,
+  "symbol_files": 12,
+  "sha256_manifest_verified": true,
+  "artifacts": [
+    {
+      "file": "com.wechat.improve_2.1-31_iphoneos-arm.deb",
+      "bytes": 1558794,
+      "sha256": "dcf32aba0df39eef113954e1f73d88a321adfb6b3b9f8ac44232ffcc00a53d5f"
+    },
+    {
+      "file": "com.wechat.improve_2.1-31_iphoneos-arm64.deb",
+      "bytes": 1558280,
+      "sha256": "e5c6a8884d0ece2afed04d39df33448bc656f372ac8141ce810dde1f7fead344"
+    },
+    {
+      "file": "com.wechat.improve_2.1-31_symbols.zip",
+      "bytes": 11263281,
+      "sha256": "3b3f60c233c851ee2406f9981ea74c55485147b844a3e56302b50cf21f5960fc"
+    }
+  ],
+  "device_installed_or_touches_verified": false
+}

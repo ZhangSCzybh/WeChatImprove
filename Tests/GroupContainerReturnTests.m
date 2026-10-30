@@ -76,18 +76,31 @@ static const NSInteger UITableViewCellStyleDefault=0,UITableViewCellSelectionSty
     (void)style;(void)identifier;if ((self=[super init])) self.textLabel=[Label new];return self;
 }
 @end
+@class MainFrameTableView;
+typedef MainFrameTableView UITableView;
+#include "GroupNeutralUIKitDouble.h"
 @interface CSCloseFriendListShield : NSObject
+@property(nonatomic,readonly) BOOL tableShielded;
+@property(nonatomic,readonly) CGSize contentSize;
+@property(nonatomic,copy,readonly) NSArray<NSNumber *> *sectionRowCounts;
 - (void)shieldCell:(UITableViewCell *)cell;
+- (void)shieldTable:(UITableView *)table;
+- (void)shieldTable:(UITableView *)table contentSize:(CGSize)size;
+- (void)shieldTable:(UITableView *)table contentSize:(CGSize)size sectionRowCounts:(NSArray<NSNumber *> *)counts;
+- (void)finishTablePublication;
 - (void)prepareForPublication;
 @end
-#include "GroupReturnPrivacyShield.h"
 static void CSCloseFriendUpdateSessionCover(id cell,id row) { (void)cell;(void)row; }
 static void CSCloseFriendRefreshSessionCover(id cell) { (void)cell; }
 @class CSGroupListAdapter,NativeHost,MainFrameTableView;
-typedef MainFrameTableView UITableView;
 static BOOL CSGroupCardPosition(UITableView *table,NSIndexPath *path,BOOL *first,BOOL *last);
 typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @interface MainFrameTableView : NSObject
+@property(nonatomic,strong) CALayer *layer;
+@property(nonatomic,strong) GroupNeutralHeader *tableHeaderView;
+@property(nonatomic) BOOL userInteractionEnabled,scrollEnabled;
+@property(nonatomic,strong) GroupNeutralGesture *panGestureRecognizer;
+@property(nonatomic) BOOL accessibilityElementsHidden;
 @property(nonatomic,weak) CSGroupListAdapter *adapter;
 @property(nonatomic,weak) NativeHost *host;
 @property(nonatomic,strong) NSMutableArray<NSArray<NSString *> *> *submissions;
@@ -98,6 +111,9 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @property(nonatomic) BOOL decoratorOutside,reenterOnce;
 @property(nonatomic) NSUInteger originalCalculations,decorationRepairs;
 @property(nonatomic,strong) NSArray<UITableViewCell *> *visibleCells;
+@property(nonatomic,strong) NSArray<NSIndexPath *> *visibleCellPaths;
+@property(nonatomic,copy) void (^afterOriginalLayout)(void);
+@property(nonatomic) NSUInteger layoutRequests;
 @property(nonatomic,copy) NSArray<NSIndexPath *> *indexPathsForVisibleRows;
 @property(nonatomic) BOOL tracking,dragging,decelerating,editing;
 @property(nonatomic) CGPoint contentOffset;
@@ -106,11 +122,16 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 - (void)layoutSubviews;
 - (void)originalLayout;
 - (void)layoutIfNeeded;
+- (void)beginUpdates;
+- (void)endUpdates;
+- (void)setNeedsLayout;
+- (NSIndexPath *)indexPathForCell:(UITableViewCell *)cell;
 - (CGRect)rectForRowAtIndexPath:(NSIndexPath *)path;
 - (void)setContentOffset:(CGPoint)point animated:(BOOL)animated;
 - (void)reloadData;
 - (void)reloadRowsAtIndexPaths:(NSArray *)paths withRowAnimation:(NSInteger)animation;
 @end
+#include "GroupReturnPrivacyShield.h"
 @interface NativeHost : NSObject
 @property(nonatomic,strong) MainFrameTableView *m_tableView;
 @property(nonatomic,strong) NSArray<NSArray<NativeSession *> *> *sections;
@@ -148,6 +169,7 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @end
 @interface ProbeChrome : NSObject
 @property(nonatomic,copy) NSString *selectedTabID;
+@property(nonatomic) BOOL userInteractionEnabled,hidden;
 - (void)refreshAppearance;
 - (void)updateTabs:(NSArray *)tabs;
 - (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)red forTabIndex:(NSInteger)index;
@@ -170,6 +192,7 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @property(nonatomic,strong) NativeHost *controller;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
 @property(nonatomic,strong) ProbeChrome *chrome;
+@property(nonatomic,strong) GroupNeutralGesture *pan,*listPan;
 @property(nonatomic,strong) CSGroupTableProxy *uiProxy;
 @property(nonatomic,strong) NSMutableDictionary<NSNumber *,ProbeProxySlot *> *proxies;
 @property(nonatomic,strong) NSMutableArray *completions;
@@ -181,6 +204,10 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @property(nonatomic) NSUInteger refreshGeneration,interactionAttempts;
 @property(nonatomic) NSTimeInterval interactionDeadline,pendingRefreshDeadline,scheduledRefreshDeadline;
 @property(nonatomic,strong) CSCloseFriendListShield *privacyShield;
+@property(nonatomic,copy) NSDictionary *neutralViewport;
+@property(nonatomic) CGSize retainedContentSize;
+@property(nonatomic,copy) NSArray<NSNumber *> *retainedSectionCounts;
+@property(nonatomic) BOOL neutralGeometryQueried;
 @property(nonatomic,strong) CSGroupProjection *projection;
 @property(nonatomic,strong) NSDictionary *identityDisplayPaths;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
@@ -190,6 +217,7 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 @property(nonatomic,copy) NSString *publishedTabID;
 @property(nonatomic) BOOL chromeVisible,swipeActive;
 @property(nonatomic) BOOL projecting,dirty,publishing,nativePresentation,pendingScrollToTop,snapshotRetryAttempted,publicationNeedsFullReload;
+@property(nonatomic) BOOL finishingNeutralPublication;
 @property(nonatomic) BOOL searching,presentationSuspended,privacyRefreshPending;
 @property(nonatomic) NSUInteger snapshotRetryGeneration,changeDepth,recoveries,modelRevision;
 - (void)pruneNativeActions;
@@ -217,6 +245,8 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 - (NSNumber *)presentationScrollHeight;
 - (void)restoreScrollHeight:(CGFloat)height;
 - (void)shieldVisiblePrivateRows;
+- (void)neutralizeVisibleContent;
+- (void)finishNeutralPublication:(BOOL)publicationCompleted;
 - (void)performVisibleLayout:(void (^)(void))layout;
 + (instancetype)adapterForTable:(id)table;
 - (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous changes:(CSGroupChangeKind)changes contentUserNames:(NSSet *)names contentIdentityKnown:(BOOL)known previouslyProjecting:(BOOL)previouslyProjecting;
@@ -284,6 +314,14 @@ static NSString *SectionTitle(CSGroupListAdapter *adapter,NSInteger section) {
     inv.selector=selector;__unsafe_unretained id table=adapter.table;[inv setArgument:&table atIndex:2];[inv setArgument:&section atIndex:3];[inv invokeWithTarget:adapter.uiProxy];__unsafe_unretained NSString *value=nil;[inv getReturnValue:&value];return value;
 }
 @implementation MainFrameTableView
+- (void)beginUpdates {}
+- (void)endUpdates {}
+- (CALayer *)layer { if(!_layer)_layer=[CALayer layer];return _layer; }
+- (void)setNeedsLayout { self.layoutRequests++; }
+- (NSIndexPath *)indexPathForCell:(UITableViewCell *)cell {
+    NSUInteger index=[self.visibleCells indexOfObjectIdenticalTo:cell];
+    return index!=NSNotFound && index<self.visibleCellPaths.count ? self.visibleCellPaths[index] : nil;
+}
 - (void)setContentOffset:(CGPoint)value { _contentOffset=value;self.offsetWrites++; }
 - (void)setContentOffset:(CGPoint)point animated:(BOOL)animated { (void)animated;self.contentOffset=point; }
 - (CGRect)rectForRowAtIndexPath:(NSIndexPath *)path { return CGRectMake(0,[self.rowOrigins[path] doubleValue],320,Height(self.adapter,path)); }
@@ -300,7 +338,7 @@ static NSString *SectionTitle(CSGroupListAdapter *adapter,NSInteger section) {
 - (void)originalLayout {
     self.originalCalculations++;
     if(self.reenterOnce) {self.reenterOnce=NO;Native(self.host,NO,^{[self layoutSubviews];});}
-    NSMutableArray *identities=[NSMutableArray array],*cells=[NSMutableArray array],*sections=[NSMutableArray array],*counts=[NSMutableArray array];
+    NSMutableArray *identities=[NSMutableArray array],*cells=[NSMutableArray array],*sections=[NSMutableArray array],*counts=[NSMutableArray array],*paths=[NSMutableArray array];
     NSMutableDictionary *origins=[NSMutableDictionary dictionary];
     NSInteger sectionCount=Count(self.adapter,@selector(numberOfSectionsInTableView:),0,NO);
     CGFloat y=80;
@@ -311,14 +349,15 @@ static NSString *SectionTitle(CSGroupListAdapter *adapter,NSInteger section) {
         for(NSInteger r=0;r<rowCount;r++) {
             NSIndexPath *path=At((NSUInteger)s,(NSUInteger)r);CGFloat height=Height(self.adapter,path);
             UITableViewCell *cell=[self.adapter.uiProxy tableView:self cellForRowAtIndexPath:path];
-            NSString *name=cell.textLabel.text ?: @"empty";[identities addObject:name];[cells addObject:cell];origins[path]=@(y);
+            NSString *name=cell.textLabel.text ?: @"empty";[identities addObject:name];[cells addObject:cell];[paths addObject:path];origins[path]=@(y);
             [rows addObject:@{@"name":name,@"y":@(y),@"height":@(height),@"roleValid":@(cell.roleValid),@"first":@(cell.roleFirst),@"last":@(cell.roleLast)}];
             y+=height;
         }
         [sections addObject:[rows copy]];
     }
-    self.contentSize=CGSizeMake(320,y);self.rowOrigins=origins;self.visibleCells=cells;[self.submissions addObject:[identities copy]];
+    self.contentSize=CGSizeMake(320,y);self.rowOrigins=origins;self.visibleCells=cells;self.visibleCellPaths=paths;[self.submissions addObject:[identities copy]];
     [self.geometrySamples addObject:@{@"sectionCounts":[counts copy],@"sections":[sections copy],@"offsetX":@(self.contentOffset.x),@"offsetY":@(self.contentOffset.y)}];
+    if(self.afterOriginalLayout)self.afterOriginalLayout();
 }
 - (void)layoutIfNeeded { [self layoutSubviews]; }
 - (void)reloadData { self.reloads++; }
@@ -340,6 +379,7 @@ static CSGroupListAdapter *List(BOOL decoratorOutside) {
     a.controller.m_tableView=a.table;a.table.host=a.controller;a.table.adapter=a;
     a.table.submissions=[NSMutableArray array];a.table.geometrySamples=[NSMutableArray array];a.table.completedLayouts=[NSMutableArray array];
     a.table.decoratorOutside=decoratorOutside;a.table.bounds=CGRectMake(0,0,320,600);a.table.contentSize=CGSizeMake(320,1800);
+    a.table.tableHeaderView=[GroupNeutralHeader new];a.table.tableHeaderView.frame=CGRectMake(0,0,320,80);
     NSMutableArray *normal=[@[@"secret@chatroom",@"normal-a@chatroom",@"gh_official",@"normal-b@chatroom",@"ordinary-private",@"brandservicesessionholder"] mutableCopy];
     for(NSUInteger i=0;i<12;i++)[normal addObject:[NSString stringWithFormat:@"extra-%lu@chatroom",(unsigned long)i]];
     NSArray *names=@[@[NSNull.null,NSNull.null],@[@"pinned-private",@"pinned-a@chatroom",@"secret-friend",@"pinned-b@chatroom",@"brandsessionholder"],normal];
@@ -386,15 +426,19 @@ static void ContainerQuery(BOOL order,BOOL nativeOwner,BOOL blankBefore) {
 }
 static void BlockedLate(BOOL order,BOOL transaction) {
     scenario=[NSString stringWithFormat:@"blocked-policy-late/%@/%@",order?@"decorator-outer":@"privacy-outer",transaction?@"native-transaction":@"no-transaction"];
-    policy=Policy(YES,NO,20);CSGroupListAdapter *a=List(order);policy=Policy(NO,YES,21);a.presentationViewport=nil;a.dirty=YES;a.changeDepth=transaction?1:0;
+    policy=Policy(YES,NO,20);CSGroupListAdapter *a=List(order);
+    CGSize retainedContentSize=a.table.contentSize;
+    NSUInteger retainedRowCount=0;for(NSArray *rows in a.projection.sections)retainedRowCount+=rows.count;
+    NSUInteger retainedSectionCount=a.projection.sections.count;
+    policy=Policy(NO,YES,21);a.presentationViewport=nil;a.dirty=YES;a.changeDepth=transaction?1:0;
     Emit(@"host-input",@{@"standardAppearanceCallbacks":@0,@"policy":@"blocked",@"changeDepth":@(a.changeDepth),@"queryBeforeLayout":@YES});
     __block NSInteger sections=-1;__block CGFloat height=-1,headerHeight=-1;__block NSString *title;__block UITableViewCell *stale;
     NSUInteger recoveryBefore=a.recoveries;
     Native(a.controller,NO,^{sections=Count(a,@selector(numberOfSectionsInTableView:),0,NO);height=Height(a,At(2,0));headerHeight=SectionHeight(a,2);title=SectionTitle(a,2);stale=[a.uiProxy tableView:a.table cellForRowAtIndexPath:At(2,0)];});
     Emit(@"blocked-query-result",@{@"sections":@(sections),@"height":@(height),@"headerHeight":@(headerHeight),@"headerTitle":title ?: @"",@"cellIsNil":@(stale==nil),@"cellText":stale.textLabel.text ?: @"",@"privateNativeCellCalls":@(a.controller.privateCellCalls),@"recoveries":@(a.recoveries-recoveryBefore),@"fullReloads":@(a.table.reloads)});
-    Check(sections==0,@"blocked policy exposes neutral empty section count before first UI content");
-    Check(height==0,@"blocked policy has no native protected row geometry");
-    Check(headerHeight==0 && title==nil,@"blocked policy exposes neutral header height/title rather than native section work");
+    Check(sections==(NSInteger)retainedSectionCount,@"blocked policy retains published section topology with content-free slots");
+    Check(fabs(height-floor((retainedContentSize.height-80)/retainedRowCount))<0.5,@"blocked ordinary slot uses integer neutral height without native row measurements");
+    Check(headerHeight==0 && title==nil,@"blocked policy neutralizes native header title and section decoration");
     Check(stale!=nil,@"stale required cell request returns nonnil safe placeholder");
     Check(![stale.textLabel.text hasPrefix:@"secret"],@"stale required cell request never returns protected identity");
     Check(a.controller.privateCellCalls==0,@"blocked policy never invokes protected native cell getter");

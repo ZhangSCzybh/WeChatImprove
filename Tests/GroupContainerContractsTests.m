@@ -1,4 +1,5 @@
-// Independent readiness contracts. The formal miniapp return probe stays frozen.
+// Independent readiness contracts. Closed gates retain scalar scroll geometry;
+// through one content-free spacer; text, views and native content stay neutral.
 // All external query inputs below are controlled host callbacks, not phone traces.
 #define main GroupContainerCoreMain
 #include "GroupContainerReturnTests.m"
@@ -36,8 +37,8 @@ static void ContractReject(NSString *name,void (^prepare)(CSGroupListAdapter *))
         @"fullReloads":@(a.table.reloads),@"rowReloads":@(a.table.rowReloads),@"offsetWrites":@(a.table.offsetWrites),
         @"tableLayouts":@(a.table.layouts),@"projectionRetained":@(a.projection==before),
         @"refreshGenerationUnchanged":@(a.refreshGeneration==generation),@"dirtyUnchanged":@(a.dirty==dirty)});
-    Check(sections==0 && rows==0,@"unready UI query returns neutral counts");
-    Check(height==0 && headerHeight==0 && title==nil,@"unready UI query returns neutral row/section layout");
+    Check(sections==3 && rows==14,@"unready UI query retains published scalar section and row counts");
+    Check(fabs(height-floor((a.table.contentSize.height-80)/18))<0.5 && headerHeight==0 && title==nil,@"unready ordinary slot uses integer neutral height while native header content stays neutral");
     Check(cell!=nil && cell.textLabel.text.length==0 && !cell.userInteractionEnabled,@"unready required cell is nonnil empty and noninteractive");
     Check(a.controller.privateCellCalls==0,@"unready query never asks native source for protected cell");
     Check(a.recoveries==0 && a.refreshGeneration==generation,@"unready query does not refresh or request recovery");
@@ -81,7 +82,7 @@ static void ContractNativeUnlocked(void) {
 }
 
 int main(void) {@autoreleasepool {
-    Emit(@"probe-boundary",@{@"deviceEvidence":@NO,@"scope":@"Independent readiness contracts; formal miniapp red/green test source remains unchanged"});
+    Emit(@"probe-boundary",@{@"deviceEvidence":@NO,@"scope":@"Independent readiness contracts; 2.1-31 supersedes zero geometry with scalar-only retained geometry; privacy assertions are retained"});
     ContractReject(@"nil-policy-projecting",^(CSGroupListAdapter *a){(void)a;policy=nil;});
     ContractReject(@"nil-policy-native",^(CSGroupListAdapter *a){a.projecting=NO;a.projection=nil;policy=nil;});
     ContractReject(@"wrong-policy-account",^(CSGroupListAdapter *a){(void)a;policy=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"other-account" profile:@{@"enabled":@YES,@"options":@{}} revealed:NO revision:100 blocked:NO];});
