@@ -1,0 +1,117 @@
+{
+  "baseline": "ad031947f858dc55a3f09792964d47c707c91dc4",
+  "status": "stopped_before_implementation",
+  "device_theme_readability": "unverified",
+  "source_files": {
+    "Controllers/CSCloseFriendSessionPresentation.m": {
+      "baseline_sha256": "ff4480590eac0728d39c43a209f911db59ec107aa1188c9176316df35b09dd9e",
+      "current_sha256": "ff4480590eac0728d39c43a209f911db59ec107aa1188c9176316df35b09dd9e",
+      "byte_identical": true
+    },
+    "Controllers/CSCloseFriendSessionPresentation.h": {
+      "baseline_sha256": "be11cbdd85d6d64849976e0b8bf97829debdbd50839e0faf65db01ebceb9d6aa",
+      "current_sha256": "be11cbdd85d6d64849976e0b8bf97829debdbd50839e0faf65db01ebceb9d6aa",
+      "byte_identical": true
+    },
+    "Controllers/CSGroupListAdapter.h": {
+      "baseline_sha256": "509c83dbba8d1977c595046c94a525635cd997ab247bfb8f5f9007f5dbb6ecfd",
+      "current_sha256": "509c83dbba8d1977c595046c94a525635cd997ab247bfb8f5f9007f5dbb6ecfd",
+      "byte_identical": true
+    },
+    "Controllers/CSGroupListAdapter.m": {
+      "baseline_sha256": "9a2220feafecdbffc6fc72115a4e7e8b50bf2e0ef365dadf609867feff0dfb96",
+      "current_sha256": "9a2220feafecdbffc6fc72115a4e7e8b50bf2e0ef365dadf609867feff0dfb96",
+      "byte_identical": true
+    },
+    "Controllers/CSReleaseNotesViewController.m": {
+      "baseline_sha256": "00a9165eeb0748a68caa832004d917e91db747e1661491d76cb992f6c1f48f8b",
+      "current_sha256": "00a9165eeb0748a68caa832004d917e91db747e1661491d76cb992f6c1f48f8b",
+      "byte_identical": true
+    },
+    "Headers/CSUserInfoHelper.h": {
+      "baseline_sha256": "75118705eade084482459a7ca33d4ec0dfb30f2395989cdcd3054d418710afb1",
+      "current_sha256": "75118705eade084482459a7ca33d4ec0dfb30f2395989cdcd3054d418710afb1",
+      "byte_identical": true
+    },
+    "Hooks/SessionGroupHooks.xm": {
+      "baseline_sha256": "23232809b13300c9820de0b410cdef9d98278fb3598cdbfa76d73ecb97dcee3a",
+      "current_sha256": "23232809b13300c9820de0b410cdef9d98278fb3598cdbfa76d73ecb97dcee3a",
+      "byte_identical": true
+    },
+    "README.md": {
+      "baseline_sha256": "b471b15112f540bfd675113ee45bba6f65fe102c5b433bdd2a0afa711913746d",
+      "current_sha256": "b471b15112f540bfd675113ee45bba6f65fe102c5b433bdd2a0afa711913746d",
+      "byte_identical": true
+    },
+    "control": {
+      "baseline_sha256": "1bedb0b349fb6de273fd55e5253df269553cc4595e178c448a737c6ecc839b2f",
+      "current_sha256": "1bedb0b349fb6de273fd55e5253df269553cc4595e178c448a737c6ecc839b2f",
+      "byte_identical": true
+    },
+    "Tests/FoldedEntryVisualTests.h": {
+      "baseline_sha256": "ca4029904973876915a97fb44b39228b49180a32eddb1655e0c665028b01360c",
+      "current_sha256": "ca4029904973876915a97fb44b39228b49180a32eddb1655e0c665028b01360c",
+      "byte_identical": true
+    },
+    "Tests/FoldedNativeRendererFixture.h": {
+      "baseline_sha256": "2d7d6360160d6a8a18c2f6da6b335bc3427a06b537d536b00cdb2ef146c382b6",
+      "current_sha256": "2d7d6360160d6a8a18c2f6da6b335bc3427a06b537d536b00cdb2ef146c382b6",
+      "byte_identical": true
+    },
+    "Tests/CloseFriendSessionPresentationTests.m": {
+      "baseline_sha256": "6fdf4be390b2c92bc7cf91c39f875b6b6c50e8e916c19aa7f44cd6f2cd8808d1",
+      "current_sha256": "6fdf4be390b2c92bc7cf91c39f875b6b6c50e8e916c19aa7f44cd6f2cd8808d1",
+      "byte_identical": true
+    },
+    "Tests/verify-close-friend-session.sh": {
+      "baseline_sha256": "53733e6b2f6f41fcae5e1f0629dd2d00ff4637274ba9913840d024c62f2af3d5",
+      "current_sha256": "53733e6b2f6f41fcae5e1f0629dd2d00ff4637274ba9913840d024c62f2af3d5",
+      "byte_identical": true
+    },
+    "HeadersFile/MMThemeManager.h": {
+      "baseline_sha256": "1fc416182903dd0600130135d63102bccb312ca8e74b1d94822467b19febdcaa",
+      "current_sha256": "1fc416182903dd0600130135d63102bccb312ca8e74b1d94822467b19febdcaa",
+      "byte_identical": true
+    },
+    "HeadersFile/MMContext.h": {
+      "baseline_sha256": "3ce62b7defff77985beec273711a73a39406fe80e37e6db57b8782501092c292",
+      "current_sha256": "3ce62b7defff77985beec273711a73a39406fe80e37e6db57b8782501092c292",
+      "byte_identical": true
+    },
+    "HeadersFile/MMRuleSetList.h": {
+      "baseline_sha256": "a98cf7645d6a7cfdae5c79d055907b7fa8946822c3d5012bcceac07c87e99b20",
+      "current_sha256": "a98cf7645d6a7cfdae5c79d055907b7fa8946822c3d5012bcceac07c87e99b20",
+      "byte_identical": true
+    },
+    "HeadersFile/DarkModeManager.h": {
+      "baseline_sha256": "acbbd29490ceea54caae801a64b3455adceba270232cdf690118e2e47c2c263a",
+      "current_sha256": "acbbd29490ceea54caae801a64b3455adceba270232cdf690118e2e47c2c263a",
+      "byte_identical": true
+    },
+    "HeadersFile/MMDarkModeObserver.h": {
+      "baseline_sha256": "bcf94152b55941ede0a56c4194c04387c781db0eeda6ee3bdb9e22f92c4e25ef",
+      "current_sha256": "bcf94152b55941ede0a56c4194c04387c781db0eeda6ee3bdb9e22f92c4e25ef",
+      "byte_identical": true
+    },
+    "HeadersFile/UIView-DarkMode.h": {
+      "baseline_sha256": "71d66b0e110c74e7a678e280aaa025ddc7b13dc169d638d4a2ed6dd49a85714e",
+      "current_sha256": "71d66b0e110c74e7a678e280aaa025ddc7b13dc169d638d4a2ed6dd49a85714e",
+      "byte_identical": true
+    },
+    "HeadersFile/IMMFontMgrExt-Protocol.h": {
+      "baseline_sha256": "0ea9eb599dc92cb9571be40c327db90b05968bb5ba84e56792e9d18c037fa381",
+      "current_sha256": "0ea9eb599dc92cb9571be40c327db90b05968bb5ba84e56792e9d18c037fa381",
+      "byte_identical": true
+    },
+    "HeadersFile/UIFont-PreHot.h": {
+      "baseline_sha256": "ec1fd8e7707b28466cbc59c1034e28cf1386328bfd050ff46d75e778bf4fd509",
+      "current_sha256": "ec1fd8e7707b28466cbc59c1034e28cf1386328bfd050ff46d75e778bf4fd509",
+      "byte_identical": true
+    },
+    "HeadersFile/UITraitEnvironment-Protocol.h": {
+      "baseline_sha256": "56daf13b9b5c737f6631d9e2e16ed7648121884e0c79ba33d53f31e9512834da",
+      "current_sha256": "56daf13b9b5c737f6631d9e2e16ed7648121884e0c79ba33d53f31e9512834da",
+      "byte_identical": true
+    }
+  }
+}

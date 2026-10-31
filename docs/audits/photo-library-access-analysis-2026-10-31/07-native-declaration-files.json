@@ -1,0 +1,32 @@
+{
+  "command": [
+    "rg",
+    "--files",
+    "HeadersFile",
+    "-g",
+    "MMAlbumDataProviderForPHAssetFramework.h",
+    "-g",
+    "MMPHAssetCacheObj.h",
+    "-g",
+    "MMPHAssetChangeInfo.h",
+    "-g",
+    "MMUIImagePickerController.h",
+    "-g",
+    "MMAssetForPHAssetFramework.h",
+    "-g",
+    "MJPHAssetsAnalyzer.h",
+    "-g",
+    "*PHPhotoLibraryChangeObserver*",
+    "-g",
+    "SystemImagePickViewController.h",
+    "-g",
+    "MMAlbumDropPickerController.h",
+    "-g",
+    "WAScreenshotMgr.h",
+    "-g",
+    "MMAlbumChangeObserver.h"
+  ],
+  "returncode": 0,
+  "stdout": "HeadersFile/SystemImagePickViewController.h\nHeadersFile/MMAssetForPHAssetFramework.h\nHeadersFile/MMUIImagePickerController.h\nHeadersFile/MMAlbumChangeObserver.h\nHeadersFile/MMAlbumDataProviderForPHAssetFramework.h\nHeadersFile/MJPHAssetsAnalyzer.h\nHeadersFile/MMAlbumDropPickerController.h\nHeadersFile/WAScreenshotMgr.h\nHeadersFile/PHPhotoLibraryChangeObserver-Protocol.h\nHeadersFile/MMPHAssetCacheObj.h\nHeadersFile/MMPHAssetChangeInfo.h\n",
+  "stderr": ""
+}

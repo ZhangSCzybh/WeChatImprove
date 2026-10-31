@@ -1,0 +1,14 @@
+{
+  "command": [
+    "rg",
+    "-n",
+    "-i",
+    "openApplicationWithBundleID|openSensitiveURL|SBSLaunch|execv|fork\\(|CFMessagePort|NSXPC|xpc_|NSDistributedNotification|bootstrap_look_up|mach_msg|containerURLForSecurityApplicationGroupIdentifier|group\\.com\\.apple",
+    "Controllers",
+    "Hooks",
+    "Headers"
+  ],
+  "returncode": 1,
+  "stdout": "",
+  "stderr": ""
+}

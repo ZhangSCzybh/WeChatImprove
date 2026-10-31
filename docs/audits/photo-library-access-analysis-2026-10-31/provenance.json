@@ -1,0 +1,37 @@
+{
+  "captured_at": "2026-10-31T04:44:02.795133+00:00",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "head": {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "returncode": 0,
+    "stdout": "282f5db17938e16c0d19233d27b85782c8f67eae\n",
+    "stderr": ""
+  },
+  "status_before": {
+    "command": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "returncode": 0,
+    "stdout": " M .DS_Store\n M packages/.DS_Store\n?? docs/audits/photo-library-access-analysis-2026-10-31/\n?? docs/audits/release-2.2-4-folded-summary-idempotent/\n?? docs/feedbacks/2026-10-30-chat-return-top-flicker.mp4\n?? docs/feedbacks/2026-10-30-chat-return-top-settled.jpg\n?? docs/feedbacks/2026-10-30-chat-return-top-transition.jpg\n?? docs/feedbacks/2026-10-30-closefriend-return-flash-hidden.jpg\n?? docs/feedbacks/2026-10-30-closefriend-return-flash-shown.jpg\n?? docs/feedbacks/2026-10-30-closefriend-return-flash.mp4\n?? docs/feedbacks/2026-10-30-closefriend-return-leak-layout.txt\n?? docs/feedbacks/2026-10-30-closefriend-return-leak.txt\n?? docs/feedbacks/2026-10-30-launch-banner-flicker.txt\n?? docs/feedbacks/2026-10-30-miniapp-closefriend-flash-2.1-20.mp4\n?? docs/feedbacks/2026-10-30-miniapp-flash-frame36-enter.jpg\n?? docs/feedbacks/2026-10-30-miniapp-flash-frame40-visible.jpg\n?? docs/feedbacks/2026-10-30-miniapp-flash-frame45-filtered.jpg\n?? docs/feedbacks/2026-10-30-miniapp-return-and-top-flicker.txt\n?? docs/feedbacks/2026-10-30-miniapp-return-leak-blank.jpg\n?? docs/feedbacks/2026-10-30-miniapp-return-leak-hidden.jpg\n?? docs/feedbacks/2026-10-30-miniapp-return-leak-lastframe.jpg\n?? docs/feedbacks/2026-10-30-miniapp-return-leak-shown.jpg\n?? docs/feedbacks/2026-10-30-miniapp-return-leak.mp4\n?? docs/feedbacks/2026-10-30-rollback-2.1-20-and-fix-and-2.2-1.txt\n?? docs/feedbacks/2026-10-30-rollback-to-2.1-30.txt\n?? docs/feedbacks/2026-10-30-service-tab-hide-and-scroll-block.txt\n?? docs/feedbacks/2026-10-30-service-tab-hide-scroll-block.mp4\n?? docs/feedbacks/2026-10-30-service-tab-rows-missing.jpg\n?? docs/feedbacks/2026-10-30-service-tab-rows-restored.jpg\n?? docs/feedbacks/2026-10-30-service-tab-stable.jpg\n?? docs/feedbacks/2026-10-30-top-chrome-flicker-blank.jpg\n?? docs/feedbacks/2026-10-30-top-chrome-flicker-normal.jpg\n?? docs/feedbacks/2026-10-30-top-chrome-flicker.mp4\n?? docs/feedbacks/2026-10-30-top-chrome-return-flicker.txt\n?? docs/feedbacks/2026-10-31-photo-library-access-analysis.txt\n?? docs/feedbacks/2026-10-31-plan-a-folded-summary-idempotent.txt\n",
+    "stderr": ""
+  },
+  "tracked_diff_before": {
+    "command": [
+      "git",
+      "diff",
+      "--name-only"
+    ],
+    "returncode": 0,
+    "stdout": ".DS_Store\npackages/.DS_Store\n",
+    "stderr": ""
+  },
+  "outside_audit_files": 50635,
+  "packages_files": 108,
+  "theos_files": 1237
+}

@@ -1,0 +1,28 @@
+补充证据，请并入本轮分析，并在报告里专门回答。
+
+【用户提供的实际来源】
+不是隐私提示、不是权限弹窗，而是 iOS「设置 → 电池」里**「照片」这个 App 的耗电详情页**：
+- 今日占用电量 20%，页面提示「“照片”今天使用电量比过去 7 天多 15%」
+- 屏幕活跃：**1 分钟**
+- 后台：**2 小时 17 分钟**
+- 趋势图从 10/24 起逐日抬升，今日出现直方图高峰
+（截图在用户消息里，内容如上。）
+
+也就是说：被耗电的不是微信，是**系统「照片」App 在后台长时间运行**。1 分钟前台 + 2 小时 17 分后台，是典型的相册后台分析/索引特征（人脸、场景、OCR、回忆生成这类一次性重活），不是被反复唤起读图。
+
+【所以本轮要回答的问题收窄成这一个】
+**插件有没有可能诱发系统「照片」App 做后台分析？** 请逐条判定，并给文件:行依据：
+
+1. 插件是否往相册**写入**任何图片/视频。我已全局搜过 `PHPhotoLibrary|PHAssetChangeRequest|UIImageWriteToSavedPhotosAlbum|UISaveVideoAtPathToSavedPhotosAlbum|ALAssetsLibrary|PHPickerViewController|PHCachingImageManager|PHImageManager`，生产代码只命中 `Controllers/CSTabBarStyleSettingsViewController.m:662/665` 两行（authorizationStatus / requestAuthorization），**没有任何写入相册的 API**。请复核这个结论，并明确写「插件不写相册」或指出我漏了哪里。
+2. 插件是否注册 `PHPhotoLibraryChangeObserver`、持有 `PHAsset`、反复请求缩略图/原图（`PHImageManager`/`PHCachingImageManager`）。若有，会不会让 photolibraryd 持续被唤起。
+3. 插件是否通过文件系统间接影响相册：例如往 `DCIM`、MediaLibrary 目录写文件，或写进相册 App 的数据容器。搜一下代码里有没有硬编码 `DCIM`、`/var/mobile/Media`、`PhotoData` 之类路径。
+4. 插件 hook 微信相册/朋友圈相册相关类之后，会不会导致微信反复请求相册资源（那会被记到微信而不是「照片」，但也要说清会不会连带把 photolibraryd 拉起来）。
+5. 是否存在**循环唤醒**的可能：某个 hook 或通知在相册 App 被系统挂起后又被拉起。若没有证据，明确写「无」。
+
+【判定标准】
+- 如果你判断这跟插件无关，就直接写「本次证据不支持插件导致」，并给出理由：插件既不写相册、也不注册相册变更观察者、也不持有资源请求，只有人手点击才碰相册。
+- 顺带给出**非插件**的更可能解释与验证方法：例如相册后台分析、大量新照片导入、iCloud 照片同步、系统升级后重建索引；以及怎么自查（照片 App 内的分析进度、是否最近导入过大量照片、`log stream` 过滤 photolibraryd / mediaanalysisd 观察是否是分析任务）。
+- 不许把这 2 小时 17 分后台直接归因给插件，也不许为了“有结论”而编造因果。
+
+【约束不变】
+只分析，不改代码、不打包、不提交；只写 `docs/audits/photo-library-access-analysis-2026-10-31/`。

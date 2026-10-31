@@ -1,0 +1,25 @@
+{
+  "command": [
+    "rg",
+    "-n",
+    "--hidden",
+    "-i",
+    "PHPhotoLibrary|PHAssetChangeRequest|UIImageWriteToSavedPhotosAlbum|UISaveVideoAtPathToSavedPhotosAlbum|ALAssetsLibrary|PHPickerViewController|PHCachingImageManager|PHImageManager",
+    "-g",
+    "!.git/**",
+    "-g",
+    "!.theos/**",
+    "-g",
+    "!packages/**",
+    "-g",
+    "!HeadersFile/**",
+    "-g",
+    "!docs/**",
+    "-g",
+    "!Tests/**",
+    "."
+  ],
+  "returncode": 0,
+  "stdout": "./Controllers/CSTabBarStyleSettingsViewController.m:662:    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];\n./Controllers/CSTabBarStyleSettingsViewController.m:665:        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {\n",
+  "stderr": ""
+}

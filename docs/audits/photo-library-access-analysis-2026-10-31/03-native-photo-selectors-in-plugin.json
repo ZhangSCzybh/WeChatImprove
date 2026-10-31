@@ -1,0 +1,13 @@
+{
+  "command": [
+    "rg",
+    "-n",
+    "photoLibraryDidChange|registerChangeObserver|fetchAssets|fetchAssetCollections|requestImageForAsset|AllMMAlbums|tryLoadPHAsset|fetchThumbImage|requestWechatAuthAndLoadAlbum|tryStartLoadAlbum|_tryToLoadPhotoData|writeImageToSavedPhotosAlbum|SaveAlbum|assets-library://|ph://",
+    "Controllers",
+    "Hooks",
+    "Headers"
+  ],
+  "returncode": 0,
+  "stdout": "Controllers/CSAIImagePreparer.m:200:        if(!protocol || !CSMessageNativeSupports(context,@\"registerExtension:withTarget:\",@\"v\",@[@\"@\",@\"@\"]) || !CSMessageNativeSupports(context,@\"unRegisterExtension:withTarget:\",@\"v\",@[@\"@\",@\"@\"]) || !CSMessageNativeSupports(manager,@\"StartDownloadImage:HD:AutoDownload:SaveAlbum:Silent:\",@\"v\",@[@\"@\",@\"B\",@\"B\",@\"B\",@\"B\"]))return nil;\nControllers/CSAIImagePreparer.m:205:        CSMessageNativeInvoke(manager,@\"StartDownloadImage:HD:AutoDownload:SaveAlbum:Silent:\",@[event[@\"imageSource\"],@NO,@NO,@NO,@YES]);\nControllers/CSMessageImageStickerAdapter.m:150:        if (!protocol || !CSMessageNativeSupports(context,@\"registerExtension:withTarget:\",@\"v\",@[@\"@\",@\"@\"]) || !CSMessageNativeSupports(context,@\"unRegisterExtension:withTarget:\",@\"v\",@[@\"@\",@\"@\"]) || !CSMessageNativeSupports(manager,@\"StartDownloadImage:HD:AutoDownload:SaveAlbum:Silent:\",@\"v\",@[@\"@\",@\"B\",@\"B\",@\"B\",@\"B\"])) { [self finish]; return; }\nControllers/CSMessageImageStickerAdapter.m:154:        CSMessageNativeInvoke(manager,@\"StartDownloadImage:HD:AutoDownload:SaveAlbum:Silent:\",@[self.context.sourceWrap,@NO,@NO,@NO,@YES]);\n",
+  "stderr": ""
+}

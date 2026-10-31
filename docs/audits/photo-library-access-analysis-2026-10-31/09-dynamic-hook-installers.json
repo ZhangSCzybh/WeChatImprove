@@ -1,0 +1,12 @@
+{
+  "command": [
+    "rg",
+    "-n",
+    "MSHookMessageEx|method_exchangeImplementations|method_setImplementation|class_replaceMethod|fishhook|rebind_symbols",
+    "Controllers",
+    "Hooks"
+  ],
+  "returncode": 0,
+  "stdout": "Hooks/AIReplyHooks.xm:27:    MSHookMessageEx(cls,selector,replacement,&original);\nHooks/AIReplyHooks.xm:37:    MSHookMessageEx(cls,selector,replacement,&original);\nHooks/SessionGroupHooks.xm:159:        MSHookMessageEx(cell,selector,(IMP)MenuReceiveTouch,(IMP *)&OriginalMenuReceiveTouch);\nHooks/CloseFriendNotificationHooks.xm:351:        MSHookMessageEx(object_getClass(audio),vibration,replacement,&original);\nHooks/CloseFriendNotificationHooks.xm:358:        MSHookMessageEx(object_getClass(audio),sound,replacement,&original);\nHooks/CloseFriendNotificationHooks.xm:375:        MSHookMessageEx(object_getClass(utility),local,replacement,&original);\nControllers/CSCloseFriendDetailAdapter.m:229:        MSHookMessageEx(meta,selector,replacement,&original);\nControllers/CSCloseFriendTimelineAdapter.m:264:        BOOL available=CSCloseFriendMethodMatches(class_getInstanceMethod(meta,sel),type); if(available) MSHookMessageEx(meta,sel,replacement,&raw); else imp_removeBlock(replacement);\nControllers/CSCloseFriendBridge.m:61:    if(available) { MSHookMessageEx(cls,sel,replacement,original); available=*original!=NULL; }\nControllers/CSAINativeSyncObserver.m:182:    MSHookMessageEx(cls,create,createReplacement,&originalCreate);\nControllers/CSAINativeSyncObserver.m:189:    MSHookMessageEx(cls,returned,returnReplacement,&originalReturn);\nControllers/CSAINativeSyncObserver.m:210:    MSHookMessageEx(cls,handled,handleReplacement,&originalHandle);\n",
+  "stderr": ""
+}
