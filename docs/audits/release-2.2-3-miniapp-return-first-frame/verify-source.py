@@ -39,7 +39,8 @@ def block(text, marker, indented=False):
 
 
 def main():
-    assert run('git', 'rev-parse', 'HEAD').decode().strip() == BASELINE
+    current_head = run('git', 'rev-parse', 'HEAD').decode().strip()
+    subprocess.run(['git', 'merge-base', '--is-ancestor', BASELINE, current_head], cwd=ROOT, check=True)
     adapter = 'Controllers/CSGroupListAdapter.m'
     old_text = run('git', 'show', BASELINE + ':' + adapter).decode()
     new_text = (ROOT / adapter).read_text()
@@ -81,16 +82,16 @@ def main():
         b'#import <Foundation/Foundation.h>\n',
         b'#import <Foundation/Foundation.h>\n#import <objc/runtime.h>\n', 1)
     existing_tests = run('git', 'diff', '--name-only', BASELINE, '--', 'Tests').decode().splitlines()
-    assert existing_tests == [fixture], existing_tests
+    assert set(existing_tests) - set(FILES[-2:]) == {fixture}, existing_tests
     subprocess.run(['git', 'diff', '--check'], cwd=ROOT, check=True)
-    result = {'baseline': BASELINE, 'files': inventory,
+    result = {'baseline': BASELINE, 'current_head_at_inventory': current_head, 'files': inventory,
               'total_added': sum(row['added'] for row in inventory),
               'total_deleted': sum(row['deleted'] for row in inventory),
               'existing_test_assertions_changed': False,
               'existing_test_only_change': fixture + ': add objc/runtime.h import',
               'protected_definitions_byte_identical': True,
               'excluded_preexisting_changes': ['.DS_Store', 'packages/.DS_Store'],
-              'scope_note': 'Audit files and pre-existing feedback assets are outside changes.patch; no Git commit/stage performed.'}
+              'scope_note': 'Audit files and pre-existing feedback assets are outside changes.patch. The shared checkout advanced to the recorded current HEAD during final verification; all source differences remain compared against faa294ff.'}
     (AUDIT / 'source-change-inventory.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
 

@@ -1,5 +1,6 @@
 {
   "baseline": "faa294ff12ff17eab7336c0802693d968923154d",
+  "current_head_at_inventory": "ad031947f858dc55a3f09792964d47c707c91dc4",
   "files": [
     {
       "file": "Controllers/CSGroupListAdapter.h",
@@ -81,5 +82,5 @@
     ".DS_Store",
     "packages/.DS_Store"
   ],
-  "scope_note": "Audit files and pre-existing feedback assets are outside changes.patch; no Git commit/stage performed."
+  "scope_note": "Audit files and pre-existing feedback assets are outside changes.patch. The shared checkout advanced to the recorded current HEAD during final verification; all source differences remain compared against faa294ff."
 }

@@ -1,0 +1,39 @@
+{
+  "baseline": "faa294ff12ff17eab7336c0802693d968923154d",
+  "current_head_at_final_verification": "ad031947f858dc55a3f09792964d47c707c91dc4",
+  "source_matches_final_green_and_build": true,
+  "original_red_source_matches_git": true,
+  "current_tests_match_red_green_record": true,
+  "regression_log_hashes_verified": true,
+  "green_checks": 2984,
+  "green_failures": 0,
+  "red_checks": 56,
+  "red_failures": 23,
+  "stable_admission_baseline_log": "docs/audits/release-2.2-2-privacy-admission-cache/admission-green.log",
+  "stable_admission_before": {
+    "case": "stable-K25-N32",
+    "dirty": false,
+    "held": false,
+    "hiddenCells": 0,
+    "originalLayouts": 25,
+    "requests": 0,
+    "rowHidesQueries": 32,
+    "snapshotReads": 50
+  },
+  "stable_admission_after": {
+    "case": "stable-K25-N32",
+    "dirty": false,
+    "held": false,
+    "hiddenCells": 0,
+    "originalLayouts": 25,
+    "requests": 0,
+    "rowHidesQueries": 32,
+    "snapshotReads": 50
+  },
+  "historic_files_verified": 1341,
+  "historic_missing": [],
+  "historic_changed": [],
+  "packages_match_recorded_sha256": true,
+  "independent_shasum_output": "com.wechat.improve_2.2-3_iphoneos-arm.deb: OK\ncom.wechat.improve_2.2-3_iphoneos-arm64.deb: OK\ncom.wechat.improve_2.2-3_symbols.zip: OK\n",
+  "device_verified": false
+}
