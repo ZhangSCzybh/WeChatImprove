@@ -1,5 +1,6 @@
 // Host replay of real header publication / search-hook bodies, not an iOS render test.
 #import <Foundation/Foundation.h>
+#import <objc/runtime.h>
 #import "CSGroupAppearance.h"
 #import "CSGroupRefreshState.h"
 #import "CSGroupProjection.h"

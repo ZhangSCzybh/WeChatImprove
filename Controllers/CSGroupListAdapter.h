@@ -32,6 +32,8 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 /// Suspend derived UI work while the native main-frame owner is offscreen.
 + (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller;
 + (void)layoutForController:(id)controller;
+/// Validate existing cells before a covering miniapp starts revealing the list.
++ (void)prepareForListVisibility;
 + (void)settingsChanged;
 /// Display-only total for identity-silent subjects; nil means native policy, zero means
 /// privacy owns the badge but no current validated main-list source is available.

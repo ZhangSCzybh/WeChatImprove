@@ -4,6 +4,9 @@
 // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
 static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
     NSDictionary *releases = @{
+        @"2.2-3": @[
+            @{@"title": @"提前保护小程序返回时的会话内容", @"detail": @"小程序退场动画及手势开始前校验聊天列表已有内容，尚未确认安全时先中性化，待过滤后的内容发布完成再恢复；保留列表滚动位置与隐私准入缓存。"}
+        ],
         @"2.2-2": @[
             @{@"title": @"减少列表重复隐私校验", @"detail": @"缓存不可变分组投影的隐私准入证明，降低聊天列表驻留时的重复逐行校验开销；策略、账号或投影变化后重新验证，保留原有隐藏与解锁规则。"}
         ],

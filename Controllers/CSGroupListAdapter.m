@@ -94,6 +94,7 @@ static BOOL Option(NSString *suffix) {
 @property (nonatomic) NSTimeInterval tabBadgeBurstStart, tabBadgeDue;
 @property (nonatomic, copy) NSArray *tabBadgePublishedKey;
 - (void)requestTabBadgeSourceRefresh;
+- (void)prepareForVisibility;
 - (void)requestTabBadgeSourceRefreshCoalesced:(BOOL)coalesced;
 - (void)cancelTabBadgeSourceRefresh;
 - (void)refreshTabBadgeSource;
@@ -648,8 +649,11 @@ static BOOL Option(NSString *suffix) {
 }
 - (void)performSessionListLayout:(void (^)(void))layout {
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
-    BOOL privacy=policy.blocked || (policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue]);
-    if (!self.isActive && !privacy) {
+    BOOL privacy=policy.blocked || ![policy.options[@"hideSessions"] isKindOfClass:NSNumber.class] ||
+        ![policy.accountID isEqual:CSGroupCurrentAccountID()] ||
+        (policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue]);
+    BOOL visibilityHeld=[objc_getAssociatedObject(self,@selector(prepareForVisibility)) boolValue];
+    if (!self.isActive && !privacy && !visibilityHeld) {
         objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);
         layout();
         self.sessionLayoutHeld=NO;
@@ -666,7 +670,8 @@ static BOOL Option(NSString *suffix) {
     id hideOption=policy.options[@"hideSessions"];
     BOOL hideSessions=[hideOption boolValue];
     long long privacyRevision=CSGroupReadInteger(projection,@"privacyRevision",-1);
-    BOOL ready=!policy.blocked && [policy.accountID isEqual:account] &&
+    BOOL ready=self.isActive && (!visibilityHeld || (self.publishing && [hideOption isKindOfClass:NSNumber.class])) &&
+        !policy.blocked && [policy.accountID isEqual:account] &&
         projection.isValid && !retry && self.snapshotEpoch==epoch &&
         [projection.accountID isEqual:account] && privacyRevision==(long long)revision;
     // A proof belongs to one immutable projection and one fully known policy.
@@ -735,6 +740,43 @@ static BOOL Option(NSString *suffix) {
     }
     self.sessionLayoutHeld=NO;
     [self.privacyShield prepareForPublication];
+}
++ (void)prepareForListVisibility {
+    if (!NSThread.isMainThread) return;
+    for (CSGroupListAdapter *adapter in Adapters().allObjects) [adapter prepareForVisibility];
+}
+- (void)prepareForVisibility {
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    NSString *account=CSGroupCurrentAccountID();
+    NSUInteger epoch=CSCloseFriendAccountEpoch();
+    NSArray *cells=self.table.visibleCells;
+    BOOL known=policy && !policy.blocked && account.length && [policy.accountID isEqual:account] &&
+        [policy.options[@"hideSessions"] isKindOfClass:NSNumber.class];
+    BOOL privacy=!known || (policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue]);
+    BOOL unsafe=privacy && (!known || !self.isActive || !self.projection.isValid || self.snapshotRetryAttempted ||
+        self.snapshotEpoch!=epoch || ![self.projection.accountID isEqual:account] ||
+        CSGroupReadInteger(self.projection,@"privacyRevision",-1)!=(long long)policy.revision);
+    if (privacy && !unsafe) for (UITableViewCell *cell in cells) {
+        NSDictionary *delivery=objc_getAssociatedObject(cell,&CellRowKey);
+        CSGroupRow *row=delivery[@"row"];
+        if (!row || ![delivery[@"account"] isEqual:account] ||
+            [policy hidesUserName:row.userName surface:CSCloseFriendSurfaceSession]) { unsafe=YES; break; }
+    }
+    CSCloseFriendSnapshot *current=CSCloseFriendCurrentSnapshot();
+    if (current!=policy || current.blocked || current.revision!=policy.revision ||
+        epoch!=CSCloseFriendAccountEpoch() || ![current.accountID isEqual:account] ||
+        ![account isEqual:CSGroupCurrentAccountID()]) unsafe=YES;
+    if (!unsafe) return;
+    // Neutralize the existing content layer before the animator can expose it.
+    // Preserve table geometry/gestures; only a completed publication releases it.
+    if (!self.privacyShield) self.privacyShield=[CSCloseFriendListShield new];
+    for (UITableViewCell *cell in cells) [self.privacyShield shieldCell:cell];
+    objc_setAssociatedObject(self,@selector(prepareForVisibility),@YES,OBJC_ASSOCIATION_RETAIN);
+    self.sessionLayoutHeld=YES;
+    BOOL needsRefresh=!self.privacyRefreshPending;
+    self.privacyRefreshPending=YES; self.dirty=YES;
+    if (needsRefresh && !current.blocked && [current.accountID isEqual:CSGroupCurrentAccountID()] &&
+        !self.publishing && !self.changeDepth) [self requestRefresh];
 }
 - (BOOL)groupPanMoving {
     return self.pan.state==UIGestureRecognizerStateBegan || self.pan.state==UIGestureRecognizerStateChanged ||
@@ -945,6 +987,9 @@ static BOOL Option(NSString *suffix) {
         self.publishing=NO;
         if (!finished && self.privacyRefreshPending) [self shieldVisiblePrivateRows];
         if (finished) {
+            if (![objc_getAssociatedObject(self,@selector(prepareForVisibility)) boolValue] ||
+                [CSGroupReadObject(CSCloseFriendCurrentSnapshot(),@"options")[@"hideSessions"] isKindOfClass:NSNumber.class])
+                objc_setAssociatedObject(self,@selector(prepareForVisibility),nil,OBJC_ASSOCIATION_RETAIN);
             self.privacyRefreshPending=NO;
             if (CSCloseFriendCurrentSnapshot().blocked && !CSGroupCurrentAccountID().length)
                 [self shieldVisiblePrivateRows];
@@ -1150,8 +1195,12 @@ static BOOL Option(NSString *suffix) {
 - (void)performInNativePresentation:(void (^)(void))action {
     NSString *account=CSGroupCurrentAccountID(); if (!account.length) return;
     NSUInteger epoch=CSCloseFriendAccountEpoch();
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    BOOL privacy=policy.blocked || ![policy.accountID isEqual:account] ||
+        ![policy.options[@"hideSessions"] isKindOfClass:NSNumber.class] ||
+        (policy.enabled && !policy.revealed && [policy.options[@"hideSessions"] boolValue]);
     void (^guarded)(void)=^{ if (epoch==CSCloseFriendAccountEpoch() && CSGroupApplicationActive() && [account isEqualToString:CSGroupCurrentAccountID()]) action(); };
-    if (CSGroupApplicationActive() && !self.isActive && !self.publishing && !self.changeDepth) { CSGroupWithNativeIndices(self.table,guarded); return; }
+    if (CSGroupApplicationActive() && !self.isActive && !privacy && !self.publishing && !self.changeDepth) { CSGroupWithNativeIndices(self.table,guarded); return; }
     [self pruneNativeActions];
     self.nativeActionsAccount=account;
     [self.nativeActions addObject:[guarded copy]];
@@ -1159,7 +1208,7 @@ static BOOL Option(NSString *suffix) {
     if (self.publishing) {
         self.nativePresentation=YES; [self requestRefresh]; return;
     }
-    if (self.presentationSuspended) {
+    if (self.presentationSuspended || (privacy && !self.isActive)) {
         // Search/next-chat navigation can target the main list from another page.
         // Publish native coordinates once for that action, then remain suspended.
         self.nativePresentation=YES; [self refresh]; return;

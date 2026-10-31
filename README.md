@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.2-2`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.2-3`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -31,8 +31,8 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | 本地提供 `2.2-2` 安装包，缓存分组投影的隐私准入证明以减少重复校验；待真机验收 |
-| Rootful | 本地提供 `2.2-2` 安装包；待真机验收 |
+| Rootless | 本地提供 `2.2-3` 安装包，在小程序退场前校验列表已有内容；待真机验收 |
+| Rootful | 本地提供 `2.2-3` 安装包；待真机验收 |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
@@ -40,7 +40,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：当前 `2.2-2` 交付 [Rootless 安装包](packages/2.2-2-privacy-admission-cache/com.wechat.improve_2.2-2_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.2-2-privacy-admission-cache/com.wechat.improve_2.2-2_iphoneos-arm.deb)、[调试符号](packages/2.2-2-privacy-admission-cache/com.wechat.improve_2.2-2_symbols.zip) 和 [SHA-256](packages/2.2-2-privacy-admission-cache/SHA256SUMS)。本版在 2.2-1 上仅缓存不可变分组投影的隐私准入证明，减少列表驻留时重复的逐行隐私校验；策略、账号或投影变化后重新验证。缓存键、红绿测试与构建结果见 [2.2-2 审计](docs/audits/release-2.2-2-privacy-admission-cache/README.md)。2.2-1 的基线恢复与两项改动见 [历史审计](docs/audits/release-2.2-1-manual-backup-and-miniapp-return/README.md)。
+1. 获取与设备注入环境匹配的 `.deb`：当前 `2.2-3` 交付 [Rootless 安装包](packages/2.2-3-miniapp-return-first-frame/com.wechat.improve_2.2-3_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.2-3-miniapp-return-first-frame/com.wechat.improve_2.2-3_iphoneos-arm.deb)、[调试符号](packages/2.2-3-miniapp-return-first-frame/com.wechat.improve_2.2-3_symbols.zip) 和 [SHA-256](packages/2.2-3-miniapp-return-first-frame/SHA256SUMS)。本版在小程序退场动画或手势开始前检查聊天列表已有 cell；内容未确认安全时先中性化，过滤后的发布完成再恢复。保留 2.2-2 的隐私准入缓存。改动、红绿测试与构建结果见 [2.2-3 审计](docs/audits/release-2.2-3-miniapp-return-first-frame/README.md)。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
@@ -206,7 +206,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.2-2_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.2-2-privacy-admission-cache/`。
+当前版本默认输出：`packages/com.wechat.improve_2.2-3_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.2-3-miniapp-return-first-frame/`。
 
 ### Rootful
 
@@ -215,7 +215,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.2-2_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.2-2-privacy-admission-cache/`。
+当前版本默认输出：`packages/com.wechat.improve_2.2-3_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.2-3-miniapp-return-first-frame/`。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -239,7 +239,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.2-2-privacy-admission-cache/com.wechat.improve_2.2-2_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.2-3-miniapp-return-first-frame/com.wechat.improve_2.2-3_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。

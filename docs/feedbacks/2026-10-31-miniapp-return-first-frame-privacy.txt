@@ -1,0 +1,81 @@
+任务：修复「从小程序页返回聊天列表时，密友/密群行先在返回转场中露出，约 0.2~0.8 秒后才消失」的隐私泄露，出 2.2-3 包。
+
+【当前基线】
+仓库 /Users/zhangshichao/Documents/Workspace/WeChatImprove，HEAD = faa294ff（Release 2.2-2，隐私准入缓存）。
+请在 2.2-2 的代码上做，不要回退任何东西，不要重跑回退核验。
+
+【素材（已在仓库里）】
+- 录屏：docs/feedbacks/2026-10-31-miniapp-return-flash-2.2-2.mp4（592x1280，30fps，235 帧，8.13s）
+- 抽帧证据：
+  - docs/feedbacks/2026-10-31-miniapp-return-flash-2.2-2-frame152-leak.jpg
+  - docs/feedbacks/2026-10-31-miniapp-return-flash-2.2-2-frame168-leak-full.jpg
+  - docs/feedbacks/2026-10-31-miniapp-return-flash-2.2-2-frame175-hidden.jpg
+  - docs/feedbacks/2026-10-31-miniapp-return-flash-2.2-2-frame200-settled.jpg
+
+【逐帧事实（已用 signalstats 与人工看帧确认，可直接引用为已知事实）】
+- 帧 0–132（0.00–4.40s）：停在肯德基小程序页。
+- 帧 133（4.43s）：返回转场开始，小程序页面向下滑，聊天列表自上而下露出。
+- 帧 152（5.07s）：列表已露出到第 5 行区域，**「Pero. 07:50 / 还不蛮」这一行已经可见**（隐私行）。
+- 帧 168（5.60s）：转场基本完成，**「Pero.」与「(是七宝的小鹏X9群) 07:44 / kā 插油久 26MAX: 演[困]」两行完全可见**，且是正常内容（没有被打码、没有变空）。
+- 帧 175（5.83s）：这两行已经消失，列表变成另一份内容（第 4 行从「再也不会测试 / 最后再优化性能的吧 昨天22:32」变成「再也不会 / 红包已领取 到账金额… 10月22日」）。
+- 帧 200（6.67s）：稳定态，与帧 175 一致。
+- 结论：隐私行在返回转场里可见时间 ≈ 帧 152→174，即 **0.77 秒**；从全部露出算起 0.23 秒。
+
+【这就是本次要修的问题】
+用户原话：「从小程序页返回聊天列表 还是会先显示密友/密群 然后再隐藏。」
+注意：这是 2.2-1/2.2-2 上仍然存在的老问题，不是 2.2-2 引入的。2.2-2 只改了扫描次数，没有关闭「列出可见到隐私化生效」的时间窗。
+
+【必须查清的根因方向（逐条给结论，不要跳）】
+1. 帧 152/168 显示的是**转场开始时列表已有的内容**（且帧 168 的第 4 行与稳定态不同，说明是旧内容），不是本次返回后新建的 cell。所以问题在「列表变为可见之前，屏幕上已有的那套内容没有被隐私化」，而不是「新建 cell 时漏了过滤」。请确认是不是这个性质。
+2. `Controllers/CSGroupListAdapter.m:652` 的早退分支：
+   `if (!self.isActive && !privacy) { ... layout(); ... prepareForPublication(); return; }`
+   这条路径会**跳过**逐行隐私判定、shield 与 hold，直接按原样布局。请确认小程序打开期间/返回瞬间 `isActive` 是否会为 NO，如果会，那么这期间任何一次布局都会把未过滤内容摆上去，返回时用户直接看到。这是当前最可疑的一条。
+3. `Controllers/CSGroupListAdapter.m:1154`：`!self.isActive` 时走 `CSGroupWithNativeIndices`，同样会在原生索引域里出内容。确认返回瞬间是否命中。
+4. `performSessionListLayout:` 只在**表格内容布局入口**被调用。若返回转场期间表格没有发生内容布局（只是重新可见 / 只是父容器动画），则整条隐私闸门一次都不会执行。请确认帧 133–168 之间表格是否真的走过这个入口；拿不到真机就明确写「静态推断」。
+5. 数据刷新是**晚到**的：帧 168 仍是旧内容，帧 175 才换新。说明真正让隐私行消失的是「返回后的一次 refresh」，它发生在转场已经结束后。这解释了为什么闪一下才隐藏——闸门装在了错误的一端（事后），而不是事前。
+
+【修复要求】
+目标一句话：**列表在屏幕上一旦可见，第一帧就必须已经是隐私化后的内容**；不能靠「可见之后再隐藏」。
+
+- 时机必须提前到「覆盖层开始消失时」，而不是「列表已经可见且发生布局时」。可用于提前的入口请自己找并说明理由（例如覆盖层 view 的 willMoveToWindow/dismiss、列表 VC 的 viewWillAppear、窗口 key 状态变化、小程序关闭回调等），但必须给出实际存在的类与方法，不许编造。
+- 覆盖层可见期间如果 `isActive == NO`，也**不允许**把未隐私化的内容摆上去。上面第 2、3 条的早退分支需要收紧：只要「当前策略判定为需要隐藏」（privacy 为真）就必须走 shield/hold，与 isActive 无关。若你认为改这条会波及别处，先报告影响面再改。
+- 不许引入任何固定延时（`dispatch_after` 等待、N 帧后修）；不许用 `performSelector:afterDelay:` 糊。
+- 不许为了掩盖问题做整表 `reloadData` 硬刷；不许降低刷新频率。
+- 允许新增「可见前置闸门」：在列表即将可见前主动校验一次并 shield/hold/中性化，之后仍走原有 refresh 恢复。这条是本次的主要改动方向。
+- 隐私必须 fail-closed：任何键读不到、状态不确定，宁可空态/中性态，不许放行。
+- 2.2-2 的隐私准入缓存的语义与计数特性不能被破坏：25 次稳定布局、32 行投影时，逐行隐私判定仍应只有 1 次（32 次查询），原生布局仍 25 次，新增刷新请求仍 0。改完后请重跑 `Tests/verify-privacy-admission-cache.sh` 与 `Tests/verify-privacy-admission-cache-events.sh` 并用同样口径给出计数对照。
+
+【受保护的既有定义（要求逐字节不变，附 SHA256 对照）】
+- `- (CSGroupProjection *)projectionForSections:`
+- `- (void)publishProjection:`
+- `+ (void)setPresentationSuspended:`
+- `performSessionListLayout:` 里的 `ready-NO` 分支（2.2-2 审计里的 baseline 块）
+除以上之外，`performSessionListLayout:` 允许改动，但必须说明改了什么、为什么不会让隐私判定退化成无条件放行。
+
+【测试要求】
+- 先在**未修改的 2.2-2** 上写新测试并跑出红色，保留红日志，再改代码转绿；不许改既有断言来凑绿。
+- 新测试必须覆盖「没有发生表格内容布局，列表直接变为可见」这一场景，断言：列表可见那一刻可见 cell 里不含任何应隐藏行，且首帧不是原生内容。至少包含：
+  1. `isActive == NO` 且 privacy 为真时，布局不得出版未隐藏内容；
+  2. 覆盖层消失 → 列表可见，期间零次内容布局，仍不得露出；
+  3. 覆盖层消失后再 refresh，正常恢复且不重复闪烁；
+  4. 转场期间并发策略变化（解锁到期/切换账号）仍然 fail-closed。
+- 既有九套回归全跑：verify-miniapp-private-layout、verify-close-friend-session、verify-group-lifecycle、verify-group-selection、verify-group-incremental、verify-group-badges、verify-group-viewport、verify-group-search、verify-list-corners。
+- 任何一项失败都不许出包。
+
+【构建与产物】
+- 版本 2.2-3；同步 `control`、`Headers/CSUserInfoHelper.h`、`README.md`、应用内发布说明。
+- 产物目录 `packages/2.2-3-miniapp-return-first-frame/`：`com.wechat.improve_2.2-3_iphoneos-arm.deb`、`_iphoneos-arm64.deb`、`_symbols.zip`、`SHA256SUMS`，必须实跑 `shasum -a 256 -c SHA256SUMS` 并给出输出。
+- 构建用独立临时 `_THEOS_LOCAL_DATA_DIR`；**不许 `make clean`**；不许覆盖任何已有 packages 目录；历史产物与主树 `.theos` 要做前后保护核对。
+- 审计写到 `docs/audits/release-2.2-3-miniapp-return-first-frame/`，含：根因判定、改动 diff、计数对照、红/绿日志、回归结果、受保护块 SHA256 对照、未验证项。
+
+【硬约束】
+- 不许凭记忆重写代码；改动范围最小化，禁止顺手重构、禁止改无关文件、禁止调整格式。
+- 不许改既有测试断言。
+- 拿不到真机就明确写「未验证」，不许编造设备数据。
+- 若你判断根因不在上述范围、或所需入口不存在，**停下来说明**，不要硬改。
+
+【完成后回答我】
+1. 根因是什么（一句话），以及为什么 2.2-1 那个修法没盖住；
+2. 具体改了哪几个文件、多少行；
+3. 计数对照与回归数字；
+4. 真机上我该看什么来确认（第一帧就隐藏、无闪、可正常滚动）。

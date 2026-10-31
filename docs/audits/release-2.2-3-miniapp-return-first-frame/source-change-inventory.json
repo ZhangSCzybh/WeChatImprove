@@ -1,0 +1,85 @@
+{
+  "baseline": "faa294ff12ff17eab7336c0802693d968923154d",
+  "files": [
+    {
+      "file": "Controllers/CSGroupListAdapter.h",
+      "added": 2,
+      "deleted": 0,
+      "baseline_sha256": "b4e908a40c86ad4c0ec47f5b5622448814abc837f32043ebb5fd5d0261e584b4",
+      "current_sha256": "509c83dbba8d1977c595046c94a525635cd997ab247bfb8f5f9007f5dbb6ecfd"
+    },
+    {
+      "file": "Controllers/CSGroupListAdapter.m",
+      "added": 54,
+      "deleted": 5,
+      "baseline_sha256": "82e96b805c63593b036804ca46159de95e44b15c3dfb59f6377ebc0b423c8ec8",
+      "current_sha256": "9a2220feafecdbffc6fc72115a4e7e8b50bf2e0ef365dadf609867feff0dfb96"
+    },
+    {
+      "file": "Controllers/CSReleaseNotesViewController.m",
+      "added": 3,
+      "deleted": 0,
+      "baseline_sha256": "95c7b0c469a7a09ebc44b839a30dda4709c8909be8432b3e9eb09e59713cff6d",
+      "current_sha256": "00a9165eeb0748a68caa832004d917e91db747e1661491d76cb992f6c1f48f8b"
+    },
+    {
+      "file": "Headers/CSUserInfoHelper.h",
+      "added": 1,
+      "deleted": 1,
+      "baseline_sha256": "1ecbc336c1c47fd38cbd4df14b7d8d54e59ed8e67e570cd67d5f686f4e1b1fb0",
+      "current_sha256": "75118705eade084482459a7ca33d4ec0dfb30f2395989cdcd3054d418710afb1"
+    },
+    {
+      "file": "Hooks/SessionGroupHooks.xm",
+      "added": 11,
+      "deleted": 0,
+      "baseline_sha256": "7e3ed572e1937a93cc6e82638972c45509fcd894dba6731dccf663a74411e806",
+      "current_sha256": "23232809b13300c9820de0b410cdef9d98278fb3598cdbfa76d73ecb97dcee3a"
+    },
+    {
+      "file": "README.md",
+      "added": 7,
+      "deleted": 7,
+      "baseline_sha256": "95335f2ac4f954ffef447810a438d697830ca9ad5640a283f334ef22a0c61793",
+      "current_sha256": "b471b15112f540bfd675113ee45bba6f65fe102c5b433bdd2a0afa711913746d"
+    },
+    {
+      "file": "Tests/GroupSearchTests.m",
+      "added": 1,
+      "deleted": 0,
+      "baseline_sha256": "746dfd03765b04d4e8e49ce2e0626357c5436d356e9060bac9363e59545050cf",
+      "current_sha256": "7a275a1b59372f03c1d902a7e10d34ea49ec1276548e246099d11c132f4ebc88"
+    },
+    {
+      "file": "control",
+      "added": 1,
+      "deleted": 1,
+      "baseline_sha256": "f7d7fe0b557d03faffcbec4583043bdbe87d20d6708f0704ebfc4297f6c63dde",
+      "current_sha256": "1bedb0b349fb6de273fd55e5253df269553cc4595e178c448a737c6ecc839b2f"
+    },
+    {
+      "file": "Tests/MiniappFirstFrameTests.m",
+      "added": 189,
+      "deleted": 0,
+      "baseline_sha256": null,
+      "current_sha256": "8a6858eb45860db4fe99b77768524809f7b0e1615a93d2e678f7485b08cd1779"
+    },
+    {
+      "file": "Tests/verify-miniapp-first-frame.sh",
+      "added": 71,
+      "deleted": 0,
+      "baseline_sha256": null,
+      "current_sha256": "4a7003dec6883e1ff28a33da4c6d7b9aeb31b6b8c867388c3c9611b91fa8d8a4"
+    }
+  ],
+  "total_added": 340,
+  "total_deleted": 14,
+  "existing_test_assertions_changed": false,
+  "existing_test_only_change": "Tests/GroupSearchTests.m: add objc/runtime.h import",
+  "protected_definitions_byte_identical": true,
+  "excluded_preexisting_changes": [
+    ".DS_Store",
+    "packages/.DS_Store"
+  ],
+  "scope_note": "Audit files and pre-existing feedback assets are outside changes.patch; no Git commit/stage performed."
+}

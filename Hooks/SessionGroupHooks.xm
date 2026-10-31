@@ -12,6 +12,8 @@
 @interface MainFrameLogicController : NSObject @end
 @interface MainSessionEditingLogic : NSObject @end
 @interface MMBaseMultiMenuTableViewCell : UITableViewCell @end
+@interface WAAppDismissAnimateTransition : NSObject @end
+@interface WAAppTansitionController : NSObject @end
 
 static char EditingContextKey;
 static CSGroupListAdapter *EditingAdapter(id owner) {
@@ -55,6 +57,15 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
     (void)center; (void)observer; (void)name; (void)object; (void)info;
     [CSGroupListAdapter settingsChanged];
 }
+
+%hook WAAppDismissAnimateTransition
+- (void)animateTransition:(id)context { [CSGroupListAdapter prepareForListVisibility]; %orig; }
+%end
+
+%hook WAAppTansitionController
+- (void)onMiniTaskDismissalGestureWillBegin { [CSGroupListAdapter prepareForListVisibility]; %orig; }
+- (void)sheetDismissalTransitionWillBegin:(id)controller { [CSGroupListAdapter prepareForListVisibility]; %orig; }
+%end
 
 %hook NewMainFrameViewController
 - (void)viewDidLoad { %orig; [CSGroupListAdapter attachToController:self]; }
