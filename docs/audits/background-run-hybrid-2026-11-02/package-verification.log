@@ -1,0 +1,128 @@
+{
+  "packages": [
+    {
+      "scheme": "rootless",
+      "package": "com.wechat.improve_2.2-4_iphoneos-arm64.deb",
+      "version": "2.2-4",
+      "package_architecture": "iphoneos-arm64",
+      "dylib_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "install_path": "/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "minimum_iOS": [
+        "15.0",
+        "15.0"
+      ],
+      "retained_symbols": [
+        "_OBJC_CLASS_$_CSBackgroundRunRuntime",
+        "_OBJC_CLASS_$_CSBackgroundRunManager",
+        "_OBJC_CLASS_$_CSAIBackgroundSync",
+        "_CSAIInstallNativeSyncObserver",
+        "_CSAIObserveBackgroundSyncRequest",
+        "_OBJC_CLASS_$_CSAINativeSyncObservation",
+        "_OBJC_CLASS_$_CSAIBackgroundSyncContext",
+        "_CSCFPaymentOutputAllowed",
+        "_CSCFUnreadPanelInstallHooks",
+        "_CSCFUnreadPanelNotifyCount",
+        "_CSCFIncomingCallToken",
+        "_CSLayoutPreferencesRead",
+        "_CSGroupCopyFoldedRowsSelectingSummary",
+        "_CSAIReplyMessageIngressEnabled",
+        "_CSAIReplyMessageIngressAllowsSession",
+        "_CSGroupResolveNativeRowPathReusing",
+        "_OBJC_CLASS_$_CSNavigationImageBinding",
+        "_CSListCornerPerformSessionTableLayout",
+        "_CSAIReadCredentialAsync",
+        "_CSTabBarBeginControllerLayout",
+        "_CSTabBarEndControllerLayout",
+        "_CSScheduledTaskAllowsExecution",
+        "_OBJC_CLASS_$_CSScheduledTaskStore",
+        "_OBJC_CLASS_$_CSScheduledTaskManager",
+        "_OBJC_CLASS_$_CSScheduledTaskSettingsViewController"
+      ],
+      "silence_bridge_symbol_absent": true,
+      "filter_matches_source": true,
+      "staged_payload_matches_package": true,
+      "version_string_present": true,
+      "uuid_matches_dSYM": {
+        "arm64": "95C39610-2A78-3FDE-9B65-E9893E78C472",
+        "arm64e": "FE9813D5-31D6-3092-BAC7-EF20DA2435F3"
+      },
+      "dylib_sha256": "8b0402a839a63eb40deab62a1204f3c50ffe46b48bf793b091b462b29f7b7bc3"
+    },
+    {
+      "scheme": "rootful",
+      "package": "com.wechat.improve_2.2-4_iphoneos-arm.deb",
+      "version": "2.2-4",
+      "package_architecture": "iphoneos-arm",
+      "dylib_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "install_path": "/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "minimum_iOS": [
+        "15.0",
+        "15.0"
+      ],
+      "retained_symbols": [
+        "_OBJC_CLASS_$_CSBackgroundRunRuntime",
+        "_OBJC_CLASS_$_CSBackgroundRunManager",
+        "_OBJC_CLASS_$_CSAIBackgroundSync",
+        "_CSAIInstallNativeSyncObserver",
+        "_CSAIObserveBackgroundSyncRequest",
+        "_OBJC_CLASS_$_CSAINativeSyncObservation",
+        "_OBJC_CLASS_$_CSAIBackgroundSyncContext",
+        "_CSCFPaymentOutputAllowed",
+        "_CSCFUnreadPanelInstallHooks",
+        "_CSCFUnreadPanelNotifyCount",
+        "_CSCFIncomingCallToken",
+        "_CSLayoutPreferencesRead",
+        "_CSGroupCopyFoldedRowsSelectingSummary",
+        "_CSAIReplyMessageIngressEnabled",
+        "_CSAIReplyMessageIngressAllowsSession",
+        "_CSGroupResolveNativeRowPathReusing",
+        "_OBJC_CLASS_$_CSNavigationImageBinding",
+        "_CSListCornerPerformSessionTableLayout",
+        "_CSAIReadCredentialAsync",
+        "_CSTabBarBeginControllerLayout",
+        "_CSTabBarEndControllerLayout",
+        "_CSScheduledTaskAllowsExecution",
+        "_OBJC_CLASS_$_CSScheduledTaskStore",
+        "_OBJC_CLASS_$_CSScheduledTaskManager",
+        "_OBJC_CLASS_$_CSScheduledTaskSettingsViewController"
+      ],
+      "silence_bridge_symbol_absent": true,
+      "filter_matches_source": true,
+      "staged_payload_matches_package": true,
+      "version_string_present": true,
+      "uuid_matches_dSYM": {
+        "arm64": "5C05C72E-5C8B-3AA9-81EB-13556440ADA8",
+        "arm64e": "EE874EBD-15DB-3421-B912-FE61CD321948"
+      },
+      "dylib_sha256": "45da38c1995d5a2a2de9be090de6ed37ee4d8a43d1dece2b1459a3f9cd3e35b2"
+    }
+  ],
+  "symbols_zip_crc_valid": true,
+  "symbol_files": 12,
+  "artifacts": [
+    {
+      "file": "com.wechat.improve_2.2-4_iphoneos-arm.deb",
+      "bytes": 1531784,
+      "sha256": "78016348a4d62896f532b735ff793f999e40d2874d7973460f62a36b81c645d5"
+    },
+    {
+      "file": "com.wechat.improve_2.2-4_iphoneos-arm64.deb",
+      "bytes": 1531780,
+      "sha256": "977000c56bfbd100ce05e74211d3d640092bd6fc42eda35e6030addae6dbb4dc"
+    },
+    {
+      "file": "com.wechat.improve_2.2-4_symbols.zip",
+      "bytes": 11136784,
+      "sha256": "b32b2e8c21ac7883c8d0cab039331eab7b1a476d57063cb4a9731e42a50ca553"
+    }
+  ],
+  "device_installed": false,
+  "shasum_check_exit_code": 0,
+  "historical_artifacts_preserved": true
+}

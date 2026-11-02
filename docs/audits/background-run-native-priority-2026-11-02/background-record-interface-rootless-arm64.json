@@ -1,0 +1,41 @@
+{
+  "scheme": "rootless",
+  "architecture": "arm64",
+  "verification_scope": "Static selector and UI string presence in this Mach-O slice; no runtime invocation.",
+  "selector_checks": {
+    "lastBackgroundStartedAt": true,
+    "lastBackgroundStartObserved": true,
+    "lastBackgroundCheckedAt": true,
+    "lastBackgroundCheckStatus": true,
+    "lastForegroundReturnedAt": true,
+    "lastBackgroundStoppedAt": true,
+    "lastBackgroundStopReason": true,
+    "lastCheckToForegroundInterval": true,
+    "showLastBackgroundRecord": true
+  },
+  "ui_text_checks": {
+    "最近一次后台": true,
+    "最后状态": true,
+    "进入后台": true,
+    "开始观察": true,
+    "最后检查": true,
+    "检查时状态": true,
+    "返回前台": true,
+    "停止时间": true,
+    "停止原因": true,
+    "检查至返回间隔": true,
+    "最近一次后台记录": true,
+    "尚无记录": true,
+    "尚未检查": true,
+    "尚未返回前台": true,
+    "尚未停止": true,
+    "尚无法计算": true,
+    "最后检查仅证明该时刻执行过检查": true,
+    "开始观察表示中途开始记录": true
+  },
+  "date_format_checks": {
+    "MM-dd HH:mm:ss": true,
+    "yyyy-MM-dd HH:mm:ss": true
+  },
+  "all_present": true
+}

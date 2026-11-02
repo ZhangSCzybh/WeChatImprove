@@ -11,6 +11,8 @@ NAME(AVAudioSessionInterruptionTypeKey); NAME(AVAudioSessionInterruptionOptionKe
 @implementation UIScene @end
 @implementation UIApplication
 + (instancetype)sharedApplication { static UIApplication *app; if (!app) { app=[self new]; app.connectedScenes=[NSSet set]; } return app; }
+- (UIBackgroundTaskIdentifier)beginBackgroundTaskWithName:(NSString *)name expirationHandler:(void (^)(void))handler { return UIBackgroundTaskInvalid; }
+- (void)endBackgroundTask:(UIBackgroundTaskIdentifier)identifier {}
 @end
 @implementation AVAudioSession
 + (instancetype)sharedInstance {

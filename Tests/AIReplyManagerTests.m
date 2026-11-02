@@ -46,7 +46,7 @@ static NSUInteger failedDirectorySyncs,manualSends,ownedSends,nativeIncomingCall
 static NSString *lastSentTo;
 static NSMutableArray<NSString *> *installedHooks;
 static void (^duringManualSend)(void);
-static BOOL backgroundAudioActive,backupReady=YES;
+static BOOL backgroundAudioActive,canAttemptBackgroundWork,backupReady=YES;
 static atomic_bool pauseNextFsync,ioPaused;
 static dispatch_semaphore_t resumeFsync;
 static id nativeSyncService;
@@ -170,6 +170,7 @@ NSString *const CSCloseFriendPolicyDidChangeNotification=@"test-privacy";
 @implementation CSBackgroundRunManager
 + (instancetype)sharedManager{static CSBackgroundRunManager *manager;static dispatch_once_t once;dispatch_once(&once,^{manager=[self new];});return manager;}
 - (BOOL)backgroundAudioActive{return backgroundAudioActive;}
+- (BOOL)canAttemptBackgroundWork{return canAttemptBackgroundWork;}
 @end
 #pragma clang diagnostic pop
 BOOL CSBackupIsReady(void){return backupReady;}
@@ -528,13 +529,13 @@ static void BackgroundSyncReplies(NSURL *url){
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;TestClient *client=[TestClient new];[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager setValue:client forKey:@"client"];
     CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:client];coordinator.delegate=(id)manager;__block NSTimeInterval messageClock=4000;coordinator.now=^{return messageClock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];[manager notify];
     CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];[scheduler stop];__block NSTimeInterval syncClock=4000;scheduler.now=^{return syncClock;};
-    TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;backgroundAudioActive=NO;SetPrivacy(NO,YES,YES);simulateSends=YES;submissions=0;
+    TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;canAttemptBackgroundWork=NO;SetPrivacy(NO,YES,YES);simulateSends=YES;submissions=0;
     [manager setValue:@NO forKey:@"started"];[manager start];DrainMain();CHECK(!scheduler.active && !service.syncCalls);
     // The fake native sync releases an already queued silent-group message through the unchanged incoming hook.
     TestMessageWrap *queued=Message(@"room@chatroom",account,1,messageClock);queued.m_nsRealChatUsr=@"member";
     service.didSynchronize=^{[nativeMessages AsyncOnAddMsg:@"room@chatroom" MsgWrap:queued];};
     UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];DrainMain();CHECK(!scheduler.active && !service.syncCalls);
-    backgroundAudioActive=YES;[NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunStateChangedNotification object:nil];DrainMain();CHECK(scheduler.active && service.syncCalls==1 && coordinator.pendingCount==1);
+    canAttemptBackgroundWork=YES;[NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunStateChangedNotification object:nil];DrainMain();CHECK(scheduler.active && service.syncCalls==1 && coordinator.pendingCount==1);
     messageClock+=2;[coordinator processPending];CHECK(client.callbacks.count==1);client.callbacks.lastObject(@"background unmentioned reply",nil);DrainMain();CHECK(submissions==1 && [lastSentTo isEqual:@"room@chatroom"]);
     for(NSUInteger i=0;i<5;i++){[NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunStateChangedNotification object:nil];[manager refresh];}DrainMain();CHECK(service.syncCalls==1);
     syncClock=4044;FireSync(scheduler);CHECK(service.syncCalls==1);syncClock=4045;FireSync(scheduler);DrainMain();CHECK(service.syncCalls==2 && !coordinator.pendingCount && client.callbacks.count==1 && submissions==1);service.didSynchronize=nil;
@@ -546,7 +547,7 @@ static void BackgroundSyncReplies(NSURL *url){
     // A queued background refresh must not override a newer foreground transition.
     [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationWillEnterForegroundNotification object:nil];CHECK(!scheduler.active);DrainMain();CHECK(!scheduler.active && service.syncCalls==3);
     syncClock=4135;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];DrainMain();CHECK(scheduler.active && service.syncCalls==4);
-    backgroundAudioActive=NO;[NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunStateChangedNotification object:nil];DrainMain();CHECK(!scheduler.active);syncClock=4180;[old fire];CHECK(service.syncCalls==4);backgroundAudioActive=YES;
+    canAttemptBackgroundWork=NO;[NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunStateChangedNotification object:nil];DrainMain();CHECK(!scheduler.active);syncClock=4180;[old fire];CHECK(service.syncCalls==4);canAttemptBackgroundWork=YES;
     [NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunStateChangedNotification object:nil];DrainMain();CHECK(scheduler.active && service.syncCalls==5);
     // Each eligibility requirement independently closes the scheduler without switching the test store.
     for(NSUInteger gate=0;gate<19;gate++){
@@ -559,9 +560,9 @@ static void BackgroundSyncReplies(NSURL *url){
         if(gate==13)disabled[@"conversations"]=@{@"missing@chatroom":@{@"enabled":@YES,@"presetID":@"",@"allowUnmentioned":@YES}};
         CHECK([store saveConfiguration:disabled error:NULL]);
         if(gate==0)UIApplication.sharedApplication.applicationState=UIApplicationStateActive;if(gate==1)UIApplication.sharedApplication.applicationState=UIApplicationStateInactive;
-        if(gate==2)backgroundAudioActive=NO;if(gate==3)authorized=NO;if(gate==14)epoch++;if(gate==15)account=@"bob";if(gate==16)suspended=YES;if(gate==17)backupReady=NO;if(gate==18)[store setValue:@NO forKey:@"snapshotReady"];
+        if(gate==2)canAttemptBackgroundWork=NO;if(gate==3)authorized=NO;if(gate==14)epoch++;if(gate==15)account=@"bob";if(gate==16)suspended=YES;if(gate==17)backupReady=NO;if(gate==18)[store setValue:@NO forKey:@"snapshotReady"];
         NSUInteger before=service.syncCalls;[scheduler refresh];CHECK(!scheduler.active && service.syncCalls==before);
-        UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;authorized=YES;epoch=7;account=@"alice";suspended=NO;backupReady=YES;[store setValue:@YES forKey:@"snapshotReady"];
+        UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;canAttemptBackgroundWork=YES;authorized=YES;epoch=7;account=@"alice";suspended=NO;backupReady=YES;[store setValue:@YES forKey:@"snapshotReady"];
         CHECK([store saveConfiguration:original error:NULL]);[scheduler refresh];DrainMain();CHECK(scheduler.active && service.syncCalls==before+1);
     }
     // Native busy and rejected attempts consume the same 45-second budget.
@@ -582,7 +583,7 @@ static void BackgroundSyncReplies(NSURL *url){
     TestBoolNativeSync *boolean=[TestBoolNativeSync new];nativeSyncService=boolean;syncClock+=45;FireSync(scheduler);CHECK(boolean.calls==1); // B as well as platform BOOL/c encodings.
     MMServiceWrapper *wrapper=[MMServiceWrapper alloc];wrapper.target=service;nativeSyncService=wrapper;syncClock+=45;FireSync(scheduler);CHECK(wrapper.forwards==0 && service.syncCalls==before+2);
     objc_setAssociatedObject(wrapper,CSNativeServiceClassKey,TestNativeSync.class,OBJC_ASSOCIATION_RETAIN_NONATOMIC);syncClock+=45;FireSync(scheduler);CHECK(wrapper.forwards==2 && service.syncCalls==before+3);
-    nativeSyncService=service;[coordinator cancelAll];[scheduler stop];[NSNotificationCenter.defaultCenter removeObserver:manager];UIApplication.sharedApplication.applicationState=UIApplicationStateActive;backgroundAudioActive=NO;simulateSends=NO;nativeSyncService=nil;SetPrivacy(YES,YES,YES);CHECK([store.configuration isEqual:original]);
+    nativeSyncService=service;[coordinator cancelAll];[scheduler stop];[NSNotificationCenter.defaultCenter removeObserver:manager];UIApplication.sharedApplication.applicationState=UIApplicationStateActive;canAttemptBackgroundWork=NO;simulateSends=NO;nativeSyncService=nil;SetPrivacy(YES,YES,YES);CHECK([store.configuration isEqual:original]);
 }
 static CSAIReplyManager *BackgroundSyncContextManager(NSURL *url,TestStore **result){
     TestStore *store=[[TestStore alloc]initWithURL:url account:account];CHECK([store load]);
@@ -594,9 +595,40 @@ static CSAIReplyManager *BackgroundSyncContextManager(NSURL *url,TestStore **res
     CSAIReplyManager *manager=[CSAIReplyManager new];[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];
     [manager setValue:[TestClient new] forKey:@"client"];*result=store;return manager;
 }
+static void BackgroundSyncTaskWithoutAudio(NSURL *url){
+    // A finite UIKit task can supply execution time before audio is needed.
+    // The two manager signals remain independent throughout this fixture.
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
+    backgroundAudioActive=NO;canAttemptBackgroundWork=YES;SetPrivacy(YES,YES,YES);
+    TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager(url,&store);
+    NSDictionary *original=store.configuration;
+    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];
+    __block NSTimeInterval clock=60000;scheduler.now=^{return clock;};
+    TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;
+    CHECK(!CSBackgroundRunManager.sharedManager.backgroundAudioActive && CSBackgroundRunManager.sharedManager.canAttemptBackgroundWork);
+    [manager refresh];CHECK(scheduler.active && service.syncCalls==1 && [manager captureBackgroundSyncContextForEpoch:epoch]);
+    clock=60044;FireSync(scheduler);CHECK(service.syncCalls==1);
+    clock=60045;FireSync(scheduler);CHECK(service.syncCalls==2);
+    // Losing the capability stops scheduling even if a stale audio signal is true.
+    NSTimer *old=SyncTimer(scheduler);backgroundAudioActive=YES;canAttemptBackgroundWork=NO;
+    [manager refresh];CHECK(!scheduler.active && !old.valid && ![manager captureBackgroundSyncContextForEpoch:epoch]);
+    [old fire];CHECK(service.syncCalls==2);
+    // Resuming the finite task preserves the last attempt's 45-second cooldown.
+    backgroundAudioActive=NO;canAttemptBackgroundWork=YES;clock=60050;
+    [manager refresh];CHECK(scheduler.active && service.syncCalls==2);
+    clock=60089;FireSync(scheduler);CHECK(service.syncCalls==2);
+    clock=60090;FireSync(scheduler);CHECK(service.syncCalls==3);
+    // Native contact access can revoke the capability after the first check.
+    duringContactLookup=^{canAttemptBackgroundWork=NO;};clock=60135;FireSync(scheduler);
+    CHECK(!scheduler.active && service.syncCalls==3);
+    CHECK([store.configuration isEqual:original]);
+    [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];duringContactLookup=nil;
+    nativeSyncService=nil;backgroundAudioActive=NO;canAttemptBackgroundWork=NO;
+    UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+}
 static BOOL HasVerifiedSync(CSAIBackgroundSync *scheduler){return [[scheduler valueForKey:@"verifiedSync"] boolValue];}
 static void BackgroundSyncContexts(NSURL *root){
-    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;SetPrivacy(YES,YES,YES);
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;canAttemptBackgroundWork=YES;SetPrivacy(YES,YES,YES);
     TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:@"sync-context-valid.plist"],&store);
     CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=10000;scheduler.now=^{return clock;};
     TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;
@@ -643,7 +675,7 @@ static void BackgroundSyncContexts(NSURL *root){
         if(variant==4){NSMutableDictionary *changed=[original mutableCopy];changed[@"enabled"]=@NO;CHECK([store saveConfiguration:changed error:NULL]);}
         if(variant==5)authorized=NO;
         if(variant==6)UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
-        if(variant==7)backgroundAudioActive=NO;
+        if(variant==7)canAttemptBackgroundWork=NO;
         if(variant==8)suspended=YES;
         if(variant==9)backupReady=NO;
         if(variant==10)duringContactLookup=^{CHECK([store saveConfiguration:original error:NULL]);};
@@ -676,12 +708,12 @@ static void BackgroundSyncContexts(NSURL *root){
         clock=20030;[manager nativeFullSyncCompletedWithContext:context];CHECK(!HasVerifiedSync(scheduler));
         if(variant==15 || variant==16 || variant==17){clock=20044;FireSync(scheduler);CHECK(service.syncCalls==1);clock=20045;FireSync(scheduler);CHECK(service.syncCalls==2);}
         [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];duringContactLookup=nil;duringAccountLookup=nil;
-        account=@"alice";epoch=7;authorized=YES;suspended=NO;backupReady=YES;backgroundAudioActive=YES;UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
+        account=@"alice";epoch=7;authorized=YES;suspended=NO;backupReady=YES;canAttemptBackgroundWork=YES;UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
     }
-    nativeSyncService=nil;backgroundAudioActive=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+    nativeSyncService=nil;canAttemptBackgroundWork=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
 }
 static void BackgroundSyncRequestReentry(NSURL *root){
-    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;canAttemptBackgroundWork=YES;
     for(NSUInteger variant=0;variant<5;variant++){
         TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:[NSString stringWithFormat:@"sync-request-reentry-%lu.plist",(unsigned long)variant]],&store);
         backgroundSyncObservationManager=manager;
@@ -701,7 +733,7 @@ static void BackgroundSyncRequestReentry(NSURL *root){
         clock=30044;FireSync(scheduler);CHECK(!service.syncCalls);clock=30045;FireSync(scheduler);CHECK(service.syncCalls==1);
         [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];backgroundSyncObservationManager=nil;
     }
-    nativeSyncService=nil;backgroundAudioActive=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+    nativeSyncService=nil;canAttemptBackgroundWork=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
 }
 static BOOL SyncDelayIs(CSAIBackgroundSync *scheduler,NSTimeInterval delay){NSTimer *timer=SyncTimer(scheduler);return timer.valid && fabs([timer.fireDate timeIntervalSinceNow]-delay)<1;}
 static void SaveBackgroundFallback(CSAIReplyManager *manager,BOOL enabled,BOOL expectedSuccess){
@@ -711,7 +743,7 @@ static void SaveBackgroundFallback(CSAIReplyManager *manager,BOOL enabled,BOOL e
     CHECK(!done && !scheduler.active);WaitFor(^BOOL{return done;});
 }
 static void BackgroundFallbackConfiguration(NSURL *root){
-    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;SetPrivacy(YES,YES,YES);
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;canAttemptBackgroundWork=YES;SetPrivacy(YES,YES,YES);
     TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:@"fallback-toggle.plist"],&store);
     NSMutableDictionary *legacy=[store.configuration mutableCopy];[legacy removeObjectForKey:@"backgroundFallback"];CHECK([store saveConfiguration:legacy error:NULL]);
     CHECK(!store.configuration[@"backgroundFallback"]);NSString *connection=store.configuration[@"verifiedConnection"];
@@ -762,10 +794,10 @@ static void BackgroundFallbackConfiguration(NSURL *root){
     CHECK(!scheduler.active && !scheduler.fallbackEnabled && service.syncCalls==4);[manager nativeFullSyncCompletedWithContext:oldContext];CHECK(!HasVerifiedSync(scheduler));
     account=@"alice";epoch=7;[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];clock=40140;[manager refresh];
     CHECK(scheduler.active && scheduler.fallbackEnabled && service.syncCalls==4 && SyncDelayIs(scheduler,40));
-    [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];nativeSyncService=nil;backgroundAudioActive=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+    [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];nativeSyncService=nil;canAttemptBackgroundWork=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
 }
 static void BackgroundFallbackReentry(NSURL *root){
-    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;backgroundAudioActive=YES;
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;canAttemptBackgroundWork=YES;
     for(NSUInteger boundary=0;boundary<4;boundary++){
         TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:[NSString stringWithFormat:@"fallback-reentry-%lu.plist",(unsigned long)boundary]],&store);
         CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=50000;scheduler.now=^{return clock;};
@@ -789,7 +821,7 @@ static void BackgroundFallbackReentry(NSURL *root){
         }
         [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];duringContactLookup=nil;duringBackgroundSyncObservation=nil;
     }
-    nativeSyncService=nil;backgroundAudioActive=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+    nativeSyncService=nil;canAttemptBackgroundWork=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
 }
 static void CapabilityAndImageIntegration(NSURL *url){
     CSAIReplyStore *store=[[CSAIReplyStore alloc]initWithURL:url account:account];CHECK([store load]);
@@ -986,6 +1018,7 @@ int main(int argc,const char **argv){@autoreleasepool{
     DisabledSessionFastPath([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"disabled-session.plist"]);
     IngressAdmissionFastPath([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"ingress-admission.plist"]);
     BackgroundSyncReplies([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"background-replies.plist"]);
+    BackgroundSyncTaskWithoutAudio([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"background-task-without-audio.plist"]);
     BackgroundSyncContexts([url URLByDeletingLastPathComponent]);
     BackgroundSyncRequestReentry([url URLByDeletingLastPathComponent]);
     BackgroundFallbackConfiguration([url URLByDeletingLastPathComponent]);

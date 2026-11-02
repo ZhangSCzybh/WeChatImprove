@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.2-3`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.2-6`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -31,8 +31,8 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | 本地提供 `2.2-3` 安装包，在小程序退场前校验列表已有内容；待真机验收 |
-| Rootful | 本地提供 `2.2-3` 安装包；待真机验收 |
+| Rootless | 本地提供 `2.2-6` 安装包，原生后台优先，音频延后介入、放宽退出，含最近后台记录；待真机验收 |
+| Rootful | 本地提供 `2.2-6` 安装包；待真机验收 |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
@@ -40,7 +40,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：当前 `2.2-3` 交付 [Rootless 安装包](packages/2.2-3-miniapp-return-first-frame/com.wechat.improve_2.2-3_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.2-3-miniapp-return-first-frame/com.wechat.improve_2.2-3_iphoneos-arm.deb)、[调试符号](packages/2.2-3-miniapp-return-first-frame/com.wechat.improve_2.2-3_symbols.zip) 和 [SHA-256](packages/2.2-3-miniapp-return-first-frame/SHA256SUMS)。本版在小程序退场动画或手势开始前检查聊天列表已有 cell；内容未确认安全时先中性化，过滤后的发布完成再恢复。保留 2.2-2 的隐私准入缓存。改动、红绿测试与构建结果见 [2.2-3 审计](docs/audits/release-2.2-3-miniapp-return-first-frame/README.md)。
+1. 获取与设备注入环境匹配的 `.deb`：当前 `2.2-6` 交付 [Rootless 安装包](packages/2.2-6-background-run-native-priority/com.wechat.improve_2.2-6_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.2-6-background-run-native-priority/com.wechat.improve_2.2-6_iphoneos-arm.deb)、[调试符号](packages/2.2-6-background-run-native-priority/com.wechat.improve_2.2-6_symbols.zip) 和 [SHA-256](packages/2.2-6-background-run-native-priority/SHA256SUMS)。本版在 2.2-5 基础上将音频介入延后至有限预算不足 8 秒，并将退出条件放宽为最短播放 5 秒、有限预算至少 12 秒、两次独立检查确认。改动与验证见 [原生后台优先调整](docs/audits/background-run-native-priority-2026-11-02/README.md)，保留 [时间记录](docs/audits/background-run-records-2026-11-02/README.md)，重构机制见 [后台运行审计](docs/audits/background-run-hybrid-2026-11-02/README.md)。保留 [2.2-3 小程序返回隐私保护](docs/audits/release-2.2-3-miniapp-return-first-frame/README.md)。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
@@ -124,7 +124,7 @@
 
 **后台模糊**默认关闭。开启后，微信失去活跃状态时显示模糊，返回后恢复清晰；控制中心、通知中心或系统认证也可能触发该效果。此功能与“后台运行”分别配置。
 
-**后台运行**在开启且微信进入后台时，通过无声音频尝试延长执行；返回前台或关闭开关时停止。2026-10-23 重构改用应用／场景生命周期与音频事件驱动，移除周期检查、后台时间续期循环和“触发间隔”设置；原开关及旧备份中的间隔值保留，间隔不再参与运行。音频数据由插件生成，不依赖微信的 `blank.caf`。微信接管音频会话或系统中断时让出，明确释放或允许恢复后再尝试；启动失败不会持续重试。设置页显示当前状态、上次后台结果及当前微信包是否声明后台音频能力。持续播放仍有基础耗电，iOS 可能挂起或结束进程，不能保证永久运行或后台自动领取必达。未越狱签名 IPA 仍须由原注入／签名流程集成，手机上的运行时间和功耗需实测。详见 [重构与验证记录](docs/audits/background-run-2026-10-23/README.md)。
+**后台运行**开启后，进入后台先申请有限系统任务，有限剩余预算不足 8 秒时再尝试无声音频接力，初次任务申请失败也可尝试音频。使用单次检查调度，临近预算边界时约每秒检查；音频至少播放 5 秒，任务仍有效且有限预算恢复至至少 12 秒、两次相隔至少 1 秒的检查确认后退出，继续利用原生任务。8 秒介入与 12 秒退出之间保留回差，减少反复启停。保留内存生成的静音 WAV 和微信通话／录音优先规则；返回前台或关闭时释放任务、检查和音频。设置页展示当前阶段及宿主后台音频声明，并在“最近一次后台”保留最后状态、进入／开始观察、最后检查及当时状态、返回前台、停止时间及原因、检查至返回间隔；点击任意记录可查看完整时间。记录仅保留当前微信进程中的最近一次，重新打开设置不会刷新最后检查；间隔按单调时钟计算，不代表此前一直运行。原开关和备份兼容。AI 后台兜底可在有效任务或音频阶段运行，仍遵守原有约 45 秒节流。音频提供继续执行的机会，不能保证给系统任务补充时间，反复申请任务也不等于系统无限续期。极大剩余时间不作为独立预算恢复证据，部分系统状态下接力音频仍会持续；本版不依靠停音频探测来假定预算已恢复。手机上的锁屏稳定性、耗电与温升需要在原注入／签名环境实测。详见 [策略调整验证](docs/audits/background-run-native-priority-2026-11-02/README.md)、[时间记录验证](docs/audits/background-run-records-2026-11-02/README.md) 与 [重构验证](docs/audits/background-run-hybrid-2026-11-02/README.md)。
 
 **版本控制**修改微信返回的版本信息，不执行安装或降级；**更新控制**针对微信内部热更新，App Store 更新由系统管理。
 
@@ -206,7 +206,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.2-3_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.2-3-miniapp-return-first-frame/`。
+当前版本默认输出：`packages/com.wechat.improve_2.2-6_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.2-6-background-run-native-priority/`。
 
 ### Rootful
 
@@ -215,7 +215,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.2-3_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.2-3-miniapp-return-first-frame/`。
+当前版本默认输出：`packages/com.wechat.improve_2.2-6_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.2-6-background-run-native-priority/`。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -239,7 +239,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.2-3-miniapp-return-first-frame/com.wechat.improve_2.2-3_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.2-6-background-run-native-priority/com.wechat.improve_2.2-6_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。

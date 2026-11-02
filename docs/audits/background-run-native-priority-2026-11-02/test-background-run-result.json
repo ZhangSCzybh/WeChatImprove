@@ -1,0 +1,55 @@
+{
+  "command": "bash Tests/verify-background-run.sh",
+  "arguments": [
+    "bash",
+    "Tests/verify-background-run.sh"
+  ],
+  "exit_code": 0,
+  "started_at_shanghai": "2026-11-02T15:05:56.168274+08:00",
+  "finished_at_shanghai": "2026-11-02T15:06:01.630317+08:00",
+  "duration_seconds": 5.462,
+  "checks": 400,
+  "count_breakdown": [
+    {
+      "count": 53,
+      "output": "Background records: 53 checks passed; actual checks, lifecycle timestamps, monotonic gaps and stale callbacks verified"
+    },
+    {
+      "count": 161,
+      "output": "Background hybrid: 161 checks passed; deterministic budgets, lifecycle, audio handoff and expiration verified"
+    },
+    {
+      "count": 186,
+      "output": "Background run: 186 checks passed; production manager, audio ownership and native hook bodies verified"
+    }
+  ],
+  "log": "docs/audits/background-run-native-priority-2026-11-02/test-background-run.log",
+  "parameters": {
+    "audio_start_remaining_strictly_below_seconds": 8,
+    "cleanup_remaining_strictly_below_seconds": 5,
+    "audio_minimum_duration_seconds": 5,
+    "finite_recovery_budget_at_least_seconds": 12,
+    "recovery_sample_count": 2,
+    "recovery_minimum_sample_spacing_seconds": 1
+  },
+  "red_evidence": {
+    "command": "bash Tests/verify-background-run.sh",
+    "exit_code": 1,
+    "log": "docs/audits/background-run-native-priority-2026-11-02/test-background-run-red.log",
+    "baseline_audio_start_threshold_seconds": 10,
+    "failure": "At 8 seconds remaining, the old strategy had already started audio; the new strict-below-8 assertion failed."
+  },
+  "coverage": [
+    "30 seconds native budget: audio stays off through exactly 8 seconds, then starts below 8",
+    "minimum 5 seconds audio and exactly 12 seconds recovery budget",
+    "two recovery samples separated by at least 1 second; same-instant notifications do not add samples",
+    "8 to below 12 second hysteresis band preserves the current strategy in both directions",
+    "7.999 seconds re-enters audio after native recovery",
+    "DBL_MAX, infinity, NaN, negative and huge finite budgets do not prove recovery",
+    "existing task expiration, stale callbacks, audio ownership, recordings and lifecycle regressions",
+    "audio minimum-tenure checkpoint remains scheduled at 5 seconds even after an unbounded reading",
+    "unnotified finite recovery before 5 seconds is sampled at 5 seconds and exits audio at 6 seconds",
+    "persistent unbounded budget does not produce continuous one-second polling or parallel timers after the minimum-tenure checkpoint"
+  ],
+  "limitations": "Native tests exercise production manager/audio/hook code with controlled clock and budget fakes. They do not establish physical-device lifetime or energy savings. No stop-audio probe was introduced."
+}

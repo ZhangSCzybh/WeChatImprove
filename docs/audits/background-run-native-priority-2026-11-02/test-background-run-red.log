@@ -1,0 +1,3 @@
+Background run: one-shot runtime boundary, finite task cleanup, public lifecycle and in-memory audio contracts
+Background records: 53 checks passed; actual checks, lifecycle timestamps, monotonic gaps and stale callbacks verified
+HYBRID FAIL 56: !audio.playing && manager.canAttemptBackgroundWork && runtime.backgroundTimeRemaining==8

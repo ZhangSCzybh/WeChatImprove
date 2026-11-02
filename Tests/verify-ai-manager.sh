@@ -24,8 +24,8 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecat
  Controllers/CSCloseFriendAutomationProjection.m Tests/AIReplyManagerTests.m -o "$test_dir/tests"
 test_output=$("$test_dir/tests" "$test_dir/state.plist")
 printf '%s\n' "$test_output"
-if [[ "$test_output" != 'AI reply manager: 850 checks passed' ]]; then
- printf 'Unexpected AI reply manager check count (expected 850).\n' >&2
+if [[ "$test_output" != 'AI reply manager: 863 checks passed' ]]; then
+ printf 'Unexpected AI reply manager check count (expected 863).\n' >&2
  exit 1
 fi
 if [[ "${1:-}" == "--ios" ]]; then

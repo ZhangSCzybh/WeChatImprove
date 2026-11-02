@@ -330,7 +330,7 @@ BOOL CSAIReplyMessageIngressAllowsSession(id session,NSUInteger epoch) {
 }
 - (BOOL)allowsBackgroundSync {
     if(self.savingConfiguration || !NSThread.isMainThread || self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground ||
-       !CSBackgroundRunManager.sharedManager.backgroundAudioActive)return NO;
+       !CSBackgroundRunManager.sharedManager.canAttemptBackgroundWork)return NO;
     NSDictionary *config=self.store.configuration;
     if(config[@"backgroundFallback"] && ![config[@"backgroundFallback"] boolValue])return NO;
     if(![config[@"enabled"] boolValue] || ![config[@"endpoint"] length] || ![config[@"model"] length] || ![config[@"credentialRevision"] length] ||
@@ -349,7 +349,7 @@ BOOL CSAIReplyMessageIngressAllowsSession(id session,NSUInteger epoch) {
     }
     return eligible && [config isEqual:self.store.configuration] && [self isCurrentAccount:self.store.account epoch:self.epoch] &&
         !self.savingConfiguration && CSAuthorizationManager.sharedManager.isAuthorized && !self.enteringForeground &&
-        UIApplication.sharedApplication.applicationState==UIApplicationStateBackground && CSBackgroundRunManager.sharedManager.backgroundAudioActive;
+        UIApplication.sharedApplication.applicationState==UIApplicationStateBackground && CSBackgroundRunManager.sharedManager.canAttemptBackgroundWork;
 }
 - (void)requestBackgroundSync {
     if(![self allowsBackgroundSync])return;

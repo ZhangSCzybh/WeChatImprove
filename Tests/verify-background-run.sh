@@ -20,17 +20,30 @@ originals=[
 assert source.count('%orig')==len(originals)
 for original in originals: source=source.replace('%orig',original,1)
 (out/'BackgroundAudioHooksUnderTest.h').write_text(source)
-production=(root/'Controllers/CSBackgroundRunManager.m').read_text()+(root/'Controllers/CSBackgroundRunAudio.m').read_text()+(root/'Hooks/BackgroundRun.xm').read_text()
-for forbidden in ('NSTimer','dispatch_source_create','dispatch_after','beginBackgroundTask','backgroundTimeRemaining','%hook AppDelegate','%hook SpringBoard','URLForResource:@"blank"'):
+manager=(root/'Controllers/CSBackgroundRunManager.m').read_text()
+runtime=(root/'Controllers/CSBackgroundRunRuntime.m').read_text()
+production=manager+runtime+(root/'Controllers/CSBackgroundRunAudio.m').read_text()+(root/'Hooks/BackgroundRun.xm').read_text()
+for forbidden in ('dispatch_source_create','dispatch_after','%hook AppDelegate','%hook SpringBoard','URLForResource:@"blank"'):
  assert forbidden not in production, forbidden
-print('Background run: no polling, renewal loop, private lifecycle hooks or host audio-file dependency')
+assert 'NSTimer' not in manager and 'beginBackgroundTask' not in manager
+assert 'repeats:NO' in runtime and 'endBackgroundTask:' in runtime
+assert 'canAttemptBackgroundWork' in manager
+print('Background run: one-shot runtime boundary, finite task cleanup, public lifecycle and in-memory audio contracts')
 PY
+compile_background_test() {
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \
     -Wno-nullability-completeness -framework Foundation \
     -DAVAudioSession=CSTestAudioSession -DAVAudioPlayer=CSTestAudioPlayer \
-    -I"$project_dir/Tests/BackgroundRunNative" -I"$project_dir/Controllers" -I"$test_dir" \
+    -I"$project_dir/Tests/BackgroundRunNative" -I"$project_dir/Controllers" -I"$project_dir/Tests" -I"$test_dir" \
     "$project_dir/Tests/BackgroundRunNative/BackgroundRunNative.m" \
     "$project_dir/Controllers/CSBackgroundRunAudio.m" "$project_dir/Controllers/CSBackgroundRunManager.m" \
-    "$project_dir/Tests/BackgroundRunTests.m" -o "$test_dir/background-run"
+    "$project_dir/Controllers/CSBackgroundRunRuntime.m" "$project_dir/Tests/BackgroundRunFakeRuntime.m" \
+    "$project_dir/Tests/$1.m" -o "$test_dir/$2"
+}
+compile_background_test BackgroundRunRecordTests background-records
+"$test_dir/background-records"
+compile_background_test BackgroundRunHybridTests background-hybrid
+"$test_dir/background-hybrid"
+compile_background_test BackgroundRunTests background-run
 "$test_dir/background-run" "$test_dir/silence.wav"
 /usr/bin/afinfo "$test_dir/silence.wav"

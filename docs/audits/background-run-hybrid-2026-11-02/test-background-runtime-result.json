@@ -1,0 +1,15 @@
+{
+  "command": "bash Tests/verify-background-run-runtime.sh --ios",
+  "exit_code": 0,
+  "counts": {
+    "native_runtime_checks": 46
+  },
+  "ios_source_object_compilation": {
+    "arm64": "passed",
+    "arm64e": "passed",
+    "minimum_ios_version": "15.0"
+  },
+  "coverage": "Production runtime task expiration, native token ownership, release idempotence and one-shot timer cancellation/delivery.",
+  "limitations": "iOS source objects were compiled, not run on a physical device. The executable checks use a macOS native harness.",
+  "log": "test-background-runtime.log"
+}

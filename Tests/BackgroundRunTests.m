@@ -2,12 +2,18 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import "CSBackgroundRunManager.h"
+#import "BackgroundRunFakeRuntime.h"
 
 static NSUInteger checks;
 #define CHECK(c) do { checks++; if (!(c)) { fprintf(stderr,"FAIL %d: %s\n",__LINE__,#c); exit(1); } } while(0)
 static NSUserDefaults *defaults;
 static CSBackgroundRunManager *manager;
 static CSBackgroundRunAudio *audio;
+static CSBackgroundRunManager *AudioOnlyManager(BOOL supported) {
+    CSTestBackgroundRuntime *runtime=[CSTestBackgroundRuntime new];
+    runtime.failBegin=YES; runtime.backgroundTimeRemaining=0;
+    return [[CSBackgroundRunManager alloc] initWithDefaults:defaults audio:audio supportsBackgroundAudio:supported runtime:runtime];
+}
 static void Drain(void) { for (NSUInteger i=0;i<4;i++) [NSRunLoop.currentRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.005]]; }
 static void Post(NSString *name,id object,NSDictionary *info) { [NSNotificationCenter.defaultCenter postNotificationName:name object:object userInfo:info]; }
 static void Enable(BOOL enabled) { [defaults setBool:enabled forKey:CSBackgroundRunEnabledKey]; [manager reloadSettings]; }
@@ -19,7 +25,9 @@ static void Foreground(void) {
 }
 static void Background(void) { UIApplication.sharedApplication.applicationState=UIApplicationStateBackground; Post(UIApplicationDidEnterBackgroundNotification,nil,nil); }
 static void Create(BOOL supported, BOOL enabled) {
-    Enable(NO); manager=nil; [audio stop]; audio=nil;
+    // Async callbacks can keep the previous fixture alive until this pool drains;
+    // it must not observe the next fixture's settings in that interval.
+    Enable(NO); [NSNotificationCenter.defaultCenter removeObserver:manager]; manager=nil; [audio stop]; audio=nil;
     AVAudioSession *session=AVAudioSession.sharedInstance;
     session.failCategory=session.failActivation=session.failDeactivation=session.throwCategory=NO;
     session.activationAction=nil; CSTestFailPlayerCreation=CSTestFailPlayerPlay=NO;
@@ -29,7 +37,7 @@ static void Create(BOOL supported, BOOL enabled) {
     UIApplication.sharedApplication.connectedScenes=[NSSet set];
     [defaults setBool:enabled forKey:CSBackgroundRunEnabledKey];
     audio=[CSBackgroundRunAudio new];
-    manager=[[CSBackgroundRunManager alloc] initWithDefaults:defaults audio:audio supportsBackgroundAudio:supported];
+    manager=AudioOnlyManager(supported);
     [manager start];
 }
 static void Interrupt(BOOL began,BOOL resume) {
@@ -47,7 +55,7 @@ int main(int argc,const char **argv) { @autoreleasepool {
     // later be mistaken for a pre-existing host audio session.
     [defaults setBool:YES forKey:CSBackgroundRunEnabledKey];
     audio=[CSBackgroundRunAudio new];
-    manager=[[CSBackgroundRunManager alloc] initWithDefaults:defaults audio:audio supportsBackgroundAudio:YES];
+    manager=AudioOnlyManager(YES);
     [manager start]; [manager start];
     CHECK(!audio.playing && !CSTestPlayerCreates && !session.configurations);
     CHECK(!manager.backgroundAudioActive);
@@ -79,7 +87,7 @@ int main(int argc,const char **argv) { @autoreleasepool {
     // Initializing after background entry is supported without another event.
     Create(YES,YES); manager=nil;
     UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
-    manager=[[CSBackgroundRunManager alloc] initWithDefaults:defaults audio:audio supportsBackgroundAudio:YES];
+    manager=AudioOnlyManager(YES);
     [manager start]; CHECK(audio.playing);
 
     // An inactive but foreground scene still wins over another background scene.
@@ -100,7 +108,9 @@ int main(int argc,const char **argv) { @autoreleasepool {
         Create(YES,YES);
         session.failCategory=failure==0; session.failActivation=failure==1;
         CSTestFailPlayerCreation=failure==2; CSTestFailPlayerPlay=failure==3;
-        Background(); CHECK(!audio.playing && !session.active && CSTestPlayersAlive==0);
+        Background();
+        if (audio.playing || session.active || CSTestPlayersAlive) fprintf(stderr,"audio failure case %lu: playing=%d active=%d alive=%lu status=%s\n",(unsigned long)failure,audio.playing,session.active,(unsigned long)CSTestPlayersAlive,manager.statusText.UTF8String);
+        CHECK(!audio.playing && !session.active && CSTestPlayersAlive==0);
         CHECK([manager.statusText containsString:@"启动失败"] && manager.enabled);
         initial=CSTestPlayerCreates;
         for (NSUInteger i=0;i<50;i++) { Post(NSUserDefaultsDidChangeNotification,nil,nil); Background(); Post(AVAudioSessionRouteChangeNotification,nil,nil); }
