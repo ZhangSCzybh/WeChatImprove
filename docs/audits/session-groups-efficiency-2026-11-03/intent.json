@@ -1,0 +1,18 @@
+{
+  "user_authorized": "按照你说的3点再优化一版。",
+  "version": "2.2-10",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "scope": [
+    "No-op chrome/header layout",
+    "Compatibility publication work and message coalescing",
+    "Interaction correctness and measurement coverage"
+  ],
+  "device_mutations_planned": false,
+  "installed_version_user_confirmed": "2.2-9+observe",
+  "target_bundle": "com.tencent.xin",
+  "preserve_existing_deletions": 6892,
+  "notes": [
+    "Do not attribute 60/s commits to grouping without runtime ownership evidence.",
+    "Only new audit and new version package directories may be written; previous evidence frozen."
+  ]
+}

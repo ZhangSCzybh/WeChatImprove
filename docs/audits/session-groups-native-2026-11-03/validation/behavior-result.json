@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-11-03T10:26:04.162787+08:00",
+  "project_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "source_unchanged_during_checks": true,
+  "production_source_sha256": {
+    "Controllers/CSGroupNativeModel.h": "0bd50a8f13b035aa973fbfd46d74db6e38ec749755f7228f2e31422e2c1d8d3a",
+    "Controllers/CSGroupNativeModel.m": "3175f288c495de06b91f2af42e93b6338a69cee5a95cf6e968a3097639ceb006",
+    "Controllers/CSGroupNativeSessionCoordinator.h": "1d4d7f1f181a9a224df2ac7e65adcc0127c80e04e1cdeecb35969611649aa590",
+    "Controllers/CSGroupNativeSessionCoordinator.m": "5429f1d5470460b61c09c655b04d8ccc65c0967dec70ffcb08819e5236cb416a",
+    "Controllers/CSGroupListAdapter.h": "9a1be763bd5122e8b059a0572cec20d75ec580f9b9dde24587d7e3548133b591",
+    "Controllers/CSGroupListAdapter.m": "539452aff9c3e0efb25fa4fe38b310ceb901c978a0cb3783f6bbde7f6b2cb107",
+    "Controllers/CSGroupNativeBridge.h": "dcd0dc848a458f653bb7c734dd2776c69992c61fae765115701ad823ede78579",
+    "Controllers/CSGroupNativeBridge.m": "0f0437a221c59099e8b28ad089eb4d6f6c61ef5e4971349b6fcc802f841b7ed2",
+    "Controllers/CSGroupProjection.h": "f92f2377662d0d684d683ee5b3b3352ef100e825b6e8398268a15990febb2f19",
+    "Controllers/CSGroupProjection.m": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a",
+    "Controllers/CSGroupPreferences.m": "1ec46fe99d45a47d56319ec5149d54ddbccb3831dbdd52de6f7f4e590bd58bd4",
+    "Controllers/WESessionTabItem.m": "dfb12f2a1eb44a0d35a175419bfe914cf7d22ff042e75cbc679ce6959928a6e0",
+    "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+    "Controllers/CSCloseFriendSignatures.m": "69e44c74c85e4e0a22dc347b8d1d5007b1e5650cd939ba016ac83098af8c849b",
+    "Controllers/CSCloseFriendUnreadPanelAdapter.m": "e61a1260a4781f1c640a4b2e52a4c41b8f39e5062c9bd952fcea78826d51e16b",
+    "Controllers/CSCloseFriendContactAdapter.m": "95f2790357e36fe88e7988654bc16c77260bf1743da6b45e88e8a455abb55245",
+    "Controllers/CSCloseFriendBridge.m": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf",
+    "Hooks/NativeSessionGroupHooks.xm": "e251e1e119112a5d0695e0402636eda7a36eaecc6505153dd7382c89d30ca7f1",
+    "Hooks/SessionGroupHooks.xm": "999991380018fed90b62973796e1eca7b89774284027820ad1ef533df7079070",
+    "Hooks/CloseFriendUnreadPanelHooks.xm": "82792efdd7d4f8a374a0e518dc84815719ca03493e9160eb1f2481732f899a29"
+  },
+  "runs": [
+    {
+      "runner": "run-native-behavior.sh",
+      "exit_code": 0,
+      "stdout": "Native model/coordinator/adapter/scheduling: 179 behavior checks passed\n",
+      "stderr": ""
+    },
+    {
+      "runner": "run-unread-panel.sh",
+      "exit_code": 0,
+      "stdout": "Close-friend unread panel: 77 checks, 0 failures\nClose-friend unread panel ABI: 7 checks, 0 failures\n",
+      "stderr": ""
+    }
+  ],
+  "isolation": "Temporary macOS Foundation executables, in-memory NSUserDefaults and host doubles; no live WeChat, account data, database, ports or service changes.",
+  "limitations": [
+    "Native coordinator/model/bridge/projection/preferences are compiled as production translation units.",
+    "Adapter and native forward-enumerator replacement bodies are extracted from current production source; UIKit/native data-source and dispatch are fixture boundaries.",
+    "Unread panel runs current production bridge/contact helpers, adapter and hook registrations using a fixture from baseline commit 863bfdb350fddf678c349574d99badb241d98958 exported only into a temporary directory. The complete-source wrapper is a controlled test double; its real implementation is checked in the native suite.",
+    "These executable behavior tests do not replace an iPhone acceptance run."
+  ]
+}

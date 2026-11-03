@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-11-03T13:57:55.510694+08:00",
+  "source_unchanged": true,
+  "production_source_sha256": {
+    "Controllers/CSGroupListAdapter.m": "b9213d515630ce1ad79ae94b229e7827f2974193b3a0e50e1d5ab2f0258a4985",
+    "Controllers/CSGroupNativeModel.h": "320b87d9aadadc4d205c4f076d87987f5e52c761c126d20ac5607b64742f9f35",
+    "Controllers/CSGroupNativeModel.m": "b71c688838184accfc7f8aa7c050818071280a30f5b9a6ad2c24e3259bc752f9",
+    "Controllers/CSGroupProjection.h": "f7dd860614a5a2747d000951cadbd3f85475064726af1e49e178ea73485a6b16",
+    "Controllers/CSGroupProjection.m": "b4784583afd936fe91aff2cb195afbeb26fb52c3534e1784aeaeaf3d8db58741",
+    "Controllers/CSGroupNativeSessionCoordinator.h": "bc4e56e2fbaabdf778d54d66fff3021f45fafbe26a7a97cb020bd9ce4ee6cea6",
+    "Controllers/CSGroupNativeSessionCoordinator.m": "49c19b6f25de1dd12b92e3fd1cffdf362ca6bdc33cabcd6c5c81b9e9741cc576",
+    "Hooks/SessionGroupHooks.xm": "76f42d5d4001da1d80b36de80215e2ea9fed978faa8d92a5aa791b608ec5e3ab"
+  },
+  "baseline_source_sha256": {
+    "Controllers/CSGroupListAdapter.m": "9bb66f066c90df4e4289f5f2c0dba6274063a1b4858263a47b1638554eb999ed",
+    "Controllers/CSGroupNativeModel.h": "c3189e10a79bee653c28061a17e6b90eb423f2514e9482d55bc977e982ac7da8",
+    "Controllers/CSGroupNativeModel.m": "ac4e3a6177e45f23911e7f09cfd64def1556a21d7b8a69a012b5bbaa60d88979",
+    "Controllers/CSGroupProjection.h": "6e4d0bfeb82747004e3d028515f9948ef8a1a923323e4583898abff177b70639",
+    "Controllers/CSGroupProjection.m": "a11a27854ce33186cf07e4b657b2989d18bf3aaf947882a0cda835d0a7641e3a",
+    "Controllers/CSGroupNativeSessionCoordinator.h": "bc4e56e2fbaabdf778d54d66fff3021f45fafbe26a7a97cb020bd9ce4ee6cea6",
+    "Controllers/CSGroupNativeSessionCoordinator.m": "57cbf10c21eea73f742b9e52c04477e12b269f1178dabaaeb9c4b0eebabf1626",
+    "Hooks/SessionGroupHooks.xm": "76f42d5d4001da1d80b36de80215e2ea9fed978faa8d92a5aa791b608ec5e3ab"
+  },
+  "runs": [
+    {
+      "name": "baseline-idle-interaction-loop",
+      "source_root": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-interaction-2026-11-03/baseline-2.2-8",
+      "environment_overrides": {
+        "WECHAT_INTERACTION_ONLY": "1",
+        "WECHAT_INTERACTION_EXPECT_BASELINE": "1"
+      },
+      "exit_code": 0,
+      "accepted": true,
+      "expected_failure_assertion": null,
+      "output": "Baseline 2.2-8: dirty+decelerating+tracking=false executed 64 immediate jobs with another pending; stopped at fixture budget.\nNative interaction scheduling: 4 behavior checks passed\n",
+      "input_sha256": {
+        "Controllers/CSGroupListAdapter.m": "9bb66f066c90df4e4289f5f2c0dba6274063a1b4858263a47b1638554eb999ed",
+        "Controllers/CSGroupNativeModel.h": "c3189e10a79bee653c28061a17e6b90eb423f2514e9482d55bc977e982ac7da8",
+        "Controllers/CSGroupNativeModel.m": "ac4e3a6177e45f23911e7f09cfd64def1556a21d7b8a69a012b5bbaa60d88979",
+        "Controllers/CSGroupProjection.h": "6e4d0bfeb82747004e3d028515f9948ef8a1a923323e4583898abff177b70639",
+        "Controllers/CSGroupProjection.m": "a11a27854ce33186cf07e4b657b2989d18bf3aaf947882a0cda835d0a7641e3a",
+        "Controllers/CSGroupNativeSessionCoordinator.h": "bc4e56e2fbaabdf778d54d66fff3021f45fafbe26a7a97cb020bd9ce4ee6cea6",
+        "Controllers/CSGroupNativeSessionCoordinator.m": "57cbf10c21eea73f742b9e52c04477e12b269f1178dabaaeb9c4b0eebabf1626",
+        "Hooks/SessionGroupHooks.xm": "76f42d5d4001da1d80b36de80215e2ea9fed978faa8d92a5aa791b608ec5e3ab"
+      }
+    },
+    {
+      "name": "baseline-selection-source-reads",
+      "source_root": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-interaction-2026-11-03/baseline-2.2-8",
+      "environment_overrides": {
+        "WECHAT_SELECTION_ONLY": "1",
+        "WECHAT_SELECTION_EXPECT_BASELINE": "1"
+      },
+      "exit_code": 0,
+      "accepted": true,
+      "expected_failure_assertion": null,
+      "output": "Coordinator selection preset_1: 120 native unread getter reads (2.2-8 baseline)\nCoordinator selection preset_2: 120 native unread getter reads (2.2-8 baseline)\nCoordinator selection preset_0: 120 native unread getter reads (2.2-8 baseline)\nCoordinator selection preset_1: 120 native unread getter reads (2.2-8 baseline)\nCoordinator selection preset_0: 120 native unread getter reads (2.2-8 baseline)\nNative selection reuse: 11 behavior checks passed\n",
+      "input_sha256": {
+        "Controllers/CSGroupListAdapter.m": "9bb66f066c90df4e4289f5f2c0dba6274063a1b4858263a47b1638554eb999ed",
+        "Controllers/CSGroupNativeModel.h": "c3189e10a79bee653c28061a17e6b90eb423f2514e9482d55bc977e982ac7da8",
+        "Controllers/CSGroupNativeModel.m": "ac4e3a6177e45f23911e7f09cfd64def1556a21d7b8a69a012b5bbaa60d88979",
+        "Controllers/CSGroupProjection.h": "6e4d0bfeb82747004e3d028515f9948ef8a1a923323e4583898abff177b70639",
+        "Controllers/CSGroupProjection.m": "a11a27854ce33186cf07e4b657b2989d18bf3aaf947882a0cda835d0a7641e3a",
+        "Controllers/CSGroupNativeSessionCoordinator.h": "bc4e56e2fbaabdf778d54d66fff3021f45fafbe26a7a97cb020bd9ce4ee6cea6",
+        "Controllers/CSGroupNativeSessionCoordinator.m": "57cbf10c21eea73f742b9e52c04477e12b269f1178dabaaeb9c4b0eebabf1626",
+        "Hooks/SessionGroupHooks.xm": "76f42d5d4001da1d80b36de80215e2ea9fed978faa8d92a5aa791b608ec5e3ab"
+      }
+    },
+    {
+      "name": "current-interaction",
+      "source_root": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "environment_overrides": {
+        "WECHAT_INTERACTION_ONLY": "1"
+      },
+      "exit_code": 0,
+      "accepted": true,
+      "expected_failure_assertion": null,
+      "output": "Native interaction scheduling: 99 behavior checks passed\n",
+      "input_sha256": {
+        "Controllers/CSGroupListAdapter.m": "b9213d515630ce1ad79ae94b229e7827f2974193b3a0e50e1d5ab2f0258a4985",
+        "Controllers/CSGroupNativeModel.h": "320b87d9aadadc4d205c4f076d87987f5e52c761c126d20ac5607b64742f9f35",
+        "Controllers/CSGroupNativeModel.m": "b71c688838184accfc7f8aa7c050818071280a30f5b9a6ad2c24e3259bc752f9",
+        "Controllers/CSGroupProjection.h": "f7dd860614a5a2747d000951cadbd3f85475064726af1e49e178ea73485a6b16",
+        "Controllers/CSGroupProjection.m": "b4784583afd936fe91aff2cb195afbeb26fb52c3534e1784aeaeaf3d8db58741",
+        "Controllers/CSGroupNativeSessionCoordinator.h": "bc4e56e2fbaabdf778d54d66fff3021f45fafbe26a7a97cb020bd9ce4ee6cea6",
+        "Controllers/CSGroupNativeSessionCoordinator.m": "49c19b6f25de1dd12b92e3fd1cffdf362ca6bdc33cabcd6c5c81b9e9741cc576",
+        "Hooks/SessionGroupHooks.xm": "76f42d5d4001da1d80b36de80215e2ea9fed978faa8d92a5aa791b608ec5e3ab"
+      }
+    },
+    {
+      "name": "current-selection",
+      "source_root": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "environment_overrides": {
+        "WECHAT_SELECTION_ONLY": "1"
+      },
+      "exit_code": 0,
+      "accepted": true,
+      "expected_failure_assertion": null,
+      "output": "Selection equivalence: 24 source/fold/privacy/duplicate/capability cases, 144 group transitions; no native unread getter reads for selection.\nCoordinator selection preset_1: 0 native unread getter reads\nCoordinator selection preset_2: 0 native unread getter reads\nCoordinator selection preset_0: 0 native unread getter reads\nCoordinator selection preset_1: 0 native unread getter reads\nCoordinator selection preset_0: 0 native unread getter reads\nNative selection reuse: 2260 behavior checks passed\n",
+      "input_sha256": {
+        "Controllers/CSGroupListAdapter.m": "b9213d515630ce1ad79ae94b229e7827f2974193b3a0e50e1d5ab2f0258a4985",
+        "Controllers/CSGroupNativeModel.h": "320b87d9aadadc4d205c4f076d87987f5e52c761c126d20ac5607b64742f9f35",
+        "Controllers/CSGroupNativeModel.m": "b71c688838184accfc7f8aa7c050818071280a30f5b9a6ad2c24e3259bc752f9",
+        "Controllers/CSGroupProjection.h": "f7dd860614a5a2747d000951cadbd3f85475064726af1e49e178ea73485a6b16",
+        "Controllers/CSGroupProjection.m": "b4784583afd936fe91aff2cb195afbeb26fb52c3534e1784aeaeaf3d8db58741",
+        "Controllers/CSGroupNativeSessionCoordinator.h": "bc4e56e2fbaabdf778d54d66fff3021f45fafbe26a7a97cb020bd9ce4ee6cea6",
+        "Controllers/CSGroupNativeSessionCoordinator.m": "49c19b6f25de1dd12b92e3fd1cffdf362ca6bdc33cabcd6c5c81b9e9741cc576",
+        "Hooks/SessionGroupHooks.xm": "76f42d5d4001da1d80b36de80215e2ea9fed978faa8d92a5aa791b608ec5e3ab"
+      }
+    },
+    {
+      "name": "selected-config-key-negative-control",
+      "source_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-selection-negative-xp8vhim2",
+      "environment_overrides": {
+        "WECHAT_SELECTION_ONLY": "1"
+      },
+      "exit_code": 1,
+      "accepted": true,
+      "expected_failure_assertion": "reads==0",
+      "output": "Selection equivalence: 24 source/fold/privacy/duplicate/capability cases, 144 group transitions; no native unread getter reads for selection.\nFAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-interaction-2026-11-03/validation/SelectionReuseFixture.h:126: reads==0\n",
+      "input_sha256": {
+        "Controllers/CSGroupListAdapter.m": "b9213d515630ce1ad79ae94b229e7827f2974193b3a0e50e1d5ab2f0258a4985",
+        "Controllers/CSGroupNativeModel.h": "320b87d9aadadc4d205c4f076d87987f5e52c761c126d20ac5607b64742f9f35",
+        "Controllers/CSGroupNativeModel.m": "b71c688838184accfc7f8aa7c050818071280a30f5b9a6ad2c24e3259bc752f9",
+        "Controllers/CSGroupProjection.h": "f7dd860614a5a2747d000951cadbd3f85475064726af1e49e178ea73485a6b16",
+        "Controllers/CSGroupProjection.m": "b4784583afd936fe91aff2cb195afbeb26fb52c3534e1784aeaeaf3d8db58741",
+        "Controllers/CSGroupNativeSessionCoordinator.h": "bc4e56e2fbaabdf778d54d66fff3021f45fafbe26a7a97cb020bd9ce4ee6cea6",
+        "Controllers/CSGroupNativeSessionCoordinator.m": "02242e80f636a15a59908e561b5ff376008269082855febc3eebadf382e27056",
+        "Hooks/SessionGroupHooks.xm": "76f42d5d4001da1d80b36de80215e2ea9fed978faa8d92a5aa791b608ec5e3ab"
+      }
+    }
+  ],
+  "isolation": "Temporary macOS Foundation executables with in-memory preferences and host doubles; no device, install, real account/database or service writes.",
+  "scope": "Real production native refresh/scheduler/helper and scroll/edit hook bodies are extracted. Model, Projection and Coordinator compile as complete production translation units. Negative controls alter temporary extracted or copied code only."
+}

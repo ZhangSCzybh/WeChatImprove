@@ -1,0 +1,27 @@
+{
+  "production_matches_behavior": true,
+  "fixture_matches_behavior": true,
+  "baseline_hashes_unchanged": true,
+  "behavior_source_unchanged": true,
+  "legacy_all_passed": true,
+  "negative_controls_expected_failures": true,
+  "negative_controls_source_unchanged": true,
+  "benchmark_equivalent": true,
+  "model_median_before_ms": 4.355280555319041,
+  "model_median_after_ms": 0.03447083290666342,
+  "metadata_reads_before_each_round": [
+    144000,
+    144000,
+    144000,
+    144000,
+    144000
+  ],
+  "metadata_reads_after_each_round": [
+    120,
+    120,
+    120,
+    120,
+    120
+  ],
+  "tests_directory_absent": true
+}

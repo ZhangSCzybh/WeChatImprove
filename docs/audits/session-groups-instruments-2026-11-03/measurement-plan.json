@@ -1,0 +1,59 @@
+{
+  "target_plugin_version": "2.2-8",
+  "plugin_version_source": "User confirms installed 2.2-8; loaded UUID will be checked if trace binary metadata is available.",
+  "wechat_version": "8.0.78",
+  "wechat_build": "8.0.78.34",
+  "device_model": "iPhone 14 Pro Max",
+  "device_product_type": "iPhone15,3",
+  "ios_version": "27.0.1",
+  "ios_build": "24A446",
+  "xcode_version": "27.2",
+  "xcode_build": "27B52",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "candidate_apps": [
+    {
+      "bundle_id": "com.tencent.xin",
+      "pid": 37813
+    },
+    {
+      "bundle_id": "com.tencent.zsc",
+      "pid": 38528
+    }
+  ],
+  "selected_app": {
+    "bundle_id": "com.tencent.xin",
+    "pid": 37813,
+    "selection_source": "Explicit user confirmation; preserve this app and its account/data."
+  },
+  "limitations": [
+    "The installed 2.2-8 grouping code has no signposts or per-invocation timing/count events.",
+    "Time Profiler samples cannot yield exact call counts or per-round latency.",
+    "Core Animation commits are rendering submissions, not grouping refresh counts.",
+    "A16 does not support Processor Trace.",
+    "CPU/frame capture may be possible without replacing installed software; actual recording is required to verify."
+  ],
+  "scenarios": [
+    {
+      "id": "idle",
+      "seconds": 60,
+      "action": "Keep foreground main chat list untouched."
+    },
+    {
+      "id": "messages",
+      "seconds": 60,
+      "action": "Receive messages continuously from a separate user-controlled account; keep main chat list foreground."
+    },
+    {
+      "id": "scroll",
+      "seconds": 60,
+      "action": "Repeatedly scroll the main chat list up/down; do not open conversations."
+    },
+    {
+      "id": "switch",
+      "seconds": 60,
+      "action": "Repeatedly switch existing grouping tabs; do not edit group membership."
+    }
+  ],
+  "data_preservation": "No account switch, app reinstall, preference/database changes or device restart. App target must be identified before capture.",
+  "message_source": "User will send messages from another account when prompted."
+}

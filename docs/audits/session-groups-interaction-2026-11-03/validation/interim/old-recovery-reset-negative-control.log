@@ -1,0 +1,19 @@
+Selection equivalence: 24 source/fold/privacy/duplicate/capability cases, 144 group transitions; no native unread getter reads for selection.
+Coordinator selection preset_1: 0 native unread getter reads
+Coordinator selection preset_2: 0 native unread getter reads
+Coordinator selection preset_0: 0 native unread getter reads
+Coordinator selection preset_1: 0 native unread getter reads
+Coordinator selection preset_0: 0 native unread getter reads
+*** Terminating app due to uncaught exception 'NSRangeException', reason: '*** __boundsFail: index 2 beyond bounds [0 .. 1]'
+*** First throw call stack:
+(
+	0   CoreFoundation                      0x0000000185a3a8c0 __exceptionPreprocess + 176
+	1   libobjc.A.dylib                     0x000000018549860c objc_exception_throw + 88
+	2   CoreFoundation                      0x0000000185b497c0 _CFGetHandleForLoadedLibrary.cold.1 + 0
+	3   CoreFoundation                      0x00000001859b550c +[NSNull null] + 0
+	4   native-behavior                     0x00000001049a1c30 ReentrantPublicationTests + 1016
+	5   native-behavior                     0x0000000104980198 main + 780
+	6   dyld                                0x0000000185533e80 start + 6688
+)
+libc++abi: terminating due to uncaught exception of type NSException
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-interaction-2026-11-03/validation/run-native-behavior.sh: line 21: 21598 Abort trap: 6           "$test_dir/native-behavior"

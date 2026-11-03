@@ -1,0 +1,133 @@
+{
+  "target_pid": 40208,
+  "window_seconds": {
+    "start": 25.0,
+    "end": 70.0
+  },
+  "source_files": [
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/switch/export/switch-toc.xml",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/switch/export/switch-cpu.xml",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/switch/export/switch-sysmon-process.xml",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/switch/export/switch-lifetime.xml",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/switch/export/switch-commits.xml",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/switch/export/switch-fps.xml"
+  ],
+  "toc_schemas": [
+    "OSSignpostIntervals",
+    "activity-monitor-process-ledger",
+    "activity-monitor-process-live",
+    "activity-monitor-system",
+    "core-animation-fps-estimate",
+    "coreanimation-commit-interval",
+    "coreanimation-commit-profile",
+    "coreanimation-commit-summary",
+    "coreanimation-lifetime-interval",
+    "device-display-info",
+    "device-thermal-state-intervals",
+    "display-surface-swap",
+    "dyld-library-load",
+    "graphics-statistic",
+    "kdebug",
+    "kdebug-strings",
+    "os-signpost",
+    "os-signpost-arg",
+    "process-info",
+    "sysmon-process",
+    "sysmon-system",
+    "thread-info",
+    "tick",
+    "time-info"
+  ],
+  "capture_integrity": "Not inferred from XML. Confirm recorder success separately; partial and failed recordings can still contain readable rows.",
+  "cpu": {
+    "status": "available",
+    "schema": "activity-monitor-process-live",
+    "sample_count": 45,
+    "covered_seconds": 45.0,
+    "window_coverage_fraction": 1.0,
+    "overlapping_interval_seconds": 1.4210854715202004e-14,
+    "uncovered_intervals_seconds": [],
+    "observed_interval_start_seconds": 25.0,
+    "observed_interval_end_seconds": 70.0,
+    "mean_percent": 24.100480846186144,
+    "time_weighted_p95_percent": 32.632697709,
+    "peak_sample_percent": 33.5724073,
+    "sample_interval_seconds_min": 1.000600916,
+    "sample_interval_seconds_max": 1.070376834,
+    "cumulative_counter_cross_check": {
+      "schema": "sysmon-process",
+      "observed_seconds": 44.6980695,
+      "cpu_seconds_delta": 10.763122791,
+      "mean_percent": 24.079614424958553,
+      "method": "Last minus first cumulative CPU time; counters are never summed. Live counters use closed interval ends and exclude the final potentially extrapolated interval."
+    },
+    "excluded_rows": {
+      "CPU row missing a verified time or formatted percentage": 1
+    },
+    "interpretation": "100% is one fully occupied CPU core; this is process CPU, not plugin-only CPU."
+  },
+  "frames": {
+    "status": "unavailable",
+    "reason": "Frame attribution is unverified",
+    "schema": "coreanimation-lifetime-interval",
+    "unattributed_row_count": 3364,
+    "excluded_rows": {}
+  },
+  "display_fps_estimate": {
+    "status": "available",
+    "scope": "Device display estimate; no PID attribution",
+    "sample_count": 46,
+    "covered_seconds": 45.00000000000003,
+    "time_weighted_mean_fps": 59.97760955555555,
+    "minimum_sample_fps": 59.0,
+    "maximum_sample_fps": 60.0,
+    "target_process_fps": {
+      "status": "unavailable",
+      "reason": "This schema has no process or surface-owner attribution"
+    },
+    "interpretation": "An estimate of display activity, not target-app animation FPS or a dropped-frame count. Static screens and variable refresh rates must not be judged against a fixed 60/120 FPS target."
+  },
+  "render_commits": {
+    "status": "available",
+    "commit_interval_count": 2347,
+    "commits_per_second": 52.15555555555556,
+    "unattributed_row_count": 0,
+    "interpretation": "Render commits are not model computations, reloadData calls or reloadRows calls."
+  },
+  "group_sampling": {
+    "status": "unavailable",
+    "reason": "No attributed samples with usable weight units",
+    "schema": "userspace-time-samples",
+    "sample_count": 0,
+    "samples_missing_weight": 0
+  },
+  "per_round_duration": {
+    "status": "unavailable",
+    "reason": "Native signpost model intervals are analyzed separately; see signpost-summary.json"
+  },
+  "group_refresh_call_counts": {
+    "status": "unavailable",
+    "reason": "Refresh/reload signposts are analyzed separately; sampling and CA commits are not call counters"
+  },
+  "display_frame_observations": {
+    "status": "available",
+    "schema": "coreanimation-lifetime-interval",
+    "observed_frame_or_hitch_rows": 3364,
+    "hitch_count": 115,
+    "summed_hitch_ms": 6144.274379000155,
+    "positive_hitch_p95_ms": 66.72975000000037,
+    "positive_hitch_p99_ms": 66.7297910000002,
+    "maximum_hitch_ms": 66.72995799999981,
+    "attribution": "Exported device/display scope; cannot attribute these frames to the target process",
+    "unattributed_row_count": 0,
+    "excluded_rows": {},
+    "interpretation": "Hitches use recorded presentation deadlines. No fixed-refresh-rate dropped-frame estimate is made.",
+    "frame_count": 3364,
+    "known_frame_hitch_fraction": 0.03418549346016647,
+    "scope": "Exported device/display frames, not WeChat-only frames",
+    "target_process_attribution": {
+      "status": "unavailable",
+      "reason": "No frame-to-process ownership mapping was exported"
+    }
+  }
+}

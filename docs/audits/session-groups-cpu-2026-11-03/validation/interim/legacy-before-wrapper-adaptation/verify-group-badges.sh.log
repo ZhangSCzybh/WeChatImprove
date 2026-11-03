@@ -1,0 +1,23 @@
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:92:25: error: call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   92 |         NSArray *before=CSGroupBuildNativeSections(p.controller,p,p.controller);
+      |                         ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:92:25: note: did you mean 'CSGroupBuildNativeSectionsReusing'?
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Controllers/CSGroupNativeBridge.h:25:64: note: 'CSGroupBuildNativeSectionsReusing' declared here
+   25 | FOUNDATION_EXPORT NSArray<NSArray<CSGroupRow *> *> * _Nullable CSGroupBuildNativeSectionsReusing(id controller, id table, id source, NSArray<NSArray<CSGroupRow *> *> * _Nullable previous);
+      |                                                                ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:92:25: error: implicit conversion of 'int' to 'NSArray *' is disallowed with ARC
+   92 |         NSArray *before=CSGroupBuildNativeSections(p.controller,p,p.controller);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:92:18: error: incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]
+   92 |         NSArray *before=CSGroupBuildNativeSections(p.controller,p,p.controller);
+      |                  ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:159:23: error: call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+  159 |     NSArray *sections=CSGroupBuildNativeSections(p.controller,p,p.controller);
+      |                       ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:159:23: error: implicit conversion of 'int' to 'NSArray *' is disallowed with ARC
+  159 |     NSArray *sections=CSGroupBuildNativeSections(p.controller,p,p.controller);
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:159:14: error: incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]
+  159 |     NSArray *sections=CSGroupBuildNativeSections(p.controller,p,p.controller);
+      |              ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+6 errors generated.

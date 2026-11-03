@@ -1,0 +1,795 @@
+ThemeBox native session groups — model and retained-path host regressions
+Recorded at: 2026-11-02T17:00:19.601769+08:00
+Checkout: /Users/zhangshichao/Documents/Workspace/WeChatImprove
+Branch: codex/themebox-native-session-groups
+HEAD: 189054633f7fb813ac3b03f7110f482ecaad9ffe
+Scope: macOS host doubles / synthetic fixtures; no WeChat/device/service/database access.
+Final commands: 25 passed; 4854 checks; 0 failures; proxy probe 5 additional scenarios.
+
+REPORT-TIME SOURCE SHA256
+07862f534f4a4a27647c34c56729e906ce70c49d8d04c9a82d818323c054a86a  Controllers/CSGroupNativeModel.h
+3175f288c495de06b91f2af42e93b6338a69cee5a95cf6e968a3097639ceb006  Controllers/CSGroupNativeModel.m
+dcd0dc848a458f653bb7c734dd2776c69992c61fae765115701ad823ede78579  Controllers/CSGroupNativeBridge.h
+0f0437a221c59099e8b28ad089eb4d6f6c61ef5e4971349b6fcc802f841b7ed2  Controllers/CSGroupNativeBridge.m
+503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a  Controllers/CSGroupProjection.m
+9a1be763bd5122e8b059a0572cec20d75ec580f9b9dde24587d7e3548133b591  Controllers/CSGroupListAdapter.h
+1d341d5fc69ed688e7d236955f06dd9f205107082e01d6b86de534bc36e8ece2  Controllers/CSGroupListAdapter.m
+407771b6f48b3856415e30f9e40488d090d49c2a8068afd1818cfbdd86fac1e3  Controllers/CSGroupNativeSessionCoordinator.h
+45629cb7bb5b4cf5897200a13ac1dea698206b4ce1e00fe680c5274b5d21fcef  Controllers/CSGroupNativeSessionCoordinator.m
+ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1  Controllers/CSCloseFriendPolicy.m
+b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829  Controllers/CSCloseFriendRuntime.m
+ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b  Controllers/CSCloseFriendListShield.m
+999991380018fed90b62973796e1eca7b89774284027820ad1ef533df7079070  Hooks/SessionGroupHooks.xm
+1a8d1fb30a5a7ed02ce634f13f648fb55835bc10a3a77c11794b19ce0772c7d0  Hooks/NativeSessionGroupHooks.xm
+a7bc24a2b19fca0191b57d6d9e12a80412cd77815dfdf65118c66a8ca23d0faf  Hooks/CloseFriendNotificationHooks.xm
+5d73fb92e5f1110fe2fd73a401546cc4809acaeab6453c7e6ae3234e7297e466  Tests/NativeGroupModelTests.m
+d5ce0c9e8e289b22b3fb2802816dbf8e7520ab7d72c0120d6441cf68fdafa0c9  Tests/verify-native-group-model.sh
+0853f2cfddf2a8562c17f64f46966e32a1cbb8a57b7d75dce87279c4b7a2d093  Tests/NativeSessionCoordinatorLegacyFixture.h
+0e7852ac18293eb3f886562dd9fc2628a472fe3f20fb1f9f856a6e3720a375f0  Tests/CloseFriendAlertTests.m
+764e73865909dd2ebb404983d3df5bdd5df5d66473e2487336fc580359584230  Tests/CloseFriendTabBadgeTests.m
+2c1ba0fee0911abf92561b13f648c66fe41a992b91893ab91034aff6f6258813  Tests/GroupViewportTests.m
+215c187192c902561f50f0d3f9a6c173c0257d1f4969c98d93eab80103da7e7d  Tests/GroupLifecycleTests.m
+c438834bb71727afb79d66f47d89299d1ad84d59c3114af30da2d884337c17cf  Tests/GroupSelectionTests.m
+f6175075fc20b346c4983db0f1f20419f4de0d6e2c1981fdec7faefc44829ee3  Tests/GroupBusinessRowTests.m
+2c1e11608b8334f459a47f8f4d9aaa086a72b53eddee4b46810e828e0fa62595  Tests/PrivacyAdmissionCacheTests.m
+ace7692f4a65373b3e3f846cbedc10db07b68b2249b80a67939725e09e85d7b5  Tests/CloseFriendSessionTests.m
+afb60b9d1b7537fe095f6c50cfb0d4c7bd55572dd3ea05182d898aafcc14f8d0  Tests/GroupInteractionTests.m
+ef9bc408bdc6fbb15dbf31bc2bc55b1ac30d36a31c2af7f2d331212a0b3deaac  Tests/GroupSearchTests.m
+62ab8d24b6fc4cd371a5d1f6731822c4f378e8c134b76560c43905ac93a681ad  Tests/extract-group-business.py
+a6f4e6503223eaa3e2be676f7cae530904ba9fba15039462359b2caa97394ee2  Tests/verify-close-friend-session.sh
+
+FINAL COMMAND OUTPUTS
+
+$ bash Tests/verify-native-group-model.sh
+exit_code=0
+Native group model: 64 checks, 0 failures
+
+$ bash Tests/verify-group-preferences.sh
+exit_code=0
+Group preferences: 23 checks, 0 failures
+
+$ bash Tests/verify-group-incremental.sh
+exit_code=0
+Group incremental: 180 checks, 0 failures
+
+$ bash Tests/verify-group-selection.sh
+exit_code=0
+Group selection stability: 31 checks, 0 failures
+
+$ bash Tests/verify-group-lifecycle.sh
+exit_code=0
+Hidden native event publications: 0 / 20 events
+Group lifecycle: 191 checks, 0 failures
+
+$ bash Tests/verify-group-business.sh
+exit_code=0
+Group business rows: 633 checks, 0 failures
+
+$ bash Tests/verify-group-badges.sh
+exit_code=0
+Group badges: 136 checks, 0 failures
+
+$ bash Tests/verify-group-header.sh
+exit_code=0
+Group header semantics: 46 checks, 0 failures
+
+$ bash Tests/verify-group-appearance.sh
+exit_code=0
+Group appearance: 8 checks, 0 failures
+
+$ bash Tests/verify-group-picker.sh
+exit_code=0
+Group picker presentation: 609 checks passed
+
+$ bash Tests/verify-group-indicator.sh
+exit_code=0
+Group indicator: 91 checks, 0 failures
+
+$ bash Tests/verify-group-viewport.sh
+exit_code=0
+Group viewport: 72 checks, 0 failures
+
+$ bash Tests/verify-group-interactions.sh
+exit_code=0
+Group interactions: 124 checks, 0 failures
+
+$ bash Tests/verify-group-search.sh
+exit_code=0
+Group search: 54 checks, 0 failures
+
+$ python3 Tests/verify-group-proxy.py
+exit_code=0
+{
+  "scope": "macOS Foundation diagnostic; actual production proxy and invocation support list; adapter forwarding stub; no UIKit",
+  "cases": [
+    {
+      "scenario": "live_target",
+      "responds": true,
+      "threw": false,
+      "enteredAdapterForwarding": 1,
+      "targetIsNil": 0,
+      "value": 23,
+      "hasSignature": 1
+    },
+    {
+      "scenario": "weak_target_released_before_delayed_callback",
+      "responds": false,
+      "threw": false,
+      "enteredAdapterForwarding": 0,
+      "targetIsNil": 1,
+      "value": 0,
+      "hasSignature": 1
+    },
+    {
+      "scenario": "same_proxy_retargeted_without_header_method",
+      "responds": false,
+      "threw": false,
+      "enteredAdapterForwarding": 0,
+      "targetIsNil": 0,
+      "value": 0,
+      "hasSignature": 1
+    },
+    {
+      "scenario": "live_target_restored",
+      "responds": true,
+      "threw": false,
+      "enteredAdapterForwarding": 1,
+      "targetIsNil": 0,
+      "value": 23,
+      "hasSignature": 1
+    },
+    {
+      "scenario": "adapter_released_before_delayed_callback",
+      "responds": true,
+      "threw": false,
+      "enteredAdapterForwarding": 0,
+      "targetIsNil": 0,
+      "value": 0,
+      "hasSignature": 1
+    }
+  ]
+}
+
+$ bash Tests/verify-privacy-admission-cache.sh
+exit_code=0
+PROVENANCE {"boundaries": "UIKit table/cells and native source are host doubles; real policy, runtime expiry, projection, safe numeric reader, and index scopes compile unchanged.", "head": "189054633f7fb813ac3b03f7110f482ecaad9ffe", "methods": {"- (void)invalidateNativeSnapshot": "74b4c43a45a46fd6b5e14c0f362a873f0b6e698398d097f2c0ab3e2768de6ff8", "- (void)performSessionListLayout:": "7359de6ea427617f992ed7cee89f74c9c9a43ec46b578a224338ef067cfe4de6"}, "source_sha256": {"Controllers/CSCloseFriendListShield.m": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b", "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1", "Controllers/CSCloseFriendRuntime.m": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829", "Controllers/CSGroupIndexScope.m": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780", "Controllers/CSGroupListAdapter.m": "1d341d5fc69ed688e7d236955f06dd9f205107082e01d6b86de534bc36e8ece2", "Controllers/CSGroupNativeBridge.m": "0f0437a221c59099e8b28ad089eb4d6f6c61ef5e4971349b6fcc802f841b7ed2", "Controllers/CSGroupProjection.m": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a"}}
+ADMISSION {"case":"stable-K25-N32","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":25,"requests":0,"rowHidesQueries":32,"snapshotReads":50}
+ADMISSION {"case":"new-projection-identity","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"new-policy-identity","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"same-policy-mutated-enabled","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"same-policy-mutated-revealed","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"same-policy-mutated-hideSessions","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"unknown-hideSessions-type","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":3,"requests":0,"rowHidesQueries":96,"snapshotReads":6}
+ADMISSION {"case":"blocked-then-ready","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"epoch-then-ready","dirty":true,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"account-then-ready","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"revision-then-ready","dirty":true,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"unknown-projection-revision-then-known","dirty":true,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"retry-then-ready","dirty":true,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"table-identity","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"native-invalidation","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"unsafe-projection","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":32,"snapshotReads":1}
+ADMISSION {"case":"safe-then-unsafe-identity","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":32,"snapshotReads":1}
+ADMISSION {"case":"policy-changed-during-original","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"real-runtime-expiry","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":52}
+Privacy admission cache: 218 checks, 0 failures
+
+$ bash Tests/verify-privacy-admission-cache-events.sh
+exit_code=0
+PROVENANCE {"boundaries": "UIKit table/cells and native source are host doubles; real policy, runtime expiry, projection, safe numeric reader, and index scopes compile unchanged.", "head": "189054633f7fb813ac3b03f7110f482ecaad9ffe", "methods": {"- (void)invalidateNativeSnapshot": "74b4c43a45a46fd6b5e14c0f362a873f0b6e698398d097f2c0ab3e2768de6ff8", "- (void)performSessionListLayout:": "7359de6ea427617f992ed7cee89f74c9c9a43ec46b578a224338ef067cfe4de6"}, "source_sha256": {"Controllers/CSCloseFriendListShield.m": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b", "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1", "Controllers/CSCloseFriendRuntime.m": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829", "Controllers/CSGroupIndexScope.m": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780", "Controllers/CSGroupListAdapter.m": "1d341d5fc69ed688e7d236955f06dd9f205107082e01d6b86de534bc36e8ece2", "Controllers/CSGroupNativeBridge.m": "0f0437a221c59099e8b28ad089eb4d6f6c61ef5e4971349b6fcc802f841b7ed2", "Controllers/CSGroupProjection.m": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a"}}
+ADMISSION {"case":"reentry-projection","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-table","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-native-invalidation","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-enabled","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-revision-readable","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-retry","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-unsafe-projection","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"runtime-add-friend","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":3}
+ADMISSION {"case":"runtime-remove-friend","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":3}
+ADMISSION {"case":"runtime-add-group","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":3}
+ADMISSION {"case":"runtime-remove-group","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":3}
+ADMISSION {"case":"runtime-manual-lock","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":3}
+ADMISSION {"case":"runtime-other-surface-option","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":3}
+Privacy admission events/reentry: 115 checks, 0 failures
+
+$ bash Tests/verify-close-friend-session.sh
+exit_code=0
+Folded native path reads (120 moved rows): legacy=7380 indexed=360
+Close-friend sessions: 174 checks, 0 failures
+Folded layouts (12): native fallback quote/remove=12/12 stable reuse quote/remove=0/0
+Close-friend session presentation: 55 checks, 0 failures
+
+$ bash Tests/verify-close-friend-privacy.sh
+exit_code=0
+CloseFriendPrivacyTests: 38 checks passed
+
+$ bash Tests/verify-close-friend-core.sh
+exit_code=0
+CloseFriendCoreTests: 455 checks passed
+
+$ bash Tests/verify-close-friend-runtime.sh
+exit_code=0
+CloseFriendRuntimeTests: 109 checks passed
+CloseFriendSchedulingTests: 9 checks passed
+CloseFriendBiometricTests: 99 checks passed
+
+$ bash Tests/verify-close-friend-unread-panel.sh
+exit_code=0
+Close-friend unread panel: 71 checks, 0 failures
+Close-friend unread panel ABI: 7 checks, 0 failures
+
+$ bash Tests/verify-close-friend-recovery.sh
+exit_code=0
+CloseFriendRecoveryTests: 24 checks passed
+
+$ bash Tests/verify-close-friend-migration.sh
+exit_code=0
+CloseFriendMigrationTests: 59 checks passed
+
+$ bash Tests/verify-close-friend-alerts.sh
+exit_code=0
+Close-friend alerts: 250 focused checks passed (identity, calls, reply, badge, payment policy)
+Close-friend tab badge: 909 focused checks passed (passthrough, reveal, pending, dot, boundary, publication, scoped bypass; host only)
+
+PREVIOUS COMPLETED ATTEMPTS (includes fixture compilation failures; final results are above)
+
+$ bash Tests/verify-group-selection.sh [prior completed attempt 1]
+exit_code=1
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupSelectionTests.m:99:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-selection.78MlCa/GroupSelectionHooks.h:3:11: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+    3 |     if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self))  { [self originalSelect:path animated:animated scrollPosition:position]; return; }
+      |           ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-selection.78MlCa/GroupSelectionHooks.h:10:11: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+   10 |     if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self))  { [self originalScroll:path atScrollPosition:position animated:animated]; return; }
+      |           ^
+2 errors generated.
+
+$ bash Tests/verify-group-selection.sh [prior completed attempt 2]
+exit_code=0
+Group selection stability: 30 checks, 0 failures
+
+$ bash Tests/verify-group-selection.sh [prior completed attempt 3]
+exit_code=0
+Group selection stability: 31 checks, 0 failures
+
+$ bash Tests/verify-group-lifecycle.sh [prior completed attempt 1]
+exit_code=1
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupLifecycleTests.m:144:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:175:18: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+  175 |         if (self.usesNativeSessionModel) {
+      |                  ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:176:13: error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'
+  176 |             CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:176:46: error: use of undeclared identifier 'coordinator'
+  176 |             CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
+      |                                              ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:176:59: error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'
+  176 |             CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:177:17: error: use of undeclared identifier 'coordinator'
+  177 |             if (coordinator.boundary || !coordinator.model.isValid || coordinator.epoch!=epoch ||
+      |                 ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:177:42: error: use of undeclared identifier 'coordinator'
+  177 |             if (coordinator.boundary || !coordinator.model.isValid || coordinator.epoch!=epoch ||
+      |                                          ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:177:71: error: use of undeclared identifier 'coordinator'
+  177 |             if (coordinator.boundary || !coordinator.model.isValid || coordinator.epoch!=epoch ||
+      |                                                                       ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:178:19: error: use of undeclared identifier 'coordinator'
+  178 |                 ![coordinator.accountID isEqual:account]) return;
+      |                   ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:179:24: error: use of undeclared identifier 'coordinator'
+  179 |             sections=@[coordinator.model.sourceRows];
+      |                        ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:234:17: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+  234 |         adapter.usesNativeSessionModel=!CSGroupIsFoldedController(controller);
+      |                 ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:235:21: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+  235 |         if (adapter.usesNativeSessionModel) {
+      |                     ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:236:15: error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'
+  236 |             [[CSGroupNativeSessionCoordinator sharedCoordinator] setMainController:controller];
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:238:22: error: use of undeclared identifier 'CSGroupNativeSessionModelDidChangeNotification'
+  238 |                 name:CSGroupNativeSessionModelDidChangeNotification object:nil];
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:538:14: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+  538 |     if (self.usesNativeSessionModel) { [self refreshNativeSessionModel]; return; }
+      |              ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-lifecycle.epRNJP/GroupLifecycleBodies.h:538:46: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'
+  538 |     if (self.usesNativeSessionModel) { [self refreshNativeSessionModel]; return; }
+      |                                         ~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~
+15 errors generated.
+
+$ bash Tests/verify-group-lifecycle.sh [prior completed attempt 2]
+exit_code=0
+Hidden native event publications: 0 / 20 events
+Group lifecycle: 191 checks, 0 failures
+
+$ bash Tests/verify-group-business.sh [prior completed attempt 1]
+exit_code=1
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupBusinessRowTests.m:102:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-business.fknjB8/GroupBusinessBodies.h:14:14: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+   14 |     if (self.usesNativeSessionModel) return [self nativePath:nativePath];
+      |              ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-business.fknjB8/GroupBusinessBodies.h:14:51: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'nativePath:'
+   14 |     if (self.usesNativeSessionModel) return [self nativePath:nativePath];
+      |                                              ~~~~ ^~~~~~~~~~
+2 errors generated.
+
+$ bash Tests/verify-group-viewport.sh [prior completed attempt 1]
+exit_code=1
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:138:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-viewport.LXHcHw/GroupViewportBodies.h:15:17: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+   15 |         adapter.usesNativeSessionModel=!CSGroupIsFoldedController(controller);
+      |                 ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-viewport.LXHcHw/GroupViewportBodies.h:16:21: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+   16 |         if (adapter.usesNativeSessionModel) {
+      |                     ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-viewport.LXHcHw/GroupViewportBodies.h:17:15: error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'
+   17 |             [[CSGroupNativeSessionCoordinator sharedCoordinator] setMainController:controller];
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-viewport.LXHcHw/GroupViewportBodies.h:19:22: error: use of undeclared identifier 'CSGroupNativeSessionModelDidChangeNotification'
+   19 |                 name:CSGroupNativeSessionModelDidChangeNotification object:nil];
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+4 errors generated.
+
+$ bash Tests/verify-group-viewport.sh [prior completed attempt 2]
+exit_code=1
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:8:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/NativeSessionCoordinatorLegacyFixture.h:4:9: fatal error: 'CSGroupNativeModel.h' file not found
+    4 | #import "CSGroupNativeModel.h"
+      |         ^~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+
+$ bash Tests/verify-group-viewport.sh [prior completed attempt 3]
+exit_code=1
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:56:1: error: duplicate interface definition for class 'CSGroupRow'
+   56 | @interface CSGroupRow : NSObject
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:21:12: note: previous definition is here
+   21 | @interface CSGroupRow : NSObject <NSCopying>
+      |            ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:57:37: error: property has a previous declaration
+   57 | @property(nonatomic,copy) NSString *userName;
+      |                                     ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:23:59: note: property declared here
+   23 | @property (nonatomic, copy, readonly, nullable) NSString *userName;
+      |                                                           ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:58:33: error: property has a previous declaration
+   58 | @property(nonatomic) NSUInteger kind;
+      |                                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:24:48: note: property declared here
+   24 | @property (nonatomic, readonly) CSGroupRowKind kind;
+      |                                                ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:60:17: error: method definition for 'initWithNativePath:userName:kind:category:top:unreadCount:redDot:' not found [-Werror,-Wincomplete-implementation]
+   60 | @implementation CSGroupRow @end
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:46:1: note: method 'initWithNativePath:userName:kind:category:top:unreadCount:redDot:' declared here
+   46 | - (instancetype)initWithNativePath:(NSIndexPath *)nativePath
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:60:17: error: method definition for 'initWithNativePath:userName:kind:category:top:unreadCount:redDot:nativeSummary:sortTime:' not found [-Werror,-Wincomplete-implementation]
+   60 | @implementation CSGroupRow @end
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:53:1: note: method 'initWithNativePath:userName:kind:category:top:unreadCount:redDot:nativeSummary:sortTime:' declared here
+   53 | - (instancetype)initWithNativePath:(NSIndexPath *)nativePath
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:60:17: error: method definition for 'initWithNativePath:userName:kind:category:top:unreadCount:redDot:nativeSummary:sortTime:nativePrefix:' not found [-Werror,-Wincomplete-implementation]
+   60 | @implementation CSGroupRow @end
+      |                 ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:62:1: note: method 'initWithNativePath:userName:kind:category:top:unreadCount:redDot:nativeSummary:sortTime:nativePrefix:' declared here
+   62 | - (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(nullable NSString *)userName
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:60:17: error: method 'copyWithZone:' in protocol 'NSCopying' not implemented [-Werror,-Wprotocol]
+   60 | @implementation CSGroupRow @end
+      |                 ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.2.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSObject.h:32:1: note: method 'copyWithZone:' declared here
+   32 | - (id)copyWithZone:(nullable NSZone *)zone;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:61:1: error: duplicate interface definition for class 'CSGroupProjection'
+   61 | @interface CSGroupProjection : NSObject
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:75:12: note: previous definition is here
+   75 | @interface CSGroupProjection : NSObject
+      |            ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:62:63: error: property has a previous declaration
+   62 | @property(nonatomic,strong) NSArray<NSArray<CSGroupRow *> *> *sections;
+      |                                                               ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:76:73: note: property declared here
+   76 | @property (nonatomic, copy, readonly) NSArray<NSArray<CSGroupRow *> *> *sections;
+      |                                                                         ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:65:17: error: method definition for 'initWithSections:tabs:selectedTabID:filterDuplicates:accountID:' not found [-Werror,-Wincomplete-implementation]
+   65 | @implementation CSGroupProjection
+      |                 ^
+   66 | - (CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)path {
+   67 |     if (!path || path.length!=2) return nil;
+   68 |     NSUInteger section=[path indexAtPosition:0],row=[path indexAtPosition:1];
+   69 |     return section<self.sections.count && row<self.sections[section].count ? self.sections[section][row] : nil;
+   70 | }
+   71 | @end
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:79:1: note: method 'initWithSections:tabs:selectedTabID:filterDuplicates:accountID:' declared here
+   79 | - (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:65:17: error: method definition for 'initWithSections:tabs:selectedTabID:filterDuplicates:accountID:previousProjection:' not found [-Werror,-Wincomplete-implementation]
+   65 | @implementation CSGroupProjection
+      |                 ^
+   66 | - (CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)path {
+   67 |     if (!path || path.length!=2) return nil;
+   68 |     NSUInteger section=[path indexAtPosition:0],row=[path indexAtPosition:1];
+   69 |     return section<self.sections.count && row<self.sections[section].count ? self.sections[section][row] : nil;
+   70 | }
+   71 | @end
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:85:1: note: method 'initWithSections:tabs:selectedTabID:filterDuplicates:accountID:previousProjection:' declared here
+   85 | - (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:65:17: error: method definition for 'initWithSections:tabs:selectedTabID:filterDuplicates:accountID:hiddenUserNames:privacyRevision:previousProjection:' not found [-Werror,-Wincomplete-implementation]
+   65 | @implementation CSGroupProjection
+      |                 ^
+   66 | - (CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)path {
+   67 |     if (!path || path.length!=2) return nil;
+   68 |     NSUInteger section=[path indexAtPosition:0],row=[path indexAtPosition:1];
+   69 |     return section<self.sections.count && row<self.sections[section].count ? self.sections[section][row] : nil;
+   70 | }
+   71 | @end
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:93:1: note: method 'initWithSections:tabs:selectedTabID:filterDuplicates:accountID:hiddenUserNames:privacyRevision:previousProjection:' declared here
+   93 | - (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:65:17: error: method definition for 'initWithSections:tabs:selectedTabID:filterDuplicates:accountID:hiddenUserNames:unmaskedAggregateUserNames:privacyRevision:previousProjection:' not found [-Werror,-Wincomplete-implementation]
+   65 | @implementation CSGroupProjection
+      |                 ^
+   66 | - (CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)path {
+   67 |     if (!path || path.length!=2) return nil;
+   68 |     NSUInteger section=[path indexAtPosition:0],row=[path indexAtPosition:1];
+   69 |     return section<self.sections.count && row<self.sections[section].count ? self.sections[section][row] : nil;
+   70 | }
+   71 | @end
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:102:1: note: method 'initWithSections:tabs:selectedTabID:filterDuplicates:accountID:hiddenUserNames:unmaskedAggregateUserNames:privacyRevision:previousProjection:' declared here
+  102 | - (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:65:17: error: method definition for 'initWithSections:tabs:selectedTabID:filterDuplicates:accountID:hiddenUserNames:unmaskedAggregateUserNames:privacyRevision:scopeFoldedEntry:foldedProjection:previousProjection:' not found [-Werror,-Wincomplete-implementation]
+   65 | @implementation CSGroupProjection
+      |                 ^
+   66 | - (CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)path {
+   67 |     if (!path || path.length!=2) return nil;
+   68 |     NSUInteger section=[path indexAtPosition:0],row=[path indexAtPosition:1];
+   69 |     return section<self.sections.count && row<self.sections[section].count ? self.sections[section][row] : nil;
+   70 | }
+   71 | @end
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:113:1: note: method 'initWithSections:tabs:selectedTabID:filterDuplicates:accountID:hiddenUserNames:unmaskedAggregateUserNames:privacyRevision:scopeFoldedEntry:foldedProjection:previousProjection:' declared here
+  113 | - (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:65:17: error: method definition for 'sessionCountForTabID:' not found [-Werror,-Wincomplete-implementation]
+   65 | @implementation CSGroupProjection
+      |                 ^
+   66 | - (CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)path {
+   67 |     if (!path || path.length!=2) return nil;
+   68 |     NSUInteger section=[path indexAtPosition:0],row=[path indexAtPosition:1];
+   69 |     return section<self.sections.count && row<self.sections[section].count ? self.sections[section][row] : nil;
+   70 | }
+   71 | @end
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:125:1: note: method 'sessionCountForTabID:' declared here
+  125 | - (NSUInteger)sessionCountForTabID:(NSString *)tabID;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:65:17: error: method definition for 'projectionByAttachingNativeSummaryRow:' not found [-Werror,-Wincomplete-implementation]
+   65 | @implementation CSGroupProjection
+      |                 ^
+   66 | - (CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)path {
+   67 |     if (!path || path.length!=2) return nil;
+   68 |     NSUInteger section=[path indexAtPosition:0],row=[path indexAtPosition:1];
+   69 |     return section<self.sections.count && row<self.sections[section].count ? self.sections[section][row] : nil;
+   70 | }
+   71 | @end
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:128:1: note: method 'projectionByAttachingNativeSummaryRow:' declared here
+  128 | - (nullable CSGroupProjection *)projectionByAttachingNativeSummaryRow:(CSGroupRow *)row;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:65:17: error: method definition for 'hasSameDisplayStructureAs:' not found [-Werror,-Wincomplete-implementation]
+   65 | @implementation CSGroupProjection
+      |                 ^
+   66 | - (CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)path {
+   67 |     if (!path || path.length!=2) return nil;
+   68 |     NSUInteger section=[path indexAtPosition:0],row=[path indexAtPosition:1];
+   69 |     return section<self.sections.count && row<self.sections[section].count ? self.sections[section][row] : nil;
+   70 | }
+   71 | @end
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:129:1: note: method 'hasSameDisplayStructureAs:' declared here
+  129 | - (BOOL)hasSameDisplayStructureAs:(nullable CSGroupProjection *)other;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:65:17: error: method definition for 'changedUnreadPathsFrom:' not found [-Werror,-Wincomplete-implementation]
+   65 | @implementation CSGroupProjection
+      |                 ^
+   66 | - (CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)path {
+   67 |     if (!path || path.length!=2) return nil;
+   68 |     NSUInteger section=[path indexAtPosition:0],row=[path indexAtPosition:1];
+   69 |     return section<self.sections.count && row<self.sections[section].count ? self.sections[section][row] : nil;
+   70 | }
+   71 | @end
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:130:1: note: method 'changedUnreadPathsFrom:' declared here
+  130 | - (NSArray<NSIndexPath *> *)changedUnreadPathsFrom:(CSGroupProjection *)other;
+      | ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupViewportTests.m:65:17: error: method definition for 'discardComputationCache' not found [-Werror,-Wincomplete-implementation]
+   65 | @implementation CSGroupProjection
+      |                 ^
+   66 | - (CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)path {
+   67 |     if (!path || path.length!=2) return nil;
+   68 |     NSUInteger section=[path indexAtPosition:0],row=[path indexAtPosition:1];
+   69 |     return section<self.sections.count && row<self.sections[section].count ? self.sections[section][row] : nil;
+   70 | }
+   71 | @end
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/../Controllers/CSGroupProjection.h:132:1: note: method 'discardComputationCache' declared here
+  132 | - (void)discardComputationCache;
+      | ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+
+$ bash Tests/verify-group-interactions.sh [prior completed attempt 1]
+exit_code=1
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupInteractionTests.m:229:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.Wp4Uuy/GroupInteractionBodies.h:264:14: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+  264 |     if (self.usesNativeSessionModel) { [self refreshNativeSessionModel]; return; }
+      |              ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.Wp4Uuy/GroupInteractionBodies.h:264:46: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'
+  264 |     if (self.usesNativeSessionModel) { [self refreshNativeSessionModel]; return; }
+      |                                         ~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~
+2 errors generated.
+
+$ bash Tests/verify-group-search.sh [prior completed attempt 1]
+exit_code=1
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupSearchTests.m:175:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.4BjgOQ/SearchBodies.h:83:14: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+   83 |     if (self.usesNativeSessionModel) { [self refreshNativeSessionModel]; return; }
+      |              ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-search.4BjgOQ/SearchBodies.h:83:46: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'
+   83 |     if (self.usesNativeSessionModel) { [self refreshNativeSessionModel]; return; }
+      |                                         ~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~
+2 errors generated.
+
+$ bash Tests/verify-privacy-admission-cache.sh [prior completed attempt 1]
+exit_code=1
+PROVENANCE {"boundaries": "UIKit table/cells and native source are host doubles; real policy, runtime expiry, projection, safe numeric reader, and index scopes compile unchanged.", "head": "189054633f7fb813ac3b03f7110f482ecaad9ffe", "methods": {"- (void)invalidateNativeSnapshot": "74b4c43a45a46fd6b5e14c0f362a873f0b6e698398d097f2c0ab3e2768de6ff8", "- (void)performSessionListLayout:": "7359de6ea427617f992ed7cee89f74c9c9a43ec46b578a224338ef067cfe4de6"}, "source_sha256": {"Controllers/CSCloseFriendListShield.m": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b", "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1", "Controllers/CSCloseFriendRuntime.m": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829", "Controllers/CSGroupIndexScope.m": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780", "Controllers/CSGroupListAdapter.m": "ee117de02fd6c43db87a30f12e9f293249368418bdc68c5d0c85e8d6b6589c14", "Controllers/CSGroupNativeBridge.m": "0f0437a221c59099e8b28ad089eb4d6f6c61ef5e4971349b6fcc802f841b7ed2", "Controllers/CSGroupProjection.m": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a"}}
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/PrivacyAdmissionCacheTests.m:69:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission.leBIYl/AdmissionProductionBody.h:2:14: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+    2 |     if (self.usesNativeSessionModel) {
+      |              ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission.leBIYl/AdmissionProductionBody.h:3:9: error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'
+    3 |         CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission.leBIYl/AdmissionProductionBody.h:3:42: error: use of undeclared identifier 'coordinator'
+    3 |         CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
+      |                                          ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission.leBIYl/AdmissionProductionBody.h:3:55: error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'
+    3 |         CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission.leBIYl/AdmissionProductionBody.h:4:13: error: use of undeclared identifier 'coordinator'
+    4 |         if (coordinator.boundary || self.nativeModelRevision!=coordinator.revision) {
+      |             ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission.leBIYl/AdmissionProductionBody.h:4:42: error: property 'nativeModelRevision' not found on object of type 'CSGroupListAdapter *'
+    4 |         if (coordinator.boundary || self.nativeModelRevision!=coordinator.revision) {
+      |                                          ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission.leBIYl/AdmissionProductionBody.h:4:63: error: use of undeclared identifier 'coordinator'
+    4 |         if (coordinator.boundary || self.nativeModelRevision!=coordinator.revision) {
+      |                                                               ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission.leBIYl/AdmissionProductionBody.h:8:38: error: use of undeclared identifier 'coordinator'
+    8 |             if (!self.publishing && !coordinator.boundary) [self requestRefresh];
+      |                                      ^~~~~~~~~~~
+8 errors generated.
+
+$ bash Tests/verify-privacy-admission-cache.sh [prior completed attempt 2]
+exit_code=0
+PROVENANCE {"boundaries": "UIKit table/cells and native source are host doubles; real policy, runtime expiry, projection, safe numeric reader, and index scopes compile unchanged.", "head": "189054633f7fb813ac3b03f7110f482ecaad9ffe", "methods": {"- (void)invalidateNativeSnapshot": "74b4c43a45a46fd6b5e14c0f362a873f0b6e698398d097f2c0ab3e2768de6ff8", "- (void)performSessionListLayout:": "7359de6ea427617f992ed7cee89f74c9c9a43ec46b578a224338ef067cfe4de6"}, "source_sha256": {"Controllers/CSCloseFriendListShield.m": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b", "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1", "Controllers/CSCloseFriendRuntime.m": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829", "Controllers/CSGroupIndexScope.m": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780", "Controllers/CSGroupListAdapter.m": "f8feda48ccbb545cac6bb4bfbf0abddbab3748781d3ad2b51bad6426ad6010de", "Controllers/CSGroupNativeBridge.m": "0f0437a221c59099e8b28ad089eb4d6f6c61ef5e4971349b6fcc802f841b7ed2", "Controllers/CSGroupProjection.m": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a"}}
+ADMISSION {"case":"stable-K25-N32","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":25,"requests":0,"rowHidesQueries":32,"snapshotReads":50}
+ADMISSION {"case":"new-projection-identity","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"new-policy-identity","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"same-policy-mutated-enabled","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"same-policy-mutated-revealed","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"same-policy-mutated-hideSessions","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"unknown-hideSessions-type","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":3,"requests":0,"rowHidesQueries":96,"snapshotReads":6}
+ADMISSION {"case":"blocked-then-ready","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"epoch-then-ready","dirty":true,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"account-then-ready","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"revision-then-ready","dirty":true,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"unknown-projection-revision-then-known","dirty":true,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"retry-then-ready","dirty":true,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"table-identity","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"native-invalidation","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"unsafe-projection","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":32,"snapshotReads":1}
+ADMISSION {"case":"safe-then-unsafe-identity","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":32,"snapshotReads":1}
+ADMISSION {"case":"policy-changed-during-original","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":1,"requests":1,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"real-runtime-expiry","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":52}
+Privacy admission cache: 218 checks, 0 failures
+
+$ bash Tests/verify-privacy-admission-cache-events.sh [prior completed attempt 1]
+exit_code=1
+PROVENANCE {"boundaries": "UIKit table/cells and native source are host doubles; real policy, runtime expiry, projection, safe numeric reader, and index scopes compile unchanged.", "head": "189054633f7fb813ac3b03f7110f482ecaad9ffe", "methods": {"- (void)invalidateNativeSnapshot": "74b4c43a45a46fd6b5e14c0f362a873f0b6e698398d097f2c0ab3e2768de6ff8", "- (void)performSessionListLayout:": "7359de6ea427617f992ed7cee89f74c9c9a43ec46b578a224338ef067cfe4de6"}, "source_sha256": {"Controllers/CSCloseFriendListShield.m": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b", "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1", "Controllers/CSCloseFriendRuntime.m": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829", "Controllers/CSGroupIndexScope.m": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780", "Controllers/CSGroupListAdapter.m": "ee117de02fd6c43db87a30f12e9f293249368418bdc68c5d0c85e8d6b6589c14", "Controllers/CSGroupNativeBridge.m": "0f0437a221c59099e8b28ad089eb4d6f6c61ef5e4971349b6fcc802f841b7ed2", "Controllers/CSGroupProjection.m": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a"}}
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/PrivacyAdmissionCacheAdditionalTests.m:3:
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/PrivacyAdmissionCacheTests.m:69:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission-events.ABWvkI/AdmissionProductionBody.h:2:14: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+    2 |     if (self.usesNativeSessionModel) {
+      |              ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission-events.ABWvkI/AdmissionProductionBody.h:3:9: error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'
+    3 |         CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission-events.ABWvkI/AdmissionProductionBody.h:3:42: error: use of undeclared identifier 'coordinator'
+    3 |         CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
+      |                                          ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission-events.ABWvkI/AdmissionProductionBody.h:3:55: error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'
+    3 |         CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission-events.ABWvkI/AdmissionProductionBody.h:4:13: error: use of undeclared identifier 'coordinator'
+    4 |         if (coordinator.boundary || self.nativeModelRevision!=coordinator.revision) {
+      |             ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission-events.ABWvkI/AdmissionProductionBody.h:4:42: error: property 'nativeModelRevision' not found on object of type 'CSGroupListAdapter *'
+    4 |         if (coordinator.boundary || self.nativeModelRevision!=coordinator.revision) {
+      |                                          ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission-events.ABWvkI/AdmissionProductionBody.h:4:63: error: use of undeclared identifier 'coordinator'
+    4 |         if (coordinator.boundary || self.nativeModelRevision!=coordinator.revision) {
+      |                                                               ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-privacy-admission-events.ABWvkI/AdmissionProductionBody.h:8:38: error: use of undeclared identifier 'coordinator'
+    8 |             if (!self.publishing && !coordinator.boundary) [self requestRefresh];
+      |                                      ^~~~~~~~~~~
+8 errors generated.
+
+$ bash Tests/verify-privacy-admission-cache-events.sh [prior completed attempt 2]
+exit_code=0
+PROVENANCE {"boundaries": "UIKit table/cells and native source are host doubles; real policy, runtime expiry, projection, safe numeric reader, and index scopes compile unchanged.", "head": "189054633f7fb813ac3b03f7110f482ecaad9ffe", "methods": {"- (void)invalidateNativeSnapshot": "74b4c43a45a46fd6b5e14c0f362a873f0b6e698398d097f2c0ab3e2768de6ff8", "- (void)performSessionListLayout:": "7359de6ea427617f992ed7cee89f74c9c9a43ec46b578a224338ef067cfe4de6"}, "source_sha256": {"Controllers/CSCloseFriendListShield.m": "ac8c6469a4521a6bc12d09be70c5fdd01339f079fb83095a79afd142132f9f7b", "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1", "Controllers/CSCloseFriendRuntime.m": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829", "Controllers/CSGroupIndexScope.m": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780", "Controllers/CSGroupListAdapter.m": "f8feda48ccbb545cac6bb4bfbf0abddbab3748781d3ad2b51bad6426ad6010de", "Controllers/CSGroupNativeBridge.m": "0f0437a221c59099e8b28ad089eb4d6f6c61ef5e4971349b6fcc802f841b7ed2", "Controllers/CSGroupProjection.m": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a"}}
+ADMISSION {"case":"reentry-projection","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-table","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-native-invalidation","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-enabled","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-revision-readable","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-retry","dirty":false,"held":false,"hiddenCells":0,"originalLayouts":1,"requests":0,"rowHidesQueries":32,"snapshotReads":2}
+ADMISSION {"case":"reentry-unsafe-projection","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":32,"snapshotReads":3}
+ADMISSION {"case":"runtime-add-friend","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":3}
+ADMISSION {"case":"runtime-remove-friend","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":3}
+ADMISSION {"case":"runtime-add-group","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":3}
+ADMISSION {"case":"runtime-remove-group","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":3}
+ADMISSION {"case":"runtime-manual-lock","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":3}
+ADMISSION {"case":"runtime-other-surface-option","dirty":true,"held":true,"hiddenCells":3,"originalLayouts":0,"requests":1,"rowHidesQueries":0,"snapshotReads":3}
+Privacy admission events/reentry: 115 checks, 0 failures
+
+$ bash Tests/verify-close-friend-session.sh [prior completed attempt 1]
+exit_code=1
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/CloseFriendSessionTests.m:237:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:71:7: error: unexpected '@' in program
+   71 |     } @finally {
+      |       ^
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/CloseFriendSessionTests.m:236:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/SessionBodies.h:74:14: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+   74 |     if (self.usesNativeSessionModel) return [path isEqual:displayPath] ? displayPath : nil;
+      |              ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/SessionBodies.h:84:14: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+   84 |     if (self.usesNativeSessionModel) return [self nativePath:nativePath];
+      |              ^
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/CloseFriendSessionTests.m:237:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:3:35: error: property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'
+    3 |         if (!self.searching) self.searchChromeVisible=NO;
+      |                                   ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:4:14: error: redefinition of 'keepsSearchGroup'
+    4 |         BOOL keepsSearchGroup=enabled && self.searching && self.searchChromeVisible && !self.nativePresentation;
+      |              ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:1:95: note: previous definition is here
+    1 | - (NSDictionary *)foldedSelectionFixture:(NSArray *)tabs selected:(NSString *)selected { BOOL keepsSearchGroup=NO; BOOL enabled=Option(@"enabled");
+      |                                                                                               ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:4:65: error: property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'
+    4 |         BOOL keepsSearchGroup=enabled && self.searching && self.searchChromeVisible && !self.nativePresentation;
+      |                                                                 ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:5:9: error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'
+    5 |         CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:5:42: error: use of undeclared identifier 'coordinator'
+    5 |         CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
+      |                                          ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:5:55: error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'
+    5 |         CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:6:9: error: use of undeclared identifier 'coordinator'
+    6 |         coordinator.nativePresentation=self.nativePresentation || (self.searching && !keepsSearchGroup);
+      |         ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:7:10: error: use of undeclared identifier 'coordinator'
+    7 |         [coordinator setMainController:self.controller];
+      |          ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:8:10: error: use of undeclared identifier 'coordinator'
+    8 |         [coordinator refreshFromPreferences];
+      |          ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:9:9: error: use of undeclared identifier 'CSGroupNativeModelResult'
+    9 |         CSGroupNativeModelResult *model=coordinator.model;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:9:35: error: use of undeclared identifier 'model'
+    9 |         CSGroupNativeModelResult *model=coordinator.model;
+      |                                   ^~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:9:41: error: use of undeclared identifier 'coordinator'
+    9 |         CSGroupNativeModelResult *model=coordinator.model;
+      |                                         ^~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:11:18: error: redefinition of 'tabs'
+   11 |         NSArray *tabs=self.preferences.tabs ?: @[];
+      |                  ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:1:53: note: previous definition is here
+    1 | - (NSDictionary *)foldedSelectionFixture:(NSArray *)tabs selected:(NSString *)selected { BOOL keepsSearchGroup=NO; BOOL enabled=Option(@"enabled");
+      |                                                     ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:11:40: error: property 'tabs' not found on object of type 'Preferences *'
+   11 |         NSArray *tabs=self.preferences.tabs ?: @[];
+      |                                        ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:12:19: error: redefinition of 'selected'
+   12 |         NSString *selected=model.selectedTabID ?: self.preferences.selectedTabID ?: @"preset_0";
+      |                   ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:1:79: note: previous definition is here
+    1 | - (NSDictionary *)foldedSelectionFixture:(NSArray *)tabs selected:(NSString *)selected { BOOL keepsSearchGroup=NO; BOOL enabled=Option(@"enabled");
+      |                                                                               ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-close-friend-session.IPOVZE/FoldedSelectionBody.h:12:28: error: use of undeclared identifier 'model'
+   12 |         NSString *selected=model.selectedTabID ?: self.preferences.selectedTabID ?: @"preset_0";
+      |                            ^~~~~
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+
+$ bash Tests/verify-close-friend-session.sh [prior completed attempt 2]
+exit_code=0
+Folded native path reads (120 moved rows): legacy=7380 indexed=360
+Close-friend sessions: 174 checks, 0 failures
+Folded layouts (12): native fallback quote/remove=12/12 stable reuse quote/remove=0/0
+Close-friend session presentation: 55 checks, 0 failures
+
+$ bash Tests/verify-close-friend-alerts.sh [prior completed attempt 1]
+exit_code=1
+In file included from Tests/CloseFriendAlertTests.m:97:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.8N9qDGUJf6/AlertBadgeBody.h:9:36: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+    9 |         BOOL currentSource=adapter.usesNativeSessionModel ?
+      |                                    ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.8N9qDGUJf6/AlertBadgeBody.h:10:22: error: property 'tabBadgeSections' not found on object of type 'CSGroupListAdapter *'
+   10 |             (adapter.tabBadgeSections && adapter.tabBadgeRevision==adapter.modelRevision && adapter.tabBadgeEpoch==epoch &&
+      |                      ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.8N9qDGUJf6/AlertBadgeBody.h:10:50: error: property 'tabBadgeRevision' not found on object of type 'CSGroupListAdapter *'
+   10 |             (adapter.tabBadgeSections && adapter.tabBadgeRevision==adapter.modelRevision && adapter.tabBadgeEpoch==epoch &&
+      |                                                  ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.8N9qDGUJf6/AlertBadgeBody.h:10:101: error: property 'tabBadgeEpoch' not found on object of type 'CSGroupListAdapter *'
+   10 |             (adapter.tabBadgeSections && adapter.tabBadgeRevision==adapter.modelRevision && adapter.tabBadgeEpoch==epoch &&
+      |                                                                                                     ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.8N9qDGUJf6/AlertBadgeBody.h:11:23: error: property 'tabBadgeAccount' not found on object of type 'CSGroupListAdapter *'
+   11 |              [adapter.tabBadgeAccount isEqual:policy.accountID]) :
+      |                       ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.8N9qDGUJf6/AlertBadgeBody.h:25:92: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+   25 |         CSGroupProjection *projection=[[CSGroupProjection alloc] initWithSections:(adapter.usesNativeSessionModel ? adapter.tabBadgeSections : adapter.cachedNativeSections) tabs:@[all] selectedTabID:all.tabId
+      |                                                                                            ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.8N9qDGUJf6/AlertBadgeBody.h:25:125: error: property 'tabBadgeSections' not found on object of type 'CSGroupListAdapter *'
+   25 |         CSGroupProjection *projection=[[CSGroupProjection alloc] initWithSections:(adapter.usesNativeSessionModel ? adapter.tabBadgeSections : adapter.cachedNativeSections) tabs:@[all] selectedTabID:all.tabId
+      |                                                                                                                             ^
+7 errors generated.
+
+$ bash Tests/verify-close-friend-alerts.sh [prior completed attempt 2]
+exit_code=1
+Close-friend alerts: 250 focused checks passed (identity, calls, reply, badge, payment policy)
+In file included from Tests/CloseFriendTabBadgeTests.m:52:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.2zha2HHlEJ/TabBadgeGetter.inc:37:64: error: property 'tabBadgeScheduleKey' not found on object of type 'CSGroupListAdapter *'
+   37 |                 (!adapter.tabBadgeSourceScheduled || ![adapter.tabBadgeScheduleKey isEqual:scheduleKey])))
+      |                                                                ^
+1 error generated.
+
+$ bash Tests/verify-close-friend-alerts.sh [prior completed attempt 3]
+exit_code=0
+Close-friend alerts: 250 focused checks passed (identity, calls, reply, badge, payment policy)
+Close-friend tab badge: 902 focused checks passed (passthrough, reveal, pending, dot, boundary, publication, scoped bypass; host only)
+
+
+FINAL AFFECTED-SUITE FOLLOW-UP
+{
+  "recorded_at": "2026-11-02T17:04:15.188558+08:00",
+  "reason": "Final production setPresentationSuspended clears temporary nativePresentation only on a native owner transition from suspended to visible with no pending native action. Only the affected lifecycle suite was rerun; all earlier green commands were reused.",
+  "checks_before": 191,
+  "checks_after": 195,
+  "added_assertions": [
+    "Native owner resumes saved group without changing preferences.",
+    "Queued native navigation keeps the temporary native presentation.",
+    "Repeated visible callback does not clear active native presentation.",
+    "Retained projection owner preserves its earlier presentation semantics."
+  ],
+  "changed_source_sha256": {
+    "Controllers/CSGroupListAdapter.m": "f2268d772abe6ce07672fe70b10d1379ef889fe5bcb85409df72deb64eb3bbcd",
+    "Tests/GroupLifecycleTests.m": "0d20b29eb07475ffcc1808f9ce8e97d136b1a6085a16b48433c8b0d2b9d5544e",
+    "Controllers/CSGroupNativeSessionCoordinator.m": "edac59ff6b7349014529ed87b5dcbb57730b7dd0f29ecd4973c791bb76d0c1c1",
+    "Hooks/NativeSessionGroupHooks.xm": "1a8d1fb30a5a7ed02ce634f13f648fb55835bc10a3a77c11794b19ce0772c7d0"
+  }
+}
+$ bash Tests/verify-group-lifecycle.sh
+exit_code=0
+Hidden native event publications: 0 / 20 events
+Group lifecycle: 195 checks, 0 failures
+Final aggregate: 25 commands, 4858 checks, 0 failures; 5 additional proxy scenarios. Only lifecycle rerun; prior green results reused.

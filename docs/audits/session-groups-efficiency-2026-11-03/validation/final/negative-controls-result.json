@@ -1,0 +1,45 @@
+{
+  "source_unchanged_during_controls": true,
+  "production_source_sha256": {
+    "Controllers/CSGroupNativeModel.h": "320b87d9aadadc4d205c4f076d87987f5e52c761c126d20ac5607b64742f9f35",
+    "Controllers/CSGroupNativeModel.m": "e289ce1d62179ad33a1d9e832a53f44571b6dc0c5894df2117aaaba49458d654",
+    "Controllers/CSGroupNativeSessionCoordinator.h": "bc4e56e2fbaabdf778d54d66fff3021f45fafbe26a7a97cb020bd9ce4ee6cea6",
+    "Controllers/CSGroupNativeSessionCoordinator.m": "49c19b6f25de1dd12b92e3fd1cffdf362ca6bdc33cabcd6c5c81b9e9741cc576",
+    "Controllers/CSGroupListAdapter.h": "ba76d08a15f136be43e9702ecfee1f393c4ea73389ac96bd239c867a3f70f7cc",
+    "Controllers/CSGroupListAdapter.m": "7adeb5b20d02e4c4ed6902cfc8c08eb71ac3cb278e71291d5a56fb71c212a703",
+    "Controllers/CSGroupNativeBridge.h": "0d32a318d0ebcb99669fa72999dd3bfdff6da7ba19eaa3fc759240cd457b255f",
+    "Controllers/CSGroupNativeBridge.m": "ef2af4e1b7286c8a04ced929c6b30ba071bbffc71563b22164fd63d312344881",
+    "Controllers/CSGroupProjection.h": "f7dd860614a5a2747d000951cadbd3f85475064726af1e49e178ea73485a6b16",
+    "Controllers/CSGroupProjection.m": "b4784583afd936fe91aff2cb195afbeb26fb52c3534e1784aeaeaf3d8db58741",
+    "Controllers/WESessionTabItem.h": "03c4a9b62fdff3d3906e2378a408c0f9791f1413215ddf20c41b2a5d3f4b2b01",
+    "Controllers/WESessionTabItem.m": "2cc891a5d00e2090d6efb322aad75015e3fdd60dda9c2055576bf9d77e9a4f62",
+    "Hooks/NativeSessionGroupHooks.xm": "c29c45304c427a717215a25205f5160ea715bcb5812e111c73785fa59627ce00",
+    "Hooks/SessionGroupHooks.xm": "76f42d5d4001da1d80b36de80215e2ea9fed978faa8d92a5aa791b608ec5e3ab"
+  },
+  "runs": [
+    {
+      "name": "forced-full-ui",
+      "environment_override": "WECHAT_VALIDATION_FORCE_FULL_UI=1",
+      "exit_code": 1,
+      "expected_assertion_failed": true,
+      "output": "FAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-efficiency-2026-11-03/validation/CpuRegressionFixture.h:235: (table.reloads==0 && table.rowReloads.count==1 && [table.rowReloads[0] isEqual:Path(0)] && table.layouts==1)\n",
+      "scope": "Only an extracted temporary adapter method body is altered; production is unchanged."
+    },
+    {
+      "name": "old-recovery-reset",
+      "environment_override": "WECHAT_VALIDATION_RESTORE_OLD_RECOVERY_RESET=1",
+      "exit_code": 1,
+      "expected_assertion_failed": true,
+      "output": "Selection equivalence: 32 source/fold/privacy/duplicate/capability cases, 192 group transitions; no native unread getter reads for selection.\nCoordinator selection preset_1: 0 native unread getter reads\nCoordinator selection preset_2: 0 native unread getter reads\nCoordinator selection preset_0: 0 native unread getter reads\nCoordinator selection preset_1: 0 native unread getter reads\nCoordinator selection preset_0: 0 native unread getter reads\nFAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-efficiency-2026-11-03/validation/BlankRegressionFixture.h:228: !failing.publishing && failing.nativeRecoveryAttempts==1 && failing.nativeRecoveryGeneration==recoveryGeneration\n",
+      "scope": "Only an extracted temporary adapter method body is altered; production is unchanged."
+    },
+    {
+      "name": "interaction-mismatch",
+      "environment_override": "WECHAT_VALIDATION_RESTORE_INTERACTION_MISMATCH=1",
+      "exit_code": 1,
+      "expected_assertion_failed": true,
+      "output": "FAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-efficiency-2026-11-03/validation/InteractionSchedulingFixture.h:49: executed==0 && a.scheduledInteraction && a.dirty\n",
+      "scope": "Only an extracted temporary adapter method body is altered; production is unchanged."
+    }
+  ]
+}

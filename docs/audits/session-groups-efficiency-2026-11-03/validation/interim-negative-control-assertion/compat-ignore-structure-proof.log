@@ -1,0 +1,2 @@
+Compatibility source boundary 1: rows=1 unread reads=2
+FAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-efficiency-2026-11-03/validation/CompatibilityPublicationFixture.h:177: all!=nil && (boundary==1 ? CpuUnreadGetterReads>=3 : CpuUnreadGetterReads==3)

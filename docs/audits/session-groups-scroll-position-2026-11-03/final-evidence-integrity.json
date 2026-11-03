@@ -1,0 +1,37 @@
+{
+  "all_checks_passed": true,
+  "current_sources_match_final_evidence_and_shipped_builds": true,
+  "validation_integrity_checks": 227,
+  "core_behavior_assertions": {
+    "native_core": 3382,
+    "unread_panel": 77,
+    "unread_panel_abi": 7,
+    "legacy_core": 392,
+    "independent_interaction": 101,
+    "compatibility_refresh_publication": 93
+  },
+  "core_behavior_total": 4052,
+  "scroll_position_assertions": 199,
+  "total_distinct_behavior_assertions": 4251,
+  "negative_controls_caught": 16,
+  "runtime_optional_hook_assertions": 69,
+  "runtime_cases": 7,
+  "sdk_syntax_checks": 4,
+  "ui_checks_inherited_not_rerun": 135,
+  "prior_dead_top_contracts_removed": 3,
+  "prior_dead_top_contracts_reason": "Native, compatibility and legacy publishers each lost one assertion for the removed unreachable custom-top state; safety checks remain.",
+  "final_packages_verified": 2,
+  "removed_observation_files": [
+    "Controllers/CSGroupPerformanceObservation.h",
+    "Controllers/CSGroupPerformanceObservation.m",
+    "Hooks/SessionGroupPerformanceObservation.xm"
+  ],
+  "tracked_deletions_preserved": 6892,
+  "prior_audits_preserved": {
+    "session-groups-instruments-2026-11-03": 2075,
+    "session-groups-instruments-2.2-9-2026-11-03": 1616,
+    "session-groups-efficiency-2026-11-03": 596
+  },
+  "device_installed": false,
+  "device_performance_measurement": false
+}

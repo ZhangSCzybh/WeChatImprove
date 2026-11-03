@@ -1,0 +1,37 @@
+[
+  {
+    "suite": "verify-group-preferences.sh",
+    "fixture_origin": "git 863bfdb350fddf678c349574d99badb241d98958:Tests (temporary export)",
+    "production_origin": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+    "exit_code": 0,
+    "output": "Group preferences: 23 checks, 0 failures"
+  },
+  {
+    "suite": "verify-group-incremental.sh",
+    "fixture_origin": "git 863bfdb350fddf678c349574d99badb241d98958:Tests (temporary export)",
+    "production_origin": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+    "exit_code": 0,
+    "output": "Group incremental: 180 checks, 0 failures"
+  },
+  {
+    "suite": "verify-group-badges.sh",
+    "fixture_origin": "git 863bfdb350fddf678c349574d99badb241d98958:Tests (temporary export)",
+    "production_origin": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+    "exit_code": 1,
+    "output": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:92:25: error: call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]\n   92 |         NSArray *before=CSGroupBuildNativeSections(p.controller,p,p.controller);\n      |                         ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:92:25: note: did you mean 'CSGroupBuildNativeSectionsReusing'?\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Controllers/CSGroupNativeBridge.h:25:64: note: 'CSGroupBuildNativeSectionsReusing' declared here\n   25 | FOUNDATION_EXPORT NSArray<NSArray<CSGroupRow *> *> * _Nullable CSGroupBuildNativeSectionsReusing(id controller, id table, id source, NSArray<NSArray<CSGroupRow *> *> * _Nullable previous);\n      |                                                                ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:92:25: error: implicit conversion of 'int' to 'NSArray *' is disallowed with ARC\n   92 |         NSArray *before=CSGroupBuildNativeSections(p.controller,p,p.controller);\n      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:92:18: error: incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]\n   92 |         NSArray *before=CSGroupBuildNativeSections(p.controller,p,p.controller);\n      |                  ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:159:23: error: call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]\n  159 |     NSArray *sections=CSGroupBuildNativeSections(p.controller,p,p.controller);\n      |                       ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:159:23: error: implicit conversion of 'int' to 'NSArray *' is disallowed with ARC\n  159 |     NSArray *sections=CSGroupBuildNativeSections(p.controller,p,p.controller);\n      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-legacy-core-wxkpmjo3/Tests/GroupBadgeTests.m:159:14: error: incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]\n  159 |     NSArray *sections=CSGroupBuildNativeSections(p.controller,p,p.controller);\n      |              ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n6 errors generated."
+  },
+  {
+    "suite": "verify-group-appearance.sh",
+    "fixture_origin": "git 863bfdb350fddf678c349574d99badb241d98958:Tests (temporary export)",
+    "production_origin": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+    "exit_code": 0,
+    "output": "Group appearance: 8 checks, 0 failures"
+  },
+  {
+    "suite": "verify-group-header.sh",
+    "fixture_origin": "git 863bfdb350fddf678c349574d99badb241d98958:Tests (temporary export)",
+    "production_origin": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+    "exit_code": 0,
+    "output": "Group header semantics: 46 checks, 0 failures"
+  }
+]

@@ -1,0 +1,177 @@
+{
+  "status": "final_review_passed",
+  "comparison_source": {
+    "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/comparison/version-comparison.json",
+    "sha256": "7215af5b4d55beb9d87a8019f90f213279eb08c514f08ae3176dfcf793844271"
+  },
+  "primary_summary_sources": [
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/idle-confirmed/summary.json",
+      "sha256": "b0cabc6c971d1abcb794baf2b1afeb676ee4503f824017ec68cafe1cb17974fc"
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/messages/summary.json",
+      "sha256": "8603c5ab13656f07abdaf6f01058afc1e185aaf73a0f14fab4db889ee136ad3a"
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/scroll/summary.json",
+      "sha256": "5f19c4fc0c17199b07587916778767f686f12f9720cd1a3ff8e563e03a430e03"
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/switch/summary.json",
+      "sha256": "fd13044e8c02f0f2b0f6530b83be9f5f2858f52fc46c21310afdf22aa962853c"
+    }
+  ],
+  "auxiliary_sources": [
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/review/messages-time-segments.json",
+      "sha256": "8801b7336cb82fac8a85d21d5bad5b00accafe609de1a84ec662ba92aa9eca93"
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/review/messages-active-sensitivity-independent.json",
+      "sha256": "bf5676ff1baf7d90842a67ac411e95c10531640d32c755c94e664a0825cdea19"
+    }
+  ],
+  "check_count": 78,
+  "checks": [
+    "all four final scenes analyzed; no pending values",
+    "all four whole-WeChat CPU comparisons verified",
+    "all four target frame metrics remain unavailable",
+    "all four current frame metrics explicitly device scope",
+    "static/switch frame comparisons device-only and same scope",
+    "message/scroll frame comparisons prohibited across SINGLE vs ALL",
+    "idle final summary hash",
+    "idle final capture hash",
+    "idle final validity hash",
+    "idle confirmed eligible action scenario",
+    "idle ModelFull remains missing rather than validated zero",
+    "idle ModelDelta remains missing rather than validated zero",
+    "idle ModelSelection remains missing rather than validated zero",
+    "idle CoordinatorApply remains missing rather than validated zero",
+    "idle AdapterRefreshAttempt remains missing rather than validated zero",
+    "idle AdapterPublication remains missing rather than validated zero",
+    "idle MainTableReloadData remains missing rather than validated zero",
+    "idle MainTableReloadRows remains missing rather than validated zero",
+    "idle target reload coverage unavailable",
+    "idle old per-round and refresh counts unavailable",
+    "messages final summary hash",
+    "messages final capture hash",
+    "messages final validity hash",
+    "messages confirmed eligible action scenario",
+    "messages ModelFull remains missing rather than validated zero",
+    "messages ModelDelta remains missing rather than validated zero",
+    "messages ModelSelection remains missing rather than validated zero",
+    "messages CoordinatorApply remains missing rather than validated zero",
+    "messages AdapterRefreshAttempt remains missing rather than validated zero",
+    "messages AdapterPublication remains missing rather than validated zero",
+    "messages MainTableReloadData remains missing rather than validated zero",
+    "messages MainTableReloadRows remains missing rather than validated zero",
+    "messages target reload coverage unavailable",
+    "messages old per-round and refresh counts unavailable",
+    "scroll final summary hash",
+    "scroll final capture hash",
+    "scroll final validity hash",
+    "scroll confirmed eligible action scenario",
+    "scroll ModelFull remains missing rather than validated zero",
+    "scroll ModelDelta remains missing rather than validated zero",
+    "scroll ModelSelection remains missing rather than validated zero",
+    "scroll CoordinatorApply remains missing rather than validated zero",
+    "scroll AdapterRefreshAttempt remains missing rather than validated zero",
+    "scroll AdapterPublication remains missing rather than validated zero",
+    "scroll MainTableReloadData remains missing rather than validated zero",
+    "scroll MainTableReloadRows remains missing rather than validated zero",
+    "scroll target reload coverage unavailable",
+    "scroll old per-round and refresh counts unavailable",
+    "switch final summary hash",
+    "switch final capture hash",
+    "switch final validity hash",
+    "switch confirmed eligible action scenario",
+    "switch ModelFull remains missing rather than validated zero",
+    "switch ModelDelta remains missing rather than validated zero",
+    "switch ModelSelection remains missing rather than validated zero",
+    "switch CoordinatorApply remains missing rather than validated zero",
+    "switch AdapterRefreshAttempt remains missing rather than validated zero",
+    "switch AdapterPublication remains missing rather than validated zero",
+    "switch MainTableReloadData remains missing rather than validated zero",
+    "switch MainTableReloadRows remains missing rather than validated zero",
+    "switch target reload coverage unavailable",
+    "switch old per-round and refresh counts unavailable",
+    "messages mean lower while P95 higher",
+    "scroll mean lower while P95 higher",
+    "idle mean and P95 higher",
+    "switch mean and P95 higher",
+    "switch sample peak lower without asserting overall improvement",
+    "message three segments exactly reconstruct unchanged primary mean",
+    "message active sensitivity stays post-hoc [25,55), not primary",
+    "frozen old source /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/scenario-comparison.json",
+    "frozen old source /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/idle/summary.json",
+    "frozen old source /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/idle/capture-result.json",
+    "frozen old source /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/messages/summary.json",
+    "frozen old source /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/messages/capture-result.json",
+    "frozen old source /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/scroll/summary.json",
+    "frozen old source /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/scroll/capture-result.json",
+    "frozen old source /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/switch-system/summary.json",
+    "frozen old source /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/switch-system/capture-result.json"
+  ],
+  "findings": [
+    {
+      "id": "overall",
+      "finding": "不能根据本次采样认定2.2-9正式版获得净性能改善。消息和滚动均值下降，但高负载P95更高；静置和切组均值/P95更高。",
+      "scope": "Descriptive whole WeChat process, not causal or plugin-only"
+    },
+    {
+      "id": "idle_render",
+      "finding": "用户确认未触屏的静置窗口仍约59.825次/秒CA提交，旧静置为0.05次/秒。消息尾段约59.733次/秒。持续提交来源值得定位；不能将其当作分组刷新或已经测得能耗。",
+      "new_idle_ca_per_second": 59.825,
+      "old_idle_ca_per_second": 0.05,
+      "new_message_tail_ca_per_second": 59.733333333333334
+    },
+    {
+      "id": "messages_tail",
+      "finding": "消息主窗均值对末15秒低负载敏感，保留25-70主窗；25-55事后敏感性只作辅助，不替代主分析，也不能据探针静默反推消息计数。",
+      "primary_window_seconds": [
+        25,
+        70
+      ],
+      "primary_cpu_mean_percent": 17.452545409899955,
+      "posthoc_sensitivity_window_seconds": [
+        25,
+        55
+      ],
+      "posthoc_sensitivity_cpu_mean_percent": 24.300047084728675,
+      "tail_window_seconds": [
+        55,
+        70
+      ],
+      "tail_cpu_mean_percent": 3.75754206024252,
+      "weighted_reconstructed_main_cpu_percent": 17.452545409899958
+    },
+    {
+      "id": "frames",
+      "finding": "新四景均为ALL设备显示；只有旧静置/切组同范围可描述比较。消息/滚动不能计算微信hitch改善。切组设备hitch87/3229变115/3364，但没有插件归因。"
+    },
+    {
+      "id": "missing_native",
+      "finding": "四景均未取得模型、协调器、实际发布、主表目标验证或reload链探针。模型每轮耗时和精确主表刷新次数仍未取得，不能把not_observed解释成0。已捕获TabRecordsUpdateAttempt/TabLayout是分组栏操作，不是模型计算。"
+    },
+    {
+      "id": "thermal_probe_input",
+      "finding": "旧切组主窗65.87%处于Fair，新切组45秒全Nominal；人工动作和消息节奏没有严格同负载计数，且新版是观测构建而旧版不是。Fair不证明降频，不能扣除未知探针开销或作因果收益估计。"
+    }
+  ],
+  "recommended_next_steps": [
+    "先定位未触屏仍接近60次/秒的持续CA提交来源，并复核实际运行的兼容/原生分组路径。",
+    "将低成本探针补到真机实际走到的模型/发布路径，验证目标主表与reload覆盖；缺失探针不能借用Tab耗时替代。",
+    "在相同消息速率、动作节奏、数据和热状态下重复2.2-8/2.2-9正式版/观测版对照，才能估计净收益及探针开销。"
+  ],
+  "interpretation_limits": [
+    "CPU 是目标微信整个进程；100% 表示一个核心满负荷。差异是本次采集的描述性变化，不能归因于插件。",
+    "2.2-9+observe 含额外 signpost 探针，2.2-8 没有；未取得同负载探针开销对照，不能当成正式版净收益。",
+    "人工消息节奏、滚动与切组速度、会话数据和缓存状态并非严格相同。单次顺序采集不支持因果或显著性结论。",
+    "2.2-8 切组窗口含 65.87% Fair 热状态；其余三景为 Nominal。Fair 不等同于已证明降频。",
+    "CA 提交是渲染事务，不能代替模型轮数、分组刷新、reloadData 或 reloadRows 次数。",
+    "hitch 是错过呈现截止时间的帧生命周期；占比按已分类记录计算，不能反推精确掉帧数或真实应用 FPS。",
+    "2.2-8 静置和切组为设备显示范围 ALL，收消息和滚动为已核对目标微信范围 SINGLE；归属不同的两次帧数据不计算差异。",
+    "2.2-8 没有分组轮次和刷新 signpost，相关指标只能报告 2.2-9 实测，旧值未取得，不能填零或计算改善比例。"
+  ]
+}

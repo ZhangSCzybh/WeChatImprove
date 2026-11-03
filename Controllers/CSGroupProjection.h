@@ -126,6 +126,21 @@ typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
 /// Attach the verified native digest to the latest visible session without recomputing
 /// membership, maps or counts. Rejects any change to the candidate's source metadata.
 - (nullable CSGroupProjection *)projectionByAttachingNativeSummaryRow:(CSGroupRow *)row;
+/// Update copied values only. The caller must have proved that the account,
+/// definitions, privacy, source order and folded-child snapshot are unchanged.
+/// Rejects identity/classification/top changes, special rows and unsafe badge
+/// arithmetic; nil asks the caller to take the complete validated build path.
+- (nullable CSGroupProjection *)projectionByReplacingRows:(NSDictionary<NSIndexPath *, CSGroupRow *> *)rows;
+/// Select from this projection's immutable source and membership cache. Account,
+/// definitions, privacy and folded scope remain unchanged. Scoped projections
+/// require the same folded source, selected for the requested tab; discarded or
+/// presentation-only computation caches return nil for the complete build path.
+- (nullable CSGroupProjection *)projectionBySelectingTabID:(NSString *)selectedTabID
+                                        foldedProjection:(nullable CSGroupProjection *)foldedProjection;
+/// Reuse this projection's membership and badges for an already verified host
+/// layout. Every supplied row must be the exact visible immutable row from this
+/// projection, consumed once; coordinates are replaced with host section/row.
+- (nullable CSGroupProjection *)projectionByRemappingVisibleRows:(NSArray<NSArray<CSGroupRow *> *> *)sections;
 - (BOOL)hasSameDisplayStructureAs:(nullable CSGroupProjection *)other;
 - (NSArray<NSIndexPath *> *)changedUnreadPathsFrom:(CSGroupProjection *)other;
 /// Release full-list computation caches when the list is not being presented.

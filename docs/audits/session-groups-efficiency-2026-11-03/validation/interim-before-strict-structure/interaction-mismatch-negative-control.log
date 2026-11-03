@@ -1,0 +1,1 @@
+FAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-efficiency-2026-11-03/validation/InteractionSchedulingFixture.h:49: executed==0 && a.scheduledInteraction && a.dirty

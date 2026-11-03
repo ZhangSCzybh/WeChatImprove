@@ -1,0 +1,18 @@
+{
+  "started_utc": "2026-11-03T06:00:52.925506+00:00",
+  "concurrency_limitation": "Only matching build/benchmark executables are recorded. Other desktop/OS processes remain uncontrolled.",
+  "matching_processes_before": [],
+  "finished_utc": "2026-11-03T06:01:09.283102+00:00",
+  "matching_processes_after": [
+    {
+      "pid": 22571,
+      "cpu_percent": 0.0,
+      "executable": "clang"
+    },
+    {
+      "pid": 22598,
+      "cpu_percent": 53.2,
+      "executable": "clang"
+    }
+  ]
+}

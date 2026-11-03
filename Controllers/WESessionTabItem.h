@@ -22,6 +22,5 @@ typedef NS_ENUM(NSInteger, WETabType) {
 + (instancetype)customTabWithName:(NSString *)name sessionUserNames:(NSArray<NSString *> *)userNames;
 
 - (NSString *)displayName;
-- (BOOL)isPresetTab;
 
 @end

@@ -47,10 +47,6 @@
     return self.tabName ?: @"";
 }
 
-- (BOOL)isPresetTab {
-    return self.type != WETabTypeCustom;
-}
-
 #pragma mark - NSCoding
 
 - (instancetype)initWithCoder:(NSCoder *)coder {

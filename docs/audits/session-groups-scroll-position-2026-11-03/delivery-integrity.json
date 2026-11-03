@@ -1,0 +1,62 @@
+{
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "device_installed": false,
+  "previous_tracked_deletions_preserved": 6892,
+  "root_tests_remain_deleted": true,
+  "frozen_baseline_files_verified": 379,
+  "prior_audits_preserved": {
+    "session-groups-instruments-2026-11-03": 2075,
+    "session-groups-instruments-2.2-9-2026-11-03": 1616,
+    "session-groups-efficiency-2026-11-03": 596
+  },
+  "production_changes_from_initial_snapshot": [
+    "Controllers/CSGroupListAdapter.h",
+    "Controllers/CSGroupListAdapter.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/SessionGroupHooks.xm",
+    "Makefile",
+    "control"
+  ],
+  "removed_observation_files": [
+    "Controllers/CSGroupPerformanceObservation.h",
+    "Controllers/CSGroupPerformanceObservation.m",
+    "Hooks/SessionGroupPerformanceObservation.xm"
+  ],
+  "obsolete_scroll_to_top_state_absent": true,
+  "observation_source_and_binary_absent": true,
+  "historical_packages_preserved": true,
+  "historical_package_artifacts_checked": 123,
+  "build_source_matches_current_production": true,
+  "frozen_source_transformed": false,
+  "verified_packages": [
+    {
+      "path": "packages/2.2-11-session-groups-scroll-position-final/com.wechat.improve_2.2-11_iphoneos-arm.deb",
+      "sha256": "dc9ec629fe4fd4ad65a7e94e5fec9a824dad102257a4d61c1a91fdd1ee33c03e",
+      "slices": {
+        "arm64": {
+          "removed_code_absent": true,
+          "core_optimization_and_scroll_methods_present": true
+        },
+        "arm64e": {
+          "removed_code_absent": true,
+          "core_optimization_and_scroll_methods_present": true
+        }
+      }
+    },
+    {
+      "path": "packages/2.2-11-session-groups-scroll-position-final/com.wechat.improve_2.2-11_iphoneos-arm64.deb",
+      "sha256": "983d4fffa57110f35c3d3e725700ba5e94948e78d88934130c1f730f0fc4504b",
+      "slices": {
+        "arm64": {
+          "removed_code_absent": true,
+          "core_optimization_and_scroll_methods_present": true
+        },
+        "arm64e": {
+          "removed_code_absent": true,
+          "core_optimization_and_scroll_methods_present": true
+        }
+      }
+    }
+  ]
+}

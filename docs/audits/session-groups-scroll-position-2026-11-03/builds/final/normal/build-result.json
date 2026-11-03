@@ -1,0 +1,96 @@
+{
+  "version": "2.2-11",
+  "observation_removed": true,
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "frozen_source": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-groups-scroll-position-20261103-_312i8km/source",
+  "device_installed": false,
+  "builds": [
+    {
+      "scheme": "rootless",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "SCHEME=rootless",
+        "PACKAGE_VERSION=2.2-11",
+        "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-groups-scroll-position-20261103-_312i8km/rootless/.theos",
+        "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-groups-scroll-position-20261103-_312i8km/rootless",
+        "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-groups-scroll-position-20261103-_312i8km/rootless/packages"
+      ],
+      "exit_code": 0,
+      "seconds": 21.71
+    },
+    {
+      "scheme": "rootful",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "SCHEME=rootful",
+        "PACKAGE_VERSION=2.2-11",
+        "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-groups-scroll-position-20261103-_312i8km/rootful/.theos",
+        "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-groups-scroll-position-20261103-_312i8km/rootful",
+        "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-groups-scroll-position-20261103-_312i8km/rootful/packages"
+      ],
+      "exit_code": 0,
+      "seconds": 21.71
+    }
+  ],
+  "inputs_unchanged": true,
+  "historical_packages_preserved": true,
+  "verified_packages": [
+    {
+      "Package": "com.wechat.improve",
+      "Version": "2.2-11",
+      "Architecture": "iphoneos-arm64",
+      "scheme": "rootless",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "sha256": "983d4fffa57110f35c3d3e725700ba5e94948e78d88934130c1f730f0fc4504b",
+      "dylib_sha256": "27826c37f0ea5349ff80ac08747b4282b1d4e020885eb544800e4f86494a71f3",
+      "dsym_uuids": {
+        "arm64": "D73293D8-D545-322C-B6FE-40E5A46C2BBB",
+        "arm64e": "F7688842-B3B5-373D-A741-40AEBC7845DF"
+      },
+      "observation_markers_absent": true,
+      "signpost_import_absent": true
+    },
+    {
+      "Package": "com.wechat.improve",
+      "Version": "2.2-11",
+      "Architecture": "iphoneos-arm",
+      "scheme": "rootful",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "sha256": "dc9ec629fe4fd4ad65a7e94e5fec9a824dad102257a4d61c1a91fdd1ee33c03e",
+      "dylib_sha256": "e6f08be7940889d62bb60e9f67c368120ab22894ae1daaa52fc163cc40fbbb59",
+      "dsym_uuids": {
+        "arm64": "1420908A-EBC7-3DFA-9F92-3B8C5BF7EEEC",
+        "arm64e": "811EF3F0-2A0A-347F-BBB6-CD9A735511A4"
+      },
+      "observation_markers_absent": true,
+      "signpost_import_absent": true
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "packages/2.2-11-session-groups-scroll-position-final/com.wechat.improve_2.2-11_iphoneos-arm.deb",
+      "sha256": "dc9ec629fe4fd4ad65a7e94e5fec9a824dad102257a4d61c1a91fdd1ee33c03e",
+      "bytes": 1632378
+    },
+    {
+      "path": "packages/2.2-11-session-groups-scroll-position-final/com.wechat.improve_2.2-11_iphoneos-arm64.deb",
+      "sha256": "983d4fffa57110f35c3d3e725700ba5e94948e78d88934130c1f730f0fc4504b",
+      "bytes": 1633986
+    },
+    {
+      "path": "packages/2.2-11-session-groups-scroll-position-final/com.wechat.improve_2.2-11_symbols.zip",
+      "sha256": "56428b1b0030ca885110eaefab84cf214e3cfc9166d51ff9bf32740a0e84fa52",
+      "bytes": 11618100
+    }
+  ]
+}

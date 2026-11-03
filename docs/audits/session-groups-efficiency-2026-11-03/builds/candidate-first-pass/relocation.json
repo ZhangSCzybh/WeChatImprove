@@ -1,0 +1,9 @@
+{
+  "reason": "Review found that real named message hooks carry Content|Structure. Preserve this uninstalled first pass while adding strict structure proof and rebuilding final artifacts.",
+  "original_package_directory": "packages/2.2-10-session-groups-efficiency-final",
+  "preserved_package_directory": "packages/2.2-10-session-groups-efficiency-candidate-before-structure-proof",
+  "original_evidence_directory": "builds/final/normal",
+  "preserved_evidence_directory": "builds/candidate-first-pass/normal",
+  "artifact_bytes_unchanged": true,
+  "device_installed": false
+}

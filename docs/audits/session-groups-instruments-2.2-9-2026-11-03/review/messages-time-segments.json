@@ -1,0 +1,116 @@
+{
+  "purpose": "Sensitivity only; does not replace cue-defined [25,70) primary window. Native probe silence does not prove no incoming messages. Segments do not infer message count.",
+  "segments": [
+    {
+      "window_seconds": [
+        25,
+        40
+      ],
+      "cpu": {
+        "status": "available",
+        "rows": 15,
+        "mean_percent": 29.207858457109857,
+        "p95_percent": 37.799030968,
+        "peak_percent": 37.799030968,
+        "coverage": {
+          "nanoseconds": 15000000000,
+          "seconds": 15.0,
+          "fraction": 1.0,
+          "gaps_seconds": []
+        },
+        "overlap_ns": 0,
+        "rejected_rows": {
+          "missing_time_or_verified_percent": 1
+        },
+        "percent_unit": "100 percent = one fully occupied core; whole process",
+        "raw_counter_crosscheck": {
+          "first_sample_seconds": 25.842071416,
+          "last_sample_seconds": 39.407600666,
+          "wall_seconds": 13.56552925,
+          "cpu_seconds_delta": 3.952876042,
+          "mean_percent": 29.13912143899583,
+          "live_mean_same_counter_span_percent": 29.138843242341764,
+          "live_minus_counter_percentage_points": -0.00027819665406452485,
+          "sample_count": 14,
+          "reset_count": 0
+        }
+      },
+      "CA_commit_count": 804,
+      "CA_commits_per_second": 53.6
+    },
+    {
+      "window_seconds": [
+        40,
+        55
+      ],
+      "cpu": {
+        "status": "available",
+        "rows": 15,
+        "mean_percent": 19.392235712347492,
+        "p95_percent": 31.925876985,
+        "peak_percent": 35.627257998,
+        "coverage": {
+          "nanoseconds": 15000000000,
+          "seconds": 15.0,
+          "fraction": 1.0,
+          "gaps_seconds": []
+        },
+        "overlap_ns": 0,
+        "rejected_rows": {
+          "missing_time_or_verified_percent": 1
+        },
+        "percent_unit": "100 percent = one fully occupied core; whole process",
+        "raw_counter_crosscheck": {
+          "first_sample_seconds": 40.475338875,
+          "last_sample_seconds": 54.040611708,
+          "wall_seconds": 13.565272833,
+          "cpu_seconds_delta": 2.498247792,
+          "mean_percent": 18.416494992438018,
+          "live_mean_same_counter_span_percent": 18.416484729313016,
+          "live_minus_counter_percentage_points": -1.0263125004578152e-05,
+          "sample_count": 14,
+          "reset_count": 0
+        }
+      },
+      "CA_commit_count": 842,
+      "CA_commits_per_second": 56.13333333333333
+    },
+    {
+      "window_seconds": [
+        55,
+        70
+      ],
+      "cpu": {
+        "status": "available",
+        "rows": 16,
+        "mean_percent": 3.75754206024252,
+        "p95_percent": 5.825796904,
+        "peak_percent": 25.145058755,
+        "coverage": {
+          "nanoseconds": 15000000000,
+          "seconds": 15.0,
+          "fraction": 1.0,
+          "gaps_seconds": []
+        },
+        "overlap_ns": 0,
+        "rejected_rows": {
+          "missing_time_or_verified_percent": 1
+        },
+        "percent_unit": "100 percent = one fully occupied core; whole process",
+        "raw_counter_crosscheck": {
+          "first_sample_seconds": 55.102357916,
+          "last_sample_seconds": 69.541365125,
+          "wall_seconds": 14.439007209,
+          "cpu_seconds_delta": 0.525836543,
+          "mean_percent": 3.641777688650505,
+          "live_mean_same_counter_span_percent": 3.6417129614437576,
+          "live_minus_counter_percentage_points": -6.472720674732493e-05,
+          "sample_count": 15,
+          "reset_count": 0
+        }
+      },
+      "CA_commit_count": 896,
+      "CA_commits_per_second": 59.733333333333334
+    }
+  ]
+}

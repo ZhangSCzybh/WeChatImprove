@@ -1,0 +1,12 @@
+{
+  "source_sha256": {
+    "Controllers/CSGroupPerformanceObservation.h": "3b57bbab3e532d8d4692347612f05e61a7b397293c8a845d6b7a566664580b83",
+    "Controllers/CSGroupPerformanceObservation.m": "487a1cbfca17f9b9f4f5de1084b9edfd272c58c6c6ade1ffd382d448ec8f3300",
+    "Hooks/SessionGroupPerformanceObservation.xm": "a6fbc8fa20f7428ba5f75aff307d717ed5ed3c3175cfeb67fe64566a2ec44b4f",
+    "Controllers/CSGroupRefreshState.h": "3435bd06d51be0818ecbebe7dc378a019f4114c2ecd25e530d8c86f8d7b016af"
+  },
+  "exit_code": 0,
+  "output": "PASS 63 observation scope, owner and hint checks",
+  "stderr": "",
+  "scope": "real observation .m scope logic plus unchanged extracted owner gates; deterministic host UIKit identities; no device, capture, timing, or rendering evidence"
+}

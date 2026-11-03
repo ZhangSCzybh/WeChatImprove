@@ -1,0 +1,7 @@
+{
+  "scenario": "scroll",
+  "eligible_for_final_comparison": true,
+  "operator_reply": "两段均按提示完成，切组正常生效",
+  "confirmed_at": "2026-11-03T16:08:31.099675+08:00",
+  "limitations": "Manual action intensity and exact switch count not independently measured. User confirms approximately60s operations and selected/list content changes."
+}

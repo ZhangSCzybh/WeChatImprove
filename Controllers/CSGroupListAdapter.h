@@ -24,6 +24,8 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 @property (nonatomic, weak, readonly) UITableView *table;
 @property (nonatomic, readonly, getter=isActive) BOOL active;
 @property (nonatomic, readonly) BOOL publishing;
+/// Main list uses one native coordinate space; ChatBox retains its own projection.
+@property (nonatomic, readonly) BOOL usesNativeSessionModel;
 @property (nonatomic, readonly) BOOL updatingHeader;
 @property (atomic, readonly) NSUInteger changeDepth;
 + (nullable instancetype)adapterForTable:(id)table;
@@ -31,6 +33,8 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 + (void)attachToController:(id)controller;
 /// Suspend derived UI work while the native main-frame owner is offscreen.
 + (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller;
+/// Restore the departure height after the native appearance/layout finishes.
++ (void)finishPresentationReturnForController:(id)controller;
 + (void)layoutForController:(id)controller;
 /// Validate existing cells before a covering miniapp starts revealing the list.
 + (void)prepareForListVisibility;
@@ -50,7 +54,8 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 + (void)applicationActivityChanged:(NSNotification *)notification;
 + (nullable NSString *)groupTitleForTitleView:(id)titleView;
 + (void)recordNativeTitle:(nullable NSString *)title status:(unsigned int)status forTitleView:(id)titleView;
-- (void)returnToGroupTop;
+/// A real user drag supersedes an older automatic height restoration.
+- (void)beginUserScrolling;
 - (void)endSwipeEditing;
 /// Wake pending work after the host custom menu handles a pan or visibility change.
 - (void)nativeMenuDidChange;
@@ -59,9 +64,13 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 - (void)layout;
 - (void)performSessionListLayout:(void (^)(void))layout;
 - (void)refresh;
+- (void)bindNativeCell:(UITableViewCell *)cell atPath:(NSIndexPath *)path;
 - (void)requestRefresh;
 - (void)beginNativeChange;
 - (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind;
+/// nil means some changed identities are unknown; publication keeps full
+/// metadata validation and broader visible-content refresh for that batch.
+- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind changedUserNames:(nullable NSSet<NSString *> *)names;
 - (void)endNativeChange;
 /// Passive badge-source reads merge 80ms after the latest notification, at most
 /// 250ms from the first; privacy, lifecycle and native restoration stay urgent.

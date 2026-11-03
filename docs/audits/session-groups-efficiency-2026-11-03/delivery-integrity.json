@@ -1,0 +1,101 @@
+{
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "device_installed": false,
+  "previous_tracked_deletions_preserved": 6892,
+  "root_tests_remain_deleted": true,
+  "frozen_baseline_files_verified": 379,
+  "prior_instruments_files_preserved": {
+    "session-groups-instruments-2026-11-03": 2075,
+    "session-groups-instruments-2.2-9-2026-11-03": 1616
+  },
+  "production_changes_from_initial_snapshot": [
+    "Controllers/CSGroupListAdapter.m",
+    "Controllers/CSGroupNativeBridge.h",
+    "Controllers/CSGroupNativeBridge.m",
+    "Controllers/CSGroupPerformanceObservation.h",
+    "Controllers/CSGroupPerformanceObservation.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Controllers/WESessionTabContainerView.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/SessionGroupPerformanceObservation.xm",
+    "control"
+  ],
+  "historical_packages_preserved": true,
+  "build_source_matches_current_production": true,
+  "same_source_for_both_variants": true,
+  "observation_version_only_snapshot_transformations": [
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "control"
+  ],
+  "verified_packages": [
+    {
+      "path": "packages/2.2-10-session-groups-efficiency-final/com.wechat.improve_2.2-10_iphoneos-arm.deb",
+      "sha256": "1a4092c7569a8b89d6b95e68c830e37e97bff1efdb4e2d5ef922b8dab75ef3a9",
+      "observation": false,
+      "slices": {
+        "arm64": {
+          "probe_symbols_match": true,
+          "probe_markers_match": true,
+          "new_optimization_methods_present": true
+        },
+        "arm64e": {
+          "probe_symbols_match": true,
+          "probe_markers_match": true,
+          "new_optimization_methods_present": true
+        }
+      }
+    },
+    {
+      "path": "packages/2.2-10-session-groups-efficiency-final/com.wechat.improve_2.2-10_iphoneos-arm64.deb",
+      "sha256": "1f44f9709d642b96e4ab9eaa44c941258e45d69b45cfbe28f9af5a789b73dbc2",
+      "observation": false,
+      "slices": {
+        "arm64": {
+          "probe_symbols_match": true,
+          "probe_markers_match": true,
+          "new_optimization_methods_present": true
+        },
+        "arm64e": {
+          "probe_symbols_match": true,
+          "probe_markers_match": true,
+          "new_optimization_methods_present": true
+        }
+      }
+    },
+    {
+      "path": "packages/2.2-10-session-groups-efficiency-observe-final/com.wechat.improve_2.2-10+observe_iphoneos-arm.deb",
+      "sha256": "ee29f41c32f0ddf88dd3fa16200973c54b327ccac94508f4281843d9142be20c",
+      "observation": true,
+      "slices": {
+        "arm64": {
+          "probe_symbols_match": true,
+          "probe_markers_match": true,
+          "new_optimization_methods_present": true
+        },
+        "arm64e": {
+          "probe_symbols_match": true,
+          "probe_markers_match": true,
+          "new_optimization_methods_present": true
+        }
+      }
+    },
+    {
+      "path": "packages/2.2-10-session-groups-efficiency-observe-final/com.wechat.improve_2.2-10+observe_iphoneos-arm64.deb",
+      "sha256": "abc419eda3f3c1c90cebe483f695ef088aa60da81548d8c1b45658cef25f7514",
+      "observation": true,
+      "slices": {
+        "arm64": {
+          "probe_symbols_match": true,
+          "probe_markers_match": true,
+          "new_optimization_methods_present": true
+        },
+        "arm64e": {
+          "probe_symbols_match": true,
+          "probe_markers_match": true,
+          "new_optimization_methods_present": true
+        }
+      }
+    }
+  ]
+}

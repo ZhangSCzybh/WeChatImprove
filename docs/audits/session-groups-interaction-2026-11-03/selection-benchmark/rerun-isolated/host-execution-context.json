@@ -1,0 +1,7 @@
+{
+  "started_utc": "2026-11-03T05:57:58.634462+00:00",
+  "concurrency_limitation": "Only matching build/benchmark executables are recorded. Other desktop/OS processes remain uncontrolled.",
+  "matching_processes_before": [],
+  "finished_utc": "2026-11-03T05:58:15.422923+00:00",
+  "matching_processes_after": []
+}

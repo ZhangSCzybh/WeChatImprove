@@ -4,8 +4,10 @@
 #import <substrate.h>
 #import "CSGroupListAdapter.h"
 #import "CSGroupNativeBridge.h"
+#import "CSGroupNativeSessionCoordinator.h"
 #import "CSCloseFriendBridge.h"
 #import "CSCloseFriendSessionPresentation.h"
+#import "CSCloseFriendListShield.h"
 
 @interface NewMainFrameViewController : NSObject @end
 @interface MainFrameTableView : UITableView @end
@@ -38,21 +40,68 @@ static CSGroupListAdapter *Adapter(id owner) {
     if (!a) a=[CSGroupListAdapter adapterForController:CSGroupReadObject(owner,@"m_delegate")];
     return a;
 }
+static BOOL (*MainScrollToTopOriginal)(id,SEL,id);
+static BOOL MainScrollToTop(id owner,SEL selector,id scrollView) {
+    BOOL accepted=MainScrollToTopOriginal ? MainScrollToTopOriginal(owner,selector,scrollView) : YES;
+    if (accepted) [[CSGroupListAdapter adapterForTable:scrollView] beginUserScrolling];
+    return accepted;
+}
+static void InstallMainScrollToTopHook(void) {
+    Class owner=NSClassFromString(@"NewMainFrameViewController");
+    SEL selector=@selector(scrollViewShouldScrollToTop:);
+    // An absent optional delegate method means YES in UIKit. Keep that default
+    // while observing the user's command before its scrolling animation starts.
+    if (class_getInstanceMethod(owner,selector))
+        CSCloseFriendInstallHook(@"NewMainFrameViewController",@"scrollViewShouldScrollToTop:",
+            (IMP)MainScrollToTop,(IMP *)&MainScrollToTopOriginal,"B@:@");
+    else class_addMethod(owner,selector,(IMP)MainScrollToTop,"B@:@");
+}
 static void Native(id owner, BOOL change, void (^body)(void)) {
     CSGroupListAdapter *a=Adapter(owner);
     if (!a.table) { body(); return; }
+    if (a.usesNativeSessionModel) {
+        CSGroupNativeSessionCoordinator *coordinator=CSGroupNativeSessionCoordinator.sharedCoordinator;
+        void (^operation)(void)=^{
+            NSUInteger revision=coordinator.revision;
+            @try { body(); }
+            @finally { if (change && revision==coordinator.revision && !coordinator.boundary) [coordinator invalidateNativeData]; }
+        };
+        if (change) [coordinator performChangeForUserNames:nil kind:CSGroupChangeUnknown original:operation];
+        else operation();
+        return;
+    }
     if (change) [a beginNativeChange];
     @try { CSGroupWithNativeIndices(a.table,body); }
     @finally { if (change) [a endNativeChange]; }
 }
-static void NativeNotification(id owner, CSGroupChangeKind kind, void (^body)(void)) {
+static NSSet *ChangedSessionNames(id value) {
+    if (!NSThread.isMainThread) return nil;
+    id session=CSGroupReadObject(value,@"mainSession") ?: value;
+    id name=[session isKindOfClass:NSString.class] ? session :
+        (CSGroupReadObject(session,@"m_nsUserName") ?: CSGroupReadObject(session,@"sessionId") ?: CSGroupReadObject(session,@"m_nsUsrName"));
+    return [name isKindOfClass:NSString.class] && [name length] ? [NSSet setWithObject:[name copy]] : nil;
+}
+static void NativeNamedNotification(id owner, CSGroupChangeKind kind, id changed, void (^body)(void)) {
     CSGroupListAdapter *a=Adapter(owner);
     if (!a.table) { body(); return; }
-    [a beginNativeChangeOfKind:kind];
+    NSSet *names=ChangedSessionNames(changed);
+    if (a.usesNativeSessionModel) {
+        CSGroupNativeSessionCoordinator *coordinator=CSGroupNativeSessionCoordinator.sharedCoordinator;
+        [coordinator performChangeForUserNames:names kind:kind original:^{
+            NSUInteger revision=coordinator.revision;
+            @try { body(); }
+            @finally { if (revision==coordinator.revision && !coordinator.boundary) [coordinator invalidateNativeData]; }
+        }];
+        return;
+    }
+    [a beginNativeChangeOfKind:kind changedUserNames:names];
     @try { CSGroupWithNativeIndices(a.table,body); }
     @finally { [a endNativeChangeCoalesced:YES]; }
 }
-static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.publishing; }
+static void NativeNotification(id owner, CSGroupChangeKind kind, void (^body)(void)) {
+    NativeNamedNotification(owner,kind,nil,body);
+}
+static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.usesNativeSessionModel && !a.publishing; }
 static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef info) {
     (void)center; (void)observer; (void)name; (void)object; (void)info;
     [CSGroupListAdapter settingsChanged];
@@ -67,7 +116,55 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 - (void)sheetDismissalTransitionWillBegin:(id)controller { [CSGroupListAdapter prepareForListVisibility]; %orig; }
 %end
 
+// Native cells can be created by initView before the main adapter attaches.
+// Keep that initial privacy boundary on the cell until a verified publication.
+static char InitialNativeCellShieldKey;
+static void ReleaseInitialNativeCellShield(UITableViewCell *cell) {
+    [objc_getAssociatedObject(cell,&InitialNativeCellShieldKey) prepareForPublication];
+    objc_setAssociatedObject(cell,&InitialNativeCellShieldKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+static void BindMainNativeCell(id table,UITableViewCell *cell,NSIndexPath *path) {
+    if (!cell) return;
+    ReleaseInitialNativeCellShield(cell);
+    CSGroupListAdapter *adapter=[CSGroupListAdapter adapterForTable:table];
+    if (adapter) { [adapter bindNativeCell:cell atPath:path];return; }
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    if (policy.blocked || ![policy.options[@"hideSessions"] isKindOfClass:NSNumber.class] ||
+        ![policy.accountID isEqual:CSGroupCurrentAccountID()] || [policy concealsSurface:CSCloseFriendSurfaceSession]) {
+        CSCloseFriendListShield *shield=[CSCloseFriendListShield new];[shield shieldCell:cell];
+        objc_setAssociatedObject(cell,&InitialNativeCellShieldKey,shield,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+}
 %hook NewMainFrameViewController
+- (id)tableView:(id)table cellForRowAtIndexPath:(id)path {
+    id cell=%orig;
+    BindMainNativeCell(table,cell,path);
+    return cell;
+}
+- (void)tableView:(id)table willDisplayCell:(id)cell forRowAtIndexPath:(id)path {
+    %orig;
+    BindMainNativeCell(table,cell,path);
+}
+- (void)tableView:(id)table didEndEditingRowAtIndexPath:(id)path {
+    %orig;
+    [[CSGroupListAdapter adapterForTable:table] endSwipeEditing];
+}
+- (void)scrollViewWillBeginDragging:(id)scrollView {
+    [[CSGroupListAdapter adapterForTable:scrollView] beginUserScrolling];
+    %orig;
+}
+- (void)scrollViewDidScrollToTop:(id)scrollView {
+    [[CSGroupListAdapter adapterForTable:scrollView] beginUserScrolling];
+    %orig;
+}
+- (void)scrollViewDidEndDragging:(id)scrollView willDecelerate:(BOOL)decelerate {
+    %orig;
+    if (!decelerate) [[CSGroupListAdapter adapterForTable:scrollView] nativeMenuDidChange];
+}
+- (void)scrollViewDidEndDecelerating:(id)scrollView {
+    %orig;
+    [[CSGroupListAdapter adapterForTable:scrollView] nativeMenuDidChange];
+}
 - (void)viewDidLoad { %orig; [CSGroupListAdapter attachToController:self]; }
 - (void)initView { %orig; [CSGroupListAdapter attachToController:self]; }
 - (void)viewWillAppear:(BOOL)animated {
@@ -79,7 +176,7 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
     [CSGroupListAdapter setPresentationSuspended:NO forController:self];
     Native(self,NO,^{ %orig; });
     [CSGroupListAdapter attachToController:self];
-    [Adapter(self) returnToGroupTop];
+    [CSGroupListAdapter finishPresentationReturnForController:self];
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [CSGroupListAdapter setPresentationSuspended:YES forController:self];
@@ -98,17 +195,17 @@ static void SettingsChanged(CFNotificationCenterRef center, void *observer, CFSt
 - (void)cancelSearch { Native(self,NO,^{ %orig; }); [Adapter(self) refresh]; }
 - (id)previewingContext:(id)context viewControllerForLocation:(CGPoint)point {
     CSGroupListAdapter *a=Adapter(self);
-    if (a.isActive) return nil; // An incidental preview must not change the selected group.
+    if (a.isActive && !a.usesNativeSessionModel) return nil; // An incidental preview must not change the selected group.
     __block id result=nil; Native(self,NO,^{ result=%orig; }); return result;
 }
-- (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,^{ %orig; }); }
-- (void)updateSession:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,^{ %orig; }); }
+- (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap { NativeNamedNotification(self,CSGroupChangeContent|CSGroupChangeStructure,contact,^{ %orig; }); }
+- (void)updateSession:(id)session { NativeNamedNotification(self,CSGroupChangeContent|CSGroupChangeStructure,session,^{ %orig; }); }
 - (void)reloadSessions { Native(self,YES,^{ %orig; }); }
 - (void)updateItem:(id)item { Native(self,YES,^{ %orig; }); }
 - (void)insertSessionCellAtIndexes:(id)paths { Native(self,YES,^{ %orig; }); }
 - (void)deleteSessionCellAtIndexes:(id)paths { Native(self,YES,^{ %orig; }); }
 - (void)onLogicDeleteSessionByUsername:(id)name { Native(self,YES,^{ %orig; }); }
-- (void)logicUpdateSession:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,^{ %orig; }); }
+- (void)logicUpdateSession:(id)session { NativeNamedNotification(self,CSGroupChangeContent|CSGroupChangeStructure,session,^{ %orig; }); }
 - (void)onAuthOK { Native(self,YES,^{ %orig; }); }
 - (void)onLogicHideSession:(id)session { Native(self,YES,^{ %orig; }); }
 - (void)selectCellForName:(id)name {
@@ -209,7 +306,7 @@ static void InstallMenuTouchGate(void) {
 - (void)onSessionRebuildEnd { @try { Native(self,NO,^{ %orig; }); } @finally { [Adapter(self) endNativeChange]; } }
 - (void)onActiveUsrNameChange:(id)oldName curUsrName:(id)newName { Native(self,YES,^{ %orig; }); }
 - (void)onSessionTotalUnreadCountChange:(unsigned int)count { NativeNotification(self,CSGroupChangeUnread,^{ %orig; }); }
-- (void)onSessionChanged:(id)session { NativeNotification(self,CSGroupChangeContent|CSGroupChangeStructure,^{ %orig; }); }
+- (void)onSessionChanged:(id)session { NativeNamedNotification(self,CSGroupChangeContent|CSGroupChangeStructure,session,^{ %orig; }); }
 - (void)onSessionTopStatusChanged:(id)session bTop:(BOOL)top { Native(self,YES,^{ %orig; }); }
 - (void)onMainSessionReload { Native(self,YES,^{ %orig; }); }
 %end
@@ -252,72 +349,72 @@ static void InstallMenuTouchGate(void) {
 }
 - (NSInteger)numberOfRowsInSection:(NSInteger)section {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (a.isActive && CSGroupUsesNativeIndices(self)) return [a nativeRowCount:section];
+    if (!a.usesNativeSessionModel && a.isActive && CSGroupUsesNativeIndices(self)) return [a nativeRowCount:section];
     return %orig;
 }
 - (NSInteger)numberOfSections {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (a.isActive && CSGroupUsesNativeIndices(self)) return [a nativeSectionCount];
+    if (!a.usesNativeSessionModel && a.isActive && CSGroupUsesNativeIndices(self)) return [a nativeSectionCount];
     return %orig;
 }
 - (UITableViewCell *)cellForRowAtIndexPath:(NSIndexPath *)path {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
     NSIndexPath *display=[a displayPath:path];
     if (!display) return nil;
     __block UITableViewCell * result=nil; CSGroupWithDisplayIndices(self, ^{ result=%orig(display); }); return result;
 }
 - (CGRect)rectForRowAtIndexPath:(NSIndexPath *)path {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
     NSIndexPath *display=[a displayPath:path];
     if (!display) return CGRectZero;
     __block CGRect result=CGRectZero; CSGroupWithDisplayIndices(self, ^{ result=%orig(display); }); return result;
 }
 - (void)selectRowAtIndexPath:(NSIndexPath *)path animated:(BOOL)animated scrollPosition:(UITableViewScrollPosition)position {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
     NSIndexPath *display=[a displayPath:path];
     if (!display && path) return; // Ignore native restoration outside the selected group.
     CSGroupWithDisplayIndices(self, ^{ %orig(display, animated, position); });
 }
 - (void)deselectRowAtIndexPath:(NSIndexPath *)path animated:(BOOL)animated {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
     NSIndexPath *display=[a displayPath:path];
     if (!display && path) return;
     CSGroupWithDisplayIndices(self, ^{ %orig(display, animated); });
 }
 - (void)scrollToRowAtIndexPath:(NSIndexPath *)path atScrollPosition:(UITableViewScrollPosition)position animated:(BOOL)animated {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
     NSIndexPath *display=[a displayPath:path];
     if (!display && path) return; // Ignore native restoration outside the selected group.
     CSGroupWithDisplayIndices(self, ^{ %orig(display, position, animated); });
 }
 - (NSIndexPath *)indexPathForCell:(UITableViewCell *)cell {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
     __block NSIndexPath *display=nil; CSGroupWithDisplayIndices(self, ^{ display=%orig(cell); }); return [a nativePath:display];
 }
 - (NSIndexPath *)indexPathForRowAtPoint:(CGPoint)point {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
     __block NSIndexPath *display=nil; CSGroupWithDisplayIndices(self, ^{ display=%orig(point); }); return [a nativePath:display];
 }
 - (NSIndexPath *)indexPathForSelectedRow {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
     __block NSIndexPath *display=nil; CSGroupWithDisplayIndices(self, ^{ display=%orig; }); return [a nativePath:display];
 }
 - (NSArray *)indexPathsForVisibleRows {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
     __block NSArray *paths=nil; CSGroupWithDisplayIndices(self, ^{ paths=%orig; }); return [a nativePaths:paths];
 }
 - (NSArray *)indexPathsForSelectedRows {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
     __block NSArray *paths=nil; CSGroupWithDisplayIndices(self, ^{ paths=%orig; }); return [a nativePaths:paths];
 }
 - (void)reloadData {
@@ -332,7 +429,7 @@ static void InstallMenuTouchGate(void) {
 }
 - (void)endUpdates {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (a.changeDepth && !a.publishing) { [a endNativeChange]; return; } %orig;
+    if (!a.usesNativeSessionModel && a.changeDepth && !a.publishing) { [a endNativeChange]; return; } %orig;
 }
 - (void)performBatchUpdates:(void (^)(void))updates completion:(void (^)(BOOL))completion {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
@@ -390,43 +487,43 @@ static void InstallMenuTouchGate(void) {
 }
 - (NSIndexPath *)indexPathForSelectedRow {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
     __block NSIndexPath *display=nil; CSGroupWithDisplayIndices(self, ^{ display=%orig; }); return [a nativePath:display];
 }
 - (void)selectRowAtIndexPath:(NSIndexPath *)path animated:(BOOL)animated scrollPosition:(UITableViewScrollPosition)position {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
     NSIndexPath *display=[a displayPath:path];
     if (!display && path) return; // Ignore native restoration outside the selected group.
     CSGroupWithDisplayIndices(self, ^{ %orig(display, animated, position); });
 }
 - (void)deselectRowAtIndexPath:(NSIndexPath *)path animated:(BOOL)animated {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self))  { %orig; return; }
     NSIndexPath *display=[a displayPath:path];
     if (!display && path) return;
     CSGroupWithDisplayIndices(self, ^{ %orig(display, animated); });
 }
 - (NSIndexPath *)selectedIndexPath {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self)) return %orig;
     __block NSIndexPath *path=nil; CSGroupWithDisplayIndices(self, ^{ path=%orig; }); return [a nativePath:path];
 }
 - (void)setSelectedIndexPath:(NSIndexPath *)path {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self)) { %orig; return; }
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self)) { %orig; return; }
     NSIndexPath *display=[a displayPath:path];
     CSGroupWithDisplayIndices(self, ^{ %orig(display); });
 }
 - (void)selectRowAtIndexPath:(NSIndexPath *)path cell:(id)cell animated:(BOOL)animated scrollPosition:(NSInteger)position {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self)) { %orig; return; }
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self)) { %orig; return; }
     NSIndexPath *display=[a displayPath:path]; if (!display) return;
     CSGroupWithDisplayIndices(self, ^{ %orig(display,cell,animated,position); });
 }
 - (void)handleSelectAtIndexPath:(NSIndexPath *)path {
     CSGroupListAdapter *a=[CSGroupListAdapter adapterForTable:self];
-    if (!a.isActive || !CSGroupUsesNativeIndices(self)) { %orig; return; }
+    if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self)) { %orig; return; }
     NSIndexPath *display=[a displayPath:path]; if (!display) return;
     CSGroupWithDisplayIndices(self, ^{ %orig(display); });
 }
@@ -451,7 +548,7 @@ static void InstallMenuTouchGate(void) {
 %end
 
 %hook UITableViewCell
-- (void)prepareForReuse { CSCloseFriendUpdateSessionCover(self,nil); %orig; }
+- (void)prepareForReuse { ReleaseInitialNativeCellShield(self); CSCloseFriendUpdateSessionCover(self,nil); %orig; }
 - (void)layoutSubviews { %orig; CSCloseFriendRefreshSessionCover(self); }
 %end
 
@@ -493,7 +590,7 @@ static void FoldedChanged(id owner,SEL selector) {
 }
 static void (*FoldedSessionOriginal)(id,SEL,id);
 static void FoldedSession(id owner,SEL selector,id session) {
-    NativeNotification(owner,CSGroupChangeContent|CSGroupChangeStructure,^{ FoldedSessionOriginal(owner,selector,session); });
+    NativeNamedNotification(owner,CSGroupChangeContent|CSGroupChangeStructure,session,^{ FoldedSessionOriginal(owner,selector,session); });
 }
 static void (*FoldedOpenOriginal)(id,SEL,id,id);
 static void FoldedOpen(id owner,SEL selector,id session,id path) {
@@ -515,6 +612,7 @@ static void InstallFoldedSessionHooks(void) {
 %ctor {
     CSBackupWhenReady(^{
         InstallMenuTouchGate();
+        InstallMainScrollToTopHook();
         InstallFoldedSessionHooks();
         [NSNotificationCenter.defaultCenter addObserver:CSGroupListAdapter.class selector:@selector(closeFriendPolicyChanged:) name:CSCloseFriendPolicyDidChangeNotification object:nil];
         for (NSString *name in @[UIApplicationWillResignActiveNotification,UIApplicationDidEnterBackgroundNotification,UIApplicationDidBecomeActiveNotification])

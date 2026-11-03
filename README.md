@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.2-6`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.2-11`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -31,8 +31,8 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | 本地提供 `2.2-6` 安装包，原生后台优先，音频延后介入、放宽退出，含最近后台记录；待真机验收 |
-| Rootful | 本地提供 `2.2-6` 安装包；待真机验收 |
+| Rootless | 本地提供 `2.2-11` 滚动位置修复正式包；沿用空白修复，待微信 8.0.78 真机复验 |
+| Rootful | 本地提供 `2.2-11` 滚动位置修复正式包；待微信 8.0.78 真机复验 |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
@@ -40,7 +40,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：当前 `2.2-6` 交付 [Rootless 安装包](packages/2.2-6-background-run-native-priority/com.wechat.improve_2.2-6_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.2-6-background-run-native-priority/com.wechat.improve_2.2-6_iphoneos-arm.deb)、[调试符号](packages/2.2-6-background-run-native-priority/com.wechat.improve_2.2-6_symbols.zip) 和 [SHA-256](packages/2.2-6-background-run-native-priority/SHA256SUMS)。本版在 2.2-5 基础上将音频介入延后至有限预算不足 8 秒，并将退出条件放宽为最短播放 5 秒、有限预算至少 12 秒、两次独立检查确认。改动与验证见 [原生后台优先调整](docs/audits/background-run-native-priority-2026-11-02/README.md)，保留 [时间记录](docs/audits/background-run-records-2026-11-02/README.md)，重构机制见 [后台运行审计](docs/audits/background-run-hybrid-2026-11-02/README.md)。保留 [2.2-3 小程序返回隐私保护](docs/audits/release-2.2-3-miniapp-return-first-frame/README.md)。
+1. 获取与设备注入环境匹配的 `.deb`：当前正式版 `2.2-11` 提供 [Rootless 安装包](packages/2.2-11-session-groups-scroll-position-final/com.wechat.improve_2.2-11_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.2-11-session-groups-scroll-position-final/com.wechat.improve_2.2-11_iphoneos-arm.deb)、[调试符号](packages/2.2-11-session-groups-scroll-position-final/com.wechat.improve_2.2-11_symbols.zip) 和 [SHA-256](packages/2.2-11-session-groups-scroll-position-final/SHA256SUMS)。本版修复聊天返回与切换分组后的滚动位置，保留此前分组减载和隐私校验。本版已移除分组性能观测模块与独立观测构建入口，见 [交付与验证记录](docs/audits/session-groups-scroll-position-2026-11-03/README.md)。本版尚待微信 `8.0.78` 真机验收；此前安装包保留用于追溯。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
@@ -68,6 +68,16 @@
 | 自定义分组 | 手动选择的会话，同一会话可加入多个自定义组 |
 
 在设置页点击“添加自定义分组”创建分组，点击分组管理成员，通过右上角“排序”调整顺序。左滑分组可重命名、隐藏预设分组或删除自定义分组。删除分组只移除分组配置，不删除会话或聊天记录。
+
+`2.2-11` 从聊天返回时恢复离开列表时的滚动高度；切组沿用切换前的当前高度，目标列表较短时夹紧到可达到的边界。同组选中保持位置；用户主动滚动、搜索、原生导航和显式回到顶部会取消旧的待恢复请求。位置只在当前账号、隐私快照与已发布列表一致且布局就绪时恢复，无新增轮询或逐帧任务。本版同时移除分组性能观测模块、构建开关和无调用的插件回顶状态链，保留 UIKit 原生回顶。详见 [滚动位置修复与验证](docs/audits/session-groups-scroll-position-2026-11-03/README.md)。
+
+`2.2-10` 将已知会话变化名单用于兼容分组路径：账号、隐私快照及宿主身份和槽位验证通过后，仅重读相关会话的元数据；稳定的命名行只刷新实际变化或名单命中的可见行，离屏更新无需强制同步布局。未知更新、结构变化、隐私变化、切组、特殊行和 UIKit 行数不符继续完整发布。分组栏缓存标题及角标尺寸，相同几何和样式跳过重复属性写入；字体、角标占位、屏幕尺寸和分组内容变化正确失效。保留此前 80–250ms 消息合并与交互结束唤醒。独立观测包补齐兼容路径和真实主表计数，便于区分入口尝试、投影计算、发布与实际 reload。主机验证不能换算为真机 CPU 或 Core Animation 提交降幅；此前静置约 60 次/秒提交的来源仍待定位。详见 [本轮优化与验证](docs/audits/session-groups-efficiency-2026-11-03/README.md) 和 [2.2-9 四场景采样与对比](docs/audits/session-groups-instruments-2.2-9-2026-11-03/README.md)。
+
+`2.2-9` 统一列表拖动、减速、编辑、菜单及分组手势期间的刷新等待条件，避免交互尚未结束时连续调度；等待有上限，最新变更由交互结束事件唤醒发布，隐私紧急刷新继续优先。仅切换选中分组且来源、配置、账号与隐私快照有效时，复用完整源元数据以及适用的成员、角标计算结果；折叠聊天最新快照不匹配则完整重算。跨“全部”与筛选分组仍按不同折叠展示规则从复制值重建投影。主列表身份和槽位校验仍保留，主机模型测试不等于真机 CPU 降幅。详见 [本轮优化与验证](docs/audits/session-groups-interaction-2026-11-03/README.md)；此前 `2.2-8` 的四场景 Instruments 基线见 [真机采样记录](docs/audits/session-groups-instruments-2026-11-03/README.md)。
+
+`2.2-8` 复用同一份已验证的分组模型；完整变更名单已知且成员、顺序、类型保持稳定时，仅重读相关会话的元数据和更新受影响的分组未读统计。界面层严格核对宿主槽位后复用已有分组投影，只刷新受影响的可见行；离屏会话仅引起角标变化时跳过表格刷新。账号、隐私、未知范围更新或结构变化继续完整校验，广域原生回调不继承局部变化名单。整体仍保留逐项身份、槽位验证，性能结果只反映主机受控模型工作负载，不能直接换算为整机 CPU 或耗电降幅。详见 [优化、清理与验收记录](docs/audits/session-groups-cpu-2026-11-03/README.md)。
+
+`2.2-7` 修复上一轮原生分组候选在微信 `8.0.78` 出现的聊天列表空白：原生展示基线允许单侧空分区，辅助未读源未加载或不兼容时使用完整展示源统计；包装会话与基础会话统一读取身份。原生接口或展示元数据持续不兼容时，先恢复完整原生源，再返回已有投影与代理方案，沿用分组、密友规则与首帧遮罩。支持的主列表继续使用原生会话对象、顺序和坐标；分组角标读取完整展示基线，未读面板及转发候选分别遵守对应的密友规则，折叠子页继续使用已有投影。普通消息刷新合并为最后事件后 80ms、同批最多 250ms，账号、隐私和显式操作优先处理。详见 [空白修复记录](docs/audits/session-groups-blank-2026-11-03/README.md)；[上一轮实现记录](docs/audits/session-groups-native-2026-11-03/README.md)保留其当时的验证范围。
 
 `2.0-18` 的自定义组成员菜单仅有“私聊 / 群聊 / 标签”。私聊、群聊使用原生全屏多选器；标签使用微信原生标签列表批选，再回到原生好友页搜索、调整勾选，最终点完成保存。取消保持原名单；已有群聊、服务号和无法解析成员不会因编辑好友类别丢失。移除的是选人菜单的“全部”，顶部预设“全部”及旧自定义组成员集合均保留。弹窗与全屏显示都等待菜单和原生页各自转场结束，不使用固定延时。详见 [改动、原生证据与验收记录](docs/audits/group-tags-folded-2.0-18/README.md)。
 
@@ -206,7 +216,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.2-6_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.2-6-background-run-native-priority/`。
+当前版本默认输出：`packages/com.wechat.improve_2.2-11_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.2-11-session-groups-scroll-position-final/`。
 
 ### Rootful
 
@@ -215,7 +225,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.2-6_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.2-6-background-run-native-priority/`。
+当前版本默认输出：`packages/com.wechat.improve_2.2-11_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.2-11-session-groups-scroll-position-final/`。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -239,7 +249,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.2-6-background-run-native-priority/com.wechat.improve_2.2-6_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.2-8-session-groups-cpu/com.wechat.improve_2.2-8_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
@@ -267,7 +277,7 @@ WeChatImprove/
 
 Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m` 参与编译。Hook 负责接入微信，业务策略、原生接口适配与设置界面主要位于 `Controllers/`。
 
-聊天分组通过原生会话快照生成显示列表与索引映射；消息操作由菜单/手势入口、动作协调器和原生适配器协作；气泡与消息合并分别处理样式、分组策略和布局。修改时应同时检查相关生命周期与功能组合。
+聊天分组主列表由 `CSGroupNativeSessionCoordinator` 管理完整原生展示基线，`CSGroupNativeModel` 复用共享归属、筛重、隐私和统计规则并输出原生会话对象；主列表使用统一的原生坐标。`CSGroupListAdapter` 负责标签、外观、身份复核和安全遮罩；折叠子页继续使用 `CSGroupProjection` / `CSGroupTableProxy`。未读面板与转发在同步完整候选作用域中取数并复核结果，随后恢复当前组。消息操作由菜单/手势入口、动作协调器和原生适配器协作；气泡与消息合并分别处理样式、分组策略和布局。修改时应同时检查相关生命周期与功能组合。
 
 ### 回归检查
 
@@ -351,7 +361,7 @@ bash Tests/verify-payment-core.sh
 
 | 主题 | 文档 |
 | --- | --- |
-| 聊天分组 | [功能与实现](docs/session-groups.md) · [重构方案](docs/session-groups-refactor-proposal.md) |
+| 聊天分组 | [2.2-8 性能优化与清理](docs/audits/session-groups-cpu-2026-11-03/README.md) · [2.2-7 空白修复](docs/audits/session-groups-blank-2026-11-03/README.md) · [原生分组实现与验证](docs/audits/session-groups-native-2026-11-03/README.md) · [本次设计](docs/superpowers/specs/2026-11-03-native-session-groups-design.md) |
 | 列表圆角 | [配置与实现](docs/list-corner-radius.md) · [圆角优化](docs/list-corners.md) |
 | 气泡与消息合并 | [消息合并说明](docs/message-merge.md) · [1.8-36 转文字语音间距](docs/audits/merge-voice-translation-1.8-36/README.md) |
 | 悬浮底栏 | [原生底栏改造](docs/tabbar-native-1.6-36.md) · [描边动画](docs/tabbar-animation-options-1.6-39.md) · [切换轻弹特效](docs/audits/tabbar-click-effect-1.9-10/README.md) |

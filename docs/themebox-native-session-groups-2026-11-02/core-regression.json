@@ -1,0 +1,32 @@
+{
+  "commands": [
+    {
+      "command": "bash Tests/verify-native-group-model.sh",
+      "checks": 64,
+      "failures": 0
+    },
+    {
+      "command": "bash Tests/verify-native-session-coordinator.sh",
+      "hosts": [
+        {
+          "owner": "UIViewController",
+          "checks": 96,
+          "failures": 0
+        },
+        {
+          "owner": "NSObject+curViewController",
+          "checks": 97,
+          "failures": 0
+        }
+      ]
+    },
+    {
+      "command": "bash Tests/verify-native-group-adapter.sh",
+      "checks": 39,
+      "failures": 0
+    }
+  ],
+  "total_checks": 296,
+  "failures": 0,
+  "note": "Core only. Broader regression results are retained separately; only affected lifecycle checks were repeated after final lifecycle edits."
+}

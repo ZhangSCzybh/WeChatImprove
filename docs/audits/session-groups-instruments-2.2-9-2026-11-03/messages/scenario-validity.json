@@ -1,0 +1,7 @@
+{
+  "scenario": "messages",
+  "eligible_for_final_comparison": true,
+  "operator_reply": "持续发送了约 60 秒，最后几秒没有发送了",
+  "confirmed_at": "2026-11-03T16:04:35.365704+08:00",
+  "limitations": "Approximately60s manual input with a short tail without sends; exact arrival rate/count not instrumented. Main window25-70 retained;25-55 post-hoc sensitivity must not replace main."
+}

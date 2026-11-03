@@ -1,0 +1,43 @@
+{
+  "cross-all-scope": {
+    "equivalent_all_destination_fingerprints": true,
+    "before_median_ms": 6.967311111899714,
+    "after_median_ms": 1.8232361103097598,
+    "time_ratio_after_over_before": 0.2616843257072002,
+    "before_metadata_reads_per_round": [
+      144120,
+      144120,
+      144120,
+      144120,
+      144120
+    ],
+    "after_metadata_reads_per_round": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "filtered-groups": {
+    "equivalent_all_destination_fingerprints": true,
+    "before_median_ms": 9.026997571345419,
+    "after_median_ms": 0.3346458349066476,
+    "time_ratio_after_over_before": 0.03707166555233389,
+    "before_metadata_reads_per_round": [
+      144120,
+      144120,
+      144120,
+      144120,
+      144120
+    ],
+    "after_metadata_reads_per_round": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "interpretation": "Controlled macOS model workload only. Filtered switches reuse membership/badges; crossing All scopes rebuilds the projection from immutable copied values. Native source/folded capture and O(N) identity validation, UIKit, real device CPU and frame timing are outside measurement."
+}

@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euo pipefail
+validation_dir="$(cd "$(dirname "$0")" && pwd)"
+project_dir="$(cd "$validation_dir/../../../.." && pwd)"
+test_dir="$(mktemp -d "${TMPDIR:-/tmp}/wechat-native-groups-validation.XXXXXX")"
+trap 'rm -rf "$test_dir"' EXIT
+python3 "$validation_dir/extract-production-bodies.py" "$project_dir" "$test_dir"
+xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-undeclared-selector -Wno-incomplete-implementation \
+  -framework Foundation -I"$test_dir" -I"$validation_dir" -I"$project_dir/Controllers" \
+  "$project_dir/Controllers/CSGroupNativeModel.m" \
+  "$project_dir/Controllers/CSGroupNativeSessionCoordinator.m" \
+  "$project_dir/Controllers/CSGroupNativeBridge.m" \
+  "$project_dir/Controllers/CSGroupProjection.m" \
+  "$project_dir/Controllers/CSGroupPreferences.m" \
+  "$project_dir/Controllers/WESessionTabItem.m" \
+  "$project_dir/Controllers/CSCloseFriendPolicy.m" \
+  "$project_dir/Controllers/CSCloseFriendSignatures.m" \
+  "$validation_dir/NativeGroupBehaviorTests.m" -o "$test_dir/native-behavior"
+"$test_dir/native-behavior"

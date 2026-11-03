@@ -103,6 +103,27 @@ id CSGroupNativeLogic(id controller) {
 }
 static NSString *SessionSelector(id logic) { return CSGroupIsFoldedController(logic) ? @"logicGetSessionAtIndexPath:" : @"getSessionInfoAtIndexPath:"; }
 static NSString *DataSelector(id logic) { return CSGroupIsFoldedController(logic) ? @"logicGetCellDataAtIndexPath:" : @"getCellDataAtIndexPath:"; }
+// MainSessionMgr may expose its aggregate wrapper while another native getter
+// returns MMSessionInfo or MMBaseSessionInfo. Resolve all three through the
+// same identity path so a real session cannot become an anonymous business row
+// merely because the host changed the representation of one getter.
+static id NativeSessionObject(id object) {
+    return CSGroupReadObject(object,@"mainSession") ?: object;
+}
+static id NativeSessionName(id session) {
+    return CSGroupReadObject(session,@"m_nsUserName") ?: CSGroupReadObject(session,@"sessionId");
+}
+static BOOL NativeOptionalFlagIsFalse(id session,NSString *name) {
+    SEL selector=NSSelectorFromString(name);
+    if (![session respondsToSelector:selector]) return YES;
+    NSMethodSignature *signature=Signature(session,selector,2);
+    if (!signature) return NO;
+    NSInvocation *invocation=[NSInvocation invocationWithMethodSignature:signature];
+    invocation.selector=selector;
+    // A present but unreadable flag cannot prove an ordinary session. A
+    // throwing host accessor reaches the enclosing builder's safe nil result.
+    return IntegerInvocationValue(invocation,session,-1)==0;
+}
 NSString *CSGroupNativeUserNameAtPath(id controller, NSIndexPath *path) {
     if (![path isKindOfClass:NSIndexPath.class] || path.length!=2) return nil;
     @try {
@@ -110,7 +131,7 @@ NSString *CSGroupNativeUserNameAtPath(id controller, NSIndexPath *path) {
     id session=ObjectAtPath(logic,SessionSelector(logic),path);
     id data=session ? nil : ObjectAtPath(logic,DataSelector(logic),path);
     session=session ?: CSGroupReadObject(data,@"m_sessionInfo");
-    id name=CSGroupReadObject(session,@"m_nsUserName") ?: CSGroupReadObject(data,@"userName");
+    id name=NativeSessionName(NativeSessionObject(session)) ?: CSGroupReadObject(data,@"userName");
     return [name isKindOfClass:NSString.class] ? name : nil;
     } @catch (__unused NSException *exception) { return nil; }
 }
@@ -140,7 +161,7 @@ static BOOL NativeIdentityMatches(id logic, NSIndexPath *path, CSGroupRow *row) 
             id name=CSGroupReadObject(data,@"userName");
             return [name isKindOfClass:NSString.class] && [name isEqualToString:row.userName];
         }
-        id name=CSGroupReadObject(session,@"m_nsUserName");
+        id name=NativeSessionName(NativeSessionObject(session));
         return [name isKindOfClass:NSString.class] && [name isEqualToString:row.userName];
     } @catch (__unused NSException *e) { return NO; }
 }
@@ -275,11 +296,30 @@ CSGroupRowCategory CSGroupCategoryForContact(id contact) {
     return CSGroupRowCategoryUnknown;
 }
 static CSGroupRowCategory CategoryForSession(id session,NSString *name,BOOL serviceContainer) {
-    CSGroupRowCategory category=CSGroupCategoryForContact(CSGroupReadObject(session,@"m_contact"));
+    CSGroupRowCategory category=CSGroupCategoryForContact(CSGroupReadObject(session,@"m_contact") ?: CSGroupReadObject(session,@"contact"));
     if ([name hasSuffix:@"@chatroom"] || [name isEqual:@"chatroom_session_box"]) return CSGroupRowCategoryGroup;
     if (serviceContainer || ServiceName(name ?: @"") || CSGroupReadInteger(session,@"isInBrandServiceBox",0)) return CSGroupRowCategoryService;
     if (category==CSGroupRowCategoryUnknown && CSGroupReadInteger(session,@"isSingleChatSession",0)) return CSGroupRowCategoryPrivate;
     return category;
+}
+CSGroupRow *CSGroupRowForNativeSession(id object, NSIndexPath *path, BOOL top) {
+    if (!object || ![path isKindOfClass:NSIndexPath.class] || path.length!=2) return nil;
+    @try {
+        id session=NativeSessionObject(object);
+        id name=NativeSessionName(session);
+        if (name && ![name isKindOfClass:NSString.class]) return nil;
+        if (![name length]) name=nil;
+        BOOL service=[@[@"brandsessionholder",@"brandservicesessionholder"] containsObject:name ?: @""] ||
+            CSGroupReadInteger(session,@"isBrandServiceBoxSession",0) || CSGroupReadInteger(session,@"isBrandEcsMsgHolderSession",0);
+        CSGroupRowKind kind=(!name ? CSGroupRowKindBusiness :
+            ([name isEqual:@"chatroom_session_box"] || service) ? CSGroupRowKindAggregate : CSGroupRowKindSession);
+        long long unread=CSGroupReadInteger(object,@"mainUnReadCount",-1);
+        if (unread<0) unread=CSGroupReadInteger(session,@"m_uUnReadCount",CSGroupReadInteger(session,@"unreadCount",0));
+        long long dot=CSGroupReadInteger(object,@"showAsRedDot",-1);
+        if (dot<0) dot=CSGroupReadInteger(session,@"m_bShowUnReadAsRedDot",CSGroupReadInteger(session,@"showRedDotOuter",0));
+        return [[CSGroupRow alloc] initWithNativePath:path userName:name kind:kind
+            category:CategoryForSession(session,name,service) top:top unreadCount:(NSUInteger)MAX(0,unread) redDot:dot>0];
+    } @catch (__unused NSException *exception) { return nil; }
 }
 static NSNumber *FoldedSessionSortTime(id session) {
     // MMSessionInfo.compare: (8.0.78): override/last time, then top time for
@@ -489,15 +529,25 @@ static NSArray<CSGroupRow *> *CopyFoldedRows(CSGroupRow *(^selector)(NSArray<CSG
     }
     return [rows copy];
 }
-NSArray<CSGroupRow *> *CSGroupCopyFoldedRows(void) { return CopyFoldedRows(nil); }
 NSArray<CSGroupRow *> *CSGroupCopyFoldedRowsSelectingSummary(CSGroupRow *(^selector)(NSArray<CSGroupRow *> *)) {
     return CopyFoldedRows(selector);
 }
-NSArray *CSGroupBuildNativeSections(id controller,id table,id source) {
-    return CSGroupBuildNativeSectionsReusing(controller,table,source,nil);
-}
 NSArray *CSGroupBuildNativeSectionsReusing(id controller,id table,id source,NSArray *previous) {
+    return CSGroupBuildNativeSectionsForChanges(controller,table,source,previous,CSGroupChangeUnknown,nil);
+}
+NSArray *CSGroupBuildNativeSectionsForChanges(id controller,id table,id source,NSArray *previous,
+                                            CSGroupChangeKind changes,NSSet<NSString *> *changedUserNames) {
     @try {
+        BOOL namedChanges=[changedUserNames isKindOfClass:NSSet.class] && !(changes&CSGroupChangeUnknown);
+        if (namedChanges) for (id name in changedUserNames)
+            if (![name isKindOfClass:NSString.class] || ![name length]) { namedChanges=NO;break; }
+        BOOL strictStructure=namedChanges && (changes&CSGroupChangeStructure);
+        NSArray *(^completeBuild)(void)=^{
+            // Unknown disables this proof path, so a rejected partial attempt
+            // can perform at most one complete rebuild and never escape here.
+            return CSGroupBuildNativeSectionsForChanges(controller,table,source,previous,changes|CSGroupChangeUnknown,nil);
+        };
+        if (strictStructure && ![previous isKindOfClass:NSArray.class]) return completeBuild();
         SEL rowsSEL=@selector(tableView:numberOfRowsInSection:);
         NSMethodSignature *rowSig=Signature(source,rowsSEL,4);
         if (!rowSig || strcmp(rowSig.methodReturnType,@encode(NSInteger)) ||
@@ -514,37 +564,73 @@ NSArray *CSGroupBuildNativeSectionsReusing(id controller,id table,id source,NSAr
             count=((NSInteger(*)(id,SEL,id))objc_msgSend)(source,sectionsSEL,table);
         }
         if (count<0 || count>1024) return nil;
+        if (strictStructure && previous.count!=(NSUInteger)count) return completeBuild();
         NSMutableArray *sections=[NSMutableArray array]; NSUInteger total=0;
+        NSMutableSet<NSString *> *verifiedNames=strictStructure ? [NSMutableSet set] : nil;
         for (NSInteger section=0;section<count;section++) {
             NSInteger rows=((NSInteger(*)(id,SEL,id,NSInteger))objc_msgSend)(source,rowsSEL,table,section);
             if (rows<0 || rows>100000 || total+(NSUInteger)rows>100000) return nil;
             total+=rows;
             NSArray *oldSection=(NSUInteger)section<previous.count ? previous[section] : nil;
+            if (strictStructure && (![oldSection isKindOfClass:NSArray.class] || oldSection.count!=(NSUInteger)rows)) return completeBuild();
             BOOL sameCount=oldSection && oldSection.count==(NSUInteger)rows;
             NSMutableArray *values=sameCount ? nil : [NSMutableArray arrayWithCapacity:rows];
             for (NSInteger row=0;row<rows;row++) {
                 CSGroupRow *old=(NSUInteger)row<oldSection.count ? oldSection[row] : nil;
                 if (![old isMemberOfClass:CSGroupRow.class] || old.nativePath.length!=2 ||
                     [old.nativePath indexAtPosition:0]!=(NSUInteger)section || [old.nativePath indexAtPosition:1]!=(NSUInteger)row) old=nil;
+                if (strictStructure && (!old || old.kind!=CSGroupRowKindSession || !old.userName.length)) return completeBuild();
                 NSUInteger indices[]={(NSUInteger)section,(NSUInteger)row};
                 NSIndexPath *path=old.nativePath ?: [NSIndexPath indexPathWithIndexes:indices length:2];
                 id session=ObjectAtPath(logic,SessionSelector(logic),path);
                 id cellData=nil;
                 if (!session) { cellData=ObjectAtPath(logic,DataSelector(logic),path); session=CSGroupReadObject(cellData,@"m_sessionInfo"); }
-                id name=CSGroupReadObject(session,@"m_nsUserName");
-                CSGroupRowKind kind=CSGroupRowKindSession;
+                id nativeObject=session;
+                session=NativeSessionObject(nativeObject);
+                BOOL top=CSGroupReadInteger(session,@"m_bIsTop",CSGroupReadInteger(cellData,@"bTopCell",0))!=0;
+                if (strictStructure) {
+                    id currentName=NativeSessionName(session);
+                    BOOL ordinary=nativeObject && [currentName isKindOfClass:NSString.class] && [currentName length] &&
+                        [old.userName isEqual:currentName] && old.top==top && ![verifiedNames containsObject:currentName] &&
+                        ![currentName isEqual:@"chatroom_session_box"] && ![currentName isEqual:@"brandsessionholder"] &&
+                        ![currentName isEqual:@"brandservicesessionholder"] &&
+                        NativeOptionalFlagIsFalse(session,@"isBrandServiceBoxSession") &&
+                        NativeOptionalFlagIsFalse(session,@"isBrandEcsMsgHolderSession");
+                    if (!ordinary) return completeBuild();
+                    [verifiedNames addObject:[currentName copy]];
+                }
+                // The hint only saves expensive metadata reads. Every current
+                // identity/slot is still read, and a moved or special row is
+                // fully classified before publication.
+                BOOL reuse=namedChanges && nativeObject && old.kind==CSGroupRowKindSession && old.userName.length &&
+                    old.top==top && ![changedUserNames containsObject:old.userName];
+                if (reuse && !strictStructure) {
+                    id currentName=NativeSessionName(session);
+                    reuse=[currentName isKindOfClass:NSString.class] && [old.userName isEqual:currentName];
+                }
+                if (reuse) {
+                    if (values) { if (sameCount) values[row]=old;else [values addObject:old]; }
+                    continue;
+                }
+                CSGroupRow *nativeRow=nativeObject ? CSGroupRowForNativeSession(nativeObject,path,top) : nil;
+                if (nativeObject && !nativeRow) return strictStructure ? completeBuild() : nil;
+                id name=nativeRow.userName;
+                CSGroupRowKind kind=nativeRow ? nativeRow.kind : CSGroupRowKindSession;
                 if (![name isKindOfClass:NSString.class] || ![name length]) {
                     name=CSGroupReadObject(cellData,@"userName"); kind=CSGroupRowKindFake;
                 }
                 if (![name isKindOfClass:NSString.class]) name=nil;
                 if (![name length]) kind=CSGroupRowKindBusiness;
-                BOOL serviceContainer=[@[@"brandsessionholder",@"brandservicesessionholder"] containsObject:name ?: @""] ||
-                    CSGroupReadInteger(session,@"isBrandServiceBoxSession",0) || CSGroupReadInteger(session,@"isBrandEcsMsgHolderSession",0);
-                if ([name isEqual:@"chatroom_session_box"] || serviceContainer) kind=CSGroupRowKindAggregate;
-                CSGroupRowCategory category=CategoryForSession(session,name,serviceContainer);
-                BOOL top=CSGroupReadInteger(session,@"m_bIsTop",CSGroupReadInteger(cellData,@"bTopCell",0))!=0;
-                NSUInteger unread=(NSUInteger)MAX(0,CSGroupReadInteger(session,@"m_uUnReadCount",0));
-                BOOL dot=CSGroupReadInteger(session,@"m_bShowUnReadAsRedDot",0)!=0;
+                CSGroupRowCategory category=nativeRow.category;
+                if (!nativeRow.userName.length) {
+                    BOOL serviceContainer=[@[@"brandsessionholder",@"brandservicesessionholder"] containsObject:name ?: @""] ||
+                        CSGroupReadInteger(session,@"isBrandServiceBoxSession",0) || CSGroupReadInteger(session,@"isBrandEcsMsgHolderSession",0);
+                    if ([name isEqual:@"chatroom_session_box"] || serviceContainer) kind=CSGroupRowKindAggregate;
+                    category=CategoryForSession(session,name,serviceContainer);
+                }
+                if (strictStructure && (kind!=old.kind || category!=old.category || ![old.userName isEqual:name])) return completeBuild();
+                NSUInteger unread=nativeRow ? nativeRow.unreadCount : 0;
+                BOOL dot=nativeRow.redDot;
                 BOOL same=old && old.kind==kind && old.category==category && old.top==top && old.unreadCount==unread && old.redDot==dot &&
                     (old.userName==name || [old.userName isEqual:name]);
                 if (!same || values) {
@@ -553,11 +639,39 @@ NSArray *CSGroupBuildNativeSectionsReusing(id controller,id table,id source,NSAr
                     else [values addObject:value];
                 }
             }
-            if (((NSInteger(*)(id,SEL,id,NSInteger))objc_msgSend)(source,rowsSEL,table,section)!=rows) return nil;
+            if (((NSInteger(*)(id,SEL,id,NSInteger))objc_msgSend)(source,rowsSEL,table,section)!=rows)
+                return strictStructure ? completeBuild() : nil;
             [sections addObject:values ? [values copy] : oldSection];
         }
-        if (sectionSig && ((NSInteger(*)(id,SEL,id))objc_msgSend)(source,sectionsSEL,table)!=count) return nil;
+        if (sectionSig && ((NSInteger(*)(id,SEL,id))objc_msgSend)(source,sectionsSEL,table)!=count)
+            return strictStructure ? completeBuild() : nil;
         if ([sections isEqualToArray:previous]) return previous;
         return [sections copy];
     } @catch (__unused NSException *e) { return nil; }
+}
+NSArray *CSGroupMapNativeSectionsToProjection(NSArray *sections,CSGroupProjection *projection) {
+    if (![sections isKindOfClass:NSArray.class] || !projection.isValid) return nil;
+    NSMutableDictionary<NSString *,CSGroupRow *> *visible=[NSMutableDictionary dictionary];
+    for (NSArray *rows in projection.sections) for (CSGroupRow *row in rows) {
+        if ((row.kind!=CSGroupRowKindSession && row.kind!=CSGroupRowKindAggregate) ||
+            row.foldedEntryScoped || !row.userName.length || visible[row.userName]) return nil;
+        visible[row.userName]=row;
+    }
+    NSMutableArray *mapped=[NSMutableArray arrayWithCapacity:sections.count];
+    NSMutableSet *consumed=[NSMutableSet set];
+    for (NSArray *rows in sections) {
+        if (![rows isKindOfClass:NSArray.class]) return nil;
+        NSMutableArray *values=[NSMutableArray arrayWithCapacity:rows.count];
+        for (CSGroupRow *row in rows) {
+            if (![row isKindOfClass:CSGroupRow.class] || (row.kind!=CSGroupRowKindSession && row.kind!=CSGroupRowKindAggregate) ||
+                !row.userName.length || [consumed containsObject:row.userName]) return nil;
+            CSGroupRow *known=visible[row.userName];
+            if (!known || row.kind!=known.kind || row.category!=known.category || row.top!=known.top ||
+                row.unreadCount!=known.unreadCount || row.redDot!=known.redDot ||
+                row.privacyMasked || row.foldedEntryScoped || row.nativeSummary || row.nativePrefix || row.nativeSortTime) return nil;
+            [values addObject:known]; [consumed addObject:row.userName];
+        }
+        [mapped addObject:[values copy]];
+    }
+    return consumed.count==visible.count ? [mapped copy] : nil;
 }

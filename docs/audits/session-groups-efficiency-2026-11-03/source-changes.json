@@ -1,0 +1,56 @@
+{
+  "production_changes": [
+    {
+      "path": "Controllers/CSGroupListAdapter.m",
+      "before": "b9213d515630ce1ad79ae94b229e7827f2974193b3a0e50e1d5ab2f0258a4985",
+      "after": "7adeb5b20d02e4c4ed6902cfc8c08eb71ac3cb278e71291d5a56fb71c212a703"
+    },
+    {
+      "path": "Controllers/CSGroupNativeBridge.h",
+      "before": "d178ab29e45f01b6dcbaa55dd247c714c146bc6b3273c437c3b34dca01c704d0",
+      "after": "0d32a318d0ebcb99669fa72999dd3bfdff6da7ba19eaa3fc759240cd457b255f"
+    },
+    {
+      "path": "Controllers/CSGroupNativeBridge.m",
+      "before": "e6f7378cbe679221a4663fb850cd3e5e2c3aaf6f7aef808098a8251c38169d3c",
+      "after": "ef2af4e1b7286c8a04ced929c6b30ba071bbffc71563b22164fd63d312344881"
+    },
+    {
+      "path": "Controllers/CSGroupPerformanceObservation.h",
+      "before": "a799e709d9d883ec79b52454adf59f7bd7a4beac47dde478ae26e8859209ded0",
+      "after": "3b57bbab3e532d8d4692347612f05e61a7b397293c8a845d6b7a566664580b83"
+    },
+    {
+      "path": "Controllers/CSGroupPerformanceObservation.m",
+      "before": "e85d8b02f9e517f097caa4b95053ad92f5108ce79d593c8d1c326c863a32a1d8",
+      "after": "487a1cbfca17f9b9f4f5de1084b9edfd272c58c6c6ade1ffd382d448ec8f3300"
+    },
+    {
+      "path": "Controllers/CSReleaseNotesViewController.m",
+      "before": "b81bbc542bc3d5bc3f5e7ca32200a25e92287c9568b9982ee921b81fb4273f72",
+      "after": "215f6e6d9bb04a0d845bf0886415fca95a2947418a50b24cafd4bebb5018adde"
+    },
+    {
+      "path": "Controllers/WESessionTabContainerView.m",
+      "before": "b7ce9e8eb8f07029668e5c47fb9735e7f234cd4e2c549b2fc169e8eef28c5764",
+      "after": "e7eed246d2883182710aa8483118d6dac8e8236e31b098366c959bad99b54905"
+    },
+    {
+      "path": "Headers/CSUserInfoHelper.h",
+      "before": "c487e8b14cd48ad1b4425128af30ac02a2be82511e702c9d2f507c4b239588a3",
+      "after": "0ca0a4e3f7904d847e11a7eee0fe0ebf444edcbe61449b757bb6dcc17911dfc7"
+    },
+    {
+      "path": "Hooks/SessionGroupPerformanceObservation.xm",
+      "before": "dd4a60babffdf3e6fe654e6522f9b515b689af38f69d48986228b396d7621b5e",
+      "after": "a6fbc8fa20f7428ba5f75aff307d717ed5ed3c3175cfeb67fe64566a2ec44b4f"
+    },
+    {
+      "path": "control",
+      "before": "41810e1b3cdf76838f50f37f3e96c6bc5206e8cabb3f8261fa4cc855a9a0cfc3",
+      "after": "3d0c1483cb8eb61ee1dc94d01b42dfade918c663f47a24d586f64b1a0cc342c8"
+    }
+  ],
+  "production_file_count_at_start": 42521,
+  "device_mutations": false
+}

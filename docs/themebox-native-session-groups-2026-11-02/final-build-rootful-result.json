@@ -1,0 +1,23 @@
+{
+  "scheme": "rootful",
+  "command": [
+    "make",
+    "package",
+    "-j4",
+    "SCHEME=rootful",
+    "PACKAGE_VERSION=2.2-6-beta01",
+    "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.2-6-beta01-native-groups-u0mles2c/rootful/.theos",
+    "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.2-6-beta01-native-groups-u0mles2c/rootful",
+    "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.2-6-beta01-native-groups-u0mles2c/rootful/packages"
+  ],
+  "exit_code": 0,
+  "duration_seconds": 23.37,
+  "warnings": [
+    "\u001b[1mHooks/CloseFriendNotificationHooks.xm:393:62: \u001b[0m\u001b[0;1;35mwarning: \u001b[0m\u001b[1m'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]\u001b[0m",
+    "\u001b[1mHooks/CloseFriendNotificationHooks.xm:393:62: \u001b[0m\u001b[0;1;35mwarning: \u001b[0m\u001b[1m'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]\u001b[0m",
+    "\u001b[1mHooks/RedEnvelopHooks.xm:132:61: \u001b[0m\u001b[0;1;35mwarning: \u001b[0m\u001b[1m'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]\u001b[0m",
+    "\u001b[1mHooks/RedEnvelopHooks.xm:132:61: \u001b[0m\u001b[0;1;35mwarning: \u001b[0m\u001b[1m'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]\u001b[0m",
+    "ld: warning: -multiply_defined is obsolete",
+    "ld: warning: -multiply_defined is obsolete"
+  ]
+}

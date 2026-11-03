@@ -1,6 +1,7 @@
 #import "CSCloseFriendUnreadPanelAdapter.h"
 #import "CSCloseFriendBridge.h"
 #import "CSCloseFriendContactAdapter.h"
+#import "CSGroupNativeSessionCoordinator.h"
 #import <objc/message.h>
 
 @interface CSCFUnreadPanelRow : NSObject
@@ -193,11 +194,16 @@ void CSCFUnreadPanelRefresh(id controller) {
             CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
             [state.rows removeAllObjects];
             if(state.revision!=NSNotFound && state.revision!=snapshot.revision)CSCFUnreadPanelInvalidatePresentation(controller);
-            // The native rebuild enumerates the full MainSessionMgr source. Its
-            // canShowSession hook rejects hidden entries before sessionSet reuse.
-            BOOL rebuilt=CSCFCallVoid(logic,@"rebuildSessionList");
-            state.safelyPublished=rebuilt && PanelFilteringAvailable;
-            if(![snapshot concealsSurface:CSCloseFriendSurfaceSession])state.safelyPublished=YES;
+            // MainSessionMgr normally holds only the selected group's rows.
+            // Read the complete account's Session-visible candidates under a
+            // guarded scope; selector availability alone cannot prove this read.
+            __block BOOL rebuilt=NO;
+            BOOL complete=[CSGroupNativeSessionCoordinator.sharedCoordinator
+                performWithCompleteSourceForSurface:CSCloseFriendSurfaceSession original:^{
+                    rebuilt=CSCFCallVoid(logic,@"rebuildSessionList");
+                }];
+            state.safelyPublished=complete && rebuilt &&
+                (PanelFilteringAvailable || ![snapshot concealsSurface:CSCloseFriendSurfaceSession]);
             if(view && rebuilt) {
                 CSCFCallVoid(controller,@"updateContent");
                 SetBool(controller,@"setNeedReloadAfterTransition:",NO);
@@ -275,8 +281,13 @@ BOOL CSCFUnreadPanelAllowsOpen(id controller,id session) {
     if(!NSThread.isMainThread || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive)return NO;
     id logic=PanelLogic(controller); CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
     if(!Allowed(controller,session,snapshot) || !Allowed(logic,session,snapshot) || PanelState(logic).sourceDepth)return NO;
-    if(PanelState(controller).revision!=snapshot.revision) { CSCFUnreadPanelRefresh(controller); return NO; }
-    CSCFUnreadPanelRow *expected=PanelState(controller).actionRow;
+    CSCFUnreadPanelState *state=PanelState(controller);
+    if(state.revision!=snapshot.revision) { CSCFUnreadPanelRefresh(controller); return NO; }
+    // Native open callbacks may already be queued when a complete-source read
+    // is rejected. Only a finished, accepted publication can authorize them.
+    if(!state.safelyPublished || state.maskActive || state.refreshAgain || state.refreshing ||
+       PanelState(logic).needsRebuild)return NO;
+    CSCFUnreadPanelRow *expected=state.actionRow;
     NSString *name=CSCloseFriendUserName(session);
     if(expected && (expected.session!=session || expected.revision!=snapshot.revision || expected.epoch!=CSCloseFriendAccountEpoch() ||
        expected.serial!=PanelState(logic).serial || ![expected.accountID isEqual:snapshot.accountID] ||

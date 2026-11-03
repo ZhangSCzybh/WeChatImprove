@@ -1,0 +1,67 @@
+{
+  "timestamp": "2026-11-03T12:11:26.384284+08:00",
+  "project_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "source_unchanged_during_checks": true,
+  "production_source_sha256": {
+    "Controllers/CSGroupNativeModel.h": "c3189e10a79bee653c28061a17e6b90eb423f2514e9482d55bc977e982ac7da8",
+    "Controllers/CSGroupNativeModel.m": "ac4e3a6177e45f23911e7f09cfd64def1556a21d7b8a69a012b5bbaa60d88979",
+    "Controllers/CSGroupNativeSessionCoordinator.h": "bc4e56e2fbaabdf778d54d66fff3021f45fafbe26a7a97cb020bd9ce4ee6cea6",
+    "Controllers/CSGroupNativeSessionCoordinator.m": "57cbf10c21eea73f742b9e52c04477e12b269f1178dabaaeb9c4b0eebabf1626",
+    "Controllers/CSGroupListAdapter.h": "ba76d08a15f136be43e9702ecfee1f393c4ea73389ac96bd239c867a3f70f7cc",
+    "Controllers/CSGroupListAdapter.m": "9bb66f066c90df4e4289f5f2c0dba6274063a1b4858263a47b1638554eb999ed",
+    "Controllers/CSGroupNativeBridge.h": "d178ab29e45f01b6dcbaa55dd247c714c146bc6b3273c437c3b34dca01c704d0",
+    "Controllers/CSGroupNativeBridge.m": "e6f7378cbe679221a4663fb850cd3e5e2c3aaf6f7aef808098a8251c38169d3c",
+    "Controllers/CSGroupProjection.h": "6e4d0bfeb82747004e3d028515f9948ef8a1a923323e4583898abff177b70639",
+    "Controllers/CSGroupProjection.m": "a11a27854ce33186cf07e4b657b2989d18bf3aaf947882a0cda835d0a7641e3a",
+    "Controllers/CSGroupPreferences.m": "1ec46fe99d45a47d56319ec5149d54ddbccb3831dbdd52de6f7f4e590bd58bd4",
+    "Controllers/WESessionTabItem.h": "03c4a9b62fdff3d3906e2378a408c0f9791f1413215ddf20c41b2a5d3f4b2b01",
+    "Controllers/WESessionTabItem.m": "2cc891a5d00e2090d6efb322aad75015e3fdd60dda9c2055576bf9d77e9a4f62",
+    "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+    "Controllers/CSCloseFriendSignatures.m": "69e44c74c85e4e0a22dc347b8d1d5007b1e5650cd939ba016ac83098af8c849b",
+    "Controllers/CSCloseFriendUnreadPanelAdapter.m": "e61a1260a4781f1c640a4b2e52a4c41b8f39e5062c9bd952fcea78826d51e16b",
+    "Controllers/CSCloseFriendContactAdapter.m": "95f2790357e36fe88e7988654bc16c77260bf1743da6b45e88e8a455abb55245",
+    "Controllers/CSCloseFriendBridge.m": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf",
+    "Hooks/NativeSessionGroupHooks.xm": "c29c45304c427a717215a25205f5160ea715bcb5812e111c73785fa59627ce00",
+    "Hooks/SessionGroupHooks.xm": "76f42d5d4001da1d80b36de80215e2ea9fed978faa8d92a5aa791b608ec5e3ab",
+    "Hooks/CloseFriendUnreadPanelHooks.xm": "82792efdd7d4f8a374a0e518dc84815719ca03493e9160eb1f2481732f899a29"
+  },
+  "runs": [
+    {
+      "runner": "run-native-behavior.sh",
+      "exit_code": 0,
+      "stdout": "Native model/coordinator/adapter/scheduling: 389 behavior checks passed\n",
+      "stderr": ""
+    },
+    {
+      "runner": "run-unread-panel.sh",
+      "exit_code": 0,
+      "stdout": "Close-friend unread panel: 77 checks, 0 failures\nClose-friend unread panel ABI: 7 checks, 0 failures\n",
+      "stderr": ""
+    }
+  ],
+  "validation_source_sha256": {
+    "AdapterBehaviorFixture.h": "0612b3ac22a767b7f2df5c3762171d7776958762cb33997b548ada533b8de988",
+    "BlankRegressionFixture.h": "b1c7f88a6f27b79c57f6fc5e76e21807e79363150df40cab97fb64acdd0e2b81",
+    "CpuRegressionFixture.h": "ddb957243e9be5709544a753cdf53078b4225b4beadea06d1c199a2757125ac1",
+    "ModelPerfBench.m": "919a832e5afd1d6a90cfa9ae650afc3571da22ed0c7d264bc607c20efde5592f",
+    "NativeGroupBehaviorTests.m": "cbcd929b2f4002e22329f53997b71b0466a367f034a312168b2937911efe4e2a",
+    "UIKit/UIKit.h": "0a07385df20f6daf0ed724a98365f13efd1bc37fb8b8983285471d09755f05c4",
+    "extract-production-bodies.py": "a6fdd38214ff0d5be4dbba8b6235a9c1cab75d363e4d8148470a4fc630a32d69",
+    "extract-unread-panel.py": "198dbea09e6443b72e195ac4b3af43f73e26799fa94f59b9c76b800c051431e2",
+    "record-validation.py": "d680d4ae0a76211ba61116098f86f28b1e22be7ad05a3205251f4d8125aeb1cc",
+    "reproduce-host-shapes.py": "5ce57a69a4903686681806324ac5307c68ae9b3a0f7a050b7884f2ba4ea39620",
+    "run-legacy-core.py": "e63c911a2d2df651d4167db06379c44e71be2066be9b9fc0525ab9fa0021a04f",
+    "run-model-benchmark.py": "b62ac406c772173ebeb0369af68eb1acf15dfb1e01463fd95f03934094902d46",
+    "run-native-behavior.sh": "f6774acd30a83a4c3db84e3f6549d66bdc122c6f878a6a4cf835af76426d334c",
+    "run-negative-controls.py": "dc55b9423f1b4ada43dce5c76f626c8d95ac7c23f1bfbd1c313af3a7ef31a3d2",
+    "run-unread-panel.sh": "885526715384c89a06a4a115af276131eb53c16a8cac253bde4e4788dc35aaab"
+  },
+  "isolation": "Temporary macOS Foundation executables, in-memory NSUserDefaults and host doubles; no live WeChat, account data, database, ports or service changes.",
+  "limitations": [
+    "Native coordinator/model/bridge/projection/preferences are compiled as production translation units.",
+    "Adapter publication, native fine row updates, change-name accumulation, privacy shielding, fallback transition, native notification, recovery and scheduling bodies plus native forward-enumerator replacement are extracted from current production source.",
+    "Metadata construction, named metadata reuse, canonical projection mapping, username reads and identity/path resolution use the real production bridge. UIKit, native data source/getters and dispatch are controlled fixture boundaries. The legacy refresh entry after handoff is observed, not its complete UIKit publication; legacy projection behavior has separate executable suites.",
+    "Unread panel runs current production bridge/contact helpers, adapter and hook registrations using a fixture from baseline commit 863bfdb350fddf678c349574d99badb241d98958 exported only into a temporary directory. The complete-source wrapper is a controlled test double; its real implementation is checked in the native suite.",
+    "These executable behavior tests do not replace an iPhone acceptance run."
+  ]
+}

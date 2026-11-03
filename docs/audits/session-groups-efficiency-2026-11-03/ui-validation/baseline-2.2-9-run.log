@@ -1,0 +1,17 @@
+{"checks":135,"failures":16,"stable_iterations":1000,"stable_visual_writes":74000,"stable_text_measurements":9000,"stable_synchronous_layouts":1000}
+FAIL: 1000 stable layouts/selection acknowledgements produce no visual/layer writes
+FAIL: 1000 stable layouts reuse title measurements
+FAIL: 1000 stable selection acknowledgements do not force synchronous layout
+FAIL: resize changes geometry and reuses text metrics
+FAIL: equal font objects do not invalidate button layout
+FAIL: 99+ to 99+ changes accessibility only and does not invalidate geometry
+FAIL: same-width capped badge does not remeasure or write geometry
+FAIL: unchanged tab records preserve layout and measurements
+FAIL: 1000 equal capsule configurations/layouts write nothing
+FAIL: capsule color change does not invalidate geometry
+FAIL: nil title remains stable under capsule layout
+FAIL: empty tab layout remains stable
+FAIL: stable nonanimated indicator target does not mutate its layer
+FAIL: same target nonanimated update cancels in-flight animation without geometry writes
+FAIL: animation-disable acknowledgement cancels transition without forcing layout
+FAIL: same capsule target cancels animation without writing model properties

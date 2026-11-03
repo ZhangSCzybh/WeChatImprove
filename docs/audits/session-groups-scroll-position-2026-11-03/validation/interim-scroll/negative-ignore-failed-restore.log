@@ -1,0 +1,1 @@
+FAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-scroll-position-2026-11-03/validation/ScrollPositionFixture.h:161: a.switchViewport && r.table.fixtureGeometryPending

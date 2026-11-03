@@ -1,0 +1,69 @@
+{
+  "scope": "Independent macOS Objective-C runtime review of exact production optional-scroll-to-top installation functions",
+  "generated_at": "2026-11-03T09:59:49.261188+00:00",
+  "production_inputs": {
+    "Hooks/SessionGroupHooks.xm": "a6932f42445ff21344c827e3d4c698e4cfad91c52568f26d00288f7816778d66",
+    "Controllers/CSCloseFriendBridge.m": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf",
+    "Controllers/CSCloseFriendSignatures.m": "69e44c74c85e4e0a22dc347b8d1d5007b1e5650cd939ba016ac83098af8c849b"
+  },
+  "source_body_sha256": "cb59c838f003b6cbc4959fb1af320142975dadde269c596716ea21438fa35efe",
+  "harness_sha256": "34cfe3839759450ac7014715f4504f7e55004e84c0343ff4d06f045f0ab5925e",
+  "cases": [
+    {
+      "case": "missing-method",
+      "assertions": 8,
+      "hook_calls": 0,
+      "original_calls": 0,
+      "pending_clears": 1
+    },
+    {
+      "case": "direct-yes",
+      "assertions": 12,
+      "hook_calls": 1,
+      "original_calls": 1,
+      "pending_clears": 1
+    },
+    {
+      "case": "direct-no",
+      "assertions": 12,
+      "hook_calls": 1,
+      "original_calls": 1,
+      "pending_clears": 0
+    },
+    {
+      "case": "inherited-yes",
+      "assertions": 14,
+      "hook_calls": 1,
+      "original_calls": 2,
+      "pending_clears": 1
+    },
+    {
+      "case": "inherited-no",
+      "assertions": 14,
+      "hook_calls": 1,
+      "original_calls": 2,
+      "pending_clears": 0
+    },
+    {
+      "case": "wrong-abi",
+      "assertions": 7,
+      "hook_calls": 0,
+      "original_calls": 1,
+      "pending_clears": 0
+    },
+    {
+      "case": "missing-class",
+      "assertions": 2,
+      "hook_calls": 0,
+      "original_calls": 0,
+      "pending_clears": 0
+    }
+  ],
+  "total_assertions": 69,
+  "passed": true,
+  "limitations": [
+    "macOS Foundation runtime, not the iPhone UIKit lifecycle",
+    "MSHookMessageEx replaced with class_replaceMethod retaining the original IMP",
+    "adapter notification receiver controlled and counted; no device or real account touched"
+  ]
+}

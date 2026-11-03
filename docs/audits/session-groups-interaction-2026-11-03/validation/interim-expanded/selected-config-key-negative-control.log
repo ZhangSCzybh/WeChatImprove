@@ -1,0 +1,2 @@
+Selection equivalence: 32 source/fold/privacy/duplicate/capability cases, 192 group transitions; no native unread getter reads for selection.
+FAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-interaction-2026-11-03/validation/SelectionReuseFixture.h:134: reads==0

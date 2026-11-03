@@ -1,0 +1,1024 @@
+{
+  "timestamp": "2026-11-03T18:07:25.443761+08:00",
+  "passed": true,
+  "counts": {
+    "native": 3382,
+    "unread": 77,
+    "unread_abi": 7,
+    "legacy_live_contracts": 392,
+    "independent_interaction": 101,
+    "compatibility": 93,
+    "core_total": 4052,
+    "scroll_position": 199,
+    "selection_subset_not_added": 2994,
+    "removed_unreachable_top_contracts": 3,
+    "current_total_without_double_counting": 4251,
+    "negative_controls": 16
+  },
+  "checks": [
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupNativeModel.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupNativeModel.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupNativeSessionCoordinator.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupNativeSessionCoordinator.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupListAdapter.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupListAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupNativeBridge.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupNativeBridge.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupProjection.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupProjection.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupPreferences.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/WESessionTabItem.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/WESessionTabItem.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSCloseFriendPolicy.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSCloseFriendSignatures.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupInvocationMapper.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupInvocationMapper.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupIndexScope.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupIndexScope.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSGroupPreferences.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSCloseFriendUnreadPanelAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSCloseFriendContactAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Controllers/CSCloseFriendBridge.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Hooks/NativeSessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Hooks/SessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:production:Hooks/CloseFriendUnreadPanelHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:AdapterBehaviorFixture.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:BlankRegressionFixture.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:CompatibilityPublicationFixture.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:CpuRegressionFixture.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:InteractionSchedulingFixture.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:ModelPerfBench.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:NativeGroupBehaviorTests.m",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:ScrollPositionFixture.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:SelectionReuseFixture.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:UIKit/UIKit.h",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:extract-production-bodies.py",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:extract-unread-panel.py",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:record-validation.py",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:reproduce-host-shapes.py",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:run-compatibility-validation.py",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:run-interaction-comparison.py",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:run-legacy-core.py",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:run-model-benchmark.py",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:run-native-behavior.sh",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:run-negative-controls.py",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:run-scroll-position-validation.py",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:run-unread-panel.sh",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:validation:seal-validation.py",
+      "passed": true
+    },
+    {
+      "check": "behavior-result.json:source_unchanged_during_checks",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Controllers/CSGroupNativeModel.h",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Controllers/CSGroupNativeModel.m",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Controllers/CSGroupNativeSessionCoordinator.h",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Controllers/CSGroupNativeSessionCoordinator.m",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Controllers/CSGroupListAdapter.h",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Controllers/CSGroupListAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Controllers/CSGroupNativeBridge.h",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Controllers/CSGroupNativeBridge.m",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Controllers/CSGroupProjection.h",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Controllers/CSGroupProjection.m",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Controllers/WESessionTabItem.h",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Controllers/WESessionTabItem.m",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Hooks/NativeSessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:production:Hooks/SessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeModel.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeModel.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeSessionCoordinator.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeSessionCoordinator.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupListAdapter.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupListAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeBridge.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeBridge.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupProjection.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupProjection.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/WESessionTabItem.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/WESessionTabItem.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Hooks/NativeSessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Hooks/SessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "negative-controls-result.json:source_unchanged_during_controls",
+      "passed": true
+    },
+    {
+      "check": "interaction-comparison.json:production:Controllers/CSGroupListAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "interaction-comparison.json:production:Controllers/CSGroupNativeModel.h",
+      "passed": true
+    },
+    {
+      "check": "interaction-comparison.json:production:Controllers/CSGroupNativeModel.m",
+      "passed": true
+    },
+    {
+      "check": "interaction-comparison.json:production:Controllers/CSGroupProjection.h",
+      "passed": true
+    },
+    {
+      "check": "interaction-comparison.json:production:Controllers/CSGroupProjection.m",
+      "passed": true
+    },
+    {
+      "check": "interaction-comparison.json:production:Controllers/CSGroupNativeSessionCoordinator.h",
+      "passed": true
+    },
+    {
+      "check": "interaction-comparison.json:production:Controllers/CSGroupNativeSessionCoordinator.m",
+      "passed": true
+    },
+    {
+      "check": "interaction-comparison.json:production:Hooks/SessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupListAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeModel.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeModel.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupProjection.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupProjection.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeSessionCoordinator.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeSessionCoordinator.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Hooks/SessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "interaction-comparison.json:source_unchanged",
+      "passed": true
+    },
+    {
+      "check": "compatibility-result.json:production:Controllers/CSGroupListAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "compatibility-result.json:production:Controllers/CSGroupListAdapter.h",
+      "passed": true
+    },
+    {
+      "check": "compatibility-result.json:production:Controllers/CSGroupProjection.m",
+      "passed": true
+    },
+    {
+      "check": "compatibility-result.json:production:Controllers/CSGroupNativeBridge.m",
+      "passed": true
+    },
+    {
+      "check": "compatibility-result.json:production:Controllers/CSGroupPreferences.m",
+      "passed": true
+    },
+    {
+      "check": "compatibility-result.json:production:Controllers/CSGroupIndexScope.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupListAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupListAdapter.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupProjection.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeBridge.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupPreferences.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupIndexScope.m",
+      "passed": true
+    },
+    {
+      "check": "compatibility-result.json:source_unchanged",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupNativeModel.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupNativeModel.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupNativeSessionCoordinator.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupNativeSessionCoordinator.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupNativeBridge.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupNativeBridge.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupProjection.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupProjection.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupIndexScope.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupIndexScope.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupInvocationMapper.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupInvocationMapper.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupPreferences.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupPreferences.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/WESessionTabItem.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/WESessionTabItem.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSCloseFriendPolicy.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSCloseFriendPolicy.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSCloseFriendSignatures.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSCloseFriendSignatures.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupListAdapter.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Controllers/CSGroupListAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Hooks/NativeSessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:production:Hooks/SessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeModel.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeModel.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeSessionCoordinator.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeSessionCoordinator.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeBridge.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupNativeBridge.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupProjection.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupProjection.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupIndexScope.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupIndexScope.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupInvocationMapper.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupInvocationMapper.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupPreferences.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupPreferences.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/WESessionTabItem.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/WESessionTabItem.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSCloseFriendPolicy.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSCloseFriendSignatures.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupListAdapter.h",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Controllers/CSGroupListAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Hooks/NativeSessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "matching current source mapping:Hooks/SessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:AdapterBehaviorFixture.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:BlankRegressionFixture.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:CompatibilityPublicationFixture.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:CpuRegressionFixture.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:InteractionSchedulingFixture.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:ModelPerfBench.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:NativeGroupBehaviorTests.m",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:ScrollPositionFixture.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:SelectionReuseFixture.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:UIKit/UIKit.h",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:extract-production-bodies.py",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:extract-unread-panel.py",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:record-validation.py",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:reproduce-host-shapes.py",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:run-compatibility-validation.py",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:run-interaction-comparison.py",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:run-legacy-core.py",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:run-model-benchmark.py",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:run-native-behavior.sh",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:run-negative-controls.py",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:run-scroll-position-validation.py",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:run-unread-panel.sh",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:validation:seal-validation.py",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:source_unchanged_during_checks",
+      "passed": true
+    },
+    {
+      "check": "scroll-position-result.json:passed",
+      "passed": true
+    },
+    {
+      "check": "behavior runners successful",
+      "passed": true
+    },
+    {
+      "check": "legacy runners successful",
+      "passed": true
+    },
+    {
+      "check": "old native negative controls caught",
+      "passed": true
+    },
+    {
+      "check": "interaction/selection and config controls accepted",
+      "passed": true
+    },
+    {
+      "check": "compatibility and controls accepted",
+      "passed": true
+    },
+    {
+      "check": "scroll and controls accepted",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupNativeModel.h",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupNativeModel.m",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupNativeSessionCoordinator.h",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupNativeSessionCoordinator.m",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupNativeBridge.h",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupNativeBridge.m",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupProjection.h",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupProjection.m",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupIndexScope.h",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupIndexScope.m",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupInvocationMapper.h",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupInvocationMapper.m",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupPreferences.h",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupPreferences.m",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/WESessionTabItem.h",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/WESessionTabItem.m",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSCloseFriendPolicy.h",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSCloseFriendPolicy.m",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSCloseFriendSignatures.h",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSCloseFriendSignatures.m",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupListAdapter.h",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Controllers/CSGroupListAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Hooks/NativeSessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "scroll frozen baseline:Hooks/SessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "interaction frozen baseline:Controllers/CSGroupListAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "interaction frozen baseline:Controllers/CSGroupNativeModel.h",
+      "passed": true
+    },
+    {
+      "check": "interaction frozen baseline:Controllers/CSGroupNativeModel.m",
+      "passed": true
+    },
+    {
+      "check": "interaction frozen baseline:Controllers/CSGroupProjection.h",
+      "passed": true
+    },
+    {
+      "check": "interaction frozen baseline:Controllers/CSGroupProjection.m",
+      "passed": true
+    },
+    {
+      "check": "interaction frozen baseline:Controllers/CSGroupNativeSessionCoordinator.h",
+      "passed": true
+    },
+    {
+      "check": "interaction frozen baseline:Controllers/CSGroupNativeSessionCoordinator.m",
+      "passed": true
+    },
+    {
+      "check": "interaction frozen baseline:Hooks/SessionGroupHooks.xm",
+      "passed": true
+    },
+    {
+      "check": "compat frozen baseline:Controllers/CSGroupListAdapter.m",
+      "passed": true
+    },
+    {
+      "check": "compat frozen baseline:Controllers/CSGroupListAdapter.h",
+      "passed": true
+    },
+    {
+      "check": "compat frozen baseline:Controllers/CSGroupProjection.m",
+      "passed": true
+    },
+    {
+      "check": "compat frozen baseline:Controllers/CSGroupNativeBridge.m",
+      "passed": true
+    },
+    {
+      "check": "compat frozen baseline:Controllers/CSGroupPreferences.m",
+      "passed": true
+    },
+    {
+      "check": "compat frozen baseline:Controllers/CSGroupIndexScope.m",
+      "passed": true
+    },
+    {
+      "check": "core count 4052",
+      "passed": true
+    },
+    {
+      "check": "scroll count 199",
+      "passed": true
+    },
+    {
+      "check": "negative controls 16",
+      "passed": true
+    }
+  ],
+  "project_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "production_source_sha256": {
+    "Controllers/CSGroupNativeModel.h": "320b87d9aadadc4d205c4f076d87987f5e52c761c126d20ac5607b64742f9f35",
+    "Controllers/CSGroupNativeModel.m": "e289ce1d62179ad33a1d9e832a53f44571b6dc0c5894df2117aaaba49458d654",
+    "Controllers/CSGroupNativeSessionCoordinator.h": "bc4e56e2fbaabdf778d54d66fff3021f45fafbe26a7a97cb020bd9ce4ee6cea6",
+    "Controllers/CSGroupNativeSessionCoordinator.m": "49c19b6f25de1dd12b92e3fd1cffdf362ca6bdc33cabcd6c5c81b9e9741cc576",
+    "Controllers/CSGroupListAdapter.h": "aefac9d1cb85242583e7db66bc1baa0835efcef3404cfb45e4d027a55c81a11a",
+    "Controllers/CSGroupListAdapter.m": "ecc54b7c105e9700b26468ab88e5119bf8e2d75d96f54c5c7b2011a50bb8451c",
+    "Controllers/CSGroupNativeBridge.h": "0d32a318d0ebcb99669fa72999dd3bfdff6da7ba19eaa3fc759240cd457b255f",
+    "Controllers/CSGroupNativeBridge.m": "ef2af4e1b7286c8a04ced929c6b30ba071bbffc71563b22164fd63d312344881",
+    "Controllers/CSGroupProjection.h": "f7dd860614a5a2747d000951cadbd3f85475064726af1e49e178ea73485a6b16",
+    "Controllers/CSGroupProjection.m": "b4784583afd936fe91aff2cb195afbeb26fb52c3534e1784aeaeaf3d8db58741",
+    "Controllers/CSGroupPreferences.m": "1ec46fe99d45a47d56319ec5149d54ddbccb3831dbdd52de6f7f4e590bd58bd4",
+    "Controllers/WESessionTabItem.h": "03c4a9b62fdff3d3906e2378a408c0f9791f1413215ddf20c41b2a5d3f4b2b01",
+    "Controllers/WESessionTabItem.m": "2cc891a5d00e2090d6efb322aad75015e3fdd60dda9c2055576bf9d77e9a4f62",
+    "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+    "Controllers/CSCloseFriendSignatures.m": "69e44c74c85e4e0a22dc347b8d1d5007b1e5650cd939ba016ac83098af8c849b",
+    "Controllers/CSGroupInvocationMapper.h": "a9db482a07d22552f86f14756e08637b035771ae4c211235bd886e222972b926",
+    "Controllers/CSGroupInvocationMapper.m": "a8149e2d01d10d4e65574edc9547ce6ee431cd523e6d6d85e505f9c9ce42c68f",
+    "Controllers/CSGroupIndexScope.h": "09cd2719a4439feb264be1666dfed459b776c595ef7772774a7e9bac0e3d24f5",
+    "Controllers/CSGroupIndexScope.m": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780",
+    "Controllers/CSGroupPreferences.h": "88d693c0de5e0fba482ad4a2ce6224d23ce095f6cc73766fb1e74f28883316a5",
+    "Controllers/CSCloseFriendUnreadPanelAdapter.m": "e61a1260a4781f1c640a4b2e52a4c41b8f39e5062c9bd952fcea78826d51e16b",
+    "Controllers/CSCloseFriendContactAdapter.m": "95f2790357e36fe88e7988654bc16c77260bf1743da6b45e88e8a455abb55245",
+    "Controllers/CSCloseFriendBridge.m": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf",
+    "Hooks/NativeSessionGroupHooks.xm": "c29c45304c427a717215a25205f5160ea715bcb5812e111c73785fa59627ce00",
+    "Hooks/SessionGroupHooks.xm": "a6932f42445ff21344c827e3d4c698e4cfad91c52568f26d00288f7816778d66",
+    "Hooks/CloseFriendUnreadPanelHooks.xm": "82792efdd7d4f8a374a0e518dc84815719ca03493e9160eb1f2481732f899a29",
+    "Controllers/CSCloseFriendPolicy.h": "4ccefb7f1a2c173a68316c0f2e0daa9b4d1be189b1cf1cab862271205cd06575",
+    "Controllers/CSCloseFriendSignatures.h": "c9ab23566b35be3a972c4b10cd50c9f7ec4e2fc2448ef000d268900d9f0b42f7"
+  },
+  "validation_source_sha256": {
+    "AdapterBehaviorFixture.h": "c0ee23f35657bc09e6a2f6a5b6b54b0cb8316c36b5968c142c4113f5d4a4b538",
+    "BlankRegressionFixture.h": "b1c7f88a6f27b79c57f6fc5e76e21807e79363150df40cab97fb64acdd0e2b81",
+    "CompatibilityPublicationFixture.h": "0fb31526205c9111053679a106ebce452b47cc85c99d0d513c32e5f1e0b9bc68",
+    "CpuRegressionFixture.h": "c9a5e2d5abd478370256a2d1a5eb171c6fdbcc671215ad230e21230d661b57ea",
+    "InteractionSchedulingFixture.h": "363825b44a1d8f942ff5244b08cc90359578ccdc5e3defd820e80310e0c8c5e6",
+    "ModelPerfBench.m": "919a832e5afd1d6a90cfa9ae650afc3571da22ed0c7d264bc607c20efde5592f",
+    "NativeGroupBehaviorTests.m": "42c6c293071381509d8690c013c072e86075867e8bb42e1a2e5c7e587b82e66d",
+    "README.md": "467eb479593a074a7b7e76c13c1073a45fb9e4dfc4e7cf980e834373a0b1a7a9",
+    "ScrollPositionFixture.h": "524773cbfa5d5e642b3153408869f6821ab3f3df8afa6b909a7cda2df4f077b0",
+    "SelectionReuseFixture.h": "c18df4a5a3fb8012767919e4340817ff91c5317dbfe2930c5d7310289d1c695d",
+    "UIKit/UIKit.h": "5088de0170885c9dafe03cec52cfbca3577a3477bba8d331040e6cc99cb9bc9d",
+    "extract-production-bodies.py": "ebac8da9291335d284698f4bd3d38e97f67cabbd5586465a745bb10af587391e",
+    "extract-unread-panel.py": "198dbea09e6443b72e195ac4b3af43f73e26799fa94f59b9c76b800c051431e2",
+    "record-validation.py": "43762a6b3d5bbc10adbebf621c63c2ada1c6b1535abeb5c5fb7258627cd393ed",
+    "reproduce-host-shapes.py": "5ce57a69a4903686681806324ac5307c68ae9b3a0f7a050b7884f2ba4ea39620",
+    "run-compatibility-validation.py": "2bfb1ec02513b590d56c55683a9639c0c275a71e11a45b80263fac9152bb1d11",
+    "run-interaction-comparison.py": "76411532e65932d96998ee8f6b96a739abcb78d3911f154b0a59d88b85456586",
+    "run-legacy-core.py": "9ae6601a0bec5ba50e9ce809c8b080f0df2726aa5a863f840341bfb7bc04313f",
+    "run-model-benchmark.py": "b62ac406c772173ebeb0369af68eb1acf15dfb1e01463fd95f03934094902d46",
+    "run-native-behavior.sh": "5fc823bff4ddfa206dc2caa1569504e08a4c267a3616179310573cfefb7f8aad",
+    "run-negative-controls.py": "da81ac8fe9a6b2a5c9f0b01a5ef542de843e202087b67c4fecfd6adb45f67cd8",
+    "run-scroll-position-validation.py": "7e37efbda363627e55d9db9106748b6175e796516cccdd17e46f8aa5eedeca51",
+    "run-unread-panel.sh": "885526715384c89a06a4a115af276131eb53c16a8cac253bde4e4788dc35aaab",
+    "seal-validation.py": "644988e20f3171a29a157fc09087d67419a318a788cf1c0c5ce8bf677a533151"
+  },
+  "final_evidence_sha256": {
+    "baseline-2.2-10-return.log": "d6339c8c4d1feafd37b9c323288800746234895664099bc594749068f934de9a",
+    "baseline-2.2-10-switch.log": "9164e9b4c27be064e62321ff9fc8e60b3d5935d870c1558ef0ee594e35ba3c3b",
+    "baseline-compatibility.log": "640524f4fed48d6d190126a6762c723eecb488aed5a4528bba55443a480164aa",
+    "baseline-idle-interaction-loop.log": "cc6c6bbe32bdc5936fef267b4c1f9a794399d062b50f3b137947872f1d693e39",
+    "baseline-selection-source-reads.log": "bbba93d863a6ada632c72b698990c04c8115b6c727cf83b44334a10e97007d61",
+    "behavior-result.json": "b5257dec9ecfdd4751353d8d18bc6b2929a8dd1549b54819b2c9f3e160524e4f",
+    "compat-always-layout.log": "aa313aaa76f0a0e2116f1e9a407f04e2998d6519c4ee4245f9b5f4b94ab60c00",
+    "compat-drop-names.log": "6e3102ead4c76947e5d7d1fea0230057d386911f3c802d45ce4ce36ab76154dd",
+    "compat-full-ui.log": "aa313aaa76f0a0e2116f1e9a407f04e2998d6519c4ee4245f9b5f4b94ab60c00",
+    "compat-ignore-metadata.log": "ce91ea1944d614c74b42c78fef07df130cb9c15ebab4e85d9ba2d0614fae07bd",
+    "compat-ignore-reentrancy.log": "00b98dc8330e81e165e976910787ec892a9bff366d6f5b929e908f491ea35062",
+    "compat-ignore-structure-proof.log": "f886a07b7eabd93ba236362054d051a13982178431642dfb105384493759d390",
+    "compatibility-result.json": "9a17ae5c233ba180fbf234766b642194b4d5d95dcba7898694156929d9a9c572",
+    "current-compatibility.log": "e5b87a80c600793ca877a21208c71ece41cb4eeecb17a94fab7aebc210b74d85",
+    "current-interaction.log": "7dd22add7d2f3cebf2b1fc276b35f5a762be551f0d12ae953c2aa391fd46b29a",
+    "current-scroll-position.log": "b71bb1b61b447bb32ca8dc74b45fd90f7ff428570b781f26f19c7b9eccf29ae3",
+    "current-selection.log": "903d22064f271f4624941da6b097e64520fb0cb09f58f104fbc2c51e94ae84e6",
+    "forced-full-ui-negative-control.log": "9a44f8775ed1a0702d0156816c874d266b6bc8437c8f9d7f72cc547f728bf0db",
+    "interaction-comparison.json": "e75e0459c9e003db0a57e599c949424e9f8de4aed0f35998cd65ca10a7628365",
+    "interaction-mismatch-negative-control.log": "fe0caa21bcbf9272e8580aba61d4c9388206e8d361f2e204bace56aa67080dbe",
+    "legacy-core-result.json": "31f26b4cbacd9c3c31b87272b713c8d885e3dbee748270536018ec7993476687",
+    "negative-controls-result.json": "348f79a9617f8f0a39b52fbc14758b8ec891d4ff7458b64c9630175554e90489",
+    "negative-ignore-failed-restore.log": "a480fa0efc537316a13cfb31274195c31db4bfe9cb8902e9bda51d05447026cd",
+    "negative-ignore-selection-readback.log": "d6f16410817087c0ae28455d905c11894f14c5416dd3c1a7eda8163bc8810f64",
+    "negative-retarget-copy-identity.log": "a8e0a4eb6b9fa061d7777b0e230f63a571a0c70ac4995a8b8cccad0d3dbe61fc",
+    "negative-skip-final-return.log": "6f2a2240584f50eb7ea2d8d108f7902aae07b1a27827780a221b36459f8e30e0",
+    "old-recovery-reset-negative-control.log": "a796ceca76f6c08856dc854ae031f4b15b270983e6ad5a3e464f3db7bd627483",
+    "run-native-behavior.sh.log": "3f4fe3dd41b781536d32534468800181a214a445f3a208784fbf5c30a386c025",
+    "run-unread-panel.sh.log": "35f330a26ae3666cc90a20eb3d957741e2fa3e3b39f0c74b97cb07ab647f3920",
+    "scroll-position-result.json": "b325b43a31a0e62dbfdaf7f9350730cd3db4fa37d701d655a35b76a20ca257ac",
+    "selected-config-key-negative-control.log": "c05709bdfc973b74477663eea28452c05191d5db445059d6e5541a899f465ecd",
+    "verify-group-appearance.sh.log": "52699684330e80fb40d7288922078a574e06338295d481c7c4a642898c4f96ee",
+    "verify-group-badges.sh.log": "2dbc30b86a888021d6cde4aceb9aecc3f19027ad5d98b2ec91c928a602ee82f9",
+    "verify-group-header.sh.log": "4dc43bec7a8c7a65c0d573b91857a46abfe2a343ca3223c8ea7636c94f788a0a",
+    "verify-group-incremental.sh.log": "a7500fb457fb22476a8a42d385e2e8dbac6338954747bdee73dad03d0b587f19",
+    "verify-group-preferences.sh.log": "f61e5a3eb1b461ee926901254f97acf1dec9a93769ca157f82a7cd8687967a7c"
+  },
+  "scope": "All listed current checks rerun here against final frozen production; actual dependencies and evidence bytes bound. No UI/observation rerun claimed. Root Tests remains deleted; old audits read only."
+}

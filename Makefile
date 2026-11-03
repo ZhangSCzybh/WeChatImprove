@@ -2,8 +2,6 @@ export DEBUG=0
 export FINALPACKAGE=1
 export THEOS=/Users/zhangshichao/theos
 
-//make clean && make package SCHEME=rootless
-
 # 项目名称
 TWEAK_NAME = WeChatImprove
 

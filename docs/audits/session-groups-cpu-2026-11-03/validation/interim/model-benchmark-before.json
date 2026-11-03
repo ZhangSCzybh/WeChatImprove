@@ -1,0 +1,174 @@
+{
+  "custom_groups": 24,
+  "final_projection_fingerprint": {
+    "benchmark_custom_0": [
+      345,
+      false,
+      81
+    ],
+    "benchmark_custom_1": [
+      398,
+      false,
+      81
+    ],
+    "benchmark_custom_2": [
+      358,
+      false,
+      81
+    ],
+    "benchmark_custom_3": [
+      398,
+      false,
+      81
+    ],
+    "benchmark_custom_4": [
+      351,
+      false,
+      81
+    ],
+    "benchmark_custom_5": [
+      401,
+      false,
+      81
+    ],
+    "benchmark_custom_6": [
+      342,
+      false,
+      81
+    ],
+    "benchmark_custom_7": [
+      393,
+      false,
+      81
+    ],
+    "benchmark_custom_8": [
+      344,
+      false,
+      81
+    ],
+    "benchmark_custom_9": [
+      396,
+      false,
+      81
+    ],
+    "benchmark_custom_10": [
+      346,
+      false,
+      81
+    ],
+    "benchmark_custom_11": [
+      397,
+      false,
+      81
+    ],
+    "benchmark_custom_12": [
+      359,
+      false,
+      81
+    ],
+    "benchmark_custom_13": [
+      398,
+      false,
+      81
+    ],
+    "benchmark_custom_14": [
+      350,
+      false,
+      81
+    ],
+    "benchmark_custom_15": [
+      402,
+      false,
+      81
+    ],
+    "benchmark_custom_16": [
+      342,
+      false,
+      80
+    ],
+    "benchmark_custom_17": [
+      391,
+      false,
+      80
+    ],
+    "benchmark_custom_18": [
+      343,
+      false,
+      80
+    ],
+    "benchmark_custom_19": [
+      392,
+      false,
+      80
+    ],
+    "benchmark_custom_20": [
+      341,
+      false,
+      80
+    ],
+    "benchmark_custom_21": [
+      393,
+      false,
+      80
+    ],
+    "benchmark_custom_22": [
+      352,
+      false,
+      80
+    ],
+    "benchmark_custom_23": [
+      391,
+      false,
+      80
+    ],
+    "preset_0": [
+      5520,
+      false,
+      1200
+    ],
+    "preset_1": [
+      1840,
+      false,
+      400
+    ],
+    "preset_2": [
+      3680,
+      false,
+      800
+    ],
+    "preset_3": [
+      0,
+      false,
+      0
+    ]
+  },
+  "implementation": "2.2-7-full-build",
+  "median_milliseconds_per_update": 4.358528822194785,
+  "metadata_reads_per_round": [
+    144000,
+    144000,
+    144000,
+    144000,
+    144000
+  ],
+  "milliseconds_per_update_each_round": [
+    4.485088544121633,
+    4.491486113208036,
+    4.35152812472855,
+    4.358528822194785,
+    4.326049653658022
+  ],
+  "rounds": 5,
+  "scope": "macOS host wall time; real production native model + projection; controlled session row provider; excludes UIKit/device CPU, source capture, bridge and coordinator",
+  "sessions": 1200,
+  "updates_per_round": 120,
+  "production_source_sha256": {
+    "Controllers/CSGroupNativeModel.m": "3175f288c495de06b91f2af42e93b6338a69cee5a95cf6e968a3097639ceb006",
+    "Controllers/CSGroupNativeModel.h": "0bd50a8f13b035aa973fbfd46d74db6e38ec749755f7228f2e31422e2c1d8d3a",
+    "Controllers/CSGroupProjection.m": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a",
+    "Controllers/CSGroupProjection.h": "f92f2377662d0d684d683ee5b3b3352ef100e825b6e8398268a15990febb2f19",
+    "Controllers/WESessionTabItem.m": "dfb12f2a1eb44a0d35a175419bfe914cf7d22ff042e75cbc679ce6959928a6e0",
+    "Controllers/WESessionTabItem.h": "11fab1658de7f1d3252b0465380dda5230f38614b417df33bc1fb24dfad96a9b"
+  },
+  "source_unchanged_during_run": true
+}

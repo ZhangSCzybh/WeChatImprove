@@ -1,0 +1,10 @@
+{
+  "source": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/WESessionTabContainerView.m",
+  "sha256": "e7eed246d2883182710aa8483118d6dac8e8236e31b098366c959bad99b54905",
+  "extracted_fixture": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-efficiency-2026-11-03/ui-validation/current-extracted.m",
+  "exit_code": 0,
+  "method_body_source": "unmodified production method bodies; deterministic host UI objects",
+  "scope": "geometry, invalidation, measurement and animation lifecycle contracts; no real UIKit rendering or device CPU",
+  "output": "{\"checks\":135,\"failures\":0,\"stable_iterations\":1000,\"stable_visual_writes\":0,\"stable_text_measurements\":0,\"stable_synchronous_layouts\":0}",
+  "stderr": ""
+}

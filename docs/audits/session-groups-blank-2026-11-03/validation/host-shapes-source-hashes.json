@@ -1,0 +1,10 @@
+{
+  "Controllers/CSGroupNativeModel.m": "3175f288c495de06b91f2af42e93b6338a69cee5a95cf6e968a3097639ceb006",
+  "Controllers/CSGroupNativeSessionCoordinator.m": "5429f1d5470460b61c09c655b04d8ccc65c0967dec70ffcb08819e5236cb416a",
+  "Controllers/CSGroupNativeBridge.m": "0f0437a221c59099e8b28ad089eb4d6f6c61ef5e4971349b6fcc802f841b7ed2",
+  "Controllers/CSGroupProjection.m": "503251c7968486aeb4b761d4bb1d97373379ba28f52650faa7bd6c265177b20a",
+  "Controllers/CSGroupPreferences.m": "1ec46fe99d45a47d56319ec5149d54ddbccb3831dbdd52de6f7f4e590bd58bd4",
+  "Controllers/WESessionTabItem.m": "dfb12f2a1eb44a0d35a175419bfe914cf7d22ff042e75cbc679ce6959928a6e0",
+  "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+  "Controllers/CSCloseFriendSignatures.m": "69e44c74c85e4e0a22dc347b8d1d5007b1e5650cd939ba016ac83098af8c849b"
+}

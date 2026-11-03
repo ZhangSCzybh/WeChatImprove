@@ -1,0 +1,275 @@
+{
+  "date": "2026-11-03",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "history": [
+    {
+      "ref": "3810d735",
+      "metadata": "3810d7350ff27ce6290eb04f53c9e52da4c98da7\n2026-10-30 16:34:26 +0800\nrelease: publish 2.1-25 with background policies and scroll position fixes\nAdd background schedules, duration limits, and energy protection while preserving existing settings. Keep configuration backups manual and retain restore rollback support.\n\nShare the current scroll height across groups and restore the departure height after returning from chats. Update tests, documentation, and verified 2.1-22 through 2.1-25 release artifacts.",
+      "control_version": "2.1-25",
+      "files": {
+        "Hooks/SessionGroupHooks.xm": {
+          "sha256": "3042fc03b62a3f987ba3755143edeca7dac6c7b8ebb4d32b3a72fc8643511e2d",
+          "excerpts": [
+            {
+              "needle": "finishPresentationReturnForController:self",
+              "line": 109,
+              "source": "106:     [CSGroupListAdapter setPresentationSuspended:NO forController:self];\n107:     Native(self,NO,^{ %orig; });\n108:     [CSGroupListAdapter attachToController:self];\n109:     [CSGroupListAdapter finishPresentationReturnForController:self];\n110: }\n111: - (void)viewWillDisappear:(BOOL)animated {\n112:     [CSGroupListAdapter setPresentationSuspended:YES forController:self];\n113:     Native(self,NO,^{ %orig; });\n114: }\n115: - (void)viewDidDisappear:(BOOL)animated {"
+            }
+          ]
+        },
+        "Controllers/CSGroupListAdapter.m": {
+          "sha256": "afec964c1b0a76975dd9942fe591ce30b8db99568eedf7b6e8e90f7aae6dba52",
+          "excerpts": [
+            {
+              "needle": "if (suspended && !adapter.presentationSuspended)",
+              "line": 211,
+              "source": "208:     if (!NSThread.isMainThread || !controller) return;\n209:     objc_setAssociatedObject(controller,&PresentationSuspendedKey,@(suspended),OBJC_ASSOCIATION_RETAIN_NONATOMIC);\n210:     CSGroupListAdapter *adapter=[self adapterForController:controller];\n211:     if (suspended && !adapter.presentationSuspended) {\n212:         adapter.presentationViewport=nil;\n213:         NSString *account=adapter.preferences.accountID;\n214:         CGFloat height=adapter.table.contentOffset.y+adapter.table.adjustedContentInset.top;\n215:         if (!CSGroupIsFoldedController(controller) && adapter.isActive && adapter.chromeVisible && !adapter.searching &&\n216:             !adapter.nativePresentation && !adapter.nativeActions.count && !adapter.pendingScrollToTop &&\n217:             account.length && [account isEqual:CSGroupCurrentAccountID()] && isfinite(height))"
+            },
+            {
+              "needle": "self.presentationViewport=nil; self.pendingScrollToTop=NO;",
+              "line": 1625,
+              "source": "1622:     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;\n1623:     // Refresh carries the current height across groups. A new selection also\n1624:     // supersedes any older explicit top request.\n1625:     self.presentationViewport=nil; self.pendingScrollToTop=NO;\n1626:     [self refresh];\n1627:     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];\n1628: }\n1629: + (void)refreshFoldedListsForAccount:(NSString *)account {\n1630:     if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;\n1631:     // Separate native owners cache the same account's group selection. A hidden"
+            },
+            {
+              "needle": "self.pendingScrollToTop=YES;",
+              "line": 1639,
+              "source": "1636: - (void)returnToGroupTop {\n1637:     if (self.presentationSuspended || !CSGroupApplicationActive()) return;\n1638:     if (!Option(@\"enabled\") || !self.chromeVisible || self.searching) return;\n1639:     self.presentationViewport=nil; self.pendingScrollToTop=YES;\n1640:     if (self.publishedTabID) [self.anchors removeObjectForKey:self.publishedTabID];\n1641:     [self.table layoutIfNeeded];\n1642:     [self applyPendingScrollToTop];\n1643:     [self refreshNavigationTitle];\n1644: }\n1645: - (void)applyPendingScrollToTop {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "ref": "0b53ff51",
+      "metadata": "0b53ff516a5e88b0c50e30ff2d9b539383b3c1c4\n2026-10-30 22:02:22 +0800\nfix: preserve safe service rows and scrolling during list return (2.1-31)",
+      "control_version": "2.1-31",
+      "files": {
+        "Hooks/SessionGroupHooks.xm": {
+          "sha256": "4dfa6d802eb1dda2a3197b16ccd282c4e489e92e14cc3ee732134c78ec3948a7",
+          "excerpts": [
+            {
+              "needle": "finishPresentationReturnForController:self",
+              "line": 119,
+              "source": "116:     [CSGroupListAdapter setPresentationSuspended:NO forController:self];\n117:     Native(self,NO,^{ %orig; });\n118:     [CSGroupListAdapter attachToController:self];\n119:     [CSGroupListAdapter finishPresentationReturnForController:self];\n120: }\n121: - (void)viewWillDisappear:(BOOL)animated {\n122:     [CSGroupListAdapter setPresentationSuspended:YES forController:self];\n123:     Native(self,NO,^{ %orig; });\n124: }\n125: - (void)viewDidDisappear:(BOOL)animated {"
+            }
+          ]
+        },
+        "Controllers/CSGroupListAdapter.m": {
+          "sha256": "8186a42e512dfc2b41c1ff27c303ad08c9c8edaac28098140d2cf8856f8c5e95",
+          "excerpts": [
+            {
+              "needle": "if (suspended && !adapter.presentationSuspended)",
+              "line": 317,
+              "source": "314:     if (!NSThread.isMainThread || !controller) return;\n315:     objc_setAssociatedObject(controller,&PresentationSuspendedKey,@(suspended),OBJC_ASSOCIATION_RETAIN_NONATOMIC);\n316:     CSGroupListAdapter *adapter=[self adapterForController:controller];\n317:     if (suspended && !adapter.presentationSuspended) {\n318:         adapter.presentationViewport=nil;\n319:         NSString *account=adapter.preferences.accountID;\n320:         CGFloat height=adapter.table.contentOffset.y+adapter.table.adjustedContentInset.top;\n321:         if (!CSGroupIsFoldedController(controller) && adapter.isActive && adapter.chromeVisible && !adapter.searching &&\n322:             !adapter.nativePresentation && !adapter.nativeActions.count && !adapter.pendingScrollToTop &&\n323:             account.length && [account isEqual:CSGroupCurrentAccountID()] && isfinite(height))"
+            },
+            {
+              "needle": "self.presentationViewport=nil; self.pendingScrollToTop=NO;",
+              "line": 1909,
+              "source": "1906:     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;\n1907:     // Refresh carries the current height across groups. A new selection also\n1908:     // supersedes any older explicit top request.\n1909:     self.presentationViewport=nil; self.pendingScrollToTop=NO;\n1910:     [self refresh];\n1911:     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];\n1912: }\n1913: + (void)refreshFoldedListsForAccount:(NSString *)account {\n1914:     if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;\n1915:     // Separate native owners cache the same account's group selection. A hidden"
+            },
+            {
+              "needle": "self.pendingScrollToTop=YES;",
+              "line": 1923,
+              "source": "1920: - (void)returnToGroupTop {\n1921:     if (self.presentationSuspended || !CSGroupApplicationActive()) return;\n1922:     if (!Option(@\"enabled\") || !self.chromeVisible || self.searching) return;\n1923:     self.presentationViewport=nil; self.pendingScrollToTop=YES;\n1924:     if (self.publishedTabID) [self.anchors removeObjectForKey:self.publishedTabID];\n1925:     [self.table layoutIfNeeded];\n1926:     [self applyPendingScrollToTop];\n1927:     [self refreshNavigationTitle];\n1928: }\n1929: - (void)applyPendingScrollToTop {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "ref": "8467df87",
+      "metadata": "8467df87bebb2998f021238b7d88eaea65266214\n2026-10-30 23:09:00 +0800\nRelease 2.2-1 from verified 2.1-20 with manual backups and miniapp privacy fix",
+      "control_version": "2.2-1",
+      "files": {
+        "Hooks/SessionGroupHooks.xm": {
+          "sha256": "7e3ed572e1937a93cc6e82638972c45509fcd894dba6731dccf663a74411e806",
+          "excerpts": [
+            {
+              "needle": "[Adapter(self) returnToGroupTop];",
+              "line": 71,
+              "source": "68:     [CSGroupListAdapter setPresentationSuspended:NO forController:self];\n69:     Native(self,NO,^{ %orig; });\n70:     [CSGroupListAdapter attachToController:self];\n71:     [Adapter(self) returnToGroupTop];\n72: }\n73: - (void)viewWillDisappear:(BOOL)animated {\n74:     [CSGroupListAdapter setPresentationSuspended:YES forController:self];\n75:     Native(self,NO,^{ %orig; });\n76: }\n77: - (void)viewDidDisappear:(BOOL)animated {"
+            }
+          ]
+        },
+        "Controllers/CSGroupListAdapter.m": {
+          "sha256": "04347cc9a79cea7c5f210b450850e3dd8b967de7e2b3824581ec650daf1f06af",
+          "excerpts": [
+            {
+              "needle": "self.pendingScrollToTop=YES;",
+              "line": 1440,
+              "source": "1437:     [self.nativeActions removeAllObjects];\n1438:     self.snapshotRetryAttempted=NO; self.recoveryAttempts=0; self.recoveryPending=NO;\n1439:     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;\n1440:     self.pendingScrollToTop=YES;\n1441:     [self.anchors removeObjectForKey:tabID];\n1442:     [self refresh];\n1443:     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];\n1444: }\n1445: + (void)refreshFoldedListsForAccount:(NSString *)account {\n1446:     if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;"
+            },
+            {
+              "needle": "self.pendingScrollToTop=YES;",
+              "line": 1455,
+              "source": "1452: - (void)returnToGroupTop {\n1453:     if (self.presentationSuspended || !CSGroupApplicationActive()) return;\n1454:     if (!Option(@\"enabled\") || !self.chromeVisible || self.searching) return;\n1455:     self.pendingScrollToTop=YES;\n1456:     if (self.publishedTabID) [self.anchors removeObjectForKey:self.publishedTabID];\n1457:     [self.table layoutIfNeeded];\n1458:     [self applyPendingScrollToTop];\n1459:     [self refreshNavigationTitle];\n1460: }\n1461: - (void)applyPendingScrollToTop {"
+            },
+            {
+              "needle": "[self.anchors removeObjectForKey:tabID];",
+              "line": 1441,
+              "source": "1438:     self.snapshotRetryAttempted=NO; self.recoveryAttempts=0; self.recoveryPending=NO;\n1439:     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;\n1440:     self.pendingScrollToTop=YES;\n1441:     [self.anchors removeObjectForKey:tabID];\n1442:     [self refresh];\n1443:     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];\n1444: }\n1445: + (void)refreshFoldedListsForAccount:(NSString *)account {\n1446:     if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;\n1447:     // Separate native owners cache the same account's group selection. A hidden"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "ref": "HEAD",
+      "metadata": "863bfdb350fddf678c349574d99badb241d98958\n2026-11-02 18:31:35 +0800\nRelease 2.2-6: prioritize native background tasks and add run records\nUse finite UIKit tasks before audio, with one cancellable adaptive check and\nsafe task rotation. Start audio below 8 seconds; return to a valid task after\nat least 5 seconds of audio and two spaced checks with 12 seconds of finite\nbudget. Preserve audio ownership, host calls, recordings and expiration guards.\n\nAllow AI background work during valid task execution as well as owned audio.\nShow the latest background entry, actual check, foreground return, stop reason\nand monotonic check-to-return interval without timestamp-only refresh broadcasts.\n\nInclude the 2.2-4 through 2.2-6 audits, packages, symbols and SHA256 manifests.\nValidation: 1,378 checks for the final adjustment, arm64/arm64e Rootless and\nRootful builds, package metadata and matching dSYM UUIDs; no new build warnings.",
+      "control_version": "2.2-6",
+      "files": {
+        "Hooks/SessionGroupHooks.xm": {
+          "sha256": "23232809b13300c9820de0b410cdef9d98278fb3598cdbfa76d73ecb97dcee3a",
+          "excerpts": [
+            {
+              "needle": "[Adapter(self) returnToGroupTop];",
+              "line": 82,
+              "source": "79:     [CSGroupListAdapter setPresentationSuspended:NO forController:self];\n80:     Native(self,NO,^{ %orig; });\n81:     [CSGroupListAdapter attachToController:self];\n82:     [Adapter(self) returnToGroupTop];\n83: }\n84: - (void)viewWillDisappear:(BOOL)animated {\n85:     [CSGroupListAdapter setPresentationSuspended:YES forController:self];\n86:     Native(self,NO,^{ %orig; });\n87: }\n88: - (void)viewDidDisappear:(BOOL)animated {"
+            }
+          ]
+        },
+        "Controllers/CSGroupListAdapter.m": {
+          "sha256": "9a2220feafecdbffc6fc72115a4e7e8b50bf2e0ef365dadf609867feff0dfb96",
+          "excerpts": [
+            {
+              "needle": "self.pendingScrollToTop=YES;",
+              "line": 1533,
+              "source": "1530:     [self.nativeActions removeAllObjects];\n1531:     self.snapshotRetryAttempted=NO; self.recoveryAttempts=0; self.recoveryPending=NO;\n1532:     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;\n1533:     self.pendingScrollToTop=YES;\n1534:     [self.anchors removeObjectForKey:tabID];\n1535:     [self refresh];\n1536:     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];\n1537: }\n1538: + (void)refreshFoldedListsForAccount:(NSString *)account {\n1539:     if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;"
+            },
+            {
+              "needle": "self.pendingScrollToTop=YES;",
+              "line": 1548,
+              "source": "1545: - (void)returnToGroupTop {\n1546:     if (self.presentationSuspended || !CSGroupApplicationActive()) return;\n1547:     if (!Option(@\"enabled\") || !self.chromeVisible || self.searching) return;\n1548:     self.pendingScrollToTop=YES;\n1549:     if (self.publishedTabID) [self.anchors removeObjectForKey:self.publishedTabID];\n1550:     [self.table layoutIfNeeded];\n1551:     [self applyPendingScrollToTop];\n1552:     [self refreshNavigationTitle];\n1553: }\n1554: - (void)applyPendingScrollToTop {"
+            },
+            {
+              "needle": "[self.anchors removeObjectForKey:tabID];",
+              "line": 1534,
+              "source": "1531:     self.snapshotRetryAttempted=NO; self.recoveryAttempts=0; self.recoveryPending=NO;\n1532:     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;\n1533:     self.pendingScrollToTop=YES;\n1534:     [self.anchors removeObjectForKey:tabID];\n1535:     [self refresh];\n1536:     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];\n1537: }\n1538: + (void)refreshFoldedListsForAccount:(NSString *)account {\n1539:     if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;\n1540:     // Separate native owners cache the same account's group selection. A hidden"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "frozen_builds": [
+    {
+      "version": "2.2-6",
+      "audit": "docs/audits/session-groups-native-2026-11-03/builds/final",
+      "frozen_source": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-native-groups-20261103-ggx1js5e/source",
+      "files": {
+        "Hooks/SessionGroupHooks.xm": {
+          "sha256": "999991380018fed90b62973796e1eca7b89774284027820ad1ef533df7079070",
+          "matches_build_manifest": true,
+          "excerpts": [
+            {
+              "needle": "[Adapter(self) returnToGroupTop];",
+              "line": 138,
+              "source": "135:     [CSGroupListAdapter setPresentationSuspended:NO forController:self];\n136:     Native(self,NO,^{ %orig; });\n137:     [CSGroupListAdapter attachToController:self];\n138:     [Adapter(self) returnToGroupTop];\n139: }\n140: - (void)viewWillDisappear:(BOOL)animated {\n141:     [CSGroupListAdapter setPresentationSuspended:YES forController:self];\n142:     Native(self,NO,^{ %orig; });\n143: }\n144: - (void)viewDidDisappear:(BOOL)animated {"
+            }
+          ]
+        },
+        "Controllers/CSGroupListAdapter.m": {
+          "sha256": "539452aff9c3e0efb25fa4fe38b310ceb901c978a0cb3783f6bbde7f6b2cb107",
+          "matches_build_manifest": true,
+          "excerpts": [
+            {
+              "needle": "self.pendingScrollToTop=YES;",
+              "line": 1810,
+              "source": "1807:     [self.nativeActions removeAllObjects];\n1808:     self.snapshotRetryAttempted=NO; self.recoveryAttempts=0; self.recoveryPending=NO;\n1809:     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;\n1810:     self.pendingScrollToTop=YES;\n1811:     [self.anchors removeObjectForKey:tabID];\n1812:     [self refresh];\n1813:     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];\n1814: }\n1815: + (void)refreshFoldedListsForAccount:(NSString *)account {\n1816:     if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;"
+            },
+            {
+              "needle": "self.pendingScrollToTop=YES;",
+              "line": 1825,
+              "source": "1822: - (void)returnToGroupTop {\n1823:     if (self.presentationSuspended || !CSGroupApplicationActive()) return;\n1824:     if (!Option(@\"enabled\") || !self.chromeVisible || self.searching) return;\n1825:     self.pendingScrollToTop=YES;\n1826:     if (self.publishedTabID) [self.anchors removeObjectForKey:self.publishedTabID];\n1827:     [self.table layoutIfNeeded];\n1828:     [self applyPendingScrollToTop];\n1829:     [self refreshNavigationTitle];\n1830: }\n1831: - (void)applyPendingScrollToTop {"
+            },
+            {
+              "needle": "[self.anchors removeObjectForKey:tabID];",
+              "line": 1811,
+              "source": "1808:     self.snapshotRetryAttempted=NO; self.recoveryAttempts=0; self.recoveryPending=NO;\n1809:     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;\n1810:     self.pendingScrollToTop=YES;\n1811:     [self.anchors removeObjectForKey:tabID];\n1812:     [self refresh];\n1813:     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];\n1814: }\n1815: + (void)refreshFoldedListsForAccount:(NSString *)account {\n1816:     if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;\n1817:     // Separate native owners cache the same account's group selection. A hidden"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "version": "2.2-7",
+      "audit": "docs/audits/session-groups-blank-2026-11-03",
+      "frozen_source": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-groups-blank-fix-20261103-zbq46mo4/source",
+      "files": {
+        "Hooks/SessionGroupHooks.xm": {
+          "sha256": "999991380018fed90b62973796e1eca7b89774284027820ad1ef533df7079070",
+          "matches_build_manifest": true,
+          "excerpts": [
+            {
+              "needle": "[Adapter(self) returnToGroupTop];",
+              "line": 138,
+              "source": "135:     [CSGroupListAdapter setPresentationSuspended:NO forController:self];\n136:     Native(self,NO,^{ %orig; });\n137:     [CSGroupListAdapter attachToController:self];\n138:     [Adapter(self) returnToGroupTop];\n139: }\n140: - (void)viewWillDisappear:(BOOL)animated {\n141:     [CSGroupListAdapter setPresentationSuspended:YES forController:self];\n142:     Native(self,NO,^{ %orig; });\n143: }\n144: - (void)viewDidDisappear:(BOOL)animated {"
+            }
+          ]
+        },
+        "Controllers/CSGroupListAdapter.m": {
+          "sha256": "02fd306548df9edbb9e7e3a909fd73426ae9745038fe80d14a5835817b062531",
+          "matches_build_manifest": true,
+          "excerpts": [
+            {
+              "needle": "self.pendingScrollToTop=YES;",
+              "line": 1844,
+              "source": "1841:     [self.nativeActions removeAllObjects];\n1842:     self.snapshotRetryAttempted=NO; self.recoveryAttempts=0; self.recoveryPending=NO;\n1843:     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;\n1844:     self.pendingScrollToTop=YES;\n1845:     [self.anchors removeObjectForKey:tabID];\n1846:     [self refresh];\n1847:     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];\n1848: }\n1849: + (void)refreshFoldedListsForAccount:(NSString *)account {\n1850:     if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;"
+            },
+            {
+              "needle": "self.pendingScrollToTop=YES;",
+              "line": 1859,
+              "source": "1856: - (void)returnToGroupTop {\n1857:     if (self.presentationSuspended || !CSGroupApplicationActive()) return;\n1858:     if (!Option(@\"enabled\") || !self.chromeVisible || self.searching) return;\n1859:     self.pendingScrollToTop=YES;\n1860:     if (self.publishedTabID) [self.anchors removeObjectForKey:self.publishedTabID];\n1861:     [self.table layoutIfNeeded];\n1862:     [self applyPendingScrollToTop];\n1863:     [self refreshNavigationTitle];\n1864: }\n1865: - (void)applyPendingScrollToTop {"
+            },
+            {
+              "needle": "[self.anchors removeObjectForKey:tabID];",
+              "line": 1845,
+              "source": "1842:     self.snapshotRetryAttempted=NO; self.recoveryAttempts=0; self.recoveryPending=NO;\n1843:     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;\n1844:     self.pendingScrollToTop=YES;\n1845:     [self.anchors removeObjectForKey:tabID];\n1846:     [self refresh];\n1847:     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];\n1848: }\n1849: + (void)refreshFoldedListsForAccount:(NSString *)account {\n1850:     if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;\n1851:     // Separate native owners cache the same account's group selection. A hidden"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "version": "2.2-8",
+      "audit": "docs/audits/session-groups-cpu-2026-11-03",
+      "frozen_source": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-groups-cpu-20261103-3inb_h9p/source",
+      "files": {
+        "Hooks/SessionGroupHooks.xm": {
+          "sha256": "76f42d5d4001da1d80b36de80215e2ea9fed978faa8d92a5aa791b608ec5e3ab",
+          "matches_build_manifest": true,
+          "excerpts": [
+            {
+              "needle": "[Adapter(self) returnToGroupTop];",
+              "line": 155,
+              "source": "152:     [CSGroupListAdapter setPresentationSuspended:NO forController:self];\n153:     Native(self,NO,^{ %orig; });\n154:     [CSGroupListAdapter attachToController:self];\n155:     [Adapter(self) returnToGroupTop];\n156: }\n157: - (void)viewWillDisappear:(BOOL)animated {\n158:     [CSGroupListAdapter setPresentationSuspended:YES forController:self];\n159:     Native(self,NO,^{ %orig; });\n160: }\n161: - (void)viewDidDisappear:(BOOL)animated {"
+            }
+          ]
+        },
+        "Controllers/CSGroupListAdapter.m": {
+          "sha256": "9bb66f066c90df4e4289f5f2c0dba6274063a1b4858263a47b1638554eb999ed",
+          "matches_build_manifest": true,
+          "excerpts": [
+            {
+              "needle": "self.pendingScrollToTop=YES;",
+              "line": 1946,
+              "source": "1943:     [self.nativeActions removeAllObjects];\n1944:     self.snapshotRetryAttempted=NO; self.recoveryAttempts=0; self.recoveryPending=NO;\n1945:     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;\n1946:     self.pendingScrollToTop=YES;\n1947:     [self.anchors removeObjectForKey:tabID];\n1948:     [self refresh];\n1949:     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];\n1950: }\n1951: + (void)refreshFoldedListsForAccount:(NSString *)account {\n1952:     if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;"
+            },
+            {
+              "needle": "self.pendingScrollToTop=YES;",
+              "line": 1961,
+              "source": "1958: - (void)returnToGroupTop {\n1959:     if (self.presentationSuspended || !CSGroupApplicationActive()) return;\n1960:     if (!Option(@\"enabled\") || !self.chromeVisible || self.searching) return;\n1961:     self.pendingScrollToTop=YES;\n1962:     if (self.publishedTabID) [self.anchors removeObjectForKey:self.publishedTabID];\n1963:     [self.table layoutIfNeeded];\n1964:     [self applyPendingScrollToTop];\n1965:     [self refreshNavigationTitle];\n1966: }\n1967: - (void)applyPendingScrollToTop {"
+            },
+            {
+              "needle": "[self.anchors removeObjectForKey:tabID];",
+              "line": 1947,
+              "source": "1944:     self.snapshotRetryAttempted=NO; self.recoveryAttempts=0; self.recoveryPending=NO;\n1945:     self.nativePresentation=!belongs; if (belongs) self.preferences.selectedTabID=tabID;\n1946:     self.pendingScrollToTop=YES;\n1947:     [self.anchors removeObjectForKey:tabID];\n1948:     [self refresh];\n1949:     if (belongs) [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];\n1950: }\n1951: + (void)refreshFoldedListsForAccount:(NSString *)account {\n1952:     if (!account.length || ![account isEqual:CSGroupCurrentAccountID()]) return;\n1953:     // Separate native owners cache the same account's group selection. A hidden"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "conclusion": "The source restoration behavior added in 2.1-25 was removed when 2.2-1 reset to the 2.1-20 implementation. The frozen native 2.2-6, 2.2-7 and 2.2-8 sources all contain forced-top behavior. This establishes source lineage, not the first installed device package that exhibited the user-reported regression.",
+  "isolation": "Read-only Git and historical frozen source/manifest reads; writes only the new scroll-position audit review directory. No package changes, installation, device, live account or database access."
+}

@@ -1,0 +1,40 @@
+{
+  "all_checks_passed": true,
+  "current_sources_match_all_final_evidence": true,
+  "behavior_assertions": {
+    "native_full_suite": 3383,
+    "unread_panel": 77,
+    "unread_panel_abi": 7,
+    "legacy_core": 393,
+    "independent_interaction": 101,
+    "compatibility_full_refresh_source_and_publication": 94,
+    "total_without_duplicate_selection_subset": 4055
+  },
+  "ui_assertions": 135,
+  "observation_scope_owner_hint_assertions": 63,
+  "negative_controls_caught": 14,
+  "sdk_syntax_checks": 20,
+  "large_source_workload": {
+    "sessions": 1200,
+    "complete_metadata_reads": 1200,
+    "named_metadata_reads": 1,
+    "all_row_fields_equal": true,
+    "scope": "Host Foundation real Adapter source helper + Bridge only; still performs complete coordinate proof; not phone CPU/time/energy."
+  },
+  "stable_ui_workload": {
+    "checks": 135,
+    "failures": 0,
+    "stable_iterations": 1000,
+    "stable_visual_writes": 0,
+    "stable_text_measurements": 0,
+    "stable_synchronous_layouts": 0
+  },
+  "final_packages_verified": 4,
+  "device_installed": false,
+  "device_performance_measurement": false,
+  "tracked_deletions_preserved": 6892,
+  "prior_instruments_files_preserved": {
+    "session-groups-instruments-2026-11-03": 2075,
+    "session-groups-instruments-2.2-9-2026-11-03": 1616
+  }
+}

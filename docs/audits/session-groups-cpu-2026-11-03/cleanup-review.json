@@ -1,0 +1,48 @@
+{
+  "scope": "Grouping model, projection, coordinator, native bridge, list adapter, preferences, settings, tab views/items, grouping hooks and group-list privacy integration; manual cross-reference review and production text scan.",
+  "reviewed_source_sha256": {
+    "Controllers/CSChatGroupSettingsViewController.h": "4cd43ab9f8a60b1bddd0b248cc733892c4a913a55a8fdbb6a777466c64db8e55",
+    "Controllers/CSChatGroupSettingsViewController.m": "d0c456222042ce4e71a817cbc5f460208d0d2d1e788b12826422b4690a4be253",
+    "Controllers/CSCloseFriendGroupListAdapter.h": "7ff1d3929269d792573bc7d25bbda2aa75f1cf0dc4dfdc10bc8a46f68bb9eaaf",
+    "Controllers/CSCloseFriendGroupListAdapter.m": "e0651391be7a70b8f7604daa79269217d4e574a18f097cedae69aecb364b874c",
+    "Controllers/CSGroupAppearance.h": "4beff6f101ae90b26fe67481d8f905a463b45374db6ef907a84f4734bc839ad8",
+    "Controllers/CSGroupIndexScope.h": "09cd2719a4439feb264be1666dfed459b776c595ef7772774a7e9bac0e3d24f5",
+    "Controllers/CSGroupIndexScope.m": "ea8ef3cd22b8632bca9999bee45250672ba1b4b5d6a4e41e6fff8051c1ffb780",
+    "Controllers/CSGroupInvocationMapper.h": "a9db482a07d22552f86f14756e08637b035771ae4c211235bd886e222972b926",
+    "Controllers/CSGroupInvocationMapper.m": "a8149e2d01d10d4e65574edc9547ce6ee431cd523e6d6d85e505f9c9ce42c68f",
+    "Controllers/CSGroupListAdapter.h": "ba76d08a15f136be43e9702ecfee1f393c4ea73389ac96bd239c867a3f70f7cc",
+    "Controllers/CSGroupListAdapter.m": "9bb66f066c90df4e4289f5f2c0dba6274063a1b4858263a47b1638554eb999ed",
+    "Controllers/CSGroupNativeBridge.h": "d178ab29e45f01b6dcbaa55dd247c714c146bc6b3273c437c3b34dca01c704d0",
+    "Controllers/CSGroupNativeBridge.m": "e6f7378cbe679221a4663fb850cd3e5e2c3aaf6f7aef808098a8251c38169d3c",
+    "Controllers/CSGroupNativeModel.h": "c3189e10a79bee653c28061a17e6b90eb423f2514e9482d55bc977e982ac7da8",
+    "Controllers/CSGroupNativeModel.m": "ac4e3a6177e45f23911e7f09cfd64def1556a21d7b8a69a012b5bbaa60d88979",
+    "Controllers/CSGroupNativeSessionCoordinator.h": "bc4e56e2fbaabdf778d54d66fff3021f45fafbe26a7a97cb020bd9ce4ee6cea6",
+    "Controllers/CSGroupNativeSessionCoordinator.m": "57cbf10c21eea73f742b9e52c04477e12b269f1178dabaaeb9c4b0eebabf1626",
+    "Controllers/CSGroupPreferences.h": "88d693c0de5e0fba482ad4a2ce6224d23ce095f6cc73766fb1e74f28883316a5",
+    "Controllers/CSGroupPreferences.m": "1ec46fe99d45a47d56319ec5149d54ddbccb3831dbdd52de6f7f4e590bd58bd4",
+    "Controllers/CSGroupProjection.h": "6e4d0bfeb82747004e3d028515f9948ef8a1a923323e4583898abff177b70639",
+    "Controllers/CSGroupProjection.m": "a11a27854ce33186cf07e4b657b2989d18bf3aaf947882a0cda835d0a7641e3a",
+    "Controllers/CSGroupRefreshState.h": "3435bd06d51be0818ecbebe7dc378a019f4114c2ecd25e530d8c86f8d7b016af",
+    "Controllers/WESessionTabContainerView.h": "aeabd4453cdd4d3f9aa293c4ef5424ce431ca560817b4bae84218fd266cf98a3",
+    "Controllers/WESessionTabContainerView.m": "b7ce9e8eb8f07029668e5c47fb9735e7f234cd4e2c549b2fc169e8eef28c5764",
+    "Controllers/WESessionTabItem.h": "03c4a9b62fdff3d3906e2378a408c0f9791f1413215ddf20c41b2a5d3f4b2b01",
+    "Controllers/WESessionTabItem.m": "2cc891a5d00e2090d6efb322aad75015e3fdd60dda9c2055576bf9d77e9a4f62",
+    "Hooks/NativeSessionGroupHooks.xm": "c29c45304c427a717215a25205f5160ea715bcb5812e111c73785fa59627ce00",
+    "Hooks/SessionGroupHooks.xm": "76f42d5d4001da1d80b36de80215e2ea9fed978faa8d92a5aa791b608ec5e3ab"
+  },
+  "production_debug_scan_matches": [],
+  "removed": [
+    "Unused CSGroupBuildNativeSections and CSGroupCopyFoldedRows wrapper declarations/implementations",
+    "Unused WESessionTabItem isPresetTab declaration/implementation",
+    "Write-only publishedTop/publishedNormal/publishedAllTop state and hasAllTop flag",
+    "Unused folded-row cache and duplicate visible-row/object metadata maps",
+    "Redundant metadata identity/category reads and duplicate red-dot state"
+  ],
+  "retained_with_reason": {
+    "IndexScope, InvocationMapper, compatibility proxies": "Used by folded pages and compatibility fallback.",
+    "Folded digest host-facing getters": "Native renderer invokes these dynamically.",
+    "NSCoding, sortOrder, createTime, updateTime, legacy preference imports": "Archive and preference compatibility.",
+    "Historical packages and audit/test artifacts": "Evidence and reproducibility; not runtime plugin code."
+  },
+  "limits": "This records the manual review and targeted scan; it is not a general-purpose proof that every runtime selector is reachable."
+}

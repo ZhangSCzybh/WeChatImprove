@@ -1,6 +1,7 @@
 #import "../Controllers/CSCloseFriendUnreadPanelAdapter.h"
 #import "../Controllers/CSCloseFriendBridge.h"
 #import "../Controllers/CSCloseFriendContactAdapter.h"
+#import "../Controllers/CSGroupNativeSessionCoordinator.h"
 #import <objc/message.h>
 
 static BOOL UnreadHook0(NSString *cls,NSString *name,void (^body)(id,void(^)(void))) {
@@ -54,7 +55,10 @@ void CSCFUnreadPanelInstallHooks(void) {
         for(NSString *name in @[@"rebuildSessionList"]) {
             BOOL observed=UnreadHook0(logic,name,^(id object,void(^native)(void)){
                 CSCFUnreadPanelSourceWillChange(object);
-                @try { native(); } @finally { CSCFUnreadPanelSourceDidChange(object); }
+                @try {
+                    [CSGroupNativeSessionCoordinator.sharedCoordinator
+                        performWithCompleteSourceForSurface:CSCloseFriendSurfaceSession original:native];
+                } @finally { CSCFUnreadPanelSourceDidChange(object); }
             });
             filtering=filtering && observed;
         }

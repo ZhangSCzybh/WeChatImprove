@@ -1,0 +1,24 @@
+{
+  "logos_exit": 0,
+  "results": [
+    {
+      "unit": "hook-macro-0",
+      "exit_code": 0
+    },
+    {
+      "unit": "api-macro-0",
+      "exit_code": 0
+    },
+    {
+      "unit": "hook-macro-1",
+      "exit_code": 0
+    },
+    {
+      "unit": "api-macro-1",
+      "exit_code": 0
+    }
+  ],
+  "architecture": "arm64",
+  "target": "iOS 15.0",
+  "scope": "offline syntax only; no device attach or runtime validation"
+}

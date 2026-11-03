@@ -1,0 +1,15 @@
+{
+  "scheme": "rootless",
+  "command": [
+    "make",
+    "package",
+    "-j4",
+    "SCHEME=rootless",
+    "PACKAGE_VERSION=2.2-11",
+    "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-groups-scroll-position-20261103-_312i8km/rootless/.theos",
+    "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-groups-scroll-position-20261103-_312i8km/rootless",
+    "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-groups-scroll-position-20261103-_312i8km/rootless/packages"
+  ],
+  "exit_code": 0,
+  "seconds": 21.71
+}
