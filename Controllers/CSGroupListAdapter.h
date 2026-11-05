@@ -54,8 +54,10 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 + (void)applicationActivityChanged:(NSNotification *)notification;
 + (nullable NSString *)groupTitleForTitleView:(id)titleView;
 + (void)recordNativeTitle:(nullable NSString *)title status:(unsigned int)status forTitleView:(id)titleView;
-/// A real user drag supersedes an older automatic height restoration.
+/// A user positioning command supersedes older heights and row anchors.
 - (void)beginUserScrolling;
+/// Native list dragging excludes an admitted horizontal group gesture.
+- (void)beginUserDragging;
 - (void)endSwipeEditing;
 /// Wake pending work after the host custom menu handles a pan or visibility change.
 - (void)nativeMenuDidChange;

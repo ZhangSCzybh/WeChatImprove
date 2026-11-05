@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.2-11`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.2-12`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -31,8 +31,8 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78`；部分原生布局分析基于 `8.0.78.34` |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | 本地提供 `2.2-11` 滚动位置修复正式包；沿用空白修复，待微信 8.0.78 真机复验 |
-| Rootful | 本地提供 `2.2-11` 滚动位置修复正式包；待微信 8.0.78 真机复验 |
+| Rootless | 本地提供 `2.2-12` 滑动回顶修复正式包；沿用空白修复，待微信 8.0.78 真机复验 |
+| Rootful | 本地提供 `2.2-12` 滑动回顶修复正式包；待微信 8.0.78 真机复验 |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
@@ -40,7 +40,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：当前正式版 `2.2-11` 提供 [Rootless 安装包](packages/2.2-11-session-groups-scroll-position-final/com.wechat.improve_2.2-11_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.2-11-session-groups-scroll-position-final/com.wechat.improve_2.2-11_iphoneos-arm.deb)、[调试符号](packages/2.2-11-session-groups-scroll-position-final/com.wechat.improve_2.2-11_symbols.zip) 和 [SHA-256](packages/2.2-11-session-groups-scroll-position-final/SHA256SUMS)。本版修复聊天返回与切换分组后的滚动位置，保留此前分组减载和隐私校验。本版已移除分组性能观测模块与独立观测构建入口，见 [交付与验证记录](docs/audits/session-groups-scroll-position-2026-11-03/README.md)。本版尚待微信 `8.0.78` 真机验收；此前安装包保留用于追溯。
+1. 获取与设备注入环境匹配的 `.deb`：当前正式版 `2.2-12` 提供 [Rootless 安装包](packages/2.2-12-session-groups-quick-top-final/com.wechat.improve_2.2-12_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.2-12-session-groups-quick-top-final/com.wechat.improve_2.2-12_iphoneos-arm.deb)、[调试符号](packages/2.2-12-session-groups-quick-top-final/com.wechat.improve_2.2-12_symbols.zip) 和 [SHA-256](packages/2.2-12-session-groups-quick-top-final/SHA256SUMS)。本版修复从聊天返回后手指滑动回顶、随后又跳回旧位置的问题，保留聊天返回和切组高度规则。未重新加入分组观测模块，见 [交付与验证记录](docs/audits/session-groups-quick-top-2026-11-05/README.md)。本版尚待微信 `8.0.78` 真机验收；此前安装包保留用于追溯。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
@@ -68,6 +68,8 @@
 | 自定义分组 | 手动选择的会话，同一会话可加入多个自定义组 |
 
 在设置页点击“添加自定义分组”创建分组，点击分组管理成员，通过右上角“排序”调整顺序。左滑分组可重命名、隐藏预设分组或删除自定义分组。删除分组只移除分组配置，不删除会话或聊天记录。
+
+`2.2-12` 在手指开始拖动列表时取消旧待恢复高度和行锚点，并使已捕获的旧高度失效，避免快速滑到顶部后又被旧刷新拉回原位置。直接监听现有表格拖动手势的开始事件，覆盖宿主未转发滚动代理回调的情况；不改变手势仲裁，横滑切组仍沿用共同高度。没有新增轮询、逐帧计算或调试观测。真机视频确认了故障现象，本轮修复的设备操作仍待复验。详见 [滑动回顶修复](docs/audits/session-groups-quick-top-2026-11-05/README.md)。
 
 `2.2-11` 从聊天返回时恢复离开列表时的滚动高度；切组沿用切换前的当前高度，目标列表较短时夹紧到可达到的边界。同组选中保持位置；用户主动滚动、搜索、原生导航和显式回到顶部会取消旧的待恢复请求。位置只在当前账号、隐私快照与已发布列表一致且布局就绪时恢复，无新增轮询或逐帧任务。本版同时移除分组性能观测模块、构建开关和无调用的插件回顶状态链，保留 UIKit 原生回顶。详见 [滚动位置修复与验证](docs/audits/session-groups-scroll-position-2026-11-03/README.md)。
 
@@ -216,7 +218,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.2-11_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.2-11-session-groups-scroll-position-final/`。
+当前版本默认输出：`packages/com.wechat.improve_2.2-12_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.2-12-session-groups-quick-top-final/`。
 
 ### Rootful
 
@@ -225,7 +227,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.2-11_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.2-11-session-groups-scroll-position-final/`。
+当前版本默认输出：`packages/com.wechat.improve_2.2-12_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.2-12-session-groups-quick-top-final/`。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |

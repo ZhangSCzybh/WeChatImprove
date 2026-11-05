@@ -1,0 +1,10 @@
+verify-group-preferences.sh: exit 0
+Group preferences: 23 checks, 0 failures
+verify-group-incremental.sh: exit 0
+Group incremental: 179 checks, 0 failures
+verify-group-badges.sh: exit 0
+Group badges: 136 checks, 0 failures
+verify-group-appearance.sh: exit 0
+Group appearance: 8 checks, 0 failures
+verify-group-header.sh: exit 0
+Group header semantics: 46 checks, 0 failures

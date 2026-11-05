@@ -76,6 +76,7 @@ static BOOL Option(NSString *suffix) {
 @property (nonatomic) BOOL presentationSuspended;
 @property (nonatomic, copy) NSDictionary *presentationViewport, *switchViewport;
 @property (nonatomic) BOOL presentationReturnFinished, restoringViewport;
+@property (nonatomic) NSUInteger viewportGeneration;
 @property (nonatomic) BOOL publishedEnabled;
 @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *prefetchedPaths;
 @property (nonatomic, strong) NSMutableArray *nativeActions;
@@ -142,6 +143,7 @@ static BOOL Option(NSString *suffix) {
 - (void)restorePendingViewport;
 - (void)restoreViewportFromSource:(NSDictionary *)viewport;
 - (void)clearPendingViewport;
+- (void)tablePan:(UIPanGestureRecognizer *)pan;
 - (void)requestRecovery;
 - (void)cancelScheduledRefresh;
 @property (nonatomic) BOOL nativePresentation, scheduled, dirty, searching;
@@ -193,7 +195,10 @@ static BOOL Option(NSString *suffix) {
 @end
 
 @implementation CSGroupListAdapter
-- (void)dealloc { [_tabBadgeSourceTimer invalidate]; [NSNotificationCenter.defaultCenter removeObserver:self]; }
+- (void)dealloc {
+    [_table.panGestureRecognizer removeTarget:self action:@selector(tablePan:)];
+    [_tabBadgeSourceTimer invalidate]; [NSNotificationCenter.defaultCenter removeObserver:self];
+}
 + (instancetype)adapterForTable:(id)table { return objc_getAssociatedObject(table,&AdapterKey); }
 + (instancetype)adapterForController:(id)controller { return objc_getAssociatedObject(controller,&AdapterKey); }
 + (void)attachToController:(id)controller {
@@ -216,6 +221,9 @@ static BOOL Option(NSString *suffix) {
         adapter.presentationSuspended=[objc_getAssociatedObject(controller,&PresentationSuspendedKey) boolValue];
         adapter.proxies=[NSMutableDictionary dictionary]; adapter.anchors=[NSMutableDictionary dictionary]; adapter.completions=[NSMutableArray array]; adapter.prefetchedPaths=[NSMutableSet set]; adapter.nativeActions=[NSMutableArray array];
         adapter.nativeHeader=[table tableHeaderView]; adapter.baselineDeceleration=[table decelerationRate];
+        // Observe the existing scroll gesture even when the host changes its
+        // delegate. Do not participate in recognition or handle changed frames.
+        [[table panGestureRecognizer] addTarget:adapter action:@selector(tablePan:)];
         objc_setAssociatedObject(controller,&AdapterKey,adapter,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(table,&AdapterKey,adapter,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [Adapters() addObject:adapter];
@@ -597,6 +605,7 @@ static BOOL Option(NSString *suffix) {
     proxy.target=target; return proxy;
 }
 - (void)detach {
+    [self.table.panGestureRecognizer removeTarget:self action:@selector(tablePan:)];
     objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);
     [self cancelTabBadgeSourceRefresh];
     [Adapters() removeObject:self];
@@ -1938,8 +1947,8 @@ static BOOL Option(NSString *suffix) {
     if (length) { void *zero=calloc(1,length); [inv setReturnValue:zero]; free(zero); }
     if (!target) return;
     NSString *name=NSStringFromSelector(inv.selector);
-    if ([name isEqual:@"scrollViewWillBeginDragging:"] || [name isEqual:@"scrollViewDidScrollToTop:"])
-        [self beginUserScrolling];
+    if ([name isEqual:@"scrollViewWillBeginDragging:"]) [self beginUserDragging];
+    else if ([name isEqual:@"scrollViewDidScrollToTop:"]) [self beginUserScrolling];
     BOOL viewportEvent=[name isEqual:@"scrollViewDidEndDecelerating:"] || [name isEqual:@"scrollViewDidEndDragging:willDecelerate:"] ||
         [name isEqual:@"tableView:didEndEditingRowAtIndexPath:"] || [name isEqual:@"scrollViewDidEndScrollingAnimation:"] ||
         [name isEqual:@"scrollViewDidChangeAdjustedContentInset:"];
@@ -2039,6 +2048,7 @@ static BOOL Option(NSString *suffix) {
         table.contentOffset.y>=-table.adjustedContentInset.top-0.5;
 }
 - (NSDictionary *)captureViewportForTabID:(NSString *)tabID {
+    NSUInteger generation=self.viewportGeneration;
     UITableView *table=self.table;
     CGFloat height=table.contentOffset.y+table.adjustedContentInset.top;
     CGFloat viewport=CGRectGetHeight(table.bounds), content=table.contentSize.height;
@@ -2060,11 +2070,15 @@ static BOOL Option(NSString *suffix) {
     // Capturing that stationary height is safe; restoration waits for tracking
     // to finish, and a real vertical drag cancels the request at its callback.
     if (content==0) for (NSArray *rows in self.projection.sections) if (rows.count) return nil;
-    return @{@"height":@(MAX(0,height)),@"account":account,@"epoch":@(epoch),@"tab":tabID};
+    if (generation!=self.viewportGeneration) return nil;
+    return @{@"height":@(MAX(0,height)),@"account":account,@"epoch":@(epoch),@"tab":tabID,
+        @"generation":@(generation)};
 }
 - (BOOL)validViewport:(NSDictionary *)viewport {
     NSNumber *height=viewport[@"height"];
     return [height isKindOfClass:NSNumber.class] && isfinite(height.doubleValue) && height.doubleValue>=0 &&
+        [viewport[@"generation"] isKindOfClass:NSNumber.class] &&
+        [viewport[@"generation"] unsignedIntegerValue]==self.viewportGeneration &&
         [viewport[@"account"] isEqual:CSGroupCurrentAccountID()] &&
         [self.preferences.accountID isEqual:viewport[@"account"]] &&
         [viewport[@"epoch"] unsignedIntegerValue]==CSCloseFriendAccountEpoch();
@@ -2074,10 +2088,23 @@ static BOOL Option(NSString *suffix) {
 }
 - (void)beginUserScrolling {
     // A real drag is a newer positioning command. Waiting for that drag to end
-    // must not resurrect a height saved before the user took control.
+    // must not resurrect a height or row saved before the user took control.
+    self.viewportGeneration++;
     [self clearPendingViewport];
+    [self.anchors removeAllObjects];
+}
+- (void)tablePan:(UIPanGestureRecognizer *)pan {
+    if (pan==self.table.panGestureRecognizer && pan.state==UIGestureRecognizerStateBegan) [self beginUserDragging];
+}
+- (void)beginUserDragging {
+    if ([self groupPanMoving]) return;
+    UIPanGestureRecognizer *pan=self.table.panGestureRecognizer;
+    CGPoint velocity=[pan velocityInView:self.table];
+    if ([self groupSwipesAvailable] && self.listTouchAllowed && fabs(velocity.x)>fabs(velocity.y)*1.5) return;
+    [self beginUserScrolling];
 }
 - (BOOL)restoreScrollHeight:(CGFloat)height {
+    NSUInteger generation=self.viewportGeneration;
     UITableView *table=self.table;
     if (self.restoringViewport || self.presentationSuspended || !CSGroupApplicationActive() || self.publishing || self.dirty ||
         self.changeDepth || self.privacyRefreshPending || self.sessionLayoutHeld || self.snapshotRetryAttempted ||
@@ -2106,7 +2133,7 @@ static BOOL Option(NSString *suffix) {
     if (!isfinite(target) || current.blocked || current.revision!=policy.revision || ![current.accountID isEqual:account] ||
         ![account isEqual:CSGroupCurrentAccountID()] || epoch!=CSCloseFriendAccountEpoch() || self.modelRevision!=revision ||
         self.table!=table || self.projection!=projection || ![self.publishedTabID isEqual:tabID] ||
-        self.dirty || self.privacyRefreshPending || self.sessionLayoutHeld) return NO;
+        self.dirty || self.privacyRefreshPending || self.sessionLayoutHeld || generation!=self.viewportGeneration) return NO;
     self.restoringViewport=YES;
     @try {
         CSGroupWithDisplayIndices(table, ^{
@@ -2116,6 +2143,7 @@ static BOOL Option(NSString *suffix) {
     } @finally { self.restoringViewport=NO; }
     current=CSCloseFriendCurrentSnapshot();
     if (current.blocked || current.revision!=policy.revision || ![current.accountID isEqual:account] ||
+        generation!=self.viewportGeneration ||
         ![account isEqual:CSGroupCurrentAccountID()] || epoch!=CSCloseFriendAccountEpoch() || self.modelRevision!=revision ||
         self.table!=table || self.projection!=projection || ![self.publishedTabID isEqual:tabID] ||
         self.presentationSuspended || !CSGroupApplicationActive() || self.publishing || self.dirty || self.changeDepth ||
@@ -2137,6 +2165,7 @@ static BOOL Option(NSString *suffix) {
     minimum=-inset.top; maximum=MAX(minimum,content-viewport+inset.bottom);
     target=MIN(maximum,MAX(minimum,height-inset.top));
     return isfinite(target) && fabs(offset-target)<=0.5 &&
+        generation==self.viewportGeneration &&
         !current.blocked && current.revision==policy.revision && [current.accountID isEqual:account] &&
         [account isEqual:CSGroupCurrentAccountID()] && epoch==CSCloseFriendAccountEpoch() && self.modelRevision==revision &&
         self.table==table && self.projection==projection && [self.publishedTabID isEqual:tabID] &&
@@ -2169,6 +2198,7 @@ static BOOL Option(NSString *suffix) {
         self.switchViewport=request; viewport=self.switchViewport;
     }
     if (![self restoreScrollHeight:[viewport[@"height"] doubleValue]]) return;
+    if (![self validViewport:viewport] || (returning ? self.presentationViewport!=viewport : self.switchViewport!=viewport)) return;
     [self.anchors removeObjectForKey:self.publishedTabID];
     if (returning) {
         // Keep the departure height through intermediate willAppear refreshes;
@@ -2189,6 +2219,7 @@ static BOOL Option(NSString *suffix) {
     [self restoreAnchor];
 }
 - (void)saveAnchor {
+    NSUInteger generation=self.viewportGeneration;
     if (self.presentationSuspended || !CSGroupApplicationActive()) return;
     if ([self validViewport:self.presentationViewport] || [self validViewport:self.switchViewport]) return;
     if (!self.isActive || !self.publishedTabID) return;
@@ -2197,9 +2228,11 @@ static BOOL Option(NSString *suffix) {
     __block NSIndexPath *first=nil; __block CGRect rect=CGRectZero;
     CSGroupWithDisplayIndices(self.table, ^{ first=[self.table.indexPathsForVisibleRows sortedArrayUsingSelector:@selector(compare:)].firstObject; if (first) rect=[self.table rectForRowAtIndexPath:first]; });
     CSGroupRow *row=[self.projection rowAtDisplayPath:first];
-    if (row.userName.length) self.anchors[self.publishedTabID]=@{@"name":row.userName,@"kind":@(row.kind),@"offset":@(self.table.contentOffset.y+self.table.adjustedContentInset.top-rect.origin.y)};
+    if (generation==self.viewportGeneration && row.userName.length)
+        self.anchors[self.publishedTabID]=@{@"name":row.userName,@"kind":@(row.kind),@"offset":@(self.table.contentOffset.y+self.table.adjustedContentInset.top-rect.origin.y)};
 }
 - (void)restoreAnchor {
+    NSUInteger generation=self.viewportGeneration;
     if (self.presentationSuspended || !CSGroupApplicationActive()) return;
     if (self.presentationViewport || self.switchViewport) { [self restorePendingViewport]; return; }
     NSDictionary *anchor=self.anchors[self.publishedTabID];
@@ -2216,7 +2249,8 @@ static BOOL Option(NSString *suffix) {
                     CGFloat min=-self.table.adjustedContentInset.top;
                     CGFloat max=MAX(min,self.table.contentSize.height-self.table.bounds.size.height+self.table.adjustedContentInset.bottom);
                     CGFloat target=MIN(max,MAX(min,y));
-                    if (isfinite(y) && fabs(target-self.table.contentOffset.y)>0.5)
+                    if ([self canRestoreAnchor] && generation==self.viewportGeneration &&
+                        isfinite(y) && fabs(target-self.table.contentOffset.y)>0.5)
                         [self.table setContentOffset:CGPointMake(self.table.contentOffset.x,target) animated:NO];
                 }); return;
             }

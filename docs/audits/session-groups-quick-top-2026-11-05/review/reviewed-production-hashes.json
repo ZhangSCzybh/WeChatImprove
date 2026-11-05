@@ -1,0 +1,10 @@
+{
+  "reviewer": "quick_top_review",
+  "files": {
+    "Controllers/CSGroupListAdapter.h": "62f381a92e1b3301ac15fa23cf780e54b85e60da828f6348c72f75e4e0e62e76",
+    "Controllers/CSGroupListAdapter.m": "bee5a152efd27eec8268f92ba03488fc1cb96be4dab0ee916ecb568d2f57fc62",
+    "Hooks/SessionGroupHooks.xm": "813864d4b59d75d9585c68b78147ee69508538a62d6851ffb8b7e3b09b075253"
+  },
+  "result": "no blocking source-review finding",
+  "device_acceptance": false
+}

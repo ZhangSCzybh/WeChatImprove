@@ -150,7 +150,7 @@ static void BindMainNativeCell(id table,UITableViewCell *cell,NSIndexPath *path)
     [[CSGroupListAdapter adapterForTable:table] endSwipeEditing];
 }
 - (void)scrollViewWillBeginDragging:(id)scrollView {
-    [[CSGroupListAdapter adapterForTable:scrollView] beginUserScrolling];
+    [[CSGroupListAdapter adapterForTable:scrollView] beginUserDragging];
     %orig;
 }
 - (void)scrollViewDidScrollToTop:(id)scrollView {

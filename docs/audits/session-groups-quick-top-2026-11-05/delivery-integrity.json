@@ -1,0 +1,10 @@
+{
+  "production_matches_build": true,
+  "review_matches_build": true,
+  "packaged_artifact_hashes_match": true,
+  "initial_deletions_preserved": true,
+  "initial_deleted_file_count": 6892,
+  "root_tests_remains_absent": true,
+  "previous_evidence_manifest_unchanged": true,
+  "device_installed": false
+}
