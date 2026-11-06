@@ -1,0 +1,1 @@
+- (BOOL)authorized { return !CSCloseFriendCurrentSnapshot().blocked && CSCloseFriendManager.sharedManager.runtime.isAuthorized; }

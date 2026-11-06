@@ -1,0 +1,18 @@
+{
+  "name": "verify-custom-text.sh",
+  "command": [
+    "bash",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-18-settings-return-header-gap/release-core-revalidation/fixture-project/Tests/verify-custom-text.sh"
+  ],
+  "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-18-settings-return-header-gap/release-core-revalidation/fixture-project",
+  "exit_code": 0,
+  "seconds": 0.783,
+  "log": "runs/verify-custom-text.sh.log",
+  "production_manifest_sha256": "bc1295684025951db54c9bb9ffba797aaf5a57cf20e97f0f57d4beffe0dc9c86",
+  "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2218-core-hmztae_u",
+  "temporary_theos_env": {
+    "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2218-core-hmztae_u/_THEOS_LOCAL_DATA_DIR",
+    "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2218-core-hmztae_u/THEOS_BUILD_DIR",
+    "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2218-core-hmztae_u/THEOS_PACKAGE_DIR"
+  }
+}

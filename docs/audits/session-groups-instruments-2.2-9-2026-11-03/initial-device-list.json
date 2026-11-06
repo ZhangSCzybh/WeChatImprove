@@ -1,0 +1,229 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "list",
+      "devices",
+      "--json-output",
+      "/tmp/wechat-groups-229-device-list.json"
+    ],
+    "commandType" : "devicectl.list.devices",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 5,
+    "outcome" : "success",
+    "version" : "651.32"
+  },
+  "result" : {
+    "devices" : [
+      {
+        "_deprecationNotice" : {
+          "deprecatedFields" : [
+            "hardwareProperties",
+            "deviceProperties",
+            "connectionProperties"
+          ],
+          "message" : "The 'hardwareProperties', 'deviceProperties', 'connectionProperties' fields are deprecated and will be removed in a future release. Use the 'properties' dictionary instead.",
+          "replacement" : "properties"
+        },
+        "capabilities" : [
+          {
+            "featureIdentifier" : "com.apple.coredevice.feature.acquireusageassertion",
+            "name" : "Acquire Usage Assertion"
+          },
+          {
+            "featureIdentifier" : "com.apple.coredevice.feature.connectdevice",
+            "name" : "Connect to Device"
+          },
+          {
+            "featureIdentifier" : "com.apple.coredevice.feature.default.user.credentials",
+            "name" : "Modify Credentials for Default Users for a Device"
+          },
+          {
+            "featureIdentifier" : "com.apple.coredevice.feature.tags",
+            "name" : "Modify Tags"
+          },
+          {
+            "featureIdentifier" : "com.apple.coredevice.feature.unpairdevice",
+            "name" : "Unpair Device"
+          }
+        ],
+        "connectionProperties" : {
+          "authenticationType" : "manualPairing",
+          "isMobileDeviceOnly" : false,
+          "lastConnectionDate" : "2026-11-03T06:03:00.000Z",
+          "pairingState" : "paired",
+          "potentialHostnames" : [
+            "zaiyebuhui.coredevice.local",
+            "BB7FAA19-FB11-5DC8-9ED8-5C963B192C17.coredevice.local",
+            "00008120-001064E10E70201E.coredevice.local"
+          ],
+          "transportType" : "wired",
+          "tunnelState" : "disconnected",
+          "tunnelTransportProtocol" : "tcp"
+        },
+        "deviceProperties" : {
+          "bootState" : "booted",
+          "bootedFromSnapshot" : true,
+          "bootedSnapshotName" : "com.apple.os.update-5FBBE0104B0B1A372C059E525D3D034B26E9CC00344A7B166315CB8A7C08F5B7",
+          "ddiServicesAvailable" : false,
+          "developerModeStatus" : "enabled",
+          "hasInternalOSBuild" : false,
+          "name" : "再也不会",
+          "osBuildUpdate" : "24A446",
+          "osVersionNumber" : "27.0.1",
+          "rootFileSystemIsWritable" : false,
+          "supportsCheckedAllocations" : false
+        },
+        "hardwareProperties" : {
+          "cpuType" : {
+            "name" : "arm64e",
+            "subType" : -2147483646,
+            "type" : 16777228
+          },
+          "deviceType" : "iPhone",
+          "ecid" : 4614517400018974,
+          "hardwareModel" : "D74AP",
+          "internalStorageCapacity" : 256000000000,
+          "isProductionFused" : true,
+          "marketingName" : "iPhone 14 Pro Max",
+          "platform" : "iOS",
+          "productType" : "iPhone15,3",
+          "reality" : "physical",
+          "serialNumber" : "LFYQW6QJ43",
+          "supportedCPUTypes" : [
+            {
+              "name" : "arm64e",
+              "subType" : -2147483646,
+              "type" : 16777228
+            },
+            {
+              "name" : "arm64",
+              "subType" : 0,
+              "type" : 16777228
+            }
+          ],
+          "supportedDeviceFamilies" : [
+            1
+          ],
+          "thinningProductType" : "iPhone15,3",
+          "udid" : "00008120-001064E10E70201E"
+        },
+        "identifier" : "BB7FAA19-FB11-5DC8-9ED8-5C963B192C17",
+        "properties" : {
+          "connection" : {
+            "authenticationType" : "manualPairing",
+            "lastConnectionDate" : 815378580,
+            "pairingState" : "paired",
+            "state" : "disconnected",
+            "transportType" : "wired",
+            "tunnelTransportProtocol" : "tcp"
+          },
+          "hardware" : {
+            "cpuCount" : {
+              "logicalCores" : 6,
+              "packages" : 1,
+              "physicalCores" : 6
+            },
+            "cpuType" : {
+              "subtype" : 18446744071562067970,
+              "type" : 16777228
+            },
+            "deviceType" : "iPhone",
+            "ecid" : 4614517400018974,
+            "hasActionButton" : false,
+            "internalStorageCapacity" : 256000000000,
+            "marketingName" : "iPhone 14 Pro Max",
+            "platform" : "iOS",
+            "productType" : "iPhone15,3",
+            "reality" : "physical",
+            "serialNumber" : "LFYQW6QJ43",
+            "supportedBiometrics" : [
+              "faceID"
+            ],
+            "supportedCPUTypes" : [
+              {
+                "subtype" : 18446744071562067970,
+                "type" : 16777228
+              },
+              {
+                "subtype" : 0,
+                "type" : 16777228
+              }
+            ],
+            "supportedDeviceFamilies" : [
+              1
+            ],
+            "supportsSiri" : true,
+            "thinningProductType" : "iPhone15,3",
+            "udid" : "00008120-001064E10E70201E"
+          },
+          "software" : {
+            "osBuildVersions" : {
+              "buildVersion" : {
+                "majorLetterComponent" : "A",
+                "majorNumberComponent" : 24,
+                "name" : "24A446",
+                "revisionVersion" : {
+                  "components" : [
+                    24,
+                    1,
+                    446,
+                    0,
+                    0
+                  ],
+                  "originalComponentsCount" : 5,
+                  "stringValue" : "24.1.446.0.0"
+                },
+                "trainProgram" : "iOS",
+                "updateNumberComponent" : 446
+              },
+              "supplementalBuildVersion" : {
+                "majorLetterComponent" : "A",
+                "majorNumberComponent" : 24,
+                "name" : "24A446",
+                "revisionVersion" : {
+                  "components" : [
+                    24,
+                    1,
+                    446,
+                    0,
+                    0
+                  ],
+                  "originalComponentsCount" : 5,
+                  "stringValue" : "24.1.446.0.0"
+                },
+                "trainProgram" : "iOS",
+                "updateNumberComponent" : 446
+              }
+            },
+            "osVersionNumber" : {
+              "components" : [
+                27,
+                0,
+                1,
+                0,
+                0
+              ],
+              "originalComponentsCount" : 3,
+              "stringValue" : "27.0.1"
+            },
+            "supportsCheckedAllocations" : false
+          },
+          "state" : {
+            "bootState" : "booted",
+            "developerModeStatus" : {
+              "enabled" : {
+                "mode" : 1
+              }
+            },
+            "name" : "再也不会"
+          }
+        },
+        "propertyDisplayNames" : null,
+        "visibilityClass" : "default"
+      }
+    ]
+  }
+}

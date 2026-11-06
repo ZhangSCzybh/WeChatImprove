@@ -1,0 +1,27 @@
+image,x,y_start,y_end,height_px,threshold,coordinate_origin
+img1-title-zaibuhui-0715.jpg,1000,896,1037,142,luminance>=252,0-based inclusive
+img1-title-zaibuhui-0715.jpg,1000,1043,1185,143,luminance>=252,0-based inclusive
+img1-title-zaibuhui-0715.jpg,1000,1331,1472,142,luminance>=252,0-based inclusive
+img1-title-zaibuhui-0715.jpg,1000,1480,1618,139,luminance>=252,0-based inclusive
+img1-title-zaibuhui-0715.jpg,1000,1623,1764,142,luminance>=252,0-based inclusive
+img1-title-zaibuhui-0715.jpg,1000,1768,1909,142,luminance>=252,0-based inclusive
+img1-title-zaibuhui-0715.jpg,1000,1919,2055,137,luminance>=252,0-based inclusive
+img1-title-zaibuhui-0715.jpg,1000,2062,2201,140,luminance>=252,0-based inclusive
+img1-title-zaibuhui-0715.jpg,1000,2206,2345,140,luminance>=252,0-based inclusive
+img1-title-zaibuhui-0715.jpg,1000,2352,2488,137,luminance>=252,0-based inclusive
+img1-title-zaibuhui-0715.jpg,1000,2503,2639,137,luminance>=252,0-based inclusive
+img1-title-zaibuhui-0715.jpg,1000,2647,2773,127,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,965,1075,111,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,1080,1193,114,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,1342,1453,112,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,1456,1568,113,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,1571,1683,113,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,1686,1798,113,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,1807,1913,107,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,1916,2029,114,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,2031,2144,114,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,2146,2259,114,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,2261,2368,108,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,2377,2489,113,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,2493,2604,112,luminance>=252,0-based inclusive
+img2-title-mofa-0618.jpg,1000,2607,2720,114,luminance>=252,0-based inclusive

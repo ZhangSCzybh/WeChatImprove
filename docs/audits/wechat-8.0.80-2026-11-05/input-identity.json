@@ -1,0 +1,14 @@
+{
+  "ipa_path": "/Users/zhangshichao/Downloads/Telegram Desktop/微信_8.0.80_大礼包Push20261026_秋名山.ipa",
+  "ipa_sha256": "6376429b62d86d4754454ea3048454506937f5289f5536751e2eb65faf9f3a30",
+  "app": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app",
+  "app_info": {
+    "CFBundleIdentifier": "com.tencent.xin",
+    "CFBundleExecutable": "WeChat",
+    "CFBundleShortVersionString": "8.0.80",
+    "CFBundleVersion": "8.0.80.34"
+  },
+  "rea_extraction_evidence": "ev_5a335c972a776ab88f479f3009d9531ea08ef2fffc8361a1c94fba71bd28c760",
+  "rea_manifest": "agm_adf320dedfc7b61d3d583a092d571e83a76f6c64c43ac187c63dc828883774c6",
+  "device_modified": false
+}

@@ -1,6 +1,7 @@
+#import "CSSettingsTableViewController.h"
 #import <UIKit/UIKit.h>
 NS_ASSUME_NONNULL_BEGIN
-@interface CSAISettingsPage : UITableViewController
+@interface CSAISettingsPage : CSSettingsTableViewController
 @end
 @interface CSAIReplySettingsViewController : CSAISettingsPage
 @end

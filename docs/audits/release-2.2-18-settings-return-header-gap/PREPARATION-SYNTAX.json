@@ -1,0 +1,508 @@
+{
+  "purpose": "Syntax-only preparation of unchanged fixtures; not a semantic revalidation. No shell fixture executed and no production source compiled.",
+  "script_count": 100,
+  "passed": 100,
+  "failed": 0,
+  "runs": [
+    {
+      "script": "verify-ai-background-sync.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-ai-backup.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-ai-coordinator.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-ai-credentials.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-ai-foundation.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-ai-images.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-ai-manager.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-ai-native-sync-observer.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-ai-native.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-ai-store-async.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-attachment-layout.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-authorization-prompt.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-authorization-read.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-avatar-input-style.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-background-blur.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-background-privacy.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-background-run-runtime.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-background-run.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-assets.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-audit.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-bootstrap.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-codec.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-compatibility.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-deletion-ui.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-deletion.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-engine.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-manual-management.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-performance.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-registry.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-reset.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-restore-paths.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-store.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-backup-transactions.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-bubble-style.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-album.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-alerts.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-automation.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-contacts-read.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-contacts.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-core.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-detail.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-discovery.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-entry.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-ios.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-migration.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-pages.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-privacy.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-profile.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-recovery.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-reset.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-runtime.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-session.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-shake.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-social.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-close-friend-unread-panel.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-custom-text.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-appearance.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-badges.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-business.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-header.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-incremental.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-indicator.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-interactions.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-lifecycle.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-picker.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-preferences.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-search.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-selection.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-group-viewport.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-layout-preferences.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-list-corners.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-managed-image-files.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-merge-bubble-integration.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-message-actions-core.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-message-actions-execution.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-message-gesture.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-message-merge.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-message-time.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-miniapp-first-frame.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-miniapp-private-layout.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-my-page-clean.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-native-contact-picker.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-native-reward.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-navigation-images.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-navigation-title-batch.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-payment-core.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-plugin-framework.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-plugin-storage-migration.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-preference-concurrency.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-privacy-admission-cache-events.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-privacy-admission-cache.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-revoke-interception.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-revoke-reference.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-scheduled-task-backup.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-scheduled-task-manager.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-scheduled-task-swipes.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-scheduled-tasks.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-tabbar.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-touch-trail.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    },
+    {
+      "script": "verify-transfer-admission.sh",
+      "exit_code": 0,
+      "diagnostic": ""
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 #import "CSAccountDetailViewController.h"
+#import "CSProvisioningProfile.h"
 #import "CSUserInfoHelper.h"
 #import "CSSettingTableViewCell.h"
 #import <sys/utsname.h>
@@ -37,7 +38,7 @@ static NSString * const kTeamID = @"团队ID";
 static NSString * const kCreationDate = @"注册时间";
 static NSString * const kExpirationDate = @"过期时间";
 static NSString * const kAllowedDevices = @"允许设备";
-static NSString * const kDeviceUDID = @"UDID";
+static NSString * const kDeviceUDID = @"授权设备 UDID";
 
 // 其他格式文本
 static NSString * const kDateFormat = @"yyyy-MM-dd HH:mm:ss";
@@ -53,6 +54,7 @@ static NSString * const kAppSuffix = @"aucfa";
 @property (nonatomic, strong) NSArray<CSSettingItem *> *userItems;
 @property (nonatomic, strong) NSArray<CSSettingItem *> *appItems;
 @property (nonatomic, strong) NSArray<CSSettingItem *> *certItems;
+@property (nonatomic, copy) NSString *profileReadMessage;
 @end
 
 @implementation CSAccountDetailViewController
@@ -78,11 +80,12 @@ static NSString * const kAppSuffix = @"aucfa";
 // 判断证书类型
 - (NSString *)determineProfileType:(NSDictionary *)profileDict {
     // 获取关键信息
-    NSArray *devices = profileDict[@"ProvisionedDevices"];
-    BOOL hasAllDevices = [profileDict[@"ProvisionsAllDevices"] boolValue];
+    id devices = profileDict[@"ProvisionedDevices"];
+    id allDevices = profileDict[@"ProvisionsAllDevices"];
+    BOOL hasAllDevices = [allDevices isKindOfClass:NSNumber.class] && [allDevices boolValue];
     
     // 判断证书类型
-    if (devices) {
+    if ([devices isKindOfClass:NSArray.class]) {
         // 有设备列表 - 个人证书
         return kCertTypePersonal;
     } else if (hasAllDevices) {
@@ -99,47 +102,22 @@ static NSString * const kAppSuffix = @"aucfa";
     // 获取embedded.mobileprovision文件路径
     NSString *embeddedPath = [NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:@"embedded.mobileprovision"];
     
-    // 检查文件是否存在
-    if (![[NSFileManager defaultManager] fileExistsAtPath:embeddedPath]) {
-        return nil;
-    }
-    
-    // 读取文件内容
-    NSData *profileData = [NSData dataWithContentsOfFile:embeddedPath];
+    // 直接读取二进制数据；描述文件不存在时仍显示信息缺失状态。
+    self.profileReadMessage = nil;
+    NSError *readError = nil;
+    NSData *profileData = [NSData dataWithContentsOfFile:embeddedPath options:0 error:&readError];
     if (!profileData) {
+        BOOL missing = [readError.domain isEqualToString:NSCocoaErrorDomain] &&
+            (readError.code == NSFileReadNoSuchFileError || readError.code == NSFileNoSuchFileError);
+        self.profileReadMessage = missing ? @"当前安装包未包含签名描述文件，无法显示签名信息。重签时请保留 embedded.mobileprovision。" :
+                                           @"暂时无法读取当前安装包的签名描述文件。";
         return nil;
     }
-    
-    // 将文件内容转换为字符串
-    NSString *profileString = [[NSString alloc] initWithData:profileData encoding:NSASCIIStringEncoding];
-    if (!profileString) {
-        return nil;
+    NSDictionary *profile = CSProvisioningProfileDictionaryFromData(profileData);
+    if (!profile) {
+        self.profileReadMessage = @"当前安装包的签名描述文件无法解析，请检查重签时使用的描述文件。";
     }
-    
-    // 查找plist内容
-    NSScanner *scanner = [NSScanner scannerWithString:profileString];
-    NSString *plistString = nil;
-    
-    // 跳过开头直到找到<plist
-    [scanner scanUpToString:@"<plist" intoString:nil];
-    if ([scanner scanUpToString:@"</plist>" intoString:&plistString]) {
-        plistString = [plistString stringByAppendingString:@"</plist>"];
-        
-        // 转换plist字符串为数据
-        NSData *plistData = [plistString dataUsingEncoding:NSUTF8StringEncoding];
-        
-        // 解析plist数据为字典
-        NSError *error;
-        NSDictionary *plistDict = [NSPropertyListSerialization propertyListWithData:plistData 
-                                                                           options:NSPropertyListImmutable 
-                                                                            format:nil 
-                                                                             error:&error];
-        if (plistDict && !error) {
-            return plistDict;
-        }
-    }
-    
-    return nil;
+    return profile;
 }
 
 // 获取设备机型标识符 (如: iPhone12,1)
@@ -304,6 +282,10 @@ static NSString * const kAppSuffix = @"aucfa";
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     return self.sections[section].header;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+    return [self.sections[section].header isEqualToString:kSectionCertInfo] ? self.profileReadMessage : nil;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {

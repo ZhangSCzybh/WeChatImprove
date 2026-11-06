@@ -1,0 +1,10 @@
+--- 2.2-16/Controllers/CSCloseFriendManager.h
++++ 2.2-17/Controllers/CSCloseFriendManager.h
+@@ -16,6 +16,7 @@
+ - (BOOL)discoverSettingsEntryWithToken:(NSDictionary *)token;
+ - (void)changePasswordFrom:(UIViewController *)presenter;
+ - (void)resetFrom:(UIViewController *)presenter completion:(void (^)(BOOL success))completion;
++- (void)resetFrom:(UIViewController *)presenter settingsToken:(NSDictionary *)token completion:(void (^)(BOOL success))completion;
+ - (NSDictionary *)capabilities;
+ - (void)recordCapability:(NSString *)name available:(BOOL)available;
+ - (void)attachRecoveryGestureTo:(UIViewController *)controller;

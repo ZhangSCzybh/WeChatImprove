@@ -1,3 +1,0 @@
-Command: bash Tests/verify-revoke-interception.sh
-Exit status: 0
-PASS: 73 production revoke interception checks (native service doubles)

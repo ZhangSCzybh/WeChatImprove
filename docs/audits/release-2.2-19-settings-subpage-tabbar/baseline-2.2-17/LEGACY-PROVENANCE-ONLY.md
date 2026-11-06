@@ -1,0 +1,1 @@
+This is the unchanged 2.2-17 source copied from the 2.2-18 audit solely for the byte-identical header-gap runner's baseline_source_sha256 provenance field. It is not the 2.2-19 release baseline and is not an execution input. The release baseline is baseline-2.2-18.

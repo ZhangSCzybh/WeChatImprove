@@ -1,0 +1,61 @@
+{
+  "group": "legacy",
+  "runs": [
+    {
+      "name": "message-merge",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-message-merge.sh"
+      ],
+      "exit_code": 0,
+      "output": "PASS: 235148 message merge/navigation checks\nPASS: 17566 native adapter/navigation lifecycle checks (UIKit double)\n"
+    },
+    {
+      "name": "bubble-style",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-bubble-style.sh"
+      ],
+      "exit_code": 0,
+      "output": "Bubble policy/renderer/ownership: 36979 checks passed\nBubble real-adapter lifecycle: 2555 checks passed\n"
+    },
+    {
+      "name": "merge-bubble-integration",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-merge-bubble-integration.sh"
+      ],
+      "exit_code": 0,
+      "output": "PASS: 2880 seam combinations, four media types, late metadata/theme/fallback; 744926 checks; no post-display shrink, no no-op row transactions, bounded template scans\n"
+    },
+    {
+      "name": "message-time",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-message-time.sh"
+      ],
+      "exit_code": 0,
+      "output": "PASS: 142 message-time production hook lifecycle checks (UIKit double)\n"
+    },
+    {
+      "name": "message-gesture",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-message-gesture.sh"
+      ],
+      "exit_code": 0,
+      "output": "PASS: 369 production gesture/lifecycle checks (UIKit/facade doubles, no native sends)\n"
+    },
+    {
+      "name": "attachment-layout",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-attachment-layout.sh"
+      ],
+      "exit_code": 0,
+      "output": "Attachment layout: 10610 checks passed; 3 scenes, 7 sort/hide variants, 4 column counts, 3 widths, unknown indexes, native side effects and disabled native return. Stable 1000 callbacks: 0 additional preference reads; each missing/empty order: 1 initialization + 1 synchronize. Native layouts=253, preference reads <=9 per enabled scene/layout; custom and defaults notifications invalidate snapshots.\n"
+    }
+  ],
+  "original_test_bytes_preserved": true,
+  "scope": "Host Foundation/native/UIKit doubles and actual iOS SDK compilation; no phone observation."
+}

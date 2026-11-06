@@ -1,7 +1,8 @@
+#import "CSSettingsTableViewController.h"
 #import <UIKit/UIKit.h>
 #import "CSSettingTableViewCell.h"
 
-@interface CSInputTextSettingsViewController : UITableViewController <UIColorPickerViewControllerDelegate>
+@interface CSInputTextSettingsViewController : CSSettingsTableViewController <UIColorPickerViewControllerDelegate>
 
 @property (nonatomic, strong) NSArray<CSSettingSection *> *sections;
 @property (nonatomic, strong) UIColor *textColor;

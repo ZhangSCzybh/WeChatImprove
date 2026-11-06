@@ -1,0 +1,6 @@
+{
+  "source": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/Base.instrdst/Contents/Extensions/com.apple.dt.instruments.base.dtac/schemas.xml",
+  "source_sha256": "8f142ce00272c4fd2abb17f40c44ffa305f3ca1cd47539362209ddb98c95c443",
+  "host_only": true,
+  "note": "Host schema reference only; not device observations or scenario results."
+}

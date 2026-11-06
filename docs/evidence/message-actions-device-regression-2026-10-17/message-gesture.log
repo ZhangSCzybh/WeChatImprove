@@ -1,3 +1,0 @@
-Command: bash Tests/verify-message-gesture.sh
-Exit status: 0
-PASS: 272 production gesture/lifecycle checks (UIKit/facade doubles, no native sends)

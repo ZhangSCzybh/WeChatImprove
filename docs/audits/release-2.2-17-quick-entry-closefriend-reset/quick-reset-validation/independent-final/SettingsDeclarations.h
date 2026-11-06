@@ -1,0 +1,5 @@
+- (BOOL)authorized;
+- (BOOL)settingsTokenIsCurrent:(NSDictionary *)token;
+- (void)invalidateQuickEntry;
+- (void)resetCloseFriends;
+- (void)tableView:(TableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;

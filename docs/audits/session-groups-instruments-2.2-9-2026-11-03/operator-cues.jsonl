@@ -1,0 +1,12 @@
+{"scenario": "smoke", "cue": "switch groups about 15 seconds then return All", "time": "2026-11-03T15:27:50.890485+08:00"}
+{"scenario": "smoke-extended", "cue": "switch existing All/group/private/custom groups about40s then return All", "time": "2026-11-03T15:32:38.520918+08:00"}
+{"scenario": "smoke-coredevice", "cue": "switch existing groups continuously40s then returnAll; command already dispatched", "time": "2026-11-03T15:36:00.129617+08:00"}
+{"scenario": "smoke-system", "cue": "confirmed recorder started; switch existing groups40s then returnAll", "time": "2026-11-03T15:37:17.438974+08:00"}
+{"scenario": "idle", "cue": "Keep All list awake without touching; cue delivered after recording time-limit due to context handoff. Prior instruction had already requested stop on All. Do not assume cue preceded analysis window.", "time": "2026-11-03T15:45:39.909888+08:00", "delivery_note": "Late cue; require operator confirmation of idle window."}
+{"scenario": "idle-confirmed", "cue": "Recording started. Keep All awake without scroll or switch for70s.", "time": "2026-11-03T15:49:07.323711+08:00"}
+{"scenario": "messages", "cue": "Recorder started. Send continuously from another account for about60s; main phone keep list without touch.", "time": "2026-11-03T15:53:44.434254+08:00"}
+{"scenario": "messages", "cue": "Stop sending now; keep chat list.", "time": "2026-11-03T15:54:49.688474+08:00"}
+{"scenario": "scroll", "cue": "Recorder started; continuous up/down drag and deceleration about60s, no group switches or opening chats. Prior messages recorder has printed Recording completed; only host save overlaps.", "time": "2026-11-03T16:00:04.349652+08:00"}
+{"scenario": "scroll", "cue": "Stop scrolling; stay on list.", "time": "2026-11-03T16:01:16.973077+08:00"}
+{"scenario": "switch", "cue": "Recorder started; switch existing top group tabs for about60s, wait for list changes per tap; do not open chats. Prior scroll device recording completed; only Mac saving overlaps.", "time": "2026-11-03T16:06:22.879940+08:00"}
+{"scenario": "switch", "cue": "Stop switching, return to All and keep list.", "time": "2026-11-03T16:07:29.842397+08:00"}

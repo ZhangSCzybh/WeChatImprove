@@ -1,3 +1,0 @@
-PASS: metadata, payload/filter/version, arm64+arm64e classes/exports and 33 required hook pairs per slice; 4 prior packages and 777 tracked .theos files unchanged
-Source commit: 53ee70c5d3a2d5f29a3c8e66cbe8f14aa1ea072d
-Package SHA-256: 35e571eea2e900f0784ae3ee051b44cc0cc90e73c0255ec4735ccf49b6543d47

@@ -1,9 +1,0 @@
-{
-  "buildRoot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-restore-compatibility-build-ujz1jtv7",
-  "strategy": "Incremental build in established isolated rootful/rootless caches; no make clean; workspace .theos preserved",
-  "previousPackagesSHA256": {
-    "com.wechat.improve_2.0-12_symbols.zip": "64a8a7d73a6c81d0852c52626a7f870280584857ff1ba39c447cddba0f2a955c",
-    "com.wechat.improve_2.0-12_iphoneos-arm64.deb": "c9c6bc4395d5793fac507ba7449d3e3ca7528966d5b09f2120d6a565d80fab8b",
-    "com.wechat.improve_2.0-12_iphoneos-arm.deb": "3e696ef7e173202af1cdcd31622516dcf2dabe13a94069b95efef37f066292c6"
-  }
-}

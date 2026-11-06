@@ -1,3 +1,4 @@
+#import "CSSettingsTableViewController.h"
 #import <UIKit/UIKit.h>
 #import "CSSettingTableViewCell.h"
 
@@ -17,7 +18,7 @@ typedef NS_ENUM(NSInteger, CSEntryDisplayMode) {
 };
 
 // 入口设置控制器 - 用于配置自定义入口的显示位置
-@interface CSEntrySettingsViewController : UITableViewController
+@interface CSEntrySettingsViewController : CSSettingsTableViewController
 
 @end
 

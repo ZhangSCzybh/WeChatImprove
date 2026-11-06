@@ -1,0 +1,23 @@
+{
+  "kind": "offline_parser_regression_not_device_measurement",
+  "passed": 13,
+  "checks": [
+    "actual smoke: 215 distinct own events",
+    "actual smoke: 215 cross-table duplicate rows merged",
+    "actual smoke: XML references and numeric payloads resolve without issues",
+    "actual smoke: only fixed own probe names leave parser",
+    "actual smoke: 16 complete intervals, no unmatched or crossing pairs",
+    "actual smoke: Tab update Unchanged outcome retained",
+    "negative control: wrong target PID yields no own observations",
+    "negative control: missing end excluded from completed timing",
+    "actual smoke: absent target is unavailable, never validated zero",
+    "negative control: boundary-crossing interval excluded",
+    "parser-only fixture: same-thread nested model belongs to coordinator",
+    "parser-only fixture: target mask and completion scope are distinct from reload units",
+    "raw XML remains byte-identical after parsing"
+  ],
+  "actual_smoke_input_sha256": [
+    "d1666d6809f8c0e07564c8c6d0a917ee1bd51d6d2a02bbf676609b09edf2e181",
+    "000c2827dfd4a36be1f73c2471cda3d796832d35ccee9333943a241a56ed7455"
+  ]
+}

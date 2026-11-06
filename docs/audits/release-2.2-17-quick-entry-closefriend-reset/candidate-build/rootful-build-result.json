@@ -1,0 +1,15 @@
+{
+  "scheme": "rootful",
+  "command": [
+    "make",
+    "all",
+    "-j4",
+    "SCHEME=rootful",
+    "PACKAGE_VERSION=2.2-17",
+    "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2217-quick-reset-03u_dlly/rootful/.theos",
+    "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2217-quick-reset-03u_dlly/rootful",
+    "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2217-quick-reset-03u_dlly/rootful/packages"
+  ],
+  "exit_code": 0,
+  "seconds": 21.69
+}

@@ -1,2 +1,0 @@
-FAIL: biometric-enabled long press must authenticate and cannot reveal on failure
-exit=1

@@ -1,8 +1,0 @@
-{
-  "originalHarnessUnchanged": true,
-  "originalRunnerUnchanged": true,
-  "sameEightSourceSha256": true,
-  "sameFiveExtractBodySha256": true,
-  "originalManifestSha256": "8d14b8738e528dc2d0f5e1ad3ee3589c580521b9cef042cf0007bfc45cb9e119",
-  "newManifestSha256": "6e3193f08bbf6bc05b3f510a6d907921c5cfe87d04c655972772ba0dc7c47b4f"
-}

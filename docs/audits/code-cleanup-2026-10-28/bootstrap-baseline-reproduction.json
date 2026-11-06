@@ -1,6 +1,0 @@
-{
-  "hook_and_test_unchanged_from_HEAD": true,
-  "old_checker_accepts": false,
-  "whitespace_tolerant_checker_accepts": true,
-  "constructor_prefix": "CSBackupWhenReady(^{dispatch_async(dispatch_get_main_queue(),^{\n        [CSAIReplyManager."
-}

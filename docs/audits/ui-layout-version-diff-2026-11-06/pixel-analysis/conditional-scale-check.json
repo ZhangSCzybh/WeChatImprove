@@ -1,0 +1,90 @@
+[
+  {
+    "image": "img1-title-zaibuhui-0715.jpg",
+    "avatar_non_background_extent": [
+      {
+        "max_channel_distance_threshold": 15,
+        "bbox": [
+          521,
+          304,
+          759,
+          544
+        ],
+        "width_px": 239,
+        "height_px": 241
+      },
+      {
+        "max_channel_distance_threshold": 25,
+        "bbox": [
+          521,
+          306,
+          758,
+          544
+        ],
+        "width_px": 238,
+        "height_px": 239
+      },
+      {
+        "max_channel_distance_threshold": 40,
+        "bbox": [
+          521,
+          306,
+          758,
+          544
+        ],
+        "width_px": 238,
+        "height_px": 239
+      }
+    ],
+    "conditional_avatar_scale_from_80pt": [
+      2.975,
+      2.9875
+    ],
+    "conditional_label_scale_from_54pt": 2.9814814814814814,
+    "assumption": "Only if screenshot uses same avatar=80pt and label=54pt source implementation as current checkout; screenshot plugin build unknown; not actual device scale proof."
+  },
+  {
+    "image": "img2-title-mofa-0618.jpg",
+    "avatar_non_background_extent": [
+      {
+        "max_channel_distance_threshold": 15,
+        "bbox": [
+          521,
+          369,
+          759,
+          611
+        ],
+        "width_px": 239,
+        "height_px": 243
+      },
+      {
+        "max_channel_distance_threshold": 25,
+        "bbox": [
+          521,
+          372,
+          758,
+          610
+        ],
+        "width_px": 238,
+        "height_px": 239
+      },
+      {
+        "max_channel_distance_threshold": 40,
+        "bbox": [
+          521,
+          372,
+          758,
+          610
+        ],
+        "width_px": 238,
+        "height_px": 239
+      }
+    ],
+    "conditional_avatar_scale_from_80pt": [
+      2.975,
+      2.9875
+    ],
+    "conditional_label_scale_from_54pt": 2.9814814814814814,
+    "assumption": "Only if screenshot uses same avatar=80pt and label=54pt source implementation as current checkout; screenshot plugin build unknown; not actual device scale proof."
+  }
+]

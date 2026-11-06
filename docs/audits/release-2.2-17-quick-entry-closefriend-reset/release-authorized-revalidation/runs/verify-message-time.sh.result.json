@@ -1,0 +1,18 @@
+{
+  "name": "verify-message-time.sh",
+  "command": [
+    "bash",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/release-authorized-revalidation/fixture-project/Tests/verify-message-time.sh"
+  ],
+  "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/release-authorized-revalidation/fixture-project",
+  "exit_code": 0,
+  "seconds": 1.586,
+  "log": "runs/verify-message-time.sh.log",
+  "production_manifest_sha256": "bf3719b6bfff8a00e67e2911cefcb661d9e0e637bf75fdbdf3c9dc9152277676",
+  "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-authorized-41_xk8as",
+  "temporary_theos_env": {
+    "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-authorized-41_xk8as/_THEOS_LOCAL_DATA_DIR",
+    "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-authorized-41_xk8as/THEOS_BUILD_DIR",
+    "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-authorized-41_xk8as/THEOS_PACKAGE_DIR"
+  }
+}

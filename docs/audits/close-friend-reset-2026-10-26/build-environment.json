@@ -1,9 +1,0 @@
-{
-  "source": "/Users/zhangshichao/.codex/worktrees/close-friend-entry-gesture/WeChatImprove",
-  "baseline": "463cb17b5a33811dae9b53911b4bad669fb18442",
-  "branch": "codex/close-friend-entry-gesture",
-  "version": "2.0-13+entry2",
-  "buildRoot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-close-friend-reset-build-jkcpion4",
-  "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk",
-  "data": "Isolated package builds only; no device installation or user data access"
-}

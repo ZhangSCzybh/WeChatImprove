@@ -1,7 +1,0 @@
-FAIL: folded controller follows current custom group instead of forcing All
-FAIL: folded proxy publishes only current-group sessions
-FAIL: folded group display zero resolves native B index
-FAIL: confirmed empty custom group has no folded entry
-FAIL: folded entry carries current group's visible conversation count
-FAIL: another group's unread folded child cannot mark B unread
-Folded group integration: 9 checks, 6 failures

@@ -1,0 +1,76 @@
+{
+  "runs": [
+    {
+      "command": [
+        "shasum",
+        "-a",
+        "256",
+        "-c",
+        "SHA256SUMS"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.2-19-settings-subpage-tabbar",
+      "exit_code": 0,
+      "stdout": "WeChatImprove.dylib: OK\ncom.wechat.improve_2.2-19_iphoneos-arm.deb: OK\ncom.wechat.improve_2.2-19_iphoneos-arm64.deb: OK\ncom.wechat.improve_2.2-19_symbols.zip: OK\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dpkg-deb",
+        "-f",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.2-19-settings-subpage-tabbar/com.wechat.improve_2.2-19_iphoneos-arm.deb",
+        "Version"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "stdout": "2.2-19\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dpkg-deb",
+        "-f",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.2-19-settings-subpage-tabbar/com.wechat.improve_2.2-19_iphoneos-arm64.deb",
+        "Version"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "stdout": "2.2-19\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "xcrun",
+        "lipo",
+        "-archs",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.2-19-settings-subpage-tabbar/WeChatImprove.dylib"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "stdout": "arm64 arm64e\n",
+      "stderr": ""
+    }
+  ],
+  "files": {
+    "SHA256SUMS": {
+      "sha256": "c100fe5329561704510e6a4274f8454b19d1f2fb8d63c2c3e710a0c0007fd469",
+      "bytes": 410
+    },
+    "WeChatImprove.dylib": {
+      "sha256": "5f9079eb8258b082967744b030494e7ff38b07bb3bbb0d882e60396aefcaddb8",
+      "bytes": 7170112
+    },
+    "com.wechat.improve_2.2-19_iphoneos-arm.deb": {
+      "sha256": "b3fdf283faef4b1fe09d99856e3fd6b229094fcca81f5182d7105ce189c67c13",
+      "bytes": 1645916
+    },
+    "com.wechat.improve_2.2-19_iphoneos-arm64.deb": {
+      "sha256": "a058da1d7a563be546d9556079268a0d031828c180f62b053c049c5e0078ce39",
+      "bytes": 1648320
+    },
+    "com.wechat.improve_2.2-19_symbols.zip": {
+      "sha256": "d7e2321ae154c5aaa59c867df858fb184e7fbb446f92f46e1f11d79cb5aa31e7",
+      "bytes": 11710002
+    }
+  },
+  "device_validated": false
+}

@@ -1,9 +1,0 @@
-{
-  "command": [
-    "bash",
-    "Tests/verify-close-friend-runtime.sh"
-  ],
-  "exit_code": 1,
-  "elapsed_seconds": 2.32,
-  "output": "FAIL 16: setup remains unlocked beyond the former maximum duration\n"
-}

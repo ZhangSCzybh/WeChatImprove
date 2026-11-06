@@ -1,8 +1,0 @@
-permission failure: rows=0, error=NSCocoaErrorDomain/257; original unchanged; retry rows=1
-missing directory: recreated=true, rows=0, error=nil; saved old root still has manual; restore rows=1
-different container: new rows=0; original container rows=1
-missing metadata: manual rows=1; manual survives prune
-damaged snapshot: rows=1, unavailable=true; file survives prune
-account/epoch/version/installation changes in same root: rows=3; prior manual survives
-interrupted pending write: committed rows remain 3
-Backup list diagnosis: 29 checks passed; no device files accessed

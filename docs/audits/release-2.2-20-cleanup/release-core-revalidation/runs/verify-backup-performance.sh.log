@@ -1,0 +1,8 @@
+Manual backup performance: current production methods, forwarded by counters.
+Manual history N=0: unchanged save reads 0; changed save reads 0; inventory reads 5 for 5 records
+Manual history N=20: unchanged save reads 0; changed save reads 0; inventory reads 25 for 25 records
+Manual history N=80: unchanged save reads 0; changed save reads 0; inventory reads 85 for 85 records
+Shared image R=1: encode validImage calls 2 -> 1
+Shared image R=20: encode validImage calls 21 -> 1
+Shared image R=100: encode validImage calls 101 -> 1
+Backup performance: 182 checks passed

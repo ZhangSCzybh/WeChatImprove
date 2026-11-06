@@ -1,0 +1,136 @@
+{
+  "pid": 37813,
+  "window_seconds": [
+    20.0,
+    65.0
+  ],
+  "capture_integrity": "Not inferred. Verify recorder exit, action labels, PID/bundle mapping, and loss separately.",
+  "toc_processes": [
+    {
+      "type": "attached",
+      "return-exit-status": "0",
+      "name": "微信",
+      "pid": "37813",
+      "termination-reason": "exit(0)"
+    },
+    {
+      "name": "kernel",
+      "pid": "0",
+      "path": "Unknown"
+    },
+    {
+      "name": "微信",
+      "pid": "37813",
+      "path": "/var/containers/Bundle/Application/AA64ACA4-652C-4861-85CC-3C21A38644F2/WeChat.app/WeChat"
+    }
+  ],
+  "attached_target_pid_matches": true,
+  "frame_table_scopes": [
+    "SINGLE"
+  ],
+  "cpu": {
+    "status": "available",
+    "rows": 45,
+    "mean_percent": 18.719343766267162,
+    "p95_percent": 29.567556372,
+    "peak_percent": 36.027472258,
+    "coverage": {
+      "nanoseconds": 45000000000,
+      "seconds": 45.0,
+      "fraction": 1.0,
+      "gaps_seconds": []
+    },
+    "overlap_ns": 0,
+    "rejected_rows": {
+      "missing_time_or_verified_percent": 1
+    },
+    "other_pid_rows": {},
+    "percent_unit": "100 percent = one fully occupied core; whole process",
+    "raw_counter_crosscheck": {
+      "first_sample_seconds": 20.443129041,
+      "last_sample_seconds": 64.329942125,
+      "wall_seconds": 43.886813084,
+      "cpu_seconds_delta": 8.240951708,
+      "mean_percent": 18.777740120310625,
+      "live_mean_same_counter_span_percent": 18.777621462834237,
+      "live_minus_counter_percentage_points": -0.00011865747638737743,
+      "sample_count": 44,
+      "reset_count": 0
+    }
+  },
+  "frames": {
+    "status": "available",
+    "scope": "target attached PID and SINGLE table independently verified",
+    "classified_lifetimes": 2712,
+    "positive_hitch_count": 48,
+    "hitch_record_fraction": 0.017699115044247787,
+    "summed_hitch_ms": 1705.999317,
+    "positive_p95_ms": 50.04975,
+    "max_hitch_ms": 66.729708,
+    "explicit_ontime_sentinels": 2664,
+    "hitch_latency_equation_checks": 48,
+    "hitch_latency_equation_mismatches": [],
+    "rejected_rows": {},
+    "interpretation": "Classified lifetimes are not FPS; positive hitch records are not exact dropped display refreshes."
+  },
+  "thermal": {
+    "status": "available",
+    "coverage": {
+      "nanoseconds": 45000000000,
+      "seconds": 45.0,
+      "fraction": 1.0,
+      "gaps_seconds": []
+    },
+    "overlap_nanoseconds": 0,
+    "state_seconds": {
+      "Nominal": 45.0
+    },
+    "state_fraction_of_window": {
+      "Nominal": 1.0
+    },
+    "intervals": [
+      {
+        "start_seconds": 0.0,
+        "end_seconds": 71.078263998,
+        "state": "Nominal",
+        "induced": 0,
+        "overlap_seconds": 45.0
+      }
+    ],
+    "rejected_rows": {},
+    "interpretation": "Device thermal state does not prove CPU throttling or identify a causal process."
+  },
+  "commits": {
+    "attributed_count": 183,
+    "per_second": 4.066666666666666,
+    "unknown_pid_rows": 0,
+    "interpretation": "CA commits are not group refresh calls."
+  },
+  "sources": [
+    {
+      "path": "docs/audits/session-groups-instruments-2026-11-03/messages/export/messages-toc.xml",
+      "sha256": "407b410c4134310627558963a49a9fbd786e80ea19138c47b29207cfec7e42b5"
+    },
+    {
+      "path": "docs/audits/session-groups-instruments-2026-11-03/messages/export/messages-cpu.xml",
+      "sha256": "084f5e01b8ec64451960b99888a18ea3bce89154348e7969c34cd75ec7c49efc"
+    },
+    {
+      "path": "docs/audits/session-groups-instruments-2026-11-03/messages/export/messages-sysmon-process.xml",
+      "sha256": "d68d2fa7c075858fa72cc15a7e3e2bf677b25ae0928c9f86fe7364b075ab2d79"
+    },
+    {
+      "path": "docs/audits/session-groups-instruments-2026-11-03/messages/export/messages-lifetime.xml",
+      "sha256": "ae3d97f4cd4fc2a2e43cae05b43d8c01e65ee6ac2b01979fe169708fd8973f44"
+    },
+    {
+      "path": "docs/audits/session-groups-instruments-2026-11-03/messages/export/messages-commits.xml",
+      "sha256": "874d04b854c89f744785dabdd30fa856801fbf6736e80d2fd95318ee59c2ba70"
+    },
+    {
+      "path": "docs/audits/session-groups-instruments-2026-11-03/messages/export/messages-thermal.xml",
+      "sha256": "385589733e8818b69d41180e7cd364351458801d1540065bbd418139a7d0e334"
+    }
+  ],
+  "table_errors": {}
+}

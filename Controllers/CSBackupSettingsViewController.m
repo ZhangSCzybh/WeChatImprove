@@ -8,7 +8,7 @@
 #import "CSContactSeparatorSettingsViewController.h"
 #import "CSNativeSettingsHost.h"
 #import "CSBackupSettingsCell.h"
-@interface CSBackupRepairViewController : UITableViewController
+@interface CSBackupRepairViewController : CSSettingsTableViewController
 @property(nonatomic) NSArray<NSString *> *contacts;
 @end
 @implementation CSBackupRepairViewController

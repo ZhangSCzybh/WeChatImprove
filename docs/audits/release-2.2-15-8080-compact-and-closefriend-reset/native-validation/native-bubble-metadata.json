@@ -1,0 +1,240 @@
+{
+  "binary": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat",
+  "sha256": "571c5b8cf8732eb5402ffddcbeb93830cb6695bad180be5613ad4167764524e9",
+  "classes": [
+    {
+      "name": "BubbleInfo",
+      "class_offset": "0x1ef22928",
+      "superclass": "NSObject",
+      "methods": [
+        {
+          "selector": "init",
+          "encoding": "@16@0:8",
+          "imp": "0x104d9eba8",
+          "metadata_offset": "0x17132d88"
+        },
+        {
+          "selector": "copyWithZone:",
+          "encoding": "@24@0:8^{_NSZone=}16",
+          "imp": "0x104d9ec28",
+          "metadata_offset": "0x17132d94"
+        },
+        {
+          "selector": "getBubbleImage:isDarkMode:",
+          "encoding": "@24@0:8B16B20",
+          "imp": "0x104d9ed00",
+          "metadata_offset": "0x17132da0"
+        },
+        {
+          "selector": "getBubbleImage:",
+          "encoding": "@20@0:8B16",
+          "imp": "0x104d9ed10",
+          "metadata_offset": "0x17132dac"
+        },
+        {
+          "selector": "getBubbleImage:isDarkMode:useCache:",
+          "encoding": "@28@0:8B16B20B24",
+          "imp": "0x104d9ed5c",
+          "metadata_offset": "0x17132db8"
+        },
+        {
+          "selector": "getNewBubbleImage:",
+          "encoding": "@20@0:8B16",
+          "imp": "0x104d9f400",
+          "metadata_offset": "0x17132dc4"
+        },
+        {
+          "selector": "resolvedBubbleImage:isDarkMode:",
+          "encoding": "@24@0:8B16B20",
+          "imp": "0x104d9f44c",
+          "metadata_offset": "0x17132dd0"
+        },
+        {
+          "selector": "bubbleName",
+          "encoding": "@16@0:8",
+          "imp": "0x104d9f9bc",
+          "metadata_offset": "0x17132ddc"
+        },
+        {
+          "selector": "setBubbleName:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x104d9f9c4",
+          "metadata_offset": "0x17132de8"
+        },
+        {
+          "selector": "bubbleNameHL",
+          "encoding": "@16@0:8",
+          "imp": "0x104d9f9d0",
+          "metadata_offset": "0x17132df4"
+        },
+        {
+          "selector": "setBubbleNameHL:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x104d9f9d8",
+          "metadata_offset": "0x17132e00"
+        },
+        {
+          "selector": "edgeInsets",
+          "encoding": "{UIEdgeInsets=dddd}16@0:8",
+          "imp": "0x104d9f9e4",
+          "metadata_offset": "0x17132e0c"
+        },
+        {
+          "selector": "setEdgeInsets:",
+          "encoding": "v48@0:8{UIEdgeInsets=dddd}16",
+          "imp": "0x104d9f9f0",
+          "metadata_offset": "0x17132e18"
+        },
+        {
+          "selector": "type",
+          "encoding": "Q16@0:8",
+          "imp": "0x104d9f9fc",
+          "metadata_offset": "0x17132e24"
+        },
+        {
+          "selector": "setType:",
+          "encoding": "v24@0:8Q16",
+          "imp": "0x104d9fa04",
+          "metadata_offset": "0x17132e30"
+        },
+        {
+          "selector": "style",
+          "encoding": "q16@0:8",
+          "imp": "0x104d9fa0c",
+          "metadata_offset": "0x17132e3c"
+        },
+        {
+          "selector": "setStyle:",
+          "encoding": "v24@0:8q16",
+          "imp": "0x104d9fa14",
+          "metadata_offset": "0x17132e48"
+        },
+        {
+          "selector": "position",
+          "encoding": "Q16@0:8",
+          "imp": "0x104d9fa1c",
+          "metadata_offset": "0x17132e54"
+        },
+        {
+          "selector": "setPosition:",
+          "encoding": "v24@0:8Q16",
+          "imp": "0x104d9fa24",
+          "metadata_offset": "0x17132e60"
+        },
+        {
+          "selector": "margin",
+          "encoding": "{UIEdgeInsets=dddd}16@0:8",
+          "imp": "0x104d9fa2c",
+          "metadata_offset": "0x17132e6c"
+        },
+        {
+          "selector": "setMargin:",
+          "encoding": "v48@0:8{UIEdgeInsets=dddd}16",
+          "imp": "0x104d9fa38",
+          "metadata_offset": "0x17132e78"
+        },
+        {
+          "selector": "isSender",
+          "encoding": "B16@0:8",
+          "imp": "0x104d9fa44",
+          "metadata_offset": "0x17132e84"
+        },
+        {
+          "selector": "setIsSender:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x104d9fa4c",
+          "metadata_offset": "0x17132e90"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8",
+          "imp": "0x104d9fa54",
+          "metadata_offset": "0x17132e9c"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_lock",
+          "encoding": "@\"NSRecursiveLock\""
+        },
+        {
+          "name": "m_bubbleCaches",
+          "encoding": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "_isSender",
+          "encoding": "B"
+        },
+        {
+          "name": "_bubbleName",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_bubbleNameHL",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_type",
+          "encoding": "Q"
+        },
+        {
+          "name": "_style",
+          "encoding": "q"
+        },
+        {
+          "name": "_position",
+          "encoding": "Q"
+        },
+        {
+          "name": "_edgeInsets",
+          "encoding": "{UIEdgeInsets=\"top\"d\"left\"d\"bottom\"d\"right\"d}"
+        },
+        {
+          "name": "_margin",
+          "encoding": "{UIEdgeInsets=\"top\"d\"left\"d\"bottom\"d\"right\"d}"
+        }
+      ]
+    },
+    {
+      "name": "BubbleManager",
+      "class_offset": "0x1ef22978",
+      "superclass": "MMUserService",
+      "methods": [
+        {
+          "selector": "init",
+          "encoding": "@16@0:8",
+          "imp": "0x104d9fb14",
+          "metadata_offset": "0x17132eb0"
+        },
+        {
+          "selector": "bubbleInfoWithType:position:isSender:",
+          "encoding": "@36@0:8Q16Q24B32",
+          "imp": "0x104d9fba4",
+          "metadata_offset": "0x17132ebc"
+        },
+        {
+          "selector": "bubbleInfoWithType:position:style:isSender:",
+          "encoding": "@44@0:8Q16Q24q32B40",
+          "imp": "0x104d9fbb8",
+          "metadata_offset": "0x17132ec8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8",
+          "imp": "0x104da0790",
+          "metadata_offset": "0x17132ed4"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_lock",
+          "encoding": "@\"NSRecursiveLock\""
+        },
+        {
+          "name": "m_bubbleInfoDict",
+          "encoding": "@\"NSMutableDictionary\""
+        }
+      ]
+    }
+  ]
+}

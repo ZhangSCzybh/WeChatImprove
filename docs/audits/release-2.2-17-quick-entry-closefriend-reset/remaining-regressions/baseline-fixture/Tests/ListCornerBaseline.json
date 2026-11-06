@@ -1,0 +1,132 @@
+{
+  "baseline": "1.7-17 / 2aa7bcb8",
+  "keys": {
+    "kListCornerRadiusEnabledKey": "com.wechat.enhance.list_corner_radius.enabled",
+    "kListCornerRadiusKey": "com.wechat.enhance.list_corner_radius.radius",
+    "kListLeftMarginKey": "com.wechat.enhance.list_corner_radius.left_margin",
+    "kListRightMarginKey": "com.wechat.enhance.list_corner_radius.right_margin",
+    "kListTopSessionTopMarginKey": "com.wechat.enhance.list_corner_radius.top_session_top_margin",
+    "kListNormalSessionTopMarginKey": "com.wechat.enhance.list_corner_radius.normal_session_top_margin",
+    "kListLightModeBgColorRedKey": "com.wechat.enhance.list_corner_radius.light_bg_color.red",
+    "kListLightModeBgColorGreenKey": "com.wechat.enhance.list_corner_radius.light_bg_color.green",
+    "kListLightModeBgColorBlueKey": "com.wechat.enhance.list_corner_radius.light_bg_color.blue",
+    "kListLightModeBgColorAlphaKey": "com.wechat.enhance.list_corner_radius.light_bg_color.alpha",
+    "kListDarkModeBgColorRedKey": "com.wechat.enhance.list_corner_radius.dark_bg_color.red",
+    "kListDarkModeBgColorGreenKey": "com.wechat.enhance.list_corner_radius.dark_bg_color.green",
+    "kListDarkModeBgColorBlueKey": "com.wechat.enhance.list_corner_radius.dark_bg_color.blue",
+    "kListDarkModeBgColorAlphaKey": "com.wechat.enhance.list_corner_radius.dark_bg_color.alpha",
+    "kTopSessionTopMarginLightBgColorRedKey": "com.wechat.enhance.list_corner_radius.top_session_top_margin_light_bg_color.red",
+    "kTopSessionTopMarginLightBgColorGreenKey": "com.wechat.enhance.list_corner_radius.top_session_top_margin_light_bg_color.green",
+    "kTopSessionTopMarginLightBgColorBlueKey": "com.wechat.enhance.list_corner_radius.top_session_top_margin_light_bg_color.blue",
+    "kTopSessionTopMarginLightBgColorAlphaKey": "com.wechat.enhance.list_corner_radius.top_session_top_margin_light_bg_color.alpha",
+    "kTopSessionTopMarginDarkBgColorRedKey": "com.wechat.enhance.list_corner_radius.top_session_top_margin_dark_bg_color.red",
+    "kTopSessionTopMarginDarkBgColorGreenKey": "com.wechat.enhance.list_corner_radius.top_session_top_margin_dark_bg_color.green",
+    "kTopSessionTopMarginDarkBgColorBlueKey": "com.wechat.enhance.list_corner_radius.top_session_top_margin_dark_bg_color.blue",
+    "kTopSessionTopMarginDarkBgColorAlphaKey": "com.wechat.enhance.list_corner_radius.top_session_top_margin_dark_bg_color.alpha",
+    "kNormalSessionTopMarginLightBgColorRedKey": "com.wechat.enhance.list_corner_radius.normal_session_top_margin_light_bg_color.red",
+    "kNormalSessionTopMarginLightBgColorGreenKey": "com.wechat.enhance.list_corner_radius.normal_session_top_margin_light_bg_color.green",
+    "kNormalSessionTopMarginLightBgColorBlueKey": "com.wechat.enhance.list_corner_radius.normal_session_top_margin_light_bg_color.blue",
+    "kNormalSessionTopMarginLightBgColorAlphaKey": "com.wechat.enhance.list_corner_radius.normal_session_top_margin_light_bg_color.alpha",
+    "kNormalSessionTopMarginDarkBgColorRedKey": "com.wechat.enhance.list_corner_radius.normal_session_top_margin_dark_bg_color.red",
+    "kNormalSessionTopMarginDarkBgColorGreenKey": "com.wechat.enhance.list_corner_radius.normal_session_top_margin_dark_bg_color.green",
+    "kNormalSessionTopMarginDarkBgColorBlueKey": "com.wechat.enhance.list_corner_radius.normal_session_top_margin_dark_bg_color.blue",
+    "kNormalSessionTopMarginDarkBgColorAlphaKey": "com.wechat.enhance.list_corner_radius.normal_session_top_margin_dark_bg_color.alpha"
+  },
+  "numericDefaults": [
+    10,
+    15,
+    15,
+    10,
+    10
+  ],
+  "numericRanges": [
+    [
+      5,
+      30
+    ],
+    [
+      1,
+      30
+    ],
+    [
+      1,
+      30
+    ],
+    [
+      0,
+      50
+    ],
+    [
+      0,
+      50
+    ]
+  ],
+  "headerOriginal": 7,
+  "headerSections": [
+    -1,
+    0,
+    1,
+    2,
+    3,
+    4,
+    10
+  ],
+  "headers": {
+    "Session": [
+      7,
+      17,
+      17,
+      17,
+      7,
+      7,
+      7
+    ],
+    "Contacts": [
+      17,
+      0,
+      0,
+      0,
+      0,
+      17,
+      17
+    ],
+    "Discover": [
+      17,
+      17,
+      17,
+      17,
+      17,
+      17,
+      17
+    ],
+    "More": [
+      17,
+      17,
+      17,
+      17,
+      17,
+      17,
+      17
+    ]
+  },
+  "footers": {
+    "Session": 0.01,
+    "Contacts": 0,
+    "Discover": 0.01,
+    "More": 0.01
+  },
+  "layout": {
+    "width": 390,
+    "height": 60,
+    "left": 15,
+    "right": 23,
+    "cardWidth": 352,
+    "mainItemX": 15,
+    "bannerX": 15,
+    "directIconX": 31,
+    "directTitleX": 67,
+    "moreHeaderAvatarX": 16,
+    "moreHeaderTitleX": 92,
+    "moreHeaderWidth": 352
+  }
+}

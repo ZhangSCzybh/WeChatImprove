@@ -1,7 +1,0 @@
-{
-  "0x11ff87bf8": "catchUnImplementMethod",
-  "0x120104840": "methodSignatureForSelector:",
-  "0x120109ce8": "setTarget:",
-  "0x1201098c8": "setSelector:",
-  "0x120103630": "invoke"
-}

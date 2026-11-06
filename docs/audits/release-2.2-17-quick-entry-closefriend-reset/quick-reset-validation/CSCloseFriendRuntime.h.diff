@@ -1,0 +1,11 @@
+--- 2.2-16/Controllers/CSCloseFriendRuntime.h
++++ 2.2-17/Controllers/CSCloseFriendRuntime.h
+@@ -40,6 +40,8 @@
+ - (BOOL)updateProfile:(NSDictionary *)profile error:(NSError **)error;
+ /// Separate password proof for destructive reset; shortcut/biometric authorization is insufficient.
+ - (nullable NSDictionary *)prepareResetWithPassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error;
++/// Destructive reset only; a live settings visit never becomes password authority.
++- (nullable NSDictionary *)prepareResetWithSettingsToken:(NSDictionary *)token error:(NSError **)error;
+ - (void)cancelResetWithToken:(NSDictionary *)token;
+ /// Consumes the proof after UI confirmation. Must run under the current account epoch lock.
+ - (BOOL)resetWithToken:(NSDictionary *)token error:(NSError **)error;

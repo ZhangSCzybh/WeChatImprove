@@ -1,2 +1,0 @@
-Payment core: 2213 checks passed
-FAIL 199: submittedStatusQueries==1 && sentMessages==0

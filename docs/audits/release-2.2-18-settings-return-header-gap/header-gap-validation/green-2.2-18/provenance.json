@@ -1,0 +1,84 @@
+{
+  "source_root": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "label": "green-2.2-18",
+  "exit_code": 0,
+  "source_sha256": {
+    "Controllers/CSCustomViewController.m": "933c2af2174ee391c916a3f43e6c798147cb54cb6293515b9e1119210c2d26f7"
+  },
+  "source_unchanged_during_test": true,
+  "baseline_source_sha256": "6f602715e9cf5863798accf429f0d02369d33c4214a22aca0d7b015c16519cd7",
+  "test_sha256": "6df06837d82d1630811f0d860e4c406ab56149f6066bad093ffc500a54396db2",
+  "runner_sha256": "59f0179dadd1d866d44ab3ff86c543a93e1d4a3f9171f8b90da0a3482e95f5d7",
+  "extracted_methods_sha256": "ab66be644e41a541a226354cde8883da83cf68d0bb4febc57532fa5a33375d57",
+  "compile_command": [
+    "xcrun",
+    "--sdk",
+    "macosx",
+    "clang",
+    "-fobjc-arc",
+    "-fblocks",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-framework",
+    "Foundation",
+    "-framework",
+    "CoreGraphics",
+    "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-18-settings-return-header-gap/header-gap-validation/green-2.2-18",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-18-settings-return-header-gap/header-gap-validation/HeaderGapLifecycleTests.m",
+    "-o",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-18-settings-return-header-gap/header-gap-validation/green-2.2-18/header-gap-tests"
+  ],
+  "routes": [
+    {
+      "title": "顶栏信息",
+      "class": "CSNavigationTitleSettingsViewController"
+    },
+    {
+      "title": "头像设置",
+      "class": "CSAvatarSettingsViewController"
+    },
+    {
+      "title": "触摸轨迹",
+      "class": "CSTouchTrailViewController"
+    },
+    {
+      "title": "界面简化",
+      "class": "CSWCEnhanceViewController"
+    },
+    {
+      "title": "界面净化",
+      "class": "CSUICleanViewController"
+    },
+    {
+      "title": "气泡样式",
+      "class": "CSBubbleStyleSettingsViewController"
+    },
+    {
+      "title": "列表圆角",
+      "class": "CSListCornerRadiusSettingsViewController"
+    },
+    {
+      "title": "底栏样式",
+      "class": "CSTabBarStyleSettingsViewController"
+    },
+    {
+      "title": "布局设置",
+      "class": "CSLayoutSettingsViewController"
+    },
+    {
+      "title": "附件布局",
+      "class": "CSChatAttachmentSettingsViewController"
+    },
+    {
+      "title": "密友设置/普通入口",
+      "class": "CSCloseFriendSettingsViewController"
+    },
+    {
+      "title": "密友设置/五击快捷入口",
+      "class": "CSCloseFriendSettingsViewController"
+    }
+  ],
+  "route_limit": "Shared parent setup/lifecycle is executed under each menu route label. Child controllers and UIKit navigation are not executed by this host fixture.",
+  "limits": "Objective-C production methods execute in a host double. Actual heights and estimate errors in both directions are independent adversarial inputs; no values are fitted to video pixels. iOS runtime, phone rendering, animation and actual default section-header measurement are not exercised."
+}

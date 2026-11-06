@@ -1,0 +1,18 @@
+{
+  "name": "verify-plugin-storage-migration.sh",
+  "command": [
+    "bash",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/fixture-project/Tests/verify-plugin-storage-migration.sh"
+  ],
+  "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/fixture-project",
+  "exit_code": 0,
+  "seconds": 2.505,
+  "log": "runs/verify-plugin-storage-migration.sh.log",
+  "production_manifest_sha256": "5cc67d44531a6c7ab92ead8a65efb79c4873ee4b89b437d794cb84ed932fe96d",
+  "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2219-core-um8vhdd2",
+  "temporary_theos_env": {
+    "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2219-core-um8vhdd2/_THEOS_LOCAL_DATA_DIR",
+    "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2219-core-um8vhdd2/THEOS_BUILD_DIR",
+    "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2219-core-um8vhdd2/THEOS_PACKAGE_DIR"
+  }
+}

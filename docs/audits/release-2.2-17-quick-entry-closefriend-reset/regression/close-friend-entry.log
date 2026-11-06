@@ -1,0 +1,95 @@
+CloseFriendEntryTests: 45 checks passed
+In file included from Tests/CloseFriendEntryGestureTests.m:95:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:12:5: error: unknown type name 'UITapGestureRecognizer'; did you mean 'UIGestureRecognizer'?
+   12 |     UITapGestureRecognizer *tap=[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapCloseFriendQuickEntry:)];
+      |     ^~~~~~~~~~~~~~~~~~~~~~
+      |     UIGestureRecognizer
+Tests/CloseFriendEntryGestureTests.m:19:12: note: 'UIGestureRecognizer' declared here
+   19 | @interface UIGestureRecognizer : NSObject
+      |            ^
+In file included from Tests/CloseFriendEntryGestureTests.m:95:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:12:35: error: unknown receiver 'UITapGestureRecognizer'; did you mean 'UIGestureRecognizer'?
+   12 |     UITapGestureRecognizer *tap=[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapCloseFriendQuickEntry:)];
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~
+      |                                   UIGestureRecognizer
+Tests/CloseFriendEntryGestureTests.m:19:12: note: 'UIGestureRecognizer' declared here
+   19 | @interface UIGestureRecognizer : NSObject
+      |            ^
+In file included from Tests/CloseFriendEntryGestureTests.m:95:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:12:65: error: no visible @interface for 'UIGestureRecognizer' declares the selector 'initWithTarget:action:'
+   12 |     UITapGestureRecognizer *tap=[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapCloseFriendQuickEntry:)];
+      |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:13:9: error: property 'numberOfTapsRequired' not found on object of type 'UIGestureRecognizer *'
+   13 |     tap.numberOfTapsRequired=1;
+      |         ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:14:9: error: property 'numberOfTouchesRequired' not found on object of type 'UIGestureRecognizer *'
+   14 |     tap.numberOfTouchesRequired=1;
+      |         ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:15:9: error: property 'cancelsTouchesInView' not found on object of type 'UIGestureRecognizer *'
+   15 |     tap.cancelsTouchesInView=NO;
+      |         ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:16:9: error: property 'delegate' not found on object of type 'UIGestureRecognizer *'
+   16 |     tap.delegate=self;
+      |         ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:18:10: error: no visible @interface for 'UIGestureRecognizer' declares the selector 'requireGestureRecognizerToFail:'
+   18 |     [tap requireGestureRecognizerToFail:gesture];
+      |      ~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:20:10: error: property 'closeFriendQuickEntryGesture' not found on object of type 'EntryController *'; did you mean 'closeFriendEntryGesture'?
+   20 |     self.closeFriendQuickEntryGesture=tap;
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |          closeFriendEntryGesture
+Tests/CloseFriendEntryGestureTests.m:86:59: note: 'closeFriendEntryGesture' declared here
+   86 | @property(nonatomic,strong) UILongPressGestureRecognizer *closeFriendEntryGesture;
+      |                                                           ^
+In file included from Tests/CloseFriendEntryGestureTests.m:95:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:20:38: error: incompatible pointer types assigning to 'UILongPressGestureRecognizer *' from 'UIGestureRecognizer *' [-Werror,-Wincompatible-pointer-types]
+   20 |     self.closeFriendQuickEntryGesture=tap;
+      |                                      ^~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:30:22: error: property 'closeFriendQuickEntryGesture' not found on object of type 'EntryController *'; did you mean 'closeFriendEntryGesture'?
+   30 |     if(gesture==self.closeFriendQuickEntryGesture) {
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                      closeFriendEntryGesture
+Tests/CloseFriendEntryGestureTests.m:86:59: note: 'closeFriendEntryGesture' declared here
+   86 | @property(nonatomic,strong) UILongPressGestureRecognizer *closeFriendEntryGesture;
+      |                                                           ^
+In file included from Tests/CloseFriendEntryGestureTests.m:95:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:31:57: error: no visible @interface for 'EntryController' declares the selector 'resetCloseFriendQuickEntry'
+   31 |         if(![self canDiscoverCloseFriendEntry]) { [self resetCloseFriendQuickEntry]; return NO; }
+      |                                                    ~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:33:18: error: no visible @interface for 'CSCloseFriendManager' declares the selector 'refreshAccount'
+   33 |         [manager refreshAccount];
+      |          ~~~~~~~ ^~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:34:9: error: unknown type name 'CSCloseFriendRuntime'; did you mean 'CSCloseFriendManager'?
+   34 |         CSCloseFriendRuntime *runtime=manager.runtime;
+      |         ^~~~~~~~~~~~~~~~~~~~
+      |         CSCloseFriendManager
+Tests/CloseFriendEntryGestureTests.m:69:12: note: 'CSCloseFriendManager' declared here
+   69 | @interface CSCloseFriendManager : NSObject
+      |            ^
+In file included from Tests/CloseFriendEntryGestureTests.m:95:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:34:47: error: property 'runtime' not found on object of type 'CSCloseFriendManager *'
+   34 |         CSCloseFriendRuntime *runtime=manager.runtime;
+      |                                               ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:35:60: error: property 'closeFriendQuickEntryToken' not found on object of type 'EntryController *'; did you mean 'closeFriendEntryToken'?
+   35 |         if(![self closeFriendQuickEntryTokenIsCurrent:self.closeFriendQuickEntryToken]) {
+      |                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                            closeFriendEntryToken
+Tests/CloseFriendEntryGestureTests.m:87:41: note: 'closeFriendEntryToken' declared here
+   87 | @property(nonatomic,copy) NSDictionary *closeFriendEntryToken;
+      |                                         ^
+In file included from Tests/CloseFriendEntryGestureTests.m:95:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:35:19: error: no visible @interface for 'EntryController' declares the selector 'closeFriendQuickEntryTokenIsCurrent:'
+   35 |         if(![self closeFriendQuickEntryTokenIsCurrent:self.closeFriendQuickEntryToken]) {
+      |              ~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:36:19: error: no visible @interface for 'EntryController' declares the selector 'resetCloseFriendQuickEntry'
+   36 |             [self resetCloseFriendQuickEntry];
+      |              ~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.ZhyCX24FOm/EntryGestureUnderTest.h:37:18: error: property 'closeFriendQuickEntryToken' not found on object of type 'EntryController *'; did you mean 'closeFriendEntryToken'?
+   37 |             self.closeFriendQuickEntryToken=runtime.settingsAccessToken;
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                  closeFriendEntryToken
+Tests/CloseFriendEntryGestureTests.m:87:41: note: 'closeFriendEntryToken' declared here
+   87 | @property(nonatomic,copy) NSDictionary *closeFriendEntryToken;
+      |                                         ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.

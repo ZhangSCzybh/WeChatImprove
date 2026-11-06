@@ -1,3 +1,4 @@
+#import "CSSettingsTableViewController.h"
 #import <UIKit/UIKit.h>
-@interface CSScheduledTaskSettingsViewController : UITableViewController
+@interface CSScheduledTaskSettingsViewController : CSSettingsTableViewController
 @end

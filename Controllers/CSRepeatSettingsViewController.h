@@ -1,5 +1,6 @@
+#import "CSSettingsTableViewController.h"
 #import <UIKit/UIKit.h>
 
-@interface CSRepeatSettingsViewController : UITableViewController
+@interface CSRepeatSettingsViewController : CSSettingsTableViewController
 
 @end

@@ -1,6 +1,0 @@
-{
-  "script": "verify-tabbar.sh",
-  "exit_code": 0,
-  "duration_seconds": 1.63,
-  "output": "tabbar geometry: PASS\n2026-10-29 08:53:28.249 native[63720:37556552] tabbar click effect: 39 checks passed\n2026-10-29 08:53:28.256 native[63720:37556552] tabbar preferences/native lifecycle: PASS"
-}

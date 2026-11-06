@@ -1,0 +1,1405 @@
+{
+  "origin_release": "2.2-19",
+  "origin_commit": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+  "fixture_and_runner_count_protected": 325,
+  "all_original_fixture_bytes_preserved": true,
+  "raw_277_restored_head_files": [
+    {
+      "path": "Tests/BackupBootstrapTests.m",
+      "sha256": "6b55aee17a857bc8a2c59301cc9302d730d2e84126391ce2d54ea56d969bdb37"
+    },
+    {
+      "path": "Tests/CloseFriendAlbumTests.m",
+      "sha256": "1bf9cda3d6712b9119b4d758ddaa94e5911a4668a968b1097cef538b0b1fc569"
+    },
+    {
+      "path": "Tests/CloseFriendRecoveryTests.m",
+      "sha256": "27702b7729c26dd397b6e93f52fd550f3f1955ce13b427d8a49cf3856ac1bc7b"
+    },
+    {
+      "path": "Tests/verify-ai-native-sync-observer.sh",
+      "sha256": "8f78ada50875b4eb8a83a96e984e9dd9efd9f46335da931c06fef4d239e6f517"
+    },
+    {
+      "path": "Tests/verify-group-interactions.sh",
+      "sha256": "d88f3b11c2907b962a3d04f83c55fb5bb14bd2b7e0cd1de1d70d25d03c3dfd4f"
+    },
+    {
+      "path": "Tests/FoldedGroupTests.h",
+      "sha256": "853a6ef9f28256b299b8b38fd97ce1b4afe589ad8c0884e7d3196f4d24b88c6a"
+    },
+    {
+      "path": "Tests/verify-payment-core.sh",
+      "sha256": "fc5b27b5ed6129b7e939a9bf125bd89b4cab927748aa3291c13177d9d0558f94"
+    },
+    {
+      "path": "Tests/ManagedImageCleanupIntegrationTests.m",
+      "sha256": "deb4ca1806d4f72cedc34eb6e1f1499d49a65f8c2083aa6f2e4165d9966290e5"
+    },
+    {
+      "path": "Tests/CloseFriendTimelineCacheTests.h",
+      "sha256": "7989fe5871a07f785f21f93d85c147c594f8edf91adc6e0e958da853b4cd20d8"
+    },
+    {
+      "path": "Tests/AIClientTests.m",
+      "sha256": "d12be6b7459d19ab0db27f8161bbaa14b805270f9a58e8584c8cf05f9e929667"
+    },
+    {
+      "path": "Tests/MiniappFirstFrameTests.m",
+      "sha256": "8a6858eb45860db4fe99b77768524809f7b0e1615a93d2e678f7485b08cd1779"
+    },
+    {
+      "path": "Tests/BackgroundRunFakeRuntime.m",
+      "sha256": "d3c188fc7c048befa31efcf4b3b67f1d1695e53cd4c061b1558bb80c1467b6e9"
+    },
+    {
+      "path": "Tests/verify-background-run-runtime.sh",
+      "sha256": "c3ec22f73d055fc58da75203667985ba15efc88a18c794b7ff3baa60e6ae5f9f"
+    },
+    {
+      "path": "Tests/verify-authorization-prompt.sh",
+      "sha256": "e740b6db731f25b2f1c495b0978053520fa08dffcf6cd0274e9a67f88eecd7a6"
+    },
+    {
+      "path": "Tests/verify-ai-credentials.sh",
+      "sha256": "67b50a8e296559a87240f6443603cfec731b13e54566f34e616399862a84be7f"
+    },
+    {
+      "path": "Tests/verify-message-actions-core.sh",
+      "sha256": "4830fa3d2a2cb3b1f20fe6b9e7f7fde8769a709fe331b55c55c6b65a619047ed"
+    },
+    {
+      "path": "Tests/RevokeReferenceTests.m",
+      "sha256": "9e2a51c56a76a0f8d791ea0111a0baf7a793b2817b60b3818f4702b7f411e944"
+    },
+    {
+      "path": "Tests/CloseFriendEntryTests.m",
+      "sha256": "99dada41164df4b757d7a759a8ccf25708fddd56d69cb6b616f370cc0b692de4"
+    },
+    {
+      "path": "Tests/verify-group-appearance.sh",
+      "sha256": "649fa00a320876d3b0e21e5defbb3f49a1eac158934b4859c75da56a4a1f00ef"
+    },
+    {
+      "path": "Tests/GroupIncrementalTests.m",
+      "sha256": "09db9ab5cd53adea0177d828f5f8fb9c4ab0c342821f28832fe7646d88267ba1"
+    },
+    {
+      "path": "Tests/verify-layout-preferences.sh",
+      "sha256": "209dbbf9044286dc174147cc1ab1a134182a9f77f0721dc74dc4d2a507f50e8b"
+    },
+    {
+      "path": "Tests/verify-ai-images.sh",
+      "sha256": "9377eda1c3c1a068ed1aee07edc1bf535c139cb4c6609d677036c69a967f9077"
+    },
+    {
+      "path": "Tests/verify-close-friend-profile.sh",
+      "sha256": "93e006f717ccf6de470e967d7c4ae0464f0d4ca4bf039b27d9fba9660e80113b"
+    },
+    {
+      "path": "Tests/GroupRefreshFixture.h",
+      "sha256": "636710660758e092585c43fd61f326944a00d7c56dcb8b450c20383d16f695aa"
+    },
+    {
+      "path": "Tests/verify-background-blur.sh",
+      "sha256": "f69ac6ec5dd6b4a99d67a1a76ad4cdd9d7187c18aa483f45bf4f7b4183a8f5ad"
+    },
+    {
+      "path": "Tests/verify-ai-background-sync.sh",
+      "sha256": "b2d551c7261911d2fa9aecc3de2056c0a4661d4d393fb882302d31b16b6d9ca4"
+    },
+    {
+      "path": "Tests/FoldedRowLookupTests.h",
+      "sha256": "6f060afc2d8652d1fdd202d8c17d38f5207ef0634c1add8361209780cb5c14ea"
+    },
+    {
+      "path": "Tests/verify-close-friend-automation.sh",
+      "sha256": "9f99b724c6a6b1b176ab9360cd29f17df9830a3517b82ace22d256dce925614a"
+    },
+    {
+      "path": "Tests/CloseFriendAutomationTests.m",
+      "sha256": "450255c4a37903973af0275a80deb917cba463f554389781af70f0947c7e8662"
+    },
+    {
+      "path": "Tests/PaymentAutomationTests.m",
+      "sha256": "44e53ea924646a004fa3d751bcb617da94a3061a79b973c0e7fd209fb339ed7e"
+    },
+    {
+      "path": "Tests/verify-ai-coordinator.sh",
+      "sha256": "a526c113e58d1bb2e18d9ee4339406bd665b068441d73ead910caae927ff141a"
+    },
+    {
+      "path": "Tests/verify-close-friend-session.sh",
+      "sha256": "53733e6b2f6f41fcae5e1f0629dd2d00ff4637274ba9913840d024c62f2af3d5"
+    },
+    {
+      "path": "Tests/TouchTrailRuntimeTests.m",
+      "sha256": "58bb3f10df8fcd16fdbf7bbdd6275e626b72abf6fe3039c95279e2b6de46c4fb"
+    },
+    {
+      "path": "Tests/.DS_Store",
+      "sha256": "b858ce36b1d884945f7c5a940a40f9c885bdb74351a5e1d7f61417fba5179d69"
+    },
+    {
+      "path": "Tests/verify-my-page-clean.sh",
+      "sha256": "3b51f0fb7ecc7b19b05097af41b8803155f0ab128995324d647c7af8403b8200"
+    },
+    {
+      "path": "Tests/verify-close-friend-ios.sh",
+      "sha256": "2ef49b8b0cee7b87a6b36013389cb8984074ec153724dd8e92d84c58dc2f870a"
+    },
+    {
+      "path": "Tests/CloseFriendIncomingCallFixture.h",
+      "sha256": "5c02213307338e25a47bbcec6a395b0a2c00fb85493464217f0e66683d6e04c0"
+    },
+    {
+      "path": "Tests/NativeContactPickerTests.m",
+      "sha256": "9b24a8c8c906cf42952a8bdf192900f141bfbc0590715402acde37913f3d6cf6"
+    },
+    {
+      "path": "Tests/PaymentCoreTests.m",
+      "sha256": "cf990b51de13eebdd88cab10dadf120946a56264bcf17250e325ec43175f1a13"
+    },
+    {
+      "path": "Tests/verify-group-selection.sh",
+      "sha256": "e1e4bd33595a9fd65c77a2a624c68b53d2833de7d5966beb6783a0aee127b636"
+    },
+    {
+      "path": "Tests/CloseFriendSchedulingTests.m",
+      "sha256": "09fd30880ce9e0f7eb480c0eabae84da39f94b3767d405f9d11d56197c387467"
+    },
+    {
+      "path": "Tests/AuthorizationPromptTests.m",
+      "sha256": "6d25ed5bae5b27bfbcfe5c4d15ec3c018102fd64c568ae630617c9557d492360"
+    },
+    {
+      "path": "Tests/verify-tabbar.sh",
+      "sha256": "a9ab113135fbfa18a49a785503ce8fc07558031fcfadbc66f426780b813fd878"
+    },
+    {
+      "path": "Tests/MessageTimeHookTests.m",
+      "sha256": "84e7e6727d225ce8a2d61d53a6f9796494dfb2ba35975a278103ca063da3d819"
+    },
+    {
+      "path": "Tests/verify-close-friend-migration.sh",
+      "sha256": "25a35d76526e9415f6f171e03671d268e403ea1cd4509c13e17d79b590d56dae"
+    },
+    {
+      "path": "Tests/verify-backup-codec.sh",
+      "sha256": "0223f99b525e298e8c3a2096b5ffdec6f190b9e9bd8b6254bf5ba626c159bb45"
+    },
+    {
+      "path": "Tests/verify-native-reward.sh",
+      "sha256": "53d39d5e14d0e253efee46c152418b280e4637da5fe55dc399caa09b914c5b3f"
+    },
+    {
+      "path": "Tests/verify-transfer-admission.sh",
+      "sha256": "bc5205faa3c2a9a3705d0a66e10c541c225e249759cfcd64df0789fb65b05c12"
+    },
+    {
+      "path": "Tests/BackupStartupIntegrationTests.m",
+      "sha256": "5c2d5fc85062fb1e9322e495973376acb44e3d95e57185fb87294db6f70e5683"
+    },
+    {
+      "path": "Tests/ListRestoreTests.h",
+      "sha256": "c13d2c139c0f0dbd8c0719d5ab99a839d4247b9fd24429a928bb8eae8a158d32"
+    },
+    {
+      "path": "Tests/CloseFriendSessionPresentationTests.m",
+      "sha256": "6fdf4be390b2c92bc7cf91c39f875b6b6c50e8e916c19aa7f44cd6f2cd8808d1"
+    },
+    {
+      "path": "Tests/verify-group-incremental.sh",
+      "sha256": "ec79488954229211f882f561632d426afd840cac56821648e674416ef915e7f3"
+    },
+    {
+      "path": "Tests/PreferenceConcurrencyTests.m",
+      "sha256": "c08bb0d1a0499c01a335f2c9066b0237ea220b5e767eb3df5570401a1243fcd0"
+    },
+    {
+      "path": "Tests/AINativeSyncObserverTests.m",
+      "sha256": "3348612ecd78c8589a70384d6feef86d529dbee4882c3ef205dff5bafcd46978"
+    },
+    {
+      "path": "Tests/verify-close-friend-runtime.sh",
+      "sha256": "f338b4e5bc1112197860c9fecd82c2516b4fad91808c50d9d8c0cb285be9ed68"
+    },
+    {
+      "path": "Tests/CloseFriendResetTests.m",
+      "sha256": "c6969a84c2fff39a62fdb258ba2d1a666dee3de8f97d4fa1cbae3941e98bb87d"
+    },
+    {
+      "path": "Tests/CloseFriendProfileTests.m",
+      "sha256": "34d6a5fc482f058f5d9a90deecc6c8833ac85a4bcb3223d6685f4ddc1bd74dcb"
+    },
+    {
+      "path": "Tests/FoldedEntryVisualTests.h",
+      "sha256": "ca4029904973876915a97fb44b39228b49180a32eddb1655e0c665028b01360c"
+    },
+    {
+      "path": "Tests/verify-close-friend-pages.sh",
+      "sha256": "a18d05c23d9854ae3bd5204df075655529a8a65463cee63c88d71c68726ba326"
+    },
+    {
+      "path": "Tests/MergeBubbleIntegrationTests.m",
+      "sha256": "f60c8d98953e596f86b6b79dd72e353e3a2a88cbd0b9dadfeae5932ace00a415"
+    },
+    {
+      "path": "Tests/verify-group-business.sh",
+      "sha256": "6f2b9cbc04d11091ddb022fe4185c7b4274d7cfa6a27813d7c3a5603364cf7cc"
+    },
+    {
+      "path": "Tests/CloseFriendPageTests.m",
+      "sha256": "13e7517bd650632fcdabb3310a95545f57603d0cb3af1c4a04b11bb22a1d7fde"
+    },
+    {
+      "path": "Tests/BackupCodecTests.m",
+      "sha256": "71a7afed6b932b7befa0c6fb564ceeb71f88a4bf5ff1b61d130f765400464c4d"
+    },
+    {
+      "path": "Tests/verify-backup-manual-management.sh",
+      "sha256": "5bd72056eff16feb6f5a494b2b68a863e87f3a7cdf5f86fbcc5cd6a6ccb0e4c4"
+    },
+    {
+      "path": "Tests/AIReplyBackupTests.m",
+      "sha256": "78adf700b7ad92f9f50fdf0de9004c8954ab5658fbe66562b398125901e0d0b9"
+    },
+    {
+      "path": "Tests/verify-group-lifecycle.sh",
+      "sha256": "d25b31102c3a4ba95d50991c6edef628e3cb44876a161f0ec142584ebc768899"
+    },
+    {
+      "path": "Tests/CloseFriendMigrationTests.m",
+      "sha256": "a1e5b9be20e268c65fae7a7f71a5ddcc33de15a02f1a77fd1c975b6df680f21f"
+    },
+    {
+      "path": "Tests/BackupStoreTests.m",
+      "sha256": "30640bd20998e34bbdec9178337f28a8a90b997b5202b0ebabea170f4020e1f5"
+    },
+    {
+      "path": "Tests/verify-managed-image-files.sh",
+      "sha256": "bac7b7fe541076c2c24a40783a214e86255e6d20e6e1afd476e18c23885362a3"
+    },
+    {
+      "path": "Tests/PluginEntryTests.m",
+      "sha256": "251e070d22933eb9bbc2c9bfdd5a59014ab2e08b144fb1f22e6437d69453b204"
+    },
+    {
+      "path": "Tests/GroupLifecycleTests.m",
+      "sha256": "30d6ead2e8fe95f146364a20251f344d190332ff4bdbe7f059040d158157ec7c"
+    },
+    {
+      "path": "Tests/CloseFriendCallReplyFixture.h",
+      "sha256": "14aa2276283238d250b94b9fbabd111d6008744de10d93650bd41003c6c43774"
+    },
+    {
+      "path": "Tests/verify-backup-deletion-ui.sh",
+      "sha256": "100a12679c3a57e7ef421e8b7f21f4f534340d34e18d7c13d5233ff53db66184"
+    },
+    {
+      "path": "Tests/CloseFriendTabBadgeTests.m",
+      "sha256": "b7fe6105021b9911ccacd6f6c67f7fa96e971a1ff15dbd16f17e347a54739c92"
+    },
+    {
+      "path": "Tests/RevokeInterceptionBaseline.json",
+      "sha256": "799a40f74f9c090d3adbada5513678a89f719332865d41706b23f246c21ed1f9"
+    },
+    {
+      "path": "Tests/verify-touch-trail.sh",
+      "sha256": "764e9d143340233d9b9cb5121bd38be2df24b29ca6a885abc49a56712e8d7f7c"
+    },
+    {
+      "path": "Tests/ScheduledTaskBackupTests.m",
+      "sha256": "1ff39069aafb8047f47e5160b8b2e7d5aae96f1e6297aa28adcff8f7b46ec767"
+    },
+    {
+      "path": "Tests/verify-close-friend-detail.sh",
+      "sha256": "86d8350ba692d43fe6f9d069e7a85bf12a359de5f7b6b9dfd6ca61f3e081d607"
+    },
+    {
+      "path": "Tests/CloseFriendDiscoveryTests.m",
+      "sha256": "d7ddb6e2f49094a1a6bc04cb1de695238d8242a58ea5f18a23f352a53930e0b7"
+    },
+    {
+      "path": "Tests/BackupResetTests.m",
+      "sha256": "3d9996c347c78f0f664e06a16e8b7f6e72d76a51055d7fcd78e4a649764d2ded"
+    },
+    {
+      "path": "Tests/verify-close-friend-contacts.sh",
+      "sha256": "34443b3d34c6e1eea04ab4ac834e2bedb72b3a30899a9db780778a87898915fb"
+    },
+    {
+      "path": "Tests/verify-close-friend-album.sh",
+      "sha256": "e76581233b582547f0c121090f807a61ed6a386475748d90f4d4e55338314006"
+    },
+    {
+      "path": "Tests/CloseFriendContactsReadTests.m",
+      "sha256": "0d33fafb09f50c23ebdceda7933ed6ba6e10f10d67204408b120101def83d8d7"
+    },
+    {
+      "path": "Tests/verify-group-viewport.sh",
+      "sha256": "a4681b6c549e043298526fdf9e9419564e3484135a99e14e8adcd2dc87c402b0"
+    },
+    {
+      "path": "Tests/MiniappPrivateLayoutTests.m",
+      "sha256": "b6666a0ada9c63171823c20603d239655149f385a86e8279b1a477b333fbb0fa"
+    },
+    {
+      "path": "Tests/BackgroundRunHybridTests.m",
+      "sha256": "0aa581203dbfff13604661d26bb0a282976fa2463c8641d6e821edc2bde76587"
+    },
+    {
+      "path": "Tests/MessageActionExecutionTests.m",
+      "sha256": "edc5714db6d8b53b5a4a43b91500278320bb22b65dbbc0d4aab0ff0afea858cf"
+    },
+    {
+      "path": "Tests/BackgroundBlurTests.m",
+      "sha256": "c85a183d8efafb238e10276613e2b10e469259aae7937d045fa6c104218a1a5d"
+    },
+    {
+      "path": "Tests/verify-backup-registry.sh",
+      "sha256": "395adef363f787e99e1f4360bd28380451864abfc812f449c6d83bb09968e535"
+    },
+    {
+      "path": "Tests/FoldedCardIntegrationTests.h",
+      "sha256": "a4fc5d0aa60d977543a5012d662481b8b39fd9145fbf96de4a4435bf6aa448c3"
+    },
+    {
+      "path": "Tests/verify-backup-bootstrap.sh",
+      "sha256": "5111d56f71d282c77fdf2a45a5e2a3a3fc2d1e34d04bdd581e7a5467fa34ff78"
+    },
+    {
+      "path": "Tests/verify-list-corners.sh",
+      "sha256": "d72f341bc6c21f0de5041f12570c480ad1ea104b851c3cae0ac4b843bdfa0cf7"
+    },
+    {
+      "path": "Tests/BackupPerformanceTests.m",
+      "sha256": "7f81af9107a50221c620c6aa6269572cdeb25720c4694cbec9536c1597ddaf7c"
+    },
+    {
+      "path": "Tests/LayoutPreferencesTests.m",
+      "sha256": "9c3f334a70e5a660290ab690e5cd5b0b82449500e39dcd88e7d3dd4df6f44672"
+    },
+    {
+      "path": "Tests/extract-group-search.py",
+      "sha256": "6eab4823931c9eadeb6f56e95ed875e6a4b6713e72e70d44f168e6852ba1c2e1"
+    },
+    {
+      "path": "Tests/verify-navigation-title-batch.sh",
+      "sha256": "51ec3083338195042349ddacaa2c05a0588fe7ad11a89d82ecfdf352edefd180"
+    },
+    {
+      "path": "Tests/verify-close-friend-recovery.sh",
+      "sha256": "821333494ec885b465da7c729691d65d31640a66a047efe48c4b932d4bd6383d"
+    },
+    {
+      "path": "Tests/verify-group-search.sh",
+      "sha256": "446a6d370957ddf3e9018ee5462600fa57396184f10504dae51828da32307727"
+    },
+    {
+      "path": "Tests/verify-message-actions-execution.sh",
+      "sha256": "eafb7aa462fe39d105f5c7ca3b37c6ffe9be8b6eff0a42122170048d0944dc40"
+    },
+    {
+      "path": "Tests/verify-native-contact-picker.sh",
+      "sha256": "33fc3d57fbb9e122650fe8cb7cef16894806251446e2e7454a521ed7ffa5a434"
+    },
+    {
+      "path": "Tests/extract-group-interactions.py",
+      "sha256": "7b211a9bf25c30ce73fcd66a070076b1c5bbac95c0087e53b3cceba2fefd3fc7"
+    },
+    {
+      "path": "Tests/verify-preference-concurrency.sh",
+      "sha256": "ac022c72fda5418317690afc059abdc2945e81507731c7180521dd77d3a84307"
+    },
+    {
+      "path": "Tests/verify-group-proxy.py",
+      "sha256": "2b350b689b455317a7a5c156382ebd5f0090a484b92854d4e4b919e4147165e8"
+    },
+    {
+      "path": "Tests/verify-custom-text.sh",
+      "sha256": "9d72c03880d349722b143ab963ce8faedfa99d3d754eb75915a2494bdbe06a9d"
+    },
+    {
+      "path": "Tests/PluginStorageMigrationTests.m",
+      "sha256": "f0dff1bd6d9cc8e4d430cd683869b8395d8a3c7d11101b10cb392ab79a948a9f"
+    },
+    {
+      "path": "Tests/extract-list-corners.py",
+      "sha256": "de19882fee1394840ccac6a26a73061d98c61979c9a7a65807dfec167063f0c0"
+    },
+    {
+      "path": "Tests/CloseFriendAlertTests.m",
+      "sha256": "9de4f08c1591ffd5d92ac43c136c4ad844296a06c20676a4c9810fe3deed6552"
+    },
+    {
+      "path": "Tests/BackupEngineTests.m",
+      "sha256": "adcc49aea3f378f1897b7735c572758bd55836c061044a1be3de8cbbd217833d"
+    },
+    {
+      "path": "Tests/GroupAppearanceTests.m",
+      "sha256": "2a5ced464412694db44c5e453c5d05645541a7d465a4f690664654ea5cc0dd89"
+    },
+    {
+      "path": "Tests/verify-backup-restore-paths.sh",
+      "sha256": "84cdd14964917e866f480a4630902a2a7a1c8b357e0fe30c6de461001354647d"
+    },
+    {
+      "path": "Tests/extract-group-business.py",
+      "sha256": "bf773158c5262ce180a7833c8f92421d4b4ff11f48fefd16dc656a55ed71e868"
+    },
+    {
+      "path": "Tests/BackgroundRunRecordTests.m",
+      "sha256": "f699b166e1b53f8815bcc59cb4aa5dcd584dce462f315b0921c89f2a2b91b7fa"
+    },
+    {
+      "path": "Tests/AttachmentLayoutTests.m",
+      "sha256": "234e77b53ac21bf267b1beedf64f0de719428c3f2b4f0737245ffc93770b0eea"
+    },
+    {
+      "path": "Tests/verify-group-badges.sh",
+      "sha256": "12823f2429da22e31a6c59a4443783a74569888fe615482aa06ed6b6264a16be"
+    },
+    {
+      "path": "Tests/BackupRestorePathTests.m",
+      "sha256": "6afa3f3f4a14ba3e30f52999994fa2153fc983126261ad3aba4eae661d0d5fa3"
+    },
+    {
+      "path": "Tests/BubbleStyleAdapterTests.m",
+      "sha256": "74c0a67c09d3b34b6ab2e92c4e8d33994d302e9e62331537531601aa9e8f9fc5"
+    },
+    {
+      "path": "Tests/verify-plugin-storage-migration.sh",
+      "sha256": "6ffbc411074a9f783a8904c1491c49937ee1b265f78e947479281f65f92b6cee"
+    },
+    {
+      "path": "Tests/verify-scheduled-tasks.sh",
+      "sha256": "99c8ced391001fa5e2b4852db5ac2828d1a0233bf02a1bf4d2ff588969960c6d"
+    },
+    {
+      "path": "Tests/RevokeInterceptionTests.m",
+      "sha256": "cfb8385c381dc10ebd00b3ebfa66581e63021f3744a51d081adb1e3c0eb207c0"
+    },
+    {
+      "path": "Tests/CloseFriendPrivacyTests.m",
+      "sha256": "c3ef8e49677504fa49f68aec8891820118a5d77eb4fc2dcbce7af48870b8b345"
+    },
+    {
+      "path": "Tests/ListCornerSemanticsTests.m",
+      "sha256": "161c955de0a9a7f3704f7e38885cd281e8cb5a48aa7d0b6be1f6d53065365ee7"
+    },
+    {
+      "path": "Tests/extract-group-indicator.py",
+      "sha256": "50956b41121c2178fcb0c679aaac8ac54c5977a252d441a32517688276d714cc"
+    },
+    {
+      "path": "Tests/AuthorizationReadTests.m",
+      "sha256": "d8f9a33e2021cbdcffeb86741bc90edb7f924af4ee3b923f6f8cd4c90cf4fcb5"
+    },
+    {
+      "path": "Tests/ScheduledTaskManagerTests.m",
+      "sha256": "6be0641b724f5d96c5a64dbdfb954f6bfa7790e4e81b7af0284804fbec611107"
+    },
+    {
+      "path": "Tests/CloseFriendSocialRouteFixture.h",
+      "sha256": "e39988b9aff5d0b1688c19043f32268a08585292a7b6170a2713fdec1d04f070"
+    },
+    {
+      "path": "Tests/extract-group-viewport.py",
+      "sha256": "1f6a851b5fff8c6e9db60b569498e935f8f340de3ceea7184b21f12cb6920071"
+    },
+    {
+      "path": "Tests/verify-close-friend-entry.sh",
+      "sha256": "9bdf44a56b547151944e2d75088fb07da4966f6e563849bf1bb019cbb8581cba"
+    },
+    {
+      "path": "Tests/verify-privacy-admission-cache-events.sh",
+      "sha256": "4fee085c565d6b8e104863ab2aa3f80f400dfb1975ef9ade6ae70e823172ae38"
+    },
+    {
+      "path": "Tests/verify-ai-foundation.sh",
+      "sha256": "03e5e296668f05aa09ff5c8233152ee7dac25e6cd26c9c60372125f1a06ed976"
+    },
+    {
+      "path": "Tests/NavigationTitleBatchTests.m",
+      "sha256": "1d88e7415448356b6feea5af2676265f5a839ec0abddb306c8cd0dac6cb83e4c"
+    },
+    {
+      "path": "Tests/TabBarNativeTests.m",
+      "sha256": "5fcb0e1fc33d6a98b20e286156004e6bc7571d19e55fc494bf33dbcf322110f8"
+    },
+    {
+      "path": "Tests/ScheduledTaskTests.m",
+      "sha256": "57963495f0d8f5cc789c0648f3a719b88d66a7b64bb565bbd8036487d507747b"
+    },
+    {
+      "path": "Tests/BackupRegistryTests.m",
+      "sha256": "ce6ee0a8519e127d18cdb3d19db00191f619d425a5b33be7a1dfa4774bbb7fa3"
+    },
+    {
+      "path": "Tests/verify-background-privacy.sh",
+      "sha256": "48170c0da6793f63ed4a9d9d92df3b28e028f8691a0fbd373b8a3aa0b904daed"
+    },
+    {
+      "path": "Tests/AIReplyManagerTests.m",
+      "sha256": "0ce6b5f2221932096e4b52fddf2607a57c7da54a6c11757f4f2ae361c3e175ac"
+    },
+    {
+      "path": "Tests/GroupHeaderSemanticsTests.m",
+      "sha256": "723bc6bc447f7d9fddcc436988758b1630b19c19be805854fbe21599a7e7af88"
+    },
+    {
+      "path": "Tests/PrivacyAdmissionCacheAdditionalTests.m",
+      "sha256": "330dcf33c38090801bb8082e7bc2c2e4e7466f6f0778e48b8490b6c98ada8e0c"
+    },
+    {
+      "path": "Tests/verify-backup-engine.sh",
+      "sha256": "3de3a31f426c2eab724d814fe6e12f17d9a7738b391170a2b09ba7479ef0e4ab"
+    },
+    {
+      "path": "Tests/verify-avatar-input-style.sh",
+      "sha256": "aca3721de56234bbf9beb354661612e732899eb26741f786c72befb0db8d1077"
+    },
+    {
+      "path": "Tests/GroupViewportTests.m",
+      "sha256": "16c6b9786f84b5768783a354e2811a8c4087383e01bfa23fd1786ac167fb37cd"
+    },
+    {
+      "path": "Tests/MessageGestureAdapterTests.m",
+      "sha256": "e721f3e738356450bc675ad256b8cca6afec425d4969918bc9938bea3ed94d1f"
+    },
+    {
+      "path": "Tests/BackupCompatibilityTests.m",
+      "sha256": "4c035df001aeb5432a5fab503e3ae10a4b1c6bf32e2cec8a72cbdb81a8858136"
+    },
+    {
+      "path": "Tests/CloseFriendBiometricTests.m",
+      "sha256": "6a632e94abd48293471ce0c6628d74c5ed10064376744a7a84f009a1ee301cb1"
+    },
+    {
+      "path": "Tests/CloseFriendSessionTests.m",
+      "sha256": "eeda1d14e6060e2539a8af48b02883b558c960a6fc704d3d1d393718e8d694b0"
+    },
+    {
+      "path": "Tests/AIReplyStoreTests.m",
+      "sha256": "55e05de270c5161b386b3d881ff4420e1fb890b7ff8e4d84f0038c7d435515af"
+    },
+    {
+      "path": "Tests/verify-close-friend-reset.sh",
+      "sha256": "10fe9e927e454591659f04b00e27ce8807787f03377941e4cae23fa74db5760d"
+    },
+    {
+      "path": "Tests/extract-group-lifecycle.py",
+      "sha256": "63f9121861e509bc89ab81e05a9dbea5a3dce74a991ace55e8745ff116181133"
+    },
+    {
+      "path": "Tests/verify-privacy-admission-cache.sh",
+      "sha256": "f4b4686114b601bb73c2c26e9184f32e8aeef90c57b561a128bfb4d81b7b3651"
+    },
+    {
+      "path": "Tests/NavigationImageTests.m",
+      "sha256": "965ae32a9c1d002e4e21aad6dcf316ea00cb76d581195593e2270dafba7dcd23"
+    },
+    {
+      "path": "Tests/CloseFriendSearchInputFixture.h",
+      "sha256": "023a00a2e7b11cd867068d798298037347f0940c4ea3930ac506203858d51cb8"
+    },
+    {
+      "path": "Tests/BackgroundRunFakeRuntime.h",
+      "sha256": "f754a0263d19c9c3c0f7bb88e6eed6f9e9e3894734688e80a81146547760b4ce"
+    },
+    {
+      "path": "Tests/verify-close-friend-unread-panel.sh",
+      "sha256": "eda8476d4cb6c43949a739a9f3f264628e31824fc142a2b4b7f173b614d3d95e"
+    },
+    {
+      "path": "Tests/ManagedImageFileTests.m",
+      "sha256": "3c0bfa27a74b840afd7426a1b5da7196859b9955fdc05247205629701bd625a2"
+    },
+    {
+      "path": "Tests/AICredentialStoreTests.m",
+      "sha256": "ade1f7c96a1db44a41a9e764413166e6b0c6a12d3aacb3e1c320af1aed1bbb6f"
+    },
+    {
+      "path": "Tests/CloseFriendContactTests.m",
+      "sha256": "8d1ad658317fdffd84f419bb2e8bc2c69153104f37d2538616e4a99f11f94afa"
+    },
+    {
+      "path": "Tests/verify-miniapp-first-frame.sh",
+      "sha256": "4a7003dec6883e1ff28a33da4c6d7b9aeb31b6b8c867388c3c9611b91fa8d8a4"
+    },
+    {
+      "path": "Tests/AIReplyNativeTests.m",
+      "sha256": "d88dd91310824b94ffac672c7515edc23020dab6ec4e7ee8275921985de0ec89"
+    },
+    {
+      "path": "Tests/verify-close-friend-shake.sh",
+      "sha256": "88da6050b4f88757ecb58e9a25240a3302525d5b26b03212b0476d6952f16af5"
+    },
+    {
+      "path": "Tests/verify-backup-performance.sh",
+      "sha256": "11e47e5c2193572917bb0ea9e6a9d71011baddcace5b1fbd3cb596ecd91691f4"
+    },
+    {
+      "path": "Tests/verify-backup-transactions.sh",
+      "sha256": "0dbebf2e54bcc6934fbb682a976a031ac5e51b21e01a8b023239b5099c206637"
+    },
+    {
+      "path": "Tests/MessageActionCoreTests.m",
+      "sha256": "14cf067ec9b5ffaddd08279811c41dfc2f93d074125a1ed9c8a9956837d5ed90"
+    },
+    {
+      "path": "Tests/verify-backup-deletion.sh",
+      "sha256": "fc2cc330ce266484e477b6158524d67b9021a090ac28896780a4528cea3a3159"
+    },
+    {
+      "path": "Tests/verify-message-gesture.sh",
+      "sha256": "31a8767ba60fe45917adba1924e5972a5fcbc0dad0e7e1a7f658a7320a672f50"
+    },
+    {
+      "path": "Tests/MessageMergePolicyTests.m",
+      "sha256": "98e645c5bb3133d9747bc8442ba2fb1ca318288210b326eda683f168a627b837"
+    },
+    {
+      "path": "Tests/verify-ai-backup.sh",
+      "sha256": "6d9a56ebf65de9f4b1fcba15feceeab0604cb03f11b26e6859ce7f44f5d6ce55"
+    },
+    {
+      "path": "Tests/verify-group-preferences.sh",
+      "sha256": "0daf7c8f62edac3f4ff3c538857bcce241bd34dceee65be94c95c4f402e0abcd"
+    },
+    {
+      "path": "Tests/FoldedSummaryTests.h",
+      "sha256": "f2d9158c6461e71c9b93a536ab1ff7add365696bb5fb46ff2cef38193892c994"
+    },
+    {
+      "path": "Tests/CloseFriendCoreTests.m",
+      "sha256": "e8fa127647bbdcd9a98b243a1817094680d4b968972149ef8c294d3d50bbc2ea"
+    },
+    {
+      "path": "Tests/verify-ai-manager.sh",
+      "sha256": "e2a0e87981a9faecbdd39c9d2afc80946f821f9dc6164d8be9aa8502ef090663"
+    },
+    {
+      "path": "Tests/GroupIndicatorTests.m",
+      "sha256": "eb76f9bf7f3984a88c5b0203d1c808248deeee2953549aca00f31207c67acb20"
+    },
+    {
+      "path": "Tests/GroupPreferencesTests.m",
+      "sha256": "e3616fd99e2fe6659972cedb8fde072e6e7816f4c7d9c75d077c1572930b7f4e"
+    },
+    {
+      "path": "Tests/BackupManualManagementTests.m",
+      "sha256": "651b3f162fe102aa44759c3187a8d777ae693b8abd7d03500f9a3e1af22507a7"
+    },
+    {
+      "path": "Tests/verify-ai-store-async.sh",
+      "sha256": "199b8296fc56a39953e8829371f4ab5c57c96bbabc1328be5af4f130ef8be2fd"
+    },
+    {
+      "path": "Tests/BackgroundRunTests.m",
+      "sha256": "bc8f11032a3db50a8c3292ef9028490b8542768ec0fb9903715933debdcf1256"
+    },
+    {
+      "path": "Tests/NativeRewardRouteTests.m",
+      "sha256": "91277bb50ac9f6ebb8e537920b0afba80f74b1076d8d37d0f1b2307b4095b092"
+    },
+    {
+      "path": "Tests/FoldedSummaryFixtures.h",
+      "sha256": "8fbcdb5ec2dc578033166d6f3b76fa527c900e5dd684854d650d2f571abcd876"
+    },
+    {
+      "path": "Tests/PrivacyAdmissionCacheTests.m",
+      "sha256": "90bbee113f00207296e1aa96e90e50fa5f582f3205cb1ca03c6c965779da664d"
+    },
+    {
+      "path": "Tests/NativeRewardPresenterTests.m",
+      "sha256": "75a9cc5bf9b24db05f19108788a501e740f4aaa55787b5cf8aad1679d111b520"
+    },
+    {
+      "path": "Tests/BackupDeletionTests.m",
+      "sha256": "2f1efdbfb780e171a469281b5f87cfe84027f98ffadfee37f2c46c771f0b00fc"
+    },
+    {
+      "path": "Tests/BackupTransactionTests.m",
+      "sha256": "b69fc574e4ee597f39db186bf9059baae4066717f094da4ec8bfd5ce5b0b5b95"
+    },
+    {
+      "path": "Tests/verify-close-friend-privacy.sh",
+      "sha256": "f5f3fac67cbb1fc604cd0a309bdc0b1ab9f8458c708e44dce36d58adcc236629"
+    },
+    {
+      "path": "Tests/GroupBadgeTests.m",
+      "sha256": "c5b0bc82e721b735adb212adea0be05ed0007ca1201d49034882d7ce4b640cf9"
+    },
+    {
+      "path": "Tests/CloseFriendShakeTests.m",
+      "sha256": "d3d699776941933029076fac70168c77f2d06c4e65898798c7a05cfecfeeb60c"
+    },
+    {
+      "path": "Tests/verify-backup-assets.sh",
+      "sha256": "73ef7da1e07f217c66c29075e7980092a54da071ad1594c5f80e9ee93908c2b4"
+    },
+    {
+      "path": "Tests/AvatarInputStyleTests.m",
+      "sha256": "dc5f6d70cd84d94417fddb140dc4517fac82041610217481f331b79aa65395df"
+    },
+    {
+      "path": "Tests/GroupInteractionTests.m",
+      "sha256": "3f9d2f2a5acc27034d5ae2804cab1d621a2f0b116c57efd87aa33cc9dd7250dd"
+    },
+    {
+      "path": "Tests/AIReplyCoordinatorTests.m",
+      "sha256": "7b672a22e331ffb2fb0cfc4558a4c745395ca8774b1528d672902bff6ec4cada"
+    },
+    {
+      "path": "Tests/verify-backup-reset.sh",
+      "sha256": "4df90e3530341ecc66e64e146762676e8121813c67bc2d1d0ed4c0d5bc093be7"
+    },
+    {
+      "path": "Tests/verify-group-indicator.sh",
+      "sha256": "f3187f1abd47c540e8ecf11547e5d22289c377d3f64888ecc8c76a542b50f43f"
+    },
+    {
+      "path": "Tests/GroupSelectionTests.m",
+      "sha256": "0a7ff8f8a35549763466790b7922666b7611479431bd922f738930c7f7c912d1"
+    },
+    {
+      "path": "Tests/BackupAssetsTests.m",
+      "sha256": "bfdaa3bb7e76a33c3142112d03081758e14d2a029070d42d08fa4e43e72bed31"
+    },
+    {
+      "path": "Tests/verify-message-time.sh",
+      "sha256": "05d27461ee22ae7a9435289a924034ad2e775a53fbc5f9440224128e6dc1d134"
+    },
+    {
+      "path": "Tests/MyPageCleanTests.m",
+      "sha256": "8317eb0b577d4a35ec13fc65e530f5bd1123581f1121f31b719081dfa7208059"
+    },
+    {
+      "path": "Tests/verify-authorization-read.sh",
+      "sha256": "942f66479254c175b4069f77d0ef43e2910f543660ef0c3fe03d5f9ca8a3422a"
+    },
+    {
+      "path": "Tests/verify-revoke-reference.sh",
+      "sha256": "5c661c7a5c0771c183313ab5a155cdebba617965c71ced35494d8eaaa7a8dec1"
+    },
+    {
+      "path": "Tests/verify-close-friend-core.sh",
+      "sha256": "90b97a3f9b220af89784f756b1a5966b92530d426b6fa057a9b730e0debf9f3b"
+    },
+    {
+      "path": "Tests/verify-scheduled-task-swipes.sh",
+      "sha256": "d6f0a03b2d85f67470deee4e0ed0708e29f9a0d1c0c044ab31a1f441f13c5b87"
+    },
+    {
+      "path": "Tests/ListCornerBaseline.json",
+      "sha256": "d0e63ba6b16aa5999717877019f78ad78ce5219525a28b1d49a41f797cdf0a5e"
+    },
+    {
+      "path": "Tests/TabBarClickEffectTests.h",
+      "sha256": "d04ea92c1037144e7b19d7d7b2a7ca656bf292663a06644fa7fa79a964e8e689"
+    },
+    {
+      "path": "Tests/verify-backup-audit.sh",
+      "sha256": "fed23287d19b44c4e2a6a8fb7bd01191b96293547de38be8bd2c02a723621ea8"
+    },
+    {
+      "path": "Tests/MessageMergeAdapterTests.m",
+      "sha256": "a19126782e5912b88de2588738a66ad5109d76a513ccc2884076b39643eb8e5f"
+    },
+    {
+      "path": "Tests/CloseFriendEntryGestureTests.m",
+      "sha256": "6681add6f9b45def9eb3ef5f09005df5450383379500ea172626442130f92e05"
+    },
+    {
+      "path": "Tests/verify-group-picker.sh",
+      "sha256": "4d0c5f3b745e310f296c6dc79ec91cfd4f69cd24b4a4fc715b3e6a2847d08fe5"
+    },
+    {
+      "path": "Tests/GroupBusinessRowTests.m",
+      "sha256": "6ff19f95d75d111986d352ac21e38aa2c33faaf93d424d7fb9069d3b391bf5c7"
+    },
+    {
+      "path": "Tests/extract-group-header.py",
+      "sha256": "1df9407eb23805f447337077385f4486b60f70ade1c2c00138eb005e9ffc555d"
+    },
+    {
+      "path": "Tests/GroupSearchTests.m",
+      "sha256": "7a275a1b59372f03c1d902a7e10d34ea49ec1276548e246099d11c132f4ebc88"
+    },
+    {
+      "path": "Tests/GroupPickerPresentationTests.h",
+      "sha256": "043060f1b0c59c82b00385e22107f123c04b19db3f5828d5f8e6d1834bad5b18"
+    },
+    {
+      "path": "Tests/verify-close-friend-discovery.sh",
+      "sha256": "e22ffa9830722e1433741902ec0deee7242c1f3693a38fb99fe51adb2a7ef763"
+    },
+    {
+      "path": "Tests/verify-close-friend-social.sh",
+      "sha256": "1f63eb5ffd7e2f330beb3fa07557d9577f17143d1889f4ce9192251d204ff3fb"
+    },
+    {
+      "path": "Tests/BackgroundRunRuntimeTests.m",
+      "sha256": "2304d894cc630a6838f82c571b2c1117f2cc9ca92be96e58497861826a52101d"
+    },
+    {
+      "path": "Tests/verify-ai-native.sh",
+      "sha256": "46463cc445d004b4ab9962cacccef8ff10d8851faf5a99ada4facd97149bcd53"
+    },
+    {
+      "path": "Tests/BackupAuditTests.m",
+      "sha256": "89a009d93dab48ea6fa1fce07f148d33a185bd659ec23c42f85c6a00b844c3af"
+    },
+    {
+      "path": "Tests/CloseFriendDetailFixture.h",
+      "sha256": "d34a20b379ac713be3670f336efcf0b9a00823b033f1d32d2291e997dc60f1c7"
+    },
+    {
+      "path": "Tests/verify-background-run.sh",
+      "sha256": "f1da1513f50c7000c76177aeaba57269d8c039093b4cb26bca89594f5c3d2ee1"
+    },
+    {
+      "path": "Tests/FoldedNativeRendererFixture.h",
+      "sha256": "2d7d6360160d6a8a18c2f6da6b335bc3427a06b537d536b00cdb2ef146c382b6"
+    },
+    {
+      "path": "Tests/CloseFriendRuntimeTests.m",
+      "sha256": "7eff329a017ddac1f0bc4847d4204bd7940db3c95c5375dc195b3002bf3a9f17"
+    },
+    {
+      "path": "Tests/verify-bubble-style.sh",
+      "sha256": "ff8e31ee9d9e8695963579c0b090c191a3e4536b173f6479801abee8fde41307"
+    },
+    {
+      "path": "Tests/ScheduledTaskSwipeTests.m",
+      "sha256": "9ab73b1a8b8179dcb147387f11c02d44f4e51eac7abcf908e7e11698c156794f"
+    },
+    {
+      "path": "Tests/verify-revoke-interception.sh",
+      "sha256": "8e4b78636971306b6600025e6e27a92420cedff853a3b31c88b7c53fbd57e905"
+    },
+    {
+      "path": "Tests/BubbleStyleTests.m",
+      "sha256": "f599cfe8c8aecb6f0d183b6d1fffd2710ad4fc132bead35e77a59e98ad48da4e"
+    },
+    {
+      "path": "Tests/CloseFriendSocialTests.m",
+      "sha256": "4b3919416311b68b3937f1d5c24039a928d7808612495420c96c00c736ba7b0e"
+    },
+    {
+      "path": "Tests/verify-scheduled-task-manager.sh",
+      "sha256": "68e1f1fd360232ef0ad420ab11d43d1e257c694cf3b33cb8366ad3b150ed3627"
+    },
+    {
+      "path": "Tests/verify-close-friend-contacts-read.sh",
+      "sha256": "13a4130cfe0ed0ea4b6eca22befa0ab0179320e931adbd93acb2cc0786fa3685"
+    },
+    {
+      "path": "Tests/verify-merge-bubble-integration.sh",
+      "sha256": "64c5c94e45a02d600448edff7e76dc4c653783624da374e11e10c64bc5c23f1d"
+    },
+    {
+      "path": "Tests/AIReplyStoreAsyncTests.m",
+      "sha256": "f470b1e5abefef95cc34f04571cc60ca3052539873033d926e12ef8a7e0b7cd4"
+    },
+    {
+      "path": "Tests/extract-group-selection.py",
+      "sha256": "9c2e344daf3ff6b11790a5723fec1e82e1a55e7ac6be44e102458656d06a6234"
+    },
+    {
+      "path": "Tests/verify-backup-store.sh",
+      "sha256": "c1aa347ba77a9446154f2fc06f6da6f9b454f9448a0f3dde8ed62a606958cd14"
+    },
+    {
+      "path": "Tests/verify-group-header.sh",
+      "sha256": "8ed55067ca9082c651736935e549354e2baf053e6f4b79c26eaa24d378e54fae"
+    },
+    {
+      "path": "Tests/AIBackgroundSyncTests.m",
+      "sha256": "b160d9acf80104481094060d6332e8485dd4992464b7722461ec23b1b2e79905"
+    },
+    {
+      "path": "Tests/TabBarGeometryTests.c",
+      "sha256": "ffd1e06deecbf565848c68687fb9fe18c82f12416a8340772518b6172758b4d4"
+    },
+    {
+      "path": "Tests/verify-message-merge.sh",
+      "sha256": "e0874a353c727dff0949fe85205097f38ed6c4beec66b192beba4628f4d5a51f"
+    },
+    {
+      "path": "Tests/verify-attachment-layout.sh",
+      "sha256": "3ab06aa77f5304ff893b9056dd2b71839d1d030c82f3bda9a774576b13f7f1a3"
+    },
+    {
+      "path": "Tests/verify-close-friend-alerts.sh",
+      "sha256": "401fc642701fb90dcffe7d2d65402006746bc143ead6e5c1c68d3ee2bd4967ad"
+    },
+    {
+      "path": "Tests/ScheduledTaskPickerPresentationTests.h",
+      "sha256": "ce2dbef86d7b282cf3b6a52221aea249ffc79c63953bc5bafdc73c4f3909e07b"
+    },
+    {
+      "path": "Tests/CloseFriendTimelinePresentationTests.h",
+      "sha256": "43c552bee0fbdcd6327e9f99b822d5dbde100b3349c05baebf116735c50bdc3a"
+    },
+    {
+      "path": "Tests/verify-scheduled-task-backup.sh",
+      "sha256": "5a11136821767e138821ac154fe31630d396f7043c48baa866d938fdf6a0539a"
+    },
+    {
+      "path": "Tests/BackupDeletionUITests.m",
+      "sha256": "29e2be36a974dd04e111a7e0598b102f5719beec164dc6bf3a7bb23a2bab8a9a"
+    },
+    {
+      "path": "Tests/verify-plugin-framework.sh",
+      "sha256": "42954b7afb2f0fe1739fc938aac41c4c53bd943faafc62bc6b35fa961b63a1a6"
+    },
+    {
+      "path": "Tests/CloseFriendUnreadPanelTests.m",
+      "sha256": "11cb74be72c0738ae819f6f6cd34800740a7db73d3db3122b81009c8774e1ba6"
+    },
+    {
+      "path": "Tests/verify-backup-compatibility.sh",
+      "sha256": "f2efc3813e44bde92e3ee8cebc229e077dc79d4816ff576e678e26e16e8b7ff1"
+    },
+    {
+      "path": "Tests/AIImagePreparerTests.m",
+      "sha256": "42f75f50b534098aac931fb16803b061e41785c75a542c87fd52d03b4f1dacf3"
+    },
+    {
+      "path": "Tests/verify-navigation-images.sh",
+      "sha256": "cdfa3726918ca9a4ec29faa69a2a6764b6471f88a138f4bc4a15d2e3f5504af3"
+    },
+    {
+      "path": "Tests/BackgroundPrivacyCoverTests.m",
+      "sha256": "1f14d87a4fa65693f3c92fb8b8362299852b7b5e5b467a738765910481c0628e"
+    },
+    {
+      "path": "Tests/CustomTextMatchTests.m",
+      "sha256": "ecbbdae093fb1605fa6213a05e9f9d2e0529c31a730b61efa82699e166de8aed"
+    },
+    {
+      "path": "Tests/verify-miniapp-private-layout.sh",
+      "sha256": "02a0576987f320a6800f37706370e890c709e951da91757e06533258a9365877"
+    },
+    {
+      "path": "Tests/BackgroundRunRuntimeNative/BackgroundRunRuntimeNative.m",
+      "sha256": "ae885cddf4fbb850a83e6e16ac7a50c7aa1cbeff6a3a987c00b4aba5c8979b6f"
+    },
+    {
+      "path": "Tests/TimeUIKit/TimeLifecycleDouble.m",
+      "sha256": "4d13ee7ebf89251da8509446de48c6e1e4bae336fb107c8f35cf9ee433449b9f"
+    },
+    {
+      "path": "Tests/TimeUIKit/TimeUIKit.m",
+      "sha256": "3c2b9ee87a38d9fb9d54a93a4690a8bd84e0462bc78982f216d006fa4323b11a"
+    },
+    {
+      "path": "Tests/MessageUIKit/.DS_Store",
+      "sha256": "2a5022bc27318bce3b5430c8de8cd2669ddd5d693ce91e920ac14dc2a7eff1de"
+    },
+    {
+      "path": "Tests/MessageUIKit/MessageUIKit.m",
+      "sha256": "0fbf08557339bcfe014f2ca4c59a3cde0e55df59aa1e06d4c7012cab4499fe3a"
+    },
+    {
+      "path": "Tests/MessageUIKit/DisplayLink.m",
+      "sha256": "f439a07558b0624e691a1ffde33023198bd56d0dbcfb68272965055c2cfd732b"
+    },
+    {
+      "path": "Tests/ListCornerUIKit/ListCornerUIKit.m",
+      "sha256": "2e8b396d95057bf39dbf376ed5a9c9ca9aa2048ad0da5c20b1993e6e0589e869"
+    },
+    {
+      "path": "Tests/GestureUIKit/GestureUIKit.m",
+      "sha256": "f235adfb58294b28c4b0aa0932817b288858d94c3b90ca04d0a070760a336643"
+    },
+    {
+      "path": "Tests/BackgroundBlurUIKit/BackgroundBlurUIKit.m",
+      "sha256": "c0dd8acf400430e6e944e518a11cc34ec9a26364fd37f950869115b87b6c3cad"
+    },
+    {
+      "path": "Tests/BubbleUIKit/BubbleUIKit.m",
+      "sha256": "8563483bf74b9b12490249ef88d0d22f55b3ad22ae5a818698a88a150ea62344"
+    },
+    {
+      "path": "Tests/BackgroundRunNative/BackgroundRunNative.m",
+      "sha256": "0e8e82f2b766e3f53b55f919323afa33d72bdf5b047ac1d8fb8e6b102e5be053"
+    },
+    {
+      "path": "Tests/StyleUIKit/StyleUIKit.m",
+      "sha256": "d7a8314f1e39ab67d7d013b9d99574720690445cc961362e297fb042c4289b8d"
+    },
+    {
+      "path": "Tests/TabBarUIKit/TabBarUIKit.m",
+      "sha256": "e1a5bb9129bc5515e94535c406a5cd6529b7ea9d9300bf6b3cde01a23d6da4f9"
+    },
+    {
+      "path": "Tests/TabBarUIKit/UIKit/UIKit.h",
+      "sha256": "af7038e4a30904e143bf32c93b25b68a4221b2aafc6af21af7213b6b6705ad89"
+    },
+    {
+      "path": "Tests/ShakeStubs/CoreMotion/CoreMotion.h",
+      "sha256": "b39e00f69e057ca8b122a379a8ec58fc718049503429f81546e2371a01bfa323"
+    },
+    {
+      "path": "Tests/StyleUIKit/UIKit/UIKit.h",
+      "sha256": "fa2fb430c9ba03a67130956899cdc604bb5d6d9290827fa3cf2e52fdca19b022"
+    },
+    {
+      "path": "Tests/BackgroundRunNative/UIKit/UIKit.h",
+      "sha256": "69e48f57dcbcb7e6e6a8f90b947fe93c1007637aac014ae6b4a6d571bec62c23"
+    },
+    {
+      "path": "Tests/BackgroundRunNative/AVFoundation/AVFoundation.h",
+      "sha256": "71a3a8d87de0e7b2aa8333e02e0e15124f5894c8e35e6c525bda6873e817426b"
+    },
+    {
+      "path": "Tests/NavigationUIKit/UIKit/UIKit.h",
+      "sha256": "9efbae0f243ac78cd7688f07cd801c7558b8537ed478567bf83e6ebef10dabcb"
+    },
+    {
+      "path": "Tests/TouchUIKit/UIKit/UIKit.h",
+      "sha256": "36bcbfd9b100fed723eeec81313b0493c495f872f02e3161cb60e2e87714e4fe"
+    },
+    {
+      "path": "Tests/RewardUIKit/UIKit/UIKit.h",
+      "sha256": "d78c4d64d9af8da55632814e6e0e5f21f91604c9cc3fbbb4791fed255a7d9a81"
+    },
+    {
+      "path": "Tests/AIDetailUIKit/UIKit/UIKit.h",
+      "sha256": "b14a3821541c0b45d704472d6c5ab7d12fb544b8223274c268bd41440484b9b4"
+    },
+    {
+      "path": "Tests/BubbleUIKit/UIKit/UIKit.h",
+      "sha256": "476495a64aa39c8fd7457287371c59c8a5fc9058277639d133083de4c90f870b"
+    },
+    {
+      "path": "Tests/NativePickerUIKit/UIKit/UIKit.h",
+      "sha256": "47d306860abbcfbbbab4bca4e4f0af085c6676988783cdbf7dfbeee8d880892e"
+    },
+    {
+      "path": "Tests/MergeBubbleUIKit/UIKit/UIKit.h",
+      "sha256": "2887c1eb2c3b23a35eccc995c3da25d6649011cdf15791d2d86e8de3a821e5d7"
+    },
+    {
+      "path": "Tests/BackgroundBlurUIKit/UIKit/UIKit.h",
+      "sha256": "63c0bdb25859ec63c4dcd9c7f063f54831884bdc59014c149b1435755ec896f8"
+    },
+    {
+      "path": "Tests/GestureUIKit/UIKit/UIKit.h",
+      "sha256": "8e78800e2a23cc86b41252041e93aa5a773e0a52ca91b6ca6839265958a8195c"
+    },
+    {
+      "path": "Tests/ListCornerUIKit/UIKit/UIKit.h",
+      "sha256": "6b217d2bba2ab1a8920738f9871292bc72c879998c0a33294b4a73438e1f664e"
+    },
+    {
+      "path": "Tests/MessageUIKit/UIKit/UIKit.h",
+      "sha256": "e427f44c4a6c701ee62b7be0ed3a383d352eac621f2871a13dbd8322331ee3df"
+    },
+    {
+      "path": "Tests/MessageUIKit/QuartzCore/CADisplayLink.h",
+      "sha256": "7fbedf48b2a01c48925c68b204a1a7efd10a691fc362f18c1cbf26879ff40822"
+    },
+    {
+      "path": "Tests/TimeUIKit/UIKit/UIKit.h",
+      "sha256": "336ecb7c3c347df8c7a08083239184661ceaf12eb96300770b737a286a8029a6"
+    },
+    {
+      "path": "Tests/BackgroundRunRuntimeNative/UIKit/UIKit.h",
+      "sha256": "eaadce0eb51c87489469c854ed9560b88d87707a07ef0cc43dbe00522c0451e4"
+    }
+  ],
+  "retained_inputs": [
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-settings/baseline-CSSettingsTableViewController.m",
+      "retained": "inputs/release-core-revalidation/prior-settings/baseline-CSSettingsTableViewController.m",
+      "sha256": "47dd8dcfb1eae1f8db2fa0d71bd20bc42da196d2946cfa1d8a04e618fad2fb83"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-settings/SettingsLifecycleTests.m",
+      "retained": "inputs/release-core-revalidation/prior-settings/SettingsLifecycleTests.m",
+      "sha256": "d671e11a73cd8116ed08bb9f9650588c18777270c8d346f912d930d60b9dc4ac"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-settings/route-coverage.json",
+      "retained": "inputs/release-core-revalidation/prior-settings/route-coverage.json",
+      "sha256": "5f51467b992e33f1a4de5ef3db146e4b48b144bda72838372de2a0322e27abbe"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-settings/UIKitDouble.m",
+      "retained": "inputs/release-core-revalidation/prior-settings/UIKitDouble.m",
+      "sha256": "a0cd0ea45ba52be65df66c6780ce64a116fd3b9fa2472d0dda2ffa0f8246d0d6"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-settings/MigratedHeaders.m",
+      "retained": "inputs/release-core-revalidation/prior-settings/MigratedHeaders.m",
+      "sha256": "c54e304771eaaff65ce3a7959deea89a569215339b45f57076c6fac3ab5e05cc"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-settings/UIKit/UIKit.h",
+      "retained": "inputs/release-core-revalidation/prior-settings/UIKit/UIKit.h",
+      "sha256": "9b8f05b41ffbfc1a8ab62b1bfa41be295de1a570f150c17af12b05f9d78397f3"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-tabbar/ModernTabBarTests.h",
+      "retained": "inputs/release-core-revalidation/prior-tabbar/ModernTabBarTests.h",
+      "sha256": "80c29c3ba00c2e6c1913f0dfc156998e1a279da41acab26e6794a59d115cc386"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-tabbar/TabBarNativeTests.m",
+      "retained": "inputs/release-core-revalidation/prior-tabbar/TabBarNativeTests.m",
+      "sha256": "17cbc4a72584259b208bcb9dac5aa0f94c7b1bc4ac02805029dca455a9c2bb3c"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-tabbar/TabBarClickEffectTests.h",
+      "retained": "inputs/release-core-revalidation/prior-tabbar/TabBarClickEffectTests.h",
+      "sha256": "d04ea92c1037144e7b19d7d7b2a7ca656bf292663a06644fa7fa79a964e8e689"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-tabbar/TabBarGeometryTests.c",
+      "retained": "inputs/release-core-revalidation/prior-tabbar/TabBarGeometryTests.c",
+      "sha256": "ffd1e06deecbf565848c68687fb9fe18c82f12416a8340772518b6172758b4d4"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-tabbar/TabBarUIKit/TabBarUIKit.m",
+      "retained": "inputs/release-core-revalidation/prior-tabbar/TabBarUIKit/TabBarUIKit.m",
+      "sha256": "e1a5bb9129bc5515e94535c406a5cd6529b7ea9d9300bf6b3cde01a23d6da4f9"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-tabbar/TabBarUIKit/UIKit/UIKit.h",
+      "retained": "inputs/release-core-revalidation/prior-tabbar/TabBarUIKit/UIKit/UIKit.h",
+      "sha256": "af7038e4a30904e143bf32c93b25b68a4221b2aafc6af21af7213b6b6705ad89"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-merge/baseline-CSMessageMergeAdapter.m",
+      "retained": "inputs/release-core-revalidation/prior-merge/baseline-CSMessageMergeAdapter.m",
+      "sha256": "c1b7f6fb18dc93c297b7ad78ba3e96986877c35dac29f96aa059a05f45394d1f"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-merge/fixtures/MessageMergePolicyTests.m",
+      "retained": "inputs/release-core-revalidation/prior-merge/fixtures/MessageMergePolicyTests.m",
+      "sha256": "98e645c5bb3133d9747bc8442ba2fb1ca318288210b326eda683f168a627b837"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-merge/fixtures/MessageMergeAdapterTests.m",
+      "retained": "inputs/release-core-revalidation/prior-merge/fixtures/MessageMergeAdapterTests.m",
+      "sha256": "95876da706b6efabbcc35f6081ce16bea95f2c7eb66ff1aba1a60f662b087705"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-merge/fixtures/MessageUIKit/MessageUIKit.m",
+      "retained": "inputs/release-core-revalidation/prior-merge/fixtures/MessageUIKit/MessageUIKit.m",
+      "sha256": "0fbf08557339bcfe014f2ca4c59a3cde0e55df59aa1e06d4c7012cab4499fe3a"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-merge/fixtures/MessageUIKit/DisplayLink.m",
+      "retained": "inputs/release-core-revalidation/prior-merge/fixtures/MessageUIKit/DisplayLink.m",
+      "sha256": "f439a07558b0624e691a1ffde33023198bd56d0dbcfb68272965055c2cfd732b"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-merge/fixtures/MessageUIKit/UIKit/UIKit.h",
+      "retained": "inputs/release-core-revalidation/prior-merge/fixtures/MessageUIKit/UIKit/UIKit.h",
+      "sha256": "e427f44c4a6c701ee62b7be0ed3a383d352eac621f2871a13dbd8322331ee3df"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-merge/fixtures/MessageUIKit/QuartzCore/CADisplayLink.h",
+      "retained": "inputs/release-core-revalidation/prior-merge/fixtures/MessageUIKit/QuartzCore/CADisplayLink.h",
+      "sha256": "7fbedf48b2a01c48925c68b204a1a7efd10a691fc362f18c1cbf26879ff40822"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-privacy/CloseFriendRecoveryTests.m",
+      "retained": "inputs/release-core-revalidation/prior-privacy/CloseFriendRecoveryTests.m",
+      "sha256": "2142e26c5fda0fc8964a5f3f96762a54e87bf69590ba7e25318ba435dfde07ba"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-privacy/CloseFriendSearchInputFixture.h",
+      "retained": "inputs/release-core-revalidation/prior-privacy/CloseFriendSearchInputFixture.h",
+      "sha256": "1f8f134a683fd87845e6a9f8cd6619d45f344c80df1934270ced5e55e31a829e"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-privacy/CloseFriendContactTests.m",
+      "retained": "inputs/release-core-revalidation/prior-privacy/CloseFriendContactTests.m",
+      "sha256": "c4e37e11e3099ded07200e4ed907bef5972bf089576c9bc92b9ec7dd4b196a87"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-compact/Native8080CompactTests.m",
+      "retained": "inputs/release-core-revalidation/prior-compact/Native8080CompactTests.m",
+      "sha256": "5fc2f2a31110474ecc8f5e500a3f710b991f5ecd8755c73c5edca11a320d3d35"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-compact/fixture-origin.json",
+      "retained": "inputs/release-core-revalidation/prior-compact/fixture-origin.json",
+      "sha256": "bf7782e6b3fe58021739ed471512437957de3fc282308f14d3d8828cc78af85b"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-compact/fixtures/MessageMergeAdapterTests.m",
+      "retained": "inputs/release-core-revalidation/prior-compact/fixtures/MessageMergeAdapterTests.m",
+      "sha256": "a19126782e5912b88de2588738a66ad5109d76a513ccc2884076b39643eb8e5f"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-compact/fixtures/MessageUIKit/MessageUIKit.m",
+      "retained": "inputs/release-core-revalidation/prior-compact/fixtures/MessageUIKit/MessageUIKit.m",
+      "sha256": "0fbf08557339bcfe014f2ca4c59a3cde0e55df59aa1e06d4c7012cab4499fe3a"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-compact/fixtures/MessageUIKit/DisplayLink.m",
+      "retained": "inputs/release-core-revalidation/prior-compact/fixtures/MessageUIKit/DisplayLink.m",
+      "sha256": "f439a07558b0624e691a1ffde33023198bd56d0dbcfb68272965055c2cfd732b"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-compact/fixtures/BubbleUIKit/BubbleUIKit-production.m",
+      "retained": "inputs/release-core-revalidation/prior-compact/fixtures/BubbleUIKit/BubbleUIKit-production.m",
+      "sha256": "49a1f25b6070f567b4c8eea718ed26339ce9bb11c336dbd6b5c3fd93091654a7"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-compact/fixtures/BubbleUIKit/BubbleUIKit.m",
+      "retained": "inputs/release-core-revalidation/prior-compact/fixtures/BubbleUIKit/BubbleUIKit.m",
+      "sha256": "8563483bf74b9b12490249ef88d0d22f55b3ad22ae5a818698a88a150ea62344"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-compact/fixtures/MergeBubbleUIKit/UIKit/UIKit.h",
+      "retained": "inputs/release-core-revalidation/prior-compact/fixtures/MergeBubbleUIKit/UIKit/UIKit.h",
+      "sha256": "2887c1eb2c3b23a35eccc995c3da25d6649011cdf15791d2d86e8de3a821e5d7"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-compact/fixtures/MessageUIKit/UIKit/UIKit.h",
+      "retained": "inputs/release-core-revalidation/prior-compact/fixtures/MessageUIKit/UIKit/UIKit.h",
+      "sha256": "e427f44c4a6c701ee62b7be0ed3a383d352eac621f2871a13dbd8322331ee3df"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-compact/fixtures/MessageUIKit/QuartzCore/CADisplayLink.h",
+      "retained": "inputs/release-core-revalidation/prior-compact/fixtures/MessageUIKit/QuartzCore/CADisplayLink.h",
+      "sha256": "7fbedf48b2a01c48925c68b204a1a7efd10a691fc362f18c1cbf26879ff40822"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/quick-entry-validation/QuickEntryTests.m",
+      "retained": "inputs/release-core-revalidation/quick-entry-validation/QuickEntryTests.m",
+      "sha256": "227c54528f0acfaecb1ea7f3749d2608889edda114dda3df94653d7954297eaa"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/rollback-validation/RollbackMigrationTests.m",
+      "retained": "inputs/release-core-revalidation/rollback-validation/RollbackMigrationTests.m",
+      "sha256": "682adc1b47a57a5cf1cde582d35550845f74944f2782ea20c2d66deca8d3c874"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/quick-reset-validation/QuickResetTests.m",
+      "retained": "inputs/release-core-revalidation/quick-reset-validation/QuickResetTests.m",
+      "sha256": "6bf19aeff02a07aabfe3ae362141a12e8ce4338a3d5ddf5f10319f38a9fdf233"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/quick-reset-validation/run_validation.py",
+      "retained": "inputs/release-core-revalidation/quick-reset-validation/run_validation.py",
+      "sha256": "d4057b3db3b83f0e8010d6f6629e26b9882cf7079c2b6aba61db5878feeaf9ae"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/new-password-validation/NewPasswordTests.m",
+      "retained": "inputs/release-core-revalidation/new-password-validation/NewPasswordTests.m",
+      "sha256": "78236ce49d8e0c6fd8b756ef81fd077d496971051e82b37ffd1a6c910ff1f2fd"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/new-password-validation/run-validation.py",
+      "retained": "inputs/release-core-revalidation/new-password-validation/run-validation.py",
+      "sha256": "b6697287abce995176f18308321914906be33df7a66e9343440839bc69cf1c64"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-settings/run-validation.py",
+      "retained": "inputs/release-core-revalidation/prior-settings/run-validation.py",
+      "sha256": "7a30257562bbd915bb41bcb054cfb24f658978fd7105e26001979a13b3cd834e"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-tabbar/run-validation.py",
+      "retained": "inputs/release-core-revalidation/prior-tabbar/run-validation.py",
+      "sha256": "8614f6ef5afa2a383df052add02372c1914166c352cb5c1f091db520adb9484f"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-merge/run-validation.py",
+      "retained": "inputs/release-core-revalidation/prior-merge/run-validation.py",
+      "sha256": "75012d103d0c0be7f6b8ae8016353f089e5ceb81514848cb2676676700d2cafd"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-privacy/run_validation.py",
+      "retained": "inputs/release-core-revalidation/prior-privacy/run_validation.py",
+      "sha256": "dd5de3bfa98e2de531ed3b8ca750bbe33392801188e611b1c33ac51ce76bd11b"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-compact/run-native-contract.py",
+      "retained": "inputs/release-core-revalidation/prior-compact/run-native-contract.py",
+      "sha256": "b5b2e9a6188b3d6f2eee2afb85dcced53c94e280ea2816233ba1918b25951eb9"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/quick-entry-validation/run_validation.py",
+      "retained": "inputs/release-core-revalidation/quick-entry-validation/run_validation.py",
+      "sha256": "6a770f6ac165f1b6781b112c039e1b294cfa21762e624ee4b4a438a285f9bfa9"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/rollback-validation/run-rollback.py",
+      "retained": "inputs/release-core-revalidation/rollback-validation/run-rollback.py",
+      "sha256": "5cb67299035b6158c81aacaf8f96589e6583e60b293528247265547b96b019c8"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/prior-privacy/extract-contact-bodies.sh",
+      "retained": "inputs/release-core-revalidation/prior-privacy/extract-contact-bodies.sh",
+      "sha256": "d8c687787e70d64e4e1b42b933bfe397bcd6a83047e1bab8f305f04bd4525cae"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/../header-gap-validation/HeaderGapLifecycleTests.m",
+      "retained": "inputs/header-gap-validation/HeaderGapLifecycleTests.m",
+      "sha256": "6df06837d82d1630811f0d860e4c406ab56149f6066bad093ffc500a54396db2"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/../header-gap-validation/run-validation.py",
+      "retained": "inputs/header-gap-validation/run-validation.py",
+      "sha256": "59f0179dadd1d866d44ab3ff86c543a93e1d4a3f9171f8b90da0a3482e95f5d7"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/run-core.py",
+      "retained": "inputs/release-core-revalidation/run-core.py",
+      "sha256": "d38c641b99a3172be5996881762c8f7403a5e2fb23c05f1f018ec8cbd6a11a60"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/selection.json",
+      "retained": "inputs/release-core-revalidation/selection.json",
+      "sha256": "6c5efc24ca2262fef3a27af7e77a3a338afba46493ffc8f46b1a4db1faa30980"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/fixture-before.json",
+      "retained": "inputs/release-core-revalidation/fixture-before.json",
+      "sha256": "6c87471f27680b8a6c72cbb965295f0a43cc39c083e019e02808df76318892be"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/regression/fixture-provenance.json",
+      "retained": "inputs/regression/fixture-provenance.json",
+      "sha256": "178fca21b2509db835e7c888107882cb35963eb5e77ef1b175c2287b45f89c35"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/baseline-2.2-17/Controllers/CSCustomViewController.m",
+      "retained": "inputs/baseline-2.2-17/Controllers/CSCustomViewController.m",
+      "sha256": "6f602715e9cf5863798accf429f0d02369d33c4214a22aca0d7b015c16519cd7"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/tabbar-navigation-validation/NavigationTests.m",
+      "retained": "inputs/tabbar-navigation-validation/NavigationTests.m",
+      "sha256": "b93313555dc4e56bd51a3b6498ee7cedf72eaef9a794a516be87ce4522c6a5a1"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/tabbar-navigation-validation/UIKitDouble.m",
+      "retained": "inputs/tabbar-navigation-validation/UIKitDouble.m",
+      "sha256": "a0cd0ea45ba52be65df66c6780ce64a116fd3b9fa2472d0dda2ffa0f8246d0d6"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/tabbar-navigation-validation/UIKit/UIKit.h",
+      "retained": "inputs/tabbar-navigation-validation/UIKit/UIKit.h",
+      "sha256": "4f70098249dc129ab96fa6caf60145b2e4188c49c9001c2d997ab2a1cdde125b"
+    },
+    {
+      "source": "docs/audits/release-2.2-19-settings-subpage-tabbar/tabbar-navigation-validation/run_validation.py",
+      "retained": "inputs/tabbar-navigation-validation/run_validation.py",
+      "sha256": "785c92ea050af51407123d618860e308c821064185f6d665de945e297ec1e2f9"
+    }
+  ],
+  "no_assertion_or_fixture_changes": true,
+  "runtime_outputs": "Temporary directory; only logs, JSON, text and source-derived evidence will be copied into audit."
+}

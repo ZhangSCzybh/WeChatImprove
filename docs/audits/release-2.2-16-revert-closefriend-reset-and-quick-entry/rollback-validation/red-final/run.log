@@ -1,0 +1,30 @@
+FAIL line 139: removed reset API must not remain callable
+FAIL line 139: removed reset API must not remain callable
+FAIL line 139: removed reset API must not remain callable
+FAIL line 139: removed reset API must not remain callable
+FAIL line 141: removed runtime state/API must not remain callable
+FAIL line 141: removed runtime state/API must not remain callable
+FAIL line 141: removed runtime state/API must not remain callable
+FAIL line 141: removed runtime state/API must not remain callable
+FAIL line 141: removed runtime state/API must not remain callable
+FAIL line 141: removed runtime state/API must not remain callable
+FAIL line 155: retired marker is deleted immediately
+FAIL line 170: second resume is non-pending and marker never returns
+FAIL line 155: retired marker is deleted immediately
+FAIL line 170: second resume is non-pending and marker never returns
+FAIL line 155: retired marker is deleted immediately
+FAIL line 157: cleanup never deletes or recreates credential
+FAIL line 158: cleanup never deletes biometric record
+FAIL line 164: valid credential resumes ordinary non-pending account
+FAIL line 165: original password remains required and works
+FAIL line 170: second resume is non-pending and marker never returns
+FAIL line 155: retired marker is deleted immediately
+FAIL line 157: cleanup never deletes or recreates credential
+FAIL line 158: cleanup never deletes biometric record
+FAIL line 164: valid credential resumes ordinary non-pending account
+FAIL line 165: original password remains required and works
+FAIL line 170: second resume is non-pending and marker never returns
+FAIL line 155: retired marker is deleted immediately
+FAIL line 170: second resume is non-pending and marker never returns
+FAIL line 212: subsequent resume completes cleanup
+Rollback/migration: 173 checks, 29 failures

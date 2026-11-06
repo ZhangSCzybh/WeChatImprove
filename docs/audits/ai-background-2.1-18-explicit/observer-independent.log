@@ -1,9 +1,0 @@
-AI native sync observer: 1180 checks passed; real production hooks, natural context bootstrap, explicit request origin, non-driving extra/continuation results, original native semantics and identity/epoch/FIFO/reentry/age fences
-AI native sync observer ABI rejection create-return-c: 6 checks passed
-AI native sync observer ABI rejection create-argument-Q: 6 checks passed
-AI native sync observer ABI rejection create-argument-count: 6 checks passed
-AI native sync observer ABI rejection return-result-B: 6 checks passed
-AI native sync observer ABI rejection return-event-Q: 6 checks passed
-AI native sync observer ABI rejection handle-result-B: 6 checks passed
-AI native sync observer ABI rejection handle-processed-c: 6 checks passed
-AI native sync observer iOS: arm64 + arm64e source objects compiled

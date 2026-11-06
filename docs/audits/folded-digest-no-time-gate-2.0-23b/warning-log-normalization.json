@@ -1,8 +1,0 @@
-[
-  {
-    "path": "docs/audits/folded-digest-no-time-gate-2.0-23b/logs/build-rootless.log",
-    "raw": "warning: tion'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]",
-    "removedInterleavedSourceFragment": "tion",
-    "occurrences": 1
-  }
-]

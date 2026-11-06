@@ -1,2 +1,0 @@
-PASS: 145544 message merge/navigation checks
-FAIL line 204: fabs(gap*scale-2)<.00001

@@ -1,0 +1,278 @@
+{
+  "verified_at": "2026-11-05T23:16:21.454473+00:00",
+  "passed": true,
+  "scope": {
+    "baseline": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-19-settings-subpage-tabbar/baseline-2.2-18",
+    "basis": "Frozen 2.2-18 worktree including all uncommitted 2.2-13 through 2.2-18 work; never Git HEAD.",
+    "line_count_method": "git diff --no-index --no-ext-diff --numstat per changed file; .DS_Store excluded only from source line counts.",
+    "directories": [
+      "Controllers",
+      "Hooks",
+      "Headers"
+    ],
+    "root_files": [
+      "Makefile",
+      "control",
+      "README.md",
+      "WeChatImprove.plist"
+    ],
+    "baseline_file_count": 381,
+    "current_file_count": 381,
+    "changed_file_count": 7,
+    "added": 19,
+    "removed": 8,
+    "files": [
+      {
+        "file": "Controllers/CSAIReplySettingsViewController.m",
+        "status": "modified",
+        "added": 2,
+        "removed": 0,
+        "baseline_sha256": "6ba96063b229d4a7f766a3d3e63fb43091b0744a5fc896ae2b6d1710349e88c8",
+        "current_sha256": "d95767accc0059060eb053d502b39d91a3426f741663642863dd39c425dfa2b2"
+      },
+      {
+        "file": "Controllers/CSReleaseNotesViewController.m",
+        "status": "modified",
+        "added": 4,
+        "removed": 0,
+        "baseline_sha256": "054937db8b339dce2b2b6691ac332c4c5475ff96d24ab5778ed5486d841dcff5",
+        "current_sha256": "7f8fe9361b87c58a67e45360e57a433b4ec8380ba735aa50a76a1bf214816c09"
+      },
+      {
+        "file": "Controllers/CSScheduledTaskSettingsViewController.m",
+        "status": "modified",
+        "added": 2,
+        "removed": 0,
+        "baseline_sha256": "058b4c2f1b388b80666886a1501efac0006f08fe7126ea1f1580b09c7cb8f868",
+        "current_sha256": "b4a7989995420b1e0f0e66bfe4928bb45d7cbe7b5309087d205813dcde496315"
+      },
+      {
+        "file": "Controllers/CSSettingsTableViewController.m",
+        "status": "modified",
+        "added": 3,
+        "removed": 0,
+        "baseline_sha256": "78b4ae44fdbc8910c5fdf674d9a24bd926a39854fee865bfe7cca3201bdd7937",
+        "current_sha256": "f9848ca17c2bb9c325994040b434e5aff4e9fc2020aaabcf87f520e23974f03e"
+      },
+      {
+        "file": "Headers/CSUserInfoHelper.h",
+        "status": "modified",
+        "added": 1,
+        "removed": 1,
+        "baseline_sha256": "d6cec59fae4866c1237797fcec20898fa2bca0219cac074a3d0481940b5366bd",
+        "current_sha256": "36a1d1d2634692f77160d25ad103d4201527c1bbc9d53661f8ead8ac9eae8b48"
+      },
+      {
+        "file": "README.md",
+        "status": "modified",
+        "added": 6,
+        "removed": 6,
+        "baseline_sha256": "64ce847fa310a317e4bad0916d5b8a98a2b20cb978ea7a5d710758346bc1741d",
+        "current_sha256": "0ec961531a86abf101a8f071ccf1ce389b2a6138f33cca706efc525377841f05"
+      },
+      {
+        "file": "control",
+        "status": "modified",
+        "added": 1,
+        "removed": 1,
+        "baseline_sha256": "c87e5f407cd90b477ffd327ef22fe1b4bb146cdf09e16da0d3a0f86dcf444b91",
+        "current_sha256": "371e06fbec4c301187b1540d2459709dc8fa369f8907b94e7d7d829477fc0ecd"
+      }
+    ],
+    "explicit_change_allowlist": [
+      "Controllers/CSAIReplySettingsViewController.m",
+      "Controllers/CSReleaseNotesViewController.m",
+      "Controllers/CSScheduledTaskSettingsViewController.m",
+      "Controllers/CSSettingsTableViewController.m",
+      "Headers/CSUserInfoHelper.h",
+      "README.md",
+      "control"
+    ],
+    "unexpected_changed_files": [],
+    "passed": true
+  },
+  "protection": {
+    "frozen_baseline": {
+      "expected_count": 42524,
+      "verified_count": 42524,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true
+    },
+    "historical_packages": {
+      "expected_count": 204,
+      "verified_count": 204,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true,
+      "permitted_new_directory": "packages/2.2-19-settings-subpage-tabbar"
+    },
+    "main_theos": {
+      "expected_count": 1237,
+      "verified_count": 1237,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true
+    },
+    "HeadersFile": {
+      "expected_count": 42142,
+      "verified_count": 42142,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true
+    },
+    "old_audits": {
+      "expected_count": 43268,
+      "verified_count": 43268,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true,
+      "preservation_window": "Preparation time through final verification. This manifest is additional protection, not a task-start hash claim.",
+      "prepared_at": "2026-11-05T22:59:22.854676+00:00",
+      "edit_or_deletion_exceptions": []
+    },
+    "original_fixtures": {
+      "copied_unmodified_test_inputs_and_runners": {
+        "expected_count": 325,
+        "verified_count": 325,
+        "missing": [],
+        "changed": [],
+        "unexpected": [],
+        "passed": true
+      }
+    },
+    "all_other_frozen_source_files_unchanged": {
+      "expected_count": 42517,
+      "verified_count": 42517,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true
+    },
+    "manifest_inputs": {
+      "baseline_manifest_unchanged": true,
+      "historical_packages_manifest_unchanged": true,
+      "main_theos_manifest_unchanged": true
+    },
+    "git_head_matches_task_baseline": true,
+    "checkout_matches_established_project": true,
+    "root_Tests_remains_absent": true
+  },
+  "git": {
+    "head": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+    "expected_head": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+    "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+    "uncommitted_work_present": true,
+    "status_sha256": "7e823462c75165d2baedabfcab5a5dd578d422386627cb494617c6dce07e4adc",
+    "status_file": "final-git-status.z"
+  },
+  "task_constraints": [
+    "No reset, checkout, stash, clean, commit, or overwrite of historical packages is authorized.",
+    "Only read-only Git diff --no-index, rev-parse and status are executed; Git state cannot prove complete shell history."
+  ],
+  "verifier_commands": [
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-19-settings-subpage-tabbar/baseline-2.2-18/Controllers/CSAIReplySettingsViewController.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSAIReplySettingsViewController.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-19-settings-subpage-tabbar/baseline-2.2-18/Controllers/CSReleaseNotesViewController.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSReleaseNotesViewController.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-19-settings-subpage-tabbar/baseline-2.2-18/Controllers/CSScheduledTaskSettingsViewController.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSScheduledTaskSettingsViewController.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-19-settings-subpage-tabbar/baseline-2.2-18/Controllers/CSSettingsTableViewController.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSSettingsTableViewController.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-19-settings-subpage-tabbar/baseline-2.2-18/Headers/CSUserInfoHelper.h",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers/CSUserInfoHelper.h"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-19-settings-subpage-tabbar/baseline-2.2-18/README.md",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/README.md"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-19-settings-subpage-tabbar/baseline-2.2-18/control",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/control"
+    ],
+    [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    [
+      "git",
+      "rev-parse",
+      "--show-toplevel"
+    ],
+    [
+      "git",
+      "status",
+      "--porcelain=v1",
+      "-z",
+      "--untracked-files=all"
+    ]
+  ],
+  "delivery_status": {
+    "directory_exists": true,
+    "files": {
+      "packages/2.2-19-settings-subpage-tabbar/SHA256SUMS": "c100fe5329561704510e6a4274f8454b19d1f2fb8d63c2c3e710a0c0007fd469",
+      "packages/2.2-19-settings-subpage-tabbar/WeChatImprove.dylib": "5f9079eb8258b082967744b030494e7ff38b07bb3bbb0d882e60396aefcaddb8",
+      "packages/2.2-19-settings-subpage-tabbar/com.wechat.improve_2.2-19_iphoneos-arm.deb": "b3fdf283faef4b1fe09d99856e3fd6b229094fcca81f5182d7105ce189c67c13",
+      "packages/2.2-19-settings-subpage-tabbar/com.wechat.improve_2.2-19_iphoneos-arm64.deb": "a058da1d7a563be546d9556079268a0d031828c180f62b053c049c5e0078ce39",
+      "packages/2.2-19-settings-subpage-tabbar/com.wechat.improve_2.2-19_symbols.zip": "d7e2321ae154c5aaa59c867df858fb184e7fbb446f92f46e1f11d79cb5aa31e7"
+    },
+    "scope_pass_is_not_a_build_or_release_pass": true
+  }
+}

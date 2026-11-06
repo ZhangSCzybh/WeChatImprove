@@ -1,0 +1,50 @@
+{
+  "first_formal_attempt": {
+    "evidence": "delivery-build",
+    "make_jobs": 4,
+    "compile_exit_codes": {
+      "rootless": 0,
+      "rootful": 0
+    },
+    "delivery_created": false,
+    "gate": "warning attribution stopped delivery; unchanged diagnostic moved between CPU buckets due to interleaved markers",
+    "diagnosis": "delivery-build/warning-attribution-diagnosis.json",
+    "reported_added_warning_count": 1
+  },
+  "final_formal_attempt": {
+    "evidence": "delivery-build-final",
+    "make_jobs": 1,
+    "compile_exit_codes": {
+      "rootless": 0,
+      "rootful": 0
+    },
+    "new_warning_count": 0,
+    "delivery_created": true,
+    "production_and_warning_comparator_unchanged": true,
+    "source_matches_authorized_revalidation": true,
+    "source_file_count": 42522,
+    "artifacts": [
+      {
+        "path": "packages/2.2-17-quick-entry-closefriend-reset/WeChatImprove.dylib",
+        "sha256": "63eacd5adb5614101f8848a38ccfb071cd7d4f6522f50165afe2f5a362feac2b",
+        "bytes": 7170112
+      },
+      {
+        "path": "packages/2.2-17-quick-entry-closefriend-reset/com.wechat.improve_2.2-17_iphoneos-arm.deb",
+        "sha256": "736fc00655fc9f7bc74a2bb924cb61944f198fad0794b5889756eee1dacd3837",
+        "bytes": 1649286
+      },
+      {
+        "path": "packages/2.2-17-quick-entry-closefriend-reset/com.wechat.improve_2.2-17_iphoneos-arm64.deb",
+        "sha256": "f45d5c3ca964423467d2e917744144a5fb7b52460ecfb9fc85211c11a4049621",
+        "bytes": 1649290
+      },
+      {
+        "path": "packages/2.2-17-quick-entry-closefriend-reset/com.wechat.improve_2.2-17_symbols.zip",
+        "sha256": "d005621e545845cb313de49477053a835d793fe148fb91ff51ba86ce2c151d59",
+        "bytes": 11708999
+      }
+    ]
+  },
+  "repair_scope": "Only audit build runner job scheduling changed; no production code, baseline, comparator, warning text, test or assertion was changed."
+}

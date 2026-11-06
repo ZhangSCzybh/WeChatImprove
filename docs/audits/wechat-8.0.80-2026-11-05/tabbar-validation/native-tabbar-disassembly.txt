@@ -1,0 +1,782 @@
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000103d79334 <_Flutter_MMFoundation_BindContext>:
+1049b6fa4: d10203ff    	sub	sp, sp, #0x80
+1049b6fa8: a9045ff8    	stp	x24, x23, [sp, #0x40]
+1049b6fac: a90557f6    	stp	x22, x21, [sp, #0x50]
+1049b6fb0: a9064ff4    	stp	x20, x19, [sp, #0x60]
+1049b6fb4: a9077bfd    	stp	x29, x30, [sp, #0x70]
+1049b6fb8: 9101c3fd    	add	x29, sp, #0x70
+1049b6fbc: d00d6cc8    	adrp	x8, 0x11f750000 <dyld_stub_binder+0x11f750000>
+1049b6fc0: 52800029    	mov	w9, #0x1                ; =1
+1049b6fc4: 39337909    	strb	w9, [x8, #0xcde]
+1049b6fc8: d00d1d68    	adrp	x8, 0x11ed64000 <dyld_stub_binder+0x11ed64000>
+1049b6fcc: f944cd08    	ldr	x8, [x8, #0x998]
+1049b6fd0: a90323e0    	stp	x0, x8, [sp, #0x30]
+1049b6fd4: d00d1788    	adrp	x8, 0x11eca8000 <dyld_stub_binder+0x11eca8000>
+1049b6fd8: f9404d01    	ldr	x1, [x8, #0x98] ; init
+1049b6fdc: 9100c3e0    	add	x0, sp, #0x30
+1049b6fe0: 94c9c322    	bl	0x107c27c68 <_Flutter_MMFoundation_BindContext+0x3eae934>
+1049b6fe4: aa0003f3    	mov	x19, x0
+1049b6fe8: b4001740    	cbz	x0, 0x1049b72d0 <_Flutter_MMFoundation_BindContext+0xc3df9c>
+1049b6fec: f00d1b48    	adrp	x8, 0x11ed21000 <dyld_stub_binder+0x11ed21000>
+1049b6ff0: f945c900    	ldr	x0, [x8, #0xb90]
+1049b6ff4: 94c9c306    	bl	0x107c27c0c <_Flutter_MMFoundation_BindContext+0x3eae8d8>
+1049b6ff8: aa0003f4    	mov	x20, x0
+1049b6ffc: d00d01e8    	adrp	x8, 0x11e9f4000 <dyld_stub_binder+0x11e9f4000>
+1049b7000: f944ed01    	ldr	x1, [x8, #0x9d8] ; setCustomDelegate:
+1049b7004: aa1303e2    	mov	x2, x19
+1049b7008: 94c9c317    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b700c: f00d1ad6    	adrp	x22, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1049b7010: f94406c0    	ldr	x0, [x22, #0x808]
+1049b7014: b00d00a8    	adrp	x8, 0x11e9cc000 <dyld_stub_binder+0x11e9cc000>
+1049b7018: f9403901    	ldr	x1, [x8, #0x70] ; Brand_100
+1049b701c: 94c9c312    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b7020: aa1d03fd    	mov	x29, x29
+1049b7024: 94c9c317    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b7028: aa0003f5    	mov	x21, x0
+1049b702c: b00d17a8    	adrp	x8, 0x11ecac000 <dyld_stub_binder+0x11ecac000>
+1049b7030: f945c101    	ldr	x1, [x8, #0xb80] ; setTintColor:
+1049b7034: aa1403e0    	mov	x0, x20
+1049b7038: aa1503e2    	mov	x2, x21
+1049b703c: 94c9c30a    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b7040: aa1503e0    	mov	x0, x21
+1049b7044: 94c9c30b    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b7048: f94406c0    	ldr	x0, [x22, #0x808]
+1049b704c: b00d1788    	adrp	x8, 0x11eca8000 <dyld_stub_binder+0x11eca8000>
+1049b7050: f945f101    	ldr	x1, [x8, #0xbe0] ; labelColor
+1049b7054: 94c9c304    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b7058: aa1d03fd    	mov	x29, x29
+1049b705c: 94c9c309    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b7060: aa0003f5    	mov	x21, x0
+1049b7064: f00d0ac8    	adrp	x8, 0x11eb12000 <dyld_stub_binder+0x11eb12000>
+1049b7068: f9469101    	ldr	x1, [x8, #0xd20] ; setUnselectedItemTintColor:
+1049b706c: aa1403e0    	mov	x0, x20
+1049b7070: aa1503e2    	mov	x2, x21
+1049b7074: 94c9c2fc    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b7078: aa1503e0    	mov	x0, x21
+1049b707c: 94c9c2fd    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b7080: f00d1ad5    	adrp	x21, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1049b7084: f94466a0    	ldr	x0, [x21, #0x8c8]
+1049b7088: 900d09c8    	adrp	x8, 0x11eaef000 <dyld_stub_binder+0x11eaef000>
+1049b708c: f946f501    	ldr	x1, [x8, #0xde8] ; isiOS18plus
+1049b7090: 94c9c2f5    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b7094: 340005a0    	cbz	w0, 0x1049b7148 <_Flutter_MMFoundation_BindContext+0xc3de14>
+1049b7098: f94466a0    	ldr	x0, [x21, #0x8c8]
+1049b709c: b00d1788    	adrp	x8, 0x11eca8000 <dyld_stub_binder+0x11eca8000>
+1049b70a0: f9455d01    	ldr	x1, [x8, #0xab8] ; isiPad
+1049b70a4: 94c9c2f0    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b70a8: 34000500    	cbz	w0, 0x1049b7148 <_Flutter_MMFoundation_BindContext+0xc3de14>
+1049b70ac: 52800040    	mov	w0, #0x2                ; =2
+1049b70b0: 52800241    	mov	w1, #0x12               ; =18
+1049b70b4: 52800002    	mov	w2, #0x0                ; =0
+1049b70b8: 52800003    	mov	w3, #0x0                ; =0
+1049b70bc: 94c9538d    	bl	0x107c0bef0 <_Flutter_MMFoundation_BindContext+0x3e92bbc>
+1049b70c0: 34000740    	cbz	w0, 0x1049b71a8 <_Flutter_MMFoundation_BindContext+0xc3de74>
+1049b70c4: d00d0a68    	adrp	x8, 0x11eb05000 <dyld_stub_binder+0x11eb05000>
+1049b70c8: f9441501    	ldr	x1, [x8, #0x828] ; traitOverrides
+1049b70cc: aa1303e0    	mov	x0, x19
+1049b70d0: 94c9c2e5    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b70d4: aa1d03fd    	mov	x29, x29
+1049b70d8: 94c9c2ea    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b70dc: aa0003f5    	mov	x21, x0
+1049b70e0: f00d0ac8    	adrp	x8, 0x11eb12000 <dyld_stub_binder+0x11eb12000>
+1049b70e4: f9469501    	ldr	x1, [x8, #0xd28] ; setHorizontalSizeClass:
+1049b70e8: 52800022    	mov	w2, #0x1                ; =1
+1049b70ec: 94c9c2de    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b70f0: aa1503e0    	mov	x0, x21
+1049b70f4: 94c9c2df    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b70f8: b00d17a8    	adrp	x8, 0x11ecac000 <dyld_stub_binder+0x11ecac000>
+1049b70fc: f9409d01    	ldr	x1, [x8, #0x138] ; setMode:
+1049b7100: aa1303e0    	mov	x0, x19
+1049b7104: 52800022    	mov	w2, #0x1                ; =1
+1049b7108: 94c9c2d7    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b710c: f00d0ac8    	adrp	x8, 0x11eb12000 <dyld_stub_binder+0x11eb12000>
+1049b7110: f9469901    	ldr	x1, [x8, #0xd30] ; sidebar
+1049b7114: aa1303e0    	mov	x0, x19
+1049b7118: 94c9c2d3    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b711c: aa1d03fd    	mov	x29, x29
+1049b7120: 94c9c2d8    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b7124: aa0003f6    	mov	x22, x0
+1049b7128: 900d17a8    	adrp	x8, 0x11ecab000 <dyld_stub_binder+0x11ecab000>
+1049b712c: f9458d15    	ldr	x21, [x8, #0xb18] ; setHidden:
+1049b7130: aa1503e1    	mov	x1, x21
+1049b7134: 52800022    	mov	w2, #0x1                ; =1
+1049b7138: 94c9c2cb    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b713c: aa1603e0    	mov	x0, x22
+1049b7140: 94c9c2cc    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b7144: 1400001b    	b	0x1049b71b0 <_Flutter_MMFoundation_BindContext+0xc3de7c>
+1049b7148: b00d17a8    	adrp	x8, 0x11ecac000 <dyld_stub_binder+0x11ecac000>
+1049b714c: f946b901    	ldr	x1, [x8, #0xd70] ; setValue:forKey:
+1049b7150: 900c4683    	adrp	x3, 0x11d287000 <dyld_stub_binder+0x11d287000>
+1049b7154: 910ae063    	add	x3, x3, #0x2b8
+1049b7158: aa1303e0    	mov	x0, x19
+1049b715c: aa1403e2    	mov	x2, x20
+1049b7160: 94c9c2c1    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b7164: d00c6c88    	adrp	x8, 0x11d749000 <dyld_stub_binder+0x11d749000>
+1049b7168: f944c508    	ldr	x8, [x8, #0x988]
+1049b716c: f9400115    	ldr	x21, [x8]
+1049b7170: f00d00c8    	adrp	x8, 0x11e9d2000 <dyld_stub_binder+0x11e9d2000>
+1049b7174: f942c901    	ldr	x1, [x8, #0x590] ; tabBar
+1049b7178: aa1303e0    	mov	x0, x19
+1049b717c: 94c9c2ba    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b7180: aa1d03fd    	mov	x29, x29
+1049b7184: 94c9c2bf    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b7188: aa0003f6    	mov	x22, x0
+1049b718c: 900d00e8    	adrp	x8, 0x11e9d3000 <dyld_stub_binder+0x11e9d3000>
+1049b7190: f941fd01    	ldr	x1, [x8, #0x3f8] ; setAccessibilityTraits:
+1049b7194: aa1503e2    	mov	x2, x21
+1049b7198: 94c9c2b3    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b719c: aa1603e0    	mov	x0, x22
+1049b71a0: 94c9c2b4    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b71a4: 14000049    	b	0x1049b72c8 <_Flutter_MMFoundation_BindContext+0xc3df94>
+1049b71a8: 900d17a8    	adrp	x8, 0x11ecab000 <dyld_stub_binder+0x11ecab000>
+1049b71ac: f9458d15    	ldr	x21, [x8, #0xb18] ; setHidden:
+1049b71b0: d00d2048    	adrp	x8, 0x11edc1000 <dyld_stub_binder+0x11edc1000>
+1049b71b4: b9855117    	ldrsw	x23, [x8, #0x550]
+1049b71b8: 8b170260    	add	x0, x19, x23
+1049b71bc: aa1403e1    	mov	x1, x20
+1049b71c0: 94c9c2b7    	bl	0x107c27c9c <_Flutter_MMFoundation_BindContext+0x3eae968>
+1049b71c4: d00c6c88    	adrp	x8, 0x11d749000 <dyld_stub_binder+0x11d749000>
+1049b71c8: f944c508    	ldr	x8, [x8, #0x988]
+1049b71cc: f9400102    	ldr	x2, [x8]
+1049b71d0: f8776a60    	ldr	x0, [x19, x23]
+1049b71d4: 900d00e8    	adrp	x8, 0x11e9d3000 <dyld_stub_binder+0x11e9d3000>
+1049b71d8: f941fd01    	ldr	x1, [x8, #0x3f8] ; setAccessibilityTraits:
+1049b71dc: 94c9c2a2    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b71e0: d00d17a8    	adrp	x8, 0x11ecad000 <dyld_stub_binder+0x11ecad000>
+1049b71e4: f9472901    	ldr	x1, [x8, #0xe50] ; view
+1049b71e8: aa1303e0    	mov	x0, x19
+1049b71ec: 94c9c29e    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b71f0: aa1d03fd    	mov	x29, x29
+1049b71f4: 94c9c2a3    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b71f8: aa0003f6    	mov	x22, x0
+1049b71fc: f8776a62    	ldr	x2, [x19, x23]
+1049b7200: d00d1768    	adrp	x8, 0x11eca5000 <dyld_stub_binder+0x11eca5000>
+1049b7204: f9456501    	ldr	x1, [x8, #0xac8] ; addSubview:
+1049b7208: 94c9c297    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b720c: aa1603e0    	mov	x0, x22
+1049b7210: 94c9c298    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b7214: 9100a3e0    	add	x0, sp, #0x28
+1049b7218: aa1303e1    	mov	x1, x19
+1049b721c: 94c9c28f    	bl	0x107c27c58 <_Flutter_MMFoundation_BindContext+0x3eae924>
+1049b7220: f00d00c8    	adrp	x8, 0x11e9d2000 <dyld_stub_binder+0x11e9d2000>
+1049b7224: f942c901    	ldr	x1, [x8, #0x590] ; tabBar
+1049b7228: aa1303e0    	mov	x0, x19
+1049b722c: 94c9c28e    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b7230: aa1d03fd    	mov	x29, x29
+1049b7234: 94c9c293    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b7238: aa0003f6    	mov	x22, x0
+1049b723c: b00c6ca8    	adrp	x8, 0x11d74c000 <dyld_stub_binder+0x11d74c000>
+1049b7240: f9449908    	ldr	x8, [x8, #0x930]
+1049b7244: f90003e8    	str	x8, [sp]
+1049b7248: 90097888    	adrp	x8, 0x1178c7000 <dyld_stub_binder+0x1178c7000>
+1049b724c: fd434100    	ldr	d0, [x8, #0x680]
+1049b7250: 90000008    	adrp	x8, 0x1049b7000 <_Flutter_MMFoundation_BindContext+0xc3dccc>
+1049b7254: 910bb108    	add	x8, x8, #0x2ec
+1049b7258: fd0007e0    	str	d0, [sp, #0x8]
+1049b725c: d00bc729    	adrp	x9, 0x11c29d000 <dyld_stub_binder+0x11c29d000>
+1049b7260: 9125a129    	add	x9, x9, #0x968
+1049b7264: a90127e8    	stp	x8, x9, [sp, #0x10]
+1049b7268: 910003f8    	mov	x24, sp
+1049b726c: 91008300    	add	x0, x24, #0x20
+1049b7270: 9100a3e1    	add	x1, sp, #0x28
+1049b7274: 94c9c26f    	bl	0x107c27c30 <_Flutter_MMFoundation_BindContext+0x3eae8fc>
+1049b7278: 910003e0    	mov	x0, sp
+1049b727c: 94c9c282    	bl	0x107c27c84 <_Flutter_MMFoundation_BindContext+0x3eae950>
+1049b7280: aa0003f7    	mov	x23, x0
+1049b7284: f00d0188    	adrp	x8, 0x11e9ea000 <dyld_stub_binder+0x11e9ea000>
+1049b7288: f9421901    	ldr	x1, [x8, #0x430] ; WCAop_hookSelector:atPosition:withTag:usingBlock:
+1049b728c: 900c4684    	adrp	x4, 0x11d287000 <dyld_stub_binder+0x11d287000>
+1049b7290: 9109e084    	add	x4, x4, #0x278
+1049b7294: aa1603e0    	mov	x0, x22
+1049b7298: aa1503e2    	mov	x2, x21
+1049b729c: d2800003    	mov	x3, #0x0                ; =0
+1049b72a0: aa1703e5    	mov	x5, x23
+1049b72a4: 94c9c270    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b72a8: aa1703e0    	mov	x0, x23
+1049b72ac: 94c9c271    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b72b0: aa1603e0    	mov	x0, x22
+1049b72b4: 94c9c26f    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b72b8: 91008300    	add	x0, x24, #0x20
+1049b72bc: 94c9c25e    	bl	0x107c27c34 <_Flutter_MMFoundation_BindContext+0x3eae900>
+1049b72c0: 9100a3e0    	add	x0, sp, #0x28
+1049b72c4: 94c9c25c    	bl	0x107c27c34 <_Flutter_MMFoundation_BindContext+0x3eae900>
+1049b72c8: aa1403e0    	mov	x0, x20
+1049b72cc: 94c9c269    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b72d0: aa1303e0    	mov	x0, x19
+1049b72d4: a9477bfd    	ldp	x29, x30, [sp, #0x70]
+1049b72d8: a9464ff4    	ldp	x20, x19, [sp, #0x60]
+1049b72dc: a94557f6    	ldp	x22, x21, [sp, #0x50]
+1049b72e0: a9445ff8    	ldp	x24, x23, [sp, #0x40]
+1049b72e4: 910203ff    	add	sp, sp, #0x80
+1049b72e8: d65f03c0    	ret
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000103d79334 <_Flutter_MMFoundation_BindContext>:
+1049b9434: 6db923e9    	stp	d9, d8, [sp, #-0x70]!
+1049b9438: a9016ffc    	stp	x28, x27, [sp, #0x10]
+1049b943c: a90267fa    	stp	x26, x25, [sp, #0x20]
+1049b9440: a9035ff8    	stp	x24, x23, [sp, #0x30]
+1049b9444: a90457f6    	stp	x22, x21, [sp, #0x40]
+1049b9448: a9054ff4    	stp	x20, x19, [sp, #0x50]
+1049b944c: a9067bfd    	stp	x29, x30, [sp, #0x60]
+1049b9450: 910183fd    	add	x29, sp, #0x60
+1049b9454: d10703ff    	sub	sp, sp, #0x1c0
+1049b9458: aa0003fb    	mov	x27, x0
+1049b945c: f00c6c88    	adrp	x8, 0x11d74c000 <dyld_stub_binder+0x11d74c000>
+1049b9460: f9451908    	ldr	x8, [x8, #0xa30]
+1049b9464: f9400108    	ldr	x8, [x8]
+1049b9468: f81903a8    	stur	x8, [x29, #-0x70]
+1049b946c: f00d6ca8    	adrp	x8, 0x11f750000 <dyld_stub_binder+0x11f750000>
+1049b9470: 52800029    	mov	w9, #0x1                ; =1
+1049b9474: 3933a909    	strb	w9, [x8, #0xcea]
+1049b9478: 900d2048    	adrp	x8, 0x11edc1000 <dyld_stub_binder+0x11edc1000>
+1049b947c: b985691c    	ldrsw	x28, [x8, #0x568]
+1049b9480: f87c6800    	ldr	x0, [x0, x28]
+1049b9484: b5001940    	cbnz	x0, 0x1049b97ac <_Flutter_MMFoundation_BindContext+0xc40478>
+1049b9488: b00d1ac8    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1049b948c: f9432d00    	ldr	x0, [x8, #0x658]
+1049b9490: 94c9b9de    	bl	0x107c27c08 <_Flutter_MMFoundation_BindContext+0x3eae8d4>
+1049b9494: aa0003f4    	mov	x20, x0
+1049b9498: 900d17a8    	adrp	x8, 0x11ecad000 <dyld_stub_binder+0x11ecad000>
+1049b949c: f9473501    	ldr	x1, [x8, #0xe68] ; viewControllers
+1049b94a0: aa1b03e0    	mov	x0, x27
+1049b94a4: 94c9b9f0    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b94a8: aa1d03fd    	mov	x29, x29
+1049b94ac: 94c9b9f5    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b94b0: aa0003f5    	mov	x21, x0
+1049b94b4: b00d1768    	adrp	x8, 0x11eca6000 <dyld_stub_binder+0x11eca6000>
+1049b94b8: f9442901    	ldr	x1, [x8, #0x850] ; count
+1049b94bc: 94c9b9ea    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b94c0: aa0003e2    	mov	x2, x0
+1049b94c4: f00d1768    	adrp	x8, 0x11eca8000 <dyld_stub_binder+0x11eca8000>
+1049b94c8: f940f501    	ldr	x1, [x8, #0x1e8] ; initWithCapacity:
+1049b94cc: aa1403e0    	mov	x0, x20
+1049b94d0: 94c9b9e5    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b94d4: f87c6b68    	ldr	x8, [x27, x28]
+1049b94d8: f83c6b60    	str	x0, [x27, x28]
+1049b94dc: aa0803e0    	mov	x0, x8
+1049b94e0: 94c9b9e4    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b94e4: aa1503e0    	mov	x0, x21
+1049b94e8: 94c9b9e2    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b94ec: 4f00e400    	movi.16b	v0, #0x0
+1049b94f0: ad0483e0    	stp	q0, q0, [sp, #0x90]
+1049b94f4: ad0383e0    	stp	q0, q0, [sp, #0x70]
+1049b94f8: b00d00c8    	adrp	x8, 0x11e9d2000 <dyld_stub_binder+0x11e9d2000>
+1049b94fc: f942c901    	ldr	x1, [x8, #0x590] ; tabBar
+1049b9500: aa1b03e0    	mov	x0, x27
+1049b9504: 94c9b9d8    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9508: aa1d03fd    	mov	x29, x29
+1049b950c: 94c9b9dd    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b9510: aa0003f4    	mov	x20, x0
+1049b9514: 900d17a8    	adrp	x8, 0x11ecad000 <dyld_stub_binder+0x11ecad000>
+1049b9518: f9433501    	ldr	x1, [x8, #0x668] ; subviews
+1049b951c: 94c9b9d2    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9520: aa1d03fd    	mov	x29, x29
+1049b9524: 94c9b9d7    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b9528: aa0003f5    	mov	x21, x0
+1049b952c: aa1403e0    	mov	x0, x20
+1049b9530: 94c9b9d0    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b9534: b00d1768    	adrp	x8, 0x11eca6000 <dyld_stub_binder+0x11eca6000>
+1049b9538: f9442d01    	ldr	x1, [x8, #0x858] ; countByEnumeratingWithState:objects:count:
+1049b953c: 9101c3e2    	add	x2, sp, #0x70
+1049b9540: d103c3a3    	sub	x3, x29, #0xf0
+1049b9544: aa1503e0    	mov	x0, x21
+1049b9548: f9000fe1    	str	x1, [sp, #0x18]
+1049b954c: 52800204    	mov	w4, #0x10               ; =16
+1049b9550: 94c9b9c5    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9554: b40008a0    	cbz	x0, 0x1049b9668 <_Flutter_MMFoundation_BindContext+0xc40334>
+1049b9558: aa0003f6    	mov	x22, x0
+1049b955c: a9026ffc    	stp	x28, x27, [sp, #0x20]
+1049b9560: 52800013    	mov	w19, #0x0               ; =0
+1049b9564: f94043e8    	ldr	x8, [sp, #0x80]
+1049b9568: f940011c    	ldr	x28, [x8]
+1049b956c: 1e7e1008    	fmov	d8, #-1.00000000
+1049b9570: aa1503f4    	mov	x20, x21
+1049b9574: d2800015    	mov	x21, #0x0               ; =0
+1049b9578: b00d1768    	adrp	x8, 0x11eca6000 <dyld_stub_binder+0x11eca6000>
+1049b957c: f9428517    	ldr	x23, [x8, #0x508] ; class
+1049b9580: f00d1768    	adrp	x8, 0x11eca8000 <dyld_stub_binder+0x11eca8000>
+1049b9584: f9444918    	ldr	x24, [x8, #0x890] ; isKindOfClass:
+1049b9588: b00d17a8    	adrp	x8, 0x11ecae000 <dyld_stub_binder+0x11ecae000>
+1049b958c: f9403519    	ldr	x25, [x8, #0x68] ; x
+1049b9590: b00d0088    	adrp	x8, 0x11e9ca000 <dyld_stub_binder+0x11e9ca000>
+1049b9594: f942c11a    	ldr	x26, [x8, #0x580] ; safeAddObject:
+1049b9598: f94043e8    	ldr	x8, [sp, #0x80]
+1049b959c: f9400108    	ldr	x8, [x8]
+1049b95a0: eb1c011f    	cmp	x8, x28
+1049b95a4: 54000060    	b.eq	0x1049b95b0 <_Flutter_MMFoundation_BindContext+0xc4027c>
+1049b95a8: aa1403e0    	mov	x0, x20
+1049b95ac: 94c9b9a4    	bl	0x107c27c3c <_Flutter_MMFoundation_BindContext+0x3eae908>
+1049b95b0: f9403fe8    	ldr	x8, [sp, #0x78]
+1049b95b4: f875791b    	ldr	x27, [x8, x21, lsl #3]
+1049b95b8: d00d1ac8    	adrp	x8, 0x11ed13000 <dyld_stub_binder+0x11ed13000>
+1049b95bc: f9470900    	ldr	x0, [x8, #0xe10]
+1049b95c0: aa1703e1    	mov	x1, x23
+1049b95c4: 94c9b9a8    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b95c8: aa0003e2    	mov	x2, x0
+1049b95cc: aa1b03e0    	mov	x0, x27
+1049b95d0: aa1803e1    	mov	x1, x24
+1049b95d4: 94c9b9a4    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b95d8: 34000200    	cbz	w0, 0x1049b9618 <_Flutter_MMFoundation_BindContext+0xc402e4>
+1049b95dc: aa1b03e0    	mov	x0, x27
+1049b95e0: aa1903e1    	mov	x1, x25
+1049b95e4: 94c9b9a0    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b95e8: 1e682000    	fcmp	d0, d8
+1049b95ec: 1a9f17e8    	cset	w8, eq
+1049b95f0: 2a130113    	orr	w19, w8, w19
+1049b95f4: aa1b03e0    	mov	x0, x27
+1049b95f8: aa1903e1    	mov	x1, x25
+1049b95fc: 94c9b99a    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9600: 4ea01c08    	mov.16b	v8, v0
+1049b9604: a94223e9    	ldp	x9, x8, [sp, #0x20]
+1049b9608: f8696900    	ldr	x0, [x8, x9]
+1049b960c: aa1a03e1    	mov	x1, x26
+1049b9610: aa1b03e2    	mov	x2, x27
+1049b9614: 94c9b994    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9618: 910006b5    	add	x21, x21, #0x1
+1049b961c: eb1502df    	cmp	x22, x21
+1049b9620: 54fffbc1    	b.ne	0x1049b9598 <_Flutter_MMFoundation_BindContext+0xc40264>
+1049b9624: 9101c3e2    	add	x2, sp, #0x70
+1049b9628: d103c3a3    	sub	x3, x29, #0xf0
+1049b962c: aa1403f5    	mov	x21, x20
+1049b9630: aa1403e0    	mov	x0, x20
+1049b9634: f9400fe1    	ldr	x1, [sp, #0x18]
+1049b9638: 52800204    	mov	w4, #0x10               ; =16
+1049b963c: 94c9b98a    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9640: aa0003f6    	mov	x22, x0
+1049b9644: b5fff960    	cbnz	x0, 0x1049b9570 <_Flutter_MMFoundation_BindContext+0xc4023c>
+1049b9648: aa1503e0    	mov	x0, x21
+1049b964c: 94c9b989    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b9650: a9426ffc    	ldp	x28, x27, [sp, #0x20]
+1049b9654: 360000f3    	tbz	w19, #0x0, 0x1049b9670 <_Flutter_MMFoundation_BindContext+0xc4033c>
+1049b9658: f87c6b60    	ldr	x0, [x27, x28]
+1049b965c: f83c6b7f    	str	xzr, [x27, x28]
+1049b9660: 94c9b984    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b9664: 14000019    	b	0x1049b96c8 <_Flutter_MMFoundation_BindContext+0xc40394>
+1049b9668: aa1503e0    	mov	x0, x21
+1049b966c: 94c9b981    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b9670: b00d1ac8    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1049b9674: f9430d00    	ldr	x0, [x8, #0x618]
+1049b9678: 900d0088    	adrp	x8, 0x11e9c9000 <dyld_stub_binder+0x11e9c9000>
+1049b967c: f9418901    	ldr	x1, [x8, #0x310] ; logWithLevel:module:errorCode:file:line:func:format:
+1049b9680: f00c3be8    	adrp	x8, 0x11d138000 <dyld_stub_binder+0x11d138000>
+1049b9684: 910be108    	add	x8, x8, #0x2f8
+1049b9688: f90003e8    	str	x8, [sp]
+1049b968c: d00abcc5    	adrp	x5, 0x11a153000 <dyld_stub_binder+0x11a153000>
+1049b9690: 910a74a5    	add	x5, x5, #0x29d
+1049b9694: d00abcc7    	adrp	x7, 0x11a153000 <dyld_stub_binder+0x11a153000>
+1049b9698: 9112b0e7    	add	x7, x7, #0x4ac
+1049b969c: 52800042    	mov	w2, #0x2                ; =2
+1049b96a0: d2800003    	mov	x3, #0x0                ; =0
+1049b96a4: 52800004    	mov	w4, #0x0                ; =0
+1049b96a8: 52803366    	mov	w6, #0x19b              ; =411
+1049b96ac: 94c9b96e    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b96b0: f87c6b60    	ldr	x0, [x27, x28]
+1049b96b4: 900d17a8    	adrp	x8, 0x11ecad000 <dyld_stub_binder+0x11ecad000>
+1049b96b8: f9409d01    	ldr	x1, [x8, #0x138] ; sortUsingComparator:
+1049b96bc: b00bc9a2    	adrp	x2, 0x11c2ee000 <dyld_stub_binder+0x11c2ee000>
+1049b96c0: 912a4042    	add	x2, x2, #0xa90
+1049b96c4: 94c9b968    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b96c8: 4f00e400    	movi.16b	v0, #0x0
+1049b96cc: ad0283e0    	stp	q0, q0, [sp, #0x50]
+1049b96d0: ad0183e0    	stp	q0, q0, [sp, #0x30]
+1049b96d4: f87c6b75    	ldr	x21, [x27, x28]
+1049b96d8: aa1503e0    	mov	x0, x21
+1049b96dc: 94c9b966    	bl	0x107c27c74 <_Flutter_MMFoundation_BindContext+0x3eae940>
+1049b96e0: 9100c3e2    	add	x2, sp, #0x30
+1049b96e4: 9102c3e3    	add	x3, sp, #0xb0
+1049b96e8: f9400fe1    	ldr	x1, [sp, #0x18]
+1049b96ec: 52800204    	mov	w4, #0x10               ; =16
+1049b96f0: 94c9b95d    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b96f4: b4000560    	cbz	x0, 0x1049b97a0 <_Flutter_MMFoundation_BindContext+0xc4046c>
+1049b96f8: aa0003f8    	mov	x24, x0
+1049b96fc: f94023e8    	ldr	x8, [sp, #0x40]
+1049b9700: f9400113    	ldr	x19, [x8]
+1049b9704: d00c4674    	adrp	x20, 0x11d287000 <dyld_stub_binder+0x11d287000>
+1049b9708: 91116294    	add	x20, x20, #0x458
+1049b970c: d00abcd6    	adrp	x22, 0x11a153000 <dyld_stub_binder+0x11a153000>
+1049b9710: 910a76d6    	add	x22, x22, #0x29d
+1049b9714: d00abcd7    	adrp	x23, 0x11a153000 <dyld_stub_binder+0x11a153000>
+1049b9718: 9112b2f7    	add	x23, x23, #0x4ac
+1049b971c: d280001a    	mov	x26, #0x0               ; =0
+1049b9720: 900d0088    	adrp	x8, 0x11e9c9000 <dyld_stub_binder+0x11e9c9000>
+1049b9724: f9418919    	ldr	x25, [x8, #0x310] ; logWithLevel:module:errorCode:file:line:func:format:
+1049b9728: f94023e8    	ldr	x8, [sp, #0x40]
+1049b972c: f9400108    	ldr	x8, [x8]
+1049b9730: eb13011f    	cmp	x8, x19
+1049b9734: 54000060    	b.eq	0x1049b9740 <_Flutter_MMFoundation_BindContext+0xc4040c>
+1049b9738: aa1503e0    	mov	x0, x21
+1049b973c: 94c9b940    	bl	0x107c27c3c <_Flutter_MMFoundation_BindContext+0x3eae908>
+1049b9740: f9401fe8    	ldr	x8, [sp, #0x38]
+1049b9744: f87a7908    	ldr	x8, [x8, x26, lsl #3]
+1049b9748: b00d1ac9    	adrp	x9, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1049b974c: f9430d20    	ldr	x0, [x9, #0x618]
+1049b9750: a90023f4    	stp	x20, x8, [sp]
+1049b9754: aa1903e1    	mov	x1, x25
+1049b9758: 52800042    	mov	w2, #0x2                ; =2
+1049b975c: d2800003    	mov	x3, #0x0                ; =0
+1049b9760: 52800004    	mov	w4, #0x0                ; =0
+1049b9764: aa1603e5    	mov	x5, x22
+1049b9768: 52803666    	mov	w6, #0x1b3              ; =435
+1049b976c: aa1703e7    	mov	x7, x23
+1049b9770: 94c9b93d    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9774: 9100075a    	add	x26, x26, #0x1
+1049b9778: eb1a031f    	cmp	x24, x26
+1049b977c: 54fffd61    	b.ne	0x1049b9728 <_Flutter_MMFoundation_BindContext+0xc403f4>
+1049b9780: 9100c3e2    	add	x2, sp, #0x30
+1049b9784: 9102c3e3    	add	x3, sp, #0xb0
+1049b9788: aa1503e0    	mov	x0, x21
+1049b978c: f9400fe1    	ldr	x1, [sp, #0x18]
+1049b9790: 52800204    	mov	w4, #0x10               ; =16
+1049b9794: 94c9b934    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9798: aa0003f8    	mov	x24, x0
+1049b979c: b5fffc00    	cbnz	x0, 0x1049b971c <_Flutter_MMFoundation_BindContext+0xc403e8>
+1049b97a0: aa1503e0    	mov	x0, x21
+1049b97a4: 94c9b933    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b97a8: f87c6b60    	ldr	x0, [x27, x28]
+1049b97ac: f85903a8    	ldur	x8, [x29, #-0x70]
+1049b97b0: f00c6c89    	adrp	x9, 0x11d74c000 <dyld_stub_binder+0x11d74c000>
+1049b97b4: f9451929    	ldr	x9, [x9, #0xa30]
+1049b97b8: f9400129    	ldr	x9, [x9]
+1049b97bc: eb08013f    	cmp	x9, x8
+1049b97c0: 54000141    	b.ne	0x1049b97e8 <_Flutter_MMFoundation_BindContext+0xc404b4>
+1049b97c4: 910703ff    	add	sp, sp, #0x1c0
+1049b97c8: a9467bfd    	ldp	x29, x30, [sp, #0x60]
+1049b97cc: a9454ff4    	ldp	x20, x19, [sp, #0x50]
+1049b97d0: a94457f6    	ldp	x22, x21, [sp, #0x40]
+1049b97d4: a9435ff8    	ldp	x24, x23, [sp, #0x30]
+1049b97d8: a94267fa    	ldp	x26, x25, [sp, #0x20]
+1049b97dc: a9416ffc    	ldp	x28, x27, [sp, #0x10]
+1049b97e0: 6cc723e9    	ldp	d9, d8, [sp], #0x70
+1049b97e4: 14c9b926    	b	0x107c27c7c <_Flutter_MMFoundation_BindContext+0x3eae948>
+1049b97e8: 94c9b7d2    	bl	0x107c27730 <_Flutter_MMFoundation_BindContext+0x3eae3fc>
+1049b97ec: 6dbc23e9    	stp	d9, d8, [sp, #-0x40]!
+1049b97f0: a90157f6    	stp	x22, x21, [sp, #0x10]
+1049b97f4: a9024ff4    	stp	x20, x19, [sp, #0x20]
+1049b97f8: a9037bfd    	stp	x29, x30, [sp, #0x30]
+1049b97fc: 9100c3fd    	add	x29, sp, #0x30
+1049b9800: aa0203f4    	mov	x20, x2
+1049b9804: aa0103f3    	mov	x19, x1
+1049b9808: aa0103e0    	mov	x0, x1
+1049b980c: 94c9b91a    	bl	0x107c27c74 <_Flutter_MMFoundation_BindContext+0x3eae940>
+1049b9810: aa1403e0    	mov	x0, x20
+1049b9814: 94c9b918    	bl	0x107c27c74 <_Flutter_MMFoundation_BindContext+0x3eae940>
+1049b9818: b00d1ac8    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1049b981c: f9439d00    	ldr	x0, [x8, #0x738]
+1049b9820: 900d17a8    	adrp	x8, 0x11ecad000 <dyld_stub_binder+0x11ecad000>
+1049b9824: f9400101    	ldr	x1, [x8]
+1049b9828: 94c9b90f    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b982c: aa1d03fd    	mov	x29, x29
+1049b9830: 94c9b914    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b9834: aa0003f5    	mov	x21, x0
+1049b9838: b00d0ac8    	adrp	x8, 0x11eb12000 <dyld_stub_binder+0x11eb12000>
+1049b983c: f946e501    	ldr	x1, [x8, #0xdc8] ; userInterfaceLayoutDirection
+1049b9840: 94c9b909    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9844: aa0003f6    	mov	x22, x0
+1049b9848: aa1503e0    	mov	x0, x21
+1049b984c: 94c9b909    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b9850: b00d17a8    	adrp	x8, 0x11ecae000 <dyld_stub_binder+0x11ecae000>
+1049b9854: f9403515    	ldr	x21, [x8, #0x68] ; x
+1049b9858: aa1303e0    	mov	x0, x19
+1049b985c: aa1503e1    	mov	x1, x21
+1049b9860: 94c9b901    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9864: 4ea01c08    	mov.16b	v8, v0
+1049b9868: aa1403e0    	mov	x0, x20
+1049b986c: aa1503e1    	mov	x1, x21
+1049b9870: 94c9b8fd    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9874: f10006df    	cmp	x22, #0x1
+1049b9878: 540000a1    	b.ne	0x1049b988c <_Flutter_MMFoundation_BindContext+0xc40558>
+1049b987c: 1e602100    	fcmp	d8, d0
+1049b9880: 540000ed    	b.le	0x1049b989c <_Flutter_MMFoundation_BindContext+0xc40568>
+1049b9884: 92800015    	mov	x21, #-0x1              ; =-1
+1049b9888: 14000018    	b	0x1049b98e8 <_Flutter_MMFoundation_BindContext+0xc405b4>
+1049b988c: 1e602100    	fcmp	d8, d0
+1049b9890: 540001ad    	b.le	0x1049b98c4 <_Flutter_MMFoundation_BindContext+0xc40590>
+1049b9894: 52800035    	mov	w21, #0x1               ; =1
+1049b9898: 14000014    	b	0x1049b98e8 <_Flutter_MMFoundation_BindContext+0xc405b4>
+1049b989c: aa1303e0    	mov	x0, x19
+1049b98a0: aa1503e1    	mov	x1, x21
+1049b98a4: 94c9b8f0    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b98a8: 4ea01c08    	mov.16b	v8, v0
+1049b98ac: aa1403e0    	mov	x0, x20
+1049b98b0: aa1503e1    	mov	x1, x21
+1049b98b4: 94c9b8ec    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b98b8: 1e602100    	fcmp	d8, d0
+1049b98bc: 1a9f57f5    	cset	w21, mi
+1049b98c0: 1400000a    	b	0x1049b98e8 <_Flutter_MMFoundation_BindContext+0xc405b4>
+1049b98c4: aa1303e0    	mov	x0, x19
+1049b98c8: aa1503e1    	mov	x1, x21
+1049b98cc: 94c9b8e6    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b98d0: 4ea01c08    	mov.16b	v8, v0
+1049b98d4: aa1403e0    	mov	x0, x20
+1049b98d8: aa1503e1    	mov	x1, x21
+1049b98dc: 94c9b8e2    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b98e0: 1e602100    	fcmp	d8, d0
+1049b98e4: da9f53f5    	csetm	x21, mi
+1049b98e8: aa1403e0    	mov	x0, x20
+1049b98ec: 94c9b8e1    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b98f0: aa1303e0    	mov	x0, x19
+1049b98f4: 94c9b8df    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b98f8: aa1503e0    	mov	x0, x21
+1049b98fc: a9437bfd    	ldp	x29, x30, [sp, #0x30]
+1049b9900: a9424ff4    	ldp	x20, x19, [sp, #0x20]
+1049b9904: a94157f6    	ldp	x22, x21, [sp, #0x10]
+1049b9908: 6cc423e9    	ldp	d9, d8, [sp], #0x40
+1049b990c: d65f03c0    	ret
+1049b9910: d10183ff    	sub	sp, sp, #0x60
+1049b9914: a90167fa    	stp	x26, x25, [sp, #0x10]
+1049b9918: a9025ff8    	stp	x24, x23, [sp, #0x20]
+1049b991c: a90357f6    	stp	x22, x21, [sp, #0x30]
+1049b9920: a9044ff4    	stp	x20, x19, [sp, #0x40]
+1049b9924: a9057bfd    	stp	x29, x30, [sp, #0x50]
+1049b9928: 910143fd    	add	x29, sp, #0x50
+1049b992c: aa0203f3    	mov	x19, x2
+1049b9930: aa0003f4    	mov	x20, x0
+1049b9934: f00d6ca8    	adrp	x8, 0x11f750000 <dyld_stub_binder+0x11f750000>
+1049b9938: 52800029    	mov	w9, #0x1                ; =1
+1049b993c: 3933ad09    	strb	w9, [x8, #0xceb]
+1049b9940: 900d2048    	adrp	x8, 0x11edc1000 <dyld_stub_binder+0x11edc1000>
+1049b9944: b9856919    	ldrsw	x25, [x8, #0x568]
+1049b9948: f8796800    	ldr	x0, [x0, x25]
+1049b994c: b5000120    	cbnz	x0, 0x1049b9970 <_Flutter_MMFoundation_BindContext+0xc4063c>
+1049b9950: b00d0ac8    	adrp	x8, 0x11eb12000 <dyld_stub_binder+0x11eb12000>
+1049b9954: f946e901    	ldr	x1, [x8, #0xdd0] ; getTabBarBtnViews
+1049b9958: aa1403e0    	mov	x0, x20
+1049b995c: 94c9b8c2    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9960: aa1d03fd    	mov	x29, x29
+1049b9964: 94c9b8d2    	bl	0x107c27cac <_Flutter_MMFoundation_BindContext+0x3eae978>
+1049b9968: f8796a80    	ldr	x0, [x20, x25]
+1049b996c: b40008c0    	cbz	x0, 0x1049b9a84 <_Flutter_MMFoundation_BindContext+0xc40750>
+1049b9970: b00d1768    	adrp	x8, 0x11eca6000 <dyld_stub_binder+0x11eca6000>
+1049b9974: f9442915    	ldr	x21, [x8, #0x850] ; count
+1049b9978: aa1503e1    	mov	x1, x21
+1049b997c: 94c9b8ba    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9980: b4000820    	cbz	x0, 0x1049b9a84 <_Flutter_MMFoundation_BindContext+0xc40750>
+1049b9984: f8796a80    	ldr	x0, [x20, x25]
+1049b9988: aa1503e1    	mov	x1, x21
+1049b998c: 94c9b8b6    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9990: eb13001f    	cmp	x0, x19
+1049b9994: 54000789    	b.ls	0x1049b9a84 <_Flutter_MMFoundation_BindContext+0xc40750>
+1049b9998: f8796a80    	ldr	x0, [x20, x25]
+1049b999c: b00d0088    	adrp	x8, 0x11e9ca000 <dyld_stub_binder+0x11e9ca000>
+1049b99a0: f941b117    	ldr	x23, [x8, #0x360] ; safeObjectAtIndex:
+1049b99a4: aa1703e1    	mov	x1, x23
+1049b99a8: aa1303e2    	mov	x2, x19
+1049b99ac: 94c9b8ae    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b99b0: aa1d03fd    	mov	x29, x29
+1049b99b4: 94c9b8b3    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b99b8: aa0003f6    	mov	x22, x0
+1049b99bc: 900d17a8    	adrp	x8, 0x11ecad000 <dyld_stub_binder+0x11ecad000>
+1049b99c0: f947e101    	ldr	x1, [x8, #0xfc0] ; window
+1049b99c4: 94c9b8a8    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b99c8: aa1d03fd    	mov	x29, x29
+1049b99cc: 94c9b8ad    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b99d0: aa0003f8    	mov	x24, x0
+1049b99d4: 94c9b8a7    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b99d8: b50007b8    	cbnz	x24, 0x1049b9acc <_Flutter_MMFoundation_BindContext+0xc40798>
+1049b99dc: b00d1ac8    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1049b99e0: f9430d00    	ldr	x0, [x8, #0x618]
+1049b99e4: 900d0088    	adrp	x8, 0x11e9c9000 <dyld_stub_binder+0x11e9c9000>
+1049b99e8: f9418901    	ldr	x1, [x8, #0x310] ; logWithLevel:module:errorCode:file:line:func:format:
+1049b99ec: d00c4668    	adrp	x8, 0x11d287000 <dyld_stub_binder+0x11d287000>
+1049b99f0: 9111e108    	add	x8, x8, #0x478
+1049b99f4: f90003e8    	str	x8, [sp]
+1049b99f8: d00abcc5    	adrp	x5, 0x11a153000 <dyld_stub_binder+0x11a153000>
+1049b99fc: 910a74a5    	add	x5, x5, #0x29d
+1049b9a00: d00abcc7    	adrp	x7, 0x11a153000 <dyld_stub_binder+0x11a153000>
+1049b9a04: 911388e7    	add	x7, x7, #0x4e2
+1049b9a08: 52800042    	mov	w2, #0x2                ; =2
+1049b9a0c: d2800003    	mov	x3, #0x0                ; =0
+1049b9a10: 52800004    	mov	w4, #0x0                ; =0
+1049b9a14: 52803826    	mov	w6, #0x1c1              ; =449
+1049b9a18: 94c9b893    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9a1c: b00d0ac8    	adrp	x8, 0x11eb12000 <dyld_stub_binder+0x11eb12000>
+1049b9a20: f946ed01    	ldr	x1, [x8, #0xdd8] ; clearTabBtns
+1049b9a24: aa1403e0    	mov	x0, x20
+1049b9a28: 94c9b88f    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9a2c: b00d0ac8    	adrp	x8, 0x11eb12000 <dyld_stub_binder+0x11eb12000>
+1049b9a30: f946e901    	ldr	x1, [x8, #0xdd0] ; getTabBarBtnViews
+1049b9a34: aa1403e0    	mov	x0, x20
+1049b9a38: 94c9b88b    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9a3c: aa1d03fd    	mov	x29, x29
+1049b9a40: 94c9b89b    	bl	0x107c27cac <_Flutter_MMFoundation_BindContext+0x3eae978>
+1049b9a44: f8796a80    	ldr	x0, [x20, x25]
+1049b9a48: aa1503e1    	mov	x1, x21
+1049b9a4c: 94c9b886    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9a50: eb00027f    	cmp	x19, x0
+1049b9a54: 540003c2    	b.hs	0x1049b9acc <_Flutter_MMFoundation_BindContext+0xc40798>
+1049b9a58: f8796a80    	ldr	x0, [x20, x25]
+1049b9a5c: aa1703e1    	mov	x1, x23
+1049b9a60: aa1303e2    	mov	x2, x19
+1049b9a64: 94c9b880    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9a68: aa1d03fd    	mov	x29, x29
+1049b9a6c: 94c9b885    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049b9a70: aa0003f3    	mov	x19, x0
+1049b9a74: aa1603e0    	mov	x0, x22
+1049b9a78: 94c9b87e    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049b9a7c: aa1303f6    	mov	x22, x19
+1049b9a80: 14000013    	b	0x1049b9acc <_Flutter_MMFoundation_BindContext+0xc40798>
+1049b9a84: b00d1ac8    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1049b9a88: f9430d00    	ldr	x0, [x8, #0x618]
+1049b9a8c: 900d0088    	adrp	x8, 0x11e9c9000 <dyld_stub_binder+0x11e9c9000>
+1049b9a90: f9418901    	ldr	x1, [x8, #0x310] ; logWithLevel:module:errorCode:file:line:func:format:
+1049b9a94: d00c4668    	adrp	x8, 0x11d287000 <dyld_stub_binder+0x11d287000>
+1049b9a98: 91126108    	add	x8, x8, #0x498
+1049b9a9c: a9004fe8    	stp	x8, x19, [sp]
+1049b9aa0: d00abcc3    	adrp	x3, 0x11a153000 <dyld_stub_binder+0x11a153000>
+1049b9aa4: 910ca463    	add	x3, x3, #0x329
+1049b9aa8: d00abcc5    	adrp	x5, 0x11a153000 <dyld_stub_binder+0x11a153000>
+1049b9aac: 910a74a5    	add	x5, x5, #0x29d
+1049b9ab0: d00abcc7    	adrp	x7, 0x11a153000 <dyld_stub_binder+0x11a153000>
+1049b9ab4: 911388e7    	add	x7, x7, #0x4e2
+1049b9ab8: 52800082    	mov	w2, #0x4                ; =4
+1049b9abc: 52800004    	mov	w4, #0x0                ; =0
+1049b9ac0: 52803946    	mov	w6, #0x1ca              ; =458
+1049b9ac4: 94c9b868    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049b9ac8: d2800016    	mov	x22, #0x0               ; =0
+1049b9acc: aa1603e0    	mov	x0, x22
+1049b9ad0: a9457bfd    	ldp	x29, x30, [sp, #0x50]
+1049b9ad4: a9444ff4    	ldp	x20, x19, [sp, #0x40]
+1049b9ad8: a94357f6    	ldp	x22, x21, [sp, #0x30]
+1049b9adc: a9425ff8    	ldp	x24, x23, [sp, #0x20]
+1049b9ae0: a94167fa    	ldp	x26, x25, [sp, #0x10]
+1049b9ae4: 910183ff    	add	sp, sp, #0x60
+1049b9ae8: 14c9b84e    	b	0x107c27c20 <_Flutter_MMFoundation_BindContext+0x3eae8ec>
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000103d79334 <_Flutter_MMFoundation_BindContext>:
+1049baa88: a9bd57f6    	stp	x22, x21, [sp, #-0x30]!
+1049baa8c: a9014ff4    	stp	x20, x19, [sp, #0x10]
+1049baa90: a9027bfd    	stp	x29, x30, [sp, #0x20]
+1049baa94: 910083fd    	add	x29, sp, #0x20
+1049baa98: aa0003f3    	mov	x19, x0
+1049baa9c: d00d6ca8    	adrp	x8, 0x11f750000 <dyld_stub_binder+0x11f750000>
+1049baaa0: 52800029    	mov	w9, #0x1                ; =1
+1049baaa4: 3933c509    	strb	w9, [x8, #0xcf1]
+1049baaa8: 900d1ad4    	adrp	x20, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1049baaac: f9446680    	ldr	x0, [x20, #0x8c8]
+1049baab0: b00d09a8    	adrp	x8, 0x11eaef000 <dyld_stub_binder+0x11eaef000>
+1049baab4: f946f501    	ldr	x1, [x8, #0xde8] ; isiOS18plus
+1049baab8: 94c9b46b    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049baabc: 34000160    	cbz	w0, 0x1049baae8 <_Flutter_MMFoundation_BindContext+0xc417b4>
+1049baac0: f9446680    	ldr	x0, [x20, #0x8c8]
+1049baac4: d00d1768    	adrp	x8, 0x11eca8000 <dyld_stub_binder+0x11eca8000>
+1049baac8: f9455d01    	ldr	x1, [x8, #0xab8] ; isiPad
+1049baacc: 94c9b466    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049baad0: 340000c0    	cbz	w0, 0x1049baae8 <_Flutter_MMFoundation_BindContext+0xc417b4>
+1049baad4: f00d2028    	adrp	x8, 0x11edc1000 <dyld_stub_binder+0x11edc1000>
+1049baad8: b9855108    	ldrsw	x8, [x8, #0x550]
+1049baadc: f8686a60    	ldr	x0, [x19, x8]
+1049baae0: 94c9b465    	bl	0x107c27c74 <_Flutter_MMFoundation_BindContext+0x3eae940>
+1049baae4: 1400001e    	b	0x1049bab5c <_Flutter_MMFoundation_BindContext+0xc41828>
+1049baae8: 900d00c8    	adrp	x8, 0x11e9d2000 <dyld_stub_binder+0x11e9d2000>
+1049baaec: f942c914    	ldr	x20, [x8, #0x590] ; tabBar
+1049baaf0: aa1303e0    	mov	x0, x19
+1049baaf4: aa1403e1    	mov	x1, x20
+1049baaf8: 94c9b45b    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049baafc: aa1d03fd    	mov	x29, x29
+1049bab00: 94c9b460    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049bab04: aa0003f5    	mov	x21, x0
+1049bab08: f00d1b28    	adrp	x8, 0x11ed21000 <dyld_stub_binder+0x11ed21000>
+1049bab0c: f945c900    	ldr	x0, [x8, #0xb90]
+1049bab10: 900d1768    	adrp	x8, 0x11eca6000 <dyld_stub_binder+0x11eca6000>
+1049bab14: f9428501    	ldr	x1, [x8, #0x508] ; class
+1049bab18: 94c9b453    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049bab1c: aa0003e2    	mov	x2, x0
+1049bab20: d00d1768    	adrp	x8, 0x11eca8000 <dyld_stub_binder+0x11eca8000>
+1049bab24: f9444901    	ldr	x1, [x8, #0x890] ; isKindOfClass:
+1049bab28: aa1503e0    	mov	x0, x21
+1049bab2c: 94c9b44e    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049bab30: aa0003f6    	mov	x22, x0
+1049bab34: aa1503e0    	mov	x0, x21
+1049bab38: 94c9b44e    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1049bab3c: 340000f6    	cbz	w22, 0x1049bab58 <_Flutter_MMFoundation_BindContext+0xc41824>
+1049bab40: aa1303e0    	mov	x0, x19
+1049bab44: aa1403e1    	mov	x1, x20
+1049bab48: 94c9b447    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1049bab4c: aa1d03fd    	mov	x29, x29
+1049bab50: 94c9b44c    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1049bab54: 14000002    	b	0x1049bab5c <_Flutter_MMFoundation_BindContext+0xc41828>
+1049bab58: d2800000    	mov	x0, #0x0                ; =0
+1049bab5c: a9427bfd    	ldp	x29, x30, [sp, #0x20]
+1049bab60: a9414ff4    	ldp	x20, x19, [sp, #0x10]
+1049bab64: a8c357f6    	ldp	x22, x21, [sp], #0x30
+1049bab68: 14c9b42e    	b	0x107c27c20 <_Flutter_MMFoundation_BindContext+0x3eae8ec>
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000103d79334 <_Flutter_MMFoundation_BindContext>:
+1046be16c: d10103ff    	sub	sp, sp, #0x40
+1046be170: a90157f6    	stp	x22, x21, [sp, #0x10]
+1046be174: a9024ff4    	stp	x20, x19, [sp, #0x20]
+1046be178: a9037bfd    	stp	x29, x30, [sp, #0x30]
+1046be17c: 9100c3fd    	add	x29, sp, #0x30
+1046be180: aa0303f3    	mov	x19, x3
+1046be184: aa0203f4    	mov	x20, x2
+1046be188: aa0003f6    	mov	x22, x0
+1046be18c: d00d8488    	adrp	x8, 0x11f750000 <dyld_stub_binder+0x11f750000>
+1046be190: 52800029    	mov	w9, #0x1                ; =1
+1046be194: 3903ad09    	strb	w9, [x8, #0xeb]
+1046be198: aa0303e0    	mov	x0, x3
+1046be19c: 94d5a6b6    	bl	0x107c27c74 <_Flutter_MMFoundation_BindContext+0x3eae940>
+1046be1a0: b00d3388    	adrp	x8, 0x11ed2f000 <dyld_stub_binder+0x11ed2f000>
+1046be1a4: f9450915    	ldr	x21, [x8, #0xa10]
+1046be1a8: aa1403e0    	mov	x0, x20
+1046be1ac: 94d5a6b2    	bl	0x107c27c74 <_Flutter_MMFoundation_BindContext+0x3eae940>
+1046be1b0: aa1503e0    	mov	x0, x21
+1046be1b4: 94d5a695    	bl	0x107c27c08 <_Flutter_MMFoundation_BindContext+0x3eae8d4>
+1046be1b8: 900c8468    	adrp	x8, 0x11d74a000 <dyld_stub_binder+0x11d74a000>
+1046be1bc: f9465508    	ldr	x8, [x8, #0xca8]
+1046be1c0: 6d400500    	ldp	d0, d1, [x8]
+1046be1c4: 6d410d02    	ldp	d2, d3, [x8, #0x10]
+1046be1c8: b00d2248    	adrp	x8, 0x11eb07000 <dyld_stub_binder+0x11eb07000>
+1046be1cc: f9427501    	ldr	x1, [x8, #0x4e8] ; initWithItem:frame:
+1046be1d0: aa1303e2    	mov	x2, x19
+1046be1d4: 94d5a6a4    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1046be1d8: aa0003f5    	mov	x21, x0
+1046be1dc: b00d3528    	adrp	x8, 0x11ed63000 <dyld_stub_binder+0x11ed63000>
+1046be1e0: f947fd08    	ldr	x8, [x8, #0xff8]
+1046be1e4: a90023f6    	stp	x22, x8, [sp]
+1046be1e8: b00d2248    	adrp	x8, 0x11eb07000 <dyld_stub_binder+0x11eb07000>
+1046be1ec: f9427901    	ldr	x1, [x8, #0x4f0] ; initWithItem:contentView:
+1046be1f0: 910003e0    	mov	x0, sp
+1046be1f4: aa1403e2    	mov	x2, x20
+1046be1f8: aa1503e3    	mov	x3, x21
+1046be1fc: 94d5a69b    	bl	0x107c27c68 <_Flutter_MMFoundation_BindContext+0x3eae934>
+1046be200: aa0003f6    	mov	x22, x0
+1046be204: aa1403e0    	mov	x0, x20
+1046be208: 94d5a69a    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1046be20c: b4000176    	cbz	x22, 0x1046be238 <_Flutter_MMFoundation_BindContext+0x944f04>
+1046be210: f00d37e8    	adrp	x8, 0x11edbd000 <dyld_stub_binder+0x11edbd000>
+1046be214: b98f0d08    	ldrsw	x8, [x8, #0xf0c]
+1046be218: 8b0802c0    	add	x0, x22, x8
+1046be21c: aa1503e1    	mov	x1, x21
+1046be220: 94d5a69f    	bl	0x107c27c9c <_Flutter_MMFoundation_BindContext+0x3eae968>
+1046be224: f00d37e8    	adrp	x8, 0x11edbd000 <dyld_stub_binder+0x11edbd000>
+1046be228: b98f1108    	ldrsw	x8, [x8, #0xf10]
+1046be22c: 8b0802c0    	add	x0, x22, x8
+1046be230: aa1303e1    	mov	x1, x19
+1046be234: 94d5a69a    	bl	0x107c27c9c <_Flutter_MMFoundation_BindContext+0x3eae968>
+1046be238: aa1503e0    	mov	x0, x21
+1046be23c: 94d5a68d    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1046be240: aa1303e0    	mov	x0, x19
+1046be244: 94d5a68b    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1046be248: aa1603e0    	mov	x0, x22
+1046be24c: a9437bfd    	ldp	x29, x30, [sp, #0x30]
+1046be250: a9424ff4    	ldp	x20, x19, [sp, #0x20]
+1046be254: a94157f6    	ldp	x22, x21, [sp, #0x10]
+1046be258: 910103ff    	add	sp, sp, #0x40
+1046be25c: d65f03c0    	ret

@@ -1,0 +1,42 @@
+{
+  "purpose": "Postcommit replay only: preserve original historical negative-control input without editing old runner bytes or the checkout Git metadata. This is orchestration verification, not another production regression run.",
+  "original_negative_control_commit": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+  "five_source_bytes_equal": true,
+  "records": [
+    {
+      "path": "Controllers/CSCloseFriendSearchAdapter.h",
+      "original_commit_sha256": "08e89571b249006e5673b857b02993889d6b650dbb1c0aaf0f7693fbee52fe1e",
+      "private_view_sha256": "08e89571b249006e5673b857b02993889d6b650dbb1c0aaf0f7693fbee52fe1e",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendSearchAdapter.m",
+      "original_commit_sha256": "8d4c9778bd04688dfa0d6ca088844a0cc24f18159a270152ed6034e8e052353c",
+      "private_view_sha256": "8d4c9778bd04688dfa0d6ca088844a0cc24f18159a270152ed6034e8e052353c",
+      "identical": true
+    },
+    {
+      "path": "Hooks/CloseFriendSearchHooks.xm",
+      "original_commit_sha256": "bd983b2ab9c70e69b9dfc22416dcf6b55072f6e90f071dea4899117f06304f4c",
+      "private_view_sha256": "bd983b2ab9c70e69b9dfc22416dcf6b55072f6e90f071dea4899117f06304f4c",
+      "identical": true
+    },
+    {
+      "path": "Controllers/CSCloseFriendManager.m",
+      "original_commit_sha256": "32029613b26321429e662eccfb778e4ff90532618b4605e00cc17256dd2e8548",
+      "private_view_sha256": "32029613b26321429e662eccfb778e4ff90532618b4605e00cc17256dd2e8548",
+      "identical": true
+    },
+    {
+      "path": "Hooks/CloseFriendLifecycleHooks.xm",
+      "original_commit_sha256": "92ab6300d49c7e981d901db8ecab1febbf66fa5218bac5bee10b55ed0299681e",
+      "private_view_sha256": "92ab6300d49c7e981d901db8ecab1febbf66fa5218bac5bee10b55ed0299681e",
+      "identical": true
+    }
+  ],
+  "private_git_files_under_temporary_directory_only": true,
+  "private_git_rev_parse_HEAD": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+  "checkout_head_before": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+  "checkout_head_after": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+  "checkout_head_unchanged": true
+}

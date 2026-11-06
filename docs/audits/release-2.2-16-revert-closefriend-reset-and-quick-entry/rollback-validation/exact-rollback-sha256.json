@@ -1,0 +1,38 @@
+[
+  {
+    "file": "Controllers/CSCloseFriendReset.h",
+    "baseline_2_2_15_sha256": "5b41d337226c46a5a51bcb612d5a3dcd73e7c42fcbaa7bdaa062c6fa29be4a62",
+    "baseline_2_2_14_sha256": "ef63c7a60a1563c9806ba95328ac28d17f4281b5e6f64ec8a5ca28a67aca04f7",
+    "exact_rollback_sha256": "ef63c7a60a1563c9806ba95328ac28d17f4281b5e6f64ec8a5ca28a67aca04f7"
+  },
+  {
+    "file": "Controllers/CSCloseFriendReset.m",
+    "baseline_2_2_15_sha256": "323c577c74c0972ca9a25bdd2e85faec461c14779a2aee338f792b7f82907f4c",
+    "baseline_2_2_14_sha256": "57cec6a01ec95d881cb188d2484aa35e8b7bf82ae96b0e3aa42829aca339456a",
+    "exact_rollback_sha256": "57cec6a01ec95d881cb188d2484aa35e8b7bf82ae96b0e3aa42829aca339456a"
+  },
+  {
+    "file": "Controllers/CSCloseFriendRuntime.h",
+    "baseline_2_2_15_sha256": "d42b649e88a8f680a8dc5803b93b7e31a006e95f7240fae4bc665109732a830d",
+    "baseline_2_2_14_sha256": "399a386dd7912f8671e2c06c44ce21dd28d77eadcead05d0cd67513d69bce1f6",
+    "exact_rollback_sha256": "399a386dd7912f8671e2c06c44ce21dd28d77eadcead05d0cd67513d69bce1f6"
+  },
+  {
+    "file": "Controllers/CSCloseFriendRuntime.m",
+    "baseline_2_2_15_sha256": "413898575ff4c3ec45db34b08c6359e1484be1be442740e08671632444002bc3",
+    "baseline_2_2_14_sha256": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829",
+    "exact_rollback_sha256": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829"
+  },
+  {
+    "file": "Controllers/CSCloseFriendManager.m",
+    "baseline_2_2_15_sha256": "a290c21c125dbe12ed771537e5189330a691a257c1cb9253a11522674005d214",
+    "baseline_2_2_14_sha256": "8292cb7754fbb5a3c7c29238766eb0346c87f4bec06d70753b455e9dfa168915",
+    "exact_rollback_sha256": "8292cb7754fbb5a3c7c29238766eb0346c87f4bec06d70753b455e9dfa168915"
+  },
+  {
+    "file": "Controllers/CSCloseFriendBridge.m",
+    "baseline_2_2_15_sha256": "de13dfe44f00105dd46e5510e55a00e48ae849ba5a816e6e3cb041c5e51535d3",
+    "baseline_2_2_14_sha256": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf",
+    "exact_rollback_sha256": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf"
+  }
+]

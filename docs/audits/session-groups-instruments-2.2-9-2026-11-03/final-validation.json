@@ -1,0 +1,26 @@
+{
+  "created_at_utc": "2026-11-03T08:23:13.262852+00:00",
+  "formal_scenarios": 4,
+  "all_formal_scenarios_analyzed": true,
+  "no_pending_formal_scenarios": true,
+  "readme_sha256": "a8a4eda6d1ccb96e418f99b5e18fa11ff2cc2b6c093cc02d45f563b00aba0ed6",
+  "readme_matches_independent_review_hash": true,
+  "nonblocking_wording_suggestion_corrected": "Requested recording limits distinguished from actual TOC durations.",
+  "independent_checks": {
+    "formal_window_assertions": 80,
+    "old_baseline_assertions": 48,
+    "primary_value_crosschecks": 52,
+    "comparison_final_checks": 78,
+    "note": "These checks overlap; counts are not summed as independent experiments."
+  },
+  "environment_preserved": true,
+  "old_baseline_preserved": true,
+  "frozen_packages_preserved": true,
+  "no_task_recorders_remaining": true,
+  "unavailable_metrics": [
+    "Native model per-round computation time",
+    "Actual main table refresh/reload counts",
+    "WeChat-specific frames in current ALL captures",
+    "Plugin-exclusive CPU and observation overhead"
+  ]
+}

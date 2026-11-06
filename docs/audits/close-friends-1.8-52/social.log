@@ -1,3 +1,0 @@
-Social routes: all native Moments lifecycle calls preserved without page unlock covers
-Timeline presentation: core cases passed (native refresh, display mapping, offscreen reveal, lifecycle deduplication, no layout/reload hooks, stale accounts)
-Close-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, locked publishing candidates and hidden-selection preservation, stale native render rejection, completed-picker authorization and reveal/relock/account transitions passed

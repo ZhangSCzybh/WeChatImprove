@@ -1,3 +1,4 @@
+#import "CSSettingsTableViewController.h"
 //
 // CSMessageGestureSettingsViewController.h
 // 消息手势设置界面
@@ -7,7 +8,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CSMessageGestureSettingsViewController : UITableViewController
+@interface CSMessageGestureSettingsViewController : CSSettingsTableViewController
 
 @end
 

@@ -1,5 +1,0 @@
-PASS: 235148 message merge/navigation checks
-/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/MessageMergeAdapterTests.m:349:91: error: assigning retained object to weak property; object will be released after assignment [-Werror,-Warc-unsafe-retained-assign]
-  349 |         UITableView *table=[UITableView new];page.table=table;page.view=table;table.window=[UIWindow new];table.bounds=CGRectMake(0,0,320,600);
-      |                                                                                           ^~~~~~~~~~~~~~~
-1 error generated.

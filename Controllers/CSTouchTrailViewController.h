@@ -1,6 +1,7 @@
+#import "CSSettingsTableViewController.h"
 #import <UIKit/UIKit.h>
 
-@interface CSTouchTrailViewController : UITableViewController
+@interface CSTouchTrailViewController : CSSettingsTableViewController
 
 /**
  * 检查并尝试恢复自定义图片路径

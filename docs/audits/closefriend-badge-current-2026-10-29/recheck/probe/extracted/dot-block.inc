@@ -1,1 +1,0 @@
-^(id owner,unsigned long long index){NSNumber *value=ChatTab(owner,(NSUInteger)index)?[CSGroupListAdapter closeFriendAlertBadgeCount]:nil;if(value && !value.unsignedLongLongValue)return;((void(*)(id,SEL,unsigned long long))dot)(owner,NSSelectorFromString(@"showRedDotOnTabBarItemAtIndex:"),index);}

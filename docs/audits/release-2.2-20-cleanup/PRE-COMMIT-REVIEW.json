@@ -1,0 +1,26 @@
+{
+  "scope": "Accumulated 2.2-13 through 2.2-20 release changes and docs cleanup",
+  "branch": "main",
+  "expected_parent": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+  "remote": "https://github.com/ZhangSCzybh/WeChatImprove.git",
+  "staged_status_counts_without_rename_inference": {
+    "D": 6620,
+    "A": 6481,
+    "M": 61
+  },
+  "test_assertions_or_sources_changed": false,
+  "test_index_changes_only_finder_metadata_removal": true,
+  "inherited_gate": {
+    "script_count": 100,
+    "passed": 82,
+    "failed": 18,
+    "runs": 100,
+    "failures": 18,
+    "gate_status": "waived_by_user_explicit_authorization; 18 baseline failures accepted for 2.2-19 by continued waiver"
+  },
+  "fresh_regression_failed_tasks": 0,
+  "new_failures_outside_waiver": 0,
+  "credential_fixture_review": "Seven mobileprovision files are documented synthetic account-signature fixtures; no real private keys.",
+  "files_over_github_100MiB_limit": [],
+  "authorization": "User: 清理调试和无用代码、docs，编译打包2.2-20，最后提交到github"
+}

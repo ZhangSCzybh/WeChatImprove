@@ -1,8 +1,0 @@
-Close-friend sessions: 85 checks, 0 failures
-FAIL: neutral title/summary share a left edge and full available width, retaining native vertical spacing
-FAIL: complete folded title including full-width brackets fits measured glyphs and cannot use ellipsis
-FAIL: folded summary is left-aligned at the title start, not centered in the native digest slot
-FAIL: native relayout/theme updates neutral summary geometry and color without another cover
-FAIL: narrow card scales the entire folded title to fit instead of truncating full-width brackets
-FAIL: widening a reused folded item restores full text width and normal font scale
-Close-friend session presentation: 36 checks, 6 failures

@@ -1,2 +1,0 @@
-PASS: 235148 message merge/navigation checks
-FAIL line 435: CSMessageMergeRowHeight(page,table,path,55)==compact

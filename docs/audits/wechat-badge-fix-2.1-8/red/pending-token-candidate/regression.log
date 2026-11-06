@@ -1,6 +1,0 @@
-Close-friend alerts: 216 focused checks passed (identity, calls, reply, badge, payment policy)
-
---- STDERR ---
-FAIL 252 [pending-new-epoch-does-not-mint-known-restore-token]: Badge(o).hidden
-
-EXIT_CODE=1

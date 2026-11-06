@@ -29,11 +29,20 @@ static NSString *SearchInput(id page,id input) {
     if(![query isKindOfClass:NSString.class]) query=CSCloseFriendRead(page,@"searchBarText");
     return [query isKindOfClass:NSString.class] ? query : @"";
 }
+BOOL CSCFSearchHasMarkedText(id range) {
+    if(!range)return NO;
+    // 8.0.80 passes a UITextRange. A present, empty range is already committed
+    // input; testing only for nil can prevent the password check indefinitely.
+    SEL selector=NSSelectorFromString(@"isEmpty");
+    if(CSCloseFriendMethodMatches(class_getInstanceMethod([range class],selector),"B@:"))
+        return !((BOOL(*)(id,SEL))[range methodForSelector:selector])(range,selector);
+    return YES;
+}
 static BOOL SearchComposing(id page) {
     id textView=CSCloseFriendRead(CSCloseFriendRead(page,@"searchBar"),@"textView");
-    return CSCloseFriendRead(CSCloseFriendRead(page,@"searchTextField"),@"markedTextRange") ||
-        CSCloseFriendRead(textView,@"markedTextRange") ||
-        CSCloseFriendRead(CSCloseFriendRead(textView,@"textView"),@"markedTextRange");
+    return CSCFSearchHasMarkedText(CSCloseFriendRead(CSCloseFriendRead(page,@"searchTextField"),@"markedTextRange")) ||
+        CSCFSearchHasMarkedText(CSCloseFriendRead(textView,@"markedTextRange")) ||
+        CSCFSearchHasMarkedText(CSCloseFriendRead(CSCloseFriendRead(textView,@"textView"),@"markedTextRange"));
 }
 static void SearchSetEmptyPresentation(id page,BOOL empty) {
     SEL selector=NSSelectorFromString(@"updateViewHideStates:");

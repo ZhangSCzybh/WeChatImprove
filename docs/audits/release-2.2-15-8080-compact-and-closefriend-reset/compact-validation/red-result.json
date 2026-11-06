@@ -1,0 +1,71 @@
+{
+  "phase": "red",
+  "production_source_root": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14",
+  "source_sha256": {
+    "CSMessageMergePolicy.m": "2bcd7122f9f70791a499553672c63fd010057f0885ceed893e91ea066d7bdd44",
+    "CSMessageMergeAdapter.m": "7012e389b11f20b38f2763f2f4e88e6b2c6cdde82d208df7b6c73bba7a329811",
+    "CSRevokeReference.m": "ec7fc7246d6315d1045d0933e2a97af99d4bf80af18b8c7679999739f990b0ea",
+    "CSChatNativeBridge.m": "9048fa7c8ec2c62295c7ab86beadd5922c5b0cff7d5d776f8f7d6bb67b605362",
+    "CSMessageNavigation.m": "c822176151c6d95fd579c8b2101ed3ff0b1dcccc3da168f1dd0ad84b5f42308d",
+    "CSMessageTimeLayout.m": "7c0b8876e9d320ddd1409aa88316f0731010c98d79681107e12daab834222745",
+    "CSBubbleStylePolicy.m": "4239b20eb1b7d3374418391141cf8011d83f305714690b43ecb53d51dad03419",
+    "CSBubbleStyleAdapter.m": "6e3b009c6d8d8c8869b8f410acde5119c044a40434b706d09562167c878360a8",
+    "CSBubbleTextColors.m": "4f23a302f87a0335a362d77806ecf09c73db7335d9b0008d985459808448ef40"
+  },
+  "source_unchanged_during_run": true,
+  "test_sha256": "5fc2f2a31110474ecc8f5e500a3f710b991f5ecd8755c73c5edca11a320d3d35",
+  "command": [
+    "xcrun",
+    "--sdk",
+    "macosx",
+    "clang",
+    "-DCS_MERGE_BUBBLE_INTEGRATION=1",
+    "-fobjc-arc",
+    "-fblocks",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-unused-parameter",
+    "-framework",
+    "Foundation",
+    "-framework",
+    "CoreGraphics",
+    "-framework",
+    "CoreFoundation",
+    "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/compact-validation/fixtures/MergeBubbleUIKit",
+    "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/compact-validation/fixtures/MessageUIKit",
+    "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/compact-validation/fixtures/MessageUIKit/MessageUIKit.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/compact-validation/fixtures/MessageUIKit/DisplayLink.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/compact-validation/fixtures/BubbleUIKit/BubbleUIKit-production.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSMessageMergePolicy.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSMessageMergeAdapter.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSRevokeReference.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSChatNativeBridge.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSMessageNavigation.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSMessageTimeLayout.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSBubbleStylePolicy.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSBubbleStyleAdapter.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSBubbleTextColors.m",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/compact-validation/Native8080CompactTests.m",
+    "-o",
+    "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2215-native-contract-gxfh2fkp/Contract.app/Contents/MacOS/contract"
+  ],
+  "runs": [
+    {
+      "version": "8.0.80",
+      "exit_code": 1,
+      "accepted": true,
+      "log": "red-8.0.80.log",
+      "summary": "FAIL: 305 checks, 48 failures; actual production merge/bubble version gates, no CS_BUBBLE_TESTING/CS_MERGE_TESTING"
+    },
+    {
+      "version": "8.0.80.34",
+      "exit_code": 1,
+      "accepted": true,
+      "log": "red-8.0.80.34.log",
+      "summary": "FAIL: 305 checks, 48 failures; actual production merge/bubble version gates, no CS_BUBBLE_TESTING/CS_MERGE_TESTING"
+    }
+  ],
+  "scope": "Host macOS Foundation execution; actual production adapters and original version gates, no CS_MERGE_TESTING or CS_BUBBLE_TESTING. UIKit/native classes and 8+38+9 geometry are controlled doubles; no actual phone or IPA process was run."
+}

@@ -1,6 +1,0 @@
-{
-  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
-  "machine": "arm64",
-  "hardware": "Apple M4",
-  "clang": "Apple clang version 21.0.0 (clang-2100.4.1.1)"
-}

@@ -1,0 +1,2 @@
+- (BOOL)authorized { return !CSCloseFriendCurrentSnapshot().blocked && CSCloseFriendManager.sharedManager.runtime.isAuthorized; }
+- (void)save:(NSDictionary *)profile { NSError *error=nil; if(!CSCloseFriendUpdateCurrentProfile(profile,&error))[self showError:error]; [self.tableView reloadData]; }

@@ -1,9 +1,0 @@
-{
-  "command": "python3 docs/audits/close-friends-1.8-45/verify-search-prefix-screenshot.py",
-  "exit_code": 0,
-  "output": "Screenshot regression: late unlock placeholders, web entry and native suggestions remain absent while typing\nSearch input: prefix isolation, full unlock, installed submit/delay/footer hooks, IME, voice and account boundaries passed\nClose-friend contacts: projection/source/tag preservation, stale forwarding, profile action guards and native-reuse regressions passed\n",
-  "scope": "Supplemental screenshot regression: synthetic two-character input and late cached gate/web/suggestion rows; production adapter and hooks compiled from the shipped source.",
-  "source_modified": false,
-  "package_sha256": "ef40c8be07eb219218c716e20ef1772fa489f723cf1a9f85a8853e9cf1580a19",
-  "device_validation": false
-}

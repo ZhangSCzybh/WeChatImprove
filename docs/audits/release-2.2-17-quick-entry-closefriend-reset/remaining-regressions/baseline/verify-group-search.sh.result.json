@@ -1,0 +1,25 @@
+{
+  "script": "verify-group-search.sh",
+  "label": "baseline",
+  "command": [
+    "bash",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture/Tests/verify-group-search.sh"
+  ],
+  "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture",
+  "exit_code": 1,
+  "timed_out": false,
+  "elapsed_seconds": 0.587,
+  "script_sha256": "446a6d370957ddf3e9018ee5462600fa57396184f10504dae51828da32307727",
+  "log": "baseline/verify-group-search.sh.log",
+  "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-igos9hi3",
+  "temporary_env": {
+    "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-igos9hi3/",
+    "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-igos9hi3/_THEOS_LOCAL_DATA_DIR",
+    "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-igos9hi3/THEOS_BUILD_DIR",
+    "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-igos9hi3/THEOS_PACKAGE_DIR",
+    "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline/verify-group-search.sh.first-frame-provenance.json",
+    "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline/verify-group-search.sh.admission-provenance.json"
+  },
+  "production_manifest": "production-before.json",
+  "fixtures_manifest": "fixtures-before.json"
+}

@@ -1,0 +1,22 @@
+{
+  "CSAIConnectionEditor": {
+    "source": "Controllers/CSAIReplySettingsViewController.m",
+    "method": "- (BOOL)hidesBottomBarWhenPushed { return YES; }",
+    "baseline_fallback": null
+  },
+  "CSAIPresetEditor": {
+    "source": "Controllers/CSAIReplySettingsViewController.m",
+    "method": "- (BOOL)hidesBottomBarWhenPushed { return YES; }",
+    "baseline_fallback": null
+  },
+  "CSScheduledTaskTextEditor": {
+    "source": "Controllers/CSScheduledTaskSettingsViewController.m",
+    "method": "- (BOOL)hidesBottomBarWhenPushed { return YES; }",
+    "baseline_fallback": null
+  },
+  "CSScheduledTaskTimeEditor": {
+    "source": "Controllers/CSScheduledTaskSettingsViewController.m",
+    "method": "- (BOOL)hidesBottomBarWhenPushed { return YES; }",
+    "baseline_fallback": null
+  }
+}

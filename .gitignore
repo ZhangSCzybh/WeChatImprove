@@ -1,0 +1,11 @@
+.DS_Store
+__pycache__/
+*.pyc
+.theos/
+
+# Local recordings and reproducible audit build caches belong in the local archive.
+docs/audits/**/*.trace/
+docs/audits/**/baseline-*/HeadersFile/
+docs/audits/**/build/
+docs/audits/**/.build/
+docs/audits/**/fixture-project/

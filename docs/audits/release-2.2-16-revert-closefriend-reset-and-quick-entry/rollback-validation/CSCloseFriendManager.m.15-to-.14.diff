@@ -1,0 +1,95 @@
+--- 2.2-15/CSCloseFriendManager.m
++++ 2.2-14/CSCloseFriendManager.m
+@@ -100,9 +100,6 @@
+         _runtime.resetStorage=^BOOL(NSString *account,BOOL begin,NSError **error){
+             return begin ? [reset beginResetForAccountID:account error:error] : [reset resumeResetForAccountID:account error:error];
+         };
+-        _runtime.credentialResetStorage=^BOOL(NSString *account,NSError **error){ return [reset beginCredentialResetForAccountID:account error:error]; };
+-        _runtime.credentialResetSetupAllowed=^BOOL(NSString *account,NSError **error){ return [reset requiresPasswordSetupForAccountID:account error:error]; };
+-        _runtime.finishCredentialResetSetup=^BOOL(NSString *account,NSError **error){ return [reset completeCredentialSetupForAccountID:account error:error]; };
+         __weak typeof(self) weakSelf=self;
+         _runtime.didChange=^{ [weakSelf schedulePolicyRefresh]; };
+     } return self;
+@@ -261,19 +258,11 @@
+ - (void)passwordPrompt:(UIViewController *)presenter token:(NSDictionary *)token setup:(BOOL)setup completion:(void (^)(BOOL))completion {
+     NSString *reason=self.passwordFallbackReason; self.passwordFallbackReason=nil;
+     NSString *message=setup?@"设置至少 6 位数字或 8 个字符的密码后才可启用（最长 128 个字符）。请妥善保存；无法通过普通备份恢复凭据。":@"验证后临时显示密友。后台、锁定或账号切换会立即失效。";
+-    if(setup && self.runtime.requiresPasswordSetup)message=[@"原密友、密群名单和保护选项已保留，名单仍隐藏。设置新密码后才可查看。\n" stringByAppendingString:message];
+     if(reason.length && !setup)message=[NSString stringWithFormat:@"%@\n%@",reason,message];
+     UIAlertController *alert=[UIAlertController alertControllerWithTitle:setup?@"设置密友密码":@"验证密友密码" message:message preferredStyle:UIAlertControllerStyleAlert];
+     [alert addTextFieldWithConfigurationHandler:^(UITextField *field){ field.secureTextEntry=YES; field.placeholder=@"密码"; field.textContentType=setup?UITextContentTypeNewPassword:UITextContentTypePassword; }];
+     if(setup)[alert addTextFieldWithConfigurationHandler:^(UITextField *field){ field.secureTextEntry=YES; field.placeholder=@"再次输入密码"; }];
+     [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action){ self.authenticating=NO; if(completion)completion(NO); }]];
+-    if(!setup) {
+-        __weak UIAlertController *weakAlert=alert;
+-        [alert addAction:[UIAlertAction actionWithTitle:@"忘记密码" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){
+-            self.authenticating=NO;
+-            [self finishResetAlert:weakAlert presenter:presenter completion:^{ [self forgotPasswordFrom:presenter token:token completion:completion]; }];
+-        }]];
+-    }
+     [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){
+         self.authenticating=NO; __block NSError *error=nil; __block BOOL ok=NO;
+         if([self validateToken:token]) {
+@@ -385,9 +374,6 @@
+ }
+ - (BOOL)settingsEntryVisible {
+     [self start]; [self refreshAccount];
+-    // A confirmed recovery must remain reachable even when its preserved options
+-    // hide this entry. The original option takes effect again after setup.
+-    if(self.runtime.requiresPasswordSetup)return YES;
+     return [self.entryState isEntryVisibleForSnapshot:CSCloseFriendCurrentSnapshot() hasCredential:self.runtime.hasCredential];
+ }
+ - (NSDictionary *)settingsEntryDiscoveryToken {
+@@ -423,52 +409,6 @@
+     return !self.backgroundCoverRequired && UIApplication.sharedApplication.applicationState==UIApplicationStateActive &&
+         presenter.view.window && [self validateToken:token] && self.runtime.isAuthorized &&
+         (!presenter.navigationController || presenter.navigationController.topViewController==presenter);
+-}
+-- (BOOL)canRecoverCredentialFrom:(UIViewController *)presenter token:(NSDictionary *)token {
+-    return !self.backgroundCoverRequired && UIApplication.sharedApplication.applicationState==UIApplicationStateActive &&
+-        presenter.view.window && [self validateToken:token] &&
+-        (!presenter.navigationController || presenter.navigationController.topViewController==presenter);
+-}
+-- (void)forgotPasswordFrom:(UIViewController *)presenter token:(NSDictionary *)token completion:(void (^)(BOOL))completion {
+-    if(![self canRecoverCredentialFrom:presenter token:token] || presenter.presentedViewController || self.authenticating) { if(completion)completion(NO); return; }
+-    NSString *message=[NSString stringWithFormat:@"请输入当前账号标识：%@\n这只是防误触确认，不是身份验证。下一步还需确认重置风险。",token[@"account"]];
+-    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"确认当前账号" message:message preferredStyle:UIAlertControllerStyleAlert];
+-    [alert addTextFieldWithConfigurationHandler:^(UITextField *field){ field.placeholder=@"当前账号标识"; field.autocorrectionType=UITextAutocorrectionTypeNo; field.autocapitalizationType=UITextAutocapitalizationTypeNone; }];
+-    __weak UIAlertController *weakAlert=alert;
+-    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action){ if(completion)completion(NO); }]];
+-    [alert addAction:[UIAlertAction actionWithTitle:@"下一步" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){
+-        __block NSDictionary *proof=nil; __block NSError *error=nil;
+-        if([self canRecoverCredentialFrom:presenter token:token])CSBackupPerformAtAccountEpoch([token[@"epoch"] unsignedIntegerValue],^{
+-            if(!CSBackupAccountIsSuspended())proof=[self.runtime prepareCredentialResetWithAccountConfirmation:weakAlert.textFields.firstObject.text?:@"" token:token error:&error];
+-        });
+-        weakAlert.textFields.firstObject.text=@"";
+-        [self finishResetAlert:weakAlert presenter:presenter completion:^{
+-            if(proof)[self confirmCredentialResetFrom:presenter token:proof completion:completion];
+-            else { if(completion)completion(NO); if(presenter.view.window)[self message:error.localizedDescription?:@"确认已失效，未重置任何数据。" presenter:presenter]; }
+-        }];
+-    }]];
+-    [presenter presentViewController:alert animated:YES completion:nil];
+-}
+-- (void)confirmCredentialResetFrom:(UIViewController *)presenter token:(NSDictionary *)token completion:(void (^)(BOOL))completion {
+-    if(![self canRecoverCredentialFrom:presenter token:token] || presenter.presentedViewController) { [self.runtime cancelResetWithToken:token]; if(completion)completion(NO); return; }
+-    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"仅重置密友凭据？"
+-        message:@"清除：旧密友密码、临时解锁态、密码错误与锁定计数、生物识别安全记录。\n保留：密友和密群名单、全部保护选项、名单加密数据与密钥、入口发现记录。名单继续按原保护选项隐藏，需重新设置密码才能查看。\n不会改动微信好友、聊天记录和其他账号。\n风险：此操作无需旧密码。能操作这台已解锁设备的人，也可重置后设置新密码查看密友。账号标识确认不能阻止这种访问。"
+-        preferredStyle:UIAlertControllerStyleAlert];
+-    __weak UIAlertController *weakAlert=alert;
+-    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action){ [self.runtime cancelResetWithToken:token]; if(completion)completion(NO); }]];
+-    [alert addAction:[UIAlertAction actionWithTitle:@"确认重置凭据" style:UIAlertActionStyleDestructive handler:^(__unused UIAlertAction *action){
+-        __block BOOL ok=NO; __block NSError *error=nil; __block NSDictionary *setupToken=nil;
+-        if([self canRecoverCredentialFrom:presenter token:token])CSBackupPerformAtAccountEpoch([token[@"epoch"] unsignedIntegerValue],^{
+-            if(!CSBackupAccountIsSuspended() && [self.runtime isTokenCurrent:token]) { ok=[self.runtime resetCredentialWithToken:token error:&error]; if(ok)setupToken=self.runtime.authenticationToken; }
+-        });
+-        [self.runtime cancelResetWithToken:token]; self.lastRevealed=NO;
+-        [self flushPolicyRefresh];
+-        [self finishResetAlert:weakAlert presenter:presenter completion:^{
+-            if(ok && !presenter.presentedViewController && [self canRecoverCredentialFrom:presenter token:setupToken] && self.runtime.requiresPasswordSetup) { self.authenticating=YES; [self passwordPrompt:presenter token:setupToken setup:YES completion:completion]; }
+-            else { if(completion)completion(NO); if(presenter.view.window)[self message:error.localizedDescription?:(ok?@"凭据已重置，名单仍隐藏。请回到刚重置的账号重新设置密友密码。":@"重置已取消，当前账号或页面已失效。") presenter:presenter]; }
+-        }];
+-    }]];
+-    [presenter presentViewController:alert animated:YES completion:nil];
+ }
+ - (void)finishResetAlert:(UIAlertController *)alert presenter:(UIViewController *)presenter completion:(void (^)(void))completion {
+     // UIAlertAction may already be dismissing its alert. Never dismiss the settings

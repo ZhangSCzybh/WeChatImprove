@@ -1,4 +1,0 @@
-Backup bootstrap: 36 checks passed
-Traceback (most recent call last):
-  File "<stdin>", line 46, in <module>
-AssertionError: AIReplyHooks.xm: missing guarded init block

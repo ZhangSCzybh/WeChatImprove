@@ -1,5 +1,0 @@
-Reverse production.patch: exit 0
-Restored 3 existing Tests from exact SHA-matched git blobs.
-Removed 3 new 2.1-7 Tests after audit snapshot.
-Delivered 2.1-6: 602/602 SHA matches; no extra or missing source/test paths.
-Version declarations: 2.1-6.

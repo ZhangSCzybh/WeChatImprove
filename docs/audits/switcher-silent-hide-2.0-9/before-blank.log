@@ -1,3 +1,0 @@
-FAIL: switcher lock must keep ordinary list and header visible before returning
-FAIL: switcher lock must finish safe publication without foreground or another runloop
-Switcher blank boundary: 2 checks, 2 failures

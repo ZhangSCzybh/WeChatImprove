@@ -1,0 +1,26 @@
+{
+  "cause": "Parallel make -j4 interleaves architecture compilation markers and diagnostics; last-compile attribution assigned one unchanged warning to the other CPU. No new diagnostic text or total multiplicity.",
+  "events": [
+    {
+      "line": 525,
+      "text": "==> Compiling Hooks/RedEnvelopHooks.xm (arm64e)…"
+    },
+    {
+      "line": 526,
+      "text": "==> Compiling Hooks/RedEnvelopHooks.xm (arm64)…"
+    },
+    {
+      "line": 527,
+      "text": "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]"
+    },
+    {
+      "line": 533,
+      "text": "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]"
+    }
+  ],
+  "baseline_frozen_sha256": "eaa79e2454c3abd949b6dfc5f659d7c8021db701b0e4be9f007f4e7c619837c2",
+  "current_sha256": "eaa79e2454c3abd949b6dfc5f659d7c8021db701b0e4be9f007f4e7c619837c2",
+  "production_file_unchanged": true,
+  "delivery_created": false,
+  "repair": "Retain the original evidence and repeat in a fresh evidence directory with make -j1 per scheme; retain exact architecture + source + full diagnostic + multiplicity comparison."
+}

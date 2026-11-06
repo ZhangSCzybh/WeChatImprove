@@ -1,0 +1,14 @@
+current search-legacy 0 Search: zero unlock placeholders, native live suggestions/web/history/submit, full unlock, late callbacks and IME passed
+Close-friend contacts: projection/source/tag preservation, stale forwarding, profile action guards and native-reuse regressions passed
+CloseFriendContactTests: 108 checks passed
+current search-8.0.80 0 Search: zero unlock placeholders, native live suggestions/web/history/submit, full unlock, late callbacks and IME passed
+Close-friend contacts: projection/source/tag preservation, stale forwarding, profile action guards and native-reuse regressions passed
+CloseFriendContactTests: 109 checks passed
+current search-8.0.80-voice 0 Search: zero unlock placeholders, native live suggestions/web/history/submit, full unlock, late callbacks and IME passed
+Close-friend contacts: projection/source/tag preservation, stale forwarding, profile action guards and native-reuse regressions passed
+CloseFriendContactTests: 108 checks passed
+current recovery 0 CloseFriendRecoveryTests: 32 checks passed
+baseline search-legacy 1 FAIL: present empty marked range unlocks before native edit dispatch
+baseline search-8.0.80 1 FAIL: present empty marked range unlocks before native edit dispatch
+baseline search-8.0.80-voice 1 FAIL: full voice password is consumed before native source-enum input dispatch
+baseline recovery 1 FAIL: native homepage title receives the hold even when custom bar is outside UINavigationBar

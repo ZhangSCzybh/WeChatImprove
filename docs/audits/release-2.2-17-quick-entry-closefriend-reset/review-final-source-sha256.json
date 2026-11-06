@@ -1,0 +1,61 @@
+{
+  "Controllers/CSCloseFriendReset.h": {
+    "sha256": "ef63c7a60a1563c9806ba95328ac28d17f4281b5e6f64ec8a5ca28a67aca04f7",
+    "baseline_sha256": "ef63c7a60a1563c9806ba95328ac28d17f4281b5e6f64ec8a5ca28a67aca04f7",
+    "equals_baseline": true
+  },
+  "Controllers/CSCloseFriendReset.m": {
+    "sha256": "57da5d4a4558fee6d192290eef19c6d22c55999416c8ba21c61dd478bf5be39b",
+    "baseline_sha256": "57da5d4a4558fee6d192290eef19c6d22c55999416c8ba21c61dd478bf5be39b",
+    "equals_baseline": true
+  },
+  "Controllers/CSCloseFriendEntryState.m": {
+    "sha256": "75011e8b2b81fc7e482584bb5776dbec8ba8b94baf48ae5f6a60b92c87d995ca",
+    "baseline_sha256": "75011e8b2b81fc7e482584bb5776dbec8ba8b94baf48ae5f6a60b92c87d995ca",
+    "equals_baseline": true
+  },
+  "Controllers/CSCloseFriendBridge.m": {
+    "sha256": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf",
+    "baseline_sha256": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf",
+    "equals_baseline": true
+  },
+  "Controllers/CSCloseFriendPolicy.m": {
+    "sha256": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+    "baseline_sha256": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+    "equals_baseline": true
+  },
+  "Controllers/CSCloseFriendRuntime.h": {
+    "sha256": "5fc06fcffa68bd86ce0f38eaac1855090f763650129f202e47a9cb3011c7cc23",
+    "baseline_sha256": "9bc00628b7c7c662a60f7e4c2ca7614aa7165ca6b1c8778edb90556d9c1ddc4d",
+    "equals_baseline": false
+  },
+  "Controllers/CSCloseFriendRuntime.m": {
+    "sha256": "92d54fe8182546fff0b3e72a302a5126ed486a135c0fbdb6e46b0746e01b7e95",
+    "baseline_sha256": "35de29d20061b58ae320cc824bd5526824b0cfc2672ba222734a1ea7a34a53f7",
+    "equals_baseline": false
+  },
+  "Controllers/CSCloseFriendManager.h": {
+    "sha256": "f2cddaf8320735b6f6c5fa0f96035194ca1b0a1fbf47fcfb426f87b0f34ef0c4",
+    "baseline_sha256": "acb17fb492c0d2aa389240cb74caae83ef213649f6230a787f2c2b4cf79549e9",
+    "equals_baseline": false
+  },
+  "Controllers/CSCloseFriendManager.m": {
+    "sha256": "916198133c42c6c0e02b30f2fa67c7076d658b133ce849405ad59f23026541c7",
+    "baseline_sha256": "4ad68df9b623f8797930b7c37ee15395240c10d3356c4a3d2db19b37a32324a2",
+    "equals_baseline": false
+  },
+  "Controllers/CSCloseFriendSettingsViewController.m": {
+    "sha256": "60c19468d4c9910d7aeb47f4415750c227a413c592f814bfda525200360548c8",
+    "baseline_sha256": "da567f1047a64a8bdabef42220aa6e4b1f641e50c80d7fcb1d0a88950e8609e9",
+    "equals_baseline": false
+  },
+  "Controllers/CSCustomViewController.m": {
+    "sha256": "6f602715e9cf5863798accf429f0d02369d33c4214a22aca0d7b015c16519cd7",
+    "baseline_sha256": "4fe22c3775424b65e204ba5eb5951024329afbdbc1d4924da593919e26859008",
+    "equals_baseline": false
+  },
+  "manager_homepage_tail": {
+    "equals_baseline": true,
+    "sha256": "734d3e2a02e5a1d82424056571fc4a391f4d2a5c49bdd7c51d7771ccccbe54ba"
+  }
+}

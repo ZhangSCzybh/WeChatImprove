@@ -16,6 +16,7 @@
 - (BOOL)discoverSettingsEntryWithToken:(NSDictionary *)token;
 - (void)changePasswordFrom:(UIViewController *)presenter;
 - (void)resetFrom:(UIViewController *)presenter completion:(void (^)(BOOL success))completion;
+- (void)resetFrom:(UIViewController *)presenter settingsToken:(NSDictionary *)token completion:(void (^)(BOOL success))completion;
 - (NSDictionary *)capabilities;
 - (void)recordCapability:(NSString *)name available:(BOOL)available;
 - (void)attachRecoveryGestureTo:(UIViewController *)controller;

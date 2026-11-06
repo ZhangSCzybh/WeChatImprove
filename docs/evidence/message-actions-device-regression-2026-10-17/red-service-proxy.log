@@ -1,5 +1,0 @@
-Production file reverted ONLY in isolated temporary harness: CSMessageNativeActionAdapter.m at 6edeedd1
-Command: bash Tests/verify-message-actions-execution.sh
-Exit status: 1
-production admission: account=nil context=nil menus=0 gesture=no
-FAIL line 259: [environment.currentAccountID isEqual:@"me"]

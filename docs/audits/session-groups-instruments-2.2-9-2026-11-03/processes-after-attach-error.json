@@ -1,0 +1,104 @@
+{
+  "error" : {
+    "code" : -1,
+    "domain" : "com.apple.dt.CoreDeviceError",
+    "userInfo" : {
+      "Backtrace" : {
+        "array" : [
+          {
+            "string" : "0   CoreFoundation                      0x0000000185a3a8c0 __exceptionPreprocess + 176"
+          },
+          {
+            "string" : "1   libobjc.A.dylib                     0x000000018549860c objc_exception_throw + 88"
+          },
+          {
+            "string" : "2   Foundation                          0x00000001870d5a60 -[NSInPredicateOperator performPrimitiveOperationUsingObject:andObject:] + 452"
+          },
+          {
+            "string" : "3   Foundation                          0x00000001870d4038 -[NSComparisonPredicate evaluateWithObject:substitutionVariables:] + 356"
+          },
+          {
+            "string" : "4   CoreDeviceCLISupport                0x000000010490e2c8 -[NSPredicate(CoreDeviceAdditions) cd_evaluateWithObject:substitutionVariables:error:] + 72"
+          },
+          {
+            "string" : "5   CoreDeviceCLISupport                0x0000000104a09088 _swift_implicitisolationactor_to_executor_cast + 4284"
+          },
+          {
+            "string" : "6   CoreDeviceCLISupport                0x000000010496fe58 __swift_closure_destructor.49 + 27312"
+          },
+          {
+            "string" : "7   CoreDeviceCLISupport                0x0000000104972e28 __swift_closure_destructor.8 + 260"
+          },
+          {
+            "string" : "8   CoreDeviceCLISupport                0x000000010496c990 __swift_closure_destructor.49 + 13800"
+          },
+          {
+            "string" : "9   CoreDeviceCLISupport                0x000000010496e658 __swift_closure_destructor.49 + 21168"
+          },
+          {
+            "string" : "10  CoreDeviceCLISupport                0x000000010496fff8 __swift_closure_destructor.49 + 27728"
+          },
+          {
+            "string" : "11  devicectl                           0x000000010438bac4 __swift_memcpy0_1 + 57656"
+          },
+          {
+            "string" : "12  devicectl                           0x000000010432925d __swift_noop_void_return + 20313"
+          },
+          {
+            "string" : "13  CoreDeviceCLISupport                0x0000000104930cb5 __swift_closure_destructor.15 + 36649"
+          },
+          {
+            "string" : "14  CoreDeviceCLISupport                0x0000000104931179 __swift_closure_destructor.15 + 37869"
+          },
+          {
+            "string" : "15  devicectl                           0x000000010432953d __swift_noop_void_return + 21049"
+          },
+          {
+            "string" : "16  devicectl                           0x0000000104535049 __swift_closure_destructor.15 + 23205"
+          },
+          {
+            "string" : "17  devicectl                           0x000000010432351d async_MainTQ4_ + 1"
+          },
+          {
+            "string" : "18  devicectl                           0x00000001043237c9 async_MainTY6_ + 313"
+          },
+          {
+            "string" : "19  libswift_Concurrency.dylib          0x00000002b2206e69 _ZL22completeTaskAndReleasePN5swift12AsyncContextEPNS_10SwiftErrorE + 1"
+          }
+        ]
+      },
+      "NSLocalizedDescription" : {
+        "string" : "An error occurred evaluating a value using the specified filter."
+      },
+      "NSLocalizedFailureReason" : {
+        "string" : "Can't use in/contains operator with collection file:///System/Library/Frameworks/FinanceKit.framework/financed (not a collection)"
+      },
+      "Name" : {
+        "string" : "NSInvalidArgumentException"
+      }
+    }
+  },
+  "errorSignature" : "(com.apple.dt.CoreDeviceError -1)",
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "info",
+      "processes",
+      "--device",
+      "00008120-001064E10E70201E",
+      "--filter",
+      "executable CONTAINS 'WeChat.app/WeChat'",
+      "--json-output",
+      "docs/audits/session-groups-instruments-2.2-9-2026-11-03/processes-after-attach-error.json",
+      "--quiet"
+    ],
+    "commandType" : "devicectl.device.info.processes",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 5,
+    "outcome" : "failed",
+    "version" : "651.32"
+  }
+}

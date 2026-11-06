@@ -1,9 +1,0 @@
-AI native sync observer: 786 checks passed; real production hooks, original ordering/arguments/results, epoch-bound marker, full terminal response, main FIFO idle, rejection/exception/reentry fences
-AI native sync observer ABI rejection create-return-c: 6 checks passed
-AI native sync observer ABI rejection create-argument-Q: 6 checks passed
-AI native sync observer ABI rejection create-argument-count: 6 checks passed
-AI native sync observer ABI rejection return-result-B: 6 checks passed
-AI native sync observer ABI rejection return-event-Q: 6 checks passed
-AI native sync observer ABI rejection handle-result-B: 6 checks passed
-AI native sync observer ABI rejection handle-processed-c: 6 checks passed
-AI native sync observer iOS: arm64 + arm64e source objects compiled

@@ -43,6 +43,10 @@ static BOOL CSResetFail(NSError **error, BOOL pending) {
     if(!CSResetAccount(account))return CSResetFail(error,NO);
     NSError *readError=nil;
     NSData *intent=self.reader(account,@"reset",&readError);
+    if(!readError && [intent isEqual:[@"close-friends-credential-reset-v1" dataUsingEncoding:NSUTF8StringEncoding]]) {
+        self.remover(account,@"reset",NULL);
+        return YES;
+    }
     if(readError || (intent && ![intent isEqual:CSResetIntent()]))return CSResetFail(error,YES);
     return !intent || [self finishResetForAccountID:account error:error];
 }

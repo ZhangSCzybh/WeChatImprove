@@ -1,7 +1,0 @@
-{
-  "Controllers/CSMessageMergeAdapter.m": "a9c0dafd246b920ffd9c278893898d1a9cd832e55549d2f860683e794df719a0",
-  "Controllers/CSMessageMergePolicy.m": "b6d62b2272e0de666b4a3bc1347a94718c36a3fe868ce5b5e2798fe1bdfb2e2c",
-  "Hooks/MessageMergeHooks.xm": "b5eeefa69549dcb1902395105948c319f18a2b0354f8f73d6e935c383d125a4f",
-  "Tests/MessageMergeAdapterTests.m": "3d32519b475967a6c0e4da92fa3c2373ac1e8a2dbe7158c4813ed597ef7cde68",
-  "docs/audits/inbound/scroll-jitter-demo.mp4": "895a12ad95461f88ca9d41a813f7bc4f7e975c267d499351308408c036039658"
-}

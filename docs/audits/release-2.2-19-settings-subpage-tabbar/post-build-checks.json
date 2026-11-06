@@ -1,0 +1,60 @@
+{
+  "working_directory": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.2-19-settings-subpage-tabbar",
+  "checks": [
+    {
+      "command": "shasum -a 256 -c SHA256SUMS",
+      "status": "fulfilled",
+      "value": {
+        "chunk_id": "86a354",
+        "wall_time_seconds": 0.000006209,
+        "exit_code": 0,
+        "original_token_count": 41,
+        "output": "WeChatImprove.dylib: OK\ncom.wechat.improve_2.2-19_iphoneos-arm.deb: OK\ncom.wechat.improve_2.2-19_iphoneos-arm64.deb: OK\ncom.wechat.improve_2.2-19_symbols.zip: OK\n"
+      }
+    },
+    {
+      "command": "dpkg-deb -f com.wechat.improve_2.2-19_iphoneos-arm.deb Version",
+      "status": "fulfilled",
+      "value": {
+        "chunk_id": "35d7c1",
+        "wall_time_seconds": 0.000005542,
+        "exit_code": 0,
+        "original_token_count": 2,
+        "output": "2.2-19\n"
+      }
+    },
+    {
+      "command": "dpkg-deb -f com.wechat.improve_2.2-19_iphoneos-arm64.deb Version",
+      "status": "fulfilled",
+      "value": {
+        "chunk_id": "f7d619",
+        "wall_time_seconds": 0.000008459,
+        "exit_code": 0,
+        "original_token_count": 2,
+        "output": "2.2-19\n"
+      }
+    },
+    {
+      "command": "xcrun lipo -archs WeChatImprove.dylib",
+      "status": "fulfilled",
+      "value": {
+        "chunk_id": "101caf",
+        "wall_time_seconds": 0.000005125,
+        "exit_code": 0,
+        "original_token_count": 4,
+        "output": "arm64 arm64e\n"
+      }
+    },
+    {
+      "command": "shasum -a 256 *",
+      "status": "fulfilled",
+      "value": {
+        "chunk_id": "6f4c2e",
+        "wall_time_seconds": 0.000004584,
+        "exit_code": 0,
+        "original_token_count": 122,
+        "output": "c100fe5329561704510e6a4274f8454b19d1f2fb8d63c2c3e710a0c0007fd469  SHA256SUMS\n5f9079eb8258b082967744b030494e7ff38b07bb3bbb0d882e60396aefcaddb8  WeChatImprove.dylib\nb3fdf283faef4b1fe09d99856e3fd6b229094fcca81f5182d7105ce189c67c13  com.wechat.improve_2.2-19_iphoneos-arm.deb\na058da1d7a563be546d9556079268a0d031828c180f62b053c049c5e0078ce39  com.wechat.improve_2.2-19_iphoneos-arm64.deb\nd7e2321ae154c5aaa59c867df858fb184e7fbb446f92f46e1f11d79cb5aa31e7  com.wechat.improve_2.2-19_symbols.zip\n"
+      }
+    }
+  ]
+}

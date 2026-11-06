@@ -1,0 +1,18 @@
+--- 2.2-18/Controllers/CSScheduledTaskSettingsViewController.m
++++ 2.2-19/Controllers/CSScheduledTaskSettingsViewController.m
+@@ -64,6 +64,7 @@
+ @property(nonatomic,strong) UITextView *textView;
+ @end
+ @implementation CSScheduledTaskTextEditor
++- (BOOL)hidesBottomBarWhenPushed { return YES; }
+ - (void)viewDidLoad {
+     [super viewDidLoad]; self.title=@"消息内容"; self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
+     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStyleDone target:self action:@selector(done)];
+@@ -95,6 +96,7 @@
+ @property(nonatomic,strong) UIDatePicker *picker;
+ @end
+ @implementation CSScheduledTaskTimeEditor
++- (BOOL)hidesBottomBarWhenPushed { return YES; }
+ - (void)viewDidLoad {
+     [super viewDidLoad]; self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
+     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStyleDone target:self action:@selector(done)];

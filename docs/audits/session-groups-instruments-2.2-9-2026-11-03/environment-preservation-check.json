@@ -1,0 +1,9 @@
+{
+  "initial_tracked_deletions": 6892,
+  "current_tracked_deletions": 6892,
+  "deleted_paths_unchanged": true,
+  "new_deleted_count": 0,
+  "restored_deleted_count": 0,
+  "old_baseline_manifest_sha256": "a77455d02b3f7f4c06e521f91250fd86a19597a3433137d9e53cf090272af41f",
+  "final_git_status_source": "final-git-status.z"
+}

@@ -1,5 +1,6 @@
+#import "CSSettingsTableViewController.h"
 #import <UIKit/UIKit.h>
 
-@interface CSListCornerRadiusSettingsViewController : UITableViewController
+@interface CSListCornerRadiusSettingsViewController : CSSettingsTableViewController
 
 @end

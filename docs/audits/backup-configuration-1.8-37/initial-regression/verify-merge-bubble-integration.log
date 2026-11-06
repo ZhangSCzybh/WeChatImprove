@@ -1,2 +1,0 @@
-Unexpected scan: fixture=0 style=1 dark=1 scale=1 outgoing=1 session=group@chatroom avatar=1 quote=0 pass=5 before=1263 after=1269
-FAIL line 363: scans==CSBubbleNativePaddingScanCount

@@ -1,0 +1,222 @@
+{
+  "checkCount" : 43,
+  "checks" : [
+    {
+      "name" : "source XML dictionaries are readable",
+      "passed" : true
+    },
+    {
+      "name" : "production parser preserves complete dictionary: ascii.plist",
+      "passed" : true
+    },
+    {
+      "name" : "production parser preserves complete dictionary: ascii.mobileprovision",
+      "passed" : true
+    },
+    {
+      "name" : "production parser preserves complete dictionary: utf8.plist",
+      "passed" : true
+    },
+    {
+      "name" : "production parser preserves complete dictionary: utf8.mobileprovision",
+      "passed" : true
+    },
+    {
+      "name" : "UTF-8 CMS preserves source field: TeamName",
+      "passed" : true
+    },
+    {
+      "name" : "UTF-8 CMS preserves source field: TeamIdentifier",
+      "passed" : true
+    },
+    {
+      "name" : "UTF-8 CMS preserves source field: CreationDate",
+      "passed" : true
+    },
+    {
+      "name" : "UTF-8 CMS preserves source field: ExpirationDate",
+      "passed" : true
+    },
+    {
+      "name" : "UTF-8 CMS preserves source field: ProvisionedDevices",
+      "passed" : true
+    },
+    {
+      "name" : "UTF-8 CMS preserves source field: Entitlements",
+      "passed" : true
+    },
+    {
+      "name" : "UTF-8 team retains original Chinese text",
+      "passed" : true
+    },
+    {
+      "name" : "profile dates remain NSDate values",
+      "passed" : true
+    },
+    {
+      "name" : "entitlement Boolean remains a property-list Boolean",
+      "passed" : true
+    },
+    {
+      "name" : "unchanged legacy parser baseline reads ASCII CMS",
+      "passed" : true
+    },
+    {
+      "name" : "regression witness: unchanged legacy parser corrupts UTF-8 team",
+      "passed" : true
+    },
+    {
+      "name" : "legacy regression does not imply every field disappeared",
+      "passed" : true
+    },
+    {
+      "name" : "nil input returns nil",
+      "passed" : true
+    },
+    {
+      "name" : "empty input returns nil",
+      "passed" : true
+    },
+    {
+      "name" : "binary input without XML plist returns nil",
+      "passed" : true
+    },
+    {
+      "name" : "missing closing plist marker returns nil",
+      "passed" : true
+    },
+    {
+      "name" : "closing marker before opening marker cannot satisfy parser",
+      "passed" : true
+    },
+    {
+      "name" : "valid array plist is rejected by dictionary root guard",
+      "passed" : true
+    },
+    {
+      "name" : "observed unbalanced XML is rejected by Foundation and production parser",
+      "passed" : true
+    },
+    {
+      "name" : "every binary byte before and after real UTF-8 CMS leaves dictionary unchanged",
+      "passed" : true
+    },
+    {
+      "name" : "existing NUL and high-byte prefix fixture preserves complete ASCII dictionary",
+      "passed" : true
+    },
+    {
+      "name" : "existing CMS truncated before closing XML marker is rejected",
+      "passed" : true
+    },
+    {
+      "name" : "documented boundary: complete XML parses without CMS trailer",
+      "passed" : true
+    },
+    {
+      "name" : "documented boundary: CMS with binary-plist payload is unsupported",
+      "passed" : true
+    },
+    {
+      "name" : "test executable main bundle is the isolated temporary directory",
+      "passed" : true
+    },
+    {
+      "name" : "synthetic CMS written only to isolated bundle",
+      "passed" : true
+    },
+    {
+      "name" : "production setupData retains three sections and existing account\/application rows",
+      "passed" : true
+    },
+    {
+      "name" : "production bundle reader and setupData produce all seven expected signature rows",
+      "passed" : true
+    },
+    {
+      "name" : "valid profile has no diagnostic footer in any section",
+      "passed" : true
+    },
+    {
+      "name" : "remove only synthetic profile to exercise missing-file path",
+      "passed" : true
+    },
+    {
+      "name" : "missing profile retains seven truthful missing-value rows",
+      "passed" : true
+    },
+    {
+      "name" : "missing-file explanation appears only below signature section",
+      "passed" : true
+    },
+    {
+      "name" : "malformed synthetic profile written to isolated bundle",
+      "passed" : true
+    },
+    {
+      "name" : "malformed profile shows seven missing rows and signature-only parse explanation",
+      "passed" : true
+    },
+    {
+      "name" : "non-file synthetic path created only inside isolated bundle",
+      "passed" : true
+    },
+    {
+      "name" : "non-file read error shows signature-only read explanation",
+      "passed" : true
+    },
+    {
+      "name" : "subsequent valid profile clears earlier error message and restores rows",
+      "passed" : true
+    },
+    {
+      "name" : "production certificate classifier checks NSNumber and NSArray before interpreting malformed values",
+      "passed" : true
+    }
+  ],
+  "failureCount" : 0,
+  "observations" : {
+    "fixedUTF8Team" : "合成测试签名团队",
+    "foundationOS" : "Version 27.0 (Build 26A428)",
+    "legacyUTF8Team" : "åææµè¯ç­¾åå¢é",
+    "malformedDirectFoundation" : {
+      "error" : "The data couldn’t be read because it isn’t in the correct format.",
+      "errorCode" : 3840,
+      "returnedValue" : 0
+    },
+    "malformedFooter" : "当前安装包的签名描述文件无法解析，请检查重签时使用的描述文件。",
+    "missingFooter" : "当前安装包未包含签名描述文件，无法显示签名信息。重签时请保留 embedded.mobileprovision。",
+    "readErrorFooter" : "暂时无法读取当前安装包的签名描述文件。",
+    "validSignatureRows" : [
+      {
+        "detail" : "1 台设备",
+        "title" : "允许设备"
+      },
+      {
+        "detail" : "个人证书",
+        "title" : "证书类型"
+      },
+      {
+        "detail" : "合成测试签名团队",
+        "title" : "签名团队"
+      },
+      {
+        "detail" : "SYNTHETIC1",
+        "title" : "团队ID"
+      },
+      {
+        "detail" : "2026-01-01 08:00:00",
+        "title" : "注册时间"
+      },
+      {
+        "detail" : "2027-01-01 08:00:00",
+        "title" : "过期时间"
+      },
+      {
+        "detail" : "0000000000000000000000000000000000000001",
+        "title" : "授权设备 UDID"
+      }
+    ]
+  },
+  "passed" : 1
+}

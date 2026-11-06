@@ -1,0 +1,448 @@
+{
+  "review_source": "release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/safety-test-source-review.md",
+  "script_count": 73,
+  "test_source_count": 95,
+  "all_script_and_test_bytes_match_review": true,
+  "all_bash_syntax_pass": true,
+  "shell": [
+    {
+      "name": "verify-ai-background-sync.sh",
+      "sha256": "b2d551c7261911d2fa9aecc3de2056c0a4661d4d393fb882302d31b16b6d9ca4",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-ai-backup.sh",
+      "sha256": "6d9a56ebf65de9f4b1fcba15feceeab0604cb03f11b26e6859ce7f44f5d6ce55",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-ai-coordinator.sh",
+      "sha256": "a526c113e58d1bb2e18d9ee4339406bd665b068441d73ead910caae927ff141a",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-ai-credentials.sh",
+      "sha256": "67b50a8e296559a87240f6443603cfec731b13e54566f34e616399862a84be7f",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-ai-foundation.sh",
+      "sha256": "03e5e296668f05aa09ff5c8233152ee7dac25e6cd26c9c60372125f1a06ed976",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-ai-images.sh",
+      "sha256": "9377eda1c3c1a068ed1aee07edc1bf535c139cb4c6609d677036c69a967f9077",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-ai-manager.sh",
+      "sha256": "e2a0e87981a9faecbdd39c9d2afc80946f821f9dc6164d8be9aa8502ef090663",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-ai-native-sync-observer.sh",
+      "sha256": "8f78ada50875b4eb8a83a96e984e9dd9efd9f46335da931c06fef4d239e6f517",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-ai-native.sh",
+      "sha256": "46463cc445d004b4ab9962cacccef8ff10d8851faf5a99ada4facd97149bcd53",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-ai-store-async.sh",
+      "sha256": "199b8296fc56a39953e8829371f4ab5c57c96bbabc1328be5af4f130ef8be2fd",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-authorization-prompt.sh",
+      "sha256": "e740b6db731f25b2f1c495b0978053520fa08dffcf6cd0274e9a67f88eecd7a6",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-authorization-read.sh",
+      "sha256": "942f66479254c175b4069f77d0ef43e2910f543660ef0c3fe03d5f9ca8a3422a",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-avatar-input-style.sh",
+      "sha256": "aca3721de56234bbf9beb354661612e732899eb26741f786c72befb0db8d1077",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-background-blur.sh",
+      "sha256": "f69ac6ec5dd6b4a99d67a1a76ad4cdd9d7187c18aa483f45bf4f7b4183a8f5ad",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-background-privacy.sh",
+      "sha256": "48170c0da6793f63ed4a9d9d92df3b28e028f8691a0fbd373b8a3aa0b904daed",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-background-run-runtime.sh",
+      "sha256": "c3ec22f73d055fc58da75203667985ba15efc88a18c794b7ff3baa60e6ae5f9f",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-background-run.sh",
+      "sha256": "f1da1513f50c7000c76177aeaba57269d8c039093b4cb26bca89594f5c3d2ee1",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-assets.sh",
+      "sha256": "73ef7da1e07f217c66c29075e7980092a54da071ad1594c5f80e9ee93908c2b4",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-audit.sh",
+      "sha256": "fed23287d19b44c4e2a6a8fb7bd01191b96293547de38be8bd2c02a723621ea8",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-bootstrap.sh",
+      "sha256": "5111d56f71d282c77fdf2a45a5e2a3a3fc2d1e34d04bdd581e7a5467fa34ff78",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-codec.sh",
+      "sha256": "0223f99b525e298e8c3a2096b5ffdec6f190b9e9bd8b6254bf5ba626c159bb45",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-compatibility.sh",
+      "sha256": "f2efc3813e44bde92e3ee8cebc229e077dc79d4816ff576e678e26e16e8b7ff1",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-deletion-ui.sh",
+      "sha256": "100a12679c3a57e7ef421e8b7f21f4f534340d34e18d7c13d5233ff53db66184",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-deletion.sh",
+      "sha256": "fc2cc330ce266484e477b6158524d67b9021a090ac28896780a4528cea3a3159",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-engine.sh",
+      "sha256": "3de3a31f426c2eab724d814fe6e12f17d9a7738b391170a2b09ba7479ef0e4ab",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-manual-management.sh",
+      "sha256": "5bd72056eff16feb6f5a494b2b68a863e87f3a7cdf5f86fbcc5cd6a6ccb0e4c4",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-performance.sh",
+      "sha256": "11e47e5c2193572917bb0ea9e6a9d71011baddcace5b1fbd3cb596ecd91691f4",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-registry.sh",
+      "sha256": "395adef363f787e99e1f4360bd28380451864abfc812f449c6d83bb09968e535",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-reset.sh",
+      "sha256": "4df90e3530341ecc66e64e146762676e8121813c67bc2d1d0ed4c0d5bc093be7",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-restore-paths.sh",
+      "sha256": "84cdd14964917e866f480a4630902a2a7a1c8b357e0fe30c6de461001354647d",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-store.sh",
+      "sha256": "c1aa347ba77a9446154f2fc06f6da6f9b454f9448a0f3dde8ed62a606958cd14",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-backup-transactions.sh",
+      "sha256": "0dbebf2e54bcc6934fbb682a976a031ac5e51b21e01a8b023239b5099c206637",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-custom-text.sh",
+      "sha256": "9d72c03880d349722b143ab963ce8faedfa99d3d754eb75915a2494bdbe06a9d",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-appearance.sh",
+      "sha256": "649fa00a320876d3b0e21e5defbb3f49a1eac158934b4859c75da56a4a1f00ef",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-badges.sh",
+      "sha256": "12823f2429da22e31a6c59a4443783a74569888fe615482aa06ed6b6264a16be",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-business.sh",
+      "sha256": "6f2b9cbc04d11091ddb022fe4185c7b4274d7cfa6a27813d7c3a5603364cf7cc",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-header.sh",
+      "sha256": "8ed55067ca9082c651736935e549354e2baf053e6f4b79c26eaa24d378e54fae",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-incremental.sh",
+      "sha256": "ec79488954229211f882f561632d426afd840cac56821648e674416ef915e7f3",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-indicator.sh",
+      "sha256": "f3187f1abd47c540e8ecf11547e5d22289c377d3f64888ecc8c76a542b50f43f",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-interactions.sh",
+      "sha256": "d88f3b11c2907b962a3d04f83c55fb5bb14bd2b7e0cd1de1d70d25d03c3dfd4f",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-lifecycle.sh",
+      "sha256": "d25b31102c3a4ba95d50991c6edef628e3cb44876a161f0ec142584ebc768899",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-picker.sh",
+      "sha256": "4d0c5f3b745e310f296c6dc79ec91cfd4f69cd24b4a4fc715b3e6a2847d08fe5",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-preferences.sh",
+      "sha256": "0daf7c8f62edac3f4ff3c538857bcce241bd34dceee65be94c95c4f402e0abcd",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-search.sh",
+      "sha256": "446a6d370957ddf3e9018ee5462600fa57396184f10504dae51828da32307727",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-selection.sh",
+      "sha256": "e1e4bd33595a9fd65c77a2a624c68b53d2833de7d5966beb6783a0aee127b636",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-group-viewport.sh",
+      "sha256": "a4681b6c549e043298526fdf9e9419564e3484135a99e14e8adcd2dc87c402b0",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-layout-preferences.sh",
+      "sha256": "209dbbf9044286dc174147cc1ab1a134182a9f77f0721dc74dc4d2a507f50e8b",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-list-corners.sh",
+      "sha256": "d72f341bc6c21f0de5041f12570c480ad1ea104b851c3cae0ac4b843bdfa0cf7",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-managed-image-files.sh",
+      "sha256": "bac7b7fe541076c2c24a40783a214e86255e6d20e6e1afd476e18c23885362a3",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-message-actions-core.sh",
+      "sha256": "4830fa3d2a2cb3b1f20fe6b9e7f7fde8769a709fe331b55c55c6b65a619047ed",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-message-actions-execution.sh",
+      "sha256": "eafb7aa462fe39d105f5c7ca3b37c6ffe9be8b6eff0a42122170048d0944dc40",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-miniapp-first-frame.sh",
+      "sha256": "4a7003dec6883e1ff28a33da4c6d7b9aeb31b6b8c867388c3c9611b91fa8d8a4",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-miniapp-private-layout.sh",
+      "sha256": "02a0576987f320a6800f37706370e890c709e951da91757e06533258a9365877",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-my-page-clean.sh",
+      "sha256": "3b51f0fb7ecc7b19b05097af41b8803155f0ab128995324d647c7af8403b8200",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-native-contact-picker.sh",
+      "sha256": "33fc3d57fbb9e122650fe8cb7cef16894806251446e2e7454a521ed7ffa5a434",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-native-reward.sh",
+      "sha256": "53d39d5e14d0e253efee46c152418b280e4637da5fe55dc399caa09b914c5b3f",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-navigation-images.sh",
+      "sha256": "cdfa3726918ca9a4ec29faa69a2a6764b6471f88a138f4bc4a15d2e3f5504af3",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-navigation-title-batch.sh",
+      "sha256": "51ec3083338195042349ddacaa2c05a0588fe7ad11a89d82ecfdf352edefd180",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-payment-core.sh",
+      "sha256": "fc5b27b5ed6129b7e939a9bf125bd89b4cab927748aa3291c13177d9d0558f94",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-plugin-framework.sh",
+      "sha256": "42954b7afb2f0fe1739fc938aac41c4c53bd943faafc62bc6b35fa961b63a1a6",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-plugin-storage-migration.sh",
+      "sha256": "6ffbc411074a9f783a8904c1491c49937ee1b265f78e947479281f65f92b6cee",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-preference-concurrency.sh",
+      "sha256": "ac022c72fda5418317690afc059abdc2945e81507731c7180521dd77d3a84307",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-privacy-admission-cache-events.sh",
+      "sha256": "4fee085c565d6b8e104863ab2aa3f80f400dfb1975ef9ade6ae70e823172ae38",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-privacy-admission-cache.sh",
+      "sha256": "f4b4686114b601bb73c2c26e9184f32e8aeef90c57b561a128bfb4d81b7b3651",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-revoke-interception.sh",
+      "sha256": "8e4b78636971306b6600025e6e27a92420cedff853a3b31c88b7c53fbd57e905",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-revoke-reference.sh",
+      "sha256": "5c661c7a5c0771c183313ab5a155cdebba617965c71ced35494d8eaaa7a8dec1",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-scheduled-task-backup.sh",
+      "sha256": "5a11136821767e138821ac154fe31630d396f7043c48baa866d938fdf6a0539a",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-scheduled-task-manager.sh",
+      "sha256": "68e1f1fd360232ef0ad420ab11d43d1e257c694cf3b33cb8366ad3b150ed3627",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-scheduled-task-swipes.sh",
+      "sha256": "d6f0a03b2d85f67470deee4e0ed0708e29f9a0d1c0c044ab31a1f441f13c5b87",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-scheduled-tasks.sh",
+      "sha256": "99c8ced391001fa5e2b4852db5ac2828d1a0233bf02a1bf4d2ff588969960c6d",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-tabbar.sh",
+      "sha256": "a9ab113135fbfa18a49a785503ce8fc07558031fcfadbc66f426780b813fd878",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-touch-trail.sh",
+      "sha256": "764e9d143340233d9b9cb5121bd38be2df24b29ca6a885abc49a56712e8d7f7c",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    },
+    {
+      "name": "verify-transfer-admission.sh",
+      "sha256": "bc5205faa3c2a9a3705d0a66e10c541c225e249759cfcd64df0789fb65b05c12",
+      "bash_n_exit": 0,
+      "bash_n_output": ""
+    }
+  ],
+  "safety_blocked": []
+}

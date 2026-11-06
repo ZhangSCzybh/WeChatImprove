@@ -1,0 +1,59 @@
+{
+  "results": [
+    {
+      "source": "current",
+      "flavor": "search-legacy",
+      "exit_code": 0,
+      "output": "Search: zero unlock placeholders, native live suggestions/web/history/submit, full unlock, late callbacks and IME passed\nClose-friend contacts: projection/source/tag preservation, stale forwarding, profile action guards and native-reuse regressions passed\nCloseFriendContactTests: 108 checks passed\n"
+    },
+    {
+      "source": "current",
+      "flavor": "search-8.0.80",
+      "exit_code": 0,
+      "output": "Search: zero unlock placeholders, native live suggestions/web/history/submit, full unlock, late callbacks and IME passed\nClose-friend contacts: projection/source/tag preservation, stale forwarding, profile action guards and native-reuse regressions passed\nCloseFriendContactTests: 109 checks passed\n"
+    },
+    {
+      "source": "current",
+      "flavor": "search-8.0.80-voice",
+      "exit_code": 0,
+      "output": "Search: zero unlock placeholders, native live suggestions/web/history/submit, full unlock, late callbacks and IME passed\nClose-friend contacts: projection/source/tag preservation, stale forwarding, profile action guards and native-reuse regressions passed\nCloseFriendContactTests: 108 checks passed\n"
+    },
+    {
+      "source": "current",
+      "flavor": "recovery",
+      "exit_code": 0,
+      "output": "CloseFriendRecoveryTests: 32 checks passed\n"
+    },
+    {
+      "source": "baseline",
+      "flavor": "search-legacy",
+      "exit_code": 1,
+      "output": "FAIL: present empty marked range unlocks before native edit dispatch\n"
+    },
+    {
+      "source": "baseline",
+      "flavor": "search-8.0.80",
+      "exit_code": 1,
+      "output": "FAIL: present empty marked range unlocks before native edit dispatch\n"
+    },
+    {
+      "source": "baseline",
+      "flavor": "search-8.0.80-voice",
+      "exit_code": 1,
+      "output": "FAIL: full voice password is consumed before native source-enum input dispatch\n"
+    },
+    {
+      "source": "baseline",
+      "flavor": "recovery",
+      "exit_code": 1,
+      "output": "FAIL: native homepage title receives the hold even when custom bar is outside UINavigationBar\n"
+    }
+  ],
+  "source_hashes": {
+    "Controllers/CSCloseFriendSearchAdapter.h": "5189ad15c308b592031f94bbeb83c06f412831db5fc09de95e5d48e779a074a3",
+    "Controllers/CSCloseFriendSearchAdapter.m": "8b3ebbe0170c0c572e38b4148ba8bf80f84e650900951c5c15a4b54cb2933077",
+    "Hooks/CloseFriendSearchHooks.xm": "d30b092009240537a4a6ab7fa226d447fa530d473c035fe39486d1db89b39b69",
+    "Controllers/CSCloseFriendManager.m": "8292cb7754fbb5a3c7c29238766eb0346c87f4bec06d70753b455e9dfa168915",
+    "Hooks/CloseFriendLifecycleHooks.xm": "db320dd4257e713553aace7274307f999a20e9b12e4ba56c1f94733d7f467d9b"
+  }
+}

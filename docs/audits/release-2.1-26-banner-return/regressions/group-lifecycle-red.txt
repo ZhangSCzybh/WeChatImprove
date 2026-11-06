@@ -1,9 +1,0 @@
-FAIL: departure without native invalidation requests reconciliation without inventing banner content
-FAIL: real lifecycle event state and real publication keep both unchanged business rows mounted on return
-FAIL: both disappearance callbacks preserve a real session event's existing content attribution
-FAIL: real content queued before or during departure refreshes only its session after return
-FAIL: both disappearance callbacks preserve a real session event's existing content attribution
-FAIL: real content queued before or during departure refreshes only its session after return
-FAIL: a changed computer-login value refreshes its business row even on a reconciliation-only return
-Hidden native event publications: 0 / 20 events
-Group lifecycle: 239 checks, 7 failures

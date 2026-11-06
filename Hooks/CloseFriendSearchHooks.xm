@@ -88,14 +88,24 @@ static void InstallSearchInputHooks(void) {
     if(!CSCloseFriendInstallHook(@"FTSHomeViewController",@"shouldReturnStartSearch",replacement,&submit,"v@:")) imp_removeBlock(replacement);
     __block IMP inputChanged=NULL;
     replacement=imp_implementationWithBlock(^(id page,id marked,id query){
-        CSCFSearchDispatchInput(page,query,marked!=nil,^{((void(*)(id,SEL,id,id))inputChanged)(page,NSSelectorFromString(@"mmInputBoxTextChanged:text:"),marked,query);});
+        CSCFSearchDispatchInput(page,query,CSCFSearchHasMarkedText(marked),^{((void(*)(id,SEL,id,id))inputChanged)(page,NSSelectorFromString(@"mmInputBoxTextChanged:text:"),marked,query);});
     });
     if(!CSCloseFriendInstallHook(@"FTSHomeViewController",@"mmInputBoxTextChanged:text:",replacement,&inputChanged,"v@:@@")) imp_removeBlock(replacement);
     __block IMP voiceInput=NULL;
-    replacement=imp_implementationWithBlock(^(id page,id query,BOOL voice){
-        CSCFSearchDispatchInput(page,query,NO,^{((void(*)(id,SEL,id,BOOL))voiceInput)(page,NSSelectorFromString(@"onGetTextInput:isFromVoice:"),query,voice);});
-    });
-    if(!CSCloseFriendInstallHook(@"FTSHomeViewController",@"onGetTextInput:isFromVoice:",replacement,&voiceInput,"v@:@B")) imp_removeBlock(replacement);
+    SEL voiceSelector=NSSelectorFromString(@"onGetTextInput:isFromVoice:");
+    // WeChat 8.0.80 changed its voice source from BOOL to an unsigned enum.
+    // Keep both exact contracts; passing an enum through BOOL loses source bits.
+    if(CSCloseFriendMethodMatches(class_getInstanceMethod(NSClassFromString(@"FTSHomeViewController"),voiceSelector),"v@:@I")) {
+        replacement=imp_implementationWithBlock(^(id page,id query,unsigned int voice){
+            CSCFSearchDispatchInput(page,query,NO,^{((void(*)(id,SEL,id,unsigned int))voiceInput)(page,voiceSelector,query,voice);});
+        });
+        if(!CSCloseFriendInstallHook(@"FTSHomeViewController",NSStringFromSelector(voiceSelector),replacement,&voiceInput,"v@:@I")) imp_removeBlock(replacement);
+    } else {
+        replacement=imp_implementationWithBlock(^(id page,id query,BOOL voice){
+            CSCFSearchDispatchInput(page,query,NO,^{((void(*)(id,SEL,id,BOOL))voiceInput)(page,voiceSelector,query,voice);});
+        });
+        if(!CSCloseFriendInstallHook(@"FTSHomeViewController",NSStringFromSelector(voiceSelector),replacement,&voiceInput,"v@:@B")) imp_removeBlock(replacement);
+    }
     __block IMP newVoice=NULL;
     replacement=imp_implementationWithBlock(^(id page,id query,id voiceID){
         CSCFSearchDispatchInput(page,query,NO,^{((void(*)(id,SEL,id,id))newVoice)(page,NSSelectorFromString(@"onGetTextInputFromNewVoice:voiceId:"),query,voiceID);});

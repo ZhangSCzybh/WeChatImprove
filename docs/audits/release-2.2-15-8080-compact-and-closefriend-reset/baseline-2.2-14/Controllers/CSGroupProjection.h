@@ -1,0 +1,154 @@
+#import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
+@class WESessionTabItem;
+
+typedef NS_ENUM(NSUInteger, CSGroupRowKind) {
+    CSGroupRowKindSession,
+    CSGroupRowKindAggregate,
+    CSGroupRowKindBusiness,
+    CSGroupRowKindFake
+};
+
+typedef NS_ENUM(NSUInteger, CSGroupRowCategory) {
+    CSGroupRowCategoryUnknown,
+    CSGroupRowCategoryGroup,
+    CSGroupRowCategoryPrivate,
+    CSGroupRowCategoryService
+};
+
+/// Immutable Foundation values only. Paths contain two indexes: section, row.
+@interface CSGroupRow : NSObject <NSCopying>
+@property (nonatomic, copy, readonly) NSIndexPath *nativePath;
+@property (nonatomic, copy, readonly, nullable) NSString *userName;
+@property (nonatomic, readonly) CSGroupRowKind kind;
+@property (nonatomic, readonly) CSGroupRowCategory category;
+@property (nonatomic, readonly) BOOL top;
+@property (nonatomic, readonly) NSUInteger unreadCount;
+/// Raw native show-as-dot flag. A displayed unread dot also requires a positive count.
+@property (nonatomic, readonly) BOOL redDot;
+@property (nonatomic, readonly) BOOL privacyMasked;
+/// Copied native folded-session digest; no native models retained.
+@property (nonatomic, copy, readonly, nullable) NSString *nativeSummary;
+/// Native aggregate name prefix, kept separate for the native two-label renderer.
+@property (nonatomic, copy, readonly, nullable) NSString *nativePrefix;
+/// Optional ordering metadata only. A missing value cannot invalidate a digest
+/// and never controls a visible time/date label on the folded entry.
+@property (nonatomic, copy, readonly, nullable) NSNumber *nativeSortTime;
+/// Presentation-only ChatBox summary. A nil count means its native children were unavailable.
+@property (nonatomic, readonly) BOOL foldedEntryScoped;
+@property (nonatomic, copy, readonly, nullable) NSNumber *foldedEntryCount;
+@property (nonatomic, copy, readonly, nullable) NSString *foldedEntryAccountID;
+@property (nonatomic, readonly) NSUInteger foldedEntryPrivacyRevision;
+@property (nonatomic, copy, readonly, nullable) NSString *foldedEntrySummary;
+@property (nonatomic, copy, readonly, nullable) NSString *foldedEntryPrefix;
+@property (nonatomic, copy, readonly, nullable) NSString *foldedEntrySummaryUserName;
+- (instancetype)initWithNativePath:(NSIndexPath *)nativePath
+                         userName:(nullable NSString *)userName
+                             kind:(CSGroupRowKind)kind
+                         category:(CSGroupRowCategory)category
+                              top:(BOOL)top
+                      unreadCount:(NSUInteger)unreadCount
+                           redDot:(BOOL)redDot;
+- (instancetype)initWithNativePath:(NSIndexPath *)nativePath
+                         userName:(nullable NSString *)userName
+                             kind:(CSGroupRowKind)kind
+                         category:(CSGroupRowCategory)category
+                              top:(BOOL)top
+                      unreadCount:(NSUInteger)unreadCount
+                           redDot:(BOOL)redDot
+                    nativeSummary:(nullable NSString *)nativeSummary
+                         sortTime:(nullable NSNumber *)sortTime;
+- (instancetype)initWithNativePath:(NSIndexPath *)nativePath userName:(nullable NSString *)userName
+                             kind:(CSGroupRowKind)kind category:(CSGroupRowCategory)category
+                              top:(BOOL)top unreadCount:(NSUInteger)unreadCount redDot:(BOOL)redDot
+                    nativeSummary:(nullable NSString *)nativeSummary sortTime:(nullable NSNumber *)sortTime
+                     nativePrefix:(nullable NSString *)nativePrefix NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
+@end
+
+@interface CSGroupBadge : NSObject
+@property (nonatomic, readonly) NSUInteger count;
+@property (nonatomic, readonly) BOOL redDot;
+@end
+
+@interface CSGroupProjection : NSObject
+@property (nonatomic, copy, readonly) NSArray<NSArray<CSGroupRow *> *> *sections;
+@property (nonatomic, copy, readonly) NSString *accountID;
+@property (nonatomic, readonly, getter=isValid) BOOL valid;
+- (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+                            tabs:(NSArray<WESessionTabItem *> *)tabs
+                   selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates
+                       accountID:(NSString *)accountID;
+/// Reuse only verified immutable values from the same account and definitions.
+- (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+                            tabs:(NSArray<WESessionTabItem *> *)tabs
+                   selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates
+                       accountID:(NSString *)accountID
+              previousProjection:(nullable CSGroupProjection *)previous;
+/// Privacy runs after complete native validation, before any grouping or badge work.
+/// A revision change invalidates reuse even when the hidden names are unchanged.
+- (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+                            tabs:(NSArray<WESessionTabItem *> *)tabs
+                   selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates
+                       accountID:(NSString *)accountID
+                 hiddenUserNames:(NSSet<NSString *> *)hiddenUserNames
+                 privacyRevision:(NSUInteger)privacyRevision
+              previousProjection:(nullable CSGroupProjection *)previous;
+/// Verified aggregates containing no hidden child may retain their native presentation.
+- (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+                            tabs:(NSArray<WESessionTabItem *> *)tabs
+                   selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates
+                       accountID:(NSString *)accountID
+                 hiddenUserNames:(NSSet<NSString *> *)hiddenUserNames
+       unmaskedAggregateUserNames:(NSSet<NSString *> *)unmaskedAggregateUserNames
+                 privacyRevision:(NSUInteger)privacyRevision
+              previousProjection:(nullable CSGroupProjection *)previous;
+/// Scope only the ChatBox aggregate, using child membership computed by this same projection.
+/// A nil child projection retains a neutral entry without claiming a precise count.
+- (instancetype)initWithSections:(NSArray<NSArray<CSGroupRow *> *> *)sections
+                            tabs:(NSArray<WESessionTabItem *> *)tabs
+                   selectedTabID:(NSString *)selectedTabID
+                filterDuplicates:(BOOL)filterDuplicates
+                       accountID:(NSString *)accountID
+                 hiddenUserNames:(NSSet<NSString *> *)hiddenUserNames
+       unmaskedAggregateUserNames:(NSSet<NSString *> *)unmaskedAggregateUserNames
+                 privacyRevision:(NSUInteger)privacyRevision
+                scopeFoldedEntry:(BOOL)scopeFoldedEntry
+                foldedProjection:(nullable CSGroupProjection *)foldedProjection
+              previousProjection:(nullable CSGroupProjection *)previous NS_DESIGNATED_INITIALIZER;
+/// Number of ordinary session rows assigned to a tab, after the same privacy and membership rules.
+- (NSUInteger)sessionCountForTabID:(NSString *)tabID;
+/// Attach the verified native digest to the latest visible session without recomputing
+/// membership, maps or counts. Rejects any change to the candidate's source metadata.
+- (nullable CSGroupProjection *)projectionByAttachingNativeSummaryRow:(CSGroupRow *)row;
+/// Update copied values only. The caller must have proved that the account,
+/// definitions, privacy, source order and folded-child snapshot are unchanged.
+/// Rejects identity/classification/top changes, special rows and unsafe badge
+/// arithmetic; nil asks the caller to take the complete validated build path.
+- (nullable CSGroupProjection *)projectionByReplacingRows:(NSDictionary<NSIndexPath *, CSGroupRow *> *)rows;
+/// Select from this projection's immutable source and membership cache. Account,
+/// definitions, privacy and folded scope remain unchanged. Scoped projections
+/// require the same folded source, selected for the requested tab; discarded or
+/// presentation-only computation caches return nil for the complete build path.
+- (nullable CSGroupProjection *)projectionBySelectingTabID:(NSString *)selectedTabID
+                                        foldedProjection:(nullable CSGroupProjection *)foldedProjection;
+/// Reuse this projection's membership and badges for an already verified host
+/// layout. Every supplied row must be the exact visible immutable row from this
+/// projection, consumed once; coordinates are replaced with host section/row.
+- (nullable CSGroupProjection *)projectionByRemappingVisibleRows:(NSArray<NSArray<CSGroupRow *> *> *)sections;
+- (BOOL)hasSameDisplayStructureAs:(nullable CSGroupProjection *)other;
+- (NSArray<NSIndexPath *> *)changedUnreadPathsFrom:(CSGroupProjection *)other;
+/// Release full-list computation caches when the list is not being presented.
+- (void)discardComputationCache;
+- (instancetype)init NS_UNAVAILABLE;
+- (nullable NSIndexPath *)displayPathForNativePath:(NSIndexPath *)nativePath;
+- (nullable CSGroupRow *)rowAtDisplayPath:(NSIndexPath *)displayPath;
+/// Snapshot-derived badge. Integration supplies the verified native All total.
+- (CSGroupBadge *)badgeForTabID:(NSString *)tabID;
+@end
+NS_ASSUME_NONNULL_END

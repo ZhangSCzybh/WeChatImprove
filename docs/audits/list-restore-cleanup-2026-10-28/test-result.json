@@ -1,5 +1,0 @@
-{
-  "command": "bash Tests/verify-list-corners.sh",
-  "exitCode": 0,
-  "summary": "List corners: 1357 checks, 0 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)"
-}

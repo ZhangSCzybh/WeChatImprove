@@ -18,8 +18,9 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
 @property(nonatomic,copy) NSString *account;
 @property(nonatomic,copy) NSDictionary *state, *credential;
 @property(nonatomic,copy) NSDictionary *resetToken;
+@property(nonatomic,copy) NSDictionary *settingsAccess;
 @property(nonatomic) NSUInteger epoch, generation, revision;
-@property(nonatomic) BOOL blocked, active, suspended;
+@property(nonatomic) BOOL blocked, active, suspended, resetPending;
 @property(nonatomic) NSTimeInterval revealUntil;
 @property(nonatomic,strong) dispatch_queue_t searchQueue;
 @property(nonatomic,strong) NSData *searchCacheKey;
@@ -36,6 +37,7 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
 }
 - (void)invalidateSearchVerification {
     self.resetToken=nil;
+    self.settingsAccess=nil;
     self.searchCredentialVersion++; self.searchRequest++;
     self.searchCache=nil; self.searchCacheKey=nil;
 }
@@ -55,6 +57,8 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
     NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
     @synchronized(self) {
         if([self.account isEqual:account] && self.epoch==epoch && self.suspended==suspended && !self.blocked)return;
+        NSDictionary *settingsAccess=[self.account isEqual:account] && self.epoch==epoch && !suspended && self.active ? self.settingsAccess : nil;
+        NSDictionary *settingsReset=[self isSettingsTokenCurrent:self.resetToken]?self.resetToken:nil;
         [self invalidateSearchVerification];
         self.account=[account copy]?:@""; self.epoch=epoch; self.suspended=suspended; self.generation++; self.revealUntil=0; self.state=nil; self.credential=nil; self.blocked=YES;
         if(account.length && !suspended && (!self.resetStorage || self.resetStorage(account,NO,NULL))) {
@@ -70,6 +74,10 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
                     self.blocked=state!=nil && !credential;
                 }
             }
+        }
+        if(self.state) {
+            self.resetPending=NO; self.settingsAccess=settingsAccess;
+            if([self isSettingsTokenCurrent:settingsReset])self.resetToken=settingsReset;
         }
         [self changed];
     }
@@ -92,9 +100,10 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
 - (void)lock {
     NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
     @synchronized(self) {
-        BOOL changed=self.publishedSnapshot.revealed || self.revealUntil>self.elapsedClock() ||
+        BOOL changed=self.settingsAccess || self.publishedSnapshot.revealed || self.revealUntil>self.elapsedClock() ||
             (self.publishedSnapshot && self.publishedSnapshot.blocked!=self.blocked);
         self.revealUntil=0; self.generation++; self.searchRequest++; self.resetToken=nil;
+        self.settingsAccess=nil;
         // Authentication is invalidated even when display state was already locked.
         if(changed)[self changed];
     }
@@ -105,6 +114,18 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
 - (void)setActive:(BOOL)active { NSAssert(NSThread.isMainThread,@"Main-thread mutation required"); @synchronized(self) { _active=active; if(!active)[self lock]; } }
 - (NSDictionary *)authenticationToken { @synchronized(self) { if(self.blocked || self.suspended || !self.active || !self.account.length)return nil; return @{@"account":self.account,@"epoch":@(self.epoch),@"generation":@(self.generation)}; } }
 - (BOOL)isTokenCurrent:(NSDictionary *)token { @synchronized(self) { return token && [[self authenticationToken] isEqual:token]; } }
+- (NSDictionary *)settingsAccessToken {
+    @synchronized(self) {
+        if(!self.state || self.resetPending || self.suspended || !self.active || !self.account.length)return nil;
+        self.settingsAccess=@{@"account":self.account,@"epoch":@(self.epoch),@"visit":NSUUID.UUID.UUIDString};
+        return self.settingsAccess;
+    }
+}
+- (BOOL)isSettingsTokenCurrent:(NSDictionary *)token {
+    @synchronized(self) { return token && [self.settingsAccess isEqual:token] && self.state && !self.resetPending && !self.suspended && self.active && [token[@"account"] isEqual:self.account] && [token[@"epoch"] isEqual:@(self.epoch)]; }
+}
+- (NSDictionary *)profileForSettingsToken:(NSDictionary *)token { @synchronized(self) { return [self isSettingsTokenCurrent:token]?self.state[@"profile"]:nil; } }
+- (void)invalidateSettingsAccessToken:(NSDictionary *)token { @synchronized(self) { if([self.settingsAccess isEqual:token])self.settingsAccess=nil; } }
 - (BOOL)hasCredential { @synchronized(self) { return self.credential!=nil; } }
 - (BOOL)isAuthorized { @synchronized(self) { return !self.blocked && !self.suspended && self.active && self.revealUntil>self.elapsedClock(); } }
 - (BOOL)setPassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error {
@@ -220,6 +241,14 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
         return [self saveState:@{@"profile":normalized,@"muteRecords":self.state[@"muteRecords"]?:@{}} error:error];
     }
 }
+- (BOOL)updateProfile:(NSDictionary *)profile settingsToken:(NSDictionary *)token error:(NSError **)error {
+    NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
+    @synchronized(self) {
+        if(![self isSettingsTokenCurrent:token])return CSRuntimeFail(error,@"快捷入口已失效，请重新连续点击头像 5 次。");
+        NSDictionary *normalized=CSCloseFriendNormalizeProfile(profile,error); if(!normalized)return NO;
+        return [self saveState:@{@"profile":normalized,@"muteRecords":self.state[@"muteRecords"]?:@{}} error:error];
+    }
+}
 - (NSDictionary *)prepareResetWithPassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error {
     NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
     @synchronized(self) {
@@ -234,14 +263,24 @@ static NSDictionary *CSEmptyProfile(void) { return @{@"enabled":@NO,@"friends":@
     NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
     @synchronized(self) { if([self.resetToken isEqual:token])self.resetToken=nil; }
 }
+- (NSDictionary *)prepareResetWithSettingsToken:(NSDictionary *)token error:(NSError **)error {
+    NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
+    @synchronized(self) {
+        self.resetToken=nil;
+        if(!self.resetStorage || ![self isSettingsTokenCurrent:token]) { CSRuntimeFail(error,@"快捷入口已失效，请重新连续点击头像 5 次。"); return nil; }
+        self.resetToken=token;
+        return self.resetToken;
+    }
+}
 - (BOOL)resetWithToken:(NSDictionary *)token error:(NSError **)error {
     NSAssert(NSThread.isMainThread,@"Main-thread mutation required");
     @synchronized(self) {
-        if(!self.resetStorage || ![self.resetToken isEqual:token] || ![self isTokenCurrent:token] || ![self isAuthorized])
+        if(!self.resetStorage || ![self.resetToken isEqual:token] ||
+           !([self isSettingsTokenCurrent:token] || ([self isTokenCurrent:token] && [self isAuthorized])))
             return CSRuntimeFail(error,@"重置验证已失效，请重新输入密友密码。");
-        [self invalidateSearchVerification]; self.generation++; self.revealUntil=0; self.blocked=YES;
+        [self invalidateSearchVerification]; self.generation++; self.revealUntil=0; self.blocked=YES; self.resetPending=YES;
         BOOL ok=self.resetStorage(self.account,YES,error);
-        if(ok) { self.state=@{@"profile":CSEmptyProfile(),@"muteRecords":@{}}; self.credential=nil; self.blocked=NO; }
+        if(ok) { self.state=@{@"profile":CSEmptyProfile(),@"muteRecords":@{}}; self.credential=nil; self.blocked=NO; self.resetPending=NO; }
         // Any partial failure stays blocked; synchronizeAccount resumes the secure intent.
         [self changed];
         return ok;

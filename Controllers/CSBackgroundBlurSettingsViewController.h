@@ -1,4 +1,5 @@
+#import "CSSettingsTableViewController.h"
 #import <UIKit/UIKit.h>
 
-@interface CSBackgroundBlurSettingsViewController : UITableViewController
+@interface CSBackgroundBlurSettingsViewController : CSSettingsTableViewController
 @end

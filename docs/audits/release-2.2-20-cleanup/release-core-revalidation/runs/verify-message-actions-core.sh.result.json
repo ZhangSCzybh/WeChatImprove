@@ -1,0 +1,18 @@
+{
+  "name": "verify-message-actions-core.sh",
+  "command": [
+    "bash",
+    "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-message-actions-core.sh"
+  ],
+  "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+  "exit_code": 0,
+  "seconds": 2.023,
+  "log": "runs/verify-message-actions-core.sh.log",
+  "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+  "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-xoojdn3c",
+  "temporary_theos_env": {
+    "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-xoojdn3c/_THEOS_LOCAL_DATA_DIR",
+    "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-xoojdn3c/THEOS_BUILD_DIR",
+    "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-xoojdn3c/THEOS_PACKAGE_DIR"
+  }
+}

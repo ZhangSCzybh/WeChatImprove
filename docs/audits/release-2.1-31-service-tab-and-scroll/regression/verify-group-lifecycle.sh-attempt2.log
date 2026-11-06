@@ -1,4 +1,0 @@
-FAIL: unreadable policy suppresses unknown rows without removing list chrome
-FAIL: account-unavailable fallback suppresses private rows after native reload without hiding table
-Hidden native event publications: 0 / 20 events
-Group lifecycle: 239 checks, 2 failures

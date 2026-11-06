@@ -1,0 +1,10 @@
+{
+  "built_source_matches_checkout": true,
+  "production_files": 42522,
+  "reset_green_sources_match_checkout": true,
+  "reset_production_files": 9,
+  "test_fixture_sha256": "9e4cc7a5d1b124793236012afae6c266520838bc3ba99366a2a6cc33115aecb3",
+  "checksum_command": "shasum -a 256 -c SHA256SUMS",
+  "checksum_exit": 0,
+  "deb_metadata_exit": 0
+}

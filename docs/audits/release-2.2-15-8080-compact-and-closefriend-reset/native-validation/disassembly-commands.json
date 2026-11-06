@@ -1,0 +1,486 @@
+[
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x10032f3d0",
+      "--stop-address=0x10032f8ec",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseMsgContentViewController-initTableView.asm",
+    "start": "0x10032f3d0",
+    "stop": "0x10032f8ec"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x100335424",
+      "--stop-address=0x100335588",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseMsgContentViewController-tableView_heightForRowAtIndexPath_.asm",
+    "start": "0x100335424",
+    "stop": "0x100335588"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x100335588",
+      "--stop-address=0x100335cd8",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseMsgContentViewController-tableView_cellForRowAtIndexPath_.asm",
+    "start": "0x100335588",
+    "stop": "0x100335cd8"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x100336580",
+      "--stop-address=0x100338004",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseMsgContentViewController-tableView_willDisplayCell_forRowAtIndexPath_.asm",
+    "start": "0x100336580",
+    "stop": "0x100338004"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x100334cc4",
+      "--stop-address=0x100335268",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseMsgContentViewController-makeCell_indexPath_.asm",
+    "start": "0x100334cc4",
+    "stop": "0x100335268"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1002abf8c",
+      "--stop-address=0x1002ac018",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseChatViewModel-rowHeight.asm",
+    "start": "0x1002abf8c",
+    "stop": "0x1002ac018"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1002abed8",
+      "--stop-address=0x1002abf8c",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseChatViewModel-shouldLayoutIfNeeded.asm",
+    "start": "0x1002abed8",
+    "stop": "0x1002abf8c"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1002ac2e8",
+      "--stop-address=0x1002ac3c8",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseChatViewModel-updateLayoutsWithoutReload.asm",
+    "start": "0x1002ac2e8",
+    "stop": "0x1002ac3c8"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1002ab850",
+      "--stop-address=0x1002ab994",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseChatCellView-layoutSubviews.asm",
+    "start": "0x1002ab850",
+    "stop": "0x1002ab994"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1002ab994",
+      "--stop-address=0x1002ab998",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseChatCellView-layoutInternal.asm",
+    "start": "0x1002ab994",
+    "stop": "0x1002ab998"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x100fd9228",
+      "--stop-address=0x100fd9498",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "ChatTableViewCell-setViewModel_.asm",
+    "start": "0x100fd9228",
+    "stop": "0x100fd9498"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x100fd9670",
+      "--stop-address=0x100fd9918",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "ChatTableViewCell-layoutSubviews.asm",
+    "start": "0x100fd9670",
+    "stop": "0x100fd9918"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1002c0d98",
+      "--stop-address=0x1002c0ee4",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseMessageViewModel-measure_.asm",
+    "start": "0x1002c0d98",
+    "stop": "0x1002c0ee4"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x10104e014",
+      "--stop-address=0x10104eae4",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "CommonMessageViewModel-measure_.asm",
+    "start": "0x10104e014",
+    "stop": "0x10104eae4"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x10104d938",
+      "--stop-address=0x10104da3c",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "CommonMessageViewModel-bgBubbleInfo.asm",
+    "start": "0x10104d938",
+    "stop": "0x10104da3c"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x105f0f278",
+      "--stop-address=0x105f0f284",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "TextMessageViewModel-cellViewClassName.asm",
+    "start": "0x105f0f278",
+    "stop": "0x105f0f284"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x105f0f284",
+      "--stop-address=0x105f0f3ac",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "TextMessageViewModel-numberOfRowsInSection.asm",
+    "start": "0x105f0f284",
+    "stop": "0x105f0f3ac"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x105f0f3ac",
+      "--stop-address=0x105f0f434",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "TextMessageViewModel-cellDataForRow_.asm",
+    "start": "0x105f0f3ac",
+    "stop": "0x105f0f434"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x105f104a0",
+      "--stop-address=0x105f104d8",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "TextMessageViewModel-measureContentViewSize_.asm",
+    "start": "0x105f104a0",
+    "stop": "0x105f104d8"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x101048b30",
+      "--stop-address=0x101048b34",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "CommonMessageCellView-updateBgImageView_.asm",
+    "start": "0x101048b30",
+    "stop": "0x101048b34"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x101035af0",
+      "--stop-address=0x101035c40",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "CommonMessageCellView-layoutSubviews.asm",
+    "start": "0x101035af0",
+    "stop": "0x101035c40"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1010360b4",
+      "--stop-address=0x101037ec0",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "CommonMessageCellView-layoutInternal.asm",
+    "start": "0x1010360b4",
+    "stop": "0x101037ec0"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1010381a8",
+      "--stop-address=0x1010381ac",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "CommonMessageCellView-layoutContentView.asm",
+    "start": "0x1010381a8",
+    "stop": "0x1010381ac"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x101034d20",
+      "--stop-address=0x101034d7c",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "CommonMessageCellView-initWithViewModel_.asm",
+    "start": "0x101034d20",
+    "stop": "0x101034d7c"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x101034d7c",
+      "--stop-address=0x101035170",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "CommonMessageCellView-setViewModel_.asm",
+    "start": "0x101034d7c",
+    "stop": "0x101035170"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x101037ec0",
+      "--stop-address=0x101038138",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "CommonMessageCellView-onAppear.asm",
+    "start": "0x101037ec0",
+    "stop": "0x101038138"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x101038288",
+      "--stop-address=0x10103840c",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "CommonMessageCellView-updateStatus.asm",
+    "start": "0x101038288",
+    "stop": "0x10103840c"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1010381ac",
+      "--stop-address=0x101038288",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "CommonMessageCellView-updateNodeStatus.asm",
+    "start": "0x1010381ac",
+    "stop": "0x101038288"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x10103df7c",
+      "--stop-address=0x10103e360",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "CommonMessageCellView-initBgImageView.asm",
+    "start": "0x10103df7c",
+    "stop": "0x10103e360"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x105ef88a4",
+      "--stop-address=0x105ef9aac",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "TextMessageCellView-layoutContentView.asm",
+    "start": "0x105ef88a4",
+    "stop": "0x105ef9aac"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1002bd158",
+      "--stop-address=0x1002bd168",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseMessageCellView-getContentView.asm",
+    "start": "0x1002bd158",
+    "stop": "0x1002bd168"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1002bbe54",
+      "--stop-address=0x1002bc17c",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BaseMessageCellView-layoutInternal.asm",
+    "start": "0x1002bbe54",
+    "stop": "0x1002bc17c"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x104d9ed5c",
+      "--stop-address=0x104d9f400",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BubbleInfo-getBubbleImage_isDarkMode_useCache_.asm",
+    "start": "0x104d9ed5c",
+    "stop": "0x104d9f400"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x104d9ed00",
+      "--stop-address=0x104d9ed10",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BubbleInfo-getBubbleImage_isDarkMode_.asm",
+    "start": "0x104d9ed00",
+    "stop": "0x104d9ed10"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x104d9ed10",
+      "--stop-address=0x104d9ed5c",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "BubbleInfo-getBubbleImage_.asm",
+    "start": "0x104d9ed10",
+    "stop": "0x104d9ed5c"
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/wechat-8.0.80-2026-11-05/merge-validation/inspect_objc.py",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat",
+      "BaseMsgContentViewController",
+      "BaseMessageViewModel",
+      "CommonMessageViewModel",
+      "TextMessageViewModel",
+      "TextMessageSubViewModel",
+      "BaseMessageCellView",
+      "CommonMessageCellView",
+      "TextMessageCellView",
+      "VoiceMessageViewModel",
+      "VoiceMessageCellView",
+      "VoIPBubbleMessageCellView",
+      "VoIPSignalMessageCellView",
+      "RichTextView",
+      "YYAsyncImageView",
+      "YYImage",
+      "BaseChatViewModel",
+      "BaseChatCellView",
+      "ChatTableViewCell",
+      "BubbleInfo",
+      "--annotate-directory",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/native-validation"
+    ],
+    "output": "annotator-metadata.json"
+  }
+]

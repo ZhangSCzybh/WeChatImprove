@@ -1,0 +1,234 @@
+{
+  "normalization": "Strip ANSI colors; omit diagnostic line/column only; retain source, architecture, complete message, and multiplicity. Architecture follows the latest compilation event for that source, or link event for ld.",
+  "schemes": [
+    {
+      "scheme": "rootless",
+      "baseline_log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/delivery-build/rootless-build.log",
+      "baseline_sha256": "d22e56f3d329e3a3492c8e1a52b5bbded894301f6e985b992d9d8caa26c04c0d",
+      "current_log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/delivery-build-final/rootless-build.log",
+      "current_sha256": "4b11d43c82764b257f7a8df71ee863fe4ccde4fa155303d1df391df9ed71d01d",
+      "baseline": [
+        {
+          "architecture": "arm64",
+          "source": "Controllers/CSSettingsTableViewController.m",
+          "diagnostic": "'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64",
+          "source": "Hooks/CloseFriendNotificationHooks.xm",
+          "diagnostic": "'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64",
+          "source": "Hooks/RedEnvelopHooks.xm",
+          "diagnostic": "'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64",
+          "source": "ld",
+          "diagnostic": "-multiply_defined is obsolete",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "Controllers/CSSettingsTableViewController.m",
+          "diagnostic": "'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "Hooks/CloseFriendNotificationHooks.xm",
+          "diagnostic": "'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "Hooks/RedEnvelopHooks.xm",
+          "diagnostic": "'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "ld",
+          "diagnostic": "-multiply_defined is obsolete",
+          "count": 1
+        }
+      ],
+      "current": [
+        {
+          "architecture": "arm64",
+          "source": "Controllers/CSSettingsTableViewController.m",
+          "diagnostic": "'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64",
+          "source": "Hooks/CloseFriendNotificationHooks.xm",
+          "diagnostic": "'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64",
+          "source": "Hooks/RedEnvelopHooks.xm",
+          "diagnostic": "'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64",
+          "source": "ld",
+          "diagnostic": "-multiply_defined is obsolete",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "Controllers/CSSettingsTableViewController.m",
+          "diagnostic": "'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "Hooks/CloseFriendNotificationHooks.xm",
+          "diagnostic": "'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "Hooks/RedEnvelopHooks.xm",
+          "diagnostic": "'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "ld",
+          "diagnostic": "-multiply_defined is obsolete",
+          "count": 1
+        }
+      ],
+      "added": [],
+      "removed": [],
+      "added_count": 0,
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ]
+    },
+    {
+      "scheme": "rootful",
+      "baseline_log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/delivery-build/rootful-build.log",
+      "baseline_sha256": "f837a098f0a361421b6a1e09f911a23720bcfc5fbf1d5038225f0a652d68763f",
+      "current_log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/delivery-build-final/rootful-build.log",
+      "current_sha256": "e5439ef2e8fc66a1aa972b59f5592e0fef7b1cee5d24829e6e0e919c2f96c41d",
+      "baseline": [
+        {
+          "architecture": "arm64",
+          "source": "Controllers/CSSettingsTableViewController.m",
+          "diagnostic": "'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64",
+          "source": "Hooks/CloseFriendNotificationHooks.xm",
+          "diagnostic": "'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64",
+          "source": "Hooks/RedEnvelopHooks.xm",
+          "diagnostic": "'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64",
+          "source": "ld",
+          "diagnostic": "-multiply_defined is obsolete",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "Controllers/CSSettingsTableViewController.m",
+          "diagnostic": "'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "Hooks/CloseFriendNotificationHooks.xm",
+          "diagnostic": "'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "Hooks/RedEnvelopHooks.xm",
+          "diagnostic": "'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "ld",
+          "diagnostic": "-multiply_defined is obsolete",
+          "count": 1
+        }
+      ],
+      "current": [
+        {
+          "architecture": "arm64",
+          "source": "Controllers/CSSettingsTableViewController.m",
+          "diagnostic": "'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64",
+          "source": "Hooks/CloseFriendNotificationHooks.xm",
+          "diagnostic": "'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64",
+          "source": "Hooks/RedEnvelopHooks.xm",
+          "diagnostic": "'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64",
+          "source": "ld",
+          "diagnostic": "-multiply_defined is obsolete",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "Controllers/CSSettingsTableViewController.m",
+          "diagnostic": "'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "Hooks/CloseFriendNotificationHooks.xm",
+          "diagnostic": "'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "Hooks/RedEnvelopHooks.xm",
+          "diagnostic": "'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+          "count": 1
+        },
+        {
+          "architecture": "arm64e",
+          "source": "ld",
+          "diagnostic": "-multiply_defined is obsolete",
+          "count": 1
+        }
+      ],
+      "added": [],
+      "removed": [],
+      "added_count": 0,
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ]
+    }
+  ],
+  "new_warning_count": 0
+}

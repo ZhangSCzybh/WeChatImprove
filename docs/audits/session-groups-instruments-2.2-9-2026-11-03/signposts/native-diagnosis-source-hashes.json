@@ -1,0 +1,8 @@
+{
+  "Controllers/CSGroupListAdapter.m": "b9213d515630ce1ad79ae94b229e7827f2974193b3a0e50e1d5ab2f0258a4985",
+  "Controllers/CSGroupNativeSessionCoordinator.m": "49c19b6f25de1dd12b92e3fd1cffdf362ca6bdc33cabcd6c5c81b9e9741cc576",
+  "Controllers/CSGroupNativeBridge.m": "e6f7378cbe679221a4663fb850cd3e5e2c3aaf6f7aef808098a8251c38169d3c",
+  "Controllers/WESessionTabContainerView.m": "b7ce9e8eb8f07029668e5c47fb9735e7f234cd4e2c549b2fc169e8eef28c5764",
+  "Hooks/NativeSessionGroupHooks.xm": "c29c45304c427a717215a25205f5160ea715bcb5812e111c73785fa59627ce00",
+  "Hooks/SessionGroupPerformanceObservation.xm": "dd4a60babffdf3e6fe654e6522f9b515b689af38f69d48986228b396d7621b5e"
+}

@@ -1,3 +1,4 @@
+#import "CSSettingsTableViewController.h"
 //
 //  CSBubbleStyleSettingsViewController.h
 //  气泡样式设置界面
@@ -7,7 +8,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CSBubbleStyleSettingsViewController : UITableViewController
+@interface CSBubbleStyleSettingsViewController : CSSettingsTableViewController
 
 @end
 

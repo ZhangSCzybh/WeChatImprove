@@ -1,7 +1,0 @@
-[
-  {
-    "command": "bash Tests/verify-close-friend-social.sh",
-    "exit_code": 0,
-    "output": "Social routes: ordinary albums/details open, hidden authors protected, identity/reveal/relock/account transitions and native lifecycle preserved\nClose-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, discovery cues, locked publishing candidates and hidden-selection preservation, stale native render rejection, completed-picker authorization and reveal/relock/account transitions passed\n"
-  }
-]

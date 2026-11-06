@@ -1,9 +1,0 @@
-{
-  "command": [
-    "bash",
-    "Tests/verify-native-contact-picker.sh"
-  ],
-  "expected_failure": "Runtime appearance subclass recurses in the 1.8-53 implementation",
-  "exit_code": 139,
-  "output": "Tests/verify-native-contact-picker.sh: line 10: 20366 Segmentation fault: 11  \"$test_dir/tests\"\n"
-}

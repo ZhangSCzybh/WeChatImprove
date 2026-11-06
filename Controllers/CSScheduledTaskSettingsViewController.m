@@ -64,6 +64,7 @@ static void CSTaskConfigureTable(UITableView *table) {
 @property(nonatomic,strong) UITextView *textView;
 @end
 @implementation CSScheduledTaskTextEditor
+- (BOOL)hidesBottomBarWhenPushed { return YES; }
 - (void)viewDidLoad {
     [super viewDidLoad]; self.title=@"消息内容"; self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStyleDone target:self action:@selector(done)];
@@ -95,6 +96,7 @@ static void CSTaskConfigureTable(UITableView *table) {
 @property(nonatomic,strong) UIDatePicker *picker;
 @end
 @implementation CSScheduledTaskTimeEditor
+- (BOOL)hidesBottomBarWhenPushed { return YES; }
 - (void)viewDidLoad {
     [super viewDidLoad]; self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStyleDone target:self action:@selector(done)];
@@ -117,7 +119,7 @@ static void CSTaskConfigureTable(UITableView *table) {
 - (void)done { if (self.completion) self.completion(self.picker.date); [self.navigationController popViewControllerAnimated:YES]; }
 @end
 
-@interface CSScheduledTaskEditor : UITableViewController
+@interface CSScheduledTaskEditor : CSSettingsTableViewController
 @property(nonatomic,strong) NSMutableDictionary *task;
 @property(nonatomic,copy) NSString *account;
 @property(nonatomic) NSUInteger accountEpoch;

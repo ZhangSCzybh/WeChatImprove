@@ -1,0 +1,49 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "info",
+      "apps",
+      "--device",
+      "00008120-001064E10E70201E",
+      "--bundle-id",
+      "com.tencent.xin",
+      "--include-all-apps",
+      "--json-output",
+      "/tmp/wechat-groups-229-app.json",
+      "--quiet"
+    ],
+    "commandType" : "devicectl.device.info.apps",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 5,
+    "outcome" : "success",
+    "version" : "651.32"
+  },
+  "result" : {
+    "apps" : [
+      {
+        "appClip" : false,
+        "builtByDeveloper" : true,
+        "bundleIdentifier" : "com.tencent.xin",
+        "bundleVersion" : "8.0.78.34",
+        "containerAccessible" : true,
+        "defaultApp" : false,
+        "hidden" : false,
+        "internalApp" : false,
+        "name" : "微信",
+        "removable" : true,
+        "url" : "file:///private/var/containers/Bundle/Application/CFE912A9-BF7F-4AD1-A8DA-D0CA02FC9B3C/WeChat.app/",
+        "version" : "8.0.78"
+      }
+    ],
+    "defaultAppsIncluded" : true,
+    "deviceIdentifier" : "BB7FAA19-FB11-5DC8-9ED8-5C963B192C17",
+    "hiddenAppsIncluded" : true,
+    "internalAppsIncluded" : true,
+    "matchingBundleIdentifier" : "com.tencent.xin",
+    "removableAppsIncluded" : true
+  }
+}

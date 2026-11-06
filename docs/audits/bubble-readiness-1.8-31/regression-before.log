@@ -1,2 +1,0 @@
-Bubble policy/renderer/ownership: 36979 checks passed
-FAIL line 287: cell.background->m_image!=unready

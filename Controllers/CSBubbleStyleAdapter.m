@@ -277,7 +277,8 @@ static BOOL CSModelTemplates(id model, BOOL dark, UIImage **normal, UIImage **pr
     *normal=nil;*pressed=nil;
 #ifndef CS_BUBBLE_TESTING
     NSString *version=NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"];
-    if (![version isEqual:@"8.0.78"] && ![version hasPrefix:@"8.0.78."]) return NO;
+    if (![version isEqual:@"8.0.78"] && ![version hasPrefix:@"8.0.78."] &&
+        ![version isEqual:@"8.0.80"] && ![version hasPrefix:@"8.0.80."]) return NO;
 #endif
     id info=CSMessageNativeObject(model,@"bgBubbleInfo");
     if (![NSStringFromClass([info class]) isEqual:@"BubbleInfo"]) return NO;
@@ -292,7 +293,7 @@ static BOOL CSModelTemplates(id model, BOOL dark, UIImage **normal, UIImage **pr
     }
     @try {
         for (NSUInteger slot=0;slot<2;slot++) {
-            // Verified 8.0.78 contract: returns a cached, stretchable UIImage;
+            // Verified 8.0.78/8.0.80 contract: returns a cached, stretchable UIImage;
             // useCache:YES avoids resolving/rasterizing a template for every row.
             id source=((id(*)(id,SEL,BOOL,BOOL,BOOL))objc_msgSend)(info,sel,slot!=0,dark,YES);
             UIImage *image=CSReadyUIImage(source,NSClassFromString(@"YYImage"));

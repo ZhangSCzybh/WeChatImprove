@@ -1,5 +1,0 @@
-{
-  "buildRoot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-restore-compatibility-build-ujz1jtv7",
-  "strategy": "Incremental build in existing isolated Theos cache; no make clean; previous deb and symbol archives preserved",
-  "previousSymbolsSHA256": "1a8a3c921ad0ca1264dbc1960833292b51d3688464f17c1b69bc8956a523bfa8"
-}

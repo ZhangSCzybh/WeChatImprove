@@ -1,0 +1,37 @@
+[
+  {
+    "file": "Controllers/CSCloseFriendSettingsViewController.m",
+    "added": 8,
+    "removed": 5,
+    "before_sha256": "da567f1047a64a8bdabef42220aa6e4b1f641e50c80d7fcb1d0a88950e8609e9",
+    "after_sha256": "60c19468d4c9910d7aeb47f4415750c227a413c592f814bfda525200360548c8"
+  },
+  {
+    "file": "Controllers/CSCloseFriendManager.h",
+    "added": 1,
+    "removed": 0,
+    "before_sha256": "acb17fb492c0d2aa389240cb74caae83ef213649f6230a787f2c2b4cf79549e9",
+    "after_sha256": "f2cddaf8320735b6f6c5fa0f96035194ca1b0a1fbf47fcfb426f87b0f34ef0c4"
+  },
+  {
+    "file": "Controllers/CSCloseFriendManager.m",
+    "added": 36,
+    "removed": 5,
+    "before_sha256": "4ad68df9b623f8797930b7c37ee15395240c10d3356c4a3d2db19b37a32324a2",
+    "after_sha256": "916198133c42c6c0e02b30f2fa67c7076d658b133ce849405ad59f23026541c7"
+  },
+  {
+    "file": "Controllers/CSCloseFriendRuntime.h",
+    "added": 2,
+    "removed": 0,
+    "before_sha256": "9bc00628b7c7c662a60f7e4c2ca7614aa7165ca6b1c8778edb90556d9c1ddc4d",
+    "after_sha256": "5fc06fcffa68bd86ce0f38eaac1855090f763650129f202e47a9cb3011c7cc23"
+  },
+  {
+    "file": "Controllers/CSCloseFriendRuntime.m",
+    "added": 21,
+    "removed": 7,
+    "before_sha256": "35de29d20061b58ae320cc824bd5526824b0cfc2672ba222734a1ea7a34a53f7",
+    "after_sha256": "92d54fe8182546fff0b3e72a302a5126ed486a135c0fbdb6e46b0746e01b7e95"
+  }
+]

@@ -1,4 +1,0 @@
-STARTUP rejected: 恢复条件未满足：当前账号未就绪或已变化，恢复保持待处理；可在备份页取消
-STARTUP rejected: 恢复条件未满足：准备恢复后配置已变化，请取消待恢复计划并重新预览
-REPRO: two separate startup processes leave journal=prepared after account/revision failures
-Backup compatibility: 35 checks passed

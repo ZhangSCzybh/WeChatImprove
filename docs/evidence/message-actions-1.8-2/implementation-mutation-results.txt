@@ -1,4 +1,0 @@
-EXPECTED RED wrong-text-owner: FAIL line 257: route
-EXPECTED RED normal-handoff-popup: FAIL line 264: feedback.count==0
-EXPECTED RED menu-type-collision: FAIL line 400: shown.count==(i==2 ? 4 : 3)
-EXPECTED RED voice-status-equality: FAIL line 540: Wait(^BOOL{ return done; })

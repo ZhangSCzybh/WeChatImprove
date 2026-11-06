@@ -1,0 +1,12 @@
+{
+  "origin": "git HEAD a227b167; read-only git show; existing assertions copied without modification",
+  "sha256": {
+    "Tests/MergeBubbleUIKit/UIKit/UIKit.h": "2887c1eb2c3b23a35eccc995c3da25d6649011cdf15791d2d86e8de3a821e5d7",
+    "Tests/MessageUIKit/UIKit/UIKit.h": "e427f44c4a6c701ee62b7be0ed3a383d352eac621f2871a13dbd8322331ee3df",
+    "Tests/MessageUIKit/MessageUIKit.m": "0fbf08557339bcfe014f2ca4c59a3cde0e55df59aa1e06d4c7012cab4499fe3a",
+    "Tests/MessageUIKit/DisplayLink.m": "f439a07558b0624e691a1ffde33023198bd56d0dbcfb68272965055c2cfd732b",
+    "Tests/MessageUIKit/QuartzCore/CADisplayLink.h": "7fbedf48b2a01c48925c68b204a1a7efd10a691fc362f18c1cbf26879ff40822",
+    "Tests/BubbleUIKit/BubbleUIKit.m": "8563483bf74b9b12490249ef88d0d22f55b3ad22ae5a818698a88a150ea62344",
+    "Tests/MessageMergeAdapterTests.m": "a19126782e5912b88de2588738a66ad5109d76a513ccc2884076b39643eb8e5f"
+  }
+}

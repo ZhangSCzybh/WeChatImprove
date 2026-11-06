@@ -1,0 +1,12 @@
+--- frozen-2.2-17/Controllers/CSCustomViewController.m
++++ unmodified-2.2-18/Controllers/CSCustomViewController.m
+@@ -916,6 +916,9 @@
+     
+     // 创建并配置tableView
+     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleInsetGrouped];
++    // Resolve section titles before the first return frame; reloads must not
++    // temporarily replace their measured heights with estimates.
++    self.tableView.estimatedSectionHeaderHeight = 0;
+     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+     self.tableView.backgroundColor = [UIColor systemGroupedBackgroundColor];
+     

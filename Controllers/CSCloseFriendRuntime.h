@@ -17,6 +17,12 @@ typedef BOOL (^CSCloseFriendCredentialWriter)(NSString *, NSDictionary *, NSErro
 - (void)setActive:(BOOL)active;
 - (nullable NSDictionary *)authenticationToken;
 - (BOOL)isTokenCurrent:(NSDictionary *)token;
+/// Page visit only; never reveals protected WeChat lists or changes password authority.
+- (nullable NSDictionary *)settingsAccessToken;
+- (BOOL)isSettingsTokenCurrent:(NSDictionary *)token;
+- (nullable NSDictionary *)profileForSettingsToken:(NSDictionary *)token;
+- (BOOL)updateProfile:(NSDictionary *)profile settingsToken:(NSDictionary *)token error:(NSError **)error;
+- (void)invalidateSettingsAccessToken:(NSDictionary *)token;
 - (BOOL)hasCredential;
 - (BOOL)setPassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error;
 - (BOOL)authenticatePassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error;
@@ -34,6 +40,8 @@ typedef BOOL (^CSCloseFriendCredentialWriter)(NSString *, NSDictionary *, NSErro
 - (BOOL)updateProfile:(NSDictionary *)profile error:(NSError **)error;
 /// Separate password proof for destructive reset; shortcut/biometric authorization is insufficient.
 - (nullable NSDictionary *)prepareResetWithPassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error;
+/// Destructive reset only; a live settings visit never becomes password authority.
+- (nullable NSDictionary *)prepareResetWithSettingsToken:(NSDictionary *)token error:(NSError **)error;
 - (void)cancelResetWithToken:(NSDictionary *)token;
 /// Consumes the proof after UI confirmation. Must run under the current account epoch lock.
 - (BOOL)resetWithToken:(NSDictionary *)token error:(NSError **)error;

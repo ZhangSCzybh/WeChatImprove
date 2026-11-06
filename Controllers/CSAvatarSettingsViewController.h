@@ -1,3 +1,4 @@
+#import "CSSettingsTableViewController.h"
 #import <UIKit/UIKit.h>
 
 // 用户默认设置的SuiteName
@@ -27,7 +28,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /// 头像设置控制器
-@interface CSAvatarSettingsViewController : UITableViewController
+@interface CSAvatarSettingsViewController : CSSettingsTableViewController
 @end
 
 NS_ASSUME_NONNULL_END 

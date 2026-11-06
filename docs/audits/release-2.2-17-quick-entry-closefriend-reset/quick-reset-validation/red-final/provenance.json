@@ -1,0 +1,26 @@
+{
+  "source": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16",
+  "label": "red-final",
+  "exit": 1,
+  "production_sha256": {
+    "Controllers/CSCloseFriendEntryState.m": "75011e8b2b81fc7e482584bb5776dbec8ba8b94baf48ae5f6a60b92c87d995ca",
+    "Controllers/CSCloseFriendReset.m": "57da5d4a4558fee6d192290eef19c6d22c55999416c8ba21c61dd478bf5be39b",
+    "Controllers/CSCloseFriendCrypto.m": "283c7f00fe233dfebcd1590603c45100714282f0f373e7fb87597b5ec69fea05",
+    "Controllers/CSCloseFriendPolicy.m": "ef01f3526292672fb9a5b7262c8cd5d62e2768de952601ff5cee3b72bd8f3eb1",
+    "Controllers/CSCloseFriendStore.m": "eaaf39fe06c2a365971502015ac0cd1fc5a932a1eecbea1e6f5530fa12e8bf8b",
+    "Controllers/CSCloseFriendRuntime.m": "35de29d20061b58ae320cc824bd5526824b0cfc2672ba222734a1ea7a34a53f7",
+    "Controllers/CSPluginStorage.m": "ccea3531fca1eea6a156d02e2a557f785cec3fb8e4362bd08258a4f64e8da158",
+    "Controllers/CSCloseFriendSettingsViewController.m": "da567f1047a64a8bdabef42220aa6e4b1f641e50c80d7fcb1d0a88950e8609e9",
+    "Controllers/CSCloseFriendManager.m": "4ad68df9b623f8797930b7c37ee15395240c10d3356c4a3d2db19b37a32324a2",
+    "Controllers/CSCloseFriendManager.h": "acb17fb492c0d2aa389240cb74caae83ef213649f6230a787f2c2b4cf79549e9",
+    "Controllers/CSCloseFriendRuntime.h": "9bc00628b7c7c662a60f7e4c2ca7614aa7165ca6b1c8778edb90556d9c1ddc4d"
+  },
+  "test_sha256": "6bf19aeff02a07aabfe3ae362141a12e8ce4338a3d5ddf5f10319f38a9fdf233",
+  "runner_sha256": "d4057b3db3b83f0e8010d6f6629e26b9882cf7079c2b6aba61db5878feeaf9ae",
+  "unchanged_normal_method_sha256": {
+    "manager_password_reset": "cb5fa3a084c62201359930491c0dfe9fcc5ca421568a1ec4fecd638397779e34",
+    "runtime_password_proof": "5bf47df7708f1c202d370c971ae30bd059586184d0e16ad9e61d39b4d4b9fa20",
+    "settings_reset_exit": "3d3f978f5aaf932647c27908c34181a7b6e976eee2e03f076417961be846f5aa"
+  },
+  "settings_routing_extraction": "unchanged method prefix through section 2 early return; remaining option/picker branches excluded"
+}

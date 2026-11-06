@@ -1,0 +1,12 @@
+$ shasum -a 256 -c SHA256SUMS
+WeChatImprove.dylib: OK
+com.wechat.improve_2.2-17_iphoneos-arm.deb: OK
+com.wechat.improve_2.2-17_iphoneos-arm64.deb: OK
+com.wechat.improve_2.2-17_symbols.zip: OK
+
+$ dpkg-deb -f com.wechat.improve_2.2-17_iphoneos-arm.deb Version
+2.2-17
+
+$ dpkg-deb -f com.wechat.improve_2.2-17_iphoneos-arm64.deb Version
+2.2-17
+

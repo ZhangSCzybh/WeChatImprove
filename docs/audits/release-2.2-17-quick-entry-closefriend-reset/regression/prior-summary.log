@@ -1,0 +1,27 @@
+settings 0 baseline accepted=True FAIL line 99: provisional.tableView.contentOffset.y==0
+current accepted=True PASS: 5114 settings lifecycle checks (host UIKit double; no iOS runtime)
+negative-navigation accepted=True FAIL line 48: !decoded.isViewLoaded && decoded.edgesForExtendedLayout==UIRectEdgeNone
+negative-bottom-addition accepted=True FAIL line 39: Equal(table.contentInset.bottom,12+safeBottom)
+negative-return-scroll accepted=True FAIL line 67: Equal(table.contentOffset.y,retainedOffset.y)
+PASS: iOS SDK compilation, route inheritance coverage and host lifecycle regression.
+tabbar 0 PASS: iOS arm64/arm64e adapter compilation, geometry, legacy and 8.0.80 native behavior
+privacy 0 native-reuse regressions passed
+CloseFriendContactTests: 108 checks passed
+current search-8.0.80 0 Search: zero unlock placeholders, native live suggestions/web/history/submit, full unlock, late callbacks and IME passed
+Close-friend contacts: projection/source/tag preservation, stale forwarding, profile action guards and native-reuse regressions passed
+CloseFriendContactTests: 109 checks passed
+current search-8.0.80-voice 0 Search: zero unlock placeholders, native live suggestions/web/history/submit, full unlock, late callbacks and IME passed
+Close-friend contacts: projection/source/tag preservation, stale forwarding, profile action guards and native-reuse regressions passed
+CloseFriendContactTests: 108 checks passed
+current recovery 0 CloseFriendRecoveryTests: 32 checks passed
+baseline search-legacy 1 FAIL: present empty marked range unlocks before native edit dispatch
+baseline search-8.0.80 1 FAIL: present empty marked range unlocks before native edit dispatch
+baseline search-8.0.80-voice 1 FAIL: full voice password is consumed before native source-enum input dispatch
+baseline recovery 1 FAIL: native homepage title receives the hold even when custom bar is outside UINavigationBar
+merge 0 baseline 8.0.78 accepted=True PASS: 17566 native adapter/navigation lifecycle checks (UIKit double)
+baseline 8.0.80 accepted=True FAIL line 434: compact==(variant>=6 ? 55 : 36)
+baseline 8.0.80.34 accepted=True FAIL line 434: compact==(variant>=6 ? 55 : 36)
+current 8.0.78 accepted=True PASS: 17566 native adapter/navigation lifecycle checks (UIKit double)
+current 8.0.80 accepted=True PASS: 17566 native adapter/navigation lifecycle checks (UIKit double)
+current 8.0.80.34 accepted=True PASS: 17566 native adapter/navigation lifecycle checks (UIKit double)
+PASS: 235148 message merge/navigation checks

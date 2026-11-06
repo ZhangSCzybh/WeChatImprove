@@ -1,0 +1,7 @@
+FAIL avatar installs quick tap
+FAIL tap explicitly waits for longpress failure
+FAIL fifth tap offers entry
+FAIL five taps enter actual settings without password
+FAIL fifth fresh tap enters
+FAIL page scope API exists
+Quick entry: 22 checks, 6 failures

@@ -1,0 +1,322 @@
+{
+  "status": "passed",
+  "assertion_count": 48,
+  "independent_source_sha256": "f78621803389968180cb56ba58d4e16a0d25a85a183b7d13f570039375b734d4",
+  "frozen_comparison_sha256": "b62176b29260cc289266cc40f3f3a74d00750f43838354b42caba3c259ac805d",
+  "scenarios": [
+    {
+      "scenario": "idle",
+      "checks": {
+        "cpu_mean": {
+          "independent": 3.143586196022962,
+          "frozen": 3.1435861960229614,
+          "absolute_difference": 4.440892098500626e-16,
+          "pass": true
+        },
+        "cpu_p95": {
+          "independent": 4.735154038,
+          "frozen": 4.735154038,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "cpu_peak": {
+          "independent": 10.068056341,
+          "frozen": 10.068056341,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "cpu_coverage": {
+          "independent": 1.0,
+          "frozen": 1.0,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "classified_lifetimes": {
+          "independent": 3599,
+          "frozen": 3599,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "positive_hitches": {
+          "independent": 0,
+          "frozen": 0,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "summed_hitch_ms": {
+          "independent": 0.0,
+          "frozen": 0,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "maximum_hitch_ms": {
+          "independent": 0,
+          "frozen": 0,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "attributed_commits": {
+          "independent": 3,
+          "frozen": 3,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "positive_hitch_equation": {
+          "checked": 0,
+          "mismatches": 0,
+          "pass": true
+        },
+        "thermal_state_weight": {
+          "independent": {
+            "Nominal": 60.0
+          },
+          "frozen": {
+            "Nominal": 60.0
+          },
+          "pass": true
+        },
+        "CPU_time_counter_alignment": {
+          "absolute_percentage_point_difference": 2.2922935739093017e-06,
+          "tolerance": 0.002,
+          "pass": true
+        }
+      }
+    },
+    {
+      "scenario": "messages",
+      "checks": {
+        "cpu_mean": {
+          "independent": 18.719343766267162,
+          "frozen": 18.719343766267162,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "cpu_p95": {
+          "independent": 29.567556372,
+          "frozen": 29.567556372,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "cpu_peak": {
+          "independent": 36.027472258,
+          "frozen": 36.027472258,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "cpu_coverage": {
+          "independent": 1.0,
+          "frozen": 1.0,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "classified_lifetimes": {
+          "independent": 2712,
+          "frozen": 2712,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "positive_hitches": {
+          "independent": 48,
+          "frozen": 48,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "summed_hitch_ms": {
+          "independent": 1705.999317,
+          "frozen": 1705.9993170000353,
+          "absolute_difference": 3.524291969370097e-11,
+          "pass": true
+        },
+        "maximum_hitch_ms": {
+          "independent": 66.729708,
+          "frozen": 66.72970799999689,
+          "absolute_difference": 3.112177182629239e-12,
+          "pass": true
+        },
+        "attributed_commits": {
+          "independent": 183,
+          "frozen": 183,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "positive_hitch_equation": {
+          "checked": 48,
+          "mismatches": 0,
+          "pass": true
+        },
+        "thermal_state_weight": {
+          "independent": {
+            "Nominal": 45.0
+          },
+          "frozen": {
+            "Nominal": 45.0
+          },
+          "pass": true
+        },
+        "CPU_time_counter_alignment": {
+          "absolute_percentage_point_difference": 0.00011865747638737743,
+          "tolerance": 0.002,
+          "pass": true
+        }
+      }
+    },
+    {
+      "scenario": "scroll",
+      "checks": {
+        "cpu_mean": {
+          "independent": 35.17084382496045,
+          "frozen": 35.17084382496045,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "cpu_p95": {
+          "independent": 42.307514883,
+          "frozen": 42.307514883,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "cpu_peak": {
+          "independent": 43.692013031,
+          "frozen": 43.692013031,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "cpu_coverage": {
+          "independent": 1.0,
+          "frozen": 1.0,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "classified_lifetimes": {
+          "independent": 4317,
+          "frozen": 4317,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "positive_hitches": {
+          "independent": 29,
+          "frozen": 29,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "summed_hitch_ms": {
+          "independent": 299.435532,
+          "frozen": 299.4355320000004,
+          "absolute_difference": 3.979039320256561e-13,
+          "pass": true
+        },
+        "maximum_hitch_ms": {
+          "independent": 37.082333,
+          "frozen": 37.082333000000745,
+          "absolute_difference": 7.460698725481052e-13,
+          "pass": true
+        },
+        "attributed_commits": {
+          "independent": 4120,
+          "frozen": 4120,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "positive_hitch_equation": {
+          "checked": 29,
+          "mismatches": 0,
+          "pass": true
+        },
+        "thermal_state_weight": {
+          "independent": {
+            "Nominal": 40.0
+          },
+          "frozen": {
+            "Nominal": 40.0
+          },
+          "pass": true
+        },
+        "CPU_time_counter_alignment": {
+          "absolute_percentage_point_difference": 0.0001290764929005415,
+          "tolerance": 0.002,
+          "pass": true
+        }
+      }
+    },
+    {
+      "scenario": "switch-system",
+      "checks": {
+        "cpu_mean": {
+          "independent": 18.815080553662437,
+          "frozen": 18.815080553662437,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "cpu_p95": {
+          "independent": 28.783687299,
+          "frozen": 28.783687299,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "cpu_peak": {
+          "independent": 59.795971669,
+          "frozen": 59.795971669,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "cpu_coverage": {
+          "independent": 1.0,
+          "frozen": 1.0,
+          "absolute_difference": 0.0,
+          "pass": true
+        },
+        "classified_lifetimes": {
+          "independent": 3229,
+          "frozen": 3229,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "positive_hitches": {
+          "independent": 87,
+          "frozen": 87,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "summed_hitch_ms": {
+          "independent": 2608.289384,
+          "frozen": 2608.2893839999565,
+          "absolute_difference": 4.3655745685100555e-11,
+          "pass": true
+        },
+        "maximum_hitch_ms": {
+          "independent": 66.756833,
+          "frozen": 66.75683299999946,
+          "absolute_difference": 5.400124791776761e-13,
+          "pass": true
+        },
+        "attributed_commits": {
+          "independent": 720,
+          "frozen": 720,
+          "absolute_difference": 0,
+          "pass": true
+        },
+        "positive_hitch_equation": {
+          "checked": 87,
+          "mismatches": 0,
+          "pass": true
+        },
+        "thermal_state_weight": {
+          "independent": {
+            "Nominal": 15.357947541,
+            "Fair": 29.642052459
+          },
+          "frozen": {
+            "Nominal": 15.357947541000001,
+            "Fair": 29.642052459
+          },
+          "pass": true
+        },
+        "CPU_time_counter_alignment": {
+          "absolute_percentage_point_difference": 0.0012820187533523423,
+          "tolerance": 0.002,
+          "pass": true
+        }
+      }
+    }
+  ]
+}

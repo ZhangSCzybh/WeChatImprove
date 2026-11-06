@@ -96,29 +96,11 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     [self setupData];
 }
 
-// 视图将要出现时强制刷新一次布局
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    // 清空表格的重用队列
-    [self.tableView reloadData];
-    
-    // 强制重新调用setupData
+    [self loadSettings];
     [self setupData];
-    
-    // 再次强制刷新表格
     [self.tableView reloadData];
-}
-
-// 添加viewDidLayoutSubviews方法确保布局完成后刷新表格
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-    
-    // 首次布局完成时强制刷新表格内容，确保图标和标签位置正确
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        [self.tableView reloadData];
-    });
 }
 
 #pragma mark - 设置加载与保存
@@ -1532,4 +1514,4 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     }
 }
 
-@end 
+@end

@@ -1,0 +1,131 @@
+--- baseline-2.2-18/Controllers/CSSettingsTableViewController.m
++++ 2.2-19/Controllers/CSSettingsTableViewController.m
+@@ -6,6 +6,9 @@
+ @end
+ 
+ @implementation CSSettingsTableViewController
++
++// Native navigation reads the destination policy before loading a pushed page.
++- (BOOL)hidesBottomBarWhenPushed { return YES; }
+ 
+ - (void)cs_prepareControllerLayout {
+     // Give the table its final navigation-bar boundary before the push starts.
+--- baseline-2.2-18/Controllers/CSAIReplySettingsViewController.m
++++ 2.2-19/Controllers/CSAIReplySettingsViewController.m
+@@ -140,6 +140,7 @@
+ @property NSString *originalConnection;
+ @end
+ @implementation CSAIConnectionEditor
++- (BOOL)hidesBottomBarWhenPushed { return YES; }
+ - (UITextField *)field:(NSString *)label value:(NSString *)value secure:(BOOL)secure stack:(UIStackView *)stack{
+     UILabel *title=[UILabel new];title.text=label;title.font=[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];title.textColor=UIColor.secondaryLabelColor;[stack addArrangedSubview:title];
+     UITextField *field=[UITextField new];field.text=value;field.borderStyle=UITextBorderStyleRoundedRect;field.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody];field.adjustsFontForContentSizeCategory=YES;field.autocapitalizationType=UITextAutocapitalizationTypeNone;field.autocorrectionType=UITextAutocorrectionTypeNo;field.secureTextEntry=secure;field.accessibilityLabel=label;field.clearButtonMode=UITextFieldViewModeWhileEditing;[field.heightAnchor constraintGreaterThanOrEqualToConstant:44].active=YES;[stack addArrangedSubview:field];return field;
+@@ -184,6 +185,7 @@
+ @property UITextView *promptView;
+ @end
+ @implementation CSAIPresetEditor
++- (BOOL)hidesBottomBarWhenPushed { return YES; }
+ - (void)viewDidLoad{
+     [super viewDidLoad];self.title=self.original?@"编辑预设":@"新增预设";self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
+     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc]initWithTitle:@"保存" style:UIBarButtonItemStyleDone target:self action:@selector(save)];
+--- baseline-2.2-18/Controllers/CSScheduledTaskSettingsViewController.m
++++ 2.2-19/Controllers/CSScheduledTaskSettingsViewController.m
+@@ -64,6 +64,7 @@
+ @property(nonatomic,strong) UITextView *textView;
+ @end
+ @implementation CSScheduledTaskTextEditor
++- (BOOL)hidesBottomBarWhenPushed { return YES; }
+ - (void)viewDidLoad {
+     [super viewDidLoad]; self.title=@"消息内容"; self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
+     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStyleDone target:self action:@selector(done)];
+@@ -95,6 +96,7 @@
+ @property(nonatomic,strong) UIDatePicker *picker;
+ @end
+ @implementation CSScheduledTaskTimeEditor
++- (BOOL)hidesBottomBarWhenPushed { return YES; }
+ - (void)viewDidLoad {
+     [super viewDidLoad]; self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
+     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStyleDone target:self action:@selector(done)];
+--- baseline-2.2-18/Controllers/CSReleaseNotesViewController.m
++++ 2.2-19/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,10 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"2.2-19": @[
++            @{@"title": @"修复设置子页出现微信底栏", @"detail": @"统一插件设置页的导航隐藏声明，避免进入功能子页时微信原生底栏覆盖内容。由微信原生导航管理退出后的底栏恢复，保留底栏样式。微信 8.0.80 真机转场与恢复效果仍待验证。"},
++            @{@"title": @"快捷密友入口继续保留", @"detail": @"任何能操作已解锁手机的人，都可五击头像并确认后查看、修改密友配置，或经两级确认不可撤销地完整重置当前账号。此入口不验证身份，两级确认只能防误触；修改密码仍须普通入口验证。"}
++        ],
+         @"2.2-18": @[
+             @{@"title": @"修复返回设置列表时的留白跳变", @"detail": @"调整插件主列表的分组测量，避免从功能子页返回时微信号下方留白先变化再恢复。微信 8.0.80 真机转场仍待验证。"},
+             @{@"title": @"快捷密友入口继续保留", @"detail": @"任何能操作已解锁手机的人，都可五击头像并确认后查看、修改密友配置，或经两级确认不可撤销地完整重置当前账号。此入口不验证身份，两级确认只能防误触；修改密码仍须普通入口验证。"}
+--- baseline-2.2-18/Headers/CSUserInfoHelper.h
++++ 2.2-19/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.2-18"  // 插件版本号
++#define kPluginVersionString @"2.2-19"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- baseline-2.2-18/control
++++ 2.2-19/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.2-18
++Version: 2.2-19
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会
+--- baseline-2.2-18/README.md
++++ 2.2-19/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
+ 
+-**当前版本：`2.2-18`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`2.2-19`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
+ 
+@@ -31,8 +31,8 @@
+ | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
+ | 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；本次按用户提供的 `8.0.80.34` IPA 核验设置布局、密友恢复入口、底栏与紧密布局 |
+ | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
+-| Rootless | 本地提供 `2.2-18` 安装包；微信 8.0.80 真机未验证 |
+-| Rootful | 本地提供 `2.2-18` 安装包及重签用 dylib；微信 8.0.80 真机未验证 |
++| Rootless | 本地提供 `2.2-19` 安装包；微信 8.0.80 真机未验证 |
++| Rootful | 本地提供 `2.2-19` 安装包及重签用 dylib；微信 8.0.80 真机未验证 |
+ | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
+ | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
+ 
+@@ -40,7 +40,7 @@
+ 
+ ### 安装步骤
+ 
+-1. 获取与设备注入环境匹配的 `.deb`：当前版本 `2.2-18` 提供 [Rootless 安装包](packages/2.2-18-settings-return-header-gap/com.wechat.improve_2.2-18_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.2-18-settings-return-header-gap/com.wechat.improve_2.2-18_iphoneos-arm.deb)、[重签 IPA 用 dylib](packages/2.2-18-settings-return-header-gap/WeChatImprove.dylib)、[调试符号](packages/2.2-18-settings-return-header-gap/com.wechat.improve_2.2-18_symbols.zip) 和 [SHA-256](packages/2.2-18-settings-return-header-gap/SHA256SUMS)。100 个原始脚本中 18 个仍未通过，本轮按用户明确授权豁免；本次新增及列明核心回归必须全部通过，详见 [原限定豁免清单](docs/audits/release-2.2-18-settings-return-header-gap/WAIVER.md) 与 [本轮沿用授权](docs/audits/release-2.2-18-settings-return-header-gap/WAIVER-CONTINUATION.md)。本版仅调整插件主列表的分组标题测量，避免返回时估算高度变为实测高度引起微信号下方留白跳变；未硬编码间距或屏蔽动画。沿用 2.2-17 的头像连续五击（相邻不超过 0.8 秒）进入的快捷页，经两级确认执行当前账号的完整密友重置。会清空密友／密群名单、全部保护选项、密码、生物识别及入口发现记录；保护关闭，“捉迷藏呀”重新隐藏。微信好友、聊天记录、免打扰和其他账号不受影响。任何能操作已解锁手机并到达头像的人，都能确认后不可撤销地清空配置；此入口不验证身份，修改密码仍需普通入口验证。重置后原快捷授权失效，可长按插件主页头像 2 秒重新发现入口，再按原首次设置流程创建新密码。保留 2.2-16 的残留标记清理、2.2-15 气泡紧密修复、2.2-14 四项适配和 2.2-13 签名信息解析。旧有“auth 已缺失且整插件入口隐藏”的组合仍可能令头像不可达，本版没有扩大根入口可见性。详见 [修复与验证记录](docs/audits/release-2.2-18-settings-return-header-gap/README.md)；本轮返回与进入子页的首帧、手势和显示均未在真机验证，历史安装包保留。
++1. 获取与设备注入环境匹配的 `.deb`：当前版本 `2.2-19` 提供 [Rootless 安装包](packages/2.2-19-settings-subpage-tabbar/com.wechat.improve_2.2-19_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.2-19-settings-subpage-tabbar/com.wechat.improve_2.2-19_iphoneos-arm.deb)、[重签 IPA 用 dylib](packages/2.2-19-settings-subpage-tabbar/WeChatImprove.dylib)、[调试符号](packages/2.2-19-settings-subpage-tabbar/com.wechat.improve_2.2-19_symbols.zip) 和 [SHA-256](packages/2.2-19-settings-subpage-tabbar/SHA256SUMS)。100 个原始脚本中 18 个仍未通过，本轮按用户明确授权豁免；本次新增及列明核心回归必须全部通过，详见 [原限定豁免清单](docs/audits/release-2.2-19-settings-subpage-tabbar/WAIVER.md) 与 [本轮沿用授权](docs/audits/release-2.2-19-settings-subpage-tabbar/WAIVER-CONTINUATION.md)。本版为插件设置子页补齐隐藏底栏的导航声明，修复微信 8.0.80 在 push 时按目标页默认值显示原生底栏的问题；由原生导航管理隐藏、转场与退出恢复。保留 2.2-18 的返回列表分组标题测量修复。沿用 2.2-17 的头像连续五击（相邻不超过 0.8 秒）进入的快捷页，经两级确认执行当前账号的完整密友重置。会清空密友／密群名单、全部保护选项、密码、生物识别及入口发现记录；保护关闭，“捉迷藏呀”重新隐藏。微信好友、聊天记录、免打扰和其他账号不受影响。任何能操作已解锁手机并到达头像的人，都能确认后不可撤销地清空配置；此入口不验证身份，修改密码仍需普通入口验证。重置后原快捷授权失效，可长按插件主页头像 2 秒重新发现入口，再按原首次设置流程创建新密码。保留 2.2-16 的残留标记清理、2.2-15 气泡紧密修复、2.2-14 四项适配和 2.2-13 签名信息解析。旧有“auth 已缺失且整插件入口隐藏”的组合仍可能令头像不可达，本版没有扩大根入口可见性。详见 [修复与验证记录](docs/audits/release-2.2-19-settings-subpage-tabbar/README.md)；本轮原生底栏对象状态、子页真机转场、主界面底栏样式恢复和点击均未在真机验证；阶段样本属于主机导航政策模型，历史安装包保留。
+ 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
+ 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
+ 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
+@@ -220,7 +220,7 @@
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.2-18_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.2-18-settings-return-header-gap/`。
++当前版本默认输出：`packages/com.wechat.improve_2.2-19_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.2-19-settings-subpage-tabbar/`。
+ 
+ ### Rootful
+ 
+@@ -229,7 +229,7 @@
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.2-18_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.2-18-settings-return-header-gap/`。
++当前版本默认输出：`packages/com.wechat.improve_2.2-19_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.2-19-settings-subpage-tabbar/`。
+ 
+ | 方案 | 动态库安装目录 |
+ | --- | --- |

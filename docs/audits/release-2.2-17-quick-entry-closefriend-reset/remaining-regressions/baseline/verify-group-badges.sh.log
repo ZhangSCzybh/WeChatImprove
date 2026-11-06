@@ -1,0 +1,39 @@
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture/Tests/GroupBadgeTests.m:56:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-41c1y2dc//wechat-group-badges.fSpKLU/ContainerBody.h:5:42: error: no visible @interface for 'WETabButton' declares the selector 'badgeWidth'
+    5 |     CGFloat previousBadgeWidth = [button badgeWidth];
+      |                                   ~~~~~~ ^~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-41c1y2dc//wechat-group-badges.fSpKLU/ContainerBody.h:6:35: error: no visible @interface for 'BadgeChrome' declares the selector 'widthForTabButton:'
+    6 |     CGFloat previousWidth = [self widthForTabButton:button];
+      |                              ~~~~ ^~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-41c1y2dc//wechat-group-badges.fSpKLU/ContainerBody.h:11:17: error: no visible @interface for 'WETabButton' declares the selector 'badgeWidth'
+   11 |     if ([button badgeWidth] != previousBadgeWidth) {
+      |          ~~~~~~ ^~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-41c1y2dc//wechat-group-badges.fSpKLU/ContainerBody.h:12:19: error: no visible @interface for 'BadgeChrome' declares the selector 'widthForTabButton:'
+   12 |         if ([self widthForTabButton:button] != previousWidth) self.tabLayoutValid = NO;
+      |              ~~~~ ^~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-41c1y2dc//wechat-group-badges.fSpKLU/ContainerBody.h:12:68: error: property 'tabLayoutValid' not found on object of type 'BadgeChrome *'
+   12 |         if ([self widthForTabButton:button] != previousWidth) self.tabLayoutValid = NO;
+      |                                                                    ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture/Tests/GroupBadgeTests.m:92:25: error: call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   92 |         NSArray *before=CSGroupBuildNativeSections(p.controller,p,p.controller);
+      |                         ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture/Tests/GroupBadgeTests.m:92:25: note: did you mean 'CSGroupBuildNativeSectionsReusing'?
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture/Controllers/CSGroupNativeBridge.h:25:64: note: 'CSGroupBuildNativeSectionsReusing' declared here
+   25 | FOUNDATION_EXPORT NSArray<NSArray<CSGroupRow *> *> * _Nullable CSGroupBuildNativeSectionsReusing(id controller, id table, id source, NSArray<NSArray<CSGroupRow *> *> * _Nullable previous);
+      |                                                                ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture/Tests/GroupBadgeTests.m:92:25: error: implicit conversion of 'int' to 'NSArray *' is disallowed with ARC
+   92 |         NSArray *before=CSGroupBuildNativeSections(p.controller,p,p.controller);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture/Tests/GroupBadgeTests.m:92:18: error: incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]
+   92 |         NSArray *before=CSGroupBuildNativeSections(p.controller,p,p.controller);
+      |                  ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture/Tests/GroupBadgeTests.m:159:23: error: call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+  159 |     NSArray *sections=CSGroupBuildNativeSections(p.controller,p,p.controller);
+      |                       ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture/Tests/GroupBadgeTests.m:159:23: error: implicit conversion of 'int' to 'NSArray *' is disallowed with ARC
+  159 |     NSArray *sections=CSGroupBuildNativeSections(p.controller,p,p.controller);
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture/Tests/GroupBadgeTests.m:159:14: error: incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]
+  159 |     NSArray *sections=CSGroupBuildNativeSections(p.controller,p,p.controller);
+      |              ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+11 errors generated.

@@ -1,0 +1,71 @@
+任务：两件事，出 2.2-16（微信 8.0.80，重签注入用 dylib + deb）。基线是你现在这份 2.2-15 工作树。
+
+【当前状态】
+- control 已是 2.2-15，packages/2.2-15-8080-compact-and-closefriend-reset/ 已交付并校验通过。
+- 2.2-13 / 2.2-14 / 2.2-15 全部**未提交**，git HEAD 还停在 a227b167。
+- 禁止 git reset / checkout / stash / 覆盖历史包 / make clean。要提交等我确认。
+
+【第一件：回滚 2.2-15 里对密友做的改动，并清理相关代码】
+2.2-15 新增的「忘记密码 → 无密码重置凭据」这套东西全部撤掉，恢复到 2.2-14 的密友行为。回滚范围（以 2.2-15 那次 diff 为准，不要多删）：
+
+- `Controllers/CSCloseFriendReset.h` / `.m`：删掉 `beginCredentialResetForAccountID:`、`finishCredentialResetForAccountID:`、`requiresPasswordSetupForAccountID:`、`completeCredentialSetupForAccountID:`、`CSCredentialResetIntent`、`CSCredentialSetupMarker`，`resumeResetForAccountID:` 回到只认 `CSResetIntent` 的原样。
+- `Controllers/CSCloseFriendRuntime.h` / `.m`：删掉为无密码重置新增的公开接口与状态（+37/−4 那部分）。
+- `Controllers/CSCloseFriendManager.m`：删掉「忘记密码」流程（+60 那部分），包括密码框里的入口、账号标识校验、二次确认、设置新密码的临时流程与对应文案。
+- `Controllers/CSCloseFriendBridge.m`：恢复 +1/−1 那行。
+- `Controllers/CSReleaseNotesViewController.m`：删掉 2.2-15 那条「修复密友恢复入口」相关的密友说明（+5），但**保留**气泡紧密那条。
+- 测试与审计：把 2.2-15 新增的密友凭据重置测试（`reset-validation/ResetCredentialTests.m` 一类）连同其断言一并移除，不要留成跳过或者注释掉的死测试。
+
+**清理必须干净**：不许留死代码、不许留未被调用的静态函数、不许留不再写入却仍在读取的 Keychain kind、不许留孤立的常量字符串。
+
+**这里有个必须处理的迁移点，别漏了**：如果用户已经装过 2.2-15 并真的走过一次重置，本机 Keychain 里可能残留 `credential-reset` 这个 kind、以及被删掉的 `auth` / `biometric-domain`。回滚后的代码如果读到不认识的 intent 就判「重置未完成」，会把账号直接锁死进不去密友。要求：
+
+- 明确写出残留数据的现状（哪些 kind 可能已存在、什么值）。
+- 给一次性兼容处理：读到 `credential-reset` 残留时，**直接清除并继续正常流程**，不要判成 pending、不要阻塞加载、不要弹错误。
+- 写测试覆盖：有残留 marker 时能正常进入；残留 marker 被清掉后不会再出现；没有残留时行为与 2.2-14 完全一致。
+- 不允许因此放宽真正的 `CSResetIntent` 语义——那个整组重置仍然要严格。
+
+【第二件：插件头像连点 5 次直接进密友设置，不需要密码】
+现状：插件主设置页的头像上有个 `UILongPressGestureRecognizer`（`CSCustomViewController.m:556`，`discoverCloseFriendEntry:`，`:579`），长按 2 秒用于恢复入口/设置密码；「捉迷藏呀」条目要密码才能进密友设置。
+
+要做：在同一处头像上支持**连续点击 5 次**，直接进入密友设置界面，不要求输入密码。
+
+实现约束：
+- 用点击时间戳判定「连续」：相邻两次点击间隔不超过一个明确阈值（建议 0.8 秒，可调），第 5 次命中即触发。不许用 `dispatch_after` 固定延时去"等一等"凑次数，也不许用定时器轮询。
+- 必须与既有长按共存，互不误伤：长按 2 秒仍要能正常触发原行为；连点不应该被长按手势吃掉，长按也不应该被连点打断后失效。两套手势的失败依赖关系请显式处理（`requireGestureRecognizerToFail:` 或等价方案），并说明选择理由。
+- 只挂在插件主设置页的头像区域，不许做成全局手势，不许影响微信首页的长按解锁（`CSCloseFriendManager` 里那套 `recoveryGesture` 一个字都不要动）。
+- 进入密友设置**只解除"进入设置页"这一道门**，不许顺手把微信聊天列表里的密友/密群解锁显示出来；隐藏状态、锁定状态、临时解锁计时器一律不动。
+- 解锁态生命周期要明确：离开密友设置页就失效，不写任何永久解锁标记、不写「已通过连点解锁」的偏好项。下次进入仍需再连点 5 次。
+- 账号隔离：连点解锁只对当前账号的密友设置生效，切号后不继承。
+- 安全：这条路径完全不校验凭据，等于任何人拿到你已解锁的手机、连点 5 下就能看到名单。请把这一点写进报告和应用内发布说明，并在确认/提示上有所体现。不要试图用"隐藏得很深"来当安全措施。
+
+【测试要求】
+- 新断言先在未修改的 2.2-15 上跑红（回滚项与连点项各自的红都要留日志与 provenance），再改代码转绿。不许改既有断言凑绿。
+- 必须覆盖：
+  1. 残留 `credential-reset` marker → 正常进入密友设置，不判 pending、不报错。
+  2. 无残留时密友流程与 2.2-14 一致（密码必需）。
+  3. 5 次点击间隔在阈值内 → 进入；间隔超阈值（如第 3 次停 2 秒）→ 不进入，计数重置。
+  4. 长按 2 秒仍正常触发原行为，连点不误触长按行为、长按不误触连点。
+  5. 连点进入设置后：微信列表里的密友仍隐藏；离开页面后再次进入必须重新连点。
+  6. 切账号后连点解锁不继承。
+- 既有回归全部要跑，特别是 2.2-14 的四项（设置页顶部、搜索密码与长按标题、新底栏、Merge 版本门槛）和 2.2-15 的气泡紧密（compact 2pt / normal 21-24pt）。
+
+【构建与产物】
+- 版本 2.2-16；同步 control、版本字符串、README、应用内发布说明。
+- 产物目录 `packages/2.2-16-revert-closefriend-reset-and-quick-entry/`：`WeChatImprove.dylib`（重签注入用）、arm.deb、arm64.deb、symbols.zip、SHA256SUMS。
+- 实跑 `shasum -a 256 -c SHA256SUMS` 贴输出；`dpkg-deb` 实查 Version。
+- 独立临时 `_THEOS_LOCAL_DATA_DIR` / `THEOS_BUILD_DIR` / `THEOS_PACKAGE_DIR`；历史 packages 与主树 `.theos` 前后哈希核对；双架构警告多重集与 2.2-15 对比，新增为 0。
+- 审计写 `docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/`。
+
+【硬约束】
+- 不许凭记忆重写代码；回滚要对着 2.2-15 的实际 diff 逐文件还原，并给出每个文件的 SHA256 前后对照。
+- 改动范围最小化，禁止顺手重构、禁止改无关文件、禁止调格式。
+- 拿不到真机就写「未验证」，不许编造设备数据。
+- 不许声称真机已验证手势或间距。
+
+【完成后回答我】
+1. 回滚了哪些文件、各多少行，逐文件 SHA256 是否回到 2.2-14 状态；
+2. 残留 marker 怎么处理的，已装过 2.2-15 的人会不会被锁死；
+3. 5 连击怎么实现的、阈值多少、和长按怎么共存；
+4. 连点进入后微信列表的密友是否仍然隐藏；
+5. 红/绿与回归数字；
+6. 这条快捷入口把安全性削弱到什么程度，你怎么在界面上告知。

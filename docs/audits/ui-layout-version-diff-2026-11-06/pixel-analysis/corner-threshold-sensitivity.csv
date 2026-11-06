@@ -1,0 +1,11 @@
+image,threshold,first_white_y_at_x1000,top_left,top_right,top_span_px,reference_full_width_y,full_left,full_right,full_width_px,radius_proxy_px,coordinate_origin
+img1-title-zaibuhui-0715.jpg,250,896,160,1135,976,1100,61,1219,1159,91.5,0-based inclusive
+img1-title-zaibuhui-0715.jpg,251,896,160,1135,976,1100,61,1219,1159,91.5,0-based inclusive
+img1-title-zaibuhui-0715.jpg,252,896,160,1135,976,1100,61,1218,1158,91.0,0-based inclusive
+img1-title-zaibuhui-0715.jpg,253,896,168,1135,968,1100,62,1218,1157,94.5,0-based inclusive
+img1-title-zaibuhui-0715.jpg,254,899,125,1151,1027,1100,64,1217,1154,63.5,0-based inclusive
+img2-title-mofa-0618.jpg,250,965,80,1199,1120,1100,60,1219,1160,20.0,0-based inclusive
+img2-title-mofa-0618.jpg,251,965,96,1183,1088,1100,60,1219,1160,36.0,0-based inclusive
+img2-title-mofa-0618.jpg,252,965,96,1183,1088,1100,61,1219,1159,35.5,0-based inclusive
+img2-title-mofa-0618.jpg,253,966,80,1199,1120,1100,61,1219,1159,19.5,0-based inclusive
+img2-title-mofa-0618.jpg,254,966,80,1183,1104,1100,61,1218,1158,27.0,0-based inclusive

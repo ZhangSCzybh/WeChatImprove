@@ -1,5 +1,0 @@
-In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/MyPageCleanTests.m:76:
-/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-my-page-clean.g3t8BE/MyPageHookUnderTest.h:1:9: fatal error: '../Controllers/CSBackupBootstrap.h' file not found
-    1 | #import "../Controllers/CSBackupBootstrap.h"
-      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-1 error generated.

@@ -1,0 +1,35 @@
+{
+  "artifacts": [
+    {
+      "path": "packages/2.2-9-session-groups-interaction-final/com.wechat.improve_2.2-9_iphoneos-arm.deb",
+      "matches_frozen_sha256sums": true,
+      "sha256": "ecc284c95da52e610c833d99dc46ebc6bdcc9f0a51d9ba5e9dc9e85008e10a72"
+    },
+    {
+      "path": "packages/2.2-9-session-groups-interaction-final/com.wechat.improve_2.2-9_iphoneos-arm64.deb",
+      "matches_frozen_sha256sums": true,
+      "sha256": "81fd349ac8753c654e0fdd091de4c8c4fe4edef1c6dd5756aea3472482485008"
+    },
+    {
+      "path": "packages/2.2-9-session-groups-interaction-final/com.wechat.improve_2.2-9_symbols.zip",
+      "matches_frozen_sha256sums": true,
+      "sha256": "38c58d374117b354a15de575f614a9ea92ef23d6a03caf2f1aa7208a7bc79287"
+    },
+    {
+      "path": "packages/2.2-9-session-groups-interaction-observe-final/com.wechat.improve_2.2-9+observe_iphoneos-arm.deb",
+      "matches_frozen_sha256sums": true,
+      "sha256": "b2a2aabcbea6152789ca81b65b3744564a91a4973e0e297db59e6fb91c1c43ff"
+    },
+    {
+      "path": "packages/2.2-9-session-groups-interaction-observe-final/com.wechat.improve_2.2-9+observe_iphoneos-arm64.deb",
+      "matches_frozen_sha256sums": true,
+      "sha256": "59bc211a64590f274898e9302eb41f7f5f81c2cbefa90408e7138395c571c8c6"
+    },
+    {
+      "path": "packages/2.2-9-session-groups-interaction-observe-final/com.wechat.improve_2.2-9+observe_symbols.zip",
+      "matches_frozen_sha256sums": true,
+      "sha256": "251a3a2c4141890be2653acb94084f65acc9e80fb3ef6be0ea0789d176129262"
+    }
+  ],
+  "all_match": true
+}

@@ -1,8 +1,0 @@
-Before counts: recorded baseline in performance-followup-2.1-15.md; after counts: current production methods, forwarded by counters.
-Inventory N=0: unchanged snapshot reads 2 -> 1; changed+prune 3 -> 2
-Inventory N=20: unchanged snapshot reads 22 -> 21; changed+prune 43 -> 22
-Inventory N=80: unchanged snapshot reads 82 -> 81; changed+prune 163 -> 82
-Shared image R=1: encode validImage calls 2 -> 1
-Shared image R=20: encode validImage calls 21 -> 1
-Shared image R=100: encode validImage calls 101 -> 1
-Backup performance: 342 checks passed

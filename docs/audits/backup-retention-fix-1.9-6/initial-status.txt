@@ -1,3 +1,0 @@
-?? .workbuddy/memory/2026-10-22.md
-?? docs/audits/backup-retention-2026-10-22/
-?? docs/audits/backup-retention-fix-1.9-6/

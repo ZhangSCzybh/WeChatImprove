@@ -1,0 +1,353 @@
+{
+  "verified_at": "2026-11-05T21:51:18.576560+00:00",
+  "passed": true,
+  "scope": {
+    "baseline": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16",
+    "basis": "Frozen 2.2-16 worktree including all uncommitted 2.2-13 through 2.2-16 work; never Git HEAD.",
+    "line_count_method": "git diff --no-index --no-ext-diff --numstat per changed file; .DS_Store excluded only from source line counts.",
+    "directories": [
+      "Controllers",
+      "Hooks",
+      "Headers"
+    ],
+    "root_files": [
+      "Makefile",
+      "control",
+      "README.md",
+      "WeChatImprove.plist"
+    ],
+    "baseline_file_count": 381,
+    "current_file_count": 381,
+    "changed_file_count": 10,
+    "added": 83,
+    "removed": 27,
+    "files": [
+      {
+        "file": "Controllers/CSCloseFriendManager.h",
+        "status": "modified",
+        "added": 1,
+        "removed": 0,
+        "baseline_sha256": "acb17fb492c0d2aa389240cb74caae83ef213649f6230a787f2c2b4cf79549e9",
+        "current_sha256": "f2cddaf8320735b6f6c5fa0f96035194ca1b0a1fbf47fcfb426f87b0f34ef0c4"
+      },
+      {
+        "file": "Controllers/CSCloseFriendManager.m",
+        "status": "modified",
+        "added": 36,
+        "removed": 5,
+        "baseline_sha256": "4ad68df9b623f8797930b7c37ee15395240c10d3356c4a3d2db19b37a32324a2",
+        "current_sha256": "916198133c42c6c0e02b30f2fa67c7076d658b133ce849405ad59f23026541c7"
+      },
+      {
+        "file": "Controllers/CSCloseFriendRuntime.h",
+        "status": "modified",
+        "added": 2,
+        "removed": 0,
+        "baseline_sha256": "9bc00628b7c7c662a60f7e4c2ca7614aa7165ca6b1c8778edb90556d9c1ddc4d",
+        "current_sha256": "5fc06fcffa68bd86ce0f38eaac1855090f763650129f202e47a9cb3011c7cc23"
+      },
+      {
+        "file": "Controllers/CSCloseFriendRuntime.m",
+        "status": "modified",
+        "added": 21,
+        "removed": 7,
+        "baseline_sha256": "35de29d20061b58ae320cc824bd5526824b0cfc2672ba222734a1ea7a34a53f7",
+        "current_sha256": "92d54fe8182546fff0b3e72a302a5126ed486a135c0fbdb6e46b0746e01b7e95"
+      },
+      {
+        "file": "Controllers/CSCloseFriendSettingsViewController.m",
+        "status": "modified",
+        "added": 8,
+        "removed": 5,
+        "baseline_sha256": "da567f1047a64a8bdabef42220aa6e4b1f641e50c80d7fcb1d0a88950e8609e9",
+        "current_sha256": "60c19468d4c9910d7aeb47f4415750c227a413c592f814bfda525200360548c8"
+      },
+      {
+        "file": "Controllers/CSCustomViewController.m",
+        "status": "modified",
+        "added": 1,
+        "removed": 1,
+        "baseline_sha256": "4fe22c3775424b65e204ba5eb5951024329afbdbc1d4924da593919e26859008",
+        "current_sha256": "6f602715e9cf5863798accf429f0d02369d33c4214a22aca0d7b015c16519cd7"
+      },
+      {
+        "file": "Controllers/CSReleaseNotesViewController.m",
+        "status": "modified",
+        "added": 5,
+        "removed": 0,
+        "baseline_sha256": "4bead9506e393543200ad1f2ccfb2a34066cb99d338d4b9d237da2b16335a6c5",
+        "current_sha256": "d3eee3cbc5d5c32af38f85fc9ebeaaa527360086877182cfe6fb029f41119596"
+      },
+      {
+        "file": "Headers/CSUserInfoHelper.h",
+        "status": "modified",
+        "added": 1,
+        "removed": 1,
+        "baseline_sha256": "5eea1f6b26f2c2d2cf1978c8d9a3035ffded76ba45732c3de4987f42ffd52e24",
+        "current_sha256": "d20ffbefef03827529f35b0b50517709b3f818d643d90b5d37ca7aefb02f0191"
+      },
+      {
+        "file": "README.md",
+        "status": "modified",
+        "added": 7,
+        "removed": 7,
+        "baseline_sha256": "cebdf3f17a22d73ca443a20f5fe209766cf9f0bdf6fc380477497bb12f62ee50",
+        "current_sha256": "60a423befef1c4a0424dec985d3b2cede4b93eadaa2ed8c65bad23ccff5a2a2a"
+      },
+      {
+        "file": "control",
+        "status": "modified",
+        "added": 1,
+        "removed": 1,
+        "baseline_sha256": "1670fef7699ecac123422a037735f4eea9cecab4b47684d7ec4898f3c175729b",
+        "current_sha256": "e8933fc97a8f4ca0047f26e3fcf2c2d8c86210671c5e070efd855c7eafc54ac5"
+      }
+    ],
+    "explicit_change_allowlist": [
+      "Controllers/CSCloseFriendManager.h",
+      "Controllers/CSCloseFriendManager.m",
+      "Controllers/CSCloseFriendRuntime.h",
+      "Controllers/CSCloseFriendRuntime.m",
+      "Controllers/CSCloseFriendSettingsViewController.m",
+      "Controllers/CSCustomViewController.m",
+      "Controllers/CSReleaseNotesViewController.m",
+      "Headers/CSUserInfoHelper.h",
+      "README.md",
+      "control"
+    ],
+    "unexpected_changed_files": [],
+    "passed": true
+  },
+  "protection": {
+    "frozen_baseline": {
+      "expected_count": 42524,
+      "verified_count": 42524,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true
+    },
+    "historical_packages": {
+      "expected_count": 194,
+      "verified_count": 194,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true,
+      "permitted_new_directory": "packages/2.2-17-quick-entry-closefriend-reset"
+    },
+    "main_theos": {
+      "expected_count": 1237,
+      "verified_count": 1237,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true
+    },
+    "HeadersFile": {
+      "expected_count": 42142,
+      "verified_count": 42142,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true
+    },
+    "old_audits": {
+      "expected_count": 43588,
+      "verified_count": 43588,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true,
+      "preservation_window": "Preparation time through final verification. This manifest is additional protection, not a task-start hash claim.",
+      "prepared_at": "2026-11-05T21:45:41.839125+00:00",
+      "edit_or_deletion_exceptions": []
+    },
+    "original_fixtures": {
+      "all_copied_prior_fixtures": {
+        "expected_count": 314,
+        "verified_count": 314,
+        "missing": [],
+        "changed": [],
+        "unexpected": [],
+        "passed": true
+      },
+      "legacy": {
+        "expected_count": 277,
+        "verified_count": 277,
+        "missing": [],
+        "changed": [],
+        "unexpected": [],
+        "passed": true
+      },
+      "compact": {
+        "expected_count": 7,
+        "verified_count": 7,
+        "missing": [],
+        "changed": [],
+        "unexpected": [],
+        "passed": true
+      },
+      "compact_with_existing_production_support": {
+        "expected_count": 8,
+        "verified_count": 8,
+        "missing": [],
+        "changed": [],
+        "unexpected": [],
+        "passed": true
+      }
+    },
+    "all_other_frozen_source_files_unchanged": {
+      "expected_count": 42514,
+      "verified_count": 42514,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true
+    },
+    "manifest_inputs": {
+      "baseline_manifest_unchanged": true,
+      "historical_packages_manifest_unchanged": true,
+      "main_theos_manifest_unchanged": true
+    },
+    "git_head_matches_task_baseline": true,
+    "checkout_matches_established_project": true,
+    "root_Tests_remains_absent": true
+  },
+  "git": {
+    "head": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+    "expected_head": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+    "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+    "uncommitted_work_present": true,
+    "status_sha256": "0b47db26869060f44b74331256f1e6b473ad8ea44c5dd7906033d9c05a0e498d",
+    "status_file": "final-git-status.z"
+  },
+  "task_constraints": [
+    "No reset, checkout, stash, clean, commit, or overwrite of historical packages is authorized.",
+    "Only read-only Git diff --no-index, rev-parse and status are executed; Git state cannot prove complete shell history."
+  ],
+  "verifier_commands": [
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16/Controllers/CSCloseFriendManager.h",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendManager.h"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16/Controllers/CSCloseFriendManager.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendManager.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16/Controllers/CSCloseFriendRuntime.h",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendRuntime.h"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16/Controllers/CSCloseFriendRuntime.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendRuntime.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16/Controllers/CSCloseFriendSettingsViewController.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendSettingsViewController.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16/Controllers/CSCustomViewController.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCustomViewController.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16/Controllers/CSReleaseNotesViewController.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSReleaseNotesViewController.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16/Headers/CSUserInfoHelper.h",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers/CSUserInfoHelper.h"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16/README.md",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/README.md"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16/control",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/control"
+    ],
+    [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    [
+      "git",
+      "rev-parse",
+      "--show-toplevel"
+    ],
+    [
+      "git",
+      "status",
+      "--porcelain=v1",
+      "-z",
+      "--untracked-files=all"
+    ]
+  ],
+  "delivery_status": {
+    "directory_exists": false,
+    "files": {},
+    "scope_pass_is_not_a_build_or_release_pass": true
+  }
+}

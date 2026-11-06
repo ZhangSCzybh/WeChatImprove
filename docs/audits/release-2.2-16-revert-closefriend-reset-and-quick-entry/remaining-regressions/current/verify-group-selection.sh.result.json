@@ -1,0 +1,25 @@
+{
+  "script": "verify-group-selection.sh",
+  "label": "current",
+  "command": [
+    "bash",
+    "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-selection.sh"
+  ],
+  "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+  "exit_code": 1,
+  "timed_out": false,
+  "elapsed_seconds": 1.149,
+  "script_sha256": "e1e4bd33595a9fd65c77a2a624c68b53d2833de7d5966beb6783a0aee127b636",
+  "log": "current/verify-group-selection.sh.log",
+  "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg",
+  "temporary_env": {
+    "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg/",
+    "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg/_THEOS_LOCAL_DATA_DIR",
+    "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg/THEOS_BUILD_DIR",
+    "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg/THEOS_PACKAGE_DIR",
+    "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-selection.sh.first-frame-provenance.json",
+    "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-selection.sh.admission-provenance.json"
+  },
+  "production_manifest": "production-before.json",
+  "fixtures_manifest": "fixtures-before.json"
+}

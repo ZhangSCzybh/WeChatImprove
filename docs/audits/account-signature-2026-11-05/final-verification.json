@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-11-05T20:26:14.881400+08:00",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "version": "2.2-13",
+  "validation_checks": 43,
+  "validation_failures": 0,
+  "validation_and_build_sources_match": true,
+  "frozen_production_file_count": 42520,
+  "historical_package_files_preserved": 173,
+  "artifacts": [
+    {
+      "path": "packages/2.2-13-account-signature-final/WeChatImprove.dylib",
+      "sha256": "6aeb1786185f84032995e56736367cdd24007d55e9332a5a01f8169dd2a0084c",
+      "bytes": 7103712
+    },
+    {
+      "path": "packages/2.2-13-account-signature-final/com.wechat.improve_2.2-13_iphoneos-arm.deb",
+      "sha256": "e588e96eb3d7940c7162ad80801ea6707440ed1cbab37a2568dc05f330ccc3ca",
+      "bytes": 1634672
+    },
+    {
+      "path": "packages/2.2-13-account-signature-final/com.wechat.improve_2.2-13_iphoneos-arm64.deb",
+      "sha256": "ae32308ba8c4f82e50a51617ed5aac8b3bc7a29c452ae6dbf41e5b80bf783c90",
+      "bytes": 1636354
+    },
+    {
+      "path": "packages/2.2-13-account-signature-final/com.wechat.improve_2.2-13_symbols.zip",
+      "sha256": "37a0eed94e3b75706c43da34a672079c87c70facc6270c82d305dd0807366f65",
+      "bytes": 11625309
+    }
+  ],
+  "exported_dylib_matches_rootful_deb": true,
+  "device_installed": false,
+  "user_environment": "Re-signed WeChat IPA 8.0.78; actual embedded.mobileprovision unavailable; no device/runtime acceptance",
+  "data_source": "Installed WeChat main bundle/embedded.mobileprovision; test fixtures are synthetic only",
+  "findings": "Confirmed legacy UTF-8 corruption and binary-as-ASCII defect; exact user all-fields failure trigger not established"
+}

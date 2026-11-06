@@ -1,5 +1,0 @@
-Production file reverted ONLY in isolated temporary harness: CSMessageActionCoordinator.m at 6edeedd1
-Command: bash Tests/verify-message-actions-execution.sh
-Exit status: 1
-production admission: account=me context=yes menus=2 gesture=yes
-FAIL line 415: sender.calls.count==1

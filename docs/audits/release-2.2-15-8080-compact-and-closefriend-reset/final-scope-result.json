@@ -1,0 +1,326 @@
+{
+  "verified_at": "2026-11-05T14:14:31.117985+00:00",
+  "passed": true,
+  "scope": {
+    "baseline": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14",
+    "basis": "Frozen 2.2-14 worktree, including the user's uncommitted 2.2-13/2.2-14 work; never Git HEAD.",
+    "line_count_method": "git diff --no-index --no-ext-diff --numstat for each changed source; .DS_Store excluded; new source files compared to /dev/null.",
+    "directories": [
+      "Controllers",
+      "Hooks",
+      "Headers"
+    ],
+    "root_files": [
+      "Makefile",
+      "control",
+      "README.md",
+      "WeChatImprove.plist"
+    ],
+    "baseline_file_count": 381,
+    "current_file_count": 381,
+    "changed_file_count": 11,
+    "added": 176,
+    "removed": 16,
+    "files": [
+      {
+        "file": "Controllers/CSBubbleStyleAdapter.m",
+        "status": "modified",
+        "added": 3,
+        "removed": 2,
+        "baseline_sha256": "6e3b009c6d8d8c8869b8f410acde5119c044a40434b706d09562167c878360a8",
+        "current_sha256": "cb55dfa87b1408d4bfe0a6f10e4c76241defac45551eff020d963761784e1576"
+      },
+      {
+        "file": "Controllers/CSCloseFriendBridge.m",
+        "status": "modified",
+        "added": 1,
+        "removed": 1,
+        "baseline_sha256": "7a052bf3316b45040747a7fd495b673c46ee5bc9224fc0b326db8380db1e2bdf",
+        "current_sha256": "de13dfe44f00105dd46e5510e55a00e48ae849ba5a816e6e3cb041c5e51535d3"
+      },
+      {
+        "file": "Controllers/CSCloseFriendManager.m",
+        "status": "modified",
+        "added": 60,
+        "removed": 0,
+        "baseline_sha256": "8292cb7754fbb5a3c7c29238766eb0346c87f4bec06d70753b455e9dfa168915",
+        "current_sha256": "a290c21c125dbe12ed771537e5189330a691a257c1cb9253a11522674005d214"
+      },
+      {
+        "file": "Controllers/CSCloseFriendReset.h",
+        "status": "modified",
+        "added": 6,
+        "removed": 0,
+        "baseline_sha256": "ef63c7a60a1563c9806ba95328ac28d17f4281b5e6f64ec8a5ca28a67aca04f7",
+        "current_sha256": "5b41d337226c46a5a51bcb612d5a3dcd73e7c42fcbaa7bdaa062c6fa29be4a62"
+      },
+      {
+        "file": "Controllers/CSCloseFriendReset.m",
+        "status": "modified",
+        "added": 48,
+        "removed": 1,
+        "baseline_sha256": "57cec6a01ec95d881cb188d2484aa35e8b7bf82ae96b0e3aa42829aca339456a",
+        "current_sha256": "323c577c74c0972ca9a25bdd2e85faec461c14779a2aee338f792b7f82907f4c"
+      },
+      {
+        "file": "Controllers/CSCloseFriendRuntime.h",
+        "status": "modified",
+        "added": 8,
+        "removed": 0,
+        "baseline_sha256": "399a386dd7912f8671e2c06c44ce21dd28d77eadcead05d0cd67513d69bce1f6",
+        "current_sha256": "d42b649e88a8f680a8dc5803b93b7e31a006e95f7240fae4bc665109732a830d"
+      },
+      {
+        "file": "Controllers/CSCloseFriendRuntime.m",
+        "status": "modified",
+        "added": 37,
+        "removed": 4,
+        "baseline_sha256": "b08edf89b04a94306f5dc8d8766224b4d182fddbd5964286d30c69813b650829",
+        "current_sha256": "413898575ff4c3ec45db34b08c6359e1484be1be442740e08671632444002bc3"
+      },
+      {
+        "file": "Controllers/CSReleaseNotesViewController.m",
+        "status": "modified",
+        "added": 5,
+        "removed": 0,
+        "baseline_sha256": "82739260136c741e0f458492761087022bf064390f457a3382e3f56ce4325edc",
+        "current_sha256": "5f05518cef2f8f8739fd6d0c6120f86779ba8033e54e5b78b75ac4ebe5858592"
+      },
+      {
+        "file": "Headers/CSUserInfoHelper.h",
+        "status": "modified",
+        "added": 1,
+        "removed": 1,
+        "baseline_sha256": "a2832f350ca53486086b13bc0e1e045a42f7913ab4ba8b6dee7d1dc7c816bf25",
+        "current_sha256": "e9476608cf1de47fe6f7ca838702455abe363b9ee051f1f8b28742b5f71a7a3b"
+      },
+      {
+        "file": "README.md",
+        "status": "modified",
+        "added": 6,
+        "removed": 6,
+        "baseline_sha256": "5ecaa5b5a69c7e7d0f09c7d3154b1a7f0acf5263d80e626de0db75025e54baae",
+        "current_sha256": "c51ed72eb936242dc7685393a4297a216b4951a90608f417d66b45741eb687e9"
+      },
+      {
+        "file": "control",
+        "status": "modified",
+        "added": 1,
+        "removed": 1,
+        "baseline_sha256": "5b9c2ba3ef60ef525854435180cdfda0f8ba688a4f308c0315e553bd844b906b",
+        "current_sha256": "89acbeb65f5ef2e0cb7fbdf60860e4dd67911fba0df596c4bc0221e49d62a85e"
+      }
+    ]
+  },
+  "protection": {
+    "frozen_baseline": {
+      "expected_count": 42524,
+      "verified_count": 42524,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true
+    },
+    "historical_packages": {
+      "expected_count": 184,
+      "verified_count": 184,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true,
+      "permitted_new_directory": "packages/2.2-15-8080-compact-and-closefriend-reset"
+    },
+    "main_theos": {
+      "expected_count": 1237,
+      "verified_count": 1237,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true
+    },
+    "HeadersFile": {
+      "expected_count": 42142,
+      "verified_count": 42142,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true
+    },
+    "old_audits": {
+      "expected_count": 207,
+      "verified_count": 207,
+      "missing": [],
+      "changed": [],
+      "unexpected": [],
+      "passed": true,
+      "preservation_window": "The preparation time through final verification; no earlier initial-task hash manifest for these audit directories was available.",
+      "prepared_at": "2026-11-05T14:10:49.815303+00:00"
+    },
+    "original_fixtures": {
+      "legacy": {
+        "expected_count": 277,
+        "verified_count": 277,
+        "missing": [],
+        "changed": [],
+        "unexpected": [],
+        "passed": true
+      },
+      "compact": {
+        "expected_count": 7,
+        "verified_count": 7,
+        "missing": [],
+        "changed": [],
+        "unexpected": [],
+        "passed": true
+      }
+    },
+    "manifest_inputs": {
+      "baseline_manifest_unchanged": true,
+      "historical_packages_manifest_unchanged": true,
+      "main_theos_manifest_unchanged": true
+    },
+    "git_head_matches_task_baseline": true
+  },
+  "git": {
+    "head": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+    "expected_head": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+    "uncommitted_work_present": true,
+    "status_sha256": "db63761152343cf1f00d0eb09b63605895f8d9b4e039ace405929b5a781e6534",
+    "status_file": "final-git-status.z"
+  },
+  "task_constraints": [
+    "No reset, checkout, stash, clean, commit, or overwrite of historical packages is authorized.",
+    "This verifier executes only Git diff --no-index, rev-parse and status; it does not infer a complete shell-command history from Git state."
+  ],
+  "verifier_commands": [
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSBubbleStyleAdapter.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSBubbleStyleAdapter.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSCloseFriendBridge.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendBridge.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSCloseFriendManager.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendManager.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSCloseFriendReset.h",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendReset.h"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSCloseFriendReset.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendReset.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSCloseFriendRuntime.h",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendRuntime.h"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSCloseFriendRuntime.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSCloseFriendRuntime.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Controllers/CSReleaseNotesViewController.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSReleaseNotesViewController.m"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/Headers/CSUserInfoHelper.h",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers/CSUserInfoHelper.h"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/README.md",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/README.md"
+    ],
+    [
+      "git",
+      "diff",
+      "--no-index",
+      "--no-ext-diff",
+      "--numstat",
+      "--",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/baseline-2.2-14/control",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/control"
+    ],
+    [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    [
+      "git",
+      "status",
+      "--porcelain=v1",
+      "-z",
+      "--untracked-files=all"
+    ]
+  ],
+  "new_delivery_files": {
+    "packages/2.2-15-8080-compact-and-closefriend-reset/SHA256SUMS": "fa694e985d8f7c4a463f29ee3ed06bcd350c3bedea81bae13646b901f3106b94",
+    "packages/2.2-15-8080-compact-and-closefriend-reset/WeChatImprove.dylib": "ef7137478cfeed5164eb3927e35f74ee83b9f2789d4b16632b448d27c5991072",
+    "packages/2.2-15-8080-compact-and-closefriend-reset/com.wechat.improve_2.2-15_iphoneos-arm.deb": "8e4e3a417b0fa53a32d443e60c9b264f24c024c25443c8ec5c48f7bc02f36627",
+    "packages/2.2-15-8080-compact-and-closefriend-reset/com.wechat.improve_2.2-15_iphoneos-arm64.deb": "f06aa6fbdbe8b59efa4712bd3f1e04862a804019f2114620089f2a14d4af56b4",
+    "packages/2.2-15-8080-compact-and-closefriend-reset/com.wechat.improve_2.2-15_symbols.zip": "f850f40db4a47fb9c842897a3ba2dc9b1f9eaea490208ba44b1b5f88dd27598e"
+  }
+}

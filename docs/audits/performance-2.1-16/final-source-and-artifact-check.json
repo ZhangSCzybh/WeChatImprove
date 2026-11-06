@@ -1,8 +1,0 @@
-{
-  "production_input_count": 42511,
-  "source_matches_built_inputs": true,
-  "preexisting_artifact_count": 1263,
-  "changed_preexisting_artifacts": [],
-  "version_metadata_consistent": true,
-  "diff_whitespace_check_passed": true
-}

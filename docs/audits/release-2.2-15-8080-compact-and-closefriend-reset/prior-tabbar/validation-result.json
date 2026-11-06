@@ -1,0 +1,109 @@
+[
+  {
+    "name": "ios-arm64",
+    "command": [
+      "xcrun",
+      "--sdk",
+      "iphoneos",
+      "clang",
+      "-target",
+      "arm64-apple-ios15.0",
+      "-fobjc-arc",
+      "-fblocks",
+      "-fsyntax-only",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-unused-parameter",
+      "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers",
+      "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSTabBarNativeAdapter.m"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "ios-arm64e",
+    "command": [
+      "xcrun",
+      "--sdk",
+      "iphoneos",
+      "clang",
+      "-target",
+      "arm64e-apple-ios15.0",
+      "-fobjc-arc",
+      "-fblocks",
+      "-fsyntax-only",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-unused-parameter",
+      "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers",
+      "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSTabBarNativeAdapter.m"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "geometry-build",
+    "command": [
+      "xcrun",
+      "clang",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/prior-tabbar/TabBarGeometryTests.c",
+      "-o",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/prior-tabbar/runtime-nv3g11_0/geometry"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "geometry",
+    "command": [
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/prior-tabbar/runtime-nv3g11_0/geometry"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "native-build",
+    "command": [
+      "xcrun",
+      "--sdk",
+      "macosx",
+      "clang",
+      "-fobjc-arc",
+      "-fblocks",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-unused-parameter",
+      "-Wno-unused-const-variable",
+      "-Wno-incompatible-pointer-types",
+      "-framework",
+      "Foundation",
+      "-framework",
+      "QuartzCore",
+      "-framework",
+      "CoreGraphics",
+      "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/prior-tabbar/TabBarUIKit",
+      "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers",
+      "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/prior-tabbar/TabBarUIKit/TabBarUIKit.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSTabBarPreferences.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSTabBarNativeAdapter.m",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/prior-tabbar/TabBarNativeTests.m",
+      "-o",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/prior-tabbar/runtime-nv3g11_0/native"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "native",
+    "command": [
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/prior-tabbar/runtime-nv3g11_0/native",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-15-8080-compact-and-closefriend-reset/prior-tabbar/runtime-nv3g11_0/icon.png"
+    ],
+    "exit_code": 0
+  }
+]

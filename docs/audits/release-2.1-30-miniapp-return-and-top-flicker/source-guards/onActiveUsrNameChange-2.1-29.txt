@@ -1,9 +1,0 @@
-- (void)onActiveUsrNameChange:(id)oldName curUsrName:(id)newName {
-    CSGroupListAdapter *a=Adapter(self);
-    if (!a.table) { %orig; return; }
-    [a recordRefreshReason:NSStringFromSelector(_cmd)];
-    [a beginNativeChangeOfKind:CSGroupChangeContent|CSGroupChangeStructure
-             sessionUserNames:CSGroupActiveSessionEventUserNames(oldName,newName)];
-    @try { CSGroupWithNativeIndices(a.table,^{ %orig; }); }
-    @finally { [a endNativeChangeCoalesced:NO]; }
-}

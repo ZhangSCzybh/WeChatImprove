@@ -1,3 +1,4 @@
+#import "CSSettingsTableViewController.h"
 #import <UIKit/UIKit.h>
 
 // 用户默认设置的SuiteName
@@ -64,7 +65,7 @@ typedef NS_ENUM(NSInteger, CSNavigationNicknamePosition) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CSNavigationTitleSettingsViewController : UITableViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+@interface CSNavigationTitleSettingsViewController : CSSettingsTableViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
 @end
 

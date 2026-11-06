@@ -1,1 +1,0 @@
-FAIL line 467: items.count==3 && items[0]==forward && items[1]==delete

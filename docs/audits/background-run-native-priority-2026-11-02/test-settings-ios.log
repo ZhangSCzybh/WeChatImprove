@@ -1,7 +1,0 @@
-$ xcrun --sdk iphoneos --show-sdk-path
-/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk
-$ xcrun --sdk iphoneos clang -target arm64-apple-ios15.0 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -IControllers -IHeaders -IHooks -c Controllers/CSBackgroundRunViewController.m -o /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.2-6-settings-ios-n62vi3hk/background-ui.arm64.o
-arm64: exit 0
-$ xcrun --sdk iphoneos clang -target arm64e-apple-ios15.0 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -IControllers -IHeaders -IHooks -c Controllers/CSBackgroundRunViewController.m -o /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.2-6-settings-ios-n62vi3hk/background-ui.arm64e.o
-arm64e: exit 0
-Background settings UI: arm64 + arm64e strict source objects compiled

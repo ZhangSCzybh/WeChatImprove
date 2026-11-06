@@ -1,0 +1,2576 @@
+{
+  "scope": "All remaining unchanged historical verify scripts, excluding six legacy message/layout scripts and 21 close-friend scripts already run by root; no actual device observation.",
+  "script_count": 73,
+  "executed": 73,
+  "passed": 60,
+  "failed": 13,
+  "safety_skipped": 0,
+  "new_failures_vs_frozen_2_2_15": 0,
+  "preexisting_compile_fixture_failures": 11,
+  "preexisting_extractor_contract_failures": 2,
+  "baseline_failed_scripts_executed": 13,
+  "maximum_parallel_workers": 3,
+  "no_HOME_home_CODEX_HOME_override": true,
+  "production_files_preserved": 378,
+  "fixture_files_preserved": 277,
+  "historical_fixture_original_hashes_preserved": true,
+  "provenance_files": [
+    "shell-safety-scan.json",
+    "safety-test-source-review.md",
+    "safety-test-source-provenance.json",
+    "production-before.json",
+    "production-after.json",
+    "fixtures-before.json",
+    "fixtures-after.json"
+  ],
+  "runs": [
+    {
+      "script": "verify-ai-background-sync.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-ai-background-sync.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.336,
+      "script_sha256": "b2d551c7261911d2fa9aecc3de2056c0a4661d4d393fb882302d31b16b6d9ca4",
+      "log": "current/verify-ai-background-sync.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-q81bmqpp",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-q81bmqpp/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-q81bmqpp/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-q81bmqpp/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-q81bmqpp/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-background-sync.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-background-sync.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "AI background sync scheduler: 115 checks passed; 45-second one-shot deadlines, verified coverage, revocation, cooldown, stale/early timers, reentry, failed attempts, finite time and release"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-ai-backup.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-ai-backup.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 4.33,
+      "script_sha256": "6d9a56ebf65de9f4b1fcba15feceeab0604cb03f11b26e6859ce7f44f5d6ce55",
+      "log": "current/verify-ai-backup.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-rfspbl2e",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-rfspbl2e/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-rfspbl2e/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-rfspbl2e/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-rfspbl2e/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-backup.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-backup.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "AI reply backup: 97 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-ai-coordinator.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-ai-coordinator.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 3.693,
+      "script_sha256": "a526c113e58d1bb2e18d9ee4339406bd665b068441d73ead910caae927ff141a",
+      "log": "current/verify-ai-coordinator.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-oh9p4jil",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-oh9p4jil/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-oh9p4jil/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-oh9p4jil/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-oh9p4jil/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-coordinator.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-coordinator.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "BackgroundFallbackConfiguration: 92 checks passed: legacy compatibility, strict booleans, persisted toggles, portable restore and connection verification preservation",
+        "AIReplyCoordinatorTests: 4588 checks passed: filtering, alias durability fences, bounded async admissions, LRU/TTL/global text budget, memory pressure, serialization, cancellation, expiry, safe failure details and one-shot timers"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-ai-credentials.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-ai-credentials.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.131,
+      "script_sha256": "67b50a8e296559a87240f6443603cfec731b13e54566f34e616399862a84be7f",
+      "log": "current/verify-ai-credentials.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xuz79mks",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xuz79mks/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xuz79mks/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xuz79mks/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xuz79mks/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-credentials.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-credentials.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "AI credential store: 30 checks passed (7 stub reads, 0 reads on main)"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-ai-foundation.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-ai-foundation.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 2.362,
+      "script_sha256": "03e5e296668f05aa09ff5c8233152ee7dac25e6cd26c9c60372125f1a06ed976",
+      "log": "current/verify-ai-foundation.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-3jha0i7f",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-3jha0i7f/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-3jha0i7f/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-3jha0i7f/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-3jha0i7f/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-foundation.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-foundation.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-ai-images.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-ai-images.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 5.258,
+      "script_sha256": "9377eda1c3c1a068ed1aee07edc1bf535c139cb4c6609d677036c69a967f9077",
+      "log": "current/verify-ai-images.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-timjuvcm",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-timjuvcm/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-timjuvcm/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-timjuvcm/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-timjuvcm/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-images.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-images.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "AI image preparation: 326 checks passed; bounded ImageIO encoding, native download identity, cancellation and account reentry verified"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-ai-manager.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-ai-manager.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 6.07,
+      "script_sha256": "e2a0e87981a9faecbdd39c9d2afc80946f821f9dc6164d8be9aa8502ef090663",
+      "log": "current/verify-ai-manager.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-7bmbux_0",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-7bmbux_0/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-7bmbux_0/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-7bmbux_0/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-7bmbux_0/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-manager.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-manager.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "AI reply manager: 863 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-ai-native-sync-observer.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-ai-native-sync-observer.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.406,
+      "script_sha256": "8f78ada50875b4eb8a83a96e984e9dd9efd9f46335da931c06fef4d239e6f517",
+      "log": "current/verify-ai-native-sync-observer.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ufr20wnh",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ufr20wnh/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ufr20wnh/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ufr20wnh/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ufr20wnh/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-native-sync-observer.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-native-sync-observer.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "AI native sync observer: 786 checks passed; real production hooks, original ordering/arguments/results, epoch-bound marker, full terminal response, main FIFO idle, rejection/exception/reentry fences",
+        "AI native sync observer ABI rejection create-return-c: 6 checks passed",
+        "AI native sync observer ABI rejection create-argument-Q: 6 checks passed",
+        "AI native sync observer ABI rejection create-argument-count: 6 checks passed",
+        "AI native sync observer ABI rejection return-result-B: 6 checks passed",
+        "AI native sync observer ABI rejection return-event-Q: 6 checks passed",
+        "AI native sync observer ABI rejection handle-result-B: 6 checks passed",
+        "AI native sync observer ABI rejection handle-processed-c: 6 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-ai-native.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-ai-native.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.004,
+      "script_sha256": "46463cc445d004b4ab9962cacccef8ff10d8851faf5a99ada4facd97149bcd53",
+      "log": "current/verify-ai-native.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-qhfjzz9g",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-qhfjzz9g/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-qhfjzz9g/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-qhfjzz9g/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-qhfjzz9g/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-native.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-native.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "AI native adapters: 86 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-ai-store-async.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-ai-store-async.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.825,
+      "script_sha256": "199b8296fc56a39953e8829371f4ab5c57c96bbabc1328be5af4f130ef8be2fd",
+      "log": "current/verify-ai-store-async.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ddxdz45v",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ddxdz45v/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ddxdz45v/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ddxdz45v/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ddxdz45v/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-store-async.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-ai-store-async.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-authorization-prompt.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-authorization-prompt.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.689,
+      "script_sha256": "e740b6db731f25b2f1c495b0978053520fa08dffcf6cd0274e9a67f88eecd7a6",
+      "log": "current/verify-authorization-prompt.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-stxh1qxl",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-stxh1qxl/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-stxh1qxl/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-stxh1qxl/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-stxh1qxl/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-authorization-prompt.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-authorization-prompt.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Authorization prompt/navigation: 92 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-authorization-read.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-authorization-read.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.495,
+      "script_sha256": "942f66479254c175b4069f77d0ef43e2910f543660ef0c3fe03d5f9ca8a3422a",
+      "log": "current/verify-authorization-read.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-45_1o8vd",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-45_1o8vd/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-45_1o8vd/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-45_1o8vd/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-45_1o8vd/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-authorization-read.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-authorization-read.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Authorization live-read tests passed (67 checks; no defaults access or logs)."
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-avatar-input-style.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-avatar-input-style.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 2.056,
+      "script_sha256": "aca3721de56234bbf9beb354661612e732899eb26741f786c72befb0db8d1077",
+      "log": "current/verify-avatar-input-style.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-jm6z9obm",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-jm6z9obm/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-jm6z9obm/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-jm6z9obm/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-jm6z9obm/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-avatar-input-style.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-avatar-input-style.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-background-blur.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-background-blur.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.009,
+      "script_sha256": "f69ac6ec5dd6b4a99d67a1a76ad4cdd9d7187c18aa483f45bf4f7b4183a8f5ad",
+      "log": "current/verify-background-blur.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-opv52y7k",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-opv52y7k/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-opv52y7k/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-opv52y7k/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-opv52y7k/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-background-blur.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-background-blur.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-background-privacy.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-background-privacy.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.207,
+      "script_sha256": "48170c0da6793f63ed4a9d9d92df3b28e028f8691a0fbd373b8a3aa0b904daed",
+      "log": "current/verify-background-privacy.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-usn05win",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-usn05win/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-usn05win/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-usn05win/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-usn05win/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-background-privacy.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-background-privacy.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "BackgroundPrivacyCoverTests: 40 checks, 0 failures"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-background-run-runtime.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-background-run-runtime.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.1,
+      "script_sha256": "c3ec22f73d055fc58da75203667985ba15efc88a18c794b7ff3baa60e6ae5f9f",
+      "log": "current/verify-background-run-runtime.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8weiri0m",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8weiri0m/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8weiri0m/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8weiri0m/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8weiri0m/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-background-run-runtime.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-background-run-runtime.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Background runtime: 47 checks passed; task expiration, ownership and one-shot checks verified"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-background-run.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-background-run.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 4.994,
+      "script_sha256": "f1da1513f50c7000c76177aeaba57269d8c039093b4cb26bca89594f5c3d2ee1",
+      "log": "current/verify-background-run.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8mte314a",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8mte314a/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8mte314a/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8mte314a/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8mte314a/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-background-run.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-background-run.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Background records: 53 checks passed; actual checks, lifecycle timestamps, monotonic gaps and stale callbacks verified",
+        "Background hybrid: 161 checks passed; deterministic budgets, lifecycle, audio handoff and expiration verified",
+        "Background run: 186 checks passed; production manager, audio ownership and native hook bodies verified"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-assets.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-assets.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.359,
+      "script_sha256": "73ef7da1e07f217c66c29075e7980092a54da071ad1594c5f80e9ee93908c2b4",
+      "log": "current/verify-backup-assets.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-viv8q04s",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-viv8q04s/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-viv8q04s/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-viv8q04s/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-viv8q04s/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-assets.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-assets.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup assets: 26 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-audit.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-audit.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.983,
+      "script_sha256": "fed23287d19b44c4e2a6a8fb7bd01191b96293547de38be8bd2c02a723621ea8",
+      "log": "current/verify-backup-audit.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-z446s4_b",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-z446s4_b/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-z446s4_b/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-z446s4_b/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-z446s4_b/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-audit.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-audit.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup passive audit: 43 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-bootstrap.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-bootstrap.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 15.979,
+      "script_sha256": "5111d56f71d282c77fdf2a45a5e2a3a3fc2d1e34d04bdd581e7a5467fa34ff78",
+      "log": "current/verify-backup-bootstrap.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-exi93njc",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-exi93njc/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-exi93njc/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-exi93njc/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-exi93njc/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-bootstrap.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-bootstrap.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup bootstrap: 34 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-codec.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-codec.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.357,
+      "script_sha256": "0223f99b525e298e8c3a2096b5ffdec6f190b9e9bd8b6254bf5ba626c159bb45",
+      "log": "current/verify-backup-codec.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-mt6vcj57",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-mt6vcj57/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-mt6vcj57/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-mt6vcj57/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-mt6vcj57/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-codec.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-codec.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup codec: 16 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-compatibility.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-compatibility.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 3.463,
+      "script_sha256": "f2efc3813e44bde92e3ee8cebc229e077dc79d4816ff576e678e26e16e8b7ff1",
+      "log": "current/verify-backup-compatibility.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-qvzu45jy",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-qvzu45jy/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-qvzu45jy/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-qvzu45jy/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-qvzu45jy/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-compatibility.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-compatibility.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup compatibility: 66 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-deletion-ui.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-deletion-ui.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.565,
+      "script_sha256": "100a12679c3a57e7ef421e8b7f21f4f534340d34e18d7c13d5233ff53db66184",
+      "log": "current/verify-backup-deletion-ui.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-j438_8g3",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-j438_8g3/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-j438_8g3/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-j438_8g3/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-j438_8g3/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-deletion-ui.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-deletion-ui.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup deletion UI: 565 checks passed (real menus/load/confirmation/manager removal; in-memory Store)"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-deletion.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-deletion.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.746,
+      "script_sha256": "fc2cc330ce266484e477b6158524d67b9021a090ac28896780a4528cea3a3159",
+      "log": "current/verify-backup-deletion.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-c2qvbbb3",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-c2qvbbb3/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-c2qvbbb3/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-c2qvbbb3/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-c2qvbbb3/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-deletion.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-deletion.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup deletion: 140 checks passed (all five kinds, unavailable/renamed files, recovery guards and confined unlink)"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-engine.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-engine.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 2.685,
+      "script_sha256": "3de3a31f426c2eab724d814fe6e12f17d9a7738b391170a2b09ba7479ef0e4ab",
+      "log": "current/verify-backup-engine.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-28ye2u8w",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-28ye2u8w/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-28ye2u8w/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-28ye2u8w/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-28ye2u8w/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-engine.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-engine.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup engine: 25 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-manual-management.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-manual-management.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.757,
+      "script_sha256": "5bd72056eff16feb6f5a494b2b68a863e87f3a7cdf5f86fbcc5cd6a6ccb0e4c4",
+      "log": "current/verify-backup-manual-management.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-4bg2yl16",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-4bg2yl16/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-4bg2yl16/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-4bg2yl16/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-4bg2yl16/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-manual-management.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-manual-management.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup manual management: 130 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-performance.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-performance.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 3.029,
+      "script_sha256": "11e47e5c2193572917bb0ea9e6a9d71011baddcace5b1fbd3cb596ecd91691f4",
+      "log": "current/verify-backup-performance.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-bie9is2r",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-bie9is2r/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-bie9is2r/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-bie9is2r/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-bie9is2r/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-performance.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-performance.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup performance: 182 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-registry.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-registry.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.017,
+      "script_sha256": "395adef363f787e99e1f4360bd28380451864abfc812f449c6d83bb09968e535",
+      "log": "current/verify-backup-registry.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-gjkd7k2j",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-gjkd7k2j/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-gjkd7k2j/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-gjkd7k2j/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-gjkd7k2j/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-registry.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-registry.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-reset.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-reset.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 2.85,
+      "script_sha256": "4df90e3530341ecc66e64e146762676e8121813c67bc2d1d0ed4c0d5bc093be7",
+      "log": "current/verify-backup-reset.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-khaj2bk4",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-khaj2bk4/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-khaj2bk4/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-khaj2bk4/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-khaj2bk4/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-reset.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-reset.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup reset: 33 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-restore-paths.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-restore-paths.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 3.537,
+      "script_sha256": "84cdd14964917e866f480a4630902a2a7a1c8b357e0fe30c6de461001354647d",
+      "log": "current/verify-backup-restore-paths.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xu336k6t",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xu336k6t/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xu336k6t/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xu336k6t/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xu336k6t/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-restore-paths.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-restore-paths.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup restore paths: 249 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-store.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-store.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.807,
+      "script_sha256": "c1aa347ba77a9446154f2fc06f6da6f9b454f9448a0f3dde8ed62a606958cd14",
+      "log": "current/verify-backup-store.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-2qptlmd2",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-2qptlmd2/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-2qptlmd2/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-2qptlmd2/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-2qptlmd2/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-store.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-store.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup store: 51 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-backup-transactions.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-backup-transactions.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 5.859,
+      "script_sha256": "0dbebf2e54bcc6934fbb682a976a031ac5e51b21e01a8b023239b5099c206637",
+      "log": "current/verify-backup-transactions.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dejknws7",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dejknws7/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dejknws7/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dejknws7/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dejknws7/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-transactions.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-backup-transactions.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Backup transactions: 104 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-custom-text.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-custom-text.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.061,
+      "script_sha256": "9d72c03880d349722b143ab963ce8faedfa99d3d754eb75915a2494bdbe06a9d",
+      "log": "current/verify-custom-text.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-fb7u0wau",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-fb7u0wau/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-fb7u0wau/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-fb7u0wau/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-fb7u0wau/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-custom-text.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-custom-text.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Custom text matching: 37502 checks passed; 10,000 ordinary labels compile no regex; three patterns compiled once"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-group-appearance.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-appearance.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.204,
+      "script_sha256": "649fa00a320876d3b0e21e5defbb3f49a1eac158934b4859c75da56a4a1f00ef",
+      "log": "current/verify-group-appearance.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-_y2kzjsn",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-_y2kzjsn/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-_y2kzjsn/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-_y2kzjsn/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-_y2kzjsn/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-appearance.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-appearance.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-host-fixture-compilation-incompatibility",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-group-appearance.sh.log",
+        "script_sha256": "649fa00a320876d3b0e21e5defbb3f49a1eac158934b4859c75da56a4a1f00ef",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "no visible @interface for 'WETabButton' declares the selector 'badgeWidth'",
+          "no visible @interface for 'Container' declares the selector 'widthForTabButton:'",
+          "no visible @interface for 'WETabButton' declares the selector 'badgeWidth'",
+          "no visible @interface for 'Container' declares the selector 'widthForTabButton:'",
+          "property 'tabLayoutValid' not found on object of type 'Container *'"
+        ],
+        "diagnostic_multiset": {
+          "no visible @interface for 'WETabButton' declares the selector 'badgeWidth'": 2,
+          "no visible @interface for 'Container' declares the selector 'widthForTabButton:'": 2,
+          "property 'tabLayoutValid' not found on object of type 'Container *'": 1
+        },
+        "diag_sha256": "35468afec642c48ac87c0766546604a69c6fcb92f91f459f95a936784742e014"
+      }
+    },
+    {
+      "script": "verify-group-badges.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-badges.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.731,
+      "script_sha256": "12823f2429da22e31a6c59a4443783a74569888fe615482aa06ed6b6264a16be",
+      "log": "current/verify-group-badges.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nny7xkiz",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nny7xkiz/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nny7xkiz/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nny7xkiz/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nny7xkiz/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-badges.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-badges.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-host-fixture-compilation-incompatibility",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-group-badges.sh.log",
+        "script_sha256": "12823f2429da22e31a6c59a4443783a74569888fe615482aa06ed6b6264a16be",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "no visible @interface for 'WETabButton' declares the selector 'badgeWidth'",
+          "no visible @interface for 'BadgeChrome' declares the selector 'widthForTabButton:'",
+          "no visible @interface for 'WETabButton' declares the selector 'badgeWidth'",
+          "no visible @interface for 'BadgeChrome' declares the selector 'widthForTabButton:'",
+          "property 'tabLayoutValid' not found on object of type 'BadgeChrome *'",
+          "call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]",
+          "implicit conversion of 'int' to 'NSArray *' is disallowed with ARC",
+          "incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]",
+          "call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]",
+          "implicit conversion of 'int' to 'NSArray *' is disallowed with ARC",
+          "incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]"
+        ],
+        "diagnostic_multiset": {
+          "no visible @interface for 'WETabButton' declares the selector 'badgeWidth'": 2,
+          "no visible @interface for 'BadgeChrome' declares the selector 'widthForTabButton:'": 2,
+          "property 'tabLayoutValid' not found on object of type 'BadgeChrome *'": 1,
+          "call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]": 2,
+          "implicit conversion of 'int' to 'NSArray *' is disallowed with ARC": 2,
+          "incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]": 2
+        },
+        "diag_sha256": "a2f24f697a5594214b0b8d32c7d590301153fff702b81ffd12e8dd2fc2cc30f9"
+      }
+    },
+    {
+      "script": "verify-group-business.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-business.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.847,
+      "script_sha256": "6f2b9cbc04d11091ddb022fe4185c7b4274d7cfa6a27813d7c3a5603364cf7cc",
+      "log": "current/verify-group-business.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-6elwz0cs",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-6elwz0cs/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-6elwz0cs/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-6elwz0cs/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-6elwz0cs/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-business.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-business.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-host-fixture-compilation-incompatibility",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-group-business.sh.log",
+        "script_sha256": "6f2b9cbc04d11091ddb022fe4185c7b4274d7cfa6a27813d7c3a5603364cf7cc",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'nativePath:'",
+          "call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]",
+          "implicit conversion of 'int' to 'NSArray *' is disallowed with ARC",
+          "incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]",
+          "implicit conversion of 'int' to 'NSArray *' is disallowed with ARC",
+          "incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]",
+          "implicit conversion of 'int' to 'NSArray *' is disallowed with ARC",
+          "incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]"
+        ],
+        "diagnostic_multiset": {
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'nativePath:'": 1,
+          "call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]": 1,
+          "implicit conversion of 'int' to 'NSArray *' is disallowed with ARC": 3,
+          "incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]": 3
+        },
+        "diag_sha256": "20713d9521308f266405a3b238a0cc3ede22472c52e65171990d33beb9e2be4d"
+      }
+    },
+    {
+      "script": "verify-group-header.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-header.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.79,
+      "script_sha256": "8ed55067ca9082c651736935e549354e2baf053e6f4b79c26eaa24d378e54fae",
+      "log": "current/verify-group-header.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-s3ox1dri",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-s3ox1dri/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-s3ox1dri/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-s3ox1dri/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-s3ox1dri/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-header.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-header.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Group header semantics: 46 checks, 0 failures"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-group-incremental.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-incremental.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.503,
+      "script_sha256": "ec79488954229211f882f561632d426afd840cac56821648e674416ef915e7f3",
+      "log": "current/verify-group-incremental.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ovw3cyh4",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ovw3cyh4/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ovw3cyh4/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ovw3cyh4/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-ovw3cyh4/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-incremental.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-incremental.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-host-fixture-compilation-incompatibility",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-group-incremental.sh.log",
+        "script_sha256": "ec79488954229211f882f561632d426afd840cac56821648e674416ef915e7f3",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]",
+          "expected method body",
+          "semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]",
+          "expected method body",
+          "semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]",
+          "expected method body",
+          "semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]",
+          "expected method body",
+          "expected a type",
+          "semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]",
+          "expected method body",
+          "semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]",
+          "expected method body",
+          "unexpected '@' in program",
+          "unexpected '@' in program",
+          "unexpected '@' in program",
+          "unexpected '@' in program",
+          "unexpected '@' in program",
+          "semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]",
+          "too many errors emitted, stopping now [-ferror-limit=]"
+        ],
+        "diagnostic_multiset": {
+          "semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]": 7,
+          "expected method body": 6,
+          "expected a type": 1,
+          "unexpected '@' in program": 5,
+          "too many errors emitted, stopping now [-ferror-limit=]": 1
+        },
+        "diag_sha256": "b5a5c35190a79ece816a5aeedd2c6537b3c773a340facca38084871af372dc83"
+      }
+    },
+    {
+      "script": "verify-group-indicator.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-indicator.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.847,
+      "script_sha256": "f3187f1abd47c540e8ecf11547e5d22289c377d3f64888ecc8c76a542b50f43f",
+      "log": "current/verify-group-indicator.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-w_la7xaq",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-w_la7xaq/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-w_la7xaq/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-w_la7xaq/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-w_la7xaq/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-indicator.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-indicator.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Group indicator: 91 checks, 0 failures"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-group-interactions.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-interactions.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.199,
+      "script_sha256": "d88f3b11c2907b962a3d04f83c55fb5bb14bd2b7e0cd1de1d70d25d03c3dfd4f",
+      "log": "current/verify-group-interactions.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xp7u2u0n",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xp7u2u0n/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xp7u2u0n/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xp7u2u0n/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-xp7u2u0n/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-interactions.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-interactions.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-host-fixture-compilation-incompatibility",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-group-interactions.sh.log",
+        "script_sha256": "d88f3b11c2907b962a3d04f83c55fb5bb14bd2b7e0cd1de1d70d25d03c3dfd4f",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'",
+          "property 'immediateRefreshPending' not found on object of type 'CSGroupListAdapter *'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'",
+          "property 'presentationViewport' not found on object of type 'CSGroupListAdapter *'",
+          "property 'switchViewport' not found on object of type 'CSGroupListAdapter *'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'captureViewportForTabID:'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'",
+          "property 'immediateRefreshPending' not found on object of type 'CSGroupListAdapter *'",
+          "property 'immediateRefreshPending' not found on object of type 'CSGroupListAdapter *'",
+          "property 'refreshCoalescedDue' not found on object of type 'CSGroupListAdapter *'",
+          "property 'refreshCoalescedDue' not found on object of type 'CSGroupListAdapter *'",
+          "property 'scheduledRefreshDue' not found on object of type 'CSGroupListAdapter *'",
+          "property 'scheduledRefreshDue' not found on object of type 'CSGroupListAdapter *'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'",
+          "too many errors emitted, stopping now [-ferror-limit=]"
+        ],
+        "diagnostic_multiset": {
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'": 3,
+          "property 'immediateRefreshPending' not found on object of type 'CSGroupListAdapter *'": 3,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 3,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'": 1,
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'": 1,
+          "property 'presentationViewport' not found on object of type 'CSGroupListAdapter *'": 1,
+          "property 'switchViewport' not found on object of type 'CSGroupListAdapter *'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'captureViewportForTabID:'": 1,
+          "property 'refreshCoalescedDue' not found on object of type 'CSGroupListAdapter *'": 2,
+          "property 'scheduledRefreshDue' not found on object of type 'CSGroupListAdapter *'": 2,
+          "too many errors emitted, stopping now [-ferror-limit=]": 1
+        },
+        "diag_sha256": "c0e19e02439829c606f05c8647ae155b7230d5a1be8e0c1664f3a9da90b53ab9"
+      }
+    },
+    {
+      "script": "verify-group-lifecycle.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-lifecycle.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.041,
+      "script_sha256": "d25b31102c3a4ba95d50991c6edef628e3cb44876a161f0ec142584ebc768899",
+      "log": "current/verify-group-lifecycle.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-3ekmkzb9",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-3ekmkzb9/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-3ekmkzb9/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-3ekmkzb9/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-3ekmkzb9/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-lifecycle.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-lifecycle.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-extractor-contract-failure",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-group-lifecycle.sh.log",
+        "script_sha256": "d25b31102c3a4ba95d50991c6edef628e3cb44876a161f0ec142584ebc768899",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "ValueError: substring not found"
+        ],
+        "diagnostic_multiset": {
+          "ValueError: substring not found": 1
+        },
+        "diag_sha256": "46be758b520a95486c79651e42c5b0fd244a193e712495813a04d82470392caa"
+      }
+    },
+    {
+      "script": "verify-group-picker.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-picker.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.181,
+      "script_sha256": "4d0c5f3b745e310f296c6dc79ec91cfd4f69cd24b4a4fc715b3e6a2847d08fe5",
+      "log": "current/verify-group-picker.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-sftr9qrs",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-sftr9qrs/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-sftr9qrs/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-sftr9qrs/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-sftr9qrs/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-picker.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-picker.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Group picker presentation: 609 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-group-preferences.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-preferences.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.786,
+      "script_sha256": "0daf7c8f62edac3f4ff3c538857bcce241bd34dceee65be94c95c4f402e0abcd",
+      "log": "current/verify-group-preferences.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-w43t9ig9",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-w43t9ig9/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-w43t9ig9/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-w43t9ig9/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-w43t9ig9/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-preferences.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-preferences.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Group preferences: 23 checks, 0 failures"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-group-search.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-search.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.563,
+      "script_sha256": "446a6d370957ddf3e9018ee5462600fa57396184f10504dae51828da32307727",
+      "log": "current/verify-group-search.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-4l43j3w9",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-4l43j3w9/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-4l43j3w9/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-4l43j3w9/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-4l43j3w9/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-search.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-search.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-host-fixture-compilation-incompatibility",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-group-search.sh.log",
+        "script_sha256": "446a6d370957ddf3e9018ee5462600fa57396184f10504dae51828da32307727",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'",
+          "use of undeclared identifier 'UIScrollViewDecelerationRate'",
+          "use of undeclared identifier 'deceleration'",
+          "use of undeclared identifier 'deceleration'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'",
+          "property 'presentationViewport' not found on object of type 'CSGroupListAdapter *'",
+          "property 'switchViewport' not found on object of type 'CSGroupListAdapter *'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'captureViewportForTabID:'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'",
+          "property 'pendingChangeNamesUnknown' not found on object of type 'CSGroupListAdapter *'",
+          "property 'pendingChangedUserNames' not found on object of type 'CSGroupListAdapter *'",
+          "property 'pendingChangedUserNames' not found on object of type 'CSGroupListAdapter *'",
+          "property 'pendingChangeNamesUnknown' not found on object of type 'CSGroupListAdapter *'",
+          "property 'modelRevision' not found on object of type 'CSGroupListAdapter *'",
+          "property 'snapshotEpoch' not found on object of type 'CSGroupListAdapter *'",
+          "call to undeclared function 'CSCloseFriendAccountEpoch'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]",
+          "too many errors emitted, stopping now [-ferror-limit=]"
+        ],
+        "diagnostic_multiset": {
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'": 1,
+          "use of undeclared identifier 'UIScrollViewDecelerationRate'": 1,
+          "use of undeclared identifier 'deceleration'": 2,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'": 1,
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'": 1,
+          "property 'presentationViewport' not found on object of type 'CSGroupListAdapter *'": 1,
+          "property 'switchViewport' not found on object of type 'CSGroupListAdapter *'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'captureViewportForTabID:'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'": 1,
+          "property 'pendingChangeNamesUnknown' not found on object of type 'CSGroupListAdapter *'": 2,
+          "property 'pendingChangedUserNames' not found on object of type 'CSGroupListAdapter *'": 2,
+          "property 'modelRevision' not found on object of type 'CSGroupListAdapter *'": 1,
+          "property 'snapshotEpoch' not found on object of type 'CSGroupListAdapter *'": 1,
+          "call to undeclared function 'CSCloseFriendAccountEpoch'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]": 1,
+          "too many errors emitted, stopping now [-ferror-limit=]": 1
+        },
+        "diag_sha256": "82b4be8b4032e324242db1425458fc7c581a99a7363b5d630d0c37a5583ce698"
+      }
+    },
+    {
+      "script": "verify-group-selection.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-selection.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 1.149,
+      "script_sha256": "e1e4bd33595a9fd65c77a2a624c68b53d2833de7d5966beb6783a0aee127b636",
+      "log": "current/verify-group-selection.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-selection.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-selection.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-host-fixture-compilation-incompatibility",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-group-selection.sh.log",
+        "script_sha256": "e1e4bd33595a9fd65c77a2a624c68b53d2833de7d5966beb6783a0aee127b636",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'"
+        ],
+        "diagnostic_multiset": {
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'": 3,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 2,
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 3
+        },
+        "diag_sha256": "9eac76d7d691c8f96c82225119ef80b5cffb5985c57ef9d0f942e7353219ab04"
+      }
+    },
+    {
+      "script": "verify-group-viewport.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-group-viewport.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.041,
+      "script_sha256": "a4681b6c549e043298526fdf9e9419564e3484135a99e14e8adcd2dc87c402b0",
+      "log": "current/verify-group-viewport.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-yqklfju7",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-yqklfju7/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-yqklfju7/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-yqklfju7/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-yqklfju7/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-viewport.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-group-viewport.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-extractor-contract-failure",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-group-viewport.sh.log",
+        "script_sha256": "a4681b6c549e043298526fdf9e9419564e3484135a99e14e8adcd2dc87c402b0",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "AssertionError"
+        ],
+        "diagnostic_multiset": {
+          "AssertionError": 1
+        },
+        "diag_sha256": "a9faa04dfabe329ab2d23876d150092f3fecea7ddde4426ab854f4e48b9eb2ab"
+      }
+    },
+    {
+      "script": "verify-layout-preferences.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-layout-preferences.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.634,
+      "script_sha256": "209dbbf9044286dc174147cc1ab1a134182a9f77f0721dc74dc4d2a507f50e8b",
+      "log": "current/verify-layout-preferences.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dq0rzch3",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dq0rzch3/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dq0rzch3/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dq0rzch3/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dq0rzch3/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-layout-preferences.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-layout-preferences.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-list-corners.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-list-corners.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 3.493,
+      "script_sha256": "d72f341bc6c21f0de5041f12570c480ad1ea104b851c3cae0ac4b843bdfa0cf7",
+      "log": "current/verify-list-corners.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-628y7ewl",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-628y7ewl/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-628y7ewl/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-628y7ewl/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-628y7ewl/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-list-corners.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-list-corners.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "List corners: 1631 checks, 0 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-managed-image-files.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-managed-image-files.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 2.627,
+      "script_sha256": "bac7b7fe541076c2c24a40783a214e86255e6d20e6e1afd476e18c23885362a3",
+      "log": "current/verify-managed-image-files.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-zl90__nh",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-zl90__nh/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-zl90__nh/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-zl90__nh/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-zl90__nh/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-managed-image-files.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-managed-image-files.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Managed image deletion: 125 checks passed",
+        "Managed image cleanup integration: 29 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-message-actions-core.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-message-actions-core.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.618,
+      "script_sha256": "4830fa3d2a2cb3b1f20fe6b9e7f7fde8769a709fe331b55c55c6b65a619047ed",
+      "log": "current/verify-message-actions-core.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-sk0yv6b2",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-sk0yv6b2/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-sk0yv6b2/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-sk0yv6b2/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-sk0yv6b2/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-message-actions-core.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-message-actions-core.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-message-actions-execution.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-message-actions-execution.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 17.813,
+      "script_sha256": "eafb7aa462fe39d105f5c7ca3b37c6ffe9be8b6eff0a42122170048d0944dc40",
+      "log": "current/verify-message-actions-execution.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dztuiaag",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dztuiaag/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dztuiaag/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dztuiaag/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-dztuiaag/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-message-actions-execution.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-message-actions-execution.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-miniapp-first-frame.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-miniapp-first-frame.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 1.424,
+      "script_sha256": "4a7003dec6883e1ff28a33da4c6d7b9aeb31b6b8c867388c3c9611b91fa8d8a4",
+      "log": "current/verify-miniapp-first-frame.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-64togfme",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-64togfme/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-64togfme/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-64togfme/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-64togfme/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-miniapp-first-frame.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-miniapp-first-frame.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-host-fixture-compilation-incompatibility",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-miniapp-first-frame.sh.log",
+        "script_sha256": "4a7003dec6883e1ff28a33da4c6d7b9aeb31b6b8c867388c3c9611b91fa8d8a4",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "unexpected '@' in program",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'",
+          "property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'",
+          "redefinition of 'keepsSearchGroup'",
+          "property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'",
+          "use of undeclared identifier 'CSGroupNativeSessionCoordinator'",
+          "use of undeclared identifier 'coordinator'",
+          "use of undeclared identifier 'CSGroupNativeSessionCoordinator'",
+          "use of undeclared identifier 'coordinator'",
+          "use of undeclared identifier 'coordinator'",
+          "too many errors emitted, stopping now [-ferror-limit=]"
+        ],
+        "diagnostic_multiset": {
+          "unexpected '@' in program": 1,
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 3,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'": 3,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 2,
+          "property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'": 2,
+          "redefinition of 'keepsSearchGroup'": 1,
+          "use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+          "use of undeclared identifier 'coordinator'": 3,
+          "too many errors emitted, stopping now [-ferror-limit=]": 1
+        },
+        "diag_sha256": "29c294455870760af0f113c8e186ef71f6d9b8f5b2799b68b2110e64d9b00d0c"
+      }
+    },
+    {
+      "script": "verify-miniapp-private-layout.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-miniapp-private-layout.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 1.37,
+      "script_sha256": "02a0576987f320a6800f37706370e890c709e951da91757e06533258a9365877",
+      "log": "current/verify-miniapp-private-layout.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8_u95fw2",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8_u95fw2/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8_u95fw2/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8_u95fw2/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8_u95fw2/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-miniapp-private-layout.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-miniapp-private-layout.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-host-fixture-compilation-incompatibility",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-miniapp-private-layout.sh.log",
+        "script_sha256": "02a0576987f320a6800f37706370e890c709e951da91757e06533258a9365877",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "unexpected '@' in program",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'",
+          "property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'",
+          "redefinition of 'keepsSearchGroup'",
+          "property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'",
+          "use of undeclared identifier 'CSGroupNativeSessionCoordinator'",
+          "use of undeclared identifier 'coordinator'",
+          "use of undeclared identifier 'CSGroupNativeSessionCoordinator'",
+          "use of undeclared identifier 'coordinator'",
+          "use of undeclared identifier 'coordinator'",
+          "too many errors emitted, stopping now [-ferror-limit=]"
+        ],
+        "diagnostic_multiset": {
+          "unexpected '@' in program": 1,
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 3,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'": 3,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 2,
+          "property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'": 2,
+          "redefinition of 'keepsSearchGroup'": 1,
+          "use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+          "use of undeclared identifier 'coordinator'": 3,
+          "too many errors emitted, stopping now [-ferror-limit=]": 1
+        },
+        "diag_sha256": "29c294455870760af0f113c8e186ef71f6d9b8f5b2799b68b2110e64d9b00d0c"
+      }
+    },
+    {
+      "script": "verify-my-page-clean.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-my-page-clean.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.531,
+      "script_sha256": "3b51f0fb7ecc7b19b05097af41b8803155f0ab128995324d647c7af8403b8200",
+      "log": "current/verify-my-page-clean.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-hzn1ndl3",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-hzn1ndl3/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-hzn1ndl3/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-hzn1ndl3/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-hzn1ndl3/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-my-page-clean.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-my-page-clean.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-native-contact-picker.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-native-contact-picker.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.978,
+      "script_sha256": "33fc3d57fbb9e122650fe8cb7cef16894806251446e2e7454a521ed7ffa5a434",
+      "log": "current/verify-native-contact-picker.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-kcwpjtn2",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-kcwpjtn2/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-kcwpjtn2/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-kcwpjtn2/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-kcwpjtn2/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-native-contact-picker.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-native-contact-picker.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Native contact picker: 196 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-native-reward.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-native-reward.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 3.934,
+      "script_sha256": "53d39d5e14d0e253efee46c152418b280e4637da5fe55dc399caa09b914c5b3f",
+      "log": "current/verify-native-reward.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-p7vsho4v",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-p7vsho4v/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-p7vsho4v/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-p7vsho4v/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-p7vsho4v/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-native-reward.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-native-reward.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Native reward route: 54 checks passed",
+        "Native reward presenter: 89 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-navigation-images.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-navigation-images.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 3.146,
+      "script_sha256": "cdfa3726918ca9a4ec29faa69a2a6764b6471f88a138f4bc4a15d2e3f5504af3",
+      "log": "current/verify-navigation-images.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-1jgwti1n",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-1jgwti1n/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-1jgwti1n/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-1jgwti1n/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-1jgwti1n/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-navigation-images.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-navigation-images.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Navigation images: 162 checks passed; shared downloads, cancellation, account/size/file invalidation and background thumbnail decoding"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-navigation-title-batch.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-navigation-title-batch.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.009,
+      "script_sha256": "51ec3083338195042349ddacaa2c05a0588fe7ad11a89d82ecfdf352edefd180",
+      "log": "current/verify-navigation-title-batch.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-rpri9zo0",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-rpri9zo0/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-rpri9zo0/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-rpri9zo0/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-rpri9zo0/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-navigation-title-batch.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-navigation-title-batch.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Navigation title batching: 15 checks passed; nested updates, final contact overrides, single setters, nickname modes and exception recovery"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-payment-core.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-payment-core.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 21.962,
+      "script_sha256": "fc5b27b5ed6129b7e939a9bf125bd89b4cab927748aa3291c13177d9d0558f94",
+      "log": "current/verify-payment-core.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-_5utlzg8",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-_5utlzg8/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-_5utlzg8/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-_5utlzg8/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-_5utlzg8/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-payment-core.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-payment-core.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Payment core: 2215 checks passed",
+        "Payment automation: 528 checks passed; native callbacks preserved"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-plugin-framework.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-plugin-framework.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.055,
+      "script_sha256": "42954b7afb2f0fe1739fc938aac41c4c53bd943faafc62bc6b35fa961b63a1a6",
+      "log": "current/verify-plugin-framework.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8gw35icp",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8gw35icp/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8gw35icp/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8gw35icp/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-8gw35icp/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-plugin-framework.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-plugin-framework.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Plugin entry: 21 checks passed",
+        "Backup startup integration: 35 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-plugin-storage-migration.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-plugin-storage-migration.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 2.439,
+      "script_sha256": "6ffbc411074a9f783a8904c1491c49937ee1b265f78e947479281f65f92b6cee",
+      "log": "current/verify-plugin-storage-migration.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-7dervoa8",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-7dervoa8/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-7dervoa8/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-7dervoa8/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-7dervoa8/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-plugin-storage-migration.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-plugin-storage-migration.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Plugin storage migration: 84 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-preference-concurrency.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-preference-concurrency.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.116,
+      "script_sha256": "ac022c72fda5418317690afc059abdc2945e81507731c7180521dd77d3a84307",
+      "log": "current/verify-preference-concurrency.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-pl6l0trj",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-pl6l0trj/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-pl6l0trj/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-pl6l0trj/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-pl6l0trj/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-preference-concurrency.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-preference-concurrency.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Preference concurrency: 12 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-privacy-admission-cache-events.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-privacy-admission-cache-events.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 1.663,
+      "script_sha256": "4fee085c565d6b8e104863ab2aa3f80f400dfb1975ef9ade6ae70e823172ae38",
+      "log": "current/verify-privacy-admission-cache-events.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-g4ce5d1l",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-g4ce5d1l/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-g4ce5d1l/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-g4ce5d1l/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-g4ce5d1l/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-privacy-admission-cache-events.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-privacy-admission-cache-events.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-host-fixture-compilation-incompatibility",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-privacy-admission-cache-events.sh.log",
+        "script_sha256": "4fee085c565d6b8e104863ab2aa3f80f400dfb1975ef9ade6ae70e823172ae38",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "use of undeclared identifier 'CSGroupNativeSessionCoordinator'",
+          "use of undeclared identifier 'coordinator'",
+          "use of undeclared identifier 'CSGroupNativeSessionCoordinator'",
+          "use of undeclared identifier 'coordinator'",
+          "property 'nativeModelRevision' not found on object of type 'CSGroupListAdapter *'",
+          "use of undeclared identifier 'coordinator'",
+          "use of undeclared identifier 'coordinator'",
+          "property 'nativeBoundaryHeld' not found on object of type 'CSGroupListAdapter *'",
+          "use of undeclared identifier 'coordinator'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'"
+        ],
+        "diagnostic_multiset": {
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'": 1,
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+          "use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+          "use of undeclared identifier 'coordinator'": 5,
+          "property 'nativeModelRevision' not found on object of type 'CSGroupListAdapter *'": 1,
+          "property 'nativeBoundaryHeld' not found on object of type 'CSGroupListAdapter *'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 1
+        },
+        "diag_sha256": "3d8e1827a92075e798b7917e27697e63b7f344d89a11519bca4c2401e21828a5"
+      }
+    },
+    {
+      "script": "verify-privacy-admission-cache.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-privacy-admission-cache.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 1.624,
+      "script_sha256": "f4b4686114b601bb73c2c26e9184f32e8aeef90c57b561a128bfb4d81b7b3651",
+      "log": "current/verify-privacy-admission-cache.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5zn5zgp2",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5zn5zgp2/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5zn5zgp2/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5zn5zgp2/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5zn5zgp2/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-privacy-admission-cache.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-privacy-admission-cache.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "preexisting-host-fixture-compilation-incompatibility",
+      "baseline_comparison": {
+        "exit_code": 1,
+        "log": "baseline/verify-privacy-admission-cache.sh.log",
+        "script_sha256": "f4b4686114b601bb73c2c26e9184f32e8aeef90c57b561a128bfb4d81b7b3651",
+        "script_bytes_identical": true,
+        "diagnostics_identical": true,
+        "diagnostics": [
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'",
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'",
+          "use of undeclared identifier 'CSGroupNativeSessionCoordinator'",
+          "use of undeclared identifier 'coordinator'",
+          "use of undeclared identifier 'CSGroupNativeSessionCoordinator'",
+          "use of undeclared identifier 'coordinator'",
+          "property 'nativeModelRevision' not found on object of type 'CSGroupListAdapter *'",
+          "use of undeclared identifier 'coordinator'",
+          "use of undeclared identifier 'coordinator'",
+          "property 'nativeBoundaryHeld' not found on object of type 'CSGroupListAdapter *'",
+          "use of undeclared identifier 'coordinator'",
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'"
+        ],
+        "diagnostic_multiset": {
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'": 1,
+          "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+          "use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+          "use of undeclared identifier 'coordinator'": 5,
+          "property 'nativeModelRevision' not found on object of type 'CSGroupListAdapter *'": 1,
+          "property 'nativeBoundaryHeld' not found on object of type 'CSGroupListAdapter *'": 1,
+          "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 1
+        },
+        "diag_sha256": "3d8e1827a92075e798b7917e27697e63b7f344d89a11519bca4c2401e21828a5"
+      }
+    },
+    {
+      "script": "verify-revoke-interception.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-revoke-interception.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.697,
+      "script_sha256": "8e4b78636971306b6600025e6e27a92420cedff853a3b31c88b7c53fbd57e905",
+      "log": "current/verify-revoke-interception.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-vj3cdrhq",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-vj3cdrhq/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-vj3cdrhq/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-vj3cdrhq/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-vj3cdrhq/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-revoke-interception.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-revoke-interception.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-revoke-reference.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-revoke-reference.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.647,
+      "script_sha256": "5c661c7a5c0771c183313ab5a155cdebba617965c71ced35494d8eaaa7a8dec1",
+      "log": "current/verify-revoke-reference.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-prg5l03i",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-prg5l03i/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-prg5l03i/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-prg5l03i/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-prg5l03i/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-revoke-reference.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-revoke-reference.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-scheduled-task-backup.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-scheduled-task-backup.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 3.709,
+      "script_sha256": "5a11136821767e138821ac154fe31630d396f7043c48baa866d938fdf6a0539a",
+      "log": "current/verify-scheduled-task-backup.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-t3098d14",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-t3098d14/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-t3098d14/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-t3098d14/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-t3098d14/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-scheduled-task-backup.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-scheduled-task-backup.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Scheduled task backup: 507 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-scheduled-task-manager.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-scheduled-task-manager.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.387,
+      "script_sha256": "68e1f1fd360232ef0ad420ab11d43d1e257c694cf3b33cb8366ad3b150ed3627",
+      "log": "current/verify-scheduled-task-manager.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-6rhtib6s",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-6rhtib6s/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-6rhtib6s/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-6rhtib6s/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-6rhtib6s/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-scheduled-task-manager.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-scheduled-task-manager.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Scheduled task manager: 2360 checks passed (production scheduler/send route, isolated stores and native fakes)"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-scheduled-task-swipes.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-scheduled-task-swipes.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.089,
+      "script_sha256": "d6f0a03b2d85f67470deee4e0ed0708e29f9a0d1c0c044ab31a1f441f13c5b87",
+      "log": "current/verify-scheduled-task-swipes.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-eq5fk08z",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-eq5fk08z/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-eq5fk08z/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-eq5fk08z/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-eq5fk08z/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-scheduled-task-swipes.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-scheduled-task-swipes.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Scheduled task swipes: 165 checks passed (extracted production UI methods, isolated stores and local UI/manager fakes)"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-scheduled-tasks.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-scheduled-tasks.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.723,
+      "script_sha256": "99c8ced391001fa5e2b4852db5ac2828d1a0233bf02a1bf4d2ff588969960c6d",
+      "log": "current/verify-scheduled-tasks.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-0adwx60t",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-0adwx60t/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-0adwx60t/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-0adwx60t/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-0adwx60t/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-scheduled-tasks.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-scheduled-tasks.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-tabbar.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-tabbar.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.615,
+      "script_sha256": "a9ab113135fbfa18a49a785503ce8fc07558031fcfadbc66f426780b813fd878",
+      "log": "current/verify-tabbar.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-2eo0fmiu",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-2eo0fmiu/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-2eo0fmiu/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-2eo0fmiu/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-2eo0fmiu/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-tabbar.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-tabbar.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "2026-11-06 05:27:06.448 native[77729:52850287] tabbar click effect: 39 checks passed"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-touch-trail.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-touch-trail.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.051,
+      "script_sha256": "764e9d143340233d9b9cb5121bd38be2df24b29ca6a885abc49a56712e8d7f7c",
+      "log": "current/verify-touch-trail.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-k0o4qqo6",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-k0o4qqo6/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-k0o4qqo6/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-k0o4qqo6/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-k0o4qqo6/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-touch-trail.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-touch-trail.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Touch runtime: 10015 checks passed; 10000 moves, zero preference/image reads, <=48 live dots"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    },
+    {
+      "script": "verify-transfer-admission.sh",
+      "label": "current",
+      "command": [
+        "bash",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/verify-transfer-admission.sh"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 21.622,
+      "script_sha256": "bc5205faa3c2a9a3705d0a66e10c541c225e249759cfcd64df0789fb65b05c12",
+      "log": "current/verify-transfer-admission.sh.log",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-hbun9n6o",
+      "temporary_env": {
+        "TMPDIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-hbun9n6o/",
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-hbun9n6o/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-hbun9n6o/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-hbun9n6o/THEOS_PACKAGE_DIR",
+        "FIRST_FRAME_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-transfer-admission.sh.first-frame-provenance.json",
+        "ADMISSION_PROVENANCE_PATH": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/current/verify-transfer-admission.sh.admission-provenance.json"
+      },
+      "production_manifest": "production-before.json",
+      "fixtures_manifest": "fixtures-before.json",
+      "reported_check_lines": [
+        "Payment core: 2215 checks passed",
+        "Payment automation: 528 checks passed; native callbacks preserved"
+      ],
+      "classification": "passed",
+      "baseline_comparison": null
+    }
+  ]
+}

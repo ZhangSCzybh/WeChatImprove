@@ -1,7 +1,0 @@
-{
-  "head": "8467df87bebb2998f021238b7d88eaea65266214",
-  "temporary_script": "/tmp/wechat-cpu-8467df87-badge-idle-probe.py",
-  "script_sha256": "07677be5b09c30c10202f493f12b2cd0ac4819555a50188b552cb78345420680",
-  "production_methods": "Extracted by current Tests/extract-group-lifecycle.py into /tmp; UI publication/count/snapshot rows are doubles",
-  "probe_source_sha256": "4b88b4287bca79976dd2ec480ac68ee399314d8656cd9f71265c39f15857cd3d"
-}

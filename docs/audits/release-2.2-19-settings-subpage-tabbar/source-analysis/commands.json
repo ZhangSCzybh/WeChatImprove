@@ -1,0 +1,226 @@
+[
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x115878564",
+      "--stop-address=0x115878958",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "MMUIViewController-initWithNibName_bundle_.asm",
+    "start": "0x115878564",
+    "stop": "0x115878958"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x115880930",
+      "--stop-address=0x115880cd0",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "MMUIViewController-viewWillAppear_.asm",
+    "start": "0x115880930",
+    "stop": "0x115880cd0"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1158824d8",
+      "--stop-address=0x115883a58",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "MMUIViewController-viewDidAppear_.asm",
+    "start": "0x1158824d8",
+    "stop": "0x115883a58"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1049b39ec",
+      "--stop-address=0x1049b3eb8",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "MMTabBarBaseNavigationController-PushViewController_animated_isForceFullScreen_isAutoRotatePortrait_completion_.asm",
+    "start": "0x1049b39ec",
+    "stop": "0x1049b3eb8"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1157d7ca4",
+      "--stop-address=0x1157d7d6c",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "WCTabBarBaseNavigationController-pushViewController_animated_.asm",
+    "start": "0x1157d7ca4",
+    "stop": "0x1157d7d6c"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1157d7d6c",
+      "--stop-address=0x1157d7e68",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "WCTabBarBaseNavigationController-navigationController_willShowViewController_animated_.asm",
+    "start": "0x1157d7d6c",
+    "stop": "0x1157d7e68"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1157d7e68",
+      "--stop-address=0x1157d7f4c",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "WCTabBarBaseNavigationController-navigationController_didShowViewController_animated_.asm",
+    "start": "0x1157d7e68",
+    "stop": "0x1157d7f4c"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1157db1b0",
+      "--stop-address=0x1157db3fc",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "WCTabBarController-tabBarNavigationController_willPushViewController_animated_.asm",
+    "start": "0x1157db1b0",
+    "stop": "0x1157db3fc"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1157db3fc",
+      "--stop-address=0x1157db540",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "WCTabBarController-tabBarNavigationController_willShowViewController_animated_.asm",
+    "start": "0x1157db3fc",
+    "stop": "0x1157db540"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1157db540",
+      "--stop-address=0x1157db5d4",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "WCTabBarController-tabBarNavigationController_didShowViewController_animated_.asm",
+    "start": "0x1157db540",
+    "stop": "0x1157db5d4"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1157db5d4",
+      "--stop-address=0x1157db994",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "WCTabBarController-transitionForNavigationController_destinationViewController_animated_.asm",
+    "start": "0x1157db5d4",
+    "stop": "0x1157db994"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1157db994",
+      "--stop-address=0x1157dbe30",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "WCTabBarController-prepareTabBarForTransition_.asm",
+    "start": "0x1157db994",
+    "stop": "0x1157dbe30"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1157dbe30",
+      "--stop-address=0x1157dbfec",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "WCTabBarController-beginTabBarTransition_.asm",
+    "start": "0x1157dbe30",
+    "stop": "0x1157dbfec"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1157dbfec",
+      "--stop-address=0x1157dc0e0",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "WCTabBarController-syncTabBarVisibilityForNavigationController_.asm",
+    "start": "0x1157dbfec",
+    "stop": "0x1157dc0e0"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1157dc26c",
+      "--stop-address=0x1157dc454",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "WCTabBarController-finishTabBarTransition_cancelled_.asm",
+    "start": "0x1157dc26c",
+    "stop": "0x1157dc454"
+  },
+  {
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=0x1157dcd70",
+      "--stop-address=0x1157dd0b4",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat"
+    ],
+    "output": "WCTabBarController-setTabBarHidden_animated_.asm",
+    "start": "0x1157dcd70",
+    "stop": "0x1157dd0b4"
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/wechat-8.0.80-2026-11-05/merge-validation/inspect_objc.py",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat",
+      "MMUIViewController",
+      "MMUINavigationController",
+      "MMTabBarBaseNavigationController",
+      "WCTabBarBaseNavigationController",
+      "MMTabBarController",
+      "WCTabBarController",
+      "--annotate-directory",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-19-settings-subpage-tabbar/source-analysis"
+    ],
+    "output": "annotator-metadata.json"
+  }
+]

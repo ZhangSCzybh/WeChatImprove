@@ -1,0 +1,4 @@
+- (void)installCloseFriendEntryGesture;
+- (BOOL)canDiscoverCloseFriendEntry;
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:(UITouch *)touch;
+- (void)discoverCloseFriendEntry:(UILongPressGestureRecognizer *)gesture;

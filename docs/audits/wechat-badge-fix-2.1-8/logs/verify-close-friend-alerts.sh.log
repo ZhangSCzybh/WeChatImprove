@@ -1,6 +1,0 @@
-Close-friend alerts: 216 focused checks passed (identity, calls, reply, badge, payment policy)
-Close-friend tab badge: 782 focused checks passed (passthrough, reveal, pending, dot, boundary, publication, scoped bypass; host only)
-
---- STDERR ---
-
-EXIT_CODE=0

@@ -1,9 +1,0 @@
-{
-  "command": [
-    "bash",
-    "Tests/verify-close-friend-album.sh"
-  ],
-  "exit_code": 0,
-  "checks": 19,
-  "output": "Album: 19 checks, native headers/terminator, updates, ordinary pages, reveal/relock, source restoration and routing passed\n"
-}

@@ -1,0 +1,231 @@
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+000000011210f56c <_O266DecReleaseOutputPicture>:
+11587787c: d10143ff    	sub	sp, sp, #0x50
+115877880: 6d0123e9    	stp	d9, d8, [sp, #0x10]
+115877884: a90257f6    	stp	x22, x21, [sp, #0x20]
+115877888: a9034ff4    	stp	x20, x19, [sp, #0x30]
+11587788c: a9047bfd    	stp	x29, x30, [sp, #0x40]
+115877890: 910103fd    	add	x29, sp, #0x40
+115877894: aa0003f3    	mov	x19, x0
+115877898: f004a4c8    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+11587789c: f944d900    	ldr	x0, [x8, #0x9b0]
+1158778a0: 90048f88    	adrp	x8, 0x11ea67000 <dyld_stub_binder+0x11ea67000>
+1158778a4: f9453901    	ldr	x1, [x8, #0xa70]
+1158778a8: aa1303e2    	mov	x2, x19
+1158778ac: 94579326    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1158778b0: 4ea01c08    	mov.16b	v8, v0
+1158778b4: d004a1a8    	adrp	x8, 0x11ecad000 <dyld_stub_binder+0x11ecad000>
+1158778b8: f9472914    	ldr	x20, [x8, #0xe50]
+1158778bc: aa1303e0    	mov	x0, x19
+1158778c0: aa1403e1    	mov	x1, x20
+1158778c4: 94579320    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1158778c8: aa1d03fd    	mov	x29, x29
+1158778cc: 9457934b    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1158778d0: aa0003f5    	mov	x21, x0
+1158778d4: 9004a188    	adrp	x8, 0x11eca7000 <dyld_stub_binder+0x11eca7000>
+1158778d8: f9478101    	ldr	x1, [x8, #0xf00]
+1158778dc: 9457931a    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1158778e0: 4ea01c09    	mov.16b	v9, v0
+1158778e4: aa1503e0    	mov	x0, x21
+1158778e8: 94579335    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1158778ec: 1e682120    	fcmp	d9, d8
+1158778f0: 54000580    	b.eq	0x1158779a0 <_O266DecReleaseOutputPicture+0x3768434>
+1158778f4: 9004a4e8    	adrp	x8, 0x11ed13000 <dyld_stub_binder+0x11ed13000>
+1158778f8: f947d900    	ldr	x0, [x8, #0xfb0]
+1158778fc: d0048aa8    	adrp	x8, 0x11e9cd000 <dyld_stub_binder+0x11e9cd000>
+115877900: f9411115    	ldr	x21, [x8, #0x220]
+115877904: aa1503e1    	mov	x1, x21
+115877908: 9457930f    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+11587790c: 90048ae8    	adrp	x8, 0x11e9d3000 <dyld_stub_binder+0x11e9d3000>
+115877910: f9418d01    	ldr	x1, [x8, #0x318]
+115877914: 52800722    	mov	w2, #0x39               ; =57
+115877918: 52800123    	mov	w3, #0x9                ; =9
+11587791c: 52800024    	mov	w4, #0x1                ; =1
+115877920: 52800005    	mov	w5, #0x0                ; =0
+115877924: 94579308    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877928: f004a688    	adrp	x8, 0x11ed4a000 <dyld_stub_binder+0x11ed4a000>
+11587792c: f9440d00    	ldr	x0, [x8, #0x818]
+115877930: aa1503e1    	mov	x1, x21
+115877934: 94579304    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877938: d0048a88    	adrp	x8, 0x11e9c9000 <dyld_stub_binder+0x11e9c9000>
+11587793c: f9418901    	ldr	x1, [x8, #0x310]
+115877940: d003f148    	adrp	x8, 0x11d6a1000 <dyld_stub_binder+0x11d6a1000>
+115877944: 910c6108    	add	x8, x8, #0x318
+115877948: a9004fe8    	stp	x8, x19, [sp]
+11587794c: d002c5c5    	adrp	x5, 0x11b131000 <dyld_stub_binder+0x11b131000>
+115877950: 911d5ca5    	add	x5, x5, #0x757
+115877954: d002c5c7    	adrp	x7, 0x11b131000 <dyld_stub_binder+0x11b131000>
+115877958: 9122a8e7    	add	x7, x7, #0x8aa
+11587795c: 52800042    	mov	w2, #0x2                ; =2
+115877960: d2800003    	mov	x3, #0x0                ; =0
+115877964: 52800004    	mov	w4, #0x0                ; =0
+115877968: 528036c6    	mov	w6, #0x1b6              ; =438
+11587796c: 945792f6    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877970: aa1303e0    	mov	x0, x19
+115877974: aa1403e1    	mov	x1, x20
+115877978: 945792f3    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+11587797c: aa1d03fd    	mov	x29, x29
+115877980: 9457931e    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+115877984: aa0003f5    	mov	x21, x0
+115877988: 9004a1a8    	adrp	x8, 0x11ecab000 <dyld_stub_binder+0x11ecab000>
+11587798c: f9458901    	ldr	x1, [x8, #0xb10]
+115877990: 4ea81d00    	mov.16b	v0, v8
+115877994: 945792ec    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877998: aa1503e0    	mov	x0, x21
+11587799c: 94579308    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1158779a0: 90049488    	adrp	x8, 0x11eb07000 <dyld_stub_binder+0x11eb07000>
+1158779a4: f9434901    	ldr	x1, [x8, #0x690]
+1158779a8: aa1303e0    	mov	x0, x19
+1158779ac: a9447bfd    	ldp	x29, x30, [sp, #0x40]
+1158779b0: a9434ff4    	ldp	x20, x19, [sp, #0x30]
+1158779b4: a94257f6    	ldp	x22, x21, [sp, #0x20]
+1158779b8: 6d4123e9    	ldp	d9, d8, [sp, #0x10]
+1158779bc: 910143ff    	add	sp, sp, #0x50
+1158779c0: 145792e1    	b	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1158779c4: 14000001    	b	0x1158779c8 <_O266DecReleaseOutputPicture+0x376845c>
+1158779c8: aa0003f3    	mov	x19, x0
+1158779cc: aa1503e0    	mov	x0, x21
+1158779d0: 945792fb    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1158779d4: aa1303e0    	mov	x0, x19
+1158779d8: 94576cc2    	bl	0x116e52ce0 <dyld_stub_binder+0x116e52ce0>
+1158779dc: d10303ff    	sub	sp, sp, #0xc0
+1158779e0: 6d023bef    	stp	d15, d14, [sp, #0x20]
+1158779e4: 6d0333ed    	stp	d13, d12, [sp, #0x30]
+1158779e8: 6d042beb    	stp	d11, d10, [sp, #0x40]
+1158779ec: 6d0523e9    	stp	d9, d8, [sp, #0x50]
+1158779f0: a9066ffc    	stp	x28, x27, [sp, #0x60]
+1158779f4: a90767fa    	stp	x26, x25, [sp, #0x70]
+1158779f8: a9085ff8    	stp	x24, x23, [sp, #0x80]
+1158779fc: a90957f6    	stp	x22, x21, [sp, #0x90]
+115877a00: a90a4ff4    	stp	x20, x19, [sp, #0xa0]
+115877a04: a90b7bfd    	stp	x29, x30, [sp, #0xb0]
+115877a08: 9102c3fd    	add	x29, sp, #0xb0
+115877a0c: aa0003f7    	mov	x23, x0
+115877a10: 9004a4e8    	adrp	x8, 0x11ed13000 <dyld_stub_binder+0x11ed13000>
+115877a14: f9465900    	ldr	x0, [x8, #0xcb0]
+115877a18: f0048b28    	adrp	x8, 0x11e9de000 <dyld_stub_binder+0x11e9de000>
+115877a1c: f947d901    	ldr	x1, [x8, #0xfb0]
+115877a20: 945792c9    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877a24: 340003e0    	cbz	w0, 0x115877aa0 <_O266DecReleaseOutputPicture+0x3768534>
+115877a28: f00494c8    	adrp	x8, 0x11eb12000 <dyld_stub_binder+0x11eb12000>
+115877a2c: f943f101    	ldr	x1, [x8, #0x7e0]
+115877a30: aa1703e0    	mov	x0, x23
+115877a34: 945792c4    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877a38: aa1d03fd    	mov	x29, x29
+115877a3c: 945792ef    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+115877a40: aa0003f3    	mov	x19, x0
+115877a44: 90049ca8    	adrp	x8, 0x11ec0b000 <dyld_stub_binder+0x11ec0b000>
+115877a48: f9476514    	ldr	x20, [x8, #0xec8]
+115877a4c: aa1403e1    	mov	x1, x20
+115877a50: 945792bd    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877a54: f100041f    	cmp	x0, #0x1
+115877a58: 540000c0    	b.eq	0x115877a70 <_O266DecReleaseOutputPicture+0x3768504>
+115877a5c: aa1303e0    	mov	x0, x19
+115877a60: aa1403e1    	mov	x1, x20
+115877a64: 945792b8    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877a68: f1000c1f    	cmp	x0, #0x3
+115877a6c: 54002121    	b.ne	0x115877e90 <_O266DecReleaseOutputPicture+0x3768924>
+115877a70: d004a188    	adrp	x8, 0x11eca9000 <dyld_stub_binder+0x11eca9000>
+115877a74: f941b101    	ldr	x1, [x8, #0x360]
+115877a78: aa1703e0    	mov	x0, x23
+115877a7c: 945792b2    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877a80: aa1d03fd    	mov	x29, x29
+115877a84: 945792dd    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+115877a88: aa0003f5    	mov	x21, x0
+115877a8c: b4000220    	cbz	x0, 0x115877ad0 <_O266DecReleaseOutputPicture+0x3768564>
+115877a90: aa1503e0    	mov	x0, x21
+115877a94: 945792d0    	bl	0x116e5c5d4 <dyld_stub_binder+0x116e5c5d4>
+115877a98: aa1503f4    	mov	x20, x21
+115877a9c: 14000012    	b	0x115877ae4 <_O266DecReleaseOutputPicture+0x3768578>
+115877aa0: a94b7bfd    	ldp	x29, x30, [sp, #0xb0]
+115877aa4: a94a4ff4    	ldp	x20, x19, [sp, #0xa0]
+115877aa8: a94957f6    	ldp	x22, x21, [sp, #0x90]
+115877aac: a9485ff8    	ldp	x24, x23, [sp, #0x80]
+115877ab0: a94767fa    	ldp	x26, x25, [sp, #0x70]
+115877ab4: a9466ffc    	ldp	x28, x27, [sp, #0x60]
+115877ab8: 6d4523e9    	ldp	d9, d8, [sp, #0x50]
+115877abc: 6d442beb    	ldp	d11, d10, [sp, #0x40]
+115877ac0: 6d4333ed    	ldp	d13, d12, [sp, #0x30]
+115877ac4: 6d423bef    	ldp	d15, d14, [sp, #0x20]
+115877ac8: 910303ff    	add	sp, sp, #0xc0
+115877acc: d65f03c0    	ret
+115877ad0: f004adc8    	adrp	x8, 0x11ee32000 <dyld_stub_binder+0x11ee32000>
+115877ad4: b98f7108    	ldrsw	x8, [x8, #0xf70]
+115877ad8: 8b0802e0    	add	x0, x23, x8
+115877adc: 9457928e    	bl	0x116e5c514 <dyld_stub_binder+0x116e5c514>
+115877ae0: aa0003f4    	mov	x20, x0
+115877ae4: aa1503e0    	mov	x0, x21
+115877ae8: 945792b5    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+115877aec: d004a1a8    	adrp	x8, 0x11ecad000 <dyld_stub_binder+0x11ecad000>
+115877af0: f9448901    	ldr	x1, [x8, #0x910]
+115877af4: aa1403e0    	mov	x0, x20
+115877af8: 94579293    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877afc: aa1d03fd    	mov	x29, x29
+115877b00: 945792be    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+115877b04: aa0003f5    	mov	x21, x0
+115877b08: eb17001f    	cmp	x0, x23
+115877b0c: 54001ba1    	b.ne	0x115877e80 <_O266DecReleaseOutputPicture+0x3768914>
+115877b10: f004adc8    	adrp	x8, 0x11ee32000 <dyld_stub_binder+0x11ee32000>
+115877b14: b98f7508    	ldrsw	x8, [x8, #0xf74]
+115877b18: 38686af6    	ldrb	w22, [x23, x8]
+115877b1c: aa1503e0    	mov	x0, x21
+115877b20: 945792a7    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+115877b24: 37001b36    	tbnz	w22, #0x0, 0x115877e88 <_O266DecReleaseOutputPicture+0x376891c>
+115877b28: f0049988    	adrp	x8, 0x11ebaa000 <dyld_stub_binder+0x11ebaa000>
+115877b2c: f9460d01    	ldr	x1, [x8, #0xc18]
+115877b30: aa1303e0    	mov	x0, x19
+115877b34: 94579284    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877b38: aa1d03fd    	mov	x29, x29
+115877b3c: 945792af    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+115877b40: aa0003f5    	mov	x21, x0
+115877b44: d004a1a8    	adrp	x8, 0x11ecad000 <dyld_stub_binder+0x11ecad000>
+115877b48: f943451b    	ldr	x27, [x8, #0x688]
+115877b4c: aa1b03e1    	mov	x1, x27
+115877b50: 9457927d    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877b54: aa1d03fd    	mov	x29, x29
+115877b58: 945792a8    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+115877b5c: aa0003f6    	mov	x22, x0
+115877b60: d004a1a8    	adrp	x8, 0x11ecad000 <dyld_stub_binder+0x11ecad000>
+115877b64: f947e118    	ldr	x24, [x8, #0xfc0]
+115877b68: aa1803e1    	mov	x1, x24
+115877b6c: 94579276    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877b70: aa1d03fd    	mov	x29, x29
+115877b74: 945792a1    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+115877b78: aa0003f9    	mov	x25, x0
+115877b7c: b40017e0    	cbz	x0, 0x115877e78 <_O266DecReleaseOutputPicture+0x376890c>
+115877b80: f0048ae8    	adrp	x8, 0x11e9d6000 <dyld_stub_binder+0x11e9d6000>
+115877b84: f940f901    	ldr	x1, [x8, #0x1f0]
+115877b88: aa1703e0    	mov	x0, x23
+115877b8c: 9457926e    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877b90: aa0003fa    	mov	x26, x0
+115877b94: aa1903e0    	mov	x0, x25
+115877b98: 94579289    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+115877b9c: 360016fa    	tbz	w26, #0x0, 0x115877e78 <_O266DecReleaseOutputPicture+0x376890c>
+115877ba0: f0048ac8    	adrp	x8, 0x11e9d2000 <dyld_stub_binder+0x11e9d2000>
+115877ba4: f9421d01    	ldr	x1, [x8, #0x438]
+115877ba8: aa1703e0    	mov	x0, x23
+115877bac: 94579266    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877bb0: aa1d03fd    	mov	x29, x29
+115877bb4: 94579291    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+115877bb8: aa0003f7    	mov	x23, x0
+115877bbc: d0048b28    	adrp	x8, 0x11e9dd000 <dyld_stub_binder+0x11e9dd000>
+115877bc0: f9415d01    	ldr	x1, [x8, #0x2b8]
+115877bc4: aa1403e0    	mov	x0, x20
+115877bc8: 9457925f    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877bcc: aa1d03fd    	mov	x29, x29
+115877bd0: 9457928a    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+115877bd4: aa0003fc    	mov	x28, x0
+115877bd8: aa1703e0    	mov	x0, x23
+115877bdc: aa1803e1    	mov	x1, x24
+115877be0: 94579259    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877be4: aa1d03fd    	mov	x29, x29
+115877be8: 94579284    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+115877bec: aa0003f9    	mov	x25, x0
+115877bf0: aa1603e0    	mov	x0, x22
+115877bf4: aa1803e1    	mov	x1, x24
+115877bf8: 94579253    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+115877bfc: aa1d03fd    	mov	x29, x29

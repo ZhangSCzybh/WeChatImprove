@@ -1,5 +1,0 @@
-Folded native path reads (120 moved rows): legacy=7380 indexed=360
-Close-friend sessions: 174 checks, 0 failures
-Folded layouts (12): native fallback quote/remove=12/12 stable reuse quote/remove=0/0
-Close-friend session presentation: 55 checks, 0 failures
-Close-friend session iOS: arm64 + arm64e source objects compiled

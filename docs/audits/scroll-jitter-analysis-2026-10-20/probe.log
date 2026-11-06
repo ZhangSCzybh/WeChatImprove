@@ -1,4 +1,0 @@
-Same native inputs / real adapter with UIKit doubles: row height 46 -> 40 pt after render; explicit table updates = 0.
-First row measurement predicted origin -7 pt; render applied -10 pt while row still had first height.
-Same-message epoch invalidation: rendered origin -10 -> 0 pt; table updates while dragging 0, after stop 1.
-Characterization checks passed. These reproduce instability; they do not validate a fix or actual UIKit timing.

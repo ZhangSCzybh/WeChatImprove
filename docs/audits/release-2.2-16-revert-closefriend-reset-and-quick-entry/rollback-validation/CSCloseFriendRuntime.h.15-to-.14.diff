@@ -1,0 +1,24 @@
+--- 2.2-15/CSCloseFriendRuntime.h
++++ 2.2-14/CSCloseFriendRuntime.h
+@@ -18,8 +18,6 @@
+ - (nullable NSDictionary *)authenticationToken;
+ - (BOOL)isTokenCurrent:(NSDictionary *)token;
+ - (BOOL)hasCredential;
+-/// Exact confirmed recovery state; membership stays protected until a new password is set.
+-- (BOOL)requiresPasswordSetup;
+ - (BOOL)setPassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error;
+ - (BOOL)authenticatePassword:(NSString *)password token:(NSDictionary *)token error:(NSError **)error;
+ /// Explicit homepage shortcut. Validates foreground account/config; no password prompt.
+@@ -39,12 +37,6 @@
+ - (void)cancelResetWithToken:(NSDictionary *)token;
+ /// Consumes the proof after UI confirmation. Must run under the current account epoch lock.
+ - (BOOL)resetWithToken:(NSDictionary *)token error:(NSError **)error;
+-/// No old password: explicit account acknowledgement followed by a separate UI risk confirmation.
+-- (nullable NSDictionary *)prepareCredentialResetWithAccountConfirmation:(NSString *)confirmation token:(NSDictionary *)token error:(NSError **)error;
+-- (BOOL)resetCredentialWithToken:(NSDictionary *)token error:(NSError **)error;
+-@property(nonatomic, copy, nullable) BOOL (^credentialResetStorage)(NSString *account, NSError **error);
+-@property(nonatomic, copy, nullable) BOOL (^credentialResetSetupAllowed)(NSString *account, NSError **error);
+-@property(nonatomic, copy, nullable) BOOL (^finishCredentialResetSetup)(NSString *account, NSError **error);
+ /// Injected account cleanup: begin=NO resumes only a previously confirmed reset before loading state.
+ @property(nonatomic, copy, nullable) BOOL (^resetStorage)(NSString *account, BOOL begin, NSError **error);
+ @property(nonatomic, copy, nullable) void (^didChange)(void);

@@ -1,0 +1,16 @@
+[
+  {
+    "scheme": "rootless",
+    "arm64": 4,
+    "arm64e": 4,
+    "unattributed": 0,
+    "new": 0
+  },
+  {
+    "scheme": "rootful",
+    "arm64": 4,
+    "arm64e": 4,
+    "unattributed": 0,
+    "new": 0
+  }
+]

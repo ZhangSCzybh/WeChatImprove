@@ -1,0 +1,145 @@
+{
+  "source_sha256": {
+    "Controllers/CSSettingsTableViewController.h": "5d44c8761fe97b29281f87d26a13dd27f4dca46b0755a5e92a575d0b34d1ab2a",
+    "Controllers/CSSettingsTableViewController.m": "78b4ae44fdbc8910c5fdf674d9a24bd926a39854fee865bfe7cca3201bdd7937"
+  },
+  "source_unchanged_during_tests": true,
+  "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+  "runs": [
+    {
+      "name": "ios-arm64",
+      "accepted": true,
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-target",
+        "arm64-apple-ios15.0",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "-fobjc-arc",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers",
+        "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers",
+        "-c",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSSettingsTableViewController.m",
+        "-o",
+        "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-authorized-28tuiro1/wechat80-settings-8rbkli0z/arm64.o"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "name": "ios-arm64e",
+      "accepted": true,
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-target",
+        "arm64e-apple-ios15.0",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "-fobjc-arc",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers",
+        "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers",
+        "-c",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSSettingsTableViewController.m",
+        "-o",
+        "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-authorized-28tuiro1/wechat80-settings-8rbkli0z/arm64e.o"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "name": "ios-migrated-headers",
+      "accepted": true,
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-target",
+        "arm64-apple-ios15.0",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "-fobjc-arc",
+        "-fsyntax-only",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers",
+        "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/release-authorized-revalidation/prior-settings/MigratedHeaders.m"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "name": "baseline",
+      "expected_failure": "provisional.tableView.contentOffset.y==0",
+      "accepted": true,
+      "command": [
+        "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-authorized-28tuiro1/wechat80-settings-8rbkli0z/baseline"
+      ],
+      "exit_code": 1,
+      "output": "FAIL line 99: provisional.tableView.contentOffset.y==0\n"
+    },
+    {
+      "name": "current",
+      "expected_failure": null,
+      "accepted": true,
+      "command": [
+        "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-authorized-28tuiro1/wechat80-settings-8rbkli0z/current"
+      ],
+      "exit_code": 0,
+      "output": "PASS: 5114 settings lifecycle checks (host UIKit double; no iOS runtime)\n"
+    },
+    {
+      "name": "negative-navigation",
+      "expected_failure": "edgesForExtendedLayout==UIRectEdgeNone",
+      "accepted": true,
+      "command": [
+        "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-authorized-28tuiro1/wechat80-settings-8rbkli0z/negative-navigation"
+      ],
+      "exit_code": 1,
+      "output": "FAIL line 48: !decoded.isViewLoaded && decoded.edgesForExtendedLayout==UIRectEdgeNone\n"
+    },
+    {
+      "name": "negative-bottom-addition",
+      "expected_failure": "table.contentInset.bottom,12+safeBottom",
+      "accepted": true,
+      "command": [
+        "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-authorized-28tuiro1/wechat80-settings-8rbkli0z/negative-bottom-addition"
+      ],
+      "exit_code": 1,
+      "output": "FAIL line 39: Equal(table.contentInset.bottom,12+safeBottom)\n"
+    },
+    {
+      "name": "negative-return-scroll",
+      "expected_failure": "table.contentOffset.y,retainedOffset.y",
+      "accepted": true,
+      "command": [
+        "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-authorized-28tuiro1/wechat80-settings-8rbkli0z/negative-return-scroll"
+      ],
+      "exit_code": 1,
+      "output": "FAIL line 67: Equal(table.contentOffset.y,retainedOffset.y)\n"
+    }
+  ],
+  "coverage": {
+    "direct_settings_classes": 38,
+    "all_settings_table_descendants": 44,
+    "custom_concrete_allocation_routes": 34
+  },
+  "limits": "iOS SDK object compilation validates actual Apple API types and arm64/arm64e code generation. Lifecycle execution uses actual production base-class code against a host UIKit double; it does not observe UIKit navigation animation or the user phone. No app installation, real account, database or preferences accessed."
+}

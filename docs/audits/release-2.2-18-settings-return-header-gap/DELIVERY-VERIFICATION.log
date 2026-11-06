@@ -1,0 +1,17 @@
+cwd: /Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.2-18-settings-return-header-gap
+command: ["shasum", "-a", "256", "-c", "SHA256SUMS"]
+WeChatImprove.dylib: OK
+com.wechat.improve_2.2-18_iphoneos-arm.deb: OK
+com.wechat.improve_2.2-18_iphoneos-arm64.deb: OK
+com.wechat.improve_2.2-18_symbols.zip: OK
+exit_code: 0
+
+cwd: /Users/zhangshichao/Documents/Workspace/WeChatImprove
+command: ["dpkg-deb", "-f", "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.2-18-settings-return-header-gap/com.wechat.improve_2.2-18_iphoneos-arm.deb", "Version"]
+2.2-18
+exit_code: 0
+
+cwd: /Users/zhangshichao/Documents/Workspace/WeChatImprove
+command: ["dpkg-deb", "-f", "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.2-18-settings-return-header-gap/com.wechat.improve_2.2-18_iphoneos-arm64.deb", "Version"]
+2.2-18
+exit_code: 0

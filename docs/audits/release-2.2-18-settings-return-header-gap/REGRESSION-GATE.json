@@ -1,0 +1,1061 @@
+{
+  "baseline": "baseline-2.2-16",
+  "script_count": 100,
+  "passed": 82,
+  "failed": 18,
+  "safety_skips": 0,
+  "new_failure_diagnostic_multisets": 0,
+  "all_failures_reproduced_with_frozen_2_2_16": true,
+  "original_277_fixture_bytes_preserved": true,
+  "gate_status": "waived_by_user_explicit_authorization; 18 baseline failures accepted for 2.2-18 by continued waiver",
+  "delivery_created": false,
+  "runs": [
+    {
+      "script": "verify-ai-background-sync.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-ai-backup.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-ai-coordinator.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-ai-credentials.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-ai-foundation.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-ai-images.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-ai-manager.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-ai-native-sync-observer.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-ai-native.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-ai-store-async.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-attachment-layout.sh",
+      "group": "legacy",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-authorization-prompt.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-authorization-read.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-avatar-input-style.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-background-blur.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-background-privacy.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-background-run-runtime.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-background-run.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-assets.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-audit.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-bootstrap.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-codec.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-compatibility.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-deletion-ui.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-deletion.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-engine.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-manual-management.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-performance.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-registry.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-reset.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-restore-paths.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-store.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-backup-transactions.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-bubble-style.sh",
+      "group": "legacy",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-album.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-alerts.sh",
+      "group": "security",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-close-friend-automation.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-contacts-read.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-contacts.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-core.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-detail.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-discovery.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-entry.sh",
+      "group": "security",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-close-friend-ios.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-migration.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-pages.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-privacy.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-profile.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-recovery.sh",
+      "group": "security",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-close-friend-reset.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-runtime.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-session.sh",
+      "group": "security",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-close-friend-shake.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-social.sh",
+      "group": "security",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-close-friend-unread-panel.sh",
+      "group": "security",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-custom-text.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-group-appearance.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-group-badges.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-group-business.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-group-header.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-group-incremental.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-group-indicator.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-group-interactions.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-group-lifecycle.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-group-picker.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-group-preferences.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-group-search.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-group-selection.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-group-viewport.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-layout-preferences.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-list-corners.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-managed-image-files.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-merge-bubble-integration.sh",
+      "group": "legacy",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-message-actions-core.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-message-actions-execution.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-message-gesture.sh",
+      "group": "legacy",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-message-merge.sh",
+      "group": "legacy",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-message-time.sh",
+      "group": "legacy",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-miniapp-first-frame.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-miniapp-private-layout.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-my-page-clean.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-native-contact-picker.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-native-reward.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-navigation-images.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-navigation-title-batch.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-payment-core.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-plugin-framework.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-plugin-storage-migration.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-preference-concurrency.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-privacy-admission-cache-events.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-privacy-admission-cache.sh",
+      "group": "remaining",
+      "exit_code": 1
+    },
+    {
+      "script": "verify-revoke-interception.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-revoke-reference.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-scheduled-task-backup.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-scheduled-task-manager.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-scheduled-task-swipes.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-scheduled-tasks.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-tabbar.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-touch-trail.sh",
+      "group": "remaining",
+      "exit_code": 0
+    },
+    {
+      "script": "verify-transfer-admission.sh",
+      "group": "remaining",
+      "exit_code": 0
+    }
+  ],
+  "failures": [
+    {
+      "script": "verify-close-friend-alerts.sh",
+      "group": "security",
+      "exit_code": 1,
+      "current_log": "regression/close-friend-alerts.log",
+      "baseline_log": "regression/baseline-2.2-16-close-friend-alerts.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 2,
+        "property 'tabBadgeSections' not found on object of type 'CSGroupListAdapter *'": 2,
+        "property 'tabBadgeRevision' not found on object of type 'CSGroupListAdapter *'": 1,
+        "property 'tabBadgeEpoch' not found on object of type 'CSGroupListAdapter *'": 1,
+        "property 'tabBadgeAccount' not found on object of type 'CSGroupListAdapter *'": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 2,
+        "property 'tabBadgeSections' not found on object of type 'CSGroupListAdapter *'": 2,
+        "property 'tabBadgeRevision' not found on object of type 'CSGroupListAdapter *'": 1,
+        "property 'tabBadgeEpoch' not found on object of type 'CSGroupListAdapter *'": 1,
+        "property 'tabBadgeAccount' not found on object of type 'CSGroupListAdapter *'": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "401fc642701fb90dcffe7d2d65402006746bc143ead6e5c1c68d3ee2bd4967ad"
+    },
+    {
+      "script": "verify-close-friend-entry.sh",
+      "group": "security",
+      "exit_code": 1,
+      "current_log": "regression/close-friend-entry.log",
+      "baseline_log": "regression/baseline-2.2-16-close-friend-entry.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "unknown type name 'UITapGestureRecognizer'; did you mean 'UIGestureRecognizer'?": 1,
+        "unknown receiver 'UITapGestureRecognizer'; did you mean 'UIGestureRecognizer'?": 1,
+        "no visible @interface for 'UIGestureRecognizer' declares the selector 'initWithTarget:action:'": 1,
+        "property 'numberOfTapsRequired' not found on object of type 'UIGestureRecognizer *'": 1,
+        "property 'numberOfTouchesRequired' not found on object of type 'UIGestureRecognizer *'": 1,
+        "property 'cancelsTouchesInView' not found on object of type 'UIGestureRecognizer *'": 1,
+        "property 'delegate' not found on object of type 'UIGestureRecognizer *'": 1,
+        "no visible @interface for 'UIGestureRecognizer' declares the selector 'requireGestureRecognizerToFail:'": 1,
+        "property 'closeFriendQuickEntryGesture' not found on object of type 'EntryController *'; did you mean 'closeFriendEntryGesture'?": 2,
+        "incompatible pointer types assigning to 'UILongPressGestureRecognizer *' from 'UIGestureRecognizer *' [-Werror,-Wincompatible-pointer-types]": 1,
+        "no visible @interface for 'EntryController' declares the selector 'resetCloseFriendQuickEntry'": 2,
+        "no visible @interface for 'CSCloseFriendManager' declares the selector 'refreshAccount'": 1,
+        "unknown type name 'CSCloseFriendRuntime'; did you mean 'CSCloseFriendManager'?": 1,
+        "property 'runtime' not found on object of type 'CSCloseFriendManager *'": 1,
+        "property 'closeFriendQuickEntryToken' not found on object of type 'EntryController *'; did you mean 'closeFriendEntryToken'?": 2,
+        "no visible @interface for 'EntryController' declares the selector 'closeFriendQuickEntryTokenIsCurrent:'": 1,
+        "too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "unknown type name 'UITapGestureRecognizer'; did you mean 'UIGestureRecognizer'?": 1,
+        "unknown receiver 'UITapGestureRecognizer'; did you mean 'UIGestureRecognizer'?": 1,
+        "no visible @interface for 'UIGestureRecognizer' declares the selector 'initWithTarget:action:'": 1,
+        "property 'numberOfTapsRequired' not found on object of type 'UIGestureRecognizer *'": 1,
+        "property 'numberOfTouchesRequired' not found on object of type 'UIGestureRecognizer *'": 1,
+        "property 'cancelsTouchesInView' not found on object of type 'UIGestureRecognizer *'": 1,
+        "property 'delegate' not found on object of type 'UIGestureRecognizer *'": 1,
+        "no visible @interface for 'UIGestureRecognizer' declares the selector 'requireGestureRecognizerToFail:'": 1,
+        "property 'closeFriendQuickEntryGesture' not found on object of type 'EntryController *'; did you mean 'closeFriendEntryGesture'?": 2,
+        "incompatible pointer types assigning to 'UILongPressGestureRecognizer *' from 'UIGestureRecognizer *' [-Werror,-Wincompatible-pointer-types]": 1,
+        "no visible @interface for 'EntryController' declares the selector 'resetCloseFriendQuickEntry'": 2,
+        "no visible @interface for 'CSCloseFriendManager' declares the selector 'refreshAccount'": 1,
+        "unknown type name 'CSCloseFriendRuntime'; did you mean 'CSCloseFriendManager'?": 1,
+        "property 'runtime' not found on object of type 'CSCloseFriendManager *'": 1,
+        "property 'closeFriendQuickEntryToken' not found on object of type 'EntryController *'; did you mean 'closeFriendEntryToken'?": 2,
+        "no visible @interface for 'EntryController' declares the selector 'closeFriendQuickEntryTokenIsCurrent:'": 1,
+        "too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "9bdf44a56b547151944e2d75088fb07da4966f6e563849bf1bb019cbb8581cba"
+    },
+    {
+      "script": "verify-close-friend-recovery.sh",
+      "group": "security",
+      "exit_code": 1,
+      "current_log": "regression/close-friend-recovery.log",
+      "baseline_log": "regression/baseline-2.2-16-close-friend-recovery.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "property 'recoveryTarget' not found on object of type 'RecoveryManager *'; did you mean 'recoveryPage'?": 2,
+        "comparison of distinct pointer types ('UIView *' and 'UIViewController *') [-Werror,-Wcompare-distinct-pointer-types]": 1,
+        "property 'window' not found on object of type 'UIView *'": 1,
+        "property 'userInteractionEnabled' not found on object of type 'UIView *'": 1,
+        "incompatible pointer types assigning to 'UIViewController *' from 'UIView *' [-Werror,-Wincompatible-pointer-types]": 1,
+        "property 'navigationItem' not found on object of type 'UIViewController *'": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "property 'recoveryTarget' not found on object of type 'RecoveryManager *'; did you mean 'recoveryPage'?": 2,
+        "comparison of distinct pointer types ('UIView *' and 'UIViewController *') [-Werror,-Wcompare-distinct-pointer-types]": 1,
+        "property 'window' not found on object of type 'UIView *'": 1,
+        "property 'userInteractionEnabled' not found on object of type 'UIView *'": 1,
+        "incompatible pointer types assigning to 'UIViewController *' from 'UIView *' [-Werror,-Wincompatible-pointer-types]": 1,
+        "property 'navigationItem' not found on object of type 'UIViewController *'": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "821333494ec885b465da7c729691d65d31640a66a047efe48c4b932d4bd6383d"
+    },
+    {
+      "script": "verify-close-friend-session.sh",
+      "group": "security",
+      "exit_code": 1,
+      "current_log": "regression/close-friend-session.log",
+      "baseline_log": "regression/baseline-2.2-16-close-friend-session.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "unexpected '@' in program": 1,
+        "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 3,
+        "no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'": 1,
+        "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'": 1,
+        "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'": 3,
+        "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 2,
+        "property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'": 2,
+        "redefinition of 'keepsSearchGroup'": 1,
+        "use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+        "use of undeclared identifier 'coordinator'": 3,
+        "too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "unexpected '@' in program": 1,
+        "property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 3,
+        "no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'": 1,
+        "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'": 1,
+        "no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'": 3,
+        "no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 2,
+        "property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'": 2,
+        "redefinition of 'keepsSearchGroup'": 1,
+        "use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+        "use of undeclared identifier 'coordinator'": 3,
+        "too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "53733e6b2f6f41fcae5e1f0629dd2d00ff4637274ba9913840d024c62f2af3d5"
+    },
+    {
+      "script": "verify-close-friend-unread-panel.sh",
+      "group": "security",
+      "exit_code": 1,
+      "current_log": "regression/close-friend-unread-panel.log",
+      "baseline_log": "regression/baseline-2.2-16-close-friend-unread-panel.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+        "unused parameter 'native' [-Werror,-Wunused-parameter]": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+        "unused parameter 'native' [-Werror,-Wunused-parameter]": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "eda8476d4cb6c43949a739a9f3f264628e31824fc142a2b4b7f173b614d3d95e"
+    },
+    {
+      "script": "verify-group-appearance.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-group-appearance.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-group-appearance.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "error: no visible @interface for 'WETabButton' declares the selector 'badgeWidth'": 2,
+        "error: no visible @interface for 'Container' declares the selector 'widthForTabButton:'": 2,
+        "error: property 'tabLayoutValid' not found on object of type 'Container *'": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "error: no visible @interface for 'WETabButton' declares the selector 'badgeWidth'": 2,
+        "error: no visible @interface for 'Container' declares the selector 'widthForTabButton:'": 2,
+        "error: property 'tabLayoutValid' not found on object of type 'Container *'": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "649fa00a320876d3b0e21e5defbb3f49a1eac158934b4859c75da56a4a1f00ef"
+    },
+    {
+      "script": "verify-group-badges.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-group-badges.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-group-badges.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "error: no visible @interface for 'WETabButton' declares the selector 'badgeWidth'": 2,
+        "error: no visible @interface for 'BadgeChrome' declares the selector 'widthForTabButton:'": 2,
+        "error: property 'tabLayoutValid' not found on object of type 'BadgeChrome *'": 1,
+        "error: call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]": 2,
+        "error: implicit conversion of 'int' to 'NSArray *' is disallowed with ARC": 2,
+        "error: incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]": 2
+      },
+      "diagnostic_multiset_baseline": {
+        "error: no visible @interface for 'WETabButton' declares the selector 'badgeWidth'": 2,
+        "error: no visible @interface for 'BadgeChrome' declares the selector 'widthForTabButton:'": 2,
+        "error: property 'tabLayoutValid' not found on object of type 'BadgeChrome *'": 1,
+        "error: call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]": 2,
+        "error: implicit conversion of 'int' to 'NSArray *' is disallowed with ARC": 2,
+        "error: incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]": 2
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "12823f2429da22e31a6c59a4443783a74569888fe615482aa06ed6b6264a16be"
+    },
+    {
+      "script": "verify-group-business.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-group-business.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-group-business.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'nativePath:'": 1,
+        "error: call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]": 1,
+        "error: implicit conversion of 'int' to 'NSArray *' is disallowed with ARC": 3,
+        "error: incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]": 3
+      },
+      "diagnostic_multiset_baseline": {
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'nativePath:'": 1,
+        "error: call to undeclared function 'CSGroupBuildNativeSections'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]": 1,
+        "error: implicit conversion of 'int' to 'NSArray *' is disallowed with ARC": 3,
+        "error: incompatible integer to pointer conversion initializing 'NSArray *__strong' with an expression of type 'int' [-Wint-conversion]": 3
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "6f2b9cbc04d11091ddb022fe4185c7b4274d7cfa6a27813d7c3a5603364cf7cc"
+    },
+    {
+      "script": "verify-group-incremental.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-group-incremental.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-group-incremental.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "error: semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]": 7,
+        "error: expected method body": 6,
+        "error: expected a type": 1,
+        "error: unexpected '@' in program": 5,
+        "error: too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "error: semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]": 7,
+        "error: expected method body": 6,
+        "error: expected a type": 1,
+        "error: unexpected '@' in program": 5,
+        "error: too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "ec79488954229211f882f561632d426afd840cac56821648e674416ef915e7f3"
+    },
+    {
+      "script": "verify-group-interactions.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-group-interactions.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-group-interactions.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'": 3,
+        "error: property 'immediateRefreshPending' not found on object of type 'CSGroupListAdapter *'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'": 1,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'": 1,
+        "error: property 'presentationViewport' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: property 'switchViewport' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'captureViewportForTabID:'": 1,
+        "error: property 'refreshCoalescedDue' not found on object of type 'CSGroupListAdapter *'": 2,
+        "error: property 'scheduledRefreshDue' not found on object of type 'CSGroupListAdapter *'": 2,
+        "error: too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'": 3,
+        "error: property 'immediateRefreshPending' not found on object of type 'CSGroupListAdapter *'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'": 1,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'": 1,
+        "error: property 'presentationViewport' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: property 'switchViewport' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'captureViewportForTabID:'": 1,
+        "error: property 'refreshCoalescedDue' not found on object of type 'CSGroupListAdapter *'": 2,
+        "error: property 'scheduledRefreshDue' not found on object of type 'CSGroupListAdapter *'": 2,
+        "error: too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "d88f3b11c2907b962a3d04f83c55fb5bb14bd2b7e0cd1de1d70d25d03c3dfd4f"
+    },
+    {
+      "script": "verify-group-lifecycle.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-group-lifecycle.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-group-lifecycle.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "ValueError: substring not found": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "ValueError: substring not found": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_extractor_contract_incompatibility",
+      "assertion_script_sha256": "d25b31102c3a4ba95d50991c6edef628e3cb44876a161f0ec142584ebc768899"
+    },
+    {
+      "script": "verify-group-search.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-group-search.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-group-search.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'": 1,
+        "error: use of undeclared identifier 'UIScrollViewDecelerationRate'": 1,
+        "error: use of undeclared identifier 'deceleration'": 2,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'": 1,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'": 1,
+        "error: property 'presentationViewport' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: property 'switchViewport' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'captureViewportForTabID:'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'": 1,
+        "error: property 'pendingChangeNamesUnknown' not found on object of type 'CSGroupListAdapter *'": 2,
+        "error: property 'pendingChangedUserNames' not found on object of type 'CSGroupListAdapter *'": 2,
+        "error: property 'modelRevision' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: property 'snapshotEpoch' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: call to undeclared function 'CSCloseFriendAccountEpoch'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]": 1,
+        "error: too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'": 1,
+        "error: use of undeclared identifier 'UIScrollViewDecelerationRate'": 1,
+        "error: use of undeclared identifier 'deceleration'": 2,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'": 1,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'": 1,
+        "error: property 'presentationViewport' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: property 'switchViewport' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'captureViewportForTabID:'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'": 1,
+        "error: property 'pendingChangeNamesUnknown' not found on object of type 'CSGroupListAdapter *'": 2,
+        "error: property 'pendingChangedUserNames' not found on object of type 'CSGroupListAdapter *'": 2,
+        "error: property 'modelRevision' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: property 'snapshotEpoch' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: call to undeclared function 'CSCloseFriendAccountEpoch'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]": 1,
+        "error: too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "446a6d370957ddf3e9018ee5462600fa57396184f10504dae51828da32307727"
+    },
+    {
+      "script": "verify-group-selection.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-group-selection.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-group-selection.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 2,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 3
+      },
+      "diagnostic_multiset_baseline": {
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 2,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 3
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "e1e4bd33595a9fd65c77a2a624c68b53d2833de7d5966beb6783a0aee127b636"
+    },
+    {
+      "script": "verify-group-viewport.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-group-viewport.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-group-viewport.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "AssertionError": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "AssertionError": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_extractor_contract_incompatibility",
+      "assertion_script_sha256": "a4681b6c549e043298526fdf9e9419564e3484135a99e14e8adcd2dc87c402b0"
+    },
+    {
+      "script": "verify-miniapp-first-frame.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-miniapp-first-frame.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-miniapp-first-frame.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "error: unexpected '@' in program": 1,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 2,
+        "error: property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'": 2,
+        "error: redefinition of 'keepsSearchGroup'": 1,
+        "error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+        "error: use of undeclared identifier 'coordinator'": 3,
+        "error: too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "error: unexpected '@' in program": 1,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 2,
+        "error: property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'": 2,
+        "error: redefinition of 'keepsSearchGroup'": 1,
+        "error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+        "error: use of undeclared identifier 'coordinator'": 3,
+        "error: too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "4a7003dec6883e1ff28a33da4c6d7b9aeb31b6b8c867388c3c9611b91fa8d8a4"
+    },
+    {
+      "script": "verify-miniapp-private-layout.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-miniapp-private-layout.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-miniapp-private-layout.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "error: unexpected '@' in program": 1,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 2,
+        "error: property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'": 2,
+        "error: redefinition of 'keepsSearchGroup'": 1,
+        "error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+        "error: use of undeclared identifier 'coordinator'": 3,
+        "error: too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "error: unexpected '@' in program": 1,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'clearPendingViewport'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'": 3,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 2,
+        "error: property 'searchChromeVisible' not found on object of type 'CSGroupListAdapter *'": 2,
+        "error: redefinition of 'keepsSearchGroup'": 1,
+        "error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+        "error: use of undeclared identifier 'coordinator'": 3,
+        "error: too many errors emitted, stopping now [-ferror-limit=]": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "02a0576987f320a6800f37706370e890c709e951da91757e06533258a9365877"
+    },
+    {
+      "script": "verify-privacy-admission-cache-events.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-privacy-admission-cache-events.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-privacy-admission-cache-events.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'": 1,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+        "error: use of undeclared identifier 'coordinator'": 5,
+        "error: property 'nativeModelRevision' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: property 'nativeBoundaryHeld' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'": 1,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+        "error: use of undeclared identifier 'coordinator'": 5,
+        "error: property 'nativeModelRevision' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: property 'nativeBoundaryHeld' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "4fee085c565d6b8e104863ab2aa3f80f400dfb1975ef9ade6ae70e823172ae38"
+    },
+    {
+      "script": "verify-privacy-admission-cache.sh",
+      "group": "remaining",
+      "exit_code": 1,
+      "current_log": "remaining-regressions/current/verify-privacy-admission-cache.sh.log",
+      "baseline_log": "remaining-regressions/baseline/verify-privacy-admission-cache.sh.log",
+      "baseline_exit_code": 1,
+      "diagnostic_multiset_current": {
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'": 1,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+        "error: use of undeclared identifier 'coordinator'": 5,
+        "error: property 'nativeModelRevision' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: property 'nativeBoundaryHeld' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 1
+      },
+      "diagnostic_multiset_baseline": {
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'": 1,
+        "error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: use of undeclared identifier 'CSGroupNativeSessionCoordinator'": 2,
+        "error: use of undeclared identifier 'coordinator'": 5,
+        "error: property 'nativeModelRevision' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: property 'nativeBoundaryHeld' not found on object of type 'CSGroupListAdapter *'": 1,
+        "error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'": 1
+      },
+      "same_diagnostics": true,
+      "classification": "existing_fixture_compile_incompatibility",
+      "assertion_script_sha256": "f4b4686114b601bb73c2c26e9184f32e8aeef90c57b561a128bfb4d81b7b3651"
+    }
+  ],
+  "additional_behavior_conflict": {
+    "script": "verify-close-friend-entry.sh",
+    "compatibility_log": "regression/entry-compatibility/run.log",
+    "original_assertion": "avatar receives exactly one recognizer",
+    "observed": "FAIL",
+    "reason": "2.2-16 already installs the required tap and long-press recognizers; declaration/link shims expose the old one-recognizer assertion without changing it."
+  },
+  "scope": "Host isolated fixtures and actual SDK compilation only. No phone, WeChat process or real user state was used.",
+  "waiver_authorization_file": "docs/audits/release-2.2-18-settings-return-header-gap/WAIVER-CONTINUATION.md",
+  "waiver_record_file": "docs/audits/release-2.2-18-settings-return-header-gap/WAIVER.md",
+  "waiver_scope": "Only the 18 existing failures recorded in failures; seven core gates and all other scripts remain mandatory.",
+  "inherited_evidence_base": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/",
+  "current_release_revalidation": "release-core-revalidation/result.json"
+}

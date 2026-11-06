@@ -1,3 +1,4 @@
+#import "CSSettingsTableViewController.h"
 //
 // CSReceiveTransferSettingsViewController.h
 // 自动收款设置界面
@@ -7,7 +8,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CSReceiveTransferSettingsViewController : UITableViewController
+@interface CSReceiveTransferSettingsViewController : CSSettingsTableViewController
 
 @end
 

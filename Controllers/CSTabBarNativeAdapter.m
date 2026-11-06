@@ -47,6 +47,7 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 
 @interface CSTabBarState : NSObject
 @property(nonatomic, weak) MMTabBar *bar;
+@property(nonatomic, weak) MMTabBar *snapshotSource;
 @property(nonatomic, weak) MMTabBarController *controller;
 @property(nonatomic) NSUInteger depth;
 @property(nonatomic) BOOL applied, geometryApplied, applying, clips;
@@ -77,12 +78,31 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 - (void)touchEnded:(UIControl *)sender;
 @end
 
+// WCTabBarView and WCTabBarController deliberately report compatibility with
+// UIKit classes. Inspect the real class chain before choosing a selector family.
+static BOOL CSHasNativeClass(id object, NSString *name) {
+    Class expected=NSClassFromString(name);
+    if (!expected) return NO;
+    for (Class cls=object_getClass(object);cls;cls=class_getSuperclass(cls)) if (cls==expected) return YES;
+    return NO;
+}
+static BOOL CSModernBar(MMTabBar *bar) { return CSHasNativeClass(bar,@"WCTabBarView"); }
 static MMTabBarController *CSOwner(MMTabBar *bar) {
-    id owner=bar.customDelegate;
-    Class main=NSClassFromString(@"MainTabBarViewController");
-    return main && [owner isKindOfClass:main] && [owner isKindOfClass:UITabBarController.class] ? owner : nil;
+    CSTabBarState *state=objc_getAssociatedObject(bar,&CSBarStateKey);
+    if (state.snapshotSource) return CSOwner(state.snapshotSource);
+    id owner=CSModernBar(bar) ? ((WCTabBarView *)bar).visibilityDelegate : bar.customDelegate;
+    return CSHasNativeClass(owner,@"MainTabBarViewController") || CSHasNativeClass(owner,@"NewMainTabBarViewController") ? owner : nil;
+}
+MMTabBar *CSTabBarForController(MMTabBarController *controller) {
+    if (CSHasNativeClass(controller,@"WCTabBarController")) {
+        id bar=((WCTabBarController *)controller).tabBarView;
+        return CSHasNativeClass(bar,@"WCTabBarView") ? bar : nil;
+    }
+    id bar=controller.tabBar;
+    return CSHasNativeClass(bar,@"MMTabBar") ? bar : nil;
 }
 static CSTabBarState *CSState(MMTabBar *bar, BOOL create) {
+    if (!bar) return nil;
     CSTabBarState *s=objc_getAssociatedObject(bar,&CSBarStateKey);
     if (!s && create && CSOwner(bar)) {
         s=[CSTabBarState new]; s.bar=bar; s.controller=CSOwner(bar);
@@ -95,7 +115,38 @@ static CSTabBarState *CSState(MMTabBar *bar, BOOL create) {
     return s;
 }
 static NSArray<MMTabBarItemView *> *CSItems(MMTabBar *bar) {
+    if (CSModernBar(bar)) {
+        NSArray *wrappers=((WCTabBarView *)bar).itemViews;
+        if (![wrappers isKindOfClass:NSArray.class]) return @[];
+        NSMutableArray *items=[NSMutableArray arrayWithCapacity:wrappers.count];
+        for (id wrapper in wrappers) {
+            if (!CSHasNativeClass(wrapper,@"MMMainTabBarItemView")) return @[];
+            MMTabBarItemView *item=((MMMainTabBarItemView *)wrapper).itemView;
+            if (!CSHasNativeClass(item,@"MMTabBarItemView") || item.item!=((MMMainTabBarItemView *)wrapper).legacyItem) return @[];
+            [items addObject:item];
+        }
+        return items;
+    }
     return [bar.tabBarItemViews isKindOfClass:NSArray.class] ? [bar.tabBarItemViews copy] : @[];
+}
+static NSUInteger CSItemIndex(MMTabBar *bar, MMTabBarItemView *item) {
+    return CSModernBar(bar) ? [CSItems(bar) indexOfObjectIdenticalTo:item] : [bar.items indexOfObjectIdenticalTo:item.item];
+}
+static UIControl *CSNativeButton(MMTabBar *bar, MMTabBarController *controller, NSUInteger index) {
+    if (CSModernBar(bar)) {
+        NSArray *wrappers=((WCTabBarView *)bar).itemViews;
+        id wrapper=index<wrappers.count ? wrappers[index] : nil;
+        return CSHasNativeClass(wrapper,@"MMMainTabBarItemView") && [wrapper isKindOfClass:UIControl.class] ? wrapper : nil;
+    }
+    return [controller respondsToSelector:@selector(getTabBarBtnForIndex:)] ? [controller getTabBarBtnForIndex:index] : nil;
+}
+static UIView *CSNativeBackground(MMTabBar *bar) {
+    return CSModernBar(bar) ? ((WCTabBarView *)bar).backgroundContentView : bar.backgroundView;
+}
+static BOOL CSIsNativeBackground(MMTabBar *bar, UIView *view) {
+    if (view==CSNativeBackground(bar)) return YES;
+    if (CSModernBar(bar)) return view==((WCTabBarView *)bar).separatorView;
+    return [NSStringFromClass(view.class) containsString:@"BarBackground"];
 }
 static UIView *CSCustomIcon(MMTabBarItemView *item) {
     SEL selector=NSSelectorFromString(@"customIconView");
@@ -111,7 +162,7 @@ static UIView *CSClickIcon(MMTabBarItemView *item) {
     return icon;
 }
 static BOOL CSFeedbackVisible(CSTabBarState *s) {
-    if (!s.applied || !CSTabBarPreferences.current.enabled || !s.bar.window ||
+    if (s.snapshotSource || !s.applied || !CSTabBarPreferences.current.enabled || !s.bar.window ||
         CSOwner(s.bar)!=s.controller || CSAnimationInactive || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return NO;
     UIWindowScene *scene=s.bar.window.windowScene;
     if (scene && ([CSInactiveAnimationScenes containsObject:scene] || scene.activationState!=UISceneActivationStateForegroundActive)) return NO;
@@ -133,7 +184,7 @@ static void CSInvalidateFeedback(CSTabBarState *s) {
 static void CSReconcileClickEffect(CSTabBarState *s) {
     if (!CSFeedbackVisible(s)) {CSInvalidateFeedback(s); return;}
     if (!s.animatedIcon) return;
-    NSUInteger index=[s.bar.items indexOfObjectIdenticalTo:s.animatedItem.item];
+    NSUInteger index=CSItemIndex(s.bar,s.animatedItem);
     if (!CSCanAnimateClick(s) || index==NSNotFound || index!=s.controller.selectedIndex ||
         ![s.animatedItem isDescendantOfView:s.bar] || s.animatedItem.hidden || CSClickIcon(s.animatedItem)!=s.animatedIcon) CSCancelClickEffect(s);
 }
@@ -174,7 +225,7 @@ static void CSRestoreItem(MMTabBarItemView *item) {
 static void CSApplyItem(MMTabBarItemView *item, MMTabBar *bar) {
     CSTabBarState *host=CSState(bar,NO);
     if (!host.applied || host.depth || !CSTabBarPreferences.current.enabled) return;
-    NSUInteger index=[bar.items indexOfObjectIdenticalTo:item.item];
+    NSUInteger index=CSItemIndex(bar,item);
     if (index==NSNotFound || index>=4) return;
     CSTabBarItemState *s=objc_getAssociatedObject(item,&CSItemStateKey);
     if (!s) {
@@ -264,7 +315,7 @@ static void CSUpdateInset(CSTabBarState *s) {
 }
 static void CSUpdateVisibleInset(CSTabBarState *s) {
     MMTabBar *bar=s.bar;
-    if (!s.applied || !CSTabBarPreferences.current.enabled || !bar.window || bar.hidden || bar.alpha<.01) CSRestoreInset(s);
+    if (s.snapshotSource || !s.applied || !CSTabBarPreferences.current.enabled || !bar.window || bar.hidden || bar.alpha<.01) CSRestoreInset(s);
     else CSUpdateInset(s);
 }
 static void CSRestoreGeometry(CSTabBarState *s) {
@@ -411,7 +462,7 @@ static void CSRenderSurface(CSTabBarState *s, UIView *container) {
     CGFloat radius=p.borderStyle==0 ? CGRectGetHeight(s.floatingRect)/2 : MIN(p.cornerRadius,CGRectGetHeight(s.floatingRect)/2);
     s.material.layer.cornerRadius=radius; s.material.clipsToBounds=YES;
     s.material.hidden=p.backgroundColor!=nil;
-    s.surface.backgroundColor=p.backgroundColor ?: s.nativeBackground ?: bar.backgroundView.backgroundColor ?: UIColor.clearColor;
+    s.surface.backgroundColor=p.backgroundColor ?: s.nativeBackground ?: CSNativeBackground(bar).backgroundColor ?: UIColor.clearColor;
     s.surface.layer.cornerRadius=radius;
     s.border.frame=s.surface.bounds;
     CGFloat line=p.borderColor ? p.borderWidth : 0;
@@ -428,13 +479,13 @@ void CSTabBarUpdate(MMTabBar *bar) {
     s.applying=YES;
     s.controller=CSOwner(bar);
     NSArray *items=CSItems(bar);
-    if (!CSTabBarPreferences.current.enabled || ![s.controller respondsToSelector:@selector(getTabBarBtnForIndex:)] || !CSOwner(bar) || items.count!=4 || bar.items.count!=4) {
+    if (!CSTabBarPreferences.current.enabled || !CSOwner(bar) || items.count!=4 || bar.items.count!=4) {
         CSStop(s); s.applying=NO; return;
     }
     // Fail closed if the native controls are unavailable; never replace navigation.
     NSMutableArray *buttons=[NSMutableArray array];
     for (NSUInteger i=0;i<items.count;i++) {
-        id button=[s.controller getTabBarBtnForIndex:i];
+        id button=CSNativeButton(bar,s.controller,i);
         if (![items[i] isKindOfClass:NSClassFromString(@"MMTabBarItemView")] || ![button isKindOfClass:UIControl.class] || ![button isDescendantOfView:bar]) {
             CSStop(s); s.applying=NO; return;
         }
@@ -454,8 +505,7 @@ void CSTabBarUpdate(MMTabBar *bar) {
     if (!s.applied) { s.nativeBackground=bar.backgroundColor; s.clips=bar.clipsToBounds; }
     else if (![bar.backgroundColor isEqual:UIColor.clearColor]) s.nativeBackground=bar.backgroundColor;
     for (UIView *view in bar.subviews) {
-        NSString *name=NSStringFromClass(view.class);
-        if (view==bar.backgroundView || [name containsString:@"BarBackground"]) {
+        if (CSIsNativeBackground(bar,view)) {
             if (![s.backgroundHidden objectForKey:view]) [s.backgroundHidden setObject:@(view.hidden) forKey:view];
             if (!view.hidden) view.hidden=YES;
         }
@@ -469,8 +519,12 @@ void CSTabBarUpdate(MMTabBar *bar) {
         MMTabBarItemView *item=items[i]; UIControl *button=buttons[i];
         CSTabBarButtonState *b=[CSTabBarButtonState new]; b.button=button; b.frame=button.frame; b.item=item; b.itemFrame=item.frame; [buttonStates addObject:b];
         CGRect frame=CSRect(CSTabBarItemRect(rect,(unsigned)i,(unsigned)items.count,rtl));
-        CSSetFrame(item,[bar convertRect:frame toView:item.superview]);
         CSSetFrame(button,[bar convertRect:frame toView:button.superview]);
+        // New item renderers are children of their native UIControl. Position the
+        // control first, then fill its content; applying two bar-space frames to
+        // this nested hierarchy would shift the renderer twice.
+        if ([item isDescendantOfView:button]) CSSetFrame(item,[button convertRect:button.bounds toView:item.superview]);
+        else CSSetFrame(item,[bar convertRect:frame toView:item.superview]);
         if (![s.observedButtons containsObject:button]) {
             [button addTarget:s action:@selector(touchBegan:) forControlEvents:UIControlEventTouchDown];
             [button addTarget:s action:@selector(touchEnded:) forControlEvents:UIControlEventTouchUpInside];
@@ -498,6 +552,20 @@ void CSTabBarUpdate(MMTabBar *bar) {
 UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot) {
     CSTabBarState *s=CSState(bar,NO);
     if (!s.applied || !s.geometryApplied || !CSTabBarPreferences.current.enabled || !nativeSnapshot) return nativeSnapshot;
+    if (CSModernBar(bar)) {
+        // 8.0.80 returns a real WCTabBarView with fresh native controls and copies
+        // their transition visual state. Style that copy through the same layout
+        // adapter so subsequent native layout passes retain its floating geometry.
+        // It never observes a page inset or participates in click feedback.
+        if (!CSHasNativeClass(nativeSnapshot,@"WCTabBarView") || CSItems((id)nativeSnapshot).count!=4) return nativeSnapshot;
+        CSTabBarState *copy=[CSTabBarState new];
+        copy.bar=(id)nativeSnapshot; copy.controller=s.controller; copy.snapshotSource=bar;
+        copy.backgroundHidden=[NSMapTable weakToStrongObjectsMapTable];
+        copy.observedButtons=[NSHashTable weakObjectsHashTable];
+        objc_setAssociatedObject(nativeSnapshot,&CSBarStateKey,copy,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        CSTabBarUpdate((id)nativeSnapshot);
+        return nativeSnapshot;
+    }
     // WeChat 8.0.78 snapshots each item into a direct UIImageView and independently adds
     // a full-width blur and hairline. Reuse those native pixels (including badges), but
     // compose them with our surface. Never move live items or touch native navigation.
@@ -546,7 +614,7 @@ void CSTabBarBeginControllerLayout(MMTabBarController *controller) {
     // Only table discovery is deferred. Geometry and snapshots remain synchronous,
     // and no discovery result is retained across layout generations.
     CSTabBarEndControllerLayout(controller);
-    MMTabBar *bar=[controller.tabBar isKindOfClass:NSClassFromString(@"MMTabBar")] ? (MMTabBar *)controller.tabBar : nil;
+    MMTabBar *bar=CSTabBarForController(controller);
     if (!bar || !CSState(bar,CSTabBarPreferences.current.enabled)) return;
     CSTabBarControllerLayout *scope=[CSTabBarControllerLayout new];scope.bar=bar;
     objc_setAssociatedObject(controller,&CSControllerLayoutKey,scope,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -602,9 +670,9 @@ UIView *CSTabBarHitTest(MMTabBar *bar, CGPoint point, UIEvent *event, BOOL *hand
         CSTabBarState *s=weakSelf;
         if (!s || s.feedbackGeneration!=generation || !CSFeedbackVisible(s) || s.controller.selectedIndex==previous) return;
         NSUInteger index=s.controller.selectedIndex;
-        if (index>=s.bar.items.count || [s.controller getTabBarBtnForIndex:index]!=weakButton) return;
+        if (index>=s.bar.items.count || CSNativeButton(s.bar,s.controller,index)!=weakButton) return;
         MMTabBarItemView *selected=nil;
-        for (MMTabBarItemView *item in CSItems(s.bar)) if (item.item==s.bar.items[index]) {selected=item; break;}
+        for (MMTabBarItemView *item in CSItems(s.bar)) if (CSItemIndex(s.bar,item)==index) {selected=item; break;}
         if (selected) CSPlayClickEffect(s,selected);
         NSInteger haptic=CSTabBarPreferences.current.haptic;
         if (!haptic) return;

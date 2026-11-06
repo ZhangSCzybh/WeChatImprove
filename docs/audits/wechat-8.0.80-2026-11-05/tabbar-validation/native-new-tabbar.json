@@ -1,0 +1,1772 @@
+{
+  "NewMainTabBarViewController": {
+    "methods": [
+      {
+        "name": "isKindOfClass:",
+        "type": "B24@0:8#16",
+        "imp": "0x105408c3c"
+      },
+      {
+        "name": "addTapGesture",
+        "type": "v16@0:8",
+        "imp": "0x105408ccc"
+      },
+      {
+        "name": "removeTapGesture",
+        "type": "v16@0:8",
+        "imp": "0x105408cdc"
+      },
+      {
+        "name": "setSelectedViewController:",
+        "type": "v24@0:8@16",
+        "imp": "0x105408cec"
+      },
+      {
+        "name": "setViewControllers:",
+        "type": "v24@0:8@16",
+        "imp": "0x105408dc0"
+      },
+      {
+        "name": "setAllTabBarItemEnabled:",
+        "type": "v20@0:8B16",
+        "imp": "0x105408e38"
+      },
+      {
+        "name": "hideTabBar",
+        "type": "v16@0:8",
+        "imp": "0x105408e80"
+      },
+      {
+        "name": "showTabBar",
+        "type": "v16@0:8",
+        "imp": "0x105408ef0"
+      },
+      {
+        "name": "hideTabBarForIndex:",
+        "type": "v24@0:8Q16",
+        "imp": "0x105409064"
+      },
+      {
+        "name": "showTabBarForIndex:",
+        "type": "v24@0:8Q16",
+        "imp": "0x1054090b0"
+      },
+      {
+        "name": "hideTabBarWithNoViewHeightUpdateForIndex:",
+        "type": "v24@0:8Q16",
+        "imp": "0x1054090fc"
+      },
+      {
+        "name": "showTabBarWithNoViewHeightUpdateForIndex:",
+        "type": "v24@0:8Q16",
+        "imp": "0x105409108"
+      },
+      {
+        "name": "currentViewController",
+        "type": "@16@0:8",
+        "imp": "0x105409114"
+      },
+      {
+        "name": "currentTopViewController",
+        "type": "@16@0:8",
+        "imp": "0x105409120"
+      },
+      {
+        "name": "getCurrentViewController",
+        "type": "@16@0:8",
+        "imp": "0x1054091a8"
+      },
+      {
+        "name": "getViewControllerAtIndex:",
+        "type": "@20@0:8I16",
+        "imp": "0x105409264"
+      },
+      {
+        "name": "setTabBarItemSelectedIndex:",
+        "type": "v24@0:8Q16",
+        "imp": "0x105409368"
+      },
+      {
+        "name": "tabBarItemIsSelectedAtIndex:",
+        "type": "B24@0:8Q16",
+        "imp": "0x1054093b0"
+      },
+      {
+        "name": "setTabBarItemTitle:forIndex:",
+        "type": "v32@0:8@16Q24",
+        "imp": "0x105409404"
+      },
+      {
+        "name": "setTabBarItemCustomIconView:forIndex:",
+        "type": "v32@0:8@16Q24",
+        "imp": "0x1054094ac"
+      },
+      {
+        "name": "setTabBarBadgeValue:forIndex:",
+        "type": "v32@0:8Q16Q24",
+        "imp": "0x105409554"
+      },
+      {
+        "name": "setTabBarBadgeString:forIndex:",
+        "type": "v32@0:8@16Q24",
+        "imp": "0x105409700"
+      },
+      {
+        "name": "showRedDotOnTabBarItemAtIndex:",
+        "type": "v24@0:8Q16",
+        "imp": "0x1054098d8"
+      },
+      {
+        "name": "removeRedDotOnTabBarItemAtIndex:",
+        "type": "v24@0:8Q16",
+        "imp": "0x105409adc"
+      },
+      {
+        "name": "tabBarItemAtIndex:",
+        "type": "@24@0:8Q16",
+        "imp": "0x105409c44"
+      },
+      {
+        "name": "badgeViewAtIndex:",
+        "type": "@24@0:8Q16",
+        "imp": "0x105409cc4"
+      },
+      {
+        "name": "supportedInterfaceOrientations",
+        "type": "Q16@0:8",
+        "imp": "0x105409d44"
+      },
+      {
+        "name": "onTabBarHiddenChanged:",
+        "type": "v20@0:8B16",
+        "imp": "0x105409df4"
+      },
+      {
+        "name": "respondsToSelector:",
+        "type": "B24@0:8:16",
+        "imp": "0x10540a130"
+      },
+      {
+        "name": "methodSignatureForSelector:",
+        "type": "@24@0:8:16",
+        "imp": "0x10540a1a0"
+      },
+      {
+        "name": "forwardInvocation:",
+        "type": "v24@0:8@16",
+        "imp": "0x10540a26c"
+      },
+      {
+        "name": "moveFromToTabIndex:lastSelectedIsFindPage:",
+        "type": "v28@0:8Q16B24",
+        "imp": "0x105408b54"
+      },
+      {
+        "name": "timeToLazyInitAfterOpenFirstView",
+        "type": "d16@0:8",
+        "imp": "0x10540a384"
+      },
+      {
+        "name": "goToLazyInitObject",
+        "type": "v16@0:8",
+        "imp": "0x10540a38c"
+      },
+      {
+        "name": "getNewMainFrameViewController",
+        "type": "@16@0:8",
+        "imp": "0x10540a420"
+      },
+      {
+        "name": "getContactsViewController",
+        "type": "@16@0:8",
+        "imp": "0x10540a494"
+      },
+      {
+        "name": "getTabBarBaseViewController:",
+        "type": "@24@0:8Q16",
+        "imp": "0x10540a508"
+      },
+      {
+        "name": "getAllTabBaseViewControllersIfExist",
+        "type": "@16@0:8",
+        "imp": "0x10540a5d0"
+      },
+      {
+        "name": "getNavigationContollerAtIndex:",
+        "type": "@24@0:8Q16",
+        "imp": "0x10540a5e0"
+      },
+      {
+        "name": "getAllNavigationControllers",
+        "type": "@16@0:8",
+        "imp": "0x10540a62c"
+      },
+      {
+        "name": "OnMainFrameDoubleClicked:",
+        "type": "v24@0:8@16",
+        "imp": "0x10540a660"
+      },
+      {
+        "name": "OnMainFrameSingleClicked:",
+        "type": "v24@0:8@16",
+        "imp": "0x10540a718"
+      },
+      {
+        "name": "OnMainFrameLongPressed:",
+        "type": "v24@0:8@16",
+        "imp": "0x10540a7d0"
+      },
+      {
+        "name": "OnMainTabBarHiddenChange:",
+        "type": "v20@0:8B16",
+        "imp": "0x10540a888"
+      },
+      {
+        "name": "tabBarController:shouldSelectViewController:",
+        "type": "B32@0:8@16@24",
+        "imp": "0x10540a918"
+      },
+      {
+        "name": "tabBarController:didSelectViewController:",
+        "type": "v32@0:8@16@24",
+        "imp": "0x10540a9e8"
+      },
+      {
+        "name": "preloadRedDotLogic:selectedIndex:findFriendPageIndex:",
+        "type": "v36@0:8B16Q20q28",
+        "imp": "0x10540ac54"
+      },
+      {
+        "name": "checkDBCorrupt",
+        "type": "v16@0:8",
+        "imp": "0x10540ae14"
+      },
+      {
+        "name": "tabBarController:animationControllerForTransitionFromViewController:toViewController:",
+        "type": "@40@0:8@16@24@32",
+        "imp": "0x10540afb8"
+      },
+      {
+        "name": "init",
+        "type": "@16@0:8",
+        "imp": "0x10540b1a8"
+      },
+      {
+        "name": "dealloc",
+        "type": "v16@0:8",
+        "imp": "0x10540b34c"
+      },
+      {
+        "name": "viewWillAppear:",
+        "type": "v20@0:8B16",
+        "imp": "0x10540b424"
+      },
+      {
+        "name": "viewDidAppear:",
+        "type": "v20@0:8B16",
+        "imp": "0x10540b474"
+      },
+      {
+        "name": "makeSureFrame",
+        "type": "v16@0:8",
+        "imp": "0x10540b4c4"
+      },
+      {
+        "name": "setMainFrameTabInteractionsEnabled:",
+        "type": "v20@0:8B16",
+        "imp": "0x10540b7c8"
+      },
+      {
+        "name": "didSingleTapTabBarItemAtIndex:wasSelected:",
+        "type": "v28@0:8Q16B24",
+        "imp": "0x10540b7d8"
+      },
+      {
+        "name": "didDoubleTapTabBarItemAtIndex:wasSelected:",
+        "type": "v28@0:8Q16B24",
+        "imp": "0x10540b858"
+      },
+      {
+        "name": "didLongPressTabBarItemAtIndex:wasSelected:",
+        "type": "v28@0:8Q16B24",
+        "imp": "0x10540b8d8"
+      },
+      {
+        "name": "longPressDurationForTabBarItemAtIndex:",
+        "type": "d24@0:8Q16",
+        "imp": "0x10540b974"
+      },
+      {
+        "name": "handleMoreTabLongPress",
+        "type": "v16@0:8",
+        "imp": "0x10540b9c8"
+      },
+      {
+        "name": "setSelectedIndex:",
+        "type": "v24@0:8Q16",
+        "imp": "0x10540bbcc"
+      },
+      {
+        "name": "p_tryToInitAllControllers",
+        "type": "v16@0:8",
+        "imp": "0x10540bd10"
+      },
+      {
+        "name": "p_createTabBarItems",
+        "type": "v16@0:8",
+        "imp": "0x10540bdb0"
+      },
+      {
+        "name": "p_createSlimViewControllers",
+        "type": "v16@0:8",
+        "imp": "0x10540c80c"
+      },
+      {
+        "name": "p_getNewMainFrameViewController",
+        "type": "@16@0:8",
+        "imp": "0x10540ca48"
+      },
+      {
+        "name": "p_createNewMainFrameViewController",
+        "type": "v16@0:8",
+        "imp": "0x10540cae4"
+      },
+      {
+        "name": "p_getContactsViewController",
+        "type": "@16@0:8",
+        "imp": "0x10540cc18"
+      },
+      {
+        "name": "p_createContactsViewController",
+        "type": "v16@0:8",
+        "imp": "0x10540ccb4"
+      },
+      {
+        "name": "findFriendEntryViewController",
+        "type": "@16@0:8",
+        "imp": "0x10540cdf8"
+      },
+      {
+        "name": "p_getFindFriendEntryViewController",
+        "type": "@16@0:8",
+        "imp": "0x10540ce08"
+      },
+      {
+        "name": "p_createFindFriendViewController",
+        "type": "v16@0:8",
+        "imp": "0x10540cea4"
+      },
+      {
+        "name": "p_getMoreViewController",
+        "type": "@16@0:8",
+        "imp": "0x10540cfd8"
+      },
+      {
+        "name": "p_createMoreViewController",
+        "type": "v16@0:8",
+        "imp": "0x10540d074"
+      },
+      {
+        "name": "recreateFindFriendViewController",
+        "type": "v16@0:8",
+        "imp": "0x10540d16c"
+      },
+      {
+        "name": "removeAllTabBarBaseViewController",
+        "type": "v16@0:8",
+        "imp": "0x10540d258"
+      },
+      {
+        "name": "onCaptureScreen:",
+        "type": "v24@0:8@16",
+        "imp": "0x10540d2f8"
+      },
+      {
+        "name": "haveLazyInit",
+        "type": "B16@0:8",
+        "imp": "0x10540d418"
+      },
+      {
+        "name": "setHaveLazyInit:",
+        "type": "v20@0:8B16",
+        "imp": "0x10540d428"
+      },
+      {
+        "name": "mainDelegate",
+        "type": "@16@0:8",
+        "imp": "0x10540d438"
+      },
+      {
+        "name": "setMainDelegate:",
+        "type": "v24@0:8@16",
+        "imp": "0x10540d458"
+      },
+      {
+        "name": "mainFrameTabInteractionsEnabled",
+        "type": "B16@0:8",
+        "imp": "0x10540d46c"
+      },
+      {
+        "name": ".cxx_destruct",
+        "type": "v16@0:8",
+        "imp": "0x10540d47c"
+      }
+    ],
+    "class_methods": [
+      {
+        "name": "instancesRespondToSelector:",
+        "type": "B24@0:8:16",
+        "imp": "0x105409e6c"
+      },
+      {
+        "name": "respondsToSelector:",
+        "type": "B24@0:8:16",
+        "imp": "0x105409edc"
+      },
+      {
+        "name": "methodSignatureForSelector:",
+        "type": "@24@0:8:16",
+        "imp": "0x105409f4c"
+      },
+      {
+        "name": "forwardInvocation:",
+        "type": "v24@0:8@16",
+        "imp": "0x10540a018"
+      }
+    ],
+    "ivars": [
+      {
+        "name": "m_whatHasInit",
+        "type": "I",
+        "offset": 8
+      },
+      {
+        "name": "m_mainFrameViewController",
+        "type": "@\"NewMainFrameViewController\"",
+        "offset": 16
+      },
+      {
+        "name": "m_mainFrameTabItem",
+        "type": "@\"MMTabbarItem\"",
+        "offset": 24
+      },
+      {
+        "name": "m_contactsViewController",
+        "type": "@\"ContactsViewController\"",
+        "offset": 32
+      },
+      {
+        "name": "m_contacsTabItem",
+        "type": "@\"MMTabbarItem\"",
+        "offset": 40
+      },
+      {
+        "name": "m_findFriendEntryViewController",
+        "type": "@\"FindFriendEntryViewController\"",
+        "offset": 48
+      },
+      {
+        "name": "m_findFrientTabItem",
+        "type": "@\"MMTabbarItem\"",
+        "offset": 56
+      },
+      {
+        "name": "m_moreViewController",
+        "type": "@\"MoreViewController\"",
+        "offset": 64
+      },
+      {
+        "name": "m_moreTabItem",
+        "type": "@\"MMTabbarItem\"",
+        "offset": 72
+      },
+      {
+        "name": "m_arrViewController",
+        "type": "@\"NSMutableArray\"",
+        "offset": 80
+      },
+      {
+        "name": "haveLazyInit",
+        "type": "B",
+        "offset": 88
+      },
+      {
+        "name": "_mainFrameTabInteractionsEnabled",
+        "type": "B",
+        "offset": 89
+      },
+      {
+        "name": "_mainDelegate",
+        "type": "@\"<MainTabBarControllerDelegate>\"",
+        "offset": 96
+      }
+    ],
+    "super": "WCTabBarController"
+  },
+  "WCTabBarController": {
+    "methods": [
+      {
+        "name": "isKindOfClass:",
+        "type": "B24@0:8#16",
+        "imp": "0x1157ddf50"
+      },
+      {
+        "name": "setupCompatibility",
+        "type": "v16@0:8",
+        "imp": "0x1157ddfbc"
+      },
+      {
+        "name": "installCompatibilityViewsIfNeeded",
+        "type": "v16@0:8",
+        "imp": "0x1157de12c"
+      },
+      {
+        "name": "layoutCompatibilityViews",
+        "type": "v16@0:8",
+        "imp": "0x1157de5ec"
+      },
+      {
+        "name": "invalidateCompatibilityTabsForViewControllerUpdate",
+        "type": "v16@0:8",
+        "imp": "0x1157de82c"
+      },
+      {
+        "name": "tabBar",
+        "type": "@16@0:8",
+        "imp": "0x1157de8e8"
+      },
+      {
+        "name": "moreNavigationController",
+        "type": "@16@0:8",
+        "imp": "0x1157de8f4"
+      },
+      {
+        "name": "customizableViewControllers",
+        "type": "@16@0:8",
+        "imp": "0x1157de9e8"
+      },
+      {
+        "name": "setCustomizableViewControllers:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dea3c"
+      },
+      {
+        "name": "initWithTabs:",
+        "type": "@24@0:8@16",
+        "imp": "0x1157deaa4"
+      },
+      {
+        "name": "mode",
+        "type": "q16@0:8",
+        "imp": "0x1157deb10"
+      },
+      {
+        "name": "setMode:",
+        "type": "v24@0:8q16",
+        "imp": "0x1157deb5c"
+      },
+      {
+        "name": "sidebar",
+        "type": "@16@0:8",
+        "imp": "0x1157deba4"
+      },
+      {
+        "name": "customizationIdentifier",
+        "type": "@16@0:8",
+        "imp": "0x1157dec98"
+      },
+      {
+        "name": "setCustomizationIdentifier:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157decec"
+      },
+      {
+        "name": "compactTabIdentifiers",
+        "type": "@16@0:8",
+        "imp": "0x1157ded54"
+      },
+      {
+        "name": "setCompactTabIdentifiers:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157deda8"
+      },
+      {
+        "name": "tabs",
+        "type": "@16@0:8",
+        "imp": "0x1157dee10"
+      },
+      {
+        "name": "setTabs:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dee90"
+      },
+      {
+        "name": "setTabs:animated:",
+        "type": "v28@0:8@16B24",
+        "imp": "0x1157deea0"
+      },
+      {
+        "name": "selectedTab",
+        "type": "@16@0:8",
+        "imp": "0x1157df510"
+      },
+      {
+        "name": "setSelectedTab:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157df630"
+      },
+      {
+        "name": "tabForIdentifier:",
+        "type": "@24@0:8@16",
+        "imp": "0x1157df908"
+      },
+      {
+        "name": "contentLayoutGuide",
+        "type": "@16@0:8",
+        "imp": "0x1157dfb30"
+      },
+      {
+        "name": "bottomAccessory",
+        "type": "@16@0:8",
+        "imp": "0x1157dfb84"
+      },
+      {
+        "name": "setBottomAccessory:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dfbd8"
+      },
+      {
+        "name": "setBottomAccessory:animated:",
+        "type": "v28@0:8@16B24",
+        "imp": "0x1157dfbe8"
+      },
+      {
+        "name": "tabBarMinimizeBehavior",
+        "type": "q16@0:8",
+        "imp": "0x1157dfea8"
+      },
+      {
+        "name": "setTabBarMinimizeBehavior:",
+        "type": "v24@0:8q16",
+        "imp": "0x1157dfef4"
+      },
+      {
+        "name": "compatibilityShouldSelectViewController:atIndex:",
+        "type": "B32@0:8@16Q24",
+        "imp": "0x1157dff3c"
+      },
+      {
+        "name": "compatibilityDidSelectViewController:atIndex:previousIndex:",
+        "type": "v40@0:8@16Q24Q32",
+        "imp": "0x1157e012c"
+      },
+      {
+        "name": "getCompatibilitySupportedInterfaceOrientations:",
+        "type": "B24@0:8^Q16",
+        "imp": "0x1157e0314"
+      },
+      {
+        "name": "getCompatibilityPreferredInterfaceOrientation:",
+        "type": "B24@0:8^q16",
+        "imp": "0x1157e039c"
+      },
+      {
+        "name": "tabBar:didSelectItem:",
+        "type": "v32@0:8@16@24",
+        "imp": "0x1157e0424"
+      },
+      {
+        "name": "respondsToSelector:",
+        "type": "B24@0:8:16",
+        "imp": "0x1157e0774"
+      },
+      {
+        "name": "methodSignatureForSelector:",
+        "type": "@24@0:8:16",
+        "imp": "0x1157e07e4"
+      },
+      {
+        "name": "forwardInvocation:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e08a4"
+      },
+      {
+        "name": "init",
+        "type": "@16@0:8",
+        "imp": "0x1157d8a50"
+      },
+      {
+        "name": "initWithNibName:bundle:",
+        "type": "@32@0:8@16@24",
+        "imp": "0x1157d8a64"
+      },
+      {
+        "name": "initWithCoder:",
+        "type": "@24@0:8@16",
+        "imp": "0x1157d8abc"
+      },
+      {
+        "name": "setupController",
+        "type": "v16@0:8",
+        "imp": "0x1157d8b14"
+      },
+      {
+        "name": "shouldWrapViewWithSafeArea",
+        "type": "B16@0:8",
+        "imp": "0x1157d8f9c"
+      },
+      {
+        "name": "loadView",
+        "type": "v16@0:8",
+        "imp": "0x1157d8fa4"
+      },
+      {
+        "name": "viewDidLoad",
+        "type": "v16@0:8",
+        "imp": "0x1157d9094"
+      },
+      {
+        "name": "viewDidLayoutSubviews",
+        "type": "v16@0:8",
+        "imp": "0x1157d928c"
+      },
+      {
+        "name": "tabBarViewForCompatibility",
+        "type": "@16@0:8",
+        "imp": "0x1157d9638"
+      },
+      {
+        "name": "setItems:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157d96e4"
+      },
+      {
+        "name": "reloadTabBarItemsFromViewControllers",
+        "type": "v16@0:8",
+        "imp": "0x1157d978c"
+      },
+      {
+        "name": "reloadItemInteractionGestureRecognizers",
+        "type": "v16@0:8",
+        "imp": "0x1157d9958"
+      },
+      {
+        "name": "gestureRecognizer:shouldReceiveTouch:",
+        "type": "B32@0:8@16@24",
+        "imp": "0x1157d9e9c"
+      },
+      {
+        "name": "gestureRecognizerShouldBegin:",
+        "type": "B24@0:8@16",
+        "imp": "0x1157da0b4"
+      },
+      {
+        "name": "handleItemTapGesture:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157da24c"
+      },
+      {
+        "name": "handleItemLongPressGesture:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157da2fc"
+      },
+      {
+        "name": "didSingleTapTabBarItemAtIndex:wasSelected:",
+        "type": "v28@0:8Q16B24",
+        "imp": "0x1157da384"
+      },
+      {
+        "name": "didDoubleTapTabBarItemAtIndex:wasSelected:",
+        "type": "v28@0:8Q16B24",
+        "imp": "0x1157da388"
+      },
+      {
+        "name": "didLongPressTabBarItemAtIndex:wasSelected:",
+        "type": "v28@0:8Q16B24",
+        "imp": "0x1157da38c"
+      },
+      {
+        "name": "longPressDurationForTabBarItemAtIndex:",
+        "type": "d24@0:8Q16",
+        "imp": "0x1157da390"
+      },
+      {
+        "name": "tabBarItemForViewController:",
+        "type": "@24@0:8@16",
+        "imp": "0x1157da398"
+      },
+      {
+        "name": "setViewControllers:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157da66c"
+      },
+      {
+        "name": "setViewControllers:animated:",
+        "type": "v28@0:8@16B24",
+        "imp": "0x1157da67c"
+      },
+      {
+        "name": "applyViewControllers:animated:",
+        "type": "v28@0:8@16B24",
+        "imp": "0x1157da6e0"
+      },
+      {
+        "name": "selectedViewController",
+        "type": "@16@0:8",
+        "imp": "0x1157dac48"
+      },
+      {
+        "name": "setSelectedViewController:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dad10"
+      },
+      {
+        "name": "setSelectedIndex:",
+        "type": "v24@0:8Q16",
+        "imp": "0x1157dadb4"
+      },
+      {
+        "name": "setSelectedIndex:commitVisualSelection:",
+        "type": "v28@0:8Q16B24",
+        "imp": "0x1157dadc4"
+      },
+      {
+        "name": "handleUserSelectionAtIndex:",
+        "type": "v24@0:8Q16",
+        "imp": "0x1157daf6c"
+      },
+      {
+        "name": "didCompleteUserSelectionOfViewController:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157db0d8"
+      },
+      {
+        "name": "tabBarNavigationControllerIsSelected:",
+        "type": "B24@0:8@16",
+        "imp": "0x1157db144"
+      },
+      {
+        "name": "tabBarNavigationController:willPushViewController:animated:",
+        "type": "v36@0:8@16@24B32",
+        "imp": "0x1157db1b0"
+      },
+      {
+        "name": "tabBarNavigationController:willShowViewController:animated:",
+        "type": "v36@0:8@16@24B32",
+        "imp": "0x1157db3fc"
+      },
+      {
+        "name": "tabBarNavigationController:didShowViewController:animated:",
+        "type": "v36@0:8@16@24B32",
+        "imp": "0x1157db540"
+      },
+      {
+        "name": "transitionForNavigationController:destinationViewController:animated:",
+        "type": "@36@0:8@16@24B32",
+        "imp": "0x1157db5d4"
+      },
+      {
+        "name": "prepareTabBarForTransition:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157db994"
+      },
+      {
+        "name": "beginTabBarTransition:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dbe30"
+      },
+      {
+        "name": "syncTabBarVisibilityForNavigationController:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dbfec"
+      },
+      {
+        "name": "addTabBarTransitionViewToView:",
+        "type": "@24@0:8@16",
+        "imp": "0x1157dc0e0"
+      },
+      {
+        "name": "finishTabBarTransition:cancelled:",
+        "type": "v28@0:8@16B24",
+        "imp": "0x1157dc26c"
+      },
+      {
+        "name": "transitionFromViewController:toViewController:animated:",
+        "type": "v36@0:8@16@24B32",
+        "imp": "0x1157dc454"
+      },
+      {
+        "name": "attachSelectedViewControllerIfNeeded",
+        "type": "v16@0:8",
+        "imp": "0x1157dc6d0"
+      },
+      {
+        "name": "updateSelectedViewControllerSafeAreaInsets",
+        "type": "v16@0:8",
+        "imp": "0x1157dc8b4"
+      },
+      {
+        "name": "safeAreaContentViewControllerForSelectedViewController",
+        "type": "@16@0:8",
+        "imp": "0x1157dca7c"
+      },
+      {
+        "name": "restoreAdjustedViewControllerSafeAreaInsets",
+        "type": "v16@0:8",
+        "imp": "0x1157dcb40"
+      },
+      {
+        "name": "setTabBarHeight:",
+        "type": "v24@0:8d16",
+        "imp": "0x1157dcc30"
+      },
+      {
+        "name": "tabBarHeight",
+        "type": "d16@0:8",
+        "imp": "0x1157dccac"
+      },
+      {
+        "name": "setTabBarHidden:",
+        "type": "v20@0:8B16",
+        "imp": "0x1157dcd60"
+      },
+      {
+        "name": "setTabBarHidden:animated:",
+        "type": "v24@0:8B16B20",
+        "imp": "0x1157dcd70"
+      },
+      {
+        "name": "isTabBarHidden",
+        "type": "B16@0:8",
+        "imp": "0x1157dd0b4"
+      },
+      {
+        "name": "tabBarView:didChangeHidden:",
+        "type": "v28@0:8@16B24",
+        "imp": "0x1157dd0c0"
+      },
+      {
+        "name": "tabBarView:didChangeTranslucent:",
+        "type": "v28@0:8@16B24",
+        "imp": "0x1157dd13c"
+      },
+      {
+        "name": "onTabBarHiddenChanged:",
+        "type": "v20@0:8B16",
+        "imp": "0x1157dd17c"
+      },
+      {
+        "name": "shouldAutomaticallyForwardAppearanceMethods",
+        "type": "B16@0:8",
+        "imp": "0x1157dd180"
+      },
+      {
+        "name": "childViewControllerForStatusBarStyle",
+        "type": "@16@0:8",
+        "imp": "0x1157dd188"
+      },
+      {
+        "name": "childViewControllerForStatusBarHidden",
+        "type": "@16@0:8",
+        "imp": "0x1157dd194"
+      },
+      {
+        "name": "childViewControllerForHomeIndicatorAutoHidden",
+        "type": "@16@0:8",
+        "imp": "0x1157dd1a0"
+      },
+      {
+        "name": "shouldAutorotate",
+        "type": "B16@0:8",
+        "imp": "0x1157dd1ac"
+      },
+      {
+        "name": "supportedInterfaceOrientations",
+        "type": "Q16@0:8",
+        "imp": "0x1157dd258"
+      },
+      {
+        "name": "preferredInterfaceOrientationForPresentation",
+        "type": "q16@0:8",
+        "imp": "0x1157dd310"
+      },
+      {
+        "name": "delegate",
+        "type": "@16@0:8",
+        "imp": "0x1157dd3e0"
+      },
+      {
+        "name": "setDelegate:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dd400"
+      },
+      {
+        "name": "viewControllers",
+        "type": "@16@0:8",
+        "imp": "0x1157dd414"
+      },
+      {
+        "name": "selectedIndex",
+        "type": "Q16@0:8",
+        "imp": "0x1157dd424"
+      },
+      {
+        "name": "items",
+        "type": "@16@0:8",
+        "imp": "0x1157dd434"
+      },
+      {
+        "name": "tabBarView",
+        "type": "@16@0:8",
+        "imp": "0x1157dd444"
+      },
+      {
+        "name": "setTabBarView:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dd454"
+      },
+      {
+        "name": "contentView",
+        "type": "@16@0:8",
+        "imp": "0x1157dd468"
+      },
+      {
+        "name": "setContentView:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dd478"
+      },
+      {
+        "name": "tabBarHiddenState",
+        "type": "B16@0:8",
+        "imp": "0x1157dd48c"
+      },
+      {
+        "name": "setTabBarHiddenState:",
+        "type": "v20@0:8B16",
+        "imp": "0x1157dd49c"
+      },
+      {
+        "name": "usesAutomaticTabBarHeight",
+        "type": "B16@0:8",
+        "imp": "0x1157dd4ac"
+      },
+      {
+        "name": "setUsesAutomaticTabBarHeight:",
+        "type": "v20@0:8B16",
+        "imp": "0x1157dd4bc"
+      },
+      {
+        "name": "configuredTabBarHeight",
+        "type": "d16@0:8",
+        "imp": "0x1157dd4cc"
+      },
+      {
+        "name": "setConfiguredTabBarHeight:",
+        "type": "v24@0:8d16",
+        "imp": "0x1157dd4dc"
+      },
+      {
+        "name": "activeNavigationTransition",
+        "type": "@16@0:8",
+        "imp": "0x1157dd4ec"
+      },
+      {
+        "name": "setActiveNavigationTransition:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dd4fc"
+      },
+      {
+        "name": "safeAreaAdjustedViewController",
+        "type": "@16@0:8",
+        "imp": "0x1157dd510"
+      },
+      {
+        "name": "setSafeAreaAdjustedViewController:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dd530"
+      },
+      {
+        "name": "appliedTabBarSafeAreaInset",
+        "type": "d16@0:8",
+        "imp": "0x1157dd544"
+      },
+      {
+        "name": "setAppliedTabBarSafeAreaInset:",
+        "type": "v24@0:8d16",
+        "imp": "0x1157dd554"
+      },
+      {
+        "name": "itemInteractionGestureRecognizers",
+        "type": "@16@0:8",
+        "imp": "0x1157dd564"
+      },
+      {
+        "name": "setItemInteractionGestureRecognizers:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dd574"
+      },
+      {
+        "name": "compatibilityState",
+        "type": "@16@0:8",
+        "imp": "0x1157dd588"
+      },
+      {
+        "name": "setCompatibilityState:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157dd598"
+      },
+      {
+        "name": ".cxx_destruct",
+        "type": "v16@0:8",
+        "imp": "0x1157dd5ac"
+      }
+    ],
+    "class_methods": [
+      {
+        "name": "load",
+        "type": "v16@0:8",
+        "imp": "0x1157ddda0"
+      },
+      {
+        "name": "instancesRespondToSelector:",
+        "type": "B24@0:8:16",
+        "imp": "0x1157e04c8"
+      },
+      {
+        "name": "respondsToSelector:",
+        "type": "B24@0:8:16",
+        "imp": "0x1157e0538"
+      },
+      {
+        "name": "methodSignatureForSelector:",
+        "type": "@24@0:8:16",
+        "imp": "0x1157e05a8"
+      },
+      {
+        "name": "forwardInvocation:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e0668"
+      }
+    ],
+    "ivars": [
+      {
+        "name": "_tabBarHiddenState",
+        "type": "B",
+        "offset": 8
+      },
+      {
+        "name": "_usesAutomaticTabBarHeight",
+        "type": "B",
+        "offset": 9
+      },
+      {
+        "name": "_delegate",
+        "type": "@\"<UITabBarControllerDelegate>\"",
+        "offset": 16
+      },
+      {
+        "name": "_viewControllers",
+        "type": "@\"NSArray\"",
+        "offset": 24
+      },
+      {
+        "name": "_selectedIndex",
+        "type": "Q",
+        "offset": 32
+      },
+      {
+        "name": "_items",
+        "type": "@\"NSArray\"",
+        "offset": 40
+      },
+      {
+        "name": "_tabBarView",
+        "type": "@\"WCTabBarView\"",
+        "offset": 48
+      },
+      {
+        "name": "_contentView",
+        "type": "@\"UIView\"",
+        "offset": 56
+      },
+      {
+        "name": "_configuredTabBarHeight",
+        "type": "d",
+        "offset": 64
+      },
+      {
+        "name": "_activeNavigationTransition",
+        "type": "@\"WCTabBarNavigationTransition\"",
+        "offset": 72
+      },
+      {
+        "name": "_safeAreaAdjustedViewController",
+        "type": "@\"UIViewController\"",
+        "offset": 80
+      },
+      {
+        "name": "_appliedTabBarSafeAreaInset",
+        "type": "d",
+        "offset": 88
+      },
+      {
+        "name": "_itemInteractionGestureRecognizers",
+        "type": "@\"NSMutableArray\"",
+        "offset": 96
+      },
+      {
+        "name": "_compatibilityState",
+        "type": "@\"WCTabBarControllerCompatibilityState\"",
+        "offset": 104
+      }
+    ],
+    "super": "UIViewController"
+  },
+  "WCTabBarItemView": {
+    "methods": [
+      {
+        "name": "initWithFrame:",
+        "type": "@48@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16",
+        "imp": "0x1157e0dcc"
+      },
+      {
+        "name": "initWithCoder:",
+        "type": "@24@0:8@16",
+        "imp": "0x1157e0e20"
+      },
+      {
+        "name": "initWithItem:",
+        "type": "@24@0:8@16",
+        "imp": "0x1157e0e74"
+      },
+      {
+        "name": "initWithItem:contentView:",
+        "type": "@32@0:8@16@24",
+        "imp": "0x1157e0e84"
+      },
+      {
+        "name": "setupDefaultContent",
+        "type": "v16@0:8",
+        "imp": "0x1157e0fcc"
+      },
+      {
+        "name": "updateWithItem:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e127c"
+      },
+      {
+        "name": "copyTransitionVisualStateFromView:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e1400"
+      },
+      {
+        "name": "setSelected:",
+        "type": "v20@0:8B16",
+        "imp": "0x1157e14b0"
+      },
+      {
+        "name": "setEnabled:",
+        "type": "v20@0:8B16",
+        "imp": "0x1157e1510"
+      },
+      {
+        "name": "updateAccessibilityTraits",
+        "type": "v16@0:8",
+        "imp": "0x1157e1588"
+      },
+      {
+        "name": "updateDefaultContent",
+        "type": "v16@0:8",
+        "imp": "0x1157e1668"
+      },
+      {
+        "name": "layoutSubviews",
+        "type": "v16@0:8",
+        "imp": "0x1157e1b64"
+      },
+      {
+        "name": "item",
+        "type": "@16@0:8",
+        "imp": "0x1157e205c"
+      },
+      {
+        "name": "setItem:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e206c"
+      },
+      {
+        "name": "customContentView",
+        "type": "@16@0:8",
+        "imp": "0x1157e2080"
+      },
+      {
+        "name": "setCustomContentView:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e2090"
+      },
+      {
+        "name": "badgeView",
+        "type": "@16@0:8",
+        "imp": "0x1157e20a4"
+      },
+      {
+        "name": "setBadgeView:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e20b4"
+      },
+      {
+        "name": "imageView",
+        "type": "@16@0:8",
+        "imp": "0x1157e20c8"
+      },
+      {
+        "name": "setImageView:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e20d8"
+      },
+      {
+        "name": "titleLabel",
+        "type": "@16@0:8",
+        "imp": "0x1157e20ec"
+      },
+      {
+        "name": "setTitleLabel:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e20fc"
+      },
+      {
+        "name": "badgeLabel",
+        "type": "@16@0:8",
+        "imp": "0x1157e2110"
+      },
+      {
+        "name": "setBadgeLabel:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e2120"
+      },
+      {
+        "name": ".cxx_destruct",
+        "type": "v16@0:8",
+        "imp": "0x1157e2134"
+      }
+    ],
+    "class_methods": [],
+    "ivars": [
+      {
+        "name": "_item",
+        "type": "@\"WCTabBarItem\"",
+        "offset": 8
+      },
+      {
+        "name": "_customContentView",
+        "type": "@\"UIView\"",
+        "offset": 16
+      },
+      {
+        "name": "_badgeView",
+        "type": "@\"UIView\"",
+        "offset": 24
+      },
+      {
+        "name": "_imageView",
+        "type": "@\"UIImageView\"",
+        "offset": 32
+      },
+      {
+        "name": "_titleLabel",
+        "type": "@\"UILabel\"",
+        "offset": 40
+      },
+      {
+        "name": "_badgeLabel",
+        "type": "@\"UILabel\"",
+        "offset": 48
+      }
+    ],
+    "super": "UIControl"
+  },
+  "WCTabBarView": {
+    "methods": [
+      {
+        "name": "tabBarItemCount",
+        "type": "q16@0:8",
+        "imp": "0x1046be47c"
+      },
+      {
+        "name": "tabBarItemViewAtIndex:",
+        "type": "@24@0:8q16",
+        "imp": "0x1046be4c8"
+      },
+      {
+        "name": "selectIndex:",
+        "type": "v24@0:8q16",
+        "imp": "0x1046be548"
+      },
+      {
+        "name": "targetIndexIsSelected:",
+        "type": "B24@0:8q16",
+        "imp": "0x1046be560"
+      },
+      {
+        "name": "initWithFrame:",
+        "type": "@48@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16",
+        "imp": "0x1157e21c4"
+      },
+      {
+        "name": "initWithCoder:",
+        "type": "@24@0:8@16",
+        "imp": "0x1157e221c"
+      },
+      {
+        "name": "setupSubviews",
+        "type": "v16@0:8",
+        "imp": "0x1157e2274"
+      },
+      {
+        "name": "setTabItems:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e245c"
+      },
+      {
+        "name": "tabItems",
+        "type": "@16@0:8",
+        "imp": "0x1157e246c"
+      },
+      {
+        "name": "applyTabItems:rebuildCompatibilityItems:",
+        "type": "v28@0:8@16B24",
+        "imp": "0x1157e2478"
+      },
+      {
+        "name": "setItemViewProvider:",
+        "type": "v24@0:8@?16",
+        "imp": "0x1157e29f0"
+      },
+      {
+        "name": "setSelectedIndex:",
+        "type": "v24@0:8Q16",
+        "imp": "0x1157e2a90"
+      },
+      {
+        "name": "setHidden:",
+        "type": "v20@0:8B16",
+        "imp": "0x1157e2aa8"
+      },
+      {
+        "name": "setTranslucent:",
+        "type": "v20@0:8B16",
+        "imp": "0x1157e2b44"
+      },
+      {
+        "name": "reloadItemViews",
+        "type": "v16@0:8",
+        "imp": "0x1157e2bb8"
+      },
+      {
+        "name": "itemViewAtIndex:",
+        "type": "@24@0:8Q16",
+        "imp": "0x1157e2f5c"
+      },
+      {
+        "name": "onItemViewTouchUpInside:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e3010"
+      },
+      {
+        "name": "isKindOfClass:",
+        "type": "B24@0:8#16",
+        "imp": "0x1157e3114"
+      },
+      {
+        "name": "delegate",
+        "type": "@16@0:8",
+        "imp": "0x1157e3180"
+      },
+      {
+        "name": "setDelegate:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e318c"
+      },
+      {
+        "name": "items",
+        "type": "@16@0:8",
+        "imp": "0x1157e3198"
+      },
+      {
+        "name": "setItems:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e31a4"
+      },
+      {
+        "name": "setItems:animated:",
+        "type": "v28@0:8@16B24",
+        "imp": "0x1157e31b4"
+      },
+      {
+        "name": "selectedItem",
+        "type": "@16@0:8",
+        "imp": "0x1157e35c8"
+      },
+      {
+        "name": "setSelectedItem:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e36a0"
+      },
+      {
+        "name": "beginCustomizingItems:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e3740"
+      },
+      {
+        "name": "endCustomizingAnimated:",
+        "type": "B20@0:8B16",
+        "imp": "0x1157e3750"
+      },
+      {
+        "name": "isCustomizing",
+        "type": "B16@0:8",
+        "imp": "0x1157e3794"
+      },
+      {
+        "name": "updateSelectedItemViews",
+        "type": "v16@0:8",
+        "imp": "0x1157e37a0"
+      },
+      {
+        "name": "didMoveToWindow",
+        "type": "v16@0:8",
+        "imp": "0x1157e3888"
+      },
+      {
+        "name": "safeAreaInsetsDidChange",
+        "type": "v16@0:8",
+        "imp": "0x1157e38d8"
+      },
+      {
+        "name": "layoutSubviews",
+        "type": "v16@0:8",
+        "imp": "0x1157e3928"
+      },
+      {
+        "name": "snapshotViewAfterScreenUpdates:",
+        "type": "@20@0:8B16",
+        "imp": "0x1157e3c40"
+      },
+      {
+        "name": "_isTranslucent",
+        "type": "B16@0:8",
+        "imp": "0x1157e4050"
+      },
+      {
+        "name": "respondsToSelector:",
+        "type": "B24@0:8:16",
+        "imp": "0x1157e4308"
+      },
+      {
+        "name": "methodSignatureForSelector:",
+        "type": "@24@0:8:16",
+        "imp": "0x1157e4378"
+      },
+      {
+        "name": "forwardInvocation:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e4438"
+      },
+      {
+        "name": "selectedIndex",
+        "type": "Q16@0:8",
+        "imp": "0x1157e4544"
+      },
+      {
+        "name": "itemViewProvider",
+        "type": "@?16@0:8",
+        "imp": "0x1157e4554"
+      },
+      {
+        "name": "itemSelectionHandler",
+        "type": "@?16@0:8",
+        "imp": "0x1157e4564"
+      },
+      {
+        "name": "setItemSelectionHandler:",
+        "type": "v24@0:8@?16",
+        "imp": "0x1157e4574"
+      },
+      {
+        "name": "visibilityDelegate",
+        "type": "@16@0:8",
+        "imp": "0x1157e4580"
+      },
+      {
+        "name": "setVisibilityDelegate:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e45a0"
+      },
+      {
+        "name": "itemViews",
+        "type": "@16@0:8",
+        "imp": "0x1157e45b4"
+      },
+      {
+        "name": "setItemViews:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e45c4"
+      },
+      {
+        "name": "backgroundContentView",
+        "type": "@16@0:8",
+        "imp": "0x1157e45d0"
+      },
+      {
+        "name": "setBackgroundContentView:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e45e0"
+      },
+      {
+        "name": "separatorView",
+        "type": "@16@0:8",
+        "imp": "0x1157e45f4"
+      },
+      {
+        "name": "setSeparatorView:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e4604"
+      },
+      {
+        "name": "isTranslucent",
+        "type": "B16@0:8",
+        "imp": "0x1157e4618"
+      },
+      {
+        "name": "storedTabItems",
+        "type": "@16@0:8",
+        "imp": "0x1157e4628"
+      },
+      {
+        "name": "setStoredTabItems:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e4638"
+      },
+      {
+        "name": "compatibilityItems",
+        "type": "@16@0:8",
+        "imp": "0x1157e4644"
+      },
+      {
+        "name": "setCompatibilityItems:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e4654"
+      },
+      {
+        "name": "compatibilityDelegate",
+        "type": "@16@0:8",
+        "imp": "0x1157e4660"
+      },
+      {
+        "name": "setCompatibilityDelegate:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e4680"
+      },
+      {
+        "name": "isCompatibilityCustomizing",
+        "type": "B16@0:8",
+        "imp": "0x1157e4694"
+      },
+      {
+        "name": "setCompatibilityCustomizing:",
+        "type": "v20@0:8B16",
+        "imp": "0x1157e46a4"
+      },
+      {
+        "name": ".cxx_destruct",
+        "type": "v16@0:8",
+        "imp": "0x1157e46b4"
+      }
+    ],
+    "class_methods": [
+      {
+        "name": "instancesRespondToSelector:",
+        "type": "B24@0:8:16",
+        "imp": "0x1157e405c"
+      },
+      {
+        "name": "respondsToSelector:",
+        "type": "B24@0:8:16",
+        "imp": "0x1157e40cc"
+      },
+      {
+        "name": "methodSignatureForSelector:",
+        "type": "@24@0:8:16",
+        "imp": "0x1157e413c"
+      },
+      {
+        "name": "forwardInvocation:",
+        "type": "v24@0:8@16",
+        "imp": "0x1157e41fc"
+      }
+    ],
+    "ivars": [
+      {
+        "name": "_translucent",
+        "type": "B",
+        "offset": 8
+      },
+      {
+        "name": "_compatibilityCustomizing",
+        "type": "B",
+        "offset": 9
+      },
+      {
+        "name": "_selectedIndex",
+        "type": "Q",
+        "offset": 16
+      },
+      {
+        "name": "_itemViewProvider",
+        "type": "@?",
+        "offset": 24
+      },
+      {
+        "name": "_itemSelectionHandler",
+        "type": "@?",
+        "offset": 32
+      },
+      {
+        "name": "_visibilityDelegate",
+        "type": "@\"<WCTabBarViewVisibilityDelegate>\"",
+        "offset": 40
+      },
+      {
+        "name": "_itemViews",
+        "type": "@\"NSArray\"",
+        "offset": 48
+      },
+      {
+        "name": "_backgroundContentView",
+        "type": "@\"UIView\"",
+        "offset": 56
+      },
+      {
+        "name": "_separatorView",
+        "type": "@\"UIView\"",
+        "offset": 64
+      },
+      {
+        "name": "_storedTabItems",
+        "type": "@\"NSArray\"",
+        "offset": 72
+      },
+      {
+        "name": "_compatibilityItems",
+        "type": "@\"NSArray\"",
+        "offset": 80
+      },
+      {
+        "name": "_compatibilityDelegate",
+        "type": "@\"<UITabBarDelegate>\"",
+        "offset": 88
+      }
+    ],
+    "super": "UIView"
+  }
+}

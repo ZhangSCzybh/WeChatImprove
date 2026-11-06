@@ -1,0 +1,401 @@
+{
+  "version": "2.2-16",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "frozen_source": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/source",
+  "device_installed": false,
+  "builds": [
+    {
+      "scheme": "rootless",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "SCHEME=rootless",
+        "PACKAGE_VERSION=2.2-16",
+        "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos",
+        "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless",
+        "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/packages"
+      ],
+      "exit_code": 0,
+      "seconds": 21.97
+    },
+    {
+      "scheme": "rootful",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "SCHEME=rootful",
+        "PACKAGE_VERSION=2.2-16",
+        "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos",
+        "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful",
+        "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/packages"
+      ],
+      "exit_code": 0,
+      "seconds": 21.96
+    }
+  ],
+  "inputs_unchanged": true,
+  "historical_packages_preserved": true,
+  "new_warning_count": 0,
+  "main_theos_preserved": true,
+  "ipa_dylib": {
+    "path": "packages/2.2-16-revert-closefriend-reset-and-quick-entry/WeChatImprove.dylib",
+    "source": "Rootful deb: Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+    "sha256": "280d50c2cfc93f12194803c1d5f7f6b620143a139ece8f9f5fdd61ba7e09e08f",
+    "matches_deb_dylib": true,
+    "binary_modified": false,
+    "architectures": [
+      "arm64",
+      "arm64e"
+    ]
+  },
+  "verified_packages": [
+    {
+      "Package": "com.wechat.improve",
+      "Version": "2.2-16",
+      "Architecture": "iphoneos-arm64",
+      "scheme": "rootless",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "sha256": "bd60e4f37d896a861c31d0a845f4d352132495ad1fb5320b986fe9095fbe76a0",
+      "dylib_sha256": "a9f6e357b2647d43f0fb3623104bfde41f399f5c1b716e6f2a67a9837ab821d8",
+      "dsym_uuids": {
+        "arm64": "0EBE629E-669F-3740-BC76-6EA747E00964",
+        "arm64e": "52BF8239-393E-3F91-8A40-9C302C0224AA"
+      },
+      "compiled_sources": [
+        "CSAccountDetailViewController",
+        "CSProvisioningProfile",
+        "CSCustomViewController",
+        "CSCloseFriendSettingsViewController",
+        "CSSettingsTableViewController",
+        "CSTabBarNativeAdapter",
+        "CSMessageMergeAdapter",
+        "CSCloseFriendSearchAdapter",
+        "CSCloseFriendManager",
+        "CSBubbleStyleAdapter",
+        "CSCloseFriendReset",
+        "CSCloseFriendRuntime"
+      ],
+      "compiled_hooks": [
+        "CloseFriendSearchHooks",
+        "CloseFriendLifecycleHooks",
+        "TabBarStyleHooks"
+      ],
+      "compiled_objects": {
+        "arm64": {
+          "CSAccountDetailViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64/Controllers/CSAccountDetailViewController.m.c045ec59.o",
+            "sha256": "12d2d4a8c1e54d463b2fba94b5b6dabd78b975d9db2b2f48cae059e9da179fc8",
+            "verified_symbol": "U _CSProvisioningProfileDictionaryFromData"
+          },
+          "CSProvisioningProfile": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64/Controllers/CSProvisioningProfile.m.c045ec59.o",
+            "sha256": "f5c5b51c3c30b5918e086dc5e9ba0e8f163d673a276f6a7dc69197500d19146d",
+            "verified_symbol": "T _CSProvisioningProfileDictionaryFromData"
+          },
+          "CSCustomViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64/Controllers/CSCustomViewController.m.c045ec59.o",
+            "sha256": "135ded5f24b48bb65704fa801274ae7dcc203ae7e27ed9f3073a72666bde29d0",
+            "verified_symbol": "_OBJC_CLASS_$_CSCustomViewController"
+          },
+          "CSCloseFriendSettingsViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64/Controllers/CSCloseFriendSettingsViewController.m.c045ec59.o",
+            "sha256": "2145ceee493639bfde4995063fbccc3a1e112ab0237799b78e13c8a732ecc15f",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendSettingsViewController"
+          },
+          "CSSettingsTableViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64/Controllers/CSSettingsTableViewController.m.c045ec59.o",
+            "sha256": "bec93e76903a5a4c58c878e3459b1ca02714d6ff4834ed8bc1c9fa54922f7e3b",
+            "verified_symbol": "_OBJC_CLASS_$_CSSettingsTableViewController"
+          },
+          "CSTabBarNativeAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64/Controllers/CSTabBarNativeAdapter.m.c045ec59.o",
+            "sha256": "de3f693dfa70dff3255ef07172209792bac358c75714e7d54b75b6b1798b61f0",
+            "verified_symbol": "T _CSTabBarForController"
+          },
+          "CSMessageMergeAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64/Controllers/CSMessageMergeAdapter.m.c045ec59.o",
+            "sha256": "78aac08d840ee11e5352dc8081bd5f1777473115a767e117e10fe904390a66b5",
+            "verified_symbol": "T _CSMessageMergeActivate"
+          },
+          "CSCloseFriendSearchAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64/Controllers/CSCloseFriendSearchAdapter.m.c045ec59.o",
+            "sha256": "807bbc7b89cf19db66bf68583f30be4819e669cdf3c22f99664a9cd379291458",
+            "verified_symbol": "T _CSCFSearchHasMarkedText"
+          },
+          "CSCloseFriendManager": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64/Controllers/CSCloseFriendManager.m.c045ec59.o",
+            "sha256": "5e76e16314090a6ffc4510203f5a3d4fe6d8e50e14e031b56acc3ff63d8fe79d",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendManager"
+          },
+          "CSBubbleStyleAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64/Controllers/CSBubbleStyleAdapter.m.c045ec59.o",
+            "sha256": "1ac3bdf0cf0683ca044a385138a005ad4e87f2192224e53a6005b8d17d28f59e",
+            "verified_symbol": "T _CSBubbleStyleModelInsets"
+          },
+          "CSCloseFriendReset": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64/Controllers/CSCloseFriendReset.m.c045ec59.o",
+            "sha256": "105a7cde515c84e9b6e0d192f0a9cc58188443889822314d57094ef74a79ad92",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendReset"
+          },
+          "CSCloseFriendRuntime": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64/Controllers/CSCloseFriendRuntime.m.c045ec59.o",
+            "sha256": "d49e184c214372492e9adac3ca58cad3f80a65a6794d55f2fee07865c2bcd4ce",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendRuntime"
+          }
+        },
+        "arm64e": {
+          "CSAccountDetailViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64e/Controllers/CSAccountDetailViewController.m.41d58911.o",
+            "sha256": "7b52886fa3d573b2b8019093a8805ecd720b126349f66ab487bb20547e32bd8e",
+            "verified_symbol": "U _CSProvisioningProfileDictionaryFromData"
+          },
+          "CSProvisioningProfile": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64e/Controllers/CSProvisioningProfile.m.41d58911.o",
+            "sha256": "f8d05364225e6b4af8af0bc6b0ba8d31048d7d1dc48287d12bd7b3359b7c8a0c",
+            "verified_symbol": "T _CSProvisioningProfileDictionaryFromData"
+          },
+          "CSCustomViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64e/Controllers/CSCustomViewController.m.41d58911.o",
+            "sha256": "1d27242141762ddd3e0e53768ee11142883e13bd532d127c1c3d60252227ca55",
+            "verified_symbol": "_OBJC_CLASS_$_CSCustomViewController"
+          },
+          "CSCloseFriendSettingsViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64e/Controllers/CSCloseFriendSettingsViewController.m.41d58911.o",
+            "sha256": "d535acb35716900f720f7987acb8802d26eb05eb48b6e48b693eb1b826ef9bcc",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendSettingsViewController"
+          },
+          "CSSettingsTableViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64e/Controllers/CSSettingsTableViewController.m.41d58911.o",
+            "sha256": "ca0c89fb80e7b7c91b3d73c4a0ecfc6f79811254ae5cbd05188bb1acf8482d08",
+            "verified_symbol": "_OBJC_CLASS_$_CSSettingsTableViewController"
+          },
+          "CSTabBarNativeAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64e/Controllers/CSTabBarNativeAdapter.m.41d58911.o",
+            "sha256": "b6aeacb405b1ede77093d3337bd98a7fdb8b4d5554d8236de2fd69cce531c539",
+            "verified_symbol": "T _CSTabBarForController"
+          },
+          "CSMessageMergeAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64e/Controllers/CSMessageMergeAdapter.m.41d58911.o",
+            "sha256": "ab141c98fcc68db6d294f8edb69d6d59b4b18fe78abd1dc5f2e91c4e611b0eb7",
+            "verified_symbol": "T _CSMessageMergeActivate"
+          },
+          "CSCloseFriendSearchAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64e/Controllers/CSCloseFriendSearchAdapter.m.41d58911.o",
+            "sha256": "8b321802ccefe6751f531b071e44eec03037c42a4cc1bb14920de75b6c333399",
+            "verified_symbol": "T _CSCFSearchHasMarkedText"
+          },
+          "CSCloseFriendManager": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64e/Controllers/CSCloseFriendManager.m.41d58911.o",
+            "sha256": "bd6b0b3b1dc711d5f88a5bb0884821f152fe0287c088224ca2240fc96b190ba2",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendManager"
+          },
+          "CSBubbleStyleAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64e/Controllers/CSBubbleStyleAdapter.m.41d58911.o",
+            "sha256": "b14932b954157dbef860911acf7795a8cd73095158e0638ca7bc39ec356dde95",
+            "verified_symbol": "T _CSBubbleStyleModelInsets"
+          },
+          "CSCloseFriendReset": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64e/Controllers/CSCloseFriendReset.m.41d58911.o",
+            "sha256": "83f5e9d0fedd50fd616b443a709fb84eaf24781b8621089079350531e888e0c6",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendReset"
+          },
+          "CSCloseFriendRuntime": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootless/.theos/obj/arm64e/Controllers/CSCloseFriendRuntime.m.41d58911.o",
+            "sha256": "890f7cf9fca16e188b6da698857ca68228127ed62df03505b7b5cc47fab251af",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendRuntime"
+          }
+        }
+      },
+      "controller_class_packaged": true
+    },
+    {
+      "Package": "com.wechat.improve",
+      "Version": "2.2-16",
+      "Architecture": "iphoneos-arm",
+      "scheme": "rootful",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "sha256": "61f99e1ef8f7cabc02f5a7f99c8060286ff9c78a27cddc74c5c197b676030fa2",
+      "dylib_sha256": "280d50c2cfc93f12194803c1d5f7f6b620143a139ece8f9f5fdd61ba7e09e08f",
+      "dsym_uuids": {
+        "arm64": "E2F16F62-7E30-3D14-BEB8-66B70B1C2D18",
+        "arm64e": "6F65DEE1-A2CF-37DD-AE9B-1DA42A52D128"
+      },
+      "compiled_sources": [
+        "CSAccountDetailViewController",
+        "CSProvisioningProfile",
+        "CSCustomViewController",
+        "CSCloseFriendSettingsViewController",
+        "CSSettingsTableViewController",
+        "CSTabBarNativeAdapter",
+        "CSMessageMergeAdapter",
+        "CSCloseFriendSearchAdapter",
+        "CSCloseFriendManager",
+        "CSBubbleStyleAdapter",
+        "CSCloseFriendReset",
+        "CSCloseFriendRuntime"
+      ],
+      "compiled_hooks": [
+        "CloseFriendSearchHooks",
+        "CloseFriendLifecycleHooks",
+        "TabBarStyleHooks"
+      ],
+      "compiled_objects": {
+        "arm64": {
+          "CSAccountDetailViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64/Controllers/CSAccountDetailViewController.m.83919f4a.o",
+            "sha256": "12d2d4a8c1e54d463b2fba94b5b6dabd78b975d9db2b2f48cae059e9da179fc8",
+            "verified_symbol": "U _CSProvisioningProfileDictionaryFromData"
+          },
+          "CSProvisioningProfile": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64/Controllers/CSProvisioningProfile.m.83919f4a.o",
+            "sha256": "f5c5b51c3c30b5918e086dc5e9ba0e8f163d673a276f6a7dc69197500d19146d",
+            "verified_symbol": "T _CSProvisioningProfileDictionaryFromData"
+          },
+          "CSCustomViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64/Controllers/CSCustomViewController.m.83919f4a.o",
+            "sha256": "135ded5f24b48bb65704fa801274ae7dcc203ae7e27ed9f3073a72666bde29d0",
+            "verified_symbol": "_OBJC_CLASS_$_CSCustomViewController"
+          },
+          "CSCloseFriendSettingsViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64/Controllers/CSCloseFriendSettingsViewController.m.83919f4a.o",
+            "sha256": "2145ceee493639bfde4995063fbccc3a1e112ab0237799b78e13c8a732ecc15f",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendSettingsViewController"
+          },
+          "CSSettingsTableViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64/Controllers/CSSettingsTableViewController.m.83919f4a.o",
+            "sha256": "bec93e76903a5a4c58c878e3459b1ca02714d6ff4834ed8bc1c9fa54922f7e3b",
+            "verified_symbol": "_OBJC_CLASS_$_CSSettingsTableViewController"
+          },
+          "CSTabBarNativeAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64/Controllers/CSTabBarNativeAdapter.m.83919f4a.o",
+            "sha256": "de3f693dfa70dff3255ef07172209792bac358c75714e7d54b75b6b1798b61f0",
+            "verified_symbol": "T _CSTabBarForController"
+          },
+          "CSMessageMergeAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64/Controllers/CSMessageMergeAdapter.m.83919f4a.o",
+            "sha256": "78aac08d840ee11e5352dc8081bd5f1777473115a767e117e10fe904390a66b5",
+            "verified_symbol": "T _CSMessageMergeActivate"
+          },
+          "CSCloseFriendSearchAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64/Controllers/CSCloseFriendSearchAdapter.m.83919f4a.o",
+            "sha256": "807bbc7b89cf19db66bf68583f30be4819e669cdf3c22f99664a9cd379291458",
+            "verified_symbol": "T _CSCFSearchHasMarkedText"
+          },
+          "CSCloseFriendManager": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64/Controllers/CSCloseFriendManager.m.83919f4a.o",
+            "sha256": "5e76e16314090a6ffc4510203f5a3d4fe6d8e50e14e031b56acc3ff63d8fe79d",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendManager"
+          },
+          "CSBubbleStyleAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64/Controllers/CSBubbleStyleAdapter.m.83919f4a.o",
+            "sha256": "1ac3bdf0cf0683ca044a385138a005ad4e87f2192224e53a6005b8d17d28f59e",
+            "verified_symbol": "T _CSBubbleStyleModelInsets"
+          },
+          "CSCloseFriendReset": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64/Controllers/CSCloseFriendReset.m.83919f4a.o",
+            "sha256": "105a7cde515c84e9b6e0d192f0a9cc58188443889822314d57094ef74a79ad92",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendReset"
+          },
+          "CSCloseFriendRuntime": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64/Controllers/CSCloseFriendRuntime.m.83919f4a.o",
+            "sha256": "d49e184c214372492e9adac3ca58cad3f80a65a6794d55f2fee07865c2bcd4ce",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendRuntime"
+          }
+        },
+        "arm64e": {
+          "CSAccountDetailViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64e/Controllers/CSAccountDetailViewController.m.2ff40cc1.o",
+            "sha256": "7b52886fa3d573b2b8019093a8805ecd720b126349f66ab487bb20547e32bd8e",
+            "verified_symbol": "U _CSProvisioningProfileDictionaryFromData"
+          },
+          "CSProvisioningProfile": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64e/Controllers/CSProvisioningProfile.m.2ff40cc1.o",
+            "sha256": "f8d05364225e6b4af8af0bc6b0ba8d31048d7d1dc48287d12bd7b3359b7c8a0c",
+            "verified_symbol": "T _CSProvisioningProfileDictionaryFromData"
+          },
+          "CSCustomViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64e/Controllers/CSCustomViewController.m.2ff40cc1.o",
+            "sha256": "1d27242141762ddd3e0e53768ee11142883e13bd532d127c1c3d60252227ca55",
+            "verified_symbol": "_OBJC_CLASS_$_CSCustomViewController"
+          },
+          "CSCloseFriendSettingsViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64e/Controllers/CSCloseFriendSettingsViewController.m.2ff40cc1.o",
+            "sha256": "d535acb35716900f720f7987acb8802d26eb05eb48b6e48b693eb1b826ef9bcc",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendSettingsViewController"
+          },
+          "CSSettingsTableViewController": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64e/Controllers/CSSettingsTableViewController.m.2ff40cc1.o",
+            "sha256": "ca0c89fb80e7b7c91b3d73c4a0ecfc6f79811254ae5cbd05188bb1acf8482d08",
+            "verified_symbol": "_OBJC_CLASS_$_CSSettingsTableViewController"
+          },
+          "CSTabBarNativeAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64e/Controllers/CSTabBarNativeAdapter.m.2ff40cc1.o",
+            "sha256": "b6aeacb405b1ede77093d3337bd98a7fdb8b4d5554d8236de2fd69cce531c539",
+            "verified_symbol": "T _CSTabBarForController"
+          },
+          "CSMessageMergeAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64e/Controllers/CSMessageMergeAdapter.m.2ff40cc1.o",
+            "sha256": "ab141c98fcc68db6d294f8edb69d6d59b4b18fe78abd1dc5f2e91c4e611b0eb7",
+            "verified_symbol": "T _CSMessageMergeActivate"
+          },
+          "CSCloseFriendSearchAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64e/Controllers/CSCloseFriendSearchAdapter.m.2ff40cc1.o",
+            "sha256": "8b321802ccefe6751f531b071e44eec03037c42a4cc1bb14920de75b6c333399",
+            "verified_symbol": "T _CSCFSearchHasMarkedText"
+          },
+          "CSCloseFriendManager": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64e/Controllers/CSCloseFriendManager.m.2ff40cc1.o",
+            "sha256": "bd6b0b3b1dc711d5f88a5bb0884821f152fe0287c088224ca2240fc96b190ba2",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendManager"
+          },
+          "CSBubbleStyleAdapter": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64e/Controllers/CSBubbleStyleAdapter.m.2ff40cc1.o",
+            "sha256": "b14932b954157dbef860911acf7795a8cd73095158e0638ca7bc39ec356dde95",
+            "verified_symbol": "T _CSBubbleStyleModelInsets"
+          },
+          "CSCloseFriendReset": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64e/Controllers/CSCloseFriendReset.m.2ff40cc1.o",
+            "sha256": "83f5e9d0fedd50fd616b443a709fb84eaf24781b8621089079350531e888e0c6",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendReset"
+          },
+          "CSCloseFriendRuntime": {
+            "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2216-quick-entry-thojfxxh/rootful/.theos/obj/arm64e/Controllers/CSCloseFriendRuntime.m.2ff40cc1.o",
+            "sha256": "890f7cf9fca16e188b6da698857ca68228127ed62df03505b7b5cc47fab251af",
+            "verified_symbol": "_OBJC_CLASS_$_CSCloseFriendRuntime"
+          }
+        }
+      },
+      "controller_class_packaged": true
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "packages/2.2-16-revert-closefriend-reset-and-quick-entry/WeChatImprove.dylib",
+      "sha256": "280d50c2cfc93f12194803c1d5f7f6b620143a139ece8f9f5fdd61ba7e09e08f",
+      "bytes": 7170080
+    },
+    {
+      "path": "packages/2.2-16-revert-closefriend-reset-and-quick-entry/com.wechat.improve_2.2-16_iphoneos-arm.deb",
+      "sha256": "61f99e1ef8f7cabc02f5a7f99c8060286ff9c78a27cddc74c5c197b676030fa2",
+      "bytes": 1647436
+    },
+    {
+      "path": "packages/2.2-16-revert-closefriend-reset-and-quick-entry/com.wechat.improve_2.2-16_iphoneos-arm64.deb",
+      "sha256": "bd60e4f37d896a861c31d0a845f4d352132495ad1fb5320b986fe9095fbe76a0",
+      "bytes": 1644070
+    },
+    {
+      "path": "packages/2.2-16-revert-closefriend-reset-and-quick-entry/com.wechat.improve_2.2-16_symbols.zip",
+      "sha256": "d5d11a75a167d32bf313aef522ad70070b46ee2e8ed3d3fbc1825e5205794116",
+      "bytes": 11696832
+    }
+  ]
+}

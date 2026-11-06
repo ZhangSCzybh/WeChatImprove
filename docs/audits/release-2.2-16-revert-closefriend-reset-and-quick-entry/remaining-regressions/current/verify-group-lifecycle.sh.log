@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/extract-group-lifecycle.py", line 70, in <module>
+    methods.append(body[:body.index(cut)] + '    self.anchorOrTitleCount++;\n}')
+                         ~~~~~~~~~~^^^^^
+ValueError: substring not found

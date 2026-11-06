@@ -1,0 +1,16 @@
+source sha256 0114183b48080011124a10ea595a3e84083fb08dae96f34a47b75e6de1a43116
+decoded 114 frames; ffprobe nb_frames=114; no CFR duplication
+f011 provided PNG RGB exact match: True
+f021 provided PNG RGB exact match: True
+f040 provided PNG RGB exact match: True
+f055 provided PNG RGB exact match: True
+f070 provided PNG RGB exact match: True
+f011 PTS=0.333333 card=413 title=386..402 WeChat=318..336 list_dy=0
+f021 PTS=0.666667 card=413 title=386..402 WeChat=318..336 list_dy=0
+f047 PTS=1.533333 card=390 title=362..378 WeChat=318..336 list_dy=-24
+f055 PTS=1.800000 card=390 title=362..378 WeChat=318..336 list_dy=-24
+f057 PTS=1.866667 card=390 title=362..378 WeChat=318..336 list_dy=-24
+f058 PTS=1.900000 card=413 title=386..402 WeChat=318..336 list_dy=0
+f062 PTS=2.033333 card=413 title=386..402 WeChat=318..336 list_dy=0
+f070 PTS=2.300000 card=413 title=386..402 WeChat=318..336 list_dy=0
+f094 PTS=3.100000 card=413 title=386..402 WeChat=318..336 list_dy=0

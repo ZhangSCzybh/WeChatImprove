@@ -1,5 +1,6 @@
+#import "CSSettingsTableViewController.h"
 #import <UIKit/UIKit.h>
 
-@interface CSChatGroupSettingsViewController : UITableViewController
+@interface CSChatGroupSettingsViewController : CSSettingsTableViewController
 
 @end

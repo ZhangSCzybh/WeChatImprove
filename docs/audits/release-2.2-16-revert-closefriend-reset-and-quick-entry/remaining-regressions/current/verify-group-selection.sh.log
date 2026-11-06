@@ -1,0 +1,30 @@
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/GroupSelectionTests.m:81:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg//wechat-group-selection.Rfpwnp/GroupSelectionBodies.h:6:63: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserDragging'
+    6 |     if ([name isEqual:@"scrollViewWillBeginDragging:"]) [self beginUserDragging];
+      |                                                          ~~~~ ^~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg//wechat-group-selection.Rfpwnp/GroupSelectionBodies.h:7:65: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'
+    7 |     else if ([name isEqual:@"scrollViewDidScrollToTop:"]) [self beginUserScrolling];
+      |                                                            ~~~~ ^~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg//wechat-group-selection.Rfpwnp/GroupSelectionBodies.h:47:33: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'
+   47 |             if (accepted) [self beginUserScrolling];
+      |                            ~~~~ ^~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg//wechat-group-selection.Rfpwnp/GroupSelectionBodies.h:50:34: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'
+   50 |         if (viewportEvent) [self restorePendingViewport];
+      |                             ~~~~ ^~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg//wechat-group-selection.Rfpwnp/GroupSelectionBodies.h:79:29: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'beginUserScrolling'
+   79 |         if (accepted) [self beginUserScrolling];
+      |                        ~~~~ ^~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg//wechat-group-selection.Rfpwnp/GroupSelectionBodies.h:88:30: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'
+   88 |     if (viewportEvent) [self restorePendingViewport];
+      |                         ~~~~ ^~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg//wechat-group-selection.Rfpwnp/GroupSelectionBodies.h:99:16: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+   99 |         (!self.usesNativeSessionModel || ![selected isEqual:@"preset_0"]);
+      |                ^
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/GroupSelectionTests.m:99:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg//wechat-group-selection.Rfpwnp/GroupSelectionHooks.h:3:11: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+    3 |     if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self))  { [self originalSelect:path animated:animated scrollPosition:position]; return; }
+      |           ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-nkie5khg//wechat-group-selection.Rfpwnp/GroupSelectionHooks.h:10:11: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+   10 |     if (a.usesNativeSessionModel || !a.isActive || !CSGroupUsesNativeIndices(self))  { [self originalScroll:path atScrollPosition:position animated:animated]; return; }
+      |           ^
+9 errors generated.

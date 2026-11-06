@@ -1,0 +1,2 @@
+64 hook declarations examined: {'MATCH': 62, 'ABSENT_IN_IMAGE': 2}
+PASS: no ABI mismatches; the two legacy mutation absences are explicit and are not counted as installed hooks.

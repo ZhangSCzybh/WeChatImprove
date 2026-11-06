@@ -1,1 +1,0 @@
-FAIL line 726: manager.calls.count==(scenario==0 ? 1 : 0)

@@ -1,9 +1,0 @@
-{
-  "command": [
-    "bash",
-    "Tests/verify-close-friend-profile.sh"
-  ],
-  "exit_code": 0,
-  "checks": 16,
-  "output": "Close-friend profile: 16 checks passed (native routes, sensitive actions, reveal/relock and stale bindings)\n"
-}

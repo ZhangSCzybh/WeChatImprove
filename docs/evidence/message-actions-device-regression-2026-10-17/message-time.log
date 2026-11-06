@@ -1,3 +1,0 @@
-Command: bash Tests/verify-message-time.sh
-Exit status: 0
-PASS: 142 message-time production hook lifecycle checks (UIKit double)

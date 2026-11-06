@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "checks": [
+    "real ALL smoke export/manifest/review matched",
+    "primary target frames preserved unavailable",
+    "display observations preserved available",
+    "normalizer explicitly selects device display field",
+    "same-scope old idle/switch permits descriptive display comparison",
+    "different-scope old messages/scroll blocks frame comparison",
+    "independent scenario validity rejects contaminated idle before output",
+    "no output directory created for rejected scenario"
+  ],
+  "smoke_summary": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2.2-9-2026-11-03/comparison/summarizer-smoke/summary.json",
+  "scope": "local only; no capture or device operation"
+}

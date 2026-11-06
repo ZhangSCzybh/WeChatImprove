@@ -1,0 +1,17 @@
+0‚	®	*†H†÷ ‚	Ÿ0‚	›10	`†He0‚Å	*†H†÷ ‚¶‚²<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Name</key>
+	<string>Synthetic fixture only</string>
+	<key>UUID</key>
+	<string>00000000-0000-0000-0000-000000000001</string>
+	<key>TeamName</key>
+	<string>Synthetic Test Team</string>
+	<key>TeamIdentifier</key>
+	<array>
+		<string>SYNTHETIC1</string>
+	</array>
+	<key>CreationDate</key>
+	<date>2026-01-01T00:00:00Z</date>
+	<key>Expir

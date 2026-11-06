@@ -1,0 +1,117 @@
+{
+  "status": "passed_with_one_nonblocking_wording_suggestion",
+  "reviewed_readme": "docs/audits/session-groups-instruments-2.2-9-2026-11-03/README.md",
+  "reviewed_readme_sha256": "a8a4eda6d1ccb96e418f99b5e18fa11ff2cc2b6c093cc02d45f563b00aba0ed6",
+  "independent_assertions": {
+    "primary_window_checks": 80,
+    "baseline_recomputation_checks": 48
+  },
+  "primary_summary_crosschecks": [
+    {
+      "scenario": "idle-confirmed",
+      "checks": {
+        "PID": true,
+        "window": true,
+        "CPU_mean": true,
+        "CPU_P95": true,
+        "CPU_peak": true,
+        "CPU_coverage": true,
+        "frame_count": true,
+        "hitch_count": true,
+        "hitch_sum": true,
+        "hitch_max": true,
+        "CA_count": true,
+        "target_frames_unavailable": true,
+        "review_source_hash": true
+      },
+      "summary_sha256": "b0cabc6c971d1abcb794baf2b1afeb676ee4503f824017ec68cafe1cb17974fc"
+    },
+    {
+      "scenario": "messages",
+      "checks": {
+        "PID": true,
+        "window": true,
+        "CPU_mean": true,
+        "CPU_P95": true,
+        "CPU_peak": true,
+        "CPU_coverage": true,
+        "frame_count": true,
+        "hitch_count": true,
+        "hitch_sum": true,
+        "hitch_max": true,
+        "CA_count": true,
+        "target_frames_unavailable": true,
+        "review_source_hash": true
+      },
+      "summary_sha256": "8603c5ab13656f07abdaf6f01058afc1e185aaf73a0f14fab4db889ee136ad3a"
+    },
+    {
+      "scenario": "scroll",
+      "checks": {
+        "PID": true,
+        "window": true,
+        "CPU_mean": true,
+        "CPU_P95": true,
+        "CPU_peak": true,
+        "CPU_coverage": true,
+        "frame_count": true,
+        "hitch_count": true,
+        "hitch_sum": true,
+        "hitch_max": true,
+        "CA_count": true,
+        "target_frames_unavailable": true,
+        "review_source_hash": true
+      },
+      "summary_sha256": "5f19c4fc0c17199b07587916778767f686f12f9720cd1a3ff8e563e03a430e03"
+    },
+    {
+      "scenario": "switch",
+      "checks": {
+        "PID": true,
+        "window": true,
+        "CPU_mean": true,
+        "CPU_P95": true,
+        "CPU_peak": true,
+        "CPU_coverage": true,
+        "frame_count": true,
+        "hitch_count": true,
+        "hitch_sum": true,
+        "hitch_max": true,
+        "CA_count": true,
+        "target_frames_unavailable": true,
+        "review_source_hash": true
+      },
+      "summary_sha256": "fd13044e8c02f0f2b0f6530b83be9f5f2858f52fc46c21310afdf22aa962853c"
+    }
+  ],
+  "scope_checks": {
+    "whole_process_CPU_one_core_100pct": true,
+    "CPU_peak_approximately_one_second": true,
+    "all_new_frames_device_ALL": true,
+    "old_messages_scroll_SINGLE_not_compared_as_same_scope": true,
+    "old_switch_Fair65_87pct_not_claimed_controlled": true,
+    "native_metrics_missing_not_zero": true,
+    "message_sensitivity_not_primary_replacement": true,
+    "observation_overhead_qualifier": true,
+    "Mac_save_overlap_device_capture_not_overlap": true,
+    "loaded_binary_UUID_unverified_disclosed": true,
+    "no_event_loss_guarantee_claim": true
+  },
+  "preservation_evidence": {
+    "old_2075_hashes_preserved": true,
+    "tracked_6892_deletions_unchanged": true,
+    "six_package_and_symbol_hashes_preserved": true,
+    "same_PID40208_alive_no_recorders": true
+  },
+  "findings": [
+    {
+      "severity": "wording_only",
+      "readme_line": 52,
+      "current_text": "录制总时长分别为70/100/100/100秒",
+      "suggested_text": "请求的录制时限分别为70/100/100/100秒，实际trace时长见TOC",
+      "reason": "Configured xctrace time limits differ from recorded TOC durations by approximately1second. Selected analysis windows and all reported values remain correct.",
+      "blocking": false
+    }
+  ],
+  "review_write_complete": true
+}

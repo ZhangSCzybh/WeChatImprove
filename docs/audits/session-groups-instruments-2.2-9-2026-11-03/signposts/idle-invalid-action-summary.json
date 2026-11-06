@@ -1,0 +1,408 @@
+{
+  "target_pid": 40208,
+  "subsystem": "com.wechatimprove.performance",
+  "category": "SessionGroups",
+  "recording_status_verified_externally": "complete",
+  "window_seconds": {
+    "begin": 0.0,
+    "end": 72.0,
+    "duration": 72.0
+  },
+  "input": {
+    "path": "docs/audits/session-groups-instruments-2.2-9-2026-11-03/idle/export/idle-signposts.xml",
+    "sha256": "98d3be7b95108b2ea94fa1cf0ae6b69f285272042ce188a4eaac393983674ac6",
+    "tables": [
+      {
+        "xpath": "//trace-toc[1]/run[1]/data[1]/table[6]",
+        "raw_row_count": 701
+      },
+      {
+        "xpath": "//trace-toc[1]/run[1]/data[1]/table[7]",
+        "raw_row_count": 39494
+      },
+      {
+        "xpath": "//trace-toc[1]/run[1]/data[1]/table[8]",
+        "raw_row_count": 39494
+      }
+    ],
+    "issues": {},
+    "cross_table_duplicate_events_merged": 192,
+    "arguments": {
+      "path": "docs/audits/session-groups-instruments-2.2-9-2026-11-03/idle/export/idle-signpost-args.xml",
+      "sha256": "c3468faf2eab17c440f7c1cde80c149033df5165a4d838afe1ec77f59512b535",
+      "tables": [
+        {
+          "xpath": "//trace-toc[1]/run[1]/data[1]/table[33]",
+          "raw_row_count": 101897
+        }
+      ],
+      "issues": {},
+      "duplicate_argument_rows": 0
+    }
+  },
+  "pairing_issues": {},
+  "whole_export_unique_probe_events": 192,
+  "whole_export_probe_time_seconds": {
+    "first": 7.780089041,
+    "last": 69.502565833
+  },
+  "whole_export_unpaired_events": {},
+  "timing_semantics": "Synchronous wall time in observation build; includes probe overhead. Nested durations must not be added. Missing probes or unverified targets are not zero computation or zero refresh.",
+  "summary": {
+    "selected_unique_raw_events": 192,
+    "selected_event_kind_counts": {
+      "Event": 176,
+      "Begin": 8,
+      "End": 8
+    },
+    "operations": {
+      "ModelFull": {
+        "status": "not_observed_in_export",
+        "complete_interval_count": 0,
+        "outcomes": {},
+        "duration_ms": {
+          "p50": null,
+          "p95_nearest_rank": null,
+          "max": null
+        },
+        "units_sum": null
+      },
+      "ModelDelta": {
+        "status": "not_observed_in_export",
+        "complete_interval_count": 0,
+        "outcomes": {},
+        "duration_ms": {
+          "p50": null,
+          "p95_nearest_rank": null,
+          "max": null
+        },
+        "units_sum": null
+      },
+      "ModelSelection": {
+        "status": "not_observed_in_export",
+        "complete_interval_count": 0,
+        "outcomes": {},
+        "duration_ms": {
+          "p50": null,
+          "p95_nearest_rank": null,
+          "max": null
+        },
+        "units_sum": null
+      },
+      "CoordinatorApply": {
+        "status": "not_observed_in_export",
+        "complete_interval_count": 0,
+        "outcomes": {},
+        "duration_ms": {
+          "p50": null,
+          "p95_nearest_rank": null,
+          "max": null
+        },
+        "units_sum": null
+      },
+      "AdapterRefreshAttempt": {
+        "status": "not_observed_in_export",
+        "complete_interval_count": 0,
+        "outcomes": {},
+        "duration_ms": {
+          "p50": null,
+          "p95_nearest_rank": null,
+          "max": null
+        },
+        "units_sum": null
+      },
+      "AdapterPublication": {
+        "status": "not_observed_in_export",
+        "complete_interval_count": 0,
+        "outcomes": {},
+        "duration_ms": {
+          "p50": null,
+          "p95_nearest_rank": null,
+          "max": null
+        },
+        "units_sum": null
+      },
+      "MainTableReloadData": {
+        "status": "not_observed_in_export",
+        "complete_interval_count": 0,
+        "outcomes": {},
+        "duration_ms": {
+          "p50": null,
+          "p95_nearest_rank": null,
+          "max": null
+        },
+        "units_sum": null
+      },
+      "MainTableReloadRows": {
+        "status": "not_observed_in_export",
+        "complete_interval_count": 0,
+        "outcomes": {},
+        "duration_ms": {
+          "p50": null,
+          "p95_nearest_rank": null,
+          "max": null
+        },
+        "units_sum": null
+      },
+      "TabRecordsUpdateAttempt": {
+        "status": "observed",
+        "complete_interval_count": 8,
+        "outcomes": {
+          "unchanged": 8
+        },
+        "duration_ms": {
+          "p50": 0.006417,
+          "p95_nearest_rank": 0.007875,
+          "max": 0.007875
+        },
+        "units_sum": 0
+      },
+      "TabLayout": {
+        "status": "not_observed_in_export",
+        "complete_interval_count": 0,
+        "outcomes": {},
+        "duration_ms": {
+          "p50": null,
+          "p95_nearest_rank": null,
+          "max": null
+        },
+        "units_sum": null
+      }
+    },
+    "models_by_coordinator_scope": {
+      "ModelSelection": {
+        "all_api_calls": {
+          "status": "not_observed_in_export",
+          "complete_interval_count": 0,
+          "outcomes": {},
+          "duration_ms": {
+            "p50": null,
+            "p95_nearest_rank": null,
+            "max": null
+          },
+          "units_sum": null
+        },
+        "inside_coordinator": {
+          "status": "not_observed_in_export",
+          "complete_interval_count": 0,
+          "outcomes": {},
+          "duration_ms": {
+            "p50": null,
+            "p95_nearest_rank": null,
+            "max": null
+          },
+          "units_sum": null
+        },
+        "outside_coordinator": {
+          "status": "not_observed_in_export",
+          "complete_interval_count": 0,
+          "outcomes": {},
+          "duration_ms": {
+            "p50": null,
+            "p95_nearest_rank": null,
+            "max": null
+          },
+          "units_sum": null
+        }
+      },
+      "ModelDelta": {
+        "all_api_calls": {
+          "status": "not_observed_in_export",
+          "complete_interval_count": 0,
+          "outcomes": {},
+          "duration_ms": {
+            "p50": null,
+            "p95_nearest_rank": null,
+            "max": null
+          },
+          "units_sum": null
+        },
+        "inside_coordinator": {
+          "status": "not_observed_in_export",
+          "complete_interval_count": 0,
+          "outcomes": {},
+          "duration_ms": {
+            "p50": null,
+            "p95_nearest_rank": null,
+            "max": null
+          },
+          "units_sum": null
+        },
+        "outside_coordinator": {
+          "status": "not_observed_in_export",
+          "complete_interval_count": 0,
+          "outcomes": {},
+          "duration_ms": {
+            "p50": null,
+            "p95_nearest_rank": null,
+            "max": null
+          },
+          "units_sum": null
+        }
+      },
+      "ModelFull": {
+        "all_api_calls": {
+          "status": "not_observed_in_export",
+          "complete_interval_count": 0,
+          "outcomes": {},
+          "duration_ms": {
+            "p50": null,
+            "p95_nearest_rank": null,
+            "max": null
+          },
+          "units_sum": null
+        },
+        "inside_coordinator": {
+          "status": "not_observed_in_export",
+          "complete_interval_count": 0,
+          "outcomes": {},
+          "duration_ms": {
+            "p50": null,
+            "p95_nearest_rank": null,
+            "max": null
+          },
+          "units_sum": null
+        },
+        "outside_coordinator": {
+          "status": "not_observed_in_export",
+          "complete_interval_count": 0,
+          "outcomes": {},
+          "duration_ms": {
+            "p50": null,
+            "p95_nearest_rank": null,
+            "max": null
+          },
+          "units_sum": null
+        }
+      }
+    },
+    "events": {
+      "MainTableTargetVerified": {
+        "status": "not_observed_in_export",
+        "count": 0,
+        "units_distribution": {},
+        "units_sum": null,
+        "unowned_completion_count": null
+      },
+      "MainTableTargetUnavailable": {
+        "status": "not_observed_in_export",
+        "count": 0,
+        "units_distribution": {},
+        "units_sum": null,
+        "unowned_completion_count": null
+      },
+      "ReloadDispatchUnverified": {
+        "status": "not_observed_in_export",
+        "count": 0,
+        "units_distribution": {},
+        "units_sum": null,
+        "unowned_completion_count": null
+      },
+      "PublicationCompleted": {
+        "status": "not_observed_in_export",
+        "count": 0,
+        "units_distribution": {},
+        "units_sum": null,
+        "unowned_completion_count": 0
+      },
+      "ReloadDataCompleted": {
+        "status": "not_observed_in_export",
+        "count": 0,
+        "units_distribution": {},
+        "units_sum": null,
+        "unowned_completion_count": 0
+      },
+      "ReloadRowsCompleted": {
+        "status": "not_observed_in_export",
+        "count": 0,
+        "units_distribution": {},
+        "units_sum": null,
+        "unowned_completion_count": 0
+      },
+      "TabRecordsRebuilt": {
+        "status": "not_observed_in_export",
+        "count": 0,
+        "units_distribution": {},
+        "units_sum": null,
+        "unowned_completion_count": 0
+      },
+      "KnownChangeHint": {
+        "status": "observed",
+        "count": 7,
+        "units_distribution": {
+          "6": 7
+        },
+        "units_sum": null,
+        "unowned_completion_count": null
+      },
+      "UnknownChangeHint": {
+        "status": "observed",
+        "count": 169,
+        "units_distribution": {
+          "8": 169
+        },
+        "units_sum": null,
+        "unowned_completion_count": null
+      }
+    },
+    "publication_target_validation": {
+      "status": "unavailable",
+      "complete_publication_count": 0,
+      "mask_distribution": {},
+      "unknown_or_unavailable_target_count": 0
+    },
+    "main_table_reload_coverage": {
+      "MainTableReloadData": {
+        "status": "unavailable",
+        "covered_publication_count": 0,
+        "uncovered_publication_count": 0,
+        "reason": "No complete verified publication scope or method dispatch coverage is incomplete; absent calls are not validated zero.",
+        "observed_intervals": {
+          "status": "not_observed_in_export",
+          "complete_interval_count": 0,
+          "outcomes": {},
+          "duration_ms": {
+            "p50": null,
+            "p95_nearest_rank": null,
+            "max": null
+          },
+          "units_sum": null
+        },
+        "normal_completion_events": {
+          "status": "not_observed_in_export",
+          "count": 0,
+          "units_distribution": {},
+          "units_sum": null,
+          "unowned_completion_count": 0
+        }
+      },
+      "MainTableReloadRows": {
+        "status": "unavailable",
+        "covered_publication_count": 0,
+        "uncovered_publication_count": 0,
+        "reason": "No complete verified publication scope or method dispatch coverage is incomplete; absent calls are not validated zero.",
+        "observed_intervals": {
+          "status": "not_observed_in_export",
+          "complete_interval_count": 0,
+          "outcomes": {},
+          "duration_ms": {
+            "p50": null,
+            "p95_nearest_rank": null,
+            "max": null
+          },
+          "units_sum": null
+        },
+        "normal_completion_events": {
+          "status": "not_observed_in_export",
+          "count": 0,
+          "units_distribution": {},
+          "units_sum": null,
+          "unowned_completion_count": 0
+        }
+      }
+    },
+    "complete_intervals_crossing_analysis_boundary": 0,
+    "unpaired_events_in_window": {}
+  },
+  "details_path": "docs/audits/session-groups-instruments-2.2-9-2026-11-03/signposts/idle-invalid-action-summary.details.json"
+}

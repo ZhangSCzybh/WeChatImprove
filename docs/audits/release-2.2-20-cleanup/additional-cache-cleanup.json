@@ -1,0 +1,356 @@
+{
+  "reason": "Second pass by file magic found reproducible compiled test executables outside directories named build; all sources, fixtures, logs, provenance and samples retained.",
+  "items": [
+    {
+      "path": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/quick-entry-validation/green/quick-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/quick-entry-validation/green/quick-tests",
+      "bytes": 298264,
+      "sha256": "468adda2cf33b36e3ca131754a1d890c06cda645e155fcd143d1c8669a71add4"
+    },
+    {
+      "path": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/quick-entry-validation/red/quick-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/quick-entry-validation/red/quick-tests",
+      "bytes": 236904,
+      "sha256": "ff6d2945c8c33d4b50f17876e941787cb199452a445a43d617618eec9cf62f69"
+    },
+    {
+      "path": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/quick-entry-validation/red-final/quick-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/quick-entry-validation/red-final/quick-tests",
+      "bytes": 278920,
+      "sha256": "f315ab38225d1a65a8bf8eff8dda92422eaaa165ec6386ed642c32cb5e4bfd33"
+    },
+    {
+      "path": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/green/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/green/rollback-tests",
+      "bytes": 223856,
+      "sha256": "17c6d3cb803e8572cb50b8a9489714e487a8826b3c7fce180b6cb779393bf2b5"
+    },
+    {
+      "path": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/green-complete/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/green-complete/rollback-tests",
+      "bytes": 241232,
+      "sha256": "aba9fdad41dc5e42f8b8dbbfd650b98b71a4356d8227c2573256b52b57c732cd"
+    },
+    {
+      "path": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/green-final-schema/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/green-final-schema/rollback-tests",
+      "bytes": 241232,
+      "sha256": "945c48ff04ad2ed1ea569eaf43d2899af1b5f8c42cf8e279351795806ba12692"
+    },
+    {
+      "path": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/green-release/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/green-release/rollback-tests",
+      "bytes": 241232,
+      "sha256": "52fa75903e7e13a8835c6bf7947e73f33ce0670e6776bc9a107c53efe2d47abb"
+    },
+    {
+      "path": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/red/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/red/rollback-tests",
+      "bytes": 242528,
+      "sha256": "109e963d82d688e12a99928be5ef8634cfc89fe80fedc5987f6e49f66d0ae505"
+    },
+    {
+      "path": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/red-complete/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/red-complete/rollback-tests",
+      "bytes": 242672,
+      "sha256": "929463c9cebcd19b53e3e67f062880d813832f7fc4449941d74197e6e876d86d"
+    },
+    {
+      "path": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/red-final/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/red-final/rollback-tests",
+      "bytes": 242672,
+      "sha256": "05c1f5bf5dab5cefc24082ab57c72db6fd84c416793e9711bb5c99d66f7bf787"
+    },
+    {
+      "path": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/red-final-schema/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/rollback-validation/red-final-schema/rollback-tests",
+      "bytes": 242672,
+      "sha256": "f4b0bb8c109586ee9b5d8cbdad7212fdd877b2cb7d6cc205868ca45e01aeacc4"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/new-password-validation/baseline-2.2-16/new-password-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/new-password-validation/baseline-2.2-16/new-password-tests",
+      "bytes": 281984,
+      "sha256": "9d303fb4479bb0b0fe72e4affd7db5354a0e8fbed683f8c1f1b8412092460606"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/new-password-validation/green/new-password-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/new-password-validation/green/new-password-tests",
+      "bytes": 282480,
+      "sha256": "14d692a669283d4a93d96e712bdc1fbd52f610a6760e7f405a6377f619fd0410"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/new-password-validation/green-release/new-password-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/new-password-validation/green-release/new-password-tests",
+      "bytes": 282480,
+      "sha256": "6ae01500101c16fea6b273bdb32ab41cde1ad5e6d06726676c3b6d0c9886a803"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/new-password-validation/red-quick-reset/new-password-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/new-password-validation/red-quick-reset/new-password-tests",
+      "bytes": 282112,
+      "sha256": "05b2efee2cb2838199a0f768ab26fce0e13f912c94be2c20d04baa6687975a37"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/new-password-validation/release-authorized-final/new-password-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/new-password-validation/release-authorized-final/new-password-tests",
+      "bytes": 282480,
+      "sha256": "6ae01500101c16fea6b273bdb32ab41cde1ad5e6d06726676c3b6d0c9886a803"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-entry-validation/baseline-2216/quick-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-entry-validation/baseline-2216/quick-tests",
+      "bytes": 298264,
+      "sha256": "468adda2cf33b36e3ca131754a1d890c06cda645e155fcd143d1c8669a71add4"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-entry-validation/green/quick-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-entry-validation/green/quick-tests",
+      "bytes": 298648,
+      "sha256": "b61349b585ee5a123f0aa159b8b3377111e3b9837dcba3d8eda56ef3a3d70774"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/cancelled-callback-green/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/cancelled-callback-green/quick-reset-tests",
+      "bytes": 321728,
+      "sha256": "b20bbf042004c17ad65d1affa8de4c963d538845af40a5e81fc4f25847db7515"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/cancelled-callback-red/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/cancelled-callback-red/quick-reset-tests",
+      "bytes": 321376,
+      "sha256": "feba558900bd4342b926e7fb5ce76ac016ed2192e19005fc236c62049b85dbab"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/green/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/green/quick-reset-tests",
+      "bytes": 303696,
+      "sha256": "2acb198fbfd2b318c24f8d4b0241d731c89e9b836f4026b86c173c5e2dfb0104"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/green-final/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/green-final/quick-reset-tests",
+      "bytes": 339296,
+      "sha256": "0bad93758a8bdd520a0594694ccae5b971a35395d5ef2a9686951002c8eda547"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/green-final-crash/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/green-final-crash/quick-reset-tests",
+      "bytes": 339296,
+      "sha256": "0bad93758a8bdd520a0594694ccae5b971a35395d5ef2a9686951002c8eda547"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/green-release/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/green-release/quick-reset-tests",
+      "bytes": 321760,
+      "sha256": "36dcb999f12ba27ba0422bd6b1e1e85c242fca3fca21e37fcb819135cf4b1ca2"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/independent-final/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/independent-final/quick-reset-tests",
+      "bytes": 339296,
+      "sha256": "0bad93758a8bdd520a0594694ccae5b971a35395d5ef2a9686951002c8eda547"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/independent-review/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/independent-review/quick-reset-tests",
+      "bytes": 321760,
+      "sha256": "36dcb999f12ba27ba0422bd6b1e1e85c242fca3fca21e37fcb819135cf4b1ca2"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/missing-auth-green/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/missing-auth-green/quick-reset-tests",
+      "bytes": 321328,
+      "sha256": "fc2a41cc5098987f8959b1d6b319205f8f3c92848d6cdbd01e9b926d47974558"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/missing-auth-red/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/missing-auth-red/quick-reset-tests",
+      "bytes": 321328,
+      "sha256": "f282dda60ab38a3b441e59e2ecda6ceb615cf0b5d3203273cca10f165c8b5662"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/red/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/red/quick-reset-tests",
+      "bytes": 302368,
+      "sha256": "85e38eb60fd9c640a89487daab98584f5a211f7eab18bf4f89630cf03e73e0c5"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/red-final/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/red-final/quick-reset-tests",
+      "bytes": 321056,
+      "sha256": "102411d7cc752d063d3bc7da3ead6e1a7979760c0fb53e2dd9c5b034751b625b"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/red-final-crash/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/red-final-crash/quick-reset-tests",
+      "bytes": 321056,
+      "sha256": "102411d7cc752d063d3bc7da3ead6e1a7979760c0fb53e2dd9c5b034751b625b"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/red-release/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/red-release/quick-reset-tests",
+      "bytes": 320064,
+      "sha256": "8d7e843b39570e18db7cb02230624c0bebd08a42eb3e71d9b3e5643f3c82105d"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/release-authorized-final/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/quick-reset-validation/release-authorized-final/quick-reset-tests",
+      "bytes": 339296,
+      "sha256": "0bad93758a8bdd520a0594694ccae5b971a35395d5ef2a9686951002c8eda547"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/release-authorized-revalidation/quick-entry-validation/green/quick-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/release-authorized-revalidation/quick-entry-validation/green/quick-tests",
+      "bytes": 298648,
+      "sha256": "b61349b585ee5a123f0aa159b8b3377111e3b9837dcba3d8eda56ef3a3d70774"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/release-authorized-revalidation/rollback-validation/green/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/release-authorized-revalidation/rollback-validation/green/rollback-tests",
+      "bytes": 241600,
+      "sha256": "a6547c18c5fc5844c7aa52978cec60b9df63b566674d5c0e0231ac40ef71c9b3"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/rollback-validation/baseline-2216/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/rollback-validation/baseline-2216/rollback-tests",
+      "bytes": 241232,
+      "sha256": "52fa75903e7e13a8835c6bf7947e73f33ce0670e6776bc9a107c53efe2d47abb"
+    },
+    {
+      "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/rollback-validation/green/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-17-quick-entry-closefriend-reset/rollback-validation/green/rollback-tests",
+      "bytes": 241600,
+      "sha256": "a6547c18c5fc5844c7aa52978cec60b9df63b566674d5c0e0231ac40ef71c9b3"
+    },
+    {
+      "path": "docs/audits/release-2.2-18-settings-return-header-gap/header-gap-validation/green-2.2-18/header-gap-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-18-settings-return-header-gap/header-gap-validation/green-2.2-18/header-gap-tests",
+      "bytes": 84368,
+      "sha256": "ec3eaf75e315e857d4dc81f6ed7c982894e21939ef05eaa1a20fd60819cc42d8"
+    },
+    {
+      "path": "docs/audits/release-2.2-18-settings-return-header-gap/header-gap-validation/red-2.2-17-run/header-gap-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-18-settings-return-header-gap/header-gap-validation/red-2.2-17-run/header-gap-tests",
+      "bytes": 84304,
+      "sha256": "5d9a70c5b151e4484a1e66338597cca596666d4e132a856b7e723c662664f5f6"
+    },
+    {
+      "path": "docs/audits/release-2.2-18-settings-return-header-gap/header-gap-validation/red-final-2.2-17/header-gap-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-18-settings-return-header-gap/header-gap-validation/red-final-2.2-17/header-gap-tests",
+      "bytes": 84304,
+      "sha256": "5d9a70c5b151e4484a1e66338597cca596666d4e132a856b7e723c662664f5f6"
+    },
+    {
+      "path": "docs/audits/release-2.2-18-settings-return-header-gap/release-core-revalidation/new-password-validation/green/new-password-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-18-settings-return-header-gap/release-core-revalidation/new-password-validation/green/new-password-tests",
+      "bytes": 282480,
+      "sha256": "6ae01500101c16fea6b273bdb32ab41cde1ad5e6d06726676c3b6d0c9886a803"
+    },
+    {
+      "path": "docs/audits/release-2.2-18-settings-return-header-gap/release-core-revalidation/quick-entry-validation/green/quick-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-18-settings-return-header-gap/release-core-revalidation/quick-entry-validation/green/quick-tests",
+      "bytes": 298648,
+      "sha256": "b61349b585ee5a123f0aa159b8b3377111e3b9837dcba3d8eda56ef3a3d70774"
+    },
+    {
+      "path": "docs/audits/release-2.2-18-settings-return-header-gap/release-core-revalidation/quick-reset-validation/green/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-18-settings-return-header-gap/release-core-revalidation/quick-reset-validation/green/quick-reset-tests",
+      "bytes": 339296,
+      "sha256": "0bad93758a8bdd520a0594694ccae5b971a35395d5ef2a9686951002c8eda547"
+    },
+    {
+      "path": "docs/audits/release-2.2-18-settings-return-header-gap/release-core-revalidation/rollback-validation/green/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-18-settings-return-header-gap/release-core-revalidation/rollback-validation/green/rollback-tests",
+      "bytes": 241600,
+      "sha256": "a6547c18c5fc5844c7aa52978cec60b9df63b566674d5c0e0231ac40ef71c9b3"
+    },
+    {
+      "path": "docs/audits/release-2.2-19-settings-subpage-tabbar/header-gap-validation/green-2.2-19/header-gap-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-19-settings-subpage-tabbar/header-gap-validation/green-2.2-19/header-gap-tests",
+      "bytes": 84368,
+      "sha256": "ec3eaf75e315e857d4dc81f6ed7c982894e21939ef05eaa1a20fd60819cc42d8"
+    },
+    {
+      "path": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/new-password-validation/green/new-password-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/new-password-validation/green/new-password-tests",
+      "bytes": 282480,
+      "sha256": "6ae01500101c16fea6b273bdb32ab41cde1ad5e6d06726676c3b6d0c9886a803"
+    },
+    {
+      "path": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/quick-entry-validation/green/quick-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/quick-entry-validation/green/quick-tests",
+      "bytes": 298648,
+      "sha256": "b61349b585ee5a123f0aa159b8b3377111e3b9837dcba3d8eda56ef3a3d70774"
+    },
+    {
+      "path": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/quick-reset-validation/green/quick-reset-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/quick-reset-validation/green/quick-reset-tests",
+      "bytes": 339296,
+      "sha256": "0bad93758a8bdd520a0594694ccae5b971a35395d5ef2a9686951002c8eda547"
+    },
+    {
+      "path": "docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/rollback-validation/green/rollback-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-19-settings-subpage-tabbar/release-core-revalidation/rollback-validation/green/rollback-tests",
+      "bytes": 241600,
+      "sha256": "a6547c18c5fc5844c7aa52978cec60b9df63b566674d5c0e0231ac40ef71c9b3"
+    },
+    {
+      "path": "docs/audits/release-2.2-19-settings-subpage-tabbar/tabbar-navigation-validation/green-2.2-19/navigation-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-19-settings-subpage-tabbar/tabbar-navigation-validation/green-2.2-19/navigation-tests",
+      "bytes": 101472,
+      "sha256": "70d4dee9cd2a1d283a0bae7bb0e7ad4f3e3f89559793d8855595b5e9ba9c3d43"
+    },
+    {
+      "path": "docs/audits/release-2.2-19-settings-subpage-tabbar/tabbar-navigation-validation/red-runtime-2.2-18/navigation-tests",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/release-2.2-19-settings-subpage-tabbar/tabbar-navigation-validation/red-runtime-2.2-18/navigation-tests",
+      "bytes": 100880,
+      "sha256": "8c55ef3805c25d5f62bd36d07e825dbe9a27c3e1f94f66a09340ee240a9530ec"
+    },
+    {
+      "path": "docs/audits/session-groups-efficiency-2026-11-03/review/observation/observation-fixture",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/session-groups-efficiency-2026-11-03/review/observation/observation-fixture",
+      "bytes": 77664,
+      "sha256": "d452f3170442171a1226aacc5b1a53c792e4b66f64a3f96e3e0664a81843c32c"
+    },
+    {
+      "path": "docs/audits/session-groups-efficiency-2026-11-03/ui-validation/badge-layout-stale-fixture",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/session-groups-efficiency-2026-11-03/ui-validation/badge-layout-stale-fixture",
+      "bytes": 169128,
+      "sha256": "91213b17cae10c289bebc40ca2635fd838f60e1123d118c5054c0eb6fa74e916"
+    },
+    {
+      "path": "docs/audits/session-groups-efficiency-2026-11-03/ui-validation/baseline-2.2-9-fixture",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/session-groups-efficiency-2026-11-03/ui-validation/baseline-2.2-9-fixture",
+      "bytes": 166712,
+      "sha256": "4e579627f756551424c99246305945b7dcf89523ebccb5cdbf020c70fbc46f47"
+    },
+    {
+      "path": "docs/audits/session-groups-efficiency-2026-11-03/ui-validation/current-fixture",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/session-groups-efficiency-2026-11-03/ui-validation/current-fixture",
+      "bytes": 169120,
+      "sha256": "f525a36bf621e0740fd06a7d9831feafa4857ce931fd4772bfeb497e9754b25f"
+    },
+    {
+      "path": "docs/audits/session-groups-efficiency-2026-11-03/ui-validation/font-cache-stale-fixture",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/session-groups-efficiency-2026-11-03/ui-validation/font-cache-stale-fixture",
+      "bytes": 169080,
+      "sha256": "7875a15c48189082c8f51914da9d2bedcc035af59cb7108a0122aca2f4878b8d"
+    },
+    {
+      "path": "docs/audits/session-groups-efficiency-2026-11-03/ui-validation/indicator-cancel-missing-fixture",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/session-groups-efficiency-2026-11-03/ui-validation/indicator-cancel-missing-fixture",
+      "bytes": 169136,
+      "sha256": "273961fcf9a34844c4231004a96bc65da649d2aee0ee03c9f78a31d7b8f75138"
+    },
+    {
+      "path": "docs/audits/session-groups-efficiency-2026-11-03/ui-validation/selection-ack-layout-fixture",
+      "archive_path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/additional-compiled-caches/docs/audits/session-groups-efficiency-2026-11-03/ui-validation/selection-ack-layout-fixture",
+      "bytes": 169136,
+      "sha256": "bf8697bef028c73205b83746a6790c830d6c2e6d928bba5d543c8c0f0168c365"
+    }
+  ],
+  "files": 58,
+  "bytes": 14572136,
+  "hash_mismatches": 0
+}

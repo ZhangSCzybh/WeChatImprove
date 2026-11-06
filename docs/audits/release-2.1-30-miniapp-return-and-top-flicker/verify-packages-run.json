@@ -1,6 +1,0 @@
-{
-  "argv": ["python3", "-B", "docs/audits/release-2.1-30-miniapp-return-and-top-flicker/verify-packages.py"],
-  "exit_code": 0,
-  "stdout": "verify-packages-run.stdout.log",
-  "boundary": "Local package and dSYM verification only; no installation or device runtime validation."
-}

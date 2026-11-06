@@ -1,0 +1,607 @@
+{
+  "version": "2.2-8",
+  "version_evidence": "User confirmed installed version; plugin UUID was not independently exported",
+  "wechat_version": "8.0.78",
+  "ios_version": "27.0.1",
+  "device": "iPhone 14 Pro Max",
+  "target_pid": 37813,
+  "bundle_id": "com.tencent.xin",
+  "scenarios": [
+    {
+      "scenario": "idle",
+      "label_zh": "静置",
+      "target_pid": 37813,
+      "bundle_id": "com.tencent.xin",
+      "window_seconds": {
+        "start": 5.0,
+        "end": 65.0
+      },
+      "analyzed_seconds": 60.0,
+      "recorder_exit_code": 0,
+      "capture_trace_present": true,
+      "cpu": {
+        "status": "available",
+        "schema": "activity-monitor-process-live",
+        "sample_count": 60,
+        "covered_seconds": 60.0,
+        "window_coverage_fraction": 1.0,
+        "overlapping_interval_seconds": 2.842170943040401e-14,
+        "uncovered_intervals_seconds": [],
+        "observed_interval_start_seconds": 5.0,
+        "observed_interval_end_seconds": 65.0,
+        "mean_percent": 3.1435861960229614,
+        "time_weighted_p95_percent": 4.735154038,
+        "peak_sample_percent": 10.068056341,
+        "sample_interval_seconds_min": 0.993421542,
+        "sample_interval_seconds_max": 1.068849334,
+        "cumulative_counter_cross_check": {
+          "schema": "sysmon-process",
+          "observed_seconds": 58.899474,
+          "cpu_seconds_delta": 1.8528123329999744,
+          "mean_percent": 3.145719659567715,
+          "method": "Last minus first cumulative CPU time; counters are never summed. Live counters use closed interval ends and exclude the final potentially extrapolated interval."
+        },
+        "excluded_rows": {
+          "CPU row missing a verified time or formatted percentage": 1
+        },
+        "interpretation": "100% is one fully occupied CPU core; this is process CPU, not plugin-only CPU."
+      },
+      "render_commits": {
+        "status": "available",
+        "commit_interval_count": 3,
+        "commits_per_second": 0.05,
+        "unattributed_row_count": 0,
+        "interpretation": "Render commits are not model computations, reloadData calls or reloadRows calls."
+      },
+      "frames": {
+        "status": "available",
+        "schema": "coreanimation-lifetime-interval",
+        "observed_frame_or_hitch_rows": 3599,
+        "hitch_count": 0,
+        "summed_hitch_ms": 0,
+        "positive_hitch_p95_ms": null,
+        "positive_hitch_p99_ms": null,
+        "maximum_hitch_ms": 0,
+        "attribution": "Exported device/display scope; cannot attribute these frames to the target process",
+        "unattributed_row_count": 0,
+        "excluded_rows": {},
+        "interpretation": "Hitches use recorded presentation deadlines. No fixed-refresh-rate dropped-frame estimate is made.",
+        "frame_count": 3599,
+        "known_frame_hitch_fraction": 0.0,
+        "scope": "Exported device/display frames, not WeChat-only frames",
+        "target_process_attribution": {
+          "status": "unavailable",
+          "reason": "No frame-to-process ownership mapping was exported"
+        }
+      },
+      "target_frames": {
+        "status": "unavailable",
+        "reason": "Frame attribution is unverified",
+        "schema": "coreanimation-lifetime-interval",
+        "unattributed_row_count": 3599,
+        "excluded_rows": {}
+      },
+      "display_frame_observations": {
+        "status": "available",
+        "schema": "coreanimation-lifetime-interval",
+        "observed_frame_or_hitch_rows": 3599,
+        "hitch_count": 0,
+        "summed_hitch_ms": 0,
+        "positive_hitch_p95_ms": null,
+        "positive_hitch_p99_ms": null,
+        "maximum_hitch_ms": 0,
+        "attribution": "Exported device/display scope; cannot attribute these frames to the target process",
+        "unattributed_row_count": 0,
+        "excluded_rows": {},
+        "interpretation": "Hitches use recorded presentation deadlines. No fixed-refresh-rate dropped-frame estimate is made.",
+        "frame_count": 3599,
+        "known_frame_hitch_fraction": 0.0,
+        "scope": "Exported device/display frames, not WeChat-only frames",
+        "target_process_attribution": {
+          "status": "unavailable",
+          "reason": "No frame-to-process ownership mapping was exported"
+        }
+      },
+      "frame_metric_source": "display_frame_observations",
+      "frame_scope_class": "device_display",
+      "frame_scope_evidence": "Device/display scope; not WeChat-only Exported device/display frames, not WeChat-only frames  Exported device/display scope; cannot attribute these frames to the target process",
+      "thermal_state_observations": {
+        "status": "available",
+        "scope": "Device thermal state; does not identify a causal process or prove throttling",
+        "source": "docs/audits/session-groups-instruments-2026-11-03/idle/export/idle-thermal.xml",
+        "source_sha256": "e3d49f925eca01750ea500126c2200de5b9d205d0328984f685a482accc2ba73",
+        "window_state_seconds": {
+          "Nominal": 60.0
+        },
+        "intervals": [
+          {
+            "recording_start_seconds": 0.0,
+            "recording_end_seconds": 70.951930999,
+            "state": "Nominal",
+            "induced": false,
+            "window_overlap_seconds": 60.0
+          }
+        ]
+      },
+      "per_round_duration": {
+        "status": "unavailable",
+        "reason": "The unmodified 2.2-8 build has no per-round event boundaries"
+      },
+      "group_refresh_call_counts": {
+        "status": "unavailable",
+        "reason": "Sampling and render commits do not count group refresh/reload invocations"
+      },
+      "signpost_summary": null,
+      "capture_context": {},
+      "explicit_invalidity": null,
+      "source": {
+        "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/idle/summary.json",
+        "sha256": "5d2526b77ae28cd6392766c11a01ab9447c873f2c6869b11ed6723d0b6564360"
+      },
+      "capture_source": {
+        "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/idle/capture-result.json",
+        "sha256": "4b0e05ae78f7d2135751ed65e869f80f2970eacbfb41f5e000bda0ca1e3cf806"
+      }
+    },
+    {
+      "scenario": "messages",
+      "label_zh": "连续收消息",
+      "target_pid": 37813,
+      "bundle_id": "com.tencent.xin",
+      "window_seconds": {
+        "start": 20.0,
+        "end": 65.0
+      },
+      "analyzed_seconds": 45.0,
+      "recorder_exit_code": 0,
+      "capture_trace_present": true,
+      "cpu": {
+        "status": "available",
+        "schema": "activity-monitor-process-live",
+        "sample_count": 45,
+        "covered_seconds": 45.0,
+        "window_coverage_fraction": 1.0,
+        "overlapping_interval_seconds": 1.4210854715202004e-14,
+        "uncovered_intervals_seconds": [],
+        "observed_interval_start_seconds": 20.0,
+        "observed_interval_end_seconds": 65.0,
+        "mean_percent": 18.719343766267162,
+        "time_weighted_p95_percent": 29.567556372,
+        "peak_sample_percent": 36.027472258,
+        "sample_interval_seconds_min": 0.983875959,
+        "sample_interval_seconds_max": 1.082525958,
+        "cumulative_counter_cross_check": {
+          "schema": "sysmon-process",
+          "observed_seconds": 43.886813084,
+          "cpu_seconds_delta": 8.240951708000011,
+          "mean_percent": 18.77774012031065,
+          "method": "Last minus first cumulative CPU time; counters are never summed. Live counters use closed interval ends and exclude the final potentially extrapolated interval."
+        },
+        "excluded_rows": {
+          "CPU row missing a verified time or formatted percentage": 1
+        },
+        "interpretation": "100% is one fully occupied CPU core; this is process CPU, not plugin-only CPU."
+      },
+      "render_commits": {
+        "status": "available",
+        "commit_interval_count": 183,
+        "commits_per_second": 4.066666666666666,
+        "unattributed_row_count": 0,
+        "interpretation": "Render commits are not model computations, reloadData calls or reloadRows calls."
+      },
+      "frames": {
+        "status": "available",
+        "schema": "coreanimation-lifetime-interval",
+        "observed_frame_or_hitch_rows": 2712,
+        "hitch_count": 48,
+        "summed_hitch_ms": 1705.9993170000353,
+        "positive_hitch_p95_ms": 50.04974999999945,
+        "positive_hitch_p99_ms": 66.72970799999689,
+        "maximum_hitch_ms": 66.72970799999689,
+        "attribution": "Verified externally with --frames-target-scoped",
+        "unattributed_row_count": 0,
+        "excluded_rows": {},
+        "interpretation": "Hitches use recorded presentation deadlines. No fixed-refresh-rate dropped-frame estimate is made.",
+        "frame_count": 2712,
+        "known_frame_hitch_fraction": 0.017699115044247787
+      },
+      "target_frames": {
+        "status": "available",
+        "schema": "coreanimation-lifetime-interval",
+        "observed_frame_or_hitch_rows": 2712,
+        "hitch_count": 48,
+        "summed_hitch_ms": 1705.9993170000353,
+        "positive_hitch_p95_ms": 50.04974999999945,
+        "positive_hitch_p99_ms": 66.72970799999689,
+        "maximum_hitch_ms": 66.72970799999689,
+        "attribution": "Verified externally with --frames-target-scoped",
+        "unattributed_row_count": 0,
+        "excluded_rows": {},
+        "interpretation": "Hitches use recorded presentation deadlines. No fixed-refresh-rate dropped-frame estimate is made.",
+        "frame_count": 2712,
+        "known_frame_hitch_fraction": 0.017699115044247787
+      },
+      "display_frame_observations": {},
+      "frame_metric_source": "frames",
+      "frame_scope_class": "target_wechat",
+      "frame_scope_evidence": "WeChat target scope (TOC SINGLE, attached PID 37813)  TOC recorded attached PID 37813 and coreanimation-lifetime-interval target-pid=SINGLE. Verified externally with --frames-target-scoped",
+      "thermal_state_observations": {
+        "status": "available",
+        "scope": "Device thermal state; does not identify a causal process or prove throttling",
+        "source": "docs/audits/session-groups-instruments-2026-11-03/messages/export/messages-thermal.xml",
+        "source_sha256": "385589733e8818b69d41180e7cd364351458801d1540065bbd418139a7d0e334",
+        "window_state_seconds": {
+          "Nominal": 45.0
+        },
+        "intervals": [
+          {
+            "recording_start_seconds": 0.0,
+            "recording_end_seconds": 71.078263998,
+            "state": "Nominal",
+            "induced": false,
+            "window_overlap_seconds": 45.0
+          }
+        ]
+      },
+      "per_round_duration": {
+        "status": "unavailable",
+        "reason": "The unmodified 2.2-8 build has no per-round event boundaries"
+      },
+      "group_refresh_call_counts": {
+        "status": "unavailable",
+        "reason": "Sampling and render commits do not count group refresh/reload invocations"
+      },
+      "signpost_summary": null,
+      "capture_context": {
+        "recorder_exit_code": 0,
+        "manual_stop_signals": false,
+        "toc_duration_seconds": 71.078264,
+        "frame_scope_proof": "TOC recorded attached PID 37813 and coreanimation-lifetime-interval target-pid=SINGLE."
+      },
+      "explicit_invalidity": null,
+      "source": {
+        "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/messages/summary.json",
+        "sha256": "aa010493a61a5193de61f3ae4f3a940fe42eebb2fecbc274d1aeaf67b50009df"
+      },
+      "capture_source": {
+        "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/messages/capture-result.json",
+        "sha256": "4c76072fd7f95d432fc065793719eb982bade5de2e4d04a60afa619b5da026a0"
+      }
+    },
+    {
+      "scenario": "scroll",
+      "label_zh": "滚动",
+      "target_pid": 37813,
+      "bundle_id": "com.tencent.xin",
+      "window_seconds": {
+        "start": 25.0,
+        "end": 65.0
+      },
+      "analyzed_seconds": 40.0,
+      "recorder_exit_code": 0,
+      "capture_trace_present": true,
+      "cpu": {
+        "status": "available",
+        "schema": "activity-monitor-process-live",
+        "sample_count": 40,
+        "covered_seconds": 40.0,
+        "window_coverage_fraction": 1.0,
+        "overlapping_interval_seconds": 0,
+        "uncovered_intervals_seconds": [],
+        "observed_interval_start_seconds": 25.0,
+        "observed_interval_end_seconds": 65.0,
+        "mean_percent": 35.17084382496045,
+        "time_weighted_p95_percent": 42.307514883,
+        "peak_sample_percent": 43.692013031,
+        "sample_interval_seconds_min": 0.978925625,
+        "sample_interval_seconds_max": 1.076610041,
+        "cumulative_counter_cross_check": {
+          "schema": "sysmon-process",
+          "observed_seconds": 38.90271575,
+          "cpu_seconds_delta": 13.782660000000021,
+          "mean_percent": 35.42852917665529,
+          "method": "Last minus first cumulative CPU time; counters are never summed. Live counters use closed interval ends and exclude the final potentially extrapolated interval."
+        },
+        "excluded_rows": {
+          "CPU row missing a verified time or formatted percentage": 1
+        },
+        "interpretation": "100% is one fully occupied CPU core; this is process CPU, not plugin-only CPU."
+      },
+      "render_commits": {
+        "status": "available",
+        "commit_interval_count": 4120,
+        "commits_per_second": 103.0,
+        "unattributed_row_count": 0,
+        "interpretation": "Render commits are not model computations, reloadData calls or reloadRows calls."
+      },
+      "frames": {
+        "status": "available",
+        "schema": "coreanimation-lifetime-interval",
+        "observed_frame_or_hitch_rows": 4317,
+        "hitch_count": 29,
+        "summed_hitch_ms": 299.4355320000004,
+        "positive_hitch_p95_ms": 16.72129100000319,
+        "positive_hitch_p99_ms": 37.082333000000745,
+        "maximum_hitch_ms": 37.082333000000745,
+        "attribution": "Verified externally with --frames-target-scoped",
+        "unattributed_row_count": 0,
+        "excluded_rows": {},
+        "interpretation": "Hitches use recorded presentation deadlines. No fixed-refresh-rate dropped-frame estimate is made.",
+        "frame_count": 4317,
+        "known_frame_hitch_fraction": 0.006717627982395182
+      },
+      "target_frames": {
+        "status": "available",
+        "schema": "coreanimation-lifetime-interval",
+        "observed_frame_or_hitch_rows": 4317,
+        "hitch_count": 29,
+        "summed_hitch_ms": 299.4355320000004,
+        "positive_hitch_p95_ms": 16.72129100000319,
+        "positive_hitch_p99_ms": 37.082333000000745,
+        "maximum_hitch_ms": 37.082333000000745,
+        "attribution": "Verified externally with --frames-target-scoped",
+        "unattributed_row_count": 0,
+        "excluded_rows": {},
+        "interpretation": "Hitches use recorded presentation deadlines. No fixed-refresh-rate dropped-frame estimate is made.",
+        "frame_count": 4317,
+        "known_frame_hitch_fraction": 0.006717627982395182
+      },
+      "display_frame_observations": {},
+      "frame_metric_source": "frames",
+      "frame_scope_class": "target_wechat",
+      "frame_scope_evidence": "WeChat target scope (TOC SINGLE, attached PID 37813)  TOC recorded attached PID 37813 and coreanimation-lifetime-interval target-pid=SINGLE. Verified externally with --frames-target-scoped",
+      "thermal_state_observations": {
+        "status": "available",
+        "scope": "Device thermal state; does not identify a causal process or prove throttling",
+        "source": "docs/audits/session-groups-instruments-2026-11-03/scroll/export/scroll-thermal.xml",
+        "source_sha256": "9589047b58072b7c9172fd38b1a816b76fabe146e2f493530a66956330c74af2",
+        "window_state_seconds": {
+          "Nominal": 40.0
+        },
+        "intervals": [
+          {
+            "recording_start_seconds": 0.0,
+            "recording_end_seconds": 71.087655067,
+            "state": "Nominal",
+            "induced": false,
+            "window_overlap_seconds": 40.0
+          }
+        ]
+      },
+      "per_round_duration": {
+        "status": "unavailable",
+        "reason": "The unmodified 2.2-8 build has no per-round event boundaries"
+      },
+      "group_refresh_call_counts": {
+        "status": "unavailable",
+        "reason": "Sampling and render commits do not count group refresh/reload invocations"
+      },
+      "signpost_summary": null,
+      "capture_context": {
+        "recorder_exit_code": 0,
+        "manual_stop_signals": false,
+        "toc_duration_seconds": 71.087655,
+        "frame_scope_proof": "TOC recorded attached PID 37813 and coreanimation-lifetime-interval target-pid=SINGLE."
+      },
+      "explicit_invalidity": null,
+      "source": {
+        "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/scroll/summary.json",
+        "sha256": "e769678b2af8dba7031616a0dd74561e18b341a62c537fd35d8cdc173a8ec116"
+      },
+      "capture_source": {
+        "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/scroll/capture-result.json",
+        "sha256": "0e0b31f62415ae427784be599b0df2feee098d0f3967b5c45e6ccaa45f1b93c7"
+      }
+    },
+    {
+      "scenario": "switch",
+      "label_zh": "切组",
+      "target_pid": 37813,
+      "bundle_id": "com.tencent.xin",
+      "window_seconds": {
+        "start": 25.0,
+        "end": 70.0
+      },
+      "analyzed_seconds": 45.0,
+      "recorder_exit_code": 0,
+      "capture_trace_present": true,
+      "cpu": {
+        "status": "available",
+        "schema": "activity-monitor-process-live",
+        "sample_count": 45,
+        "covered_seconds": 45.0,
+        "window_coverage_fraction": 1.0,
+        "overlapping_interval_seconds": 0,
+        "uncovered_intervals_seconds": [],
+        "observed_interval_start_seconds": 25.0,
+        "observed_interval_end_seconds": 70.0,
+        "mean_percent": 18.815080553662437,
+        "time_weighted_p95_percent": 28.783687299,
+        "peak_sample_percent": 59.795971669,
+        "sample_interval_seconds_min": 0.96417025,
+        "sample_interval_seconds_max": 1.074108709,
+        "cumulative_counter_cross_check": {
+          "schema": "sysmon-process",
+          "observed_seconds": 43.71781675,
+          "cpu_seconds_delta": 8.198336125000026,
+          "mean_percent": 18.75284891714092,
+          "method": "Last minus first cumulative CPU time; counters are never summed. Live counters use closed interval ends and exclude the final potentially extrapolated interval."
+        },
+        "excluded_rows": {
+          "CPU row missing a verified time or formatted percentage": 1
+        },
+        "interpretation": "100% is one fully occupied CPU core; this is process CPU, not plugin-only CPU."
+      },
+      "render_commits": {
+        "status": "available",
+        "commit_interval_count": 720,
+        "commits_per_second": 16.0,
+        "unattributed_row_count": 0,
+        "interpretation": "Render commits are not model computations, reloadData calls or reloadRows calls."
+      },
+      "frames": {
+        "status": "available",
+        "schema": "coreanimation-lifetime-interval",
+        "observed_frame_or_hitch_rows": 3229,
+        "hitch_count": 87,
+        "summed_hitch_ms": 2608.2893839999565,
+        "positive_hitch_p95_ms": 58.41887500000098,
+        "positive_hitch_p99_ms": 66.75683299999946,
+        "maximum_hitch_ms": 66.75683299999946,
+        "attribution": "Exported device/display scope; cannot attribute these frames to the target process",
+        "unattributed_row_count": 0,
+        "excluded_rows": {},
+        "interpretation": "Hitches use recorded presentation deadlines. No fixed-refresh-rate dropped-frame estimate is made.",
+        "frame_count": 3229,
+        "known_frame_hitch_fraction": 0.026943326107153918,
+        "scope": "Exported device/display frames, not WeChat-only frames",
+        "target_process_attribution": {
+          "status": "unavailable",
+          "reason": "No frame-to-process ownership mapping was exported"
+        }
+      },
+      "target_frames": {
+        "status": "unavailable",
+        "reason": "Frame attribution is unverified",
+        "schema": "coreanimation-lifetime-interval",
+        "unattributed_row_count": 3229,
+        "excluded_rows": {}
+      },
+      "display_frame_observations": {
+        "status": "available",
+        "schema": "coreanimation-lifetime-interval",
+        "observed_frame_or_hitch_rows": 3229,
+        "hitch_count": 87,
+        "summed_hitch_ms": 2608.2893839999565,
+        "positive_hitch_p95_ms": 58.41887500000098,
+        "positive_hitch_p99_ms": 66.75683299999946,
+        "maximum_hitch_ms": 66.75683299999946,
+        "attribution": "Exported device/display scope; cannot attribute these frames to the target process",
+        "unattributed_row_count": 0,
+        "excluded_rows": {},
+        "interpretation": "Hitches use recorded presentation deadlines. No fixed-refresh-rate dropped-frame estimate is made.",
+        "frame_count": 3229,
+        "known_frame_hitch_fraction": 0.026943326107153918,
+        "scope": "Exported device/display frames, not WeChat-only frames",
+        "target_process_attribution": {
+          "status": "unavailable",
+          "reason": "No frame-to-process ownership mapping was exported"
+        }
+      },
+      "frame_metric_source": "display_frame_observations",
+      "frame_scope_class": "device_display",
+      "frame_scope_evidence": "Device/display scope; not WeChat-only Exported device/display frames, not WeChat-only frames CoreAnimationLifetime TOC target-pid=ALL; target process frame ownership is unavailable. CPU and commit rows remain filtered strictly to PID 37813. Exported device/display scope; cannot attribute these frames to the target process",
+      "thermal_state_observations": {
+        "status": "available",
+        "scope": "Device thermal state; does not identify a causal process or prove throttling",
+        "source": "docs/audits/session-groups-instruments-2026-11-03/switch-system/export/switch-system-thermal.xml",
+        "source_sha256": "0b9f26767952d06e69a174b96c97b4891056586efe2b23c0b37529e92d2a5b01",
+        "window_state_seconds": {
+          "Nominal": 15.357947541000001,
+          "Fair": 29.642052459
+        },
+        "intervals": [
+          {
+            "recording_start_seconds": 0.0,
+            "recording_end_seconds": 40.357947541,
+            "state": "Nominal",
+            "induced": false,
+            "window_overlap_seconds": 15.357947541000001
+          },
+          {
+            "recording_start_seconds": 40.357947541,
+            "recording_end_seconds": 81.022759914,
+            "state": "Fair",
+            "induced": false,
+            "window_overlap_seconds": 29.642052459
+          }
+        ]
+      },
+      "per_round_duration": {
+        "status": "unavailable",
+        "reason": "The unmodified 2.2-8 build has no per-round event boundaries"
+      },
+      "group_refresh_call_counts": {
+        "status": "unavailable",
+        "reason": "Sampling and render commits do not count group refresh/reload invocations"
+      },
+      "signpost_summary": null,
+      "capture_context": {
+        "recorder_exit_code": 0,
+        "manual_recorder_signals_after_time_limit": [
+          "SIGINT",
+          "SIGTERM"
+        ],
+        "toc_duration_seconds": 81.02276,
+        "recording_wall_start": "2026-11-03T13:19:17.035000+08:00",
+        "analysis_wall_start": "2026-11-03T13:19:42.035000+08:00",
+        "analysis_wall_end": "2026-11-03T13:20:27.035000+08:00",
+        "frame_scope_proof": "CoreAnimationLifetime TOC target-pid=ALL; target process frame ownership is unavailable. CPU and commit rows remain filtered strictly to PID 37813.",
+        "postprocessing_note": "Recorder signals were sent on the host after the recording time limit; the trace then saved successfully. Capture-result was preserved.",
+        "analysis_end_boundary_note": "Selected at t=70 s to exclude the end of recording; no precise operator stop-cue timestamp is available."
+      },
+      "explicit_invalidity": null,
+      "source": {
+        "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/switch-system/summary.json",
+        "sha256": "ffe16cb05d1ba349da2cc1a1234ae68ee93e831b47a89c21629a640bbabeb0a4"
+      },
+      "capture_source": {
+        "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/switch-system/capture-result.json",
+        "sha256": "caed60de9b4ef652e4b66e8e3c47540e4673b9308c29e034ceaff25d8d37129e"
+      }
+    }
+  ],
+  "source_files": [
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/scenario-comparison.json",
+      "sha256": "b62176b29260cc289266cc40f3f3a74d00750f43838354b42caba3c259ac805d"
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/idle/summary.json",
+      "sha256": "5d2526b77ae28cd6392766c11a01ab9447c873f2c6869b11ed6723d0b6564360"
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/idle/capture-result.json",
+      "sha256": "4b0e05ae78f7d2135751ed65e869f80f2970eacbfb41f5e000bda0ca1e3cf806"
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/messages/summary.json",
+      "sha256": "aa010493a61a5193de61f3ae4f3a940fe42eebb2fecbc274d1aeaf67b50009df"
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/messages/capture-result.json",
+      "sha256": "4c76072fd7f95d432fc065793719eb982bade5de2e4d04a60afa619b5da026a0"
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/scroll/summary.json",
+      "sha256": "e769678b2af8dba7031616a0dd74561e18b341a62c537fd35d8cdc173a8ec116"
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/scroll/capture-result.json",
+      "sha256": "0e0b31f62415ae427784be599b0df2feee098d0f3967b5c45e6ccaa45f1b93c7"
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/switch-system/summary.json",
+      "sha256": "ffe16cb05d1ba349da2cc1a1234ae68ee93e831b47a89c21629a640bbabeb0a4"
+    },
+    {
+      "path": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-instruments-2026-11-03/switch-system/capture-result.json",
+      "sha256": "caed60de9b4ef652e4b66e8e3c47540e4673b9308c29e034ceaff25d8d37129e"
+    }
+  ],
+  "interpretation_notes": [
+    "CPU is the whole WeChat process, not plugin-only CPU; one fully occupied core is 100%.",
+    "CPU peak is a roughly one-second sample peak, not an instantaneous spike.",
+    "Frame counts are classified frame-lifetime records. The ratio is hitch records divided by known frame-lifetime records, not an inferred number of dropped display refreshes.",
+    "Legacy Core Animation FPS estimates are device scope and are not interchanged with frame-lifetime event density or used to compute dropped frames.",
+    "Idle and switch-system captures required manual host postprocessing stop signals after their recording time limits and saved with exit 0. Target CPU windows cover 100%; original capture-result files are preserved.",
+    "Action windows were manually selected after operator start cues. Exact stop-cue timestamps were not recorded; analysis boundaries are conservative choices, not instrumented per-action markers.",
+    "Idle and switch-system frames are exported at ALL device/display scope. Only messages and scroll have independently verified SINGLE target scope.",
+    "Idle, messages and scroll exported Nominal thermal state. Switch-system changed from Nominal to Fair at t=40.357947541 s; its main window contains 15.357947541 s Nominal and 29.642052459 s Fair. These are not thermally controlled comparisons; Fair alone does not establish throttling or cause."
+  ],
+  "unavailable_metrics": {
+    "per_round_group_computation_duration": "No per-round event boundaries in the installed build. Processor Trace unsupported on this A16 device.",
+    "group_refresh_reload_call_counts": "No exact group computation/reload counters in the installed build. CA commits are separate render events.",
+    "formal_plugin_function_cpu_attribution": "Time Profiler combinations failed modeler validation; partial samples are not formal scenario evidence."
+  }
+}

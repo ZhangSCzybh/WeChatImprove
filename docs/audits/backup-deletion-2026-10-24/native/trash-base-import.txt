@@ -1,1 +1,0 @@
-[{'branch': '0x107c27504', 'to': '0x10f85b80c'}, {'branch': '0x10f85b80c', 'to': '0x117476138'}, {'branch': '0x117476138', 'to': '0x1183231b8'}, {'stub': '0x1183231b8', 'symbol': '_NSTemporaryDirectory'}]

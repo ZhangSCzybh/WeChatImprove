@@ -1,3 +1,4 @@
+#import "CSSettingsTableViewController.h"
 //
 // CSRedEnvelopSettingsViewController.h
 // 红包功能设置界面
@@ -7,7 +8,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CSRedEnvelopSettingsViewController : UITableViewController
+@interface CSRedEnvelopSettingsViewController : CSSettingsTableViewController
 
 @end
 

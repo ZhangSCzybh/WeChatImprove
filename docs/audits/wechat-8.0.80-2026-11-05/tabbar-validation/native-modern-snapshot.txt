@@ -1,0 +1,266 @@
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+000000011210f56c <_O266DecReleaseOutputPicture>:
+1157e3c40: d101c3ff    	sub	sp, sp, #0x70
+1157e3c44: a9016ffc    	stp	x28, x27, [sp, #0x10]
+1157e3c48: a90267fa    	stp	x26, x25, [sp, #0x20]
+1157e3c4c: a9035ff8    	stp	x24, x23, [sp, #0x30]
+1157e3c50: a90457f6    	stp	x22, x21, [sp, #0x40]
+1157e3c54: a9054ff4    	stp	x20, x19, [sp, #0x50]
+1157e3c58: a9067bfd    	stp	x29, x30, [sp, #0x60]
+1157e3c5c: 910183fd    	add	x29, sp, #0x60
+1157e3c60: aa0003fb    	mov	x27, x0
+1157e3c64: b004ab88    	adrp	x8, 0x11ed54000 <dyld_stub_binder+0x11ed54000>
+1157e3c68: f944b900    	ldr	x0, [x8, #0x970]
+1157e3c6c: 9459e1d9    	bl	0x116e5c3d0 <dyld_stub_binder+0x116e5c3d0>
+1157e3c70: aa0003f3    	mov	x19, x0
+1157e3c74: 9004a628    	adrp	x8, 0x11eca7000 <dyld_stub_binder+0x11eca7000>
+1157e3c78: f9433501    	ldr	x1, [x8, #0x668] ; frame
+1157e3c7c: aa1b03e0    	mov	x0, x27
+1157e3c80: 9459e231    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3c84: b004a628    	adrp	x8, 0x11eca8000 <dyld_stub_binder+0x11eca8000>
+1157e3c88: f9418501    	ldr	x1, [x8, #0x308] ; initWithFrame:
+1157e3c8c: aa1303e0    	mov	x0, x19
+1157e3c90: 9459e22d    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3c94: aa0003f3    	mov	x19, x0
+1157e3c98: f004a974    	adrp	x20, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1157e3c9c: f9440a80    	ldr	x0, [x20, #0x810]
+1157e3ca0: f004a608    	adrp	x8, 0x11eca6000 <dyld_stub_binder+0x11eca6000>
+1157e3ca4: f942a916    	ldr	x22, [x8, #0x550] ; clearColor
+1157e3ca8: aa1603e1    	mov	x1, x22
+1157e3cac: 9459e226    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3cb0: aa1d03fd    	mov	x29, x29
+1157e3cb4: 9459e251    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3cb8: aa0003f7    	mov	x23, x0
+1157e3cbc: 9004a648    	adrp	x8, 0x11ecab000 <dyld_stub_binder+0x11ecab000>
+1157e3cc0: f9401d15    	ldr	x21, [x8, #0x38] ; setBackgroundColor:
+1157e3cc4: aa1303e0    	mov	x0, x19
+1157e3cc8: aa1503e1    	mov	x1, x21
+1157e3ccc: aa1703e2    	mov	x2, x23
+1157e3cd0: 9459e21d    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3cd4: aa1703e0    	mov	x0, x23
+1157e3cd8: 9459e239    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3cdc: f9440a80    	ldr	x0, [x20, #0x810]
+1157e3ce0: aa1603e1    	mov	x1, x22
+1157e3ce4: 9459e218    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3ce8: aa1d03fd    	mov	x29, x29
+1157e3cec: 9459e243    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3cf0: aa0003f6    	mov	x22, x0
+1157e3cf4: d0049da8    	adrp	x8, 0x11eb99000 <dyld_stub_binder+0x11eb99000>
+1157e3cf8: f9420d17    	ldr	x23, [x8, #0x418] ; backgroundContentView
+1157e3cfc: aa1303e0    	mov	x0, x19
+1157e3d00: aa1703e1    	mov	x1, x23
+1157e3d04: 9459e210    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3d08: aa1d03fd    	mov	x29, x29
+1157e3d0c: 9459e23b    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3d10: aa0003f8    	mov	x24, x0
+1157e3d14: aa1503e1    	mov	x1, x21
+1157e3d18: aa1603e2    	mov	x2, x22
+1157e3d1c: 9459e20a    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3d20: aa1803e0    	mov	x0, x24
+1157e3d24: 9459e226    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3d28: aa1603e0    	mov	x0, x22
+1157e3d2c: 9459e224    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3d30: aa1303e0    	mov	x0, x19
+1157e3d34: aa1703e1    	mov	x1, x23
+1157e3d38: 9459e203    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3d3c: aa1d03fd    	mov	x29, x29
+1157e3d40: 9459e22e    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3d44: aa0003f6    	mov	x22, x0
+1157e3d48: f004a974    	adrp	x20, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1157e3d4c: f9440680    	ldr	x0, [x20, #0x808]
+1157e3d50: 900490c8    	adrp	x8, 0x11e9fb000 <dyld_stub_binder+0x11e9fb000>
+1157e3d54: f9417d01    	ldr	x1, [x8, #0x2f8] ; attachBarBlur
+1157e3d58: 9459e1fb    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3d5c: aa1d03fd    	mov	x29, x29
+1157e3d60: 9459e226    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3d64: aa0003f7    	mov	x23, x0
+1157e3d68: b0048fa8    	adrp	x8, 0x11e9d8000 <dyld_stub_binder+0x11e9d8000>
+1157e3d6c: f9417501    	ldr	x1, [x8, #0x2e8] ; addBlurEffectWithColor:
+1157e3d70: aa1603e0    	mov	x0, x22
+1157e3d74: aa1703e2    	mov	x2, x23
+1157e3d78: 9459e1f3    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3d7c: aa1703e0    	mov	x0, x23
+1157e3d80: 9459e20f    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3d84: aa1603e0    	mov	x0, x22
+1157e3d88: 9459e20d    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3d8c: f9440680    	ldr	x0, [x20, #0x808]
+1157e3d90: b0048f48    	adrp	x8, 0x11e9cc000 <dyld_stub_binder+0x11e9cc000>
+1157e3d94: f9408501    	ldr	x1, [x8, #0x108] ; seperatorColor
+1157e3d98: 9459e1eb    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3d9c: aa1d03fd    	mov	x29, x29
+1157e3da0: 9459e216    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3da4: aa0003f6    	mov	x22, x0
+1157e3da8: b00490c8    	adrp	x8, 0x11e9fc000 <dyld_stub_binder+0x11e9fc000>
+1157e3dac: f941c501    	ldr	x1, [x8, #0x388] ; separatorView
+1157e3db0: aa1303e0    	mov	x0, x19
+1157e3db4: 9459e1e4    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3db8: aa1d03fd    	mov	x29, x29
+1157e3dbc: 9459e20f    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3dc0: aa0003f7    	mov	x23, x0
+1157e3dc4: aa1503e1    	mov	x1, x21
+1157e3dc8: aa1603e2    	mov	x2, x22
+1157e3dcc: 9459e1de    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3dd0: aa1703e0    	mov	x0, x23
+1157e3dd4: 9459e1fa    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3dd8: aa1603e0    	mov	x0, x22
+1157e3ddc: 9459e1f8    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3de0: b0049128    	adrp	x8, 0x11ea08000 <dyld_stub_binder+0x11ea08000>
+1157e3de4: f9404501    	ldr	x1, [x8, #0x88] ; tintColor
+1157e3de8: aa1b03e0    	mov	x0, x27
+1157e3dec: 9459e1d6    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3df0: aa1d03fd    	mov	x29, x29
+1157e3df4: 9459e201    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3df8: aa0003f5    	mov	x21, x0
+1157e3dfc: b004a648    	adrp	x8, 0x11ecac000 <dyld_stub_binder+0x11ecac000>
+1157e3e00: f945c101    	ldr	x1, [x8, #0xb80] ; setTintColor:
+1157e3e04: aa1303e0    	mov	x0, x19
+1157e3e08: aa1503e2    	mov	x2, x21
+1157e3e0c: 9459e1ce    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3e10: aa1503e0    	mov	x0, x21
+1157e3e14: 9459e1ea    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3e18: 9004a588    	adrp	x8, 0x11ec93000 <dyld_stub_binder+0x11ec93000>
+1157e3e1c: f943b101    	ldr	x1, [x8, #0x760] ; itemViewProvider
+1157e3e20: aa1b03e0    	mov	x0, x27
+1157e3e24: 9459e1c8    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3e28: aa1d03fd    	mov	x29, x29
+1157e3e2c: 9459e1f3    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3e30: aa0003f5    	mov	x21, x0
+1157e3e34: 9004a588    	adrp	x8, 0x11ec93000 <dyld_stub_binder+0x11ec93000>
+1157e3e38: f9421901    	ldr	x1, [x8, #0x430] ; setItemViewProvider:
+1157e3e3c: aa1303e0    	mov	x0, x19
+1157e3e40: aa1503e2    	mov	x2, x21
+1157e3e44: 9459e1c0    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3e48: aa1503e0    	mov	x0, x21
+1157e3e4c: 9459e1dc    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3e50: d0049268    	adrp	x8, 0x11ea31000 <dyld_stub_binder+0x11ea31000>
+1157e3e54: f941e901    	ldr	x1, [x8, #0x3d0] ; tabItems
+1157e3e58: aa1b03e0    	mov	x0, x27
+1157e3e5c: 9459e1ba    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3e60: aa1d03fd    	mov	x29, x29
+1157e3e64: 9459e1e5    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3e68: aa0003f5    	mov	x21, x0
+1157e3e6c: b0049268    	adrp	x8, 0x11ea30000 <dyld_stub_binder+0x11ea30000>
+1157e3e70: f9472d01    	ldr	x1, [x8, #0xe58] ; setTabItems:
+1157e3e74: aa1303e0    	mov	x0, x19
+1157e3e78: aa1503e2    	mov	x2, x21
+1157e3e7c: 9459e1b2    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3e80: aa1503e0    	mov	x0, x21
+1157e3e84: 9459e1ce    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3e88: f0048f68    	adrp	x8, 0x11e9d2000 <dyld_stub_binder+0x11e9d2000>
+1157e3e8c: f942b901    	ldr	x1, [x8, #0x570] ; selectedIndex
+1157e3e90: aa1b03e0    	mov	x0, x27
+1157e3e94: 9459e1ac    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3e98: aa0003e2    	mov	x2, x0
+1157e3e9c: f0048f68    	adrp	x8, 0x11e9d2000 <dyld_stub_binder+0x11e9d2000>
+1157e3ea0: f9433501    	ldr	x1, [x8, #0x668] ; setSelectedIndex:
+1157e3ea4: aa1303e0    	mov	x0, x19
+1157e3ea8: 9459e1a7    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3eac: 90049088    	adrp	x8, 0x11e9f3000 <dyld_stub_binder+0x11e9f3000>
+1157e3eb0: f947b515    	ldr	x21, [x8, #0xf68] ; itemViews
+1157e3eb4: aa1303e0    	mov	x0, x19
+1157e3eb8: aa1503e1    	mov	x1, x21
+1157e3ebc: 9459e1a2    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3ec0: aa1d03fd    	mov	x29, x29
+1157e3ec4: 9459e1cd    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3ec8: aa0003f6    	mov	x22, x0
+1157e3ecc: f004a608    	adrp	x8, 0x11eca6000 <dyld_stub_binder+0x11eca6000>
+1157e3ed0: f9442917    	ldr	x23, [x8, #0x850] ; count
+1157e3ed4: aa1703e1    	mov	x1, x23
+1157e3ed8: 9459e19b    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3edc: aa0003f8    	mov	x24, x0
+1157e3ee0: aa1603e0    	mov	x0, x22
+1157e3ee4: 9459e1b6    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3ee8: aa1b03e0    	mov	x0, x27
+1157e3eec: aa1503e1    	mov	x1, x21
+1157e3ef0: 9459e195    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3ef4: aa1d03fd    	mov	x29, x29
+1157e3ef8: 9459e1c0    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3efc: aa0003f6    	mov	x22, x0
+1157e3f00: aa1703e1    	mov	x1, x23
+1157e3f04: 9459e190    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3f08: aa0003f7    	mov	x23, x0
+1157e3f0c: aa1603e0    	mov	x0, x22
+1157e3f10: 9459e1ab    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3f14: eb17031f    	cmp	x24, x23
+1157e3f18: 9a973318    	csel	x24, x24, x23, lo
+1157e3f1c: b4000658    	cbz	x24, 0x1157e3fe4 <_O266DecReleaseOutputPicture+0x36d4a78>
+1157e3f20: d2800016    	mov	x22, #0x0               ; =0
+1157e3f24: d004a628    	adrp	x8, 0x11eca9000 <dyld_stub_binder+0x11eca9000>
+1157e3f28: f9431117    	ldr	x23, [x8, #0x620] ; objectAtIndexedSubscript:
+1157e3f2c: 90049928    	adrp	x8, 0x11eb07000 <dyld_stub_binder+0x11eb07000>
+1157e3f30: f9428108    	ldr	x8, [x8, #0x500] ; copyTransitionVisualStateFromView:
+1157e3f34: f90007e8    	str	x8, [sp, #0x8]
+1157e3f38: aa1303e0    	mov	x0, x19
+1157e3f3c: aa1503e1    	mov	x1, x21
+1157e3f40: 9459e181    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3f44: aa1d03fd    	mov	x29, x29
+1157e3f48: 9459e1ac    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3f4c: aa0003f9    	mov	x25, x0
+1157e3f50: aa1703e1    	mov	x1, x23
+1157e3f54: aa1603e2    	mov	x2, x22
+1157e3f58: 9459e17b    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3f5c: aa1d03fd    	mov	x29, x29
+1157e3f60: 9459e1a6    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3f64: aa0003fa    	mov	x26, x0
+1157e3f68: aa1b03e0    	mov	x0, x27
+1157e3f6c: aa1503e1    	mov	x1, x21
+1157e3f70: 9459e175    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3f74: aa1d03fd    	mov	x29, x29
+1157e3f78: 9459e1a0    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3f7c: aa1303f4    	mov	x20, x19
+1157e3f80: aa1b03f3    	mov	x19, x27
+1157e3f84: aa0003fb    	mov	x27, x0
+1157e3f88: aa1703e1    	mov	x1, x23
+1157e3f8c: aa1603e2    	mov	x2, x22
+1157e3f90: 9459e16d    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3f94: aa1d03fd    	mov	x29, x29
+1157e3f98: 9459e198    	bl	0x116e5c5f8 <dyld_stub_binder+0x116e5c5f8>
+1157e3f9c: aa0003fc    	mov	x28, x0
+1157e3fa0: aa1a03e0    	mov	x0, x26
+1157e3fa4: f94007e1    	ldr	x1, [sp, #0x8]
+1157e3fa8: aa1c03e2    	mov	x2, x28
+1157e3fac: 9459e166    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3fb0: aa1c03e0    	mov	x0, x28
+1157e3fb4: 9459e182    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3fb8: aa1b03e0    	mov	x0, x27
+1157e3fbc: aa1303fb    	mov	x27, x19
+1157e3fc0: aa1403f3    	mov	x19, x20
+1157e3fc4: 9459e17e    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3fc8: aa1a03e0    	mov	x0, x26
+1157e3fcc: 9459e17c    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3fd0: aa1903e0    	mov	x0, x25
+1157e3fd4: 9459e17a    	bl	0x116e5c5bc <dyld_stub_binder+0x116e5c5bc>
+1157e3fd8: 910006d6    	add	x22, x22, #0x1
+1157e3fdc: eb16031f    	cmp	x24, x22
+1157e3fe0: 54fffac1    	b.ne	0x1157e3f38 <_O266DecReleaseOutputPicture+0x36d49cc>
+1157e3fe4: b004a648    	adrp	x8, 0x11ecac000 <dyld_stub_binder+0x11ecac000>
+1157e3fe8: f9469d01    	ldr	x1, [x8, #0xd38] ; setUserInteractionEnabled:
+1157e3fec: aa1303e0    	mov	x0, x19
+1157e3ff0: 52800002    	mov	w2, #0x0                ; =0
+1157e3ff4: 9459e154    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e3ff8: f004a628    	adrp	x8, 0x11ecaa000 <dyld_stub_binder+0x11ecaa000>
+1157e3ffc: f9466901    	ldr	x1, [x8, #0xcd0] ; setAccessibilityElementsHidden:
+1157e4000: aa1303e0    	mov	x0, x19
+1157e4004: 52800022    	mov	w2, #0x1                ; =1
+1157e4008: 9459e14f    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e400c: 9004a648    	adrp	x8, 0x11ecac000 <dyld_stub_binder+0x11ecac000>
+1157e4010: f9411101    	ldr	x1, [x8, #0x220] ; setNeedsLayout
+1157e4014: aa1303e0    	mov	x0, x19
+1157e4018: 9459e14b    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e401c: 9004a628    	adrp	x8, 0x11eca8000 <dyld_stub_binder+0x11eca8000>
+1157e4020: f9465d01    	ldr	x1, [x8, #0xcb8] ; layoutIfNeeded
+1157e4024: aa1303e0    	mov	x0, x19
+1157e4028: 9459e147    	bl	0x116e5c544 <dyld_stub_binder+0x116e5c544>
+1157e402c: aa1303e0    	mov	x0, x19
+1157e4030: a9467bfd    	ldp	x29, x30, [sp, #0x60]
+1157e4034: a9454ff4    	ldp	x20, x19, [sp, #0x50]
+1157e4038: a94457f6    	ldp	x22, x21, [sp, #0x40]
+1157e403c: a9435ff8    	ldp	x24, x23, [sp, #0x30]
+1157e4040: a94267fa    	ldp	x26, x25, [sp, #0x20]
+1157e4044: a9416ffc    	ldp	x28, x27, [sp, #0x10]
+1157e4048: 9101c3ff    	add	sp, sp, #0x70
+1157e404c: 1459e0f9    	b	0x116e5c430 <dyld_stub_binder+0x116e5c430>

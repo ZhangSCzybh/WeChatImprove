@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-// Minimal declarations verified against the local 8.0.78.34 method inventory.
+// Minimal declarations verified against the local 8.0.78.34 and 8.0.80 inventories.
 @interface MMTabbarItem : UITabBarItem
 @property(nonatomic) long long index;
 @end
@@ -20,6 +20,25 @@
 @property(nonatomic, weak) id customDelegate;
 - (void)relayoutTabBarItems;
 @end
+// 8.0.80 uses a UIView/UIControl based hierarchy and retains the legacy item
+// renderer inside MMMainTabBarItemView. Do not assume its UIKit compatibility
+// isKindOfClass: result means that MMTabBar's selectors are implemented.
+@interface WCTabBarView : UIView
+@property(nonatomic, copy) NSArray *items;
+@property(nonatomic, copy) NSArray *itemViews;
+@property(nonatomic, strong) UIView *backgroundContentView;
+@property(nonatomic, strong) UIView *separatorView;
+@property(nonatomic, weak) id visibilityDelegate;
+@end
+@interface WCTabBarItemView : UIControl
+@end
+@interface MMMainTabBarItemView : WCTabBarItemView
+@property(nonatomic, readonly) MMTabBarItemView *itemView;
+@property(nonatomic, readonly) MMTabbarItem *legacyItem;
+@end
+@interface WCTabBarController : UIViewController
+@property(nonatomic, readonly) WCTabBarView *tabBarView;
+@end
 @interface MMTabBarController : UITabBarController
 - (id)getTabBarBtnForIndex:(unsigned long long)index;
 - (void)onTabBarItemViewsRelayout;
@@ -34,6 +53,7 @@ void CSTabBarEndLayout(MMTabBar *bar);
 void CSTabBarBeginControllerLayout(MMTabBarController *controller);
 void CSTabBarEndControllerLayout(MMTabBarController *controller);
 void CSTabBarUpdate(MMTabBar *bar);
+MMTabBar *CSTabBarForController(MMTabBarController *controller);
 UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot);
 void CSTabBarBeginItemUpdate(MMTabBarItemView *item);
 void CSTabBarEndItemUpdate(MMTabBarItemView *item);

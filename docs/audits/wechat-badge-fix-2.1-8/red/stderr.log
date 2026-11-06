@@ -1,2 +1,0 @@
-EXPECTED RED: revealed must preserve native10, actual legacy decision=7, originalCalls=1, originalCount=7
-EXPECTED RED: same-boundary dirty must hold without numeric0, actual legacy decision=0, originalCalls=1, originalCount=0

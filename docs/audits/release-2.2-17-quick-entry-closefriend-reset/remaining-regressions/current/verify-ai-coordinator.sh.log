@@ -1,0 +1,2 @@
+BackgroundFallbackConfiguration: 92 checks passed: legacy compatibility, strict booleans, persisted toggles, portable restore and connection verification preservation
+AIReplyCoordinatorTests: 4588 checks passed: filtering, alias durability fences, bounded async admissions, LRU/TTL/global text budget, memory pressure, serialization, cancellation, expiry, safe failure details and one-shot timers

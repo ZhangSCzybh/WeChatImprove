@@ -1,0 +1,45 @@
+{
+  "baseline": "c52ccc80",
+  "methods": [
+    {
+      "section": "",
+      "marker": "static BOOL isRevokeEnabled",
+      "sha256": "db4aff1aac27ef8c6f851d7d60bf10c3d64895d8d6e28e45d51124473955fd60"
+    },
+    {
+      "section": "",
+      "marker": "static BOOL isSelfRevokeMessage",
+      "sha256": "2f9490a7fa5859e556619f13a620d04dec0c04dd3f6200dfee012a71fc90ccbd"
+    },
+    {
+      "section": "",
+      "marker": "static id revokeMsgWrapFromObject",
+      "sha256": "48fed2ce39b9eaf92d2583243046e10be04c8ee89741bbeadbf10f64f86c36bb"
+    },
+    {
+      "section": "",
+      "marker": "static NSString *revokeChatNameFromObject",
+      "sha256": "bc943768b9086629e66b250e245ad270a892b71c1bc74305caecceffa306a096"
+    },
+    {
+      "section": "%hook CMessageMgr",
+      "marker": "- (void)onRevokeMsg:",
+      "sha256": "0eb11133a4992155f8cb4bb2d6563c8bf610e48add17edd5bb6076efed2a4782"
+    },
+    {
+      "section": "%hook MessageRevokeMgr",
+      "marker": "- (void)onRevokeMsg:",
+      "sha256": "bfa607750484694193bfc9866774a04562cf35577c134df363e62578c5f1dfdf"
+    },
+    {
+      "section": "%hook MessageRevokeMgr",
+      "marker": "- (void)replaceRevokedMsg:",
+      "sha256": "04d8bba2ff892ac63f53cbf3897cdeb6b1eda573e42b774fd682d0a32b0fabc6"
+    },
+    {
+      "section": "%hook MessageRevokeMgr",
+      "marker": "- (void)deleteLocalProcessRevokeMsgWithToast:",
+      "sha256": "aff06884e6d1a8dc13836b97ad68979f75016af4931b6c522bc6aaad068f3ea4"
+    }
+  ]
+}

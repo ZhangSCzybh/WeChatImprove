@@ -1,4 +1,0 @@
-FAIL: switcher privacy lock keeps the list/header container visible (no title-only frame)
-FAIL: switcher privacy lock synchronously publishes safe rows before foreground
-Hidden native event publications: 0 / 20 events
-Group lifecycle: 76 checks, 2 failures

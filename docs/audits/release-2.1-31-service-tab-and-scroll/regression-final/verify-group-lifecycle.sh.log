@@ -1,3 +1,0 @@
-FAIL: continuous notifications flush at the maximum window instead of waiting for silence
-Hidden native event publications: 0 / 20 events
-Group lifecycle: 239 checks, 1 failures

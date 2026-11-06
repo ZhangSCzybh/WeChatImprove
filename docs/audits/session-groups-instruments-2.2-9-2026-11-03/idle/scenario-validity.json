@@ -1,0 +1,7 @@
+{
+  "scenario": "idle",
+  "eligible_for_final_comparison": false,
+  "reason": "Operator confirms activity during proposed idle window; must recapture.",
+  "operator_reply": "期间有操作，需要重采静置",
+  "confirmed_at": "2026-11-03T15:46:30.371851+08:00"
+}

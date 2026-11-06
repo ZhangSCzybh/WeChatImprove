@@ -1,5 +1,0 @@
-{
-  "buildRoot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-restore-compatibility-build-ujz1jtv7",
-  "strategy": "Reuse isolated 2.0-5 build cache; preserve earlier deb and archived dSYM packages; no make clean",
-  "previousSymbolsSHA256": "b7e8546e82ec00a58ae0712695e27f8b51fb5c7b60eb4df2208542260c6847b1"
-}

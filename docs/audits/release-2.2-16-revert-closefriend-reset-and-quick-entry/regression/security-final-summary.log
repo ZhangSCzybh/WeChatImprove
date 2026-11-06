@@ -1,0 +1,4 @@
+close-friend-ios 0 Close-friend iOS: arm64 + arm64e source objects compiled
+close-friend-runtime 0 CloseFriendRuntimeTests: 109 checks passed
+CloseFriendSchedulingTests: 9 checks passed
+CloseFriendBiometricTests: 99 checks passed

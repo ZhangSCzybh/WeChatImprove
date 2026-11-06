@@ -1,0 +1,45 @@
+{
+  "comparison": "Frozen uncommitted 2.2-17 and 2.2-18 source snapshots, not Git HEAD",
+  "navigation_and_style_files": [
+    {
+      "path": "Controllers/CSSettingsTableViewController.m",
+      "frozen_2_2_17_sha256": "78b4ae44fdbc8910c5fdf674d9a24bd926a39854fee865bfe7cca3201bdd7937",
+      "frozen_2_2_18_sha256": "78b4ae44fdbc8910c5fdf674d9a24bd926a39854fee865bfe7cca3201bdd7937",
+      "bytes_equal": true
+    },
+    {
+      "path": "Controllers/CSAIReplySettingsViewController.m",
+      "frozen_2_2_17_sha256": "6ba96063b229d4a7f766a3d3e63fb43091b0744a5fc896ae2b6d1710349e88c8",
+      "frozen_2_2_18_sha256": "6ba96063b229d4a7f766a3d3e63fb43091b0744a5fc896ae2b6d1710349e88c8",
+      "bytes_equal": true
+    },
+    {
+      "path": "Controllers/CSScheduledTaskSettingsViewController.m",
+      "frozen_2_2_17_sha256": "058b4c2f1b388b80666886a1501efac0006f08fe7126ea1f1580b09c7cb8f868",
+      "frozen_2_2_18_sha256": "058b4c2f1b388b80666886a1501efac0006f08fe7126ea1f1580b09c7cb8f868",
+      "bytes_equal": true
+    },
+    {
+      "path": "Controllers/CSNativeSettingsHost.m",
+      "frozen_2_2_17_sha256": "10ab09e564445c02a66ed2c0d538a4682adb5812f8518ff1ff252bea9d24adeb",
+      "frozen_2_2_18_sha256": "10ab09e564445c02a66ed2c0d538a4682adb5812f8518ff1ff252bea9d24adeb",
+      "bytes_equal": true
+    },
+    {
+      "path": "Controllers/CSTabBarNativeAdapter.m",
+      "frozen_2_2_17_sha256": "dbf182b1cbe3911b20d6ba0c99bb615de2fe9d0b69f534065428e3eca12b39f4",
+      "frozen_2_2_18_sha256": "dbf182b1cbe3911b20d6ba0c99bb615de2fe9d0b69f534065428e3eca12b39f4",
+      "bytes_equal": true
+    },
+    {
+      "path": "Hooks/TabBarStyleHooks.xm",
+      "frozen_2_2_17_sha256": "f80aa3b2877b4735901bf38320339dbff692d503c64de0e6f6579bb2df666add",
+      "frozen_2_2_18_sha256": "f80aa3b2877b4735901bf38320339dbff692d503c64de0e6f6579bb2df666add",
+      "bytes_equal": true
+    }
+  ],
+  "custom_2_2_18_diff": "2.2-18-custom-actual-diff.patch",
+  "observation": "The six navigation/style sources are byte-identical; Custom only added estimatedSectionHeaderHeight=0 and comments. Neither snapshot declares the missing plugin-page hidesBottomBarWhenPushed policy.",
+  "conclusion": "The missing navigation intent was already present in the frozen 2.2-17 source. The 2.2-18 source change did not introduce this policy gap.",
+  "limits": "No 2.2-17 device capture or runtime comparison is available. This is source attribution only, not proof of the first affected release, nor a claim that the device symptom was reproduced on 2.2-17."
+}

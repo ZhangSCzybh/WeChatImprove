@@ -1,0 +1,18 @@
+--- 2.2-18/Controllers/CSAIReplySettingsViewController.m
++++ 2.2-19/Controllers/CSAIReplySettingsViewController.m
+@@ -140,6 +140,7 @@
+ @property NSString *originalConnection;
+ @end
+ @implementation CSAIConnectionEditor
++- (BOOL)hidesBottomBarWhenPushed { return YES; }
+ - (UITextField *)field:(NSString *)label value:(NSString *)value secure:(BOOL)secure stack:(UIStackView *)stack{
+     UILabel *title=[UILabel new];title.text=label;title.font=[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];title.textColor=UIColor.secondaryLabelColor;[stack addArrangedSubview:title];
+     UITextField *field=[UITextField new];field.text=value;field.borderStyle=UITextBorderStyleRoundedRect;field.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody];field.adjustsFontForContentSizeCategory=YES;field.autocapitalizationType=UITextAutocapitalizationTypeNone;field.autocorrectionType=UITextAutocorrectionTypeNo;field.secureTextEntry=secure;field.accessibilityLabel=label;field.clearButtonMode=UITextFieldViewModeWhileEditing;[field.heightAnchor constraintGreaterThanOrEqualToConstant:44].active=YES;[stack addArrangedSubview:field];return field;
+@@ -184,6 +185,7 @@
+ @property UITextView *promptView;
+ @end
+ @implementation CSAIPresetEditor
++- (BOOL)hidesBottomBarWhenPushed { return YES; }
+ - (void)viewDidLoad{
+     [super viewDidLoad];self.title=self.original?@"编辑预设":@"新增预设";self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
+     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc]initWithTitle:@"保存" style:UIBarButtonItemStyleDone target:self action:@selector(save)];

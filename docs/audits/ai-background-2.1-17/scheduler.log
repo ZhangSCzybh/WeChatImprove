@@ -1,2 +1,0 @@
-AI background sync scheduler: 78 checks passed; 45-second one-shot deadlines, verified coverage, revocation, cooldown, stale/early timers, reentry, failed attempts, finite time and release
-AI background sync iOS: arm64 + arm64e source objects compiled

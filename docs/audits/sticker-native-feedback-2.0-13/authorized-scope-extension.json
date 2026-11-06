@@ -1,5 +1,0 @@
-{
-  "Controllers/CSScheduledTaskStore.m": "User added scheduled-task backup/restore integration after the initial UI-only scope.",
-  "Controllers/CSScheduledTaskManager.m": "Reuse the same account file URL resolver for scheduling and backup.",
-  "Controllers/CSScheduledTaskSettingsViewController.m": "Explain that scheduled task configuration is backed up and restores paused."
-}

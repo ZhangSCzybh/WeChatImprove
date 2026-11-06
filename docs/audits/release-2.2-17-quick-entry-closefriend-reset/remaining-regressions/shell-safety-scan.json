@@ -1,0 +1,1246 @@
+{
+  "scripts": [
+    {
+      "name": "verify-ai-background-sync.sh",
+      "sha256": "b2d551c7261911d2fa9aecc3de2056c0a4661d4d393fb882302d31b16b6d9ca4",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\ntest_dir=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-ai-background-sync.XXXXXX\")\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \\\n -IControllers -framework Foundation Controllers/CSAIBackgroundSync.m Tests/AIBackgroundSyncTests.m -o \"$test_dir/tests\"\ntest_output=$(\"$test_dir/tests\")\nprintf '%s\\n' \"$test_output\"\nif [[ \"$test_output\" != 'AI background sync scheduler: 115 checks passed;'* ]]; then\n printf 'Unexpected AI background sync check count (expected 115).\\n' >&2\n exit 1\nfi\nif [[ \"${1:-}\" == \"--ios\" ]]; then\n sdk_dir=$(xcrun --sdk iphoneos --show-sdk-path)\n for arch in arm64 arm64e; do\n  xcrun --sdk iphoneos clang -target \"$arch-apple-ios15.0\" -isysroot \"$sdk_dir\" \\\n   -fobjc-arc -fblocks -Wall -Wextra -Werror -IControllers \\\n   -c Controllers/CSAIBackgroundSync.m -o \"$test_dir/scheduler.$arch.o\"\n done\n printf 'AI background sync iOS: arm64 + arm64e source objects compiled\\n'\nfi\n"
+    },
+    {
+      "name": "verify-ai-backup.sh",
+      "sha256": "6d9a56ebf65de9f4b1fcba15feceeab0604cb03f11b26e6859ce7f44f5d6ce55",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 16,
+          "text": "Path(sys.argv[1],'AIBackupManagerBoundary.h').write_text('\\n'.join(methods))"
+        },
+        {
+          "line": 24,
+          "text": "\"$test_dir/tests\" \"$test_dir/Library/Preferences/WeChatImprove\""
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\ntest_dir=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-ai-backup.XXXXXX\")\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\nsource=Path('Controllers/CSBackupManager.m').read_text()\nmethods=[]\nfor selector in ('- (void)preview:', '- (void)prepare:'):\n    start=source.index(selector);opening=source.index('{',start);depth=1;end=opening+1\n    while depth:\n        depth+=(source[end]=='{')-(source[end]=='}');end+=1\n    methods.append(source[start:end])\nPath(sys.argv[1],'AIBackupManagerBoundary.h').write_text('\\n'.join(methods))\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations \\\n  -IControllers -I\"$test_dir\" -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics \\\n  Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m \\\n  Controllers/CSPluginStorage.m Controllers/CSBackupStore.m Controllers/CSManagedImageFile.m \\\n  Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m \\\n  Tests/AIReplyBackupTests.m -o \"$test_dir/tests\"\n\"$test_dir/tests\" \"$test_dir/Library/Preferences/WeChatImprove\"\n"
+    },
+    {
+      "name": "verify-ai-coordinator.sh",
+      "sha256": "a526c113e58d1bb2e18d9ee4339406bd665b068441d73ead910caae927ff141a",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers -framework Foundation Controllers/CSAIReplyStore.m Controllers/CSAIReplyCoordinator.m Tests/AIReplyCoordinatorTests.m -o \"$work/coordinator-tests\"\n\"$work/coordinator-tests\"\n"
+    },
+    {
+      "name": "verify-ai-credentials.sh",
+      "sha256": "67b50a8e296559a87240f6443603cfec731b13e54566f34e616399862a84be7f",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 9,
+          "text": "source='#import <Foundation/Foundation.h>\\n#import <Security/Security.h>\\nOSStatus CSAITestCopyMatching(CFDictionaryRef,CFTypeRef *);\\n#define SecItemCopyMatching CSAITestCopyMatching\\n#include \"'+str(Path('Controllers/CSAICredentialStore.m').resolve())+'\"\\n'"
+        },
+        {
+          "line": 10,
+          "text": "Path(sys.argv[1],'CredentialStoreUnderTest.m').write_text(source)"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\ntest_dir=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-ai-credentials.XXXXXX\")\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\nsource='#import <Foundation/Foundation.h>\\n#import <Security/Security.h>\\nOSStatus CSAITestCopyMatching(CFDictionaryRef,CFTypeRef *);\\n#define SecItemCopyMatching CSAITestCopyMatching\\n#include \"'+str(Path('Controllers/CSAICredentialStore.m').resolve())+'\"\\n'\nPath(sys.argv[1],'CredentialStoreUnderTest.m').write_text(source)\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -IControllers \\\n -framework Foundation -framework Security \"$test_dir/CredentialStoreUnderTest.m\" Tests/AICredentialStoreTests.m -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-ai-foundation.sh",
+      "sha256": "03e5e296668f05aa09ff5c8233152ee7dac25e6cd26c9c60372125f1a06ed976",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\nflags=(-fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers -framework Foundation -framework Security)\nxcrun --sdk macosx clang \"${flags[@]}\" Controllers/CSAIReplyStore.m Tests/AIReplyStoreTests.m -o \"$work/store-tests\"\n\"$work/store-tests\"\nxcrun --sdk macosx clang \"${flags[@]}\" Controllers/CSAIReplyStore.m Controllers/CSAIClient.m Controllers/CSAICredentialStore.m Tests/AIClientTests.m -o \"$work/client-tests\"\n\"$work/client-tests\"\n"
+    },
+    {
+      "name": "verify-ai-images.sh",
+      "sha256": "9377eda1c3c1a068ed1aee07edc1bf535c139cb4c6609d677036c69a967f9077",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-ai-images.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \\\n  -framework Foundation -framework ImageIO -framework CoreGraphics -lz \\\n  -I\"$project_dir/Controllers\" \\\n  \"$project_dir/Controllers/CSMessageActionContext.m\" \\\n  \"$project_dir/Controllers/CSMessageNativeActionAdapter.m\" \\\n  \"$project_dir/Controllers/CSAIImagePreparer.m\" \\\n  \"$project_dir/Tests/AIImagePreparerTests.m\" -o \"$test_dir/ai-images\"\n\"$test_dir/ai-images\" \"$test_dir\"\n"
+    },
+    {
+      "name": "verify-ai-manager.sh",
+      "sha256": "e2a0e87981a9faecbdd39c9d2afc80946f821f9dc6164d8be9aa8502ef090663",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 10,
+          "text": "Path(sys.argv[1],'AINativeDispatchUnderTest.m').write_text(source)"
+        },
+        {
+          "line": 11,
+          "text": "Path(sys.argv[1],'AIPreparedSendUnderTest.m').write_text(Path('Controllers/CSMessageSendAdapter.m').read_text().split('@interface CSMessageSendAdapter ()',1)[0])"
+        },
+        {
+          "line": 14,
+          "text": "Path(sys.argv[1],'AIHooksUnderTest.m').write_text(hooks)"
+        },
+        {
+          "line": 15,
+          "text": "Path(sys.argv[1],'substrate.h').write_text('#import <objc/runtime.h>\\nvoid MSHookMessageEx(Class, SEL, IMP, IMP *);\\n')"
+        },
+        {
+          "line": 17,
+          "text": "Path(sys.argv[1],'AIStoreUnderTest.m').write_text(store)"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\ntest_dir=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-ai-manager.XXXXXX\")\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$test_dir\" <<'PY'\nimport sys\nfrom pathlib import Path\nsource=Path('Controllers/CSMessageNativeActionAdapter.m').read_text().split('@interface NSObject (CSNativeAppPath)',1)[0]\nPath(sys.argv[1],'AINativeDispatchUnderTest.m').write_text(source)\nPath(sys.argv[1],'AIPreparedSendUnderTest.m').write_text(Path('Controllers/CSMessageSendAdapter.m').read_text().split('@interface CSMessageSendAdapter ()',1)[0])\nhooks=Path('Hooks/AIReplyHooks.xm').read_text().replace('../Controllers/','').replace('%ctor {','static void CSAITestInstallHooks(void) {')\nhooks=hooks.replace('dispatch_async(', 'CSAITestHookDispatch(')\nPath(sys.argv[1],'AIHooksUnderTest.m').write_text(hooks)\nPath(sys.argv[1],'substrate.h').write_text('#import <objc/runtime.h>\\nvoid MSHookMessageEx(Class, SEL, IMP, IMP *);\\n')\nstore='#import <Foundation/Foundation.h>\\n#include <unistd.h>\\nint CSAITestFsync(int);\\n#define fsync(...) CSAITestFsync(__VA_ARGS__)\\n#include \"'+str(Path('Controllers/CSAIReplyStore.m').resolve())+'\"\\n'\nPath(sys.argv[1],'AIStoreUnderTest.m').write_text(store)\n\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -Wno-incomplete-implementation \\\n -ITests/AIDetailUIKit -IControllers -I\"$test_dir\" -framework Foundation -framework ImageIO -framework CoreGraphics \\\n \"$test_dir/AIStoreUnderTest.m\" Controllers/CSAIClient.m Controllers/CSAIReplyCoordinator.m Controllers/CSAIMessageAdapter.m Controllers/CSAIBackgroundSync.m \\\n Controllers/CSAIImagePreparer.m Controllers/CSAIReplyManager.m Controllers/CSBackupMutation.m Controllers/CSCloseFriendPolicy.m \\\n Controllers/CSCloseFriendAutomationProjection.m Tests/AIReplyManagerTests.m -o \"$test_dir/tests\"\ntest_output=$(\"$test_dir/tests\" \"$test_dir/state.plist\")\nprintf '%s\\n' \"$test_output\"\nif [[ \"$test_output\" != 'AI reply manager: 863 checks passed' ]]; then\n printf 'Unexpected AI reply manager check count (expected 863).\\n' >&2\n exit 1\nfi\nif [[ \"${1:-}\" == \"--ios\" ]]; then\n sdk_dir=$(xcrun --sdk iphoneos --show-sdk-path)\n for arch in arm64 arm64e; do\n  xcrun --sdk iphoneos clang -target \"$arch-apple-ios15.0\" -isysroot \"$sdk_dir\" \\\n   -fobjc-arc -fblocks -Wall -Wextra -Werror -IControllers \\\n   -c Controllers/CSAIReplyManager.m -o \"$test_dir/manager.$arch.o\"\n done\n printf 'AI reply manager iOS: arm64 + arm64e source objects compiled\\n'\nfi\n"
+    },
+    {
+      "name": "verify-ai-native-sync-observer.sh",
+      "sha256": "8f78ada50875b4eb8a83a96e984e9dd9efd9f46335da931c06fef4d239e6f517",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 11,
+          "text": "(target/'AINativeDispatchUnderTest.m').write_text(source)"
+        },
+        {
+          "line": 12,
+          "text": "(target/'substrate.h').write_text('#import <objc/runtime.h>\\nvoid MSHookMessageEx(Class, SEL, IMP, IMP *);\\n')"
+        },
+        {
+          "line": 15,
+          "text": "(target/'ObserverManagerAPIs.h').write_text('#import \"CSAIReplyManager.h\"\\n@interface CSAIReplyManager (ObserverFixturePrefix)\\n- (id _Nullable)captureBackgroundSyncContextForEpoch:(NSUInteger)epoch;\\n- (void)nativeFullSyncCompletedWithContext:(id _Nonnull)context;\\n@end\\n')"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\ntest_dir=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-ai-native-sync-observer.XXXXXX\")\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$test_dir\" <<'PY'\nimport sys\nfrom pathlib import Path\ntarget=Path(sys.argv[1])\nsource=Path('Controllers/CSMessageNativeActionAdapter.m').read_text().split('@interface NSObject (CSNativeAppPath)',1)[0]\n(target/'AINativeDispatchUnderTest.m').write_text(source)\n(target/'substrate.h').write_text('#import <objc/runtime.h>\\nvoid MSHookMessageEx(Class, SEL, IMP, IMP *);\\n')\n# The manager integration may be edited concurrently; this fixture supplies only\n# the two observer-facing declarations and stubs their implementation itself.\n(target/'ObserverManagerAPIs.h').write_text('#import \"CSAIReplyManager.h\"\\n@interface CSAIReplyManager (ObserverFixturePrefix)\\n- (id _Nullable)captureBackgroundSyncContextForEpoch:(NSUInteger)epoch;\\n- (void)nativeFullSyncCompletedWithContext:(id _Nonnull)context;\\n@end\\n')\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \\\n -Wno-incomplete-implementation -IControllers -I\"$test_dir\" \\\n -include \"$test_dir/ObserverManagerAPIs.h\" -framework Foundation \\\n \"$test_dir/AINativeDispatchUnderTest.m\" Controllers/CSAINativeSyncObserver.m Tests/AINativeSyncObserverTests.m \\\n -o \"$test_dir/tests\"\n\"$test_dir/tests\"\nfor mode in create-return-c create-argument-Q create-argument-count return-result-B return-event-Q handle-result-B handle-processed-c; do\n \"$test_dir/tests\" \"$mode\"\ndone\nif [[ \"${1:-}\" == \"--ios\" ]]; then\n sdk_dir=$(xcrun --sdk iphoneos --show-sdk-path)\n for arch in arm64 arm64e; do\n  xcrun --sdk iphoneos clang -target \"$arch-apple-ios15.0\" -isysroot \"$sdk_dir\" \\\n   -fobjc-arc -fblocks -Wall -Wextra -Werror -IControllers -I\"$test_dir\" \\\n   -include \"$test_dir/ObserverManagerAPIs.h\" -c Controllers/CSAINativeSyncObserver.m -o \"$test_dir/observer.$arch.o\"\n done\n printf 'AI native sync observer iOS: arm64 + arm64e source objects compiled\\n'\nfi\n"
+    },
+    {
+      "name": "verify-ai-native.sh",
+      "sha256": "46463cc445d004b4ab9962cacccef8ff10d8851faf5a99ada4facd97149bcd53",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 10,
+          "text": "Path(sys.argv[1],'AINativeDispatchUnderTest.m').write_text(source)"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\ntest_dir=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-ai-native.XXXXXX\")\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$test_dir\" <<'PY'\nimport sys\nfrom pathlib import Path\nsource=Path('Controllers/CSMessageNativeActionAdapter.m').read_text().split('@interface NSObject (CSNativeAppPath)',1)[0]\nPath(sys.argv[1],'AINativeDispatchUnderTest.m').write_text(source)\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations \\\n -ITests/AIDetailUIKit -IControllers -I\"$test_dir\" -framework Foundation \\\n Controllers/CSAIReplyStore.m Controllers/CSAIMessageAdapter.m Controllers/CSAIChatDetailAdapter.m Tests/AIReplyNativeTests.m -o \"$test_dir/tests\"\n\"$test_dir/tests\" \"$test_dir/state.plist\"\n"
+    },
+    {
+      "name": "verify-ai-store-async.sh",
+      "sha256": "199b8296fc56a39953e8829371f4ab5c57c96bbabc1328be5af4f130ef8be2fd",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 9,
+          "text": "Path(sys.argv[1],'AIStoreUnderTest.m').write_text('#import <Foundation/Foundation.h>\\n#include <unistd.h>\\nint CSAIAsyncFsync(int);\\n#define fsync(...) CSAIAsyncFsync(__VA_ARGS__)\\n#include \"'+str(Path('Controllers/CSAIReplyStore.m').resolve())+'\"\\n')"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\ntest_dir=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-ai-store-async.XXXXXX\")\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\nPath(sys.argv[1],'AIStoreUnderTest.m').write_text('#import <Foundation/Foundation.h>\\n#include <unistd.h>\\nint CSAIAsyncFsync(int);\\n#define fsync(...) CSAIAsyncFsync(__VA_ARGS__)\\n#include \"'+str(Path('Controllers/CSAIReplyStore.m').resolve())+'\"\\n')\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations \\\n -DCSAI_STORE_TRACK_MUTATIONS=1 -IControllers -framework Foundation \\\n \"$test_dir/AIStoreUnderTest.m\" Controllers/CSBackupMutation.m Tests/AIReplyStoreAsyncTests.m -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-authorization-prompt.sh",
+      "sha256": "e740b6db731f25b2f1c495b0978053520fa08dffcf6cd0274e9a67f88eecd7a6",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 27,
+          "text": "(out / 'AuthorizationManagerPromptUnderTest.h').write_text(extract(manager, '- (void)requestAuthorizationWithPresentingViewController:'))"
+        },
+        {
+          "line": 28,
+          "text": "(out / 'AuthorizationSettingsUnderTest.h').write_text('\\n'.join(extract(settings, signature) for signature in ("
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\ntest_dir=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-authorization-prompt.XXXXXX\")\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\n\nout = Path(sys.argv[1])\ndef extract(source, signature):\n    start = source.index(signature)\n    opening = source.index('{', start)\n    depth, pos = 1, opening + 1\n    while depth:\n        depth += (source[pos] == '{') - (source[pos] == '}')\n        pos += 1\n    return source[start:pos]\n\nmanager = Path('Controllers/CSAuthorizationManager.m').read_text()\nsettings = Path('Controllers/CSCustomViewController.m').read_text()\nentry = Path('Hooks/CustomEntryHooks.xm').read_text()\nfor signature in ('- (void)onCustomEntryClick {', '- (void)onCustomEntryClickInSetting:'):\n    method = extract(entry, signature)\n    assert 'requestAuthorizationWithPresentingViewController:' in method, 'Entry must use shared native authorization prompt'\n    assert 'UIAlertController' not in method, 'Entry must not create a separate authorization prompt'\n(out / 'AuthorizationManagerPromptUnderTest.h').write_text(extract(manager, '- (void)requestAuthorizationWithPresentingViewController:'))\n(out / 'AuthorizationSettingsUnderTest.h').write_text('\\n'.join(extract(settings, signature) for signature in (\n    '- (void)returnFromUnauthorizedSettings', '- (void)viewDidAppear:', '- (void)viewDidDisappear:')))\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \\\n    -framework Foundation -I\"$test_dir\" Tests/AuthorizationPromptTests.m -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-authorization-read.sh",
+      "sha256": "942f66479254c175b4069f77d0ef43e2910f543660ef0c3fe03d5f9ca8a3422a",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 13,
+          "text": "Path(sys.argv[1], 'AuthorizationReadUnderTest.m').write_text(prefix + '\\n@end\\n')"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\ntest_dir=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-authorization-read.XXXXXX\")\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$test_dir\" <<'PY'\nimport sys\nfrom pathlib import Path\n\nsource = Path('Controllers/CSAuthorizationManager.m').read_text()\nprefix, marker, _ = source.partition('- (void)requestAuthorizationWithPresentingViewController:')\nassert marker, 'Authorization implementation boundary changed; update the test extraction.'\nPath(sys.argv[1], 'AuthorizationReadUnderTest.m').write_text(prefix + '\\n@end\\n')\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-incomplete-implementation \\\n    -ITests/AIDetailUIKit -IControllers -I\"$test_dir\" -framework Foundation \\\n    Tests/AuthorizationReadTests.m -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-avatar-input-style.sh",
+      "sha256": "aca3721de56234bbf9beb354661612e732899eb26741f786c72befb0db8d1077",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 36,
+          "text": "(out/'StyleHooksUnderTest.h').write_text('\\n'.join(result))"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-avatar-input.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys,re\nroot,out=map(Path,sys.argv[1:])\ns=(root/'Hooks/InputTextHooks.xm').read_text()\nresult=[]\nfor name,parent in [('BaseMsgContentViewController','UIViewController'),('MMGrowTextView','TestNativeInput'),('MMInputToolView','TestNativeTool')]:\n    body=s.split('%hook '+name+'\\n')[1].split('%end')[0]\n    if name=='BaseMsgContentViewController':\n        for sel in ['viewWillAppear','viewWillDisappear']:\n            body=re.sub(r'(- \\(void\\)'+sel+r':[^\\n]+)',lambda m:m.group().replace('%orig;',f'[super {sel}:animated];'),body)\n    elif name=='MMGrowTextView':\n        replacements=['[super layoutSubviews];','[super didMoveToWindow];','[super didMoveToSuperview];','[super traitCollectionDidChange:previous];',\n          '[super setPlaceHolder:text];','[super setAttributePlaceholder:text];','[super setPlaceHolderColor:color];','[super setPlaceHolderMultiLine:multiline];',\n          '[super setPlaceholder:text animated:animated];','[super setAttributedPlaceholder:text animated:animated];']\n        for r in replacements: body=body.replace('%orig;',r,1)\n    else:\n        for r in ['[super layoutSubviews];','[super updateToolViewHeight:animated];','[super onWillAppear];','[super onViewDidInit];']:body=body.replace('%orig;',r,1)\n    assert '%' not in body\n    result.append('@interface '+name+' : '+parent+' @end\\n@implementation '+name+'\\n'+body+'\\n@end\\n')\ns=(root/'Hooks/CSAvatarShape.xm').read_text()\nfor name in ['MMHeadImageView','FakeHeadImageView']:\n    body=s.split('%hook '+name+'\\n')[1].split('%end')[0]\n    body=body[body.index('- (void)didMoveToWindow'):body.index('// Hook conerSize')]\n    for r in ['[super didMoveToWindow];','[super didMoveToSuperview];','[super setHidden:hidden];','[super setAlpha:alpha];','[super setTag:tag];']:body=body.replace('%orig;',r,1)\n    assert '%' not in body\n    result.append('@interface '+name+' : UIView @end\\n@implementation '+name+'\\n'+body+'\\n@end\\n')\nbody=s.split('%hook MoreViewController\\n')[1].split('%end')[0]\nfor r in ['[super viewDidAppear:animated];','[super viewWillDisappear:animated];','[super viewDidLayoutSubviews];']:body=body.replace('%orig;',r,1)\nresult.append('@interface MoreViewController : UIViewController @end\\n@implementation MoreViewController\\n'+body+'\\n@end\\n')\n(out/'StyleHooksUnderTest.h').write_text('\\n'.join(result))\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \\\n  -Wno-unused-parameter -framework Foundation -framework CoreGraphics -framework QuartzCore \\\n  -I\"$project_dir/Tests/StyleUIKit\" -I\"$project_dir/Controllers\" -I\"$test_dir\" \\\n  \"$project_dir/Tests/TabBarUIKit/TabBarUIKit.m\" \"$project_dir/Tests/StyleUIKit/StyleUIKit.m\" \\\n  \"$project_dir/Controllers/CSAvatarRotation.m\" \"$project_dir/Controllers/CSInputTextStyle.m\" \\\n  \"$project_dir/Tests/AvatarInputStyleTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-background-blur.sh",
+      "sha256": "f69ac6ec5dd6b4a99d67a1a76ad4cdd9d7187c18aa483f45bf4f7b4183a8f5ad",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-background-blur.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \\\n    -framework Foundation -framework CoreGraphics -framework QuartzCore \\\n    -I\"$project_dir/Tests/BackgroundBlurUIKit\" -I\"$project_dir/Controllers\" \\\n    \"$project_dir/Tests/BackgroundBlurUIKit/BackgroundBlurUIKit.m\" \\\n    \"$project_dir/Controllers/CSBackgroundBlurManager.m\" \\\n    \"$project_dir/Tests/BackgroundBlurTests.m\" -o \"$test_dir/background-blur\"\n\"$test_dir/background-blur\"\n"
+    },
+    {
+      "name": "verify-background-privacy.sh",
+      "sha256": "48170c0da6793f63ed4a9d9d92df3b28e028f8691a0fbd373b8a3aa0b904daed",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$privacy_work\"' EXIT"
+        },
+        {
+          "line": 20,
+          "text": "Path(sys.argv[1],'BackgroundPrivacyUnderTest.h').write_text('\\n'.join(methods))"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nprivacy_work=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-background-privacy.XXXXXX\")\ntrap 'rm -rf \"$privacy_work\"' EXIT\npython3 - \"$privacy_work\" \"${1:-Controllers/CSCloseFriendManager.m}\" <<'PY'\nfrom pathlib import Path\nimport re,sys\nsource=Path(sys.argv[2]).read_text()\nmethods=[]\nfor name in ['windows','cover','uncover','schedulePolicyRefresh','flushPolicyRefresh','canLockForShake','handleShake','backgroundPrivacySettingsChanged:','start','lockAndReturnToSafePage','cancelBiometricAuthentication','resign:','suspend:','active:','accountChanged:']:\n match=re.search(r'^- \\([^)]+\\)'+re.escape(name)+r'(?=[ :(])',source,re.M)\n # The optional source argument reproduces the old lifecycle without the new observer.\n if not match and name in ['backgroundPrivacySettingsChanged:','flushPolicyRefresh']:continue\n start=match.start()\n opening=source.index('{',start);depth=1;pos=opening+1\n while depth:\n  depth+=(source[pos]=='{')-(source[pos]=='}');pos+=1\n methods.append(source[start:pos])\nPath(sys.argv[1],'BackgroundPrivacyUnderTest.h').write_text('\\n'.join(methods))\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \\\n -framework Foundation -framework CoreGraphics -framework QuartzCore \\\n -ITests/BackgroundBlurUIKit -IControllers -I\"$privacy_work\" \\\n Tests/BackgroundBlurUIKit/BackgroundBlurUIKit.m Controllers/CSBackgroundBlurManager.m \\\n Controllers/CSCloseFriendPolicy.m Tests/BackgroundPrivacyCoverTests.m -o \"$privacy_work/privacy\"\n\"$privacy_work/privacy\"\n"
+    },
+    {
+      "name": "verify-background-run-runtime.sh",
+      "sha256": "c3ec22f73d055fc58da75203667985ba15efc88a18c794b7ff3baa60e6ae5f9f",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-background-runtime.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \\\n    -I\"$project_dir/Tests/BackgroundRunRuntimeNative\" -I\"$project_dir/Controllers\" -framework Foundation \\\n    \"$project_dir/Tests/BackgroundRunRuntimeNative/BackgroundRunRuntimeNative.m\" \\\n    \"$project_dir/Controllers/CSBackgroundRunRuntime.m\" \"$project_dir/Tests/BackgroundRunRuntimeTests.m\" \\\n    -o \"$test_dir/background-runtime\"\n\"$test_dir/background-runtime\"\nif [[ \"${1:-}\" == \"--ios\" ]]; then\n    sdk_dir=\"$(xcrun --sdk iphoneos --show-sdk-path)\"\n    for arch in arm64 arm64e; do\n        xcrun --sdk iphoneos clang -target \"$arch-apple-ios15.0\" -isysroot \"$sdk_dir\" \\\n            -fobjc-arc -fblocks -Wall -Wextra -Werror -I\"$project_dir/Controllers\" \\\n            -c \"$project_dir/Controllers/CSBackgroundRunRuntime.m\" -o \"$test_dir/runtime.$arch.o\"\n    done\n    printf 'Background runtime iOS: arm64 + arm64e source objects compiled\\n'\nfi\n"
+    },
+    {
+      "name": "verify-background-run.sh",
+      "sha256": "f1da1513f50c7000c76177aeaba57269d8c039093b4cb26bca89594f5c3d2ee1",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 22,
+          "text": "(out/'BackgroundAudioHooksUnderTest.h').write_text(source)"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-background-run.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport re,sys\nroot,out=map(Path,sys.argv[1:])\nsource=(root/'Hooks/BackgroundRun.xm').read_text().split('%hook AVAudioSession',1)[1].split('%end',1)[0]\noriginals=[\n '[self setCategory:category withOptions:0 error:error]',\n '[self setCategory:category mode:self.mode options:options error:error]',\n '[self setCategory:category mode:mode routeSharingPolicy:0 options:options error:error]',\n '[self nativeCategory:category mode:mode policy:policy options:options error:error]',\n '[self nativeMode:mode error:error]',\n '[self setActive:active withOptions:0 error:error]',\n '[self nativeActive:active error:error]',\n]\nassert source.count('%orig')==len(originals)\nfor original in originals: source=source.replace('%orig',original,1)\n(out/'BackgroundAudioHooksUnderTest.h').write_text(source)\nmanager=(root/'Controllers/CSBackgroundRunManager.m').read_text()\nruntime=(root/'Controllers/CSBackgroundRunRuntime.m').read_text()\nproduction=manager+runtime+(root/'Controllers/CSBackgroundRunAudio.m').read_text()+(root/'Hooks/BackgroundRun.xm').read_text()\nfor forbidden in ('dispatch_source_create','dispatch_after','%hook AppDelegate','%hook SpringBoard','URLForResource:@\"blank\"'):\n assert forbidden not in production, forbidden\nassert 'NSTimer' not in manager and 'beginBackgroundTask' not in manager\nassert 'repeats:NO' in runtime and 'endBackgroundTask:' in runtime\nassert 'canAttemptBackgroundWork' in manager\nprint('Background run: one-shot runtime boundary, finite task cleanup, public lifecycle and in-memory audio contracts')\nPY\ncompile_background_test() {\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \\\n    -Wno-nullability-completeness -framework Foundation \\\n    -DAVAudioSession=CSTestAudioSession -DAVAudioPlayer=CSTestAudioPlayer \\\n    -I\"$project_dir/Tests/BackgroundRunNative\" -I\"$project_dir/Controllers\" -I\"$project_dir/Tests\" -I\"$test_dir\" \\\n    \"$project_dir/Tests/BackgroundRunNative/BackgroundRunNative.m\" \\\n    \"$project_dir/Controllers/CSBackgroundRunAudio.m\" \"$project_dir/Controllers/CSBackgroundRunManager.m\" \\\n    \"$project_dir/Controllers/CSBackgroundRunRuntime.m\" \"$project_dir/Tests/BackgroundRunFakeRuntime.m\" \\\n    \"$project_dir/Tests/$1.m\" -o \"$test_dir/$2\"\n}\ncompile_background_test BackgroundRunRecordTests background-records\n\"$test_dir/background-records\"\ncompile_background_test BackgroundRunHybridTests background-hybrid\n\"$test_dir/background-hybrid\"\ncompile_background_test BackgroundRunTests background-run\n\"$test_dir/background-run\" \"$test_dir/silence.wav\"\n/usr/bin/afinfo \"$test_dir/silence.wav\"\n"
+    },
+    {
+      "name": "verify-backup-assets.sh",
+      "sha256": "73ef7da1e07f217c66c29075e7980092a54da071ad1594c5f80e9ee93908c2b4",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-backup-assets.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics -I\"$project_dir/Controllers\" \"$project_dir/Controllers/CSBackupAssets.m\" \"$project_dir/Controllers/CSBackupCodec.m\" \"$project_dir/Controllers/CSScheduledTaskStore.m\" \"$project_dir/Controllers/CSAIReplyStore.m\" \"$project_dir/Controllers/CSBackupRegistry.m\" \"$project_dir/Tests/BackupAssetsTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-backup-audit.sh",
+      "sha256": "fed23287d19b44c4e2a6a8fb7bd01191b96293547de38be8bd2c02a723621ea8",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\n# These symbols have no place in the passive implementation; validate the compiled source boundary as well as runtime IMPs.\nif rg -n 'MSHook|method_setImplementation|method_exchangeImplementations|imp_implementationWithBlock|CSBackupInstallFileProtection|affectsBackup|moveFileToTmpTrash|moveFolderToTmpTrash' Controllers/CSBackupAudit.h Controllers/CSBackupAudit.m; then\n    echo 'Passive audit unexpectedly contains interception code' >&2\n    exit 1\nfi\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSBackupStore.m Controllers/CSPluginStorage.m Controllers/CSBackupAudit.m Tests/BackupAuditTests.m -o \"$work/tests\"\n\"$work/tests\"\n"
+    },
+    {
+      "name": "verify-backup-bootstrap.sh",
+      "sha256": "5111d56f71d282c77fdf2a45a5e2a3a3fc2d1e34d04bdd581e7a5467fa34ff78",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        },
+        {
+          "line": 13,
+          "text": "theos = pathlib.Path(os.environ.get('THEOS', '/Users/zhangshichao/theos'))"
+        },
+        {
+          "line": 35,
+          "text": "    output.write_text(generated)"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -IControllers -IHeaders -framework Foundation Controllers/CSPluginStorage.m Controllers/CSBackupBootstrap.m Tests/BackupBootstrapTests.m -o \"$work/tests\"\n\"$work/tests\"\n# Logos creates an implicit _logosLocalInit when a file has hooks but no explicit %init,\n# even when %ctor exists. Verify every generated feature install is in the barrier block.\npython3 - \"$work\" <<'PY'\nimport os, pathlib, re, subprocess, sys\nroot = pathlib.Path.cwd()\ntheos = pathlib.Path(os.environ.get('THEOS', '/Users/zhangshichao/theos'))\nlogos = theos / 'bin/logos.pl'\nif not logos.is_file():\n    raise SystemExit('Logos is required to verify actual hook initialization')\nsdk = subprocess.run(['xcrun', '--sdk', 'iphoneos', '--show-sdk-path'], capture_output=True, text=True)\nsyntax = ['xcrun', '--sdk', 'iphoneos', 'clang++', '-fsyntax-only', '-fobjc-arc', '-fblocks',\n          '-target', 'arm64-apple-ios15.0', '-isysroot', sdk.stdout.strip(),\n          '-I' + str(root / 'Headers'), '-I' + str(root / 'Hooks'), '-I' + str(root / 'Controllers'),\n          '-I' + str(theos / 'vendor/include'), '-F' + str(theos / 'vendor/lib'),\n          '-Wno-deprecated-declarations', '-Wno-nullability-completeness']\nfeatures = 0\n# These use independent encrypted state, outside the configuration backup registry.\n# Their native hooks are registered asynchronously, not through the settings-consumer gate.\nindependent = {'CloseFriendCallHooks.xm', 'CloseFriendCallReplyHooks.xm',\n               'CloseFriendContactHooks.xm', 'CloseFriendLifecycleHooks.xm',\n               'CloseFriendNotificationHooks.xm', 'CloseFriendProfileHooks.xm',\n               'CloseFriendSearchHooks.xm', 'CloseFriendSocialHooks.xm',\n               'CloseFriendUnreadPanelHooks.xm'}\nindependent_checked = 0\nfor path in sorted((root / 'Hooks').glob('*.xm')):\n    generated = subprocess.check_output([str(logos), str(path)], text=True)\n    output = pathlib.Path(sys.argv[1]) / (path.stem + '.mm')\n    output.write_text(generated)\n    if sdk.returncode == 0:\n        compiled = subprocess.run(syntax + [str(output)], capture_output=True, text=True)\n        assert compiled.returncode == 0, path.name + ': iOS syntax failed\\n' + compiled.stderr\n    assert '_logosLocalInit()' not in generated, f'{path.name}: implicit hook constructor bypasses barrier'\n    if path.name in ('CustomEntryHooks.xm', 'BackupLifecycleHooks.xm'):\n        assert 'CSBackupWhenReady(' not in generated, f'{path.name}: recovery infrastructure must stay available'\n        continue\n    features += 1\n    ctor = generated.index('static __attribute__((constructor))')\n    if path.name in independent:\n        assert 'dispatch_async(dispatch_get_main_queue(),' in generated[ctor:], f'{path.name}: native registration must be deferred'\n        adapter = generated\n        if path.name == 'CloseFriendSocialHooks.xm':\n            assert 'CSCFSocialInstall();' in generated[ctor:], 'social native adapter must be registered'\n            adapter += (root / 'Controllers/CSCloseFriendSocialAdapter.m').read_text()\n        assert 'CSCloseFriendInstallHook(' in adapter, f'{path.name}: missing independent native adapter'\n        independent_checked += 1\n        features -= 1\n        continue\n    callback = generated.index('CSBackupWhenReady(', ctor)\n    assert not re.search(r'\\b(?:MSHookMessageEx|MSHookFunction|class_addMethod)\\(', generated[ctor:callback]), f'{path.name}: hooks installed before readiness'\n    assert re.match(r'CSBackupWhenReady\\(\\s*\\^\\s*\\{', generated[callback:]), f'{path.name}: missing guarded init block'\nassert independent_checked == len(independent), 'independent native adapters must all be checked'\nprint(f'Backup bootstrap: Logos generated {features} gated feature files, {independent_checked} independent native adapters and 2 recovery files')\nif sdk.returncode == 0:\n    compiled = subprocess.run(syntax + ['-x', 'objective-c', str(root / 'Controllers/CSBackupBootstrap.m')], capture_output=True, text=True)\n    assert compiled.returncode == 0, 'CSBackupBootstrap.m: iOS syntax failed\\n' + compiled.stderr\n    print('Backup bootstrap: all generated hooks and bootstrap passed iOS arm64 syntax compilation')\nelse:\n    print('Backup bootstrap: iOS SDK unavailable; target syntax compilation was skipped')\nPY\n# Objective-C++ hook callers and Objective-C implementation must share C symbol linkage.\ncat > \"$work/linkage.mm\" <<'EOF'\n#import \"CSBackupBootstrap.h\"\nNSUInteger CSBackupLinkageCheck(void) { return CSBackupAccountEpoch(); }\nEOF\nxcrun --sdk macosx clang++ -fobjc-arc -fblocks -IControllers -c \"$work/linkage.mm\" -o \"$work/linkage.o\"\nnm -u \"$work/linkage.o\" | rg -q '^_CSBackupAccountEpoch$'\necho 'Backup bootstrap: Objective-C++ C linkage verified'\n"
+    },
+    {
+      "name": "verify-backup-codec.sh",
+      "sha256": "0223f99b525e298e8c3a2096b5ffdec6f190b9e9bd8b6254bf5ba626c159bb45",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-backup-codec.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nsources=(\"$project_dir/Controllers/CSBackupCodec.m\" \"$project_dir/Controllers/CSBackupAssets.m\")\nsources+=(\"$project_dir/Controllers/CSScheduledTaskStore.m\" \"$project_dir/Controllers/CSAIReplyStore.m\")\nif [[ -f \"$project_dir/Controllers/CSBackupRegistry.m\" ]]; then sources+=(\"$project_dir/Controllers/CSBackupRegistry.m\"); fi\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics -I\"$project_dir/Controllers\" \"${sources[@]}\" \"$project_dir/Tests/BackupCodecTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-backup-compatibility.sh",
+      "sha256": "f2efc3813e44bde92e3ee8cebc229e077dc79d4816ff576e678e26e16e8b7ff1",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\nengine_source=\"${CS_COMPAT_ENGINE_SOURCE:-Controllers/CSBackupEngine.m}\"\ntest_source=\"${CS_COMPAT_TEST_SOURCE:-Tests/BackupCompatibilityTests.m}\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers \\\n -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics \\\n Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSPluginStorage.m Controllers/CSBackupStore.m \\\n Controllers/CSBackupAudit.m Controllers/CSManagedImageFile.m \"$engine_source\" Controllers/CSBackupMutation.m \\\n \"$test_source\" -o \"$work/tests\"\n\"$work/tests\" \"$@\"\n"
+    },
+    {
+      "name": "verify-backup-deletion-ui.sh",
+      "sha256": "100a12679c3a57e7ef421e8b7f21f4f534340d34e18d7c13d5233ff53db66184",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "# backup engine, real backup files, defaults or UIKit is loaded. The manager's"
+        },
+        {
+          "line": 43,
+          "text": "    (work / 'BackupDeletionUIUnderTest.h').write_text('\\n'.join(methods) + '\\n')"
+        },
+        {
+          "line": 44,
+          "text": "    (work / 'BackupDeletionManagerUnderTest.h').write_text(manager_method + '\\n')"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\n# Compile the real UI method bodies against in-memory Foundation doubles. No\n# backup engine, real backup files, defaults or UIKit is loaded. The manager's\n# real remove method connects the controller to a recording Store double.\npython3 - <<'PY'\nfrom pathlib import Path\nimport re\nimport subprocess\nimport tempfile\n\nsource = Path('Controllers/CSBackupSettingsViewController.m').read_text()\nsource = source.split('@implementation CSBackupSettingsViewController', 1)[1]\nmethods = []\nfor name in ('openRecord:', 'showUnavailableRecord:', 'showRecord:', 'deleteRecord:', 'retryRestore'):\n    match = re.search(r'^- \\([^)]+\\)' + re.escape(name), source, re.M)\n    if not match:\n        raise SystemExit('Missing production selector: ' + name)\n    start = match.start()\n    opening = source.index('{', start)\n    # Stop at the next method boundary; braces in Objective-C strings do not\n    # affect extraction. Each selector must have its own complete body.\n    next_method = re.search(r'^[-+] \\(', source[opening + 1:], re.M)\n    end = opening + 1 + next_method.start() if next_method else source.index('\\n@end', opening)\n    methods.append(source[start:end].rstrip())\n\nfor path in ('CSBackupSettingsViewController.m', 'CSBackupPreviewViewController.m', 'CSResetSettingsViewController.m'):\n    ui = Path('Controllers', path).read_text()\n    for removed_api in ('isAutoBackupEnabled', 'enableAutoBackup:', 'cleanupStatus', 'retryStartup'):\n        assert removed_api not in ui, (path, removed_api)\n    for removed_promise in ('\u5148\u4fdd\u5b58\u6062\u590d\u524d\u4fdd\u62a4\u5907\u4efd', '\u4f5c\u4e3a\u4fdd\u62a4\u5907\u4efd', '\u9ed8\u8ba4\u4fdd\u7559 20 \u4efd', '\u4fdd\u7559\u4e0d\u81ea\u52a8\u6e05\u7406'):\n        assert removed_promise not in ui, (path, removed_promise)\n\nmanager_source = Path('Controllers/CSBackupManager.m').read_text()\nstart = manager_source.index('- (void)remove:(NSDictionary *)record completion:')\nnext_method = re.search(r'^[-+] \\(', manager_source[start + 1:], re.M)\nend = start + 1 + next_method.start() if next_method else manager_source.index('\\n@end', start)\nmanager_method = manager_source[start:end].rstrip()\n\nwith tempfile.TemporaryDirectory(prefix='wechat-backup-deletion-ui-') as directory:\n    work = Path(directory)\n    (work / 'BackupDeletionUIUnderTest.h').write_text('\\n'.join(methods) + '\\n')\n    (work / 'BackupDeletionManagerUnderTest.h').write_text(manager_method + '\\n')\n    executable = work / 'tests'\n    subprocess.run([\n        'xcrun', '--sdk', 'macosx', 'clang', '-fobjc-arc', '-fblocks',\n        '-Wall', '-Wextra', '-Werror', '-I' + str(work),\n        '-framework', 'Foundation', 'Tests/BackupDeletionUITests.m',\n        '-o', str(executable),\n    ], check=True)\n    subprocess.run([str(executable)], check=True)\nPY\n"
+    },
+    {
+      "name": "verify-backup-deletion.sh",
+      "sha256": "fc2cc330ce266484e477b6158524d67b9021a090ac28896780a4528cea3a3159",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\npython3 - <<'PY'\nimport pathlib\nimport subprocess\nimport tempfile\n\nwith tempfile.TemporaryDirectory(prefix=\"backup-deletion-build-\") as work:\n    binary = str(pathlib.Path(work) / \"tests\")\n    subprocess.run([\n        \"xcrun\", \"--sdk\", \"macosx\", \"clang\", \"-fobjc-arc\", \"-fblocks\",\n        \"-Wall\", \"-Wextra\", \"-Werror\", \"-Wno-deprecated-declarations\", \"-IControllers\",\n        \"-framework\", \"Foundation\", \"-framework\", \"CoreFoundation\",\n        \"-framework\", \"ImageIO\", \"-framework\", \"CoreGraphics\",\n        \"Controllers/CSScheduledTaskStore.m\", \"Controllers/CSAIReplyStore.m\",\n        \"Controllers/CSBackupRegistry.m\", \"Controllers/CSBackupCodec.m\",\n        \"Controllers/CSBackupAssets.m\", \"Controllers/CSPluginStorage.m\",\n        \"Controllers/CSBackupStore.m\", \"Tests/BackupDeletionTests.m\", \"-o\", binary,\n    ], check=True)\n    subprocess.run([binary], check=True)\nPY\n"
+    },
+    {
+      "name": "verify-backup-engine.sh",
+      "sha256": "3de3a31f426c2eab724d814fe6e12f17d9a7738b391170a2b09ba7479ef0e4ab",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSPluginStorage.m Controllers/CSBackupStore.m Controllers/CSManagedImageFile.m Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m Tests/BackupEngineTests.m -o \"$work/tests\"\n\"$work/tests\"\n"
+    },
+    {
+      "name": "verify-backup-manual-management.sh",
+      "sha256": "5bd72056eff16feb6f5a494b2b68a863e87f3a7cdf5f86fbcc5cd6a6ccb0e4c4",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSPluginStorage.m Controllers/CSBackupStore.m Tests/BackupManualManagementTests.m -o \"$work/tests\"\n\"$work/tests\"\n"
+    },
+    {
+      "name": "verify-backup-performance.sh",
+      "sha256": "11e47e5c2193572917bb0ea9e6a9d71011baddcace5b1fbd3cb596ecd91691f4",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\npython3 - <<'PY'\nfrom pathlib import Path\nimport subprocess\nimport tempfile\nwith tempfile.TemporaryDirectory(prefix='backup-performance-') as directory:\n    executable = str(Path(directory) / 'tests')\n    subprocess.run([\n        'xcrun', '--sdk', 'macosx', 'clang', '-fobjc-arc', '-fblocks',\n        '-Wall', '-Wextra', '-Werror', '-Wno-deprecated-declarations', '-IControllers',\n        '-framework', 'Foundation', '-framework', 'CoreFoundation',\n        '-framework', 'ImageIO', '-framework', 'CoreGraphics',\n        'Controllers/CSScheduledTaskStore.m', 'Controllers/CSAIReplyStore.m',\n        'Controllers/CSBackupRegistry.m', 'Controllers/CSBackupCodec.m',\n        'Controllers/CSBackupAssets.m', 'Controllers/CSPluginStorage.m',\n        'Controllers/CSBackupStore.m', 'Controllers/CSManagedImageFile.m',\n        'Controllers/CSBackupEngine.m', 'Controllers/CSBackupMutation.m',\n        'Tests/BackupPerformanceTests.m', '-o', executable,\n    ], check=True)\n    subprocess.run([executable], check=True)\nPY\n"
+    },
+    {
+      "name": "verify-backup-registry.sh",
+      "sha256": "395adef363f787e99e1f4360bd28380451864abfc812f449c6d83bb09968e535",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-backup-registry.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation \\\n  -I\"$project_dir/Controllers\" \"$project_dir/Controllers/CSScheduledTaskStore.m\" \"$project_dir/Controllers/CSAIReplyStore.m\" \"$project_dir/Controllers/CSBackupRegistry.m\" \\\n  \"$project_dir/Tests/BackupRegistryTests.m\" -o \"$test_dir/registry-tests\"\n\"$test_dir/registry-tests\"\n"
+    },
+    {
+      "name": "verify-backup-reset.sh",
+      "sha256": "4df90e3530341ecc66e64e146762676e8121813c67bc2d1d0ed4c0d5bc093be7",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSPluginStorage.m Controllers/CSBackupStore.m Controllers/CSManagedImageFile.m Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m Tests/BackupResetTests.m -o \"$work/tests\"\n\"$work/tests\"\n"
+    },
+    {
+      "name": "verify-backup-restore-paths.sh",
+      "sha256": "84cdd14964917e866f480a4630902a2a7a1c8b357e0fe30c6de461001354647d",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\nrestore_image_source=\"${CS_RESTORE_IMAGE_SOURCE:-Controllers/CSManagedImageFile.m}\"\nflags=(-fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers)\n# Define shims after system headers: Darwin's open declaration has an asm alias\n# that otherwise silently bypasses a function-like macro supplied via -D.\ncat > \"$work/image.m\" <<EOF_IMAGE\n#import <Foundation/Foundation.h>\n#include <fcntl.h>\n#include <unistd.h>\nint CSRestoreTestOpen(const char *, int, ...);\n#define open(...) CSRestoreTestOpen(__VA_ARGS__)\n#include \"$(pwd)/$restore_image_source\"\nEOF_IMAGE\ncat > \"$work/store.m\" <<EOF_STORE\n#import <Foundation/Foundation.h>\n#include <fcntl.h>\n#include <unistd.h>\n#include <stdio.h>\nint CSRestoreStoreOpen(const char *, int, ...);\nint CSRestoreStoreRename(const char *, const char *);\nint CSRestoreStoreFsync(int);\n#define open(...) CSRestoreStoreOpen(__VA_ARGS__)\n#define rename(...) CSRestoreStoreRename(__VA_ARGS__)\n#define fsync(...) CSRestoreStoreFsync(__VA_ARGS__)\n#include \"$(pwd)/Controllers/CSBackupStore.m\"\nEOF_STORE\nxcrun --sdk macosx clang \"${flags[@]}\" -c \"$work/image.m\" -o \"$work/image.o\"\nxcrun --sdk macosx clang \"${flags[@]}\" -c \"$work/store.m\" -o \"$work/store.o\"\nnm -u \"$work/image.o\" | rg -q '_CSRestoreTestOpen$'\nnm -u \"$work/store.o\" | rg -q '_CSRestoreStoreOpen$'\nxcrun --sdk macosx clang \"${flags[@]}\" -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSPluginStorage.m Controllers/CSBackupAudit.m Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m Tests/BackupRestorePathTests.m \"$work/image.o\" \"$work/store.o\" -o \"$work/tests\"\n\"$work/tests\" \"$@\"\n"
+    },
+    {
+      "name": "verify-backup-store.sh",
+      "sha256": "c1aa347ba77a9446154f2fc06f6da6f9b454f9448a0f3dde8ed62a606958cd14",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSPluginStorage.m Controllers/CSBackupStore.m Tests/BackupStoreTests.m -o \"$work/tests\"\n\"$work/tests\"\n"
+    },
+    {
+      "name": "verify-backup-transactions.sh",
+      "sha256": "0dbebf2e54bcc6934fbb682a976a031ac5e51b21e01a8b023239b5099c206637",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSPluginStorage.m Controllers/CSBackupStore.m Controllers/CSManagedImageFile.m Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m Tests/BackupTransactionTests.m -o \"$work/tests\"\n\"$work/tests\"\n"
+    },
+    {
+      "name": "verify-custom-text.sh",
+      "sha256": "9d72c03880d349722b143ab963ce8faedfa99d3d754eb75915a2494bdbe06a9d",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-custom-text.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation \\\n  -I\"$project_dir/Controllers\" \"$project_dir/Controllers/CSCustomTextMatch.m\" \\\n  \"$project_dir/Tests/CustomTextMatchTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-group-appearance.sh",
+      "sha256": "649fa00a320876d3b0e21e5defbb3f49a1eac158934b4859c75da56a4a1f00ef",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 17,
+          "text": " (Path(sys.argv[2])/(name+'Body.h')).write_text(text[start:end+1])"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-group-appearance.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\ntext=(Path(sys.argv[1])/'Controllers/WESessionTabContainerView.m').read_text()\nfor name,marker in [('Badge','- (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot {'),('Container','- (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot forTabIndex:')]:\n start=text.index(marker);brace=text.index('{',start);depth=0\n for end in range(brace,len(text)):\n  if text[end]=='{':depth+=1\n  elif text[end]=='}':\n   depth-=1\n   if not depth:break\n (Path(sys.argv[2])/(name+'Body.h')).write_text(text[start:end+1])\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation -I\"$test_dir\" \"$project_dir/Tests/GroupAppearanceTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-group-badges.sh",
+      "sha256": "12823f2429da22e31a6c59a4443783a74569888fe615482aa06ed6b6264a16be",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 21,
+          "text": "    (out/(name+'Body.h')).write_text(source[start:end+1])"
+        },
+        {
+          "line": 25,
+          "text": "(out/'PublicationBody.h').write_text('- (void)publish:(CSGroupProjection *)projection tabs:(NSArray *)tabs privacy:(BOOL)privacy {\\n'+source[start:end]+'\\n}')"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-group-badges.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\n# Optional pre-fix projection provides a reproducible red/green control.\nprojection_source=\"${1:-$project_dir/Controllers/CSGroupProjection.m}\"\npython3 - \"$project_dir\" \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\nroot, out = map(Path, sys.argv[1:])\nsource = (root/'Controllers/WESessionTabContainerView.m').read_text()\nfor name, marker in [('Badge', '- (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot {'),\n                     ('Container', '- (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot forTabIndex:')]:\n    start=source.index(marker); brace=source.index('{', start); depth=0\n    for end in range(brace, len(source)):\n        if source[end]=='{': depth+=1\n        elif source[end]=='}':\n            depth-=1\n            if not depth: break\n    (out/(name+'Body.h')).write_text(source[start:end+1])\nsource = (root/'Controllers/CSGroupListAdapter.m').read_text()\nstart=source.index('        id logic=CSGroupReadObject(self.controller,@\"m_mainFrameLogicController\");', source.index('- (void)refresh {'))\nend=source.index('        [self layout];',start)\n(out/'PublicationBody.h').write_text('- (void)publish:(CSGroupProjection *)projection tabs:(NSArray *)tabs privacy:(BOOL)privacy {\\n'+source[start:end]+'\\n}')\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-undeclared-selector \\\n  -framework Foundation -I\"$test_dir\" -I\"$project_dir/Controllers\" \\\n  \"$projection_source\" \"$project_dir/Controllers/CSGroupNativeBridge.m\" \\\n  \"$project_dir/Controllers/WESessionTabItem.m\" \"$project_dir/Tests/GroupBadgeTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-group-business.sh",
+      "sha256": "6f2b9cbc04d11091ddb022fe4185c7b4274d7cfa6a27813d7c3a5603364cf7cc",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-group-business.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nbridge_source=\"${1:-$project_dir/Controllers/CSGroupNativeBridge.m}\"\npython3 \"$project_dir/Tests/extract-group-business.py\" \"$test_dir\" \"${2:-$project_dir/Controllers/CSGroupListAdapter.m}\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-undeclared-selector \\\n  -framework Foundation -I\"$test_dir\" -I\"$project_dir/Controllers\" \\\n  \"$bridge_source\" \"$project_dir/Controllers/CSGroupProjection.m\" \\\n  \"$project_dir/Controllers/CSGroupIndexScope.m\" \"$project_dir/Controllers/WESessionTabItem.m\" \\\n  \"$project_dir/Tests/GroupBusinessRowTests.m\" -o \"$test_dir/business-tests\"\n\"$test_dir/business-tests\"\n"
+    },
+    {
+      "name": "verify-group-header.sh",
+      "sha256": "8ed55067ca9082c651736935e549354e2baf053e6f4b79c26eaa24d378e54fae",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-group-header.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 \"$project_dir/Tests/extract-group-header.py\" \"$test_dir/GroupHeaderBodies.h\" \"$@\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \\\n    -framework Foundation -I\"$test_dir\" -I\"$project_dir/Controllers\" \\\n    \"$project_dir/Tests/GroupHeaderSemanticsTests.m\" \"$project_dir/Controllers/CSGroupIndexScope.m\" \\\n    -o \"$test_dir/header-tests\"\n\"$test_dir/header-tests\"\n"
+    },
+    {
+      "name": "verify-group-incremental.sh",
+      "sha256": "ec79488954229211f882f561632d426afd840cac56821648e674416ef915e7f3",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 16,
+          "text": "(Path(sys.argv[2])/'GroupPublicationBody.h').write_text(text[start:end+1])"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-group-incremental.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\ntext=(Path(sys.argv[1])/'Controllers/CSGroupListAdapter.m').read_text()\nstart=text.index('- (void)publishProjection:'); brace=text.index('{',start); depth=0\nfor end in range(brace,len(text)):\n if text[end]=='{': depth+=1\n elif text[end]=='}':\n  depth-=1\n  if depth==0: break\n(Path(sys.argv[2])/'GroupPublicationBody.h').write_text(text[start:end+1])\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation \\\n  -I\"$test_dir\" -I\"$project_dir/Controllers\" \\\n  \"$project_dir/Controllers/CSGroupProjection.m\" \"$project_dir/Controllers/WESessionTabItem.m\" \\\n  \"$project_dir/Tests/GroupIncrementalTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-group-indicator.sh",
+      "sha256": "f3187f1abd47c540e8ecf11547e5d22289c377d3f64888ecc8c76a542b50f43f",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-group-indicator.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 \"$project_dir/Tests/extract-group-indicator.py\" \"$test_dir/GroupIndicatorBodies.h\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \\\n    -framework Foundation -framework QuartzCore -framework CoreGraphics -I\"$test_dir\" \\\n    \"$project_dir/Tests/GroupIndicatorTests.m\" -o \"$test_dir/indicator-tests\"\n\"$test_dir/indicator-tests\"\n"
+    },
+    {
+      "name": "verify-group-interactions.sh",
+      "sha256": "d88f3b11c2907b962a3d04f83c55fb5bb14bd2b7e0cd1de1d70d25d03c3dfd4f",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-group-interactions.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 \"$project_dir/Tests/extract-group-interactions.py\" \"$test_dir/GroupInteractionBodies.h\" \"$@\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \\\n    -framework Foundation -framework CoreGraphics -I\"$test_dir\" \\\n    \"$project_dir/Tests/GroupInteractionTests.m\" -o \"$test_dir/interaction-tests\"\n\"$test_dir/interaction-tests\"\n"
+    },
+    {
+      "name": "verify-group-lifecycle.sh",
+      "sha256": "d25b31102c3a4ba95d50991c6edef628e3cb44876a161f0ec142584ebc768899",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-group-lifecycle.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 \"$project_dir/Tests/extract-group-lifecycle.py\" \"$test_dir/GroupLifecycleBodies.h\" \"$@\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-variable \\\n    -framework Foundation -framework CoreGraphics -framework QuartzCore -I\"$test_dir\" \\\n    -I\"$project_dir/Tests/BackgroundBlurUIKit\" -I\"$project_dir/Controllers\" \\\n    \"$project_dir/Tests/BackgroundBlurUIKit/BackgroundBlurUIKit.m\" \\\n    \"$project_dir/Controllers/CSCloseFriendListShield.m\" \\\n    \"$project_dir/Controllers/CSCloseFriendPolicy.m\" \\\n    \"$project_dir/Controllers/CSGroupProjection.m\" \"$project_dir/Controllers/WESessionTabItem.m\" \\\n    \"$project_dir/Tests/GroupLifecycleTests.m\" -o \"$test_dir/lifecycle-tests\"\n\"$test_dir/lifecycle-tests\"\n"
+    },
+    {
+      "name": "verify-group-picker.sh",
+      "sha256": "4d0c5f3b745e310f296c6dc79ec91cfd4f69cd24b4a4fc715b3e6a2847d08fe5",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\nCS_TEST_GROUP_PICKER=1 bash \"$project_dir/Tests/verify-native-contact-picker.sh\"\n"
+    },
+    {
+      "name": "verify-group-preferences.sh",
+      "sha256": "0daf7c8f62edac3f4ff3c538857bcce241bd34dceee65be94c95c4f402e0abcd",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-group-preferences.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation -I\"$project_dir/Controllers\" \"$project_dir/Controllers/CSGroupPreferences.m\" \"$project_dir/Controllers/WESessionTabItem.m\" \"$project_dir/Tests/GroupPreferencesTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-group-search.sh",
+      "sha256": "446a6d370957ddf3e9018ee5462600fa57396184f10504dae51828da32307727",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-group-search.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 \"$project_dir/Tests/extract-group-search.py\" \"$test_dir/SearchBodies.h\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation \\\n  -I\"$test_dir\" -I\"$project_dir/Controllers\" \"$project_dir/Tests/GroupSearchTests.m\" \\\n  \"$project_dir/Controllers/CSGroupProjection.m\" \"$project_dir/Controllers/WESessionTabItem.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-group-selection.sh",
+      "sha256": "e1e4bd33595a9fd65c77a2a624c68b53d2833de7d5966beb6783a0aee127b636",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-group-selection.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 \"$project_dir/Tests/extract-group-selection.py\" \"$test_dir\" \"$@\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-function \\\n    -framework Foundation -framework CoreGraphics -I\"$test_dir\" -I\"$project_dir/Controllers\" \\\n    \"$project_dir/Controllers/CSCloseFriendPolicy.m\" \"$project_dir/Controllers/CSGroupProjection.m\" \"$project_dir/Controllers/CSGroupPreferences.m\" \\\n    \"$project_dir/Controllers/WESessionTabItem.m\" \"$project_dir/Controllers/CSGroupIndexScope.m\" \\\n    \"$project_dir/Controllers/CSGroupInvocationMapper.m\" \"$project_dir/Tests/GroupSelectionTests.m\" \\\n    -o \"$test_dir/selection-tests\"\n\"$test_dir/selection-tests\"\n"
+    },
+    {
+      "name": "verify-group-viewport.sh",
+      "sha256": "a4681b6c549e043298526fdf9e9419564e3484135a99e14e8adcd2dc87c402b0",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-group-viewport.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 \"$project_dir/Tests/extract-group-viewport.py\" \"$test_dir/GroupViewportBodies.h\" \"$@\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-function \\\n    -framework Foundation -framework CoreGraphics -I\"$test_dir\" \\\n    \"$project_dir/Tests/GroupViewportTests.m\" -o \"$test_dir/viewport-tests\"\n\"$test_dir/viewport-tests\"\n"
+    },
+    {
+      "name": "verify-layout-preferences.sh",
+      "sha256": "209dbbf9044286dc174147cc1ab1a134182a9f77f0721dc74dc4d2a507f50e8b",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-layout-preferences.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \\\n -framework Foundation -framework CoreFoundation -I\"$project_dir/Controllers\" \\\n \"$project_dir/Controllers/CSLayoutPreferences.m\" \"$project_dir/Tests/LayoutPreferencesTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-list-corners.sh",
+      "sha256": "d72f341bc6c21f0de5041f12570c480ad1ea104b851c3cae0ac4b843bdfa0cf7",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-list-corners.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 \"$project_dir/Tests/extract-list-corners.py\" \"$test_dir/ListCornerBodies.h\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -Wno-incomplete-implementation \\\n    -framework Foundation -framework CoreText -framework QuartzCore -framework CoreGraphics \\\n    -I\"$test_dir\" -I\"$project_dir/Tests/ListCornerUIKit\" -I\"$project_dir/Controllers\" \\\n    \"$project_dir/Tests/ListCornerSemanticsTests.m\" \"$project_dir/Tests/ListCornerUIKit/ListCornerUIKit.m\" \\\n    \"$project_dir/Controllers/CSListCornerConfiguration.m\" \"$project_dir/Controllers/CSListCornerSectionPolicy.m\" \\\n    \"$project_dir/Controllers/CSListCornerPageContext.m\" \"$project_dir/Controllers/CSListCornerRenderer.m\" \\\n    \"$project_dir/Controllers/CSListCornerSessionAdapter.m\" \"$project_dir/Controllers/CSListCornerContactsAdapter.m\" \\\n    \"$project_dir/Controllers/CSListCornerSessionRestore.m\" \\\n    \"$project_dir/Controllers/CSListCornerDiscoverAdapter.m\" \"$project_dir/Controllers/CSListCornerMoreAdapter.m\" \\\n    \"$project_dir/Controllers/CSGroupIndexScope.m\" \"$project_dir/Controllers/CSGroupProjection.m\" \\\n    \"$project_dir/Controllers/WESessionTabItem.m\" \"$project_dir/Controllers/CSCloseFriendPolicy.m\" -o \"$test_dir/list-tests\"\n\"$test_dir/list-tests\" \"$project_dir/Tests/ListCornerBaseline.json\"\n"
+    },
+    {
+      "name": "verify-managed-image-files.sh",
+      "sha256": "bac7b7fe541076c2c24a40783a214e86255e6d20e6e1afd476e18c23885362a3",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 7,
+          "text": "xcrun --sdk macosx clang \"${flags[@]}\" -Dunlinkat=CSManagedImageTestUnlinkAt \\"
+        },
+        {
+          "line": 22,
+          "text": "(Path(sys.argv[2]) / \"ManagedImageCleanupMethods.inc\").write_text(methods + \"\\n\" + source[start:end])"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-managed-image-files.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nflags=(-fobjc-arc -fblocks -Wall -Wextra -Werror -I\"$project_dir/Controllers\")\nxcrun --sdk macosx clang \"${flags[@]}\" -Dunlinkat=CSManagedImageTestUnlinkAt \\\n    -c \"$project_dir/Controllers/CSManagedImageFile.m\" -o \"$test_dir/managed-image.o\"\nxcrun --sdk macosx clang \"${flags[@]}\" -framework Foundation \\\n    \"$test_dir/managed-image.o\" \"$project_dir/Tests/ManagedImageFileTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\" \"$test_dir/fixtures\"\npython3 - \"$project_dir\" \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\nsource = (Path(sys.argv[1]) / \"Controllers/CSTabBarStyleSettingsViewController.m\").read_text()\nstart = source.index(\"- (void)clearCustomIcon {\")\nend = source.index(\"\\n- (NSString *)iconKeyForType:\", start)\nmethods = source[start:end]\nsource = (Path(sys.argv[1]) / \"Controllers/CSNavigationTitleSettingsViewController.m\").read_text()\nstart = source.index(\"- (void)saveSeparatorImage:(UIImage *)image {\")\nend = source.index(\"\\n// \u8bbe\u7f6ecell\u7684\u80cc\u666f\u8272\", start)\n(Path(sys.argv[2]) / \"ManagedImageCleanupMethods.inc\").write_text(methods + \"\\n\" + source[start:end])\nPY\nxcrun --sdk macosx clang \"${flags[@]}\" -Wno-deprecated-declarations -I\"$test_dir\" \\\n    -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics \\\n    \"$project_dir/Controllers/CSManagedImageFile.m\" \\\n    \"$project_dir/Controllers/CSPluginStorage.m\" \"$project_dir/Controllers/CSBackupStore.m\" \"$project_dir/Controllers/CSBackupCodec.m\" \\\n    \"$project_dir/Controllers/CSScheduledTaskStore.m\" \"$project_dir/Controllers/CSAIReplyStore.m\" \"$project_dir/Controllers/CSBackupRegistry.m\" \"$project_dir/Controllers/CSBackupAssets.m\" \\\n    \"$project_dir/Tests/ManagedImageCleanupIntegrationTests.m\" -o \"$test_dir/integration\"\n\"$test_dir/integration\" \"$test_dir/integration-fixtures\"\n"
+    },
+    {
+      "name": "verify-message-actions-core.sh",
+      "sha256": "4830fa3d2a2cb3b1f20fe6b9e7f7fde8769a709fe331b55c55c6b65a619047ed",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-message-actions-core.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation \\\n  -I\"$project_dir/Controllers\" \\\n  \"$project_dir/Controllers/CSMessageActionPreferences.m\" \\\n  \"$project_dir/Controllers/CSMessageActionContext.m\" \\\n  \"$project_dir/Controllers/CSMessageActionPolicy.m\" \\\n  \"$project_dir/Tests/MessageActionCoreTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-message-actions-execution.sh",
+      "sha256": "eafb7aa462fe39d105f5c7ca3b37c6ffe9be8b6eff0a42122170048d0944dc40",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 24,
+          "text": "(out/'VoiceDownloadHookUnderTest.h').write_text('static NSUInteger voiceHookNativeCalls, voiceHookCoordinatorReads;\\nstatic CSMessageActionCoordinator *voiceHookCoordinator;\\nstatic CSMessageActionCoordinator *TestVoiceCoordinator(void) { voiceHookCoordinatorReads++; return voiceHookCoordinator; }\\nstatic void TestNativeVoiceCallback(NSString *chat, unsigned int localID, long long serverID, unsigned int endFlag, unsigned int error) '+body+'\\n')"
+        },
+        {
+          "line": 36,
+          "text": "(out/'RepeatMenuHooksUnderTest.h').write_text('\\n'.join(extracted))"
+        },
+        {
+          "line": 41,
+          "text": "(out/'MenuDedupHookUnderTest.h').write_text('''"
+        },
+        {
+          "line": 48,
+          "text": "(out/'VoiceForwardCleanupHooksUnderTest.h').write_text('static CSMessageActionCoordinator *forwardHookCoordinator;\\nstatic NSUInteger forwardNativeClearCalls;\\n@interface TestLogic (CleanupHook)\\n- (void)clearData;\\n- (BOOL)bShowSendSuccessView;\\n- (BOOL)bHiddenSendSuccessToastView;\\n@end\\n@implementation TestLogic (CleanupHook)\\n'+clear+'\\n'+'\\n'.join(ui)+'\\n@end\\n@interface TestForwardManager : NSObject\\n@property(nonatomic, strong) NSMutableArray *originalCalls;\\n@end\\n@implementation TestForwardManager\\n'+'\\n'.join(methods)+'\\n@end\\n')"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-message-actions-execution.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$test_dir\" <<'PYEXTRACT'\nfrom pathlib import Path\nimport re, sys\nroot,out=map(Path,sys.argv[1:])\nsource=(root/'Hooks/VoiceForwardHooks.xm').read_text()\nmanager=source.split('%hook ForwardMessageMgr',1)[1].split('%end',1)[0]\nmethods=[]\nfor name in ('OnForwardMessageSend','OnForwardMessageCancel'):\n    match=re.search(r'- \\(void\\)'+name+r':\\(id\\)logic \\{.*?\\n\\}',manager,re.S)\n    assert match, name\n    methods.append(match.group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig;', '[self.originalCalls addObject:@\"'+name+'\"]; [logic clearData];'))\nlogic=source.split('%hook ForwardMessageLogicController',1)[1].split('%end',1)[0]\nui=[]\nfor name,native in (('bShowSendSuccessView','YES'),('bHiddenSendSuccessToastView','NO')):\n    ui.append(re.search(r'- \\(BOOL\\)'+name+r' \\{.*?\\n\\}',logic,re.S).group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig',native))\nclear=re.search(r'- \\(void\\)clearData \\{.*?\\n\\}',logic,re.S).group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig;', 'forwardNativeClearCalls++;')\ndownload=source.split('%hook VoiceMsgDownloader',1)[1].split('%end',1)[0]\nbody=download[download.index('{'):download.rindex('}')+1].replace('%orig;', 'voiceHookNativeCalls++;').replace('CSMessageActionCoordinator.sharedCoordinator','TestVoiceCoordinator()')\n(out/'VoiceDownloadHookUnderTest.h').write_text('static NSUInteger voiceHookNativeCalls, voiceHookCoordinatorReads;\\nstatic CSMessageActionCoordinator *voiceHookCoordinator;\\nstatic CSMessageActionCoordinator *TestVoiceCoordinator(void) { voiceHookCoordinatorReads++; return voiceHookCoordinator; }\\nstatic void TestNativeVoiceCallback(NSString *chat, unsigned int localID, long long serverID, unsigned int endFlag, unsigned int error) '+body+'\\n')\nmenu=(root/'Hooks/RepeatHooks.xm').read_text()\nclasses=('CommonMessageCellView','TextMessageCellView','ImageMessageCellView','EmoticonMessageCellView','VideoMessageCellView','VoiceMessageCellView','AppEmoticonMessageCellView','AppFileMessageCellView','ShareCardMessageCellView','GameMessageCellView')\nextracted=['static CSMessageActionMenuAdapter *menuHookAdapter;']\nfor cls in classes:\n    match=re.search(r'%hook '+cls+r'\\n(.*?)%end',menu,re.S)\n    body=re.search(r'- \\(id\\)operationMenuItems \\{.*?\\}',match.group(1),re.S).group() if match else '- (id)operationMenuItems { return %orig; }'\n    body=body.replace('CSMessageActionMenuAdapter itemsByAddingActionsForCell','menuHookAdapter itemsByAddingActionsForCell').replace('%orig','self.nativeItems')\n    if cls in ('EmoticonMessageCellView','AppEmoticonMessageCellView'):\n        body+='\\n- (id)getViewController { return [self.nativeDelegate getViewController]; }'\n    native='@property(nonatomic,weak) TestMessageCellDelegate *nativeDelegate;\\n' if cls in ('EmoticonMessageCellView','AppEmoticonMessageCellView') else ''\n    extracted.append('@interface '+cls+' : TestCell\\n'+native+'@property(nonatomic,copy) NSArray *nativeItems;\\n- (id)operationMenuItems;\\n@end\\n@implementation '+cls+'\\n'+body+'\\n@end')\n(out/'RepeatMenuHooksUnderTest.h').write_text('\\n'.join(extracted))\ndedup=menu.split('%hook BaseMessageCellView',1)[1].split('%end',1)[0]\ndedup=dedup.replace('[CSMessageActionMenuAdapter itemsBeforeNativeDedupForCell:self items:items]', '[menuHookAdapter itemsBeforeNativeDedupForCell:self items:items]')\ndedup=dedup.replace('return %orig(prepared);', 'self.observedInput=prepared; return prepared;')\nassert '%orig' not in dedup\n(out/'MenuDedupHookUnderTest.h').write_text('''\n@interface TestMenuDedupCell : TestCell\n@property(nonatomic,strong) id observedInput;\n- (id)uniqMenuItems:(id)items;\n@end\n@implementation TestMenuDedupCell\n'''+dedup+'\\n@end\\n')\n(out/'VoiceForwardCleanupHooksUnderTest.h').write_text('static CSMessageActionCoordinator *forwardHookCoordinator;\\nstatic NSUInteger forwardNativeClearCalls;\\n@interface TestLogic (CleanupHook)\\n- (void)clearData;\\n- (BOOL)bShowSendSuccessView;\\n- (BOOL)bHiddenSendSuccessToastView;\\n@end\\n@implementation TestLogic (CleanupHook)\\n'+clear+'\\n'+'\\n'.join(ui)+'\\n@end\\n@interface TestForwardManager : NSObject\\n@property(nonatomic, strong) NSMutableArray *originalCalls;\\n@end\\n@implementation TestForwardManager\\n'+'\\n'.join(methods)+'\\n@end\\n')\nPYEXTRACT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation \\\n  -I\"$test_dir\" -I\"$project_dir/Controllers\" \\\n  \"$project_dir/Controllers/CSMessageActionPreferences.m\" \\\n  \"$project_dir/Controllers/CSMessageActionContext.m\" \\\n  \"$project_dir/Controllers/CSMessageActionPolicy.m\" \\\n  \"$project_dir/Controllers/CSMessageNativeActionAdapter.m\" \\\n  \"$project_dir/Controllers/CSMessageMediaProvider.m\" \\\n  \"$project_dir/Controllers/CSMessageImageStickerAdapter.m\" \\\n  \"$project_dir/Controllers/CSMessageSendAdapter.m\" \\\n  \"$project_dir/Controllers/CSVoiceForwardAdapter.m\" \\\n  \"$project_dir/Controllers/CSMessageActionMenuAdapter.m\" \\\n  \"$project_dir/Controllers/CSMessageActionCoordinator.m\" \\\n  \"$project_dir/Tests/MessageActionExecutionTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-miniapp-first-frame.sh",
+      "sha256": "4a7003dec6883e1ff28a33da4c6d7b9aeb31b6b8c867388c3c9611b91fa8d8a4",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 6,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 16,
+          "text": "(output/'MiniappFirstFrameBase.h').write_text((project/'Tests/MiniappPrivateLayoutTests.m').read_text().replace('int main(void)', 'int CSUnusedMiniappLayoutFixtureMain(void)'))"
+        },
+        {
+          "line": 20,
+          "text": "(output/'CloseFriendSessionTests.m').write_text(session_fixture.replace(snapshot_provider,'static void (^firstFrameSnapshotRead)(void);\\nstatic CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) { if(firstFrameSnapshotRead)firstFrameSnapshotRead(); return policy; }'))"
+        },
+        {
+          "line": 37,
+          "text": "(output/'FirstFrameGateBodies.h').write_text('\\n'.join(bodies)+'\\n')"
+        },
+        {
+          "line": 55,
+          "text": "(output/'FirstFrameAnimatorHook.h').write_text(hook_bodies[0][1]+'\\n')"
+        },
+        {
+          "line": 56,
+          "text": "(output/'FirstFrameContainerHooks.h').write_text('\\n'.join(b for c,b in hook_bodies[1:])+'\\n')"
+        },
+        {
+          "line": 58,
+          "text": "provenance={'head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=project,text=True).strip(),'source_sha256':{p:hashlib.sha256((source/p).read_bytes()).hexdigest() for p in paths},'gate_bodies_sha256':[hashlib.sha256(b.encode()).hexdigest() for b in bodies],'new_gate_present':'- (void)prepareForVisibility' in adapter,'boundaries':'Complete production table layout/projection/cell/index-scope/gate/hook bodies; UIKit visibility and native callbacks are host doubles. Policy mutation injection changes only the temporary snapshot provider, never production sources. No natural device lifecycle or screen frame is measured.'}"
+        },
+        {
+          "line": 61,
+          "text": "    Path(provenance_path).write_text(json.dumps(provenance,indent=2)+'\\n')"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\nsource_dir=\"${1:-$project_dir}\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-miniapp-first-frame.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$source_dir\" \"$test_dir\" \"${FIRST_FRAME_PROVENANCE_PATH:-}\" <<'PY'\nfrom pathlib import Path\nimport hashlib,json,subprocess,sys\nproject,source,output=map(Path,sys.argv[1:4]);provenance_path=sys.argv[4]\n# Reuse the unmodified fixture generators, then extract the actual visibility\n# boundaries and gate. An absent 2.2-2 gate is its existing no-op behavior.\ngenerator=(project/'Tests/verify-miniapp-private-layout.sh').read_text().split(\"<<'PY'\\n\",1)[1].split('\\nPY\\n',1)[0]\nsys.argv=['extract-miniapp-fixture',str(project),str(source),str(output)]\nexec(compile(generator,str(project/'Tests/verify-miniapp-private-layout.sh'),'exec'),{'__name__':'first_frame_fixture_extractor'})\n(output/'MiniappFirstFrameBase.h').write_text((project/'Tests/MiniappPrivateLayoutTests.m').read_text().replace('int main(void)', 'int CSUnusedMiniappLayoutFixtureMain(void)'))\nsession_fixture=(project/'Tests/CloseFriendSessionTests.m').read_text()\nsnapshot_provider='static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) { return policy; }'\nassert session_fixture.count(snapshot_provider)==1\n(output/'CloseFriendSessionTests.m').write_text(session_fixture.replace(snapshot_provider,'static void (^firstFrameSnapshotRead)(void);\\nstatic CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) { if(firstFrameSnapshotRead)firstFrameSnapshotRead(); return policy; }'))\nadapter=(source/'Controllers/CSGroupListAdapter.m').read_text()\nhooks=(source/'Hooks/SessionGroupHooks.xm').read_text()\ndef method(text,marker):\n    start=text.index(marker);brace=text.index('{',start);depth=0\n    for end in range(brace,len(text)):\n        if text[end]=='{':depth+=1\n        elif text[end]=='}':\n            depth-=1\n            if not depth:return text[start:end+1]\n    raise AssertionError(marker)\nbodies=[]\nfor marker,fallback in [\n    ('+ (void)prepareForListVisibility {', '+ (void)prepareForListVisibility {}'),\n    ('- (void)prepareForVisibility {', '- (void)prepareForVisibility {}'),\n]:\n    bodies.append(method(adapter,marker) if marker in adapter else fallback)\n(output/'FirstFrameGateBodies.h').write_text('\\n'.join(bodies)+'\\n')\nentries=[\n ('WAAppDismissAnimateTransition','- (void)animateTransition:', '- (void)animateTransition:(id)context { (void)context; %orig; }'),\n ('WAAppTansitionController','- (void)onMiniTaskDismissalGestureWillBegin', '- (void)onMiniTaskDismissalGestureWillBegin { %orig; }'),\n ('WAAppTansitionController','- (void)sheetDismissalTransitionWillBegin:', '- (void)sheetDismissalTransitionWillBegin:(id)context { (void)context; %orig; }'),\n]\nhook_bodies=[]\nfor cls,marker,fallback in entries:\n    chunk=hooks.split('%hook '+cls+'\\n',1)[1].split('%end',1)[0] if '%hook '+cls+'\\n' in hooks else ''\n    body=method(chunk,marker) if marker in chunk else fallback\n    if ':' in marker:\n        brace=body.index('{');declaration=body[:brace]\n        # Real transition protocols are UIKit-only; retain selector/body and use\n        # id for the host protocol type. The argument is deliberately inert.\n        import re\n        declaration=re.sub(r'\\(id<[^>]+>\\)', '(id)', declaration)\n        body=declaration+body[brace:]\n    hook_bodies.append((cls,body.replace('%orig','[self captureOriginal]')))\n(output/'FirstFrameAnimatorHook.h').write_text(hook_bodies[0][1]+'\\n')\n(output/'FirstFrameContainerHooks.h').write_text('\\n'.join(b for c,b in hook_bodies[1:])+'\\n')\npaths=['Controllers/CSGroupListAdapter.m','Hooks/SessionGroupHooks.xm','Controllers/CSCloseFriendListShield.m','Controllers/CSGroupProjection.m','Controllers/CSCloseFriendPolicy.m']\nprovenance={'head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=project,text=True).strip(),'source_sha256':{p:hashlib.sha256((source/p).read_bytes()).hexdigest() for p in paths},'gate_bodies_sha256':[hashlib.sha256(b.encode()).hexdigest() for b in bodies],'new_gate_present':'- (void)prepareForVisibility' in adapter,'boundaries':'Complete production table layout/projection/cell/index-scope/gate/hook bodies; UIKit visibility and native callbacks are host doubles. Policy mutation injection changes only the temporary snapshot provider, never production sources. No natural device lifecycle or screen frame is measured.'}\nprint('PROVENANCE '+json.dumps(provenance,sort_keys=True))\nif provenance_path:\n    Path(provenance_path).write_text(json.dumps(provenance,indent=2)+'\\n')\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-undeclared-selector \\\n -Wno-unused-function -Wno-unused-parameter -framework Foundation -framework CoreGraphics \\\n -I\"$test_dir\" -I\"$project_dir/Controllers\" -I\"$project_dir/Tests\" \\\n \"$test_dir/MeasuredProjection.m\" \"$source_dir/Controllers/WESessionTabItem.m\" \\\n \"$source_dir/Controllers/CSGroupInvocationMapper.m\" \"$source_dir/Controllers/CSGroupNativeBridge.m\" \\\n \"$source_dir/Controllers/CSGroupIndexScope.m\" \"$source_dir/Controllers/CSCloseFriendPolicy.m\" \\\n \"$source_dir/Controllers/CSCloseFriendSignatures.m\" \"$project_dir/Tests/MiniappFirstFrameTests.m\" \\\n -o \"$test_dir/first-frame-tests\"\n\"$test_dir/first-frame-tests\"\n"
+    },
+    {
+      "name": "verify-miniapp-private-layout.sh",
+      "sha256": "02a0576987f320a6800f37706370e890c709e951da91757e06533258a9365877",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 6,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 29,
+          "text": "(output/'MiniappLayoutBody.h').write_text(body+'\\n')"
+        },
+        {
+          "line": 32,
+          "text": "(output/'MiniappPublicationRelease.h').write_text('- (void)finishPublicationFixture { BOOL finished=YES; '+release+' }\\n')"
+        },
+        {
+          "line": 36,
+          "text": "(output/'MiniappTableLayoutHook.h').write_text(body.replace('%orig', '[self captureLayout]')+'\\n')"
+        },
+        {
+          "line": 37,
+          "text": "(output/'MiniappCardPosition.h').write_text(method(adapter, 'BOOL CSGroupCardPosition(')+'\\n')"
+        },
+        {
+          "line": 38,
+          "text": "(output/'MiniappShieldBody.h').write_text('\\n'.join(line for line in (source/'Controllers/CSCloseFriendListShield.m').read_text().splitlines() if not line.startswith('#import'))+'\\n')"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\nsource_dir=\"${1:-$project_dir}\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-miniapp-private-layout.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$source_dir\" \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\nproject, source, output = map(Path, sys.argv[1:])\n# Reuse the baseline session fixture's extraction of complete production methods.\ngenerator = (project/'Tests/verify-close-friend-session.sh').read_text().split(\"<<'PY'\\n\", 1)[1].split('\\nPY\\n', 1)[0]\nsys.argv = ['extract-session-fixture', str(source), str(output)]\nexec(compile(generator, str(project/'Tests/verify-close-friend-session.sh'), 'exec'), {'__name__':'miniapp_fixture_extractor'})\nadapter = (source/'Controllers/CSGroupListAdapter.m').read_text()\nhooks = (source/'Hooks/SessionGroupHooks.xm').read_text()\ndef method(text, marker):\n    start = text.index(marker)\n    brace = text.index('{', start)\n    depth = 0\n    for end in range(brace, len(text)):\n        if text[end] == '{': depth += 1\n        elif text[end] == '}':\n            depth -= 1\n            if depth == 0: return text[start:end+1]\n    raise AssertionError(marker)\nmarker = '- (void)performSessionListLayout:'\nbody = method(adapter, marker) if marker in adapter else '- (void)performSessionListLayout:(void (^)(void))layout { layout(); }'\n(output/'MiniappLayoutBody.h').write_text(body+'\\n')\nrefresh=method(adapter,'- (void)refresh {')\nrelease=method(refresh[refresh.index('    } @finally {'):], '        if (finished) {')\n(output/'MiniappPublicationRelease.h').write_text('- (void)finishPublicationFixture { BOOL finished=YES; '+release+' }\\n')\nmain_table = hooks.split('%hook MainFrameTableView\\n', 1)[1].split('%end', 1)[0]\nmarker = '- (void)layoutSubviews {'\nbody = method(main_table, marker) if marker in main_table else marker+' %orig; }'\n(output/'MiniappTableLayoutHook.h').write_text(body.replace('%orig', '[self captureLayout]')+'\\n')\n(output/'MiniappCardPosition.h').write_text(method(adapter, 'BOOL CSGroupCardPosition(')+'\\n')\n(output/'MiniappShieldBody.h').write_text('\\n'.join(line for line in (source/'Controllers/CSCloseFriendListShield.m').read_text().splitlines() if not line.startswith('#import'))+'\\n')\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-undeclared-selector \\\n -Wno-unused-function -framework Foundation -framework CoreGraphics \\\n -I\"$test_dir\" -I\"$project_dir/Controllers\" -I\"$project_dir/Tests\" \\\n \"$test_dir/MeasuredProjection.m\" \"$source_dir/Controllers/WESessionTabItem.m\" \\\n \"$source_dir/Controllers/CSGroupInvocationMapper.m\" \"$source_dir/Controllers/CSGroupNativeBridge.m\" \\\n \"$source_dir/Controllers/CSGroupIndexScope.m\" \"$source_dir/Controllers/CSCloseFriendPolicy.m\" \\\n \"$source_dir/Controllers/CSCloseFriendSignatures.m\" \"$project_dir/Tests/MiniappPrivateLayoutTests.m\" \\\n -o \"$test_dir/miniapp-tests\"\n\"$test_dir/miniapp-tests\"\n"
+    },
+    {
+      "name": "verify-my-page-clean.sh",
+      "sha256": "3b51f0fb7ecc7b19b05097af41b8803155f0ab128995324d647c7af8403b8200",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 21,
+          "text": "(output / 'MyPageHookUnderTest.h').write_text(source)"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-my-page-clean.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\n# Exercise the production filtering and lifecycle code against a small native-list double.\npython3 - \"$project_dir\" \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\nroot, output = map(Path, sys.argv[1:])\nsource = (root / 'Hooks/HideMomentsHooks.xm').read_text()\nsource = source.split('%ctor {')[0]\n# The lifecycle gate is independently exercised by verify-backup-bootstrap.sh.\nsource = source.replace('#import \"../Controllers/CSBackupBootstrap.h\"', '')\nsource = source.replace('#import <UIKit/UIKit.h>', '#import <Foundation/Foundation.h>')\nsource = source.replace('@interface MoreViewController : NSObject', '@interface MoreViewController : NativeMoreViewController')\nsource = source.replace('%hook MoreViewController', '@implementation MoreViewController').replace('%end', '@end')\nfor replacement in ('[super viewDidLoad];', '[super viewWillAppear:arg1];', '[super reloadMoreView];'):\n    source = source.replace('%orig;', replacement, 1)\nassert '%orig' not in source\n(output / 'MyPageHookUnderTest.h').write_text(source)\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \\\n  -Wno-unused-parameter -Wno-unused-function -Wno-undeclared-selector \\\n  -framework Foundation -I\"$test_dir\" \\\n  \"$project_dir/Tests/MyPageCleanTests.m\" -o \"$test_dir/my-page-tests\"\n\"$test_dir/my-page-tests\"\n"
+    },
+    {
+      "name": "verify-native-contact-picker.sh",
+      "sha256": "33fc3d57fbb9e122650fe8cb7cef16894806251446e2e7454a521ed7ffa5a434",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 21,
+          "text": "(out/'ScheduledTaskPickerUnderTest.h').write_text('\\n'.join(methods))"
+        },
+        {
+          "line": 33,
+          "text": "(out/'GroupPickerUnderTest.h').write_text('\\n'.join(methods))"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-native-picker.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport os, re, sys\nrepo,out=map(Path,sys.argv[1:])\nsource=Path(os.environ.get('CS_TEST_SCHEDULED_SETTINGS_SOURCE',repo/'Controllers/CSScheduledTaskSettingsViewController.m')).read_text()\nmethods=[]\nfor name in ['canPresentTargetPicker','finishTargetSheet:','chooseTarget','presentTargetPicker:']:\n    match=re.search(r'^- \\([^)]+\\)'+re.escape(name)+r'(?=[ :(])',source,re.M)\n    if not match:\n        assert name in ['canPresentTargetPicker','finishTargetSheet:'],name\n        continue # Allows the regression to execute unchanged pre-fix code.\n    start=match.start();opening=source.index('{',start);depth=1;end=opening+1\n    while depth:\n        depth+=(source[end]=='{')-(source[end]=='}');end+=1\n    methods.append(source[start:end])\n(out/'ScheduledTaskPickerUnderTest.h').write_text('\\n'.join(methods))\nsource=Path(os.environ.get('CS_TEST_GROUP_SETTINGS_SOURCE',repo/'Controllers/CSChatGroupSettingsViewController.m')).read_text()\nmethods=[]\nfor name in ['copyAccountPreferences','canEditAccount:','customTabWithID:', 'contactSelectionPolicyChanged:', 'contactSelectionValidatorForTab:', 'contactName:','showContactSelectForTab:','showTagSelectForTab:','presentContactSelectWithType:']:\n    match=re.search(r'^- \\([^\\n]+?\\)'+re.escape(name)+r'(?=[ :(])',source,re.M)\n    if not match:\n        assert name in ['contactSelectionPolicyChanged:', 'contactSelectionValidatorForTab:', 'contactName:'],name\n        continue\n    start=match.start();opening=source.index('{',start);depth=1;end=opening+1\n    while depth:\n        depth+=(source[end]=='{')-(source[end]=='}');end+=1\n    methods.append(source[start:end])\n(out/'GroupPickerUnderTest.h').write_text('\\n'.join(methods))\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \\\n  -framework Foundation -I\"$test_dir\" -I\"$project_dir/Tests/NativePickerUIKit\" -I\"$project_dir/Controllers\" \\\n  \"$project_dir/Controllers/CSCloseFriendSignatures.m\" \"$project_dir/Controllers/CSNativeContactPicker.m\" \\\n  \"$project_dir/Controllers/CSGroupPreferences.m\" \"$project_dir/Controllers/WESessionTabItem.m\" \\\n  \"$project_dir/Tests/NativeContactPickerTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-native-reward.sh",
+      "sha256": "53d39d5e14d0e253efee46c152418b280e4637da5fe55dc399caa09b914c5b3f",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-native-reward.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \\\n  -framework Foundation -I\"$project_dir/Controllers\" \\\n  \"$project_dir/Controllers/CSNativeRewardRoute.m\" \"$project_dir/Tests/NativeRewardRouteTests.m\" \\\n  -o \"$test_dir/native-reward-tests\"\n\"$test_dir/native-reward-tests\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \\\n  -framework Foundation -I\"$project_dir/Tests/RewardUIKit\" -I\"$project_dir/Controllers\" \\\n  \"$project_dir/Controllers/CSNativeRewardRoute.m\" \"$project_dir/Controllers/CSNativeRewardPresenter.m\" \\\n  \"$project_dir/Controllers/CSNativeSettingsHost.m\" \"$project_dir/Tests/NativeRewardPresenterTests.m\" -o \"$test_dir/native-reward-presenter-tests\"\n\"$test_dir/native-reward-presenter-tests\"\n"
+    },
+    {
+      "name": "verify-navigation-images.sh",
+      "sha256": "cdfa3726918ca9a4ec29faa69a2a6764b6471f88a138f4bc4a15d2e3f5504af3",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 19,
+          "text": "(Path(sys.argv[2])/'NavigationAvatarBodies.h').write_text('\\n'.join(methods))"
+        },
+        {
+          "line": 34,
+          "text": "(out/'NavigationPopoverBodies.h').write_text(extract(popover,['- (void)viewDidAppear:', '- (void)viewWillDisappear:', '- (void)loadPopoverAvatar', '- (void)tableView:(UITableView *)tableView didEndDisplayingCell:']))"
+        },
+        {
+          "line": 36,
+          "text": "(out/'NavigationSettingsAvatarBodies.h').write_text(extract(settings,['- (void)configureContactAvatarURL:', '- (void)viewDidAppear:', '- (void)viewWillDisappear:', '- (void)loadContactAvatar', '- (void)tableView:(UITableView *)tableView didEndDisplayingHeaderView:']))"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-navigation-images.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\nsource=(Path(sys.argv[1])/'Hooks/NavigationTitleHooks.xm').read_text().split('@implementation CSAvatarTitleView',1)[1]\nmethods=[]\nfor marker in ['- (void)updateOtherAvatarWithUrl:', '- (void)updateSelfAvatarWithUrl:', '- (void)updateAvatarWithURL:']:\n start=source.index(marker);brace=source.index('{',start);depth=0\n for end in range(brace,len(source)):\n  if source[end]=='{':depth+=1\n  elif source[end]=='}':\n   depth-=1\n   if depth==0:break\n methods.append(source[start:end+1])\n(Path(sys.argv[2])/'NavigationAvatarBodies.h').write_text('\\n'.join(methods))\nroot=Path(sys.argv[1]);out=Path(sys.argv[2])\ndef extract(source,markers):\n result=[]\n for marker in markers:\n  start=source.index(marker);brace=source.index('{',start);depth=0\n  for end in range(brace,len(source)):\n   if source[end]=='{':depth+=1\n   elif source[end]=='}':\n    depth-=1\n    if not depth:break\n  result.append(source[start:end+1])\n return '\\n'.join(result)\npopover=(root/'Hooks/NavigationTitleHooks.xm').read_text().split('@implementation CSUserInfoPopoverController',1)[1]\nassert 'dataWithContentsOfURL:' not in popover and 'NSURLSession' not in popover\n(out/'NavigationPopoverBodies.h').write_text(extract(popover,['- (void)viewDidAppear:', '- (void)viewWillDisappear:', '- (void)loadPopoverAvatar', '- (void)tableView:(UITableView *)tableView didEndDisplayingCell:']))\nsettings=(root/'Controllers/CSContactSeparatorSettingsViewController.m').read_text()\n(out/'NavigationSettingsAvatarBodies.h').write_text(extract(settings,['- (void)configureContactAvatarURL:', '- (void)viewDidAppear:', '- (void)viewWillDisappear:', '- (void)loadContactAvatar', '- (void)tableView:(UITableView *)tableView didEndDisplayingHeaderView:']))\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \\\n  -framework Foundation -framework CoreGraphics -framework ImageIO \\\n  -I\"$test_dir\" -I\"$project_dir/Tests/NavigationUIKit\" -I\"$project_dir/Controllers\" \\\n  \"$project_dir/Controllers/CSNavigationImageLoader.m\" \"$project_dir/Tests/NavigationImageTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-navigation-title-batch.sh",
+      "sha256": "51ec3083338195042349ddacaa2c05a0588fe7ad11a89d82ecfdf352edefd180",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 25,
+          "text": "(out/'NavigationTitleDeclarations.h').write_text('@interface CSAvatarTitleView : UIView\\n'+properties+'\\n'+declarations+'\\n@end\\n')"
+        },
+        {
+          "line": 26,
+          "text": "(out/'NavigationTitleBodies.h').write_text('\\n'.join(methods))"
+        },
+        {
+          "line": 34,
+          "text": "(out/'NavigationTitleConstants.h').write_text('\\n'.join(constants))"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-navigation-title.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport re, sys\nroot,out=map(Path,sys.argv[1:])\nsource=(root/'Hooks/NavigationTitleHooks.xm').read_text()\nimplementation=source.split('@implementation CSAvatarTitleView',1)[1]\nmarkers=['performTitleUpdates:', 'updateLayoutWithMode:', 'updateSizeAndRadius:', 'updateSeparatorText:',\n         'updateSeparatorSize:', 'updateAvatarSpacing:', 'updateVerticalOffset:', 'updateOtherNickname:',\n         'updateOtherAvatarWithContact:', 'updateSeparatorForContactId:', 'settingsChanged:']\nmethods=[]\nfor marker in markers:\n start=implementation.index('- (void)'+marker); brace=implementation.index('{',start);depth=1;end=brace+1\n while depth:\n  if implementation[end]=='{':depth+=1\n  elif implementation[end]=='}':depth-=1\n  end+=1\n methods.append(implementation[start:end])\nproperties='\\n'.join(line for line in source.split('@interface CSAvatarTitleView : UIView',1)[1].split('@end',1)[0].splitlines() if line.startswith('@property'))\ndeclarations='\\n'.join(method.split('{',1)[0].strip()+';' for method in methods)\n(out/'NavigationTitleDeclarations.h').write_text('@interface CSAvatarTitleView : UIView\\n'+properties+'\\n'+declarations+'\\n@end\\n')\n(out/'NavigationTitleBodies.h').write_text('\\n'.join(methods))\nsettings=(root/'Controllers/CSNavigationTitleSettingsViewController.m').read_text()\nnames=set(re.findall(r'\\bk(?:Navigation\\w+Key|Default\\w+)\\b','\\n'.join(methods)))\nconstants=[]\nfor name in sorted(names):\n match=re.search(r'(?:NSString\\s*\\*\\s*const|CGFloat const)\\s+'+name+r'\\s*=\\s*[^;]+;',settings)\n assert match,name\n constants.append(match.group())\n(out/'NavigationTitleConstants.h').write_text('\\n'.join(constants))\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \\\n  -Wno-incomplete-implementation -framework Foundation -framework CoreGraphics -framework QuartzCore \\\n  -I\"$project_dir/Tests/StyleUIKit\" -I\"$test_dir\" \\\n  \"$project_dir/Tests/TabBarUIKit/TabBarUIKit.m\" \"$project_dir/Tests/StyleUIKit/StyleUIKit.m\" \\\n  \"$project_dir/Tests/NavigationTitleBatchTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-payment-core.sh",
+      "sha256": "fc5b27b5ed6129b7e939a9bf125bd89b4cab927748aa3291c13177d9d0558f94",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 15,
+          "text": "s=(root/'Controllers/CSPaymentAutomation.m').read_text().replace('#import <UIKit/UIKit.h>','').replace('NSUserDefaults.standardUserDefaults','paymentDefaults')"
+        },
+        {
+          "line": 16,
+          "text": "(out/'PaymentAutomationUnderTest.h').write_text(s)"
+        },
+        {
+          "line": 25,
+          "text": "(out/'PaymentLogicHooksUnderTest.h').write_text(logic)"
+        },
+        {
+          "line": 27,
+          "text": "(out/'TransferNetworkHooksUnderTest.h').write_text(network)"
+        },
+        {
+          "line": 29,
+          "text": "(out/'PaymentResponseHooksUnderTest.h').write_text(response)"
+        },
+        {
+          "line": 32,
+          "text": "(out/'EnvelopeNetworkHooksUnderTest.h').write_text(network)"
+        },
+        {
+          "line": 34,
+          "text": "(out/'EnvelopeResponseHooksUnderTest.h').write_text(response)"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-payment-core.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nif [[ \"${1:-}\" != \"--privacy\" ]]; then\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -framework Foundation -I\"$project_dir/Controllers\" \"$project_dir/Tests/PaymentCoreTests.m\" \"$project_dir/Controllers/CSPaymentCore.m\" \"$project_dir/Controllers/CSPaymentLedger.m\" -o \"$test_dir/core\"\n\"$test_dir/core\"\nfi\n\npython3 - \"$project_dir\" \"$test_dir\" <<'PYTEST'\nfrom pathlib import Path\nimport sys\nroot,out=map(Path,sys.argv[1:])\ns=(root/'Controllers/CSPaymentAutomation.m').read_text().replace('#import <UIKit/UIKit.h>','').replace('NSUserDefaults.standardUserDefaults','paymentDefaults')\n(out/'PaymentAutomationUnderTest.h').write_text(s)\nhooks=(root/'Hooks/ReceiveTransferHooks.xm').read_text()\nlogic=hooks.split('%hook WCPayReveiverControlTransferControlLogic',1)[1].split('%end',1)[0]\nlogic=logic.replace('id result=%orig;','id result=[super init]; self.data=data;')\nstart=logic.index('- (void)startLogic');confirm=logic.index('- (void)OnWCPayTransferMoneyStatusViewControllerConfirmTransfer')\ntail=logic[confirm:]\nstop=tail.index('// This callback')\ntail=tail[:stop].replace('%orig;','[self nativeConfirm];')+tail[stop:].replace('%orig;','originalCallbacks++;')\nlogic=logic[:start]+logic[start:confirm].replace('%orig;','nativeStarts++;')+tail\n(out/'PaymentLogicHooksUnderTest.h').write_text(logic)\nnetwork=hooks.split('%hook WCPayNetworkHelper',1)[1].split('%end',1)[0].replace('%orig;','nativeNetworkSubmissions++;')\n(out/'TransferNetworkHooksUnderTest.h').write_text(network)\nresponse=hooks.split('%hook WCPayLogicMgr',1)[1].split('%end',1)[0].replace('%orig;','originalCallbacks++;').replace('%orig(scene,guarded,deny,start,stop);','[self nativeLicense:guarded];')\n(out/'PaymentResponseHooksUnderTest.h').write_text(response)\nhooks=(root/'Hooks/RedEnvelopHooks.xm').read_text()\nnetwork=hooks.split('%hook WCRedEnvelopesNetworkHelper',1)[1].split('%end',1)[0].replace('%orig;','nativeNetworkSubmissions++;')\n(out/'EnvelopeNetworkHooksUnderTest.h').write_text(network)\nresponse=hooks.split('%hook WCRedEnvelopesLogicMgr',1)[1].split('%end',1)[0].replace('%orig;','originalCallbacks++;')\n(out/'EnvelopeResponseHooksUnderTest.h').write_text(response)\nPYTEST\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -Wno-nullability-completeness -framework Foundation -I\"$project_dir/Controllers\" -I\"$test_dir\" \"$project_dir/Tests/PaymentAutomationTests.m\" \"$project_dir/Controllers/CSPaymentCore.m\" \"$project_dir/Controllers/CSPaymentLedger.m\" -o \"$test_dir/automation\"\n\"$test_dir/automation\" \"$@\"\n"
+    },
+    {
+      "name": "verify-plugin-framework.sh",
+      "sha256": "42954b7afb2f0fe1739fc938aac41c4c53bd943faafc62bc6b35fa961b63a1a6",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        },
+        {
+          "line": 18,
+          "text": "(out/'EntryUnderTest.h').write_text(('\\n'.join(functions)+'\\n@implementation TestEntry\\n'+'\\n'.join(methods)+'\\n@end\\n').replace('[NSUserDefaults standardUserDefaults]','testDefaults'))"
+        },
+        {
+          "line": 21,
+          "text": "(out/'ManagerUnderTest.h').write_text('\\n'.join(methods).replace('NSUserDefaults.standardUserDefaults','self.testDefaults'))"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\npython3 - \"$work\" <<'PY'\nfrom pathlib import Path\nimport sys\nout=Path(sys.argv[1])\ndef extract(source, signature):\n    start=source.index(signature); opening=source.index('{',start); depth=1; pos=opening+1\n    while depth:\n        depth += (source[pos]=='{')-(source[pos]=='}');pos+=1\n    return source[start:pos]\nentry=Path('Hooks/CustomEntryHooks.xm').read_text()\nfunctions=[extract(entry,s) for s in ('static CSEntryDisplayMode getEntryDisplayMode()', 'static NSString *getCustomEntryTitle()', 'static void loadEntrySettings()', 'static void CSRemoveHiddenPluginEntryFromHost(id host)')]\nmethods=[extract(entry,s) for s in ('- (void)onCustomEntryClick {','- (void)openCustomViewController {','- (void)onCustomEntryClickInSetting:', '- (void)openCustomViewControllerFromSetting {')]\n(out/'EntryUnderTest.h').write_text(('\\n'.join(functions)+'\\n@implementation TestEntry\\n'+'\\n'.join(methods)+'\\n@end\\n').replace('[NSUserDefaults standardUserDefaults]','testDefaults'))\nmanager=Path('Controllers/CSBackupManager.m').read_text()\nmethods=[extract(manager,s) for s in ('- (NSString *)lastRestoreFailure', '- (NSError *)restoreError:', '- (void)clearRestoreFailure', '- (void)performRestore:', '- (void)create:', '- (void)cancelPending:', '- (void)retryPendingWork:', '- (void)resolveStartup:')]\n(out/'ManagerUnderTest.h').write_text('\\n'.join(methods).replace('NSUserDefaults.standardUserDefaults','self.testDefaults'))\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-function \\\n -framework Foundation -I\"$work\" Tests/PluginEntryTests.m -o \"$work/entry\"\n\"$work/entry\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \\\n -framework Foundation -I\"$work\" -IHeaders -IControllers Tests/BackupStartupIntegrationTests.m -o \"$work/startup\"\n\"$work/startup\"\n"
+    },
+    {
+      "name": "verify-plugin-storage-migration.sh",
+      "sha256": "6ffbc411074a9f783a8904c1491c49937ee1b265f78e947479281f65f92b6cee",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        },
+        {
+          "line": 7,
+          "text": "xcrun --sdk macosx clang \"${flags[@]}\" -Dlinkat=CSMigrationLinkat -Dunlinkat=CSMigrationUnlinkat -c Controllers/CSPluginStorage.m -o \"$work/storage.o\""
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d)\ntrap 'rm -rf \"$work\"' EXIT\nflags=(-fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -IControllers)\nxcrun --sdk macosx clang \"${flags[@]}\" -Dlinkat=CSMigrationLinkat -Dunlinkat=CSMigrationUnlinkat -c Controllers/CSPluginStorage.m -o \"$work/storage.o\"\nxcrun --sdk macosx clang \"${flags[@]}\" -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics Controllers/CSScheduledTaskStore.m Controllers/CSAIReplyStore.m Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m Controllers/CSBackupStore.m Controllers/CSManagedImageFile.m Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m Tests/PluginStorageMigrationTests.m \"$work/storage.o\" -o \"$work/tests\"\n\"$work/tests\"\n"
+    },
+    {
+      "name": "verify-preference-concurrency.sh",
+      "sha256": "ac022c72fda5418317690afc059abdc2945e81507731c7180521dd77d3a84307",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-preference-concurrency.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation -framework CoreFoundation -I\"$project_dir/Controllers\" \"$project_dir/Controllers/CSAvatarURLCache.m\" \"$project_dir/Controllers/CSMessageActionPreferences.m\" \"$project_dir/Tests/PreferenceConcurrencyTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-privacy-admission-cache-events.sh",
+      "sha256": "4fee085c565d6b8e104863ab2aa3f80f400dfb1975ef9ade6ae70e823172ae38",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 6,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\nsource_dir=\"${1:-$project_dir}\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-privacy-admission-events.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$source_dir\" \"$test_dir\" \"${ADMISSION_PROVENANCE_PATH:-}\" <<'PY'\nfrom pathlib import Path\nimport sys\nproject,source,output=map(Path,sys.argv[1:4]);provenance=sys.argv[4]\ngenerator=(project/'Tests/verify-privacy-admission-cache.sh').read_text().split(\"<<'PY'\\n\",1)[1].split('\\nPY\\n',1)[0]\nsys.argv=['extract-admission',str(source),str(output),provenance]\nexec(compile(generator,str(project/'Tests/verify-privacy-admission-cache.sh'),'exec'),{'__name__':'admission_event_extractor'})\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations \\\n -framework Foundation -framework Security -I\"$test_dir\" -I\"$source_dir/Controllers\" -I\"$project_dir/Tests\" \\\n \"$source_dir/Controllers/CSGroupProjection.m\" \"$source_dir/Controllers/WESessionTabItem.m\" \\\n \"$source_dir/Controllers/CSGroupNativeBridge.m\" \"$source_dir/Controllers/CSGroupIndexScope.m\" \\\n \"$source_dir/Controllers/CSCloseFriendPolicy.m\" \"$source_dir/Controllers/CSCloseFriendRuntime.m\" \\\n \"$source_dir/Controllers/CSCloseFriendStore.m\" \"$source_dir/Controllers/CSCloseFriendCrypto.m\" \\\n \"$source_dir/Controllers/CSPluginStorage.m\" \"$project_dir/Tests/PrivacyAdmissionCacheAdditionalTests.m\" \\\n -o \"$test_dir/admission-event-tests\"\n\"$test_dir/admission-event-tests\"\n"
+    },
+    {
+      "name": "verify-privacy-admission-cache.sh",
+      "sha256": "f4b4686114b601bb73c2c26e9184f32e8aeef90c57b561a128bfb4d81b7b3651",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 6,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 21,
+          "text": "(output/'AdmissionProductionBody.h').write_text('\\n\\n'.join(bodies)+'\\n')"
+        },
+        {
+          "line": 23,
+          "text": "(output/'AdmissionShieldBody.h').write_text('\\n'.join(line for line in shield.splitlines() if not line.startswith('#import'))+'\\n')"
+        },
+        {
+          "line": 25,
+          "text": "provenance={'head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=source,text=True).strip(),'source_sha256':{name:hashlib.sha256((source/name).read_bytes()).hexdigest() for name in paths},'methods':{marker:hashlib.sha256(body.encode()).hexdigest() for marker,body in zip(markers,bodies)},'boundaries':'UIKit table/cells and native source are host doubles; real policy, runtime expiry, projection, safe numeric reader, and index scopes compile unchanged.'}"
+        },
+        {
+          "line": 28,
+          "text": "    target=Path(sys.argv[3]);target.parent.mkdir(parents=True,exist_ok=True);target.write_text(json.dumps(provenance,indent=2)+'\\n')"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\nsource_dir=\"${1:-$project_dir}\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-privacy-admission.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$source_dir\" \"$test_dir\" \"${ADMISSION_PROVENANCE_PATH:-}\" <<'PY'\nfrom pathlib import Path\nimport hashlib,json,subprocess,sys\nsource,output=map(Path,sys.argv[1:3]);adapter=(source/'Controllers/CSGroupListAdapter.m').read_text()\ndef method(text,marker):\n    start=text.index(marker);opening=text.index('{',start);depth=0\n    for end in range(opening,len(text)):\n        if text[end]=='{':depth+=1\n        elif text[end]=='}':\n            depth-=1\n            if not depth:return text[start:end+1]\n    raise AssertionError(marker)\nmarkers=['- (void)performSessionListLayout:','- (void)invalidateNativeSnapshot']\nbodies=[method(adapter,marker) for marker in markers]\n(output/'AdmissionProductionBody.h').write_text('\\n\\n'.join(bodies)+'\\n')\nshield=(source/'Controllers/CSCloseFriendListShield.m').read_text()\n(output/'AdmissionShieldBody.h').write_text('\\n'.join(line for line in shield.splitlines() if not line.startswith('#import'))+'\\n')\npaths=['Controllers/CSGroupListAdapter.m','Controllers/CSGroupProjection.m','Controllers/CSGroupNativeBridge.m','Controllers/CSGroupIndexScope.m','Controllers/CSCloseFriendPolicy.m','Controllers/CSCloseFriendRuntime.m','Controllers/CSCloseFriendListShield.m']\nprovenance={'head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=source,text=True).strip(),'source_sha256':{name:hashlib.sha256((source/name).read_bytes()).hexdigest() for name in paths},'methods':{marker:hashlib.sha256(body.encode()).hexdigest() for marker,body in zip(markers,bodies)},'boundaries':'UIKit table/cells and native source are host doubles; real policy, runtime expiry, projection, safe numeric reader, and index scopes compile unchanged.'}\nprint('PROVENANCE '+json.dumps(provenance,sort_keys=True))\nif sys.argv[3]:\n    target=Path(sys.argv[3]);target.parent.mkdir(parents=True,exist_ok=True);target.write_text(json.dumps(provenance,indent=2)+'\\n')\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations \\\n -framework Foundation -framework Security -I\"$test_dir\" -I\"$source_dir/Controllers\" \\\n \"$source_dir/Controllers/CSGroupProjection.m\" \"$source_dir/Controllers/WESessionTabItem.m\" \\\n \"$source_dir/Controllers/CSGroupNativeBridge.m\" \"$source_dir/Controllers/CSGroupIndexScope.m\" \\\n \"$source_dir/Controllers/CSCloseFriendPolicy.m\" \"$source_dir/Controllers/CSCloseFriendRuntime.m\" \\\n \"$source_dir/Controllers/CSCloseFriendStore.m\" \"$source_dir/Controllers/CSCloseFriendCrypto.m\" \\\n \"$source_dir/Controllers/CSPluginStorage.m\" \"$project_dir/Tests/PrivacyAdmissionCacheTests.m\" \\\n -o \"$test_dir/admission-tests\"\n\"$test_dir/admission-tests\"\n"
+    },
+    {
+      "name": "verify-revoke-interception.sh",
+      "sha256": "8e4b78636971306b6600025e6e27a92420cedff853a3b31c88b7c53fbd57e905",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 28,
+          "text": "(out/'RevokeUnderTest.h').write_text(s)"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-revoke-interception.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$test_dir\" <<'EXTRACT'\nfrom pathlib import Path\nimport sys\nroot,out=map(Path,sys.argv[1:])\nsource=(root/'Hooks/RevokeHooks.xm').read_text()\ns=source.split('%hook CMessageMgr',1)[0]\ns='\\n'.join(l for l in s.splitlines() if not l.startswith('#import'))\ndef route(section, method, name):\n start=source.index(method,source.index(section));begin=source.index('{',start);depth=0\n for i in range(begin,len(source)):\n  if source[i]=='{':depth+=1\n  elif source[i]=='}':\n   depth-=1\n   if not depth:\n    body=source[begin+1:i].replace('%orig;', 'return NO;').replace('return;', 'return YES;')\n    return 'static BOOL '+name+'(id arg1) {'+body+'}\\n'\n raise ValueError(method)\nfor section,method,name in [('%hook CMessageMgr','- (void)onRevokeMsg:', 'testPrimary'),\n ('%hook MessageRevokeMgr','- (void)onRevokeMsg:', 'testSecondary'),\n ('%hook MessageRevokeMgr','- (void)replaceRevokedMsg:', 'testReplace'),\n ('%hook MessageRevokeMgr','- (void)deleteLocalProcessRevokeMsgWithToast:', 'testDelete')]:\n s+='\\n'+route(section,method,name)\n(out/'RevokeUnderTest.h').write_text(s)\nEXTRACT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-function -Wno-unused-parameter \\\n -framework Foundation -I\"$project_dir/Controllers\" -I\"$test_dir\" \\\n \"$project_dir/Controllers/CSRevokeReference.m\" \\\n \"$project_dir/Tests/RevokeInterceptionTests.m\" -o \"$test_dir/revoke-tests\"\n\"$test_dir/revoke-tests\"\n"
+    },
+    {
+      "name": "verify-revoke-reference.sh",
+      "sha256": "5c661c7a5c0771c183313ab5a155cdebba617965c71ced35494d8eaaa7a8dec1",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-revoke.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -Wall -Wextra -Werror -Wno-unused-parameter -framework Foundation \\\n -I\"$project_dir/Controllers\" \"$project_dir/Controllers/CSRevokeReference.m\" \"$project_dir/Tests/RevokeReferenceTests.m\" -o \"$test_dir/revoke-tests\"\n\"$test_dir/revoke-tests\"\n"
+    },
+    {
+      "name": "verify-scheduled-task-backup.sh",
+      "sha256": "5a11136821767e138821ac154fe31630d396f7043c48baa866d938fdf6a0539a",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$work\"' EXIT"
+        },
+        {
+          "line": 16,
+          "text": "Path(sys.argv[1],'ScheduledBackupManagerBoundary.h').write_text('\\n'.join(methods))"
+        },
+        {
+          "line": 18,
+          "text": "Path(sys.argv[1],'ScheduledStoreUnderTest.m').write_text('#import <Foundation/Foundation.h>\\n#include <unistd.h>\\nint CSScheduledBackupFsync(int);\\n#define fsync(...) CSScheduledBackupFsync(__VA_ARGS__)\\n#include \"'+str(store)+'\"\\n')"
+        },
+        {
+          "line": 26,
+          "text": "\"$work/tests\" \"$work/Library/Preferences/WeChatImprove\""
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\nwork=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-scheduled-backup.XXXXXX\")\ntrap 'rm -rf \"$work\"' EXIT\npython3 - \"$work\" <<'PY'\nfrom pathlib import Path\nimport sys\nsource=Path('Controllers/CSBackupManager.m').read_text()\nmethods=[]\nfor selector in ('- (void)preview:', '- (void)prepare:'):\n    start=source.index(selector);opening=source.index('{',start);depth=1;end=opening+1\n    while depth:\n        depth+=(source[end]=='{')-(source[end]=='}');end+=1\n    methods.append(source[start:end])\nPath(sys.argv[1],'ScheduledBackupManagerBoundary.h').write_text('\\n'.join(methods))\nstore=Path('Controllers/CSScheduledTaskStore.m').resolve()\nPath(sys.argv[1],'ScheduledStoreUnderTest.m').write_text('#import <Foundation/Foundation.h>\\n#include <unistd.h>\\nint CSScheduledBackupFsync(int);\\n#define fsync(...) CSScheduledBackupFsync(__VA_ARGS__)\\n#include \"'+str(store)+'\"\\n')\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations \\\n  -DCS_SCHEDULED_STORE_TRACK_MUTATIONS=1 -IControllers -I\"$work\" -framework Foundation -framework CoreFoundation -framework ImageIO -framework CoreGraphics \\\n  Controllers/CSBackupRegistry.m Controllers/CSBackupCodec.m Controllers/CSBackupAssets.m \\\n  Controllers/CSPluginStorage.m Controllers/CSBackupStore.m Controllers/CSManagedImageFile.m \\\n  Controllers/CSBackupEngine.m Controllers/CSBackupMutation.m \"$work/ScheduledStoreUnderTest.m\" Controllers/CSAIReplyStore.m \\\n  Tests/ScheduledTaskBackupTests.m -o \"$work/tests\"\n\"$work/tests\" \"$work/Library/Preferences/WeChatImprove\"\n"
+    },
+    {
+      "name": "verify-scheduled-task-manager.sh",
+      "sha256": "68e1f1fd360232ef0ad420ab11d43d1e257c694cf3b33cb8366ad3b150ed3627",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 11,
+          "text": "(out/'ScheduledNativeDispatchUnderTest.m').write_text(source)"
+        },
+        {
+          "line": 14,
+          "text": "(out/'ScheduledSendUnderTest.m').write_text(source+'\\n@end\\n')"
+        },
+        {
+          "line": 15,
+          "text": "(out/'ScheduledStoreUnderTest.m').write_text('#import <Foundation/Foundation.h>\\n#include <unistd.h>\\nint CSScheduledTestFsync(int);\\n#define fsync(...) CSScheduledTestFsync(__VA_ARGS__)\\n#include \"'+str(Path('Controllers/CSScheduledTaskStore.m').resolve())+'\"\\n')"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\ntest_dir=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-scheduled-manager.XXXXXX\")\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$test_dir\" <<'PY'\nimport sys\nfrom pathlib import Path\nout=Path(sys.argv[1])\nsource=Path('Controllers/CSMessageNativeActionAdapter.m').read_text().split('@interface NSObject (CSNativeAppPath)',1)[0]\n(out/'ScheduledNativeDispatchUnderTest.m').write_text(source)\n# Compile the real scheduled-send factory and prepared route, omitting unrelated media routes.\nsource=Path('Controllers/CSMessageSendAdapter.m').read_text().split('- (CSMessagePreparedSend *)prepareContext:',1)[0]\n(out/'ScheduledSendUnderTest.m').write_text(source+'\\n@end\\n')\n(out/'ScheduledStoreUnderTest.m').write_text('#import <Foundation/Foundation.h>\\n#include <unistd.h>\\nint CSScheduledTestFsync(int);\\n#define fsync(...) CSScheduledTestFsync(__VA_ARGS__)\\n#include \"'+str(Path('Controllers/CSScheduledTaskStore.m').resolve())+'\"\\n')\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-incomplete-implementation -Wno-unused-function \\\n  -DCS_SCHEDULED_STORE_TRACK_MUTATIONS=1 -ITests/AIDetailUIKit -IControllers -I\"$test_dir\" -framework Foundation \\\n  \"$test_dir/ScheduledStoreUnderTest.m\" Controllers/CSBackupMutation.m Controllers/CSScheduledTaskManager.m Controllers/CSCloseFriendPolicy.m \\\n  Controllers/CSCloseFriendAutomationProjection.m Tests/ScheduledTaskManagerTests.m -o \"$test_dir/tests\"\n\"$test_dir/tests\" \"$test_dir/data\"\n"
+    },
+    {
+      "name": "verify-scheduled-task-swipes.sh",
+      "sha256": "d6f0a03b2d85f67470deee4e0ed0708e29f9a0d1c0c044ab31a1f441f13c5b87",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 26,
+          "text": "Path(sys.argv[1],'ScheduledTaskSwipeUnderTest.h').write_text('\\n'.join(method(selector) for selector in selectors))"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")/..\"\ntest_dir=$(mktemp -d \"${TMPDIR:-/tmp}/wechat-scheduled-swipes.XXXXXX\")\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\nsource=Path('Controllers/CSScheduledTaskSettingsViewController.m').read_text().split('@implementation CSScheduledTaskSettingsViewController',1)[1]\ndef method(selector):\n    start=source.index(selector)\n    opening=source.index('{',start)\n    depth=1\n    end=opening+1\n    while depth:\n        depth+=(source[end]=='{')-(source[end]=='}')\n        end+=1\n    return source[start:end]\nselectors=(\n    '- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:',\n    '- (NSDictionary *)swipeTaskWithID:',\n    '- (void)performTaskAction:',\n    '- (UISwipeActionsConfiguration *)tableView:',\n    '- (void)tableView:(UITableView *)tableView commitEditingStyle:',\n)\nPath(sys.argv[1],'ScheduledTaskSwipeUnderTest.h').write_text('\\n'.join(method(selector) for selector in selectors))\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \\\n  -IControllers -I\"$test_dir\" -framework Foundation \\\n  Controllers/CSScheduledTaskStore.m Controllers/CSCloseFriendPolicy.m Controllers/CSCloseFriendAutomationProjection.m \\\n  Tests/ScheduledTaskSwipeTests.m -o \"$test_dir/tests\"\n\"$test_dir/tests\" \"$test_dir/data\"\n"
+    },
+    {
+      "name": "verify-scheduled-tasks.sh",
+      "sha256": "99c8ced391001fa5e2b4852db5ac2828d1a0233bf02a1bf4d2ff588969960c6d",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-scheduled-tasks.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation \\\n  -I\"$project_dir/Controllers\" \"$project_dir/Controllers/CSScheduledTaskStore.m\" \\\n  \"$project_dir/Tests/ScheduledTaskTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\" \"$test_dir/data\"\n"
+    },
+    {
+      "name": "verify-tabbar.sh",
+      "sha256": "a9ab113135fbfa18a49a785503ce8fc07558031fcfadbc66f426780b813fd878",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-tabbar.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\nxcrun clang -Wall -Wextra -Werror -I\"$project_dir/Headers\" \"$project_dir/Tests/TabBarGeometryTests.c\" -o \"$test_dir/geometry\"\n\"$test_dir/geometry\"\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-const-variable -Wno-incompatible-pointer-types -framework Foundation -framework QuartzCore -framework CoreGraphics -I\"$project_dir/Tests/TabBarUIKit\" -I\"$project_dir/Headers\" -I\"$project_dir/Controllers\" \"$project_dir/Tests/TabBarUIKit/TabBarUIKit.m\" \"$project_dir/Controllers/CSTabBarPreferences.m\" \"$project_dir/Controllers/CSTabBarNativeAdapter.m\" \"$project_dir/Tests/TabBarNativeTests.m\" -o \"$test_dir/native\"\n\"$test_dir/native\" \"$test_dir/icon.png\"\n"
+    },
+    {
+      "name": "verify-touch-trail.sh",
+      "sha256": "764e9d143340233d9b9cb5121bd38be2df24b29ca6a885abc49a56712e8d7f7c",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [
+        {
+          "line": 5,
+          "text": "trap 'rm -rf \"$test_dir\"' EXIT"
+        },
+        {
+          "line": 30,
+          "text": "(out/'TouchHookUnderTest.h').write_text(s)"
+        }
+      ],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\ntest_dir=\"$(mktemp -d \"${TMPDIR:-/tmp}/wechat-touch-trail.XXXXXX\")\"\ntrap 'rm -rf \"$test_dir\"' EXIT\npython3 - \"$project_dir\" \"$test_dir\" <<'PY'\nfrom pathlib import Path\nimport sys\nroot,out=map(Path,sys.argv[1:])\ns=(root/'Hooks/TouchTrailHooks.xm').read_text().replace('../Controllers/','')\n# Execute the existing runtime after readiness; the real gate has its own suite.\ns=s.replace('#import \"CSBackupBootstrap.h\"', 'static void CSBackupWhenReady(void (^callback)(void)) { callback(); }').replace('%init;', '')\na=s.index('@implementation WBTouchTrailDotView');b=s.index('// \u83b7\u53d6\u5f53\u524d\u8bbe\u7f6e\u7684\u89e6\u6478\u8f68\u8ff9\u989c\u8272',a)\n# Only drawing/CA interpolation are doubles; execute the production settings,\n# image cache, event admission, sampling, ownership and lifecycle code.\nviews='''@implementation WBTouchTrailView\n- (void)updateWithPoint:(CGPoint)point isMoving:(BOOL)moving { (void)moving; self.frame=CGRectMake(point.x,point.y,self.trailSize,self.trailSize); }\n@end\n@implementation WBTouchTrailDotView\n- (instancetype)initWithPoint:(CGPoint)p dotColor:(UIColor *)c borderColor:(UIColor *)b dotSize:(CGFloat)s borderWidth:(CGFloat)w hasBorder:(BOOL)h duration:(CGFloat)d {\n return [self initWithPoint:p dotColor:c borderColor:b dotSize:s borderWidth:w hasBorder:h duration:d useCustomImage:NO customImage:nil cornerRadiusRatio:1];\n}\n- (instancetype)initWithPoint:(CGPoint)p dotColor:(UIColor *)c borderColor:(UIColor *)b dotSize:(CGFloat)s borderWidth:(CGFloat)w hasBorder:(BOOL)h duration:(CGFloat)d useCustomImage:(BOOL)u customImage:(UIImage *)i cornerRadiusRatio:(CGFloat)r {\n return [super initWithFrame:CGRectMake(p.x,p.y,s,s)];\n}\n@end\n'''\ns=s[:a]+views+s[b:]\ns=s.replace('%hook UIApplication','@implementation UIApplication (TouchTest)').replace('%orig;','nativeEvents++;').replace('%end','@end').replace('%ctor {','static void CSInstallTouchRuntime(void) {')\n(out/'TouchHookUnderTest.h').write_text(s)\nPY\nxcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -Wno-incomplete-implementation -Wno-unused-const-variable -framework Foundation -framework CoreGraphics -framework QuartzCore -I\"$project_dir/Tests/TouchUIKit\" -I\"$project_dir/Controllers\" -I\"$test_dir\" \"$project_dir/Tests/TabBarUIKit/TabBarUIKit.m\" \"$project_dir/Tests/TouchTrailRuntimeTests.m\" -o \"$test_dir/tests\"\n\"$test_dir/tests\"\n"
+    },
+    {
+      "name": "verify-transfer-admission.sh",
+      "sha256": "bc5205faa3c2a9a3705d0a66e10c541c225e249759cfcd64df0789fb65b05c12",
+      "bash_n_exit": 0,
+      "bash_n_output": "",
+      "safety_flags": [],
+      "full_script": "#!/bin/bash\nset -euo pipefail\nproject_dir=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\n# Admission now shares the payment parser and lifecycle; keep this entry point.\nexec bash \"$project_dir/Tests/verify-payment-core.sh\"\n"
+    }
+  ],
+  "count": 73
+}

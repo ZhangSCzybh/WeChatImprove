@@ -1,0 +1,67 @@
+BUNDLE {
+    CFBundleExecutable = contract;
+    CFBundleIdentifier = "test.wechat2215.compact";
+    CFBundlePackageType = APPL;
+    CFBundleShortVersionString = "8.0.80";
+}
+SETTINGS new-mode=1 legacy=0 actual=1 expected=1
+GAP version=8.0.80 mode=compact unsupported=0 style=0 outgoing=1 pass=0 actual=2.000 target=2.000 heights=44.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=0 outgoing=1 pass=1 actual=2.000 target=2.000 heights=44.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=0 outgoing=1 pass=2 actual=2.000 target=2.000 heights=44.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=0 outgoing=1 pass=3 actual=2.000 target=2.000 heights=44.000,47.000
+SETTINGS new-mode=0 legacy=-8 actual=0 expected=0
+GAP version=8.0.80 mode=normal unsupported=0 style=0 outgoing=1 pass=0 actual=21.000 target=21.000 heights=55.000,55.000
+GAP version=8.0.80 mode=normal unsupported=0 style=0 outgoing=1 pass=1 actual=21.000 target=21.000 heights=55.000,55.000
+GAP version=8.0.80 mode=normal unsupported=0 style=0 outgoing=1 pass=2 actual=21.000 target=21.000 heights=55.000,55.000
+GAP version=8.0.80 mode=normal unsupported=0 style=0 outgoing=1 pass=3 actual=21.000 target=21.000 heights=55.000,55.000
+SETTINGS new-mode=absent legacy=-8 actual=1 expected=1
+GAP version=8.0.80 mode=compact unsupported=0 style=0 outgoing=1 pass=0 actual=2.000 target=2.000 heights=44.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=0 outgoing=1 pass=1 actual=2.000 target=2.000 heights=44.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=0 outgoing=1 pass=2 actual=2.000 target=2.000 heights=44.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=0 outgoing=1 pass=3 actual=2.000 target=2.000 heights=44.000,47.000
+SETTINGS new-mode=1 legacy=0 actual=1 expected=1
+GAP version=8.0.80 mode=compact unsupported=1 style=0 outgoing=1 pass=0 actual=21.000 target=21.000 heights=55.000,55.000
+GAP version=8.0.80 mode=compact unsupported=1 style=0 outgoing=1 pass=1 actual=21.000 target=21.000 heights=55.000,55.000
+GAP version=8.0.80 mode=compact unsupported=1 style=0 outgoing=1 pass=2 actual=21.000 target=21.000 heights=55.000,55.000
+GAP version=8.0.80 mode=compact unsupported=1 style=0 outgoing=1 pass=3 actual=21.000 target=21.000 heights=55.000,55.000
+SETTINGS new-mode=1 legacy=0 actual=1 expected=1
+GAP version=8.0.80 mode=compact unsupported=0 style=0 outgoing=0 pass=0 actual=2.000 target=2.000 heights=53.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=0 outgoing=0 pass=1 actual=2.000 target=2.000 heights=53.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=0 outgoing=0 pass=2 actual=2.000 target=2.000 heights=53.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=0 outgoing=0 pass=3 actual=2.000 target=2.000 heights=53.000,47.000
+SETTINGS new-mode=0 legacy=-8 actual=0 expected=0
+GAP version=8.0.80 mode=normal unsupported=0 style=0 outgoing=0 pass=0 actual=24.000 target=24.000 heights=67.000,55.000
+GAP version=8.0.80 mode=normal unsupported=0 style=0 outgoing=0 pass=1 actual=24.000 target=24.000 heights=67.000,55.000
+GAP version=8.0.80 mode=normal unsupported=0 style=0 outgoing=0 pass=2 actual=24.000 target=24.000 heights=67.000,55.000
+GAP version=8.0.80 mode=normal unsupported=0 style=0 outgoing=0 pass=3 actual=24.000 target=24.000 heights=67.000,55.000
+SETTINGS new-mode=1 legacy=0 actual=1 expected=1
+GAP version=8.0.80 mode=compact unsupported=0 style=1 outgoing=1 pass=0 actual=2.000 target=2.000 heights=44.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=1 outgoing=1 pass=1 actual=2.000 target=2.000 heights=44.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=1 outgoing=1 pass=2 actual=2.000 target=2.000 heights=44.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=1 outgoing=1 pass=3 actual=2.000 target=2.000 heights=44.000,47.000
+SETTINGS new-mode=0 legacy=-8 actual=0 expected=0
+GAP version=8.0.80 mode=normal unsupported=0 style=1 outgoing=1 pass=0 actual=21.000 target=21.000 heights=55.000,55.000
+GAP version=8.0.80 mode=normal unsupported=0 style=1 outgoing=1 pass=1 actual=21.000 target=21.000 heights=55.000,55.000
+GAP version=8.0.80 mode=normal unsupported=0 style=1 outgoing=1 pass=2 actual=21.000 target=21.000 heights=55.000,55.000
+GAP version=8.0.80 mode=normal unsupported=0 style=1 outgoing=1 pass=3 actual=21.000 target=21.000 heights=55.000,55.000
+SETTINGS new-mode=absent legacy=-8 actual=1 expected=1
+GAP version=8.0.80 mode=compact unsupported=0 style=1 outgoing=1 pass=0 actual=2.000 target=2.000 heights=44.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=1 outgoing=1 pass=1 actual=2.000 target=2.000 heights=44.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=1 outgoing=1 pass=2 actual=2.000 target=2.000 heights=44.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=1 outgoing=1 pass=3 actual=2.000 target=2.000 heights=44.000,47.000
+SETTINGS new-mode=1 legacy=0 actual=1 expected=1
+GAP version=8.0.80 mode=compact unsupported=1 style=1 outgoing=1 pass=0 actual=21.000 target=21.000 heights=55.000,55.000
+GAP version=8.0.80 mode=compact unsupported=1 style=1 outgoing=1 pass=1 actual=21.000 target=21.000 heights=55.000,55.000
+GAP version=8.0.80 mode=compact unsupported=1 style=1 outgoing=1 pass=2 actual=21.000 target=21.000 heights=55.000,55.000
+GAP version=8.0.80 mode=compact unsupported=1 style=1 outgoing=1 pass=3 actual=21.000 target=21.000 heights=55.000,55.000
+SETTINGS new-mode=1 legacy=0 actual=1 expected=1
+GAP version=8.0.80 mode=compact unsupported=0 style=1 outgoing=0 pass=0 actual=2.000 target=2.000 heights=53.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=1 outgoing=0 pass=1 actual=2.000 target=2.000 heights=53.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=1 outgoing=0 pass=2 actual=2.000 target=2.000 heights=53.000,47.000
+GAP version=8.0.80 mode=compact unsupported=0 style=1 outgoing=0 pass=3 actual=2.000 target=2.000 heights=53.000,47.000
+SETTINGS new-mode=0 legacy=-8 actual=0 expected=0
+GAP version=8.0.80 mode=normal unsupported=0 style=1 outgoing=0 pass=0 actual=24.000 target=24.000 heights=67.000,55.000
+GAP version=8.0.80 mode=normal unsupported=0 style=1 outgoing=0 pass=1 actual=24.000 target=24.000 heights=67.000,55.000
+GAP version=8.0.80 mode=normal unsupported=0 style=1 outgoing=0 pass=2 actual=24.000 target=24.000 heights=67.000,55.000
+GAP version=8.0.80 mode=normal unsupported=0 style=1 outgoing=0 pass=3 actual=24.000 target=24.000 heights=67.000,55.000
+PASS: 369 checks, 0 failures; actual production merge/bubble version gates, no CS_BUBBLE_TESTING/CS_MERGE_TESTING

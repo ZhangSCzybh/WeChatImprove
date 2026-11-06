@@ -1,0 +1,58 @@
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/baseline-fixture/Tests/GroupInteractionTests.m:229:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:4:11: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'
+    4 |     [self consumeRefreshRequest];
+      |      ~~~~ ^~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:12:10: error: property 'immediateRefreshPending' not found on object of type 'CSGroupListAdapter *'
+   12 |     self.immediateRefreshPending=YES;
+      |          ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:65:22: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'
+   65 |             [adapter restorePendingViewport];
+      |              ~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:133:11: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'
+  133 |     [self restorePendingViewport];
+      |      ~~~~ ^~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:146:11: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'
+  146 |     [self restorePendingViewport];
+      |      ~~~~ ^~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:278:38: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'
+  278 |     if (NSThread.isMainThread) [self adoptCompatibilityModelIfNeeded];
+      |                                 ~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:279:14: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
+  279 |     if (self.usesNativeSessionModel) { [self refreshNativeSessionModel]; return; }
+      |              ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:279:46: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'
+  279 |     if (self.usesNativeSessionModel) { [self refreshNativeSessionModel]; return; }
+      |                                         ~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:282:40: error: property 'presentationViewport' not found on object of type 'CSGroupListAdapter *'
+  282 |     NSDictionary *sourceViewport=(self.presentationViewport || self.switchViewport) ? nil : [self captureViewportForTabID:self.publishedTabID];
+      |                                        ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:282:69: error: property 'switchViewport' not found on object of type 'CSGroupListAdapter *'
+  282 |     NSDictionary *sourceViewport=(self.presentationViewport || self.switchViewport) ? nil : [self captureViewportForTabID:self.publishedTabID];
+      |                                                                     ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:282:99: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'captureViewportForTabID:'
+  282 |     NSDictionary *sourceViewport=(self.presentationViewport || self.switchViewport) ? nil : [self captureViewportForTabID:self.publishedTabID];
+      |                                                                                              ~~~~ ^~~~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:301:11: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'
+  301 |     [self consumeRefreshRequest];
+      |      ~~~~ ^~~~~~~~~~~~~~~~~~~~~
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:308:10: error: property 'immediateRefreshPending' not found on object of type 'CSGroupListAdapter *'
+  308 |     self.immediateRefreshPending=YES;
+      |          ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:325:57: error: property 'immediateRefreshPending' not found on object of type 'CSGroupListAdapter *'
+  325 |     BOOL coalesced=!self.privacyRefreshPending && !self.immediateRefreshPending && self.coalescingNotification && !self.nativeActions.count;
+      |                                                         ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:334:49: error: property 'refreshCoalescedDue' not found on object of type 'CSGroupListAdapter *'
+  334 |     NSTimeInterval delay=coalesced ? MAX(0,self.refreshCoalescedDue-now) : 0;
+      |                                                 ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:334:49: error: property 'refreshCoalescedDue' not found on object of type 'CSGroupListAdapter *'
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:354:37: error: property 'scheduledRefreshDue' not found on object of type 'CSGroupListAdapter *'
+  354 |         BOOL sameDeadline=fabs(self.scheduledRefreshDue-due)<0.001;
+      |                                     ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:358:10: error: property 'scheduledRefreshDue' not found on object of type 'CSGroupListAdapter *'
+  358 |     self.scheduledRefreshDue=due;
+      |          ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2216-regression-5vycpryj//wechat-group-interactions.XmtG4D/GroupInteractionBodies.h:367:20: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'
+  367 |         else [self consumeRefreshRequest];
+      |               ~~~~ ^~~~~~~~~~~~~~~~~~~~~
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.

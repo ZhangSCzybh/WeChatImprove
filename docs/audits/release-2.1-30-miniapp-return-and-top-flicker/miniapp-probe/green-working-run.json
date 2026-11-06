@@ -1,8 +1,0 @@
-{
-  "argv": [
-    "bash",
-    "Tests/verify-group-container-return.sh"
-  ],
-  "exit_code": 0,
-  "boundary": "Host-controlled UI proxy reentry, not natural miniapp lifecycle evidence."
-}

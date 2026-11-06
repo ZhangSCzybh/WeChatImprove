@@ -1,9 +1,0 @@
-Close-friend sessions: 85 checks, 0 failures
-FAIL: folded row retains native content, card, aggregate icon and separator
-FAIL: folded row has two neutral lines inside native item without a full-cell opaque slab
-FAIL: neutral title/summary follow native two-line insets and vertical spacing
-FAIL: neutral typography follows native label fonts and colors
-FAIL: native relayout/theme updates neutral summary geometry and color without another cover
-FAIL: native relayout hides new business content while retaining aggregate icon
-FAIL: ordinary-cell reuse restores native hidden states and removes only owned overlay
-Close-friend session presentation: 31 checks, 7 failures

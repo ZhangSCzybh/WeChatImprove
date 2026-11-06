@@ -1,9 +1,0 @@
-{
-  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
-  "base_commit": "fc1bcad8e3e6523da633a8c81a291c0738ed193a",
-  "branch": "main",
-  "version_before": "2.1-14",
-  "version_target": "2.1-15",
-  "task": "seven remaining performance optimizations, release notes and two scheme packages",
-  "service_or_database_operations": false
-}

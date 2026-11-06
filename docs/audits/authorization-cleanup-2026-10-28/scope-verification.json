@@ -1,8 +1,0 @@
-{
-  "Controllers/CSCustomViewController.m_body_unchanged": true,
-  "Hooks/CustomEntryHooks.xm_body_unchanged": true,
-  "manager_prompt_and_routing_byte_identical": true,
-  "query_body_unchanged_except_comments": true,
-  "Controllers/CSAIReplyManager.m_byte_identical": true,
-  "Controllers/CSScheduledTaskManager.m_byte_identical": true
-}

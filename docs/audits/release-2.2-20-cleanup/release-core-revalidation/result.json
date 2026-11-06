@@ -1,0 +1,1702 @@
+{
+  "selected_raw_scripts": 82,
+  "waived_raw_scripts": [
+    "verify-close-friend-alerts.sh",
+    "verify-close-friend-entry.sh",
+    "verify-close-friend-recovery.sh",
+    "verify-close-friend-session.sh",
+    "verify-close-friend-unread-panel.sh",
+    "verify-group-appearance.sh",
+    "verify-group-badges.sh",
+    "verify-group-business.sh",
+    "verify-group-incremental.sh",
+    "verify-group-interactions.sh",
+    "verify-group-lifecycle.sh",
+    "verify-group-search.sh",
+    "verify-group-selection.sh",
+    "verify-group-viewport.sh",
+    "verify-miniapp-first-frame.sh",
+    "verify-miniapp-private-layout.sh",
+    "verify-privacy-admission-cache-events.sh",
+    "verify-privacy-admission-cache.sh"
+  ],
+  "raw_passed": 82,
+  "raw_failed": 0,
+  "modern_suite_count": 10,
+  "completed_tasks": 92,
+  "all_selected_passed": true,
+  "production_bound_to_current_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "production_file_count": 42522,
+  "production_unchanged_during_revalidation": true,
+  "fixture_bytes_preserved": true,
+  "old_evidence_overwritten": false,
+  "device_validated": false,
+  "runs": [
+    {
+      "name": "compact1436",
+      "command": [
+        "python3",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/prior-compact/run-native-contract.py",
+        "--phase",
+        "green"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "seconds": 2.753,
+      "log": "runs/compact1436.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-8p0fqut3",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-8p0fqut3/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-8p0fqut3/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-8p0fqut3/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "header37152",
+      "command": [
+        "python3",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/header-gap-validation/run-validation.py",
+        "--source",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+        "--label",
+        "green-2.2-20"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "seconds": 0.606,
+      "log": "runs/header37152.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-3sm7ualg",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-3sm7ualg/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-3sm7ualg/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-3sm7ualg/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "new-password105",
+      "command": [
+        "python3",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/new-password-validation/run-validation.py",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+        "green"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "seconds": 3.018,
+      "log": "runs/new-password105.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-8mfzeeha",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-8mfzeeha/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-8mfzeeha/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-8mfzeeha/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "prior-merge",
+      "command": [
+        "python3",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/prior-merge/run-validation.py"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "seconds": 5.436,
+      "log": "runs/prior-merge.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-0ptotpe5",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-0ptotpe5/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-0ptotpe5/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-0ptotpe5/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "prior-privacy",
+      "command": [
+        "python3",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/prior-privacy/run_validation.py"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "seconds": 7.747,
+      "log": "runs/prior-privacy.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-b6y6bzx4",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-b6y6bzx4/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-b6y6bzx4/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-b6y6bzx4/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "prior-settings",
+      "command": [
+        "python3",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/prior-settings/run-validation.py"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "seconds": 5.032,
+      "log": "runs/prior-settings.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-ft2jthn7",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-ft2jthn7/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-ft2jthn7/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-ft2jthn7/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "prior-tabbar",
+      "command": [
+        "python3",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/prior-tabbar/run-validation.py"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "seconds": 2.214,
+      "log": "runs/prior-tabbar.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-viohojzz",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-viohojzz/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-viohojzz/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-viohojzz/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "quick-reset259",
+      "command": [
+        "python3",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/quick-reset-validation/run_validation.py",
+        "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+        "green"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "seconds": 3.802,
+      "log": "runs/quick-reset259.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-711j2bdz",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-711j2bdz/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-711j2bdz/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-711j2bdz/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "quick90",
+      "command": [
+        "python3",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/quick-entry-validation/run_validation.py"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "seconds": 1.753,
+      "log": "runs/quick90.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-yufqa73q",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-yufqa73q/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-yufqa73q/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-yufqa73q/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "rollback232",
+      "command": [
+        "python3",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/rollback-validation/run-rollback.py"
+      ],
+      "cwd": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "exit_code": 0,
+      "seconds": 3.584,
+      "log": "runs/rollback232.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-l04cq5l0",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-l04cq5l0/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-l04cq5l0/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-l04cq5l0/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-ai-background-sync.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-ai-background-sync.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.724,
+      "log": "runs/verify-ai-background-sync.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-mo5zcj_w",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-mo5zcj_w/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-mo5zcj_w/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-mo5zcj_w/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-ai-backup.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-ai-backup.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 4.156,
+      "log": "runs/verify-ai-backup.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-9tqy415i",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-9tqy415i/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-9tqy415i/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-9tqy415i/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-ai-coordinator.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-ai-coordinator.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 3.272,
+      "log": "runs/verify-ai-coordinator.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-4p1ub269",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-4p1ub269/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-4p1ub269/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-4p1ub269/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-ai-credentials.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-ai-credentials.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.758,
+      "log": "runs/verify-ai-credentials.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-lknc9ltc",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-lknc9ltc/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-lknc9ltc/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-lknc9ltc/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-ai-foundation.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-ai-foundation.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 2.284,
+      "log": "runs/verify-ai-foundation.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-d9on33cz",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-d9on33cz/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-d9on33cz/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-d9on33cz/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-ai-images.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-ai-images.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 5.257,
+      "log": "runs/verify-ai-images.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-7cgfdaa9",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-7cgfdaa9/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-7cgfdaa9/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-7cgfdaa9/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-ai-manager.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-ai-manager.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 6.002,
+      "log": "runs/verify-ai-manager.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-2f2b1c11",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-2f2b1c11/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-2f2b1c11/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-2f2b1c11/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-ai-native-sync-observer.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-ai-native-sync-observer.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.322,
+      "log": "runs/verify-ai-native-sync-observer.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-zihmh74m",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-zihmh74m/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-zihmh74m/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-zihmh74m/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-ai-native.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-ai-native.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.03,
+      "log": "runs/verify-ai-native.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-uymig922",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-uymig922/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-uymig922/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-uymig922/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-ai-store-async.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-ai-store-async.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.835,
+      "log": "runs/verify-ai-store-async.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-zzefqztd",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-zzefqztd/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-zzefqztd/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-zzefqztd/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-attachment-layout.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-attachment-layout.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.561,
+      "log": "runs/verify-attachment-layout.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-xfq6xx22",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-xfq6xx22/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-xfq6xx22/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-xfq6xx22/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-authorization-prompt.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-authorization-prompt.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.706,
+      "log": "runs/verify-authorization-prompt.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-ygap3ayx",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-ygap3ayx/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-ygap3ayx/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-ygap3ayx/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-authorization-read.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-authorization-read.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.518,
+      "log": "runs/verify-authorization-read.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-cgn3ufnd",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-cgn3ufnd/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-cgn3ufnd/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-cgn3ufnd/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-avatar-input-style.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-avatar-input-style.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 2.021,
+      "log": "runs/verify-avatar-input-style.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-qzrnevf4",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-qzrnevf4/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-qzrnevf4/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-qzrnevf4/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-background-blur.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-background-blur.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.991,
+      "log": "runs/verify-background-blur.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-6pnn7t2u",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-6pnn7t2u/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-6pnn7t2u/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-6pnn7t2u/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-background-privacy.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-background-privacy.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.318,
+      "log": "runs/verify-background-privacy.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-g5c_97ua",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-g5c_97ua/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-g5c_97ua/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-g5c_97ua/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-background-run-runtime.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-background-run-runtime.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.119,
+      "log": "runs/verify-background-run-runtime.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-5x7w6t80",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-5x7w6t80/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-5x7w6t80/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-5x7w6t80/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-background-run.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-background-run.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 4.971,
+      "log": "runs/verify-background-run.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-s52clam9",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-s52clam9/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-s52clam9/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-s52clam9/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-assets.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-assets.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.402,
+      "log": "runs/verify-backup-assets.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-jad8cqe4",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-jad8cqe4/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-jad8cqe4/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-jad8cqe4/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-audit.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-audit.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.928,
+      "log": "runs/verify-backup-audit.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-rr4hbuoo",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-rr4hbuoo/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-rr4hbuoo/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-rr4hbuoo/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-bootstrap.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-bootstrap.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 14.461,
+      "log": "runs/verify-backup-bootstrap.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-2fduyifo",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-2fduyifo/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-2fduyifo/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-2fduyifo/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-codec.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-codec.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.406,
+      "log": "runs/verify-backup-codec.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-loenjmid",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-loenjmid/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-loenjmid/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-loenjmid/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-compatibility.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-compatibility.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 3.505,
+      "log": "runs/verify-backup-compatibility.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-erp3bjej",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-erp3bjej/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-erp3bjej/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-erp3bjej/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-deletion-ui.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-deletion-ui.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.64,
+      "log": "runs/verify-backup-deletion-ui.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-kj8phqoa",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-kj8phqoa/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-kj8phqoa/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-kj8phqoa/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-deletion.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-deletion.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.802,
+      "log": "runs/verify-backup-deletion.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-lr61vj08",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-lr61vj08/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-lr61vj08/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-lr61vj08/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-engine.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-engine.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 2.732,
+      "log": "runs/verify-backup-engine.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-e4wovdd0",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-e4wovdd0/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-e4wovdd0/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-e4wovdd0/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-manual-management.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-manual-management.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.912,
+      "log": "runs/verify-backup-manual-management.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-nc_ayv4e",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-nc_ayv4e/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-nc_ayv4e/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-nc_ayv4e/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-performance.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-performance.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 3.068,
+      "log": "runs/verify-backup-performance.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-jgp1sb5z",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-jgp1sb5z/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-jgp1sb5z/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-jgp1sb5z/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-registry.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-registry.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.104,
+      "log": "runs/verify-backup-registry.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-0twklm2x",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-0twklm2x/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-0twklm2x/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-0twklm2x/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-reset.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-reset.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 2.749,
+      "log": "runs/verify-backup-reset.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-sqtzf43i",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-sqtzf43i/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-sqtzf43i/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-sqtzf43i/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-restore-paths.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-restore-paths.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 3.559,
+      "log": "runs/verify-backup-restore-paths.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-e4ix4m73",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-e4ix4m73/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-e4ix4m73/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-e4ix4m73/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-store.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-store.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.841,
+      "log": "runs/verify-backup-store.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-62br61px",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-62br61px/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-62br61px/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-62br61px/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-backup-transactions.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-backup-transactions.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 5.735,
+      "log": "runs/verify-backup-transactions.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-dts3rhqp",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-dts3rhqp/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-dts3rhqp/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-dts3rhqp/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-bubble-style.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-bubble-style.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 10.946,
+      "log": "runs/verify-bubble-style.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-7jymu9y6",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-7jymu9y6/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-7jymu9y6/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-7jymu9y6/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-album.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-album.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.938,
+      "log": "runs/verify-close-friend-album.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-n5ubdh31",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-n5ubdh31/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-n5ubdh31/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-n5ubdh31/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-automation.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-automation.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.832,
+      "log": "runs/verify-close-friend-automation.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-1lbumwg7",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-1lbumwg7/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-1lbumwg7/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-1lbumwg7/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-contacts-read.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-contacts-read.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.971,
+      "log": "runs/verify-close-friend-contacts-read.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-_296mzk7",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-_296mzk7/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-_296mzk7/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-_296mzk7/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-contacts.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-contacts.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.09,
+      "log": "runs/verify-close-friend-contacts.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-73jsi_lr",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-73jsi_lr/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-73jsi_lr/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-73jsi_lr/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-core.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-core.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.168,
+      "log": "runs/verify-close-friend-core.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-h21h_oh6",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-h21h_oh6/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-h21h_oh6/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-h21h_oh6/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-detail.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-detail.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.184,
+      "log": "runs/verify-close-friend-detail.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-c7g2pim0",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-c7g2pim0/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-c7g2pim0/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-c7g2pim0/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-discovery.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-discovery.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.206,
+      "log": "runs/verify-close-friend-discovery.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-o9ubzms_",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-o9ubzms_/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-o9ubzms_/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-o9ubzms_/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-ios.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-ios.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 20.528,
+      "log": "runs/verify-close-friend-ios.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-8l_gby3x",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-8l_gby3x/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-8l_gby3x/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-8l_gby3x/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-migration.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-migration.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.484,
+      "log": "runs/verify-close-friend-migration.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-58mulex9",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-58mulex9/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-58mulex9/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-58mulex9/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-pages.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-pages.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.993,
+      "log": "runs/verify-close-friend-pages.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-e7ex6xd5",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-e7ex6xd5/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-e7ex6xd5/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-e7ex6xd5/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-privacy.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-privacy.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.914,
+      "log": "runs/verify-close-friend-privacy.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-1ynx1p6s",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-1ynx1p6s/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-1ynx1p6s/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-1ynx1p6s/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-profile.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-profile.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.821,
+      "log": "runs/verify-close-friend-profile.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-0e24_9fj",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-0e24_9fj/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-0e24_9fj/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-0e24_9fj/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-reset.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-reset.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 3.327,
+      "log": "runs/verify-close-friend-reset.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-2t1fmbff",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-2t1fmbff/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-2t1fmbff/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-2t1fmbff/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-runtime.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-runtime.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 6.202,
+      "log": "runs/verify-close-friend-runtime.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-dm9tboc0",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-dm9tboc0/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-dm9tboc0/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-dm9tboc0/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-shake.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-shake.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.888,
+      "log": "runs/verify-close-friend-shake.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-l0tjfrh4",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-l0tjfrh4/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-l0tjfrh4/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-l0tjfrh4/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-close-friend-social.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-close-friend-social.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.537,
+      "log": "runs/verify-close-friend-social.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-oayjmtz0",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-oayjmtz0/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-oayjmtz0/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-oayjmtz0/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-custom-text.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-custom-text.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.94,
+      "log": "runs/verify-custom-text.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-_rd0ka_f",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-_rd0ka_f/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-_rd0ka_f/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-_rd0ka_f/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-group-header.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-group-header.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.736,
+      "log": "runs/verify-group-header.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-x02yt7_o",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-x02yt7_o/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-x02yt7_o/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-x02yt7_o/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-group-indicator.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-group-indicator.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.717,
+      "log": "runs/verify-group-indicator.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-jyr1r1mx",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-jyr1r1mx/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-jyr1r1mx/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-jyr1r1mx/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-group-picker.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-group-picker.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.477,
+      "log": "runs/verify-group-picker.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-wpfl2s8b",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-wpfl2s8b/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-wpfl2s8b/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-wpfl2s8b/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-group-preferences.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-group-preferences.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.951,
+      "log": "runs/verify-group-preferences.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-h9axkkhi",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-h9axkkhi/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-h9axkkhi/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-h9axkkhi/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-layout-preferences.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-layout-preferences.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.773,
+      "log": "runs/verify-layout-preferences.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-9hu5pz8k",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-9hu5pz8k/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-9hu5pz8k/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-9hu5pz8k/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-list-corners.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-list-corners.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 3.978,
+      "log": "runs/verify-list-corners.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-pvcasblg",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-pvcasblg/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-pvcasblg/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-pvcasblg/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-managed-image-files.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-managed-image-files.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 2.779,
+      "log": "runs/verify-managed-image-files.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-z6_v3170",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-z6_v3170/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-z6_v3170/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-z6_v3170/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-merge-bubble-integration.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-merge-bubble-integration.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 35.43,
+      "log": "runs/verify-merge-bubble-integration.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-3mpp9i3y",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-3mpp9i3y/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-3mpp9i3y/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-3mpp9i3y/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-message-actions-core.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-message-actions-core.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 2.023,
+      "log": "runs/verify-message-actions-core.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-xoojdn3c",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-xoojdn3c/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-xoojdn3c/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-xoojdn3c/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-message-actions-execution.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-message-actions-execution.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 18.064,
+      "log": "runs/verify-message-actions-execution.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-ma9kt8oo",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-ma9kt8oo/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-ma9kt8oo/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-ma9kt8oo/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-message-gesture.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-message-gesture.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.924,
+      "log": "runs/verify-message-gesture.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-6046ynvq",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-6046ynvq/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-6046ynvq/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-6046ynvq/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-message-merge.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-message-merge.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 3.195,
+      "log": "runs/verify-message-merge.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-j1n2mj0i",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-j1n2mj0i/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-j1n2mj0i/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-j1n2mj0i/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-message-time.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-message-time.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.6,
+      "log": "runs/verify-message-time.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-cc1d8922",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-cc1d8922/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-cc1d8922/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-cc1d8922/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-my-page-clean.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-my-page-clean.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.601,
+      "log": "runs/verify-my-page-clean.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-7j3w8pxp",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-7j3w8pxp/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-7j3w8pxp/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-7j3w8pxp/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-native-contact-picker.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-native-contact-picker.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.073,
+      "log": "runs/verify-native-contact-picker.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-6woccdy_",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-6woccdy_/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-6woccdy_/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-6woccdy_/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-native-reward.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-native-reward.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 3.992,
+      "log": "runs/verify-native-reward.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-n896o2uo",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-n896o2uo/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-n896o2uo/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-n896o2uo/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-navigation-images.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-navigation-images.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 3.187,
+      "log": "runs/verify-navigation-images.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-4md7p70p",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-4md7p70p/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-4md7p70p/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-4md7p70p/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-navigation-title-batch.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-navigation-title-batch.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.084,
+      "log": "runs/verify-navigation-title-batch.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-11_09641",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-11_09641/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-11_09641/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-11_09641/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-payment-core.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-payment-core.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 19.648,
+      "log": "runs/verify-payment-core.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-r2e6wlai",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-r2e6wlai/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-r2e6wlai/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-r2e6wlai/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-plugin-framework.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-plugin-framework.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.141,
+      "log": "runs/verify-plugin-framework.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-9egd75_4",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-9egd75_4/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-9egd75_4/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-9egd75_4/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-plugin-storage-migration.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-plugin-storage-migration.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 2.626,
+      "log": "runs/verify-plugin-storage-migration.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-hcyqrcba",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-hcyqrcba/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-hcyqrcba/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-hcyqrcba/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-preference-concurrency.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-preference-concurrency.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.121,
+      "log": "runs/verify-preference-concurrency.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-h9pvdru1",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-h9pvdru1/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-h9pvdru1/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-h9pvdru1/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-revoke-interception.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-revoke-interception.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.809,
+      "log": "runs/verify-revoke-interception.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-j760kvq2",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-j760kvq2/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-j760kvq2/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-j760kvq2/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-revoke-reference.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-revoke-reference.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.652,
+      "log": "runs/verify-revoke-reference.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-desgj5ld",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-desgj5ld/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-desgj5ld/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-desgj5ld/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-scheduled-task-backup.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-scheduled-task-backup.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 4.755,
+      "log": "runs/verify-scheduled-task-backup.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-g7ly392_",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-g7ly392_/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-g7ly392_/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-g7ly392_/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-scheduled-task-manager.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-scheduled-task-manager.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.719,
+      "log": "runs/verify-scheduled-task-manager.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-vxl55pj5",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-vxl55pj5/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-vxl55pj5/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-vxl55pj5/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-scheduled-task-swipes.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-scheduled-task-swipes.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.145,
+      "log": "runs/verify-scheduled-task-swipes.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-1rudacn5",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-1rudacn5/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-1rudacn5/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-1rudacn5/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-scheduled-tasks.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-scheduled-tasks.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 0.742,
+      "log": "runs/verify-scheduled-tasks.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-alvljs9i",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-alvljs9i/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-alvljs9i/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-alvljs9i/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-tabbar.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-tabbar.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.735,
+      "log": "runs/verify-tabbar.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-37tmaf46",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-37tmaf46/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-37tmaf46/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-37tmaf46/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-touch-trail.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-touch-trail.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 1.135,
+      "log": "runs/verify-touch-trail.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-rlb1uksd",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-rlb1uksd/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-rlb1uksd/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-rlb1uksd/THEOS_PACKAGE_DIR"
+      }
+    },
+    {
+      "name": "verify-transfer-admission.sh",
+      "command": [
+        "bash",
+        "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project/Tests/verify-transfer-admission.sh"
+      ],
+      "cwd": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2220-core-cinrro31/audit/release-core-revalidation/fixture-project",
+      "exit_code": 0,
+      "seconds": 19.083,
+      "log": "runs/verify-transfer-admission.sh.log",
+      "production_manifest_sha256": "32fb334bc38a5a350c1b11c4c67fb4622c532fd3857e2b27937c9058435f4a37",
+      "temporary_data_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-mr1sffdv",
+      "temporary_theos_env": {
+        "_THEOS_LOCAL_DATA_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-mr1sffdv/_THEOS_LOCAL_DATA_DIR",
+        "THEOS_BUILD_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-mr1sffdv/THEOS_BUILD_DIR",
+        "THEOS_PACKAGE_DIR": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2220-core-mr1sffdv/THEOS_PACKAGE_DIR"
+      }
+    }
+  ]
+}

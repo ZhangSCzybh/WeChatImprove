@@ -1,0 +1,2 @@
+Navigation popover/settings: 2 consumers -> 1 network start; 100 stable rebinds -> 0 additional starts; same-key invalidation cancels pending work and clears stale images; lifecycle/account/contact/URL/target guards passed; main-thread thumbnail decodes=0.
+Navigation images: 162 checks passed; shared downloads, cancellation, account/size/file invalidation and background thumbnail decoding

@@ -1,1 +1,0 @@
-FAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/PaymentCoreTests.m:32: CSPaymentTransferFields(XML(nil),@{@"id":@"id-1",@"subtype":@0},@"self",@"payer",@"self")

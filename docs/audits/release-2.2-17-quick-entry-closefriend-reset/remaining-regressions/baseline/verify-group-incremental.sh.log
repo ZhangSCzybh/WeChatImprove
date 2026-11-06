@@ -1,0 +1,60 @@
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture/Tests/GroupIncrementalTests.m:45:
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:3:54: error: semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]
+    3 |       previouslyProjecting:(BOOL)previouslyProjecting;
+      |                                                      ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:4:1: error: expected method body
+    4 | - (NSArray *)nativeSectionsForAccount:(NSString *)account changes:(CSGroupChangeKind)changes
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:6:60: error: semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]
+    6 | - (NSDictionary *)captureViewportForTabID:(NSString *)tabID;
+      |                                                            ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:7:1: error: expected method body
+    7 | - (BOOL)validViewport:(NSDictionary *)viewport;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:8:44: error: semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]
+    8 | - (BOOL)restoreScrollHeight:(CGFloat)height;
+      |                                            ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:9:1: error: expected method body
+    9 | - (void)restorePendingViewport;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:10:59: error: semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]
+   10 | - (void)restoreViewportFromSource:(NSDictionary *)viewport;
+      |                                                           ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:11:1: error: expected method body
+   11 | - (void)clearPendingViewport;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:12:19: error: expected a type
+   12 | - (void)tablePan:(UIPanGestureRecognizer *)pan;
+      |                   ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:12:47: error: semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]
+   12 | - (void)tablePan:(UIPanGestureRecognizer *)pan;
+      |                                               ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:13:1: error: expected method body
+   13 | - (void)requestRecovery;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:14:31: error: semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]
+   14 | - (void)cancelScheduledRefresh;
+      |                               ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:15:1: error: expected method body
+   15 | @property (nonatomic) BOOL nativePresentation, scheduled, dirty, searching;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:16:1: error: unexpected '@' in program
+   16 | @property (nonatomic) BOOL snapshotRetryAttempted;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:17:1: error: unexpected '@' in program
+   17 | @property (nonatomic) NSUInteger snapshotRetryGeneration;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:18:1: error: unexpected '@' in program
+   18 | @property (nonatomic, readwrite) BOOL publishing;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:19:1: error: unexpected '@' in program
+   19 | @property (atomic, readwrite) NSUInteger changeDepth;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:20:1: error: unexpected '@' in program
+   20 | @property (nonatomic) UIScrollViewDecelerationRate baselineDeceleration;
+      | ^
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wci-2217-regression-uxvlnpmq//wechat-group-incremental.yYTPSj/GroupPublicationBody.h:21:30: error: semicolon before method body is ignored [-Werror,-Wsemicolon-before-method-body]
+   21 | - (void)useNativePresentation;
+      |                              ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.

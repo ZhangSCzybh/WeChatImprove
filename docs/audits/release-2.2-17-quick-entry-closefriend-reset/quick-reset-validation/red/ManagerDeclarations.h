@@ -1,0 +1,5 @@
+- (BOOL)validateToken:(NSDictionary *)token;
+- (BOOL)canResetFrom:(UIViewController *)presenter token:(NSDictionary *)token;
+- (void)finishResetAlert:(UIAlertController *)alert presenter:(UIViewController *)presenter completion:(void (^)(void))completion;
+- (void)confirmResetFrom:(UIViewController *)presenter token:(NSDictionary *)token completion:(void (^)(BOOL))completion;
+- (void)resetFrom:(UIViewController *)presenter completion:(void (^)(BOOL))completion;

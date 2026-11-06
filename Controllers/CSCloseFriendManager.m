@@ -63,6 +63,7 @@ static BOOL CSKeychainRemove(NSString *account, NSString *kind, NSError **error)
 @property(nonatomic,strong) NSTimer *timer;
 @property(nonatomic,strong) CSCloseFriendShakeMonitor *shakeMonitor;
 @property(nonatomic,weak) UIViewController *recoveryPage;
+@property(nonatomic,weak) UIView *recoveryTarget;
 @property(nonatomic,weak) UILongPressGestureRecognizer *recoveryGesture;
 @property(nonatomic) NSUInteger recoveryEpoch;
 @property(nonatomic) BOOL started, lastRevealed, authenticating, backgroundCoverRequired, routingProtectedChat, policyRefreshScheduled;
@@ -97,6 +98,7 @@ static BOOL CSKeychainRemove(NSString *account, NSString *kind, NSError **error)
             writer:^BOOL(NSString *account,NSString *kind,NSData *data,NSError **error){ return CSKeychainWrite(account,kind,data,NO,error); }
             remover:^BOOL(NSString *account,NSString *kind,NSError **error){ return CSKeychainRemove(account,kind,error); }];
         _runtime.resetStorage=^BOOL(NSString *account,BOOL begin,NSError **error){
+            if(!begin)CSKeychainRemove(account,@"credential-reset",NULL);
             return begin ? [reset beginResetForAccountID:account error:error] : [reset resumeResetForAccountID:account error:error];
         };
         __weak typeof(self) weakSelf=self;
@@ -406,7 +408,9 @@ static BOOL CSKeychainRemove(NSString *account, NSString *kind, NSError **error)
 }
 - (BOOL)canResetFrom:(UIViewController *)presenter token:(NSDictionary *)token {
     return !self.backgroundCoverRequired && UIApplication.sharedApplication.applicationState==UIApplicationStateActive &&
-        presenter.view.window && [self validateToken:token] && self.runtime.isAuthorized &&
+        presenter.view.window && ([token[@"visit"] isKindOfClass:NSString.class] ?
+        (!CSBackupAccountIsSuspended() && [token[@"epoch"] unsignedIntegerValue]==CSBackupAccountEpoch() && [self.runtime isSettingsTokenCurrent:token]) :
+        ([self validateToken:token] && self.runtime.isAuthorized)) &&
         (!presenter.navigationController || presenter.navigationController.topViewController==presenter);
 }
 - (void)finishResetAlert:(UIAlertController *)alert presenter:(UIViewController *)presenter completion:(void (^)(void))completion {
@@ -418,18 +422,22 @@ static BOOL CSKeychainRemove(NSString *account, NSString *kind, NSError **error)
     else completion();
 }
 - (void)confirmResetFrom:(UIViewController *)presenter token:(NSDictionary *)token completion:(void (^)(BOOL))completion {
-    if(![self canResetFrom:presenter token:token]) { [self.runtime cancelResetWithToken:token]; if(completion)completion(NO); return; }
+    if(![self canResetFrom:presenter token:token] || presenter.presentedViewController) { [self.runtime cancelResetWithToken:token]; if(completion)completion(NO); return; }
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"重置当前账号的密友？"
-        message:@"将清空密友和密群名单、全部保护选项、密友密码、生物识别记录及入口发现记录。保护将关闭，“捉迷藏呀”重新隐藏。\n微信好友、聊天记录、免打扰设置和其他账号不受影响。此操作无法撤销。"
+        message:[@"将清空密友和密群名单、全部保护选项、密友密码、生物识别记录及入口发现记录。保护将关闭，“捉迷藏呀”重新隐藏。\n微信好友、聊天记录、免打扰设置和其他账号不受影响。此操作无法撤销。" stringByAppendingString:token[@"visit"]?@"\n快捷入口不校验密码：任何拿到已解锁手机的人，连点头像 5 下并确认，即可清空整个密友配置。":@""]
         preferredStyle:UIAlertControllerStyleAlert];
     __weak UIAlertController *weakAlert=alert;
+    __block BOOL quickDecisionPending=YES;
     [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action){
+        if(token[@"visit"]) { if(!quickDecisionPending)return; quickDecisionPending=NO; }
         [self.runtime cancelResetWithToken:token]; if(completion)completion(NO);
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"重置密友" style:UIAlertActionStyleDestructive handler:^(__unused UIAlertAction *action){
+        if(token[@"visit"]) { if(!quickDecisionPending)return; quickDecisionPending=NO; }
         __block BOOL ok=NO; __block NSError *error=nil;
-        if([self canResetFrom:presenter token:token])CSBackupPerformAtAccountEpoch([token[@"epoch"] unsignedIntegerValue],^{
-            if(!CSBackupAccountIsSuspended() && [self.runtime isTokenCurrent:token])ok=[self.runtime resetWithToken:token error:&error];
+        if([self canResetFrom:presenter token:token] && (!presenter.presentedViewController || presenter.presentedViewController==weakAlert))CSBackupPerformAtAccountEpoch([token[@"epoch"] unsignedIntegerValue],^{
+            [self refreshAccount];
+            if(!CSBackupAccountIsSuspended() && [self canResetFrom:presenter token:token])ok=[self.runtime resetWithToken:token error:&error];
         });
         [self.runtime cancelResetWithToken:token];
         self.lastRevealed=self.runtime.isAuthorized;
@@ -462,6 +470,31 @@ static BOOL CSKeychainRemove(NSString *account, NSString *kind, NSError **error)
     }]];
     [presenter presentViewController:alert animated:YES completion:nil];
 }
+- (void)resetFrom:(UIViewController *)presenter settingsToken:(NSDictionary *)token completion:(void (^)(BOOL))completion {
+    NSAssert(NSThread.isMainThread,@"Reset UI on main");
+    [self refreshAccount];
+    if(![self.runtime isSettingsTokenCurrent:token] || ![self canResetFrom:presenter token:token] || presenter.presentedViewController || self.authenticating) { if(completion)completion(NO); return; }
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"无密码重置须知"
+        message:@"将清空当前账号的密友和密群名单、全部保护选项、密友密码、生物识别记录及入口发现记录。保护将关闭，“捉迷藏呀”重新隐藏。\n微信好友、聊天记录、免打扰设置和其他账号不受影响。此操作无法撤销。\n快捷入口不校验密码：任何拿到已解锁手机的人，连点头像 5 下并确认，即可清空整个密友配置。继续后还需再次确认。"
+        preferredStyle:UIAlertControllerStyleAlert];
+    __weak UIAlertController *weakAlert=alert;
+    __block BOOL decisionPending=YES;
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(__unused UIAlertAction *action){ if(!decisionPending)return; decisionPending=NO; if(completion)completion(NO); }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"继续" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){
+        if(!decisionPending)return; decisionPending=NO;
+        if(presenter.presentedViewController && presenter.presentedViewController!=weakAlert) { if(completion)completion(NO); return; }
+        [self finishResetAlert:weakAlert presenter:presenter completion:^{
+            __block NSDictionary *proof=nil;
+            if([self canResetFrom:presenter token:token] && !presenter.presentedViewController)CSBackupPerformAtAccountEpoch([token[@"epoch"] unsignedIntegerValue],^{
+                [self refreshAccount];
+                if([self canResetFrom:presenter token:token])proof=[self.runtime prepareResetWithSettingsToken:token error:NULL];
+            });
+            if(proof)[self confirmResetFrom:presenter token:proof completion:completion];
+            else if(completion)completion(NO);
+        }];
+    }]];
+    [presenter presentViewController:alert animated:YES completion:nil];
+}
 - (NSDictionary *)capabilities { @synchronized(self.capabilityMap) { return [self.capabilityMap copy]; } }
 - (void)recordCapability:(NSString *)name available:(BOOL)available { if(!name.length)return; @synchronized(self.capabilityMap) { self.capabilityMap[name]=@(available); } }
 - (void)checkHomepageSearchPassword:(NSString *)query isCurrent:(BOOL (^)(void))isCurrent completion:(void (^)(BOOL))completion {
@@ -475,7 +508,8 @@ static BOOL CSKeychainRemove(NSString *account, NSString *kind, NSError **error)
 - (void)recovery:(UILongPressGestureRecognizer *)gesture {
     if(gesture!=self.recoveryGesture || !gesture.enabled || gesture.state!=UIGestureRecognizerStateBegan || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return;
     UIViewController *page=self.recoveryPage;
-    if(!page || page.navigationController.topViewController!=page || page.presentedViewController || gesture.view!=page.navigationController.navigationBar) return;
+    if(!page || page.navigationController.topViewController!=page || page.presentedViewController ||
+       gesture.view!=self.recoveryTarget || !gesture.view.window || [self recoveryGestureTargetForPage:page]!=gesture.view) return;
     NSUInteger epoch=self.recoveryEpoch;
     [self refreshAccount];
     CSCloseFriendSnapshot *snapshot=CSCloseFriendCurrentSnapshot();
@@ -507,18 +541,27 @@ static BOOL CSKeychainRemove(NSString *account, NSString *kind, NSError **error)
     // Some WeChat builds expose an NSObject main-frame owner with curViewController.
     id page=[controller isKindOfClass:UIViewController.class] ? controller : CSCloseFriendRead(controller,@"curViewController");
     if(![page isKindOfClass:UIViewController.class]) return;
+    UIView *target=[self recoveryGestureTargetForPage:page]; if(!target)return;
     self.recoveryPage=page;
-    UINavigationBar *bar=self.recoveryPage.navigationController.navigationBar; if(!bar)return;
     static char recoveryKey;
-    UILongPressGestureRecognizer *gesture=objc_getAssociatedObject(bar,&recoveryKey);
+    UILongPressGestureRecognizer *gesture=objc_getAssociatedObject(target,&recoveryKey);
     if(!gesture) {
         gesture=[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(recovery:)];
         gesture.cancelsTouchesInView=NO;
-        [bar addGestureRecognizer:gesture]; objc_setAssociatedObject(bar,&recoveryKey,gesture,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        target.userInteractionEnabled=YES;
+        [target addGestureRecognizer:gesture]; objc_setAssociatedObject(target,&recoveryKey,gesture,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     if(self.recoveryGesture!=gesture) self.recoveryGesture.enabled=NO;
+    self.recoveryTarget=target;
     self.recoveryGesture=gesture;
     [self refreshRecoveryGesture];
+}
+- (UIView *)recoveryGestureTargetForPage:(UIViewController *)page {
+    // 8.0.80 can render the native title in MainFrameCustomBarView. Bind to
+    // that title itself, so the gesture follows the view actually hit by a hold.
+    id title=CSCloseFriendRead(page,@"m_titleView");
+    if(![title isKindOfClass:UIView.class]) title=page.navigationItem.titleView;
+    return [title isKindOfClass:UIView.class] ? title : page.navigationController.navigationBar;
 }
 
 @end

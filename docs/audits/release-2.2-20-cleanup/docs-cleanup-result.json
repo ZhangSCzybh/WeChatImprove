@@ -1,0 +1,72 @@
+{
+  "status": "archived_and_full_sha256_verified",
+  "started_at": "2026-11-06T03:31:01.634706+00:00",
+  "finished_at": "2026-11-06T03:35:31.022873+00:00",
+  "archive": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06",
+  "archive_type": "external_local_same_filesystem_rename",
+  "plan": "docs/audits/release-2.2-20-cleanup/docs-cleanup-plan.json",
+  "plan_sha256": "e89072697cfeada3bbeb229f21bd923c048f2a94140f41231b5e1f854cfa77cc",
+  "file_manifest": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/FILE-SHA256.jsonl",
+  "file_manifest_sha256": "439388266c36c67c802a4a7f272595c7deb901ffaf23e5b8d720fd3bda51525f",
+  "root_manifest": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/2.2-20-cleanup-2026-11-06/ROOTS-MANIFEST.json",
+  "root_manifest_sha256": "12b2ceaaf50e09ff49c8c95ef95de8f2468b528d429337ca2215803aac872f30",
+  "moved_root_count": 166,
+  "moved_file_count": 256490,
+  "moved_bytes": 2130403146,
+  "files_verified": 256490,
+  "hash_mismatches": [],
+  "docs_before": {
+    "file_count": 267227,
+    "bytes": 2578845361,
+    "exclude_active_release20": false
+  },
+  "docs_after_before_index_write": {
+    "file_count": 11087,
+    "bytes": 469507019,
+    "exclude_active_release20": false
+  },
+  "docs_before_excluding_active_audit": {
+    "file_count": 267154,
+    "bytes": 2571791755,
+    "exclude_active_release20": true
+  },
+  "docs_after_excluding_active_audit": {
+    "file_count": 10667,
+    "bytes": 441390603,
+    "exclude_active_release20": true
+  },
+  "count_reconciliation": {
+    "matched": true,
+    "added_by_parent": {
+      "path": "docs/README.md",
+      "file_count": 1,
+      "bytes": 1707,
+      "note": "Created concurrently by parent cleanup task, outside this archive operation."
+    },
+    "symlink_inventory_reclassification": [
+      {
+        "path": "docs/audits/release-2.2-17-quick-entry-closefriend-reset/remaining-regressions/baseline-fixture/HeadersFile",
+        "bytes": 138,
+        "target": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/baseline-2.2-16/HeadersFile",
+        "note": "Unmodified preexisting directory symlink now points to archived target; os.walk reclassifies it as a file, adding one to file-only inventory."
+      },
+      {
+        "path": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/remaining-regressions/baseline-fixture/HeadersFile",
+        "bytes": 149,
+        "target": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/baseline-2.2-15/HeadersFile",
+        "note": "Unmodified preexisting directory symlink now points to archived target; os.walk reclassifies it as a file, adding one to file-only inventory."
+      }
+    ],
+    "total_added_to_file_only_inventory": 3,
+    "bytes_added_to_file_only_inventory": 1994
+  },
+  "production_tests_packages_main_theos_touched": false,
+  "all_candidate_source_paths_absent_after_rename": true,
+  "notes": [
+    "All archive moves were restricted to the 166 plan candidates.",
+    "The active release20 audit is excluded from stable comparison because regressions write there concurrently.",
+    "README, WAIVER, REGRESSION-GATE, raw red/green logs, provenance, assertions, fixtures, baseline production source and full samples.json were unchanged by this operation.",
+    "The two historical baseline-fixture symlinks are unchanged; restore archived baseline HeadersFile at original paths to rerun old standalone baseline workspaces. Current release20 fixture uses current main HeadersFile and is not affected.",
+    "The first executor verified all archived hashes, then stopped at its overly strict total-count assertion. This completion pass independently reverified every file and reconciled the count difference without moving additional paths."
+  ]
+}

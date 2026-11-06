@@ -1,0 +1,4 @@
+Social routes: all native Moments lifecycle calls preserved without page unlock covers
+Timeline native cache: model hashing/equality bypassed, repeat reads and same-ID replacement preserved, native archive reentry completed; policy/account events release cached data
+Timeline presentation: core cases passed (native refresh, display mapping, offscreen reveal, lifecycle deduplication, no layout/reload hooks, stale accounts, disappearance releases cache without reload)
+Close-friend social: scoped native timeline/model reads, mixed interactions, cache/source/ACL preservation, status indexes, locked publishing candidates and hidden-selection preservation, stale native render rejection, completed-picker authorization and reveal/relock/account transitions passed

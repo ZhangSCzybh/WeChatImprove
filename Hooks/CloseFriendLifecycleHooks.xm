@@ -27,6 +27,16 @@ static void CSMotionEnded(id self, SEL command, UIEventSubtype motion, UIEvent *
     // Only register deferred bootstrap. No service lookup, Keychain access, file read or class scan here.
     dispatch_async(dispatch_get_main_queue(),^{
         CSCloseFriendInstallHook(@"NewMainFrameViewController",@"viewDidAppear:",(IMP)CSHomeDidAppear,(IMP *)&CSHomeDidAppearOriginal,"v@:B");
+        // Native custom-navigation layouts may replace/reparent the title after
+        // viewDidAppear. Refresh only the attachment at those existing callbacks.
+        for(NSString *name in @[@"initNavigationTitileView",@"viewDidLayoutSubviews"]) {
+            __block IMP original=NULL; SEL selector=NSSelectorFromString(name);
+            IMP replacement=imp_implementationWithBlock(^(id page){
+                ((void(*)(id,SEL))original)(page,selector);
+                [CSCloseFriendManager.sharedManager attachRecoveryGestureTo:page];
+            });
+            if(!CSCloseFriendInstallHook(@"NewMainFrameViewController",name,replacement,&original,"v@:")) imp_removeBlock(replacement);
+        }
         CSCloseFriendInstallHook(@"UIWindow",@"motionBegan:withEvent:",(IMP)CSMotionBegan,(IMP *)&CSMotionBeganOriginal,"v@:q@");
         CSCloseFriendInstallHook(@"UIWindow",@"motionEnded:withEvent:",(IMP)CSMotionEnded,(IMP *)&CSMotionEndedOriginal,"v@:q@");
         CSCloseFriendInstallHook(@"BaseMsgContentViewController",@"viewDidAppear:",(IMP)CSChatDidAppear,(IMP *)&CSChatDidAppearOriginal,"v@:B");

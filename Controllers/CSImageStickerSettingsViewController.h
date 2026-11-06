@@ -1,4 +1,5 @@
+#import "CSSettingsTableViewController.h"
 #import <UIKit/UIKit.h>
 
-@interface CSImageStickerSettingsViewController : UITableViewController
+@interface CSImageStickerSettingsViewController : CSSettingsTableViewController
 @end

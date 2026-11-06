@@ -401,9 +401,11 @@ static NSUInteger CSAuxiliaryContentFlags(id model) {
     if ((CSUInt(wrap,@"m_uiMessageType")==49 || CSBool(wrap,@"isReferMsgType",NO)) && !CSIsQuotedText(model)) flags|=(1UL<<30);
     return flags;
 }
-// This first-pass profile is limited to the version whose native geometry was
-// verified. A published height/translation pair never shrinks from a later cell sample.
-// Unqualified versions retain native spacing until an actual input change.
+// Qualify first-pass geometry only for inspected native message implementations.
+// 8.0.80 retains CommonMessageViewModel's top/name/reply metrics, the cell's
+// separate avatar/content lanes, and VoiceMessageViewModel's complete transcript
+// height (including its 4pt internal gap). Render still validates actual children.
+// A published height/translation pair never shrinks from a later cell sample.
 #ifdef CS_MERGE_TESTING
 NSString *CSMessageMergeTestProfileVersion=@"8.0.78";
 #endif
@@ -416,7 +418,9 @@ static BOOL CSNativeProfile(CSMessageMergeState *s, id logical, CGFloat *top, CG
 #else
     NSString *version=NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"];
 #endif
-    if (![version isEqual:@"8.0.78"] && ![version hasPrefix:@"8.0.78."]) return NO;
+    BOOL qualified=[version isEqual:@"8.0.78"] || [version hasPrefix:@"8.0.78."] ||
+        [version isEqual:@"8.0.80"] || [version hasPrefix:@"8.0.80."];
+    if (!qualified) return NO;
     BOOL identity=!s.decision.hidesIdentity;
     BOOL named=s.group && !CSBool(logical,@"isSender",NO) && identity && CSBool(logical,@"isShowChatRoomDisplayName",YES);
     // Native origins, not UILabel height or an additive name budget. The avatar
@@ -441,7 +445,7 @@ static BOOL CSNativeProfile(CSMessageMergeState *s, id logical, CGFloat *top, CG
 static BOOL CSCanCompact(CSMessageMergeState *s, NSUInteger flags) {
     CSMessageMergeConfiguration *config=s.context.config;
     // Loading, secondary language translation and dialect controls remain guarded.
-    // CSNativeProfile still restricts first-pass compaction to verified 8.0.78.
+    // CSNativeProfile still restricts first-pass compaction to inspected versions.
     if ((flags&CSVoiceTranscriptFlag) && CSIsVoice(CSParent(s.model))) flags&=~CSVoiceTranscriptFlag;
     return config.spacingMode==CSMessageSpacingCompact && !s.geometryRejected && s.contentHeight>0 &&
         !(!s.decision.hidesIdentity && config.reservesAvatarTime) && !config.hasLargeTimeLabel &&

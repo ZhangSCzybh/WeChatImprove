@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-11-06T03:37:13.917259+00:00",
+  "head": "a227b1677255fe0e2dc727dcc2e6f62386fc3afd",
+  "protected_file_count": 43970,
+  "changed": [
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "control",
+    "README.md"
+  ],
+  "expected_changes_only": true,
+  "missing": [],
+  "historical_packages_preserved": true,
+  "main_theos_preserved": true,
+  "waiver_and_gate_byte_identical_to_2219": true,
+  "test_content_diff": "",
+  "device_validated": false
+}

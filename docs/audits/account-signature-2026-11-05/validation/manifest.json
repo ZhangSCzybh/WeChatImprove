@@ -1,0 +1,47 @@
+{
+  "sourceHashes": {
+    "Controllers/CSProvisioningProfile.m": "4a5a3779a1852091f799ab4e6670b162062d854bfaadcbe95970ea5f1d772092",
+    "Controllers/CSProvisioningProfile.h": "0361d4f3e5facb54b0e10ff094fba7ea278d55e2552686a6724f509029aa665b",
+    "Controllers/CSAccountDetailViewController.m": "01a01a65bbd3738d1d74e7ec245e025d41cabd6caf6b1ca7a0f5c731118751e6",
+    "docs/audits/account-signature-2026-11-05/validation/ProfileValidation.m": "597afe28d5a61eee578619b68454369ad3ae8d1b2e81ad5b7e62c4bfcfb24394",
+    "docs/audits/account-signature-2026-11-05/validation/run-validation.py": "2378a6f30598a62376a66e7706e878a4f3501aa370d7d5f4b4a0444796b2c3d3",
+    "docs/audits/account-signature-2026-11-05/legacy-reproduction/LegacyProfileReproduction.m": "395bc2d91d6e860a7a66e4d36365761e0741843d6b81cbca4f819420c6e431ef"
+  },
+  "extractedMethodsSHA256": {
+    "- (NSString *)determineProfileType:(NSDictionary *)profileDict": "423a564f7b707337f8d767c297a19cbaf0cf3429201dbc76ae2a871276174573",
+    "- (NSDictionary *)readProvisioningProfile": "d1726f04b1bfc7cc27ba09f27fd479c4a7ef27b256e90bb0f40b3ccf188a67a7",
+    "- (NSString *)getDeviceModelIdentifier": "970e406e8b93363c224432314acf060d9950d8c7568f77579e099ade98179b00",
+    "- (void)setupData": "057492ac2e1783e99ce942355c7e827596b1a81ab831ad22d546d9937f544102",
+    "- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section": "19e7355fded657e17c438f3ae3406cecc95392756858a514ca9f2a266871d4e1"
+  },
+  "extractedFileSHA256": "23fbc8c1acf101b945a278f63e21aaca4f7fda0aec2253f1c53b01f210dd5279",
+  "fixtureHashes": {
+    "ascii.plist": "0ed3175d9d559559a35908f9799316c6838ff3f06c1b573e3c4cfa0d047f2e19",
+    "ascii.mobileprovision": "19eeddef2e79d9f85b184436f518aaa26c45a8d5c99ce98037fff1dfe4e6abc2",
+    "utf8.plist": "d3fc2ed0e06359bf38ef04e4a60ebc4d7dc528810b82abe4566834fa027ac405",
+    "utf8.mobileprovision": "10ada72ed9968d1d51cec15949ffba13f16adbf24028cc70abae012a55e61f89",
+    "utf8-binary.plist": "2aefeb87462acf418a698b9db6cd7c8a964f85453b36780d20756bde3a28fcc2",
+    "utf8-binary.mobileprovision": "5bd279b4479ef7d728ae6ca940038a7a34064d74428515c93a068c10cb84ec32",
+    "all-byte-prefix-with-xml.bin": "0ee86587cebea894d0e4abee9f1b4f8a67ae9519808bdbd98d453aff5a8c43ae",
+    "truncated-before-xml-close.mobileprovision": "62c709eda5fd1862bf782cca96319df06211f7d1eb6addbd3ca91435a853302e",
+    "truncated-after-xml-close.mobileprovision": "91cfef9dfa30fe4507f664d6bcabf83cbf0bb5c6910d690b55a607fea491176b"
+  },
+  "fixtures": {
+    "ascii.mobileprovision": {
+      "sha256": "19eeddef2e79d9f85b184436f518aaa26c45a8d5c99ce98037fff1dfe4e6abc2",
+      "payloadSHA256": "0ed3175d9d559559a35908f9799316c6838ff3f06c1b573e3c4cfa0d047f2e19",
+      "CMSContentSignatureVerified": true
+    },
+    "utf8.mobileprovision": {
+      "sha256": "10ada72ed9968d1d51cec15949ffba13f16adbf24028cc70abae012a55e61f89",
+      "payloadSHA256": "d3fc2ed0e06359bf38ef04e4a60ebc4d7dc528810b82abe4566834fa027ac405",
+      "CMSContentSignatureVerified": true
+    },
+    "utf8-binary.mobileprovision": {
+      "sha256": "5bd279b4479ef7d728ae6ca940038a7a34064d74428515c93a068c10cb84ec32",
+      "payloadSHA256": "2aefeb87462acf418a698b9db6cd7c8a964f85453b36780d20756bde3a28fcc2",
+      "CMSContentSignatureVerified": true
+    }
+  },
+  "validationExitCode": 0
+}

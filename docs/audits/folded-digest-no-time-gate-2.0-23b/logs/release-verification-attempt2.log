@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/folded-digest-no-time-gate-2.0-23b/verify-release.py", line 68, in <module>
-    assert not added,added
-           ^^^^^^^^^
-AssertionError: ["warning: tion'openURL:' is deprecated: first deprecated in iOS 10.0 [-Wdeprecated-declarations]"]

@@ -1,0 +1,13 @@
+{
+  "binary": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat",
+  "binary_sha256": "571c5b8cf8732eb5402ffddcbeb93830cb6695bad180be5613ad4167764524e9",
+  "metadata_reader": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/wechat-8.0.80-2026-11-05/privacy-validation/objc_metadata.py",
+  "metadata_reader_sha256": "997b64fe94b1ab6ada8c922be7519fd84d981a9b9d6f9c86331ffcaef6f28f4c",
+  "annotator_sha256": "9abc37e2e573e4b4593dd78bebef2e7dd289a696b137a6389417bad924a593ce",
+  "source_sha256": {
+    "Hooks/MessageMergeHooks.xm": "72f6259bdf3c8f01829f323c0a1f7f479c38a5a1f1ad4139be47646038573303",
+    "Hooks/BubbleStyleHooks.xm": "02a9a01e4359f391e1de58e6378c4fa3c862e23d13bbb92bae44899c3baa16c4",
+    "Hooks/MessageGestureHooks.xm": "1096760ebb8cfde3ee9586158ea15c4a63d915747c8c987ab3c1821d782aa642"
+  },
+  "scope": "Offline metadata and targeted disassembly only; no image execution, phone install, runtime hook instrumentation, or device frame collection."
+}
