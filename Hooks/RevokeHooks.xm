@@ -10,6 +10,7 @@
 #import "../Controllers/CSMessageNavigation.h"
 #import "../Controllers/CSChatNativeBridge.h"
 #import "../Controllers/CSRevokeReference.h"
+#import "../Controllers/CSRevokeTapAdapter.h"
 
 // UserDefaults Key常量
 static NSString * const kRevokeEnabledKey = @"com.wechat.enhance.revoke.enabled";
@@ -459,6 +460,12 @@ static NSString *revokeChatNameFromObject(id obj) {
 %end
 
 %hook SystemMessageCellView
+- (void)layoutContentView {
+    %orig;
+    // Persisted tips keep their own precise tap route even when native link
+    // delivery is interrupted. The adapter revalidates the current cell on tap.
+    CSRevokeTapBind(self, isRevokeEnabled());
+}
 - (void)onLinkClicked:(id)link withRect:(CGRect)rect {
     if (isRevokeEnabled() && CSMessageHandleRevokeLink(self,getMessageMgr(),link,nil)) return;
     %orig;

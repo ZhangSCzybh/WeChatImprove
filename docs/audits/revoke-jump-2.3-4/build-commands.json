@@ -1,0 +1,32 @@
+[
+  {
+    "scheme": "rootless",
+    "command": [
+      "make",
+      "package",
+      "-j4",
+      "SCHEME=rootless",
+      "PACKAGE_VERSION=2.3-4",
+      "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-234-build-vb92snfy/rootless/.theos",
+      "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-234-build-vb92snfy/rootless",
+      "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-234-build-vb92snfy/rootless/packages"
+    ],
+    "exit_code": 0,
+    "seconds": 23.94
+  },
+  {
+    "scheme": "rootful",
+    "command": [
+      "make",
+      "package",
+      "-j4",
+      "SCHEME=rootful",
+      "PACKAGE_VERSION=2.3-4",
+      "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-234-build-vb92snfy/rootful/.theos",
+      "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-234-build-vb92snfy/rootful",
+      "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-234-build-vb92snfy/rootful/packages"
+    ],
+    "exit_code": 0,
+    "seconds": 23.97
+  }
+]

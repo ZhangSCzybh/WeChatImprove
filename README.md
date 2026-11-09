@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.2-20`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.3-4`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -31,8 +31,8 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；本次按用户提供的 `8.0.80.34` IPA 核验设置布局、密友恢复入口、底栏与紧密布局 |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | 本地提供 `2.2-20` 安装包；微信 8.0.80 真机未验证 |
-| Rootful | 本地提供 `2.2-20` 安装包及重签用 dylib；微信 8.0.80 真机未验证 |
+| Rootless | 本地提供 `2.3-4` 安装包；微信 8.0.80 真机未验证 |
+| Rootful | 本地提供 `2.3-4` 安装包及重签用 dylib；微信 8.0.80 真机未验证 |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
@@ -40,7 +40,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：当前版本 `2.2-20` 提供 [Rootless 安装包](packages/2.2-20-cleanup/com.wechat.improve_2.2-20_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.2-20-cleanup/com.wechat.improve_2.2-20_iphoneos-arm.deb)、[重签 IPA 用 dylib](packages/2.2-20-cleanup/WeChatImprove.dylib)、[调试符号](packages/2.2-20-cleanup/com.wechat.improve_2.2-20_symbols.zip) 和 [SHA-256](packages/2.2-20-cleanup/SHA256SUMS)。本版整理文档与开发残留，保留现有设置布局、底栏、气泡紧密和密友功能。100 个原始脚本中 18 个仍未通过，继续按用户授权限定豁免；不将历史失败计为通过，详见 [豁免清单](docs/audits/release-2.2-20-cleanup/WAIVER.md)、[沿用记录](docs/audits/release-2.2-20-cleanup/WAIVER-CONTINUATION.md) 和 [本轮交付报告](docs/audits/release-2.2-20-cleanup/README.md)。真机转场、手势、底栏恢复、气泡观感与 Keychain 行为本轮未验证。
+1. 获取与设备注入环境匹配的 `.deb`：当前版本 `2.3-4` 提供 [Rootless 安装包](packages/2.3-4-revoke-jump/com.wechat.improve_2.3-4_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.3-4-revoke-jump/com.wechat.improve_2.3-4_iphoneos-arm.deb)、[重签 IPA 用 dylib](packages/2.3-4-revoke-jump/WeChatImprove.dylib)、[调试符号](packages/2.3-4-revoke-jump/com.wechat.improve_2.3-4_symbols.zip) 和 [SHA-256](packages/2.3-4-revoke-jump/SHA256SUMS)。本版针对防撤回蓝字增加独立的精确点击入口，复用原有原文定位及布局稳定后的微信原生高亮；支持已有的持久化提示，保留账号、会话和消息身份校验。此次聚焦防撤回与导航核心回归，不重跑无关功能的全量脚本。主机验证不能代替微信 8.0.80 真机验收；设备上的原始回调断点与修复后观感尚未采样，详见 [2.3-4 修复记录](docs/audits/revoke-jump-2.3-4/README.md)。前版的添加入口、编辑页顶部布局及发现页圆角修复继续保留。
 
    密友头像五击快捷入口不验证身份：任何能操作已解锁手机并到达头像的人，都能查看或修改配置，并经两级确认不可撤销地完整重置当前账号的密友配置。此风险继续存在；修改密码仍须普通入口验证。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
@@ -222,7 +222,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.2-20_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.2-20-cleanup/`。
+当前版本默认输出：`packages/com.wechat.improve_2.3-4_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.3-4-revoke-jump/`。
 
 ### Rootful
 
@@ -231,7 +231,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.2-20_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.2-20-cleanup/`。
+当前版本默认输出：`packages/com.wechat.improve_2.3-4_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.3-4-revoke-jump/`。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -255,7 +255,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.2-20-cleanup/com.wechat.improve_2.2-20_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.3-4-revoke-jump/com.wechat.improve_2.3-4_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。

@@ -1,0 +1,10 @@
+{
+  "rootless": {
+    "warning_count": 8,
+    "revoke_change_warnings": []
+  },
+  "rootful": {
+    "warning_count": 8,
+    "revoke_change_warnings": []
+  }
+}

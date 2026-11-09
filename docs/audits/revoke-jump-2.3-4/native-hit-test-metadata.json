@@ -1,0 +1,131 @@
+{
+  "target": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-cf6cb9d6-f0a6-4248-ba40-f3933418ac8d/Payload/WeChat.app/WeChat",
+  "target_size": 545074336,
+  "target_sha256": "1d626426df97058a8a87c661532b2801cd27b7d9fcc12e27609c751f5877b7ed",
+  "parser": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/wechat-8.0.80-2026-11-05/privacy-validation/objc_metadata.py",
+  "parser_sha256": "997b64fe94b1ab6ada8c922be7519fd84d981a9b9d6f9c86331ffcaef6f28f4c",
+  "classes": [
+    {
+      "name": "RichTextView",
+      "class_offset": "0x1ef3a988",
+      "superclass": "MMCPLabel",
+      "methods": [
+        {
+          "selector": "getPreviewLinkForLocation:inView:",
+          "encoding": "@40@0:8{CGPoint=dd}16@32",
+          "imp": "0x1058a0be0",
+          "metadata_offset": "0x1747e99c"
+        },
+        {
+          "selector": "getPreviewLinkFrameForLocation:inView:",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}40@0:8{CGPoint=dd}16@32",
+          "imp": "0x1058a0d08",
+          "metadata_offset": "0x1747e9a8"
+        },
+        {
+          "selector": "arrStyles",
+          "encoding": "@16@0:8",
+          "imp": "0x1058a3fc0",
+          "metadata_offset": "0x1747ec60"
+        }
+      ],
+      "class_methods": [
+        {
+          "selector": "targetLinkStyleFromStyles:withPoint:",
+          "encoding": "@40@0:8@16{CGPoint=dd}24",
+          "imp": "0x1058a0040",
+          "metadata_offset": "0x1708eb98"
+        }
+      ]
+    },
+    {
+      "name": "MMCPLabel",
+      "class_offset": "0x1eebf5f8",
+      "superclass": "MMUILabel",
+      "methods": [],
+      "class_methods": []
+    },
+    {
+      "name": "MMUIView",
+      "class_offset": "0x1f1e6160",
+      "superclass": "UIView",
+      "methods": [],
+      "class_methods": []
+    },
+    {
+      "name": "SystemMessageCellView",
+      "class_offset": "0x1ef4a4c8",
+      "superclass": "BaseMessageCellView",
+      "methods": [
+        {
+          "selector": "getRichTextView",
+          "encoding": "@16@0:8",
+          "imp": "0x105e705d8",
+          "metadata_offset": "0x174b686c"
+        }
+      ],
+      "class_methods": []
+    },
+    {
+      "name": "LinkStyle",
+      "class_offset": "0x1eea1738",
+      "superclass": "TextStyle",
+      "methods": [
+        {
+          "selector": "nsUrl",
+          "encoding": "@16@0:8",
+          "imp": "0x1022c0e6c",
+          "metadata_offset": "0x1725bde8"
+        }
+      ],
+      "class_methods": []
+    },
+    {
+      "name": "MMUILabel",
+      "class_offset": "0x1f1e60c0",
+      "superclass": "UILabel",
+      "methods": []
+    }
+  ],
+  "static_only": true,
+  "decoded_selectors": [
+    {
+      "reference_address": "0x11e9d7950",
+      "selector": "convertPoint:fromView:"
+    },
+    {
+      "reference_address": "0x11ea4a078",
+      "selector": "bTouchBeginOnLink"
+    },
+    {
+      "reference_address": "0x11e9ef4c8",
+      "selector": "targetLinkStyleFromStyles:withPoint:"
+    },
+    {
+      "reference_address": "0x11eb13650",
+      "selector": "eDataDectorType"
+    },
+    {
+      "reference_address": "0x11e9ce7b8",
+      "selector": "jumpType"
+    },
+    {
+      "reference_address": "0x11e9ef4d0",
+      "selector": "nsUrl"
+    }
+  ],
+  "decoded_ivars": [
+    {
+      "class": "RichTextView",
+      "name": "_arrStyles",
+      "offset": 56,
+      "offset_symbol": "0x11edceeb4"
+    },
+    {
+      "class": "SystemMessageCellView",
+      "name": "m_richTextView",
+      "offset": 48,
+      "offset_symbol": "0x11edd478c"
+    }
+  ]
+}

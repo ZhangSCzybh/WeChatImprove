@@ -1,8 +1,12 @@
 # 文档索引
 
-当前发布记录：[2.2-20 清理与交付](audits/release-2.2-20-cleanup/README.md)。
+当前发布记录：[2.3-4 防撤回蓝字点击入口与原文定位](audits/revoke-jump-2.3-4/README.md)。
+
+2.3-4 同时保留 2.3-1～2.3-3 的发现页外观、添加入口和编辑页布局修复。
 
 ## 近期修复与分析
+
+- [2.2-20：清理与交付](audits/release-2.2-20-cleanup/README.md)
 
 - [2.2-19：设置子页原生底栏](audits/release-2.2-19-settings-subpage-tabbar/README.md)
 - [2.2-18：返回设置列表的留白](audits/release-2.2-18-settings-return-header-gap/README.md)

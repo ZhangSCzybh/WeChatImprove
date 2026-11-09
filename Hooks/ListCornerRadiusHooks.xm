@@ -85,6 +85,17 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
     UITableView *table=CSListCornerTableForView(cell);
     CSListCornerDiscoverDecorate(cell,table,nil,nil);
     CSListCornerRepairCellSeparators(cell,table);
+    CSListCornerRepairCellSelection(cell,table);
+}
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
+    %orig;
+    UITableViewCell *cell=(UITableViewCell *)self;
+    CSListCornerRepairCellSelection(cell,CSListCornerTableForView(cell));
+}
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    %orig;
+    UITableViewCell *cell=(UITableViewCell *)self;
+    CSListCornerRepairCellSelection(cell,CSListCornerTableForView(cell));
 }
 %end
 %hook MMTableSectionHeaderView
@@ -147,6 +158,17 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 %end
 
 %hook FindFriendEntryViewController
+- (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2 {
+    UITableViewCell *cell=%orig;
+    CSListCornerDiscoverDecorate(cell,(UITableView *)arg1,(NSIndexPath *)arg2,self);
+    CSListCornerRepairCellSelection(cell,(UITableView *)arg1);
+    return cell;
+}
+- (void)tableView:(id)arg1 willDisplayCell:(id)arg2 forRowAtIndexPath:(id)arg3 {
+    %orig;
+    CSListCornerDiscoverDecorate((UITableViewCell *)arg2,(UITableView *)arg1,(NSIndexPath *)arg3,self);
+    CSListCornerRepairCellSelection((UITableViewCell *)arg2,(UITableView *)arg1);
+}
 - (void)viewDidLoad {
     %orig;
     CSListCornerPrepareTable(self,CSListCornerPageDiscover,YES);

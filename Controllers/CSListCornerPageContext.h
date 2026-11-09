@@ -10,6 +10,7 @@ FOUNDATION_EXPORT UIColor *CSListCornerSessionTableColor(UITableView *table);
 FOUNDATION_EXPORT UIView * _Nullable CSListCornerNativeContent(UITableViewCell *cell);
 FOUNDATION_EXPORT void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial);
 FOUNDATION_EXPORT void CSListCornerRepairCellSeparators(UITableViewCell *cell, UITableView *table);
+FOUNDATION_EXPORT void CSListCornerRepairCellSelection(UITableViewCell *cell, UITableView *table);
 FOUNDATION_EXPORT UIView * _Nullable CSListCornerViewIvar(id object, const char *name, UIView *container);
 FOUNDATION_EXPORT BOOL CSListCornerBeginOperation(id _Nullable object);
 FOUNDATION_EXPORT void CSListCornerEndOperation(id object);

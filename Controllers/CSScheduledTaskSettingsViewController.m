@@ -8,6 +8,16 @@
 #import "CSBackupBootstrap.h"
 #include <math.h>
 
+static void CSTaskConfigureEditorLayout(UIViewController *page) {
+    page.edgesForExtendedLayout=UIRectEdgeNone;
+    page.extendedLayoutIncludesOpaqueBars=NO;
+    // Keep the legacy controller policy aligned with each scroll view's modern inset policy.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    page.automaticallyAdjustsScrollViewInsets=NO;
+#pragma clang diagnostic pop
+    page.navigationItem.largeTitleDisplayMode=UINavigationItemLargeTitleDisplayModeNever;
+}
 static void CSTaskAlert(UIViewController *vc, NSString *message) {
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"定时任务" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleCancel handler:nil]];
@@ -64,11 +74,14 @@ static void CSTaskConfigureTable(UITableView *table) {
 @property(nonatomic,strong) UITextView *textView;
 @end
 @implementation CSScheduledTaskTextEditor
+- (instancetype)init { if ((self=[super init])) CSTaskConfigureEditorLayout(self); return self; }
+- (instancetype)initWithCoder:(NSCoder *)coder { if ((self=[super initWithCoder:coder])) CSTaskConfigureEditorLayout(self); return self; }
 - (BOOL)hidesBottomBarWhenPushed { return YES; }
 - (void)viewDidLoad {
-    [super viewDidLoad]; self.title=@"消息内容"; self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
+    CSTaskConfigureEditorLayout(self); [super viewDidLoad]; self.title=@"消息内容"; self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStyleDone target:self action:@selector(done)];
     UITextView *text=[UITextView new]; self.textView=text; text.text=self.text; text.accessibilityLabel=@"消息内容";
+    text.contentInsetAdjustmentBehavior=UIScrollViewContentInsetAdjustmentNever; text.automaticallyAdjustsScrollIndicatorInsets=NO;
     text.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody]; text.adjustsFontForContentSizeCategory=YES;
     text.backgroundColor=UIColor.secondarySystemGroupedBackgroundColor; text.textColor=UIColor.labelColor;
     text.layer.cornerRadius=10; text.textContainerInset=UIEdgeInsetsMake(12,12,12,12); text.translatesAutoresizingMaskIntoConstraints=NO;
@@ -76,7 +89,7 @@ static void CSTaskConfigureTable(UITableView *table) {
     [NSLayoutConstraint activateConstraints:@[
         [text.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor constant:16],
         [text.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor constant:-16],
-        [text.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:20],
+        [text.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:20],
         [text.bottomAnchor constraintEqualToAnchor:self.view.keyboardLayoutGuide.topAnchor constant:-16]
     ]];
 }
@@ -96,9 +109,11 @@ static void CSTaskConfigureTable(UITableView *table) {
 @property(nonatomic,strong) UIDatePicker *picker;
 @end
 @implementation CSScheduledTaskTimeEditor
+- (instancetype)init { if ((self=[super init])) CSTaskConfigureEditorLayout(self); return self; }
+- (instancetype)initWithCoder:(NSCoder *)coder { if ((self=[super initWithCoder:coder])) CSTaskConfigureEditorLayout(self); return self; }
 - (BOOL)hidesBottomBarWhenPushed { return YES; }
 - (void)viewDidLoad {
-    [super viewDidLoad]; self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
+    CSTaskConfigureEditorLayout(self); [super viewDidLoad]; self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStyleDone target:self action:@selector(done)];
     UIDatePicker *picker=[UIDatePicker new]; self.picker=picker;
     picker.preferredDatePickerStyle=UIDatePickerStyleWheels; picker.datePickerMode=self.calendarMode?UIDatePickerModeTime:UIDatePickerModeDateAndTime;
@@ -110,7 +125,7 @@ static void CSTaskConfigureTable(UITableView *table) {
     [NSLayoutConstraint activateConstraints:@[
         [picker.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor constant:16],
         [picker.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor constant:-16],
-        [picker.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:20],
+        [picker.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:20],
         [zone.leadingAnchor constraintEqualToAnchor:picker.leadingAnchor constant:16],
         [zone.trailingAnchor constraintEqualToAnchor:picker.trailingAnchor constant:-16],
         [zone.topAnchor constraintEqualToAnchor:picker.bottomAnchor constant:12]
@@ -363,7 +378,7 @@ static void CSTaskConfigureTable(UITableView *table) {
 @implementation CSScheduledTaskSettingsViewController
 - (void)viewDidLoad {
     [super viewDidLoad]; self.title=@"定时任务"; CSTaskConfigureTable(self.tableView);
-    self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(add)];
+    self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithTitle:@"添加任务" style:UIBarButtonItemStylePlain target:self action:@selector(add)];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(reload) name:CSScheduledTasksDidChange object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(reload) name:CSCloseFriendPolicyDidChangeNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(reload) name:@"CSBackupAccountChanged" object:nil];

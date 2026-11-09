@@ -1,13 +1,23 @@
 #import "CSListCornerPageContext.h"
 #import "CSListCornerRenderer.h"
 #import "CSListCornerSessionRestore.h"
+#import <QuartzCore/QuartzCore.h>
 #import <objc/runtime.h>
 #import <math.h>
 @interface UITableView (CSListCornerNativeFooter)
 - (void)drawFooterLine:(BOOL)draw;
 @end
+@protocol CSListCornerNativeSelection <NSObject>
+- (UIView *)selectedBackgroundView;
+@end
 static char OperationKey, BackgroundKey, PreviousBackgroundKey;
 static char SessionStateKey;
+static char SelectionStateKey;
+@interface CSListCornerSelectionState : NSObject
+@property(nonatomic,strong) UIView *surface;
+@property(nonatomic,strong) CAShapeLayer *mask;
+@end
+@implementation CSListCornerSelectionState @end
 @interface CSListCornerSessionState : NSObject
 @property(nonatomic) BOOL preservesMargins;
 @property(nonatomic) UIEdgeInsets separatorInset,layoutMargins;
@@ -147,10 +157,49 @@ static void CSListCornerHideSeparator(UITableViewCell *cell) {
 }
 void CSListCornerRepairCellSeparators(UITableViewCell *cell, UITableView *table) {
     if (![[CSListCornerConfiguration sharedConfiguration] snapshot].enabled) return;
-    if (!CSListCornerOwnerForTable(table,CSListCornerPageContacts) && !CSListCornerOwnerForTable(table,CSListCornerPageMore)) return;
+    if (!CSListCornerOwnerForTable(table,CSListCornerPageContacts) && !CSListCornerOwnerForTable(table,CSListCornerPageDiscover) && !CSListCornerOwnerForTable(table,CSListCornerPageMore)) return;
     if (!CSListCornerBeginOperation(cell)) return;
     @try { CSListCornerHideSeparator(cell); }
     @finally { CSListCornerEndOperation(cell); }
+}
+static void CSListCornerRestoreCellSelection(UITableViewCell *cell) {
+    CSListCornerSelectionState *state=objc_getAssociatedObject(cell,&SelectionStateKey);
+    if (state.surface.layer.mask==state.mask) state.surface.layer.mask=nil;
+    objc_setAssociatedObject(cell,&SelectionStateKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+void CSListCornerRepairCellSelection(UITableViewCell *cell, UITableView *table) {
+    BOOL owned=CSListCornerOwnerForTable(table,CSListCornerPageDiscover)!=nil || CSListCornerOwnerForTable(table,CSListCornerPageMore)!=nil;
+    if (![[CSListCornerConfiguration sharedConfiguration] snapshot].enabled || !owned) {
+        CSListCornerRestoreCellSelection(cell); return;
+    }
+    if (!CSListCornerBeginOperation(cell)) return;
+    @try {
+        CSListCornerHideSeparator(cell);
+        UIView *card=objc_getAssociatedObject(cell,&PreviousBackgroundKey);
+        UIView *surface=[cell respondsToSelector:@selector(selectedBackgroundView)] ? [(id<CSListCornerNativeSelection>)cell selectedBackgroundView] : nil;
+        CSListCornerSelectionState *state=objc_getAssociatedObject(cell,&SelectionStateKey);
+        if (state.surface!=surface) { CSListCornerRestoreCellSelection(cell); state=nil; }
+        NSString *name=surface ? NSStringFromClass(surface.class) : nil;
+        BOOL plain=[name isEqualToString:@"UIView"] || [name isEqualToString:@"MMUIView"];
+        CAShapeLayer *cardMask=[card.layer.mask isKindOfClass:CAShapeLayer.class] ? (CAShapeLayer *)card.layer.mask : nil;
+        if (!card || card.superview!=cell.contentView || !cardMask.path || !plain || surface.subviews.count ||
+            ![surface isDescendantOfView:cell] || !CSListCornerValidRect(surface.bounds) ||
+            (surface.layer.mask && surface.layer.mask!=state.mask)) {
+            CSListCornerRestoreCellSelection(cell); return;
+        }
+        // Native layout/highlighting can extend its rectangular fill beyond the cell.
+        // Reuse the rendered card's actual role and coordinates without querying rows.
+        CGRect frame=[card convertRect:card.bounds toView:surface];
+        if (!CSListCornerValidRect(frame)) { CSListCornerRestoreCellSelection(cell); return; }
+        if (!state) {
+            state=[CSListCornerSelectionState new]; state.surface=surface; state.mask=[CAShapeLayer layer];
+            state.mask.actions=@{@"position":NSNull.null,@"bounds":NSNull.null,@"path":NSNull.null};
+            objc_setAssociatedObject(cell,&SelectionStateKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        if (!CGRectEqualToRect(state.mask.frame,frame)) state.mask.frame=frame;
+        if (!state.mask.path || !CGPathEqualToPath(state.mask.path,cardMask.path)) state.mask.path=cardMask.path;
+        if (surface.layer.mask!=state.mask) surface.layer.mask=state.mask;
+    } @finally { CSListCornerEndOperation(cell); }
 }
 UIColor *CSListCornerSessionTableColor(UITableView *table) {
     CSListCornerSnapshot *configuration=CSListCornerConfiguration.sharedConfiguration.snapshot;
@@ -169,7 +218,7 @@ void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial) {
         table.sectionIndexBackgroundColor=[UIColor clearColor];
         table.sectionIndexTrackingBackgroundColor=[UIColor clearColor];
     }
-    if (page==CSListCornerPageContacts || page==CSListCornerPageMore) {
+    if (page==CSListCornerPageContacts || page==CSListCornerPageDiscover || page==CSListCornerPageMore) {
         table.separatorStyle=UITableViewCellSeparatorStyleNone;
         if ([table respondsToSelector:@selector(drawFooterLine:)]) [table drawFooterLine:NO];
     }

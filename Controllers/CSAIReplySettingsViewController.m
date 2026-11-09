@@ -5,6 +5,16 @@
 #import "CSCloseFriendBridge.h"
 #import "CSCloseFriendAutomationProjection.h"
 
+static void CSAIConfigureEditorLayout(UIViewController *page){
+    page.edgesForExtendedLayout=UIRectEdgeNone;
+    page.extendedLayoutIncludesOpaqueBars=NO;
+    // Keep the legacy controller policy aligned with each scroll view's modern inset policy.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    page.automaticallyAdjustsScrollViewInsets=NO;
+#pragma clang diagnostic pop
+    page.navigationItem.largeTitleDisplayMode=UINavigationItemLargeTitleDisplayModeNever;
+}
 static void AIAlert(UIViewController *page,NSString *message){
     if(page.presentedViewController)return;
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"AI 自动回复" message:message preferredStyle:UIAlertControllerStyleAlert];
@@ -140,17 +150,19 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 @property NSString *originalConnection;
 @end
 @implementation CSAIConnectionEditor
+- (instancetype)init{if((self=[super init]))CSAIConfigureEditorLayout(self);return self;}
+- (instancetype)initWithCoder:(NSCoder *)coder{if((self=[super initWithCoder:coder]))CSAIConfigureEditorLayout(self);return self;}
 - (BOOL)hidesBottomBarWhenPushed { return YES; }
 - (UITextField *)field:(NSString *)label value:(NSString *)value secure:(BOOL)secure stack:(UIStackView *)stack{
     UILabel *title=[UILabel new];title.text=label;title.font=[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];title.textColor=UIColor.secondaryLabelColor;[stack addArrangedSubview:title];
     UITextField *field=[UITextField new];field.text=value;field.borderStyle=UITextBorderStyleRoundedRect;field.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody];field.adjustsFontForContentSizeCategory=YES;field.autocapitalizationType=UITextAutocapitalizationTypeNone;field.autocorrectionType=UITextAutocorrectionTypeNo;field.secureTextEntry=secure;field.accessibilityLabel=label;field.clearButtonMode=UITextFieldViewModeWhileEditing;[field.heightAnchor constraintGreaterThanOrEqualToConstant:44].active=YES;[stack addArrangedSubview:field];return field;
 }
 - (void)viewDidLoad{
-    [super viewDidLoad];self.title=@"模型连接";self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
+    CSAIConfigureEditorLayout(self);[super viewDidLoad];self.title=@"模型连接";self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc]initWithTitle:@"保存" style:UIBarButtonItemStyleDone target:self action:@selector(save)];
-    UIScrollView *scroll=[UIScrollView new];scroll.translatesAutoresizingMaskIntoConstraints=NO;scroll.keyboardDismissMode=UIScrollViewKeyboardDismissModeInteractive;[self.view addSubview:scroll];
+    UIScrollView *scroll=[UIScrollView new];scroll.contentInsetAdjustmentBehavior=UIScrollViewContentInsetAdjustmentNever;scroll.automaticallyAdjustsScrollIndicatorInsets=NO;scroll.translatesAutoresizingMaskIntoConstraints=NO;scroll.keyboardDismissMode=UIScrollViewKeyboardDismissModeInteractive;[self.view addSubview:scroll];
     UIStackView *stack=[UIStackView new];stack.axis=UILayoutConstraintAxisVertical;stack.spacing=10;stack.translatesAutoresizingMaskIntoConstraints=NO;[scroll addSubview:stack];
-    [NSLayoutConstraint activateConstraints:@[[scroll.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor],[scroll.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor],[scroll.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],[scroll.bottomAnchor constraintEqualToAnchor:self.view.keyboardLayoutGuide.topAnchor],[stack.leadingAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.leadingAnchor constant:20],[stack.trailingAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.trailingAnchor constant:-20],[stack.topAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.topAnchor constant:20],[stack.bottomAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.bottomAnchor constant:-20],[stack.widthAnchor constraintEqualToAnchor:scroll.frameLayoutGuide.widthAnchor constant:-40]]];
+    [NSLayoutConstraint activateConstraints:@[[scroll.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor],[scroll.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor],[scroll.topAnchor constraintEqualToAnchor:self.view.topAnchor],[scroll.bottomAnchor constraintEqualToAnchor:self.view.keyboardLayoutGuide.topAnchor],[stack.leadingAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.leadingAnchor constant:20],[stack.trailingAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.trailingAnchor constant:-20],[stack.topAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.topAnchor constant:20],[stack.bottomAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.bottomAnchor constant:-20],[stack.widthAnchor constraintEqualToAnchor:scroll.frameLayoutGuide.widthAnchor constant:-40]]];
     NSDictionary *config=CSAIReplyManager.sharedManager.store.configuration;self.originalConnection=CSAIConnectionIdentifier(config);
     self.endpointField=[self field:@"API 请求地址" value:config[@"endpoint"] secure:NO stack:stack];self.endpointField.keyboardType=UIKeyboardTypeURL;self.endpointField.placeholder=@"https://服务域名/v1/chat/completions";
     self.modelField=[self field:@"模型名称" value:config[@"model"] secure:NO stack:stack];self.modelField.placeholder=@"输入服务商提供的模型名称";
@@ -185,14 +197,16 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 @property UITextView *promptView;
 @end
 @implementation CSAIPresetEditor
+- (instancetype)init{if((self=[super init]))CSAIConfigureEditorLayout(self);return self;}
+- (instancetype)initWithCoder:(NSCoder *)coder{if((self=[super initWithCoder:coder]))CSAIConfigureEditorLayout(self);return self;}
 - (BOOL)hidesBottomBarWhenPushed { return YES; }
 - (void)viewDidLoad{
-    [super viewDidLoad];self.title=self.original?@"编辑预设":@"新增预设";self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
+    CSAIConfigureEditorLayout(self);[super viewDidLoad];self.title=self.original?@"编辑预设":@"新增预设";self.view.backgroundColor=UIColor.systemGroupedBackgroundColor;
     self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc]initWithTitle:@"保存" style:UIBarButtonItemStyleDone target:self action:@selector(save)];
     UITextField *name=[UITextField new];self.nameField=name;name.borderStyle=UITextBorderStyleRoundedRect;name.placeholder=@"预设名称";name.text=self.preset[@"name"];name.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody];name.translatesAutoresizingMaskIntoConstraints=NO;[self.view addSubview:name];
     UILabel *label=[UILabel new];label.text=@"角色与回复规则";label.font=[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];label.textColor=UIColor.secondaryLabelColor;label.translatesAutoresizingMaskIntoConstraints=NO;[self.view addSubview:label];
-    UITextView *prompt=[UITextView new];self.promptView=prompt;prompt.text=self.preset[@"prompt"];prompt.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody];prompt.adjustsFontForContentSizeCategory=YES;prompt.textColor=UIColor.labelColor;prompt.backgroundColor=UIColor.secondarySystemGroupedBackgroundColor;prompt.layer.cornerRadius=10;prompt.textContainerInset=UIEdgeInsetsMake(12,12,12,12);prompt.translatesAutoresizingMaskIntoConstraints=NO;[self.view addSubview:prompt];
-    [NSLayoutConstraint activateConstraints:@[[name.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:20],[name.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor constant:16],[name.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor constant:-16],[name.heightAnchor constraintGreaterThanOrEqualToConstant:44],[label.topAnchor constraintEqualToAnchor:name.bottomAnchor constant:16],[label.leadingAnchor constraintEqualToAnchor:name.leadingAnchor],[prompt.topAnchor constraintEqualToAnchor:label.bottomAnchor constant:8],[prompt.leadingAnchor constraintEqualToAnchor:name.leadingAnchor],[prompt.trailingAnchor constraintEqualToAnchor:name.trailingAnchor],[prompt.bottomAnchor constraintEqualToAnchor:self.view.keyboardLayoutGuide.topAnchor constant:-16]]];
+    UITextView *prompt=[UITextView new];prompt.contentInsetAdjustmentBehavior=UIScrollViewContentInsetAdjustmentNever;prompt.automaticallyAdjustsScrollIndicatorInsets=NO;self.promptView=prompt;prompt.text=self.preset[@"prompt"];prompt.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody];prompt.adjustsFontForContentSizeCategory=YES;prompt.textColor=UIColor.labelColor;prompt.backgroundColor=UIColor.secondarySystemGroupedBackgroundColor;prompt.layer.cornerRadius=10;prompt.textContainerInset=UIEdgeInsetsMake(12,12,12,12);prompt.translatesAutoresizingMaskIntoConstraints=NO;[self.view addSubview:prompt];
+    [NSLayoutConstraint activateConstraints:@[[name.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:20],[name.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor constant:16],[name.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor constant:-16],[name.heightAnchor constraintGreaterThanOrEqualToConstant:44],[label.topAnchor constraintEqualToAnchor:name.bottomAnchor constant:16],[label.leadingAnchor constraintEqualToAnchor:name.leadingAnchor],[prompt.topAnchor constraintEqualToAnchor:label.bottomAnchor constant:8],[prompt.leadingAnchor constraintEqualToAnchor:name.leadingAnchor],[prompt.trailingAnchor constraintEqualToAnchor:name.trailingAnchor],[prompt.bottomAnchor constraintEqualToAnchor:self.view.keyboardLayoutGuide.topAnchor constant:-16]]];
 }
 - (void)save{
     if(self.saving)return;
@@ -208,7 +222,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 @interface CSAIPresetsPage : CSAISettingsPage
 @end
 @implementation CSAIPresetsPage
-- (void)viewDidLoad{[super viewDidLoad];self.title=@"管理预设";self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(add)];}
+- (void)viewDidLoad{[super viewDidLoad];self.title=@"管理预设";self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc]initWithTitle:@"添加" style:UIBarButtonItemStylePlain target:self action:@selector(add)];}
 - (void)open:(NSDictionary *)preset original:(NSDictionary *)original{
     CSAIPresetEditor *editor=[CSAIPresetEditor new];editor.account=self.account;editor.epoch=self.epoch;editor.preset=preset;editor.original=original;[self.navigationController pushViewController:editor animated:YES];
 }
