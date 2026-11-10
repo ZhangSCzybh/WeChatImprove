@@ -29,15 +29,18 @@ static id CSIndependentCopy(id source) {
     if (![source respondsToSelector:@selector(copyWithZone:)]) return nil;
     id copy=[source copy]; return copy!=source ? copy : nil;
 }
-static BOOL CSResetSendWrap(id wrap, CSMessageActionContext *context, NSString *target) {
+static BOOL CSResetSendWrapForAccount(id wrap, NSString *accountID, NSString *target) {
     unsigned int now=(unsigned int)NSDate.date.timeIntervalSince1970;
-    return CSMessageNativeSet(wrap,@"setM_nsFromUsr:",context.accountID,YES) && CSMessageNativeSet(wrap,@"setM_nsToUsr:",target,YES) &&
+    return CSMessageNativeSet(wrap,@"setM_nsFromUsr:",accountID,YES) && CSMessageNativeSet(wrap,@"setM_nsToUsr:",target,YES) &&
         CSMessageNativeSet(wrap,@"setM_uiMesLocalID:",@0,YES) && CSMessageNativeSet(wrap,@"setM_n64MesSvrID:",@0,YES) &&
         CSMessageNativeSet(wrap,@"setM_uiCreateTime:",@(now),YES) && CSMessageNativeSet(wrap,@"setM_uiStatus:",@1,YES) &&
         CSMessageNativeSet(wrap,@"setM_uiIsSenderStatus:",@1,NO) && CSMessageNativeSet(wrap,@"setM_uiSendTime:",@(now),NO) &&
         CSMessageNativeSet(wrap,@"setM_nsClientMsgID:",NSUUID.UUID.UUIDString,NO) &&
-        CSMessageNativeSet(wrap,@"setM_nsRealChatUsr:",[target containsString:@"@chatroom"] ? context.accountID : @"",NO) &&
+        CSMessageNativeSet(wrap,@"setM_nsRealChatUsr:",[target containsString:@"@chatroom"] ? accountID : @"",NO) &&
         CSMessageNativeSet(wrap,@"setM_nsMsgSource:",nil,NO) && CSMessageNativeSet(wrap,@"setM_nsRevokeBatchId:",nil,NO);
+}
+static BOOL CSResetSendWrap(id wrap, CSMessageActionContext *context, NSString *target) {
+    return CSResetSendWrapForAccount(wrap,context.accountID,target);
 }
 static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArray *arguments, id wrap) {
     __block __weak CSMessagePreparedSend *weakRoute=nil;
@@ -50,6 +53,34 @@ static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArr
 }
 @implementation CSMessageSendAdapter
 - (instancetype)initWithEnvironment:(id<CSMessageActionEnvironment>)environment { if ((self=[super init])) _environment=environment; return self; }
+- (id)voiceWrapForResource:(CSMessageVoiceResource *)voice accountID:(NSString *)accountID targetID:(NSString *)target {
+    if (!NSThread.isMainThread || !accountID.length || !target.length || !voice.data.length || !voice.durationMilliseconds) return nil;
+    @try {
+        id wrap=CSFreshWrap(34); if (!wrap || !CSResetSendWrapForAccount(wrap,accountID,target)) return nil;
+        if (!CSMessageNativeSet(wrap,@"setM_dtVoice:",voice.data,YES) || !CSMessageNativeSet(wrap,@"setM_uiVoiceTime:",@(voice.durationMilliseconds),YES) || !CSMessageNativeSet(wrap,@"setM_uiVoiceFormat:",@(voice.format),YES) || !CSMessageNativeSet(wrap,@"setM_uiDownloadStatus:",@9,YES)) return nil;
+        CSMessageNativeSet(wrap,@"setM_uiVoiceForwardFlag:",@0,NO);
+        CSMessageNativeSet(wrap,@"setM_nsContent:",[NSString stringWithFormat:@"<msg><voicemsg voicelength=\"%u\" voiceformat=\"%u\" forwardflag=\"0\" /></msg>",voice.durationMilliseconds,voice.format],NO);
+        return wrap;
+    } @catch (__unused NSException *exception) { return nil; }
+}
+- (CSMessagePreparedSend *)prepareVoiceResource:(CSMessageVoiceResource *)voice accountID:(NSString *)accountID targetID:(NSString *)target {
+    if (!NSThread.isMainThread || ![[_environment currentAccountID] isEqual:accountID]) return nil;
+    @try {
+        id wrap=[self voiceWrapForResource:voice accountID:accountID targetID:target]; if (!wrap) return nil;
+        id manager=[_environment serviceNamed:@"CMessageMgr"], audio=[_environment serviceNamed:@"AudioSender"];
+        if (!CSMessageNativeSupports(audio,@"uploaderForMsgWrap:",@"@",@[@"@"]) || !CSMessageNativeSupports(manager,@"AddLocalMsg:MsgWrap:",@"v",@[@"@",@"@"])) return nil;
+        id uploader=CSMessageNativeInvoke(audio,@"uploaderForMsgWrap:",@[wrap]);
+        // AudioSender's own resend deletes originals. Use only its concrete uploader.
+        if (uploader==audio || !CSMessageNativeSupports(uploader,@"ResendVoiceMsg:MsgWrap:",@"v",@[@"@",@"@"])) return nil;
+        __block __weak CSMessagePreparedSend *weakRoute=nil;
+        CSMessagePreparedSend *route=[[CSMessagePreparedSend alloc] initWithWrap:wrap routeName:@"fresh-voice" submission:^{
+            CSMessageNativeInvoke(manager,@"AddLocalMsg:MsgWrap:",@[target,wrap]);
+            if (!CSMessageNativeUnsigned(wrap,@"m_uiMesLocalID")) return CSMessageActionSubmissionStateUnknown;
+            if (weakRoute.submissionStillAuthorized && !weakRoute.submissionStillAuthorized()) return CSMessageActionSubmissionStateUnknown;
+            CSMessageNativeInvoke(uploader,@"ResendVoiceMsg:MsgWrap:",@[target,wrap]); weakRoute.nativeHandoffReturned=YES; return CSMessageActionSubmissionStateUnknown;
+        }]; weakRoute=route; return route;
+    } @catch (__unused NSException *exception) { return nil; }
+}
 - (CSMessagePreparedSend *)prepareScheduledText:(NSString *)text targetID:(NSString *)targetID accountID:(NSString *)accountID {
     if (!NSThread.isMainThread || !text.length || text.length>4000 || !targetID.length || !accountID.length || ![[_environment currentAccountID] isEqual:accountID]) return nil;
     @try {
@@ -88,23 +119,7 @@ static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArr
         return nil;
     }
     if (context.messageType==34) {
-        if (!voice.data.length || !voice.durationMilliseconds) return nil;
-        id wrap=CSFreshWrap(34); if (!wrap || !CSResetSendWrap(wrap,context,target)) return nil;
-        if (!CSMessageNativeSet(wrap,@"setM_dtVoice:",voice.data,YES) || !CSMessageNativeSet(wrap,@"setM_uiVoiceTime:",@(voice.durationMilliseconds),YES) || !CSMessageNativeSet(wrap,@"setM_uiVoiceFormat:",@(voice.format),YES) || !CSMessageNativeSet(wrap,@"setM_uiDownloadStatus:",@9,YES)) return nil;
-        CSMessageNativeSet(wrap,@"setM_uiVoiceForwardFlag:",@0,NO);
-        CSMessageNativeSet(wrap,@"setM_nsContent:",[NSString stringWithFormat:@"<msg><voicemsg voicelength=\"%u\" voiceformat=\"%u\" forwardflag=\"0\" /></msg>",voice.durationMilliseconds,voice.format],NO);
-        id audio=[_environment serviceNamed:@"AudioSender"];
-        if (!CSMessageNativeSupports(audio,@"uploaderForMsgWrap:",@"@",@[@"@"]) || !CSMessageNativeSupports(manager,@"AddLocalMsg:MsgWrap:",@"v",@[@"@",@"@"])) return nil;
-        id uploader=CSMessageNativeInvoke(audio,@"uploaderForMsgWrap:",@[wrap]);
-        // The AudioSender resend API deletes outgoing originals. Only the selected concrete uploader owns this route.
-        if (uploader==audio || !CSMessageNativeSupports(uploader,@"ResendVoiceMsg:MsgWrap:",@"v",@[@"@",@"@"])) return nil;
-        __block __weak CSMessagePreparedSend *weakRoute=nil;
-        CSMessagePreparedSend *route=[[CSMessagePreparedSend alloc] initWithWrap:wrap routeName:@"fresh-voice" submission:^{
-            CSMessageNativeInvoke(manager,@"AddLocalMsg:MsgWrap:",@[target,wrap]);
-            if (!CSMessageNativeUnsigned(wrap,@"m_uiMesLocalID")) return CSMessageActionSubmissionStateUnknown;
-            if (weakRoute.submissionStillAuthorized && !weakRoute.submissionStillAuthorized()) return CSMessageActionSubmissionStateUnknown;
-            CSMessageNativeInvoke(uploader,@"ResendVoiceMsg:MsgWrap:",@[target,wrap]); weakRoute.nativeHandoffReturned=YES; return CSMessageActionSubmissionStateUnknown;
-        }]; weakRoute=route; return route;
+        return [self prepareVoiceResource:voice accountID:context.accountID targetID:target];
     }
     Class factory=NSClassFromString(@"ForwardMsgUtil");
     if (context.messageType==43) return [self prepareVideo:context target:target factory:factory manager:manager];

@@ -1,0 +1,9 @@
+{
+  "date": "2026-11-10",
+  "source": "User message in this conversation",
+  "quote": "现在可以了。打包2.4-1版本。更新版本说明",
+  "confirmed_fix": "favorite-voice-forward-8.0.80-fix1-2026-11-10",
+  "scope": "用户在反馈收藏语音时长失败、普通聊天与收藏语音选人后下一步无响应后，确认修复可用。",
+  "release_2_4_1_installed_by_agent": false,
+  "messages_sent_by_release_task": false
+}

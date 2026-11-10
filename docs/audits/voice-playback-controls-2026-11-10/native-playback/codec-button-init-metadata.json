@@ -1,0 +1,2048 @@
+{
+  "AMRAudioPlayer": {
+    "name": "AMRAudioPlayer",
+    "class_offset": "0x1ee3be88",
+    "superclass": "BaseAudioPlayer",
+    "methods": [
+      {
+        "selector": "openAMRFile:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10001bdbc",
+        "metadata_offset": "0x16eae920"
+      },
+      {
+        "selector": "setDataFormat",
+        "encoding": "v16@0:8",
+        "imp": "0x10001be50",
+        "metadata_offset": "0x16eae92c"
+      },
+      {
+        "selector": "prepareBuffers",
+        "encoding": "v16@0:8",
+        "imp": "0x10001be98",
+        "metadata_offset": "0x16eae938"
+      },
+      {
+        "selector": "preparePlayNotNotify",
+        "encoding": "B16@0:8",
+        "imp": "0x10001af74",
+        "metadata_offset": "0x16eae944"
+      },
+      {
+        "selector": "clearVoiceHeadWithFile:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10001b698",
+        "metadata_offset": "0x16eae950"
+      },
+      {
+        "selector": "preparePlayWithFile:sync:",
+        "encoding": "B28@0:8@16B24",
+        "imp": "0x10001b86c",
+        "metadata_offset": "0x16eae95c"
+      },
+      {
+        "selector": "play",
+        "encoding": "v16@0:8",
+        "imp": "0x10001bad4",
+        "metadata_offset": "0x16eae968"
+      },
+      {
+        "selector": "playAtTime:",
+        "encoding": "v20@0:8I16",
+        "imp": "0x10001bae4",
+        "metadata_offset": "0x16eae974"
+      },
+      {
+        "selector": "setProgress:",
+        "encoding": "v20@0:8I16",
+        "imp": "0x10001bbd0",
+        "metadata_offset": "0x16eae980"
+      },
+      {
+        "selector": "replay",
+        "encoding": "v16@0:8",
+        "imp": "0x10001bc80",
+        "metadata_offset": "0x16eae98c"
+      },
+      {
+        "selector": "stop",
+        "encoding": "v16@0:8",
+        "imp": "0x10001bd00",
+        "metadata_offset": "0x16eae998"
+      },
+      {
+        "selector": "autostop",
+        "encoding": "v16@0:8",
+        "imp": "0x10001bd6c",
+        "metadata_offset": "0x16eae9a4"
+      }
+    ],
+    "ivars": []
+  },
+  "OpusAudioPlayer": {
+    "name": "OpusAudioPlayer",
+    "class_offset": "0x1ef315b8",
+    "superclass": "BaseAudioPlayer",
+    "methods": [
+      {
+        "selector": "init",
+        "encoding": "@16@0:8",
+        "imp": "0x105591cac",
+        "metadata_offset": "0x17453958"
+      },
+      {
+        "selector": "dealloc",
+        "encoding": "v16@0:8",
+        "imp": "0x105591cf8",
+        "metadata_offset": "0x17453964"
+      },
+      {
+        "selector": "preparePlayNotNotify",
+        "encoding": "B16@0:8",
+        "imp": "0x105591d78",
+        "metadata_offset": "0x17453970"
+      },
+      {
+        "selector": "preparePlayWithFile:sync:",
+        "encoding": "B28@0:8@16B24",
+        "imp": "0x1055924ec",
+        "metadata_offset": "0x1745397c"
+      },
+      {
+        "selector": "setCurrentPacketWithTime:",
+        "encoding": "v20@0:8I16",
+        "imp": "0x105592cb8",
+        "metadata_offset": "0x17453988"
+      },
+      {
+        "selector": "playAtTime:",
+        "encoding": "v20@0:8I16",
+        "imp": "0x105592d1c",
+        "metadata_offset": "0x17453994"
+      },
+      {
+        "selector": "setProgress:",
+        "encoding": "v20@0:8I16",
+        "imp": "0x105592ec0",
+        "metadata_offset": "0x174539a0"
+      },
+      {
+        "selector": "replay",
+        "encoding": "v16@0:8",
+        "imp": "0x105592ee8",
+        "metadata_offset": "0x174539ac"
+      },
+      {
+        "selector": "getCurrentTimeMs",
+        "encoding": "i16@0:8",
+        "imp": "0x105592f68",
+        "metadata_offset": "0x174539b8"
+      },
+      {
+        "selector": "stop",
+        "encoding": "v16@0:8",
+        "imp": "0x105592fd4",
+        "metadata_offset": "0x174539c4"
+      },
+      {
+        "selector": "autostop",
+        "encoding": "v16@0:8",
+        "imp": "0x10559312c",
+        "metadata_offset": "0x174539d0"
+      },
+      {
+        "selector": "onReceiveHandleOutput",
+        "encoding": "v16@0:8",
+        "imp": "0x105593274",
+        "metadata_offset": "0x174539dc"
+      },
+      {
+        "selector": "updateStatus",
+        "encoding": "v16@0:8",
+        "imp": "0x105593340",
+        "metadata_offset": "0x174539e8"
+      },
+      {
+        "selector": "TimerCheckMeter",
+        "encoding": "f16@0:8",
+        "imp": "0x1055937e0",
+        "metadata_offset": "0x174539f4"
+      },
+      {
+        "selector": "checkQueueState:",
+        "encoding": "v20@0:8f16",
+        "imp": "0x10559384c",
+        "metadata_offset": "0x17453a00"
+      },
+      {
+        "selector": "openOpusFile:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x105593a64",
+        "metadata_offset": "0x17453a0c"
+      },
+      {
+        "selector": "setDataFormat",
+        "encoding": "v16@0:8",
+        "imp": "0x105593ae0",
+        "metadata_offset": "0x17453a18"
+      },
+      {
+        "selector": "prepareBuffers",
+        "encoding": "v16@0:8",
+        "imp": "0x105593b2c",
+        "metadata_offset": "0x17453a24"
+      },
+      {
+        "selector": "isNeedUnmuteLongVideoPlay",
+        "encoding": "B16@0:8",
+        "imp": "0x105593f30",
+        "metadata_offset": "0x17453a30"
+      },
+      {
+        "selector": "setIsNeedUnmuteLongVideoPlay:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x105593f40",
+        "metadata_offset": "0x17453a3c"
+      },
+      {
+        "selector": "launchTime",
+        "encoding": "Q16@0:8",
+        "imp": "0x105593f50",
+        "metadata_offset": "0x17453a48"
+      },
+      {
+        "selector": "setLaunchTime:",
+        "encoding": "v24@0:8Q16",
+        "imp": "0x105593f60",
+        "metadata_offset": "0x17453a54"
+      },
+      {
+        "selector": "launchCost",
+        "encoding": "Q16@0:8",
+        "imp": "0x105593f70",
+        "metadata_offset": "0x17453a60"
+      },
+      {
+        "selector": "setLaunchCost:",
+        "encoding": "v24@0:8Q16",
+        "imp": "0x105593f80",
+        "metadata_offset": "0x17453a6c"
+      },
+      {
+        "selector": "receiveHandleOutputCost",
+        "encoding": "Q16@0:8",
+        "imp": "0x105593f90",
+        "metadata_offset": "0x17453a78"
+      },
+      {
+        "selector": "setReceiveHandleOutputCost:",
+        "encoding": "v24@0:8Q16",
+        "imp": "0x105593fa0",
+        "metadata_offset": "0x17453a84"
+      }
+    ],
+    "ivars": [
+      {
+        "name": "m_sampleRate",
+        "encoding": "d"
+      },
+      {
+        "name": "_isNeedUnmuteLongVideoPlay",
+        "encoding": "B"
+      },
+      {
+        "name": "_launchTime",
+        "encoding": "Q"
+      },
+      {
+        "name": "_launchCost",
+        "encoding": "Q"
+      },
+      {
+        "name": "_receiveHandleOutputCost",
+        "encoding": "Q"
+      }
+    ]
+  },
+  "SPXAudioPlayer": {
+    "name": "SPXAudioPlayer",
+    "class_offset": "0x1ef3c508",
+    "superclass": "BaseAudioPlayer",
+    "methods": [
+      {
+        "selector": "openSPXFile:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10597762c",
+        "metadata_offset": "0x16f658d0"
+      },
+      {
+        "selector": "setDataFormat",
+        "encoding": "v16@0:8",
+        "imp": "0x1059776a8",
+        "metadata_offset": "0x16f658dc"
+      },
+      {
+        "selector": "prepareBuffers",
+        "encoding": "v16@0:8",
+        "imp": "0x1059776f0",
+        "metadata_offset": "0x16f658e8"
+      },
+      {
+        "selector": "init",
+        "encoding": "@16@0:8",
+        "imp": "0x105976a7c",
+        "metadata_offset": "0x16f658f4"
+      },
+      {
+        "selector": "dealloc",
+        "encoding": "v16@0:8",
+        "imp": "0x105976b14",
+        "metadata_offset": "0x16f65900"
+      },
+      {
+        "selector": "preparePlayWithFile:sync:",
+        "encoding": "B28@0:8@16B24",
+        "imp": "0x105976b84",
+        "metadata_offset": "0x16f6590c"
+      },
+      {
+        "selector": "playAtTime:",
+        "encoding": "v20@0:8I16",
+        "imp": "0x1059773e8",
+        "metadata_offset": "0x16f65918"
+      },
+      {
+        "selector": "setProgress:",
+        "encoding": "v20@0:8I16",
+        "imp": "0x1059774bc",
+        "metadata_offset": "0x16f65924"
+      },
+      {
+        "selector": "replay",
+        "encoding": "v16@0:8",
+        "imp": "0x10597756c",
+        "metadata_offset": "0x16f65930"
+      },
+      {
+        "selector": "stop",
+        "encoding": "v16@0:8",
+        "imp": "0x1059775ec",
+        "metadata_offset": "0x16f6593c"
+      },
+      {
+        "selector": "autostop",
+        "encoding": "v16@0:8",
+        "imp": "0x105977620",
+        "metadata_offset": "0x16f65948"
+      }
+    ],
+    "ivars": []
+  },
+  "SilkAudioPlayer": {
+    "name": "SilkAudioPlayer",
+    "class_offset": "0x1ef452e8",
+    "superclass": "BaseAudioPlayer",
+    "methods": [
+      {
+        "selector": "init",
+        "encoding": "@16@0:8",
+        "imp": "0x105cf3e78",
+        "metadata_offset": "0x174a5ab0"
+      },
+      {
+        "selector": "dealloc",
+        "encoding": "v16@0:8",
+        "imp": "0x105cf3ec4",
+        "metadata_offset": "0x174a5abc"
+      },
+      {
+        "selector": "preparePlayNotNotify",
+        "encoding": "B16@0:8",
+        "imp": "0x105cf3f44",
+        "metadata_offset": "0x174a5ac8"
+      },
+      {
+        "selector": "preparePlayWithFile:sync:",
+        "encoding": "B28@0:8@16B24",
+        "imp": "0x105cf4674",
+        "metadata_offset": "0x174a5ad4"
+      },
+      {
+        "selector": "setCurrentPacketWithTime:",
+        "encoding": "v20@0:8I16",
+        "imp": "0x105cf4b08",
+        "metadata_offset": "0x174a5ae0"
+      },
+      {
+        "selector": "playAtTime:",
+        "encoding": "v20@0:8I16",
+        "imp": "0x105cf4b6c",
+        "metadata_offset": "0x174a5aec"
+      },
+      {
+        "selector": "setProgress:",
+        "encoding": "v20@0:8I16",
+        "imp": "0x105cf4d10",
+        "metadata_offset": "0x174a5af8"
+      },
+      {
+        "selector": "replay",
+        "encoding": "v16@0:8",
+        "imp": "0x105cf4d38",
+        "metadata_offset": "0x174a5b04"
+      },
+      {
+        "selector": "getCurrentTimeMs",
+        "encoding": "i16@0:8",
+        "imp": "0x105cf4db8",
+        "metadata_offset": "0x174a5b10"
+      },
+      {
+        "selector": "stop",
+        "encoding": "v16@0:8",
+        "imp": "0x105cf4e24",
+        "metadata_offset": "0x174a5b1c"
+      },
+      {
+        "selector": "autostop",
+        "encoding": "v16@0:8",
+        "imp": "0x105cf50b4",
+        "metadata_offset": "0x174a5b28"
+      },
+      {
+        "selector": "onReceiveHandleOutput",
+        "encoding": "v16@0:8",
+        "imp": "0x105cf5210",
+        "metadata_offset": "0x174a5b34"
+      },
+      {
+        "selector": "updateStatus",
+        "encoding": "v16@0:8",
+        "imp": "0x105cf52dc",
+        "metadata_offset": "0x174a5b40"
+      },
+      {
+        "selector": "TimerCheckMeter",
+        "encoding": "f16@0:8",
+        "imp": "0x105cf5514",
+        "metadata_offset": "0x174a5b4c"
+      },
+      {
+        "selector": "checkQueueState:",
+        "encoding": "v20@0:8f16",
+        "imp": "0x105cf5580",
+        "metadata_offset": "0x174a5b58"
+      },
+      {
+        "selector": "openSilkFile:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x105cf57c8",
+        "metadata_offset": "0x174a5b64"
+      },
+      {
+        "selector": "setDataFormat",
+        "encoding": "v16@0:8",
+        "imp": "0x105cf5844",
+        "metadata_offset": "0x174a5b70"
+      },
+      {
+        "selector": "setSmapleRate:",
+        "encoding": "v24@0:8d16",
+        "imp": "0x105cf5890",
+        "metadata_offset": "0x174a5b7c"
+      },
+      {
+        "selector": "prepareBuffers",
+        "encoding": "v16@0:8",
+        "imp": "0x105cf58b0",
+        "metadata_offset": "0x174a5b88"
+      },
+      {
+        "selector": "enableSnrEstimator",
+        "encoding": "v16@0:8",
+        "imp": "0x105cf59b8",
+        "metadata_offset": "0x174a5b94"
+      },
+      {
+        "selector": "fetchEstimatedSnrResult:playedMs:isDataOver:",
+        "encoding": "B40@0:8^i16^I24^B32",
+        "imp": "0x105cf5b14",
+        "metadata_offset": "0x174a5ba0"
+      },
+      {
+        "selector": "setHAidMode:device:",
+        "encoding": "v24@0:8i16i20",
+        "imp": "0x105cf5bac",
+        "metadata_offset": "0x174a5bac"
+      },
+      {
+        "selector": "setAIDenoiseLevel:",
+        "encoding": "v20@0:8i16",
+        "imp": "0x105cf5c44",
+        "metadata_offset": "0x174a5bb8"
+      },
+      {
+        "selector": "ifSilkAudioPlayerAgcOn",
+        "encoding": "B16@0:8",
+        "imp": "0x105cf5da0",
+        "metadata_offset": "0x174a5bc4"
+      },
+      {
+        "selector": "isNeedUnmuteLongVideoPlay",
+        "encoding": "B16@0:8",
+        "imp": "0x105cf5ff8",
+        "metadata_offset": "0x174a5bd0"
+      },
+      {
+        "selector": "setIsNeedUnmuteLongVideoPlay:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x105cf6008",
+        "metadata_offset": "0x174a5bdc"
+      },
+      {
+        "selector": "launchTime",
+        "encoding": "Q16@0:8",
+        "imp": "0x105cf6018",
+        "metadata_offset": "0x174a5be8"
+      },
+      {
+        "selector": "setLaunchTime:",
+        "encoding": "v24@0:8Q16",
+        "imp": "0x105cf6028",
+        "metadata_offset": "0x174a5bf4"
+      },
+      {
+        "selector": "launchCost",
+        "encoding": "Q16@0:8",
+        "imp": "0x105cf6038",
+        "metadata_offset": "0x174a5c00"
+      },
+      {
+        "selector": "setLaunchCost:",
+        "encoding": "v24@0:8Q16",
+        "imp": "0x105cf6048",
+        "metadata_offset": "0x174a5c0c"
+      },
+      {
+        "selector": "receiveHandleOutputCost",
+        "encoding": "Q16@0:8",
+        "imp": "0x105cf6058",
+        "metadata_offset": "0x174a5c18"
+      },
+      {
+        "selector": "setReceiveHandleOutputCost:",
+        "encoding": "v24@0:8Q16",
+        "imp": "0x105cf6068",
+        "metadata_offset": "0x174a5c24"
+      },
+      {
+        "selector": "snrEstimatorEnabled",
+        "encoding": "B16@0:8",
+        "imp": "0x105cf6078",
+        "metadata_offset": "0x174a5c30"
+      },
+      {
+        "selector": "setSnrEstimatorEnabled:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x105cf6088",
+        "metadata_offset": "0x174a5c3c"
+      },
+      {
+        "selector": "cachedEstimatedSnr",
+        "encoding": "i16@0:8",
+        "imp": "0x105cf6098",
+        "metadata_offset": "0x174a5c48"
+      },
+      {
+        "selector": "setCachedEstimatedSnr:",
+        "encoding": "v20@0:8i16",
+        "imp": "0x105cf60a8",
+        "metadata_offset": "0x174a5c54"
+      },
+      {
+        "selector": "cachedPlayedMs",
+        "encoding": "I16@0:8",
+        "imp": "0x105cf60b8",
+        "metadata_offset": "0x174a5c60"
+      },
+      {
+        "selector": "setCachedPlayedMs:",
+        "encoding": "v20@0:8I16",
+        "imp": "0x105cf60c8",
+        "metadata_offset": "0x174a5c6c"
+      },
+      {
+        "selector": "cachedIsDataOver",
+        "encoding": "B16@0:8",
+        "imp": "0x105cf60d8",
+        "metadata_offset": "0x174a5c78"
+      },
+      {
+        "selector": "setCachedIsDataOver:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x105cf60e8",
+        "metadata_offset": "0x174a5c84"
+      },
+      {
+        "selector": "haidMode",
+        "encoding": "i16@0:8",
+        "imp": "0x105cf60f8",
+        "metadata_offset": "0x174a5c90"
+      },
+      {
+        "selector": "setHaidMode:",
+        "encoding": "v20@0:8i16",
+        "imp": "0x105cf6108",
+        "metadata_offset": "0x174a5c9c"
+      },
+      {
+        "selector": "haidDevice",
+        "encoding": "i16@0:8",
+        "imp": "0x105cf6118",
+        "metadata_offset": "0x174a5ca8"
+      },
+      {
+        "selector": "setHaidDevice:",
+        "encoding": "v20@0:8i16",
+        "imp": "0x105cf6128",
+        "metadata_offset": "0x174a5cb4"
+      }
+    ],
+    "ivars": [
+      {
+        "name": "m_smapleRate",
+        "encoding": "d"
+      },
+      {
+        "name": "_isNeedUnmuteLongVideoPlay",
+        "encoding": "B"
+      },
+      {
+        "name": "_snrEstimatorEnabled",
+        "encoding": "B"
+      },
+      {
+        "name": "_cachedIsDataOver",
+        "encoding": "B"
+      },
+      {
+        "name": "_cachedEstimatedSnr",
+        "encoding": "i"
+      },
+      {
+        "name": "_cachedPlayedMs",
+        "encoding": "I"
+      },
+      {
+        "name": "_haidMode",
+        "encoding": "i"
+      },
+      {
+        "name": "_haidDevice",
+        "encoding": "i"
+      },
+      {
+        "name": "_launchTime",
+        "encoding": "Q"
+      },
+      {
+        "name": "_launchCost",
+        "encoding": "Q"
+      },
+      {
+        "name": "_receiveHandleOutputCost",
+        "encoding": "Q"
+      }
+    ]
+  },
+  "VoiceMessageViewModel": {
+    "name": "VoiceMessageViewModel",
+    "class_offset": "0x1ef5c3f8",
+    "superclass": "CommonMessageViewModel",
+    "methods": [
+      {
+        "selector": "initWithMessageWrap:contact:chatContact:",
+        "encoding": "@40@0:8@16@24@32",
+        "imp": "0x106588abc",
+        "metadata_offset": "0x17511380"
+      },
+      {
+        "selector": "dealloc",
+        "encoding": "v16@0:8",
+        "imp": "0x106588c84",
+        "metadata_offset": "0x1751138c"
+      },
+      {
+        "selector": "cellViewClassName",
+        "encoding": "@16@0:8",
+        "imp": "0x106588d64",
+        "metadata_offset": "0x17511398"
+      },
+      {
+        "selector": "measureContentViewSize:",
+        "encoding": "{CGSize=dd}32@0:8{CGSize=dd}16",
+        "imp": "0x106588d70",
+        "metadata_offset": "0x175113a4"
+      },
+      {
+        "selector": "voiceTimeLength",
+        "encoding": "d16@0:8",
+        "imp": "0x106588dbc",
+        "metadata_offset": "0x175113b0"
+      },
+      {
+        "selector": "richTextViewForCalcu",
+        "encoding": "@16@0:8",
+        "imp": "0x1065893d4",
+        "metadata_offset": "0x175113bc"
+      },
+      {
+        "selector": "voiceNodeWidth",
+        "encoding": "d16@0:8",
+        "imp": "0x1065894d0",
+        "metadata_offset": "0x175113c8"
+      },
+      {
+        "selector": "voiceNodeHeight",
+        "encoding": "d16@0:8",
+        "imp": "0x106589714",
+        "metadata_offset": "0x175113d4"
+      },
+      {
+        "selector": "voiceTimeStirng",
+        "encoding": "@16@0:8",
+        "imp": "0x106589fb4",
+        "metadata_offset": "0x175113e0"
+      },
+      {
+        "selector": "isPlaying",
+        "encoding": "B16@0:8",
+        "imp": "0x10658a078",
+        "metadata_offset": "0x175113ec"
+      },
+      {
+        "selector": "voiceTranslateInfo",
+        "encoding": "@16@0:8",
+        "imp": "0x10658a160",
+        "metadata_offset": "0x175113f8"
+      },
+      {
+        "selector": "translatedTextSize",
+        "encoding": "{CGSize=dd}16@0:8",
+        "imp": "0x10658a23c",
+        "metadata_offset": "0x17511404"
+      },
+      {
+        "selector": "displayTextSize",
+        "encoding": "{CGSize=dd}16@0:8",
+        "imp": "0x10658a33c",
+        "metadata_offset": "0x17511410"
+      },
+      {
+        "selector": "pathOfTranslateResult",
+        "encoding": "@16@0:8",
+        "imp": "0x10658a488",
+        "metadata_offset": "0x1751141c"
+      },
+      {
+        "selector": "hasLocalTranslateResult",
+        "encoding": "B16@0:8",
+        "imp": "0x10658a644",
+        "metadata_offset": "0x17511428"
+      },
+      {
+        "selector": "isTranslateEnd",
+        "encoding": "B16@0:8",
+        "imp": "0x10658a75c",
+        "metadata_offset": "0x17511434"
+      },
+      {
+        "selector": "canShowTranslateText",
+        "encoding": "B16@0:8",
+        "imp": "0x10658a864",
+        "metadata_offset": "0x17511440"
+      },
+      {
+        "selector": "canShowTranslateLoadingView",
+        "encoding": "B16@0:8",
+        "imp": "0x10658a984",
+        "metadata_offset": "0x1751144c"
+      },
+      {
+        "selector": "tableOffsetToScroll",
+        "encoding": "d16@0:8",
+        "imp": "0x10658aa9c",
+        "metadata_offset": "0x17511458"
+      },
+      {
+        "selector": "adjustTableOffset",
+        "encoding": "v16@0:8",
+        "imp": "0x10658af20",
+        "metadata_offset": "0x17511464"
+      },
+      {
+        "selector": "adjustTableOffsetByPop:",
+        "encoding": "v24@0:8d16",
+        "imp": "0x10658afa0",
+        "metadata_offset": "0x17511470"
+      },
+      {
+        "selector": "canShowPlayRateButton",
+        "encoding": "B16@0:8",
+        "imp": "0x10658b1a4",
+        "metadata_offset": "0x1751147c"
+      },
+      {
+        "selector": "playRateTitle",
+        "encoding": "@16@0:8",
+        "imp": "0x10658b388",
+        "metadata_offset": "0x17511488"
+      },
+      {
+        "selector": "onClickPlayRate",
+        "encoding": "v16@0:8",
+        "imp": "0x10658b458",
+        "metadata_offset": "0x17511494"
+      },
+      {
+        "selector": "currentPlayRate",
+        "encoding": "d16@0:8",
+        "imp": "0x10658b728",
+        "metadata_offset": "0x175114a0"
+      },
+      {
+        "selector": "reportKV",
+        "encoding": "v16@0:8",
+        "imp": "0x10658b738",
+        "metadata_offset": "0x175114ac"
+      },
+      {
+        "selector": "canShowTextTranslateEntry",
+        "encoding": "B16@0:8",
+        "imp": "0x10658bc84",
+        "metadata_offset": "0x175114b8"
+      },
+      {
+        "selector": "canShowTextTranslateView",
+        "encoding": "B16@0:8",
+        "imp": "0x10658bda8",
+        "metadata_offset": "0x175114c4"
+      },
+      {
+        "selector": "canShowTextTranslateText",
+        "encoding": "B16@0:8",
+        "imp": "0x10658bf18",
+        "metadata_offset": "0x175114d0"
+      },
+      {
+        "selector": "textTranslateInfo",
+        "encoding": "@16@0:8",
+        "imp": "0x10658c04c",
+        "metadata_offset": "0x175114dc"
+      },
+      {
+        "selector": "textTranslateTextSize",
+        "encoding": "{CGSize=dd}16@0:8",
+        "imp": "0x10658c100",
+        "metadata_offset": "0x175114e8"
+      },
+      {
+        "selector": "textTranslateTextStyles",
+        "encoding": "@16@0:8",
+        "imp": "0x10658c138",
+        "metadata_offset": "0x175114f4"
+      },
+      {
+        "selector": "calculateTextTranslatedTextSize",
+        "encoding": "{CGSize=dd}16@0:8",
+        "imp": "0x10658c178",
+        "metadata_offset": "0x17511500"
+      },
+      {
+        "selector": "translateVoice",
+        "encoding": "v16@0:8",
+        "imp": "0x10658c3dc",
+        "metadata_offset": "0x1751150c"
+      },
+      {
+        "selector": "stopTranslateVoice",
+        "encoding": "v16@0:8",
+        "imp": "0x10658c484",
+        "metadata_offset": "0x17511518"
+      },
+      {
+        "selector": "removeTranslateVoiceInfo",
+        "encoding": "v16@0:8",
+        "imp": "0x10658c554",
+        "metadata_offset": "0x17511524"
+      },
+      {
+        "selector": "foldTranslateResult",
+        "encoding": "v16@0:8",
+        "imp": "0x10658c624",
+        "metadata_offset": "0x17511530"
+      },
+      {
+        "selector": "animateShowQuickTransTips",
+        "encoding": "v16@0:8",
+        "imp": "0x10658c6f4",
+        "metadata_offset": "0x1751153c"
+      },
+      {
+        "selector": "animateHiddenQuickTransTips",
+        "encoding": "v16@0:8",
+        "imp": "0x10658c79c",
+        "metadata_offset": "0x17511548"
+      },
+      {
+        "selector": "onMessageStartPlaying",
+        "encoding": "v16@0:8",
+        "imp": "0x10658c814",
+        "metadata_offset": "0x17511554"
+      },
+      {
+        "selector": "timerEvent",
+        "encoding": "v16@0:8",
+        "imp": "0x10658c998",
+        "metadata_offset": "0x17511560"
+      },
+      {
+        "selector": "onMessageStopPlaying",
+        "encoding": "v16@0:8",
+        "imp": "0x10658c9d8",
+        "metadata_offset": "0x1751156c"
+      },
+      {
+        "selector": "additionalAccessibilityDescription",
+        "encoding": "@16@0:8",
+        "imp": "0x10658ca58",
+        "metadata_offset": "0x17511578"
+      },
+      {
+        "selector": "accessibilityMessageType",
+        "encoding": "@16@0:8",
+        "imp": "0x10658ce20",
+        "metadata_offset": "0x17511584"
+      },
+      {
+        "selector": "canShowResumeButton",
+        "encoding": "B16@0:8",
+        "imp": "0x10658cec8",
+        "metadata_offset": "0x17511590"
+      },
+      {
+        "selector": "tryShowVoiceEnhanceTipsAfterPlayEnd",
+        "encoding": "v16@0:8",
+        "imp": "0x10658d154",
+        "metadata_offset": "0x1751159c"
+      },
+      {
+        "selector": "onTranslateMessageFailed:errTip:",
+        "encoding": "v32@0:8@16@24",
+        "imp": "0x10658d480",
+        "metadata_offset": "0x175115a8"
+      },
+      {
+        "selector": "onTranslateMessageChanged:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10658d704",
+        "metadata_offset": "0x175115b4"
+      },
+      {
+        "selector": "OnVoiceTranslateBegin:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10658dbe0",
+        "metadata_offset": "0x175115c0"
+      },
+      {
+        "selector": "setVoiceNodeWidth:",
+        "encoding": "v24@0:8d16",
+        "imp": "0x10658dc64",
+        "metadata_offset": "0x175115cc"
+      },
+      {
+        "selector": "setVoiceNodeHeight:",
+        "encoding": "v24@0:8d16",
+        "imp": "0x10658dc74",
+        "metadata_offset": "0x175115d8"
+      },
+      {
+        "selector": "setIsPlaying:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x10658dc84",
+        "metadata_offset": "0x175115e4"
+      },
+      {
+        "selector": "setVoiceTranslateInfo:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10658dc94",
+        "metadata_offset": "0x175115f0"
+      },
+      {
+        "selector": "inMultiSelectStatus",
+        "encoding": "B16@0:8",
+        "imp": "0x10658dca8",
+        "metadata_offset": "0x175115fc"
+      },
+      {
+        "selector": "setInMultiSelectStatus:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x10658dcb8",
+        "metadata_offset": "0x17511608"
+      },
+      {
+        "selector": "bShowingQuickTranTips",
+        "encoding": "B16@0:8",
+        "imp": "0x10658dcc8",
+        "metadata_offset": "0x17511614"
+      },
+      {
+        "selector": "setBShowingQuickTranTips:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x10658dcd8",
+        "metadata_offset": "0x17511620"
+      },
+      {
+        "selector": "bDelayRetryPlay",
+        "encoding": "B16@0:8",
+        "imp": "0x10658dce8",
+        "metadata_offset": "0x1751162c"
+      },
+      {
+        "selector": "setBDelayRetryPlay:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x10658dcf8",
+        "metadata_offset": "0x17511638"
+      },
+      {
+        "selector": "dialectFeedbackShowing",
+        "encoding": "B16@0:8",
+        "imp": "0x10658dd08",
+        "metadata_offset": "0x17511644"
+      },
+      {
+        "selector": "setDialectFeedbackShowing:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x10658dd18",
+        "metadata_offset": "0x17511650"
+      },
+      {
+        "selector": "setTextTranslateTextSize:",
+        "encoding": "v32@0:8{CGSize=dd}16",
+        "imp": "0x10658dd28",
+        "metadata_offset": "0x1751165c"
+      },
+      {
+        "selector": "setTextTranslateTextStyles:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10658dd3c",
+        "metadata_offset": "0x17511668"
+      },
+      {
+        "selector": "setRichTextViewForCalcu:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10658dd50",
+        "metadata_offset": "0x17511674"
+      },
+      {
+        "selector": ".cxx_destruct",
+        "encoding": "v16@0:8",
+        "imp": "0x10658dd64",
+        "metadata_offset": "0x17511680"
+      }
+    ],
+    "ivars": [
+      {
+        "name": "m_isLastStatusUnPlay",
+        "encoding": "B"
+      },
+      {
+        "name": "m_startPlayCount",
+        "encoding": "I"
+      },
+      {
+        "name": "m_playingTimer",
+        "encoding": "@\"MMTimer\""
+      },
+      {
+        "name": "m_currentPlayRate",
+        "encoding": "d"
+      },
+      {
+        "name": "_isPlaying",
+        "encoding": "B"
+      },
+      {
+        "name": "_inMultiSelectStatus",
+        "encoding": "B"
+      },
+      {
+        "name": "_bShowingQuickTranTips",
+        "encoding": "B"
+      },
+      {
+        "name": "_bDelayRetryPlay",
+        "encoding": "B"
+      },
+      {
+        "name": "_dialectFeedbackShowing",
+        "encoding": "B"
+      },
+      {
+        "name": "_voiceNodeWidth",
+        "encoding": "d"
+      },
+      {
+        "name": "_voiceNodeHeight",
+        "encoding": "d"
+      },
+      {
+        "name": "_voiceTranslateInfo",
+        "encoding": "@\"VoiceTransInfo\""
+      },
+      {
+        "name": "_textTranslateTextStyles",
+        "encoding": "@\"NSMutableArray\""
+      },
+      {
+        "name": "_richTextViewForCalcu",
+        "encoding": "@\"CTRichTextView\""
+      },
+      {
+        "name": "_textTranslateTextSize",
+        "encoding": "{CGSize=\"width\"d\"height\"d}"
+      }
+    ]
+  },
+  "VoiceMessageCellView": {
+    "name": "VoiceMessageCellView",
+    "class_offset": "0x1ef5c2b8",
+    "superclass": "CommonMessageCellView",
+    "methods": [
+      {
+        "selector": "initTextTranslateView",
+        "encoding": "v16@0:8",
+        "imp": "0x10656d0d0",
+        "metadata_offset": "0x16f83c70"
+      },
+      {
+        "selector": "initTextTranslateTextView",
+        "encoding": "v16@0:8",
+        "imp": "0x10656d460",
+        "metadata_offset": "0x16f83c7c"
+      },
+      {
+        "selector": "updateTextTranslateLoadingView",
+        "encoding": "v16@0:8",
+        "imp": "0x10656d590",
+        "metadata_offset": "0x16f83c88"
+      },
+      {
+        "selector": "updateTextTranslateSuccessView",
+        "encoding": "v16@0:8",
+        "imp": "0x10656d688",
+        "metadata_offset": "0x16f83c94"
+      },
+      {
+        "selector": "setTextTranslateText",
+        "encoding": "v16@0:8",
+        "imp": "0x10656dadc",
+        "metadata_offset": "0x16f83ca0"
+      },
+      {
+        "selector": "getTextTranslateViewMenus",
+        "encoding": "@16@0:8",
+        "imp": "0x10656e23c",
+        "metadata_offset": "0x16f83cac"
+      },
+      {
+        "selector": "onDoubleTapTextTranslateView:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10656e824",
+        "metadata_offset": "0x16f83cb8"
+      },
+      {
+        "selector": "onLongPressTextTranslateView:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10656eb64",
+        "metadata_offset": "0x16f83cc4"
+      },
+      {
+        "selector": "addTextTranslateCoverViewToControllerTable",
+        "encoding": "B16@0:8",
+        "imp": "0x10656ee10",
+        "metadata_offset": "0x16f83cd0"
+      },
+      {
+        "selector": "onTapTextTranslateView:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10656f7d4",
+        "metadata_offset": "0x16f83cdc"
+      },
+      {
+        "selector": "onCopyTextTranslate:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10656f890",
+        "metadata_offset": "0x16f83ce8"
+      },
+      {
+        "selector": "onFavoriteTextTranslate:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10656f994",
+        "metadata_offset": "0x16f83cf4"
+      },
+      {
+        "selector": "onForwardTextTranslate:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10656fcd0",
+        "metadata_offset": "0x16f83d00"
+      },
+      {
+        "selector": "onClickTextTranslate:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10656ffb8",
+        "metadata_offset": "0x16f83d0c"
+      },
+      {
+        "selector": "onClickTextResultTranslateSearchMenus",
+        "encoding": "v16@0:8",
+        "imp": "0x106570414",
+        "metadata_offset": "0x16f83d18"
+      },
+      {
+        "selector": "translateMsg",
+        "encoding": "v16@0:8",
+        "imp": "0x1065704a8",
+        "metadata_offset": "0x16f83d24"
+      },
+      {
+        "selector": "onSetTranslateLanguage:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106570a0c",
+        "metadata_offset": "0x16f83d30"
+      },
+      {
+        "selector": "onReportTextTranslationError:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106570c8c",
+        "metadata_offset": "0x16f83d3c"
+      },
+      {
+        "selector": "onSpeakMsgFromTextTranslate:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106570e60",
+        "metadata_offset": "0x16f83d48"
+      },
+      {
+        "selector": "onTextTranslateSpeak:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106571110",
+        "metadata_offset": "0x16f83d54"
+      },
+      {
+        "selector": "onCancelTextTranslateSpeak:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x1065714f8",
+        "metadata_offset": "0x16f83d60"
+      },
+      {
+        "selector": "onTapTextTranslateViewToStopSpeak",
+        "encoding": "v16@0:8",
+        "imp": "0x106571674",
+        "metadata_offset": "0x16f83d6c"
+      },
+      {
+        "selector": "getTranslateRichTextView",
+        "encoding": "@16@0:8",
+        "imp": "0x106571754",
+        "metadata_offset": "0x16f83d78"
+      },
+      {
+        "selector": "getTranslateView",
+        "encoding": "@16@0:8",
+        "imp": "0x106571768",
+        "metadata_offset": "0x16f83d84"
+      },
+      {
+        "selector": "highLightSearchKeyWords:",
+        "encoding": "B24@0:8@16",
+        "imp": "0x10657177c",
+        "metadata_offset": "0x16f83d90"
+      },
+      {
+        "selector": "initWithViewModel:",
+        "encoding": "@24@0:8@16",
+        "imp": "0x106571ad0",
+        "metadata_offset": "0x16f83d9c"
+      },
+      {
+        "selector": "layoutContentView",
+        "encoding": "v16@0:8",
+        "imp": "0x106571e5c",
+        "metadata_offset": "0x16f83da8"
+      },
+      {
+        "selector": "updateStatus",
+        "encoding": "v16@0:8",
+        "imp": "0x106572670",
+        "metadata_offset": "0x16f83db4"
+      },
+      {
+        "selector": "onAppear",
+        "encoding": "v16@0:8",
+        "imp": "0x106572e4c",
+        "metadata_offset": "0x16f83dc0"
+      },
+      {
+        "selector": "onWillBeginDragging",
+        "encoding": "v16@0:8",
+        "imp": "0x106573414",
+        "metadata_offset": "0x16f83dcc"
+      },
+      {
+        "selector": "prepareForReuse",
+        "encoding": "v16@0:8",
+        "imp": "0x106573424",
+        "metadata_offset": "0x16f83dd8"
+      },
+      {
+        "selector": "initSecLabel",
+        "encoding": "v16@0:8",
+        "imp": "0x106573478",
+        "metadata_offset": "0x16f83de4"
+      },
+      {
+        "selector": "initPlayingImageView",
+        "encoding": "v16@0:8",
+        "imp": "0x10657352c",
+        "metadata_offset": "0x16f83df0"
+      },
+      {
+        "selector": "initRecordingView",
+        "encoding": "v16@0:8",
+        "imp": "0x1065738c4",
+        "metadata_offset": "0x16f83dfc"
+      },
+      {
+        "selector": "initUnreadView",
+        "encoding": "v16@0:8",
+        "imp": "0x106573f88",
+        "metadata_offset": "0x16f83e08"
+      },
+      {
+        "selector": "redDotWidth",
+        "encoding": "d16@0:8",
+        "imp": "0x106574054",
+        "metadata_offset": "0x16f83e14"
+      },
+      {
+        "selector": "initQuickTransTipButton",
+        "encoding": "v16@0:8",
+        "imp": "0x106574090",
+        "metadata_offset": "0x16f83e20"
+      },
+      {
+        "selector": "reportQuickTransTipExposureIfNeeded",
+        "encoding": "v16@0:8",
+        "imp": "0x106574500",
+        "metadata_offset": "0x16f83e2c"
+      },
+      {
+        "selector": "updateQuickTransTipButtonColor",
+        "encoding": "v16@0:8",
+        "imp": "0x10657476c",
+        "metadata_offset": "0x16f83e38"
+      },
+      {
+        "selector": "updateQuickTransTipButtonPosition",
+        "encoding": "v16@0:8",
+        "imp": "0x106574b54",
+        "metadata_offset": "0x16f83e44"
+      },
+      {
+        "selector": "onVoiceTransByQuickButton:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106574d10",
+        "metadata_offset": "0x16f83e50"
+      },
+      {
+        "selector": "getQuickTransTipsView",
+        "encoding": "@16@0:8",
+        "imp": "0x106574eb8",
+        "metadata_offset": "0x16f83e5c"
+      },
+      {
+        "selector": "animateShowQuickTransTips",
+        "encoding": "v16@0:8",
+        "imp": "0x106574ec8",
+        "metadata_offset": "0x16f83e68"
+      },
+      {
+        "selector": "animateHiddenQuickTransTips",
+        "encoding": "v16@0:8",
+        "imp": "0x106575138",
+        "metadata_offset": "0x16f83e74"
+      },
+      {
+        "selector": "translateButtonWidth",
+        "encoding": "d16@0:8",
+        "imp": "0x1065752ac",
+        "metadata_offset": "0x16f83e80"
+      },
+      {
+        "selector": "initResumePlayButton",
+        "encoding": "v16@0:8",
+        "imp": "0x1065752f4",
+        "metadata_offset": "0x16f83e8c"
+      },
+      {
+        "selector": "updateResumePlayButtonColor",
+        "encoding": "v16@0:8",
+        "imp": "0x106575898",
+        "metadata_offset": "0x16f83e98"
+      },
+      {
+        "selector": "updateResumePlayButtonPosition",
+        "encoding": "v16@0:8",
+        "imp": "0x106576368",
+        "metadata_offset": "0x16f83ea4"
+      },
+      {
+        "selector": "onClickResumePlayButton:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106576584",
+        "metadata_offset": "0x16f83eb0"
+      },
+      {
+        "selector": "resumeButtonWidth",
+        "encoding": "d16@0:8",
+        "imp": "0x1065767f8",
+        "metadata_offset": "0x16f83ebc"
+      },
+      {
+        "selector": "initPlayRateButton",
+        "encoding": "v16@0:8",
+        "imp": "0x106576840",
+        "metadata_offset": "0x16f83ec8"
+      },
+      {
+        "selector": "updatePlayRateButtonColor",
+        "encoding": "v16@0:8",
+        "imp": "0x106576a90",
+        "metadata_offset": "0x16f83ed4"
+      },
+      {
+        "selector": "updatePlayRateButtonPosition",
+        "encoding": "v16@0:8",
+        "imp": "0x106577924",
+        "metadata_offset": "0x16f83ee0"
+      },
+      {
+        "selector": "onClickPlayRateButton:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106577b40",
+        "metadata_offset": "0x16f83eec"
+      },
+      {
+        "selector": "playRateButtonWidth",
+        "encoding": "d16@0:8",
+        "imp": "0x106577c1c",
+        "metadata_offset": "0x16f83ef8"
+      },
+      {
+        "selector": "createTranslateTextLabel",
+        "encoding": "@16@0:8",
+        "imp": "0x106577c64",
+        "metadata_offset": "0x16f83f04"
+      },
+      {
+        "selector": "createTranslateView",
+        "encoding": "@16@0:8",
+        "imp": "0x106577f48",
+        "metadata_offset": "0x16f83f10"
+      },
+      {
+        "selector": "initTranslatingView",
+        "encoding": "v16@0:8",
+        "imp": "0x10657842c",
+        "metadata_offset": "0x16f83f1c"
+      },
+      {
+        "selector": "initTranslatingTextLabel",
+        "encoding": "v16@0:8",
+        "imp": "0x106578490",
+        "metadata_offset": "0x16f83f28"
+      },
+      {
+        "selector": "initTranslateView",
+        "encoding": "v16@0:8",
+        "imp": "0x1065784f0",
+        "metadata_offset": "0x16f83f34"
+      },
+      {
+        "selector": "initTranslateTextLabel",
+        "encoding": "v16@0:8",
+        "imp": "0x106578554",
+        "metadata_offset": "0x16f83f40"
+      },
+      {
+        "selector": "displayViewForImageBrowser",
+        "encoding": "@16@0:8",
+        "imp": "0x1065785b4",
+        "metadata_offset": "0x16f83f4c"
+      },
+      {
+        "selector": "onLongPressTranslateView:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x1065785c8",
+        "metadata_offset": "0x16f83f58"
+      },
+      {
+        "selector": "addCoverViewToControllerTable",
+        "encoding": "B16@0:8",
+        "imp": "0x10657884c",
+        "metadata_offset": "0x16f83f64"
+      },
+      {
+        "selector": "onTapTranslateView:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106579204",
+        "metadata_offset": "0x16f83f70"
+      },
+      {
+        "selector": "onDoubleTapTranslateView:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x1065794b8",
+        "metadata_offset": "0x16f83f7c"
+      },
+      {
+        "selector": "onCopyTranslate:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106579a34",
+        "metadata_offset": "0x16f83f88"
+      },
+      {
+        "selector": "reportTranslateClickAction:",
+        "encoding": "v20@0:8I16",
+        "imp": "0x106579b48",
+        "metadata_offset": "0x16f83f94"
+      },
+      {
+        "selector": "onFavoriteTranslate:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106579e08",
+        "metadata_offset": "0x16f83fa0"
+      },
+      {
+        "selector": "onForwardTranslate:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10657a124",
+        "metadata_offset": "0x16f83fac"
+      },
+      {
+        "selector": "handleTranslateMenuWillHideMenuNotification:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10657a41c",
+        "metadata_offset": "0x16f83fb8"
+      },
+      {
+        "selector": "getTranslateMenus",
+        "encoding": "@16@0:8",
+        "imp": "0x10657a57c",
+        "metadata_offset": "0x16f83fc4"
+      },
+      {
+        "selector": "canPerformAction:withSender:",
+        "encoding": "B32@0:8:16@24",
+        "imp": "0x10657ab20",
+        "metadata_offset": "0x16f83fd0"
+      },
+      {
+        "selector": "canBecomeFirstResponder",
+        "encoding": "B16@0:8",
+        "imp": "0x10657ad60",
+        "metadata_offset": "0x16f83fdc"
+      },
+      {
+        "selector": "onLongTouch",
+        "encoding": "v16@0:8",
+        "imp": "0x10657ad68",
+        "metadata_offset": "0x16f83fe8"
+      },
+      {
+        "selector": "operationMenuItems",
+        "encoding": "@16@0:8",
+        "imp": "0x10657ae10",
+        "metadata_offset": "0x16f83ff4"
+      },
+      {
+        "selector": "onMinimize",
+        "encoding": "v16@0:8",
+        "imp": "0x10657b290",
+        "metadata_offset": "0x16f84000"
+      },
+      {
+        "selector": "canShowVoiceTransMenu",
+        "encoding": "B16@0:8",
+        "imp": "0x10657b3d0",
+        "metadata_offset": "0x16f8400c"
+      },
+      {
+        "selector": "onSwitch:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10657b884",
+        "metadata_offset": "0x16f84018"
+      },
+      {
+        "selector": "onVoiceTransStop:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10657bac0",
+        "metadata_offset": "0x16f84024"
+      },
+      {
+        "selector": "onVoiceTransClose:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10657c1a4",
+        "metadata_offset": "0x16f84030"
+      },
+      {
+        "selector": "onVoiceTrans:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10657c344",
+        "metadata_offset": "0x16f8403c"
+      },
+      {
+        "selector": "showDialectFeedbackButton",
+        "encoding": "v16@0:8",
+        "imp": "0x10657c9ac",
+        "metadata_offset": "0x16f84048"
+      },
+      {
+        "selector": "animateShowDialectFeedback",
+        "encoding": "v16@0:8",
+        "imp": "0x10657d248",
+        "metadata_offset": "0x16f84054"
+      },
+      {
+        "selector": "updateDialectFeedbackButtonPosition",
+        "encoding": "v16@0:8",
+        "imp": "0x10657da58",
+        "metadata_offset": "0x16f84060"
+      },
+      {
+        "selector": "reportDialectFeedbackTipExposureIfNeeded",
+        "encoding": "v16@0:8",
+        "imp": "0x10657dc5c",
+        "metadata_offset": "0x16f8406c"
+      },
+      {
+        "selector": "hideDialectFeedbackButton",
+        "encoding": "v16@0:8",
+        "imp": "0x10657ddd4",
+        "metadata_offset": "0x16f84078"
+      },
+      {
+        "selector": "hideDialectFeedbackButtonAnimated:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x10657dde4",
+        "metadata_offset": "0x16f84084"
+      },
+      {
+        "selector": "onDialectTransFeedback:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x10657e490",
+        "metadata_offset": "0x16f84090"
+      },
+      {
+        "selector": "onClickTranslateSearchMenus",
+        "encoding": "v16@0:8",
+        "imp": "0x10657ec8c",
+        "metadata_offset": "0x16f8409c"
+      },
+      {
+        "selector": "showVoiceTransView",
+        "encoding": "v16@0:8",
+        "imp": "0x10657ed20",
+        "metadata_offset": "0x16f840a8"
+      },
+      {
+        "selector": "shouldLayoutIfNeeded",
+        "encoding": "B16@0:8",
+        "imp": "0x10657f098",
+        "metadata_offset": "0x16f840b4"
+      },
+      {
+        "selector": "isTouchInView:",
+        "encoding": "B24@0:8@16",
+        "imp": "0x10657f1a0",
+        "metadata_offset": "0x16f840c0"
+      },
+      {
+        "selector": "onTouchUpInside",
+        "encoding": "v16@0:8",
+        "imp": "0x10657f2ec",
+        "metadata_offset": "0x16f840cc"
+      },
+      {
+        "selector": "onClick",
+        "encoding": "v16@0:8",
+        "imp": "0x10657f424",
+        "metadata_offset": "0x16f840d8"
+      },
+      {
+        "selector": "onClick:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x10657f434",
+        "metadata_offset": "0x16f840e4"
+      },
+      {
+        "selector": "responseUserClick",
+        "encoding": "B16@0:8",
+        "imp": "0x10657f754",
+        "metadata_offset": "0x16f840f0"
+      },
+      {
+        "selector": "responseUserClick:",
+        "encoding": "B20@0:8B16",
+        "imp": "0x10657f764",
+        "metadata_offset": "0x16f840fc"
+      },
+      {
+        "selector": "shouldShowVoiceSnackBar",
+        "encoding": "B16@0:8",
+        "imp": "0x10657fd34",
+        "metadata_offset": "0x16f84108"
+      },
+      {
+        "selector": "voiceEnhancementActionAttrTitle",
+        "encoding": "@16@0:8",
+        "imp": "0x106580138",
+        "metadata_offset": "0x16f84114"
+      },
+      {
+        "selector": "showVoiceSnackBarOnStartPlayingIfNeeded",
+        "encoding": "v16@0:8",
+        "imp": "0x106580320",
+        "metadata_offset": "0x16f84120"
+      },
+      {
+        "selector": "checkVoiceState:",
+        "encoding": "B20@0:8i16",
+        "imp": "0x106581290",
+        "metadata_offset": "0x16f8412c"
+      },
+      {
+        "selector": "startPlaying",
+        "encoding": "v16@0:8",
+        "imp": "0x106581970",
+        "metadata_offset": "0x16f84138"
+      },
+      {
+        "selector": "stopPlaying",
+        "encoding": "v16@0:8",
+        "imp": "0x106581aa8",
+        "metadata_offset": "0x16f84144"
+      },
+      {
+        "selector": "updateSecLabelColor",
+        "encoding": "v16@0:8",
+        "imp": "0x106581b08",
+        "metadata_offset": "0x16f84150"
+      },
+      {
+        "selector": "updateVoiceLength",
+        "encoding": "v16@0:8",
+        "imp": "0x106581c90",
+        "metadata_offset": "0x16f8415c"
+      },
+      {
+        "selector": "getVoicePath",
+        "encoding": "@16@0:8",
+        "imp": "0x1065831c8",
+        "metadata_offset": "0x16f84168"
+      },
+      {
+        "selector": "onWindowHide",
+        "encoding": "v16@0:8",
+        "imp": "0x1065834b8",
+        "metadata_offset": "0x16f84174"
+      },
+      {
+        "selector": "getMediaWrap",
+        "encoding": "@16@0:8",
+        "imp": "0x106583568",
+        "metadata_offset": "0x16f84180"
+      },
+      {
+        "selector": "getViewController",
+        "encoding": "@16@0:8",
+        "imp": "0x1065835bc",
+        "metadata_offset": "0x16f8418c"
+      },
+      {
+        "selector": "startTranslatingAnimation",
+        "encoding": "v16@0:8",
+        "imp": "0x106583610",
+        "metadata_offset": "0x16f84198"
+      },
+      {
+        "selector": "startTextAnimation",
+        "encoding": "v16@0:8",
+        "imp": "0x1065838bc",
+        "metadata_offset": "0x16f841a4"
+      },
+      {
+        "selector": "stopTextAnimation",
+        "encoding": "v16@0:8",
+        "imp": "0x1065839d8",
+        "metadata_offset": "0x16f841b0"
+      },
+      {
+        "selector": "updateTranslateText",
+        "encoding": "v16@0:8",
+        "imp": "0x106583a24",
+        "metadata_offset": "0x16f841bc"
+      },
+      {
+        "selector": "setTranslatingText:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106583d08",
+        "metadata_offset": "0x16f841c8"
+      },
+      {
+        "selector": "setTranslateText:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106583f5c",
+        "metadata_offset": "0x16f841d4"
+      },
+      {
+        "selector": "animateSetTranslateText:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x1065847e4",
+        "metadata_offset": "0x16f841e0"
+      },
+      {
+        "selector": "doTranslateTextLineAnimation:lineNumber:",
+        "encoding": "v28@0:8@16i24",
+        "imp": "0x1065856f4",
+        "metadata_offset": "0x16f841ec"
+      },
+      {
+        "selector": "animationDidStop:finished:",
+        "encoding": "v28@0:8@16B24",
+        "imp": "0x1065858b4",
+        "metadata_offset": "0x16f841f8"
+      },
+      {
+        "selector": "OnVoiceTranslateBegin:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106585988",
+        "metadata_offset": "0x16f84204"
+      },
+      {
+        "selector": "OnVoiceTranslateSuccess:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106585a64",
+        "metadata_offset": "0x16f84210"
+      },
+      {
+        "selector": "OnVoiceTranslateFail:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106585c94",
+        "metadata_offset": "0x16f8421c"
+      },
+      {
+        "selector": "onExtChatBackgroundChanged:",
+        "encoding": "v24@0:8@16",
+        "imp": "0x106585f7c",
+        "metadata_offset": "0x16f84228"
+      },
+      {
+        "selector": "onBeginPlayingMsg:autoPlayEnabled:",
+        "encoding": "v28@0:8@16B24",
+        "imp": "0x106586078",
+        "metadata_offset": "0x16f84234"
+      },
+      {
+        "selector": "timerEvent",
+        "encoding": "v16@0:8",
+        "imp": "0x106586270",
+        "metadata_offset": "0x16f84240"
+      },
+      {
+        "selector": "onEndPlayingMsg:autoPlayEnabled:",
+        "encoding": "v28@0:8@16B24",
+        "imp": "0x1065864d4",
+        "metadata_offset": "0x16f8424c"
+      },
+      {
+        "selector": "accessibilityTraits",
+        "encoding": "Q16@0:8",
+        "imp": "0x1065868cc",
+        "metadata_offset": "0x16f84258"
+      },
+      {
+        "selector": "additionalCustomActions",
+        "encoding": "@16@0:8",
+        "imp": "0x106586920",
+        "metadata_offset": "0x16f84264"
+      },
+      {
+        "selector": "shouldAutoScrollUp",
+        "encoding": "B16@0:8",
+        "imp": "0x106586c20",
+        "metadata_offset": "0x16f84270"
+      },
+      {
+        "selector": "setShouldAutoScrollUp:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x106586c30",
+        "metadata_offset": "0x16f8427c"
+      },
+      {
+        "selector": "quickTransTipIsDialect",
+        "encoding": "B16@0:8",
+        "imp": "0x106586c40",
+        "metadata_offset": "0x16f84288"
+      },
+      {
+        "selector": "setQuickTransTipIsDialect:",
+        "encoding": "v20@0:8B16",
+        "imp": "0x106586c50",
+        "metadata_offset": "0x16f84294"
+      },
+      {
+        "selector": ".cxx_destruct",
+        "encoding": "v16@0:8",
+        "imp": "0x106586c60",
+        "metadata_offset": "0x16f842a0"
+      }
+    ],
+    "ivars": [
+      {
+        "name": "m_translateView",
+        "encoding": "@\"UIView\""
+      },
+      {
+        "name": "m_richTextCoverView",
+        "encoding": "@\"MMRichTextCoverView\""
+      },
+      {
+        "name": "m_secLabel",
+        "encoding": "@\"UILabel\""
+      },
+      {
+        "name": "m_playingImageView",
+        "encoding": "@\"VoicePlayingView\""
+      },
+      {
+        "name": "m_recordingView",
+        "encoding": "@\"UIImageView\""
+      },
+      {
+        "name": "m_unreadImageView",
+        "encoding": "@\"MMBadgeView\""
+      },
+      {
+        "name": "m_quickTransTipButton",
+        "encoding": "@\"UIButton\""
+      },
+      {
+        "name": "transTipButtonContainer",
+        "encoding": "@\"UIView\""
+      },
+      {
+        "name": "m_resumePlayButton",
+        "encoding": "@\"UIButton\""
+      },
+      {
+        "name": "m_playRateButton",
+        "encoding": "@\"UIButton\""
+      },
+      {
+        "name": "m_oTranslateTextLabel",
+        "encoding": "@\"CTRichTextView\""
+      },
+      {
+        "name": "m_translatingTextLabel",
+        "encoding": "@\"CTRichTextView\""
+      },
+      {
+        "name": "m_translatingView",
+        "encoding": "@\"UIView\""
+      },
+      {
+        "name": "m_translateMenus",
+        "encoding": "@\"NSArray\""
+      },
+      {
+        "name": "m_animationTimer",
+        "encoding": "@\"MMTimer\""
+      },
+      {
+        "name": "m_hasClickedToStartPlaying",
+        "encoding": "B"
+      },
+      {
+        "name": "m_dialectFeedbackButton",
+        "encoding": "@\"UIButton\""
+      },
+      {
+        "name": "m_dialectFeedbackBtnContainer",
+        "encoding": "@\"UIView\""
+      },
+      {
+        "name": "m_isAnimatingDialectFeedback",
+        "encoding": "B"
+      },
+      {
+        "name": "m_textTranslateView",
+        "encoding": "@\"UIView\""
+      },
+      {
+        "name": "m_textTranslateTextView",
+        "encoding": "@\"RichTextView\""
+      },
+      {
+        "name": "m_textTranslateLoadingView",
+        "encoding": "@\"MMUIActivityIndicatorView\""
+      },
+      {
+        "name": "m_textTranslateSuccessIconView",
+        "encoding": "@\"UIImageView\""
+      },
+      {
+        "name": "m_textTranslateSuccessLabel",
+        "encoding": "@\"UILabel\""
+      },
+      {
+        "name": "m_textTranslateMenus",
+        "encoding": "@\"NSArray\""
+      },
+      {
+        "name": "m_isTranslating",
+        "encoding": "B"
+      },
+      {
+        "name": "m_isAnimatingTranslateText",
+        "encoding": "B"
+      },
+      {
+        "name": "kVoiceEnhancementSnackBarMaxShowCount",
+        "encoding": "I"
+      },
+      {
+        "name": "isXLabEnableShow",
+        "encoding": "B"
+      },
+      {
+        "name": "_shouldAutoScrollUp",
+        "encoding": "B"
+      },
+      {
+        "name": "_quickTransTipIsDialect",
+        "encoding": "B"
+      }
+    ]
+  }
+}

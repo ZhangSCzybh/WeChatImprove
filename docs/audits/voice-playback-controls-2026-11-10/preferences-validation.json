@@ -1,0 +1,83 @@
+{
+  "status": "passed",
+  "completed_at": "2026-11-10T11:17:21.035245+00:00",
+  "scope": "Progress-only independent Foundation preferences, existing voice settings section, backup allowlist, limited isolated core regression",
+  "interface": {
+    "class": "CSVoicePlaybackPreferences",
+    "singleton": "+sharedPreferences",
+    "readonly_flags": [
+      "progressEnabled"
+    ],
+    "test_initializer": "-initWithDefaults:",
+    "refresh": "-requestRefresh",
+    "progress_key": "CSVoicePlaybackProgressEnabledKey = com.wechat.enhance.voice_playback.progress_enabled",
+    "notification": "CSVoicePlaybackSettingsDidChangeNotification; object=preferences; main delivery; changed values only"
+  },
+  "behavior": [
+    "Progress defaults to NO without writing or registering defaults",
+    "Defaults/Darwin/app activation refreshes coalesce on main",
+    "Progress key changes do not alter CSMessageActionSettings.version",
+    "Existing chat and favorites forwarding switches preserved",
+    "Backup registry includes only progress bool/global key in standard/message_actions",
+    "Partial reset preserves progress/forwarding when module not selected; full reset removes all three registered keys"
+  ],
+  "tests": [
+    {
+      "command": "bash Tests/verify-voice-playback-preferences.sh",
+      "exit_code": 0,
+      "checks": 28,
+      "result": "Voice playback preferences passed (28 checks)"
+    },
+    {
+      "command": "bash Tests/verify-backup-registry.sh",
+      "exit_code": 0,
+      "checks": 1448,
+      "result": "Backup registry passed 1448 assertions"
+    },
+    {
+      "command": "bash Tests/verify-backup-reset.sh",
+      "exit_code": 0,
+      "checks": 42,
+      "result": "Backup reset: 42 checks passed"
+    },
+    {
+      "command": "bash Tests/verify-message-actions-core.sh",
+      "exit_code": 0,
+      "checks": 1372,
+      "result": "PASS: 1372 message action core checks (isolated defaults suite; no native sends)"
+    },
+    {
+      "command": "git diff --check (owned files)",
+      "exit_code": 0
+    }
+  ],
+  "test_data": "Unique disposable NSUserDefaults suites and temporary file roots; no real account database or native sends",
+  "files_sha256": {
+    "Controllers/CSVoicePlaybackPreferences.h": "7de8be56e4ee4f8d88d620cdafb2076bf6b00b312d1e2fe373f9370cf8adc43b",
+    "Controllers/CSVoicePlaybackPreferences.m": "d1918cbf8726059a3779e8ad0c177cad7866b7f672a2ab6b50be0c3008bd98d5",
+    "Controllers/CSVoiceForwardSettingsViewController.m": "611bf282ac27ac08c728cde84a01589ba11daddbd01aca6c8fde8eabb798d9f6",
+    "Controllers/CSBackupRegistry.m": "e550f232da69a585b7c0481a14613e7d3b1fc515de48737dad34615b2f1c7962",
+    "Tests/VoicePlaybackPreferencesTests.m": "359daf5002653df91e77f07dc608281ac5da15db1bff616e742983f448c16d50",
+    "Tests/verify-voice-playback-preferences.sh": "be22043ef4536225387227cd864bd64ea2f948b9b9648a00b6b88459c13123cf",
+    "Tests/BackupRegistryTests.m": "e110cf78742e3b9134b3001f41cf08f11e4e0c349784676440d65a84e5f75590",
+    "Tests/BackupResetTests.m": "1418b9c20f9fe66d0039dc9c9010ce35a26e18c9445bc2afe28ab89f3b7f44ac"
+  },
+  "untouched_scope": [
+    "Native playback adapter",
+    "Playback UI/lifecycle integration",
+    "Plugin version files",
+    "README",
+    "Existing CSMessageActionSettings"
+  ],
+  "speed_feature": {
+    "status": "obsolete_and_removed",
+    "reason": "用户纠正：倍速播放有了就不需要做了，只做进度条的。",
+    "removed_from_this_change": [
+      "SpeedEnabledKey",
+      "speedEnabled",
+      "DefaultRate",
+      "倍速设置项与1.5倍说明"
+    ],
+    "native_WeChat_speed_behavior": "unchanged"
+  }
+}

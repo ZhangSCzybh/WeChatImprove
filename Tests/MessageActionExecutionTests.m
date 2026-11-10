@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
 #import "CSMessageActionCoordinator.h"
+#import "CSFavoriteVoiceForwardAdapter.h"
 #import "CSMessageSendAdapter.h"
 #import "CSVoiceForwardAdapter.h"
 #import "CSMessageActionMenuAdapter.h"

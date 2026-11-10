@@ -1,0 +1,8 @@
+{
+  "old_source": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/source/Controllers/CSMessageMediaProvider.m",
+  "old_build_manifest": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/favorite-voice-forward-2026-11-10/build-attempt-20261110T100039.581193Z/production-inputs.json",
+  "test": "Tests/FavoriteVoiceMediaTests.m",
+  "expected_failure": true,
+  "observed_exit_code": 1,
+  "observed_output": "FAIL 126: decodes==1 && !legacyDecodes && !lengthCalculations\n"
+}

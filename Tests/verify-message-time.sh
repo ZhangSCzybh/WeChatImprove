@@ -38,5 +38,5 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-p
  -I"$project_dir/Tests/GestureUIKit" -I"$project_dir/Controllers" -I"$test_dir" \
  "$project_dir/Tests/MessageUIKit/MessageUIKit.m" "$project_dir/Tests/TimeUIKit/TimeUIKit.m" \
  "$project_dir/Controllers/CSChatNativeBridge.m" \
- "$project_dir/Controllers/CSMessageTimeLayout.m" "$project_dir/Controllers/CSMessageCellLifecycle.m" "$project_dir/Tests/ClownLifecycleDouble.m" "$project_dir/Tests/TimeUIKit/TimeLifecycleDouble.m" "$project_dir/Tests/MessageTimeHookTests.m" -o "$test_dir/time-tests"
+ "$project_dir/Controllers/CSMessageTimeLayout.m" "$project_dir/Controllers/CSMessageCellLifecycle.m" "$project_dir/Tests/ClownLifecycleDouble.m" "$project_dir/Tests/VoicePlaybackLifecycleDouble.m" "$project_dir/Tests/TimeUIKit/TimeLifecycleDouble.m" "$project_dir/Tests/MessageTimeHookTests.m" -o "$test_dir/time-tests"
 "$test_dir/time-tests"

@@ -228,6 +228,8 @@ static BOOL CSContacts(id value) {
             @[@"standard",@"com.wechat.enhance.tabbar_style.text.discover",@"tabbar",@"string",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.text.me",@"tabbar",@"string",@"global",@""],
             @[@"standard",@"com.wechat.enhance.voice_forward.enabled",@"message_actions",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.voice_forward.favorite_enabled",@"message_actions",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.voice_playback.progress_enabled",@"message_actions",@"bool",@"global",@""],
             @[@"standard",@"com.wechat.enhance.image_sticker.enabled",@"message_actions",@"bool",@"global",@""],
             @[@"standard",@"com.wechat.enhance.clown.enabled",@"message_actions",@"bool",@"global",@""],
             @[@"standard",@"com.wechat.enhance.clown.text.enabled",@"message_actions",@"bool",@"global",@""],

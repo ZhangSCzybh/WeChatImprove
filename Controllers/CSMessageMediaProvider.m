@@ -166,9 +166,9 @@ static BOOL CSVoiceSourceMatches(id source, CSMessageActionContext *context) {
     });
     return YES;
 }
-// Immutable-byte validation stays on the serial media queue. Header recognition follows
-// native getVoiceFormat; a header alone is never evidence of a complete recording.
-static CSMessageVoiceResource *CSValidatedVoice(NSData *data, unsigned int duration, unsigned int format, BOOL formatKnown, unsigned int expected, NSString **failureHint) {
+// Callers supply immutable bytes on their media queue or native main-thread path.
+// Header recognition follows native getVoiceFormat; a header alone never proves completeness.
+CSMessageVoiceResource *CSMessageValidateVoiceData(NSData *data, unsigned int duration, unsigned int format, BOOL formatKnown, unsigned int expected, NSString **failureHint) {
     if (!data.length) { *failureHint=@"原语音文件未就绪，请先播放后重试"; return nil; }
     if (!duration || !formatKnown) { *failureHint=@"原语音信息不完整"; return nil; }
     if (expected && expected!=data.length) { *failureHint=@"原语音数据不完整"; return nil; }
@@ -181,9 +181,16 @@ static CSMessageVoiceResource *CSValidatedVoice(NSData *data, unsigned int durat
     {
         unsigned long long measured=0; BOOL decodedBytes=NO; Class utility=NSClassFromString(@"AudioUtil");
         @try {
-            if (format==4 && CSMessageNativeSupports(utility,@"calcSilkVoiceTime:",@"I",@[@"@"])) { decodedBytes=YES; measured=[CSMessageNativeInvoke(utility,@"calcSilkVoiceTime:",@[data]) unsignedLongLongValue]; }
+            // 8.0.80 takes NSData here and dispatches SILK/OPUS to their native
+            // decoders, which return milliseconds. A zero result is a decode
+            // failure, so do not fall through to another calculator.
+            if ((format==0 || format==1 || format==4 || format==7) && CSMessageNativeSupports(utility,@"calcVoiceTimeWithData:VoiceFormat:",@"I",@[@"@",@"I"])) { decodedBytes=format==4 || format==7; measured=[CSMessageNativeInvoke(utility,@"calcVoiceTimeWithData:VoiceFormat:",@[data,@(format)]) unsignedLongLongValue]; }
+            else if (format==4 && CSMessageNativeSupports(utility,@"calcSilkVoiceTime:",@"I",@[@"@"])) { decodedBytes=YES; measured=[CSMessageNativeInvoke(utility,@"calcSilkVoiceTime:",@[data]) unsignedLongLongValue]; }
             else if (format==7 && CSMessageNativeSupports(NSClassFromString(@"OpusAudioPlayer"),@"calculateVoiceTime:",@"I",@[@"@"])) { decodedBytes=YES; measured=[CSMessageNativeInvoke(NSClassFromString(@"OpusAudioPlayer"),@"calculateVoiceTime:",@[data]) unsignedLongLongValue]; }
-            else if (CSMessageNativeSupports(utility,@"calcVoiceTime:VoiceFormat:",@"I",@[@"I",@"I"]) && data.length<=UINT_MAX) measured=[CSMessageNativeInvoke(utility,@"calcVoiceTime:VoiceFormat:",@[@(data.length),@(format)]) unsignedLongLongValue];
+            // Only AMR/SPEEX use length arithmetic. For other formats this
+            // legacy selector reads AudioSender.currentAudioDuration, which
+            // belongs to the recorder rather than the supplied voice bytes.
+            else if ((format==0 || format==1) && CSMessageNativeSupports(utility,@"calcVoiceTime:VoiceFormat:",@"I",@[@"I",@"I"]) && data.length<=UINT_MAX) measured=[CSMessageNativeInvoke(utility,@"calcVoiceTime:VoiceFormat:",@[@(data.length),@(format)]) unsignedLongLongValue];
         } @catch (__unused NSException *exception) {}
         if (!measured || measured>UINT_MAX) { *failureHint=@"无法读取原语音时长"; return nil; }
         if (llabs((long long)measured-duration)>20) {
@@ -216,7 +223,7 @@ static CSMessageVoiceResource *CSValidatedVoice(NSData *data, unsigned int durat
     dispatch_async(_queue,^{
         @autoreleasepool {
             NSString *failureHint=nil;
-            CSMessageVoiceResource *resource=CSValidatedVoice(snapshot,duration,format,known,expected,&failureHint);
+            CSMessageVoiceResource *resource=CSMessageValidateVoiceData(snapshot,duration,format,known,expected,&failureHint);
             if (!resource && path.length) {
                 // A UI wrapper can retain only a cached chunk. Try its native file
                 // once, on this queue, with the same completeness/codec checks.
@@ -224,7 +231,7 @@ static CSMessageVoiceResource *CSValidatedVoice(NSData *data, unsigned int durat
                 NSData *data=reader(path);
                 NSDictionary *after=[NSFileManager.defaultManager attributesOfItemAtPath:path error:nil];
                 BOOL stable=before && after && [before[NSFileSize] isEqual:after[NSFileSize]] && [before[NSFileModificationDate] isEqual:after[NSFileModificationDate]] && [after[NSFileSize] unsignedLongLongValue]==data.length;
-                if (stable) resource=CSValidatedVoice(data,duration,format,known,expected,&failureHint);
+                if (stable) resource=CSMessageValidateVoiceData(data,duration,format,known,expected,&failureHint);
                 else if (data.length) failureHint=@"原语音文件仍在更新，请稍后重试";
             }
             dispatch_async(dispatch_get_main_queue(),^{

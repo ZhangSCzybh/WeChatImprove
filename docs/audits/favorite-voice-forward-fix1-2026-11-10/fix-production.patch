@@ -1,0 +1,126 @@
+--- a/Controllers/CSCloseFriendContactAdapter.h
++++ b/Controllers/CSCloseFriendContactAdapter.h
+@@ -16,6 +16,7 @@
+ FOUNDATION_EXPORT void CSCFForwardSearchDidUpdate(id owner);
+ FOUNDATION_EXPORT void CSCFRefreshForwardSearch(id owner);
+ FOUNDATION_EXPORT void CSCFBeginSelection(id owner);
++FOUNDATION_EXPORT NSArray *CSCFCurrentForwardRecipients(id owner);
+ FOUNDATION_EXPORT BOOL CSCFAllowSelection(id owner, NSArray *recipients);
+ FOUNDATION_EXPORT void CSCFCancelSelection(id owner);
+ /// Stops the current operation. Successful authentication asks user to repeat on native full data.
+--- a/Controllers/CSCloseFriendContactAdapter.m
++++ b/Controllers/CSCloseFriendContactAdapter.m
+@@ -115,6 +115,20 @@
+     // Keep the invalid ticket so a late callback cannot resurrect this operation.
+     // The native Back/Cancel button remains available to start a fresh operation.
+ }
++NSArray *CSCFCurrentForwardRecipients(id owner) {
++    if(!NSThread.isMainThread || !CSCFIsClass(owner,@"SessionSelectController")) return nil;
++    // 8.0.80 endMultiSelect: fills m_selectedContacts only AFTER onMultiDone.
++    // Read the same ordered selection that native completion is about to copy.
++    id view=CSCloseFriendRead(owner,@"m_selectView");
++    id selection=CSCloseFriendRead(view,@"m_dicMultiSelect");
++    SEL selector=NSSelectorFromString(@"allValuesInOrder");
++    Method method=class_getInstanceMethod([selection class],selector);
++    if(!CSCloseFriendMethodMatches(method,"@@:")) return nil;
++    @try {
++        id recipients=((id(*)(id,SEL))objc_msgSend)(selection,selector);
++        return [recipients isKindOfClass:NSArray.class] ? [recipients copy] : nil;
++    } @catch(__unused NSException *exception) { return nil; }
++}
+ BOOL CSCFAllowSelection(id owner,NSArray *recipients) {
+     CSCFBeginSelection(owner);
+     CSCloseFriendSelectionTicket *ticket=objc_getAssociatedObject(owner,&SelectionKey);
+--- a/Controllers/CSFavoriteVoiceContext.h
++++ b/Controllers/CSFavoriteVoiceContext.h
+@@ -16,6 +16,7 @@
+ @property(nonatomic, readonly) unsigned int expectedBytes;
+ @property(nonatomic, strong, readonly) id sourceItem;
+ @property(nonatomic, strong, readonly) id dataItem;
+++ (nullable id)standaloneItemForListObject:(id)object;
+ + (nullable instancetype)contextWithItem:(id)item accountID:(NSString *)accountID accountEpoch:(NSUInteger)epoch;
+ - (BOOL)matchesItem:(id)item;
+ - (nullable id)dataItemInItem:(id)item;
+--- a/Controllers/CSFavoriteVoiceContext.m
++++ b/Controllers/CSFavoriteVoiceContext.m
+@@ -33,6 +33,21 @@
+ }
+ 
+ @implementation CSFavoriteVoiceContext
+++ (id)standaloneItemForListObject:(id)object {
++    if (CSFavoriteSingleVoiceField(object)) return object;
++    Class wrapperClass=NSClassFromString(@"FavDataItemWrap");
++    if (!NSThread.isMainThread || !wrapperClass || ![object isKindOfClass:wrapperClass] ||
++        !CSMessageNativeSupports(object,@"parent",@"@",@[]) ||
++        !CSMessageNativeSupports(object,@"dataItem",@"@",@[])) return nil;
++    @try {
++        id parent=CSMessageNativeInvoke(object,@"parent",@[]);
++        id field=CSFavoriteSingleVoiceField(parent);
++        id wrappedField=CSMessageNativeInvoke(object,@"dataItem",@[]);
++        // Native whole-item wrappers have a nil dataItem. A field wrapper must
++        // point to the standalone parent's sole voice field, never a nested one.
++        return field && (!wrappedField || wrappedField==field) ? parent : nil;
++    } @catch (__unused NSException *exception) { return nil; }
++}
+ + (instancetype)contextWithItem:(id)item accountID:(NSString *)accountID accountEpoch:(NSUInteger)epoch {
+     if (!NSThread.isMainThread || ![accountID isKindOfClass:NSString.class] || !accountID.length || !epoch) return nil;
+     id field=CSFavoriteSingleVoiceField(item);
+--- a/Controllers/CSMessageMediaProvider.m
++++ b/Controllers/CSMessageMediaProvider.m
+@@ -166,8 +166,8 @@
+     });
+     return YES;
+ }
+-// Immutable-byte validation stays on the serial media queue. Header recognition follows
+-// native getVoiceFormat; a header alone is never evidence of a complete recording.
++// Callers supply immutable bytes on their media queue or native main-thread path.
++// Header recognition follows native getVoiceFormat; a header alone never proves completeness.
+ CSMessageVoiceResource *CSMessageValidateVoiceData(NSData *data, unsigned int duration, unsigned int format, BOOL formatKnown, unsigned int expected, NSString **failureHint) {
+     if (!data.length) { *failureHint=@"原语音文件未就绪，请先播放后重试"; return nil; }
+     if (!duration || !formatKnown) { *failureHint=@"原语音信息不完整"; return nil; }
+@@ -181,9 +181,16 @@
+     {
+         unsigned long long measured=0; BOOL decodedBytes=NO; Class utility=NSClassFromString(@"AudioUtil");
+         @try {
+-            if (format==4 && CSMessageNativeSupports(utility,@"calcSilkVoiceTime:",@"I",@[@"@"])) { decodedBytes=YES; measured=[CSMessageNativeInvoke(utility,@"calcSilkVoiceTime:",@[data]) unsignedLongLongValue]; }
++            // 8.0.80 takes NSData here and dispatches SILK/OPUS to their native
++            // decoders, which return milliseconds. A zero result is a decode
++            // failure, so do not fall through to another calculator.
++            if ((format==0 || format==1 || format==4 || format==7) && CSMessageNativeSupports(utility,@"calcVoiceTimeWithData:VoiceFormat:",@"I",@[@"@",@"I"])) { decodedBytes=format==4 || format==7; measured=[CSMessageNativeInvoke(utility,@"calcVoiceTimeWithData:VoiceFormat:",@[data,@(format)]) unsignedLongLongValue]; }
++            else if (format==4 && CSMessageNativeSupports(utility,@"calcSilkVoiceTime:",@"I",@[@"@"])) { decodedBytes=YES; measured=[CSMessageNativeInvoke(utility,@"calcSilkVoiceTime:",@[data]) unsignedLongLongValue]; }
+             else if (format==7 && CSMessageNativeSupports(NSClassFromString(@"OpusAudioPlayer"),@"calculateVoiceTime:",@"I",@[@"@"])) { decodedBytes=YES; measured=[CSMessageNativeInvoke(NSClassFromString(@"OpusAudioPlayer"),@"calculateVoiceTime:",@[data]) unsignedLongLongValue]; }
+-            else if (CSMessageNativeSupports(utility,@"calcVoiceTime:VoiceFormat:",@"I",@[@"I",@"I"]) && data.length<=UINT_MAX) measured=[CSMessageNativeInvoke(utility,@"calcVoiceTime:VoiceFormat:",@[@(data.length),@(format)]) unsignedLongLongValue];
++            // Only AMR/SPEEX use length arithmetic. For other formats this
++            // legacy selector reads AudioSender.currentAudioDuration, which
++            // belongs to the recorder rather than the supplied voice bytes.
++            else if ((format==0 || format==1) && CSMessageNativeSupports(utility,@"calcVoiceTime:VoiceFormat:",@"I",@[@"I",@"I"]) && data.length<=UINT_MAX) measured=[CSMessageNativeInvoke(utility,@"calcVoiceTime:VoiceFormat:",@[@(data.length),@(format)]) unsignedLongLongValue];
+         } @catch (__unused NSException *exception) {}
+         if (!measured || measured>UINT_MAX) { *failureHint=@"无法读取原语音时长"; return nil; }
+         if (llabs((long long)measured-duration)>20) {
+--- a/Hooks/CloseFriendContactHooks.xm
++++ b/Hooks/CloseFriendContactHooks.xm
+@@ -177,7 +177,7 @@
+         if([contacts isKindOfClass:NSArray.class] && CSCFAllowSelection(object,contacts)) orig(contacts);
+     });
+     for(NSString *name in @[@"onMultiDone",@"onMultiDoneInPageSheetMode"]) Hook0(@"SessionSelectController",name,^(id object,void(^orig)(void)){
+-        id contacts=CSCloseFriendRead(object,@"m_selectedContacts");
++        NSArray *contacts=CSCFCurrentForwardRecipients(object);
+         if([contacts isKindOfClass:NSArray.class] && CSCFAllowSelection(object,contacts)) orig();
+     });
+     for(NSString *name in @[@"contactSelectorViewController:didSelectContact:",@"contactSelectorViewController:didFinishMultiplySelectingContacts:"]) {
+--- a/Hooks/FavoriteVoiceForwardHooks.xm
++++ b/Hooks/FavoriteVoiceForwardHooks.xm
+@@ -36,10 +36,10 @@
+ 
+ %hook MyFavoritesViewController
+ - (void)forwardData:(id)data {
+-    // The native entry also accepts wrapped records and multi-selection. Only a
+-    // single standalone FavoritesItem may use the voice-specific forwarding path.
++    // Native filtered/search lists also pass FavDataItemWrap. Resolve only a
++    // standalone voice parent; wrapped records and multi-selection stay native.
+     if ([data isKindOfClass:NSArray.class] && [(NSArray *)data count]==1) {
+-        id item=[(NSArray *)data firstObject];
++        id item=[CSFavoriteVoiceContext standaloneItemForListObject:[(NSArray *)data firstObject]];
+         CSFavoriteVoiceForwardAdapter *adapter=CSFavoriteVoiceForwardAdapter.sharedAdapter;
+         if ([adapter canForwardItem:item]) {
+             [adapter forwardItem:item fromController:self];

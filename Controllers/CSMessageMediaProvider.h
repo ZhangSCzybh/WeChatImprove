@@ -9,6 +9,10 @@ FOUNDATION_EXPORT BOOL CSMessageHasPendingVoiceDownloads(void);
 @property(nonatomic, readonly) unsigned int format;
 - (instancetype)initWithData:(NSData *)data durationMilliseconds:(unsigned int)duration format:(unsigned int)format;
 @end
+// Shared immutable-byte validator. Callers own source identity and completeness checks.
+FOUNDATION_EXPORT CSMessageVoiceResource * _Nullable CSMessageValidateVoiceData(NSData *data,
+    unsigned int duration, unsigned int format, BOOL formatKnown, unsigned int expectedBytes,
+    NSString * _Nullable * _Nonnull failureReason);
 @interface CSMessageMediaProvider : NSObject
 - (instancetype)initWithReader:(NSData * _Nullable (^)(NSString *path))reader;
 - (instancetype)init;

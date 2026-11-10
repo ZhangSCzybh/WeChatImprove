@@ -4,6 +4,7 @@
 #import "CSMessageImageStickerAdapter.h"
 #import <TargetConditionals.h>
 #include <stdatomic.h>
+NSNotificationName const CSMessageActionAccountStateDidChangeNotification=@"CSMessageActionAccountStateDidChangeNotification";
 @interface CSMessageActionCoordinator (CSAccountBoundary)
 - (void)synchronizeAccountBoundary;
 @end
@@ -128,14 +129,23 @@ void CSMessageActionAccountDidChangeAtNativeBoundary(void) { CSMarkAccountBounda
     if (token==_boundaryToken) return;
     _boundaryToken=token; _accountSuspended=(token&1)!=0; _accountEpoch++; [_pendingFeedback removeAllObjects]; _accountID=_accountSuspended ? nil : [[_environment currentAccountID] copy];
     [self cancelAllUnsubmittedOperations];
+    [NSNotificationCenter.defaultCenter postNotificationName:CSMessageActionAccountStateDidChangeNotification object:self];
 }
 - (void)refreshAccount {
     [self synchronizeAccountBoundary];
     if (_accountSuspended) return;
     NSString *account=[_environment currentAccountID]; if (![_accountID isEqualToString:account] && (_accountID || account)) [self accountDidChange];
 }
-- (void)accountWillChange { NSAssert(NSThread.isMainThread,@"Account lifecycle is main owned"); _accountSuspended=YES; _accountEpoch++; [_pendingFeedback removeAllObjects]; _accountID=nil; [self cancelAllUnsubmittedOperations]; }
-- (void)accountDidChange { _accountSuspended=NO; NSAssert(NSThread.isMainThread,@"Account lifecycle is main owned"); [self cancelAllUnsubmittedOperations]; _accountEpoch++; [_pendingFeedback removeAllObjects]; _accountID=[[_environment currentAccountID] copy]; }
+- (void)accountWillChange { NSAssert(NSThread.isMainThread,@"Account lifecycle is main owned"); _accountSuspended=YES; _accountEpoch++; [_pendingFeedback removeAllObjects]; _accountID=nil; [self cancelAllUnsubmittedOperations]; [NSNotificationCenter.defaultCenter postNotificationName:CSMessageActionAccountStateDidChangeNotification object:self]; }
+- (void)accountDidChange { _accountSuspended=NO; NSAssert(NSThread.isMainThread,@"Account lifecycle is main owned"); [self cancelAllUnsubmittedOperations]; _accountEpoch++; [_pendingFeedback removeAllObjects]; _accountID=[[_environment currentAccountID] copy]; [NSNotificationCenter.defaultCenter postNotificationName:CSMessageActionAccountStateDidChangeNotification object:self]; }
+- (void)refreshAccountState { if (NSThread.isMainThread) [self refreshAccount]; }
+- (BOOL)isCurrentAccountID:(NSString *)accountID epoch:(NSUInteger)epoch {
+    if (!NSThread.isMainThread || !accountID.length) return NO;
+    [self refreshAccount];
+    uint64_t token=atomic_load_explicit(&CSActionAccountBoundary,memory_order_acquire);
+    return !_accountSuspended && _boundaryToken==token && !(token&1) &&
+        epoch==_accountEpoch && [accountID isEqual:_accountID];
+}
 - (BOOL)validAccount:(CSMessageActionContext *)context { [self refreshAccount]; return !_accountSuspended && !(atomic_load_explicit(&CSActionAccountBoundary,memory_order_acquire)&1) && [context isValidForAccountID:_accountID epoch:_accountEpoch]; }
 - (CSMessageActionContext *)captureContextForCell:(id)cell controller:(id)controller bindingGeneration:(NSUInteger)generation {
     if (!NSThread.isMainThread) return nil; [self refreshAccount];

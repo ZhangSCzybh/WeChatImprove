@@ -1,4 +1,5 @@
 #import "CSMessageGestureAdapter.h"
+#import "CSVoicePlaybackOverlay.h"
 #import <objc/runtime.h>
 #import <math.h>
 
@@ -117,6 +118,7 @@ static BOOL CSGestureFlag(id object, ptrdiff_t offset) {
     UIView *cell=_cell, *region=_region;
     if (!region || !cell.window || !_context.controller || !(_leftAction || _rightAction)) return NO;
     CGPoint point=[touch locationInView:cell];
+    if (CSVoicePlaybackOwnsTouch(cell,point)) return NO;
     if (!CGRectContainsPoint([cell convertRect:region.bounds fromView:region],point)) return NO;
     for (UIView *view=touch.view; view && view!=cell; view=view.superview) {
         if ([view isKindOfClass:UIControl.class]) return NO;

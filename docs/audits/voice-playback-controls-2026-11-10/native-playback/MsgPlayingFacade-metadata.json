@@ -1,0 +1,391 @@
+{
+  "name": "MsgPlayingFacade",
+  "class_offset": "0x1ef285f8",
+  "superclass": "MMUserService",
+  "methods": [
+    {
+      "selector": "onServiceInit",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a5788",
+      "metadata_offset": "0x17423490"
+    },
+    {
+      "selector": "onServiceClearData",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a5974",
+      "metadata_offset": "0x1742349c"
+    },
+    {
+      "selector": "onEnterSession:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050a5b0c",
+      "metadata_offset": "0x174234a8"
+    },
+    {
+      "selector": "onSessionAppear:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050a5bb0",
+      "metadata_offset": "0x174234b4"
+    },
+    {
+      "selector": "onSessionDisappear:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050a5c54",
+      "metadata_offset": "0x174234c0"
+    },
+    {
+      "selector": "onLeaveSession:touchCorner:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x1050a5d08",
+      "metadata_offset": "0x174234cc"
+    },
+    {
+      "selector": "showMinimizeView",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a5f08",
+      "metadata_offset": "0x174234d8"
+    },
+    {
+      "selector": "hideMinimizeView",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a5f18",
+      "metadata_offset": "0x174234e4"
+    },
+    {
+      "selector": "isShowingMinimizeView",
+      "encoding": "B16@0:8",
+      "imp": "0x1050a5f30",
+      "metadata_offset": "0x174234f0"
+    },
+    {
+      "selector": "startPlayingMsg:playArgs:",
+      "encoding": "v32@0:8@16{MsgStartPlayArgs=IB}24",
+      "imp": "0x1050a5f48",
+      "metadata_offset": "0x174234fc"
+    },
+    {
+      "selector": "stopPlayingMsg:",
+      "encoding": "v32@0:8{MsgStopPlayArgs=@ii}16",
+      "imp": "0x1050a6058",
+      "metadata_offset": "0x17423508"
+    },
+    {
+      "selector": "pause",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a60e4",
+      "metadata_offset": "0x17423514"
+    },
+    {
+      "selector": "resume",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a6168",
+      "metadata_offset": "0x17423520"
+    },
+    {
+      "selector": "isMsgPlaying:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x1050a61ec",
+      "metadata_offset": "0x1742352c"
+    },
+    {
+      "selector": "isPlaying",
+      "encoding": "B16@0:8",
+      "imp": "0x1050a626c",
+      "metadata_offset": "0x17423538"
+    },
+    {
+      "selector": "currentPlayingMsg",
+      "encoding": "@16@0:8",
+      "imp": "0x1050a6284",
+      "metadata_offset": "0x17423544"
+    },
+    {
+      "selector": "currentPlayTime",
+      "encoding": "i16@0:8",
+      "imp": "0x1050a629c",
+      "metadata_offset": "0x17423550"
+    },
+    {
+      "selector": "lastPlayPosition:",
+      "encoding": "i24@0:8@16",
+      "imp": "0x1050a6334",
+      "metadata_offset": "0x1742355c"
+    },
+    {
+      "selector": "setPlayRate:",
+      "encoding": "v24@0:8d16",
+      "imp": "0x1050a6584",
+      "metadata_offset": "0x17423568"
+    },
+    {
+      "selector": "seekToTime:",
+      "encoding": "v20@0:8I16",
+      "imp": "0x1050a659c",
+      "metadata_offset": "0x17423574"
+    },
+    {
+      "selector": "switchToEarMode:",
+      "encoding": "v20@0:8B16",
+      "imp": "0x1050a6600",
+      "metadata_offset": "0x17423580"
+    },
+    {
+      "selector": "reporterWithMsg:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x1050a6654",
+      "metadata_offset": "0x1742358c"
+    },
+    {
+      "selector": "StartPlayMessage:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050a6890",
+      "metadata_offset": "0x17423598"
+    },
+    {
+      "selector": "StartPlayMessage:FromTime:",
+      "encoding": "v28@0:8@16I24",
+      "imp": "0x1050a68a0",
+      "metadata_offset": "0x174235a4"
+    },
+    {
+      "selector": "hideMinimizeViewIfNeed",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a6a90",
+      "metadata_offset": "0x174235b0"
+    },
+    {
+      "selector": "canShowMinimizeView:",
+      "encoding": "B20@0:8B16",
+      "imp": "0x1050a6bd8",
+      "metadata_offset": "0x174235bc"
+    },
+    {
+      "selector": "showMinimizeViewIfNeed",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a6d1c",
+      "metadata_offset": "0x174235c8"
+    },
+    {
+      "selector": "showMinimizeViewIfNeed:",
+      "encoding": "v20@0:8B16",
+      "imp": "0x1050a6d2c",
+      "metadata_offset": "0x174235d4"
+    },
+    {
+      "selector": "initMinimizeViewTransitionController",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a6e14",
+      "metadata_offset": "0x174235e0"
+    },
+    {
+      "selector": "clearPlayList",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a6f0c",
+      "metadata_offset": "0x174235ec"
+    },
+    {
+      "selector": "OnBeginPlaying:success:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x1050a6fc8",
+      "metadata_offset": "0x174235f8"
+    },
+    {
+      "selector": "OnPausePlaying:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050a7138",
+      "metadata_offset": "0x17423604"
+    },
+    {
+      "selector": "OnEndPlaying:isForceStop:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x1050a722c",
+      "metadata_offset": "0x17423610"
+    },
+    {
+      "selector": "GetDownMsgFromID:Limit:LeftCount:",
+      "encoding": "@32@0:8I16i20^I24",
+      "imp": "0x1050a73b8",
+      "metadata_offset": "0x1742361c"
+    },
+    {
+      "selector": "GetFirstUnreadMsg",
+      "encoding": "@16@0:8",
+      "imp": "0x1050a76f8",
+      "metadata_offset": "0x17423628"
+    },
+    {
+      "selector": "autoPlayMsg:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050a78e8",
+      "metadata_offset": "0x17423634"
+    },
+    {
+      "selector": "shouldStopAutoPlayUnRead",
+      "encoding": "B16@0:8",
+      "imp": "0x1050a7a18",
+      "metadata_offset": "0x17423640"
+    },
+    {
+      "selector": "onAutoPlayEndWithMsg:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050a7af4",
+      "metadata_offset": "0x1742364c"
+    },
+    {
+      "selector": "onCloseMinimizeView",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a7c84",
+      "metadata_offset": "0x17423658"
+    },
+    {
+      "selector": "audioModuleInterruptionBegin:param:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x1050a7d08",
+      "metadata_offset": "0x17423664"
+    },
+    {
+      "selector": "audioModuleInterruptionEnd:param:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x1050a7f38",
+      "metadata_offset": "0x17423670"
+    },
+    {
+      "selector": "useNewMinimizeTransition:withTransitionType:",
+      "encoding": "B28@0:8@16I24",
+      "imp": "0x1050a81bc",
+      "metadata_offset": "0x1742367c"
+    },
+    {
+      "selector": "getMinimizationTransitionContext",
+      "encoding": "@16@0:8",
+      "imp": "0x1050a81c4",
+      "metadata_offset": "0x17423688"
+    },
+    {
+      "selector": "onMinimizeTransitionEnd:isComplete:",
+      "encoding": "v24@0:8I16B20",
+      "imp": "0x1050a82cc",
+      "metadata_offset": "0x17423694"
+    },
+    {
+      "selector": "onDeleteContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050a82e4",
+      "metadata_offset": "0x174236a0"
+    },
+    {
+      "selector": "onDeleteSessionOfUser:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050a833c",
+      "metadata_offset": "0x174236ac"
+    },
+    {
+      "selector": "onDidDeleteAllSession",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a83e4",
+      "metadata_offset": "0x174236b8"
+    },
+    {
+      "selector": "OnRevokeMsg:MsgWrap:ResultCode:ResultMsg:EducationMsg:",
+      "encoding": "v52@0:8@16@24I32@36@44",
+      "imp": "0x1050a8400",
+      "metadata_offset": "0x174236c4"
+    },
+    {
+      "selector": "OnDelMsg:MsgWrap:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x1050a84a4",
+      "metadata_offset": "0x174236d0"
+    },
+    {
+      "selector": "OnDelMsg:DelAll:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x1050a8548",
+      "metadata_offset": "0x174236dc"
+    },
+    {
+      "selector": "OnMsgRevoked:n64MsgId:",
+      "encoding": "v32@0:8@16q24",
+      "imp": "0x1050a8608",
+      "metadata_offset": "0x174236e8"
+    },
+    {
+      "selector": "transitionController",
+      "encoding": "@16@0:8",
+      "imp": "0x1050a86ec",
+      "metadata_offset": "0x174236f4"
+    },
+    {
+      "selector": "contact",
+      "encoding": "@16@0:8",
+      "imp": "0x1050a86fc",
+      "metadata_offset": "0x17423700"
+    },
+    {
+      "selector": "setContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050a870c",
+      "metadata_offset": "0x1742370c"
+    },
+    {
+      "selector": "currentInterruptMsg",
+      "encoding": "@16@0:8",
+      "imp": "0x1050a8720",
+      "metadata_offset": "0x17423718"
+    },
+    {
+      "selector": "setCurrentInterruptMsg:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050a8730",
+      "metadata_offset": "0x17423724"
+    },
+    {
+      "selector": "voiceMsgReporters",
+      "encoding": "@16@0:8",
+      "imp": "0x1050a8744",
+      "metadata_offset": "0x17423730"
+    },
+    {
+      "selector": "setVoiceMsgReporters:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050a8754",
+      "metadata_offset": "0x1742373c"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "encoding": "v16@0:8",
+      "imp": "0x1050a8768",
+      "metadata_offset": "0x17423748"
+    }
+  ],
+  "ivars": [
+    {
+      "name": "m_playingController",
+      "encoding": "@\"PlayingController\""
+    },
+    {
+      "name": "m_autoplayController",
+      "encoding": "@\"AutoplayController\""
+    },
+    {
+      "name": "m_minimizeController",
+      "encoding": "@\"MsgPlayingMinimizeController\""
+    },
+    {
+      "name": "_transitionController",
+      "encoding": "@\"MinimizeNewTransitionController\""
+    },
+    {
+      "name": "_contact",
+      "encoding": "@\"CBaseContact\""
+    },
+    {
+      "name": "_currentInterruptMsg",
+      "encoding": "@\"CMessageWrap\""
+    },
+    {
+      "name": "_voiceMsgReporters",
+      "encoding": "@\"NSMutableArray\""
+    }
+  ]
+}

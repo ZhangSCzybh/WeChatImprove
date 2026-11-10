@@ -13,12 +13,12 @@ methods=[]
 for name in ('OnForwardMessageSend','OnForwardMessageCancel'):
     match=re.search(r'- \(void\)'+name+r':\(id\)logic \{.*?\n\}',manager,re.S)
     assert match, name
-    methods.append(match.group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig;', '[self.originalCalls addObject:@"'+name+'"]; [logic clearData];'))
+    methods.append(match.group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('CSFavoriteVoiceForwardAdapter.sharedAdapter','favoriteHookAdapter').replace('%orig;', '[self.originalCalls addObject:@"'+name+'"]; [logic clearData];'))
 logic=source.split('%hook ForwardMessageLogicController',1)[1].split('%end',1)[0]
 ui=[]
 for name,native in (('bShowSendSuccessView','YES'),('bHiddenSendSuccessToastView','NO')):
-    ui.append(re.search(r'- \(BOOL\)'+name+r' \{.*?\n\}',logic,re.S).group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig',native))
-clear=re.search(r'- \(void\)clearData \{.*?\n\}',logic,re.S).group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('%orig;', 'forwardNativeClearCalls++;')
+    ui.append(re.search(r'- \(BOOL\)'+name+r' \{.*?\n\}',logic,re.S).group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('CSFavoriteVoiceForwardAdapter.sharedAdapter','favoriteHookAdapter').replace('%orig',native))
+clear=re.search(r'- \(void\)clearData \{.*?\n\}',logic,re.S).group().replace('CSMessageActionCoordinator.sharedCoordinator','forwardHookCoordinator').replace('CSFavoriteVoiceForwardAdapter.sharedAdapter','favoriteHookAdapter').replace('%orig;', 'forwardNativeClearCalls++;')
 download=source.split('%hook VoiceMsgDownloader',1)[1].split('%end',1)[0]
 body=download[download.index('{'):download.rindex('}')+1].replace('%orig;', 'voiceHookNativeCalls++;').replace('CSMessageActionCoordinator.sharedCoordinator','TestVoiceCoordinator()')
 (out/'VoiceDownloadHookUnderTest.h').write_text('static NSUInteger voiceHookNativeCalls, voiceHookCoordinatorReads;\nstatic CSMessageActionCoordinator *voiceHookCoordinator;\nstatic CSMessageActionCoordinator *TestVoiceCoordinator(void) { voiceHookCoordinatorReads++; return voiceHookCoordinator; }\nstatic void TestNativeVoiceCallback(NSString *chat, unsigned int localID, long long serverID, unsigned int endFlag, unsigned int error) '+body+'\n')
@@ -48,7 +48,7 @@ assert '%orig' not in dedup
 @end
 @implementation TestMenuDedupCell
 '''+dedup+'\n@end\n')
-(out/'VoiceForwardCleanupHooksUnderTest.h').write_text('static CSMessageActionCoordinator *forwardHookCoordinator;\nstatic NSUInteger forwardNativeClearCalls;\n@interface TestLogic (CleanupHook)\n- (void)clearData;\n- (BOOL)bShowSendSuccessView;\n- (BOOL)bHiddenSendSuccessToastView;\n@end\n@implementation TestLogic (CleanupHook)\n'+clear+'\n'+'\n'.join(ui)+'\n@end\n@interface TestForwardManager : NSObject\n@property(nonatomic, strong) NSMutableArray *originalCalls;\n@end\n@implementation TestForwardManager\n'+'\n'.join(methods)+'\n@end\n')
+(out/'VoiceForwardCleanupHooksUnderTest.h').write_text('static CSMessageActionCoordinator *forwardHookCoordinator;\nstatic CSFavoriteVoiceForwardAdapter *favoriteHookAdapter;\nstatic NSUInteger forwardNativeClearCalls;\n@interface TestLogic (CleanupHook)\n- (void)clearData;\n- (BOOL)bShowSendSuccessView;\n- (BOOL)bHiddenSendSuccessToastView;\n@end\n@implementation TestLogic (CleanupHook)\n'+clear+'\n'+'\n'.join(ui)+'\n@end\n@interface TestForwardManager : NSObject\n@property(nonatomic, strong) NSMutableArray *originalCalls;\n@end\n@implementation TestForwardManager\n'+'\n'.join(methods)+'\n@end\n')
 PYEXTRACT
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation \
   -I"$test_dir" -I"$project_dir/Controllers" \
@@ -62,5 +62,8 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Fo
   "$project_dir/Controllers/CSVoiceForwardAdapter.m" \
   "$project_dir/Controllers/CSMessageActionMenuAdapter.m" \
   "$project_dir/Controllers/CSMessageActionCoordinator.m" \
+  "$project_dir/Controllers/CSFavoriteVoiceContext.m" \
+  "$project_dir/Controllers/CSFavoriteVoiceMediaProvider.m" \
+  "$project_dir/Controllers/CSFavoriteVoiceForwardAdapter.m" \
   "$project_dir/Tests/MessageActionExecutionTests.m" -o "$test_dir/tests"
 "$test_dir/tests"

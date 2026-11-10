@@ -1,0 +1,52 @@
+{
+  "provenance": {
+    "analysis": "offline static metadata and bounded disassembly; no target execution",
+    "ipa": "/Users/zhangshichao/Downloads/Telegram Desktop/com.tencent.xin_8.0.80.ipa",
+    "ipa_sha256": "5cacb443b743793ccfe6026bc81c1f2678cb5cfdcd38584ad73ac7f19ecf4a5f",
+    "plist_entry": "Payload/WeChat.app/Info.plist",
+    "bundle_identifier": "com.tencent.xin",
+    "short_version": "8.0.80",
+    "bundle_version": "8.0.80.34",
+    "binary": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-fav-8080-20261110-g5qs3obm/WeChat",
+    "binary_sha256": "1d626426df97058a8a87c661532b2801cd27b7d9fcc12e27609c751f5877b7ed",
+    "architecture": "arm64",
+    "image_base": "0x100000000",
+    "metadata_reader": "docs/audits/wechat-8.0.80-2026-11-05/privacy-validation/objc_metadata.py"
+  },
+  "legacy_calcSilkVoiceTime_class_method_present": false,
+  "unsupported_formats": {
+    "modern_calcVoiceTimeWithData": "format 2/3 and all other values except 0/1/4/7 return 0; no recorder fallback",
+    "legacy_calcVoiceTime": "all formats except 0/1 read AudioSender.currentAudioDuration; unsafe for supplied SILK/OPUS bytes",
+    "production_validator": "modern API and legacy length API gated by verified format; only modern 0/1/4/7 permitted, length only 0/1; unsupported formats fail"
+  },
+  "tests": [
+    {
+      "command": "bash Tests/verify-favorite-voice-media.sh",
+      "status": "passed",
+      "checks": 687,
+      "after_final_format_allowlist": true
+    },
+    {
+      "command": "bash Tests/verify-message-actions-execution.sh",
+      "status": "passed",
+      "checks": 2573,
+      "after_final_format_allowlist": true
+    }
+  ],
+  "limits": [
+    "No iOS runtime codec execution or native message sending was performed.",
+    "Synthetic host decoder doubles verify routing, ABI refusal, units, integrity gates and source preservation; they do not establish native decoder correctness for arbitrary media."
+  ],
+  "source_sha256": {
+    "Controllers/CSMessageMediaProvider.m": "ee358bf8fb8f16cd7a6e8070d3c311d86c0162770417780190815ed2a33f1b1b",
+    "Tests/FavoriteVoiceMediaTests.m": "3fb83adc071c3352cf89f32cdbc29f67dd277bc1b0960f8bc89c7da57d6aa60e"
+  },
+  "evidence_sha256": {
+    "AudioUtil-calcVoiceTimeWithData_VoiceFormat_.asm": "c2e9a0c5beef68143cac76e866b907a272475fd3544d28734da4bf1f1661da9d",
+    "AudioUtil-calcVoiceTime_VoiceFormat_.asm": "7f5c72d387c09ed7ac0ebe20d71517e6395b08cd7ac225b58dd356cff61ab2bd",
+    "OpusAudioPlayer-calculateVoiceTime_.asm": "9f86f13ccc69c87a26aed2792305111a3d60f68c003c0a81c36ed8f2c3b1df23",
+    "README.md": "fe80985129d92adf9f22f1c542ca3b88325f16bdf17fb66b0a4e38eca2be59c3",
+    "SilkAudioPlayer-calculateVoiceTime_.asm": "d35c46bf5e012f3fb3cff94397bcd0b1f4606a31bf9eaac0092453d620b28a14",
+    "metadata.json": "6162b67404a2441ea10df2cc3c46c2c5cddd0eea91fe343902a4a70b5e8c217b"
+  }
+}

@@ -1,10 +1,17 @@
 # 文档索引
 
-当前发布记录：[2.3-4 防撤回蓝字点击入口与原文定位](audits/revoke-jump-2.3-4/README.md)。
+当前发布记录：[2.4-2 语音气泡进度与拖动播放](audits/voice-playback-controls-2026-11-10/README.md)。
 
 2.3-4 同时保留 2.3-1～2.3-3 的发现页外观、添加入口和编辑页布局修复。
 
 ## 近期修复与分析
+
+- [2.4-2：语音气泡进度与拖动播放](audits/voice-playback-controls-2026-11-10/README.md)
+
+- [2.4-1：收藏语音转发与正式发布核验](audits/release-2.4-1-favorite-voice-forward/README.md)
+- [微信 8.0.80 语音时长与转发下一步修复](audits/favorite-voice-forward-fix1-2026-11-10/README.md)
+- [收藏语音转发实现](audits/favorite-voice-forward-2026-11-10/README.md)
+- [2.3-4：防撤回蓝字点击入口与原文定位](audits/revoke-jump-2.3-4/README.md)
 
 - [2.2-20：清理与交付](audits/release-2.2-20-cleanup/README.md)
 

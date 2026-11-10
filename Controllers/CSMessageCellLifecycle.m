@@ -2,6 +2,7 @@
 #import "CSMessageGestureAdapter.h"
 #import "CSMessageMergeAdapter.h"
 #import "CSClownPresentation.h"
+#import "CSVoicePlaybackOverlay.h"
 #import <objc/runtime.h>
 static char CSLifecycleKey;
 @interface CSMessageCellLifecycleState : NSObject
@@ -29,6 +30,7 @@ void CSMessageCellPerformLayout(id cell, void (^native)(void)) {
             CSMessageMergeRender(cell); // merge owns final time positioning, active or inactive
             CSClownRenderCell(cell);
             [adapter refreshForLayout]; [adapter reattachAfterLayout];
+            CSVoicePlaybackRefreshCell(cell);
         }
     }
 }
@@ -38,6 +40,7 @@ void CSMessageCellPerformBinding(id cell, id model, void (^native)(void)) {
     CSMessageGestureAdapter *adapter=CSMessageGestureAdapterForCell(cell,NO);
     BOOL changed=CSMessageActionObjectGetter(cell,NSSelectorFromString(@"viewModel"))!=model;
     if (outer) {
+        CSVoicePlaybackDetachCell(cell);
         CSClownReuseCell(cell); [adapter invalidateBinding]; CSMessageMergeReuse(cell);
         if (changed) CSMessageTimeResetCell(cell);
     }
@@ -50,7 +53,7 @@ void CSMessageCellPerformBinding(id cell, id model, void (^native)(void)) {
 void CSMessageCellPerformReuse(id cell, void (^native)(void)) {
     CSMessageCellLifecycleState *state=CSLifecycle(cell);
     BOOL outer=state.reuseDepth++==0;
-    if (outer) { CSClownReuseCell(cell); [CSMessageGestureAdapterForCell(cell,NO) invalidateBinding]; CSMessageMergeReuse(cell); CSMessageTimeResetCell(cell); }
+    if (outer) { CSVoicePlaybackDetachCell(cell); CSClownReuseCell(cell); [CSMessageGestureAdapterForCell(cell,NO) invalidateBinding]; CSMessageMergeReuse(cell); CSMessageTimeResetCell(cell); }
     @try { native(); }
     @finally { state.reuseDepth--; }
 }
@@ -61,9 +64,10 @@ void CSMessageCellRefresh(id cell) {
     CSMessageGestureAdapter *adapter=CSMessageGestureAdapterForCell(cell,YES);
     [adapter detachForLayout]; CSClownRestoreCell(cell); CSMessageTimePrepareCell(cell); CSMessageMergeRender(cell); CSClownRenderCell(cell);
     [adapter refreshForLayout]; [adapter reattachAfterLayout];
+    CSVoicePlaybackRefreshCell(cell);
 }
 void CSMessageCellWindowChanged(id cell) {
-    if (![(UIView *)cell window]) [CSMessageGestureAdapterForCell(cell,NO) cancel];
+    if (![(UIView *)cell window]) { CSVoicePlaybackDetachCell(cell); [CSMessageGestureAdapterForCell(cell,NO) cancel]; }
     else {
         CSMessageGestureAdapter *adapter=CSMessageGestureAdapterForCell(cell,NO);
         if (adapter) [adapter bind];

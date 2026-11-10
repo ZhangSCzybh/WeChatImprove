@@ -70,6 +70,7 @@ static GestureModel *model(unsigned int ident) {
     GestureModel *m=[GestureModel new];m.messageWrap=[GestureWrap new];m.messageWrap.m_nsFromUsr=@"peer";m.messageWrap.m_nsToUsr=@"self";
     m.messageWrap.m_uiMesLocalID=ident;m.messageWrap.m_uiMessageType=1;return m;
 }
+extern BOOL CSVoicePlaybackTestClaimsTouch;
 static BOOL admit(CSMessageGestureAdapter *adapter, UIView *view, CGFloat x, CGFloat vx, CGFloat vy) {
     UITouch *touch=[UITouch new];touch.view=view;touch.testLocation=CGPointMake(x,20);
     adapter.pan.testTranslation=CGPointZero;adapter.pan.testVelocity=CGPointMake(vx,vy);adapter.pan.state=UIGestureRecognizerStatePossible;
@@ -109,6 +110,9 @@ int main(void) { @autoreleasepool {
     CHECK(!admit(adapter,cell.bubble,90,-100,300)); // vertical passes to native scroll
     CHECK(!admit(adapter,cell.bubble,90,300,0)); // exact disabled direction
     CHECK(!admit(adapter,cell,20,-300,0)); // blank/avatar space
+    CSVoicePlaybackTestClaimsTouch=YES;
+    CHECK(!admit(adapter,cell.bubble,90,-300,0)); // active voice bubble belongs to playback seeking
+    CSVoicePlaybackTestClaimsTouch=NO;
     UIControl *control=[UIControl new];[cell.bubble addSubview:control];CHECK(!admit(adapter,control,90,-300,0));
     UIScrollView *nested=[UIScrollView new];nested.scrollEnabled=YES;nested.contentSize=CGSizeMake(500,40);nested.bounds=CGRectMake(0,0,160,40);[cell.bubble addSubview:nested];CHECK(!admit(adapter,nested,90,-300,0));
     cell->m_bDisableAllOperation=YES;CHECK(!admit(adapter,cell.bubble,90,-300,0));cell->m_bDisableAllOperation=NO;

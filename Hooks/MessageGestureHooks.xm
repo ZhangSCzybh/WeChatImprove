@@ -2,6 +2,7 @@
 #import <UIKit/UIKit.h>
 #import "../Controllers/CSMessageCellLifecycle.h"
 #import "../Controllers/CSMessageGestureAdapter.h"
+#import "../Controllers/CSVoicePlaybackOverlay.h"
 
 @interface CommonMessageCellView : UIView @end
 @interface VoiceMessageCellView : CommonMessageCellView @end
@@ -15,7 +16,7 @@
 - (void)layoutSubviews { CSMessageCellPerformLayout(self,^{ %orig; }); }
 - (void)updateNodeStatus { %orig; CSMessageCellRefresh(self); }
 - (void)onAppear { %orig; CSMessageCellRefresh(self); }
-- (void)onDisappear { [CSMessageGestureAdapterForCell(self,NO) cancel]; %orig; }
+- (void)onDisappear { CSVoicePlaybackDetachCell(self); [CSMessageGestureAdapterForCell(self,NO) cancel]; %orig; }
 - (void)didMoveToWindow { %orig; CSMessageCellWindowChanged(self); }
 %end
 

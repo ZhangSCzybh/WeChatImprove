@@ -13,6 +13,18 @@ int main(void) { @autoreleasepool {
     CHECK(Entry(@"GameCheat_Enabled") != nil);
     CHECK(Entry(@"WCTimeLineMessageTailText") != nil);
     CHECK(Entry(@"kReceiveTransferAutoEnableKey") != nil);
+    NSDictionary *favoriteVoice=Entry(@"com.wechat.enhance.voice_forward.favorite_enabled");
+    CHECK([favoriteVoice[@"module"] isEqual:@"message_actions"] && [favoriteVoice[@"scope"] isEqual:@"global"] && [favoriteVoice[@"type"] isEqual:@"bool"]);
+    CHECK(Valid(@YES,favoriteVoice) && Valid(@NO,favoriteVoice));
+    CHECK(!Valid(@"YES",favoriteVoice) && !Valid(@2,favoriteVoice));
+    CHECK([CSBackupRegistry entryForDomain:@"legacy" key:@"com.wechat.enhance.voice_forward.favorite_enabled"]==nil);
+    for (NSString *key in @[@"com.wechat.enhance.voice_playback.progress_enabled"]) {
+        NSDictionary *playback=Entry(key);
+        CHECK([playback[@"module"] isEqual:@"message_actions"] && [playback[@"scope"] isEqual:@"global"] && [playback[@"type"] isEqual:@"bool"]);
+        CHECK(Valid(@YES,playback) && Valid(@NO,playback));
+        CHECK(!Valid(@"YES",playback) && !Valid(@2,playback));
+        CHECK([CSBackupRegistry entryForDomain:@"legacy" key:key]==nil);
+    }
     for (NSString *key in @[@"com.wechat.enhance.unknown", @"AppleLanguages", @"CSAuthorizationStatus", @"CSLastAuthorizationCheckTime", @"com.wechat.enhance.redenvelop.totalCount", @"com.wechat.enhance.redenvelop.totalAmount", @"kReceiveTransferTotalCountKey", @"kReceiveTransferTotalAmountKey", @"com.wechat.enhance.chat_group.profile_backups", @"com.wechat.enhance.chat_group.legacy_backup"]) CHECK(Entry(key)==nil);
     NSString *prefix=@"com.wechat.enhance.chat_group.selection.";
     CHECK(Entry([prefix stringByAppendingString:@"wxid_abc-123"]) != nil);

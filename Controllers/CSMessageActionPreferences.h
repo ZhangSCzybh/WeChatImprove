@@ -19,6 +19,7 @@ typedef NS_ENUM(NSInteger, CSMessageActionDirection) {
 FOUNDATION_EXPORT NSString *const CSMessageActionGestureEnabledKey;
 FOUNDATION_EXPORT NSString *const CSMessageActionRepeatEnabledKey;
 FOUNDATION_EXPORT NSString *const CSMessageActionVoiceForwardEnabledKey;
+FOUNDATION_EXPORT NSString *const CSMessageActionFavoriteVoiceForwardEnabledKey;
 FOUNDATION_EXPORT NSString *const CSMessageActionImageStickerEnabledKey;
 FOUNDATION_EXPORT NSString *const CSMessageActionLeftOtherKey;
 FOUNDATION_EXPORT NSString *const CSMessageActionLeftSelfKey;
@@ -34,6 +35,7 @@ FOUNDATION_EXPORT NSString *const CSMessageActionVoiceForwardDarwinNotification;
 @property(nonatomic, readonly) BOOL gestureEnabled;
 @property(nonatomic, readonly) BOOL repeatEnabled;
 @property(nonatomic, readonly) BOOL voiceForwardEnabled;
+@property(nonatomic, readonly) BOOL favoriteVoiceForwardEnabled;
 @property(nonatomic, readonly) BOOL imageStickerEnabled;
 @property(nonatomic, readonly) NSUInteger version;
 // Raw values remain available; unknown values are interpreted as Disabled only by policy.

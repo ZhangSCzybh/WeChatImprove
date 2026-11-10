@@ -1,0 +1,49 @@
+{
+  "reviewed_at": "2026-11-10T11:31:00.425627+00:00",
+  "status": "passed_no_blocking_findings",
+  "scope": "Independent read-only review of final progress-only production integration: Controller, bubble overlay, native hooks, message-cell lifecycle and message gesture admission",
+  "review_activity": "Read production source and existing native-playback evidence only; no source edits, test expansion, test execution or package build in this review step.",
+  "findings": [],
+  "reviewed_behaviors": [
+    {
+      "area": "Native playback/source",
+      "conclusion": "Controller reads currentPlayingMsg/isMsgPlaying, int32 currentPlayTime and m_uiVoiceTime; seek uses uint32 milliseconds. It revalidates the active message/account, consumes generation before native seek and does not call rate/start/stop or mutate message/audio."
+    },
+    {
+      "area": "Tap/long press/vertical scroll",
+      "conclusion": "Fill is userInteractionEnabled=NO. Pan is attached to the content host, admits only a live matching bubble, rejects UIControl touches, requires horizontal intent and never delays unrecognized native touches. Vertical intent fails admission; navigation edge/pop gets priority. Recognized drag cancels the native click."
+    },
+    {
+      "area": "Message-action gesture coexistence",
+      "conclusion": "Existing message pan rejects touch points owned by active progress before starting; inactive voices and points outside the progress region retain the existing action path."
+    },
+    {
+      "area": "Binding and drag lifetime",
+      "conclusion": "Overlay captures model/message pointer plus binding/generation and rechecks them throughout drag. Binding/reuse/disappearance/window removal/window hide detach the old state; geometry refresh follows native/time/merge/clown layout. End clears drag before potentially reentrant seek publication."
+    },
+    {
+      "area": "Settings/background/account",
+      "conclusion": "Settings changes invalidate controller and refresh/hide overlays; background blocks snapshots. Account nil/empty notification suspends snapshots even with an old still-playing same-account facade, and valid login notification restores only a new generation."
+    },
+    {
+      "area": "Scope preservation",
+      "conclusion": "No added speed setting, rate mutation, thumb control or standalone slider; native rate/resume/transcribe controls retain their own touch regions. Existing forwarding preference versions remain independent."
+    }
+  ],
+  "evidence": [
+    "docs/audits/voice-playback-controls-2026-11-10/native-playback/README.md",
+    "docs/audits/voice-playback-controls-2026-11-10/controller-validation.json",
+    "docs/audits/voice-playback-controls-2026-11-10/preferences-validation.json"
+  ],
+  "verification_limit": "Read-only code review confirms integration logic; actual iPhone native gesture arbitration, themed appearance and audible codec seek timing remain part of device verification. UI agent owns the bubble-pan regression result.",
+  "files_sha256": {
+    "Controllers/CSVoicePlaybackController.h": "810a465b552cd06bf63f56651847ccf7176a89de2f9f5741d782f147771c7dc5",
+    "Controllers/CSVoicePlaybackController.m": "b762cfc414db09d1a3bc4986f7aeeec2b4a2f9082c1557f88be979841d9eca64",
+    "Controllers/CSVoicePlaybackOverlay.h": "4776042a93868143948438a55abe342ac31619a9a825ff6bc8d9836cdadb61ff",
+    "Controllers/CSVoicePlaybackOverlay.m": "4024c463cb48dc1a13408ee80675e8700b0ec93f08decd02bf8684335b3d7b53",
+    "Hooks/VoicePlaybackHooks.xm": "46bed4de2d1b330f00db6704513b8684b62d0d214202f222427566b819979305",
+    "Controllers/CSMessageCellLifecycle.m": "4baeeaf036ba35101fb984f455b3ce00801270c9692ee48ea87ac6603c1af099",
+    "Controllers/CSMessageGestureAdapter.m": "46ad9bee8020bf655ab3251027d5ed53b68784da9cb2b0c496540f33eca33fc7",
+    "Hooks/MessageGestureHooks.xm": "ccf1e2f8e3112ce174dbcdbcc3807d4818c8782d3b6178621e79233023d7cf00"
+  }
+}

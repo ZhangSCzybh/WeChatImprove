@@ -5,6 +5,8 @@ NS_ASSUME_NONNULL_BEGIN
 // Thread-safe, service-free boundary markers. Call immediately on the native hook thread.
 FOUNDATION_EXPORT void CSMessageActionAccountWillChangeAtNativeBoundary(void);
 FOUNDATION_EXPORT void CSMessageActionAccountDidChangeAtNativeBoundary(void);
+// Published on main whenever this coordinator invalidates an account generation.
+FOUNDATION_EXPORT NSNotificationName const CSMessageActionAccountStateDidChangeNotification;
 @interface CSMessageActionCoordinator : NSObject
 + (instancetype)sharedCoordinator;
 - (instancetype)initWithEnvironment:(id<CSMessageActionEnvironment>)environment
@@ -16,6 +18,9 @@ FOUNDATION_EXPORT void CSMessageActionAccountDidChangeAtNativeBoundary(void);
 @property(nonatomic, readonly) CSMessageActionSettings *settings;
 @property(nonatomic, copy, readonly, nullable) NSString *accountID;
 @property(nonatomic, readonly) NSUInteger accountEpoch;
+// Source-neutral account boundary used by independently identified media sources.
+- (void)refreshAccountState;
+- (BOOL)isCurrentAccountID:(NSString *)accountID epoch:(NSUInteger)epoch;
 - (nullable CSMessageActionContext *)captureContextForCell:(id)cell controller:(nullable id)controller bindingGeneration:(NSUInteger)generation;
 - (BOOL)validateContext:(CSMessageActionContext *)context;
 - (BOOL)canExecuteContext:(CSMessageActionContext *)context action:(CSMessageAction)action entry:(CSMessageActionEntry)entry;

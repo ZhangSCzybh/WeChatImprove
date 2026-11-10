@@ -4,6 +4,7 @@
 NSString *const CSMessageActionGestureEnabledKey = @"com.wechat.enhance.message_gesture.enabled";
 NSString *const CSMessageActionRepeatEnabledKey = @"com.wechat.enhance.repeat.enabled";
 NSString *const CSMessageActionVoiceForwardEnabledKey = @"com.wechat.enhance.voice_forward.enabled";
+NSString *const CSMessageActionFavoriteVoiceForwardEnabledKey = @"com.wechat.enhance.voice_forward.favorite_enabled";
 NSString *const CSMessageActionImageStickerEnabledKey = @"com.wechat.enhance.image_sticker.enabled";
 NSString *const CSMessageActionLeftOtherKey = @"com.wechat.enhance.left_swipe_other.action";
 NSString *const CSMessageActionLeftSelfKey = @"com.wechat.enhance.left_swipe_self.action";
@@ -28,6 +29,7 @@ static BOOL CSActionBool(NSUserDefaults *defaults, NSString *key) {
         _gestureEnabled=CSActionBool(defaults,CSMessageActionGestureEnabledKey);
         _repeatEnabled=CSActionBool(defaults,CSMessageActionRepeatEnabledKey);
         _voiceForwardEnabled=CSActionBool(defaults,CSMessageActionVoiceForwardEnabledKey);
+        _favoriteVoiceForwardEnabled=CSActionBool(defaults,CSMessageActionFavoriteVoiceForwardEnabledKey);
         _imageStickerEnabled=CSActionBool(defaults,CSMessageActionImageStickerEnabledKey);
         _leftOtherAction=CSActionInteger(defaults,CSMessageActionLeftOtherKey);
         _leftSelfAction=CSActionInteger(defaults,CSMessageActionLeftSelfKey);
@@ -39,7 +41,8 @@ static BOOL CSActionBool(NSUserDefaults *defaults, NSString *key) {
 }
 - (BOOL)hasSameValuesAs:(CSMessageActionSettings *)other {
     return _gestureEnabled==other.gestureEnabled && _repeatEnabled==other.repeatEnabled &&
-        _voiceForwardEnabled==other.voiceForwardEnabled && _imageStickerEnabled==other.imageStickerEnabled && _leftOtherAction==other.leftOtherAction &&
+        _voiceForwardEnabled==other.voiceForwardEnabled && _favoriteVoiceForwardEnabled==other.favoriteVoiceForwardEnabled &&
+        _imageStickerEnabled==other.imageStickerEnabled && _leftOtherAction==other.leftOtherAction &&
         _leftSelfAction==other.leftSelfAction && _rightOtherAction==other.rightOtherAction &&
         _rightSelfAction==other.rightSelfAction;
 }

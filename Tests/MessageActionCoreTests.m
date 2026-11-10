@@ -270,9 +270,10 @@ static void TestAllSubmissionTransitions(void) {
 }
 static void TestPreferences(CountingDefaults *d, NSString *suite) {
     CSMessageActionPreferences *p=[[CSMessageActionPreferences alloc] initWithDefaults:d];
-    CHECK(!p.snapshot.gestureEnabled && !p.snapshot.repeatEnabled && !p.snapshot.voiceForwardEnabled && !p.snapshot.imageStickerEnabled);
+    CHECK(!p.snapshot.gestureEnabled && !p.snapshot.repeatEnabled && !p.snapshot.voiceForwardEnabled && !p.snapshot.favoriteVoiceForwardEnabled && !p.snapshot.imageStickerEnabled);
     CHECK(p.snapshot.leftOtherAction==0 && p.snapshot.leftSelfAction==0 && p.snapshot.rightOtherAction==0 && p.snapshot.rightSelfAction==0);
-    CHECK(d.readKeys.count==8);
+    CHECK(d.readKeys.count==9);
+    CHECK([CSMessageActionFavoriteVoiceForwardEnabledKey isEqual:@"com.wechat.enhance.voice_forward.favorite_enabled"]);
     __block unsigned notifications=0; __block BOOL mainDelivery=YES;
     id observer=[[NSNotificationCenter defaultCenter] addObserverForName:CSMessageActionSettingsDidChangeNotification object:p queue:nil usingBlock:^(__unused NSNotification *n){ notifications++; mainDelivery &= NSThread.isMainThread; }];
     CSMessageActionSettings *initial=p.snapshot;
@@ -297,19 +298,34 @@ static void TestPreferences(CountingDefaults *d, NSString *suite) {
     // NS defaults notification bridge, independently of Darwin.
     [d setBool:YES forKey:CSMessageActionVoiceForwardEnabledKey];
     [[NSNotificationCenter defaultCenter] postNotificationName:NSUserDefaultsDidChangeNotification object:d];
-    Drain(); CHECK(p.snapshot.voiceForwardEnabled && p.snapshot.version==version+3);
+    Drain(); CHECK(p.snapshot.voiceForwardEnabled && !p.snapshot.favoriteVoiceForwardEnabled && p.snapshot.version==version+3);
     [d setBool:YES forKey:CSMessageActionImageStickerEnabledKey]; [p requestRefresh]; Drain();
     CHECK(p.snapshot.imageStickerEnabled && p.snapshot.version==version+4);
     CHECK(CSMessageActionEntryAllows(p.snapshot,CSMessageActionEntryMenuAddSticker,CSMessageActionAddSticker));
     CHECK(!CSMessageActionEntryAllows(p.snapshot,CSMessageActionEntryGesture,CSMessageActionAddSticker));
     CHECK(!CSMessageActionEntryAllows(p.snapshot,CSMessageActionEntryMenuAddSticker,CSMessageActionRepeat));
+    // The favorites switch refreshes through the shared voice notification and
+    // remains independent of the chat voice switch in both directions.
+    CSMessageActionSettings *beforeFavorite=p.snapshot;
+    [d setBool:YES forKey:CSMessageActionFavoriteVoiceForwardEnabledKey];
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),(__bridge CFStringRef)CSMessageActionVoiceForwardDarwinNotification,NULL,NULL,true);
+    Drain(); CHECK(p.snapshot.favoriteVoiceForwardEnabled && p.snapshot.voiceForwardEnabled);
+    CHECK(!beforeFavorite.favoriteVoiceForwardEnabled && p.snapshot.version==beforeFavorite.version+1);
+    [d setBool:NO forKey:CSMessageActionVoiceForwardEnabledKey];
+    [[NSNotificationCenter defaultCenter] postNotificationName:NSUserDefaultsDidChangeNotification object:d];
+    Drain(); CHECK(p.snapshot.favoriteVoiceForwardEnabled && !p.snapshot.voiceForwardEnabled);
+    CHECK(!CSMessageActionEntryAllows(p.snapshot,CSMessageActionEntryMenuVoiceForward,CSMessageActionForward));
+    NSUInteger favoriteVersion=p.snapshot.version;
+    [d setBool:NO forKey:CSMessageActionFavoriteVoiceForwardEnabledKey];
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),(__bridge CFStringRef)CSMessageActionVoiceForwardDarwinNotification,NULL,NULL,true);
+    Drain(); CHECK(!p.snapshot.favoriteVoiceForwardEnabled && !p.snapshot.voiceForwardEnabled && p.snapshot.version==favoriteVersion+1);
     // Backup import/reset may replace the domain without a feature-specific Darwin notification.
-    [d setPersistentDomain:@{CSMessageActionGestureEnabledKey:@YES,CSMessageActionLeftSelfKey:@6} forName:suite];
+    [d setPersistentDomain:@{CSMessageActionGestureEnabledKey:@YES,CSMessageActionLeftSelfKey:@6,CSMessageActionFavoriteVoiceForwardEnabledKey:@YES} forName:suite];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"UIApplicationDidBecomeActiveNotification" object:nil];
-    Drain(); CHECK(p.snapshot.gestureEnabled && p.snapshot.leftSelfAction==6 && !p.snapshot.voiceForwardEnabled);
+    Drain(); CHECK(p.snapshot.gestureEnabled && p.snapshot.leftSelfAction==6 && !p.snapshot.voiceForwardEnabled && p.snapshot.favoriteVoiceForwardEnabled);
     [d removePersistentDomainForName:suite];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"UIApplicationDidBecomeActiveNotification" object:nil];
-    Drain(); CHECK(!p.snapshot.gestureEnabled && p.snapshot.leftSelfAction==0);
+    Drain(); CHECK(!p.snapshot.gestureEnabled && p.snapshot.leftSelfAction==0 && !p.snapshot.favoriteVoiceForwardEnabled);
     [[NSNotificationCenter defaultCenter] removeObserver:observer];
 }
 int main(void) { @autoreleasepool {

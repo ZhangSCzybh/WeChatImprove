@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.3-9`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.4-2`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -31,8 +31,8 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；既有适配参考用户提供的 `8.0.80.34` IPA，小丑功能在两版微信中的显示与交互仍待真机验收 |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | `2.3-9` 已构建并核对，包含 arm64／arm64e；尚待 iPhone 微信安装复验 |
-| Rootful | `2.3-9` 安装包及重签用 dylib 已构建并核对，包含 arm64／arm64e；尚待 iPhone 微信安装复验 |
+| Rootless | `2.4-2` 已构建并核对，包含 arm64／arm64e |
+| Rootful | `2.4-2` 安装包及重签用 dylib 已构建并核对，包含 arm64／arm64e |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
@@ -40,7 +40,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：[2.3-9 Rootless 安装包](packages/2.3-9-merge-history-scroll/com.wechat.improve_2.3-9_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.3-9-merge-history-scroll/com.wechat.improve_2.3-9_iphoneos-arm.deb)、[重签用 dylib](packages/2.3-9-merge-history-scroll/WeChatImprove.dylib) 与 [SHA-256 清单](packages/2.3-9-merge-history-scroll/SHA256SUMS)。本版修正向上查看历史消息时的滚动回退：历史加载按表格实际显示高度计算补位，并在 reload 完成前暂缓额外行高事务。继续保留 2.3-8 已确认正常的连续消息间距与此前停滚稳定处理。详见 [2.3-9 修复与验证记录](docs/audits/merge-history-scroll-2.3-9/README.md)；[2.3-8 修复记录](docs/audits/merge-first-seam-2.3-8/README.md)及既有安装包保留。2.3-9 的 iPhone 微信安装、历史加载及滚动效果仍待复验。
+1. 获取与设备注入环境匹配的 `.deb`：[2.4-2 Rootless 安装包](packages/2.4-2-voice-progress/com.wechat.improve_2.4-2_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.4-2-voice-progress/com.wechat.improve_2.4-2_iphoneos-arm.deb)、[重签用 dylib](packages/2.4-2-voice-progress/WeChatImprove.dylib) 与 [SHA-256 清单](packages/2.4-2-voice-progress/SHA256SUMS)。本版新增默认关闭的“语音进度拖动”：正在播放的聊天语音以气泡整宽填充显示进度，在气泡上左右滑动预览位置，松手后定位续播。沿用微信已有倍速能力。详见 [2.4-2 实现与核验记录](docs/audits/voice-playback-controls-2026-11-10/README.md)。此前 [2.4-1 收藏语音转发发布记录](docs/audits/release-2.4-1-favorite-voice-forward/README.md)、[2.3-9 历史滚动修复](docs/audits/merge-history-scroll-2.3-9/README.md)及既有安装包保留。
 
    密友头像五击快捷入口不验证身份：任何能操作已解锁手机并到达头像的人，都能查看或修改配置，并经两级确认不可撤销地完整重置当前账号的密友配置。此风险继续存在；修改密码仍须普通入口验证。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
@@ -142,6 +142,12 @@
 
 在 **消息手势** 中，可分别为己方/对方消息的左滑和右滑选择引用、删除、转发、收藏、撤回、复读或禁用；具体动作仍受微信原生能力和消息类型限制。**语音转发**与**复读功能**提供对应的消息菜单能力。
 
+**语音转发 → 收藏语音转发** 默认关闭，与聊天语音转发开关独立。开启后，在微信 **收藏** 中打开单条语音，通过 **右上角菜单 → 发送给朋友** 使用微信原生界面选择联系人并确认发送。本次按微信 `8.0.80.34` 适配，仅支持独立的语音收藏；聊天记录收藏中的嵌套语音、笔记录音等不在处理范围内。音频未下载时先等待下载，可取消本次操作；取消、关闭开关或切换账号后，待处理操作失效。原收藏文件不会被改写，发送时为每个目标创建独立语音消息。实现、构建与真机验证范围见 [收藏语音转发验证记录](docs/audits/favorite-voice-forward-2026-11-10/README.md)。
+
+微信 8.0.80 的“无法读取原语音时长”和普通聊天、收藏转发选人后“下一步”无反应，已针对原生时长接口和选人完成时序修复，用户已确认可以使用。修复已包含在 **2.4-1 及后续版本**；实现证据见 [fix1 修复记录](docs/audits/favorite-voice-forward-fix1-2026-11-10/README.md)，发布核验见 [2.4-1 发布记录](docs/audits/release-2.4-1-favorite-voice-forward/README.md)。此前候选包保留用于回归对照。
+
+**语音转发 → 语音进度拖动** 默认关闭，独立于聊天和收藏语音转发。开启后，正在播放的普通聊天语音以气泡自身长度显示已播比例：气泡内部使用与原背景协调的半透明填充，无独立滑杆或圆点。直接在气泡上左右滑动可预览目标时间，松手后通过微信原生接口定位并继续播放；取消拖动不跳转，结束、切换语音、关闭开关、切号或复用后，旧操作失效。原生点击播放、长按菜单、上下滚动及已有倍速继续使用；正在播放的气泡区域横滑优先用于拖动进度。开关支持配置备份、恢复和恢复默认。当前按微信 8.0.80 适配，实际定位精度与缓冲延迟由原生语音格式决定。详见 [2.4-2 实现与核验记录](docs/audits/voice-playback-controls-2026-11-10/README.md)。
+
 **后台模糊**默认关闭。开启后，微信失去活跃状态时显示模糊，返回后恢复清晰；控制中心、通知中心或系统认证也可能触发该效果。此功能与“后台运行”分别配置。
 
 **后台运行**开启后，进入后台先申请有限系统任务，有限剩余预算不足 8 秒时再尝试无声音频接力，初次任务申请失败也可尝试音频。使用单次检查调度，临近预算边界时约每秒检查；音频至少播放 5 秒，任务仍有效且有限预算恢复至至少 12 秒、两次相隔至少 1 秒的检查确认后退出，继续利用原生任务。8 秒介入与 12 秒退出之间保留回差，减少反复启停。保留内存生成的静音 WAV 和微信通话／录音优先规则；返回前台或关闭时释放任务、检查和音频。设置页展示当前阶段及宿主后台音频声明，并在“最近一次后台”保留最后状态、进入／开始观察、最后检查及当时状态、返回前台、停止时间及原因、检查至返回间隔；点击任意记录可查看完整时间。记录仅保留当前微信进程中的最近一次，重新打开设置不会刷新最后检查；间隔按单调时钟计算，不代表此前一直运行。原开关和备份兼容。AI 后台兜底可在有效任务或音频阶段运行，仍遵守原有约 45 秒节流。音频提供继续执行的机会，不能保证给系统任务补充时间，反复申请任务也不等于系统无限续期。极大剩余时间不作为独立预算恢复证据，部分系统状态下接力音频仍会持续；本版不依靠停音频探测来假定预算已恢复。手机上的锁屏稳定性、耗电与温升需要在原注入／签名环境实测。详见 [策略调整验证](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/background-run-native-priority-2026-11-02/README.md)、[时间记录验证](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/background-run-records-2026-11-02/README.md) 与 [重构验证](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/background-run-hybrid-2026-11-02/README.md)。
@@ -230,7 +236,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.3-9_iphoneos-arm64.deb`。本轮交付为 [2.3-9 Rootless 安装包](packages/2.3-9-merge-history-scroll/com.wechat.improve_2.3-9_iphoneos-arm64.deb)，已核对包含 arm64／arm64e。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.4-2_iphoneos-arm64.deb`。本轮交付为 [2.4-2 Rootless 安装包](packages/2.4-2-voice-progress/com.wechat.improve_2.4-2_iphoneos-arm64.deb)，已核对包含 arm64／arm64e。
 
 ### Rootful
 
@@ -239,7 +245,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.3-9_iphoneos-arm.deb`。本轮交付为 [2.3-9 Rootful 安装包](packages/2.3-9-merge-history-scroll/com.wechat.improve_2.3-9_iphoneos-arm.deb)，已核对包含 arm64／arm64e。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.4-2_iphoneos-arm.deb`。本轮交付为 [2.4-2 Rootful 安装包](packages/2.4-2-voice-progress/com.wechat.improve_2.4-2_iphoneos-arm.deb)，已核对包含 arm64／arm64e。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -263,7 +269,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.3-9-merge-history-scroll/com.wechat.improve_2.3-9_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.4-2-voice-progress/com.wechat.improve_2.4-2_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
@@ -312,6 +318,9 @@ bash Tests/verify-merge-bubble-integration.sh
 # 消息动作、菜单与语音执行路径
 bash Tests/verify-message-actions-core.sh
 bash Tests/verify-message-actions-execution.sh
+bash Tests/verify-favorite-voice-media.sh
+bash Tests/verify-favorite-voice-forward.sh
+bash Tests/verify-forward-selection-boundary.sh
 
 # 红包、转账核心与自动处理
 bash Tests/verify-payment-core.sh

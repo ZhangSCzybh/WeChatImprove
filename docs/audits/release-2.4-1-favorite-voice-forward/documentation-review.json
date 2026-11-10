@@ -1,0 +1,63 @@
+{
+  "reviewed_at": "2026-11-10T10:48:37.750780+00:00",
+  "review_type": "Independent read-only source and release-documentation review; no production edits or builds",
+  "version": "2.4-1",
+  "status": "passed_for_documentation_source",
+  "version_consistency": {
+    "control": "2.4-1",
+    "kPluginVersionString": "2.4-1",
+    "README_current_version": "2.4-1",
+    "docs_index_current_version": "2.4-1",
+    "current_release_notes_key": "2.4-1",
+    "selection_expression": "releases[kPluginVersionString]",
+    "passed": true
+  },
+  "release_notes_history": {
+    "previous_version_entries": 156,
+    "current_version_entries": 157,
+    "added_version_keys": [
+      "2.4-1"
+    ],
+    "new_notes_count": 3,
+    "old_source_preserved_exactly_except_added_entry_and_final_newline": true,
+    "previous_keys_in_same_order": true,
+    "passed": true
+  },
+  "README_review": {
+    "current_install_and_build_example_paths_use_2_4_1": true,
+    "historical_2_3_8_and_2_3_9_paragraphs_preserved_exactly": true,
+    "historical_audit_links_retained": true,
+    "fix1_device_confirmation_distinguished_from_new_formal_package": true,
+    "independent_switch_default_off_and_standalone_voice_scope_match_implementation": true,
+    "next_button_and_duration_fix_notes_match_user_confirmed_fix1": true,
+    "passed": true
+  },
+  "docs_index_review": {
+    "current_pointer_updated": true,
+    "prior_2_3_4_link_retained_in_recent_list": true,
+    "prior_2_3_4_historical_explanation_preserved": true,
+    "passed": true
+  },
+  "source_evidence": [
+    "Controllers/CSVoiceForwardSettingsViewController.m",
+    "Controllers/CSMessageActionPreferences.m",
+    "Controllers/CSFavoriteVoiceContext.m",
+    "Controllers/CSBackupRegistry.m",
+    "Hooks/FavoriteVoiceForwardHooks.xm",
+    "docs/audits/release-2.4-1-favorite-voice-forward/device-confirmation.json",
+    "docs/audits/release-2.4-1-favorite-voice-forward/source-provenance.json"
+  ],
+  "reviewed_files_sha256": {
+    "control": "413589b9c0a6b6dcdd6073d90d21f833e84a33bb4d95ac59af2df0f0658f2f96",
+    "Headers/CSUserInfoHelper.h": "436a0698217fa9bb1fc5ddd7b14efcdb9d9277640baff62b8fc0c9a5cc35897f",
+    "Controllers/CSReleaseNotesViewController.m": "c3ce326a7a662dc8404f0b918f7dd4fa9445edc8b33e1ad0659cf05f89896683",
+    "README.md": "6e81647f53154346f5a6c8a311a69a988223caef8020c6cb8ae165583304edf2",
+    "docs/README.md": "6e0015546d6cf62f023b3d82a84c0833fa9b99706e13222dc41661bea6d09d8a",
+    "docs/audits/release-2.4-1-favorite-voice-forward/README.md": "c63dbef1a0620ad1190c1400323703792363f6e76c5ad13b6a6495a111b91fae"
+  },
+  "deferred_to_release_owner": {
+    "artifact_files_and_SHA256SUMS": "Build in progress during documentation review; final artifact/link checks are owned by root release task.",
+    "architecture_and_symbols_claims": "Require final build-result.json/final-verification.json; this source review does not assert completed package validation."
+  },
+  "findings": []
+}

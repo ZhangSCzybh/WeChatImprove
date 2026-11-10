@@ -16,6 +16,7 @@ FOUNDATION_EXPORT void CSCFForwardSearchWillUpdate(id owner);
 FOUNDATION_EXPORT void CSCFForwardSearchDidUpdate(id owner);
 FOUNDATION_EXPORT void CSCFRefreshForwardSearch(id owner);
 FOUNDATION_EXPORT void CSCFBeginSelection(id owner);
+FOUNDATION_EXPORT NSArray *CSCFCurrentForwardRecipients(id owner);
 FOUNDATION_EXPORT BOOL CSCFAllowSelection(id owner, NSArray *recipients);
 FOUNDATION_EXPORT void CSCFCancelSelection(id owner);
 /// Stops the current operation. Successful authentication asks user to repeat on native full data.

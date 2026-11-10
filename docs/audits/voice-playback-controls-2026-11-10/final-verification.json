@@ -1,0 +1,200 @@
+{
+  "status": "passed",
+  "version": "2.4-2",
+  "final_scope": "one progress switch; full voice bubble fill; horizontal bubble scrubbing; no thumb; native speed unchanged",
+  "device_installed_by_task": false,
+  "native_messages_sent": false,
+  "frozen_sources_match_build_and_current": true,
+  "production_files": 409,
+  "packages": [
+    {
+      "Package": "com.wechat.improve",
+      "Version": "2.4-2",
+      "Architecture": "iphoneos-arm64",
+      "scheme": "rootless",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "sha256": "a34cac4c586d57586db55ed5c17092b7fb3ac136beea240b921b1607a4074661",
+      "payload_sha256": "7c873f88c6dd07810c7af31d3e805aa7ef938acede5d02e709dab068c01c85ca",
+      "filter_matches_source": true
+    },
+    {
+      "Package": "com.wechat.improve",
+      "Version": "2.4-2",
+      "Architecture": "iphoneos-arm",
+      "scheme": "rootful",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "sha256": "4d7c8a22432f404b8605fe8ae7db19926a74ffa4db109dd09d8c6fee100a167b",
+      "payload_sha256": "9b1d7db979068e95d16dd718a2308a743c95ce9798fe66fcace693b3bf69e732",
+      "filter_matches_source": true
+    }
+  ],
+  "symbols": [
+    {
+      "scheme": "rootless",
+      "cpu": "arm64",
+      "uuid": "9178EDC1-5D65-3683-B4EF-900DDBBE23C5",
+      "embedded_version_and_chinese_release_titles": true,
+      "native_progress_selectors_and_pause_hook_present": true,
+      "dwarf_sha256": "d408d02e70cefb46b05f1cb3ae43f8f91a79a8aa7904ce2b3244129d58acedcf"
+    },
+    {
+      "scheme": "rootless",
+      "cpu": "arm64e",
+      "uuid": "006B1841-4884-32F0-8AD1-1B2D7E4F475B",
+      "embedded_version_and_chinese_release_titles": true,
+      "native_progress_selectors_and_pause_hook_present": true,
+      "dwarf_sha256": "4bdf7e29b6105c9a2936df5c598fed936c5b349eba7351c33ad000157ac84447"
+    },
+    {
+      "scheme": "rootful",
+      "cpu": "arm64",
+      "uuid": "CB2BC0BD-77F8-3E14-8FDA-0F3B52DA07C8",
+      "embedded_version_and_chinese_release_titles": true,
+      "native_progress_selectors_and_pause_hook_present": true,
+      "dwarf_sha256": "8949c742bfe21dca2afcf9218ef7bc4cc9c6f6b61c694495c7bd13188ffe5d01"
+    },
+    {
+      "scheme": "rootful",
+      "cpu": "arm64e",
+      "uuid": "529FC321-76DF-333E-A2B3-C15CD6A69AC2",
+      "embedded_version_and_chinese_release_titles": true,
+      "native_progress_selectors_and_pause_hook_present": true,
+      "dwarf_sha256": "e97c2e472db16b1b4b81ede20231e50e53462bed32188139b61d960147748872"
+    }
+  ],
+  "SHA256SUMS_matches": true,
+  "artifacts": {
+    "WeChatImprove.dylib": {
+      "sha256": "9b1d7db979068e95d16dd718a2308a743c95ce9798fe66fcace693b3bf69e732",
+      "bytes": 7624672
+    },
+    "com.wechat.improve_2.4-2_iphoneos-arm.deb": {
+      "sha256": "4d7c8a22432f404b8605fe8ae7db19926a74ffa4db109dd09d8c6fee100a167b",
+      "bytes": 1733600
+    },
+    "com.wechat.improve_2.4-2_iphoneos-arm64.deb": {
+      "sha256": "a34cac4c586d57586db55ed5c17092b7fb3ac136beea240b921b1607a4074661",
+      "bytes": 1734478
+    },
+    "com.wechat.improve_2.4-2_symbols.zip": {
+      "sha256": "53ca99673f7c2864aac5e9e0217f13977c0af837366a6550077c62dc654a8834",
+      "bytes": 12551053
+    }
+  },
+  "protected_main_theos_files": 2114,
+  "protected_previous_package_files": 275,
+  "all_protected_file_hashes_match": true,
+  "release_links_checked": [
+    {
+      "source": "README.md",
+      "target": "packages/2.4-2-voice-progress/com.wechat.improve_2.4-2_iphoneos-arm64.deb"
+    },
+    {
+      "source": "README.md",
+      "target": "packages/2.4-2-voice-progress/com.wechat.improve_2.4-2_iphoneos-arm.deb"
+    },
+    {
+      "source": "README.md",
+      "target": "packages/2.4-2-voice-progress/WeChatImprove.dylib"
+    },
+    {
+      "source": "README.md",
+      "target": "packages/2.4-2-voice-progress/SHA256SUMS"
+    },
+    {
+      "source": "README.md",
+      "target": "docs/audits/voice-playback-controls-2026-11-10/README.md"
+    },
+    {
+      "source": "README.md",
+      "target": "docs/audits/voice-playback-controls-2026-11-10/README.md"
+    },
+    {
+      "source": "README.md",
+      "target": "packages/2.4-2-voice-progress/com.wechat.improve_2.4-2_iphoneos-arm64.deb"
+    },
+    {
+      "source": "README.md",
+      "target": "packages/2.4-2-voice-progress/com.wechat.improve_2.4-2_iphoneos-arm.deb"
+    },
+    {
+      "source": "docs/README.md",
+      "target": "audits/voice-playback-controls-2026-11-10/README.md"
+    },
+    {
+      "source": "docs/README.md",
+      "target": "audits/voice-playback-controls-2026-11-10/README.md"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "native-playback/README.md"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "cell-ui-review.md"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "controller-validation.json"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "overlay-validation.json"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "preferences-validation.json"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "validation.json"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "final-code-review.json"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "version-verification.json"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "../../../packages/2.4-2-voice-progress/com.wechat.improve_2.4-2_iphoneos-arm64.deb"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "../../../packages/2.4-2-voice-progress/com.wechat.improve_2.4-2_iphoneos-arm.deb"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "../../../packages/2.4-2-voice-progress/WeChatImprove.dylib"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "../../../packages/2.4-2-voice-progress/com.wechat.improve_2.4-2_symbols.zip"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "../../../packages/2.4-2-voice-progress/SHA256SUMS"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "build-result.json"
+    },
+    {
+      "source": "docs/audits/voice-playback-controls-2026-11-10/README.md",
+      "target": "final-verification.json"
+    }
+  ],
+  "git_diff_check": "passed",
+  "warning_counts_per_scheme": {
+    "rootless": 8,
+    "rootful": 8
+  }
+}

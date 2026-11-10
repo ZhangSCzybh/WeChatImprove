@@ -1,0 +1,5139 @@
+{
+  "binary": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-fav-8080-20261110-g5qs3obm/WeChat",
+  "sha256": "1d626426df97058a8a87c661532b2801cd27b7d9fcc12e27609c751f5877b7ed",
+  "classes": [
+    {
+      "name": "FavBaseTableDataController",
+      "class_offset": "0x1ee85fd8",
+      "superclass": "MMObject",
+      "methods": [
+        {
+          "selector": "isPinTopConfigEnable",
+          "encoding": "B16@0:8",
+          "imp": "0x101a46a98",
+          "metadata_offset": "0x171fa458"
+        },
+        {
+          "selector": "getTotalPinTopCount",
+          "encoding": "Q16@0:8",
+          "imp": "0x101a46b30",
+          "metadata_offset": "0x171fa464"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8",
+          "imp": "0x101a46cb0",
+          "metadata_offset": "0x171fa470"
+        },
+        {
+          "selector": "updateFoldButtonStateWithCompletion:",
+          "encoding": "v24@0:8@?16",
+          "imp": "0x101a47024",
+          "metadata_offset": "0x171fa47c"
+        },
+        {
+          "selector": "checkAndAutoAddOrRemovePinTopButtonAnimated:completion:",
+          "encoding": "v28@0:8B16@?20",
+          "imp": "0x101a474d4",
+          "metadata_offset": "0x171fa488"
+        },
+        {
+          "selector": "fav_aiSearchFooterView",
+          "encoding": "@16@0:8",
+          "imp": "0x101a47b18",
+          "metadata_offset": "0x171fa494"
+        },
+        {
+          "selector": "fav_setAISearchFooterView:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a47b24",
+          "metadata_offset": "0x171fa4a0"
+        },
+        {
+          "selector": "fav_aiSearchFeedbackTapHandler",
+          "encoding": "@?16@0:8",
+          "imp": "0x101a47b34",
+          "metadata_offset": "0x171fa4ac"
+        },
+        {
+          "selector": "fav_setAISearchFeedbackTapHandler:",
+          "encoding": "v24@0:8@?16",
+          "imp": "0x101a47b40",
+          "metadata_offset": "0x171fa4b8"
+        },
+        {
+          "selector": "fav_isAISearchFooterVisible",
+          "encoding": "B16@0:8",
+          "imp": "0x101a47b90",
+          "metadata_offset": "0x171fa4c4"
+        },
+        {
+          "selector": "fav_setAISearchFooterVisible:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a47bdc",
+          "metadata_offset": "0x171fa4d0"
+        },
+        {
+          "selector": "enableAISearchFeedbackFooterWithTapHandler:",
+          "encoding": "v24@0:8@?16",
+          "imp": "0x101a47c40",
+          "metadata_offset": "0x171fa4dc"
+        },
+        {
+          "selector": "revealAISearchFeedbackFooter",
+          "encoding": "v16@0:8",
+          "imp": "0x101a47e10",
+          "metadata_offset": "0x171fa4e8"
+        },
+        {
+          "selector": "disableAISearchFeedbackFooter",
+          "encoding": "v16@0:8",
+          "imp": "0x101a47e84",
+          "metadata_offset": "0x171fa4f4"
+        },
+        {
+          "selector": "setHasMoreData:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a47f70",
+          "metadata_offset": "0x171fa500"
+        },
+        {
+          "selector": "setAISearchFooterEmptyState:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a48588",
+          "metadata_offset": "0x171fa50c"
+        },
+        {
+          "selector": "hideEndline",
+          "encoding": "v16@0:8",
+          "imp": "0x101a48614",
+          "metadata_offset": "0x171fa518"
+        },
+        {
+          "selector": "aiSearchFooter_visibleTableHeight",
+          "encoding": "d16@0:8",
+          "imp": "0x101a48630",
+          "metadata_offset": "0x171fa524"
+        },
+        {
+          "selector": "aiSearchFooter_contentHeightExcludingFooter",
+          "encoding": "d16@0:8",
+          "imp": "0x101a4869c",
+          "metadata_offset": "0x171fa530"
+        },
+        {
+          "selector": "aiSearchFooter_didTapFeedback",
+          "encoding": "v16@0:8",
+          "imp": "0x101a48740",
+          "metadata_offset": "0x171fa53c"
+        },
+        {
+          "selector": "setCellFrameAnimationEnabled:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a48784",
+          "metadata_offset": "0x171fa548"
+        },
+        {
+          "selector": "performDeleteSectionsWithIndices:cellsToClean:animation:completion:",
+          "encoding": "v48@0:8@16@24q32@?40",
+          "imp": "0x101a48798",
+          "metadata_offset": "0x171fa554"
+        },
+        {
+          "selector": "hideFavoritesItemsWithAnimation:isUseBeautifulFade:completion:",
+          "encoding": "v36@0:8@16B24@?28",
+          "imp": "0x101a48d40",
+          "metadata_offset": "0x171fa560"
+        },
+        {
+          "selector": "showFavoritesItemWithAnimation:animated:completion:",
+          "encoding": "v36@0:8@16B24@?28",
+          "imp": "0x101a49910",
+          "metadata_offset": "0x171fa56c"
+        },
+        {
+          "selector": "getFoldButtonIndex",
+          "encoding": "q16@0:8",
+          "imp": "0x101a4a020",
+          "metadata_offset": "0x171fa578"
+        },
+        {
+          "selector": "insertXiaoweiBannerItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a4a0dc",
+          "metadata_offset": "0x171fa584"
+        },
+        {
+          "selector": "removeXiaoweiBannerItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a4a348",
+          "metadata_offset": "0x171fa590"
+        },
+        {
+          "selector": "setMultiSelecting:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a4a558",
+          "metadata_offset": "0x171fa59c"
+        },
+        {
+          "selector": "setMultiSelectCellStyle:",
+          "encoding": "v24@0:8Q16",
+          "imp": "0x101a4a680",
+          "metadata_offset": "0x171fa5a8"
+        },
+        {
+          "selector": "setShowsFirstSectionTopSpacing:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a4a6d8",
+          "metadata_offset": "0x171fa5b4"
+        },
+        {
+          "selector": "selectedItemsDict",
+          "encoding": "@16@0:8",
+          "imp": "0x101a4a70c",
+          "metadata_offset": "0x171fa5c0"
+        },
+        {
+          "selector": "setSelectedItemsDictWith:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a4a71c",
+          "metadata_offset": "0x171fa5cc"
+        },
+        {
+          "selector": "arrFavItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101a4a730",
+          "metadata_offset": "0x171fa5d8"
+        },
+        {
+          "selector": "arrFavDataWrap",
+          "encoding": "@16@0:8",
+          "imp": "0x101a4a740",
+          "metadata_offset": "0x171fa5e4"
+        },
+        {
+          "selector": "bReadyToLoad",
+          "encoding": "B16@0:8",
+          "imp": "0x101a4a750",
+          "metadata_offset": "0x171fa5f0"
+        },
+        {
+          "selector": "addFavItemList:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a4a760",
+          "metadata_offset": "0x171fa5fc"
+        },
+        {
+          "selector": "addFavItemListBySize:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a4b304",
+          "metadata_offset": "0x171fa608"
+        },
+        {
+          "selector": "addFavItemListByUsedTimes:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a4b610",
+          "metadata_offset": "0x171fa614"
+        },
+        {
+          "selector": "addFavItemListByUpdateTimeForASC:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a4b91c",
+          "metadata_offset": "0x171fa620"
+        },
+        {
+          "selector": "getInsertIndexOfFavItemBySize:",
+          "encoding": "i24@0:8@16",
+          "imp": "0x101a4bc28",
+          "metadata_offset": "0x171fa62c"
+        },
+        {
+          "selector": "getInsertIndexOfFavItemByUpdateTimeForASC:",
+          "encoding": "i24@0:8@16",
+          "imp": "0x101a4bd58",
+          "metadata_offset": "0x171fa638"
+        },
+        {
+          "selector": "getInsertIndexOfFavItemByUsedTimes:",
+          "encoding": "i24@0:8@16",
+          "imp": "0x101a4be88",
+          "metadata_offset": "0x171fa644"
+        },
+        {
+          "selector": "addFavDataWrapList:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a4bfb8",
+          "metadata_offset": "0x171fa650"
+        },
+        {
+          "selector": "removeDataAtIndex:",
+          "encoding": "v20@0:8i16",
+          "imp": "0x101a4c124",
+          "metadata_offset": "0x171fa65c"
+        },
+        {
+          "selector": "getInsertIndexOfFavItem:withOldIndex:",
+          "encoding": "i28@0:8@16i24",
+          "imp": "0x101a4c3e8",
+          "metadata_offset": "0x171fa668"
+        },
+        {
+          "selector": "getInsertIndexOfFavDataWrap:",
+          "encoding": "i24@0:8@16",
+          "imp": "0x101a4c56c",
+          "metadata_offset": "0x171fa674"
+        },
+        {
+          "selector": "getInsertIndexOfFavItem:",
+          "encoding": "i24@0:8@16",
+          "imp": "0x101a4c998",
+          "metadata_offset": "0x171fa680"
+        },
+        {
+          "selector": "getSortTypeForItem:",
+          "encoding": "q24@0:8@16",
+          "imp": "0x101a4cbb0",
+          "metadata_offset": "0x171fa68c"
+        },
+        {
+          "selector": "shouldInsertFavItem:beforeItem:withType:",
+          "encoding": "B40@0:8@16@24q32",
+          "imp": "0x101a4cc88",
+          "metadata_offset": "0x171fa698"
+        },
+        {
+          "selector": "getInsertIndexOfFavItemOldWay:",
+          "encoding": "i24@0:8@16",
+          "imp": "0x101a4cd24",
+          "metadata_offset": "0x171fa6a4"
+        },
+        {
+          "selector": "getInsertIndexOfFavItemForRecentUsed:",
+          "encoding": "i24@0:8@16",
+          "imp": "0x101a4cf70",
+          "metadata_offset": "0x171fa6b0"
+        },
+        {
+          "selector": "hideMenuOptionsIfViewMatchData:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a4d108",
+          "metadata_offset": "0x171fa6bc"
+        },
+        {
+          "selector": "moveFavItem:toIndexProvider:bAnimated:",
+          "encoding": "v36@0:8@16@?24B32",
+          "imp": "0x101a4d390",
+          "metadata_offset": "0x171fa6c8"
+        },
+        {
+          "selector": "moveFavItem:toIndexProvider:bAnimated:completion:",
+          "encoding": "v44@0:8@16@?24B32@?36",
+          "imp": "0x101a4d3a4",
+          "metadata_offset": "0x171fa6d4"
+        },
+        {
+          "selector": "moveFavItem:toIndexProvider:bAnimated:forceFullMove:completion:",
+          "encoding": "v48@0:8@16@?24B32B36@?40",
+          "imp": "0x101a4d3b8",
+          "metadata_offset": "0x171fa6e0"
+        },
+        {
+          "selector": "indexOfdata:",
+          "encoding": "i24@0:8@16",
+          "imp": "0x101a4e304",
+          "metadata_offset": "0x171fa6ec"
+        },
+        {
+          "selector": "isDataInArray:",
+          "encoding": "B24@0:8@16",
+          "imp": "0x101a4e770",
+          "metadata_offset": "0x171fa6f8"
+        },
+        {
+          "selector": "clearCache",
+          "encoding": "v16@0:8",
+          "imp": "0x101a4e84c",
+          "metadata_offset": "0x171fa704"
+        },
+        {
+          "selector": "cleanCache",
+          "encoding": "v16@0:8",
+          "imp": "0x101a4ea08",
+          "metadata_offset": "0x171fa710"
+        },
+        {
+          "selector": "clearData",
+          "encoding": "v16@0:8",
+          "imp": "0x101a4ea20",
+          "metadata_offset": "0x171fa71c"
+        },
+        {
+          "selector": "clearSelection",
+          "encoding": "v16@0:8",
+          "imp": "0x101a4ebf8",
+          "metadata_offset": "0x171fa728"
+        },
+        {
+          "selector": "cellIdForDataIndex:",
+          "encoding": "@24@0:8q16",
+          "imp": "0x101a4ec10",
+          "metadata_offset": "0x171fa734"
+        },
+        {
+          "selector": "getcellIdWith:data:",
+          "encoding": "@32@0:8@16@24",
+          "imp": "0x101a4ed44",
+          "metadata_offset": "0x171fa740"
+        },
+        {
+          "selector": "dataAtIndex:",
+          "encoding": "@24@0:8q16",
+          "imp": "0x101a4ee50",
+          "metadata_offset": "0x171fa74c"
+        },
+        {
+          "selector": "dataWrapAtIndex:",
+          "encoding": "@24@0:8q16",
+          "imp": "0x101a4eec0",
+          "metadata_offset": "0x171fa758"
+        },
+        {
+          "selector": "numberOfSectionsInTableView:",
+          "encoding": "q24@0:8@16",
+          "imp": "0x101a4ef8c",
+          "metadata_offset": "0x171fa764"
+        },
+        {
+          "selector": "tableView:numberOfRowsInSection:",
+          "encoding": "q32@0:8@16q24",
+          "imp": "0x101a4efe8",
+          "metadata_offset": "0x171fa770"
+        },
+        {
+          "selector": "tableView:heightForRowAtIndexPath:",
+          "encoding": "d32@0:8@16@24",
+          "imp": "0x101a4eff0",
+          "metadata_offset": "0x171fa77c"
+        },
+        {
+          "selector": "getHeightForItem:",
+          "encoding": "d24@0:8@16",
+          "imp": "0x101a4f1e0",
+          "metadata_offset": "0x171fa788"
+        },
+        {
+          "selector": "tableView:heightForHeaderInSection:",
+          "encoding": "d32@0:8@16q24",
+          "imp": "0x101a4f4f8",
+          "metadata_offset": "0x171fa794"
+        },
+        {
+          "selector": "tableView:viewForHeaderInSection:",
+          "encoding": "@32@0:8@16q24",
+          "imp": "0x101a4f5f4",
+          "metadata_offset": "0x171fa7a0"
+        },
+        {
+          "selector": "tableView:canEditRowAtIndexPath:",
+          "encoding": "B32@0:8@16@24",
+          "imp": "0x101a4f794",
+          "metadata_offset": "0x171fa7ac"
+        },
+        {
+          "selector": "tableView:shouldShowMenuForRowAtIndexPath:",
+          "encoding": "B32@0:8@16@24",
+          "imp": "0x101a4f7a4",
+          "metadata_offset": "0x171fa7b8"
+        },
+        {
+          "selector": "tableView:canPerformAction:forRowAtIndexPath:withSender:",
+          "encoding": "B48@0:8@16:24@32@40",
+          "imp": "0x101a4f7d8",
+          "metadata_offset": "0x171fa7c4"
+        },
+        {
+          "selector": "canPerformAction:forRowAtIndexPath:",
+          "encoding": "B32@0:8:16@24",
+          "imp": "0x101a4f7ec",
+          "metadata_offset": "0x171fa7d0"
+        },
+        {
+          "selector": "getSelectedItemTypeWith:",
+          "encoding": "I24@0:8@16",
+          "imp": "0x101a4f8bc",
+          "metadata_offset": "0x171fa7dc"
+        },
+        {
+          "selector": "tableView:performAction:forRowAtIndexPath:withSender:",
+          "encoding": "v48@0:8@16:24@32@40",
+          "imp": "0x101a4f994",
+          "metadata_offset": "0x171fa7e8"
+        },
+        {
+          "selector": "tableView:editingStyleForRowAtIndexPath:",
+          "encoding": "q32@0:8@16@24",
+          "imp": "0x101a4fa3c",
+          "metadata_offset": "0x171fa7f4"
+        },
+        {
+          "selector": "tableView:willDisplayCell:forRowAtIndexPath:",
+          "encoding": "v40@0:8@16@24@32",
+          "imp": "0x101a4fa44",
+          "metadata_offset": "0x171fa800"
+        },
+        {
+          "selector": "tableView:cellForRowAtIndexPath:",
+          "encoding": "@32@0:8@16@24",
+          "imp": "0x101a4fad8",
+          "metadata_offset": "0x171fa80c"
+        },
+        {
+          "selector": "getEndLineView",
+          "encoding": "@16@0:8",
+          "imp": "0x101a4fd14",
+          "metadata_offset": "0x171fa818"
+        },
+        {
+          "selector": "updateFooterViewWithMultiSelect:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a50054",
+          "metadata_offset": "0x171fa824"
+        },
+        {
+          "selector": "updateFooterViewWithWidth:",
+          "encoding": "v24@0:8d16",
+          "imp": "0x101a50108",
+          "metadata_offset": "0x171fa830"
+        },
+        {
+          "selector": "setFooterViewHidden:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a50278",
+          "metadata_offset": "0x171fa83c"
+        },
+        {
+          "selector": "getReusableCellForRowAtIndexPath:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a50290",
+          "metadata_offset": "0x171fa848"
+        },
+        {
+          "selector": "getCircleButtonImage:coler:",
+          "encoding": "@32@0:8@16@24",
+          "imp": "0x101a519e0",
+          "metadata_offset": "0x171fa854"
+        },
+        {
+          "selector": "genImageOfView:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a51b6c",
+          "metadata_offset": "0x171fa860"
+        },
+        {
+          "selector": "genDeleteConfirmIcon:",
+          "encoding": "@24@0:8Q16",
+          "imp": "0x101a51cfc",
+          "metadata_offset": "0x171fa86c"
+        },
+        {
+          "selector": "genEraseConfirmIcon",
+          "encoding": "@16@0:8",
+          "imp": "0x101a52244",
+          "metadata_offset": "0x171fa878"
+        },
+        {
+          "selector": "genNormalCell:indexPath:",
+          "encoding": "v32@0:8@16@24",
+          "imp": "0x101a52918",
+          "metadata_offset": "0x171fa884"
+        },
+        {
+          "selector": "getCellViewWithCellId:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a52dc4",
+          "metadata_offset": "0x171fa890"
+        },
+        {
+          "selector": "getCellViewAtIndex:",
+          "encoding": "@24@0:8q16",
+          "imp": "0x101a52ddc",
+          "metadata_offset": "0x171fa89c"
+        },
+        {
+          "selector": "tableView:commitEditingStyle:forRowAtIndexPath:",
+          "encoding": "v40@0:8@16q24@32",
+          "imp": "0x101a5310c",
+          "metadata_offset": "0x171fa8a8"
+        },
+        {
+          "selector": "getSelectedStateWith:",
+          "encoding": "B24@0:8q16",
+          "imp": "0x101a531b4",
+          "metadata_offset": "0x171fa8b4"
+        },
+        {
+          "selector": "selectedItemButWebPageCount",
+          "encoding": "I16@0:8",
+          "imp": "0x101a5320c",
+          "metadata_offset": "0x171fa8c0"
+        },
+        {
+          "selector": "executeFoldPinTopItem",
+          "encoding": "v16@0:8",
+          "imp": "0x101a5333c",
+          "metadata_offset": "0x171fa8cc"
+        },
+        {
+          "selector": "executeFoldPinTopItemDirectWithAnimation",
+          "encoding": "v16@0:8",
+          "imp": "0x101a53504",
+          "metadata_offset": "0x171fa8d8"
+        },
+        {
+          "selector": "executeFoldPinTopItemStep1",
+          "encoding": "v16@0:8",
+          "imp": "0x101a53844",
+          "metadata_offset": "0x171fa8e4"
+        },
+        {
+          "selector": "executeFoldPinTopItemStep2",
+          "encoding": "v16@0:8",
+          "imp": "0x101a53b34",
+          "metadata_offset": "0x171fa8f0"
+        },
+        {
+          "selector": "executeUnfoldPinTopItem",
+          "encoding": "v16@0:8",
+          "imp": "0x101a53e90",
+          "metadata_offset": "0x171fa8fc"
+        },
+        {
+          "selector": "tableView:willSelectRowAtIndexPath:",
+          "encoding": "@32@0:8@16@24",
+          "imp": "0x101a54140",
+          "metadata_offset": "0x171fa908"
+        },
+        {
+          "selector": "tableView:didSelectRowAtIndexPath:",
+          "encoding": "v32@0:8@16@24",
+          "imp": "0x101a5424c",
+          "metadata_offset": "0x171fa914"
+        },
+        {
+          "selector": "normalizedSelectionKeyForData:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a54734",
+          "metadata_offset": "0x171fa920"
+        },
+        {
+          "selector": "replaceSelectionWithDataList:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a54938",
+          "metadata_offset": "0x171fa92c"
+        },
+        {
+          "selector": "areDataListItemsSelected:",
+          "encoding": "B24@0:8@16",
+          "imp": "0x101a54ac4",
+          "metadata_offset": "0x171fa938"
+        },
+        {
+          "selector": "isSelectionSubsetOfDataList:",
+          "encoding": "B24@0:8@16",
+          "imp": "0x101a54ca8",
+          "metadata_offset": "0x171fa944"
+        },
+        {
+          "selector": "isDataSelected:",
+          "encoding": "B24@0:8@16",
+          "imp": "0x101a54fdc",
+          "metadata_offset": "0x171fa950"
+        },
+        {
+          "selector": "isParentItemSelectedForData:",
+          "encoding": "B24@0:8@16",
+          "imp": "0x101a55094",
+          "metadata_offset": "0x171fa95c"
+        },
+        {
+          "selector": "unionSelectionWithDataList:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a551bc",
+          "metadata_offset": "0x171fa968"
+        },
+        {
+          "selector": "subtractSelectionWithDataList:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a55418",
+          "metadata_offset": "0x171fa974"
+        },
+        {
+          "selector": "modifySelectedDicWith:selected:",
+          "encoding": "B28@0:8@16B24",
+          "imp": "0x101a5566c",
+          "metadata_offset": "0x171fa980"
+        },
+        {
+          "selector": "scrollViewDidEndScrollingAnimation:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a55a90",
+          "metadata_offset": "0x171fa98c"
+        },
+        {
+          "selector": "scrollViewWillBeginDragging:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a55b6c",
+          "metadata_offset": "0x171fa998"
+        },
+        {
+          "selector": "scrollViewDidEndDragging:willDecelerate:",
+          "encoding": "v28@0:8@16B24",
+          "imp": "0x101a55c80",
+          "metadata_offset": "0x171fa9a4"
+        },
+        {
+          "selector": "scrollViewDidEndDecelerating:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a55e10",
+          "metadata_offset": "0x171fa9b0"
+        },
+        {
+          "selector": "autoScrollForSearchBar:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a55f34",
+          "metadata_offset": "0x171fa9bc"
+        },
+        {
+          "selector": "scrollViewDidScroll:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a55ff4",
+          "metadata_offset": "0x171fa9c8"
+        },
+        {
+          "selector": "onLoadMore",
+          "encoding": "v16@0:8",
+          "imp": "0x101a56160",
+          "metadata_offset": "0x171fa9d4"
+        },
+        {
+          "selector": "isFavPinTopFeatureEnabledForMenu",
+          "encoding": "B16@0:8",
+          "imp": "0x101a561f4",
+          "metadata_offset": "0x171fa9e0"
+        },
+        {
+          "selector": "onMenuOptionsShowOnCell:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a56200",
+          "metadata_offset": "0x171fa9ec"
+        },
+        {
+          "selector": "onMenuTransitionToConfirmState:forRowAtIndexPath:",
+          "encoding": "v32@0:8q16@24",
+          "imp": "0x101a5634c",
+          "metadata_offset": "0x171fa9f8"
+        },
+        {
+          "selector": "getDataAtIndexPath:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a56428",
+          "metadata_offset": "0x171faa04"
+        },
+        {
+          "selector": "performAction:forRowAtIndexPath:",
+          "encoding": "v32@0:8:16@24",
+          "imp": "0x101a56464",
+          "metadata_offset": "0x171faa10"
+        },
+        {
+          "selector": "processNextPinTopChangeTask",
+          "encoding": "v16@0:8",
+          "imp": "0x101a564d8",
+          "metadata_offset": "0x171faa1c"
+        },
+        {
+          "selector": "updateItemBecausePinTopChange:shouldShowToast:isFromMock:",
+          "encoding": "v32@0:8@16B24B28",
+          "imp": "0x101a56800",
+          "metadata_offset": "0x171faa28"
+        },
+        {
+          "selector": "refreshFavItemPinTopAppearanceAtIndex:withItem:",
+          "encoding": "v32@0:8q16@24",
+          "imp": "0x101a569f4",
+          "metadata_offset": "0x171faa34"
+        },
+        {
+          "selector": "reloadFavItemCellAtIndex:withItem:",
+          "encoding": "v32@0:8q16@24",
+          "imp": "0x101a56d38",
+          "metadata_offset": "0x171faa40"
+        },
+        {
+          "selector": "updateItemBecausePinTopChangeOutOfQueue:shouldShowToast:isFromMock:completion:",
+          "encoding": "v40@0:8@16B24B28@?32",
+          "imp": "0x101a57134",
+          "metadata_offset": "0x171faa4c"
+        },
+        {
+          "selector": "onRepairUpdateFavItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a57cf8",
+          "metadata_offset": "0x171faa58"
+        },
+        {
+          "selector": "OnUploadFavoritesItemFinish:ErrCode:",
+          "encoding": "v28@0:8@16i24",
+          "imp": "0x101a57d9c",
+          "metadata_offset": "0x171faa64"
+        },
+        {
+          "selector": "OnDelFavoritesItems:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a57f38",
+          "metadata_offset": "0x171faa70"
+        },
+        {
+          "selector": "OnUpdateItems:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a584e4",
+          "metadata_offset": "0x171faa7c"
+        },
+        {
+          "selector": "updateItemsFromPinTopServer:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a58590",
+          "metadata_offset": "0x171faa88"
+        },
+        {
+          "selector": "OnCacheWebFinish:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a58b18",
+          "metadata_offset": "0x171faa94"
+        },
+        {
+          "selector": "OnFavoritesItemDownloadFinished:ErrCode:",
+          "encoding": "v28@0:8@16i24",
+          "imp": "0x101a58bd8",
+          "metadata_offset": "0x171faaa0"
+        },
+        {
+          "selector": "indexForFavItemLocalId:",
+          "encoding": "q20@0:8I16",
+          "imp": "0x101a58c98",
+          "metadata_offset": "0x171faaac"
+        },
+        {
+          "selector": "inMemoryFavItemAtIndex:",
+          "encoding": "@24@0:8q16",
+          "imp": "0x101a58e3c",
+          "metadata_offset": "0x171faab8"
+        },
+        {
+          "selector": "isTagIdList:equalTo:",
+          "encoding": "B32@0:8@16@24",
+          "imp": "0x101a58ef0",
+          "metadata_offset": "0x171faac4"
+        },
+        {
+          "selector": "isStringTagList:equalTo:",
+          "encoding": "B32@0:8@16@24",
+          "imp": "0x101a58f9c",
+          "metadata_offset": "0x171faad0"
+        },
+        {
+          "selector": "partialChangeReasonFromCachedItem:toItem:",
+          "encoding": "Q32@0:8@16@24",
+          "imp": "0x101a59048",
+          "metadata_offset": "0x171faadc"
+        },
+        {
+          "selector": "isFavItemDisplayContentEqualBetweenCached:andItem:",
+          "encoding": "B32@0:8@16@24",
+          "imp": "0x101a593ec",
+          "metadata_offset": "0x171faae8"
+        },
+        {
+          "selector": "isFavItemDataListSnapshotEqual:listB:",
+          "encoding": "B32@0:8@16@24",
+          "imp": "0x101a59718",
+          "metadata_offset": "0x171faaf4"
+        },
+        {
+          "selector": "isFavItemMetadataOnlyUpdateFromCached:toItem:",
+          "encoding": "B32@0:8@16@24",
+          "imp": "0x101a599ec",
+          "metadata_offset": "0x171fab00"
+        },
+        {
+          "selector": "mergeFavItemMetadataFrom:toCached:",
+          "encoding": "v32@0:8@16@24",
+          "imp": "0x101a59d20",
+          "metadata_offset": "0x171fab0c"
+        },
+        {
+          "selector": "applyPartialUpdateForItem:atIndex:reason:source:",
+          "encoding": "B48@0:8@16q24Q32@40",
+          "imp": "0x101a59e80",
+          "metadata_offset": "0x171fab18"
+        },
+        {
+          "selector": "OnFavItemPartialChanged:reason:",
+          "encoding": "v32@0:8@16Q24",
+          "imp": "0x101a5a2cc",
+          "metadata_offset": "0x171fab24"
+        },
+        {
+          "selector": "updateItems:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a5a6cc",
+          "metadata_offset": "0x171fab30"
+        },
+        {
+          "selector": "findFavData:inDataList:",
+          "encoding": "B32@0:8@16@24",
+          "imp": "0x101a5b840",
+          "metadata_offset": "0x171fab3c"
+        },
+        {
+          "selector": "isOnSearch",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5ba70",
+          "metadata_offset": "0x171fab48"
+        },
+        {
+          "selector": "isNewSearchMode",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5bb40",
+          "metadata_offset": "0x171fab54"
+        },
+        {
+          "selector": "handlePinTopResult:success:isPinTop:isFromMock:",
+          "encoding": "v36@0:8@16B24B28B32",
+          "imp": "0x101a5bc10",
+          "metadata_offset": "0x171fab60"
+        },
+        {
+          "selector": "OnPinTopFavItemSuccess:isFromMock:",
+          "encoding": "v28@0:8@16B24",
+          "imp": "0x101a5bf60",
+          "metadata_offset": "0x171fab6c"
+        },
+        {
+          "selector": "OnPinTopFavItemFail:errorCode:",
+          "encoding": "v28@0:8@16i24",
+          "imp": "0x101a5bf78",
+          "metadata_offset": "0x171fab78"
+        },
+        {
+          "selector": "OnCancelPinTopFavItemSuccess:isFromMock:",
+          "encoding": "v28@0:8@16B24",
+          "imp": "0x101a5bf90",
+          "metadata_offset": "0x171fab84"
+        },
+        {
+          "selector": "OnCancelPinTopFavItemFail:errorCode:",
+          "encoding": "v28@0:8@16i24",
+          "imp": "0x101a5bfa8",
+          "metadata_offset": "0x171fab90"
+        },
+        {
+          "selector": "mmkvKeyForFoldingState",
+          "encoding": "@16@0:8",
+          "imp": "0x101a5bfc0",
+          "metadata_offset": "0x171fab9c"
+        },
+        {
+          "selector": "initFoldingMMKV",
+          "encoding": "v16@0:8",
+          "imp": "0x101a5c084",
+          "metadata_offset": "0x171faba8"
+        },
+        {
+          "selector": "loadFoldingStateFromMMKV",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c128",
+          "metadata_offset": "0x171fabb4"
+        },
+        {
+          "selector": "saveFoldingStateToMMKV:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a5c1a4",
+          "metadata_offset": "0x171fabc0"
+        },
+        {
+          "selector": "syncFoldStatusFromLocal",
+          "encoding": "v16@0:8",
+          "imp": "0x101a5c21c",
+          "metadata_offset": "0x171fabcc"
+        },
+        {
+          "selector": "hasMoreData",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c368",
+          "metadata_offset": "0x171fabd8"
+        },
+        {
+          "selector": "itemEditable",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c378",
+          "metadata_offset": "0x171fabe4"
+        },
+        {
+          "selector": "setItemEditable:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a5c388",
+          "metadata_offset": "0x171fabf0"
+        },
+        {
+          "selector": "multiSelecting",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c398",
+          "metadata_offset": "0x171fabfc"
+        },
+        {
+          "selector": "cellStyle",
+          "encoding": "Q16@0:8",
+          "imp": "0x101a5c3a8",
+          "metadata_offset": "0x171fac08"
+        },
+        {
+          "selector": "setCellStyle:",
+          "encoding": "v24@0:8Q16",
+          "imp": "0x101a5c3b8",
+          "metadata_offset": "0x171fac14"
+        },
+        {
+          "selector": "multiSelectCellStyle",
+          "encoding": "Q16@0:8",
+          "imp": "0x101a5c3c8",
+          "metadata_offset": "0x171fac20"
+        },
+        {
+          "selector": "usesDataItemSelectionKey",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c3d8",
+          "metadata_offset": "0x171fac2c"
+        },
+        {
+          "selector": "setUsesDataItemSelectionKey:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a5c3e8",
+          "metadata_offset": "0x171fac38"
+        },
+        {
+          "selector": "preservesSelectionOnClearData",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c3f8",
+          "metadata_offset": "0x171fac44"
+        },
+        {
+          "selector": "setPreservesSelectionOnClearData:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a5c408",
+          "metadata_offset": "0x171fac50"
+        },
+        {
+          "selector": "searchBarHeight",
+          "encoding": "d16@0:8",
+          "imp": "0x101a5c418",
+          "metadata_offset": "0x171fac5c"
+        },
+        {
+          "selector": "setSearchBarHeight:",
+          "encoding": "v24@0:8d16",
+          "imp": "0x101a5c428",
+          "metadata_offset": "0x171fac68"
+        },
+        {
+          "selector": "tableView",
+          "encoding": "@16@0:8",
+          "imp": "0x101a5c438",
+          "metadata_offset": "0x171fac74"
+        },
+        {
+          "selector": "setTableView:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a5c448",
+          "metadata_offset": "0x171fac80"
+        },
+        {
+          "selector": "highLightContent",
+          "encoding": "@16@0:8",
+          "imp": "0x101a5c45c",
+          "metadata_offset": "0x171fac8c"
+        },
+        {
+          "selector": "setHighLightContent:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a5c46c",
+          "metadata_offset": "0x171fac98"
+        },
+        {
+          "selector": "highLightKeywords",
+          "encoding": "@16@0:8",
+          "imp": "0x101a5c480",
+          "metadata_offset": "0x171faca4"
+        },
+        {
+          "selector": "setHighLightKeywords:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a5c490",
+          "metadata_offset": "0x171facb0"
+        },
+        {
+          "selector": "sortUnuploadedItem",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c4a4",
+          "metadata_offset": "0x171facbc"
+        },
+        {
+          "selector": "setSortUnuploadedItem:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a5c4b4",
+          "metadata_offset": "0x171facc8"
+        },
+        {
+          "selector": "showDataSize",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c4c4",
+          "metadata_offset": "0x171facd4"
+        },
+        {
+          "selector": "setShowDataSize:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a5c4d4",
+          "metadata_offset": "0x171face0"
+        },
+        {
+          "selector": "showEraseBtn",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c4e4",
+          "metadata_offset": "0x171facec"
+        },
+        {
+          "selector": "setShowEraseBtn:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a5c4f4",
+          "metadata_offset": "0x171facf8"
+        },
+        {
+          "selector": "maxSelectedCount",
+          "encoding": "Q16@0:8",
+          "imp": "0x101a5c504",
+          "metadata_offset": "0x171fad04"
+        },
+        {
+          "selector": "setMaxSelectedCount:",
+          "encoding": "v24@0:8Q16",
+          "imp": "0x101a5c514",
+          "metadata_offset": "0x171fad10"
+        },
+        {
+          "selector": "cellSpacing",
+          "encoding": "d16@0:8",
+          "imp": "0x101a5c524",
+          "metadata_offset": "0x171fad1c"
+        },
+        {
+          "selector": "setCellSpacing:",
+          "encoding": "v24@0:8d16",
+          "imp": "0x101a5c534",
+          "metadata_offset": "0x171fad28"
+        },
+        {
+          "selector": "showsFirstSectionTopSpacing",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c544",
+          "metadata_offset": "0x171fad34"
+        },
+        {
+          "selector": "decouplesSelectionFromParentItem",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c554",
+          "metadata_offset": "0x171fad40"
+        },
+        {
+          "selector": "setDecouplesSelectionFromParentItem:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a5c564",
+          "metadata_offset": "0x171fad4c"
+        },
+        {
+          "selector": "foldButtonAddedInList",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c574",
+          "metadata_offset": "0x171fad58"
+        },
+        {
+          "selector": "setFoldButtonAddedInList:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a5c584",
+          "metadata_offset": "0x171fad64"
+        },
+        {
+          "selector": "folding",
+          "encoding": "B16@0:8",
+          "imp": "0x101a5c594",
+          "metadata_offset": "0x171fad70"
+        },
+        {
+          "selector": "setFolding:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a5c5a4",
+          "metadata_offset": "0x171fad7c"
+        },
+        {
+          "selector": "delegate",
+          "encoding": "@16@0:8",
+          "imp": "0x101a5c5b4",
+          "metadata_offset": "0x171fad88"
+        },
+        {
+          "selector": "setDelegate:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a5c5d4",
+          "metadata_offset": "0x171fad94"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8",
+          "imp": "0x101a5c5e8",
+          "metadata_offset": "0x171fada0"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_bAnimating",
+          "encoding": "B"
+        },
+        {
+          "name": "m_bReadyToLoad",
+          "encoding": "B"
+        },
+        {
+          "name": "m_bNowScrollBecauseWantFold",
+          "encoding": "B"
+        },
+        {
+          "name": "m_editingMenuTableCell",
+          "encoding": "@\"FavMultiMenuTableViewCell\""
+        },
+        {
+          "name": "m_cellViewCache",
+          "encoding": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "m_mutiSelectedCellHeightCache",
+          "encoding": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "m_activityView",
+          "encoding": "@\"MMUIActivityIndicatorView\""
+        },
+        {
+          "name": "m_footerView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "m_endLineView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "m_cellIdentifier",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "m_arrFavDataWrap",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_arrFavItem",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_arrFavPinTopHiddenItem",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_selectedItemsDict",
+          "encoding": "@\"OrderedDictionary\""
+        },
+        {
+          "name": "arrFavPinTopHoddenSizeOnUiFix",
+          "encoding": "q"
+        },
+        {
+          "name": "m_foldingMMKV",
+          "encoding": "@\"MemoryMappedKV\""
+        },
+        {
+          "name": "m_animationConcurrencyCounter",
+          "encoding": "q"
+        },
+        {
+          "name": "m_pinTopChangeTaskQueue",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_isProcessingPinTopChangeTask",
+          "encoding": "B"
+        },
+        {
+          "name": "_hasMoreData",
+          "encoding": "B"
+        },
+        {
+          "name": "_itemEditable",
+          "encoding": "B"
+        },
+        {
+          "name": "_multiSelecting",
+          "encoding": "B"
+        },
+        {
+          "name": "_usesDataItemSelectionKey",
+          "encoding": "B"
+        },
+        {
+          "name": "_preservesSelectionOnClearData",
+          "encoding": "B"
+        },
+        {
+          "name": "_sortUnuploadedItem",
+          "encoding": "B"
+        },
+        {
+          "name": "_showDataSize",
+          "encoding": "B"
+        },
+        {
+          "name": "_showEraseBtn",
+          "encoding": "B"
+        },
+        {
+          "name": "_showsFirstSectionTopSpacing",
+          "encoding": "B"
+        },
+        {
+          "name": "_decouplesSelectionFromParentItem",
+          "encoding": "B"
+        },
+        {
+          "name": "_foldButtonAddedInList",
+          "encoding": "B"
+        },
+        {
+          "name": "_folding",
+          "encoding": "B"
+        },
+        {
+          "name": "_cellStyle",
+          "encoding": "Q"
+        },
+        {
+          "name": "_multiSelectCellStyle",
+          "encoding": "Q"
+        },
+        {
+          "name": "_searchBarHeight",
+          "encoding": "d"
+        },
+        {
+          "name": "_tableView",
+          "encoding": "@\"UITableView\""
+        },
+        {
+          "name": "_highLightContent",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_highLightKeywords",
+          "encoding": "@\"NSArray\""
+        },
+        {
+          "name": "_maxSelectedCount",
+          "encoding": "Q"
+        },
+        {
+          "name": "_cellSpacing",
+          "encoding": "d"
+        },
+        {
+          "name": "_delegate",
+          "encoding": "@\"<FavBaseTableDataControllerDelegate>\""
+        }
+      ]
+    },
+    {
+      "name": "FavBaseListViewController",
+      "class_offset": "0x1ee85ee8",
+      "superclass": "MMUIViewController",
+      "methods": [
+        {
+          "selector": "usesFilterRedesignUI",
+          "encoding": "B16@0:8",
+          "imp": "0x101a1ed48",
+          "metadata_offset": "0x171f91e0"
+        },
+        {
+          "selector": "activeTopFilterView",
+          "encoding": "@16@0:8",
+          "imp": "0x101a1ed5c",
+          "metadata_offset": "0x171f91ec"
+        },
+        {
+          "selector": "activeExtendFilterPanelView",
+          "encoding": "@16@0:8",
+          "imp": "0x101a1edb4",
+          "metadata_offset": "0x171f91f8"
+        },
+        {
+          "selector": "activeTopFilter_updateWithWidth:",
+          "encoding": "v24@0:8d16",
+          "imp": "0x101a1ee0c",
+          "metadata_offset": "0x171f9204"
+        },
+        {
+          "selector": "activeTopFilter_setTypes:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a1ee9c",
+          "metadata_offset": "0x171f9210"
+        },
+        {
+          "selector": "activeTopFilter_setTags:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a1ef30",
+          "metadata_offset": "0x171f921c"
+        },
+        {
+          "selector": "activeTopFilter_setSelectedTypeNames:selectedTagNames:",
+          "encoding": "v32@0:8@16@24",
+          "imp": "0x101a1efc4",
+          "metadata_offset": "0x171f9228"
+        },
+        {
+          "selector": "activeExtendPanel_updateWithWidth:",
+          "encoding": "v24@0:8d16",
+          "imp": "0x101a1f058",
+          "metadata_offset": "0x171f9234"
+        },
+        {
+          "selector": "activeExtendPanel_clearSelection",
+          "encoding": "v16@0:8",
+          "imp": "0x101a1f0e8",
+          "metadata_offset": "0x171f9240"
+        },
+        {
+          "selector": "clearRedesignActiveFiltersKeepDisplayedChips",
+          "encoding": "v16@0:8",
+          "imp": "0x101a1f13c",
+          "metadata_offset": "0x171f924c"
+        },
+        {
+          "selector": "resetRedesignFilterSession",
+          "encoding": "v16@0:8",
+          "imp": "0x101a1f248",
+          "metadata_offset": "0x171f9258"
+        },
+        {
+          "selector": "activeExtendPanel_setTag:selected:",
+          "encoding": "v28@0:8@16B24",
+          "imp": "0x101a1f3c8",
+          "metadata_offset": "0x171f9264"
+        },
+        {
+          "selector": "activeExtendPanel_setTags:withTitle:",
+          "encoding": "v32@0:8@16@24",
+          "imp": "0x101a1f470",
+          "metadata_offset": "0x171f9270"
+        },
+        {
+          "selector": "activeExtendPanel_selectType:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a1f528",
+          "metadata_offset": "0x171f927c"
+        },
+        {
+          "selector": "activeExtendPanel_cancelType",
+          "encoding": "v16@0:8",
+          "imp": "0x101a1f5bc",
+          "metadata_offset": "0x171f9288"
+        },
+        {
+          "selector": "activeExtendPanel_setTypes:withTitle:",
+          "encoding": "v32@0:8@16@24",
+          "imp": "0x101a1f634",
+          "metadata_offset": "0x171f9294"
+        },
+        {
+          "selector": "activeExtendPanel_setQuickFilters:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a1f6ec",
+          "metadata_offset": "0x171f92a0"
+        },
+        {
+          "selector": "activeExtendPanel_setQuickFilterSelectedNames:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a1f780",
+          "metadata_offset": "0x171f92ac"
+        },
+        {
+          "selector": "activeExtendPanel_resetScrollPosition",
+          "encoding": "v16@0:8",
+          "imp": "0x101a1f814",
+          "metadata_offset": "0x171f92b8"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8",
+          "imp": "0x101a1f88c",
+          "metadata_offset": "0x171f92c4"
+        },
+        {
+          "selector": "isDualTabMode",
+          "encoding": "B16@0:8",
+          "imp": "0x101a1f89c",
+          "metadata_offset": "0x171f92d0"
+        },
+        {
+          "selector": "initWithFilterTypeDic:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a1f8c0",
+          "metadata_offset": "0x171f92dc"
+        },
+        {
+          "selector": "preSetSelectedType:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a1fc64",
+          "metadata_offset": "0x171f92e8"
+        },
+        {
+          "selector": "itemTypeBitForPresetFilter:",
+          "encoding": "@24@0:8q16",
+          "imp": "0x101a1fde0",
+          "metadata_offset": "0x171f92f4"
+        },
+        {
+          "selector": "preSetSelectedFilter:",
+          "encoding": "v24@0:8q16",
+          "imp": "0x101a1fe2c",
+          "metadata_offset": "0x171f9300"
+        },
+        {
+          "selector": "scrollToTop",
+          "encoding": "v16@0:8",
+          "imp": "0x101a20180",
+          "metadata_offset": "0x171f930c"
+        },
+        {
+          "selector": "beginLongPressNoteConversionSnapshot",
+          "encoding": "@16@0:8",
+          "imp": "0x101a201dc",
+          "metadata_offset": "0x171f9318"
+        },
+        {
+          "selector": "finishLongPressNoteConversionSnapshot:completed:",
+          "encoding": "v28@0:8@16B24",
+          "imp": "0x101a2067c",
+          "metadata_offset": "0x171f9324"
+        },
+        {
+          "selector": "prepareFlatPOILocationForDisplayType:",
+          "encoding": "v24@0:8q16",
+          "imp": "0x101a20834",
+          "metadata_offset": "0x171f9330"
+        },
+        {
+          "selector": "distanceFromCurrentLocationForFlatPOIDataWrap:",
+          "encoding": "d24@0:8@16",
+          "imp": "0x101a2098c",
+          "metadata_offset": "0x171f933c"
+        },
+        {
+          "selector": "sortedFlatPOIDataWraps:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a20b0c",
+          "metadata_offset": "0x171f9348"
+        },
+        {
+          "selector": "reloadFlatPOIData",
+          "encoding": "v16@0:8",
+          "imp": "0x101a20c98",
+          "metadata_offset": "0x171f9354"
+        },
+        {
+          "selector": "updateData",
+          "encoding": "v16@0:8",
+          "imp": "0x101a20e88",
+          "metadata_offset": "0x171f9360"
+        },
+        {
+          "selector": "updateReport",
+          "encoding": "v16@0:8",
+          "imp": "0x101a21d10",
+          "metadata_offset": "0x171f936c"
+        },
+        {
+          "selector": "entranceScene",
+          "encoding": "I16@0:8",
+          "imp": "0x101a220f0",
+          "metadata_offset": "0x171f9378"
+        },
+        {
+          "selector": "getTagSearchScene",
+          "encoding": "I16@0:8",
+          "imp": "0x101a22218",
+          "metadata_offset": "0x171f9384"
+        },
+        {
+          "selector": "itemEditable",
+          "encoding": "B16@0:8",
+          "imp": "0x101a222c8",
+          "metadata_offset": "0x171f9390"
+        },
+        {
+          "selector": "viewDidLoad",
+          "encoding": "v16@0:8",
+          "imp": "0x101a222e0",
+          "metadata_offset": "0x171f939c"
+        },
+        {
+          "selector": "setupAIAskButtonIfNeeded",
+          "encoding": "v16@0:8",
+          "imp": "0x101a22458",
+          "metadata_offset": "0x171f93a8"
+        },
+        {
+          "selector": "refreshAIAskButton",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2252c",
+          "metadata_offset": "0x171f93b4"
+        },
+        {
+          "selector": "traitCollectionDidChange:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a2256c",
+          "metadata_offset": "0x171f93c0"
+        },
+        {
+          "selector": "favAIAskButtonIsOnSearch",
+          "encoding": "B16@0:8",
+          "imp": "0x101a22684",
+          "metadata_offset": "0x171f93cc"
+        },
+        {
+          "selector": "favAIAskButtonIsSearchBarFirstResponder",
+          "encoding": "B16@0:8",
+          "imp": "0x101a22690",
+          "metadata_offset": "0x171f93d8"
+        },
+        {
+          "selector": "viewWillAppear:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a226a8",
+          "metadata_offset": "0x171f93e4"
+        },
+        {
+          "selector": "viewDidAppear:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a22c60",
+          "metadata_offset": "0x171f93f0"
+        },
+        {
+          "selector": "shouldPreloadVisibleFavMPArticles",
+          "encoding": "B16@0:8",
+          "imp": "0x101a22eec",
+          "metadata_offset": "0x171f93fc"
+        },
+        {
+          "selector": "schedulePreloadVisibleFavMPArticles",
+          "encoding": "v16@0:8",
+          "imp": "0x101a22ef4",
+          "metadata_offset": "0x171f9408"
+        },
+        {
+          "selector": "onScrollViewDidBecomeIdle:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a23294",
+          "metadata_offset": "0x171f9414"
+        },
+        {
+          "selector": "viewWillDisappear:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a232b8",
+          "metadata_offset": "0x171f9420"
+        },
+        {
+          "selector": "viewDidDisappear:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a23310",
+          "metadata_offset": "0x171f942c"
+        },
+        {
+          "selector": "viewDidBePushed:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a2336c",
+          "metadata_offset": "0x171f9438"
+        },
+        {
+          "selector": "viewDidBeDismissed:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a235c4",
+          "metadata_offset": "0x171f9444"
+        },
+        {
+          "selector": "viewDidBePoped:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a23660",
+          "metadata_offset": "0x171f9450"
+        },
+        {
+          "selector": "cancelServerSearch",
+          "encoding": "v16@0:8",
+          "imp": "0x101a236fc",
+          "metadata_offset": "0x171f945c"
+        },
+        {
+          "selector": "clearSearch",
+          "encoding": "v16@0:8",
+          "imp": "0x101a23714",
+          "metadata_offset": "0x171f9468"
+        },
+        {
+          "selector": "viewDidTransitionToNewSize",
+          "encoding": "v16@0:8",
+          "imp": "0x101a23998",
+          "metadata_offset": "0x171f9474"
+        },
+        {
+          "selector": "viewDidLayoutSubviews",
+          "encoding": "v16@0:8",
+          "imp": "0x101a23a40",
+          "metadata_offset": "0x171f9480"
+        },
+        {
+          "selector": "keepsSearchHeaderInMultiSelect",
+          "encoding": "B16@0:8",
+          "imp": "0x101a23c58",
+          "metadata_offset": "0x171f948c"
+        },
+        {
+          "selector": "usesNewFavMultiSelectCheckBoxStyle",
+          "encoding": "B16@0:8",
+          "imp": "0x101a23c60",
+          "metadata_offset": "0x171f9498"
+        },
+        {
+          "selector": "feedFlowViewContentTop",
+          "encoding": "d16@0:8",
+          "imp": "0x101a23cf8",
+          "metadata_offset": "0x171f94a4"
+        },
+        {
+          "selector": "updateFeedFlowViewFrame",
+          "encoding": "v16@0:8",
+          "imp": "0x101a23d74",
+          "metadata_offset": "0x171f94b0"
+        },
+        {
+          "selector": "updateContentFrame",
+          "encoding": "v16@0:8",
+          "imp": "0x101a23ee4",
+          "metadata_offset": "0x171f94bc"
+        },
+        {
+          "selector": "isEnableShowPinTop",
+          "encoding": "B16@0:8",
+          "imp": "0x101a24250",
+          "metadata_offset": "0x171f94c8"
+        },
+        {
+          "selector": "didReceiveMemoryWarning",
+          "encoding": "v16@0:8",
+          "imp": "0x101a24258",
+          "metadata_offset": "0x171f94d4"
+        },
+        {
+          "selector": "dealloc",
+          "encoding": "v16@0:8",
+          "imp": "0x101a242b0",
+          "metadata_offset": "0x171f94e0"
+        },
+        {
+          "selector": "initNavigationBar",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2448c",
+          "metadata_offset": "0x171f94ec"
+        },
+        {
+          "selector": "initTableView",
+          "encoding": "v16@0:8",
+          "imp": "0x101a247f0",
+          "metadata_offset": "0x171f94f8"
+        },
+        {
+          "selector": "applyRedesignTableViewSectionLayoutIfNeeded",
+          "encoding": "v16@0:8",
+          "imp": "0x101a24974",
+          "metadata_offset": "0x171f9504"
+        },
+        {
+          "selector": "initSearchType",
+          "encoding": "v16@0:8",
+          "imp": "0x101a249c8",
+          "metadata_offset": "0x171f9510"
+        },
+        {
+          "selector": "initSearchHeader",
+          "encoding": "v16@0:8",
+          "imp": "0x101a24c34",
+          "metadata_offset": "0x171f951c"
+        },
+        {
+          "selector": "updateSearchHeader",
+          "encoding": "v16@0:8",
+          "imp": "0x101a252b0",
+          "metadata_offset": "0x171f9528"
+        },
+        {
+          "selector": "updateSearchHeaderPreservingVisualOffset:",
+          "encoding": "v24@0:8d16",
+          "imp": "0x101a252c4",
+          "metadata_offset": "0x171f9534"
+        },
+        {
+          "selector": "updateRedesignSearchHeaderLayout",
+          "encoding": "v16@0:8",
+          "imp": "0x101a25688",
+          "metadata_offset": "0x171f9540"
+        },
+        {
+          "selector": "getRedesignFilterVerticalGap",
+          "encoding": "d16@0:8",
+          "imp": "0x101a25854",
+          "metadata_offset": "0x171f954c"
+        },
+        {
+          "selector": "getRedesignListContentTopY",
+          "encoding": "d16@0:8",
+          "imp": "0x101a25868",
+          "metadata_offset": "0x171f9558"
+        },
+        {
+          "selector": "getFavoritesListHeaderAnchorY",
+          "encoding": "d16@0:8",
+          "imp": "0x101a258d4",
+          "metadata_offset": "0x171f9564"
+        },
+        {
+          "selector": "getRedesignNavigationHeaderHeight",
+          "encoding": "d16@0:8",
+          "imp": "0x101a2595c",
+          "metadata_offset": "0x171f9570"
+        },
+        {
+          "selector": "getExtendPanelBottomCornerRadius",
+          "encoding": "d16@0:8",
+          "imp": "0x101a25968",
+          "metadata_offset": "0x171f957c"
+        },
+        {
+          "selector": "applyDuoFixedHeightToExtendPanel:panelTop:",
+          "encoding": "v32@0:8@16d24",
+          "imp": "0x101a259a4",
+          "metadata_offset": "0x171f9588"
+        },
+        {
+          "selector": "syncRedesignExtendPanelLayoutAnchor",
+          "encoding": "v16@0:8",
+          "imp": "0x101a25b04",
+          "metadata_offset": "0x171f9594"
+        },
+        {
+          "selector": "getHeaderContentInset",
+          "encoding": "d16@0:8",
+          "imp": "0x101a25bd4",
+          "metadata_offset": "0x171f95a0"
+        },
+        {
+          "selector": "getSearchBarBottom",
+          "encoding": "d16@0:8",
+          "imp": "0x101a25cfc",
+          "metadata_offset": "0x171f95ac"
+        },
+        {
+          "selector": "favNavigationBottom",
+          "encoding": "d16@0:8",
+          "imp": "0x101a25d14",
+          "metadata_offset": "0x171f95b8"
+        },
+        {
+          "selector": "getSearchBarTop",
+          "encoding": "d16@0:8",
+          "imp": "0x101a25dd0",
+          "metadata_offset": "0x171f95c4"
+        },
+        {
+          "selector": "initLoadingView",
+          "encoding": "v16@0:8",
+          "imp": "0x101a25df4",
+          "metadata_offset": "0x171f95d0"
+        },
+        {
+          "selector": "initEmptyView",
+          "encoding": "v16@0:8",
+          "imp": "0x101a26398",
+          "metadata_offset": "0x171f95dc"
+        },
+        {
+          "selector": "isExtendFilterPanelShowing",
+          "encoding": "B16@0:8",
+          "imp": "0x101a26914",
+          "metadata_offset": "0x171f95e8"
+        },
+        {
+          "selector": "hideSearchOverlaysForExtendFilterPanel",
+          "encoding": "v16@0:8",
+          "imp": "0x101a26970",
+          "metadata_offset": "0x171f95f4"
+        },
+        {
+          "selector": "restoreSearchOverlaysAfterExtendFilterPanelDismiss",
+          "encoding": "v16@0:8",
+          "imp": "0x101a269ec",
+          "metadata_offset": "0x171f9600"
+        },
+        {
+          "selector": "showSearchLoading",
+          "encoding": "v16@0:8",
+          "imp": "0x101a26bc0",
+          "metadata_offset": "0x171f960c"
+        },
+        {
+          "selector": "setSearchLoading:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a26bd0",
+          "metadata_offset": "0x171f9618"
+        },
+        {
+          "selector": "initEmptySearchLabel",
+          "encoding": "v16@0:8",
+          "imp": "0x101a26dc8",
+          "metadata_offset": "0x171f9624"
+        },
+        {
+          "selector": "setSearchEmpty:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a27010",
+          "metadata_offset": "0x171f9630"
+        },
+        {
+          "selector": "initFilterDataWithFilterTypeDic:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a27440",
+          "metadata_offset": "0x171f963c"
+        },
+        {
+          "selector": "prefetchFilterDataSynchronously",
+          "encoding": "v16@0:8",
+          "imp": "0x101a28478",
+          "metadata_offset": "0x171f9648"
+        },
+        {
+          "selector": "applyCachedFilterDataIfPossible:",
+          "encoding": "B24@0:8@16",
+          "imp": "0x101a28aa4",
+          "metadata_offset": "0x171f9654"
+        },
+        {
+          "selector": "checkFilterData",
+          "encoding": "v16@0:8",
+          "imp": "0x101a28df4",
+          "metadata_offset": "0x171f9660"
+        },
+        {
+          "selector": "onCheckTypeWithResultCount:",
+          "encoding": "v20@0:8i16",
+          "imp": "0x101a291b4",
+          "metadata_offset": "0x171f966c"
+        },
+        {
+          "selector": "getCheckedTypes",
+          "encoding": "@16@0:8",
+          "imp": "0x101a29360",
+          "metadata_offset": "0x171f9678"
+        },
+        {
+          "selector": "useBlackStatusbar",
+          "encoding": "B16@0:8",
+          "imp": "0x101a2953c",
+          "metadata_offset": "0x171f9684"
+        },
+        {
+          "selector": "showNavigationBarSepLine",
+          "encoding": "B16@0:8",
+          "imp": "0x101a29544",
+          "metadata_offset": "0x171f9690"
+        },
+        {
+          "selector": "useTransparentNavibar",
+          "encoding": "B16@0:8",
+          "imp": "0x101a2954c",
+          "metadata_offset": "0x171f969c"
+        },
+        {
+          "selector": "shouldResignSearchBarOnExtendFilter",
+          "encoding": "B16@0:8",
+          "imp": "0x101a29554",
+          "metadata_offset": "0x171f96a8"
+        },
+        {
+          "selector": "extendFilter",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2955c",
+          "metadata_offset": "0x171f96b4"
+        },
+        {
+          "selector": "gestureRecognizer:shouldReceiveTouch:",
+          "encoding": "B32@0:8@16@24",
+          "imp": "0x101a2a16c",
+          "metadata_offset": "0x171f96c0"
+        },
+        {
+          "selector": "dismissFilterPanel",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2a228",
+          "metadata_offset": "0x171f96cc"
+        },
+        {
+          "selector": "dismissFilterPanelWithAnimation:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a2a238",
+          "metadata_offset": "0x171f96d8"
+        },
+        {
+          "selector": "dismissFilterPanelEnd",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2a3d4",
+          "metadata_offset": "0x171f96e4"
+        },
+        {
+          "selector": "dismissFilterPanelComplete",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2a5cc",
+          "metadata_offset": "0x171f96f0"
+        },
+        {
+          "selector": "bringTopFilterBarToFront",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2a7a4",
+          "metadata_offset": "0x171f96fc"
+        },
+        {
+          "selector": "setSearchHeaderHidden:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a2a814",
+          "metadata_offset": "0x171f9708"
+        },
+        {
+          "selector": "getSearchBarHeight",
+          "encoding": "d16@0:8",
+          "imp": "0x101a2a9d4",
+          "metadata_offset": "0x171f9714"
+        },
+        {
+          "selector": "isSearchBarEditing",
+          "encoding": "B16@0:8",
+          "imp": "0x101a2aa50",
+          "metadata_offset": "0x171f9720"
+        },
+        {
+          "selector": "updateTypeFilterWith:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a2aa68",
+          "metadata_offset": "0x171f972c"
+        },
+        {
+          "selector": "updateTagFilter",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2b3bc",
+          "metadata_offset": "0x171f9738"
+        },
+        {
+          "selector": "isOnSearch",
+          "encoding": "B16@0:8",
+          "imp": "0x101a2b664",
+          "metadata_offset": "0x171f9744"
+        },
+        {
+          "selector": "isStarredOnlyFilterActive",
+          "encoding": "B16@0:8",
+          "imp": "0x101a2b75c",
+          "metadata_offset": "0x171f9750"
+        },
+        {
+          "selector": "getContentOffsetAfterAdd:",
+          "encoding": "d24@0:8@16",
+          "imp": "0x101a2b7a8",
+          "metadata_offset": "0x171f975c"
+        },
+        {
+          "selector": "getHeightForItem:",
+          "encoding": "d24@0:8@16",
+          "imp": "0x101a2ba84",
+          "metadata_offset": "0x171f9768"
+        },
+        {
+          "selector": "addItemList:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a2bb78",
+          "metadata_offset": "0x171f9774"
+        },
+        {
+          "selector": "addItemList:withAutoScrollToAddPositon:",
+          "encoding": "v28@0:8@16B24",
+          "imp": "0x101a2bb88",
+          "metadata_offset": "0x171f9780"
+        },
+        {
+          "selector": "reloadContent",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2bfe4",
+          "metadata_offset": "0x171f978c"
+        },
+        {
+          "selector": "hideLoadingView",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2c218",
+          "metadata_offset": "0x171f9798"
+        },
+        {
+          "selector": "shouldUseRecentFavoritesList",
+          "encoding": "B16@0:8",
+          "imp": "0x101a2c268",
+          "metadata_offset": "0x171f97a4"
+        },
+        {
+          "selector": "activeCategoryTypeBitForFilter",
+          "encoding": "q16@0:8",
+          "imp": "0x101a2c2c4",
+          "metadata_offset": "0x171f97b0"
+        },
+        {
+          "selector": "favSearchTypeMaskForItem:",
+          "encoding": "i24@0:8@16",
+          "imp": "0x101a2c408",
+          "metadata_offset": "0x171f97bc"
+        },
+        {
+          "selector": "favoritesItem:matchesTypeBit:",
+          "encoding": "B32@0:8@16q24",
+          "imp": "0x101a2c574",
+          "metadata_offset": "0x171f97c8"
+        },
+        {
+          "selector": "filterFavoritesItems:byTypeBit:",
+          "encoding": "@32@0:8@16q24",
+          "imp": "0x101a2c6b0",
+          "metadata_offset": "0x171f97d4"
+        },
+        {
+          "selector": "filteredRecentFavoritesItems",
+          "encoding": "@16@0:8",
+          "imp": "0x101a2c8b4",
+          "metadata_offset": "0x171f97e0"
+        },
+        {
+          "selector": "tearDownCategorySpecificResultViews",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2cdf4",
+          "metadata_offset": "0x171f97ec"
+        },
+        {
+          "selector": "presentFilteredItems:append:hasMoreData:",
+          "encoding": "B32@0:8@16B24B28",
+          "imp": "0x101a2d028",
+          "metadata_offset": "0x171f97f8"
+        },
+        {
+          "selector": "updateSearchEmptyStateAfterPresentingResults",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2e04c",
+          "metadata_offset": "0x171f9804"
+        },
+        {
+          "selector": "updateRecentData",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2e1b8",
+          "metadata_offset": "0x171f9810"
+        },
+        {
+          "selector": "initFeedFlowView",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2e20c",
+          "metadata_offset": "0x171f981c"
+        },
+        {
+          "selector": "convertFeedContentVMsToCustomBusinessFeedIDModels:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a2e50c",
+          "metadata_offset": "0x171f9828"
+        },
+        {
+          "selector": "setFeedDetailViewController:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a2e704",
+          "metadata_offset": "0x171f9834"
+        },
+        {
+          "selector": "getArrFinderItems",
+          "encoding": "@16@0:8",
+          "imp": "0x101a2e718",
+          "metadata_offset": "0x171f9840"
+        },
+        {
+          "selector": "filterNameForType:",
+          "encoding": "@24@0:8q16",
+          "imp": "0x101a2e728",
+          "metadata_offset": "0x171f984c"
+        },
+        {
+          "selector": "finderFilterContentHorizontalMargin",
+          "encoding": "d16@0:8",
+          "imp": "0x101a2e798",
+          "metadata_offset": "0x171f9858"
+        },
+        {
+          "selector": "finderFeedFlowView:edgeInsetsAtSection:",
+          "encoding": "{UIEdgeInsets=dddd}32@0:8@16Q24",
+          "imp": "0x101a2e8ec",
+          "metadata_offset": "0x171f9864"
+        },
+        {
+          "selector": "finderFeedFlowViewCurrentViewController:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a2e918",
+          "metadata_offset": "0x171f9870"
+        },
+        {
+          "selector": "finderFeedFlowView:cellConfigAtIndexPath:",
+          "encoding": "@32@0:8@16@24",
+          "imp": "0x101a2e91c",
+          "metadata_offset": "0x171f987c"
+        },
+        {
+          "selector": "finderFeedFlowView:requestDataWithType:",
+          "encoding": "v32@0:8@16Q24",
+          "imp": "0x101a2e9d8",
+          "metadata_offset": "0x171f9888"
+        },
+        {
+          "selector": "finderFeedFlowViewState:",
+          "encoding": "Q24@0:8@16",
+          "imp": "0x101a2ea74",
+          "metadata_offset": "0x171f9894"
+        },
+        {
+          "selector": "finderFeedFlowViewDidScroll:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a2ea84",
+          "metadata_offset": "0x171f98a0"
+        },
+        {
+          "selector": "finderFeedFlowView:numberOfItemsInSection:",
+          "encoding": "q32@0:8@16q24",
+          "imp": "0x101a2eaf0",
+          "metadata_offset": "0x171f98ac"
+        },
+        {
+          "selector": "finderFeedFlowView:contentVMAtIndexPath:",
+          "encoding": "@32@0:8@16@24",
+          "imp": "0x101a2eb08",
+          "metadata_offset": "0x171f98b8"
+        },
+        {
+          "selector": "initFastBrowserView",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2eb4c",
+          "metadata_offset": "0x171f98c4"
+        },
+        {
+          "selector": "didAddFavBrowseCollectionView",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2f098",
+          "metadata_offset": "0x171f98d0"
+        },
+        {
+          "selector": "initFastBrowserViewFooterView",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2f09c",
+          "metadata_offset": "0x171f98dc"
+        },
+        {
+          "selector": "tryOpenBrandMpVideoWithInfo:thumbView:",
+          "encoding": "B32@0:8@16@24",
+          "imp": "0x101a2f4e0",
+          "metadata_offset": "0x171f98e8"
+        },
+        {
+          "selector": "onShowEmptyView",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2f7a4",
+          "metadata_offset": "0x171f98f4"
+        },
+        {
+          "selector": "isNewSearchMode",
+          "encoding": "B16@0:8",
+          "imp": "0x101a2f88c",
+          "metadata_offset": "0x171f9900"
+        },
+        {
+          "selector": "onHideEmptyView",
+          "encoding": "v16@0:8",
+          "imp": "0x101a2f894",
+          "metadata_offset": "0x171f990c"
+        },
+        {
+          "selector": "onUpdateUnexistItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a2f938",
+          "metadata_offset": "0x171f9918"
+        },
+        {
+          "selector": "onSelectRowAtIndexPath:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a2fa24",
+          "metadata_offset": "0x171f9924"
+        },
+        {
+          "selector": "onSelectLocationItemAtIndexPath:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a2ffd0",
+          "metadata_offset": "0x171f9930"
+        },
+        {
+          "selector": "onScrollViewDidScroll:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a300f8",
+          "metadata_offset": "0x171f993c"
+        },
+        {
+          "selector": "onScrollViewWillBeginDragging:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a301f4",
+          "metadata_offset": "0x171f9948"
+        },
+        {
+          "selector": "getSelectedType",
+          "encoding": "q16@0:8",
+          "imp": "0x101a3020c",
+          "metadata_offset": "0x171f9954"
+        },
+        {
+          "selector": "onGetLocationSuccess:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3021c",
+          "metadata_offset": "0x171f9960"
+        },
+        {
+          "selector": "onGetLocationFailedWithReason:",
+          "encoding": "v24@0:8Q16",
+          "imp": "0x101a30318",
+          "metadata_offset": "0x171f996c"
+        },
+        {
+          "selector": "OnHasAnyFavoriteData:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a30374",
+          "metadata_offset": "0x171f9978"
+        },
+        {
+          "selector": "OnGetFirstPageFavoritesItemList:IsSuccess:HasMoreItems:tabMode:",
+          "encoding": "v40@0:8@16B24B28q32",
+          "imp": "0x101a30448",
+          "metadata_offset": "0x171f9984"
+        },
+        {
+          "selector": "OnGetNextPageFavoritesItemList:IsSuccess:HasMoreItems:tabMode:",
+          "encoding": "v40@0:8@16B24B28q32",
+          "imp": "0x101a305ac",
+          "metadata_offset": "0x171f9990"
+        },
+        {
+          "selector": "handleGetFavoritesItemList:IsSuccess:HasMoreItems:",
+          "encoding": "v32@0:8@16B24B28",
+          "imp": "0x101a30710",
+          "metadata_offset": "0x171f999c"
+        },
+        {
+          "selector": "OnAddNewFavoritesItems:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a307b4",
+          "metadata_offset": "0x171f99a8"
+        },
+        {
+          "selector": "filterItemListByTabMode:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a30874",
+          "metadata_offset": "0x171f99b4"
+        },
+        {
+          "selector": "filterOutStarItemsIfNeeded:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a30b00",
+          "metadata_offset": "0x171f99c0"
+        },
+        {
+          "selector": "applyStarTypeFilterForDisplay:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a30ee0",
+          "metadata_offset": "0x171f99cc"
+        },
+        {
+          "selector": "prefetchRedesignTopFilterQuickItems",
+          "encoding": "v16@0:8",
+          "imp": "0x101a3118c",
+          "metadata_offset": "0x171f99d8"
+        },
+        {
+          "selector": "redesignQuickTypeNames",
+          "encoding": "@16@0:8",
+          "imp": "0x101a311d0",
+          "metadata_offset": "0x171f99e4"
+        },
+        {
+          "selector": "redesignTopFilterTypeNames",
+          "encoding": "@16@0:8",
+          "imp": "0x101a31248",
+          "metadata_offset": "0x171f99f0"
+        },
+        {
+          "selector": "updateTopFilterQuickItems",
+          "encoding": "v16@0:8",
+          "imp": "0x101a31318",
+          "metadata_offset": "0x171f99fc"
+        },
+        {
+          "selector": "getExtendPanelQuickFilters",
+          "encoding": "@16@0:8",
+          "imp": "0x101a31600",
+          "metadata_offset": "0x171f9a08"
+        },
+        {
+          "selector": "updateStarFilterAvailability",
+          "encoding": "v16@0:8",
+          "imp": "0x101a316e4",
+          "metadata_offset": "0x171f9a14"
+        },
+        {
+          "selector": "getExtendPanelTypes",
+          "encoding": "@16@0:8",
+          "imp": "0x101a31960",
+          "metadata_offset": "0x171f9a20"
+        },
+        {
+          "selector": "currentQuickFilterSelectedNames",
+          "encoding": "@16@0:8",
+          "imp": "0x101a31ab8",
+          "metadata_offset": "0x171f9a2c"
+        },
+        {
+          "selector": "syncLegacyFilterPanelState",
+          "encoding": "v16@0:8",
+          "imp": "0x101a31c30",
+          "metadata_offset": "0x171f9a38"
+        },
+        {
+          "selector": "syncRedesignTopFilterChips",
+          "encoding": "v16@0:8",
+          "imp": "0x101a31db4",
+          "metadata_offset": "0x171f9a44"
+        },
+        {
+          "selector": "syncTopFilterSelectedState",
+          "encoding": "v16@0:8",
+          "imp": "0x101a31e9c",
+          "metadata_offset": "0x171f9a50"
+        },
+        {
+          "selector": "updateExtendPanelTypes",
+          "encoding": "v16@0:8",
+          "imp": "0x101a32010",
+          "metadata_offset": "0x171f9a5c"
+        },
+        {
+          "selector": "isWeNoteMode",
+          "encoding": "B16@0:8",
+          "imp": "0x101a32284",
+          "metadata_offset": "0x171f9a68"
+        },
+        {
+          "selector": "getSearchMethodOnReport",
+          "encoding": "q16@0:8",
+          "imp": "0x101a322a8",
+          "metadata_offset": "0x171f9a74"
+        },
+        {
+          "selector": "presentFavSearchFeedbackSheet",
+          "encoding": "v16@0:8",
+          "imp": "0x101a323cc",
+          "metadata_offset": "0x171f9a80"
+        },
+        {
+          "selector": "updateServerSearchHintWithQuery:resultCount:",
+          "encoding": "v32@0:8@16q24",
+          "imp": "0x101a32610",
+          "metadata_offset": "0x171f9a8c"
+        },
+        {
+          "selector": "removeServerSearchHint",
+          "encoding": "v16@0:8",
+          "imp": "0x101a32b74",
+          "metadata_offset": "0x171f9a98"
+        },
+        {
+          "selector": "OnFavIndexFinished",
+          "encoding": "v16@0:8",
+          "imp": "0x101a32bcc",
+          "metadata_offset": "0x171f9aa4"
+        },
+        {
+          "selector": "OnSearch:taskKey:",
+          "encoding": "v32@0:8@16@24",
+          "imp": "0x101a32e28",
+          "metadata_offset": "0x171f9ab0"
+        },
+        {
+          "selector": "hasTingListenListBar",
+          "encoding": "B16@0:8",
+          "imp": "0x101a346c4",
+          "metadata_offset": "0x171f9abc"
+        },
+        {
+          "selector": "initTingListenListBar",
+          "encoding": "v16@0:8",
+          "imp": "0x101a34728",
+          "metadata_offset": "0x171f9ac8"
+        },
+        {
+          "selector": "openFavMusicListProfile:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a350f8",
+          "metadata_offset": "0x171f9ad4"
+        },
+        {
+          "selector": "filterMusicItemBySelectedType:resultArr:",
+          "encoding": "@32@0:8q16@24",
+          "imp": "0x101a35204",
+          "metadata_offset": "0x171f9ae0"
+        },
+        {
+          "selector": "genFinderDataItemsWith:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a354c8",
+          "metadata_offset": "0x171f9aec"
+        },
+        {
+          "selector": "updateTagSearchResult",
+          "encoding": "B16@0:8",
+          "imp": "0x101a35838",
+          "metadata_offset": "0x171f9af8"
+        },
+        {
+          "selector": "OnUpdateItems:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a35d7c",
+          "metadata_offset": "0x171f9b04"
+        },
+        {
+          "selector": "OnFavItemPartialChanged:reason:",
+          "encoding": "v32@0:8@16Q24",
+          "imp": "0x101a35db0",
+          "metadata_offset": "0x171f9b10"
+        },
+        {
+          "selector": "OnTagListUpdate",
+          "encoding": "v16@0:8",
+          "imp": "0x101a35f58",
+          "metadata_offset": "0x171f9b1c"
+        },
+        {
+          "selector": "OnDelFavoritesItems:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a35f64",
+          "metadata_offset": "0x171f9b28"
+        },
+        {
+          "selector": "getCurrentViewController",
+          "encoding": "@16@0:8",
+          "imp": "0x101a367cc",
+          "metadata_offset": "0x171f9b34"
+        },
+        {
+          "selector": "onLoadMore",
+          "encoding": "v16@0:8",
+          "imp": "0x101a367d0",
+          "metadata_offset": "0x171f9b40"
+        },
+        {
+          "selector": "onReloadData",
+          "encoding": "v16@0:8",
+          "imp": "0x101a36904",
+          "metadata_offset": "0x171f9b4c"
+        },
+        {
+          "selector": "onAddressViewDidScroll:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a36944",
+          "metadata_offset": "0x171f9b58"
+        },
+        {
+          "selector": "cellStyle",
+          "encoding": "Q16@0:8",
+          "imp": "0x101a369d4",
+          "metadata_offset": "0x171f9b64"
+        },
+        {
+          "selector": "locationSubPageSelectMode",
+          "encoding": "Q16@0:8",
+          "imp": "0x101a369e4",
+          "metadata_offset": "0x171f9b70"
+        },
+        {
+          "selector": "getSelectedDic",
+          "encoding": "@16@0:8",
+          "imp": "0x101a369ec",
+          "metadata_offset": "0x171f9b7c"
+        },
+        {
+          "selector": "getMaxSelectedCount",
+          "encoding": "Q16@0:8",
+          "imp": "0x101a36a04",
+          "metadata_offset": "0x171f9b88"
+        },
+        {
+          "selector": "onSearchBarMoved:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a36a1c",
+          "metadata_offset": "0x171f9b94"
+        },
+        {
+          "selector": "onDeleteTag:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a36a28",
+          "metadata_offset": "0x171f9ba0"
+        },
+        {
+          "selector": "onDeleteType:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a36b1c",
+          "metadata_offset": "0x171f9bac"
+        },
+        {
+          "selector": "onDeleteStarFilter",
+          "encoding": "v16@0:8",
+          "imp": "0x101a36bf8",
+          "metadata_offset": "0x171f9bb8"
+        },
+        {
+          "selector": "onStartSearch:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a36c98",
+          "metadata_offset": "0x171f9bc4"
+        },
+        {
+          "selector": "onBeginEditing",
+          "encoding": "v16@0:8",
+          "imp": "0x101a36dc4",
+          "metadata_offset": "0x171f9bd0"
+        },
+        {
+          "selector": "realSearch",
+          "encoding": "v16@0:8",
+          "imp": "0x101a36ef4",
+          "metadata_offset": "0x171f9bdc"
+        },
+        {
+          "selector": "onSelectType:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a376f0",
+          "metadata_offset": "0x171f9be8"
+        },
+        {
+          "selector": "onSelectRecentUsedFilter",
+          "encoding": "v16@0:8",
+          "imp": "0x101a37940",
+          "metadata_offset": "0x171f9bf4"
+        },
+        {
+          "selector": "onSelectStarredFilter",
+          "encoding": "v16@0:8",
+          "imp": "0x101a37a3c",
+          "metadata_offset": "0x171f9c00"
+        },
+        {
+          "selector": "onSelectTag:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a37ba0",
+          "metadata_offset": "0x171f9c0c"
+        },
+        {
+          "selector": "onClickExtendBtn",
+          "encoding": "v16@0:8",
+          "imp": "0x101a37dec",
+          "metadata_offset": "0x171f9c18"
+        },
+        {
+          "selector": "onExtendBtnExposed",
+          "encoding": "v16@0:8",
+          "imp": "0x101a37df8",
+          "metadata_offset": "0x171f9c24"
+        },
+        {
+          "selector": "onQuickFilterExposed",
+          "encoding": "v16@0:8",
+          "imp": "0x101a37ed8",
+          "metadata_offset": "0x171f9c30"
+        },
+        {
+          "selector": "onQuickFilterClicked:tabName:sessionId:",
+          "encoding": "v40@0:8q16@24@32",
+          "imp": "0x101a37fc0",
+          "metadata_offset": "0x171f9c3c"
+        },
+        {
+          "selector": "onTotalFilterClicked:tabName:",
+          "encoding": "v32@0:8q16@24",
+          "imp": "0x101a380b8",
+          "metadata_offset": "0x171f9c48"
+        },
+        {
+          "selector": "getFavHomepageSessionId",
+          "encoding": "@16@0:8",
+          "imp": "0x101a381c8",
+          "metadata_offset": "0x171f9c54"
+        },
+        {
+          "selector": "onSelectTypeFromExtendPanel:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a381d4",
+          "metadata_offset": "0x171f9c60"
+        },
+        {
+          "selector": "onCancelTypeFromExtendPanel:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a383bc",
+          "metadata_offset": "0x171f9c6c"
+        },
+        {
+          "selector": "onSelectTagFromExtendPanel:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a38570",
+          "metadata_offset": "0x171f9c78"
+        },
+        {
+          "selector": "onCancelTagFromExtendPanel:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a38710",
+          "metadata_offset": "0x171f9c84"
+        },
+        {
+          "selector": "onUpdateTag:to:fromFilter:",
+          "encoding": "v40@0:8@16@24@32",
+          "imp": "0x101a38880",
+          "metadata_offset": "0x171f9c90"
+        },
+        {
+          "selector": "onHideExtendFilterPanel",
+          "encoding": "v16@0:8",
+          "imp": "0x101a38b20",
+          "metadata_offset": "0x171f9c9c"
+        },
+        {
+          "selector": "getContentViewY",
+          "encoding": "d16@0:8",
+          "imp": "0x101a38b2c",
+          "metadata_offset": "0x171f9ca8"
+        },
+        {
+          "selector": "messageWrapsForFavBrowseView:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a38bb4",
+          "metadata_offset": "0x171f9cb4"
+        },
+        {
+          "selector": "getIndexOfImage:",
+          "encoding": "i24@0:8@16",
+          "imp": "0x101a38bc0",
+          "metadata_offset": "0x171f9cc0"
+        },
+        {
+          "selector": "onFavBrowseViewGetMoreMsg:Last:Next:",
+          "encoding": "v32@0:8@16B24B28",
+          "imp": "0x101a38d88",
+          "metadata_offset": "0x171f9ccc"
+        },
+        {
+          "selector": "checkAndLoadMoreIfNeeded",
+          "encoding": "v16@0:8",
+          "imp": "0x101a38ff4",
+          "metadata_offset": "0x171f9cd8"
+        },
+        {
+          "selector": "onFavBrowseViewWillBeginDragging:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a392c0",
+          "metadata_offset": "0x171f9ce4"
+        },
+        {
+          "selector": "onFavBrowseViewDidScroll:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a392d8",
+          "metadata_offset": "0x171f9cf0"
+        },
+        {
+          "selector": "selectTag:fromFilter:",
+          "encoding": "v32@0:8@16@24",
+          "imp": "0x101a39344",
+          "metadata_offset": "0x171f9cfc"
+        },
+        {
+          "selector": "deselectTag:fromFilter:",
+          "encoding": "v32@0:8@16@24",
+          "imp": "0x101a39514",
+          "metadata_offset": "0x171f9d08"
+        },
+        {
+          "selector": "onClickTagButtonWithTagName:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a395b8",
+          "metadata_offset": "0x171f9d14"
+        },
+        {
+          "selector": "enableTingListMode",
+          "encoding": "B16@0:8",
+          "imp": "0x101a39630",
+          "metadata_offset": "0x171f9d20"
+        },
+        {
+          "selector": "businessCustomListDetailRemainSection:",
+          "encoding": "v24@0:8q16",
+          "imp": "0x101a3979c",
+          "metadata_offset": "0x171f9d2c"
+        },
+        {
+          "selector": "feedViewControllerScene",
+          "encoding": "i16@0:8",
+          "imp": "0x101a39864",
+          "metadata_offset": "0x171f9d38"
+        },
+        {
+          "selector": "feedViewerScene",
+          "encoding": "Q16@0:8",
+          "imp": "0x101a3986c",
+          "metadata_offset": "0x171f9d44"
+        },
+        {
+          "selector": "getOriginImageViewWithSimpleImgInfo:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101a39874",
+          "metadata_offset": "0x171f9d50"
+        },
+        {
+          "selector": "reportSearchItemClickedAtPosition:withFavItem:listType:",
+          "encoding": "v40@0:8q16@24@32",
+          "imp": "0x101a398f4",
+          "metadata_offset": "0x171f9d5c"
+        },
+        {
+          "selector": "initBottomPinTopButton",
+          "encoding": "v16@0:8",
+          "imp": "0x101a39c40",
+          "metadata_offset": "0x171f9d68"
+        },
+        {
+          "selector": "handleFoldTopViewTap",
+          "encoding": "v16@0:8",
+          "imp": "0x101a3ab60",
+          "metadata_offset": "0x171f9d74"
+        },
+        {
+          "selector": "handleFoldTopViewPress:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3aba4",
+          "metadata_offset": "0x171f9d80"
+        },
+        {
+          "selector": "autoSetBottomPinTopButtonVisible",
+          "encoding": "v16@0:8",
+          "imp": "0x101a3add0",
+          "metadata_offset": "0x171f9d8c"
+        },
+        {
+          "selector": "updateFoldTopViewVisibility:animated:",
+          "encoding": "v24@0:8B16B20",
+          "imp": "0x101a3b2a8",
+          "metadata_offset": "0x171f9d98"
+        },
+        {
+          "selector": "onFoldButtonStatusDetermined",
+          "encoding": "v16@0:8",
+          "imp": "0x101a3b524",
+          "metadata_offset": "0x171f9da4"
+        },
+        {
+          "selector": "doReport14103",
+          "encoding": "v16@0:8",
+          "imp": "0x101a3b530",
+          "metadata_offset": "0x171f9db0"
+        },
+        {
+          "selector": "selectedType",
+          "encoding": "q16@0:8",
+          "imp": "0x101a3b710",
+          "metadata_offset": "0x171f9dbc"
+        },
+        {
+          "selector": "selectedTags",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3b720",
+          "metadata_offset": "0x171f9dc8"
+        },
+        {
+          "selector": "searchText",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3b730",
+          "metadata_offset": "0x171f9dd4"
+        },
+        {
+          "selector": "defaultTitle",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3b740",
+          "metadata_offset": "0x171f9de0"
+        },
+        {
+          "selector": "setDefaultTitle:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3b750",
+          "metadata_offset": "0x171f9dec"
+        },
+        {
+          "selector": "backgroundColor",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3b764",
+          "metadata_offset": "0x171f9df8"
+        },
+        {
+          "selector": "setBackgroundColor:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3b774",
+          "metadata_offset": "0x171f9e04"
+        },
+        {
+          "selector": "enterPageTimeInS",
+          "encoding": "I16@0:8",
+          "imp": "0x101a3b788",
+          "metadata_offset": "0x171f9e10"
+        },
+        {
+          "selector": "setEnterPageTimeInS:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101a3b798",
+          "metadata_offset": "0x171f9e1c"
+        },
+        {
+          "selector": "reportEnterFrom",
+          "encoding": "Q16@0:8",
+          "imp": "0x101a3b7a8",
+          "metadata_offset": "0x171f9e28"
+        },
+        {
+          "selector": "setReportEnterFrom:",
+          "encoding": "v24@0:8Q16",
+          "imp": "0x101a3b7b8",
+          "metadata_offset": "0x171f9e34"
+        },
+        {
+          "selector": "hasReportedFoldableStatus",
+          "encoding": "B16@0:8",
+          "imp": "0x101a3b7c8",
+          "metadata_offset": "0x171f9e40"
+        },
+        {
+          "selector": "setHasReportedFoldableStatus:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a3b7d8",
+          "metadata_offset": "0x171f9e4c"
+        },
+        {
+          "selector": "favHomepageSessionid",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3b7e8",
+          "metadata_offset": "0x171f9e58"
+        },
+        {
+          "selector": "setFavHomepageSessionid:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3b7f8",
+          "metadata_offset": "0x171f9e64"
+        },
+        {
+          "selector": "displayItemTypes",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3b80c",
+          "metadata_offset": "0x171f9e70"
+        },
+        {
+          "selector": "setDisplayItemTypes:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3b81c",
+          "metadata_offset": "0x171f9e7c"
+        },
+        {
+          "selector": "favBrowseCollectionView",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3b830",
+          "metadata_offset": "0x171f9e88"
+        },
+        {
+          "selector": "setFavBrowseCollectionView:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3b840",
+          "metadata_offset": "0x171f9e94"
+        },
+        {
+          "selector": "arrImgInfo",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3b854",
+          "metadata_offset": "0x171f9ea0"
+        },
+        {
+          "selector": "setArrImgInfo:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3b864",
+          "metadata_offset": "0x171f9eac"
+        },
+        {
+          "selector": "tabMode",
+          "encoding": "q16@0:8",
+          "imp": "0x101a3b878",
+          "metadata_offset": "0x171f9eb8"
+        },
+        {
+          "selector": "setTabMode:",
+          "encoding": "v24@0:8q16",
+          "imp": "0x101a3b888",
+          "metadata_offset": "0x171f9ec4"
+        },
+        {
+          "selector": "topFilterRedesign",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3b898",
+          "metadata_offset": "0x171f9ed0"
+        },
+        {
+          "selector": "setTopFilterRedesign:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3b8a8",
+          "metadata_offset": "0x171f9edc"
+        },
+        {
+          "selector": "filterExtendPanelRedesign",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3b8bc",
+          "metadata_offset": "0x171f9ee8"
+        },
+        {
+          "selector": "setFilterExtendPanelRedesign:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3b8cc",
+          "metadata_offset": "0x171f9ef4"
+        },
+        {
+          "selector": "suppressNextConvertedNoteAutoScroll",
+          "encoding": "B16@0:8",
+          "imp": "0x101a3b8e0",
+          "metadata_offset": "0x171f9f00"
+        },
+        {
+          "selector": "setSuppressNextConvertedNoteAutoScroll:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a3b8f0",
+          "metadata_offset": "0x171f9f0c"
+        },
+        {
+          "selector": "starredOnly",
+          "encoding": "B16@0:8",
+          "imp": "0x101a3b900",
+          "metadata_offset": "0x171f9f18"
+        },
+        {
+          "selector": "setStarredOnly:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a3b910",
+          "metadata_offset": "0x171f9f24"
+        },
+        {
+          "selector": "lastStarredOnly",
+          "encoding": "B16@0:8",
+          "imp": "0x101a3b920",
+          "metadata_offset": "0x171f9f30"
+        },
+        {
+          "selector": "setLastStarredOnly:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a3b930",
+          "metadata_offset": "0x171f9f3c"
+        },
+        {
+          "selector": "recentUsedOnly",
+          "encoding": "B16@0:8",
+          "imp": "0x101a3b940",
+          "metadata_offset": "0x171f9f48"
+        },
+        {
+          "selector": "setRecentUsedOnly:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a3b950",
+          "metadata_offset": "0x171f9f54"
+        },
+        {
+          "selector": "lastRecentUsedOnly",
+          "encoding": "B16@0:8",
+          "imp": "0x101a3b960",
+          "metadata_offset": "0x171f9f60"
+        },
+        {
+          "selector": "setLastRecentUsedOnly:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a3b970",
+          "metadata_offset": "0x171f9f6c"
+        },
+        {
+          "selector": "lastPanelTransientTypeSelected",
+          "encoding": "B16@0:8",
+          "imp": "0x101a3b980",
+          "metadata_offset": "0x171f9f78"
+        },
+        {
+          "selector": "setLastPanelTransientTypeSelected:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a3b990",
+          "metadata_offset": "0x171f9f84"
+        },
+        {
+          "selector": "panelTransientType",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3b9a0",
+          "metadata_offset": "0x171f9f90"
+        },
+        {
+          "selector": "setPanelTransientType:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3b9b0",
+          "metadata_offset": "0x171f9f9c"
+        },
+        {
+          "selector": "panelTransientTypeSelected",
+          "encoding": "B16@0:8",
+          "imp": "0x101a3b9bc",
+          "metadata_offset": "0x171f9fa8"
+        },
+        {
+          "selector": "setPanelTransientTypeSelected:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101a3b9cc",
+          "metadata_offset": "0x171f9fb4"
+        },
+        {
+          "selector": "panelTransientTags",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3b9dc",
+          "metadata_offset": "0x171f9fc0"
+        },
+        {
+          "selector": "setPanelTransientTags:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3b9ec",
+          "metadata_offset": "0x171f9fcc"
+        },
+        {
+          "selector": "panelSelectedTransientTags",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3ba00",
+          "metadata_offset": "0x171f9fd8"
+        },
+        {
+          "selector": "setPanelSelectedTransientTags:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3ba10",
+          "metadata_offset": "0x171f9fe4"
+        },
+        {
+          "selector": "aiAskButtonController",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3ba24",
+          "metadata_offset": "0x171f9ff0"
+        },
+        {
+          "selector": "setAiAskButtonController:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3ba34",
+          "metadata_offset": "0x171f9ffc"
+        },
+        {
+          "selector": "longPressNoteConversionSnapshot",
+          "encoding": "@16@0:8",
+          "imp": "0x101a3ba48",
+          "metadata_offset": "0x171fa008"
+        },
+        {
+          "selector": "setLongPressNoteConversionSnapshot:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a3ba58",
+          "metadata_offset": "0x171fa014"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8",
+          "imp": "0x101a3ba6c",
+          "metadata_offset": "0x171fa020"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_curMinItemUpdateTime",
+          "encoding": "I"
+        },
+        {
+          "name": "m_curMinItemPinTopTime",
+          "encoding": "I"
+        },
+        {
+          "name": "m_searchTaskKey",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "m_cellStyle",
+          "encoding": "Q"
+        },
+        {
+          "name": "m_tableView",
+          "encoding": "@\"MMTableView\""
+        },
+        {
+          "name": "m_emptyView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "m_loadingView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "m_emptySearchLabel",
+          "encoding": "@\"MMUILabel\""
+        },
+        {
+          "name": "m_feedFlowView",
+          "encoding": "@\"WCFinderFeedFlowView\""
+        },
+        {
+          "name": "m_arrFinderItems",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_feedFlowViewState",
+          "encoding": "Q"
+        },
+        {
+          "name": "m_feedDetailViewController",
+          "encoding": "@\"WCFinderBusinessCustomListDetailViewController\""
+        },
+        {
+          "name": "m_dataController",
+          "encoding": "@\"FavBaseTableDataController\""
+        },
+        {
+          "name": "m_addressDataController",
+          "encoding": "@\"FavAddressDataController\""
+        },
+        {
+          "name": "m_searchBar",
+          "encoding": "@\"FavSearchBar\""
+        },
+        {
+          "name": "m_topFilter",
+          "encoding": "@\"FavSearchTopFilterView\""
+        },
+        {
+          "name": "m_filterExtendPanel",
+          "encoding": "@\"FavSearchExtendFilterPanel\""
+        },
+        {
+          "name": "m_containView",
+          "encoding": "@\"MMUIView\""
+        },
+        {
+          "name": "m_maskView",
+          "encoding": "@\"MMUIView\""
+        },
+        {
+          "name": "m_hasItemUpdate",
+          "encoding": "B"
+        },
+        {
+          "name": "m_navigationBarBackground",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "m_navigationSep",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "m_duringAnimation",
+          "encoding": "B"
+        },
+        {
+          "name": "m_bReceiveSearchResult",
+          "encoding": "B"
+        },
+        {
+          "name": "m_toCheckTypes",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_checkedTypes",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_filterTypeToName",
+          "encoding": "@\"NSDictionary\""
+        },
+        {
+          "name": "m_typeCount",
+          "encoding": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "m_filterNameToType",
+          "encoding": "@\"NSDictionary\""
+        },
+        {
+          "name": "m_checkFilterSearchKey",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "m_searchLoadingView",
+          "encoding": "@\"MMUIActivityIndicatorView\""
+        },
+        {
+          "name": "m_preResultCount",
+          "encoding": "i"
+        },
+        {
+          "name": "m_searchTagsFromCard",
+          "encoding": "@\"NSMutableSet\""
+        },
+        {
+          "name": "showFinderTime",
+          "encoding": "Q"
+        },
+        {
+          "name": "m_hasSelectedTypeSinceInit",
+          "encoding": "B"
+        },
+        {
+          "name": "m_afterPresectHandler",
+          "encoding": "@?"
+        },
+        {
+          "name": "m_foldTopView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "m_foldTopLabel",
+          "encoding": "@\"UILabel\""
+        },
+        {
+          "name": "m_foldTopButton",
+          "encoding": "@\"MMUIButton\""
+        },
+        {
+          "name": "m_isAnimatingToVisible",
+          "encoding": "B"
+        },
+        {
+          "name": "m_isAnimatingToHidden",
+          "encoding": "B"
+        },
+        {
+          "name": "m_serverSearchAdapter",
+          "encoding": "@\"FavServerSearchAdapter\""
+        },
+        {
+          "name": "m_isServerSearch",
+          "encoding": "B"
+        },
+        {
+          "name": "m_serverSearchHintView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "m_indexFinishRetryCount",
+          "encoding": "i"
+        },
+        {
+          "name": "m_flatPOIDataWraps",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_flatPOILocationGetter",
+          "encoding": "@\"WALocationGetter\""
+        },
+        {
+          "name": "m_flatPOICurrentLocation",
+          "encoding": "@\"CLLocation\""
+        },
+        {
+          "name": "m_flatPOIDataComplete",
+          "encoding": "B"
+        },
+        {
+          "name": "m_debugFloatingView",
+          "encoding": "@\"FavDebugFloatingView\""
+        },
+        {
+          "name": "_hasReportedFoldableStatus",
+          "encoding": "B"
+        },
+        {
+          "name": "_suppressNextConvertedNoteAutoScroll",
+          "encoding": "B"
+        },
+        {
+          "name": "_starredOnly",
+          "encoding": "B"
+        },
+        {
+          "name": "_lastStarredOnly",
+          "encoding": "B"
+        },
+        {
+          "name": "_recentUsedOnly",
+          "encoding": "B"
+        },
+        {
+          "name": "_lastRecentUsedOnly",
+          "encoding": "B"
+        },
+        {
+          "name": "_lastPanelTransientTypeSelected",
+          "encoding": "B"
+        },
+        {
+          "name": "_panelTransientTypeSelected",
+          "encoding": "B"
+        },
+        {
+          "name": "_enterPageTimeInS",
+          "encoding": "I"
+        },
+        {
+          "name": "_selectedType",
+          "encoding": "q"
+        },
+        {
+          "name": "_selectedTags",
+          "encoding": "@\"NSArray\""
+        },
+        {
+          "name": "_searchText",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_defaultTitle",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_backgroundColor",
+          "encoding": "@\"UIColor\""
+        },
+        {
+          "name": "_reportEnterFrom",
+          "encoding": "Q"
+        },
+        {
+          "name": "_favHomepageSessionid",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_displayItemTypes",
+          "encoding": "@\"NSArray\""
+        },
+        {
+          "name": "_favBrowseCollectionView",
+          "encoding": "@\"FavBrowseCollectionView\""
+        },
+        {
+          "name": "_arrImgInfo",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "_tabMode",
+          "encoding": "q"
+        },
+        {
+          "name": "_topFilterRedesign",
+          "encoding": "@\"FavSearchTopFilterViewV2\""
+        },
+        {
+          "name": "_filterExtendPanelRedesign",
+          "encoding": "@\"FavSearchExtendFilterPanelV2\""
+        },
+        {
+          "name": "_panelTransientType",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_panelTransientTags",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "_panelSelectedTransientTags",
+          "encoding": "@\"NSMutableSet\""
+        },
+        {
+          "name": "_aiAskButtonController",
+          "encoding": "@\"FavAIAskButtonController\""
+        },
+        {
+          "name": "_longPressNoteConversionSnapshot",
+          "encoding": "@\"UIImageView\""
+        }
+      ]
+    },
+    {
+      "name": "FavoritesItem",
+      "class_offset": "0x1ee89390",
+      "superclass": "FavoritesModel",
+      "methods": [
+        {
+          "selector": "ftsSearchTitle:ftsSearchDetail:forDisplay:",
+          "encoding": "v36@0:8^@16^@24B32",
+          "imp": "0x101b88060",
+          "metadata_offset": "0x16edfde8"
+        },
+        {
+          "selector": "ftsDisplayPrefix",
+          "encoding": "@16@0:8",
+          "imp": "0x101b8a260",
+          "metadata_offset": "0x16edfdf4"
+        },
+        {
+          "selector": "ftsDisplayImageView",
+          "encoding": "@16@0:8",
+          "imp": "0x101b8a324",
+          "metadata_offset": "0x16edfe00"
+        },
+        {
+          "selector": "fts5FavModelForDisplay:",
+          "encoding": "@20@0:8B16",
+          "imp": "0x101b8bab0",
+          "metadata_offset": "0x16edfe0c"
+        },
+        {
+          "selector": "fts5RowidItemWithRowid:",
+          "encoding": "@24@0:8q16",
+          "imp": "0x101b8bccc",
+          "metadata_offset": "0x16edfe18"
+        },
+        {
+          "selector": "searchSubTypes",
+          "encoding": "i16@0:8",
+          "imp": "0x101b8be00",
+          "metadata_offset": "0x16edfe24"
+        },
+        {
+          "selector": "favCheckId",
+          "encoding": "@16@0:8",
+          "imp": "0x101b99314",
+          "metadata_offset": "0x16edfe30"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8",
+          "imp": "0x101b993e0",
+          "metadata_offset": "0x16edfe3c"
+        },
+        {
+          "selector": "initWithAddFavItem:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101b9942c",
+          "metadata_offset": "0x16edfe48"
+        },
+        {
+          "selector": "addData:Index:",
+          "encoding": "v28@0:8@16i24",
+          "imp": "0x101b9953c",
+          "metadata_offset": "0x16edfe54"
+        },
+        {
+          "selector": "dataHasBeenCopyedToTarget",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9963c",
+          "metadata_offset": "0x16edfe60"
+        },
+        {
+          "selector": "canAutoDownload",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9a06c",
+          "metadata_offset": "0x16edfe6c"
+        },
+        {
+          "selector": "itemTotalDataSize",
+          "encoding": "Q16@0:8",
+          "imp": "0x101b9a228",
+          "metadata_offset": "0x16edfe78"
+        },
+        {
+          "selector": "hasCDNData",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9a2ec",
+          "metadata_offset": "0x16edfe84"
+        },
+        {
+          "selector": "isRecordItem",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9a314",
+          "metadata_offset": "0x16edfe90"
+        },
+        {
+          "selector": "isFromMessage",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9a364",
+          "metadata_offset": "0x16edfe9c"
+        },
+        {
+          "selector": "isEditable",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9a450",
+          "metadata_offset": "0x16edfea8"
+        },
+        {
+          "selector": "getFirstMediaData",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9a4d4",
+          "metadata_offset": "0x16edfeb4"
+        },
+        {
+          "selector": "canBeForwardWithMsg",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9a620",
+          "metadata_offset": "0x16edfec0"
+        },
+        {
+          "selector": "canBeForwardWithMsg:",
+          "encoding": "@20@0:8B16",
+          "imp": "0x101b9a630",
+          "metadata_offset": "0x16edfecc"
+        },
+        {
+          "selector": "sourceUserName",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9aeb4",
+          "metadata_offset": "0x16edfed8"
+        },
+        {
+          "selector": "sourceTime",
+          "encoding": "I16@0:8",
+          "imp": "0x101b9af60",
+          "metadata_offset": "0x16edfee4"
+        },
+        {
+          "selector": "summaryInfo",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9af94",
+          "metadata_offset": "0x16edfef0"
+        },
+        {
+          "selector": "checkIllegalTypeBeforeForwardInDataList:",
+          "encoding": "i24@0:8@16",
+          "imp": "0x101b9b3c8",
+          "metadata_offset": "0x16edfefc"
+        },
+        {
+          "selector": "checkNeedDownloadDataBeforeForward:",
+          "encoding": "B20@0:8B16",
+          "imp": "0x101b9b598",
+          "metadata_offset": "0x16edff08"
+        },
+        {
+          "selector": "canBeForward",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9b9d0",
+          "metadata_offset": "0x16edff14"
+        },
+        {
+          "selector": "needUpload",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9ba0c",
+          "metadata_offset": "0x16edff20"
+        },
+        {
+          "selector": "isUploading",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9baf8",
+          "metadata_offset": "0x16edff2c"
+        },
+        {
+          "selector": "isUploadFail",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9bbbc",
+          "metadata_offset": "0x16edff38"
+        },
+        {
+          "selector": "shouldLimitFavMenuToDeleteOnly",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9bc70",
+          "metadata_offset": "0x16edff44"
+        },
+        {
+          "selector": "shouldShowEraseSwipeMenuItem",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9bcd4",
+          "metadata_offset": "0x16edff50"
+        },
+        {
+          "selector": "needDownLoad",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9bd1c",
+          "metadata_offset": "0x16edff5c"
+        },
+        {
+          "selector": "chectNeedDownload",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9be44",
+          "metadata_offset": "0x16edff68"
+        },
+        {
+          "selector": "enumerateDataUsingBlock:",
+          "encoding": "v24@0:8@?16",
+          "imp": "0x101b9bf48",
+          "metadata_offset": "0x16edff74"
+        },
+        {
+          "selector": "enumerateDataIn:UsingBlock:",
+          "encoding": "B32@0:8@16@?24",
+          "imp": "0x101b9bf64",
+          "metadata_offset": "0x16edff80"
+        },
+        {
+          "selector": "enumerateFullDataUsingBlock:",
+          "encoding": "v24@0:8@?16",
+          "imp": "0x101b9c168",
+          "metadata_offset": "0x16edff8c"
+        },
+        {
+          "selector": "enumerateFullDataIn:InDeep:UsingBlock:",
+          "encoding": "B36@0:8@16i24@?28",
+          "imp": "0x101b9c1e0",
+          "metadata_offset": "0x16edff98"
+        },
+        {
+          "selector": "getDataByLocalDataId:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101b9c3f0",
+          "metadata_offset": "0x16edffa4"
+        },
+        {
+          "selector": "getAllTags",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9c598",
+          "metadata_offset": "0x16edffb0"
+        },
+        {
+          "selector": "isEqualToItem:",
+          "encoding": "B24@0:8@16",
+          "imp": "0x101b9ef68",
+          "metadata_offset": "0x16edffbc"
+        },
+        {
+          "selector": "tingListenItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9f898",
+          "metadata_offset": "0x16edffc8"
+        },
+        {
+          "selector": "tingCategoryItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9fa44",
+          "metadata_offset": "0x16edffd4"
+        },
+        {
+          "selector": "dataList",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9fbf0",
+          "metadata_offset": "0x16edffe0"
+        },
+        {
+          "selector": "setDataList:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9fc00",
+          "metadata_offset": "0x16edffec"
+        },
+        {
+          "selector": "isFoldBtn",
+          "encoding": "B16@0:8",
+          "imp": "0x101b9fc14",
+          "metadata_offset": "0x16edfff8"
+        },
+        {
+          "selector": "setIsFoldBtn:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101b9fc24",
+          "metadata_offset": "0x16ee0004"
+        },
+        {
+          "selector": "favId",
+          "encoding": "I16@0:8",
+          "imp": "0x101b9fc34",
+          "metadata_offset": "0x16ee0010"
+        },
+        {
+          "selector": "setFavId:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101b9fc44",
+          "metadata_offset": "0x16ee001c"
+        },
+        {
+          "selector": "localId",
+          "encoding": "I16@0:8",
+          "imp": "0x101b9fc54",
+          "metadata_offset": "0x16ee0028"
+        },
+        {
+          "selector": "setLocalId:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101b9fc64",
+          "metadata_offset": "0x16ee0034"
+        },
+        {
+          "selector": "sourceId",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9fc74",
+          "metadata_offset": "0x16ee0040"
+        },
+        {
+          "selector": "setSourceId:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9fc84",
+          "metadata_offset": "0x16ee004c"
+        },
+        {
+          "selector": "setFavCheckId:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9fc98",
+          "metadata_offset": "0x16ee0058"
+        },
+        {
+          "selector": "localStatus",
+          "encoding": "i16@0:8",
+          "imp": "0x101b9fcac",
+          "metadata_offset": "0x16ee0064"
+        },
+        {
+          "selector": "setLocalStatus:",
+          "encoding": "v20@0:8i16",
+          "imp": "0x101b9fcbc",
+          "metadata_offset": "0x16ee0070"
+        },
+        {
+          "selector": "type",
+          "encoding": "i16@0:8",
+          "imp": "0x101b9fccc",
+          "metadata_offset": "0x16ee007c"
+        },
+        {
+          "selector": "setType:",
+          "encoding": "v20@0:8i16",
+          "imp": "0x101b9fcdc",
+          "metadata_offset": "0x16ee0088"
+        },
+        {
+          "selector": "sourceType",
+          "encoding": "i16@0:8",
+          "imp": "0x101b9fcec",
+          "metadata_offset": "0x16ee0094"
+        },
+        {
+          "selector": "setSourceType:",
+          "encoding": "v20@0:8i16",
+          "imp": "0x101b9fcfc",
+          "metadata_offset": "0x16ee00a0"
+        },
+        {
+          "selector": "updateTime",
+          "encoding": "I16@0:8",
+          "imp": "0x101b9fd0c",
+          "metadata_offset": "0x16ee00ac"
+        },
+        {
+          "selector": "setUpdateTime:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101b9fd1c",
+          "metadata_offset": "0x16ee00b8"
+        },
+        {
+          "selector": "srcCreateTime",
+          "encoding": "I16@0:8",
+          "imp": "0x101b9fd2c",
+          "metadata_offset": "0x16ee00c4"
+        },
+        {
+          "selector": "setSrcCreateTime:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101b9fd3c",
+          "metadata_offset": "0x16ee00d0"
+        },
+        {
+          "selector": "version",
+          "encoding": "I16@0:8",
+          "imp": "0x101b9fd4c",
+          "metadata_offset": "0x16ee00dc"
+        },
+        {
+          "selector": "setVersion:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101b9fd5c",
+          "metadata_offset": "0x16ee00e8"
+        },
+        {
+          "selector": "deviceid",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9fd6c",
+          "metadata_offset": "0x16ee00f4"
+        },
+        {
+          "selector": "setDeviceid:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9fd7c",
+          "metadata_offset": "0x16ee0100"
+        },
+        {
+          "selector": "updateSeq",
+          "encoding": "I16@0:8",
+          "imp": "0x101b9fd90",
+          "metadata_offset": "0x16ee010c"
+        },
+        {
+          "selector": "setUpdateSeq:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101b9fda0",
+          "metadata_offset": "0x16ee0118"
+        },
+        {
+          "selector": "localUpdateSeq",
+          "encoding": "I16@0:8",
+          "imp": "0x101b9fdb0",
+          "metadata_offset": "0x16ee0124"
+        },
+        {
+          "selector": "setLocalUpdateSeq:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101b9fdc0",
+          "metadata_offset": "0x16ee0130"
+        },
+        {
+          "selector": "editTime",
+          "encoding": "I16@0:8",
+          "imp": "0x101b9fdd0",
+          "metadata_offset": "0x16ee013c"
+        },
+        {
+          "selector": "setEditTime:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101b9fde0",
+          "metadata_offset": "0x16ee0148"
+        },
+        {
+          "selector": "pinTopTimestamp",
+          "encoding": "I16@0:8",
+          "imp": "0x101b9fdf0",
+          "metadata_offset": "0x16ee0154"
+        },
+        {
+          "selector": "setPinTopTimestamp:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101b9fe00",
+          "metadata_offset": "0x16ee0160"
+        },
+        {
+          "selector": "title",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9fe10",
+          "metadata_offset": "0x16ee016c"
+        },
+        {
+          "selector": "setTitle:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9fe20",
+          "metadata_offset": "0x16ee0178"
+        },
+        {
+          "selector": "desc",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9fe34",
+          "metadata_offset": "0x16ee0184"
+        },
+        {
+          "selector": "setDesc:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9fe44",
+          "metadata_offset": "0x16ee0190"
+        },
+        {
+          "selector": "link",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9fe58",
+          "metadata_offset": "0x16ee019c"
+        },
+        {
+          "selector": "setLink:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9fe68",
+          "metadata_offset": "0x16ee01a8"
+        },
+        {
+          "selector": "ctrlFlag",
+          "encoding": "I16@0:8",
+          "imp": "0x101b9fe7c",
+          "metadata_offset": "0x16ee01b4"
+        },
+        {
+          "selector": "setCtrlFlag:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101b9fe8c",
+          "metadata_offset": "0x16ee01c0"
+        },
+        {
+          "selector": "fromUsr",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9fe9c",
+          "metadata_offset": "0x16ee01cc"
+        },
+        {
+          "selector": "setFromUsr:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9feac",
+          "metadata_offset": "0x16ee01d8"
+        },
+        {
+          "selector": "realChatName",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9fec0",
+          "metadata_offset": "0x16ee01e4"
+        },
+        {
+          "selector": "setRealChatName:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9fed0",
+          "metadata_offset": "0x16ee01f0"
+        },
+        {
+          "selector": "toUsr",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9fee4",
+          "metadata_offset": "0x16ee01fc"
+        },
+        {
+          "selector": "setToUsr:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9fef4",
+          "metadata_offset": "0x16ee0208"
+        },
+        {
+          "selector": "editUsr",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9ff08",
+          "metadata_offset": "0x16ee0214"
+        },
+        {
+          "selector": "setEditUsr:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9ff18",
+          "metadata_offset": "0x16ee0220"
+        },
+        {
+          "selector": "n64MsgID",
+          "encoding": "q16@0:8",
+          "imp": "0x101b9ff2c",
+          "metadata_offset": "0x16ee022c"
+        },
+        {
+          "selector": "setN64MsgID:",
+          "encoding": "v24@0:8q16",
+          "imp": "0x101b9ff3c",
+          "metadata_offset": "0x16ee0238"
+        },
+        {
+          "selector": "eventId",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9ff4c",
+          "metadata_offset": "0x16ee0244"
+        },
+        {
+          "selector": "setEventId:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9ff5c",
+          "metadata_offset": "0x16ee0250"
+        },
+        {
+          "selector": "appId",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9ff70",
+          "metadata_offset": "0x16ee025c"
+        },
+        {
+          "selector": "setAppId:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9ff80",
+          "metadata_offset": "0x16ee0268"
+        },
+        {
+          "selector": "brandId",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9ff94",
+          "metadata_offset": "0x16ee0274"
+        },
+        {
+          "selector": "setBrandId:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9ffa4",
+          "metadata_offset": "0x16ee0280"
+        },
+        {
+          "selector": "totalDataSize",
+          "encoding": "Q16@0:8",
+          "imp": "0x101b9ffb8",
+          "metadata_offset": "0x16ee028c"
+        },
+        {
+          "selector": "setTotalDataSize:",
+          "encoding": "v24@0:8Q16",
+          "imp": "0x101b9ffc8",
+          "metadata_offset": "0x16ee0298"
+        },
+        {
+          "selector": "locItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9ffd8",
+          "metadata_offset": "0x16ee02a4"
+        },
+        {
+          "selector": "setLocItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b9ffe8",
+          "metadata_offset": "0x16ee02b0"
+        },
+        {
+          "selector": "urlItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101b9fffc",
+          "metadata_offset": "0x16ee02bc"
+        },
+        {
+          "selector": "setUrlItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba000c",
+          "metadata_offset": "0x16ee02c8"
+        },
+        {
+          "selector": "productItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba0020",
+          "metadata_offset": "0x16ee02d4"
+        },
+        {
+          "selector": "setProductItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba0030",
+          "metadata_offset": "0x16ee02e0"
+        },
+        {
+          "selector": "tvItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba0044",
+          "metadata_offset": "0x16ee02ec"
+        },
+        {
+          "selector": "setTvItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba0054",
+          "metadata_offset": "0x16ee02f8"
+        },
+        {
+          "selector": "weAppItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba0068",
+          "metadata_offset": "0x16ee0304"
+        },
+        {
+          "selector": "setWeAppItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba0078",
+          "metadata_offset": "0x16ee0310"
+        },
+        {
+          "selector": "tagList",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba008c",
+          "metadata_offset": "0x16ee031c"
+        },
+        {
+          "selector": "setTagList:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba009c",
+          "metadata_offset": "0x16ee0328"
+        },
+        {
+          "selector": "tagIdList",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba00b0",
+          "metadata_offset": "0x16ee0334"
+        },
+        {
+          "selector": "setTagIdList:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba00c0",
+          "metadata_offset": "0x16ee0340"
+        },
+        {
+          "selector": "usedTimes",
+          "encoding": "I16@0:8",
+          "imp": "0x101ba00d4",
+          "metadata_offset": "0x16ee034c"
+        },
+        {
+          "selector": "setUsedTimes:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101ba00e4",
+          "metadata_offset": "0x16ee0358"
+        },
+        {
+          "selector": "retryTimes",
+          "encoding": "i16@0:8",
+          "imp": "0x101ba00f4",
+          "metadata_offset": "0x16ee0364"
+        },
+        {
+          "selector": "setRetryTimes:",
+          "encoding": "v20@0:8i16",
+          "imp": "0x101ba0104",
+          "metadata_offset": "0x16ee0370"
+        },
+        {
+          "selector": "startUploadTime",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba0114",
+          "metadata_offset": "0x16ee037c"
+        },
+        {
+          "selector": "setStartUploadTime:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba0124",
+          "metadata_offset": "0x16ee0388"
+        },
+        {
+          "selector": "cellHeight",
+          "encoding": "d16@0:8",
+          "imp": "0x101ba0138",
+          "metadata_offset": "0x16ee0394"
+        },
+        {
+          "selector": "setCellHeight:",
+          "encoding": "v24@0:8d16",
+          "imp": "0x101ba0148",
+          "metadata_offset": "0x16ee03a0"
+        },
+        {
+          "selector": "uploadFailButtomShow",
+          "encoding": "B16@0:8",
+          "imp": "0x101ba0158",
+          "metadata_offset": "0x16ee03ac"
+        },
+        {
+          "selector": "setUploadFailButtomShow:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101ba0168",
+          "metadata_offset": "0x16ee03b8"
+        },
+        {
+          "selector": "uploadFailButtomClicked",
+          "encoding": "B16@0:8",
+          "imp": "0x101ba0178",
+          "metadata_offset": "0x16ee03c4"
+        },
+        {
+          "selector": "setUploadFailButtomClicked:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101ba0188",
+          "metadata_offset": "0x16ee03d0"
+        },
+        {
+          "selector": "webCacheStatus",
+          "encoding": "I16@0:8",
+          "imp": "0x101ba0198",
+          "metadata_offset": "0x16ee03dc"
+        },
+        {
+          "selector": "setWebCacheStatus:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101ba01a8",
+          "metadata_offset": "0x16ee03e8"
+        },
+        {
+          "selector": "searchText",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba01b8",
+          "metadata_offset": "0x16ee03f4"
+        },
+        {
+          "selector": "setSearchText:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba01c8",
+          "metadata_offset": "0x16ee0400"
+        },
+        {
+          "selector": "m_preMsgIndex",
+          "encoding": "I16@0:8",
+          "imp": "0x101ba01dc",
+          "metadata_offset": "0x16ee040c"
+        },
+        {
+          "selector": "setM_preMsgIndex:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101ba01ec",
+          "metadata_offset": "0x16ee0418"
+        },
+        {
+          "selector": "isAutoSave",
+          "encoding": "B16@0:8",
+          "imp": "0x101ba01fc",
+          "metadata_offset": "0x16ee0424"
+        },
+        {
+          "selector": "setIsAutoSave:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101ba020c",
+          "metadata_offset": "0x16ee0430"
+        },
+        {
+          "selector": "forceReuploadCdnDataURLSet",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba021c",
+          "metadata_offset": "0x16ee043c"
+        },
+        {
+          "selector": "setForceReuploadCdnDataURLSet:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba022c",
+          "metadata_offset": "0x16ee0448"
+        },
+        {
+          "selector": "svrRepairReupload",
+          "encoding": "B16@0:8",
+          "imp": "0x101ba0240",
+          "metadata_offset": "0x16ee0454"
+        },
+        {
+          "selector": "setSvrRepairReupload:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101ba0250",
+          "metadata_offset": "0x16ee0460"
+        },
+        {
+          "selector": "starType",
+          "encoding": "I16@0:8",
+          "imp": "0x101ba0260",
+          "metadata_offset": "0x16ee046c"
+        },
+        {
+          "selector": "setStarType:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101ba0270",
+          "metadata_offset": "0x16ee0478"
+        },
+        {
+          "selector": "starBizKey",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba0280",
+          "metadata_offset": "0x16ee0484"
+        },
+        {
+          "selector": "setStarBizKey:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba0290",
+          "metadata_offset": "0x16ee0490"
+        },
+        {
+          "selector": "isChatRoom",
+          "encoding": "i16@0:8",
+          "imp": "0x101ba02a4",
+          "metadata_offset": "0x16ee049c"
+        },
+        {
+          "selector": "setIsChatRoom:",
+          "encoding": "v20@0:8i16",
+          "imp": "0x101ba02b4",
+          "metadata_offset": "0x16ee04a8"
+        },
+        {
+          "selector": "m_uiFromScene",
+          "encoding": "I16@0:8",
+          "imp": "0x101ba02c4",
+          "metadata_offset": "0x16ee04b4"
+        },
+        {
+          "selector": "setM_uiFromScene:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101ba02d4",
+          "metadata_offset": "0x16ee04c0"
+        },
+        {
+          "selector": "isFromFavToChat",
+          "encoding": "B16@0:8",
+          "imp": "0x101ba02e4",
+          "metadata_offset": "0x16ee04cc"
+        },
+        {
+          "selector": "setIsFromFavToChat:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101ba02f4",
+          "metadata_offset": "0x16ee04d8"
+        },
+        {
+          "selector": "finderShareItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba0304",
+          "metadata_offset": "0x16ee04e4"
+        },
+        {
+          "selector": "setFinderShareItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba0314",
+          "metadata_offset": "0x16ee04f0"
+        },
+        {
+          "selector": "finderLongVideoShareItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba0328",
+          "metadata_offset": "0x16ee04fc"
+        },
+        {
+          "selector": "setFinderLongVideoShareItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba0338",
+          "metadata_offset": "0x16ee0508"
+        },
+        {
+          "selector": "finderLiveShareItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba034c",
+          "metadata_offset": "0x16ee0514"
+        },
+        {
+          "selector": "setFinderLiveShareItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba035c",
+          "metadata_offset": "0x16ee0520"
+        },
+        {
+          "selector": "finderThemeLiveShareItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba0370",
+          "metadata_offset": "0x16ee052c"
+        },
+        {
+          "selector": "setFinderThemeLiveShareItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba0380",
+          "metadata_offset": "0x16ee0538"
+        },
+        {
+          "selector": "finderShareNameCard",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba0394",
+          "metadata_offset": "0x16ee0544"
+        },
+        {
+          "selector": "setFinderShareNameCard:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba03a4",
+          "metadata_offset": "0x16ee0550"
+        },
+        {
+          "selector": "finderTopicShareItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba03b8",
+          "metadata_offset": "0x16ee055c"
+        },
+        {
+          "selector": "setFinderTopicShareItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba03c8",
+          "metadata_offset": "0x16ee0568"
+        },
+        {
+          "selector": "finderCollectionShareItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba03dc",
+          "metadata_offset": "0x16ee0574"
+        },
+        {
+          "selector": "setFinderCollectionShareItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba03ec",
+          "metadata_offset": "0x16ee0580"
+        },
+        {
+          "selector": "finderContentColumnSharedItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba0400",
+          "metadata_offset": "0x16ee058c"
+        },
+        {
+          "selector": "setFinderContentColumnSharedItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba0410",
+          "metadata_offset": "0x16ee0598"
+        },
+        {
+          "selector": "transferInfo",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba0424",
+          "metadata_offset": "0x16ee05a4"
+        },
+        {
+          "selector": "setTransferInfo:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba0434",
+          "metadata_offset": "0x16ee05b0"
+        },
+        {
+          "selector": "musicShareItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba0448",
+          "metadata_offset": "0x16ee05bc"
+        },
+        {
+          "selector": "setMusicShareItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba0458",
+          "metadata_offset": "0x16ee05c8"
+        },
+        {
+          "selector": "liteAppItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba046c",
+          "metadata_offset": "0x16ee05d4"
+        },
+        {
+          "selector": "setLiteAppItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba047c",
+          "metadata_offset": "0x16ee05e0"
+        },
+        {
+          "selector": "isXiaoweiBanner",
+          "encoding": "B16@0:8",
+          "imp": "0x101ba0490",
+          "metadata_offset": "0x16ee05ec"
+        },
+        {
+          "selector": "setIsXiaoweiBanner:",
+          "encoding": "v20@0:8B16",
+          "imp": "0x101ba04a0",
+          "metadata_offset": "0x16ee05f8"
+        },
+        {
+          "selector": "xiaoweiFavAddedToastPrompt",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba04b0",
+          "metadata_offset": "0x16ee0604"
+        },
+        {
+          "selector": "setXiaoweiFavAddedToastPrompt:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba04c0",
+          "metadata_offset": "0x16ee0610"
+        },
+        {
+          "selector": "info",
+          "encoding": "@16@0:8",
+          "imp": "0x101ba04d4",
+          "metadata_offset": "0x16ee061c"
+        },
+        {
+          "selector": "setInfo:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101ba04e4",
+          "metadata_offset": "0x16ee0628"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8",
+          "imp": "0x101ba04f8",
+          "metadata_offset": "0x16ee0634"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "_dataList",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "_tagList",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "_sourceId",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_toUsr",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_isFoldBtn",
+          "encoding": "B"
+        },
+        {
+          "name": "_uploadFailButtomShow",
+          "encoding": "B"
+        },
+        {
+          "name": "_uploadFailButtomClicked",
+          "encoding": "B"
+        },
+        {
+          "name": "_isAutoSave",
+          "encoding": "B"
+        },
+        {
+          "name": "_svrRepairReupload",
+          "encoding": "B"
+        },
+        {
+          "name": "_isFromFavToChat",
+          "encoding": "B"
+        },
+        {
+          "name": "_isXiaoweiBanner",
+          "encoding": "B"
+        },
+        {
+          "name": "_favId",
+          "encoding": "I"
+        },
+        {
+          "name": "_localId",
+          "encoding": "I"
+        },
+        {
+          "name": "_localStatus",
+          "encoding": "i"
+        },
+        {
+          "name": "_type",
+          "encoding": "i"
+        },
+        {
+          "name": "_sourceType",
+          "encoding": "i"
+        },
+        {
+          "name": "_updateTime",
+          "encoding": "I"
+        },
+        {
+          "name": "_srcCreateTime",
+          "encoding": "I"
+        },
+        {
+          "name": "_version",
+          "encoding": "I"
+        },
+        {
+          "name": "_updateSeq",
+          "encoding": "I"
+        },
+        {
+          "name": "_localUpdateSeq",
+          "encoding": "I"
+        },
+        {
+          "name": "_editTime",
+          "encoding": "I"
+        },
+        {
+          "name": "_pinTopTimestamp",
+          "encoding": "I"
+        },
+        {
+          "name": "_ctrlFlag",
+          "encoding": "I"
+        },
+        {
+          "name": "_usedTimes",
+          "encoding": "I"
+        },
+        {
+          "name": "_retryTimes",
+          "encoding": "i"
+        },
+        {
+          "name": "_webCacheStatus",
+          "encoding": "I"
+        },
+        {
+          "name": "_m_preMsgIndex",
+          "encoding": "I"
+        },
+        {
+          "name": "_starType",
+          "encoding": "I"
+        },
+        {
+          "name": "_isChatRoom",
+          "encoding": "i"
+        },
+        {
+          "name": "_m_uiFromScene",
+          "encoding": "I"
+        },
+        {
+          "name": "_favCheckId",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_deviceid",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_title",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_desc",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_link",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_fromUsr",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_realChatName",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_editUsr",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_n64MsgID",
+          "encoding": "q"
+        },
+        {
+          "name": "_eventId",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_appId",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_brandId",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_totalDataSize",
+          "encoding": "Q"
+        },
+        {
+          "name": "_locItem",
+          "encoding": "@\"FavLocationItem\""
+        },
+        {
+          "name": "_urlItem",
+          "encoding": "@\"FavURLItem\""
+        },
+        {
+          "name": "_productItem",
+          "encoding": "@\"FavProductItem\""
+        },
+        {
+          "name": "_tvItem",
+          "encoding": "@\"FavTVItem\""
+        },
+        {
+          "name": "_weAppItem",
+          "encoding": "@\"FavWeAppItem\""
+        },
+        {
+          "name": "_tagIdList",
+          "encoding": "@\"NSArray\""
+        },
+        {
+          "name": "_startUploadTime",
+          "encoding": "@\"NSDate\""
+        },
+        {
+          "name": "_cellHeight",
+          "encoding": "d"
+        },
+        {
+          "name": "_searchText",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_forceReuploadCdnDataURLSet",
+          "encoding": "@\"NSSet\""
+        },
+        {
+          "name": "_starBizKey",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_finderShareItem",
+          "encoding": "@\"WCFinderShareToMomentsItem\""
+        },
+        {
+          "name": "_finderLongVideoShareItem",
+          "encoding": "@\"WCMegaVideoShareItem\""
+        },
+        {
+          "name": "_finderLiveShareItem",
+          "encoding": "@\"WCFinderLiveShareItem\""
+        },
+        {
+          "name": "_finderThemeLiveShareItem",
+          "encoding": "@\"WCFinderThemeLiveStreamShareItem\""
+        },
+        {
+          "name": "_finderShareNameCard",
+          "encoding": "@\"WCFinderMessageShareNameCard\""
+        },
+        {
+          "name": "_finderTopicShareItem",
+          "encoding": "@\"WCFinderTopicShareItem\""
+        },
+        {
+          "name": "_finderCollectionShareItem",
+          "encoding": "@\"WCFinderCollectionShareItem\""
+        },
+        {
+          "name": "_finderContentColumnSharedItem",
+          "encoding": "@\"WCFinderContentColumnSharedItem\""
+        },
+        {
+          "name": "_transferInfo",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "_musicShareItem",
+          "encoding": "@\"MMMusicShareItem\""
+        },
+        {
+          "name": "_liteAppItem",
+          "encoding": "@\"FavLiteAppItem\""
+        },
+        {
+          "name": "_xiaoweiFavAddedToastPrompt",
+          "encoding": "@\"CBTFavAddedToastPromptData\""
+        },
+        {
+          "name": "_info",
+          "encoding": "@\"NSString\""
+        }
+      ]
+    },
+    {
+      "name": "FavDataItemWrap",
+      "class_offset": "0x1ee86708",
+      "superclass": "RecordNodeDataSource",
+      "methods": [
+        {
+          "selector": "initWithParent:DataItem:Index:",
+          "encoding": "@36@0:8@16@24I32",
+          "imp": "0x101a755e8",
+          "metadata_offset": "0x171fcab8"
+        },
+        {
+          "selector": "initWithParent:DataItem:dataList:Index:",
+          "encoding": "@44@0:8@16@24@32I40",
+          "imp": "0x101a7568c",
+          "metadata_offset": "0x171fcac4"
+        },
+        {
+          "selector": "getParserType",
+          "encoding": "Q16@0:8",
+          "imp": "0x101a75784",
+          "metadata_offset": "0x171fcad0"
+        },
+        {
+          "selector": "GetParent",
+          "encoding": "@16@0:8",
+          "imp": "0x101a7578c",
+          "metadata_offset": "0x171fcadc"
+        },
+        {
+          "selector": "GetDataItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101a7579c",
+          "metadata_offset": "0x171fcae8"
+        },
+        {
+          "selector": "messageViewModel",
+          "encoding": "@16@0:8",
+          "imp": "0x101a757ac",
+          "metadata_offset": "0x171fcaf4"
+        },
+        {
+          "selector": "GetParentLocalID",
+          "encoding": "I16@0:8",
+          "imp": "0x101a75858",
+          "metadata_offset": "0x171fcb00"
+        },
+        {
+          "selector": "GetImageAndVideoIndex",
+          "encoding": "I16@0:8",
+          "imp": "0x101a75870",
+          "metadata_offset": "0x171fcb0c"
+        },
+        {
+          "selector": "GetImageDataDownloadStatus",
+          "encoding": "i16@0:8",
+          "imp": "0x101a75b4c",
+          "metadata_offset": "0x171fcb18"
+        },
+        {
+          "selector": "GetParentDownloadStatus",
+          "encoding": "i16@0:8",
+          "imp": "0x101a75c20",
+          "metadata_offset": "0x171fcb24"
+        },
+        {
+          "selector": "GetImgAndVideoArray",
+          "encoding": "@16@0:8",
+          "imp": "0x101a75cd4",
+          "metadata_offset": "0x171fcb30"
+        },
+        {
+          "selector": "GetMusicInfo",
+          "encoding": "@16@0:8",
+          "imp": "0x101a7606c",
+          "metadata_offset": "0x171fcb3c"
+        },
+        {
+          "selector": "StartDownload",
+          "encoding": "B16@0:8",
+          "imp": "0x101a76644",
+          "metadata_offset": "0x171fcb48"
+        },
+        {
+          "selector": "dataItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101a76808",
+          "metadata_offset": "0x171fcb54"
+        },
+        {
+          "selector": "setDataItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a76818",
+          "metadata_offset": "0x171fcb60"
+        },
+        {
+          "selector": "parent",
+          "encoding": "@16@0:8",
+          "imp": "0x101a7682c",
+          "metadata_offset": "0x171fcb6c"
+        },
+        {
+          "selector": "setParent:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a7683c",
+          "metadata_offset": "0x171fcb78"
+        },
+        {
+          "selector": "index",
+          "encoding": "I16@0:8",
+          "imp": "0x101a76850",
+          "metadata_offset": "0x171fcb84"
+        },
+        {
+          "selector": "setIndex:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101a76860",
+          "metadata_offset": "0x171fcb90"
+        },
+        {
+          "selector": "setMessageViewModel:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101a76870",
+          "metadata_offset": "0x171fcb9c"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8",
+          "imp": "0x101a76884",
+          "metadata_offset": "0x171fcba8"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_dataItem",
+          "encoding": "@\"FavoritesItemDataField\""
+        },
+        {
+          "name": "m_parent",
+          "encoding": "@\"FavoritesItem\""
+        },
+        {
+          "name": "m_index",
+          "encoding": "I"
+        },
+        {
+          "name": "m_dataList",
+          "encoding": "@\"NSArray\""
+        },
+        {
+          "name": "_messageViewModel",
+          "encoding": "@\"BaseMessageViewModel\""
+        }
+      ]
+    },
+    {
+      "name": "FavSearchHelper",
+      "class_offset": "0x1ee87ec8",
+      "superclass": "MMObject",
+      "methods": [
+        {
+          "selector": "init",
+          "encoding": "@16@0:8",
+          "imp": "0x101b27734",
+          "metadata_offset": "0x17203a48"
+        },
+        {
+          "selector": "getAddressWithLocation:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b277cc",
+          "metadata_offset": "0x17203a54"
+        },
+        {
+          "selector": "getFavItemsAddress:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b27a0c",
+          "metadata_offset": "0x17203a60"
+        },
+        {
+          "selector": "getAddressInQueue",
+          "encoding": "v16@0:8",
+          "imp": "0x101b27d70",
+          "metadata_offset": "0x17203a6c"
+        },
+        {
+          "selector": "requestAddressFromLocation:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b27f4c",
+          "metadata_offset": "0x17203a78"
+        },
+        {
+          "selector": "onFindFavAddress:eventID:",
+          "encoding": "v28@0:8@16I24",
+          "imp": "0x101b28174",
+          "metadata_offset": "0x17203a84"
+        },
+        {
+          "selector": "delegate",
+          "encoding": "@16@0:8",
+          "imp": "0x101b283d0",
+          "metadata_offset": "0x17203a90"
+        },
+        {
+          "selector": "setDelegate:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b283f0",
+          "metadata_offset": "0x17203a9c"
+        },
+        {
+          "selector": "currentEventID",
+          "encoding": "I16@0:8",
+          "imp": "0x101b28404",
+          "metadata_offset": "0x17203aa8"
+        },
+        {
+          "selector": "setCurrentEventID:",
+          "encoding": "v20@0:8I16",
+          "imp": "0x101b28414",
+          "metadata_offset": "0x17203ab4"
+        },
+        {
+          "selector": "arrLocItem",
+          "encoding": "@16@0:8",
+          "imp": "0x101b28424",
+          "metadata_offset": "0x17203ac0"
+        },
+        {
+          "selector": "setArrLocItem:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x101b28434",
+          "metadata_offset": "0x17203acc"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8",
+          "imp": "0x101b28448",
+          "metadata_offset": "0x17203ad8"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "_currentEventID",
+          "encoding": "I"
+        },
+        {
+          "name": "_delegate",
+          "encoding": "@\"<FavSearchHelperDelegate>\""
+        },
+        {
+          "name": "_arrLocItem",
+          "encoding": "@\"NSMutableArray\""
+        }
+      ],
+      "class_methods": [
+        {
+          "selector": "filterAndAggregateSearchResult:withSearchText:withSearchType:withTagList:",
+          "encoding": "@48@0:8@16@24q32@40",
+          "imp": "0x101b26750",
+          "metadata_offset": "0x1702e210"
+        },
+        {
+          "selector": "aggregatePicSearchResult:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101b27260",
+          "metadata_offset": "0x1702e21c"
+        },
+        {
+          "selector": "convertFavDataToSimpleInfo:inItem:",
+          "encoding": "@32@0:8@16@24",
+          "imp": "0x101b275b8",
+          "metadata_offset": "0x1702e228"
+        }
+      ]
+    }
+  ]
+}

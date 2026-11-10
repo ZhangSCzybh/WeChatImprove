@@ -1,6 +1,7 @@
 #import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import "CSMessageActionCoordinator.h"
+#import "CSFavoriteVoiceForwardAdapter.h"
 
 // Native selection, confirmation, comments and cleanup always run. Only the verified
 // per-target voice boundary may replace the native (voice-refusing) sender.
@@ -16,27 +17,33 @@
 
 %hook ForwardMessageLogicController
 - (void)forwardMessage:(id)source {
+    [CSFavoriteVoiceForwardAdapter.sharedAdapter bindLogic:self source:source];
     [CSMessageActionCoordinator.sharedCoordinator bindForwardLogic:self source:source];
     %orig;
 }
 - (BOOL)bShowSendSuccessView {
+    if ([CSFavoriteVoiceForwardAdapter.sharedAdapter suppressesNativeSuccessForLogic:self]) return NO;
     if ([CSMessageActionCoordinator.sharedCoordinator shouldSuppressNativeSuccessForLogic:self]) return NO;
     return %orig;
 }
 - (BOOL)bHiddenSendSuccessToastView {
+    if ([CSFavoriteVoiceForwardAdapter.sharedAdapter suppressesNativeSuccessForLogic:self]) return YES;
     if ([CSMessageActionCoordinator.sharedCoordinator shouldSuppressNativeSuccessForLogic:self]) return YES;
     return %orig;
 }
 - (void)ForwardMsgList:(id)messages ToContact:(id)target WithRevokeBatchId:(id)batchID {
     // Reaching native dispatch (after waiting/refusal checks) authorizes the final target snapshot.
     [CSMessageActionCoordinator.sharedCoordinator confirmForwardLogic:self];
+    [CSFavoriteVoiceForwardAdapter.sharedAdapter confirmLogic:self];
     %orig;
 }
 - (void)ForwardMsg:(id)source ToContact:(id)target {
+    if ([CSFavoriteVoiceForwardAdapter.sharedAdapter handleLogic:self source:source target:target]) return;
     if ([CSMessageActionCoordinator.sharedCoordinator handleForwardLogic:self source:source target:target]) return;
     %orig;
 }
 - (void)clearData {
+    [CSFavoriteVoiceForwardAdapter.sharedAdapter finishLogic:self cancelled:YES];
     [CSMessageActionCoordinator.sharedCoordinator finishForwardLogic:self cancelled:YES];
     %orig;
 }
@@ -46,9 +53,11 @@
 - (void)OnForwardMessageSend:(id)logic {
     // UI completion is not native acceptance/delivery and never causes another send.
     [CSMessageActionCoordinator.sharedCoordinator finishForwardLogic:logic cancelled:NO];
+    [CSFavoriteVoiceForwardAdapter.sharedAdapter finishLogic:logic cancelled:NO];
     %orig;
 }
 - (void)OnForwardMessageCancel:(id)logic {
+    [CSFavoriteVoiceForwardAdapter.sharedAdapter finishLogic:logic cancelled:YES];
     [CSMessageActionCoordinator.sharedCoordinator finishForwardLogic:logic cancelled:YES];
     %orig;
 }

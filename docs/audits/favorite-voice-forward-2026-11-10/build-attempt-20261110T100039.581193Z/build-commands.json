@@ -1,0 +1,46 @@
+[
+  {
+    "scheme": "rootless",
+    "command": [
+      "make",
+      "package",
+      "-j4",
+      "SCHEME=rootless",
+      "PACKAGE_VERSION=2.3-9",
+      "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootless/.theos",
+      "THEOS_OBJ_DIR_NAME=obj",
+      "THEOS_STAGING_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootless/staging",
+      "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootless",
+      "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootless/packages"
+    ],
+    "exit_code": 0,
+    "seconds": 26.04,
+    "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/favorite-voice-forward-2026-11-10/build-attempt-20261110T100039.581193Z/rootless-build.log",
+    "warning_count": 8,
+    "object_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootless/.theos/obj",
+    "staging_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootless/staging",
+    "package_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootless/packages"
+  },
+  {
+    "scheme": "rootful",
+    "command": [
+      "make",
+      "package",
+      "-j4",
+      "SCHEME=rootful",
+      "PACKAGE_VERSION=2.3-9",
+      "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootful/.theos",
+      "THEOS_OBJ_DIR_NAME=obj",
+      "THEOS_STAGING_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootful/staging",
+      "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootful",
+      "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootful/packages"
+    ],
+    "exit_code": 0,
+    "seconds": 26.04,
+    "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/favorite-voice-forward-2026-11-10/build-attempt-20261110T100039.581193Z/rootful-build.log",
+    "warning_count": 8,
+    "object_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootful/.theos/obj",
+    "staging_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootful/staging",
+    "package_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-favorite-voice-candidate-build-sk1q0aav/rootful/packages"
+  }
+]

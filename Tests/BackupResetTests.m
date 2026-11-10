@@ -30,9 +30,12 @@ int main(void){@autoreleasepool{
     [standard setObject:missing forKey:navImage];
     [standard setObject:@{@"friend":@{@"enabled":@YES,@"separatorImagePath":missing,@"separatorText":@"keep"}} forKey:contacts];
     [standard setObject:@"keep" forKey:text];[standard setObject:@"host-secret" forKey:@"host.account"];[standard setInteger:99 forKey:@"kReceiveTransferTotalCountKey"];
+    NSArray *voiceKeys=@[@"com.wechat.enhance.voice_playback.progress_enabled",@"com.wechat.enhance.voice_forward.enabled",@"com.wechat.enhance.voice_forward.favorite_enabled"];
+    for(NSString *key in voiceKeys)[standard setBool:YES forKey:key];
     NSError *error=nil;NSSet *all=[NSSet setWithArray:CSBackupRegistry.moduleTitles.allKeys],*alice=[NSSet setWithObject:@"alice"],*tabbar=[NSSet setWithObject:@"tabbar"];
     Check(![engine save:@"strict" error:&error]&&error!=nil,@"ordinary backups still reject missing images");
     error=nil;NSDictionary *reset=[engine resetSnapshot:&error];Check(reset!=nil&&error==nil,@"missing tabbar, navigation and contact images do not block reset entry");
+    for(NSString *key in voiceKeys)Check([Field(reset[@"fields"],key)[@"present"] isEqual:@NO],@"reset snapshot removes each registered playback/forward preference");
     NSDictionary *preview=[engine preview:reset modules:tabbar accounts:alice error:&error];Check(preview!=nil,@"missing images do not block reset preview");
     Check([preview[@"warnings"] count]>0,@"preview discloses lost images");
     BOOL removal=NO;for(NSDictionary *change in preview[@"changes"])if([change[@"key"] isEqual:icon])removal=[change[@"before"][@"value"] isEqual:missing]&&[change[@"reset"] boolValue];
@@ -57,11 +60,13 @@ int main(void){@autoreleasepool{
     preview=[engine preview:reset modules:tabbar accounts:alice error:&error];Check([engine prepare:preview error:&error],@"prepare partial reset");account=@"bob";Check(![engine applyPending:&error],@"account change still blocks reset");account=@"alice";
     Check([engine applyPending:&error]&&[engine finishStartup:&error]&&[engine confirmStartup:&error],@"partial reset applies and completes startup");
     Check([standard objectForKey:icon]==nil&&[standard objectForKey:otherIcon]==nil,@"selected tabbar preferences cleared");
+    for(NSString *key in voiceKeys)Check([standard boolForKey:key],@"unselected message-actions module retains playback and forward preferences");
     Check([[standard objectForKey:navImage] isEqual:missing]&&[[standard objectForKey:text] isEqual:@"keep"],@"unselected navigation preferences preserved including missing path");
     Check([engine applyPending:&error],@"completed partial reset is idempotent");
     reset=[engine resetSnapshot:&error];preview=[engine preview:reset modules:all accounts:alice error:&error];
     Check([engine prepare:preview error:&error]&&[engine applyPending:&error]&&[engine finishStartup:&error]&&[engine confirmStartup:&error],@"full reset with missing contact and fixed-path images completes");
     Check([standard objectForKey:contacts]==nil&&[standard objectForKey:navImage]==nil,@"full reset removes selected missing image references");
+    for(NSString *key in voiceKeys)Check([standard objectForKey:key]==nil,@"full reset removes playback progress and preserves forwarding reset semantics");
     Check([[standard objectForKey:@"host.account"] isEqual:@"host-secret"]&&[standard integerForKey:@"kReceiveTransferTotalCountKey"]==99,@"host account and payment statistics preserved");
     Check([store records:NULL].count==0,@"prepare, reset, interrupted rollback and startup never create backup files");
     Check([engine save:@"after reset" error:&error]!=nil,@"complete backup works after full reset");

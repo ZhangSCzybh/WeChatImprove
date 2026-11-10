@@ -115,6 +115,20 @@ void CSCFCancelSelection(id owner) {
     // Keep the invalid ticket so a late callback cannot resurrect this operation.
     // The native Back/Cancel button remains available to start a fresh operation.
 }
+NSArray *CSCFCurrentForwardRecipients(id owner) {
+    if(!NSThread.isMainThread || !CSCFIsClass(owner,@"SessionSelectController")) return nil;
+    // 8.0.80 endMultiSelect: fills m_selectedContacts only AFTER onMultiDone.
+    // Read the same ordered selection that native completion is about to copy.
+    id view=CSCloseFriendRead(owner,@"m_selectView");
+    id selection=CSCloseFriendRead(view,@"m_dicMultiSelect");
+    SEL selector=NSSelectorFromString(@"allValuesInOrder");
+    Method method=class_getInstanceMethod([selection class],selector);
+    if(!CSCloseFriendMethodMatches(method,"@@:")) return nil;
+    @try {
+        id recipients=((id(*)(id,SEL))objc_msgSend)(selection,selector);
+        return [recipients isKindOfClass:NSArray.class] ? [recipients copy] : nil;
+    } @catch(__unused NSException *exception) { return nil; }
+}
 BOOL CSCFAllowSelection(id owner,NSArray *recipients) {
     CSCFBeginSelection(owner);
     CSCloseFriendSelectionTicket *ticket=objc_getAssociatedObject(owner,&SelectionKey);

@@ -177,7 +177,7 @@ static void InstallContacts(void) {
         if([contacts isKindOfClass:NSArray.class] && CSCFAllowSelection(object,contacts)) orig(contacts);
     });
     for(NSString *name in @[@"onMultiDone",@"onMultiDoneInPageSheetMode"]) Hook0(@"SessionSelectController",name,^(id object,void(^orig)(void)){
-        id contacts=CSCloseFriendRead(object,@"m_selectedContacts");
+        NSArray *contacts=CSCFCurrentForwardRecipients(object);
         if([contacts isKindOfClass:NSArray.class] && CSCFAllowSelection(object,contacts)) orig();
     });
     for(NSString *name in @[@"contactSelectorViewController:didSelectContact:",@"contactSelectorViewController:didFinishMultiplySelectingContacts:"]) {
