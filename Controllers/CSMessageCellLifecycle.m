@@ -1,6 +1,7 @@
 #import "CSMessageCellLifecycle.h"
 #import "CSMessageGestureAdapter.h"
 #import "CSMessageMergeAdapter.h"
+#import "CSClownPresentation.h"
 #import <objc/runtime.h>
 static char CSLifecycleKey;
 @interface CSMessageCellLifecycleState : NSObject
@@ -19,13 +20,14 @@ void CSMessageCellPerformLayout(id cell, void (^native)(void)) {
     if (state.bindingDepth || state.reuseDepth) { native(); return; }
     BOOL outer=state.layoutDepth++==0;
     CSMessageGestureAdapter *adapter=CSMessageGestureAdapterForCell(cell,YES);
-    if (outer) { [adapter detachForLayout]; CSMessageMergeRestore(cell); }
+    if (outer) { [adapter detachForLayout]; CSClownRestoreCell(cell); CSMessageMergeRestore(cell); }
     @try { native(); }
     @finally {
         state.layoutDepth--;
         if (outer) {
             CSMessageTimePrepareCell(cell);
             CSMessageMergeRender(cell); // merge owns final time positioning, active or inactive
+            CSClownRenderCell(cell);
             [adapter refreshForLayout]; [adapter reattachAfterLayout];
         }
     }
@@ -36,7 +38,7 @@ void CSMessageCellPerformBinding(id cell, id model, void (^native)(void)) {
     CSMessageGestureAdapter *adapter=CSMessageGestureAdapterForCell(cell,NO);
     BOOL changed=CSMessageActionObjectGetter(cell,NSSelectorFromString(@"viewModel"))!=model;
     if (outer) {
-        [adapter invalidateBinding]; CSMessageMergeReuse(cell);
+        CSClownReuseCell(cell); [adapter invalidateBinding]; CSMessageMergeReuse(cell);
         if (changed) CSMessageTimeResetCell(cell);
     }
     @try { native(); }
@@ -48,7 +50,7 @@ void CSMessageCellPerformBinding(id cell, id model, void (^native)(void)) {
 void CSMessageCellPerformReuse(id cell, void (^native)(void)) {
     CSMessageCellLifecycleState *state=CSLifecycle(cell);
     BOOL outer=state.reuseDepth++==0;
-    if (outer) { [CSMessageGestureAdapterForCell(cell,NO) invalidateBinding]; CSMessageMergeReuse(cell); CSMessageTimeResetCell(cell); }
+    if (outer) { CSClownReuseCell(cell); [CSMessageGestureAdapterForCell(cell,NO) invalidateBinding]; CSMessageMergeReuse(cell); CSMessageTimeResetCell(cell); }
     @try { native(); }
     @finally { state.reuseDepth--; }
 }
@@ -57,7 +59,7 @@ void CSMessageCellRefresh(id cell) {
     CSMessageCellLifecycleState *state=CSLifecycle(cell);
     if (state.layoutDepth || state.bindingDepth || state.reuseDepth) return;
     CSMessageGestureAdapter *adapter=CSMessageGestureAdapterForCell(cell,YES);
-    [adapter detachForLayout]; CSMessageTimePrepareCell(cell); CSMessageMergeRender(cell);
+    [adapter detachForLayout]; CSClownRestoreCell(cell); CSMessageTimePrepareCell(cell); CSMessageMergeRender(cell); CSClownRenderCell(cell);
     [adapter refreshForLayout]; [adapter reattachAfterLayout];
 }
 void CSMessageCellWindowChanged(id cell) {

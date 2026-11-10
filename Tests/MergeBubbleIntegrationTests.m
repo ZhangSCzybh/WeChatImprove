@@ -59,6 +59,82 @@ static void Display(YYAsyncImageView *bg) {
     YYAsyncLayerDisplayTask *task=[bg newAsyncDisplayTask];
     task.displayContentsForLayer(bg.frame.size,^BOOL { return NO; });DrainIntegration();
 }
+static void VerifyDynamicNamedBubbleSeams(void) {
+    // One custom stacked-bubble chain reproduces the reported group first seam.
+    // Its CSS/font origin changes without changing any native body/row dimensions.
+    for (Class cls in @[TextMessageViewModel.class,VoiceMessageViewModel.class]) {
+        BOOL voice=cls==VoiceMessageViewModel.class;
+        ConfigureIntegration(YES,2);nativeMessageMarginTop=8;nativeMessageNameLength=16;
+        BubbleInfo *info=[BubbleInfo new];info.normal=NativeCapsTemplate(3,1,3);info.pressed=info.normal;
+        TestController *page=[TestController new];page.session=@"group@chatroom";page.nodes=[NSMutableArray array];
+        UIWindow *window=[UIWindow new];UITableView *table=[UITableView new];page.table=table;page.view=table;table.window=window;
+        table.bounds=CGRectMake(0,0,320,500);table.contentSize=CGSizeMake(320,1200);table.contentOffset=CGPointMake(0,19);
+        for (NSUInteger i=0;i<4;i++) {
+            TextMessageViewModel *m=[cls new];m.messageWrap=model(26000+(unsigned)i).messageWrap;
+            m.messageWrap.m_uiMessageType=voice ? 34 : 1;m.contentViewSize=CGSizeMake(180,37);m.bgBubbleInfo=info;
+            m.chatRoomTextStateIconDescription=@"";
+            [page.nodes addObject:m];
+        }
+        CSMessageMergeActivate(page);
+        NSMutableArray *views=[NSMutableArray array],*paths=[NSMutableArray array],*heights=[NSMutableArray array],*tips=[NSMutableArray array];
+        NSMutableDictionary *cells=[NSMutableDictionary dictionary];
+        for (NSUInteger phase=0;phase<2;phase++) {
+            if (phase) { nativeMessageMarginTop=11;nativeMessageNameLength=18; }
+            for (NSUInteger i=0;i<4;i++) {
+                NSIndexPath *path=phase ? paths[i] : [NSIndexPath indexPathForRow:0 inSection:i];if (!phase) [paths addObject:path];
+                CSMessageMergePrepare(page,table,path);
+                CGFloat y=i ? nativeMessageMarginTop+3 : ceil(nativeMessageMarginTop+nativeMessageNameLength);
+                CGFloat expected=i==0 ? y+35 : (i==3 ? 90-y : 35);
+                CGFloat height=CSMessageMergeRowHeight(page,table,path,90);CHECK(fabs(height-expected)<.01);
+                if (phase) heights[i]=@(height);else [heights addObject:@(height)];
+                NativeHierarchyCellView *v=phase ? views[i] : (voice ? [VoiceMessageCellView new] : [NativeHierarchyCellView new]);
+                if (!phase) {
+                    v.viewModel=page.nodes[i];MMHeadImageView *head=[MMHeadImageView new];
+                    head.bounds=CGRectMake(0,0,43,43);head.imageSize=CGSizeMake(37,37);
+                    head.headImageView=[UIView new];head.headImageView.frame=CGRectMake(3,3,37,37);
+                    head.headImageView.bounds=CGRectMake(0,0,37,37);[head addSubview:head.headImageView];
+                    v.head=head;[v addSubview:head];
+                    v.container=[UIView new];[v addSubview:v.container];
+                    YYAsyncImageView *bg=[YYAsyncImageView new];bg.image=[ForbiddenYYImage deferredImageWithUIImage:info.normal];
+                    bg.highlightedImage=[ForbiddenYYImage deferredImageWithUIImage:info.pressed];v.content=bg;[v.container addSubview:bg];
+                    v->m_chatRoomNameLabel=[UIView new];v->m_chatRoomNameLabel.frame=CGRectMake(50,0,160,14);
+                    v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,160,14);v->m_chatRoomNameLabel.hidden=i!=0;[v addSubview:v->m_chatRoomNameLabel];
+                    if (voice) {
+                        VoiceMessageCellView *vc=(id)v;UIView *glyph=[UIView new];glyph.frame=CGRectMake(18,6.5,24,24);glyph.bounds=CGRectMake(0,0,24,24);
+                        vc->m_playingImageView=glyph;[v.container addSubview:glyph];
+                        UIView *tip=[UIView new];tip.bounds=CGRectMake(0,0,60,20);[v addSubview:tip];[tips addObject:tip];
+                    }
+                    TestTableCell *cell=[TestTableCell new];cell.cellView=v;cells[path]=cell;[views addObject:v];
+                } else CSMessageMergeRestore(v);
+                v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;v.head.frame=CGRectMake(0,nativeMessageMarginTop,43,43);
+                v.container.frame=CGRectMake(40,y,240,37);v.container.bounds=CGRectMake(0,0,240,37);
+                v.content.frame=CGRectMake(10,0,180,37);v.content.bounds=CGRectMake(0,0,180,37);
+                if (voice) ((UIView *)tips[i]).frame=CGRectMake(258,y+8.5,60,20);
+                CSMessageMergeBind(page,table,path,cells[path]);
+            }
+            table.testCells=cells;table.testHeights=heights;table.indexPathsForVisibleRows=paths;
+            for (NSUInteger pass=0;pass<12;pass++) {
+                table.dragging=pass<4;table.decelerating=pass>=4 && pass<8;
+                for (NSUInteger i=0;i<4;i++) {
+                    NativeHierarchyCellView *v=views[i];
+                    if (voice) { ((VoiceMessageViewModel *)v.viewModel).bShowingQuickTranTips=pass%3!=0;((UIView *)tips[i]).hidden=pass%3==0; }
+                    if (pass==1 || pass==3) { ((YYAsyncImageView *)v.content).highlighted=pass==3;Display((id)v.content); }
+                    CSMessageMergeRender(v);CHECK(fabs(CSMessageMergeRowHeight(page,table,paths[i],90)-[heights[i] doubleValue])<.01);
+                    if (i) {
+                        NativeHierarchyCellView *previous=views[i-1];
+                        CGFloat previousBottom=previous.frame.origin.y+CGRectGetMaxY([previous convertRect:previous.content.bounds fromView:previous.content])-3;
+                        CGFloat currentTop=v.frame.origin.y+CGRectGetMinY([v convertRect:v.content.bounds fromView:v.content])+1;
+                        CHECK(fabs([heights[i-1] doubleValue]+currentTop-previousBottom-2)<.01);
+                    }
+                }
+                CSMessageMergeFlush(page);CHECK(table.updateCount==0);CHECK(table.contentOffset.y==19);
+            }
+            CHECK(CSMessageMergeLayoutSettled(page));
+        }
+        for (NativeHierarchyCellView *v in views) { CSMessageMergeReuse(v);CSBubbleStyleDetach(v); }
+        CSMessageMergeDeactivate(page);nativeMessageMarginTop=5;nativeMessageNameLength=12;
+    }
+}
 
 static NSUInteger VerifyVoiceTranslationSeams(void) {
     NSUInteger scenarios=0;
@@ -108,7 +184,7 @@ static NSUInteger VerifyVoiceTranslationSeams(void) {
             v.viewModel=page.nodes[i];v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
             v.traitCollection.userInterfaceStyle=table.traitCollection.userInterfaceStyle;
             v.container=[UIView new];v.container.frame=CGRectMake(40,y,240,total);v.container.bounds=CGRectMake(0,0,240,total);[v addSubview:v.container];
-            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 282 : 0,named ? 3 : 8,38,38);v.head.bounds=CGRectMake(0,0,38,38);[v addSubview:v.head];
+            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 282 : 0,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);[v addSubview:v.head];
             YYAsyncImageView *bg=[YYAsyncImageView new];bg.frame=CGRectMake(10,0,180,body);bg.bounds=CGRectMake(0,0,180,body);
             bg.traitCollection.userInterfaceStyle=v.traitCollection.userInterfaceStyle;
             bg.image=[ForbiddenYYImage deferredImageWithUIImage:dark ? info.darkNormal : info.normal];
@@ -208,6 +284,7 @@ static NSUInteger VerifyVoiceTranslationSeams(void) {
 }
 
 int main(void) { @autoreleasepool {
+    VerifyDynamicNamedBubbleSeams();
     NSUInteger translationScenarios=VerifyVoiceTranslationSeams();
     ConfigureIntegration(NO,2);
     // Regression: a 38pt body exactly fits the native fixed caps. Requiring an
@@ -292,7 +369,7 @@ int main(void) { @autoreleasepool {
             v.viewModel=m;v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
             v.container=[UIView new];v.container.frame=CGRectMake(40,y,240,native-y);v.container.bounds=CGRectMake(0,0,240,native-y);[v addSubview:v.container];
             v.traitCollection.userInterfaceStyle=table.traitCollection.userInterfaceStyle;
-            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 282 : 0,named ? 3 : 8,38,38);v.head.bounds=CGRectMake(0,0,38,38);[v addSubview:v.head];
+            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 282 : 0,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);[v addSubview:v.head];
             YYAsyncImageView *bg=[YYAsyncImageView new];bg.frame=CGRectMake(10,0,180,bodyHeight);bg.bounds=CGRectMake(0,0,180,bodyHeight);
             bg.traitCollection.userInterfaceStyle=v.traitCollection.userInterfaceStyle;
             bg.image=[ForbiddenYYImage deferredImageWithUIImage:dark ? info.darkNormal : info.normal];

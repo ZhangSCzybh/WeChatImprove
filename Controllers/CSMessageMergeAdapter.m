@@ -5,6 +5,7 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 #include <math.h>
+#include <limits.h>
 
 // All private dispatch is signature checked. Dumped headers do not prove runtime inheritance.
 static Method CSGetter(id object, SEL selector) {
@@ -64,6 +65,10 @@ NSString *CSMessageNativeIdentity(id model) {
 }
 
 @class CSMessageMergeContext;
+typedef struct {
+    CGFloat contentTop, headTop;
+    BOOL valid, showsHead;
+} CSMessageNativeGeometry;
 @interface CSMessageMergeState : NSObject
 @property(nonatomic, weak) CSMessageMergeContext *context;
 @property(nonatomic, weak) id model;
@@ -94,6 +99,7 @@ NSString *CSMessageNativeIdentity(id model) {
 @property(nonatomic) CGFloat occupiedBottom;
 @property(nonatomic) NSUInteger auxiliaryFlags;
 @property(nonatomic) BOOL showsName;
+@property(nonatomic) CSMessageNativeGeometry nativeGeometry;
 @end
 @implementation CSMessageMergeState @end
 
@@ -124,6 +130,8 @@ NSString *CSMessageNativeIdentity(id model) {
 @property(nonatomic, strong) CSMessageMergeConfiguration *config;
 @property(nonatomic) NSUInteger epoch;
 @property(nonatomic) NSUInteger mutationDepth;
+@property(nonatomic) NSUInteger historyDepth;
+@property(nonatomic) BOOL measuringHistory;
 @property(nonatomic) BOOL active;
 @property(nonatomic) BOOL scheduled;
 @property(nonatomic) BOOL dirty;
@@ -409,36 +417,100 @@ static NSUInteger CSAuxiliaryContentFlags(id model) {
 #ifdef CS_MERGE_TESTING
 NSString *CSMessageMergeTestProfileVersion=@"8.0.78";
 #endif
-static BOOL CSNativeProfile(CSMessageMergeState *s, id logical, CGFloat *top, CGFloat *bottom) {
-    if (!CSSupported(logical)) return NO;
-    NSString *kind=NSStringFromClass([logical class]);
-    BOOL usesTemplate=[kind isEqual:@"TextMessageViewModel"] || [kind isEqual:@"VoiceMessageViewModel"];
+static BOOL CSQualifiedNativeVersion(void) {
 #ifdef CS_MERGE_TESTING
     NSString *version=CSMessageMergeTestProfileVersion;
 #else
     NSString *version=NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"];
 #endif
-    BOOL qualified=[version isEqual:@"8.0.78"] || [version hasPrefix:@"8.0.78."] ||
+    return [version isEqual:@"8.0.78"] || [version hasPrefix:@"8.0.78."] ||
         [version isEqual:@"8.0.80"] || [version hasPrefix:@"8.0.80."];
-    if (!qualified) return NO;
+}
+static NSMethodSignature *CSNativeSignature(id receiver, NSString *name, const char *result, NSUInteger arguments) {
+    if (!receiver) return nil;
+    Method method=class_getInstanceMethod(object_getClass(receiver),NSSelectorFromString(name));
+    const char *types=method ? method_getTypeEncoding(method) : NULL;
+    NSMethodSignature *sig=types ? [NSMethodSignature signatureWithObjCTypes:types] : nil;
+    return sig && sig.numberOfArguments==arguments+2 && !strcmp(sig.methodReturnType,result) ? sig : nil;
+}
+static id CSNativeObjects(id receiver, NSString *name, NSArray *arguments) {
+    NSMethodSignature *sig=CSNativeSignature(receiver,name,@encode(id),arguments.count);
+    if (!sig) return nil;
+    for (NSUInteger i=0;i<arguments.count;i++) {
+        const char *type=[sig getArgumentTypeAtIndex:i+2];
+        if (type[0]!='@' && type[0]!='#') return nil;
+    }
+    SEL sel=NSSelectorFromString(name);
+    if (!arguments.count) return ((id(*)(id,SEL))objc_msgSend)(receiver,sel);
+    if (arguments.count==1) return ((id(*)(id,SEL,id))objc_msgSend)(receiver,sel,arguments[0]);
+    if (arguments.count==2) return ((id(*)(id,SEL,id,id))objc_msgSend)(receiver,sel,arguments[0],arguments[1]);
+    return nil;
+}
+static CSMessageNativeGeometry CSNativeGeometry(CSMessageMergeState *s, id logical, CGFloat nativeHeight) {
+    CSMessageNativeGeometry geometry={0};
+    if (s.context.config.spacingMode!=CSMessageSpacingCompact || !CSQualifiedNativeVersion() ||
+        !CSSupported(logical) || !CSBool(logical,@"isHeadPart",NO)) return geometry;
+    @try {
+        Class theme=NSClassFromString(@"MMThemeManager"),util=NSClassFromString(@"MMThemeUtil");
+        if (!theme || !util) return geometry;
+        id context=CSNativeObjects(NSClassFromString(@"MMContext"),@"currentContext",@[]);
+        id manager=CSNativeObjects(context,@"getService:",@[theme]);
+        id values=CSNativeObjects(manager,@"getValueOfProperty:inRuleSet:",@[@"message_node_bkg_margin_top",@"#message_node_view"]);
+        NSMethodSignature *parse=CSNativeSignature(util,@"parseFloatFromValues:",@encode(double),1);
+        if (!values || !parse || [parse getArgumentTypeAtIndex:2][0]!='@') return geometry;
+        double margin=((double(*)(id,SEL,id))objc_msgSend)(util,NSSelectorFromString(@"parseFloatFromValues:"),values);
+        if (!isfinite(margin) || margin<0 || margin>nativeHeight) return geometry;
+        Method headMethod=CSGetter(logical,NSSelectorFromString(@"isShowHeadImage"));
+        if (!headMethod || !strchr("Bc",method_getTypeEncoding(headMethod)[0])) return geometry;
+        geometry.showsHead=CSBool(logical,@"isShowHeadImage",NO);
+        geometry.headTop=margin;
+        geometry.contentTop=margin+(geometry.showsHead ? 3 : 0);
+        if (s.showsName) {
+            // Native returns @"" when there is no status icon. Treating that
+            // non-nil sentinel as visible content preserves the entire native
+            // trailing margin only on the named first row. Actual status icons
+            // can add another point; keep their conservative first-pass fallback.
+            id status=CSMessageNativeObject(logical,@"chatRoomTextStateIconDescription");
+            if (status && (![status isKindOfClass:NSString.class] || [(NSString *)status length])) return (CSMessageNativeGeometry){0};
+            Class font=NSClassFromString(@"UIFont");
+            NSMethodSignature *dynamic=CSNativeSignature(font,@"dynamicLength:",@encode(double),1);
+            if (!dynamic || strcmp([dynamic getArgumentTypeAtIndex:2],@encode(double))) return (CSMessageNativeGeometry){0};
+            double nameHeight=((double(*)(id,SEL,double))objc_msgSend)(font,NSSelectorFromString(@"dynamicLength:"),16);
+            if (!isfinite(nameHeight) || nameHeight<=0 || nameHeight>nativeHeight) return (CSMessageNativeGeometry){0};
+            geometry.contentTop=ceil(margin+nameHeight);
+        }
+        geometry.valid=isfinite(geometry.contentTop) && geometry.contentTop<=nativeHeight;
+    } @catch (__unused NSException *exception) { return (CSMessageNativeGeometry){0}; }
+    return geometry;
+}
+static BOOL CSNativeGeometryChanged(CSMessageNativeGeometry previous, CSMessageNativeGeometry next) {
+    // A native fallback cannot learn a late shrink from newly available metadata.
+    // Real size/configuration changes reopen measurement through the normal path.
+    return previous.valid && (!next.valid || previous.showsHead!=next.showsHead ||
+        fabs(previous.contentTop-next.contentTop)>.01 || fabs(previous.headTop-next.headTop)>.01);
+}
+static BOOL CSNativeProfile(CSMessageMergeState *s, id logical, CGFloat *top, CGFloat *bottom) {
+    if (!s.nativeGeometry.valid) return NO;
+    NSString *kind=NSStringFromClass([logical class]);
+    BOOL usesTemplate=[kind isEqual:@"TextMessageViewModel"] || [kind isEqual:@"VoiceMessageViewModel"];
     BOOL identity=!s.decision.hidesIdentity;
-    BOOL named=s.group && !CSBool(logical,@"isSender",NO) && identity && CSBool(logical,@"isShowChatRoomDisplayName",YES);
-    // Native origins, not UILabel height or an additive name budget. The avatar
-    // extent is a conservative first-pass profile, never a substitute for validation.
+    // Match CommonMessageCellView.layoutInternal: CSS margin + native avatar
+    // offset, replaced by ceil(CSS margin + UIFont dynamicLength:16) for a name.
+    // The model's name decision is already installed before native measurement.
     CGSize body=CGSizeZero;
     if (!CSReadSize(logical,@"contentViewSize",&body)) return NO;
     UIEdgeInsets insets={0,0,0,0};
     s.hasBubbleInsets=usesTemplate && CSBubbleStyleModelInsets(logical,s.context.table,body,&insets);s.bubbleInsets=insets;
     if (usesTemplate && !s.hasBubbleInsets) return NO; // Freeze a safe native fallback; never learn a late shrink.
-    *top=named ? 0 : 8+s.bubbleInsets.top;
+    *top=s.showsName ? 0 : s.nativeGeometry.contentTop+s.bubbleInsets.top;
     // Voice contentViewSize already includes the complete transcription box and
     // its native 4pt internal gap. The lower edge is that box, not the voice bubble's
     // transparent inset; subtracting it would undercount the occupied height.
     BOOL hasLowerContent=CSIsQuotedText(logical) || ((s.auxiliaryFlags&CSVoiceTranscriptFlag) && CSIsVoice(logical));
-    *bottom=(named ? 17 : 8)+s.contentHeight-(hasLowerContent ? 0 : s.bubbleInsets.bottom);
-    if (identity) {
-        if (!s.decision.joinsPrevious) *top=MIN(*top,named ? 3 : 8);
-        if (!s.decision.joinsNext) *bottom=MAX(*bottom,(named ? 3 : 8)+38);
+    *bottom=s.nativeGeometry.contentTop+s.contentHeight-(hasLowerContent ? 0 : s.bubbleInsets.bottom);
+    if (identity && s.nativeGeometry.showsHead) {
+        if (!s.decision.joinsPrevious) *top=MIN(*top,s.nativeGeometry.headTop);
+        if (!s.decision.joinsNext) *bottom=MAX(*bottom,s.nativeGeometry.headTop+38);
     }
     return *bottom<=s.nativeHeight;
 }
@@ -459,6 +531,7 @@ static BOOL CSModelMetricsChanged(CSMessageMergeState *s) {
     // That absence is not evidence of a smaller layout. The row-height boundary
     // validates the complete result after native measurement has finished.
     return (valid && (fabs(size.width-s.contentWidth)>.01 || fabs(size.height-s.contentHeight)>.01)) ||
+        CSNativeGeometryChanged(s.nativeGeometry,CSNativeGeometry(s,logical,s.nativeHeight)) ||
         fabs(s.context.table.bounds.size.width-s.width)>.01 ||
         CSAuxiliaryContentFlags(logical)!=s.auxiliaryFlags || named!=s.showsName ||
         CSBubbleStyleIsDark(s.context.table)!=s.dark;
@@ -476,14 +549,19 @@ CGSize CSMessageMergeMeasure(id model, CGSize nativeSize) {
     if (!hasContent) contentSize=CGSizeZero;
     NSUInteger flags=CSAuxiliaryContentFlags(logical);
     BOOL showsName=s.group && !CSBool(logical,@"isSender",NO) && !s.decision.hidesIdentity && CSBool(logical,@"isShowChatRoomDisplayName",YES);
+    BOOL nameChanged=s.showsName!=showsName;
+    s.showsName=showsName;
+    CSMessageNativeGeometry geometry=CSNativeGeometry(s,logical,nativeSize.height);
     if (fabs(s.contentWidth-contentSize.width)>.01 || fabs(s.width-nativeSize.width)>.01 || fabs(s.nativeHeight-nativeSize.height)>.01 ||
-        fabs(s.contentHeight-contentSize.height)>.01 || s.auxiliaryFlags!=flags || s.showsName!=showsName ||
+        fabs(s.contentHeight-contentSize.height)>.01 || s.auxiliaryFlags!=flags || nameChanged ||
+        CSNativeGeometryChanged(s.nativeGeometry,geometry) ||
         s.dark!=CSBubbleStyleIsDark(s.context.table)) {
         s.geometryRejected=NO;s.measurementDecided=NO;s.hasNativeGeometry=NO;
     }
     s.width=nativeSize.width;s.nativeHeight=nativeSize.height;s.contentHeight=contentSize.height;s.contentWidth=contentSize.width;
     s.auxiliaryFlags=flags;s.showsName=showsName;s.dark=CSBubbleStyleIsDark(s.context.table);
     if (!s.measurementDecided) {
+        s.nativeGeometry=geometry;
         s.appliedDelta=0;s.appliedOriginDelta=0;
         CGFloat top=s.occupiedTop,bottom=s.occupiedBottom;
         if (CSCanCompact(s,flags) && (s.hasNativeGeometry || CSNativeProfile(s,logical,&top,&bottom))) {
@@ -549,6 +627,30 @@ static void CSHide(UIView *view, NSMutableArray *records) {
     CSMessageViewOverride *record = [CSMessageViewOverride new]; record.view = view; record.hidden = view.hidden;
     [records addObject:record]; view.hidden = YES;
 }
+static CGRect CSHeadVisibleBounds(UIView *head) {
+    // MMHeadImageView includes a 3pt interaction border on each side. Its
+    // wrapper height is not the visible avatar height (43pt vs 37pt for the
+    // reported font). Only unwrap this inspected native hierarchy; other avatar
+    // containers and larger/animated decorations retain the full safety bounds.
+    if (![NSStringFromClass(head.class) isEqual:@"MMHeadImageView"]) return head.bounds;
+    UIView *image=CSMessageNativeObject(head,@"headImageView");
+    CGSize size=CGSizeZero;
+    if (![image isKindOfClass:UIView.class] || image.superview!=head || image.hidden || image.alpha<=.01 ||
+        !CGAffineTransformIsIdentity(image.transform) || !CSReadSize(head,@"imageSize",&size) || size.width<=0 ||
+        !CGPointEqualToPoint(head.bounds.origin,CGPointZero) ||
+        fabs(head.bounds.size.width-size.width-6)>.01 || fabs(head.bounds.size.height-size.height-6)>.01)
+        return head.bounds;
+    // Native setImageSize: stores the size before the child's layoutSubviews
+    // centers its frame. Use that same centering rule on the first parent pass;
+    // a still-empty/stale child frame must not permanently expand the row.
+    CGRect rect=CGRectMake((head.bounds.size.width-size.width)/2,(head.bounds.size.height-size.height)/2,
+        size.width,size.height);
+    // A native border image is itself visible and must not be discarded.
+    UIView *border=CSIvarView(head,"_borderImageView");
+    if (border && !border.hidden && border.alpha>.01 && !CGRectIsEmpty(border.bounds) &&
+        (CSMessageNativeObject(border,@"image") || CSMessageNativeObject(border,@"highlightedImage"))) return head.bounds;
+    return rect;
+}
 void CSMessageMergeRender(UIView *view) {
     if (!NSThread.isMainThread) return;
     CSRestoreOrigins(view);
@@ -595,12 +697,13 @@ void CSMessageMergeRender(UIView *view) {
         (head.superview==view || (hasContainer && head.superview==container));
     BOOL bubbleKnown=[bubble isKindOfClass:UIView.class] &&
         (bubble.superview==view || (hasContainer && bubble.superview==container));
+    CGRect headBounds=headKnown ? CSHeadVisibleBounds(head) : CGRectZero;
     BOOL canPlaceHead=headKnown && bubbleKnown && !head.hidden &&
         CGAffineTransformIsIdentity(head.transform) && CGAffineTransformIsIdentity(bubble.transform) &&
-        !CGRectIsEmpty(head.bounds) && !CGRectIsEmpty(bubble.bounds) &&
-        head.bounds.size.height<=38.01 && head.bounds.size.height<=plannedHeight;
+        !CGRectIsEmpty(headBounds) && !CGRectIsEmpty(bubble.bounds) &&
+        headBounds.size.height<=38.01 && headBounds.size.height<=plannedHeight;
     if (canPlaceHead) {
-        CGRect headRect=[view convertRect:head.bounds fromView:head];
+        CGRect headRect=[view convertRect:headBounds fromView:head];
         CGRect bubbleRect=[view convertRect:bubble.bounds fromView:bubble];
         canPlaceHead=isfinite(CGRectGetMinX(headRect)) && isfinite(CGRectGetMaxX(headRect)) &&
             isfinite(CGRectGetMinX(bubbleRect)) && isfinite(CGRectGetMaxX(bubbleRect)) &&
@@ -617,7 +720,7 @@ void CSMessageMergeRender(UIView *view) {
         if (!CGAffineTransformIsIdentity(child.transform) && !CSIsNativeVoiceGlyphMirror(view,child,model)) {
             geometryValid=NO;break;
         }
-        CGRect bounds=child.bounds;
+        CGRect bounds=child==head ? headBounds : child.bounds;
         if (child==bubble && visibleInsets && insets.top+insets.bottom<bounds.size.height) {
             bounds.origin.y+=insets.top;bounds.size.height-=insets.top+insets.bottom;
         }
@@ -653,9 +756,9 @@ void CSMessageMergeRender(UIView *view) {
     if (s.appliedDelta>=0) return;
     if (canPlaceHead) {
         CGRect frame=head.frame;
-        CGRect rect=[view convertRect:head.bounds fromView:head];
+        CGRect rect=[view convertRect:headBounds fromView:head];
         CGFloat projectedTop=view.frame.origin.y+s.appliedOriginDelta+CGRectGetMinY(rect)-view.bounds.origin.y;
-        CGFloat y=MAX(0,MIN(projectedTop,plannedHeight-head.bounds.size.height));
+        CGFloat y=MAX(0,MIN(projectedTop,plannedHeight-headBounds.size.height));
         if (fabs(y-projectedTop)>.01) {
             CSMessageOriginOverride *record=[CSMessageOriginOverride new];record.view=head;
             record.originalOrigin=frame.origin;frame.origin.y+=y-projectedTop;record.appliedOrigin=frame.origin;
@@ -689,7 +792,7 @@ void CSMessageMergeReuse(UIView *view) {
 - (void)flush {
     UITableView *table = self.table;
     if (!self.dirty || !self.active || !CSCanPublish(self) || !table.window || self.mutationDepth || self.refreshing) return;
-    if (table.dragging || table.decelerating || table.editing || table.hasUncommittedUpdates ||
+    if (table.dragging || table.decelerating || table.editing || table.hasUncommittedUpdates || CSBool(table,@"isReloadingData",NO) ||
         UIMenuController.sharedMenuController.menuVisible || CSBool(self.owner,@"isBeingDismissed",NO)) return;
     self.dirty = NO; self.refreshing = YES;
     @try {
@@ -765,6 +868,75 @@ void CSMessageMergeDidMutate(id controller) {
     if (!ctx) return;
     if (ctx.mutationDepth) ctx.mutationDepth--;
     [ctx schedule];
+}
+void CSMessageMergeBeginHistory(id controller) {
+    if (!NSThread.isMainThread) return;
+    CSMessageMergeContext *ctx=CSContext(controller,NO);
+    if (!ctx) return;
+    ctx.historyDepth++;
+    CSMessageMergeWillMutate(controller);
+}
+void CSMessageMergeEndHistory(id controller) {
+    if (!NSThread.isMainThread) return;
+    CSMessageMergeContext *ctx=CSContext(controller,NO);
+    if (!ctx.historyDepth) return;
+    ctx.historyDepth--;
+    CSMessageMergeDidMutate(controller);
+}
+unsigned long long CSMessageMergeHistoryContentHeight(id controller, unsigned long long nativeHeight) {
+    if (!NSThread.isMainThread) return nativeHeight;
+    CSMessageMergeContext *ctx=CSContext(controller,NO);
+    UITableView *table=ctx.table;
+    if (!ctx.historyDepth || ctx.measuringHistory || !ctx.active || !ctx.config.enabled ||
+        ctx.config.spacingMode!=CSMessageSpacingCompact || ![ctx.config appliesToGroup:ctx.session.length && [ctx.session hasSuffix:@"@chatroom"]] ||
+        !CSQualifiedNativeVersion() || !table || table!=CSMessageNativeTable(controller)) return nativeHeight;
+    NSMethodSignature *height=CSNativeSignature(controller,@"tableView:heightForRowAtIndexPath:",@encode(double),2);
+    if (!height || [height getArgumentTypeAtIndex:2][0]!='@' || [height getArgumentTypeAtIndex:3][0]!='@') return nativeHeight;
+    NSArray *nodes=[CSNodes(controller) copy];
+    if (!nodes.count) return nativeHeight;
+    ctx.measuringHistory=YES;
+    @try {
+        // getCurContentSizeHeight has already measured every native section.
+        // Capture those baselines before preparing rows: a newly joined old
+        // first row may change its name decision and reset its native cache.
+        NSMutableArray<NSNumber *> *nativeSections=[NSMutableArray arrayWithCapacity:nodes.count];
+        NSMutableArray<NSNumber *> *rowCounts=[NSMutableArray arrayWithCapacity:nodes.count];
+        for (id node in nodes) {
+            if (!CSNativeSignature(node,@"sectionHeight",@encode(double),0) || !CSGetter(node,NSSelectorFromString(@"numberOfRowsInSection"))) return nativeHeight;
+            double value=((double(*)(id,SEL))objc_msgSend)(node,NSSelectorFromString(@"sectionHeight"));
+            if (!isfinite(value) || value<0) return nativeHeight;
+            [nativeSections addObject:@(value)];
+            [rowCounts addObject:@(CSUInt(node,@"numberOfRowsInSection"))];
+        }
+        double projected=nativeHeight;
+        for (NSUInteger section=0;section<nodes.count;section++) {
+            double displayed=0;
+            for (NSUInteger row=0;row<[rowCounts[section] unsignedLongLongValue];row++) {
+                // This is the actual table delegate, including the merge and
+                // local display adapters. It prepares previously unseen history
+                // rows and updates the old first row's new neighbor decision.
+                double value=((double(*)(id,SEL,id,id))objc_msgSend)(controller,
+                    NSSelectorFromString(@"tableView:heightForRowAtIndexPath:"),table,
+                    [NSIndexPath indexPathForRow:row inSection:section]);
+                if (!isfinite(value) || value<0) return nativeHeight;
+                displayed+=value;
+            }
+            // The native helper truncates its running unsigned total after
+            // each section. Remove exactly that contribution; keep fractional
+            // displayed heights until the final integer return.
+            projected+=displayed-floor([nativeSections[section] doubleValue]);
+        }
+        // Preserve the original helper's header/other contributions and integer
+        // ABI. Never publish a total for a different/reentrantly changed list.
+        NSArray *current=CSNodes(controller);
+        if (current.count!=nodes.count || !isfinite(projected) || projected<0 || projected>=(double)ULLONG_MAX) return nativeHeight;
+        for (NSUInteger i=0;i<nodes.count;i++) if (current[i]!=nodes[i]) return nativeHeight;
+        return (unsigned long long)projected;
+    } @catch (__unused NSException *exception) {
+        return nativeHeight;
+    } @finally {
+        ctx.measuringHistory=NO;
+    }
 }
 void CSMessageMergeFlush(id controller) { [CSContext(controller,NO) flush]; }
 static void CSSettingsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef info) {

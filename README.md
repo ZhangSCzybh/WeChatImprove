@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.3-4`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.3-9`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -16,7 +16,7 @@
 | 导航外观 | 底栏样式、顶栏信息、头像设置 | 悬浮底栏、图标与文字、描边动画；聊天顶栏头像与名称、分隔符；聊天头像隐藏、圆角和旋转 |
 | 页面定制 | 界面简化、界面净化、布局设置 | 标题与菜单文字定制、页面入口和聊天提示隐藏、全局缩放与聊天字体 |
 | 聊天布局 | 附件布局、信息时间、文本占位、触摸轨迹 | 附件按钮排序与列数、消息时间格式与位置、输入框占位文字与外观、触摸轨迹效果 |
-| 消息操作 | 防止撤回、消息手势、语音转发、复读功能、表情功能 | 防撤回与提示显示；分别设置己方/对方消息的左右滑动作；语音转发和消息复读 |
+| 消息操作 | 防止撤回、消息手势、语音转发、复读功能、表情功能、小丑功能 | 防撤回与提示显示；己方/对方消息的左右滑动作；语音转发和消息复读；临时修改当前聊天的文字、时间、图片与转账金额显示 |
 | 红包与收款 | 红包功能、自动收款 | 私聊/群聊开关、延迟处理、通知、自动回复和记录；红包另支持群白名单/黑名单、串行领取与汇总 |
 | 密友保护 | 账号与安全 → 捉迷藏呀 | 独立密码、账号隔离、临时显示、已适配界面的隐藏和来电拒接；支持范围与限制见交付记录 |
 | 账号与辅助 | 账号信息、收藏验证、后台模糊、后台运行、游戏辅助 | 账号信息查看、收藏生物认证、后台页面模糊、后台运行辅助、骰子与猜拳结果选择 |
@@ -29,10 +29,10 @@
 | 项目 | 说明 |
 | --- | --- |
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
-| 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；本次按用户提供的 `8.0.80.34` IPA 核验设置布局、密友恢复入口、底栏与紧密布局 |
+| 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；既有适配参考用户提供的 `8.0.80.34` IPA，小丑功能在两版微信中的显示与交互仍待真机验收 |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | 本地提供 `2.3-4` 安装包；微信 8.0.80 真机未验证 |
-| Rootful | 本地提供 `2.3-4` 安装包及重签用 dylib；微信 8.0.80 真机未验证 |
+| Rootless | `2.3-9` 已构建并核对，包含 arm64／arm64e；尚待 iPhone 微信安装复验 |
+| Rootful | `2.3-9` 安装包及重签用 dylib 已构建并核对，包含 arm64／arm64e；尚待 iPhone 微信安装复验 |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
@@ -40,7 +40,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：当前版本 `2.3-4` 提供 [Rootless 安装包](packages/2.3-4-revoke-jump/com.wechat.improve_2.3-4_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.3-4-revoke-jump/com.wechat.improve_2.3-4_iphoneos-arm.deb)、[重签 IPA 用 dylib](packages/2.3-4-revoke-jump/WeChatImprove.dylib)、[调试符号](packages/2.3-4-revoke-jump/com.wechat.improve_2.3-4_symbols.zip) 和 [SHA-256](packages/2.3-4-revoke-jump/SHA256SUMS)。本版针对防撤回蓝字增加独立的精确点击入口，复用原有原文定位及布局稳定后的微信原生高亮；支持已有的持久化提示，保留账号、会话和消息身份校验。此次聚焦防撤回与导航核心回归，不重跑无关功能的全量脚本。主机验证不能代替微信 8.0.80 真机验收；设备上的原始回调断点与修复后观感尚未采样，详见 [2.3-4 修复记录](docs/audits/revoke-jump-2.3-4/README.md)。前版的添加入口、编辑页顶部布局及发现页圆角修复继续保留。
+1. 获取与设备注入环境匹配的 `.deb`：[2.3-9 Rootless 安装包](packages/2.3-9-merge-history-scroll/com.wechat.improve_2.3-9_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.3-9-merge-history-scroll/com.wechat.improve_2.3-9_iphoneos-arm.deb)、[重签用 dylib](packages/2.3-9-merge-history-scroll/WeChatImprove.dylib) 与 [SHA-256 清单](packages/2.3-9-merge-history-scroll/SHA256SUMS)。本版修正向上查看历史消息时的滚动回退：历史加载按表格实际显示高度计算补位，并在 reload 完成前暂缓额外行高事务。继续保留 2.3-8 已确认正常的连续消息间距与此前停滚稳定处理。详见 [2.3-9 修复与验证记录](docs/audits/merge-history-scroll-2.3-9/README.md)；[2.3-8 修复记录](docs/audits/merge-first-seam-2.3-8/README.md)及既有安装包保留。2.3-9 的 iPhone 微信安装、历史加载及滚动效果仍待复验。
 
    密友头像五击快捷入口不验证身份：任何能操作已解锁手机并到达头像的人，都能查看或修改配置，并经两级确认不可撤销地完整重置当前账号的密友配置。此风险继续存在；修改密码仍须普通入口验证。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
@@ -120,6 +120,10 @@
 - **正常**：保留原生间距。
 - **紧密**：以相邻消息间 `2 pt` 逻辑距离为目标，头像、昵称和附加内容仍保留必要空间。
 
+`2.3-8` 针对首条与第二条接缝补齐两项兼容：微信的 `chatRoomTextStateIconDescription` 在普通昵称下可返回空字符串，空字符串不再被当作真实附加状态而保留整条原生余白；原生头像外层高 43pt、内层可见图像高 37pt 且上下各 3pt 时，使用经过校验的内层图像边界计算占位。真实附加状态、超大头像和无法可靠确认的边界继续使用安全布局。`2.3-7` 的停滚稳定处理继续沿用；用户已确认 `2.3-8` 的连续消息间距正常。
+
+`2.3-9` 让历史加载前后的高度累计复用表格实际行高，包含新补入消息与原首条接上历史后的合并变化；列表 reload 期间暂缓额外布局事务，减少向上滚动时的位置回退。
+
 当前版本支持带“转文字”按钮及已展开转写内容的语音参与紧密布局，语音与自身转写框之间保留原生内部间隔。加载中、二次翻译等未确认的附加布局，以及未适配的版本或模型，可能保留原生空间。实现与验证范围见 [1.8-36 修复记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/merge-voice-translation-1.8-36/README.md)。
 
 ### 列表圆角与悬浮底栏
@@ -163,6 +167,10 @@
 `2.0-16` 修复弹窗样式下，定时任务选择私聊/群聊时整个插件退出的问题。等待会话类型菜单自身关闭后打开原生选择器，取消回到原编辑页并保留未保存内容；同样覆盖全屏/push 显示。见 [修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/scheduled-picker-dismiss-2.0-16/README.md)。
 
 **功能增强 → 表情功能 → 图片添加到表情开关**：默认关闭，保留升级前的开关状态。打开后长按会话里的普通图片，选择“添加到表情”；图片未加载时尝试原生下载，再交由微信原生表情流程处理。整个添加过程只使用微信原生反馈；2.0-14 补齐添加完成后的原生“已添加表情”提示，插件不显示额外的加载、成功、失败提示；已有表情消息保留微信自己的添加入口。更多规则和验收步骤见 [功能说明](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/features/scheduled-tasks-and-image-stickers.md)。
+
+**功能增强 → 小丑功能**：入口位于“表情功能”下方，沿用公共设置页样式。总开关和“聊天文字修改／聊天时间修改／聊天图片修改／聊天转账修改”四个子开关默认全部关闭；关闭总开关保留子项选择。启用对应项后，长按文字、图片或转账分别选择“修改文字”“修改图片”“修改金额”，长按聊天中的系统时间可输入 `yyyy-MM-dd HH:mm` 格式的新时间。修改后的系统时间继续随微信原生点击在简略与包含星期的详细格式间切换，星期按新日期计算。金额接受 1–9 位整数、最多两位小数的正数，规范显示为两位小数。替换仅保存在当前聊天页面的内存中，离开会话后恢复；不上传，不修改原始消息对象、数据库、图片文件或真实转账及支付状态。使用方式、输入规则与真机验证边界见 [小丑功能说明](docs/features/clown-local-display.md)。
+
+用户实测 `2.3-5` 后反馈，转账“修改金额”菜单和系统时间切换存在问题。`2.3-6` 兼容转账标题中的纯数字、千分位与币种格式，避免金额识别失败时过滤菜单；真实 UIKit 检查确认原生视图透明度会影响点击命中，本轮改用可恢复的展示遮罩，并依微信 `8.0.80` 的原生时间模式更新替换时间的两种格式。本轮小丑功能 1115 项检查通过（偏好 249、菜单 302、会话 120、布局 116、真实 UIKit 展示 328），既有消息手势、消息时间和消息动作执行共 3089 项回归通过；旧版两组反向检查能复现金额菜单缺失与时间点击命中失效。Rootless／Rootful 构建及产物核对完成，见[本轮记录](docs/audits/clown-menu-time-fix-2026-11-09/README.md)。真实 UIKit 检查运行于 Mac Catalyst，微信类与相册边界使用替身，不能替代 iPhone 微信的安装与交互复验。
 
 ## 配置与备份
 
@@ -222,7 +230,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.3-4_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.3-4-revoke-jump/`。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.3-9_iphoneos-arm64.deb`。本轮交付为 [2.3-9 Rootless 安装包](packages/2.3-9-merge-history-scroll/com.wechat.improve_2.3-9_iphoneos-arm64.deb)，已核对包含 arm64／arm64e。
 
 ### Rootful
 
@@ -231,7 +239,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出：`packages/com.wechat.improve_2.3-4_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.3-4-revoke-jump/`。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.3-9_iphoneos-arm.deb`。本轮交付为 [2.3-9 Rootful 安装包](packages/2.3-9-merge-history-scroll/com.wechat.improve_2.3-9_iphoneos-arm.deb)，已核对包含 arm64／arm64e。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -255,7 +263,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.3-4-revoke-jump/com.wechat.improve_2.3-4_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.3-9-merge-history-scroll/com.wechat.improve_2.3-9_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。

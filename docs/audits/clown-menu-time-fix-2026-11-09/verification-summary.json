@@ -1,0 +1,30 @@
+{
+  "feature_checks": {
+    "preferences_backup": 249,
+    "menu": 302,
+    "session": 120,
+    "layout_date_amount": 116,
+    "presentation_real_uikit": 328
+  },
+  "related_regression_checks": {
+    "message_gesture_lifecycle": 369,
+    "message_time": 142,
+    "message_actions_execution": 2578
+  },
+  "old_snapshot_red": {
+    "amount_menu": {
+      "compile_exit": 0,
+      "run_exit": 1
+    },
+    "native_time": {
+      "compile_exit": 0,
+      "run_exit": 1
+    }
+  },
+  "source_matches_build_manifest": true,
+  "production_inputs_count": 395,
+  "device_installed": false,
+  "uikit_touch_stream_injected": false,
+  "feature_checks_total": 1115,
+  "related_regression_checks_total": 3089
+}

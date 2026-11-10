@@ -1,0 +1,34 @@
+{
+  "version": "2.3-8",
+  "production_manifest_matches_current_checkout": true,
+  "delivery_hashes_verified": true,
+  "scroll_flush_implementation_identical_to_2_3_7": true,
+  "previous_2_3_7_delivery_hashes_verified": true,
+  "builds": [
+    {
+      "scheme": "rootless",
+      "exit_code": 0,
+      "seconds": 21.79
+    },
+    {
+      "scheme": "rootful",
+      "exit_code": 0,
+      "seconds": 21.8
+    }
+  ],
+  "device_installed": false,
+  "final_test_inputs_match_build": true,
+  "core_regressions": {
+    "merge_policy": 235148,
+    "merge_adapter": 37136,
+    "merge_bubble_combinations": 2880,
+    "merge_bubble_checks": 1392136,
+    "bubble_policy_renderer": 36979,
+    "bubble_adapter_lifecycle": 2555
+  },
+  "test_logs_sha256": {
+    "tests/final-merge.log": "492c01b80646f7297364bcf96f0e028815b7e06cb6dd70ce69cce47c60dc05fa",
+    "tests/final-integration.log": "9fd3c803dd67ab294b7d5e7e4129eaab2218a7630aa1a32afb9d87e06bc66cc5",
+    "bubble-core.log": "38bbf771e37a2ca956f46335bae9b8f8016d5eb99f2ab2f340ce7755e9ae0e0d"
+  }
+}

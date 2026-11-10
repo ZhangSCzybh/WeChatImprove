@@ -1,0 +1,93 @@
+{
+  "version": "2.3-8",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "snapshot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/source",
+  "builds": [
+    {
+      "scheme": "rootless",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "SCHEME=rootless",
+        "PACKAGE_VERSION=2.3-8",
+        "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootless/.theos",
+        "THEOS_OBJ_DIR_NAME=obj",
+        "THEOS_STAGING_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootless/staging",
+        "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootless",
+        "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootless/packages"
+      ],
+      "object_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootless/.theos/obj",
+      "staging_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootless/staging",
+      "package_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootless/packages",
+      "exit_code": 0,
+      "seconds": 21.79
+    },
+    {
+      "scheme": "rootful",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "SCHEME=rootful",
+        "PACKAGE_VERSION=2.3-8",
+        "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootful/.theos",
+        "THEOS_OBJ_DIR_NAME=obj",
+        "THEOS_STAGING_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootful/staging",
+        "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootful",
+        "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootful/packages"
+      ],
+      "object_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootful/.theos/obj",
+      "staging_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootful/staging",
+      "package_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-238-merge-first-seam-build-uaztvoyj/rootful/packages",
+      "exit_code": 0,
+      "seconds": 21.8
+    }
+  ],
+  "packages": [
+    {
+      "Package": "com.wechat.improve",
+      "Version": "2.3-8",
+      "Architecture": "iphoneos-arm64",
+      "scheme": "rootless",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "dylib_sha256": "6b6cd1bf1121d654ec0162cb243ed0e2ee3b34c992d7e7fb18f92732862dfcd1",
+      "dsym_uuids": {
+        "arm64": "AF3DF529-F08E-3E56-9B64-F1E1758741E2",
+        "arm64e": "7B66D06D-E9FB-3009-8D4E-984C20E2E2E0"
+      }
+    },
+    {
+      "Package": "com.wechat.improve",
+      "Version": "2.3-8",
+      "Architecture": "iphoneos-arm",
+      "scheme": "rootful",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "dylib_sha256": "e11b5b7947de5cd79cca59d0ba9926466e4327b9f41941fd9cf990c8439b8e85",
+      "dsym_uuids": {
+        "arm64": "C75DA02A-7162-3EE0-A0AA-D1424157B0BC",
+        "arm64e": "3811D244-4F0E-3E41-8091-B5EC2BF2EFF4"
+      }
+    }
+  ],
+  "artifacts": {
+    "WeChatImprove.dylib": "e11b5b7947de5cd79cca59d0ba9926466e4327b9f41941fd9cf990c8439b8e85",
+    "com.wechat.improve_2.3-8_iphoneos-arm.deb": "8695e312e98e18e603d905fea4fde7a36af2864b99900b10d74503ea7b65ccbd",
+    "com.wechat.improve_2.3-8_iphoneos-arm64.deb": "ac58b8edd9da3b45dba71058e01650936cd2ed4273fa8ba2b53c8f80e06400df",
+    "com.wechat.improve_2.3-8_symbols.zip": "ee5bcd1ec47542d92006abd7d49dee3ac8cf7618593f7b6762166dd6a94b03a6"
+  },
+  "sources_unchanged_during_build": true,
+  "previous_packages_preserved": true,
+  "device_installed": false,
+  "build_environment": {
+    "theos": "/Users/zhangshichao/theos",
+    "clang": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+    "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk"
+  }
+}

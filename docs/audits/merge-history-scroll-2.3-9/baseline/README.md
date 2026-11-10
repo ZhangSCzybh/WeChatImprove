@@ -1,0 +1,404 @@
+# WeChatImprove
+
+面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
+
+**当前版本：`2.3-8`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+
+[功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
+
+## 功能概览
+
+| 分类 | 设置入口 | 主要能力 |
+| --- | --- | --- |
+| 会话管理 | 聊天分组 | 全部、群聊、私聊、服务及自定义分组；成员管理、排序、隐藏、未读角标、搜索与手势切换 |
+| 聊天气泡 | 气泡样式 | 经典圆角、连续圆角、效果预览；浅深色背景与收发字体颜色；连续消息合并、间距和头像位置 |
+| 列表外观 | 列表圆角 | 会话、通讯录、发现和“我”页面的卡片样式；圆角、左右边距、顶部距离与浅深色背景 |
+| 导航外观 | 底栏样式、顶栏信息、头像设置 | 悬浮底栏、图标与文字、描边动画；聊天顶栏头像与名称、分隔符；聊天头像隐藏、圆角和旋转 |
+| 页面定制 | 界面简化、界面净化、布局设置 | 标题与菜单文字定制、页面入口和聊天提示隐藏、全局缩放与聊天字体 |
+| 聊天布局 | 附件布局、信息时间、文本占位、触摸轨迹 | 附件按钮排序与列数、消息时间格式与位置、输入框占位文字与外观、触摸轨迹效果 |
+| 消息操作 | 防止撤回、消息手势、语音转发、复读功能、表情功能、小丑功能 | 防撤回与提示显示；己方/对方消息的左右滑动作；语音转发和消息复读；临时修改当前聊天的文字、时间、图片与转账金额显示 |
+| 红包与收款 | 红包功能、自动收款 | 私聊/群聊开关、延迟处理、通知、自动回复和记录；红包另支持群白名单/黑名单、串行领取与汇总 |
+| 密友保护 | 账号与安全 → 捉迷藏呀 | 独立密码、账号隔离、临时显示、已适配界面的隐藏和来电拒接；支持范围与限制见交付记录 |
+| 账号与辅助 | 账号信息、收藏验证、后台模糊、后台运行、游戏辅助 | 账号信息查看、收藏生物认证、后台页面模糊、后台运行辅助、骰子与猜拳结果选择 |
+| 插件管理 | 入口设置、版本控制、更新控制、备份配置、重置设置 | 入口名称与位置、微信版本返回值定制、内部热更新控制、配置导入导出与恢复 |
+
+## 安装与入口
+
+### 环境与兼容性
+
+| 项目 | 说明 |
+| --- | --- |
+| 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
+| 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；既有适配参考用户提供的 `8.0.80.34` IPA，小丑功能在两版微信中的显示与交互仍待真机验收 |
+| 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
+| Rootless | `2.3-8` 已构建并核对，包含 arm64／arm64e；尚待 iPhone 微信安装复验 |
+| Rootful | `2.3-8` 安装包及重签用 dylib 已构建并核对，包含 arm64／arm64e；尚待 iPhone 微信安装复验 |
+| Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
+| 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
+
+微信私有接口会随版本变化。主机回归和成功打包只能验证相应代码与产物，真实设备上的显示、交互及其他插件组合仍需实际确认。
+
+### 安装步骤
+
+1. 获取与设备注入环境匹配的 `.deb`：[2.3-8 Rootless 安装包](packages/2.3-8-merge-first-seam/com.wechat.improve_2.3-8_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.3-8-merge-first-seam/com.wechat.improve_2.3-8_iphoneos-arm.deb)、[重签用 dylib](packages/2.3-8-merge-first-seam/WeChatImprove.dylib) 与 [SHA-256 清单](packages/2.3-8-merge-first-seam/SHA256SUMS)。本版修正紧密合并时收发双方首个接缝偏大的两处误判：普通群昵称的空状态描述不再触发整条原生留白回退，标准头像外层的上下留白不再被视为大头像。用户已确认 `2.3-7` 的停滚重排恢复正常，本版沿用首次确定行高和内容位置的处理；`2.3-8` 的 iPhone 微信安装、首缝显示与滚动效果尚待复验。详见 [2.3-8 修复与验证记录](docs/audits/merge-first-seam-2.3-8/README.md)；[2.3-7 修复记录](docs/audits/merge-nickname-scroll-2.3-7/README.md)及既有安装包保留。小丑菜单与系统时间、防撤回、添加入口、编辑页布局和发现页圆角等前版修复继续保留。
+
+   密友头像五击快捷入口不验证身份：任何能操作已解锁手机并到达头像的人，都能查看或修改配置，并经两级确认不可撤销地完整重置当前账号的密友配置。此风险继续存在；修改密码仍须普通入口验证。
+2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
+3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
+4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
+
+默认入口名称为“再也不会”。在 **入口设置** 中可以修改名称，并选择显示在“我”、微信设置页或已有的插件管理入口；插件管理入口需要宿主环境提供 `WCPluginsMgr`。
+
+`2.1-5` 已包含此前 `2.1-4` 图片修复候选的下载恢复，以及完整 JPEG/PNG 在结束标记后带附加数据时的兼容修复，后续版本继续保留。此前安装包保留；当前版本请使用上方安装包。实际 JPEG 复现、图片 326 项及 ASan/UBSan 验证见 [图片格式修复记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/ai-image-container-2026-10-28/README.md)，下载恢复见 [上次记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/ai-image-recovery-2026-10-28/README.md)；真机显示和图片回复仍需使用新消息验收。
+
+仓库未提供可直接安装的 IPA、现成的重签名流程或 `install.sh`。
+
+## 使用说明
+
+以下路径均从插件设置首页进入。
+
+### 聊天分组
+
+进入 **聊天分组**，打开“启用聊天分组”，返回聊天列表即可使用顶部标签栏。
+
+| 分组 | 内容 |
+| --- | --- |
+| 全部 | 完整会话列表 |
+| 群聊 | 群聊会话 |
+| 私聊 | 普通联系人会话 |
+| 服务 | 公众号、订阅号、服务号及可识别的服务聚合入口 |
+| 自定义分组 | 手动选择的会话，同一会话可加入多个自定义组 |
+
+在设置页点击“添加自定义分组”创建分组，点击分组管理成员，通过右上角“排序”调整顺序。左滑分组可重命名、隐藏预设分组或删除自定义分组。删除分组只移除分组配置，不删除会话或聊天记录。
+
+`2.2-12` 在手指开始拖动列表时取消旧待恢复高度和行锚点，并使已捕获的旧高度失效，避免快速滑到顶部后又被旧刷新拉回原位置。直接监听现有表格拖动手势的开始事件，覆盖宿主未转发滚动代理回调的情况；不改变手势仲裁，横滑切组仍沿用共同高度。没有新增轮询、逐帧计算或调试观测。真机视频确认了故障现象，本轮修复的设备操作仍待复验。详见 [滑动回顶修复](docs/audits/session-groups-quick-top-2026-11-05/README.md)。
+
+`2.2-11` 从聊天返回时恢复离开列表时的滚动高度；切组沿用切换前的当前高度，目标列表较短时夹紧到可达到的边界。同组选中保持位置；用户主动滚动、搜索、原生导航和显式回到顶部会取消旧的待恢复请求。位置只在当前账号、隐私快照与已发布列表一致且布局就绪时恢复，无新增轮询或逐帧任务。本版同时移除分组性能观测模块、构建开关和无调用的插件回顶状态链，保留 UIKit 原生回顶。详见 [滚动位置修复与验证](docs/audits/session-groups-scroll-position-2026-11-03/README.md)。
+
+`2.2-10` 将已知会话变化名单用于兼容分组路径：账号、隐私快照及宿主身份和槽位验证通过后，仅重读相关会话的元数据；稳定的命名行只刷新实际变化或名单命中的可见行，离屏更新无需强制同步布局。未知更新、结构变化、隐私变化、切组、特殊行和 UIKit 行数不符继续完整发布。分组栏缓存标题及角标尺寸，相同几何和样式跳过重复属性写入；字体、角标占位、屏幕尺寸和分组内容变化正确失效。保留此前 80–250ms 消息合并与交互结束唤醒。独立观测包补齐兼容路径和真实主表计数，便于区分入口尝试、投影计算、发布与实际 reload。主机验证不能换算为真机 CPU 或 Core Animation 提交降幅；此前静置约 60 次/秒提交的来源仍待定位。详见 [本轮优化与验证](docs/audits/session-groups-efficiency-2026-11-03/README.md) 和 [2.2-9 四场景采样与对比](docs/audits/session-groups-instruments-2.2-9-2026-11-03/README.md)。
+
+`2.2-9` 统一列表拖动、减速、编辑、菜单及分组手势期间的刷新等待条件，避免交互尚未结束时连续调度；等待有上限，最新变更由交互结束事件唤醒发布，隐私紧急刷新继续优先。仅切换选中分组且来源、配置、账号与隐私快照有效时，复用完整源元数据以及适用的成员、角标计算结果；折叠聊天最新快照不匹配则完整重算。跨“全部”与筛选分组仍按不同折叠展示规则从复制值重建投影。主列表身份和槽位校验仍保留，主机模型测试不等于真机 CPU 降幅。详见 [本轮优化与验证](docs/audits/session-groups-interaction-2026-11-03/README.md)；此前 `2.2-8` 的四场景 Instruments 基线见 [真机采样记录](docs/audits/session-groups-instruments-2026-11-03/README.md)。
+
+`2.2-8` 复用同一份已验证的分组模型；完整变更名单已知且成员、顺序、类型保持稳定时，仅重读相关会话的元数据和更新受影响的分组未读统计。界面层严格核对宿主槽位后复用已有分组投影，只刷新受影响的可见行；离屏会话仅引起角标变化时跳过表格刷新。账号、隐私、未知范围更新或结构变化继续完整校验，广域原生回调不继承局部变化名单。整体仍保留逐项身份、槽位验证，性能结果只反映主机受控模型工作负载，不能直接换算为整机 CPU 或耗电降幅。详见 [优化、清理与验收记录](docs/audits/session-groups-cpu-2026-11-03/README.md)。
+
+`2.2-7` 修复上一轮原生分组候选在微信 `8.0.78` 出现的聊天列表空白：原生展示基线允许单侧空分区，辅助未读源未加载或不兼容时使用完整展示源统计；包装会话与基础会话统一读取身份。原生接口或展示元数据持续不兼容时，先恢复完整原生源，再返回已有投影与代理方案，沿用分组、密友规则与首帧遮罩。支持的主列表继续使用原生会话对象、顺序和坐标；分组角标读取完整展示基线，未读面板及转发候选分别遵守对应的密友规则，折叠子页继续使用已有投影。普通消息刷新合并为最后事件后 80ms、同批最多 250ms，账号、隐私和显式操作优先处理。详见 [空白修复记录](docs/audits/session-groups-blank-2026-11-03/README.md)；[上一轮实现记录](docs/audits/session-groups-native-2026-11-03/README.md)保留其当时的验证范围。
+
+`2.0-18` 的自定义组成员菜单仅有“私聊 / 群聊 / 标签”。私聊、群聊使用原生全屏多选器；标签使用微信原生标签列表批选，再回到原生好友页搜索、调整勾选，最终点完成保存。取消保持原名单；已有群聊、服务号和无法解析成员不会因编辑好友类别丢失。移除的是选人菜单的“全部”，顶部预设“全部”及旧自定义组成员集合均保留。弹窗与全屏显示都等待菜单和原生页各自转场结束，不使用固定延时。详见 [改动、原生证据与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/group-tags-folded-2.0-18/README.md)。
+
+`2.0-27` 清理折叠摘要排查用的日志、去重缓存、来源/原因字段和重复遍历，移除测试中的旧构造方法兼容分支。保留已验收的原生摘要与表格代理修复，完成核心回归和隔离构建。见 [清理与验证记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/folded-summary-cleanup-2.0-27/README.md)。
+
+`2.0-26` 根据真机 `chat_mismatch` 诊断修正微信消息对象的运行时签名读取，避免将有效会话名称及消息误判为不可用。新增真实签名兜底行为回归，旧代码47项失败、修复后通过；沿用原生摘要布局和2.0-25闪退修复；用户已安装并确认摘要正常显示。见 [真机证据与交付记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/folded-summary-runtime-2.0-26/README.md)。
+
+`2.0-25` 补齐折叠会话内存消息缺失或正文未加载时，按当前会话读取最新消息的原生路径；修复原生页面释放后迟到的表格代理回调。仅做核心回归与本地构建，真机显示及进出页面仍待验收。见 [修复与验证记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/group-header-crash-2.0-24/README.md)。
+
+“折叠的聊天”跟随当前分组：内容按同一成员及密友隐私规则过滤，入口优先沿用微信原生“折叠的聊天”标题及字号，不显示数量后缀、不缩字；确认当前组无可见折叠会话时隐藏。摘要只取当前分组可见折叠会话里，按原生有效排序时间最新一条的原生摘要；名称与消息分别使用微信原生 label，由原生方法决定名称来源、分隔、字号、颜色和截断。优先读取与当前候选消息严格匹配的原生折叠入口双字段；缓存缺失、为空或属于其它会话时，在消息副本上调用微信原生正文与折叠名称生成方法，冷启动无需先打开折叠列表。摘要文本不可用、消息身份不可确认或账号/隐私快照失效时保持中性，后续消息/页面刷新自动重取，不借用全局入口的消息。折叠状态仍是微信全局的一份：在某组中取消折叠，会影响其它包含同一会话的组。折叠页不增加分组栏，随当前选中组更新，不为每组另存折叠标记。
+
+`2.0-24` 保留 2.0-21 的连续圆角卡片：折叠行按普通行参与同一 section，不额外分卡或增加间距，仅整组首尾保留外侧圆角。继续使用同一份圆角、边距、浅深色配色，关闭圆角恢复原生平面样式；摘要左对齐，保留原生图标、两行布局和行高，右侧时间/日期及全局未读仍被隐藏；时间仅参与摘要候选排序，缺失时间不再否决有效摘要。详见 [摘要来源、失败用例与核心回归](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/folded-native-parity-2.0-24/README.md)。
+
+“过滤重复联系人”开启后，已加入自定义分组的普通群聊或私聊会话会从对应预设组中移除。“全部”仍保留完整会话；服务号按服务归属显示，也可以手动加入自定义分组。无法可靠识别的其他业务入口可能保留显示。
+
+**搜索与外观：** “显示分组栏搜索按钮”默认开启，使用标签栏右侧按钮进入微信原生搜索，同时收起整块原生搜索头部及其占位；关闭后恢复原生搜索区域。标签字号默认 `18 pt`，支持 `12–28 pt` 及系统动态文字缩放；可配置角标、选中颜色、触感，以及下划线、胶囊包裹或关闭三种指示器动画选项。主列表顶部标题跟随当前分组名称，搜索页保留原生标题。
+
+**横滑操作：** 开启“分组切换手势”后，按手指起始位置区分用途。
+
+| 起手位置 | 行为 |
+| --- | --- |
+| 会话列表可视区域左侧 `85%` | 左滑切到下一组，右滑切到上一组 |
+| 会话列表可视区域右侧 `15%` | 左滑展开微信原生会话菜单 |
+| 分组栏标签区域 | 横滑切组；标签超出宽度时优先滚动标签 |
+
+滑动中途跨越分界线不会改变用途，分组首尾不循环，搜索时暂停切组。关闭该手势后恢复原生会话滑动范围。这里的切组手势与聊天内的“消息手势”分别配置。
+
+### 气泡样式与连续消息合并
+
+进入 **气泡样式**，打开“自定义气泡”后，可以选择经典圆角或连续圆角、调整圆角大小，并分别设置浅色/深色下发送方与接收方的背景和字体颜色。页面顶部提供预览，字体颜色也可恢复为跟随微信。
+
+自定义样式覆盖普通文本、引用文本、语音及语音/视频通话记录；链接保留原生文字样式。连续圆角根据消息在组内的位置调整连接处，通话记录保持独立气泡。
+
+“连续消息合并”可独立开启，支持群聊、私聊或全部会话范围。同一发送者的连续消息可保留首条或末条头像，组内间距提供两档：
+
+- **正常**：保留原生间距。
+- **紧密**：以相邻消息间 `2 pt` 逻辑距离为目标，头像、昵称和附加内容仍保留必要空间。
+
+`2.3-8` 针对首条与第二条接缝补齐两项兼容：微信的 `chatRoomTextStateIconDescription` 在普通昵称下可返回空字符串，空字符串不再被当作真实附加状态而保留整条原生余白；原生头像外层高 43pt、内层可见图像高 37pt 且上下各 3pt 时，使用经过校验的内层图像边界计算占位。真实附加状态、超大头像和无法可靠确认的边界继续使用安全布局。`2.3-7` 的停滚稳定处理继续沿用，本版真机效果仍待复验。
+
+当前版本支持带“转文字”按钮及已展开转写内容的语音参与紧密布局，语音与自身转写框之间保留原生内部间隔。加载中、二次翻译等未确认的附加布局，以及未适配的版本或模型，可能保留原生空间。实现与验证范围见 [1.8-36 修复记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/merge-voice-translation-1.8-36/README.md)。
+
+### 列表圆角与悬浮底栏
+
+**列表圆角**可调整卡片圆角、左右边距、置顶/普通会话顶部距离及浅深色背景。与聊天分组同时开启时，卡片首末行依据当前分组实际显示的会话确定。
+
+**底栏样式**复用微信原生按钮、图标、文字与角标，支持悬浮布局、图标导入、文字隐藏、背景、描边、位置和触感设置。描边动画包括扩散呼吸、扩散心跳、经典呼吸、经典心跳和无动画；系统开启“减弱动态效果”时停止动画。修改后返回主页查看效果。
+
+`2.1-9` 修复设置密友／密群后底栏“微信”数字消失或不随消息更新的问题。普通消息刷新期间保留同账号、同策略下已验证的角标，新数据稳定后更新；在聊天页、设置页或关闭聊天分组时仍维护计数。清空密友／密群或关闭保护后主动恢复当前原生角标。密友会话隐藏时，受保护会话继续按规则排除；未改动底栏布局和微信真实未读状态。详见 [修复记录与验收清单](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/wechat-badge-fix-2.1-9/README.md)。 用户已确认此前角标问题修复。
+
+`2.1-10` 将同一“会话隐藏”规则接入长按底栏“微信”的未读聊天面板。锁定时，受保护会话的整行内容与未读聊天数量一同排除；解锁后按原生顺序恢复显示。面板打开期间重新锁定、修改名单或收到新消息时同步更新；点击及已读操作前重新验证当前会话。只有受保护会话时采用微信原生空态，不显示受保护会话数量。详见 [面板修复记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/closefriend-unread-panel-2.1-10/README.md)。
+
+### 消息操作与辅助功能
+
+**账号信息 → 签名信息**读取当前微信安装包的 `embedded.mobileprovision`，展示其中的类型、团队、团队 ID、创建／过期时间及设备名单信息。`2.2-13` 先按字节提取 plist 再解析，不再把二进制 CMS 文件整体按 ASCII 转成字符串，支持中文团队名。缺文件或解析失败时在分组下方说明原因；不会用插件包或其他安装环境的数据填充。这里的时间属于描述文件，“授权设备 UDID”来自描述文件设备名单中的首项，不保证是当前设备。此次本机回归与打包不代表用户重签微信 8.0.78 的真机验收，详见 [修复记录](docs/audits/account-signature-2026-11-05/README.md)。
+
+在 **消息手势** 中，可分别为己方/对方消息的左滑和右滑选择引用、删除、转发、收藏、撤回、复读或禁用；具体动作仍受微信原生能力和消息类型限制。**语音转发**与**复读功能**提供对应的消息菜单能力。
+
+**后台模糊**默认关闭。开启后，微信失去活跃状态时显示模糊，返回后恢复清晰；控制中心、通知中心或系统认证也可能触发该效果。此功能与“后台运行”分别配置。
+
+**后台运行**开启后，进入后台先申请有限系统任务，有限剩余预算不足 8 秒时再尝试无声音频接力，初次任务申请失败也可尝试音频。使用单次检查调度，临近预算边界时约每秒检查；音频至少播放 5 秒，任务仍有效且有限预算恢复至至少 12 秒、两次相隔至少 1 秒的检查确认后退出，继续利用原生任务。8 秒介入与 12 秒退出之间保留回差，减少反复启停。保留内存生成的静音 WAV 和微信通话／录音优先规则；返回前台或关闭时释放任务、检查和音频。设置页展示当前阶段及宿主后台音频声明，并在“最近一次后台”保留最后状态、进入／开始观察、最后检查及当时状态、返回前台、停止时间及原因、检查至返回间隔；点击任意记录可查看完整时间。记录仅保留当前微信进程中的最近一次，重新打开设置不会刷新最后检查；间隔按单调时钟计算，不代表此前一直运行。原开关和备份兼容。AI 后台兜底可在有效任务或音频阶段运行，仍遵守原有约 45 秒节流。音频提供继续执行的机会，不能保证给系统任务补充时间，反复申请任务也不等于系统无限续期。极大剩余时间不作为独立预算恢复证据，部分系统状态下接力音频仍会持续；本版不依靠停音频探测来假定预算已恢复。手机上的锁屏稳定性、耗电与温升需要在原注入／签名环境实测。详见 [策略调整验证](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/background-run-native-priority-2026-11-02/README.md)、[时间记录验证](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/background-run-records-2026-11-02/README.md) 与 [重构验证](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/background-run-hybrid-2026-11-02/README.md)。
+
+**版本控制**修改微信返回的版本信息，不执行安装或降级；**更新控制**针对微信内部热更新，App Store 更新由系统管理。
+
+### 密友保护
+
+入口是 **插件设置 → 账号与安全 → 捉迷藏呀**。当前账号首次默认隐藏；在插件主设置页长按顶部头像 **2 秒**，轻震后显示入口并按账号记住，后台和重启后保留。已有密友密码的账号沿用原入口与隐藏偏好。头像手势只负责首次发现，不启用保护或解锁内容，也不覆盖“隐藏密友设置”。开发分支及验证见 [手势入口记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friend-entry-gesture-2026-10-26/README.md)。进入后先设置独立密码、选择密友或密群，再启用；默认临时显示 300 秒，后台、账号切换及重启后重新隐藏。“首页长按解锁”默认开启，长按微信首页顶部导航栏 1 秒触发临时解锁；开启“生物识别解锁”后需通过系统面容／指纹验证，不可用、取消或失败时转密友密码，关闭时保留直接解锁；可在密友的“账号保护”中关闭，或将“长按触发时长”设为 **0.5–2 秒**，保存后生效。在首页原生搜索框输入完整密友密码也可解锁，不受长按开关影响。**密友隐藏时，搜索不显示“解锁后查看”占位行；原生实时联想、“搜索网络结果”和普通搜索照常工作。** 完整密码匹配后立即清空输入并停止本次搜索。解锁期间恢复隐藏的密友设置入口，不修改隐藏选项。临时解锁期间可正常接听和拨打密友语音／视频通话；重新锁定后恢复来电拒接设置。消息通知由微信及 iOS 原生设置决定，锁定与临时解锁均不再额外静默。朋友圈可见范围图标继续按对应开关处理。“隐藏全部朋友圈可见范围图标”覆盖朋友圈动态流、我的朋友圈列表（含缩略图）和动态详情，关闭后按原始动态恢复图标，不修改实际发布权限。开启图标隐藏时使用已适配的微信原生朋友圈页面；1.9-9 隐藏详情范围图标时保留原生占位及换行，删除按钮保持原位；入口隐藏、生物识别、摇动锁定、长按解锁和时长设置仍归入“账号保护”。详见 [1.9-9 修改与验证记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friend-position-1.9-9/README.md)。开启“摇动立即锁定”后，临时解锁期间轻摇手机即可重新隐藏密友；仅在微信前台检测，锁定或进入后台即停止。
+
+**消息提醒**：`2.1-11` 移除“静默消息通知”开关及对应策略，旧配置中的该选项不再生效，升级保留密友名单、密码和其他保护选项。锁定且开启“隐藏聊天会话”时，桌面和底栏角标继续排除受保护会话；临时解锁或关闭会话隐藏后恢复原生角标。来电提醒由“拒接语音来电”和“拒接视频来电”控制，原生免打扰仍需手动管理。
+
+**独立重置**：在密友页底部点击“重置密友”。普通入口需输入当前密友密码并再次确认；头像五连击快捷页无需密码，经两级确认后清空当前账号的密友／密群名单、全部选项、密码、生物识别记录及入口发现记录。任何能操作已解锁手机的人均可通过快捷页不可撤销地清空配置，两级确认不能阻止有意操作。完成后退出密友页，“捉迷藏呀”恢复首次隐藏；重新长按插件页头像 2 秒可再次发现并设置新密码。该操作不随普通“重置设置”执行，不删除微信好友、聊天记录或其他账号数据，也不改变微信原生免打扰。已确认的重置若中断，下次进入当前账号时继续清理，完成前不允许重新配置。详见 [独立重置记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friend-reset-2026-10-26/README.md)。
+
+功能保留真实好友关系、消息、未读、标签和发布权限。“谁可以看”保持原生可用，在部分可见／不给谁看／提醒谁看的候选列表过滤密友，并保留原有隐藏成员的发布权限。锁定时资料页沿用原生页面与“添加到通讯录”按钮；朋友圈入口保持微信原生页面，密友个人朋友圈仅隐藏下方动态并显示原生横杠；自己的动态详情过滤密友点赞和评论，发现页朋友圈数字角标扣除密友互动。部分消息搜索及状态仍需要临时显示。自 1.8-58 起，自动设置微信免打扰及对应设置项已移除，原生免打扰由用户手动管理。**升级保留微信已有免打扰状态；需要关闭时请在对应好友／群聊中手动调整。** 1.8-44 补齐普通单人 ilink 与旧版单聊的提前拒接入口；「挂断回复」默认关闭，启用后在提交拒接请求后私聊回复对方，同一人 5 分钟内最多一次。1.8-45 修正原生消息创建签名，发送任务独立于通话对象；服务短暂不可用会重试，明确发送失败后最多自动重试两次，复用原消息记录。状态未知时不重复新增消息，最终失败可在临时解锁后的原生聊天中手动重试。部分群广播、进程被杀后的通知及系统 CallKit 首帧仍需真机验证。详见 [密友交付与限制](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-42/README.md) 和 [挂断回复修复记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-45/README.md)、[1.8-46 搜索修正与复验清单](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-46/README.md)。
+
+### 定时任务与图片添加到表情
+
+**功能增强 → 定时任务**：总开关和各任务开关默认按账号独立保存，可创建单次、每 N 分钟（1–1440）、每 N 小时（1–168）、每天或每周任务，向一个私聊、群聊或文件传输助手发送文字。`2.1-20` 新增“时间段内执行”：每天或指定星期，在开始至结束时间内每 N 分钟／每 N 小时执行，支持跨午夜，时段结束后不补发。列表左滑可启用、停止或删除任务；单项启用不打开总开关，停止撤销尚未提交微信的执行。列表和编辑页沿用公共设置样式，私聊/群聊使用与密友相同的微信原生选择器，每个任务只接受一个目标。执行前记录去重状态；重启后不会自动重发结果未知的消息。微信被挂起、强退或设备关机时不能保证准点。可选择跳过错过的时刻，或只补发最近 10 分钟内的最后一次。
+
+**功能增强 → 人工智能**：总开关与会话开关默认关闭。支持显式选择百炼服务商、联网模式、单图识别与思考开关，新增能力默认关闭；百炼流式收齐后一次回复，通用接口保留原文本行为。可填写兼容 Chat Completions 的 HTTPS API 地址、API Key 和模型，测试连接后启用；支持多个命名预设和会话独立选择。群聊在聊天详情「查找聊天内容」下方设置，默认仅被单独 @ 时回复；`2.1-2` 在「启用 AI 回复」下方新增「免 @ 回复」，开启后仅当前群无需艾特。`2.1-19` 在全局“功能”分组新增“后台兜底补拉”，默认开启，旧配置保持 2.1-17 的约 45 秒兜底及完整同步顺延规则；可在设置中关闭，关闭后不安排插件补拉，依靠微信自身同步，后台可能不再自动回复。周期性网络同步及符合规则消息触发的模型请求存在额外耗电。保留群免打扰设置；同步与保活仍有能耗，系统挂起或退出后无法保证回复。手动回复与 AI 并行。密友保护可分别隐藏 AI 已开启会话列表和定时任务列表，隐藏后自动回复、定时发送仍按原配置运行。详见 [功能说明](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/features/ai-auto-reply.md) 与 [核心验证记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/features/ai-auto-reply-validation.md)。首次免 @ 包见 [2.1-2 发布记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/release-2.1-2/README.md)，本次修复见 [后台同步修复记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/ai-muted-background-2.1-2/README.md)。
+
+`2.0-16` 修复弹窗样式下，定时任务选择私聊/群聊时整个插件退出的问题。等待会话类型菜单自身关闭后打开原生选择器，取消回到原编辑页并保留未保存内容；同样覆盖全屏/push 显示。见 [修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/scheduled-picker-dismiss-2.0-16/README.md)。
+
+**功能增强 → 表情功能 → 图片添加到表情开关**：默认关闭，保留升级前的开关状态。打开后长按会话里的普通图片，选择“添加到表情”；图片未加载时尝试原生下载，再交由微信原生表情流程处理。整个添加过程只使用微信原生反馈；2.0-14 补齐添加完成后的原生“已添加表情”提示，插件不显示额外的加载、成功、失败提示；已有表情消息保留微信自己的添加入口。更多规则和验收步骤见 [功能说明](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/features/scheduled-tasks-and-image-stickers.md)。
+
+**功能增强 → 小丑功能**：入口位于“表情功能”下方，沿用公共设置页样式。总开关和“聊天文字修改／聊天时间修改／聊天图片修改／聊天转账修改”四个子开关默认全部关闭；关闭总开关保留子项选择。启用对应项后，长按文字、图片或转账分别选择“修改文字”“修改图片”“修改金额”，长按聊天中的系统时间可输入 `yyyy-MM-dd HH:mm` 格式的新时间。修改后的系统时间继续随微信原生点击在简略与包含星期的详细格式间切换，星期按新日期计算。金额接受 1–9 位整数、最多两位小数的正数，规范显示为两位小数。替换仅保存在当前聊天页面的内存中，离开会话后恢复；不上传，不修改原始消息对象、数据库、图片文件或真实转账及支付状态。使用方式、输入规则与真机验证边界见 [小丑功能说明](docs/features/clown-local-display.md)。
+
+用户实测 `2.3-5` 后反馈，转账“修改金额”菜单和系统时间切换存在问题。`2.3-6` 兼容转账标题中的纯数字、千分位与币种格式，避免金额识别失败时过滤菜单；真实 UIKit 检查确认原生视图透明度会影响点击命中，本轮改用可恢复的展示遮罩，并依微信 `8.0.80` 的原生时间模式更新替换时间的两种格式。本轮小丑功能 1115 项检查通过（偏好 249、菜单 302、会话 120、布局 116、真实 UIKit 展示 328），既有消息手势、消息时间和消息动作执行共 3089 项回归通过；旧版两组反向检查能复现金额菜单缺失与时间点击命中失效。Rootless／Rootful 构建及产物核对完成，见[本轮记录](docs/audits/clown-menu-time-fix-2026-11-09/README.md)。真实 UIKit 检查运行于 Mac Catalyst，微信类与相册边界使用替身，不能替代 iPhone 微信的安装与交互复验。
+
+## 配置与备份
+
+聊天分组的成员、排序、隐藏项和选中状态按微信账号保存；多数外观与功能开关使用微信进程内的 `NSUserDefaults`。切换账号后，如果出现“导入旧分组到当前账号”，可确认账号后手动导入，旧配置不会自动复制到所有账号。
+
+进入 **备份配置**，可以手动创建完整备份、从文件导入、预览恢复和管理历史文件。快照保存在微信应用容器的 `Library/Preferences/WeChatImprove/BackupV2/`，统一使用 `.wcbak` 二进制 Property List；旧 `Library/Backup` 不再读取或转换，原文件保留。
+
+- **保存**：每次手动操作创建一份 `manual` 备份，直接保存，不扫描历史去重，不按数量清理。更改配置、恢复或重置之前，需要保留旧配置时请先手动保存。
+- **备份内容**：三个实际配置域中登记的插件设置、自定义图片、已存档账号分组，以及当前账号的定时任务定义。日期、二进制颜色和“未设置”状态均保留；图片包含实际字节，恢复时重建当前容器路径。
+- **恢复流程**：选择模块与原所属账号 → 查看差异 → 准备计划 → 手动退出并重新打开微信 → 校验和应用。准备恢复或重置不生成保护备份文件；事务的原始值仍用于失败、中断时回滚。准备完成不表示已恢复，计划可以取消；配置或账号变化后须重新预览。
+- **账号范围**：默认恢复全局模块和当前账号分组，其他账号需主动选择，始终保留原账号 ID。定时任务仅可恢复到原所属的当前账号，恢复后总开关关闭；旧备份没有对应模块时保留现有配置。
+- **历史管理**：历史 `automatic`、`upgrade`、`protection` 文件仍可读取、导入、导出、预览恢复、命名、收藏和手动删除；活动事务引用的文件继续保护。
+- **导入与分享**：导入不会自动应用，仅支持当前 `.wcbak` 二进制格式。无法读取的文件仍可手动管理或导出可读取的原件。
+- **配置修复**：图片缺失或损坏时，可在页面中修复引用后重新手动保存。真正待执行或中断的恢复事务仍在功能初始化前校验。
+
+备份不包含微信聊天记录、登录凭据、授权缓存、支付账本、定时任务执行记录或待发送状态。文件可能包含联系人标识、分组成员和自定义文字，当前格式未加密。完整用法见 [备份指南](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/backup-guide.md)。
+
+`2.0-10` 修复聊天分组红点残留：未读清零即清除红点，聚合与服务号容器不再仅凭残留计数生成红点；保留有效未读提示和原有数字规则。详见 [2.0-10 角标链路、失败复现与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/group-badge-clear-2.0-10/README.md)。
+
+`2.0-9` 将切换器、后台和摇动锁定统一为静默隐藏：在当前主线程调用内完成锁定、退出敏感页和隐私列表刷新，保留普通会话与分组栏。已移除 2.0-8 的抖动、缩放和“密友已隐藏”提示占位；后台模糊关闭时不添加全窗遮罩。详见 [2.0-9 时序对比、失败复现与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/switcher-silent-hide-2.0-9/README.md)。
+
+`2.0-7` 让密友后台整屏遮罩遵循“后台模糊”开关：关闭后立即移除，后续切换器和后台事件不再添加；密友后台锁定与验证取消仍有效。原实现仅模糊模块的关闭用例已通过，本轮复现并修复的是密友独立遮罩，真机毛玻璃效果来源仍需区分。详见 [2.0-7 后台遮罩修复记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/background-blur-disable-2.0-7/README.md)。
+
+`2.0-6` 修复密友首页长按绕过生物识别的问题，并修正系统验证期间的生命周期处理；本轮仅执行认证运行时与长按入口核心回归。验证范围、真机验收步骤及安装包见 [2.0-6 生物识别修复记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friend-biometric-2.0-6/README.md)。
+
+`2.0-5` 增加未应用恢复计划的跨启动自动撤销、明确跨版本资源兼容策略，并补齐元数据读取、回滚和归档审计。真机日志的证据边界、对比实验和新包见 [2.0-5 恢复兼容与事务收尾记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/restore-compatibility-2.0-5/README.md)。
+
+`2.0-4` 修复恢复图片清理依赖打开容器外祖先目录的问题，保留直接子级 PNG 与防链接保护；增加恢复阶段审计、具体错误分类及跨启动失败提示。复现、五项排查结论与新安装包见 [2.0-4 恢复修复记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/restore-paths-2.0-4/README.md)。
+
+`2.0-3` 将备份和密友数据分别迁至 `Library/Preferences/WeChatImprove/BackupV2/`、`Library/Preferences/WeChatImprove/CloseFriends/`，移除 2.0-2 的清理拦截。插件加载时尽早迁移旧 `Application Support/WeChatImprove` 下对应两目录；失败保留原数据并可重试，不向旧目录新增数据。密友沿用原账号密文、钥匙串凭据和解锁逻辑。图片清理仅删除资源根的直接子级普通 PNG。
+
+审计文件 `Library/Preferences/com.wechat.improve.backup-audit.plist` 只记录插件自身操作和观察结果，不 hook 微信或系统删除 API。新路径规则核验、迁移边界、测试与安装包见[2.0-3 存储迁移记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/preferences-storage-migration-2026-10-24/README.md)。[2.0-2 调查及旧拦截方案](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/backup-deletion-2026-10-24/README.md) 保留作历史证据，已被本版替代。
+
+完整功能、触发条件、收藏保护、清理规则和恢复事务说明见 [备份逻辑与功能说明（2.0-15）](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/backup-guide.md)。实现边界及真机验收要求见 [备份重构验证记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/backup-configuration-1.8-37/README.md)，精确配置范围见 [配置登记表](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/backup-configuration-registry.md)。
+
+## 源码编译
+
+### 准备工具
+
+- macOS、Xcode，以及可用的 iPhoneOS SDK。
+- [Theos](https://theos.dev/docs/installation) 与目标打包方案所需的工具链、签名和打包工具。
+- 完整的 `Headers/`、`HeadersFile/`；其中包含项目与微信私有接口声明。
+
+```bash
+git clone https://github.com/ZhangSCzybh/WeChatImprove.git
+cd WeChatImprove
+
+xcrun --sdk iphoneos --show-sdk-path
+```
+
+Makefile 内包含开发机的固定 Theos 路径。下面显式使用 `THEOS` 覆盖它，假设本机安装在 `$HOME/theos`；请按实际位置调整。打包版本直接读取 `control`，避免示例版本号与源码脱节。
+
+### Rootless
+
+```bash
+make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
+  PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+```
+
+当前版本默认输出文件名：`packages/com.wechat.improve_2.3-8_iphoneos-arm64.deb`。本轮交付为 [2.3-8 Rootless 安装包](packages/2.3-8-merge-first-seam/com.wechat.improve_2.3-8_iphoneos-arm64.deb)，已核对包含 arm64／arm64e。
+
+### Rootful
+
+```bash
+make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
+  PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+```
+
+当前版本默认输出文件名：`packages/com.wechat.improve_2.3-8_iphoneos-arm.deb`。本轮交付为 [2.3-8 Rootful 安装包](packages/2.3-8-merge-first-seam/com.wechat.improve_2.3-8_iphoneos-arm.deb)，已核对包含 arm64／arm64e。
+
+| 方案 | 动态库安装目录 |
+| --- | --- |
+| Rootless | `/var/jb/Library/MobileSubstrate/DynamicLibraries/` |
+| Rootful | `/Library/MobileSubstrate/DynamicLibraries/` |
+
+两种方案均配置 `arm64` 与 `arm64e`。包名中的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按设备注入环境选择。Roothide 可通过 `SCHEME=roothide` 指定，需要匹配的 Theos 方案支持，当前未验证其打包与运行。
+
+> **清理前保留产物：** 项目的 `make clean` 会删除整个 `.theos/` 和 `packages/`，包括其中已有安装包与调试符号。普通打包直接运行 `make package`；需要清理时，先将要保留的文件备份到这些目录之外。
+
+### 版本与产物核对
+
+发布新版本时同步维护：
+
+| 文件 | 内容 |
+| --- | --- |
+| [`control`](control) | Debian 包版本与依赖 |
+| [`Headers/CSUserInfoHelper.h`](Headers/CSUserInfoHelper.h) | `kPluginVersionString`，插件内显示版本 |
+| [`Controllers/CSReleaseNotesViewController.m`](Controllers/CSReleaseNotesViewController.m) | 当前版本的内置更新说明 |
+
+`PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
+
+```bash
+dpkg-deb -f packages/2.3-8-merge-first-seam/com.wechat.improve_2.3-8_iphoneos-arm64.deb Version Architecture
+```
+
+插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
+
+## 开发与验证
+
+当前文档入口见 [文档索引](docs/README.md)。已从工作树清理的旧审计链接指向固定 Git 历史；本地大体积证据的恢复方式见归档索引。
+
+### 目录结构
+
+```text
+WeChatImprove/
+├── Controllers/        # 设置界面、业务策略、原生适配与渲染组件
+├── Hooks/              # Logos Hook 与微信生命周期接入
+├── Headers/            # 项目公共声明、插件版本与辅助接口
+├── HeadersFile/        # 微信私有接口声明
+├── Tests/              # macOS 主机回归脚本、测试与 UIKit 替身
+├── docs/               # 功能说明、设计、修复及验证记录
+│   ├── audits/         # 专项分析、版本交付与回归证据
+│   ├── feedbacks/      # 反馈附件与发布授权
+│   └── README.md       # 当前文档及本机归档索引
+├── packages/           # 安装包与调试符号等产物
+├── WeChatImprove.plist # 注入过滤配置
+├── Makefile            # 编译架构、SDK 与打包方案
+└── control             # 包标识、版本与依赖
+```
+
+Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m` 参与编译。Hook 负责接入微信，业务策略、原生接口适配与设置界面主要位于 `Controllers/`。
+
+聊天分组主列表由 `CSGroupNativeSessionCoordinator` 管理完整原生展示基线，`CSGroupNativeModel` 复用共享归属、筛重、隐私和统计规则并输出原生会话对象；主列表使用统一的原生坐标。`CSGroupListAdapter` 负责标签、外观、身份复核和安全遮罩；折叠子页继续使用 `CSGroupProjection` / `CSGroupTableProxy`。未读面板与转发在同步完整候选作用域中取数并复核结果，随后恢复当前组。消息操作由菜单/手势入口、动作协调器和原生适配器协作；气泡与消息合并分别处理样式、分组策略和布局。修改时应同时检查相关生命周期与功能组合。
+
+### 回归检查
+
+`Tests/verify-*.sh` 在 macOS 主机执行，使用 Xcode 的 macOS SDK，部分脚本还需要 Python 3。按修改范围选择相应脚本，例如：
+
+```bash
+# 分组配置与列表圆角
+bash Tests/verify-group-preferences.sh
+bash Tests/verify-list-corners.sh
+
+# 消息合并、气泡及二者的联合布局
+bash Tests/verify-message-merge.sh
+bash Tests/verify-bubble-style.sh
+bash Tests/verify-merge-bubble-integration.sh
+
+# 消息动作、菜单与语音执行路径
+bash Tests/verify-message-actions-core.sh
+bash Tests/verify-message-actions-execution.sh
+
+# 红包、转账核心与自动处理
+bash Tests/verify-payment-core.sh
+```
+
+仓库另有搜索、手势、底栏、消息时间、防撤回、后台模糊等专项脚本。测试通过主机替身验证策略、接口调用和生命周期，不替代设备验收。
+
+`1.9-10` 在 **底栏样式 → 样式设置 → 切换点击特效** 新增“关闭 / 轻弹”，默认关闭，与切换触感独立。启用悬浮导航栏并选择轻弹后，切换成功时图标以约 0.34 秒完成轻微收缩、上弹和回位；支持自定义图标，快速切换只播放最新一次，系统减弱动态效果开启时停用。配置即时生效，并纳入备份和恢复默认。详见 [实现与验证记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/tabbar-click-effect-1.9-10/README.md)。
+
+`1.9-6` 修复备份保护记录异常时的误清理，增加双份保护记录、异常原件展示与清理审计；仅支持当前备份格式，移除旧格式兼容和旧模型。验证与交付见 [备份保护修复记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/backup-retention-fix-1.9-6/README.md)。
+
+`1.9-4` 修正密友临时解锁期间的通话策略：语音／视频来电恢复微信原生处理，资料页语音、视频和通话菜单允许主动拨打；重新锁定后恢复原拒接设置。解锁后不再启动或重试挂断回复。核心回归与交付记录见 [1.9-4 密友通话修复](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-calls-1.9-4/README.md)。
+
+`1.9-3` 补齐密友选择器底部工具栏布局的空名单保存，实际底部完成按钮与内部按钮项同步更新授权状态。原生回调、空名单重开和动态子类回归见 [1.9-3 底部完成按钮修复](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/native-picker-bottom-1.9-3/README.md)。
+
+`1.9-2` 修复密友选择器空名单时“完成”置灰的问题，支持未选择联系人或取消最后一个联系人后保存。保留微信原生选择界面、已选人数及授权校验；验证记录见 [1.9-2 空名单保存修复](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/native-picker-empty-1.9-2/README.md)。
+
+`1.9-1` 修复进入备份配置时标题和列表上移的问题。加载提示改用右上角固定尺寸的活动指示器，避免异步读取前后改变导航栏高度；沿用原有忙碌期间交互限制和全部备份操作。验证范围见 [1.9-1 备份页标题修复记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/backup-title-1.9-1/README.md)。
+
+`1.8-60` 统一密友设置页的图标、文字起点、分隔线和开关间距，并限制长回复的预览宽度。保留原两组 26 个条目、配置键、认证流程和所有操作回调。验证与交付范围见 [1.8-60 密友设置布局记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-settings-1.8-60/README.md)。
+
+`1.8-59` 修复 1.8-58 朋友圈进入与滚动时的缓存递归加锁闪退。基于两份真机日志和匹配 UUID 的符号定位，改用对象身份缓存键并避免原生模型内容比较；离开朋友圈、切换账号及密友策略变化时主动清理缓存。新增旧代码失败、修复后通过的专项回归，以及动态对象和缓存数据释放验证。详见 [1.8-59 崩溃修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-crash-1.8-59/README.md)。
+
+`1.8-58` 优化密友搜索密码校验、朋友圈缓存、策略刷新、列表与角标计算以及到期调度；移除自动设置微信免打扰及对应设置项，交由用户手动管理。验证记录见 [1.8-58 优化与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-performance-1.8-58/README.md)。
+
+`1.8-57` 去除公共操作项的固定字号，使气泡样式、底栏样式和布局设置的恢复操作与其他设置行字号一致。验证记录见 [1.8-57 修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/settings-action-font-1.8-57/README.md)。
+
+`1.8-56` 补齐通讯录群聊列表的密群过滤；隐藏密友时保留当前页面，仅退出密友聊天；修复搜索群聊及关注的视频号头像缺失。验证记录见 [1.8-56 修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-56/README.md)。
+
+`1.8-55` 将密友群聊、红包白名单群和黑名单群修正为微信原生多选场景，恢复勾选和完成保存。验证记录见 [1.8-55 修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/native-picker-selection-1.8-55/README.md)。
+
+`1.8-54` 修复密友群聊、红包白名单群和黑名单群打开时的原生选择器无限递归闪退，并修正好友选择器完成按钮的同类调用。验证记录见 [1.8-54 修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/native-picker-fixes-1.8-54/README.md)。
+
+`1.8-53` 将密友与红包名单选择入口接入微信原生选择器，并修复底栏未配置图片或残留失效图片路径时无法备份的问题。验证记录见 [1.8-53 修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/native-pickers-backup-1.8-53/README.md)。
+
+`1.8-52` 修复密友解锁后朋友圈首屏缺失、滑动后才恢复的问题：按当前状态完成一次原生刷新，并统一单元格显示与列表投影。验证记录见 [1.8-52 修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-52/README.md)。
+
+`1.8-51` 将首页导航栏长按解锁缩短为 1 秒，并提高“摇动立即锁定”的灵敏度。验证及构建记录见 [1.8-51 修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-51/README.md)。
+
+`1.8-50` 基于 1.8-48，单独恢复群聊头像资料页的原生“朋友圈”和“朋友资料”入口。朋友圈主列表沿用 1.8-48 的实现。验证及构建记录见 [1.8-50 修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-50/README.md)。
+
+`1.8-48` 修复分组搜索进出时闪到“全部”，个人朋友圈保留原生封面与资料、仅隐藏密友动态并显示原生空内容横杠；补齐发现页数字角标和自己朋友圈详情中的密友互动过滤。定向回归与构建记录见 [1.8-48 修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-48/README.md)。
+
+`1.8-47` 修复普通好友的个人朋友圈与动态详情被整页提示解锁的问题，按当前好友或作者判定访问；同步处理页面复用、解锁与重新锁定。定向回归与构建记录见 [朋友圈误锁修正记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-47/README.md)。
+
+`1.8-46` 移除“解锁后查看”搜索占位，恢复原生实时联想与网络搜索提示，保留完整密码解锁和加载收尾。定向回归与构建记录见 [搜索修正记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-46/README.md)。
+
+`1.8-45` 修复挂断回复的原生创建入口与发送时序，补充同消息失败重试；首页密码输入期间暂停建议，普通搜索改为显式提交。定向回归与构建记录见 [修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-45/README.md)。
+
+`1.8-44` 补齐「提醒谁看」名单过滤、修复密码解锁后的输入与加载收尾，补齐单人来电提前拒接并增加可编辑挂断回复。定向回归与构建记录见 [修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-44/README.md)。
+
+`1.8-43` 根据 1.8-42 真机反馈修复发布范围选择、服务号原生展示、昵称／备注搜索、资料页原生按钮和快捷解锁，并移除设置页兼容性状态。针对性主机回归与 Rootless 双架构构建已通过，本轮改动待真机复验。参见 [修复与验收记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friends-1.8-43/README.md)。
+
+`1.8-41` 统一备份、重置及下级页面的文字样式，整理预览概览与修复分组，处理长名称和账号文字的宽度，记录见[设置页面字号与布局调整](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/settings-font-1.8-41/README.md)。
+
+`1.8-40` 修正了版本备份失败替换插件入口并阻止功能加载的问题，恢复原有“再也不会”框架和入口路由，记录见[插件框架恢复验证](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/restore-plugin-framework-1.8-40/README.md)。
+
+`1.8-39` 聚焦验证重置、图片读取、备份编解码、恢复事务和启动边界，记录见[重置修复与设置页验证](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/reset-settings-1.8-39/README.md)。页面复用项目原有设置单元格；当前环境无 iOS 模拟器运行时，真机显示与操作仍需安装验收。
+
+`1.8-37` 的[备份重构交付记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/backup-configuration-1.8-37/README.md)记录了本轮 41/41 项回归脚本通过、Rootless 双架构构建、包与调试符号核对。测试覆盖备份事务、异常退出、账号范围和原有功能回归；尚未安装到手机或验证真机启动、性能及全部插件组合。历史记录仅对应各自版本与测试环境。
+
+### 进一步阅读
+
+| 主题 | 文档 |
+| --- | --- |
+| 聊天分组 | [2.2-8 性能优化与清理](docs/audits/session-groups-cpu-2026-11-03/README.md) · [2.2-7 空白修复](docs/audits/session-groups-blank-2026-11-03/README.md) · [原生分组实现与验证](docs/audits/session-groups-native-2026-11-03/README.md) · [本次设计](docs/superpowers/specs/2026-11-03-native-session-groups-design.md) |
+| 列表圆角 | [配置与实现](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/list-corner-radius.md) · [圆角优化](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/list-corners.md) |
+| 气泡与消息合并 | [消息合并说明](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/message-merge.md) · [1.8-36 转文字语音间距](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/merge-voice-translation-1.8-36/README.md) |
+| 悬浮底栏 | [原生底栏改造](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/tabbar-native-1.6-36.md) · [描边动画](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/tabbar-animation-options-1.6-39.md) · [切换轻弹特效](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/tabbar-click-effect-1.9-10/README.md) |
+| 后台模糊 | [功能说明](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/background-blur-1.7-13.md) · [过渡与清理](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/background-blur-cleanup-1.7-17.md) |
+| 历史分析与验证 | [专项记录](docs/audits/) · [验证材料](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/evidence/) · [性能记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/performance/) |
+
+这些文档保留各阶段的设计、问题和验证结果；旧方案是否仍适用，应结合当前源码判断。
+
+## 常见问题
+
+| 问题 | 处理方式 |
+| --- | --- |
+| 准备恢复后设置尚未变化 | 手动退出并重新打开微信后应用；准备完成只表示计划已保存 |
+| 升级后版本备份提示图片缺失 | 在原插件的“备份配置”中查看和修复，其他功能继续正常加载；不要删除恢复日志或清空偏好域 |
+| 找不到插件入口 | 默认在微信“我 → 设置 → 再也不会”；修改过名称或位置时按实际设置查找，并确认安装方案与注入是否生效 |
+| 开启聊天分组后没有标签 | 检查开关、登录状态与微信版本，退出搜索/编辑状态后返回聊天列表，必要时重新打开微信 |
+| 原生搜索框不见了 | 默认改用分组栏右侧搜索按钮；关闭“显示分组栏搜索按钮”可恢复原生搜索区域 |
+| 横滑只能切组，无法打开会话菜单 | 从会话列表最右侧 `15%` 区域起手左滑，或关闭“分组切换手势” |
+| 换账号后找不到自定义分组 | 分组配置按账号保存；旧版无账号归属的配置需在设置页手动导入 |
+| 紧密间距下仍有较大空隙 | 昵称、头像、附加内容及未适配布局可能保留必要空间，不能假定所有消息都压到 `2 pt` |
+| 包版本和插件显示版本不同 | 核对 `control`、`kPluginVersionString` 与打包参数 `PACKAGE_VERSION` |
+| 编译找不到 Theos 或微信头文件 | 显式传入本机 `THEOS` 路径，确认头文件目录完整，并核对 `xcrun` 使用的 SDK |
+
+反馈问题时，请提供插件版本、微信实际版本、iOS 版本、注入环境、相关功能开关及复现步骤。界面问题可附遮挡个人信息后的截图，崩溃问题可附对应日志。项目问题可在 [GitHub Issues](https://github.com/ZhangSCzybh/WeChatImprove/issues) 反馈。
+
+本项目用于学习和研究 iOS 界面定制与 Runtime Hook。感谢 Theos 等开源工具，以及贡献代码、测试和问题反馈的使用者。

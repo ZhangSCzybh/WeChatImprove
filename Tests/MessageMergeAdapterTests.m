@@ -6,9 +6,15 @@
 #import "CSMessageTimeLayout.h"
 #import "CSRevokeReference.h"
 #include <stdlib.h>
+#include <string.h>
 static unsigned checks;
 extern NSUInteger CSMessageMergeDescriptorBuildCount;
 extern NSString *CSMessageMergeTestProfileVersion;
+// Weak entry points keep the frozen 2.3-8 baseline executable: missing history
+// support follows native raw-height behavior and fails a geometry assertion.
+extern void CSMessageMergeBeginHistory(id controller) __attribute__((weak_import));
+extern void CSMessageMergeEndHistory(id controller) __attribute__((weak_import));
+extern unsigned long long CSMessageMergeHistoryContentHeight(id controller,unsigned long long nativeHeight) __attribute__((weak_import));
 static UIView *insetBackground;
 static UIEdgeInsets visibleInsets;
 static NSUInteger appearanceUpdates;
@@ -34,9 +40,38 @@ BOOL CSBubbleStyleModelInsets(id model, UIView *appearance, CGSize size, UIEdgeI
 #define CHECK(x) do { checks++; if (!(x)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#x); exit(1); } } while (0)
 @interface MMContext : NSObject
 + (NSString *)currentUserName;
++ (instancetype)currentContext;
+- (id)getService:(Class)serviceClass;
+@end
+static double nativeMessageMarginTop=5, nativeMessageNameLength=12;
+static BOOL nativeMessageThemeAvailable=YES;
+static BOOL nativeMessageNamesVisible=YES;
+@interface MMThemeManager : NSObject
+- (id)getValueOfProperty:(NSString *)property inRuleSet:(NSString *)ruleSet;
+@end
+@implementation MMThemeManager
+- (id)getValueOfProperty:(NSString *)property inRuleSet:(NSString *)ruleSet {
+    CHECK([property isEqual:@"message_node_bkg_margin_top"]);
+    CHECK([ruleSet isEqual:@"#message_node_view"]);
+    return @[@(nativeMessageMarginTop)];
+}
+@end
+@interface MMThemeUtil : NSObject
++ (double)parseFloatFromValues:(id)values;
+@end
+@implementation MMThemeUtil
++ (double)parseFloatFromValues:(id)values { return [values[0] doubleValue]; }
+@end
+@interface UIFont : NSObject
++ (double)dynamicLength:(double)value;
+@end
+@implementation UIFont
++ (double)dynamicLength:(double)value { CHECK(value==16);return nativeMessageNameLength; }
 @end
 @implementation MMContext
 + (NSString *)currentUserName { return @"account"; }
++ (instancetype)currentContext { if (!nativeMessageThemeAvailable) return nil;static MMContext *context; if (!context) context=[self new];return context; }
+- (id)getService:(Class)serviceClass { CHECK(serviceClass==MMThemeManager.class);return [MMThemeManager new]; }
 @end
 @interface TestWrap : NSObject
 @property(nonatomic) unsigned int m_uiMesLocalID;
@@ -64,15 +99,26 @@ BOOL CSBubbleStyleModelInsets(id model, UIView *appearance, CGSize size, UIEdgeI
 @property(nonatomic) CGSize replyTextSize;
 @property(nonatomic) UIEdgeInsets replyTextInset;
 @property(nonatomic,strong) NSArray *subViewModels;
+@property(nonatomic,strong) id chatRoomTextStateIconDescription;
+@property(nonatomic) double nativeCachedHeight;
+@property(nonatomic) NSUInteger nativeSectionReads;
+- (double)sectionHeight;
 - (long long)numberOfRowsInSection;
 - (id)cellDataForRow:(unsigned long long)row;
 - (void)resetLayoutCache;
+- (BOOL)isHeadPart;
+- (BOOL)isShowHeadImage;
+- (BOOL)isShowChatRoomDisplayName;
 @end
 @implementation TextMessageViewModel
 - (instancetype)init { if ((self=[super init])) _rows=1;return self; }
 - (long long)numberOfRowsInSection { return self.rows; }
 - (id)cellDataForRow:(unsigned long long)row { return self.subViewModels.count>row ? self.subViewModels[row] : self; }
 - (void)resetLayoutCache { self.resetCount++; CSMessageMergeResetGeometry(self); }
+- (BOOL)isHeadPart { return YES; }
+- (BOOL)isShowHeadImage { return YES; }
+- (BOOL)isShowChatRoomDisplayName { return nativeMessageNamesVisible && !CSMessageMergeHidesName(self); }
+- (double)sectionHeight { self.nativeSectionReads++;return self.nativeCachedHeight; }
 @end
 @interface VoiceMessageViewModel : TextMessageViewModel
 @property(nonatomic) BOOL canShowTranslateText;
@@ -124,6 +170,13 @@ BOOL CSBubbleStyleModelInsets(id model, UIView *appearance, CGSize size, UIEdgeI
 @implementation NativeHierarchyCellView
 - (id)getContentView { return self.container; }
 @end
+// Native MMHeadImageView owns a smaller, inset image view. The outer 43pt
+// interaction view is not the visible 37pt avatar in the supplied screenshot.
+@interface MMHeadImageView : UIView
+@property(nonatomic,strong) UIView *headImageView;
+@property(nonatomic) CGSize imageSize;
+@end
+@implementation MMHeadImageView @end
 @interface VoiceMessageCellView : NativeHierarchyCellView {
 @public UIView *m_playingImageView;
 @public UIView *m_secLabel;
@@ -164,11 +217,15 @@ BOOL CSBubbleStyleModelInsets(id model, UIView *appearance, CGSize size, UIEdgeI
 @property(nonatomic) BOOL highlightVisible;
 @property(nonatomic) BOOL missingHighlightAPI;
 @property(nonatomic) BOOL incompatibleHighlightAPI;
+@property(nonatomic) double historyOuterRowDelta;
+@property(nonatomic) BOOL historyReentryProbe;
+@property(nonatomic) NSUInteger historyDelegateRequests, historyReentryChecks;
 - (void)highlightMsg:(id)message;
 - (id)getTableView;
 - (id)getCurrentChatName;
 - (id)GetMessageNodeDataArray;
 - (void)scrollToMessage:(id)message highlight:(BOOL)highlight marginTop:(double)margin animated:(BOOL)animated;
+- (double)tableView:(UITableView *)table heightForRowAtIndexPath:(NSIndexPath *)path;
 @end
 @implementation TestController
 - (id)getTableView { return self.table; }
@@ -176,6 +233,17 @@ BOOL CSBubbleStyleModelInsets(id model, UIView *appearance, CGSize size, UIEdgeI
 - (id)GetMessageNodeDataArray { return self.nodes; }
 - (void)scrollToMessage:(id)message highlight:(BOOL)highlight marginTop:(double)margin animated:(BOOL)animated { self.scrollCount++; self.lastMargin=margin; self.lastScrollHighlight=highlight; }
 - (void)highlightMsg:(id)message { self.highlightCount++;self.highlightedMessage=message;self.highlightVisible=!self.nativePresentationPending; }
+- (double)tableView:(UITableView *)table heightForRowAtIndexPath:(NSIndexPath *)path {
+    self.historyDelegateRequests++;
+    if (self.historyReentryProbe && CSMessageMergeHistoryContentHeight) {
+        self.historyReentryChecks++;
+        CHECK(CSMessageMergeHistoryContentHeight(self,11713)==11713);
+    }
+    TextMessageViewModel *node=self.nodes[path.section];
+    double nativeHeight=node.nativeCachedHeight;
+    CSMessageMergePrepare(self,table,path);
+    return CSMessageMergeRowHeight(self,table,path,nativeHeight)+self.historyOuterRowDelta;
+}
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)selector {
     if (selector==@selector(highlightMsg:)) {
         if (self.missingHighlightAPI) return nil;
@@ -183,6 +251,24 @@ BOOL CSBubbleStyleModelInsets(id model, UIView *appearance, CGSize size, UIEdgeI
     }
     return [super methodSignatureForSelector:selector];
 }
+@end
+@interface HistoryTable : UITableView
+@property(nonatomic,weak) TestController *historyOwner;
+@property(nonatomic) NSUInteger offsetWrites;
+- (void)rebuildHistoryRows;
+@end
+@implementation HistoryTable
+- (void)rebuildHistoryRows {
+    NSMutableArray *heights=[NSMutableArray array];double total=0;
+    for (NSUInteger i=0;i<self.historyOwner.nodes.count;i++) {
+        NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];
+        double height=[self.historyOwner tableView:self heightForRowAtIndexPath:path];
+        [heights addObject:@(height)];total+=height;
+    }
+    self.testHeights=heights;self.contentSize=CGSizeMake(320,total);
+}
+- (void)endUpdates { [super endUpdates];[self rebuildHistoryRows]; }
+- (void)setContentOffset:(CGPoint)point animated:(BOOL)animated { self.offsetWrites++;[super setContentOffset:point animated:animated]; }
 @end
 @interface TestManager : NSObject
 @property(nonatomic,strong) TestWrap *wrap;
@@ -198,6 +284,341 @@ static TextMessageViewModel *model(unsigned n) {
 static void configure(BOOL enabled) {
     [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSMessageMergeEnabledKey:@(enabled),CSMessageMergeScopeKey:@3,
         CSMessageMergeSpacingKey:@(-12),CSMessageMergeAvatarKey:@1} forName:NSArgumentDomain];
+}
+static TextMessageViewModel *HistoryModel(unsigned ID, NSString *sender) {
+    // Synthetic text sizes/cache values exercise the authenticated native loader
+    // contract. They are not measurements taken from a phone or from the video.
+    TextMessageViewModel *m=model(ID);double body=37+(ID%3)*13;
+    m.contentViewSize=CGSizeMake(180,body);m.nativeCachedHeight=body+32;
+    m.chatRoomTextStateIconDescription=@"";m.messageWrap.m_nsRealChatUsr=sender;return m;
+}
+static unsigned long long HistoryRawTotal(TestController *page) {
+    unsigned long long total=11; // A native header contribution must survive projection.
+    for (TextMessageViewModel *m in page.nodes) total+=(unsigned long long)[m sectionHeight];
+    return total;
+}
+static unsigned long long HistoryQuery(TestController *page,unsigned long long raw) {
+    page.historyReentryProbe=YES;
+    unsigned long long result=CSMessageMergeHistoryContentHeight ? CSMessageMergeHistoryContentHeight(page,raw) : raw;
+    page.historyReentryProbe=NO;return result;
+}
+static void HistoryBegin(TestController *page) {
+    if (CSMessageMergeBeginHistory) CSMessageMergeBeginHistory(page);else CSMessageMergeWillMutate(page);
+}
+static void HistoryEnd(TestController *page) {
+    if (CSMessageMergeEndHistory) CSMessageMergeEndHistory(page);else CSMessageMergeDidMutate(page);
+}
+static CGFloat HistoryAnchorScreenY(TestController *page,HistoryTable *table,id anchor) {
+    NSUInteger section=[page.nodes indexOfObjectIdenticalTo:anchor];CHECK(section!=NSNotFound);
+    return [table rectForSection:(NSInteger)section].origin.y-table.contentOffset.y;
+}
+static void VerifyHistoryReloadGuard(void) {
+    const char *only=getenv("CS_HISTORY_REGRESSION");if (only && !strcmp(only,"anchor")) return;
+    [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSMessageMergeEnabledKey:@YES,
+        CSMessageMergeScopeKey:@3,CSMessageMergeSpacingModeKey:@1,CSMessageMergeAvatarKey:@2} forName:NSArgumentDomain];
+    TestController *page=[TestController new];page.session=@"group@chatroom";
+    page.nodes=[NSMutableArray arrayWithArray:@[HistoryModel(28001,@"alice"),HistoryModel(28002,@"alice")]];
+    HistoryTable *table=[HistoryTable new];table.historyOwner=page;page.table=table;page.view=table;
+    UIWindow *window=[UIWindow new];table.window=window;table.bounds=CGRectMake(0,0,320,120);
+    CSMessageMergeActivate(page);[table rebuildHistoryRows];table.contentOffset=CGPointMake(0,19);
+    NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:0];
+    TestTableCell *cell=[TestTableCell new];cell.cellView=[TestCellView new];cell.cellView.viewModel=page.nodes[0];
+    table.testCells=@{path:cell};table.indexPathsForVisibleRows=@[path];CSMessageMergeBind(page,table,path,cell);
+    [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSMessageMergeEnabledKey:@NO,
+        CSMessageMergeScopeKey:@3,CSMessageMergeSpacingModeKey:@1,CSMessageMergeAvatarKey:@2} forName:NSArgumentDomain];
+    table.isReloadingData=YES;CSMessageMergeActivate(page);CSMessageMergeFlush(page);
+    if (table.updateCount || table.offsetWrites) fprintf(stderr,"history-reload-guard updates=%lu offsetWrites=%lu while isReloadingData=YES\n",
+        (unsigned long)table.updateCount,(unsigned long)table.offsetWrites);
+    CHECK(table.updateCount==0);CHECK(table.offsetWrites==0);
+    table.isReloadingData=NO;CSMessageMergeFlush(page);CHECK(table.updateCount==1);
+    CHECK(CSMessageMergeLayoutSettled(page));CSMessageMergeDeactivate(page);
+}
+static void VerifyNativeHistoryPrependAnchors(void) {
+    const char *only=getenv("CS_HISTORY_REGRESSION");if (only && !strcmp(only,"reload")) return;
+    nativeMessageNamesVisible=YES;nativeMessageMarginTop=5;nativeMessageNameLength=15;
+    for (NSUInteger variant=0;variant<4;variant++) for (NSUInteger motion=0;motion<3;motion++) {
+        BOOL compact=variant<2,enabled=variant!=3;
+        [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSMessageMergeEnabledKey:@(enabled),
+            CSMessageMergeScopeKey:@3,CSMessageMergeSpacingModeKey:@(compact ? 1 : 0),CSMessageMergeAvatarKey:@2} forName:NSArgumentDomain];
+        TestController *page=[TestController new];page.session=@"group@chatroom";page.nodes=[NSMutableArray array];
+        page.historyOuterRowDelta=variant==1 ? 4 : 0; // Models an outer Clown row-height projection.
+        for (unsigned i=0;i<8;i++) [page.nodes addObject:HistoryModel(28100+i,@"alice")];
+        TextMessageViewModel *oldFirst=page.nodes[0],*anchor=page.nodes[3];NSString *anchorID=CSMessageNativeIdentity(anchor);
+        HistoryTable *table=[HistoryTable new];table.historyOwner=page;page.table=table;page.view=table;
+        UIWindow *window=[UIWindow new];table.window=window;table.bounds=CGRectMake(0,0,320,120);
+        CSMessageMergeActivate(page);[table rebuildHistoryRows];
+        table.contentOffset=CGPointMake(0,[table rectForSection:3].origin.y-36);
+        CGFloat oldFirstHeight=[table.testHeights[0] doubleValue];
+        unsigned long long raw=HistoryRawTotal(page);NSUInteger requests=page.historyDelegateRequests;
+        CHECK(!CSMessageMergeHistoryContentHeight || CSMessageMergeHistoryContentHeight(page,raw)==raw);
+        CHECK(page.historyDelegateRequests==requests); // Outside history is a pure native pass-through.
+        HistoryBegin(page);HistoryBegin(page);
+        unsigned long long nested=HistoryQuery(page,raw);HistoryEnd(page);
+        CHECK(HistoryQuery(page,raw)==nested);HistoryEnd(page);
+        CHECK(!CSMessageMergeHistoryContentHeight || CSMessageMergeHistoryContentHeight(page,raw)==raw);
+        for (NSUInteger batch=0;batch<3;batch++) {
+            table.dragging=motion==0;table.decelerating=motion==1;
+            CGFloat beforeFinger=HistoryAnchorScreenY(page,table,anchor),fingerDelta=-(CGFloat)(7+batch*3);
+            table.contentOffset=CGPointMake(0,table.contentOffset.y+fingerDelta);
+            CGFloat expectedScreenY=beforeFinger-fingerDelta;
+            HistoryBegin(page);
+            unsigned long long oldRaw=HistoryRawTotal(page),oldTotal=HistoryQuery(page,oldRaw);
+            CGFloat oldOffset=table.contentOffset.y,oldDisplayHeight=table.contentSize.height;
+            BOOL oldTotalMatches=oldTotal==(compact ? (unsigned long long)(oldDisplayHeight+11) : oldRaw);
+            NSMutableArray *older=[NSMutableArray array];NSUInteger count=batch==1 ? 2 : 3;
+            NSString *sender=batch==1 ? @"bob" : @"alice";
+            for (NSUInteger i=0;i<count;i++) [older addObject:HistoryModel(28200+(unsigned)batch*10+(unsigned)i,sender)];
+            [page.nodes insertObjects:older atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0,count)]];
+            unsigned long long newRaw=HistoryRawTotal(page),newTotal=HistoryQuery(page,newRaw);
+            table.isReloadingData=YES;[table rebuildHistoryRows];table.isReloadingData=NO;
+            BOOL newTotalMatches=newTotal==(compact ? (unsigned long long)(table.contentSize.height+11) : newRaw);
+            NSUInteger section=[page.nodes indexOfObjectIdenticalTo:anchor];NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:section];
+            TestTableCell *cell=[TestTableCell new];cell.cellView=[TestCellView new];cell.cellView.viewModel=anchor;
+            table.indexPathsForVisibleRows=@[path];table.testCells=@{path:cell};CSMessageMergeBind(page,table,path,cell);
+            // Native onLoadMoreMessage restores oldOffset + newTotal - oldTotal.
+            // The only change under test is the values supplied by the height hook.
+            NSUInteger writes=table.offsetWrites;
+            [table setContentOffset:CGPointMake(0,oldOffset+(double)newTotal-(double)oldTotal) animated:NO];
+            HistoryEnd(page);CSMessageMergeFlush(page);
+            CGFloat actualScreenY=HistoryAnchorScreenY(page,table,anchor);
+            if (fabs(actualScreenY-expectedScreenY)>.01) fprintf(stderr,
+                "history-anchor variant=%lu motion=%lu batch=%lu nativeDelta=%.2f tableDelta=%.2f anchorDrift=%.2f\n",
+                (unsigned long)variant,(unsigned long)motion,(unsigned long)batch,(double)newRaw-(double)oldRaw,
+                table.contentSize.height-oldDisplayHeight,actualScreenY-expectedScreenY);
+            CHECK(fabs(actualScreenY-expectedScreenY)<.01);CHECK([anchorID isEqual:CSMessageNativeIdentity(anchor)]);
+            CHECK(oldTotalMatches);CHECK(newTotalMatches);
+            CHECK(table.updateCount==0);CHECK(table.offsetWrites==writes+1);
+            if (compact && batch==0) {
+                NSUInteger oldSection=[page.nodes indexOfObjectIdenticalTo:oldFirst];
+                CHECK([table.testHeights[oldSection] doubleValue]<oldFirstHeight);
+                CSMessageMergeDecision decision;CHECK(CSMessageMergeReadAppearance(oldFirst,&decision));CHECK(decision.joinsPrevious);
+            }
+            if (compact && batch==1) {
+                CSMessageMergeDecision decision;CHECK(CSMessageMergeReadAppearance(page.nodes[1],&decision));CHECK(!decision.joinsNext);
+                CHECK(CSMessageMergeReadAppearance(page.nodes[2],&decision));CHECK(!decision.joinsPrevious);
+            }
+            for (TextMessageViewModel *m in page.nodes) CHECK(m.nativeCachedHeight==m.contentViewSize.height+32);
+        }
+        table.dragging=NO;table.decelerating=NO;NSUInteger writes=table.offsetWrites;
+        CSMessageMergeFlush(page);CHECK(table.updateCount==0);CHECK(table.offsetWrites==writes);CHECK(CSMessageMergeLayoutSettled(page));
+        if (compact && CSMessageMergeHistoryContentHeight) CHECK(page.historyReentryChecks>0);
+        CSMessageMergeDeactivate(page);
+    }
+    nativeMessageNamesVisible=YES;nativeMessageMarginTop=5;nativeMessageNameLength=12;
+}
+static void VerifyFractionalHistoryTotals(void) {
+    const char *only=getenv("CS_HISTORY_REGRESSION");if (only && !strcmp(only,"reload")) return;
+    nativeMessageNamesVisible=YES;nativeMessageMarginTop=5;nativeMessageNameLength=15;
+    [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSMessageMergeEnabledKey:@YES,
+        CSMessageMergeScopeKey:@3,CSMessageMergeSpacingModeKey:@1,CSMessageMergeAvatarKey:@2} forName:NSArgumentDomain];
+    TestController *page=[TestController new];page.session=@"group@chatroom";page.historyOuterRowDelta=.25;
+    TextMessageViewModel *first=HistoryModel(28301,@"alice"),*anchor=HistoryModel(28302,@"alice");
+    first.contentViewSize=anchor.contentViewSize=CGSizeMake(180,37);first.nativeCachedHeight=60.75;anchor.nativeCachedHeight=61.25;
+    page.nodes=[NSMutableArray arrayWithArray:@[first,anchor]];
+    HistoryTable *table=[HistoryTable new];table.historyOwner=page;page.table=table;page.view=table;
+    UIWindow *window=[UIWindow new];table.window=window;table.bounds=CGRectMake(0,0,320,40);table.dragging=YES;
+    CSMessageMergeActivate(page);[table rebuildHistoryRows];table.contentOffset=CGPointMake(0,20);
+    CGFloat before=HistoryAnchorScreenY(page,table,anchor);table.contentOffset=CGPointMake(0,17);
+    HistoryBegin(page);
+    unsigned long long rawOld=HistoryRawTotal(page),old=HistoryQuery(page,rawOld);
+    CHECK(rawOld==132);CHECK(old==11+(unsigned long long)table.contentSize.height);CHECK(old==123);
+    CGFloat oldOffset=table.contentOffset.y;
+    TextMessageViewModel *older=HistoryModel(28303,@"alice");older.contentViewSize=CGSizeMake(180,37);older.nativeCachedHeight=60.25;
+    [page.nodes insertObject:older atIndex:0];
+    unsigned long long rawNew=HistoryRawTotal(page),next=HistoryQuery(page,rawNew);[table rebuildHistoryRows];
+    CHECK(rawNew==192);CHECK(next==11+(unsigned long long)table.contentSize.height);CHECK(next==163);
+    [table setContentOffset:CGPointMake(0,oldOffset+(double)next-(double)old) animated:NO];HistoryEnd(page);
+    // Native converts each section to Q before summing; the projected display
+    // total keeps its fractional sum until the final Q conversion. That ABI can
+    // leave a sub-point anchor difference, never one truncation error per row.
+    CHECK(fabs(HistoryAnchorScreenY(page,table,anchor)-(before+3))<1);
+    CHECK(first.nativeCachedHeight==60.75 && anchor.nativeCachedHeight==61.25 && older.nativeCachedHeight==60.25);
+    CHECK(table.updateCount==0);CHECK(table.offsetWrites==1);
+    table.dragging=NO;CSMessageMergeFlush(page);CHECK(table.updateCount==0);CHECK(table.offsetWrites==1);
+    CSMessageMergeDeactivate(page);nativeMessageNameLength=12;
+}
+static void VerifyNativeAvatarWrapperSeams(void) {
+    // The coordinates are fixed independently of the merge measurement helper:
+    // native margin 5, named origin 20, unnamed origin 8, avatar wrapper y=5,
+    // inner visible image y=3/height=37, outer wrapper height=43. These are the
+    // native wrapper/image relationship and the screenshot's visible dimensions.
+    UIWindow *window=[UIWindow new];
+    nativeMessageMarginTop=5;nativeMessageNameLength=15;
+    for (NSUInteger initialChildState=0;initialChildState<3;initialChildState++)
+    for (NSUInteger scenario=0;scenario<3;scenario++) {
+        BOOL outgoing=scenario==0,named=scenario==2;
+        const char *only=getenv("CS_NATIVE_AVATAR_SCENARIO");
+        if (only && (!named || strcmp(only,"named"))) continue;
+        nativeMessageNamesVisible=named;
+        [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSMessageMergeEnabledKey:@YES,
+            CSMessageMergeScopeKey:@3,CSMessageMergeSpacingModeKey:@1,CSMessageMergeAvatarKey:@2} forName:NSArgumentDomain];
+        TestController *page=[TestController new];page.session=@"group@chatroom";page.nodes=[NSMutableArray array];
+        UITableView *table=[UITableView new];page.table=table;page.view=table;table.window=window;
+        table.bounds=CGRectMake(0,0,320,500);table.contentSize=CGSizeMake(320,1200);table.contentOffset=CGPointMake(0,19);
+        for (NSUInteger i=0;i<4;i++) {
+            TextMessageViewModel *m=model(27000+(unsigned)scenario*10+(unsigned)i);
+            if (named) m.chatRoomTextStateIconDescription=@""; // Native ordinary no-status value.
+            m.isSender=outgoing;m.contentViewSize=CGSizeMake(180,37);[page.nodes addObject:m];
+        }
+        CSMessageMergeActivate(page);
+        NSMutableArray *paths=[NSMutableArray array],*views=[NSMutableArray array],*heights=[NSMutableArray array];
+        NSMutableDictionary *cells=[NSMutableDictionary dictionary];
+        for (NSUInteger i=0;i<4;i++) {
+            NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];[paths addObject:path];
+            CSMessageMergePrepare(page,table,path);
+            CGFloat height=CSMessageMergeRowHeight(page,table,path,90);[heights addObject:@(height)];
+            NativeHierarchyCellView *v=[NativeHierarchyCellView new];v.viewModel=page.nodes[i];
+            v.frame=CGRectMake(0,0,320,height);v.bounds=CGRectMake(0,0,320,height);
+            MMHeadImageView *head=[MMHeadImageView new];head.frame=CGRectMake(outgoing ? 277 : 0,5,43,43);
+            head.bounds=CGRectMake(0,0,43,43);head.imageSize=CGSizeMake(37,37);
+            head.headImageView=[UIView new];head.headImageView.frame=CGRectMake(3,3,37,37);
+            head.headImageView.bounds=CGRectMake(0,0,37,37);
+            if (initialChildState==1) { head.headImageView.frame=CGRectZero;head.headImageView.bounds=CGRectZero; }
+            if (initialChildState==2) { head.headImageView.frame=CGRectMake(5,5,32,32);head.headImageView.bounds=CGRectMake(0,0,32,32); }
+            head.subviews=@[head.headImageView];head.headImageView.superview=head;v.head=head;
+            v.container=[UIView new];v.container.frame=CGRectMake(50,(named && i==0) ? 20 : 8,220,37);
+            v.container.bounds=CGRectMake(0,0,220,37);v.content=[UIView new];v.content.frame=CGRectMake(0,0,180,37);
+            v.content.bounds=CGRectMake(0,0,180,37);v.container.subviews=@[v.content];v.content.superview=v.container;
+            v->m_chatRoomNameLabel=[UIView new];v->m_chatRoomNameLabel.frame=CGRectMake(50,5,160,15);
+            v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,160,15);v->m_chatRoomNameLabel.hidden=!named || i!=0;
+            v.subviews=@[head,v.container,v->m_chatRoomNameLabel];
+            TestTableCell *cell=[TestTableCell new];cell.cellView=v;cells[path]=cell;[views addObject:v];
+            CSMessageMergeBind(page,table,path,cell);
+        }
+        table.testCells=cells;table.testHeights=heights;table.indexPathsForVisibleRows=paths;
+        for (NSUInteger pass=0;pass<12;pass++) {
+            table.dragging=pass<4;table.decelerating=pass>=4 && pass<8;
+            // setImageSize: precedes the native child layout. Its first frame can
+            // be empty or retain an older size until that layout finishes.
+            if (pass==1) for (NativeHierarchyCellView *v in views) {
+                UIView *image=((MMHeadImageView *)v.head).headImageView;
+                image.frame=CGRectMake(3,3,37,37);image.bounds=CGRectMake(0,0,37,37);
+            }
+            for (NativeHierarchyCellView *v in views) CSMessageMergeRender(v);
+            // Re-read each final height exactly as table row layout does. A safety
+            // expansion must show up in the physical gap, even if flush is deferred.
+            NSMutableArray *finalHeights=[NSMutableArray array];
+            for (NSUInteger i=0;i<4;i++) [finalHeights addObject:@(CSMessageMergeRowHeight(page,table,paths[i],90))];
+            CGFloat tableY=0,previousBottom=0;
+            for (NSUInteger i=0;i<4;i++) {
+                NativeHierarchyCellView *v=views[i];
+                CGRect body=[v convertRect:v.content.bounds fromView:v.content];
+                CGFloat bodyTop=tableY+v.frame.origin.y+CGRectGetMinY(body);
+                if (i) {
+                    CGFloat gap=bodyTop-previousBottom;
+                    if (fabs(gap-2)>.01) fprintf(stderr,"native-avatar-wrapper scenario=%s initialChildState=%lu pass=%lu seam=%lu gap=%.2f firstHeight=%.2f finalFirstHeight=%.2f\n",
+                        named ? "incoming-named" : outgoing ? "outgoing" : "incoming-unnamed",(unsigned long)initialChildState,(unsigned long)pass,(unsigned long)i,gap,[heights[0] doubleValue],[finalHeights[0] doubleValue]);
+                    CHECK(fabs(gap-2)<.01);
+                }
+                previousBottom=tableY+v.frame.origin.y+CGRectGetMaxY(body);tableY+=[finalHeights[i] doubleValue];
+                if (i==0) {
+                    MMHeadImageView *head=(id)v.head;
+                    CGRect image=[v convertRect:CGRectMake(3,3,37,37) fromView:head];
+                    if (pass || !initialChildState) CHECK(CGRectEqualToRect(image,[v convertRect:head.headImageView.bounds fromView:head.headImageView]));
+                    CHECK(!head.hidden);CHECK(v.frame.origin.y+CGRectGetMinY(image)>=-.01);
+                    CHECK(v.frame.origin.y+CGRectGetMaxY(image)<=[heights[i] doubleValue]+.01);
+                } else CHECK(v.head.hidden);
+            }
+            for (NSUInteger i=0;i<4;i++) {
+                CHECK(fabs([finalHeights[i] doubleValue]-[heights[i] doubleValue])<.01);
+                CHECK(fabs([heights[i] doubleValue]-(i==0 ? (named ? 58 : 46) : (i==3 ? 83 : 39)))<.01);
+            }
+            CSMessageMergeFlush(page);CHECK(table.updateCount==0);CHECK(table.contentOffset.y==19);
+        }
+        CHECK(CSMessageMergeLayoutSettled(page));
+        for (NativeHierarchyCellView *v in views) CSMessageMergeReuse(v);
+        CSMessageMergeDeactivate(page);
+    }
+    nativeMessageNamesVisible=YES;nativeMessageMarginTop=5;nativeMessageNameLength=12;
+}
+static void VerifyDynamicNativeMessageOrigins(void) {
+    // Native CSS/font inputs are deliberately different from the old 17/8 profile.
+    // The first row must agree with actual layout before any cell has been created.
+    UIWindow *window=[UIWindow new];
+    for (NSUInteger names=0;names<2;names++) {
+        nativeMessageNamesVisible=names!=0;nativeMessageMarginTop=8;nativeMessageNameLength=16;
+        [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSMessageMergeEnabledKey:@YES,
+            CSMessageMergeScopeKey:@3,CSMessageMergeSpacingModeKey:@1,CSMessageMergeAvatarKey:@2} forName:NSArgumentDomain];
+        TestController *page=[TestController new];page.session=@"group@chatroom";page.nodes=[NSMutableArray array];
+        UITableView *table=[UITableView new];page.table=table;page.view=table;table.window=window;
+        table.bounds=CGRectMake(0,0,320,500);table.contentSize=CGSizeMake(320,1200);table.contentOffset=CGPointMake(0,19);
+        for (NSUInteger i=0;i<4;i++) { TextMessageViewModel *m=model(25000+(unsigned)i);m.contentViewSize=CGSizeMake(180,38);[page.nodes addObject:m]; }
+        CSMessageMergeActivate(page);
+        NSMutableArray *paths=[NSMutableArray array],*views=[NSMutableArray array],*heights=[NSMutableArray array];
+        NSMutableDictionary *cells=[NSMutableDictionary dictionary];
+        for (NSUInteger phase=0;phase<2;phase++) {
+            if (phase) { nativeMessageMarginTop=11;nativeMessageNameLength=18; }
+            for (NSUInteger i=0;i<4;i++) {
+                NSIndexPath *path=phase ? paths[i] : [NSIndexPath indexPathForRow:0 inSection:i];
+                if (!phase) [paths addObject:path];
+                CSMessageMergePrepare(page,table,path);
+                CGFloat top=(i || !nativeMessageNamesVisible) ? nativeMessageMarginTop+3 : ceil(nativeMessageMarginTop+nativeMessageNameLength);
+                CGFloat expected=i==0 ? top+39 : (i==3 ? 90-top+1 : 40);
+                // Body size, native row height, model identity and width stay unchanged
+                // in phase 2. Only native CSS/font geometry invalidates the cached pair.
+                CGFloat height=CSMessageMergeRowHeight(page,table,path,90);
+                CHECK(fabs(height-expected)<.01);
+                if (phase) heights[i]=@(height);else [heights addObject:@(height)];
+                NativeHierarchyCellView *v=phase ? views[i] : [NativeHierarchyCellView new];
+                if (!phase) {
+                    v.viewModel=page.nodes[i];v.head=[UIView new];v.head.bounds=CGRectMake(0,0,38,38);
+                    v.container=[UIView new];v.content=[UIView new];v.container.subviews=@[v.content];v.content.superview=v.container;
+                    v->m_chatRoomNameLabel=[UIView new];v->m_chatRoomNameLabel.frame=CGRectMake(50,0,160,14);
+                    v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,160,14);v->m_chatRoomNameLabel.hidden=i!=0 || !nativeMessageNamesVisible;
+                    v.subviews=@[v.head,v.container,v->m_chatRoomNameLabel];
+                    TestTableCell *cell=[TestTableCell new];cell.cellView=v;cells[path]=cell;[views addObject:v];
+                } else CSMessageMergeRestore(v);
+                v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
+                v.head.frame=CGRectMake(0,nativeMessageMarginTop,38,38);
+                v.container.frame=CGRectMake(50,top,220,38);v.container.bounds=CGRectMake(0,0,220,38);
+                v.content.frame=CGRectMake(0,0,180,38);v.content.bounds=v.content.frame;
+                CSMessageMergeBind(page,table,path,cells[path]);
+            }
+            table.testCells=cells;table.testHeights=heights;table.indexPathsForVisibleRows=paths;
+            for (NSUInteger pass=0;pass<12;pass++) {
+                table.dragging=pass<4;table.decelerating=pass>=4 && pass<8;
+                for (NSUInteger i=0;i<4;i++) {
+                    NativeHierarchyCellView *v=views[i];CSMessageMergeRender(v);
+                    CHECK(fabs(CSMessageMergeRowHeight(page,table,paths[i],90)-[heights[i] doubleValue])<.01);
+                    if (i) {
+                        NativeHierarchyCellView *previous=views[i-1];
+                        CGFloat previousBottom=previous.frame.origin.y+CGRectGetMaxY([previous convertRect:previous.content.bounds fromView:previous.content]);
+                        CGFloat currentTop=v.frame.origin.y+CGRectGetMinY([v convertRect:v.content.bounds fromView:v.content]);
+                        CHECK(fabs([heights[i-1] doubleValue]+currentTop-previousBottom-2)<.01);
+                    }
+                }
+                CSMessageMergeFlush(page);CHECK(table.updateCount==0);CHECK(table.contentOffset.y==19);
+            }
+            CHECK(CSMessageMergeLayoutSettled(page));
+        }
+        for (NativeHierarchyCellView *v in views) CSMessageMergeReuse(v);
+        CSMessageMergeDeactivate(page);
+    }
+    nativeMessageNamesVisible=YES;
+    // Missing/invalid native inputs and an unqualified nickname state icon keep
+    // the native row from first display. Recovering metadata must not tighten it late.
+    for (NSUInteger invalid=0;invalid<4;invalid++) {
+        nativeMessageThemeAvailable=invalid!=0;
+        nativeMessageMarginTop=invalid==1 ? NAN : 8;nativeMessageNameLength=invalid==2 ? NAN : 16;
+        TestController *fallback=[TestController new];fallback.session=@"group@chatroom";
+        TextMessageViewModel *first=model(25100+(unsigned)invalid*2),*next=model(25101+(unsigned)invalid*2);
+        first.contentViewSize=CGSizeMake(180,38);if (invalid==3) first.chatRoomTextStateIconDescription=@"state-icon";
+        fallback.nodes=[NSMutableArray arrayWithArray:@[first,next]];
+        UITableView *t=[UITableView new];fallback.table=t;fallback.view=t;t.window=window;t.bounds=CGRectMake(0,0,320,500);
+        NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:0];CSMessageMergeActivate(fallback);CSMessageMergePrepare(fallback,t,path);
+        CHECK(CSMessageMergeRowHeight(fallback,t,path,90)==90);
+        TestCellView *v=[TestCellView new];v.viewModel=first;v.frame=CGRectMake(0,0,320,90);v.bounds=v.frame;
+        v.content=[UIView new];v.content.frame=CGRectMake(50,24,180,38);v.content.bounds=CGRectMake(0,0,180,38);v.subviews=@[v.content];
+        TestTableCell *cell=[TestTableCell new];cell.cellView=v;t.testCells=@{path:cell};t.testHeights=@[@90,@90];t.indexPathsForVisibleRows=@[path];
+        CSMessageMergeBind(fallback,t,path,cell);
+        nativeMessageThemeAvailable=YES;nativeMessageMarginTop=8;nativeMessageNameLength=16;
+        for (NSUInteger pass=0;pass<3;pass++) {
+            t.dragging=pass==0;t.decelerating=pass==1;CSMessageMergeRender(v);CSMessageMergeFlush(fallback);
+            CHECK(CSMessageMergeRowHeight(fallback,t,path,90)==90);CHECK(t.updateCount==0);CHECK(v.frame.origin.y==0);
+        }
+        CSMessageMergeReuse(v);CSMessageMergeDeactivate(fallback);
+    }
+    nativeMessageThemeAvailable=YES;nativeMessageMarginTop=5;nativeMessageNameLength=12;
 }
 static void VerifyShortAndQuotedSeams(void) {
     UIWindow *window=[UIWindow new];
@@ -230,7 +651,7 @@ static void VerifyShortAndQuotedSeams(void) {
                 NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];[paths addObject:path];CSMessageMergePrepare(page,t,path);
                 CGFloat height=CSMessageMergeRowHeight(page,t,path,native);[heights addObject:@(height)];
                 TestCellView *v=[TestCellView new];v.viewModel=m;v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
-                v.head=[UIView new];v.head.frame=CGRectMake(0,named ? 3 : 8,38,38);v.head.bounds=CGRectMake(0,0,38,38);
+                v.head=[UIView new];v.head.frame=CGRectMake(0,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);
                 v.content=[UIView new];v.content.frame=CGRectMake(50,y,200,38);v.content.bounds=CGRectMake(0,0,200,38);
                 v->m_chatRoomNameLabel=[UIView new];v->m_chatRoomNameLabel.frame=CGRectMake(50,0,150,14);
                 v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,150,14);v->m_chatRoomNameLabel.hidden=!named;
@@ -306,7 +727,7 @@ static void VerifyNativeAvatarHierarchy(void) {
             NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];[paths addObject:path];
             CSMessageMergePrepare(page,table,path);CGFloat height=CSMessageMergeRowHeight(page,table,path,55);[heights addObject:@(height)];
             NativeHierarchyCellView *v=[NativeHierarchyCellView new];v.viewModel=page.nodes[i];v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
-            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 280 : 2,8,38,38);v.head.bounds=CGRectMake(0,0,38,38);
+            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 280 : 2,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);
             v.container=[UIView new];v.container.frame=CGRectMake(50,8,220,38);v.container.bounds=CGRectMake(0,0,220,38);
             v.content=[UIView new];v.content.frame=CGRectMake(0,0,220,38);v.content.bounds=v.content.frame;
             v.container.subviews=@[v.content];v.content.superview=v.container;v.subviews=@[v.head,v.container];
@@ -335,9 +756,12 @@ static void VerifyNativeAvatarHierarchy(void) {
         }
         if (outgoing) {
             NSUInteger identity=avatar==2 ? 0 : 2;NativeHierarchyCellView *v=views[identity];
-            // Local frames appear separate, but the container now moves the bubble
-            // into the avatar's lane. This must retain the normal safety expansion.
+            // An unexpected native relayout moves the bubble into the avatar's
+            // lane and lowers the avatar beyond the measured body footprint.
+            // Overlapping lanes cannot use avatar relocation to hide the overflow.
+            CSMessageMergeRestore(v);
             CGRect shifted=v.container.frame;shifted.origin.x=270;v.container.frame=shifted;
+            CGRect lowered=v.head.frame;lowered.origin.y=8;v.head.frame=lowered;
             CSMessageMergeRender(v);
             CGFloat safeHeight=CSMessageMergeRowHeight(page,table,paths[identity],55);
             CHECK(safeHeight>[heights[identity] doubleValue]);CHECK(v.head.frame.origin.y==8);
@@ -379,7 +803,7 @@ static void VerifyVoiceGlyphGeometry(void) {
             VoiceMessageCellView *v=[VoiceMessageCellView new];v.viewModel=page.nodes[i];v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
             v.container=[UIView new];v.container.frame=CGRectMake(40,8,240,37);v.container.bounds=CGRectMake(0,0,240,37);
             v.content=[UIView new];v.content.frame=CGRectMake(10,0,180,37);v.content.bounds=CGRectMake(0,0,180,37);
-            v.head=[UIView new];v.head.frame=CGRectMake(282,8,38,38);v.head.bounds=CGRectMake(0,0,38,38);
+            v.head=[UIView new];v.head.frame=CGRectMake(282,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);
             v.container.subviews=@[v.content];v.content.superview=v.container;v.subviews=@[v.head,v.container];
             if (i==1) {
                 voice=v;UIView *glyph=[UIView new];glyph.frame=CGRectMake(158,6.5,24,24);glyph.bounds=CGRectMake(0,0,24,24);
@@ -462,6 +886,11 @@ static void VerifyVoiceAuxiliaryStates(void) {
     insetBackground=nil;visibleInsets=(UIEdgeInsets){0,0,0,0};
 }
 int main(void) { @autoreleasepool {
+    VerifyHistoryReloadGuard();
+    VerifyNativeHistoryPrependAnchors();
+    VerifyFractionalHistoryTotals();
+    VerifyNativeAvatarWrapperSeams();
+    VerifyDynamicNativeMessageOrigins();
     VerifyVoiceAuxiliaryStates();
     VerifyVoiceGlyphGeometry();
     VerifyNativeAvatarHierarchy();
@@ -503,7 +932,7 @@ int main(void) { @autoreleasepool {
     NSIndexPath *p=[NSIndexPath indexPathForRow:0 inSection:0];table.indexPathsForVisibleRows=@[p];
     TestCellView *view=[TestCellView new];view.viewModel=vc.nodes[0];view.head=[UIView new];view.content=[UIView new];view->m_chatRoomNameLabel=[UIView new];
     view.bounds=CGRectMake(0,0,320,60);view.content.bounds=CGRectMake(0,0,200,30);view.content.frame=CGRectMake(50,8,200,30);
-    view.head.bounds=CGRectMake(0,0,30,30);view.head.frame=CGRectMake(0,8,30,30);view.subviews=@[view.head,view.content,view->m_chatRoomNameLabel];
+    view.head.bounds=CGRectMake(0,0,30,30);view.head.frame=CGRectMake(0,5,30,30);view.subviews=@[view.head,view.content,view->m_chatRoomNameLabel];
     TestTableCell *cell=[TestTableCell new];cell.cellView=view;table.testCells=@{p:cell};
     CSMessageMergeActivate(vc);CSMessageMergePrepare(vc,table,p);
     CHECK(CSMessageMergeHidesName(view.viewModel));
@@ -721,7 +1150,7 @@ int main(void) { @autoreleasepool {
         NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:0];
         TestCellView *v=[TestCellView new];v.viewModel=first;v.head=[UIView new];v.content=[UIView new];
         v.bounds=CGRectMake(0,0,320,60);v.content.bounds=CGRectMake(0,0,200,30);v.content.frame=CGRectMake(50,8,200,30);
-        v.head.bounds=CGRectMake(0,0,30,30);v.head.frame=CGRectMake(0,8,30,30);v.subviews=@[v.head,v.content];
+        v.head.bounds=CGRectMake(0,0,30,30);v.head.frame=CGRectMake(0,5,30,30);v.subviews=@[v.head,v.content];
         TestTableCell *c=[TestTableCell new];c.cellView=v;t.indexPathsForVisibleRows=@[path];t.testCells=@{path:c};
         t.contentOffset=CGPointMake(0,19);t.dragging=mode==0;t.decelerating=mode==1;
         CSMessageMergeActivate(page);CSMessageMergePrepare(page,t,path);
@@ -844,7 +1273,7 @@ int main(void) { @autoreleasepool {
         NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:0];
         TestCellView *v=[TestCellView new];v.viewModel=(id)child;v.head=[UIView new];v.content=[UIView new];
         v.frame=CGRectMake(0,0,320,39);v.bounds=CGRectMake(0,0,320,39);
-        v.head.bounds=CGRectMake(0,0,30,30);v.head.frame=CGRectMake(0,8,30,30);
+        v.head.bounds=CGRectMake(0,0,30,30);v.head.frame=CGRectMake(0,5,30,30);
         v.content.bounds=CGRectMake(0,0,200,30);v.content.frame=CGRectMake(50,8,200,30);v.subviews=@[v.head,v.content];
         TestTableCell *cell=[TestTableCell new];cell.cellView=v;t.testCells=@{path:cell};t.indexPathsForVisibleRows=@[path];
         CSMessageMergeActivate(page);CSMessageMergePrepare(page,t,path);
@@ -940,7 +1369,7 @@ int main(void) { @autoreleasepool {
         CHECK(CSMessageMergeRowHeight(page,t,bPath,55)==40);
         TestCellView *a=[TestCellView new];a.viewModel=first;
         a.frame=CGRectMake(0,0,320,planned);a.bounds=a.frame;
-        a.head=[UIView new];a.head.frame=CGRectMake(0,3,38,38);a.head.bounds=CGRectMake(0,0,38,38);
+        a.head=[UIView new];a.head.frame=CGRectMake(0,5,38,38);a.head.bounds=CGRectMake(0,0,38,38);
         a->m_chatRoomNameLabel=[UIView new];a->m_chatRoomNameLabel.frame=CGRectMake(50,0,150,14);
         a->m_chatRoomNameLabel.bounds=CGRectMake(0,0,150,14);
         a.content=[UIView new];a.content.frame=CGRectMake(50,17,200,contentHeight.doubleValue);
@@ -982,7 +1411,7 @@ int main(void) { @autoreleasepool {
                 CGFloat height=CSMessageMergeRowHeight(page,t,path,native);[heights addObject:@(height)];
                 TestCellView *v=[TestCellView new];v.viewModel=page.nodes[i];[views addObject:v];
                 v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
-                v.head=[UIView new];v.head.frame=CGRectMake(0,named ? 3 : 8,44,44);v.head.bounds=CGRectMake(0,0,44,44);
+                v.head=[UIView new];v.head.frame=CGRectMake(0,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);
                 v->m_chatRoomNameLabel=[UIView new];v->m_chatRoomNameLabel.frame=CGRectMake(50,0,150,14);
                 v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,150,14);v->m_chatRoomNameLabel.hidden=!named;
                 v.content=[UIView new];v.content.frame=CGRectMake(50,y,200,60);v.content.bounds=CGRectMake(0,0,200,60);
@@ -995,7 +1424,9 @@ int main(void) { @autoreleasepool {
                     TestCellView *v=views[i];CGRect content=v.content.frame;
                     CSMessageMergeRender(v);CHECK(CGRectEqualToRect(content,v.content.frame));
                     BOOL named=[session hasSuffix:@"@chatroom"] && (avatar==2 ? i==0 : i==count-1);
-                    CHECK(CSMessageMergeRowHeight(page,t,paths[i],named ? 89 : 77)==[heights[i] doubleValue]);
+                    CGFloat measured=CSMessageMergeRowHeight(page,t,paths[i],named ? 89 : 77);
+                    if (measured!=[heights[i] doubleValue]) fprintf(stderr,"group edge mismatch: session=%s avatar=%ld count=%lu mode=%ld row=%lu pass=%lu expected=%g actual=%g\n",session.UTF8String,avatar,count,mode,i,pass,[heights[i] doubleValue],measured);
+                    CHECK(measured==[heights[i] doubleValue]);
                     if (i) {
                         TestCellView *prev=views[i-1];
                         CGFloat gap=[heights[i-1] doubleValue]+v.frame.origin.y+CGRectGetMinY(v.content.frame)-
@@ -1061,14 +1492,14 @@ int main(void) { @autoreleasepool {
         UITableView *t=[UITableView new];page.table=t;page.view=t;t.window=window;t.bounds=CGRectMake(0,0,320,500);
         NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:0];
         TestCellView *v=[TestCellView new];v.viewModel=page.nodes[0];v.frame=CGRectMake(0,0,320,100);v.bounds=v.frame;
-        v.head=[UIView new];v.head.frame=CGRectMake(0,8,avatarSize.doubleValue,avatarSize.doubleValue);v.head.bounds=CGRectMake(0,0,avatarSize.doubleValue,avatarSize.doubleValue);
+        v.head=[UIView new];v.head.frame=CGRectMake(0,5,avatarSize.doubleValue,avatarSize.doubleValue);v.head.bounds=CGRectMake(0,0,avatarSize.doubleValue,avatarSize.doubleValue);
         v.content=[UIView new];v.content.frame=CGRectMake(50,8,200,30);v.content.bounds=CGRectMake(0,0,200,30);v.subviews=@[v.head,v.content];
         TestTableCell *cell=[TestTableCell new];cell.cellView=v;t.testCells=@{path:cell};t.indexPathsForVisibleRows=@[path];t.testHeights=@[@100,@100];
         CSMessageMergeActivate(page);CSMessageMergePrepare(page,t,path);
         CHECK(CSMessageMergeRowHeight(page,t,path,100)==39);
         CSMessageMergeBind(page,t,path,cell);CSMessageMergeRender(v);CSMessageMergeFlush(page);
         CHECK(t.updateCount==(avatarSize.doubleValue>38 ? 1 : 0));
-        CGFloat expected=avatarSize.doubleValue<=38 ? 39 : avatarSize.doubleValue+9;
+        CGFloat expected=avatarSize.doubleValue<=38 ? 39 : avatarSize.doubleValue+6;
         CHECK(CSMessageMergeRowHeight(page,t,path,100)==expected);
         for (NSUInteger pass=0;pass<20;pass++) {
             CSMessageMergeRender(v);CSMessageMergeFlush(page);

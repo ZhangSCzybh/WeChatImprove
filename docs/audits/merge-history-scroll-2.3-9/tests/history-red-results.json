@@ -1,0 +1,17 @@
+{
+  "compileExitCode": 0,
+  "runs": [
+    {
+      "name": "reload-guard-red",
+      "exitCode": 1
+    },
+    {
+      "name": "history-anchor-red",
+      "exitCode": 1
+    }
+  ],
+  "fixtureSha256": "6338be6c3b0f9f82b23657cda13cbd90c9ec9c2932b6de8810c44efb822226cc",
+  "baselineSha256": "e08e5bfb81a6102fe2069b918dcc785e6b750020975e37035185ce4b8e7352d6",
+  "compatibilityShimSha256": "54ca079fa9b8230b554d35c6bafc921f358c6bfb2171bad93f5fc33d6eaa8cec",
+  "provenance": "Synthetic body/cache heights and prepend sequences; native old/new-total+oldOffset contract from authenticated disassembly; not phone/video geometry."
+}

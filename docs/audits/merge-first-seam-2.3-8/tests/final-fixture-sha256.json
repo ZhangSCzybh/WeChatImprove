@@ -1,0 +1,9 @@
+{
+  "Tests/MessageMergeAdapterTests.m": "431d907bd7566466ee652c38e2bdc004242584b672d077bd81011f6dda450994",
+  "Tests/MergeBubbleIntegrationTests.m": "b1c0f5b7ffe63f6b49ed1b311447872a96771f4794596658c2412b21c8310cf5",
+  "Controllers/CSMessageMergeAdapter.m": "e08e5bfb81a6102fe2069b918dcc785e6b750020975e37035185ce4b8e7352d6",
+  "frozenRedAdapterSha256": "f119037eed94fa5f49ad39a998aca1823c4f9c2edaf0346d43210a29b2833724",
+  "initialRedFixtureDiffersFromFinal": true,
+  "fixtureHistory": "Initial red reproduction preceded empty-string nickname and empty/stale native image child phases. Both outgoing and named red runs were repeated using the final fixture; native-avatar-red-result.json records the final fixture hash.",
+  "nativeOuterRowHeight": "90pt synthetic row validates empty-string fallback; it does not claim the screenshot outer row height."
+}

@@ -17,5 +17,6 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-p
  "$project_dir/Tests/MessageUIKit/MessageUIKit.m" "$project_dir/Tests/TimeUIKit/TimeUIKit.m" "$project_dir/Tests/GestureUIKit/GestureUIKit.m" \
  "$project_dir/Controllers/CSMessageActionPreferences.m" "$project_dir/Controllers/CSMessageActionContext.m" "$project_dir/Controllers/CSMessageActionPolicy.m" \
  "$project_dir/Controllers/CSMessageGestureAdapter.m" "$project_dir/Controllers/CSMessageCellLifecycle.m" \
+ "$project_dir/Tests/ClownLifecycleDouble.m" \
  "$project_dir/Tests/MessageGestureAdapterTests.m" -o "$test_dir/tests"
 "$test_dir/tests"

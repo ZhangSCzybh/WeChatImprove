@@ -1,0 +1,3375 @@
+{
+  "WCPayBaseMessageCellView-initTitleLabel.asm": [
+    {
+      "instruction": "0x1097b7a90",
+      "slot": "0x11ed127f8",
+      "kind": "__objc_classrefs",
+      "value": "MMUILabel"
+    },
+    {
+      "instruction": "0x1097b7aac",
+      "slot": "0x11eca8308",
+      "kind": "__objc_selrefs",
+      "value": "initWithFrame:"
+    },
+    {
+      "instruction": "0x1097b7ac8",
+      "slot": "0x11ed127e0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d5"
+    },
+    {
+      "instruction": "0x1097b7ad0",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x1097b7ad8",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x1097b7ae0",
+      "slot": "0x11e9c9800",
+      "kind": "__objc_selrefs",
+      "value": "currentContext"
+    },
+    {
+      "instruction": "0x1097b7af8",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x1097b7b00",
+      "slot": "0x11eca6508",
+      "kind": "__objc_selrefs",
+      "value": "class"
+    },
+    {
+      "instruction": "0x1097b7b10",
+      "slot": "0x11e9c9a40",
+      "kind": "__objc_selrefs",
+      "value": "getService:"
+    },
+    {
+      "instruction": "0x1097b7b2c",
+      "slot": "0x11e9cbee8",
+      "kind": "__objc_selrefs",
+      "value": "getValueOfProperty:inRuleSet:"
+    },
+    {
+      "instruction": "0x1097b7b54",
+      "slot": "0x11e9cbef0",
+      "kind": "__objc_selrefs",
+      "value": "parseFloatFromValues:"
+    },
+    {
+      "instruction": "0x1097b7b68",
+      "slot": "0x11e9d2e70",
+      "kind": "__objc_selrefs",
+      "value": "mediumSystemFontOfSize:"
+    },
+    {
+      "instruction": "0x1097b7b88",
+      "slot": "0x11ecaba08",
+      "kind": "__objc_selrefs",
+      "value": "setFont:"
+    },
+    {
+      "instruction": "0x1097b7bb8",
+      "slot": "0x11ed12810",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d3"
+    },
+    {
+      "instruction": "0x1097b7bc0",
+      "slot": "0x11ecadf80",
+      "kind": "__objc_selrefs",
+      "value": "whiteColor"
+    },
+    {
+      "instruction": "0x1097b7bdc",
+      "slot": "0x11ed12810",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d3"
+    },
+    {
+      "instruction": "0x1097b7bf8",
+      "slot": "0x11e9d01c8",
+      "kind": "__objc_selrefs",
+      "value": "Alpha0_8"
+    },
+    {
+      "instruction": "0x1097b7c10",
+      "slot": "0x11e9cbf28",
+      "kind": "__objc_selrefs",
+      "value": "colorInLightMode:DarkMode:"
+    },
+    {
+      "instruction": "0x1097b7c38",
+      "slot": "0x11ecacae8",
+      "kind": "__objc_selrefs",
+      "value": "setTextColor:"
+    },
+    {
+      "instruction": "0x1097b7c6c",
+      "slot": "0x11ecac278",
+      "kind": "__objc_selrefs",
+      "value": "setNumberOfLines:"
+    },
+    {
+      "instruction": "0x1097b7c7c",
+      "slot": "0x11e9ce380",
+      "kind": "__objc_selrefs",
+      "value": "viewModel"
+    },
+    {
+      "instruction": "0x1097b7c9c",
+      "slot": "0x11e9ce358",
+      "kind": "__objc_selrefs",
+      "value": "titleText"
+    },
+    {
+      "instruction": "0x1097b7cb8",
+      "slot": "0x11eca87b8",
+      "kind": "__objc_selrefs",
+      "value": "isEqualToString:"
+    },
+    {
+      "instruction": "0x1097b7cec",
+      "slot": "0x11ec18160",
+      "kind": "__objc_selrefs",
+      "value": "canAdjustsFontSizeToFitWidth"
+    },
+    {
+      "instruction": "0x1097b7d04",
+      "slot": "0x11ecaad78",
+      "kind": "__objc_selrefs",
+      "value": "setAdjustsFontSizeToFitWidth:"
+    },
+    {
+      "instruction": "0x1097b7d40",
+      "slot": "0x11ecacad8",
+      "kind": "__objc_selrefs",
+      "value": "setText:"
+    }
+  ],
+  "WCPayBaseMessageCellView-initDescLabel.asm": [
+    {
+      "instruction": "0x1097b7dac",
+      "slot": "0x11ed127f8",
+      "kind": "__objc_classrefs",
+      "value": "MMUILabel"
+    },
+    {
+      "instruction": "0x1097b7dc8",
+      "slot": "0x11eca8308",
+      "kind": "__objc_selrefs",
+      "value": "initWithFrame:"
+    },
+    {
+      "instruction": "0x1097b7de4",
+      "slot": "0x11ed127e0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d5"
+    },
+    {
+      "instruction": "0x1097b7dec",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x1097b7df4",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x1097b7dfc",
+      "slot": "0x11e9c9800",
+      "kind": "__objc_selrefs",
+      "value": "currentContext"
+    },
+    {
+      "instruction": "0x1097b7e14",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x1097b7e1c",
+      "slot": "0x11eca6508",
+      "kind": "__objc_selrefs",
+      "value": "class"
+    },
+    {
+      "instruction": "0x1097b7e2c",
+      "slot": "0x11e9c9a40",
+      "kind": "__objc_selrefs",
+      "value": "getService:"
+    },
+    {
+      "instruction": "0x1097b7e48",
+      "slot": "0x11e9cbee8",
+      "kind": "__objc_selrefs",
+      "value": "getValueOfProperty:inRuleSet:"
+    },
+    {
+      "instruction": "0x1097b7e70",
+      "slot": "0x11e9cbef0",
+      "kind": "__objc_selrefs",
+      "value": "parseFloatFromValues:"
+    },
+    {
+      "instruction": "0x1097b7e84",
+      "slot": "0x11ecad6d0",
+      "kind": "__objc_selrefs",
+      "value": "systemFontOfSize:"
+    },
+    {
+      "instruction": "0x1097b7ea4",
+      "slot": "0x11ecaba08",
+      "kind": "__objc_selrefs",
+      "value": "setFont:"
+    },
+    {
+      "instruction": "0x1097b7ed4",
+      "slot": "0x11ed12810",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d3"
+    },
+    {
+      "instruction": "0x1097b7edc",
+      "slot": "0x11ecadf80",
+      "kind": "__objc_selrefs",
+      "value": "whiteColor"
+    },
+    {
+      "instruction": "0x1097b7ef8",
+      "slot": "0x11ed12810",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d3"
+    },
+    {
+      "instruction": "0x1097b7f14",
+      "slot": "0x11e9d01c8",
+      "kind": "__objc_selrefs",
+      "value": "Alpha0_8"
+    },
+    {
+      "instruction": "0x1097b7f2c",
+      "slot": "0x11e9cbf28",
+      "kind": "__objc_selrefs",
+      "value": "colorInLightMode:DarkMode:"
+    },
+    {
+      "instruction": "0x1097b7f54",
+      "slot": "0x11ecacae8",
+      "kind": "__objc_selrefs",
+      "value": "setTextColor:"
+    },
+    {
+      "instruction": "0x1097b7f88",
+      "slot": "0x11ecac278",
+      "kind": "__objc_selrefs",
+      "value": "setNumberOfLines:"
+    },
+    {
+      "instruction": "0x1097b7f98",
+      "slot": "0x11e9ce380",
+      "kind": "__objc_selrefs",
+      "value": "viewModel"
+    },
+    {
+      "instruction": "0x1097b7fb4",
+      "slot": "0x11ea00c30",
+      "kind": "__objc_selrefs",
+      "value": "descText"
+    },
+    {
+      "instruction": "0x1097b7fd0",
+      "slot": "0x11ecacad8",
+      "kind": "__objc_selrefs",
+      "value": "setText:"
+    }
+  ],
+  "WCPayTransferMessageCellView-initTitleLabel.asm": [
+    {
+      "instruction": "0x109e73824",
+      "slot": "0x11e9d9020",
+      "kind": "__objc_selrefs",
+      "value": "initTitleLabel"
+    },
+    {
+      "instruction": "0x109e73834",
+      "slot": "0x11ed127e0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d5"
+    },
+    {
+      "instruction": "0x109e7383c",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x109e73844",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x109e7384c",
+      "slot": "0x11e9c9800",
+      "kind": "__objc_selrefs",
+      "value": "currentContext"
+    },
+    {
+      "instruction": "0x109e73864",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x109e7386c",
+      "slot": "0x11eca6508",
+      "kind": "__objc_selrefs",
+      "value": "class"
+    },
+    {
+      "instruction": "0x109e7387c",
+      "slot": "0x11e9c9a40",
+      "kind": "__objc_selrefs",
+      "value": "getService:"
+    },
+    {
+      "instruction": "0x109e73898",
+      "slot": "0x11e9cbee8",
+      "kind": "__objc_selrefs",
+      "value": "getValueOfProperty:inRuleSet:"
+    },
+    {
+      "instruction": "0x109e738c0",
+      "slot": "0x11e9cbef0",
+      "kind": "__objc_selrefs",
+      "value": "parseFloatFromValues:"
+    },
+    {
+      "instruction": "0x109e738d4",
+      "slot": "0x11e9f0940",
+      "kind": "__objc_selrefs",
+      "value": "mediumWechatStdFontOfSize:"
+    },
+    {
+      "instruction": "0x109e73900",
+      "slot": "0x11ecaba08",
+      "kind": "__objc_selrefs",
+      "value": "setFont:"
+    }
+  ],
+  "WCPayTransferMessageCellView-updateTitleLabel.asm": [
+    {
+      "instruction": "0x109e742c8",
+      "slot": "0x11e9ce380",
+      "kind": "__objc_selrefs",
+      "value": "viewModel"
+    },
+    {
+      "instruction": "0x109e742e8",
+      "slot": "0x11ec2d778",
+      "kind": "__objc_selrefs",
+      "value": "isGroupTransferMsgOrOpenim"
+    },
+    {
+      "instruction": "0x109e74300",
+      "slot": "0x11ed127e0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d5"
+    },
+    {
+      "instruction": "0x109e74308",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x109e74310",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x109e74318",
+      "slot": "0x11e9c9800",
+      "kind": "__objc_selrefs",
+      "value": "currentContext"
+    },
+    {
+      "instruction": "0x109e74334",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x109e7433c",
+      "slot": "0x11eca6508",
+      "kind": "__objc_selrefs",
+      "value": "class"
+    },
+    {
+      "instruction": "0x109e74350",
+      "slot": "0x11e9c9a40",
+      "kind": "__objc_selrefs",
+      "value": "getService:"
+    },
+    {
+      "instruction": "0x109e74370",
+      "slot": "0x11e9cbee8",
+      "kind": "__objc_selrefs",
+      "value": "getValueOfProperty:inRuleSet:"
+    },
+    {
+      "instruction": "0x109e7439c",
+      "slot": "0x11e9cbef0",
+      "kind": "__objc_selrefs",
+      "value": "parseFloatFromValues:"
+    },
+    {
+      "instruction": "0x109e743c4",
+      "slot": "0x11e9d2e70",
+      "kind": "__objc_selrefs",
+      "value": "mediumSystemFontOfSize:"
+    },
+    {
+      "instruction": "0x109e743f0",
+      "slot": "0x11ecaba08",
+      "kind": "__objc_selrefs",
+      "value": "setFont:"
+    },
+    {
+      "instruction": "0x109e74424",
+      "slot": "0x11ecac278",
+      "kind": "__objc_selrefs",
+      "value": "setNumberOfLines:"
+    },
+    {
+      "instruction": "0x109e7444c",
+      "slot": "0x11ec2d788",
+      "kind": "__objc_selrefs",
+      "value": "groupTransferTitleAttributedText"
+    },
+    {
+      "instruction": "0x109e74474",
+      "slot": "0x11ecaaf10",
+      "kind": "__objc_selrefs",
+      "value": "setAttributedText:"
+    },
+    {
+      "instruction": "0x109e74488",
+      "slot": "0x11eca7628",
+      "kind": "__objc_selrefs",
+      "value": "font"
+    },
+    {
+      "instruction": "0x109e744a0",
+      "slot": "0x11ed135e8",
+      "kind": "__objc_classrefs",
+      "value": "MessageNodeComponentHelper"
+    },
+    {
+      "instruction": "0x109e744a4",
+      "slot": "0x11e9cfd98",
+      "kind": "__objc_selrefs",
+      "value": "getMessageBackgroundShorterWidth:"
+    },
+    {
+      "instruction": "0x109e744b8",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x109e744c0",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x109e744e0",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x109e74550",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x109e74554",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x109e74574",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x109e745e8",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x109e745f0",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x109e74610",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x109e74678",
+      "slot": "0x11ea10f30",
+      "kind": "__objc_selrefs",
+      "value": "stringSizeWithFont:constrainedToSize:"
+    },
+    {
+      "instruction": "0x109e746f8",
+      "slot": "0x11ecabb10",
+      "kind": "__objc_selrefs",
+      "value": "setHeight:"
+    },
+    {
+      "instruction": "0x109e7471c",
+      "slot": "0x11e9f0940",
+      "kind": "__objc_selrefs",
+      "value": "mediumWechatStdFontOfSize:"
+    },
+    {
+      "instruction": "0x109e7474c",
+      "slot": "0x11ecaba08",
+      "kind": "__objc_selrefs",
+      "value": "setFont:"
+    },
+    {
+      "instruction": "0x109e74780",
+      "slot": "0x11ecac278",
+      "kind": "__objc_selrefs",
+      "value": "setNumberOfLines:"
+    },
+    {
+      "instruction": "0x109e747a8",
+      "slot": "0x11e9ce358",
+      "kind": "__objc_selrefs",
+      "value": "titleText"
+    },
+    {
+      "instruction": "0x109e747c4",
+      "slot": "0x11ecacad8",
+      "kind": "__objc_selrefs",
+      "value": "setText:"
+    },
+    {
+      "instruction": "0x109e747e8",
+      "slot": "0x11e9ee5a8",
+      "kind": "__objc_selrefs",
+      "value": "heightToFit"
+    },
+    {
+      "instruction": "0x109e74814",
+      "slot": "0x11ecad7d8",
+      "kind": "__objc_selrefs",
+      "value": "text"
+    },
+    {
+      "instruction": "0x109e7482c",
+      "slot": "0x11eca8ce8",
+      "kind": "__objc_selrefs",
+      "value": "length"
+    },
+    {
+      "instruction": "0x109e74858",
+      "slot": "0x11e9cc648",
+      "kind": "__objc_selrefs",
+      "value": "right"
+    },
+    {
+      "instruction": "0x109e7486c",
+      "slot": "0x11ed135e8",
+      "kind": "__objc_classrefs",
+      "value": "MessageNodeComponentHelper"
+    },
+    {
+      "instruction": "0x109e74874",
+      "slot": "0x11e9cfd98",
+      "kind": "__objc_selrefs",
+      "value": "getMessageBackgroundShorterWidth:"
+    },
+    {
+      "instruction": "0x109e74894",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x109e7489c",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x109e748bc",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x109e74920",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x109e74928",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x109e74944",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x109e749ac",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x109e749b0",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x109e749c8",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x109e74a34",
+      "slot": "0x11eca7f00",
+      "kind": "__objc_selrefs",
+      "value": "height"
+    },
+    {
+      "instruction": "0x109e74a48",
+      "slot": "0x11e9cf160",
+      "kind": "__objc_selrefs",
+      "value": "setExpFrame:"
+    },
+    {
+      "instruction": "0x109e74ac8",
+      "slot": "0x11ecae078",
+      "kind": "__objc_selrefs",
+      "value": "y"
+    },
+    {
+      "instruction": "0x109e74adc",
+      "slot": "0x11eca7f00",
+      "kind": "__objc_selrefs",
+      "value": "height"
+    },
+    {
+      "instruction": "0x109e74b10",
+      "slot": "0x11ecacf30",
+      "kind": "__objc_selrefs",
+      "value": "setY:"
+    }
+  ],
+  "WCPayTransferMessageCellView-operationMenuItems.asm": [
+    {
+      "instruction": "0x109e76794",
+      "slot": "0x11ed12658",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027ea"
+    },
+    {
+      "instruction": "0x109e767a4",
+      "slot": "0x11e9ce420",
+      "kind": "__objc_selrefs",
+      "value": "addRevokeOrDeleteMenuItem:"
+    }
+  ],
+  "WCPayTransferMessageViewModel-titleText.asm": [
+    {
+      "instruction": "0x109e78944",
+      "slot": "0x11e9ddd78",
+      "kind": "__objc_selrefs",
+      "value": "m_oWCPayInfoItem"
+    },
+    {
+      "instruction": "0x109e78960",
+      "slot": "0x11e9ddd80",
+      "kind": "__objc_selrefs",
+      "value": "m_uiPaySubType"
+    }
+  ],
+  "WCPayTransferMessageViewModel-innerTitleText.asm": [
+    {
+      "instruction": "0x109e78a44",
+      "slot": "0x11e9ddd78",
+      "kind": "__objc_selrefs",
+      "value": "m_oWCPayInfoItem"
+    },
+    {
+      "instruction": "0x109e78a60",
+      "slot": "0x11e9dddd0",
+      "kind": "__objc_selrefs",
+      "value": "m_nsFeeDesc"
+    },
+    {
+      "instruction": "0x109e78a7c",
+      "slot": "0x11eca8ce8",
+      "kind": "__objc_selrefs",
+      "value": "length"
+    },
+    {
+      "instruction": "0x109e78aa0",
+      "slot": "0x11ec2d778",
+      "kind": "__objc_selrefs",
+      "value": "isGroupTransferMsgOrOpenim"
+    },
+    {
+      "instruction": "0x109e78ab4",
+      "slot": "0x11ec2d7c8",
+      "kind": "__objc_selrefs",
+      "value": "getGroupTransferTitleText"
+    },
+    {
+      "instruction": "0x109e78ac8",
+      "slot": "0x11e9ce438",
+      "kind": "__objc_selrefs",
+      "value": "m_nsDesc"
+    }
+  ],
+  "WCPayTransferMessageViewModel-canCreateMessageViewModelWithMessageWrap_.asm": [
+    {
+      "instruction": "0x109e76fb0",
+      "slot": "0x11e9ce3f0",
+      "kind": "__objc_selrefs",
+      "value": "m_uiMessageType"
+    },
+    {
+      "instruction": "0x109e76fcc",
+      "slot": "0x11e9ce3f8",
+      "kind": "__objc_selrefs",
+      "value": "m_uiAppMsgInnerType"
+    },
+    {
+      "instruction": "0x109e77018",
+      "slot": "0x11ed12618",
+      "kind": "__objc_classrefs",
+      "value": "iConsole"
+    },
+    {
+      "instruction": "0x109e77030",
+      "slot": "0x11e9ce3f8",
+      "kind": "__objc_selrefs",
+      "value": "m_uiAppMsgInnerType"
+    },
+    {
+      "instruction": "0x109e77040",
+      "slot": "0x11e9c9310",
+      "kind": "__objc_selrefs",
+      "value": "logWithLevel:module:errorCode:file:line:func:format:"
+    }
+  ],
+  "ChatTimeCellView-layoutInternal.asm": [
+    {
+      "instruction": "0x100fdedd4",
+      "slot": "0x11e9d10c8",
+      "kind": "__objc_selrefs",
+      "value": "needUpdateLightStyle"
+    },
+    {
+      "instruction": "0x100fdede0",
+      "slot": "0x11e9d0d08",
+      "kind": "__objc_selrefs",
+      "value": "isUseLightStyle"
+    },
+    {
+      "instruction": "0x100fdedf4",
+      "slot": "0x11e9d0d80",
+      "kind": "__objc_selrefs",
+      "value": "setUseLightStyle:"
+    },
+    {
+      "instruction": "0x100fdee14",
+      "slot": "0x11ed127f8",
+      "kind": "__objc_classrefs",
+      "value": "MMUILabel"
+    },
+    {
+      "instruction": "0x100fdee34",
+      "slot": "0x11ecacae0",
+      "kind": "__objc_selrefs",
+      "value": "setTextAlignment:"
+    },
+    {
+      "instruction": "0x100fdee48",
+      "slot": "0x11ecacd38",
+      "kind": "__objc_selrefs",
+      "value": "setUserInteractionEnabled:"
+    },
+    {
+      "instruction": "0x100fdee58",
+      "slot": "0x11ed12e60",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x8010000000002804"
+    },
+    {
+      "instruction": "0x100fdee64",
+      "slot": "0x11ea186d0",
+      "kind": "__objc_selrefs",
+      "value": "onClickTimeLabel"
+    },
+    {
+      "instruction": "0x100fdee6c",
+      "slot": "0x11e9ccc50",
+      "kind": "__objc_selrefs",
+      "value": "initWithTarget:action:"
+    },
+    {
+      "instruction": "0x100fdee84",
+      "slot": "0x11e9ccc58",
+      "kind": "__objc_selrefs",
+      "value": "addGestureRecognizer:"
+    },
+    {
+      "instruction": "0x100fdee9c",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x100fdeea4",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x100fdeeac",
+      "slot": "0x11e9c9800",
+      "kind": "__objc_selrefs",
+      "value": "currentContext"
+    },
+    {
+      "instruction": "0x100fdeec8",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x100fdeed0",
+      "slot": "0x11eca6508",
+      "kind": "__objc_selrefs",
+      "value": "class"
+    },
+    {
+      "instruction": "0x100fdeee4",
+      "slot": "0x11e9c9a40",
+      "kind": "__objc_selrefs",
+      "value": "getService:"
+    },
+    {
+      "instruction": "0x100fdef04",
+      "slot": "0x11e9cbee8",
+      "kind": "__objc_selrefs",
+      "value": "getValueOfProperty:inRuleSet:"
+    },
+    {
+      "instruction": "0x100fdef30",
+      "slot": "0x11e9cd050",
+      "kind": "__objc_selrefs",
+      "value": "parseFontFromValues:"
+    },
+    {
+      "instruction": "0x100fdef54",
+      "slot": "0x11ecaba08",
+      "kind": "__objc_selrefs",
+      "value": "setFont:"
+    },
+    {
+      "instruction": "0x100fdef88",
+      "slot": "0x11e9ce380",
+      "kind": "__objc_selrefs",
+      "value": "viewModel"
+    },
+    {
+      "instruction": "0x100fdefa8",
+      "slot": "0x11e9d22e8",
+      "kind": "__objc_selrefs",
+      "value": "timeText"
+    },
+    {
+      "instruction": "0x100fdefc4",
+      "slot": "0x11ecacad8",
+      "kind": "__objc_selrefs",
+      "value": "setText:"
+    },
+    {
+      "instruction": "0x100fdeffc",
+      "slot": "0x11ea18518",
+      "kind": "__objc_selrefs",
+      "value": "normalSystemTextColorMaterialStyle"
+    },
+    {
+      "instruction": "0x100fdf018",
+      "slot": "0x11ecacae8",
+      "kind": "__objc_selrefs",
+      "value": "setTextColor:"
+    },
+    {
+      "instruction": "0x100fdf038",
+      "slot": "0x11ecadfa8",
+      "kind": "__objc_selrefs",
+      "value": "width"
+    },
+    {
+      "instruction": "0x100fdf064",
+      "slot": "0x11e9fcd08",
+      "kind": "__objc_selrefs",
+      "value": "labelWidth"
+    },
+    {
+      "instruction": "0x100fdf0a8",
+      "slot": "0x11ed135e8",
+      "kind": "__objc_classrefs",
+      "value": "MessageNodeComponentHelper"
+    },
+    {
+      "instruction": "0x100fdf0b0",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x100fdf0d0",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x100fdf128",
+      "slot": "0x11e9cfe28",
+      "kind": "__objc_selrefs",
+      "value": "getMessageCssFloatValue:component:"
+    },
+    {
+      "instruction": "0x100fdf148",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x100fdf150",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x100fdf170",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x100fdf1c4",
+      "slot": "0x11e9cbef0",
+      "kind": "__objc_selrefs",
+      "value": "parseFloatFromValues:"
+    },
+    {
+      "instruction": "0x100fdf1e8",
+      "slot": "0x11ecaba60",
+      "kind": "__objc_selrefs",
+      "value": "setFrame:"
+    },
+    {
+      "instruction": "0x100fdf254",
+      "slot": "0x11ed13290",
+      "kind": "__objc_classrefs",
+      "value": "MMUIButton"
+    },
+    {
+      "instruction": "0x100fdf25c",
+      "slot": "0x11eca61d0",
+      "kind": "__objc_selrefs",
+      "value": "buttonWithType:"
+    },
+    {
+      "instruction": "0x100fdf284",
+      "slot": "0x11ed12810",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d3"
+    },
+    {
+      "instruction": "0x100fdf28c",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x100fdf2a8",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x100fdf2d4",
+      "slot": "0x11e9cbf00",
+      "kind": "__objc_selrefs",
+      "value": "colorList"
+    },
+    {
+      "instruction": "0x100fdf2f0",
+      "slot": "0x11e9cc2b8",
+      "kind": "__objc_selrefs",
+      "value": "getColorByName:withAlpha:"
+    },
+    {
+      "instruction": "0x100fdf338",
+      "slot": "0x11ed12810",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d3"
+    },
+    {
+      "instruction": "0x100fdf340",
+      "slot": "0x11eca6550",
+      "kind": "__objc_selrefs",
+      "value": "clearColor"
+    },
+    {
+      "instruction": "0x100fdf360",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x100fdf37c",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x100fdf3f8",
+      "slot": "0x11eca6550",
+      "kind": "__objc_selrefs",
+      "value": "clearColor"
+    },
+    {
+      "instruction": "0x100fdf418",
+      "slot": "0x11e9cbf28",
+      "kind": "__objc_selrefs",
+      "value": "colorInLightMode:DarkMode:"
+    },
+    {
+      "instruction": "0x100fdf440",
+      "slot": "0x11ecab038",
+      "kind": "__objc_selrefs",
+      "value": "setBackgroundColor:"
+    },
+    {
+      "instruction": "0x100fdf4a8",
+      "slot": "0x11ed127e0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d5"
+    },
+    {
+      "instruction": "0x100fdf4b0",
+      "slot": "0x11ecad6d0",
+      "kind": "__objc_selrefs",
+      "value": "systemFontOfSize:"
+    },
+    {
+      "instruction": "0x100fdf4d0",
+      "slot": "0x11ecad8a0",
+      "kind": "__objc_selrefs",
+      "value": "titleLabel"
+    },
+    {
+      "instruction": "0x100fdf508",
+      "slot": "0x11eca8ca0",
+      "kind": "__objc_selrefs",
+      "value": "layer"
+    },
+    {
+      "instruction": "0x100fdf524",
+      "slot": "0x11ecab4c0",
+      "kind": "__objc_selrefs",
+      "value": "setCornerRadius:"
+    },
+    {
+      "instruction": "0x100fdf554",
+      "slot": "0x11ecac028",
+      "kind": "__objc_selrefs",
+      "value": "setMasksToBounds:"
+    },
+    {
+      "instruction": "0x100fdf570",
+      "slot": "0x11e9d7860",
+      "kind": "__objc_selrefs",
+      "value": "setExpandHitWidth:"
+    },
+    {
+      "instruction": "0x100fdf584",
+      "slot": "0x11e9d7858",
+      "kind": "__objc_selrefs",
+      "value": "setExpandHitHeight:"
+    },
+    {
+      "instruction": "0x100fdf598",
+      "slot": "0x11ed12808",
+      "kind": "__objc_classrefs",
+      "value": "WCColor"
+    },
+    {
+      "instruction": "0x100fdf5a0",
+      "slot": "0x11e9cfe68",
+      "kind": "__objc_selrefs",
+      "value": "FG_1"
+    },
+    {
+      "instruction": "0x100fdf5b8",
+      "slot": "0x11ecacb98",
+      "kind": "__objc_selrefs",
+      "value": "setTitleColor:forState:"
+    },
+    {
+      "instruction": "0x100fdf5dc",
+      "slot": "0x11ea186d8",
+      "kind": "__objc_selrefs",
+      "value": "handleRightButtonClicked:"
+    },
+    {
+      "instruction": "0x100fdf5e4",
+      "slot": "0x11eca5ad0",
+      "kind": "__objc_selrefs",
+      "value": "addTarget:action:forControlEvents:"
+    },
+    {
+      "instruction": "0x100fdf614",
+      "slot": "0x11e9d4be0",
+      "kind": "__objc_selrefs",
+      "value": "rightButtonInfo"
+    },
+    {
+      "instruction": "0x100fdf634",
+      "slot": "0x11e9d4be8",
+      "kind": "__objc_selrefs",
+      "value": "hasRightButton"
+    },
+    {
+      "instruction": "0x100fdf64c",
+      "slot": "0x11ecaade8",
+      "kind": "__objc_selrefs",
+      "value": "setAlpha:"
+    },
+    {
+      "instruction": "0x100fdf65c",
+      "slot": "0x11ea186e0",
+      "kind": "__objc_selrefs",
+      "value": "rightButtonStr"
+    },
+    {
+      "instruction": "0x100fdf67c",
+      "slot": "0x11ecacb90",
+      "kind": "__objc_selrefs",
+      "value": "setTitle:forState:"
+    },
+    {
+      "instruction": "0x100fdf6bc",
+      "slot": "0x11ecaace0",
+      "kind": "__objc_selrefs",
+      "value": "setAccessibilityLabel:"
+    },
+    {
+      "instruction": "0x100fdf6ec",
+      "slot": "0x11ea186e8",
+      "kind": "__objc_selrefs",
+      "value": "rightButtonWidth"
+    },
+    {
+      "instruction": "0x100fdf6fc",
+      "slot": "0x11ecace98",
+      "kind": "__objc_selrefs",
+      "value": "setWidth:"
+    },
+    {
+      "instruction": "0x100fdf728",
+      "slot": "0x11ea186f0",
+      "kind": "__objc_selrefs",
+      "value": "rightButtonHeight"
+    },
+    {
+      "instruction": "0x100fdf738",
+      "slot": "0x11ecabb10",
+      "kind": "__objc_selrefs",
+      "value": "setHeight:"
+    },
+    {
+      "instruction": "0x100fdf764",
+      "slot": "0x11ea186f8",
+      "kind": "__objc_selrefs",
+      "value": "rightButtonOrigin"
+    },
+    {
+      "instruction": "0x100fdf774",
+      "slot": "0x11e9c9a68",
+      "kind": "__objc_selrefs",
+      "value": "setWcOrigin:"
+    },
+    {
+      "instruction": "0x100fdf798",
+      "slot": "0x11ed12a58",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027af"
+    },
+    {
+      "instruction": "0x100fdf7b8",
+      "slot": "0x11e9d0dd0",
+      "kind": "__objc_selrefs",
+      "value": "useLightStyle"
+    },
+    {
+      "instruction": "0x100fdf7d0",
+      "slot": "0x11e9d0ed8",
+      "kind": "__objc_selrefs",
+      "value": "setBackgroundBlurEffectUseLightStyle:"
+    },
+    {
+      "instruction": "0x100fdf804",
+      "slot": "0x11ed135e8",
+      "kind": "__objc_classrefs",
+      "value": "MessageNodeComponentHelper"
+    },
+    {
+      "instruction": "0x100fdf80c",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x100fdf828",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x100fdf894",
+      "slot": "0x11e9cbff0",
+      "kind": "__objc_selrefs",
+      "value": "setSize:"
+    },
+    {
+      "instruction": "0x100fdf8cc",
+      "slot": "0x11eca63c0",
+      "kind": "__objc_selrefs",
+      "value": "center"
+    },
+    {
+      "instruction": "0x100fdf8dc",
+      "slot": "0x11ecab2d8",
+      "kind": "__objc_selrefs",
+      "value": "setCenter:"
+    },
+    {
+      "instruction": "0x100fdf8f8",
+      "slot": "0x11ecabb18",
+      "kind": "__objc_selrefs",
+      "value": "setHidden:"
+    },
+    {
+      "instruction": "0x100fdf910",
+      "slot": "0x11eca5ac8",
+      "kind": "__objc_selrefs",
+      "value": "addSubview:"
+    }
+  ],
+  "ChatTimeCellView-onClickTimeLabel.asm": [
+    {
+      "instruction": "0x100fdf9dc",
+      "slot": "0x11e9ce380",
+      "kind": "__objc_selrefs",
+      "value": "viewModel"
+    },
+    {
+      "instruction": "0x100fdf9f8",
+      "slot": "0x11ea18700",
+      "kind": "__objc_selrefs",
+      "value": "showingTime"
+    },
+    {
+      "instruction": "0x100fdfa24",
+      "slot": "0x11e9d07d0",
+      "kind": "__objc_selrefs",
+      "value": "createTime"
+    },
+    {
+      "instruction": "0x100fdfa4c",
+      "slot": "0x11eca6d38",
+      "kind": "__objc_selrefs",
+      "value": "delegate"
+    },
+    {
+      "instruction": "0x100fdfa88",
+      "slot": "0x11ea18708",
+      "kind": "__objc_selrefs",
+      "value": "toggleTimeShowMode:"
+    },
+    {
+      "instruction": "0x100fdfa90",
+      "slot": "0x11ecaa808",
+      "kind": "__objc_selrefs",
+      "value": "respondsToSelector:"
+    }
+  ],
+  "ChatTimeViewModel-measure_.asm": [
+    {
+      "instruction": "0x100fdfd74",
+      "slot": "0x11ea18700",
+      "kind": "__objc_selrefs",
+      "value": "showingTime"
+    },
+    {
+      "instruction": "0x100fdfd84",
+      "slot": "0x11e9d07d0",
+      "kind": "__objc_selrefs",
+      "value": "createTime"
+    },
+    {
+      "instruction": "0x100fdfda0",
+      "slot": "0x11eca6d38",
+      "kind": "__objc_selrefs",
+      "value": "delegate"
+    },
+    {
+      "instruction": "0x100fdfddc",
+      "slot": "0x11ea18710",
+      "kind": "__objc_selrefs",
+      "value": "isNeedShowTimeInDetail"
+    },
+    {
+      "instruction": "0x100fdfde4",
+      "slot": "0x11ecaa808",
+      "kind": "__objc_selrefs",
+      "value": "respondsToSelector:"
+    },
+    {
+      "instruction": "0x100fdfe5c",
+      "slot": "0x11ed12840",
+      "kind": "__objc_classrefs",
+      "value": "CAppUtil"
+    },
+    {
+      "instruction": "0x100fdfe90",
+      "slot": "0x11ed12c70",
+      "kind": "__objc_classrefs",
+      "value": "CControlUtil"
+    },
+    {
+      "instruction": "0x100fdfea0",
+      "slot": "0x11ed129b0",
+      "kind": "__objc_classrefs",
+      "value": "UiUtil"
+    },
+    {
+      "instruction": "0x100fdfea8",
+      "slot": "0x11e9cdde8",
+      "kind": "__objc_selrefs",
+      "value": "pageScopeWidthFor:"
+    },
+    {
+      "instruction": "0x100fdfebc",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x100fdfec4",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x100fdfecc",
+      "slot": "0x11e9c9800",
+      "kind": "__objc_selrefs",
+      "value": "currentContext"
+    },
+    {
+      "instruction": "0x100fdfee8",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x100fdfef0",
+      "slot": "0x11eca6508",
+      "kind": "__objc_selrefs",
+      "value": "class"
+    },
+    {
+      "instruction": "0x100fdff04",
+      "slot": "0x11e9c9a40",
+      "kind": "__objc_selrefs",
+      "value": "getService:"
+    },
+    {
+      "instruction": "0x100fdff24",
+      "slot": "0x11e9cbee8",
+      "kind": "__objc_selrefs",
+      "value": "getValueOfProperty:inRuleSet:"
+    },
+    {
+      "instruction": "0x100fdff50",
+      "slot": "0x11e9cd050",
+      "kind": "__objc_selrefs",
+      "value": "parseFontFromValues:"
+    },
+    {
+      "instruction": "0x100fdff70",
+      "slot": "0x11e9d0448",
+      "kind": "__objc_selrefs",
+      "value": "labelWidth:maxWidth:font:"
+    },
+    {
+      "instruction": "0x100fdffc0",
+      "slot": "0x11ed12c38",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeUtil"
+    },
+    {
+      "instruction": "0x100fdffc8",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x100fdffe4",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x100fe0034",
+      "slot": "0x11e9cbef0",
+      "kind": "__objc_selrefs",
+      "value": "parseFloatFromValues:"
+    },
+    {
+      "instruction": "0x100fe004c",
+      "slot": "0x11ed135e8",
+      "kind": "__objc_classrefs",
+      "value": "MessageNodeComponentHelper"
+    },
+    {
+      "instruction": "0x100fe0050",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x100fe006c",
+      "slot": "0x11ed12c40",
+      "kind": "__objc_classrefs",
+      "value": "MMThemeManager"
+    },
+    {
+      "instruction": "0x100fe00bc",
+      "slot": "0x11e9cfe28",
+      "kind": "__objc_selrefs",
+      "value": "getMessageCssFloatValue:component:"
+    },
+    {
+      "instruction": "0x100fe010c",
+      "slot": "0x11ea18720",
+      "kind": "__objc_selrefs",
+      "value": "isRightButtonNeedANewLine"
+    }
+  ],
+  "ChatTimeViewModel-updateLayouts.asm": [
+    {
+      "instruction": "0x100fe071c",
+      "slot": "0x11e9cf200",
+      "kind": "__objc_selrefs",
+      "value": "cellView"
+    },
+    {
+      "instruction": "0x100fe0738",
+      "slot": "0x11ed158f0",
+      "kind": "__objc_classrefs",
+      "value": "BaseChatCellView"
+    },
+    {
+      "instruction": "0x100fe0740",
+      "slot": "0x11eca6508",
+      "kind": "__objc_selrefs",
+      "value": "class"
+    },
+    {
+      "instruction": "0x100fe0750",
+      "slot": "0x11eca8890",
+      "kind": "__objc_selrefs",
+      "value": "isKindOfClass:"
+    },
+    {
+      "instruction": "0x100fe078c",
+      "slot": "0x11e9dab60",
+      "kind": "__objc_selrefs",
+      "value": "isLayouting"
+    },
+    {
+      "instruction": "0x100fe07a0",
+      "slot": "0x11e9d16d8",
+      "kind": "__objc_selrefs",
+      "value": "resetLayoutCache"
+    },
+    {
+      "instruction": "0x100fe07c0",
+      "slot": "0x11e9d16d0",
+      "kind": "__objc_selrefs",
+      "value": "rowHeight"
+    },
+    {
+      "instruction": "0x100fe07d0",
+      "slot": "0x11ed12898",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027ba"
+    },
+    {
+      "instruction": "0x100fe07d8",
+      "slot": "0x11eca6d38",
+      "kind": "__objc_selrefs",
+      "value": "delegate"
+    },
+    {
+      "instruction": "0x100fe07f8",
+      "slot": "0x11ea18728",
+      "kind": "__objc_selrefs",
+      "value": "reloadVisibleNodeWithCellView:"
+    },
+    {
+      "instruction": "0x100fe0800",
+      "slot": "0x11e9c9ec0",
+      "kind": "__objc_selrefs",
+      "value": "safeCancelPreviousPerformRequestsWithTarget:selector:object:"
+    },
+    {
+      "instruction": "0x100fe083c",
+      "slot": "0x11e9c9ec8",
+      "kind": "__objc_selrefs",
+      "value": "safePerformSelector:withObject:afterDelay:"
+    }
+  ],
+  "BaseMsgContentViewController-toggleTimeShowMode_.asm": [
+    {
+      "instruction": "0x100322a34",
+      "slot": "0x11eca6858",
+      "kind": "__objc_selrefs",
+      "value": "countByEnumeratingWithState:objects:count:"
+    },
+    {
+      "instruction": "0x100322a68",
+      "slot": "0x11eca6508",
+      "kind": "__objc_selrefs",
+      "value": "class"
+    },
+    {
+      "instruction": "0x100322a70",
+      "slot": "0x11eca8890",
+      "kind": "__objc_selrefs",
+      "value": "isKindOfClass:"
+    },
+    {
+      "instruction": "0x100322a78",
+      "slot": "0x11e9d16d8",
+      "kind": "__objc_selrefs",
+      "value": "resetLayoutCache"
+    },
+    {
+      "instruction": "0x100322a80",
+      "slot": "0x11e9cf438",
+      "kind": "__objc_selrefs",
+      "value": "updateLayouts"
+    },
+    {
+      "instruction": "0x100322aa4",
+      "slot": "0x11ed15650",
+      "kind": "__objc_classrefs",
+      "value": "ChatTimeViewModel"
+    },
+    {
+      "instruction": "0x100322b10",
+      "slot": "0x11eca6508",
+      "kind": "__objc_selrefs",
+      "value": "class"
+    },
+    {
+      "instruction": "0x100322b20",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x100322b28",
+      "slot": "0x11e9c9800",
+      "kind": "__objc_selrefs",
+      "value": "currentContext"
+    },
+    {
+      "instruction": "0x100322b40",
+      "slot": "0x11ed12c10",
+      "kind": "__objc_classrefs",
+      "value": "DataReportService"
+    },
+    {
+      "instruction": "0x100322b54",
+      "slot": "0x11e9c9a40",
+      "kind": "__objc_selrefs",
+      "value": "getService:"
+    },
+    {
+      "instruction": "0x100322b90",
+      "slot": "0x11e9d4de8",
+      "kind": "__objc_selrefs",
+      "value": "GetContact"
+    },
+    {
+      "instruction": "0x100322bb0",
+      "slot": "0x11e9cb620",
+      "kind": "__objc_selrefs",
+      "value": "m_nsUsrName"
+    },
+    {
+      "instruction": "0x100322be0",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x100322be8",
+      "slot": "0x11eca95a8",
+      "kind": "__objc_selrefs",
+      "value": "numberWithInt:"
+    },
+    {
+      "instruction": "0x100322c18",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x100322c20",
+      "slot": "0x11eca9598",
+      "kind": "__objc_selrefs",
+      "value": "numberWithDouble:"
+    },
+    {
+      "instruction": "0x100322c40",
+      "slot": "0x11ed12698",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027bc"
+    },
+    {
+      "instruction": "0x100322c48",
+      "slot": "0x11eca6fc0",
+      "kind": "__objc_selrefs",
+      "value": "dictionaryWithObjects:forKeys:count:"
+    },
+    {
+      "instruction": "0x100322c6c",
+      "slot": "0x11e9cbe38",
+      "kind": "__objc_selrefs",
+      "value": "reportCustomEvent:target:params:routeRule:"
+    }
+  ],
+  "BaseMsgContentViewController-isNeedShowTimeInDetail.asm": [],
+  "BaseMessageCellView-generateOperationMenu.asm": [
+    {
+      "instruction": "0x1002b1160",
+      "slot": "0x11e9ce380",
+      "kind": "__objc_selrefs",
+      "value": "viewModel"
+    },
+    {
+      "instruction": "0x1002b117c",
+      "slot": "0x11e9d1c88",
+      "kind": "__objc_selrefs",
+      "value": "isRecordDetail"
+    },
+    {
+      "instruction": "0x1002b1198",
+      "slot": "0x11e9dad78",
+      "kind": "__objc_selrefs",
+      "value": "generateOperationMenuForRecordDetail"
+    },
+    {
+      "instruction": "0x1002b11b8",
+      "slot": "0x11ed12658",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027ea"
+    },
+    {
+      "instruction": "0x1002b11c0",
+      "slot": "0x11eca5d88",
+      "kind": "__objc_selrefs",
+      "value": "array"
+    },
+    {
+      "instruction": "0x1002b11f0",
+      "slot": "0x11e9dad80",
+      "kind": "__objc_selrefs",
+      "value": "isChatRoomMessageUnsafe"
+    },
+    {
+      "instruction": "0x1002b1214",
+      "slot": "0x11e9dad88",
+      "kind": "__objc_selrefs",
+      "value": "restoreMenuItem"
+    },
+    {
+      "instruction": "0x1002b1230",
+      "slot": "0x11e9ca580",
+      "kind": "__objc_selrefs",
+      "value": "safeAddObject:"
+    },
+    {
+      "instruction": "0x1002b1248",
+      "slot": "0x11e9d0d60",
+      "kind": "__objc_selrefs",
+      "value": "deleteMenuItem"
+    },
+    {
+      "instruction": "0x1002b1280",
+      "slot": "0x11e9dad90",
+      "kind": "__objc_selrefs",
+      "value": "operationMenuItems"
+    },
+    {
+      "instruction": "0x1002b129c",
+      "slot": "0x11eca5a40",
+      "kind": "__objc_selrefs",
+      "value": "addObjectsFromArray:"
+    },
+    {
+      "instruction": "0x1002b12b8",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b12c0",
+      "slot": "0x11eca95b0",
+      "kind": "__objc_selrefs",
+      "value": "numberWithInteger:"
+    },
+    {
+      "instruction": "0x1002b12e0",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b1300",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b1320",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b1340",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b1360",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b1380",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b13a0",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b13c0",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b13e0",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b1404",
+      "slot": "0x11ed12688",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027c1"
+    },
+    {
+      "instruction": "0x1002b140c",
+      "slot": "0x11eca5dc0",
+      "kind": "__objc_selrefs",
+      "value": "arrayWithObjects:count:"
+    },
+    {
+      "instruction": "0x1002b147c",
+      "slot": "0x11ed13978",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x8010000000002864"
+    },
+    {
+      "instruction": "0x1002b1484",
+      "slot": "0x11e9d0e00",
+      "kind": "__objc_selrefs",
+      "value": "indexSet"
+    },
+    {
+      "instruction": "0x1002b14b0",
+      "slot": "0x11eca6858",
+      "kind": "__objc_selrefs",
+      "value": "countByEnumeratingWithState:objects:count:"
+    },
+    {
+      "instruction": "0x1002b14e4",
+      "slot": "0x11eca8618",
+      "kind": "__objc_selrefs",
+      "value": "intValue"
+    },
+    {
+      "instruction": "0x1002b14e8",
+      "slot": "0x11eca59f0",
+      "kind": "__objc_selrefs",
+      "value": "addIndex:"
+    },
+    {
+      "instruction": "0x1002b1560",
+      "slot": "0x11eca6850",
+      "kind": "__objc_selrefs",
+      "value": "count"
+    },
+    {
+      "instruction": "0x1002b1568",
+      "slot": "0x11e9ca360",
+      "kind": "__objc_selrefs",
+      "value": "safeObjectAtIndex:"
+    },
+    {
+      "instruction": "0x1002b1574",
+      "slot": "0x11e9cf728",
+      "kind": "__objc_selrefs",
+      "value": "menuType"
+    },
+    {
+      "instruction": "0x1002b157c",
+      "slot": "0x11eca6728",
+      "kind": "__objc_selrefs",
+      "value": "containsIndex:"
+    },
+    {
+      "instruction": "0x1002b1604",
+      "slot": "0x11e9dad98",
+      "kind": "__objc_selrefs",
+      "value": "canShowMsgReplyMenuItem"
+    },
+    {
+      "instruction": "0x1002b1620",
+      "slot": "0x11e9dada0",
+      "kind": "__objc_selrefs",
+      "value": "msgReplyMenuItem"
+    },
+    {
+      "instruction": "0x1002b1640",
+      "slot": "0x11e9cbad8",
+      "kind": "__objc_selrefs",
+      "value": "safeInsertObject:atIndex:"
+    },
+    {
+      "instruction": "0x1002b167c",
+      "slot": "0x11e9dada8",
+      "kind": "__objc_selrefs",
+      "value": "canShowMsgNoteMenuItem"
+    },
+    {
+      "instruction": "0x1002b1698",
+      "slot": "0x11e9dadb0",
+      "kind": "__objc_selrefs",
+      "value": "msgAddNoteMenuItem"
+    },
+    {
+      "instruction": "0x1002b16bc",
+      "slot": "0x11e9cbad8",
+      "kind": "__objc_selrefs",
+      "value": "safeInsertObject:atIndex:"
+    },
+    {
+      "instruction": "0x1002b16e8",
+      "slot": "0x11e9dadb8",
+      "kind": "__objc_selrefs",
+      "value": "canShowScheduleMenuItem"
+    },
+    {
+      "instruction": "0x1002b1700",
+      "slot": "0x11e9dadc0",
+      "kind": "__objc_selrefs",
+      "value": "scheduleMenuItem"
+    },
+    {
+      "instruction": "0x1002b1724",
+      "slot": "0x11e9cbad8",
+      "kind": "__objc_selrefs",
+      "value": "safeInsertObject:atIndex:"
+    },
+    {
+      "instruction": "0x1002b1740",
+      "slot": "0x11ed14e60",
+      "kind": "__objc_classrefs",
+      "value": "CBTHalfScreenMsgBubbleRoute"
+    },
+    {
+      "instruction": "0x1002b1748",
+      "slot": "0x11e9dadc8",
+      "kind": "__objc_selrefs",
+      "value": "isRemindAskXiaoWeiEnabled"
+    },
+    {
+      "instruction": "0x1002b175c",
+      "slot": "0x11ed12c28",
+      "kind": "__objc_classrefs",
+      "value": "CBTAskXiaoWeiReporter"
+    },
+    {
+      "instruction": "0x1002b178c",
+      "slot": "0x11e9ce378",
+      "kind": "__objc_selrefs",
+      "value": "messageWrap"
+    },
+    {
+      "instruction": "0x1002b17a8",
+      "slot": "0x11e9ce070",
+      "kind": "__objc_selrefs",
+      "value": "GetChatName"
+    },
+    {
+      "instruction": "0x1002b17e0",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b1814",
+      "slot": "0x11e9ccfd0",
+      "kind": "__objc_selrefs",
+      "value": "m_n64MesSvrID"
+    },
+    {
+      "instruction": "0x1002b1824",
+      "slot": "0x11eca95c0",
+      "kind": "__objc_selrefs",
+      "value": "numberWithLongLong:"
+    },
+    {
+      "instruction": "0x1002b1844",
+      "slot": "0x11ed12698",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027bc"
+    },
+    {
+      "instruction": "0x1002b184c",
+      "slot": "0x11eca6fc0",
+      "kind": "__objc_selrefs",
+      "value": "dictionaryWithObjects:forKeys:count:"
+    },
+    {
+      "instruction": "0x1002b1870",
+      "slot": "0x11e9cbec8",
+      "kind": "__objc_selrefs",
+      "value": "reportCustomEventWithEventId:enterScene:viewId:extraParams:"
+    },
+    {
+      "instruction": "0x1002b18e0",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x1002b18e8",
+      "slot": "0x11e9c9800",
+      "kind": "__objc_selrefs",
+      "value": "currentContext"
+    },
+    {
+      "instruction": "0x1002b1904",
+      "slot": "0x11ed12890",
+      "kind": "__objc_classrefs",
+      "value": "ExptService"
+    },
+    {
+      "instruction": "0x1002b190c",
+      "slot": "0x11eca6508",
+      "kind": "__objc_selrefs",
+      "value": "class"
+    },
+    {
+      "instruction": "0x1002b1920",
+      "slot": "0x11e9c9a40",
+      "kind": "__objc_selrefs",
+      "value": "getService:"
+    },
+    {
+      "instruction": "0x1002b1940",
+      "slot": "0x11e9c9e48",
+      "kind": "__objc_selrefs",
+      "value": "getExpt:withBoolDef:"
+    },
+    {
+      "instruction": "0x1002b1978",
+      "slot": "0x11e9dadd0",
+      "kind": "__objc_selrefs",
+      "value": "canShowSpeakMsgItem"
+    },
+    {
+      "instruction": "0x1002b198c",
+      "slot": "0x11ed13638",
+      "kind": "__objc_classrefs",
+      "value": "MMMenuItem"
+    },
+    {
+      "instruction": "0x1002b1998",
+      "slot": "0x11e9dadd8",
+      "kind": "__objc_selrefs",
+      "value": "onSpeakMsg"
+    },
+    {
+      "instruction": "0x1002b19a0",
+      "slot": "0x11e9cf310",
+      "kind": "__objc_selrefs",
+      "value": "initWithType:action:"
+    },
+    {
+      "instruction": "0x1002b19c0",
+      "slot": "0x11e9cbad8",
+      "kind": "__objc_selrefs",
+      "value": "safeInsertObject:atIndex:"
+    },
+    {
+      "instruction": "0x1002b1a50",
+      "slot": "0x11ed14e60",
+      "kind": "__objc_classrefs",
+      "value": "CBTHalfScreenMsgBubbleRoute"
+    },
+    {
+      "instruction": "0x1002b1a58",
+      "slot": "0x11e9dade0",
+      "kind": "__objc_selrefs",
+      "value": "isEntryEnabled"
+    },
+    {
+      "instruction": "0x1002b1a70",
+      "slot": "0x11e9dade8",
+      "kind": "__objc_selrefs",
+      "value": "isAskXiaoWeiTempBlockedForCurrentMsg"
+    },
+    {
+      "instruction": "0x1002b1aa0",
+      "slot": "0x11e9ce378",
+      "kind": "__objc_selrefs",
+      "value": "messageWrap"
+    },
+    {
+      "instruction": "0x1002b1abc",
+      "slot": "0x11e9dadf0",
+      "kind": "__objc_selrefs",
+      "value": "IsTextMsg"
+    },
+    {
+      "instruction": "0x1002b1b0c",
+      "slot": "0x11e9cf1d0",
+      "kind": "__objc_selrefs",
+      "value": "isAppMsgAppearAsTextMsg"
+    },
+    {
+      "instruction": "0x1002b1b40",
+      "slot": "0x11e9dadf8",
+      "kind": "__objc_selrefs",
+      "value": "onAskXiaoWei:"
+    },
+    {
+      "instruction": "0x1002b1b48",
+      "slot": "0x11e9dae00",
+      "kind": "__objc_selrefs",
+      "value": "makeAskXiaoWeiMenuItemWithAction:"
+    },
+    {
+      "instruction": "0x1002b1b70",
+      "slot": "0x11e9cbad8",
+      "kind": "__objc_selrefs",
+      "value": "safeInsertObject:atIndex:"
+    },
+    {
+      "instruction": "0x1002b1b98",
+      "slot": "0x11e9dae08",
+      "kind": "__objc_selrefs",
+      "value": "reportAskXiaoWeiBubbleUnderlineForClick:"
+    },
+    {
+      "instruction": "0x1002b1bc4",
+      "slot": "0x11ed14e68",
+      "kind": "__objc_classrefs",
+      "value": "CBTHalfScreenImageBrowserRoute"
+    },
+    {
+      "instruction": "0x1002b1bd8",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x1002b1bf4",
+      "slot": "0x11ed12890",
+      "kind": "__objc_classrefs",
+      "value": "ExptService"
+    },
+    {
+      "instruction": "0x1002b1c50",
+      "slot": "0x11e9ce378",
+      "kind": "__objc_selrefs",
+      "value": "messageWrap"
+    },
+    {
+      "instruction": "0x1002b1c68",
+      "slot": "0x11e9dae10",
+      "kind": "__objc_selrefs",
+      "value": "IsImgMsg"
+    },
+    {
+      "instruction": "0x1002b1c78",
+      "slot": "0x11e9dae18",
+      "kind": "__objc_selrefs",
+      "value": "isAskXiaoWeiImageEntryReady"
+    },
+    {
+      "instruction": "0x1002b1cb0",
+      "slot": "0x11e9dae20",
+      "kind": "__objc_selrefs",
+      "value": "onAskXiaoWeiImage:"
+    },
+    {
+      "instruction": "0x1002b1cb8",
+      "slot": "0x11e9dae00",
+      "kind": "__objc_selrefs",
+      "value": "makeAskXiaoWeiMenuItemWithAction:"
+    },
+    {
+      "instruction": "0x1002b1ce0",
+      "slot": "0x11e9cbad8",
+      "kind": "__objc_selrefs",
+      "value": "safeInsertObject:atIndex:"
+    },
+    {
+      "instruction": "0x1002b1d54",
+      "slot": "0x11ed14e70",
+      "kind": "__objc_classrefs",
+      "value": "CBTHalfScreenFinderRoute"
+    },
+    {
+      "instruction": "0x1002b1d68",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x1002b1d84",
+      "slot": "0x11ed12890",
+      "kind": "__objc_classrefs",
+      "value": "ExptService"
+    },
+    {
+      "instruction": "0x1002b1dc8",
+      "slot": "0x11ed12e10",
+      "kind": "__objc_classrefs",
+      "value": "CMessageWrap"
+    },
+    {
+      "instruction": "0x1002b1dec",
+      "slot": "0x11e9ce378",
+      "kind": "__objc_selrefs",
+      "value": "messageWrap"
+    },
+    {
+      "instruction": "0x1002b1e04",
+      "slot": "0x11e9dae28",
+      "kind": "__objc_selrefs",
+      "value": "IsFinderFeedMsgEnable:"
+    },
+    {
+      "instruction": "0x1002b1e4c",
+      "slot": "0x11e9dae30",
+      "kind": "__objc_selrefs",
+      "value": "onAskXiaoWeiFinder:"
+    },
+    {
+      "instruction": "0x1002b1e54",
+      "slot": "0x11e9dae00",
+      "kind": "__objc_selrefs",
+      "value": "makeAskXiaoWeiMenuItemWithAction:"
+    },
+    {
+      "instruction": "0x1002b1e78",
+      "slot": "0x11e9cbad8",
+      "kind": "__objc_selrefs",
+      "value": "safeInsertObject:atIndex:"
+    },
+    {
+      "instruction": "0x1002b1ea4",
+      "slot": "0x11ed14e78",
+      "kind": "__objc_classrefs",
+      "value": "CBTAskXiaoWeiMenuMutexHelper"
+    },
+    {
+      "instruction": "0x1002b1eac",
+      "slot": "0x11e9dae38",
+      "kind": "__objc_selrefs",
+      "value": "removeMutexMenuItemsIfNeeded:"
+    },
+    {
+      "instruction": "0x1002b1ec4",
+      "slot": "0x11e9dadd0",
+      "kind": "__objc_selrefs",
+      "value": "canShowSpeakMsgItem"
+    },
+    {
+      "instruction": "0x1002b1ed8",
+      "slot": "0x11ed13638",
+      "kind": "__objc_classrefs",
+      "value": "MMMenuItem"
+    },
+    {
+      "instruction": "0x1002b1ee4",
+      "slot": "0x11e9dadd8",
+      "kind": "__objc_selrefs",
+      "value": "onSpeakMsg"
+    },
+    {
+      "instruction": "0x1002b1eec",
+      "slot": "0x11e9cf310",
+      "kind": "__objc_selrefs",
+      "value": "initWithType:action:"
+    },
+    {
+      "instruction": "0x1002b1f00",
+      "slot": "0x11e9ca580",
+      "kind": "__objc_selrefs",
+      "value": "safeAddObject:"
+    },
+    {
+      "instruction": "0x1002b1f1c",
+      "slot": "0x11e9dae40",
+      "kind": "__objc_selrefs",
+      "value": "canShowTopMsgMenuItem"
+    },
+    {
+      "instruction": "0x1002b1f40",
+      "slot": "0x11e9dae50",
+      "kind": "__objc_selrefs",
+      "value": "canShowCancelTopMenuItem"
+    },
+    {
+      "instruction": "0x1002b1f70",
+      "slot": "0x11eca5a38",
+      "kind": "__objc_selrefs",
+      "value": "addObject:"
+    },
+    {
+      "instruction": "0x1002b1fc8",
+      "slot": "0x11e9cf728",
+      "kind": "__objc_selrefs",
+      "value": "menuType"
+    },
+    {
+      "instruction": "0x1002b2050",
+      "slot": "0x11e9d0d60",
+      "kind": "__objc_selrefs",
+      "value": "deleteMenuItem"
+    },
+    {
+      "instruction": "0x1002b206c",
+      "slot": "0x11e9ca580",
+      "kind": "__objc_selrefs",
+      "value": "safeAddObject:"
+    },
+    {
+      "instruction": "0x1002b2098",
+      "slot": "0x11e9dae60",
+      "kind": "__objc_selrefs",
+      "value": "canShowMoreMenuItem"
+    },
+    {
+      "instruction": "0x1002b20ec",
+      "slot": "0x11eca8890",
+      "kind": "__objc_selrefs",
+      "value": "isKindOfClass:"
+    },
+    {
+      "instruction": "0x1002b20f4",
+      "slot": "0x11e9cf728",
+      "kind": "__objc_selrefs",
+      "value": "menuType"
+    },
+    {
+      "instruction": "0x1002b2118",
+      "slot": "0x11ed13638",
+      "kind": "__objc_classrefs",
+      "value": "MMMenuItem"
+    },
+    {
+      "instruction": "0x1002b2188",
+      "slot": "0x11e9dae68",
+      "kind": "__objc_selrefs",
+      "value": "moreMenuItem"
+    },
+    {
+      "instruction": "0x1002b21a8",
+      "slot": "0x11e9ca580",
+      "kind": "__objc_selrefs",
+      "value": "safeAddObject:"
+    },
+    {
+      "instruction": "0x1002b21dc",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x1002b21f8",
+      "slot": "0x11ed13f80",
+      "kind": "__objc_classrefs",
+      "value": "ChatBotVoIPMgr"
+    },
+    {
+      "instruction": "0x1002b2224",
+      "slot": "0x11e9dae70",
+      "kind": "__objc_selrefs",
+      "value": "enableTransferMsg"
+    },
+    {
+      "instruction": "0x1002b224c",
+      "slot": "0x11e9ce378",
+      "kind": "__objc_selrefs",
+      "value": "messageWrap"
+    },
+    {
+      "instruction": "0x1002b2268",
+      "slot": "0x11e9dadf0",
+      "kind": "__objc_selrefs",
+      "value": "IsTextMsg"
+    },
+    {
+      "instruction": "0x1002b22ac",
+      "slot": "0x11e9cf1d0",
+      "kind": "__objc_selrefs",
+      "value": "isAppMsgAppearAsTextMsg"
+    },
+    {
+      "instruction": "0x1002b22ec",
+      "slot": "0x11ed13638",
+      "kind": "__objc_classrefs",
+      "value": "MMMenuItem"
+    },
+    {
+      "instruction": "0x1002b22f8",
+      "slot": "0x11e9dae80",
+      "kind": "__objc_selrefs",
+      "value": "onAskAsst:"
+    },
+    {
+      "instruction": "0x1002b2300",
+      "slot": "0x11e9cf310",
+      "kind": "__objc_selrefs",
+      "value": "initWithType:action:"
+    },
+    {
+      "instruction": "0x1002b2314",
+      "slot": "0x11ed13358",
+      "kind": "__objc_classrefs",
+      "value": "ChatBotResMgr"
+    },
+    {
+      "instruction": "0x1002b231c",
+      "slot": "0x11ecad018",
+      "kind": "__objc_selrefs",
+      "value": "sharedInstance"
+    },
+    {
+      "instruction": "0x1002b2338",
+      "slot": "0x11e9ce368",
+      "kind": "__objc_selrefs",
+      "value": "getString:"
+    },
+    {
+      "instruction": "0x1002b2358",
+      "slot": "0x11ecacb88",
+      "kind": "__objc_selrefs",
+      "value": "setTitle:"
+    },
+    {
+      "instruction": "0x1002b237c",
+      "slot": "0x11ed12810",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d3"
+    },
+    {
+      "instruction": "0x1002b2384",
+      "slot": "0x11ecadf80",
+      "kind": "__objc_selrefs",
+      "value": "whiteColor"
+    },
+    {
+      "instruction": "0x1002b23a0",
+      "slot": "0x11ed12810",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d3"
+    },
+    {
+      "instruction": "0x1002b23c0",
+      "slot": "0x11e9d01c8",
+      "kind": "__objc_selrefs",
+      "value": "Alpha0_8"
+    },
+    {
+      "instruction": "0x1002b23d8",
+      "slot": "0x11e9cbf28",
+      "kind": "__objc_selrefs",
+      "value": "colorInLightMode:DarkMode:"
+    },
+    {
+      "instruction": "0x1002b2418",
+      "slot": "0x11ed127e0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d5"
+    },
+    {
+      "instruction": "0x1002b2420",
+      "slot": "0x11e9c9a20",
+      "kind": "__objc_selrefs",
+      "value": "dynamicLength:"
+    },
+    {
+      "instruction": "0x1002b2434",
+      "slot": "0x11ed13358",
+      "kind": "__objc_classrefs",
+      "value": "ChatBotResMgr"
+    },
+    {
+      "instruction": "0x1002b2450",
+      "slot": "0x11e9ce298",
+      "kind": "__objc_selrefs",
+      "value": "getSvg:size:color:"
+    },
+    {
+      "instruction": "0x1002b247c",
+      "slot": "0x11e9cf328",
+      "kind": "__objc_selrefs",
+      "value": "setIconImage:"
+    },
+    {
+      "instruction": "0x1002b24a4",
+      "slot": "0x11e9ca580",
+      "kind": "__objc_selrefs",
+      "value": "safeAddObject:"
+    },
+    {
+      "instruction": "0x1002b24c8",
+      "slot": "0x11e9dae88",
+      "kind": "__objc_selrefs",
+      "value": "canShowFTSIndexMenuItem"
+    },
+    {
+      "instruction": "0x1002b24dc",
+      "slot": "0x11e9dae90",
+      "kind": "__objc_selrefs",
+      "value": "showFTSIndexMenuItem"
+    },
+    {
+      "instruction": "0x1002b24f8",
+      "slot": "0x11eca5a38",
+      "kind": "__objc_selrefs",
+      "value": "addObject:"
+    },
+    {
+      "instruction": "0x1002b2514",
+      "slot": "0x11e9dae98",
+      "kind": "__objc_selrefs",
+      "value": "canShowResendMenu"
+    },
+    {
+      "instruction": "0x1002b2528",
+      "slot": "0x11ed13638",
+      "kind": "__objc_classrefs",
+      "value": "MMMenuItem"
+    },
+    {
+      "instruction": "0x1002b2534",
+      "slot": "0x11e9daea0",
+      "kind": "__objc_selrefs",
+      "value": "onMenuResend"
+    },
+    {
+      "instruction": "0x1002b253c",
+      "slot": "0x11e9cf310",
+      "kind": "__objc_selrefs",
+      "value": "initWithType:action:"
+    },
+    {
+      "instruction": "0x1002b2550",
+      "slot": "0x11e9ca580",
+      "kind": "__objc_selrefs",
+      "value": "safeAddObject:"
+    },
+    {
+      "instruction": "0x1002b25e8",
+      "slot": "0x11e9dae78",
+      "kind": "__objc_selrefs",
+      "value": "IsUrlMessage"
+    }
+  ],
+  "BaseMessageCellView-uniqMenuItems_.asm": [
+    {
+      "instruction": "0x1002b3474",
+      "slot": "0x11ed12658",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027ea"
+    },
+    {
+      "instruction": "0x1002b347c",
+      "slot": "0x11eca6850",
+      "kind": "__objc_selrefs",
+      "value": "count"
+    },
+    {
+      "instruction": "0x1002b3490",
+      "slot": "0x11eca5da8",
+      "kind": "__objc_selrefs",
+      "value": "arrayWithCapacity:"
+    },
+    {
+      "instruction": "0x1002b34ac",
+      "slot": "0x11ed13978",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x8010000000002864"
+    },
+    {
+      "instruction": "0x1002b34b4",
+      "slot": "0x11e9d0e00",
+      "kind": "__objc_selrefs",
+      "value": "indexSet"
+    },
+    {
+      "instruction": "0x1002b34e0",
+      "slot": "0x11eca6858",
+      "kind": "__objc_selrefs",
+      "value": "countByEnumeratingWithState:objects:count:"
+    },
+    {
+      "instruction": "0x1002b3514",
+      "slot": "0x11e9cf728",
+      "kind": "__objc_selrefs",
+      "value": "menuType"
+    },
+    {
+      "instruction": "0x1002b351c",
+      "slot": "0x11eca6728",
+      "kind": "__objc_selrefs",
+      "value": "containsIndex:"
+    },
+    {
+      "instruction": "0x1002b3524",
+      "slot": "0x11eca59f0",
+      "kind": "__objc_selrefs",
+      "value": "addIndex:"
+    },
+    {
+      "instruction": "0x1002b352c",
+      "slot": "0x11e9ca580",
+      "kind": "__objc_selrefs",
+      "value": "safeAddObject:"
+    }
+  ],
+  "BaseMessageCellView-filteredMenuItems_.asm": [
+    {
+      "instruction": "0x1002b3670",
+      "slot": "0x11e9ce380",
+      "kind": "__objc_selrefs",
+      "value": "viewModel"
+    },
+    {
+      "instruction": "0x1002b368c",
+      "slot": "0x11e9cf750",
+      "kind": "__objc_selrefs",
+      "value": "chatContact"
+    },
+    {
+      "instruction": "0x1002b36ac",
+      "slot": "0x11e9cb620",
+      "kind": "__objc_selrefs",
+      "value": "m_nsUsrName"
+    },
+    {
+      "instruction": "0x1002b36cc",
+      "slot": "0x11eca8ce8",
+      "kind": "__objc_selrefs",
+      "value": "length"
+    },
+    {
+      "instruction": "0x1002b36e0",
+      "slot": "0x11ed12bc0",
+      "kind": "__objc_classrefs",
+      "value": "MMKernelUtil"
+    },
+    {
+      "instruction": "0x1002b36e8",
+      "slot": "0x11e9d3bb8",
+      "kind": "__objc_selrefs",
+      "value": "IsBypMsgUserName:"
+    },
+    {
+      "instruction": "0x1002b36fc",
+      "slot": "0x11ed12658",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027ea"
+    },
+    {
+      "instruction": "0x1002b3704",
+      "slot": "0x11eca6850",
+      "kind": "__objc_selrefs",
+      "value": "count"
+    },
+    {
+      "instruction": "0x1002b3718",
+      "slot": "0x11eca5da8",
+      "kind": "__objc_selrefs",
+      "value": "arrayWithCapacity:"
+    },
+    {
+      "instruction": "0x1002b3730",
+      "slot": "0x11ed12bc0",
+      "kind": "__objc_classrefs",
+      "value": "MMKernelUtil"
+    },
+    {
+      "instruction": "0x1002b3738",
+      "slot": "0x11e9cd980",
+      "kind": "__objc_selrefs",
+      "value": "IsWeClawBot:"
+    },
+    {
+      "instruction": "0x1002b3754",
+      "slot": "0x11e9daec8",
+      "kind": "__objc_selrefs",
+      "value": "weclawMessageMenuItemsBlacklist:"
+    },
+    {
+      "instruction": "0x1002b3784",
+      "slot": "0x11eca6858",
+      "kind": "__objc_selrefs",
+      "value": "countByEnumeratingWithState:objects:count:"
+    },
+    {
+      "instruction": "0x1002b37b8",
+      "slot": "0x11ecad890",
+      "kind": "__objc_selrefs",
+      "value": "title"
+    },
+    {
+      "instruction": "0x1002b37c0",
+      "slot": "0x11eca6738",
+      "kind": "__objc_selrefs",
+      "value": "containsObject:"
+    },
+    {
+      "instruction": "0x1002b37c8",
+      "slot": "0x11e9ca580",
+      "kind": "__objc_selrefs",
+      "value": "safeAddObject:"
+    },
+    {
+      "instruction": "0x1002b3870",
+      "slot": "0x11e9daed0",
+      "kind": "__objc_selrefs",
+      "value": "bypassMessageMenuItemsWhitelist:"
+    },
+    {
+      "instruction": "0x1002b38d4",
+      "slot": "0x11ecad890",
+      "kind": "__objc_selrefs",
+      "value": "title"
+    },
+    {
+      "instruction": "0x1002b38dc",
+      "slot": "0x11eca6738",
+      "kind": "__objc_selrefs",
+      "value": "containsObject:"
+    },
+    {
+      "instruction": "0x1002b38e4",
+      "slot": "0x11e9ca580",
+      "kind": "__objc_selrefs",
+      "value": "safeAddObject:"
+    },
+    {
+      "instruction": "0x1002b39a0",
+      "slot": "0x11e9daed8",
+      "kind": "__objc_selrefs",
+      "value": "isOnlyShowDeleteMenu"
+    },
+    {
+      "instruction": "0x1002b39b4",
+      "slot": "0x11ed12658",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027ea"
+    },
+    {
+      "instruction": "0x1002b39bc",
+      "slot": "0x11eca6850",
+      "kind": "__objc_selrefs",
+      "value": "count"
+    },
+    {
+      "instruction": "0x1002b39d4",
+      "slot": "0x11eca5da8",
+      "kind": "__objc_selrefs",
+      "value": "arrayWithCapacity:"
+    },
+    {
+      "instruction": "0x1002b3a04",
+      "slot": "0x11eca6858",
+      "kind": "__objc_selrefs",
+      "value": "countByEnumeratingWithState:objects:count:"
+    },
+    {
+      "instruction": "0x1002b3a38",
+      "slot": "0x11e9cf728",
+      "kind": "__objc_selrefs",
+      "value": "menuType"
+    },
+    {
+      "instruction": "0x1002b3a40",
+      "slot": "0x11ecad890",
+      "kind": "__objc_selrefs",
+      "value": "title"
+    },
+    {
+      "instruction": "0x1002b3a48",
+      "slot": "0x11e9c9800",
+      "kind": "__objc_selrefs",
+      "value": "currentContext"
+    },
+    {
+      "instruction": "0x1002b3a54",
+      "slot": "0x11eca6508",
+      "kind": "__objc_selrefs",
+      "value": "class"
+    },
+    {
+      "instruction": "0x1002b3a5c",
+      "slot": "0x11e9c9a40",
+      "kind": "__objc_selrefs",
+      "value": "getService:"
+    },
+    {
+      "instruction": "0x1002b3a68",
+      "slot": "0x11e9c9a48",
+      "kind": "__objc_selrefs",
+      "value": "getStringForCurLanguage:"
+    },
+    {
+      "instruction": "0x1002b3a70",
+      "slot": "0x11eca87b8",
+      "kind": "__objc_selrefs",
+      "value": "isEqualToString:"
+    },
+    {
+      "instruction": "0x1002b3a7c",
+      "slot": "0x11e9ca580",
+      "kind": "__objc_selrefs",
+      "value": "safeAddObject:"
+    },
+    {
+      "instruction": "0x1002b3af8",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x1002b3b14",
+      "slot": "0x11ed12800",
+      "kind": "__objc_classrefs",
+      "value": "MMLanguageMgr"
+    },
+    {
+      "instruction": "0x1002b3bf8",
+      "slot": "0x11ed128c8",
+      "kind": "__objc_classrefs",
+      "value": "DeviceInfo"
+    },
+    {
+      "instruction": "0x1002b3c00",
+      "slot": "0x11e9cc208",
+      "kind": "__objc_selrefs",
+      "value": "isVisionPro"
+    },
+    {
+      "instruction": "0x1002b3c10",
+      "slot": "0x11ed12658",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027ea"
+    },
+    {
+      "instruction": "0x1002b3c18",
+      "slot": "0x11eca6850",
+      "kind": "__objc_selrefs",
+      "value": "count"
+    },
+    {
+      "instruction": "0x1002b3c2c",
+      "slot": "0x11eca5da8",
+      "kind": "__objc_selrefs",
+      "value": "arrayWithCapacity:"
+    },
+    {
+      "instruction": "0x1002b3c48",
+      "slot": "0x11ed12ca8",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027ee"
+    },
+    {
+      "instruction": "0x1002b3c50",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b3c58",
+      "slot": "0x11eca95b0",
+      "kind": "__objc_selrefs",
+      "value": "numberWithInteger:"
+    },
+    {
+      "instruction": "0x1002b3c78",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b3c98",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b3cb8",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b3cd8",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b3cf8",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b3d18",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b3d40",
+      "slot": "0x11ed12688",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027c1"
+    },
+    {
+      "instruction": "0x1002b3d48",
+      "slot": "0x11eca5dc0",
+      "kind": "__objc_selrefs",
+      "value": "arrayWithObjects:count:"
+    },
+    {
+      "instruction": "0x1002b3d68",
+      "slot": "0x11ecaceb0",
+      "kind": "__objc_selrefs",
+      "value": "setWithArray:"
+    },
+    {
+      "instruction": "0x1002b3ddc",
+      "slot": "0x11eca6858",
+      "kind": "__objc_selrefs",
+      "value": "countByEnumeratingWithState:objects:count:"
+    },
+    {
+      "instruction": "0x1002b3e10",
+      "slot": "0x11e9cf728",
+      "kind": "__objc_selrefs",
+      "value": "menuType"
+    },
+    {
+      "instruction": "0x1002b3e18",
+      "slot": "0x11eca6738",
+      "kind": "__objc_selrefs",
+      "value": "containsObject:"
+    },
+    {
+      "instruction": "0x1002b3e20",
+      "slot": "0x11e9ca580",
+      "kind": "__objc_selrefs",
+      "value": "safeAddObject:"
+    },
+    {
+      "instruction": "0x1002b3e48",
+      "slot": "0x11ed126c0",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280f"
+    },
+    {
+      "instruction": "0x1002b3ef8",
+      "slot": "0x11eca6818",
+      "kind": "__objc_selrefs",
+      "value": "copy"
+    }
+  ],
+  "BaseMessageCellView-showOperationMenu.asm": [
+    {
+      "instruction": "0x1002b3fac",
+      "slot": "0x11e9ce380",
+      "kind": "__objc_selrefs",
+      "value": "viewModel"
+    },
+    {
+      "instruction": "0x1002b3fc8",
+      "slot": "0x11e9ce378",
+      "kind": "__objc_selrefs",
+      "value": "messageWrap"
+    },
+    {
+      "instruction": "0x1002b3fe4",
+      "slot": "0x11eca6508",
+      "kind": "__objc_selrefs",
+      "value": "class"
+    },
+    {
+      "instruction": "0x1002b3ff4",
+      "slot": "0x11e9daee0",
+      "kind": "__objc_selrefs",
+      "value": "isPreViewMsg"
+    },
+    {
+      "instruction": "0x1002b4030",
+      "slot": "0x11eca6d38",
+      "kind": "__objc_selrefs",
+      "value": "delegate"
+    },
+    {
+      "instruction": "0x1002b4048",
+      "slot": "0x11e9daee8",
+      "kind": "__objc_selrefs",
+      "value": "canShowOperationMenu"
+    },
+    {
+      "instruction": "0x1002b4070",
+      "slot": "0x11e9daef0",
+      "kind": "__objc_selrefs",
+      "value": "generateOperationMenu"
+    },
+    {
+      "instruction": "0x1002b408c",
+      "slot": "0x11e9daef8",
+      "kind": "__objc_selrefs",
+      "value": "uniqMenuItems:"
+    },
+    {
+      "instruction": "0x1002b40b4",
+      "slot": "0x11e9daf00",
+      "kind": "__objc_selrefs",
+      "value": "filteredMenuItems:"
+    },
+    {
+      "instruction": "0x1002b40dc",
+      "slot": "0x11ed14e80",
+      "kind": "__objc_classrefs",
+      "value": "SessionMenuAdjuester"
+    },
+    {
+      "instruction": "0x1002b40e4",
+      "slot": "0x11e9daf08",
+      "kind": "__objc_selrefs",
+      "value": "pinAskXiaoWeiMenuItemToEnd:"
+    },
+    {
+      "instruction": "0x1002b4104",
+      "slot": "0x11ed14e80",
+      "kind": "__objc_classrefs",
+      "value": "SessionMenuAdjuester"
+    },
+    {
+      "instruction": "0x1002b410c",
+      "slot": "0x11e9daf10",
+      "kind": "__objc_selrefs",
+      "value": "adjustCustomMenuItems:"
+    },
+    {
+      "instruction": "0x1002b4148",
+      "slot": "0x11eca6850",
+      "kind": "__objc_selrefs",
+      "value": "count"
+    },
+    {
+      "instruction": "0x1002b4158",
+      "slot": "0x11ed13638",
+      "kind": "__objc_classrefs",
+      "value": "MMMenuItem"
+    },
+    {
+      "instruction": "0x1002b4168",
+      "slot": "0x11ed12780",
+      "kind": "__objc_classrefs",
+      "value": "MMContext"
+    },
+    {
+      "instruction": "0x1002b4170",
+      "slot": "0x11e9c9800",
+      "kind": "__objc_selrefs",
+      "value": "currentContext"
+    },
+    {
+      "instruction": "0x1002b4188",
+      "slot": "0x11ed12800",
+      "kind": "__objc_classrefs",
+      "value": "MMLanguageMgr"
+    },
+    {
+      "instruction": "0x1002b419c",
+      "slot": "0x11e9c9a40",
+      "kind": "__objc_selrefs",
+      "value": "getService:"
+    },
+    {
+      "instruction": "0x1002b41b8",
+      "slot": "0x11e9c9a48",
+      "kind": "__objc_selrefs",
+      "value": "getStringForCurLanguage:"
+    },
+    {
+      "instruction": "0x1002b41d8",
+      "slot": "0x11ecacb88",
+      "kind": "__objc_selrefs",
+      "value": "setTitle:"
+    },
+    {
+      "instruction": "0x1002b4204",
+      "slot": "0x11ed12808",
+      "kind": "__objc_classrefs",
+      "value": "WCColor"
+    },
+    {
+      "instruction": "0x1002b420c",
+      "slot": "0x11e9daf18",
+      "kind": "__objc_selrefs",
+      "value": "Glyph_White_1"
+    },
+    {
+      "instruction": "0x1002b4224",
+      "slot": "0x11e9cc288",
+      "kind": "__objc_selrefs",
+      "value": "setTitleColor:"
+    },
+    {
+      "instruction": "0x1002b4240",
+      "slot": "0x11ed12688",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027c1"
+    },
+    {
+      "instruction": "0x1002b4248",
+      "slot": "0x11eca5db0",
+      "kind": "__objc_selrefs",
+      "value": "arrayWithObject:"
+    },
+    {
+      "instruction": "0x1002b4294",
+      "slot": "0x11eca6858",
+      "kind": "__objc_selrefs",
+      "value": "countByEnumeratingWithState:objects:count:"
+    },
+    {
+      "instruction": "0x1002b42d0",
+      "slot": "0x11eca8ce8",
+      "kind": "__objc_selrefs",
+      "value": "length"
+    },
+    {
+      "instruction": "0x1002b42d8",
+      "slot": "0x11e9cf728",
+      "kind": "__objc_selrefs",
+      "value": "menuType"
+    },
+    {
+      "instruction": "0x1002b42e0",
+      "slot": "0x11e9c9360",
+      "kind": "__objc_selrefs",
+      "value": "stringWithUInt64:"
+    },
+    {
+      "instruction": "0x1002b42e8",
+      "slot": "0x11ecad5c8",
+      "kind": "__objc_selrefs",
+      "value": "stringWithFormat:"
+    },
+    {
+      "instruction": "0x1002b4330",
+      "slot": "0x11ed12638",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027b9"
+    },
+    {
+      "instruction": "0x1002b4420",
+      "slot": "0x11e9daf20",
+      "kind": "__objc_selrefs",
+      "value": "willShowMenuController:inMsgWrap:menuSourceType:buttonList:"
+    },
+    {
+      "instruction": "0x1002b4428",
+      "slot": "0x11ecaa808",
+      "kind": "__objc_selrefs",
+      "value": "respondsToSelector:"
+    },
+    {
+      "instruction": "0x1002b44bc",
+      "slot": "0x11eca6010",
+      "kind": "__objc_selrefs",
+      "value": "becomeFirstResponder"
+    },
+    {
+      "instruction": "0x1002b44cc",
+      "slot": "0x11e9daf28",
+      "kind": "__objc_selrefs",
+      "value": "targetRectForMenuController"
+    },
+    {
+      "instruction": "0x1002b44ec",
+      "slot": "0x11ed14e58",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027d6"
+    },
+    {
+      "instruction": "0x1002b4500",
+      "slot": "0x11e9dad50",
+      "kind": "__objc_selrefs",
+      "value": "ancestorOrSelfWithClass:"
+    },
+    {
+      "instruction": "0x1002b451c",
+      "slot": "0x11ed14e88",
+      "kind": "__objc_classrefs",
+      "value": "MMMenuController"
+    },
+    {
+      "instruction": "0x1002b4524",
+      "slot": "0x11ecad020",
+      "kind": "__objc_selrefs",
+      "value": "sharedMenuController"
+    },
+    {
+      "instruction": "0x1002b453c",
+      "slot": "0x11e9daf30",
+      "kind": "__objc_selrefs",
+      "value": "setTargetRect:inView:"
+    },
+    {
+      "instruction": "0x1002b4564",
+      "slot": "0x11e9daf38",
+      "kind": "__objc_selrefs",
+      "value": "setMenuItems:"
+    },
+    {
+      "instruction": "0x1002b4574",
+      "slot": "0x11ecac788",
+      "kind": "__objc_selrefs",
+      "value": "setScene:"
+    },
+    {
+      "instruction": "0x1002b45c4",
+      "slot": "0x11ed12698",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027bc"
+    },
+    {
+      "instruction": "0x1002b45cc",
+      "slot": "0x11eca6fc0",
+      "kind": "__objc_selrefs",
+      "value": "dictionaryWithObjects:forKeys:count:"
+    },
+    {
+      "instruction": "0x1002b45f0",
+      "slot": "0x11e9daf40",
+      "kind": "__objc_selrefs",
+      "value": "setMenuExtraInfo:"
+    },
+    {
+      "instruction": "0x1002b461c",
+      "slot": "0x11e9daf48",
+      "kind": "__objc_selrefs",
+      "value": "setMenuVisible:responder:animated:"
+    },
+    {
+      "instruction": "0x1002b4638",
+      "slot": "0x11ed126c8",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x801000000000280d"
+    },
+    {
+      "instruction": "0x1002b4640",
+      "slot": "0x11eca6cd0",
+      "kind": "__objc_selrefs",
+      "value": "defaultCenter"
+    },
+    {
+      "instruction": "0x1002b4658",
+      "slot": "0x11e9daf50",
+      "kind": "__objc_selrefs",
+      "value": "handleMenuControllerWillHideMenuNotification:"
+    },
+    {
+      "instruction": "0x1002b466c",
+      "slot": "0x11eca5a50",
+      "kind": "__objc_selrefs",
+      "value": "addObserver:selector:name:object:"
+    },
+    {
+      "instruction": "0x1002b4688",
+      "slot": "0x11e9cf720",
+      "kind": "__objc_selrefs",
+      "value": "onShowOperationMenu"
+    }
+  ],
+  "BaseMessageCellView-operationMenuItems.asm": [
+    {
+      "instruction": "0x1002b4970",
+      "slot": "0x11e9d0d60",
+      "kind": "__objc_selrefs",
+      "value": "deleteMenuItem"
+    },
+    {
+      "instruction": "0x1002b498c",
+      "slot": "0x11ed12688",
+      "kind": "__objc_classrefs",
+      "value": "unresolved external binding 0x80100000000027c1"
+    },
+    {
+      "instruction": "0x1002b4994",
+      "slot": "0x11eca5dc0",
+      "kind": "__objc_selrefs",
+      "value": "arrayWithObjects:count:"
+    }
+  ],
+  "BaseMessageCellView-LongPressEvents.asm": [
+    {
+      "instruction": "0x1002bdcf0",
+      "slot": "0x11eca5c80",
+      "kind": "__objc_selrefs",
+      "value": "anyObject"
+    },
+    {
+      "instruction": "0x1002bdd14",
+      "slot": "0x11eca8ea8",
+      "kind": "__objc_selrefs",
+      "value": "locationInView:"
+    },
+    {
+      "instruction": "0x1002bdd20",
+      "slot": "0x11e9db370",
+      "kind": "__objc_selrefs",
+      "value": "onLongTouch:"
+    }
+  ],
+  "BaseMessageCellView-onLongTouch_.asm": [
+    {
+      "instruction": "0x1002be0ac",
+      "slot": "0x11e9cf408",
+      "kind": "__objc_selrefs",
+      "value": "onLongTouch"
+    }
+  ],
+  "BaseMessageCellView-onLongTouch.asm": [
+    {
+      "instruction": "0x1002be0c8",
+      "slot": "0x11e9db300",
+      "kind": "__objc_selrefs",
+      "value": "canCellShowOperationMenu"
+    },
+    {
+      "instruction": "0x1002be0dc",
+      "slot": "0x11e9d0d30",
+      "kind": "__objc_selrefs",
+      "value": "showOperationMenu"
+    },
+    {
+      "instruction": "0x1002be0ec",
+      "slot": "0x11e9cfec0",
+      "kind": "__objc_selrefs",
+      "value": "setHighlighted:"
+    }
+  ]
+}

@@ -3,6 +3,7 @@
 #import "../Controllers/CSMessageMergeAdapter.h"
 #import "../Controllers/CSMessageNavigation.h"
 #import "../Controllers/CSMessageGestureAdapter.h"
+#import "../Controllers/CSClownPresentation.h"
 
 @interface BaseMsgContentViewController : UIViewController @end
 @interface CommonMessageViewModel : NSObject @end
@@ -11,22 +12,23 @@
 
 %hook BaseMsgContentViewController
 - (void)viewDidLoad { %orig; CSMessageMergeActivate(self); }
-- (void)viewWillAppear:(BOOL)animated { %orig; CSMessageMergeActivate(self); }
-- (void)viewDidDisappear:(BOOL)animated { CSMessageGestureCancelForController(self); CSMessageNavigationCancel(self); CSMessageMergeDeactivate(self); %orig; }
+- (void)viewWillAppear:(BOOL)animated { %orig; CSMessageMergeActivate(self); CSClownPageDidAppear(self); }
+- (void)viewDidDisappear:(BOOL)animated { CSMessageGestureCancelForController(self); CSMessageNavigationCancel(self); CSMessageMergeDeactivate(self); %orig; CSClownPageDidDisappear(self); }
 - (double)tableView:(UITableView *)table heightForRowAtIndexPath:(NSIndexPath *)path {
     CSMessageMergePrepare(self,table,path);
     double height = %orig;
-    return CSMessageMergeRowHeight(self,table,path,height);
+    return CSClownRowHeight(self,table,path,CSMessageMergeRowHeight(self,table,path,height));
 }
 - (id)tableView:(UITableView *)table cellForRowAtIndexPath:(NSIndexPath *)path {
     CSMessageMergePrepare(self,table,path);
     id cell = %orig;
     CSMessageMergeBind(self,table,path,cell);
     CSMessageNavigationBind(self,table,path,cell);
+    CSClownBindRow(self,table,path,cell);
     return cell;
 }
 - (void)tableView:(UITableView *)table willDisplayCell:(id)cell forRowAtIndexPath:(NSIndexPath *)path {
-    %orig; CSMessageMergeBind(self,table,path,cell); CSMessageNavigationBind(self,table,path,cell);
+    %orig; CSMessageMergeBind(self,table,path,cell); CSMessageNavigationBind(self,table,path,cell); CSClownBindRow(self,table,path,cell);
     CSMessageNavigationLayoutReady(self);
 }
 - (void)scrollViewDidEndDragging:(id)scroll willDecelerate:(BOOL)decelerate {
@@ -42,8 +44,16 @@
     __weak id weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{ CSMessageMergeFlush(weakSelf); });
 }
-- (void)viewDidAppear:(BOOL)animated { %orig; CSMessageMergeFlush(self); CSMessageNavigationLayoutReady(self); }
+- (void)viewDidAppear:(BOOL)animated { %orig; CSMessageMergeFlush(self); CSMessageNavigationLayoutReady(self); CSClownPageDidAppear(self); }
 - (void)viewDidLayoutSubviews { %orig; CSMessageNavigationLayoutReady(self); }
+- (void)onLoadMoreMessage {
+    CSMessageMergeBeginHistory(self);
+    @try { %orig; } @finally { CSMessageMergeEndHistory(self); }
+}
+- (unsigned long long)getCurContentSizeHeight {
+    unsigned long long height=%orig;
+    return CSMessageMergeHistoryContentHeight(self,height);
+}
 - (void)addMessageNode:(id)node layout:(BOOL)layout addMoreMsg:(BOOL)more {
     CSMessageNavigationContentChanged(self); CSMessageMergeWillMutate(self); @try { %orig; } @finally { CSMessageMergeDidMutate(self); }
 }

@@ -1,0 +1,910 @@
+{
+  "image": "WeChat 8.0.80 supplied arm64 executable",
+  "source_path_at_audit": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-3052a2ef-a112-4e10-88b7-75cbdfda71bc/Payload/WeChat.app/WeChat",
+  "sha256": "571c5b8cf8732eb5402ffddcbeb93830cb6695bad180be5613ad4167764524e9",
+  "classes": [
+    {
+      "name": "BaseMsgContentViewController",
+      "class_offset": "0x1ee45078",
+      "superclass": "MMUIViewController",
+      "methods": [
+        {
+          "selector": "getCurContentSizeHeight",
+          "encoding": "Q16@0:8",
+          "imp": "0x100302dc8",
+          "metadata_offset": "0x16eb5b7c"
+        },
+        {
+          "selector": "addChatViewModel:addMoreMsg:",
+          "encoding": "v28@0:8@16B24",
+          "imp": "0x10032a888",
+          "metadata_offset": "0x16eb650c"
+        },
+        {
+          "selector": "addMessageNode:addMoreMsg:addNewMsg:",
+          "encoding": "v32@0:8@16B24B28",
+          "imp": "0x10032ae24",
+          "metadata_offset": "0x16eb653c"
+        },
+        {
+          "selector": "addMessageNode:layout:addMoreMsg:addNewMsg:",
+          "encoding": "v36@0:8@16B24B28B32",
+          "imp": "0x10032ae3c",
+          "metadata_offset": "0x16eb6548"
+        },
+        {
+          "selector": "onLoadMoreMessage",
+          "encoding": "v16@0:8",
+          "imp": "0x10032d7d0",
+          "metadata_offset": "0x16eb6578"
+        },
+        {
+          "selector": "mmTableViewDidFinishedLoading:",
+          "encoding": "v24@0:8@16",
+          "imp": "0x1003353cc",
+          "metadata_offset": "0x16eb6878"
+        },
+        {
+          "selector": "tableView:heightForRowAtIndexPath:",
+          "encoding": "d32@0:8@16@24",
+          "imp": "0x100335424",
+          "metadata_offset": "0x16eb6884"
+        },
+        {
+          "selector": "reloadTableData",
+          "encoding": "v16@0:8",
+          "imp": "0x10033f184",
+          "metadata_offset": "0x16eb6b30"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_arrMessageNodeData",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_uLastTime",
+          "encoding": "I"
+        },
+        {
+          "name": "m_uLastMoreMsgTime",
+          "encoding": "I"
+        },
+        {
+          "name": "m_bKeyboardShow",
+          "encoding": "B"
+        },
+        {
+          "name": "m_bToolViewHidden",
+          "encoding": "B"
+        },
+        {
+          "name": "m_moreMsgIndex",
+          "encoding": "Q"
+        },
+        {
+          "name": "m_bReadtToLoadMoreMsg",
+          "encoding": "B"
+        },
+        {
+          "name": "m_delegate",
+          "encoding": "@\"<BaseMsgContentDelgate>\""
+        },
+        {
+          "name": "m_delegateClass",
+          "encoding": "#"
+        },
+        {
+          "name": "m_LockerTimer",
+          "encoding": "@\"MMTimer\""
+        },
+        {
+          "name": "m_tableView",
+          "encoding": "@\"MMTableView\""
+        },
+        {
+          "name": "m_activityView",
+          "encoding": "@\"MMUIActivityIndicatorView\""
+        },
+        {
+          "name": "m_headerView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "_inputToolView",
+          "encoding": "@\"MMInputToolView\""
+        },
+        {
+          "name": "m_backgroundView",
+          "encoding": "@\"UIImageView\""
+        },
+        {
+          "name": "m_arrDeleteRows",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_bViewUnloaded",
+          "encoding": "B"
+        },
+        {
+          "name": "m_pTableViewOffset",
+          "encoding": "{CGPoint=\"x\"d\"y\"d}"
+        },
+        {
+          "name": "m_keyboardHeight",
+          "encoding": "q"
+        },
+        {
+          "name": "m_text",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "m_inputMode",
+          "encoding": "Q"
+        },
+        {
+          "name": "m_positionMode",
+          "encoding": "Q"
+        },
+        {
+          "name": "m_contentMode",
+          "encoding": "Q"
+        },
+        {
+          "name": "m_fKeyboardAnimationDuration",
+          "encoding": "d"
+        },
+        {
+          "name": "m_oMsgSearchHelper",
+          "encoding": "@\"MsgSearchHelper\""
+        },
+        {
+          "name": "m_iInitTableViewContentOffset",
+          "encoding": "i"
+        },
+        {
+          "name": "m_bNeedAdjustTableViewContentOffset",
+          "encoding": "B"
+        },
+        {
+          "name": "m_uiSearchResultNodeViewHeight",
+          "encoding": "I"
+        },
+        {
+          "name": "m_uiInterfaceOrientation",
+          "encoding": "q"
+        },
+        {
+          "name": "m_loadingView",
+          "encoding": "@\"MMLoadingView\""
+        },
+        {
+          "name": "_shareMessageConfirmLogicHelper",
+          "encoding": "@\"ShareMessageConfirmLogicHelper\""
+        },
+        {
+          "name": "_multiSelectView",
+          "encoding": "@\"MMMultiSelectToolView\""
+        },
+        {
+          "name": "_askXiaoweiFloatButton",
+          "encoding": "@\"MMAskXiaoweiFloatButton\""
+        },
+        {
+          "name": "m_arrSelectMsgLocalID",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_msgReceivingTipsView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "m_uiSelectSearchMsgID",
+          "encoding": "I"
+        },
+        {
+          "name": "m_bShouldShowKeyboardAnimation",
+          "encoding": "B"
+        },
+        {
+          "name": "m_bIsRevokeAdding",
+          "encoding": "B"
+        },
+        {
+          "name": "m_msgCounerDurOneSync",
+          "encoding": "i"
+        },
+        {
+          "name": "m_bHightlightedSearchedMsgNode",
+          "encoding": "B"
+        },
+        {
+          "name": "m_decelerateTarget",
+          "encoding": "{CGPoint=\"x\"d\"y\"d}"
+        },
+        {
+          "name": "m_isTimeShowInDetail",
+          "encoding": "B"
+        },
+        {
+          "name": "m_firstUnReadMsg",
+          "encoding": "@\"CMessageWrap\""
+        },
+        {
+          "name": "m_unreadCount",
+          "encoding": "Q"
+        },
+        {
+          "name": "m_scrollActionSheet",
+          "encoding": "@\"MMScrollActionSheet\""
+        },
+        {
+          "name": "m_fullScreenWindow",
+          "encoding": "@\"MMUIWindow\""
+        },
+        {
+          "name": "m_fullScreenNodeData",
+          "encoding": "@\"BaseChatViewModel\""
+        },
+        {
+          "name": "m_specialMsgSearchHelper",
+          "encoding": "@\"MMSpecialMsgSearchHelper\""
+        },
+        {
+          "name": "m_magicEmojiReportInfo",
+          "encoding": "@\"NSMutableDictionary\""
+        },
+        {
+          "name": "m_multiSelectLogic",
+          "encoding": "@\"BaseMsgContentViewMultiSelectLogic\""
+        },
+        {
+          "name": "m_isMsgReceiveTipsJacking",
+          "encoding": "B"
+        },
+        {
+          "name": "m_menuHideTime",
+          "encoding": "{timeval=\"tv_sec\"q\"tv_usec\"i}"
+        },
+        {
+          "name": "m_shouldScrollToBottomAfterRotate",
+          "encoding": "B"
+        },
+        {
+          "name": "m_resignInputToolViewFirstResponder",
+          "encoding": "B"
+        },
+        {
+          "name": "m_scrollingTableToBottom",
+          "encoding": "B"
+        },
+        {
+          "name": "m_scrollingInvisibleRange",
+          "encoding": "{_NSRange=\"location\"Q\"length\"Q}"
+        },
+        {
+          "name": "m_needLayoutOnMenuHide",
+          "encoding": "B"
+        },
+        {
+          "name": "m_needScrollOnMenuHide",
+          "encoding": "B"
+        },
+        {
+          "name": "m_patToastShowing",
+          "encoding": "B"
+        },
+        {
+          "name": "m_lastSectionCount",
+          "encoding": "Q"
+        },
+        {
+          "name": "m_scrollingToTop",
+          "encoding": "i"
+        },
+        {
+          "name": "m_scrollingToFirstUnRead",
+          "encoding": "B"
+        },
+        {
+          "name": "m_initialOffset",
+          "encoding": "d"
+        },
+        {
+          "name": "m_lastMsgInNewArray",
+          "encoding": "@\"CMessageWrap\""
+        },
+        {
+          "name": "m_footerView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "m_footerActivityView",
+          "encoding": "@\"MMUIActivityIndicatorView\""
+        },
+        {
+          "name": "m_needLoadMoreWhenScrollToFistUnRead",
+          "encoding": "B"
+        },
+        {
+          "name": "m_needHideFirstUnReadBtn",
+          "encoding": "B"
+        },
+        {
+          "name": "m_bMovingToMainFrameTab",
+          "encoding": "B"
+        },
+        {
+          "name": "m_bannerHeight",
+          "encoding": "d"
+        },
+        {
+          "name": "m_isPeekPreview",
+          "encoding": "B"
+        },
+        {
+          "name": "m_imgFullScreenWnd",
+          "encoding": "@\"MsgImgFullScreenWindow\""
+        },
+        {
+          "name": "m_snapshotView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "m_uiEnterRoomTime",
+          "encoding": "I"
+        },
+        {
+          "name": "m_uiEnterRoomUnreadCount",
+          "encoding": "I"
+        },
+        {
+          "name": "m_bCloseForViewDetail",
+          "encoding": "B"
+        },
+        {
+          "name": "_startTime",
+          "encoding": "I"
+        },
+        {
+          "name": "_previewingContext",
+          "encoding": "@\"<UIViewControllerPreviewing>\""
+        },
+        {
+          "name": "m_streamVoiceInputViewController",
+          "encoding": "@\"StreamVoiceInputViewController\""
+        },
+        {
+          "name": "m_topBarView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "m_voiceStreamTitle",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "m_voiceStreamSavedText",
+          "encoding": "@\"NSString\""
+        },
+        {
+          "name": "m_bHasAppear",
+          "encoding": "B"
+        },
+        {
+          "name": "m_dropManager",
+          "encoding": "@\"MMDropManager\""
+        },
+        {
+          "name": "m_readerReporter",
+          "encoding": "@\"ReaderReporter\""
+        },
+        {
+          "name": "m_voiceRecordPopUpHeight",
+          "encoding": "d"
+        },
+        {
+          "name": "m_menuReporter",
+          "encoding": "@\"MMMsgMenuReporter\""
+        },
+        {
+          "name": "m_lastScrollingOffsetY",
+          "encoding": "d"
+        },
+        {
+          "name": "m_multiSelectChecker",
+          "encoding": "@?"
+        },
+        {
+          "name": "m_multiSelectHandler",
+          "encoding": "@?"
+        },
+        {
+          "name": "m_bForbidMultiSelect",
+          "encoding": "B"
+        },
+        {
+          "name": "m_multiManualUnSelectedId",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_lastScrollingHandledMessage",
+          "encoding": "@\"CMessageWrap\""
+        },
+        {
+          "name": "m_tipsHelper",
+          "encoding": "@\"VoiceTransTipsHelper\""
+        },
+        {
+          "name": "m_dialectFeedbackHelper",
+          "encoding": "@\"DialectFeedbackHelper\""
+        },
+        {
+          "name": "m_bIsLocating",
+          "encoding": "B"
+        },
+        {
+          "name": "m_referOwnerMsg",
+          "encoding": "@\"CMessageWrap\""
+        },
+        {
+          "name": "m_referKeeperMsg",
+          "encoding": "@\"CMessageWrap\""
+        },
+        {
+          "name": "m_newArrMessageNodeData",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_canHighLightScrollTargetMsg",
+          "encoding": "B"
+        },
+        {
+          "name": "m_hightTextRange",
+          "encoding": "{_NSRange=\"location\"Q\"length\"Q}"
+        },
+        {
+          "name": "m_scrollTargetMsg",
+          "encoding": "@\"CMessageWrap\""
+        },
+        {
+          "name": "m_scrollMarginTop",
+          "encoding": "d"
+        },
+        {
+          "name": "m_bMultiSelectMode",
+          "encoding": "B"
+        },
+        {
+          "name": "m_currentSpeakTextMsg",
+          "encoding": "@\"CMessageWrap\""
+        },
+        {
+          "name": "m_speakTextTipView",
+          "encoding": "@\"SpeakTextTipsView\""
+        },
+        {
+          "name": "m_speakTextHLTimer",
+          "encoding": "@\"CADisplayLink\""
+        },
+        {
+          "name": "m_startSpeakTextTime",
+          "encoding": "Q"
+        },
+        {
+          "name": "m_speakTextController",
+          "encoding": "@\"SpeakTextLogicController\""
+        },
+        {
+          "name": "m_speakTextSource",
+          "encoding": "Q"
+        },
+        {
+          "name": "m_embedExcerptMsgHasExposedSet",
+          "encoding": "@\"NSMutableSet\""
+        },
+        {
+          "name": "m_weappTailMsgHasExposedSet",
+          "encoding": "@\"NSMutableSet\""
+        },
+        {
+          "name": "m_mpScreenshotMsgHasExposedSet",
+          "encoding": "@\"NSMutableSet\""
+        },
+        {
+          "name": "m_customerHelperDeeplinkExposedSet",
+          "encoding": "@\"NSMutableSet\""
+        },
+        {
+          "name": "m_bHasAddedSplitNode",
+          "encoding": "B"
+        },
+        {
+          "name": "m_localIdToAddSplitNode",
+          "encoding": "I"
+        },
+        {
+          "name": "_m_bIsInMainFrame",
+          "encoding": "B"
+        },
+        {
+          "name": "_dismissWithoutReset",
+          "encoding": "B"
+        },
+        {
+          "name": "_isShowMsgSearch",
+          "encoding": "B"
+        },
+        {
+          "name": "_isPresentingOtherQuickReplaySession",
+          "encoding": "B"
+        },
+        {
+          "name": "_bSuppressVoiceTransSendScroll",
+          "encoding": "B"
+        },
+        {
+          "name": "_didTouchMinimizeCorner",
+          "encoding": "B"
+        },
+        {
+          "name": "_isAccessbilityBoldTextEnable",
+          "encoding": "B"
+        },
+        {
+          "name": "_isAppTaskCycleJumpRestoring",
+          "encoding": "B"
+        },
+        {
+          "name": "_chatBotCardRuntimeActivated",
+          "encoding": "B"
+        },
+        {
+          "name": "_uiMultiSelectMaxCount",
+          "encoding": "I"
+        },
+        {
+          "name": "_uiMultiSelectMaxMegaBytes",
+          "encoding": "I"
+        },
+        {
+          "name": "_liteAppMaxSelectCount",
+          "encoding": "I"
+        },
+        {
+          "name": "_tableScrollActionType",
+          "encoding": "i"
+        },
+        {
+          "name": "m_shareContacts",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "m_searchScene",
+          "encoding": "Q"
+        },
+        {
+          "name": "_inputPresenter",
+          "encoding": "@\"<MMMsgInputPresenter><MMRecordUIManager>\""
+        },
+        {
+          "name": "_inputControlView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "_m_badRoomLogicController",
+          "encoding": "@\"BadRoomLogicController\""
+        },
+        {
+          "name": "_richTextCoverView",
+          "encoding": "@\"MMRichTextCoverView\""
+        },
+        {
+          "name": "_richTextView",
+          "encoding": "@\"RichTextView\""
+        },
+        {
+          "name": "_msgReferView",
+          "encoding": "@\"MMInputMsgReferView\""
+        },
+        {
+          "name": "_messageHistoryTypeFilter",
+          "encoding": "@\"LiteAppMessageHistoryTypeFilter\""
+        },
+        {
+          "name": "_oRoomHistoryStat",
+          "encoding": "@\"ChatRoomHistoryShareStat\""
+        },
+        {
+          "name": "_tipsNavBar",
+          "encoding": "@\"MMMsgContentNavBar\""
+        },
+        {
+          "name": "_tipsNewNavBar",
+          "encoding": "@\"MMNewMsgContentNavBar\""
+        },
+        {
+          "name": "_chatRoomDismissedView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "_pendingTipsView",
+          "encoding": "@\"MMEdgeTipsView\""
+        },
+        {
+          "name": "_referTipsView",
+          "encoding": "@\"MMEdgeTipsView\""
+        },
+        {
+          "name": "_jumpMsgEdgeTipsView",
+          "encoding": "@\"MMEdgeTipsView\""
+        },
+        {
+          "name": "_jumpMsgItems",
+          "encoding": "@\"NSMutableArray\""
+        },
+        {
+          "name": "_jumpMsgItemKeys",
+          "encoding": "@\"NSMutableSet\""
+        },
+        {
+          "name": "_chatroomBkgColor",
+          "encoding": "@\"UIColor\""
+        },
+        {
+          "name": "_locateMsg",
+          "encoding": "@\"CMessageWrap\""
+        },
+        {
+          "name": "_minimizationTransitionController",
+          "encoding": "@\"MiniRecTransitionController\""
+        },
+        {
+          "name": "_autoTranslateAnchorMsg",
+          "encoding": "@\"CMessageWrap\""
+        },
+        {
+          "name": "_autoTranslateAnchorMsgLastContentOffset",
+          "encoding": "d"
+        },
+        {
+          "name": "_pasteboardMsgProvider",
+          "encoding": "@\"PasteboardMsgProvider\""
+        },
+        {
+          "name": "_msgMediaGroupAgent",
+          "encoding": "@\"MsgMediaGroupChatAgent\""
+        },
+        {
+          "name": "_translateSpeakEndType",
+          "encoding": "q"
+        },
+        {
+          "name": "_translateSpeakReporter",
+          "encoding": "@\"TranslateSpeakReporter\""
+        },
+        {
+          "name": "_msgDataSaveLogic",
+          "encoding": "@\"MsgDataSaveLogic\""
+        },
+        {
+          "name": "_chatTableViewYOffset",
+          "encoding": "d"
+        },
+        {
+          "name": "_chatBotCardRecycleManager",
+          "encoding": "@\"WAAgentCardRecycleManager\""
+        },
+        {
+          "name": "_chatBotCardSceneHandle",
+          "encoding": "@\"WAAgentSceneInstanceHandle\""
+        }
+      ]
+    },
+    {
+      "name": "BaseChatViewModel",
+      "class_offset": "0x1ee44df8",
+      "superclass": "NSObject",
+      "methods": [
+        {
+          "selector": "sectionHeight",
+          "encoding": "d16@0:8",
+          "imp": "0x1002abe10",
+          "metadata_offset": "0x16eb2e68"
+        },
+        {
+          "selector": "rowHeight",
+          "encoding": "d16@0:8",
+          "imp": "0x1002abf8c",
+          "metadata_offset": "0x16eb2e80"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_chatContact",
+          "encoding": "@\"CBaseContact\""
+        },
+        {
+          "name": "m_layoutWidth",
+          "encoding": "d"
+        },
+        {
+          "name": "m_cachedHeight",
+          "encoding": "d"
+        },
+        {
+          "name": "m_cellView",
+          "encoding": "@"
+        },
+        {
+          "name": "_shouldReCreate",
+          "encoding": "B"
+        },
+        {
+          "name": "_modelType",
+          "encoding": "Q"
+        },
+        {
+          "name": "_splitPosition",
+          "encoding": "Q"
+        },
+        {
+          "name": "_createTime",
+          "encoding": "d"
+        },
+        {
+          "name": "_delegate",
+          "encoding": "@\"<ChatViewModelDelegate>\""
+        },
+        {
+          "name": "_chatSplitWording",
+          "encoding": "@\"NSString\""
+        }
+      ]
+    },
+    {
+      "name": "MMTableView",
+      "class_offset": "0x1f1e7c40",
+      "superclass": "UITableView",
+      "methods": [
+        {
+          "selector": "reloadData",
+          "encoding": "v16@0:8",
+          "imp": "0x11593d228",
+          "metadata_offset": "0x16f3f868"
+        },
+        {
+          "selector": "initWithFrame:style:",
+          "encoding": "@56@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16q48",
+          "imp": "0x11593dde8",
+          "metadata_offset": "0x16f3f8bc"
+        },
+        {
+          "selector": "isReloadingData",
+          "encoding": "B16@0:8",
+          "imp": "0x1159416b8",
+          "metadata_offset": "0x16f3fb74"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_delegateProxy",
+          "encoding": "@\"<MMTableViewDelegate>\""
+        },
+        {
+          "name": "cancelButtonTouchsTrack",
+          "encoding": "B"
+        },
+        {
+          "name": "cancelTouchsTrackClass",
+          "encoding": "#"
+        },
+        {
+          "name": "_footerView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "_footerViewBackground",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "_tailColor",
+          "encoding": "@\"UIColor\""
+        },
+        {
+          "name": "m_dontDrawFooterLine",
+          "encoding": "B"
+        },
+        {
+          "name": "m_lastSetContentOffset",
+          "encoding": "{CGPoint=\"x\"d\"y\"d}"
+        },
+        {
+          "name": "_gestureHelper",
+          "encoding": "@\"MMTableViewGestureHelper\""
+        },
+        {
+          "name": "_dragGesture",
+          "encoding": "@\"UIPanGestureRecognizer\""
+        },
+        {
+          "name": "_bTriggerRecEnabled",
+          "encoding": "B"
+        },
+        {
+          "name": "_beginRecOffset",
+          "encoding": "{CGPoint=\"x\"d\"y\"d}"
+        },
+        {
+          "name": "_isMainView",
+          "encoding": "B"
+        },
+        {
+          "name": "_isHideExtraFooterLine",
+          "encoding": "B"
+        },
+        {
+          "name": "_bForceContentInsetAdjustAutomatic",
+          "encoding": "B"
+        },
+        {
+          "name": "_enableContentInsetForAdjustAutomatic",
+          "encoding": "B"
+        },
+        {
+          "name": "_shouldSynchronizeTopContentInsetWithLayout",
+          "encoding": "B"
+        },
+        {
+          "name": "_isReloadingData",
+          "encoding": "B"
+        },
+        {
+          "name": "_forbidFixSearchBarHeaderView",
+          "encoding": "B"
+        },
+        {
+          "name": "_enableCustomCellSelectedStatus",
+          "encoding": "B"
+        },
+        {
+          "name": "_shouldSelectedCellRecoverAnimated",
+          "encoding": "B"
+        },
+        {
+          "name": "m_delegate",
+          "encoding": "@\"<MMTableViewDelegate>\""
+        },
+        {
+          "name": "_indexView",
+          "encoding": "@\"MMTableViewIndexView\""
+        },
+        {
+          "name": "_topInsetUnderContentViewY",
+          "encoding": "d"
+        },
+        {
+          "name": "_dragNotifyOffset",
+          "encoding": "d"
+        },
+        {
+          "name": "_tailView",
+          "encoding": "@\"UIView\""
+        },
+        {
+          "name": "_singleSelectedIndexPath",
+          "encoding": "@\"NSIndexPath\""
+        },
+        {
+          "name": "_maskedBottomView",
+          "encoding": "@\"GradientMaskBottomView\""
+        },
+        {
+          "name": "_progressRunner",
+          "encoding": "@\"_TtC7WCUIKit21AnimateProgressRunner\""
+        }
+      ]
+    }
+  ],
+  "method": "Read-only ObjC metadata parsing and bounded llvm-objdump ranges; executable not launched.",
+  "estimated_height_inventory": "No estimatedHeightForRowAtIndexPath implementation in BaseMsgContentViewController or any of its native subclasses; MMTableView style initializer explicitly zeros all three estimated heights."
+}

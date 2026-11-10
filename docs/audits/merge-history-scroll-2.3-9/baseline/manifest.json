@@ -1,0 +1,11 @@
+{
+  "Controllers/CSMessageMergeAdapter.m": "e08e5bfb81a6102fe2069b918dcc785e6b750020975e37035185ce4b8e7352d6",
+  "Headers/CSUserInfoHelper.h": "1b5a58a5aa241e01350554785477271d2add69860a732209696a8d600fe28a00",
+  "Controllers/CSReleaseNotesViewController.m": "c9786490c52d1017349fad6836d5e7205cedb5ff01f3f2a6765f072ef9043430",
+  "Hooks/MessageMergeHooks.xm": "d73a8c9c0f6220e0922ec30554d026004cec5bc28219154248d452963ede13a3",
+  "Controllers/CSMessageMergeAdapter.h": "075c55df44e6fd7ac15ac41c742949b2dbfb9412ff86c9f8f48202518e3eb516",
+  "Tests/MessageMergeAdapterTests.m": "431d907bd7566466ee652c38e2bdc004242584b672d077bd81011f6dda450994",
+  "Tests/MergeBubbleIntegrationTests.m": "b1c0f5b7ffe63f6b49ed1b311447872a96771f4794596658c2412b21c8310cf5",
+  "control": "3f084d1d2fe0ee2377a6a055c01a86e0e541ff8514879d982f2b56d0bd06b527",
+  "README.md": "d8fb16822652bcf90a4a234ebe167607e8d5b0bf9e88a87e1302c7ddc56442e2"
+}

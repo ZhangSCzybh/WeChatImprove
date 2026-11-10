@@ -1,0 +1,2 @@
+history-reload-guard updates=1 offsetWrites=1 while isReloadingData=YES
+FAIL line 332: table.updateCount==0

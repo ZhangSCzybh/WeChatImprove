@@ -28,6 +28,9 @@ extracted=['static CSMessageActionMenuAdapter *menuHookAdapter;']
 for cls in classes:
     match=re.search(r'%hook '+cls+r'\n(.*?)%end',menu,re.S)
     body=re.search(r'- \(id\)operationMenuItems \{.*?\}',match.group(1),re.S).group() if match else '- (id)operationMenuItems { return %orig; }'
+    # This suite exercises the existing message actions with the independent display-edit layer inactive.
+    body=re.sub(r'\[CSClownMenuAdapter itemsByAddingActionsForCell:self items:(\[CSMessageActionMenuAdapter itemsByAddingActionsForCell:self items:%orig\])\]',r'\1',body)
+    assert 'CSClownMenuAdapter' not in body
     body=body.replace('CSMessageActionMenuAdapter itemsByAddingActionsForCell','menuHookAdapter itemsByAddingActionsForCell').replace('%orig','self.nativeItems')
     if cls in ('EmoticonMessageCellView','AppEmoticonMessageCellView'):
         body+='\n- (id)getViewController { return [self.nativeDelegate getViewController]; }'

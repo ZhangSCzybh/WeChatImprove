@@ -1,0 +1,4 @@
+PASS: 235148 message merge/navigation checks
+FAIL line 259: fabs(height-expected)<.01
+
+exit_code=1

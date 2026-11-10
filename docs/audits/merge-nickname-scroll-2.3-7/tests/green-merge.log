@@ -1,0 +1,4 @@
+PASS: 235148 message merge/navigation checks
+PASS: 33530 native adapter/navigation lifecycle checks (UIKit double)
+
+exit_code=0

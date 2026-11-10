@@ -1,0 +1,1156 @@
+diff --git a/Controllers/CSBackupRegistry.m b/Controllers/CSBackupRegistry.m
+index b9a21075..018f2166 100644
+--- a/Controllers/CSBackupRegistry.m
++++ b/Controllers/CSBackupRegistry.m
+@@ -229,6 +229,11 @@ @implementation CSBackupRegistry
+             @[@"standard",@"com.wechat.enhance.tabbar_style.text.me",@"tabbar",@"string",@"global",@""],
+             @[@"standard",@"com.wechat.enhance.voice_forward.enabled",@"message_actions",@"bool",@"global",@""],
+             @[@"standard",@"com.wechat.enhance.image_sticker.enabled",@"message_actions",@"bool",@"global",@""],
++            @[@"standard",@"com.wechat.enhance.clown.enabled",@"message_actions",@"bool",@"global",@""],
++            @[@"standard",@"com.wechat.enhance.clown.text.enabled",@"message_actions",@"bool",@"global",@""],
++            @[@"standard",@"com.wechat.enhance.clown.time.enabled",@"message_actions",@"bool",@"global",@""],
++            @[@"standard",@"com.wechat.enhance.clown.image.enabled",@"message_actions",@"bool",@"global",@""],
++            @[@"standard",@"com.wechat.enhance.clown.amount.enabled",@"message_actions",@"bool",@"global",@""],
+             @[@"legacy",@"com.wechat.tweak.background.blur.enabled",@"background",@"bool",@"global",@""],
+             @[@"legacy",@"com.wechat.tweak.biometric.auth.favorite",@"privacy",@"bool",@"global",@""],
+             @[@"standard",@"com.wechat.tweak.chat.attachment.columns",@"attachments",@"number",@"global",@""],
+diff --git a/Controllers/CSCustomViewController.m b/Controllers/CSCustomViewController.m
+index 497e02f9..ffa764aa 100644
+--- a/Controllers/CSCustomViewController.m
++++ b/Controllers/CSCustomViewController.m
+@@ -32,6 +32,7 @@
+ #import "CSVoiceForwardSettingsViewController.h"
+ #import "CSRepeatSettingsViewController.h"
+ #import "CSImageStickerSettingsViewController.h"
++#import "CSClownSettingsViewController.h"
+ #import "CSScheduledTaskSettingsViewController.h"
+ #import "CSResetSettingsViewController.h"
+ #import "CSBackupSettingsViewController.h"
+@@ -839,6 +840,7 @@ - (void)setupData {
+     CSSettingItem *aiReplyItem = [CSSettingItem itemWithTitle:@"人工智能" iconName:@"sparkles" iconColor:UIColor.systemPurpleColor detail:nil];
+     CSSettingItem *scheduledItem = [CSSettingItem itemWithTitle:@"定时任务" iconName:@"calendar.badge.clock" iconColor:UIColor.systemOrangeColor detail:nil];
+     CSSettingItem *imageStickerItem = [CSSettingItem itemWithTitle:@"表情功能" iconName:@"face.smiling" iconColor:UIColor.systemOrangeColor detail:nil];
++    CSSettingItem *clownItem = [CSSettingItem itemWithTitle:@"小丑功能" iconName:@"theatermasks.fill" iconColor:UIColor.systemPurpleColor detail:nil];
+     CSSettingSection *enhancementSection = [CSSettingSection sectionWithHeader:@"功能增强" 
+                                                                       items:@[backgroundRunItem,
+                                                                              backgroundBlurItem,
+@@ -852,7 +854,8 @@ - (void)setupData {
+                                                                              repeatItem,
+                                                                              aiReplyItem,
+                                                                              scheduledItem,
+-                                                                             imageStickerItem]];
++                                                                             imageStickerItem,
++                                                                             clownItem]];
+     
+     // 添加插件设置组
+     CSSettingItem *entrySettingsItem = [CSSettingItem itemWithTitle:@"入口设置"
+@@ -1106,6 +1109,9 @@ - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath
+         else if ([item.title isEqualToString:@"表情功能"]) {
+             [self.navigationController pushViewController:[[CSImageStickerSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped] animated:YES];
+         }
++        else if ([item.title isEqualToString:@"小丑功能"]) {
++            [self.navigationController pushViewController:[[CSClownSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped] animated:YES];
++        }
+         // 处理复读功能点击
+         else if ([item.title isEqualToString:@"复读功能"]) {
+             CSRepeatSettingsViewController *repeatVC = [[CSRepeatSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
+diff --git a/Controllers/CSMessageCellLifecycle.m b/Controllers/CSMessageCellLifecycle.m
+index 4be8903e..e03fd42a 100644
+--- a/Controllers/CSMessageCellLifecycle.m
++++ b/Controllers/CSMessageCellLifecycle.m
+@@ -1,6 +1,7 @@
+ #import "CSMessageCellLifecycle.h"
+ #import "CSMessageGestureAdapter.h"
+ #import "CSMessageMergeAdapter.h"
++#import "CSClownPresentation.h"
+ #import <objc/runtime.h>
+ static char CSLifecycleKey;
+ @interface CSMessageCellLifecycleState : NSObject
+@@ -19,13 +20,14 @@ void CSMessageCellPerformLayout(id cell, void (^native)(void)) {
+     if (state.bindingDepth || state.reuseDepth) { native(); return; }
+     BOOL outer=state.layoutDepth++==0;
+     CSMessageGestureAdapter *adapter=CSMessageGestureAdapterForCell(cell,YES);
+-    if (outer) { [adapter detachForLayout]; CSMessageMergeRestore(cell); }
++    if (outer) { [adapter detachForLayout]; CSClownRestoreCell(cell); CSMessageMergeRestore(cell); }
+     @try { native(); }
+     @finally {
+         state.layoutDepth--;
+         if (outer) {
+             CSMessageTimePrepareCell(cell);
+             CSMessageMergeRender(cell); // merge owns final time positioning, active or inactive
++            CSClownRenderCell(cell);
+             [adapter refreshForLayout]; [adapter reattachAfterLayout];
+         }
+     }
+@@ -36,7 +38,7 @@ void CSMessageCellPerformBinding(id cell, id model, void (^native)(void)) {
+     CSMessageGestureAdapter *adapter=CSMessageGestureAdapterForCell(cell,NO);
+     BOOL changed=CSMessageActionObjectGetter(cell,NSSelectorFromString(@"viewModel"))!=model;
+     if (outer) {
+-        [adapter invalidateBinding]; CSMessageMergeReuse(cell);
++        CSClownReuseCell(cell); [adapter invalidateBinding]; CSMessageMergeReuse(cell);
+         if (changed) CSMessageTimeResetCell(cell);
+     }
+     @try { native(); }
+@@ -48,7 +50,7 @@ void CSMessageCellPerformBinding(id cell, id model, void (^native)(void)) {
+ void CSMessageCellPerformReuse(id cell, void (^native)(void)) {
+     CSMessageCellLifecycleState *state=CSLifecycle(cell);
+     BOOL outer=state.reuseDepth++==0;
+-    if (outer) { [CSMessageGestureAdapterForCell(cell,NO) invalidateBinding]; CSMessageMergeReuse(cell); CSMessageTimeResetCell(cell); }
++    if (outer) { CSClownReuseCell(cell); [CSMessageGestureAdapterForCell(cell,NO) invalidateBinding]; CSMessageMergeReuse(cell); CSMessageTimeResetCell(cell); }
+     @try { native(); }
+     @finally { state.reuseDepth--; }
+ }
+@@ -57,7 +59,7 @@ void CSMessageCellRefresh(id cell) {
+     CSMessageCellLifecycleState *state=CSLifecycle(cell);
+     if (state.layoutDepth || state.bindingDepth || state.reuseDepth) return;
+     CSMessageGestureAdapter *adapter=CSMessageGestureAdapterForCell(cell,YES);
+-    [adapter detachForLayout]; CSMessageTimePrepareCell(cell); CSMessageMergeRender(cell);
++    [adapter detachForLayout]; CSClownRestoreCell(cell); CSMessageTimePrepareCell(cell); CSMessageMergeRender(cell); CSClownRenderCell(cell);
+     [adapter refreshForLayout]; [adapter reattachAfterLayout];
+ }
+ void CSMessageCellWindowChanged(id cell) {
+diff --git a/Controllers/CSMessageMergeAdapter.m b/Controllers/CSMessageMergeAdapter.m
+index 607509bd..390229e8 100644
+--- a/Controllers/CSMessageMergeAdapter.m
++++ b/Controllers/CSMessageMergeAdapter.m
+@@ -64,6 +64,10 @@ static id CSRowModel(id node, NSUInteger row) {
+ }
+ 
+ @class CSMessageMergeContext;
++typedef struct {
++    CGFloat contentTop, headTop;
++    BOOL valid, showsHead;
++} CSMessageNativeGeometry;
+ @interface CSMessageMergeState : NSObject
+ @property(nonatomic, weak) CSMessageMergeContext *context;
+ @property(nonatomic, weak) id model;
+@@ -94,6 +98,7 @@ @interface CSMessageMergeState : NSObject
+ @property(nonatomic) CGFloat occupiedBottom;
+ @property(nonatomic) NSUInteger auxiliaryFlags;
+ @property(nonatomic) BOOL showsName;
++@property(nonatomic) CSMessageNativeGeometry nativeGeometry;
+ @end
+ @implementation CSMessageMergeState @end
+ 
+@@ -409,36 +414,100 @@ static NSUInteger CSAuxiliaryContentFlags(id model) {
+ #ifdef CS_MERGE_TESTING
+ NSString *CSMessageMergeTestProfileVersion=@"8.0.78";
+ #endif
+-static BOOL CSNativeProfile(CSMessageMergeState *s, id logical, CGFloat *top, CGFloat *bottom) {
+-    if (!CSSupported(logical)) return NO;
+-    NSString *kind=NSStringFromClass([logical class]);
+-    BOOL usesTemplate=[kind isEqual:@"TextMessageViewModel"] || [kind isEqual:@"VoiceMessageViewModel"];
++static BOOL CSQualifiedNativeVersion(void) {
+ #ifdef CS_MERGE_TESTING
+     NSString *version=CSMessageMergeTestProfileVersion;
+ #else
+     NSString *version=NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"];
+ #endif
+-    BOOL qualified=[version isEqual:@"8.0.78"] || [version hasPrefix:@"8.0.78."] ||
++    return [version isEqual:@"8.0.78"] || [version hasPrefix:@"8.0.78."] ||
+         [version isEqual:@"8.0.80"] || [version hasPrefix:@"8.0.80."];
+-    if (!qualified) return NO;
++}
++static NSMethodSignature *CSNativeSignature(id receiver, NSString *name, const char *result, NSUInteger arguments) {
++    if (!receiver) return nil;
++    Method method=class_getInstanceMethod(object_getClass(receiver),NSSelectorFromString(name));
++    const char *types=method ? method_getTypeEncoding(method) : NULL;
++    NSMethodSignature *sig=types ? [NSMethodSignature signatureWithObjCTypes:types] : nil;
++    return sig && sig.numberOfArguments==arguments+2 && !strcmp(sig.methodReturnType,result) ? sig : nil;
++}
++static id CSNativeObjects(id receiver, NSString *name, NSArray *arguments) {
++    NSMethodSignature *sig=CSNativeSignature(receiver,name,@encode(id),arguments.count);
++    if (!sig) return nil;
++    for (NSUInteger i=0;i<arguments.count;i++) {
++        const char *type=[sig getArgumentTypeAtIndex:i+2];
++        if (type[0]!='@' && type[0]!='#') return nil;
++    }
++    SEL sel=NSSelectorFromString(name);
++    if (!arguments.count) return ((id(*)(id,SEL))objc_msgSend)(receiver,sel);
++    if (arguments.count==1) return ((id(*)(id,SEL,id))objc_msgSend)(receiver,sel,arguments[0]);
++    if (arguments.count==2) return ((id(*)(id,SEL,id,id))objc_msgSend)(receiver,sel,arguments[0],arguments[1]);
++    return nil;
++}
++static CSMessageNativeGeometry CSNativeGeometry(CSMessageMergeState *s, id logical, CGFloat nativeHeight) {
++    CSMessageNativeGeometry geometry={0};
++    if (s.context.config.spacingMode!=CSMessageSpacingCompact || !CSQualifiedNativeVersion() ||
++        !CSSupported(logical) || !CSBool(logical,@"isHeadPart",NO)) return geometry;
++    @try {
++        Class theme=NSClassFromString(@"MMThemeManager"),util=NSClassFromString(@"MMThemeUtil");
++        if (!theme || !util) return geometry;
++        id context=CSNativeObjects(NSClassFromString(@"MMContext"),@"currentContext",@[]);
++        id manager=CSNativeObjects(context,@"getService:",@[theme]);
++        id values=CSNativeObjects(manager,@"getValueOfProperty:inRuleSet:",@[@"message_node_bkg_margin_top",@"#message_node_view"]);
++        NSMethodSignature *parse=CSNativeSignature(util,@"parseFloatFromValues:",@encode(double),1);
++        if (!values || !parse || [parse getArgumentTypeAtIndex:2][0]!='@') return geometry;
++        double margin=((double(*)(id,SEL,id))objc_msgSend)(util,NSSelectorFromString(@"parseFloatFromValues:"),values);
++        if (!isfinite(margin) || margin<0 || margin>nativeHeight) return geometry;
++        Method headMethod=CSGetter(logical,NSSelectorFromString(@"isShowHeadImage"));
++        if (!headMethod || !strchr("Bc",method_getTypeEncoding(headMethod)[0])) return geometry;
++        geometry.showsHead=CSBool(logical,@"isShowHeadImage",NO);
++        geometry.headTop=margin;
++        geometry.contentTop=margin+(geometry.showsHead ? 3 : 0);
++        if (s.showsName) {
++            // Native returns @"" when there is no status icon. Treating that
++            // non-nil sentinel as visible content preserves the entire native
++            // trailing margin only on the named first row. Actual status icons
++            // can add another point; keep their conservative first-pass fallback.
++            id status=CSMessageNativeObject(logical,@"chatRoomTextStateIconDescription");
++            if (status && (![status isKindOfClass:NSString.class] || [(NSString *)status length])) return (CSMessageNativeGeometry){0};
++            Class font=NSClassFromString(@"UIFont");
++            NSMethodSignature *dynamic=CSNativeSignature(font,@"dynamicLength:",@encode(double),1);
++            if (!dynamic || strcmp([dynamic getArgumentTypeAtIndex:2],@encode(double))) return (CSMessageNativeGeometry){0};
++            double nameHeight=((double(*)(id,SEL,double))objc_msgSend)(font,NSSelectorFromString(@"dynamicLength:"),16);
++            if (!isfinite(nameHeight) || nameHeight<=0 || nameHeight>nativeHeight) return (CSMessageNativeGeometry){0};
++            geometry.contentTop=ceil(margin+nameHeight);
++        }
++        geometry.valid=isfinite(geometry.contentTop) && geometry.contentTop<=nativeHeight;
++    } @catch (__unused NSException *exception) { return (CSMessageNativeGeometry){0}; }
++    return geometry;
++}
++static BOOL CSNativeGeometryChanged(CSMessageNativeGeometry previous, CSMessageNativeGeometry next) {
++    // A native fallback cannot learn a late shrink from newly available metadata.
++    // Real size/configuration changes reopen measurement through the normal path.
++    return previous.valid && (!next.valid || previous.showsHead!=next.showsHead ||
++        fabs(previous.contentTop-next.contentTop)>.01 || fabs(previous.headTop-next.headTop)>.01);
++}
++static BOOL CSNativeProfile(CSMessageMergeState *s, id logical, CGFloat *top, CGFloat *bottom) {
++    if (!s.nativeGeometry.valid) return NO;
++    NSString *kind=NSStringFromClass([logical class]);
++    BOOL usesTemplate=[kind isEqual:@"TextMessageViewModel"] || [kind isEqual:@"VoiceMessageViewModel"];
+     BOOL identity=!s.decision.hidesIdentity;
+-    BOOL named=s.group && !CSBool(logical,@"isSender",NO) && identity && CSBool(logical,@"isShowChatRoomDisplayName",YES);
+-    // Native origins, not UILabel height or an additive name budget. The avatar
+-    // extent is a conservative first-pass profile, never a substitute for validation.
++    // Match CommonMessageCellView.layoutInternal: CSS margin + native avatar
++    // offset, replaced by ceil(CSS margin + UIFont dynamicLength:16) for a name.
++    // The model's name decision is already installed before native measurement.
+     CGSize body=CGSizeZero;
+     if (!CSReadSize(logical,@"contentViewSize",&body)) return NO;
+     UIEdgeInsets insets={0,0,0,0};
+     s.hasBubbleInsets=usesTemplate && CSBubbleStyleModelInsets(logical,s.context.table,body,&insets);s.bubbleInsets=insets;
+     if (usesTemplate && !s.hasBubbleInsets) return NO; // Freeze a safe native fallback; never learn a late shrink.
+-    *top=named ? 0 : 8+s.bubbleInsets.top;
++    *top=s.showsName ? 0 : s.nativeGeometry.contentTop+s.bubbleInsets.top;
+     // Voice contentViewSize already includes the complete transcription box and
+     // its native 4pt internal gap. The lower edge is that box, not the voice bubble's
+     // transparent inset; subtracting it would undercount the occupied height.
+     BOOL hasLowerContent=CSIsQuotedText(logical) || ((s.auxiliaryFlags&CSVoiceTranscriptFlag) && CSIsVoice(logical));
+-    *bottom=(named ? 17 : 8)+s.contentHeight-(hasLowerContent ? 0 : s.bubbleInsets.bottom);
+-    if (identity) {
+-        if (!s.decision.joinsPrevious) *top=MIN(*top,named ? 3 : 8);
+-        if (!s.decision.joinsNext) *bottom=MAX(*bottom,(named ? 3 : 8)+38);
++    *bottom=s.nativeGeometry.contentTop+s.contentHeight-(hasLowerContent ? 0 : s.bubbleInsets.bottom);
++    if (identity && s.nativeGeometry.showsHead) {
++        if (!s.decision.joinsPrevious) *top=MIN(*top,s.nativeGeometry.headTop);
++        if (!s.decision.joinsNext) *bottom=MAX(*bottom,s.nativeGeometry.headTop+38);
+     }
+     return *bottom<=s.nativeHeight;
+ }
+@@ -459,6 +528,7 @@ static BOOL CSModelMetricsChanged(CSMessageMergeState *s) {
+     // That absence is not evidence of a smaller layout. The row-height boundary
+     // validates the complete result after native measurement has finished.
+     return (valid && (fabs(size.width-s.contentWidth)>.01 || fabs(size.height-s.contentHeight)>.01)) ||
++        CSNativeGeometryChanged(s.nativeGeometry,CSNativeGeometry(s,logical,s.nativeHeight)) ||
+         fabs(s.context.table.bounds.size.width-s.width)>.01 ||
+         CSAuxiliaryContentFlags(logical)!=s.auxiliaryFlags || named!=s.showsName ||
+         CSBubbleStyleIsDark(s.context.table)!=s.dark;
+@@ -476,14 +546,19 @@ CGSize CSMessageMergeMeasure(id model, CGSize nativeSize) {
+     if (!hasContent) contentSize=CGSizeZero;
+     NSUInteger flags=CSAuxiliaryContentFlags(logical);
+     BOOL showsName=s.group && !CSBool(logical,@"isSender",NO) && !s.decision.hidesIdentity && CSBool(logical,@"isShowChatRoomDisplayName",YES);
++    BOOL nameChanged=s.showsName!=showsName;
++    s.showsName=showsName;
++    CSMessageNativeGeometry geometry=CSNativeGeometry(s,logical,nativeSize.height);
+     if (fabs(s.contentWidth-contentSize.width)>.01 || fabs(s.width-nativeSize.width)>.01 || fabs(s.nativeHeight-nativeSize.height)>.01 ||
+-        fabs(s.contentHeight-contentSize.height)>.01 || s.auxiliaryFlags!=flags || s.showsName!=showsName ||
++        fabs(s.contentHeight-contentSize.height)>.01 || s.auxiliaryFlags!=flags || nameChanged ||
++        CSNativeGeometryChanged(s.nativeGeometry,geometry) ||
+         s.dark!=CSBubbleStyleIsDark(s.context.table)) {
+         s.geometryRejected=NO;s.measurementDecided=NO;s.hasNativeGeometry=NO;
+     }
+     s.width=nativeSize.width;s.nativeHeight=nativeSize.height;s.contentHeight=contentSize.height;s.contentWidth=contentSize.width;
+     s.auxiliaryFlags=flags;s.showsName=showsName;s.dark=CSBubbleStyleIsDark(s.context.table);
+     if (!s.measurementDecided) {
++        s.nativeGeometry=geometry;
+         s.appliedDelta=0;s.appliedOriginDelta=0;
+         CGFloat top=s.occupiedTop,bottom=s.occupiedBottom;
+         if (CSCanCompact(s,flags) && (s.hasNativeGeometry || CSNativeProfile(s,logical,&top,&bottom))) {
+@@ -549,6 +624,30 @@ static void CSHide(UIView *view, NSMutableArray *records) {
+     CSMessageViewOverride *record = [CSMessageViewOverride new]; record.view = view; record.hidden = view.hidden;
+     [records addObject:record]; view.hidden = YES;
+ }
++static CGRect CSHeadVisibleBounds(UIView *head) {
++    // MMHeadImageView includes a 3pt interaction border on each side. Its
++    // wrapper height is not the visible avatar height (43pt vs 37pt for the
++    // reported font). Only unwrap this inspected native hierarchy; other avatar
++    // containers and larger/animated decorations retain the full safety bounds.
++    if (![NSStringFromClass(head.class) isEqual:@"MMHeadImageView"]) return head.bounds;
++    UIView *image=CSMessageNativeObject(head,@"headImageView");
++    CGSize size=CGSizeZero;
++    if (![image isKindOfClass:UIView.class] || image.superview!=head || image.hidden || image.alpha<=.01 ||
++        !CGAffineTransformIsIdentity(image.transform) || !CSReadSize(head,@"imageSize",&size) || size.width<=0 ||
++        !CGPointEqualToPoint(head.bounds.origin,CGPointZero) ||
++        fabs(head.bounds.size.width-size.width-6)>.01 || fabs(head.bounds.size.height-size.height-6)>.01)
++        return head.bounds;
++    // Native setImageSize: stores the size before the child's layoutSubviews
++    // centers its frame. Use that same centering rule on the first parent pass;
++    // a still-empty/stale child frame must not permanently expand the row.
++    CGRect rect=CGRectMake((head.bounds.size.width-size.width)/2,(head.bounds.size.height-size.height)/2,
++        size.width,size.height);
++    // A native border image is itself visible and must not be discarded.
++    UIView *border=CSIvarView(head,"_borderImageView");
++    if (border && !border.hidden && border.alpha>.01 && !CGRectIsEmpty(border.bounds) &&
++        (CSMessageNativeObject(border,@"image") || CSMessageNativeObject(border,@"highlightedImage"))) return head.bounds;
++    return rect;
++}
+ void CSMessageMergeRender(UIView *view) {
+     if (!NSThread.isMainThread) return;
+     CSRestoreOrigins(view);
+@@ -595,12 +694,13 @@ void CSMessageMergeRender(UIView *view) {
+         (head.superview==view || (hasContainer && head.superview==container));
+     BOOL bubbleKnown=[bubble isKindOfClass:UIView.class] &&
+         (bubble.superview==view || (hasContainer && bubble.superview==container));
++    CGRect headBounds=headKnown ? CSHeadVisibleBounds(head) : CGRectZero;
+     BOOL canPlaceHead=headKnown && bubbleKnown && !head.hidden &&
+         CGAffineTransformIsIdentity(head.transform) && CGAffineTransformIsIdentity(bubble.transform) &&
+-        !CGRectIsEmpty(head.bounds) && !CGRectIsEmpty(bubble.bounds) &&
+-        head.bounds.size.height<=38.01 && head.bounds.size.height<=plannedHeight;
++        !CGRectIsEmpty(headBounds) && !CGRectIsEmpty(bubble.bounds) &&
++        headBounds.size.height<=38.01 && headBounds.size.height<=plannedHeight;
+     if (canPlaceHead) {
+-        CGRect headRect=[view convertRect:head.bounds fromView:head];
++        CGRect headRect=[view convertRect:headBounds fromView:head];
+         CGRect bubbleRect=[view convertRect:bubble.bounds fromView:bubble];
+         canPlaceHead=isfinite(CGRectGetMinX(headRect)) && isfinite(CGRectGetMaxX(headRect)) &&
+             isfinite(CGRectGetMinX(bubbleRect)) && isfinite(CGRectGetMaxX(bubbleRect)) &&
+@@ -617,7 +717,7 @@ void CSMessageMergeRender(UIView *view) {
+         if (!CGAffineTransformIsIdentity(child.transform) && !CSIsNativeVoiceGlyphMirror(view,child,model)) {
+             geometryValid=NO;break;
+         }
+-        CGRect bounds=child.bounds;
++        CGRect bounds=child==head ? headBounds : child.bounds;
+         if (child==bubble && visibleInsets && insets.top+insets.bottom<bounds.size.height) {
+             bounds.origin.y+=insets.top;bounds.size.height-=insets.top+insets.bottom;
+         }
+@@ -653,9 +753,9 @@ void CSMessageMergeRender(UIView *view) {
+     if (s.appliedDelta>=0) return;
+     if (canPlaceHead) {
+         CGRect frame=head.frame;
+-        CGRect rect=[view convertRect:head.bounds fromView:head];
++        CGRect rect=[view convertRect:headBounds fromView:head];
+         CGFloat projectedTop=view.frame.origin.y+s.appliedOriginDelta+CGRectGetMinY(rect)-view.bounds.origin.y;
+-        CGFloat y=MAX(0,MIN(projectedTop,plannedHeight-head.bounds.size.height));
++        CGFloat y=MAX(0,MIN(projectedTop,plannedHeight-headBounds.size.height));
+         if (fabs(y-projectedTop)>.01) {
+             CSMessageOriginOverride *record=[CSMessageOriginOverride new];record.view=head;
+             record.originalOrigin=frame.origin;frame.origin.y+=y-projectedTop;record.appliedOrigin=frame.origin;
+diff --git a/Controllers/CSReleaseNotesViewController.m b/Controllers/CSReleaseNotesViewController.m
+index 3953e1be..3c635d9f 100644
+--- a/Controllers/CSReleaseNotesViewController.m
++++ b/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,26 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"2.3-8": @[
++            @{@"title": @"修复群聊首个合并接缝", @"detail": @"正确识别没有附加状态的普通群昵称，避免首条消息误用原生整段留白；紧密模式下，首条与第二条继续以 2pt 接缝为目标。"},
++            @{@"title": @"按可见头像边界处理占位", @"detail": @"识别原生头像外层的上下留白，避免将标准头像误判为大头像，修正发送方首个接缝额外变宽；真实超大头像与无法可靠识别的布局继续保留必要空间。"},
++            @{@"title": @"保留停滚布局稳定", @"detail": @"沿用 2.3-7 的首次测量与布局处理，保持连续文本和语音的停滚稳定；本版尚待 iPhone 微信安装与显示、滚动复验。"}
++        ],
++        @"2.3-7": @[
++            @{@"title": @"统一显示昵称时的合并间距", @"detail": @"紧密模式跟随微信当前昵称、字体和样式布局计算正文位置，保留群昵称，让普通连续消息的组内接缝保持一致。"},
++            @{@"title": @"稳定滚动后的消息布局", @"detail": @"首次测量同时确定行高与内容位置，减少连续文本和语音停滚后的二次重排；附加内容、真实尺寸变化和异常布局继续保留必要空间。"},
++            @{@"title": @"验证范围", @"detail": @"针对微信 8.0.80 完成动态昵称位置、气泡与语音联合布局的主机回归及双架构编译；iPhone 微信显示与滚动效果仍待复验。保留 2.3-6 的既有功能。"}
++        ],
++        @"2.3-6": @[
++            @{@"title": @"修复转账修改金额入口", @"detail": @"根据 2.3-5 的实际使用反馈，兼容转账标题中的纯数字、千分位与币种格式，避免金额识别失败时过滤“修改金额”菜单；继续保留消息类型与当前会话校验。"},
++            @{@"title": @"保留系统时间点击切换", @"detail": @"修改系统时间后保留微信原生点击响应；简略与包含星期的详细格式均按替换后的日期显示，并随当前聊天的原生时间模式一起切换。离开聊天后恢复原显示。"},
++            @{@"title": @"修正版验证范围", @"detail": @"本轮依据真实 UIKit 检查与微信 8.0.80 原生接口静态证据调整展示逻辑。替换仍仅存在当前聊天的本机内存中；2.3-6 尚待 iPhone 微信复验，主机与 Mac Catalyst 检查不能替代真机验收。"}
++        ],
++        @"2.3-5": @[
++            @{@"title": @"新增小丑功能", @"detail": @"在功能增强的“表情功能”下方新增入口。总开关与聊天文字、系统时间、图片、转账金额四项开关默认关闭，页面沿用其他设置页样式。"},
++            @{@"title": @"临时修改聊天显示", @"detail": @"长按文字、图片或转账可选择“修改文字”“修改图片”“修改金额”；长按聊天中的系统时间可输入新时间。仅在本机当前会话内存中显示，离开会话后恢复，不上传，也不修改原始消息、聊天数据库、图片文件或真实支付状态。"},
++            @{@"title": @"输入规则与验证范围", @"detail": @"时间使用 yyyy-MM-dd HH:mm；金额支持 1–9 位整数、最多两位小数的正数，确认后统一显示两位小数。微信 8.0.78／8.0.80 的真实设备交互仍待验收，主机及 Mac Catalyst 测试不代表 iPhone 微信已通过。"}
++        ],
+         @"2.3-4": @[
+             @{@"title": @"补齐防撤回蓝字点击入口", @"detail": @"为防撤回原文链接增加独立的精确点击处理，点击后定位原消息，并在布局稳定后调用微信原生高亮；保留账号、会话和消息身份校验。"},
+             @{@"title": @"兼容已有撤回提示", @"detail": @"开启防撤回时，已有提示的蓝字同样接入原文定位；普通文字、普通链接、滚动及关闭开关后的行为沿用原有规则。微信 8.0.80 真机效果待复验。"}
+diff --git a/Headers/CSUserInfoHelper.h b/Headers/CSUserInfoHelper.h
+index ebfc2b2e..e8062c1c 100644
+--- a/Headers/CSUserInfoHelper.h
++++ b/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@ extern NSString * const kUserAvatarURLKey;    // 用户头像URL缓存键
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.3-4"  // 插件版本号
++#define kPluginVersionString @"2.3-8"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+diff --git a/Hooks/MessageMergeHooks.xm b/Hooks/MessageMergeHooks.xm
+index 54d2dca0..c49ef1ca 100644
+--- a/Hooks/MessageMergeHooks.xm
++++ b/Hooks/MessageMergeHooks.xm
+@@ -3,6 +3,7 @@
+ #import "../Controllers/CSMessageMergeAdapter.h"
+ #import "../Controllers/CSMessageNavigation.h"
+ #import "../Controllers/CSMessageGestureAdapter.h"
++#import "../Controllers/CSClownPresentation.h"
+ 
+ @interface BaseMsgContentViewController : UIViewController @end
+ @interface CommonMessageViewModel : NSObject @end
+@@ -11,22 +12,23 @@
+ 
+ %hook BaseMsgContentViewController
+ - (void)viewDidLoad { %orig; CSMessageMergeActivate(self); }
+-- (void)viewWillAppear:(BOOL)animated { %orig; CSMessageMergeActivate(self); }
+-- (void)viewDidDisappear:(BOOL)animated { CSMessageGestureCancelForController(self); CSMessageNavigationCancel(self); CSMessageMergeDeactivate(self); %orig; }
++- (void)viewWillAppear:(BOOL)animated { %orig; CSMessageMergeActivate(self); CSClownPageDidAppear(self); }
++- (void)viewDidDisappear:(BOOL)animated { CSMessageGestureCancelForController(self); CSMessageNavigationCancel(self); CSMessageMergeDeactivate(self); %orig; CSClownPageDidDisappear(self); }
+ - (double)tableView:(UITableView *)table heightForRowAtIndexPath:(NSIndexPath *)path {
+     CSMessageMergePrepare(self,table,path);
+     double height = %orig;
+-    return CSMessageMergeRowHeight(self,table,path,height);
++    return CSClownRowHeight(self,table,path,CSMessageMergeRowHeight(self,table,path,height));
+ }
+ - (id)tableView:(UITableView *)table cellForRowAtIndexPath:(NSIndexPath *)path {
+     CSMessageMergePrepare(self,table,path);
+     id cell = %orig;
+     CSMessageMergeBind(self,table,path,cell);
+     CSMessageNavigationBind(self,table,path,cell);
++    CSClownBindRow(self,table,path,cell);
+     return cell;
+ }
+ - (void)tableView:(UITableView *)table willDisplayCell:(id)cell forRowAtIndexPath:(NSIndexPath *)path {
+-    %orig; CSMessageMergeBind(self,table,path,cell); CSMessageNavigationBind(self,table,path,cell);
++    %orig; CSMessageMergeBind(self,table,path,cell); CSMessageNavigationBind(self,table,path,cell); CSClownBindRow(self,table,path,cell);
+     CSMessageNavigationLayoutReady(self);
+ }
+ - (void)scrollViewDidEndDragging:(id)scroll willDecelerate:(BOOL)decelerate {
+@@ -42,7 +44,7 @@
+     __weak id weakSelf = self;
+     dispatch_async(dispatch_get_main_queue(), ^{ CSMessageMergeFlush(weakSelf); });
+ }
+-- (void)viewDidAppear:(BOOL)animated { %orig; CSMessageMergeFlush(self); CSMessageNavigationLayoutReady(self); }
++- (void)viewDidAppear:(BOOL)animated { %orig; CSMessageMergeFlush(self); CSMessageNavigationLayoutReady(self); CSClownPageDidAppear(self); }
+ - (void)viewDidLayoutSubviews { %orig; CSMessageNavigationLayoutReady(self); }
+ - (void)addMessageNode:(id)node layout:(BOOL)layout addMoreMsg:(BOOL)more {
+     CSMessageNavigationContentChanged(self); CSMessageMergeWillMutate(self); @try { %orig; } @finally { CSMessageMergeDidMutate(self); }
+diff --git a/Hooks/RepeatHooks.xm b/Hooks/RepeatHooks.xm
+index 15924c53..bb282425 100644
+--- a/Hooks/RepeatHooks.xm
++++ b/Hooks/RepeatHooks.xm
+@@ -1,6 +1,7 @@
+ #import "../Controllers/CSBackupBootstrap.h"
+ #import <UIKit/UIKit.h>
+ #import "CSMessageActionMenuAdapter.h"
++#import "CSClownMenuAdapter.h"
+ 
+ // Centralized policy and native actions; these are compatibility entry points only.
+ 
+@@ -17,8 +18,9 @@
+ %end
+ 
+ %hook TextMessageCellView
+-- (id)operationMenuItems { return [CSMessageActionMenuAdapter itemsByAddingActionsForCell:self items:%orig]; }
++- (id)operationMenuItems { return [CSClownMenuAdapter itemsByAddingActionsForCell:self items:[CSMessageActionMenuAdapter itemsByAddingActionsForCell:self items:%orig]]; }
+ - (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
++    if ([CSClownMenuAdapter isPluginSelector:action]) return [CSClownMenuAdapter canPerformSelector:action cell:self];
+     if ([CSMessageActionMenuAdapter isPluginSelector:action]) return [CSMessageActionMenuAdapter canPerformSelector:action cell:self];
+     return %orig;
+ }
+@@ -26,11 +28,14 @@
+ - (void)cs_handleRepeatMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
+ %new
+ - (void)cs_handleVoiceForwardMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
++%new
++- (void)cs_clownEditText:(id)sender { [CSClownMenuAdapter performSelector:_cmd cell:self]; }
+ %end
+ 
+ %hook ImageMessageCellView
+-- (id)operationMenuItems { return [CSMessageActionMenuAdapter itemsByAddingActionsForCell:self items:%orig]; }
++- (id)operationMenuItems { return [CSClownMenuAdapter itemsByAddingActionsForCell:self items:[CSMessageActionMenuAdapter itemsByAddingActionsForCell:self items:%orig]]; }
+ - (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
++    if ([CSClownMenuAdapter isPluginSelector:action]) return [CSClownMenuAdapter canPerformSelector:action cell:self];
+     if ([CSMessageActionMenuAdapter isPluginSelector:action]) return [CSMessageActionMenuAdapter canPerformSelector:action cell:self];
+     return %orig;
+ }
+@@ -40,6 +45,8 @@
+ - (void)cs_handleVoiceForwardMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
+ %new
+ - (void)cs_handleAddStickerMenuItem:(id)sender { [CSMessageActionMenuAdapter performSelector:_cmd cell:self]; }
++%new
++- (void)cs_clownEditImage:(id)sender { [CSClownMenuAdapter performSelector:_cmd cell:self]; }
+ %end
+ 
+ %hook EmoticonMessageCellView
+diff --git a/Makefile b/Makefile
+index a9467b27..e1070b37 100644
+--- a/Makefile
++++ b/Makefile
+@@ -32,7 +32,7 @@ WeChatImprove_CFLAGS = -fobjc-arc \
+                        -Wno-error \
+ 
+ # 框架依赖
+-WeChatImprove_FRAMEWORKS = UIKit Foundation AVFoundation QuartzCore LocalAuthentication Security ImageIO CoreGraphics UniformTypeIdentifiers UserNotifications CoreMotion
++WeChatImprove_FRAMEWORKS = UIKit Foundation AVFoundation QuartzCore LocalAuthentication Security ImageIO CoreGraphics UniformTypeIdentifiers UserNotifications CoreMotion PhotosUI
+ 
+ # 包含 Theos make 系统
+ include $(THEOS)/makefiles/common.mk
+diff --git a/README.md b/README.md
+index eb494f90..c218ca36 100644
+--- a/README.md
++++ b/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
+ 
+-**当前版本：`2.3-4`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前版本：`2.3-8`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
+ 
+@@ -16,7 +16,7 @@
+ | 导航外观 | 底栏样式、顶栏信息、头像设置 | 悬浮底栏、图标与文字、描边动画；聊天顶栏头像与名称、分隔符；聊天头像隐藏、圆角和旋转 |
+ | 页面定制 | 界面简化、界面净化、布局设置 | 标题与菜单文字定制、页面入口和聊天提示隐藏、全局缩放与聊天字体 |
+ | 聊天布局 | 附件布局、信息时间、文本占位、触摸轨迹 | 附件按钮排序与列数、消息时间格式与位置、输入框占位文字与外观、触摸轨迹效果 |
+-| 消息操作 | 防止撤回、消息手势、语音转发、复读功能、表情功能 | 防撤回与提示显示；分别设置己方/对方消息的左右滑动作；语音转发和消息复读 |
++| 消息操作 | 防止撤回、消息手势、语音转发、复读功能、表情功能、小丑功能 | 防撤回与提示显示；己方/对方消息的左右滑动作；语音转发和消息复读；临时修改当前聊天的文字、时间、图片与转账金额显示 |
+ | 红包与收款 | 红包功能、自动收款 | 私聊/群聊开关、延迟处理、通知、自动回复和记录；红包另支持群白名单/黑名单、串行领取与汇总 |
+ | 密友保护 | 账号与安全 → 捉迷藏呀 | 独立密码、账号隔离、临时显示、已适配界面的隐藏和来电拒接；支持范围与限制见交付记录 |
+ | 账号与辅助 | 账号信息、收藏验证、后台模糊、后台运行、游戏辅助 | 账号信息查看、收藏生物认证、后台页面模糊、后台运行辅助、骰子与猜拳结果选择 |
+@@ -29,10 +29,10 @@
+ | 项目 | 说明 |
+ | --- | --- |
+ | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
+-| 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；本次按用户提供的 `8.0.80.34` IPA 核验设置布局、密友恢复入口、底栏与紧密布局 |
++| 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；既有适配参考用户提供的 `8.0.80.34` IPA，小丑功能在两版微信中的显示与交互仍待真机验收 |
+ | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
+-| Rootless | 本地提供 `2.3-4` 安装包；微信 8.0.80 真机未验证 |
+-| Rootful | 本地提供 `2.3-4` 安装包及重签用 dylib；微信 8.0.80 真机未验证 |
++| Rootless | `2.3-8` 已构建并核对，包含 arm64／arm64e；尚待 iPhone 微信安装复验 |
++| Rootful | `2.3-8` 安装包及重签用 dylib 已构建并核对，包含 arm64／arm64e；尚待 iPhone 微信安装复验 |
+ | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
+ | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
+ 
+@@ -40,7 +40,7 @@
+ 
+ ### 安装步骤
+ 
+-1. 获取与设备注入环境匹配的 `.deb`：当前版本 `2.3-4` 提供 [Rootless 安装包](packages/2.3-4-revoke-jump/com.wechat.improve_2.3-4_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.3-4-revoke-jump/com.wechat.improve_2.3-4_iphoneos-arm.deb)、[重签 IPA 用 dylib](packages/2.3-4-revoke-jump/WeChatImprove.dylib)、[调试符号](packages/2.3-4-revoke-jump/com.wechat.improve_2.3-4_symbols.zip) 和 [SHA-256](packages/2.3-4-revoke-jump/SHA256SUMS)。本版针对防撤回蓝字增加独立的精确点击入口，复用原有原文定位及布局稳定后的微信原生高亮；支持已有的持久化提示，保留账号、会话和消息身份校验。此次聚焦防撤回与导航核心回归，不重跑无关功能的全量脚本。主机验证不能代替微信 8.0.80 真机验收；设备上的原始回调断点与修复后观感尚未采样，详见 [2.3-4 修复记录](docs/audits/revoke-jump-2.3-4/README.md)。前版的添加入口、编辑页顶部布局及发现页圆角修复继续保留。
++1. 获取与设备注入环境匹配的 `.deb`：[2.3-8 Rootless 安装包](packages/2.3-8-merge-first-seam/com.wechat.improve_2.3-8_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.3-8-merge-first-seam/com.wechat.improve_2.3-8_iphoneos-arm.deb)、[重签用 dylib](packages/2.3-8-merge-first-seam/WeChatImprove.dylib) 与 [SHA-256 清单](packages/2.3-8-merge-first-seam/SHA256SUMS)。本版修正紧密合并时收发双方首个接缝偏大的两处误判：普通群昵称的空状态描述不再触发整条原生留白回退，标准头像外层的上下留白不再被视为大头像。用户已确认 `2.3-7` 的停滚重排恢复正常，本版沿用首次确定行高和内容位置的处理；`2.3-8` 的 iPhone 微信安装、首缝显示与滚动效果尚待复验。详见 [2.3-8 修复与验证记录](docs/audits/merge-first-seam-2.3-8/README.md)；[2.3-7 修复记录](docs/audits/merge-nickname-scroll-2.3-7/README.md)及既有安装包保留。小丑菜单与系统时间、防撤回、添加入口、编辑页布局和发现页圆角等前版修复继续保留。
+ 
+    密友头像五击快捷入口不验证身份：任何能操作已解锁手机并到达头像的人，都能查看或修改配置，并经两级确认不可撤销地完整重置当前账号的密友配置。此风险继续存在；修改密码仍须普通入口验证。
+ 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
+@@ -120,6 +120,8 @@
+ - **正常**：保留原生间距。
+ - **紧密**：以相邻消息间 `2 pt` 逻辑距离为目标，头像、昵称和附加内容仍保留必要空间。
+ 
++`2.3-8` 针对首条与第二条接缝补齐两项兼容：微信的 `chatRoomTextStateIconDescription` 在普通昵称下可返回空字符串，空字符串不再被当作真实附加状态而保留整条原生余白；原生头像外层高 43pt、内层可见图像高 37pt 且上下各 3pt 时，使用经过校验的内层图像边界计算占位。真实附加状态、超大头像和无法可靠确认的边界继续使用安全布局。`2.3-7` 的停滚稳定处理继续沿用，本版真机效果仍待复验。
++
+ 当前版本支持带“转文字”按钮及已展开转写内容的语音参与紧密布局，语音与自身转写框之间保留原生内部间隔。加载中、二次翻译等未确认的附加布局，以及未适配的版本或模型，可能保留原生空间。实现与验证范围见 [1.8-36 修复记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/merge-voice-translation-1.8-36/README.md)。
+ 
+ ### 列表圆角与悬浮底栏
+@@ -164,6 +166,10 @@
+ 
+ **功能增强 → 表情功能 → 图片添加到表情开关**：默认关闭，保留升级前的开关状态。打开后长按会话里的普通图片，选择“添加到表情”；图片未加载时尝试原生下载，再交由微信原生表情流程处理。整个添加过程只使用微信原生反馈；2.0-14 补齐添加完成后的原生“已添加表情”提示，插件不显示额外的加载、成功、失败提示；已有表情消息保留微信自己的添加入口。更多规则和验收步骤见 [功能说明](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/features/scheduled-tasks-and-image-stickers.md)。
+ 
++**功能增强 → 小丑功能**：入口位于“表情功能”下方，沿用公共设置页样式。总开关和“聊天文字修改／聊天时间修改／聊天图片修改／聊天转账修改”四个子开关默认全部关闭；关闭总开关保留子项选择。启用对应项后，长按文字、图片或转账分别选择“修改文字”“修改图片”“修改金额”，长按聊天中的系统时间可输入 `yyyy-MM-dd HH:mm` 格式的新时间。修改后的系统时间继续随微信原生点击在简略与包含星期的详细格式间切换，星期按新日期计算。金额接受 1–9 位整数、最多两位小数的正数，规范显示为两位小数。替换仅保存在当前聊天页面的内存中，离开会话后恢复；不上传，不修改原始消息对象、数据库、图片文件或真实转账及支付状态。使用方式、输入规则与真机验证边界见 [小丑功能说明](docs/features/clown-local-display.md)。
++
++用户实测 `2.3-5` 后反馈，转账“修改金额”菜单和系统时间切换存在问题。`2.3-6` 兼容转账标题中的纯数字、千分位与币种格式，避免金额识别失败时过滤菜单；真实 UIKit 检查确认原生视图透明度会影响点击命中，本轮改用可恢复的展示遮罩，并依微信 `8.0.80` 的原生时间模式更新替换时间的两种格式。本轮小丑功能 1115 项检查通过（偏好 249、菜单 302、会话 120、布局 116、真实 UIKit 展示 328），既有消息手势、消息时间和消息动作执行共 3089 项回归通过；旧版两组反向检查能复现金额菜单缺失与时间点击命中失效。Rootless／Rootful 构建及产物核对完成，见[本轮记录](docs/audits/clown-menu-time-fix-2026-11-09/README.md)。真实 UIKit 检查运行于 Mac Catalyst，微信类与相册边界使用替身，不能替代 iPhone 微信的安装与交互复验。
++
+ ## 配置与备份
+ 
+ 聊天分组的成员、排序、隐藏项和选中状态按微信账号保存；多数外观与功能开关使用微信进程内的 `NSUserDefaults`。切换账号后，如果出现“导入旧分组到当前账号”，可确认账号后手动导入，旧配置不会自动复制到所有账号。
+@@ -222,7 +228,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.3-4_iphoneos-arm64.deb`。本次交付包单独保存在 `packages/2.3-4-revoke-jump/`。
++当前版本默认输出文件名：`packages/com.wechat.improve_2.3-8_iphoneos-arm64.deb`。本轮交付为 [2.3-8 Rootless 安装包](packages/2.3-8-merge-first-seam/com.wechat.improve_2.3-8_iphoneos-arm64.deb)，已核对包含 arm64／arm64e。
+ 
+ ### Rootful
+ 
+@@ -231,7 +237,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出：`packages/com.wechat.improve_2.3-4_iphoneos-arm.deb`。本次交付包单独保存在 `packages/2.3-4-revoke-jump/`。
++当前版本默认输出文件名：`packages/com.wechat.improve_2.3-8_iphoneos-arm.deb`。本轮交付为 [2.3-8 Rootful 安装包](packages/2.3-8-merge-first-seam/com.wechat.improve_2.3-8_iphoneos-arm.deb)，已核对包含 arm64／arm64e。
+ 
+ | 方案 | 动态库安装目录 |
+ | --- | --- |
+@@ -255,7 +261,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
+ `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
+ 
+ ```bash
+-dpkg-deb -f packages/2.3-4-revoke-jump/com.wechat.improve_2.3-4_iphoneos-arm64.deb Version Architecture
++dpkg-deb -f packages/2.3-8-merge-first-seam/com.wechat.improve_2.3-8_iphoneos-arm64.deb Version Architecture
+ ```
+ 
+ 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
+diff --git a/Tests/MergeBubbleIntegrationTests.m b/Tests/MergeBubbleIntegrationTests.m
+index 4a6353b5..9fe14e3d 100644
+--- a/Tests/MergeBubbleIntegrationTests.m
++++ b/Tests/MergeBubbleIntegrationTests.m
+@@ -59,6 +59,82 @@ static void Display(YYAsyncImageView *bg) {
+     YYAsyncLayerDisplayTask *task=[bg newAsyncDisplayTask];
+     task.displayContentsForLayer(bg.frame.size,^BOOL { return NO; });DrainIntegration();
+ }
++static void VerifyDynamicNamedBubbleSeams(void) {
++    // One custom stacked-bubble chain reproduces the reported group first seam.
++    // Its CSS/font origin changes without changing any native body/row dimensions.
++    for (Class cls in @[TextMessageViewModel.class,VoiceMessageViewModel.class]) {
++        BOOL voice=cls==VoiceMessageViewModel.class;
++        ConfigureIntegration(YES,2);nativeMessageMarginTop=8;nativeMessageNameLength=16;
++        BubbleInfo *info=[BubbleInfo new];info.normal=NativeCapsTemplate(3,1,3);info.pressed=info.normal;
++        TestController *page=[TestController new];page.session=@"group@chatroom";page.nodes=[NSMutableArray array];
++        UIWindow *window=[UIWindow new];UITableView *table=[UITableView new];page.table=table;page.view=table;table.window=window;
++        table.bounds=CGRectMake(0,0,320,500);table.contentSize=CGSizeMake(320,1200);table.contentOffset=CGPointMake(0,19);
++        for (NSUInteger i=0;i<4;i++) {
++            TextMessageViewModel *m=[cls new];m.messageWrap=model(26000+(unsigned)i).messageWrap;
++            m.messageWrap.m_uiMessageType=voice ? 34 : 1;m.contentViewSize=CGSizeMake(180,37);m.bgBubbleInfo=info;
++            m.chatRoomTextStateIconDescription=@"";
++            [page.nodes addObject:m];
++        }
++        CSMessageMergeActivate(page);
++        NSMutableArray *views=[NSMutableArray array],*paths=[NSMutableArray array],*heights=[NSMutableArray array],*tips=[NSMutableArray array];
++        NSMutableDictionary *cells=[NSMutableDictionary dictionary];
++        for (NSUInteger phase=0;phase<2;phase++) {
++            if (phase) { nativeMessageMarginTop=11;nativeMessageNameLength=18; }
++            for (NSUInteger i=0;i<4;i++) {
++                NSIndexPath *path=phase ? paths[i] : [NSIndexPath indexPathForRow:0 inSection:i];if (!phase) [paths addObject:path];
++                CSMessageMergePrepare(page,table,path);
++                CGFloat y=i ? nativeMessageMarginTop+3 : ceil(nativeMessageMarginTop+nativeMessageNameLength);
++                CGFloat expected=i==0 ? y+35 : (i==3 ? 90-y : 35);
++                CGFloat height=CSMessageMergeRowHeight(page,table,path,90);CHECK(fabs(height-expected)<.01);
++                if (phase) heights[i]=@(height);else [heights addObject:@(height)];
++                NativeHierarchyCellView *v=phase ? views[i] : (voice ? [VoiceMessageCellView new] : [NativeHierarchyCellView new]);
++                if (!phase) {
++                    v.viewModel=page.nodes[i];MMHeadImageView *head=[MMHeadImageView new];
++                    head.bounds=CGRectMake(0,0,43,43);head.imageSize=CGSizeMake(37,37);
++                    head.headImageView=[UIView new];head.headImageView.frame=CGRectMake(3,3,37,37);
++                    head.headImageView.bounds=CGRectMake(0,0,37,37);[head addSubview:head.headImageView];
++                    v.head=head;[v addSubview:head];
++                    v.container=[UIView new];[v addSubview:v.container];
++                    YYAsyncImageView *bg=[YYAsyncImageView new];bg.image=[ForbiddenYYImage deferredImageWithUIImage:info.normal];
++                    bg.highlightedImage=[ForbiddenYYImage deferredImageWithUIImage:info.pressed];v.content=bg;[v.container addSubview:bg];
++                    v->m_chatRoomNameLabel=[UIView new];v->m_chatRoomNameLabel.frame=CGRectMake(50,0,160,14);
++                    v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,160,14);v->m_chatRoomNameLabel.hidden=i!=0;[v addSubview:v->m_chatRoomNameLabel];
++                    if (voice) {
++                        VoiceMessageCellView *vc=(id)v;UIView *glyph=[UIView new];glyph.frame=CGRectMake(18,6.5,24,24);glyph.bounds=CGRectMake(0,0,24,24);
++                        vc->m_playingImageView=glyph;[v.container addSubview:glyph];
++                        UIView *tip=[UIView new];tip.bounds=CGRectMake(0,0,60,20);[v addSubview:tip];[tips addObject:tip];
++                    }
++                    TestTableCell *cell=[TestTableCell new];cell.cellView=v;cells[path]=cell;[views addObject:v];
++                } else CSMessageMergeRestore(v);
++                v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;v.head.frame=CGRectMake(0,nativeMessageMarginTop,43,43);
++                v.container.frame=CGRectMake(40,y,240,37);v.container.bounds=CGRectMake(0,0,240,37);
++                v.content.frame=CGRectMake(10,0,180,37);v.content.bounds=CGRectMake(0,0,180,37);
++                if (voice) ((UIView *)tips[i]).frame=CGRectMake(258,y+8.5,60,20);
++                CSMessageMergeBind(page,table,path,cells[path]);
++            }
++            table.testCells=cells;table.testHeights=heights;table.indexPathsForVisibleRows=paths;
++            for (NSUInteger pass=0;pass<12;pass++) {
++                table.dragging=pass<4;table.decelerating=pass>=4 && pass<8;
++                for (NSUInteger i=0;i<4;i++) {
++                    NativeHierarchyCellView *v=views[i];
++                    if (voice) { ((VoiceMessageViewModel *)v.viewModel).bShowingQuickTranTips=pass%3!=0;((UIView *)tips[i]).hidden=pass%3==0; }
++                    if (pass==1 || pass==3) { ((YYAsyncImageView *)v.content).highlighted=pass==3;Display((id)v.content); }
++                    CSMessageMergeRender(v);CHECK(fabs(CSMessageMergeRowHeight(page,table,paths[i],90)-[heights[i] doubleValue])<.01);
++                    if (i) {
++                        NativeHierarchyCellView *previous=views[i-1];
++                        CGFloat previousBottom=previous.frame.origin.y+CGRectGetMaxY([previous convertRect:previous.content.bounds fromView:previous.content])-3;
++                        CGFloat currentTop=v.frame.origin.y+CGRectGetMinY([v convertRect:v.content.bounds fromView:v.content])+1;
++                        CHECK(fabs([heights[i-1] doubleValue]+currentTop-previousBottom-2)<.01);
++                    }
++                }
++                CSMessageMergeFlush(page);CHECK(table.updateCount==0);CHECK(table.contentOffset.y==19);
++            }
++            CHECK(CSMessageMergeLayoutSettled(page));
++        }
++        for (NativeHierarchyCellView *v in views) { CSMessageMergeReuse(v);CSBubbleStyleDetach(v); }
++        CSMessageMergeDeactivate(page);nativeMessageMarginTop=5;nativeMessageNameLength=12;
++    }
++}
+ 
+ static NSUInteger VerifyVoiceTranslationSeams(void) {
+     NSUInteger scenarios=0;
+@@ -108,7 +184,7 @@ static NSUInteger VerifyVoiceTranslationSeams(void) {
+             v.viewModel=page.nodes[i];v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
+             v.traitCollection.userInterfaceStyle=table.traitCollection.userInterfaceStyle;
+             v.container=[UIView new];v.container.frame=CGRectMake(40,y,240,total);v.container.bounds=CGRectMake(0,0,240,total);[v addSubview:v.container];
+-            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 282 : 0,named ? 3 : 8,38,38);v.head.bounds=CGRectMake(0,0,38,38);[v addSubview:v.head];
++            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 282 : 0,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);[v addSubview:v.head];
+             YYAsyncImageView *bg=[YYAsyncImageView new];bg.frame=CGRectMake(10,0,180,body);bg.bounds=CGRectMake(0,0,180,body);
+             bg.traitCollection.userInterfaceStyle=v.traitCollection.userInterfaceStyle;
+             bg.image=[ForbiddenYYImage deferredImageWithUIImage:dark ? info.darkNormal : info.normal];
+@@ -208,6 +284,7 @@ static NSUInteger VerifyVoiceTranslationSeams(void) {
+ }
+ 
+ int main(void) { @autoreleasepool {
++    VerifyDynamicNamedBubbleSeams();
+     NSUInteger translationScenarios=VerifyVoiceTranslationSeams();
+     ConfigureIntegration(NO,2);
+     // Regression: a 38pt body exactly fits the native fixed caps. Requiring an
+@@ -292,7 +369,7 @@ int main(void) { @autoreleasepool {
+             v.viewModel=m;v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
+             v.container=[UIView new];v.container.frame=CGRectMake(40,y,240,native-y);v.container.bounds=CGRectMake(0,0,240,native-y);[v addSubview:v.container];
+             v.traitCollection.userInterfaceStyle=table.traitCollection.userInterfaceStyle;
+-            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 282 : 0,named ? 3 : 8,38,38);v.head.bounds=CGRectMake(0,0,38,38);[v addSubview:v.head];
++            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 282 : 0,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);[v addSubview:v.head];
+             YYAsyncImageView *bg=[YYAsyncImageView new];bg.frame=CGRectMake(10,0,180,bodyHeight);bg.bounds=CGRectMake(0,0,180,bodyHeight);
+             bg.traitCollection.userInterfaceStyle=v.traitCollection.userInterfaceStyle;
+             bg.image=[ForbiddenYYImage deferredImageWithUIImage:dark ? info.darkNormal : info.normal];
+diff --git a/Tests/MessageMergeAdapterTests.m b/Tests/MessageMergeAdapterTests.m
+index ad350025..8ebbc04c 100644
+--- a/Tests/MessageMergeAdapterTests.m
++++ b/Tests/MessageMergeAdapterTests.m
+@@ -6,6 +6,7 @@
+ #import "CSMessageTimeLayout.h"
+ #import "CSRevokeReference.h"
+ #include <stdlib.h>
++#include <string.h>
+ static unsigned checks;
+ extern NSUInteger CSMessageMergeDescriptorBuildCount;
+ extern NSString *CSMessageMergeTestProfileVersion;
+@@ -34,9 +35,38 @@ BOOL CSBubbleStyleModelInsets(id model, UIView *appearance, CGSize size, UIEdgeI
+ #define CHECK(x) do { checks++; if (!(x)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#x); exit(1); } } while (0)
+ @interface MMContext : NSObject
+ + (NSString *)currentUserName;
+++ (instancetype)currentContext;
++- (id)getService:(Class)serviceClass;
++@end
++static double nativeMessageMarginTop=5, nativeMessageNameLength=12;
++static BOOL nativeMessageThemeAvailable=YES;
++static BOOL nativeMessageNamesVisible=YES;
++@interface MMThemeManager : NSObject
++- (id)getValueOfProperty:(NSString *)property inRuleSet:(NSString *)ruleSet;
++@end
++@implementation MMThemeManager
++- (id)getValueOfProperty:(NSString *)property inRuleSet:(NSString *)ruleSet {
++    CHECK([property isEqual:@"message_node_bkg_margin_top"]);
++    CHECK([ruleSet isEqual:@"#message_node_view"]);
++    return @[@(nativeMessageMarginTop)];
++}
++@end
++@interface MMThemeUtil : NSObject
+++ (double)parseFloatFromValues:(id)values;
++@end
++@implementation MMThemeUtil
+++ (double)parseFloatFromValues:(id)values { return [values[0] doubleValue]; }
++@end
++@interface UIFont : NSObject
+++ (double)dynamicLength:(double)value;
++@end
++@implementation UIFont
+++ (double)dynamicLength:(double)value { CHECK(value==16);return nativeMessageNameLength; }
+ @end
+ @implementation MMContext
+ + (NSString *)currentUserName { return @"account"; }
+++ (instancetype)currentContext { if (!nativeMessageThemeAvailable) return nil;static MMContext *context; if (!context) context=[self new];return context; }
++- (id)getService:(Class)serviceClass { CHECK(serviceClass==MMThemeManager.class);return [MMThemeManager new]; }
+ @end
+ @interface TestWrap : NSObject
+ @property(nonatomic) unsigned int m_uiMesLocalID;
+@@ -64,15 +94,22 @@ @interface TextMessageViewModel : NSObject
+ @property(nonatomic) CGSize replyTextSize;
+ @property(nonatomic) UIEdgeInsets replyTextInset;
+ @property(nonatomic,strong) NSArray *subViewModels;
++@property(nonatomic,strong) id chatRoomTextStateIconDescription;
+ - (long long)numberOfRowsInSection;
+ - (id)cellDataForRow:(unsigned long long)row;
+ - (void)resetLayoutCache;
++- (BOOL)isHeadPart;
++- (BOOL)isShowHeadImage;
++- (BOOL)isShowChatRoomDisplayName;
+ @end
+ @implementation TextMessageViewModel
+ - (instancetype)init { if ((self=[super init])) _rows=1;return self; }
+ - (long long)numberOfRowsInSection { return self.rows; }
+ - (id)cellDataForRow:(unsigned long long)row { return self.subViewModels.count>row ? self.subViewModels[row] : self; }
+ - (void)resetLayoutCache { self.resetCount++; CSMessageMergeResetGeometry(self); }
++- (BOOL)isHeadPart { return YES; }
++- (BOOL)isShowHeadImage { return YES; }
++- (BOOL)isShowChatRoomDisplayName { return nativeMessageNamesVisible && !CSMessageMergeHidesName(self); }
+ @end
+ @interface VoiceMessageViewModel : TextMessageViewModel
+ @property(nonatomic) BOOL canShowTranslateText;
+@@ -124,6 +161,13 @@ @interface NativeHierarchyCellView : TestCellView
+ @implementation NativeHierarchyCellView
+ - (id)getContentView { return self.container; }
+ @end
++// Native MMHeadImageView owns a smaller, inset image view. The outer 43pt
++// interaction view is not the visible 37pt avatar in the supplied screenshot.
++@interface MMHeadImageView : UIView
++@property(nonatomic,strong) UIView *headImageView;
++@property(nonatomic) CGSize imageSize;
++@end
++@implementation MMHeadImageView @end
+ @interface VoiceMessageCellView : NativeHierarchyCellView {
+ @public UIView *m_playingImageView;
+ @public UIView *m_secLabel;
+@@ -199,6 +243,189 @@ static void configure(BOOL enabled) {
+     [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSMessageMergeEnabledKey:@(enabled),CSMessageMergeScopeKey:@3,
+         CSMessageMergeSpacingKey:@(-12),CSMessageMergeAvatarKey:@1} forName:NSArgumentDomain];
+ }
++static void VerifyNativeAvatarWrapperSeams(void) {
++    // The coordinates are fixed independently of the merge measurement helper:
++    // native margin 5, named origin 20, unnamed origin 8, avatar wrapper y=5,
++    // inner visible image y=3/height=37, outer wrapper height=43. These are the
++    // native wrapper/image relationship and the screenshot's visible dimensions.
++    UIWindow *window=[UIWindow new];
++    nativeMessageMarginTop=5;nativeMessageNameLength=15;
++    for (NSUInteger initialChildState=0;initialChildState<3;initialChildState++)
++    for (NSUInteger scenario=0;scenario<3;scenario++) {
++        BOOL outgoing=scenario==0,named=scenario==2;
++        const char *only=getenv("CS_NATIVE_AVATAR_SCENARIO");
++        if (only && (!named || strcmp(only,"named"))) continue;
++        nativeMessageNamesVisible=named;
++        [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSMessageMergeEnabledKey:@YES,
++            CSMessageMergeScopeKey:@3,CSMessageMergeSpacingModeKey:@1,CSMessageMergeAvatarKey:@2} forName:NSArgumentDomain];
++        TestController *page=[TestController new];page.session=@"group@chatroom";page.nodes=[NSMutableArray array];
++        UITableView *table=[UITableView new];page.table=table;page.view=table;table.window=window;
++        table.bounds=CGRectMake(0,0,320,500);table.contentSize=CGSizeMake(320,1200);table.contentOffset=CGPointMake(0,19);
++        for (NSUInteger i=0;i<4;i++) {
++            TextMessageViewModel *m=model(27000+(unsigned)scenario*10+(unsigned)i);
++            if (named) m.chatRoomTextStateIconDescription=@""; // Native ordinary no-status value.
++            m.isSender=outgoing;m.contentViewSize=CGSizeMake(180,37);[page.nodes addObject:m];
++        }
++        CSMessageMergeActivate(page);
++        NSMutableArray *paths=[NSMutableArray array],*views=[NSMutableArray array],*heights=[NSMutableArray array];
++        NSMutableDictionary *cells=[NSMutableDictionary dictionary];
++        for (NSUInteger i=0;i<4;i++) {
++            NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];[paths addObject:path];
++            CSMessageMergePrepare(page,table,path);
++            CGFloat height=CSMessageMergeRowHeight(page,table,path,90);[heights addObject:@(height)];
++            NativeHierarchyCellView *v=[NativeHierarchyCellView new];v.viewModel=page.nodes[i];
++            v.frame=CGRectMake(0,0,320,height);v.bounds=CGRectMake(0,0,320,height);
++            MMHeadImageView *head=[MMHeadImageView new];head.frame=CGRectMake(outgoing ? 277 : 0,5,43,43);
++            head.bounds=CGRectMake(0,0,43,43);head.imageSize=CGSizeMake(37,37);
++            head.headImageView=[UIView new];head.headImageView.frame=CGRectMake(3,3,37,37);
++            head.headImageView.bounds=CGRectMake(0,0,37,37);
++            if (initialChildState==1) { head.headImageView.frame=CGRectZero;head.headImageView.bounds=CGRectZero; }
++            if (initialChildState==2) { head.headImageView.frame=CGRectMake(5,5,32,32);head.headImageView.bounds=CGRectMake(0,0,32,32); }
++            head.subviews=@[head.headImageView];head.headImageView.superview=head;v.head=head;
++            v.container=[UIView new];v.container.frame=CGRectMake(50,(named && i==0) ? 20 : 8,220,37);
++            v.container.bounds=CGRectMake(0,0,220,37);v.content=[UIView new];v.content.frame=CGRectMake(0,0,180,37);
++            v.content.bounds=CGRectMake(0,0,180,37);v.container.subviews=@[v.content];v.content.superview=v.container;
++            v->m_chatRoomNameLabel=[UIView new];v->m_chatRoomNameLabel.frame=CGRectMake(50,5,160,15);
++            v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,160,15);v->m_chatRoomNameLabel.hidden=!named || i!=0;
++            v.subviews=@[head,v.container,v->m_chatRoomNameLabel];
++            TestTableCell *cell=[TestTableCell new];cell.cellView=v;cells[path]=cell;[views addObject:v];
++            CSMessageMergeBind(page,table,path,cell);
++        }
++        table.testCells=cells;table.testHeights=heights;table.indexPathsForVisibleRows=paths;
++        for (NSUInteger pass=0;pass<12;pass++) {
++            table.dragging=pass<4;table.decelerating=pass>=4 && pass<8;
++            // setImageSize: precedes the native child layout. Its first frame can
++            // be empty or retain an older size until that layout finishes.
++            if (pass==1) for (NativeHierarchyCellView *v in views) {
++                UIView *image=((MMHeadImageView *)v.head).headImageView;
++                image.frame=CGRectMake(3,3,37,37);image.bounds=CGRectMake(0,0,37,37);
++            }
++            for (NativeHierarchyCellView *v in views) CSMessageMergeRender(v);
++            // Re-read each final height exactly as table row layout does. A safety
++            // expansion must show up in the physical gap, even if flush is deferred.
++            NSMutableArray *finalHeights=[NSMutableArray array];
++            for (NSUInteger i=0;i<4;i++) [finalHeights addObject:@(CSMessageMergeRowHeight(page,table,paths[i],90))];
++            CGFloat tableY=0,previousBottom=0;
++            for (NSUInteger i=0;i<4;i++) {
++                NativeHierarchyCellView *v=views[i];
++                CGRect body=[v convertRect:v.content.bounds fromView:v.content];
++                CGFloat bodyTop=tableY+v.frame.origin.y+CGRectGetMinY(body);
++                if (i) {
++                    CGFloat gap=bodyTop-previousBottom;
++                    if (fabs(gap-2)>.01) fprintf(stderr,"native-avatar-wrapper scenario=%s initialChildState=%lu pass=%lu seam=%lu gap=%.2f firstHeight=%.2f finalFirstHeight=%.2f\n",
++                        named ? "incoming-named" : outgoing ? "outgoing" : "incoming-unnamed",(unsigned long)initialChildState,(unsigned long)pass,(unsigned long)i,gap,[heights[0] doubleValue],[finalHeights[0] doubleValue]);
++                    CHECK(fabs(gap-2)<.01);
++                }
++                previousBottom=tableY+v.frame.origin.y+CGRectGetMaxY(body);tableY+=[finalHeights[i] doubleValue];
++                if (i==0) {
++                    MMHeadImageView *head=(id)v.head;
++                    CGRect image=[v convertRect:CGRectMake(3,3,37,37) fromView:head];
++                    if (pass || !initialChildState) CHECK(CGRectEqualToRect(image,[v convertRect:head.headImageView.bounds fromView:head.headImageView]));
++                    CHECK(!head.hidden);CHECK(v.frame.origin.y+CGRectGetMinY(image)>=-.01);
++                    CHECK(v.frame.origin.y+CGRectGetMaxY(image)<=[heights[i] doubleValue]+.01);
++                } else CHECK(v.head.hidden);
++            }
++            for (NSUInteger i=0;i<4;i++) {
++                CHECK(fabs([finalHeights[i] doubleValue]-[heights[i] doubleValue])<.01);
++                CHECK(fabs([heights[i] doubleValue]-(i==0 ? (named ? 58 : 46) : (i==3 ? 83 : 39)))<.01);
++            }
++            CSMessageMergeFlush(page);CHECK(table.updateCount==0);CHECK(table.contentOffset.y==19);
++        }
++        CHECK(CSMessageMergeLayoutSettled(page));
++        for (NativeHierarchyCellView *v in views) CSMessageMergeReuse(v);
++        CSMessageMergeDeactivate(page);
++    }
++    nativeMessageNamesVisible=YES;nativeMessageMarginTop=5;nativeMessageNameLength=12;
++}
++static void VerifyDynamicNativeMessageOrigins(void) {
++    // Native CSS/font inputs are deliberately different from the old 17/8 profile.
++    // The first row must agree with actual layout before any cell has been created.
++    UIWindow *window=[UIWindow new];
++    for (NSUInteger names=0;names<2;names++) {
++        nativeMessageNamesVisible=names!=0;nativeMessageMarginTop=8;nativeMessageNameLength=16;
++        [NSUserDefaults.standardUserDefaults setVolatileDomain:@{CSMessageMergeEnabledKey:@YES,
++            CSMessageMergeScopeKey:@3,CSMessageMergeSpacingModeKey:@1,CSMessageMergeAvatarKey:@2} forName:NSArgumentDomain];
++        TestController *page=[TestController new];page.session=@"group@chatroom";page.nodes=[NSMutableArray array];
++        UITableView *table=[UITableView new];page.table=table;page.view=table;table.window=window;
++        table.bounds=CGRectMake(0,0,320,500);table.contentSize=CGSizeMake(320,1200);table.contentOffset=CGPointMake(0,19);
++        for (NSUInteger i=0;i<4;i++) { TextMessageViewModel *m=model(25000+(unsigned)i);m.contentViewSize=CGSizeMake(180,38);[page.nodes addObject:m]; }
++        CSMessageMergeActivate(page);
++        NSMutableArray *paths=[NSMutableArray array],*views=[NSMutableArray array],*heights=[NSMutableArray array];
++        NSMutableDictionary *cells=[NSMutableDictionary dictionary];
++        for (NSUInteger phase=0;phase<2;phase++) {
++            if (phase) { nativeMessageMarginTop=11;nativeMessageNameLength=18; }
++            for (NSUInteger i=0;i<4;i++) {
++                NSIndexPath *path=phase ? paths[i] : [NSIndexPath indexPathForRow:0 inSection:i];
++                if (!phase) [paths addObject:path];
++                CSMessageMergePrepare(page,table,path);
++                CGFloat top=(i || !nativeMessageNamesVisible) ? nativeMessageMarginTop+3 : ceil(nativeMessageMarginTop+nativeMessageNameLength);
++                CGFloat expected=i==0 ? top+39 : (i==3 ? 90-top+1 : 40);
++                // Body size, native row height, model identity and width stay unchanged
++                // in phase 2. Only native CSS/font geometry invalidates the cached pair.
++                CGFloat height=CSMessageMergeRowHeight(page,table,path,90);
++                CHECK(fabs(height-expected)<.01);
++                if (phase) heights[i]=@(height);else [heights addObject:@(height)];
++                NativeHierarchyCellView *v=phase ? views[i] : [NativeHierarchyCellView new];
++                if (!phase) {
++                    v.viewModel=page.nodes[i];v.head=[UIView new];v.head.bounds=CGRectMake(0,0,38,38);
++                    v.container=[UIView new];v.content=[UIView new];v.container.subviews=@[v.content];v.content.superview=v.container;
++                    v->m_chatRoomNameLabel=[UIView new];v->m_chatRoomNameLabel.frame=CGRectMake(50,0,160,14);
++                    v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,160,14);v->m_chatRoomNameLabel.hidden=i!=0 || !nativeMessageNamesVisible;
++                    v.subviews=@[v.head,v.container,v->m_chatRoomNameLabel];
++                    TestTableCell *cell=[TestTableCell new];cell.cellView=v;cells[path]=cell;[views addObject:v];
++                } else CSMessageMergeRestore(v);
++                v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
++                v.head.frame=CGRectMake(0,nativeMessageMarginTop,38,38);
++                v.container.frame=CGRectMake(50,top,220,38);v.container.bounds=CGRectMake(0,0,220,38);
++                v.content.frame=CGRectMake(0,0,180,38);v.content.bounds=v.content.frame;
++                CSMessageMergeBind(page,table,path,cells[path]);
++            }
++            table.testCells=cells;table.testHeights=heights;table.indexPathsForVisibleRows=paths;
++            for (NSUInteger pass=0;pass<12;pass++) {
++                table.dragging=pass<4;table.decelerating=pass>=4 && pass<8;
++                for (NSUInteger i=0;i<4;i++) {
++                    NativeHierarchyCellView *v=views[i];CSMessageMergeRender(v);
++                    CHECK(fabs(CSMessageMergeRowHeight(page,table,paths[i],90)-[heights[i] doubleValue])<.01);
++                    if (i) {
++                        NativeHierarchyCellView *previous=views[i-1];
++                        CGFloat previousBottom=previous.frame.origin.y+CGRectGetMaxY([previous convertRect:previous.content.bounds fromView:previous.content]);
++                        CGFloat currentTop=v.frame.origin.y+CGRectGetMinY([v convertRect:v.content.bounds fromView:v.content]);
++                        CHECK(fabs([heights[i-1] doubleValue]+currentTop-previousBottom-2)<.01);
++                    }
++                }
++                CSMessageMergeFlush(page);CHECK(table.updateCount==0);CHECK(table.contentOffset.y==19);
++            }
++            CHECK(CSMessageMergeLayoutSettled(page));
++        }
++        for (NativeHierarchyCellView *v in views) CSMessageMergeReuse(v);
++        CSMessageMergeDeactivate(page);
++    }
++    nativeMessageNamesVisible=YES;
++    // Missing/invalid native inputs and an unqualified nickname state icon keep
++    // the native row from first display. Recovering metadata must not tighten it late.
++    for (NSUInteger invalid=0;invalid<4;invalid++) {
++        nativeMessageThemeAvailable=invalid!=0;
++        nativeMessageMarginTop=invalid==1 ? NAN : 8;nativeMessageNameLength=invalid==2 ? NAN : 16;
++        TestController *fallback=[TestController new];fallback.session=@"group@chatroom";
++        TextMessageViewModel *first=model(25100+(unsigned)invalid*2),*next=model(25101+(unsigned)invalid*2);
++        first.contentViewSize=CGSizeMake(180,38);if (invalid==3) first.chatRoomTextStateIconDescription=@"state-icon";
++        fallback.nodes=[NSMutableArray arrayWithArray:@[first,next]];
++        UITableView *t=[UITableView new];fallback.table=t;fallback.view=t;t.window=window;t.bounds=CGRectMake(0,0,320,500);
++        NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:0];CSMessageMergeActivate(fallback);CSMessageMergePrepare(fallback,t,path);
++        CHECK(CSMessageMergeRowHeight(fallback,t,path,90)==90);
++        TestCellView *v=[TestCellView new];v.viewModel=first;v.frame=CGRectMake(0,0,320,90);v.bounds=v.frame;
++        v.content=[UIView new];v.content.frame=CGRectMake(50,24,180,38);v.content.bounds=CGRectMake(0,0,180,38);v.subviews=@[v.content];
++        TestTableCell *cell=[TestTableCell new];cell.cellView=v;t.testCells=@{path:cell};t.testHeights=@[@90,@90];t.indexPathsForVisibleRows=@[path];
++        CSMessageMergeBind(fallback,t,path,cell);
++        nativeMessageThemeAvailable=YES;nativeMessageMarginTop=8;nativeMessageNameLength=16;
++        for (NSUInteger pass=0;pass<3;pass++) {
++            t.dragging=pass==0;t.decelerating=pass==1;CSMessageMergeRender(v);CSMessageMergeFlush(fallback);
++            CHECK(CSMessageMergeRowHeight(fallback,t,path,90)==90);CHECK(t.updateCount==0);CHECK(v.frame.origin.y==0);
++        }
++        CSMessageMergeReuse(v);CSMessageMergeDeactivate(fallback);
++    }
++    nativeMessageThemeAvailable=YES;nativeMessageMarginTop=5;nativeMessageNameLength=12;
++}
+ static void VerifyShortAndQuotedSeams(void) {
+     UIWindow *window=[UIWindow new];
+     for (NSUInteger scale=1;scale<=3;scale++) for (NSUInteger group=0;group<2;group++)
+@@ -230,7 +457,7 @@ static void VerifyShortAndQuotedSeams(void) {
+                 NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];[paths addObject:path];CSMessageMergePrepare(page,t,path);
+                 CGFloat height=CSMessageMergeRowHeight(page,t,path,native);[heights addObject:@(height)];
+                 TestCellView *v=[TestCellView new];v.viewModel=m;v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
+-                v.head=[UIView new];v.head.frame=CGRectMake(0,named ? 3 : 8,38,38);v.head.bounds=CGRectMake(0,0,38,38);
++                v.head=[UIView new];v.head.frame=CGRectMake(0,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);
+                 v.content=[UIView new];v.content.frame=CGRectMake(50,y,200,38);v.content.bounds=CGRectMake(0,0,200,38);
+                 v->m_chatRoomNameLabel=[UIView new];v->m_chatRoomNameLabel.frame=CGRectMake(50,0,150,14);
+                 v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,150,14);v->m_chatRoomNameLabel.hidden=!named;
+@@ -306,7 +533,7 @@ static void VerifyNativeAvatarHierarchy(void) {
+             NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];[paths addObject:path];
+             CSMessageMergePrepare(page,table,path);CGFloat height=CSMessageMergeRowHeight(page,table,path,55);[heights addObject:@(height)];
+             NativeHierarchyCellView *v=[NativeHierarchyCellView new];v.viewModel=page.nodes[i];v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
+-            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 280 : 2,8,38,38);v.head.bounds=CGRectMake(0,0,38,38);
++            v.head=[UIView new];v.head.frame=CGRectMake(outgoing ? 280 : 2,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);
+             v.container=[UIView new];v.container.frame=CGRectMake(50,8,220,38);v.container.bounds=CGRectMake(0,0,220,38);
+             v.content=[UIView new];v.content.frame=CGRectMake(0,0,220,38);v.content.bounds=v.content.frame;
+             v.container.subviews=@[v.content];v.content.superview=v.container;v.subviews=@[v.head,v.container];
+@@ -335,9 +562,12 @@ static void VerifyNativeAvatarHierarchy(void) {
+         }
+         if (outgoing) {
+             NSUInteger identity=avatar==2 ? 0 : 2;NativeHierarchyCellView *v=views[identity];
+-            // Local frames appear separate, but the container now moves the bubble
+-            // into the avatar's lane. This must retain the normal safety expansion.
++            // An unexpected native relayout moves the bubble into the avatar's
++            // lane and lowers the avatar beyond the measured body footprint.
++            // Overlapping lanes cannot use avatar relocation to hide the overflow.
++            CSMessageMergeRestore(v);
+             CGRect shifted=v.container.frame;shifted.origin.x=270;v.container.frame=shifted;
++            CGRect lowered=v.head.frame;lowered.origin.y=8;v.head.frame=lowered;
+             CSMessageMergeRender(v);
+             CGFloat safeHeight=CSMessageMergeRowHeight(page,table,paths[identity],55);
+             CHECK(safeHeight>[heights[identity] doubleValue]);CHECK(v.head.frame.origin.y==8);
+@@ -379,7 +609,7 @@ static void VerifyVoiceGlyphGeometry(void) {
+             VoiceMessageCellView *v=[VoiceMessageCellView new];v.viewModel=page.nodes[i];v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
+             v.container=[UIView new];v.container.frame=CGRectMake(40,8,240,37);v.container.bounds=CGRectMake(0,0,240,37);
+             v.content=[UIView new];v.content.frame=CGRectMake(10,0,180,37);v.content.bounds=CGRectMake(0,0,180,37);
+-            v.head=[UIView new];v.head.frame=CGRectMake(282,8,38,38);v.head.bounds=CGRectMake(0,0,38,38);
++            v.head=[UIView new];v.head.frame=CGRectMake(282,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);
+             v.container.subviews=@[v.content];v.content.superview=v.container;v.subviews=@[v.head,v.container];
+             if (i==1) {
+                 voice=v;UIView *glyph=[UIView new];glyph.frame=CGRectMake(158,6.5,24,24);glyph.bounds=CGRectMake(0,0,24,24);
+@@ -462,6 +692,8 @@ static void VerifyVoiceAuxiliaryStates(void) {
+     insetBackground=nil;visibleInsets=(UIEdgeInsets){0,0,0,0};
+ }
+ int main(void) { @autoreleasepool {
++    VerifyNativeAvatarWrapperSeams();
++    VerifyDynamicNativeMessageOrigins();
+     VerifyVoiceAuxiliaryStates();
+     VerifyVoiceGlyphGeometry();
+     VerifyNativeAvatarHierarchy();
+@@ -503,7 +735,7 @@ int main(void) { @autoreleasepool {
+     NSIndexPath *p=[NSIndexPath indexPathForRow:0 inSection:0];table.indexPathsForVisibleRows=@[p];
+     TestCellView *view=[TestCellView new];view.viewModel=vc.nodes[0];view.head=[UIView new];view.content=[UIView new];view->m_chatRoomNameLabel=[UIView new];
+     view.bounds=CGRectMake(0,0,320,60);view.content.bounds=CGRectMake(0,0,200,30);view.content.frame=CGRectMake(50,8,200,30);
+-    view.head.bounds=CGRectMake(0,0,30,30);view.head.frame=CGRectMake(0,8,30,30);view.subviews=@[view.head,view.content,view->m_chatRoomNameLabel];
++    view.head.bounds=CGRectMake(0,0,30,30);view.head.frame=CGRectMake(0,5,30,30);view.subviews=@[view.head,view.content,view->m_chatRoomNameLabel];
+     TestTableCell *cell=[TestTableCell new];cell.cellView=view;table.testCells=@{p:cell};
+     CSMessageMergeActivate(vc);CSMessageMergePrepare(vc,table,p);
+     CHECK(CSMessageMergeHidesName(view.viewModel));
+@@ -721,7 +953,7 @@ int main(void) { @autoreleasepool {
+         NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:0];
+         TestCellView *v=[TestCellView new];v.viewModel=first;v.head=[UIView new];v.content=[UIView new];
+         v.bounds=CGRectMake(0,0,320,60);v.content.bounds=CGRectMake(0,0,200,30);v.content.frame=CGRectMake(50,8,200,30);
+-        v.head.bounds=CGRectMake(0,0,30,30);v.head.frame=CGRectMake(0,8,30,30);v.subviews=@[v.head,v.content];
++        v.head.bounds=CGRectMake(0,0,30,30);v.head.frame=CGRectMake(0,5,30,30);v.subviews=@[v.head,v.content];
+         TestTableCell *c=[TestTableCell new];c.cellView=v;t.indexPathsForVisibleRows=@[path];t.testCells=@{path:c};
+         t.contentOffset=CGPointMake(0,19);t.dragging=mode==0;t.decelerating=mode==1;
+         CSMessageMergeActivate(page);CSMessageMergePrepare(page,t,path);
+@@ -844,7 +1076,7 @@ int main(void) { @autoreleasepool {
+         NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:0];
+         TestCellView *v=[TestCellView new];v.viewModel=(id)child;v.head=[UIView new];v.content=[UIView new];
+         v.frame=CGRectMake(0,0,320,39);v.bounds=CGRectMake(0,0,320,39);
+-        v.head.bounds=CGRectMake(0,0,30,30);v.head.frame=CGRectMake(0,8,30,30);
++        v.head.bounds=CGRectMake(0,0,30,30);v.head.frame=CGRectMake(0,5,30,30);
+         v.content.bounds=CGRectMake(0,0,200,30);v.content.frame=CGRectMake(50,8,200,30);v.subviews=@[v.head,v.content];
+         TestTableCell *cell=[TestTableCell new];cell.cellView=v;t.testCells=@{path:cell};t.indexPathsForVisibleRows=@[path];
+         CSMessageMergeActivate(page);CSMessageMergePrepare(page,t,path);
+@@ -940,7 +1172,7 @@ int main(void) { @autoreleasepool {
+         CHECK(CSMessageMergeRowHeight(page,t,bPath,55)==40);
+         TestCellView *a=[TestCellView new];a.viewModel=first;
+         a.frame=CGRectMake(0,0,320,planned);a.bounds=a.frame;
+-        a.head=[UIView new];a.head.frame=CGRectMake(0,3,38,38);a.head.bounds=CGRectMake(0,0,38,38);
++        a.head=[UIView new];a.head.frame=CGRectMake(0,5,38,38);a.head.bounds=CGRectMake(0,0,38,38);
+         a->m_chatRoomNameLabel=[UIView new];a->m_chatRoomNameLabel.frame=CGRectMake(50,0,150,14);
+         a->m_chatRoomNameLabel.bounds=CGRectMake(0,0,150,14);
+         a.content=[UIView new];a.content.frame=CGRectMake(50,17,200,contentHeight.doubleValue);
+@@ -982,7 +1214,7 @@ int main(void) { @autoreleasepool {
+                 CGFloat height=CSMessageMergeRowHeight(page,t,path,native);[heights addObject:@(height)];
+                 TestCellView *v=[TestCellView new];v.viewModel=page.nodes[i];[views addObject:v];
+                 v.frame=CGRectMake(0,0,320,height);v.bounds=v.frame;
+-                v.head=[UIView new];v.head.frame=CGRectMake(0,named ? 3 : 8,44,44);v.head.bounds=CGRectMake(0,0,44,44);
++                v.head=[UIView new];v.head.frame=CGRectMake(0,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);
+                 v->m_chatRoomNameLabel=[UIView new];v->m_chatRoomNameLabel.frame=CGRectMake(50,0,150,14);
+                 v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,150,14);v->m_chatRoomNameLabel.hidden=!named;
+                 v.content=[UIView new];v.content.frame=CGRectMake(50,y,200,60);v.content.bounds=CGRectMake(0,0,200,60);
+@@ -995,7 +1227,9 @@ int main(void) { @autoreleasepool {
+                     TestCellView *v=views[i];CGRect content=v.content.frame;
+                     CSMessageMergeRender(v);CHECK(CGRectEqualToRect(content,v.content.frame));
+                     BOOL named=[session hasSuffix:@"@chatroom"] && (avatar==2 ? i==0 : i==count-1);
+-                    CHECK(CSMessageMergeRowHeight(page,t,paths[i],named ? 89 : 77)==[heights[i] doubleValue]);
++                    CGFloat measured=CSMessageMergeRowHeight(page,t,paths[i],named ? 89 : 77);
++                    if (measured!=[heights[i] doubleValue]) fprintf(stderr,"group edge mismatch: session=%s avatar=%ld count=%lu mode=%ld row=%lu pass=%lu expected=%g actual=%g\n",session.UTF8String,avatar,count,mode,i,pass,[heights[i] doubleValue],measured);
++                    CHECK(measured==[heights[i] doubleValue]);
+                     if (i) {
+                         TestCellView *prev=views[i-1];
+                         CGFloat gap=[heights[i-1] doubleValue]+v.frame.origin.y+CGRectGetMinY(v.content.frame)-
+@@ -1061,14 +1295,14 @@ int main(void) { @autoreleasepool {
+         UITableView *t=[UITableView new];page.table=t;page.view=t;t.window=window;t.bounds=CGRectMake(0,0,320,500);
+         NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:0];
+         TestCellView *v=[TestCellView new];v.viewModel=page.nodes[0];v.frame=CGRectMake(0,0,320,100);v.bounds=v.frame;
+-        v.head=[UIView new];v.head.frame=CGRectMake(0,8,avatarSize.doubleValue,avatarSize.doubleValue);v.head.bounds=CGRectMake(0,0,avatarSize.doubleValue,avatarSize.doubleValue);
++        v.head=[UIView new];v.head.frame=CGRectMake(0,5,avatarSize.doubleValue,avatarSize.doubleValue);v.head.bounds=CGRectMake(0,0,avatarSize.doubleValue,avatarSize.doubleValue);
+         v.content=[UIView new];v.content.frame=CGRectMake(50,8,200,30);v.content.bounds=CGRectMake(0,0,200,30);v.subviews=@[v.head,v.content];
+         TestTableCell *cell=[TestTableCell new];cell.cellView=v;t.testCells=@{path:cell};t.indexPathsForVisibleRows=@[path];t.testHeights=@[@100,@100];
+         CSMessageMergeActivate(page);CSMessageMergePrepare(page,t,path);
+         CHECK(CSMessageMergeRowHeight(page,t,path,100)==39);
+         CSMessageMergeBind(page,t,path,cell);CSMessageMergeRender(v);CSMessageMergeFlush(page);
+         CHECK(t.updateCount==(avatarSize.doubleValue>38 ? 1 : 0));
+-        CGFloat expected=avatarSize.doubleValue<=38 ? 39 : avatarSize.doubleValue+9;
++        CGFloat expected=avatarSize.doubleValue<=38 ? 39 : avatarSize.doubleValue+6;
+         CHECK(CSMessageMergeRowHeight(page,t,path,100)==expected);
+         for (NSUInteger pass=0;pass<20;pass++) {
+             CSMessageMergeRender(v);CSMessageMergeFlush(page);
+diff --git a/Tests/verify-message-actions-execution.sh b/Tests/verify-message-actions-execution.sh
+index 6134ebb0..b773c17d 100755
+--- a/Tests/verify-message-actions-execution.sh
++++ b/Tests/verify-message-actions-execution.sh
+@@ -28,6 +28,9 @@ extracted=['static CSMessageActionMenuAdapter *menuHookAdapter;']
+ for cls in classes:
+     match=re.search(r'%hook '+cls+r'\n(.*?)%end',menu,re.S)
+     body=re.search(r'- \(id\)operationMenuItems \{.*?\}',match.group(1),re.S).group() if match else '- (id)operationMenuItems { return %orig; }'
++    # This suite exercises the existing message actions with the independent display-edit layer inactive.
++    body=re.sub(r'\[CSClownMenuAdapter itemsByAddingActionsForCell:self items:(\[CSMessageActionMenuAdapter itemsByAddingActionsForCell:self items:%orig\])\]',r'\1',body)
++    assert 'CSClownMenuAdapter' not in body
+     body=body.replace('CSMessageActionMenuAdapter itemsByAddingActionsForCell','menuHookAdapter itemsByAddingActionsForCell').replace('%orig','self.nativeItems')
+     if cls in ('EmoticonMessageCellView','AppEmoticonMessageCellView'):
+         body+='\n- (id)getViewController { return [self.nativeDelegate getViewController]; }'
+diff --git a/Tests/verify-message-gesture.sh b/Tests/verify-message-gesture.sh
+index d4076696..4d5c457a 100755
+--- a/Tests/verify-message-gesture.sh
++++ b/Tests/verify-message-gesture.sh
+@@ -17,5 +17,6 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-p
+  "$project_dir/Tests/MessageUIKit/MessageUIKit.m" "$project_dir/Tests/TimeUIKit/TimeUIKit.m" "$project_dir/Tests/GestureUIKit/GestureUIKit.m" \
+  "$project_dir/Controllers/CSMessageActionPreferences.m" "$project_dir/Controllers/CSMessageActionContext.m" "$project_dir/Controllers/CSMessageActionPolicy.m" \
+  "$project_dir/Controllers/CSMessageGestureAdapter.m" "$project_dir/Controllers/CSMessageCellLifecycle.m" \
++ "$project_dir/Tests/ClownLifecycleDouble.m" \
+  "$project_dir/Tests/MessageGestureAdapterTests.m" -o "$test_dir/tests"
+ "$test_dir/tests"
+diff --git a/Tests/verify-message-time.sh b/Tests/verify-message-time.sh
+index 930c6bc3..41a18f62 100644
+--- a/Tests/verify-message-time.sh
++++ b/Tests/verify-message-time.sh
+@@ -38,5 +38,5 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-p
+  -I"$project_dir/Tests/GestureUIKit" -I"$project_dir/Controllers" -I"$test_dir" \
+  "$project_dir/Tests/MessageUIKit/MessageUIKit.m" "$project_dir/Tests/TimeUIKit/TimeUIKit.m" \
+  "$project_dir/Controllers/CSChatNativeBridge.m" \
+- "$project_dir/Controllers/CSMessageTimeLayout.m" "$project_dir/Controllers/CSMessageCellLifecycle.m" "$project_dir/Tests/TimeUIKit/TimeLifecycleDouble.m" "$project_dir/Tests/MessageTimeHookTests.m" -o "$test_dir/time-tests"
++ "$project_dir/Controllers/CSMessageTimeLayout.m" "$project_dir/Controllers/CSMessageCellLifecycle.m" "$project_dir/Tests/ClownLifecycleDouble.m" "$project_dir/Tests/TimeUIKit/TimeLifecycleDouble.m" "$project_dir/Tests/MessageTimeHookTests.m" -o "$test_dir/time-tests"
+ "$test_dir/time-tests"
+diff --git a/control b/control
+index 5b66b622..19093bc7 100644
+--- a/control
++++ b/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.3-4
++Version: 2.3-8
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会

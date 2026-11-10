@@ -11,6 +11,11 @@ FOUNDATION_EXPORT void CSMessageMergeBind(id controller, UITableView *table, NSI
 FOUNDATION_EXPORT void CSMessageMergeWillMutate(id controller);
 FOUNDATION_EXPORT void CSMessageMergeInvalidateLayout(id controller);
 FOUNDATION_EXPORT void CSMessageMergeDidMutate(id controller);
+// Native history loading anchors by the change in total height. Project that
+// event's totals through the same delegate as the table; keep native caches intact.
+FOUNDATION_EXPORT void CSMessageMergeBeginHistory(id controller);
+FOUNDATION_EXPORT void CSMessageMergeEndHistory(id controller);
+FOUNDATION_EXPORT unsigned long long CSMessageMergeHistoryContentHeight(id controller, unsigned long long nativeHeight);
 FOUNDATION_EXPORT void CSMessageMergeFlush(id controller);
 FOUNDATION_EXPORT void CSMessageMergeRestore(UIView *cellView);
 FOUNDATION_EXPORT void CSMessageMergeRender(UIView *cellView);

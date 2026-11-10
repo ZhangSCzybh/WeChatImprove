@@ -1,0 +1,78 @@
+{
+  "version": "2.3-5",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "snapshot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-235-clown-build-eynv5pdw/source",
+  "builds": [
+    {
+      "scheme": "rootless",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "SCHEME=rootless",
+        "PACKAGE_VERSION=2.3-5",
+        "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-235-clown-build-eynv5pdw/rootless/.theos",
+        "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-235-clown-build-eynv5pdw/rootless",
+        "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-235-clown-build-eynv5pdw/rootless/packages"
+      ],
+      "exit_code": 0,
+      "seconds": 22.61
+    },
+    {
+      "scheme": "rootful",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "SCHEME=rootful",
+        "PACKAGE_VERSION=2.3-5",
+        "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-235-clown-build-eynv5pdw/rootful/.theos",
+        "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-235-clown-build-eynv5pdw/rootful",
+        "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-235-clown-build-eynv5pdw/rootful/packages"
+      ],
+      "exit_code": 0,
+      "seconds": 22.6
+    }
+  ],
+  "packages": [
+    {
+      "Package": "com.wechat.improve",
+      "Version": "2.3-5",
+      "Architecture": "iphoneos-arm64",
+      "scheme": "rootless",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "dylib_sha256": "e4279677fc8a97c498ec7bcc8f9063fcde3b321464cee065045e746074f0a869",
+      "dsym_uuids": {
+        "arm64": "97904D1E-B2E2-3FE3-AD24-0C27B0842624",
+        "arm64e": "2C120096-E202-3504-8616-A64EBC1932F2"
+      }
+    },
+    {
+      "Package": "com.wechat.improve",
+      "Version": "2.3-5",
+      "Architecture": "iphoneos-arm",
+      "scheme": "rootful",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "dylib_sha256": "8cd17a9c92175fc9c1e166a882cbc6937a45e1208fafbed1e50c3882b34cc616",
+      "dsym_uuids": {
+        "arm64": "E087A003-4CBA-34B7-84CB-19DEBB0A965C",
+        "arm64e": "2BF548B4-6629-38B5-BF9F-BFE8EFC4D658"
+      }
+    }
+  ],
+  "artifacts": {
+    "WeChatImprove.dylib": "8cd17a9c92175fc9c1e166a882cbc6937a45e1208fafbed1e50c3882b34cc616",
+    "com.wechat.improve_2.3-5_iphoneos-arm.deb": "4a8bf774a10a8bef20b9bb8690b37a42868901eb6787608ba76d0bcd2e9545c9",
+    "com.wechat.improve_2.3-5_iphoneos-arm64.deb": "7398fc284bc558abe54c9c7a1849a2da1868f9483ad3b0af4c93b1d5b7d4f37a",
+    "com.wechat.improve_2.3-5_symbols.zip": "ca13b615ed404b6b8761d5cb8779b3355426ee23e38cbfb3e7037697fc2adc0c"
+  },
+  "sources_unchanged_during_build": true,
+  "previous_packages_preserved": true,
+  "device_installed": false
+}
