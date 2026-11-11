@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.4-8`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.5-1`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -18,6 +18,7 @@
 | 聊天布局 | 附件布局、信息时间、文本占位、触摸轨迹 | 附件按钮排序与列数、消息时间格式与位置、输入框占位文字与外观、触摸轨迹效果 |
 | 消息操作 | 防止撤回、消息手势、语音转发、复读功能、表情功能、小丑功能 | 防撤回与提示显示；己方/对方消息的左右滑动作；语音转发和消息复读；临时修改当前聊天的文字、时间、图片与转账金额显示 |
 | 群聊工具 | 群聊功能（小丑功能下方） | 自定义入群欢迎与真实 @、本地退群提示及可选本群通知、后台有执行机会时处理群事件、自动保存到通讯录、原生批量退群 |
+| 自动处理 | 自动功能（群聊功能下方） | 拍我回拍及可选撤回、拍我回复、真实 @ 回复、关键词独立规则与引用回复；各模块独立私聊/群聊名单和延迟 |
 | 红包与收款 | 红包功能、自动收款 | 私聊/群聊开关、延迟处理、通知、自动回复和记录；红包另支持群白名单/黑名单、串行领取与汇总 |
 | 密友保护 | 账号与安全 → 捉迷藏呀 | 独立密码、账号隔离、临时显示、已适配界面的隐藏和来电拒接；支持范围与限制见交付记录 |
 | 账号与辅助 | 账号信息、收藏验证、后台模糊、后台运行、游戏辅助 | 账号信息查看、收藏生物认证、后台页面模糊、后台运行辅助、骰子与猜拳结果选择 |
@@ -32,18 +33,20 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；既有适配参考用户提供的 `8.0.80.34` IPA，小丑功能在两版微信中的显示与交互仍待真机验收 |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | `2.4-8` 安装包，包含 arm64／arm64e |
-| Rootful | `2.4-8` 安装包及重签用 dylib，包含 arm64／arm64e |
+| Rootless | `2.5-1` 安装包，包含 arm64／arm64e |
+| Rootful | `2.5-1` 安装包及重签用 dylib，包含 arm64／arm64e |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
 微信私有接口会随版本变化。主机回归和成功打包只能验证相应代码与产物，真实设备上的显示、交互及其他插件组合仍需实际确认。
 
-`2.4-8` 的 Rootless／Rootful 双架构构建和产物核验已完成；十项原回归脚本中九项通过，群聊 manager 仍保留与 `2.4-7` 相同的既有失败：旧断言要求进入后台关闭事件入口并清空待发欢迎，与现有后台处理行为冲突，停止点之后未覆盖。本版未完成真机安装、排版与交互验收，详见 [本版验证记录](docs/audits/2.4-8/README.md)。
+`2.5-1` 针对微信 `8.0.80.34` 修复朋友圈广告评论合并时因不可变数组导致的闪退：归档读取完整原始互动数据，广告数据解码后恢复点赞与评论数组的可变性，保留已有元素、顺序及密友隐藏规则。针对性回归、构建和产物核验见 [2.5-1 验证记录](../WeChatImprove-local-archive/audits/2.5-1/README.md)；iPhone 微信的广告刷新、切页、前后台及锁屏恢复仍待安装复验。
+
+`2.4-10` 修复自动功能的后台消息入口、延迟调度和暂时不可用时丢任务的问题。五项对照取证、修复前后回归与构建产物核验见 [2.4-10 验证记录](../WeChatImprove-local-archive/audits/2.4-10/README.md)。微信仍有执行机会且账号、数据和授权可用时处理；锁屏数据不可用时等待恢复，在到期后 5 分钟内补发一次。系统挂起或进程退出期间不能实时执行，真机实际送达和撤回仍需验收。
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：[2.4-8 Rootless 安装包](packages/2.4-8-group-chat-template-layout/com.wechat.improve_2.4-8_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.4-8-group-chat-template-layout/com.wechat.improve_2.4-8_iphoneos-arm.deb)、[重签用 dylib](packages/2.4-8-group-chat-template-layout/WeChatImprove.dylib)、[调试符号](packages/2.4-8-group-chat-template-layout/symbols.zip) 与 [SHA-256 清单](packages/2.4-8-group-chat-template-layout/SHA256SUMS)。功能范围和验证结果见 [2.4-8 审计记录](docs/audits/2.4-8/README.md)。此前 [2.4-7](packages/2.4-7-group-chat-background-opportunity/)、[2.4-6](packages/2.4-6-group-chat-global-background/)、[2.4-5](packages/2.4-5-group-chat-background/)、[2.4-4](packages/2.4-4-group-chat-notices/)、[2.4-3-1](packages/2.4-3-1-group-chat-welcome-fix/)、[2.4-3](packages/2.4-3-group-chat-tools/) 及更早的安装包继续保留。
+1. 获取与设备注入环境匹配的 `.deb`：[2.5-1 Rootless 安装包](packages/2.5-1-moments-comments/com.wechat.improve_2.5-1_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.5-1-moments-comments/com.wechat.improve_2.5-1_iphoneos-arm.deb)、[重签用 dylib](packages/2.5-1-moments-comments/WeChatImprove.dylib)、[调试符号](packages/2.5-1-moments-comments/symbols.zip) 与 [SHA-256 清单](packages/2.5-1-moments-comments/SHA256SUMS)。功能范围和验证结果见 [2.5-1 审计记录](../WeChatImprove-local-archive/audits/2.5-1/README.md)。2.4-10 与 2.4-9 的历史安装包保留在本机；此前 [2.4-8](packages/2.4-8-group-chat-template-layout/)、[2.4-7](packages/2.4-7-group-chat-background-opportunity/)、[2.4-6](packages/2.4-6-group-chat-global-background/)、[2.4-5](packages/2.4-5-group-chat-background/)、[2.4-4](packages/2.4-4-group-chat-notices/)、[2.4-3-1](packages/2.4-3-1-group-chat-welcome-fix/)、[2.4-3](packages/2.4-3-group-chat-tools/) 及更早的安装包继续保留。
 
    密友头像五击快捷入口不验证身份：任何能操作已解锁手机并到达头像的人，都能查看或修改配置，并经两级确认不可撤销地完整重置当前账号的密友配置。此风险继续存在；修改密码仍须普通入口验证。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
@@ -157,6 +160,19 @@
 
 **版本控制**修改微信返回的版本信息，不执行安装或降级；**更新控制**针对微信内部热更新，App Store 更新由系统管理。
 
+### 自动功能
+
+入口位于“群聊功能”后面。四个模块默认关闭，每块分别使用微信原生选择器选择生效私聊和群聊；空名单不执行。执行延迟为 0–300 秒。
+
+- **拍我自动回拍**：他人拍到自己时延迟回拍；可开启撤回并设置成功回拍后的撤回延迟。只撤回这次自动回拍，遵循微信原生限频和实际撤回窗口。
+- **拍我自动回复**：配置多条文案，触发时随机选一条；可在群聊中真实 @ 拍自己的人。
+- **@我自动回复**：仅原生 @ 名单包含自己的消息触发，纯文本写了“@我”和仅 @所有人不会触发。支持随机文案及群聊中 @ 对方。
+- **关键词自动回复**：每条关键词独立配置回复列表及全匹配、开头匹配或模糊匹配，可排序；第一条命中的有效规则生效。可选择引用原消息，并独立控制是否回复自己、别人。仅匹配本条正文，引用内容不会作为本条关键词命中。
+
+真实 @ 回复优先于关键词回复，固定回复认领后同一事件不再交给 AI；回拍和拍动文字回复可以各执行一次。自动发出的消息不再触发本插件关键词。普通消息及单条引用消息可参与关键词匹配，图片、语音等不参与。
+
+微信进程在前台或后台仍有执行机会时会处理事件，不要求本插件“后台运行”开关开启，也可利用其他插件维持的执行机会。系统挂起时无法实时执行；账号、授权或受保护数据暂不可用时保留任务，恢复或回到前台立即重评估，在到期后 5 分钟内补发一次，超过窗口终止并显示原因；进程重启不恢复待发送任务。修改设置或切换账号取消旧的待发任务，已成功提交的回拍在回拍及撤回开关仍开启时保留原撤回计时。备份只包含配置；恢复后四个模块关闭，本机去重记录保留。
+
 ### 密友保护
 
 入口是 **插件设置 → 账号与安全 → 捉迷藏呀**。当前账号首次默认隐藏；在插件主设置页长按顶部头像 **2 秒**，轻震后显示入口并按账号记住，后台和重启后保留。已有密友密码的账号沿用原入口与隐藏偏好。头像手势只负责首次发现，不启用保护或解锁内容，也不覆盖“隐藏密友设置”。开发分支及验证见 [手势入口记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friend-entry-gesture-2026-10-26/README.md)。进入后先设置独立密码、选择密友或密群，再启用；默认临时显示 300 秒，后台、账号切换及重启后重新隐藏。“首页长按解锁”默认开启，长按微信首页顶部导航栏 1 秒触发临时解锁；开启“生物识别解锁”后需通过系统面容／指纹验证，不可用、取消或失败时转密友密码，关闭时保留直接解锁；可在密友的“账号保护”中关闭，或将“长按触发时长”设为 **0.5–2 秒**，保存后生效。在首页原生搜索框输入完整密友密码也可解锁，不受长按开关影响。**密友隐藏时，搜索不显示“解锁后查看”占位行；原生实时联想、“搜索网络结果”和普通搜索照常工作。** 完整密码匹配后立即清空输入并停止本次搜索。解锁期间恢复隐藏的密友设置入口，不修改隐藏选项。临时解锁期间可正常接听和拨打密友语音／视频通话；重新锁定后恢复来电拒接设置。消息通知由微信及 iOS 原生设置决定，锁定与临时解锁均不再额外静默。朋友圈可见范围图标继续按对应开关处理。“隐藏全部朋友圈可见范围图标”覆盖朋友圈动态流、我的朋友圈列表（含缩略图）和动态详情，关闭后按原始动态恢复图标，不修改实际发布权限。开启图标隐藏时使用已适配的微信原生朋友圈页面；1.9-9 隐藏详情范围图标时保留原生占位及换行，删除按钮保持原位；入口隐藏、生物识别、摇动锁定、长按解锁和时长设置仍归入“账号保护”。详见 [1.9-9 修改与验证记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friend-position-1.9-9/README.md)。开启“摇动立即锁定”后，临时解锁期间轻摇手机即可重新隐藏密友；仅在微信前台检测，锁定或进入后台即停止。
@@ -251,7 +267,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.4-8_iphoneos-arm64.deb`。本轮交付为 [2.4-8 Rootless 安装包](packages/2.4-8-group-chat-template-layout/com.wechat.improve_2.4-8_iphoneos-arm64.deb)。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.5-1_iphoneos-arm64.deb`。本轮交付为 [2.5-1 Rootless 安装包](packages/2.5-1-moments-comments/com.wechat.improve_2.5-1_iphoneos-arm64.deb)。
 
 ### Rootful
 
@@ -260,7 +276,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.4-8_iphoneos-arm.deb`。本轮交付为 [2.4-8 Rootful 安装包](packages/2.4-8-group-chat-template-layout/com.wechat.improve_2.4-8_iphoneos-arm.deb)。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.5-1_iphoneos-arm.deb`。本轮交付为 [2.5-1 Rootful 安装包](packages/2.5-1-moments-comments/com.wechat.improve_2.5-1_iphoneos-arm.deb)。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -284,7 +300,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.4-8-group-chat-template-layout/com.wechat.improve_2.4-8_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.5-1-moments-comments/com.wechat.improve_2.5-1_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。

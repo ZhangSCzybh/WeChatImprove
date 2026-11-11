@@ -34,6 +34,7 @@
 #import "CSImageStickerSettingsViewController.h"
 #import "CSClownSettingsViewController.h"
 #import "CSGroupChatSettingsViewController.h"
+#import "CSAutomationSettingsViewController.h"
 #import "CSScheduledTaskSettingsViewController.h"
 #import "CSResetSettingsViewController.h"
 #import "CSBackupSettingsViewController.h"
@@ -843,6 +844,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     CSSettingItem *imageStickerItem = [CSSettingItem itemWithTitle:@"表情功能" iconName:@"face.smiling" iconColor:UIColor.systemOrangeColor detail:nil];
     CSSettingItem *clownItem = [CSSettingItem itemWithTitle:@"小丑功能" iconName:@"theatermasks.fill" iconColor:UIColor.systemPurpleColor detail:nil];
     CSSettingItem *groupChatToolsItem = [CSSettingItem itemWithTitle:@"群聊功能" iconName:@"person.3.fill" iconColor:UIColor.systemGreenColor detail:nil];
+    CSSettingItem *automationItem = [CSSettingItem itemWithTitle:@"自动功能" iconName:@"bolt.circle.fill" iconColor:UIColor.systemOrangeColor detail:nil];
     CSSettingSection *enhancementSection = [CSSettingSection sectionWithHeader:@"功能增强" 
                                                                       items:@[backgroundRunItem,
                                                                              backgroundBlurItem,
@@ -858,7 +860,8 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                                              scheduledItem,
                                                                              imageStickerItem,
                                                                              clownItem,
-                                                                             groupChatToolsItem]];
+                                                                             groupChatToolsItem,
+                                                                             automationItem]];
     
     // 添加插件设置组
     CSSettingItem *entrySettingsItem = [CSSettingItem itemWithTitle:@"入口设置"
@@ -1117,6 +1120,9 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
         }
         else if ([item.title isEqualToString:@"群聊功能"]) {
             [self.navigationController pushViewController:[[CSGroupChatSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped] animated:YES];
+        }
+        else if ([item.title isEqualToString:@"自动功能"]) {
+            [self.navigationController pushViewController:[[CSAutomationSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped] animated:YES];
         }
         // 处理复读功能点击
         else if ([item.title isEqualToString:@"复读功能"]) {

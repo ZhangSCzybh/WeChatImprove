@@ -1,4 +1,5 @@
 #import "CSAIReplyManager.h"
+#import "CSAutomationManager.h"
 #import "CSAIReplyCoordinator.h"
 #import "CSAIBackgroundSync.h"
 #import "CSAINativeSyncObserver.h"
@@ -563,6 +564,16 @@ BOOL CSAIReplyMessageIngressAllowsSession(id session,NSUInteger epoch) {
 }
 - (void)receiveNativeSession:(id)session wrap:(id)wrap epoch:(NSUInteger)epoch {
     if(!NSThread.isMainThread){if(CSAIReplyMessageIngressAllowsSession(session,epoch))dispatch_async(dispatch_get_main_queue(),^{[self receiveNativeSession:session wrap:wrap epoch:epoch];});return;}
+    // Fixed replies own the shared text action only after a durable admission.
+    // Resolve the optional component by name so focused AI host fixtures retain
+    // their existing dependency boundary.
+    CSAutomationManager *automation=[NSClassFromString(@"CSAutomationManager") sharedManager];
+    if(automation){
+        __weak typeof(self) weakSelf=self;
+        [automation receiveNativeSession:session wrap:wrap epoch:epoch completion:^(BOOL claimed){if(!claimed)[weakSelf receiveAIOnlySession:session wrap:wrap epoch:epoch];}];
+    }else [self receiveAIOnlySession:session wrap:wrap epoch:epoch];
+}
+- (void)receiveAIOnlySession:(id)session wrap:(id)wrap epoch:(NSUInteger)epoch {
     if(epoch!=CSBackupAccountEpoch() || epoch!=self.epoch)return;
     NSDictionary *configuration=self.store.configuration;
     if(!self.store.ready || !self.coordinator || ![configuration[@"enabled"] boolValue])return;

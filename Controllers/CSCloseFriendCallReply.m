@@ -1,3 +1,4 @@
+#import "CSAutomationOwnership.h"
 #import "CSCloseFriendCallAdapter.h"
 #import "CSCloseFriendCallReply.h"
 #import "CSCloseFriendBridge.h"
@@ -189,6 +190,7 @@ static void Prepare(CSCFCallReplyTask *task) {
         task.wrap=wrap;task.submitted=YES;task.prepareAttempts=0;
         SubmittedCalls[task.callKey]=@(ReplyNow());
         Recipients[task.caller]=@{@"call":task.callKey,@"time":@(ReplyNow())};
+        CSAutomationTagOwnedSend(wrap);
         ((void(*)(id,SEL,id,id))objc_msgSend)(manager,NSSelectorFromString(@"AddMsg:MsgWrap:"),task.caller,wrap);
         CSCloseFriendRecordCapability(@"calls.reply.messageABI",YES);
     } @catch (__unused NSException *exception) {

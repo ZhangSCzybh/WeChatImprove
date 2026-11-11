@@ -7,7 +7,7 @@ trap 'rm -rf "$work"' EXIT
 # painting is compiled for iOS separately; no database, service process or account is touched.
 python3 - "$work" <<'PY'
 from pathlib import Path
-import sys
+import os,sys
 out=Path(sys.argv[1])
 def body(source,marker):
  start=source.index(marker); brace=source.index('{',start); depth=0
@@ -16,7 +16,7 @@ def body(source,marker):
   elif source[end]=='}':
    depth-=1
    if not depth: return source[start:end+1]
-s=Path('Controllers/CSCloseFriendTimelineAdapter.m').read_text()
+s=Path(os.environ.get('CS_TIMELINE_ADAPTER_SOURCE','Controllers/CSCloseFriendTimelineAdapter.m')).read_text()
 a=s.index('@interface CSCFTimelineState'); b=s.index('static void ClearLikes')
 (out/'TimelineBodies.h').write_text(s[a:b]+'\n'+'\n'.join(body(s,m) for m in ['static void ClearLikes(', 'static CSCFTimelineState *State(', 'id CSCFTimelineFacade(', 'static CSCFTimelineScope *Enter(', 'static void Leave(', 'static void InvalidateTimeline(id owner) {', 'static void PrepareTimeline(id owner) {', 'static void InstallTimelinePresentation(', 'static NSArray *ProjectedPosts(', 'static BOOL ModelScoped(', 'static NSArray *ProjectedUsers(', 'static BOOL LikesFiltered(', 'static void InstallModel(', 'static void TimelineMethod(']))
 s=Path('Controllers/CSCloseFriendSocialAdapter.m').read_text()

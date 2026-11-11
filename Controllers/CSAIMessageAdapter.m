@@ -1,10 +1,10 @@
 #import "CSAIMessageAdapter.h"
 #import "CSMessageNativeActionAdapter.h"
 #import <objc/runtime.h>
+#import "CSAutomationOwnership.h"
 
-static const void *OwnedKey=&OwnedKey;
-void CSAIMarkOwnedSend(id wrap) { if(wrap)objc_setAssociatedObject(wrap,OwnedKey,@YES,OBJC_ASSOCIATION_RETAIN_NONATOMIC); }
-BOOL CSAIIsOwnedSend(id wrap) { return wrap && [objc_getAssociatedObject(wrap,OwnedKey) boolValue]; }
+void CSAIMarkOwnedSend(id wrap) { CSAutomationTagOwnedSend(wrap); }
+BOOL CSAIIsOwnedSend(id wrap) { return CSAutomationHasOwnedTag(wrap); }
 static NSString *String(id object,NSString *name) {
     id value=CSMessageActionNativeObject(object,name);return [value isKindOfClass:NSString.class]?[value copy]:@"";
 }

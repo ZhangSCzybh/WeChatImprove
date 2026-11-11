@@ -20,6 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable CSMessagePreparedSend *)prepareScheduledText:(NSString *)text targetID:(NSString *)targetID accountID:(NSString *)accountID;
 // Fresh group text with actual native mention metadata. Preparation never sends.
 - (nullable CSMessagePreparedSend *)prepareGroupText:(NSString *)text mentions:(NSArray<NSString *> *)mentions targetID:(NSString *)targetID accountID:(NSString *)accountID;
+// Native type-49/subtype-57 quote construction. Requires a referenceable source
+// from this exact conversation and a positive server identity; never opens UI.
+- (nullable CSMessagePreparedSend *)prepareAutomationQuote:(NSString *)text source:(id)source targetID:(NSString *)targetID accountID:(NSString *)accountID;
 - (nullable CSMessagePreparedSend *)prepareContext:(CSMessageActionContext *)context targetID:(NSString *)targetID voice:(nullable CSMessageVoiceResource *)voice appData:(nullable NSData *)appData appDataPath:(nullable NSString *)path;
 - (nullable CSMessagePreparedSend *)prepareContext:(CSMessageActionContext *)context targetID:(NSString *)targetID voice:(nullable CSMessageVoiceResource *)voice;
 @end

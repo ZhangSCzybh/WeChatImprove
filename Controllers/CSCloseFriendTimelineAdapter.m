@@ -40,6 +40,48 @@ static BOOL SameObjects(NSArray *left,NSArray *right) {
     for(NSUInteger i=0;i<left.count;i++)if(left[i]!=right[i])return NO;
     return YES;
 }
+static void RestoreMutableInteractionUsers(id item,id (*read)(id,SEL),SEL getter,SEL setter) {
+    id source=read(item,getter);
+    if([source isKindOfClass:NSArray.class] && ![source isKindOfClass:NSMutableArray.class])
+        ((void(*)(id,SEL,id))objc_msgSend)(item,setter,[source mutableCopy]);
+}
+static void InstallModelSerialization(void) {
+    Class model=NSClassFromString(@"WCDataItem"),meta=object_getClass(model);
+    SEL encode=NSSelectorFromString(@"encodeWithCoder:"),decode=NSSelectorFromString(@"fromNSCodingBuffer:");
+    SEL likes=NSSelectorFromString(@"likeUsers"),comments=NSSelectorFromString(@"commentUsers");
+    SEL setLikes=NSSelectorFromString(@"setLikeUsers:"),setComments=NSSelectorFromString(@"setCommentUsers:");
+    BOOL ready=RawLikes && RawComments &&
+        CSCloseFriendMethodMatches(class_getInstanceMethod(model,encode),"v@:@") &&
+        CSCloseFriendMethodMatches(class_getInstanceMethod(meta,decode),"@@:@") &&
+        CSCloseFriendMethodMatches(class_getInstanceMethod(model,setLikes),"v@:@") &&
+        CSCloseFriendMethodMatches(class_getInstanceMethod(model,setComments),"v@:@");
+    if(!ready) {CSCloseFriendRecordCapability(@"social.timeline.serialization",NO); return;}
+    // Native archives must retain complete interactions/counts, even when encoding
+    // reenters the model from a scoped UI read (for example WCDataItem.hash).
+    __block IMP rawEncode=NULL;
+    IMP replacement=imp_implementationWithBlock(^(id item,id coder){
+        if(!NSThread.isMainThread) {((void(*)(id,SEL,id))rawEncode)(item,encode,coder); return;}
+        CSCFTimelineScope *saved=Scope; Scope=nil;
+        @try {((void(*)(id,SEL,id))rawEncode)(item,encode,coder);}
+        @finally {Scope=saved;}
+    });
+    if(!CSCloseFriendInstallHook(@"WCDataItem",@"encodeWithCoder:",replacement,&rawEncode,"v@:@")) {
+        imp_removeBlock(replacement);
+        CSCloseFriendRecordCapability(@"social.timeline.serialization",NO); return;
+    }
+    __block IMP rawDecode=NULL;
+    replacement=imp_implementationWithBlock(^id(id cls,id buffer){
+        id item=((id(*)(id,SEL,id))rawDecode)(cls,decode,buffer);
+        if(![item isKindOfClass:model])return item;
+        // Older buffers can contain immutable UI projections. Native ad merging
+        // mutates these arrays; keep all elements/order and existing mutable identity.
+        RestoreMutableInteractionUsers(item,RawLikes,likes,setLikes);
+        RestoreMutableInteractionUsers(item,RawComments,comments,setComments);
+        return item;
+    });
+    MSHookMessageEx(meta,decode,replacement,&rawDecode);
+    CSCloseFriendRecordCapability(@"social.timeline.serialization",rawDecode!=NULL);
+}
 static void ClearInteractionProjections(void) {
     [LikeProjections removeAllObjects]; [CommentProjections removeAllObjects];
     UsersCacheEpoch=CSCloseFriendAccountEpoch();
@@ -215,6 +257,7 @@ static void InstallModel(void) {
         replacement=imp_implementationWithBlock(^int(id object){return ModelScoped(object) && RawLikes && RawComments ? (int)MIN(ProjectedUsers(object,likes).count,INT_MAX) : ((int(*)(id,SEL))raw)(object,sel);});
         if(!CSCloseFriendInstallHook(@"WCDataItem",name,replacement,&raw,"i@:")) imp_removeBlock(replacement);
     }
+    InstallModelSerialization();
     // Native itemID/width caches have no policy revision. Clear before scoped layout reads and
     // after each affected layout read, so filtered styles cannot contaminate an unscoped consumer.
     __block IMP styles=NULL;

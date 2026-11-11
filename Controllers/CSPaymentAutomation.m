@@ -1,3 +1,4 @@
+#import "CSAutomationOwnership.h"
 #import "CSCloseFriendNotificationAdapter.h"
 #import "CSPaymentAutomation.h"
 #import "CSPaymentLedger.h"
@@ -219,6 +220,7 @@ static void CSSend(NSString *content, NSString *session, CSPaymentTask *t) {
         [wrap setValue:content forKey:@"m_nsContent"]; [wrap setValue:t.account forKey:@"m_nsFromUsr"];
         [wrap setValue:session forKey:@"m_nsToUsr"]; [wrap setValue:@((unsigned int)CSNow()) forKey:@"m_uiCreateTime"];
         [wrap setValue:@1 forKey:@"m_uiStatus"];
+        CSAutomationTagOwnedSend(wrap);
         ((void(*)(id,SEL,id,id))objc_msgSend)(mgr,add,session,wrap);
     } @catch (__unused NSException *e) {}
 }

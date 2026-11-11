@@ -47,11 +47,12 @@
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     (void)tableView;
     if(section==0)return self.message.length?self.message:@"未选中的模块和账号保持当前配置。";
-    if(section==2)return @"默认选择当前账号。其他账号的分组始终归属原账号；定时任务仅恢复到原所属的当前账号，恢复后总开关关闭。群聊功能仅恢复原账号配置，重新建立成员基线，不补发历史事件。联系人和群关系仅支持同一本机、同一当前账号操作。";
+    if(section==2)return @"默认选择当前账号。其他账号的分组始终归属原账号；定时任务仅恢复到原所属的当前账号，恢复后总开关关闭。群聊功能仅恢复原账号配置，重新建立成员基线，不补发历史事件。自动功能仅恢复原所属当前账号的规则，恢复后四个模块均关闭，不补发历史事件。联系人和群关系仅支持同一本机、同一当前账号操作。";
     if(section==3)return self.resetting?@"如需保留当前完整配置，请先手动创建备份。已丢失图片无法找回；重启前配置变化会使计划失效。":@"如需保留当前完整配置，请先手动创建备份。重新打开微信时应用；期间配置变化会使计划失效。";
     return nil;
 }
 - (NSString *)changeDescription:(NSDictionary *)change {
+    if([change[@"module"] isEqual:@"automation"])return [change[@"reset"] boolValue]?@"清除当前账号的自动功能规则；运行去重记录、其他账号配置和聊天记录保持不变。":@"恢复当前账号的生效会话、延迟、回复内容和关键词规则；四个模块开关均关闭，不导入待执行动作或运行记录，请检查后手动开启。";
     if([change[@"module"] isEqual:@"group_chat_tools"])return [change[@"reset"] boolValue]?@"清除当前账号的群聊功能配置；其他账号配置、群资料和聊天记录保持不变。":@"恢复当前账号的群聊选择、欢迎与退群文案、发送延迟及群聊功能开关；重新建立成员基线，不恢复待发送欢迎或批量退群任务。";
     if([change[@"module"] isEqual:@"ai_reply"])return [change[@"reset"] boolValue]?@"清除当前账号的 AI 回复配置与运行记录；其他账号保持不变。":@"恢复当前账号的模型地址、预设和会话规则；总开关关闭，需重新输入 API Key 并测试连接。";
     if([change[@"module"] isEqual:@"scheduled_tasks"]){

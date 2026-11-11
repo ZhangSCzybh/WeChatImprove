@@ -1,4 +1,5 @@
 #import "CSMessageSendAdapter.h"
+#import "CSAutomationOwnership.h"
 @interface NSObject (CSMessageWrapConstruction)
 - (instancetype)initWithMsgType:(long long)type;
 @end
@@ -90,6 +91,7 @@ static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArr
             !CSMessageNativeSet(wrap,@"setM_nsContent:",text,YES) || !CSMessageNativeSet(wrap,@"setM_uiCreateTime:",@((unsigned int)NSDate.date.timeIntervalSince1970),YES) ||
             !CSMessageNativeSet(wrap,@"setM_uiStatus:",@1,YES) || !CSMessageNativeSet(wrap,@"setM_uiMesLocalID:",@0,YES) || !CSMessageNativeSet(wrap,@"setM_n64MesSvrID:",@0,YES)) return nil;
         CSMessageNativeSet(wrap,@"setM_nsClientMsgID:",NSUUID.UUID.UUIDString,NO);
+        CSAutomationTagOwnedSend(wrap);
         return CSVoidRoute(manager,@"AddMsg:MsgWrap:",@[targetID,wrap],wrap);
     } @catch (__unused NSException *e) { return nil; }
 }
@@ -109,6 +111,46 @@ static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArr
         if(ids.count && (!CSMessageNativeSupports(route.outputWrap,@"setM_nsAtUserList:",@"v",@[@"@"]) ||
             !CSMessageNativeSet(route.outputWrap,@"setM_nsAtUserList:",[ids.array componentsJoinedByString:@","],YES)))return nil;
         return route;
+    } @catch (__unused NSException *exception) { return nil; }
+}
+- (CSMessagePreparedSend *)prepareAutomationQuote:(NSString *)text source:(id)source targetID:(NSString *)targetID accountID:(NSString *)accountID {
+    if (!NSThread.isMainThread || ![text isKindOfClass:NSString.class] || !text.length || text.length>4000 ||
+        ![targetID isKindOfClass:NSString.class] || !targetID.length || ![accountID isKindOfClass:NSString.class] ||
+        !accountID.length || ![[_environment currentAccountID] isEqual:accountID]) return nil;
+    @try {
+        if (!CSMessageNativeSupports(source,@"m_n64MesSvrID",@"q",@[]) ||
+            [CSMessageNativeInvoke(source,@"m_n64MesSvrID",@[]) longLongValue]<=0 ||
+            !CSMessageNativeSupports(source,@"msgCanBeRefered",@"B",@[]) ||
+            ![CSMessageNativeInvoke(source,@"msgCanBeRefered",@[]) boolValue]) return nil;
+        NSString *from=CSMessageActionNativeObject(source,@"m_nsFromUsr"), *to=CSMessageActionNativeObject(source,@"m_nsToUsr");
+        if (![from isKindOfClass:NSString.class] || ![to isKindOfClass:NSString.class]) return nil;
+        BOOL group=[targetID hasSuffix:@"@chatroom"];
+        BOOL inbound=[from isEqual:targetID] && [to isEqual:accountID];
+        BOOL outbound=[from isEqual:accountID] && [to isEqual:targetID];
+        // A quote must never carry a message from another private chat or room.
+        if (!inbound && !outbound) return nil;
+        if (group && inbound) {
+            NSString *sender=CSMessageActionNativeObject(source,@"m_nsRealChatUsr");
+            if (![sender isKindOfClass:NSString.class] || !sender.length || [sender hasSuffix:@"@chatroom"]) return nil;
+        }
+        id manager=[_environment serviceNamed:@"CMessageMgr"], wrap=CSFreshWrap(49);
+        if (!wrap || !CSMessageNativeSupports(manager,@"AddMsg:MsgWrap:",@"v",@[@"@",@"@"]) ||
+            !CSMessageNativeSupports(wrap,@"updateForReferMsg:replyContent:",@"v",@[@"@",@"@"]) ||
+            !CSMessageNativeSupports(wrap,@"UpdateMsgSource",@"v",@[]) ||
+            !CSMessageNativeSupports(wrap,@"m_nsContent",@"@",@[]) ||
+            !CSMessageNativeSupports(wrap,@"setM_uiAppMsgInnerType:",@"v",@[@"I"]) ||
+            !CSResetSendWrapForAccount(wrap,accountID,targetID) ||
+            !CSMessageNativeSet(wrap,@"setM_uiAppMsgInnerType:",@57,YES)) return nil;
+        // 8.0.80.34's native SendTextMessage:replyingMessage:isPasted: uses this
+        // model builder after filling the envelope. It preserves group sender
+        // identity and performs the native XML escaping in UpdateContent:.
+        CSMessageNativeInvoke(wrap,@"updateForReferMsg:replyContent:",@[source,text]);
+        NSString *content=CSMessageActionNativeObject(wrap,@"m_nsContent");
+        if (![content isKindOfClass:NSString.class] || !content.length ||
+            ![[_environment currentAccountID] isEqual:accountID]) return nil;
+        CSMessageNativeInvoke(wrap,@"UpdateMsgSource",@[]);
+        CSAutomationTagOwnedSend(wrap);
+        return CSVoidRoute(manager,@"AddMsg:MsgWrap:",@[targetID,wrap],wrap);
     } @catch (__unused NSException *exception) { return nil; }
 }
 - (CSMessagePreparedSend *)prepareContext:(CSMessageActionContext *)context targetID:(NSString *)targetID voice:(CSMessageVoiceResource *)voice {

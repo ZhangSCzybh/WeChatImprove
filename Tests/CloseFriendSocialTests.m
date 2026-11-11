@@ -31,6 +31,7 @@ static BOOL CSCFSocialGate(id owner,CSCloseFriendSurface surface,BOOL force) {
 }
 static BOOL CSCFUnreadBegin(void) {return NO;}
 static void CSCFUnreadEnd(__unused BOOL previous) {}
+static void CSCloseFriendRecordCapability(__unused NSString *name,__unused BOOL available) {}
 static CSCloseFriendSocialProjection *CSCFSocialProject(NSArray *source,CSCloseFriendSurface surface) {return [[CSCloseFriendSocialProjection alloc] initWithSource:source snapshot:Snapshot surface:surface read:^id(id item,NSString *key){return CSCloseFriendRead(item,key);}];}
 static BOOL CSCFSocialHidden(id object,CSCloseFriendSurface surface) {return CSCloseFriendSocialObjectHidden(object,Snapshot,surface,^id(id item,NSString *key){return CSCloseFriendRead(item,key);});}
 static NSMutableSet *InstalledHooks;
@@ -41,6 +42,11 @@ static BOOL CSCloseFriendInstallHook(NSString *cls,NSString *name,IMP replacemen
     if(!InstalledHooks)InstalledHooks=[NSMutableSet new]; [InstalledHooks addObject:[cls stringByAppendingFormat:@".%@",name]];
     // MSHookMessageEx creates a class-local override for inherited lifecycle methods.
     class_replaceMethod(NSClassFromString(cls),NSSelectorFromString(name),replacement,method_getTypeEncoding(m)); return YES;
+}
+static void MSHookMessageEx(Class cls,SEL selector,IMP replacement,IMP *original) {
+    Method method=class_getInstanceMethod(cls,selector);
+    *original=method_getImplementation(method);
+    class_replaceMethod(cls,selector,replacement,method_getTypeEncoding(method));
 }
 static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(void))) {
     __block IMP original=NULL; SEL selector=NSSelectorFromString(name);
@@ -56,17 +62,50 @@ static void CSCFSocialHook0(NSString *cls,NSString *name,void(^body)(id,void(^)(
 - (NSInteger)row {return (NSInteger)[self indexAtPosition:1];}
 - (NSInteger)section {return (NSInteger)[self indexAtPosition:0];}
 @end
-@interface WCDataItem : NSObject
+@interface WCDataItem : NSObject <NSCoding>
 @property(nonatomic,copy) NSString *username,*itemID;
 @property(nonatomic,strong) NSArray *likeUsers,*commentUsers;
 @property(nonatomic) BOOL isPrivate;
 @property(nonatomic,copy) NSSet *selectContacts,*selectTags;
+@property(nonatomic) NSInteger archivedLikeCount,archivedCommentCount;
 - (int)likeCount;
 - (int)commentCount;
++ (instancetype)fromNSCodingBuffer:(NSData *)data;
 @end
+static NSArray *TimelineFactoryDecodedLikes,*TimelineFactoryDecodedComments;
+static BOOL TimelineFactoryThrows,TimelineFactoryReturnsNil;
 @implementation WCDataItem
 - (int)likeCount {return (int)_likeUsers.count;}
 - (int)commentCount {return (int)_commentUsers.count;}
+// Native WCDataItem archives its getters and counts, then retains decoded
+// arrays through its setters. UI projections must not escape this contract.
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeObject:self.likeUsers forKey:@"likes"];
+    [coder encodeObject:self.commentUsers forKey:@"comments"];
+    [coder encodeInteger:self.likeCount forKey:@"likeCount"];
+    [coder encodeInteger:self.commentCount forKey:@"commentCount"];
+}
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    if((self=[super init])) {
+        self.likeUsers=[coder decodeObjectForKey:@"likes"];
+        self.commentUsers=[coder decodeObjectForKey:@"comments"];
+        self.archivedLikeCount=[coder decodeIntegerForKey:@"likeCount"];
+        self.archivedCommentCount=[coder decodeIntegerForKey:@"commentCount"];
+    }
+    return self;
+}
++ (instancetype)fromNSCodingBuffer:(NSData *)data {
+    if(TimelineFactoryThrows)@throw [NSException exceptionWithName:@"TimelineNativeDecodeFailure" reason:@"native decoder failed" userInfo:nil];
+    if(TimelineFactoryReturnsNil)return nil;
+    NSError *error=nil;
+    NSKeyedUnarchiver *decoder=[[NSKeyedUnarchiver alloc]initForReadingFromData:data error:&error];
+    if(!decoder || error)return nil;
+    decoder.requiresSecureCoding=NO;
+    WCDataItem *item=[decoder decodeObjectForKey:NSKeyedArchiveRootObjectKey];
+    [decoder finishDecoding];
+    TimelineFactoryDecodedLikes=item.likeUsers;TimelineFactoryDecodedComments=item.commentUsers;
+    return item;
+}
 @end
 @interface WCFacade : NSObject
 @property(nonatomic,strong) NSArray *source;
@@ -211,10 +250,12 @@ static void Policy(BOOL revealed,NSUInteger revision) {
 #include "CloseFriendSocialRouteFixture.h"
 #include "CloseFriendTimelinePresentationTests.h"
 #include "CloseFriendTimelineCacheTests.h"
+#include "CloseFriendTimelineArchiveTests.h"
 int main(void) { @autoreleasepool {
     Check(TestSocialRoutes()==0);
     Policy(NO,1); InstallModel();
     Check(TestTimelineCacheNativeCallbacks()==0);
+    Check(TestTimelineArchiveBoundaries()==0);
     Policy(NO,1);
     TableMethod(@"tableView:cellForRowAtIndexPath:","@@:@@"); TableMethod(@"tableView:heightForRowAtIndexPath:","d@:@@");
     NSDictionary *ordinary=@{@"username":@"alice"}, *hidden=@{@"username":@"secret"}, *reply=@{@"username":@"alice",@"refUserName":@"secret"};

@@ -8,6 +8,7 @@
 #import "CSScheduledTaskStore.h"
 #import "CSAIReplyStore.h"
 #import "CSGroupChatStore.h"
+#import "CSAutomationStore.h"
 #import <sys/stat.h>
 static NSString *const Profiles=@"com.wechat.enhance.chat_group.account_profiles";
 static NSString *const Selection=@"com.wechat.enhance.chat_group.selection.";
@@ -90,7 +91,7 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
 - (NSArray *)rawFields:(NSError **)error {
     NSArray *fields=[self preferenceFields:error];if(!fields)return nil;
     NSMutableArray *result=[fields mutableCopy];NSString *account=self.context()[@"account"];
-    if(account.length){NSDictionary *scheduled=[self scheduledFieldForAccount:account error:error];if(!scheduled)return nil;if([scheduled[@"present"] boolValue])[result addObject:scheduled];NSDictionary *ai=[self aiFieldForAccount:account error:error];if(!ai)return nil;if([ai[@"present"] boolValue])[result addObject:ai];NSDictionary *groups=[self groupChatFieldForAccount:account error:error];if(!groups)return nil;if([groups[@"present"] boolValue])[result addObject:groups];}
+    if(account.length){NSDictionary *scheduled=[self scheduledFieldForAccount:account error:error];if(!scheduled)return nil;if([scheduled[@"present"] boolValue])[result addObject:scheduled];NSDictionary *ai=[self aiFieldForAccount:account error:error];if(!ai)return nil;if([ai[@"present"] boolValue])[result addObject:ai];NSDictionary *groups=[self groupChatFieldForAccount:account error:error];if(!groups)return nil;if([groups[@"present"] boolValue])[result addObject:groups];NSDictionary *automation=[self automationFieldForAccount:account error:error];if(!automation)return nil;if([automation[@"present"] boolValue])[result addObject:automation];}
     [result sortUsingComparator:^NSComparisonResult(NSDictionary *a,NSDictionary *b){return [Identity(a) compare:Identity(b)];}];return result;
 }
 - (NSDictionary *)scheduledFieldForAccount:(NSString *)account error:(NSError **)error {
@@ -110,6 +111,13 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     NSError *failure=nil;NSDictionary *state=CSGroupChatReadState(CSGroupChatFileURL(self.resourceRoot,account),account,&failure);
     if(failure){if(error)*error=failure;return nil;}
     NSMutableDictionary *field=[@{@"domain":CSGroupChatBackupDomain,@"key":account,@"present":state?@YES:@NO} mutableCopy];if(state)field[@"value"]=state;return field;
+}
+- (NSDictionary *)automationFieldForAccount:(NSString *)account error:(NSError **)error {
+    if(![CSBackupRegistry entryForDomain:CSAutomationBackupDomain key:account]){EngineFail(error,@"自动功能配置所属账号无效");return nil;}
+    NSError *failure=nil;NSDictionary *state=CSAutomationReadState(CSAutomationFileURL(self.resourceRoot,account),account,&failure);
+    if(failure){if(error)*error=failure;return nil;}
+    // Only the portable configuration file is read; the owned-action ledger stays local.
+    NSMutableDictionary *field=[@{@"domain":CSAutomationBackupDomain,@"key":account,@"present":state?@YES:@NO} mutableCopy];if(state)field[@"value"]=state;return field;
 }
 - (NSArray *)readRawFields:(NSError **)error {
     NSMutableDictionary *values=[NSMutableDictionary dictionary];
@@ -213,6 +221,14 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
         }else if([f[@"domain"] isEqual:CSGroupChatBackupDomain]) {
             if(![accounts containsObject:key] || ![key isEqual:context[@"account"]] || ![key isEqual:source[@"account"]]){[warnings addObject:@"已跳过其他账号的群聊功能配置：请登录备份原账号后恢复。"];continue;}
             if([f[@"present"] boolValue])[warnings addObject:@"群聊功能恢复所选群、文案、延迟和开关；重新建立成员基线，不导入待发送欢迎或批量退群任务，也不补发历史事件。"];
+        }else if([f[@"domain"] isEqual:CSAutomationBackupDomain]) {
+            if(![accounts containsObject:key] || ![key isEqual:context[@"account"]] || ![key isEqual:source[@"account"]]){[warnings addObject:@"已跳过其他账号的自动功能配置：请登录备份原账号后恢复。"];continue;}
+            if([f[@"present"] boolValue]){
+                NSMutableDictionary *state=[f[@"value"] mutableCopy],*configuration=[state[@"configuration"] mutableCopy];
+                for(NSString *module in @[@"patBack",@"patReply",@"mentionReply",@"keywordReply"]){NSMutableDictionary *value=[configuration[module] mutableCopy];value[@"enabled"]=@NO;configuration[module]=value;}
+                state[@"configuration"]=configuration;f[@"value"]=state;
+                [warnings addObject:@"自动功能恢复后四个模块开关均关闭；只恢复会话名单、延迟、回复内容和关键词规则，不导入待执行动作或运行记录。请检查后手动开启，不补发历史事件。"];
+            }
         }else if([key isEqual:Profiles]) {
             if(!accounts.count)continue;
             NSDictionary *old=byID[Identity(f)][@"value"]?:@{};NSMutableDictionary *merged=[old mutableCopy];NSDictionary *incoming=f[@"value"]?:@{};
@@ -231,8 +247,8 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     NSArray *raw=[self preferenceFields:error];if(!raw)return nil;NSMutableDictionary *byID=[NSMutableDictionary dictionary];for(NSDictionary *f in raw)byID[Identity(f)]=f;
     NSMutableArray *result=[NSMutableArray array];for(NSDictionary *f in fields){
         // Rollback may run after an account change; verify the journal's original file.
-        NSDictionary *before=[f[@"domain"] isEqual:CSScheduledTaskBackupDomain]?[self scheduledFieldForAccount:f[@"key"] error:error]:([f[@"domain"] isEqual:CSAIReplyBackupDomain]?[self aiFieldForAccount:f[@"key"] error:error]:([f[@"domain"] isEqual:CSGroupChatBackupDomain]?[self groupChatFieldForAccount:f[@"key"] error:error]:byID[Identity(f)]));
-        if(([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]||[f[@"domain"] isEqual:CSAIReplyBackupDomain]||[f[@"domain"] isEqual:CSGroupChatBackupDomain])&&!before)return nil;
+        NSDictionary *before=[f[@"domain"] isEqual:CSScheduledTaskBackupDomain]?[self scheduledFieldForAccount:f[@"key"] error:error]:([f[@"domain"] isEqual:CSAIReplyBackupDomain]?[self aiFieldForAccount:f[@"key"] error:error]:([f[@"domain"] isEqual:CSGroupChatBackupDomain]?[self groupChatFieldForAccount:f[@"key"] error:error]:([f[@"domain"] isEqual:CSAutomationBackupDomain]?[self automationFieldForAccount:f[@"key"] error:error]:byID[Identity(f)])));
+        if(([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]||[f[@"domain"] isEqual:CSAIReplyBackupDomain]||[f[@"domain"] isEqual:CSGroupChatBackupDomain]||[f[@"domain"] isEqual:CSAutomationBackupDomain])&&!before)return nil;
         [result addObject:before?:@{@"domain":f[@"domain"],@"key":f[@"key"],@"present":@NO}];
     }return result;
 }
@@ -269,6 +285,7 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
         NSMutableSet *seen=[NSMutableSet set];for(NSDictionary *f in fields){if(![f isKindOfClass:NSDictionary.class])return EngineFail(error,@"恢复字段损坏");NSDictionary *entry=[CSBackupRegistry entryForDomain:f[@"domain"] key:f[@"key"]];if(!entry||![f[@"present"] isKindOfClass:NSNumber.class]||[seen containsObject:Identity(f)])return EngineFail(error,@"恢复日志包含未登记或重复的配置");[seen addObject:Identity(f)];if([f[@"present"] boolValue]&&![CSBackupRegistry validateValue:f[@"value"] entry:entry error:error])return NO;
             if([f[@"domain"] isEqual:CSAIReplyBackupDomain]&&(![f[@"key"] isEqual:journal[@"account"]]||([f[@"present"] boolValue]&&(!f[@"value"][@"history"]||!f[@"value"][@"handled"]))))return EngineFail(error,@"AI 回复恢复日志所属账号或状态无效");
             if([f[@"domain"] isEqual:CSGroupChatBackupDomain]&&![f[@"key"] isEqual:journal[@"account"]])return EngineFail(error,@"群聊功能恢复日志所属账号无效");
+            if([f[@"domain"] isEqual:CSAutomationBackupDomain]&&![f[@"key"] isEqual:journal[@"account"]])return EngineFail(error,@"自动功能恢复日志所属账号无效");
             if([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]&&(![f[@"key"] isEqual:journal[@"account"]]||([f[@"present"] boolValue]&&!f[@"value"][@"history"])))return EngineFail(error,@"定时任务恢复日志所属账号或状态无效");}
     }
     for(NSString *part in @[@"beforeWrites",@"afterWrites"]){NSDictionary *writes=journal[part];if(![writes isKindOfClass:NSDictionary.class]||writes.count>256)return EngineFail(error,@"恢复日志资源无效");
@@ -305,6 +322,14 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
             if(!ok){if(error)*error=failure;return NO;}
             if(self.checkpoint)self.checkpoint(@"group-chat-tools");continue;
         }
+        if([f[@"domain"] isEqual:CSAutomationBackupDomain]){
+            NSURL *url=CSAutomationFileURL(self.resourceRoot,f[@"key"]);NSDictionary *details=@{@"path":url.path,@"action":[f[@"present"] boolValue]?@"write":@"reset"};
+            [self.store recordRestoreStage:@"write-automation" status:@"started" error:nil details:details];NSError *failure=nil;
+            BOOL ok=CSAutomationWriteState([f[@"present"] boolValue]?f[@"value"]:nil,url,f[@"key"],&failure);
+            [self.store recordRestoreStage:@"write-automation" status:ok?@"ok":@"failed" error:failure details:details];
+            if(!ok){if(error)*error=failure;return NO;}
+            if(self.checkpoint)self.checkpoint(@"automation");continue;
+        }
         if([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]){
             NSURL *url=CSScheduledTaskFileURL(self.resourceRoot,f[@"key"]);NSDictionary *details=@{@"path":url.path,@"action":[f[@"present"] boolValue]?@"write":@"reset"};
             [self.store recordRestoreStage:@"write-scheduled-tasks" status:@"started" error:nil details:details];NSError *failure=nil;
@@ -318,6 +343,9 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     if(context&&![context isEqual:self.context()])return EngineFail(error,@"恢复期间账号发生变化");
     BOOL verified=[self verifyFields:fields writes:writes error:error];
     if(context&&![context isEqual:self.context()])return EngineFail(error,@"核验期间账号发生变化");
+    if(verified)for(NSDictionary *field in fields)if([field[@"domain"] isEqual:CSAutomationBackupDomain]){
+        dispatch_async(dispatch_get_main_queue(),^{[NSNotificationCenter.defaultCenter postNotificationName:@"CSAutomationRestoreDidComplete" object:nil];});break;
+    }
     return verified;
 }
 - (BOOL)verifyFields:(NSArray *)fields writes:(NSDictionary *)writes error:(NSError **)error {
