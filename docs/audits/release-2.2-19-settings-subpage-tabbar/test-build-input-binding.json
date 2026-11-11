@@ -1,7 +1,0 @@
-{
-  "source_file_count": 42522,
-  "test_build_inputs_identical": true,
-  "test_manifest": "release-core-revalidation/production-before.json",
-  "build_manifest": "delivery-build/production-inputs.json.files",
-  "device_validated": false
-}

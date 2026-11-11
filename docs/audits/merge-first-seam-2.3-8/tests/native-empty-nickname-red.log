@@ -1,2 +1,0 @@
-native-avatar-wrapper scenario=incoming-named initialChildState=0 pass=0 seam=1 gap=34.00 firstHeight=90.00 finalFirstHeight=90.00
-FAIL line 317: fabs(gap-2)<.01

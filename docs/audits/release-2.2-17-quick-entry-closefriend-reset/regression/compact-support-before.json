@@ -1,7 +1,0 @@
-{
-  "source_audit": "docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry",
-  "files": {
-    "BubbleUIKit/BubbleUIKit-production.m": "49a1f25b6070f567b4c8eea718ed26339ce9bb11c336dbd6b5c3fd93091654a7"
-  },
-  "reason": "Existing 2.2-15/2.2-16 production-mode UIKit support, additional to the seven original compact fixtures."
-}

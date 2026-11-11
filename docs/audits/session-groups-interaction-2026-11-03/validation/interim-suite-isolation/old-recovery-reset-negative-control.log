@@ -1,7 +1,0 @@
-Selection equivalence: 24 source/fold/privacy/duplicate/capability cases, 144 group transitions; no native unread getter reads for selection.
-Coordinator selection preset_1: 0 native unread getter reads
-Coordinator selection preset_2: 0 native unread getter reads
-Coordinator selection preset_0: 0 native unread getter reads
-Coordinator selection preset_1: 0 native unread getter reads
-Coordinator selection preset_0: 0 native unread getter reads
-FAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-interaction-2026-11-03/validation/BlankRegressionFixture.h:228: !failing.publishing && failing.nativeRecoveryAttempts==1 && failing.nativeRecoveryGeneration==recoveryGeneration

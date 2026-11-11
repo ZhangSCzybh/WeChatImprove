@@ -1,4 +1,0 @@
-FAIL line 332: quick reset enters first confirmation instead of rejection
-FAIL line 349: runtime supports scoped preparation
-FAIL line 358: missing-auth valid policy enters quick reset explanation
-Quick reset: 54 checks, 3 failures

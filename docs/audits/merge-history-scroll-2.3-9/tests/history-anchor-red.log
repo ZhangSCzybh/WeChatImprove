@@ -1,2 +1,0 @@
-history-anchor variant=0 motion=0 batch=0 nativeDelta=246.00 tableDelta=156.00 anchorDrift=-90.00
-FAIL line 388: fabs(actualScreenY-expectedScreenY)<.01

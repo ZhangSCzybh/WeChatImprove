@@ -1,3 +1,0 @@
-FAIL line 84: fabs(height-expected)<.01
-
-exit_code=1

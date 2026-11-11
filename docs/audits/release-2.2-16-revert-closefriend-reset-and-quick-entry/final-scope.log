@@ -1,4 +1,0 @@
-Scope vs frozen 2.2-15: 13 files, +204 / -195 lines.
-Historical packages: 189/189; main .theos: 1237/1237.
-Original fixtures: all_copied_prior_fixtures 314/314, legacy 277/277, compact 7/7
-Final scope/protection: PASS

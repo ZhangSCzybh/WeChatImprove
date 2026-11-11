@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-16-revert-closefriend-reset-and-quick-entry/regression/fixture-project/Tests/extract-group-viewport.py", line 22, in <module>
-    assert marker in ["- (BOOL)hasScrollableContent", "- (BOOL)canRestoreAnchor"]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError

@@ -1,3 +1,0 @@
-{"checks":135,"failures":2,"stable_iterations":1000,"stable_visual_writes":0,"stable_text_measurements":0,"stable_synchronous_layouts":0}
-FAIL: same target nonanimated update cancels in-flight animation without geometry writes
-FAIL: animation-disable acknowledgement cancels transition without forcing layout

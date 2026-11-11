@@ -1,5 +1,0 @@
-In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Hooks/SessionGroupPerformanceObservation.xm:53:
-/Users/zhangshichao/theos/vendor/include/substrate.h:1:10: fatal error: 'CydiaSubstrate/CydiaSubstrate.h' file not found
-    1 | #include <CydiaSubstrate/CydiaSubstrate.h>
-      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-1 error generated.

@@ -1,3 +1,0 @@
-FAIL line 322: quick reset enters first confirmation instead of rejection
-FAIL line 339: runtime supports scoped preparation
-Quick reset: 43 checks, 2 failures

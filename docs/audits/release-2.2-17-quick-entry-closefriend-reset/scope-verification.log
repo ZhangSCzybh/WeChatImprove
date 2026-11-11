@@ -1,5 +1,0 @@
-Scope vs frozen 2.2-16: 10 files, +83 / -27 lines.
-Historical packages: 194/194; main .theos: 1237/1237.
-Original fixtures: all_copied_prior_fixtures 314/314, legacy 277/277, compact 7/7, compact_with_existing_production_support 8/8
-Scope/protection: PASS
-Build/release status is separate; delivery present=True

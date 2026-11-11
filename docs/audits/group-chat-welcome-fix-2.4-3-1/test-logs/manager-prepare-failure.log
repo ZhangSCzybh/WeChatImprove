@@ -1,2 +1,0 @@
-prepare-failure evidence: prepareFails=1, submitAttempts=0, nativeHandoffs=0, status=当前无法发送群欢迎消息，请检查微信版本和群状态。
-Group chat welcome prepare-failure: 6 checks passed

@@ -1,7 +1,0 @@
-{
-  "scenario": "idle-confirmed",
-  "eligible_for_final_comparison": true,
-  "operator_reply": "静置重采时全程未触屏",
-  "confirmed_at": "2026-11-03T16:04:35.365704+08:00",
-  "limitations": "User confirms no touch throughout recaptured idle."
-}

@@ -1,2 +1,0 @@
-submit-failure evidence: prepareFails=0, submitAttempts=1, nativeHandoffs=0, status=欢迎消息未提交：群成员或发送条件已变化。
-Group chat welcome submit-failure: 6 checks passed

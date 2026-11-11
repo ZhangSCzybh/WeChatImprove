@@ -1,8 +1,0 @@
-{
-  "source": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-17-quick-entry-closefriend-reset/release-authorized-revalidation",
-  "copied_fixture_count": 311,
-  "fixture_bytes_unchanged": true,
-  "new_quick_reset_sha256": "6bf19aeff02a07aabfe3ae362141a12e8ce4338a3d5ddf5f10319f38a9fdf233",
-  "new_password_sha256": "78236ce49d8e0c6fd8b756ef81fd077d496971051e82b37ffd1a6c910ff1f2fd",
-  "runner_adaptations": "Top-level tasks add unchanged QuickResetTests and NewPasswordTests; output/temp directory label changes only. No fixture, assertion or expected result edits."
-}

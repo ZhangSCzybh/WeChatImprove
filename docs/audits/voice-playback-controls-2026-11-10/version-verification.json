@@ -1,7 +1,0 @@
-{
-  "status": "passed",
-  "version": "2.4-2",
-  "old_release_notes_preserved_exactly": true,
-  "new_release_notes_count": 3,
-  "scope": "progress only; full bubble fill and horizontal scrubbing; existing native speed unchanged"
-}

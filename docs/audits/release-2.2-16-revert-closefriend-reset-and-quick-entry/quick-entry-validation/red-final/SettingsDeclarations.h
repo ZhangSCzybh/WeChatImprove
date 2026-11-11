@@ -1,2 +1,0 @@
-- (BOOL)authorized;
-- (void)save:(NSDictionary *)profile;

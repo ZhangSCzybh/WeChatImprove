@@ -1,7 +1,0 @@
-baseline 8.0.78 accepted=True PASS: 17566 native adapter/navigation lifecycle checks (UIKit double)
-baseline 8.0.80 accepted=True FAIL line 434: compact==(variant>=6 ? 55 : 36)
-baseline 8.0.80.34 accepted=True FAIL line 434: compact==(variant>=6 ? 55 : 36)
-current 8.0.78 accepted=True PASS: 17566 native adapter/navigation lifecycle checks (UIKit double)
-current 8.0.80 accepted=True PASS: 17566 native adapter/navigation lifecycle checks (UIKit double)
-current 8.0.80.34 accepted=True PASS: 17566 native adapter/navigation lifecycle checks (UIKit double)
-PASS: 235148 message merge/navigation checks

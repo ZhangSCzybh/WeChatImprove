@@ -1,7 +1,0 @@
-{
-  "expected_failure": true,
-  "exit_code": 1,
-  "production_adapter_unchanged": true,
-  "restored_behavior": "Only in the temporary extracted notification body: if (!self.publishing) reset nativeRecoveryAttempts/nativeRecoveryGeneration.",
-  "output": "FAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-blank-2026-11-03/validation/BlankRegressionFixture.h:228: !failing.publishing && failing.nativeRecoveryAttempts==1 && failing.nativeRecoveryGeneration==recoveryGeneration\n"
-}

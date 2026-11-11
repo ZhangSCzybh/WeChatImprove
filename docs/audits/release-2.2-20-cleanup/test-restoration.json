@@ -1,9 +1,0 @@
-{
-  "source": "git archive HEAD Tests",
-  "authorization": "User reply: 恢复测试文件并保留测试套件（推荐）",
-  "files": 277,
-  "changed_assertions": false,
-  "mode_restored_from_git_tree": true,
-  "verified_bytes_and_modes": 277,
-  "executable_modes_restored": 40
-}

@@ -1,1 +1,0 @@
-FAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-scroll-position-2026-11-03/validation/CompatibilityPublicationFixture.h:114: table.reloads==0 && table.rowReloads.count==1 && [table.rowReloads[0] isEqual:Path(0)]

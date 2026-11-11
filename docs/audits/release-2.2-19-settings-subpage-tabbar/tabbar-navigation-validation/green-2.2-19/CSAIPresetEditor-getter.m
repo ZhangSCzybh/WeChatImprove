@@ -1,1 +1,0 @@
-- (BOOL)hidesBottomBarWhenPushed { return YES; }

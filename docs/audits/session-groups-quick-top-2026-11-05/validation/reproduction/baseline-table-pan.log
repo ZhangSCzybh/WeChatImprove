@@ -1,2 +1,0 @@
-Height mismatch native=1 selected=preset_0 actual=1150.000 expected=0.000 dirty=0 publishing=0 pendingGeo=0
-FAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-quick-top-2026-11-05/validation/ScrollPositionFixture.h:78: fabs(ScrollHeight(r)-expected)<.01

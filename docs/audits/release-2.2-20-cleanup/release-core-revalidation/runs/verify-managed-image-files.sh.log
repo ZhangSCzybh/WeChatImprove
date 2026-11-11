@@ -1,3 +1,0 @@
-Managed image deletion: 125 checks passed
-2026-11-06 11:30:49.391 integration[7666:53697605] 创建图片资源目录失败: The file “WeChatImprove” couldn’t be saved in the folder “Preferences” because a file with the same name already exists.
-Managed image cleanup integration: 29 checks passed

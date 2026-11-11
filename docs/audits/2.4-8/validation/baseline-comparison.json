@@ -1,9 +1,0 @@
-{
-  "tests_hashes_unchanged_after_validation": true,
-  "tests_visible_top_level": 307,
-  "manager_failure_matches_2_4_7_byte_for_byte": true,
-  "manager_failure_message": "FAIL: background disables ingress and clears pending welcome",
-  "manager_failure_source": "Tests/GroupChatManagerTests.m:289",
-  "compact1436": "144 historical baseline failures; not rerun, fixed, waived, or treated as packaging blocker",
-  "scripts_modified": false
-}

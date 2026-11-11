@@ -1,9 +1,0 @@
-{
-  "open": false,
-  "analysis_activity": {
-    "status": "not_observed",
-    "providers": []
-  },
-  "analysis_provider_binding": null,
-  "retained_statement": "close_binary returned {result:null} before this final state check; only target binding was used. Native metadata/disassembly performed by recorded offline companion tools."
-}

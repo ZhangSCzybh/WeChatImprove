@@ -1,2 +1,0 @@
-Baseline compatibility: offscreen unread performs synchronous layout; known content refreshes both visible rows.
-Compatibility publication and refresh: 3 behavior checks passed

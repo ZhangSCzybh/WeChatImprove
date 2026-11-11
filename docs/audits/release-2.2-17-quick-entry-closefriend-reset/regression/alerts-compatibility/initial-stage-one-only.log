@@ -1,9 +1,0 @@
-Close-friend alerts: 248 focused checks passed (identity, calls, reply, badge, payment policy)
-In file included from Tests/CloseFriendTabBadgeTests.m:51:
-/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.v19X4Qyntn/TabBadgeGetter.inc:30:27: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'
-   30 |         else if (!adapter.usesNativeSessionModel && !adapter.changeDepth && !adapter.dirty && adapter.cachedNativeSections && adapter.snapshotRevision==revision &&
-      |                           ^
-/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/tmp.v19X4Qyntn/TabBadgeGetter.inc:37:64: error: property 'tabBadgeScheduleKey' not found on object of type 'CSGroupListAdapter *'
-   37 |                 (!adapter.tabBadgeSourceScheduled || ![adapter.tabBadgeScheduleKey isEqual:scheduleKey])))
-      |                                                                ^
-2 errors generated.

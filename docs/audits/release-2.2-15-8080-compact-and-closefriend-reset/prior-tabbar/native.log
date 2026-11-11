@@ -1,3 +1,0 @@
-2026-11-05 22:07:28.889 native[15237:52304544] tabbar click effect: 39 checks passed
-2026-11-05 22:07:28.928 native[15237:52304544] 8.0.80 native tabbar: wrappers, layout, selection, badge, hit targets, snapshot, restoration PASS
-2026-11-05 22:07:28.928 native[15237:52304544] tabbar preferences/native lifecycle: PASS

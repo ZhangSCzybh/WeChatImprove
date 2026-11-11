@@ -1,3 +1,0 @@
-FAIL line 352: missing-auth quick reset succeeds after final real Manager refresh
-FAIL line 352: missing-auth final reset revokes page and leaves clean setup state
-Quick reset: 209 checks, 2 failures

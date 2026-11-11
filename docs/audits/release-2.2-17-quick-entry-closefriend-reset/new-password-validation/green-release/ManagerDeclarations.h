@@ -1,7 +1,0 @@
-- (BOOL)validateToken:(NSDictionary *)token;
-- (void)passwordPrompt:(UIViewController *)presenter token:(NSDictionary *)token setup:(BOOL)setup completion:(void (^)(BOOL))completion;
-- (void)authenticateFrom:(UIViewController *)presenter completion:(void (^)(BOOL))completion;
-- (BOOL)settingsEntryVisible;
-- (NSDictionary *)settingsEntryDiscoveryToken;
-- (BOOL)discoverSettingsEntryWithToken:(NSDictionary *)token;
-- (void)presentSettingsFrom:(UIViewController *)presenter;

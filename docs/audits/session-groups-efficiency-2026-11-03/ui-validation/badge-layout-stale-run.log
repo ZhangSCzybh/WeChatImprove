@@ -1,6 +1,0 @@
-{"checks":135,"failures":5,"stable_iterations":1000,"stable_visual_writes":0,"stable_text_measurements":0,"stable_synchronous_layouts":0}
-FAIL: badge reveal button frame
-FAIL: badge reveal title frame
-FAIL: badge reveal button frame
-FAIL: badge reveal button frame
-FAIL: badge reveal button frame

@@ -1,8 +1,0 @@
-{
-  "Controllers/CSGroupChatSettingsViewController.m": "a51de3efcb05d5805748ba8729cdcf762178cd82344f4aa0129ae5f0479b0cd7",
-  "Controllers/CSSettingsTableViewController.m": "f9848ca17c2bb9c325994040b434e5aff4e9fc2020aaabcf87f520e23974f03e",
-  "Controllers/CSSettingTableViewCell.m": "c0007fd984b278ce73f49d063c30ab8d93565c911be552ef8a853667f97b0e5e",
-  "Controllers/CSGroupChatTemplate.m": "73c7186acc8ce7d0f8eb70a5847b87fa0f2d4279b5d7f1aae9707ce27028bbc2",
-  "Controllers/CSGroupChatStore.m": "cc899a2cdd02b831e396a5f2033fc8c86a2e240cdfde8dceb97e8db8428c09ed",
-  "Controllers/CSGroupChatManager.m": "50c1070b092051c7c0ce448c61b16d180f7b1d7fe48223d5af04d0c0b3172906"
-}

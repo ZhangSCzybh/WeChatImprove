@@ -1,6 +1,0 @@
-baseline accepted=True FAIL line 99: provisional.tableView.contentOffset.y==0
-current accepted=True PASS: 5114 settings lifecycle checks (host UIKit double; no iOS runtime)
-negative-navigation accepted=True FAIL line 48: !decoded.isViewLoaded && decoded.edgesForExtendedLayout==UIRectEdgeNone
-negative-bottom-addition accepted=True FAIL line 39: Equal(table.contentInset.bottom,12+safeBottom)
-negative-return-scroll accepted=True FAIL line 67: Equal(table.contentOffset.y,retainedOffset.y)
-PASS: iOS SDK compilation, route inheritance coverage and host lifecycle regression.

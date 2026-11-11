@@ -1,7 +1,0 @@
-Selection equivalence: 32 source/fold/privacy/duplicate/capability cases, 192 group transitions; no native unread getter reads for selection.
-Coordinator selection preset_1: 0 native unread getter reads
-Coordinator selection preset_2: 0 native unread getter reads
-Coordinator selection preset_0: 0 native unread getter reads
-Coordinator selection preset_1: 0 native unread getter reads
-Coordinator selection preset_0: 0 native unread getter reads
-Native model/coordinator/adapter/scheduling: 3382 behavior checks passed

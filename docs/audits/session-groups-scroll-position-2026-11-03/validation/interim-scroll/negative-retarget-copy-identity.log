@@ -1,8 +1,0 @@
-deleted target mode=0 selected=preset_0 pref=preset_0 pending={
-    account = "validation-scroll-account";
-    epoch = 1;
-    height = 600;
-    tab = "preset_1";
-    targetTab = "preset_0";
-} dirty=0
-FAIL /Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/session-groups-scroll-position-2026-11-03/validation/ScrollPositionFixture.h:265: [a.publishedTabID isEqual:@"preset_0"] && !a.switchViewport

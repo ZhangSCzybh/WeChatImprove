@@ -1,8 +1,0 @@
-{
-  "docs/audits/release-2.2-18-settings-return-header-gap/REGRESSION-GATE.json": "550935d9603fc4472ead2c638c69b48f16e96cd38d9a875ce3357d41b8ed4d57",
-  "docs/audits/release-2.2-18-settings-return-header-gap/REGRESSION-GATE.md": "f623075c4d29dfba74d0c26d222a48ee40ae4a675beed007554deae869f1b2ad",
-  "docs/audits/release-2.2-18-settings-return-header-gap/WAIVER.md": "fac9e1374e0b0eb9ac153ceb99d36fa531f7659bbf743a774ff864cda6646ace",
-  "docs/audits/release-2.2-18-settings-return-header-gap/WAIVER-CONTINUATION.md": "2925c6b589823319256d7d388c04976e568e54ade52c614c5ad0c47e17ef8158",
-  "docs/audits/release-2.2-18-settings-return-header-gap/CORE-REGRESSIONS.json": "f2431fadbd7b536e0779793b8b89687031f55b731db57a0acc12ff5d47d6da9e",
-  "docs/audits/release-2.2-18-settings-return-header-gap/FINAL-RELEASE-STATUS.json": "ce783ad20af38722c9660899cef2e7684d33a95e9385445cf5bb0ebc13e3be43"
-}

@@ -1,5 +1,0 @@
-Scope vs frozen 2.2-17: 5 files, +15 / -8 lines.
-Historical packages: 199/199; main .theos: 1237/1237.
-Original fixtures: copied_unmodified_test_inputs_and_runners 323/323
-Scope/protection: PASS
-Build/release status is separate; delivery present=True

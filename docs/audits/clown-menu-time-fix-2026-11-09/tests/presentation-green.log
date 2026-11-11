@@ -1,3 +1,0 @@
-Command: bash Tests/verify-clown-presentation.sh
-Exit code: 0
-Clown production presentation passed 319 checks (real Mac Catalyst UIKit, isolated defaults).

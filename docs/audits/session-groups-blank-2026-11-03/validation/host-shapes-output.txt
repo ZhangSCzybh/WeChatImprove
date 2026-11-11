@@ -1,5 +1,0 @@
-ABI-accurate ivar-only raw source and unsigned wrapper: accepted
-nil empty top partition: boundary=1 published_normal_count=0 native_normal_count=1
-nil empty normal partition: boundary=1 published_top_count=0 native_top_count=1
-unavailable raw source with ready main arrays: boundary=1 published_normal_count=0 native_normal_count=1
-Host-shape probe: 2 assertions passed; remaining lines are observations

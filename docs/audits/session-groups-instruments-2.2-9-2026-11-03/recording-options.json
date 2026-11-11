@@ -1,8 +1,0 @@
-{
-  "os_signpost": {
-    "dynamicTracingEnabledSubsystems": [
-      "com.wechatimprove.performance"
-    ],
-    "recordAllProcessesInSingleProcessMode": false
-  }
-}

@@ -1,5 +1,0 @@
-FAIL line 358: cancelled first-step callback cannot revive confirmation in same visit
-FAIL line 360: cancelled destructive callback cannot consume a newer proof in same visit
-FAIL line 358: cancelled first-step callback cannot revive confirmation in same visit
-FAIL line 360: cancelled destructive callback cannot consume a newer proof in same visit
-Quick reset: 223 checks, 4 failures

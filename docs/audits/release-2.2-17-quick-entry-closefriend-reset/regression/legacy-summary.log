@@ -1,8 +1,0 @@
-message-merge 0 PASS: 235148 message merge/navigation checks
-PASS: 17566 native adapter/navigation lifecycle checks (UIKit double)
-bubble-style 0 Bubble policy/renderer/ownership: 36979 checks passed
-Bubble real-adapter lifecycle: 2555 checks passed
-merge-bubble-integration 0 PASS: 2880 seam combinations, four media types, late metadata/theme/fallback; 744926 checks; no post-display shrink, no no-op row transactions, bounded template scans
-message-time 0 PASS: 142 message-time production hook lifecycle checks (UIKit double)
-message-gesture 0 PASS: 369 production gesture/lifecycle checks (UIKit/facade doubles, no native sends)
-attachment-layout 0 Attachment layout: 10610 checks passed; 3 scenes, 7 sort/hide variants, 4 column counts, 3 widths, unknown indexes, native side effects and disabled native return. Stable 1000 callbacks: 0 additional preference reads; each missing/empty order: 1 initialization + 1 synchronize. Native layouts=253, preference reads <=9 per enabled scene/layout; custom and defaults notifications invalidate snapshots.

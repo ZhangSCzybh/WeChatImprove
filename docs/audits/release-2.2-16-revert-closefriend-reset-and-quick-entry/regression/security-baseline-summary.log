@@ -1,5 +1,0 @@
-close-friend-alerts pre_existing_fixture_compile_incompatibility current=1 baseline=1 errors=7
-close-friend-entry requires_review current=1 baseline=0 errors=0
-close-friend-recovery pre_existing_fixture_compile_incompatibility current=1 baseline=1 errors=7
-close-friend-session pre_existing_fixture_compile_incompatibility current=1 baseline=1 errors=20
-close-friend-unread-panel pre_existing_fixture_compile_incompatibility current=1 baseline=1 errors=3

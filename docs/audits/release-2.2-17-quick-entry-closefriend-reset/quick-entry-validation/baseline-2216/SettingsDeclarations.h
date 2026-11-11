@@ -1,7 +1,0 @@
-- (BOOL)authorized;
-- (NSDictionary *)settingsProfile;
-- (void)invalidateQuickEntry;
-- (void)viewWillDisappear:(BOOL)animated;
-- (BOOL)settingsTokenIsCurrent:(NSDictionary *)token;
-- (void)willMoveToParentViewController:(UIViewController *)parent;
-- (void)save:(NSDictionary *)profile;

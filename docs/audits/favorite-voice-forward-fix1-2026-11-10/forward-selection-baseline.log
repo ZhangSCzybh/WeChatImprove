@@ -1,1 +1,0 @@
-FAIL line 112: NativeCalls(picker)==1 && picker.callbackCalls==1 && picker.cancelCalls==0

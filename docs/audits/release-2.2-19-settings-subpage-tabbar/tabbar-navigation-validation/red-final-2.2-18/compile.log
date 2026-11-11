@@ -1,7 +1,0 @@
-/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/release-2.2-19-settings-subpage-tabbar/tabbar-navigation-validation/red-final-2.2-18/NavigationTests.m:76:218: error: 'new' is deprecated: first deprecated in macOS 10.14 - Use -initRequiringSecureCoding: instead [-Werror,-Wdeprecated-declarations]
-   76 |             UIViewController *vc=initializer==1 && [cls isSubclassOfClass:UITableViewController.class]?[[cls alloc]initWithStyle:UITableViewStyleInsetGrouped]:initializer==2?[[cls alloc]initWithCoder:[NSKeyedArchiver new]]:[cls new];
-      |                                                                                                                                                                                                                          ^
-/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.2.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSKeyedArchiver.h:57:1: note: 'init' has been explicitly marked deprecated here
-   57 | - (instancetype)init API_DEPRECATED("Use -initRequiringSecureCoding: instead", macosx(10.12,10.14), ios(10.0,12.0), watchos(3.0,5.0), tvos(10.0,12.0));
-      | ^
-1 error generated.
